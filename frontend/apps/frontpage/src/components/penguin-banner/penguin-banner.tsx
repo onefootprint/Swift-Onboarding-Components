@@ -73,6 +73,8 @@ const StyledContainer = styled(Container)`
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[11]} 0 ${theme.spacing[12]} 0;
+      align-items: center;
+      justify-content: center;
     `}
   `}
 `;

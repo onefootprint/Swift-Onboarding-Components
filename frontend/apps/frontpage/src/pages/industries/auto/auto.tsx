@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import SEO from '../../../components/seo';
-import PenguinBanner from './sections/banner';
+import Banner from '../components/banner';
 import Experience from './sections/experience';
 import FeaturedCards from './sections/featured-cards';
 import Hero from './sections/hero';
@@ -16,7 +16,13 @@ const RealEstate = () => {
   });
   return (
     <>
-      <SEO title={t('html-title')} slug="/industries/auto" />
+      <SEO
+        title={t('html-title')}
+        slug="/industries/auto"
+        og={{
+          image: '/og-img-auto.png',
+        }}
+      />
       <Hero
         title={t('hero.title')}
         subtitle={t('hero.subtitle')}
@@ -27,7 +33,11 @@ const RealEstate = () => {
       <Solutions />
       <QuoteSection />
       <Experience />
-      <PenguinBanner />
+      <Banner
+        title={t('banner.title')}
+        primaryButton={t('banner.primary-button')}
+        secondaryButton={t('banner.secondary-button')}
+      />
     </>
   );
 };

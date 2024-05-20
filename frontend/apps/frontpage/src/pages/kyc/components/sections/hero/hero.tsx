@@ -36,7 +36,7 @@ const Hero = () => {
           {t('subtitle')}
         </Text>
       </TitleContainer>
-      <Stack gap={4}>
+      <Stack gap={4} align="center">
         <Button
           variant="primary"
           size="large"

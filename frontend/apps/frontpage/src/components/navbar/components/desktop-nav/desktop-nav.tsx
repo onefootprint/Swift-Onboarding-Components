@@ -1,4 +1,3 @@
-import { primitives } from '@onefootprint/design-tokens';
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Button, createFontStyles, media } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
@@ -15,46 +14,30 @@ import LogoCopyAssets from './components/logo-copy-assets';
 
 type DesktopNavProps = {
   entries: NavEntry[];
-  $isOnDarkSection?: boolean;
 };
 
-const DesktopNav = ({ entries, $isOnDarkSection }: DesktopNavProps) => {
+const DesktopNav = ({ entries }: DesktopNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
 
   return (
     <Container>
+      <LogoCopyAssets />
       <MainNav>
-        <LogoCopyAssets $isOnDarkSection={$isOnDarkSection} />
         {entries.map(entry => {
           if (isNavLink(entry)) {
-            return (
-              <DesktopNavLink
-                link={entry}
-                key={entry.text}
-                $isOnDarkSection={$isOnDarkSection}
-              />
-            );
+            return <DesktopNavLink link={entry} key={entry.text} />;
           }
           if (isNavMenu(entry)) {
-            return (
-              <DesktopNavMenu
-                menu={entry}
-                key={entry.text}
-                $isOnDarkSection={$isOnDarkSection}
-              />
-            );
+            return <DesktopNavMenu menu={entry} key={entry.text} />;
           }
           return null;
         })}
       </MainNav>
       <SecondaryNav>
-        <Login
-          href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}
-          $isOnDarkSection={$isOnDarkSection}
-        >
+        <Login href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>
           {t('login')}
         </Login>
-        <StyledButton
+        <Button
           onClick={() =>
             window.open(
               `${DASHBOARD_BASE_URL}/authentication/sign-up`,
@@ -62,30 +45,13 @@ const DesktopNav = ({ entries, $isOnDarkSection }: DesktopNavProps) => {
             )
           }
           size="compact"
-          $isOnDarkSection={$isOnDarkSection}
         >
           {t('sign-up')}
-        </StyledButton>
+        </Button>
       </SecondaryNav>
     </Container>
   );
 };
-
-const StyledButton = styled(Button)<{ $isOnDarkSection?: boolean }>`
-  ${({ $isOnDarkSection }) =>
-    $isOnDarkSection &&
-    css`
-      &&& {
-        background-color: ${primitives.Gray800}; /* Dark theme background */
-        color: ${primitives.Gray0}; /* Text color for dark theme */
-        border-color: ${primitives.Gray700}; /* Border color for dark theme */
-
-        &:hover {
-          background-color: ${primitives.Gray700}; /* Darker background on hover */
-        }
-      }
-    `}
-`;
 
 const Container = styled(NavigationMenu.Root)`
   ${({ theme }) => css`
@@ -96,7 +62,6 @@ const Container = styled(NavigationMenu.Root)`
       align-items: center;
       gap: ${theme.spacing[7]};
       justify-content: space-between;
-      
       };
     `}
   `}
@@ -126,13 +91,17 @@ const SecondaryNav = styled(NavigationMenu.List)`
   `}
 `;
 
-const Login = styled(Link)<{ $isOnDarkSection?: boolean }>`
-  ${({ theme, $isOnDarkSection }) => css`
+const Login = styled(Link)`
+  ${({ theme }) => css`
     ${createFontStyles('label-3')};
-    color: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+    color: ${theme.color.primary};
     text-decoration: none;
     transition: color 0.2s ease-in-out;
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
+
+    &:hover {
+      opacity: 0.7;
+    }
   `}
 `;
 

@@ -1,10 +1,13 @@
 import { Box, media, Stack, Text } from '@onefootprint/ui';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+import { useTimeout } from 'usehooks-ts';
+
+const LOOP_DELAY = 10000;
 
 export type SolutionKey = {
   key: string;
@@ -25,7 +28,10 @@ const containerAppearVariants = {
 
 const progressBarVariants = {
   initial: { width: 0 },
-  animate: { width: '100%', transition: { duration: 5, ease: 'linear' } },
+  animate: {
+    width: '100%',
+    transition: { duration: LOOP_DELAY / 1000, ease: 'linear' },
+  },
 };
 
 const imageVariants = {
@@ -38,28 +44,22 @@ const SolutionsViewer = ({ keys }: { keys: SolutionKey[] }) => {
     keyPrefix: 'pages.industries',
   });
   const [selectedKey, setSelectedKey] = useState<string | null>(keys[0].key);
-  const [progress, setProgress] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { margin: '0px 100px -50px 0px' });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress(prevProgress => {
-        if (prevProgress < 100) {
-          return prevProgress + 20;
-        }
-        return 0;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [selectedKey]);
+  const getNextKey = () => {
+    const currentIndex = keys.findIndex(k => k.key === selectedKey);
+    const nextIndex = (currentIndex + 1) % keys.length;
+    return keys[nextIndex].key;
+  };
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const currentIndex = keys.findIndex(k => k.key === selectedKey);
-      const nextIndex = (currentIndex + 1) % keys.length;
-      setSelectedKey(keys[nextIndex].key);
-    }, 5000);
-    return () => clearTimeout(timeout);
-  }, [keys, selectedKey]);
+  useTimeout(() => {
+    setSelectedKey(getNextKey());
+  }, LOOP_DELAY);
+
+  const handleAnimationComplete = () => {
+    setSelectedKey(getNextKey());
+  };
 
   const backgroundPath = `${
     keys.find(k => k.key === selectedKey)?.imgPath || ''
@@ -69,7 +69,7 @@ const SolutionsViewer = ({ keys }: { keys: SolutionKey[] }) => {
   }/front.svg`;
 
   return (
-    <ViewerContainer>
+    <ViewerContainer ref={containerRef}>
       <ImageContainer
         src={backgroundPath}
         variants={containerAppearVariants}
@@ -95,10 +95,9 @@ const SolutionsViewer = ({ keys }: { keys: SolutionKey[] }) => {
           <Bar
             key={selectedKey}
             initial="initial"
-            animate="animate"
+            animate={isInView ? 'animate' : 'initial'}
             variants={progressBarVariants}
-            onAnimationComplete={() => setProgress(100)}
-            $width={`${progress}%`}
+            onAnimationComplete={handleAnimationComplete}
           />
         </AnimatePresence>
       </ProgressBar>
@@ -109,7 +108,6 @@ const SolutionsViewer = ({ keys }: { keys: SolutionKey[] }) => {
             data-selected={selectedKey === key}
             onClick={() => {
               setSelectedKey(key);
-              setProgress(0);
             }}
           >
             <Text variant="label-1" tag="h3">
@@ -136,12 +134,11 @@ const ViewerContainer = styled(Box)`
   `}
 `;
 
-const Bar = styled(motion.div)<{ $width: string }>`
-  ${({ theme, $width }) => css`
+const Bar = styled(motion.div)`
+  ${({ theme }) => css`
     height: 100%;
     background-color: ${theme.backgroundColor.accent};
     position: relative;
-    width: ${$width};
   `}
 `;
 

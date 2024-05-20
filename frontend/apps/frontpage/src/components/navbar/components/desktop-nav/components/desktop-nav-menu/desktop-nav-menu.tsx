@@ -1,4 +1,3 @@
-import { primitives } from '@onefootprint/design-tokens';
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import { createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
@@ -10,27 +9,22 @@ import DesktopNavMenuItem from '../desktop-nav-menu-item';
 
 type DesktopNavbarMenuProps = {
   menu: NavMenu;
-  $isOnDarkSection?: boolean;
 };
 
-const DesktopNavMenu = ({ menu, $isOnDarkSection }: DesktopNavbarMenuProps) => {
+const DesktopNavMenu = ({ menu }: DesktopNavbarMenuProps) => {
   const items = menu.items.map(item => (
-    <DesktopNavMenuItem
-      item={item}
-      key={item.text}
-      $isOnDarkSection={$isOnDarkSection}
-    />
+    <DesktopNavMenuItem item={item} key={item.text} />
   ));
 
   return (
     <ItemContainer>
       <StyledTrigger>
-        <Title $isOnDarkSection={$isOnDarkSection}>{menu.text}</Title>
-        <IconContainer $isOnDarkSection={$isOnDarkSection}>
+        <Title>{menu.text}</Title>
+        <IconContainer>
           <IcoChevronDown16 />
         </IconContainer>
       </StyledTrigger>
-      <Content $isOnDarkSection={$isOnDarkSection}>{items}</Content>
+      <Content>{items}</Content>
     </ItemContainer>
   );
 };
@@ -40,10 +34,10 @@ const ItemContainer = styled(NavigationMenu.Item)`
   display: flex;
 `;
 
-const Title = styled.p<{ $isOnDarkSection?: boolean }>`
-  ${({ theme, $isOnDarkSection }) => css`
+const Title = styled.p`
+  ${({ theme }) => css`
     ${createFontStyles('label-3')}
-    color: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+    color: ${theme.color.primary};
     text-decoration: none;
     display: flex;
   `}
@@ -69,8 +63,8 @@ const StyledTrigger = styled(NavigationMenu.Trigger)`
   `}
 `;
 
-const IconContainer = styled.div<{ $isOnDarkSection?: boolean }>`
-  ${({ theme, $isOnDarkSection }) => css`
+const IconContainer = styled.div`
+  ${({ theme }) => css`
     min-width: 16px;
     height: 20px;
     display: flex;
@@ -79,19 +73,11 @@ const IconContainer = styled.div<{ $isOnDarkSection?: boolean }>`
     svg {
       margin-left: ${theme.spacing[2]};
     }
-
-    && {
-      svg {
-        path {
-          fill: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
-        }
-      }
-    }
   `}
 `;
 
-const Content = styled(NavigationMenu.Content)<{ $isOnDarkSection?: boolean }>`
-  ${({ theme, $isOnDarkSection }) => css`
+const Content = styled(NavigationMenu.Content)`
+  ${({ theme }) => css`
     position: absolute;
     left: 0;
     top: 100%;
@@ -100,12 +86,9 @@ const Content = styled(NavigationMenu.Content)<{ $isOnDarkSection?: boolean }>`
     border-radius: ${theme.borderRadius.default};
     overflow: hidden;
     box-shadow: ${theme.elevation[2]};
-    background-color: ${$isOnDarkSection
-      ? primitives.Gray875
-      : theme.backgroundColor.primary};
+    background-color: ${theme.backgroundColor.primary};
     padding: ${theme.spacing[3]};
-    border: ${theme.borderWidth[1]} solid
-      ${$isOnDarkSection ? primitives.Gray700 : theme.borderColor.tertiary};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     z-index: 1;
 
     &[data-state='open'] {

@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 type HeroProps = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   illustration: string;
 };
 
@@ -18,14 +18,16 @@ const Hero = ({ title, subtitle, illustration }: HeroProps) => (
       <Text variant="display-2" maxWidth="770px" textAlign="center">
         {title}
       </Text>
-      <Text
-        variant="display-4"
-        color="secondary"
-        maxWidth="660px"
-        textAlign="center"
-      >
-        {subtitle}
-      </Text>
+      {subtitle && (
+        <Text
+          variant="display-4"
+          color="secondary"
+          maxWidth="660px"
+          textAlign="center"
+        >
+          {subtitle}
+        </Text>
+      )}
     </TextContainer>
   </HeroContainer>
 );

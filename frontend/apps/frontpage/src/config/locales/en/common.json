@@ -3,9 +3,8 @@
     "errors": {}
   },
   "components": {
-    "case-study-banner": {
-      "text": "Flexcar and Footprint collaboration achieved a 96% document verification rate and enhanced fraud detection.",
-      "cta": "Read case study"
+    "message-banner": {
+      "cta": "Read more"
     },
     "developer-experience": {
       "title": "Developer experience like no other",
@@ -19,7 +18,7 @@
     },
     "penguin-banner": {
       "home": {
-        "title": "Onboard more customers and enjoy peace of mind. Today.",
+        "title": "Onboard more customers and enjoy peace of mind.",
         "primary": "Get started",
         "secondary": "Book a demo",
         "alt-img": "Penguin fishing in the north pole"
@@ -126,6 +125,31 @@
             }
           }
         },
+        "industries": {
+          "text": "Industries",
+          "links": {
+            "real-estate": {
+              "text": "Real estate",
+              "subtext": "Rental applications, property management, and more",
+              "href": "/industries/real-estate"
+            },
+            "auto": {
+              "text": "Auto",
+              "subtext": "Car dealership, car financing, and more",
+              "href": "/industries/auto"
+            },
+            "fintech": {
+              "text": "Fintech",
+              "subtext": "Financial services, banking, and more",
+              "href": "/industries/fintech"
+            },
+            "baas": {
+              "text": "Financial Institutions",
+              "subtext": "Banking, BaaS, and more",
+              "href": "/industries/financial-institutions"
+            }
+          }
+        },
         "case-studies": {
           "text": "Case studies",
           "href": "/case-studies"
@@ -152,25 +176,6 @@
               "subtext": "Updates we share with our investors"
             }
           }
-        },
-        "company": {
-          "text": "Company",
-          "links": {
-            "about": {
-              "text": "About us",
-              "href": "/company",
-              "subtext": "Learn more about our company & team"
-            },
-            "join-us": {
-              "text": "Join us",
-              "href": "https://jobs.ashbyhq.com/footprint",
-              "subtext": "Help us bring back trust to the Internet"
-            }
-          }
-        },
-        "media": {
-          "text": "Media",
-          "href": "/media"
         },
         "changelog": {
           "text": "Changelog",
@@ -204,14 +209,41 @@
         "text": "Linkedin"
       },
       "product": {
-        "title": "Product",
-        "compare": {
-          "text": "Compare",
-          "href": "/compare"
+        "title": "Platform",
+        "kyc": {
+          "text": "KYC",
+          "href": "/kyc"
         },
-        "pricing": {
-          "text": "Pricing",
-          "href": "/pricing"
+        "kyb": {
+          "text": "KYB",
+          "href": "/kyb"
+        },
+        "vaulting": {
+          "text": "Vaulting",
+          "href": "/vaulting"
+        },
+        "auth": {
+          "text": "Auth",
+          "href": "/auth"
+        }
+      },
+      "industries": {
+        "title": "Industries",
+        "real-estate": {
+          "text": "Real estate",
+          "href": "/industries/real-estate"
+        },
+        "auto": {
+          "text": "Auto",
+          "href": "/industries/auto"
+        },
+        "fintech": {
+          "text": "Fintech",
+          "href": "/industries/fintech"
+        },
+        "baas": {
+          "text": "Financial Institutions",
+          "href": "/industries/financial-institutions"
         }
       },
       "company": {
@@ -219,6 +251,10 @@
         "about": {
           "text": "About us",
           "href": "/company"
+        },
+        "careers": {
+          "text": "Careers",
+          "href": "https://jobs.ashbyhq.com/footprint"
         },
         "blog": {
           "text": "Blog",
@@ -279,10 +315,10 @@
         "read-case-study": "Read case study"
       },
       "baas": {
-        "html-title": "Footprint - Industries: Banks & BaaS",
+        "html-title": "Footprint - Industries: Banks & Financial Institutions",
         "hero": {
-          "title": "Solve KYC, AML, and Compliance with one tool",
-          "subtitle": "Footprint has been built to help Banks, BaaS, and Financial Institutions holistically solve challenges facing the identity lifecycle of their customers",
+          "title": "Solve KYC, AML, and compliance with one tool",
+          "subtitle": "Footprint is built to help Banks, BaaS, and Financial Institutions holistically solve challenges facing the identity lifecycle of their customers",
           "get-started": "Get started",
           "schedule-demo": "Schedule a call"
         },
@@ -292,52 +328,52 @@
         "featured": {
           "verify-identities": {
             "title": "Verify identities",
-            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+            "subtitle": "With extensive database connectivity and state of the art machine learning, Footprint has over 96% IDV accuracy."
           },
           "verify-credit": {
             "title": "Verify credit",
-            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+            "subtitle": "With one form and one dashboard, you can assess and verify PII and credit information."
           },
           "detect-fraud": {
-            "title": "Detect fraudulent actors",
-            "subtitle": "Companies have used Footprint to flag thousands of fraudulent actors to PMs during application."
+            "title": "Detect fraud",
+            "subtitle": "Detect and decision on fraud signals like behavioral biometrics and device level insights at the time of identity verification."
           }
         },
         "problem": {
           "title": "We know your problems...",
           "rising-costs": {
-            "title": "Rising Costs due to bloating of tools + manual review",
-            "subtitle": "Forbes found that the average financial institution spends upwards of $115M on KYC, customer due diligence, and client onboarding. Companies in the US and Canada spend $61B a year on technology for Financial Crime Compliance, with close to 80% of companies seeing KYC-specific costs go up over the last year."
+            "title": "Rising costs of digital onboarding",
+            "subtitle": "FIs are spending millions of dollars on multiple tools to conduct KYC and prevent fraud."
           },
           "regulatory-scrutiny": {
-            "title": "Heightened Regulatory Scrutiny ",
-            "subtitle": "New regulations, such as the EU's Fifth Anti-Money Laundering Directive (5AMLD) and the Financial Action Task Force's (FATF) recommendations, have compelled banks to enhance their KYC procedures, including more robust customer due diligence, ongoing monitoring, and risk assessments. Additionally, the emergence of digital banking and fintech innovations has prompted regulators to address cybersecurity concerns and adapt regulations to encompass digital identities and transactions, adding further complexity to compliance efforts for banks."
+            "title": "Heightened regulatory scrutiny",
+            "subtitle": "With the rise of fintechs and evolving regulatory landscape, it has never been more important to have robust KYC and fraud prevention tactics."
           },
           "evolving-threat": {
-            "title": "Fraud as an evolving threat vector",
-            "subtitle": "The American Banker Association found that 36% of fraud impacting banks is occurring at account creation, while ever $1.00 of fraud is now costing banks north of $4.00 in associated costs. With the rise of GenerativeAI and consumer demand for more digital products, banks have ever more vectors they must monitor to prevent fraud."
+            "title": "The elusive nature of fraud detection",
+            "subtitle": "Online forms and chatrooms provide perpetrators with tools and strategies to take advantage of the evolving landscape."
           }
         },
         "solution": {
           "title": "...and we know how to help ✨",
           "unified-kyc-aml-monitoring": {
-            "title": "Unified KYC + AML Monitoring",
+            "title": "Unified KYC + AML monitoring",
             "subtitle": "Footprint equips teams with comprehensive tools for compliant identity verification across all CIP requirements, including driver’s licenses, passports, and utility bills, while providing ongoing AML and Adverse Media monitoring."
           },
           "dynamic-rules-engine-with-step-ups": {
-            "title": "Dynamic Rules Engine with Step-ups",
-            "subtitle": "Risk and fraud leaders can effortlessly modify the no-code Footprint rules engine and Playbook to adapt to evolving CIPs and onboarding requirements. Footprint automatically backtests all adjustments, demonstrating the potential impact of any rule changes."
+            "title": "Dynamic rules engine with step-ups",
+            "subtitle": "Risk and fraud leaders can effortlessly modify the on-code Footprint rules engine and Playbooks to adapt to evolving onboarding requirements. Our backtests automatically demonstrate the potential impact of any rule changes."
           },
           "built-in-compliance-dashboard": {
-            "title": "Built-in Compliance",
+            "title": "Built-in compliance",
             "subtitle": "Footprint’s audit log and advanced data permissioning makes it easy for compliance officers to get a 360-degree view of users from initial onboard to each successive log-in."
           },
           "security-to-prevent-breaches": {
-            "title": "Security to Prevent Breaches",
+            "title": "Security to prevent breaches",
             "subtitle": "Footprint is one of a handful of companies to leverage Nitro Enclaves, cutting—edge technology built by AWS to advanced far past an age of encryption at rest to protect consumer PII and prevent breaches."
           },
           "prevent-phishing-and-ato-compliance": {
-            "title": "Prevent Phishing + ATO Compliance",
+            "title": "Prevent phishing + ATO compliance",
             "subtitle": "Footprint binds a biometric (utilizing) passkeys to user PII as they create accounts. The result is that each time a user comes back to a banking application, they can cryptographically prove that it is the same user who created the account."
           }
         },
@@ -372,7 +408,7 @@
       "fintech": {
         "html-title": "Footprint - Industries: Fintech",
         "hero": {
-          "title": "Footprint is the only KYC tool built to make it easier for fintechs to work with their partner banks or broker-dealers.",
+          "title": "KYC designed to boost conversion and simplify your work with partner banks and broker-dealers",
           "subtitle": "Fintechs like Bloom, Composer and Coba use Footprint to seamlessly comply with their partner’s CIP requirements, even when navigating evolving landscapes.",
           "get-started": "Get started",
           "schedule-demo": "Schedule a call"
@@ -382,46 +418,46 @@
         },
         "featured": {
           "verify-identities": {
-            "title": "Verify identities",
-            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+            "title": "Conduct KYC",
+            "subtitle": "With extensive database connectivity and state of the art machine learning, Footprint has over 96% automatic KYC pass rate."
           },
           "verify-credit": {
-            "title": "Verify credit",
-            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+            "title": "Boost conversions",
+            "subtitle": "Use dynamic step-ups to satisfy evolving CIPs without users landing in manual review."
           },
           "detect-fraud": {
-            "title": "Detect fraudulent actors",
-            "subtitle": "Companies have used Footprint to flag thousands of fraudulent actors to PMs during application."
+            "title": "Vault data",
+            "subtitle": "Automatically vault PII and PCI data in our SOC II and PCI Level I compliant vault."
           }
         },
         "problem": {
           "title": "We know your problems...",
           "cips-are-complicated": {
             "title": "CIPs are complicated",
-            "subtitle": "Cips are designed to address a confusing maze of regulations, resulting in some complicated and unintuitive requirements. Fintechs are burdened with navigating these requirements in a way that does not affect conversion but satisfies all necessary regulations."
+            "subtitle": "Fintechs are burdened with navigating evolving CIP requirements without adding unnecessary friction."
           },
           "competitive-environment": {
             "title": "The competitive environment requires a frictionless onboarding experience",
-            "subtitle": "According to Statista the number of fintechs doubled from 2019 to 2021 and the landscape continues to get more competitive. In order to compete, fintechs must offer a seamless onboarding experience."
+            "subtitle": "ou managed to get a potential user to your application. You cannot lose them to unnecessary friction throughout onboarding."
           },
           "sensitive-information": {
-            "title": "Sharing sensitive information is challenging",
-            "subtitle": "Fintechs often default to whatever KYC program they can find that works with their partner bank or broker dealer. This alleviates the need to handle sending sensitive information directly to your partners, but often requires trade-offs with user experience."
+            "title": "Data security",
+            "subtitle": "Fintechs are expected to handle and share sensitive information with multiple third parties."
           }
         },
         "solution": {
           "title": "...and we know how to help ✨",
           "dynamically-satisfy-cip": {
-            "title": "Dynamically satisfy CIP requirements",
-            "subtitle": "KYC and onboarding does not need to be static. Often times partner banks and broker dealers will With Footprint’s rules engine, you can toggle friction up and down based on various risk signals. This lets you not only satisfy KYC requirement but be truly confident in who you are onboarding. All without sacrificing a smooth onboarding experience for the people you are confident are good actors"
+            "title": "Dynamic onboarding",
+            "subtitle": "Configure rules to dynamically request additional information needed to satisfy your CIP."
           },
           "case-management": {
-            "title": "Case management",
-            "subtitle": "Footprint notifies companies the moment users go into manual review, giving them the tools to quickly and thoroughly approve/reject a user or request more information without waiting on a partner."
+            "title": "Manual review",
+            "subtitle": "One dashboard with tools to quickly review your users."
           },
           "data-vault": {
-            "title": "Compliant data vault and vault proxy technology",
-            "subtitle": "Footprint is one of a handful of companies to leverage Nitro Enclaves, cutting—edge technology built by AWS to advanced far past an age of encryption at rest to protect consumer PII and prevent breaches. We are CPI Level I and SOC II complaint and give you the tools to share sensitive information with third parties without ever needing to handle that data yourself."
+            "title": "Data vault",
+            "subtitle": "Our data vaulting technology is unmatched allowing you to own, use and send sensitive information without if ever touching your servers."
           },
           "partner-with-broker": {
             "title": "Be a true partner to your bank or broker dealer",
@@ -437,16 +473,16 @@
         "experience": {
           "title": "We have the experience and the expertise",
           "accuracy": {
-            "title": "Over 96% Document Fraud Accuracy",
-            "subtitle": "Our advanced scanning technology ensures unparalleled precision in detecting document fraud, maintaining a high accuracy rate of over 96%"
+            "title": "Over 96% document fraud accuracy",
+            "subtitle": "Dynamic step-ups, world class doc scanning and a seamless flow boosts conversion and quickly approves your users."
           },
           "attempts": {
-            "title": "Stopped over 1,000 attempts to use non-live selfies in security checks",
-            "subtitle": "Footprint detected thousands of attempts to use screen captures instead of an actual selfie, and prevented close to 1,000 people who had non-live selfies."
+            "title": "Industry expertise",
+            "subtitle": "Whether you are an investment platform, a neo bank, or a credit card company, we have the expertise to guide you through best practices."
           },
           "flagged": {
-            "title": "Flagged over 1,000 mismatches between barcode and front data on licenses",
-            "subtitle": "As fraudsters can increasingly generate realistic images, ensuring it is a real upload has never been more salient. Even as bad actors create physical fake IDs, this is a great line of defense."
+            "title": "Over 1,000 fraudulent onboarding blocked",
+            "subtitle": "Machine learning and device level insights give us an unparalleled ability to spot and stop fraud, before it is a problem."
           }
         },
         "banner": {
@@ -460,29 +496,29 @@
         "html-title": "Footprint - Industries: Auto",
         "hero": {
           "title": "Streamline onboarding, verify licenses, and assess driving history in real-time",
-          "subtitle": "Footprint has been built to help auto companies conduct robust yet seamless identity verification to reduce fraud and simplify the rental or purchase process",
+          "subtitle": "Footprint is built to help auto companies conduct robust yet seamless identity verification to reduce fraud and simplify the rental or purchase process",
           "get-started": "Get started",
           "schedule-demo": "Schedule a call"
         },
         "featured": {
           "verify-identities": {
             "title": "Verify identities",
-            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+            "subtitle": "With extensive database connectivity and state of the art machine learning, Footprint has over 96% IDV accuracy."
           },
           "verify-credit": {
             "title": "Verify credit",
-            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+            "subtitle": "With one form and one dashboard, you can assess and verify PII and credit information."
           },
           "detect-fraud": {
-            "title": "Detect fraudulent actors",
-            "subtitle": "Companies have used Footprint to flag thousands of fraudulent actors to PMs during application."
+            "title": "Detect fraud",
+            "subtitle": "Detect and decision on fraud signals like behavioral biometrics and device level insights at the time of identity verification."
           }
         },
         "problem": {
           "title": "We know your problems...",
           "raising-fraud": {
-            "title": "The rising threat of identity fraud in the auto space",
-            "subtitle": "People expect renting or buying a car should be as easy as ordering groceries. Companies are forced to remove friction in the process in order to compete. This has led to a surge in fraud across auto lending and auto rental. According to findings by the Aite Group, synthetic identity fraud leads to around $50 billion in losses."
+            "title": "The rising threat of identity fraud",
+            "subtitle": "Your users expect a frictionless onboarding process. This elimination of friction has led to a surge in fraud with over $50 billion in losses."
           },
           "inadequate-screening": {
             "title": "The high stakes of inadequate screening",
@@ -490,22 +526,22 @@
           },
           "fraud-detection": {
             "title": "The elusive nature of effective fraud detection",
-            "subtitle": "Identifying fraudulent activities throughout onboarding poses a considerable challenge. The interconnected digital world provides perpetrators with an arsenal of tools to forge documents, manipulate records, and obscure their true identities."
+            "subtitle": "Online forms and chatrooms provide perpetrators with tools and strategies to take advantage of the evolving landscape."
           }
         },
         "solution": {
           "title": "...and we know how to help ✨",
           "unified-risk-engine": {
             "title": "Unified risk engine",
-            "subtitle": "Footprint can verify user KYC details, scan Driver’s Licenses, and pull MVR + Driver Records"
+            "subtitle": "Verify user information, scan Driver’s Licenses, pull MVR + Driver Records and decision on it all in realtime."
           },
           "online-in-person": {
             "title": "Online + in-person",
-            "subtitle": "Utilize the Footprint passkey to verify user location. For example, companies can prove that the same person who signed up online to rent a car is the one picking the car up, and they are at the proper location."
+            "subtitle": "Use passkeys for location information, linked to a verified identity."
           },
           "automate-extra-document-collection": {
             "title": "Automate extra document collection",
-            "subtitle": "Companies can use the Footprint dashboard to request additional documentation from applicants, increasing their confidence. Footprint will automatically reach out, collect the information, and return new, verified results to our customers."
+            "subtitle": "eamlessly and securely request additional documentation from applicants."
           }
         },
         "quote": {
@@ -518,15 +554,15 @@
           "title": "We have the experience and the expertise",
           "accuracy": {
             "title": "Over 96% Document Fraud Accuracy",
-            "subtitle": "Our advanced scanning technology ensures unparalleled precision in detecting document fraud, maintaining a high accuracy rate of over 96%"
+            "subtitle": "Our advanced doc scanning technology and machine learning models ensures unparralled precision in detecting document fraud."
           },
           "attempts": {
             "title": "Stopped over 1,000 attempts to use non-live selfies in security checks",
-            "subtitle": "Footprint detected thousands of attempts to use screen captures instead of an actual selfie, and prevented close to 1,000 people who had non-live selfies."
+            "subtitle": "With the use of App Clips, Footprint has the unique ability to detect and block non-live selfies."
           },
           "flagged": {
             "title": "Flagged over 1,000 mismatches between barcode and front data on licenses",
-            "subtitle": "As fraudsters can increasingly generate realistic images, ensuring it is a real upload has never been more salient. Even as bad actors create physical fake IDs, this is a great line of defense."
+            "subtitle": "The rise of AI generated fake identities and documents is no match for Footprint’s fraud detection. With machine learning, OCR technology and our advance scanning, you can detect and block any discrepancies."
           }
         },
         "banner": {
@@ -540,29 +576,29 @@
         "html-title": "Footprint - Industries: Real Estate",
         "hero": {
           "title": "Reduce Fraud, Increase Trust in Rental Applicants by verifying identity + credit in one place",
-          "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs",
+          "subtitle": "Footprint is built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs",
           "get-started": "Get started",
           "schedule-demo": "Schedule a call"
         },
         "featured": {
           "verify-identities": {
             "title": "Verify identities",
-            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+            "subtitle": "With extensive database connectivity and state of the art machine learning, Footprint has over 96% IDV accuracy."
           },
           "verify-credit": {
             "title": "Verify credit",
-            "subtitle": "Footprint has been built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs."
+            "subtitle": "With one form and one dashboard, you can assess and verify PII and credit information."
           },
           "detect-fraud": {
-            "title": "Detect fraudulent actors",
-            "subtitle": "Companies have used Footprint to flag thousands of fraudulent actors to PMs during application."
+            "title": "Detect fraud",
+            "subtitle": "Detect and decision on fraud signals like behavioral biometrics and device level insights at the time of identity verification."
           }
         },
         "problem": {
           "title": "We know your problems...",
           "identity-fraud": {
             "title": "The Rising Threat of Identity Fraud in Rental Applications",
-            "subtitle": "As the rental market becomes increasingly competitive, the potential for identity fraud looms large. Evictions are up 35% in the last 10 years, primarily due to fraud that went unfound in the tenant screening process."
+            "subtitle": "Evictions are up 35% in the last 10 years, primarily due to undetected fraud throughout the screening process."
           },
           "tenant-screening": {
             "title": "The High Stakes of Inadequate Tenant Screening",
@@ -570,7 +606,7 @@
           },
           "fraud-detection": {
             "title": "The Elusive Nature of Effective Fraud Detection:",
-            "subtitle": "Identifying fraudulent activities within rental applications poses a considerable challenge. The interconnected digital world provides perpetrators with an arsenal of tools to forge documents, manipulate records, and obscure their true identities. "
+            "subtitle": "Online forms and chatrooms provide perpetrators with tools and strategies to take advantage of the evolving landscape."
           }
         },
         "solution": {
@@ -585,15 +621,15 @@
           },
           "case-management": {
             "title": "Robust Case Management",
-            "subtitle": "Footprint tools such as block lists and labeling allow you to mark tenants in your network, giving your property managers increased insight into tenant behavior at previous residences."
+            "subtitle": "Tools like block lists and labeling give you insight and flexibility throughout the process."
           },
           "catch-fraud": {
             "title": "Catch Fraud",
             "subtitle": "Most PMs who have used Footprint report that increased fraudulent indicators have proven instrumental in catching fraudulent applications. Footprint’s case management can let."
           },
           "extra-doc-collection": {
-            "title": "Automate Extra Document Collection",
-            "subtitle": "Property Managers can request additional documentation via the Footprint dashboard, enhancing their confidence. Footprint automatically contacts applicants, collects the required information, and delivers verified results back to PMs."
+            "title": "Automate Document Collection",
+            "subtitle": "Seamlessly and securely request additional documentation from applicants."
           }
         },
         "quote": {
@@ -619,149 +655,273 @@
         },
         "banner": {
           "alt-img": "A penguin fishing in the north pole",
-          "title": "Start boosting your conversions and onboarding experience now",
+          "title": "Enhance your screening experience today",
           "primary-button": "Sign up for free",
           "secondary-button": "Book a call"
         }
       }
     },
     "home": {
-      "html-title": "Footprint - One tool to unify onboarding, identity verification, and data security",
+      "html-title": "Footprint - Home",
+      "title": "One tool to unify onboarding, identity verification, and data security",
       "hero": {
-        "title": "Onboarding that solves identity, security, fraud, and auth",
-        "subtitle": "Embedding KYC, KYB, and PII + Card Vaulting with 5 lines of code, we empower companies to own their onboarding experience and customer data with one-click.",
-        "desktop-img-alt": "desktop mockup",
-        "mobile-img-alt": "mobile mockup",
-        "primary-button": "Sign up for free",
-        "secondary-button": "Book a call",
-        "tertiary-button": "Watch demo",
-        "demo-video-close": "Close"
+        "title": "The single onboarding tool your company needs",
+        "subtitle": "Seamlessly onboard customers, block fraud, and ensure compliance.",
+        "get-started": "Get started",
+        "book-a-call": "Book a call"
       },
-      "customers-logos": {
-        "title": "World-class teams are onboarding more customers and trusting Footprint with their customer data"
+      "logos-section": {
+        "title": "World-class teams are onboarding more users and trusting Footprint with their data"
       },
-      "new-approach": {
-        "title": "A new approach to unify verification for onboarding",
-        "subtitle": "A security-first approach utilizing novel biometrics to remove the toggle between fraud and friction.",
-        "kyc": {
-          "title": "Know Your Customer (KYC)",
-          "subtitle": "Verify real people, not typed information.",
-          "alt-image": "A phone with an authorization screen and face ID validation",
-          "cta": "Learn more",
-          "href": "/kyc"
-        },
-        "kyb": {
-          "title": "Know Your Business (KYB)",
-          "subtitle": "Verify businesses, and the people behind the business.",
-          "alt-image": "A phone with details about a business",
-          "cta": "Learn more",
-          "href": "/kyb"
+      "customize": {
+        "title": "Customize it all",
+        "subtitle": "Use our Onboarding Components to build a fully embeddable and customizable onboarding experience.",
+        "components": {
+          "button-text-color": "Button text color",
+          "border-radius": "Button border radius",
+          "button-background-color": "Button background color",
+          "screen": {
+            "title": "Basic data",
+            "subtitle": "Fill this information to get started.",
+            "first-name": "First name",
+            "last-name": "Last name",
+            "date-of-birth": "Date of birth",
+            "cta": "Continue"
+          },
+          "out-of-the-box": {
+            "first-part": "or integrate our",
+            "cta": "out-of-the-box onboarding experience,",
+            "second-part": "also fully customizable."
+          }
+        }
+      },
+      "control": {
+        "title": "Have complete control",
+        "subtitle": "Define the data, documents, and logic required from users in our playbook configurations.",
+        "illustration": {
+          "add": "Add",
+          "edit": "Edit",
+          "kyc": {
+            "title": "Know Your Customer (KYC)",
+            "toggle": {
+              "title": "Perform database checks with collected identity data",
+              "subtitle": "Identity data collected will be verified against government databases, credit bureaus, or other official sources."
+            },
+            "extra-content": "As easy as this, any user you onboard will be verified against the best available databases allowing you to have complete control over the verification process."
+          },
+          "anti-money-laundering": {
+            "title": "Anti-money laundering",
+            "toggle": {
+              "title": "Enhanced AML monitoring",
+              "subtitle": "Continuous monitoring, governmental watchlists, PEP and adverse media monitoring."
+            },
+            "extra-content": "Enhance your AML compliance with comprehensive monitoring and additional controls."
+          },
+          "additional-documents": {
+            "title": "Additional documents",
+            "subtitle": "Additional proofs that may help you analyze the user",
+            "extra-content": "Request additional documents like proof of address, proof of SSN, or custom documents to help you analyze the user."
+          },
+          "investor-profile-questions": {
+            "title": "Investor profile questions",
+            "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
+            "cta": "Add",
+            "extra-content": "Add questions to understand how risk-averse your investors are and tailor the onboarding questions to fit their profile."
+          },
+          "government-issued-id": {
+            "title": "Collect government-issued ID",
+            "subtitle": "Request that users submit scanned IDs",
+            "cta": "Add",
+            "extra-content": "Request that users submit scanned IDs to help you verify their identity."
+          },
+          "editing-additional-documents": {
+            "title": "Editing additional documents to request",
+            "extra-content": "Request additional documents when needed so you can make informed decisions on users.",
+            "proof-of-address": {
+              "title": "Proof of address",
+              "subtitle": "Official documents displaying the user's name and address."
+            },
+            "proof-of-ssn": {
+              "title": "Proof of SSN",
+              "subtitle": "Scan of Social Security card or official document displaying your name and Social Security Number."
+            },
+            "custom": {
+              "title": "Custom document",
+              "subtitle": "Request that users submit a custom document."
+            }
+          },
+          "personal-information": {
+            "title": "Personal information & docs",
+            "extra-content": "There is an almost endless number of combinations from which you can choose to create your own playbook.",
+            "basic-information": {
+              "title": "Basic information",
+              "email": "Email",
+              "phone-number": "Phone number",
+              "first-and-last-name": "First and last name",
+              "date-of-birth": "Date of birth",
+              "country-of-birth": "Country of birth",
+              "address": "Address"
+            },
+            "us-residents": {
+              "title": "U.S. residents",
+              "legal-status": "Legal status in the U.S.",
+              "ssn": "SSN",
+              "id-doc": "ID document scan",
+              "selfie": "Selfie"
+            },
+            "non-us-residents": {
+              "title": "Non-U.S. residents",
+              "restricted": "Restricted to these countries",
+              "id-document-scan": "ID document scan",
+              "selfie": "Selfie"
+            }
+          }
+        }
+      },
+      "verify": {
+        "title": "Verify People, not PII",
+        "subtitle": "Fraud signals you can act on in a unified rules engine with your KYC Checks.",
+        "cards": {
+          "build-rules": {
+            "title": "Build rules",
+            "subtitle": "Create custom rules to verify users based on your requirements.",
+            "illustration": {
+              "title": "Fail",
+              "subtitle": "User will be marked as failed"
+            }
+          },
+          "backtest": {
+            "title": "Backtest and analyze the impact of your rules",
+            "subtitle": "Backtest your rules and analyze the impact of your rules on your users.",
+            "illustration": {
+              "table": {
+                "headers": {
+                  "current-onboarding-status": "Current onboarding status",
+                  "original-rule-outcome": "Original rule outcome",
+                  "backtested-rule-outcome": "Backtested rule outcome"
+                },
+                "rows": {
+                  "failed": "Failed",
+                  "fail-and-manual-review": "Fail + Manual review",
+                  "pass": "Pass",
+                  "pass-and-manual-review": "Pass + Manual review"
+                }
+              },
+              "outcomes": {
+                "title": "Backtested rule outcomes (40)",
+                "subtitle": "If the rules that are being tested existed at the time of the onboardings above, the rule outcomes would've been these instead:",
+                "fail": "Fail",
+                "fail-and-manual-review": "Fail + Manual review",
+                "pass": "Pass",
+                "pass-and-manual-review": "Pass + Manual review",
+                "step-up": "Step up"
+              }
+            }
+          },
+          "verify": {
+            "title": "Verify what users tell you",
+            "subtitle": "Verify what users say analyzing their documents.",
+            "illustration": {
+              "user-input-data": "User input data",
+              "ocr-data": "OCR data",
+              "name": "Name",
+              "Address": "Address"
+            }
+          },
+          "behavior-and-device-insights": {
+            "title": "Behavior and device insights",
+            "subtitle": "Add another security layer to our onboarding experience, helping reduce fraud and increase accuracy",
+            "illustration": {
+              "date-and-time": "Date and time",
+              "ip-address": "IP address",
+              "biometric": "Biometric",
+              "verified": "Verified",
+              "not-verified": "Not verified",
+              "app-clip": {
+                "title": "App Clip",
+                "whats-this": "What's this?",
+                "description": "App Clips are small parts of your app that are discoverable at the moment they are needed and load quickly to complete a specific task, such as renting a scooter, purchasing a coffee, or filling a parking meter.",
+                "yes": "Yes",
+                "no": "No",
+                "what-is-this": {
+                  "title": "What's an App Clip?",
+                  "description": "App Clips are small parts of your app that are discoverable at the moment they are needed and load quickly to complete a specific task. We use this technology to verify the device of the user, get the device attestation and insights."
+                }
+              }
+            }
+          }
+        }
+      },
+      "leverage": {
+        "title": "Leverage the best and most secure technology available",
+        "subtitle": "App Clip and Passkeys add another security layer to our onboarding experience, helping reduce fraud and increase accuracy",
+        "app-clip": {
+          "title": "Capture ID documents with App Clip",
+          "subtitle": "Leveraging the user’s mobile device, we are able to:",
+          "real-phone": "Ensure the legitatamacy of the device",
+          "device-attestation": "Leverage Apple and Google’s rectangular detection",
+          "duplicate-fraud": "Detect and block duplicate fraud",
+          "give-it-a-try": "Give it a try on your own"
         },
         "passkeys": {
-          "title": "Passkeys.",
-          "subtitle": " We are on the cutting edge of using passkeys to bind a strong cryptographic credential to verified PII info protected by biometrics."
-        },
-        "increased-conversion": {
-          "title": "Increased conversion.",
-          "subtitle": "Millions of users are being verified in Footprint. Imagine your conversion if people didn't need to complete a form?"
-        },
-        "dev-experience": {
-          "title": "Enhanced dev experience.",
-          "subtitle": "With a few lines of code, you'll be onboarding customers within hours. We sell results, not complexity."
-        },
-        "last-pixel": {
-          "title": "Designed to the last pixel.",
-          "subtitle": "Our polished interface and intuitive user experience make KYC, KYB and vaulting a breeze."
+          "title": "Passkeys",
+          "subtitle": "Passkeys use cryptography to authenticate users and allow us to:",
+          "identity-and-device": "Link the identity to the device",
+          "prevent-ato": "Prevent ATOs and phishing",
+          "same-person": "Verify account creator is the signer-in",
+          "link-kyc-and-auth": "Link the identity to the device"
         }
       },
-      "customizable": {
-        "title": "Beautiful, modern, customizable",
-        "subtitle": "Customize the look and feel of your onboarding flow to perfectly match your brand.",
-        "cta": "See documentation",
-        "your-own": {
-          "title": "Make it your own",
-          "subtitle": "Match your brand's font-family, colors, border radius, and more, across all platforms."
-        },
-        "easy-flexible": {
-          "title": "Easy & flexible",
-          "subtitle": "We offer 80+ variables that can be customized as you'd like at speed of light."
-        },
-        "fine-tune": {
-          "title": "Fine-tune component styles",
-          "subtitle": "Need to go a step further? Missing something? You can use CSS-in-JS to arbitrarily style individual components."
-        },
-        "world-class": {
-          "title": "World-class developer experience",
-          "subtitle": "Beautiful docs, SDKs, and APIs that make integrating it a breeze (in 5 lines of code)."
-        }
-      },
-      "vault-pii": {
-        "title": "Vault PII, PCI, and custom data",
-        "subtitle": "Footprint securely vaults three types of data: identity data, payment card data, and custom key-value data.",
-        "cta": "Learn more",
-        "identity-data": {
-          "title": "Identity data (PII)",
-          "subtitle": "Identity data that originates from user and business embedded onboarding flows (KYC and KYB) is verified with our decisioning platform and then vaulted. Identity data is comprised of specific attributes that are validated, vaulted, tokenized, and in some attribute types fingerprinted to become matchable."
-        },
-        "card-data": {
-          "title": "Payment card data (PCI)",
-          "subtitle": "In many financial applications, it's required to collect or store payment card, so we provide a PCI-compliant vaulting solution for payment card holder data such as card number, expiration date and security code (CVV)."
-        },
-        "custom-data": {
-          "title": "Custom data",
-          "subtitle": "We support custom key-value attributes that are provided by you and are not validated. You can use custom data to securely vault any associated sensitive user or business in the vault using a unified vaulting API."
-        }
-      },
-      "vault-proxy": {
-        "title": "Next-gen vault proxy",
-        "subtitle": "Send PII data to third parties from Footprint without having to decrypt it yourself.",
-        "cta": "Learn more",
-        "features": {
-          "enhanced-security": {
-            "title": "Enhanced security",
-            "subtitle": "Simplify your data management and minimize the amount of sensitive data stored on your systems, reducing the risk of data breaches and other security incidents."
+      "quotes": {
+        "title": "Best onboarding tool in town",
+        "subtitle": "Do not take our word for it.",
+        "quote-list": {
+          "apiture": {
+            "quote": "Based on experience vetting and partnering with many identity-based techs, partnering with Footprint has been a breath of fresh air. In my product, IDV is critical. I want the best security net possible, configurability, trust in a reliable partner, quick support whenever asked, and a commitment to staying ahead of the bad actors. Footprint is thinking outside the box and doing things other IDV providers should have thought about years ago. Proud to stand side by side with Footprint combatting fraud.",
+            "name": "Craig Pawling",
+            "role": "VP of Product",
+            "company": "Apiture"
           },
-          "reduced-liability": {
-            "title": "Reduced liability",
-            "subtitle": "Offload the responsibility of securely storing and managing sensitive data to us, you minimize your exposure to security risks and demonstrate compliance with data privacy regulations."
+          "flexcar-2": {
+            "quote": "Flexcar turned to Footprint with a clear goal: rein in fraud without adding unnecessary friction, which would pose significant user experience challenges in an increasingly competitive market.",
+            "name": "Jon Coombs",
+            "role": "Director of Product Management",
+            "company": "Flexcar"
           },
-          "less-money": {
-            "title": "Save time and money",
-            "subtitle": "Protect your sensitive data with our all-in-one solution. Bundle PII vaulting with Vault Proxy to simplify security management and reduce implementation costs while minimizing providers for better security."
+          "flexcar": {
+            "quote": "I love how Footprint is able to onboard users while offloading the storage of PII. Weʼre able to access the data we need while leveraging Footprintʼs secure vaulting for the collection and storage.",
+            "name": "Michael Zambrano",
+            "role": "Executive Head of Risk",
+            "company": "Flexcar"
+          },
+          "bloom": {
+            "quote": "Best integration experience since Stripe.",
+            "name": "Sam Yang",
+            "role": "Co-founder and CPO",
+            "company": "Bloom"
+          },
+          "findigs": {
+            "quote": "Footprint has been a significant improvement to our onboarding + fraud stack. It caught four new fraud cases in its first week live, and the app clip minimizes drop-off during document scanning.",
+            "name": "Anuj Desai",
+            "role": "Lead Product Manager",
+            "company": "Findigs"
+          },
+          "coba": {
+            "quote": "In an age of heightened compliance born from the importance of bank-direct relationships, Footprint’s Identity + Security suite was key in helping us smoothly onboard to our sponsor bank. They offer a world-class product with white-glove support.",
+            "name": "Joseph Saliba",
+            "role": "CEO",
+            "company": "Coba"
           }
         },
-        "illustration": {
-          "third-party": "Third party services",
-          "your-app": "Your application"
+        "empty-quote": {
+          "title": "Ready to be the next happy customer with a quote in here?",
+          "cta": "Let's chat"
         }
       },
-      "more-than-expect": {
-        "title": "Everything you need. More than you expect.",
-        "subtitle": "One tool to unify account creation, continuous auth and monitoring, and company security.",
-        "appclip": {
-          "title": "App Clip",
-          "subtitle": "App Clip allows your users to quickly verify their identity without needing to download any app. Web to mobile, seamlessly."
-        },
-        "fraud-risk": {
-          "title": "Fraud & risk",
-          "subtitle": "By tying security to fraud to KYC, we can create a bar to enter the digital ecosystem, and once cleared in a second let people create accounts with certainty."
-        },
-        "security-logs": {
-          "title": "Security logs",
-          "subtitle": "Each time data is accessed in the enclave, it automatically gets appended in our security logs, which are always accessible via API."
-        },
-        "id-scan": {
-          "title": "ID Scan + Selfie",
-          "subtitle": "Leveraging FaceID biometrics natively built into smartphones, we combine an incredible onboarding experience with the most accurate attestation of liveness."
-        },
-        "auth": {
-          "title": "Auth & IAM",
-          "subtitle": "Identity should not be limited to onboarding. Footprint helps you bridge the identity gap from onboarding to auth to IAM."
-        },
-        "manual-review": {
-          "title": "Manual review",
-          "subtitle": "In the event we can't automatically verify a user, you can easily review them yourself and make a pass/fail decision."
-        }
+      "banner": {
+        "title": "Onboard more customers and enjoy peace of mind.",
+        "get-started": "Get started",
+        "book-a-demo": "Book a demo"
       }
     },
     "company": {

@@ -1,4 +1,3 @@
-import { Container } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
@@ -29,57 +28,51 @@ const Illustration = () => {
 
   return (
     <IllustrationContainer>
-      <Container
-        sx={{
-          zIndex: 1,
-        }}
-      >
-        <Grid variants={containerVariants} initial="hidden" animate="show">
-          <Col variants={columnVariants}>
-            <Image
-              alt=""
-              src="/kyc/hero/hey-there.png"
-              height={234}
-              width={283}
-              priority
-            />
-            <Image
-              alt=""
-              src="/kyc/hero/basic-data.png"
-              height={257}
-              width={283}
-              priority
-            />
-          </Col>
-          <Col variants={columnVariants}>
-            <Image
-              alt=""
-              src="/kyc/hero/address.png"
-              height={413}
-              width={283}
-              priority
-            />
-          </Col>
-          <Col variants={columnVariants}>
-            <Image
-              alt=""
-              src="/kyc/hero/ssn.png"
-              height={383}
-              width={283}
-              priority
-            />
-          </Col>
-        </Grid>
-      </Container>
-      <Waves>
-        <Image
-          alt=""
-          src="/kyc/hero/waves.svg"
-          height={400}
-          width={1400}
-          priority
-        />
-      </Waves>
+      <Grid variants={containerVariants} initial="hidden" animate="show">
+        <Waves>
+          <Image
+            alt=""
+            src="/kyc/hero/waves.svg"
+            height={400}
+            width={1400}
+            priority
+          />
+        </Waves>
+        <Col variants={columnVariants}>
+          <Image
+            alt=""
+            src="/kyc/hero/hey-there.png"
+            height={234}
+            width={283}
+            priority
+          />
+          <Image
+            alt=""
+            src="/kyc/hero/basic-data.png"
+            height={257}
+            width={283}
+            priority
+          />
+        </Col>
+        <Col variants={columnVariants}>
+          <Image
+            alt=""
+            src="/kyc/hero/address.png"
+            height={413}
+            width={283}
+            priority
+          />
+        </Col>
+        <Col variants={columnVariants}>
+          <Image
+            alt=""
+            src="/kyc/hero/ssn.png"
+            height={383}
+            width={283}
+            priority
+          />
+        </Col>
+      </Grid>
     </IllustrationContainer>
   );
 };
@@ -89,6 +82,7 @@ const IllustrationContainer = styled.div`
   width: 100%;
   height: 100%;
   overflow: hidden;
+  isolation: isolate;
 `;
 
 const Grid = styled(motion.div)`
@@ -96,10 +90,13 @@ const Grid = styled(motion.div)`
     display: grid;
     grid-template-columns: repeat(3, 283px);
     justify-content: center;
+    align-items: center;
     gap: ${theme.spacing[4]};
     mask: linear-gradient(180deg, #fff 85%, transparent 92%);
     height: 340px;
     mask-mode: alpha;
+    margin: 0 auto;
+    z-index: 1;
   `}
 `;
 
@@ -111,6 +108,11 @@ const Col = styled(motion.div)`
     justify-content: center;
     gap: ${theme.spacing[4]};
     height: fit-content;
+
+    img {
+      z-index: 1;
+      background-color: ${theme.backgroundColor.primary};
+    }
   `}
 `;
 

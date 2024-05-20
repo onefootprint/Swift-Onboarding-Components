@@ -1,84 +1,113 @@
 import {
   IcoLinkedin24,
-  IcoTwitter24,
+  IcoX24,
   ThemedLogoFpCompact,
 } from '@onefootprint/icons';
-import { media, Stack, Text } from '@onefootprint/ui';
+import { Box, createFontStyles, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const SUPPORT_EMAIL_ADDRESS = 'support@onefootprint.com';
 
 const currentYear = new Date().getFullYear();
 
 const socialLinks = [
-  { hrefKey: 'twitter.href', Icon: IcoTwitter24 },
+  { hrefKey: 'twitter.href', Icon: IcoX24 },
   { hrefKey: 'linkedin.href', Icon: IcoLinkedin24 },
 ];
 
 const SuportLinks = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.footer' });
+
   return (
-    <LeftContainer align="center" justify="space-between" width="100%">
-      <TopLeftLinks direction="column" gap={6} align="flex-start">
-        <Link href="/">
-          <ThemedLogoFpCompact color="secondary" />
-        </Link>
-        <Text variant="body-3" color="tertiary">
-          © {currentYear} {t('copyright')}
-        </Text>
-        <Link href={`mailto:${SUPPORT_EMAIL_ADDRESS}`}>
-          <Text variant="body-3" color="tertiary">
-            {SUPPORT_EMAIL_ADDRESS}
-          </Text>
-        </Link>
-        <Stack direction="row" gap={4}>
-          {socialLinks.map(({ hrefKey, Icon }) => (
-            <Link
-              key={hrefKey}
-              href={t(hrefKey as ParseKeys<'common'>)}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              <Icon color="tertiary" />
-            </Link>
-          ))}
-        </Stack>
-        <Stack align="center" gap={4}>
-          <Image
-            src="/footer/soc-2-badge-vanta.svg"
-            height={40}
-            width={40}
-            alt="Soc2 badge"
-          />
-          <Image src="/footer/PCI.png" height={45} width={45} alt="PCI badge" />
-        </Stack>
-      </TopLeftLinks>
-    </LeftContainer>
+    <Container>
+      <Link href="/">
+        <ThemedLogoFpCompact color="secondary" />
+      </Link>
+      <Text variant="body-3" color="tertiary">
+        © {currentYear} {t('copyright')}
+      </Text>
+      <SupportMail href={`mailto:${SUPPORT_EMAIL_ADDRESS}`}>
+        {SUPPORT_EMAIL_ADDRESS}
+      </SupportMail>
+      <SocialLinks>
+        {socialLinks.map(({ hrefKey, Icon }) => (
+          <StyledIconLink
+            key={hrefKey}
+            href={t(hrefKey as ParseKeys<'common'>)}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <Icon color="tertiary" />
+          </StyledIconLink>
+        ))}
+      </SocialLinks>
+      <BadgesContainer>
+        <Image
+          src="/footer/soc-2-badge-vanta.svg"
+          height={40}
+          width={40}
+          alt="Soc2 badge"
+        />
+        <Image src="/footer/PCI.png" height={45} width={45} alt="PCI badge" />
+      </BadgesContainer>
+    </Container>
   );
 };
 
-const TopLeftLinks = styled(Stack)`
-  width: 100%;
-  a {
-    text-decoration: none;
-  }
-
-  ${media.greaterThan('lg')`
-      width: 300px;
-    `}
+const StyledIconLink = styled(Link)`
+  ${({ theme }) => css`
+    &:hover {
+      svg {
+        path {
+          fill: ${theme.color.primary};
+        }
+      }
+    }
+  `}
 `;
 
-const LeftContainer = styled(Stack)`
-  ${media.greaterThan('lg')`
-      width: 300px;
-      flex-direction: column;
-      align-items: flex-start;
-    `};
+const Container = styled(Box)`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[3]};
+  `}
+`;
+
+const SocialLinks = styled(Stack)`
+  ${({ theme }) => css`
+    flex-direction: row;
+    gap: ${theme.spacing[2]};
+    padding-top: ${theme.spacing[3]};
+    height: 100%;
+  `}
+`;
+
+const SupportMail = styled(Link)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-3')}
+    text-decoration: none;
+    color: ${theme.color.tertiary};
+    &:hover {
+      color: ${theme.color.primary};
+    }
+  `}
+`;
+
+const BadgesContainer = styled(Stack)`
+  ${({ theme }) => css`
+    flex-direction: row;
+    gap: ${theme.spacing[4]};
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  `}
 `;
 
 export default SuportLinks;

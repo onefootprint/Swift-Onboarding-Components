@@ -11,7 +11,7 @@ type PenguinBannerProps = {
 };
 
 const PenguinBanner = ({
-  imgSrc = '/home/penguin-banner/home.svg',
+  imgSrc = '/home/banner/penguin-complete.svg',
 }: PenguinBannerProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.industries.real-estate.banner',
@@ -23,7 +23,7 @@ const PenguinBanner = ({
         <Illustration
           src={imgSrc}
           height={600}
-          width={900}
+          width={600}
           alt={t('alt-img')}
         />
         <TextContainer>
@@ -68,7 +68,7 @@ const BannerContainer = styled(Container)`
     justify-content: center;
 
     ${media.greaterThan('md')`
-      gap: ${theme.spacing[9]};
+      gap: ${theme.spacing[10]};
       padding: ${theme.spacing[11]} 0 ${theme.spacing[14]} 0;
       flex-direction: row;
     `}
@@ -95,6 +95,7 @@ const TextContainer = styled(Box)`
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
+    max-width: 75%;
   `}
 `;
 

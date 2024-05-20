@@ -1,81 +1,144 @@
-import { Box } from '@onefootprint/ui';
-import Image from 'next/image';
+import type { Icon } from '@onefootprint/icons';
+import {
+  IcoBuilding16,
+  IcoCake16,
+  IcoCar16,
+  IcoFileText16,
+  IcoPhone16,
+  IcoUserCircle16,
+} from '@onefootprint/icons';
+import { Box, createFontStyles, Stack } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export const VerifyIdentities = () => (
-  <IllustrationContainer>
-    <ScoresTable
-      src="/industries/featured-cards/detect-fraud/scores.svg"
-      alt="scores table"
-      width={314 * 2}
-      height={111 * 2}
-    />
-    <Renters
-      src="/industries/featured-cards/detect-fraud/renter.svg"
-      alt="scores table"
-      width={191 * 2}
-      height={54 * 2}
-    />
-    <UploadSource
-      src="/industries/featured-cards/detect-fraud/upload.svg"
-      alt="uploads"
-      width={264 * 2}
-      height={30 * 2}
-    />
-  </IllustrationContainer>
-);
+type ChipProps = {
+  label: string;
+  icon: Icon;
+  position: ChipPosition;
+};
+
+type ChipPosition = {
+  top: string;
+  left: string;
+  rotate: string;
+  elevation: 1 | 2 | 3;
+};
+
+const chips: ChipProps[] = [
+  {
+    label: 'Name',
+    icon: IcoUserCircle16,
+    position: {
+      top: '10%',
+      left: '85%',
+      rotate: '-10deg',
+      elevation: 1,
+    },
+  },
+  {
+    label: 'Address',
+    icon: IcoBuilding16,
+    position: {
+      top: '80%',
+      left: '10%',
+      rotate: '5deg',
+      elevation: 1,
+    },
+  },
+  {
+    label: 'Social Security Number',
+    icon: IcoFileText16,
+    position: {
+      top: '50%',
+      left: '50%',
+      rotate: '0deg',
+      elevation: 1,
+    },
+  },
+  {
+    label: 'Phone Number',
+    icon: IcoPhone16,
+    position: {
+      top: '70%',
+      left: '75%',
+      rotate: '-5deg',
+      elevation: 1,
+    },
+  },
+  {
+    label: "Driver's License",
+    icon: IcoCar16,
+    position: {
+      top: '10%',
+      left: '50%',
+      rotate: '10deg',
+      elevation: 1,
+    },
+  },
+  {
+    label: 'Date of Birth',
+    icon: IcoCake16,
+    position: {
+      top: '20%',
+      left: '15%',
+      rotate: '5deg',
+      elevation: 1,
+    },
+  },
+];
+
+export const VerifyCredit = () => {
+  const renderIcon = (IconComponent: Icon) => <IconComponent />;
+  return (
+    <IllustrationContainer>
+      {chips.map(chip => (
+        <ChipContainer key={chip.label} $position={chip.position}>
+          {renderIcon(chip.icon)}
+          {chip.label}
+        </ChipContainer>
+      ))}
+    </IllustrationContainer>
+  );
+};
 
 const IllustrationContainer = styled(Box)`
   width: 100%;
   height: 100%;
   position: relative;
-  isolation: isolate;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: url('/industries/featured-cards/request-more-info/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
+  background-size: 120% 120%;
+  mask: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+  mask-size: 100% 100%;
+  mask-position: center;
+  mask-repeat: repeat;
+  mask-type: alpha;
 `;
 
-const ScoresTable = styled(Image)`
-  ${({ theme }) => css`
+const ChipContainer = styled(Stack)<{
+  $position: ChipPosition;
+}>`
+  ${({ theme, $position }) => css`
+    ${createFontStyles('label-3')}
     position: absolute;
-    transform: translate(-50%, -50%) rotate(-10deg);
-    box-shadow: ${theme.elevation[1]};
-    top: 50%;
-    left: 30%;
-    width: 324px;
-    height: auto;
-    border-radius: ${theme.borderRadius.default};
-    border: 1px solid ${theme.borderColor.tertiary};
-    z-index: 1;
+    flex-direction: row;
+    gap: ${theme.spacing[3]};
+    white-space: nowrap;
+    align-items: center;
+    justify-content: center;
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
+    border-radius: ${theme.borderRadius.full};
+    background-color: ${theme.backgroundColor.primary};
+    top: ${$position.top};
+    left: ${$position.left};
+    transform: translate(-50%, -50%) rotate(${$position.rotate});
+    box-shadow: ${theme.elevation[$position.elevation]};
   `}
 `;
-
-const Renters = styled(Image)`
-  ${({ theme }) => css`
-    position: absolute;
-    bottom: 0;
-    box-shadow: ${theme.elevation[3]};
-    right: -10%;
-    width: 300px;
-    transform: rotate(4deg);
-    height: auto;
-    border-radius: ${theme.borderRadius.default};
-    border: 1px solid ${theme.borderColor.tertiary};
-    z-index: 2;
-  `}
-`;
-
-const UploadSource = styled(Image)`
-  ${({ theme }) => css`
-    position: absolute;
-    width: 264px;
-    height: auto;
-    left: 0;
-    top: 10%;
-    transform: translateY(-50%) rotate(4deg);
-    border-radius: ${theme.borderRadius.default};
-    border: 1px solid ${theme.borderColor.tertiary};
-    box-shadow: ${theme.elevation[1]};
-    z-index: 0;
-  `}
-`;
-
-export default VerifyIdentities;
+export default VerifyCredit;

@@ -1,6 +1,9 @@
-import { primitives } from '@onefootprint/design-tokens';
 import { useHasScroll, useToggle } from '@onefootprint/hooks';
 import {
+  IcoBank24,
+  IcoBuilding24,
+  IcoCar24,
+  IcoDollar24,
   IcoKey24,
   IcoMegaphone24,
   IcoShield24,
@@ -9,11 +12,11 @@ import {
   IcoWriting24,
 } from '@onefootprint/icons';
 import { Container, media } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { CASE_STUDY_BANNER_PORTAL_ID } from '../layout/case-study-banner';
+import { CASE_STUDY_BANNER_PORTAL_ID } from '../layout/message-banner';
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
 import type { NavEntry } from './types';
@@ -21,7 +24,7 @@ import type { NavEntry } from './types';
 const Navbar = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
-  const [isOnDarkSection, setIsOnDarkSection] = useState(false);
+
   const hasScroll = useHasScroll();
 
   const entries: NavEntry[] = [
@@ -54,16 +57,37 @@ const Navbar = () => {
         },
       ],
     },
-    // {
-    //   text: t('entries.case-studies.text'),
-    //   href: t('entries.case-studies.href'),
-    // },
+    {
+      text: t('entries.industries.text'),
+      items: [
+        {
+          text: t('entries.industries.links.real-estate.text'),
+          subtext: t('entries.industries.links.real-estate.subtext'),
+          href: t('entries.industries.links.real-estate.href'),
+          iconComponent: IcoBuilding24,
+        },
+        {
+          text: t('entries.industries.links.fintech.text'),
+          subtext: t('entries.industries.links.fintech.subtext'),
+          href: t('entries.industries.links.fintech.href'),
+          iconComponent: IcoDollar24,
+        },
+        {
+          text: t('entries.industries.links.auto.text'),
+          subtext: t('entries.industries.links.auto.subtext'),
+          href: t('entries.industries.links.auto.href'),
+          iconComponent: IcoCar24,
+        },
+        {
+          text: t('entries.industries.links.baas.text'),
+          subtext: t('entries.industries.links.baas.subtext'),
+          href: t('entries.industries.links.baas.href'),
+          iconComponent: IcoBank24,
+        },
+      ],
+    },
     { text: t('entries.pricing.text'), href: t('entries.pricing.href') },
     { text: t('entries.docs.text'), href: t('entries.docs.href') },
-    {
-      text: t('entries.company.text'),
-      href: t('entries.company.links.about.href'),
-    },
     {
       text: t('entries.writing.text'),
       items: [
@@ -81,48 +105,23 @@ const Navbar = () => {
         },
       ],
     },
-    { text: t('entries.media.text'), href: t('entries.media.href') },
-    { text: t('entries.changelog.text'), href: t('entries.changelog.href') },
+    {
+      text: t('entries.changelog.text'),
+      href: t('entries.changelog.href'),
+    },
   ];
 
-  const handleScroll = () => {
-    const darkStart = document.getElementById('dark-start');
-    const darkEnd = document.getElementById('dark-end');
-
-    if (darkStart && darkEnd) {
-      const rectStart = darkStart.getBoundingClientRect();
-      const rectEnd = darkEnd.getBoundingClientRect();
-
-      if (rectStart.top < 50 && rectEnd.top > 50) {
-        setIsOnDarkSection(true);
-      } else {
-        setIsOnDarkSection(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   return (
-    <Header
-      isFloating={hasScroll && isFloatingEnabled}
-      $isOnDarkSection={isOnDarkSection}
-    >
+    <Header $isFloating={hasScroll && isFloatingEnabled}>
       <div id={CASE_STUDY_BANNER_PORTAL_ID} />
-      <Container as="div">
+      <Container>
         <Inner id="navbar">
           <MobileNav
             onOpen={disableFloating}
             onClose={enableFloating}
             entries={entries}
-            $isOnDarkSection={isOnDarkSection}
           />
-          <DesktopNav entries={entries} $isOnDarkSection={isOnDarkSection} />
+          <DesktopNav entries={entries} />
         </Inner>
       </Container>
     </Header>
@@ -130,10 +129,9 @@ const Navbar = () => {
 };
 
 const Header = styled.header<{
-  isFloating: boolean;
-  $isOnDarkSection?: boolean;
+  $isFloating: boolean;
 }>`
-  ${({ theme, isFloating, $isOnDarkSection }) => css`
+  ${({ theme, $isFloating }) => css`
     left: 0;
     position: fixed;
     right: 0;
@@ -141,16 +139,12 @@ const Header = styled.header<{
     transition: background 200ms ease 0s;
     z-index: ${theme.zIndex.overlay};
 
-    ${isFloating &&
+    ${$isFloating &&
     css`
       -webkit-backdrop-filter: blur(15px) saturate(125%);
       backdrop-filter: blur(15px) saturate(125%);
-      background-color: rgba(
-        ${$isOnDarkSection ? primitives.Gray0 : theme.backgroundColor.primary},
-        0.75
-      );
-      border-bottom: ${theme.borderWidth[1]} solid
-        ${$isOnDarkSection ? primitives.Gray700 : theme.borderColor.primary};
+      background-color: rgba(${theme.backgroundColor.primary}, 0.75);
+      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     `}
   `}
 `;
@@ -158,6 +152,7 @@ const Header = styled.header<{
 const Inner = styled.div`
   ${({ theme }) => css`
     position: relative;
+    width: 100%;
     padding: ${theme.spacing[6]} 0 ${theme.spacing[5]};
 
     ${media.greaterThan('md')`

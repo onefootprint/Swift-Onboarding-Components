@@ -48,6 +48,7 @@
     "thiserror",
     "vsock",
     "webauthn",
+    "webp",
     "workos"
   ],
   "[rust]": {
@@ -95,7 +96,7 @@
   "cSpell.diagnosticLevel": "Hint",
   "files.exclude": {
     "**/target/**": true,
-    "**/vscode-target/**": true,
+    "**/vscode-target/**": true
   },
   "files.watcherExclude": {
     "**/target/**": true,
@@ -103,42 +104,28 @@
     "**/.git/**": true,
     "**/node_modules/*/**": true
   },
-  "rust-analyzer.files.excludeDirs": [
-    "**/target/**",
-    "**/vscode-target/**"
-  ],
+  "rust-analyzer.files.excludeDirs": ["**/target/**", "**/vscode-target/**"],
   "rust-analyzer.rustfmt.extraArgs": ["+nightly"],
   "search.exclude": {
     "**/target/": true,
     "**/vscode-target/": true,
     "**/.jest-cache/**": true
   },
-  "eslint.workingDirectories": [
-    "./frontend"
-  ],
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.workingDirectories": ["./frontend"],
+  "eslint.validate": ["javascript", "typescript", "typescriptreact"],
   "command-runner.terminal.name": "RunCommand",
   "command-runner.terminal.autoClear": true,
   "command-runner.terminal.autoFocus": true,
   "command-runner.commands": {
     "clippy fix": "cd backend && cargo clippy --fix --workspace --allow-dirty"
   },
-  "python.testing.pytestArgs": [
-    "backend"
-  ],
+  "python.testing.pytestArgs": ["backend"],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "rust-analyzer.cargo.features": [],
   "rust-analyzer.check.command": "clippy",
   // Separate cargo build directory so vscode can do in parallel
-  "rust-analyzer.cargo.extraArgs": [
-    "--target-dir",
-    "vscode-target"
-  ],
+  "rust-analyzer.cargo.extraArgs": ["--target-dir", "vscode-target"],
   "[javascript][typescript][typescriptreact]": {
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"

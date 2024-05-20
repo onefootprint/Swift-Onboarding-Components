@@ -1,7 +1,7 @@
-import { Text } from '@onefootprint/ui';
+import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 type FooterLinkProps = {
   text: string;
@@ -15,14 +15,20 @@ const FooterLink = ({ text, href, newWindow }: FooterLinkProps) => (
     rel="noopener noreferrer"
     target={newWindow ? '_blank' : undefined}
   >
-    <Text color="tertiary" variant="body-3">
-      {text}
-    </Text>
+    {text}
   </StyledLink>
 );
 
 const StyledLink = styled(Link)`
-  text-decoration: none;
+  ${({ theme }) => css`
+    ${createFontStyles('body-3')}
+    text-decoration: none;
+    color: ${theme.color.tertiary};
+
+    &:hover {
+      color: ${theme.color.secondary};
+    }
+  `}
 `;
 
 export default FooterLink;

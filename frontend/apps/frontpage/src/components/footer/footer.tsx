@@ -12,14 +12,49 @@ const linkSections = [
     title: 'product.title',
     links: [
       {
-        name: 'compare',
-        textKey: 'product.compare.text',
-        hrefKey: 'product.compare.href',
+        name: 'kyc',
+        textKey: 'product.kyc.text',
+        hrefKey: 'product.kyc.href',
       },
       {
-        name: 'pricing',
-        textKey: 'product.pricing.text',
-        hrefKey: 'product.pricing.href',
+        name: 'kyb',
+        textKey: 'product.kyb.text',
+        hrefKey: 'product.kyb.href',
+      },
+      {
+        name: 'vaulting',
+        textKey: 'product.vaulting.text',
+        hrefKey: 'product.vaulting.href',
+      },
+      {
+        name: 'auth',
+        textKey: 'product.auth.text',
+        hrefKey: 'product.auth.href',
+      },
+    ],
+  },
+  {
+    title: 'industries.title',
+    links: [
+      {
+        name: 'real-estate',
+        textKey: 'industries.real-estate.text',
+        hrefKey: 'industries.real-estate.href',
+      },
+      {
+        name: 'auto',
+        textKey: 'industries.auto.text',
+        hrefKey: 'industries.auto.href',
+      },
+      {
+        name: 'fintech',
+        textKey: 'industries.fintech.text',
+        hrefKey: 'industries.fintech.href',
+      },
+      {
+        name: 'baas',
+        textKey: 'industries.baas.text',
+        hrefKey: 'industries.baas.href',
       },
     ],
   },
@@ -30,6 +65,11 @@ const linkSections = [
         name: 'about',
         textKey: 'company.about.text',
         hrefKey: 'company.about.href',
+      },
+      {
+        name: 'careers',
+        textKey: 'company.careers.text',
+        hrefKey: 'company.careers.href',
       },
       {
         name: 'blog',
@@ -100,48 +140,42 @@ const Footer = () => {
   return (
     <>
       <Divider />
-      <Container as="footer">
-        <Inner
-          direction="column-reverse"
-          justify="space-between"
-          paddingTop={10}
-          paddingBottom={9}
-        >
-          <SupportLinks />
-          <LinksContainer>
-            {linkSections.map(section => (
-              <Stack
-                direction="column"
-                align="start"
-                gap={3}
-                minWidth="160px"
-                key={section.title}
-              >
-                <Text variant="label-3">
-                  {t(section.title as ParseKeys<'common'>)}
-                </Text>
-                {section.links.map(link => (
-                  <FooterLink
-                    key={link.name}
-                    text={t(link.textKey as ParseKeys<'common'>)}
-                    href={t(link.hrefKey as ParseKeys<'common'>)}
-                  />
-                ))}
-              </Stack>
-            ))}
-          </LinksContainer>
-        </Inner>
-      </Container>
+      <FooterContainer tag="footer" position="relative">
+        <SupportLinks />
+        <LinksContainer>
+          {linkSections.map(section => (
+            <SectionColumn>
+              <Text variant="label-3">
+                {t(section.title as ParseKeys<'common'>)}
+              </Text>
+              {section.links.map(link => (
+                <FooterLink
+                  key={link.name}
+                  text={t(link.textKey as ParseKeys<'common'>)}
+                  href={t(link.hrefKey as ParseKeys<'common'>)}
+                />
+              ))}
+            </SectionColumn>
+          ))}
+        </LinksContainer>
+      </FooterContainer>
     </>
   );
 };
 
-const Inner = styled(Stack)`
+const FooterContainer = styled(Container)`
   ${({ theme }) => css`
-    gap: ${theme.spacing[9]};
+    gap: ${theme.spacing[10]};
+    width: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    padding-top: ${theme.spacing[10]};
+    padding-bottom: ${theme.spacing[9]};
 
     ${media.greaterThan('lg')`
       flex-direction: row;
+      justify-content: space-between;
+      align-items: space-between;
     `};
   `}
 `;
@@ -152,8 +186,15 @@ const LinksContainer = styled(Grid.Container)`
     grid-row-gap: ${theme.spacing[9]};
 
     ${media.greaterThan('md')`
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
     `}
+  `}
+`;
+
+const SectionColumn = styled(Stack)`
+  ${({ theme }) => css`
+    flex-direction: column;
+    gap: ${theme.spacing[3]};
   `}
 `;
 

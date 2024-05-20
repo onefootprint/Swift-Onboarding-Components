@@ -27,7 +27,7 @@ type SeoProps = {
 
 const Seo = ({
   description = "The last identity verification you'll ever need",
-  image = 'https://onefootprint.com/cover.png',
+  image = '/og-img-home.png',
   keywords = 'footprint,foot,print,id,onefootprint,identity,kyc,verify,security',
   kind = 'product',
   slug,

@@ -4,8 +4,10 @@ import styled, { css } from 'styled-components';
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
 import media from '../../utils/media';
+import type { StackProps } from '../stack';
+import Stack from '../stack';
 
-export type ContainerProps = {
+export type ContainerProps = StackProps & {
   as?: 'div' | 'section' | 'main' | 'article' | 'nav' | 'header' | 'footer';
   children: React.ReactNode;
   fluid?: boolean;
@@ -14,17 +16,17 @@ export type ContainerProps = {
   testID?: string;
   className?: string;
 };
-
-const Container = forwardRef<HTMLElement, ContainerProps>(
+const Container = forwardRef<HTMLDivElement, ContainerProps>(
   (
     {
       id,
-      as = 'div',
+      as,
       sx,
       children,
       testID,
       fluid = false,
       className,
+      ...stackProps
     }: ContainerProps,
     ref,
   ) => {
@@ -38,6 +40,8 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
         ref={ref}
         sx={sxStyles}
         className={className}
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...stackProps}
       >
         {children}
       </StyledContainer>
@@ -45,7 +49,7 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
   },
 );
 
-const StyledContainer = styled.div<{ sx: SXStyles }>`
+const StyledContainer = styled(Stack)<{ sx: SXStyles }>`
   ${({ theme, sx }) => css`
     position: relative;
     margin-left: auto;

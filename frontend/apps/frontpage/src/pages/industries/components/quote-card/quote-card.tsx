@@ -11,7 +11,7 @@ type QuoteCardProps = {
   author: string;
   role: string;
   company: string;
-  caseStudyLink: string;
+  caseStudyLink?: string;
   authorImage: string;
 };
 

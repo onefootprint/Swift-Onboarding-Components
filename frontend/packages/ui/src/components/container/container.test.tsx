@@ -8,12 +8,12 @@ import Container from './container';
 
 describe('<Container />', () => {
   const renderContainer = ({
-    as = 'div',
+    tag = 'div',
     children = 'Foo',
     testID,
   }: Partial<ContainerProps>) =>
     customRender(
-      <Container as={as} testID={testID}>
+      <Container tag={tag} testID={testID}>
         {children}
       </Container>,
     );
@@ -30,7 +30,7 @@ describe('<Container />', () => {
 
   describe('when it has a custom tag', () => {
     it('should render with the correct tag', () => {
-      renderContainer({ children: 'Lorem', as: 'section' });
+      renderContainer({ children: 'Lorem', tag: 'section' });
       const el = screen.getByText('Lorem');
       expect(el.tagName).toEqual('SECTION');
     });

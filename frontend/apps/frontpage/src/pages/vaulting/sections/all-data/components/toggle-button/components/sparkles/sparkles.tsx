@@ -52,8 +52,12 @@ const sparkAnimation = {
   },
   exit: {
     rotate: 0,
-    scale: 0,
+    scale: 0.5,
     opacity: 0,
+    transition: {
+      duration: 1,
+      ease: 'easeOut',
+    },
   },
 };
 
@@ -71,7 +75,7 @@ const Sparkles = ({ color, children, ...delegated }: SparklesProps) => {
     });
     nextSparkles.push(sparkle);
     setSparkles(nextSparkles);
-  }, 350);
+  }, 500);
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <Container {...delegated}>

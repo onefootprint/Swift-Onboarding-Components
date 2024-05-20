@@ -3,24 +3,23 @@ import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import FeaturedCard from 'src/pages/industries/components/featured-card';
+import RequestMoreInfo from 'src/pages/industries/components/featured-card-illustrations/request-more-info';
+import VaultData from 'src/pages/industries/components/featured-card-illustrations/vault-data';
+import VerifyIdentities from 'src/pages/industries/components/featured-card-illustrations/verify-identities';
 import styled, { css } from 'styled-components';
-
-import DetectFraudulentActors from '../../../components/featured-card-illustrations/detect-fraudulent-actors';
-import VerifyCredit from '../../../components/featured-card-illustrations/verify-credit';
-import VerifyIdentities from '../../../components/featured-card-illustrations/verify-identities';
 
 const keys = [
   {
     key: 'verify-identities',
-    illustration: <VerifyCredit />,
-  },
-  {
-    key: 'verify-credit',
     illustration: <VerifyIdentities />,
   },
   {
+    key: 'verify-credit',
+    illustration: <RequestMoreInfo />,
+  },
+  {
     key: 'detect-fraud',
-    illustration: <DetectFraudulentActors />,
+    illustration: <VaultData />,
   },
 ];
 
@@ -43,6 +42,7 @@ const FeaturedCards = () => {
     </Background>
   );
 };
+
 const CardsContainer = styled(Container)`
   ${({ theme }) => css`
     display: grid;

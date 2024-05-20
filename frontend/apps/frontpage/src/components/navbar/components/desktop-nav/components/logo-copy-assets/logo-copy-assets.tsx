@@ -1,4 +1,3 @@
-import { primitives } from '@onefootprint/design-tokens';
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoDownload16, ThemedLogoFpCompact } from '@onefootprint/icons';
 import { Dropdown, Text } from '@onefootprint/ui';
@@ -22,13 +21,9 @@ const assetsToCopy = [
 
 type LogoCopyAssetsProps = {
   href?: string;
-  $isOnDarkSection?: boolean;
 };
 
-const LogoCopyAssets = ({
-  href = FRONTPAGE_BASE_URL,
-  $isOnDarkSection,
-}: LogoCopyAssetsProps) => {
+const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.navbar.save-assets',
   });
@@ -72,11 +67,8 @@ const LogoCopyAssets = ({
         <Trigger
           onClick={handleButtonClick}
           onContextMenu={handleButtonContextMenu}
-          $isOnDarkSection={$isOnDarkSection}
         >
-          <ThemedLogoFpCompact
-            color={$isOnDarkSection ? 'quinary' : 'primary'}
-          />
+          <ThemedLogoFpCompact color="primary" />
         </Trigger>
       </Dropdown.Trigger>
       <Dropdown.Content
@@ -99,8 +91,8 @@ const LogoCopyAssets = ({
   );
 };
 
-const Trigger = styled.button<{ $isOnDarkSection?: boolean }>`
-  ${({ theme, $isOnDarkSection }) => css`
+const Trigger = styled.button`
+  ${({ theme }) => css`
     display: flex;
     align-items: center;
     min-width: fit-content;
@@ -126,7 +118,7 @@ const Trigger = styled.button<{ $isOnDarkSection?: boolean }>`
         margin-bottom: 3px;
         path {
            {
-            fill: ${$isOnDarkSection ? primitives.Gray0 : theme.color.primary};
+            fill: ${theme.color.primary};
           }
         }
       }

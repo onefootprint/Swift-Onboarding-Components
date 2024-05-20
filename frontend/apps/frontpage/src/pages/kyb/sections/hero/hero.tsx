@@ -25,7 +25,7 @@ const Hero = () => {
     setShowDialog(false);
   };
   return (
-    <Container>
+    <Container align="center" justify="center">
       <SectionContainer>
         <TitleContainer>
           <Title>{t('title')}</Title>

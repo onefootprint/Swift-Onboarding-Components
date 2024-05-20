@@ -8,7 +8,7 @@ type QuoteFooterProps = {
   author: string;
   role: string;
   company: string;
-  caseStudyLink: string;
+  caseStudyLink?: string;
 };
 
 const QuoteFooter = ({
@@ -35,15 +35,17 @@ const QuoteFooter = ({
           </Text>
         </Stack>
       </Stack>
-      <LinkButton
-        variant="label-2"
-        iconComponent={IcoArrowRightSmall16}
-        iconPosition="right"
-        target="_blank"
-        href={caseStudyLink}
-      >
-        {t('read-case-study')}
-      </LinkButton>
+      {caseStudyLink && (
+        <LinkButton
+          variant="label-2"
+          iconComponent={IcoArrowRightSmall16}
+          iconPosition="right"
+          target="_blank"
+          href={caseStudyLink}
+        >
+          {t('read-case-study')}
+        </LinkButton>
+      )}
     </FooterContainer>
   );
 };
@@ -58,6 +60,7 @@ const FooterContainer = styled(Box)`
       flex-direction: row;
       justify-content: space-between;
       align-items: flex-end;
+      gap: ${theme.spacing[9]};
     `}
   `}
 `;

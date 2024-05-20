@@ -21,11 +21,7 @@ const sections = [
 const Secure = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.auth.sections' });
   return (
-    <Container
-      sx={{
-        marginTop: 12,
-      }}
-    >
+    <Container marginTop={10} direction="column">
       <Title
         iconSrc="/auth/icons/ico-illustrated-chip-40.svg"
         title={t('title')}

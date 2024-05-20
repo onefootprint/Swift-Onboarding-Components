@@ -23,6 +23,7 @@ const GlobalStyle = createGlobalStyle`
      --desktop-spacing: ${theme.spacing[10]};
      --mobile-header-height: 72px;
      --mobile-spacing: ${theme.spacing[9]};
+     --custom-gray: #fcfcfc;
      font-size: 16px;
    }
    body {
@@ -90,7 +91,6 @@ const App = ({ Component, pageProps }: AppProps) => (
       async
       defer
     />
-
     <QueryClientProvider client={queryClient}>
       <CustomDesignSystemProvider>
         <GlobalStyle />

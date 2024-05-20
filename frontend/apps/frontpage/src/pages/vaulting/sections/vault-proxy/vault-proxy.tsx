@@ -4,7 +4,7 @@ import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import MicroFeatureCard from 'src/pages/home/components/micro-feature-card/micro-feature-card';
+import MicroFeatureCard from 'src/components/micro-feature-card';
 import styled, { css } from 'styled-components';
 
 import SectionSubtitle from '../../components/section-subtitle';

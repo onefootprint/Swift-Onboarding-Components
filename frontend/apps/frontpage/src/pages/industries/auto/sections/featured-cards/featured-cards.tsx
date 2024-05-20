@@ -12,11 +12,11 @@ import VerifyIdentities from '../../../components/featured-card-illustrations/ve
 const keys = [
   {
     key: 'verify-identities',
-    illustration: <VerifyCredit />,
+    illustration: <VerifyIdentities />,
   },
   {
     key: 'verify-credit',
-    illustration: <VerifyIdentities />,
+    illustration: <VerifyCredit />,
   },
   {
     key: 'detect-fraud',

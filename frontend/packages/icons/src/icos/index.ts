@@ -357,6 +357,7 @@ export { default as IcoWriting16 } from './ico-writing-16';
 export { default as IcoWriting24 } from './ico-writing-24';
 export { default as IcoWww16 } from './ico-www-16';
 export { default as IcoWww24 } from './ico-www-24';
+export { default as IcoX24 } from './ico-x-24';
 export { default as IlluLightPhoneWithId } from './illu-light-phone-with-id-colored';
 export { default as LogoFpCompact } from './logo-fp-compact-colored';
 export { default as LogoFpDefault } from './logo-fp-default-colored';

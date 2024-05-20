@@ -16,7 +16,7 @@ export default {
       name: 'Children *',
       required: true,
     },
-    as: {
+    tag: {
       control: 'select',
       options: ['div', 'section', 'article', 'main'],
       table: { defaultValue: { summary: 'div' } },
@@ -50,7 +50,7 @@ const Template: Story<ContainerProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
-  as: 'div',
+  tag: 'div',
   children: 'Some content',
   testID: 'container-test-id',
 };

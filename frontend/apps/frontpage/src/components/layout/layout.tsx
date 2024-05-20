@@ -1,47 +1,47 @@
 import { media } from '@onefootprint/ui';
-import { getCookie, setCookie } from 'cookies-next';
-import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+// import { getCookie, setCookie } from 'cookies-next';
+// import { useRouter } from 'next/router';
+import React from 'react';
 import styled from 'styled-components';
 
 import Footer from '../footer';
 import Navbar from '../navbar';
-import CaseStudyBanner from './case-study-banner';
+// import CaseStudyBanner from './message-banner';
 
 type LayoutProps = {
   children: React.ReactNode;
 };
 
-const CASE_STUDY_URL = '/customer-stories/flexcar';
+// const ARTICLE_URL = '/';
 
-const Layout = ({ children }: LayoutProps) => {
-  const router = useRouter();
-  const isArticlePage = router.pathname.includes(CASE_STUDY_URL);
+const Layout = ({ children }: LayoutProps) => (
+  // const router = useRouter();
+  // const isArticlePage = router.pathname.includes(ARTICLE_URL);
 
-  const [isBannerVisible, setIsBannerVisible] = useState(
-    getCookie('should-show-case-study-banner') !== 'false' && !isArticlePage,
-  );
+  // const [isBannerVisible, setIsBannerVisible] = useState(
+  //   getCookie('should-show-case-study-banner') !== 'false' && !isArticlePage,
+  // );
 
-  const handleCloseBanner = () => {
-    setCookie('should-show-case-study-banner', 'false');
-    setIsBannerVisible(false);
-  };
+  // const handleCloseBanner = () => {
+  //   setCookie('should-show-case-study-banner', 'false');
+  //   setIsBannerVisible(false);
+  // };
 
-  return (
-    <>
-      {isBannerVisible && (
+  <>
+    {/* {isBannerVisible && (
         <CaseStudyBanner
           onClose={handleCloseBanner}
-          articleUrl={CASE_STUDY_URL}
-        />
-      )}
-      <Navbar />
-      <Content>{children}</Content>
-      <Footer />
-    </>
-  );
-};
-const Content = styled.section`
+          articleUrl={ARTICLE_URL}
+        >
+          Footprint raised $13M Series A led by QED Investors
+        </CaseStudyBanner>
+      )} */}
+    <Navbar />
+    <Content>{children}</Content>
+    <Footer />
+  </>
+);
+const Content = styled.div`
   position: relative;
   padding-top: calc(var(--mobile-header-height) + var(--mobile-spacing));
 

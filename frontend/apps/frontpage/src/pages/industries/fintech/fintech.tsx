@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import SEO from '../../../components/seo';
-import PenguinBanner from './sections/banner';
+import Banner from '../components/banner';
+import IntroCard from '../components/intro-card';
 import Experience from './sections/experience';
 import FeaturedCards from './sections/featured-cards';
 import Hero from './sections/hero';
@@ -16,18 +17,29 @@ const RealEstate = () => {
   });
   return (
     <>
-      <SEO title={t('html-title')} slug="/industries/fintech" />
+      <SEO
+        title={t('html-title')}
+        slug="/industries/fintech"
+        og={{
+          image: '/og-img-fintech.png',
+        }}
+      />
       <Hero
         title={t('hero.title')}
-        subtitle={t('hero.subtitle')}
         illustration="/industries/illustrations/fintech.svg"
       />
+      <IntroCard>{t('hero.subtitle')}</IntroCard>
       <FeaturedCards />
       <Problems />
       <Solutions />
       <QuoteSection />
       <Experience />
-      <PenguinBanner />
+      <Banner
+        title={t('banner.title')}
+        primaryButton={t('banner.primary-button')}
+        secondaryButton={t('banner.secondary-button')}
+        imgSrc="/home/banner/onboard.jpg"
+      />
     </>
   );
 };

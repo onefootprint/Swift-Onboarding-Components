@@ -6,8 +6,8 @@ import FeaturedCard from 'src/pages/industries/components/featured-card';
 import styled, { css } from 'styled-components';
 
 import DetectFraudulentActors from '../../../components/featured-card-illustrations/detect-fraudulent-actors';
-import VerifyCredit from '../../../components/featured-card-illustrations/verify-credit';
-import VerifyIdentities from '../../../components/featured-card-illustrations/verify-identities';
+import VerifyIdentities from '../../../components/featured-card-illustrations/verify-credit';
+import VerifyCredit from '../../../components/featured-card-illustrations/verify-identities';
 
 const keys = [
   {
