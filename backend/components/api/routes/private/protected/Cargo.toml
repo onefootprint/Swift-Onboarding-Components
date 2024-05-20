@@ -12,6 +12,7 @@ api_core = { path = "../../../core" }
 newtypes = { path = "../../../../newtypes" }
 selfie_doc = { path = "../../../../selfie_doc" }
 db = { path = "../../../../db/core" }
+db_schema = { path = "../../../../db/schema" }
 api_wire_types = { path = "../../../wire_types" }
 
 diesel = { workspace = true }
@@ -32,3 +33,4 @@ serde_json = { workspace = true }
 serde_cbor = { workspace = true }
 chrono = { workspace = true }
 itertools = { workspace = true }
+futures = { workspace = true }

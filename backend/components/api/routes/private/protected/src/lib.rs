@@ -1,4 +1,5 @@
 mod aws_selfie_doc;
+mod backfill;
 mod decrypt;
 mod default_rules;
 mod incode;
@@ -32,6 +33,7 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(webhooks::post)
         .service(org::update_business_info)
         .service(org::get_business_info);
+    backfill::configure(config);
 }
 
 #[actix_web::get("/private/protected/check")]
