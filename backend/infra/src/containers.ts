@@ -64,6 +64,7 @@ export abstract class ServiceContainers {
       region,
       appPort,
       logGroupComponent,
+      datadogTags,
     );
 
     const datadogAgent = ServiceContainers.createDatadogAgent(
@@ -523,6 +524,9 @@ export abstract class ServiceContainers {
                 value: [
                   // Using fpc-api as the service name for crons and workers
                   // too so they are grouped under the same Honeycomb dataset.
+                  //
+                  // During the trial period, the Datadog service name is
+                  // overwritten by the otel.yml config.
                   `service.name=fpc-api`,
                   `service.version=${constants.containers.apiVersion}`,
                   `deployment.environment=${pulumi.getStack()}`,
@@ -690,6 +694,7 @@ export abstract class ServiceContainers {
     region: Region,
     serverContainerPort: number,
     logGroupComponent: string,
+    datadogTags: Map<string, string>,
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
     const metadata = GetStackMetadata();
     const out = pulumi
@@ -729,6 +734,10 @@ export abstract class ServiceContainers {
             {
               name: 'DD_OTEL_PORT',
               value: `${DD_OTEL_PORT}`,
+            },
+            {
+              name: 'DD_SERVICE',
+              value: datadogTags.get('service') || 'unknown',
             },
           ],
           healthCheck: {

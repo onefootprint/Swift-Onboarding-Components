@@ -55,7 +55,8 @@ processors:
     # In Datadog, we want to use the actual service name.
     actions:
       - key: service.name
-        action: delete
+        action: upsert
+        value: '${DD_SERVICE}'
 
 exporters:
   logging:
@@ -124,11 +125,11 @@ service:
       exporters: [otlp/datadog]
     logs/datadog:
       receivers: [otlp]
-      processors: [memory_limiter]
+      processors: [memory_limiter, attributes/remove_honeycomb_service_name]
       exporters: [otlp/datadog]
     metrics/datadog:
       receivers: [otlp]
-      processors: [memory_limiter]
+      processors: [memory_limiter, attributes/remove_honeycomb_service_name]
       exporters: [otlp/datadog]
 
   extensions: [health_check]
