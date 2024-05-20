@@ -59,9 +59,6 @@ processors:
         value: '${DD_SERVICE}'
 
 exporters:
-  logging:
-    loglevel: debug
-
   otlphttp:
     endpoint: 'https://collect.observeinc.com/v1/otel'
     headers:
@@ -98,15 +95,15 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch/traces]
-      exporters: [logging, otlphttp]
+      exporters: [otlphttp]
     metrics/application:
       receivers: [otlp, prometheus]
       processors: [memory_limiter]
-      exporters: [logging, otlp/honeycombprom]
+      exporters: [otlp/honeycombprom]
     metrics/performance:
       receivers: [awsecscontainermetrics]
       processors: [memory_limiter, filter]
-      exporters: [logging, otlp/honeycombaws]
+      exporters: [otlp/honeycombaws]
     traces/honeycomb:
       receivers: [otlp]
       processors: [memory_limiter, batch/honeycomb]
