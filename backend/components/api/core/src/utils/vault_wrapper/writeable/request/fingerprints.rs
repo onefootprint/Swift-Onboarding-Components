@@ -10,10 +10,9 @@ use db::{
 };
 use itertools::{chain, Itertools};
 use newtypes::{
-    fingerprint_salt::FingerprintSalt, CompositeFingerprintKind, DataLifetimeId, Fingerprint,
-    FingerprintKind, FingerprintVariant, MissingPartialFingerprint,
+    fingerprint_salt::FingerprintSalt, CompositeFingerprint, CompositeFingerprintKind, DataLifetimeId,
+    Fingerprint, FingerprintKind, FingerprintVariant, MissingFingerprint,
 };
-use strum::IntoEnumIterator;
 
 use crate::{
     errors::{ApiResult, AssertionError, ValidationError},
@@ -50,6 +49,7 @@ impl Fingerprints {
         new_vd: &[VaultData],
     ) -> ApiResult<()> {
         let Self { fps, salt_to_dl_id } = self;
+        let sv = ScopedVault::get(conn, &vw.scoped_vault_id)?;
 
         struct FingerprintData<'a> {
             kind: FingerprintKind,
@@ -67,14 +67,14 @@ impl Fingerprints {
             .flat_map(|vd| {
                 let fps = fps
                     .iter()
-                    .filter(|(scope, _)| scope.di() == vd.kind)
+                    .filter(|(salt, _)| salt.di() == vd.kind)
                     // Don't save partial fingerprints to the database
-                    .filter_map(|(scope, fp)| scope.kind().map(|k| (scope, k, fp)))
-                    .map(|(scope, scope_kind, fp)| FingerprintData {
-                        kind: scope.di().into(),
+                    .filter_map(|(salt, fp)| salt.kind().map(|scope| (salt, scope, fp)))
+                    .map(|(salt, scope, fp)| FingerprintData {
+                        kind: salt.di().into(),
                         data: fp.clone().into(),
                         lifetime_ids: vec![&vd.lifetime_id],
-                        scope: scope_kind,
+                        scope,
                     })
                     .collect_vec();
                 if fps.is_empty() {
@@ -101,25 +101,21 @@ impl Fingerprints {
         //
         // Create composite fingerprints out of pre-computed partial fingerprints
         //
-        let partial_fps: HashMap<_, _> = fps
-            .into_iter()
-            .filter_map(|(salt, fp)| {
-                let FingerprintSalt::Partial(pfpk) = salt else {
-                    return None;
-                };
-                Some((pfpk, fp))
-            })
-            .collect();
+        let fps: HashMap<_, _> = fps.into_iter().collect();
         let vd_kinds = new_vd.iter().map(|vd| &vd.kind).collect_vec();
-        let composite_fingerprints = CompositeFingerprintKind::iter()
-            .filter(|cfpk| cfpk.contains(&vd_kinds))
-            .map(|cfpk| -> ApiResult<_> {
+        let composite_fingerprints = CompositeFingerprint::list(&sv.tenant_id)
+            .into_iter()
+            .filter(|cfp| cfp.contains(&vd_kinds))
+            .map(|cfp| -> ApiResult<_> {
                 // For each Composite FPK that has any DI represented in this data update, generate
                 // the new composite fingerprint out of the pre-computed partial fingerprints
-                let sh_data = match cfpk.compute(&partial_fps) {
+                let sh_data = match cfp.compute(&fps) {
                     Ok(sh_data) => sh_data,
-                    Err(MissingPartialFingerprint(pfpk)) => {
-                        tracing::error!(%pfpk, "Failed to compute composite fingerprint. Missing partial fingerprint");
+                    Err(MissingFingerprint(salt)) => {
+                        tracing::error!(
+                            ?salt,
+                            "Failed to compute composite fingerprint. Missing fingerprint"
+                        );
                         return Ok(None);
                     }
                 };
@@ -129,21 +125,20 @@ impl Fingerprints {
                 // The lifetime could be from a newly created VD, or from a VD that already exists.
                 let new_vd_lifetime_ids = new_vd
                     .iter()
-                    .filter(|vd| cfpk.contains(&[&vd.kind]))
+                    .filter(|vd| cfp.contains(&[&vd.kind]))
                     .map(|vd| &vd.lifetime_id);
-                let existing_vd_lifetime_ids = cfpk
-                    .partial_fp_kinds()
-                    .into_iter()
-                    .flat_map(|pfpk| salt_to_dl_id.get(&pfpk.into()));
+                let existing_vd_lifetime_ids =
+                    cfp.salts().into_iter().flat_map(|salt| salt_to_dl_id.get(&salt));
                 let lifetime_ids = chain(new_vd_lifetime_ids, existing_vd_lifetime_ids).collect_vec();
-                if lifetime_ids.len() != cfpk.partial_fp_kinds().len() {
+                if lifetime_ids.len() != cfp.salts().len() {
                     return AssertionError("Not one lifetime ID for every partial fingerprint").into();
                 }
+                let cfpk = CompositeFingerprintKind::from(&cfp);
                 let d = FingerprintData {
                     kind: cfpk.into(),
                     data: sh_data.into(),
                     lifetime_ids,
-                    scope: FingerprintVariant::Composite,
+                    scope: cfpk.scope(),
                 };
                 Ok(Some(d))
             })
@@ -169,7 +164,6 @@ impl Fingerprints {
         // Save fingerprints to the database
         //
 
-        let sv = ScopedVault::get(conn, &vw.scoped_vault_id)?;
         let fingerprints = chain!(sh_data_fingerprints, p_data_fingerprints, composite_fingerprints)
             .map(|d| {
                 let FingerprintData {

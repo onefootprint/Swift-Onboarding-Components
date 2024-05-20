@@ -1,10 +1,9 @@
 use itertools::Itertools;
 use newtypes::{
-    fingerprint_salt::FingerprintSalt, CompositeFingerprintKind, DataIdentifier, DataRequest, Fingerprint,
+    fingerprint_salt::FingerprintSalt, CompositeFingerprint, DataIdentifier, DataRequest, Fingerprint,
     PiiString, ScopedVaultId, TenantId,
 };
 use std::{clone::Clone, collections::HashMap};
-use strum::IntoEnumIterator;
 
 use crate::{
     errors::ApiResult,
@@ -43,9 +42,10 @@ impl FingerprintedDataRequest {
         // fingerprints from the existing data in the vault for all other DIs that make up the
         // composite fingerprint
         let dis = res.data.keys().collect_vec();
-        let needed_fps = CompositeFingerprintKind::iter()
-            .filter(|cfpk| cfpk.contains(&dis))
-            .flat_map(|cfpk| cfpk.partial_fp_kinds())
+        let needed_fps = CompositeFingerprint::list(t_id)
+            .into_iter()
+            .filter(|cfp| cfp.contains(&dis))
+            .flat_map(|cfp| cfp.salts())
             .map(|pfpk| pfpk.di())
             .unique()
             .collect_vec();

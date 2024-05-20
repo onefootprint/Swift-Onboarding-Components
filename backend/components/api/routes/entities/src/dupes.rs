@@ -93,7 +93,7 @@ pub async fn get_dupes(
                     .into_iter()
                     .map(DupeKind::try_from)
                     // For now, only show dupes for demo tenant
-                    .filter(|dk| !matches!(dk, Ok(DupeKind::NameDob)) || auth.tenant().is_demo_tenant)
+                    .filter_ok(|dk| !matches!(dk, DupeKind::NameDob) || auth.tenant().is_demo_tenant)
                     .collect::<newtypes::NtResult<Vec<_>>>()?,
                 duplicate_neuro_kinds,
             )

@@ -29,6 +29,7 @@ pub struct Fingerprint {
     pub version: FingerprintVersion,
     /// The variant of the fingerprint. Was formerly named `scope`, but is probably more
     /// descriptively called a variant now.
+    /// TODO maybe we do put this back to scope - global / tenant / plaintext
     pub scope: FingerprintVariant,
     /// True if we want to hide this fingerprint from search results.
     /// This is only set manually through a dbshell

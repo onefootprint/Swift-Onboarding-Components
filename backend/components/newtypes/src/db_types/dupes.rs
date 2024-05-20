@@ -44,9 +44,7 @@ impl TryFrom<FingerprintKind> for DupeKind {
                     format!("Can't convert {} into DupeKind", value).to_owned(),
                 )),
             },
-            FingerprintKind::Composite(cfpk) => match cfpk {
-                CompositeFingerprintKind::NameDob => Ok(Self::NameDob),
-            },
+            FingerprintKind::Composite(CompositeFingerprintKind::NameDob) => Ok(Self::NameDob),
             _ => Err(crate::Error::Custom(
                 format!("Can't convert {} into DupeKind", value).to_owned(),
             )),

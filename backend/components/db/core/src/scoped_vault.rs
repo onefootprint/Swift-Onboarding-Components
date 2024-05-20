@@ -290,6 +290,9 @@ fn vaults_matching_search(
             .flat_map(|fps| {
                 // Each inner FingerprintQuery represents an AND filter.
                 // Return only the vaults that match all fingerprints in the FingerprintQuery.
+                // TODO: eventually, represent AND filters with a single query on composite
+                // fingerprints. But to do this, we probably want tenant-scoped composite
+                // fingerprints of, say, (id.first_name + id.last_name)
                 fps.0
                     .iter()
                     .cloned()
