@@ -1,7 +1,7 @@
 use crate::{
     fingerprint_salt::{FingerprintSalt, GlobalFingerprintKind, PartialFingerprintKind},
     util::impl_enum_string_diesel,
-    DataIdentifier, Fingerprint, FingerprintVariant, IdentityDataKind as IDK, TenantId, ValidationError,
+    DataIdentifier, Fingerprint, FingerprintScope, IdentityDataKind as IDK, TenantId, ValidationError,
 };
 use diesel::{deserialize::FromSqlRow, expression::AsExpression, sql_types::Text};
 use itertools::{chain, Itertools};
@@ -29,7 +29,7 @@ impl FingerprintKind {
     /// Returns true if the FingerprintKind can be globally fingerprinted (vs tenant-scoped)
     pub fn is_globally_fingerprintable(&self) -> bool {
         match self {
-            Self::Composite(cfpk) => cfpk.scope() == FingerprintVariant::Global,
+            Self::Composite(cfpk) => cfpk.scope() == FingerprintScope::Global,
             Self::DI(di) => GlobalFingerprintKind::try_from(di).is_ok(),
         }
     }
@@ -156,10 +156,10 @@ impl CompositeFingerprint {
 }
 
 impl CompositeFingerprintKind {
-    pub fn scope(&self) -> FingerprintVariant {
+    pub fn scope(&self) -> FingerprintScope {
         match self {
-            Self::Name => FingerprintVariant::Tenant,
-            Self::NameDob => FingerprintVariant::Global,
+            Self::Name => FingerprintScope::Tenant,
+            Self::NameDob => FingerprintScope::Global,
         }
     }
 }

@@ -1,7 +1,7 @@
 use itertools::{chain, Itertools};
 use strum::{EnumIter, IntoEnumIterator};
 
-use crate::{BusinessDataKind as BDK, DataIdentifier, FingerprintVariant, IdentityDataKind as IDK, TenantId};
+use crate::{BusinessDataKind as BDK, DataIdentifier, FingerprintScope, IdentityDataKind as IDK, TenantId};
 
 
 impl DataIdentifier {
@@ -69,10 +69,10 @@ impl FingerprintSalt {
 
     /// Returns the FingerprintVariant for this salt, if exists.
     /// Only FingerprintSalts with a corresponding variant are saved into the database.
-    pub fn kind(&self) -> Option<FingerprintVariant> {
+    pub fn kind(&self) -> Option<FingerprintScope> {
         match self {
-            Self::Global(_) => Some(FingerprintVariant::Global),
-            Self::Tenant(_, _) => Some(FingerprintVariant::Tenant),
+            Self::Global(_) => Some(FingerprintScope::Global),
+            Self::Tenant(_, _) => Some(FingerprintScope::Tenant),
             Self::Partial(_) => None,
         }
     }

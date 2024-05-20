@@ -15,7 +15,7 @@ use macros::test_state;
 use newtypes::{
     fingerprint_salt::{FingerprintSalt, GlobalFingerprintKind},
     CollectedDataOption as CDO, DataIdentifier, DataLifetimeSource, DataRequest, Fingerprint,
-    FingerprintVariant, IdentityDataKind, IdentityDataKind as IDK, PiiString, ValidateArgs,
+    FingerprintScope, IdentityDataKind, IdentityDataKind as IDK, PiiString, ValidateArgs,
 };
 use std::collections::HashMap;
 
@@ -71,8 +71,8 @@ async fn test_prefill_data(state: &mut State) {
             .map(|(s, _)| (s.di(), s.kind()))
             .collect(),
         vec![
-            (IDK::PhoneNumber.into(), Some(FingerprintVariant::Global)),
-            (IDK::PhoneNumber.into(), Some(FingerprintVariant::Tenant)),
+            (IDK::PhoneNumber.into(), Some(FingerprintScope::Global)),
+            (IDK::PhoneNumber.into(), Some(FingerprintScope::Tenant)),
         ],
     );
     let phone_ci = prefill_data.old_ci.get(&IDK::PhoneNumber.into()).unwrap();
@@ -127,12 +127,12 @@ async fn test_prefill_data(state: &mut State) {
         .map(|(s, _)| (s.di(), s.kind()))
         .collect();
     let expected_fingerprints = vec![
-        (IDK::Email.into(), Some(FingerprintVariant::Global)),
-        (IDK::Email.into(), Some(FingerprintVariant::Tenant)),
-        (IDK::PhoneNumber.into(), Some(FingerprintVariant::Global)),
-        (IDK::PhoneNumber.into(), Some(FingerprintVariant::Tenant)),
-        (IDK::FirstName.into(), Some(FingerprintVariant::Tenant)),
-        (IDK::LastName.into(), Some(FingerprintVariant::Tenant)),
+        (IDK::Email.into(), Some(FingerprintScope::Global)),
+        (IDK::Email.into(), Some(FingerprintScope::Tenant)),
+        (IDK::PhoneNumber.into(), Some(FingerprintScope::Global)),
+        (IDK::PhoneNumber.into(), Some(FingerprintScope::Tenant)),
+        (IDK::FirstName.into(), Some(FingerprintScope::Tenant)),
+        (IDK::LastName.into(), Some(FingerprintScope::Tenant)),
         (IDK::FirstName.into(), None),
         (IDK::LastName.into(), None),
     ];

@@ -138,7 +138,7 @@ impl FingerprintId {
     const LENGTH: usize = 22;
 
     pub fn generate() -> Self {
-        Self(generate_random_id("fprint_", Self::LENGTH))
+        Self(generate_random_id("fprint", Self::LENGTH))
     }
 }
 

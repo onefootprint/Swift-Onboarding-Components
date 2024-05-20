@@ -8,8 +8,8 @@ use diesel::{
 use itertools::Itertools;
 use newtypes::{
     CompositeFingerprintKind, DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData,
-    FingerprintId, FingerprintKind, FingerprintVariant, FingerprintVersion, IdentityDataKind as IDK,
-    PiiString, ScopedVaultId, TenantId, VaultId,
+    FingerprintId, FingerprintKind, FingerprintScope, FingerprintVersion, IdentityDataKind as IDK, PiiString,
+    ScopedVaultId, TenantId, VaultId,
 };
 
 use crate::{DbError, DbResult, PgConn, TxnPgConn};
@@ -27,10 +27,7 @@ pub struct Fingerprint {
     pub kind: FingerprintKind,
     /// Version of the fingerprint schema
     pub version: FingerprintVersion,
-    /// The variant of the fingerprint. Was formerly named `scope`, but is probably more
-    /// descriptively called a variant now.
-    /// TODO maybe we do put this back to scope - global / tenant / plaintext
-    pub scope: FingerprintVariant,
+    pub scope: FingerprintScope,
     /// True if we want to hide this fingerprint from search results.
     /// This is only set manually through a dbshell
     pub is_hidden: bool,
@@ -63,7 +60,7 @@ pub struct NewFingerprintArgs<'a> {
     pub kind: FingerprintKind,
     pub lifetime_ids: Vec<&'a DataLifetimeId>,
     pub version: FingerprintVersion,
-    pub scope: FingerprintVariant,
+    pub scope: FingerprintScope,
     pub scoped_vault_id: &'a ScopedVaultId,
     pub vault_id: &'a VaultId,
     pub tenant_id: &'a TenantId,
@@ -78,7 +75,7 @@ struct NewFingerprintRow<'a> {
     p_data: Option<PiiString>,
     kind: FingerprintKind,
     version: FingerprintVersion,
-    scope: FingerprintVariant,
+    scope: FingerprintScope,
     is_hidden: bool,
     scoped_vault_id: &'a ScopedVaultId,
     vault_id: &'a VaultId,
@@ -110,7 +107,7 @@ impl Fingerprint {
                     fp.kind
                 )));
             }
-            if fp.scope == FingerprintVariant::Global && !fp.kind.is_globally_fingerprintable() {
+            if fp.scope == FingerprintScope::Global && !fp.kind.is_globally_fingerprintable() {
                 return Err(DbError::ValidationError(format!(
                     "Fingerprinting DI that is not globally fingerprintable {}",
                     fp.kind

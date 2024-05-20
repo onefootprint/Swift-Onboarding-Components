@@ -15,12 +15,12 @@ use strum_macros::{AsRefStr, EnumString};
     Copy,
     AsExpression,
     FromSqlRow,
-    EnumString,
+    // EnumString,
     AsRefStr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum FingerprintVariant {
+pub enum FingerprintScope {
     /// Fingerprint of a single field created with a global scope across all tenants.
     /// Created using a global salt.
     Global,
@@ -29,10 +29,30 @@ pub enum FingerprintVariant {
     Tenant,
     /// Fingerprint is stored in plaintext.
     Plaintext,
-    /// Fingerprint is a function of multiple pieces of data.
-    /// Created using multiple fingerprints with a partial salt.
-    /// It has a global scope across all tenants
-    Composite,
+}
+
+#[allow(clippy::use_self)]
+impl ::core::str::FromStr for FingerprintScope {
+    type Err = ::strum::ParseError;
+
+    fn from_str(s: &str) -> ::core::result::Result<FingerprintScope, <Self as ::core::str::FromStr>::Err> {
+        ::core::result::Result::Ok(match s {
+            "global" | "composite" => FingerprintScope::Global,
+            "tenant" => FingerprintScope::Tenant,
+            "plaintext" => FingerprintScope::Plaintext,
+            _ => return ::core::result::Result::Err(::strum::ParseError::VariantNotFound),
+        })
+    }
+}
+#[allow(clippy::use_self)]
+impl ::core::convert::TryFrom<&str> for FingerprintScope {
+    type Error = ::strum::ParseError;
+
+    fn try_from(
+        s: &str,
+    ) -> ::core::result::Result<FingerprintScope, <Self as ::core::convert::TryFrom<&str>>::Error> {
+        ::core::str::FromStr::from_str(s)
+    }
 }
 
 #[derive(
@@ -67,5 +87,5 @@ impl FingerprintVersion {
     }
 }
 
-crate::util::impl_enum_str_diesel!(FingerprintVariant);
+crate::util::impl_enum_str_diesel!(FingerprintScope);
 crate::util::impl_enum_str_diesel!(FingerprintVersion);

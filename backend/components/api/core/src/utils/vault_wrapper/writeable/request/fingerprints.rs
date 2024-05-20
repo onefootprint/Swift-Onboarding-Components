@@ -11,7 +11,7 @@ use db::{
 use itertools::{chain, Itertools};
 use newtypes::{
     fingerprint_salt::FingerprintSalt, CompositeFingerprint, CompositeFingerprintKind, DataLifetimeId,
-    Fingerprint, FingerprintKind, FingerprintVariant, MissingFingerprint,
+    Fingerprint, FingerprintKind, FingerprintScope, MissingFingerprint,
 };
 
 use crate::{
@@ -55,7 +55,7 @@ impl Fingerprints {
             kind: FingerprintKind,
             data: FingerprintDataValue,
             lifetime_ids: Vec<&'a DataLifetimeId>,
-            scope: FingerprintVariant,
+            scope: FingerprintScope,
         }
 
         //
@@ -95,7 +95,7 @@ impl Fingerprints {
                 kind: FingerprintKind::DI(vd.kind.clone()),
                 data: p_data.into(),
                 lifetime_ids: vec![&vd.lifetime_id],
-                scope: FingerprintVariant::Plaintext,
+                scope: FingerprintScope::Plaintext,
             });
 
         //
