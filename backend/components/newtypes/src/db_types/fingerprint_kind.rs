@@ -119,9 +119,16 @@ impl CompositeFingerprint {
         }
     }
 
-    /// Returns true if the CompositeFingerprintKind is a function of any of the given DataIdentifiers
-    pub fn contains(&self, dis: &[&DataIdentifier]) -> bool {
-        self.salts().iter().any(|fpk| dis.contains(&&fpk.di()))
+    /// Returns true if we can generate this composite fingerprint. We'll only generate a composite
+    /// fingerprint if (1) a constituent piece of data is updated in this request and
+    /// (2) all constituent pieces of data are either present in the vault or the request.
+    pub fn should_generate(&self, existing_dis: &[DataIdentifier], new_dis: &[&DataIdentifier]) -> bool {
+        let new_data_intersects = self.salts().iter().any(|fpk| new_dis.contains(&&fpk.di()));
+        let all_data_contains = self
+            .salts()
+            .iter()
+            .all(|fpk| new_dis.contains(&&fpk.di()) || existing_dis.contains(&fpk.di()));
+        new_data_intersects && all_data_contains
     }
 
     /// Given the partial FPs from which this composite FP is composed, compute the composite FP.
@@ -162,12 +169,14 @@ pub struct MissingFingerprint(pub FingerprintSalt);
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
-
     use crate::{
         fingerprint_salt::{FingerprintSalt, PartialFingerprintKind},
-        CompositeFingerprint, Fingerprint, IdentityDataKind as IDK, MissingFingerprint, TenantId,
+        CompositeFingerprint, DataIdentifier, Fingerprint, IdentityDataKind as IDK, MissingFingerprint,
+        TenantId,
     };
+    use itertools::Itertools;
+    use std::collections::HashMap;
+    use test_case::test_case;
 
     #[test]
     fn test_composite_fingerprint() {
@@ -224,5 +233,19 @@ mod test {
             result,
             Err(MissingFingerprint(PartialFingerprintKind::Dob.into()))
         )
+    }
+
+    #[test_case(CompositeFingerprint::NameDob, vec![], vec![] => false)]
+    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName, IDK::LastName, IDK::Dob], vec![] => false)]
+    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName, IDK::LastName], vec![IDK::Dob] => true)]
+    #[test_case(CompositeFingerprint::NameDob, vec![IDK::FirstName], vec![IDK::LastName, IDK::Dob] => true)]
+    #[test_case(CompositeFingerprint::NameDob, vec![], vec![IDK::FirstName, IDK::LastName, IDK::Dob] => true)]
+    #[test_case(CompositeFingerprint::NameDob, vec![], vec![IDK::LastName, IDK::Dob] => false)]
+    #[test_case(CompositeFingerprint::NameDob, vec![IDK::LastName], vec![IDK::LastName, IDK::Dob] => false)]
+    fn test_should_generate(cfp: CompositeFingerprint, existing: Vec<IDK>, new: Vec<IDK>) -> bool {
+        let existing = existing.into_iter().map(DataIdentifier::from).collect_vec();
+        let new = new.into_iter().map(DataIdentifier::from).collect_vec();
+        let new = new.iter().collect_vec();
+        cfp.should_generate(&existing, &new)
     }
 }

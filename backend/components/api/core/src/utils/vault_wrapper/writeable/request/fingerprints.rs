@@ -102,10 +102,11 @@ impl Fingerprints {
         // Create composite fingerprints out of pre-computed partial fingerprints
         //
         let fps: HashMap<_, _> = fps.into_iter().collect();
-        let vd_kinds = new_vd.iter().map(|vd| &vd.kind).collect_vec();
+        let new_vd: HashMap<_, _> = new_vd.iter().map(|vd| (&vd.kind, vd)).collect();
+        let vd_kinds = new_vd.keys().cloned().collect_vec();
         let composite_fingerprints = CompositeFingerprint::list(&sv.tenant_id)
             .into_iter()
-            .filter(|cfp| cfp.contains(&vd_kinds))
+            .filter(|cfp| cfp.should_generate(&vw.populated_dis(), &vd_kinds))
             .map(|cfp| -> ApiResult<_> {
                 // For each Composite FPK that has any DI represented in this data update, generate
                 // the new composite fingerprint out of the pre-computed partial fingerprints
@@ -123,9 +124,10 @@ impl Fingerprints {
                 // This composite fingerprint will be linked to multiple DataLifetimes, so when any
                 // of the constituent pieces of data is deactivated, this fingerprint will be too.
                 // The lifetime could be from a newly created VD, or from a VD that already exists.
-                let new_vd_lifetime_ids = new_vd
-                    .iter()
-                    .filter(|vd| cfp.contains(&[&vd.kind]))
+                let new_vd_lifetime_ids = cfp
+                    .salts()
+                    .into_iter()
+                    .flat_map(|salt| new_vd.get(&salt.di()))
                     .map(|vd| &vd.lifetime_id);
                 let existing_vd_lifetime_ids =
                     cfp.salts().into_iter().flat_map(|salt| salt_to_dl_id.get(&salt));
