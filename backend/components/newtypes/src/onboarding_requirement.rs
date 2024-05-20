@@ -5,6 +5,7 @@ use crate::{
     DocumentUploadMode, IdDocKind, Iso3166TwoDigitCountryCode,
 };
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
 
 use strum::EnumDiscriminants;
@@ -166,6 +167,40 @@ impl OnboardingRequirement {
                 config: _,
             } => false,
             Self::Process => false,
+        }
+    }
+
+    /// The human-readable error describing why this requirement is unmet
+    pub fn unmet_str(&self) -> String {
+        match self {
+            Self::CollectData {
+                missing_attributes,
+                optional_attributes: _,
+                populated_attributes: _,
+            }
+            | Self::CollectInvestorProfile {
+                missing_attributes,
+                missing_document: _,
+                populated_attributes: _,
+            }
+            | Self::CollectBusinessData {
+                missing_attributes,
+                populated_attributes: _,
+            } => format!(
+                "Missing {}",
+                missing_attributes.iter().map(|c| c.to_string()).join(", ")
+            ),
+            Self::Authorize {
+                fields_to_authorize: _,
+                authorized_at: _,
+            } => "Onboarding is unauthorized".into(),
+            Self::RegisterPasskey => "Missing passkey registration".into(),
+            Self::CollectDocument {
+                document_request_id: _,
+                upload_mode: _,
+                config,
+            } => format!("Missing {} document", DocumentRequestKind::from(config)),
+            Self::Process => "Onboarding pending".into(),
         }
     }
 }

@@ -8,7 +8,7 @@ use api_core::{
         actions::WorkflowActions, document::DocumentState, kyc::KycState, DocCollected,
         RunIncodeMachineAndWorkflowResult, WorkflowKind, WorkflowWrapper,
     },
-    errors::{workflow::WorkflowError, ApiResult},
+    errors::{onboarding::UnmetRequirements, workflow::WorkflowError, ApiResult},
     types::{EmptyResponse, JsonApiResponse},
     utils::{actix::OptionalJson, requirements::GetRequirementsArgs},
 };
@@ -51,8 +51,7 @@ pub async fn post(
         .filter(|r| !matches!(r, OnboardingRequirement::Process))
         .collect_vec();
     if !unmet_reqs.is_empty() {
-        let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
-        return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
+        return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());
     }
 
     // Update the fixture result on the workflow, if provided

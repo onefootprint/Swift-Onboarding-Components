@@ -1,6 +1,9 @@
+use std::fmt::Display;
+
+use itertools::Itertools;
 use newtypes::{
     output::Csv, CollectedDataOption, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationKind,
-    OnboardingRequirementKind, WorkflowId,
+    OnboardingRequirement, WorkflowId,
 };
 use thiserror::Error;
 
@@ -20,8 +23,6 @@ pub enum OnboardingError {
     IdvReqsAlreadyInitiated,
     #[error("Tenant does not match")]
     TenantMismatch,
-    #[error("Unmet onboarding requirements: {0}")]
-    UnmetRequirements(Csv<OnboardingRequirementKind>),
     #[error("Some attributes have not been collected: {0}")]
     MissingAttributes(Csv<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state")]
@@ -64,4 +65,16 @@ pub enum OnboardingError {
     OnlyOneImageAllowed,
     #[error("Cannot onboard onto an {0} playbook")]
     CannotOnboardOntoPlaybook(ObConfigurationKind),
+    #[error("{0}")]
+    UnmetRequirements(#[from] UnmetRequirements),
+}
+
+#[derive(Debug, Error)]
+pub struct UnmetRequirements(pub Vec<OnboardingRequirement>);
+
+impl Display for UnmetRequirements {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> core::fmt::Result {
+        let missing_reqs = self.0.iter().map(|req| req.unmet_str()).collect_vec();
+        write!(f, "{}", missing_reqs.join(". "))
+    }
 }

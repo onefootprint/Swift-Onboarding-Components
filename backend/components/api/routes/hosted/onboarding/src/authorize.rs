@@ -6,6 +6,7 @@ use crate::{
 };
 use api_core::{
     auth::user::UserWfAuthContext,
+    errors::onboarding::UnmetRequirements,
     types::{EmptyResponse, JsonApiResponse},
     utils::requirements::{get_requirements_for_person_and_maybe_business, GetRequirementsArgs},
 };
@@ -39,8 +40,7 @@ pub async fn post(user_auth: UserWfAuthContext, state: web::Data<State>) -> Json
         .filter(|r| !matches!(r, OnboardingRequirement::Authorize { .. } | OnboardingRequirement::Process ))
         .collect_vec();
     if !unmet_reqs.is_empty() {
-        let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
-        return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
+        return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());
     }
 
     // mark person and business wf as authorized

@@ -36,7 +36,7 @@ def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
     expected_error = None
     if missing_data:
         vault_data.pop("business.name")
-        expected_error = "Unmet onboarding requirements: CollectBusinessData"  # TODO: these are not great user facing errors
+        expected_error = "Missing business_name"
 
     vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
     fp_id = vault["id"]

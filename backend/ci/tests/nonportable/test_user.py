@@ -67,8 +67,20 @@ def test_external_id(tenant, sandbox_tenant):
 def test_create_with_external_id_after_deactivate(tenant, sandbox_tenant):
     idempotency_id = f"idempotency_id_{_gen_random_sandbox_id()}"
     external_id = f"my_cus_id_{_gen_random_sandbox_id()}"
-    body_1 = post("users/", None, tenant.sk.key, IdempotencyId(idempotency_id), ExternalId(external_id))
-    body_2 = post("users/", None, tenant.sk.key, IdempotencyId(idempotency_id), ExternalId(external_id))
+    body_1 = post(
+        "users/",
+        None,
+        tenant.sk.key,
+        IdempotencyId(idempotency_id),
+        ExternalId(external_id),
+    )
+    body_2 = post(
+        "users/",
+        None,
+        tenant.sk.key,
+        IdempotencyId(idempotency_id),
+        ExternalId(external_id),
+    )
 
     assert body_1["id"] == body_2["id"]
     assert body_1["external_id"] == body_2["external_id"] == external_id
@@ -77,16 +89,30 @@ def test_create_with_external_id_after_deactivate(tenant, sandbox_tenant):
     delete(f"users/{fp_id}", None, tenant.sk.key)
 
     # Reusing the same idempotency ID results in a 400 error.
-    post("users/", None, tenant.sk.key, IdempotencyId(idempotency_id), ExternalId(external_id), status_code=400)
+    post(
+        "users/",
+        None,
+        tenant.sk.key,
+        IdempotencyId(idempotency_id),
+        ExternalId(external_id),
+        status_code=400,
+    )
 
     # Using a new idempotency ID works.
     idempotency_id = f"idempotency_id_{_gen_random_sandbox_id()}"
-    body_1 = post("users/", None, tenant.sk.key, IdempotencyId(idempotency_id), ExternalId(external_id))
+    body_1 = post(
+        "users/",
+        None,
+        tenant.sk.key,
+        IdempotencyId(idempotency_id),
+        ExternalId(external_id),
+    )
 
     # Using no idempotency ID works.
     body_2 = post("users/", None, tenant.sk.key, ExternalId(external_id))
     assert body_1["id"] == body_2["id"]
     assert body_1["external_id"] == body_2["external_id"] == external_id
+
 
 @pytest.mark.parametrize(
     "missing_can_access_data,missing_vault_data,expected_error",
@@ -100,7 +126,7 @@ def test_create_with_external_id_after_deactivate(tenant, sandbox_tenant):
         (
             [],
             ["id.ssn9"],
-            "Unmet onboarding requirements: CollectData",
+            "Missing ssn9",
         ),  # TODO: these are not great user facing errors
     ],
 )

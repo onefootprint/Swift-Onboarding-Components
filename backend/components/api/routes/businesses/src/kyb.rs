@@ -4,7 +4,11 @@ use crate::{
     State,
 };
 use api_core::{
-    errors::{onboarding::OnboardingError, tenant::TenantError, ApiResult, ValidationError},
+    errors::{
+        onboarding::{OnboardingError, UnmetRequirements},
+        tenant::TenantError,
+        ApiResult, ValidationError,
+    },
     task,
     telemetry::RootSpan,
     utils::{
@@ -140,8 +144,7 @@ pub async fn post(
                 .filter(|r| !matches!(r, OnboardingRequirement::Process))
                 .collect_vec();
             if !unmet_reqs.is_empty() {
-                let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
-                return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
+                return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());
             }
 
             Ok(biz_wf)

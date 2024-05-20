@@ -3,7 +3,10 @@ use api_core::{
         user::{load_auth_events, UserAuthContext, UserAuthScope, UserIdentifier, UserWfAuthContext},
         IsGuardMet,
     },
-    errors::{onboarding::OnboardingError, AssertionError},
+    errors::{
+        onboarding::{OnboardingError, UnmetRequirements},
+        AssertionError,
+    },
     types::{response::ResponseData, JsonApiResponse},
     utils::{
         identify::get_user_challenge_context,
@@ -37,8 +40,7 @@ pub async fn post(
         let reqs = get_requirements_for_person_and_maybe_business(&state, args).await?;
         let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();
         if !unmet_reqs.is_empty() {
-            let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
-            return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
+            return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());
         }
 
         let wf = user_wf_auth.workflow().clone();
