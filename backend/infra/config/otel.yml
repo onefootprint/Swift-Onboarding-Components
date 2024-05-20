@@ -50,6 +50,13 @@ processors:
           - ecs.task.storage.write_bytes
           - container.duration
 
+  attributes/remove_honeycomb_service_name:
+    # In Honeycomb, we use fpc-api as the service name even for workers and crons.
+    # In Datadog, we want to use the actual service name.
+    actions:
+      - key: service.name
+        action: delete
+
 exporters:
   logging:
     loglevel: debug
@@ -77,6 +84,14 @@ exporters:
       'x-honeycomb-team': '${HONEYCOMB_API_KEY}'
       'x-honeycomb-dataset': 'fpc-aws-otel'
 
+  otlp/datadog:
+    # Exporting to the Datdog agent's OTLP receiver. This makes it easier to
+    # switch to the Datadog agent directly.
+    endpoint: 'http://127.0.0.1:${DD_OTEL_PORT}'
+    tls:
+      # Connecting to local agent.
+      insecure: true
+
 service:
   pipelines:
     traces:
@@ -103,5 +118,17 @@ service:
       receivers: [otlp]
       processors: [memory_limiter, batch/honeycomb]
       exporters: [otlp/honeycomb]
+    traces/datadog:
+      receivers: [otlp]
+      processors: [memory_limiter, attributes/remove_honeycomb_service_name]
+      exporters: [otlp/datadog]
+    logs/datadog:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlp/datadog]
+    metrics/datadog:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlp/datadog]
 
   extensions: [health_check]

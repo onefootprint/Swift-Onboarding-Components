@@ -15,6 +15,7 @@ import { GetStackMetadata, StackEnvironment } from './stack_metadata';
 import { FPC_SERVICE_PORT } from './sg';
 
 const OTEL_PORT = 4317;
+const DD_OTEL_PORT = 4327;
 
 // The path at which metrics are served.
 const METRICS_ENDPOINT_PATH = 'metrics';
@@ -523,7 +524,7 @@ export abstract class ServiceContainers {
                   // Using fpc-api as the service name for crons and workers
                   // too so they are grouped under the same Honeycomb dataset.
                   `service.name=fpc-api`,
-                  `service.version=1.0`,
+                  `service.version=${constants.containers.apiVersion}`,
                   `deployment.environment=${pulumi.getStack()}`,
                   ...Array.from(otelExtraAttributes.entries()).map(
                     ([k, v]) => `${k}=${v}`,
@@ -725,6 +726,10 @@ export abstract class ServiceContainers {
               name: 'API_SERVER_METRICS_ENDPOINT_PATH',
               value: `${METRICS_ENDPOINT_PATH}`,
             },
+            {
+              name: 'DD_OTEL_PORT',
+              value: `${DD_OTEL_PORT}`,
+            },
           ],
           healthCheck: {
             command: ['CMD', '/healthcheck'],
@@ -788,11 +793,25 @@ export abstract class ServiceContainers {
               hostPort: 8126,
               protocol: 'tcp',
             },
+            {
+              // OTLP gRPC endpoint
+              containerPort: DD_OTEL_PORT,
+              hostPort: DD_OTEL_PORT,
+              protocol: 'tcp',
+            },
           ],
           environment: [
             {
               name: 'ECS_FARGATE',
               value: 'true',
+            },
+            {
+              name: 'DD_APM_ENABLED',
+              value: 'true',
+            },
+            {
+              name: 'DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_GRPC_ENDPOINT',
+              value: `0.0.0.0:${DD_OTEL_PORT}`,
             },
             {
               name: 'DD_TAGS',
