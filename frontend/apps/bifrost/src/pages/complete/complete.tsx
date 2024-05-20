@@ -7,7 +7,7 @@ import {
 } from '@onefootprint/idv';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
 import checkIsMobile from '@onefootprint/idv/src/utils/check-is-mobile';
-import { Box, LinkButton } from '@onefootprint/ui';
+import { Box, Button, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
@@ -43,22 +43,30 @@ const Complete = () => {
 
   return (
     <Container>
-      <NavigationHeader leftButton={{ variant: 'close' }} />
-      <IcoCheckCircle40 color="success" />
+      <NavigationHeader
+        leftButton={isWebview ? undefined : { variant: 'close' }}
+      />
+      {!isWebview && <IcoCheckCircle40 color="success" />}
       <Box marginBottom={4} />
       <HeaderTitle
         display="flex"
         flexDirection="column"
         gap={4}
-        subtitle={t('subtitle')}
-        title={t('title')}
+        subtitle={isWebview ? t('subtitle.webview') : t('subtitle.browser')}
+        title={isWebview ? t('title.webview') : t('title.browser')}
         zIndex={3}
       />
       <Box />
-      <Box marginTop={7}>
-        <LinkButton onClick={() => handleComplete()}>
-          {isWebview ? t('cta.webview') : t('cta.browser')}
-        </LinkButton>
+      <Box marginTop={7} width="100%">
+        {isWebview ? (
+          <Button fullWidth onClick={() => handleComplete()}>
+            {t('cta.webview')}
+          </Button>
+        ) : (
+          <LinkButton onClick={() => handleComplete()}>
+            {t('cta.browser')}
+          </LinkButton>
+        )}
       </Box>
     </Container>
   );
@@ -68,6 +76,7 @@ const Container = styled.div`
   height: 100%;
   width: 100%;
   align-items: center;
+  justify-content: center;
   display: flex;
   flex-direction: column;
   text-align: center;
