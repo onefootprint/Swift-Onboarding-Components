@@ -15,7 +15,7 @@ use strum_macros::{AsRefStr, EnumString};
     Copy,
     AsExpression,
     FromSqlRow,
-    // EnumString,
+    EnumString,
     AsRefStr,
 )]
 #[strum(serialize_all = "snake_case")]
@@ -29,30 +29,6 @@ pub enum FingerprintScope {
     Tenant,
     /// Fingerprint is stored in plaintext.
     Plaintext,
-}
-
-#[allow(clippy::use_self)]
-impl ::core::str::FromStr for FingerprintScope {
-    type Err = ::strum::ParseError;
-
-    fn from_str(s: &str) -> ::core::result::Result<FingerprintScope, <Self as ::core::str::FromStr>::Err> {
-        ::core::result::Result::Ok(match s {
-            "global" | "composite" => FingerprintScope::Global,
-            "tenant" => FingerprintScope::Tenant,
-            "plaintext" => FingerprintScope::Plaintext,
-            _ => return ::core::result::Result::Err(::strum::ParseError::VariantNotFound),
-        })
-    }
-}
-#[allow(clippy::use_self)]
-impl ::core::convert::TryFrom<&str> for FingerprintScope {
-    type Error = ::strum::ParseError;
-
-    fn try_from(
-        s: &str,
-    ) -> ::core::result::Result<FingerprintScope, <Self as ::core::convert::TryFrom<&str>>::Error> {
-        ::core::str::FromStr::from_str(s)
-    }
 }
 
 #[derive(
