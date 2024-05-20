@@ -90,6 +90,7 @@ pub async fn post(
     ResponseData::ok(response).json()
 }
 
+#[tracing::instrument(skip_all)]
 async fn backfill_composite_fingerprints(
     state: &State,
     vw: TenantVw,
