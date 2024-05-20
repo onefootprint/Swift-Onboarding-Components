@@ -1475,7 +1475,7 @@
               "device-not-found": "Cámara no encontrada",
               "device-busy": "La cámara está ocupada",
               "no-video-option": "La cámara no puede tomar fotos",
-              "missing-media-devices": "La cámara no disponible",
+              "missing-media-devices": "La cámara no está disponible",
               "other-error": "Algo salió mal"
             },
             "subtitle": {
