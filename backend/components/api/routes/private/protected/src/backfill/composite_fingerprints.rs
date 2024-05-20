@@ -10,14 +10,10 @@ use api_core::{
     State,
 };
 use db::{
-    models::{
-        fingerprint::{Fingerprint as DbFingerprint, NewFingerprintArgs},
-        scoped_vault::ScopedVault,
-        vault::Vault,
-    },
+    models::fingerprint::{Fingerprint as DbFingerprint, NewFingerprintArgs},
     DbError,
 };
-use db_schema::schema::{fingerprint, scoped_vault, vault};
+use db_schema::schema::fingerprint;
 use diesel::{prelude::*, QueryDsl};
 use futures::StreamExt;
 use itertools::Itertools;
@@ -51,7 +47,7 @@ pub async fn post(
         cursor,
     } = request.into_inner();
 
-    let (vws, cursor) = state
+    let (sv_ids, cursor) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv_ids = svs_to_backfill::table
@@ -62,21 +58,13 @@ pub async fn post(
                 .get_results::<ScopedVaultId>(conn)
                 .map_err(DbError::from)?;
             let cursor = sv_ids.last().cloned();
-            let svs = scoped_vault::table
-                .filter(scoped_vault::id.eq_any(&sv_ids))
-                .inner_join(vault::table)
-                .get_results::<(ScopedVault, Vault)>(conn)
-                .map_err(DbError::from)?;
-            let vws: HashMap<ScopedVaultId, TenantVw> =
-                VaultWrapper::multi_get_for_tenant(conn, svs.clone(), None)?;
-            let vws = vws.into_values().collect_vec();
-            Ok((vws, cursor))
+            Ok((sv_ids, cursor))
         })
         .await?;
 
-    let vws_fut = vws
+    let vws_fut = sv_ids
         .into_iter()
-        .map(|vw| backfill_composite_fingerprints(&state, vw, dry_run))
+        .map(|sv_id| backfill_composite_fingerprints(&state, sv_id, dry_run))
         .collect_vec();
     let futs = futures::stream::iter(vws_fut).buffer_unordered(concurrency);
     let data = futs
@@ -93,9 +81,13 @@ pub async fn post(
 #[tracing::instrument(skip_all)]
 async fn backfill_composite_fingerprints(
     state: &State,
-    vw: TenantVw,
+    sv_id: ScopedVaultId,
     dry_run: bool,
 ) -> ApiResult<ScopedVaultId> {
+    let vw: TenantVw = state
+        .db_pool
+        .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
+        .await?;
     let sv = vw.scoped_vault.clone();
     let sv_id = sv.id.clone();
     let tenant_id = &vw.scoped_vault.tenant_id;
