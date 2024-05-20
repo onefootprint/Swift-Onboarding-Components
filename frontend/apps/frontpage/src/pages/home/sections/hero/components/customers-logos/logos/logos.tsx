@@ -6,6 +6,7 @@ import ComposerLogo from 'src/components/company-logos/themed/composer';
 import FindigsLogo from 'src/components/company-logos/themed/findigs';
 import FlexcarLogo from 'src/components/company-logos/themed/flexcar';
 import GridLogo from 'src/components/company-logos/themed/grid';
+import YieldstreetLogo from 'src/components/company-logos/themed/yieldstreet';
 import styled, { css, useTheme } from 'styled-components';
 
 const Logos = () => {
@@ -29,6 +30,9 @@ const Logos = () => {
       </Stack>
       <Stack justify="center" align="center" padding={2}>
         <BloomLogo color={theme.color.tertiary} />
+      </Stack>
+      <Stack justify="center" align="center" padding={2}>
+        <YieldstreetLogo color={theme.color.tertiary} />
       </Stack>
     </Container>
   );

@@ -38,15 +38,10 @@ export const Customize = () => {
     const component = footprint.init({
       kind: FootprintComponentKind.Verify,
       publicKey,
-      appearance: {
-        variables: {
-          borderRadius: `${borderRadius}px`,
-          buttonPrimaryBg: backgroundColor,
-        },
-      },
     });
     component.render();
   };
+
   return (
     <SectionContainer>
       <SectionTitle title={t('title')} subtitle={t('subtitle')} />

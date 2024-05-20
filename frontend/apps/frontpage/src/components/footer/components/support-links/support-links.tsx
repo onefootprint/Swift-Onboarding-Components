@@ -3,7 +3,7 @@ import {
   IcoX24,
   ThemedLogoFpCompact,
 } from '@onefootprint/icons';
-import { Box, createFontStyles, Stack, Text } from '@onefootprint/ui';
+import { Box, createFontStyles, media, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -59,23 +59,15 @@ const SuportLinks = () => {
   );
 };
 
-const StyledIconLink = styled(Link)`
-  ${({ theme }) => css`
-    &:hover {
-      svg {
-        path {
-          fill: ${theme.color.primary};
-        }
-      }
-    }
-  `}
-`;
-
 const Container = styled(Box)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[4]};
+
+    ${media.greaterThan('md')`
+      gap: ${theme.spacing[3]};
+    `}
   `}
 `;
 
@@ -106,6 +98,18 @@ const BadgesContainer = styled(Stack)`
     img {
       width: 32px;
       height: 32px;
+    }
+  `}
+`;
+
+const StyledIconLink = styled(Link)`
+  ${({ theme }) => css`
+    &:hover {
+      svg {
+        path {
+          fill: ${theme.color.primary};
+        }
+      }
     }
   `}
 `;
