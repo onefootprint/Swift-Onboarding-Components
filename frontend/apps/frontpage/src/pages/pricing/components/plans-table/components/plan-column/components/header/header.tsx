@@ -7,13 +7,32 @@ import { type HeaderProps } from '../../../../plans-table-types';
 
 const Header = ({ title, price }: HeaderProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
-  const hasPrice = price && price.monthly && price.yearly;
 
   const USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0,
   });
+
+  const renderPrice = (
+    priceDetails: {
+      monthly?: number;
+      yearly?: number;
+    } = {},
+  ) => {
+    const { monthly, yearly } = priceDetails;
+    if (monthly && yearly) {
+      return (
+        <Stack direction="row" gap={2}>
+          <Text variant="label-3">
+            {t('units.from')} {USDollar.format(monthly)}
+          </Text>
+          <Text variant="label-3">{t('units.per-month')}</Text>
+        </Stack>
+      );
+    }
+    return null;
+  };
 
   return (
     <Container
@@ -27,20 +46,7 @@ const Header = ({ title, price }: HeaderProps) => {
     >
       <Stack direction="column" gap={2}>
         <Text variant="heading-3">{title}</Text>
-        {hasPrice ? (
-          <Stack direction="column">
-            <Stack direction="row" gap={2}>
-              <Text variant="label-3">
-                {t('units.from')} {USDollar.format(price.monthly || 0)}
-              </Text>
-              <Text variant="label-3">{t('units.per-month')}</Text>
-            </Stack>
-          </Stack>
-        ) : (
-          <Text variant="body-3" color="tertiary">
-            {t('contact-us')}
-          </Text>
-        )}
+        {renderPrice(price)}
       </Stack>
     </Container>
   );

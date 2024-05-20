@@ -7,8 +7,8 @@ const PlansDetails = [
     title: Plans.startup,
     id: Plans.startup,
     price: {
-      monthly: 500,
-      yearly: 5000,
+      monthly: undefined,
+      yearly: undefined,
     },
     features: [
       {
