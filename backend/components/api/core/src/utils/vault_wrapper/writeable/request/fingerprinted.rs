@@ -1,8 +1,10 @@
+use itertools::Itertools;
 use newtypes::{
-    fingerprint_salt::FingerprintSalt, DataIdentifier, DataRequest, Fingerprint, PiiString, ScopedVaultId,
-    TenantId,
+    fingerprint_salt::FingerprintSalt, CompositeFingerprintKind, DataIdentifier, DataRequest, Fingerprint,
+    PiiString, ScopedVaultId, TenantId,
 };
 use std::{clone::Clone, collections::HashMap};
+use strum::IntoEnumIterator;
 
 use crate::{
     errors::ApiResult,
@@ -35,11 +37,21 @@ impl FingerprintedDataRequest {
             .db_query(move |conn| VaultWrapper::<Any>::build_for_tenant(conn, &sv_id))
             .await?;
         let t_id = &vw.scoped_vault.tenant_id;
-        let res = Self::build_for_new_user(state, data, t_id).await?;
-        // TODO one day get missing fingerprints from the data in the vault if it's not in this request
-        // TODO should we also check that the data we use to make partial fingerprints doesn't change
-        // before we make the composite fingerprint?
-        // otherwise, we could still have stale composite fingerprints...
+        let mut res = Self::build_for_new_user(state, data, t_id).await?;
+
+        // If we're only updating some of the DIs that makes up a composite fingerprint, generate
+        // fingerprints from the existing data in the vault for all other DIs that make up the
+        // composite fingerprint
+        let dis = res.data.keys().collect_vec();
+        let needed_fps = CompositeFingerprintKind::iter()
+            .filter(|cfpk| cfpk.contains(&dis))
+            .flat_map(|cfpk| cfpk.partial_fp_kinds())
+            .map(|pfpk| pfpk.di())
+            .unique()
+            .collect_vec();
+        let missing_fps = needed_fps.iter().filter(|di| !dis.contains(di)).collect_vec();
+        let (addl_fingerprints, salt_to_dl_id) = vw.fingerprint_ciphertext(state, missing_fps, t_id).await?;
+        res.fingerprints.extend(addl_fingerprints, salt_to_dl_id);
         Ok(res)
     }
 

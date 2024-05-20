@@ -4,7 +4,6 @@ use db::{
     models::{
         contact_info::{ContactInfo, NewContactInfoArgs},
         data_lifetime::DataLifetime,
-        scoped_vault::ScopedVault,
         vault_data::{NewVaultData, VaultData},
     },
     TxnPgConn,
@@ -91,10 +90,9 @@ impl ValidatedDataRequest {
         // Create the new VDs
         let actor = actor.map(|a| a.into());
         let vd = VaultData::bulk_create(conn, v_id, sv_id, data, seqno, actor)?;
-        let sv = ScopedVault::get(conn, sv_id)?;
 
         // Save fingerprints
-        fingerprints.save(conn, &sv, &vd)?;
+        fingerprints.save(conn, vw, &vd)?;
 
         // Add contact info for the new CIs added
         let new_contact_info = vd

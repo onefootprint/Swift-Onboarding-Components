@@ -1,4 +1,4 @@
-from tests.utils import _gen_random_str, post, get, _gen_random_sandbox_id
+from tests.utils import _gen_random_str, post, get, _gen_random_sandbox_id, patch
 from tests.constants import FIXTURE_PHONE_NUMBER
 from tests.headers import SandboxId
 from tests.bifrost_client import BifrostClient
@@ -75,14 +75,36 @@ def test_composite_dupes(sandbox_tenant):
         "id.last_name": "Valley",
         "id.dob": "1995-01-01",
     }
-    fp_id1 = post("users", data, sandbox_tenant.sk.key)["id"]
+    fp_id1 = post("users", data, sandbox_tenant.s_sk)["id"]
     data["id.last_name"] = data["id.last_name"].lower()
-    fp_id2 = post("users", data, sandbox_tenant.sk.key)["id"]
+    fp_id2 = post("users", data, sandbox_tenant.s_sk)["id"]
 
-    data = {"id.first_name": "Noe", "id.last_name": "v", "id.dob": "1995-01-01"}
-    post("users", data, sandbox_tenant.sk.key)["id"]
+    other_data = {
+        **data,
+        "id.first_name": "Noe",
+    }
+    fp_id3 = post("users", other_data, sandbox_tenant.s_sk)["id"]
 
     dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
     assert len(dupes["same_tenant"]) == 1
     assert dupes["same_tenant"][0]["fp_id"] == fp_id2
     assert dupes["same_tenant"][0]["dupe_kinds"] == ["name_dob"]
+
+    # When we update fp_id3's first name, it will make a new composite fingerprint that matches.
+    data = {"id.first_name": data["id.first_name"]}
+    patch(f"users/{fp_id3}/vault", data, sandbox_tenant.s_sk)
+
+    dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
+    assert len(dupes["same_tenant"]) == 2
+    dupe2 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id2)
+    assert dupe2["dupe_kinds"] == ["name_dob"]
+
+    dupe3 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id3)
+    assert dupe3["dupe_kinds"] == ["name_dob"]
+
+    # And updating the last name will deactivate the matching composite fingerprint and make a
+    # new composite fingerprint that doesn't match
+    data = {"id.last_name": "Hill"}
+    patch(f"users/{fp_id3}/vault", data, sandbox_tenant.s_sk)
+    dupes = get(f"entities/{fp_id1}/dupes", None, sandbox_tenant.s_sk)
+    assert not any(i["fp_id"] == fp_id3 for i in dupes["same_tenant"])

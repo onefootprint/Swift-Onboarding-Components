@@ -15,19 +15,41 @@ use newtypes::{
 };
 use strum::IntoEnumIterator;
 
-use crate::errors::{ApiResult, AssertionError};
+use crate::{
+    errors::{ApiResult, AssertionError, ValidationError},
+    utils::vault_wrapper::WriteableVw,
+};
 
 
 #[derive(Debug, Clone, derive_more::Deref)]
-pub(in super::super) struct Fingerprints(Vec<(FingerprintSalt, Fingerprint)>);
+pub(in super::super) struct Fingerprints {
+    #[deref]
+    fps: Vec<(FingerprintSalt, Fingerprint)>,
+    salt_to_dl_id: HashMap<FingerprintSalt, DataLifetimeId>,
+}
 
 impl Fingerprints {
-    pub fn new(data: Vec<(FingerprintSalt, Fingerprint)>) -> Self {
-        Self(data)
+    pub fn new(fps: Vec<(FingerprintSalt, Fingerprint)>) -> Self {
+        let salt_to_dl_id = HashMap::new();
+        Self { fps, salt_to_dl_id }
     }
 
-    pub fn save(self, conn: &mut TxnPgConn, sv: &ScopedVault, vd: &[VaultData]) -> ApiResult<()> {
-        let Self(fps) = self;
+    pub fn extend(
+        &mut self,
+        fps: Vec<(FingerprintSalt, Fingerprint)>,
+        salt_to_dl_id: HashMap<FingerprintSalt, DataLifetimeId>,
+    ) {
+        self.fps.extend(fps);
+        self.salt_to_dl_id.extend(salt_to_dl_id);
+    }
+
+    pub fn save<Type>(
+        self,
+        conn: &mut TxnPgConn,
+        vw: &WriteableVw<Type>,
+        new_vd: &[VaultData],
+    ) -> ApiResult<()> {
+        let Self { fps, salt_to_dl_id } = self;
 
         struct FingerprintData<'a> {
             kind: FingerprintKind,
@@ -36,8 +58,10 @@ impl Fingerprints {
             scope: FingerprintVariant,
         }
 
+        //
         // Create fingerprints for every piece of vault data we've saved
-        let sh_data_fingerprints = vd
+        //
+        let sh_data_fingerprints = new_vd
             .iter()
             .filter(|vd| vd.kind.is_fingerprintable())
             .flat_map(|vd| {
@@ -60,8 +84,10 @@ impl Fingerprints {
             })
             .collect_vec();
 
+        //
         // Some DIs are stored in plaintext and searchable - we want to make fingeprint rows for these too
-        let p_data_fingerprints = vd
+        //
+        let p_data_fingerprints = new_vd
             .iter()
             .filter(|vd| vd.kind.store_plaintext() && vd.kind.is_fingerprintable())
             .filter_map(|vd| vd.p_data.as_ref().map(|p_data| (p_data.clone(), vd)))
@@ -72,7 +98,9 @@ impl Fingerprints {
                 scope: FingerprintVariant::Plaintext,
             });
 
+        //
         // Create composite fingerprints out of pre-computed partial fingerprints
+        //
         let partial_fps: HashMap<_, _> = fps
             .into_iter()
             .filter_map(|(salt, fp)| {
@@ -82,7 +110,7 @@ impl Fingerprints {
                 Some((pfpk, fp))
             })
             .collect();
-        let vd_kinds = vd.iter().map(|vd| &vd.kind).collect_vec();
+        let vd_kinds = new_vd.iter().map(|vd| &vd.kind).collect_vec();
         let composite_fingerprints = CompositeFingerprintKind::iter()
             .filter(|cfpk| cfpk.contains(&vd_kinds))
             .map(|cfpk| -> ApiResult<_> {
@@ -91,21 +119,25 @@ impl Fingerprints {
                 let sh_data = match cfpk.compute(&partial_fps) {
                     Ok(sh_data) => sh_data,
                     Err(MissingPartialFingerprint(pfpk)) => {
-                        // TODO one day hard error here, or tracing::error.
-                        // We'll see this for any time a data update only updates part of a
-                        // composite fingerprint
-                        tracing::info!(%pfpk, "Failed to compute composite fingerprint. Missing partial fingerprint");
+                        tracing::error!(%pfpk, "Failed to compute composite fingerprint. Missing partial fingerprint");
                         return Ok(None);
                     }
                 };
-                let lifetime_ids = vd
+
+                // This composite fingerprint will be linked to multiple DataLifetimes, so when any
+                // of the constituent pieces of data is deactivated, this fingerprint will be too.
+                // The lifetime could be from a newly created VD, or from a VD that already exists.
+                let new_vd_lifetime_ids = new_vd
                     .iter()
                     .filter(|vd| cfpk.contains(&[&vd.kind]))
-                    .map(|vd| &vd.lifetime_id)
-                    .collect_vec();
+                    .map(|vd| &vd.lifetime_id);
+                let existing_vd_lifetime_ids = cfpk
+                    .partial_fp_kinds()
+                    .into_iter()
+                    .flat_map(|pfpk| salt_to_dl_id.get(&pfpk.into()));
+                let lifetime_ids = chain(new_vd_lifetime_ids, existing_vd_lifetime_ids).collect_vec();
                 if lifetime_ids.len() != cfpk.partial_fp_kinds().len() {
-                    // TODO eventually also look for lifetime_ids from existing vault data
-                    return AssertionError("Missing lifetime for composite fingerprint").into();
+                    return AssertionError("Not one lifetime ID for every partial fingerprint").into();
                 }
                 let d = FingerprintData {
                     kind: cfpk.into(),
@@ -118,7 +150,26 @@ impl Fingerprints {
             .collect::<ApiResult<Vec<_>>>()?
             .into_iter()
             .flatten();
+        // We are susceptible to a race condition... Our partial fingerprints may be stale if the
+        // vault data changed since we computed them. This may happen since we cannot lock the
+        // vault while computing partial fingerprints.
+        // If the partial fingeprints are stale, we've made the arbitrary decision to error.
+        for (salt, dl_id) in salt_to_dl_id.iter() {
+            let new_dl_id = vw.get_lifetime(&salt.di()).map(|dl| &dl.id);
+            if new_dl_id != Some(dl_id) {
+                tracing::error!(di=%salt.di(), old_dl_id=%dl_id, ?new_dl_id, "Aborted data update due to stale partial fingerprint");
+                return ValidationError(
+                    "Operation aborted due to a concurrent update on this user. Please retry this request",
+                )
+                .into();
+            }
+        }
 
+        //
+        // Save fingerprints to the database
+        //
+
+        let sv = ScopedVault::get(conn, &vw.scoped_vault_id)?;
         let fingerprints = chain!(sh_data_fingerprints, p_data_fingerprints, composite_fingerprints)
             .map(|d| {
                 let FingerprintData {
