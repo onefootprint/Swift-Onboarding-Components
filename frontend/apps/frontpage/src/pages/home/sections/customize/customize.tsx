@@ -38,7 +38,15 @@ export const Customize = () => {
     const component = footprint.init({
       kind: FootprintComponentKind.Verify,
       publicKey,
+      appearance: {
+        variables: {
+          borderRadius: `${borderRadius}px`,
+          buttonPrimaryBg: backgroundColor,
+          buttonPrimaryBorderColor: backgroundColor,
+        },
+      },
     });
+
     component.render();
   };
 

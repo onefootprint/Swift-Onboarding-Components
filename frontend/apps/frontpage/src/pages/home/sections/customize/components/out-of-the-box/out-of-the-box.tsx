@@ -10,6 +10,7 @@ const OutOfTheBox = ({ onClick }: OutOfTheBoxProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.home.customize.components.out-of-the-box',
   });
+
   return (
     <Text
       variant="label-2"
