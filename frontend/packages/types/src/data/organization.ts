@@ -21,4 +21,10 @@ export type Organization = {
   supportEmail?: string | null;
   supportPhone?: string | null;
   supportWebsite?: string | null;
+  parent: ParentOrganization | null;
+};
+
+export type ParentOrganization = {
+  name: string;
+  id: string;
 };

@@ -26,13 +26,18 @@ pub async fn get(
     let tenant = auth.tenant().clone();
 
     let domains = tenant.domains.clone();
-    let is_domain_already_claimed = state
+    let (is_domain_already_claimed, tenant_with_parent) = state
         .db_pool
-        .db_query(move |conn| Tenant::is_domain_already_claimed(conn, &domains))
+        .db_query(move |conn| -> ApiResult<_> {
+            Ok((
+                Tenant::is_domain_already_claimed(conn, &domains)?,
+                tenant.with_parent(conn)?,
+            ))
+        })
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db((
-        tenant,
+        tenant_with_parent,
         IsDomainAlreadyClaimed(is_domain_already_claimed),
     )))))
 }
@@ -107,11 +112,13 @@ async fn patch(
                 .into());
             }
 
-            if update_tenant == UpdateTenant::default() {
-                Ok(tenant)
+            let tenant = if update_tenant == UpdateTenant::default() {
+                tenant
             } else {
-                Ok(Tenant::update(conn, &tenant_id, update_tenant)?)
+                Tenant::update(conn, &tenant_id, update_tenant)?
             }
+            .with_parent(conn)?;
+            Ok(tenant)
         })
         .await?;
 

@@ -24,6 +24,7 @@ pub struct Organization {
     pub support_email: Option<String>,
     pub support_phone: Option<String>,
     pub support_website: Option<String>,
+    pub parent: Option<ParentOrganization>,
 }
 
 /// Partner Organization
@@ -41,4 +42,11 @@ pub struct PartnerOrganization {
     pub is_auth_method_supported: Option<bool>,
     pub logo_url: Option<String>,
     pub website_url: Option<String>,
+}
+
+/// Parent Organization
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct ParentOrganization {
+    pub id: TenantId,
+    pub name: String,
 }

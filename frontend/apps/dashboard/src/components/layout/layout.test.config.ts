@@ -36,6 +36,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: true,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
   {
     id: '_private_it_org_3',
@@ -50,6 +51,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: false,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
 ];
 

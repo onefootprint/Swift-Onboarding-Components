@@ -132,6 +132,17 @@ pub struct UserCounts {
     pub sandbox: i64,
 }
 
+pub struct TenantWithParent {
+    pub tenant: Tenant,
+    pub parent: Option<Tenant>,
+}
+
+impl From<Tenant> for TenantWithParent {
+    fn from(tenant: Tenant) -> Self {
+        TenantWithParent { tenant, parent: None }
+    }
+}
+
 impl Tenant {
     fn query(id: TenantIdentifier) -> BoxedQuery<Pg> {
         match id {
@@ -304,6 +315,22 @@ impl Tenant {
             false
         };
         Ok(result)
+    }
+
+    #[tracing::instrument("Tenant::get_with_parent", skip_all)]
+    pub fn with_parent(self, conn: &mut PgConn) -> DbResult<TenantWithParent> {
+        if let Some(super_tenant_id) = &self.super_tenant_id {
+            let parent = Tenant::get(conn, TenantIdentifier::Id(super_tenant_id))?;
+            Ok(TenantWithParent {
+                tenant: self,
+                parent: Some(parent),
+            })
+        } else {
+            Ok(TenantWithParent {
+                tenant: self,
+                parent: None,
+            })
+        }
     }
 }
 

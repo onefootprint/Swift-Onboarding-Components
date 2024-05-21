@@ -20,6 +20,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: true,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
   {
     id: '_private_it_org_2',
@@ -34,6 +35,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: false,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
   {
     id: '_private_it_org_3',
@@ -48,6 +50,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: true,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
   {
     id: '_private_it_org_4',
@@ -62,6 +65,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: true,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
   {
     id: '_private_it_org_5',
@@ -76,6 +80,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: true,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
   {
     id: '_private_it_org_6',
@@ -90,6 +95,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: true,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
   {
     id: '_private_it_org_7',
@@ -104,6 +110,7 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
     isAuthMethodSupported: true,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
 ];
 
@@ -178,6 +185,7 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
     isDomainAlreadyClaimed: null,
     isProdKybPlaybookRestricted: false,
     isProdKycPlaybookRestricted: false,
+    parent: null,
   },
 };
 

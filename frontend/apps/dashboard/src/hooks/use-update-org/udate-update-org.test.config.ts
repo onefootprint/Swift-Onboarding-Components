@@ -13,6 +13,7 @@ export const organizationFixture: Organization = {
   isDomainAlreadyClaimed: false,
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
+  parent: null,
 };
 
 export const withUpdateOrg = (newOrg: Partial<Organization>) =>

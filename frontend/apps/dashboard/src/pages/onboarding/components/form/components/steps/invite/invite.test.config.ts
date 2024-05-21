@@ -37,6 +37,7 @@ export const orgFixture: Organization = {
   isDomainAlreadyClaimed: false,
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
+  parent: null,
 };
 
 export const withRoles = (Roles: Role[] = RolesFixture) =>

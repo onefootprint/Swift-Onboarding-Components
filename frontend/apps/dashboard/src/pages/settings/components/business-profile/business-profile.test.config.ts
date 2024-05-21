@@ -16,6 +16,7 @@ export const organizationFixture: Organization = {
   isDomainAlreadyClaimed: false,
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
+  parent: null,
 };
 
 export const organizationDataLabels = [

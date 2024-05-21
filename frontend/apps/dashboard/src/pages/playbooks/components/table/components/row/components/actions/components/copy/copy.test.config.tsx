@@ -67,6 +67,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
     supportWebsite: null,
     isDomainAlreadyClaimed: false,
     companySize: null,
+    parent: null,
   },
   {
     id: 'org_hyZP3ksCvsT0AlLqMZsgrI',
@@ -85,6 +86,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
     supportWebsite: 'https://demo.onefootprint.com/acme',
     isDomainAlreadyClaimed: false,
     companySize: null,
+    parent: null,
   },
   {
     id: 'org_UT091oogB4RJv1QbBesp2h',
@@ -103,6 +105,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
     supportWebsite: null,
     isDomainAlreadyClaimed: false,
     companySize: null,
+    parent: null,
   },
 ];
 
@@ -147,6 +150,7 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
     supportWebsite: null,
     isDomainAlreadyClaimed: false,
     companySize: null,
+    parent: null,
   },
 };
 

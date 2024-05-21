@@ -6,6 +6,7 @@ import HelpDialog from './components/help-dialog';
 import Id from './components/id';
 import Logo from './components/logo';
 import Name from './components/name';
+import Parent from './components/parent/parent';
 import SupportEmail from './components/support-email';
 import SupportPhone from './components/support-phone';
 import SupportWebsite from './components/support-website';
@@ -32,6 +33,7 @@ const Content = ({ organization }: ContentProps) => {
         <Website value={organization.websiteUrl} />
         <Id value={organization.id} />
       </Grid.Container>
+      {organization.parent && <Parent org={organization.parent} />}
       <Stack direction="column" gap={5}>
         <Stack direction="column" gap={2}>
           <Text variant="label-2">{t('title')}</Text>
