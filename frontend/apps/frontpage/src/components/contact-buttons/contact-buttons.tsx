@@ -35,7 +35,12 @@ const ContactButtons = ({
         <Button
           variant="primary"
           size="large"
-          onClick={() => window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')}
+          onClick={() =>
+            window.open(
+              `${DASHBOARD_BASE_URL}/authentication/sign-up`,
+              '_blank',
+            )
+          }
         >
           {signUpButton}
         </Button>

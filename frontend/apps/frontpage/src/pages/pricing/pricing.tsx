@@ -37,7 +37,7 @@ const Pricing = () => {
             secondaryButton={t('banner.get-started')}
             onClickPrimaryButton={handleClickTrigger}
             onClickSecondaryButton={() =>
-              router.push(`${DASHBOARD_BASE_URL}/sign-up`)
+              router.push(`${DASHBOARD_BASE_URL}/authentication/sign-up`)
             }
           />
         </Stack>

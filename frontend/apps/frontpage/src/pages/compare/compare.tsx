@@ -32,7 +32,7 @@ const Compare = () => {
             {t('hero.subtitle')}
           </Text>
           <Box marginBottom={4} />
-          <LinkButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+          <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>
             {t('hero.cta')}
           </LinkButton>
           <Box marginBottom={10} />
