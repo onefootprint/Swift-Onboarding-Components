@@ -1,7 +1,6 @@
 import type { DuplicateDataItem } from '@onefootprint/types';
 import { DupeKind } from '@onefootprint/types';
 import { Box, CodeInline, Tag, Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import StatusBadge from 'src/components/status-badge';
@@ -11,19 +10,20 @@ export type RowProps = {
   duplicateDataItem: DuplicateDataItem;
 };
 
-const dupeKindToTranslationKey: Record<DupeKind, string> = {
-  [DupeKind.ssn9]: 'dupe-kinds.ssn9',
-  [DupeKind.email]: 'dupe-kinds.email',
-  [DupeKind.phoneNumber]: 'dupe-kinds.phone-number',
-  [DupeKind.deviceId]: 'dupe-kinds.device-id',
-  [DupeKind.cookieId]: 'dupe-kinds.cookie-id',
-};
-
 const Row = ({ duplicateDataItem }: RowProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.duplicate-data',
   });
   const { dupeKinds, fpId, status, startTimestamp, data } = duplicateDataItem;
+
+  const dupeKindToTranslation: Record<DupeKind, string> = {
+    [DupeKind.ssn9]: t('dupe-kinds.ssn9'),
+    [DupeKind.email]: t('dupe-kinds.email'),
+    [DupeKind.phoneNumber]: t('dupe-kinds.phone-number'),
+    [DupeKind.nameDob]: t('dupe-kinds.name-dob'),
+    [DupeKind.deviceId]: t('dupe-kinds.device-id'),
+    [DupeKind.cookieId]: t('dupe-kinds.cookie-id'),
+  };
 
   return (
     <>
@@ -44,9 +44,7 @@ const Row = ({ duplicateDataItem }: RowProps) => {
           paddingBottom={4}
         >
           {dupeKinds.map(kind => (
-            <Tag key={kind}>
-              {t(dupeKindToTranslationKey[kind] as ParseKeys)}
-            </Tag>
+            <Tag key={kind}>{dupeKindToTranslation[kind]}</Tag>
           ))}
         </Box>
       </td>

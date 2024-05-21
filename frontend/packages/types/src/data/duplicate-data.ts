@@ -4,6 +4,7 @@ export enum DupeKind {
   ssn9 = 'ssn9',
   email = 'email',
   phoneNumber = 'phone_number',
+  nameDob = 'name_dob',
   deviceId = 'device_id',
   cookieId = 'cookie_id',
 }

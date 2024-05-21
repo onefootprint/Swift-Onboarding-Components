@@ -1762,6 +1762,7 @@
           "ssn9": "SSN",
           "email": "Email address",
           "phone-number": "Phone number",
+          "name-dob": "Name + DOB",
           "device-id": "Device ID",
           "cookie-id": "Cookie ID"
         },
