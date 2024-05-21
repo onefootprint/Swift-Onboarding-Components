@@ -779,7 +779,7 @@
         }
       },
       "verify": {
-        "title": "Verify People, not PII",
+        "title": "Verify people, not PII",
         "subtitle": "Fraud signals you can act on in a unified rules engine with your KYC Checks.",
         "cards": {
           "build-rules": {

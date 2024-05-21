@@ -32,8 +32,21 @@ const Seo = ({
   kind = 'product',
   slug,
   title,
-  og = {},
-  twitter = {},
+  og = {
+    image: '/og-img-home.png',
+    title: 'Footprint',
+    description: "The last identity verification you'll ever need",
+    author: 'Footprint',
+  },
+  twitter = {
+    title: 'Footprint',
+    description: "The last identity verification you'll ever need",
+    image: '/og-img-home.png',
+    extraData: [
+      { label: 'Footprint', data: 'Footprint' },
+      { label: 'Footprint', data: 'Footprint' },
+    ],
+  },
 }: SeoProps) => (
   <Head>
     <title>{title}</title>
