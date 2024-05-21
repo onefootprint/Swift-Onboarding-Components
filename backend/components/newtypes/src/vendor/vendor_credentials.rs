@@ -77,6 +77,14 @@ impl NeuroIdCredentials {
     }
 }
 
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct SambaSafetyCredentials {
+    pub api_key: PiiString,
+    pub base_url: PiiString,
+    pub auth_username: PiiString,
+    pub auth_password: PiiString,
+}
+
 /// The bulk of experian credentials are shared across requests for different tenants
 /// All that is different is the subscriber code
 impl ExperianCredentialBuilder {

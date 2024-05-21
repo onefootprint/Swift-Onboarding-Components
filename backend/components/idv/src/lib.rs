@@ -34,6 +34,7 @@ pub mod lexis;
 pub mod middesk;
 pub mod neuro_id;
 pub mod requirements;
+pub mod samba;
 pub mod socure;
 pub mod stytch;
 pub mod test_fixtures;
