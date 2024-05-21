@@ -5,9 +5,7 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 const COMMIT_SHA = process.env.VERCEL_GIT_COMMIT_SHA;
 
 const SHOULD_SHOW_ANALYZE = IS_DEV && process.env.ANALYZE === 'true';
-const SHOULD_UPLOAD_SOURCE_MAPS =
-  process.env.VERCEL_ENV === 'production' ||
-  process.env.VERCEL_ENV === 'preview';
+const SHOULD_UPLOAD_SOURCE_MAPS = false; // process.env.VERCEL_ENV === 'production' || process.env.VERCEL_ENV === 'preview';
 
 const getNextConfig = () => {
   const SENTRY_CONNECT_SRC = ['*.sentry.io', '*.ingest.sentry.io'].join(' ');
