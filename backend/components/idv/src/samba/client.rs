@@ -1,12 +1,30 @@
-use newtypes::{vendor_credentials::SambaSafetyCredentials, PiiString};
+use newtypes::{vendor_credentials::SambaSafetyCredentials, PiiString, SambaOrderId, SambaReportId};
 use reqwest::header;
 
 use crate::footprint_http_client::FootprintVendorHttpClient;
 
-use super::{error::Error as SambaSafetyError, response::auth::AuthenticationResponse};
+use super::{
+    error::Error as SambaSafetyError,
+    request::{license_validation::CreateLVOrderRequest, SambaCreateLVOrderRequest},
+    response::auth::AuthenticationResponse,
+};
+
+type SambaResult<T> = Result<T, SambaSafetyError>;
 
 #[derive(Clone)]
 struct SambaHeaders(header::HeaderMap);
+
+impl SambaHeaders {
+    pub fn headers_for_report(&self) -> SambaResult<header::HeaderMap> {
+        let mut headers = self.0.clone();
+        headers.insert(
+            "Accept",
+            header::HeaderValue::from_str("application/vnd.sambasafety.json;version=2.0.4")?,
+        );
+
+        Ok(headers)
+    }
+}
 #[derive(Clone)]
 #[allow(unused)]
 pub(crate) struct SambaAuthToken(PiiString);
@@ -20,13 +38,14 @@ pub struct SambaSafetyClientAdapter {
 }
 
 impl SambaSafetyClientAdapter {
-    pub fn new(credentials: SambaSafetyCredentials) -> Result<Self, SambaSafetyError> {
+    pub fn new(credentials: SambaSafetyCredentials) -> SambaResult<Self> {
         let mut headers = header::HeaderMap::new();
         let base_url = credentials.base_url.leak_to_string();
         headers.insert(
             "x-api-key",
             header::HeaderValue::from_str(credentials.api_key.leak())?,
         );
+
 
         Ok(Self {
             base_url,
@@ -40,7 +59,7 @@ impl SambaSafetyClientAdapter {
     pub async fn get_authenticated_client(
         self,
         footprint_http_client: &FootprintVendorHttpClient,
-    ) -> Result<AuthenticatedSambaSafetyClientAdapter, SambaSafetyError> {
+    ) -> SambaResult<AuthenticatedSambaSafetyClientAdapter> {
         let mut params = std::collections::HashMap::new();
         params.insert("grant_type", "client_credentials");
         params.insert("scope", "API");
@@ -80,7 +99,7 @@ impl SambaSafetyClientAdapter {
 
 impl SambaSafetyClientAdapter {
     // TODO: auto-fix this
-    fn api_url(&self, path: &str) -> Result<String, SambaSafetyError> {
+    fn api_url(&self, path: &str) -> SambaResult<String> {
         if path.starts_with('/') {
             return Err(SambaSafetyError::SendError(
                 "path suffix should not start with leading /".into(),
@@ -90,12 +109,11 @@ impl SambaSafetyClientAdapter {
     }
 }
 
-#[derive(Clone)]
+#[derive(derive_more::Deref, Clone)]
 /// A struct that represents a client that has an Authorization token to be reused across API calls
 pub struct AuthenticatedSambaSafetyClientAdapter {
-    #[allow(unused)]
+    #[deref]
     client_adapter: SambaSafetyClientAdapter,
-    #[allow(unused)]
     auth_token: PiiString,
 }
 
@@ -108,32 +126,179 @@ impl AuthenticatedSambaSafetyClientAdapter {
     }
 }
 
+impl AuthenticatedSambaSafetyClientAdapter {
+    /// Create a LicenseValidation Order
+    #[tracing::instrument(skip_all)]
+    pub async fn create_license_validation_order(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        request: SambaCreateLVOrderRequest,
+    ) -> SambaResult<reqwest::Response> {
+        let request = CreateLVOrderRequest::from(request);
+        let url = self.api_url("orders/v1/licensereports/verifylicense")?;
+
+        let response = footprint_http_client
+            .post(url)
+            .bearer_auth(self.auth_token.leak())
+            .headers(self.headers.clone().0)
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| SambaSafetyError::SendError(err.to_string()))?;
+
+        Ok(response)
+    }
+
+    /// Get the status of a LicenseValidation Order, returns a report_id which we can use to fetch the results
+    #[tracing::instrument(skip_all)]
+    pub async fn get_license_validation_status(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        order_id: SambaOrderId,
+    ) -> SambaResult<reqwest::Response> {
+        let path = format!("orders/v1/licensereports/verifylicense/{0}", order_id.as_str());
+        let url = self.api_url(&path)?;
+
+        let response = footprint_http_client
+            .get(url)
+            .bearer_auth(self.auth_token.leak())
+            .headers(self.headers.clone().0)
+            .send()
+            .await
+            .map_err(|err| SambaSafetyError::SendError(err.to_string()))?;
+        Ok(response)
+    }
+
+    /// Get the LicenseValidation Report
+    #[tracing::instrument(skip_all)]
+    pub async fn get_license_validation_report(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+        report_id: SambaReportId,
+    ) -> SambaResult<reqwest::Response> {
+        let path = format!("reports/v1/licensereports/verifylicense/{0}", report_id.as_str());
+        let url = self.api_url(&path)?;
+
+        let response = footprint_http_client
+            .get(url)
+            .bearer_auth(self.auth_token.leak())
+            .headers(self.headers.headers_for_report()?) // need to specify "Accept" here, or we get 400
+            .send()
+            .await
+            .map_err(|err| SambaSafetyError::SendError(err.to_string()))?;
+        Ok(response)
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
-    use crate::footprint_http_client::FpVendorClientArgs;
+    use crate::{
+        footprint_http_client::FpVendorClientArgs,
+        samba::{
+            request::license_validation::CreateLVOrderAddress,
+            response::license_validation::{CheckLVOrderStatus, CreateLVOrderResponse, GetLVOrderResponse},
+        },
+    };
 
     use super::*;
+    use std::{thread, time};
 
-    async fn get_authed_client() -> AuthenticatedSambaSafetyClientAdapter {
-        let api_key = PiiString::from(dotenv::var("SAMBA_API_KEY").unwrap());
-        let auth_username = PiiString::from(dotenv::var("SAMBA_AUTH_USERNAME").unwrap());
-        let auth_password = PiiString::from(dotenv::var("SAMBA_AUTH_PASSWORD").unwrap());
-        let creds = SambaSafetyCredentials {
-            api_key,
-            base_url: "https://api-demo.sambasafety.io".into(),
-            auth_username,
-            auth_password,
-        };
+    async fn get_authed_client(creds: SambaSafetyCredentials) -> AuthenticatedSambaSafetyClientAdapter {
         let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
 
         let client_adapter = SambaSafetyClientAdapter::new(creds).unwrap();
         client_adapter.get_authenticated_client(&fp_client).await.unwrap()
     }
 
+    fn get_credentials() -> SambaSafetyCredentials {
+        let api_key = PiiString::from(dotenv::var("SAMBA_API_KEY").unwrap());
+        let auth_username = PiiString::from(dotenv::var("SAMBA_AUTH_USERNAME").unwrap());
+        let auth_password = PiiString::from(dotenv::var("SAMBA_AUTH_PASSWORD").unwrap());
+        SambaSafetyCredentials {
+            api_key,
+            base_url: "https://api-demo.sambasafety.io".into(),
+            auth_username,
+            auth_password,
+        }
+    }
+
     #[ignore]
     #[tokio::test]
     async fn test_get_authed_client() {
-        get_authed_client().await;
+        get_authed_client(get_credentials()).await;
+    }
+
+
+    #[ignore]
+    #[tokio::test]
+    async fn test_create_order() {
+        // samba provided test case
+        let request = SambaCreateLVOrderRequest {
+            credentials: get_credentials(),
+            first_name: "John".into(),
+            last_name: "Doe".into(),
+            license_number: "057986548".into(),
+            license_state: "GA".into(),
+            // result doesn't change if we add these or don't include them
+            // their test cases aren't amazing though
+            dob: Some("1980-08-16".into()),
+            address: Some(CreateLVOrderAddress {
+                street: "495 Grove Street".into(),
+                city: "Boulder".into(),
+                state: "CO".into(),
+                zip_code: "80301".into(),
+            }),
+            ..Default::default()
+        };
+
+        let authed_client = get_authed_client(request.credentials.clone()).await;
+        let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
+
+        // create order
+        let raw_response = authed_client
+            .create_license_validation_order(&fp_client, request)
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+
+
+        let response: CreateLVOrderResponse = serde_json::from_value(raw_response).unwrap();
+        let order_id = response.order_id;
+        assert!(!order_id.leak().is_empty());
+
+        // wait for a few secs so it moves to FULFILLED
+        thread::sleep(time::Duration::from_secs(10));
+
+
+        // get order status
+        let order_resp = authed_client
+            .get_license_validation_status(&fp_client, SambaOrderId::from(order_id.leak_to_string()))
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+
+
+        let response: CheckLVOrderStatus = serde_json::from_value(order_resp).unwrap();
+        let report_id = response.report_id().unwrap();
+        let report_resp = authed_client
+            .get_license_validation_report(&fp_client, report_id)
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+
+        let response: GetLVOrderResponse = serde_json::from_value(report_resp).unwrap();
+
+        assert!(!response.valid());
+        assert_eq!(
+            response.record.dl_record.result.error_code.unwrap(),
+            "A2".to_string()
+        );
     }
 }

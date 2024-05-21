@@ -354,3 +354,5 @@ define_newtype_id!(
     "Identifier for a WaterfallExecution"
 );
 define_newtype_id!(WaterfallStepId, String, "Identifier for a WaterfallStep");
+define_newtype_id!(SambaOrderId, String, "Identifier for a Samba Order");
+define_newtype_id!(SambaReportId, String, "Identifier for a Samba Report");
