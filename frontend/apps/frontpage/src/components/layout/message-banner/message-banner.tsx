@@ -1,5 +1,6 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { LinkButton, media, Portal, Stack, Text } from '@onefootprint/ui';
+import { media, Portal, Stack, Text } from '@onefootprint/ui';
+import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -22,9 +23,7 @@ const MessageBanner = ({ onClose, articleUrl, text }: MessageBannerProps) => {
       <Container>
         <Text variant="label-3">
           {text}
-          <LinkButton href={articleUrl} variant="label-3" $marginLeft={3}>
-            {t('cta')}
-          </LinkButton>
+          <StyledLink href={articleUrl}>{t('cta')}</StyledLink>
         </Text>
         <CloseButtonContainer onClick={onClose}>
           <IcoCloseSmall16 />
@@ -65,6 +64,12 @@ const CloseButtonContainer = styled.button`
     right: ${theme.spacing[5]};
     top: 50%;
     transform: translateY(-50%);
+  `}
+`;
+
+const StyledLink = styled(Link)`
+  ${({ theme }) => css`
+    margin-left: ${theme.spacing[3]};
   `}
 `;
 
