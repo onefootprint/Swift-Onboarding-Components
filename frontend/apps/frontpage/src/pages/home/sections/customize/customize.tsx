@@ -40,7 +40,7 @@ export const Customize = () => {
       publicKey,
       appearance: {
         variables: {
-          borderRadius: `${borderRadius}px`,
+          buttonBorderRadius: `${borderRadius}px`,
           buttonPrimaryBg: backgroundColor,
           buttonPrimaryBorderColor: backgroundColor,
         },
