@@ -1,6 +1,6 @@
 import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
-import * as Sentry from '@sentry/nextjs';
+// import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 
 import { IS_LOGGING_ENABLED } from './constants';
@@ -12,7 +12,7 @@ import {
   registerErrorHandlers,
   registerUnloadHandler,
 } from './utils/register-event-listeners';
-import configureSentry from './utils/sentry';
+// import configureSentry from './utils/sentry';
 
 const LoggerFactory = () => {
   let appName: string = '';
@@ -26,7 +26,7 @@ const LoggerFactory = () => {
     isLREnabled = !disableLogRocket;
 
     configureObserve(appName);
-    configureSentry(appName);
+    // configureSentry(appName);
     if (isLREnabled) {
       configureLogRocket(appName);
       Observe.setLogRocketSessionUrl();
@@ -40,7 +40,7 @@ const LoggerFactory = () => {
         cause: error.cause,
         error: getErrorMessage(error),
       });
-      Sentry.captureException(error);
+      // Sentry.captureException(error);
       if (isLREnabled) {
         LogRocket.captureException(error);
       }
@@ -57,10 +57,8 @@ const LoggerFactory = () => {
 
     const filteredTraits = filterTraits(traits);
     const sessionId = getSessionId();
-    Sentry.setUser({
-      id: sessionId,
-    });
-    Sentry.setTags(filteredTraits);
+    // Sentry.setUser({ id: sessionId });
+    // Sentry.setTags(filteredTraits);
     Observe.identify(sessionId, filteredTraits);
     if (isLREnabled) {
       LogRocket.identify(sessionId, filteredTraits);
@@ -98,13 +96,13 @@ const LoggerFactory = () => {
     }
     Observe.log(eventName, { extra: filteredExtra, level: 'track' });
     // The breadcrumbs will be included with future exceptions sent to Sentry
-    Sentry.addBreadcrumb({
-      type: 'track',
-      message: eventName,
-      data: filteredExtra,
-      // Sentry.io expects a string here even though the SDK type is number
-      timestamp: new Date().toISOString() as unknown as number,
-    });
+    // Sentry.addBreadcrumb({
+    //   type: 'track',
+    //   message: eventName,
+    //   data: filteredExtra,
+    //   // Sentry.io expects a string here even though the SDK type is number
+    //   timestamp: new Date().toISOString() as unknown as number,
+    // });
   };
 
   const error = (err: unknown, extra?: PrimitiveData) => {
@@ -116,7 +114,7 @@ const LoggerFactory = () => {
     const errorMessage = getErrorMessage(err);
     const errorObj: Error =
       err instanceof Error ? (err as Error) : new Error(errorMessage);
-    Sentry.captureException(errorMessage, filteredExtra);
+    // Sentry.captureException(errorMessage, filteredExtra);
     Observe.log(errorMessage, {
       extra: filteredExtra,
       errorObj,
@@ -145,7 +143,7 @@ const LoggerFactory = () => {
         ...filteredExtra,
       });
     }
-    Sentry.captureMessage(message, { extra: filteredExtra, level: 'warning' });
+    // Sentry.captureMessage(message, { extra: filteredExtra, level: 'warning' });
     Observe.log(message, { extra: filteredExtra, level: 'warn' });
   };
 
@@ -161,7 +159,7 @@ const LoggerFactory = () => {
         ...filteredExtra,
       });
     }
-    Sentry.captureMessage(message, { extra: filteredExtra, level: 'info' });
+    // Sentry.captureMessage(message, { extra: filteredExtra, level: 'info' });
     Observe.log(message, { extra: filteredExtra, level: 'info' });
   };
 

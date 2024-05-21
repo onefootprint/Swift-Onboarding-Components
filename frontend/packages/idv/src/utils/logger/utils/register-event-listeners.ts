@@ -1,11 +1,11 @@
-import * as Sentry from '@sentry/nextjs';
+// import * as Sentry from '@sentry/nextjs';
 
 import { Observe } from './observe';
 
 export const registerUnloadHandler = () => {
   window.addEventListener('beforeunload', () => {
     Observe.flush();
-    Sentry.flush();
+    // Sentry.flush();
   });
 };
 

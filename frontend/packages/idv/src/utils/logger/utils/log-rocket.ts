@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs';
+// import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 // @ts-ignore
 import * as setupLogRocketReact from 'logrocket-react';
@@ -7,6 +7,7 @@ import { BASE_URL_DOMAIN, COMMIT_SHA } from '../constants';
 
 const LOG_ROCKET_ORG_ID = 'lrswdg/footprint-bifrost-prod';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const configureLogRocket = (appName: string) => {
   LogRocket.init(LOG_ROCKET_ORG_ID, {
     release: COMMIT_SHA,
@@ -60,11 +61,11 @@ const configureLogRocket = (appName: string) => {
   setupLogRocketReact(LogRocket);
 
   // Tie sentry issues to logrocket recordings
-  LogRocket.getSessionURL(sessionURL => {
-    const scope = Sentry.getCurrentScope();
-    scope.setExtra('LogRocketSessionURL', sessionURL);
-    scope.setExtra('appName', appName);
-  });
+  // LogRocket.getSessionURL(sessionURL => {
+  //   // const scope = Sentry.getCurrentScope();
+  //   // scope.setExtra('LogRocketSessionURL', sessionURL);
+  //   // scope.setExtra('appName', appName);
+  // });
 };
 
 export default configureLogRocket;
