@@ -16,6 +16,7 @@ export const tenantsFixture: PaginatedRequestResponse<GetTenantsResponse> = {
       numLiveVaults: 1556,
       numSandboxVaults: 0,
       createdAt: '2023-06-07T19:13:12.074521Z',
+      superTenantId: null,
     },
     {
       id: 'org_wlN7vCQ7nZabaByoWTgVpM',
@@ -29,6 +30,7 @@ export const tenantsFixture: PaginatedRequestResponse<GetTenantsResponse> = {
       numLiveVaults: 11,
       numSandboxVaults: 103,
       createdAt: '2023-06-06T18:21:05.349780Z',
+      superTenantId: null,
     },
     {
       id: '_private_it_org_2',
@@ -42,6 +44,7 @@ export const tenantsFixture: PaginatedRequestResponse<GetTenantsResponse> = {
       numLiveVaults: 4,
       numSandboxVaults: 2740,
       createdAt: '2023-06-06T17:58:56.928098Z',
+      superTenantId: null,
     },
   ],
   meta: {

@@ -10,4 +10,5 @@ export type Tenant = {
   numLiveVaults: number;
   numSandboxVaults: number;
   createdAt: string;
+  superTenantId: string | null;
 };

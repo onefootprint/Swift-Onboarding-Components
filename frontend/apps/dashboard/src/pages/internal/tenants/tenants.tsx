@@ -19,6 +19,7 @@ const Tenants = () => {
   const columns = [
     { text: t('table.header.name'), width: '20%' },
     { text: t('table.header.id'), width: '25%' },
+    { text: t('table.header.parent-tenant-id'), width: '25%' },
     { text: t('table.header.live-users'), width: '12.5%' },
     { text: t('table.header.sandbox-users'), width: '12.5%' },
     { text: t('table.header.created-at'), width: '15%' },

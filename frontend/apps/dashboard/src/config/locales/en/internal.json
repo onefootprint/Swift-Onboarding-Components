@@ -12,7 +12,8 @@
       "live-users": "Live users",
       "sandbox-users": "Sandbox users",
       "created-at": "Created at",
-      "actions": "Actions"
+      "actions": "Actions",
+      "parent-tenant-id": "Parent org id"
     },
     "row": {
       "assume": "View as Super Admin"

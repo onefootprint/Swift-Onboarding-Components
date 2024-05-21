@@ -14,6 +14,13 @@ const Row = ({ tenant }: TenantProps) => (
         {tenant.id}
       </CodeInline>
     </td>
+    <td>
+      {tenant.superTenantId && (
+        <CodeInline isPrivate truncate>
+          {tenant.superTenantId}
+        </CodeInline>
+      )}
+    </td>
     <td>{tenant.numLiveVaults}</td>
     <td>{tenant.numSandboxVaults}</td>
     <td>{tenant.createdAt}</td>

@@ -14,6 +14,7 @@ impl DbToApi<(Option<UserCounts>, Tenant)> for api_wire_types::PrivateTenant {
             is_prod_kyb_playbook_restricted,
             supported_auth_methods,
             _created_at,
+            super_tenant_id,
             ..
         } = t;
         Self {
@@ -28,6 +29,7 @@ impl DbToApi<(Option<UserCounts>, Tenant)> for api_wire_types::PrivateTenant {
             num_live_vaults: counts.as_ref().map(|c| c.live).unwrap_or_default(),
             num_sandbox_vaults: counts.as_ref().map(|c| c.sandbox).unwrap_or_default(),
             created_at: _created_at,
+            super_tenant_id,
         }
     }
 }

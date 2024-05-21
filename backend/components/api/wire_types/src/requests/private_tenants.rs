@@ -21,4 +21,5 @@ pub struct PrivateTenant {
     pub num_live_vaults: i64,
     pub num_sandbox_vaults: i64,
     pub created_at: DateTime<Utc>,
+    pub super_tenant_id: Option<TenantId>,
 }
