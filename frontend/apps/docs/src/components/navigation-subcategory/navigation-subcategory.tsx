@@ -49,7 +49,7 @@ const NavigationSubcategory = ({
                 $isSelected={router.asPath.startsWith(item.slug)}
                 as={Link}
                 href={item.slug}
-                key={item.slug}
+                key={`nav-item-${item.title}-${item.slug}`}
               >
                 {item.title}
               </NavigationLink>

@@ -1,7 +1,6 @@
 import { dateToIso8601 } from '@onefootprint/core';
+import type { FootprintUserData } from '@onefootprint/footprint-js';
 import isPlainObject from 'lodash/isPlainObject';
-
-import type { UserData } from '../@types';
 
 const flattenObject = (
   obj: Record<string, unknown>,
@@ -29,7 +28,7 @@ const flattenObject = (
   return toReturn;
 };
 
-const getVaultData = (formData: UserData) => {
+const getVaultData = (formData: FootprintUserData) => {
   const data = flattenObject(formData);
   delete data['id.phone_number'];
   delete data['id.email'];

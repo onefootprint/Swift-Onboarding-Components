@@ -59,8 +59,8 @@ const Sections = ({ sections }: SectionsProps) => {
             <LinkContainer key={id}>
               <StyledLink
                 $active={activeSectionID === id}
+                $level={level}
                 href={anchor}
-                level={level}
                 onClick={scrollToArticle(id)}
               >
                 {label}
@@ -96,14 +96,14 @@ const ActiveMarker = styled.div`
   `};
 `;
 
-const StyledLink = styled.a<{ level: number; $active: boolean }>`
-  ${({ theme, level, $active }) => css`
+const StyledLink = styled.a<{ $level: number; $active: boolean }>`
+  ${({ theme, $level, $active }) => css`
     all: unset;
     position: relative;
     display: inline-block;
     text-decoration: none;
     color: ${theme.color.tertiary};
-    margin-left: calc(${level} * ${theme.spacing[4]});
+    margin-left: calc(${$level} * ${theme.spacing[4]});
     padding: ${theme.spacing[1]} 0;
     cursor: pointer;
     overflow: hidden;

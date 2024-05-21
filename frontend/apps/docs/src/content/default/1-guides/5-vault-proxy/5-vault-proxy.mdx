@@ -1,0 +1,352 @@
+---
+page: default
+category: Guides
+title: Vault Proxy
+slug: /vault/proxy
+meta:
+  {
+    title: KYC + PII Vault - Vault Proxy,
+    description: Never touch sensitive data by leveraging Footprint's Vault Proxy,
+  }
+---
+
+<img
+  alt="Vault proxy overview"
+  height={250}
+  src="/vault-proxy/overview_hero.png"
+  width={720}
+/>
+
+<br />
+
+<br />
+
+In certain cases, your application may need to communicate sensitive data (like PII or PCI data) to third-party services (like payment gateways). With Footprint's Vault Proxy, you can avoid sensitive data touching your application code and infrastructure in plaintext. Not only does vault proxying help strengthen your security posture and avoid data leaks/compromises, but this also helps you satisfy strict compliance requirements (like PCI) by never having this data touch your networks or infrastructure.
+
+<inline-alert variant="info">
+  Please ensure you are familiar with our [server-side API authentication
+  guide](/integrate/api-auth) to securely connect to the Footprint API from your
+  backend.
+</inline-alert>
+
+The vault proxy supports the following main features:
+
+| Feature                         | Overview                                                                                                                         |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Any HTTPS URL and method**    | Works with any HTTPS resource                                                                                                    |
+| **Flexible detokenization**     | Supports secure detokenization for any type of request body, content-type agnostic                                               |
+| **Fixed IP range**              | Requests from Footprint Vault Proxy always come from a fixed set of IP addresses that you can whitelist on the proxy destination |
+| **Custom headers**              | Attach custom headers                                                                                                            |
+| **Authentication secrets**      | Securely attach custom authentication secrets                                                                                    |
+| **Client Certififcates (mTLS)** | Securely attach a ceritificate + key for mTLS Client Certififcate authentication connections                                     |
+| **Server Certificate Pinning**  | Specify one or more Root CAs and leaf certificates to securely validate the destination                                          |
+| **Ingress Vaulting**            | Securely vault data that comes back on the ingress. Support for JSONPath (XPath and Regex coming soon) rules                     |
+
+# Configuration
+
+The proxy can be configured in two main ways: define the configuration using the dashboard/admin API or dynamically specify all the configuration values via headers "just-in-time." Both methods support the same fundamental capabilities, but the two options offer flexibility in defining proxy configurations and simplifying the management of sensitive data and authentication credentials.
+
+## Just-in-time
+
+In order to dynamically proxy data anywhere, without defining a configuration ahead of time, you must specify the following header:
+
+| Header                  | Usage                      | Description                                                          |
+| ----------------------- | -------------------------- | -------------------------------------------------------------------- |
+| `x-fp-proxy-target-url` | Required if "just-in-time" | The target destination HTTPS URL to which the request will be routed |
+
+## By configuration
+
+Alternatively, if using a vault proxy configuration either via the API or the dashboard, you can invoke a specific configuration by grabbing it's `id` as follows:
+
+```bash
+curl  https://api.onefootprint.com/vault_proxy/proxy_id_AY5ec7I5QDUFWG8BAQG78k \
+  ...other parameters...
+```
+
+<img
+  alt="Vault proxy configuration"
+  height={250}
+  src="/vault-proxy/dashboard.png"
+  width={720}
+/>
+
+# Basics
+
+## Making a proxy request
+
+A vault proxy request consists of a typical authenticated HTTP `POST` request to either `/vault_proxy/jit` or `/vault_proxy/{proxy_config_id}` endpoint.
+
+For example:
+
+```bash
+
+curl https://api.onefootprint.com/vault_proxy/jit \
+    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+    -X POST \
+    -H 'x-fp-proxy-target-url: https://payments.acmebank.com' \
+    -H 'x-fp-proxy-fwd-custom-header: custom value' \
+    -H 'x-fp-proxy-fwd-content-type: application/json' \
+    --data '{
+        "full_name": "{{ fp_id_tctecBEvGc98V7Vx4MhZU.id.first_name }} {{ fp_id_tctecBEvGc98V7Vx4MhZU.id.last_name }}",
+        "last4_ssn": "{{ fp_id_tctecBEvGc98V7Vx4MhZU.id.ssn4 }}",
+        "cc": "{{ fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card }}",
+        "cc_exp": "{{ fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card_exp }}",
+        "cc_cvc": "{{ fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card_cvc }}"
+    }'
+```
+
+The above request detokenizes each of the fields in the request body in the Footprint vault enclave, and then makes an upstream request with the corresponding in-place-updated plaintext body to the target (in this case `https://payments.acmebank.com`) with custom headers `'Custom-Header: custom value'` and `'Content-type: application/json'`.
+
+You can add additional control headers to configure how the upstream proxy request behaves:
+
+| Header                     | Required? | Function                                                                                                  |
+| -------------------------- | --------- | --------------------------------------------------------------------------------------------------------- |
+| `x-fp-proxy-fwd-<HEADER>`  | Optional  | Sends a header named `<HEADER>` with the corresponding value                                              |
+| `x-fp-proxy-method`        | Optional  | Selects the HTTP Method Verb to use (defaults to POST if unspecified)                                     |
+| `x-fp-proxy-access-reason` | Optional  | The decryption reason to use for access/security logs during detokenization. Defaults to empty/no-reason. |
+
+<inline-alert variant="warning">
+  The proxy request will fail if the API key does not have permission to
+  detokenize the supplied fields or if any of the supplied fields do not exist
+  on the object.
+</inline-alert>
+
+<inline-alert variant="info">
+  The body of the proxy request does **NOT** need to be JSON. Any UTF-8 body
+  will work and tokens will be substituted in-place. See the token template
+  format for a detailed description on how to specify tokens in the body.
+</inline-alert>
+
+## Token body template format
+
+Footprint's Vault Proxy will attempt to substitute in-place any tokens found in the body of the request with the corresponding detokenized, plain-text values. A token expression starts with `{{` and ends with `}}`.
+
+Footprint's vault proxy APIs support two methods of specifying tokens in the request body:
+
+### Fully-qualified tokens
+
+Each token is specified as `{{ <footprint_user_token>.<data_identifier> }}`. `<footprint_user_token>` is the user's footprint token. `<data_identifier>` can be any identity KYC attribute (prefixed with `id.`) or any custom attribute defined by you (prefixed with `custom.`)
+
+| Fully-qualified format                                 |
+| ------------------------------------------------------ |
+| `{{ fp_id_tctecBEvGc98V7Vx4MhZU.id.last_name }}`       |
+| `{{ fp_id_tctecBEvGc98V7Vx4MhZU.id.ssn9 }}`            |
+| `{{ fp_id_tctecBEvGc98V7Vx4MhZU.id.dob }}`             |
+| `{{ fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card }}` |
+
+### Inferred-user tokens
+
+If you're operating on a single Footprint user vault, you can simplify the token body formatting by specifying the following header to identify which user vault is referenced.
+
+| Header    | Value                                                 |
+| --------- | ----------------------------------------------------- |
+| `x-fp-id` | The Footprint user token used to infer request tokens |
+
+In this case, the token can omit the `<footprint_user_token>` above and specify tokens as `{{ <data_identifier> }}`.
+
+| Inferred-user format       |
+| -------------------------- |
+| `{{ id.last_name }}`       |
+| `{{ id.ssn9 }}`            |
+| `{{ id.dob }}`             |
+| `{{ custom.credit_card }}` |
+
+## Filter Functions
+
+Similar to common template languages like Jinja and Handlebars, Footprint's templates support filter functions to help transform data in and out of the vault.
+Using the token template format above, simply concatentate zero or more filter functions, separated by `|`
+
+| Filter Function                      | Description                                                                                                                                                                                                                                                    |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `to_lowercase`                       | Converts the target utf-8 string to lowercase characters                                                                                                                                                                                                       |
+| `to_uppercase`                       | Converts the target utf-8 string to UPPERCASE characters                                                                                                                                                                                                       |
+| `to_ascii`                           | Converts the target utf-8 string to ASCII characters only                                                                                                                                                                                                      |
+| `prefix(n)`                          | Returns the first `n` characters of the target utf-8 string where `n` is a positive integer.                                                                                                                                                                   |
+| `suffix(n)`                          | Returns the last `n` characters of the target utf-8 string where `n` is a positive integer.                                                                                                                                                                    |
+| `replace(from,to)`                   | Replaces all matches of the string `from` with the string `to` in the target utf-8 string.                                                                                                                                                                     |
+| `date_format(from_format,to_format)` | Parses the target string in date format `from_format` and then converts it to date format `to_format`. Supports [`strftime` format strings](https://strftime.org). Uses of this filter will error if the target string is not codable in the supplied formats. |
+| `hmac_sha256(key)`                   | HMAC-SHA256 algorithm where the `key` argument is parsed as a HEX-encoded string, and the output is HEX-encoded.                                                                                                                                               |
+| `encrypt(algorithm, public_key)`     | Asymmetrically encrypts the contents to a public-key, where algorithm is either `rsa_pkcs1v15` or `ecies_p256_x963_sha256_aes_gcm` and the corresponding public key is a HEX-encoded DER-formatted public key. RSA public-keys must be formatted with PKCS#8.  |
+
+<inline-alert variant="info">
+  String arguments to filter functions must be enclosed in either `"` or `'`
+  quotations.
+</inline-alert>
+
+### Filter function examples
+
+Below find several examples for how to use the filter functions syntax:
+
+- `{{ id.last_name | to_ascii | to_uppercase }}` Converts `Doè` to `DOE`
+- `{{ id.dob | date_format("%Y-%m-%d", "%A in %B of %y") }}` Converts `1988-12-30` to `Friday in December of 88`
+- `{{ custom.ach_account| replace("-", "") }}` Converts `12-1212-1212` to `1212121212`.
+
+<br />
+
+<br />
+
+# Ingress Vaulting
+
+Ingress vaulting rules define how to tokenize and vault certain sensitive fields that appear in the response from the upstream proxy destination. This allows the vault proxy to not only de-tokenize outgoing data but to also tokenize incoming data to vault it just in time.
+
+For simplicity, you can also define all of your ingress vaulting rules via the developer dashboard or admin API and simply invoke the proxy configuration by it's `id` using the `api.onefootprint.com/vault_proxy/{proxy_id}` endpoint.
+
+However, when you declare ingress vaulting rules in the configuration, you still need to denote in the proxy request into which Footprint user vault to tokenize the data. Therefore, the following header value is required when using ingress rules for pre-configured proxy:
+
+| Header    | Format    | value                                                           |
+| --------- | --------- | --------------------------------------------------------------- |
+| `x-fp-id` | `<fp_id>` | The Footprint user token for which the vaulting rules apply too |
+
+For example: add the header `'x-fp-id: fp_id_tctecBEvGc98V7Vx4MhZU'` where the rule in the proxy configuration would be defined as `custom.credit_card_number=$.data.card.number`.
+
+## Just-in-time ingress vaulting
+
+The format of the rule is defined as `<footprint_token_id>.custom.<property_name>=<path-to-value>` where the path format is relative to the content-type being used.
+
+Note if using a dynamic proxy configuration (just-in-time), you **must specify** a single `x-fp-proxy-ingress-content-type` header if one more `x-fp-proxy-ingress-rule` headers are present.
+Ingress rules use a similar token format to the body format above, except without the `{{` and `}}` delimiters.
+
+## JSONPath
+
+Currently ingress only supports JSON and the associated [JSONPath](https://github.com/json-path/JsonPath) format for specifying a target value.
+
+```bash
+-H 'x-fp-proxy-ingress-rule: fp_id_tctecBEvGc98V7Vx4MhZU.custom.credit_card_number=$.data.card.number'
+```
+
+The above token would extract `4242424242424` from the following response object and vault it under the `custom.credit_card_number` field for `fp_id_tctecBEvGc98V7Vx4MhZU`'s user vault.
+
+```json
+{
+  "data": {
+    "card": {
+      "number": "4242424242424",
+      "expiration": {
+        "month": "04",
+        "year": "25"
+      }
+    },
+    "processor": "amex"
+  }
+}
+```
+
+| More examples                                                                     |
+| --------------------------------------------------------------------------------- |
+| `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.number=$.data.card.number`              |
+| `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.exp_month=$.data.card.expiration_month` |
+| `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.exp_year=$.data.card.expiration_year`   |
+| `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.cvc=$.data.card.security_code`          |
+
+### Support for filter functions
+
+In some cases, you may need to alter or reformat ingress data prior to storing it in the vault. Ingress directives support filter functions defined above to solve this exact problem. The format is defined as above, except the filter functions are appended to the right side of the JSONPath selector:
+
+```
+<fp_id>.<data_identifier> = <json_path> | <filter_function> | <filter_function> | ...
+```
+
+For example, given a JSON body like
+
+```json
+{
+  "card": {
+    "number": "4242-4242-4242-4242"
+  }
+}
+```
+
+With an ingress directive like
+
+```
+fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.number = $.card.number | replace("-", "")
+```
+
+Results in `fp_id_tctecBEvGc98V7Vx4MhZU.card.primary.number` having the value `4242424242424242`.
+
+# Reflection
+
+In some cases, you may not need to proxy a complex object to a third-party destination, but would still like to use the vault proxy syntax and mechanics. Footprint supports this operation with our `reflect` endpoint. The reflect endpoint can be useful for decrypting into complex objects or for even testing your vault proxy configurations. You can think of this as the just the "first hop" of the vault proxy.
+
+For example,
+
+```bash
+curl https://api.onefootprint.com/vault_proxy/reflect \
+      -u sk_test_0Te2YtSveZpWLMjQgNRkCv6siiC86iMIkZ: \
+      -H 'x-fp-id: fp_id_JHSfbHz7VdxfoPXuaOlZqb' \
+      --data \
+      'The name on my credit card is {{ card.primary.name | to_ascii | to_uppercase }}. I was born on a {{ id.dob | date_format("%Y-%m-%d", "%A in %B of %y") }}.'
+
+The name on my credit card is JANE DOE. I was born on a Friday in December of 88.
+
+```
+
+To use reflection: make a `POST` request to `/vault_proxy/reflect` and send your complex object with proxy token syntax (including filter functions in the body). For simplicity, you can send a `x-fp-id` header to use the inferred proxy token syntax (i.e. omitting the fp_id in each directive).
+
+# Advanced proxy settings
+
+Footprint's vault proxy supports advanced configurations such as mTLS (client certificates), certificate pinning (custom server certificates), and automatically selecting and tokenizing parts of the response data and storing it in the vault. Note that the guide below shows how to configure these advanced features using "just-in-time" headers, but we recommend specifying these instead using the developer dashboard for simplicity and greater security (you won't need to manage authentication secrets for the destination service).
+
+## Client certificate authentication (mTLS)
+
+Optionally, specify a client certificate and key in order to connect securely to the proxy destination using Mutual TLS (mTLS).
+
+Only a single cert/key pair can be supplied. Note the format of the certificate/key is in [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) and then [Percent-encoded](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
+
+## Service certificate pinning and Root CAs
+
+Optionally, specify zero or more server certificates or Root CAs to pin the upstream proxy request server certificate validation.
+
+If multiple certificates are specified, all the supplied certificates will be used in the validation process and as long as a single certificate can validate the incoming certificate chain, the connection will succeed. Note the format of the certificate/key is in [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) format and then [`Percent-encoded`](https://developer.mozilla.org/en-US/docs/Glossary/percent-encoding).
+
+# Header and Configuration Reference
+
+Below find the complete reference guide of headers and their uses for both configuring and invoking the proxy "just-in-time".
+Note that some values can be defined in the proxy configuration settings and do not need to be sent each time.
+
+| Header                            | Usage                                            | Description                                                                                                                           |
+| --------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `x-fp-proxy-target-url`           | Required if "just-in-time"                       | The target destination HTTPS URL to which the request will be routed                                                                  |
+| `x-fp-proxy-method`               | Optional.                                        | Selects the HTTP Method Verb to use (defaults to POST if unspecified). Overrides a configuration's value if present.                  |
+| `x-fp-proxy-fwd-<HEADER>`         | Optional. Multiple allowed.                      | Sends a header named `<HEADER>` with the corresponding value                                                                          |
+| `x-fp-path-and-query`             | Optional.                                        | Use this header to customize/add additional path and/or query parameters to your existing proxy target URL                            |
+| `x-fp-id`                         | Optional.                                        | The Footprint user token for which the proxy rules apply to. Required if tokens in the body dont specify an `fp_id_` prefix.          |
+| `x-fp-proxy-access-reason`        | Optional.                                        | The decryption reason to use for access/security logs during detokenization. Defaults to empty/no-reason.                             |
+| `x-fp-proxy-client-cert`          | Optional. Percent-encoded PEM                    | The client certificate to use                                                                                                         |
+| `x-fp-proxy-client-key`           | Optional. Percent-encoded PEM                    | The client certificate private key to use                                                                                             |
+| `x-fp-proxy-pin-cert`             | Optional. Percent-encoded PEM. Multiple allowed. | A root CA certificate or self-signed certificate to validate the certificate of the server                                            |
+| `x-fp-proxy-ingress-content-type` | Optional.                                        | The content-type of the response to process ingress rules. Currently only `json` is supported, but `regex` and `xml` are coming soon! |
+| `x-fp-proxy-ingress-rule`         | Optional. `<token>=<path>`. Multiple allowed.    | Ingress rule itself, assigning a specific namepspeced token to the corresponding path of the value to vault                           |
+
+# Playground
+
+Use our `ditto` server to test your proxy configurations. Sending requests to `https://ditto.footprint.dev` will replay the headers and body of any incoming requests. Give it a try!
+
+## Basic usage
+
+```bash
+$ curl -i -X POST https://ditto.footprint.dev -H 'Test-Header: FootprintRocks'  --data '{"hello": "world" }'
+
+test-header: FootprintRocks
+content-type: application/x-www-form-urlencoded
+
+{"hello": "world" }
+```
+
+By using `https://ditto.footprint.dev` as your proxy destination target, you can test that the proxy decryption and token templating is working as expected.
+
+## Testing with client certificates
+
+The footprint ditto server also supports testing mTLS with client certificates: use `https://ditto.footprint.dev:8443` (port 8443). Note that the server certificate is self-signed so you must either trust it or pin it the configuration.
+
+```bash
+$ curl --cert client.crt --key client.key -i -k -X POST https://ditto.footprint.dev:8443 -H 'Test-Header: FootprintRocks' --data '{"hello": "world" }'
+
+x-ditto-client-cert-serial: 12431179266346922388
+test-header: FootprintRocks
+content-type: application/x-www-form-urlencoded
+
+{"hello": "world" }
+```
+
+Note the ditto server echoes the client certificate SERIAL (if a client certificate is used) in the special header `x-ditto-client-cert-serial`.

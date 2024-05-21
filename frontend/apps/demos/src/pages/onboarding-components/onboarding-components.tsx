@@ -1,18 +1,4 @@
-import {
-  AddressInput,
-  CustomInput,
-  CustomSelect,
-  DobInput,
-  EmailInput,
-  FirstNameInput,
-  Form,
-  LastNameInput,
-  MiddleNameInput,
-  PhoneInput,
-  Provider,
-  SSN9Input,
-  useFootprint,
-} from '@onefootprint/footprint-react';
+import { Fp, useFootprint } from '@onefootprint/footprint-react';
 import {
   Box,
   Button,
@@ -27,7 +13,6 @@ import React, { useState } from 'react';
 
 import Header from './components/header';
 import Layout from './components/layout';
-import useRequest from './hooks/use-request';
 import GlobalStyles from './onboarding-components.styles';
 
 const steps = [
@@ -38,10 +23,6 @@ const steps = [
   {
     label: 'Personal information',
     value: 'basic-data',
-  },
-  {
-    label: 'Drive information',
-    value: 'custom-data',
   },
   {
     label: 'Confirmation',
@@ -60,13 +41,12 @@ const Demo = () => {
 
   const isIdentify = option.value === 'identify';
   const isBasicData = option.value === 'basic-data';
-  const isCustomData = option.value === 'custom-data';
   const isSuccess = option.value === 'confirmation';
 
   return (
     <>
       <GlobalStyles />
-      <Provider
+      <Fp.Provider
         publicKey={publicKey}
         onComplete={() => {
           setOption(steps[3]);
@@ -96,12 +76,11 @@ const Demo = () => {
                   }}
                 />
               )}
-              {isCustomData && <CustomData />}
               {isSuccess && <Success />}
             </Box>
           </Stack>
         </Container>
-      </Provider>
+      </Fp.Provider>
     </>
   );
 };
@@ -110,7 +89,7 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
   const handleSubmit = () => {
-    fp.launchIdentify({ onDone });
+    fp.launchIdentify({ onAuthenticated: onDone });
   };
 
   return (
@@ -121,25 +100,36 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
           Please provide your email and phone number
         </Text>
       </Box>
-      <Form onSubmit={handleSubmit}>
+      <Fp.Form onSubmit={handleSubmit}>
         <Stack gap={4} direction="column">
-          <EmailInput />
-          <PhoneInput />
+          <Fp.Field name="id.email">
+            <Fp.Label>Your email</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="id.phone_number">
+            <Fp.Label>Phone</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
           <Divider marginBlock={3} />
           <Button type="submit">Continue</Button>
         </Stack>
-      </Form>
+      </Fp.Form>
     </Layout>
   );
 };
 
 const BasicData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
-  const saveMutation = useRequest(fp.save);
 
   const handleSubmit = () => {
-    saveMutation.mutate({
-      onSuccess: onDone,
+    fp.save({
+      onSuccess: () => {
+        fp.handoff({
+          onComplete: onDone,
+        });
+      },
     });
   };
 
@@ -151,93 +141,66 @@ const BasicData = ({ onDone }: { onDone: () => void }) => {
           Please provide some basic personal information
         </Text>
       </Box>
-      <Form onSubmit={handleSubmit}>
+      <Fp.Form onSubmit={handleSubmit}>
         <Stack gap={4} direction="column">
-          <FirstNameInput />
-          <MiddleNameInput />
-          <LastNameInput />
-          <DobInput />
+          <Fp.Field name="id.first_name">
+            <Fp.Label>First name</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="id.middle_name">
+            <Fp.Label>Middle name</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="id.last_name">
+            <Fp.Label>Last name</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="id.dob">
+            <Fp.Label>DOB</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
           <Divider marginBlock={3} />
-          <AddressInput />
+          <Fp.Field name="id.country">
+            <Fp.Label>Country</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="id.address_line1">
+            <Fp.Label>Address line 1</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="id.address_line2">
+            <Fp.Label>Address line 2 (optional)</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="id.city">
+            <Fp.Label>City</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="id.state">
+            <Fp.Label>State</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
           <Divider marginBlock={3} />
-          <SSN9Input />
+          <Fp.Field name="id.ssn9">
+            <Fp.Label>SSN</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
           <Divider marginBlock={3} />
-          <Button type="submit" loading={saveMutation.loading}>
+          <Button type="submit" loading={fp.busy === 'save'}>
             Continue
           </Button>
         </Stack>
-      </Form>
-    </Layout>
-  );
-};
-
-const CustomData = () => {
-  const fp = useFootprint();
-  const saveMutation = useRequest(fp.save);
-
-  const handleSubmit = () => {
-    saveMutation.mutate({
-      onSuccess: () => {
-        fp.handoff();
-      },
-    });
-  };
-
-  return (
-    <Layout>
-      <Box marginBottom={7}>
-        <Text variant="heading-3">Driver information</Text>
-        <Text variant="body-3" color="secondary">
-          Please provide some driver information
-        </Text>
-      </Box>
-      <Form onSubmit={handleSubmit}>
-        <Stack gap={4} direction="column">
-          <CustomInput
-            label="Make"
-            identifier="custom.make"
-            placeholder="Toyota, Ford, Honda"
-            validations={{
-              required: 'Make is required',
-            }}
-          />
-          <CustomInput
-            label="Model"
-            identifier="custom.model"
-            placeholder="Corolla, F-150, Civic"
-            validations={{
-              required: 'Model is required',
-            }}
-          />
-          <CustomSelect
-            label="Year"
-            identifier="custom.year"
-            placeholder="Select..."
-            validations={{
-              required: 'Year is required',
-            }}
-          >
-            {Array.from({ length: 65 }, (_, i) => 2024 - i).map(year => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </CustomSelect>
-          <CustomInput
-            identifier="custom.insurance"
-            label="Insurance policy number"
-            mask={{
-              blocks: [4, 3, 3, 4],
-            }}
-            name="insurance"
-            placeholder="Policy number"
-          />
-          <Divider marginBlock={3} />
-          <Button type="submit" loading={saveMutation.loading}>
-            Continue
-          </Button>
-        </Stack>
-      </Form>
+      </Fp.Form>
     </Layout>
   );
 };

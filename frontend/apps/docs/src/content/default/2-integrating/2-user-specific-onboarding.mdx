@@ -1,0 +1,163 @@
+---
+page: default
+slug: /integrate/user-specific-sessions
+category: Integrate
+title: User-specific sessions
+meta:
+  {
+    title: User-specific sessions,
+    description: How to collect additional information from an existing user,
+  }
+---
+
+If the user has already identified themselves to your application, you may invoke the Footprint SDK with an auth token specific to that user. This allows you to progressively collect new and updated information from existing users and guarantees that the user will not create a separate Footprint account when they already have one associated with your application.
+
+This powerful feature can be used for many flows:
+
+- Asking the user to onboard onto a playbook
+- Requesting the user to provide a new driver's license when it expires
+- Asking the user to provide any information requested from the Footprint dashboard
+- Allowing the user to update their login methods with Footprint
+- And more...
+
+## Prerequisites
+
+Please read our [Server-side API Authentication guide](/integrate/api-auth).
+
+## Step 1: Get or create a Footprint user on your backend
+
+You should be storing a mapping from your own user records to Footprint's identifier for the user, the `fp_id`. When the user logs into your application, look up the specific `fp_id` for the user for whom you'd like to open an onboarding flow.
+
+If your user doesn't have an `fp_id` yet, create a new user in Footprint and vault any information you've already collected from them. More information can be found [here](/integrate/migrate-existing-data).
+
+Data already in the user's Footprint vault won't need to be recollected from the user when opening a user-specific onboarding flow, but they may edit it.
+
+## Step 2: Generate an auth token for the user on your backend
+
+From your backend, using a secret API key, generate an auth token associated with the specific user using the <navigation-link href="/api-reference#post-users-fp-id-token" fontFamily="code">POST /users/{fp_id}/token</navigation-link> API:
+
+### Example request
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/token \
+  -X POST \
+  -d '{"kind": "onboard", "key": "pb_live_qBV2iO3nQI5moqo5GJlFhI"}' \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+### Example response
+
+```json
+{
+  "token": "utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0",
+  "expires_at": "2023-10-24T20:44:13.639341Z"
+}
+```
+
+### Token kinds
+
+You should select the kind of token to match the SDK you are using and the flow into which you'd like to launch the user.
+
+| Token kind            | Description                                                                                                                                             | SDK Component |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `onboard`             | Onboard the user onto a specific playbook, specified by the `key` (from the [Playbooks tab](https://dashboard.onefootprint.com/playbooks)).             | Verify        |
+| `reonboard`           | Convenience method to reonboard the user onto the last playbook that they onboarded onto.                                                               | Verify        |
+| `inherit`             | Inherit any operation previously requested via the dashboard, including reonboarding, ID document collection, and SSN card collection. More info below. | Verify        |
+| `user`                | Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.                          | Verify        |
+| `update_auth_methods` | Allows the user to update any/all of their login methods (phone, email, passkey) using the Footprint Auth component.                                    | Auth          |
+
+You can find more info in the <navigation-link href="/api-reference#post-users-fp-id-token" fontFamily="code">POST /users/{fp_id}/token</navigation-link> API reference.
+
+A few token kinds have additional options. More information on those below.
+
+### The inherit token kind
+
+The `inherit` token kind is powerful and deserves more explanation. On Footprint's admin dashboard, you are able to request additional information from a user who has already onboarded onto your service. For example, you may request the user to upload an SSN card or a driver's license. By default, this will send a link to the user to allow them to complete the form.
+
+If you would prefer a more native experience to your application, you can instead embed the Footprint Verify component to complete any outstanding data requests.
+
+Before generating an `inherit` token and invoking the Footprint Verify SDK for the user, you can check via API if a user has an outstanding request to provide more info using the <navigation-link fontFamily="code" href="/api-reference#get-users-fp-id">GET /users/{fp_id}</navigation-link> API:
+
+#### Example request
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+#### Example response
+
+```json
+{
+  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr",
+  "requires_manual_review": false,
+  "status": "pass",
+  "requires_additional_info": {
+    "timestamp": "2023-12-12T21:28:38.771377Z",
+    "note": "Hi Christian, we can't wait for you to get started with your Acme Bank credit card! To finish verifying your identity, can you please submit a photo of your SSN card? Once received, we can approve your application and mail out your credit card."
+  }
+}
+```
+
+If the `requires_additional_info` field is non-null, there is an outstanding request to collect information from this user, and you can create an `inherit` token. It will also include a human-readable note you provided in the dashboard to display to your user, which you may choose to render in your own application.
+
+### The update_auth_methods token kind
+
+The `update_auth_methods` token is used to allow a user to update their login methods using the Footprint Auth component. They will first be asked to log in using an existing login method on their account, and then they will be able to update their phone and/or email.
+
+If you'd like to limit which auth methods are allowed to be updated, you can pass the list of desired methods in `limit_auth_methods` when creating the token. For example, if you'd only like the user to be allowed to update their phone number, you can create a token like so:
+
+#### Example request
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/token \
+  -X POST \
+  -d '{"kind": "update_auth_methods", "limit_auth_methods": ["phone"]}' \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+## Step 3: Pass auth token into the Footprint SDK
+
+You will provide this auth token to the Footprint SDK. This will ask the user to authenticate and then will launch them into the flow specified by the token kind and/or playbook. Check out the specific documentation for the SDK you're using, and review the documentation for the token kinds above to see which component to invoke.
+
+### Onboarding flow example
+
+If you are launching the user into a KYC onboarding flow, you would pass the `authToken` as a prop like so:
+
+```javascript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const handleClick = () => {
+  const component = footprint.init({
+    kind: 'verify',
+    authToken: 'utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0', // Auth token from Step 2
+    onComplete: validationToken => {
+      // TODO: Post to Footprint server to fetch user ID or verification status
+    },
+  });
+  component.render();
+};
+```
+
+### Update auth methods example
+
+If you are launching the user into the Update auth methods flow, you would pass the `authToken` as a prop like so:
+
+<inline-alert variant='info'>Make sure you are using at least the @onefootprint/footprint-js@3.9.0 version.</inline-alert>
+
+```javascript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const handleClick = () => {
+  const component = footprint.init({
+    kind: 'update_login_methods',
+    authToken: 'utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0',
+    onComplete: validationToken => {
+      // TODO: Post to Footprint server to fetch user ID or verification status
+    },
+  });
+  component.render();
+};
+```

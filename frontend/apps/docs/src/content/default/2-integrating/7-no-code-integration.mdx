@@ -1,0 +1,37 @@
+---
+page: default
+slug: /integrate/no-code
+category: Integrate
+title: No-code integration
+meta:
+  {
+    title: No-code integration,
+    description: Start using Footprint without our SDKs,
+  }
+---
+
+Footprint offers a no code integration that takes minutes to set up. While our SDKs provide the best experience for users onboarding from your website, our no-code integration is a great alternative if you want to share a permanent link with your users that they can use to create Footprint vaults.
+
+## Step 1: Create an onboarding configuration
+
+1. Go to the Footprint [Playbooks tab](https://dashboard.onefootprint.com/playbooks) and create a new Playbook.
+
+   - On the "Your Playbook" screen, click the edit button to change the fields you plan to collect.
+   - On the "Authorized scopes" screen, select the fields you require access to decrypt.
+
+2. Grab the permanent onboarding link
+
+   - Open the dropdown menu in the Playbook you just created
+   - Clicking "Get shareable link" will copy the onboarding config link to your clipboard. This link never expires, and you can share it with your users.
+
+<img
+  alt="Getting shareable link"
+  src="/no-code/shareable-link.png"
+  height={250}
+  width={720}
+/>
+
+## Step 2: (Optional) Set up Webhooks for new onboardings
+
+You can set up webhooks to receive updates on this configuration. For example, you can receive Slack notifications every time a user successfully onboards using the configuration you created.
+More information on how to configure Webhooks can be found [here](https://docs.onefootprint.com/integrate/webhooks).

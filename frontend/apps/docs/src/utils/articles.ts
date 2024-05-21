@@ -68,23 +68,28 @@ const replaceContent = (content: string) => {
 const getAllMarkdownFiles = (contentPaths: string[]): Promise<Article[]> =>
   Promise.all(
     contentPaths.map(async contentPath => {
-      const fileContent = await fs.promises.readFile(contentPath, {
-        encoding: 'utf8',
-      });
-      const matterFile = matter(fileContent) as unknown as Article;
-      const content = replaceContent(matterFile.content);
-      return {
-        ...matterFile,
-        content,
-        data: {
-          ...matterFile.data,
-          readingTime: readingTime(content),
-          sections: [
-            getSectionMeta(`#${matterFile.data.title}`),
-            ...getSections(content),
-          ],
-        },
-      };
+      try {
+        const fileContent = await fs.promises.readFile(contentPath, {
+          encoding: 'utf8',
+        });
+        const matterFile = matter(fileContent) as unknown as Article;
+        const content = replaceContent(matterFile.content);
+        return {
+          ...matterFile,
+          content,
+          data: {
+            ...matterFile.data,
+            readingTime: readingTime(content),
+            sections: [
+              getSectionMeta(`#${matterFile.data.title}`),
+              ...getSections(content),
+            ],
+          },
+        };
+      } catch (e) {
+        console.log(contentPath);
+        throw e;
+      }
     }),
   );
 
@@ -129,7 +134,6 @@ const findOrCreateSubcategory = (
   if (!subcategoryItem) {
     subcategoryItem = {
       title: subcategory,
-      position: 0,
       slug: '',
       items: [],
     };
@@ -145,7 +149,7 @@ export const getNavigationByPage = async (
   const articles = await getArticlesByPage(page);
 
   articles.forEach(
-    ({ data: { category, subcategory, title, position, slug, hidden } }) => {
+    ({ data: { category, subcategory, title, slug, hidden } }) => {
       if (hidden) return;
 
       const navigationCategory = findOrCreateSubcategory(
@@ -156,7 +160,6 @@ export const getNavigationByPage = async (
       if (navigationCategory.items) {
         navigationCategory.items.push({
           title,
-          position,
           slug,
           items: null,
         });
@@ -164,16 +167,13 @@ export const getNavigationByPage = async (
     },
   );
 
-  return Array.from(navigation.values()).map(({ name, items }) => ({
+  const res = Array.from(navigation.values()).map(({ name, items }) => ({
     name,
-    items: items
-      .sort((a, b) => a.position - b.position)
-      .map(item => ({
-        ...item,
-        items:
-          item.items && item.items.length > 0
-            ? item.items.sort((a, b) => a.position - b.position)
-            : null,
-      })),
+    items: items.map(item => ({
+      ...item,
+      items: item.items && item.items.length > 0 ? item.items : null,
+    })),
   }));
+  console.log(JSON.stringify(res, null, 2));
+  return res;
 };

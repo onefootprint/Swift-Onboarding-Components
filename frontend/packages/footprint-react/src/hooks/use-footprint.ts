@@ -1,17 +1,24 @@
+import type { FootprintUserData } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { ApiError, type UserData, type UserDataError } from '../@types';
+import { ApiError, type UserDataError } from '../@types';
 import { Context } from '../components/onboarding-components/provider';
-import getOnboardingStatusReq from '../queries/get-onboarding-status';
 import saveReq from '../queries/save';
 import { lockBody, unlockBody } from '../utils/dom-utils';
 import getVaultData from '../utils/get-vault-data';
 
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
-  const form = useFormContext<UserData>();
+  const form = useFormContext<FootprintUserData>();
+  const [busy, setBusy] = useState<'save' | null>(null);
+  const callbacks: {
+    onError?: (error: unknown) => void;
+    onComplete?: (validationToken: string) => void;
+    onCancel?: () => void;
+    onClose?: () => void;
+  } = {};
 
   const getVaultFormData = () => {
     const values = form.getValues();
@@ -21,12 +28,20 @@ export const useFootprint = () => {
   const launchIdentify = ({
     email,
     phoneNumber,
-    onDone,
+    onAuthenticated,
+    onCancel,
+    onError,
+    onComplete,
+    onClose,
   }: {
     email?: string;
     phoneNumber?: string;
-    onDone: () => void;
-  }) => {
+    onAuthenticated?: () => void;
+    onError?: (error: unknown) => void;
+    onCancel?: () => void;
+    onComplete?: (validationToken: string) => void;
+    onClose?: () => void;
+  } = {}) => {
     const fp = footprint.init({
       appearance: context.appearance,
       publicKey: context.publicKey,
@@ -35,34 +50,18 @@ export const useFootprint = () => {
         'id.email': email || form.getValues('id.email'),
       },
       kind: FootprintComponentKind.Components,
-      onComplete: context.onComplete,
-      onError: context.onError,
-      onCancel: context.onCancel,
+      onComplete: callbacks.onComplete || onComplete,
+      onError: callbacks.onError || onError,
+      onCancel: callbacks.onCancel || onCancel,
+      onClose: callbacks.onClose || onClose,
       onRelayToComponents: (authToken: string) => {
         unlockBody();
         setContext(prev => ({ ...prev, authToken }));
-        onDone();
+        onAuthenticated?.();
       },
     });
     fp.render();
     setContext({ ...context, fpInstance: fp });
-  };
-
-  const getMissingRequirements = async (token?: string) => {
-    const authToken = token || context.authToken;
-    if (authToken) {
-      try {
-        const { missingRequirements } = await getOnboardingStatusReq({
-          authToken,
-        });
-        setContext(prev => ({ ...prev, missingRequirements }));
-        return missingRequirements;
-      } catch (e) {
-        console.error(e);
-      }
-      return [];
-    }
-    throw new Error('No authToken found');
   };
 
   const handleError = (error: unknown) => {
@@ -70,31 +69,55 @@ export const useFootprint = () => {
       const apiError = error as ApiError<UserDataError>;
       Object.entries(apiError.details.message).forEach(([key, value]) => {
         if (typeof value === 'string') {
-          form.setError(key, { message: value });
+          form.setError(key as keyof FootprintUserData, { message: value });
         }
       });
     }
   };
 
-  const save = async () => {
+  const save = async ({
+    onSuccess,
+    onError,
+  }: {
+    onSuccess?: () => void;
+    onError?: (error: unknown) => void;
+  } = {}) => {
     const { authToken } = context;
     if (!authToken) {
       throw new Error('No authToken found');
     }
     try {
+      setBusy('save');
       const data = getVaultFormData();
       await saveReq({ data, bootstrapDis: [], authToken });
+      onSuccess?.();
     } catch (error: unknown) {
+      onError?.(error);
       handleError(error);
-      throw error;
+    } finally {
+      setBusy(null);
     }
-    await getMissingRequirements(authToken);
   };
 
-  const handoff = () => {
+  const handoff = ({
+    onCancel,
+    onError,
+    onComplete,
+    onClose,
+  }: {
+    onError?: (error: unknown) => void;
+    onCancel?: () => void;
+    onComplete?: (validationToken: string) => void;
+    onClose?: () => void;
+  } = {}) => {
     if (!context.fpInstance) {
       throw new Error('No fpInstance found');
     }
+    callbacks.onCancel = onCancel;
+    callbacks.onError = onError;
+    callbacks.onComplete = onComplete;
+    callbacks.onClose = onClose;
+
     lockBody();
     context.fpInstance.relayFromComponents?.();
   };
@@ -105,7 +128,7 @@ export const useFootprint = () => {
     save,
   };
 
-  return { form, context, ...methods };
+  return { form, context, busy, ...methods };
 };
 
 export default useFootprint;

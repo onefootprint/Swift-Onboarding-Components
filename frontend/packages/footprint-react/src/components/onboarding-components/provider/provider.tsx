@@ -1,3 +1,4 @@
+import type { FootprintUserData } from '@onefootprint/footprint-js';
 import type { Component } from '@onefootprint/footprint-js/src/types/components';
 import type {
   OnboardingRequirement,
@@ -8,7 +9,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type { Appearance, UserData } from '../../../@types';
+import type { Appearance } from '../../../@types';
 import configureI18n from '../../../config/initializers/i18next';
 
 configureI18n();
@@ -25,7 +26,7 @@ export type ContextData = {
   publicKey: string;
   sandboxId?: string;
   signupChallenge: SignupChallengeResponse | null;
-  userData?: UserData;
+  userData?: FootprintUserData;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -51,7 +52,7 @@ export type ProviderProps = {
   onError?: (error: unknown) => void;
   publicKey: string;
   sandboxId?: string;
-  userData?: UserData;
+  userData?: FootprintUserData;
 };
 
 const Provider = ({
@@ -65,7 +66,7 @@ const Provider = ({
   sandboxId,
   userData = {},
 }: ProviderProps) => {
-  const methods = useForm<UserData>({
+  const methods = useForm<FootprintUserData>({
     defaultValues: userData,
   });
   const [context, setContext] = useState<ContextData>({

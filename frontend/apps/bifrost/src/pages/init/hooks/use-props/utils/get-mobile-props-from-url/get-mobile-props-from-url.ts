@@ -46,6 +46,7 @@ const getMobilePropsFromUrl = (
   }
 
   return {
+    // @ts-ignore
     userData: getParsedProps(part1),
     options: getParsedProps(part2),
     l10n: getParsedProps(part3),

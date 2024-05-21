@@ -22,13 +22,17 @@ const AppNav = ({ navigation, onItemClick }: AppNavProps) => {
           const hasSubItems = subItems && subItems.length > 0;
 
           return hasSubItems ? (
-            <NavigationSubcategory items={subItems} key={slug} title={title} />
+            <NavigationSubcategory
+              items={subItems}
+              key={`nav-subcategory-${title}-${slug}`}
+              title={title}
+            />
           ) : (
             <NavigationLink
               $isSelected={router.asPath === slug}
               as={Link}
               href={slug}
-              key={slug}
+              key={`nav-item-${title}-${slug}`}
               onClick={onItemClick}
             >
               {title}

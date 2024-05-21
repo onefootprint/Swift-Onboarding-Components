@@ -1,7 +1,7 @@
-import type { UserData } from './user-data';
+import type { FootprintUserData } from '@onefootprint/footprint-js';
 
 export type UserDataError = {
   error: {
-    message: Partial<Record<keyof UserData, string>> | string;
+    message: Partial<Record<keyof FootprintUserData, string>> | string;
   };
 };

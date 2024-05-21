@@ -1,0 +1,177 @@
+---
+page: default
+slug: /sdks/react-auth
+category: SDKs
+subcategory: React
+title: Auth
+meta:
+  {
+    title: Footprint | React Integration - Auth,
+    description: Discover how to integrate Footprint's Auth flow into your React application.,
+  }
+---
+
+## Getting started
+
+In order to launch the auth flow, you need to use the `<FootprintVerifyButton />` component and specify the `kind` prop to `auth`.
+This component will render a button that will launch the auth flow when clicked. The steps are similar to our [javascript integration](/sdks/js-auth):
+
+1. **Access Your Dashboard**:
+
+   - Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
+   - Use an existing playbook or create a new one.
+   - Obtain the Publishable Key, e.g., `pb_test_7TdzxpZoqUpzPuvfgncUtu`.
+
+2. **Initialize the Footprint Flow**:
+
+- With the playbook obtained, you can now use the `FootprintButton` component to trigger the auth flow:
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+
+import { FootprintButton } from '@onefootprint/footprint-react';
+
+const Page = () => {
+  const handleComplete = (validationToken: string) => {
+    console.log(validationToken);
+  }
+
+  return (
+    <FootprintButton
+      kind="auth"
+      publicKey="pb_test_7TdzxpZoqUpzPuvfgncUtu"
+      onComplete={handleComplete}
+    />
+  );
+};
+```
+
+3. **Handle Completion:**
+   - Once the user completes the flow, you'll receive the validationToken through the `onComplete` callback. Post this token to your backend for further processing.
+
+## Demo
+
+With the code above, you should see a button that launches the onboarding flow when clicked:
+
+<div style="display: flex; align-items: center; justify-content: center; margin: 0 0 24px;">
+  <demo-react kind="auth"></demo-react>
+</div>
+
+## Update login methods flow
+
+If you would like to enable users to update their authentication methods securely, you can use the `update_login_methods` kind. Instead of using a `publicKey`, you should provide an `authToken`:
+
+1. **Get the fp_id**:
+
+- Go to your [dashboard](https://dashboard.onefootprint.com/users) and get the `fp_id` of the user you want to update the login methods.
+
+2. ** Get a secret API key**:
+
+- Go to your [dashboard](https://dashboard.onefootprint.com/api-keys) and get a secret API key.
+
+3. ** Make a POST request**:
+
+- Make a POST request to the Footprint API to get an authentication token. You can use the following cURL command:
+
+```bash
+curl -s https://api.onefootprint.com/users/FP_USER_ID/token -X POST -d '{"kind": "update_auth_methods"}' -u YOUR_SECRET_KEY: | jq
+```
+
+4. **Initialize the Footprint Flow**:
+
+- With the authentication token obtained, you can now use the `FootprintButton` component to trigger the update login methods flow:
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintButton } from '@onefootprint/footprint-react';
+
+const Page = () => {
+  const handleComplete = (validationToken: string) => {
+    console.log(validationToken);
+  }
+
+  return (
+    <FootprintButton
+      kind="update_login_methods"
+      authToken="utok_123"
+    />
+  );
+};
+```
+
+## Setting user data
+
+Depending on your onboarding configuration, Footprint might request customer's phone number and email. In some circustances,
+you might have this data already available, so Footprint doesn't need to request this data once more. To pass user data to Footprint's flow,
+use the prop `userData`:
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+
+import { FootprintButton } from '@onefootprint/footprint-react';
+
+const Page = () => {
+  return (
+    <main>
+      <FootprintButton
+        kind="auth"
+        publicKey="pb_test_7TdzxpZoqUpzPuvfgncUtu"
+        userData={{
+          'id.email': 'jane.doe@acme.com',
+          'id.phone_number': '+12025550179',
+        }}
+      />
+    </main>
+  );
+};
+```
+
+## Setting a custom appearance
+
+You can customize the appearance of the onboarding flow by passing an `appearance` object to the `init` method.
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+
+const Page = () => {
+  return (
+    <main>
+      <FootprintButton
+        kind="auth"
+        publicKey="pb_test_7TdzxpZoqUpzPuvfgncUtu"
+        appearance={{
+          variables: {
+            borderRadius: '8px',
+            colorSuccess: '#10b981',
+            colorError: '#F87171',
+            buttonPrimaryBg: '#5550e9',
+          }
+        }}
+      />
+    </main>
+  );
+};
+```
+
+For more information, including a list of available variables, check out the [customization guide](/integrate/customization).
+
+## Available props
+
+| Property        | Description                                                                                                                                                                                                                      |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `appearance`    | Optional. Customizes the integration's visual style with a `FootprintAppearance` object.                                                                                                                                         |
+| `authToken`     | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID, and fields to collect. One of publicKey or authToken must be provided. More info [here](/integrate/user-specific-sessions). |
+| `className`     | Optional. Specifies a custom class name for the HTMLButtonElement.                                                                                                                                                               |
+| `dialogVariant` | Optional. Determines the dialog's appearance: 'modal', 'drawer'. Default: 'modal'.                                                                                                                                               |
+| `l10n`          | Optional. Specifies the desired localization. For more details, see [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                    |
+| `label`         | Optional. Sets the text displayed within the HTMLButtonElement.                                                                                                                                                                  |
+| `onCancel`      | Optional. Triggered when the user abandons the flow, such as clicking the close button inside our iframe.                                                                                                                        |
+| `onClick`       | Optional. Defines the action triggered upon clicking the HTMLButtonElement.                                                                                                                                                      |
+| `onClose`       | Optional. Triggered when the user closes the flow, whether completed or canceled.                                                                                                                                                |
+| `onError`       | Optional. Calls a function in the event of an unrecoverable error during onboarding flow initialization, providing an error string with details.                                                                                 |
+| `options`       | Optional. Customizes the flow with an options object, which may include `showLogo`. For more information, see [here](https://docs.onefootprint.com/integrate/customization#available-options).                                   |
+| `publicKey`     | Optional. Onboarding configuration public key.                                                                                                                                                                                   |
+| `testID`        | Optional. Sets the value for the `data-testid` attribute of the HTMLButtonElement.                                                                                                                                               |
+| `userData`      | Optional. Contains previously collected user data to bootstrap the onboarding flow. See more [here](https://docs.onefootprint.com/integrate/user-data).                                                                          |

@@ -29,4 +29,5 @@ const DemoReact = ({ kind }: DemoReactProps) => {
   }
   return null;
 };
+
 export default DemoReact;

@@ -3,16 +3,11 @@
   "private": false,
   "type": "module",
   "version": "7.0.0",
-  "main": "./dist/footprint-react.umd.js",
+  "main": "./dist/footprint-react.cjs",
   "module": "./dist/footprint-react.js",
+  "unpkg": "./dist/footprint-react.js",
   "types": "./dist/footprint-react.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/footprint-react.js",
-      "require": "./dist/footprint-react.umd.js",
-      "types": "./dist/footprint-react.d.ts"
-    }
-  },
+  "style": "./dist/footprint-react.css",
   "sideEffects": false,
   "license": "MIT",
   "files": [

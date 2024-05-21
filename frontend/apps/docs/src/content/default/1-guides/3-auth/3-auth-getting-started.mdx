@@ -1,0 +1,133 @@
+---
+page: default
+slug: /auth/getting-started
+category: Guides
+title: Customer Authentication
+meta:
+  {
+    title: Footprint Auth - Getting started,
+    description: Getting started with Auth,
+  }
+---
+
+Footprint Auth provides a lightweight component for users to both sign up and log in to your app.
+
+At a high level, the Footprint Auth component will prompt the user to authenticate and, once complete, return a validation token to your app. This validation token acts as proof from Footprint that the user has logged in. You must verify this validation token on your backend and exchange it for the exact `fp_id` (unique identifier) of the authenticated user.
+
+## Add Footprint.js to your app
+
+1. Go to the Footprint [Playbooks tab](https://dashboard.onefootprint.com/playbooks) and grab the publishable key of your auth playbook. If you don't have an auth playbook, please reach out to us and we will create one for you. The publishable key will look like `pb_test_VMooXd04EUlnu3AvMYKjMW`.
+
+2. Add the `@onefootprint/footprint-js` dependency to your app and render the Auth component.
+
+Here's what your integration may look like if you use React/Typescript:
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const Page = () => {
+  const launchAuth = () => {
+    const component = footprint.init({
+      kind: 'auth',
+      publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
+      onComplete: (validationToken: string) => {
+         // TODO: Post to Footprint server to fetch user ID
+      }
+    });
+    component.render();
+  };
+
+  return (
+    <button onClick={launchAuth}>
+      Launch Auth
+    </button>
+  );
+};
+```
+
+Click [here](https://github.com/onefootprint/examples/tree/master/auth/frontend-react-typescript-next) to see an example integration.
+
+If your app is built using Vanilla HTML/Javascript, [here is more information](/sdks/javascript#auth-component-integration) on what the integration will look like.
+
+<inline-alert variant='info'>Make sure your application's permissions and content security policies are configured correctly to allow the Footprint integration. More info can be found [here](/integrate/content-security-policy).</inline-alert>
+
+Once the user authenticates with the Footprint component, it will return a "validation token" to your frontend, which serves as proof that the user has authenticated via Footprint. You must verify the validation token to exchange it for a stable Footprint user identifier (`fp_id`) on your backend.
+
+## Verify the Footprint token server-side
+
+### Setup and authentication
+
+Get or create a Secret API Key on your [developer dashboard](https://dashboard.onefootprint.com/api-keys). The key will look something like `sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv`. Add this to the credential manager of your server-side app. To learn more about server-side API authentication, read the short guide on [API Authentication](/integrate/api-auth).
+
+### Verifying the validation token
+
+You should create an endpoint on your backend to handle logins. It will receive the validation token returned by the Footprint auth component above and should exchange it with Footprint's backend for information on the authenticated user using the <navigation-link fontFamily="code" href="/api-reference#post-onboarding-session-validate">POST /onboarding/session/validate</navigation-link> API:
+
+```bash
+curl -X POST https://api.onefootprint.com/onboarding/session/validate \
+   -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+   -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
+```
+
+Footprint will give you some information on the method the user used to authenticate. We’ll also give you an `fp_id`, which looks like `fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX`.
+
+```json
+{
+  "user_auth": {
+    "fp_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
+    "auth_events": [
+      "kind": "sms",
+      "timestamp": "2022-01-04T12:00-07:00"
+    ]
+  }
+}
+```
+
+<inline-alert variant="info">
+  Save the `fp_id` in your database tied to this specific user. It is the
+  identifier you will use to perform other operations for this user in
+  Footprint, like KYC and data vaulting.
+</inline-alert>
+
+## Using Footprint Verify (KYC) after authentication
+
+You can use the `fp_id` for this user for many other operations on Footprint.
+
+Commonly, you may use Footprint KYC in conjunction with Footprint authentication. To use Footprint KYC for a user who has already authenticated, generate an onboarding token for a specific user:
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/token \
+  -X POST \
+  -d '{"key": "pb_live_qBV2iO3nQI5moqo5GJlFhI"}' \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+```bash
+{
+  "token": "utok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0",
+  "expires_at": "2023-10-24T20:44:13.639341Z"
+}
+```
+
+You may then invoke Footprint KYC with the provided onboarding token. The user will not be asked to re-authenticate if they have logged into your app recently. Instead, they will be send straight to the identity verification portion of the playbook.
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+
+const MyComponent = () => {
+  const handleComplete = (validationToken: string) => {
+    // TODO: Post to Footprint server to fetch user ID and verification status
+  };
+
+  return (
+    <FootprintVerifyButton
+      authToken='tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0'
+      onComplete={handleComplete}
+    />
+  );
+};
+```
+
+More info on user-specific onboarding can be found [here](/integrate/user-specific-sessions).
