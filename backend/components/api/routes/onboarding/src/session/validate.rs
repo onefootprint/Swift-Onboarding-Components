@@ -99,7 +99,7 @@ pub async fn post(
         if auth.tenant().uses_legacy_serialization() {
             (
                 Some(sv.fp_id.clone()),
-                Some(wf.as_ref().and_then(|(wf, _)| wf.status).ok_or(OnboardingError::NoStatusForWorkflow)?),
+                wf.as_ref().and_then(|(wf, _)| wf.status),
                 Some(wf.as_ref().is_some_and(|(_, mrs)| !mrs.is_empty())),
                 wf.as_ref().and_then(|(wf, _)| wf.ob_configuration_id.clone()),
                 wf.as_ref().map(|(wf, _)| wf.created_at),
