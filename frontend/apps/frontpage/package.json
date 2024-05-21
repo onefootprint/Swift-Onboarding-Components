@@ -26,7 +26,6 @@
     "@next/mdx": "^14.1.4",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/footprint-js": "*",
-    "@onefootprint/footprint-react": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
