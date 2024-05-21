@@ -35,6 +35,7 @@ const Title = styled(Box)<{ textAlign: 'left' | 'center' }>`
   ${({ textAlign }) => css`
     ${createFontStyles('display-3')}
     text-align: ${textAlign};
+    max-width: 600px;
 
     ${media.greaterThan('md')`
       ${createFontStyles('display-2')}
