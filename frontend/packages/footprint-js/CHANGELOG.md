@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.11.0
+
+### Minor Changes
+
+- 5061ff38fc: Preparation for ob components
+
 ## 3.10.0
 
 ### Minor Changes

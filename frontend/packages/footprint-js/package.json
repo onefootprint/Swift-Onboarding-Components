@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-js",
   "private": false,
   "type": "module",
-  "version": "3.10.0",
+  "version": "3.11.0",
   "main": "./dist/footprint-js.cjs",
   "module": "./dist/footprint-js.js",
   "unpkg": "./dist/footprint-js.js",
