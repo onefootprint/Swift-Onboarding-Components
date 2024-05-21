@@ -52,7 +52,6 @@ impl BillingEvent {
             .inner_join(scoped_vault::table)
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(true))
-            .filter(scoped_vault::deactivated_at.is_null())
             // Filter for events that occurred this month
             .filter(billing_event::timestamp.ge(start_date))
             .filter(billing_event::timestamp.lt(end_date))

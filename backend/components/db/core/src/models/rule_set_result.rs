@@ -177,7 +177,6 @@ impl RuleSetResult {
         let res: Vec<(ScopedVault, Vault, RuleSetResult)> = workflow::table
             .inner_join(scoped_vault::table.inner_join(vault::table))
             .inner_join(rule_set_result::table)
-            .filter(scoped_vault::deactivated_at.is_null())
             .filter(workflow::ob_configuration_id.eq(obc_id))
             .filter(not(workflow::completed_at.is_null()))
             .filter(workflow::completed_at.ge(start))

@@ -203,7 +203,6 @@ impl OnboardingDecision {
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
-            .filter(scoped_vault::deactivated_at.is_null())
             .order_by(onboarding_decision::created_at.desc())
             .select(onboarding_decision::all_columns)
             .first(conn)
@@ -224,7 +223,6 @@ impl OnboardingDecision {
                     .on(manual_review::completed_by_decision_id.eq(onboarding_decision::id.nullable())),
             )
             .filter(scoped_vault::id.eq(sv_id))
-            .filter(scoped_vault::deactivated_at.is_null())
             .order_by(onboarding_decision::created_at.desc())
             .select((
                 onboarding_decision::all_columns,

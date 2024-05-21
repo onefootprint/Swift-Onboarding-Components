@@ -420,10 +420,7 @@ impl Workflow {
         id: T,
     ) -> DbResult<(Self, ScopedVault)> {
         use db_schema::schema::{business_owner, scoped_vault};
-        let mut query = workflow::table
-            .inner_join(scoped_vault::table)
-            .filter(scoped_vault::deactivated_at.is_null())
-            .into_boxed();
+        let mut query = workflow::table.inner_join(scoped_vault::table).into_boxed();
         match id.into() {
             WorkflowIdentifier::Id { id } => query = query.filter(workflow::id.eq(id)),
             WorkflowIdentifier::BusinessOwner {
@@ -470,7 +467,6 @@ impl Workflow {
         let res = workflow::table
             .filter(workflow::id.eq(id))
             .inner_join(scoped_vault::table.inner_join(vault::table))
-            .filter(scoped_vault::deactivated_at.is_null())
             .select((workflow::all_columns, vault::all_columns))
             .get_result::<(Self, Vault)>(conn)?;
         Ok(res)

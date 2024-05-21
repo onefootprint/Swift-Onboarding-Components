@@ -92,7 +92,6 @@ impl AppleDeviceAttestation {
             .inner_join(vault::table)
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(vault::id)))
             .filter(scoped_vault::id.eq(sv_id))
-            .filter(scoped_vault::deactivated_at.is_null())
             .select(apple_device_attestation::all_columns)
             .load(conn)?;
 

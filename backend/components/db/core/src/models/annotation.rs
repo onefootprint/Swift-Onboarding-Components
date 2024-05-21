@@ -90,7 +90,6 @@ impl Annotation {
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
-            .filter(scoped_vault::deactivated_at.is_null())
             .select(scoped_vault::id);
         let result = diesel::update(annotation::table)
             .filter(annotation::id.eq(id))
@@ -133,7 +132,6 @@ impl Annotation {
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
-            .filter(scoped_vault::deactivated_at.is_null())
             .into_boxed();
         if let Some(is_pinned) = is_pinned {
             query = query.filter(annotation::is_pinned.eq(is_pinned));

@@ -105,14 +105,5 @@ mod tests {
         let vw0: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[0].id).unwrap();
         assert!(vw0.get(&IDK::FirstName.into()).is_some());
         assert!(vw0.get(&IDK::Ssn4.into()).is_some());
-
-        // Delete the entire scoped vault.
-        vw1.soft_delete_vault(conn).unwrap();
-        // Refetch since the VW is consumed.
-        assert!(VaultWrapper::<Person>::lock_for_onboarding(conn, &scoped_vaults[1].id).is_err());
-        // The other scoped vault still works properly.
-        let vw0: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vaults[0].id).unwrap();
-        assert!(vw0.get(&IDK::FirstName.into()).is_some());
-        assert!(vw0.get(&IDK::Ssn4.into()).is_some());
     }
 }

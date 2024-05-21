@@ -72,7 +72,6 @@ impl Vault {
             VaultIdentifier::ScopedVaultId(scoped_user_id) => {
                 let uv_ids = scoped_vault::table
                     .filter(scoped_vault::id.eq(scoped_user_id))
-                    .filter(scoped_vault::deactivated_at.is_null())
                     .select(scoped_vault::vault_id);
                 vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
@@ -85,7 +84,6 @@ impl Vault {
                     .filter(scoped_vault::fp_id.eq(fp_id))
                     .filter(scoped_vault::tenant_id.eq(tenant_id))
                     .filter(scoped_vault::is_live.eq(is_live))
-                    .filter(scoped_vault::deactivated_at.is_null())
                     .select(scoped_vault::vault_id);
                 vault::table.filter(vault::id.eq_any(uv_ids)).into_boxed()
             }
@@ -354,7 +352,6 @@ impl Vault {
                 // Un-verified vaults owned by this tenant
                 .filter(fingerprint::tenant_id.eq(tenant_id))
                 .filter(data_lifetime::portablized_seqno.is_null())
-                .filter(scoped_vault::deactivated_at.is_null())
                 .filter(vault::is_verified.eq(false))
                 .filter(vault::is_identifiable.eq(false))
                 .filter(vault::is_hidden.eq(false))
@@ -394,6 +391,7 @@ impl Vault {
         // Get the scoped vaults for each vault
         let v_id_to_svs = scoped_vault::table
             .filter(scoped_vault::vault_id.eq_any(v_ids.clone()))
+            .filter(scoped_vault::deactivated_at.is_null())
             .get_results::<ScopedVault>(conn)?
             .into_iter()
             .into_group_map_by(|sv| sv.vault_id.clone());
@@ -412,6 +410,8 @@ impl Vault {
         // correctness, and others are heuristics to select the best of many duplicate vaults
         let highest_priority = vaults
             .into_iter()
+            // Filter out vaults that only have deactivated scoped vaults
+            .filter(|vault| v_id_to_svs.get(&vault.id).is_some_and(|svs| !svs.is_empty()))
             .map(|vault| {
                 // True if the vault already has a scoped vault at the tenatn
                 let empty = vec![];

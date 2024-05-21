@@ -168,7 +168,6 @@ impl ScopedVault {
         let scoped_vault = scoped_vault::table
             .filter(scoped_vault::vault_id.eq(&uv.id))
             .filter(scoped_vault::tenant_id.eq(&ob_config.tenant_id))
-            .filter(scoped_vault::deactivated_at.is_null())
             .first(conn.conn())
             .optional()?;
         if let Some(scoped_vault) = scoped_vault {
@@ -221,14 +220,12 @@ impl ScopedVault {
             // Get the existing vault if an active scoped vault already exists with the given
             // external ID. Otherwise, create a new vault.
             Some(external_id) => {
-                let svr = ScopedVault::get(
-                    conn,
-                    ScopedVaultIdentifier::ExternalId {
-                        e_id: external_id,
-                        t_id: &tenant_id,
-                        is_live: new_user.is_live,
-                    },
-                );
+                let id = ScopedVaultIdentifier::ExternalId {
+                    e_id: external_id,
+                    t_id: &tenant_id,
+                    is_live: new_user.is_live,
+                };
+                let svr = ScopedVault::get(conn, id);
                 match svr {
                     Ok(sv) => Ok((Vault::lock(conn, &sv.vault_id)?, false)),
                     Err(err) if err.is_not_found() => Ok(Vault::insert(conn, new_user, idempotency_id)?),
@@ -285,9 +282,7 @@ impl ScopedVault {
 
     #[tracing::instrument("ScopedVault::get", skip_all)]
     pub fn get<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<ScopedVault> {
-        let mut query = scoped_vault::table
-            .filter(scoped_vault::deactivated_at.is_null())
-            .into_boxed();
+        let mut query = scoped_vault::table.into_boxed();
 
         match id.into() {
             ScopedVaultIdentifier::Id { id } => query = query.filter(scoped_vault::id.eq(id)),
@@ -319,6 +314,7 @@ impl ScopedVault {
                     .filter(scoped_vault::external_id.eq(e_id))
                     .filter(scoped_vault::tenant_id.eq(t_id))
                     .filter(scoped_vault::is_live.eq(is_live))
+                    .filter(scoped_vault::deactivated_at.is_null())
             }
             ScopedVaultIdentifier::SuperAdminView { identifier } => {
                 query = query.filter(
@@ -343,7 +339,6 @@ impl ScopedVault {
         let mut query = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(is_live))
-            .filter(scoped_vault::deactivated_at.is_null())
             .inner_join(vault::table)
             .into_boxed();
 
@@ -387,7 +382,6 @@ impl ScopedVault {
                     .and(scoped_vault_label::deactivated_at.is_null())),
             )
             .filter(scoped_vault::id.eq_any(&ids))
-            .filter(scoped_vault::deactivated_at.is_null())
             .load(conn)?;
 
         // Fetch manual reviews separately since there may be multiple for one scoped vault
@@ -443,13 +437,11 @@ impl ScopedVault {
             // No-op if the update is empty
             let existing_sv = scoped_vault::table
                 .filter(scoped_vault::id.eq(id))
-                .filter(scoped_vault::deactivated_at.is_null())
                 .get_result(conn.conn())?;
             return Ok(existing_sv);
         }
         let updated_sv = diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(id))
-            .filter(scoped_vault::deactivated_at.is_null())
             .set(update)
             .get_result(conn.conn())?;
         Ok(updated_sv)
@@ -487,7 +479,6 @@ impl ScopedVault {
         }
         diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(&wf.scoped_vault_id))
-            .filter(scoped_vault::deactivated_at.is_null())
             .set(scoped_vault::status.eq(Option::<OnboardingStatus>::None))
             .execute(conn.conn())?;
         Ok(())
@@ -516,7 +507,6 @@ impl ScopedVault {
             .inner_join(scoped_vault::table)
             .inner_join(ob_configuration::table)
             .inner_join(tenant::table.on(tenant::id.eq(ob_configuration::tenant_id)))
-            .filter(scoped_vault::deactivated_at.is_null())
             .filter(scoped_vault::vault_id.eq(v_id))
             .filter(not(workflow::authorized_at.is_null()))
             .order_by(workflow::created_at.desc())

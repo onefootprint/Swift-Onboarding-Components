@@ -88,8 +88,7 @@ impl BusinessOwner {
                     .on(scoped_vault::vault_id
                         .nullable()
                         .eq(business_owner::user_vault_id)
-                        .and(scoped_vault::tenant_id.eq(tenant_id))
-                        .and(scoped_vault::deactivated_at.is_null()))
+                        .and(scoped_vault::tenant_id.eq(tenant_id)))
                     .inner_join(vault::table),
             )
             .get_results(conn)?;
@@ -110,7 +109,6 @@ impl BusinessOwner {
                     .on(scoped_vault::vault_id.eq(business_owner::business_vault_id))
                     .inner_join(workflow::table),
             )
-            .filter(scoped_vault::deactivated_at.is_null())
             .filter(business_owner::user_vault_id.eq(uv_id))
             // Only get the ScopedVault for the businesses that onboarded onto the
             // same ob config

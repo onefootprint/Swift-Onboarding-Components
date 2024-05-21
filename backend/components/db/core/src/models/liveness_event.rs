@@ -41,7 +41,6 @@ impl LivenessEvent {
             .inner_join(scoped_vault::table)
             .left_join(insight_event::table)
             .filter(scoped_vault::vault_id.eq(vault_id))
-            .filter(scoped_vault::deactivated_at.is_null())
             .select((liveness_event::all_columns, insight_event::all_columns.nullable()))
             .load(conn)?;
         Ok(results)
@@ -72,7 +71,6 @@ impl LivenessEvent {
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::fp_id.eq(fp_id))
             .filter(scoped_vault::is_live.eq(is_live))
-            .filter(scoped_vault::deactivated_at.is_null())
             .select((
                 liveness_event::all_columns,
                 schema::insight_event::all_columns.nullable(),
