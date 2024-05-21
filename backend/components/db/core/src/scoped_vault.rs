@@ -8,17 +8,17 @@ use diesel::{dsl::not, prelude::*};
 use itertools::Itertools;
 use newtypes::{
     output::Csv, ExternalId, Fingerprint, FpId, LabelKind, ObConfigurationId, OnboardingStatus,
-    OnboardingStatusFilter, PiiString, ScopedVaultCursor, ScopedVaultCursorKind, TenantId, VaultKind,
-    WatchlistCheckStatusKind,
+    OnboardingStatusFilter, PiiString, ScopedVaultCursor, ScopedVaultCursorKind, ScopedVaultId, TenantId,
+    VaultKind, WatchlistCheckStatusKind,
 };
 use tracing::instrument;
 
 #[derive(Debug, Clone, Default)]
-pub struct ScopedVaultListQueryParams {
+pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub tenant_id: TenantId,
     pub is_live: bool,
     pub statuses: Vec<OnboardingStatusFilter>,
-    pub search: Option<SearchQuery>,
+    pub search: Option<TSearch>,
     pub fp_id: Option<FpId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
@@ -41,6 +41,54 @@ pub struct SearchQuery {
     pub fingerprint_queries: Vec<Fingerprint>,
 }
 
+impl ScopedVaultListQueryParams {
+    fn map_search(self, conn: &mut PgConn) -> DbResult<ScopedVaultListQueryParams<Vec<ScopedVaultId>>> {
+        let Self {
+            tenant_id,
+            is_live,
+            statuses,
+            search,
+            fp_id,
+            timestamp_lte,
+            timestamp_gte,
+            requires_manual_review,
+            watchlist_hit,
+            kind,
+            only_visible,
+            playbook_ids,
+            has_outstanding_workflow_request,
+            external_id,
+            labels,
+        } = self;
+
+        let matching_vaults = if let Some(search) = search {
+            let vault_ids = vaults_matching_search(conn, search, &tenant_id, is_live)?;
+            Some(vault_ids)
+        } else {
+            None
+        };
+
+        let result = ScopedVaultListQueryParams {
+            tenant_id,
+            is_live,
+            statuses,
+            search: matching_vaults,
+            fp_id,
+            timestamp_lte,
+            timestamp_gte,
+            requires_manual_review,
+            watchlist_hit,
+            kind,
+            only_visible,
+            playbook_ids,
+            has_outstanding_workflow_request,
+            external_id,
+            labels,
+        };
+        Ok(result)
+    }
+}
+
 /// Composes the query to fetch authorized users matching the provided filter params.
 /// Requires the `conn` only to execute one subquery because diesel doesn't like it. Returns a box
 /// query that must still be executed
@@ -50,7 +98,7 @@ macro_rules! list_query {
         // not be visible in the dashboard since the tenant doesn't have permissions to view anything
         // about the user
         use db_schema::schema::{
-            manual_review, scoped_vault, scoped_vault_label, watchlist_check, workflow, workflow_request, fingerprint
+            manual_review, scoped_vault, scoped_vault_label, watchlist_check, workflow, workflow_request,
         };
         let mut query = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
@@ -158,6 +206,10 @@ macro_rules! list_query {
             }
         }
 
+        if let Some(sv_ids) = $params.search.as_ref() {
+            query = query.filter(scoped_vault::id.eq_any(sv_ids))
+        }
+
         if let Some(external_id) = $params.external_id.as_ref() {
             query = query.filter(scoped_vault::external_id.eq(external_id))
         }
@@ -171,49 +223,66 @@ macro_rules! list_query {
             query = query.filter(scoped_vault::id.eq_any(matching_ids))
         }
 
-        if let Some(search) = $params.search.as_ref() {
-            let SearchQuery { search, fingerprint_queries } = search;
-            // Search both plaintext results and fingerprinted results
-            let plaintext_results = {
-                tracing::info!(search_len=%search.len(), "Searching for plaintext results");
-                let plaintext_search = format!("%{}%", search.leak());
-                // Be careful changing this query - it's optimized to use a specific index
-                fingerprint::table
-                    .filter(fingerprint::deactivated_at.is_null())
-                    .filter(fingerprint::tenant_id.eq(&$params.tenant_id))
-                    .filter(fingerprint::is_live.eq(&$params.is_live))
-                    .filter(fingerprint::is_hidden.eq(false))
-                    // Matching filter
-                    .filter(fingerprint::p_data.is_not_null())
-                    .filter(fingerprint::p_data.ilike(plaintext_search))
-                    .select(fingerprint::scoped_vault_id)
-            };
-
-            let fingerprint_results = {
-                tracing::info!(sh_datas=%Csv::from(fingerprint_queries.iter().cloned().collect_vec()), "Searching for fingerprint results");
-                // Be careful changing this query - it's optimized to use a specific index
-                fingerprint::table
-                    .filter(fingerprint::deactivated_at.is_null())
-                    .filter(fingerprint::tenant_id.eq(&$params.tenant_id))
-                    .filter(fingerprint::is_live.eq(&$params.is_live))
-                    .filter(fingerprint::is_hidden.eq(false))
-                    // Matching filter
-                    .filter(fingerprint::sh_data.is_not_null())
-                    .filter(fingerprint::sh_data.eq_any(fingerprint_queries))
-                    .select(fingerprint::scoped_vault_id)
-            };
-
-            query = query.filter(scoped_vault::id.eq_any(plaintext_results).or(scoped_vault::id.eq_any(fingerprint_results)))
-        }
-
         query
     }};
 }
 
 #[instrument(skip_all)]
+fn vaults_matching_search(
+    conn: &mut PgConn,
+    search: SearchQuery,
+    tenant_id: &TenantId,
+    is_live: bool,
+) -> DbResult<Vec<ScopedVaultId>> {
+    use db_schema::schema::fingerprint;
+    let SearchQuery {
+        search,
+        fingerprint_queries,
+    } = search;
+    // Search both plaintext results and fingerprinted results
+    let plaintext_results = {
+        tracing::info!(search_len=%search.len(), "Searching for plaintext results");
+        let plaintext_search = format!("%{}%", search.leak());
+        // Be careful changing this query - it's optimized to use a specific index
+        fingerprint::table
+            .filter(fingerprint::deactivated_at.is_null())
+            .filter(fingerprint::tenant_id.eq(tenant_id))
+            .filter(fingerprint::is_live.eq(is_live))
+            .filter(fingerprint::is_hidden.eq(false))
+            // Matching filter
+            .filter(fingerprint::p_data.is_not_null())
+            .filter(fingerprint::p_data.ilike(plaintext_search))
+            .select(fingerprint::scoped_vault_id)
+            .get_results::<ScopedVaultId>(conn)?
+    };
+
+    let fingerprint_results = {
+        tracing::info!(sh_datas=%Csv::from(fingerprint_queries.iter().cloned().collect_vec()), "Searching for fingerprint results");
+
+        // Be careful changing this query - it's optimized to use a specific index
+        fingerprint::table
+            .filter(fingerprint::deactivated_at.is_null())
+            .filter(fingerprint::tenant_id.eq(tenant_id))
+            .filter(fingerprint::is_live.eq(is_live))
+            .filter(fingerprint::is_hidden.eq(false))
+            // Matching filter
+            .filter(fingerprint::sh_data.is_not_null())
+            .filter(fingerprint::sh_data.eq_any(fingerprint_queries))
+            .select(fingerprint::scoped_vault_id)
+            .get_results::<ScopedVaultId>(conn)?
+    };
+    let all_ids = fingerprint_results
+        .into_iter()
+        .chain(plaintext_results)
+        .unique()
+        .collect();
+    Ok(all_ids)
+}
+
+#[instrument(skip_all)]
 fn list(
     conn: &mut PgConn,
-    params: &ScopedVaultListQueryParams,
+    params: &ScopedVaultListQueryParams<Vec<ScopedVaultId>>,
     cursor: Option<ScopedVaultCursor>,
     order_by: ScopedVaultCursorKind,
     page_size: i64,
@@ -252,16 +321,18 @@ fn list(
 #[instrument(skip_all)]
 pub fn list_authorized_for_tenant(
     conn: &mut PgConn,
-    params: &ScopedVaultListQueryParams,
+    params: ScopedVaultListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
 ) -> DbResult<Vec<(ScopedVault, Vault)>> {
+    let params = &params.map_search(conn)?;
     let cursor = cursor.map(ScopedVaultCursor::OrderingId);
     list(conn, params, cursor, ScopedVaultCursorKind::OrderingId, page_size)
 }
 
 #[instrument(skip_all)]
 pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
+    let params = &params.map_search(conn)?;
     let count = list_query!(params).count().get_result(conn)?;
     Ok(count)
 }
@@ -277,7 +348,9 @@ pub fn list_and_count_authorized_for_tenant(
     order_by: ScopedVaultCursorKind,
     page_size: i64,
 ) -> DbResult<(Vec<(ScopedVault, Vault)>, i64)> {
-    let results = list(conn, &params, cursor, order_by, page_size)?;
-    let count = count_for_tenant(conn, params)?;
+    let params = &params.map_search(conn)?;
+
+    let results = list(conn, params, cursor, order_by, page_size)?;
+    let count = list_query!(params).count().get_result(conn)?;
     Ok((results, count))
 }
