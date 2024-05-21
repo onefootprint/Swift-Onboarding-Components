@@ -39,6 +39,7 @@ const Container = forwardRef<HTMLDivElement, ContainerProps>(
         id={id}
         ref={ref}
         sx={sxStyles}
+        direction="column"
         className={className}
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...stackProps}
