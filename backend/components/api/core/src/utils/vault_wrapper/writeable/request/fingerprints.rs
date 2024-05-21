@@ -133,7 +133,8 @@ impl Fingerprints {
                     cfp.salts().into_iter().flat_map(|salt| salt_to_dl_id.get(&salt));
                 let lifetime_ids = chain(new_vd_lifetime_ids, existing_vd_lifetime_ids).collect_vec();
                 if lifetime_ids.len() != cfp.salts().len() {
-                    return AssertionError("Not one lifetime ID for every partial fingerprint").into();
+                    return AssertionError("Need exactly one lifetime ID for each partial fingerprint")
+                        .into();
                 }
                 let cfpk = CompositeFingerprintKind::from(&cfp);
                 let d = FingerprintData {

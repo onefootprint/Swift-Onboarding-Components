@@ -11,7 +11,6 @@ use newtypes::{
     OnboardingStatusFilter, PiiString, ScopedVaultCursor, ScopedVaultCursorKind, ScopedVaultId, TenantId,
     VaultKind, WatchlistCheckStatusKind,
 };
-use std::collections::HashMap;
 use tracing::instrument;
 
 #[derive(Debug, Clone, Default)]
@@ -38,14 +37,9 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
 pub struct SearchQuery {
     /// Plaintext search query. Will perform an ilike on plaintext data to try to find matches
     pub search: PiiString,
-    /// Fingerprint search queries. Results will match ANY of the FingerprintQueries, where a
-    /// FingerprintQuery matches if ALL of the fingerprints in the query are matched
-    pub fingerprint_queries: Vec<AndFingerprintQuery>,
+    /// Fingerprint search queries. Results will match ANY of the FingerprintQueries
+    pub fingerprint_queries: Vec<Fingerprint>,
 }
-
-#[derive(Debug, Clone, Default)]
-/// Fingerprint search query. For a vault to this query, it must match ALL of the fingerprints in the Vec.
-pub struct AndFingerprintQuery(pub Vec<Fingerprint>);
 
 impl ScopedVaultListQueryParams {
     fn map_search(self, conn: &mut PgConn) -> DbResult<ScopedVaultListQueryParams<Vec<ScopedVaultId>>> {
@@ -263,45 +257,19 @@ fn vaults_matching_search(
     };
 
     let fingerprint_results = {
-        let all_fps = fingerprint_queries
-            .iter()
-            .flat_map(|fps| &fps.0)
-            .unique()
-            .collect_vec();
-        tracing::info!(sh_datas=%Csv::from(all_fps.iter().cloned().collect_vec()), "Searching for fingerprint results");
+        tracing::info!(sh_datas=%Csv::from(fingerprint_queries.iter().cloned().collect_vec()), "Searching for fingerprint results");
 
         // Be careful changing this query - it's optimized to use a specific index
-        let results: HashMap<_, _> = fingerprint::table
+        fingerprint::table
             .filter(fingerprint::deactivated_at.is_null())
             .filter(fingerprint::tenant_id.eq(tenant_id))
             .filter(fingerprint::is_live.eq(is_live))
             .filter(fingerprint::is_hidden.eq(false))
             // Matching filter
             .filter(fingerprint::sh_data.is_not_null())
-            .filter(fingerprint::sh_data.eq_any(all_fps.clone()))
-            .select((fingerprint::sh_data.assume_not_null(), fingerprint::scoped_vault_id))
-            .get_results::<(Fingerprint, ScopedVaultId)>(conn)?
-            .into_iter()
-            .into_group_map();
-
-        // Compose the list of vaults that match _any_ of the FingerprintQueries
-        fingerprint_queries
-            .into_iter()
-            .flat_map(|fps| {
-                // Each inner FingerprintQuery represents an AND filter.
-                // Return only the vaults that match all fingerprints in the FingerprintQuery.
-                // TODO: eventually, represent AND filters with a single query on composite
-                // fingerprints. But to do this, we probably want tenant-scoped composite
-                // fingerprints of, say, (id.first_name + id.last_name)
-                fps.0
-                    .iter()
-                    .cloned()
-                    .map(|fp| results.get(&fp).cloned().unwrap_or_default())
-                    .reduce(|a, b| a.into_iter().filter(|i| b.contains(i)).collect_vec())
-                    .unwrap_or_default()
-            })
-            .unique()
-            .collect_vec()
+            .filter(fingerprint::sh_data.eq_any(fingerprint_queries))
+            .select(fingerprint::scoped_vault_id)
+            .get_results::<ScopedVaultId>(conn)?
     };
     let all_ids = fingerprint_results
         .into_iter()

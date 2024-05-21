@@ -1,9 +1,10 @@
 use crate::{errors::ApiResult, State};
-use db::scoped_vault::{AndFingerprintQuery, SearchQuery};
+use db::scoped_vault::SearchQuery;
 use itertools::Itertools;
 use newtypes::{
-    fingerprint_salt::FingerprintSalt, BusinessDataKind as BDK, DataIdentifier, FpId,
-    IdentityDataKind as IDK, PhoneNumber, PiiString, TenantId,
+    fingerprint_salt::FingerprintSalt, BusinessDataKind as BDK, CompositeFingerprint,
+    CompositeFingerprintKind, DataIdentifier, FingerprintKind, FpId, IdentityDataKind as IDK, PhoneNumber,
+    PiiString, TenantId,
 };
 
 /// Given a search string and fp_id, parse into the list of FingerprintQueries and fp_id by which to query
@@ -28,7 +29,7 @@ pub async fn parse_search(
     let search_str = search.clean_for_fingerprint();
     tracing::info!(search_len=%search_str.leak().len(), "Parsing search string");
     // A list of fingerprint queries, with each element representing an AND search condition
-    let mut fingerprint_queries = vec![];
+    let mut fingerprint_queries: Vec<(FingerprintKind, _)> = vec![];
 
     // Fingerprints for phone number
     let dis = &[Id(IDK::PhoneNumber), Business(BDK::PhoneNumber)];
@@ -43,9 +44,9 @@ pub async fn parse_search(
     .unique()
     .collect_vec();
     for phone in formatted_phone_numbers.iter() {
-        for di in dis.iter() {
+        for di in dis {
             for d in di.get_fingerprint_payload(phone, t_id) {
-                fingerprint_queries.push(vec![d]);
+                fingerprint_queries.push((di.clone().into(), vec![d]));
             }
         }
     }
@@ -56,11 +57,7 @@ pub async fn parse_search(
     let fn_di = &Id(IDK::FirstName);
     let ln_di = &Id(IDK::LastName);
     for (first_name, last_name) in name_permutations.iter() {
-        // If this permutation includes both a first name and last name, a matching result must
-        // match on both the first name and the last name.
-        // This is the only place that utilizes AND search conditions.
-        // TODO: maybe one day we can replace this with a composite fingerprint lookup
-        let name_fingerprints = vec![
+        let fingerprints = vec![
             first_name
                 .as_ref()
                 .map(|p| (FingerprintSalt::Tenant(fn_di.clone(), tenant_id.clone()), p)),
@@ -71,7 +68,16 @@ pub async fn parse_search(
         .into_iter()
         .flatten()
         .collect_vec();
-        fingerprint_queries.push(name_fingerprints)
+        match (first_name, last_name) {
+            (Some(_), None) => fingerprint_queries.push((fn_di.clone().into(), fingerprints)),
+            (None, Some(_)) => fingerprint_queries.push((ln_di.clone().into(), fingerprints)),
+            (_, _) => {
+                // If this permutation includes both a first name and last name, a matching result must
+                // match on both the first name and the last name.
+                let fpk = CompositeFingerprintKind::Name.into();
+                fingerprint_queries.push((fpk, fingerprints))
+            }
+        }
     }
 
     // Fingerprint for website
@@ -81,8 +87,9 @@ pub async fn parse_search(
     ];
     if !search_str.leak().contains(' ') && search_str.leak().contains('.') {
         for w in websites.iter() {
-            for d in Business(BDK::Website).get_fingerprint_payload(w, t_id) {
-                fingerprint_queries.push(vec![d]);
+            let di = Business(BDK::Website);
+            for d in di.get_fingerprint_payload(w, t_id) {
+                fingerprint_queries.push((di.clone().into(), vec![d]));
             }
         }
     }
@@ -103,28 +110,41 @@ pub async fn parse_search(
             )
         })
         .collect_vec();
-    for di in dis.iter() {
+    for di in dis {
         for d in di.get_fingerprint_payload(&search_str, t_id) {
-            fingerprint_queries.push(vec![d]);
+            fingerprint_queries.push((di.clone().into(), vec![d]));
         }
     }
 
-    // The data we're going to fingerprint is grouped into vecs that represent an AND search condition.
+    // The data we're going to fingerprint is grouped into vecs that represent a single search
+    // condition. When there are multiple items in the vec, it's a composite fingerprint query.
     // Flatten this 2d array into a 1d-array, but keep track of the initial index so we can group
     // the fingerprints back into their 2d-array format.
     let data_to_fp = fingerprint_queries
         .into_iter()
         .enumerate()
-        .flat_map(|(i, d)| d.into_iter().map(move |d| (i, d)))
+        .flat_map(|(i, (fpk, fps))| {
+            fps.into_iter()
+                .map(move |(s, d)| ((fpk.clone(), s.clone(), i), (s, d)))
+        })
         .collect_vec();
-    let fingerprint_queries = state
-        .enclave_client
-        .compute_fingerprints_keys(data_to_fp)
-        .await?
+    let fingerprints = state.enclave_client.compute_fingerprints_keys(data_to_fp).await?;
+
+    let fingerprint_queries = fingerprints
         .into_iter()
+        .map(|((fpk, salt, i), fp)| ((fpk, i), (salt, fp)))
         .into_group_map()
-        .into_values()
-        .map(AndFingerprintQuery)
+        .into_iter()
+        .flat_map(|((fpk, _), fps)| match fpk {
+            FingerprintKind::DI(_) => fps.into_iter().map(|(_, fp)| fp).next(),
+            // Compute the composite fingerprint from partial fingerprints if needed
+            FingerprintKind::Composite(cfpk) => match cfpk {
+                CompositeFingerprintKind::Name => CompositeFingerprint::Name(tenant_id.clone())
+                    .compute(&fps.into_iter().collect())
+                    .ok(),
+                CompositeFingerprintKind::NameDob => None,
+            },
+        })
         .collect_vec();
 
     let search = SearchQuery {

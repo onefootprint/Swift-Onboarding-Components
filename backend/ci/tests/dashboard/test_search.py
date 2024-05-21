@@ -1,5 +1,5 @@
 import pytest
-from tests.utils import post
+from tests.utils import patch, post, _gen_random_str
 
 
 @pytest.fixture(scope="session")
@@ -92,3 +92,34 @@ def test_search(
         assert (
             exists == expected
         ), f"fp_id {i}: exists={exists}, but expected={expected}"
+
+
+def test_composite_search(sandbox_tenant):
+    nonce = _gen_random_str(5)
+
+    data = {
+        "id.first_name": "Hayes",
+        "id.last_name": f"Valley {nonce}",
+        "id.dob": "1995-01-01",
+    }
+    fp_id1 = post("users", data, sandbox_tenant.s_sk)["id"]
+    fp_id2 = post("users", data, sandbox_tenant.s_sk)["id"]
+
+    search_data = dict(search=f"Hayes Valley {nonce}", pagination=dict(page_size=100))
+    results = post(f"entities/search", search_data, *sandbox_tenant.db_auths)
+    assert any(i["id"] == fp_id1 for i in results["data"])
+    assert any(i["id"] == fp_id2 for i in results["data"])
+
+    # When we update fp_id2's first name, it will make a new composite fingerprint and we won't
+    # be able to find it with the same search query
+    data = {"id.first_name": "Noe"}
+    patch(f"users/{fp_id2}/vault", data, sandbox_tenant.s_sk)
+
+    results = post(f"entities/search", search_data, *sandbox_tenant.db_auths)
+    assert any(i["id"] == fp_id1 for i in results["data"])
+    assert not any(i["id"] == fp_id2 for i in results["data"])
+
+    search_data = dict(search=f"Noe Valley {nonce}", pagination=dict(page_size=100))
+    results = post(f"entities/search", search_data, *sandbox_tenant.db_auths)
+    assert not any(i["id"] == fp_id1 for i in results["data"])
+    assert any(i["id"] == fp_id2 for i in results["data"])
