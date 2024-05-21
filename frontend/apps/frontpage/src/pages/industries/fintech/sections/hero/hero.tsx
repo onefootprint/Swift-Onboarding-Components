@@ -12,7 +12,7 @@ type HeroProps = {
 const Hero = ({ title, subtitle, illustration }: HeroProps) => (
   <HeroContainer>
     <IllustrationContainer>
-      <Image src={illustration} alt={title} width={770} height={500} />
+      <Image src={illustration} alt={title} width={770} height={500} priority />
     </IllustrationContainer>
     <TextContainer direction="column" align="center">
       <Text variant="display-2" maxWidth="770px" textAlign="center">
