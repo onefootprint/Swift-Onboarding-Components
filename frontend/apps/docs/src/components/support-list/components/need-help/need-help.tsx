@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next';
 import SupportDialog from '../support-dialog';
 import SupportListItem from '../support-list-item';
 
-const GET_FORM_URL =
-  'https://getform.io/f/7500e0a7-0049-4cea-b1f0-001671e39abd';
+const GET_FORM_URL = 'https://getform.io/f/pbgxoqza';
 
 const NeedHelp = () => {
   const { t } = useTranslation('common', {

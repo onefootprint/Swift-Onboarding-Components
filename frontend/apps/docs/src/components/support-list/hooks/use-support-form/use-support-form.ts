@@ -1,4 +1,4 @@
-import request from '@onefootprint/request';
+import { baseRequest } from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
 
 import type { SupportFormData } from '../../support-list.types';
@@ -9,15 +9,11 @@ export type SupportFormRequest = {
 };
 
 const supportFormRequest = async ({ url, data }: SupportFormRequest) => {
-  const response = await request(
-    {
-      method: 'POST',
-      url,
-      data,
-      withCredentials: false,
-    },
-    { omitSessionId: true },
-  );
+  const response = await baseRequest({
+    method: 'POST',
+    url,
+    data,
+  });
   return response.data;
 };
 
