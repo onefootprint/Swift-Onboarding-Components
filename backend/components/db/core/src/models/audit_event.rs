@@ -49,6 +49,7 @@ pub struct AuditEvent {
     pub is_live: Option<bool>,
     pub list_entry_creation_id: Option<ListEntryCreationId>,
     pub list_entry_id: Option<ListEntryId>,
+    pub list_id: Option<ListId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -72,6 +73,7 @@ struct NewAuditEventRow {
     is_live: Option<bool>,
     list_entry_creation_id: Option<ListEntryCreationId>,
     list_entry_id: Option<ListEntryId>,
+    list_id: Option<ListId>,
 }
 
 #[derive(Debug, Clone)]
@@ -176,6 +178,7 @@ impl AuditEvent {
                     is_live,
                     list_entry_creation_id,
                     list_entry_id,
+                    list_id,
                 } = detail.into();
                 NewAuditEventRow {
                     id,
@@ -194,6 +197,7 @@ impl AuditEvent {
                     is_live,
                     list_entry_creation_id,
                     list_entry_id,
+                    list_id,
                 }
             })
             .collect_vec();

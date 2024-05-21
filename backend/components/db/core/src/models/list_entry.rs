@@ -237,6 +237,7 @@ impl ListEntry {
             insight_event_id: insight_event_id.clone(),
             detail: AuditEventDetail::DeleteListEntry {
                 is_live,
+                list_id: res.list_id.clone(),
                 list_entry_id: res.id.clone(),
             },
         }

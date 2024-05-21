@@ -65,6 +65,7 @@ impl ListEntryCreation {
             insight_event_id: insight_event_id.clone(),
             detail: AuditEventDetail::CreateListEntry {
                 is_live,
+                list_id: list_id.clone(),
                 list_entry_creation_id: res.id.clone(),
             },
         }

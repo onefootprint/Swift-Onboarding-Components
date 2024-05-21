@@ -1,5 +1,5 @@
 use crate::{
-    util::impl_enum_str_diesel, DataIdentifier, DocumentDataId, ListEntryCreationId, ListEntryId,
+    util::impl_enum_str_diesel, DataIdentifier, DocumentDataId, ListEntryCreationId, ListEntryId, ListId,
     ObConfigurationId, ScopedVaultId, TenantApiKeyId, TenantRoleId, TenantUserId,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -59,10 +59,12 @@ pub enum AuditEventDetail {
     UpdateOrgRole,
     CreateListEntry {
         is_live: bool,
+        list_id: ListId,
         list_entry_creation_id: ListEntryCreationId,
     },
     DeleteListEntry {
         is_live: bool,
+        list_id: ListId,
         list_entry_id: ListEntryId,
     },
 }
@@ -82,6 +84,7 @@ pub struct CommonAuditEventDetail {
     pub is_live: Option<bool>,
     pub list_entry_creation_id: Option<ListEntryCreationId>,
     pub list_entry_id: Option<ListEntryId>,
+    pub list_id: Option<ListId>,
 }
 
 impl From<AuditEventDetail> for CommonAuditEventDetail {
@@ -104,6 +107,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 is_live: Some(is_live),
                 list_entry_creation_id: None,
                 list_entry_id: None,
+                list_id: None,
             },
             AuditEventDetail::UpdateUserData {
                 is_live,
@@ -122,6 +126,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 is_live: Some(is_live),
                 list_entry_creation_id: None,
                 list_entry_id: None,
+                list_id: None,
             },
             AuditEventDetail::DeleteUserData {
                 is_live,
@@ -140,6 +145,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 is_live: Some(is_live),
                 list_entry_creation_id: None,
                 list_entry_id: None,
+                list_id: None,
             },
             AuditEventDetail::DecryptUserData {
                 is_live,
@@ -160,6 +166,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 is_live: Some(is_live),
                 list_entry_creation_id: None,
                 list_entry_id: None,
+                list_id: None,
             },
             AuditEventDetail::DeleteUser {
                 is_live,
@@ -175,9 +182,11 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 is_live: Some(is_live),
                 list_entry_creation_id: None,
                 list_entry_id: None,
+                list_id: None,
             },
             AuditEventDetail::CreateListEntry {
                 is_live,
+                list_id,
                 list_entry_creation_id,
             } => Self {
                 metadata: AuditEventMetadata::CreateListEntry,
@@ -190,9 +199,11 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 is_live: Some(is_live),
                 list_entry_creation_id: Some(list_entry_creation_id),
                 list_entry_id: None,
+                list_id: Some(list_id),
             },
             AuditEventDetail::DeleteListEntry {
                 is_live,
+                list_id,
                 list_entry_id,
             } => Self {
                 metadata: AuditEventMetadata::DeleteListEntry,
@@ -205,6 +216,7 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
                 is_live: Some(is_live),
                 list_entry_creation_id: None,
                 list_entry_id: Some(list_entry_id),
+                list_id: Some(list_id),
             },
             AuditEventDetail::CreateUserAnnotation => todo!(),
             AuditEventDetail::CompleteUserCheckLiveness => todo!(),

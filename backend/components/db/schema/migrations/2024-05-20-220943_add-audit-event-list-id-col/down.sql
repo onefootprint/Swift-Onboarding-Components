@@ -1,0 +1,1 @@
+ALTER TABLE audit_event DROP COLUMN IF EXISTS list_id;
