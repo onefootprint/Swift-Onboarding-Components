@@ -1,6 +1,5 @@
-use std::pin::Pin;
-
 use actix_web::FromRequest;
+use chrono::{SecondsFormat, Utc};
 use futures_util::Future;
 use opentelemetry::{
     global,
@@ -8,11 +7,22 @@ use opentelemetry::{
         metrics::{controllers::BasicController, selectors},
         propagation::TraceContextPropagator,
     },
+    trace::{SpanId, TraceContextExt, TraceId},
 };
 use opentelemetry_otlp::WithExportConfig;
-use tracing::Span;
+use serde::{ser::SerializeMap, Serializer};
+use std::{io, pin::Pin};
+use tracing::{Span, Subscriber};
 use tracing_actix_web::{root_span, DefaultRootSpanBuilder, RootSpanBuilder};
-use tracing_subscriber::{prelude::*, EnvFilter, Layer, Registry};
+use tracing_core::Event;
+use tracing_opentelemetry::OtelData;
+use tracing_serde::{fields::AsMap, AsSerde};
+use tracing_subscriber::{
+    fmt::{self, format::Writer, FmtContext, FormatEvent, FormatFields},
+    layer::SubscriberExt,
+    registry::{LookupSpan, SpanRef},
+    EnvFilter, Layer, Registry,
+};
 
 use crate::{
     config::Config,
@@ -32,7 +42,12 @@ pub fn init(config: &Config) -> Result<Option<BasicController>> {
     if config.pretty_logs.is_some() {
         layers.push(tracing_subscriber::fmt::layer().with_ansi(true).pretty().boxed());
     } else {
-        layers.push(tracing_subscriber::fmt::layer().json().boxed());
+        layers.push(
+            fmt::layer()
+                .json()
+                .event_format(DatadogJsonEventFormatter)
+                .boxed(),
+        );
     }
 
     let exporter = || {
@@ -183,3 +198,94 @@ impl paperclip::v2::schema::Apiv2Schema for RootSpan {
 }
 
 impl paperclip::actix::OperationModifier for RootSpan {}
+
+
+struct DatadogJsonEventFormatter;
+
+impl<S, N> FormatEvent<S, N> for DatadogJsonEventFormatter
+where
+    S: Subscriber + for<'lookup> LookupSpan<'lookup>,
+    N: for<'writer> FormatFields<'writer> + 'static,
+{
+    fn format_event(
+        &self,
+        ctx: &FmtContext<'_, S, N>,
+        mut writer: Writer<'_>,
+        event: &Event<'_>,
+    ) -> std::fmt::Result
+    where
+        S: Subscriber + for<'a> LookupSpan<'a>,
+    {
+        // See https://github.com/tokio-rs/tracing/issues/1531
+        // Maybe there will be an easier way to do this in the future.
+
+        let meta = event.metadata();
+
+        let mut visit = || {
+            let mut s = serde_json::Serializer::new(WriteAdaptor(&mut writer));
+
+            let mut s = s.serialize_map(None)?;
+            s.serialize_entry(
+                "timestamp",
+                &Utc::now().to_rfc3339_opts(SecondsFormat::Micros, true),
+            )?;
+            s.serialize_entry("level", &meta.level().as_serde())?;
+            s.serialize_entry("fields", &event.field_map())?;
+            s.serialize_entry("target", meta.target())?;
+
+            if let Some(file) = meta.file() {
+                s.serialize_entry("filename", file)?;
+            }
+            if let Some(line) = meta.line() {
+                s.serialize_entry("line_number", &line)?;
+            }
+
+            if let Some(ref span_ref) = ctx.lookup_current() {
+                if let Some((trace_id, span_id)) = lookup_trace_ids(span_ref) {
+                    s.serialize_entry("dd.trace_id", &trace_id.to_string())?;
+                    s.serialize_entry("dd.span_id", &span_id.to_string())?;
+                }
+            }
+
+            s.end()
+        };
+
+        visit().map_err(|_| std::fmt::Error)?;
+        writeln!(writer)
+    }
+}
+
+struct WriteAdaptor<'a, 'b>(&'a mut Writer<'b>);
+
+impl<'a, 'b> io::Write for WriteAdaptor<'a, 'b> {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        let s = std::str::from_utf8(buf).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+
+        self.0
+            .write_str(s)
+            .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+
+        Ok(s.as_bytes().len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+fn lookup_trace_ids<S>(span_ref: &SpanRef<S>) -> Option<(TraceId, SpanId)>
+where
+    S: Subscriber + for<'a> LookupSpan<'a>,
+{
+    span_ref.extensions().get::<OtelData>().map(|o| {
+        let trace_id = if o.parent_cx.has_active_span() {
+            o.parent_cx.span().span_context().trace_id()
+        } else {
+            o.builder.trace_id.unwrap_or(TraceId::INVALID)
+        };
+
+        let span_id = o.builder.span_id.unwrap_or(SpanId::INVALID);
+
+        (trace_id, span_id)
+    })
+}

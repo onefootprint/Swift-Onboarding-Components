@@ -16,6 +16,8 @@ log = "0.4.14"
 opentelemetry = { version = "0.19", features = ["rt-tokio", "metrics"] }
 tracing-opentelemetry = "0.19"
 tracing = { workspace = true }
+tracing-core = { workspace = true }
+tracing-serde = { workspace = true }
 tracing-actix-web = { version = "0.7.5", features = ["opentelemetry_0_19"] }
 tracing-subscriber = { version = "0.3", features = [
     "json",

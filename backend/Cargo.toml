@@ -69,6 +69,8 @@ rand = { version = "0.8 " }
 thiserror = "1.0"
 itertools = "0.10.3"
 tracing = "0.1.28"
+tracing-core = "0.1.32"
+tracing-serde = "0.1.3"
 lazy_static = "1.0"
 once_cell = "1.13.1"
 async-trait = "0.1"
