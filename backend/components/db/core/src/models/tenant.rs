@@ -107,6 +107,7 @@ pub struct NewTenant {
     pub is_prod_auth_playbook_restricted: bool,
     pub allow_domain_access: bool,
     pub domains: Vec<String>,
+    pub super_tenant_id: Option<TenantId>,
 }
 
 /// Allows creating with an application-generated TenantId rather than db-generated

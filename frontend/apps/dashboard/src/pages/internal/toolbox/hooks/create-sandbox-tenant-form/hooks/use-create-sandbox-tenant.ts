@@ -7,6 +7,7 @@ import useSession from 'src/hooks/use-session';
 type CreateSandboxTenantRequest = {
   name: string;
   domains: string[];
+  superTenantId?: string;
 };
 
 type CreateSandboxTenantResponse = {

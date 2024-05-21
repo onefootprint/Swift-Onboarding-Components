@@ -17,6 +17,7 @@ pub fn create(conn: &mut TxnPgConn) -> Tenant {
         is_prod_auth_playbook_restricted: true,
         domains: vec!["Test domain".to_owned()],
         allow_domain_access: false,
+        super_tenant_id: None,
     };
     Tenant::create(conn, new_tenant).expect("Couldn't create tenant")
 }
@@ -38,6 +39,7 @@ pub fn create_with_keys(
         is_prod_auth_playbook_restricted: true,
         domains: vec!["Test domain".to_owned()],
         allow_domain_access: false,
+        super_tenant_id: None,
     };
 
     Tenant::create(conn, new_tenant).expect("Couldn't create tenant")

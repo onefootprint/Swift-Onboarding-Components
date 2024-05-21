@@ -248,6 +248,7 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> ApiResult<(T
         is_prod_auth_playbook_restricted: true,
         domains: domain.into_iter().collect(),
         allow_domain_access: false, // false by default on creation, has to become true manually with PATCH /org
+        super_tenant_id: None,
     };
     let tenant = state
         .db_pool

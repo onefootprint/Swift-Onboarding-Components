@@ -11,6 +11,7 @@ import useCreateSandboxTenant from './hooks/use-create-sandbox-tenant';
 type CreateSandboxTenantFormData = {
   name: string;
   domain?: string;
+  superTenantId?: string;
 };
 
 const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
@@ -29,6 +30,7 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
     const requestData = {
       name: data.name,
       domains: data.domain ? [data.domain] : [],
+      superTenantId: data.superTenantId,
     };
     createSandboxTenantMutation.mutate(requestData, {
       onSuccess: async ({ token }) => {
@@ -60,6 +62,13 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
           placeholder="acme.org"
           hasError={!!errors.domain}
           {...register('domain', { required: false })}
+        />
+        <TextInput
+          label="Parent tenant ID"
+          hint="If this is a child tenant, specify the parent tenant ID"
+          placeholder="org_xyz..."
+          hasError={!!errors.superTenantId}
+          {...register('superTenantId', { required: false })}
         />
       </StyledForm>
     </FormProvider>

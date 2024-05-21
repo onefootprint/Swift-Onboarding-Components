@@ -172,6 +172,7 @@ pub async fn post(
                         is_prod_auth_playbook_restricted: true,
                         domains: vec![],
                         allow_domain_access: false,
+                        super_tenant_id: None,
                     },
                 )?;
 

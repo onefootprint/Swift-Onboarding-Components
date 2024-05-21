@@ -10,12 +10,13 @@ use api_core::{
     utils::session::AuthSession,
 };
 use db::models::tenant::{NewTenant, Tenant};
-use newtypes::SessionAuthToken;
+use newtypes::{SessionAuthToken, TenantId};
 
 #[derive(serde::Deserialize)]
 pub struct SandboxTenantRequest {
     name: String,
     domains: Vec<String>,
+    super_tenant_id: Option<TenantId>
 }
 
 #[derive(serde::Serialize)]
@@ -30,7 +31,7 @@ pub async fn post(
     auth: FirmEmployeeAuthContext,
 ) -> JsonApiResponse<SandboxTenantResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
-    let SandboxTenantRequest { name, domains } = request.into_inner();
+    let SandboxTenantRequest { name, domains , super_tenant_id} = request.into_inner();
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let tenant_user_id = auth.tenant_user.id.clone();
@@ -55,6 +56,7 @@ pub async fn post(
                 is_prod_auth_playbook_restricted: true,
                 domains,
                 allow_domain_access: false,
+                super_tenant_id,
             };
             let tenant = Tenant::create(conn, new_tenant)?;
             // Update the auth session to be impersonating the newly created tenant

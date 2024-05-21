@@ -109,6 +109,7 @@ mod test {
             is_prod_auth_playbook_restricted: true,
             domains: vec![],
             allow_domain_access: false,
+            super_tenant_id: None,
         };
         pool.db_transaction(|conn| Tenant::create(conn, tenant))
             .await
