@@ -5,6 +5,29 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '14',
+      url: 'https://www.businessinsider.com/footprint-pitch-deck-fintech-series-a-2024-5',
+      website: 'Business Insider',
+      imageUrl: '/media/business-insider-2.png',
+      imageAlt: 'Footprint Pitch Deck',
+      publishedAt: 'May 21, 2024',
+      title:
+        "Here's the pitch deck Footprint, a startup helping Wall Street verify customer identities, used to raise $13 million from VCs like QED and Index Ventures",
+      excerpt:
+        'Footprint raised $13 million in a Series A, announced today, that was led by QED Investors.',
+    },
+    {
+      id: '13',
+      url: 'https://www.qedinvestors.com/blog/why-qed-invested-in-footprint',
+      website: 'QED Investors',
+      imageUrl: '/media/qed.png',
+      imageAlt: 'Footprint Raised 13M in Series A led by QED',
+      publishedAt: 'May 21, 2024',
+      title: 'Why QED invested in Footprint',
+      excerpt:
+        'QED invested in Footprint to help solve the problem of how to verify a person’s identity online.',
+    },
+    {
       id: '12',
       url: 'https://www.fintechinnovation50.com/',
       website: 'Fintech Innovation 50',

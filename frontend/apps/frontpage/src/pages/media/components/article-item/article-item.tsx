@@ -33,7 +33,7 @@ const ArticleItem = ({
         </Text>
       </Content>
       <Picture>
-        <Image alt={imageAlt} height={128} src={imageUrl} width={128} />
+        <Image alt={imageAlt} height={400} src={imageUrl} width={400} />
       </Picture>
     </Anchor>
   </article>
@@ -62,13 +62,22 @@ const Content = styled.div`
 `;
 
 const Picture = styled.div`
-  display: none;
-  img {
-    object-fit: cover;
-  }
+  ${({ theme }) => css`
+    display: none;
+    border-radius: ${theme.borderRadius.default};
+    overflow: hidden;
+    width: 128px;
+    height: 128px;
 
-  ${media.greaterThan('md')`
-    display: block;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    ${media.greaterThan('md')`
+      display: block;
+    `}
   `}
 `;
 

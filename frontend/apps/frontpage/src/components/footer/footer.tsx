@@ -67,11 +67,6 @@ const linkSections = [
         hrefKey: 'company.about.href',
       },
       {
-        name: 'careers',
-        textKey: 'company.careers.text',
-        hrefKey: 'company.careers.href',
-      },
-      {
         name: 'blog',
         textKey: 'company.blog.text',
         hrefKey: 'company.blog.href',
@@ -80,6 +75,11 @@ const linkSections = [
         name: 'investor-updates',
         textKey: 'company.investor-updates.text',
         hrefKey: 'company.investor-updates.href',
+      },
+      {
+        name: 'media',
+        textKey: 'company.media.text',
+        hrefKey: 'company.media.href',
       },
     ],
   },

@@ -263,6 +263,10 @@
         "investor-updates": {
           "text": "Investor Updates",
           "href": "/investor-updates"
+        },
+        "media": {
+          "text": "Media",
+          "href": "/media"
         }
       },
       "resources": {
