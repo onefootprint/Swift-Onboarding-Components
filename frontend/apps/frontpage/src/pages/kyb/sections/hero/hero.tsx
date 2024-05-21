@@ -12,8 +12,7 @@ import { useTranslation } from 'react-i18next';
 import ContactDialog from 'src/components/contact-dialog';
 import styled, { css } from 'styled-components';
 
-const GET_FORM_URL =
-  'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
+const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
 
 const Hero = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.kyb.hero' });

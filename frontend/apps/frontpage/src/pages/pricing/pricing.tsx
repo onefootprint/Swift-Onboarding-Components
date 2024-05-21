@@ -10,8 +10,7 @@ import Heading from './components/heading';
 import PenguinBanner from './components/penguin-banner';
 import PlansTable from './components/plans-table';
 
-const GET_FORM_URL =
-  'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
+const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
 
 const Pricing = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });

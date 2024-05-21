@@ -1,4 +1,4 @@
-import request from '@onefootprint/request';
+import { baseRequest } from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
 
 import type { ContactDialogData } from '../../contact-dialog.types';
@@ -9,15 +9,11 @@ export type ContactFormRequest = {
 };
 
 const contactFormRequest = async ({ url, data }: ContactFormRequest) => {
-  const response = await request(
-    {
-      method: 'POST',
-      url,
-      data,
-      withCredentials: false,
-    },
-    { omitSessionId: true },
-  );
+  const response = await baseRequest({
+    method: 'POST',
+    url,
+    data,
+  });
   return response.data;
 };
 

@@ -7,6 +7,7 @@ export type {
 } from './request';
 export { default } from './request';
 export {
+  baseRequest,
   getErrorMessage,
   isFootprintError,
   isFootprintServerError,

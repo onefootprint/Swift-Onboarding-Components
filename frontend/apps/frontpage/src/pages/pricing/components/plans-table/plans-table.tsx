@@ -7,8 +7,7 @@ import PlanColumn from './components/plan-column';
 import PlansDetails from './plans-table-data';
 import { Plans } from './plans-table-types';
 
-const GET_FORM_URL =
-  'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
+const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
 
 const PlansTable = () => {
   const [showDialog, setShowDialog] = useState(false);

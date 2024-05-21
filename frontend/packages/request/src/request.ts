@@ -221,4 +221,6 @@ export const requestWithoutCaseConverter = <Response = unknown>(
   return client.request<Response>(options);
 };
 
+export { axios as baseRequest };
+
 export default request;
