@@ -82,13 +82,6 @@
           "title": "Need help?",
           "description": "We're more than happy to help! Please let us know what you need help with and we'll get back to you as soon as possible."
         }
-      },
-      "send-feedback": {
-        "label": "Send feedback",
-        "dialog": {
-          "title": "Send feedback",
-          "description": "We'd love to hear your thoughts on our docs!"
-        }
       }
     },
     "navigation-api-reference": {

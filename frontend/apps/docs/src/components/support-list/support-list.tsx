@@ -3,14 +3,10 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import NeedHelp from './components/need-help';
-import SendFeedback from './components/send-feedback';
 
 const SupportList = () => (
   <Container>
     <SupportLinks>
-      <li>
-        <SendFeedback />
-      </li>
       <li>
         <NeedHelp />
       </li>
