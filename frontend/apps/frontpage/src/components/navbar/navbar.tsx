@@ -24,9 +24,7 @@ import type { NavEntry } from './types';
 const Navbar = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
-
   const hasScroll = useHasScroll();
-
   const entries: NavEntry[] = [
     {
       text: t('entries.platform.text'),

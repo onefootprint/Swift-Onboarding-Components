@@ -1,6 +1,7 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -17,12 +18,16 @@ const DesktopNavMenuItem = ({
 }: DesktopNavMenuItemProps) => {
   const Icon = item.iconComponent;
   return (
-    <StyledLink href={item.href} $isOnDarkSection={$isOnDarkSection}>
-      <Icon />
-      <ItemText>
-        <Title $isOnDarkSection={$isOnDarkSection}>{item.text}</Title>
-        <Subtitle $isOnDarkSection={$isOnDarkSection}>{item.subtext}</Subtitle>
-      </ItemText>
+    <StyledLink $isOnDarkSection={$isOnDarkSection} asChild>
+      <Link href={item.href}>
+        <Icon />
+        <ItemText>
+          <Title $isOnDarkSection={$isOnDarkSection}>{item.text}</Title>
+          <Subtitle $isOnDarkSection={$isOnDarkSection}>
+            {item.subtext}
+          </Subtitle>
+        </ItemText>
+      </Link>
     </StyledLink>
   );
 };
