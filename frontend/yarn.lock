@@ -3204,6 +3204,11 @@
   dependencies:
     "@octokit/openapi-types" "^17.1.0"
 
+"@onefootprint/footprint-react@*":
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/@onefootprint/footprint-react/-/footprint-react-6.4.0.tgz#7eface0fccff9b596b15a0216c225b1f6f03de2e"
+  integrity sha512-wfaiVgOWCOdDhsqNwSHXMLkEl2zkQwulxGig8Z7gmaCZ8yVcEudqruPbfhBlQX9kCcE3J9wmhR6AlAEokbsh+A==
+
 "@onefootprint/postmate@2.1.0":
   version "2.1.0"
   resolved "https://registry.npmjs.org/@onefootprint/postmate/-/postmate-2.1.0.tgz"
