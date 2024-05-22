@@ -17,6 +17,7 @@ impl DbToApi<(JoinedAuditEvent, ListEventDetail)> for ListEvent {
             tenant_role: _,
             list_entry_creation: _,
             list_entry: _,
+            list: _,
         } = event;
 
         api_wire_types::ListEvent {

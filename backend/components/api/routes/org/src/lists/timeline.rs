@@ -149,6 +149,11 @@ async fn saturate_events(
                         .cloned()
                         .ok_or(AssertionError("list entries not found for CreateListEntry event"))?;
                     Ok(ListEventDetail::CreateListEntry {
+                        list_id: le
+                            .list
+                            .clone()
+                            .ok_or(AssertionError("list is not available for this event"))?
+                            .id,
                         list_entry_creation_id: le
                             .list_entry_creation
                             .clone()
@@ -167,6 +172,11 @@ async fn saturate_events(
                         .cloned()
                         .ok_or(AssertionError("list entries not available for this event"))?;
                     Ok(ListEventDetail::DeleteListEntry {
+                        list_id: le
+                            .list
+                            .clone()
+                            .ok_or(AssertionError("list is not available for this event"))?
+                            .id,
                         list_entry_id: le
                             .list_entry
                             .clone()

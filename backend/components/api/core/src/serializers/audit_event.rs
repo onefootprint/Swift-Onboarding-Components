@@ -22,6 +22,7 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             tenant_role: _,
             list_entry_creation,
             list_entry,
+            list,
         } = event;
 
         if audit_event.name != AuditEventName::from(&audit_event.metadata) {
@@ -78,6 +79,9 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
             AuditEventMetadata::CreateOrgRole => AuditEventDetail::CreateOrgRole,
             AuditEventMetadata::UpdateOrgRole => AuditEventDetail::UpdateOrgRole,
             AuditEventMetadata::CreateListEntry => AuditEventDetail::CreateListEntry {
+                list_id: list
+                    .ok_or(AssertionError("list is not available for this event"))?
+                    .id,
                 list_entry_creation_id: list_entry_creation
                     .ok_or(AssertionError(
                         "list_entry_creation is not available for this event",
@@ -85,6 +89,9 @@ impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
                     .id,
             },
             AuditEventMetadata::DeleteListEntry => AuditEventDetail::DeleteListEntry {
+                list_id: list
+                    .ok_or(AssertionError("list is not available for this event"))?
+                    .id,
                 list_entry_id: list_entry
                     .ok_or(AssertionError("list_entry is not available for this event"))?
                     .id,

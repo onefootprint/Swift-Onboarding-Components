@@ -1,6 +1,6 @@
 use crate::*;
 use newtypes::{
-    AuditEventId, AuditEventName, DataIdentifier, FpId, ListEntryCreationId, ListEntryId, TenantId,
+    AuditEventId, AuditEventName, DataIdentifier, FpId, ListEntryCreationId, ListEntryId, ListId, TenantId,
 };
 use strum_macros::Display;
 
@@ -70,9 +70,11 @@ pub enum AuditEventDetail {
     CreateOrgRole,
     UpdateOrgRole,
     CreateListEntry {
+        list_id: ListId,
         list_entry_creation_id: ListEntryCreationId,
     },
     DeleteListEntry {
+        list_id: ListId,
         list_entry_id: ListEntryId,
     },
 }

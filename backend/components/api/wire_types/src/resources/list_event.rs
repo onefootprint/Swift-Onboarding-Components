@@ -1,5 +1,5 @@
 use crate::*;
-use newtypes::{AuditEventId, AuditEventName, ListEntryCreationId, ListEntryId, PiiString, TenantId};
+use newtypes::{AuditEventId, AuditEventName, ListEntryCreationId, ListEntryId, ListId, PiiString, TenantId};
 use strum_macros::Display;
 
 // TODO: this is basically a fork of AuditEvent but for use by the List specific /timeline endpoint which does retrieval/decryption of entries that we
@@ -21,10 +21,12 @@ pub struct ListEvent {
 #[serde(tag = "kind", content = "data")]
 pub enum ListEventDetail {
     CreateListEntry {
+        list_id: ListId,
         list_entry_creation_id: ListEntryCreationId,
         entries: Vec<PiiString>,
     },
     DeleteListEntry {
+        list_id: ListId,
         list_entry_id: ListEntryId,
         entry: PiiString,
     },

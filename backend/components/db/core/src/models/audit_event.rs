@@ -1,4 +1,4 @@
-use super::{list_entry::ListEntry, list_entry_creation::ListEntryCreation};
+use super::{list::List, list_entry::ListEntry, list_entry_creation::ListEntryCreation};
 use crate::{
     actor::{saturate_actors, HasActor, SaturatedActor},
     models::{
@@ -10,7 +10,7 @@ use crate::{
 };
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
-    audit_event, document_data, insight_event, list_entry, list_entry_creation, ob_configuration,
+    audit_event, document_data, insight_event, list, list_entry, list_entry_creation, ob_configuration,
     scoped_vault, tenant, tenant_api_key, tenant_role, tenant_user,
 };
 use diesel::{
@@ -132,6 +132,7 @@ pub struct JoinedAuditEvent {
     pub tenant_role: Option<TenantRole>,
     pub list_entry_creation: Option<ListEntryCreation>,
     pub list_entry: Option<ListEntry>,
+    pub list: Option<List>,
 }
 
 type DieselJoinedAuditEvent = (
@@ -146,6 +147,7 @@ type DieselJoinedAuditEvent = (
     Option<TenantRole>,
     Option<ListEntryCreation>,
     Option<ListEntry>,
+    Option<List>,
 );
 
 impl HasActor for DieselJoinedAuditEvent {
@@ -228,6 +230,7 @@ impl AuditEvent {
                     .left_join(tenant_role::table)
                     .left_join(list_entry_creation::table)
                     .left_join(list_entry::table)
+                    .left_join(list::table)
                     .order_by(audit_event::timestamp.desc())
                     // Secondary sort by ID to support (timestamp, id) cursor.
                     .then_order_by(audit_event::id.desc())
@@ -266,11 +269,7 @@ impl AuditEvent {
         }
 
         if let Some(list_id) = params.list_id {
-            results = results.filter(
-                list_entry_creation::list_id
-                    .eq(list_id.clone())
-                    .or(list_entry::list_id.eq(list_id)),
-            )
+            results = results.filter(list::id.eq(list_id))
         }
 
         if let Some(search) = params.search.as_ref() {
@@ -290,6 +289,7 @@ impl AuditEvent {
                 tenant_role::all_columns.nullable(),
                 list_entry_creation::all_columns.nullable(),
                 list_entry::all_columns.nullable(),
+                list::all_columns.nullable(),
             ))
             .load(conn)?;
         let saturated_results = saturate_actors(conn, results)?;
@@ -309,6 +309,7 @@ impl AuditEvent {
                     tenant_role,
                     list_entry_creation,
                     list_entry,
+                    list,
                 ) = result;
                 JoinedAuditEvent {
                     audit_event,
@@ -323,6 +324,7 @@ impl AuditEvent {
                     tenant_role,
                     list_entry_creation,
                     list_entry,
+                    list,
                 }
             })
             .collect();
