@@ -55,7 +55,7 @@ pub struct Workflow {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub source: WorkflowSource,
     /// When true, there was existing data added by another tenant (or not decryptable).
-    /// This won't always be a full picture of a one-click onboarding - we might want to trac
+    /// This won't always be a full picture of a one-click onboarding - we might want to trace
     /// which fields specificaly were prefilled
     pub is_one_click: bool,
     /// The first timestamp at which the tenant used a validation token to "validate" the onboarding

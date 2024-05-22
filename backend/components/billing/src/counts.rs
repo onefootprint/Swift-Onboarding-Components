@@ -12,6 +12,8 @@ pub struct BillingCounts {
     pub pii: i64,
     /// Number of KYC verifications ran this month
     pub kyc: i64,
+    pub kyc_waterfall_second_vendor: Option<i64>,
+    pub kyc_waterfall_third_vendor: Option<i64>,
     /// Number of KYB verifications ran this month
     pub kyb: i64,
     /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't finish onboarding
@@ -47,6 +49,8 @@ impl BillingCounts {
         let &BillingCounts {
             pii,
             kyc,
+            kyc_waterfall_second_vendor,
+            kyc_waterfall_third_vendor,
             kyb,
             watchlist_checks,
             id_docs,
@@ -58,6 +62,8 @@ impl BillingCounts {
             continuous_monitoring_per_year,
         } = self;
         pii + kyc
+            + kyc_waterfall_second_vendor.unwrap_or_default()
+            + kyc_waterfall_third_vendor.unwrap_or_default()
             + kyb
             + id_docs
             + watchlist_checks
@@ -74,6 +80,8 @@ impl BillingCounts {
         match product {
             Product::Pii => Some(self.pii),
             Product::Kyc => Some(self.kyc),
+            Product::KycWaterfallSecondVendor => self.kyc_waterfall_second_vendor,
+            Product::KycWaterfallThirdVendor => self.kyc_waterfall_third_vendor,
             Product::Kyb => Some(self.kyb),
             Product::IdDocs => Some(self.id_docs),
             Product::WatchlistChecks => Some(self.watchlist_checks),

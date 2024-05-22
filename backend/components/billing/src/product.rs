@@ -9,6 +9,10 @@ use strum_macros::{Display, EnumIter};
 pub enum Product {
     /// Number of KYC verifications ran this month
     Kyc,
+    /// Number of KYC verifications that contacted a second vendor in waterfall
+    KycWaterfallSecondVendor,
+    /// Number of KYC verifications that contacted a third vendor in waterfall
+    KycWaterfallThirdVendor,
     /// Number of completed workflows onto playbooks that include adverse media checks.
     /// Adverse media checks are billing per onboarding even though we run them monthly???
     AdverseMediaPerOnboarding,
@@ -43,6 +47,8 @@ impl Product {
             Self::Kyb => "prod_NbtsYZ8CIBKWo2",
             Self::WatchlistChecks => "prod_NbtH04u60RlSWg",
             Self::Kyc => "prod_NPMdLP5c6udoVi",
+            Self::KycWaterfallSecondVendor => "prod_Q1mwTQQ0xcjBDu",
+            Self::KycWaterfallThirdVendor => "prod_Q9b7G9YpzDznfs",
             Self::Pii => "prod_NPMd4yoHoFrHw7",
             Self::VaultsWithNonPci => "prod_OXKFlTuCOGcCvW",
             Self::VaultsWithPci => "prod_OXKHHjVIuWL7OV",
@@ -58,6 +64,8 @@ impl Product {
         let price_id = match self {
             Self::Pii => "price_1NkF5kGerPBo41PtfIaoIhXN",
             Self::Kyc => "price_1NkF5NGerPBo41PtviDJIY8K",
+            Self::KycWaterfallSecondVendor => "price_1PJHuvGerPBo41PtDjwSRWvJ",
+            Self::KycWaterfallThirdVendor => "price_1PJHwLGerPBo41Ptc4G3h022",
             Self::Kyb => "price_1NkLQ1GerPBo41PtKbvpKKCg",
             Self::IdDocs => "price_1NkF3zGerPBo41PtnyBrvOU1",
             Self::WatchlistChecks => "price_1NkF4sGerPBo41Ptb21nKXbp",

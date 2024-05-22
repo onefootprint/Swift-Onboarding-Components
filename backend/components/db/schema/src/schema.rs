@@ -153,6 +153,9 @@ diesel::table! {
         adverse_media_per_user -> Nullable<Text>,
         continuous_monitoring_per_year -> Nullable<Text>,
         monthly_minimum -> Nullable<Text>,
+        kyc_waterfall_second_vendor -> Nullable<Text>,
+        kyc_waterfall_third_vendor -> Nullable<Text>,
+        one_click_kyc -> Nullable<Text>,
     }
 }
 

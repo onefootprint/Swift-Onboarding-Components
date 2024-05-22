@@ -26,6 +26,9 @@ pub struct BillingProfile {
     pub adverse_media_per_user: Option<String>,
     pub continuous_monitoring_per_year: Option<String>,
     pub monthly_minimum: Option<String>,
+    pub kyc_waterfall_second_vendor: Option<String>,
+    pub kyc_waterfall_third_vendor: Option<String>,
+    pub one_click_kyc: Option<String>,
 }
 
 impl BillingProfile {
