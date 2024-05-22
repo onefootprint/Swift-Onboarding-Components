@@ -29,6 +29,7 @@ const Email = ({ index }: EmailProps) => {
     <TextInput
       type="email"
       data-private
+      data-dd-privacy="mask"
       label={t('label')}
       placeholder={t('placeholder')}
       hasError={hasError}

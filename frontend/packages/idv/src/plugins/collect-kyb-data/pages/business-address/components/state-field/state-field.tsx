@@ -44,6 +44,7 @@ const StateField = ({ countryCode }: StateFieldProps) => {
   ) : (
     <TextInput
       data-private
+      data-dd-privacy="mask"
       autoComplete="address-level1"
       hasError={!!errors.state}
       hint={errors.state && t('error')}

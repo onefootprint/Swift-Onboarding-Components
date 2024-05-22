@@ -84,7 +84,7 @@ const initDataDogRum = (config: RumInitConfiguration): void => {
     site: 'datadoghq.com', // `site` refers to the Datadog site parameter of your organization. see https://docs.datadoghq.com/getting_started/site/
     version: `${config.env}:${GIT_COMMIT_SHA}`, // Specify a version number to identify the deployed version of your application in Datadog
 
-    defaultPrivacyLevel: 'mask', // `mask`, `mask-user-input`, or `allow`
+    defaultPrivacyLevel: 'mask-user-input', // `mask`, `mask-user-input`, or `allow`
     sessionReplaySampleRate: DDOG_RUM_PERCENTAGE, // The percentage of tracked sessions with Browser RUM & Session Replay pricing features: 100 for all, 0
     sessionSampleRate: 100, // The percentage of sessions to track: 100 for all, 0 for none.
     trackLongTasks: true, // Enables collection of long task events.

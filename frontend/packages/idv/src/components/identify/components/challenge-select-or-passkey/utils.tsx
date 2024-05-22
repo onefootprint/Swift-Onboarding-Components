@@ -73,7 +73,10 @@ function getChallengeTitleEmail(
   const sendTo = t('challenge-select-or-biometric.send-code-to');
   return displayEmail ? (
     <>
-      {sendTo} <span data-private="true">{displayEmail}</span>
+      {sendTo}{' '}
+      <span data-private="true" data-dd-privacy="mask">
+        {displayEmail}
+      </span>
     </>
   ) : (
     t('challenge-select-or-biometric.send-code-via-email')
@@ -88,7 +91,10 @@ const getChallengeTitlePhone = (
   const sendTo = t('challenge-select-or-biometric.send-code-to');
   return displayPhone ? (
     <>
-      {sendTo} <span data-private="true">{displayPhone}</span>
+      {sendTo}{' '}
+      <span data-private="true" data-dd-privacy="mask">
+        {displayPhone}
+      </span>
     </>
   ) : (
     t('challenge-select-or-biometric.send-code-via-sms')

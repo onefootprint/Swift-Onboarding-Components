@@ -29,7 +29,9 @@ const EditButton = ({
     <Stack align="center" justify="center" height="24px" width="24px">
       <Icon />
     </Stack>
-    <TextContainer data-private="true">{label}</TextContainer>
+    <TextContainer data-private="true" data-dd-privacy="mask">
+      {label}
+    </TextContainer>
     <EditButtonActions
       shouldShowVerify={isVerified}
       isEmpty={isEmpty}

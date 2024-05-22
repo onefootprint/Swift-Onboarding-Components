@@ -188,6 +188,7 @@ const IdDocCountryAndTypeContainer = ({
       <InputsContainer>
         <CountrySelect
           data-private
+          data-dd-privacy="mask"
           disabled={supportedCountryRecords.length <= 1}
           label={t('form.country')}
           onChange={handleCountryChange}

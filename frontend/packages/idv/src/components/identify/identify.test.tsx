@@ -800,7 +800,7 @@ describe('<Identify />', () => {
         ).toBeInTheDocument();
       });
       await userEvent.click(
-        screen.getByText('piip@onefootprint.com'), // Send code to <span data-private="true">piip@onefootprint.com</span>
+        screen.getByText('piip@onefootprint.com'), // Send code to <span data-private="true" data-dd-privacy="mask">piip@onefootprint.com</span>
       );
       await userEvent.click(screen.getByText('Continue'));
       await fillChallengePin();

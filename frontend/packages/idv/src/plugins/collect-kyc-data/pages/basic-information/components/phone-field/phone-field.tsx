@@ -27,6 +27,7 @@ const PhoneField = ({ disabled }: EmailFieldProps) => {
     <TextInput
       data-nid-target="phone-number"
       data-private
+      data-dd-privacy="mask"
       defaultValue={getValues('phoneNumber')}
       disabled={disabled}
       hasError={!!errors.phoneNumber}

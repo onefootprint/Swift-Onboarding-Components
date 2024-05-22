@@ -137,6 +137,7 @@ const UpdateVerify = ({
     <Container>
       <Header
         data-private
+        data-dd-privacy="mask"
         title={headerTitle}
         subtitle={headerSubtitle}
         overrideLeftButton={overrideLeftButton}

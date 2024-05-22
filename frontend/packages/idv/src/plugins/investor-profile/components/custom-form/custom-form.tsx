@@ -29,7 +29,9 @@ const CustomForm = ({
   // eslint-disable-next-line react/jsx-props-no-spreading
   <Form {...formAttributes}>
     <HeaderTitle title={title} subtitle={subtitle} />
-    <Container data-private>{children}</Container>
+    <Container data-private data-dd-privacy="mask">
+      {children}
+    </Container>
     {error && <Error label={error} />}
     <ContinueButton isLoading={isLoading} label={ctaLabel} />
   </Form>

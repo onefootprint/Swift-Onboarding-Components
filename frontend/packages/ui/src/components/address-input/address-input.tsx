@@ -116,6 +116,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       return (
         <AddressDropdownItem
           data-private
+          data-dd-privacy="mask"
           disableHoverStyles={highlightedIndex !== -1}
           highlighted={highlightedIndex === index}
           key={item.place_id}
@@ -142,6 +143,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
             tabIndex={0}
             value={value}
             data-private
+            data-dd-privacy="mask"
             ref={mergeRefs([
               localRef,
               inputProps.ref,
@@ -156,6 +158,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
               ref={mergeRefs([menuProps.ref, setPopperElement])}
               style={popper.styles.popper}
               data-private
+              data-dd-privacy="mask"
             >
               <>
                 {options.map(renderAddressItem)}

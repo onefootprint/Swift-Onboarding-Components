@@ -75,6 +75,7 @@ const PhoneForm = ({
             autoFocus
             data-nid-target="phone-number"
             data-private
+            data-dd-privacy="mask"
             hasError={!!error}
             hint={hint}
             label={texts.phoneLabel}

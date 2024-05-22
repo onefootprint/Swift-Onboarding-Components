@@ -24,7 +24,7 @@ const UpdateVerifyPhone = ({
 }: UpdateVerifyPhoneProps) => {
   const { t } = useTranslation('identify');
   const subtitle = phoneNumber ? (
-    <span data-private="true">
+    <span data-private="true" data-dd-privacy="mask">
       {t('sms-challenge.prompt-with-phone', { phone: phoneNumber })}
     </span>
   ) : (

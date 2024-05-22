@@ -24,7 +24,9 @@ describe('getChallengeTitleByKind', () => {
         email: (
           <>
             challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true">a@b.com</span>
+            <span data-private="true" data-dd-privacy="mask">
+              a@b.com
+            </span>
           </>
         ),
         sms: 'challenge-select-or-biometric.send-code-via-sms',
@@ -43,7 +45,9 @@ describe('getChallengeTitleByKind', () => {
         sms: (
           <>
             challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true">+123</span>
+            <span data-private="true" data-dd-privacy="mask">
+              +123
+            </span>
           </>
         ),
       },
@@ -60,13 +64,17 @@ describe('getChallengeTitleByKind', () => {
         email: (
           <>
             challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true">b•••@g••.com</span>
+            <span data-private="true" data-dd-privacy="mask">
+              b•••@g••.com
+            </span>
           </>
         ),
         sms: (
           <>
             challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true">+123</span>
+            <span data-private="true" data-dd-privacy="mask">
+              +123
+            </span>
           </>
         ),
       },
@@ -86,13 +94,17 @@ describe('getChallengeTitleByKind', () => {
         email: (
           <>
             challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true">a@b.com</span>
+            <span data-private="true" data-dd-privacy="mask">
+              a@b.com
+            </span>
           </>
         ),
         sms: (
           <>
             challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true">+123</span>
+            <span data-private="true" data-dd-privacy="mask">
+              +123
+            </span>
           </>
         ),
       },

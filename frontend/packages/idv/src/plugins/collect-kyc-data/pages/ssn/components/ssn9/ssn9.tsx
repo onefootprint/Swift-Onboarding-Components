@@ -38,6 +38,7 @@ const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
         autoFocus
         data-nid-target="ssn9"
         data-private
+        data-dd-privacy="mask"
         disabled={disabled}
         hasError={!!errors.ssn9}
         hint={getHint()}

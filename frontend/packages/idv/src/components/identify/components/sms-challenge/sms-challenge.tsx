@@ -27,7 +27,7 @@ const SmsChallenge = ({ Header }: SmsChallengeProps) => {
   const displayPhone = getDisplayPhone({ identify, phoneNumber });
 
   const formTitle = displayPhone ? (
-    <span data-private="true">
+    <span data-private="true" data-dd-privacy="mask">
       {t('sms-challenge.prompt-with-phone', { phone: displayPhone })}
     </span>
   ) : (

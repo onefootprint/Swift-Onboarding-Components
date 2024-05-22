@@ -34,6 +34,7 @@ const Name = ({ index }: NameProps) => {
         <TextInput
           autoFocus
           data-private
+          data-dd-privacy="mask"
           hasError={hasFirstNameError}
           hint={hasFirstNameError ? t('first-name.error') : undefined}
           label={t('first-name.label')}
@@ -46,6 +47,7 @@ const Name = ({ index }: NameProps) => {
 
         <TextInput
           data-private
+          data-dd-privacy="mask"
           label={t('middle-name.label')}
           placeholder={t('middle-name.placeholder')}
           {...register(
@@ -56,6 +58,7 @@ const Name = ({ index }: NameProps) => {
       <Row columns={1}>
         <TextInput
           data-private
+          data-dd-privacy="mask"
           hasError={hasLastNameError}
           hint={hasLastNameError ? t('last-name.error') : undefined}
           label={t('last-name.label')}

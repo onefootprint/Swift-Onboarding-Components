@@ -25,6 +25,7 @@ const ZipField = () => {
       autoComplete="postal-code"
       data-nid-target="zip"
       data-private
+      data-dd-privacy="mask"
       defaultValue={getValues('zip')}
       hasError={!!errors.zip}
       hint={errors.zip && t('error')}

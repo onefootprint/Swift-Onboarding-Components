@@ -32,6 +32,7 @@ const AddressDropdownItem = forwardRef<HTMLLIElement, AddressDropdownItemProps>(
   ) => (
     <AddressDropdownItemContainer
       data-private
+      data-dd-privacy="mask"
       aria-selected={ariaSelected}
       data-disable-hover-styles={disableHoverStyles}
       data-highlighted={highlighted}

@@ -33,6 +33,7 @@ const CodeInline = ({
       <CodeContent
         data-truncate={truncate}
         data-private={isPrivate}
+        data-dd-privacy={isPrivate ? 'mask' : 'allow'}
         size={size}
       >
         {children}
@@ -55,6 +56,7 @@ const CodeInline = ({
       <CodeContent
         data-truncate={truncate}
         data-private={isPrivate}
+        data-dd-privacy={isPrivate ? 'mask' : 'allow'}
         size={size}
       >
         {children}

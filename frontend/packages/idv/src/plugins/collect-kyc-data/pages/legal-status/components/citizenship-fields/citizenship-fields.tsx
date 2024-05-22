@@ -91,6 +91,7 @@ const CitizenshipFields = () => {
         <Controller
           key={citizenshipField.id}
           data-private
+          data-dd-privacy="mask"
           name={`citizenships.${index}`}
           control={control}
           rules={{

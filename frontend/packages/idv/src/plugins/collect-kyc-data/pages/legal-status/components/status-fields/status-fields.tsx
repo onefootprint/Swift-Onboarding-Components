@@ -16,7 +16,7 @@ const StatusFields = ({ handleStatusChange }: StatusFieldsProps) => {
   const { register } = useFormContext();
 
   return (
-    <Container data-private>
+    <Container data-private data-dd-privacy="mask">
       <Radio
         value={UsLegalStatus.citizen}
         label={t('citizen')}

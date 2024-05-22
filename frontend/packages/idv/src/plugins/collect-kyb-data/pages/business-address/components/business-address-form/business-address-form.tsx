@@ -150,10 +150,15 @@ const BusinessAddressForm = ({
         onSubmit={handleSubmit(onSubmitFormData)}
       >
         <Stack gap={5} direction="column">
-          <CountryField onChange={handleCountryChange} data-private />
+          <CountryField
+            onChange={handleCountryChange}
+            data-private
+            data-dd-privacy="mask"
+          />
           <AddressInput
             autoFocus
             data-private
+            data-dd-privacy="mask"
             country={country.value}
             hasError={!!errors.addressLine1}
             hint={errors.addressLine1 && t('address-line-1.error')}
@@ -164,6 +169,7 @@ const BusinessAddressForm = ({
           />
           <TextInput
             data-private
+            data-dd-privacy="mask"
             autoComplete="address-line2"
             label={t('address-line-2.label')}
             placeholder={t('address-line-2.placeholder')}

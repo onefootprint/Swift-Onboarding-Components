@@ -125,6 +125,7 @@ const BasicDataForm = ({
         <TextInput
           autoFocus
           data-private
+          data-dd-privacy="mask"
           hasError={!!errors.name}
           hint={errors.name ? t('business-name.error') : undefined}
           label={t('business-name.label')}
@@ -133,12 +134,14 @@ const BasicDataForm = ({
         />
         <TextInput
           data-private
+          data-dd-privacy="mask"
           label={t('doing-business-as.label')}
           placeholder={t('doing-business-as.placeholder')}
           {...register('doingBusinessAs')}
         />
         <TextInput
           data-private
+          data-dd-privacy="mask"
           hasError={!!tinHint}
           hint={tinHint}
           mask={inputMasks.tin}
@@ -160,6 +163,7 @@ const BasicDataForm = ({
         {optionalFields?.includes(BusinessDI.corporationType) && (
           <Controller
             data-private
+            data-dd-privacy="mask"
             control={control}
             name="corporationType"
             rules={{
@@ -174,6 +178,7 @@ const BasicDataForm = ({
             }) => (
               <Select<{ label: string; value: string }>
                 data-private
+                data-dd-privacy="mask"
                 hasError={!!error}
                 label={t('corporation-type.label')}
                 options={corporationTypeOptions}
@@ -189,6 +194,7 @@ const BasicDataForm = ({
         {optionalFields?.includes(BusinessDI.website) && (
           <TextInput
             data-private
+            data-dd-privacy="mask"
             hasError={!!websiteHint}
             hint={websiteHint}
             label={t('website.label')}
@@ -219,6 +225,7 @@ const BasicDataForm = ({
             }) => (
               <PhoneInput
                 data-private
+                data-dd-privacy="mask"
                 hasError={!!error && !!phoneNumberHint}
                 hint={phoneNumberHint}
                 label={t('phone-number.label')}

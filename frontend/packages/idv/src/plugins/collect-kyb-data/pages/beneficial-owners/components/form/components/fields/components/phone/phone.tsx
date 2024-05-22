@@ -49,6 +49,7 @@ const Phone = ({ index, config, locale }: PhoneProps) => {
       }) => (
         <PhoneInput
           data-private
+          data-dd-privacy="mask"
           hasError={!!error}
           hint={error ? phoneErrors?.message : undefined}
           label={t('label')}

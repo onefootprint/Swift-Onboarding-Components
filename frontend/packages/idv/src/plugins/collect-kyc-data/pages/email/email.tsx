@@ -90,6 +90,7 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
           <TextInput
             data-nid-target="email"
             data-private
+            data-dd-privacy="mask"
             defaultValue={getValues('email')}
             hasError={!!errors.email}
             hint={errors.email?.message}

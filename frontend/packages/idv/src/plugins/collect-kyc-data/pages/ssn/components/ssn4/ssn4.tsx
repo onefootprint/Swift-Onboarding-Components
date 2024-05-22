@@ -33,6 +33,7 @@ const SSN4 = ({ disabled }: SSN4Props) => {
       autoFocus
       data-nid-target="ssn4"
       data-private
+      data-dd-privacy="mask"
       disabled={disabled}
       hasError={!!errors.ssn4}
       hint={getHint()}

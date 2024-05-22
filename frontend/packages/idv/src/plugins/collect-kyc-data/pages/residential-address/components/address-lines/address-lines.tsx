@@ -74,6 +74,7 @@ const AddressLines = () => {
         data-attribute="address-line-1"
         autoFocus
         data-private
+        data-dd-privacy="mask"
         country={country.value}
         hasError={!!errors.addressLine1}
         hint={errors.addressLine1 && t('address-line-1.error')}
@@ -91,6 +92,7 @@ const AddressLines = () => {
       />
       <TextInput
         data-private
+        data-dd-privacy="mask"
         data-attribute="address-line-2"
         autoComplete="address-line2"
         label={

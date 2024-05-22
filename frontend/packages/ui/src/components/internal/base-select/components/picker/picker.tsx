@@ -134,6 +134,7 @@ const Picker = ({
                 tabIndex={0}
                 value={search}
                 data-private
+                data-dd-privacy="mask"
               />
             </SearchContainer>
             <OptionsContainer maxHeight={height - 100} onScroll={handleScroll}>

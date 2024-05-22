@@ -95,6 +95,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
           data-nid-target="first-name"
           autoFocus
           data-private
+          data-dd-privacy="mask"
           disabled={disabled}
           hasError={!!errors.firstName}
           hint={getFirstNameHint(t, getValues, errors)}
@@ -108,6 +109,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
         <TextInput
           data-nid-target="middle-name"
           data-private
+          data-dd-privacy="mask"
           disabled={disabled}
           hasError={!!errors.middleName}
           hint={getMiddleNameHint(t, getValues, errors)}
@@ -123,6 +125,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
         <TextInput
           data-nid-target="last-name"
           data-private
+          data-dd-privacy="mask"
           disabled={disabled}
           hasError={!!errors.lastName}
           hint={getLastNameHint(t, getValues, errors)}

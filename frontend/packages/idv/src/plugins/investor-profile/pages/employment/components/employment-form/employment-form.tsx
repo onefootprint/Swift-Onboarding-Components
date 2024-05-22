@@ -110,6 +110,7 @@ const EmploymentForm = ({
         <>
           <TextInput
             data-private
+            data-dd-privacy="mask"
             hasError={!!errors.occupation}
             hint={errors.occupation ? t('occupation.error') : undefined}
             label={t('occupation.label')}
@@ -120,6 +121,7 @@ const EmploymentForm = ({
           />
           <TextInput
             data-private
+            data-dd-privacy="mask"
             hasError={!!errors.employer}
             hint={errors.employer ? t('employer.error') : undefined}
             label={t('employer.label')}

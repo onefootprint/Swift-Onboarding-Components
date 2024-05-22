@@ -59,6 +59,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
     <TextInput
       data-nid-target="dob"
       data-private
+      data-dd-privacy="mask"
       disabled={disabled}
       hasError={!!errors.dob}
       hint={getErrorMessage(t, getValues, errors, inputMasks)}
