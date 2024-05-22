@@ -32,7 +32,8 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(sandbox_tenant::post)
         .service(webhooks::post)
         .service(org::update_business_info)
-        .service(org::get_business_info);
+        .service(org::get_business_info)
+        .service(org::update_tenant_live_mode);
     backfill::configure(config);
 }
 
