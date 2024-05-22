@@ -206,7 +206,8 @@ impl BillingClient {
                 new_invoice_item.amount = remaining_cents.to_i64();
                 new_invoice_item.metadata = Some(managed_metadata());
                 new_invoice_item.currency = Some(Currency::USD);
-                InvoiceItem::create(&self.client, new_invoice_item).await?;
+                let i = InvoiceItem::create(&self.client, new_invoice_item).await?;
+                items.insert(i.id.clone(), i);
             }
         }
 
