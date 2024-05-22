@@ -1,13 +1,13 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
-  .fp-form {
+  .fp-c-form {
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
 
-  .fp-input  {
+  .fp-c-input  {
     font-family: inherit;
     font-size: 0.9375rem;
     font-weight: 400;
@@ -55,7 +55,7 @@ const GlobalStyles = createGlobalStyle`
     }
   }
   
-  .fp-select {
+  .fp-c-select {
     font-family: inherit;
     font-size: 0.9375rem;
     font-weight: 400;
@@ -102,12 +102,12 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 
-  .fp-label {
+  .fp-c-label {
     margin-bottom: 8px;
     display: block;
   }
 
-  .fp-field-errors {
+  .fp-c-field-errors {
     font-family: inherit;
     font-weight: 400;
     font-size: 0.9375rem;
@@ -116,7 +116,7 @@ const GlobalStyles = createGlobalStyle`
     color: rgb(153, 16, 8);
   }
 
-  .fp-address-container {
+  .fp-c-address-container {
     display: flex;
     flex-direction: column;
     gap: 12px;

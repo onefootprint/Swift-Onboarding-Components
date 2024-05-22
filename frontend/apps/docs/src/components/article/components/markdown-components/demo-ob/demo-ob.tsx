@@ -4,7 +4,7 @@ import { Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import DemoObStyles from './demo-ob-styles';
+import Styles from './demo-ob-styles';
 
 type DemoOnboardingComponentsProps = {
   step: string;
@@ -44,17 +44,17 @@ const Step2 = () => (
 
 const Step3 = () => (
   <>
-    <DemoObStyles />
-    <Fp.Form onSubmit={() => {}}>
-      <Fp.Field name="id.email">
-        <Fp.Label>Your email</Fp.Label>
-        <Fp.Input placeholder="lorem@footprint.com" />
-        <Fp.FieldErrors />
+    <Styles />
+    <Fp.Form onSubmit={() => {}} className="fp-c-form">
+      <Fp.Field name="id.email" className="fp-c-field">
+        <Fp.Label className="fp-c-label">Your email</Fp.Label>
+        <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
+        <Fp.FieldErrors className="fp-c-field-errors" />
       </Fp.Field>
-      <Fp.Field name="id.phone_number">
-        <Fp.Label>Phone</Fp.Label>
-        <Fp.Input />
-        <Fp.FieldErrors />
+      <Fp.Field name="id.phone_number" className="fp-c-field">
+        <Fp.Label className="fp-c-label">Phone</Fp.Label>
+        <Fp.Input className="fp-c-input" />
+        <Fp.FieldErrors className="fp-c-field-errors" />
       </Fp.Field>
       <button type="submit" className="fp-button">
         Continue
@@ -76,17 +76,17 @@ const Step4 = () => {
 
   return (
     <>
-      <DemoObStyles />
-      <Fp.Form onSubmit={handleSubmit}>
-        <Fp.Field name="id.email">
-          <Fp.Label>Your email</Fp.Label>
-          <Fp.Input placeholder="lorem@footprint.com" />
-          <Fp.FieldErrors />
+      <Styles />
+      <Fp.Form onSubmit={handleSubmit} className="fp-c-form">
+        <Fp.Field name="id.email" className="fp-c-field">
+          <Fp.Label className="fp-c-label">Your email</Fp.Label>
+          <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
+          <Fp.FieldErrors className="fp-c-field-errors" />
         </Fp.Field>
-        <Fp.Field name="id.phone_number">
-          <Fp.Label>Phone</Fp.Label>
-          <Fp.Input />
-          <Fp.FieldErrors />
+        <Fp.Field name="id.phone_number" className="fp-c-field">
+          <Fp.Label className="fp-c-label">Phone</Fp.Label>
+          <Fp.Input className="fp-c-input" />
+          <Fp.FieldErrors className="fp-c-field-errors" />
         </Fp.Field>
         <button type="submit" className="fp-button">
           Continue
@@ -118,18 +118,21 @@ const Step5 = () => {
 
   return (
     <>
-      <DemoObStyles />
+      <Styles />
       {step === 'identify' && (
-        <Fp.Form onSubmit={identify}>
-          <Fp.Field name="id.email">
-            <Fp.Label>Your email</Fp.Label>
-            <Fp.Input placeholder="lorem@footprint.com" />
-            <Fp.FieldErrors />
+        <Fp.Form onSubmit={identify} className="fp-c-form">
+          <Fp.Field name="id.email" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Your email</Fp.Label>
+            <Fp.Input
+              className="fp-c-input"
+              placeholder="lorem@footprint.com"
+            />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.phone_number">
-            <Fp.Label>Phone</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.phone_number" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Phone</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
             Continue
@@ -138,60 +141,62 @@ const Step5 = () => {
       )}
       {step === 'collect-data' && (
         <Fp.Form onSubmit={save}>
-          <Fp.Field name="id.first_name">
-            <Fp.Label>First name</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.first_name" className="fp-c-field">
+            <Fp.Label className="fp-c-label">First name</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.middle_name">
-            <Fp.Label>Middle name</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.middle_name" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Middle name</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.last_name">
-            <Fp.Label>Last name</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.last_name" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Last name</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.dob">
-            <Fp.Label>DOB</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.dob" className="fp-c-field">
+            <Fp.Label className="fp-c-label">DOB</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.country">
-            <Fp.Label>Country</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.country" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Country</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.address_line1">
-            <Fp.Label>Address line 1</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.address_line1" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Address line 1</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.address_line2">
-            <Fp.Label>Address line 2 (optional)</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.address_line2" className="fp-c-field">
+            <Fp.Label className="fp-c-label">
+              Address line 2 (optional)
+            </Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.city">
-            <Fp.Label>City</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.city" className="fp-c-field">
+            <Fp.Label className="fp-c-label">City</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.zip">
-            <Fp.Label>Zip code</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.zip" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Zip code</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.state">
-            <Fp.Label>State</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.state" className="fp-c-field">
+            <Fp.Label className="fp-c-label">State</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.ssn9">
-            <Fp.Label>SSN9</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.ssn9" className="fp-c-field">
+            <Fp.Label className="fp-c-label">SSN9</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
             {fp.busy === 'save' ? 'Saving...' : 'Continue'}
@@ -226,18 +231,21 @@ const Step6 = () => {
 
   return (
     <>
-      <DemoObStyles />
+      <Styles />
       {step === 'identify' && (
         <Fp.Form onSubmit={identify}>
-          <Fp.Field name="id.email">
-            <Fp.Label>Your email</Fp.Label>
-            <Fp.Input placeholder="lorem@footprint.com" />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.email" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Your email</Fp.Label>
+            <Fp.Input
+              className="fp-c-input"
+              placeholder="lorem@footprint.com"
+            />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.phone_number">
-            <Fp.Label>Phone</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.phone_number" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Phone</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
             Continue
@@ -245,61 +253,63 @@ const Step6 = () => {
         </Fp.Form>
       )}
       {step === 'collect-data' && (
-        <Fp.Form onSubmit={save}>
-          <Fp.Field name="id.first_name">
-            <Fp.Label>First name</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+        <Fp.Form onSubmit={save} className="fp-c-form">
+          <Fp.Field name="id.first_name" className="fp-c-field">
+            <Fp.Label className="fp-c-label">First name</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.middle_name">
-            <Fp.Label>Middle name</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.middle_name" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Middle name</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.last_name">
-            <Fp.Label>Last name</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.last_name" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Last name</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.dob">
-            <Fp.Label>DOB</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.dob" className="fp-c-field">
+            <Fp.Label className="fp-c-label">DOB</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.country">
-            <Fp.Label>Country</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.country" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Country</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.address_line1">
-            <Fp.Label>Address line 1</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.address_line1" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Address line 1</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.address_line2">
-            <Fp.Label>Address line 2 (optional)</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.address_line2" className="fp-c-field">
+            <Fp.Label className="fp-c-label">
+              Address line 2 (optional)
+            </Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.city">
-            <Fp.Label>City</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.city" className="fp-c-field">
+            <Fp.Label className="fp-c-label">City</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.zip">
-            <Fp.Label>Zip code</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.zip" className="fp-c-field">
+            <Fp.Label className="fp-c-label">Zip code</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.state">
-            <Fp.Label>State</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.state" className="fp-c-field">
+            <Fp.Label className="fp-c-label">State</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.ssn9">
-            <Fp.Label>SSN9</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
+          <Fp.Field name="id.ssn9" className="fp-c-field">
+            <Fp.Label className="fp-c-label">SSN9</Fp.Label>
+            <Fp.Input className="fp-c-input" />
+            <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
             {fp.busy === 'save' ? 'Saving...' : 'Continue'}
@@ -332,8 +342,6 @@ const DemoOnboardingComponents = ({ step }: DemoOnboardingComponentsProps) => {
 
   return null;
 };
-
-// const OLD = pb_test_hLKePSu5AH5wAYuZH2ehR7
 
 const DemoObWithProvider = ({ step }: DemoOnboardingComponentsProps) => (
   <Fp.Provider publicKey="pb_test_ZaqkFwlwizObSzxUYvUjzK">

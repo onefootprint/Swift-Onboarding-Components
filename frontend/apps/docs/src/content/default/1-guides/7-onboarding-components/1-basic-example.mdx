@@ -6,14 +6,34 @@ subcategory: Onboarding Components
 title: Basic Example
 meta:
   {
-    title: Footprint | React Integration - Onboarding components,
-    description: Discover how to integrate Footprint's Onboarding components flow into your React application.,
+    title: Footprint | React Integration - Onboarding Components,
+    description: Discover how to integrate Footprint's Onboarding Components flow into your React application,
   }
 ---
 
-## 1. Add Footprint Provider
+## 1. Getting started
 
-To use Onboarding components, you need to start by wrapping your application with the `Fp.Provider` component. This component provides the necessary context for the Footprint components to work.
+### 1.1 Install dependencies:
+
+```terminal
+# With NPM
+npm install @onefootprint/footprint-js
+npm install @onefootprint/footprint-react@beta
+
+# With yarn
+yarn add @onefootprint/footprint-js
+yarn add @onefootprint/footprint-react@beta
+```
+
+### 1.2. Get a public key
+
+- Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
+- Use an existing playbook or create a new one.
+- Obtain the Publishable Key, e.g., `pb_test_hLKePSu5AH5wAYuZH2ehR7`.
+
+## 2. Add Footprint Provider
+
+To use Onboarding Components, you need to start by wrapping your application with the `Fp.Provider` component. This component provides the necessary context for the Footprint components to work. Them, pass the `publicKey`.
 
 ```tsx filename="app.tsx"
 import { Fp } from '@onefootprint/footprint-react';
@@ -29,7 +49,7 @@ const Demo = () => {
 export default Demo;
 ```
 
-## 2. Identify your user
+## 3. Identify your user
 
 With the Provider in place, you can now start using Onboarding components. Let's start by identifying the user. We need to create a form with the user's email and phone number:
 
@@ -71,9 +91,9 @@ And this is how it looks like:
 
 As you can see, our components are really raw: they don't have any styling. This is intentional so you can style them as you wish. However, we provide a set of pre-defined behaviors / values, such as placeholders, validations, masks and other attributes to make your form accessible: for example, once you click on the LoadableContext, it will focus the input as you would expect.
 
-### 2.1 Adding default values
+### 3.1 Changing default values
 
-Our Onboarding are totally customizable. If you want to change the default placeholder, you can just pass the attribute as you would normally do. The same goes for all the other input attributes:
+Our Onboarding Components are totally customizable. If you want to change the default placeholder, you can just pass the attribute as you would normally do. The same goes for all the other input attributes:
 
 ```jsx filename="app.tsx" highlight="15,16"
 import { Fp } from '@onefootprint/footprint-react';
@@ -109,7 +129,7 @@ const Flow = () => {
   <demo-ob step={2}></demo-ob>
 </div>
 
-### 2.2 Adding styles
+### 3.2 Adding styles
 
 You can customize the style of Onboarding Components with your preferred approach: using `className`, `style` or using our pre-defined classes. You can see more about our classes in the [Styling](/guides/onboarding-components-styling) section. For the sake of simplicity, we'll go with the last approach:
 
@@ -242,7 +262,7 @@ Looks much better now:
   <demo-ob step={3}></demo-ob>
 </div>
 
-### 2.3 Identifying the user
+### 3.3 Identifying the user
 
 Once the user submits the data, we should identify the user. This the part where the user needs to verify their identify using OTP or Passkeys. Because this part is more complex, we delegate this part to Footprint: you just need to call `fp.launchIdentify()`:
 
@@ -292,7 +312,7 @@ Demo:
   <demo-ob step={4}></demo-ob>
 </div>
 
-## 3. Collecting user's data
+## 4. Collecting user's data
 
 Now that we identified the user, it's time to collect data. This evolves declaring the components that you want to collect, and later, saving the data.
 
@@ -415,9 +435,9 @@ const Flow = () => {
 
 <demo-ob step={5}></demo-ob>
 
-## 4. Finalizing the onboarding
+## 5. Finalizing the onboarding
 
-With all the data collected, we need to now init Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding.
+With all the data collected, we need to now init Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token.
 
 ```jsx filename="app.tsx" highlight="26,27,28"
 import { Fp, useFootprint } from '@onefootprint/footprint-react';
@@ -432,8 +452,7 @@ const Demo = () => {
 
 const Flow = () => {
   const fp = useFootprint();
-  const [step, setStep] =
-    (useState < 'identify') | ('collect-data' > 'identify');
+  const [step, setStep] = useState < string > 'identify';
 
   const identify = () => {
     fp.launchIdentify({
@@ -539,3 +558,6 @@ const Flow = () => {
   );
 };
 ```
+
+Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` callback. Post this token to your backend for further processing.
+import { use } from "react"

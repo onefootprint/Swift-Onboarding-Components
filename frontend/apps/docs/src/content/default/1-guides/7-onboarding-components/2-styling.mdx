@@ -1,0 +1,126 @@
+---
+page: default
+slug: /guides/onboarding-components-styling
+category: Guides
+subcategory: Onboarding Components
+title: Styling
+meta:
+  {
+    title: Footprint | Onboarding Components - Styling,
+    description: Discover how to style Footprint's Onboarding components,
+  }
+---
+
+Styling your onboarding components are easy and it should be the same process as styling any other React component. You can use CSS, SASS, or any other styling library you prefer. Here's the list, for context:
+
+## Class names
+
+You can pass class names to your components using the `className` prop. This is useful if have already your classes or you use a CSS library, like Tailwind. Here's an example:
+
+```jsx filename="app.tsx"
+import React from 'react';
+import { Fp } from '@onefootprint/footprint-react';
+
+const App = () => {
+  return (
+    <Fp.Field name="id.first_name" className="mb-4">
+      <Fp.Label className="block text-gray-700 text-sm font-bold mb-2">
+        First name
+      </Fp.Label>
+      <Fp.Input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+      <Fp.FieldErrors className="text-red-500 text-xs italic" />
+    </Fp.Field>
+  );
+};
+```
+
+## Inline styles
+
+You can pass inline styles to your components using the `style` prop. This is useful when you need to apply styles conditionally or avoid creating a separate CSS file. Here's an example:
+
+```jsx filename="app.tsx"
+import React from 'react';
+import { Fp } from '@onefootprint/footprint-react';
+
+const App = () => {
+  return (
+    <Fp.Field name="id.first_name" style={{ marginBottom: '1rem' }}>
+      <Fp.Label
+        style={{
+          display: 'block',
+          color: '#4a5568',
+          fontSize: '0.875rem',
+          fontWeight: 'bold',
+          marginBottom: '0.5rem',
+        }}
+      >
+        First name
+      </Fp.Label>
+      <Fp.Input
+        style={{
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+          appearance: 'none',
+          border: '1px solid #e2e8f0',
+          borderRadius: '0.25rem',
+          width: '100%',
+          padding: '0.5rem 0.75rem',
+          color: '#4a5568',
+          lineHeight: '1.25',
+          outline: 'none',
+          transition: 'box-shadow 0.2s',
+        }}
+      />
+      <Fp.FieldErrors
+        style={{
+          color: '#f56565',
+          fontSize: '0.75rem',
+          fontStyle: 'italic',
+        }}
+      />
+    </Fp.Field>
+  );
+};
+
+export default App;
+```
+
+## Pre-defined classes
+
+Another way to style your components is by using pre-defined classes. Footprint provides a set of classes that you can use to style your components. Inspecting a component, you'll the markAsUntransferable, and will look like this:
+
+<div style="margin-bottom: 24px;">
+  <img
+    alt="An image containing the code produced by an Onboarding component"
+    height={420}
+    src="/guides/onboarding-components/code.png"
+    width={720}
+  />
+</div>
+
+Based on this, you can extend the classes as expected:
+
+```css filename="styles.css"
+.fp-field {
+  ...
+}
+
+.fp-input {
+  ...
+}
+
+```
+
+## Styling components based on states
+
+You can style components based on their states. For example, if you submit an email that is not valid, we'll add an `aria-invalid` attribute to the input field. You can use this attribute to style the input field when it's invalid. Here's an example:
+
+<div style="margin-bottom: 24px;">
+  <img
+    alt="An image containing the code produced by an Onboarding component with an invalid state"
+    height={420}
+    src="/guides/onboarding-components/code-invalid.png"
+    width={720}
+  />
+</div>
+
+Footprint will always follow WAI-ARIA guidelines, so you can rely on these attributes to style your components.

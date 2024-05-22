@@ -25,11 +25,13 @@ export const getStaticProps: GetStaticProps<
   if (!page || !title) {
     return { notFound: true };
   }
+
   const slug = `/${page}/${title}`;
   const article = await getArticleBySlug(slug);
   if (!article) {
     return { notFound: true };
   }
+
   const navigation = await getNavigationByPage(article.data.page);
   if (!navigation) {
     return { notFound: true };
