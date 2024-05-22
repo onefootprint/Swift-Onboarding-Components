@@ -25,6 +25,7 @@ pub struct BillingProfile {
     pub vaults_with_pci: Option<String>,
     pub adverse_media_per_user: Option<String>,
     pub continuous_monitoring_per_year: Option<String>,
+    pub monthly_minimum: Option<String>,
 }
 
 impl BillingProfile {

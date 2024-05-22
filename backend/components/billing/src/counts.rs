@@ -1,5 +1,9 @@
-use crate::{product::Product, profile::BillingProfile, BResult, Error};
-use stripe::PriceId;
+use crate::{
+    product::Product,
+    profile::{BillingProfile, PriceInfo},
+    BResult, Error,
+};
+use rust_decimal_macros::dec;
 use strum::IntoEnumIterator;
 
 #[derive(Debug)]
@@ -33,7 +37,7 @@ pub struct BillingCounts {
 #[derive(Debug)]
 pub(crate) struct LineItem {
     pub product: Product,
-    pub price_id: PriceId,
+    pub price: PriceInfo,
     pub count: i64,
 }
 
@@ -83,9 +87,9 @@ impl BillingCounts {
         }
     }
 
-    pub(crate) fn line_items(&self, prices: BillingProfile) -> BResult<Vec<LineItem>> {
-        let tenant_has_watchlist_product = prices.get(Product::WatchlistChecks).is_some();
-        let tenant_has_cm_product = prices.get(Product::ContinuousMonitoringPerYear).is_some();
+    pub(crate) fn line_items(&self, profile: &BillingProfile) -> BResult<Vec<LineItem>> {
+        let tenant_has_watchlist_product = profile.get(Product::WatchlistChecks).is_some();
+        let tenant_has_cm_product = profile.get(Product::ContinuousMonitoringPerYear).is_some();
         if tenant_has_watchlist_product && tenant_has_cm_product {
             return Err(Error::ValidationError(
                 "Tenant can't have both WatchlistChecks and ContinuousMonitoringPerYear".into(),
@@ -106,21 +110,27 @@ impl BillingCounts {
             .filter_map(|(p, count)| count.map(|c| (p, c)))
             .filter(|(_, count)| count > &0)
             .map(|(product, count)| -> BResult<_> {
-                let (price_id, is_uncontracted) = if let Some(price_id) = prices.get(product) {
+                let (price, is_uncontracted) = if let Some(price) = profile.get(product) {
                     // If the BillingProfile for this tenant has a price set for the product, use it
-                    (price_id, false)
+                    (price.clone(), false)
                 } else {
                     // If there is no price set up for this tenant but they have used the product,
                     // error by adding a line item to the invoice that shows the uncontracted price
-                    (product.uncontracted_price_id()?, true)
+                    let price_id = product.uncontracted_price_id()?;
+                    let price = PriceInfo {
+                        price_id,
+                        price_cents: dec!(0),
+                    };
+                    (price, true)
                 };
                 if is_uncontracted {
                     // These require manual human action, but we don't want to prevent invoice generation
-                    tracing::error!(tenant_id=%prices.tenant_id, product=%product, price_id=%price_id, "Billing line item is uncontracted");
+                    tracing::error!(tenant_id=%profile.tenant_id, product=%product, price_id=%price.price_id, "Billing line item is uncontracted");
                 }
-                Ok(LineItem { product, price_id, count })
+                Ok(LineItem { product, price, count })
             })
-            .collect::<BResult<_>>()?;
+            .collect::<BResult<Vec<_>>>()?;
+
         Ok(results)
     }
 }

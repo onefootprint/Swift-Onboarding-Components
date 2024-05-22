@@ -7,6 +7,10 @@ use interval::BillingInterval;
 use itertools::Itertools;
 use newtypes::{PiiString, StripeCustomerId, TenantId};
 use profile::BillingProfile;
+use rust_decimal::{
+    prelude::{FromPrimitive, ToPrimitive},
+    Decimal,
+};
 use std::{collections::HashMap, str::FromStr};
 pub use stripe::Client;
 use stripe::{
@@ -113,10 +117,10 @@ impl BillingClient {
     #[tracing::instrument(skip(self))]
     async fn get_or_create_invoice_item(
         &self,
-        customer_id: CustomerId,
+        customer_id: &CustomerId,
         line_item: LineItem,
     ) -> BResult<Option<InvoiceItem>> {
-        let LineItem { price_id, count, .. } = line_item;
+        let LineItem { price, count, .. } = line_item;
         if count == 0 {
             return Ok(None);
         }
@@ -130,10 +134,11 @@ impl BillingClient {
         let existing_item = existing_items
             .data
             .iter()
-            .find(|l| l.price.as_ref().map(|p| &p.id) == Some(&price_id) && is_managed(&l.metadata));
+            .find(|l| l.price.as_ref().map(|p| &p.id) == Some(&price.price_id) && is_managed(&l.metadata));
 
         let item = if let Some(item) = existing_item {
             // If the pending invoice item for this price exists, just update it
+            // TODO rm this logic?
             let update = UpdateInvoiceItem {
                 quantity: Some(count as u64),
                 ..Default::default()
@@ -141,8 +146,8 @@ impl BillingClient {
             InvoiceItem::update(&self.client, &item.id, update).await?
         } else {
             // Otherwise, make a new one
-            let mut new_invoice_item = CreateInvoiceItem::new(customer_id);
-            new_invoice_item.price = Some(price_id);
+            let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
+            new_invoice_item.price = Some(price.price_id);
             new_invoice_item.quantity = Some(count as u64);
             new_invoice_item.metadata = Some(managed_metadata());
             InvoiceItem::create(&self.client, new_invoice_item).await?
@@ -175,20 +180,33 @@ impl BillingClient {
             Invoice::delete(&self.client, &i.id).await?;
         }
 
-        // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
-        let prices = BillingProfile::get_for(&self.client, &info).await?;
-
+        // Calculate each of the line items
+        let profile = BillingProfile::get_for(&self.client, &info).await?;
         let mut items = HashMap::new();
-        for l in info
-            .counts
-            .line_items(prices)?
-            .into_iter()
-            .sorted_by_key(|l| l.product)
-        {
-            let Some(i) = self.get_or_create_invoice_item(customer_id.clone(), l).await? else {
+        let line_items = info.counts.line_items(&profile)?;
+        let monthly_spend_cents: Decimal = line_items
+            .iter()
+            .flat_map(|r| Decimal::from_i64(r.count).map(|c| c * r.price.price_cents))
+            .sum();
+
+        // Create the invoice items in stripe, including monthly minimum
+        for l in line_items.into_iter().sorted_by_key(|l| l.product) {
+            let Some(i) = self.get_or_create_invoice_item(&customer_id, l).await? else {
                 continue;
             };
             items.insert(i.id.clone(), i);
+        }
+
+        // If the tenant didn't hit their monthly minimum, add another line item for the remaining
+        // amount
+        if let Some(monthly_minimum_cents) = profile.monthly_minimum.as_ref() {
+            if monthly_spend_cents < *monthly_minimum_cents {
+                let remaining_cents = monthly_minimum_cents - monthly_spend_cents;
+                let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
+                new_invoice_item.amount = remaining_cents.to_i64();
+                new_invoice_item.metadata = Some(managed_metadata());
+                InvoiceItem::create(&self.client, new_invoice_item).await?;
+            }
         }
 
         // Create the invoice, which will automatically include these billing items

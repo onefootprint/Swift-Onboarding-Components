@@ -12,31 +12,56 @@ use crate::{is_managed, managed_metadata, product::Product, BResult, BillingInfo
 #[derive(Debug)]
 pub struct BillingProfile {
     pub(crate) tenant_id: TenantId,
-    prices: HashMap<Product, stripe::PriceId>,
+    prices: HashMap<Product, PriceInfo>,
+    pub(crate) monthly_minimum: Option<Decimal>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PriceInfo {
+    /// Identifier for the price of the specific product on stripe
+    pub(crate) price_id: stripe::PriceId,
+    /// Price, in cents
+    pub(crate) price_cents: Decimal,
 }
 
 impl BillingProfile {
-    pub(crate) fn get(&self, product: Product) -> Option<stripe::PriceId> {
-        self.prices.get(&product).cloned()
+    pub(crate) fn get(&self, product: Product) -> Option<&PriceInfo> {
+        self.prices.get(&product)
     }
 
     pub(crate) async fn get_for(client: &stripe::Client, info: &BillingInfo) -> BResult<Self> {
         // Get prices for each product
         let mut prices = HashMap::new();
         for product in Product::iter() {
-            let price = get_price_from(info.billing_profile.as_ref(), product);
-            if let Some(price) = price {
+            let price_cents = get_price_from(info.billing_profile.as_ref(), product);
+            if let Some(price_cents) = price_cents {
                 let product_id = product.product_id();
-                let price_id = get_or_create_price(client, product_id, price).await?;
-                prices.insert(product, price_id);
+                let price_id = get_or_create_price(client, product_id, price_cents).await?;
+                let price_cents = Decimal::from_str(price_cents)?;
+                let price_info = PriceInfo {
+                    price_id,
+                    price_cents,
+                };
+                prices.insert(product, price_info);
             }
         }
         let tenant_id = info.tenant_id.clone();
-        let profile = BillingProfile { tenant_id, prices };
+        let monthly_minimum = info
+            .billing_profile
+            .as_ref()
+            .and_then(|p| p.monthly_minimum.as_ref())
+            .map(|p| Decimal::from_str(p))
+            .transpose()?;
+        let profile = BillingProfile {
+            tenant_id,
+            prices,
+            monthly_minimum,
+        };
         Ok(profile)
     }
 }
 
+/// Returns the price of the specified product, in cents
 fn get_price_from(profile: Option<&DbBillingProfile>, product: Product) -> Option<&str> {
     let profile = profile?;
     match product {

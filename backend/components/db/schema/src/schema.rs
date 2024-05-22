@@ -152,6 +152,7 @@ diesel::table! {
         vaults_with_pci -> Nullable<Text>,
         adverse_media_per_user -> Nullable<Text>,
         continuous_monitoring_per_year -> Nullable<Text>,
+        monthly_minimum -> Nullable<Text>,
     }
 }
 

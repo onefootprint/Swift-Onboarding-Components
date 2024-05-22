@@ -1,0 +1,1 @@
+ALTER TABLE billing_profile ADD COLUMN monthly_minimum TEXT;
