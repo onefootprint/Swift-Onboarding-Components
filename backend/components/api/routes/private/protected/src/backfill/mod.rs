@@ -2,8 +2,6 @@ use std::hash::{DefaultHasher, Hasher};
 
 use actix_web::web;
 
-mod composite_fingerprints;
-
 #[derive(serde::Deserialize)]
 #[allow(unused)]
 struct BackfillRequest<TCursor> {
@@ -23,6 +21,7 @@ struct ShardConfig {
 
 impl ShardConfig {
     /// Returns true if the shard is responsible for the provided key
+    #[allow(unused)]
     fn select<T: std::hash::Hash>(&self, key: &T) -> bool {
         let mut hasher = DefaultHasher::new();
         key.hash(&mut hasher);
@@ -38,6 +37,5 @@ struct BackfillResponse<T, TCursor> {
     cursor: Option<TCursor>,
 }
 
-pub fn configure(config: &mut web::ServiceConfig) {
-    config.service(composite_fingerprints::post);
-}
+#[allow(unused)]
+pub fn configure(config: &mut web::ServiceConfig) {}
