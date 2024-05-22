@@ -116,22 +116,9 @@ impl BillingClient {
         customer_id: CustomerId,
         line_item: LineItem,
     ) -> BResult<Option<InvoiceItem>> {
-        let LineItem {
-            product,
-            price_id,
-            count,
-            is_uncontracted,
-        } = line_item;
+        let LineItem { price_id, count, .. } = line_item;
         if count == 0 {
             return Ok(None);
-        }
-        let description = is_uncontracted.then_some(format!(
-            "{} - The price for this product is not contracted for this tenant. Please review.",
-            product
-        ));
-        if is_uncontracted {
-            // These require manual human action, but we don't want to prevent invoice generation
-            tracing::error!(customer_id=%customer_id, price_id=%price_id, "Billing line item is uncontracted");
         }
         // First check if there's already a pending invoice item
         let list_items = ListInvoiceItems {
@@ -149,7 +136,6 @@ impl BillingClient {
             // If the pending invoice item for this price exists, just update it
             let update = UpdateInvoiceItem {
                 quantity: Some(count as u64),
-                description: description.as_deref(),
                 ..Default::default()
             };
             InvoiceItem::update(&self.client, &item.id, update).await?
@@ -159,7 +145,6 @@ impl BillingClient {
             new_invoice_item.price = Some(price_id);
             new_invoice_item.quantity = Some(count as u64);
             new_invoice_item.metadata = Some(managed_metadata());
-            new_invoice_item.description = description.as_deref();
             InvoiceItem::create(&self.client, new_invoice_item).await?
         };
         Ok(Some(item))
@@ -191,7 +176,7 @@ impl BillingClient {
         }
 
         // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
-        let prices = BillingProfile::get_for(&self.client, info.billing_profile).await?;
+        let prices = BillingProfile::get_for(&self.client, &info).await?;
 
         let mut items = HashMap::new();
         for l in info

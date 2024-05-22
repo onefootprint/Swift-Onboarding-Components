@@ -1,15 +1,17 @@
 use std::{collections::HashMap, str::FromStr};
 
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
+use newtypes::TenantId;
 use rust_decimal::Decimal;
 use stripe::{CreatePrice, Currency, IdOrCreate, ListPrices, Price, PriceBillingScheme, PriceId};
 use strum::IntoEnumIterator;
 
-use crate::{is_managed, managed_metadata, product::Product, BResult};
+use crate::{is_managed, managed_metadata, product::Product, BResult, BillingInfo};
 
 /// Stores all the price IDs for products we offer. This may differ per environment and occasionally per tenant
 #[derive(Debug)]
 pub struct BillingProfile {
+    pub(crate) tenant_id: TenantId,
     prices: HashMap<Product, stripe::PriceId>,
 }
 
@@ -18,21 +20,19 @@ impl BillingProfile {
         self.prices.get(&product).cloned()
     }
 
-    pub(crate) async fn get_for(
-        client: &stripe::Client,
-        billing_profile: Option<DbBillingProfile>,
-    ) -> BResult<Self> {
+    pub(crate) async fn get_for(client: &stripe::Client, info: &BillingInfo) -> BResult<Self> {
         // Get prices for each product
         let mut prices = HashMap::new();
         for product in Product::iter() {
-            let price = get_price_from(billing_profile.as_ref(), product);
+            let price = get_price_from(info.billing_profile.as_ref(), product);
             if let Some(price) = price {
                 let product_id = product.product_id();
                 let price_id = get_or_create_price(client, product_id, price).await?;
                 prices.insert(product, price_id);
             }
         }
-        let profile = BillingProfile { prices };
+        let tenant_id = info.tenant_id.clone();
+        let profile = BillingProfile { tenant_id, prices };
         Ok(profile)
     }
 }

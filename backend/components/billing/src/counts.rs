@@ -35,7 +35,6 @@ pub(crate) struct LineItem {
     pub product: Product,
     pub price_id: PriceId,
     pub count: i64,
-    pub is_uncontracted: bool,
 }
 
 impl BillingCounts {
@@ -115,12 +114,11 @@ impl BillingCounts {
                     // error by adding a line item to the invoice that shows the uncontracted price
                     (product.uncontracted_price_id()?, true)
                 };
-                Ok(LineItem {
-                    product,
-                    price_id,
-                    count,
-                    is_uncontracted,
-                })
+                if is_uncontracted {
+                    // These require manual human action, but we don't want to prevent invoice generation
+                    tracing::error!(tenant_id=%prices.tenant_id, product=%product, price_id=%price_id, "Billing line item is uncontracted");
+                }
+                Ok(LineItem { product, price_id, count })
             })
             .collect::<BResult<_>>()?;
         Ok(results)
