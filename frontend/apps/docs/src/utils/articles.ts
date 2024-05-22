@@ -174,6 +174,5 @@ export const getNavigationByPage = async (
       items: item.items && item.items.length > 0 ? item.items : null,
     })),
   }));
-  console.log(JSON.stringify(res, null, 2));
   return res;
 };
