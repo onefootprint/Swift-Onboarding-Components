@@ -23,6 +23,7 @@ use crate::{
 use async_trait::async_trait;
 use db::{
     models::{
+        billing_event::BillingEvent,
         data_lifetime::DataLifetime,
         document::{Document, DocumentImageArgs, DocumentUpdate},
         document_data::DocumentData,
@@ -37,11 +38,11 @@ use db::{
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use itertools::Itertools;
 use newtypes::{
-    CleanAndValidate, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentDiKind,
-    DocumentId, DocumentReviewStatus, DocumentStatus, FootprintReasonCode, IdDocKind,
-    IdentityDataKind as IDK, IncodeFailureReason, ObConfigurationKind, OcrDataKind as ODK, PiiJsonValue,
-    PiiString, ScopedVaultId, ScrubbedPiiString, ValidateArgs, VendorAPI, VendorValidatedCountryCode,
-    VerificationResultId,
+    BillingEventKind, CleanAndValidate, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest,
+    DocumentDiKind, DocumentId, DocumentReviewStatus, DocumentStatus, FootprintReasonCode, IdDocKind,
+    IdentityDataKind as IDK, IncodeFailureReason, ObConfigurationId, ObConfigurationKind, OcrDataKind as ODK,
+    PiiJsonValue, PiiString, ScopedVaultId, ScrubbedPiiString, ValidateArgs, VendorAPI,
+    VendorValidatedCountryCode, VerificationResultId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -317,6 +318,7 @@ fn vault_complete_images(
 pub struct CompleteArgs<'a> {
     pub vault: &'a Vault,
     pub sv_id: &'a ScopedVaultId,
+    pub obc_id: &'a ObConfigurationId,
     pub id_doc_id: &'a DocumentId,
     pub dk: ValidatedIdDocKind,
     pub country_code: Option<VendorValidatedCountryCode>,
@@ -332,6 +334,7 @@ impl Complete {
         let CompleteArgs {
             vault,
             sv_id,
+            obc_id,
             id_doc_id,
             dk,
             country_code,
@@ -383,6 +386,8 @@ impl Complete {
             review_status: Some(DocumentReviewStatus::ReviewedByMachine),
         };
         Document::update(conn, id_doc_id, update)?;
+
+        BillingEvent::create(conn, sv_id, obc_id, BillingEventKind::IdentityDocument)?;
 
         // TODO: still need to fingerprint data afterwards!
 

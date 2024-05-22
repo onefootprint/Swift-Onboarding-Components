@@ -196,6 +196,7 @@ pub async fn save_incode_fixtures(
             let args = CompleteArgs {
                 vault: &vw.vault,
                 sv_id: &suid,
+                obc_id: &obc.id,
                 id_doc_id: &id_doc.id,
                 dk: ValidatedIdDocKind::new_for_fixture(doc_type),
                 ocr_data,
