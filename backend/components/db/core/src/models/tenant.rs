@@ -337,6 +337,19 @@ impl Tenant {
             })
         }
     }
+
+    #[tracing::instrument("Tenant::private_update_live_mode", skip_all)]
+    pub fn private_update_live_mode(
+        &self,
+        conn: &mut TxnPgConn,
+        update_tenant: UpdateTenantLiveMode,
+    ) -> DbResult<Self> {
+        let result = diesel::update(tenant::table)
+            .filter(tenant::id.eq(&self.id))
+            .set(update_tenant)
+            .get_result(conn.conn())?;
+        Ok(result)
+    }
 }
 
 impl WorkosAuthIdentity for Tenant {
@@ -369,4 +382,13 @@ pub struct UpdateTenant {
     pub support_email: Option<Option<String>>,
     pub support_phone: Option<Option<String>>,
     pub support_website: Option<Option<String>>,
+}
+
+#[derive(Debug, Clone, AsChangeset, Default, PartialEq)]
+#[diesel(table_name = tenant)]
+pub struct UpdateTenantLiveMode {
+    pub sandbox_restricted: Option<bool>,
+    pub is_prod_ob_config_restricted: Option<bool>,
+    pub is_prod_kyb_playbook_restricted: Option<bool>,
+    pub is_prod_auth_playbook_restricted: Option<bool>,
 }
