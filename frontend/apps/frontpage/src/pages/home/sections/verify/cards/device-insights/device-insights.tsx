@@ -99,7 +99,7 @@ const DeviceInsights = () => {
             ip={activeDeviceCard.ip}
             biometric={activeDeviceCard.biometric}
             appClip={activeDeviceCard.appClip}
-            key={activeDeviceCard.id}
+            id={activeDeviceCard.id}
             onWhatsThisClick={() => setShowWhatsThis(true)}
           />
         )}

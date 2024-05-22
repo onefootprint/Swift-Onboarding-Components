@@ -144,7 +144,7 @@ const Footer = () => {
         <SupportLinks />
         <LinksContainer>
           {linkSections.map(section => (
-            <SectionColumn>
+            <SectionColumn key={section.title}>
               <Text variant="label-3">
                 {t(section.title as ParseKeys<'common'>)}
               </Text>

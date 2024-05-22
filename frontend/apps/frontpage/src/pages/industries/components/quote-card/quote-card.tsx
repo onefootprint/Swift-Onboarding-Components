@@ -27,7 +27,9 @@ const QuoteCard = ({
     <AuthorImage src={authorImage} alt={`${author} image`} />
     <QuoteContainer>
       <Box position="relative">
-        <StyledOpenQuoteIcon variant="open" />
+        <QuoteIconContainer>
+          <QuoteIcon variant="open" />
+        </QuoteIconContainer>
         <Text variant="body-2">{`${quote}"`}</Text>
       </Box>
       <QuoteFooter
@@ -69,7 +71,7 @@ const QuoteContainer = styled(Box)`
   `}
 `;
 
-const StyledOpenQuoteIcon = styled(QuoteIcon)`
+const QuoteIconContainer = styled(Box)`
   ${({ theme }) => css`
     position: absolute;
     transform: translateX(-100%) scale(0.8);

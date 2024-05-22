@@ -10,7 +10,7 @@ type ContactUsBannerProps = {
   cta: string;
 };
 
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
+const GET_FORM_URL = 'https://api.getform.io/v1/forms/pbygomeb';
 
 const ContactUsBanner: React.FC<ContactUsBannerProps> = ({
   title,

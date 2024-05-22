@@ -18,7 +18,7 @@ type DeviceCardProps = {
   ip: string;
   biometric: boolean;
   appClip: boolean;
-  key?: string;
+  id?: string;
   onWhatsThisClick?: () => void;
 };
 
@@ -49,7 +49,7 @@ const DeviceCard = ({
   ip,
   biometric,
   appClip,
-  key,
+  id,
   onWhatsThisClick,
 }: DeviceCardProps) => {
   const { t } = useTranslation('common', {
@@ -97,7 +97,7 @@ const DeviceCard = ({
       initial="initial"
       animate="animate"
       exit="exit"
-      key={key}
+      key={id}
     >
       <Stack direction="column" align="center" justify="center" gap={5}>
         <IconContainer>

@@ -1,3 +1,4 @@
+import { Box } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -11,11 +12,11 @@ const SIZE = 80;
 
 const AuthorImage = ({ src, alt }: AuthorImageProps) => (
   <StyledAuthorImage>
-    <StyledImage src={src} alt={alt} width={200} height={200} />
+    <Image src={src} alt={alt} width={200} height={200} />
   </StyledAuthorImage>
 );
 
-const StyledAuthorImage = styled.div`
+const StyledAuthorImage = styled(Box)`
   ${({ theme }) => css`
     display: flex;
     justify-content: center;
@@ -27,17 +28,15 @@ const StyledAuthorImage = styled.div`
     padding: ${theme.spacing[2]};
     border-radius: ${theme.borderRadius.default};
     background-color: ${theme.backgroundColor.primary};
-  `}
-`;
 
-const StyledImage = styled(Image)`
-  ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default};
-    object-fit: cover;
-    object-position: center;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
+    img {
+      border-radius: ${theme.borderRadius.default};
+      object-fit: cover;
+      object-position: center;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }
   `}
 `;
 

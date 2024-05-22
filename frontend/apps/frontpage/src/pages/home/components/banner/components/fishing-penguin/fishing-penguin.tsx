@@ -10,6 +10,7 @@ export const FishingPenguin = () => (
       alt="Fishing Penguin"
       width={275}
       height={275}
+      priority
     />
     <Bucket
       src="/banners/fishing-penguin/bucket.svg"
@@ -30,11 +31,12 @@ const IllustrationContainer = styled(Box)`
 `;
 
 const Penguin = styled(Image)``;
+
 const Bucket = styled(Image)`
   position: absolute;
   bottom: 0;
   right: 0%;
-
+  height: auto;
   width: 80px;
 
   ${media.greaterThan('md')`
