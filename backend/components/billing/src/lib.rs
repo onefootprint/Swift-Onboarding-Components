@@ -203,6 +203,7 @@ impl BillingClient {
             if monthly_spend_cents < *monthly_minimum_cents {
                 let remaining_cents = monthly_minimum_cents - monthly_spend_cents;
                 let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
+                new_invoice_item.description = Some("Monthly minimum spend");
                 new_invoice_item.amount = remaining_cents.to_i64();
                 new_invoice_item.metadata = Some(managed_metadata());
                 new_invoice_item.currency = Some(Currency::USD);
