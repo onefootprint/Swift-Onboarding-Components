@@ -11,6 +11,9 @@ pub enum BillingEventKind {
     ContinuousMonitoringPerYear,
     AdverseMediaPerUser,
     CurpValidation,
+    Kyc,
+    KycWaterfallSecondVendor,
+    KycWaterfallThirdVendor,
 }
 
 impl BillingEventKind {
@@ -22,6 +25,9 @@ impl BillingEventKind {
             Self::ContinuousMonitoringPerYear => Some(Duration::days(365)),
             Self::AdverseMediaPerUser => None,
             Self::CurpValidation => None,
+            Self::Kyc => None,
+            Self::KycWaterfallSecondVendor => None,
+            Self::KycWaterfallThirdVendor => None,
         }
     }
 }

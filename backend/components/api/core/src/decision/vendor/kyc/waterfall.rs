@@ -17,6 +17,7 @@ use crate::{
     ApiErrorKind, State,
 };
 use db::models::{
+    billing_event::BillingEvent,
     decision_intent::DecisionIntent,
     ob_configuration::ObConfiguration,
     scoped_vault::ScopedVault,
@@ -25,7 +26,10 @@ use db::models::{
     waterfall_step::{UpdateWaterfallStep, WaterfallStep},
 };
 use itertools::Itertools;
-use newtypes::{VerificationResultId, WaterfallExecutionId, WaterfallStepAction, WorkflowId};
+use newtypes::{
+    BillingEventKind, ObConfigurationId, ScopedVaultId, VerificationResultId, WaterfallExecutionId,
+    WaterfallStepAction, WorkflowId,
+};
 
 use super::waterfall_vendor_api::WaterfallVendorAPI;
 
@@ -74,19 +78,13 @@ pub async fn run_kyc_waterfall(
         })
         .await?;
 
-    let sv_id = di.scoped_vault_id.clone();
-    let di_id = di.id.clone();
-
     //
     // BEGIN WATERFALL LOGIC
     //
     // check if we have any existing results
-    let existing_successful_results = WaterfallVendorAPI::get_all_vendor_results(
-        state,
-        VReqIdentifier::DiId(di_id.clone()),
-        &vw.vault.e_private_key,
-    )
-    .await?;
+    let id = VReqIdentifier::DiId(di.id.clone());
+    let existing_successful_results =
+        WaterfallVendorAPI::get_all_vendor_results(state, id, &vw.vault.e_private_key).await?;
 
     // First, check if we already have a _successful_ (not a rule-passing) vendor result for this DI.
     // If we do, this means we crashed somewhere after the waterfall started and we're now re-running it.
@@ -94,7 +92,7 @@ pub async fn run_kyc_waterfall(
     if let Some(already_have_success_vr) =
         choose_best_waterfall_vendor_response(existing_successful_results, &vw, &obc)
     {
-        complete_waterfall_execution(state, &waterfall_execution.id).await?;
+        complete_waterfall_execution(state, &di.scoped_vault_id, &obc.id, &waterfall_execution.id).await?;
 
         return Ok(already_have_success_vr.clone());
     }
@@ -118,8 +116,8 @@ pub async fn run_kyc_waterfall(
         let (vreq, vres, res) = make_request::make_idv_vendor_call_save_vreq_vres(
             state,
             &tvc,
-            &sv_id,
-            &di_id,
+            &di.scoped_vault_id,
+            &di.id,
             ob_configuration_key.clone(),
             waterfall_vendor_api.into(),
         )
@@ -177,7 +175,7 @@ pub async fn run_kyc_waterfall(
         }
     }
 
-    complete_waterfall_execution(state, &waterfall_execution.id).await?;
+    complete_waterfall_execution(state, &di.scoped_vault_id, &obc.id, &waterfall_execution.id).await?;
     let final_result =
         choose_best_waterfall_vendor_response(final_results.into_iter().flatten().collect(), &vw, &obc);
 
@@ -209,13 +207,46 @@ fn choose_best_waterfall_vendor_response(
 
 /// Complete the WFE DB model
 #[tracing::instrument(skip_all)]
-async fn complete_waterfall_execution(state: &State, execution_id: &WaterfallExecutionId) -> ApiResult<()> {
+async fn complete_waterfall_execution(
+    state: &State,
+    sv_id: &ScopedVaultId,
+    obc_id: &ObConfigurationId,
+    execution_id: &WaterfallExecutionId,
+) -> ApiResult<()> {
     let eid = execution_id.clone();
+    let sv_id = sv_id.clone();
+    let obc_id = obc_id.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let locked = WaterfallExecution::lock(conn, &eid)?;
+            if locked.completed_at.is_some() {
+                return Ok(());
+            }
             let update = UpdateWaterfallExecution::set_completed_at();
+            let waterfall_steps = WaterfallStep::list(conn, &locked.id)?;
+            let num_non_error_vendors = waterfall_steps
+                .iter()
+                .filter(|ws| !ws.verification_result_is_error.unwrap_or_default())
+                .count();
+            let kyc_billing_event_kinds = vec![
+                BillingEventKind::Kyc,
+                BillingEventKind::KycWaterfallSecondVendor,
+                BillingEventKind::KycWaterfallThirdVendor,
+            ];
+            if num_non_error_vendors > kyc_billing_event_kinds.len() {
+                tracing::error!(
+                    num_steps=%num_non_error_vendors,
+                    "More waterfall steps than kyc waterfall vendors"
+                );
+            }
+            let events_to_create = kyc_billing_event_kinds
+                .into_iter()
+                .take(num_non_error_vendors)
+                .collect_vec();
+            for kind in events_to_create {
+                BillingEvent::create(conn, &sv_id, &obc_id, kind)?;
+            }
             let _ = WaterfallExecution::update(locked, conn, update)?;
             Ok(())
         })

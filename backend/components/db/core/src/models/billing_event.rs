@@ -31,11 +31,11 @@ pub struct BillingEvent {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = billing_event)]
-struct NewBillingEventRow {
+struct NewBillingEventRow<'a> {
     pub timestamp: DateTime<Utc>,
     pub kind: BillingEventKind,
-    pub scoped_vault_id: ScopedVaultId,
-    pub ob_configuration_id: ObConfigurationId,
+    pub scoped_vault_id: &'a ScopedVaultId,
+    pub ob_configuration_id: &'a ObConfigurationId,
     pub existing_event_id: Option<BillingEventId>,
 }
 
@@ -69,11 +69,11 @@ impl BillingEvent {
     /// save it with an existing_event_id.
     pub fn create(
         conn: &mut TxnPgConn,
-        sv_id: ScopedVaultId,
-        obc_id: ObConfigurationId,
+        sv_id: &ScopedVaultId,
+        obc_id: &ObConfigurationId,
         kind: BillingEventKind,
     ) -> DbResult<Self> {
-        ScopedVault::lock(conn, &sv_id)?;
+        ScopedVault::lock(conn, sv_id)?;
         let mut query = billing_event::table
             .filter(billing_event::scoped_vault_id.eq(&sv_id))
             .filter(billing_event::kind.eq(kind))
