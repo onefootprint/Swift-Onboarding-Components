@@ -387,7 +387,7 @@ impl Complete {
         };
         Document::update(conn, id_doc_id, update)?;
 
-        BillingEvent::create(conn, sv_id, obc_id, BillingEventKind::IdentityDocument)?;
+        BillingEvent::create(conn, sv_id, Some(obc_id), BillingEventKind::IdentityDocument)?;
 
         // TODO: still need to fingerprint data afterwards!
 

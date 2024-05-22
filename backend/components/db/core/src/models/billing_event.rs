@@ -23,7 +23,7 @@ pub struct BillingEvent {
     pub timestamp: DateTime<Utc>,
     pub kind: BillingEventKind,
     pub scoped_vault_id: ScopedVaultId,
-    pub ob_configuration_id: ObConfigurationId,
+    pub ob_configuration_id: Option<ObConfigurationId>,
     /// When set, the event that already existed during this billing period and prevented this one
     /// from being created
     pub existing_event_id: Option<BillingEventId>,
@@ -35,7 +35,7 @@ struct NewBillingEventRow<'a> {
     pub timestamp: DateTime<Utc>,
     pub kind: BillingEventKind,
     pub scoped_vault_id: &'a ScopedVaultId,
-    pub ob_configuration_id: &'a ObConfigurationId,
+    pub ob_configuration_id: Option<&'a ObConfigurationId>,
     pub existing_event_id: Option<BillingEventId>,
 }
 
@@ -70,7 +70,7 @@ impl BillingEvent {
     pub fn create(
         conn: &mut TxnPgConn,
         sv_id: &ScopedVaultId,
-        obc_id: &ObConfigurationId,
+        obc_id: Option<&ObConfigurationId>,
         kind: BillingEventKind,
     ) -> DbResult<Self> {
         ScopedVault::lock(conn, sv_id)?;

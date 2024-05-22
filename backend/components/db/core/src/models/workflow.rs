@@ -584,7 +584,7 @@ impl Workflow {
                 if let EnhancedAmlOption::Yes { adverse_media, .. } = obc.enhanced_aml() {
                     if adverse_media {
                         use newtypes::BillingEventKind::AdverseMediaPerUser;
-                        BillingEvent::create(conn, &wf.scoped_vault_id, &obc.id, AdverseMediaPerUser)?;
+                        BillingEvent::create(conn, &wf.scoped_vault_id, Some(&obc.id), AdverseMediaPerUser)?;
                     }
                 }
             }

@@ -128,7 +128,7 @@ diesel::table! {
         timestamp -> Timestamptz,
         kind -> Text,
         scoped_vault_id -> Text,
-        ob_configuration_id -> Text,
+        ob_configuration_id -> Nullable<Text>,
         existing_event_id -> Nullable<Text>,
     }
 }

@@ -173,7 +173,7 @@ pub async fn run_curp_validation_check(
 
                     let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
                     // create billing event
-                    BillingEvent::create(conn, &sv_id, &obc.id, BillingEventKind::CurpValidation)?;
+                    BillingEvent::create(conn, &sv_id, Some(&obc.id), BillingEventKind::CurpValidation)?;
 
                     Ok(())
                 })

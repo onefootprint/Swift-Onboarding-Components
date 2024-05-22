@@ -245,7 +245,7 @@ async fn complete_waterfall_execution(
                 .take(num_non_error_vendors)
                 .collect_vec();
             for kind in events_to_create {
-                BillingEvent::create(conn, &sv_id, &obc_id, kind)?;
+                BillingEvent::create(conn, &sv_id, Some(&obc_id), kind)?;
             }
             let _ = WaterfallExecution::update(locked, conn, update)?;
             Ok(())

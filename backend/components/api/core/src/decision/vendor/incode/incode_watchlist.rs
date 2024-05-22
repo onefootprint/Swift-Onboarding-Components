@@ -228,7 +228,7 @@ pub async fn run_watchlist_check(
             let (obc, _) = ObConfiguration::get(conn, &obc_key)?;
 
             // Create a BillingEvent once per year for this user
-            BillingEvent::create(conn, &sv.id, &obc.id, ContinuousMonitoringPerYear)?;
+            BillingEvent::create(conn, &sv.id, Some(&obc.id), ContinuousMonitoringPerYear)?;
 
             Ok((sv.tenant_id, vw, obc))
         })
