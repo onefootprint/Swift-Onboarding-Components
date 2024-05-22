@@ -14,7 +14,7 @@ type InitAuthTokenProps = {
   children?: JSX.Element | null;
 };
 
-const { logError } = getLogger('identify-init-auth-token');
+const { logError } = getLogger({ location: 'identify-init-auth-token' });
 
 const requiredScopes: Record<IdentifyVariant, UserTokenScope[]> = {
   [IdentifyVariant.auth]: [],

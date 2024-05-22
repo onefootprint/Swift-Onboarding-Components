@@ -16,7 +16,7 @@ import LegalStatus from '../legal-status';
 import Address from '../residential-address';
 import Ssn from '../ssn';
 
-const { logWarn, logError } = getLogger('collect-kyc-router');
+const { logWarn, logError } = getLogger({ location: 'collect-kyc-router' });
 
 const VerifyHeader: ComponentProps<typeof UpdateVerify>['Header'] = ({
   title,

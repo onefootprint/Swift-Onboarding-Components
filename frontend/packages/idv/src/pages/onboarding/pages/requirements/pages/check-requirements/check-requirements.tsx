@@ -2,9 +2,18 @@ import { getErrorMessage } from '@onefootprint/request';
 import { type OnboardingStatusResponse } from '@onefootprint/types';
 
 import { useGetOnboardingStatus } from '../../../../../../hooks/api';
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import computeRequirementsToShow from './utils/compute-requirements-to-show';
+
+const logOnboardingStatusResponse = (response: OnboardingStatusResponse) => {
+  // Just log requirements and whether they are met or not for now
+  Logger.info(
+    `Onboarding requirements: ${response.allRequirements
+      .map(x => `${x.kind}:${x.isMet ? 'done' : '-'}`)
+      .join(', ')}`,
+  );
+};
 
 const CheckRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
@@ -13,18 +22,6 @@ const CheckRequirements = () => {
     idvContext: { authToken, isTransfer, componentsSdkContext },
     collectedKycData,
   } = state.context;
-
-  const logOnboardingStatusResponse = (response: OnboardingStatusResponse) => {
-    // Just log requirements and whether they are met or not for now
-    const requirements: { kind: string; isMet: boolean }[] = [];
-    response.allRequirements.forEach(req => {
-      requirements.push({
-        kind: req.kind,
-        isMet: req.isMet,
-      });
-    });
-    Logger.info(`Onboarding requirements: ${JSON.stringify(requirements)}`);
-  };
 
   useGetOnboardingStatus({
     authToken,
@@ -40,10 +37,7 @@ const CheckRequirements = () => {
         };
         const payload = computeRequirementsToShow(context, response);
 
-        send({
-          type: 'onboardingRequirementsReceived',
-          payload,
-        });
+        send({ type: 'onboardingRequirementsReceived', payload });
       },
       onError: (err: unknown) => {
         Logger.error(

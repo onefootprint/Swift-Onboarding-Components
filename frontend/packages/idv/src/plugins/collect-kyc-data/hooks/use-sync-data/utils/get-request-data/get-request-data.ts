@@ -18,7 +18,7 @@ import { isString } from '../../../../../../utils/type-guards';
 import allAttributes from '../../../../utils/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 
-const { logInfo } = getLogger('use-user-data');
+const { logInfo } = getLogger({ location: 'use-user-data' });
 
 const isDate = (di: string) =>
   di === IdDI.dob || di === IdDI.visaExpirationDate;

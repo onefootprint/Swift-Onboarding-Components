@@ -3,6 +3,7 @@ import type { ComponentProps } from 'react';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { getLogger } from '../../../../utils/logger';
 import InlineAction from '../inline-action';
 import type { ResendButtonProps } from './components/resend-button';
 import ResendButton from './components/resend-button';
@@ -24,6 +25,8 @@ export type PinFormProps = Omit<ResendButtonProps, 'texts'> & {
   };
   tryOtherAction?: InlineActionProps;
 };
+
+const { logInfo } = getLogger({ location: 'pin-form' });
 
 const PinForm = ({
   hasError,
@@ -82,7 +85,10 @@ const PinForm = ({
             isDisabled={tryOtherAction.isDisabled}
             label={tryOtherAction.label}
             labelCta={tryOtherAction.labelCta}
-            onClick={tryOtherAction.onClick}
+            onClick={ev => {
+              logInfo('User clicked on try other action');
+              tryOtherAction.onClick(ev);
+            }}
           />
         ) : null}
       </Stack>

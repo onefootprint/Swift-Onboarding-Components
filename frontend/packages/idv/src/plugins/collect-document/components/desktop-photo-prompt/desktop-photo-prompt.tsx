@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
-import Logger from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import useProcessImage from '../../hooks/use-process-image';
 import transformCase from '../../id-doc/utils/transform-case';
@@ -21,6 +21,8 @@ import Error from '../error';
 import Loading from '../loading';
 import DraggableInputField from './components/draggable-input-field';
 import handleFileUpload from './utils/handle-file-upload';
+
+const { logError } = getLogger({ location: 'desktop-photo-prompt' });
 
 type DesktopPhotoPromptProps = {
   docName?: string;
@@ -77,9 +79,8 @@ const DesktopPhotoPrompt = ({
     if (!processResult) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
-      Logger.error(
-        'Image upload failed on desktop mode. Uploaded image could not be processed',
-        { location: 'desktop-photo-prompt' },
+      logError(
+        'The uploaded image could not be processed due to an unknown error.',
       );
       return;
     }

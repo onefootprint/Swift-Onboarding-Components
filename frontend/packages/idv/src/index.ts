@@ -57,7 +57,6 @@ export {
   getBiometricChallengeResponse,
   getCanChallengeBiometrics,
   getLogger,
-  getLoggerDeprecated,
   getRandomID,
   getSdkArgsToken,
   hasAuthMethodUnverifiedEmail,

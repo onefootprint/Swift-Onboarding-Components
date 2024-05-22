@@ -27,7 +27,7 @@ import InitError from '../init-error';
 
 type RootProps = { variant?: FootprintVariant };
 
-const { logError, logInfo } = getLogger('bifrost-root');
+const { logError, logInfo } = getLogger({ location: 'bifrost-root' });
 
 const Root = ({ variant }: RootProps) => {
   const fpProvider = useFootprintProvider();

@@ -4,7 +4,7 @@ import {
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import Logger from '../../../../../utils/logger';
+import { Logger } from '../../../../../utils/logger';
 import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 

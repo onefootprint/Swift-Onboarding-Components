@@ -4,11 +4,12 @@ import * as LogRocket from 'logrocket';
 import * as setupLogRocketReact from 'logrocket-react';
 
 import { BASE_URL_DOMAIN, COMMIT_SHA } from '../constants';
+import type { ExtraProps } from '../types';
 
 const LOG_ROCKET_ORG_ID = 'lrswdg/footprint-bifrost-prod';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const configureLogRocket = (appName: string) => {
+const initLogRocket = (appName: string) => {
   LogRocket.init(LOG_ROCKET_ORG_ID, {
     release: COMMIT_SHA,
     rootHostname: BASE_URL_DOMAIN,
@@ -68,4 +69,19 @@ const configureLogRocket = (appName: string) => {
   // });
 };
 
-export default configureLogRocket;
+export const logRocketErrorEvent = (error: Error, extra?: ExtraProps) =>
+  extra
+    ? LogRocket.captureException(error, { extra })
+    : LogRocket.captureException(error);
+
+export const logRocketTrackEvent = (msg: string, extra: ExtraProps) =>
+  LogRocket.track(msg, { level: 'track', ...extra });
+
+export const logRocketWarnEvent = (msg: string, extra: ExtraProps) =>
+  LogRocket.log(msg, { level: 'warn', ...extra });
+
+export const logRocketInfoEvent = (msg: string, extra: ExtraProps) => {
+  LogRocket.log(msg, { level: 'info', ...extra });
+};
+
+export default initLogRocket;

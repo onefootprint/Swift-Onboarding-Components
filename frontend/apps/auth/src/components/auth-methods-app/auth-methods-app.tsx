@@ -3,11 +3,7 @@
 import { getWindowUrl } from '@onefootprint/core';
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import type { CustomChildAPI } from '@onefootprint/idv';
-import {
-  AuthMethods,
-  getLoggerDeprecated,
-  getSdkArgsToken,
-} from '@onefootprint/idv';
+import { AuthMethods, getLogger, getSdkArgsToken } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -33,7 +29,7 @@ type AuthContainerProps = {
 const EmptyConfig = {} as PublicOnboardingConfig;
 const { canceled, closed, completed } = FootprintPublicEvent;
 
-const { logError } = getLoggerDeprecated('auth-methods-app');
+const { logError } = getLogger({ location: 'auth-methods-app' });
 
 const initAuthToken = (): string =>
   !isEmbeddedInIframe()

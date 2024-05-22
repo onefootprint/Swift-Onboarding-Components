@@ -11,7 +11,7 @@ import Loading from '../loading';
 
 type StepBootstrapProps = { children?: JSX.Element | null };
 
-const { logError } = getLogger('auth-init-bootstrap');
+const { logError } = getLogger({ location: 'auth-init-bootstrap' });
 
 const StepBootstrap = ({ children }: StepBootstrapProps) => {
   const [state, send] = useIdentifyMachine();

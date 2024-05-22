@@ -71,7 +71,7 @@ const getUserAuthMethods = (list: UserAuthMethodsResponse): MethodsMap =>
     return objRef;
   }, Object.create(null));
 
-const { logWarn } = getLogger('user-dashboard');
+const { logWarn } = getLogger({ location: 'user-dashboard' });
 
 const Dashboard = ({ children, Header, isEditing, onDone }: DashboardProps) => {
   const [state, send] = useAuthMethodsMachine();

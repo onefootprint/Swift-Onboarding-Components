@@ -16,7 +16,9 @@ import generateEventEmitter from '../utils/generate-event-emitter';
 const { auth, canceled, closed, completed, relayToComponents } =
   FootprintPublicEvent;
 const { propsReceived, started, relayFromComponents } = FootprintPrivateEvent;
-const { logInfo, logWarn } = getLogger('bifrost-iframe-adapter');
+const { logError, logInfo, logWarn } = getLogger({
+  location: 'bifrost-iframe-adapter',
+});
 
 const getSpecificEvent = (
   event: string,
@@ -49,7 +51,6 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
       return Promise.resolve(postmateChildApiRef);
     }
 
-    logInfo('Loading footprint from iframe adapter');
     const contextModel = {
       [propsReceived]: (props: FootprintProps) => {
         eventEmitter.emit(propsReceived, props);
@@ -68,7 +69,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
       return postmateChildApiRef;
     } catch (err) {
       isAdapterLoaded = true;
-      logWarn('Footprint.js handshake reply failed');
+      logError('Footprint.js handshake reply failed', err);
 
       return null;
     }

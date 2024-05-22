@@ -15,7 +15,7 @@ import PhonePageStructure from '../phone-page-structure';
 
 type StepPhoneProps = { Header: (props: HeaderProps) => JSX.Element };
 
-const { logError } = getLogger('step-phone');
+const { logError, logInfo } = getLogger({ location: 'step-phone' });
 
 const StepPhone = ({ Header }: StepPhoneProps) => {
   const [state, send] = useIdentifyMachine();
@@ -28,8 +28,11 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
 
   const options = COUNTRIES;
 
-  const handlePhoneValidation = (phone: string) =>
-    checkIsPhoneValid(phone, config?.isLive === false);
+  const handlePhoneValidation = (phone: string) => {
+    const isPhoneValid = checkIsPhoneValid(phone, config?.isLive === false);
+    if (!isPhoneValid) logInfo('Phone number is not valid');
+    return isPhoneValid;
+  };
 
   const handleChangeEmail = () => send({ type: 'navigatedToPrevPage' });
 

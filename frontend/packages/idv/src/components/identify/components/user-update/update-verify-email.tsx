@@ -11,7 +11,7 @@ type UpdateVerifyEmailProps = UpdateVerifyBaseProps & {
   email: string;
 };
 
-const { logWarn, logError } = getLogger('update-verify-email');
+const { logWarn, logError } = getLogger({ location: 'update-verify-email' });
 
 const UpdateVerifyEmail = ({
   Header,

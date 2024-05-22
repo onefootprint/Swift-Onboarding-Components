@@ -24,7 +24,7 @@ import {
   FPCustomEvents,
   sendCustomEvent,
 } from '../../../../utils/custom-event';
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import useBiometricInit, {
@@ -103,6 +103,9 @@ const Register = () => {
     if (skipLivenessMutation.isLoading) {
       return;
     }
+    Logger.info('Skipping liveness after retrying registering passkeys', {
+      location: 'liveness-register',
+    });
     const context = {
       reason: SkipLivenessReason.failed,
       clientType: SkipLivenessClientType.web,

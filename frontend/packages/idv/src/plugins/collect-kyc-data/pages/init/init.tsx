@@ -7,7 +7,7 @@ import { useCollectKycDataMachine } from '../../components/machine-provider';
 import type { KycData } from '../../utils/data-types';
 import useDecryptKycData from './hooks/use-decrypt-kyc-data/use-decrypt-kyc-data';
 
-const { logError } = getLogger('kyc-init');
+const { logError } = getLogger({ location: 'kyc-init' });
 
 const Init = () => {
   const [state, send] = useCollectKycDataMachine();

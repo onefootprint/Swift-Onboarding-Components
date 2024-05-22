@@ -29,7 +29,7 @@ type SyncDataArgs = {
 const onlyNumericAndPlus = (s?: unknown): string =>
   typeof s === 'string' ? s.trim().replace(/[^0-9+]/g, '') : '';
 
-const { logError } = getLogger('kyc-use-sync-data');
+const { logError } = getLogger({ location: 'kyc-use-sync-data' });
 
 const useSyncData = () => {
   const { t } = useTranslation('idv', {

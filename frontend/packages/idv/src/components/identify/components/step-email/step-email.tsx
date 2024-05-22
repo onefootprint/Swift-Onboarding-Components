@@ -17,7 +17,7 @@ type StepEmailProps = {
   Header: (props: HeaderProps) => JSX.Element;
 };
 
-const { logError } = getLogger('step-email');
+const { logError } = getLogger({ location: 'step-email' });
 
 const StepEmail = ({ children, Header }: StepEmailProps) => {
   const [state, send] = useIdentifyMachine();

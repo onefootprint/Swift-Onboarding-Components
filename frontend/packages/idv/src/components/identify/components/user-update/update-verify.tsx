@@ -69,7 +69,7 @@ const UpdateVerify = ({
 
     mutUserChallenge.mutate(payload, {
       onError: err => {
-        logError(`Failed to initiate sms login challenge`, err);
+        logWarn(`Failed to initiate sms login challenge`, err);
         toast.show(getErrorToastVariant(err));
       },
       onSuccess: setChallengeData,

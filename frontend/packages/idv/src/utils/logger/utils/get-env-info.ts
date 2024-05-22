@@ -11,6 +11,9 @@ import {
 import type { PrimitiveData } from '../types';
 
 const getEnvInfo = async (): Promise<PrimitiveData> => {
+  const isSSR = typeof window === 'undefined';
+  if (isSSR) return Promise.resolve({});
+
   const uaParser = new UAParser();
   const device = uaParser.getDevice();
   const os = uaParser.getOS();

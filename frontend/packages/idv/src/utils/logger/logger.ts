@@ -1,49 +1,82 @@
+import { datadogLogs } from '@datadog/browser-logs';
 import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 // import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 
 import { IS_LOGGING_ENABLED } from './constants';
-import type { PrimitiveData } from './types';
+import type { ExtraProps, PrimitiveData } from './types';
+import initDataDog, {
+  dataDogErrorEvent,
+  dataDogInfoEvent,
+  dataDogTrackEvent,
+  dataDogWarnEvent,
+} from './utils/datadog';
 import getEnvInfo from './utils/get-env-info';
-import configureLogRocket from './utils/log-rocket';
-import configureObserve, { Observe } from './utils/observe';
+import initLogRocket, {
+  logRocketErrorEvent,
+  logRocketInfoEvent,
+  logRocketTrackEvent,
+  logRocketWarnEvent,
+} from './utils/log-rocket';
+import initObserve, {
+  Observe,
+  observeErrorCauseEvent,
+  observeErrorEvent,
+  observeInfoEvent,
+  observeTrackEvent,
+  observeWarnEvent,
+} from './utils/observe';
 import {
   registerErrorHandlers,
   registerUnloadHandler,
 } from './utils/register-event-listeners';
-// import configureSentry from './utils/sentry';
+// import initSentry, {
+//   sentryErrorEvent,
+//   sentryInfoEvent,
+//   sentryTrackEvent,
+//   sentryWarnEvent,
+// } from './utils/sentry';
+
+/**
+ * Filters out any traits that are null, undefined, or empty strings.
+ *
+ * @param traits The object to filter.
+ * @returns An object with the same shape as `traits`, but with any null, undefined, or empty string values removed.
+ */
+const filterNonEmptyTraits = (traits: PrimitiveData): ExtraProps =>
+  Object.fromEntries(
+    Object.entries(traits).filter(
+      ([, value]) => value !== null && value !== undefined && value !== '',
+    ),
+  );
 
 const LoggerFactory = () => {
   let appName: string = '';
-  let isLREnabled: boolean = false;
+  let isLogRocketEnabled: boolean = false;
+  let isDataDogEnabled: boolean = false;
 
   const init = (app: string, disableLogRocket?: boolean) => {
-    if (!IS_LOGGING_ENABLED) {
-      return;
-    }
-    appName = app;
-    isLREnabled = !disableLogRocket;
+    if (!IS_LOGGING_ENABLED) return;
 
-    configureObserve(appName);
-    // configureSentry(appName);
-    if (isLREnabled) {
-      configureLogRocket(appName);
+    appName = app;
+    isLogRocketEnabled = !disableLogRocket;
+
+    // initSentry(appName);
+    initObserve(appName);
+    isDataDogEnabled = initDataDog(appName);
+    if (isLogRocketEnabled) {
+      initLogRocket(appName);
       Observe.setLogRocketSessionUrl();
     }
 
-    getEnvInfo().then(identify);
+    getEnvInfo().then(identify).catch(console.warn);
 
     const onError = (error: Error) => {
-      Observe.log('error', {
-        level: 'error',
-        cause: error.cause,
-        error: getErrorMessage(error),
-      });
-      // Sentry.captureException(error);
-      if (isLREnabled) {
-        LogRocket.captureException(error);
-      }
+      // sentryErrorEvent(error);
+      observeErrorCauseEvent(error);
+      if (isLogRocketEnabled) logRocketErrorEvent(error);
+      if (isDataDogEnabled) dataDogErrorEvent(error);
     };
 
     registerErrorHandlers(onError);
@@ -51,116 +84,77 @@ const LoggerFactory = () => {
   };
 
   const identify = (traits: PrimitiveData) => {
-    if (!IS_LOGGING_ENABLED) {
-      return;
-    }
+    if (!IS_LOGGING_ENABLED) return;
 
-    const filteredTraits = filterTraits(traits);
+    const filteredTraits = filterNonEmptyTraits(traits);
     const sessionId = getSessionId();
+
     // Sentry.setUser({ id: sessionId });
     // Sentry.setTags(filteredTraits);
     Observe.identify(sessionId, filteredTraits);
-    if (isLREnabled) {
-      LogRocket.identify(sessionId, filteredTraits);
-    }
+    if (isLogRocketEnabled) LogRocket.identify(sessionId, filteredTraits);
+    if (isDataDogEnabled)
+      datadogLogs.setGlobalContext({
+        ...filteredTraits,
+        fpSessionId: sessionId,
+      });
   };
 
-  const filterTraits = (traits: PrimitiveData) =>
-    Object.fromEntries(
-      Object.entries(traits).filter(
-        ([, value]) => value !== null && value !== undefined && value !== '',
-      ),
-    );
-
   const enableLogRocket = () => {
-    if (isLREnabled) {
-      return;
-    }
+    if (isLogRocketEnabled) return;
 
-    isLREnabled = true;
-    configureLogRocket(appName);
+    isLogRocketEnabled = true;
+    initLogRocket(appName);
     Observe.setLogRocketSessionUrl();
   };
 
-  const track = (eventName: string, extra: PrimitiveData) => {
-    if (!IS_LOGGING_ENABLED) {
-      return;
-    }
+  const track = (msg: string, extra: PrimitiveData) => {
+    if (!IS_LOGGING_ENABLED) return;
 
-    const filteredExtra = filterTraits(extra);
-    if (isLREnabled) {
-      LogRocket.track(eventName, {
-        level: 'track',
-        ...filteredExtra,
-      });
-    }
-    Observe.log(eventName, { extra: filteredExtra, level: 'track' });
-    // The breadcrumbs will be included with future exceptions sent to Sentry
-    // Sentry.addBreadcrumb({
-    //   type: 'track',
-    //   message: eventName,
-    //   data: filteredExtra,
-    //   // Sentry.io expects a string here even though the SDK type is number
-    //   timestamp: new Date().toISOString() as unknown as number,
-    // });
+    const filteredExtra = filterNonEmptyTraits(extra);
+
+    // sentryTrackEvent(msg, filteredExtra);
+    observeTrackEvent(msg, filteredExtra);
+    if (isLogRocketEnabled) logRocketTrackEvent(msg, filteredExtra);
+    if (isDataDogEnabled) dataDogTrackEvent(msg, filteredExtra);
   };
 
-  const error = (err: unknown, extra?: PrimitiveData) => {
-    if (!IS_LOGGING_ENABLED) {
-      return;
-    }
+  const error = (err: unknown, extra?: PrimitiveData, msg?: string) => {
+    if (!IS_LOGGING_ENABLED) return;
 
-    const filteredExtra = filterTraits(extra || {});
-    const errorMessage = getErrorMessage(err);
+    const filteredExtra = filterNonEmptyTraits(extra || {});
+    const errorMessage = msg || getErrorMessage(err);
     const errorObj: Error =
-      err instanceof Error ? (err as Error) : new Error(errorMessage);
-    // Sentry.captureException(errorMessage, filteredExtra);
-    Observe.log(errorMessage, {
-      extra: filteredExtra,
-      errorObj,
-      level: 'error',
-    });
+      err instanceof Error ? err : new Error(errorMessage);
 
-    if (isLREnabled) {
-      LogRocket.captureException(errorObj, {
-        extra: {
-          ...filteredExtra,
-          level: 'error',
-        },
-      });
+    // sentryErrorEvent(errorMessage, filteredExtra);
+    observeErrorEvent(errorMessage, errorObj, filteredExtra);
+    if (isLogRocketEnabled) {
+      logRocketErrorEvent(errorObj, { ...filteredExtra, level: 'error' });
+    }
+    if (isDataDogEnabled) {
+      dataDogErrorEvent(errorObj, errorMessage, filteredExtra);
     }
   };
 
-  const warn = (message: string, extra?: PrimitiveData) => {
-    if (!IS_LOGGING_ENABLED) {
-      return;
-    }
+  const warn = (msg: string, extra?: PrimitiveData, err?: unknown) => {
+    if (!IS_LOGGING_ENABLED) return;
+    const filteredExtra = filterNonEmptyTraits(extra || {});
 
-    const filteredExtra = filterTraits(extra || {});
-    if (isLREnabled) {
-      LogRocket.log(message, {
-        level: 'warn',
-        ...filteredExtra,
-      });
-    }
-    // Sentry.captureMessage(message, { extra: filteredExtra, level: 'warning' });
-    Observe.log(message, { extra: filteredExtra, level: 'warn' });
+    // sentryWarnEvent(msg, filteredExtra);
+    observeWarnEvent(msg, filteredExtra);
+    if (isLogRocketEnabled) logRocketWarnEvent(msg, filteredExtra);
+    if (isDataDogEnabled) dataDogWarnEvent(msg, filteredExtra, err);
   };
 
-  const info = (message: string, extra?: PrimitiveData) => {
-    if (!IS_LOGGING_ENABLED) {
-      return;
-    }
+  const info = (msg: string, extra?: PrimitiveData) => {
+    if (!IS_LOGGING_ENABLED) return;
+    const filteredExtra = filterNonEmptyTraits(extra || {});
 
-    const filteredExtra = filterTraits(extra || {});
-    if (isLREnabled) {
-      LogRocket.log(message, {
-        level: 'info',
-        ...filteredExtra,
-      });
-    }
-    // Sentry.captureMessage(message, { extra: filteredExtra, level: 'info' });
-    Observe.log(message, { extra: filteredExtra, level: 'info' });
+    // sentryInfoEvent(msg, filteredExtra);
+    observeInfoEvent(msg, filteredExtra);
+    if (isLogRocketEnabled) logRocketInfoEvent(msg, filteredExtra);
+    if (isDataDogEnabled) dataDogInfoEvent(msg, filteredExtra);
   };
 
   return {
@@ -176,14 +170,25 @@ const LoggerFactory = () => {
 
 const Logger = LoggerFactory();
 
-// TODO: delete this getLogger method
-export const getLogger = (location?: string) => ({
-  logInfo: (str: string, err?: unknown) =>
-    Logger.info(`${str} ${err ? getErrorMessage(err) : ''} in ${location}`),
-  logWarn: (str: string, err?: unknown) =>
-    Logger.warn(`${str} ${err ? getErrorMessage(err) : ''} in ${location}`),
-  logError: (str: string, err?: unknown) =>
-    Logger.error(`${str} ${err ? getErrorMessage(err) : ''} in ${location}`),
+export const getLogger = (
+  preExtra: PrimitiveData = Object.create(null),
+): {
+  logError: (msg: string, err?: unknown, extra?: PrimitiveData) => void;
+  logWarn: (msg: string, err?: unknown, extra?: PrimitiveData) => void;
+  logInfo: (msg: string, extra?: PrimitiveData) => void;
+  logTrack: (msg: string, extra?: PrimitiveData) => void;
+} => ({
+  logTrack: (msg: string, extra?: PrimitiveData) =>
+    Logger.track(msg, { ...preExtra, ...extra }),
+
+  logInfo: (msg: string, extra?: PrimitiveData) =>
+    Logger.info(msg, { ...preExtra, ...extra }),
+
+  logWarn: (msg: string, err?: unknown, extra?: PrimitiveData) =>
+    Logger.warn(msg, { ...preExtra, ...extra }, err),
+
+  logError: (msg: string, err?: unknown, extra?: PrimitiveData) =>
+    Logger.error(err, { ...preExtra, ...extra }, msg),
 });
 
 export default Logger;

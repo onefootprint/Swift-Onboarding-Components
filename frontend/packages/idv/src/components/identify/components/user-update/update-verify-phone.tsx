@@ -11,7 +11,7 @@ type UpdateVerifyPhoneProps = UpdateVerifyBaseProps & {
   phoneNumber: string;
 };
 
-const { logWarn, logError } = getLogger('update-verify-phone');
+const { logWarn, logError } = getLogger({ location: 'update-verify-phone' });
 
 const UpdateVerifyPhone = ({
   Header,

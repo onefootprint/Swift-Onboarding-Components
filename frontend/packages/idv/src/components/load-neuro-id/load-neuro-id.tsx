@@ -31,7 +31,7 @@ const LoadNeuroId = ({ config }: LoadNeuroIdProps) => {
     <Script
       id="neuro-id-script"
       onError={e => {
-        Logger.error(
+        Logger.warn(
           `Failed to load the Neuro-ID script: ${getErrorMessage(e)}`,
         );
       }}

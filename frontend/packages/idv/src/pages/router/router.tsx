@@ -28,7 +28,7 @@ type RouterProps = {
 };
 
 const { receivedDeviceResponseJson, stepUpCompleted } = FPCustomEvents;
-const { logWarn } = getLogger('idv-router');
+const { logWarn } = getLogger({ location: 'idv-router' });
 
 const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
   const [state, send] = useIdvMachine();

@@ -1,6 +1,5 @@
 import { getSessionId } from '@onefootprint/dev-tools';
 import { IS_BROWSER, IS_PROD } from '@onefootprint/global-constants';
-import { getErrorMessage } from '@onefootprint/request';
 import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 // @ts-ignore
@@ -22,13 +21,6 @@ export const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 export const VERCEL_ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
 
 type PrimitiveData = Record<string, string | number | boolean>;
-type LogFn = (str: string, err?: unknown) => void;
-type BasicLevel = keyof Pick<typeof Logger, 'info' | 'warn' | 'error'>;
-type MakeLoggerOutput = {
-  logError: LogFn;
-  logInfo: LogFn;
-  logWarn: LogFn;
-};
 
 // Allow the apps to set custom context data like tenant name or bifrost session id etc. that can be emitted with each item.
 const identify = (context: PrimitiveData) => {
@@ -252,18 +244,6 @@ const Logger = {
   setupLogRocket,
   identify,
   track,
-};
-
-export const getLogger = (location?: string): MakeLoggerOutput => {
-  const logFunction = (level: BasicLevel, str: string, err?: unknown) => {
-    Logger[level](`${str} ${err ? getErrorMessage(err) : ''}`, location);
-  };
-
-  return {
-    logInfo: (str, err) => logFunction('info', str, err),
-    logWarn: (str, err) => logFunction('warn', str, err),
-    logError: (str, err) => logFunction('error', str, err),
-  };
 };
 
 export default Logger;

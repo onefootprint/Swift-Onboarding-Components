@@ -7,7 +7,7 @@ import type { KycData } from '../../../../utils/data-types';
 import updateDataValue from '../../../../utils/update-data-value';
 import type { FormData } from '../../types';
 
-const { logError } = getLogger('ssn-use-convert-form-data');
+const { logError } = getLogger({ location: 'ssn-use-convert-form-data' });
 
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();

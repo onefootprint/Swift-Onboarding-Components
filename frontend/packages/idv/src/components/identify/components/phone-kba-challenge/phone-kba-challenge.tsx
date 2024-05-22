@@ -13,7 +13,7 @@ import PhonePageStructure from '../phone-page-structure';
 
 type PhoneKbaChallengeProps = { Header: (props: HeaderProps) => JSX.Element };
 
-const { logError, logWarn } = getLogger('phone-kba-challenge');
+const { logError, logWarn } = getLogger({ location: 'phone-kba-challenge' });
 
 const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
   const [state, send] = useIdentifyMachine();

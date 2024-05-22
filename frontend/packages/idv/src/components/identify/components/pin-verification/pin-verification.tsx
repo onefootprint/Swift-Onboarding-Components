@@ -30,7 +30,7 @@ type PinVerificationProps = {
   title?: string;
 } & PinFormProps;
 
-const { logError, logWarn } = getLogger('pin-verification');
+const { logError, logWarn } = getLogger({ location: 'pin-verification' });
 
 const PinVerification = ({
   onChallengeSucceed,

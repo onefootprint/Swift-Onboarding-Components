@@ -23,7 +23,7 @@ import HeaderTitle from '../../../../../../components/layout/components/header-t
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
 import useIdvRequestErrorToast from '../../../../../../hooks/ui/use-idv-request-error-toast';
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import useSubmitDocType from '../../../../hooks/use-submit-doc-type';
 import { getCountryFromCode } from '../../../../utils/get-country-from-code';
 import { useIdDocMachine } from '../../../components/machine-provider';

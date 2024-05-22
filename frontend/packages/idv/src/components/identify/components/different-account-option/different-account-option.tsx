@@ -4,8 +4,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
+import { getLogger } from '../../../../utils/logger';
 import LegalFooter from '../../../legal-footer';
 import { useIdentifyMachine } from '../../state';
+
+const { logInfo } = getLogger();
 
 /**
  * If data was bootstrapped, show the option to provide different contact info directly to us
@@ -17,9 +20,8 @@ const DifferentAccountOption = () => {
     keyPrefix: 'log-in-different-account',
   });
   const handleLoginWithDifferent = () => {
-    send({
-      type: 'loginWithDifferentAccount',
-    });
+    logInfo('Login with different account');
+    send({ type: 'loginWithDifferentAccount' });
   };
 
   const { config, bootstrapData } = state.context;

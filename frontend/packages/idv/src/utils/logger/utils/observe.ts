@@ -1,8 +1,9 @@
 import { getSessionId } from '@onefootprint/dev-tools';
+import { getErrorMessage } from '@onefootprint/request';
 import debounce from 'lodash/debounce';
 import LogRocket from 'logrocket';
 
-import type { PrimitiveData } from '../types';
+import type { ExtraProps, PrimitiveData } from '../types';
 
 const OBSERVE_INGEST_TOKEN =
   'ds1FFZo4VU4NEv9yYems:2b8XTbUIjt5vRarHo7bc716EXZSICoDi';
@@ -105,8 +106,30 @@ const ObserveFactory = () => {
 
 export const Observe = ObserveFactory();
 
-const configureObserve = (appName: string) => {
+export const observeErrorCauseEvent = (error: Error) =>
+  Observe.log('error', {
+    level: 'error',
+    cause: error.cause,
+    error: getErrorMessage(error),
+  });
+
+export const observeErrorEvent = (
+  msg: string,
+  errorObj: Error,
+  extra: ExtraProps,
+) => Observe.log(msg, { level: 'error', errorObj, extra });
+
+export const observeTrackEvent = (msg: string, extra: ExtraProps) =>
+  Observe.log(msg, { level: 'track', extra });
+
+export const observeWarnEvent = (msg: string, extra: ExtraProps) =>
+  Observe.log(msg, { level: 'warn', extra });
+
+export const observeInfoEvent = (msg: string, extra: ExtraProps) =>
+  Observe.log(msg, { level: 'info', extra });
+
+const initObserve = (appName: string) => {
   Observe.init(appName);
 };
 
-export default configureObserve;
+export default initObserve;

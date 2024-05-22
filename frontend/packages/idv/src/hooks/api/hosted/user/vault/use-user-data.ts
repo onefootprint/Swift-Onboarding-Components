@@ -6,7 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { getLogger } from '../../../../../utils/logger';
 
 const BOOTSTRAP_FIELDS_HEADER = 'X-Fp-Bootstrapped-Fields';
-const { logInfo } = getLogger('use-user-data');
+const { logInfo } = getLogger({ location: 'use-user-data' });
 
 const userDataRequest = async (payload: UserDataRequest) => {
   const {
