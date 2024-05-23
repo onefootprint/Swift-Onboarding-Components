@@ -46,6 +46,7 @@ const shouldAvoidLog = (log?: string) =>
     'A component is changing an uncontrolled',
     'Google Maps Places API library must be loaded',
     'If you want to write it to the DOM, pass a string instead',
+    'Minified React error #', // https://linear.app/footprint/issue/FP-7692/error-minified-react-error-418-423-425
     'React does not recognize',
   ].some(str => log?.includes(str));
 
