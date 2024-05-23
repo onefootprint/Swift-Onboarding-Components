@@ -3,7 +3,6 @@ use crate::{
     profile::{BillingProfile, PriceInfo},
     BResult, Error,
 };
-use rust_decimal_macros::dec;
 use strum::IntoEnumIterator;
 
 #[derive(Debug)]
@@ -39,8 +38,14 @@ pub struct BillingCounts {
 #[derive(Debug)]
 pub(crate) struct LineItem {
     pub product: Product,
-    pub price: PriceInfo,
+    pub price: LineItemPrice,
     pub count: i64,
+}
+
+#[derive(Debug, derive_more::From)]
+pub enum LineItemPrice {
+    Price(PriceInfo),
+    Uncontracted,
 }
 
 impl BillingCounts {
@@ -118,23 +123,16 @@ impl BillingCounts {
             .filter_map(|(p, count)| count.map(|c| (p, c)))
             .filter(|(_, count)| count > &0)
             .map(|(product, count)| -> BResult<_> {
-                let (price, is_uncontracted) = if let Some(price) = profile.get(product) {
+                let price = if let Some(price) = profile.get(product) {
                     // If the BillingProfile for this tenant has a price set for the product, use it
-                    (price.clone(), false)
+                    price.clone().into()
                 } else {
                     // If there is no price set up for this tenant but they have used the product,
-                    // error by adding a line item to the invoice that shows the uncontracted price
-                    let price_id = product.uncontracted_price_id()?;
-                    let price = PriceInfo {
-                        price_id,
-                        price_cents: dec!(0),
-                    };
-                    (price, true)
-                };
-                if is_uncontracted {
+                    // error by adding a line item to the invoice that shows the uncontracted price.
                     // These require manual human action, but we don't want to prevent invoice generation
-                    tracing::error!(tenant_id=%profile.tenant_id, product=%product, price_id=%price.price_id, "Billing line item is uncontracted");
-                }
+                    tracing::error!(tenant_id=%profile.tenant_id, product=%product, "Billing line item is uncontracted");
+                    LineItemPrice::Uncontracted
+                };
                 Ok(LineItem { product, price, count })
             })
             .collect::<BResult<Vec<_>>>()?;

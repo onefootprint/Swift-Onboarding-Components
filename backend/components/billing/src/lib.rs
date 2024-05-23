@@ -1,4 +1,5 @@
 use crate::counts::LineItem;
+use counts::LineItemPrice;
 use db::{
     models::{billing_profile::BillingProfile as DbBillingProfile, tenant::Tenant},
     DbError,
@@ -15,8 +16,7 @@ use std::{collections::HashMap, str::FromStr};
 pub use stripe::Client;
 use stripe::{
     CreateCustomer, CreateInvoice, CreateInvoiceItem, Currency, Customer, CustomerId, Invoice, InvoiceItem,
-    InvoicePendingInvoiceItemsBehavior, InvoiceStatus, ListCustomers, ListInvoiceItems, ListInvoices,
-    UpdateInvoiceItem,
+    InvoicePendingInvoiceItemsBehavior, InvoiceStatus, ListCustomers, ListInvoices,
 };
 
 pub type BResult<T> = Result<T, Error>;
@@ -120,38 +120,29 @@ impl BillingClient {
         customer_id: &CustomerId,
         line_item: LineItem,
     ) -> BResult<Option<InvoiceItem>> {
-        let LineItem { price, count, .. } = line_item;
+        let LineItem {
+            price,
+            count,
+            product,
+        } = line_item;
         if count == 0 {
             return Ok(None);
         }
-        // First check if there's already a pending invoice item
-        let list_items = ListInvoiceItems {
-            customer: Some(customer_id.clone()),
-            pending: Some(true),
-            ..Default::default()
-        };
-        let existing_items = InvoiceItem::list(&self.client, &list_items).await?;
-        let existing_item = existing_items
-            .data
-            .iter()
-            .find(|l| l.price.as_ref().map(|p| &p.id) == Some(&price.price_id) && is_managed(&l.metadata));
-
-        let item = if let Some(item) = existing_item {
-            // If the pending invoice item for this price exists, just update it
-            // TODO rm this logic?
-            let update = UpdateInvoiceItem {
-                quantity: Some(count as u64),
-                ..Default::default()
-            };
-            InvoiceItem::update(&self.client, &item.id, update).await?
-        } else {
-            // Otherwise, make a new one
-            let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
-            new_invoice_item.price = Some(price.price_id);
-            new_invoice_item.quantity = Some(count as u64);
-            new_invoice_item.metadata = Some(managed_metadata());
-            InvoiceItem::create(&self.client, new_invoice_item).await?
-        };
+        // Otherwise, make a new one
+        let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
+        match price {
+            LineItemPrice::Price(price) => {
+                new_invoice_item.price = Some(price.price_id);
+            }
+            LineItemPrice::Uncontracted => {
+                new_invoice_item.currency = Some(Currency::USD);
+                new_invoice_item.unit_amount = Some(0);
+                new_invoice_item.description = Some(product.uncontracted_description());
+            }
+        }
+        new_invoice_item.quantity = Some(count as u64);
+        new_invoice_item.metadata = Some(managed_metadata());
+        let item = InvoiceItem::create(&self.client, new_invoice_item).await?;
         Ok(Some(item))
     }
 
@@ -186,7 +177,14 @@ impl BillingClient {
         let line_items = info.counts.line_items(&profile)?;
         let monthly_spend_cents: Decimal = line_items
             .iter()
-            .flat_map(|r| Decimal::from_i64(r.count).map(|c| c * r.price.price_cents))
+            .flat_map(|r| {
+                let LineItemPrice::Price(price) = &r.price else {
+                    return None;
+                };
+                let count = Decimal::from_i64(r.count)?;
+                let notional = price.price_cents * count;
+                Some(notional)
+            })
             .sum();
 
         // Create the invoice items in stripe, including monthly minimum

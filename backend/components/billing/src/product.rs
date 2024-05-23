@@ -1,8 +1,3 @@
-use std::str::FromStr;
-
-use stripe::PriceId;
-
-use crate::BResult;
 use strum_macros::{Display, EnumIter};
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter, Display, Ord, PartialOrd)]
@@ -57,26 +52,21 @@ impl Product {
         }
     }
 
-    /// Every product has a special price called the "uncontracted" price that we use to create
-    /// line items when a tenant hasn't been contracted to use a product but we count that they
-    /// have already used it.
-    pub fn uncontracted_price_id(&self) -> BResult<PriceId> {
-        let price_id = match self {
-            Self::Pii => "price_1NkF5kGerPBo41PtfIaoIhXN",
-            Self::Kyc => "price_1NkF5NGerPBo41PtviDJIY8K",
-            Self::KycWaterfallSecondVendor => "price_1PJHuvGerPBo41PtDjwSRWvJ",
-            Self::KycWaterfallThirdVendor => "price_1PJHwLGerPBo41Ptc4G3h022",
-            Self::Kyb => "price_1NkLQ1GerPBo41PtKbvpKKCg",
-            Self::IdDocs => "price_1NkF3zGerPBo41PtnyBrvOU1",
-            Self::WatchlistChecks => "price_1NkF4sGerPBo41Ptb21nKXbp",
-            Self::HotVaults => "price_1NkF3eGerPBo41Ptv5wHuJFY",
-            Self::HotProxyVaults => "price_1NkF3HGerPBo41Pt8FI5ii7q",
-            Self::VaultsWithNonPci => "price_1NkFbHGerPBo41PtUNBe5Zlx",
-            Self::VaultsWithPci => "price_1NkFcaGerPBo41Ptx8aKzHeS",
-            Self::AdverseMediaPerOnboarding => "price_1OIZnRGerPBo41Pt2hz8DkKf",
-            Self::ContinuousMonitoringPerYear => "price_1OIZoPGerPBo41PtautRHeYl",
-        };
-        let result = PriceId::from_str(price_id)?;
-        Ok(result)
+    pub fn uncontracted_description(&self) -> &'static str {
+        match self {
+            Self::HotProxyVaults => "Uncontracted HotProxyVaults",
+            Self::HotVaults => "Uncontracted HotVaults",
+            Self::IdDocs => "Uncontracted IdDocs",
+            Self::Kyb => "Uncontracted Kyb",
+            Self::WatchlistChecks => "Uncontracted WatchlistChecks",
+            Self::Kyc => "Uncontracted Kyc",
+            Self::KycWaterfallSecondVendor => "Uncontracted KycWaterfallSecondVendor",
+            Self::KycWaterfallThirdVendor => "Uncontracted KycWaterfallThirdVendor",
+            Self::Pii => "Uncontracted Pii",
+            Self::VaultsWithNonPci => "Uncontracted VaultsWithNonPci",
+            Self::VaultsWithPci => "Uncontracted VaultsWithPci",
+            Self::AdverseMediaPerOnboarding => "Uncontracted AdverseMediaPerOnboarding",
+            Self::ContinuousMonitoringPerYear => "Uncontracted ContinuousMonitoringPerYear",
+        }
     }
 }
