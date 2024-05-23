@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS audit_event_tenant_id_is_live_timestamp_name;
