@@ -6,13 +6,13 @@ import styled, { css } from 'styled-components';
 import { createText } from '../../utils';
 import Tooltip from '../tooltip';
 
-export type LabelTooltipProps = {
+type LabelTooltipProps = {
   text: string;
   triggerAriaLabel?: string;
   iconComponent?: Icon;
 };
 
-export type LabelProps = {
+type FormLabelLabelProps = {
   children: string;
   hasError?: boolean;
   htmlFor?: string;
@@ -21,14 +21,14 @@ export type LabelProps = {
   tooltip?: LabelTooltipProps;
 };
 
-const Label = ({
+const FormLabel = ({
   children,
   hasError = false,
   htmlFor,
   id,
   size = 'default',
   tooltip = undefined,
-}: LabelProps) => (
+}: FormLabelLabelProps) => (
   <LabelContainer>
     <StyledLabel
       /** Do not change/remove these classes */
@@ -49,6 +49,7 @@ const Label = ({
     )}
   </LabelContainer>
 );
+
 const InfoButton = styled.button`
   ${({ theme }) => css`
     background: none;
@@ -87,4 +88,4 @@ const StyledLabel = styled.label`
   }}
 `;
 
-export default Label;
+export default FormLabel;

@@ -1,11 +1,4 @@
-import {
-  Box,
-  FormControl,
-  FormLabel,
-  NativeSelect,
-  Text,
-  TextInput,
-} from '@onefootprint/ui';
+import { Box, Form, NativeSelect, Text, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -59,8 +52,8 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
             },
           })}
         />
-        <FormControl>
-          <FormLabel htmlFor="method">{t('method.label')}</FormLabel>
+        <Form.Field>
+          <Form.Label htmlFor="method">{t('method.label')}</Form.Label>
           <NativeSelect
             id="method"
             {...register('method', {
@@ -76,7 +69,7 @@ const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
             <option value="DELETE">DELETE</option>
             <option value="PATCH">PATCH</option>
           </NativeSelect>
-        </FormControl>
+        </Form.Field>
         <TextInput
           hasError={!!formState.errors.accessReason}
           hint={formState.errors.accessReason?.message}

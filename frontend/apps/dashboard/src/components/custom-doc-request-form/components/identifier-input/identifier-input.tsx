@@ -1,9 +1,7 @@
-import { IcoInfo16 } from '@onefootprint/icons';
-import { Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
-import React from 'react';
+import { Form, TextInput } from '@onefootprint/ui';
+import React, { useId } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import styled, { css } from 'styled-components';
 
 type IdentifierInputProps = {
   customDocIdentifierFormField: string;
@@ -19,6 +17,7 @@ const IdentifierInput = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'components.custom-doc-request-form.document-identifier',
   });
+  const id = useId();
   const {
     register,
     formState: { isSubmitted },
@@ -34,6 +33,7 @@ const IdentifierInput = ({
       return t('errors.no-special-characters');
     return undefined;
   };
+
   register(customDocIdentifierFormField, {
     validate: getIdentifierError,
   });
@@ -45,49 +45,28 @@ const IdentifierInput = ({
   };
 
   return (
-    <Stack direction="column" gap={3}>
-      <Stack direction="row" gap={2} alignItems="center">
-        <label htmlFor="custom-doc-identifier-form-field">
-          <Text variant="label-4">{t('label')}</Text>
-        </label>
-        <Tooltip text={t('tooltip')}>
-          <IcoInfo16 color="tertiary" />
-        </Tooltip>
-      </Stack>
-      <Input
-        placeholder=""
-        id="custom-doc-identifier-form-field"
-        hasError={!!identifierFieldState.error}
-        prefixComponent={
-          <IdentifierPrefix>
-            <Text variant="body-4">{IDENTIFIER_PREFIX}</Text>
-          </IdentifierPrefix>
-        }
-        hint={identifierFieldState.error?.message}
-        disabled={disabled}
-        onChangeText={handleChangeIdentifier}
-      />
-    </Stack>
+    <Form.Field>
+      <Form.Label
+        htmlFor={id}
+        tooltip={{
+          text: t('tooltip'),
+        }}
+      >
+        {t('label')}
+      </Form.Label>
+      <Form.Group>
+        <Form.Addon>{IDENTIFIER_PREFIX}</Form.Addon>
+        <TextInput
+          disabled={disabled}
+          hasError={!!identifierFieldState.error}
+          id={id}
+          onChangeText={handleChangeIdentifier}
+          placeholder=""
+        />
+      </Form.Group>
+      <Form.Errors>{identifierFieldState.error?.message}</Form.Errors>
+    </Form.Field>
   );
 };
-
-const IdentifierPrefix = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    height: 100%;
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    border-top-left-radius: ${theme.borderRadius.default};
-    border-bottom-left-radius: ${theme.borderRadius.default};
-    background-color: ${theme.backgroundColor.secondary};
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
-  `};
-`;
-
-const Input = styled(TextInput)`
-  ${({ theme }) => css`
-    padding-left: calc(${theme.spacing[13]} + ${theme.spacing[5]});
-  `};
-`;
 
 export default IdentifierInput;

@@ -1,6 +1,5 @@
-import { IcoInfo16 } from '@onefootprint/icons';
-import { Stack, Text, TextArea, TextInput, Tooltip } from '@onefootprint/ui';
-import React from 'react';
+import { Form, TextArea, TextInput } from '@onefootprint/ui';
+import React, { useId } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -23,50 +22,46 @@ const CustomDocRequestForm = ({
     keyPrefix: 'components.custom-doc-request-form',
   });
   const { register, getFieldState } = useFormContext();
-
+  const id = useId();
   const nameFieldState = getFieldState(customDocNameFormField);
 
   return (
     <>
-      <Stack direction="column" gap={3}>
-        <Stack direction="row" gap={2} alignItems="center">
-          <label htmlFor="custom-doc-name-form-field">
-            <Text variant="label-4">{t('document-name.label')}</Text>
-          </label>
-          <Tooltip text={t('document-name.tooltip')}>
-            <IcoInfo16 color="tertiary" />
-          </Tooltip>
-        </Stack>
+      <Form.Field>
+        <Form.Label
+          htmlFor={`document-name-${id}`}
+          tooltip={{ text: t('document-name.tooltip') }}
+        >
+          {t('document-name.label')}
+        </Form.Label>
         <TextInput
-          placeholder={t('document-name.placeholder')}
-          hasError={!!nameFieldState.error}
-          id="custom-doc-name-form-field"
-          hint={nameFieldState.error && t('document-name.errors.required')}
           disabled={disabled}
-          {...register(customDocNameFormField, { required: true })}
+          hasError={!!nameFieldState.error}
+          id={`document-name-${id}`}
+          placeholder={t('document-name.placeholder')}
+          {...register(customDocNameFormField, {
+            required: t('document-name.errors.required'),
+          })}
         />
-      </Stack>
+        <Form.Errors>{nameFieldState.error?.message}</Form.Errors>
+      </Form.Field>
       <IdentifierInput
         customDocIdentifierFormField={customDocIdentifierFormField}
         disabled={disabled}
       />
-      <Stack direction="column" gap={3}>
-        <Stack direction="row" gap={2} alignItems="center">
-          <label htmlFor="custom-doc-description-form-field">
-            <Text variant="label-4">{t('document-description.label')}</Text>
-          </label>
-          <Tooltip text={t('document-description.tooltip')}>
-            <IcoInfo16 color="tertiary" />
-          </Tooltip>
-        </Stack>
+      <Form.Field>
+        <Form.Label
+          htmlFor={`document-description-${id}`}
+          tooltip={{ text: t('document-description.tooltip') }}
+        >
+          {t('document-description.label')}
+        </Form.Label>
         <TextArea
-          id="custom-doc-description-form-field"
+          id={`document-description-${id}`}
           disabled={disabled}
-          {...register(customDocDescriptionFormField, {
-            required: false,
-          })}
+          {...register(customDocDescriptionFormField)}
         />
-      </Stack>
+      </Form.Field>
     </>
   );
 };

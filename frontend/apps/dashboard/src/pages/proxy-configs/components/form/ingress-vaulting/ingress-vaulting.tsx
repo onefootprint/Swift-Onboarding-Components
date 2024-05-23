@@ -1,8 +1,7 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import {
   Box,
-  FormControl,
-  FormLabel,
+  Form,
   Grid,
   LinkButton,
   NativeSelect,
@@ -56,8 +55,8 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
         {t('title')}
       </Text>
       <Box marginBottom={8}>
-        <FormControl>
-          <FormLabel htmlFor="method">{t('content-type.label')}</FormLabel>
+        <Form.Field>
+          <Form.Label htmlFor="method">{t('content-type.label')}</Form.Label>
           <NativeSelect
             id="method"
             {...register('ingressSettings.contentType')}
@@ -65,7 +64,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
             <option value="none">None</option>
             <option value="json">JSON</option>
           </NativeSelect>
-        </FormControl>
+        </Form.Field>
       </Box>
       {ingressContentType !== 'none' && (
         <>
@@ -76,10 +75,10 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
             {fields.map((field, index) => (
               <Box key={field.id}>
                 <Grid.Container gap={5} marginBottom={3}>
-                  <FormControl>
-                    <FormLabel htmlFor={`token-${index}`}>
+                  <Form.Field>
+                    <Form.Label htmlFor={`token-${index}`}>
                       {t('vaulting-rules.token.label')}
-                    </FormLabel>
+                    </Form.Label>
                     <TextInput
                       autoFocus
                       id={`token-${index}`}
@@ -91,11 +90,11 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
                         ),
                       })}
                     />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor={`target-${index}`}>
+                  </Form.Field>
+                  <Form.Field>
+                    <Form.Label htmlFor={`target-${index}`}>
                       {t('vaulting-rules.target.label')}
-                    </FormLabel>
+                    </Form.Label>
                     <TextInput
                       id={`target-${index}`}
                       placeholder={t('vaulting-rules.target.placeholder')}
@@ -106,7 +105,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
                         ),
                       })}
                     />
-                  </FormControl>
+                  </Form.Field>
                 </Grid.Container>
                 {fields.length >= 2 && (
                   <LinkButton onClick={handleRemove(index)} destructive>

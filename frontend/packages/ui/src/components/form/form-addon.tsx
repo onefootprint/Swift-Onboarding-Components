@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils';
 
-const InputAddon = styled.div`
+const FormInputAddon = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('body-4')};
     padding: ${theme.spacing[3]} ${theme.spacing[5]};
@@ -35,4 +35,4 @@ const InputAddon = styled.div`
   }
 `;
 
-export default InputAddon;
+export default FormInputAddon;
