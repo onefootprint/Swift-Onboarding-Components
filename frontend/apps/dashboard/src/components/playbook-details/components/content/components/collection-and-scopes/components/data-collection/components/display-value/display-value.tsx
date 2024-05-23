@@ -25,8 +25,8 @@ const DisplayValue = ({
 
   if (field === 'document') {
     const documentString = mustCollectData.find(a => a.match('document'));
-    const idDocKinds = Object.values(SupportedIdDocTypes).filter(
-      k => documentString?.includes(k),
+    const idDocKinds = Object.values(SupportedIdDocTypes).filter(k =>
+      documentString?.includes(k),
     );
     if (idDocKinds.length > 0) {
       return <IdDocDisplay idDocKind={idDocKinds} threshold={2} />;

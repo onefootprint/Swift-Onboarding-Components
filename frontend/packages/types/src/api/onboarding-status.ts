@@ -119,18 +119,18 @@ export type RequirementForKind<K> =
   K extends OnboardingRequirementKind.registerPasskey
     ? RegisterPasskeyRequirement
     : K extends OnboardingRequirementKind.idDoc
-    ? IdDocRequirement
-    : K extends OnboardingRequirementKind.collectKycData
-    ? CollectKycDataRequirement
-    : K extends OnboardingRequirementKind.collectKybData
-    ? CollectKybDataRequirement
-    : K extends OnboardingRequirementKind.investorProfile
-    ? CollectInvestorProfileRequirement
-    : K extends OnboardingRequirementKind.authorize
-    ? AuthorizeRequirement
-    : K extends OnboardingRequirementKind.process
-    ? ProcessRequirement
-    : never;
+      ? IdDocRequirement
+      : K extends OnboardingRequirementKind.collectKycData
+        ? CollectKycDataRequirement
+        : K extends OnboardingRequirementKind.collectKybData
+          ? CollectKybDataRequirement
+          : K extends OnboardingRequirementKind.investorProfile
+            ? CollectInvestorProfileRequirement
+            : K extends OnboardingRequirementKind.authorize
+              ? AuthorizeRequirement
+              : K extends OnboardingRequirementKind.process
+                ? ProcessRequirement
+                : never;
 
 export const getRequirement = <K extends OnboardingRequirementKind>(
   reqs: OnboardingRequirement[],

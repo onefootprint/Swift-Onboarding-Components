@@ -59,8 +59,8 @@ const Picker = ({
     editingCountryRecord ?? countryOptions[0],
   );
   const documentOptions = useIdDocOptions(selectedCountry);
-  const globalDocOptions = documentOptions.filter(
-    doc => globalDocs?.includes(doc.value),
+  const globalDocOptions = documentOptions.filter(doc =>
+    globalDocs?.includes(doc.value),
   );
   let preselectedDocs = documentOptions.filter(
     doc =>

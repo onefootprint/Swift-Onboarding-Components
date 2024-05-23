@@ -3,15 +3,16 @@ import isObject from 'lodash/isObject';
 import snakeCase from 'lodash/snakeCase';
 import transform from 'lodash/transform';
 
-type CaseTransformed<T> = T extends Array<infer U>
-  ? Array<CaseTransformed<U>>
-  : T extends {}
-  ? {
-      [K in keyof T as K extends string ? string : never]: CaseTransformed<
-        T[K]
-      >;
-    }
-  : T;
+type CaseTransformed<T> =
+  T extends Array<infer U>
+    ? Array<CaseTransformed<U>>
+    : T extends {}
+      ? {
+          [K in keyof T as K extends string ? string : never]: CaseTransformed<
+            T[K]
+          >;
+        }
+      : T;
 
 const keysToCamelCase = <T extends Record<string, unknown>>(
   obj: T,

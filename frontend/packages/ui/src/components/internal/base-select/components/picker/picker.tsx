@@ -94,8 +94,8 @@ const Picker = ({
 
   const filteredOptions = useMemo(() => {
     if (!search) return options;
-    return options?.filter(
-      option => option?.label.toLowerCase().includes(search.toLowerCase()),
+    return options?.filter(option =>
+      option?.label.toLowerCase().includes(search.toLowerCase()),
     );
   }, [search, options]);
 

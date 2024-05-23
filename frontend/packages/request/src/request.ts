@@ -69,8 +69,8 @@ export const isLogoutError = (error: unknown) => {
   const codeMatches = LOGOUT_ERROR_CODES.some(
     code => serverError?.code === code,
   );
-  const messageMatches = LOGOUT_ERRORS.some(
-    e => serverError?.message?.includes(e),
+  const messageMatches = LOGOUT_ERRORS.some(e =>
+    serverError?.message?.includes(e),
   );
   return codeMatches || messageMatches;
 };

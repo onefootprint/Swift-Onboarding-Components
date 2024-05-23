@@ -32,8 +32,8 @@ const Section = ({
   const documentString =
     docScanForOptionalSsn ||
     canAccessData.filter(scopes => scopes.includes('document'))?.[0];
-  const idDocKinds = Object.values(SupportedIdDocTypes).filter(
-    v => documentString?.includes(v),
+  const idDocKinds = Object.values(SupportedIdDocTypes).filter(v =>
+    documentString?.includes(v),
   );
   if (displayScopes.includes('document')) {
     dataToDisplay.push(...idDocKinds);

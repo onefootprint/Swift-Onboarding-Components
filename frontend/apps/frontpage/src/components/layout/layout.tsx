@@ -19,9 +19,8 @@ const Layout = ({ children }: LayoutProps) => {
   const isArticlePage = router.pathname.includes(ARTICLE_URL);
   // const isCookieSet = getCookie('should-show-case-study-banner') !== 'false';
 
-  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(
-    !isArticlePage,
-  );
+  const [isBannerVisible, setIsBannerVisible] =
+    useState<boolean>(!isArticlePage);
 
   const handleCloseBanner = () => {
     setCookie('should-show-case-study-banner', 'false');
