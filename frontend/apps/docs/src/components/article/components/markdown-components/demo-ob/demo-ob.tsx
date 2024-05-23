@@ -140,7 +140,7 @@ const Step5 = () => {
         </Fp.Form>
       )}
       {step === 'collect-data' && (
-        <Fp.Form onSubmit={save}>
+        <Fp.Form onSubmit={save} className="fp-c-form">
           <Fp.Field name="id.first_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">First name</Fp.Label>
             <Fp.Input className="fp-c-input" />
@@ -222,8 +222,9 @@ const Step6 = () => {
   const save = () => {
     fp.save({
       onSuccess: () => {
+        console.log('success');
         fp.handoff({
-          onComplete: validationToken => console.log(validationToken),
+          onComplete: (validationToken: string) => console.log(validationToken),
         });
       },
     });
@@ -233,7 +234,7 @@ const Step6 = () => {
     <>
       <Styles />
       {step === 'identify' && (
-        <Fp.Form onSubmit={identify}>
+        <Fp.Form onSubmit={identify} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
             <Fp.Input
@@ -343,7 +344,7 @@ const DemoOnboardingComponents = ({ step }: DemoOnboardingComponentsProps) => {
   return null;
 };
 
-const publicKey = process.env.NEXT_PUBLIC_ONBOARDING_COMPONENTS_KEY || '';
+const publicKey = 'pb_test_hLKePSu5AH5wAYuZH2ehR7';
 
 const DemoObWithProvider = ({ step }: DemoOnboardingComponentsProps) => (
   <Fp.Provider publicKey={publicKey}>
