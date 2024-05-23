@@ -33,7 +33,7 @@ yarn add @onefootprint/footprint-react@beta
 
 ## 2. Add Footprint Provider
 
-To use Onboarding Components, you need to start by wrapping your application with the `Fp.Provider` component. This component provides the necessary context for the Footprint components to work. Them, pass the `publicKey`.
+To use Onboarding Components, you need to start by wrapping your application with the `Fp.Provider` component. This component provides the necessary context for the Footprint components to work. Then, pass the `publicKey`.
 
 ```tsx filename="app.tsx"
 import { Fp } from '@onefootprint/footprint-react';
@@ -89,7 +89,7 @@ And this is how it looks like:
   <demo-ob step={1}></demo-ob>
 </div>
 
-As you can see, our components are really raw: they don't have any styling. This is intentional so you can style them as you wish. However, we provide a set of pre-defined behaviors / values, such as placeholders, validations, masks and other attributes to make your form accessible: for example, once you click on the LoadableContext, it will focus the input as you would expect.
+As you can see, our components are really raw: they don't have any styling. This is intentional so you can style them as you wish. However, we provide a set of pre-defined behaviors / values, such as placeholders, validations, masks and other attributes to make your form accessible: for example, once you click on the Label, it will focus the input as you would expect.
 
 ### 3.1 Changing default values
 
@@ -560,4 +560,3 @@ const Flow = () => {
 ```
 
 Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` callback. Post this token to your backend for further processing.
-import { use } from "react"
