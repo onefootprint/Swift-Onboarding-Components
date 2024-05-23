@@ -20,7 +20,7 @@ import {
   Tooltip,
   useToast,
 } from '@onefootprint/ui';
-import { cloneDeep, flatten, isEqual } from 'lodash';
+import { cloneDeep, flatten, isEqual, partition } from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
@@ -164,12 +164,14 @@ const Content = ({
         delete newRule['tempId' as keyof AddedRuleWithId];
         return newRule;
       });
+    const [nonEmptyEditedRules, emptyEditedRules] = partition(
+      editedRules,
+      rule => rule.ruleExpression.some(ruleField => ruleField.field),
+    );
     return {
       add,
-      delete: deletedRuleIds,
-      edit: editedRules.filter(rule =>
-        rule.ruleExpression.some(ruleField => ruleField.field),
-      ),
+      delete: deletedRuleIds.concat(emptyEditedRules.map(rule => rule.ruleId)),
+      edit: nonEmptyEditedRules,
     };
   };
 
