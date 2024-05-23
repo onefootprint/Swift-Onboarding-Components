@@ -13,6 +13,7 @@ use db::{
     DbError,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
+use idv::experian::error::Error as ExperianError;
 use idv::{
     experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
     idology::{expectid::response::ExpectIDResponse, IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
@@ -41,7 +42,20 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
         make_idv_vendor_call_save_vreq(state, tvc, sv_id, di_id, ob_configuration_key, vendor_api).await?;
 
     if let Err(err) = vendor_result.as_ref() {
-        tracing::error!(?err, "Error making vendor call");
+        let VendorAPIError { vendor_api: _, error } = err;
+        let log_msg = "Error making vendor call";
+        match error {
+            idv::Error::ExperianError(ExperianError::ErrorWithResponse(e)) => {
+                match e.is_known_error() {
+                    true => {tracing::warn!(?err, log_msg);},
+                    false => tracing::error!(?err, log_msg),
+                }
+            }
+            _ => {tracing::error!(?err, log_msg);}
+        };
+
+        
+        
     }
 
     let sv_id = sv_id.clone();

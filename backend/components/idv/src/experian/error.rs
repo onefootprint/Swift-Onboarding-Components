@@ -237,6 +237,46 @@ pub struct ErrorWithResponse {
     pub response: PiiJsonValue,
 }
 
+impl ErrorWithResponse {
+    // some errors are expected since it involves input validation which experian is stingy about
+    pub fn is_known_error(&self) -> bool {
+        match &self.error {
+            Error::ResponseError(CrossCoreResponseError::Error(err, _)) => match err {
+                ErrorCode::ConsumerIsMinor
+                | ErrorCode::FormatError
+                | ErrorCode::InformationOnInquiryReportedAsFraudByConsumer
+                | ErrorCode::InvalidSurname
+                | ErrorCode::CurrentZipCodeError
+                | ErrorCode::StateRequiresMoreInfoForMatch
+                | ErrorCode::InputValidationError
+                | ErrorCode::SsnRequiredToAccessConsumerFile
+                | ErrorCode::GenerationCodeRequiredToAccessConsumerFile
+                | ErrorCode::YobRequiredToAccessConsumerFile
+                | ErrorCode::MiddleNameRequiredToAccessConsumerFile
+                | ErrorCode::CannotStandardizeAddress
+                | ErrorCode::InvalidStreetAddressFiled
+                | ErrorCode::CurrentAddressExceedsMaxLength => true,
+                ErrorCode::NFDUnavailable
+                | ErrorCode::NFDNotColoradoZip
+                | ErrorCode::NotEnoughInfoForExperianDetect
+                | ErrorCode::ExperianDetectNotAvailable
+                | ErrorCode::PreciseIdNotAvailable
+                | ErrorCode::FraudShieldNotAvailable
+                | ErrorCode::CreditReportingNotAvailable
+                | ErrorCode::InvalidPreambleForSubcode
+                | ErrorCode::InvalidUserIdOrPassword
+                | ErrorCode::KiqSessionTimeout
+                | ErrorCode::EndUserRequired
+                | ErrorCode::OtherPreciseIdError
+                | ErrorCode::Other(_)
+                | ErrorCode::ResubmitLater
+                | ErrorCode::ResubmitCheckpointSystem => false,
+            },
+            _ => false,
+        }
+    }
+}
+
 impl std::fmt::Display for ErrorWithResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.error)
