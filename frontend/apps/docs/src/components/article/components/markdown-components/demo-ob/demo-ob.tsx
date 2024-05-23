@@ -343,8 +343,10 @@ const DemoOnboardingComponents = ({ step }: DemoOnboardingComponentsProps) => {
   return null;
 };
 
+const publicKey = process.env.NEXT_PUBLIC_ONBOARDING_COMPONENTS_KEY || '';
+
 const DemoObWithProvider = ({ step }: DemoOnboardingComponentsProps) => (
-  <Fp.Provider publicKey="pb_test_ZaqkFwlwizObSzxUYvUjzK">
+  <Fp.Provider publicKey={publicKey}>
     <Paper>
       <DemoOnboardingComponents step={step} />
     </Paper>
