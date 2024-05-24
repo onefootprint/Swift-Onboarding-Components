@@ -9,7 +9,7 @@ use itertools::Itertools;
 use newtypes::{
     output::Csv, CipKind, CollectedData as CD, CollectedDataOption as CDO, CollectedDataOptionKind as CDOK,
     DataIdentifierDiscriminant as DID, DocumentRequestConfig, EnhancedAmlOption, ObConfigurationKind,
-    TenantId,
+    TenantId, VerificationCheckKind,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -510,6 +510,30 @@ impl ObConfigurationArgsToValidate {
     }
 
     pub(super) fn validate_checks(&self) -> ApiResult<()> {
+        let duplicates: Vec<VerificationCheckKind> = self
+            .verification_checks
+            .clone()
+            .into_iter()
+            .fold(HashMap::new(), |mut acc: HashMap<_, _>, check| {
+                *acc.entry(VerificationCheckKind::from(check)).or_insert(0) += 1;
+                acc
+            })
+            .into_iter()
+            .filter(|(_, count)| *count > 1)
+            .collect::<HashMap<VerificationCheckKind, i32>>()
+            .keys()
+            .cloned()
+            .collect();
+
+        if !duplicates.is_empty() {
+            return Err(TenantError::ValidationError(format!(
+                "Duplicate verification_checks defined: {0}",
+                Csv(duplicates.iter().map(|d| d.to_string()).collect())
+            ))
+            .into());
+        }
+
+
         self.verification_checks
             .iter()
             .try_for_each(|c| -> ApiResult<()> {

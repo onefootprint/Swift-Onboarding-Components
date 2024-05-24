@@ -22,7 +22,7 @@ use crate::AdverseMediaListKind;
 #[strum_discriminants(
     name(VerificationCheckKind),
     vis(pub),
-    derive(strum_macros::EnumString, strum_macros::Display),
+    derive(strum_macros::EnumString, strum_macros::Display, Hash),
     strum(serialize_all = "snake_case")
 )]
 #[serde(rename_all = "snake_case")]

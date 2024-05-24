@@ -12,8 +12,7 @@ use newtypes::{
     DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo,
     DocumentRequestConfig, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, Locked,
     ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
-    SupportedDocumentAndCountryMappingForBifrost, TenantId, VerificationCheck, VerificationCheckKind,
-    WorkflowId,
+    SupportedDocumentAndCountryMappingForBifrost, TenantId, VerificationCheck, WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -380,15 +379,12 @@ pub fn get_verification_checks_for_legacy_compat(
 
     // Frontend will start sending KYB checks first, so if we receive one, take that
     if let Some(api_checks) = verification_checks_from_api_req {
-        if let Some(c) = api_checks
-            .into_iter()
-            .find(|c| matches!(c.clone().into(), VerificationCheckKind::Kyb))
-        {
-            checks.push(c.clone());
-        };
+        api_checks.into_iter().for_each(|c| {
+            checks.push(c);
+        });
     }
 
-    checks.into_iter().unique().collect()
+    checks.into_iter().collect()
 }
 
 #[derive(Debug, derive_more::From)]

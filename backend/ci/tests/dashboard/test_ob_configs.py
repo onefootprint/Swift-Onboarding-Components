@@ -642,6 +642,87 @@ def test_skip_kyc(
 
 
 @pytest.mark.parametrize(
+    "collected_data,kind,checks,expected_error",
+    [
+       (
+           [
+                "business_name",
+                "business_tin",
+                "business_address",
+                "business_phone_number",
+                "business_website",
+                "business_beneficial_owners",
+                "name",
+            ], 
+            "kyb", 
+            [{"kind": "kyb", "data": {"ein_only": False}}], 
+            None
+        ),
+        (
+           [
+                "business_name",
+                "business_tin",
+                "business_address",
+                "business_phone_number",
+                "business_website",
+                "business_beneficial_owners",
+                "name",
+            ], 
+            "kyb", 
+            [{"kind": "kyb", "data": {"ein_only": False}}, {"kind": "kyb", "data": {"ein_only": True}}], 
+            "Validation error: Duplicate verification_checks defined: kyb"
+        ),
+         (
+           [
+                "name",
+                "full_address",
+                "phone_number",
+                "email",
+                "document.drivers_license.us_only.require_selfie",
+            ],
+            "kyc", 
+            [{"kind": "kyb", "data": {"ein_only": False}}], 
+            "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks"
+        ),
+        (
+           [
+                "name",
+                "full_address",
+                "phone_number",
+                "email",
+                "document.drivers_license.us_only.require_selfie",
+            ],
+            "kyc", 
+            [{"kind": "kyb", "data": {"ein_only": True}}], 
+            "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks"
+        ),
+    ], 
+)
+def test_verification_checks(
+    sandbox_tenant, collected_data, kind, checks, expected_error
+):
+    data = dict(
+        name="skip kyc",
+        must_collect_data=collected_data,
+        can_access_data=collected_data,
+        kind=kind,
+        verification_checks=checks
+    )
+    res = post(
+        "org/onboarding_configs",
+        data,
+        *sandbox_tenant.db_auths,
+        status_code=200 if expected_error is None else 400,
+    )
+
+    if expected_error:
+        assert res["error"]["message"] == expected_error
+    else:
+        for c in checks:
+            assert c in res['verification_checks']
+
+
+@pytest.mark.parametrize(
     "enhanced_aml,expected_error",
     [
         (
