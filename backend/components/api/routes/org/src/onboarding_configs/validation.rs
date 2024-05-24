@@ -9,7 +9,7 @@ use itertools::Itertools;
 use newtypes::{
     output::Csv, CipKind, CollectedData as CD, CollectedDataOption as CDO, CollectedDataOptionKind as CDOK,
     DataIdentifierDiscriminant as DID, DocumentRequestConfig, EnhancedAmlOption, ObConfigurationKind,
-    TenantId, VerificationCheckKind,
+    TenantId, VerificationCheck, VerificationCheckKind,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -249,7 +249,7 @@ impl ObConfigurationArgsToValidate {
         // Check for required fields based on playbook kind
         let required_fields = match self.kind {
             ObConfigurationKind::Auth => vec![CDOK::Email, CDOK::PhoneNumber],
-            ObConfigurationKind::Kyb => vec![CDOK::BusinessName, CDOK::BusinessAddress],
+            ObConfigurationKind::Kyb => vec![CDOK::BusinessName],
             ObConfigurationKind::Kyc => {
                 if self.is_no_phone_flow {
                     vec![CDOK::Name, CDOK::FullAddress, CDOK::Email]
@@ -533,7 +533,7 @@ impl ObConfigurationArgsToValidate {
             .into());
         }
 
-
+        // validate against kind
         self.verification_checks
             .iter()
             .try_for_each(|c| -> ApiResult<()> {
@@ -552,6 +552,48 @@ impl ObConfigurationArgsToValidate {
                 }
             })?;
 
+
+        // validate against collected data
+        self.verification_checks
+            .iter()
+            .try_for_each(|c| -> ApiResult<()> {
+                self.validate_verification_check_collected_data(c.clone())?;
+
+                Ok(())
+            })?;
+
+
         Ok(())
+    }
+
+    fn validate_verification_check_collected_data(
+        &self,
+        verification_check: VerificationCheck,
+    ) -> ApiResult<()> {
+        match verification_check {
+            VerificationCheck::Kyb { ein_only } => {
+                let required_fields = if ein_only {
+                    vec![CDOK::BusinessName, CDOK::BusinessTin]
+                } else {
+                    vec![CDOK::BusinessName, CDOK::BusinessAddress] // this is what we do for validating OBCKind, idk why
+                };
+                let missing_required_fields: Vec<_> = required_fields
+                    .into_iter()
+                    .filter(|x| !self.must_collect_data.iter().map(CDOK::from).contains(x))
+                    .collect();
+                if !missing_required_fields.is_empty() {
+                    Err(TenantError::ValidationError(format!(
+                        "Playbook performing `kyb` verification_check with ein_only={} must collect: {}",
+                        ein_only,
+                        Csv(missing_required_fields)
+                    ))
+                    .into())
+                } else {
+                    Ok(())
+                }
+            }
+            // TODO
+            _ => Ok(()),
+        }
     }
 }

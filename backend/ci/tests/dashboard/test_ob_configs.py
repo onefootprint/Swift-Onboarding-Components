@@ -672,7 +672,32 @@ def test_skip_kyc(
             [{"kind": "kyb", "data": {"ein_only": False}}, {"kind": "kyb", "data": {"ein_only": True}}], 
             "Validation error: Duplicate verification_checks defined: kyb"
         ),
-         (
+        (
+           [
+                "business_name",
+                "business_phone_number",
+                "business_website",
+                "business_beneficial_owners",
+                "name",
+            ], 
+            "kyb", 
+            [{"kind": "kyb", "data": {"ein_only": True}}], 
+            "Validation error: Playbook performing `kyb` verification_check with ein_only=true must collect: business_tin"
+        ),
+        (
+           [
+                "business_name",
+                "business_tin",
+                "business_phone_number",
+                "business_website",
+                "business_beneficial_owners",
+                "name",
+            ], 
+            "kyb", 
+            [{"kind": "kyb", "data": {"ein_only": False}}], 
+            "Validation error: Playbook performing `kyb` verification_check with ein_only=false must collect: business_address"
+        ),
+        (
            [
                 "name",
                 "full_address",
