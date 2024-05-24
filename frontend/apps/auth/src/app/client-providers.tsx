@@ -1,12 +1,10 @@
 'use client';
 
 import { AppearanceProvider } from '@onefootprint/appearance';
-import { LoggerDeprecated } from '@onefootprint/idv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 import configureI18n from '@/src/config/initializers/18next';
-import { useEffectOnceStrict } from '@/src/hooks';
 import FootprintProvider from '@/src/provider-footprint';
 import configureFootprint from '@/src/provider-footprint/adapters';
 
@@ -46,26 +44,16 @@ const overrideThemeBackground = (theme: Theme) => {
   return theme;
 };
 
-try {
-  LoggerDeprecated.setupSentry();
-} catch (e) {
-  console.error(e);
-}
-
-const ClientProviders = ({ loadedStyle, children }: ClientProvidersProps) => {
-  useEffectOnceStrict(() => LoggerDeprecated.setupLogRocket('auth'));
-
-  return (
-    <AppearanceProvider
-      appearance={loadedStyle.appearance || {}}
-      rules={loadedStyle.rules || ''}
-      theme={overrideThemeBackground(loadedStyle.theme) as NonNullable<Theme>}
-    >
-      <QueryClientProvider client={queryClient}>
-        <FootprintProvider client={fpClient}>{children}</FootprintProvider>
-      </QueryClientProvider>
-    </AppearanceProvider>
-  );
-};
+const ClientProviders = ({ loadedStyle, children }: ClientProvidersProps) => (
+  <AppearanceProvider
+    appearance={loadedStyle.appearance || {}}
+    rules={loadedStyle.rules || ''}
+    theme={overrideThemeBackground(loadedStyle.theme) as NonNullable<Theme>}
+  >
+    <QueryClientProvider client={queryClient}>
+      <FootprintProvider client={fpClient}>{children}</FootprintProvider>
+    </QueryClientProvider>
+  </AppearanceProvider>
+);
 
 export default ClientProviders;

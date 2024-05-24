@@ -5,7 +5,7 @@ import {
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import type { DeviceInfo } from '@onefootprint/idv';
-import { isAuth, LoggerDeprecated, useDeviceInfo } from '@onefootprint/idv';
+import { isAuth, useDeviceInfo } from '@onefootprint/idv';
 import type { DoneArgs } from '@onefootprint/idv/src/components/identify';
 import {
   Identify,
@@ -68,10 +68,6 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
     (authProps, authConfig) => {
       setProps(authProps);
       setConfig(authConfig);
-      if (authConfig) {
-        const { orgName, orgId, key } = authConfig;
-        LoggerDeprecated.identify({ orgName, orgId, publicKey: key });
-      }
 
       if (notification) return;
       if (!isAuth(authConfig?.kind)) {
