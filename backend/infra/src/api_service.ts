@@ -66,9 +66,9 @@ export async function CreateApiService(
     g.buckets,
     g.assetCdn,
     nitroService,
-    // Honeycomb
+    // OTEL attributes
     new Map([['component', 'api']]),
-    // Datadog
+    // Datadog agent tags (note that these don't seem to apply to traces).
     new Map([['service', `fpc-api`]]),
     '',
     ['api-server'],

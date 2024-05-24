@@ -32,14 +32,14 @@ export async function CreateScheduledTasks(
         g.buckets,
         g.assetCdn,
         nitroService,
-        // Honeycomb
+        // OTEL attributes
         new Map([
           ['component', 'cron'],
           ['cron.name', cronTask.name],
         ]),
-        // Datadog
+        // Datadog agent tags (note that these don't seem to apply to traces).
         new Map([
-          ['service', `cron-${cronTask.name}`],
+          ['service', 'cron'],
           ['cron', cronTask.name],
         ]),
         cronTask.name,

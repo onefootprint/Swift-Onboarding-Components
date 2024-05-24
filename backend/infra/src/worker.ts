@@ -30,12 +30,12 @@ export async function CreateWorkerTasks(
         g.buckets,
         g.assetCdn,
         nitroService,
-        // Honeycomb
+        // OTEL attributes
         new Map([
           ['component', 'worker'],
           ['worker.name', worker.name],
         ]),
-        // Datadog
+        // Datadog agent tags (note that these don't seem to apply to traces).
         new Map([
           ['service', `worker-${worker.name}`],
           ['worker', worker.name],
