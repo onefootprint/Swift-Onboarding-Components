@@ -3029,7 +3029,7 @@
               "doingBusinessAs": "Doing Business As (optional)",
               "business_beneficial_owners": "Beneficial owners",
               "business_address": "Registered business address",
-              "business_tin": "EIN"
+              "business_tin": "TIN (EIN)"
             }
           },
           "auth": {

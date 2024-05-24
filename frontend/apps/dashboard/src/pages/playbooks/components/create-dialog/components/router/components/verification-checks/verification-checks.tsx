@@ -43,13 +43,20 @@ const VerificationChecks = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.verification-checks',
   });
-  const canRunKyc = isKyb ? collectBO : !allowInternationalResident;
-  const showSkipKyc = !allowInternationalResident;
+
   const initialKybKind = getInitialKybKind(isKyb, businessInfo);
+  const canRunKyc = isKyb ? collectBO : !allowInternationalResident;
+  const canRunKyb = isKyb;
+
+  const showSkipKyc = !allowInternationalResident;
+  const showSkipKyb = isKyb;
 
   const form = useForm<VerificationChecksFormData>({
     defaultValues: {
+      runKyb: canRunKyb,
       kybKind: initialKybKind,
+
+      // TODO: Migrate to runKyc
       skipKyc: !canRunKyc,
       amlFormData: defaultAmlValues,
       kycOptionForBeneficialOwners:
@@ -87,7 +94,9 @@ const VerificationChecks = ({
           </Text>
         </Header>
         <Stack direction="column" gap={9} marginBottom={8}>
-          {isKyb && <KybChecks canRunFullKyb={initialKybKind === 'full'} />}
+          {showSkipKyb && (
+            <KybChecks canRunFullKyb={initialKybKind === 'full'} />
+          )}
           {showSkipKyc && (
             <KycCheck
               isKyb={isKyb}

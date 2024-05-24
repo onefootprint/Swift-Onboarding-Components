@@ -65,10 +65,11 @@ const Router = ({ onCreate }: RouterProps) => {
   const createPlaybook = (
     context: MachineContext,
     {
-      skipKyc: shouldSkipKyc,
       amlFormData: enhancedAml,
-      kycOptionForBeneficialOwners,
       kybKind,
+      kycOptionForBeneficialOwners,
+      runKyb,
+      skipKyc: shouldSkipKyc,
     }: VerificationChecksFormData,
   ) => {
     const { playbook, nameForm, residencyForm } = context;
@@ -100,7 +101,10 @@ const Router = ({ onCreate }: RouterProps) => {
       residencyForm,
       template: onboardingTemplate,
       verificationChecks: {
-        kyb: kybKind ? { kind: kybKind } : undefined,
+        kyb: {
+          skip: !runKyb,
+          kind: kybKind,
+        },
       },
       skipKyc: shouldSkipKyc,
       kycOptionForBeneficialOwners,

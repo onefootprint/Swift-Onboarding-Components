@@ -5,7 +5,7 @@ import React from 'react';
 import VerificationChecks from '.';
 import type { VerificationChecksProps } from './verification-checks';
 
-describe('VerificationChecks', () => {
+describe('<VerificationChecks />', () => {
   const renderAml = ({
     defaultAmlValues = {
       enhancedAml: false,
@@ -149,6 +149,132 @@ describe('VerificationChecks', () => {
       expect(allOwners).toBeChecked();
       expect(primaryOwners).not.toBeChecked();
     });
+
+    describe('aml checks', () => {
+      describe('when clicking on the "AML monitoring" option', () => {
+        it('should show the "AML monitoring" option', async () => {
+          renderAml({});
+
+          const aml = screen.getByRole('switch', {
+            name: 'Enhanced AML monitoring',
+          });
+          await userEvent.click(aml);
+
+          const ofac = screen.getByRole('checkbox', {
+            name: 'Office of Foreign Assets Control (OFAC)',
+          });
+          expect(ofac).toBeInTheDocument();
+
+          const pep = screen.getByRole('checkbox', {
+            name: 'Politically Exposed Person (PEP)',
+          });
+          expect(pep).toBeInTheDocument();
+
+          const adverseMedia = screen.getByRole('checkbox', {
+            name: 'Adverse media',
+          });
+          expect(adverseMedia).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when submitting the data', () => {
+      it('should call the onSubmit callback', async () => {
+        const onSubmit = jest.fn();
+        renderAml({ onSubmit, allowInternationalResident: true });
+
+        const aml = screen.getByRole('switch', {
+          name: 'Enhanced AML monitoring',
+        });
+        await userEvent.click(aml);
+
+        const ofac = screen.getByRole('checkbox', {
+          name: 'Office of Foreign Assets Control (OFAC)',
+        });
+        await userEvent.click(ofac);
+
+        const pep = screen.getByRole('checkbox', {
+          name: 'Politically Exposed Person (PEP)',
+        });
+        await userEvent.click(pep);
+
+        const adverseMedia = screen.getByRole('checkbox', {
+          name: 'Adverse media',
+        });
+        await userEvent.click(adverseMedia);
+
+        const submit = screen.getByRole('button', { name: 'Create Playbook' });
+        await userEvent.click(submit);
+
+        expect(onSubmit).toHaveBeenCalledWith({
+          skipKyc: true,
+          runKyb: false,
+          amlFormData: {
+            enhancedAml: true,
+            ofac: true,
+            pep: true,
+            adverseMedia: true,
+          },
+        });
+      });
+    });
+
+    describe('when it is loading', () => {
+      it('should show the loading state', () => {
+        renderAml({ isLoading: true });
+
+        const back = screen.getByRole('button', { name: 'Back' });
+        expect(back).toBeDisabled();
+
+        const submit = screen.getByRole('progressbar', { name: 'Loading...' });
+        expect(submit).toBeInTheDocument();
+      });
+    });
+
+    describe('when clicking on the back button', () => {
+      it('should call the onBack callback', async () => {
+        const onBack = jest.fn();
+        renderAml({ onBack });
+
+        const back = screen.getByRole('button', { name: 'Back' });
+        await userEvent.click(back);
+
+        expect(onBack).toHaveBeenCalled();
+      });
+    });
+
+    describe('when it has default data', () => {
+      it('should render the default data', () => {
+        renderAml({
+          defaultAmlValues: {
+            enhancedAml: true,
+            ofac: true,
+            pep: true,
+            adverseMedia: true,
+          },
+        });
+
+        const aml = screen.getByRole('switch', {
+          name: 'Enhanced AML monitoring',
+        });
+        expect(aml).toBeChecked();
+
+        const ofac = screen.getByRole('checkbox', {
+          name: 'Office of Foreign Assets Control (OFAC)',
+        });
+        expect(ofac).toBeChecked();
+
+        const pep = screen.getByRole('checkbox', {
+          name: 'Politically Exposed Person (PEP)',
+        });
+        expect(pep).toBeChecked();
+
+        const adverseMedia = screen.getByRole('checkbox', {
+          name: 'Adverse media',
+        });
+        expect(adverseMedia).toBeChecked();
+      });
+    });
   });
 
   describe('kyb checks', () => {
@@ -167,10 +293,20 @@ describe('VerificationChecks', () => {
 
         const title = screen.getByText('Know Your Business (KYB)');
         expect(title).toBeInTheDocument();
+
+        const fullCheck = screen.getByRole('radio', {
+          name: 'Full KYB',
+        });
+        expect(fullCheck).toBeInTheDocument();
+
+        const einOnly = screen.getByRole('radio', {
+          name: 'TIN (EIN) verification only',
+        });
+        expect(einOnly).toBeInTheDocument();
       });
 
-      describe('when it is not collection business address', () => {
-        it('should disable Full KYB option', () => {
+      describe('when clicking on the toggle "Run KYB"', () => {
+        it('should hide the KYB checks', async () => {
           renderAml({
             isKyb: true,
             businessInfo: {
@@ -184,10 +320,15 @@ describe('VerificationChecks', () => {
             },
           });
 
-          const fullKyb = screen.getByRole('radio', {
-            name: 'Full KYB',
+          const kybCheck = screen.getByRole('switch', {
+            name: 'Run KYB',
           });
-          expect(fullKyb).toBeDisabled();
+          await userEvent.click(kybCheck);
+
+          const runFull = screen.queryByRole('radio', {
+            name: 'Run full KYB',
+          });
+          expect(runFull).not.toBeInTheDocument();
         });
 
         it('should display a tooltip with the reason why the Full KYB option is disabled', async () => {
@@ -214,152 +355,49 @@ describe('VerificationChecks', () => {
           });
           expect(tooltip).toBeInTheDocument();
         });
-      });
 
-      it('should check the "EIN verificarion only"', () => {
-        renderAml({
-          isKyb: true,
-          businessInfo: {
-            [CollectedKybDataOption.address]: false,
-            [CollectedKybDataOption.beneficialOwners]: true,
-            [CollectedKybDataOption.corporationType]: false,
-            [CollectedKybDataOption.name]: false,
-            [CollectedKybDataOption.phoneNumber]: false,
-            [CollectedKybDataOption.tin]: false,
-            [CollectedKybDataOption.website]: false,
-          },
+        it('should check the "EIN verificarion only"', () => {
+          renderAml({
+            isKyb: true,
+            businessInfo: {
+              [CollectedKybDataOption.address]: false,
+              [CollectedKybDataOption.beneficialOwners]: true,
+              [CollectedKybDataOption.corporationType]: false,
+              [CollectedKybDataOption.name]: false,
+              [CollectedKybDataOption.phoneNumber]: false,
+              [CollectedKybDataOption.tin]: false,
+              [CollectedKybDataOption.website]: false,
+            },
+          });
+
+          const einOnly = screen.getByRole('radio', {
+            name: 'TIN (EIN) verification only',
+          });
+          expect(einOnly).toBeChecked();
         });
+      });
 
-        const einOption = screen.getByRole('radio', {
-          name: 'EIN verificarion only',
+      describe('when it is not collection business address', () => {
+        it('should disable Full KYB option', () => {
+          renderAml({
+            isKyb: true,
+            businessInfo: {
+              [CollectedKybDataOption.address]: false,
+              [CollectedKybDataOption.beneficialOwners]: true,
+              [CollectedKybDataOption.corporationType]: false,
+              [CollectedKybDataOption.name]: false,
+              [CollectedKybDataOption.phoneNumber]: false,
+              [CollectedKybDataOption.tin]: false,
+              [CollectedKybDataOption.website]: false,
+            },
+          });
+
+          const fullKyb = screen.getByRole('radio', {
+            name: 'Full KYB',
+          });
+          expect(fullKyb).toBeDisabled();
         });
-        expect(einOption).toBeChecked();
       });
-    });
-  });
-
-  describe('aml checks', () => {
-    describe('when clicking on the "AML monitoring" option', () => {
-      it('should show the "AML monitoring" option', async () => {
-        renderAml({});
-
-        const aml = screen.getByRole('switch', {
-          name: 'Enhanced AML monitoring',
-        });
-        await userEvent.click(aml);
-
-        const ofac = screen.getByRole('checkbox', {
-          name: 'Office of Foreign Assets Control (OFAC)',
-        });
-        expect(ofac).toBeInTheDocument();
-
-        const pep = screen.getByRole('checkbox', {
-          name: 'Politically Exposed Person (PEP)',
-        });
-        expect(pep).toBeInTheDocument();
-
-        const adverseMedia = screen.getByRole('checkbox', {
-          name: 'Adverse media',
-        });
-        expect(adverseMedia).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('when submitting the data', () => {
-    it('should call the onSubmit callback', async () => {
-      const onSubmit = jest.fn();
-      renderAml({ onSubmit, allowInternationalResident: true });
-
-      const aml = screen.getByRole('switch', {
-        name: 'Enhanced AML monitoring',
-      });
-      await userEvent.click(aml);
-
-      const ofac = screen.getByRole('checkbox', {
-        name: 'Office of Foreign Assets Control (OFAC)',
-      });
-      await userEvent.click(ofac);
-
-      const pep = screen.getByRole('checkbox', {
-        name: 'Politically Exposed Person (PEP)',
-      });
-      await userEvent.click(pep);
-
-      const adverseMedia = screen.getByRole('checkbox', {
-        name: 'Adverse media',
-      });
-      await userEvent.click(adverseMedia);
-
-      const submit = screen.getByRole('button', { name: 'Create Playbook' });
-      await userEvent.click(submit);
-
-      expect(onSubmit).toHaveBeenCalledWith({
-        skipKyc: true,
-        amlFormData: {
-          enhancedAml: true,
-          ofac: true,
-          pep: true,
-          adverseMedia: true,
-        },
-      });
-    });
-  });
-
-  describe('when it is loading', () => {
-    it('should show the loading state', () => {
-      renderAml({ isLoading: true });
-
-      const back = screen.getByRole('button', { name: 'Back' });
-      expect(back).toBeDisabled();
-
-      const submit = screen.getByRole('progressbar', { name: 'Loading...' });
-      expect(submit).toBeInTheDocument();
-    });
-  });
-
-  describe('when clicking on the back button', () => {
-    it('should call the onBack callback', async () => {
-      const onBack = jest.fn();
-      renderAml({ onBack });
-
-      const back = screen.getByRole('button', { name: 'Back' });
-      await userEvent.click(back);
-
-      expect(onBack).toHaveBeenCalled();
-    });
-  });
-
-  describe('when it has default data', () => {
-    it('should render the default data', () => {
-      renderAml({
-        defaultAmlValues: {
-          enhancedAml: true,
-          ofac: true,
-          pep: true,
-          adverseMedia: true,
-        },
-      });
-
-      const aml = screen.getByRole('switch', {
-        name: 'Enhanced AML monitoring',
-      });
-      expect(aml).toBeChecked();
-
-      const ofac = screen.getByRole('checkbox', {
-        name: 'Office of Foreign Assets Control (OFAC)',
-      });
-      expect(ofac).toBeChecked();
-
-      const pep = screen.getByRole('checkbox', {
-        name: 'Politically Exposed Person (PEP)',
-      });
-      expect(pep).toBeChecked();
-
-      const adverseMedia = screen.getByRole('checkbox', {
-        name: 'Adverse media',
-      });
-      expect(adverseMedia).toBeChecked();
     });
   });
 });

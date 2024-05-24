@@ -30,7 +30,8 @@ type ProcessPlaybookProps = {
   kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
   verificationChecks: {
     kyb?: {
-      kind: KybChecksKind;
+      skip: boolean;
+      kind?: KybChecksKind;
     };
   };
 };
@@ -192,7 +193,7 @@ const processPlaybook = ({
     skipKyc: shouldSkipKyc,
     docScanForOptionalSsn,
     documentTypesAndCountries,
-    verificationChecks: getVerificationChecks({ verificationChecks, kind }),
+    verificationChecks: getVerificationChecks({ kind, verificationChecks }),
     ...getResidency(residencyForm),
     cipKind: template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
   };
@@ -205,16 +206,20 @@ const getVerificationChecks = ({
   kind: PlaybookKind;
   verificationChecks: {
     kyb?: {
-      kind: KybChecksKind;
+      skip: boolean;
+      kind?: KybChecksKind;
     };
   };
 }) => {
-  if (kind === PlaybookKind.Kyb && verificationChecks.kyb) {
+  if (kind === PlaybookKind.Kyb) {
+    if (!verificationChecks.kyb || verificationChecks.kyb.skip) {
+      return [];
+    }
     return [
       {
         kind: 'kyb',
         data: {
-          einOnly: verificationChecks.kyb.kind === 'ein',
+          einOnly: verificationChecks.kyb?.kind === 'ein',
         },
       },
     ];

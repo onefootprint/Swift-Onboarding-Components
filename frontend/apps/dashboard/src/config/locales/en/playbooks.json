@@ -47,13 +47,17 @@
   "create": {
     "kyb-checks": {
       "title": "Know Your Business (KYB)",
+      "toggle": {
+        "label": "Run KYB",
+        "description": "If not enabled, we'll only collect the data and won't do any verification checks."
+      },
       "full": {
         "label": "Full KYB",
         "disabled": "Running full KYB requires you to collect Business name, Business address and EIN, at least."
       },
       "ein": {
-        "label": "EIN verificarion only",
-        "description": "We'll only verify EIN and business name."
+        "label": "TIN (EIN) verification only",
+        "description": "We'll only verify TIN (EIN) and business name."
       }
     }
   }

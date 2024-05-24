@@ -1,6 +1,14 @@
-import { Radio, Stack, Text, Tooltip } from '@onefootprint/ui';
+import {
+  Box,
+  Divider,
+  Radio,
+  Stack,
+  Text,
+  Toggle,
+  Tooltip,
+} from '@onefootprint/ui';
 import React from 'react';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { type VerificationChecksFormData } from 'src/pages/playbooks/utils/machine/types';
 
@@ -10,30 +18,52 @@ export type KybChecksProps = {
 
 const KybChecks = ({ canRunFullKyb }: KybChecksProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.kyb-checks' });
-  const { register } = useFormContext<VerificationChecksFormData>();
+  const { register, watch, control } =
+    useFormContext<VerificationChecksFormData>();
+  const showKind = Boolean(watch('runKyb'));
 
   return (
-    <Stack gap={5} direction="column">
-      <Text variant="label-2" color="secondary">
+    <Box>
+      <Text variant="label-2" color="secondary" marginBottom={5}>
         {t('title')}
       </Text>
-      <Stack gap={4} direction="column">
-        <Tooltip disabled={canRunFullKyb} text={t('full.disabled')}>
-          <Radio
-            disabled={!canRunFullKyb}
-            label={t('full.label')}
-            value="full"
-            {...register('kybKind')}
+      <Controller
+        control={control}
+        name="runKyb"
+        render={({ field }) => (
+          <Toggle
+            onBlur={field.onBlur}
+            onChange={nextValue => {
+              field.onChange(nextValue);
+            }}
+            checked={field.value}
+            hint={t('toggle.description')}
+            label={t('toggle.label')}
           />
-        </Tooltip>
-        <Radio
-          hint={t('ein.description')}
-          label={t('ein.label')}
-          value="ein"
-          {...register('kybKind')}
-        />
-      </Stack>
-    </Stack>
+        )}
+      />
+      {showKind && (
+        <Box>
+          <Divider variant="secondary" marginBottom={5} marginTop={5} />
+          <Stack gap={4} direction="column">
+            <Tooltip disabled={canRunFullKyb} text={t('full.disabled')}>
+              <Radio
+                disabled={!canRunFullKyb}
+                label={t('full.label')}
+                value="full"
+                {...register('kybKind')}
+              />
+            </Tooltip>
+            <Radio
+              hint={t('ein.description')}
+              label={t('ein.label')}
+              value="ein"
+              {...register('kybKind')}
+            />
+          </Stack>
+        </Box>
+      )}
+    </Box>
   );
 };
 

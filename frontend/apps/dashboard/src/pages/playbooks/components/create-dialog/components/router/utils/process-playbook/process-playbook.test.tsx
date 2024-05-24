@@ -594,6 +594,7 @@ describe('processPlaybook', () => {
         nameForm: defaultNameFormData,
         verificationChecks: {
           kyb: {
+            skip: false,
             kind: 'full',
           },
         },
@@ -616,6 +617,7 @@ describe('processPlaybook', () => {
         nameForm: defaultNameFormData,
         verificationChecks: {
           kyb: {
+            skip: false,
             kind: 'full',
           },
         },
@@ -641,6 +643,7 @@ describe('processPlaybook', () => {
         nameForm: defaultNameFormData,
         verificationChecks: {
           kyb: {
+            skip: false,
             kind: 'full',
           },
         },
@@ -662,6 +665,7 @@ describe('processPlaybook', () => {
         nameForm: defaultNameFormData,
         verificationChecks: {
           kyb: {
+            skip: false,
             kind: 'full',
           },
         },
@@ -685,6 +689,7 @@ describe('processPlaybook', () => {
         nameForm: defaultNameFormData,
         verificationChecks: {
           kyb: {
+            skip: false,
             kind: 'full',
           },
         },
@@ -706,6 +711,7 @@ describe('processPlaybook', () => {
         nameForm: defaultNameFormData,
         verificationChecks: {
           kyb: {
+            skip: false,
             kind: 'full',
           },
         },
@@ -727,6 +733,7 @@ describe('processPlaybook', () => {
         nameForm: defaultNameFormData,
         verificationChecks: {
           kyb: {
+            skip: false,
             kind: 'full',
           },
         },
@@ -748,6 +755,7 @@ describe('processPlaybook', () => {
         nameForm: defaultNameFormData,
         verificationChecks: {
           kyb: {
+            skip: false,
             kind: 'full',
           },
         },
@@ -773,6 +781,7 @@ describe('processPlaybook', () => {
             nameForm: defaultNameFormData,
             verificationChecks: {
               kyb: {
+                skip: false,
                 kind: 'full',
               },
             },
@@ -802,6 +811,7 @@ describe('processPlaybook', () => {
             nameForm: defaultNameFormData,
             verificationChecks: {
               kyb: {
+                skip: false,
                 kind: 'ein',
               },
             },

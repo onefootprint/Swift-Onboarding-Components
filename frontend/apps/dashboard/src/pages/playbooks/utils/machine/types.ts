@@ -99,6 +99,7 @@ export type VerificationChecksFormData = {
   amlFormData: AMLFormData;
   kybKind?: KybChecksKind;
   kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
+  runKyb?: boolean;
   skipKyc?: boolean;
 };
 
