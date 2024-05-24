@@ -12,7 +12,7 @@ use newtypes::{
     DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo,
     DocumentRequestConfig, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, Locked,
     ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
-    SupportedDocumentAndCountryMappingForBifrost, TenantId, WorkflowId,
+    SupportedDocumentAndCountryMappingForBifrost, TenantId, VerificationCheck, WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -64,6 +64,8 @@ pub struct ObConfiguration {
     /// to this field in the future.
     #[diesel(deserialize_as = OptionalNonNullVec<DocumentRequestConfig>)]
     pub documents_to_collect: Option<Vec<DocumentRequestConfig>>,
+    #[diesel(deserialize_as = OptionalNonNullVec<VerificationCheck>)]
+    pub verification_checks: Option<Vec<VerificationCheck>>,
 }
 
 impl ObConfiguration {

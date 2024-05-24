@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN verification_checks JSONB[];

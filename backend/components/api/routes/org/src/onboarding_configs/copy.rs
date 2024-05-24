@@ -180,6 +180,7 @@ fn copy_playbook(
 
         // Maybe we should copy appearance one day. But it's not really used today.
         appearance_id: _,
+        verification_checks: _,
     } = pb;
 
     NewObConfigurationArgs {

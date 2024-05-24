@@ -85,6 +85,7 @@ fn test_ob_config_international_countries(
         document_types_and_countries: None,
         curp_validation_enabled: false,
         documents_to_collect: None,
+        verification_checks: None,
     };
 
     assert_have_same_elements(
@@ -132,6 +133,7 @@ fn obc_with_doc_cdo(
         document_types_and_countries: None,
         curp_validation_enabled: false,
         documents_to_collect: None,
+        verification_checks: None,
     }
 }
 
@@ -383,6 +385,7 @@ fn test_doc_scan_for_optional_ssn(cdo: Option<&str>) -> Option<Vec<IdDocKind>> {
         document_types_and_countries: None,
         curp_validation_enabled: false,
         documents_to_collect: None,
+        verification_checks: None,
     };
 
     obc.optional_ssn_restricted_id_doc_kinds()
@@ -427,6 +430,7 @@ fn test_cip_kind_documents(cip: Option<CipKind>, residential_country: Option<Iso
         document_types_and_countries: None,
         curp_validation_enabled: false,
         documents_to_collect: None,
+        verification_checks: None,
     };
 
     let mapping = obc.supported_country_mapping_for_document(residential_country).0;
@@ -508,6 +512,7 @@ fn test_document_types_and_countries() {
         document_types_and_countries: Some(doc_config),
         curp_validation_enabled: false,
         documents_to_collect: None,
+        verification_checks: None,
     };
 
     let mapping = obc_with_supported_countries_set
@@ -563,6 +568,7 @@ fn test_document_and_countries_field_with_cip_kind() {
         document_types_and_countries: Some(doc_config),
         curp_validation_enabled: false,
         documents_to_collect: None,
+        verification_checks: None,
     };
 
     // Despite configuring document_types_and_countries on the OBC, we respect the alpaca overrides
