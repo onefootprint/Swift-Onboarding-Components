@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import Banner from '../../components/banner';
+import Banner from '../../../../components/banner';
 
 const BannerSection = () => {
   const { t } = useTranslation('common', {

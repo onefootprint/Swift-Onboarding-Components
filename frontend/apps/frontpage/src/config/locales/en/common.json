@@ -150,9 +150,9 @@
             }
           }
         },
-        "case-studies": {
-          "text": "Case studies",
-          "href": "/case-studies"
+        "customers": {
+          "text": "Customers",
+          "href": "/customers"
         },
         "pricing": {
           "text": "Pricing",
@@ -267,6 +267,10 @@
         "media": {
           "text": "Media",
           "href": "/media"
+        },
+        "customers": {
+          "text": "Customers",
+          "href": "/customers"
         }
       },
       "resources": {
@@ -314,6 +318,54 @@
     }
   },
   "pages": {
+    "customers": {
+      "html-title": "Footprint - Customers",
+      "hero": {
+        "title": "Meet our happy customers",
+        "subtitle": "Footprint powers many product teams, from ambitious startups to multi-national companies."
+      },
+      "other-customers": {
+        "title": "Trusted by the best teams",
+        "subtitle": "Empowering elite teams with efficient customer onboarding solutions"
+      },
+      "quptes": {
+        "apiture": {
+          "quote": "Based on experience vetting and partnering with many identity-based techs, partnering with Footprint has been a breath of fresh air. In my product, IDV is critical. I want the best security net possible, configurability, trust in a reliable partner, quick support whenever asked, and a commitment to staying ahead of the bad actors. Footprint is thinking outside the box and doing things other IDV providers should have thought about years ago. Proud to stand side by side with Footprint combatting fraud.",
+          "author": "Craig Pawling",
+          "role": "VP of Product",
+          "company": "Apiture"
+        },
+        "coba": {
+          "quote": "In an age of heightened compliance born from the importance of bank-direct relationships, Footprint’s Identity + Security suite was key in helping us smoothly onboard to our sponsor bank. They offer a world-class product with white-glove support.",
+          "author": "Joseph Saliba",
+          "role": "CEO",
+          "company": "Coba"
+        },
+        "flexcar": {
+          "quote": "I love how Footprint is able to onboard users while offloading the storage of PII. Weʼre able to access the data we need while leveraging Footprintʼs secure vaulting for the collection and storage.",
+          "author": "Michael Zambrano",
+          "role": "Executive Head of Risk",
+          "company": "Flexcar"
+        },
+        "findigs": {
+          "quote": "Footprint has been a significant improvement to our onboarding + fraud stack. It caught four new fraud cases in its first week live, and the app clip minimizes drop-off during document scanning.",
+          "author": "Anuj Desai",
+          "role": "Lead Product Manager",
+          "company": "Findigs"
+        },
+        "bloom": {
+          "quote": "Best integration experience since Stripe.",
+          "author": "Sam Yang",
+          "role": "Co-founder and CPO",
+          "company": "Bloom"
+        }
+      },
+      "banner": {
+        "title": "Ready to improve your onboarding experience?",
+        "primary-button": "Start for free",
+        "secondary-button": "Schedule a call"
+      }
+    },
     "industries": {
       "components": {
         "read-case-study": "Read case study"

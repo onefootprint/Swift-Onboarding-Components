@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import SectionTitle from '../../components/section-title';
+import SectionTitle from '../../../../components/desktop-share-post/section-title';
 import IllustrationGrid from './illustration-grid';
 
 const Control = () => {

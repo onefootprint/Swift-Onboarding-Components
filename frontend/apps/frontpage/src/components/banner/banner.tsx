@@ -29,7 +29,6 @@ const Banner = ({ title }: BannerProps) => {
     <>
       <BannerContainer>
         <FishingPenguin />
-
         <TextContainer>
           {title}
           <ButtonContainer>

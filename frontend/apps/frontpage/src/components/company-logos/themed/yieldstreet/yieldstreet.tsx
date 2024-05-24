@@ -28,7 +28,7 @@ const ApitureLogo = ({ color }: ApitureLogoProps) => (
 );
 
 const StyledSvg = styled.svg`
-  height: 56px;
+  height: auto;
   width: 110px;
 `;
 

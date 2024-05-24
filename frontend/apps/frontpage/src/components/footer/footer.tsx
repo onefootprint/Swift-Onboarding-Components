@@ -81,6 +81,11 @@ const linkSections = [
         textKey: 'company.media.text',
         hrefKey: 'company.media.href',
       },
+      {
+        name: 'customers',
+        textKey: 'company.customers.text',
+        hrefKey: 'company.customers.href',
+      },
     ],
   },
   {

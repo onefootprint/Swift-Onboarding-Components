@@ -17,7 +17,7 @@ const QuoteSection = () => {
           author={t('author')}
           role={t('role')}
           company={t('company')}
-          caseStudyLink="/customer-stories/flexcar"
+          caseStudyLink="/customers/flexcar"
           authorImage="/industries/customer-images/michael.png"
         />
       </SectionContainer>

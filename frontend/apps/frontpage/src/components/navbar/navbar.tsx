@@ -84,6 +84,7 @@ const Navbar = () => {
         },
       ],
     },
+    { text: t('entries.customers.text'), href: t('entries.customers.href') },
     { text: t('entries.pricing.text'), href: t('entries.pricing.href') },
     { text: t('entries.docs.text'), href: t('entries.docs.href') },
     {
