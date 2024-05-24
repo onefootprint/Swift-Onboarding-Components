@@ -1,16 +1,20 @@
-import { Button, Text } from '@onefootprint/ui';
+import { CollectedKybDataOption } from '@onefootprint/types';
+import { Button, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import {
-  type AMLFormData,
-  KycOptionsForBeneficialOwners,
-  type VerificationChecksFormData,
+import type {
+  AMLFormData,
+  BusinessInformation,
+  KybChecksKind,
+  VerificationChecksFormData,
 } from 'src/pages/playbooks/utils/machine/types';
+import { KycOptionsForBeneficialOwners } from 'src/pages/playbooks/utils/machine/types';
 import styled, { css } from 'styled-components';
 
 import Aml from './components/aml';
-import KycCheck from './components/kyc-check';
+import KybChecks from './components/kyb-checks';
+import KycCheck from './components/kyc-checks';
 
 export type VerificationChecksProps = {
   defaultAmlValues: AMLFormData;
@@ -21,6 +25,7 @@ export type VerificationChecksProps = {
   collectBO?: boolean;
   onBack: () => void;
   onSubmit: (formData: VerificationChecksFormData) => void;
+  businessInfo?: BusinessInformation;
 };
 
 const VerificationChecks = ({
@@ -28,10 +33,11 @@ const VerificationChecks = ({
   isLoading,
   requiresDoc,
   allowInternationalResident,
-  isKyb,
+  isKyb = false,
   collectBO,
   onBack,
   onSubmit,
+  businessInfo,
 }: VerificationChecksProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
@@ -39,35 +45,39 @@ const VerificationChecks = ({
   });
   const canRunKyc = isKyb ? collectBO : !allowInternationalResident;
   const showSkipKyc = !allowInternationalResident;
-  const formMethods = useForm<VerificationChecksFormData>({
+  const initialKybKind = getInitialKybKind(isKyb, businessInfo);
+
+  const form = useForm<VerificationChecksFormData>({
     defaultValues: {
+      kybKind: initialKybKind,
       skipKyc: !canRunKyc,
       amlFormData: defaultAmlValues,
       kycOptionForBeneficialOwners:
         isKyb && canRunKyc ? KycOptionsForBeneficialOwners.primary : undefined,
     },
   });
-  const { watch, handleSubmit } = formMethods;
+  const { watch } = form;
 
   const isAmlChecked = watch('amlFormData.enhancedAml');
   const ofac = watch('amlFormData.ofac');
   const pep = watch('amlFormData.pep');
   const adverseMedia = watch('amlFormData.adverseMedia');
+
   const isMissingSelection = !!isAmlChecked && !ofac && !pep && !adverseMedia;
   const [showError, setShowError] = useState(false);
-  const disableAml = isKyb && !collectBO;
+  const isAmlDisabled = isKyb && !collectBO;
 
-  const handleBeforeSubmit = (formData: VerificationChecksFormData) => {
+  const handleSubmit = (formData: VerificationChecksFormData) => {
     if (isMissingSelection) {
       setShowError(true);
-      return;
+    } else {
+      onSubmit(formData);
     }
-    onSubmit(formData);
   };
 
   return (
-    <FormProvider {...formMethods}>
-      <Form onSubmit={handleSubmit(handleBeforeSubmit)}>
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
         <Header>
           <Text variant="label-1" color="secondary">
             {t('title')}
@@ -76,14 +86,17 @@ const VerificationChecks = ({
             {t('subtitle')}
           </Text>
         </Header>
-        {showSkipKyc && (
-          <KycCheck
-            isKyb={isKyb}
-            collectBO={collectBO}
-            requiresDoc={requiresDoc}
-          />
-        )}
-        <Aml showError={showError} disabled={disableAml} />
+        <Stack direction="column" gap={9} marginBottom={8}>
+          {isKyb && <KybChecks canRunFullKyb={initialKybKind === 'full'} />}
+          {showSkipKyc && (
+            <KycCheck
+              isKyb={isKyb}
+              collectBO={collectBO}
+              requiresDoc={requiresDoc}
+            />
+          )}
+          <Aml showError={showError} disabled={isAmlDisabled} />
+        </Stack>
         <ButtonContainer>
           <Button variant="secondary" onClick={onBack} disabled={isLoading}>
             {allT('back')}
@@ -92,28 +105,31 @@ const VerificationChecks = ({
             {allT('pages.playbooks.create-button')}
           </Button>
         </ButtonContainer>
-      </Form>
+      </form>
     </FormProvider>
   );
 };
 
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[7]};
-  `};
-`;
+const getInitialKybKind = (
+  isKyb: boolean,
+  businessInfo?: BusinessInformation,
+): KybChecksKind | undefined => {
+  if (!isKyb || !businessInfo) {
+    return undefined;
+  }
+  return businessInfo[CollectedKybDataOption.address] ? 'full' : 'ein';
+};
 
-const Header = styled.div`
+const Header = styled.header`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[2]};
+    margin-bottom: ${theme.spacing[7]};
   `};
 `;
 
-const ButtonContainer = styled.div`
+const ButtonContainer = styled.footer`
   ${({ theme }) => css`
     display: flex;
     align-items: center;

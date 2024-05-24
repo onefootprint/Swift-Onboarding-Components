@@ -8,8 +8,8 @@ import {
 import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
   BusinessInformation,
+  KybChecksKind,
   NameFormData,
-  PlaybookKind,
   ResidencyFormData,
   SummaryFormData,
 } from '@/playbooks/utils/machine/types';
@@ -17,6 +17,7 @@ import {
   CountryRestriction,
   KycOptionsForBeneficialOwners,
   OnboardingTemplate,
+  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
@@ -27,11 +28,15 @@ type ProcessPlaybookProps = {
   template?: OnboardingTemplate;
   skipKyc?: boolean;
   kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
+  verificationChecks: {
+    kyb?: {
+      kind: KybChecksKind;
+    };
+  };
 };
 
 const getRequiredKybCollectFields = () => [
   CollectedKybDataOption.name,
-  CollectedKybDataOption.address,
   CollectedKybDataOption.tin,
 ];
 
@@ -47,6 +52,7 @@ const processPlaybook = ({
   nameForm,
   playbook,
   residencyForm,
+  verificationChecks,
   template,
   skipKyc,
   kycOptionForBeneficialOwners,
@@ -58,6 +64,7 @@ const processPlaybook = ({
 
   // KYB field handling;
   const optionalKYBFields = [
+    CollectedKybDataOption.address,
     CollectedKybDataOption.corporationType,
     CollectedKybDataOption.website,
     CollectedKybDataOption.phoneNumber,
@@ -92,13 +99,16 @@ const processPlaybook = ({
     isKyb(kind) &&
     !businessInformation?.[CollectedKybDataOption.beneficialOwners];
   if (omitBeneficialOwnersKycForKybPlaybook) {
-    return getNoBoKycOptions({
-      mustCollectData,
-      optionalData,
-      nameForm,
-      shouldSkipKyc,
-      residencyForm,
-    });
+    return {
+      ...getNoBoKycOptions({
+        mustCollectData,
+        optionalData,
+        nameForm,
+        shouldSkipKyc,
+        residencyForm,
+      }),
+      verificationChecks: getVerificationChecks({ verificationChecks, kind }),
+    };
   }
 
   const requiredKycFields = getRequiredKycCollectFields();
@@ -182,9 +192,34 @@ const processPlaybook = ({
     skipKyc: shouldSkipKyc,
     docScanForOptionalSsn,
     documentTypesAndCountries,
+    verificationChecks: getVerificationChecks({ verificationChecks, kind }),
     ...getResidency(residencyForm),
     cipKind: template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
   };
+};
+
+const getVerificationChecks = ({
+  verificationChecks,
+  kind,
+}: {
+  kind: PlaybookKind;
+  verificationChecks: {
+    kyb?: {
+      kind: KybChecksKind;
+    };
+  };
+}) => {
+  if (kind === PlaybookKind.Kyb && verificationChecks.kyb) {
+    return [
+      {
+        kind: 'kyb',
+        data: {
+          einOnly: verificationChecks.kyb.kind === 'ein',
+        },
+      },
+    ];
+  }
+  return null;
 };
 
 const getResidency = (residencyForm?: ResidencyFormData) => {

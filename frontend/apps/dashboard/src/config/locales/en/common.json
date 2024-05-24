@@ -3001,15 +3001,19 @@
               "business-information": "Editing business information",
               "legal-entity-type": {
                 "title": "Legal entity type",
-                "toggle": "Request users to provide their business legal entity type"
+                "label": "Request users to provide their business legal entity type"
               },
               "website": {
                 "title": "Website",
-                "toggle": "Request users to provide their business website"
+                "label": "Request users to provide their business website"
               },
               "phone-number": {
                 "title": "Phone number",
-                "toggle": "Request that users provide their business phone number"
+                "label": "Request that users provide their business phone number"
+              },
+              "address": {
+                "title": "Business address",
+                "label": "Request that users provide their business address"
               },
               "save": "Save",
               "cancel": "Cancel"
@@ -3082,7 +3086,7 @@
               "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable AML monitoring."
             }
           },
-          "kyc-check": {
+          "kyc-checks": {
             "title": "Know Your Customer (KYC)",
             "disabled-tooltip": {
               "must-collect-beneficial-owners": "You must collect beneficial owners' information to enable KYC checks.",

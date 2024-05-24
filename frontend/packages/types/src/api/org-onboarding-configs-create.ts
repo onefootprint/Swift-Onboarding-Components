@@ -1,6 +1,13 @@
-import type { OnboardingConfigKind } from '../data';
 import type { CollectedDataOption } from '../data/collected-data-option';
-import type { DocumentTypesAndCountries } from '../data/onboarding-config';
+import type {
+  DocumentTypesAndCountries,
+  OnboardingConfigKind,
+} from '../data/onboarding-config';
+
+type VerificationCheck = {
+  kind: string;
+  data: Record<string, unknown>;
+};
 
 export type OrgOnboardingConfigCreateRequest = {
   name: string;
@@ -28,6 +35,7 @@ export type OrgOnboardingConfigCreateRequest = {
   skipConfirm?: boolean;
   documentTypesAndCountries: DocumentTypesAndCountries;
   cipKind?: string;
+  verificationChecks: VerificationCheck[] | null;
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

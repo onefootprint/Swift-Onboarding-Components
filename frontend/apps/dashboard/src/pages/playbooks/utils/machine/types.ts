@@ -96,10 +96,13 @@ export const defaultResidencyFormDataCreditCard: ResidencyFormData = {
 };
 
 export type VerificationChecksFormData = {
-  skipKyc?: boolean;
-  kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
   amlFormData: AMLFormData;
+  kybKind?: KybChecksKind;
+  kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
+  skipKyc?: boolean;
 };
+
+export type KybChecksKind = 'full' | 'ein';
 
 export type AMLFormData = {
   enhancedAml: boolean;

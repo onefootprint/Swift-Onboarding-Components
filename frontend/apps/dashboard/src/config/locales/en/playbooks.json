@@ -43,5 +43,18 @@
       "cancel": "Cancel",
       "cta": "Copy to target"
     }
+  },
+  "create": {
+    "kyb-checks": {
+      "title": "Know Your Business (KYB)",
+      "full": {
+        "label": "Full KYB",
+        "disabled": "Running full KYB requires you to collect Business name, Business address and EIN, at least."
+      },
+      "ein": {
+        "label": "EIN verificarion only",
+        "description": "We'll only verify EIN and business name."
+      }
+    }
   }
 }

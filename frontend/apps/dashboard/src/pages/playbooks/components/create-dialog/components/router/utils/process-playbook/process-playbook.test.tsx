@@ -24,665 +24,795 @@ const setsEqual = (
 ): boolean => a.length === b.length && a.every(i => b.includes(i));
 
 describe('processPlaybook', () => {
-  it('should return required KYC fields in mustCollectData regardless of playbook values', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          [CollectedKycDataOption.email]: false,
-          [CollectedKycDataOption.phoneNumber]: false,
-          [CollectedKycDataOption.dob]: false,
-          [CollectedKycDataOption.address]: false,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain(CollectedKycDataOption.email);
-    expect(mustCollectData).toContain(CollectedKycDataOption.name);
-    expect(mustCollectData).toContain(CollectedKycDataOption.dob);
-    expect(mustCollectData).toContain(CollectedKycDataOption.address);
-  });
-
-  it('should return required KYB fields in mustCollectData regardless of playbook values', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.name]: false,
-          [CollectedKybDataOption.address]: false,
-          [CollectedKybDataOption.tin]: false,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain(CollectedKybDataOption.name);
-    expect(mustCollectData).toContain(CollectedKybDataOption.address);
-    expect(mustCollectData).toContain(CollectedKybDataOption.tin);
-  });
-
-  it('should not include any KYC fields in mustCollectData if KYB beneficial owners is not collected', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.beneficialOwners]: false,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.email);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.phoneNumber);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.name);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.dob);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.address);
-  });
-
-  it('should include full SSN in optional data but not mustCollectData if it is optional', () => {
-    const { mustCollectData, optionalData, canAccessData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          ssn: true,
-          ssnOptional: true,
-          ssnKind: CollectedKycDataOption.ssn9,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn9);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn4);
-    expect(optionalData).toContain(CollectedKycDataOption.ssn9);
-    expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
-    expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
-    expect(
-      setsEqual(canAccessData, mustCollectData.concat(optionalData)),
-    ).toBeTruthy();
-  });
-
-  it('should include SSN last 4 in optional data but not mustCollectData if it is optional', () => {
-    const { mustCollectData, optionalData, canAccessData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          ssn: true,
-          ssnOptional: true,
-          ssnKind: CollectedKycDataOption.ssn4,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn4);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn9);
-    expect(optionalData).toContain(CollectedKycDataOption.ssn4);
-    expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
-    expect(canAccessData).toContain(CollectedKycDataOption.ssn4);
-    expect(canAccessData).not.toContain(CollectedKycDataOption.ssn9);
-    expect(
-      setsEqual(canAccessData, mustCollectData.concat(optionalData)),
-    ).toBeTruthy();
-  });
-
-  it('should include full SSN in mustCollectData if required', () => {
-    const { mustCollectData, optionalData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          ssn: true,
-          ssnKind: CollectedKycDataOption.ssn9,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain(CollectedKycDataOption.ssn9);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn4);
-    expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
-    expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
-  });
-
-  it('should SSN last4 in mustCollectData if required', () => {
-    const { mustCollectData, optionalData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          ssn: true,
-          ssnKind: CollectedKycDataOption.ssn4,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain(CollectedKycDataOption.ssn4);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn9);
-    expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
-    expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
-  });
-
-  // tk - tests for ID doc and selfie which are still coming
-
-  it('should include investor profile in mustCollectData if required', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-        },
-        [CollectedInvestorProfileDataOption.investorProfile]: true,
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain(
-      CollectedInvestorProfileDataOption.investorProfile,
-    );
-  });
-
-  it('should include corporation type if required', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.corporationType]: true,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain(CollectedKybDataOption.corporationType);
-  });
-
-  it('should not include corporation type if not required', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.corporationType]: false,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).not.toContain(
-      CollectedKybDataOption.corporationType,
-    );
-  });
-
-  it('should include website type if required', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.website]: true,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain(CollectedKybDataOption.website);
-  });
-
-  it('should not include website type if not required', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.website]: false,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).not.toContain(CollectedKybDataOption.website);
-  });
-
-  it('should include phone number if required', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.phoneNumber]: true,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain(CollectedKybDataOption.phoneNumber);
-  });
-
-  it('should not include phone number if not required', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYB,
-        businessInformation: {
-          ...defaultBusinessInformation,
-          [CollectedKybDataOption.website]: false,
-        },
-      },
-      kind: PlaybookKind.Kyb,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).not.toContain(CollectedKybDataOption.phoneNumber);
-  });
-
-  it('should handle canAccessData as expected for default KYC values', () => {
-    const { canAccessData, mustCollectData } = processPlaybook({
-      playbook: defaultPlaybookValuesKYC,
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(canAccessData).toContain(CollectedKycDataOption.email);
-    expect(canAccessData).toContain(CollectedKycDataOption.phoneNumber);
-    expect(canAccessData).toContain(CollectedKycDataOption.name);
-    expect(canAccessData).toContain(CollectedKycDataOption.dob);
-    expect(canAccessData).toContain(CollectedKycDataOption.address);
-    expect(canAccessData).not.toContain(CollectedKycDataOption.ssn4);
-    expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
-    // tk document case
-    expect(canAccessData).not.toContain(
-      CollectedInvestorProfileDataOption.investorProfile,
-    );
-    expect(setsEqual(canAccessData, mustCollectData)).toBeTruthy();
-  });
-
-  it('should handle single id doc type correctly without selfie', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.passport],
-          selfie: false,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain('document');
-  });
-
-  it('should handle multiple id doc types correctly without selfie', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [
-            SupportedIdDocTypes.passport,
-            SupportedIdDocTypes.driversLicense,
-          ],
-          selfie: false,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain('document');
-  });
-
-  it('should handle single id doc type correctly with selfie', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.passport],
-          selfie: true,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain('document_and_selfie');
-  });
-
-  it('should handle multiple id doc types correctly with selfie', () => {
-    const { mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [
-            SupportedIdDocTypes.passport,
-            SupportedIdDocTypes.driversLicense,
-          ],
-          selfie: true,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-
-    expect(mustCollectData).toContain('document_and_selfie');
-  });
-
-  it('should process case where doc flow is first correctly', () => {
-    const { isDocFirstFlow } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [
-            SupportedIdDocTypes.passport,
-            SupportedIdDocTypes.driversLicense,
-          ],
-          idDocFirst: true,
-          selfie: true,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-    expect(isDocFirstFlow).toBe(true);
-  });
-
-  it('should process default case where doc flow is not specified correctly', () => {
-    const { isDocFirstFlow } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [
-            SupportedIdDocTypes.passport,
-            SupportedIdDocTypes.driversLicense,
-          ],
-          selfie: true,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-    expect(isDocFirstFlow).toBe(false);
-  });
-
-  it('should process case where doc flow is not first correctly', () => {
-    const { isDocFirstFlow } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          idDoc: true,
-          idDocKind: [
-            SupportedIdDocTypes.passport,
-            SupportedIdDocTypes.driversLicense,
-          ],
-          selfie: true,
-          idDocFirst: false,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-    expect(isDocFirstFlow).toBe(false);
-  });
-
-  it('in default case, should not be phone first flow flow', () => {
-    const { isNoPhoneFlow, mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-    expect(isNoPhoneFlow).toBe(false);
-    expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
-  });
-
-  it('should register as no phone flow if phone is toggled off', () => {
-    const { isNoPhoneFlow, mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          [CollectedKycDataOption.phoneNumber]: false,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-    expect(isNoPhoneFlow).toBe(true);
-    expect(mustCollectData).not.toContain(CollectedKycDataOption.phoneNumber);
-  });
-
-  it('should not register as no phone flow if phone is toggled on', () => {
-    const { isNoPhoneFlow, mustCollectData } = processPlaybook({
-      playbook: {
-        ...defaultPlaybookValuesKYC,
-        personal: {
-          ...defaultPlaybookValuesKYC.personal,
-          [CollectedKycDataOption.phoneNumber]: true,
-        },
-      },
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-    expect(isNoPhoneFlow).toBe(false);
-    expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
-  });
-
-  it('should include phone number and not submit isNoPhoneFlow for default case', () => {
-    const { isNoPhoneFlow, mustCollectData } = processPlaybook({
-      playbook: defaultPlaybookValuesKYC,
-      kind: PlaybookKind.Kyc,
-      nameForm: defaultNameFormData,
-    });
-    expect(isNoPhoneFlow).toBe(false);
-    expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
-  });
-
-  it('should correctly extract name', () => {
-    const { name } = processPlaybook({
-      playbook: defaultPlaybookValuesKYC,
-      kind: PlaybookKind.Kyc,
-      nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
-    });
-    expect(name).toBe('test name');
-  });
-
-  describe('residency', () => {
-    describe('when only "US residents" is selected', () => {
-      it('should generate the payload correctly', () => {
-        const {
-          allowUsResidents,
-          allowUsTerritories,
-          allowInternationalResidents,
-          internationalCountryRestrictions,
-        } = processPlaybook({
-          playbook: defaultPlaybookValuesKYC,
-          kind: PlaybookKind.Kyc,
-          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
-          residencyForm: {
-            allowUsResidents: true,
-            allowUsTerritories: false,
-            allowInternationalResidents: false,
+  describe('KYC', () => {
+    it('should return required KYC fields in mustCollectData regardless of playbook values', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            [CollectedKycDataOption.email]: false,
+            [CollectedKycDataOption.phoneNumber]: false,
+            [CollectedKycDataOption.dob]: false,
+            [CollectedKycDataOption.address]: false,
           },
-        });
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
 
-        expect(allowUsResidents).toBeTruthy();
-        expect(allowUsTerritories).toBeFalsy();
-        expect(allowInternationalResidents).toBeFalsy();
-        expect(internationalCountryRestrictions).toBeNull();
+      expect(mustCollectData).toContain(CollectedKycDataOption.email);
+      expect(mustCollectData).toContain(CollectedKycDataOption.name);
+      expect(mustCollectData).toContain(CollectedKycDataOption.dob);
+      expect(mustCollectData).toContain(CollectedKycDataOption.address);
+    });
+
+    it('should include full SSN in optional data but not mustCollectData if it is optional', () => {
+      const { mustCollectData, optionalData, canAccessData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            ssn: true,
+            ssnOptional: true,
+            ssnKind: CollectedKycDataOption.ssn9,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn9);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn4);
+      expect(optionalData).toContain(CollectedKycDataOption.ssn9);
+      expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
+      expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
+      expect(
+        setsEqual(canAccessData, mustCollectData.concat(optionalData)),
+      ).toBeTruthy();
+    });
+
+    it('should include SSN last 4 in optional data but not mustCollectData if it is optional', () => {
+      const { mustCollectData, optionalData, canAccessData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            ssn: true,
+            ssnOptional: true,
+            ssnKind: CollectedKycDataOption.ssn4,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn4);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn9);
+      expect(optionalData).toContain(CollectedKycDataOption.ssn4);
+      expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
+      expect(canAccessData).toContain(CollectedKycDataOption.ssn4);
+      expect(canAccessData).not.toContain(CollectedKycDataOption.ssn9);
+      expect(
+        setsEqual(canAccessData, mustCollectData.concat(optionalData)),
+      ).toBeTruthy();
+    });
+
+    it('should include full SSN in mustCollectData if required', () => {
+      const { mustCollectData, optionalData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            ssn: true,
+            ssnKind: CollectedKycDataOption.ssn9,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).toContain(CollectedKycDataOption.ssn9);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn4);
+      expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
+      expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
+    });
+
+    it('should SSN last4 in mustCollectData if required', () => {
+      const { mustCollectData, optionalData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            ssn: true,
+            ssnKind: CollectedKycDataOption.ssn4,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).toContain(CollectedKycDataOption.ssn4);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.ssn9);
+      expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
+      expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
+    });
+
+    it('should include investor profile in mustCollectData if required', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+          },
+          [CollectedInvestorProfileDataOption.investorProfile]: true,
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).toContain(
+        CollectedInvestorProfileDataOption.investorProfile,
+      );
+    });
+
+    it('should handle canAccessData as expected for default KYC values', () => {
+      const { canAccessData, mustCollectData } = processPlaybook({
+        playbook: defaultPlaybookValuesKYC,
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(canAccessData).toContain(CollectedKycDataOption.email);
+      expect(canAccessData).toContain(CollectedKycDataOption.phoneNumber);
+      expect(canAccessData).toContain(CollectedKycDataOption.name);
+      expect(canAccessData).toContain(CollectedKycDataOption.dob);
+      expect(canAccessData).toContain(CollectedKycDataOption.address);
+      expect(canAccessData).not.toContain(CollectedKycDataOption.ssn4);
+      expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
+      // tk document case
+      expect(canAccessData).not.toContain(
+        CollectedInvestorProfileDataOption.investorProfile,
+      );
+      expect(setsEqual(canAccessData, mustCollectData)).toBeTruthy();
+    });
+
+    it('should handle single id doc type correctly without selfie', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            idDoc: true,
+            idDocKind: [SupportedIdDocTypes.passport],
+            selfie: false,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).toContain('document');
+    });
+
+    it('should handle multiple id doc types correctly without selfie', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            idDoc: true,
+            idDocKind: [
+              SupportedIdDocTypes.passport,
+              SupportedIdDocTypes.driversLicense,
+            ],
+            selfie: false,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).toContain('document');
+    });
+
+    it('should handle single id doc type correctly with selfie', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            idDoc: true,
+            idDocKind: [SupportedIdDocTypes.passport],
+            selfie: true,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).toContain('document_and_selfie');
+    });
+
+    it('should handle multiple id doc types correctly with selfie', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            idDoc: true,
+            idDocKind: [
+              SupportedIdDocTypes.passport,
+              SupportedIdDocTypes.driversLicense,
+            ],
+            selfie: true,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(mustCollectData).toContain('document_and_selfie');
+    });
+
+    it('should process case where doc flow is first correctly', () => {
+      const { isDocFirstFlow } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            idDoc: true,
+            idDocKind: [
+              SupportedIdDocTypes.passport,
+              SupportedIdDocTypes.driversLicense,
+            ],
+            idDocFirst: true,
+            selfie: true,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(isDocFirstFlow).toBe(true);
+    });
+
+    it('should process default case where doc flow is not specified correctly', () => {
+      const { isDocFirstFlow } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            idDoc: true,
+            idDocKind: [
+              SupportedIdDocTypes.passport,
+              SupportedIdDocTypes.driversLicense,
+            ],
+            selfie: true,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(isDocFirstFlow).toBe(false);
+    });
+
+    it('should process case where doc flow is not first correctly', () => {
+      const { isDocFirstFlow } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            idDoc: true,
+            idDocKind: [
+              SupportedIdDocTypes.passport,
+              SupportedIdDocTypes.driversLicense,
+            ],
+            selfie: true,
+            idDocFirst: false,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(isDocFirstFlow).toBe(false);
+    });
+
+    it('in default case, should not be phone first flow flow', () => {
+      const { isNoPhoneFlow, mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+
+      expect(isNoPhoneFlow).toBe(false);
+      expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
+    });
+
+    it('should register as no phone flow if phone is toggled off', () => {
+      const { isNoPhoneFlow, mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            [CollectedKycDataOption.phoneNumber]: false,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+      expect(isNoPhoneFlow).toBe(true);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.phoneNumber);
+    });
+
+    it('should include phone number and not submit isNoPhoneFlow for default case', () => {
+      const { isNoPhoneFlow, mustCollectData } = processPlaybook({
+        playbook: defaultPlaybookValuesKYC,
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+      expect(isNoPhoneFlow).toBe(false);
+      expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
+    });
+
+    it('should not register as no phone flow if phone is toggled on', () => {
+      const { isNoPhoneFlow, mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYC,
+          personal: {
+            ...defaultPlaybookValuesKYC.personal,
+            [CollectedKycDataOption.phoneNumber]: true,
+          },
+        },
+        kind: PlaybookKind.Kyc,
+        nameForm: defaultNameFormData,
+        verificationChecks: {},
+      });
+      expect(isNoPhoneFlow).toBe(false);
+      expect(mustCollectData).toContain(CollectedKycDataOption.phoneNumber);
+    });
+
+    it('should correctly extract name', () => {
+      const { name } = processPlaybook({
+        playbook: defaultPlaybookValuesKYC,
+        kind: PlaybookKind.Kyc,
+        nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+        verificationChecks: {},
+      });
+      expect(name).toBe('test name');
+    });
+
+    describe('residency', () => {
+      describe('when only "US residents" is selected', () => {
+        it('should generate the payload correctly', () => {
+          const {
+            allowUsResidents,
+            allowUsTerritories,
+            allowInternationalResidents,
+            internationalCountryRestrictions,
+          } = processPlaybook({
+            playbook: defaultPlaybookValuesKYC,
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            residencyForm: {
+              allowUsResidents: true,
+              allowUsTerritories: false,
+              allowInternationalResidents: false,
+            },
+            verificationChecks: {},
+          });
+
+          expect(allowUsResidents).toBeTruthy();
+          expect(allowUsTerritories).toBeFalsy();
+          expect(allowInternationalResidents).toBeFalsy();
+          expect(internationalCountryRestrictions).toBeNull();
+        });
+      });
+
+      describe('when "US residents" and "US territories" is selected', () => {
+        it('should generate the payload correctly', () => {
+          const {
+            allowUsResidents,
+            allowUsTerritories,
+            allowInternationalResidents,
+            internationalCountryRestrictions,
+          } = processPlaybook({
+            playbook: defaultPlaybookValuesKYC,
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            residencyForm: {
+              allowUsResidents: true,
+              allowUsTerritories: true,
+              allowInternationalResidents: false,
+            },
+            verificationChecks: {},
+          });
+
+          expect(allowUsResidents).toBeTruthy();
+          expect(allowUsTerritories).toBeTruthy();
+          expect(allowInternationalResidents).toBeFalsy();
+          expect(internationalCountryRestrictions).toBeNull();
+        });
+      });
+
+      describe('when "US residents" and "International" are selected', () => {
+        it('should generate the payload correctly', () => {
+          const {
+            allowUsResidents,
+            allowUsTerritories,
+            allowInternationalResidents,
+            internationalCountryRestrictions,
+          } = processPlaybook({
+            playbook: defaultPlaybookValuesKYC,
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            residencyForm: {
+              allowUsResidents: true,
+              allowUsTerritories: false,
+              allowInternationalResidents: true,
+              restrictCountries: CountryRestriction.all,
+            },
+            verificationChecks: {},
+          });
+
+          expect(allowUsResidents).toBeTruthy();
+          expect(allowUsTerritories).toBeFalsy();
+          expect(allowInternationalResidents).toBeTruthy();
+          expect(internationalCountryRestrictions).toBeNull();
+        });
+      });
+
+      describe('when "US Residents", "International" and "Restrict onboarding to specific countries" is selected', () => {
+        it('should generate the payload correctly', () => {
+          const chile = COUNTRIES.find(
+            country => country.label === 'Chile',
+          ) as CountryRecord;
+
+          const {
+            allowUsResidents,
+            allowUsTerritories,
+            allowInternationalResidents,
+            internationalCountryRestrictions,
+          } = processPlaybook({
+            playbook: defaultPlaybookValuesKYC,
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            residencyForm: {
+              allowUsResidents: true,
+              allowUsTerritories: false,
+              allowInternationalResidents: true,
+              restrictCountries: CountryRestriction.restrict,
+              countryList: [chile],
+            },
+            verificationChecks: {},
+          });
+
+          expect(allowUsResidents).toBeTruthy();
+          expect(allowUsTerritories).toBeFalsy();
+          expect(allowInternationalResidents).toBe(true);
+          expect(internationalCountryRestrictions).toEqual(['CL']);
+        });
+      });
+
+      describe('when "US Residents" is unselected and "International" and is selected', () => {
+        it('should process restricted US-inclusive international config properly', () => {
+          const chile = COUNTRIES.find(
+            country => country.label === 'Chile',
+          ) as CountryRecord;
+
+          const {
+            allowUsResidents,
+            allowUsTerritories,
+            allowInternationalResidents,
+            internationalCountryRestrictions,
+          } = processPlaybook({
+            playbook: defaultPlaybookValuesKYC,
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            residencyForm: {
+              allowUsResidents: false,
+              allowUsTerritories: false,
+              allowInternationalResidents: true,
+              restrictCountries: CountryRestriction.restrict,
+              countryList: [chile],
+            },
+            verificationChecks: {},
+          });
+
+          expect(allowUsResidents).toBeFalsy();
+          expect(allowUsTerritories).toBeFalsy();
+          expect(allowInternationalResidents).toBeTruthy();
+          expect(internationalCountryRestrictions).toEqual(['CL']);
+        });
+      });
+
+      describe('when "All countries" and "Allow residentes from US" are selected', () => {
+        it('should set allowUsTerritories to false', () => {
+          const {
+            allowUsResidents,
+            allowUsTerritories,
+            allowInternationalResidents,
+            internationalCountryRestrictions,
+          } = processPlaybook({
+            playbook: defaultPlaybookValuesKYC,
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            residencyForm: {
+              allowUsResidents: true,
+              allowUsTerritories: false,
+              allowInternationalResidents: true,
+              restrictCountries: CountryRestriction.all,
+            },
+            verificationChecks: {},
+          });
+
+          expect(allowUsResidents).toBeTruthy();
+          expect(allowUsTerritories).toBeFalsy();
+          expect(allowInternationalResidents).toBeTruthy();
+          expect(internationalCountryRestrictions).toBeNull();
+        });
       });
     });
+  });
 
-    describe('when "US residents" and "US territories" is selected', () => {
-      it('should generate the payload correctly', () => {
-        const {
-          allowUsResidents,
-          allowUsTerritories,
-          allowInternationalResidents,
-          internationalCountryRestrictions,
-        } = processPlaybook({
-          playbook: defaultPlaybookValuesKYC,
-          kind: PlaybookKind.Kyc,
-          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
-          residencyForm: {
-            allowUsResidents: true,
-            allowUsTerritories: true,
-            allowInternationalResidents: false,
+  describe('KYB', () => {
+    it('should return required KYB fields in mustCollectData regardless of playbook values', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYB,
+          businessInformation: {
+            ...defaultBusinessInformation,
+            [CollectedKybDataOption.name]: false,
+            [CollectedKybDataOption.tin]: false,
           },
-        });
-
-        expect(allowUsResidents).toBeTruthy();
-        expect(allowUsTerritories).toBeTruthy();
-        expect(allowInternationalResidents).toBeFalsy();
-        expect(internationalCountryRestrictions).toBeNull();
+        },
+        kind: PlaybookKind.Kyb,
+        nameForm: defaultNameFormData,
+        verificationChecks: {
+          kyb: {
+            kind: 'full',
+          },
+        },
       });
+
+      expect(mustCollectData).toContain(CollectedKybDataOption.name);
+      expect(mustCollectData).toContain(CollectedKybDataOption.tin);
     });
 
-    describe('when "US residents" and "International" are selected', () => {
-      it('should generate the payload correctly', () => {
-        const {
-          allowUsResidents,
-          allowUsTerritories,
-          allowInternationalResidents,
-          internationalCountryRestrictions,
-        } = processPlaybook({
-          playbook: defaultPlaybookValuesKYC,
-          kind: PlaybookKind.Kyc,
-          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
-          residencyForm: {
-            allowUsResidents: true,
-            allowUsTerritories: false,
-            allowInternationalResidents: true,
-            restrictCountries: CountryRestriction.all,
+    it('should not include any KYC fields in mustCollectData if KYB beneficial owners is not collected', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYB,
+          businessInformation: {
+            ...defaultBusinessInformation,
+            [CollectedKybDataOption.beneficialOwners]: false,
           },
-        });
-        expect(allowUsResidents).toBeTruthy();
-        expect(allowUsTerritories).toBeFalsy();
-        expect(allowInternationalResidents).toBeTruthy();
-        expect(internationalCountryRestrictions).toBeNull();
+        },
+        kind: PlaybookKind.Kyb,
+        nameForm: defaultNameFormData,
+        verificationChecks: {
+          kyb: {
+            kind: 'full',
+          },
+        },
       });
+
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.email);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.phoneNumber);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.name);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.dob);
+      expect(mustCollectData).not.toContain(CollectedKycDataOption.address);
     });
 
-    describe('when "US Residents", "International" and "Restrict onboarding to specific countries" is selected', () => {
-      it('should generate the payload correctly', () => {
-        const chile = COUNTRIES.find(
-          country => country.label === 'Chile',
-        ) as CountryRecord;
-
-        const {
-          allowUsResidents,
-          allowUsTerritories,
-          allowInternationalResidents,
-          internationalCountryRestrictions,
-        } = processPlaybook({
-          playbook: defaultPlaybookValuesKYC,
-          kind: PlaybookKind.Kyc,
-          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
-          residencyForm: {
-            allowUsResidents: true,
-            allowUsTerritories: false,
-            allowInternationalResidents: true,
-            restrictCountries: CountryRestriction.restrict,
-            countryList: [chile],
+    it('should include corporation type if required', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYB,
+          businessInformation: {
+            ...defaultBusinessInformation,
+            [CollectedKybDataOption.corporationType]: true,
           },
-        });
-
-        expect(allowUsResidents).toBeTruthy();
-        expect(allowUsTerritories).toBeFalsy();
-        expect(allowInternationalResidents).toBe(true);
-        expect(internationalCountryRestrictions).toEqual(['CL']);
+        },
+        kind: PlaybookKind.Kyb,
+        nameForm: defaultNameFormData,
+        verificationChecks: {
+          kyb: {
+            kind: 'full',
+          },
+        },
       });
+
+      expect(mustCollectData).toContain(CollectedKybDataOption.corporationType);
     });
 
-    describe('when "US Residents" is unselected and "International" and is selected', () => {
-      it('should process restricted US-inclusive international config properly', () => {
-        const chile = COUNTRIES.find(
-          country => country.label === 'Chile',
-        ) as CountryRecord;
-
-        const {
-          allowUsResidents,
-          allowUsTerritories,
-          allowInternationalResidents,
-          internationalCountryRestrictions,
-        } = processPlaybook({
-          playbook: defaultPlaybookValuesKYC,
-          kind: PlaybookKind.Kyc,
-          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
-          residencyForm: {
-            allowUsResidents: false,
-            allowUsTerritories: false,
-            allowInternationalResidents: true,
-            restrictCountries: CountryRestriction.restrict,
-            countryList: [chile],
+    it('should not include corporation type if not required', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYB,
+          businessInformation: {
+            ...defaultBusinessInformation,
+            [CollectedKybDataOption.corporationType]: false,
           },
-        });
-
-        expect(allowUsResidents).toBeFalsy();
-        expect(allowUsTerritories).toBeFalsy();
-        expect(allowInternationalResidents).toBeTruthy();
-        expect(internationalCountryRestrictions).toEqual(['CL']);
+        },
+        kind: PlaybookKind.Kyb,
+        nameForm: defaultNameFormData,
+        verificationChecks: {
+          kyb: {
+            kind: 'full',
+          },
+        },
       });
+
+      expect(mustCollectData).not.toContain(
+        CollectedKybDataOption.corporationType,
+      );
     });
 
-    describe('when "All countries" and "Allow residentes from US" are selected', () => {
-      it('should set allowUsTerritories to false', () => {
-        const {
-          allowUsResidents,
-          allowUsTerritories,
-          allowInternationalResidents,
-          internationalCountryRestrictions,
-        } = processPlaybook({
-          playbook: defaultPlaybookValuesKYC,
-          kind: PlaybookKind.Kyc,
-          nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
-          residencyForm: {
-            allowUsResidents: true,
-            allowUsTerritories: false,
-            allowInternationalResidents: true,
-            restrictCountries: CountryRestriction.all,
+    it('should include website type if required', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYB,
+          businessInformation: {
+            ...defaultBusinessInformation,
+            [CollectedKybDataOption.website]: true,
           },
-        });
+        },
+        kind: PlaybookKind.Kyb,
+        nameForm: defaultNameFormData,
+        verificationChecks: {
+          kyb: {
+            kind: 'full',
+          },
+        },
+      });
 
-        expect(allowUsResidents).toBeTruthy();
-        expect(allowUsTerritories).toBeFalsy();
-        expect(allowInternationalResidents).toBeTruthy();
-        expect(internationalCountryRestrictions).toBeNull();
+      expect(mustCollectData).toContain(CollectedKybDataOption.website);
+    });
+
+    it('should not include website type if not required', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYB,
+          businessInformation: {
+            ...defaultBusinessInformation,
+            [CollectedKybDataOption.website]: false,
+          },
+        },
+        kind: PlaybookKind.Kyb,
+        nameForm: defaultNameFormData,
+        verificationChecks: {
+          kyb: {
+            kind: 'full',
+          },
+        },
+      });
+
+      expect(mustCollectData).not.toContain(CollectedKybDataOption.website);
+    });
+
+    it('should include phone number if required', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYB,
+          businessInformation: {
+            ...defaultBusinessInformation,
+            [CollectedKybDataOption.phoneNumber]: true,
+          },
+        },
+        kind: PlaybookKind.Kyb,
+        nameForm: defaultNameFormData,
+        verificationChecks: {
+          kyb: {
+            kind: 'full',
+          },
+        },
+      });
+
+      expect(mustCollectData).toContain(CollectedKybDataOption.phoneNumber);
+    });
+
+    it('should not include phone number if not required', () => {
+      const { mustCollectData } = processPlaybook({
+        playbook: {
+          ...defaultPlaybookValuesKYB,
+          businessInformation: {
+            ...defaultBusinessInformation,
+            [CollectedKybDataOption.website]: false,
+          },
+        },
+        kind: PlaybookKind.Kyb,
+        nameForm: defaultNameFormData,
+        verificationChecks: {
+          kyb: {
+            kind: 'full',
+          },
+        },
+      });
+
+      expect(mustCollectData).not.toContain(CollectedKybDataOption.phoneNumber);
+    });
+
+    describe('verification checks', () => {
+      describe('when the user selects to do a full KYB verification', () => {
+        it('should return einOnly == false in the verification checks object', () => {
+          const { verificationChecks } = processPlaybook({
+            playbook: {
+              ...defaultPlaybookValuesKYB,
+              businessInformation: {
+                ...defaultBusinessInformation,
+                [CollectedKybDataOption.name]: false,
+                [CollectedKybDataOption.address]: false,
+                [CollectedKybDataOption.tin]: false,
+              },
+            },
+            kind: PlaybookKind.Kyb,
+            nameForm: defaultNameFormData,
+            verificationChecks: {
+              kyb: {
+                kind: 'full',
+              },
+            },
+          });
+
+          const isFull = verificationChecks?.find(
+            ({ kind, data }) =>
+              kind === 'kyb' && data && data.einOnly === false,
+          );
+          expect(isFull).toBeTruthy();
+        });
+      });
+
+      describe('when the user selects to verify ein only', () => {
+        it('should return einOnly == true in the verification checks object', () => {
+          const { verificationChecks } = processPlaybook({
+            playbook: {
+              ...defaultPlaybookValuesKYB,
+              businessInformation: {
+                ...defaultBusinessInformation,
+                [CollectedKybDataOption.name]: false,
+                [CollectedKybDataOption.address]: false,
+                [CollectedKybDataOption.tin]: false,
+              },
+            },
+            kind: PlaybookKind.Kyb,
+            nameForm: defaultNameFormData,
+            verificationChecks: {
+              kyb: {
+                kind: 'ein',
+              },
+            },
+          });
+
+          const isEin = verificationChecks?.find(
+            ({ kind, data }) => kind === 'kyb' && data?.einOnly,
+          );
+
+          expect(isEin).toBeTruthy();
+        });
       });
     });
   });

@@ -30,6 +30,25 @@ const Editing = ({ onStopEditing }: EditingProps) => {
     <EditingContainer>
       <Section>
         <Text variant="label-2">{t('business-information')}</Text>
+        <Text variant="label-3">{t('address.title')}</Text>
+        <Controller
+          control={control}
+          name={`businessInformation.${CollectedKybDataOption.address}`}
+          render={({ field }) => (
+            <ToggleContainer>
+              <Toggle
+                onBlur={field.onBlur}
+                onChange={nextValue => {
+                  field.onChange(nextValue);
+                }}
+                checked={field.value}
+                label={t('address.label')}
+              />
+            </ToggleContainer>
+          )}
+        />
+      </Section>
+      <Section>
         <Text variant="label-3">{t('legal-entity-type.title')}</Text>
         <Controller
           control={control}
@@ -42,7 +61,7 @@ const Editing = ({ onStopEditing }: EditingProps) => {
                   field.onChange(nextValue);
                 }}
                 checked={field.value}
-                label={t('legal-entity-type.toggle')}
+                label={t('legal-entity-type.label')}
               />
             </ToggleContainer>
           )}
@@ -62,7 +81,7 @@ const Editing = ({ onStopEditing }: EditingProps) => {
                 }}
                 defaultChecked={false}
                 checked={field.value}
-                label={t('website.toggle')}
+                label={t('website.label')}
               />
             </ToggleContainer>
           )}
@@ -81,7 +100,7 @@ const Editing = ({ onStopEditing }: EditingProps) => {
                   field.onChange(nextValue);
                 }}
                 checked={field.value}
-                label={t('phone-number.toggle')}
+                label={t('phone-number.label')}
               />
             </ToggleContainer>
           )}

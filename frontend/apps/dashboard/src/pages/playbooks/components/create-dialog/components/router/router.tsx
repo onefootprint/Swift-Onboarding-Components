@@ -64,14 +64,14 @@ const Router = ({ onCreate }: RouterProps) => {
 
   const createPlaybook = (
     context: MachineContext,
-    verificationChecks: VerificationChecksFormData,
-  ) => {
-    const { playbook, nameForm, residencyForm } = context;
-    const {
+    {
       skipKyc: shouldSkipKyc,
       amlFormData: enhancedAml,
       kycOptionForBeneficialOwners,
-    } = verificationChecks;
+      kybKind,
+    }: VerificationChecksFormData,
+  ) => {
+    const { playbook, nameForm, residencyForm } = context;
     if (!playbook || !nameForm || !enhancedAml) {
       return;
     }
@@ -92,22 +92,29 @@ const Router = ({ onCreate }: RouterProps) => {
       documentTypesAndCountries,
       cipKind,
       skipKyc,
+      verificationChecks,
     } = processPlaybook({
       kind,
       nameForm,
       playbook,
       residencyForm,
       template: onboardingTemplate,
+      verificationChecks: {
+        kyb: kybKind ? { kind: kybKind } : undefined,
+      },
       skipKyc: shouldSkipKyc,
       kycOptionForBeneficialOwners,
     });
+
     mutation.mutate(
       {
         allowInternationalResidents,
         allowUsResidents,
         allowUsTerritories,
         canAccessData,
+        cipKind,
         docScanForOptionalSsn,
+        documentTypesAndCountries,
         enhancedAml,
         internationalCountryRestrictions,
         isDocFirstFlow,
@@ -116,10 +123,9 @@ const Router = ({ onCreate }: RouterProps) => {
         mustCollectData,
         name,
         optionalData,
-        skipKyc,
         skipConfirm,
-        documentTypesAndCountries,
-        cipKind,
+        skipKyc,
+        verificationChecks,
       },
       {
         onSuccess: () => {
@@ -307,6 +313,7 @@ const Router = ({ onCreate }: RouterProps) => {
               state.context.playbook?.businessInformation
                 ?.business_beneficial_owners
             }
+            businessInfo={state.context.playbook?.businessInformation}
           />
         )}
       </Content>

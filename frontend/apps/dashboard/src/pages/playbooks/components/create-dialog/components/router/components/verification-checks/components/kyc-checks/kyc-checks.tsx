@@ -1,4 +1,4 @@
-import { Divider, Radio, Text, Toggle, Tooltip } from '@onefootprint/ui';
+import { Divider, Radio, Stack, Text, Toggle, Tooltip } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -8,15 +8,15 @@ import {
 } from 'src/pages/playbooks/utils/machine/types';
 import styled, { css } from 'styled-components';
 
-type KycCheckProps = {
+type KycChecksProps = {
   isKyb?: boolean;
   collectBO?: boolean;
   requiresDoc?: boolean;
 };
 
-const KycCheck = ({ isKyb, collectBO, requiresDoc }: KycCheckProps) => {
+const KycChecks = ({ isKyb, collectBO, requiresDoc }: KycChecksProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.dialog.verification-checks.kyc-check',
+    keyPrefix: 'pages.playbooks.dialog.verification-checks.kyc-checks',
   });
   const { watch, setValue, register } =
     useFormContext<VerificationChecksFormData>();
@@ -56,18 +56,20 @@ const KycCheck = ({ isKyb, collectBO, requiresDoc }: KycCheckProps) => {
       </Tooltip>
       {isKybWithBo && shouldRunKyc && (
         <>
-          <Divider />
-          <Radio
-            label={t('bo-options.all-bos')}
-            value={KycOptionsForBeneficialOwners.all}
-            {...register('kycOptionForBeneficialOwners')}
-          />
-          <Radio
-            label={t('bo-options.only-primary-bo')}
-            hint={t('bo-options.only-primary-bo-hint')}
-            value={KycOptionsForBeneficialOwners.primary}
-            {...register('kycOptionForBeneficialOwners')}
-          />
+          <Divider variant="secondary" />
+          <Stack direction="column" gap={3}>
+            <Radio
+              label={t('bo-options.only-primary-bo')}
+              hint={t('bo-options.only-primary-bo-hint')}
+              value={KycOptionsForBeneficialOwners.primary}
+              {...register('kycOptionForBeneficialOwners')}
+            />
+            <Radio
+              label={t('bo-options.all-bos')}
+              value={KycOptionsForBeneficialOwners.all}
+              {...register('kycOptionForBeneficialOwners')}
+            />
+          </Stack>
         </>
       )}
     </Container>
@@ -82,4 +84,4 @@ const Container = styled.div`
   `}
 `;
 
-export default KycCheck;
+export default KycChecks;

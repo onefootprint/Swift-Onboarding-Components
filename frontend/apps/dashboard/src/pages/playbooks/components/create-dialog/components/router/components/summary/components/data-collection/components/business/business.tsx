@@ -27,7 +27,7 @@ const Container = styled.div`
     flex-direction: column;
     padding: ${theme.spacing[5]} ${theme.spacing[6]};
     gap: ${theme.spacing[5]};
-    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} dashed;
+    border: ${theme.borderColor.tertiary} ${theme.borderWidth[1]} solid;
     border-radius: ${theme.borderRadius.default};
   `}
 `;

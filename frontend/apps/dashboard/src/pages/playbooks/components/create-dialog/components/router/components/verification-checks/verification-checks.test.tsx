@@ -1,4 +1,5 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import { CollectedKybDataOption } from '@onefootprint/types';
 import React from 'react';
 
 import VerificationChecks from '.';
@@ -12,24 +13,34 @@ describe('VerificationChecks', () => {
       pep: false,
       adverseMedia: false,
     },
+    businessInfo = {
+      [CollectedKybDataOption.address]: true,
+      [CollectedKybDataOption.beneficialOwners]: true,
+      [CollectedKybDataOption.corporationType]: false,
+      [CollectedKybDataOption.name]: false,
+      [CollectedKybDataOption.phoneNumber]: false,
+      [CollectedKybDataOption.tin]: false,
+      [CollectedKybDataOption.website]: false,
+    },
+    allowInternationalResident = false,
+    collectBO = false,
+    isKyb = false,
     isLoading = false,
     onBack = jest.fn(),
     onSubmit = jest.fn(),
     requiresDoc = false,
-    allowInternationalResident = false,
-    isKyb = false,
-    collectBO = false,
   }: Partial<VerificationChecksProps>) => {
     customRender(
       <VerificationChecks
+        allowInternationalResident={allowInternationalResident}
+        businessInfo={businessInfo}
+        collectBO={collectBO}
         defaultAmlValues={defaultAmlValues}
+        isKyb={isKyb}
         isLoading={isLoading}
         onBack={onBack}
         onSubmit={onSubmit}
         requiresDoc={requiresDoc}
-        allowInternationalResident={allowInternationalResident}
-        isKyb={isKyb}
-        collectBO={collectBO}
       />,
     );
   };
@@ -65,7 +76,7 @@ describe('VerificationChecks', () => {
     });
   });
 
-  describe('kyc check', () => {
+  describe('kyc checks', () => {
     it('should show the "KYC check" option for KYC kind with requires doc', () => {
       renderAml({ requiresDoc: true });
 
@@ -140,29 +151,118 @@ describe('VerificationChecks', () => {
     });
   });
 
-  describe('when selecting "AML monitoring"', () => {
-    it('should show the "AML monitoring" option', async () => {
-      renderAml({});
+  describe('kyb checks', () => {
+    describe('when it is not KYB', () => {
+      it('should not show the KYB checks', () => {
+        renderAml({});
 
-      const aml = screen.getByRole('switch', {
-        name: 'Enhanced AML monitoring',
+        const title = screen.queryByText('Know Your Business (KYB)');
+        expect(title).not.toBeInTheDocument();
       });
-      await userEvent.click(aml);
+    });
 
-      const ofac = screen.getByRole('checkbox', {
-        name: 'Office of Foreign Assets Control (OFAC)',
-      });
-      expect(ofac).toBeInTheDocument();
+    describe('when it is KYB', () => {
+      it('should show the KYB checks', () => {
+        renderAml({ isKyb: true });
 
-      const pep = screen.getByRole('checkbox', {
-        name: 'Politically Exposed Person (PEP)',
+        const title = screen.getByText('Know Your Business (KYB)');
+        expect(title).toBeInTheDocument();
       });
-      expect(pep).toBeInTheDocument();
 
-      const adverseMedia = screen.getByRole('checkbox', {
-        name: 'Adverse media',
+      describe('when it is not collection business address', () => {
+        it('should disable Full KYB option', () => {
+          renderAml({
+            isKyb: true,
+            businessInfo: {
+              [CollectedKybDataOption.address]: false,
+              [CollectedKybDataOption.beneficialOwners]: true,
+              [CollectedKybDataOption.corporationType]: false,
+              [CollectedKybDataOption.name]: false,
+              [CollectedKybDataOption.phoneNumber]: false,
+              [CollectedKybDataOption.tin]: false,
+              [CollectedKybDataOption.website]: false,
+            },
+          });
+
+          const fullKyb = screen.getByRole('radio', {
+            name: 'Full KYB',
+          });
+          expect(fullKyb).toBeDisabled();
+        });
+
+        it('should display a tooltip with the reason why the Full KYB option is disabled', async () => {
+          renderAml({
+            isKyb: true,
+            businessInfo: {
+              [CollectedKybDataOption.address]: false,
+              [CollectedKybDataOption.beneficialOwners]: true,
+              [CollectedKybDataOption.corporationType]: false,
+              [CollectedKybDataOption.name]: false,
+              [CollectedKybDataOption.phoneNumber]: false,
+              [CollectedKybDataOption.tin]: false,
+              [CollectedKybDataOption.website]: false,
+            },
+          });
+
+          const fullKyb = screen.getByRole('radio', {
+            name: 'Full KYB',
+          });
+          await userEvent.hover(fullKyb);
+
+          const tooltip = screen.getByRole('tooltip', {
+            name: 'Running full KYB requires you to collect Business name, Business address and EIN, at least.',
+          });
+          expect(tooltip).toBeInTheDocument();
+        });
       });
-      expect(adverseMedia).toBeInTheDocument();
+
+      it('should check the "EIN verificarion only"', () => {
+        renderAml({
+          isKyb: true,
+          businessInfo: {
+            [CollectedKybDataOption.address]: false,
+            [CollectedKybDataOption.beneficialOwners]: true,
+            [CollectedKybDataOption.corporationType]: false,
+            [CollectedKybDataOption.name]: false,
+            [CollectedKybDataOption.phoneNumber]: false,
+            [CollectedKybDataOption.tin]: false,
+            [CollectedKybDataOption.website]: false,
+          },
+        });
+
+        const einOption = screen.getByRole('radio', {
+          name: 'EIN verificarion only',
+        });
+        expect(einOption).toBeChecked();
+      });
+    });
+  });
+
+  describe('aml checks', () => {
+    describe('when clicking on the "AML monitoring" option', () => {
+      it('should show the "AML monitoring" option', async () => {
+        renderAml({});
+
+        const aml = screen.getByRole('switch', {
+          name: 'Enhanced AML monitoring',
+        });
+        await userEvent.click(aml);
+
+        const ofac = screen.getByRole('checkbox', {
+          name: 'Office of Foreign Assets Control (OFAC)',
+        });
+        expect(ofac).toBeInTheDocument();
+
+        const pep = screen.getByRole('checkbox', {
+          name: 'Politically Exposed Person (PEP)',
+        });
+        expect(pep).toBeInTheDocument();
+
+        const adverseMedia = screen.getByRole('checkbox', {
+          name: 'Adverse media',
+        });
+        expect(adverseMedia).toBeInTheDocument();
+      });
     });
   });
 
