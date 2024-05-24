@@ -8,14 +8,13 @@ use crate::{
 };
 use api_core::decision::rule_engine;
 use db::models::{
-    ob_configuration::{NewObConfigurationArgs, ObConfiguration},
+    ob_configuration::{get_verification_checks_for_legacy_compat, NewObConfigurationArgs, ObConfiguration},
     rule_set_version::RuleSetVersion,
 };
-use feature_flag::BoolFlag;
 use newtypes::{
     AdverseMediaListKind, CipKind, CollectedDataOption as CDO, DocumentAndCountryConfiguration,
     DocumentRequestConfig, EnhancedAml, EnhancedAmlOption, Iso3166TwoDigitCountryCode, ObConfigurationKind,
-    TenantId,
+    TenantId, VerificationCheck,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -50,6 +49,8 @@ pub struct CreateOnboardingConfigurationRequest {
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     #[serde(default)]
     pub curp_validation_enabled: Option<bool>,
+    #[serde(default)]
+    pub verification_checks: Option<Vec<VerificationCheck>>,
 }
 
 #[api_v2_operation(
@@ -88,6 +89,7 @@ pub async fn post(
         curp_validation_enabled,
         enhanced_aml,
         kind,
+        verification_checks,
     } = request.into_inner();
 
     // First, map some of the API format to the format we write to the DB
@@ -110,12 +112,9 @@ pub async fn post(
         .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
         .unwrap_or(EnhancedAmlOption::No);
 
-    // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them
-    // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags
-    let skip_kyc = skip_kyc
-        || state
-            .feature_flag_client
-            .flag(BoolFlag::IsSkipKycTenant(tenant_id));
+    let skip_kyb = false;
+    let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
+    let verification_checks = get_verification_checks_for_legacy_compat(verification_checks);
 
     let args = NewObConfigurationArgs {
         name,
@@ -137,11 +136,12 @@ pub async fn post(
         allow_us_residents: allow_us_residents.unwrap_or(true),
         allow_us_territory_residents: allow_us_territories.unwrap_or(false),
         kind,
-        skip_kyb: false,
+        skip_kyb,
         skip_confirm: skip_confirm.unwrap_or(false),
         document_types_and_countries,
         documents_to_collect,
-        curp_validation_enabled: curp_validation_enabled.unwrap_or(false),
+        curp_validation_enabled,
+        verification_checks,
     };
 
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;

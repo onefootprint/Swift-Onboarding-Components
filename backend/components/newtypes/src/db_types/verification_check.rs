@@ -11,6 +11,7 @@ use crate::AdverseMediaListKind;
     Clone,
     Eq,
     PartialEq,
+    Hash,
     AsRefStr,
     EnumDiscriminants,
     Apiv2Schema,

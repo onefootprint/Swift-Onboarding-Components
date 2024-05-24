@@ -161,6 +161,7 @@ impl EnhancedAmlOption {
     FromSqlRow,
     EnumString,
     EnumIter,
+    Hash,
     AsRefStr,
     serde_with::DeserializeFromStr,
     Serialize,

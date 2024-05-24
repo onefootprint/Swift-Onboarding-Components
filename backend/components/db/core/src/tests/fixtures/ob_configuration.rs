@@ -1,4 +1,7 @@
-use crate::{models::ob_configuration::NewObConfigurationArgs, PgConn};
+use crate::{
+    models::ob_configuration::{get_verification_checks_for_legacy_compat, NewObConfigurationArgs},
+    PgConn,
+};
 use newtypes::{
     CipKind, CollectedDataOption as CDO, DbActor, DocumentAndCountryConfiguration, EnhancedAmlOption,
     Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
@@ -31,6 +34,8 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         document_types_and_countries: None,
         documents_to_collect: vec![],
         curp_validation_enabled: false,
+        // TODO: fix this test when migrated over
+        verification_checks: vec![],
     };
     ObConfiguration::create(conn, args).expect("Could not create ob config")
 }
@@ -100,6 +105,10 @@ pub fn create_with_opts(
         kind,
         document_types_and_countries,
     } = opts;
+    let documents_to_collect = vec![];
+    let skip_kyb = false;
+    let curp_validation_enabled = false;
+    let verification_checks = get_verification_checks_for_legacy_compat(None);
     let args = NewObConfigurationArgs {
         name,
         tenant_id: tenant_id.clone(),
@@ -119,11 +128,12 @@ pub fn create_with_opts(
         allow_us_residents: true,
         allow_us_territory_residents: false,
         kind,
-        skip_kyb: false,
+        skip_kyb,
         skip_confirm: false,
         document_types_and_countries,
-        documents_to_collect: vec![],
-        curp_validation_enabled: false,
+        documents_to_collect,
+        curp_validation_enabled,
+        verification_checks,
     };
     ObConfiguration::create(conn, args).expect("Could not create ob config")
 }

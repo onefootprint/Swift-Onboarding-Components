@@ -31,6 +31,7 @@ impl ObConfigurationArgsToValidate {
         args.validate_kind()?;
         args.validate_flags(state, &tenant.id)?;
         args.validate_tenant_restrictions(tenant)?;
+        args.validate_checks()?;
         Ok(args.0)
     }
 
@@ -505,6 +506,28 @@ impl ObConfigurationArgsToValidate {
                 return Err(TenantError::CannotCreateProdPlaybook(self.kind).into());
             }
         }
+        Ok(())
+    }
+
+    pub(super) fn validate_checks(&self) -> ApiResult<()> {
+        self.verification_checks
+            .iter()
+            .try_for_each(|c| -> ApiResult<()> {
+                match c {
+                    newtypes::VerificationCheck::Kyb { .. } => {
+                        if !matches!(&self.kind, &ObConfigurationKind::Kyb) || self.skip_kyb {
+                            Err(TenantError::ValidationError(
+                                "Cannot run KYB for non-KYB or skip_kyb Playbooks".to_owned(),
+                            )
+                            .into())
+                        } else {
+                            Ok(())
+                        }
+                    }
+                    _ => Ok(()),
+                }
+            })?;
+
         Ok(())
     }
 }

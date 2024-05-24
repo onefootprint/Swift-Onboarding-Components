@@ -2,7 +2,7 @@ use crate::*;
 use newtypes::{
     ApiKeyStatus, AppClipExperienceId, AuthMethodKind, CipKind, CollectedDataOption,
     DocumentAndCountryConfiguration, DocumentRequestConfig, EnhancedAml, Iso3166TwoDigitCountryCode,
-    ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId,
+    ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId, VerificationCheck,
 };
 
 /// OnboardingConfiguration that was created
@@ -37,6 +37,7 @@ pub struct OnboardingConfiguration {
     pub cip_kind: Option<CipKind>,
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     pub curp_validation_enabled: bool,
+    pub verification_checks: Vec<VerificationCheck>,
 }
 
 /// The public onboarding configuration

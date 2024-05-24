@@ -12,7 +12,8 @@ use newtypes::{
     DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo,
     DocumentRequestConfig, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, Locked,
     ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
-    SupportedDocumentAndCountryMappingForBifrost, TenantId, VerificationCheck, WorkflowId,
+    SupportedDocumentAndCountryMappingForBifrost, TenantId, VerificationCheck, VerificationCheckKind,
+    WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -339,6 +340,7 @@ struct NewObConfiguration {
     document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     curp_validation_enabled: bool,
     documents_to_collect: Vec<DocumentRequestConfig>,
+    verification_checks: Vec<VerificationCheck>,
 }
 
 pub struct NewObConfigurationArgs {
@@ -366,6 +368,27 @@ pub struct NewObConfigurationArgs {
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     pub curp_validation_enabled: bool,
     pub documents_to_collect: Vec<DocumentRequestConfig>,
+    pub verification_checks: Vec<VerificationCheck>,
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn get_verification_checks_for_legacy_compat(
+    verification_checks_from_api_req: Option<Vec<VerificationCheck>>,
+) -> Vec<VerificationCheck> {
+    let mut checks = vec![];
+
+
+    // Frontend will start sending KYB checks first, so if we receive one, take that
+    if let Some(api_checks) = verification_checks_from_api_req {
+        if let Some(c) = api_checks
+            .into_iter()
+            .find(|c| matches!(c.clone().into(), VerificationCheckKind::Kyb))
+        {
+            checks.push(c.clone());
+        };
+    }
+
+    checks.into_iter().unique().collect()
 }
 
 #[derive(Debug, derive_more::From)]
@@ -581,6 +604,7 @@ impl ObConfiguration {
             document_types_and_countries,
             documents_to_collect,
             curp_validation_enabled,
+            verification_checks,
         } = args;
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -609,6 +633,7 @@ impl ObConfiguration {
             document_types_and_countries,
             curp_validation_enabled,
             documents_to_collect,
+            verification_checks,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)

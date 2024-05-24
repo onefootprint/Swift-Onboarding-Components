@@ -143,7 +143,14 @@ impl
             documents_to_collect,
             cip_kind,
             curp_validation_enabled,
-            ..
+            verification_checks,
+
+            // explicitly enumerating unused fields here so we don't forget to expose
+            tenant_id: _,
+            _created_at: _,
+            _updated_at: _,
+            appearance_id: _,
+            author: _,
         } = ob_config;
 
         Self {
@@ -175,6 +182,7 @@ impl
             cip_kind,
             documents_to_collect: documents_to_collect.unwrap_or_default(),
             curp_validation_enabled,
+            verification_checks: verification_checks.unwrap_or_default(),
         }
     }
 }

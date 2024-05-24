@@ -180,7 +180,7 @@ fn copy_playbook(
 
         // Maybe we should copy appearance one day. But it's not really used today.
         appearance_id: _,
-        verification_checks: _,
+        verification_checks,
     } = pb;
 
     NewObConfigurationArgs {
@@ -208,5 +208,6 @@ fn copy_playbook(
         document_types_and_countries,
         curp_validation_enabled,
         documents_to_collect: documents_to_collect.unwrap_or_default(),
+        verification_checks: verification_checks.unwrap_or_default(),
     }
 }
