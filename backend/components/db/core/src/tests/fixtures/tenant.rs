@@ -12,6 +12,7 @@ pub fn create(conn: &mut TxnPgConn) -> Tenant {
         workos_id: None,
         logo_url: None,
         sandbox_restricted: false,
+        is_demo_tenant: false,
         is_prod_ob_config_restricted: false,
         is_prod_kyb_playbook_restricted: false,
         is_prod_auth_playbook_restricted: true,
@@ -34,6 +35,7 @@ pub fn create_with_keys(
         workos_id: None,
         logo_url: None,
         sandbox_restricted: false,
+        is_demo_tenant: false,
         is_prod_ob_config_restricted: false,
         is_prod_kyb_playbook_restricted: false,
         is_prod_auth_playbook_restricted: true,
@@ -73,6 +75,6 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         support_email: Default::default(),
         support_phone: Default::default(),
         support_website: Default::default(),
-        super_tenant_id: None
+        super_tenant_id: None,
     }
 }

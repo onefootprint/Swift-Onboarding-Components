@@ -16,7 +16,7 @@ use newtypes::{SessionAuthToken, TenantId};
 pub struct SandboxTenantRequest {
     name: String,
     domains: Vec<String>,
-    super_tenant_id: Option<TenantId>
+    super_tenant_id: Option<TenantId>,
 }
 
 #[derive(serde::Serialize)]
@@ -31,7 +31,11 @@ pub async fn post(
     auth: FirmEmployeeAuthContext,
 ) -> JsonApiResponse<SandboxTenantResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
-    let SandboxTenantRequest { name, domains , super_tenant_id} = request.into_inner();
+    let SandboxTenantRequest {
+        name,
+        domains,
+        super_tenant_id,
+    } = request.into_inner();
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let tenant_user_id = auth.tenant_user.id.clone();
@@ -51,6 +55,7 @@ pub async fn post(
                 workos_id: None,
                 logo_url: None,
                 sandbox_restricted: true,
+                is_demo_tenant: false,
                 is_prod_ob_config_restricted: true,
                 is_prod_kyb_playbook_restricted: true,
                 is_prod_auth_playbook_restricted: true,

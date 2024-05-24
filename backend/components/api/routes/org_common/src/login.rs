@@ -243,6 +243,7 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> ApiResult<(T
         workos_id: None,
         logo_url: None,
         sandbox_restricted: true,
+        is_demo_tenant: false,
         is_prod_ob_config_restricted: true,
         is_prod_kyb_playbook_restricted: true,
         is_prod_auth_playbook_restricted: true,

@@ -167,6 +167,7 @@ pub async fn post(
                         workos_id: None,
                         logo_url: None,
                         sandbox_restricted: false,
+                        is_demo_tenant: true,
                         is_prod_ob_config_restricted: false,
                         is_prod_kyb_playbook_restricted: true,
                         is_prod_auth_playbook_restricted: true,

@@ -102,6 +102,7 @@ pub struct NewTenant {
     pub workos_id: Option<String>,
     pub logo_url: Option<String>,
     pub sandbox_restricted: bool,
+    pub is_demo_tenant: bool,
     pub is_prod_ob_config_restricted: bool,
     pub is_prod_kyb_playbook_restricted: bool,
     pub is_prod_auth_playbook_restricted: bool,
