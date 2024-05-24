@@ -19,6 +19,7 @@
         "BIFROST_URL",
         "CI",
         "COMPONENTS_URL",
+        "DATADOG_API_KEY",
         "DEMO_FORM_AUTH_TOKEN",
         "DEMO_RENDER_AUTH_TOKEN",
         "E2E_ACME_SECRET_API_KEY_DEV",
@@ -35,6 +36,7 @@
         "IS_LOCAL",
         "IS_VERCEL_ENV_DEV",
         "IS_VERCEL_ENV_PREV",
+        "SOURCE_MAPS_PUBLIC_STATIC_PATH",
         "NEXT_PUBLIC_API_BASE_URL",
         "NEXT_PUBLIC_APP_CLIP_ENABLED",
         "NEXT_PUBLIC_ARYEO_AUTH_TOKEN",
@@ -61,6 +63,7 @@
         "NEXT_PUBLIC_LOCAL_HANDOFF_BASE_URL",
         "NEXT_PUBLIC_ONBOARDING_COMPONENTS_KEY",
         "NEXT_PUBLIC_SENTRY_DSN",
+        "NEXT_PUBLIC_STATIC_URL",
         "NEXT_PUBLIC_STYTCH_PUBLIC_TOKEN",
         "NEXT_PUBLIC_TENANT_KEY",
         "NEXT_PUBLIC_UNIFY_API_KEY",
@@ -73,6 +76,11 @@
         "REVALIDATE_SECRET_TOKEN",
         "SDK_VERSION"
       ]
+    },
+    "upload:sourcemaps": {
+      "cache": false,
+      "dependsOn": [],
+      "outputs": []
     },
     "test": {
       "dependsOn": [
