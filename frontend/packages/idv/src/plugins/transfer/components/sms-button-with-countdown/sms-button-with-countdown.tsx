@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useD2PSms } from '../../../../hooks/api';
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 
 const COUNTER_SECONDS = 10;
 

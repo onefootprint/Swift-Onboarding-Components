@@ -6,7 +6,7 @@ import {
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 import type { IdDocImageErrorType } from '../../types';
 import PromptWithGuidelines from '../prompt-with-guidelines';
 

@@ -2,7 +2,7 @@ import { useToast } from '@onefootprint/ui';
 import imageCompression from 'browser-image-compression';
 import partial from 'lodash/fp/partial';
 
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 import { useImgProcessorsContext } from '../../components/image-processors';
 import {
   hasFileReaderSupport,

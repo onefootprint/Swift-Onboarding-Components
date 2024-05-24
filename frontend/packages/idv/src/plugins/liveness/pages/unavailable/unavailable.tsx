@@ -11,7 +11,7 @@ import { useEffectOnce } from 'usehooks-ts';
 import { NavigationHeader } from '../../../../components';
 import { useSkipLiveness } from '../../../../hooks';
 import { checkIsSocialMediaBrowser } from '../../../../utils';
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 
 const Unavailable = () => {

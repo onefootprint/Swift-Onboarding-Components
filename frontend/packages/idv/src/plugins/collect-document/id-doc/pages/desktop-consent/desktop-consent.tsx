@@ -8,7 +8,7 @@ import NavigationHeader from '../../../../../components/layout/components/naviga
 import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box';
 import { LAYOUT_CONTAINER_ID } from '../../../../../components/layout/constants';
 import useIdvRequestErrorToast from '../../../../../hooks/ui/use-idv-request-error-toast';
-import Logger from '../../../../../utils/logger';
+import { Logger } from '../../../../../utils/logger';
 import type { ImageConsentHandler } from '../../components/image-consent';
 import ImageConsent from '../../components/image-consent';
 import useConsent from '../../hooks/use-consent';

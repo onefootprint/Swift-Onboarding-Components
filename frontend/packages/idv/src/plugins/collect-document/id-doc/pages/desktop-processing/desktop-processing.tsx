@@ -11,7 +11,7 @@ import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import Logger from '../../../../../utils/logger';
+import { Logger } from '../../../../../utils/logger';
 import DesktopHeader from '../../../components/desktop-header';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';

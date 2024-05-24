@@ -10,7 +10,7 @@ import {
   NavigationHeader,
   useLayoutOptions,
 } from '../../../../components';
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../types';
 import { isDesktop, isDocument, isFace, isMobile } from '../../utils/capture';

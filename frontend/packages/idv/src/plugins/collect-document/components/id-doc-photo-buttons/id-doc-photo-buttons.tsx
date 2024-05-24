@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../types';
 

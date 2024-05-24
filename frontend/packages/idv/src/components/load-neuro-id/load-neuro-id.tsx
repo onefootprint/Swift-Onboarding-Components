@@ -10,7 +10,7 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import Script from 'next/script';
 import React from 'react';
 
-import Logger from '../../utils/logger';
+import { Logger } from '../../utils/logger';
 import nid from '../../utils/neuro-id';
 
 const NID_LIVE_SITE_NAME = 'humor717';

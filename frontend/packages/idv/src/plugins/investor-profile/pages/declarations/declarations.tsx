@@ -3,7 +3,7 @@ import { DocumentDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import useUploadFile from '../../../../hooks/api/hosted/user/use-upload-file';
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';

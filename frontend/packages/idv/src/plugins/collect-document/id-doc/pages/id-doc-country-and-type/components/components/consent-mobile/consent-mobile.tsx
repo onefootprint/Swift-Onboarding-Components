@@ -2,7 +2,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import React, { useRef } from 'react';
 
 import useIdvRequestErrorToast from '../../../../../../../../hooks/ui/use-idv-request-error-toast';
-import Logger from '../../../../../../../../utils/logger';
+import { Logger } from '../../../../../../../../utils/logger';
 import type { ImageConsentHandler } from '../../../../../components/image-consent';
 import ImageConsent from '../../../../../components/image-consent';
 import useConsent from '../../../../../hooks/use-consent';

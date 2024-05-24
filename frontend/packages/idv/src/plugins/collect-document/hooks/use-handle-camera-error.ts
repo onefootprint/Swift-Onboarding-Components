@@ -1,7 +1,7 @@
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import Logger from '../../../utils/logger';
+import { Logger } from '../../../utils/logger';
 import { useMissingPermissionsSheet } from '../components/missing-permissions-sheet';
 
 const useHandleCameraError = () => {

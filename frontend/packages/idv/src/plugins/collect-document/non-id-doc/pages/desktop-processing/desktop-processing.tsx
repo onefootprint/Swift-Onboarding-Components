@@ -12,7 +12,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { HeaderTitle } from '../../../../../components';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import Logger from '../../../../../utils/logger';
+import { Logger } from '../../../../../utils/logger';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';

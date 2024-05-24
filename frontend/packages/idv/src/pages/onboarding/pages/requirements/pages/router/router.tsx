@@ -11,7 +11,7 @@ import {
   Liveness,
   Transfer,
 } from '../../../../../../plugins';
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import Error from '../../../../components/error';
 import WaitForComponentsSdk from '../../components/wait-for-components-sdk';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';

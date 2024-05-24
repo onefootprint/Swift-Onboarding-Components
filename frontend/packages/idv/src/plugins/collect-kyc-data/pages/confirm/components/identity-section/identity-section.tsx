@@ -15,7 +15,7 @@ import {
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import { FPCustomEvents, sendCustomEvent } from '../../../../../../utils';
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
 import type { KycData } from '../../../../utils/data-types';

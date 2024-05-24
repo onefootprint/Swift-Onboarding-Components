@@ -13,7 +13,7 @@ import { validate as isEmail } from 'isemail';
 
 import type { UserData, UserDatum } from '../../../../../../types';
 import { isObject, isStringValid } from '../../../../../../utils';
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import {
   fromUSDateToISO8601Format,
   strInputToUSDate,

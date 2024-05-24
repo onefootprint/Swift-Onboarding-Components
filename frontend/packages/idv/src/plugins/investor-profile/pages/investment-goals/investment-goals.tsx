@@ -1,7 +1,7 @@
 import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
-import Logger from '../../../../utils/logger';
+import { Logger } from '../../../../utils/logger';
 import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';

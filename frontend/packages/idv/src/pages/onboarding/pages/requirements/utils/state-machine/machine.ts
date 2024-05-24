@@ -6,7 +6,7 @@ import type {
 import { assign, createMachine } from 'xstate';
 
 import type { UserData } from '../../../../../../types';
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 import isRepeatRequirement from '../is-repeat-requirement';
 import {

@@ -1,7 +1,7 @@
 import { useInterval } from '@onefootprint/hooks';
 import { useState } from 'react';
 
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import parsePermissionError from '../utils/parse-permission-error';
 
 export type CameraPermissionState =

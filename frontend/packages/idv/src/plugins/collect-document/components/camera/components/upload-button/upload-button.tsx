@@ -3,7 +3,7 @@ import { useToast } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import useProcessImage from '../../../../hooks/use-process-image';
 import type { CaptureKind } from '../../../../types';
 

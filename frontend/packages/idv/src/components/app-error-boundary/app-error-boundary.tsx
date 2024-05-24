@@ -2,7 +2,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import Logger from '../../utils/logger';
+import { Logger } from '../../utils/logger';
 import Error from './components/error';
 
 type AppErrorBoundaryProps = {

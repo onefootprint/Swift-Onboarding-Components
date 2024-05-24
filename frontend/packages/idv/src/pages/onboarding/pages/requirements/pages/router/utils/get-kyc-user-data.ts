@@ -2,7 +2,7 @@ import { IdDI } from '@onefootprint/types';
 import { pickBy } from 'lodash';
 
 import type { UserData } from '../../../../../../../types';
-import Logger from '../../../../../../../utils/logger';
+import { Logger } from '../../../../../../../utils/logger';
 
 const getKycUserData = (data: UserData): UserData => {
   // Filter down to keys of the IdDI enum

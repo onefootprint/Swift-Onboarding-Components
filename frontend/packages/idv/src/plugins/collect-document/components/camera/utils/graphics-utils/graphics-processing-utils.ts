@@ -7,7 +7,7 @@ import type {
   useOpenCv,
 } from 'opencv-react-ts';
 
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import type { ParamsType } from './params';
 
 export type OpenCVType = Exclude<

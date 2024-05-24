@@ -13,7 +13,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
-import Logger from '../../../../../../utils/logger';
+import { Logger } from '../../../../../../utils/logger';
 import {
   isDocCdo,
   isInvestorProfileCdo,

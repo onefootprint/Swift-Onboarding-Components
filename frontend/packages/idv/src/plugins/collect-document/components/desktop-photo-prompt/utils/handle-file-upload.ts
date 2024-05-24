@@ -1,6 +1,6 @@
 import { IdDocImageUploadError } from '@onefootprint/types';
 
-import Logger from '../../../../../utils/logger';
+import { Logger } from '../../../../../utils/logger';
 
 type HandleFileUploadProps = {
   files: FileList | File[] | null;

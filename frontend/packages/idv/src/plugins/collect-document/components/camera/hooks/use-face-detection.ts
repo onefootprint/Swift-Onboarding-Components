@@ -5,7 +5,7 @@ import {
   TinyFaceDetectorOptions,
 } from 'face-api.js';
 
-import Logger from '../../../../../utils/logger';
+import { Logger } from '../../../../../utils/logger';
 import { useFaceModel } from '../../../hooks/use-face-model-loader';
 import {
   calculateFaceAngle,
