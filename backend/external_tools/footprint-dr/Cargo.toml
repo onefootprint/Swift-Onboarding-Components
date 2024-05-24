@@ -1,0 +1,12 @@
+[package]
+name = "footprint-dr"
+version = "0.0.1"
+authors.workspace = true
+
+description = "CLI for interacting with the Footprint Vault Disaster Recovery system"
+edition.workspace = true
+
+[dependencies]
+clap = { workspace = true }
+env_logger = { workspace = true }
+log = { workspace = true }

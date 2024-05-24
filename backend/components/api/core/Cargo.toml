@@ -11,7 +11,7 @@ doctest = false
 anyhow = { workspace = true }
 actix-web = { workspace = true }
 async-trait = "0.1"
-env_logger = "0.9.0"
+env_logger = { workspace = true }
 log = "0.4.14"
 opentelemetry = { version = "0.19", features = ["rt-tokio", "metrics"] }
 tracing-opentelemetry = "0.19"
