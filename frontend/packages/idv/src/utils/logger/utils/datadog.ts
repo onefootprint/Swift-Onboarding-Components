@@ -40,7 +40,8 @@ const appServiceMap: Record<
   },
 };
 
-const shouldAvoidLog = (log?: string) =>
+const hasMessageToOmit = (log?: string) =>
+  Boolean(log) &&
   [
     'A component is changing a controlled',
     'A component is changing an uncontrolled',
@@ -48,6 +49,18 @@ const shouldAvoidLog = (log?: string) =>
     'If you want to write it to the DOM, pass a string instead',
     'Minified React error #', // https://linear.app/footprint/issue/FP-7692/error-minified-react-error-418-423-425
     'React does not recognize',
+  ].some(str => log?.includes(str));
+
+const hasUrlToOmit = (log?: string) =>
+  Boolean(log) &&
+  [
+    'ingest-lr.com',
+    'launchdarkly.com',
+    'maps.googleapis.com',
+    'neuro-id.com',
+    'neuroid.cloud',
+    'observeinc.com',
+    'stytch.com',
   ].some(str => log?.includes(str));
 
 const initDataDogLogs = (config: LogsInitConfiguration): void => {
@@ -66,7 +79,14 @@ const initDataDogLogs = (config: LogsInitConfiguration): void => {
       // Discard 200 network logs
       if (log.http && log.http.status_code === 200) return false;
 
-      if (shouldAvoidLog(log.message) || shouldAvoidLog(log.error?.message)) {
+      if (
+        hasMessageToOmit(log.message) ||
+        hasMessageToOmit(log.error?.message)
+      ) {
+        return false;
+      }
+
+      if (hasUrlToOmit(log.http?.url)) {
         return false;
       }
 
