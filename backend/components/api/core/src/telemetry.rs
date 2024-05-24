@@ -1,6 +1,7 @@
 use actix_web::FromRequest;
 use chrono::{SecondsFormat, Utc};
 use futures_util::Future;
+use itertools::Itertools;
 use opentelemetry::{
     global,
     sdk::{
@@ -241,6 +242,10 @@ where
             }
 
             if let Some(ref span_ref) = ctx.lookup_current() {
+                if let Some(root_span_ref) = span_ref.scope().from_root().next() {
+                    ser_root_span_attrs(&root_span_ref, &mut s)?;
+                }
+
                 if let Some((trace_id, span_id)) = lookup_trace_ids(span_ref) {
                     s.serialize_entry("dd.trace_id", &trace_id.to_string())?;
                     s.serialize_entry("dd.span_id", &span_id.to_string())?;
@@ -288,4 +293,60 @@ where
 
         (trace_id, span_id)
     })
+}
+
+// Copies root span attributes to associated log events.
+fn ser_root_span_attrs<S, T>(root_span_ref: &SpanRef<T>, serializer: &mut S) -> Result<(), S::Error>
+where
+    S: SerializeMap,
+    T: Subscriber + for<'a> LookupSpan<'a>,
+{
+    let ext = root_span_ref.extensions();
+    if let Some(attributes) = ext.get::<OtelData>().and_then(|o| o.builder.attributes.as_ref()) {
+        for (k, v) in attributes {
+            let k = k.as_str();
+            match k {
+                // Note that these fields are written at the top level of the log event for ease of
+                // querying, so they must not collide with standard attributes.
+                //
+                // Omitted fields:
+                //   - server_git_hash: Redundant with Datadog's version tag.
+                "tenant_id"
+                | "fp_id"
+                | "vault_id"
+                | "is_live"
+                | "auth_method"
+                | "auth_token_hash"
+                | "client_version"
+                | "session_id"
+                | "is_integration_test_req"
+                | "route"
+                | "ip_address"
+                | "country"
+                | "user_agent"
+                | "http.route"
+                | "http.target" => match v {
+                    opentelemetry::Value::Bool(v) => serializer.serialize_entry(k, v)?,
+                    opentelemetry::Value::I64(v) => serializer.serialize_entry(k, v)?,
+                    opentelemetry::Value::F64(v) => serializer.serialize_entry(k, v)?,
+                    opentelemetry::Value::String(v) => serializer.serialize_entry(k, v.as_ref())?,
+                    opentelemetry::Value::Array(opentelemetry::Array::Bool(v)) => {
+                        serializer.serialize_entry(k, &v)?
+                    }
+                    opentelemetry::Value::Array(opentelemetry::Array::I64(v)) => {
+                        serializer.serialize_entry(k, &v)?
+                    }
+                    opentelemetry::Value::Array(opentelemetry::Array::F64(v)) => {
+                        serializer.serialize_entry(k, &v)?
+                    }
+                    opentelemetry::Value::Array(opentelemetry::Array::String(v)) => {
+                        serializer.serialize_entry(k, &v.iter().map(|v| v.as_str()).collect_vec())?
+                    }
+                },
+                _ => {}
+            }
+        }
+    }
+
+    Ok(())
 }
