@@ -14,7 +14,7 @@ use crate::{
             OnAction, WorkflowState,
         },
         utils::should_execute_rules_for_document_only,
-        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
+        vendor::tenant_vendor_control::TenantVendorControl,
     },
     errors::ApiResult,
     State,
@@ -131,7 +131,7 @@ impl DocumentDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
-    type AsyncRes = (Arc<dyn FeatureFlagClient>, Vec<VendorResult>);
+    type AsyncRes = Arc<dyn FeatureFlagClient>;
 
     #[tracing::instrument(
         "OnAction<MakeDecision, DocumentState>::execute_async_idempotent_actions",
@@ -142,9 +142,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let vendor_results = common::get_latest_vendor_results(state, &self.sv_id).await?;
-
-        Ok((state.feature_flag_client.clone(), vendor_results))
+        Ok(state.feature_flag_client.clone())
     }
 
     #[tracing::instrument("OnAction<MakeDecision, DocumentState>::on_commit", skip_all)]
@@ -154,7 +152,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<DocumentState> {
-        let (ff_client, vendor_results) = async_res;
+        let ff_client = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         // Note: in a document workflow, this is generally the last playbook you onboarded onto.
         // So, we will run rules from the last playbook
@@ -165,6 +163,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
+        let vres_ids = risk_signals.verification_result_ids();
 
         // TODO: what's the review strategy for this case?
         let args = EvaluateWorkflowDecisionArgs {
@@ -189,10 +188,6 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         } else {
             decision
         };
-        let vres_ids = vendor_results
-            .into_iter()
-            .map(|vr| vr.verification_result_id)
-            .collect();
 
         let output = common::handle_rules_output(conn, wf, v.id, vres_ids, decision, rsr_id, vec![])?;
         match output {

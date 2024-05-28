@@ -248,7 +248,7 @@ fn deserialize_from_vendor_api(
         VendorAPI::AwsTextract => ParsedResponse::AwsTextract(raw_response.into()),
         // End of Caution Note
         VendorAPI::LexisFlexId => ParsedResponse::from_lexis_flex_id(raw_response)?,
-        VendorAPI::IncodeCurpValidation => ParsedResponse::from_incode_curp_validation(raw_response)?,
+        VendorAPI::IncodeCurpValidation => ParsedResponse::IncodeRawResponse(raw_response.into()),
         VendorAPI::IncodeGovernmentValidation => {
             ParsedResponse::IncodeGovernmentValidation(raw_response.into())
         }

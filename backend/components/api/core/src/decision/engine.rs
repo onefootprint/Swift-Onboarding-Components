@@ -10,15 +10,12 @@ use super::{
     *,
 };
 use crate::{
-    enclave_client::EnclaveClient,
     errors::{ApiError, ApiErrorKind, ApiResult},
     State,
 };
 use db::{
     models::{
-        vault::Vault,
-        verification_request::{RequestAndMaybeResult, VerificationRequest},
-        verification_result::VerificationResult,
+        verification_request::VerificationRequest, verification_result::VerificationResult,
         workflow::Workflow,
     },
     DbError, DbPool,
@@ -26,7 +23,7 @@ use db::{
 use either::Either;
 
 use itertools::Itertools;
-use newtypes::{PiiJsonValue, ScopedVaultId, VerificationRequestId, WorkflowId};
+use newtypes::{PiiJsonValue, VerificationRequestId, WorkflowId};
 
 pub async fn save_vendor_responses(
     db_pool: &DbPool,
@@ -75,48 +72,6 @@ pub struct VendorRequests {
     pub outstanding_requests: Vec<VerificationRequest>, // requests that we do not yet have results for
 }
 
-#[tracing::instrument(skip(db_pool, enclave_client))]
-pub async fn get_latest_verification_requests_and_results(
-    scoped_user_id: &ScopedVaultId,
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-) -> ApiResult<VendorRequests> {
-    let suid = scoped_user_id.clone();
-    let requests_and_results = db_pool
-        .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
-            // Load our requests and results
-            // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
-            VerificationRequest::get_latest_requests_and_maybe_successful_results_for_scoped_user(conn, suid)
-        })
-        .await?;
-
-    let su_id = scoped_user_id.clone();
-    let uv = db_pool.db_query(move |conn| Vault::get(conn, &su_id)).await?;
-
-    let previous_results = vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
-        requests_and_results.clone(),
-        enclave_client,
-        &uv.e_private_key,
-    )
-    .await?;
-
-    let requests: Vec<VerificationRequest> = requests_and_results
-        .into_iter()
-        .filter_map(|(request, result)| {
-            // Only send requests for which we don't already have a result
-            if result.is_none() {
-                Some(request)
-            } else {
-                None
-            }
-        })
-        .collect();
-
-    Ok(VendorRequests {
-        completed_requests: previous_results,
-        outstanding_requests: requests,
-    })
-}
 
 pub struct VendorResults {
     pub successful: Vec<VerificationRequestWithVendorResponse>,

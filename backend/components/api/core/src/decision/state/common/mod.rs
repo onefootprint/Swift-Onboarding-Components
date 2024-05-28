@@ -186,17 +186,6 @@ pub async fn run_aml_call(
     }
 }
 
-#[tracing::instrument(skip(state))]
-pub async fn get_latest_vendor_results(state: &State, sv_id: &ScopedVaultId) -> ApiResult<Vec<VendorResult>> {
-    decision::engine::get_latest_verification_requests_and_results(
-        sv_id,
-        &state.db_pool,
-        &state.enclave_client,
-    )
-    .await
-    .map(|r| r.completed_requests)
-}
-
 pub enum DecisionOutput {
     Terminal,
     NonTerminal,
