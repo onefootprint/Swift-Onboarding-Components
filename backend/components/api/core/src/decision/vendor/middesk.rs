@@ -2,6 +2,11 @@
 
 use std::sync::Arc;
 
+use self::vendor_api::{
+    loaders::load_response_for_vendor_api,
+    vendor_api_struct::{MiddeskBusinessUpdateWebhook, MiddeskGetBusiness},
+};
+
 use super::{vendor_trait::VendorAPIResponse, *};
 
 use crate::{
@@ -23,7 +28,7 @@ use db::{
         ob_configuration::ObConfiguration,
         risk_signal::{NewRiskSignalInfo, RiskSignal},
         risk_signal_group::RiskSignalGroup,
-        verification_request::VerificationRequest,
+        verification_request::{VReqIdentifier, VerificationRequest},
         verification_result::VerificationResult,
         workflow::{Workflow, WorkflowUpdate},
     },
@@ -75,6 +80,7 @@ pub struct PendingGetBusinessCall {
 #[derive(Debug)]
 pub struct Complete {
     business_response_vreq: VerificationRequest,
+    #[allow(unused)] // TODO: remove
     business_response_vres: VerificationResult,
 }
 
@@ -505,33 +511,46 @@ impl MiddeskState<Complete> {
             })
             .await?;
 
-        // TODO: make a version of this method for a single vreq/vres
-        let vendor_result = vendor_result::VendorResult::from_verification_results_for_onboarding(
-            vec![(
-                self.state.business_response_vreq,
-                Some(self.state.business_response_vres),
-            )],
-            &state.enclave_client,
-            &v.e_private_key,
-        )
-        .await?
-        .pop()
-        .ok_or(DbError::ObjectNotFound)?;
+        let (business_response, vendor_api, vres_id) = match self.state.business_response_vreq.vendor_api {
+            v_api @ VendorAPI::MiddeskGetBusiness => {
+                let (res, vres_id) = load_response_for_vendor_api(
+                    state,
+                    VReqIdentifier::Id(self.state.business_response_vreq.id.clone()),
+                    &v.e_private_key,
+                    MiddeskGetBusiness,
+                )
+                .await?
+                .ok()
+                .ok_or(MiddeskError::AssertionError("No successful vres".into()))?;
 
-        let (business_response, vendor_api) = match vendor_result.response.response {
-            ParsedResponse::MiddeskGetBusiness(r) => Ok((r, VendorAPI::MiddeskGetBusiness)),
-            ParsedResponse::MiddeskBusinessUpdateWebhook(r) => r
-                .business_response()
-                .cloned()
-                .ok_or(MiddeskError::ResponseMissingExpectedData("business data".into()))
-                .map(|b| (b, VendorAPI::MiddeskBusinessUpdateWebhook)),
+                Ok((res, v_api, vres_id))
+            }
+            v_api @ VendorAPI::MiddeskBusinessUpdateWebhook => {
+                let (resp, vres_id) = load_response_for_vendor_api(
+                    state,
+                    VReqIdentifier::Id(self.state.business_response_vreq.id.clone()),
+                    &v.e_private_key,
+                    MiddeskBusinessUpdateWebhook,
+                )
+                .await?
+                .ok()
+                .ok_or(MiddeskError::AssertionError("No successful vres".into()))?;
+
+
+                let res = resp
+                    .business_response()
+                    .cloned()
+                    .ok_or(MiddeskError::ResponseMissingExpectedData("business data".into()))?;
+
+                Ok((res, v_api, vres_id))
+            }
             _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
         }?;
 
         let risk_signals: Vec<NewRiskSignalInfo> =
             decision::features::middesk::reason_codes(&business_response)
                 .into_iter()
-                .map(|rc| (rc, vendor_api, vendor_result.verification_result_id.clone()))
+                .map(|rc| (rc, vendor_api, vres_id.clone()))
                 .collect();
 
         let obc_id = wf.ob_configuration_id.clone();

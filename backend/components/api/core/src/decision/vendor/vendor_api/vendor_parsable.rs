@@ -6,6 +6,7 @@ use idv::{
         watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
     },
     lexis::response::FlexIdResponse,
+    middesk::response::{business::BusinessResponse, webhook::MiddeskBusinessUpdateWebhookResponse},
     ParsedResponse,
 };
 use newtypes::VendorAPI;
@@ -118,5 +119,23 @@ impl VendorParsable for LexisFlexId {
 impl AsParsedResponse for FlexIdResponse {
     fn into_parsed_response(self) -> ParsedResponse {
         ParsedResponse::LexisFlexId(self)
+    }
+}
+
+// Middesk
+impl VendorParsable for MiddeskGetBusiness {
+    type ParsedType = BusinessResponse;
+}
+impl AsParsedResponse for BusinessResponse {
+    fn into_parsed_response(self) -> ParsedResponse {
+        ParsedResponse::MiddeskGetBusiness(self)
+    }
+}
+impl VendorParsable for MiddeskBusinessUpdateWebhook {
+    type ParsedType = MiddeskBusinessUpdateWebhookResponse;
+}
+impl AsParsedResponse for MiddeskBusinessUpdateWebhookResponse {
+    fn into_parsed_response(self) -> ParsedResponse {
+        ParsedResponse::MiddeskBusinessUpdateWebhook(self)
     }
 }

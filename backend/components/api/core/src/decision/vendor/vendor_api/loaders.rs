@@ -154,6 +154,8 @@ mod tests {
     #[test_state_case(VendorAPI::IncodeWatchlistCheck)]
     #[test_state_case(VendorAPI::IdologyPa)]
     #[test_state_case(VendorAPI::LexisFlexId)]
+    #[test_state_case(VendorAPI::MiddeskGetBusiness)]
+    #[test_state_case(VendorAPI::MiddeskBusinessUpdateWebhook)]
     #[tokio::test(flavor = "multi_thread")]
     async fn test_load_response_for_vendor_api_for_multiple_apis(state: &mut State, vendor_api: VendorAPI) {
         let FixtureData {
@@ -262,8 +264,30 @@ mod tests {
                 .await
             }
             VendorAPI::MiddeskCreateBusiness => todo!(),
-            VendorAPI::MiddeskGetBusiness => todo!(),
-            VendorAPI::MiddeskBusinessUpdateWebhook => todo!(),
+            VendorAPI::MiddeskGetBusiness => {
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    sv_id2,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    MiddeskGetBusiness,
+                )
+                .await
+            }
+            VendorAPI::MiddeskBusinessUpdateWebhook => {
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    sv_id2,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    MiddeskBusinessUpdateWebhook,
+                )
+                .await
+            }
             VendorAPI::MiddeskTinRetriedWebhook => todo!(),
             VendorAPI::IncodeStartOnboarding => todo!(),
             VendorAPI::IncodeAddFront => todo!(),
@@ -442,8 +466,10 @@ mod tests {
             VendorAPI::SocureIdPlus => todo!(),
             VendorAPI::ExperianPreciseId => idv::test_fixtures::experian_cross_core_response(None, None),
             VendorAPI::MiddeskCreateBusiness => todo!(),
-            VendorAPI::MiddeskGetBusiness => todo!(),
-            VendorAPI::MiddeskBusinessUpdateWebhook => todo!(),
+            VendorAPI::MiddeskGetBusiness => idv::test_fixtures::middesk_business_response(),
+            VendorAPI::MiddeskBusinessUpdateWebhook => {
+                idv::test_fixtures::middesk_business_update_webhook_response()
+            }
             VendorAPI::MiddeskTinRetriedWebhook => todo!(),
             VendorAPI::IncodeStartOnboarding => todo!(),
             VendorAPI::IncodeAddFront => todo!(),
