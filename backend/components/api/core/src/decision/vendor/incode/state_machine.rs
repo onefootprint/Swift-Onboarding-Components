@@ -107,7 +107,7 @@ impl IncodeStateMachine {
     ) -> ApiResult<Self> {
         let use_demo_creds_in_livemode =
             state
-                .feature_flag_client
+                .ff_client
                 .flag(feature_flag::BoolFlag::UseIncodeDemoCredentialsInLivemode(
                     &tenant_id,
                 ));
@@ -265,7 +265,7 @@ impl IncodeStateMachine {
         let docv_data = build_docv_data_from_identity_doc(state, id_doc.id.clone()).await?;
         let vault_country = uvw.get_decrypted_country(state).await?;
         let disable_selfie = state
-            .feature_flag_client
+            .ff_client
             .flag(feature_flag::BoolFlag::DisableSelfieChecking(&obc.tenant_id));
 
         let should_collect_selfie = doc_req.should_collect_selfie() && !id_doc.should_skip_selfie();
@@ -281,7 +281,7 @@ impl IncodeStateMachine {
             doc_request_id: doc_req.id,
             state: state.clone(),
             tenant_id: obc.tenant_id.clone(),
-            ff_client: state.feature_flag_client.clone(),
+            ff_client: state.ff_client.clone(),
             failed_attempts_for_side: 0, // !! this is the one thing that is hard coded here that would differ from the existing code path that inits a IVS. We could have this method pass in DocumentSide and calculate this for real and then also call this init method from /upload and consolidate code paths
             disable_selfie,
             is_re_run: true,

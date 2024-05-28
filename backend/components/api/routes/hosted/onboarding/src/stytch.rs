@@ -70,11 +70,7 @@ pub async fn post(
     let obc_key_for_flag = user_auth.ob_config().map(|o| o.key.clone());
     let should_hide_risk_signals = obc_key_for_flag
         .as_ref()
-        .map(|obc_key| {
-            state
-                .feature_flag_client
-                .flag(BoolFlag::IsNeuroEnabledForObc(obc_key))
-        })
+        .map(|obc_key| state.ff_client.flag(BoolFlag::IsNeuroEnabledForObc(obc_key)))
         .unwrap_or(false);
 
     state

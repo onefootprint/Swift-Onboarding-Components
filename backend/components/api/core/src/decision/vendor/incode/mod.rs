@@ -28,7 +28,7 @@ pub fn get_config_id(
 ) -> IncodeConfigurationId {
     let use_demo_creds_in_livemode =
         state
-            .feature_flag_client
+            .ff_client
             .flag(feature_flag::BoolFlag::UseIncodeDemoCredentialsInLivemode(
                 tenant_id,
             ));

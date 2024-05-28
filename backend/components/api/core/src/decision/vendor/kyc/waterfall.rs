@@ -33,7 +33,6 @@ use newtypes::{
 
 use super::waterfall_vendor_api::WaterfallVendorAPI;
 
-
 #[tracing::instrument(skip(state))]
 pub async fn run_kyc_waterfall(
     state: &State,
@@ -252,7 +251,6 @@ async fn complete_waterfall_execution(
         })
         .await?;
 
-
     Ok(())
 }
 
@@ -262,7 +260,6 @@ pub(super) enum WaterfallControlFlowAction {
     TryNextVendor,
 }
 
-
 #[derive(Clone)]
 pub(super) struct WaterfallStepResult {
     pub action: WaterfallControlFlowAction,
@@ -271,7 +268,6 @@ pub(super) struct WaterfallStepResult {
     pub verification_result_id: Option<VerificationResultId>,
     pub verification_result_is_error: Option<bool>,
 }
-
 
 impl WaterfallStepResult {
     pub fn new_with_action_only(action: WaterfallControlFlowAction) -> Self {
@@ -284,7 +280,6 @@ impl WaterfallStepResult {
         }
     }
 }
-
 
 #[tracing::instrument(skip_all)]
 pub(super) fn eval_waterfall_rules(

@@ -7,7 +7,7 @@ use diesel::{
     Queryable,
 };
 use newtypes::{
-    DataLifetimeSeqno, DocumentSide, DocumentUploadId, DocumentId, IncodeFailureReason, S3Url,
+    DataLifetimeSeqno, DocumentId, DocumentSide, DocumentUploadId, IncodeFailureReason, S3Url,
     SealedVaultDataKey,
 };
 

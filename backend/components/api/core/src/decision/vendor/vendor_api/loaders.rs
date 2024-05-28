@@ -18,7 +18,6 @@ use crate::{
 
 use super::vendor_parsable::{AsParsedResponse, VendorParsable};
 
-
 // Represents an attempt to load and deserialize a vendor API response
 pub enum LoadVendorResponseResult<T: AsParsedResponse> {
     NotFound,
@@ -26,7 +25,6 @@ pub enum LoadVendorResponseResult<T: AsParsedResponse> {
     Success((T, VerificationRequest, VerificationResult)),
     Error(ApiError),
 }
-
 
 impl<T: AsParsedResponse> LoadVendorResponseResult<T> {
     pub fn ok(self) -> Option<(T, VerificationResultId)> {
@@ -59,7 +57,6 @@ impl<T: AsParsedResponse> LoadVendorResponseResult<T> {
         }
     }
 }
-
 
 // This method loads and deserializes the latest successful vendor response for a given VendorAPI
 // for the given workflow.
@@ -102,7 +99,6 @@ where
     )
     .await?;
 
-
     let Some(pii_json) = decrypted.first().cloned() else {
         tracing::warn!(reason = "no response after decrypt", ?vendor_api, log_msg);
         return Ok(LoadVendorResponseResult::NoResponse);
@@ -116,7 +112,6 @@ where
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -143,7 +138,6 @@ mod tests {
     use idv::test_fixtures::DocTestOpts;
     use macros::test_state_case;
     use newtypes::{DecisionIntentId, DecisionIntentKind, ScopedVaultId, VendorAPI, WorkflowId};
-
 
     #[test_state_case(VendorAPI::ExperianPreciseId)]
     #[test_state_case(VendorAPI::IncodeApproveSession)]
@@ -216,7 +210,6 @@ mod tests {
                         }
                     }
                 }
-
 
                 Ok((vres_id_to_check, di.id))
             })

@@ -256,7 +256,6 @@ pub enum RuleSetResultKind {
 
 crate::util::impl_enum_string_diesel!(RuleSetResultKind);
 
-
 #[derive(
     Debug,
     Eq,

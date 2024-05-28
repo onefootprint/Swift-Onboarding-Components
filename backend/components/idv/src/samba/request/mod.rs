@@ -4,7 +4,6 @@ use self::license_validation::CreateLVOrderAddress;
 
 pub mod license_validation;
 
-
 // app code interop request structs
 #[derive(Default)]
 pub struct SambaCreateLVOrderRequest {

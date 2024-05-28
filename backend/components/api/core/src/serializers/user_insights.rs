@@ -210,7 +210,6 @@ pub fn from_db(
         vec![]
     };
 
-
     behavior_features.into_iter().chain(wf_features).collect()
 }
 

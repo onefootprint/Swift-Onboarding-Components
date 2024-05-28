@@ -459,9 +459,7 @@ impl ObConfigurationArgsToValidate {
             }
         }
 
-        let is_alpaca_tenant = state
-            .feature_flag_client
-            .flag(BoolFlag::IsAlpacaTenant(tenant_id));
+        let is_alpaca_tenant = state.ff_client.flag(BoolFlag::IsAlpacaTenant(tenant_id));
         // TODO: throw error if is_alpaca_tenant and another cip_kind sent up? TODO: restrict cip_kind to integration tenants now?
         let cip_kind = self.cip_kind.or(is_alpaca_tenant.then_some(CipKind::Alpaca));
 
@@ -471,9 +469,7 @@ impl ObConfigurationArgsToValidate {
 
         let can_make_no_phone_obc = !state.config.service_config.is_production()
             || tenant_id.is_integration_test_tenant()
-            || state
-                .feature_flag_client
-                .flag(BoolFlag::TenantCanMakeNoPhoneObc(tenant_id));
+            || state.ff_client.flag(BoolFlag::TenantCanMakeNoPhoneObc(tenant_id));
         if self.is_no_phone_flow && !can_make_no_phone_obc {
             return Err(TenantError::ValidationError(
                 "Unable to create config with is_no_phone_flow = true".to_owned(),
@@ -482,7 +478,7 @@ impl ObConfigurationArgsToValidate {
         }
 
         let can_make_doc_first = state
-            .feature_flag_client
+            .ff_client
             .flag(BoolFlag::TenantCanMakeDocFirstObc(tenant_id));
         if self.is_doc_first && !can_make_doc_first {
             return Err(TenantError::ValidationError(
@@ -552,7 +548,6 @@ impl ObConfigurationArgsToValidate {
                 }
             })?;
 
-
         // validate we are sending the checks appropriately during the migration
         match self.kind {
             ObConfigurationKind::Kyb => {
@@ -576,7 +571,6 @@ impl ObConfigurationArgsToValidate {
             ObConfigurationKind::Document => Ok(()),
         }?;
 
-
         // validate against collected data
         self.verification_checks
             .iter()
@@ -585,7 +579,6 @@ impl ObConfigurationArgsToValidate {
 
                 Ok(())
             })?;
-
 
         Ok(())
     }

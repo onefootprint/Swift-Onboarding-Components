@@ -103,8 +103,7 @@ async fn post(
             Ok((obc, actor, rs))
         })
         .await?;
-    let result =
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone()));
+    let result = api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()));
     ResponseData::ok(result).json()
 }
 

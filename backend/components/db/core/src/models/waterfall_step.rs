@@ -32,7 +32,6 @@ pub struct WaterfallStep {
     pub _created_at: DateTime<Utc>,
 }
 
-
 #[derive(Debug, Clone)]
 pub struct NewWaterfallStepArgs {
     pub vendor_api: VendorAPI,
@@ -48,7 +47,6 @@ pub struct NewWaterfallStepRow {
     step: i32,
     created_at: DateTime<Utc>,
 }
-
 
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = waterfall_step)]

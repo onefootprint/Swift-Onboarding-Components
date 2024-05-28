@@ -31,8 +31,7 @@ async fn test_handle_setup(state: &mut State) {
         .unwrap();
     assert!(vault.is_live);
 
-    let res =
-        utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &wf, &tenant.id).unwrap();
+    let res = utils::get_fixture_data_decision(state.ff_client.clone(), &vault, &wf, &tenant.id).unwrap();
     assert!(res.is_none()); // No fixture decision
 
     //
@@ -69,7 +68,6 @@ async fn test_handle_setup(state: &mut State) {
     });
     state.set_ff_client(mock_ff_client.into_mock());
 
-    let res =
-        utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &wf, &tenant.id).unwrap();
+    let res = utils::get_fixture_data_decision(state.ff_client.clone(), &vault, &wf, &tenant.id).unwrap();
     assert!(res == Some((DecisionStatus::Pass, false))); // Fixture decision for demo tenant
 }

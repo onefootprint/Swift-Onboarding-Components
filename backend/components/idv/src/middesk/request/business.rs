@@ -241,7 +241,6 @@ mod tests {
             BusinessDataForRequest::try_from((business_data.clone(), EinOnly(false))).unwrap();
         let business_request = BusinessRequest::from((business_data_for_request, "external_id123".into()));
 
-
         assert_eq!(business_request.clone(), expected_request_struct);
         assert_eq!(serde_json::to_value(business_request).unwrap(), expected_json);
 

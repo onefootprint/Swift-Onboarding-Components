@@ -59,7 +59,6 @@ pub async fn get_dupes(
             let vws: HashMap<ScopedVaultId, TenantVw> =
                 VaultWrapper::multi_get_for_tenant(conn, vaults, None)?;
 
-
             Ok((dupes, vws, neuro_dupes))
         })
         .await?;

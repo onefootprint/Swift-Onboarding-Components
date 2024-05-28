@@ -217,7 +217,6 @@ impl RiskSignal {
     }
 }
 
-
 impl RiskSignal {
     // Historically, we were writing RiskSignal's with onboarding_decision_id as a foreign key.
     // Now OBD_id is optional and soon new RiskSignal's will be created with onboarding_decision_id = None and instead have

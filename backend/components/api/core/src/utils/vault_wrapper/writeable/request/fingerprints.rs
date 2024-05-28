@@ -19,7 +19,6 @@ use crate::{
     utils::vault_wrapper::WriteableVw,
 };
 
-
 #[derive(Debug, Clone, derive_more::Deref)]
 pub(in super::super) struct Fingerprints {
     #[deref]

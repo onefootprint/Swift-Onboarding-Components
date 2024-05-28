@@ -12,7 +12,6 @@ pub(super) enum WaterfallRuleAction {
     RuleTriggered,
 }
 
-
 #[derive(Serialize)]
 pub(super) struct WaterfallRule(pub RuleExpression, pub WaterfallRuleAction);
 impl HasRule<WaterfallRuleAction> for WaterfallRule {
@@ -70,7 +69,6 @@ pub(super) fn waterfall_rules() -> Vec<WaterfallRule> {
     })
     .collect()
 }
-
 
 #[cfg(test)]
 mod tests {

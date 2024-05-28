@@ -47,7 +47,7 @@ pub async fn handle_incode_request(
     let sv_id: newtypes::ScopedVaultId = doc_request.scoped_vault_id.clone();
     let id_doc_id = identity_document_id.clone();
     let disable_selfie = state
-        .feature_flag_client
+        .ff_client
         .flag(feature_flag::BoolFlag::DisableSelfieChecking(&tenant_id));
     // Initialize our state machine
     let ctx = IncodeContext {

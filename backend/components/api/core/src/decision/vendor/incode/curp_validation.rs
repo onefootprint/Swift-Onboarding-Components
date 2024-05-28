@@ -283,7 +283,7 @@ impl DocumentForCurpHelper {
         let is_sandbox = !is_live;
         let can_make_incode_request_in_sandbox = !is_live
             && state
-                .feature_flag_client
+                .ff_client
                 .flag(BoolFlag::CanMakeDemoIncodeRequestsInSandbox(tenant_id))
             && matches!(fixture, Some(DocumentFixtureResult::Real),);
 
@@ -411,7 +411,6 @@ async fn save_canned_response(
             let update = DocumentUpdate::set_curp_completed_seqno(seqno);
             let _ = Document::update(conn, &id_doc_id, update)?;
 
-
             let vendor_result = VendorResult {
                 response: VendorResponse {
                     response: ParsedResponse::IncodeCurpValidation(parsed),
@@ -466,7 +465,6 @@ fn doc_expects_curp(doc: &Document) -> bool {
         Some(Iso3166TwoDigitCountryCode::MX)
     )
 }
-
 
 #[tracing::instrument(skip_all)]
 async fn handle_curp_error(

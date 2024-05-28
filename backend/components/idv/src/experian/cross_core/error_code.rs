@@ -66,7 +66,6 @@ pub enum ErrorCode {
     Other(String),
 }
 
-
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;

@@ -61,12 +61,7 @@ async fn get_list(
     let results = results
         .into_iter()
         .map(|(obc, actor, rs)| {
-            api_wire_types::OnboardingConfiguration::from_db((
-                obc,
-                actor,
-                rs,
-                state.feature_flag_client.clone(),
-            ))
+            api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()))
         })
         .collect::<Vec<_>>();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
@@ -97,7 +92,6 @@ async fn get_detail(
         })
         .await?;
 
-    let result =
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone()));
+    let result = api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()));
     ResponseData::ok(result).json()
 }

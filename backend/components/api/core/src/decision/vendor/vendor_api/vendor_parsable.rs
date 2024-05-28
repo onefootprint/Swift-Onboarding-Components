@@ -36,7 +36,6 @@ where
     }
 }
 
-
 // Idology KYC
 impl VendorParsable for IdologyExpectID {
     type ParsedType = ExpectIDResponse;

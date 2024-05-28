@@ -8,7 +8,7 @@ use api_core::{
     utils::file_upload::handle_file_upload,
 };
 
-use newtypes::{DocumentSide, DocumentId, WorkflowGuard};
+use newtypes::{DocumentId, DocumentSide, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
 
 const MIN_DOCUMENT_SIZE_IN_BYTES: usize = 100;

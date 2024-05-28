@@ -158,7 +158,6 @@ pub enum BusinessDataForRequest {
     },
 }
 
-
 impl From<BusinessOwnerData> for BoData {
     fn from(value: BusinessOwnerData) -> Self {
         Self {
@@ -209,11 +208,9 @@ impl TryFrom<(BusinessDataFromVault, EinOnly)> for BusinessDataForRequest {
             }
         };
 
-
         Ok(res)
     }
 }
-
 
 #[cfg(test)]
 mod tests {

@@ -8,7 +8,6 @@ use itertools::{chain, Itertools};
 use std::{collections::HashMap, str::FromStr};
 use strum::{EnumIter, EnumString, IntoEnumIterator};
 
-
 #[derive(Debug, Clone, derive_more::From, AsExpression, FromSqlRow, Eq, PartialEq, Hash)]
 #[diesel(sql_type = Text)]
 pub enum FingerprintKind {

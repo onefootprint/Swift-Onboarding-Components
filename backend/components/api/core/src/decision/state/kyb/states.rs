@@ -233,12 +233,8 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
             .db_pool
             .db_query(move |conn| DbWorkflow::get_with_vault(conn, &wf_id))
             .await?;
-        let fixture_decision = decision::utils::get_fixture_data_decision(
-            state.feature_flag_client.clone(),
-            &v,
-            &wf,
-            &self.t_id,
-        )?;
+        let fixture_decision =
+            decision::utils::get_fixture_data_decision(state.ff_client.clone(), &v, &wf, &self.t_id)?;
         if fixture_decision.is_none() {
             // TODO: later will refactor so we instead construct the BusinessData from the vault here, then make the CreateBusiness request to middesk
             // and then in the on_commit txn save the vreq + vres + MiddeskRequest with the business_id from the response all at once.
@@ -253,7 +249,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
                     &state.db_pool,
                     &state.config,
                     &state.enclave_client,
-                    state.feature_flag_client.clone(),
+                    state.ff_client.clone(),
                     state.vendor_clients.middesk_create_business.clone(),
                     &self.t_id,
                 )
@@ -403,11 +399,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let rule_exprs = rules.iter().map(|r| &r.rule_expression).collect_vec();
         let vault_data_for_rules = VaultDataForRules::decrypt_for_rules(state, vw, &rule_exprs).await?;
         let lists_for_rules = common::saturate_list_entries(state, &tenant, lists).await?;
-        Ok((
-            state.feature_flag_client.clone(),
-            vault_data_for_rules,
-            lists_for_rules,
-        ))
+        Ok((state.ff_client.clone(), vault_data_for_rules, lists_for_rules))
     }
 
     #[tracing::instrument("KybDecisioning#OnAction<MakeDecision, KybState>::on_commit", skip_all)]

@@ -38,7 +38,6 @@ pub struct LaunchDarklyFeatureFlagClient {
     launch_darkly_client: Option<Arc<ManagedClient>>,
 }
 
-
 impl LaunchDarklyFeatureFlagClient {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {

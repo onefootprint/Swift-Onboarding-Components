@@ -90,7 +90,6 @@ struct NewFingerprintJunction<'a> {
     lifetime_id: &'a DataLifetimeId,
 }
 
-
 impl Fingerprint {
     #[tracing::instrument("Fingerprint::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprintArgs>) -> DbResult<()> {

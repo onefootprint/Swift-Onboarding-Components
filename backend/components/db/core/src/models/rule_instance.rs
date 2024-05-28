@@ -613,7 +613,6 @@ mod tests {
                 .version
         );
 
-
         let update = RuleInstanceUpdate {
             rule_id: rule.rule_id.clone(),
             name: Some(Some("name2".to_owned())),
@@ -795,7 +794,6 @@ mod tests {
         assert_eq!(RuleAction::ManualReview, new_rules[0].action);
         assert_eq!(RuleAction::ManualReview, new_rules[1].action);
 
-
         // list should return 5 rules. we started with 5, deleted 2, and added 2 (and edited 2)
         assert_eq!(
             5,
@@ -825,7 +823,6 @@ mod tests {
 
         let reloaded_rule1 = RuleInstance::get(conn, &rule1.rule_id).unwrap();
         assert_eq!(reloaded_rule1.action, RuleAction::StepUp(StepUpKind::Identity));
-
 
         let rule2 = NewRule {
             name: Some("name1".to_owned()),

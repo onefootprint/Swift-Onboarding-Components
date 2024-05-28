@@ -2,9 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     auth::{
-        session::{
-            tenant::WorkOsSession, AuthSessionData, ExtractableAuthSession, RequestInfo,
-        },
+        session::{tenant::WorkOsSession, AuthSessionData, ExtractableAuthSession, RequestInfo},
         AuthError,
     },
     errors::ApiResult,

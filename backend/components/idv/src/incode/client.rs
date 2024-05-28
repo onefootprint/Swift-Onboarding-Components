@@ -746,7 +746,6 @@ mod tests {
 
         assert!(!customer_res.success);
 
-
         let raw_fetch_scores_res = authenticated_client
             .fetch_scores(&fp_client)
             .await

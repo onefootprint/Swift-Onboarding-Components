@@ -74,7 +74,7 @@ pub async fn post(
     // Only allow certain tenants to create third-party auth
     let can_provide_3p_auth = auth.tenant().is_demo_tenant
         || state
-            .feature_flag_client
+            .ff_client
             .flag(BoolFlag::CanProvideThirdPartyAuth(&tenant_id));
     if third_party_auth && !can_provide_3p_auth {
         return Err(ValidationError("You are not able to provide third-party authentication.").into());

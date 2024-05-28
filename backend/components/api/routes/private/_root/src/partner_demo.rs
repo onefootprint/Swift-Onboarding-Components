@@ -25,7 +25,6 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Deserialize)]
 #[serde(rename_all = "snake_case")]
 struct CreatePartnerDemoRequest {
@@ -64,7 +63,6 @@ struct DemoUser {
     id: TenantUserId,
     token: SessionAuthToken,
 }
-
 
 #[post("/private/partner_demo")]
 pub async fn post(

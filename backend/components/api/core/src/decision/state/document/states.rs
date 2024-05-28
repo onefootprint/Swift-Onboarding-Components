@@ -30,7 +30,6 @@ use newtypes::{
 };
 use std::{collections::HashMap, sync::Arc};
 
-
 ///
 /// States
 ///
@@ -142,7 +141,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(state.feature_flag_client.clone())
+        Ok(state.ff_client.clone())
     }
 
     #[tracing::instrument("OnAction<MakeDecision, DocumentState>::on_commit", skip_all)]

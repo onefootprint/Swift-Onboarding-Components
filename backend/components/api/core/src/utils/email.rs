@@ -266,9 +266,7 @@ pub async fn send_email_challenge(
 ) -> Result<(), ApiError> {
     // Some tenants don't ever want to verify email
     // TODO we'll want to ignore this on no-phone OBCs
-    let omit_email_verification = state
-        .feature_flag_client
-        .flag(BoolFlag::OmitEmailVerification(tenant_id));
+    let omit_email_verification = state.ff_client.flag(BoolFlag::OmitEmailVerification(tenant_id));
     if omit_email_verification {
         return Ok(());
     }

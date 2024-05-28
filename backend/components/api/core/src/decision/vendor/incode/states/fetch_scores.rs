@@ -396,7 +396,6 @@ async fn add_customer_and_save_session(
     let session_args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeApproveSession, &ctx);
     let _ = session_args.save(db_pool).await?;
 
-
     let parsed: AddCustomerResponse = res
         .map_err(map_to_api_error)?
         .result
@@ -428,7 +427,6 @@ async fn add_customer_and_save_session(
         ivs_id=?log_ivs_id,
         "IncodeCustomerSession creation result"
     );
-
 
     Ok(())
 }

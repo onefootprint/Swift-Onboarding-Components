@@ -135,7 +135,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let person_requirement_opts = RequirementOpts {
         require_capture_on_stepup: Some(
             state
-                .feature_flag_client
+                .ff_client
                 .flag(BoolFlag::RequireCaptureOnStepUp(&person_obc.key)),
         ),
     };
@@ -491,7 +491,6 @@ fn get_requirement_inner(
                         // TODO this might be a new mode - select between capture or upload, no preference
                         DocumentRequestKind::Custom => DocumentUploadMode::AllowUpload,
                     };
-
 
                     let req = OnboardingRequirement::CollectDocument {
                         document_request_id: dr.id.clone(),

@@ -113,7 +113,6 @@ impl CrossCoreAPIResponse {
             Error::ResponseError(CrossCoreResponseError::Error(description, code))
         });
 
-
         // Check for errors
         if let Some(e) = final_err {
             return Err(e);

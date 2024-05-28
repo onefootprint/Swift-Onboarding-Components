@@ -15,8 +15,8 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    DecisionStatus, DocumentFixtureResult, OnboardingStatus, RiskSignalGroupKind, TenantId,
-    VendorAPI, WorkflowFixtureResult, WorkflowId,
+    DecisionStatus, DocumentFixtureResult, OnboardingStatus, RiskSignalGroupKind, TenantId, VendorAPI,
+    WorkflowFixtureResult, WorkflowId,
 };
 
 use super::{
@@ -101,10 +101,7 @@ pub async fn should_initiate_requests_for_document(
         //     // Ensure that each sandbox vault has a fixture result - we don't want to make real
         //     // requests for sandbox vaults
         //     .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
-        Ok(matches!(
-            document_decision,
-            Some(DocumentFixtureResult::Real)
-        ))
+        Ok(matches!(document_decision, Some(DocumentFixtureResult::Real)))
     // guard against prod vaults from providing document fixtures (we prevent this in the API route that starts the flow, but double checking never hurt nobody)
     } else if document_decision.is_some() {
         Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into())

@@ -74,7 +74,6 @@ pub enum IdDocKind {
     VoterIdentification,
 }
 
-
 impl TryFrom<DocumentKind> for IdDocKind {
     type Error = crate::Error;
 
@@ -109,7 +108,6 @@ impl From<IdDocKind> for DocumentKind {
         }
     }
 }
-
 
 impl From<DocumentKind> for DocumentRequestKind {
     fn from(value: DocumentKind) -> Self {

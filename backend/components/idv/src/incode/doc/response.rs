@@ -534,7 +534,6 @@ impl IncodeOcrFixtureResponseFields {
     }
 }
 
-
 impl FetchOCRResponse {
     fn format_date(date: Option<&ScrubbedPiiString>) -> Result<ScrubbedPiiString, IncodeError> {
         let expiration_timestamp = date

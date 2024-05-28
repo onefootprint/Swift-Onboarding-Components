@@ -42,7 +42,6 @@ struct ExperianResponse(VR);
 #[derive(Clone, Debug)]
 struct IdologyResponse(VR);
 
-
 #[derive(Clone, Debug)]
 enum ExpectedResult {
     SingularSuccessVendorResult(Vendor),
@@ -273,7 +272,6 @@ async fn test_run_kyc_waterfall(
     .await;
 }
 
-
 fn mock_calls(state: &mut State, experian_response: ExperianResponse, idology_response: IdologyResponse) {
     // TODO: maybe by default the state's mock_ff_client could respond to any flag and return their default value (since thats something we specify in enum). Oof but then we gotta solve the whole is_production dealiooo
     let mut mock_ff_client = MockFFClient::new();
@@ -384,7 +382,6 @@ async fn assert_vendor_result(state: &mut State, expected_vendor: Vendor, vr: Ve
         _ => panic!(),
     };
 }
-
 
 async fn assert_waterfall_execution(
     state: &mut State,

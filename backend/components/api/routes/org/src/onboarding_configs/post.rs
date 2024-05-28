@@ -145,7 +145,7 @@ pub async fn post(
     };
 
     let args = ObConfigurationArgsToValidate::validate(&state, args, &tenant)?;
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
     let (obc, actor, rs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -159,7 +159,7 @@ pub async fn post(
         .await?;
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone())),
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone())),
     )))
 }
 

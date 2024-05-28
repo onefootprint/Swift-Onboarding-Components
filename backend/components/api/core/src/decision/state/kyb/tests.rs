@@ -173,7 +173,6 @@ async fn run_kyc_for_bo(
     assert!(!rs.is_empty());
     assert!(rs.iter().all(|r| !r.hidden));
 
-
     // Expect Webhooks
     mock_webhooks(
         state,

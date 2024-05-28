@@ -225,7 +225,6 @@ pub(super) async fn post_inner(
     ResponseData::ok(out).json()
 }
 
-
 impl TempDecryptResponse {
     fn build(resp: DecryptResponse) -> Self {
         // Temporarily, while we're migrating away from old ProofOfAddress DIs, manually include

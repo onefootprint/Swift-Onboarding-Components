@@ -247,7 +247,7 @@ pub async fn run_watchlist_check(
     // dont make real call if non-Prod, unless specifically FF'd to do so
     if state.config.service_config.is_production()
         || state
-            .feature_flag_client
+            .ff_client
             .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(&obc.key))
     {
         make_watchlist_result_call(
@@ -295,7 +295,6 @@ async fn existing_watchlist_check_response(
         .ok()
         .map(|(u, vres_id)| (u.0, vres_id)),
     };
-
 
     if let Some((wr, vres_id)) = response {
         Ok(Some((vres_id, wr)))

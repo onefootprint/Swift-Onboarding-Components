@@ -186,9 +186,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             None
         };
 
-        let is_neuro_enabled_ff = state
-            .feature_flag_client
-            .flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
+        let is_neuro_enabled_ff = state.ff_client.flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
         let is_neuro_enabled_for_workflow = wf.is_neuro_enabled;
         let neuro_result = if is_neuro_enabled_ff && is_neuro_enabled_for_workflow {
             match common::run_neuro_check(state, &self.wf_id, &self.t_id).await {
@@ -224,7 +222,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             user_input_reason_codes,
             kyc_vendor_result,
             aml_vendor_result,
-            state.feature_flag_client.clone(),
+            state.ff_client.clone(),
             curp_result,
             neuro_result,
         )))
@@ -408,11 +406,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let vault_data_for_rules = VaultDataForRules::decrypt_for_rules(state, vw, &rule_exprs).await?;
         let lists_for_rules = common::saturate_list_entries(state, &tenant, lists).await?;
 
-        Ok((
-            state.feature_flag_client.clone(),
-            vault_data_for_rules,
-            lists_for_rules,
-        ))
+        Ok((state.ff_client.clone(), vault_data_for_rules, lists_for_rules))
     }
 
     #[tracing::instrument("OnAction<MakeDecision, KycState>::on_commit", skip_all)]

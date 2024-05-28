@@ -49,6 +49,6 @@ async fn patch(
         .await?;
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.feature_flag_client.clone())),
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone())),
     )))
 }

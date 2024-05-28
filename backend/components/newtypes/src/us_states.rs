@@ -204,13 +204,11 @@ impl From<UsStateFull> for UsState {
     }
 }
 
-
 #[cfg(test)]
 
 mod tests {
     use super::*;
     use test_case::test_case;
-
 
     #[test_case("  North DaKotA     " => UsStateFull::NorthDakota)]
     #[test_case("new york" => UsStateFull::NewYork)]

@@ -204,7 +204,6 @@ pub fn default_rules_for_obc(
         }
     });
 
-
     // KYB
     let business_rules = if !obc.skip_kyb && obc.kind == ObConfigurationKind::Kyb {
         base_kyb_rules()
@@ -213,7 +212,6 @@ pub fn default_rules_for_obc(
     }
     .into_iter()
     .map(|(r, a)| (r, a, RuleInstanceKind::Business));
-
 
     person_rules
         .into_iter()

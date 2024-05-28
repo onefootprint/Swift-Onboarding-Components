@@ -73,7 +73,6 @@ impl IncodeCustomerSession {
             }
         };
 
-
         Ok(res)
     }
 }
@@ -108,7 +107,6 @@ impl IncodeCustomerSession {
         Ok(IncodeSelfieDupesResult { internal: matches })
     }
 }
-
 
 #[derive(derive_more::From)]
 pub enum IncodeCustomerSessionIdentifier<'a> {

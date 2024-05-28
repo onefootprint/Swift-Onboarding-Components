@@ -72,7 +72,7 @@ pub struct State {
     pub session_sealing_key: ScopedSealingKey,
     pub idology_client: IdologyClient, // TOOD: remove, only used for now unused idology endpoints
     pub s3_client: Arc<dyn S3Client>,
-    pub feature_flag_client: Arc<dyn FeatureFlagClient>,
+    pub ff_client: Arc<dyn FeatureFlagClient>,
     pub webhook_client: Arc<dyn WebhookClient>,
     #[allow(unused)]
     pub billing_client: billing::BillingClient,
@@ -117,7 +117,7 @@ impl State {
     #[allow(clippy::expect_used)]
     #[tracing::instrument(skip_all)]
     pub async fn init_or_die(mut config: Config) -> Self {
-        let feature_flag_client: Arc<dyn FeatureFlagClient> = if config.disable_launch_darkly.is_none() {
+        let ff_client: Arc<dyn FeatureFlagClient> = if config.disable_launch_darkly.is_none() {
             let ff_client = LaunchDarklyFeatureFlagClient::new();
             let ff_client = match ff_client.init(&config.launch_darkly_sdk_key).await {
                 Ok(client) => {
@@ -173,7 +173,7 @@ impl State {
             twilio,
             twilio_backup,
             config.time_s_between_challenges,
-            feature_flag_client.clone(),
+            ff_client.clone(),
         )
         .expect("failed to build SMS client");
 
@@ -285,7 +285,7 @@ impl State {
             session_sealing_key,
             idology_client,
             s3_client: Arc::new(s3_client),
-            feature_flag_client,
+            ff_client,
             webhook_client: Arc::new(webhook_service_client),
             billing_client,
             fingerprintjs_client,
@@ -303,7 +303,7 @@ impl State {
 
     #[cfg(test)]
     pub fn set_ff_client(&mut self, ff_client: Arc<dyn FeatureFlagClient>) {
-        self.feature_flag_client = ff_client;
+        self.ff_client = ff_client;
     }
 
     #[cfg(test)]
@@ -600,7 +600,7 @@ mod test {
         state.set_s3_client(Arc::new(mock_s3_client));
 
         // Test
-        let flag_res = state.feature_flag_client.flag(BoolFlag::DisableAllSocure);
+        let flag_res = state.ff_client.flag(BoolFlag::DisableAllSocure);
 
         let socure_res = state
             .vendor_clients
@@ -649,7 +649,7 @@ mod test {
         state.set_ff_client(Arc::new(mock_ff_client));
 
         // Test
-        let flag_res = state.feature_flag_client.flag(BoolFlag::DisableAllSocure);
+        let flag_res = state.ff_client.flag(BoolFlag::DisableAllSocure);
         some_db_stuff(state).await; // just for good measure
         flag_res
     }

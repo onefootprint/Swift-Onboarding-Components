@@ -16,7 +16,7 @@ pub async fn add_default_rules(
     _: ProtectedAuth,
     path: web::Path<ObConfigurationId>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {

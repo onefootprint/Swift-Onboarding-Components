@@ -23,7 +23,6 @@ pub struct FingerprintedDataRequest {
     pub(super) fingerprints: Fingerprints,
 }
 
-
 impl FingerprintedDataRequest {
     /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
     /// and returns a new DataRequest with the Fingerprints populated.

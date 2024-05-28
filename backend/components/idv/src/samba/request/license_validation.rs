@@ -56,7 +56,6 @@ pub struct CreateLVOrderAddress {
     pub zip_code: PiiString,
 }
 
-
 impl From<SambaCreateLVOrderRequest> for CreateLVOrderRequest {
     fn from(value: SambaCreateLVOrderRequest) -> Self {
         let SambaCreateLVOrderRequest {

@@ -200,7 +200,6 @@ impl paperclip::v2::schema::Apiv2Schema for RootSpan {
 
 impl paperclip::actix::OperationModifier for RootSpan {}
 
-
 struct DatadogJsonEventFormatter;
 
 impl<S, N> FormatEvent<S, N> for DatadogJsonEventFormatter

@@ -82,7 +82,7 @@ pub async fn get(
         .collect_vec();
     let ob_config = user_auth.ob_config()?.clone();
     let tenant = user_auth.tenant().clone();
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
     let ob_config =
         api_wire_types::PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
 

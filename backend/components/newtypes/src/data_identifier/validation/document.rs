@@ -45,7 +45,6 @@ impl CleanAndValidate for DocumentDiKind {
     }
 }
 
-
 fn validate_barcodes(doc_kind: DocumentDiKind, value: PiiJsonValue) -> VResult<DataIdentifierValue<()>> {
     let value_kind = PiiValueKind::from(&value);
     if value_kind != PiiValueKind::Array {

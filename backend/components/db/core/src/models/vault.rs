@@ -387,7 +387,6 @@ impl Vault {
             .collect_vec();
         let v_ids = vaults.iter().map(|v| &v.id).collect_vec();
 
-
         // Get the scoped vaults for each vault
         let v_id_to_svs = scoped_vault::table
             .filter(scoped_vault::vault_id.eq_any(v_ids.clone()))

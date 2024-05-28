@@ -3,7 +3,6 @@ use strum::{EnumIter, IntoEnumIterator};
 
 use crate::{BusinessDataKind as BDK, DataIdentifier, FingerprintScope, IdentityDataKind as IDK, TenantId};
 
-
 impl DataIdentifier {
     /// Given a DataIdentifier and its corresponding data, returns the fingerprintable payloads
     /// that will be sent to the enclave

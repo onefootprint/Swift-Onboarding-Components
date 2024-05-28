@@ -37,7 +37,6 @@ impl DbToApi<(Option<UserCounts>, Tenant)> for api_wire_types::PrivateTenant {
     }
 }
 
-
 impl DbToApi<(Tenant, Option<BillingProfile>)> for api_wire_types::PrivateTenantDetail {
     fn from_db((t, bp): (Tenant, Option<BillingProfile>)) -> Self {
         let Tenant {
@@ -91,7 +90,6 @@ impl DbToApi<(Tenant, Option<BillingProfile>)> for api_wire_types::PrivateTenant
         }
     }
 }
-
 
 impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
     fn from_db(bp: BillingProfile) -> Self {

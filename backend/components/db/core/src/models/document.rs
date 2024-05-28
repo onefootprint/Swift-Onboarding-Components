@@ -196,7 +196,6 @@ impl Document {
             .values(new)
             .get_result(conn.conn())?;
 
-
         Ok(result)
     }
 

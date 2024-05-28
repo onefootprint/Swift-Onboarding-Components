@@ -66,7 +66,7 @@ pub fn get(
         })
         .await?;
 
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
 
     Ok(Json(ResponseData::ok(
         api_wire_types::PublicOnboardingConfiguration::from_db((

@@ -59,7 +59,6 @@ impl WaterfallVendorAPI {
         let futs = Self::iter()
             .map(|v| Self::get_vendor_result(v.clone(), state, id.clone(), user_vault_private_key));
 
-
         let res = futures::future::join_all(futs)
             .await
             .into_iter()
@@ -91,7 +90,6 @@ impl From<WaterfallVendorAPI> for VendorAPI {
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {

@@ -24,7 +24,6 @@ pub struct PrivateTenant {
     pub super_tenant_id: Option<TenantId>,
 }
 
-
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct PrivateTenantDetail {
     pub id: TenantId,

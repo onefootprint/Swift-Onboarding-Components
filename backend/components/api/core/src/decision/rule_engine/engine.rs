@@ -209,7 +209,6 @@ impl VaultDataForRules {
     }
 }
 
-
 #[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all)]
 pub fn evaluate_rules(

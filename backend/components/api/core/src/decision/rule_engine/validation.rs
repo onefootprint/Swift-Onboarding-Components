@@ -179,10 +179,8 @@ pub fn validate_rule_expression(
         .min()
         .ok_or(AssertionError("unable to compute rule instance kind"))?;
 
-
     Ok((RuleExpression(rule_expression.0), rule_instance_kind))
 }
-
 
 // TODO: test
 pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) -> RuleInstanceKind {
@@ -210,7 +208,6 @@ pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) ->
         RuleInstanceKind::Person
     }
 }
-
 
 #[cfg(test)]
 mod tests {

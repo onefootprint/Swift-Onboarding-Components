@@ -50,7 +50,7 @@ pub async fn just_in_time(
 
     let tenant_id = &auth.tenant().id;
     if !state
-        .feature_flag_client
+        .ff_client
         .flag(feature_flag::BoolFlag::IsVaultProxyJitEndpointEnabled(tenant_id))
     {
         return Err(AuthError::ApiEndpointRequiresSupportEnablement.into());
@@ -89,7 +89,7 @@ pub async fn id(
 
     let tenant_id = &auth.tenant().id;
     if !state
-        .feature_flag_client
+        .ff_client
         .flag(feature_flag::BoolFlag::IsVaultProxyPreConfiguredEndpointEnabled(
             tenant_id,
         ))

@@ -45,17 +45,16 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
         let VendorAPIError { vendor_api: _, error } = err;
         let log_msg = "Error making vendor call";
         match error {
-            idv::Error::ExperianError(ExperianError::ErrorWithResponse(e)) => {
-                match e.is_known_error() {
-                    true => {tracing::warn!(?err, log_msg);},
-                    false => tracing::error!(?err, log_msg),
+            idv::Error::ExperianError(ExperianError::ErrorWithResponse(e)) => match e.is_known_error() {
+                true => {
+                    tracing::warn!(?err, log_msg);
                 }
+                false => tracing::error!(?err, log_msg),
+            },
+            _ => {
+                tracing::error!(?err, log_msg);
             }
-            _ => {tracing::error!(?err, log_msg);}
         };
-
-        
-        
     }
 
     let sv_id = sv_id.clone();
@@ -120,7 +119,7 @@ pub async fn send_idv_request(
                 is_production,
                 ob_configuration_key,
                 state.vendor_clients.idology_expect_id.clone(),
-                state.feature_flag_client.clone(),
+                state.ff_client.clone(),
             )
             .await
         }
@@ -140,7 +139,7 @@ pub async fn send_idv_request(
                 ob_configuration_key,
                 is_production,
                 state.vendor_clients.socure_id_plus.clone(),
-                state.feature_flag_client.clone(),
+                state.ff_client.clone(),
             )
             .await
         }
@@ -151,7 +150,7 @@ pub async fn send_idv_request(
                 is_production,
                 ob_configuration_key,
                 state.vendor_clients.experian_cross_core.clone(),
-                state.feature_flag_client.clone(),
+                state.ff_client.clone(),
             )
             .await
         }
@@ -168,7 +167,7 @@ pub async fn send_idv_request(
                     is_production,
                     ob_configuration_key,
                     state.vendor_clients.lexis_flex_id.clone(),
-                    state.feature_flag_client.clone(),
+                    state.ff_client.clone(),
                 )
                 .await
             } else {

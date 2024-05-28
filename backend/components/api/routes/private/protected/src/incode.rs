@@ -93,7 +93,7 @@ pub async fn rerun_machine(
         !su.is_live,
         dr.should_collect_selfie(),
         &dr.workflow_id,
-        state.feature_flag_client.clone(),
+        state.ff_client.clone(),
         Some(0),
         true,
         vec![],

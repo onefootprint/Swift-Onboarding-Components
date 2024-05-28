@@ -87,7 +87,6 @@ pub async fn get_business_info(
     ResponseData::ok(tbi).json()
 }
 
-
 #[derive(serde::Deserialize)]
 pub struct UpdateTenantLiveModeRequest {
     is_live: bool,

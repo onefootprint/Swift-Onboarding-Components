@@ -384,7 +384,6 @@ pub fn get_verification_checks_for_legacy_compat(
 ) -> Vec<VerificationCheck> {
     let mut checks = vec![];
 
-
     // Frontend will start sending KYB checks first, so if we receive one, take that
     if let Some(api_checks) = verification_checks_from_api_req {
         api_checks.into_iter().for_each(|c| {

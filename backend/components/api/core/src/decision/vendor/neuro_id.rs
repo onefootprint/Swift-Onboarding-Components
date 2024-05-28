@@ -200,11 +200,8 @@ pub async fn save_neuro_event(
 }
 
 pub fn tenant_can_view_neuro(state: &State, tenant_id: &TenantId) -> bool {
-    state
-        .feature_flag_client
-        .flag(BoolFlag::TenantCanViewNeuro(tenant_id))
+    state.ff_client.flag(BoolFlag::TenantCanViewNeuro(tenant_id))
 }
-
 
 #[cfg(test)]
 
@@ -347,7 +344,6 @@ mod tests {
         };
         let resp4 = test_fixtures::neuro_id_success_response(opts4);
         let sv4 = create_neuro_event(state, resp4, None).await;
-
 
         //
         // Tests

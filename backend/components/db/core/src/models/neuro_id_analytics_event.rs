@@ -49,7 +49,6 @@ pub struct NeuroIdAnalyticsEvent {
     // pub model_combined_digital_intent_result: Option<String>,
 }
 
-
 #[derive(Debug, Clone)]
 pub struct NewNeuroIdAnalyticsEvent {
     pub verification_result_id: VerificationResultId,

@@ -83,9 +83,7 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
-    let is_neuro_enabled = state
-        .feature_flag_client
-        .flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
+    let is_neuro_enabled = state.ff_client.flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
@@ -125,7 +123,7 @@ pub async fn post(
         })
         .await?;
 
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
     let onboarding_config =
         api_wire_types::PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
     ResponseData::ok(OnboardingResponse {

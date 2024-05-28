@@ -267,7 +267,6 @@ pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId, obc:
         .for_each(|bdk| update.push(bdk))
     }
 
-
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, sb_id).unwrap();
     uvw.patch_data_test(conn, update, false).unwrap();
 }

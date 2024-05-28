@@ -87,7 +87,7 @@ pub async fn run_kyc_vendor_calls(
             Ok((wf, v, di))
         })
         .await?;
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
     let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
 
     if fixture_decision.is_some() {
@@ -161,7 +161,7 @@ pub async fn run_aml_call(
             Ok((wf, obc, v, di))
         })
         .await?;
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
     let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
 
     if let Some(fixture_decision) = fixture_decision {

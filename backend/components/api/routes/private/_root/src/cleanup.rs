@@ -111,7 +111,7 @@ async fn post(
 
     let is_production = state.config.service_config.is_production();
 
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
     let num_deleted_rows = state
         .db_pool
         .db_transaction(move |conn| -> Result<usize, ApiError> {
@@ -146,7 +146,7 @@ async fn post(
 fn ensure_phone_number_allowed(state: &State, phone_number: &PhoneNumber) -> ApiResult<bool> {
     // Use e164 to see if cleanup is allowed for this phone number
     let can_clean_up_number = state
-        .feature_flag_client
+        .ff_client
         .flag(BoolFlag::CanCleanUpPhoneNumber(&phone_number.e164()));
 
     if !can_clean_up_number {

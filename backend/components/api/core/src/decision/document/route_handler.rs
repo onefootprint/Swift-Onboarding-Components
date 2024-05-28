@@ -51,7 +51,7 @@ pub async fn handle_document_create(
     let doc_kind: DocumentRequestKind = document_type.into();
     let su_id = sv_id.clone();
     let su_id2 = su_id.clone();
-    let ff_client = state.feature_flag_client.clone();
+    let ff_client = state.ff_client.clone();
 
     tracing::info!(has_request_id=%request_id.is_some(), "Creating document with request_id");
 
@@ -327,7 +327,7 @@ pub async fn handle_document_process(
             is_sandbox,
             should_collect_selfie,
             &wf_id3,
-            state.feature_flag_client.clone(),
+            state.ff_client.clone(),
             failed_attempts,
             false,
             missing_sides.0,

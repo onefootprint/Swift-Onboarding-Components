@@ -3,8 +3,8 @@ use idv::incode::{
     IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    DecisionIntentId, DocumentId, IncodeConfigurationId, IncodeEnvironment, ScopedVaultId,
-    VaultPublicKey, VendorAPI,
+    DecisionIntentId, DocumentId, IncodeConfigurationId, IncodeEnvironment, ScopedVaultId, VaultPublicKey,
+    VendorAPI,
 };
 
 use crate::{

@@ -661,7 +661,6 @@ pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Re
     }
 }
 
-
 async fn send_middesk_call(
     db_pool: &DbPool,
     middesk_client: &VendorClient<

@@ -2,7 +2,6 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::waterfall_execution;
 use newtypes::{DecisionIntentId, Locked, VendorAPI, WaterfallExecutionId};
 
-
 use diesel::{prelude::*, Insertable, Queryable};
 
 use crate::{DbResult, NonNullVec, PgConn, TxnPgConn};
@@ -23,7 +22,6 @@ pub struct WaterfallExecution {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
 }
-
 
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = waterfall_execution)]
@@ -48,7 +46,6 @@ impl UpdateWaterfallExecution {
     }
 }
 
-
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = waterfall_execution)]
 pub struct NewWaterfallExecutionRow {
@@ -57,7 +54,6 @@ pub struct NewWaterfallExecutionRow {
     latest_step: i32,
     created_at: DateTime<Utc>,
 }
-
 
 impl WaterfallExecution {
     #[tracing::instrument("WaterfallExecution::get_or_create", skip_all)]

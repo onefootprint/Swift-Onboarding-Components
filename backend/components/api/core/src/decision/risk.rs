@@ -104,7 +104,6 @@ pub fn save_final_decision(
     Ok(())
 }
 
-
 fn get_final_decision_status(
     decision: Decision,
     has_doc_mr: bool,
@@ -128,7 +127,6 @@ fn get_final_decision_status(
         Decision::RulesNotExecuted => (DecisionStatus::Pass, false),
     }
 }
-
 
 #[cfg(test)]
 mod test {

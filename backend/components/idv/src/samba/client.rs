@@ -46,7 +46,6 @@ impl SambaSafetyClientAdapter {
             header::HeaderValue::from_str(credentials.api_key.leak())?,
         );
 
-
         Ok(Self {
             base_url,
             headers: SambaHeaders(headers),
@@ -190,7 +189,6 @@ impl AuthenticatedSambaSafetyClientAdapter {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::{
@@ -229,7 +227,6 @@ mod tests {
         get_authed_client(get_credentials()).await;
     }
 
-
     #[ignore]
     #[tokio::test]
     async fn test_create_order() {
@@ -264,14 +261,12 @@ mod tests {
             .await
             .unwrap();
 
-
         let response: CreateLVOrderResponse = serde_json::from_value(raw_response).unwrap();
         let order_id = response.order_id;
         assert!(!order_id.leak().is_empty());
 
         // wait for a few secs so it moves to FULFILLED
         thread::sleep(time::Duration::from_secs(10));
-
 
         // get order status
         let order_resp = authed_client
@@ -281,7 +276,6 @@ mod tests {
             .json()
             .await
             .unwrap();
-
 
         let response: CheckLVOrderStatus = serde_json::from_value(order_resp).unwrap();
         let report_id = response.report_id().unwrap();
