@@ -17,7 +17,6 @@ pub fn configure(config: &mut actix_web::web::ServiceConfig) {
         .service(cleanup::post)
         .service(assume::post)
         .service(entities::get)
-        .service(tenants::get)
         .service(test_tenant::post)
         .service(test_partner_tenant::post)
         .service(panic::get)
@@ -26,4 +25,6 @@ pub fn configure(config: &mut actix_web::web::ServiceConfig) {
         .service(invoice::post_all)
         .service(compliance_partnership::post)
         .service(partner_demo::post);
+
+    tenants::configure(config);
 }

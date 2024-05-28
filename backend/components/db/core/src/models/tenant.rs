@@ -1,8 +1,11 @@
-use super::tenant_role::{ImmutableRoleKind, TenantRole};
+use super::{
+    billing_profile::BillingProfile,
+    tenant_role::{ImmutableRoleKind, TenantRole},
+};
 use crate::{helpers::WorkosAuthIdentity, DbResult, NonNullVec, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
-    scoped_vault,
+    billing_profile, scoped_vault,
     tenant::{self, BoxedQuery},
 };
 use diesel::{
@@ -217,6 +220,15 @@ impl Tenant {
             results.retain(|t| t.domains.is_empty() != only_with_domains);
         }
         Ok(results)
+    }
+
+    #[tracing::instrument("Tenant::private_get", skip_all)]
+    pub fn private_get(conn: &mut PgConn, id: &TenantId) -> DbResult<(Self, Option<BillingProfile>)> {
+        let result = tenant::table
+            .filter(tenant::id.eq(id))
+            .left_join(billing_profile::table)
+            .get_result(conn)?;
+        Ok(result)
     }
 
     #[tracing::instrument("Tenant::private_user_counts", skip_all)]
