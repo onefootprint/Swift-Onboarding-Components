@@ -21,16 +21,16 @@ base64 = { workspace = true }
 regex = { workspace = true }
 async-trait = { workspace = true }
 crypto = { path = "../enclave/crypto" }
-lazy_static = "1.0"
+lazy_static = { workspace = true }
 uuid = { workspace = true }
 itertools = { workspace = true }
 reqwest = { workspace = true }
-serde_with = "2.2.0"
+serde_with = { workspace = true }
 either = { workspace = true }
 mime = { workspace = true }
 futures-util = { workspace = true }
 futures = { workspace = true }
-card-validate = "2.3"
+card-validate = { workspace = true }
 enum_variant_type = { workspace = true }
 tracing = { workspace = true }
 macros = { path = "../macros" }
@@ -38,12 +38,12 @@ rand = { workspace = true }
 # diesel
 diesel = { workspace = true }
 
-diesel_as_jsonb = "1.0.0"
-phonenumber = "0.3.3"
+diesel_as_jsonb = { workspace = true }
+phonenumber = { workspace = true }
 url = { workspace = true }
-deunicode = "1.3.3"
+deunicode = { workspace = true }
 
-email_address = "0.2.4"
+email_address = { workspace = true }
 
 [dev-dependencies]
 test-case = { workspace = true }

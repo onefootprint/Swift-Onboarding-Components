@@ -24,14 +24,14 @@ macros = { path = "../../../../macros" }
 
 actix-web = { workspace = true }
 paperclip = { workspace = true }
-log = "0.4.14"
+log = { workspace = true }
 tracing = { workspace = true }
 either = { workspace = true }
 tokio = { workspace = true }
 futures-util = { workspace = true }
 futures = { workspace = true }
 serde = { workspace = true }
-serde_with = "2.2.0"
+serde_with = { workspace = true }
 
 derive_more = { workspace = true }
 aws-config = { workspace = true }

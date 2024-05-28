@@ -17,11 +17,11 @@ openssl = { workspace = true }
 byteorder = { workspace = true }
 x509-parser = { workspace = true }
 reqwest = { workspace = true }
-jwt-simple = "0.11.6"
+jwt-simple = { workspace = true }
 chrono = { workspace = true }
-der-parser = "8.2.0"
+der-parser = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
 serde_json = { workspace = true }
-josekit = "0.8.3"
+josekit = { workspace = true }

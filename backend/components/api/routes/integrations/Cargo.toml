@@ -14,7 +14,7 @@ db = { path = "../../../db/core" }
 idv = { path = "../../../idv" }
 api_wire_types = { path = "../../wire_types" }
 alpaca = { path = "../../../integrations/alpaca" }
-deunicode = "1.3.3"
+deunicode = { workspace = true }
 
 
 actix-web = { workspace = true }

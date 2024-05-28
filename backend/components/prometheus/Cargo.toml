@@ -13,7 +13,7 @@ readme = "README.md"
 exclude = [".gitignore", ".github/", "README.tpl", "examples/"]
 
 [dependencies]
-actix-web = { version = "4.0", default-features = false, features = ["macros"] }
-futures-core = "0.3"
-pin-project-lite = "0.2"
-prometheus = { version = "0.13", default-features = false }
+actix-web = { workspace = true, features = ["macros"] }
+futures-core = { workspace = true }
+pin-project-lite = { workspace = true }
+prometheus = { workspace = true }

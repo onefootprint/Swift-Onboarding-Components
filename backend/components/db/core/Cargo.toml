@@ -47,12 +47,12 @@ diesel = { workspace = true, features = [
 diesel_migrations = { workspace = true }
 hex = { workspace = true }
 
-ipnetwork = { version = ">=0.12.2, <0.21.0" }
+ipnetwork = { workspace = true }
 
 db_schema = { path = "../schema" }
 diesel_as_jsonb = { workspace = true }
 
 [dev-dependencies]
-actix-rt = "2.7.0"
+actix-rt = { workspace = true }
 macros = { path = "../../macros" }
 test-case = { workspace = true }

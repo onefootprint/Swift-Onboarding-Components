@@ -9,7 +9,7 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = "1.0"
+thiserror = { workspace = true }
 byteorder = { workspace = true }
-blind-rsa-signatures = "0.13"
+blind-rsa-signatures = { workspace = true }
 crypto = { path = "../enclave/crypto"}

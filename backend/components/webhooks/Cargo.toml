@@ -9,9 +9,9 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-svix = "0.78.0"
+svix = { workspace = true }
 serde = { workspace = true }
-async-trait = "0.1"
+async-trait = { workspace = true }
 serde_json = { workspace = true }
 derive_more = { workspace = true }
 paperclip = { workspace = true }
@@ -23,4 +23,4 @@ chrono = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 mockall = { workspace = true }
-schemars = { version = "0.8.15", features = ["chrono"] }
+schemars = { workspace = true, features = ["chrono"] }

@@ -17,11 +17,11 @@ nitro = ["tokio-vsock"]
 
 [dependencies]
 tokio = { workspace = true }
-tokio-vsock = { version = "0.3", optional = true }
+tokio-vsock = { workspace = true, optional = true }
 futures = { workspace = true }
-libc = "0.2"
-envconfig = "0.10.0"
-log = "0.4"
+libc = { workspace = true }
+envconfig = { workspace = true }
+log = { workspace = true }
 serde = { workspace = true }
 serde_cbor = { workspace = true }
 byteorder = { workspace = true }

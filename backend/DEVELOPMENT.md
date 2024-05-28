@@ -117,6 +117,10 @@ cargo run -p enclave_proxy --features vsock
 cargo run -p api_server
 ```
 
+## Crate and Workspace Layout
+
+Lift crate dependencies to the workspace to avoid introducing multiple versions of the same crate, which may result in build-time or run-time conflicts. Bulk lifts can be automated using [`cargo-autoinherit`](https://github.com/mainmatter/cargo-autoinherit), but as of May 2024 it is not enforced in CI.
+
 ## Pulumi setup (for infra managment only)
 
 Pulumi is our infra-as-code framework. All of the pulumi code is in /infra. For development, you'll interact with pulumi directly if you're adding/modifying config variables or secrets, if you're modifying infrastructure, or if you're building an ephemeral environment/stack.

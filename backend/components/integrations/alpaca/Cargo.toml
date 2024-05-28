@@ -14,7 +14,7 @@ itertools = { workspace = true }
 uuid = { workspace=true }
 tracing = { workspace = true }
 tokio = { workspace = true }
-tokio-retry = "0.3"
+tokio-retry = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
 base64 = { workspace = true }

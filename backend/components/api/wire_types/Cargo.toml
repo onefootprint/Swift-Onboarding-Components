@@ -25,4 +25,4 @@ tracing = { workspace = true }
 alpaca = { path = "../../integrations/alpaca" }
 macros = { path = "../../macros" }
 
-paste = "1.0"
+paste = { workspace = true }

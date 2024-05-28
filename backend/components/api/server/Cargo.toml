@@ -21,7 +21,7 @@ tracing = { workspace = true }
 log = { workspace = true }
 futures = { workspace = true }
 tokio = { workspace = true }
-actix-cors = "0.6"
+actix-cors = { workspace = true }
 paperclip = { workspace = true }
 
 chrono = { workspace = true }
@@ -36,5 +36,5 @@ diesel = { workspace = true }
 byteorder = { workspace = true }
 
 opentelemetry_api = { version = "0.18" }
-actix-web-opentelemetry = { version = "0.13.0", features = ["metrics"] }
+actix-web-opentelemetry = { workspace = true, features = ["metrics"] }
 clap = { workspace = true }

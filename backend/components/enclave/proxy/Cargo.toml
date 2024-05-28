@@ -14,7 +14,7 @@ vsock = ["tokio-vsock"]
 
 [dependencies]
 tokio = { workspace = true }
-tokio-vsock = { version = "0.3", optional = true }
+tokio-vsock = { workspace = true, optional = true }
 reqwest = { workspace = true }
 reqwest-middleware = { workspace = true }
 reqwest-retry = { workspace = true }
@@ -24,22 +24,22 @@ chrono = { workspace = true }
 
 
 futures = { workspace = true }
-libc = "0.2"
-envconfig = "0.10.0"
-log = "0.4"
+libc = { workspace = true }
+envconfig = { workspace = true }
+log = { workspace = true }
 serde = { workspace = true }
 serde_cbor = { workspace = true }
 byteorder = { workspace = true }
 rpc = { path = "../rpc" }
 crypto = { path = "../crypto"}
 
-actix-web = "4.0.1"
-actix-web-httpauth = "0.8.0"
+actix-web = { workspace = true }
+actix-web-httpauth = { workspace = true }
 env_logger = { workspace = true }
-tracing = "0.1.30"
+tracing = { workspace = true }
 uuid = { workspace = true }
 futures-util = { workspace = true }
-bb8 = "0.7"
+bb8 = { workspace = true }
 async-trait = { workspace = true }
 thiserror = { workspace = true }
-hyper = "0.14.18"
+hyper = { workspace = true }
