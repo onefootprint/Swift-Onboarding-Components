@@ -10,9 +10,7 @@ const Expired = () => {
   const [, send] = useHostedMachine();
 
   const handleClick = () => {
-    send({
-      type: 'reset',
-    });
+    send({ type: 'reset' });
   };
 
   return (

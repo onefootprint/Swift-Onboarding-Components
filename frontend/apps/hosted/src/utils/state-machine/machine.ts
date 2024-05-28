@@ -45,9 +45,7 @@ export const createHostedMachine = () =>
         },
         intro: {
           on: {
-            introductionCompleted: {
-              target: 'idv',
-            },
+            introductionCompleted: { target: 'idv' },
           },
         },
         expired: {
@@ -58,19 +56,9 @@ export const createHostedMachine = () =>
             },
           },
         },
-        idv: {
-          on: {
-            idvCompleted: {
-              target: 'complete',
-            },
-          },
-        },
-        complete: {
-          type: 'final',
-        },
-        invalidUrl: {
-          type: 'final',
-        },
+        idv: { on: { idvCompleted: { target: 'complete' } } },
+        complete: { type: 'final' },
+        invalidUrl: { type: 'final' },
       },
     },
     {

@@ -13,9 +13,7 @@ const Intro = () => {
   const isKyb = useIsKyb();
 
   const handleClick = () => {
-    send({
-      type: 'introductionCompleted',
-    });
+    send({ type: 'introductionCompleted' });
   };
 
   return (

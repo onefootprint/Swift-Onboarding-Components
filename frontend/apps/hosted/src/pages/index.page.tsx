@@ -5,18 +5,16 @@ import { IdDI } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import type { GetServerSideProps } from 'next';
 import React from 'react';
-import Layout from 'src/components/layout';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
+import Layout from '../components/layout';
 import Complete from './complete';
 import Expired from './expired';
 import Init from './init';
 import Intro from './intro';
 import InvalidUrl from './invalid-url';
 
-type RootProps = {
-  variant?: FootprintVariant;
-};
+type RootProps = { variant?: FootprintVariant };
 
 const Root = ({ variant }: RootProps) => {
   const [state, send] = useHostedMachine();
@@ -26,9 +24,7 @@ const Root = ({ variant }: RootProps) => {
 
   const handleComplete = () => {
     Logger.info('IDV flow is completed on hosted');
-    send({
-      type: 'idvCompleted',
-    });
+    send({ type: 'idvCompleted' });
   };
 
   return (
@@ -38,11 +34,11 @@ const Root = ({ variant }: RootProps) => {
           send({ type: 'reset' });
         }}
       >
-        {state.matches('init') && <Init />}
-        {state.matches('intro') && <Intro />}
-        {state.matches('expired') && <Expired />}
-        {state.matches('invalidUrl') && <InvalidUrl />}
-        {state.matches('idv') && (
+        {state.matches('init') ? <Init /> : null}
+        {state.matches('intro') ? <Intro /> : null}
+        {state.matches('expired') ? <Expired /> : null}
+        {state.matches('invalidUrl') ? <InvalidUrl /> : null}
+        {state.matches('idv') ? (
           <Idv
             bootstrapData={{
               [IdDI.email]: email,
@@ -53,8 +49,8 @@ const Root = ({ variant }: RootProps) => {
             onComplete={handleComplete}
             showLogo
           />
-        )}
-        {state.matches('complete') && <Complete />}
+        ) : null}
+        {state.matches('complete') ? <Complete /> : null}
       </AppErrorBoundary>
     </Layout>
   );

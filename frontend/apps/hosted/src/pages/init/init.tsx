@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { Logger, useGetOnboardingConfig } from '@onefootprint/idv';
+import { getLogger, Logger, useGetOnboardingConfig } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
 import { media, Shimmer } from '@onefootprint/ui';
@@ -10,6 +10,8 @@ import styled, { css } from 'styled-components';
 
 import useGetBusiness from './hooks/use-get-business';
 import useParseUrl from './hooks/use-url-params';
+
+const { logError } = getLogger({ location: 'hosted-init' });
 
 const Init = () => {
   const [state, send] = useHostedMachine();
@@ -31,11 +33,9 @@ const Init = () => {
         },
       });
     },
-    onError: (error: string) => {
-      Logger.error(error, { location: 'hosted-init' });
-      send({
-        type: 'invalidUrlReceived',
-      });
+    onError: (err: string) => {
+      logError('Error parsing URL', err);
+      send({ type: 'invalidUrlReceived' });
     },
   });
 
@@ -51,17 +51,10 @@ const Init = () => {
           },
         });
       },
-      onError: error => {
-        Logger.error(
-          `Hosted app init page fetching business details failed: ${getErrorMessage(
-            error,
-          )}`,
-          { location: 'hosted-init' },
-        );
-        showRequestError(error);
-        send({
-          type: 'invalidUrlReceived',
-        });
+      onError: err => {
+        logError(`Fetching business details: ${getErrorMessage(err)}`, err);
+        showRequestError(err);
+        send({ type: 'invalidUrlReceived' });
       },
     },
   );
@@ -73,32 +66,18 @@ const Init = () => {
         const { orgName, orgId, key, isLive } = onboardingConfig;
         if (isLive && !orgIds.has(orgId)) {
           Logger.enableLogRocket();
-          Logger.identify({
-            orgName,
-            orgId,
-            publicKey: key,
-          });
+          Logger.identify({ orgName, orgId, publicKey: key });
         }
 
         send({
           type: 'initContextUpdated',
-          payload: {
-            obConfigAuth,
-            onboardingConfig,
-          },
+          payload: { obConfigAuth, onboardingConfig },
         });
       },
-      onError: error => {
-        Logger.error(
-          `Hosted app init page fetching onboarding config failed: ${getErrorMessage(
-            error,
-          )}`,
-          { location: 'hosted-init' },
-        );
-        showRequestError(error);
-        send({
-          type: 'invalidUrlReceived',
-        });
+      onError: err => {
+        logError(`Fetching onboarding config: ${getErrorMessage(err)}`, err);
+        showRequestError(err);
+        send({ type: 'invalidUrlReceived' });
       },
     },
   );
