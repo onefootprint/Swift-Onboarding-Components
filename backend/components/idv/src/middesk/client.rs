@@ -50,8 +50,9 @@ impl MiddeskClient {
         let MiddeskCreateBusinessRequest {
             business_data,
             credentials,
+            tenant_id,
         } = req;
-        let req = BusinessRequest::from(business_data);
+        let req = BusinessRequest::from((business_data, tenant_id.to_string()));
         let url = Url::parse(self.base_url.as_str())
             .map_err(Error::RequestUrlError)?
             .join("businesses")
@@ -97,9 +98,11 @@ impl MiddeskClient {
 #[cfg(test)]
 mod tests {
 
+    use std::str::FromStr;
+
     use super::*;
     use dotenv;
-    use newtypes::{BoData, BusinessData, PiiString};
+    use newtypes::{BoData, BusinessData, PiiString, TenantId};
 
     #[ignore]
     #[tokio::test]
@@ -131,6 +134,7 @@ mod tests {
             .post_business(MiddeskCreateBusinessRequest {
                 business_data,
                 credentials,
+                tenant_id: TenantId::from_str("t_123").unwrap(),
             })
             .await
             .unwrap();

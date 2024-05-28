@@ -10,6 +10,7 @@ pub struct BusinessRequest {
     website: Option<Website>,
     phone_numbers: Option<Vec<PhoneNumber>>,
     names: Option<Vec<Name>>,
+    external_id: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
@@ -48,8 +49,10 @@ pub struct Name {
     pub name_type: PiiString,
 }
 
-impl From<BusinessData> for BusinessRequest {
-    fn from(data: BusinessData) -> Self {
+type ExternalId = String;
+impl From<(BusinessData, ExternalId)> for BusinessRequest {
+    fn from(data: (BusinessData, ExternalId)) -> Self {
+        let (data, external_id) = data;
         // TODO: .ok_or(ConversionError::MissingFirstName)? here
         Self {
             name: data.name.unwrap(),
@@ -76,6 +79,7 @@ impl From<BusinessData> for BusinessRequest {
                     name_type: PiiString::from("dba"),
                 }]
             }),
+            external_id,
         }
     }
 }
@@ -114,8 +118,9 @@ mod tests {
         };
 
         assert_eq!(
-            BusinessRequest::from(business_data),
+            BusinessRequest::from((business_data, "external_id123".into())),
             BusinessRequest {
+                external_id: "external_id123".to_string(),
                 name: PiiString::from("Waffle House"),
                 addresses: vec![Address {
                     address_line1: PiiString::from("2180 Bryant St"),
@@ -144,7 +149,7 @@ mod tests {
                 names: Some(vec![request::business::Name {
                     name: PiiString::from("waho"),
                     name_type: PiiString::from("dba")
-                }])
+                }]),
             }
         );
     }

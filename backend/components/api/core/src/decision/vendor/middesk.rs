@@ -644,6 +644,7 @@ async fn send_middesk_call(
             .make_request(MiddeskCreateBusinessRequest {
                 business_data,
                 credentials: tvc.middesk_credentials(),
+                tenant_id: tenant_id.clone(),
             })
             .await
             .map_err(|e| ApiError::from(idv::Error::from(e)))
