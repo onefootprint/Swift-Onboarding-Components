@@ -31,7 +31,7 @@ pub async fn get(
         search,
         fp_id,
         kind: Some(VaultKind::Person),
-        only_visible: true,
+        only_active: true,
         external_id,
         ..ScopedVaultListQueryParams::default()
     };
@@ -97,7 +97,7 @@ pub async fn post_search(
         search,
         fp_id,
         kind: Some(VaultKind::Person),
-        only_visible: true,
+        only_active: true,
         external_id: None,
         ..ScopedVaultListQueryParams::default()
     };

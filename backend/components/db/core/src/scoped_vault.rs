@@ -26,7 +26,7 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub watchlist_hit: Option<bool>,
     pub kind: Option<VaultKind>,
     /// Temporary - only show vaults that are visible to be shown in search
-    pub only_visible: bool,
+    pub only_active: bool,
     pub playbook_ids: Option<Vec<ObConfigurationId>>,
     pub has_outstanding_workflow_request: Option<bool>,
     pub external_id: Option<ExternalId>,
@@ -54,7 +54,7 @@ impl ScopedVaultListQueryParams {
             requires_manual_review,
             watchlist_hit,
             kind,
-            only_visible,
+            only_active,
             playbook_ids,
             has_outstanding_workflow_request,
             external_id,
@@ -79,7 +79,7 @@ impl ScopedVaultListQueryParams {
             requires_manual_review,
             watchlist_hit,
             kind,
-            only_visible,
+            only_active,
             playbook_ids,
             has_outstanding_workflow_request,
             external_id,
@@ -103,11 +103,10 @@ macro_rules! list_query {
         let mut query = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
             .filter(scoped_vault::is_live.eq($params.is_live))
-            .filter(scoped_vault::deactivated_at.is_null())
             .into_boxed();
 
-        if $params.only_visible {
-            query = query.filter(scoped_vault::show_in_search.eq(true));
+        if $params.only_active {
+            query = query.filter(scoped_vault::is_active.eq(true));
         }
 
         // Filter on whether user is in manual review

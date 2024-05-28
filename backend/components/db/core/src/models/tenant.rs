@@ -235,7 +235,7 @@ impl Tenant {
     /// Count the number of vaults that exist for each tenant
     pub fn private_user_counts(conn: &mut PgConn) -> DbResult<HashMap<TenantId, UserCounts>> {
         let results: Vec<((TenantId, bool), i64)> = scoped_vault::table
-            .filter(scoped_vault::deactivated_at.is_null())
+            .filter(scoped_vault::is_active.eq(true))
             .group_by((scoped_vault::tenant_id, scoped_vault::is_live))
             .select(((scoped_vault::tenant_id, scoped_vault::is_live), count_star()))
             .get_results(conn)?;

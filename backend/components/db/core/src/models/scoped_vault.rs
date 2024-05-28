@@ -302,7 +302,7 @@ impl ScopedVault {
             scoped_vault::table
                 .filter(scoped_vault::vault_id.eq(&uv.id))
                 .filter(scoped_vault::tenant_id.eq(&tenant_id))
-                .filter(scoped_vault::deactivated_at.is_null())
+                .filter(scoped_vault::is_active.eq(true))
                 .get_result(conn.conn())
                 .map_err(|e| match e {
                     diesel::result::Error::NotFound if idempotency_id_given => DbError::ValidationError(
@@ -348,7 +348,7 @@ impl ScopedVault {
                     .filter(scoped_vault::external_id.eq(e_id))
                     .filter(scoped_vault::tenant_id.eq(t_id))
                     .filter(scoped_vault::is_live.eq(is_live))
-                    .filter(scoped_vault::deactivated_at.is_null())
+                    .filter(scoped_vault::is_active.eq(true))
             }
             ScopedVaultIdentifier::SuperAdminView { identifier } => {
                 query = query.filter(
@@ -493,7 +493,10 @@ impl ScopedVault {
         let updated_sv = diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(id))
             .filter(scoped_vault::deactivated_at.is_null())
-            .set(scoped_vault::deactivated_at.eq(now))
+            .set((
+                scoped_vault::deactivated_at.eq(now),
+                scoped_vault::is_active.eq(false),
+            ))
             .get_result(conn.conn())?;
         Ok(updated_sv)
     }
@@ -588,9 +591,8 @@ impl ScopedVault {
         let count = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(t_id))
             .filter(scoped_vault::is_live.eq(true))
-            // Only allow billing authorized scoped users for portable vaults OR non-portable vaults
-            // owned by the tenant
-            .filter(scoped_vault::is_billable.eq(true))
+            // Only allow billing for active users
+            .filter(scoped_vault::is_active.eq(true))
             // Only bill for users that have data in them
             .filter(scoped_vault::id.eq_any(sv_with_data))
             // Only bill for vaults that existed by the end of the billng period
@@ -598,8 +600,6 @@ impl ScopedVault {
             // And, this calculation won't be stable if we re-run it for a historical period. But
             // it will only change by very small amounts
             .filter(scoped_vault::start_timestamp.lt(end_date))
-            // Only bill for vaults that were not deactivated by the end of the billing period.
-            .filter(scoped_vault::deactivated_at.is_null())
             .select(count_distinct(scoped_vault::id))
             .get_result(conn)?;
         Ok(count)

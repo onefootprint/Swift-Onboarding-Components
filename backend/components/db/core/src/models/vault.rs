@@ -391,7 +391,7 @@ impl Vault {
         // Get the scoped vaults for each vault
         let v_id_to_svs = scoped_vault::table
             .filter(scoped_vault::vault_id.eq_any(v_ids.clone()))
-            .filter(scoped_vault::deactivated_at.is_null())
+            .filter(scoped_vault::is_active.eq(true))
             .get_results::<ScopedVault>(conn)?
             .into_iter()
             .into_group_map_by(|sv| sv.vault_id.clone());

@@ -92,7 +92,7 @@ pub async fn post(
         timestamp_lte,
         timestamp_gte,
         kind,
-        only_visible: !show_all.unwrap_or_default(),
+        only_active: !show_all.unwrap_or_default(),
         playbook_ids,
         has_outstanding_workflow_request,
         external_id: None,

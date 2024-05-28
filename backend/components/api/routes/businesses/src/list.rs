@@ -27,7 +27,7 @@ pub async fn get(
         search: None,
         fp_id: None,
         kind: Some(VaultKind::Business),
-        only_visible: true,
+        only_active: true,
         external_id,
         ..ScopedVaultListQueryParams::default()
     };

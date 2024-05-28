@@ -41,7 +41,7 @@ async fn get(
             watchlist_hit: None,
             // TODO this could drift easily. Be careful changing this since it could affect the
             // pass rate we display if we start also looking for vaults that aren't verified
-            only_visible: true,
+            only_active: true,
             statuses,
             playbook_ids: playbook_id.clone().map(|playbook_id| vec![playbook_id]),
             has_outstanding_workflow_request: None,

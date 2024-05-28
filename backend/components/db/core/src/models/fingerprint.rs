@@ -227,7 +227,7 @@ impl Fingerprint {
             // TODO when we stop making unverified vaults after each signup challenge, remove this
             // logic. It will be horribly slow
             .inner_join(scoped_vault::table)
-            .filter(scoped_vault::show_in_search.eq(true))
+            .filter(scoped_vault::is_active.eq(true))
             .select(fingerprint::all_columns);
 
         // TODO hide dupes at other tenants in sandbox in next PR
