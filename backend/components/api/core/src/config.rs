@@ -39,6 +39,9 @@ pub struct Config {
     #[envconfig(from = "OTEL_ENDPOINT")]
     pub otel_endpoint: Option<String>,
 
+    #[envconfig(from = "DISABLE_LAUNCH_DARKLY")]
+    pub disable_launch_darkly: Option<String>,
+
     #[envconfig(from = "DATABASE_URL")]
     pub database_url: String,
 

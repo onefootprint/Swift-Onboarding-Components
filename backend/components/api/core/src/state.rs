@@ -12,7 +12,7 @@ use crate::{
     GIT_HASH,
 };
 use crypto::aead::ScopedSealingKey;
-use db::DbPool;
+use db::{tests::MockFFClient, DbPool};
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use idv::{
     fingerprintjs::client::FingerprintJSClient,
@@ -73,7 +73,6 @@ pub struct State {
     pub idology_client: IdologyClient, // TOOD: remove, only used for now unused idology endpoints
     pub s3_client: Arc<dyn S3Client>,
     pub feature_flag_client: Arc<dyn FeatureFlagClient>,
-    pub feature_flag_client_raw: LaunchDarklyFeatureFlagClient, // hack for now cause JsonFlag isn't working on the trait
     pub webhook_client: Arc<dyn WebhookClient>,
     #[allow(unused)]
     pub billing_client: billing::BillingClient,
@@ -118,16 +117,23 @@ impl State {
     #[allow(clippy::expect_used)]
     #[tracing::instrument(skip_all)]
     pub async fn init_or_die(mut config: Config) -> Self {
-        let feature_flag_client = LaunchDarklyFeatureFlagClient::new();
-        let feature_flag_client = match feature_flag_client.init(&config.launch_darkly_sdk_key).await {
-            Ok(client) => {
-                tracing::info!("FeatureFlagClient successfully initialized");
-                client
-            }
-            Err(error) => {
-                tracing::warn!(?error, "FeatureFlagClient failed to initialize");
-                feature_flag_client
-            }
+        let feature_flag_client: Arc<dyn FeatureFlagClient> = if config.disable_launch_darkly.is_none() {
+            let ff_client = LaunchDarklyFeatureFlagClient::new();
+            let ff_client = match ff_client.init(&config.launch_darkly_sdk_key).await {
+                Ok(client) => {
+                    tracing::info!("FeatureFlagClient successfully initialized");
+                    client
+                }
+                Err(error) => {
+                    tracing::warn!(?error, "FeatureFlagClient failed to initialize");
+                    ff_client
+                }
+            };
+            Arc::new(ff_client)
+        } else {
+            // The launch darkly client seems to make network requests and block server startup.
+            // This option allows you to run the server with LD mocked out.
+            MockFFClient::new().into_mock()
         };
 
         let enclave_client = EnclaveClient::new(config.clone()).await;
@@ -279,8 +285,7 @@ impl State {
             session_sealing_key,
             idology_client,
             s3_client: Arc::new(s3_client),
-            feature_flag_client: Arc::new(feature_flag_client.clone()),
-            feature_flag_client_raw: feature_flag_client,
+            feature_flag_client,
             webhook_client: Arc::new(webhook_service_client),
             billing_client,
             fingerprintjs_client,

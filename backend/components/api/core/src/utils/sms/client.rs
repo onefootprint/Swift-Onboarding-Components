@@ -8,14 +8,14 @@ use aws_credential_types::provider::SharedCredentialsProvider;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::tenant::Tenant;
-use feature_flag::{BoolFlag, FeatureFlagClient, JsonFlag, LaunchDarklyFeatureFlagClient};
+use feature_flag::{BoolFlag, FeatureFlagClient, JsonFlag};
 use itertools::Itertools;
 use newtypes::{
     output::Csv,
     sms_message::{SmsMessage, SmsMessageKind},
     PhoneNumber, PiiString, SandboxId, VaultId,
 };
-use std::fmt::Debug;
+use std::{fmt::Debug, sync::Arc};
 use tokio::sync::oneshot::{self, Receiver, Sender};
 use tracing::Instrument;
 use twilio::TwilioConfig;
@@ -38,7 +38,7 @@ pub struct SmsClient {
     pub twilio_client_backup: Option<twilio::Client>,
     /// AWS pinpoint SMS client
     pub(super) pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
-    pub(super) ff_client: LaunchDarklyFeatureFlagClient,
+    pub(super) ff_client: Arc<dyn FeatureFlagClient>,
 }
 
 impl SmsClient {
@@ -46,7 +46,7 @@ impl SmsClient {
         twilio: TwilioConfig,
         twilio_backup: TwilioConfig,
         time_s_between_challenges: i64,
-        ff_client: LaunchDarklyFeatureFlagClient,
+        ff_client: Arc<dyn FeatureFlagClient>,
     ) -> ApiResult<Self> {
         let twilio_client = twilio
             .make_client()
@@ -159,9 +159,10 @@ impl SmsClient {
         // This launchdarkly flag controls both (1) which vendors are available and
         // (2) the priority of which to use first.
         // We can use this flag to quickly switch away from vendors who are misbehaving without a deploy
-        let vendors = self
+        let vendors: Result<Option<Vec<SmsVendorKind>>, _> = self
             .ff_client
-            .json_flag::<Option<Vec<SmsVendorKind>>>(JsonFlag::AvailableOtpVendorPriorities(e164.leak()));
+            .json_flag(JsonFlag::AvailableOtpVendorPriorities(e164.leak()))
+            .and_then(serde_json::value::from_value);
         let vendor_kinds = match vendors {
             Err(err) => {
                 tracing::error!(

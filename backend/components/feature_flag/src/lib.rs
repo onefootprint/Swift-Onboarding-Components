@@ -134,6 +134,9 @@ where
 pub trait FeatureFlagClient: Sync + Send + 'static {
     #[allow(clippy::needless_lifetimes)]
     fn flag<'a>(&self, flag: BoolFlag<'a>) -> bool;
+
+    #[allow(clippy::needless_lifetimes)]
+    fn json_flag<'a>(&self, flag: JsonFlag<'a>) -> Result<serde_json::Value, serde_json::Error>;
 }
 
 impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
@@ -146,15 +149,10 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
         // log an error if we can't evaluate the flag, but shouldn't stop program execution
         result.unwrap_or_else(|_| flag.default())
     }
-}
 
-impl LaunchDarklyFeatureFlagClient {
     /// Fetches the value for the provided JsonFlag and deserializes into T
     #[tracing::instrument(skip(self))]
-    pub fn json_flag<'a, T>(&self, flag: JsonFlag<'a>) -> Result<T, serde_json::Error>
-    where
-        T: serde::de::DeserializeOwned,
-    {
+    fn json_flag<'a>(&self, flag: JsonFlag<'a>) -> Result<serde_json::Value, serde_json::Error> {
         let evaluate_flag = || -> Result<serde_json::Value, Error> {
             let client = &self.unwrap_client()?.inner;
             let rollout = get_rollout_flag_value::<JsonLdRollout>(client, &flag.flag_name())?;
@@ -168,8 +166,7 @@ impl LaunchDarklyFeatureFlagClient {
         // Catch errors reading the value from LD by returning the default value - we will
         // log an error if we can't evaluate the flag, but shouldn't stop program execution
         let value = result.unwrap_or_else(|_| flag.default());
-        // Then parse the feteched value into T as a convenience
-        serde_json::value::from_value(value)
+        Ok(value)
     }
 }
 
