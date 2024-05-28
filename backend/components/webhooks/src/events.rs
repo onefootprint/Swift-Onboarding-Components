@@ -40,10 +40,6 @@ mod payloads {
         /// the footprint id of the entity that completed onboarding
         #[schemars(with = "String")]
         pub fp_id: FpId,
-        /// deprecated (replaced by fp_id)        
-        #[schemars(skip)]
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
         #[schemars(with = "OnboardingStatusShadow")]
         pub status: OnboardingStatus,
@@ -58,10 +54,6 @@ mod payloads {
         /// the footprint id of the entity that completed onboarding
         #[schemars(with = "String")]
         pub fp_id: FpId,
-        /// deprecated (replaced by fp_id)        
-        #[schemars(skip)]
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
         #[schemars(with = "OnboardingStatusShadow")]
         pub new_status: OnboardingStatus,
@@ -76,10 +68,6 @@ mod payloads {
         /// the footprint id of the entity that completed onboarding
         #[schemars(with = "String")]
         pub fp_id: FpId,
-        /// deprecated (replaced by fp_id)        
-        #[schemars(skip)]
-        #[serde(skip_serializing_if = "Option::is_none")]
-        pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
         #[schemars(with = "WatchlistCheckStatusKindShadow")]
         pub status: WatchlistCheckStatusKind,
@@ -140,7 +128,6 @@ mod examples {
         pub fn example() -> Self {
             OnboardingCompletedPayload {
                 fp_id: FpId::test_data("fp_id_xyz".into()),
-                footprint_user_id: None,
                 timestamp: Utc::now(),
                 status: Default::default(),
                 requires_manual_review: false,
@@ -153,7 +140,6 @@ mod examples {
         pub fn example() -> Self {
             OnboardingStatusChangedPayload {
                 fp_id: FpId::test_data("fp_id_xyz".into()),
-                footprint_user_id: None,
                 timestamp: Utc::now(),
                 new_status: Default::default(),
                 requires_manual_review: false,
@@ -166,7 +152,6 @@ mod examples {
         pub fn example() -> Self {
             WatchlistCheckCompletedPayload {
                 fp_id: FpId::test_data("fp_id_xyz".into()),
-                footprint_user_id: None,
                 timestamp: Utc::now(),
                 status: Default::default(),
                 error: None,
@@ -196,7 +181,6 @@ impl From<NTOnboardingCompletedPayload> for OnboardingCompletedPayload {
     fn from(value: NTOnboardingCompletedPayload) -> Self {
         Self {
             fp_id: value.fp_id,
-            footprint_user_id: value.footprint_user_id,
             timestamp: value.timestamp,
             status: value.status,
             requires_manual_review: value.requires_manual_review,
@@ -209,7 +193,6 @@ impl From<NTOnboardingStatusChangedPayload> for OnboardingStatusChangedPayload {
     fn from(value: NTOnboardingStatusChangedPayload) -> Self {
         Self {
             fp_id: value.fp_id,
-            footprint_user_id: value.footprint_user_id,
             timestamp: value.timestamp,
             new_status: value.new_status,
             requires_manual_review: value.requires_manual_review,
@@ -222,7 +205,6 @@ impl From<NTWatchlistCheckCompletedPayload> for WatchlistCheckCompletedPayload {
     fn from(value: NTWatchlistCheckCompletedPayload) -> Self {
         Self {
             fp_id: value.fp_id,
-            footprint_user_id: value.footprint_user_id,
             timestamp: value.timestamp,
             status: value.status,
             error: value.error,
