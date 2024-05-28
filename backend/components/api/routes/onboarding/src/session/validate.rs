@@ -108,6 +108,13 @@ pub async fn post(
             (None, None, None, None, None)
         };
 
+    // TODO clean this up after migrating composer
+    let onboarding_configuration_id = if auth.tenant().pinned_api_version.is_some_and(|v| v <= 2) {
+        wf.as_ref().and_then(|(wf, _)| wf.ob_configuration_id.clone())
+    } else {
+        onboarding_configuration_id
+    };
+
     // Validate and serialize the user and optionally the business onboardings
     let validate_and_serialize = |sv: ScopedVault,
                                   mrs: Vec<ManualReview>,
