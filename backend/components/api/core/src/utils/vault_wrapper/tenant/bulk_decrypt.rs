@@ -28,7 +28,7 @@ pub struct BulkDecryptReq<'a, T = Any> {
     pub targets: Vec<EnclaveDecryptOperation>,
 }
 
-const EVENT_CREATE_BATCH_SIZE: usize = 5000;
+const EVENT_CREATE_BATCH_SIZE: usize = 500;
 
 /// Represents all the info needed to make an access event during decryption
 #[allow(clippy::large_enum_variant)]
