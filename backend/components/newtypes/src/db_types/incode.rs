@@ -116,6 +116,7 @@ pub enum IncodeFailureReason {
     DocumentSharpness,
     ProcessIdCouldNotProcess,
     MilitaryIdNotAllowed,
+    InvalidCurp,
     Other(String),
 }
 

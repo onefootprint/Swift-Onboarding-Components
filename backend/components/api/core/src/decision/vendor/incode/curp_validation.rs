@@ -8,6 +8,8 @@ use db::{
         document_request::DocumentRequest,
         incode_verification_session::IncodeVerificationSession,
         ob_configuration::ObConfiguration,
+        risk_signal::{NewRiskSignalInfo, RiskSignal},
+        risk_signal_group::RiskSignalGroup,
         scoped_vault::ScopedVault,
         verification_request::VerificationRequest,
     },
@@ -21,9 +23,10 @@ use itertools::Itertools;
 use newtypes::{
     vendor_credentials::IncodeCredentialsWithToken, BillingEventKind, DataIdentifier, DataLifetimeSeqno,
     DataLifetimeSource, DataRequest, DecisionIntentId, DocumentDiKind, DocumentFixtureResult, DocumentId,
-    DocumentKind, DocumentRequestKind, IdDocKind, IncodeConfigurationId, IncodeEnvironment, IncodeSessionId,
-    IncodeVerificationSessionKind, Iso3166TwoDigitCountryCode, OcrDataKind as ODK, PiiJsonValue, PiiString,
-    ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, WorkflowId,
+    DocumentKind, DocumentRequestKind, FootprintReasonCode, IdDocKind, IncodeConfigurationId,
+    IncodeEnvironment, IncodeFailureReason, IncodeSessionId, IncodeVerificationSessionKind,
+    Iso3166TwoDigitCountryCode, OcrDataKind as ODK, PiiJsonValue, PiiString, RiskSignalGroupKind,
+    ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use super::common::call_start_onboarding;
@@ -140,55 +143,70 @@ pub async fn run_curp_validation_check(
             let (vres_id, vreq_id) = args.save(&state.db_pool).await?;
             let curp_response = res.map_err(map_to_api_error)?;
             let raw_response = curp_response.raw_response.clone();
-            let parsed: CurpValidationResponse =
-                curp_response.result.into_success().map_err(map_to_api_error)?;
+            match curp_response.result.safe_into_success() {
+                either::Either::Left(parsed) => {
+                    // Vaulting
+                    let iddoc_id = iddoc.id.clone();
+                    let is_live = matches!(environment, IncodeEnvironment::Production);
 
-            // Vaulting
-            let iddoc_id = iddoc.id.clone();
-            let is_live = matches!(environment, IncodeEnvironment::Production);
+                    let sv_id = di.scoped_vault_id.clone();
+                    let vault_data =
+                        pre_vault(state, doc_kind, raw_response.clone(), is_live, &sv_id).await?;
 
-            let sv_id = di.scoped_vault_id.clone();
-            // TODO: fix this in upstack PR
-            let vault_data = pre_vault(state, doc_kind, raw_response.clone(), is_live, &sv_id).await?;
+                    state
+                        .db_pool
+                        .db_transaction(move |conn| -> ApiResult<_> {
+                            // Vault the curp response
+                            let seqno = vault_curp_response(conn, &sv_id, vault_data)?;
 
-            state
-                .db_pool
-                .db_transaction(move |conn| -> ApiResult<_> {
-                    // Vault the curp response
-                    let seqno = vault_curp_response(conn, &sv_id, vault_data)?;
+                            // create an IVS record for tracking
+                            let _ = IncodeVerificationSession::create(
+                                conn,
+                                iddoc.id,
+                                config_id,
+                                IncodeVerificationSessionKind::CurpValidation,
+                                Some(environment),
+                                Some(incode_session_id),
+                            )?;
 
-                    // create an IVS record for tracking
-                    let _ = IncodeVerificationSession::create(
-                        conn,
-                        iddoc.id,
-                        config_id,
-                        IncodeVerificationSessionKind::CurpValidation,
-                        Some(environment),
-                        Some(incode_session_id),
-                    )?;
+                            // set curp completed seqno so we can render historical responses in the dashboard
+                            let update = DocumentUpdate::set_curp_completed_seqno(seqno);
+                            let _ = Document::update(conn, &iddoc_id, update)?;
 
-                    // set curp completed seqno so we can render historical responses in the dashboard
-                    let update = DocumentUpdate::set_curp_completed_seqno(seqno);
-                    let _ = Document::update(conn, &iddoc_id, update)?;
+                            // set curp completed seqno so we can render historical responses in the dashboard
+                            let update = DocumentUpdate::set_curp_completed_seqno(seqno);
+                            let _ = Document::update(conn, &iddoc_id, update)?;
 
-                    let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
-                    // create billing event
-                    BillingEvent::create(conn, &sv_id, Some(&obc.id), BillingEventKind::CurpValidation)?;
+                            let (obc, _) = ObConfiguration::get(conn, &wf_id3)?;
+                            // create billing event
+                            BillingEvent::create(
+                                conn,
+                                &sv_id,
+                                Some(&obc.id),
+                                BillingEventKind::CurpValidation,
+                            )?;
 
-                    Ok(())
-                })
-                .await?;
+                            Ok(())
+                        })
+                        .await?;
 
-            let vendor_result = VendorResult {
-                response: VendorResponse {
-                    response: ParsedResponse::IncodeCurpValidation(parsed),
-                    raw_response,
-                },
-                verification_result_id: vres_id,
-                verification_request_id: vreq_id,
-            };
+                    let vendor_result = VendorResult {
+                        response: VendorResponse {
+                            response: ParsedResponse::IncodeCurpValidation(parsed),
+                            raw_response,
+                        },
+                        verification_result_id: vres_id,
+                        verification_request_id: vreq_id,
+                    };
 
-            Ok(Some(vendor_result))
+                    Ok(Some(vendor_result))
+                }
+                either::Either::Right(errors) => {
+                    handle_curp_error(state, &di.scoped_vault_id, &vres_id, errors).await?;
+
+                    Err(map_to_api_error(idv::incode::error::Error::InvalidCurp))
+                }
+            }
         }
         None => {
             let doc = id_doc_helper.identity_document_for_sandbox();
@@ -447,4 +465,38 @@ fn doc_expects_curp(doc: &Document) -> bool {
         doc.vendor_validated_country_code().map(|v| v.0),
         Some(Iso3166TwoDigitCountryCode::MX)
     )
+}
+
+
+#[tracing::instrument(skip_all)]
+async fn handle_curp_error(
+    state: &State,
+    sv_id: &ScopedVaultId,
+    vres_id: &VerificationResultId,
+    errors: Option<Vec<IncodeFailureReason>>,
+) -> ApiResult<()> {
+    let svid = sv_id.clone();
+    // We save under the same RSG created during the incode state machine if it ran so we
+    // don't invalidate the old RSG
+    if errors
+        .as_ref()
+        .map(|e| e.contains(&IncodeFailureReason::InvalidCurp))
+        .unwrap_or(false)
+    {
+        let new_reason_codes: Vec<NewRiskSignalInfo> = vec![(
+            FootprintReasonCode::CurpInputCurpInvalid,
+            VendorAPI::IncodeCurpValidation,
+            vres_id.clone(),
+        )];
+        state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let rsg = RiskSignalGroup::get_or_create(conn, &svid, RiskSignalGroupKind::Doc)?;
+                RiskSignal::bulk_add(conn, new_reason_codes, false, rsg.id)?;
+
+                Ok(())
+            })
+            .await?;
+    }
+    Ok(())
 }

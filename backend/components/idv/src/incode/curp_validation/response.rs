@@ -165,9 +165,17 @@ pub enum RenapoError {
 }
 
 impl IncodeClientErrorCustomFailureReasons for CurpValidationResponse {
-    fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
-        // TODO: invalid curp is here
-        None
+    fn custom_failure_reasons(error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        if error
+            .message
+            .as_ref()
+            .map(|m| m.trim().to_lowercase().contains("invalid curp"))
+            .unwrap_or(false)
+        {
+            Some(vec![IncodeFailureReason::InvalidCurp])
+        } else {
+            None
+        }
     }
 }
 

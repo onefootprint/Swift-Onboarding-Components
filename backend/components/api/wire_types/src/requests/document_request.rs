@@ -135,6 +135,7 @@ impl From<IncodeFailureReason> for DocumentImageError {
             IncodeFailureReason::FaceNotFound => Self::FaceNotFound,
             IncodeFailureReason::ProcessIdCouldNotProcess => Self::DocumentNotReadable, // close enough
             IncodeFailureReason::MilitaryIdNotAllowed => Self::MilitaryIdNotAllowed,
+            IncodeFailureReason::InvalidCurp => Self::UnknownError, // doesn't apply in this codepath
         }
     }
 }

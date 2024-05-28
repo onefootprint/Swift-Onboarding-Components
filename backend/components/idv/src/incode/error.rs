@@ -30,4 +30,6 @@ pub enum Error {
     ResultsNotReady,
     #[error("Request indicated real result")]
     FixtureResultMismatch,
+    #[error("Input CURP was invalid")]
+    InvalidCurp,
 }

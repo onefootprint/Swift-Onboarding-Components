@@ -1022,6 +1022,10 @@ footprint_reason_code_enum! {
         CurpValid,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "String provided was not a valid CURP", severity = SignalSeverity::High,  description = "The string provided was not a valid CURP"]
+        CurpInputCurpInvalid,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "CURP could not be validate", severity = SignalSeverity::Medium,  description = "CURP could not be validated"]
         CurpCouldNotValidate,
 
