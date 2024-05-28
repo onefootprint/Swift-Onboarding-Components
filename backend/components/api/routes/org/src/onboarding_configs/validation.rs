@@ -553,6 +553,30 @@ impl ObConfigurationArgsToValidate {
             })?;
 
 
+        // validate we are sending the checks appropriately during the migration
+        match self.kind {
+            ObConfigurationKind::Kyb => {
+                if !self.skip_kyb
+                    && !self
+                        .verification_checks
+                        .clone()
+                        .into_iter()
+                        .any(|c| matches!(c.into(), VerificationCheckKind::Kyb))
+                {
+                    Err(ApiError::from(TenantError::ValidationError(
+                        "Must provide a kyb verification_check if skip_kyb=false".to_owned(),
+                    )))
+                } else {
+                    Ok(())
+                }
+            }
+            // TODO: finish these
+            ObConfigurationKind::Kyc => Ok(()),
+            ObConfigurationKind::Auth => Ok(()),
+            ObConfigurationKind::Document => Ok(()),
+        }?;
+
+
         // validate against collected data
         self.verification_checks
             .iter()

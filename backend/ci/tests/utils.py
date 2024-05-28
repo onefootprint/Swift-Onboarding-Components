@@ -300,7 +300,10 @@ def create_ob_config(
     documents_to_collect=None,
     curp_validation_enabled=False,
     skip_kyc=False,
+    verification_checks=None
 ):
+    kind = kind or 'kyc'
+    checks = get_verification_checks(verification_checks, kind)
     ob_conf_data = {
         "name": name,
         "must_collect_data": must_collect_data,
@@ -312,18 +315,27 @@ def create_ob_config(
         "allow_international_residents": allow_international_residents,
         "international_country_restrictions": international_country_restrictions,
         "doc_scan_for_optional_ssn": doc_scan_for_optional_ssn,
-        "kind": kind or "kyc",
+        "kind": kind,
         "skip_confirm": skip_confirm,
         "enhanced_aml": enhanced_aml,
         "document_types_and_countries": document_types_and_countries,
         "documents_to_collect": documents_to_collect or [],
         "curp_validation_enabled": curp_validation_enabled,
         "skip_kyc": skip_kyc,
+        "verification_checks": checks
     }
     auths = override_auths if override_auths else tenant.db_auths
     body = post("org/onboarding_configs", ob_conf_data, *auths)
     ob_config = ObConfiguration.from_response(body, tenant)
     return ob_config
+
+def get_verification_checks(verification_checks, kind):
+    if verification_checks is not None:
+        return verification_checks
+    
+    if kind == 'kyb':
+        return [{"kind": "kyb", "data": {"ein_only": False}}]
+
 
 
 def clean_up_user(phone_number, email):

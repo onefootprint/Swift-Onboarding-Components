@@ -721,6 +721,34 @@ def test_skip_kyc(
             [{"kind": "kyb", "data": {"ein_only": True}}], 
             "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks"
         ),
+        (
+          [
+                "business_name",
+                "business_tin",
+                "business_address",
+                "business_phone_number",
+                "business_website",
+                "business_beneficial_owners",
+                "name",
+            ], 
+            "kyb", 
+            None, 
+            "Validation error: Must provide a kyb verification_check if skip_kyb=false"
+        ),
+        (
+          [
+                "business_name",
+                "business_tin",
+                "business_address",
+                "business_phone_number",
+                "business_website",
+                "business_beneficial_owners",
+                "name",
+            ], 
+            "kyb", 
+            [], 
+            "Validation error: Must provide a kyb verification_check if skip_kyb=false"
+        ),
     ], 
 )
 def test_verification_checks(
@@ -731,7 +759,7 @@ def test_verification_checks(
         must_collect_data=collected_data,
         can_access_data=collected_data,
         kind=kind,
-        verification_checks=checks
+        verification_checks=checks,
     )
     res = post(
         "org/onboarding_configs",
@@ -858,6 +886,7 @@ def test_business_only_obc(sandbox_tenant):
         must_collect_data=collect_data,
         can_access_data=collect_data,
         kind="kyb",
+        verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}]
     )
     res = post(
         "org/onboarding_configs",
