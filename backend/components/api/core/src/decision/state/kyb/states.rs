@@ -385,7 +385,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> ApiResult<_> {
                 let wf = DbWorkflow::get(conn, &wfid)?;
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;

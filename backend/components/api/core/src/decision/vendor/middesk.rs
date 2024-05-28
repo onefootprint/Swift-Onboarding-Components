@@ -17,6 +17,7 @@ use crate::{
 };
 use db::{
     models::{
+        billing_event::BillingEvent,
         decision_intent::DecisionIntent,
         middesk_request::{MiddeskRequest, UpdateMiddeskRequest},
         ob_configuration::ObConfiguration,
@@ -43,9 +44,9 @@ use idv::middesk::{
 use idv::{ParsedResponse, VendorResponse};
 
 use newtypes::{
-    BusinessDataForRequest, DecisionIntentKind, EinOnly, MiddeskRequestState, ObConfigurationKey,
-    OnboardingStatus, PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI, VerificationCheck,
-    VerificationCheckKind, WorkflowId,
+    BillingEventKind, BusinessDataForRequest, DecisionIntentKind, EinOnly, MiddeskRequestState,
+    ObConfigurationKey, OnboardingStatus, PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI,
+    VerificationCheck, VerificationCheckKind, WorkflowId,
 };
 use strum_macros::EnumDiscriminants;
 
@@ -533,11 +534,14 @@ impl MiddeskState<Complete> {
                 .map(|rc| (rc, vendor_api, vendor_result.verification_result_id.clone()))
                 .collect();
 
+        let obc_id = wf.ob_configuration_id.clone();
         state
             .db_pool
-            .db_transaction(move |conn| {
+            .db_transaction(move |conn| -> ApiResult<_> {
                 let rsg = RiskSignalGroup::get_or_create(conn, &sv.id, RiskSignalGroupKind::Kyb)?;
-                RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)
+                RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)?;
+                BillingEvent::create(conn, &sv.id, obc_id.as_ref(), BillingEventKind::Kyb)?;
+                Ok(())
             })
             .await?;
 

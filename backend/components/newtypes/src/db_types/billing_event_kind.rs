@@ -15,6 +15,7 @@ pub enum BillingEventKind {
     KycWaterfallSecondVendor,
     KycWaterfallThirdVendor,
     IdentityDocument,
+    Kyb,
 }
 
 impl BillingEventKind {
@@ -30,6 +31,7 @@ impl BillingEventKind {
             Self::KycWaterfallSecondVendor => None,
             Self::KycWaterfallThirdVendor => None,
             Self::IdentityDocument => None,
+            Self::Kyb => None,
         }
     }
 }
