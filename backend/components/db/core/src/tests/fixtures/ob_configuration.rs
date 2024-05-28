@@ -4,7 +4,7 @@ use crate::{
 };
 use newtypes::{
     CipKind, CollectedDataOption as CDO, DbActor, DocumentAndCountryConfiguration, EnhancedAmlOption,
-    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
+    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId, VerificationCheck,
 };
 
 use crate::models::ob_configuration::ObConfiguration;
@@ -57,6 +57,7 @@ pub struct ObConfigurationOpts {
     pub enhanced_aml: EnhancedAmlOption,
     pub kind: ObConfigurationKind,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
+    pub verification_checks: Option<Vec<VerificationCheck>>,
 }
 
 impl Default for ObConfigurationOpts {
@@ -78,6 +79,7 @@ impl Default for ObConfigurationOpts {
             enhanced_aml: EnhancedAmlOption::No,
             kind: ObConfigurationKind::Kyc,
             document_types_and_countries: None,
+            verification_checks: None,
         }
     }
 }
@@ -104,11 +106,12 @@ pub fn create_with_opts(
         enhanced_aml,
         kind,
         document_types_and_countries,
+        verification_checks,
     } = opts;
     let documents_to_collect = vec![];
     let skip_kyb = false;
     let curp_validation_enabled = false;
-    let verification_checks = get_verification_checks_for_legacy_compat(None);
+    let verification_checks = get_verification_checks_for_legacy_compat(verification_checks);
     let args = NewObConfigurationArgs {
         name,
         tenant_id: tenant_id.clone(),

@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use super::Error::AssertionError;
 use crate::{
     BusinessOwnerData, IdentityDataKind, Iso3166TwoDigitCountryCode, PiiString, VerificationRequestId,
     DATE_FORMAT,
@@ -119,8 +120,9 @@ pub struct BoData {
     pub last_name: PiiString,
 }
 
+// An struct representing the business data we fetch from the vault
 #[derive(Debug, Clone, Default)]
-pub struct BusinessData {
+pub struct BusinessDataFromVault {
     pub name: Option<PiiString>,
     pub dba: Option<PiiString>,
     pub website_url: Option<PiiString>,
@@ -134,6 +136,29 @@ pub struct BusinessData {
     pub business_owners: Vec<BoData>,
 }
 
+// An enum representing the validated business we produce to send to middesk
+#[allow(clippy::large_enum_variant)]
+pub enum BusinessDataForRequest {
+    FullKyb {
+        name: PiiString,
+        city: PiiString,
+        state: PiiString,
+        zip: PiiString,
+        dba: Option<PiiString>,
+        website_url: Option<PiiString>,
+        phone_number: Option<PiiString>,
+        tin: Option<PiiString>,
+        address_line1: PiiString,
+        address_line2: Option<PiiString>,
+        business_owners: Vec<BoData>,
+    },
+    EinOnly {
+        tin: PiiString,
+        name: PiiString,
+    },
+}
+
+
 impl From<BusinessOwnerData> for BoData {
     fn from(value: BusinessOwnerData) -> Self {
         Self {
@@ -142,6 +167,53 @@ impl From<BusinessOwnerData> for BoData {
         }
     }
 }
+
+pub struct EinOnly(pub bool);
+impl TryFrom<(BusinessDataFromVault, EinOnly)> for BusinessDataForRequest {
+    type Error = super::Error;
+
+    fn try_from(value: (BusinessDataFromVault, EinOnly)) -> Result<Self, Self::Error> {
+        let (data, ein_only) = value;
+        let BusinessDataFromVault {
+            name,
+            dba,
+            website_url,
+            phone_number,
+            tin,
+            address_line1,
+            address_line2,
+            city,
+            state,
+            zip,
+            business_owners,
+        } = data;
+        let res = if ein_only.0 {
+            BusinessDataForRequest::EinOnly {
+                tin: tin.ok_or(AssertionError("missing business tin".into()))?,
+                name: name.ok_or(AssertionError("missing business name".into()))?,
+            }
+        } else {
+            BusinessDataForRequest::FullKyb {
+                name: name.ok_or(AssertionError("missing business name".into()))?,
+                city: city.ok_or(AssertionError("missing business city".into()))?,
+                state: state.ok_or(AssertionError("missing business state".into()))?,
+                zip: zip.ok_or(AssertionError("missing business zip".into()))?,
+                address_line1: address_line1
+                    .ok_or(AssertionError("missing business address_line_1".into()))?,
+                address_line2,
+                dba,
+                website_url,
+                phone_number,
+                tin,
+                business_owners,
+            }
+        };
+
+
+        Ok(res)
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

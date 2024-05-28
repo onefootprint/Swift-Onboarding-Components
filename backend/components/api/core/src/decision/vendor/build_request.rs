@@ -15,9 +15,9 @@ use db::{
     DbPool,
 };
 use newtypes::{
-    email::Email, BoData, BusinessData, BusinessDataKind as BDK, DataIdentifier, DocVData, DocumentId,
-    DocumentSide, EncryptedVaultPrivateKey, IdentityDataKind as IDK, IdvData, PhoneNumber, PiiBytes,
-    PiiString, ScopedVaultId,
+    email::Email, BoData, BusinessDataFromVault, BusinessDataKind as BDK, DataIdentifier, DocVData,
+    DocumentId, DocumentSide, EncryptedVaultPrivateKey, IdentityDataKind as IDK, IdvData, PhoneNumber,
+    PiiBytes, PiiString, ScopedVaultId,
 };
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
@@ -152,7 +152,7 @@ pub async fn build_business_data_from_verification_request(
     db_pool: &DbPool,
     enclave_client: &EnclaveClient,
     request: VerificationRequest,
-) -> Result<BusinessData, ApiError> {
+) -> Result<BusinessDataFromVault, ApiError> {
     let seqno = request.uvw_snapshot_seqno;
     let (sv, bvw) = db_pool
         .db_query(move |conn| -> ApiResult<(ScopedVault, VaultWrapper<_>)> {
@@ -240,7 +240,7 @@ pub async fn build_business_data_from_verification_request(
         .collect();
     let mut decrypted_values = bvw.decrypt_unchecked(enclave_client, &all_bdks).await?;
 
-    let bd = BusinessData {
+    let bd = BusinessDataFromVault {
         name: decrypted_values.remove(&BDK::Name.into()),
         dba: decrypted_values.remove(&BDK::Dba.into()),
         website_url: decrypted_values.remove(&BDK::Website.into()),

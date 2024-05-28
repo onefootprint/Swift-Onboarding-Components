@@ -12,7 +12,8 @@ use newtypes::{
     DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo,
     DocumentRequestConfig, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, Locked,
     ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
-    SupportedDocumentAndCountryMappingForBifrost, TenantId, VerificationCheck, WorkflowId,
+    SupportedDocumentAndCountryMappingForBifrost, TenantId, VerificationCheck, VerificationCheckKind,
+    WorkflowId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -243,6 +244,13 @@ impl ObConfiguration {
 
     pub fn is_stepup_enabled(&self) -> bool {
         matches!(self.cip_kind, Some(CipKind::Alpaca))
+    }
+
+    pub fn get_verification_check(&self, kind: VerificationCheckKind) -> Option<VerificationCheck> {
+        self.verification_checks.clone().and_then(|vc| {
+            vc.into_iter()
+                .find(|c| VerificationCheckKind::from(c.clone()) == kind)
+        })
     }
 }
 

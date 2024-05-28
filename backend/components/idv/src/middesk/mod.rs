@@ -1,4 +1,4 @@
-use newtypes::{vendor_credentials::MiddeskCredentials, BusinessData, PiiJsonValue, TenantId};
+use newtypes::{vendor_credentials::MiddeskCredentials, BusinessDataForRequest, PiiJsonValue, TenantId};
 use reqwest::StatusCode;
 use thiserror::Error;
 
@@ -9,7 +9,7 @@ pub mod response;
 use self::response::{business::BusinessResponse, MiddeskApiErrorResponse};
 
 pub struct MiddeskCreateBusinessRequest {
-    pub business_data: BusinessData,
+    pub business_data: BusinessDataForRequest,
     pub credentials: MiddeskCredentials,
     pub tenant_id: TenantId,
 }

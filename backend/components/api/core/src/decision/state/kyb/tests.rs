@@ -33,20 +33,26 @@ use macros::{test_state, test_state_case};
 use newtypes::{
     CollectedDataOption as CDO, FootprintReasonCode, KybState, KycState, ObConfigurationKind,
     OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleInstanceKind, SignalSeverity, VendorAPI,
-    WorkflowFixtureResult, WorkflowState,
+    VerificationCheck, WorkflowFixtureResult, WorkflowState,
 };
 
 async fn setup(
     state: &State,
     fixture_result: Option<WorkflowFixtureResult>,
+    ein_only: bool,
 ) -> (DbWorkflow, Tenant, ObConfiguration, DbWorkflow) {
     let is_live = fixture_result.is_none();
-    let cdos = vec![
-        CDO::PhoneNumber,
-        CDO::FullAddress,
-        CDO::BusinessName,
-        CDO::BusinessBeneficialOwners,
-    ];
+    let cdos: Vec<CDO> = vec![
+        Some(CDO::PhoneNumber),
+        Some(CDO::FullAddress),
+        Some(CDO::BusinessName),
+        Some(CDO::BusinessBeneficialOwners),
+        (!ein_only).then_some(CDO::BusinessAddress),
+        Some(CDO::BusinessTin),
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
     let (t, wf, _v, _sv, obc, biz_wf) = test_helpers::create_kyb_user_and_onboarding(
         state,
         ObConfigurationOpts {
@@ -54,6 +60,7 @@ async fn setup(
             must_collect_data: cdos.clone(),
             can_access_data: cdos,
             kind: ObConfigurationKind::Kyb,
+            verification_checks: Some(vec![VerificationCheck::Kyb { ein_only: false }]),
             ..Default::default()
         },
         fixture_result,
@@ -210,7 +217,7 @@ async fn run_kyc_for_bo(
 
 #[test_state]
 async fn authorize(state: &mut State) {
-    let (wf, _, _, _) = setup(state, None).await;
+    let (wf, _, _, _) = setup(state, None, false).await;
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
     assert!(matches!(
@@ -228,12 +235,14 @@ async fn authorize(state: &mut State) {
     ));
 }
 
-#[test_state_case(WorkflowFixtureResult::Pass)]
-#[test_state_case(WorkflowFixtureResult::Fail)]
+#[test_state_case(WorkflowFixtureResult::Pass, false)]
+#[test_state_case(WorkflowFixtureResult::Fail, false)]
+#[test_state_case(WorkflowFixtureResult::Pass, true)]
+#[test_state_case(WorkflowFixtureResult::Fail, true)]
 #[tokio::test(flavor = "multi_thread")]
-async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
+async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_only: bool) {
     // SETUP
-    let (wf, tenant, obc, person_wf) = setup(state, Some(fixture_result)).await;
+    let (wf, tenant, obc, person_wf) = setup(state, Some(fixture_result), ein_only).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
@@ -325,12 +334,14 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     assert_eq!(expected_status, wf.status.unwrap());
 }
 
-#[test_state_case(TerminalDecisionStatus::Pass)]
-#[test_state_case(TerminalDecisionStatus::Fail)]
+#[test_state_case(TerminalDecisionStatus::Pass, false)]
+#[test_state_case(TerminalDecisionStatus::Fail, false)]
+#[test_state_case(TerminalDecisionStatus::Pass, true)]
+#[test_state_case(TerminalDecisionStatus::Fail, true)]
 #[tokio::test(flavor = "multi_thread")]
-async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
+async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_only: bool) {
     // SETUP
-    let (wf, tenant, obc, person_wf) = setup(state, None).await;
+    let (wf, tenant, obc, person_wf) = setup(state, None, ein_only).await;
     let t1 = tenant.clone();
     let obc1 = obc.clone();
     let wfid = wf.id.clone();

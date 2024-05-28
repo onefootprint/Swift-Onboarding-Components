@@ -14,7 +14,7 @@ use db::{
 };
 use newtypes::{
     BusinessDataKind, DataIdentifier, DocumentRequestKind, IdentityDataKind, PiiString, ScopedVaultId,
-    VaultKind, WorkflowFixtureResult, WorkflowSource,
+    VaultKind, VerificationCheck, VerificationCheckKind, WorkflowFixtureResult, WorkflowSource,
 };
 
 use crate::{
@@ -102,7 +102,7 @@ pub async fn create_user_and_onboarding(
 
             if let Some(biz_wf) = biz_wf.as_ref() {
                 let sbv = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
-                populate_business_vault(conn, &sbv.id);
+                populate_business_vault(conn, &sbv.id, &obc);
                 if let Some(fixture_result) = kyc_fixture_result {
                     Workflow::update_fixture_result(conn, &biz_wf.id, fixture_result).unwrap();
                 }
@@ -223,8 +223,12 @@ pub fn create_user_and_populate_vault(
     (uv.into_inner(), su)
 }
 
-pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId) {
-    let update = vec![
+pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId, obc: &ObConfiguration) {
+    let Some(VerificationCheck::Kyb { ein_only }) = obc.get_verification_check(VerificationCheckKind::Kyb)
+    else {
+        panic!("missing kyb check in configured obc")
+    };
+    let mut update = vec![
         (
             BusinessDataKind::BeneficialOwners.into(),
             PiiString::new(
@@ -236,7 +240,33 @@ pub fn populate_business_vault(conn: &mut TxnPgConn, sb_id: &ScopedVaultId) {
             PiiString::new("Waffle House".to_owned()),
         ),
         (BusinessDataKind::Dba.into(), PiiString::new("Waho".to_owned())),
+        (
+            BusinessDataKind::Tin.into(),
+            PiiString::new("123456789".to_owned()),
+        ),
     ];
+    if !ein_only {
+        vec![
+            (
+                BusinessDataKind::AddressLine1.into(),
+                PiiString::new("1 Biz Blvd".to_owned()),
+            ),
+            (
+                BusinessDataKind::City.into(),
+                PiiString::new("Gwinsville".to_owned()),
+            ),
+            (BusinessDataKind::State.into(), PiiString::new("NY".to_owned())),
+            (BusinessDataKind::Zip.into(), PiiString::new("12345".to_owned())),
+            (BusinessDataKind::Country.into(), PiiString::new("US".to_owned())),
+            (
+                BusinessDataKind::AddressLine2.into(),
+                PiiString::new("Apt 2".to_owned()),
+            ),
+        ]
+        .into_iter()
+        .for_each(|bdk| update.push(bdk))
+    }
+
 
     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, sb_id).unwrap();
     uvw.patch_data_test(conn, update, false).unwrap();

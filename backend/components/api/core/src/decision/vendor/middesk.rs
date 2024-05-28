@@ -6,10 +6,12 @@ use super::{vendor_trait::VendorAPIResponse, *};
 
 use crate::{
     config::Config,
-    decision,
-    decision::state::{actions::WorkflowActions, AsyncVendorCallsCompleted, WorkflowWrapper},
+    decision::{
+        self,
+        state::{actions::WorkflowActions, AsyncVendorCallsCompleted, WorkflowWrapper},
+    },
     enclave_client::EnclaveClient,
-    errors::ApiError,
+    errors::{ApiError, AssertionError},
     vendor_clients::VendorClient,
     State,
 };
@@ -41,8 +43,9 @@ use idv::middesk::{
 use idv::{ParsedResponse, VendorResponse};
 
 use newtypes::{
-    BusinessData, DecisionIntentKind, MiddeskRequestState, ObConfigurationKey, OnboardingStatus,
-    PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI, WorkflowId,
+    BusinessDataForRequest, DecisionIntentKind, EinOnly, MiddeskRequestState, ObConfigurationKey,
+    OnboardingStatus, PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI, VerificationCheck,
+    VerificationCheckKind, WorkflowId,
 };
 use strum_macros::EnumDiscriminants;
 
@@ -221,6 +224,11 @@ impl MiddeskState<PendingCreateBusinessCall> {
         let vreq_id = self.state.create_business_vreq.id.clone();
         let wf_id = self.middesk_request.workflow_id;
 
+        let obc = db_pool
+            .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
+            .await?
+            .0;
+
         let business_data = build_request::build_business_data_from_verification_request(
             db_pool,
             enclave_client,
@@ -228,11 +236,19 @@ impl MiddeskState<PendingCreateBusinessCall> {
         )
         .await?;
 
-        let ob_configuration_key = db_pool
-            .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
-            .await?
-            .0
-            .key;
+        let Some(VerificationCheck::Kyb { ein_only }) =
+            obc.get_verification_check(VerificationCheckKind::Kyb)
+        else {
+            // todo make this into a proper variant
+            return Err(AssertionError("no kyb check configured").into());
+        };
+
+        // Validate we have the appropriate data for the call we're making
+        let business_data_for_request = BusinessDataForRequest::try_from((business_data, EinOnly(ein_only)))?;
+
+        let obc_key = obc.key.clone();
+
+        // based on the check we're performing... validate the data
 
         let res = send_middesk_call(
             db_pool,
@@ -240,8 +256,8 @@ impl MiddeskState<PendingCreateBusinessCall> {
             ff_client,
             config,
             enclave_client,
-            business_data,
-            ob_configuration_key,
+            business_data_for_request,
+            obc_key,
             tenant_id,
         )
         .await?;
@@ -622,6 +638,7 @@ pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Re
     }
 }
 
+
 async fn send_middesk_call(
     db_pool: &DbPool,
     middesk_client: &VendorClient<
@@ -632,7 +649,7 @@ async fn send_middesk_call(
     ff_client: Arc<dyn FeatureFlagClient>,
     config: &Config,
     enclave_client: &EnclaveClient,
-    business_data: BusinessData,
+    business_data: BusinessDataForRequest,
     ob_configuration_key: ObConfigurationKey,
     tenant_id: &TenantId,
 ) -> ApiResult<MiddeskCreateBusinessResponse> {

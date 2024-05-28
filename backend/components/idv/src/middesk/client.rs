@@ -102,7 +102,7 @@ mod tests {
 
     use super::*;
     use dotenv;
-    use newtypes::{BoData, BusinessData, PiiString, TenantId};
+    use newtypes::{BoData, BusinessDataForRequest, BusinessDataFromVault, EinOnly, PiiString, TenantId};
 
     #[ignore]
     #[tokio::test]
@@ -113,7 +113,7 @@ mod tests {
 
         let client = MiddeskClient::new(base_url).unwrap();
 
-        let business_data = BusinessData {
+        let business_data = BusinessDataFromVault {
             name: Some(PiiString::from("Middesk".to_owned())),
             dba: Some(PiiString::from("mid")),
             website_url: None,
@@ -132,7 +132,7 @@ mod tests {
 
         let res = client
             .post_business(MiddeskCreateBusinessRequest {
-                business_data,
+                business_data: BusinessDataForRequest::try_from((business_data, EinOnly(false))).unwrap(),
                 credentials,
                 tenant_id: TenantId::from_str("t_123").unwrap(),
             })
