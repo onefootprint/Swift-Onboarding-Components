@@ -182,6 +182,7 @@ export type {
   SubmitFreeFormNoteResponse,
   SubmitReviewRequest,
   SubmitReviewResponse,
+  TenantDetail,
   TriggerRequest,
   TriggerResponse,
   UpdateAnnotationRequest,

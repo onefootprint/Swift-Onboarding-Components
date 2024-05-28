@@ -22,7 +22,7 @@ export const organizationFixture: Organization = {
 export const organizationDataLabels = [
   'Company name',
   'Website',
-  'Organization id',
+  'Organization ID',
   'Support email',
   'Support phone',
   'Support website',

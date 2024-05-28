@@ -147,7 +147,11 @@ export type {
 } from './get-risk-signal-details';
 export type { GetRolesRequest, GetRolesResponse } from './get-roles';
 export type { GetRulesResponse } from './get-rules';
-export type { GetTenantsRequest, GetTenantsResponse } from './get-tenants';
+export type {
+  GetTenantsRequest,
+  GetTenantsResponse,
+  TenantDetail,
+} from './get-tenants';
 export type { GetTimelineRequest, GetTimelineResponse } from './get-timeline';
 export type {
   GetUserInsightsRequest,

@@ -2100,7 +2100,7 @@
           "not-allowed": "You are not allowed to change the organization logo"
         },
         "id": {
-          "label": "Organization id"
+          "label": "Organization ID"
         },
         "parent": {
           "name": "Parent Organization",
