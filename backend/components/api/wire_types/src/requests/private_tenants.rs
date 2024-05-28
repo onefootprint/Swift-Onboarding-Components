@@ -38,8 +38,10 @@ pub struct PrivateTenantDetail {
     pub is_prod_kyb_playbook_restricted: bool,
     pub is_prod_auth_playbook_restricted: bool,
 
+    // TODO support updating with the new PATCH
     pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
     pub allowed_preview_apis: Vec<PreviewApi>,
+    // TODO support updating with the new PATCH
     pub pinned_api_version: Option<i32>,
     pub is_demo_tenant: bool,
 
@@ -75,6 +77,45 @@ pub struct PrivateBillingProfile {
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+pub struct PrivateUpdateBillingProfile {
+    #[serde(default)]
+    pub kyc: Patch<String>,
+    #[serde(default)]
+    pub one_click_kyc: Patch<String>,
+    #[serde(default)]
+    pub kyc_waterfall_second_vendor: Patch<String>,
+    #[serde(default)]
+    pub kyc_waterfall_third_vendor: Patch<String>,
+
+    #[serde(default)]
+    pub id_docs: Patch<String>,
+    #[serde(default)]
+    pub kyb: Patch<String>,
+
+    #[serde(default)]
+    pub pii: Patch<String>,
+    #[serde(default)]
+    pub hot_vaults: Patch<String>,
+    #[serde(default)]
+    pub hot_proxy_vaults: Patch<String>,
+    #[serde(default)]
+    pub vaults_with_non_pci: Patch<String>,
+    #[serde(default)]
+    pub vaults_with_pci: Patch<String>,
+
+    #[serde(default)]
+    pub watchlist: Patch<String>,
+    #[serde(default)]
+    pub adverse_media_per_user: Patch<String>,
+    #[serde(default)]
+    pub continuous_monitoring_per_year: Patch<String>,
+
+    #[serde(default)]
+    pub monthly_minimum: Patch<String>,
+}
+
+
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivatePatchTenant {
     pub name: Option<String>,
 
@@ -90,4 +131,5 @@ pub struct PrivatePatchTenant {
     pub is_demo_tenant: Option<bool>,
 
     pub super_tenant_id: Option<TenantId>,
+    pub billing_profile: Option<PrivateUpdateBillingProfile>,
 }

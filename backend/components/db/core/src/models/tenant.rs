@@ -259,6 +259,11 @@ impl Tenant {
         id: &TenantId,
         update: PrivateUpdateTenant,
     ) -> DbResult<Self> {
+        if update == Default::default() {
+            // Support no-op updates
+            let (tenant, _) = Self::private_get(conn, id)?;
+            return Ok(tenant);
+        }
         let result = diesel::update(tenant::table)
             .filter(tenant::id.eq(id))
             .set(update)

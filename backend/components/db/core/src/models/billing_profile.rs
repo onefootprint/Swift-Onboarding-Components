@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::billing_profile;
 use diesel::{prelude::*, Queryable};
@@ -31,6 +31,32 @@ pub struct BillingProfile {
     pub one_click_kyc: Option<String>,
 }
 
+#[derive(Debug, Clone, Insertable)]
+#[diesel(table_name = billing_profile)]
+pub struct NewBillingProfile<'a> {
+    pub tenant_id: &'a TenantId,
+}
+
+#[derive(Debug, Clone, AsChangeset, Default)]
+#[diesel(table_name = billing_profile)]
+pub struct UpdateBillingProfile {
+    pub kyc: Option<Option<String>>,
+    pub kyb: Option<Option<String>>,
+    pub pii: Option<Option<String>>,
+    pub id_docs: Option<Option<String>>,
+    pub watchlist: Option<Option<String>>,
+    pub hot_vaults: Option<Option<String>>,
+    pub hot_proxy_vaults: Option<Option<String>>,
+    pub vaults_with_non_pci: Option<Option<String>>,
+    pub vaults_with_pci: Option<Option<String>>,
+    pub adverse_media_per_user: Option<Option<String>>,
+    pub continuous_monitoring_per_year: Option<Option<String>>,
+    pub monthly_minimum: Option<Option<String>>,
+    pub kyc_waterfall_second_vendor: Option<Option<String>>,
+    pub kyc_waterfall_third_vendor: Option<Option<String>>,
+    pub one_click_kyc: Option<Option<String>>,
+}
+
 impl BillingProfile {
     pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> DbResult<Option<Self>> {
         let result = billing_profile::table
@@ -38,5 +64,63 @@ impl BillingProfile {
             .get_result::<Self>(conn)
             .optional()?;
         Ok(result)
+    }
+
+    pub fn update_or_create(
+        conn: &mut TxnPgConn,
+        tenant_id: &TenantId,
+        update: UpdateBillingProfile,
+    ) -> DbResult<Self> {
+        let existing = billing_profile::table
+            .filter(billing_profile::tenant_id.eq(tenant_id))
+            .for_no_key_update()
+            .get_result::<Self>(conn.conn())
+            .optional()?;
+        if existing.is_none() {
+            let new = NewBillingProfile { tenant_id };
+            diesel::insert_into(billing_profile::table)
+                .values(new)
+                .execute(conn.conn())?;
+        }
+        let result = diesel::update(billing_profile::table)
+            .filter(billing_profile::tenant_id.eq(tenant_id))
+            .set(update)
+            .get_result::<Self>(conn.conn())?;
+        Ok(result)
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use crate::{models::billing_profile::UpdateBillingProfile, tests::prelude::*};
+    use macros::db_test;
+    use newtypes::TenantId;
+
+    use crate::{models::billing_profile::BillingProfile, tests::prelude::TestPgConn};
+
+    #[db_test]
+    fn test_billing_profile(conn: &mut TestPgConn) {
+        let tenant_id = TenantId::test_data("org_flerp".into());
+        let update = UpdateBillingProfile {
+            kyc: Some(Some("50".into())),
+            kyb: Some(Some("700".into())),
+            pii: Some(Some("3".into())),
+            ..Default::default()
+        };
+        BillingProfile::update_or_create(conn, &tenant_id, update).unwrap();
+        let update = UpdateBillingProfile {
+            // Should clear kyc
+            kyc: Some(None),
+            // Should leave kyb untouched
+            kyb: None,
+            // And should update pii
+            pii: Some(Some("5".into())),
+            ..Default::default()
+        };
+        let bp = BillingProfile::update_or_create(conn, &tenant_id, update).unwrap();
+        assert!(bp.kyc.is_none());
+        assert_eq!(bp.kyb, Some("700".into()));
+        assert_eq!(bp.pii, Some("5".into()));
     }
 }
