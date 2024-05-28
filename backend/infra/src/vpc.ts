@@ -78,10 +78,10 @@ export async function CreateRegionalVPC(
       },
       { provider },
     );
+
+    // S3 VPC endpoints are created manually outside the scope of a Pulumi stack.
   } else {
     // otherwise create an isolated VPC
-    const vpcStack = `vpc-${stack}-${region}`;
-
     switch (stackMetadata.environment) {
       case StackEnvironment.Dev: {
         cidrBlock = DEV_CIDR_BLOCK;
@@ -98,8 +98,9 @@ export async function CreateRegionalVPC(
       }
     }
 
+    let vpcName = `vpc-${stack}-${region}`;
     vpc = new awsx.ec2.Vpc(
-      vpcStack,
+      vpcName,
       {
         tags: { stack: stack },
         numberOfAvailabilityZones: NUM_AZ,
@@ -113,6 +114,8 @@ export async function CreateRegionalVPC(
         return ng.natGateway;
       }),
     );
+
+    await createVpcEndpoints(vpc, vpcName, provider, region);
   }
 
   await createEgressDnsRecord(natGateways, dnsConfig, provider);
@@ -153,4 +156,37 @@ async function createEgressDnsRecord(
     },
     { provider },
   );
+}
+
+// Gateway VPC endpoints route traffic for the respective services away from
+// the NAT gateway, which has a high cost for data transfer.
+async function createVpcEndpoints(
+  vpc: Vpc,
+  vpcName: string,
+  provider: aws.Provider,
+  region: Region,
+) {
+  pulumi
+    .all([vpc.id, await vpc.privateSubnetIds])
+    .apply(([vpcId, subnetIds]) => {
+      let routeTableIds = Promise.all(
+        subnetIds.map(async subnetId => {
+          let routeTable = await aws.ec2.getRouteTable({
+            vpcId: vpcId,
+            subnetId: subnetId,
+          });
+          return routeTable.id;
+        }),
+      );
+
+      const s3Endpoint = new aws.ec2.VpcEndpoint(
+        `${vpcName}-s3-endpoint`,
+        {
+          vpcId: vpcId,
+          serviceName: `com.amazonaws.${region}.s3`,
+          routeTableIds: routeTableIds,
+        },
+        { provider },
+      );
+    });
 }
