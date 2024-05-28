@@ -1,4 +1,7 @@
-import base from './base';
-import footprint from './footprint';
+import dark from './dark';
+import light from './light';
 
-export default { base, footprint };
+export default {
+  light,
+  dark,
+};

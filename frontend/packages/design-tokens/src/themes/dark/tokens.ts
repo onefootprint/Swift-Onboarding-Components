@@ -1,6 +1,6 @@
-import * as p from '../../../primitives';
-import { elevationDark } from '../../../primitives/elevation';
-import type { Tokens } from '../../../types/tokens';
+import * as p from '../../primitives';
+import { elevationDark } from '../../primitives/elevation';
+import type { Tokens } from '../../types/tokens';
 
 export const backgroundColor = {
   primary: `${p.Gray900}`,

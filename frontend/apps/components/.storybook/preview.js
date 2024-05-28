@@ -24,7 +24,7 @@ export const parameters = {
 
 export const decorators = [
   Story => (
-    <DesignSystemProvider theme={themes.footprint.light}>
+    <DesignSystemProvider theme={themes.light}>
       <Story />
     </DesignSystemProvider>
   ),

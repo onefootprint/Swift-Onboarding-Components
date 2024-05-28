@@ -117,7 +117,7 @@ describe('<CardCvc />', () => {
     const hint = screen.getByText('hint');
     expect(hint).toBeInTheDocument();
     expect(hint).toHaveStyle({
-      color: themes.footprint.light.color.error,
+      color: themes.light.color.error,
     });
   });
 });

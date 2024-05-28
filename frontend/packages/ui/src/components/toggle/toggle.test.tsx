@@ -144,8 +144,8 @@ describe('<Toggle />', () => {
           });
           const toggle = screen.getByRole('switch');
           expect(toggle).toHaveStyle({
-            backgroundColor: themes.footprint.light.backgroundColor.secondary,
-            borderColor: themes.footprint.light.borderColor.primary,
+            backgroundColor: themes.light.backgroundColor.secondary,
+            borderColor: themes.light.borderColor.primary,
           });
         });
       });
@@ -158,7 +158,7 @@ describe('<Toggle />', () => {
           const toggle = screen.getByRole('switch');
           expect(toggle).toHaveStyle({
             borderColor: 'transparent',
-            backgroundColor: themes.footprint.light.backgroundColor.accent,
+            backgroundColor: themes.light.backgroundColor.accent,
           });
         });
       });

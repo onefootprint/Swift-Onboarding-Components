@@ -8,9 +8,7 @@ import { initTranslations, TranslationsProvider } from '@/i18n';
 type WithChildren = { children: React.ReactNode };
 
 export const WithDesignSystem = ({ children }: WithChildren) => (
-  <DesignSystemProvider theme={themes.footprint.light}>
-    {children}
-  </DesignSystemProvider>
+  <DesignSystemProvider theme={themes.light}>{children}</DesignSystemProvider>
 );
 
 export const withTranslations = async (

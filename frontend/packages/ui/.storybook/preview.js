@@ -32,7 +32,7 @@ const StoryDecorator = (Story, context) => {
   return (
     // here catches the suspense from components not yet ready (still loading translations)
     // alternative set useSuspense false on i18next.options.react when initializing i18next
-    <DesignSystemProvider theme={themes.footprint.light}>
+    <DesignSystemProvider theme={themes.light}>
       <Story />
     </DesignSystemProvider>
   );

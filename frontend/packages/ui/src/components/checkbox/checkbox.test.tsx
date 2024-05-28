@@ -72,7 +72,7 @@ describe('<Checkbox />', () => {
         });
         const input = screen.getByLabelText('label') as HTMLInputElement;
         expect(input).toHaveStyle({
-          borderColor: themes.footprint.light.borderColor.error,
+          borderColor: themes.light.borderColor.error,
         });
       });
 
@@ -83,7 +83,7 @@ describe('<Checkbox />', () => {
         });
         const hint = screen.getByText('Hint');
         expect(hint).toHaveStyle({
-          color: themes.footprint.light.color.error,
+          color: themes.light.color.error,
         });
       });
     });

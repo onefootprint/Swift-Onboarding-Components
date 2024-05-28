@@ -16,7 +16,7 @@ export default {
     },
     color: {
       control: 'select',
-      options: Object.keys(themes.footprint.light.color),
+      options: Object.keys(themes.light.color),
     },
     testID: {
       control: 'text',

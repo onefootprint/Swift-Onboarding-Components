@@ -1,6 +1,6 @@
-import * as p from '../../../primitives';
-import { elevationLight } from '../../../primitives/elevation';
-import type { Tokens } from '../../../types/tokens';
+import * as p from '../../primitives';
+import { elevationLight } from '../../primitives/elevation';
+import type { Tokens } from '../../types/tokens';
 
 export const backgroundColor = {
   primary: `${p.Gray0}`,
@@ -25,10 +25,10 @@ export const backgroundColor = {
 };
 
 export const primaryBtnBackgroundColor = {
-  default: `${p.Darkblue900}`,
-  hover: `${p.Darkblue700}`,
-  active: `${p.Darkblue600}`,
-  disabled: `${p.Gray50}`,
+  default: `${p.Purple500}`,
+  hover: `${p.Purple700}`,
+  active: `${p.Purple600}`,
+  disabled: `${p.Gray0}`,
 };
 
 export const secondaryBtnBackgroundColor = {
@@ -118,24 +118,24 @@ export const overlay = {
 
 export const primaryBtnBoxShadow = {
   none: 'none',
-  default: `0px 1px 2px 0px rgba(0, 0, 0, 0.24),
+  default: `0px 1px 2px 0px rgba(0, 0, 0, 0.12),
   inset 0px -1px 1px rgba(200, 200, 200, 0.2),
   inset 0px 1px 1px rgba(255, 255, 255, 0.2);`,
-  hover: `0px 1px 1px 0px rgba(0, 0, 0, 0.2),
+  hover: `0px 1px 1px 0px rgba(0, 0, 0, 0.12),
   inset 0px -1px 1px rgba(200, 200, 200, 0.12),
   inset 0px 1px 1px rgba(255, 255, 255, 0.3);`,
   active: `0px 1px 1px 0px rgba(0, 0, 0, 0.12),
   inset 0px -1px 1px rgba(200, 200, 200, 0.1),
   inset 0px 1px 1px rgba(255, 255, 255, 0.2);`,
-  disabled: 'none',
+  disabled: `0px 1px 2px 0px rgba(0, 0, 0, 0.12);`,
 };
 
 export const secondaryBtnBoxShadow = {
   none: 'none',
   default: `0px 1px 2px 0px rgba(0, 0, 0, 0.12);`,
-  hover: `0px 1px 1px 0px rgba(0, 0, 0, 0.2);`,
+  hover: `0px 1px 1px 0px rgba(0, 0, 0, 0.12);`,
   active: `0px 1px 1px 0px rgba(0, 0, 0, 0.12);`,
-  disabled: 'none',
+  disabled: `0px 1px 2px 0px rgba(0, 0, 0, 0.12);`,
 };
 
 const tokens: Tokens = {
@@ -313,8 +313,8 @@ const tokens: Tokens = {
           },
           disabled: {
             bg: primaryBtnBackgroundColor.disabled,
-            color: textColor.quinary,
-            borderColor: 'transparent',
+            color: textColor.quaternary,
+            borderColor: borderColor.tertiary,
             boxShadow: primaryBtnBoxShadow.disabled,
           },
         },

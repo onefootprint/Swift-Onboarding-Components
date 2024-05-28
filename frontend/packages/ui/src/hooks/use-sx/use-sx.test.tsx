@@ -3,7 +3,7 @@ import { renderHook, Wrapper } from '@onefootprint/test-utils';
 
 import useSX from './use-sx';
 
-const theme = themes.base.light;
+const theme = themes.light;
 
 describe('useSX', () => {
   describe('when the parameter is undefined', () => {

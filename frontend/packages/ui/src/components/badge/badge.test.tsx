@@ -41,8 +41,8 @@ describe('<Badge />', () => {
     it('should render with the correct styles', () => {
       renderBadge({ children: 'Badge content', variant });
       expect(screen.getByText('Badge content')).toHaveStyle({
-        backgroundColor: themes.footprint.light.backgroundColor[variant],
-        color: themes.footprint.light.color[variant],
+        backgroundColor: themes.light.backgroundColor[variant],
+        color: themes.light.color[variant],
       });
     });
   });

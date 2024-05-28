@@ -68,7 +68,7 @@ describe('<Content />', () => {
 
   const renderContent = (mockFootprint: ProviderReturn) =>
     render(
-      <DesignSystemProvider theme={themes.footprint.light}>
+      <DesignSystemProvider theme={themes.light}>
         <QueryClientProvider client={queryClient}>
           <FootprintProvider client={mockFootprint}>
             <Content fallback={<Loading />} />

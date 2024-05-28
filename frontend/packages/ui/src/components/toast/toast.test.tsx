@@ -97,7 +97,7 @@ describe('<Toast />', () => {
       const title = screen.getByText('Title');
 
       expect(title).toHaveStyle({
-        color: themes.footprint.light.color.error,
+        color: themes.light.color.error,
       });
     });
   });

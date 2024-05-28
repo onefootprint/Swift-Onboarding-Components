@@ -49,7 +49,7 @@ describe('<SegmentedControl />', () => {
       });
       const selectedOption = screen.getByRole('button', { name: 'Option 2' });
       expect(selectedOption).toHaveStyle({
-        backgroundColor: themes.footprint.light.backgroundColor.tertiary,
+        backgroundColor: themes.light.backgroundColor.tertiary,
       });
     });
   });

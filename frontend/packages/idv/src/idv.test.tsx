@@ -147,7 +147,7 @@ describe('<Idv />', () => {
     render(
       <React.StrictMode>
         <QueryClientProvider client={queryClient}>
-          <DesignSystemProvider theme={themes.footprint.light}>
+          <DesignSystemProvider theme={themes.light}>
             <ToastProvider>
               <Layout>
                 <Idv

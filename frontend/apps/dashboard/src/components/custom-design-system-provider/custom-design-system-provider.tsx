@@ -22,7 +22,7 @@ const DesignSystemProviderWrapper = ({
   const isDark = theme === 'dark';
 
   return (
-    <DesignSystemProvider theme={themes.footprint[isDark ? 'dark' : 'light']}>
+    <DesignSystemProvider theme={themes[isDark ? 'dark' : 'light']}>
       {children}
     </DesignSystemProvider>
   );

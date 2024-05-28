@@ -33,7 +33,7 @@ type AppearanceResponse = {
 
 const getCustomAppearance = async ({
   variant = 'modal',
-  defaultTheme = themes.footprint.light,
+  defaultTheme = themes.light,
   params,
   strategy,
   authToken,
