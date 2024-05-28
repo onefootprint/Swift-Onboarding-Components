@@ -147,8 +147,6 @@ pub(super) fn on_otp_verified(
     Vault::mark_verified(conn, v_id)?;
     let update = ScopedVaultUpdate {
         is_active: Some(true),
-        show_in_search: Some(true),
-        is_billable: Some(true),
         ..ScopedVaultUpdate::default()
     };
     ScopedVault::update(conn, sv_id, update)?;

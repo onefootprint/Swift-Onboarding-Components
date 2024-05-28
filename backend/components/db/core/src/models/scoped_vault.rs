@@ -43,19 +43,9 @@ pub struct ScopedVault {
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,
     pub status: Option<OnboardingStatus>,
-    /// Denormalized column to track which vaults are billable for monthly PII storage. True when
-    ///   (1) the ScopedVault was created via API as a non-portable user OR
-    ///   (2) the ScopedVault has an authorized onboarding
-    /// Eventually, we might remove this as we're moving more towards a hot vault model
-    /// TODO rm this
-    pub is_billable: bool,
     /// Last time we logged a hosted API interacted with this scoped vault. Vaults touched recently
     /// are considered in progress if their KYC status is still incomplete
     pub last_heartbeat_at: DateTime<Utc>,
-    /// Temporary flag that will hide users (made in bifrost) without verified credentials from
-    /// search. Users made via API will always show in search
-    /// TODO rm this
-    pub show_in_search: bool,
     /// The seqno at which the SV was created or refreshed.
     /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the VW
     pub snapshot_seqno: DataLifetimeSeqno,
@@ -87,9 +77,7 @@ struct NewScopedVault {
     tenant_id: TenantId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
-    is_billable: bool,
     last_heartbeat_at: DateTime<Utc>,
-    show_in_search: bool,
     snapshot_seqno: DataLifetimeSeqno,
     external_id: Option<ExternalId>,
     last_activity_at: DateTime<Utc>,
@@ -102,9 +90,7 @@ struct NewScopedVault {
 #[diesel(table_name = scoped_vault)]
 pub struct ScopedVaultUpdate {
     pub status: Option<OnboardingStatus>,
-    pub is_billable: Option<bool>,
     pub is_active: Option<bool>,
-    pub show_in_search: Option<bool>,
     pub last_activity_at: Option<DateTime<Utc>>,
 }
 
@@ -214,11 +200,7 @@ impl ScopedVault {
             last_activity_at: start_timestamp,
             tenant_id: obc.tenant_id,
             is_live: obc.is_live,
-            // All vaults created via bifrost start as non-billable. They are marked billable as
-            // soon as they have an authorized workflow
-            is_billable: false,
             last_heartbeat_at: Utc::now(),
-            show_in_search: args.is_active,
             is_active: args.is_active,
             snapshot_seqno: seqno,
             // NOTE: for now we won't support adding an external id to
@@ -282,10 +264,8 @@ impl ScopedVault {
                 tenant_id,
                 is_live: uv.is_live,
                 vault_id: uv.id.clone(),
-                // All vaults created via API are billable
-                is_billable: true,
                 last_heartbeat_at: Utc::now(),
-                show_in_search: true,
+                // Vaults created via API are immediately active
                 is_active: true,
                 snapshot_seqno: seqno,
                 external_id,
@@ -461,18 +441,11 @@ impl ScopedVault {
     #[tracing::instrument("ScopedVault::update", skip_all)]
     pub fn update(conn: &mut TxnPgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<Self> {
         let ScopedVaultUpdate {
-            is_billable,
             status,
             is_active,
-            show_in_search,
             last_activity_at,
         } = &update;
-        if is_billable.is_none()
-            && status.is_none()
-            && is_active.is_none()
-            && show_in_search.is_none()
-            && last_activity_at.is_none()
-        {
+        if status.is_none() && is_active.is_none() && last_activity_at.is_none() {
             // No-op if the update is empty
             let existing_sv = scoped_vault::table
                 .filter(scoped_vault::id.eq(id))

@@ -298,10 +298,8 @@ impl Workflow {
 
         // In locked transaction, update scoped vault status to Incomplete if it's null
         let new_status = sv.status.is_none().then_some(OnboardingStatus::Incomplete);
-        let is_billable = authorized.then_some(true);
         let update = ScopedVaultUpdate {
             status: new_status,
-            is_billable,
             ..ScopedVaultUpdate::default()
         };
         ScopedVault::update(conn, &sv.id, update)?;
@@ -567,14 +565,6 @@ impl Workflow {
         let WorkflowUpdate { update, new_decision } = update;
         let requires_manual_review_before_update =
             !ManualReview::get_active(conn, &wf.scoped_vault_id)?.is_empty();
-        if update.authorized_at.is_some() {
-            let update = ScopedVaultUpdate {
-                is_billable: Some(true),
-                ..Default::default()
-            };
-            ScopedVault::update(conn, &wf.scoped_vault_id, update)?;
-        }
-
         if update.decision_made_at.is_some() {
             // We are making the first decision for this workflow. Create the billing event(s)
             if let Some(obc_id) = wf.ob_configuration_id.as_ref() {
