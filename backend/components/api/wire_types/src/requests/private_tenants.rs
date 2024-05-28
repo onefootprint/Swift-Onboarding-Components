@@ -73,3 +73,21 @@ pub struct PrivateBillingProfile {
 
     pub monthly_minimum: Option<String>,
 }
+
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+pub struct PrivatePatchTenant {
+    pub name: Option<String>,
+
+    pub domains: Option<Vec<String>>,
+    pub allow_domain_access: Option<bool>,
+
+    pub sandbox_restricted: Option<bool>,
+    pub is_prod_kyc_playbook_restricted: Option<bool>,
+    pub is_prod_kyb_playbook_restricted: Option<bool>,
+    pub is_prod_auth_playbook_restricted: Option<bool>,
+
+    pub allowed_preview_apis: Option<Vec<PreviewApi>>,
+    pub is_demo_tenant: Option<bool>,
+
+    pub super_tenant_id: Option<TenantId>,
+}

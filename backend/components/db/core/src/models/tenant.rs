@@ -253,6 +253,19 @@ impl Tenant {
         Ok(results)
     }
 
+    #[tracing::instrument("Tenant::private_update_live_mode", skip_all)]
+    pub fn private_update(
+        conn: &mut TxnPgConn,
+        id: &TenantId,
+        update: PrivateUpdateTenant,
+    ) -> DbResult<Self> {
+        let result = diesel::update(tenant::table)
+            .filter(tenant::id.eq(id))
+            .set(update)
+            .get_result(conn.conn())?;
+        Ok(result)
+    }
+
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
     /// are kind of clunky, but removes the need to have two separate functions with the same exact body
     #[tracing::instrument("Tenant::create", skip_all)]
@@ -350,19 +363,6 @@ impl Tenant {
             })
         }
     }
-
-    #[tracing::instrument("Tenant::private_update_live_mode", skip_all)]
-    pub fn private_update_live_mode(
-        &self,
-        conn: &mut TxnPgConn,
-        update_tenant: UpdateTenantLiveMode,
-    ) -> DbResult<Self> {
-        let result = diesel::update(tenant::table)
-            .filter(tenant::id.eq(&self.id))
-            .set(update_tenant)
-            .get_result(conn.conn())?;
-        Ok(result)
-    }
 }
 
 impl WorkosAuthIdentity for Tenant {
@@ -399,9 +399,19 @@ pub struct UpdateTenant {
 
 #[derive(Debug, Clone, AsChangeset, Default, PartialEq)]
 #[diesel(table_name = tenant)]
-pub struct UpdateTenantLiveMode {
+pub struct PrivateUpdateTenant {
+    pub name: Option<String>,
+
+    pub domains: Option<Vec<String>>,
+    pub allow_domain_access: Option<bool>,
+
     pub sandbox_restricted: Option<bool>,
     pub is_prod_ob_config_restricted: Option<bool>,
     pub is_prod_kyb_playbook_restricted: Option<bool>,
     pub is_prod_auth_playbook_restricted: Option<bool>,
+
+    pub allowed_preview_apis: Option<Vec<PreviewApi>>,
+    pub is_demo_tenant: Option<bool>,
+
+    pub super_tenant_id: Option<TenantId>,
 }

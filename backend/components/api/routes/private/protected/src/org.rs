@@ -6,7 +6,7 @@ use api_core::{
     utils,
 };
 use db::models::{
-    tenant::{Tenant, UpdateTenantLiveMode},
+    tenant::{PrivateUpdateTenant, Tenant},
     tenant_business_info::{NewBusinessInfo, TenantBusinessInfo},
     tenant_vendor::TenantVendorControl,
 };
@@ -118,15 +118,14 @@ pub async fn update_tenant_live_mode(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let tenant = Tenant::get(conn, &path.into_inner())?;
-            let _ = tenant.private_update_live_mode(
-                conn,
-                UpdateTenantLiveMode {
-                    sandbox_restricted: Some(!request.is_live),
-                    is_prod_ob_config_restricted: request.kyc_live.map(|b| !b),
-                    is_prod_kyb_playbook_restricted: request.kyb_live.map(|b| !b),
-                    is_prod_auth_playbook_restricted: request.auth_live.map(|b| !b),
-                },
-            )?;
+            let update = PrivateUpdateTenant {
+                sandbox_restricted: Some(!request.is_live),
+                is_prod_ob_config_restricted: request.kyc_live.map(|b| !b),
+                is_prod_kyb_playbook_restricted: request.kyb_live.map(|b| !b),
+                is_prod_auth_playbook_restricted: request.auth_live.map(|b| !b),
+                ..Default::default()
+            };
+            Tenant::private_update(conn, &tenant.id, update)?;
 
             if let Some(UpdateTenantVendorControl {
                 idology_enabled,
