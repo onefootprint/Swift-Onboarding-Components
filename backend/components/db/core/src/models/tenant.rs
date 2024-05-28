@@ -75,6 +75,14 @@ pub struct Tenant {
     pub super_tenant_id: Option<TenantId>,
 }
 
+impl Tenant {
+    /// Support a version of the API that is backwards-compatible for some tenants that integrated
+    /// Namely: `footprint_user_id` vs the new `fp_id` api format
+    pub fn uses_legacy_serialization(&self) -> bool {
+        self.pinned_api_version.map(|v| v <= 1) == Some(true)
+    }
+}
+
 pub struct PrivateTenantFilters {
     pub search: Option<String>,
     pub is_live: Option<bool>,

@@ -214,6 +214,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                 };
                 let webhook_event = WebhookEvent::WatchlistCheckCompleted(WatchlistCheckCompletedPayload {
                     fp_id: sv.fp_id.clone(),
+                    footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
                     timestamp: Utc::now(),
                     status: wc.status,
                     error,

@@ -17,10 +17,27 @@ pub struct ValidateResponse {
     /// Information on the business and its onboarding session. Provided for KYB playbook sessions
     pub business: Option<EntityValidateResponse>,
 
+    // Legacy fields that are deprecated
     #[serde(skip_serializing_if = "Option::is_none")]
     #[openapi(skip)]
-    /// Legacy field - deprecated.
+    /// Deprecated
+    pub footprint_user_id: Option<FpId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
+    /// Deprecated
+    pub status: Option<OnboardingStatus>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
+    /// Deprecated
+    pub requires_manual_review: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
+    /// Deprecated
     pub onboarding_configuration_id: Option<ObConfigurationId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
+    /// Deprecated
+    pub timestamp: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]

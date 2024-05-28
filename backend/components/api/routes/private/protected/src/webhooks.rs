@@ -76,6 +76,8 @@ fn create_webhook_event(entity: SerializableEntity, kind: WebhookEventKind) -> A
             };
             WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                 fp_id: sv.fp_id,
+                // For legacy serialization - can omit
+                footprint_user_id: None,
                 timestamp: Utc::now(),
                 status,
                 requires_manual_review: !mrs.is_empty(),

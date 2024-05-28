@@ -10,6 +10,7 @@ use strum::{EnumMessage, IntoEnumIterator};
 fn test_raw() {
     let evt = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
         fp_id: FpId::from("test".to_string()),
+        footprint_user_id: None,
         timestamp: Utc::now(),
         status: OnboardingStatus::Pass,
         requires_manual_review: false,
