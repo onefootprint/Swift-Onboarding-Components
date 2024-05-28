@@ -96,3 +96,83 @@ Please find additional docs and guides for using Footprint vaults:
 1. [API Reference](/api-reference#post-users)
 2. [PII Vault docs](/vault/apis)
 3. [Vault Proxy Ingress](/vault/proxy)
+
+## Manual migration assistance
+
+If you need help migrating data please reach out to us at `support@onefootprint.com` with the details of your request.
+For any sensitive data please use the PGP key below to secure data in transit.
+
+### Footprint PGP instructions
+
+First, use [GPG](https://gnupg.org) to [import](http://www.gnupg.org/gph/en/manual.html#AEN84) our public key below.
+
+After importing our Public Key, you can encrypt files by running:
+
+```bash
+gpg --encrypt --recipient 1ED420961981B558 <FILENAME>
+```
+
+Note the parameters represent the following.
+
+- `1ED420961981B558`: is the Footprint key ID.
+- `<FILENAME>`: is the name of the plaintext file you are encrypting.
+- `<FILENAME>.gpg`: is the encrypted file that will be output for you to send us.
+
+<br />
+
+### Footprint PGP Public Key
+
+```text
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+OwC3wKkvTn6QpiPA9DDuE3PSp2ZZ
+=EpSl
+-----END PGP PUBLIC KEY BLOCK-----
+```
