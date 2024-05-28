@@ -141,7 +141,7 @@ pub fn get_or_start_onboarding(
             };
             let business_vault = Vault::create(conn, args)?;
             BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;
-            let (sb, _) = ScopedVault::get_or_create(conn, &business_vault, obc.id.clone())?;
+            let (sb, _) = ScopedVault::get_or_create_for_playbook(conn, &business_vault, obc.id.clone())?;
             let ob_create_args = OnboardingWorkflowArgs {
                 scoped_vault_id: sb.id,
                 ob_configuration_id: obc.id.clone(),

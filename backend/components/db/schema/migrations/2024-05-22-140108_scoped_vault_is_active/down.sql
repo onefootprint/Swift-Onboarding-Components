@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault DROP column is_active;

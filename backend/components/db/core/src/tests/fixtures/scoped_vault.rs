@@ -10,7 +10,7 @@ use crate::{
 
 pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, ob_config_id: &ObConfigurationId) -> ScopedVault {
     let uv = Vault::lock(conn, uv_id).unwrap();
-    ScopedVault::get_or_create(conn, &uv, ob_config_id.clone())
+    ScopedVault::get_or_create_for_playbook(conn, &uv, ob_config_id.clone())
         .unwrap()
         .0
 }

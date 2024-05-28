@@ -1068,6 +1068,7 @@ diesel::table! {
         last_activity_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
         kind -> Text,
+        is_active -> Bool,
     }
 }
 

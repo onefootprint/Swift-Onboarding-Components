@@ -43,15 +43,18 @@ pub struct ScopedVault {
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,
     pub status: Option<OnboardingStatus>,
-    /// Denormalized column to track which vaults are billable for PII storage. True when
+    /// Denormalized column to track which vaults are billable for monthly PII storage. True when
     ///   (1) the ScopedVault was created via API as a non-portable user OR
     ///   (2) the ScopedVault has an authorized onboarding
+    /// Eventually, we might remove this as we're moving more towards a hot vault model
+    /// TODO rm this
     pub is_billable: bool,
     /// Last time we logged a hosted API interacted with this scoped vault. Vaults touched recently
     /// are considered in progress if their KYC status is still incomplete
     pub last_heartbeat_at: DateTime<Utc>,
     /// Temporary flag that will hide users (made in bifrost) without verified credentials from
     /// search. Users made via API will always show in search
+    /// TODO rm this
     pub show_in_search: bool,
     /// The seqno at which the SV was created or refreshed.
     /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the VW
@@ -68,6 +71,11 @@ pub struct ScopedVault {
     pub deactivated_at: Option<DateTime<Utc>>,
     /// Denormalized from vault for faster querying
     pub kind: VaultKind,
+    /// Determines whether the ScopedVault is generally active to be logged into, shown in the
+    /// dashboard, and billable. There are two ways a scoped vault may be inactive:
+    /// - The old DELETE /users/{fp_id} API could deactivate a user.
+    /// - When an unverified vault is made via bifrost, it is inactive until it is OTP verified
+    pub is_active: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -86,6 +94,8 @@ struct NewScopedVault {
     external_id: Option<ExternalId>,
     last_activity_at: DateTime<Utc>,
     kind: VaultKind,
+    is_active: bool,
+    status: Option<OnboardingStatus>,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset)]
@@ -93,6 +103,7 @@ struct NewScopedVault {
 pub struct ScopedVaultUpdate {
     pub status: Option<OnboardingStatus>,
     pub is_billable: Option<bool>,
+    pub is_active: Option<bool>,
     pub show_in_search: Option<bool>,
     pub last_activity_at: Option<DateTime<Utc>>,
 }
@@ -149,20 +160,21 @@ pub type SerializableEntity = (
 
 pub type IsNew = bool;
 
+pub struct NewScopedVaultArgs {
+    pub is_active: bool,
+    pub status: Option<OnboardingStatus>,
+}
+
 impl ScopedVault {
-    /// Used to create a ScopedUser for an already-existing portable vault when that vault onboards
+    /// Used to create a ScopedVault for an already-existing portable vault when that vault onboards
     /// onto a new tenant.
-    #[tracing::instrument("ScopedVault::get_or_create", skip_all)]
-    pub fn get_or_create(
+    #[tracing::instrument("ScopedVault::get_or_create_for_playbook", skip_all)]
+    pub fn get_or_create_for_playbook(
         conn: &mut TxnPgConn,
         uv: &Locked<Vault>,
         ob_configuration_id: ObConfigurationId,
     ) -> DbResult<(Self, IsNew)> {
-        // Get the ob config to do some validation before we make the SV
         let (ob_config, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
-        if uv.is_live != ob_config.is_live {
-            return Err(DbError::SandboxMismatch);
-        }
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
         let scoped_vault = scoped_vault::table
@@ -174,6 +186,24 @@ impl ScopedVault {
             return Ok((scoped_vault, false));
         }
         // Row doesn't exist for vault_id, tenant_id - create a new one
+        let args = NewScopedVaultArgs {
+            is_active: true,
+            status: None,
+        };
+        let sv = Self::create_for_playbook(conn, uv, ob_config, args)?;
+        Ok((sv, true))
+    }
+
+    #[tracing::instrument("ScopedVault::create_for_playbook", skip_all)]
+    pub fn create_for_playbook(
+        conn: &mut TxnPgConn,
+        uv: &Locked<Vault>,
+        obc: ObConfiguration,
+        args: NewScopedVaultArgs,
+    ) -> DbResult<Self> {
+        if uv.is_live != obc.is_live {
+            return Err(DbError::SandboxMismatch);
+        }
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let start_timestamp = Utc::now();
         let new = NewScopedVault {
@@ -182,23 +212,25 @@ impl ScopedVault {
             vault_id: uv.id.clone(),
             start_timestamp,
             last_activity_at: start_timestamp,
-            tenant_id: ob_config.tenant_id,
-            is_live: ob_config.is_live,
+            tenant_id: obc.tenant_id,
+            is_live: obc.is_live,
             // All vaults created via bifrost start as non-billable. They are marked billable as
             // soon as they have an authorized workflow
             is_billable: false,
             last_heartbeat_at: Utc::now(),
-            show_in_search: true,
+            show_in_search: args.is_active,
+            is_active: args.is_active,
             snapshot_seqno: seqno,
             // NOTE: for now we won't support adding an external id to
             // users created via Verify
             external_id: None,
             kind: uv.kind,
+            status: args.status,
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
             .get_result::<ScopedVault>(conn.conn())?;
-        Ok((sv, true))
+        Ok(sv)
     }
 
     /// Used to create a ScopedUser for a non-portable vault
@@ -254,9 +286,11 @@ impl ScopedVault {
                 is_billable: true,
                 last_heartbeat_at: Utc::now(),
                 show_in_search: true,
+                is_active: true,
                 snapshot_seqno: seqno,
                 external_id,
                 kind: uv.kind,
+                status: None,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)
@@ -429,10 +463,15 @@ impl ScopedVault {
         let ScopedVaultUpdate {
             is_billable,
             status,
+            is_active,
             show_in_search,
             last_activity_at,
         } = &update;
-        if is_billable.is_none() && status.is_none() && show_in_search.is_none() && last_activity_at.is_none()
+        if is_billable.is_none()
+            && status.is_none()
+            && is_active.is_none()
+            && show_in_search.is_none()
+            && last_activity_at.is_none()
         {
             // No-op if the update is empty
             let existing_sv = scoped_vault::table
@@ -440,6 +479,7 @@ impl ScopedVault {
                 .get_result(conn.conn())?;
             return Ok(existing_sv);
         }
+
         let updated_sv = diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(id))
             .set(update)

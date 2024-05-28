@@ -98,7 +98,7 @@ pub async fn post(
                             return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
                         }
                         let uv = Vault::lock(conn, &uv_id)?;
-                        ScopedVault::get_or_create(conn, &uv, obc.id.clone())?
+                        ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?
                     } else {
                         let Some(su_from_token) = user_auth.scoped_user() else {
                             // A playbook MUST be provided if we're not stepping up
@@ -127,7 +127,7 @@ pub async fn post(
                         // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
                         // created with an ob config. This will create a SU when we are one-clicking onto this tenant
                         let uv = Vault::lock(conn, &uv_id)?;
-                        ScopedVault::get_or_create(conn, &uv, obc.id.clone())?
+                        ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?
                     } else {
                         return Err(ValidationError("No scoped vault available").into());
                     };

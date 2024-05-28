@@ -12,7 +12,7 @@ use crate::{
 use db::{
     models::{
         ob_configuration::ObConfiguration,
-        scoped_vault::{ScopedVault, ScopedVaultUpdate},
+        scoped_vault::{NewScopedVaultArgs, ScopedVault},
         vault::{NewVaultArgs, Vault},
     },
     TxnPgConn,
@@ -93,9 +93,6 @@ impl VaultWrapper<Person> {
             duplicate_of_id,
         };
         let uv = Vault::create(conn, new_user_vault)?;
-        let (su, _) = ScopedVault::get_or_create(conn, &uv, obc.id)?;
-
-        // Since this vault is created for the first time here, it starts as billable and hidden from search
         let status = match obc.kind {
             // For now, when auth playbooks are super lightweight, just mark them as no status
             ObConfigurationKind::Auth => None,
@@ -103,13 +100,13 @@ impl VaultWrapper<Person> {
                 Some(OnboardingStatus::Incomplete)
             }
         };
-        let update = ScopedVaultUpdate {
-            is_billable: Some(true),
+        // The vault starts as inactive since the phone/email haven't been verified by the user.
+        // It will be marked as active when the user logs into this vault for the first time.
+        let args = NewScopedVaultArgs {
+            is_active: false,
             status,
-            show_in_search: Some(false),
-            last_activity_at: None,
         };
-        ScopedVault::update(conn, &su.id, update)?;
+        let su = ScopedVault::create_for_playbook(conn, &uv, obc, args)?;
 
         // Record some properties on the root span
         root_span.record("tenant_id", su.tenant_id.to_string());
