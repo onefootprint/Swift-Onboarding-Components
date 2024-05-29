@@ -1,5 +1,5 @@
 use crate::*;
-use newtypes::{AppClipExperienceId, PreviewApi, StripeCustomerId, TenantId, WorkosAuthMethod};
+use newtypes::{AppClipExperienceId, PiiString, PreviewApi, StripeCustomerId, TenantId, WorkosAuthMethod};
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivateTenantFilters {
@@ -49,6 +49,7 @@ pub struct PrivateTenantDetail {
     pub app_clip_experience_id: AppClipExperienceId,
 
     pub billing_profile: Option<PrivateBillingProfile>,
+    pub vendor_control: Option<PrivateTenantVendorControl>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -72,6 +73,15 @@ pub struct PrivateBillingProfile {
     pub continuous_monitoring_per_year: Option<String>,
 
     pub monthly_minimum: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct PrivateTenantVendorControl {
+    pub idology_enabled: bool,
+    pub experian_enabled: bool,
+    pub lexis_enabled: bool,
+    pub experian_subscriber_code: Option<String>,
+    pub middesk_api_key_exists: bool,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
@@ -112,6 +122,16 @@ pub struct PrivateUpdateBillingProfile {
     pub monthly_minimum: Patch<String>,
 }
 
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+pub struct PrivateUpdateTvc {
+    pub idology_enabled: Option<bool>,
+    pub lexis_enabled: Option<bool>,
+    pub experian_enabled: Option<bool>,
+    #[serde(default)]
+    pub experian_subscriber_code: Patch<String>,
+    #[serde(default)]
+    pub middesk_api_key: Patch<PiiString>,
+}
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivatePatchTenant {
@@ -134,5 +154,7 @@ pub struct PrivatePatchTenant {
 
     #[serde(default)]
     pub super_tenant_id: Patch<TenantId>,
+
     pub billing_profile: Option<PrivateUpdateBillingProfile>,
+    pub vendor_control: Option<PrivateUpdateTvc>,
 }

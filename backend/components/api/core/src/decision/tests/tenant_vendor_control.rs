@@ -3,7 +3,8 @@ use crate::{
     enclave_client::EnclaveClient, State,
 };
 use db::{
-    models::tenant_vendor::TenantVendorControl as DbTenantVendorControl, tests::test_db_pool::TestDbPool,
+    models::tenant_vendor::{TenantVendorControl as DbTenantVendorControl, UpdateTenantVendorControlArgs},
+    tests::test_db_pool::TestDbPool,
     DbPool, DbResult,
 };
 use macros::test_state;
@@ -24,16 +25,13 @@ async fn create_db_vendor_control(
     db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let tenant = db::tests::fixtures::tenant::create_with_keys(conn, public_key, e_private_key);
-            DbTenantVendorControl::create(
-                conn,
-                tenant.id.clone(),
-                idology_enabled,
-                experian_enabled,
-                false,
-                experian_subscriber_code,
-                None,
-            )
-            .unwrap();
+            let args = UpdateTenantVendorControlArgs {
+                idology_enabled: Some(idology_enabled),
+                experian_enabled: Some(experian_enabled),
+                experian_subscriber_code: Some(experian_subscriber_code),
+                ..Default::default()
+            };
+            DbTenantVendorControl::update_or_create(conn, &tenant.id, args).unwrap();
 
             Ok(tenant.id)
         })

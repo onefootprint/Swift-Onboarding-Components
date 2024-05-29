@@ -6,9 +6,8 @@ use api_core::{
     utils,
 };
 use db::models::{
-    tenant::{PrivateUpdateTenant, Tenant},
+    tenant::Tenant,
     tenant_business_info::{NewBusinessInfo, TenantBusinessInfo},
-    tenant_vendor::TenantVendorControl,
 };
 use newtypes::{PiiString, TenantId};
 
@@ -85,70 +84,4 @@ pub async fn get_business_info(
         None
     };
     ResponseData::ok(tbi).json()
-}
-
-#[derive(serde::Deserialize)]
-pub struct UpdateTenantLiveModeRequest {
-    is_live: bool,
-    kyc_live: Option<bool>,
-    kyb_live: Option<bool>,
-    auth_live: Option<bool>,
-    vendor_control: Option<UpdateTenantVendorControl>,
-}
-
-#[derive(serde::Deserialize)]
-pub struct UpdateTenantVendorControl {
-    idology_enabled: bool,
-    lexis_enabled: bool,
-    experian_enabled: bool,
-    experian_subscriber_code: Option<String>,
-    middesk_api_key: Option<PiiString>,
-}
-
-#[patch("/private/protected/org/{tenant_id}/live_mode")]
-pub async fn update_tenant_live_mode(
-    state: web::Data<State>,
-    _: ProtectedAuth,
-    path: web::Path<TenantId>,
-    request: Json<UpdateTenantLiveModeRequest>,
-) -> JsonApiResponse<EmptyResponse> {
-    let request = request.into_inner();
-
-    state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let tenant = Tenant::get(conn, &path.into_inner())?;
-            let update = PrivateUpdateTenant {
-                sandbox_restricted: Some(!request.is_live),
-                is_prod_ob_config_restricted: request.kyc_live.map(|b| !b),
-                is_prod_kyb_playbook_restricted: request.kyb_live.map(|b| !b),
-                is_prod_auth_playbook_restricted: request.auth_live.map(|b| !b),
-                ..Default::default()
-            };
-            Tenant::private_update(conn, &tenant.id, update)?;
-
-            if let Some(UpdateTenantVendorControl {
-                idology_enabled,
-                lexis_enabled,
-                experian_enabled,
-                experian_subscriber_code,
-                middesk_api_key,
-            }) = request.vendor_control
-            {
-                let _ = TenantVendorControl::create(
-                    conn,
-                    tenant.id,
-                    idology_enabled,
-                    experian_enabled,
-                    lexis_enabled,
-                    experian_subscriber_code,
-                    middesk_api_key
-                        .map(|key| tenant.public_key.seal_bytes(key.leak().as_bytes()))
-                        .transpose()?,
-                )?;
-            }
-            Ok(())
-        })
-        .await?;
-    EmptyResponse::ok().json()
 }

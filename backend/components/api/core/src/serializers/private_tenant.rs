@@ -1,6 +1,7 @@
 use db::models::{
     billing_profile::BillingProfile,
     tenant::{Tenant, UserCounts},
+    tenant_vendor::TenantVendorControl,
 };
 
 use crate::utils::db2api::DbToApi;
@@ -37,8 +38,11 @@ impl DbToApi<(Option<UserCounts>, Tenant)> for api_wire_types::PrivateTenant {
     }
 }
 
-impl DbToApi<(Tenant, Option<BillingProfile>)> for api_wire_types::PrivateTenantDetail {
-    fn from_db((t, bp): (Tenant, Option<BillingProfile>)) -> Self {
+
+impl DbToApi<(Tenant, Option<BillingProfile>, Option<TenantVendorControl>)>
+    for api_wire_types::PrivateTenantDetail
+{
+    fn from_db((t, bp, tvc): (Tenant, Option<BillingProfile>, Option<TenantVendorControl>)) -> Self {
         let Tenant {
             id,
             name,
@@ -87,6 +91,7 @@ impl DbToApi<(Tenant, Option<BillingProfile>)> for api_wire_types::PrivateTenant
             app_clip_experience_id,
 
             billing_profile: bp.map(api_wire_types::PrivateBillingProfile::from_db),
+            vendor_control: tvc.map(api_wire_types::PrivateTenantVendorControl::from_db),
         }
     }
 }
@@ -132,6 +137,33 @@ impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
             kyc_waterfall_second_vendor,
             kyc_waterfall_third_vendor,
             one_click_kyc,
+        }
+    }
+}
+
+
+impl DbToApi<TenantVendorControl> for api_wire_types::PrivateTenantVendorControl {
+    fn from_db(bp: TenantVendorControl) -> Self {
+        let TenantVendorControl {
+            idology_enabled,
+            experian_enabled,
+            lexis_enabled,
+            experian_subscriber_code,
+            middesk_api_key,
+
+            id: _,
+            tenant_id: _,
+            deactivated_at: _,
+            _created_at: _,
+            _updated_at: _,
+        } = bp;
+
+        Self {
+            idology_enabled,
+            experian_enabled,
+            lexis_enabled,
+            experian_subscriber_code,
+            middesk_api_key_exists: middesk_api_key.is_some(),
         }
     }
 }

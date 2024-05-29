@@ -6,10 +6,11 @@ use api_core::{
     utils::db2api::DbToApi,
     State,
 };
-use api_wire_types::PrivateUpdateBillingProfile;
+use api_wire_types::{PrivateUpdateBillingProfile, PrivateUpdateTvc};
 use db::models::{
     billing_profile::{BillingProfile, UpdateBillingProfile},
     tenant::{PrivateUpdateTenant, Tenant},
+    tenant_vendor::{TenantVendorControl, UpdateTenantVendorControlArgs},
 };
 use newtypes::TenantId;
 
@@ -23,32 +24,43 @@ async fn patch(
     let id = id.into_inner();
     let request = request.into_inner();
 
-    let (tenant, bp) = state
+    let tenant_info = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let tenant = Tenant::private_get(conn, &id)?;
+            let (tenant, bp, tvc) = Tenant::private_get(conn, &id)?;
             // In absence of a real update log, will just add a log line
-            tracing::info!(?request, ?tenant, "Updating tenant info");
+            tracing::info!(?request, ?tenant, ?bp, ?tvc, "Updating tenant info");
 
-            let (update, bp_update) = make_tenant_update(request);
+            let (update, bp_update, tvc_update) = make_tenant_update(&tenant, request)?;
             let tenant = Tenant::private_update(conn, &id, update)?;
             let bp = if let Some(bp_update) = bp_update {
                 let bp = BillingProfile::update_or_create(conn, &tenant.id, bp_update)?;
                 Some(bp)
             } else {
-                BillingProfile::get(conn, &tenant.id)?
+                bp
             };
-            Ok((tenant, bp))
+            let tvc = if let Some(tvc_update) = tvc_update {
+                let bp = TenantVendorControl::update_or_create(conn, &tenant.id, tvc_update)?;
+                Some(bp)
+            } else {
+                tvc
+            };
+            Ok((tenant, bp, tvc))
         })
         .await?;
 
-    let response = api_wire_types::PrivateTenantDetail::from_db((tenant, bp));
+    let response = api_wire_types::PrivateTenantDetail::from_db(tenant_info);
     ResponseData::ok(response).json()
 }
 
 fn make_tenant_update(
+    tenant: &Tenant,
     req: api_wire_types::PrivatePatchTenant,
-) -> (PrivateUpdateTenant, Option<UpdateBillingProfile>) {
+) -> ApiResult<(
+    PrivateUpdateTenant,
+    Option<UpdateBillingProfile>,
+    Option<UpdateTenantVendorControlArgs>,
+)> {
     let api_wire_types::PrivatePatchTenant {
         name,
         domains,
@@ -63,6 +75,7 @@ fn make_tenant_update(
         is_demo_tenant,
         super_tenant_id,
         billing_profile,
+        vendor_control,
     } = req;
     let update = PrivateUpdateTenant {
         name,
@@ -79,7 +92,10 @@ fn make_tenant_update(
         super_tenant_id: super_tenant_id.to_changeset(),
     };
     let billing_profile = billing_profile.map(make_billing_profile_update);
-    (update, billing_profile)
+    let vendor_control = vendor_control
+        .map(|tvc| make_tvc_update(tenant, tvc))
+        .transpose()?;
+    Ok((update, billing_profile, vendor_control))
 }
 
 fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBillingProfile {
@@ -117,4 +133,26 @@ fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBi
         continuous_monitoring_per_year: continuous_monitoring_per_year.to_changeset(),
         monthly_minimum: monthly_minimum.to_changeset(),
     }
+}
+
+
+fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> ApiResult<UpdateTenantVendorControlArgs> {
+    let PrivateUpdateTvc {
+        idology_enabled,
+        lexis_enabled,
+        experian_enabled,
+        experian_subscriber_code,
+        middesk_api_key,
+    } = request;
+    let tvc = UpdateTenantVendorControlArgs {
+        idology_enabled,
+        lexis_enabled,
+        experian_enabled,
+        experian_subscriber_code: experian_subscriber_code.to_changeset(),
+        middesk_api_key: middesk_api_key
+            .map(|key| tenant.public_key.seal_bytes(key.leak().as_bytes()))
+            .transpose()?
+            .to_changeset(),
+    };
+    Ok(tvc)
 }

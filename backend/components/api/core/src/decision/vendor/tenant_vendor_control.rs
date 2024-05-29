@@ -44,7 +44,7 @@ impl TenantVendorControl {
         let (tenant, vendor_control, tbi) = db_pool
             .db_query(move |conn| -> DbResult<_> {
                 let t = Tenant::get(conn, &tenant_id)?;
-                let tvc = DbTenantVendorControl::get(conn, t.id.clone())?;
+                let tvc = DbTenantVendorControl::get(conn, &t.id)?;
                 let tbi = TenantBusinessInfo::get(conn, &t.id)?;
 
                 Ok((t, tvc, tbi))

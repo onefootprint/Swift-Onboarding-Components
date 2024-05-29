@@ -1,12 +1,14 @@
 use super::{
     billing_profile::BillingProfile,
     tenant_role::{ImmutableRoleKind, TenantRole},
+    tenant_vendor::TenantVendorControl,
 };
 use crate::{helpers::WorkosAuthIdentity, DbResult, NonNullVec, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
     billing_profile, scoped_vault,
     tenant::{self, BoxedQuery},
+    tenant_vendor_control,
 };
 use diesel::{
     dsl::count_star,
@@ -215,10 +217,15 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::private_get", skip_all)]
-    pub fn private_get(conn: &mut PgConn, id: &TenantId) -> DbResult<(Self, Option<BillingProfile>)> {
+    pub fn private_get(
+        conn: &mut PgConn,
+        id: &TenantId,
+    ) -> DbResult<(Self, Option<BillingProfile>, Option<TenantVendorControl>)> {
         let result = tenant::table
             .filter(tenant::id.eq(id))
             .left_join(billing_profile::table)
+            .left_join(tenant_vendor_control::table)
+            .filter(tenant_vendor_control::deactivated_at.is_null())
             .get_result(conn)?;
         Ok(result)
     }
@@ -245,7 +252,7 @@ impl Tenant {
         Ok(results)
     }
 
-    #[tracing::instrument("Tenant::private_update_live_mode", skip_all)]
+    #[tracing::instrument("Tenant::private_update", skip_all)]
     pub fn private_update(
         conn: &mut TxnPgConn,
         id: &TenantId,
@@ -253,7 +260,7 @@ impl Tenant {
     ) -> DbResult<Self> {
         if update == Default::default() {
             // Support no-op updates
-            let (tenant, _) = Self::private_get(conn, id)?;
+            let (tenant, _, _) = Self::private_get(conn, id)?;
             return Ok(tenant);
         }
         let result = diesel::update(tenant::table)

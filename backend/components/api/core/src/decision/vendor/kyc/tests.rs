@@ -9,8 +9,10 @@ use crate::{
 };
 use db::{
     models::{
-        decision_intent::DecisionIntent, tenant_vendor::TenantVendorControl as DbTenantVendorControl,
-        verification_result::VerificationResult, waterfall_execution::WaterfallExecution,
+        decision_intent::DecisionIntent,
+        tenant_vendor::{TenantVendorControl as DbTenantVendorControl, UpdateTenantVendorControlArgs},
+        verification_result::VerificationResult,
+        waterfall_execution::WaterfallExecution,
         waterfall_step::WaterfallStep,
     },
     tests::{fixtures::ob_configuration::ObConfigurationOpts, MockFFClient},
@@ -208,16 +210,13 @@ async fn test_run_kyc_waterfall(
     let di = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let _tvc: DbTenantVendorControl = DbTenantVendorControl::create(
-                conn,
-                t.id,
-                idology_enabled.0,
-                experian_enabled.0,
-                false,
-                experian_enabled.0.then(|| "abc123".to_owned()),
-                None,
-            )
-            .unwrap();
+            let args = UpdateTenantVendorControlArgs {
+                idology_enabled: Some(idology_enabled.0),
+                experian_enabled: Some(experian_enabled.0),
+                experian_subscriber_code: Some(experian_enabled.0.then_some("abc123".to_owned())),
+                ..Default::default()
+            };
+            DbTenantVendorControl::update_or_create(conn, &t.id, args).unwrap();
 
             Ok(
                 DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &wf.scoped_vault_id, None)

@@ -32,6 +32,27 @@ impl<T> Patch<T> {
             Self::Value(t) => Some(Some(t)),
         }
     }
+
+    pub fn map<F, U>(self, f: F) -> Patch<U>
+    where
+        F: FnOnce(T) -> U,
+    {
+        match self {
+            Self::Missing => Patch::Missing,
+            Self::Null => Patch::Null,
+            Self::Value(t) => Patch::Value(f(t)),
+        }
+    }
+}
+
+impl<T, E> Patch<Result<T, E>> {
+    pub fn transpose(self) -> Result<Patch<T>, E> {
+        match self {
+            Self::Missing => Ok(Patch::Missing),
+            Self::Null => Ok(Patch::Null),
+            Self::Value(t) => t.map(Patch::Value),
+        }
+    }
 }
 
 impl<'de, T> Deserialize<'de> for Patch<T>

@@ -23,7 +23,7 @@ use db::{
         rule_set_result::RuleSetResult,
         tenant::Tenant,
         tenant_user::TenantUser,
-        tenant_vendor::TenantVendorControl,
+        tenant_vendor::{TenantVendorControl, UpdateTenantVendorControlArgs},
         user_timeline::{UserTimeline, UserTimelineInfo},
         vault::Vault,
         verification_request::VerificationRequest,
@@ -161,7 +161,11 @@ pub async fn setup_data(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             // only enable Idology for this dummy test merchant
-            TenantVendorControl::create(conn, tid, true, false, false, None, None).unwrap();
+            let args = UpdateTenantVendorControlArgs {
+                idology_enabled: Some(true),
+                ..Default::default()
+            };
+            TenantVendorControl::update_or_create(conn, &tid, args).unwrap();
             let tu = fixtures::tenant_user::create(conn);
             Ok(tu)
         })
