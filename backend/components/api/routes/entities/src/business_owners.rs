@@ -1,4 +1,4 @@
-use crate::{
+use api_core::{
     auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
     types::{response::ResponseData, JsonApiResponse},
     State,
@@ -14,15 +14,22 @@ use api_core::{
 };
 use api_wire_types::BusinessOwner as ApiBusinessOwner;
 use db::models::scoped_vault::ScopedVault;
+use macros::route_alias;
 use paperclip::actix::{api_v2_operation, get, web};
 
 type BusinessOwnerListResponse = Vec<ApiBusinessOwner>;
 
-#[api_v2_operation(
+// TODO rm this
+#[route_alias(get(
+    "/businesses/{fp_id}/owners",
+    tags(Businesses, Private),
     description = "Gets the beneficial owners of a business.",
-    tags(Businesses, Private)
+))]
+#[api_v2_operation(
+    description = "Gets the beneficial owners of a business entity.",
+    tags(EntityDetails, Private)
 )]
-#[get("/businesses/{fp_id}/owners")]
+#[get("/entities/{fp_id}/business_owners")]
 pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,

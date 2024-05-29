@@ -1139,6 +1139,46 @@
                 ]
             }
         },
+        "/entities/{fp_id}/business_owners": {
+            "get": {
+                "tags": [
+                    "EntityDetails",
+                    "Private"
+                ],
+                "description": "Gets the beneficial owners of a business entity.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/BusinessOwner"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/data": {
             "get": {
                 "tags": [

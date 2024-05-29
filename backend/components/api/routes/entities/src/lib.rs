@@ -19,9 +19,11 @@ mod token;
 mod triggers;
 mod user_insight;
 mod vault;
+mod business_owners;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);
+    business_owners::configure_get_aliases(config);
     config
         .service(client_token::post::post)
         .service(client_token::get::get)
@@ -44,6 +46,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(auth_events::get)
         .service(rule_set_result::get_latest_workflow_decision)
         .service(rule_set_result::get)
+        .service(business_owners::get)
         .service(user_insight::get)
         .service(dupes::get_dupes)
         .service(ai_summarize::get);
