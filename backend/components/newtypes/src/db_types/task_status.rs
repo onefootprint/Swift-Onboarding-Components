@@ -134,7 +134,6 @@ pub enum WebhookEvent {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct OnboardingCompletedPayload {
     pub fp_id: FpId,
-    pub footprint_user_id: Option<FpId>,
     pub timestamp: DateTime<Utc>,
     pub status: OnboardingStatus,
     pub requires_manual_review: bool,
@@ -144,7 +143,6 @@ pub struct OnboardingCompletedPayload {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct OnboardingStatusChangedPayload {
     pub fp_id: FpId,
-    pub footprint_user_id: Option<FpId>,
     pub timestamp: DateTime<Utc>,
     pub new_status: OnboardingStatus,
     pub requires_manual_review: bool,
@@ -155,7 +153,6 @@ pub struct OnboardingStatusChangedPayload {
 
 pub struct WatchlistCheckCompletedPayload {
     pub fp_id: FpId,
-    pub footprint_user_id: Option<FpId>,
     pub timestamp: DateTime<Utc>,
     pub status: WatchlistCheckStatusKind,
     pub error: Option<WatchlistCheckError>,

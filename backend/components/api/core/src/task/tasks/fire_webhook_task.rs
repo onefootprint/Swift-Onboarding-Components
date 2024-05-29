@@ -62,7 +62,6 @@ mod tests {
             is_live: sv.is_live,
             webhook_event: NTWebhookEvent::OnboardingCompleted(NTOnboardingCompletedPayload {
                 fp_id: sv.fp_id.clone(),
-                footprint_user_id: None,
                 timestamp: chrono::Utc::now(),
                 status: OnboardingStatus::Fail,
                 requires_manual_review: true,

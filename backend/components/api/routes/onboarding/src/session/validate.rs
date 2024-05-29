@@ -91,28 +91,15 @@ pub async fn post(
     root_span.record("vault_id", sv.vault_id.to_string());
     root_span.record("tenant_id", sv.tenant_id.to_string());
     root_span.record("is_live", sv.is_live);
-    root_span.record("is_live", sv.is_live);
 
-    let (footprint_user_id, status, requires_manual_review, onboarding_configuration_id, timestamp) =
-        // Support a version of the API that is backwards-compatible for some tenants that integrated
-        // with an old version
-        if auth.tenant().uses_legacy_serialization() {
-            (
-                Some(sv.fp_id.clone()),
-                wf.as_ref().and_then(|(wf, _)| wf.status),
-                Some(wf.as_ref().is_some_and(|(_, mrs)| !mrs.is_empty())),
-                wf.as_ref().and_then(|(wf, _)| wf.ob_configuration_id.clone()),
-                wf.as_ref().map(|(wf, _)| wf.created_at),
-            )
-        } else {
-            (None, None, None, None, None)
-        };
-
-    // TODO clean this up after migrating composer
+    // Composer integrated with an old version of this API that expects the obc ID...
+    // https://onefootprint.slack.com/archives/C04QDTDM7TR/p1716407736679449?thread_ts=1710368278.003619&cid=C04QDTDM7TR
+    // For now, we'll keep serializing this, but we should migrate them away as soon as we start
+    // serializing the playbook key here.
     let onboarding_configuration_id = if auth.tenant().pinned_api_version.is_some_and(|v| v <= 2) {
         wf.as_ref().and_then(|(wf, _)| wf.ob_configuration_id.clone())
     } else {
-        onboarding_configuration_id
+        None
     };
 
     // Validate and serialize the user and optionally the business onboardings
@@ -171,11 +158,7 @@ pub async fn post(
         user_auth,
         user,
         business,
-        footprint_user_id,
-        status,
-        requires_manual_review,
         onboarding_configuration_id,
-        timestamp,
     };
     ResponseData::ok(response).json()
 }

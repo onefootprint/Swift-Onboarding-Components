@@ -611,7 +611,6 @@ impl Workflow {
             if !wf.status.map(|s| s.has_decision()).unwrap_or(false) && new_status.has_decision() {
                 let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                     fp_id: sv.fp_id.clone(),
-                    footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
                     timestamp: Utc::now(),
                     status: new_status,
                     requires_manual_review: requires_manual_review_after_update,
@@ -654,7 +653,6 @@ impl Workflow {
                 // Only fire a OnboardingStatusChanged webhook if the scoped vault status changes or requires_manual_review changes
                 let webhook_event = WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {
                     fp_id: sv.fp_id.clone(),
-                    footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
                     timestamp: Utc::now(),
                     new_status,
                     requires_manual_review: requires_manual_review_after_update,
