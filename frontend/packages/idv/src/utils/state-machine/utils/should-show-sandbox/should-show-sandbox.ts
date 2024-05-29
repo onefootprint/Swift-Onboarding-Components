@@ -9,7 +9,7 @@ const shouldShowSandbox = (
   }
 
   const config = context.config || event.payload.config;
-  return !config?.isLive && !context.isTransfer && !context.authToken;
+  return !config?.isLive && !context.isTransfer;
 };
 
 export default shouldShowSandbox;
