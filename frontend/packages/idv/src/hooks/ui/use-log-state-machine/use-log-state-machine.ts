@@ -11,7 +11,7 @@ const useLogStateMachine = (name: string, state: any) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stateData = (state as State<any, any>).toJSON();
     Logger.track(
-      `machine ${name}:${state.value} done:${Boolean(stateData.done)}`,
+      `${stateData.done ? '(done)' : '(pending)'} ${name} ${state.value}`,
       {
         name,
         value: state.value,

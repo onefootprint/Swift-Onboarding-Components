@@ -1,2 +1,5 @@
 export { ObserveCollectorProvider, useObserveCollector } from './hooks';
-export { default as getSessionId } from './utils/session-id';
+export {
+  default as getSessionId,
+  getSessionIdFromStorage,
+} from './utils/session-id';

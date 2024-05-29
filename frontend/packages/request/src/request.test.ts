@@ -65,6 +65,17 @@ describe('@onefootprint/request', () => {
         'Message delivery failed. Please try resending the message or use a different phone number.',
       );
     });
+
+    it('should keep the original error', () => {
+      const str = `Fetching onboarding config in bifrost init failed with error: ${getErrorMessageStandAlone(
+        new Error('test'),
+      )}`;
+
+      expect(str).toBe(
+        'Fetching onboarding config in bifrost init failed with error: test',
+      );
+      expect(getErrorMessageStandAlone(str)).toBe(str);
+    });
   });
 
   describe('useRequestError', () => {

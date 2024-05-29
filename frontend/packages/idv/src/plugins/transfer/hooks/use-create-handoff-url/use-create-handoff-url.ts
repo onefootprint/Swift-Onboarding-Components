@@ -1,3 +1,4 @@
+import { getSessionIdFromStorage } from '@onefootprint/dev-tools';
 import { HANDOFF_BASE_URL } from '@onefootprint/global-constants';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { DocumentRequestKind } from '@onefootprint/types';
@@ -7,16 +8,16 @@ import type { TransferRequirements } from '../../types';
 
 const useCreateHandoffUrl = ({
   authToken,
-  onboardingConfig,
   baseUrl = HANDOFF_BASE_URL,
   language = 'en',
   missingRequirements,
+  onboardingConfig,
 }: {
   authToken?: string;
-  onboardingConfig?: PublicOnboardingConfig;
   baseUrl?: string;
   language?: string;
   missingRequirements?: TransferRequirements;
+  onboardingConfig?: PublicOnboardingConfig;
 }) =>
   useMemo(() => {
     if (!authToken || !onboardingConfig || !missingRequirements) {
@@ -38,11 +39,16 @@ const useCreateHandoffUrl = ({
     }
 
     const params = new URLSearchParams();
+    const fpSessionId = getSessionIdFromStorage();
     const randomSeed = Math.floor(Math.random() * 1000).toString();
-    params.append('r', randomSeed);
     if (language !== 'en') {
       params.append('lng', language);
     }
+    if (fpSessionId) {
+      params.append('xfpsessionid', fpSessionId);
+    }
+    params.append('r', randomSeed);
+
     newUrl.search = params.toString();
     newUrl.hash = encodeURI(authToken);
 

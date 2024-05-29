@@ -1,1 +1,1 @@
-export { default } from './session-id';
+export { default, getSessionIdFromStorage } from './session-id';

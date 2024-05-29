@@ -6,6 +6,7 @@ import applyCaseMiddleware from 'axios-case-converter';
 import { useTranslation } from 'react-i18next';
 
 type Obj = Record<string, unknown>;
+export type RequestError = AxiosError<{ error: FootprintServerError }>;
 export type FootprintServerError = {
   message: string;
   code?: string; // Translation code for resolving the erorr to the correct language
@@ -13,10 +14,6 @@ export type FootprintServerError = {
   statusCode: number;
   supportId: string;
 };
-
-export type RequestError = AxiosError<{
-  error: FootprintServerError;
-}>;
 
 export type PaginatedRequestResponse<T> = {
   data: T;
@@ -45,20 +42,26 @@ const LOGOUT_ERRORS = [
 const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
 const isString = (x: unknown): x is string => typeof x === 'string' && !!x;
 
-export const isFootprintError = (error: unknown): error is RequestError =>
-  (error as RequestError)?.response?.data !== undefined;
+export const isFootprintError = (err: unknown): err is RequestError =>
+  typeof err === 'object' &&
+  err != null &&
+  'response' in err &&
+  typeof err.response === 'object' &&
+  err.response != null &&
+  'data' in err.response;
 
-export const isUnhandledError = (error: unknown): error is Error =>
-  (error as Error)?.message !== undefined;
+export const isUnhandledError = (err: unknown): err is Error =>
+  typeof err === 'object' &&
+  err != null &&
+  'message' in err &&
+  typeof err.message === 'string';
 
 export const isFootprintServerError = (
   error: unknown,
 ): FootprintServerError | undefined => {
-  const errorData = (error as RequestError).response?.data?.error;
-  if (errorData?.message && errorData?.statusCode && errorData?.supportId) {
-    return errorData;
-  }
-  return undefined;
+  if (!isFootprintError(error)) return undefined;
+  const err = error?.response?.data?.error;
+  return err?.message && err?.statusCode && err?.supportId ? err : undefined;
 };
 
 export const isLogoutError = (error: unknown) => {
@@ -76,13 +79,18 @@ export const isLogoutError = (error: unknown) => {
 };
 
 const extractStringProps = (x: unknown, acc: string[] = []): string[] => {
-  if (isString(x)) return [x];
-  if (isObject(x)) {
-    for (const key in x) {
-      if (isString(x[key])) {
-        acc.push(x[key] as string);
-      } else if (isObject(x[key])) {
-        extractStringProps(x[key] as Obj, acc);
+  const stack = [x];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+
+    if (isString(current)) {
+      acc.push(current);
+    } else if (isObject(current)) {
+      for (const key in current) {
+        if (Object.prototype.hasOwnProperty.call(current, key)) {
+          stack.push(current[key]);
+        }
       }
     }
   }
@@ -91,31 +99,29 @@ const extractStringProps = (x: unknown, acc: string[] = []): string[] => {
 };
 
 export const getErrorMessage = (error?: unknown | Error): string => {
-  if (typeof error === 'string') {
-    return error;
-  }
+  if (isString(error)) return error.trim();
   if (isFootprintError(error) && error?.response?.data?.error?.message) {
     return isString(error?.response?.data?.error?.message)
-      ? error.response.data.error.message
+      ? error.response.data.error.message.trim()
       : extractStringProps(error.response.data.error.message)
           .filter(x => !x.match(uuidPattern))
-          .join('') || '';
+          .join('')
+          .trim() || '';
   }
   if (isUnhandledError(error) && isString(error.message)) {
-    return error.message;
+    return error.message.trim();
   }
 
   return (
     extractStringProps(error)
       .filter(x => !x.match(uuidPattern))
-      .join('') || 'Something went wrong'
+      .join('')
+      .trim() || 'Something went wrong'
   );
 };
 
 export const useRequestError = () => {
-  const { t, i18n } = useTranslation('request', {
-    keyPrefix: 'errors',
-  });
+  const { t, i18n } = useTranslation('request', { keyPrefix: 'errors' });
 
   const isValidErrorCode = (code?: string) =>
     !!code?.match(/^E[0-9]+$/g) && i18n.exists(`request:errors.${code}`);
@@ -132,9 +138,8 @@ export const useRequestError = () => {
   };
 
   const getMessage = (error?: unknown | Error): string => {
-    if (typeof error === 'string') {
-      return error;
-    }
+    if (isString(error)) return error;
+
     const unknownError = t('unknown');
     if (isFootprintError(error)) {
       const data = error?.response?.data?.error;

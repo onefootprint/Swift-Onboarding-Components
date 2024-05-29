@@ -96,7 +96,7 @@ const LoggerFactory = () => {
     if (isDataDogEnabled)
       datadogLogs.setGlobalContext({
         ...filteredTraits,
-        fpSessionId: sessionId,
+        fp_session_id: sessionId,
       });
   };
 
