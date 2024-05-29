@@ -7769,6 +7769,22 @@
                             "name": {
                                 "type": "string"
                             },
+                            "parent": {
+                                "description": "Parent Organization",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name"
+                                ]
+                            },
                             "support_email": {
                                 "type": "string"
                             },
@@ -8277,6 +8293,22 @@
                             },
                             "name": {
                                 "type": "string"
+                            },
+                            "parent": {
+                                "description": "Parent Organization",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name"
+                                ]
                             },
                             "support_email": {
                                 "type": "string"
@@ -9489,6 +9521,12 @@
                     },
                     "skip_kyc": {
                         "type": "boolean"
+                    },
+                    "verification_checks": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "required": [
@@ -11778,6 +11816,7 @@
                                             "ssn9",
                                             "email",
                                             "phone_number",
+                                            "name_dob",
                                             "device_id",
                                             "cookie_id",
                                             "selfie"
@@ -12881,6 +12920,7 @@
                                         "curp_not_valid",
                                         "curp_not_found",
                                         "curp_valid",
+                                        "curp_input_curp_invalid",
                                         "curp_could_not_validate",
                                         "curp_multiple_results_for_data",
                                         "curp_service_not_available",
@@ -13970,6 +14010,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -14364,6 +14405,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -14758,6 +14800,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -15152,6 +15195,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -15546,6 +15590,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -15940,6 +15985,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -16334,6 +16380,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -16728,6 +16775,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -17122,6 +17170,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -17516,6 +17565,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -17910,6 +17960,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -18304,6 +18355,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -18698,6 +18750,7 @@
                                                 "curp_not_valid",
                                                 "curp_not_found",
                                                 "curp_valid",
+                                                "curp_input_curp_invalid",
                                                 "curp_could_not_validate",
                                                 "curp_multiple_results_for_data",
                                                 "curp_service_not_available",
@@ -20749,6 +20802,12 @@
                                         "disabled",
                                         "enabled"
                                     ]
+                                },
+                                "verification_checks": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
                                 }
                             },
                             "required": [
@@ -20773,7 +20832,8 @@
                                 "skip_confirm",
                                 "skip_kyb",
                                 "skip_kyc",
-                                "status"
+                                "status",
+                                "verification_checks"
                             ]
                         }
                     },
@@ -21732,6 +21792,12 @@
                             "disabled",
                             "enabled"
                         ]
+                    },
+                    "verification_checks": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "required": [
@@ -21756,7 +21822,8 @@
                     "skip_confirm",
                     "skip_kyb",
                     "skip_kyc",
-                    "status"
+                    "status",
+                    "verification_checks"
                 ]
             },
             "OrgClientSecurityConfig": {
@@ -21910,6 +21977,22 @@
                             },
                             "name": {
                                 "type": "string"
+                            },
+                            "parent": {
+                                "description": "Parent Organization",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name"
+                                ]
                             },
                             "support_email": {
                                 "type": "string"
@@ -22145,6 +22228,22 @@
                     },
                     "name": {
                         "type": "string"
+                    },
+                    "parent": {
+                        "description": "Parent Organization",
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "name"
+                        ]
                     },
                     "support_email": {
                         "type": "string"
@@ -23690,6 +23789,7 @@
                             "curp_not_valid",
                             "curp_not_found",
                             "curp_valid",
+                            "curp_input_curp_invalid",
                             "curp_could_not_validate",
                             "curp_multiple_results_for_data",
                             "curp_service_not_available",
@@ -24099,6 +24199,7 @@
                             "curp_not_valid",
                             "curp_not_found",
                             "curp_valid",
+                            "curp_input_curp_invalid",
                             "curp_could_not_validate",
                             "curp_multiple_results_for_data",
                             "curp_service_not_available",
