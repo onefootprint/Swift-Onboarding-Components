@@ -35,7 +35,7 @@ use newtypes::{
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    description = "Triggers KYB on the provided business. KYB can only be run once per Business vault.",
+    description = "Triggers KYB on the provided business.",
     tags(Businesses, Preview)
 )]
 #[post("/businesses/{fp_bid}/kyb")]
@@ -126,7 +126,7 @@ pub async fn post(
                 wfr: None,
                 is_neuro_enabled: false,
             };
-            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, false)?;
+            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, true)?;
 
             // Check requirements for this Business vault w.r.t the OBC
             let reqs = api_core::utils::requirements::get_requirements_inner(
