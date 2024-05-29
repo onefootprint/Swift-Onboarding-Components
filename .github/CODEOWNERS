@@ -1,11 +1,4 @@
 # Each line is a file pattern followed by one or more owners.
-
-/frontend @onefootprint/frontend
 /frontend/packages/ui @onefootprint/design-system
-/mobile @onefootprint/mobile
-/backend @onefootprint/backend
-/backend/components/enclave @agrinman
-
-# An exception to the frontend rule: don't require frontend review when updating open API schema specs
-
-/frontend/apps/docs/src/pages/api-reference/assets
+/backend/components/enclave @agrinman @evforde
+/backend/infra @onefootprint/backend
