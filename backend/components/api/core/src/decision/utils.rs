@@ -49,7 +49,7 @@ pub fn get_fixture_data_decision(
         } else {
             // TODO error here with OnboardingError::NoFixtureResultForSandboxUser.
             // Temporarily setting this to Pass until the frontend allows choosing result on auth flows
-            tracing::error!("No fixture result provided");
+            tracing::warn!("No fixture result provided");
             WorkflowFixtureResult::Pass
         };
         let fixture_decision = decision_status(fixture_result);
@@ -76,7 +76,7 @@ pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow
         } else {
             // TODO error here with OnboardingError::NoFixtureResultForSandboxUser.
             // Temporarily setting this to Pass until the frontend allows choosing result on auth flows
-            tracing::error!("No fixture result provided");
+            tracing::warn!("No fixture result provided in document only");
             WorkflowFixtureResult::Pass
         };
         Ok(matches!(fixture_result, WorkflowFixtureResult::DocumentDecision))
