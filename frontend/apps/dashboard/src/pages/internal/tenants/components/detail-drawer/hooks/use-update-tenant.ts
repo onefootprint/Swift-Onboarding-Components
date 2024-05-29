@@ -1,5 +1,6 @@
 import request from '@onefootprint/request';
 import type {
+  TenantBillingProfile,
   TenantDetail,
   TenantPreviewApi,
   TenantSupportedAuthMethod,
@@ -23,6 +24,8 @@ export type PrivatePatchTenantRequest = {
 
   supportedAuthMethods?: TenantSupportedAuthMethod[] | null;
   allowedPreviewApis?: TenantPreviewApi[];
+
+  billingProfile?: TenantBillingProfile;
 };
 
 const patchTenant = async (

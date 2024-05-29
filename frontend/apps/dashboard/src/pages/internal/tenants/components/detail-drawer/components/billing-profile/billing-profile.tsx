@@ -1,129 +1,208 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { TenantDetail } from '@onefootprint/types';
-import { Stack } from '@onefootprint/ui';
-import React from 'react';
+import type {
+  TenantBillingProfile,
+  TenantBillingProfileProduct,
+} from '@onefootprint/types/src/api/get-tenants';
+import { Stack, TextInput } from '@onefootprint/ui';
+import React, { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { Field, Fieldset } from 'src/components';
+import type { FieldsetProps } from 'src/components/fieldset/fieldset';
+
+import useUpdateTenant from '../../hooks/use-update-tenant';
+import type { BillingProfileFormData } from './convert-form-data';
+import { convertFormData } from './convert-form-data';
 
 type BillingProfileProps = {
   tenant: TenantDetail;
 };
 
+type BillingProfileField = {
+  title: string;
+  field: TenantBillingProfileProduct;
+};
+
+const UPDATE_BP_FORM_ID = 'update-bp-form';
+
+const KYC: BillingProfileField[] = [
+  {
+    title: 'KYC',
+    field: 'kyc',
+  },
+  {
+    title: 'One-click KYC',
+    field: 'oneClickKyc',
+  },
+  {
+    title: 'KYC Waterfall (second vendor)',
+    field: 'kycWaterfallSecondVendor',
+  },
+  {
+    title: 'KYC Waterfall (third vendor)',
+    field: 'kycWaterfallThirdVendor',
+  },
+];
+
+const OTHER_VERIFICATIONS: BillingProfileField[] = [
+  {
+    title: 'ID documents',
+    field: 'idDocs',
+  },
+  {
+    title: 'KYB',
+    field: 'kyb',
+  },
+];
+
+const VAULTING: BillingProfileField[] = [
+  {
+    title: 'Monthly PII',
+    field: 'pii',
+  },
+  {
+    title: 'Hot vaults',
+    field: 'hotVaults',
+  },
+  {
+    title: 'Hot proxy vaults',
+    field: 'hotProxyVaults',
+  },
+  {
+    title: 'Monthly vaults with PCI',
+    field: 'vaultsWithPci',
+  },
+  {
+    title: 'Monthly vaults with Non-PCI',
+    field: 'vaultsWithNonPci',
+  },
+];
+
+const WATCHLIST: BillingProfileField[] = [
+  {
+    title: 'Monthly Watchlist',
+    field: 'watchlist',
+  },
+  {
+    title: 'Adverse media (per user)',
+    field: 'adverseMediaPerUser',
+  },
+  {
+    title: 'Continuous monitoring (per year)',
+    field: 'continuousMonitoringPerYear',
+  },
+];
+
+const OTHER: BillingProfileField[] = [
+  {
+    title: 'Monthly minimum',
+    field: 'monthlyMinimum',
+  },
+];
+
+const SECTIONS = [
+  {
+    title: 'KYC',
+    fields: KYC,
+  },
+  {
+    title: 'Other verifications',
+    fields: OTHER_VERIFICATIONS,
+  },
+  {
+    title: 'Vaulting',
+    fields: VAULTING,
+  },
+  {
+    title: 'Watchlist monitoring',
+    fields: WATCHLIST,
+  },
+  {
+    title: 'Other',
+    fields: OTHER,
+  },
+];
+
+const getDefaultValues = (bp?: TenantBillingProfile): BillingProfileFormData =>
+  bp || ({} as BillingProfileFormData);
+
 const BillingProfile = ({ tenant }: BillingProfileProps) => {
   const bp = tenant.billingProfile;
 
-  const kyc = [
-    {
-      title: 'KYC',
-      content: bp?.kyc,
-    },
-    {
-      title: 'One-click KYC',
-      content: bp?.oneClickKyc,
-    },
-    {
-      title: 'KYC Waterfall (second vendor)',
-      content: bp?.kycWaterfallSecondVendor,
-    },
-    {
-      title: 'KYC Waterfall (third vendor)',
-      content: bp?.kycWaterfallThirdVendor,
-    },
-  ];
+  const editMethods = useForm<BillingProfileFormData>({
+    defaultValues: getDefaultValues(bp),
+  });
+  const { register, reset, handleSubmit } = editMethods;
 
-  const otherVerifications = [
-    {
-      title: 'ID documents',
-      content: bp?.idDocs,
-    },
-    {
-      title: 'KYB',
-      content: bp?.kyb,
-    },
-  ];
+  const [isEditing, setIsEditing] = useState(false);
+  const updateTenantMutation = useUpdateTenant(tenant.id);
+  const showErrorToast = useRequestErrorToast();
 
-  const vaulting = [
-    {
-      title: 'Monthly PII',
-      content: bp?.pii,
-    },
-    {
-      title: 'Hot vaults',
-      content: bp?.hotVaults,
-    },
-    {
-      title: 'Hot proxy vaults',
-      content: bp?.hotProxyVaults,
-    },
-    {
-      title: 'Monthly vaults with PCI',
-      content: bp?.vaultsWithPci,
-    },
-    {
-      title: 'Monthly vaults with Non-PCI',
-      content: bp?.vaultsWithNonPci,
-    },
-  ];
+  const handleFormSubmit = (formData: TenantBillingProfile) => {
+    const bpRequestData = convertFormData(bp, formData);
+    if (Object.values(bpRequestData).every(v => v === undefined)) {
+      setIsEditing(false);
+      reset();
+      return;
+    }
+    updateTenantMutation.mutate(
+      {
+        billingProfile: bpRequestData,
+      },
+      {
+        onSuccess: newTenant => {
+          setIsEditing(false);
+          reset(getDefaultValues(newTenant.billingProfile));
+        },
+        onError: e => {
+          showErrorToast(e);
+          setIsEditing(false);
+          reset();
+        },
+      },
+    );
+  };
 
-  const watchlist = [
-    {
-      title: 'Monthly Watchlist',
-      content: bp?.watchlist,
-    },
-    {
-      title: 'Adverse media (per user)',
-      content: bp?.adverseMediaPerUser,
-    },
-    {
-      title: 'Continuous monitoring (per year)',
-      content: bp?.continuousMonitoringPerYear,
-    },
-  ];
+  const enableEditMode = () => {
+    // For some reason, without this setTimeout, we immediately exit out of edit mode...
+    setTimeout(() => setIsEditing(true), 10);
+  };
 
-  const other = [
-    {
-      title: 'Monthly minimum',
-      content: bp?.monthlyMinimum,
-    },
-  ];
+  const headerCta: FieldsetProps['cta'] = {
+    label: isEditing ? 'Save' : 'Edit',
+    onClick: isEditing ? undefined : enableEditMode,
+    type: isEditing ? 'submit' : 'button',
+    form: isEditing ? UPDATE_BP_FORM_ID : undefined,
+    disabled: updateTenantMutation.isLoading,
+  };
 
-  const sections = [
-    {
-      title: 'KYC',
-      fields: kyc,
-    },
-    {
-      title: 'Other verifications',
-      fields: otherVerifications,
-    },
-    {
-      title: 'Vaulting',
-      fields: vaulting,
-    },
-    {
-      title: 'Watchlist monitoring',
-      fields: watchlist,
-    },
-    {
-      title: 'Other',
-      fields: other,
-    },
-  ];
-
-  const priceDisplay = (value?: string) => (value ? `${value} cents` : '-');
-
+  const priceDisplay = (value?: string | null) =>
+    value ? `${value} cents` : '-';
   return (
-    <Stack direction="column">
-      {sections.map(section => (
-        <Fieldset title={section.title} key={section.title}>
-          <Stack direction="column" gap={5}>
-            {section.fields.map(f => (
-              <Field label={f.title} key={f.title}>
-                {priceDisplay(f.content)}
-              </Field>
-            ))}
-          </Stack>
-        </Fieldset>
-      ))}
-    </Stack>
+    <FormProvider {...editMethods}>
+      <form id={UPDATE_BP_FORM_ID} onSubmit={handleSubmit(handleFormSubmit)}>
+        <Stack direction="column">
+          {SECTIONS.map((section, i) => (
+            <Fieldset
+              title={section.title}
+              key={section.title}
+              cta={i === 0 ? headerCta : undefined}
+            >
+              <Stack direction="column" gap={5}>
+                {section.fields.map(f => (
+                  <Field label={f.title} key={f.title}>
+                    {!isEditing && priceDisplay(bp?.[f.field])}
+                    {isEditing && (
+                      <TextInput placeholder="0" {...register(f.field)} />
+                    )}
+                  </Field>
+                ))}
+              </Stack>
+            </Fieldset>
+          ))}
+        </Stack>
+      </form>
+    </FormProvider>
   );
 };
 

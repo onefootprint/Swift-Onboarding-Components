@@ -27,30 +27,34 @@ export enum TenantPreviewApi {
   Tags = 'tags',
 }
 
+export const TENANT_BILLING_PROFILE_PRODUCTS = [
+  'kyc',
+  'oneClickKyc',
+  'kycWaterfallSecondVendor',
+  'kycWaterfallThirdVendor',
+  'idDocs',
+  'kyb',
+  'pii',
+  'hotVaults',
+  'hotProxyVaults',
+  'vaultsWithNonPci',
+  'vaultsWithPci',
+  'watchlist',
+  'adverseMediaPerUser',
+  'continuousMonitoringPerYear',
+  'monthlyMinimum',
+];
+
+export type TenantBillingProfileProduct =
+  (typeof TENANT_BILLING_PROFILE_PRODUCTS)[number];
+
 /**
  * The price of each product for this tenant, set in cents.
  */
-export type TenantBillingProfile = {
-  kyc?: string;
-  oneClickKyc?: string;
-  kycWaterfallSecondVendor?: string;
-  kycWaterfallThirdVendor?: string;
-
-  idDocs?: string;
-  kyb?: string;
-
-  pii?: string;
-  hotVaults?: string;
-  hotProxyVaults?: string;
-  vaultsWithNonPci?: string;
-  vaultsWithPci?: string;
-
-  watchlist?: string;
-  adverseMediaPerUser?: string;
-  continuousMonitoringPerYear?: string;
-
-  monthlyMinimum?: string;
-};
+export type TenantBillingProfile = Record<
+  TenantBillingProfileProduct,
+  string | undefined | null
+>;
 
 export type TenantDetail = {
   id: string;
