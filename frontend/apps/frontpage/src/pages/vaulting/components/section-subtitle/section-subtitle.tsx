@@ -1,24 +1,17 @@
-import { Text } from '@onefootprint/ui';
+import { Box, Text } from '@onefootprint/ui';
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 type SectionSubtitleProps = {
-  maxWidth?: number;
+  maxWidth?: string;
   children: React.ReactNode;
 };
 
 const SectionSubtitle = ({ maxWidth, children }: SectionSubtitleProps) => (
-  <Container maxWidth={maxWidth}>
-    <Text variant="display-4" color="secondary" textAlign="center">
+  <Box maxWidth={maxWidth}>
+    <Text variant="display-4" color="secondary" textAlign="center" tag="h4">
       {children}
     </Text>
-  </Container>
+  </Box>
 );
-
-const Container = styled.div<{ maxWidth?: number }>`
-  ${({ maxWidth }) => css`
-    max-width: ${maxWidth}px;
-  `}
-`;
 
 export default SectionSubtitle;

@@ -14,7 +14,7 @@ const FeaturedCard = ({ title, subtitle, illustration }: FeaturedCardProps) => (
       {illustration}
     </Stack>
     <TextContent>
-      <Text variant="label-1">
+      <Text variant="label-1" tag="h4">
         {title}.
         <Box tag="span" width="4px" display="inline-block" />
         <Text variant="label-1" color="tertiary" tag="span">

@@ -1,4 +1,4 @@
-import { createFontStyles, media } from '@onefootprint/ui';
+import { Box, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -16,7 +16,11 @@ const SectionTitle = ({
   multiline,
 }: SectionTitleProps) => (
   <Container maxWidth={maxWidth}>
-    <Title variant={variant} multiline={multiline}>
+    <Title
+      variant={variant}
+      multiline={multiline}
+      tag={variant === 'display-1' ? 'h1' : 'h2'}
+    >
       {children}
     </Title>
   </Container>
@@ -28,7 +32,7 @@ const Container = styled.div<{ maxWidth?: number }>`
   `}
 `;
 
-const Title = styled.h1<{
+const Title = styled(Box)<{
   variant: 'display-1' | 'display-2' | 'display-3';
   multiline?: boolean;
 }>`

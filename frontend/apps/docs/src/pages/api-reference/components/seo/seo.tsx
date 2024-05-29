@@ -25,7 +25,7 @@ type SeoProps = {
 };
 
 const Seo = ({
-  description = "The last identity verification you'll ever need",
+  description = 'One tool to unify onboarding, identity verification, and data security',
   image = 'https://docs.onefootprint.com/cover.png',
   keywords = 'footprint,foot,print,id,onefootprint,identity,kyc,verify,security',
   kind = 'product',

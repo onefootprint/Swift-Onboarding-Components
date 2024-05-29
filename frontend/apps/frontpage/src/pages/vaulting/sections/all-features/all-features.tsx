@@ -62,11 +62,11 @@ const AllFeatures = () => {
     <StyledContainer>
       <Title>
         <TitleIllustration />
-        <TitleContainer direction="column" gap={3}>
-          <SectionTitle variant="display-1" maxWidth={460} multiline>
+        <TitleContainer direction="column" gap={3} align="center">
+          <SectionTitle variant="display-2" maxWidth={460} multiline>
             {t('title')}
           </SectionTitle>
-          <SectionSubtitle maxWidth={500}>{t('subtitle')}</SectionSubtitle>
+          <SectionSubtitle maxWidth="500px">{t('subtitle')}</SectionSubtitle>
         </TitleContainer>
       </Title>
       <FeatureCardGrid

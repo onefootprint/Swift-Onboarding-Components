@@ -24,13 +24,13 @@ const QuoteCard = ({
   authorImage,
 }: QuoteCardProps) => (
   <CardContainer>
-    <AuthorImage src={authorImage} alt={`${author} image`} />
+    <AuthorImage src={authorImage} alt={`${author}'s headshot`} />
     <QuoteContainer>
       <Box position="relative">
         <QuoteIconContainer>
           <QuoteIcon variant="open" />
         </QuoteIconContainer>
-        <Text variant="body-2">{`${quote}"`}</Text>
+        <Text variant="body-2" tag="blockquote">{`${quote}"`}</Text>
       </Box>
       <QuoteFooter
         author={author}

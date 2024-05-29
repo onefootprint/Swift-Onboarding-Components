@@ -33,8 +33,13 @@ const Hero = () => {
         <HeroContainer>
           <TextContainer>
             <Stack direction="column" gap={5}>
-              <Title>{t('hero.title')}</Title>
-              <Text variant="display-4" maxWidth="700px" textAlign="center">
+              <Title tag="h1">{t('hero.title')}</Title>
+              <Text
+                tag="h2"
+                variant="display-4"
+                maxWidth="700px"
+                textAlign="center"
+              >
                 {t('hero.subtitle')}
               </Text>
             </Stack>

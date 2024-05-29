@@ -43,8 +43,8 @@ const ProblemSolutionCard = ({
       />
     </IconContainer>
     <TextContainer>
-      <Text variant="label-1" tag="span">
-        {title}.<Subtitle>{subtitle}</Subtitle>
+      <Text variant="label-1" tag="h3">
+        {title}.<Subtitle tag="span">{subtitle}</Subtitle>
       </Text>
     </TextContainer>
   </CardContainer>
@@ -77,7 +77,7 @@ const IconContainer = styled(Box)`
   `}
 `;
 
-const Subtitle = styled.span`
+const Subtitle = styled(Box)`
   ${({ theme }) => css`
     ${createFontStyles('body-1')}
     color: ${theme.color.tertiary};

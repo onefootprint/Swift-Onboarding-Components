@@ -22,8 +22,10 @@ const OtherCustomers = () => {
   return (
     <SectionContainer>
       <TitleContainer>
-        <Text variant="display-2">{t('title')}</Text>
-        <Text variant="display-4" color="secondary">
+        <Text variant="display-2" tag="h2">
+          {t('title')}
+        </Text>
+        <Text variant="display-4" color="secondary" tag="h4">
           {t('subtitle')}
         </Text>
       </TitleContainer>

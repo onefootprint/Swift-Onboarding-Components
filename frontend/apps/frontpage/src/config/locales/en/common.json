@@ -318,8 +318,272 @@
     }
   },
   "pages": {
+    "home": {
+      "html-title": "Footprint: The single onboarding tool your company needs",
+      "description": "Unify onboarding, identity verification, and data security",
+      "hero": {
+        "title": "The single onboarding tool your company needs",
+        "subtitle": "Drive revenue, block fraud, ensure security and compliance.",
+        "get-started": "Get started",
+        "book-a-call": "Book a call"
+      },
+      "logos-section": {
+        "title": "World-class teams are onboarding more users and trusting Footprint with their data"
+      },
+      "customize": {
+        "title": "Customize it all",
+        "subtitle": "Use our Onboarding Components to build a fully embeddable and customizable onboarding experience.",
+        "components": {
+          "button-text-color": "Button text color",
+          "border-radius": "Button border radius",
+          "button-background-color": "Button background color",
+          "screen": {
+            "title": "Basic data",
+            "subtitle": "Fill this information to get started.",
+            "first-name": "First name",
+            "last-name": "Last name",
+            "date-of-birth": "Date of birth",
+            "cta": "Continue"
+          },
+          "out-of-the-box": {
+            "first-part": "or integrate our",
+            "cta": "out-of-the-box onboarding experience,",
+            "second-part": "also fully customizable."
+          }
+        }
+      },
+      "control": {
+        "title": "Have complete control",
+        "subtitle": "Define the data, documents, and logic required from users in our playbook configurations.",
+        "illustration": {
+          "add": "Add",
+          "edit": "Edit",
+          "kyc": {
+            "title": "Know Your Customer (KYC)",
+            "toggle": {
+              "title": "Perform database checks with collected identity data",
+              "subtitle": "Identity data collected will be verified against government databases, credit bureaus, or other official sources."
+            },
+            "extra-content": "As easy as this, any user you onboard will be verified against the best available databases allowing you to have complete control over the verification process."
+          },
+          "anti-money-laundering": {
+            "title": "Anti-money laundering",
+            "toggle": {
+              "title": "Enhanced AML monitoring",
+              "subtitle": "Continuous monitoring, governmental watchlists, PEP and adverse media monitoring."
+            },
+            "extra-content": "Enhance your AML compliance with comprehensive monitoring and additional controls."
+          },
+          "additional-documents": {
+            "title": "Additional documents",
+            "subtitle": "Additional proofs that may help you analyze the user",
+            "extra-content": "Request additional documents like proof of address, proof of SSN, or custom documents to help you analyze the user."
+          },
+          "investor-profile-questions": {
+            "title": "Investor profile questions",
+            "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
+            "cta": "Add",
+            "extra-content": "Add questions to understand how risk-averse your investors are and tailor the onboarding questions to fit their profile."
+          },
+          "government-issued-id": {
+            "title": "Collect government-issued ID",
+            "subtitle": "Request that users submit scanned IDs",
+            "cta": "Add",
+            "extra-content": "Request that users submit scanned IDs to help you verify their identity."
+          },
+          "editing-additional-documents": {
+            "title": "Editing additional documents to request",
+            "extra-content": "Request additional documents when needed so you can make informed decisions on users.",
+            "proof-of-address": {
+              "title": "Proof of address",
+              "subtitle": "Official documents displaying the user's name and address."
+            },
+            "proof-of-ssn": {
+              "title": "Proof of SSN",
+              "subtitle": "Scan of Social Security card or official document displaying your name and Social Security Number."
+            },
+            "custom": {
+              "title": "Custom document",
+              "subtitle": "Request that users submit a custom document."
+            }
+          },
+          "personal-information": {
+            "title": "Personal information & docs",
+            "extra-content": "There is an almost endless number of combinations from which you can choose to create your own playbook.",
+            "basic-information": {
+              "title": "Basic information",
+              "email": "Email",
+              "phone-number": "Phone number",
+              "first-and-last-name": "First and last name",
+              "date-of-birth": "Date of birth",
+              "country-of-birth": "Country of birth",
+              "address": "Address"
+            },
+            "us-residents": {
+              "title": "U.S. residents",
+              "legal-status": "Legal status in the U.S.",
+              "ssn": "SSN",
+              "id-doc": "ID document scan",
+              "selfie": "Selfie"
+            },
+            "non-us-residents": {
+              "title": "Non-U.S. residents",
+              "restricted": "Restricted to these countries",
+              "id-document-scan": "ID document scan",
+              "selfie": "Selfie"
+            }
+          }
+        }
+      },
+      "verify": {
+        "title": "Verify people, not PII",
+        "subtitle": "Fraud signals you can act on in a unified rules engine with your KYC Checks.",
+        "cards": {
+          "build-rules": {
+            "title": "Build rules",
+            "subtitle": "Create custom rules to verify users based on your requirements.",
+            "illustration": {
+              "title": "Fail",
+              "subtitle": "User will be marked as failed"
+            }
+          },
+          "backtest": {
+            "title": "Backtest and analyze the impact of your rules",
+            "subtitle": "Backtest your rules and analyze the impact of your rules on your users.",
+            "illustration": {
+              "table": {
+                "headers": {
+                  "current-onboarding-status": "Current onboarding status",
+                  "original-rule-outcome": "Original rule outcome",
+                  "backtested-rule-outcome": "Backtested rule outcome"
+                },
+                "rows": {
+                  "failed": "Failed",
+                  "fail-and-manual-review": "Fail + Manual review",
+                  "pass": "Pass",
+                  "pass-and-manual-review": "Pass + Manual review"
+                }
+              },
+              "outcomes": {
+                "title": "Backtested rule outcomes (40)",
+                "subtitle": "If the rules that are being tested existed at the time of the onboardings above, the rule outcomes would've been these instead:",
+                "fail": "Fail",
+                "fail-and-manual-review": "Fail + Manual review",
+                "pass": "Pass",
+                "pass-and-manual-review": "Pass + Manual review",
+                "step-up": "Step up"
+              }
+            }
+          },
+          "verify": {
+            "title": "Verify what users tell you",
+            "subtitle": "Verify what users say analyzing their documents.",
+            "illustration": {
+              "user-input-data": "User input data",
+              "ocr-data": "OCR data",
+              "name": "Name",
+              "Address": "Address"
+            }
+          },
+          "behavior-and-device-insights": {
+            "title": "Behavior and device insights",
+            "subtitle": "Add another security layer to our onboarding experience, helping reduce fraud and increase accuracy",
+            "illustration": {
+              "date-and-time": "Date and time",
+              "ip-address": "IP address",
+              "biometric": "Biometric",
+              "verified": "Verified",
+              "not-verified": "Not verified",
+              "app-clip": {
+                "title": "App Clip",
+                "whats-this": "What's this?",
+                "description": "App Clips are small parts of your app that are discoverable at the moment they are needed and load quickly to complete a specific task, such as renting a scooter, purchasing a coffee, or filling a parking meter.",
+                "yes": "Yes",
+                "no": "No",
+                "what-is-this": {
+                  "title": "What's an App Clip?",
+                  "description": "App Clips are small parts of your app that are discoverable at the moment they are needed and load quickly to complete a specific task. We use this technology to verify the device of the user, get the device attestation and insights."
+                }
+              }
+            }
+          }
+        }
+      },
+      "leverage": {
+        "title": "Leverage the best and most secure technology available",
+        "subtitle": "App Clip and Passkeys add another security layer to our onboarding experience, helping reduce fraud and increase accuracy",
+        "app-clip": {
+          "title": "Capture ID documents with App Clip",
+          "subtitle": "Leveraging the user’s mobile device, we are able to:",
+          "real-phone": "Ensure the legitatamacy of the device",
+          "device-attestation": "Leverage Apple and Google’s rectangular detection",
+          "duplicate-fraud": "Detect and block duplicate fraud",
+          "give-it-a-try": "Give it a try on your own"
+        },
+        "passkeys": {
+          "title": "Passkeys",
+          "subtitle": "Passkeys use cryptography to authenticate users and allow us to:",
+          "identity-and-device": "Link the identity to the device",
+          "prevent-ato": "Prevent ATOs and phishing",
+          "same-person": "Verify account creator is the signer-in",
+          "link-kyc-and-auth": "Link the identity to the device"
+        }
+      },
+      "quotes": {
+        "title": "Best onboarding tool in town",
+        "subtitle": "Do not take our word for it.",
+        "quote-list": {
+          "apiture": {
+            "quote": "Based on experience vetting and partnering with many identity-based techs, partnering with Footprint has been a breath of fresh air. In my product, IDV is critical. I want the best security net possible, configurability, trust in a reliable partner, quick support whenever asked, and a commitment to staying ahead of the bad actors. Footprint is thinking outside the box and doing things other IDV providers should have thought about years ago. Proud to stand side by side with Footprint combatting fraud.",
+            "name": "Craig Pawling",
+            "role": "VP of Product",
+            "company": "Apiture"
+          },
+          "flexcar-2": {
+            "quote": "Flexcar turned to Footprint with a clear goal: rein in fraud without adding unnecessary friction, which would pose significant user experience challenges in an increasingly competitive market.",
+            "name": "Jon Coombs",
+            "role": "Director of Product Management",
+            "company": "Flexcar"
+          },
+          "flexcar": {
+            "quote": "I love how Footprint is able to onboard users while offloading the storage of PII. Weʼre able to access the data we need while leveraging Footprintʼs secure vaulting for the collection and storage.",
+            "name": "Michael Zambrano",
+            "role": "Executive Head of Risk",
+            "company": "Flexcar"
+          },
+          "bloom": {
+            "quote": "Best integration experience since Stripe.",
+            "name": "Sam Yang",
+            "role": "Co-founder and CPO",
+            "company": "Bloom"
+          },
+          "findigs": {
+            "quote": "Footprint has been a significant improvement to our onboarding + fraud stack. It caught four new fraud cases in its first week live, and the app clip minimizes drop-off during document scanning.",
+            "name": "Anuj Desai",
+            "role": "Lead Product Manager",
+            "company": "Findigs"
+          },
+          "coba": {
+            "quote": "In an age of heightened compliance born from the importance of bank-direct relationships, Footprint’s Identity + Security suite was key in helping us smoothly onboard to our sponsor bank. They offer a world-class product with white-glove support.",
+            "name": "Joseph Saliba",
+            "role": "CEO",
+            "company": "Coba"
+          }
+        },
+        "empty-quote": {
+          "title": "Ready to be the next happy customer with a quote in here?",
+          "cta": "Let's chat"
+        }
+      },
+      "banner": {
+        "title": "Onboard more customers and enjoy peace of mind.",
+        "get-started": "Get started",
+        "book-a-demo": "Book a demo"
+      }
+    },
     "customers": {
       "html-title": "Footprint - Customers",
+      "description": "Footprint powers many product teams, from ambitious startups to multi-national companies.",
       "hero": {
         "title": "Meet our happy customers",
         "subtitle": "Footprint powers many product teams, from ambitious startups to multi-national companies."
@@ -715,269 +979,6 @@
           "primary-button": "Sign up for free",
           "secondary-button": "Book a call"
         }
-      }
-    },
-    "home": {
-      "html-title": "Footprint - Home",
-      "title": "One tool to unify onboarding, identity verification, and data security",
-      "hero": {
-        "title": "The single onboarding tool your company needs",
-        "subtitle": "Drive revenue, block fraud, ensure security and compliance.",
-        "get-started": "Get started",
-        "book-a-call": "Book a call"
-      },
-      "logos-section": {
-        "title": "World-class teams are onboarding more users and trusting Footprint with their data"
-      },
-      "customize": {
-        "title": "Customize it all",
-        "subtitle": "Use our Onboarding Components to build a fully embeddable and customizable onboarding experience.",
-        "components": {
-          "button-text-color": "Button text color",
-          "border-radius": "Button border radius",
-          "button-background-color": "Button background color",
-          "screen": {
-            "title": "Basic data",
-            "subtitle": "Fill this information to get started.",
-            "first-name": "First name",
-            "last-name": "Last name",
-            "date-of-birth": "Date of birth",
-            "cta": "Continue"
-          },
-          "out-of-the-box": {
-            "first-part": "or integrate our",
-            "cta": "out-of-the-box onboarding experience,",
-            "second-part": "also fully customizable."
-          }
-        }
-      },
-      "control": {
-        "title": "Have complete control",
-        "subtitle": "Define the data, documents, and logic required from users in our playbook configurations.",
-        "illustration": {
-          "add": "Add",
-          "edit": "Edit",
-          "kyc": {
-            "title": "Know Your Customer (KYC)",
-            "toggle": {
-              "title": "Perform database checks with collected identity data",
-              "subtitle": "Identity data collected will be verified against government databases, credit bureaus, or other official sources."
-            },
-            "extra-content": "As easy as this, any user you onboard will be verified against the best available databases allowing you to have complete control over the verification process."
-          },
-          "anti-money-laundering": {
-            "title": "Anti-money laundering",
-            "toggle": {
-              "title": "Enhanced AML monitoring",
-              "subtitle": "Continuous monitoring, governmental watchlists, PEP and adverse media monitoring."
-            },
-            "extra-content": "Enhance your AML compliance with comprehensive monitoring and additional controls."
-          },
-          "additional-documents": {
-            "title": "Additional documents",
-            "subtitle": "Additional proofs that may help you analyze the user",
-            "extra-content": "Request additional documents like proof of address, proof of SSN, or custom documents to help you analyze the user."
-          },
-          "investor-profile-questions": {
-            "title": "Investor profile questions",
-            "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
-            "cta": "Add",
-            "extra-content": "Add questions to understand how risk-averse your investors are and tailor the onboarding questions to fit their profile."
-          },
-          "government-issued-id": {
-            "title": "Collect government-issued ID",
-            "subtitle": "Request that users submit scanned IDs",
-            "cta": "Add",
-            "extra-content": "Request that users submit scanned IDs to help you verify their identity."
-          },
-          "editing-additional-documents": {
-            "title": "Editing additional documents to request",
-            "extra-content": "Request additional documents when needed so you can make informed decisions on users.",
-            "proof-of-address": {
-              "title": "Proof of address",
-              "subtitle": "Official documents displaying the user's name and address."
-            },
-            "proof-of-ssn": {
-              "title": "Proof of SSN",
-              "subtitle": "Scan of Social Security card or official document displaying your name and Social Security Number."
-            },
-            "custom": {
-              "title": "Custom document",
-              "subtitle": "Request that users submit a custom document."
-            }
-          },
-          "personal-information": {
-            "title": "Personal information & docs",
-            "extra-content": "There is an almost endless number of combinations from which you can choose to create your own playbook.",
-            "basic-information": {
-              "title": "Basic information",
-              "email": "Email",
-              "phone-number": "Phone number",
-              "first-and-last-name": "First and last name",
-              "date-of-birth": "Date of birth",
-              "country-of-birth": "Country of birth",
-              "address": "Address"
-            },
-            "us-residents": {
-              "title": "U.S. residents",
-              "legal-status": "Legal status in the U.S.",
-              "ssn": "SSN",
-              "id-doc": "ID document scan",
-              "selfie": "Selfie"
-            },
-            "non-us-residents": {
-              "title": "Non-U.S. residents",
-              "restricted": "Restricted to these countries",
-              "id-document-scan": "ID document scan",
-              "selfie": "Selfie"
-            }
-          }
-        }
-      },
-      "verify": {
-        "title": "Verify people, not PII",
-        "subtitle": "Fraud signals you can act on in a unified rules engine with your KYC Checks.",
-        "cards": {
-          "build-rules": {
-            "title": "Build rules",
-            "subtitle": "Create custom rules to verify users based on your requirements.",
-            "illustration": {
-              "title": "Fail",
-              "subtitle": "User will be marked as failed"
-            }
-          },
-          "backtest": {
-            "title": "Backtest and analyze the impact of your rules",
-            "subtitle": "Backtest your rules and analyze the impact of your rules on your users.",
-            "illustration": {
-              "table": {
-                "headers": {
-                  "current-onboarding-status": "Current onboarding status",
-                  "original-rule-outcome": "Original rule outcome",
-                  "backtested-rule-outcome": "Backtested rule outcome"
-                },
-                "rows": {
-                  "failed": "Failed",
-                  "fail-and-manual-review": "Fail + Manual review",
-                  "pass": "Pass",
-                  "pass-and-manual-review": "Pass + Manual review"
-                }
-              },
-              "outcomes": {
-                "title": "Backtested rule outcomes (40)",
-                "subtitle": "If the rules that are being tested existed at the time of the onboardings above, the rule outcomes would've been these instead:",
-                "fail": "Fail",
-                "fail-and-manual-review": "Fail + Manual review",
-                "pass": "Pass",
-                "pass-and-manual-review": "Pass + Manual review",
-                "step-up": "Step up"
-              }
-            }
-          },
-          "verify": {
-            "title": "Verify what users tell you",
-            "subtitle": "Verify what users say analyzing their documents.",
-            "illustration": {
-              "user-input-data": "User input data",
-              "ocr-data": "OCR data",
-              "name": "Name",
-              "Address": "Address"
-            }
-          },
-          "behavior-and-device-insights": {
-            "title": "Behavior and device insights",
-            "subtitle": "Add another security layer to our onboarding experience, helping reduce fraud and increase accuracy",
-            "illustration": {
-              "date-and-time": "Date and time",
-              "ip-address": "IP address",
-              "biometric": "Biometric",
-              "verified": "Verified",
-              "not-verified": "Not verified",
-              "app-clip": {
-                "title": "App Clip",
-                "whats-this": "What's this?",
-                "description": "App Clips are small parts of your app that are discoverable at the moment they are needed and load quickly to complete a specific task, such as renting a scooter, purchasing a coffee, or filling a parking meter.",
-                "yes": "Yes",
-                "no": "No",
-                "what-is-this": {
-                  "title": "What's an App Clip?",
-                  "description": "App Clips are small parts of your app that are discoverable at the moment they are needed and load quickly to complete a specific task. We use this technology to verify the device of the user, get the device attestation and insights."
-                }
-              }
-            }
-          }
-        }
-      },
-      "leverage": {
-        "title": "Leverage the best and most secure technology available",
-        "subtitle": "App Clip and Passkeys add another security layer to our onboarding experience, helping reduce fraud and increase accuracy",
-        "app-clip": {
-          "title": "Capture ID documents with App Clip",
-          "subtitle": "Leveraging the user’s mobile device, we are able to:",
-          "real-phone": "Ensure the legitatamacy of the device",
-          "device-attestation": "Leverage Apple and Google’s rectangular detection",
-          "duplicate-fraud": "Detect and block duplicate fraud",
-          "give-it-a-try": "Give it a try on your own"
-        },
-        "passkeys": {
-          "title": "Passkeys",
-          "subtitle": "Passkeys use cryptography to authenticate users and allow us to:",
-          "identity-and-device": "Link the identity to the device",
-          "prevent-ato": "Prevent ATOs and phishing",
-          "same-person": "Verify account creator is the signer-in",
-          "link-kyc-and-auth": "Link the identity to the device"
-        }
-      },
-      "quotes": {
-        "title": "Best onboarding tool in town",
-        "subtitle": "Do not take our word for it.",
-        "quote-list": {
-          "apiture": {
-            "quote": "Based on experience vetting and partnering with many identity-based techs, partnering with Footprint has been a breath of fresh air. In my product, IDV is critical. I want the best security net possible, configurability, trust in a reliable partner, quick support whenever asked, and a commitment to staying ahead of the bad actors. Footprint is thinking outside the box and doing things other IDV providers should have thought about years ago. Proud to stand side by side with Footprint combatting fraud.",
-            "name": "Craig Pawling",
-            "role": "VP of Product",
-            "company": "Apiture"
-          },
-          "flexcar-2": {
-            "quote": "Flexcar turned to Footprint with a clear goal: rein in fraud without adding unnecessary friction, which would pose significant user experience challenges in an increasingly competitive market.",
-            "name": "Jon Coombs",
-            "role": "Director of Product Management",
-            "company": "Flexcar"
-          },
-          "flexcar": {
-            "quote": "I love how Footprint is able to onboard users while offloading the storage of PII. Weʼre able to access the data we need while leveraging Footprintʼs secure vaulting for the collection and storage.",
-            "name": "Michael Zambrano",
-            "role": "Executive Head of Risk",
-            "company": "Flexcar"
-          },
-          "bloom": {
-            "quote": "Best integration experience since Stripe.",
-            "name": "Sam Yang",
-            "role": "Co-founder and CPO",
-            "company": "Bloom"
-          },
-          "findigs": {
-            "quote": "Footprint has been a significant improvement to our onboarding + fraud stack. It caught four new fraud cases in its first week live, and the app clip minimizes drop-off during document scanning.",
-            "name": "Anuj Desai",
-            "role": "Lead Product Manager",
-            "company": "Findigs"
-          },
-          "coba": {
-            "quote": "In an age of heightened compliance born from the importance of bank-direct relationships, Footprint’s Identity + Security suite was key in helping us smoothly onboard to our sponsor bank. They offer a world-class product with white-glove support.",
-            "name": "Joseph Saliba",
-            "role": "CEO",
-            "company": "Coba"
-          }
-        },
-        "empty-quote": {
-          "title": "Ready to be the next happy customer with a quote in here?",
-          "cta": "Let's chat"
-        }
-      },
-      "banner": {
-        "title": "Onboard more customers and enjoy peace of mind.",
-        "get-started": "Get started",
-        "book-a-demo": "Book a demo"
       }
     },
     "company": {

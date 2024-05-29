@@ -1,4 +1,4 @@
-import { Container, media, Stack, Text } from '@onefootprint/ui';
+import { Container, media, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -30,9 +30,9 @@ const Solutions = () => {
   return (
     <Background>
       <SectionContainer>
-        <Stack>
-          <Text variant="display-3">{t('title')}</Text>
-        </Stack>
+        <Text variant="display-3" tag="h2">
+          {t('title')}
+        </Text>
         <SolutionsViewer keys={keys} />
       </SectionContainer>
     </Background>

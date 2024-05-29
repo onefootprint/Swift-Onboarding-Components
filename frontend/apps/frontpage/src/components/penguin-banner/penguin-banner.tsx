@@ -1,4 +1,10 @@
-import { Container, createFontStyles, media, Stack } from '@onefootprint/ui';
+import {
+  Box,
+  Container,
+  createFontStyles,
+  media,
+  Stack,
+} from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React from 'react';
@@ -41,7 +47,7 @@ const PenguinBanner = ({
           justify="center"
           maxWidth="960px"
         >
-          <Title isDarkTheme={isDarkTheme}>
+          <Title isDarkTheme={isDarkTheme} tag="h2" maxWidth="720px">
             {t(`${section}.title` as ParseKeys<'common'>)}
           </Title>
           <ContactButtons
@@ -56,7 +62,7 @@ const PenguinBanner = ({
   );
 };
 
-const Title = styled.h2<{ isDarkTheme?: boolean }>`
+const Title = styled(Box)<{ isDarkTheme?: boolean }>`
   ${({ theme, isDarkTheme }) => css`
     color: ${isDarkTheme ? theme.color.quinary : theme.color.primary};
     ${createFontStyles('display-3')}

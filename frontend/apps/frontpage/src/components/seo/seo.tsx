@@ -26,7 +26,7 @@ type SeoProps = {
 };
 
 const Seo = ({
-  description = "The last identity verification you'll ever need",
+  description = 'One tool to unify onboarding, identity verification, and data security',
   image = '/og-img-home.png',
   keywords = 'footprint,foot,print,id,onefootprint,identity,kyc,verify,security',
   kind = 'product',
@@ -35,12 +35,14 @@ const Seo = ({
   og = {
     image: '/og-img-home.png',
     title: 'Footprint',
-    description: "The last identity verification you'll ever need",
+    description:
+      'One tool to unify onboarding, identity verification, and data security',
     author: 'Footprint',
   },
   twitter = {
     title: 'Footprint',
-    description: "The last identity verification you'll ever need",
+    description:
+      'One tool to unify onboarding, identity verification, and data security',
     image: '/og-img-home.png',
     extraData: [
       { label: 'Footprint', data: 'Footprint' },

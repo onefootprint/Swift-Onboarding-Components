@@ -1,5 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { createFontStyles, media, Text } from '@onefootprint/ui';
+import { Box, createFontStyles, media, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -13,14 +13,16 @@ type SectionTextProps = {
 
 const SectionText = ({ title, subtitle, items, iconSrc }: SectionTextProps) => (
   <Container>
-    {iconSrc && <Image src={iconSrc} alt="" width={80} height={80} />}
+    {iconSrc && (
+      <Image src={iconSrc} alt="section icon" width={80} height={80} />
+    )}
     <TitleContainer>
-      <Title>{title}</Title>
-      <Subtitle>{subtitle}</Subtitle>
+      <Title tag="h3">{title}</Title>
+      <Subtitle tag="h4">{subtitle}</Subtitle>
     </TitleContainer>
-    <ItemsContainer>
+    <ItemsContainer tag="ul">
       {items.map(item => (
-        <ItemContainer key={item}>
+        <ItemContainer key={item} tag="li">
           <IconWrapper>
             <IcoCheck16 color="accent" />
           </IconWrapper>
@@ -62,30 +64,26 @@ const Container = styled.div`
   `}
 `;
 
-const Title = styled.h3`
+const Title = styled(Box)`
+  ${({ theme }) => css`
   position: relative;
   ${createFontStyles('heading-2')}
 
   ${media.greaterThan('md')`
     &::before {
-      ${
-        /** @ts-expect-error: Binding element 'theme' implicitly has an 'any' type. */ ({
-          theme,
-        }) => css`
-          content: '';
-          position: absolute;
-          left: calc(-1 * ${theme.spacing[9]});
-          top: 0;
-          height: 100%;
-          width: ${theme.borderWidth[1]};
-          background: ${theme.color.accent};
-        `
-      }
+      content: '';
+      position: absolute;
+      left: calc(-1 * ${theme.spacing[9]});
+      top: 0;
+      height: 100%;
+      width: ${theme.borderWidth[1]};
+      background: ${theme.color.accent};
+    `}
     }
   `}
 `;
 
-const Subtitle = styled.p`
+const Subtitle = styled(Box)`
   ${({ theme }) => css`
     ${createFontStyles('heading-3')}
     font-weight: 400;
@@ -102,7 +100,7 @@ const TitleContainer = styled.div`
   `}
 `;
 
-const ItemsContainer = styled.div`
+const ItemsContainer = styled(Box)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
@@ -111,7 +109,7 @@ const ItemsContainer = styled.div`
   `}
 `;
 
-const ItemContainer = styled.div`
+const ItemContainer = styled(Box)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: row;

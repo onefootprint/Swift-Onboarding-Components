@@ -29,7 +29,7 @@ const AllData = () => {
           <Rectangle top={125} left={280} width={50} height={24} />
         </IllustrationContainer>
         <Title>
-          <SectionTitle variant="display-1">{t('title')}</SectionTitle>
+          <SectionTitle variant="display-2">{t('title')}</SectionTitle>
           <AnimatePresence>
             {isDecrypted ? (
               <ToggleButton
@@ -49,7 +49,7 @@ const AllData = () => {
           </AnimatePresence>
         </Title>
       </TitleContainer>
-      <SectionSubtitle maxWidth={500}>{t('subtitle')}</SectionSubtitle>
+      <SectionSubtitle maxWidth="500px">{t('subtitle')}</SectionSubtitle>
       <Box marginBottom={8} />
       <DesktopImageGrid isDecrypted={isDecrypted} />
       <MobileImageGrid isDecrypted={isDecrypted} />

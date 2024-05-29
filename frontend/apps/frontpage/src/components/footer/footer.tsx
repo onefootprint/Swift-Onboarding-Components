@@ -150,7 +150,7 @@ const Footer = () => {
         <LinksContainer>
           {linkSections.map(section => (
             <SectionColumn key={section.title}>
-              <Text variant="label-3">
+              <Text variant="label-3" tag="h4">
                 {t(section.title as ParseKeys<'common'>)}
               </Text>
               {section.links.map(link => (

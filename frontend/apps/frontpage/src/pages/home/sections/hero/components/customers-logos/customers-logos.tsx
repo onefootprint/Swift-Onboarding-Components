@@ -19,7 +19,9 @@ const CustomersLogos = () => {
         textAlign="center"
       >
         <IcoSparkles40 color="secondary" />
-        <Text variant="display-4">{t('title')}</Text>
+        <Text tag="h4" variant="display-4">
+          {t('title')}
+        </Text>
       </Stack>
       <Logos />
     </Container>

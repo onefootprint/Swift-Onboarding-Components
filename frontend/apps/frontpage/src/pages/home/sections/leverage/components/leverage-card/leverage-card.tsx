@@ -63,17 +63,23 @@ const LeverageCard = ({ variant, videoSrc, $inverted }: LeverageCardProps) => {
       <Stack align="center" justify="flex-start">
         <TextContainer>
           <Stack direction="column" gap={4}>
-            <Chip variant={variant}>
+            <Chip tag="h3" variant={variant}>
               {variant === 'app-clip' ? 'Modern' : 'Secure'}
             </Chip>
-            <Text variant="heading-2">
+            <Text variant="heading-2" tag="h3">
               {t(`${variant}.title` as unknown as ParseKeys<'common'>)}
             </Text>
-            <Text variant="body-1" color="secondary">
+            <Text variant="body-1" color="secondary" tag="h4">
               {t(`${variant}.subtitle` as unknown as ParseKeys<'common'>)}
             </Text>
           </Stack>
-          <Stack direction="column" gap={3} paddingTop={2} width="100%">
+          <Stack
+            direction="column"
+            gap={3}
+            paddingTop={2}
+            width="100%"
+            tag="ul"
+          >
             {bullets.map(bullet => (
               <Bullet key={bullet.translationKey} icon={bullet.icon}>
                 {t(

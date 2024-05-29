@@ -32,7 +32,7 @@ const ToggleButton = ({
   >
     <Sparkles color="white">
       <StyledButton>
-        <SectionTitle variant="display-2">{children}</SectionTitle>
+        <SectionTitle variant="display-3">{children}</SectionTitle>
       </StyledButton>
     </Sparkles>
     <Border />
@@ -43,9 +43,8 @@ const StyledButton = styled(motion.button)`
   ${({ theme }) => css`
     all: unset;
     position: relative;
-
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.xl};
+    border-radius: ${theme.borderRadius.lg};
     cursor: pointer;
     color: ${theme.color.secondary};
     overflow: hidden;
@@ -60,7 +59,7 @@ const Border = styled.span`
     position: absolute;
     width: calc(100% + ${theme.spacing[1]} * 1.2);
     height: calc(100% + ${theme.spacing[1]} * 1.2);
-    border-radius: calc(${theme.borderRadius.xl} + ${theme.spacing[1]} * 1.2);
+    border-radius: calc(${theme.borderRadius.lg} + ${theme.spacing[1]} * 1.2);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

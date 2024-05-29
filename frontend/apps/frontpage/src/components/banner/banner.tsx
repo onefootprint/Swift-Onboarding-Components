@@ -5,6 +5,7 @@ import {
   createFontStyles,
   media,
   Stack,
+  Text,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +31,9 @@ const Banner = ({ title }: BannerProps) => {
       <BannerContainer>
         <FishingPenguin />
         <TextContainer>
-          {title}
+          <Text variant="display-2" tag="h3">
+            {title}
+          </Text>
           <ButtonContainer>
             <Button
               variant="primary"
@@ -75,7 +78,6 @@ const BannerContainer = styled(Container)`
 
 const TextContainer = styled(Stack)`
   ${({ theme }) => css`
-    ${createFontStyles('display-3')}
     position: relative;
     flex-direction: column;
     gap: ${theme.spacing[8]};

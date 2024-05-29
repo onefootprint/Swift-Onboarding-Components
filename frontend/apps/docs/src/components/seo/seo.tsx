@@ -9,7 +9,7 @@ type SeoProps = {
 };
 
 const Seo = ({
-  description = "The last identity verification you'll ever need",
+  description = 'One tool to unify onboarding, identity verification, and data security',
   keywords = 'footprint,foot,print,id,onefootprint,identity,kyc,verify,security',
   slug,
   title,

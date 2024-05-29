@@ -47,7 +47,7 @@ const DeveloperExperience = () => {
         <Text variant="display-2" color="primary" tag="h2">
           {t('title')}
         </Text>
-        <Text variant="display-4" color="secondary" tag="p">
+        <Text variant="display-4" color="secondary" tag="h4">
           {t('subtitle')}
         </Text>
         <LinkButton

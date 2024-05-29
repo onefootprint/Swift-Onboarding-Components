@@ -30,7 +30,9 @@ const Experience = () => {
     <Background>
       <SectionContainer>
         <Stack>
-          <Text variant="display-3">{t('title')}</Text>
+          <Text variant="display-3" tag="h2">
+            {t('title')}
+          </Text>
         </Stack>
         <CardsContainer>
           {keys.map(({ key, icon }) => (

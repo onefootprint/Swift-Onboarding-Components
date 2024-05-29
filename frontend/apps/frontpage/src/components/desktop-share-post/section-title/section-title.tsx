@@ -18,9 +18,12 @@ const SectionTitle = ({
     gap={4}
     align={align === 'left' ? 'flex-start' : 'center'}
   >
-    <Title textAlign={align}>{title}</Title>
+    <Title textAlign={align} tag="h3">
+      {title}
+    </Title>
     {subtitle && (
       <Text
+        tag="h4"
         variant="body-1"
         maxWidth="600px"
         textAlign={align === 'left' ? 'left' : 'center'}

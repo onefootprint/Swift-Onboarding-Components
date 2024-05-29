@@ -46,6 +46,7 @@ const FeaturedCard = ({
           variants={logoVariants}
           initial="hidden"
           animate={isHovering ? 'visible' : 'hidden'}
+          aria-label={`${title}'s logo`}
         >
           <Logo />
           <IconContainer

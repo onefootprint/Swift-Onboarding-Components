@@ -7,7 +7,7 @@ const IntroCard = ({ children }: { children: React.ReactNode }) => (
   <SectionContainer>
     <CardContainer>
       <IcoSparkles24 />
-      <Text variant="body-1" maxWidth="600px">
+      <Text variant="body-1" maxWidth="600px" tag="h3">
         {children}
       </Text>
     </CardContainer>

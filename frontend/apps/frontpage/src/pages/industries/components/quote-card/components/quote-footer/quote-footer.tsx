@@ -23,7 +23,7 @@ const QuoteFooter = ({
   return (
     <FooterContainer>
       <Stack direction="column" gap={2}>
-        <Text variant="label-2" color="primary">
+        <Text variant="label-2" color="primary" tag="h5">
           {author}
         </Text>
         <Stack direction="row" gap={2}>

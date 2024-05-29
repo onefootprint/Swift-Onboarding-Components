@@ -15,7 +15,7 @@ const NewHome = () => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/" />
+      <SEO title={t('html-title')} description={t('description')} slug="/" />
       <Hero />
       <Customize />
       <Control />

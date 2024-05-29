@@ -9,7 +9,7 @@ type BulletProps = {
 };
 
 export const Bullet = ({ children, icon: Icon }: BulletProps) => (
-  <Container>
+  <Container tag="li">
     <IconContainer>
       <Icon />
     </IconContainer>

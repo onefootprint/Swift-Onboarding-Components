@@ -21,14 +21,14 @@ const QuoteCard = ({ company }: QuoteCardProps) => {
       <LogoContainer>
         <Image
           src={`/home/quotes/${company}/logo.png`}
-          alt={company}
+          alt={`${company.charAt(0).toUpperCase() + company.slice(1)}'s logo`}
           width={200}
           height={200}
         />
       </LogoContainer>
       <Stack flex={1} position="relative">
         <PositionedQuoteIcon />
-        <Text variant="body-3" zIndex={1} paddingTop={3}>
+        <Text variant="body-3" zIndex={1} paddingTop={3} tag="blockquote">
           {t(`${company}.quote` as unknown as ParseKeys<'common'>)}&quot;
         </Text>
       </Stack>
@@ -39,16 +39,16 @@ const QuoteCard = ({ company }: QuoteCardProps) => {
         position="relative"
         gap={2}
       >
-        <Text variant="label-3">
+        <Text variant="label-3" tag="h4">
           {t(`${company}.name` as unknown as ParseKeys<'common'>)}
         </Text>
-        <Text variant="body-3" color="tertiary">
+        <Text variant="body-3" color="tertiary" tag="h5">
           {t(`${company}.role` as unknown as ParseKeys<'common'>)}
         </Text>
         <AuthorImageContainer $rotation={Math.floor(Math.random() * 20) - 6}>
           <Image
             src={`/home/quotes/${company}/author.png`}
-            alt={company}
+            alt={`${t(`${company}.name` as unknown as ParseKeys<'common'>)}'s headshot`}
             width={200}
             height={200}
           />

@@ -44,7 +44,7 @@ const Hero = () => {
       <MobileHeroImage />
       <Title>
         <SectionTitle variant="display-1">{t('title')}</SectionTitle>
-        <SectionSubtitle maxWidth={640}>{t('subtitle')}</SectionSubtitle>
+        <SectionSubtitle maxWidth="640px">{t('subtitle')}</SectionSubtitle>
       </Title>
       <FeatureCardsGrid
         width="100%"

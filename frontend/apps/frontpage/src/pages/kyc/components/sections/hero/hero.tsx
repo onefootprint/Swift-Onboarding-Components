@@ -28,10 +28,10 @@ const Hero = () => {
     >
       <Illustration />
       <TitleContainer>
-        <Text variant="display-2" textAlign="center">
+        <Text variant="display-2" textAlign="center" tag="h1">
           {t('title')}
         </Text>
-        <Text variant="display-4" color="tertiary">
+        <Text variant="display-4" color="tertiary" tag="h2">
           {t('subtitle')}
         </Text>
       </TitleContainer>

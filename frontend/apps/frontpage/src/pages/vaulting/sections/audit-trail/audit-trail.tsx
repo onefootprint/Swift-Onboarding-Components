@@ -26,8 +26,8 @@ const AuditTrail = () => {
           <Rectangle top={92} left={164} width={160} height={12} />
         </IllustrationContainer>
         <TitleContainer>
-          <SectionTitle variant="display-1">{t('title')}</SectionTitle>
-          <SectionSubtitle maxWidth={500}>{t('subtitle')}</SectionSubtitle>
+          <SectionTitle variant="display-2">{t('title')}</SectionTitle>
+          <SectionSubtitle maxWidth="500px">{t('subtitle')}</SectionSubtitle>
         </TitleContainer>
       </Title>
       <DesktopTimeline

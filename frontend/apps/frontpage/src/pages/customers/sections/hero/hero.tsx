@@ -28,8 +28,10 @@ const Hero = () => {
         animate="visible"
         variants={titleVariants}
       >
-        <Text variant="display-2">{t('title')}</Text>
-        <Text variant="display-4" color="secondary">
+        <Text variant="display-2" tag="h1">
+          {t('title')}
+        </Text>
+        <Text variant="display-4" color="secondary" tag="h4">
           {t('subtitle')}
         </Text>
       </TitleContainer>
