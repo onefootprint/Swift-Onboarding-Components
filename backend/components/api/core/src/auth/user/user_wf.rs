@@ -1,35 +1,44 @@
-use std::sync::Arc;
-
-use super::UserAuth;
-use db::{
-    models::{
-        ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault,
-        tenant::Tenant,
-        vault::Vault,
-        workflow::{Workflow, WorkflowIdentifier},
-    },
-    PgConn,
+use super::{
+    ParsedUserSessionContext,
+    UserAuth,
+    UserSessionContext,
 };
+use crate::auth::session::{
+    AuthSessionData,
+    ExtractableAuthSession,
+    RequestInfo,
+};
+use crate::auth::{
+    AuthError,
+    IsGuardMet,
+    SessionContext,
+};
+use crate::errors::onboarding::OnboardingError;
+use crate::errors::ApiResult;
+use crate::ApiError;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
+use db::models::vault::Vault;
+use db::models::workflow::{
+    Workflow,
+    WorkflowIdentifier,
+};
+use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::{ScopedVaultId, VaultId, WorkflowGuard};
-use paperclip::actix::Apiv2Security;
-
-use crate::{
-    auth::{
-        session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
-        AuthError, IsGuardMet, SessionContext,
-    },
-    errors::{onboarding::OnboardingError, ApiResult},
-    ApiError,
+use newtypes::{
+    ScopedVaultId,
+    UserAuthScope,
+    VaultId,
+    WorkflowGuard,
 };
-
-use super::{ParsedUserSessionContext, UserSessionContext};
-use newtypes::UserAuthScope;
+use paperclip::actix::Apiv2Security;
+use std::sync::Arc;
 
 /// A wrapper around UserSession that can only be extracted when the auth token is for an active
 /// onboarding session linked to a scoped user.
-/// We preload information for the scoped vault and onboarding that is commonly used by HTTP handlers
+/// We preload information for the scoped vault and onboarding that is commonly used by HTTP
+/// handlers
 #[derive(Debug, Clone)]
 pub struct UserWfSession {
     pub user_session: UserSessionContext,

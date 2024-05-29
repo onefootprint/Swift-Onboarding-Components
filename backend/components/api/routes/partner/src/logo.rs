@@ -1,14 +1,27 @@
 use actix_multipart::Multipart;
-use api_core::{
-    auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    types::{JsonApiResponse, ResponseData},
-    utils::db2api::DbToApi,
-    State,
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    PartnerTenantGuard,
+    PartnerTenantSessionAuth,
 };
-use db::models::partner_tenant::{PartnerTenant, UpdatePartnerTenant};
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
+use db::models::partner_tenant::{
+    PartnerTenant,
+    UpdatePartnerTenant,
+};
+use paperclip::actix::web::{
+    HttpRequest,
+    Json,
+};
 use paperclip::actix::{
-    self, api_v2_operation, web,
-    web::{HttpRequest, Json},
+    self,
+    api_v2_operation,
+    web,
 };
 
 #[api_v2_operation(

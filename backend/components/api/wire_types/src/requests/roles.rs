@@ -1,4 +1,7 @@
-use newtypes::{TenantRoleKindDiscriminant, TenantScope};
+use newtypes::{
+    TenantRoleKindDiscriminant,
+    TenantScope,
+};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]

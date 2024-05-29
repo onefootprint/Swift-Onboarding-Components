@@ -1,10 +1,23 @@
-use super::{compliance_doc::ComplianceDoc, compliance_doc_review::ComplianceDocReview};
-use crate::{DbError, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use super::compliance_doc::ComplianceDoc;
+use super::compliance_doc_review::ComplianceDocReview;
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::compliance_doc_submission;
 use diesel::prelude::*;
 use newtypes::{
-    ComplianceDocData, ComplianceDocId, ComplianceDocRequestId, ComplianceDocSubmissionId, Locked,
+    ComplianceDocData,
+    ComplianceDocId,
+    ComplianceDocRequestId,
+    ComplianceDocSubmissionId,
+    Locked,
     TenantUserId,
 };
 

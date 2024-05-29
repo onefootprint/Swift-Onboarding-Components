@@ -1,34 +1,52 @@
-use std::{collections::HashMap, sync::Arc};
-
-use chrono::{DateTime, Duration, Utc};
-use crypto::aead::ScopedSealingKey;
-use db::{
-    models::{
-        auth_event::AuthEvent, ob_configuration::ObConfiguration, scoped_vault::ScopedVault, tenant::Tenant,
-        vault::Vault,
-    },
-    PgConn,
+use crate::auth::session::user::{
+    AssociatedAuthEvent,
+    AssociatedAuthEventKind,
+    UserSession,
 };
+use crate::auth::session::{
+    AllowSessionUpdate,
+    AuthSessionData,
+    ExtractableAuthSession,
+    RequestInfo,
+};
+use crate::auth::user::UserAuth;
+use crate::auth::{
+    AuthError,
+    IsGuardMet,
+    SessionContext,
+};
+use crate::errors::{
+    ApiError,
+    ApiResult,
+};
+use crate::utils::session::AuthSession;
+use chrono::{
+    DateTime,
+    Duration,
+    Utc,
+};
+use crypto::aead::ScopedSealingKey;
+use db::models::auth_event::AuthEvent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
+use db::models::vault::Vault;
+use db::PgConn;
+use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
-    AuthEventKind, ObConfigurationId, ScopedVaultId, SessionAuthToken, VaultId, VaultKind, WorkflowId,
+    AuthEventKind,
+    ObConfigurationId,
+    ScopedVaultId,
+    SessionAuthToken,
+    UserAuthScope,
+    VaultId,
+    VaultKind,
+    WorkflowId,
 };
 use paperclip::actix::Apiv2Security;
-
-use crate::{
-    auth::{
-        session::{
-            user::{AssociatedAuthEvent, AssociatedAuthEventKind, UserSession},
-            AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
-        },
-        user::UserAuth,
-        AuthError, IsGuardMet, SessionContext,
-    },
-    errors::{ApiError, ApiResult},
-    utils::session::AuthSession,
-};
-use feature_flag::FeatureFlagClient;
-use newtypes::UserAuthScope;
+use std::collections::HashMap;
+use std::sync::Arc;
 
 #[derive(Debug, Clone, derive_more::Deref)]
 pub struct UserSessionContext {

@@ -1,11 +1,14 @@
-use newtypes::{ObConfigurationId, ScopedVaultId, WorkflowFixtureResult, WorkflowSource};
-
-use crate::{
-    models::{
-        insight_event::CreateInsightEvent,
-        workflow::{OnboardingWorkflowArgs, Workflow},
-    },
-    TxnPgConn,
+use crate::models::insight_event::CreateInsightEvent;
+use crate::models::workflow::{
+    OnboardingWorkflowArgs,
+    Workflow,
+};
+use crate::TxnPgConn;
+use newtypes::{
+    ObConfigurationId,
+    ScopedVaultId,
+    WorkflowFixtureResult,
+    WorkflowSource,
 };
 
 pub fn create(

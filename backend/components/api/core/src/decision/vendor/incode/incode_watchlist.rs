@@ -1,51 +1,71 @@
-use db::{
-    models::{
-        billing_event::BillingEvent,
-        decision_intent::DecisionIntent,
-        ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault,
-        verification_request::{VReqIdentifier, VerificationRequest},
-    },
-    DbPool,
+use crate::decision::vendor::incode::common::call_start_onboarding;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use crate::decision::vendor::vendor_api::vendor_api_struct::{
+    IncodeUpdatedWatchlistResult,
+    IncodeWatchlistCheck,
 };
+use crate::decision::vendor::verification_result::{
+    self,
+    SaveVerificationResultArgs,
+    ShouldSaveVerificationRequest,
+};
+use crate::decision::vendor::{
+    build_request,
+    map_to_api_error,
+};
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+    VwArgs,
+};
+use crate::State;
+use db::models::billing_event::BillingEvent;
+use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::verification_request::{
+    VReqIdentifier,
+    VerificationRequest,
+};
+use db::DbPool;
 use feature_flag::BoolFlag;
+use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::incode::watchlist::{
+    IncodeUpdatedWatchlistResultRequest,
+    IncodeWatchlistCheckRequest,
+};
+use idv::incode::{
+    IncodeClientErrorCustomFailureReasons,
+    IncodeResponse,
+};
 use idv::{
-    incode::{
-        watchlist::{
-            response::WatchlistResultResponse, IncodeUpdatedWatchlistResultRequest,
-            IncodeWatchlistCheckRequest,
-        },
-        IncodeClientErrorCustomFailureReasons, IncodeResponse,
-    },
-    ParsedResponse, VendorResponse,
+    ParsedResponse,
+    VendorResponse,
 };
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
+use newtypes::BillingEventKind::ContinuousMonitoringPerYear;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, BillingEventKind::ContinuousMonitoringPerYear,
-    DecisionIntentId, EncryptedVaultPrivateKey, IdvData, IncodeConfigurationId, IncodeEnvironment,
-    IncodeWatchlistResultRef, ObConfigurationKey, PiiJsonValue, ScopedVaultId, VaultPublicKey, VendorAPI,
-    VerificationRequestId, VerificationResultId,
-};
-
-use crate::{
-    decision::vendor::{
-        build_request,
-        incode::common::call_start_onboarding,
-        map_to_api_error,
-        tenant_vendor_control::TenantVendorControl,
-        vendor_api::{
-            loaders::load_response_for_vendor_api,
-            vendor_api_struct::{IncodeUpdatedWatchlistResult, IncodeWatchlistCheck},
-        },
-        verification_result::{self, SaveVerificationResultArgs, ShouldSaveVerificationRequest},
-    },
-    errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
-    State,
+    DecisionIntentId,
+    EncryptedVaultPrivateKey,
+    IdvData,
+    IncodeConfigurationId,
+    IncodeEnvironment,
+    IncodeWatchlistResultRef,
+    ObConfigurationKey,
+    PiiJsonValue,
+    ScopedVaultId,
+    VaultPublicKey,
+    VendorAPI,
+    VerificationRequestId,
+    VerificationResultId,
 };
 
 // Watchlist check saves Vreq first, so we wrap existing incode utils to just save vreq
-// For future us: This is just because we need IdvData, and we create that from `build_idv_data_from_verification_request` which requires a Vreq
-// We could just refactor so that the fn just takes a seqno, rather than a vreq
+// For future us: This is just because we need IdvData, and we create that from
+// `build_idv_data_from_verification_request` which requires a Vreq We could just refactor so that
+// the fn just takes a seqno, rather than a vreq
 #[tracing::instrument(skip(db_pool, res, user_vault_public_key, vreq_id))]
 async fn save_verification_result_for_watchlist_check<
     T: IncodeClientErrorCustomFailureReasons + serde::Serialize,
@@ -89,8 +109,9 @@ async fn call_watchlist_result(
         .await?;
     let vreq_id = vreq.id.clone();
 
-    // TODO: we're moving towards a paradigm where we write the Vreq + Vres at the same time after making the call, but build_idv_data
-    // still requires a vreq so here we are splitting the saving on vreq + vres. Could refactor build_idv_data to just take a seqno?
+    // TODO: we're moving towards a paradigm where we write the Vreq + Vres at the same time after
+    // making the call, but build_idv_data still requires a vreq so here we are splitting the saving
+    // on vreq + vres. Could refactor build_idv_data to just take a seqno?
     let idv_data: IdvData =
         build_request::build_idv_data_from_verification_request(&state.db_pool, &state.enclave_client, vreq)
             .await?;
@@ -258,7 +279,8 @@ pub async fn run_watchlist_check(
             &vw.vault.public_key,
             kind,
         )
-        .await //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
+        .await //we return vres.id instead of vres just because we currently only get vres_id from
+               // our VendorAPIResponseIdentifiersMap
     } else {
         save_canned_response(
             state,

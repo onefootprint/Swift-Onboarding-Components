@@ -1,5 +1,9 @@
 use self::cross_core::response::CrossCoreAPIResponse;
-use newtypes::{vendor_credentials::ExperianCredentials, IdvData, PiiJsonValue};
+use newtypes::vendor_credentials::ExperianCredentials;
+use newtypes::{
+    IdvData,
+    PiiJsonValue,
+};
 use regex::Regex;
 
 pub mod auth;

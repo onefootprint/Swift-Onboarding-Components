@@ -131,10 +131,12 @@ impl From<(BusinessDataForRequest, ExternalId)> for BusinessRequest {
 #[cfg(test)]
 mod tests {
 
-    use crate::middesk::request;
-
     use super::*;
-    use newtypes::{BoData, BusinessDataFromVault};
+    use crate::middesk::request;
+    use newtypes::{
+        BoData,
+        BusinessDataFromVault,
+    };
 
     #[test]
     fn test_from_business_data() {

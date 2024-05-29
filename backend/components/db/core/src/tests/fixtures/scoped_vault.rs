@@ -1,11 +1,14 @@
-use newtypes::{DbActor, ObConfigurationId, TenantId, VaultId};
-
-use crate::{
-    models::{
-        scoped_vault::ScopedVault,
-        vault::{NewVaultArgs, Vault},
-    },
-    TxnPgConn,
+use crate::models::scoped_vault::ScopedVault;
+use crate::models::vault::{
+    NewVaultArgs,
+    Vault,
+};
+use crate::TxnPgConn;
+use newtypes::{
+    DbActor,
+    ObConfigurationId,
+    TenantId,
+    VaultId,
 };
 
 pub fn create(conn: &mut TxnPgConn, uv_id: &VaultId, ob_config_id: &ObConfigurationId) -> ScopedVault {

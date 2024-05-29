@@ -1,18 +1,25 @@
-use idv::{
-    experian::cross_core::response::CrossCoreAPIResponse,
-    idology::{expectid::response::ExpectIDResponse, pa::response::PaResponse},
-    incode::{
-        doc::response::{AddCustomerResponse, FetchOCRResponse, FetchScoresResponse},
-        watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
-    },
-    lexis::response::FlexIdResponse,
-    middesk::response::{business::BusinessResponse, webhook::MiddeskBusinessUpdateWebhookResponse},
-    ParsedResponse,
+use super::vendor_api_struct::{
+    WrappedVendorAPI,
+    *,
 };
+use idv::experian::cross_core::response::CrossCoreAPIResponse;
+use idv::idology::expectid::response::ExpectIDResponse;
+use idv::idology::pa::response::PaResponse;
+use idv::incode::doc::response::{
+    AddCustomerResponse,
+    FetchOCRResponse,
+    FetchScoresResponse,
+};
+use idv::incode::watchlist::response::{
+    UpdatedWatchlistResultResponse,
+    WatchlistResultResponse,
+};
+use idv::lexis::response::FlexIdResponse;
+use idv::middesk::response::business::BusinessResponse;
+use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
+use idv::ParsedResponse;
 use newtypes::VendorAPI;
 use serde::de::DeserializeOwned;
-
-use super::vendor_api_struct::{WrappedVendorAPI, *};
 
 pub trait AsParsedResponse {
     fn into_parsed_response(self) -> ParsedResponse;

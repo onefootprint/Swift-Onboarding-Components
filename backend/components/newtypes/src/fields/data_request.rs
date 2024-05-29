@@ -1,11 +1,27 @@
+use crate::data_identifier::DiValidationError;
 use crate::{
-    data_identifier::DiValidationError, CleanAndValidate, CollectedDataOption, DataIdentifier,
-    DataValidationError, DeriveValues, Error, IdentityDataKind as IDK, NtResult, PiiJsonValue, PiiString,
+    CleanAndValidate,
+    CollectedDataOption,
+    DataIdentifier,
+    DataValidationError,
+    DeriveValues,
+    Error,
+    IdentityDataKind as IDK,
+    NtResult,
+    PiiJsonValue,
+    PiiString,
     StorageType,
 };
-use either::Either::{Left, Right};
-use itertools::{chain, Itertools};
-use std::{clone::Clone, collections::HashMap};
+use either::Either::{
+    Left,
+    Right,
+};
+use itertools::{
+    chain,
+    Itertools,
+};
+use std::clone::Clone;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, derive_more::Deref)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString

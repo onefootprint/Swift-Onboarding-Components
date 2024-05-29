@@ -1,33 +1,58 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    errors::ApiResult,
-    types::{EmptyResponse, JsonApiResponse},
-    utils::{headers::InsightHeaders, vault_wrapper::VaultWrapper},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    auth::{
-        tenant::{ClientTenantAuthContext, TenantAuth, TenantSessionAuth},
-        CanVault, Either,
-    },
-    errors::AssertionError,
-    utils::{
-        fp_id_path::FpIdPath,
-        headers::IgnoreLuhnValidation,
-        vault_wrapper::{Any, DataLifetimeSources, FingerprintedDataRequest},
-    },
+use crate::errors::ApiResult;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
-use db::models::{
-    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
-    scoped_vault::ScopedVault,
+use crate::utils::headers::InsightHeaders;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::auth::tenant::{
+    ClientTenantAuthContext,
+    TenantAuth,
+    TenantSessionAuth,
 };
+use api_core::auth::{
+    CanVault,
+    Either,
+};
+use api_core::errors::AssertionError;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::headers::IgnoreLuhnValidation;
+use api_core::utils::vault_wrapper::{
+    Any,
+    DataLifetimeSources,
+    FingerprintedDataRequest,
+};
+use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::{
-    put_data_request::{PatchDataRequest, RawDataRequest},
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DbActor, FpId, ValidateArgs,
+use newtypes::put_data_request::{
+    PatchDataRequest,
+    RawDataRequest,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use newtypes::{
+    AccessEventKind,
+    AccessEventPurpose,
+    AuditEventDetail,
+    AuditEventId,
+    DbActor,
+    FpId,
+    ValidateArgs,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[route_alias(
     actix::patch(

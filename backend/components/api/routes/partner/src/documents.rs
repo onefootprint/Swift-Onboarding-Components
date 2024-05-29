@@ -1,23 +1,34 @@
-use crate::{types::JsonApiResponse, State};
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    PartnerTenantGuard,
+    PartnerTenantSessionAuth,
+};
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
+    ValidationError,
+};
+use api_core::types::ResponseData;
+use api_core::utils::db2api::TryDbToApi;
 use api_core::{
-    auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::{ApiResult, AssertionError, ValidationError},
-    types::ResponseData,
-    utils::db2api::TryDbToApi,
-    ApiError, ApiErrorKind,
+    ApiError,
+    ApiErrorKind,
 };
 use api_wire_types::ListComplianceDocumentsResponse;
 use chrono::Utc;
-use db::{
-    helpers::ComplianceDocSummary,
-    models::{
-        compliance_doc::NewComplianceDoc, compliance_doc_request::NewComplianceDocRequest,
-        compliance_doc_template_version::ComplianceDocTemplateVersion,
-        tenant_compliance_partnership::TenantCompliancePartnership,
-    },
-};
+use db::helpers::ComplianceDocSummary;
+use db::models::compliance_doc::NewComplianceDoc;
+use db::models::compliance_doc_request::NewComplianceDocRequest;
+use db::models::compliance_doc_template_version::ComplianceDocTemplateVersion;
+use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
 use newtypes::TenantCompliancePartnershipId;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Returns a list of documents for a company partnered with the authorized compliance partner.",

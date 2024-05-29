@@ -1,8 +1,8 @@
-use serde_with::DeserializeFromStr;
-
-use crate::{api_schema_helper::string_api_data_type_alias, PiiString};
+use crate::api_schema_helper::string_api_data_type_alias;
+use crate::PiiString;
 use lazy_static::lazy_static;
 use regex::Regex;
+use serde_with::DeserializeFromStr;
 
 /// Findigs wants some of their own emails to always produce a fixture PIN code for their own
 /// internal QA testing

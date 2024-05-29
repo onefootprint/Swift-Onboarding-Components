@@ -1,26 +1,45 @@
-use std::{collections::HashMap, str::FromStr};
-
 use super::{
-    Any, DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, PatchDataResult, Person,
-    VaultWrapper, WriteableVw,
+    Any,
+    DataLifetimeSources,
+    DataRequestSource,
+    FingerprintedDataRequest,
+    PatchDataResult,
+    Person,
+    VaultWrapper,
+    WriteableVw,
 };
-use crate::{
-    enclave_client::VaultKeyPair,
-    errors::{user::UserError, ApiResult, AssertionError},
-    telemetry::RootSpan,
+use crate::enclave_client::VaultKeyPair;
+use crate::errors::user::UserError;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
 };
-use db::{
-    models::{
-        ob_configuration::ObConfiguration,
-        scoped_vault::{NewScopedVaultArgs, ScopedVault},
-        vault::{NewVaultArgs, Vault},
-    },
-    TxnPgConn,
+use crate::telemetry::RootSpan;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::{
+    NewScopedVaultArgs,
+    ScopedVault,
 };
+use db::models::vault::{
+    NewVaultArgs,
+    Vault,
+};
+use db::TxnPgConn;
+use newtypes::email::Email;
 use newtypes::{
-    email::Email, DataIdentifier as DI, DataLifetimeSource, IdentityDataKind as IDK, Locked,
-    ObConfigurationKind, OnboardingStatus, PhoneNumber, SandboxId, VaultId, VaultKind,
+    DataIdentifier as DI,
+    DataLifetimeSource,
+    IdentityDataKind as IDK,
+    Locked,
+    ObConfigurationKind,
+    OnboardingStatus,
+    PhoneNumber,
+    SandboxId,
+    VaultId,
+    VaultKind,
 };
+use std::collections::HashMap;
+use std::str::FromStr;
 
 pub struct VaultContext {
     pub data: FingerprintedDataRequest,

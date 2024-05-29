@@ -1,18 +1,36 @@
 use crate::State;
-use api_core::{
-    auth::{
-        session::user::{NewUserSessionContext, TokenCreationPurpose},
-        user::UserAuthContext,
-        Any,
-    },
-    errors::{ApiResult, ValidationError},
-    types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::{VaultWrapper, VwArgs},
+use api_core::auth::session::user::{
+    NewUserSessionContext,
+    TokenCreationPurpose,
+};
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::Any;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::vault_wrapper::{
+    VaultWrapper,
+    VwArgs,
 };
 use api_wire_types::KbaResponse;
 use itertools::Itertools;
-use newtypes::{put_data_request::RawDataRequest, DataIdentifier, IdentityDataKind as IDK, ValidateArgs};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use newtypes::put_data_request::RawDataRequest;
+use newtypes::{
+    DataIdentifier,
+    IdentityDataKind as IDK,
+    ValidateArgs,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Identify, Hosted),

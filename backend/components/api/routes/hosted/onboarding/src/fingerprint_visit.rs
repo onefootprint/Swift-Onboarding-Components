@@ -1,14 +1,23 @@
-use crate::{
-    auth::user::{UserAuth, UserAuthContext, UserAuthScope},
-    errors::ApiError,
-    types::{EmptyResponse, JsonApiResponse},
-    utils::headers::TelemetryHeaders,
-    State,
+use crate::auth::user::{
+    UserAuth,
+    UserAuthContext,
+    UserAuthScope,
 };
+use crate::errors::ApiError;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use crate::utils::headers::TelemetryHeaders;
+use crate::State;
 use actix_web::web::Json;
 use api_wire_types::hosted::fingerprint_visit::FingerprintVisitRequest;
 use db::models::fingerprint_visit_event::FingerprintVisitEvent;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),
@@ -60,7 +69,8 @@ pub async fn post(
                     resp,
                 )?;
 
-                // associate session_id with visitor_id and other identifiers in logs so we can see things in observe
+                // associate session_id with visitor_id and other identifiers in logs so we can see things in
+                // observe
                 tracing::info!(
                     session_id=%format!("{:?}", telemetry_headers.session_id),
                     visitor_id=%visitor_id,

@@ -1,11 +1,16 @@
-use crate::task::{ExecuteTask, TaskError};
+use crate::task::{
+    ExecuteTask,
+    TaskError,
+};
 use async_trait::async_trait;
+use db::models::tenant::Tenant;
+use db::models::tenant_api_key::{
+    ApiKeyListFilters,
+    TenantApiKey,
+};
 use db::{
-    models::{
-        tenant::Tenant,
-        tenant_api_key::{ApiKeyListFilters, TenantApiKey},
-    },
-    DbError, DbPool,
+    DbError,
+    DbPool,
 };
 use newtypes::LogNumTenantApiKeysArgs;
 

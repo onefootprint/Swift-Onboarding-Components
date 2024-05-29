@@ -1,17 +1,31 @@
-use actix_web::{post, web, web::Json};
-use api_core::{
-    auth::{
-        session::{tenant::FirmEmployeeSession, AuthSessionData, GetSessionForUpdate},
-        tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
-        AuthError,
-    },
-    errors::ApiResult,
-    types::{JsonApiResponse, ResponseData},
-    utils::{db2api::DbToApi, session::AuthSession},
-    State,
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
 };
+use api_core::auth::session::tenant::FirmEmployeeSession;
+use api_core::auth::session::{
+    AuthSessionData,
+    GetSessionForUpdate,
+};
+use api_core::auth::tenant::{
+    FirmEmployeeAuthContext,
+    FirmEmployeeGuard,
+};
+use api_core::auth::AuthError;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::session::AuthSession;
+use api_core::State;
 use db::models::tenant::Tenant;
-use newtypes::{SessionAuthToken, TenantId};
+use newtypes::{
+    SessionAuthToken,
+    TenantId,
+};
 
 #[derive(Debug, serde::Deserialize)]
 struct AssumeRequest {
@@ -37,7 +51,8 @@ async fn post(
     let tenant_id = request.into_inner().tenant_id;
 
     // We have this custom logic for the integration testing user to limit who they can impersonate.
-    // We don't want the integration testing user to be able to have unlimited read access to all tenants.
+    // We don't want the integration testing user to be able to have unlimited read access to all
+    // tenants.
     if firm_employee.email.is_integration_test_email() && !tenant_id.is_integration_test_tenant() {
         return Err(AuthError::NotAllowedForIntegrationTestUser.into());
     }

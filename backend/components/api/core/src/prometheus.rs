@@ -1,9 +1,10 @@
-use std::collections::HashMap;
-
-use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
-use gethostname::gethostname;
-
 use crate::config::Config;
+use actix_web_prom::{
+    PrometheusMetrics,
+    PrometheusMetricsBuilder,
+};
+use gethostname::gethostname;
+use std::collections::HashMap;
 
 #[allow(clippy::expect_used)]
 pub fn init(config: &Config) -> PrometheusMetrics {

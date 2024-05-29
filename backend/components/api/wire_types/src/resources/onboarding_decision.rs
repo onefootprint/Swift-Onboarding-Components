@@ -1,6 +1,10 @@
 use crate::*;
 use newtypes::{
-    CollectedDataOption, DecisionStatus, ObConfigurationId, OnboardingDecisionId, RuleSetResultId,
+    CollectedDataOption,
+    DecisionStatus,
+    ObConfigurationId,
+    OnboardingDecisionId,
+    RuleSetResultId,
 };
 
 /// Describes the outcome of an onboarding decision that took place on the user

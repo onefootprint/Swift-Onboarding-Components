@@ -63,7 +63,11 @@ mod test {
     use chrono::Utc;
     use db::models::data_lifetime::DataLifetime;
     use newtypes::{
-        DataLifetimeId, DataLifetimeSeqno, DataLifetimeSource, IdentityDataKind as IDK, ScopedVaultId,
+        DataLifetimeId,
+        DataLifetimeSeqno,
+        DataLifetimeSource,
+        IdentityDataKind as IDK,
+        ScopedVaultId,
         VaultId,
     };
     use test_case::test_case;
@@ -108,7 +112,7 @@ mod test {
         ] => vec![
             // Everything from first address EXCEPT the line 2
             ("sv_id1".into(), IDK::AddressLine1, 1),
-            // Filtered out the AddressLine2 here. 
+            // Filtered out the AddressLine2 here.
             // Also City, State, and Zip just because they're optional for international addresses.
             // Won't affect the reads because we have the full address added at seqno2
             ("sv_id1".into(), IDK::Country, 1),

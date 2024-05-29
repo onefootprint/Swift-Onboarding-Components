@@ -1,5 +1,9 @@
 use crate::*;
-use newtypes::{D2pSessionStatus, HandoffMetadata, SessionAuthToken};
+use newtypes::{
+    D2pSessionStatus,
+    HandoffMetadata,
+    SessionAuthToken,
+};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct D2pUpdateStatusRequest {

@@ -1,21 +1,40 @@
-use super::{Any, Business, VaultWrapper, WriteableVw};
-use crate::utils::vault_wrapper::{Person, VwArgs};
-use db::{
-    models::{
-        data_lifetime::DataLifetime,
-        user_timeline::UserTimeline,
-        vault_data::{NewVaultData, VaultData},
-    },
-    tests::{fixtures, prelude::*},
+use super::{
+    Any,
+    Business,
+    VaultWrapper,
+    WriteableVw,
 };
+use crate::utils::vault_wrapper::{
+    Person,
+    VwArgs,
+};
+use db::models::data_lifetime::DataLifetime;
+use db::models::user_timeline::UserTimeline;
+use db::models::vault_data::{
+    NewVaultData,
+    VaultData,
+};
+use db::tests::fixtures;
+use db::tests::prelude::*;
 use itertools::Itertools;
 use macros::db_test;
 use newtypes::{
-    BusinessDataKind as BDK, DataIdentifier, DataLifetimeSource, DocumentDiKind, DocumentSide, IdDocKind,
-    IdentityDataKind as IDK, InvestorProfileKind as IPK, KvDataKey, PiiString, S3Url, SealedVaultBytes,
+    BusinessDataKind as BDK,
+    DataIdentifier,
+    DataLifetimeSource,
+    DocumentDiKind,
+    DocumentSide,
+    IdDocKind,
+    IdentityDataKind as IDK,
+    InvestorProfileKind as IPK,
+    KvDataKey,
+    PiiString,
+    S3Url,
+    SealedVaultBytes,
     VaultDataFormat,
 };
-use std::{collections::HashSet, str::FromStr};
+use std::collections::HashSet;
+use std::str::FromStr;
 
 #[db_test]
 fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
@@ -955,8 +974,8 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
 
 #[db_test]
 fn test_portable_view(conn: &mut TestPgConn) {
-    // Create a vault that has a portablized address from tenant1, then portablized address from tenant 2.
-    // Make sure we choose the correct address line2
+    // Create a vault that has a portablized address from tenant1, then portablized address from tenant
+    // 2. Make sure we choose the correct address line2
     let tenant1 = db::tests::fixtures::tenant::create(conn);
     let tenant2 = db::tests::fixtures::tenant::create(conn);
     let pb1 = db::tests::fixtures::ob_configuration::create(conn, &tenant1.id, true);

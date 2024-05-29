@@ -1,13 +1,22 @@
-use crate::errors::{proxy::VaultProxyError, ApiResult};
+use crate::errors::proxy::VaultProxyError;
+use crate::errors::ApiResult;
 use futures_util::future::FutureExt;
-use hyper::{
-    client::connect::dns::{GaiResolver as HyperGaiResolver, Name},
-    service::Service,
+use hyper::client::connect::dns::{
+    GaiResolver as HyperGaiResolver,
+    Name,
 };
-use reqwest::dns::{Addrs, Resolve, Resolving};
-use std::{
-    error::Error,
-    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
+use hyper::service::Service;
+use reqwest::dns::{
+    Addrs,
+    Resolve,
+    Resolving,
+};
+use std::error::Error;
+use std::net::{
+    IpAddr,
+    Ipv4Addr,
+    Ipv6Addr,
+    SocketAddr,
 };
 
 pub fn validate_safe_url(url: &url::Url) -> ApiResult<()> {

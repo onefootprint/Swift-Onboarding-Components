@@ -1,10 +1,13 @@
-use std::{marker::PhantomData, pin::Pin};
-
-use actix_web::{web, FromRequest};
+use crate::auth::AuthError;
+use crate::State;
+use actix_web::{
+    web,
+    FromRequest,
+};
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
-
-use crate::{auth::AuthError, State};
+use std::marker::PhantomData;
+use std::pin::Pin;
 
 /// Protected custodian context guards protected custodian APIs
 #[derive(Debug, Clone, Apiv2Security)]

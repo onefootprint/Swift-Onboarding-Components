@@ -1,16 +1,22 @@
 use crate::errors::ApiError;
+use actix_web::dev::Payload;
+use actix_web::error::{
+    Error as ActixError,
+    JsonPayloadError,
+};
+use actix_web::web::JsonBody;
 use actix_web::{
-    dev::Payload,
-    error::{Error as ActixError, JsonPayloadError},
-    web::JsonBody,
-    FromRequest, HttpRequest,
+    FromRequest,
+    HttpRequest,
 };
 use futures::Future;
 use paperclip::v2::schema::Apiv2Schema;
 use serde::de::DeserializeOwned;
-use std::{
-    pin::Pin,
-    task::{ready, Context, Poll},
+use std::pin::Pin;
+use std::task::{
+    ready,
+    Context,
+    Poll,
 };
 
 /// Just like Actix's Json, but custom size limit represented in the type
@@ -39,9 +45,8 @@ impl<T: DeserializeOwned, const LIMIT: usize> FromRequest for LargeJson<T, LIMIT
 /// Code adapted from actix's json.rs
 /// to poll the json parsing future
 mod actix_json {
-    use crate::ApiErrorKind;
-
     use super::*;
+    use crate::ApiErrorKind;
 
     fn err_handler(err: JsonPayloadError) -> ActixError {
         actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidJsonBody(err)))

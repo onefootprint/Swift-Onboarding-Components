@@ -1,23 +1,35 @@
-use api_core::{errors::ApiResult, State};
-use app_attest::{
-    error::AttestationError,
-    google::{
-        integrity_verdict::{AppLicensingVerdict, AppRecognitionVerdict, DeviceRecognitionVerdict},
-        GoogleAppAttestationVerifier, IntegrityVerdictWithRawResponse, PlayIntegrityTokenError,
-    },
+use api_core::errors::ApiResult;
+use api_core::State;
+use app_attest::error::AttestationError;
+use app_attest::google::integrity_verdict::{
+    AppLicensingVerdict,
+    AppRecognitionVerdict,
+    DeviceRecognitionVerdict,
+};
+use app_attest::google::{
+    GoogleAppAttestationVerifier,
+    IntegrityVerdictWithRawResponse,
+    PlayIntegrityTokenError,
 };
 use chrono::Utc;
 use crypto::base64;
-use db::{
-    models::{
-        google_device_attest::{GoogleDeviceMetadata, NewGoogleDeviceAttestation},
-        tenant::Tenant,
-        tenant_android_app_meta::{TenantAndroidAppFilters, TenantAndroidAppMeta},
-        webauthn_credential::WebauthnCredential,
-    },
-    DbResult,
+use db::models::google_device_attest::{
+    GoogleDeviceMetadata,
+    NewGoogleDeviceAttestation,
 };
-use newtypes::{AndroidAppLicense, AndroidAppRecognition, AndroidDeviceIntegrityLevel, VaultId};
+use db::models::tenant::Tenant;
+use db::models::tenant_android_app_meta::{
+    TenantAndroidAppFilters,
+    TenantAndroidAppMeta,
+};
+use db::models::webauthn_credential::WebauthnCredential;
+use db::DbResult;
+use newtypes::{
+    AndroidAppLicense,
+    AndroidAppRecognition,
+    AndroidDeviceIntegrityLevel,
+    VaultId,
+};
 
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]

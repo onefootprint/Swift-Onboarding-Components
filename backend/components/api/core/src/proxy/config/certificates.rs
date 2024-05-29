@@ -1,9 +1,11 @@
-use crate::errors::{proxy::VaultProxyError, ApiError, ApiResult};
-use actix_web::http::header::HeaderMap;
-
-use std::fmt::Debug;
-
 use super::ProxyHeaderParams;
+use crate::errors::proxy::VaultProxyError;
+use crate::errors::{
+    ApiError,
+    ApiResult,
+};
+use actix_web::http::header::HeaderMap;
+use std::fmt::Debug;
 
 /// Client certificate authentication to use for the upstream proxy
 #[derive(Clone)]

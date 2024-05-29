@@ -1,62 +1,106 @@
-use std::{sync::Arc, time::Duration};
-
-use crate::{
-    config::Config,
-    enclave_client::EnclaveClient,
-    errors::ApiError,
-    fingerprinter::AwsHmacClient,
-    metrics::Metrics,
-    s3::{self, S3Client},
-    utils::{email::SendgridClient, sms::SmsClient},
-    vendor_clients::VendorClients,
-    GIT_HASH,
+use crate::config::Config;
+use crate::enclave_client::EnclaveClient;
+use crate::errors::ApiError;
+use crate::fingerprinter::AwsHmacClient;
+use crate::metrics::Metrics;
+use crate::s3::{
+    self,
+    S3Client,
 };
-use crypto::aead::ScopedSealingKey;
-use db::{tests::MockFFClient, DbPool};
-use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
-use idv::{
-    fingerprintjs::client::FingerprintJSClient,
-    footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
-    idology::client::IdologyClient,
-    middesk::client::MiddeskClient,
-    socure::client::SocureClient,
-    stytch::client::StytchClient,
-};
-
-use selfie_doc::AwsSelfieDocClient;
-use twilio::TwilioConfig;
-use webhooks::WebhookClient;
-use workos::{ApiKey, WorkOs};
-
+use crate::utils::email::SendgridClient;
+use crate::utils::sms::SmsClient;
 #[cfg(test)]
 use crate::vendor_clients::VendorClient;
+use crate::vendor_clients::VendorClients;
+use crate::GIT_HASH;
+use crypto::aead::ScopedSealingKey;
+use db::tests::MockFFClient;
+use db::DbPool;
+use feature_flag::{
+    FeatureFlagClient,
+    LaunchDarklyFeatureFlagClient,
+};
+use idv::fingerprintjs::client::FingerprintJSClient;
+use idv::footprint_http_client::{
+    FootprintVendorHttpClient,
+    FpVendorClientArgs,
+};
+use idv::idology::client::IdologyClient;
+use idv::middesk::client::MiddeskClient;
+use idv::socure::client::SocureClient;
+use idv::stytch::client::StytchClient;
 #[cfg(test)]
 use idv::{
-    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
-    idology::pa::{IdologyPaAPIResponse, IdologyPaRequest},
-    idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
-    incode::watchlist::{response::UpdatedWatchlistResultResponse, IncodeUpdatedWatchlistResultRequest},
+    experian::{
+        ExperianCrossCoreRequest,
+        ExperianCrossCoreResponse,
+    },
+    idology::pa::{
+        IdologyPaAPIResponse,
+        IdologyPaRequest,
+    },
+    idology::{
+        IdologyExpectIDAPIResponse,
+        IdologyExpectIDRequest,
+    },
+    incode::watchlist::{
+        response::UpdatedWatchlistResultResponse,
+        IncodeUpdatedWatchlistResultRequest,
+    },
     incode::{
         doc::{
             response::{
-                AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
-                FetchScoresResponse, GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
+                AddConsentResponse,
+                AddSelfieResponse,
+                AddSideResponse,
+                FetchOCRResponse,
+                FetchScoresResponse,
+                GetOnboardingStatusResponse,
+                ProcessFaceResponse,
+                ProcessIdResponse,
             },
-            IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
-            IncodeAddPrivacyConsentRequest, IncodeAddSelfieRequest, IncodeFetchOCRRequest,
-            IncodeFetchScoresRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
+            IncodeAddBackRequest,
+            IncodeAddFrontRequest,
+            IncodeAddMLConsentRequest,
+            IncodeAddPrivacyConsentRequest,
+            IncodeAddSelfieRequest,
+            IncodeFetchOCRRequest,
+            IncodeFetchScoresRequest,
+            IncodeGetOnboardingStatusRequest,
+            IncodeProcessFaceRequest,
             IncodeProcessIdRequest,
         },
         response::OnboardingStartResponse,
-        watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
-        IncodeResponse, IncodeStartOnboardingRequest,
+        watchlist::{
+            response::WatchlistResultResponse,
+            IncodeWatchlistCheckRequest,
+        },
+        IncodeResponse,
+        IncodeStartOnboardingRequest,
     },
     middesk::{
-        MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, MiddeskGetBusinessRequest,
+        MiddeskCreateBusinessRequest,
+        MiddeskCreateBusinessResponse,
+        MiddeskGetBusinessRequest,
         MiddeskGetBusinessResponse,
     },
-    socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
-    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
+    socure::{
+        SocureIDPlusAPIResponse,
+        SocureIDPlusRequest,
+    },
+    twilio::{
+        TwilioLookupV2APIResponse,
+        TwilioLookupV2Request,
+    },
+};
+use selfie_doc::AwsSelfieDocClient;
+use std::sync::Arc;
+use std::time::Duration;
+use twilio::TwilioConfig;
+use webhooks::WebhookClient;
+use workos::{
+    ApiKey,
+    WorkOs,
 };
 
 #[derive(Clone)]
@@ -86,7 +130,8 @@ impl State {
     #[cfg(test)]
     #[allow(clippy::expect_used)]
     pub async fn test_state() -> Self {
-        use crate::{s3::MockS3Client, utils::mock_enclave::MockEnclave};
+        use crate::s3::MockS3Client;
+        use crate::utils::mock_enclave::MockEnclave;
         use webhooks::MockWebhookClient;
         let config = Config::load_from_env().expect("failed to load config");
 
@@ -96,7 +141,8 @@ impl State {
 
         // by default, the ff_client on a test state will just return the default
         s.set_ff_client(MockFFClient::new().into_mock());
-        // by default, any s3 calls will be stubbed out and a test will fail unless you mock or update this to use a client with local aws creds
+        // by default, any s3 calls will be stubbed out and a test will fail unless you mock or update this
+        // to use a client with local aws creds
         s.set_s3_client(Arc::new(MockS3Client::new()));
 
         // by default, the webhook_client on a test state will expect anything
@@ -218,7 +264,8 @@ impl State {
             panic!("should not have experian credentials in anything other than local or production!")
         }
 
-        // API path interpolation requires base_url to not end in '/' or else we'll get errors from Incode (`Missing Authentication Token`, argoff can explain why we get that error if interested)
+        // API path interpolation requires base_url to not end in '/' or else we'll get errors from Incode
+        // (`Missing Authentication Token`, argoff can explain why we get that error if interested)
         // TODO: more intelligently do this in incode client code perhaps
         if config.incode.base_url.leak_to_string().ends_with('/') {
             panic!("config.incode.base_url cannot end with /")
@@ -558,14 +605,20 @@ impl State {
 
 #[cfg(test)]
 mod test {
-    use feature_flag::{BoolFlag, MockFeatureFlagClient};
-    use idv::socure::SocureIDPlusRequest;
-    use macros::{test_state, test_state_case};
-    use newtypes::IdvData;
-
     use super::*;
     use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-    use db::{models::tenant::Tenant, tests::test_db_pool::TestDbPool};
+    use db::models::tenant::Tenant;
+    use db::tests::test_db_pool::TestDbPool;
+    use feature_flag::{
+        BoolFlag,
+        MockFeatureFlagClient,
+    };
+    use idv::socure::SocureIDPlusRequest;
+    use macros::{
+        test_state,
+        test_state_case,
+    };
+    use newtypes::IdvData;
 
     #[test_state]
     async fn test_test_state(state: &mut State) {

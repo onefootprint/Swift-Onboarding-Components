@@ -1,17 +1,26 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
 };
-use api_core::{
-    auth::tenant::SecretTenantAuthContext,
-    errors::ApiResult,
-    types::{EmptyResponse, JsonApiResponse, ResponseData},
-    utils::fp_id_path::FpIdPath,
+use crate::State;
+use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
+    ResponseData,
 };
+use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::CreateLabelRequest;
-use db::models::{scoped_vault::ScopedVault, scoped_vault_label::ScopedVaultLabel};
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault_label::ScopedVaultLabel;
 use newtypes::PreviewApi;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(description = "Update a user's label", tags(Users, Preview))]
 #[actix::post("/users/{fp_id}/label")]

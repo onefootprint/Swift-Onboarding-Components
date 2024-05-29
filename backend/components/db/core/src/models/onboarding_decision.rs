@@ -1,22 +1,50 @@
-use std::collections::HashMap;
-
-use super::{
-    manual_review::{ManualReview, ManualReviewArgs},
-    ob_configuration::ObConfiguration,
-    user_timeline::UserTimeline,
+use super::manual_review::{
+    ManualReview,
+    ManualReviewArgs,
 };
-use crate::{actor, actor::SaturatedActor, models::workflow::Workflow, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use super::ob_configuration::ObConfiguration;
+use super::user_timeline::UserTimeline;
+use crate::actor::SaturatedActor;
+use crate::models::workflow::Workflow;
+use crate::{
+    actor,
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::{
-    manual_review, onboarding_decision, onboarding_decision_verification_result_junction, scoped_vault,
+    manual_review,
+    onboarding_decision,
+    onboarding_decision_verification_result_junction,
+    scoped_vault,
     workflow,
 };
-use diesel::{dsl::not, prelude::*, Insertable, Queryable};
+use diesel::dsl::not;
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use newtypes::{
-    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, FpId, OnboardingDecisionId,
-    OnboardingDecisionInfo, RuleSetResultId, ScopedVaultId, TenantId, VaultId, VerificationResultId,
+    AnnotationId,
+    DataLifetimeSeqno,
+    DbActor,
+    DecisionStatus,
+    FpId,
+    OnboardingDecisionId,
+    OnboardingDecisionInfo,
+    RuleSetResultId,
+    ScopedVaultId,
+    TenantId,
+    VaultId,
+    VerificationResultId,
     WorkflowId,
 };
+use std::collections::HashMap;
 
 pub type FailedForDocReview = bool;
 
@@ -33,8 +61,8 @@ pub struct OnboardingDecision {
     pub actor: DbActor,
     pub seqno: Option<DataLifetimeSeqno>,
     pub workflow_id: WorkflowId,
-    /// If this is an OBD from a workflow, this will be the corresponding rule result making that decision
-    /// Note: this is NOT currently backfilled so will be null for historical workflows
+    /// If this is an OBD from a workflow, this will be the corresponding rule result making that
+    /// decision Note: this is NOT currently backfilled so will be null for historical workflows
     pub rule_set_result_id: Option<RuleSetResultId>,
     /// When true, the user had a document manual review. If no other rule action was matched,
     /// we would fail the user.
@@ -148,7 +176,10 @@ impl OnboardingDecision {
         conn: &mut PgConn,
         ids: Vec<&OnboardingDecisionId>,
     ) -> DbResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
-        use db_schema::schema::{ob_configuration, workflow};
+        use db_schema::schema::{
+            ob_configuration,
+            workflow,
+        };
         let results: Vec<(Self, (Workflow, ObConfiguration), Option<ManualReview>)> =
             onboarding_decision::table
                 .inner_join(workflow::table.inner_join(ob_configuration::table))

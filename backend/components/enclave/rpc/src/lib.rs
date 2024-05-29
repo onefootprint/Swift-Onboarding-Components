@@ -1,10 +1,15 @@
-use std::fmt::Debug;
-
-use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
-
+use byteorder::{
+    BigEndian,
+    ByteOrder,
+    WriteBytesExt,
+};
 use serde::Serialize;
+use std::fmt::Debug;
 use thiserror::Error;
-use tokio::io::{AsyncRead, AsyncReadExt};
+use tokio::io::{
+    AsyncRead,
+    AsyncReadExt,
+};
 
 mod request;
 mod response;
@@ -12,7 +17,9 @@ mod transform;
 pub use transform::*;
 
 mod types;
-pub use self::{request::*, response::*, types::*};
+pub use self::request::*;
+pub use self::response::*;
+pub use self::types::*;
 
 #[derive(Debug, Clone)]
 pub struct WireMessage {

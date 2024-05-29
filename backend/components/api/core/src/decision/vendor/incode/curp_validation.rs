@@ -1,53 +1,88 @@
-use std::collections::HashMap;
-
-use db::{
-    models::{
-        billing_event::BillingEvent,
-        decision_intent::DecisionIntent,
-        document::{Document, DocumentUpdate},
-        document_request::DocumentRequest,
-        incode_verification_session::IncodeVerificationSession,
-        ob_configuration::ObConfiguration,
-        risk_signal::{NewRiskSignalInfo, RiskSignal},
-        risk_signal_group::RiskSignalGroup,
-        scoped_vault::ScopedVault,
-        verification_request::VerificationRequest,
-    },
-    TxnPgConn,
+use super::common::call_start_onboarding;
+use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::decision::vendor::verification_result::{
+    self,
+    SaveVerificationResultArgs,
+    ShouldSaveVerificationRequest,
 };
+use crate::decision::{
+    self,
+};
+use crate::enclave_client::EnclaveClient;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    DataLifetimeSources,
+    FingerprintedDataRequest,
+    VaultWrapper,
+    VwArgs,
+    WriteableVw,
+};
+use crate::{
+    ApiError,
+    State,
+};
+use db::models::billing_event::BillingEvent;
+use db::models::decision_intent::DecisionIntent;
+use db::models::document::{
+    Document,
+    DocumentUpdate,
+};
+use db::models::document_request::DocumentRequest;
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::{
+    NewRiskSignalInfo,
+    RiskSignal,
+};
+use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::scoped_vault::ScopedVault;
+use db::models::verification_request::VerificationRequest;
+use db::TxnPgConn;
+use feature_flag::BoolFlag;
+use idv::incode::curp_validation::response::CurpValidationResponse;
+use idv::incode::curp_validation::IncodeCurpValidationRequest;
 use idv::{
-    incode::curp_validation::{response::CurpValidationResponse, IncodeCurpValidationRequest},
-    ParsedResponse, VendorResponse,
+    ParsedResponse,
+    VendorResponse,
 };
 use itertools::Itertools;
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, BillingEventKind, DataIdentifier, DataLifetimeSeqno,
-    DataLifetimeSource, DataRequest, DecisionIntentId, DocumentDiKind, DocumentFixtureResult, DocumentId,
-    DocumentKind, DocumentRequestKind, FootprintReasonCode, IdDocKind, IncodeConfigurationId,
-    IncodeEnvironment, IncodeFailureReason, IncodeSessionId, IncodeVerificationSessionKind,
-    Iso3166TwoDigitCountryCode, OcrDataKind as ODK, PiiJsonValue, PiiString, RiskSignalGroupKind,
-    ScopedVaultId, TenantId, ValidateArgs, VaultPublicKey, VendorAPI, VerificationResultId, WorkflowId,
+    BillingEventKind,
+    DataIdentifier,
+    DataLifetimeSeqno,
+    DataLifetimeSource,
+    DataRequest,
+    DecisionIntentId,
+    DocumentDiKind,
+    DocumentFixtureResult,
+    DocumentId,
+    DocumentKind,
+    DocumentRequestKind,
+    FootprintReasonCode,
+    IdDocKind,
+    IncodeConfigurationId,
+    IncodeEnvironment,
+    IncodeFailureReason,
+    IncodeSessionId,
+    IncodeVerificationSessionKind,
+    Iso3166TwoDigitCountryCode,
+    OcrDataKind as ODK,
+    PiiJsonValue,
+    PiiString,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+    TenantId,
+    ValidateArgs,
+    VaultPublicKey,
+    VendorAPI,
+    VerificationResultId,
+    WorkflowId,
 };
-
-use super::common::call_start_onboarding;
-use crate::{
-    decision::{
-        self,
-        vendor::{
-            map_to_api_error,
-            tenant_vendor_control::TenantVendorControl,
-            vendor_result::VendorResult,
-            verification_result::{self, SaveVerificationResultArgs, ShouldSaveVerificationRequest},
-        },
-    },
-    enclave_client::EnclaveClient,
-    errors::ApiResult,
-    utils::vault_wrapper::{
-        Any, DataLifetimeSources, FingerprintedDataRequest, VaultWrapper, VwArgs, WriteableVw,
-    },
-    ApiError, State,
-};
-use feature_flag::BoolFlag;
+use std::collections::HashMap;
 
 #[tracing::instrument(skip(state, di))]
 pub async fn run_curp_validation_check(
@@ -271,7 +306,8 @@ impl DocumentForCurpHelper {
     }
 
     // TODO: we need to incorporate UseIncodeDemoCredentialsInLivemode
-    //    -- if we flip the flag to use Incode demo creds in prod? I'm not sure validations will work there...? Does this actually do anything w/ Renapo in demo?
+    //    -- if we flip the flag to use Incode demo creds in prod? I'm not sure validations will work
+    // there...? Does this actually do anything w/ Renapo in demo?
     #[tracing::instrument(skip_all)]
     pub fn get_incode_environment(
         &self,
@@ -288,7 +324,8 @@ impl DocumentForCurpHelper {
             && matches!(fixture, Some(DocumentFixtureResult::Real),);
 
         if is_sandbox {
-            // TODO: Does this actually do anything w/ Renapo? Check w/ incode. maybe should just return sandbox responses always
+            // TODO: Does this actually do anything w/ Renapo? Check w/ incode. maybe should just return
+            // sandbox responses always
             if can_make_incode_request_in_sandbox {
                 Some(IncodeEnvironment::Demo)
             } else {
@@ -305,8 +342,8 @@ impl DocumentForCurpHelper {
 }
 
 // TODO: upstream this?
-// These are configurations that _only_ have the CURP validation module enabled, so we don't change, for example, our selfie flowID and forget to
-// add CURP
+// These are configurations that _only_ have the CURP validation module enabled, so we don't change,
+// for example, our selfie flowID and forget to add CURP
 fn get_config_id(env: IncodeEnvironment) -> IncodeConfigurationId {
     let flow_id = match env {
         IncodeEnvironment::Demo => "65e241cbac19b78faa5d22e3",
@@ -317,15 +354,20 @@ fn get_config_id(env: IncodeEnvironment) -> IncodeConfigurationId {
 }
 
 // Retrieve a CURP from the vault for the latest document that we got from incode.
-// In the future we maybe can vault CURP under `id.curp`, but this introduced complexity of needing to know situations in which we should run CURP validation
+// In the future we maybe can vault CURP under `id.curp`, but this introduced complexity of needing
+// to know situations in which we should run CURP validation
 //
 // Ex1: suppose a Tenant is onboarding a user and getting CURP via collecting a document:
 // 1. they provide a Voter ID which has CURP, we vault in `id.curp` we run CURP validation
-// 2. now they are asked to provide a new document, and they give a passport which _doesn't_ have CURP. we don't change the data associated with `id.curp`
-// 3. now how do we know if we are supposed to run curp validation or not run it? One way would be to keep track of which documents have CURP, but the most straightforward
-//    is to just pull from the latest identity document and see if we have a CURP OCRd, otherwise we automatically won't do anything
+// 2. now they are asked to provide a new document, and they give a passport which _doesn't_ have
+//    CURP. we don't change the data associated with `id.curp`
+// 3. now how do we know if we are supposed to run curp validation or not run it? One way would be
+//    to keep track of which documents have CURP, but the most straightforward is to just pull from
+//    the latest identity document and see if we have a CURP OCRd, otherwise we automatically won't
+//    do anything
 //
-// Ex2: If we add curp to `must_collect`, it's a little more straightforward since we expect this to be collected by the time we get to vendor calls in the workflow
+// Ex2: If we add curp to `must_collect`, it's a little more straightforward since we expect this to
+// be collected by the time we get to vendor calls in the workflow
 #[tracing::instrument(skip_all)]
 async fn get_curp_for_check(
     enclave_client: &EnclaveClient,
@@ -346,8 +388,8 @@ async fn get_curp_for_check(
 
         let di = DataIdentifier::from(DocumentDiKind::OcrData(vaulted_document_type, ODK::Curp));
         // We should always get CURP on a voter ID
-        // TODO: In the future we could have a risk signal or something for this i suppose. arguably this should go before the decryption, but just to observe incode
-        // weirdness
+        // TODO: In the future we could have a risk signal or something for this i suppose. arguably this
+        // should go before the decryption, but just to observe incode weirdness
         let decrypted_curp = if vw.get(&di).is_some() {
             vw.decrypt_unchecked_single(enclave_client, di).await?
         } else {

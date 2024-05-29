@@ -1,16 +1,23 @@
-use actix_web::{dev::Payload, FromRequest, HttpRequest};
-use futures::Future;
-use paperclip::{
-    actix::web,
-    v2::{models::DataTypeFormat, schema::Apiv2Schema},
-};
-use std::{
-    pin::Pin,
-    task::{ready, Context, Poll},
-};
-pub use web::{Bytes, BytesMut};
-
 use crate::ApiError;
+use actix_web::dev::Payload;
+use actix_web::{
+    FromRequest,
+    HttpRequest,
+};
+use futures::Future;
+use paperclip::actix::web;
+use paperclip::v2::models::DataTypeFormat;
+use paperclip::v2::schema::Apiv2Schema;
+use std::pin::Pin;
+use std::task::{
+    ready,
+    Context,
+    Poll,
+};
+pub use web::{
+    Bytes,
+    BytesMut,
+};
 
 /// Just like Actix's bytes, but custom size limit represented in the type
 #[derive(derive_more::Deref, derive_more::DerefMut)]
@@ -52,10 +59,10 @@ pub enum InvalidBodyError {
 }
 /// adapted from actix_web payload.rs to control limits per request
 mod actix_bytes {
-    use actix_web::{dev, http::header};
-    use futures_util::Stream;
-
     pub use super::*;
+    use actix_web::dev;
+    use actix_web::http::header;
+    use futures_util::Stream;
 
     /// Future for `Bytes` extractor.
     pub struct BytesExtractFut<const LIMIT: usize> {

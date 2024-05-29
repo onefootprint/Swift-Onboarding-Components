@@ -1,25 +1,50 @@
+use crate::models::compliance_doc::ComplianceDoc;
+use crate::models::compliance_doc_assignment::ComplianceDocAssignment;
+use crate::models::compliance_doc_request::ComplianceDocRequest;
+use crate::models::compliance_doc_review::ComplianceDocReview;
+use crate::models::compliance_doc_submission::ComplianceDocSubmission;
+use crate::models::partner_tenant::PartnerTenant;
+use crate::models::tenant::Tenant;
+use crate::models::tenant_compliance_partnership::TenantCompliancePartnership;
+use crate::models::tenant_user::TenantUser;
 use crate::{
-    models::{
-        compliance_doc::ComplianceDoc, compliance_doc_assignment::ComplianceDocAssignment,
-        compliance_doc_request::ComplianceDocRequest, compliance_doc_review::ComplianceDocReview,
-        compliance_doc_submission::ComplianceDocSubmission, partner_tenant::PartnerTenant, tenant::Tenant,
-        tenant_compliance_partnership::TenantCompliancePartnership, tenant_user::TenantUser,
-    },
-    DbError, DbResult, PgConn,
+    DbError,
+    DbResult,
+    PgConn,
 };
-use chrono::{DateTime, Utc};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::{
-    compliance_doc, compliance_doc_assignment, compliance_doc_request, compliance_doc_review,
-    compliance_doc_submission, partner_tenant, tenant, tenant_compliance_partnership,
+    compliance_doc,
+    compliance_doc_assignment,
+    compliance_doc_request,
+    compliance_doc_review,
+    compliance_doc_submission,
+    partner_tenant,
+    tenant,
+    tenant_compliance_partnership,
 };
 use diesel::prelude::*;
 use itertools::chain;
 use newtypes::{
-    ComplianceDocAssignmentId, ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewDecision,
-    ComplianceDocReviewId, ComplianceDocStatus, ComplianceDocSubmissionId, OrgIdentifierRef,
-    TenantCompliancePartnershipId, TenantKind, TenantUserId,
+    ComplianceDocAssignmentId,
+    ComplianceDocId,
+    ComplianceDocRequestId,
+    ComplianceDocReviewDecision,
+    ComplianceDocReviewId,
+    ComplianceDocStatus,
+    ComplianceDocSubmissionId,
+    OrgIdentifierRef,
+    TenantCompliancePartnershipId,
+    TenantKind,
+    TenantUserId,
 };
-use std::collections::{HashMap, HashSet};
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 
 #[derive(Debug, Clone)]
 pub struct ComplianceDocSummary {
@@ -300,15 +325,18 @@ impl ComplianceDocSummary {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        models::{
-            partner_tenant::{NewPartnerTenant, PartnerTenant},
-            tenant::Tenant,
-        },
-        tests::{fixtures, prelude::*},
+    use crate::models::partner_tenant::{
+        NewPartnerTenant,
+        PartnerTenant,
     };
+    use crate::models::tenant::Tenant;
+    use crate::tests::fixtures;
+    use crate::tests::prelude::*;
     use macros::db_test;
-    use newtypes::{EncryptedVaultPrivateKey, VaultPublicKey};
+    use newtypes::{
+        EncryptedVaultPrivateKey,
+        VaultPublicKey,
+    };
 
     #[db_test]
     fn test_compliance_doc_summary(conn: &mut TestPgConn) {

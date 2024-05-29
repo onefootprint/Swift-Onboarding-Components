@@ -1,9 +1,17 @@
-use crate::{auth::AuthError, errors::ApiError, State};
-use actix_web::{web, FromRequest};
+use crate::auth::AuthError;
+use crate::errors::ApiError;
+use crate::State;
+use actix_web::{
+    web,
+    FromRequest,
+};
 use chrono::Utc;
 use db::models::session::Session;
 use futures_util::Future;
-use newtypes::{PiiString, SessionAuthToken};
+use newtypes::{
+    PiiString,
+    SessionAuthToken,
+};
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 

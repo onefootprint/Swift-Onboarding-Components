@@ -1,14 +1,17 @@
 pub mod client;
 mod conversion;
-use newtypes::{IdvData, PiiJsonValue, PiiString};
+use newtypes::{
+    IdvData,
+    PiiJsonValue,
+    PiiString,
+};
 pub mod reason_code;
 pub mod requirements;
 pub mod response;
+use self::response::SocureIDPlusResponse;
 use serde::de::DeserializeOwned;
 use std::fmt::Display;
 use thiserror::Error;
-
-use self::response::SocureIDPlusResponse;
 
 pub struct SocureIDPlusRequest {
     pub idv_data: IdvData,
@@ -95,13 +98,18 @@ pub enum SocureReqwestError {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
-    use crate::socure::response::{GlobalWatchlist, GlobalWatchlistMatch, GlobalWatchlistMatchComment};
-
     use super::*;
+    use crate::socure::response::{
+        GlobalWatchlist,
+        GlobalWatchlistMatch,
+        GlobalWatchlistMatchComment,
+    };
     use newtypes::ScrubbedPiiString;
-    use serde_json::{json, Value};
+    use serde_json::{
+        json,
+        Value,
+    };
+    use std::collections::HashMap;
 
     #[test]
     fn test_parse_response() {

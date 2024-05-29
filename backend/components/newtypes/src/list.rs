@@ -1,8 +1,16 @@
-use std::{net::IpAddr, str::FromStr};
-
-use crate::{email::Email, ssn::Ssn9, Error, ListKind, NtResult, PhoneNumber, PiiString};
+use crate::email::Email;
+use crate::ssn::Ssn9;
+use crate::{
+    Error,
+    ListKind,
+    NtResult,
+    PhoneNumber,
+    PiiString,
+};
 use email_address::EmailAddress;
 use phonenumber::metadata::DATABASE as PHONE_DB;
+use std::net::IpAddr;
+use std::str::FromStr;
 
 pub enum ListEntryValue {
     EmailAddress(Email),

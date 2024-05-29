@@ -1,14 +1,25 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{JsonApiResponse, ResponseData},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{auth::tenant::AuthActor, errors::tenant::TenantError};
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::auth::tenant::AuthActor;
+use api_core::errors::tenant::TenantError;
 use chrono::Utc;
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::TenantApiKeyId;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     description = "Permanently deactivates an existing tenant API key.",

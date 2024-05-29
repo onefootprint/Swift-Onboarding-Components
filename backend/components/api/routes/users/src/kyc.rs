@@ -1,41 +1,69 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    types::{response::ResponseData, JsonApiResponse},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    decision::state::{actions::WorkflowActions, kyc::KycState, Authorize, WorkflowKind, WorkflowWrapper},
-    errors::{
-        onboarding::{OnboardingError, UnmetRequirements},
-        tenant::TenantError,
-        ApiResult, ValidationError,
-    },
-    task,
-    telemetry::RootSpan,
-    utils::{
-        db2api::DbToApi,
-        fp_id_path::FpIdPath,
-        onboarding::NewOnboardingArgs,
-        requirements::{get_requirements_inner, GetRequirementsArgs, RequirementOpts},
-        vault_wrapper::{Any, VaultWrapper, VwArgs},
-    },
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::decision::state::actions::WorkflowActions;
+use api_core::decision::state::kyc::KycState;
+use api_core::decision::state::{
+    Authorize,
+    WorkflowKind,
+    WorkflowWrapper,
 };
-use api_wire_types::{EntityValidateResponse, SimpleFixtureResult, TriggerKycRequest};
-use db::{
-    models::{
-        liveness_event::NewLivenessEvent,
-        manual_review::ManualReview,
-        ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault,
-        workflow::{Workflow, WorkflowUpdate},
-    },
-    DbError,
+use api_core::errors::onboarding::{
+    OnboardingError,
+    UnmetRequirements,
 };
+use api_core::errors::tenant::TenantError;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::task;
+use api_core::telemetry::RootSpan;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::onboarding::NewOnboardingArgs;
+use api_core::utils::requirements::{
+    get_requirements_inner,
+    GetRequirementsArgs,
+    RequirementOpts,
+};
+use api_core::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+    VwArgs,
+};
+use api_wire_types::{
+    EntityValidateResponse,
+    SimpleFixtureResult,
+    TriggerKycRequest,
+};
+use db::models::liveness_event::NewLivenessEvent;
+use db::models::manual_review::ManualReview;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
+use db::DbError;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifierDiscriminant as DID, ObConfigurationKind, OnboardingRequirement, VaultKind, WorkflowSource,
+    DataIdentifierDiscriminant as DID,
+    ObConfigurationKind,
+    OnboardingRequirement,
+    VaultKind,
+    WorkflowSource,
 };
-use paperclip::actix::{api_v2_operation, post, web};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(description = "Trigger KYC on the provided user.", tags(Users, Preview))]
 #[post("/users/{fp_id}/kyc")]
@@ -159,7 +187,8 @@ pub async fn post(
             }
 
             // /kyc endpoint currently does not properly handle IPK doc requirements!
-            // Also does not check any requirements for the Business vault if this person is a primary BO for a Business
+            // Also does not check any requirements for the Business vault if this person is a primary BO for
+            // a Business
             let reqs =
                 get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, RequirementOpts::default())?;
             // TODO: consolidate with /authorize code

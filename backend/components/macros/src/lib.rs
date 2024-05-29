@@ -1,6 +1,18 @@
 use proc_macro::TokenStream;
-use quote::{format_ident, quote, ToTokens};
-use syn::{parse_macro_input, parse_quote, spanned::Spanned, AttributeArgs, ItemFn, Meta, NestedMeta};
+use quote::{
+    format_ident,
+    quote,
+    ToTokens,
+};
+use syn::spanned::Spanned;
+use syn::{
+    parse_macro_input,
+    parse_quote,
+    AttributeArgs,
+    ItemFn,
+    Meta,
+    NestedMeta,
+};
 use test_case_core::TestCase;
 
 extern crate proc_macro;
@@ -57,8 +69,9 @@ pub fn db_test(args: proc_macro::TokenStream, stream: proc_macro::TokenStream) -
 /// 3. _(Optional)_ Test case description
 /// 4. _(Required)_ Test body
 ///
-///  When _expected result_ is provided, it is compared against the actual value generated with _test body_ using `assert_eq!`.
-/// _Test cases_ that don't provide _expected result_ should contain custom assertions within _test body_ or return `Result` similar to `#[test]` macro.
+///  When _expected result_ is provided, it is compared against the actual value generated with
+/// _test body_ using `assert_eq!`. _Test cases_ that don't provide _expected result_ should contain
+/// custom assertions within _test body_ or return `Result` similar to `#[test]` macro.
 pub fn db_test_case(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
@@ -238,8 +251,9 @@ pub fn test_state(args: proc_macro::TokenStream, stream: proc_macro::TokenStream
 /// 3. _(Optional)_ Test case description
 /// 4. _(Required)_ Test body
 ///
-///  When _expected result_ is provided, it is compared against the actual value generated with _test body_ using `assert_eq!`.
-/// _Test cases_ that don't provide _expected result_ should contain custom assertions within _test body_ or return `Result` similar to `#[test]` macro.
+///  When _expected result_ is provided, it is compared against the actual value generated with
+/// _test body_ using `assert_eq!`. _Test cases_ that don't provide _expected result_ should contain
+/// custom assertions within _test body_ or return `Result` similar to `#[test]` macro.
 pub fn test_state_case(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,

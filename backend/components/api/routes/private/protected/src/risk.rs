@@ -1,52 +1,81 @@
 use crate::ProtectedAuth;
-use actix_web::{
-    post,
-    web::{self, Json},
+use actix_web::post;
+use actix_web::web::{
+    self,
+    Json,
+};
+use api_core::decision::features::risk_signals::{
+    fetch_latest_risk_signals_map,
+    parse_reason_codes_from_vendor_result,
+};
+use api_core::decision::onboarding::Decision;
+use api_core::decision::rule_engine::engine::{
+    EvaluateWorkflowDecisionArgs,
+    VaultDataForRules,
+};
+use api_core::decision::rule_engine::eval::RuleEvalConfig;
+use api_core::decision::rule_engine::{
+    self,
+};
+use api_core::decision::state::common::{
+    self,
+    DecisionOutput,
+};
+use api_core::decision::vendor::get_vendor_apis_for_verification_requests;
+use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use api_core::decision::vendor::vendor_result::VendorResult;
+use api_core::decision::{
+    self,
+};
+use api_core::errors::onboarding::OnboardingError;
+use api_core::errors::{
+    ApiError,
+    ApiResult,
+    AssertionError,
+};
+use api_core::types::response::ResponseData;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::vault_wrapper::{
+    VaultWrapper,
+    VwArgs,
 };
 use api_core::{
-    decision::{
-        self,
-        features::risk_signals::{fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result},
-        onboarding::Decision,
-        rule_engine::{
-            self,
-            engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
-            eval::RuleEvalConfig,
-        },
-        state::common::{self, DecisionOutput},
-        vendor::{
-            get_vendor_apis_for_verification_requests, tenant_vendor_control::TenantVendorControl,
-            vendor_result::VendorResult,
-        },
-    },
-    errors::{onboarding::OnboardingError, ApiError, ApiResult, AssertionError},
     task,
-    types::response::ResponseData,
-    utils::{
-        db2api::DbToApi,
-        vault_wrapper::{VaultWrapper, VwArgs},
-    },
-    ApiErrorKind, State,
+    ApiErrorKind,
+    State,
 };
 use chrono::Utc;
-use db::models::{
-    data_lifetime::DataLifetime,
-    decision_intent::DecisionIntent,
-    ob_configuration::ObConfiguration,
-    risk_signal::RiskSignal,
-    rule_instance::{IncludeRules, RuleInstance},
-    scoped_vault::ScopedVault,
-    verification_request::VerificationRequest,
-    verification_result::VerificationResult,
-    workflow::Workflow,
+use db::models::data_lifetime::DataLifetime;
+use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::RiskSignal;
+use db::models::rule_instance::{
+    IncludeRules,
+    RuleInstance,
 };
+use db::models::scoped_vault::ScopedVault;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::models::workflow::Workflow;
 use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, FpId, RiskSignalGroupKind, RiskSignalId, RuleAction, RuleInstanceKind,
-    RuleSetResultKind, TenantId, VaultKind, Vendor, VendorAPI, VerificationRequestId, VerificationResultId,
+    DecisionIntentId,
+    FpId,
+    RiskSignalGroupKind,
+    RiskSignalId,
+    RuleAction,
+    RuleInstanceKind,
+    RuleSetResultKind,
+    TenantId,
+    VaultKind,
+    Vendor,
+    VendorAPI,
+    VerificationRequestId,
+    VerificationResultId,
     WorkflowId,
 };
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
+use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct MakeVendorCallsRequest {
@@ -155,8 +184,8 @@ pub struct MakeDecisionResponse {
     decision: Decision,
 }
 
-/// Fetches latest risk signals, executes rules against those, and writes a new onboarding decision from the result
-/// For now errors if the decision is StepUp
+/// Fetches latest risk signals, executes rules against those, and writes a new onboarding decision
+/// from the result For now errors if the decision is StepUp
 #[post("/private/protected/risk/make_decision")]
 async fn make_decision(
     state: web::Data<State>,
@@ -275,8 +304,9 @@ async fn shadow_run(
         )))?;
     }
 
-    // calculate_decision currently requires Vec<VendorResult> which we normally get from saving VerificationResult's to PG
-    // since we want to keep things in-memory-only, we manually create VendorResult's here with dummy VerificationResultId's
+    // calculate_decision currently requires Vec<VendorResult> which we normally get from saving
+    // VerificationResult's to PG since we want to keep things in-memory-only, we manually create
+    // VendorResult's here with dummy VerificationResultId's
     #[allow(clippy::unwrap_used)]
     let vendor_result = vendor_results
         .successful

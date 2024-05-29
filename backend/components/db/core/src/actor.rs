@@ -1,14 +1,28 @@
+use crate::models::access_event::AccessEvent;
+use crate::models::annotation::Annotation;
+use crate::models::audit_event::AuditEvent;
+use crate::models::ob_configuration::ObConfiguration;
+use crate::models::onboarding_decision::OnboardingDecision;
+use crate::models::scoped_vault::ScopedVault;
+use crate::models::tenant_api_key::TenantApiKey;
+use crate::models::tenant_user::TenantUser;
 use crate::{
-    models::{
-        access_event::AccessEvent, annotation::Annotation, audit_event::AuditEvent,
-        ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision,
-        scoped_vault::ScopedVault, tenant_api_key::TenantApiKey, tenant_user::TenantUser,
-    },
-    DbError, DbResult, PgConn,
+    DbError,
+    DbResult,
+    PgConn,
 };
-use db_schema::schema::{scoped_vault, tenant_api_key, tenant_user};
+use db_schema::schema::{
+    scoped_vault,
+    tenant_api_key,
+    tenant_user,
+};
 use diesel::prelude::*;
-use newtypes::{DbActor, ScopedVaultId, TenantApiKeyId, TenantUserId};
+use newtypes::{
+    DbActor,
+    ScopedVaultId,
+    TenantApiKeyId,
+    TenantUserId,
+};
 use std::collections::HashMap;
 use tracing::instrument;
 

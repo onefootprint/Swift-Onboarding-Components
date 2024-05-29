@@ -1,10 +1,28 @@
-use crate::{DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::tenant_business_info;
-use diesel::{ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
-use newtypes::{DataLifetimeSeqno, SealedVaultBytes, TenantBusinessInfoId, TenantId};
-
 use super::data_lifetime::DataLifetime;
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::tenant_business_info;
+use diesel::{
+    ExpressionMethods,
+    Insertable,
+    OptionalExtension,
+    QueryDsl,
+    Queryable,
+    RunQueryDsl,
+};
+use newtypes::{
+    DataLifetimeSeqno,
+    SealedVaultBytes,
+    TenantBusinessInfoId,
+    TenantId,
+};
 
 #[derive(Debug, Clone, Queryable, PartialEq, Eq)]
 #[diesel(table_name = tenant_business_info)]

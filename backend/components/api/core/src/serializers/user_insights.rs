@@ -1,9 +1,15 @@
 use api_wire_types::UserInsight;
-use db::models::{
-    insight_event::InsightEvent, neuro_id_analytics_event::NeuroIdAnalyticsEvent, workflow::Workflow,
+use db::models::insight_event::InsightEvent;
+use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
+use db::models::workflow::Workflow;
+use newtypes::{
+    UserInsightScope,
+    UserInsightUnit,
 };
-use newtypes::{UserInsightScope, UserInsightUnit};
-use strum_macros::{Display, EnumString};
+use strum_macros::{
+    Display,
+    EnumString,
+};
 macro_rules! user_insight {
     (
         $(#[$macros:meta])*

@@ -1,13 +1,20 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiResult,
-    types::ResponseData,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::errors::ApiResult;
+use crate::types::ResponseData;
+use crate::State;
 use api_core::types::EmptyResponse;
 use db::models::list::List;
 use newtypes::ListId;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(description = "Delete the List", tags(Lists, Organization, Private))]
 #[actix::delete("/org/lists/{list_id}")]

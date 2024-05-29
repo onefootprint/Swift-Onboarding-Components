@@ -1,28 +1,43 @@
 // for test fixture vendor responses json
 #![recursion_limit = "256"]
-use std::fmt::Debug;
-
 use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
-use idology::{expectid::response::ExpectIDResponse, pa::response::PaResponse};
+use idology::expectid::response::ExpectIDResponse;
+use idology::pa::response::PaResponse;
+use incode::curp_validation::response::CurpValidationResponse;
+use incode::doc::response::{
+    AddConsentResponse,
+    AddCustomerResponse,
+    AddSelfieResponse,
+    AddSideResponse,
+    FetchOCRResponse,
+    FetchScoresResponse,
+    GetOnboardingStatusResponse,
+    ProcessFaceResponse,
+    ProcessIdResponse,
+};
+use incode::response::OnboardingStartResponse;
+use incode::watchlist::response::{
+    UpdatedWatchlistResultResponse,
+    WatchlistResultResponse,
+};
 use incode::{
-    curp_validation::response::CurpValidationResponse,
-    doc::response::{
-        AddConsentResponse, AddCustomerResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
-        FetchScoresResponse, GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
-    },
-    response::OnboardingStartResponse,
-    watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
-    IncodeAPIResult, IncodeClientErrorCustomFailureReasons,
+    IncodeAPIResult,
+    IncodeClientErrorCustomFailureReasons,
 };
 use lexis::response::FlexIdResponse;
-use middesk::response::{
-    business::BusinessResponse,
-    webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse},
+use middesk::response::business::BusinessResponse;
+use middesk::response::webhook::{
+    MiddeskBusinessUpdateWebhookResponse,
+    MiddeskTinRetriedWebhookResponse,
 };
 use neuro_id::response::NeuroIdAnalyticsResponse;
-use newtypes::{PiiJsonValue, VendorAPI};
+use newtypes::{
+    PiiJsonValue,
+    VendorAPI,
+};
 use socure::response::SocureIDPlusResponse;
+use std::fmt::Debug;
 
 pub mod experian;
 pub mod fingerprintjs;
@@ -301,7 +316,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::IncodeAddSelfie(_) => VendorAPI::IncodeAddSelfie,
             ParsedResponse::IncodeWatchlistCheck(_) => VendorAPI::IncodeWatchlistCheck,
             ParsedResponse::IncodeUpdatedWatchlistResult(_) => VendorAPI::IncodeUpdatedWatchlistResult,
-            ParsedResponse::IncodeRawResponse(_) => VendorAPI::IncodeGetOnboardingStatus, // TODO: i think we decided we'd remove IncodeRawResponse
+            ParsedResponse::IncodeRawResponse(_) => VendorAPI::IncodeGetOnboardingStatus, /* TODO: i think we decided we'd remove IncodeRawResponse */
             ParsedResponse::IncodeGetOnboardingStatus(_) => VendorAPI::IncodeGetOnboardingStatus,
             ParsedResponse::IncodeProcessFace(_) => VendorAPI::IncodeProcessFace,
             ParsedResponse::StytchLookup(_) => VendorAPI::StytchLookup,
@@ -317,8 +332,10 @@ impl From<&ParsedResponse> for VendorAPI {
     }
 }
 
-// Experian and Idology throw a hard error on last names <2 char length. This is a silly hack which will append hyphens to such names so we can at least do a successful
-// vendor call to proceed the workflow and also for the chance that an id can be located (even if we get back name does not reason codes)
+// Experian and Idology throw a hard error on last names <2 char length. This is a silly hack which
+// will append hyphens to such names so we can at least do a successful vendor call to proceed the
+// workflow and also for the chance that an id can be located (even if we get back name does not
+// reason codes)
 pub fn elongate_if_single_letter(s: String) -> String {
     if s.is_empty() {
         "--".to_owned()

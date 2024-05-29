@@ -1,7 +1,6 @@
+use super::SambaCreateLVOrderRequest;
 use newtypes::PiiString;
 use serde::Serialize;
-
-use super::SambaCreateLVOrderRequest;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -28,8 +27,9 @@ pub struct CreateLVOrderRequest {
     options: Vec<String>,
     custom_fields: Vec<CreateLVOrderCustomField>,
     // The more of these we supply, the more things they match in the DMV
-    // Samba allows you to configure which of these are included in the overall "is license valid" calculation
-    // We don't want to use this functionality, and will send everything we can just so we get back does it match records
+    // Samba allows you to configure which of these are included in the overall "is license valid"
+    // calculation We don't want to use this functionality, and will send everything we can just so we
+    // get back does it match records
     license_category: Option<PiiString>,
     issue_date: Option<PiiString>,
     expiry_date: Option<PiiString>,

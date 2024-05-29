@@ -1,7 +1,15 @@
-use serde::{Deserialize, Serialize};
-use std::{fmt::Debug, str::FromStr};
-
-use crate::{PiiBytes, PiiString, VResult, VaultDataFormat};
+use crate::{
+    PiiBytes,
+    PiiString,
+    VResult,
+    VaultDataFormat,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use std::fmt::Debug;
+use std::str::FromStr;
 
 /// Wrapper to hide PII around serde_json::Value that contains all variants of values
 #[derive(Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -42,7 +50,8 @@ impl PiiJsonValue {
         }
     }
 
-    /// Returns true if the value is a String and doesn't need to be serialized to be stored in the vault
+    /// Returns true if the value is a String and doesn't need to be serialized to be stored in the
+    /// vault
     pub fn is_string(&self) -> bool {
         matches!(self.0, serde_json::Value::String(_))
     }

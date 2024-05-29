@@ -1,6 +1,13 @@
 use crate::*;
 use newtypes::{
-    DbActor, ListAlias, ListEntryId, ListId, ListKind, ObConfigurationId, ObConfigurationKey, PiiString,
+    DbActor,
+    ListAlias,
+    ListEntryId,
+    ListId,
+    ListKind,
+    ObConfigurationId,
+    ObConfigurationKey,
+    PiiString,
 };
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

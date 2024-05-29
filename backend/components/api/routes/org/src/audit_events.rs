@@ -1,19 +1,41 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{request::CursorPaginationRequest, response::CursorPaginatedResponse},
-    utils::db2api::TryDbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    errors::ApiResult,
-    types::{Base64Cursor, CursorPaginatedResponseInner},
+use crate::types::request::CursorPaginationRequest;
+use crate::types::response::CursorPaginatedResponse;
+use crate::utils::db2api::TryDbToApi;
+use crate::State;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    Base64Cursor,
+    CursorPaginatedResponseInner,
 };
-use api_wire_types::{AuditEvent, AuditEventRequest};
-use chrono::{DateTime, Utc};
-use db::{models::audit_event::FilterQueryParams, DbResult};
-use newtypes::{AuditEventId, AuditEventName, DataIdentifier};
-use paperclip::actix::{api_v2_operation, get, web};
-use serde::{Deserialize, Serialize};
+use api_wire_types::{
+    AuditEvent,
+    AuditEventRequest,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db::models::audit_event::FilterQueryParams;
+use db::DbResult;
+use newtypes::{
+    AuditEventId,
+    AuditEventName,
+    DataIdentifier,
+};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[api_v2_operation(
     description = "Query audit events, in descending order of timestamp.",

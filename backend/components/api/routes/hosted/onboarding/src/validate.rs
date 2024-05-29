@@ -1,24 +1,33 @@
-use api_core::{
-    auth::{
-        user::{load_auth_events, UserAuthContext, UserAuthScope, UserIdentifier, UserWfAuthContext},
-        IsGuardMet,
-    },
-    errors::{
-        onboarding::{OnboardingError, UnmetRequirements},
-        AssertionError,
-    },
-    types::{response::ResponseData, JsonApiResponse},
-    utils::{
-        identify::get_user_challenge_context,
-        requirements::{get_requirements_for_person_and_maybe_business, GetRequirementsArgs},
-    },
-    State,
+use api_core::auth::user::{
+    load_auth_events,
+    UserAuthContext,
+    UserAuthScope,
+    UserIdentifier,
+    UserWfAuthContext,
 };
+use api_core::auth::IsGuardMet;
+use api_core::errors::onboarding::{
+    OnboardingError,
+    UnmetRequirements,
+};
+use api_core::errors::AssertionError;
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
+use api_core::utils::identify::get_user_challenge_context;
+use api_core::utils::requirements::{
+    get_requirements_for_person_and_maybe_business,
+    GetRequirementsArgs,
+};
+use api_core::State;
 use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::validate::HostedValidateResponse;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),

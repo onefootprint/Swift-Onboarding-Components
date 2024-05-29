@@ -1,13 +1,19 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::EmptyResponse,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::types::EmptyResponse;
+use crate::State;
 use api_core::types::JsonApiResponse;
-
-use db::{models::tenant_ios_app_meta::TenantIosAppMeta, DbResult};
+use db::models::tenant_ios_app_meta::TenantIosAppMeta;
+use db::DbResult;
 use newtypes::TenantIosAppMetaId;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Delete a tenant iOS app metadata for the organization.",

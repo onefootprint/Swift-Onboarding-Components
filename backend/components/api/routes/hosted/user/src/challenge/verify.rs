@@ -1,40 +1,66 @@
-use std::collections::HashMap;
-
-use crate::{challenge::RegisterChallenge, State};
-use api_core::{
-    auth::{
-        user::{CheckedUserAuthContext, UserAuth, UserAuthContext, UserAuthScope},
-        IsGuardMet,
-    },
-    errors::{error_with_code::ErrorWithCode, ApiResult, AssertionError, ValidationError},
-    types::{response::ResponseData, EmptyResponse, JsonApiResponse},
-    utils::{
-        challenge::Challenge,
-        headers::InsightHeaders,
-        passkey::{VerifyChallengeResult, WebauthnConfig},
-        vault_wrapper::{Any, FingerprintedDataRequest, VaultWrapper},
-    },
+use super::RegisterChallengeData;
+use crate::challenge::RegisterChallenge;
+use crate::State;
+use api_core::auth::user::{
+    CheckedUserAuthContext,
+    UserAuth,
+    UserAuthContext,
+    UserAuthScope,
+};
+use api_core::auth::IsGuardMet;
+use api_core::errors::error_with_code::ErrorWithCode;
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
+    ValidationError,
+};
+use api_core::types::response::ResponseData;
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use api_core::utils::challenge::Challenge;
+use api_core::utils::headers::InsightHeaders;
+use api_core::utils::passkey::{
+    VerifyChallengeResult,
+    WebauthnConfig,
+};
+use api_core::utils::vault_wrapper::{
+    Any,
+    FingerprintedDataRequest,
+    VaultWrapper,
 };
 use api_wire_types::UserChallengeVerifyRequest;
 use chrono::Utc;
 use crypto::sha256;
-use db::{
-    models::{
-        auth_event::{AuthEvent, NewAuthEventArgs},
-        contact_info::ContactInfo,
-        insight_event::CreateInsightEvent,
-        webauthn_credential::WebauthnCredential,
-    },
-    TxnPgConn,
+use db::models::auth_event::{
+    AuthEvent,
+    NewAuthEventArgs,
 };
+use db::models::contact_info::ContactInfo;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::webauthn_credential::WebauthnCredential;
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    ActionKind, AuthEventKind, ContactInfoKind, DataLifetimeSource, DataRequest, InsightEventId, PiiString,
-    ScopedVaultId, ValidateArgs, WebauthnCredentialId,
+    ActionKind,
+    AuthEventKind,
+    ContactInfoKind,
+    DataLifetimeSource,
+    DataRequest,
+    InsightEventId,
+    PiiString,
+    ScopedVaultId,
+    ValidateArgs,
+    WebauthnCredentialId,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
-
-use super::RegisterChallengeData;
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
+use std::collections::HashMap;
 
 #[api_v2_operation(
     tags(Challenge, Hosted),

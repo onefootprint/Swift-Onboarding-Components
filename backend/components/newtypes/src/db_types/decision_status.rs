@@ -1,9 +1,18 @@
 use derive_more::Display;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, EnumString};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use strum_macros::{
+    AsRefStr,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -36,10 +45,9 @@ crate::util::impl_enum_str_diesel!(DecisionStatus);
 
 #[cfg(test)]
 mod tests {
-    use test_case::test_case;
-
     use super::DecisionStatus;
     use std::cmp::Ordering;
+    use test_case::test_case;
 
     #[test_case(DecisionStatus::Fail, DecisionStatus::Pass => Ordering::Less)]
     #[test_case(DecisionStatus::StepUp, DecisionStatus::Pass => Ordering::Less)]

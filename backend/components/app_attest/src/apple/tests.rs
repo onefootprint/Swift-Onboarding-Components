@@ -1,8 +1,7 @@
-use openssl::sha::sha256;
-
-use crate::apple::{device_check::ReceiptType, tests::test_vectors::CDH_1};
-
 use super::*;
+use crate::apple::device_check::ReceiptType;
+use crate::apple::tests::test_vectors::CDH_1;
+use openssl::sha::sha256;
 
 fn combine_hash_list(input: &[&[u8]]) -> Vec<u8> {
     input

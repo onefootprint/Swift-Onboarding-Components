@@ -1,18 +1,16 @@
 //! Parses PII on the INGRESS for vaulting/tokenization
 
-use std::collections::HashMap;
-
+use super::config::{
+    IngressConfig,
+    IngressContentType,
+};
+use super::net_client::ProxyResponse;
+use crate::errors::proxy::VaultProxyError;
 use crate::proxy::IngressRule;
 use actix_web::web::Bytes;
 use mime::Mime;
 use newtypes::PiiString;
-
-use crate::errors::proxy::VaultProxyError;
-
-use super::{
-    config::{IngressConfig, IngressContentType},
-    net_client::ProxyResponse,
-};
+use std::collections::HashMap;
 
 pub struct TokenizedIngress {
     pub tokenized_body: Bytes,

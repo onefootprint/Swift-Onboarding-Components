@@ -1,17 +1,27 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    get::{search::decrypt_visible_attrs, EntityDetailResponse},
-    types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::VaultWrapper,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    errors::ApiResult,
-    utils::{db2api::DbToApi, fp_id_path::FpIdPath, vault_wrapper::TenantVw},
-    ApiErrorKind,
+use crate::get::search::decrypt_visible_attrs;
+use crate::get::EntityDetailResponse;
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
 };
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::errors::ApiResult;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::TenantVw;
+use api_core::ApiErrorKind;
 use db::models::scoped_vault::ScopedVault;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 #[api_v2_operation(
     description = "View details of a specific entity (business or user)",

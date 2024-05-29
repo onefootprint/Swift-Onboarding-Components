@@ -1,45 +1,77 @@
-use super::{BiometricChallengeState, PhoneEmailChallengeState};
-use crate::{ChallengeData, ChallengeState, State};
-use api_core::{
-    auth::{
-        session::user::{AssociatedAuthEvent, NewUserSessionContext},
-        user::{allowed_user_scopes, CheckedUserAuthContext, UserAuthContext},
-        Any,
-    },
-    config::Config,
-    errors::{
-        business::BusinessError, challenge::ChallengeError, error_with_code::ErrorWithCode, user::UserError,
-        ApiResult, ValidationError,
-    },
-    telemetry::RootSpan,
-    types::{response::ResponseData, JsonApiResponse},
-    utils::{
-        challenge::Challenge,
-        headers::InsightHeaders,
-        passkey::WebauthnConfig,
-        vault_wrapper::{Person, PrefillKind, VaultWrapper, WriteableVw},
-    },
+use super::{
+    BiometricChallengeState,
+    PhoneEmailChallengeState,
 };
-use api_wire_types::{IdentifyVerifyRequest, IdentifyVerifyResponse};
+use crate::{
+    ChallengeData,
+    ChallengeState,
+    State,
+};
+use api_core::auth::session::user::{
+    AssociatedAuthEvent,
+    NewUserSessionContext,
+};
+use api_core::auth::user::{
+    allowed_user_scopes,
+    CheckedUserAuthContext,
+    UserAuthContext,
+};
+use api_core::auth::Any;
+use api_core::config::Config;
+use api_core::errors::business::BusinessError;
+use api_core::errors::challenge::ChallengeError;
+use api_core::errors::error_with_code::ErrorWithCode;
+use api_core::errors::user::UserError;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::telemetry::RootSpan;
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
+use api_core::utils::challenge::Challenge;
+use api_core::utils::headers::InsightHeaders;
+use api_core::utils::passkey::WebauthnConfig;
+use api_core::utils::vault_wrapper::{
+    Person,
+    PrefillKind,
+    VaultWrapper,
+    WriteableVw,
+};
+use api_wire_types::{
+    IdentifyVerifyRequest,
+    IdentifyVerifyResponse,
+};
 use chrono::Utc;
 use crypto::sha256;
-use db::{
-    errors::OptionalExtension,
-    models::{
-        auth_event::{AuthEvent, NewAuthEventArgs},
-        business_owner::BusinessOwner,
-        insight_event::CreateInsightEvent,
-        scoped_vault::ScopedVault,
-        vault::Vault,
-        webauthn_credential::WebauthnCredential,
-    },
-    TxnPgConn,
+use db::errors::OptionalExtension;
+use db::models::auth_event::{
+    AuthEvent,
+    NewAuthEventArgs,
 };
+use db::models::business_owner::BusinessOwner;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
+use db::models::webauthn_credential::WebauthnCredential;
+use db::TxnPgConn;
 use newtypes::{
-    ActionKind, AuthEventKind, BoId, DataIdentifier, IdentifyScope, IdentityDataKind as IDK,
-    ObConfigurationKind, VaultId, WebauthnCredentialId,
+    ActionKind,
+    AuthEventKind,
+    BoId,
+    DataIdentifier,
+    IdentifyScope,
+    IdentityDataKind as IDK,
+    ObConfigurationKind,
+    VaultId,
+    WebauthnCredentialId,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Identify, Hosted),
@@ -124,8 +156,9 @@ pub async fn post(
                         if obc.kind == ObConfigurationKind::Auth {
                             return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
                         }
-                        // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
-                        // created with an ob config. This will create a SU when we are one-clicking onto this tenant
+                        // Since only some codepaths above will create a SU, we need to always get_or_create a
+                        // SU if created with an ob config. This will create a SU when
+                        // we are one-clicking onto this tenant
                         let uv = Vault::lock(conn, &uv_id)?;
                         ScopedVault::get_or_create_for_playbook(conn, &uv, obc.id.clone())?
                     } else {

@@ -1,10 +1,17 @@
-use api_core::{
-    auth::tenant::{AnyPartnerTenantSessionAuth, InvalidateAuth},
-    types::{EmptyResponse, JsonApiResponse},
-    State,
+use api_core::auth::tenant::{
+    AnyPartnerTenantSessionAuth,
+    InvalidateAuth,
 };
-
-use paperclip::actix::{api_v2_operation, post, web};
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use api_core::State;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     tags(Auth, Private),

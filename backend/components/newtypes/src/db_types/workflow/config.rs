@@ -1,9 +1,14 @@
-use crate::DocumentRequestConfig;
-
 pub use super::*;
-use diesel::{AsExpression, FromSqlRow};
+use crate::DocumentRequestConfig;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 // TODO: probs consolidate this into WorkflowState somehow
 #[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, PartialEq, Eq)]

@@ -1,11 +1,14 @@
+use self::request::OnboardingStartCustomNameFields;
 use itertools::Either;
+use newtypes::vendor_credentials::IncodeCredentials;
 use newtypes::{
-    vendor_credentials::IncodeCredentials, IncodeConfigurationId, IncodeFailureReason, IncodeSessionId,
-    PiiJsonValue, ScrubbedPiiJsonValue,
+    IncodeConfigurationId,
+    IncodeFailureReason,
+    IncodeSessionId,
+    PiiJsonValue,
+    ScrubbedPiiJsonValue,
 };
 use serde::de::DeserializeOwned;
-
-use self::request::OnboardingStartCustomNameFields;
 
 pub mod client;
 pub mod curp_validation;
@@ -23,8 +26,8 @@ pub struct IncodeStartOnboardingRequest {
     pub custom_name_fields: Option<OnboardingStartCustomNameFields>,
 }
 
-/// Incode provides custom Error object when sending a 4xx. This trait is used to handle various error cases
-/// for the various response structs
+/// Incode provides custom Error object when sending a 4xx. This trait is used to handle various
+/// error cases for the various response structs
 pub trait IncodeClientErrorCustomFailureReasons {
     fn custom_failure_reasons(error: response::Error) -> Option<Vec<IncodeFailureReason>>;
 }
@@ -144,9 +147,10 @@ impl<T: IncodeClientErrorCustomFailureReasons> IncodeAPIResult<T> {
         match response_json {
             Ok(j) => {
                 let result = if http_status.is_success() {
-                    // TODO: there's a footgun here with incode in which for most of our response structs we only
-                    // have optional fields. so if we get a response shape that is totally different than what we're expecting
-                    // we'll get Ok(_) here, but it's actually not ok..
+                    // TODO: there's a footgun here with incode in which for most of our response structs we
+                    // only have optional fields. so if we get a response shape that is
+                    // totally different than what we're expecting we'll get Ok(_) here,
+                    // but it's actually not ok..
                     let raw: Result<T, serde_json::Error> = serde_json::from_value(j.clone());
                     match raw {
                         Ok(deser_json) => IncodeAPIResult::<T>::Success(deser_json),

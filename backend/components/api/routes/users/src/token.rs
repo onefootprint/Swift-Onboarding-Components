@@ -1,33 +1,57 @@
-use crate::{
-    auth::tenant::CheckTenantGuard,
-    types::{response::ResponseData, JsonApiResponse},
-    State,
+use crate::auth::tenant::CheckTenantGuard;
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::session::user::AssociatedAuthEvent;
+use api_core::auth::tenant::{
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    auth::{
-        session::user::AssociatedAuthEvent,
-        tenant::{SecretTenantAuthContext, TenantGuard},
-        user::allowed_user_scopes,
-    },
-    config::LinkKind,
-    errors::{ApiResult, ValidationError},
-    utils::{
-        actix::OptionalJson,
-        fp_id_path::FpIdPath,
-        token::{create_token, CreateTokenArgs, CreateTokenResult},
-        vault_wrapper::{Any, TenantVw, VaultWrapper},
-    },
+use api_core::auth::user::allowed_user_scopes;
+use api_core::config::LinkKind;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
 };
-use api_wire_types::{CreateTokenRequest, CreateTokenResponse, TokenOperationKind};
-use chrono::{Duration, Utc};
-use db::models::{
-    auth_event::{AuthEvent, NewAuthEventArgs},
-    scoped_vault::ScopedVault,
+use api_core::utils::actix::OptionalJson;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::token::{
+    create_token,
+    CreateTokenArgs,
+    CreateTokenResult,
 };
+use api_core::utils::vault_wrapper::{
+    Any,
+    TenantVw,
+    VaultWrapper,
+};
+use api_wire_types::{
+    CreateTokenRequest,
+    CreateTokenResponse,
+    TokenOperationKind,
+};
+use chrono::{
+    Duration,
+    Utc,
+};
+use db::models::auth_event::{
+    AuthEvent,
+    NewAuthEventArgs,
+};
+use db::models::scoped_vault::ScopedVault;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{AuthEventKind, IdentifyScope, PreviewApi, RequestedTokenScope};
-use paperclip::actix::{api_v2_operation, post, web};
+use newtypes::{
+    AuthEventKind,
+    IdentifyScope,
+    PreviewApi,
+    RequestedTokenScope,
+};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
@@ -106,10 +130,10 @@ pub async fn post(
             let implied_auth_events = {
                 // As customers start to use us for auth, there will be situations in which:
                 // - The user logs into/creates an account at, say, Grid using the Footprint auth component.
-                // - The user then signs up for a credit card with Grid, which requires KYC through
-                //   the Footprint verify component. When this happens, we want to avoid the user
-                //   needing to re-log in inside the Footprint verify component with an SMS OTP
-                //   since they just did that a few minutes ago.
+                // - The user then signs up for a credit card with Grid, which requires KYC through the
+                //   Footprint verify component. When this happens, we want to avoid the user needing to
+                //   re-log in inside the Footprint verify component with an SMS OTP since they just did that
+                //   a few minutes ago.
                 // We could achieve this behavior by having the tenant physically pass us some
                 // proof that the user already logged into Grid.
                 // But for a better ergonomic experience, we inherit "implied" auth events -

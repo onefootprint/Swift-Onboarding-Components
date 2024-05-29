@@ -1,20 +1,34 @@
-use std::str::FromStr;
-
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::{proxy::VaultProxyError, ApiResult},
-    types::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::errors::proxy::VaultProxyError;
+use crate::errors::ApiResult;
+use crate::types::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::proxy::ssrf_protection::validate_safe_url;
-use api_wire_types::{CreateProxyConfigRequest, GetProxyConfigRequest, PatchProxyConfigRequest};
-use db::{
-    models::proxy_config::{NewProxyConfigArgs, ProxyConfig, ProxyConfigFilters, UpdateProxyConfigArgs},
-    DbError,
+use api_wire_types::{
+    CreateProxyConfigRequest,
+    GetProxyConfigRequest,
+    PatchProxyConfigRequest,
 };
+use db::models::proxy_config::{
+    NewProxyConfigArgs,
+    ProxyConfig,
+    ProxyConfigFilters,
+    UpdateProxyConfigArgs,
+};
+use db::DbError;
 use newtypes::ProxyConfigId;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
+use std::str::FromStr;
 
 type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfigBasic>>>;
 

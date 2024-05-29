@@ -1,29 +1,35 @@
-use std::collections::HashMap;
-
-use super::{
-    vendor::{
-        make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
-        tenant_vendor_control::TenantVendorControl,
-        vendor_result::VendorResult,
-        verification_result, VendorAPIError,
-    },
-    *,
+use super::vendor::make_request::{
+    VerificationRequestWithVendorError,
+    VerificationRequestWithVendorResponse,
 };
-use crate::{
-    errors::{ApiError, ApiErrorKind, ApiResult},
-    State,
+use super::vendor::tenant_vendor_control::TenantVendorControl;
+use super::vendor::vendor_result::VendorResult;
+use super::vendor::{
+    verification_result,
+    VendorAPIError,
 };
+use super::*;
+use crate::errors::{
+    ApiError,
+    ApiErrorKind,
+    ApiResult,
+};
+use crate::State;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::models::workflow::Workflow;
 use db::{
-    models::{
-        verification_request::VerificationRequest, verification_result::VerificationResult,
-        workflow::Workflow,
-    },
-    DbError, DbPool,
+    DbError,
+    DbPool,
 };
 use either::Either;
-
 use itertools::Itertools;
-use newtypes::{PiiJsonValue, VerificationRequestId, WorkflowId};
+use newtypes::{
+    PiiJsonValue,
+    VerificationRequestId,
+    WorkflowId,
+};
+use std::collections::HashMap;
 
 pub async fn save_vendor_responses(
     db_pool: &DbPool,
@@ -72,7 +78,6 @@ pub struct VendorRequests {
     pub outstanding_requests: Vec<VerificationRequest>, // requests that we do not yet have results for
 }
 
-
 pub struct VendorResults {
     pub successful: Vec<VerificationRequestWithVendorResponse>,
     pub non_critical_errors: Vec<VerificationRequestWithVendorError>,
@@ -111,7 +116,8 @@ impl VendorResults {
 }
 
 impl VendorResults {
-    // TODO: this and the struct in general doesnt need to operate on ApiError, we could keep VendorAPIError
+    // TODO: this and the struct in general doesnt need to operate on ApiError, we could keep
+    // VendorAPIError
     pub fn construct_requests_with_responses_for_verification_result(
         v: &VerificationRequestWithVendorError,
     ) -> (VerificationRequest, Option<PiiJsonValue>) {
@@ -140,7 +146,8 @@ impl VendorResults {
 fn partition_vendor_errors(
     raw_results: Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>,
 ) -> VendorResults {
-    // TODO: This just fails if any vendor requests return errors. We should handle these appropriately somewhere!
+    // TODO: This just fails if any vendor requests return errors. We should handle these appropriately
+    // somewhere!
 
     let (successful, errors): (
         Vec<VerificationRequestWithVendorResponse>,

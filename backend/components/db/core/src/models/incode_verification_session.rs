@@ -1,17 +1,40 @@
-use crate::{DbResult, NonNullVec, PgConn, TxnPgConn};
-use chrono::{DateTime, Duration, Utc};
-use db_schema::schema::{
-    document_request, identity_document,
-    incode_verification_session::{self, BoxedQuery},
-};
-use diesel::{pg::Pg, prelude::*};
-use newtypes::{
-    DocumentId, DocumentSide, IncodeAuthorizationToken, IncodeConfigurationId, IncodeEnvironment,
-    IncodeFailureReason, IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
-    IncodeVerificationSessionPurpose, IncodeVerificationSessionState, Locked, WorkflowId,
-};
-
 use super::incode_verification_session_event::IncodeVerificationSessionEvent;
+use crate::{
+    DbResult,
+    NonNullVec,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Duration,
+    Utc,
+};
+use db_schema::schema::incode_verification_session::{
+    self,
+    BoxedQuery,
+};
+use db_schema::schema::{
+    document_request,
+    identity_document,
+};
+use diesel::pg::Pg;
+use diesel::prelude::*;
+use newtypes::{
+    DocumentId,
+    DocumentSide,
+    IncodeAuthorizationToken,
+    IncodeConfigurationId,
+    IncodeEnvironment,
+    IncodeFailureReason,
+    IncodeSessionId,
+    IncodeVerificationSessionId,
+    IncodeVerificationSessionKind,
+    IncodeVerificationSessionPurpose,
+    IncodeVerificationSessionState,
+    Locked,
+    WorkflowId,
+};
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = incode_verification_session)]
@@ -40,7 +63,8 @@ pub struct IncodeVerificationSession {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub incode_environment: Option<IncodeEnvironment>,
     pub latest_hard_error: Option<String>,
-    // The purpose of this session as a whole (identity verification, curp validation, government validation. )
+    // The purpose of this session as a whole (identity verification, curp validation, government validation.
+    // )
     pub purpose: IncodeVerificationSessionPurpose,
 }
 

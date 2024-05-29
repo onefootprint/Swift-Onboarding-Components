@@ -1,6 +1,5 @@
-use std::collections::HashSet;
-
 use crate::SandboxId;
+use std::collections::HashSet;
 
 impl SandboxId {
     pub fn new() -> Self {

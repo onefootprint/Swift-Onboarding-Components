@@ -1,24 +1,40 @@
-use chrono::Duration;
-use db_schema::schema;
-
-use crate::{errors::ValidationError, DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::auth_event;
-use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::ActionKind;
-use newtypes::AuthMethodKind;
-use newtypes::AuthMethodUpdatedInfo;
-use newtypes::{AuthEventId, AuthEventKind, IdentifyScope, WebauthnCredentialId};
-
-use newtypes::{InsightEventId, ScopedVaultId};
-
+use super::apple_device_attest::AppleDeviceAttestation;
+use super::google_device_attest::GoogleDeviceAttestation;
+use super::insight_event::InsightEvent;
 use super::user_timeline::UserTimeline;
-use super::{
-    apple_device_attest::AppleDeviceAttestation, google_device_attest::GoogleDeviceAttestation,
-    insight_event::InsightEvent,
+use crate::errors::ValidationError;
+use crate::{
+    DbError,
+    DbResult,
+    NextPage,
+    OffsetPagination,
+    PgConn,
+    TxnPgConn,
 };
-use newtypes::VaultId;
-
+use chrono::{
+    DateTime,
+    Duration,
+    Utc,
+};
+use db_schema::schema;
+use db_schema::schema::auth_event;
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    ActionKind,
+    AuthEventId,
+    AuthEventKind,
+    AuthMethodKind,
+    AuthMethodUpdatedInfo,
+    IdentifyScope,
+    InsightEventId,
+    ScopedVaultId,
+    VaultId,
+    WebauthnCredentialId,
+};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -219,7 +235,7 @@ impl AuthEvent {
                     (AuthEventKind::Sms | AuthEventKind::Email | AuthEventKind::ThirdParty, None) => {
                         Some(LoadedAuthEvent {
                             insight,
-                            attested_devices: None, 
+                            attested_devices: None,
                             event,
                         })
                     },
@@ -236,7 +252,7 @@ impl AuthEvent {
                             .collect();
                         Some(LoadedAuthEvent {
                             insight,
-                            attested_devices: Some(LinkedDeviceAttestation { 
+                            attested_devices: Some(LinkedDeviceAttestation {
                                 android_devices,
                                 ios_devices,
                             }),

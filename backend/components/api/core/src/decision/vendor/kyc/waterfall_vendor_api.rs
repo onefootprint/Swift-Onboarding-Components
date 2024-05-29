@@ -1,22 +1,26 @@
+use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use crate::decision::vendor::vendor_api::vendor_api_struct::{
+    ExperianPreciseID,
+    IdologyExpectID,
+    LexisFlexId,
+};
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::errors::ApiResult;
+use crate::State;
 use db::models::verification_request::VReqIdentifier;
-use newtypes::{EncryptedVaultPrivateKey, VendorAPI};
-use strum::{EnumIter, IntoEnumIterator};
-
-use crate::{
-    decision::vendor::{
-        vendor_api::{
-            loaders::load_response_for_vendor_api,
-            vendor_api_struct::{ExperianPreciseID, IdologyExpectID, LexisFlexId},
-        },
-        vendor_result::VendorResult,
-    },
-    errors::ApiResult,
-    State,
+use newtypes::{
+    EncryptedVaultPrivateKey,
+    VendorAPI,
+};
+use strum::{
+    EnumIter,
+    IntoEnumIterator,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, EnumIter)]
-// For now, we just have 1 singular KYC waterfall ordering for all vendors. We start with Experian and then waterfall to Idology if needed.
-// (we still only make vendor calls that are available to the tenant as dictated by tvc)
+// For now, we just have 1 singular KYC waterfall ordering for all vendors. We start with Experian
+// and then waterfall to Idology if needed. (we still only make vendor calls that are available to
+// the tenant as dictated by tvc)
 pub enum WaterfallVendorAPI {
     Experian,
     Lexis,
@@ -93,9 +97,8 @@ impl From<WaterfallVendorAPI> for VendorAPI {
 
 #[cfg(test)]
 mod tests {
-    use std::cmp::Ordering;
-
     use super::*;
+    use std::cmp::Ordering;
     use test_case::test_case;
     #[test_case(WaterfallVendorAPI::Experian, WaterfallVendorAPI::Idology => Ordering::Less)]
     #[test_case(WaterfallVendorAPI::Experian, WaterfallVendorAPI::Lexis => Ordering::Less)]

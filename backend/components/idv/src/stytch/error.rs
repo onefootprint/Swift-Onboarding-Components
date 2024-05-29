@@ -1,10 +1,12 @@
+use super::response::StytchErrorResponse;
 use newtypes::PiiJsonValue;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
 use std::fmt::Debug;
 use strum::Display;
 use strum_macros::EnumString;
-
-use super::response::StytchErrorResponse;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

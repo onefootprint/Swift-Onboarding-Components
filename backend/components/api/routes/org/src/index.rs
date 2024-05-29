@@ -1,17 +1,27 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{response::ResponseData, JsonApiResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use actix_web::web;
-use api_core::{
-    errors::{tenant::TenantError, ApiResult},
-    serializers::IsDomainAlreadyClaimed,
-};
+use api_core::errors::tenant::TenantError;
+use api_core::errors::ApiResult;
+use api_core::serializers::IsDomainAlreadyClaimed;
 use api_wire_types::UpdateTenantRequest;
-use db::models::tenant::{Tenant, UpdateTenant};
-use paperclip::actix::{self, api_v2_operation, patch, web::Json};
+use db::models::tenant::{
+    Tenant,
+    UpdateTenant,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    patch,
+};
 
 #[api_v2_operation(
     tags(Organization, OrgSettings, Private),

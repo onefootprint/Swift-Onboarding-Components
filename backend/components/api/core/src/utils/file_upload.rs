@@ -1,18 +1,24 @@
-use std::time::Duration;
-
+use super::timeouts::ResponseDeadline;
+use crate::errors::error_with_code::ErrorWithCode;
+use crate::errors::ApiResult;
 use crate::{
-    errors::{error_with_code::ErrorWithCode, ApiResult},
-    ApiError, ApiErrorKind,
+    ApiError,
+    ApiErrorKind,
 };
 use actix_multipart::Multipart;
-use actix_web::{HttpMessage, HttpRequest};
-use bytes::{BufMut, BytesMut};
+use actix_web::{
+    HttpMessage,
+    HttpRequest,
+};
+use bytes::{
+    BufMut,
+    BytesMut,
+};
 use futures_util::StreamExt as _;
-
-use super::timeouts::ResponseDeadline;
 use mime::Mime;
 use newtypes::PiiBytes;
 use reqwest::header::CONTENT_LENGTH;
+use std::time::Duration;
 
 #[derive(Clone)]
 pub struct FileUpload {

@@ -1,10 +1,26 @@
-use std::collections::HashMap;
-
-use crate::{DbError, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::tenant_user;
-use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{Locked, OrgMemberEmail, PiiString, TenantUserId};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    Locked,
+    OrgMemberEmail,
+    PiiString,
+    TenantUserId,
+};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Selectable)]
 #[diesel(table_name = tenant_user)]

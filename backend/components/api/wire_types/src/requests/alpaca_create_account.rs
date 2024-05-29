@@ -1,7 +1,16 @@
-use alpaca::types::account::{AccountType, Agreement, AssetClass, Disclosures, TrustedContact};
-use newtypes::{FpId, PiiJsonValue, PiiString};
-
 use crate::*;
+use alpaca::types::account::{
+    AccountType,
+    Agreement,
+    AssetClass,
+    Disclosures,
+    TrustedContact,
+};
+use newtypes::{
+    FpId,
+    PiiJsonValue,
+    PiiString,
+};
 
 #[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct AlpacaCreateAccountRequest {
@@ -11,7 +20,8 @@ pub struct AlpacaCreateAccountRequest {
     /// API Secret to use with alpaca
     pub api_secret: PiiString,
 
-    /// Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)
+    /// Alpaca Hostname to use (i.e. sandbox or production, like:
+    /// `broker-api.sandbox.alpaca.markets`)
     pub hostname: String,
 
     pub enabled_assets: Option<Vec<AssetClass>>,
@@ -32,7 +42,8 @@ pub struct DeprecatedAlpacaCreateAccountRequest {
     /// API Secret to use with alpaca
     pub api_secret: PiiString,
 
-    /// Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)
+    /// Alpaca Hostname to use (i.e. sandbox or production, like:
+    /// `broker-api.sandbox.alpaca.markets`)
     pub hostname: String,
 
     pub enabled_assets: Option<Vec<AssetClass>>,

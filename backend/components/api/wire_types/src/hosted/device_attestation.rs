@@ -28,6 +28,6 @@ pub struct DeviceAttestationChallengeResponse {
 pub struct CreateDeviceAttestationRequest {
     /// state from `DeviceAttestationChallengeResponse`
     pub state: String,
-    /// base64 encoded attestation  
+    /// base64 encoded attestation
     pub attestation: String,
 }

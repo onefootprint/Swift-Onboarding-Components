@@ -1,14 +1,20 @@
-use crate::socure::{conversion::SocureRequest, SocureReqwestError};
-
-use newtypes::{IdvData, PiiString};
+use super::{
+    decode_response,
+    requirements,
+};
+use crate::socure::conversion::SocureRequest;
+use crate::socure::SocureReqwestError;
+use newtypes::{
+    IdvData,
+    PiiString,
+};
 use reqwest::header;
 use std::time::Duration;
-use tokio_retry::{
-    strategy::{jitter, ExponentialBackoff},
-    Retry,
+use tokio_retry::strategy::{
+    jitter,
+    ExponentialBackoff,
 };
-
-use super::{decode_response, requirements};
+use tokio_retry::Retry;
 
 #[derive(Clone)]
 pub struct SocureClient {
@@ -140,7 +146,6 @@ mod tests {
 
     use super::*;
     use dotenv;
-
     use newtypes::PiiString;
     use tracing_test::traced_test;
 

@@ -1,27 +1,32 @@
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::decision::vendor::vendor_trait::VendorAPIResponse;
+use crate::decision::vendor::{
+    verification_result,
+    VendorAPIError,
+};
+use crate::decision::{
+    self,
+};
+use crate::errors::ApiResult;
 use crate::{
-    decision::{
-        vendor::{
-            tenant_vendor_control::TenantVendorControl, vendor_trait::VendorAPIResponse, verification_result,
-            VendorAPIError,
-        },
-        {self},
-    },
-    errors::ApiResult,
-    ApiError, State,
+    ApiError,
+    State,
 };
-use db::models::{
-    risk_signal::NewRiskSignalInfo, vault::Vault, verification_request::VerificationRequest,
-    verification_result::VerificationResult,
-};
-use idv::{
-    idology::{
-        expectid::response::PaWatchlistHit,
-        pa::{response::PaResponse, IdologyPaAPIResponse},
-    },
-    VendorResponse,
-};
+use db::models::risk_signal::NewRiskSignalInfo;
+use db::models::vault::Vault;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use idv::idology::expectid::response::PaWatchlistHit;
+use idv::idology::pa::response::PaResponse;
+use idv::idology::pa::IdologyPaAPIResponse;
+use idv::VendorResponse;
 use newtypes::{
-    DecisionIntentId, FootprintReasonCode, ScopedVaultId, TenantId, VendorAPI, VerificationResultId,
+    DecisionIntentId,
+    FootprintReasonCode,
+    ScopedVaultId,
+    TenantId,
+    VendorAPI,
+    VerificationResultId,
 };
 
 pub async fn complete_vendor_call(
@@ -32,7 +37,8 @@ pub async fn complete_vendor_call(
     existing_response: Option<(PaResponse, VerificationResultId)>,
 ) -> ApiResult<Vec<NewRiskSignalInfo>> {
     let (reason_codes, vres_id) = if let Some((res, vres_id)) = existing_response {
-        // we already successfully completed a IdologyPa call for this watchlist task, so just return reason codes from it
+        // we already successfully completed a IdologyPa call for this watchlist task, so just return reason
+        // codes from it
         (parse_reason_codes(res.clone())?, vres_id)
     } else {
         let (res, vres) = make_vendor_call(state, sv_id, di_id, tenant_id).await?;
@@ -112,7 +118,8 @@ fn parse_reason_codes(res: PaResponse) -> ApiResult<Vec<FootprintReasonCode>> {
             restriction.watchlists(),
         ))
     } else {
-        // TODO: we really should have .validate() on the raw response validate stuff like this and transform it into a struct without Option's
+        // TODO: we really should have .validate() on the raw response validate stuff like this and
+        // transform it into a struct without Option's
         Err(ApiError::from(idv::Error::from(
             idv::idology::error::Error::MissingRestrictionField,
         )))

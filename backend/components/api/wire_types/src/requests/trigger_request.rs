@@ -1,5 +1,10 @@
 use crate::*;
-use newtypes::{ObConfigurationKey, PiiString, WorkflowFixtureResult, WorkflowRequestConfig};
+use newtypes::{
+    ObConfigurationKey,
+    PiiString,
+    WorkflowFixtureResult,
+    WorkflowRequestConfig,
+};
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -15,7 +20,8 @@ pub struct TriggerKycRequest {
     #[openapi(skip)]
     pub onboarding_config_key: Option<ObConfigurationKey>,
     #[openapi(required)]
-    /// The publishable key of the playbook onto which you would like this user to onboard. The playbook will specify required information and the rules by which to make a KYC decision.
+    /// The publishable key of the playbook onto which you would like this user to onboard. The
+    /// playbook will specify required information and the rules by which to make a KYC decision.
     pub key: Option<ObConfigurationKey>,
     /// (only valid for sandbox users) choose the desired KYC outcome
     pub fixture_result: Option<SimpleFixtureResult>,
@@ -52,7 +58,8 @@ pub struct TriggerKybRequest {
     pub onboarding_config_key: Option<ObConfigurationKey>,
     #[openapi(required)]
     /// The publishable key of the playbook onto which you would like this business to onboard.
-    /// The playbook will specify required information and the rules by which to make a KYB decision.
+    /// The playbook will specify required information and the rules by which to make a KYB
+    /// decision.
     pub key: Option<ObConfigurationKey>,
     /// (only valid for sandbox businesses) choose the desired KYB outcome
     pub fixture_result: Option<SimpleFixtureResult>,

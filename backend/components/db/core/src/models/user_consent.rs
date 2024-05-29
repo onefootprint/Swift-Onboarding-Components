@@ -1,9 +1,26 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::user_consent;
-use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{InsightEventId, UserConsentId, WorkflowId};
-use serde::{Deserialize, Serialize};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    InsightEventId,
+    UserConsentId,
+    WorkflowId,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Clone, Queryable, Default, Serialize, Deserialize)]
 #[diesel(table_name = user_consent)]

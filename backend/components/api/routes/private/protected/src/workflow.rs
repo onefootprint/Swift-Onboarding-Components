@@ -1,17 +1,26 @@
-use crate::{ProtectedAuth, State};
-use actix_web::{post, web, web::Json};
-use api_core::{
-    decision::state::{
-        actions::{WorkflowActions, WorkflowActionsKind},
-        traits::Workflow as TWorkflow,
-        WorkflowWrapper,
-    },
-    errors::ApiError,
-    types::response::ResponseData,
-    ApiErrorKind,
+use crate::{
+    ProtectedAuth,
+    State,
 };
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
+};
+use api_core::decision::state::actions::{
+    WorkflowActions,
+    WorkflowActionsKind,
+};
+use api_core::decision::state::traits::Workflow as TWorkflow;
+use api_core::decision::state::WorkflowWrapper;
+use api_core::errors::ApiError;
+use api_core::types::response::ResponseData;
+use api_core::ApiErrorKind;
 use db::models::workflow::Workflow;
-use newtypes::{WorkflowId, WorkflowState};
+use newtypes::{
+    WorkflowId,
+    WorkflowState,
+};
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct ProceedRequest {

@@ -12,8 +12,8 @@ mod webhooks;
 mod workflow;
 
 use actix_web::web;
-
-pub use api_core::{auth::protected_auth::ProtectedAuth, State};
+pub use api_core::auth::protected_auth::ProtectedAuth;
+pub use api_core::State;
 
 pub fn configure(config: &mut web::ServiceConfig) {
     config

@@ -1,15 +1,29 @@
-use std::time::Duration;
-
 use super::client::*;
-use crate::{config::Config, pool, StreamManager};
+use crate::config::Config;
+use crate::{
+    pool,
+    StreamManager,
+};
+use actix_web::dev::Server;
+use actix_web::http::KeepAlive;
+use actix_web::middleware::Logger;
 use actix_web::{
-    dev::Server, get, http::KeepAlive, middleware::Logger, post, web, App, HttpServer, Responder,
+    get,
+    post,
+    web,
+    App,
+    HttpServer,
+    Responder,
     ResponseError,
 };
 use actix_web_httpauth::extractors::bearer::BearerAuth;
-
 use futures::TryFutureExt;
-use rpc::{EnclavePayload, RpcPayload, RpcRequest};
+use rpc::{
+    EnclavePayload,
+    RpcPayload,
+    RpcRequest,
+};
+use std::time::Duration;
 use thiserror::Error;
 
 #[derive(Clone)]

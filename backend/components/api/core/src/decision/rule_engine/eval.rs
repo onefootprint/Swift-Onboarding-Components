@@ -1,20 +1,38 @@
-use std::{collections::HashMap, str::FromStr};
-
-use db::models::{
-    insight_event::InsightEvent, list_entry::ListWithDecryptedEntries, rule_instance::RuleInstance,
-};
-use itertools::Itertools;
-use newtypes::{
-    email::Email, BooleanOperator, BusinessDataKind, DataIdentifier, DeviceInsightField,
-    DeviceInsightOperation, DocumentRequestKind, Equals, FootprintReasonCode, IdentityDataKind, IsIn,
-    ListEntryValue, ListId, ListKind, PhoneNumber, PiiString, RuleAction, RuleExpression,
-    RuleExpressionCondition, StepUpKind, VaultOperation,
-};
-use strum::IntoEnumIterator;
-
-use crate::errors::{ApiResult, AssertionError};
-
 use super::engine::VaultDataForRules;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+};
+use db::models::insight_event::InsightEvent;
+use db::models::list_entry::ListWithDecryptedEntries;
+use db::models::rule_instance::RuleInstance;
+use itertools::Itertools;
+use newtypes::email::Email;
+use newtypes::{
+    BooleanOperator,
+    BusinessDataKind,
+    DataIdentifier,
+    DeviceInsightField,
+    DeviceInsightOperation,
+    DocumentRequestKind,
+    Equals,
+    FootprintReasonCode,
+    IdentityDataKind,
+    IsIn,
+    ListEntryValue,
+    ListId,
+    ListKind,
+    PhoneNumber,
+    PiiString,
+    RuleAction,
+    RuleExpression,
+    RuleExpressionCondition,
+    StepUpKind,
+    VaultOperation,
+};
+use std::collections::HashMap;
+use std::str::FromStr;
+use strum::IntoEnumIterator;
 
 /// Trait that represents a Rule
 pub trait HasRule<A: Ord + PartialOrd> {
@@ -22,7 +40,8 @@ pub trait HasRule<A: Ord + PartialOrd> {
     fn action(&self) -> A;
 }
 
-/// Trait that represents whether a Rule contains an action that is allowed per the state of the workflow (to avoid infinite step up loops)
+/// Trait that represents whether a Rule contains an action that is allowed per the state of the
+/// workflow (to avoid infinite step up loops)
 pub trait IsActionAllowed<A>
 where
     A: Ord + PartialOrd,
@@ -71,7 +90,8 @@ impl IsActionAllowed<RuleAction> for RuleInstance {
     }
 }
 
-// Interface to help map from what we've collected (documents) to the appropriate rules we should evaluate
+// Interface to help map from what we've collected (documents) to the appropriate rules we should
+// evaluate
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct RuleEvalConfig {
     pub allowed_rule_actions: Vec<RuleAction>,
@@ -122,9 +142,13 @@ impl Default for RuleEvalConfig {
 pub fn evaluate_rule_set<R, A>(
     rules: Vec<R>,
     reason_codes: &[FootprintReasonCode],
-    vault_data: &VaultDataForRules, // TODO: for waterfall, we won't execute on vault data based rules so should probs more explicitly handle that vs having it pass in an empty DUR here
-    // a bit annoying to have to put this here, but this is our one case currently where a ruleset is evaluated but a particular action is not allowed. If we have already collected a document or already step'd up, we want to ensure that we don't chose that action again
-    // maybe soon we'll put StepUp rules in a separate group and evaluate those separately and then can remove this from here
+    vault_data: &VaultDataForRules, /* TODO: for waterfall, we won't execute on vault data based rules so
+                                     * should probs more explicitly handle that vs having it pass in an
+                                     * empty DUR here */
+    // a bit annoying to have to put this here, but this is our one case currently where a ruleset is
+    // evaluated but a particular action is not allowed. If we have already collected a document or already
+    // step'd up, we want to ensure that we don't chose that action again maybe soon we'll put StepUp
+    // rules in a separate group and evaluate those separately and then can remove this from here
     insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
     rule_config: &RuleEvalConfig,
@@ -145,8 +169,10 @@ where
             ) {
                 Ok(r) => r,
                 Err(err) => {
-                    // !!!! For now, the only possible source of errors is from blocklist rules. If there is an error, we log and fail open by just treating the eval as false (ie instead of erroring the entire eval of the ruleset)
-                    // when the new blocklist stuff seems more stable, we should maybe change this to a regular hard error
+                    // !!!! For now, the only possible source of errors is from blocklist rules. If there is
+                    // an error, we log and fail open by just treating the eval as false (ie instead of
+                    // erroring the entire eval of the ruleset) when the new blocklist
+                    // stuff seems more stable, we should maybe change this to a regular hard error
                     tracing::error!(?err, "Error evaluating rule expression, defaulting to `false`");
                     false
                 }
@@ -177,7 +203,9 @@ pub fn evaluate_rule_expression(
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
 ) -> ApiResult<bool> {
     // Conditions in a Rule are all AND'd together
-    // Empty rule_expression's with no conditions shouldn't be possible (should fail validation), but should one of these sneak into existence (ie a bad manual PG fiddle) then we'd want to default to evaluate to false there, not true
+    // Empty rule_expression's with no conditions shouldn't be possible (should fail validation), but
+    // should one of these sneak into existence (ie a bad manual PG fiddle) then we'd want to default to
+    // evaluate to false there, not true
     let results = rule_expression
         .0
         .iter()
@@ -349,14 +377,21 @@ pub mod tests {
     use super::*;
     use crate::decision::rule_engine::engine::VaultDataForRules;
     use newtypes::{
-        BooleanOperator as BO, DataIdentifier as DI, FootprintReasonCode as FRC, IdentityDataKind,
-        InvestorProfileKind, PiiJsonValue, RuleAction as RA, RuleExpression as RE,
+        BooleanOperator as BO,
+        DataIdentifier as DI,
+        FootprintReasonCode as FRC,
+        IdentityDataKind,
+        InvestorProfileKind,
+        PiiJsonValue,
+        RuleAction as RA,
+        RuleExpression as RE,
         RuleExpressionCondition as REC,
     };
     use std::collections::HashMap;
     use test_case::test_case;
 
-    // just to avoid having to make RuleInstance's. Also proves that we could use evaluate_rules in a RAM-only way (ie for backtesting or whatever)
+    // just to avoid having to make RuleInstance's. Also proves that we could use evaluate_rules in a
+    // RAM-only way (ie for backtesting or whatever)
     pub struct TRule(pub RE, pub RA);
     impl HasRule<RA> for TRule {
         fn expression(&self) -> RE {

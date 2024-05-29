@@ -1,20 +1,29 @@
-use super::{
-    config::EgressConfig,
-    ssrf_protection::{validate_safe_url, PublicIpDNSResolver},
+use super::config::EgressConfig;
+use super::ssrf_protection::{
+    validate_safe_url,
+    PublicIpDNSResolver,
 };
-use crate::{
-    errors::{proxy::VaultProxyError, ApiError, ApiResult},
-    State,
+use crate::errors::proxy::VaultProxyError;
+use crate::errors::{
+    ApiError,
+    ApiResult,
 };
+use crate::State;
 use bytes::Bytes;
 use chrono::Utc;
-use db::models::{
-    proxy_request_log::{FinishedRequestLog, NewProxyRequestLog, ProxyRequestLog},
-    tenant::Tenant,
+use db::models::proxy_request_log::{
+    FinishedRequestLog,
+    NewProxyRequestLog,
+    ProxyRequestLog,
 };
+use db::models::tenant::Tenant;
 use http::HeaderName;
-use newtypes::{PiiString, ProxyConfigId};
-use reqwest::{header::HeaderMap, StatusCode};
+use newtypes::{
+    PiiString,
+    ProxyConfigId,
+};
+use reqwest::header::HeaderMap;
+use reqwest::StatusCode;
 use std::sync::Arc;
 
 pub struct ProxyResponse {

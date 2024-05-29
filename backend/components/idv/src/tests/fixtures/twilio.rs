@@ -1,7 +1,10 @@
-use newtypes::{PiiJsonValue, PiiString, ScrubbedPiiString};
-use twilio::response::lookup::LookupV2Response;
-
 use crate::twilio::TwilioLookupV2APIResponse;
+use newtypes::{
+    PiiJsonValue,
+    PiiString,
+    ScrubbedPiiString,
+};
+use twilio::response::lookup::LookupV2Response;
 
 pub fn create_response() -> TwilioLookupV2APIResponse {
     let parsed_response = LookupV2Response {

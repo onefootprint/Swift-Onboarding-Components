@@ -1,8 +1,6 @@
-use std::fmt;
-
-use newtypes::PiiJsonValue;
-
 use super::cross_core::error_code::ErrorCode;
+use newtypes::PiiJsonValue;
+use std::fmt;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -190,7 +188,8 @@ pub enum ExperianErrorCode {
     /// Invalid User ID/Password
     #[serde(rename = "709")]
     E709,
-    /// Session timeout (for KIQ product options only). May also be returned if the Session ID does not exist (for KIQ product responses only).
+    /// Session timeout (for KIQ product options only). May also be returned if the Session ID does
+    /// not exist (for KIQ product responses only).
     #[serde(rename = "710")]
     E710,
     /// End User is required

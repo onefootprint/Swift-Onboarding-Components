@@ -1,8 +1,12 @@
-use std::{fmt::Display, str::FromStr};
-
 use paperclip::actix::Apiv2Schema;
-
-use serde::{de, Deserialize, Deserializer, Serialize};
+use serde::{
+    de,
+    Deserialize,
+    Deserializer,
+    Serialize,
+};
+use std::fmt::Display;
+use std::str::FromStr;
 
 const B64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
 

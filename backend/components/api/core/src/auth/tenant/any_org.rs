@@ -1,9 +1,17 @@
 use super::{
-    Any, CheckTenantGuard, Either, PartnerTenantSessionAuth, SessionContext, TenantSessionAuth,
+    Any,
+    CheckTenantGuard,
+    Either,
+    PartnerTenantSessionAuth,
+    SessionContext,
+    TenantSessionAuth,
     WorkOsSessionData,
 };
 use crate::errors::ApiResult;
-use newtypes::{TenantUserId, WorkosAuthMethod};
+use newtypes::{
+    TenantUserId,
+    WorkosAuthMethod,
+};
 
 pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, TenantSessionAuth>;
 pub type AnyPartnerTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, PartnerTenantSessionAuth>;

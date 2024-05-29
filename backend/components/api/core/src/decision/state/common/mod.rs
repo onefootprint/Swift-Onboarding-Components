@@ -1,52 +1,93 @@
-use std::collections::HashMap;
-
-use crypto::aead::{AeadSealedBytes, SealingKey};
+use crate::decision::features::incode_docv::{
+    self,
+    IncodeOcrComparisonDataFields,
+};
+use crate::decision::features::risk_signals::risk_signal_group_struct::Aml;
+use crate::decision::features::risk_signals::{
+    RiskSignalGroupStruct,
+    RiskSignalsForDecision,
+};
+use crate::decision::onboarding::Decision;
+use crate::decision::vendor::incode::curp_validation::run_curp_validation_check;
+use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
+use crate::decision::vendor::neuro_id::run_neuro_call;
+use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeFetchOCR;
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::decision::vendor::{
+    self,
+};
+use crate::decision::{
+    self,
+    risk,
+};
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    VaultWrapper,
+    VwArgs,
+};
+use crate::{
+    ApiError,
+    State,
+};
+use crypto::aead::{
+    AeadSealedBytes,
+    SealingKey,
+};
+use db::models::decision_intent::DecisionIntent;
+use db::models::document_request::{
+    DocumentRequest,
+    NewDocumentRequestArgs,
+};
+use db::models::list_entry::{
+    ListEntry,
+    ListWithDecryptedEntries,
+    ListWithEntries,
+};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::NewRiskSignalInfo;
+use db::models::rule_instance::RuleInstance;
+use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
+use db::models::user_timeline::UserTimeline;
+use db::models::verification_request::VReqIdentifier;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
 use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        list_entry::{ListEntry, ListWithDecryptedEntries, ListWithEntries},
-        ob_configuration::ObConfiguration,
-        risk_signal::NewRiskSignalInfo,
-        rule_instance::RuleInstance,
-        scoped_vault::ScopedVault,
-        tenant::Tenant,
-        user_timeline::UserTimeline,
-        verification_request::VReqIdentifier,
-        workflow::{Workflow, WorkflowUpdate},
-    },
-    DbPool, DbResult, PgConn, TxnPgConn,
+    DbPool,
+    DbResult,
+    PgConn,
+    TxnPgConn,
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::{
-    CipKind, DecisionIntentKind, DeviceInsightOperation, FootprintReasonCode, ListId, Locked,
-    OnboardingStatus, PiiBytes, PiiString, ReviewReason, RuleAction, RuleExpressionCondition,
-    RuleSetResultId, ScopedVaultId, SealedVaultBytes, StepUpInfo, TenantId, VaultId, VaultOperation,
-    VendorAPI, VerificationResultId, WorkflowId,
+    CipKind,
+    DecisionIntentKind,
+    DeviceInsightOperation,
+    FootprintReasonCode,
+    ListId,
+    Locked,
+    OnboardingStatus,
+    PiiBytes,
+    PiiString,
+    ReviewReason,
+    RuleAction,
+    RuleExpressionCondition,
+    RuleSetResultId,
+    ScopedVaultId,
+    SealedVaultBytes,
+    StepUpInfo,
+    TenantId,
+    VaultId,
+    VaultOperation,
+    VendorAPI,
+    VerificationResultId,
+    WorkflowId,
 };
-
-use crate::{
-    decision::{
-        self,
-        features::{
-            incode_docv::{self, IncodeOcrComparisonDataFields},
-            risk_signals::{risk_signal_group_struct::Aml, RiskSignalGroupStruct, RiskSignalsForDecision},
-        },
-        onboarding::Decision,
-        risk,
-        vendor::{
-            self,
-            incode::{curp_validation::run_curp_validation_check, incode_watchlist::WatchlistCheckKind},
-            neuro_id::run_neuro_call,
-            vendor_api::{loaders::load_response_for_vendor_api, vendor_api_struct::IncodeFetchOCR},
-            vendor_result::VendorResult,
-        },
-    },
-    errors::ApiResult,
-    utils::vault_wrapper::{VaultWrapper, VwArgs},
-    ApiError, State,
-};
+use std::collections::HashMap;
 
 #[tracing::instrument(skip(db_pool))]
 pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbResult<ScopedVault> {
@@ -175,7 +216,8 @@ pub async fn run_aml_call(
         .await
         .map(|(vr, wr)| (vr.id, wr))
     } else {
-        // maybe in future it might make sense to also re-use an existing search for AML calls we make from workflows?
+        // maybe in future it might make sense to also re-use an existing search for AML calls we make from
+        // workflows?
         vendor::incode::incode_watchlist::run_watchlist_check(
             state,
             &di,
@@ -249,8 +291,10 @@ pub async fn maybe_generate_ocr_reason_codes(
         return Ok(None);
     }
 
-    // TODO: instead of retrieving all results from all vendor calls here, we could just retrieve the ones for the DocScan DI or even just directly retrieve IncodeFetchOCR itself
-    // also slightly sketch to query latest by sv_id instead of strictly querying from vres's made within this workflow specifically
+    // TODO: instead of retrieving all results from all vendor calls here, we could just retrieve the
+    // ones for the DocScan DI or even just directly retrieve IncodeFetchOCR itself also slightly
+    // sketch to query latest by sv_id instead of strictly querying from vres's made within this
+    // workflow specifically
     let wfid = wf_id.clone();
     let Some((fetch_ocr, vres_id)) = load_response_for_vendor_api(
         state,

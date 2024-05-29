@@ -1,22 +1,36 @@
-use super::{
-    states::{
-        AddBack, AddConsent, AddFront, AddSelfie, Complete, Fail, FetchScores, GetOnboardingStatus,
-        ProcessFace, ProcessId, VerificationSession,
-    },
-    IncodeContext,
+use super::states::{
+    AddBack,
+    AddConsent,
+    AddFront,
+    AddSelfie,
+    Complete,
+    Fail,
+    FetchScores,
+    GetOnboardingStatus,
+    ProcessFace,
+    ProcessId,
+    VerificationSession,
 };
-use crate::{decision::state::StateError, errors::ApiResult, vendor_clients::IncodeClients};
+use super::IncodeContext;
+use crate::decision::state::StateError;
+use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
+use db::models::document_upload::DocumentUpload;
+use db::models::incode_verification_session::{
+    IncodeVerificationSession,
+    UpdateIncodeVerificationSession,
+};
 use db::{
-    models::{
-        document_upload::DocumentUpload,
-        incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession},
-    },
-    DbPool, TxnPgConn,
+    DbPool,
+    TxnPgConn,
 };
 use enum_dispatch::enum_dispatch;
 use itertools::Itertools;
-use newtypes::{DocumentSide, IncodeFailureReason};
+use newtypes::{
+    DocumentSide,
+    IncodeFailureReason,
+};
 use std::marker::PhantomData;
 
 pub struct Uninitialized<T>(PhantomData<T>);
@@ -30,7 +44,8 @@ impl<T> Uninitialized<T> {
 pub struct TransitionResult {
     /// Any failure reasons experienced during the handling of this state
     pub failure_reasons: Vec<IncodeFailureReason>,
-    /// The side being handled by this step of the Incode machine. It will be cleared if there is an error.
+    /// The side being handled by this step of the Incode machine. It will be cleared if there is an
+    /// error.
     pub side: Option<DocumentSide>,
 }
 
@@ -171,7 +186,8 @@ where
                     let exceeded_max_attempts =
                         ctx.failed_attempts_for_side + 1 >= DocumentUpload::MAX_ATTEMPTS_PER_SIDE;
                     // Retry if we haven't exceeded max attempts AND this isn't a re-run flow.
-                    // Re-run flows aren't interactive, so we should never retry, which breaks out of the machine
+                    // Re-run flows aren't interactive, so we should never retry, which breaks out of the
+                    // machine
                     let should_retry = !exceeded_max_attempts && !ctx.is_re_run;
 
                     let (result, deactivate) = if should_retry {

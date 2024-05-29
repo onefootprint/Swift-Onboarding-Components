@@ -1,25 +1,36 @@
+use super::request::{
+    ControlOption,
+    CrossCoreAPIRequest,
+    PreciseIDRequestConfig,
+};
+use super::response::{
+    CCErrorResponse,
+    CrossCoreAPIResponse,
+};
+use super::validation;
+use crate::experian::auth::response::JwtTokenResponse;
+use crate::experian::auth::{
+    self,
+};
+use crate::experian::cross_core::error_code::ErrorCode;
+use crate::experian::error::{
+    EnvironmentMismatchError,
+    Error,
+    ValidationError,
+};
+use crate::footprint_http_client::FootprintVendorHttpClient;
 use chrono::Utc;
+use newtypes::experian::ProductOptions;
+use newtypes::vendor_credentials::ExperianCredentials;
 use newtypes::{
-    experian::ProductOptions, vendor_credentials::ExperianCredentials, IdvData, PiiString, Uuid,
+    Base64Data,
+    Base64EncodedString,
+    IdvData,
+    PiiString,
+    Uuid,
     VerificationRequestId,
 };
 use tokio_retry::strategy::FixedInterval;
-
-use crate::{
-    experian::{
-        auth::{self, response::JwtTokenResponse},
-        cross_core::error_code::ErrorCode,
-        error::{EnvironmentMismatchError, Error, ValidationError},
-    },
-    footprint_http_client::FootprintVendorHttpClient,
-};
-use newtypes::{Base64Data, Base64EncodedString};
-
-use super::{
-    request::{ControlOption, CrossCoreAPIRequest, PreciseIDRequestConfig},
-    response::{CCErrorResponse, CrossCoreAPIResponse},
-    validation,
-};
 
 const REQUIRED_X_USER_DOMAIN_HEADER_VAL: &str = "onefootprint.com";
 
@@ -29,8 +40,9 @@ pub enum ClientEnvironment {
     Sandbox,
 }
 /// CrossCore is Experian's single API access point to a multitude of their products.
-/// We make requests to CC, then they translate ("map") the requests into the format required by the product (and then back again)
-/// We specify in the CC request which of the products we'd like to use
+/// We make requests to CC, then they translate ("map") the requests into the format required by the
+/// product (and then back again) We specify in the CC request which of the products we'd like to
+/// use
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct ExperianClientAdapter {
@@ -119,7 +131,8 @@ impl ExperianClientAdapter {
     ) -> Result<JwtTokenResponse, Error> {
         let url = "https://us-api.experian.com/oauth2/experianone/v1/token";
         let req = serde_json::to_string(&self.create_cross_core_token_request()).map_err(Error::from)?;
-        // A global unique identifier. When submitting a token request, an X-Correlation-Id must be populated with a globally unique identifier
+        // A global unique identifier. When submitting a token request, an X-Correlation-Id must be
+        // populated with a globally unique identifier
         let correlation_id = Uuid::new_v4().to_string();
 
         let response = client
@@ -205,7 +218,8 @@ impl ExperianClientAdapter {
 
                     tracing::info!(?codes, "send_precise_id_request error");
 
-                    // These are errors we might want to retry in the client itself. for other errors, we validate in `make_request`
+                    // These are errors we might want to retry in the client itself. for other errors, we
+                    // validate in `make_request`
                     if codes.contains(&ErrorCode::OtherPreciseIdError) {
                         Err(Error::OtherPreciseIdServerError)
                     } else if codes.contains(&ErrorCode::InvalidUserIdOrPassword) {
@@ -333,7 +347,8 @@ impl ValidatedIdvData {
     }
 }
 
-/// CC requires a JWT auth token (TTL 30m), and these credentials are used in the request to get a token
+/// CC requires a JWT auth token (TTL 30m), and these credentials are used in the request to get a
+/// token
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct CrossCoreAuthTokenCredentials {
@@ -366,21 +381,31 @@ impl CrossCoreRequestCredentials {
 
 #[cfg(test)]
 mod tests {
-    use super::{ClientEnvironment, ExperianClientAdapter};
-    use crate::{
-        experian::{
-            cross_core::{
-                request::CrossCoreAPIRequest,
-                response::CrossCoreAPIResponse,
-                send_precise_id_request,
-                validation::{self, load_sandbox_data},
-            },
-            error::{Error, ValidationError},
-            ExperianCrossCoreRequest,
-        },
-        footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
+    use super::{
+        ClientEnvironment,
+        ExperianClientAdapter,
     };
-    use newtypes::{vendor_credentials::ExperianCredentials, IdvData, PiiString};
+    use crate::experian::cross_core::request::CrossCoreAPIRequest;
+    use crate::experian::cross_core::response::CrossCoreAPIResponse;
+    use crate::experian::cross_core::send_precise_id_request;
+    use crate::experian::cross_core::validation::{
+        self,
+        load_sandbox_data,
+    };
+    use crate::experian::error::{
+        Error,
+        ValidationError,
+    };
+    use crate::experian::ExperianCrossCoreRequest;
+    use crate::footprint_http_client::{
+        FootprintVendorHttpClient,
+        FpVendorClientArgs,
+    };
+    use newtypes::vendor_credentials::ExperianCredentials;
+    use newtypes::{
+        IdvData,
+        PiiString,
+    };
     use test_case::test_case;
 
     fn load_sandbox_credentials() -> ExperianCredentials {

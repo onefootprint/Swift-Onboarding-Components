@@ -1,5 +1,4 @@
 use paperclip::actix::Apiv2Schema;
-
 use strum::Display;
 
 #[derive(Debug, Clone, PartialEq, Eq, Display)]
@@ -54,10 +53,10 @@ pub enum MatchLevel {
 
 #[cfg(test)]
 mod tests {
+    use super::MatchLevel;
+    use super::MatchLevel::*;
     use std::cmp::Ordering;
     use test_case::test_case;
-
-    use super::{MatchLevel, MatchLevel::*};
 
     #[test_case(NoMatch, CouldNotMatch => Ordering::Less)]
     #[test_case(NoMatch, Partial => Ordering::Less)]

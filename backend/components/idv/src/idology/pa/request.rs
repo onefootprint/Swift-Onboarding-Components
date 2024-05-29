@@ -1,6 +1,13 @@
 use crate::idology::error as IdologyError;
-use chrono::{Datelike, NaiveDate};
-use newtypes::{IdvData, PiiString, DATE_FORMAT};
+use chrono::{
+    Datelike,
+    NaiveDate,
+};
+use newtypes::{
+    IdvData,
+    PiiString,
+    DATE_FORMAT,
+};
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -14,7 +21,8 @@ pub(crate) struct RequestData {
     city: Option<PiiString>,
     state: Option<PiiString>,
     zip: Option<PiiString>,
-    // we use invoice field to pass through a tenant identifier so we can keep track of things on the idology side
+    // we use invoice field to pass through a tenant identifier so we can keep track of things on the idology
+    // side
     invoice: Option<String>,
 }
 

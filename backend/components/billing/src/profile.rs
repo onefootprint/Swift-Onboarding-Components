@@ -1,14 +1,28 @@
-use std::{collections::HashMap, str::FromStr};
-
+use crate::product::Product;
+use crate::{
+    is_managed,
+    managed_metadata,
+    BResult,
+    BillingInfo,
+};
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use newtypes::TenantId;
 use rust_decimal::Decimal;
-use stripe::{CreatePrice, Currency, IdOrCreate, ListPrices, Price, PriceBillingScheme, PriceId};
+use std::collections::HashMap;
+use std::str::FromStr;
+use stripe::{
+    CreatePrice,
+    Currency,
+    IdOrCreate,
+    ListPrices,
+    Price,
+    PriceBillingScheme,
+    PriceId,
+};
 use strum::IntoEnumIterator;
 
-use crate::{is_managed, managed_metadata, product::Product, BResult, BillingInfo};
-
-/// Stores all the price IDs for products we offer. This may differ per environment and occasionally per tenant
+/// Stores all the price IDs for products we offer. This may differ per environment and occasionally
+/// per tenant
 #[derive(Debug)]
 pub struct BillingProfile {
     pub(crate) tenant_id: TenantId,

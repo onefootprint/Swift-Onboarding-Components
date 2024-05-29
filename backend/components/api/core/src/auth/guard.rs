@@ -1,6 +1,6 @@
+use newtypes::output::Csv;
+use newtypes::DataIdentifier;
 use std::fmt::Display;
-
-use newtypes::{output::Csv, DataIdentifier};
 
 pub trait IsGuardMet<ScopeT>: Display {
     /// Given the `token_scopes` that exist on the auth token, checks if the required permission
@@ -128,10 +128,9 @@ impl Display for CanVault {
 
 #[cfg(test)]
 mod test {
-    use std::fmt::Display;
-
     use super::*;
     use newtypes::IdentityDataKind as IDK;
+    use std::fmt::Display;
     use test_case::test_case;
 
     #[test_case(CanDecrypt::new(vec![IDK::FirstName, IDK::LastName]) => "CanDecrypt<id.first_name, id.last_name>".to_owned())]

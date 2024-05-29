@@ -1,5 +1,11 @@
-use chrono::{DateTime, Utc};
-use newtypes::{FingerprintRequestId, FingerprintVisitorId};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use newtypes::{
+    FingerprintRequestId,
+    FingerprintVisitorId,
+};
 use serde::*;
 
 /// Response from Fingerprint's Server API

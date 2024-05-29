@@ -1,15 +1,36 @@
+use crate::models::scoped_vault::ScopedVault;
+use crate::models::vault::Vault;
 use crate::{
-    models::{scoped_vault::ScopedVault, vault::Vault},
-    DbResult, PgConn,
+    DbResult,
+    PgConn,
 };
-use chrono::{DateTime, Utc};
-use db_schema::schema::{self, vault};
-use diesel::{dsl::not, prelude::*};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    self,
+    vault,
+};
+use diesel::dsl::not;
+use diesel::prelude::*;
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{
-    output::Csv, ExternalId, Fingerprint, FpId, LabelKind, ObConfigurationId, OnboardingStatus,
-    OnboardingStatusFilter, PiiString, ScopedVaultCursor, ScopedVaultCursorKind, ScopedVaultId, TenantId,
-    VaultKind, WatchlistCheckStatusKind,
+    ExternalId,
+    Fingerprint,
+    FpId,
+    LabelKind,
+    ObConfigurationId,
+    OnboardingStatus,
+    OnboardingStatusFilter,
+    PiiString,
+    ScopedVaultCursor,
+    ScopedVaultCursorKind,
+    ScopedVaultId,
+    TenantId,
+    VaultKind,
+    WatchlistCheckStatusKind,
 };
 use tracing::instrument;
 
@@ -98,7 +119,12 @@ macro_rules! list_query {
         // not be visible in the dashboard since the tenant doesn't have permissions to view anything
         // about the user
         use db_schema::schema::{
-            manual_review, scoped_vault, scoped_vault_label, watchlist_check, workflow, workflow_request,
+            manual_review,
+            scoped_vault,
+            scoped_vault_label,
+            watchlist_check,
+            workflow,
+            workflow_request,
         };
         let mut query = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))

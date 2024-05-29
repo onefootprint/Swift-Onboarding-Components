@@ -1,6 +1,10 @@
-use newtypes::{input::Csv, AuditEventName, DataIdentifier, ListId};
-
 use crate::*;
+use newtypes::input::Csv;
+use newtypes::{
+    AuditEventName,
+    DataIdentifier,
+    ListId,
+};
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

@@ -1,7 +1,13 @@
-use newtypes::{IdvData, PiiJsonValue};
-use twilio::response::{lookup::LookupV2Response, parse_response};
-
-use crate::{ParsedResponse, VendorResponse};
+use crate::{
+    ParsedResponse,
+    VendorResponse,
+};
+use newtypes::{
+    IdvData,
+    PiiJsonValue,
+};
+use twilio::response::lookup::LookupV2Response;
+use twilio::response::parse_response;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

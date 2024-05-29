@@ -1,16 +1,16 @@
-use std::{collections::HashMap, marker::PhantomData};
-
 #[allow(unused_imports)]
 pub use accessors::*;
-
-use db::{
-    models::{
-        data_lifetime::DataLifetime, document_data::DocumentData, vault::Vault,
-        vault_data::VaultData as DbVaultData,
-    },
-    HasLifetime,
+use db::models::data_lifetime::DataLifetime;
+use db::models::document_data::DocumentData;
+use db::models::vault::Vault;
+use db::models::vault_data::VaultData as DbVaultData;
+use db::HasLifetime;
+use newtypes::{
+    DataIdentifier,
+    DataLifetimeSeqno,
 };
-use newtypes::{DataIdentifier, DataLifetimeSeqno};
+use std::collections::HashMap;
+use std::marker::PhantomData;
 
 mod accessors;
 mod args;
@@ -33,14 +33,17 @@ pub struct Person;
 pub struct Business;
 #[derive(Debug, Clone)]
 pub struct Any;
-/// VaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
-/// about a particular user.
+/// VaultWrapper represents the current "state" of the UserVault - the most up to date and complete
+/// information we have about a particular user.
 ///
 /// In other words, the UserVault is a major dividing line in Footprint's product.
-///    1. the API routes and backend logic determine `OnboardingRequirements` that the frontend knows how to collect.
-///    2. The information collected is stashed in various tables (see the impls below for the actual locations)
+///    1. the API routes and backend logic determine `OnboardingRequirements` that the frontend
+///       knows how to collect.
+///    2. The information collected is stashed in various tables (see the impls below for the actual
+///       locations)
 ///    3. The decision engine and verification logic _only knows about what's in the UserVault_
-///         * it is the information we send to vendors (a UVW gets "serialized" in a `VerificationRequest` in the decision engine)
+///         * it is the information we send to vendors (a UVW gets "serialized" in a
+///           `VerificationRequest` in the decision engine)
 ///         * it is the source of truth to know what we datums we have collected from a User
 #[derive(Debug, Clone)]
 pub struct VaultWrapper<Type = Any> {

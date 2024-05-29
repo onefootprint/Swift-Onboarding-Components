@@ -4,8 +4,9 @@
 ///   - we don't have a need to parse the response into a structured format
 ///   - it's unclear if the enums will change
 ///   - it's unclear if the docs represent the enums correctly
-///   
-/// so we'll keep only the enums required for requests around, and deal with the response enums as we need to
+///
+/// so we'll keep only the enums required for requests around, and deal with the response enums as
+/// we need to
 
 #[derive(
     Debug, strum::Display, strum::EnumString, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize,
@@ -57,8 +58,8 @@ pub enum ProductOptions {
     IDScreeningScore,
 }
 
-// The following is a list of the decision codes that can be returned from the Precise ID application.
-// Due to
+// The following is a list of the decision codes that can be returned from the Precise ID
+// application. Due to
 #[derive(Debug, strum::Display, strum::EnumString, Clone, Eq, PartialEq)]
 pub enum DecisionCodes {
     // Accept
@@ -122,7 +123,8 @@ pub enum ResponseCode {
     //  Wrong clientId .
     #[serde(rename = "R0111")]
     WrongClientId,
-    // Workflow complete. Note: This code may indicate an unknown mapper when a responseCode of Error is returned.
+    // Workflow complete. Note: This code may indicate an unknown mapper when a responseCode of Error is
+    // returned.
     #[serde(rename = "R0201")]
     WorkflowComplete,
     //  Workflow paused.
@@ -140,7 +142,10 @@ pub enum ResponseCode {
     //  CrossCore configuration is missing.
     #[serde(rename = "R0207")]
     CrossCoreConfigurationMissing,
-    //  Indicates that following a pause, the workflow cannot be completed because the resume point (i.e., sequenceId) cannot be found. Check your CrossCore configuration file to make sure that the target sequenceId ex- ists, and that the sequenceId returned by the pauseScript matches the target sequenceId .
+    //  Indicates that following a pause, the workflow cannot be completed because the resume point (i.e.,
+    // sequenceId) cannot be found. Check your CrossCore configuration file to make sure that the target
+    // sequenceId ex- ists, and that the sequenceId returned by the pauseScript matches the target
+    // sequenceId .
     #[serde(rename = "R0208")]
     WorflowCannotBecompletedAfterPause,
 }

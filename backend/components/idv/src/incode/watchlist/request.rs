@@ -10,8 +10,9 @@ pub struct WatchlistResultRequest {
     // Float Determines how closely the returned results must match the supplied name.
     pub fuzziness: Option<f32>,
     //Configuration fields we likely won't be using:
-    //pub country_codes: Option<Vec<String>>, // List Results are filtered by the entity nationality or country of residence.
-    //pub watchlist_types: Option<Vec<String>>, // List
-    //pub subscribe: Option<bool>, // Boolean Subsribes to updates on the watchlists to receive notification for updates on the search.
-    //pub search_profile: Option<String>, // String Search profile set for the client to use specify what sources they will be searching against.
+    //pub country_codes: Option<Vec<String>>, // List Results are filtered by the entity nationality or
+    // country of residence. pub watchlist_types: Option<Vec<String>>, // List
+    //pub subscribe: Option<bool>, // Boolean Subsribes to updates on the watchlists to receive notification
+    // for updates on the search. pub search_profile: Option<String>, // String Search profile set for
+    // the client to use specify what sources they will be searching against.
 }

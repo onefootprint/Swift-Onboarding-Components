@@ -1,42 +1,65 @@
-use crate::{
-    decision::{self, document::meta_headers::MetaHeaders, state::test_utils::query_risk_signals},
-    utils::file_upload::FileUpload,
-    State,
+use super::document_test_utils::{
+    mock_enclave_s3_client,
+    mock_ff_client,
+    mock_incode_request,
+    mock_s3_put_object,
+    DocumentUploadTestCase,
+    UserKind,
 };
-use api_wire_types::{CreateDocumentRequest, DocumentResponse};
+use super::test_helpers::FixtureData;
+use crate::decision::document::meta_headers::MetaHeaders;
+use crate::decision::state::test_utils::query_risk_signals;
+use crate::decision::{
+    self,
+};
+use crate::utils::file_upload::FileUpload;
+use crate::State;
+use api_wire_types::{
+    CreateDocumentRequest,
+    DocumentResponse,
+};
 use chrono::Utc;
-use db::{
-    models::{
-        document::Document,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        incode_verification_session::IncodeVerificationSession,
-        incode_verification_session_event::IncodeVerificationSessionEvent,
-        insight_event::{CreateInsightEvent, InsightEvent},
-        user_consent::UserConsent,
-        vault::Vault,
-        workflow::Workflow,
-    },
-    test_helpers::assert_have_same_elements,
-    tests::fixtures::ob_configuration::ObConfigurationOpts,
-    DbResult,
+use db::models::document::Document;
+use db::models::document_request::{
+    DocumentRequest,
+    NewDocumentRequestArgs,
 };
-
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::incode_verification_session_event::IncodeVerificationSessionEvent;
+use db::models::insight_event::{
+    CreateInsightEvent,
+    InsightEvent,
+};
+use db::models::user_consent::UserConsent;
+use db::models::vault::Vault;
+use db::models::workflow::Workflow;
+use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::DbResult;
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentFixtureResult,
-    DocumentId, DocumentKind, DocumentRequestConfig, DocumentRequestKind, DocumentSide, DocumentStatus,
-    IdDocKind, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind,
-    ScopedVaultId, Selfie, TenantId, WorkflowFixtureResult,
+    CollectedDataOption,
+    CountryRestriction,
+    DocTypeRestriction,
+    DocumentCdoInfo,
+    DocumentFixtureResult,
+    DocumentId,
+    DocumentKind,
+    DocumentRequestConfig,
+    DocumentRequestKind,
+    DocumentSide,
+    DocumentStatus,
+    IdDocKind,
+    IncodeVerificationSessionState,
+    Iso3166TwoDigitCountryCode,
+    PiiBytes,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+    Selfie,
+    TenantId,
+    WorkflowFixtureResult,
 };
 use strum::IntoEnumIterator;
-
-use super::{
-    document_test_utils::{
-        mock_enclave_s3_client, mock_ff_client, mock_incode_request, mock_s3_put_object,
-        DocumentUploadTestCase, UserKind,
-    },
-    test_helpers::FixtureData,
-};
 
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]
 #[test_state_case(UserKind::Live, Selfie::None)]
@@ -271,8 +294,8 @@ async fn upload_and_process_inner(
         mock_enclave_s3_client(state, document_id.clone(), &vault.e_private_key).await;
     }
 
-    // Assert incode machine is in the right state, but we create the IVS inside handle_document_process on the first pass through,
-    // so if we're handling front we won't have it yet
+    // Assert incode machine is in the right state, but we create the IVS inside handle_document_process
+    // on the first pass through, so if we're handling front we won't have it yet
     if side != DocumentSide::Front && test_case.make_incode_calls() {
         assert_ivs_in_state(state, document_id.clone(), side_to_ivs_state(side)).await;
     }

@@ -1,25 +1,26 @@
-use std::{collections::BTreeMap, pin::Pin};
-
+use super::tenant::{
+    GetFirmEmployee,
+    InvalidateAuth,
+};
+use super::AuthError;
+use crate::errors::{
+    ApiError,
+    ApiErrorKind,
+    ApiResult,
+};
+use crate::State;
 use actix_web::FromRequest;
 use async_trait::async_trait;
 use futures_util::Future;
-use paperclip::{
-    actix::OperationModifier,
-    v2::{
-        models::{DefaultOperationRaw, DefaultSchemaRaw, SecurityScheme},
-        schema::Apiv2Schema,
-    },
+use paperclip::actix::OperationModifier;
+use paperclip::v2::models::{
+    DefaultOperationRaw,
+    DefaultSchemaRaw,
+    SecurityScheme,
 };
-
-use crate::{
-    errors::{ApiError, ApiErrorKind, ApiResult},
-    State,
-};
-
-use super::{
-    tenant::{GetFirmEmployee, InvalidateAuth},
-    AuthError,
-};
+use paperclip::v2::schema::Apiv2Schema;
+use std::collections::BTreeMap;
+use std::pin::Pin;
 
 #[derive(Debug, Clone)]
 /// Abstract Session Context Type

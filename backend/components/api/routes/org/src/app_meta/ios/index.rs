@@ -1,17 +1,28 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::types::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::types::JsonApiResponse;
 use api_wire_types::UpdateTenantIosAppMetaRequest;
-use db::{
-    models::tenant_ios_app_meta::{TenantIosAppFilters, TenantIosAppMeta},
-    DbResult,
+use db::models::tenant_ios_app_meta::{
+    TenantIosAppFilters,
+    TenantIosAppMeta,
 };
-use newtypes::{SealedVaultBytes, TenantIosAppMetaId};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use db::DbResult;
+use newtypes::{
+    SealedVaultBytes,
+    TenantIosAppMetaId,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Returns a list of metadata for tenant ios apps.",

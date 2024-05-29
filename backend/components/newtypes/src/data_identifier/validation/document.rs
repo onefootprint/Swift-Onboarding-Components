@@ -1,7 +1,17 @@
-use super::{Error, VResult};
+use super::{
+    Error,
+    VResult,
+};
 use crate::{
-    AllData, CleanAndValidate, DataIdentifierValue, DocumentDiKind, NtResult, PiiJsonValue, PiiString,
-    PiiValueKind, ValidateArgs,
+    AllData,
+    CleanAndValidate,
+    DataIdentifierValue,
+    DocumentDiKind,
+    NtResult,
+    PiiJsonValue,
+    PiiString,
+    PiiValueKind,
+    ValidateArgs,
 };
 
 impl CleanAndValidate for DocumentDiKind {

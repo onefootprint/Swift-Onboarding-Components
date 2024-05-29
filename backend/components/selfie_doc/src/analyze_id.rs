@@ -1,5 +1,8 @@
 use aws_sdk_textract::types::IdentityDocument as SdkIdentityDocument;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

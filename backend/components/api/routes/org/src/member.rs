@@ -1,16 +1,30 @@
-use crate::{
-    auth::{
-        tenant::{AuthActor, CheckTenantGuard, TenantGuard, TenantRbAuthContext, TenantSessionAuth},
-        Any,
-    },
-    errors::tenant::TenantError,
-    types::{JsonApiResponse, ResponseData},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    AuthActor,
+    CheckTenantGuard,
+    TenantGuard,
+    TenantRbAuthContext,
+    TenantSessionAuth,
 };
+use crate::auth::Any;
+use crate::errors::tenant::TenantError;
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::auth::Either;
-use db::models::tenant_user::{TenantUser, TenantUserUpdate};
-use paperclip::actix::{api_v2_operation, get, patch, web, Apiv2Schema};
+use db::models::tenant_user::{
+    TenantUser,
+    TenantUserUpdate,
+};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    patch,
+    web,
+    Apiv2Schema,
+};
 
 #[api_v2_operation(
     tags(Members, OrgSettings, Private),

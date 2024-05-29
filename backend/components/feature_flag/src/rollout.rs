@@ -1,7 +1,10 @@
-use std::hash::{DefaultHasher, Hash, Hasher};
-
 use itertools::Itertools;
 use newtypes::Uuid;
+use std::hash::{
+    DefaultHasher,
+    Hash,
+    Hasher,
+};
 
 /// LaunchDarkly is hugely overkill for boolean flags. We generally just check if a tenant ID,
 /// obc key, or user identifier is in a list of values.
@@ -80,7 +83,11 @@ impl JsonLdRollout {
 
 #[cfg(test)]
 mod test {
-    use super::{JsonLdRollout, JsonLdRolloutVariant, LdRollout};
+    use super::{
+        JsonLdRollout,
+        JsonLdRolloutVariant,
+        LdRollout,
+    };
     use serde_json::json;
     use test_case::test_case;
 

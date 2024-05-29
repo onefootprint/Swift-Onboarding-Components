@@ -1,4 +1,7 @@
-use crate::{IdDocKind, PiiString};
+use crate::{
+    IdDocKind,
+    PiiString,
+};
 
 #[derive(Debug, Default, Clone)]
 pub struct DocVData {

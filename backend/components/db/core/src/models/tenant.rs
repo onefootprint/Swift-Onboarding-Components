@@ -1,27 +1,56 @@
-use super::{
-    billing_profile::BillingProfile,
-    tenant_role::{ImmutableRoleKind, TenantRole},
-    tenant_vendor::TenantVendorControl,
+use super::billing_profile::BillingProfile;
+use super::tenant_role::{
+    ImmutableRoleKind,
+    TenantRole,
 };
-use crate::{helpers::WorkosAuthIdentity, DbResult, NonNullVec, OptionalNonNullVec, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use super::tenant_vendor::TenantVendorControl;
+use crate::helpers::WorkosAuthIdentity;
+use crate::{
+    DbResult,
+    NonNullVec,
+    OptionalNonNullVec,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::tenant::{
+    self,
+    BoxedQuery,
+};
 use db_schema::schema::{
-    billing_profile, scoped_vault,
-    tenant::{self, BoxedQuery},
+    billing_profile,
+    scoped_vault,
     tenant_vendor_control,
 };
+use diesel::dsl::count_star;
+use diesel::insertable::CanInsertInSingleQuery;
+use diesel::pg::Pg;
+use diesel::prelude::*;
+use diesel::query_builder::{
+    QueryFragment,
+    QueryId,
+};
 use diesel::{
-    dsl::count_star,
-    insertable::CanInsertInSingleQuery,
-    pg::Pg,
-    prelude::*,
-    query_builder::{QueryFragment, QueryId},
-    Insertable, Queryable,
+    Insertable,
+    Queryable,
 };
 use itertools::Itertools;
 use newtypes::{
-    AppClipExperienceId, CompanySize, EncryptedVaultPrivateKey, PreviewApi, ScopedVaultId, StripeCustomerId,
-    TenantId, TenantKind, TenantRoleKind, VaultId, VaultPublicKey, WorkosAuthMethod,
+    AppClipExperienceId,
+    CompanySize,
+    EncryptedVaultPrivateKey,
+    PreviewApi,
+    ScopedVaultId,
+    StripeCustomerId,
+    TenantId,
+    TenantKind,
+    TenantRoleKind,
+    VaultId,
+    VaultPublicKey,
+    WorkosAuthMethod,
 };
 use std::collections::HashMap;
 
@@ -271,7 +300,8 @@ impl Tenant {
     }
 
     /// Save any struct that implements `Insertable<tenant::table>`. The diesel trait constraints
-    /// are kind of clunky, but removes the need to have two separate functions with the same exact body
+    /// are kind of clunky, but removes the need to have two separate functions with the same exact
+    /// body
     #[tracing::instrument("Tenant::create", skip_all)]
     pub fn create<T>(conn: &mut TxnPgConn, value: T) -> DbResult<Self>
     where

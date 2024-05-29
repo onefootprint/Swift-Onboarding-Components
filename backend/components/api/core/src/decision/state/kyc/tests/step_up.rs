@@ -1,32 +1,60 @@
-use crate::{
-    decision::state::{
-        actions::{Authorize, MakeVendorCalls},
-        test_utils::{
-            mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_doc_requests,
-            query_rule_set_result, query_timeline_events, setup_data, ExpectedRequiresManualReview,
-            ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, WithQualifier,
-        },
-        MakeDecision, WorkflowActions, WorkflowWrapper,
-    },
-    errors::ApiResult,
-    State,
+use crate::decision::state::actions::{
+    Authorize,
+    MakeVendorCalls,
 };
-
-use db::{
-    models::{
-        ob_configuration::ObConfiguration,
-        rule_instance::{NewRule, RuleInstance},
-    },
-    test_helpers::assert_have_same_elements,
-    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool, MockFFClient},
+use crate::decision::state::test_utils::{
+    mock_idology,
+    mock_incode_doc_collection,
+    mock_webhooks,
+    query_data,
+    query_doc_requests,
+    query_rule_set_result,
+    query_timeline_events,
+    setup_data,
+    ExpectedRequiresManualReview,
+    ExpectedStatus,
+    OnboardingCompleted,
+    OnboardingStatusChanged,
+    WithQualifier,
 };
+use crate::decision::state::{
+    MakeDecision,
+    WorkflowActions,
+    WorkflowWrapper,
+};
+use crate::errors::ApiResult;
+use crate::State;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_instance::{
+    NewRule,
+    RuleInstance,
+};
+use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::test_db_pool::TestDbPool;
+use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
-
-use macros::{test_state, test_state_case};
+use macros::{
+    test_state,
+    test_state_case,
+};
 use newtypes::{
-    BooleanOperator, CollectedDataOption as CDO, DbActor, DbUserTimelineEvent, DbUserTimelineEventKind,
-    DecisionStatus, DocumentRequestKind, FootprintReasonCode as FRC, KycState, OnboardingStatus, RuleAction,
-    RuleExpression, RuleExpressionCondition, RuleInstanceKind, StepUpKind, WorkflowState,
+    BooleanOperator,
+    CollectedDataOption as CDO,
+    DbActor,
+    DbUserTimelineEvent,
+    DbUserTimelineEventKind,
+    DecisionStatus,
+    DocumentRequestKind,
+    FootprintReasonCode as FRC,
+    KycState,
+    OnboardingStatus,
+    RuleAction,
+    RuleExpression,
+    RuleExpressionCondition,
+    RuleInstanceKind,
+    StepUpKind,
+    WorkflowState,
 };
 
 #[test_state_case(StepUpKind::Identity)]
@@ -164,7 +192,8 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     );
 
     // Now mock document being collected
-    // TODO: not quite right since we need to not let wf run to completion if there's still doc requests pending
+    // TODO: not quite right since we need to not let wf run to completion if there's still doc requests
+    // pending
     mock_incode_doc_collection(
         state,
         svid.clone(),

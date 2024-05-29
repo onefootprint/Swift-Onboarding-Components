@@ -1,11 +1,20 @@
-use derive_more::Display;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, EnumIter, EnumString};
-
 use crate::FootprintReasonCode;
+use derive_more::Display;
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
+use paperclip::actix::Apiv2Schema;
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use strum_macros::{
+    AsRefStr,
+    EnumIter,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -93,7 +102,10 @@ pub enum IncodeFailureReason {
     #[strum(serialize = "ID_TYPE_UNACCEPTABLE")]
     IdTypeNotAcceptable,
     #[strum(serialize = "UNEXPECTED_ERROR_OCCURRED")]
-    UnexpectedErrorOccurred, // TODO: its kinda wack we just synthetically produce this ourselves as well... need to audit what kinds of errors we are swallowing in here (this will cause us to ask user to re-upload, even if its some transient Incode nonsense and not a actual validation issue)
+    UnexpectedErrorOccurred, /* TODO: its kinda wack we just synthetically produce this ourselves as
+                              * well... need to audit what kinds of errors we are swallowing in here
+                              * (this will cause us to ask user to re-upload, even if its some transient
+                              * Incode nonsense and not a actual validation issue) */
     // These aren't deserialized with strum
     UnsupportedDocumentType,
     DocTypeMismatch,
@@ -122,8 +134,9 @@ pub enum IncodeFailureReason {
 
 impl IncodeFailureReason {
     pub fn can_ignore(&self) -> bool {
-        // IdTypeNotAcceptable | MilitaryIdNotAllowed => military IDs which incode cannot process (nor can we)
-        // ProcessIdCouldNotProcess => something is up with the image and incode can't run it's ML models
+        // IdTypeNotAcceptable | MilitaryIdNotAllowed => military IDs which incode cannot process (nor can
+        // we) ProcessIdCouldNotProcess => something is up with the image and incode can't run it's
+        // ML models
         !matches!(
             self,
             Self::IdTypeNotAcceptable | Self::ProcessIdCouldNotProcess | Self::MilitaryIdNotAllowed

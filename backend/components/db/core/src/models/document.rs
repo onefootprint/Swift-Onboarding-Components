@@ -1,33 +1,64 @@
-use crate::{errors::ValidationError, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{document_request, document_upload, identity_document, incode_verification_session};
-
-use diesel::{
-    dsl::{count_star, not},
-    prelude::*,
-    Insertable, Queryable,
+use super::document_request::DocumentRequest;
+use super::document_upload::DocumentUpload;
+use super::incode_verification_session::IncodeVerificationSession;
+use super::insight_event::CreateInsightEvent;
+use crate::errors::ValidationError;
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
 };
-use std::collections::HashMap;
-
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    document_request,
+    document_upload,
+    identity_document,
+    incode_verification_session,
+};
+use diesel::dsl::{
+    count_star,
+    not,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DataLifetimeSeqno, DeviceType, DocumentDiKind,
-    DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestConfig, DocumentRequestId,
-    DocumentReviewStatus, DocumentSide, DocumentStatus, IdDocKind, IncodeVerificationSessionState,
-    InsightEventId, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, VendorValidatedCountryCode,
+    CustomDocumentConfig,
+    DataIdentifier,
+    DataLifetimeSeqno,
+    DeviceType,
+    DocumentDiKind,
+    DocumentFixtureResult,
+    DocumentId,
+    DocumentKind,
+    DocumentRequestConfig,
+    DocumentRequestId,
+    DocumentReviewStatus,
+    DocumentSide,
+    DocumentStatus,
+    IdDocKind,
+    IncodeVerificationSessionState,
+    InsightEventId,
+    Iso3166TwoDigitCountryCode,
+    ScopedVaultId,
+    TenantId,
+    VendorValidatedCountryCode,
     WorkflowId,
 };
-
-use super::{
-    document_request::DocumentRequest, document_upload::DocumentUpload,
-    incode_verification_session::IncodeVerificationSession, insight_event::CreateInsightEvent,
-};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = identity_document)]
 pub struct Document {
     pub id: DocumentId,
     pub request_id: DocumentRequestId,
-    /// This is the stated document type, selected by the user, not necessarily the true document type
+    /// This is the stated document type, selected by the user, not necessarily the true document
+    /// type
     pub document_type: DocumentKind,
     pub country_code: Option<String>,
     pub created_at: DateTime<Utc>,
@@ -44,7 +75,8 @@ pub struct Document {
     pub fixture_result: Option<DocumentFixtureResult>,
     // Indicating that the client cannot collect selfie for some reason
     pub skip_selfie: Option<bool>,
-    // the device type that was used to collect this document (currently provided by bifrost, in the future perhaps derived from Stytch)
+    // the device type that was used to collect this document (currently provided by bifrost, in the future
+    // perhaps derived from Stytch)
     pub device_type: Option<DeviceType>,
     // the document_type we stored this in the vault as
     pub vaulted_document_type: Option<DocumentKind>,
@@ -314,7 +346,10 @@ impl Document {
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
     ) -> DbResult<i64> {
-        use db_schema::schema::{incode_verification_session, scoped_vault};
+        use db_schema::schema::{
+            incode_verification_session,
+            scoped_vault,
+        };
         let count = identity_document::table
             .inner_join(document_request::table.inner_join(scoped_vault::table))
             // This will have the effect of not charging for SSN cards since we don't verify them

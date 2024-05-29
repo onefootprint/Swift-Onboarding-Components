@@ -1,7 +1,18 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum_macros::{Display, EnumIter, EnumString};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum_macros::{
+    Display,
+    EnumIter,
+    EnumString,
+};
 
 // NOTE: we backfilled all DataLifetimeSources in prod that were created before
 // 2023-08-25 19:53:43.944937+00 using a heuristic.

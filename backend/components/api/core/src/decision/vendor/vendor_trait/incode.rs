@@ -1,37 +1,60 @@
+use super::{
+    VendorAPICall,
+    VendorAPIResponse,
+};
 use async_trait::async_trait;
 use chrono::Datelike;
-use idv::{
-    footprint_http_client::FootprintVendorHttpClient,
-    incode::{
-        client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
-        curp_validation::{response::CurpValidationResponse, IncodeCurpValidationRequest},
-        doc::{
-            request::DocumentSide,
-            response::{
-                AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
-                FetchScoresResponse, GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
-            },
-            IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
-            IncodeAddPrivacyConsentRequest, IncodeAddSelfieRequest, IncodeFetchOCRRequest,
-            IncodeFetchScoresRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
-            IncodeProcessIdRequest,
-        },
-        error::Error as IncodeError,
-        government_validation::{
-            request::IncodeGovernmentValidationRequest, response::GovernmentValidationResponse,
-        },
-        response::OnboardingStartResponse,
-        watchlist::{
-            response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
-            IncodeUpdatedWatchlistResultRequest, IncodeWatchlistCheckRequest,
-        },
-        IncodeResponse, IncodeStartOnboardingRequest,
-    },
-    ParsedResponse,
+use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::incode::client::{
+    AuthenticatedIncodeClientAdapter,
+    IncodeClientAdapter,
 };
-use newtypes::{PiiString, VendorAPI};
-
-use super::{VendorAPICall, VendorAPIResponse};
+use idv::incode::curp_validation::response::CurpValidationResponse;
+use idv::incode::curp_validation::IncodeCurpValidationRequest;
+use idv::incode::doc::request::DocumentSide;
+use idv::incode::doc::response::{
+    AddConsentResponse,
+    AddSelfieResponse,
+    AddSideResponse,
+    FetchOCRResponse,
+    FetchScoresResponse,
+    GetOnboardingStatusResponse,
+    ProcessFaceResponse,
+    ProcessIdResponse,
+};
+use idv::incode::doc::{
+    IncodeAddBackRequest,
+    IncodeAddFrontRequest,
+    IncodeAddMLConsentRequest,
+    IncodeAddPrivacyConsentRequest,
+    IncodeAddSelfieRequest,
+    IncodeFetchOCRRequest,
+    IncodeFetchScoresRequest,
+    IncodeGetOnboardingStatusRequest,
+    IncodeProcessFaceRequest,
+    IncodeProcessIdRequest,
+};
+use idv::incode::error::Error as IncodeError;
+use idv::incode::government_validation::request::IncodeGovernmentValidationRequest;
+use idv::incode::government_validation::response::GovernmentValidationResponse;
+use idv::incode::response::OnboardingStartResponse;
+use idv::incode::watchlist::response::{
+    UpdatedWatchlistResultResponse,
+    WatchlistResultResponse,
+};
+use idv::incode::watchlist::{
+    IncodeUpdatedWatchlistResultRequest,
+    IncodeWatchlistCheckRequest,
+};
+use idv::incode::{
+    IncodeResponse,
+    IncodeStartOnboardingRequest,
+};
+use idv::ParsedResponse;
+use newtypes::{
+    PiiString,
+    VendorAPI,
+};
 
 //////////////////////
 /// Incode impl
@@ -527,7 +550,8 @@ impl VendorAPIResponse for IncodeResponse<UpdatedWatchlistResultResponse> {
 
     // we don't use incode in this way
     fn parsed_response(&self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a IncodeRawResponse again ??
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a
+                                                                     // IncodeRawResponse again ??
     }
 }
 
@@ -564,7 +588,9 @@ impl VendorAPIResponse for IncodeResponse<CurpValidationResponse> {
 
     // we don't use incode in this way
     fn parsed_response(&self) -> ParsedResponse {
-        ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a IncodeRawResponse again ?? idk i forget
+        ParsedResponse::IncodeRawResponse(self.raw_response.clone()) // TODO: why do have a
+                                                                     // IncodeRawResponse again ??
+                                                                     // idk i forget
     }
 }
 

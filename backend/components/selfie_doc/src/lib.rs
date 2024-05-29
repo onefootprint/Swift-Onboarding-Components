@@ -1,22 +1,29 @@
-use analyze_id::AnalyzeIdResult;
-use aws_sdk_rekognition::{
-    client::Client as RekClient,
-    error::SdkError as RekSdkError,
-    operation::{
-        compare_faces::CompareFacesError, detect_faces::DetectFacesError, detect_text::DetectTextError,
-    },
-    primitives::Blob,
-    types::{Attribute, Image},
-};
-use aws_sdk_textract::{
-    error::SdkError as TextSdkError, operation::analyze_id::AnalyzeIDError, types::Document,
-    Client as TexClient,
-};
-use aws_types::SdkConfig;
-use compare::{CompareFacesResponse, CompareResult, FaceCompareDetails};
-use newtypes::{PiiBytes, PiiString};
-
 use crate::face::FaceResult;
+use analyze_id::AnalyzeIdResult;
+use aws_sdk_rekognition::client::Client as RekClient;
+use aws_sdk_rekognition::error::SdkError as RekSdkError;
+use aws_sdk_rekognition::operation::compare_faces::CompareFacesError;
+use aws_sdk_rekognition::operation::detect_faces::DetectFacesError;
+use aws_sdk_rekognition::operation::detect_text::DetectTextError;
+use aws_sdk_rekognition::primitives::Blob;
+use aws_sdk_rekognition::types::{
+    Attribute,
+    Image,
+};
+use aws_sdk_textract::error::SdkError as TextSdkError;
+use aws_sdk_textract::operation::analyze_id::AnalyzeIDError;
+use aws_sdk_textract::types::Document;
+use aws_sdk_textract::Client as TexClient;
+use aws_types::SdkConfig;
+use compare::{
+    CompareFacesResponse,
+    CompareResult,
+    FaceCompareDetails,
+};
+use newtypes::{
+    PiiBytes,
+    PiiString,
+};
 
 pub mod analyze_id;
 pub mod compare;
@@ -220,9 +227,8 @@ fn max_f32(f1: Option<f32>, f2: Option<f32>) -> std::cmp::Ordering {
 #[cfg(test)]
 mod tests {
 
-    use crate::face::BoundingBox;
-
     use super::*;
+    use crate::face::BoundingBox;
 
     async fn run_test(doc: PiiBytes, selfie: PiiBytes) {
         let _dotenv = dotenv::dotenv().unwrap();

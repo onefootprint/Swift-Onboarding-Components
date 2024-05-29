@@ -1,6 +1,14 @@
 use crate::{
-    AllData, CleanAndValidate, CollectedData, DataIdentifier, DataIdentifierValue,
-    IsDataIdentifierDiscriminant, KvDataKey, NtResult, PiiJsonValue, ValidateArgs,
+    AllData,
+    CleanAndValidate,
+    CollectedData,
+    DataIdentifier,
+    DataIdentifierValue,
+    IsDataIdentifierDiscriminant,
+    KvDataKey,
+    NtResult,
+    PiiJsonValue,
+    ValidateArgs,
 };
 
 impl CleanAndValidate for KvDataKey {

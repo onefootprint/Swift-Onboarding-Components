@@ -1,10 +1,18 @@
-use std::{net::SocketAddr, time::Duration};
-
-use hyper::{
-    server::conn::AddrIncoming,
-    service::{make_service_fn, service_fn},
-    Body, Method, Request, Response, Server, StatusCode,
+use hyper::server::conn::AddrIncoming;
+use hyper::service::{
+    make_service_fn,
+    service_fn,
 };
+use hyper::{
+    Body,
+    Method,
+    Request,
+    Response,
+    Server,
+    StatusCode,
+};
+use std::net::SocketAddr;
+use std::time::Duration;
 
 pub async fn ditto(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     match (req.method(), req.uri().path()) {

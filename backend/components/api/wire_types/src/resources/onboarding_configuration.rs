@@ -1,8 +1,19 @@
 use crate::*;
 use newtypes::{
-    ApiKeyStatus, AppClipExperienceId, AuthMethodKind, CipKind, CollectedDataOption,
-    DocumentAndCountryConfiguration, DocumentRequestConfig, EnhancedAml, Iso3166TwoDigitCountryCode,
-    ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId, VerificationCheck,
+    ApiKeyStatus,
+    AppClipExperienceId,
+    AuthMethodKind,
+    CipKind,
+    CollectedDataOption,
+    DocumentAndCountryConfiguration,
+    DocumentRequestConfig,
+    EnhancedAml,
+    Iso3166TwoDigitCountryCode,
+    ObConfigurationId,
+    ObConfigurationKey,
+    ObConfigurationKind,
+    TenantId,
+    VerificationCheck,
 };
 
 /// OnboardingConfiguration that was created
@@ -33,7 +44,12 @@ pub struct OnboardingConfiguration {
     pub kind: ObConfigurationKind,
     pub is_rules_enabled: bool,
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
-    pub rule_set: Option<RuleSet>, // theoretically we have a RuleSet for every OBC but this might not always be the case (ie mb Auth playbooks won't always have this?) and just to be a bit more defensive about a super important model here we make it optional (avoid nasty potential errors in inner joining on rule_set on OBC queries and such which is a wide blast radius for just this rule set version stuff here)
+    pub rule_set: Option<RuleSet>, /* theoretically we have a RuleSet for every OBC but this might not
+                                    * always be the case (ie mb Auth playbooks won't always have this?)
+                                    * and just to be a bit more defensive about a super important model
+                                    * here we make it optional (avoid nasty potential errors in inner
+                                    * joining on rule_set on OBC queries and such which is a wide blast
+                                    * radius for just this rule set version stuff here) */
     pub cip_kind: Option<CipKind>,
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     pub curp_validation_enabled: bool,
@@ -79,7 +95,9 @@ pub struct PublicOnboardingConfiguration {
     pub support_phone: Option<String>,
     pub support_website: Option<String>,
 
-    /// When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.
+    /// When non-null, the provided auth methods are required to be verified by the playbook. Null
+    /// does not mean that no auth is required - it just means the playbook doesn't care which
+    /// method is used.
     pub required_auth_methods: Option<Vec<AuthMethodKind>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nid_enabled: Option<bool>,

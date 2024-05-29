@@ -1,15 +1,31 @@
-use std::collections::HashMap;
-
-use crate::{DbResult, HasLifetime, PgConn, TxnPgConn, VaultedData};
-use chrono::{DateTime, Utc};
+use super::data_lifetime::DataLifetime;
+use crate::{
+    DbResult,
+    HasLifetime,
+    PgConn,
+    TxnPgConn,
+    VaultedData,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::document_data;
 use diesel::prelude::*;
 use newtypes::{
-    DataIdentifier, DataLifetimeId, DataLifetimeSeqno, DataLifetimeSource, DbActor, DocumentDataId,
-    PiiString, S3Url, ScopedVaultId, SealedVaultDataKey, VaultId,
+    DataIdentifier,
+    DataLifetimeId,
+    DataLifetimeSeqno,
+    DataLifetimeSource,
+    DbActor,
+    DocumentDataId,
+    PiiString,
+    S3Url,
+    ScopedVaultId,
+    SealedVaultDataKey,
+    VaultId,
 };
-
-use super::data_lifetime::DataLifetime;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = document_data)]

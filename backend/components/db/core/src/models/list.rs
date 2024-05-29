@@ -1,18 +1,44 @@
-use std::collections::HashMap;
-
-use super::{data_lifetime::DataLifetime, ob_configuration::IsLive};
-use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::list::{self, BoxedQuery};
-use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
-use newtypes::{
-    DataLifetimeSeqno, DbActor, ListAlias, ListId, ListKind, Locked, SealedVaultDataKey, TenantId,
+use super::data_lifetime::DataLifetime;
+use super::ob_configuration::IsLive;
+use crate::{
+    DbError,
+    DbResult,
+    NextPage,
+    OffsetPagination,
+    PgConn,
+    TxnPgConn,
 };
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::list::{
+    self,
+    BoxedQuery,
+};
+use diesel::pg::Pg;
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    DataLifetimeSeqno,
+    DbActor,
+    ListAlias,
+    ListId,
+    ListKind,
+    Locked,
+    SealedVaultDataKey,
+    TenantId,
+};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = list)]
-/// Represents a list of data (emails, email domains, ip addresses, etc) that a Tenant can reference in Rules
-/// aka "BlockList"'s but these lists don't inherently imply blocking/failing a user. They could be used in whatever manner in Rules
+/// Represents a list of data (emails, email domains, ip addresses, etc) that a Tenant can reference
+/// in Rules aka "BlockList"'s but these lists don't inherently imply blocking/failing a user. They
+/// could be used in whatever manner in Rules
 pub struct List {
     pub id: ListId,
     pub created_at: DateTime<Utc>,
@@ -61,7 +87,8 @@ impl List {
         is_live: IsLive,
         actor: DbActor,
         name: String,
-        alias: ListAlias, // TODO: still a bit unclear if this is user set or only automatically generated from us
+        alias: ListAlias, /* TODO: still a bit unclear if this is user set or only automatically generated
+                           * from us */
         kind: ListKind,
         e_data_key: SealedVaultDataKey,
     ) -> DbResult<Self> {
@@ -219,11 +246,10 @@ impl List {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use super::*;
     use crate::tests::prelude::*;
     use macros::db_test;
+    use std::str::FromStr;
 
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {

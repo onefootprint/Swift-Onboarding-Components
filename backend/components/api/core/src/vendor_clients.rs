@@ -1,46 +1,85 @@
-use std::sync::Arc;
-
-use idv::{
-    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
-    footprint_http_client::FootprintVendorHttpClient,
-    idology::{
-        pa::{IdologyPaAPIResponse, IdologyPaRequest},
-        IdologyExpectIDAPIResponse, IdologyExpectIDRequest,
-    },
-    incode::{
-        curp_validation::{response::CurpValidationResponse, IncodeCurpValidationRequest},
-        doc::{
-            response::{
-                AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
-                FetchScoresResponse, GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
-            },
-            IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
-            IncodeAddPrivacyConsentRequest, IncodeAddSelfieRequest, IncodeFetchOCRRequest,
-            IncodeFetchScoresRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
-            IncodeProcessIdRequest,
-        },
-        government_validation::{
-            request::IncodeGovernmentValidationRequest, response::GovernmentValidationResponse,
-        },
-        response::OnboardingStartResponse,
-        watchlist::{
-            response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
-            IncodeUpdatedWatchlistResultRequest, IncodeWatchlistCheckRequest,
-        },
-        IncodeResponse, IncodeStartOnboardingRequest,
-    },
-    lexis::client::{LexisFlexIdRequest, LexisFlexIdResponse},
-    middesk::{
-        client::MiddeskClient, MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse,
-        MiddeskGetBusinessRequest, MiddeskGetBusinessResponse,
-    },
-    neuro_id::{response::NeuroApiResponse, NeuroIdAnalyticsRequest},
-    socure::{client::SocureClient, SocureIDPlusAPIResponse, SocureIDPlusRequest},
-    stytch::{client::StytchClient, StytchLookupRequest, StytchLookupResponse},
-    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
+use crate::decision::vendor::vendor_trait::VendorAPICall;
+use crate::utils::sms::SmsClient;
+use idv::experian::{
+    ExperianCrossCoreRequest,
+    ExperianCrossCoreResponse,
 };
-
-use crate::{decision::vendor::vendor_trait::VendorAPICall, utils::sms::SmsClient};
+use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::idology::pa::{
+    IdologyPaAPIResponse,
+    IdologyPaRequest,
+};
+use idv::idology::{
+    IdologyExpectIDAPIResponse,
+    IdologyExpectIDRequest,
+};
+use idv::incode::curp_validation::response::CurpValidationResponse;
+use idv::incode::curp_validation::IncodeCurpValidationRequest;
+use idv::incode::doc::response::{
+    AddConsentResponse,
+    AddSelfieResponse,
+    AddSideResponse,
+    FetchOCRResponse,
+    FetchScoresResponse,
+    GetOnboardingStatusResponse,
+    ProcessFaceResponse,
+    ProcessIdResponse,
+};
+use idv::incode::doc::{
+    IncodeAddBackRequest,
+    IncodeAddFrontRequest,
+    IncodeAddMLConsentRequest,
+    IncodeAddPrivacyConsentRequest,
+    IncodeAddSelfieRequest,
+    IncodeFetchOCRRequest,
+    IncodeFetchScoresRequest,
+    IncodeGetOnboardingStatusRequest,
+    IncodeProcessFaceRequest,
+    IncodeProcessIdRequest,
+};
+use idv::incode::government_validation::request::IncodeGovernmentValidationRequest;
+use idv::incode::government_validation::response::GovernmentValidationResponse;
+use idv::incode::response::OnboardingStartResponse;
+use idv::incode::watchlist::response::{
+    UpdatedWatchlistResultResponse,
+    WatchlistResultResponse,
+};
+use idv::incode::watchlist::{
+    IncodeUpdatedWatchlistResultRequest,
+    IncodeWatchlistCheckRequest,
+};
+use idv::incode::{
+    IncodeResponse,
+    IncodeStartOnboardingRequest,
+};
+use idv::lexis::client::{
+    LexisFlexIdRequest,
+    LexisFlexIdResponse,
+};
+use idv::middesk::client::MiddeskClient;
+use idv::middesk::{
+    MiddeskCreateBusinessRequest,
+    MiddeskCreateBusinessResponse,
+    MiddeskGetBusinessRequest,
+    MiddeskGetBusinessResponse,
+};
+use idv::neuro_id::response::NeuroApiResponse;
+use idv::neuro_id::NeuroIdAnalyticsRequest;
+use idv::socure::client::SocureClient;
+use idv::socure::{
+    SocureIDPlusAPIResponse,
+    SocureIDPlusRequest,
+};
+use idv::stytch::client::StytchClient;
+use idv::stytch::{
+    StytchLookupRequest,
+    StytchLookupResponse,
+};
+use idv::twilio::{
+    TwilioLookupV2APIResponse,
+    TwilioLookupV2Request,
+};
+use std::sync::Arc;
 
 pub type VendorClient<Req, Resp, E> = Arc<dyn VendorAPICall<Req, Resp, E>>;
 

@@ -1,9 +1,16 @@
-use idv::incode::watchlist::response::{Hit, WatchlistResultResponse};
-use itertools::Itertools;
-use newtypes::{vendor_reason_code_enum, AdverseMediaListKind, EnhancedAmlOption, FootprintReasonCode};
-use strum_macros::EnumString;
-
 use super::incode_utils::pii_strings_match_name_normalized;
+use idv::incode::watchlist::response::{
+    Hit,
+    WatchlistResultResponse,
+};
+use itertools::Itertools;
+use newtypes::{
+    vendor_reason_code_enum,
+    AdverseMediaListKind,
+    EnhancedAmlOption,
+    FootprintReasonCode,
+};
+use strum_macros::EnumString;
 
 vendor_reason_code_enum! {
     #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, Hash)]
@@ -167,7 +174,8 @@ impl IncodeWatchlistType {
     }
 }
 
-// If a Hit's `score` is below this number, we will consider it a true hit. Else we will ignore it for the purposes for producing reason codes
+// If a Hit's `score` is below this number, we will consider it a true hit. Else we will ignore it
+// for the purposes for producing reason codes
 const SCORE_THRESHOLD_FOR_HIT: f32 = 10.0;
 
 pub fn type_to_frc(s: String) -> Option<FootprintReasonCode> {
@@ -202,8 +210,9 @@ fn watchlist_types_for_enhanced_aml_opt(enhanced_aml: &EnhancedAmlOption) -> Vec
             ofac.then(|| {
                 vec![
                     IncodeWatchlistType::Sanction,
-                    // TODO: turning these off now as a quick patch to improve precision. Getting clarity from CA on what exactly these entail and if `sanction` is sufficient for most general OFAC needs
-                    // IncodeWatchlistType::Warning,
+                    // TODO: turning these off now as a quick patch to improve precision. Getting clarity
+                    // from CA on what exactly these entail and if `sanction` is sufficient for most general
+                    // OFAC needs IncodeWatchlistType::Warning,
                     // IncodeWatchlistType::FitnessProbity,
                 ]
             }),
@@ -244,7 +253,7 @@ pub fn get_hits(res: &WatchlistResultResponse, enhanced_aml: &EnhancedAmlOption)
         // for now, also only consider it a hit if `name_exact`, for a bit more precision
         .filter(|h| h.match_types.as_ref().map(|t| t.contains(&"name_exact".to_string())).unwrap_or(false))
         // CA's logic for determine hits/what it calls "name_exact" matches is still very low precision. In particular, this returns many hits where parts of the names are ordered differently in our search term vs the found hit or the found hit has additional names that the search term does not. Unclear what default settings most tenants would want here or how CA/Incode typically suggest mitigating these sorts of factors but for now as a quick patch we manually confirm here that our searched name exactly matches the found hit's name
-        .filter(|h| h.doc.as_ref().and_then(|d| d.name.as_ref().map(|n| 
+        .filter(|h| h.doc.as_ref().and_then(|d| d.name.as_ref().map(|n|
             match &search_term {
                 Some(st) => pii_strings_match_name_normalized(&st.clone().into(), &n.clone().into()),
                 None => {
@@ -288,11 +297,15 @@ pub fn reason_codes_from_watchlist_result(
 
 #[cfg(test)]
 mod test {
-    use idv::incode::watchlist::response::{Content, Data, Doc, Hit};
+    use super::*;
+    use idv::incode::watchlist::response::{
+        Content,
+        Data,
+        Doc,
+        Hit,
+    };
     use std::str::FromStr;
     use test_case::test_case;
-
-    use super::*;
 
     #[test_case("pep" => (Some(IncodeWatchlistType::Pep), Some(FootprintReasonCode::WatchlistHitPep)))]
     #[test_case("pep-class-2" => (Some(IncodeWatchlistType::PepClass2), Some(FootprintReasonCode::WatchlistHitPep)))]

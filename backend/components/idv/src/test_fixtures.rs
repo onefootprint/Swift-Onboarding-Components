@@ -1,6 +1,8 @@
 use chrono::NaiveDate;
+use newtypes::incode::IncodeStatus;
 use newtypes::{
-    incode::IncodeStatus, ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes,
+    ExperianAddressAndNameMatchReasonCodes,
+    ExperianSSNReasonCodes,
     ExperianWatchlistReasonCodes,
 };
 // From: https://learn.sayari.com/mexico-national-id-number-curp/

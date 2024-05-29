@@ -1,17 +1,34 @@
-use chrono::{DateTime, Duration, Utc};
+use crate::{
+    FpId,
+    OnboardingStatus,
+    ScopedVaultId,
+    TenantId,
+    WatchlistCheckError,
+    WatchlistCheckStatusKind,
+    WorkflowId,
+};
+use chrono::{
+    DateTime,
+    Duration,
+    Utc,
+};
 use derive_more::Display;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use serde_with::DeserializeFromStr;
 use strum::EnumDiscriminants;
-use strum_macros::{AsRefStr, EnumString};
-
-use crate::{
-    FpId, OnboardingStatus, ScopedVaultId, TenantId, WatchlistCheckError, WatchlistCheckStatusKind,
-    WorkflowId,
+use strum_macros::{
+    AsRefStr,
+    EnumString,
 };
 
 // TODO: can probs rename this to task.rs now
@@ -55,7 +72,8 @@ crate::util::impl_enum_str_diesel!(TaskStatus);
 #[serde(tag = "kind", content = "data")]
 pub enum TaskData {
     LogMessage(LogMessageTaskArgs),
-    LogNumTenantApiKeys(LogNumTenantApiKeysArgs), // proof of concept non-trivial task that does DB stuffs, can remove in future
+    LogNumTenantApiKeys(LogNumTenantApiKeysArgs), /* proof of concept non-trivial task that does DB
+                                                   * stuffs, can remove in future */
     WatchlistCheck(WatchlistCheckArgs),
     FireWebhook(FireWebhookArgs),
     RunIncodeStuckWorkflow(RunIncodeStuckWorkflowArgs),
@@ -72,7 +90,9 @@ impl TaskKind {
         match self {
             TaskKind::LogMessage => 1,
             TaskKind::LogNumTenantApiKeys => 1,
-            TaskKind::WatchlistCheck => 1, // errors here are unexpected and the task is not time sensitive so we'd rather investigate a failure as soon as it happens
+            TaskKind::WatchlistCheck => 1, /* errors here are unexpected and the task is not time */
+            // sensitive so we'd rather investigate a failure as soon as it
+            // happens
             TaskKind::FireWebhook => 3,
             TaskKind::RunIncodeStuckWorkflow => 3,
         }

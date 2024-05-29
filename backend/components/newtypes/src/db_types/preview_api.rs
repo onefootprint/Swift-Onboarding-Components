@@ -1,9 +1,19 @@
 use crate::util::impl_enum_string_diesel;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
 use strum::IntoEnumIterator;
-use strum_macros::{Display, EnumIter};
+use strum_macros::{
+    Display,
+    EnumIter,
+};
 
 #[derive(
     Eq,

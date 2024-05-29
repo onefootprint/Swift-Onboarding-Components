@@ -1,9 +1,19 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use macros::SerdeAttr;
 use paperclip::actix::Apiv2Schema;
-
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum_macros::{AsRefStr, Display, EnumString};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum_macros::{
+    AsRefStr,
+    Display,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -36,9 +46,8 @@ crate::util::impl_enum_str_diesel!(WaterfallStepAction);
 
 #[cfg(test)]
 mod tests {
-    use std::cmp::Ordering;
-
     use super::*;
+    use std::cmp::Ordering;
     use test_case::test_case;
     #[test_case(WaterfallStepAction::Pass, WaterfallStepAction::IdFlagged => Ordering::Less)]
     #[test_case(WaterfallStepAction::IdFlagged, WaterfallStepAction::RuleTriggered => Ordering::Less)]

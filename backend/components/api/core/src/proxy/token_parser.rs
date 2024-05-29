@@ -1,14 +1,15 @@
 //! Parses tokens on the EGRESS and detokenizes
 
-use std::collections::HashMap;
-
-use crate::{errors::proxy::VaultProxyError, telemetry::RootSpan};
-
+use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiResult;
-
+use crate::telemetry::RootSpan;
 use itertools::Itertools;
-
-use newtypes::{FpId, PiiString, ProxyToken};
+use newtypes::{
+    FpId,
+    PiiString,
+    ProxyToken,
+};
+use std::collections::HashMap;
 
 /// The Proxy Token Parser finds proxy tokens in a body
 /// and stores the string matches for future replacement
@@ -83,8 +84,8 @@ impl<'a> ProxyTokenParser<'a> {
 /// A util to iterate through the raw body in linear time. The callback is called with each token
 /// and allows replacing the token with a detokenized value.
 /// This returns the raw body with tokens replaced with the return value of the callback.
-/// - `detokenize` is called for each complete token in the body that is extracted. Its return
-///   value is used to replace the token in the return value.
+/// - `detokenize` is called for each complete token in the body that is extracted. Its return value
+///   is used to replace the token in the return value.
 fn process_tokens<'a, F>(raw: &str, mut detokenize: F) -> ApiResult<PiiString>
 where
     F: FnMut(&str) -> ApiResult<Option<&'a PiiString>>,
@@ -174,12 +175,17 @@ mod tests {
     //!     - failure cases (invalid tokens)
     //!     - multiple fp_ids
     //!     - multiple matches
-    use std::str::FromStr;
-
     use super::*;
     use newtypes::{
-        pii, CountArgs, DataIdentifier, FilterFunction, FpId, IdentityDataKind as IDK, KvDataKey,
+        pii,
+        CountArgs,
+        DataIdentifier,
+        FilterFunction,
+        FpId,
+        IdentityDataKind as IDK,
+        KvDataKey,
     };
+    use std::str::FromStr;
     use test_case::test_case;
     use DataIdentifier as DI;
     use FilterFunction::*;
@@ -215,9 +221,9 @@ mod tests {
         // The main constraint is that process_tokens should be extracting only the minimal set of
         // tokens.
         let mut tokens = vec![];
-        let raw = 
+        let raw =
             "{{token1}} This is a nice string. }} It has {{ with-spaces     }} some tokens inside of it. And {{{ extra-opening-brace  }} another token. And also {{ extra-closing-brace  }}} some {{ text-before-an-extra-opening-brace {{{ double-opening-braces-is-minimal }} more tokens.{{ {{ end-of-string-is-token }}";
-        let expected_non_token_str = 
+        let expected_non_token_str =
             "*** This is a nice string. }} It has *** some tokens inside of it. And {*** another token. And also ***} some {{ text-before-an-extra-opening-brace {*** more tokens.{{ ***";
         let token_replacement = PiiString::new("***".into());
         let non_token_str = process_tokens(raw, |token| -> ApiResult<Option<&PiiString>> {

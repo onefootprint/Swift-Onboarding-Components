@@ -1,5 +1,9 @@
 use api_core::errors::ApiResult;
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{
+    criterion_group,
+    criterion_main,
+    Criterion,
+};
 
 fn api_error() -> ApiResult<()> {
     Ok(())

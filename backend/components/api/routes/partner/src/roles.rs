@@ -1,13 +1,20 @@
-use crate::{
-    errors::ApiResult,
-    types::{JsonApiResponse, OffsetPaginationRequest},
-    State,
+use crate::errors::ApiResult;
+use crate::types::{
+    JsonApiResponse,
+    OffsetPaginationRequest,
 };
+use crate::State;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_route_org_common::roles as roles_common;
 use api_wire_types::OrgRoleFilters;
 use newtypes::TenantRoleId;
-use paperclip::actix::{api_v2_operation, get, patch, post, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    patch,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     tags(Roles, OrgSettings, Private),

@@ -1,5 +1,12 @@
-use crate::{models::list::List, PgConn};
-use newtypes::{DbActor, ListAlias, ListKind, SealedVaultDataKey, TenantId};
+use crate::models::list::List;
+use crate::PgConn;
+use newtypes::{
+    DbActor,
+    ListAlias,
+    ListKind,
+    SealedVaultDataKey,
+    TenantId,
+};
 use std::str::FromStr;
 
 pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> List {

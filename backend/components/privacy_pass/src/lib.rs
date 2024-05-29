@@ -1,6 +1,13 @@
-use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{
+    BigEndian,
+    ReadBytesExt,
+    WriteBytesExt,
+};
 use crypto::base64;
-use std::io::{Read, Write};
+use std::io::{
+    Read,
+    Write,
+};
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -57,7 +64,6 @@ impl TokenChallenge {
     ///     uint16_t origin_info_length;       // Origin info length, in network-byte order
     ///     char origin_info[];                // Hostname of your server
     /// } TokenChallenge;
-    ///
     pub fn marshal_bytes(&self) -> Result<Vec<u8>> {
         let mut result = vec![];
 
@@ -102,7 +108,7 @@ impl Token {
     ///    uint8_t challenge_digest[32];
     ///    uint8_t token_key_id[32];
     ///    uint8_t authenticator[256];
-    ///} Token;         
+    ///} Token;
     pub fn unmarshal(token: &str) -> Result<Self> {
         let token = base64::decode_config(token, base64::URL_SAFE)?;
         let mut token = std::io::Cursor::new(token);
@@ -176,7 +182,10 @@ impl Token {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Token, TokenChallenge};
+    use crate::{
+        Token,
+        TokenChallenge,
+    };
 
     #[test]
     fn test_verify() {

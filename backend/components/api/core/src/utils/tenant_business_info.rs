@@ -1,9 +1,13 @@
-use db::models::{tenant::Tenant, tenant_business_info::TenantBusinessInfo};
-
-use crate::{
-    enclave_client::{DecryptReq, EnclaveClient},
-    errors::{ApiResult, AssertionError},
+use crate::enclave_client::{
+    DecryptReq,
+    EnclaveClient,
 };
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+};
+use db::models::tenant::Tenant;
+use db::models::tenant_business_info::TenantBusinessInfo;
 
 #[derive(PartialEq, Eq, Hash)]
 enum BusinessInfoField {

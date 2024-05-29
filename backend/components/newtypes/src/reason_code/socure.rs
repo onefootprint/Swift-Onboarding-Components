@@ -1,8 +1,10 @@
 use crate::db_types::FootprintReasonCode;
-use strum::{Display, EnumIter};
-use strum_macros::EnumString;
-
 use crate::vendor_reason_code_enum;
+use strum::{
+    Display,
+    EnumIter,
+};
+use strum_macros::EnumString;
 
 vendor_reason_code_enum! {
     #[derive(Debug, Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, Hash, EnumIter)]
@@ -1496,7 +1498,8 @@ vendor_reason_code_enum! {
 
 #[cfg(test)]
 mod tests {
-    use crate::{db_types::FootprintReasonCode, reason_code::socure::SocureReasonCode};
+    use crate::db_types::FootprintReasonCode;
+    use crate::reason_code::socure::SocureReasonCode;
 
     #[test]
     fn test_vendor_reason_code_enum_use() {

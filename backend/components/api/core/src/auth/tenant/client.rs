@@ -1,24 +1,44 @@
-use crate::{
-    auth::{
-        session::{tenant::ClientTenantAuth, AuthSessionData, ExtractableAuthSession, RequestInfo},
-        AuthError, CanDecrypt, CanVault, IsGuardMet, SessionContext,
-    },
-    errors::ApiResult,
-    State,
+use super::{
+    AuthActor,
+    TenantAuth,
 };
+use crate::auth::session::tenant::ClientTenantAuth;
+use crate::auth::session::{
+    AuthSessionData,
+    ExtractableAuthSession,
+    RequestInfo,
+};
+use crate::auth::{
+    AuthError,
+    CanDecrypt,
+    CanVault,
+    IsGuardMet,
+    SessionContext,
+};
+use crate::errors::ApiResult;
+use crate::State;
 use actix_web::web;
-use db::{models::tenant::Tenant, PgConn};
+use db::models::tenant::Tenant;
+use db::PgConn;
 use futures_util::Future;
 use itertools::Itertools;
-use newtypes::{DataIdentifier, DataLifetimeSource, FpId, PiiString, TenantApiKeyId};
-use paperclip::{
-    actix::Apiv2Security,
-    v2::models::{DataType, DefaultSchemaRaw, Parameter, ParameterIn},
+use newtypes::{
+    DataIdentifier,
+    DataLifetimeSource,
+    FpId,
+    PiiString,
+    TenantApiKeyId,
 };
-use std::{pin::Pin, sync::Arc};
+use paperclip::actix::Apiv2Security;
+use paperclip::v2::models::{
+    DataType,
+    DefaultSchemaRaw,
+    Parameter,
+    ParameterIn,
+};
+use std::pin::Pin;
+use std::sync::Arc;
 use tracing_actix_web::RootSpan;
-
-use super::{AuthActor, TenantAuth};
 
 #[derive(Debug, Clone)]
 pub struct ClientTenantData {

@@ -10,7 +10,8 @@ mod tenants;
 mod test_partner_tenant;
 mod test_tenant;
 
-pub use api_core::{auth::protected_auth::ProtectedAuth, State};
+pub use api_core::auth::protected_auth::ProtectedAuth;
+pub use api_core::State;
 
 pub fn configure(config: &mut actix_web::web::ServiceConfig) {
     config

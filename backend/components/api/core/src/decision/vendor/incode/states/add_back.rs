@@ -1,21 +1,32 @@
-use super::{AddConsent, AddSelfie, AddSideResponseHelper, IncodeStateTransition, VerificationSession};
-use crate::{
-    decision::vendor::{
-        incode::{
-            state::{IncodeState, TransitionResult},
-            IncodeContext,
-        },
-        map_to_api_error,
-        verification_result::SaveVerificationResultArgs,
-    },
-    errors::ApiResult,
-    vendor_clients::IncodeClients,
+use super::{
+    AddConsent,
+    AddSelfie,
+    AddSideResponseHelper,
+    IncodeStateTransition,
+    VerificationSession,
 };
+use crate::decision::vendor::incode::state::{
+    IncodeState,
+    TransitionResult,
+};
+use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-use db::{DbPool, TxnPgConn};
+use db::{
+    DbPool,
+    TxnPgConn,
+};
 use either::Either;
 use idv::incode::doc::IncodeAddBackRequest;
-use newtypes::{DocVData, DocumentSide, IncodeFailureReason, VendorAPI};
+use newtypes::{
+    DocVData,
+    DocumentSide,
+    IncodeFailureReason,
+    VendorAPI,
+};
 
 pub struct AddBack {
     add_side_response_helper: AddSideResponseHelper,
@@ -102,8 +113,9 @@ impl IncodeStateTransition for AddBack {
         //
         // Theoretically if we progressed to back fine, and are _now_ getting this error, it
         // means the user switched document types halfway through or incode is bugging out. One option is
-        // to require them to go back to AddFront, but we'll assume that having a front and back from different documents will
-        // fail upon processing, and this state is just about collecting documents to produce a score, so I think it's ok
+        // to require them to go back to AddFront, but we'll assume that having a front and back from
+        // different documents will fail upon processing, and this state is just about collecting
+        // documents to produce a score, so I think it's ok
         let type_of_id = self.add_side_response_helper.type_of_id.as_ref();
         let document_subtype = self.add_side_response_helper.document_subtype.as_ref();
         let country_code = self.add_side_response_helper.country_code.as_ref();

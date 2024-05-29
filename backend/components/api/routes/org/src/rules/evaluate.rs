@@ -1,36 +1,63 @@
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
+};
+use crate::errors::ApiResult;
+use crate::types::ResponseData;
+use crate::State;
+use api_core::decision::rule_engine::engine::VaultDataForRules;
+use api_core::decision::rule_engine::eval::{
+    Rule,
+    RuleEvalConfig,
+};
+use api_core::decision::rule_engine::validation::validate_rule_expression;
+use api_core::decision::state::common::saturate_list_entries;
+use api_core::decision::{
+    self,
+};
+use api_core::errors::AssertionError;
+use api_core::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+};
+use api_wire_types::{
+    EvaluateRuleRequest,
+    RuleEvalResult,
+    RuleEvalStats,
+    RuleResultRuleAction,
+};
+use db::models::insight_event::InsightEvent;
+use db::models::list::List;
+use db::models::list_entry::ListEntry;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_instance::{
+    IncludeRules,
+    RuleInstance,
+};
+use db::models::rule_set_result::{
+    RuleSetResult,
+    RuleSetResultSample,
+};
+use itertools::{
+    chain,
+    Itertools,
+};
+use newtypes::{
+    ListId,
+    ObConfigurationId,
+    RuleAction,
+    RuleExpression,
+    RuleId,
+    RuleInstanceKind,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 use std::collections::HashMap;
-
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiResult,
-    types::ResponseData,
-    State,
-};
-use api_core::{
-    decision::{
-        self,
-        rule_engine::{
-            engine::VaultDataForRules,
-            eval::{Rule, RuleEvalConfig},
-            validation::validate_rule_expression,
-        },
-        state::common::saturate_list_entries,
-    },
-    errors::AssertionError,
-    utils::vault_wrapper::{Any, VaultWrapper},
-};
-use api_wire_types::{EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
-use db::models::{
-    insight_event::InsightEvent,
-    list::List,
-    list_entry::ListEntry,
-    ob_configuration::ObConfiguration,
-    rule_instance::{IncludeRules, RuleInstance},
-    rule_set_result::{RuleSetResult, RuleSetResultSample},
-};
-use itertools::{chain, Itertools};
-use newtypes::{ListId, ObConfigurationId, RuleAction, RuleExpression, RuleId, RuleInstanceKind};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 /*
 In the ideal case, you are backtesting only on onboardings that have occurred since the last rule edit was made. If that is the case then the results of the backtest are purely a function of the hypothetical edits.
@@ -275,9 +302,12 @@ fn get_stats(results: &[RuleEvalResult]) -> RuleEvalStats {
 
 #[cfg(test)]
 mod tests {
-    use newtypes::{FpId, OnboardingStatus, RuleAction};
-
     use super::*;
+    use newtypes::{
+        FpId,
+        OnboardingStatus,
+        RuleAction,
+    };
 
     #[test]
     fn test_get_stats() {

@@ -1,10 +1,23 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum_macros::{AsRefStr, Display, EnumString};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum_macros::{
+    AsRefStr,
+    Display,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -25,11 +38,14 @@ use strum_macros::{AsRefStr, Display, EnumString};
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum WatchlistCheckStatus {
-    Pending,                                  // have not completed vendors calls or decisioning yet
-    Pass,                                     // no watchlist hit
-    Fail,                                     // yes watchlist hit
-    Error(WatchlistCheckError), // check could not be performed (eg: a non-portable vault has insufficient or malformed data the vendor errors on)
-    NotNeeded(WatchlistCheckNotNeededReason), // we do not need to perform the watchlist check for the user at the time the task is run (currently this would be because they are offboarded)
+    Pending, // have not completed vendors calls or decisioning yet
+    Pass,    // no watchlist hit
+    Fail,    // yes watchlist hit
+    Error(WatchlistCheckError), /* check could not be performed (eg: a non-portable vault has
+              * insufficient or malformed data the vendor errors on) */
+    NotNeeded(WatchlistCheckNotNeededReason), /* we do not need to perform the watchlist check for the
+                                               * user at the time the task is run (currently this would
+                                               * be because they are offboarded) */
 }
 
 // couldnt get EnumDiscriminants to work with the diesel attributes ¯\_(ツ)_/¯

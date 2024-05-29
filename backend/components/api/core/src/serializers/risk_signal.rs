@@ -1,6 +1,5 @@
-use db::models::risk_signal::RiskSignal;
-
 use crate::utils::db2api::DbToApi;
+use db::models::risk_signal::RiskSignal;
 
 impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
     fn from_db(rs: RiskSignal) -> Self {

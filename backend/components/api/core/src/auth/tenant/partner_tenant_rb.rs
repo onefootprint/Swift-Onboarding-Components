@@ -1,24 +1,31 @@
-use std::sync::Arc;
-
-use super::{AuthActor, CanCheckTenantGuard, PartnerTenantAuth};
-use crate::{
-    auth::{
-        session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
-        AuthError, SessionContext,
-    },
-    errors::ApiResult,
+use super::{
+    AuthActor,
+    CanCheckTenantGuard,
+    PartnerTenantAuth,
 };
-use db::{
-    helpers::TenantOrPartnerTenant,
-    models::{
-        partner_tenant::PartnerTenant, tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding,
-        tenant_user::TenantUser,
-    },
-    PgConn,
+use crate::auth::session::{
+    AuthSessionData,
+    ExtractableAuthSession,
+    RequestInfo,
 };
+use crate::auth::{
+    AuthError,
+    SessionContext,
+};
+use crate::errors::ApiResult;
+use db::helpers::TenantOrPartnerTenant;
+use db::models::partner_tenant::PartnerTenant;
+use db::models::tenant_role::TenantRole;
+use db::models::tenant_rolebinding::TenantRolebinding;
+use db::models::tenant_user::TenantUser;
+use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::{TenantScope, WorkosAuthMethod};
+use newtypes::{
+    TenantScope,
+    WorkosAuthMethod,
+};
 use paperclip::actix::Apiv2Security;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 /// Represents all partner tenant info identified by a TenantRbSession token. This struct is
@@ -33,8 +40,8 @@ pub struct PartnerTenantRbAuth {
     pub(super) auth_method: WorkosAuthMethod,
 }
 
-/// Nests a private PartnerTenantRbAuth and implements traits required to extract this session from an
-/// actix request.
+/// Nests a private PartnerTenantRbAuth and implements traits required to extract this session from
+/// an actix request.
 ///
 /// Notably, this struct isn't very useful since the entire nested PartnerTenantRbAuth is hidden.
 /// If you want to do something useful, you likely have to enforce permissions by calling

@@ -1,60 +1,101 @@
-use std::sync::Arc;
-
+use crate::decision::features::risk_signals::risk_signal_group_struct::Doc;
+use crate::decision::features::risk_signals::RiskSignalGroupStruct;
+use crate::decision::tests::test_helpers::{
+    self,
+    FixtureData,
+};
+use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+use crate::decision::vendor::{
+    self,
+};
+use crate::errors::ApiResult;
 use crate::{
-    decision::{
-        features::risk_signals::{risk_signal_group_struct::Doc, RiskSignalGroupStruct},
-        tests::test_helpers::{self, FixtureData},
-        vendor::{self, vendor_trait::MockVendorAPICall},
-    },
-    errors::ApiResult,
-    ApiError, State,
+    ApiError,
+    State,
+};
+use db::models::data_lifetime::DataLifetime;
+use db::models::decision_intent::DecisionIntent;
+use db::models::document_request::{
+    DocumentRequest,
+    NewDocumentRequestArgs,
+};
+use db::models::manual_review::ManualReview;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding_decision::OnboardingDecision;
+use db::models::risk_signal::{
+    AtSeqno,
+    RiskSignal,
+};
+use db::models::rule_instance::RuleInstance;
+use db::models::rule_result::RuleResult;
+use db::models::rule_set_result::RuleSetResult;
+use db::models::tenant::Tenant;
+use db::models::tenant_user::TenantUser;
+use db::models::tenant_vendor::{
+    TenantVendorControl,
+    UpdateTenantVendorControlArgs,
+};
+use db::models::user_timeline::{
+    UserTimeline,
+    UserTimelineInfo,
+};
+use db::models::vault::Vault;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::models::workflow::Workflow;
+use db::models::workflow_event::WorkflowEvent;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::fixtures::{
+    self,
 };
 use db::{
-    models::{
-        data_lifetime::DataLifetime,
-        decision_intent::DecisionIntent,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        manual_review::ManualReview,
-        ob_configuration::ObConfiguration,
-        onboarding_decision::OnboardingDecision,
-        risk_signal::{AtSeqno, RiskSignal},
-        rule_instance::RuleInstance,
-        rule_result::RuleResult,
-        rule_set_result::RuleSetResult,
-        tenant::Tenant,
-        tenant_user::TenantUser,
-        tenant_vendor::{TenantVendorControl, UpdateTenantVendorControlArgs},
-        user_timeline::{UserTimeline, UserTimelineInfo},
-        vault::Vault,
-        verification_request::VerificationRequest,
-        verification_result::VerificationResult,
-        workflow::Workflow,
-        workflow_event::WorkflowEvent,
-    },
-    tests::fixtures::{self, ob_configuration::ObConfigurationOpts},
-    DbError, DbResult, TxnPgConn,
+    DbError,
+    DbResult,
+    TxnPgConn,
 };
 use db_schema::schema::document_request;
-use idv::{
-    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
-    idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
-    incode::response::OnboardingStartResponse,
-};
-
 use diesel::prelude::*;
-use idv::{
-    incode::{IncodeResponse, IncodeStartOnboardingRequest},
-    middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse},
-    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
+use idv::experian::{
+    ExperianCrossCoreRequest,
+    ExperianCrossCoreResponse,
+};
+use idv::idology::{
+    IdologyExpectIDAPIResponse,
+    IdologyExpectIDRequest,
+};
+use idv::incode::response::OnboardingStartResponse;
+use idv::incode::{
+    IncodeResponse,
+    IncodeStartOnboardingRequest,
+};
+use idv::middesk::{
+    MiddeskCreateBusinessRequest,
+    MiddeskCreateBusinessResponse,
+};
+use idv::twilio::{
+    TwilioLookupV2APIResponse,
+    TwilioLookupV2Request,
 };
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, DbUserTimelineEventKind, DecisionIntentKind, DocumentRequestConfig,
-    DocumentRequestKind, FootprintReasonCode, OnboardingStatus, PiiJsonValue, RiskSignalGroupKind,
-    ScopedVaultId, VendorAPI, WorkflowFixtureResult, WorkflowId,
+    DataLifetimeSeqno,
+    DbUserTimelineEventKind,
+    DecisionIntentKind,
+    DocumentRequestConfig,
+    DocumentRequestKind,
+    FootprintReasonCode,
+    OnboardingStatus,
+    PiiJsonValue,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+    VendorAPI,
+    WorkflowFixtureResult,
+    WorkflowId,
 };
+use std::sync::Arc;
 use strum_macros::EnumIter;
-use webhooks::{events::WebhookEvent, MockWebhookClient};
+use webhooks::events::WebhookEvent;
+use webhooks::MockWebhookClient;
 
 #[derive(Clone, Copy, Debug)]
 pub enum UserKind {
@@ -483,8 +524,10 @@ pub struct ExpectedRequiresManualReview(pub bool);
 pub struct OnboardingCompleted(pub ExpectedStatus, pub ExpectedRequiresManualReview);
 pub struct OnboardingStatusChanged(pub ExpectedStatus, pub ExpectedRequiresManualReview);
 
-// TODO: I think since we are executing the webhook Task's spawned threads, it could be possible these expectations panic but don't necessarily fail the test
-// need to check what CI would do that in situation. Possible fixes could be: wrap tests in a runtime we create with unhandled_panic OR wrap mock webhook client in a Mutex and call .checkpoint throughout test
+// TODO: I think since we are executing the webhook Task's spawned threads, it could be possible
+// these expectations panic but don't necessarily fail the test need to check what CI would do that
+// in situation. Possible fixes could be: wrap tests in a runtime we create with unhandled_panic OR
+// wrap mock webhook client in a Mutex and call .checkpoint throughout test
 pub fn mock_webhooks(
     state: &mut State,
     expected_ob_status_changed: Vec<OnboardingStatusChanged>,
@@ -547,7 +590,8 @@ pub fn save_vres_for_doc_fixture_risk_signals(
     Ok(vres)
 }
 
-// TODO: we need to simulate actually collecting a document, but incode machine is not currently mockable.
+// TODO: we need to simulate actually collecting a document, but incode machine is not currently
+// mockable.
 pub async fn mock_incode_doc_collection(
     state: &State,
     scoped_vault_id: ScopedVaultId,
@@ -565,7 +609,8 @@ pub async fn mock_incode_doc_collection(
                     .unwrap()
                     .is_none()
             {
-                // we need a doc request in order to indicate to the decision engine that we should include document rules in decisioning
+                // we need a doc request in order to indicate to the decision engine that we should include
+                // document rules in decisioning
                 let config = DocumentRequestConfig::Identity {
                     collect_selfie: false,
                 };

@@ -1,13 +1,9 @@
-use api_wire_types::Actor;
-use db::{
-    actor::SaturatedActor,
-    models::{
-        manual_review::ManualReview, ob_configuration::ObConfiguration,
-        onboarding_decision::OnboardingDecision,
-    },
-};
-
 use crate::utils::db2api::DbToApi;
+use api_wire_types::Actor;
+use db::actor::SaturatedActor;
+use db::models::manual_review::ManualReview;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding_decision::OnboardingDecision;
 
 impl DbToApi<(OnboardingDecision, SaturatedActor)> for api_wire_types::OnboardingDecision {
     fn from_db((decision, saturated_db_actor): (OnboardingDecision, SaturatedActor)) -> Self {

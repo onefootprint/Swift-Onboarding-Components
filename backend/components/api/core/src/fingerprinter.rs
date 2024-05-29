@@ -1,25 +1,30 @@
+use crate::errors::kms::KmsSignError;
+use crate::errors::ApiResult;
+use crate::{
+    ApiError,
+    State,
+};
 use api_wire_types::IdentifyId;
 use async_trait::async_trait;
 use aws_sdk_kms::primitives::Blob;
 use crypto::sha256;
-use db::{
-    errors::OptionalExtension,
-    models::{
-        scoped_vault::ScopedVault,
-        vault::{LocatedVault, Vault},
-    },
+use db::errors::OptionalExtension;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::{
+    LocatedVault,
+    Vault,
 };
 use itertools::Itertools;
+use newtypes::secret_api_key::ApiKeyFingerprinter;
 use newtypes::{
-    secret_api_key::ApiKeyFingerprinter, DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString,
-    ScopedVaultId, TenantId,
+    DataIdentifier,
+    Fingerprint,
+    IdentityDataKind as IDK,
+    PiiString,
+    SandboxId,
+    ScopedVaultId,
+    TenantId,
 };
-
-use crate::{
-    errors::{kms::KmsSignError, ApiResult},
-    ApiError, State,
-};
-use newtypes::SandboxId;
 
 /// Deprecated: old signed hash method using KMS directly
 /// replaced by hmac signing in the enclave

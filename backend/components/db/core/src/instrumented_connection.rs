@@ -1,22 +1,46 @@
 // This is a diesel-2.0 compatible version of https://github.com/CQCL/diesel-tracing
 // When diesel-tracing is updated to support 2.0, we can use it instead.
 
-use std::marker::PhantomData;
-
-use diesel::{
-    backend::Backend,
-    connection::{
-        AnsiTransactionManager, Connection, ConnectionGatWorkaround, DefaultLoadingMode, LoadConnection,
-        LoadRowIter, SimpleConnection, TransactionManager,
-    },
-    deserialize::Queryable,
-    expression::QueryMetadata,
-    pg::{GetPgMetadataCache, Pg, PgConnection, PgRowByRowLoadingMode},
-    query_builder::{Query, QueryBuilder, QueryFragment, QueryId},
-    result::{ConnectionError, ConnectionResult, QueryResult},
-    select, RunQueryDsl,
+use diesel::backend::Backend;
+use diesel::connection::{
+    AnsiTransactionManager,
+    Connection,
+    ConnectionGatWorkaround,
+    DefaultLoadingMode,
+    LoadConnection,
+    LoadRowIter,
+    SimpleConnection,
+    TransactionManager,
 };
-use tracing::{debug, field, instrument};
+use diesel::deserialize::Queryable;
+use diesel::expression::QueryMetadata;
+use diesel::pg::{
+    GetPgMetadataCache,
+    Pg,
+    PgConnection,
+    PgRowByRowLoadingMode,
+};
+use diesel::query_builder::{
+    Query,
+    QueryBuilder,
+    QueryFragment,
+    QueryId,
+};
+use diesel::result::{
+    ConnectionError,
+    ConnectionResult,
+    QueryResult,
+};
+use diesel::{
+    select,
+    RunQueryDsl,
+};
+use std::marker::PhantomData;
+use tracing::{
+    debug,
+    field,
+    instrument,
+};
 
 // https://www.postgresql.org/docs/12/functions-info.html
 // db.name

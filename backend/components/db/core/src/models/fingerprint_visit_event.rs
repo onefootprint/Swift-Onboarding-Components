@@ -1,9 +1,24 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::fingerprint_visit_event;
-use diesel::{prelude::*, Insertable, Queryable};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use newtypes::{
-    FingerprintRequestId, FingerprintVisitEventId, FingerprintVisitorId, ScopedVaultId, SessionId, VaultId,
+    FingerprintRequestId,
+    FingerprintVisitEventId,
+    FingerprintVisitorId,
+    ScopedVaultId,
+    SessionId,
+    VaultId,
 };
 
 /// Represents a single visit from a FootprintVisitorId

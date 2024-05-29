@@ -1,13 +1,34 @@
-use aes_gcm::{aead::Payload, Aes256Gcm, Key, Nonce};
-use p256::{ecdh::EphemeralSecret, elliptic_curve::sec1::ToEncodedPoint, EncodedPoint};
-use rand_core::{OsRng, RngCore};
-use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
-use std::{fmt::Debug, str::FromStr};
-
-use crate::aead::{generate_chacha20_poly1305_key_bytes, AeadSealedBytes, ScopedSealingKey, SealingKey};
-
-pub use self::{seal::seal_ecies_p256_x963_sha256_aes_gcm, unseal::unseal_ecies_p256_x963_sha256_aes_gcm};
+pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
+pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
+use crate::aead::{
+    generate_chacha20_poly1305_key_bytes,
+    AeadSealedBytes,
+    ScopedSealingKey,
+    SealingKey,
+};
+use aes_gcm::aead::Payload;
+use aes_gcm::{
+    Aes256Gcm,
+    Key,
+    Nonce,
+};
+use p256::ecdh::EphemeralSecret;
+use p256::elliptic_curve::sec1::ToEncodedPoint;
+use p256::EncodedPoint;
+use rand_core::{
+    OsRng,
+    RngCore,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use sha2::{
+    Digest,
+    Sha256,
+};
+use std::fmt::Debug;
+use std::str::FromStr;
 
 #[derive(Serialize, Debug, Deserialize, Clone)]
 /// ECDH sealed data
@@ -67,12 +88,13 @@ fn x963_kdf_sha256_32(shared_key: &[u8], shared_info: &[u8]) -> [u8; 32] {
 
 #[allow(clippy::module_inception)]
 pub mod seal {
-    use aes_gcm::{aead::Aead, aes::Aes256, KeyInit};
-
     use super::*;
+    use aes_gcm::aead::Aead;
+    use aes_gcm::aes::Aes256;
+    use aes_gcm::KeyInit;
 
-    /// Anon ECDH0-based sealing under the public key (ECIESEncryptionCofactorVariableIVX963SHA256AESGCM)
-    /// public key is uncompressed
+    /// Anon ECDH0-based sealing under the public key
+    /// (ECIESEncryptionCofactorVariableIVX963SHA256AESGCM) public key is uncompressed
     pub fn seal_ecies_p256_x963_sha256_aes_gcm(
         public_key: &[u8],
         message: Vec<u8>,
@@ -87,8 +109,8 @@ pub mod seal {
         seal_ecies_p256_x963_sha256_aes_gcm_internal(public_key, ephem_priv_key, nonce, message)
     }
 
-    /// Anon ECDH0-based sealing under the public key (ECIESEncryptionCofactorVariableIVX963SHA256AESGCM)
-    /// public key is uncompressed
+    /// Anon ECDH0-based sealing under the public key
+    /// (ECIESEncryptionCofactorVariableIVX963SHA256AESGCM) public key is uncompressed
     fn seal_ecies_p256_x963_sha256_aes_gcm_internal(
         recipient_public_key: &[u8],
         ephemeral_private_key: EphemeralSecret,
@@ -125,8 +147,11 @@ pub mod seal {
 
 pub mod unseal {
     use super::*;
-    use aes_gcm::{aead::Aead, aes::Aes256, KeyInit};
-    use elliptic_curve::{ecdh::diffie_hellman, sec1::ToEncodedPoint};
+    use aes_gcm::aead::Aead;
+    use aes_gcm::aes::Aes256;
+    use aes_gcm::KeyInit;
+    use elliptic_curve::ecdh::diffie_hellman;
+    use elliptic_curve::sec1::ToEncodedPoint;
     pub struct Unsealed(pub Vec<u8>);
 
     /// raw private key BE

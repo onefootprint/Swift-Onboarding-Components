@@ -1,10 +1,14 @@
-use std::fmt::Display;
-
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{
-    output::Csv, CollectedDataOption, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationKind,
-    OnboardingRequirement, WorkflowId,
+    CollectedDataOption,
+    IdDocKind,
+    Iso3166TwoDigitCountryCode,
+    ObConfigurationKind,
+    OnboardingRequirement,
+    WorkflowId,
 };
+use std::fmt::Display;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

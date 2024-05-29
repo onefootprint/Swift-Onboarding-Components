@@ -1,5 +1,4 @@
 use paperclip::actix::Apiv2Schema;
-
 use serde::Serialize;
 
 /// This status is used to group and display decrypted documents in the dashboard

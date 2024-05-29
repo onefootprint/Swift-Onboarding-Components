@@ -1,16 +1,19 @@
-use std::sync::Arc;
-
-use crate::{
-    auth::{
-        session::{tenant::WorkOsSession, AuthSessionData, ExtractableAuthSession, RequestInfo},
-        AuthError,
-    },
-    errors::ApiResult,
+use crate::auth::session::tenant::WorkOsSession;
+use crate::auth::session::{
+    AuthSessionData,
+    ExtractableAuthSession,
+    RequestInfo,
 };
+use crate::auth::AuthError;
+use crate::errors::ApiResult;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::{TenantUserId, WorkosAuthMethod};
+use newtypes::{
+    TenantUserId,
+    WorkosAuthMethod,
+};
 use paperclip::actix::Apiv2Security;
+use std::sync::Arc;
 
 /// Represents a session where a user has logged in but is part of multiple tenants and hasn't yet
 /// selected the tenant whose dashboard they want to view

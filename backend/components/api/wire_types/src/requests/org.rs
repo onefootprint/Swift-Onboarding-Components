@@ -1,8 +1,12 @@
-use newtypes::{
-    email::Email, input::Csv, CompanySize, TenantFrequentNoteKind, TenantRoleId, TenantRoleKindDiscriminant,
-};
-
 use crate::*;
+use newtypes::email::Email;
+use newtypes::input::Csv;
+use newtypes::{
+    CompanySize,
+    TenantFrequentNoteKind,
+    TenantRoleId,
+    TenantRoleKindDiscriminant,
+};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct UpdateTenantRequest {
@@ -86,7 +90,8 @@ pub struct CreateTenantUserRequest {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     #[serde(default)]
-    /// A feature only used by employees to allow inviting users to a tenant without sending them an email
+    /// A feature only used by employees to allow inviting users to a tenant without sending them an
+    /// email
     pub omit_email_invite: bool,
 }
 

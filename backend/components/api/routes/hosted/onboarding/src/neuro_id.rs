@@ -1,11 +1,19 @@
-use api_core::{
-    auth::user::UserAuthContext,
-    errors::AssertionError,
-    types::{JsonApiResponse, ResponseData},
+use api_core::auth::user::UserAuthContext;
+use api_core::errors::AssertionError;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
 };
 use api_wire_types::hosted::neuro_id::NeuroIdentityIdResponse;
-use newtypes::{NeuroIdentityId, UserAuthScope};
-use paperclip::actix::{self, api_v2_operation, web};
+use newtypes::{
+    NeuroIdentityId,
+    UserAuthScope,
+};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),

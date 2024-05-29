@@ -31,9 +31,8 @@ pub fn parse_private_email_domain(email_address: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use test_case::test_case;
-
     use super::parse_private_email_domain;
+    use test_case::test_case;
 
     #[test_case("alex@onefootprint.com" => Some("onefootprint.com".to_string()))]
     #[test_case("josh@donotpay.com" => Some("donotpay.com".to_string()))]

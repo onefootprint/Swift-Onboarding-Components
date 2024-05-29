@@ -1,6 +1,17 @@
-use super::{Error, VResult};
-use crate::{Iso3166TwoDigitCountryCode, PiiJsonValue, PiiString, UsState};
-use chrono::{Datelike, NaiveDate};
+use super::{
+    Error,
+    VResult,
+};
+use crate::{
+    Iso3166TwoDigitCountryCode,
+    PiiJsonValue,
+    PiiString,
+    UsState,
+};
+use chrono::{
+    Datelike,
+    NaiveDate,
+};
 use regex::Regex;
 use serde::de::DeserializeOwned;
 use std::str::FromStr;
@@ -119,7 +130,6 @@ impl AgeHelper {
         }
     }
 }
-
 
 /// validates simple date format in `YYYY-MM-DD` format
 pub fn clean_and_validate_formation_date(input: PiiString) -> VResult<PiiString> {

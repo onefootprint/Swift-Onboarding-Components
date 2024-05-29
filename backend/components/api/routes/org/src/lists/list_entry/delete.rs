@@ -1,13 +1,26 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiResult,
-    types::ResponseData,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{types::EmptyResponse, utils::headers::InsightHeaders};
-use db::models::{insight_event::CreateInsightEvent, list::List, list_entry::ListEntry};
-use newtypes::{ListEntryId, ListId};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use crate::errors::ApiResult;
+use crate::types::ResponseData;
+use crate::State;
+use api_core::types::EmptyResponse;
+use api_core::utils::headers::InsightHeaders;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::list::List;
+use db::models::list_entry::ListEntry;
+use newtypes::{
+    ListEntryId,
+    ListId,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(description = "Delete the List", tags(Lists, Organization, Private))]
 #[actix::delete("/org/lists/{list_id}/entries/{list_entry_id}")]

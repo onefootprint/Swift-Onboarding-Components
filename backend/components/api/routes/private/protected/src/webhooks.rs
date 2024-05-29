@@ -1,19 +1,39 @@
 use crate::ProtectedAuth;
-use actix_web::{post, web, web::Json};
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
+};
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
 use api_core::{
-    errors::{ApiResult, ValidationError},
     task,
-    types::{EmptyResponse, JsonApiResponse},
     State,
 };
 use chrono::Utc;
-use db::models::{
-    scoped_vault::{ScopedVault, SerializableEntity},
-    task::{Task, TaskCreateArgs},
+use db::models::scoped_vault::{
+    ScopedVault,
+    SerializableEntity,
+};
+use db::models::task::{
+    Task,
+    TaskCreateArgs,
 };
 use itertools::Itertools;
 use newtypes::{
-    FireWebhookArgs, FpId, OnboardingCompletedPayload, TaskData, TaskId, TenantId, WebhookEvent,
+    FireWebhookArgs,
+    FpId,
+    OnboardingCompletedPayload,
+    TaskData,
+    TaskId,
+    TenantId,
+    WebhookEvent,
     WebhookEventKind,
 };
 

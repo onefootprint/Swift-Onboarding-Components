@@ -1,7 +1,14 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-
-use strum_macros::{AsRefStr, Display, EnumString};
+use strum_macros::{
+    AsRefStr,
+    Display,
+    EnumString,
+};
 
 #[derive(
     Debug,

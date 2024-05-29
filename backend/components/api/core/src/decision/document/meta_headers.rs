@@ -1,10 +1,9 @@
-use std::pin::Pin;
-
 use crate::utils::headers::get_bool_header;
-
-use actix_web::{http::header::HeaderMap, FromRequest};
+use actix_web::http::header::HeaderMap;
+use actix_web::FromRequest;
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
+use std::pin::Pin;
 
 #[derive(Debug, Apiv2Schema, Clone, Default)]
 pub struct MetaHeaders {
@@ -14,7 +13,8 @@ pub struct MetaHeaders {
     pub is_manual: Option<bool>,
     pub is_extra_compressed: bool,
     pub is_upload: Option<bool>,
-    /// When true, camera permissions were granted, but the camera did not initialize so we allowed uploads.
+    /// When true, camera permissions were granted, but the camera did not initialize so we allowed
+    /// uploads.
     pub is_forced_upload: Option<bool>,
 }
 

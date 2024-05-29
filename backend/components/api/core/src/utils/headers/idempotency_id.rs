@@ -1,16 +1,24 @@
-use crate::{errors::ApiResult, ApiErrorKind};
-
 use super::get_header;
-use actix_web::{http::header::HeaderMap, FromRequest};
+use crate::errors::ApiResult;
+use crate::ApiErrorKind;
+use actix_web::http::header::HeaderMap;
+use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
 use lazy_static::lazy_static;
-use paperclip::v2::{
-    models::{DefaultSchemaRaw, Parameter},
-    schema::{Apiv2Schema, TypedData},
+use paperclip::v2::models::{
+    DefaultSchemaRaw,
+    Parameter,
+};
+use paperclip::v2::schema::{
+    Apiv2Schema,
+    TypedData,
 };
 use regex::Regex;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::pin::Pin;
 
 fn idempotency_id_regex() -> Regex {
@@ -24,9 +32,9 @@ lazy_static! {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Deref)]
-/// To safely support retrying requests without accidentally performing the same operation multiple times,
-/// provide a client-generated `x-idempotency-id`. Requests made with the same x-idempotency-id value
-/// will no-op and return the same result
+/// To safely support retrying requests without accidentally performing the same operation multiple
+/// times, provide a client-generated `x-idempotency-id`. Requests made with the same
+/// x-idempotency-id value will no-op and return the same result
 pub struct IdempotencyId(pub Option<String>);
 
 impl Apiv2Schema for IdempotencyId {

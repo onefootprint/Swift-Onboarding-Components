@@ -1,20 +1,45 @@
-use super::{
-    partner_tenant::PartnerTenant,
-    tenant::Tenant,
-    tenant_role::{ImmutableRoleKind, TenantRole},
-    tenant_user::TenantUser,
+use super::partner_tenant::PartnerTenant;
+use super::tenant::Tenant;
+use super::tenant_role::{
+    ImmutableRoleKind,
+    TenantRole,
+};
+use super::tenant_user::TenantUser;
+use crate::helpers::{
+    TenantOrPartnerTenant,
+    WorkosAuthIdentity,
 };
 use crate::{
-    helpers::{TenantOrPartnerTenant, WorkosAuthIdentity},
-    DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn,
+    DbError,
+    DbResult,
+    NextPage,
+    OffsetPagination,
+    PgConn,
+    TxnPgConn,
 };
-use chrono::{DateTime, Utc};
-use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    tenant_role,
+    tenant_rolebinding,
+    tenant_user,
+};
 use derive_more::From;
-use diesel::{dsl::not, prelude::*, Queryable};
+use diesel::dsl::not;
+use diesel::prelude::*;
+use diesel::Queryable;
 use newtypes::{
-    OrgIdentifierRef, PartnerTenantId, TenantId, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant,
-    TenantRolebindingId, TenantUserId, WorkosAuthMethod,
+    OrgIdentifierRef,
+    PartnerTenantId,
+    TenantId,
+    TenantRoleId,
+    TenantRoleKind,
+    TenantRoleKindDiscriminant,
+    TenantRolebindingId,
+    TenantUserId,
+    WorkosAuthMethod,
 };
 
 #[derive(Debug, Clone, Queryable, Selectable)]
@@ -191,7 +216,10 @@ impl TenantRolebinding {
         conn: &mut TxnPgConn,
         user_id: &TenantUserId,
     ) -> DbResult<Vec<(Self, TenantOrPartnerTenant)>> {
-        use db_schema::schema::{partner_tenant, tenant};
+        use db_schema::schema::{
+            partner_tenant,
+            tenant,
+        };
         #[allow(clippy::type_complexity)]
         let results: Vec<(
             TenantRolebinding,
@@ -219,7 +247,10 @@ impl TenantRolebinding {
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
-        use db_schema::schema::{partner_tenant, tenant};
+        use db_schema::schema::{
+            partner_tenant,
+            tenant,
+        };
         let mut query = tenant_user::table
             .inner_join(
                 tenant_rolebinding::table.inner_join(
@@ -333,7 +364,8 @@ impl TenantRolebinding {
 
         if let Some(tenant_role_id) = update.tenant_role_id.as_ref() {
             // Lock the role to make sure we don't deactivate it before we update this rolebinding.
-            // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
+            // Make sure the role we are using belongs to the tenant, otherwise could update permissions to
+            // work on another tenant's role
             let role = TenantRole::lock_active(conn, tenant_role_id, t_pt.id())?;
 
             // Validate the given role's kind.

@@ -1,16 +1,22 @@
-use crate::auth::{
-    tenant::{SecretTenantAuthContext, TenantSessionAuth},
-    Either,
+use crate::auth::tenant::{
+    SecretTenantAuthContext,
+    TenantSessionAuth,
 };
-
-use api_core::{
-    auth::tenant::{CheckTenantGuard, TenantGuard},
-    types::{JsonApiResponse, ResponseData},
+use crate::auth::Either;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+};
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
 };
 use api_wire_types::PublicRiskSignalDescription;
-
 use newtypes::FootprintReasonCode;
-use paperclip::actix::{api_v2_operation, get};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+};
 use strum::IntoEnumIterator;
 
 #[api_v2_operation(description = "List all Footprint Risk Signals", tags(Org, Preview))]

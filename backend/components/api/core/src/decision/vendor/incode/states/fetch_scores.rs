@@ -1,53 +1,88 @@
 use super::{
-    compute_ocr_data, compute_risk_signals, Complete, CompleteArgs, IncodeStateTransition, NewRiskSignal,
-    PreCompleteArgs, ValidatedIdDocKind, VerificationSession,
+    compute_ocr_data,
+    compute_risk_signals,
+    Complete,
+    CompleteArgs,
+    IncodeStateTransition,
+    NewRiskSignal,
+    PreCompleteArgs,
+    ValidatedIdDocKind,
+    VerificationSession,
 };
-use crate::{
-    decision::{
-        features::incode_docv::IncodeOcrComparisonDataFields,
-        vendor::{
-            incode::{
-                state::{IncodeState, TransitionResult},
-                IncodeContext,
-            },
-            map_to_api_error,
-            verification_result::{save_vreq_and_vres, SaveVerificationResultArgs},
-            VendorAPIError,
-        },
-    },
-    errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::{Any, EnclaveDecryptOperation, FingerprintedDataRequest, Pii, VaultWrapper},
-    vendor_clients::IncodeClients,
-    ApiErrorKind,
+use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
+use crate::decision::vendor::incode::state::{
+    IncodeState,
+    TransitionResult,
 };
+use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::verification_result::{
+    save_vreq_and_vres,
+    SaveVerificationResultArgs,
+};
+use crate::decision::vendor::{
+    map_to_api_error,
+    VendorAPIError,
+};
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+};
+use crate::utils::vault_wrapper::{
+    Any,
+    EnclaveDecryptOperation,
+    FingerprintedDataRequest,
+    Pii,
+    VaultWrapper,
+};
+use crate::vendor_clients::IncodeClients;
+use crate::ApiErrorKind;
 use async_trait::async_trait;
+use db::models::decision_intent::DecisionIntent;
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
+};
+use db::models::incode_customer_session::IncodeCustomerSession;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::verification_result::VerificationResult;
 use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        document::{Document, DocumentImageArgs},
-        incode_customer_session::IncodeCustomerSession,
-        ob_configuration::ObConfiguration,
-        verification_result::VerificationResult,
-    },
-    DbPool, DbResult, TxnPgConn,
+    DbPool,
+    DbResult,
+    TxnPgConn,
 };
 use feature_flag::BoolFlag;
 use http::StatusCode;
-use idv::{
-    footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
-    incode::{
-        client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
-        doc::{
-            response::{AddCustomerResponse, FetchScoresResponse},
-            IncodeFetchOCRRequest, IncodeFetchScoresRequest,
-        },
-        IncodeResponse,
-    },
-    ParsedResponse, VendorResponse,
+use idv::footprint_http_client::{
+    FootprintVendorHttpClient,
+    FpVendorClientArgs,
 };
+use idv::incode::client::{
+    AuthenticatedIncodeClientAdapter,
+    IncodeClientAdapter,
+};
+use idv::incode::doc::response::{
+    AddCustomerResponse,
+    FetchScoresResponse,
+};
+use idv::incode::doc::{
+    IncodeFetchOCRRequest,
+    IncodeFetchScoresRequest,
+};
+use idv::incode::IncodeResponse;
+use idv::{
+    ParsedResponse,
+    VendorResponse,
+};
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DecisionIntentKind, DocumentDiKind,
-    DocumentSide, IncodeVerificationSessionId, PiiJsonValue, VendorAPI, VendorValidatedCountryCode,
+    DataIdentifier,
+    DecisionIntentKind,
+    DocumentDiKind,
+    DocumentSide,
+    IncodeVerificationSessionId,
+    PiiJsonValue,
+    VendorAPI,
+    VendorValidatedCountryCode,
 };
 use selfie_doc::compare::CompareFacesResponse;
 use tracing::Instrument;
@@ -281,7 +316,8 @@ async fn run_aws_rekognition(
         .await?;
     let doc_kind = id_doc.document_type.try_into()?;
 
-    // At this point, until we reach `Complete`, we have not vaulted the images under the DocumentKind::Image DIs
+    // At this point, until we reach `Complete`, we have not vaulted the images under the
+    // DocumentKind::Image DIs
     let doc_id_op: EnclaveDecryptOperation =
         DataIdentifier::Document(DocumentDiKind::LatestUpload(doc_kind, DocumentSide::Front)).into();
     // make this conditional

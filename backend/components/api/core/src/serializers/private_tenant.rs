@@ -1,10 +1,10 @@
-use db::models::{
-    billing_profile::BillingProfile,
-    tenant::{Tenant, UserCounts},
-    tenant_vendor::TenantVendorControl,
-};
-
 use crate::utils::db2api::DbToApi;
+use db::models::billing_profile::BillingProfile;
+use db::models::tenant::{
+    Tenant,
+    UserCounts,
+};
+use db::models::tenant_vendor::TenantVendorControl;
 
 impl DbToApi<(Option<UserCounts>, Tenant)> for api_wire_types::PrivateTenant {
     fn from_db((counts, t): (Option<UserCounts>, Tenant)) -> Self {
@@ -37,7 +37,6 @@ impl DbToApi<(Option<UserCounts>, Tenant)> for api_wire_types::PrivateTenant {
         }
     }
 }
-
 
 impl DbToApi<(Tenant, Option<BillingProfile>, Option<TenantVendorControl>)>
     for api_wire_types::PrivateTenantDetail
@@ -140,7 +139,6 @@ impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
         }
     }
 }
-
 
 impl DbToApi<TenantVendorControl> for api_wire_types::PrivateTenantVendorControl {
     fn from_db(bp: TenantVendorControl) -> Self {

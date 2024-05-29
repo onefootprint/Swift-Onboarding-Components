@@ -2,8 +2,9 @@ use std::rc::Rc;
 
 /// A struct is !Sync/!Send if any of the fields are !Sync/!Send. Embed NotSyncMarker inside a
 /// struct to make that struct !Sync and !Send.
-/// This works because Rc is not Send/Sync (since it's non-atomically counting references which is amenable to race conditions across threads)
-/// TODO: impl !Sync for Locked<T> once this feature is out of rust nightly
+/// This works because Rc is not Send/Sync (since it's non-atomically counting references which is
+/// amenable to race conditions across threads) TODO: impl !Sync for Locked<T> once this feature is
+/// out of rust nightly
 #[derive(Debug, Clone)]
 pub struct NotSyncMarker(#[allow(unused)] Rc<()>);
 

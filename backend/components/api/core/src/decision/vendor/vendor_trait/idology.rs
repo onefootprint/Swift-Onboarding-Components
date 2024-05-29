@@ -1,15 +1,22 @@
-use async_trait::async_trait;
-use idv::{
-    footprint_http_client::FootprintVendorHttpClient,
-    idology::{
-        pa::{IdologyPaAPIResponse, IdologyPaRequest},
-        IdologyExpectIDAPIResponse, IdologyExpectIDRequest,
-    },
-    ParsedResponse,
+use super::{
+    VendorAPICall,
+    VendorAPIResponse,
 };
-use newtypes::{PiiJsonValue, VendorAPI};
-
-use super::{VendorAPICall, VendorAPIResponse};
+use async_trait::async_trait;
+use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::idology::pa::{
+    IdologyPaAPIResponse,
+    IdologyPaRequest,
+};
+use idv::idology::{
+    IdologyExpectIDAPIResponse,
+    IdologyExpectIDRequest,
+};
+use idv::ParsedResponse;
+use newtypes::{
+    PiiJsonValue,
+    VendorAPI,
+};
 
 /////////////////////
 /// Idology Impl - ExpectID

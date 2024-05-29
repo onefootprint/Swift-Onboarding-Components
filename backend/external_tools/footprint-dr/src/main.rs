@@ -1,4 +1,9 @@
-use clap::{ArgGroup, Args, Parser, Subcommand};
+use clap::{
+    ArgGroup,
+    Args,
+    Parser,
+    Subcommand,
+};
 use log::debug;
 use std::path::PathBuf;
 

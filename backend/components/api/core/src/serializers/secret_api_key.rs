@@ -1,7 +1,7 @@
-use db::models::{tenant_api_key::TenantApiKey, tenant_role::TenantRole};
-use newtypes::secret_api_key::SecretApiKey;
-
 use crate::utils::db2api::DbToApi;
+use db::models::tenant_api_key::TenantApiKey;
+use db::models::tenant_role::TenantRole;
+use newtypes::secret_api_key::SecretApiKey;
 
 type DbTenantApiKey = (TenantApiKey, TenantRole, Option<SecretApiKey>);
 

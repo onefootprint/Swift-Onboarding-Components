@@ -1,48 +1,86 @@
-use super::{IncodeStateTransition, ValidatedIdDocKind, VerificationSession};
-use crate::{
-    decision::{
-        features::{
-            incode_docv::{self, IncodeOcrComparisonDataFields},
-            incode_utils::{ParsedIncodeFields, ParsedIncodeNames},
-        },
-        vendor::incode::{
-            state::{IncodeState, TransitionResult},
-            state_machine::IncodeContext,
-        },
-    },
-    errors::{ApiErrorKind, ApiResult, AssertionError},
-    utils::{
-        file_upload::mime_type_to_extension,
-        vault_wrapper::{
-            DataLifetimeSources, FingerprintedDataRequest, NewDocument, Person, VaultWrapper, WriteableVw,
-        },
-    },
-    vendor_clients::IncodeClients,
-    State,
+use super::{
+    IncodeStateTransition,
+    ValidatedIdDocKind,
+    VerificationSession,
 };
+use crate::decision::features::incode_docv::{
+    self,
+    IncodeOcrComparisonDataFields,
+};
+use crate::decision::features::incode_utils::{
+    ParsedIncodeFields,
+    ParsedIncodeNames,
+};
+use crate::decision::vendor::incode::state::{
+    IncodeState,
+    TransitionResult,
+};
+use crate::decision::vendor::incode::state_machine::IncodeContext;
+use crate::errors::{
+    ApiErrorKind,
+    ApiResult,
+    AssertionError,
+};
+use crate::utils::file_upload::mime_type_to_extension;
+use crate::utils::vault_wrapper::{
+    DataLifetimeSources,
+    FingerprintedDataRequest,
+    NewDocument,
+    Person,
+    VaultWrapper,
+    WriteableVw,
+};
+use crate::vendor_clients::IncodeClients;
+use crate::State;
 use async_trait::async_trait;
-use db::{
-    models::{
-        billing_event::BillingEvent,
-        data_lifetime::DataLifetime,
-        document::{Document, DocumentImageArgs, DocumentUpdate},
-        document_data::DocumentData,
-        document_upload::DocumentUpload,
-        ob_configuration::ObConfiguration,
-        risk_signal::RiskSignal,
-        user_timeline::UserTimeline,
-        vault::Vault,
-    },
-    DbPool, TxnPgConn,
+use db::models::billing_event::BillingEvent;
+use db::models::data_lifetime::DataLifetime;
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
+    DocumentUpdate,
 };
-use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
+use db::models::document_data::DocumentData;
+use db::models::document_upload::DocumentUpload;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::RiskSignal;
+use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
+use db::{
+    DbPool,
+    TxnPgConn,
+};
+use idv::incode::doc::response::{
+    FetchOCRResponse,
+    FetchScoresResponse,
+};
 use itertools::Itertools;
 use newtypes::{
-    BillingEventKind, CleanAndValidate, DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest,
-    DocumentDiKind, DocumentId, DocumentReviewStatus, DocumentStatus, FootprintReasonCode, IdDocKind,
-    IdentityDataKind as IDK, IncodeFailureReason, ObConfigurationId, ObConfigurationKind, OcrDataKind as ODK,
-    PiiJsonValue, PiiString, ScopedVaultId, ScrubbedPiiString, ValidateArgs, VendorAPI,
-    VendorValidatedCountryCode, VerificationResultId,
+    BillingEventKind,
+    CleanAndValidate,
+    DataIdentifier,
+    DataLifetimeSeqno,
+    DataLifetimeSource,
+    DataRequest,
+    DocumentDiKind,
+    DocumentId,
+    DocumentReviewStatus,
+    DocumentStatus,
+    FootprintReasonCode,
+    IdDocKind,
+    IdentityDataKind as IDK,
+    IncodeFailureReason,
+    ObConfigurationId,
+    ObConfigurationKind,
+    OcrDataKind as ODK,
+    PiiJsonValue,
+    PiiString,
+    ScopedVaultId,
+    ScrubbedPiiString,
+    ValidateArgs,
+    VendorAPI,
+    VendorValidatedCountryCode,
+    VerificationResultId,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -122,8 +160,8 @@ fn doc_first_id_data(
 ) -> Vec<(DataIdentifier, PiiJsonValue)> {
     let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(r);
 
-    // Incode sends full state in one field, and 2 character code in another, so we handle here. we prefer the checked address, since it
-    // uses an external service to validate
+    // Incode sends full state in one field, and 2 character code in another, so we handle here. we
+    // prefer the checked address, since it uses an external service to validate
     let address_checked_bean_state = r.checked_address_bean.as_ref().and_then(|a| a.normalized_state());
     let address_fields_state = r.address_fields.as_ref().and_then(|a| a.normalized_state());
     let state = match address_checked_bean_state.or(address_fields_state) {
@@ -208,8 +246,8 @@ pub(super) fn compute_risk_signals<'a>(
     .into_iter()
     .map(|r| (r, VendorAPI::IncodeFetchScores, score_vres_id.clone()));
 
-    // Since doc first means we are vaulting `id.*` data from the document and obc.kind == Document means we are _just_ collecting document,
-    // we don't have any data to actually match to
+    // Since doc first means we are vaulting `id.*` data from the document and obc.kind == Document
+    // means we are _just_ collecting document, we don't have any data to actually match to
     let pii_matching_ocr_reason_codes = if !(obc.is_doc_first || obc.kind == ObConfigurationKind::Document) {
         // Only calculate OCR reason codes if we have already collected ID data
         let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
@@ -283,7 +321,8 @@ pub(super) fn compute_risk_signals<'a>(
     Ok(s)
 }
 
-/// Now that we have the correct type of the document, add the images to the vault under the correct type
+/// Now that we have the correct type of the document, add the images to the vault under the correct
+/// type
 #[tracing::instrument(skip_all)]
 fn vault_complete_images(
     conn: &mut TxnPgConn,
@@ -291,8 +330,8 @@ fn vault_complete_images(
     dk: IdDocKind,
     id_doc: &Document,
 ) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
-    // When we vault .latest_upload, we use the document_type that is provided by the user, not the eventual doc_type from incode which is the one
-    // we vault the complete images for
+    // When we vault .latest_upload, we use the document_type that is provided by the user, not the
+    // eventual doc_type from incode which is the one we vault the complete images for
     let doc_type = IdDocKind::try_from(id_doc.document_type)?;
     let docs = id_doc
         .images(conn, DocumentImageArgs::default())?

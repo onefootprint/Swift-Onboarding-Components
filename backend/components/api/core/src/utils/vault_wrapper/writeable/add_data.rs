@@ -1,25 +1,41 @@
 use super::{
-    DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, SavedData, ValidatedDataRequest,
+    DataLifetimeSources,
+    DataRequestSource,
+    FingerprintedDataRequest,
+    SavedData,
+    ValidatedDataRequest,
     WriteableVw,
 };
-use crate::{
-    auth::tenant::AuthActor,
-    errors::{ApiResult, AssertionError},
-    utils::{file_upload::FileUpload, vault_wrapper::Person},
-    State,
+use crate::auth::tenant::AuthActor;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
 };
+use crate::utils::file_upload::FileUpload;
+use crate::utils::vault_wrapper::Person;
+use crate::State;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
-use db::{
-    models::{
-        business_owner::BusinessOwner, contact_info::ContactInfo, data_lifetime::DataLifetime,
-        document_data::DocumentData, user_timeline::UserTimeline, vault::Vault,
-    },
-    TxnPgConn,
-};
+use db::models::business_owner::BusinessOwner;
+use db::models::contact_info::ContactInfo;
+use db::models::data_lifetime::DataLifetime;
+use db::models::document_data::DocumentData;
+use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    BusinessDataKind as BDK, CollectedDataOption, DataCollectedInfo, DataIdentifier, DataLifetimeSeqno,
-    DataLifetimeSource, KycedBusinessOwnerData, PiiString, S3Url, ScopedVaultId, SealedVaultDataKey, VaultId,
+    BusinessDataKind as BDK,
+    CollectedDataOption,
+    DataCollectedInfo,
+    DataIdentifier,
+    DataLifetimeSeqno,
+    DataLifetimeSource,
+    KycedBusinessOwnerData,
+    PiiString,
+    S3Url,
+    ScopedVaultId,
+    SealedVaultDataKey,
+    VaultId,
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
@@ -41,8 +57,8 @@ pub struct NewDocument {
 /// Right now, we only allow adding data to a user vault inside of a locked transaction and when
 /// we have built the VaultWrapper for a specific tenant.
 /// These are the publically accessible utils to update data on a VaultWrapper.
-/// They use the private, update_data_unsafe method, which cannot be exposed publically because they don't
-/// take ownership over the VaultWrapper that is potentially stale after an update
+/// They use the private, update_data_unsafe method, which cannot be exposed publically because they
+/// don't take ownership over the VaultWrapper that is potentially stale after an update
 impl<Type> WriteableVw<Type> {
     #[tracing::instrument("WriteableVw::patch_data", skip_all)]
     pub fn patch_data(
@@ -127,8 +143,9 @@ impl<Type> WriteableVw<Type> {
 }
 
 impl WriteableVw<Person> {
-    /// TODO: could later figure out how to merge this into VaultDataBuilder or make a complimentary struct for docs
-    /// Docs are fun in that it sounds like we need to support having multiple docs of the same kind in general (eg: right now you can upload 2 FINRA docs)
+    /// TODO: could later figure out how to merge this into VaultDataBuilder or make a complimentary
+    /// struct for docs Docs are fun in that it sounds like we need to support having multiple
+    /// docs of the same kind in general (eg: right now you can upload 2 FINRA docs)
     ///  so the logic around deactivating/portabalizing DL's is a little divergent here
     /// NOTE: do not read from `self` after using this util as `self` will be stale
     #[allow(clippy::too_many_arguments)]

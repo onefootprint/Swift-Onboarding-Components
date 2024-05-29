@@ -1,5 +1,7 @@
-use crate::{vendor_reason_code_enum, FootprintReasonCode};
-
+use crate::{
+    vendor_reason_code_enum,
+    FootprintReasonCode,
+};
 use strum::EnumIter;
 use strum_macros::EnumString;
 
@@ -527,11 +529,10 @@ impl serde::Serialize for IDologyReasonCode {
 
 #[cfg(test)]
 mod tests {
+    use crate::db_types::FootprintReasonCode;
+    use crate::idology_match_codes;
+    use crate::reason_code::idology::IDologyReasonCode;
     use strum::IntoEnumIterator;
-
-    use crate::{
-        db_types::FootprintReasonCode, idology_match_codes, reason_code::idology::IDologyReasonCode,
-    };
 
     #[test]
     fn test_vendor_reason_code_enum_use() {

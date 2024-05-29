@@ -1,5 +1,4 @@
 use std::time::Duration;
-
 use tokio::time::Instant;
 
 #[derive(Debug, Clone, Copy)]

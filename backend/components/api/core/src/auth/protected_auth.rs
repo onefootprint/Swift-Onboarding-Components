@@ -1,15 +1,17 @@
-use std::pin::Pin;
-
-use crate::{
-    auth::{
-        protected_custodian::ProtectedCustodianAuthContext,
-        tenant::{FirmEmployeeAuth, FirmEmployeeAuthContext, FirmEmployeeGuard},
-        Either, SessionContext,
-    },
-    ApiError,
+use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
+use crate::auth::tenant::{
+    FirmEmployeeAuth,
+    FirmEmployeeAuthContext,
+    FirmEmployeeGuard,
 };
+use crate::auth::{
+    Either,
+    SessionContext,
+};
+use crate::ApiError;
 use actix_web::FromRequest;
 use futures_util::Future;
+use std::pin::Pin;
 
 /// Auth that allows either the airplane API key or a risk ops firm employee to perform the action
 pub struct ProtectedAuth(

@@ -1,12 +1,12 @@
 pub mod business;
 pub mod webhook;
-use std::fmt;
-
-use serde::de::DeserializeOwned;
-
 use self::business::BusinessResponse;
-
-use super::{Error, MiddeskReqwestError};
+use super::{
+    Error,
+    MiddeskReqwestError,
+};
+use serde::de::DeserializeOwned;
+use std::fmt;
 
 pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T, Error> {
     let status = response.status();
@@ -44,7 +44,10 @@ pub struct ApiErrorResponseError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::{json, Value};
+    use serde_json::{
+        json,
+        Value,
+    };
 
     #[test]
     fn test_parse_response() {

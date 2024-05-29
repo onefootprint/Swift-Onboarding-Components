@@ -1,22 +1,34 @@
-use crate::{types::JsonApiResponse, State};
-use api_core::{
-    auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::{ApiResult, AssertionError},
-    types::{EmptyResponse, ResponseData},
-    utils::db2api::DbToApi,
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    PartnerTenantGuard,
+    PartnerTenantSessionAuth,
 };
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
+};
+use api_core::types::{
+    EmptyResponse,
+    ResponseData,
+};
+use api_core::utils::db2api::DbToApi;
 use chrono::Utc;
-use db::{
-    models::{
-        compliance_doc_template::{ComplianceDocTemplate, NewComplianceDocTemplate},
-        compliance_doc_template_version::NewComplianceDocTemplateVersion,
-        tenant_user::TenantUser,
-    },
-    DbResult,
+use db::models::compliance_doc_template::{
+    ComplianceDocTemplate,
+    NewComplianceDocTemplate,
 };
+use db::models::compliance_doc_template_version::NewComplianceDocTemplateVersion;
+use db::models::tenant_user::TenantUser;
+use db::DbResult;
 use itertools::Itertools;
 use newtypes::ComplianceDocTemplateId;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Lists compliance document templates.",

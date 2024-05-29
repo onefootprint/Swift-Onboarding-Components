@@ -1,11 +1,18 @@
-use async_trait::async_trait;
-use idv::{
-    socure::{client::SocureClient, SocureIDPlusAPIResponse, SocureIDPlusRequest},
-    ParsedResponse,
+use super::{
+    VendorAPICall,
+    VendorAPIResponse,
 };
-use newtypes::{PiiJsonValue, VendorAPI};
-
-use super::{VendorAPICall, VendorAPIResponse};
+use async_trait::async_trait;
+use idv::socure::client::SocureClient;
+use idv::socure::{
+    SocureIDPlusAPIResponse,
+    SocureIDPlusRequest,
+};
+use idv::ParsedResponse;
+use newtypes::{
+    PiiJsonValue,
+    VendorAPI,
+};
 
 ////////////////////
 /// Socure Impl

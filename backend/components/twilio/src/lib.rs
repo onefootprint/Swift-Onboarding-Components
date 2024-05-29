@@ -1,18 +1,29 @@
-use crate::{error::Error, response::message::Status};
-use newtypes::{sms_message::SmsMessage, PiiString};
+use crate::error::Error;
+use crate::response::message::Status;
+use newtypes::sms_message::SmsMessage;
+use newtypes::PiiString;
 use rand::Rng;
 use request::send_message::SendMessage;
-use reqwest::{IntoUrl, Method};
-use reqwest_middleware::{ClientWithMiddleware, RequestBuilder};
+use reqwest::{
+    IntoUrl,
+    Method,
+};
+use reqwest_middleware::{
+    ClientWithMiddleware,
+    RequestBuilder,
+};
 use reqwest_tracing::TracingMiddleware;
-use response::{decode_response, lookup::LookupResponse, message::Message};
+use response::decode_response;
+use response::lookup::LookupResponse;
+use response::message::Message;
 use std::time::Duration;
 
 pub mod error;
 pub mod request;
 pub mod response;
 
-use tokio_retry::{strategy::FixedInterval, Retry};
+use tokio_retry::strategy::FixedInterval;
+use tokio_retry::Retry;
 
 #[derive(Clone)]
 pub struct TwilioConfig {

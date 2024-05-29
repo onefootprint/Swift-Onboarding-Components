@@ -1,6 +1,8 @@
+use crate::idology::{
+    expectid,
+    pa,
+};
 use newtypes::PiiString;
-
-use crate::idology::{expectid, pa};
 
 /// Request to Idology ExpectID
 #[derive(Debug, Clone, serde::Serialize)]

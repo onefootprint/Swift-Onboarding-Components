@@ -1,10 +1,21 @@
-use crate::{DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use super::workflow::Workflow;
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::decision_intent;
 use diesel::prelude::*;
-use newtypes::{DecisionIntentId, DecisionIntentKind, ScopedVaultId, WorkflowId};
-
-use super::workflow::Workflow;
+use newtypes::{
+    DecisionIntentId,
+    DecisionIntentKind,
+    ScopedVaultId,
+    WorkflowId,
+};
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = decision_intent)]

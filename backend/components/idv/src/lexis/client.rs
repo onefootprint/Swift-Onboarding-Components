@@ -1,12 +1,18 @@
-use crate::{
-    footprint_http_client::FootprintVendorHttpClient,
-    lexis::{self, request::LexisRequest, ReqwestError},
+use super::response::FlexIdResponse;
+use crate::footprint_http_client::FootprintVendorHttpClient;
+use crate::lexis::request::LexisRequest;
+use crate::lexis::{
+    self,
+    ReqwestError,
 };
-use newtypes::{vendor_credentials::LexisCredentials, IdvData, PiiJsonValue, TenantBusinessInfo};
+use newtypes::vendor_credentials::LexisCredentials;
+use newtypes::{
+    IdvData,
+    PiiJsonValue,
+    TenantBusinessInfo,
+};
 use reqwest::header;
 use std::time::Duration;
-
-use super::response::FlexIdResponse;
 
 pub struct LexisFlexIdRequest {
     pub idv_data: IdvData,
@@ -64,11 +70,9 @@ pub async fn flex_id(
 
 #[cfg(test)]
 mod tests {
-    use crate::footprint_http_client::FpVendorClientArgs;
-
     use super::*;
+    use crate::footprint_http_client::FpVendorClientArgs;
     use dotenv;
-
     use newtypes::PiiString;
     use tracing_test::traced_test;
 
@@ -83,7 +87,8 @@ mod tests {
         };
 
         let tbi = TenantBusinessInfo {
-            // TODO: put these in .env? seems better than plaintexting it here even though its not super duper sensitive
+            // TODO: put these in .env? seems better than plaintexting it here even though its not super duper
+            // sensitive
             company_name: PiiString::from(""),
             address_line1: PiiString::from(""),
             city: PiiString::from(""),

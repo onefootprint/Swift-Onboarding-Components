@@ -1,10 +1,24 @@
-use crate::{MatchLevel, SignalScope};
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use crate::{
+    MatchLevel,
+    SignalScope,
+};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use strum::IntoEnumIterator;
-use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
+use strum_macros::{
+    AsRefStr,
+    Display,
+    EnumIter,
+    EnumString,
+};
 
 // yes one day we'll consolidate this and vendor_reason_code_enum into beautiful proc macros
 macro_rules! footprint_reason_code_enum {
@@ -1567,11 +1581,14 @@ pub fn export_reason_codes() {
 
 #[cfg(test)]
 mod tests {
-    use test_case::test_case;
-
-    use super::{FootprintReasonCode, SignalScope, SignalSeverity};
+    use super::{
+        FootprintReasonCode,
+        SignalScope,
+        SignalSeverity,
+    };
     use std::cmp::Ordering;
     use strum::IntoEnumIterator;
+    use test_case::test_case;
 
     #[test_case(SignalSeverity::Low, SignalSeverity::High => Ordering::Less)]
     #[test_case(SignalSeverity::Info, SignalSeverity::Low => Ordering::Less)]
@@ -1595,7 +1612,8 @@ mod tests {
 
     #[test]
     #[ignore]
-    // Just a little script to dump our reason codes into CSV format for uploading to google docs so non-eng folks can work on them
+    // Just a little script to dump our reason codes into CSV format for uploading to google docs so
+    // non-eng folks can work on them
     fn test_export_reason_codes() {
         super::export_reason_codes()
     }

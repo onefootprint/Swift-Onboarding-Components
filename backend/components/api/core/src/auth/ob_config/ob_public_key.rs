@@ -1,14 +1,18 @@
-use std::{marker::PhantomData, pin::Pin};
-
-use actix_web::{web, FromRequest};
-use db::{
-    models::{ob_configuration::ObConfiguration, tenant::Tenant},
-    DbResult,
+use crate::auth::AuthError;
+use crate::errors::AssertionError;
+use crate::telemetry::RootSpan;
+use crate::State;
+use actix_web::{
+    web,
+    FromRequest,
 };
+use db::models::ob_configuration::ObConfiguration;
+use db::models::tenant::Tenant;
+use db::DbResult;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
-
-use crate::{auth::AuthError, errors::AssertionError, telemetry::RootSpan, State};
+use std::marker::PhantomData;
+use std::pin::Pin;
 
 /// Extracts a publishable key from the X-Onboarding-Config-Key header
 /// which indicates the tenant and onboarding configuration context
@@ -58,7 +62,8 @@ impl FromRequest for PublicOnboardingContext {
                 .await
                 .map_err(|e| -> Self::Error {
                     if e.is_not_found() {
-                        // Slightly more informative error message when we can't find an ObConfig with this key
+                        // Slightly more informative error message when we can't find an ObConfig with this
+                        // key
                         if key2.starts_with("sk_") {
                             AuthError::ApiKeyUsedForObConfig.into()
                         } else {

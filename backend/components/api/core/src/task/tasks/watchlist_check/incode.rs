@@ -1,27 +1,38 @@
-use crate::{
-    decision::{
-        vendor::{incode::incode_watchlist::WatchlistCheckKind, vendor_result::VendorResult},
-        {self},
-    },
-    errors::ApiResult,
-    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
-    State,
+use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::decision::{
+    self,
 };
-use chrono::{Duration, Utc};
-use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        ob_configuration::ObConfiguration,
-        risk_signal::NewRiskSignalInfo,
-        verification_request::{RequestAndResult, VerificationRequest},
-        verification_result::VerificationResult,
-    },
-    DbResult,
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Person,
+    VaultWrapper,
+    VwArgs,
 };
+use crate::State;
+use chrono::{
+    Duration,
+    Utc,
+};
+use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::NewRiskSignalInfo;
+use db::models::verification_request::{
+    RequestAndResult,
+    VerificationRequest,
+};
+use db::models::verification_result::VerificationResult;
+use db::DbResult;
 use idv::ParsedResponse;
 use newtypes::{
-    DataIdentifier as DI, DecisionIntentId, EncryptedVaultPrivateKey, IdentityDataKind as IDK,
-    IncodeWatchlistResultRef, PiiString, ScopedVaultId, VendorAPI,
+    DataIdentifier as DI,
+    DecisionIntentId,
+    EncryptedVaultPrivateKey,
+    IdentityDataKind as IDK,
+    IncodeWatchlistResultRef,
+    PiiString,
+    ScopedVaultId,
+    VendorAPI,
 };
 
 pub async fn complete_vendor_call(
@@ -140,7 +151,8 @@ async fn has_data_changed_since_vres(
         .decrypt_unchecked(&state.enclave_client, &idks)
         .await?;
 
-    // dob technically we only send the year so theoretically we don't need to re-search if month or day only have changed. but thats kinda weird so dont bother handling for now
+    // dob technically we only send the year so theoretically we don't need to re-search if month or day
+    // only have changed. but thats kinda weird so dont bother handling for now
     Ok(idks.into_iter().any(|idk| {
         is_different(
             current_decrypted.get_di(idk.clone()).ok(),

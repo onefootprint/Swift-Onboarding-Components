@@ -1,27 +1,38 @@
 //! Private Access Tokens -- alternative to captcha for iOS 16 + macOS 13 devices
 //! https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-02.html
 
+use crate::auth::user::{
+    UserAuth,
+    UserAuthContext,
+};
+use crate::errors::{
+    ApiError,
+    ApiResult,
+};
+use crate::types::EmptyResponse;
+use crate::utils::headers::InsightHeaders;
+use crate::State;
 use actix_web::HttpResponseBuilder;
-use api_core::{auth::user::UserAuthScope, errors::AssertionError};
-use db::models::{
-    insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent, user_timeline::UserTimeline,
+use api_core::auth::user::UserAuthScope;
+use api_core::errors::AssertionError;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::liveness_event::NewLivenessEvent;
+use db::models::user_timeline::UserTimeline;
+use newtypes::{
+    LivenessAttributes,
+    LivenessInfo,
+    LivenessIssuer,
 };
-use newtypes::{LivenessAttributes, LivenessInfo, LivenessIssuer};
+use paperclip::actix::web::{
+    self,
+};
 use paperclip::actix::{
-    api_v2_operation, get,
-    web::{self},
+    api_v2_operation,
+    get,
 };
-use reqwest::{header::AUTHORIZATION, StatusCode};
-
+use reqwest::header::AUTHORIZATION;
+use reqwest::StatusCode;
 use web::HttpResponse;
-
-use crate::{
-    auth::user::{UserAuth, UserAuthContext},
-    errors::{ApiError, ApiResult},
-    types::EmptyResponse,
-    utils::headers::InsightHeaders,
-    State,
-};
 
 #[api_v2_operation(tags(Onboarding, Hosted), description = "initiates privacy pass protocol.")]
 #[get("/hosted/onboarding/privacy_pass")]

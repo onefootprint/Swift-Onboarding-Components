@@ -1,8 +1,18 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::task_execution;
 use diesel::prelude::*;
-use newtypes::{TaskExecutionId, TaskId, TaskStatus};
+use newtypes::{
+    TaskExecutionId,
+    TaskId,
+    TaskStatus,
+};
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName)]
 #[diesel(table_name = task_execution)]

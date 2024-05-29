@@ -1,10 +1,18 @@
+use super::incode_docv::{
+    IncodeOcrAddress,
+    IncodeOcrComparisonDataFields,
+};
 use idv::incode::doc::response::FetchOCRResponse;
 use itertools::Itertools;
 use levenshtein::levenshtein;
-use newtypes::{FootprintReasonCode, IdentityDataKind, OcrDataKind as ODK, PiiString, ScrubbedPiiString};
+use newtypes::{
+    FootprintReasonCode,
+    IdentityDataKind,
+    OcrDataKind as ODK,
+    PiiString,
+    ScrubbedPiiString,
+};
 use regex::Regex;
-
-use super::incode_docv::{IncodeOcrAddress, IncodeOcrComparisonDataFields};
 
 #[derive(Debug, Clone)]
 pub struct ParsedIncodeField {
@@ -18,7 +26,8 @@ pub struct ParsedIncodeFields(pub Vec<ParsedIncodeField>);
 
 impl ParsedIncodeFields {
     pub fn from_fetch_ocr_res(r: &FetchOCRResponse) -> ParsedIncodeFields {
-        // TODO: maybe we should incorporate the confidence scores in here and not vault a particular field at all if its confidence is too low?
+        // TODO: maybe we should incorporate the confidence scores in here and not vault a particular field
+        // at all if its confidence is too low?
 
         let pif = |odk: ODK, confidence: Option<f32>, pii: Option<PiiString>| -> Option<ParsedIncodeField> {
             pii.map(|value| ParsedIncodeField {
@@ -95,7 +104,8 @@ impl ParsedIncodeFields {
                     conf.as_ref().and_then(|c| c.ref_number_confidence),
                     r.ref_number.clone().map(|s| s.into()),
                 ),
-                // TODO: use nationality_mrz_confidence here too? also why would a MRZ field have confidence in the first place?
+                // TODO: use nationality_mrz_confidence here too? also why would a MRZ field have confidence
+                // in the first place?
                 pif(ODK::Nationality, nationality_conf, nationality_value),
                 pif(
                     ODK::Curp,
@@ -153,12 +163,18 @@ impl ParsedIncodeNames {
             return ParsedIncodeNames::new(None, None, None);
         };
 
-        // If we have both given_name_mrz and last_name_mrz, then we can populate fn/mn/ln entirely from these
-        // this seems to only be the case for MEX style documents where there are "given names" + "surnames" rather than fn/ln
+        // If we have both given_name_mrz and last_name_mrz, then we can populate fn/mn/ln entirely from
+        // these this seems to only be the case for MEX style documents where there are "given
+        // names" + "surnames" rather than fn/ln
         if let (Some(given_name_mrz), Some(last_name_mrz)) = (name.given_name_mrz, name.last_name_mrz) {
             let last_name = last_name_mrz.leak_to_string().trim().into();
 
-            // there is some ambiguity here in differentiating "first" vs "middle" names. In particular if this is indeed a MEX style case, there is no concept really of a middle name and we can't be totally sure how these folks will enter their names in across first_name vs middle_name. So for now, we just take the first token as first_name and the rest as middle_name and then when we produce match reason codes, we need to be careful to be robust to users entering in given names across first_name + middle_name in different ways
+            // there is some ambiguity here in differentiating "first" vs "middle" names. In particular if
+            // this is indeed a MEX style case, there is no concept really of a middle name and we can't be
+            // totally sure how these folks will enter their names in across first_name vs middle_name. So for
+            // now, we just take the first token as first_name and the rest as middle_name and then when we
+            // produce match reason codes, we need to be careful to be robust to users entering in given names
+            // across first_name + middle_name in different ways
             let (first_name, middle_name) =
                 Self::parse_into_first_middle(given_name_mrz.leak_to_string().trim().into());
 
@@ -173,7 +189,11 @@ impl ParsedIncodeNames {
                 let p = p.leak().trim();
                 let m = m.leak().trim();
                 if p == m {
-                    // we aren't quite sure if this is possible and if it is what it means. for eg: in MEX if your parents have the same last name, do have duplicate last names or do you consolidate into one? and would incode ever erronesouly populate both of these when the person in fact only has a singular "last name"? Some mysteries of the universe remain so, but if you ctrl+F'd this error string then today is your lucky day friend
+                    // we aren't quite sure if this is possible and if it is what it means. for eg: in MEX if
+                    // your parents have the same last name, do have duplicate last names or do you
+                    // consolidate into one? and would incode ever erronesouly populate both of these when the
+                    // person in fact only has a singular "last name"? Some mysteries of the universe remain
+                    // so, but if you ctrl+F'd this error string then today is your lucky day friend
                     tracing::error!("Incode response seen with paternal_last_name = maternal_last_name");
                 }
                 Some(format!("{} {}", p, m).into())
@@ -189,7 +209,9 @@ impl ParsedIncodeNames {
         // the alternative mrz format is full_name_mrz, so we parse this into first + middle + last
         if let Some(mrz_full_name) = name.machine_readable_full_name {
             let mrz_full_name: PiiString = mrz_full_name.leak_to_string().trim().to_owned().into();
-            // if the mrz full name matches the Incode given first/middle/last breakdown, then we can just use Incode's name parsing here (which may be better if they use context of the doc or something more intelligent than splitting on strings?)
+            // if the mrz full name matches the Incode given first/middle/last breakdown, then we can just use
+            // Incode's name parsing here (which may be better if they use context of the doc or something
+            // more intelligent than splitting on strings?)
             let mrz_name_components: Vec<PiiString> = mrz_full_name
                 .leak_to_string()
                 .split(' ')
@@ -219,7 +241,8 @@ impl ParsedIncodeNames {
             .collect_vec();
 
             // We have to compare this way because sometimes Incode is giving us mrz names that are jumbled
-            // eg: name is Alice Bob Cook but mrz_full_name = Cook Alice Bob (even though the non mrz fields are parsed in the right order)
+            // eg: name is Alice Bob Cook but mrz_full_name = Cook Alice Bob (even though the non mrz fields
+            // are parsed in the right order)
             let mrz_and_incode_parsed_match =
                 Self::name_components_match(&mrz_name_components, &incode_parsed_name_components);
 
@@ -255,8 +278,10 @@ impl ParsedIncodeNames {
     }
 
     fn name_components_match(v1: &[PiiString], v2: &[PiiString]) -> bool {
-        // Checks if any permutation of concatenating the components of the mrz name (v1) matches any permutation of concatenating the components of the non-mrz names (v2)
-        // This is dumb as hell I know but I couldn't really figure out a better way to handle all combinations of apostrophes/hyphens/trailing white spaces + name jumblings
+        // Checks if any permutation of concatenating the components of the mrz name (v1) matches any
+        // permutation of concatenating the components of the non-mrz names (v2) This is dumb as
+        // hell I know but I couldn't really figure out a better way to handle all combinations of
+        // apostrophes/hyphens/trailing white spaces + name jumblings
         let v1_name_permutations = v1
             .iter()
             .permutations(v1.len())
@@ -320,7 +345,8 @@ impl ParsedIncodeNames {
         (first_name, middle_name, last_name)
     }
 
-    // unclear if its safe to remove all non-letter characters, so for now just remove hyphens and apostrophes
+    // unclear if its safe to remove all non-letter characters, so for now just remove hyphens and
+    // apostrophes
     fn remove_hyphens_and_apostrophes(s: &PiiString) -> PiiString {
         match Regex::new(r#"[-'\"]\s*"#) {
             Ok(re) => re.replace_all(s.leak(), "").into_owned().into(),
@@ -416,7 +442,8 @@ pub(crate) fn first_name_matches(
     // for eg: if a MEX user entered both their given names into first_name and left middle_name blank
     let first_middle_matches_first = merge(parsed_first_middle.as_ref(), vault.first_name.as_ref())
         .map(|(a, b)| pii_strings_match_name_normalized(a, b));
-    // for eg: if you have many given names and split them across first_name/middle_name differently than our/Incode's parsing logic
+    // for eg: if you have many given names and split them across first_name/middle_name differently
+    // than our/Incode's parsing logic
     let first_middle_matches_first_middle = merge(parsed_first_middle.as_ref(), vault_first_middle.as_ref())
         .map(|(a, b)| pii_strings_match_name_normalized(a, b));
 
@@ -653,7 +680,10 @@ pub fn reason_codes_from_match_field(
 mod tests {
     use super::*;
     use crate::decision::features::incode_docv::IncodeOcrAddress;
-    use idv::incode::doc::response::{OCRAddress, OCRName};
+    use idv::incode::doc::response::{
+        OCRAddress,
+        OCRName,
+    };
     use newtypes::IdentityDataKind as IDK;
     use test_case::test_case;
 

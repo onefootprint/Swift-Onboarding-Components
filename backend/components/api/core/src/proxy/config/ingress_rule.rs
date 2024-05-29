@@ -1,11 +1,14 @@
-use std::str::FromStr;
-
-use crate::errors::{proxy::VaultProxyError, ApiError};
+use super::ProxyHeaderParams;
+use crate::errors::proxy::VaultProxyError;
+use crate::errors::ApiError;
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
-use newtypes::{FilterFunction, FpId, ProxyToken};
-
-use super::ProxyHeaderParams;
+use newtypes::{
+    FilterFunction,
+    FpId,
+    ProxyToken,
+};
+use std::str::FromStr;
 
 /// Ingress rules define how to vault data in the response
 /// from the proxy requests

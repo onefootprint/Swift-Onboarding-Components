@@ -1,13 +1,35 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{google_device_attestation, scoped_vault, vault};
-use diesel::{prelude::*, Insertable, Queryable};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    google_device_attestation,
+    scoped_vault,
+    vault,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use diesel_as_jsonb::AsJsonb;
 use newtypes::{
-    AndroidAppLicense, AndroidAppRecognition, AndroidDeviceIntegrityLevel, GoogleDeviceAttestationId,
-    ScopedVaultId, VaultId, WebauthnCredentialId,
+    AndroidAppLicense,
+    AndroidAppRecognition,
+    AndroidDeviceIntegrityLevel,
+    GoogleDeviceAttestationId,
+    ScopedVaultId,
+    VaultId,
+    WebauthnCredentialId,
 };
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Serialize, Clone, Queryable)]
 #[diesel(table_name = google_device_attestation)]

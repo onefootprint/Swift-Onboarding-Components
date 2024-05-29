@@ -1,6 +1,8 @@
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use strum_macros::Display;
 
 #[derive(Debug, Display, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, Apiv2Schema)]

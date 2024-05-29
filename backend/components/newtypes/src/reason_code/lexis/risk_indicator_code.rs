@@ -1,4 +1,8 @@
-use crate::{vendor_reason_code_enum, FootprintReasonCode, FootprintReasonCode::*};
+use crate::FootprintReasonCode::*;
+use crate::{
+    vendor_reason_code_enum,
+    FootprintReasonCode,
+};
 use strum_macros::EnumString;
 
 vendor_reason_code_enum! {

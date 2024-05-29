@@ -1,5 +1,10 @@
 use crate::*;
-use newtypes::{ApiKeyStatus, ProxyConfigId, ProxyConfigSecretHeaderId, ProxyIngressContentType};
+use newtypes::{
+    ApiKeyStatus,
+    ProxyConfigId,
+    ProxyConfigSecretHeaderId,
+    ProxyIngressContentType,
+};
 
 /// Proxy configuration
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
@@ -40,7 +45,9 @@ pub struct ProxyConfigDetailed {
     /// Custom headers containing auth secrets
     pub secret_headers: Vec<OmittedSecretCustomHeader>,
 
-    /// A list of PEM-encoded x509 certificates or chains that are either CAs or self-signed. These certificates will be used to verify the root-of-trust of the certificate presented by the proxy.
+    /// A list of PEM-encoded x509 certificates or chains that are either CAs or self-signed. These
+    /// certificates will be used to verify the root-of-trust of the certificate presented by the
+    /// proxy.
     pub pinned_server_certificates: Vec<String>,
 
     /// The reason to use for decryptions that occur during proxying.

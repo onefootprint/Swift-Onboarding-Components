@@ -1,6 +1,14 @@
-use strum_macros::{EnumIter, EnumString};
-
-use crate::{lexis_name_address_phone_enum, Address, FirstName, LastName, LexisNAP};
+use crate::{
+    lexis_name_address_phone_enum,
+    Address,
+    FirstName,
+    LastName,
+    LexisNAP,
+};
+use strum_macros::{
+    EnumIter,
+    EnumString,
+};
 
 #[derive(derive_more::Deref)]
 struct Phone(bool);

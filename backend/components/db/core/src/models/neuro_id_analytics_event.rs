@@ -1,17 +1,32 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
+use super::scoped_vault::ScopedVault;
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::neuro_id_analytics_event;
-use diesel::{prelude::*, Insertable, Queryable};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use itertools::Itertools;
 use newtypes::{
-    DupeKind, NeuroIdAnalyticsEventId, NeuroIdentityId, ScopedVaultId, TenantId, VerificationResultId,
+    DupeKind,
+    NeuroIdAnalyticsEventId,
+    NeuroIdentityId,
+    ScopedVaultId,
+    TenantId,
+    VerificationResultId,
     WorkflowId,
 };
 
-use super::scoped_vault::ScopedVault;
-
 /// An append-only, immutable event that denormalizes a lot of data we get back from NeuroID
-/// in order to render and/or compute signals for the dashboard, analysis, or model training pipelines
+/// in order to render and/or compute signals for the dashboard, analysis, or model training
+/// pipelines
 #[derive(Debug, Clone, Insertable, Queryable)]
 #[diesel(table_name = neuro_id_analytics_event)]
 pub struct NeuroIdAnalyticsEvent {

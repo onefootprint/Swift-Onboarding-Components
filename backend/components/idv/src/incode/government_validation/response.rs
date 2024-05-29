@@ -1,12 +1,18 @@
-use newtypes::{incode::IncodeStatus, IncodeFailureReason};
-use serde::{Deserialize, Serialize};
-
-use crate::incode::{
-    doc::response::{FetchOCRResponse, ValueStatusKey},
-    IncodeClientErrorCustomFailureReasons,
+use crate::incode::doc::response::{
+    FetchOCRResponse,
+    ValueStatusKey,
 };
-
-use strum::{Display, EnumString};
+use crate::incode::IncodeClientErrorCustomFailureReasons;
+use newtypes::incode::IncodeStatus;
+use newtypes::IncodeFailureReason;
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use strum::{
+    Display,
+    EnumString,
+};
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -95,7 +101,8 @@ impl From<u8> for MXStatusCode {
 pub struct RegistralSituation {
     /// Possible values - [ VIGENTE, NO_VIGENTE, DATOS_NO_ENCONTRADOS ]
     pub tipo_situacion_registral: Option<String>,
-    /// Possible values - [ null, REPORTE_DE_EXTRAVIO, REPORTE_DE_ROBO, REPORTE_DE_ROBO_TEMPORAL, REPORTE_DE_EXTRAVIO_TEMPORAL ]
+    /// Possible values - [ null, REPORTE_DE_EXTRAVIO, REPORTE_DE_ROBO, REPORTE_DE_ROBO_TEMPORAL,
+    /// REPORTE_DE_EXTRAVIO_TEMPORAL ]
     pub tipo_reporte_robo_extravio: Option<String>,
 }
 
@@ -104,7 +111,8 @@ pub struct RegistralSituation {
 pub struct GovernmentValidation {
     pub validation_status: Option<ValueStatusKey>,
     pub overall: Option<ValueStatusKey>,
-    /// keys have possibel values  issueDate, firstName, maternalLastName, paternalLastName, ocr, personalId, electorsKey, emissionNumber, registrationDate
+    /// keys have possibel values  issueDate, firstName, maternalLastName, paternalLastName, ocr,
+    /// personalId, electorsKey, emissionNumber, registrationDate
     pub ocr_validation: Option<Vec<ValueStatusKey>>,
     pub ocr_validation_overall: Option<ValueStatusKey>,
 }

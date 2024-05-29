@@ -1,13 +1,21 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiError,
-    types::{response::ResponseData, JsonApiResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
 use newtypes::TenantIosAppMetaId;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     description = "Decrypts a specific ios app metadata entry",

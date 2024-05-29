@@ -1,10 +1,15 @@
-use std::collections::HashMap;
-
 use crate::events::*;
 use chrono::Utc;
-use newtypes::{FpId, OnboardingStatus};
+use newtypes::{
+    FpId,
+    OnboardingStatus,
+};
 use schemars::gen::SchemaSettings;
-use strum::{EnumMessage, IntoEnumIterator};
+use std::collections::HashMap;
+use strum::{
+    EnumMessage,
+    IntoEnumIterator,
+};
 
 #[test]
 fn test_raw() {

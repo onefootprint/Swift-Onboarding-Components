@@ -1,25 +1,40 @@
-use std::sync::Arc;
-
-use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
-use crate::{
-    auth::{
-        session::{get_is_live, AuthSessionData, ExtractableAuthSession, RequestInfo},
-        AuthError, SessionContext,
-    },
-    errors::ApiResult,
-    utils::headers::get_bool_header,
+use super::{
+    AuthActor,
+    CanCheckTenantGuard,
+    GetFirmEmployee,
+    TenantAuth,
 };
-use db::{
-    models::{
-        tenant::Tenant,
-        tenant_role::{ImmutableRoleKind, TenantRole},
-        tenant_user::TenantUser,
-    },
-    PgConn,
+use crate::auth::session::{
+    get_is_live,
+    AuthSessionData,
+    ExtractableAuthSession,
+    RequestInfo,
 };
-use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::{DataLifetimeSource, TenantRoleKind, TenantScope, WorkosAuthMethod};
+use crate::auth::{
+    AuthError,
+    SessionContext,
+};
+use crate::errors::ApiResult;
+use crate::utils::headers::get_bool_header;
+use db::models::tenant::Tenant;
+use db::models::tenant_role::{
+    ImmutableRoleKind,
+    TenantRole,
+};
+use db::models::tenant_user::TenantUser;
+use db::PgConn;
+use feature_flag::{
+    BoolFlag,
+    FeatureFlagClient,
+};
+use newtypes::{
+    DataLifetimeSource,
+    TenantRoleKind,
+    TenantScope,
+    WorkosAuthMethod,
+};
 use paperclip::actix::Apiv2Security;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 /// Represents all tenant info identified by a workos session token. This struct is hydrated from
@@ -37,10 +52,10 @@ pub struct FirmEmployeeAssumeAuth {
     pub(super) auth_method: WorkosAuthMethod,
 }
 
-/// Nests a private FirmEmployeeAssumeAuth and implements traits required to extract this session from an
-/// actix request.
-/// Notably, this struct isn't very useful since the entire nested FirmEmployeeAssumeAuth is hidden. If you
-/// want to do something useful, you likely have to enforce permissions by calling
+/// Nests a private FirmEmployeeAssumeAuth and implements traits required to extract this session
+/// from an actix request.
+/// Notably, this struct isn't very useful since the entire nested FirmEmployeeAssumeAuth is hidden.
+/// If you want to do something useful, you likely have to enforce permissions by calling
 /// `check_permissions`, which will give you the more useful nested FirmEmployeeAssumeAuth
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
@@ -52,7 +67,8 @@ pub struct FirmEmployeeAssumeAuth {
 )]
 pub struct ParsedFirmEmployeeAssumeAuth<const IS_SECONDARY: bool>(pub(super) FirmEmployeeAssumeAuth);
 
-/// A shorthand for the extractor for an auth session in which a firm employee has assumed anther tenant
+/// A shorthand for the extractor for an auth session in which a firm employee has assumed anther
+/// tenant
 pub type FirmEmployeeAssumeAuthContext<const IS_SECONDARY: bool> =
     SessionContext<ParsedFirmEmployeeAssumeAuth<IS_SECONDARY>>;
 
@@ -201,17 +217,25 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
 
 #[cfg(test)]
 mod test {
-    use super::{super::CanCheckTenantGuard, FirmEmployeeAssumeAuth, ParsedFirmEmployeeAssumeAuth};
-    use crate::auth::{
-        session::{tenant::FirmEmployeeSession, AuthSessionData},
-        SessionContext,
+    use super::super::CanCheckTenantGuard;
+    use super::{
+        FirmEmployeeAssumeAuth,
+        ParsedFirmEmployeeAssumeAuth,
     };
-    use db::{
-        models::tenant_role::{ImmutableRoleKind, TenantRole},
-        tests::prelude::*,
+    use crate::auth::session::tenant::FirmEmployeeSession;
+    use crate::auth::session::AuthSessionData;
+    use crate::auth::SessionContext;
+    use db::models::tenant_role::{
+        ImmutableRoleKind,
+        TenantRole,
     };
+    use db::tests::prelude::*;
     use macros::db_test_case;
-    use newtypes::{TenantRoleKind, TenantScope, WorkosAuthMethod};
+    use newtypes::{
+        TenantRoleKind,
+        TenantScope,
+        WorkosAuthMethod,
+    };
 
     #[db_test_case(false, false, false => vec![TenantScope::Read])]
     #[db_test_case(false, true, false => vec![TenantScope::Read])]

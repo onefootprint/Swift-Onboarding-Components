@@ -1,12 +1,19 @@
-use derive_more::{From, Into};
-use diesel::{
-    backend::Backend,
-    deserialize::{FromSql, FromSqlRow},
-    expression::AsExpression,
-    serialize::ToSql,
-    sql_types::Binary,
+use derive_more::{
+    From,
+    Into,
 };
-use serde::{Deserialize, Serialize};
+use diesel::backend::Backend;
+use diesel::deserialize::{
+    FromSql,
+    FromSqlRow,
+};
+use diesel::expression::AsExpression;
+use diesel::serialize::ToSql;
+use diesel::sql_types::Binary;
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(
     Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, AsExpression, FromSqlRow,

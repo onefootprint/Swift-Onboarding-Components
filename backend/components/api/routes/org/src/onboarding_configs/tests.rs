@@ -1,13 +1,22 @@
+use super::validation::ObConfigurationArgsToValidate;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use newtypes::{
-    CipKind, CollectedDataOption as CDO, CountryRestriction, CustomDocumentConfig, DataIdentifier, DbActor,
-    DocTypeRestriction, DocumentCdoInfo, DocumentRequestConfig, EnhancedAmlOption, ObConfigurationKind,
-    Selfie, TenantId,
+    CipKind,
+    CollectedDataOption as CDO,
+    CountryRestriction,
+    CustomDocumentConfig,
+    DataIdentifier,
+    DbActor,
+    DocTypeRestriction,
+    DocumentCdoInfo,
+    DocumentRequestConfig,
+    EnhancedAmlOption,
+    ObConfigurationKind,
+    Selfie,
+    TenantId,
 };
 use std::str::FromStr;
 use test_case::test_case;
-
-use super::validation::ObConfigurationArgsToValidate;
 
 #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))] => true)]
 #[test_case(vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::RequireSelfie))], vec![], vec![CDO::Name, CDO::Ssn4, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))] => false)] // could be true, but client doesn't do this

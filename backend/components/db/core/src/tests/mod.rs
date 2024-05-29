@@ -1,9 +1,8 @@
 // TODO put prelude / fixtures in a feature to not compile in the prod binary
 // https://stackoverflow.com/questions/41700543/can-we-share-test-utilites-between-crates
 
-use std::sync::Arc;
-
 use feature_flag::MockFeatureFlagClient;
+use std::sync::Arc;
 
 /// Contains all test helper utils that should be auto-imported in test files
 pub mod prelude;

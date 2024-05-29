@@ -1,10 +1,12 @@
-use crate::{
-    helpers::WorkosAuthIdentity,
-    models::{partner_tenant::PartnerTenant, tenant::Tenant},
-    DbError,
-};
+use crate::helpers::WorkosAuthIdentity;
+use crate::models::partner_tenant::PartnerTenant;
+use crate::models::tenant::Tenant;
+use crate::DbError;
 use derive_more::From;
-use newtypes::{OrgIdentifierRef, TenantKind};
+use newtypes::{
+    OrgIdentifierRef,
+    TenantKind,
+};
 
 #[derive(Debug, Clone, From)]
 #[allow(clippy::large_enum_variant)]

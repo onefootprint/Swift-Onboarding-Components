@@ -1,14 +1,22 @@
-use crate::{ProtectedAuth, State};
-use actix_web::{patch, web};
-use api_core::{
-    decision::rule_engine,
-    errors::ApiResult,
-    types::{EmptyResponse, JsonApiResponse},
+use crate::{
+    ProtectedAuth,
+    State,
+};
+use actix_web::{
+    patch,
+    web,
+};
+use api_core::decision::rule_engine;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
 
-/// Writes default rules for the given playbook. If the playbook already has rules, then nothing happens.
+/// Writes default rules for the given playbook. If the playbook already has rules, then nothing
+/// happens.
 // TODO: can remove this now
 #[patch("/private/protected/onboarding_configs/{ob_config_id}/add_default_rules")]
 pub async fn add_default_rules(

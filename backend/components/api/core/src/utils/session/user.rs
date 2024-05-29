@@ -1,12 +1,23 @@
-use chrono::{DateTime, Duration, Utc};
+use crate::auth::session::AuthSessionData;
+use crate::errors::error_with_code::ErrorWithCode;
+use crate::errors::ApiResult;
+use crate::State;
+use chrono::{
+    DateTime,
+    Duration,
+    Utc,
+};
 use crypto::aead::ScopedSealingKey;
-use db::{models::session::Session, DbResult, PgConn};
-use newtypes::{AuthTokenHash, HasSessionKind, SealedSessionBytes, SessionAuthToken};
-
-use crate::{
-    auth::session::AuthSessionData,
-    errors::{error_with_code::ErrorWithCode, ApiResult},
-    State,
+use db::models::session::Session;
+use db::{
+    DbResult,
+    PgConn,
+};
+use newtypes::{
+    AuthTokenHash,
+    HasSessionKind,
+    SealedSessionBytes,
+    SessionAuthToken,
 };
 
 #[derive(Debug, Clone)]

@@ -1,13 +1,33 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{decision_intent, scoped_vault, vault, verification_request, verification_result};
-use diesel::{prelude::*, Insertable};
+use super::data_lifetime::DataLifetime;
+use super::vault::Vault;
+use super::verification_result::VerificationResult;
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    decision_intent,
+    scoped_vault,
+    vault,
+    verification_request,
+    verification_result,
+};
+use diesel::prelude::*;
+use diesel::Insertable;
 use newtypes::{
-    DataLifetimeSeqno, DecisionIntentId, DocumentId, ScopedVaultId, Vendor, VendorAPI, VerificationRequestId,
+    DataLifetimeSeqno,
+    DecisionIntentId,
+    DocumentId,
+    ScopedVaultId,
+    Vendor,
+    VendorAPI,
+    VerificationRequestId,
     WorkflowId,
 };
-
-use super::{data_lifetime::DataLifetime, vault::Vault, verification_result::VerificationResult};
 
 #[derive(Debug, Clone, Queryable, Identifiable)]
 #[diesel(table_name = verification_request)]
@@ -21,8 +41,8 @@ pub struct VerificationRequest {
     // The current seqno when this VerificationRequest was created.
     // This is used to reconstruct the VaultWrapper at the time the request was sent.
     pub uvw_snapshot_seqno: DataLifetimeSeqno,
-    // If we are verifying an identity document, we want to know exactly which one we were verifying since there
-    // could be multiple in the vault, seqno doesn't help us
+    // If we are verifying an identity document, we want to know exactly which one we were verifying since
+    // there could be multiple in the vault, seqno doesn't help us
     pub identity_document_id: Option<DocumentId>,
     pub scoped_vault_id: ScopedVaultId,
     pub decision_intent_id: DecisionIntentId,
@@ -190,7 +210,8 @@ impl VerificationRequest {
         Ok(req_and_res)
     }
 
-    /// Will return the latest Vres per vendor_api, ignoring vreq's without vres's and vres's where is_error = true
+    /// Will return the latest Vres per vendor_api, ignoring vreq's without vres's and vres's where
+    /// is_error = true
     #[tracing::instrument(
         "VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user",
         skip_all
@@ -341,11 +362,14 @@ pub enum VReqIdentifier {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        models::decision_intent::DecisionIntent, test_helpers::assert_have_same_elements, tests::prelude::*,
-    };
+    use crate::models::decision_intent::DecisionIntent;
+    use crate::test_helpers::assert_have_same_elements;
+    use crate::tests::prelude::*;
     use macros::db_test_case;
-    use newtypes::{DecisionIntentKind, VerificationResultId};
+    use newtypes::{
+        DecisionIntentKind,
+        VerificationResultId,
+    };
     use std::str::FromStr;
 
     enum VresType {

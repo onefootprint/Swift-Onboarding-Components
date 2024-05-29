@@ -1,6 +1,8 @@
-use newtypes::{IncodeFailureReason, PiiString};
-
 use super::IncodeClientErrorCustomFailureReasons;
+use newtypes::{
+    IncodeFailureReason,
+    PiiString,
+};
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -11,19 +13,25 @@ pub struct OnboardingStartResponse {
     pub token: PiiString, // TODO: this isn't PII?
     // interviewCode: String. 6 characters. This value is used for connecting to conference call.
     pub interview_code: Option<String>,
-    // interviewId: String. 24 characters. Identifies the onboarding session that is initialized. Can be used for fetching data about that session in future calls.
+    // interviewId: String. 24 characters. Identifies the onboarding session that is initialized. Can be used
+    // for fetching data about that session in future calls.
     pub interview_id: String,
-    // flowType: String, optional (only if configurationId is sent in request). Type of the flow used. Could be flow (in most cases), or legacy type configuration (not used anymore).
+    // flowType: String, optional (only if configurationId is sent in request). Type of the flow used. Could
+    // be flow (in most cases), or legacy type configuration (not used anymore).
     pub flow_type: Option<String>,
-    // idCaptureTimeout: Integer. Number of seconds after which manual capture button should be shown to the user, while capturing ID.
+    // idCaptureTimeout: Integer. Number of seconds after which manual capture button should be shown to the
+    // user, while capturing ID.
     pub id_capture_timeout: Option<i32>,
     // idCaptureRetries: Integer. Number of ID captures after which user should be taken to next screen.
     pub id_capture_retries: Option<i32>,
-    // selfieCaptureTimeout: Integer. Number of seconds after which manual capture button should be shown to the user, while capturing selfie.
+    // selfieCaptureTimeout: Integer. Number of seconds after which manual capture button should be shown to
+    // the user, while capturing selfie.
     pub selfie_capture_timeout: Option<i32>,
-    // selfieCaptureRetries: Integer. Number of selfie captures after which user should be taken to next screen.
+    // selfieCaptureRetries: Integer. Number of selfie captures after which user should be taken to next
+    // screen.
     pub selfie_capture_retries: Option<i32>,
-    // curpValidationRetries: Integer. Number of curp validations after which user should be taken to next screen. (only for Mexico)
+    // curpValidationRetries: Integer. Number of curp validations after which user should be taken to next
+    // screen. (only for Mexico)
     pub curp_validation_retries: Option<i32>,
     // clientId: String. Customer specific clientId that corresponds to api key.
     pub client_id: Option<PiiString>, // TODO: this isn't PII?
@@ -31,7 +39,8 @@ pub struct OnboardingStartResponse {
     pub env: Option<String>,
     // existingSession: Boolean. It's true if interviewId corresponds to an existing Onboarding Session.
     pub existing_session: Option<bool>,
-    // Some 4xx errors that could be handled programmatically include status of an error and message that briefly explains the error reported.
+    // Some 4xx errors that could be handled programmatically include status of an error and message that
+    // briefly explains the error reported.
     #[serde(flatten)]
     pub error: Option<Error>,
 }

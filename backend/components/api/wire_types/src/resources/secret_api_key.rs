@@ -1,5 +1,8 @@
 use crate::*;
-use newtypes::{ApiKeyStatus, TenantApiKeyId};
+use newtypes::{
+    ApiKeyStatus,
+    TenantApiKeyId,
+};
 
 /// Secret API key
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

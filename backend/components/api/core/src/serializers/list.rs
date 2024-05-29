@@ -1,8 +1,9 @@
 use crate::utils::db2api::DbToApi;
 use api_wire_types::ListPlaybookUsage;
-use db::models::{
-    list::List, list_entry::ListEntry, ob_configuration::ObConfiguration, rule_instance::RuleInstance,
-};
+use db::models::list::List;
+use db::models::list_entry::ListEntry;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_instance::RuleInstance;
 use newtypes::PiiString;
 
 impl DbToApi<(List, usize, bool)> for api_wire_types::List {

@@ -1,21 +1,29 @@
 use async_trait::async_trait;
-use aws_sdk_s3::{
-    operation::{
-        abort_multipart_upload::AbortMultipartUploadError,
-        complete_multipart_upload::CompleteMultipartUploadError,
-        create_multipart_upload::CreateMultipartUploadError, delete_objects::DeleteObjectsError,
-        get_object::GetObjectError, list_buckets::ListBucketsError, put_object::PutObjectError,
-        upload_part::UploadPartError,
-    },
-    primitives::ByteStream,
-    types::{CompletedMultipartUpload, CompletedPart},
+use aws_sdk_s3::operation::abort_multipart_upload::AbortMultipartUploadError;
+use aws_sdk_s3::operation::complete_multipart_upload::CompleteMultipartUploadError;
+use aws_sdk_s3::operation::create_multipart_upload::CreateMultipartUploadError;
+use aws_sdk_s3::operation::delete_objects::DeleteObjectsError;
+use aws_sdk_s3::operation::get_object::GetObjectError;
+use aws_sdk_s3::operation::list_buckets::ListBucketsError;
+use aws_sdk_s3::operation::put_object::PutObjectError;
+use aws_sdk_s3::operation::upload_part::UploadPartError;
+use aws_sdk_s3::primitives::ByteStream;
+use aws_sdk_s3::types::{
+    CompletedMultipartUpload,
+    CompletedPart,
 };
-use bytes::{Bytes, BytesMut};
+use bytes::{
+    Bytes,
+    BytesMut,
+};
 use futures::StreamExt;
 #[cfg(test)]
 use mockall::automock;
 use thiserror::Error;
-use url::{ParseError, Url};
+use url::{
+    ParseError,
+    Url,
+};
 
 #[allow(unused)]
 const S3_PATH_PREFIX: &str = "s3://";
@@ -68,19 +76,23 @@ impl S3Client for AwsS3Client {
     }
 }
 
-/// Thin wrapper around the base AWS SDK client so that we can add some type safety, custom errors, tracing etc
+/// Thin wrapper around the base AWS SDK client so that we can add some type safety, custom errors,
+/// tracing etc
 ///
 /// How does this work?
 /// - We grant S3 AWS IAM credentials to a specific `AWS_ACCESS_KEY_ID`
-/// - In the various environments/servers (dev/local/prod) we read in the AWS access key from the environment (via the .env)
-/// - So, if you want to run this in a new environment, be sure to add the appropriate IAM config to the AWS key in that environment!
+/// - In the various environments/servers (dev/local/prod) we read in the AWS access key from the
+///   environment (via the .env)
+/// - So, if you want to run this in a new environment, be sure to add the appropriate IAM config to
+///   the AWS key in that environment!
 ///
 /// Resources:
 ///   - Overview of S3 architecture: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
 ///   - Actions that can be performed in S3 https://docs.aws.amazon.com/AmazonS3/latest/API/API_Operations_Amazon_Simple_Storage_Service.html
 impl AwsS3Client {
     /// Put an object in S3 at the path specified by `s3://{bucket}/{key}`
-    ///    - Note: S3 is a flat heirarchy, but key can use `/` in the name to mimic a directory structure
+    ///    - Note: S3 is a flat heirarchy, but key can use `/` in the name to mimic a directory
+    ///      structure
     #[tracing::instrument(skip(self, object))]
     pub async fn put_object<T>(
         &self,

@@ -1,26 +1,40 @@
-use super::{IncodeStateTransition, ProcessId, VerificationSession};
-use crate::{
-    decision::vendor::{
-        incode::{
-            state::{IncodeState, TransitionResult},
-            IncodeContext,
-        },
-        map_to_api_error,
-        verification_result::SaveVerificationResultArgs,
-    },
-    errors::{ApiResult, AssertionError},
-    vendor_clients::IncodeClients,
+use super::{
+    IncodeStateTransition,
+    ProcessId,
+    VerificationSession,
 };
+use crate::decision::vendor::incode::state::{
+    IncodeState,
+    TransitionResult,
+};
+use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+};
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-use db::{
-    models::{
-        document::{Document, DocumentUpdate},
-        user_consent::UserConsent,
-    },
-    DbPool, TxnPgConn,
+use db::models::document::{
+    Document,
+    DocumentUpdate,
 };
-use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
-use newtypes::{DocumentId, DocumentReviewStatus, DocumentStatus, VendorAPI};
+use db::models::user_consent::UserConsent;
+use db::{
+    DbPool,
+    TxnPgConn,
+};
+use idv::incode::doc::{
+    IncodeAddMLConsentRequest,
+    IncodeAddPrivacyConsentRequest,
+};
+use newtypes::{
+    DocumentId,
+    DocumentReviewStatus,
+    DocumentStatus,
+    VendorAPI,
+};
 
 /// Add Consent
 pub struct AddConsent {}
@@ -28,8 +42,10 @@ pub struct AddConsent {}
 impl AddConsent {
     pub fn enter(conn: &mut TxnPgConn, id_doc_id: &DocumentId) -> ApiResult<()> {
         // Update Document to status = complete so we clear the Bifrost req
-        // TODO: we are setting status to complete here but set completed_seqno later- is that gunna cause any problems??
-        // It would actually be nice to write the timeline event, vault the docs, etc here but it sounds like the problem is our DI data model requires us to know the doc type and we can't confirm that until the processing part of the flow is complete
+        // TODO: we are setting status to complete here but set completed_seqno later- is that gunna cause
+        // any problems?? It would actually be nice to write the timeline event, vault the docs, etc
+        // here but it sounds like the problem is our DI data model requires us to know the doc type and we
+        // can't confirm that until the processing part of the flow is complete
         let update = DocumentUpdate {
             status: Some(DocumentStatus::Complete),
             review_status: Some(DocumentReviewStatus::PendingMachineReview),

@@ -1,7 +1,17 @@
-use api_core::{errors::ApiError, types::response::ResponseData, State};
-use api_wire_types::{OrgLoginResponse, PartnerLoginRequest};
+use api_core::errors::ApiError;
+use api_core::types::response::ResponseData;
+use api_core::State;
+use api_wire_types::{
+    OrgLoginResponse,
+    PartnerLoginRequest,
+};
 use newtypes::TenantKind;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     tags(Auth, Private),

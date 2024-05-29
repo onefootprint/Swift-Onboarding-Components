@@ -1,19 +1,33 @@
-use std::sync::Arc;
-
 use crate::errors::ApiResult;
-use db::{
-    models::{
-        ob_configuration::ObConfiguration,
-        rule_instance::{IncludeRules, NewRule, RuleInstance},
-    },
-    TxnPgConn,
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_instance::{
+    IncludeRules,
+    NewRule,
+    RuleInstance,
 };
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use db::TxnPgConn;
+use feature_flag::{
+    BoolFlag,
+    FeatureFlagClient,
+};
 use newtypes::{
-    BooleanOperator, CipKind, CollectedDataOption as CDO, DbActor, EnhancedAmlOption,
-    FootprintReasonCode as FRC, Locked, ObConfigurationKind, RuleAction, RuleAction as RA, RuleExpression,
-    RuleExpressionCondition, RuleInstanceKind, VerificationCheck, VerificationCheckKind,
+    BooleanOperator,
+    CipKind,
+    CollectedDataOption as CDO,
+    DbActor,
+    EnhancedAmlOption,
+    FootprintReasonCode as FRC,
+    Locked,
+    ObConfigurationKind,
+    RuleAction,
+    RuleAction as RA,
+    RuleExpression,
+    RuleExpressionCondition,
+    RuleInstanceKind,
+    VerificationCheck,
+    VerificationCheckKind,
 };
+use std::sync::Arc;
 
 pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
     vec![
@@ -36,7 +50,11 @@ pub fn ssn_rules() -> Vec<(RuleExpression, RuleAction)> {
     ]
 }
 
-// we use this base set of Document rules for both Alpaca and regular playbooks. However, precedent for Alpaca currently is to always raise a review if a doc was uploaded. We haven't yet decided with folks that there are cases where they want a document to "hard fail" and not even raise a review. so for now, the alpaca rules will pass in always_review=true here and that means would be Fail RuleAction's here are instead RuleAction::ManualReview
+// we use this base set of Document rules for both Alpaca and regular playbooks. However, precedent
+// for Alpaca currently is to always raise a review if a doc was uploaded. We haven't yet decided
+// with folks that there are cases where they want a document to "hard fail" and not even raise a
+// review. so for now, the alpaca rules will pass in always_review=true here and that means would be
+// Fail RuleAction's here are instead RuleAction::ManualReview
 pub fn base_doc_rules(always_review: bool) -> Vec<(RuleExpression, RuleAction)> {
     let fail_action = match always_review {
         true => RA::ManualReview,
@@ -291,12 +309,17 @@ fn if_not_risk_signal(frc: FRC) -> RuleExpression {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use db::{
-        test_helpers::assert_have_same_elements,
-        tests::{fixtures::ob_configuration::ObConfigurationOpts, prelude::*, MockFFClient},
-    };
+    use db::test_helpers::assert_have_same_elements;
+    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+    use db::tests::prelude::*;
+    use db::tests::MockFFClient;
     use macros::db_test_case;
-    use newtypes::{CountryRestriction, DocTypeRestriction, DocumentCdoInfo, Selfie};
+    use newtypes::{
+        CountryRestriction,
+        DocTypeRestriction,
+        DocumentCdoInfo,
+        Selfie,
+    };
 
     fn kyb_vc(ein_only: bool) -> Option<Vec<VerificationCheck>> {
         Some(vec![VerificationCheck::Kyb { ein_only }])

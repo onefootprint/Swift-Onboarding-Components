@@ -1,8 +1,9 @@
-use ::workos::{
-    organizations::CreateOrganizationError, sso::GetProfileAndTokenError, WorkOsError as LibWorkOsError,
-};
+use ::workos::organizations::CreateOrganizationError;
+use ::workos::sso::GetProfileAndTokenError;
+use ::workos::WorkOsError as LibWorkOsError;
 use thiserror::Error;
-use workos::{organizations::GetOrganizationError, passwordless::CreatePasswordlessSessionError};
+use workos::organizations::GetOrganizationError;
+use workos::passwordless::CreatePasswordlessSessionError;
 
 #[derive(Debug, Error)]
 pub enum WorkOsError {

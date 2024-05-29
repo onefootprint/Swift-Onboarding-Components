@@ -1,19 +1,22 @@
-use super::{FetchScores, IncodeStateTransition, VerificationSession};
-use crate::{
-    decision::vendor::{
-        incode::{
-            state::{IncodeState, TransitionResult},
-            IncodeContext,
-        },
-        map_to_api_error,
-        verification_result::SaveVerificationResultArgs,
-    },
-    errors::ApiResult,
-    vendor_clients::IncodeClients,
+use super::{
+    FetchScores,
+    IncodeStateTransition,
+    VerificationSession,
 };
+use crate::decision::vendor::incode::state::{
+    IncodeState,
+    TransitionResult,
+};
+use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-
-use db::{DbPool, TxnPgConn};
+use db::{
+    DbPool,
+    TxnPgConn,
+};
 use idv::incode::doc::IncodeGetOnboardingStatusRequest;
 use newtypes::VendorAPI;
 
@@ -50,7 +53,8 @@ impl IncodeStateTransition for GetOnboardingStatus {
             }
             Err(e) => {
                 // If polling Incode times out, return None to terminate the state machine.
-                // This prevents us from hard erroring during Bifrost and allows us to re-run the Incode state machine later (in /proceed or async thereafter)
+                // This prevents us from hard erroring during Bifrost and allows us to re-run the Incode state
+                // machine later (in /proceed or async thereafter)
                 if matches!(e, idv::incode::error::Error::ResultsNotReady) {
                     tracing::error!(
                         "IncodeStateTransition::GetOnboardingStatus ResultsNotReady, not transitioning"

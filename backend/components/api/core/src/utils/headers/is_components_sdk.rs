@@ -1,17 +1,23 @@
 use super::get_bool_header;
 use crate::errors::ApiResult;
-use actix_web::{http::header::HeaderMap, FromRequest};
+use actix_web::http::header::HeaderMap;
+use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
-use paperclip::v2::{
-    models::{DefaultSchemaRaw, Parameter},
-    schema::Apiv2Schema,
+use paperclip::v2::models::{
+    DefaultSchemaRaw,
+    Parameter,
 };
-use serde::{Deserialize, Serialize};
+use paperclip::v2::schema::Apiv2Schema;
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Deref)]
-/// When a non-empty value is provided, indicates that the request is originating from the components SDK
+/// When a non-empty value is provided, indicates that the request is originating from the
+/// components SDK
 pub struct IsComponentsSdk(pub bool);
 
 impl Apiv2Schema for IsComponentsSdk {

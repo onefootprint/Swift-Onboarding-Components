@@ -1,8 +1,6 @@
-use strum::IntoEnumIterator;
-
-use crate::OnboardingRequirementKind;
-
 use super::WorkflowState;
+use crate::OnboardingRequirementKind;
+use strum::IntoEnumIterator;
 
 impl WorkflowState {
     /// List the relevant onboarding requirements that a workflow may require displaying to bifrost.

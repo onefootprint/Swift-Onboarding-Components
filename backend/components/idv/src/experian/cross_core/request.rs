@@ -1,12 +1,27 @@
-use chrono::{DateTime, NaiveDate, SecondsFormat, Utc};
-use newtypes::{
-    experian::{AddressType, ApplicantType, DocumentType, TypeOfPerson},
-    IdvData, PiiString,
+use crate::experian::error::{
+    ConversionError,
+    Error,
 };
-
 use crate::experian::{
-    error::{ConversionError, Error},
-    normalize_address_line_1, normalize_city, normalize_name,
+    normalize_address_line_1,
+    normalize_city,
+    normalize_name,
+};
+use chrono::{
+    DateTime,
+    NaiveDate,
+    SecondsFormat,
+    Utc,
+};
+use newtypes::experian::{
+    AddressType,
+    ApplicantType,
+    DocumentType,
+    TypeOfPerson,
+};
+use newtypes::{
+    IdvData,
+    PiiString,
 };
 
 /// This is the top level request to CrossCore
@@ -53,7 +68,8 @@ impl CrossCoreAPIRequest {
 pub struct BodyHeader {
     // The ID for our instance
     pub tenant_id: String,
-    // This is the scenario defined in the CrossCore configuration used to determine which back- ing applications are contacted and in what order.
+    // This is the scenario defined in the CrossCore configuration used to determine which back- ing
+    // applications are contacted and in what order.
     pub request_type: String,
     // Reference ID that you provide for each specific call to CrossCore. This ID does not have to be unique.
     // You can reuse the same ID if desired, although using a unique ID for each call is best practice.
@@ -103,8 +119,9 @@ pub struct ControlOption {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Contact {
-    // Value used to cross-reference pieces of data to other objects within the message. The value is whatever you decide to code it as.
-    // When you need to reference this object, you will use the id value from this object in the target object to associate this object to the target object.
+    // Value used to cross-reference pieces of data to other objects within the message. The value is
+    // whatever you decide to code it as. When you need to reference this object, you will use the id
+    // value from this object in the target object to associate this object to the target object.
     pub id: Option<String>,
     pub person: Person,
     pub addresses: Vec<Address>,
@@ -283,7 +300,8 @@ pub struct Telephone {
 pub struct Email {
     // Value used to cross-reference pieces of data to other objects within the message.
     pub id: Option<String>,
-    // The following special characters are not allowed, if included, the email address will not be included in the request to Precise ID: < > % & + = [ { ] : ; ? *
+    // The following special characters are not allowed, if included, the email address will not be included
+    // in the request to Precise ID: < > % & + = [ { ] : ; ? *
     pub email: Option<PiiString>,
 }
 
@@ -334,7 +352,8 @@ pub struct PreciseIDRequestConfig {
     pub control_options: Vec<ControlOption>,
     // The ID for our instance
     pub tenant_id: String,
-    // This is the scenario defined in the CrossCore configuration used to determine which back- ing applications are contacted and in what order.
+    // This is the scenario defined in the CrossCore configuration used to determine which back- ing
+    // applications are contacted and in what order.
     pub request_type: String,
     // Reference ID that you provide for each specific call to CrossCore. This ID does not have to be unique.
     // You can reuse the same ID if desired, although using a unique ID for each call is best practice.

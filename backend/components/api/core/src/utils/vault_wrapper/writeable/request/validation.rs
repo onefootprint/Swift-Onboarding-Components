@@ -1,19 +1,35 @@
-use super::{FingerprintedDataRequest, ValidatedDataRequest};
-use crate::{
-    auth::tenant::AuthActor,
-    errors::ApiResult,
-    utils::vault_wrapper::{PrefillData, VaultWrapper, WriteableVw},
+use super::{
+    FingerprintedDataRequest,
+    ValidatedDataRequest,
 };
-use db::{
-    models::{contact_info::ContactInfo, vault_data::NewVaultData},
-    PgConn,
+use crate::auth::tenant::AuthActor;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    PrefillData,
+    VaultWrapper,
+    WriteableVw,
 };
+use db::models::contact_info::ContactInfo;
+use db::models::vault_data::NewVaultData;
+use db::PgConn;
 use itertools::Itertools;
 use newtypes::{
-    BusinessDataKind as BDK, CollectedDataOption, DataIdentifier, DataLifetimeSource, DiValidationError,
-    Error as NtError, IdentityDataKind as IDK, NtResult, ScopedVaultId, VaultDataFormat, VaultKind,
+    BusinessDataKind as BDK,
+    CollectedDataOption,
+    DataIdentifier,
+    DataLifetimeSource,
+    DiValidationError,
+    Error as NtError,
+    IdentityDataKind as IDK,
+    NtResult,
+    ScopedVaultId,
+    VaultDataFormat,
+    VaultKind,
 };
-use std::collections::{HashMap, HashSet};
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 
 pub enum DataRequestSource {
     CreateVault,
@@ -179,7 +195,8 @@ impl<Type> VaultWrapper<Type> {
                     .flat_map(|di| self.data(&di))
                     .all(|d| &d.lifetime.scoped_vault_id != prefill_sv_id);
                 if is_full_cdo_added_by_other_tenant {
-                    // If the full CDO was added by another tenant and this is prefill data, temporarily allow it
+                    // If the full CDO was added by another tenant and this is prefill data, temporarily allow
+                    // it
                     continue;
                 }
             }

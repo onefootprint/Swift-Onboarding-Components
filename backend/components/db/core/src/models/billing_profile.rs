@@ -1,8 +1,19 @@
-use crate::{DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::billing_profile;
-use diesel::{prelude::*, Queryable};
-use newtypes::{BillingProfileId, TenantId};
+use diesel::prelude::*;
+use diesel::Queryable;
+use newtypes::{
+    BillingProfileId,
+    TenantId,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = billing_profile)]
@@ -90,14 +101,18 @@ impl BillingProfile {
     }
 }
 
-
 #[cfg(test)]
 mod test {
-    use crate::{models::billing_profile::UpdateBillingProfile, tests::prelude::*};
+    use crate::models::billing_profile::{
+        BillingProfile,
+        UpdateBillingProfile,
+    };
+    use crate::tests::prelude::{
+        TestPgConn,
+        *,
+    };
     use macros::db_test;
     use newtypes::TenantId;
-
-    use crate::{models::billing_profile::BillingProfile, tests::prelude::TestPgConn};
 
     #[db_test]
     fn test_billing_profile(conn: &mut TestPgConn) {

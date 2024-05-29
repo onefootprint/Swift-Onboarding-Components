@@ -1,27 +1,61 @@
-use std::collections::{HashMap, HashSet};
-
-use super::{
-    list::List,
-    ob_configuration::ObConfiguration,
-    rule_instance_references_list::{NewRuleInstanceReferencesList, RuleInstanceReferencesList},
-    rule_set_version::RuleSetVersion,
+use super::list::List;
+use super::ob_configuration::ObConfiguration;
+use super::rule_instance_references_list::{
+    NewRuleInstanceReferencesList,
+    RuleInstanceReferencesList,
 };
-use crate::{DbError, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{ob_configuration, rule_instance, rule_instance_references_list};
-use diesel::{prelude::*, Insertable, Queryable};
+use super::rule_set_version::RuleSetVersion;
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    ob_configuration,
+    rule_instance,
+    rule_instance_references_list,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{
-    output::Csv, DataLifetimeSeqno, DbActor, ListId, Locked, ObConfigurationId, RuleAction, RuleExpression,
-    RuleId, RuleInstanceId, RuleInstanceKind, TenantId,
+    DataLifetimeSeqno,
+    DbActor,
+    ListId,
+    Locked,
+    ObConfigurationId,
+    RuleAction,
+    RuleExpression,
+    RuleId,
+    RuleInstanceId,
+    RuleInstanceKind,
+    TenantId,
+};
+use std::collections::{
+    HashMap,
+    HashSet,
 };
 use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_instance)]
-// We use an "immutable changelog" approach here. So what corresponds to 1 User-Facing Rule is actually represented under the hood by N RuleInstance rows in Postgres.
-// When a User modifies a rule (changes rule_expression/is_shadow/name), we find the latest/active RuleInstance row in PG for that User-Facing Rule, we mark it as deactived, and clone a new version of it with the edit made.
-// A single User-Facing Rule has a single `rule_id` (we use this as a stable identifier, because `name` can be changed). So all the N RuleInstance rows in PG for that User-Facing Rule will have the same `rule_id` (even though each would have a unique `id` which remains a true row-unique identifier in PG)
+// We use an "immutable changelog" approach here. So what corresponds to 1 User-Facing Rule is
+// actually represented under the hood by N RuleInstance rows in Postgres. When a User modifies a
+// rule (changes rule_expression/is_shadow/name), we find the latest/active RuleInstance row in PG
+// for that User-Facing Rule, we mark it as deactived, and clone a new version of it with the edit
+// made. A single User-Facing Rule has a single `rule_id` (we use this as a stable identifier,
+// because `name` can be changed). So all the N RuleInstance rows in PG for that User-Facing Rule
+// will have the same `rule_id` (even though each would have a unique `id` which remains a true
+// row-unique identifier in PG)
 pub struct RuleInstance {
     pub id: RuleInstanceId,
     pub created_at: DateTime<Utc>,
@@ -31,7 +65,8 @@ pub struct RuleInstance {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub deactivated_seqno: Option<DataLifetimeSeqno>,
     pub rule_id: RuleId,
-    pub ob_configuration_id: ObConfigurationId, // later to be replaced by rule_set_id which will in turn have a pointer to OBC
+    pub ob_configuration_id: ObConfigurationId, /* later to be replaced by rule_set_id which will in turn
+                                                 * have a pointer to OBC */
     pub actor: DbActor,
     pub name: Option<String>, // not used yet
     pub rule_expression: RuleExpression,
@@ -251,7 +286,9 @@ impl RuleInstance {
                 action: existing.action,
                 is_shadow: update.is_shadow.unwrap_or(existing.is_shadow),
                 deactivated_at: update.deactivate.then_some(now),
-                deactivated_seqno: update.deactivate.then_some(seqno), // when we delete rules, we write a new rule_instance row which has deactivated_seqno set,
+                deactivated_seqno: update.deactivate.then_some(seqno), /* when we delete rules, we write a
+                                                                        * new rule_instance row which has
+                                                                        * deactivated_seqno set, */
                 kind: update.kind.unwrap_or(existing.kind),
             })
             .collect_vec();
@@ -300,7 +337,10 @@ impl RuleInstance {
             obc,
             actor,
             MultiRuleUpdate {
-                expected_rule_set_version: None, // currently the only (non test) use of `bulk_create` is when default rules are created for a playbook. We could just probably just safely pass `0` in those cases and drop this option
+                expected_rule_set_version: None, /* currently the only (non test) use of `bulk_create` is
+                                                  * when default rules are created for a playbook. We could
+                                                  * just probably just safely pass `0` in those cases and
+                                                  * drop this option */
                 new_rules,
                 updates: vec![],
             },
@@ -343,7 +383,8 @@ impl RuleInstance {
         Ok(res)
     }
 
-    // Returns (Obc, Vec<RuleInstance>) for any (active) RuleInstance that contains a condition that uses the input list_id
+    // Returns (Obc, Vec<RuleInstance>) for any (active) RuleInstance that contains a condition that
+    // uses the input list_id
     #[tracing::instrument("Rule::list_using_list", skip_all)]
     pub fn list_using_list(
         conn: &mut PgConn,
@@ -380,7 +421,8 @@ impl RuleInstance {
         Ok(res)
     }
 
-    // takes in a list of list_id's and returns those which are used in at least 1 (active) rule in 1 playbook
+    // takes in a list of list_id's and returns those which are used in at least 1 (active) rule in 1
+    // playbook
     #[tracing::instrument("Rule::get_is_used_in_some_playbook", skip_all)]
     pub fn get_is_used_in_some_playbook(conn: &mut PgConn, list_ids: &[ListId]) -> DbResult<HashSet<ListId>> {
         let res = rule_instance_references_list::table
@@ -405,12 +447,20 @@ pub enum IncludeRules {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{models::rule_set_version::RuleSetVersion, tests::prelude::*};
+    use crate::models::rule_set_version::RuleSetVersion;
+    use crate::tests::prelude::*;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
     use newtypes::{
-        BooleanOperator, DataIdentifier as DI, FootprintReasonCode as FRC, IdentityDataKind as IDK, IsIn,
-        RuleExpressionCondition, RuleExpressionCondition as REC, StepUpKind, VaultOperation,
+        BooleanOperator,
+        DataIdentifier as DI,
+        FootprintReasonCode as FRC,
+        IdentityDataKind as IDK,
+        IsIn,
+        RuleExpressionCondition,
+        RuleExpressionCondition as REC,
+        StepUpKind,
+        VaultOperation,
     };
     use std::collections::HashSet;
 
@@ -548,7 +598,8 @@ mod tests {
                     value: list2.id.clone(),
                 }),
                 REC::VaultData(VaultOperation::IsIn {
-                    // contrived, but test that even if a single rule references a list multiple times we still only create 1 junction row
+                    // contrived, but test that even if a single rule references a list multiple times we
+                    // still only create 1 junction row
                     field: DI::Id(IDK::Ssn4),
                     op: IsIn::IsIn,
                     value: list2.id.clone(),

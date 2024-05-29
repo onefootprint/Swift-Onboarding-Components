@@ -1,12 +1,16 @@
-use std::fmt::Display;
-
-use crate::{
-    errors::{ApiErrorKind, ApiResult},
-    ApiError,
-};
-use newtypes::{DecisionIntentId, IdentityDataKind, ScopedVaultId, VendorAPI};
-
 use self::tenant_vendor_control::TenantVendorControl;
+use crate::errors::{
+    ApiErrorKind,
+    ApiResult,
+};
+use crate::ApiError;
+use newtypes::{
+    DecisionIntentId,
+    IdentityDataKind,
+    ScopedVaultId,
+    VendorAPI,
+};
+use std::fmt::Display;
 
 pub mod build_request;
 pub mod fp_device_attestation;
@@ -35,7 +39,8 @@ pub fn get_vendor_apis_for_verification_requests(
         Err(ApiErrorKind::AssertionError(
             "Not enough information to send to any vendors".into(),
         ))?;
-    } // probably should add some more validations in the future, like make sure we are _at least_ sending to a KYC vendor
+    } // probably should add some more validations in the future, like make sure we are _at least_ sending
+      // to a KYC vendor
     Ok(vendor_apis)
 }
 

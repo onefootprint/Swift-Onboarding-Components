@@ -1,37 +1,54 @@
-use std::collections::HashMap;
-
-use db::models::risk_signal::{AtSeqno, RiskSignal};
-use idv::ParsedResponse;
-use newtypes::{
-    FootprintReasonCode, IdentityDataKind as IDK, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
-    VerificationResultId,
+use super::{
+    curp_validation,
+    experian,
+    idology_expectid,
+    lexis,
+    neuro_id,
 };
-
-use super::{curp_validation, experian, idology_expectid, lexis, neuro_id};
-use crate::{
-    decision::vendor::vendor_result::VendorResult, errors::ApiResult, utils::vault_wrapper::VaultWrapper,
-    ApiError,
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::ApiError;
+use db::models::risk_signal::{
+    AtSeqno,
+    RiskSignal,
 };
 use derive_more::Display;
 use enum_variant_type::EnumVariantType;
+use idv::ParsedResponse;
+use newtypes::{
+    FootprintReasonCode,
+    IdentityDataKind as IDK,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+    VendorAPI,
+    VerificationResultId,
+};
+use std::collections::HashMap;
 
 // There are 2 main ways we interact RiskSignals:
 //  - WRITE - when handling vendor responses, in order to produce and save risk signals
-//  - READ - when reading from the database for decisioning or populating an Alpaca CIP or displaying the dashboard etc
+//  - READ - when reading from the database for decisioning or populating an Alpaca CIP or
+//    displaying the dashboard etc
 //
 //
-// However, rules are defined per Vendor for a multitude of reasons (the main one being that reason codes are different across vendors, or mean different things)
-// so when using the most recent grouping of risk signals, we need a way to decompose back into vendor-specific risk signals (currently our `*Features`)
+// However, rules are defined per Vendor for a multitude of reasons (the main one being that reason
+// codes are different across vendors, or mean different things) so when using the most recent
+// grouping of risk signals, we need a way to decompose back into vendor-specific risk signals
+// (currently our `*Features`)
 //
 // Walking through an example:
 //  * Writing
 //   1. we make vendor requests
-//   2. we convert the responses into a `RiskSignalGroupStruct`. We have defined via traits how to convert a HashMap of vendor responses into the appropriate grouping of RiskSignals
+//   2. we convert the responses into a `RiskSignalGroupStruct`. We have defined via traits how to
+//      convert a HashMap of vendor responses into the appropriate grouping of RiskSignals
 //   3. Save RiskSignals
 // * Reading
-//   1. We reach a decision point where we need all the latest risk signals for a specific RiskSignalGroupKind
+//   1. We reach a decision point where we need all the latest risk signals for a specific
+//      RiskSignalGroupKind
 //   2. We fetch all RiskSignals from the latest RSG of that kind
-//   3. We define (via `From`) ways to convert from `RiskSignalGroupStruct` into the various Vendor-specific features that are used in rules
+//   3. We define (via `From`) ways to convert from `RiskSignalGroupStruct` into the various
+//      Vendor-specific features that are used in rules
 //
 // Why all these traits?
 //  convenience and type safety, and makes the decisioning code more generic
@@ -68,7 +85,8 @@ pub struct ParsedFootprintReasonCodes {
 }
 
 pub fn parse_reason_codes_from_vendor_result(
-    vendor_result: VendorResult, // TODO: this could be VendorResponse later when vres_id is removed from here
+    vendor_result: VendorResult, /* TODO: this could be VendorResponse later when vres_id is removed from
+                                  * here */
     vw: &VaultWrapper,
 ) -> ApiResult<ParsedFootprintReasonCodes> {
     let vendor_api: VendorAPI = (&vendor_result.response.response).into();
@@ -126,8 +144,12 @@ pub fn parse_reason_codes(
 // READ
 //
 
-// temp hack for the AlpacaKyc workflow which makes an initial decision purely on KYC risk signals and then later makes the AML vendor call and checks AML risk_signals
-// this prevents scenarios like: A user goes through AlpacaKyc and gets a watchlist hit, the Tenant asks them to redo KYC and enter in their full name. They go through the flow again and enter a new name which doesn't have any watchlist hits associated with it. But we immediatly fail them in AlpacaKycDecisioning because their latest AML risk signals from the first onboarding still exist
+// temp hack for the AlpacaKyc workflow which makes an initial decision purely on KYC risk signals
+// and then later makes the AML vendor call and checks AML risk_signals this prevents scenarios
+// like: A user goes through AlpacaKyc and gets a watchlist hit, the Tenant asks them to redo KYC
+// and enter in their full name. They go through the flow again and enter a new name which doesn't
+// have any watchlist hits associated with it. But we immediatly fail them in AlpacaKycDecisioning
+// because their latest AML risk signals from the first onboarding still exist
 pub fn fetch_latest_kyc_risk_signals(
     conn: &mut db::PgConn,
     scoped_vault_id: &ScopedVaultId,

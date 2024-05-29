@@ -1,24 +1,35 @@
+use self::certificates::{
+    ParsedClientCertificate,
+    PinnedServerCertificates,
+};
+use self::fwd_headers::ForwardProxyHeaders;
+use self::ingress_rule::{
+    IngressRule,
+    ParsedIngressRules,
+};
+use crate::auth::tenant::TenantAuth;
+use crate::enclave_client::DecryptReq;
+use crate::errors::proxy::VaultProxyError;
+use crate::errors::{
+    ApiError,
+    ApiResult,
+};
+use crate::{
+    api_headers_schema,
+    State,
+};
 use actix_web::http::header::HeaderMap;
-
-use newtypes::{ApiKeyStatus, FpId, PiiString, ProxyConfigId, ProxyIngressContentType};
+use newtypes::{
+    ApiKeyStatus,
+    FpId,
+    PiiString,
+    ProxyConfigId,
+    ProxyIngressContentType,
+};
 use reqwest::Method;
 use std::str::FromStr;
 use strum::EnumString;
 use url::Url;
-
-use crate::{
-    api_headers_schema,
-    auth::tenant::TenantAuth,
-    enclave_client::DecryptReq,
-    errors::{proxy::VaultProxyError, ApiError, ApiResult},
-    State,
-};
-
-use self::{
-    certificates::{ParsedClientCertificate, PinnedServerCertificates},
-    fwd_headers::ForwardProxyHeaders,
-    ingress_rule::{IngressRule, ParsedIngressRules},
-};
 
 mod certificates;
 pub use self::certificates::ClientCertificateKey;

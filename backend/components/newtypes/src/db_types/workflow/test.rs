@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use super::*;
+use std::str::FromStr;
 use test_case::test_case;
 
 #[test_case(WorkflowState::Kyc(KycState::DataCollection) => "kyc.data_collection")]

@@ -1,22 +1,35 @@
-use crate::{
-    errors::ApiError,
-    types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::VaultWrapper,
-    State,
+use crate::errors::ApiError;
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
 };
-use api_core::{
-    auth::{user::UserAuthContext, Any, CanDecrypt},
-    utils::vault_wrapper::VwArgs,
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::{
+    Any,
+    CanDecrypt,
 };
+use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::DecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-use std::collections::{HashMap, HashSet};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+    Apiv2Schema,
+};
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct UserDecryptRequest {
-    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `business.name`
+    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
+    /// `business.name`
     fields: HashSet<DataIdentifier>,
 }
 

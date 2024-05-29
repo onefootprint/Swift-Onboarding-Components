@@ -1,17 +1,24 @@
-use api_core::{
-    auth::tenant::{AnyOrgSessionAuth, AnyPartnerTenantSessionAuth},
-    errors::ApiError,
-    serializers::IsAuthMethodSupported,
-    types::response::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use api_core::auth::tenant::{
+    AnyOrgSessionAuth,
+    AnyPartnerTenantSessionAuth,
 };
+use api_core::errors::ApiError;
+use api_core::serializers::IsAuthMethodSupported;
+use api_core::types::response::ResponseData;
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use api_wire_types::PartnerOrganization;
-use db::{
-    helpers::{TenantOrPartnerTenant, WorkosAuthIdentity},
-    models::tenant_rolebinding::TenantRolebinding,
+use db::helpers::{
+    TenantOrPartnerTenant,
+    WorkosAuthIdentity,
 };
-use paperclip::actix::{api_v2_operation, get, web, web::Json};
+use db::models::tenant_rolebinding::TenantRolebinding;
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 pub type RolesResponse = Vec<PartnerOrganization>;
 

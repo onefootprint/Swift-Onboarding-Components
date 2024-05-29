@@ -1,5 +1,4 @@
 use crate::*;
-
 use newtypes::OnboardingRequirement;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]

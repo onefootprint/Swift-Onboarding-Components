@@ -1,9 +1,13 @@
+use crate::models::apple_device_attest::{
+    AppleDeviceAttestation,
+    AppleDeviceMetadata,
+    NewAppleDeviceAttestation,
+};
+use crate::TxnPgConn;
 use chrono::Utc;
-use newtypes::{AppleAttestationReceiptType, VaultId};
-
-use crate::{
-    models::apple_device_attest::{AppleDeviceAttestation, AppleDeviceMetadata, NewAppleDeviceAttestation},
-    TxnPgConn,
+use newtypes::{
+    AppleAttestationReceiptType,
+    VaultId,
 };
 
 pub fn create(conn: &mut TxnPgConn, vault_id: &VaultId) -> AppleDeviceAttestation {

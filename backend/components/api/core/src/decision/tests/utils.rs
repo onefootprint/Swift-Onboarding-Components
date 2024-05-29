@@ -1,11 +1,15 @@
-use crate::{decision::utils, tests::fixtures, State};
-use db::{
-    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool},
-    DbResult,
-};
+use crate::decision::utils;
+use crate::tests::fixtures;
+use crate::State;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::test_db_pool::TestDbPool;
+use db::DbResult;
 use feature_flag::BoolFlag;
 use macros::test_state;
-use newtypes::{DecisionStatus, OnboardingStatus};
+use newtypes::{
+    DecisionStatus,
+    OnboardingStatus,
+};
 
 #[test_state]
 async fn test_handle_setup(state: &mut State) {

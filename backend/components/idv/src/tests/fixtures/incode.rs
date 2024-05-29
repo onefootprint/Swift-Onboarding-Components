@@ -1,13 +1,33 @@
-use crate::incode::{
-    doc::response::{
-        AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
-        GetOnboardingStatusResponse, IncodeOcrFixtureResponseFields, ProcessFaceResponse, ProcessIdResponse,
-    },
-    response::{self, OnboardingStartResponse},
-    watchlist::response::{Content, Data, Doc, Hit, WatchlistResultResponse},
-    IncodeAPIResult, IncodeResponse,
+use crate::incode::doc::response::{
+    AddConsentResponse,
+    AddSelfieResponse,
+    AddSideResponse,
+    FetchOCRResponse,
+    FetchScoresResponse,
+    GetOnboardingStatusResponse,
+    IncodeOcrFixtureResponseFields,
+    ProcessFaceResponse,
+    ProcessIdResponse,
 };
-use newtypes::{PiiJsonValue, PiiString};
+use crate::incode::response::{
+    self,
+    OnboardingStartResponse,
+};
+use crate::incode::watchlist::response::{
+    Content,
+    Data,
+    Doc,
+    Hit,
+    WatchlistResultResponse,
+};
+use crate::incode::{
+    IncodeAPIResult,
+    IncodeResponse,
+};
+use newtypes::{
+    PiiJsonValue,
+    PiiString,
+};
 
 pub fn start_onboarding_response() -> IncodeResponse<OnboardingStartResponse> {
     let result = OnboardingStartResponse {

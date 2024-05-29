@@ -1,12 +1,29 @@
-use std::collections::HashMap;
-
-use crate::{DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::document_request::{self};
-use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{
-    DocumentRequestConfig, DocumentRequestId, DocumentRequestKind, RuleSetResultId, ScopedVaultId, WorkflowId,
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
 };
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::document_request::{
+    self,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    DocumentRequestConfig,
+    DocumentRequestId,
+    DocumentRequestKind,
+    RuleSetResultId,
+    ScopedVaultId,
+    WorkflowId,
+};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = document_request)]
@@ -116,7 +133,8 @@ impl DocumentRequest {
     pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
         let kind = DocumentRequestKind::from(&args.config);
         if let Some(existing) = Self::get(conn, &args.workflow_id, kind)? {
-            // TODO FP-5894: this is a bit lacking in specificity could be a doc req that is _not_ a selfie, but should be a selfie based on app logic
+            // TODO FP-5894: this is a bit lacking in specificity could be a doc req that is _not_ a selfie,
+            // but should be a selfie based on app logic
             Ok(existing)
         } else {
             Self::create(conn, args)

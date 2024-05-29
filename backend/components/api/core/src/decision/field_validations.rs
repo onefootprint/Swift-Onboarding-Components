@@ -1,8 +1,14 @@
-use std::collections::HashMap;
-
-use api_wire_types::{FieldValidation, FieldValidationDetail};
+use api_wire_types::{
+    FieldValidation,
+    FieldValidationDetail,
+};
 use itertools::Itertools;
-use newtypes::{decision::MatchLevel, FootprintReasonCode, SignalScope};
+use newtypes::decision::MatchLevel;
+use newtypes::{
+    FootprintReasonCode,
+    SignalScope,
+};
+use std::collections::HashMap;
 
 pub fn create_field_validation_results(
     reason_codes: Vec<FootprintReasonCode>,
@@ -56,7 +62,10 @@ mod tests {
     use crate::decision::field_validations::create_field_validation_results;
     use db::test_helpers::have_same_elements;
     use newtypes::{
-        ExperianAddressAndNameMatchReasonCodes, ExperianDobMatchReasonCodes, FootprintReasonCode, MatchLevel,
+        ExperianAddressAndNameMatchReasonCodes,
+        ExperianDobMatchReasonCodes,
+        FootprintReasonCode,
+        MatchLevel,
         SignalScope,
     };
     use test_case::test_case;

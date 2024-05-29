@@ -1,7 +1,11 @@
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
-use rpc::{EnclavePayload, RpcRequest};
-use std::{error::Error, time::Duration};
+use rpc::{
+    EnclavePayload,
+    RpcRequest,
+};
+use std::error::Error;
+use std::time::Duration;
 
 #[derive(Clone, Debug)]
 pub struct ProxyHttpClient {

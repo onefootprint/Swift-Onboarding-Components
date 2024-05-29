@@ -1,5 +1,8 @@
 use aws_sdk_rekognition::types::FaceDetail as AwsFaceDetails;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]

@@ -1,19 +1,33 @@
-use crate::{
-    auth::user::UserAuthScope, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi, State,
+use crate::auth::user::UserAuthScope;
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::auth::user::UserWfAuthContext;
+use api_core::utils::headers::InsightHeaders;
+use api_core::utils::requirements::GetRequirementsArgs;
+use api_wire_types::hosted::onboarding_status::{
+    ApiOnboardingRequirement,
+    OnboardingStatusResponse,
 };
-use api_core::{
-    auth::user::UserWfAuthContext,
-    utils::{headers::InsightHeaders, requirements::GetRequirementsArgs},
+use db::models::insight_event::CreateInsightEvent;
+use db::models::liveness_event::{
+    LivenessEvent,
+    NewLivenessEvent,
 };
-use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse};
-use db::models::{
-    insight_event::CreateInsightEvent,
-    liveness_event::{LivenessEvent, NewLivenessEvent},
-    webauthn_credential::WebauthnCredential,
-};
+use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
-use newtypes::{LivenessSource, SkipLivenessClientType, SkipLivenessContext};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use newtypes::{
+    LivenessSource,
+    SkipLivenessClientType,
+    SkipLivenessContext,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),

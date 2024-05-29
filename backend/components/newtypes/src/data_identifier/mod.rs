@@ -1,8 +1,10 @@
-//! This module contains all of the different ways that we identify data stored inside of a UserVault.
+//! This module contains all of the different ways that we identify data stored inside of a
+//! UserVault.
 //!
-//! `DataIdentifier`: the top level identitfier of a piece of data. Given a UVW and a `DataIdentifier`,
-//! we should be able to locate the underlying piece of data that is requested. `DataIdentifier`s are
-//! also used in access events to designate which pieces of data were decrypted.
+//! `DataIdentifier`: the top level identitfier of a piece of data. Given a UVW and a
+//! `DataIdentifier`, we should be able to locate the underlying piece of data that is requested.
+//! `DataIdentifier`s are also used in access events to designate which pieces of data were
+//! decrypted.
 //!
 //! `CollectedData` and `CollectedDataOption` are also tangential - they are used in onboarding
 //! configurations to specify the set of dentity data that needs to be collected, and in permissions
@@ -10,7 +12,8 @@
 //! variant represents a kind of data that can be collected, like Name or Ssn.
 //! - Some `CollectedData` variants have multiple configurations of identity data that can be
 //!   collected. Those configurations are represented in `CollectedDataOption` - for example, to
-//!   collected a `CD::Address`, you could either collected `CDO::PartialAddress` or `CDO::FullAddress`
+//!   collected a `CD::Address`, you could either collected `CDO::PartialAddress` or
+//!   `CDO::FullAddress`
 //! - Some `CollectedDataOption` variants may represent multiple underlying `IdentityDataKind`s -
 //!   for example, `CDO::Name` cannot be collected without collecting _both_ `IDK::FirstName` and
 //!   `IDK::LastName`.
@@ -28,25 +31,41 @@ mod investor_profile_kind;
 mod kv_data_key;
 mod validation;
 
-pub use self::{
-    business_data_kind::*,
-    card_data_kind::*,
-    collected_data::*,
-    contact_info_kind::*,
-    decryptable_identifier::*,
-    derived::*,
-    doc_kind::*,
-    document_di_kind::*,
-    identity_data_kind::*,
-    investor_profile_kind::*,
-    validation::{Error as DiValidationError, *},
+pub use self::business_data_kind::*;
+pub use self::card_data_kind::*;
+pub use self::collected_data::*;
+pub use self::contact_info_kind::*;
+pub use self::decryptable_identifier::*;
+pub use self::derived::*;
+pub use self::doc_kind::*;
+pub use self::document_di_kind::*;
+pub use self::identity_data_kind::*;
+pub use self::investor_profile_kind::*;
+pub use self::validation::{
+    Error as DiValidationError,
+    *,
 };
-use crate::{util::impl_enum_string_diesel, KvDataKey, NtResult, PiiJsonValue, PiiString, ValidateArgs};
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use crate::util::impl_enum_string_diesel;
+use crate::{
+    KvDataKey,
+    NtResult,
+    PiiJsonValue,
+    PiiString,
+    ValidateArgs,
+};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use itertools::Itertools;
 use paperclip::v2::models::DataType;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use std::{hash::Hash, str::FromStr};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use std::hash::Hash;
+use std::str::FromStr;
 use strum::IntoEnumIterator;
 use strum_macros::EnumDiscriminants;
 
@@ -193,8 +212,8 @@ impl CleanAndValidate for DataIdentifier {
     }
 }
 
-/// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.
-/// We serialize DIs as `prefix.suffix`
+/// A custom implementation to make the appearance of serialized DataIdentifiers much more
+/// reasonable. We serialize DIs as `prefix.suffix`
 impl std::fmt::Display for DataIdentifier {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let prefix = DataIdentifierDiscriminant::from(self);
@@ -262,8 +281,8 @@ impl paperclip::v2::schema::Apiv2Schema for DataIdentifier {
 }
 impl paperclip::actix::OperationModifier for DataIdentifier {}
 
-/// A custom implementation to make the appearance of serialized DataIdentifiers much more reasonable.
-/// We serialize DIs as `prefix.suffix`
+/// A custom implementation to make the appearance of serialized DataIdentifiers much more
+/// reasonable. We serialize DIs as `prefix.suffix`
 impl FromStr for DataIdentifier {
     type Err = crate::Error;
 
@@ -370,7 +389,11 @@ impl_enum_string_diesel!(DataIdentifier);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{AliasId, DocumentSide, IdDocKind};
+    use crate::{
+        AliasId,
+        DocumentSide,
+        IdDocKind,
+    };
     use itertools::Itertools;
     use test_case::test_case;
 

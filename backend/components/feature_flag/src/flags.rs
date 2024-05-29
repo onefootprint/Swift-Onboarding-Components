@@ -1,4 +1,9 @@
-use newtypes::{ObConfigurationKey, OrgMemberEmail, PiiString, TenantId};
+use newtypes::{
+    ObConfigurationKey,
+    OrgMemberEmail,
+    PiiString,
+    TenantId,
+};
 use serde_json::json;
 
 #[derive(Debug, Eq, PartialEq, strum::Display)]

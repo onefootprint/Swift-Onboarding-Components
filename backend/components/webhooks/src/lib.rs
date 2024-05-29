@@ -1,9 +1,18 @@
 use async_trait::async_trait;
 use events::WebhookEvent;
 use mockall::automock;
-use newtypes::{TenantId, WebhookServiceId};
+use newtypes::{
+    TenantId,
+    WebhookServiceId,
+};
 use std::fmt::Debug;
-use svix::api::{AppPortalAccessIn, ApplicationIn, MessageIn, PostOptions, Svix};
+use svix::api::{
+    AppPortalAccessIn,
+    ApplicationIn,
+    MessageIn,
+    PostOptions,
+    Svix,
+};
 pub mod events;
 
 #[cfg(test)]

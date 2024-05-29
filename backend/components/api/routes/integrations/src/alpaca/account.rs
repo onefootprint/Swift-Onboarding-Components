@@ -1,29 +1,57 @@
-use alpaca::{
-    types::account::{
-        Contact, CreateAccountRequest, Disclosures, Document as AlpacaDocument, DocumentType, Identity,
-        TaxIdType,
-    },
-    AlpacaCip,
+use alpaca::types::account::{
+    Contact,
+    CreateAccountRequest,
+    Disclosures,
+    Document as AlpacaDocument,
+    DocumentType,
+    Identity,
+    TaxIdType,
 };
-use api_core::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    errors::{cip_error::CipError, ApiResult},
-    types::{JsonApiResponse, ResponseData},
-    utils::{
-        fp_id_path::FpIdPath,
-        vault_wrapper::{Person, TenantVw, VaultWrapper},
-    },
-    State,
+use alpaca::AlpacaCip;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
+use api_core::errors::cip_error::CipError;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::{
+    Person,
+    TenantVw,
+    VaultWrapper,
+};
+use api_core::State;
 use api_wire_types::{
-    AlpacaCreateAccountRequest, AlpacaCreateAccountResponse, DeprecatedAlpacaCreateAccountRequest,
+    AlpacaCreateAccountRequest,
+    AlpacaCreateAccountResponse,
+    DeprecatedAlpacaCreateAccountRequest,
 };
-use db::models::{document::Document, scoped_vault::ScopedVault};
+use db::models::document::Document;
+use db::models::scoped_vault::ScopedVault;
+use newtypes::email::Email;
 use newtypes::{
-    email::Email, DataIdentifier as DI, Declaration, DocumentDiKind as DK, IdDocKind,
-    IdentityDataKind as IDK, InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
+    DataIdentifier as DI,
+    Declaration,
+    DocumentDiKind as DK,
+    IdDocKind,
+    IdentityDataKind as IDK,
+    InvestorProfileKind as IPK,
+    PhoneNumber,
+    PiiJsonValue,
+    PiiString,
+    TenantId,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 use std::str::FromStr;
 
 #[api_v2_operation(description = "Create an Alpaca account", tags(Integrations, Alpaca, Preview))]
@@ -215,7 +243,8 @@ async fn create_create_account_request(
             street_address: vec![decrypted.rm_di(IDK::AddressLine1)?.into()],
             unit: decrypted.rm_di(IDK::AddressLine2).ok().map(|a| a.into()),
             city: decrypted.rm_di(IDK::City)?.into(),
-            state: Some(decrypted.rm_di(IDK::State)?.into()), // required if country_of_tax_residence is USA which currently our users are
+            state: Some(decrypted.rm_di(IDK::State)?.into()), /* required if country_of_tax_residence is
+                                                               * USA which currently our users are */
             postal_code: decrypted.rm_di(IDK::Zip)?.into(),
             country: decrypted.rm_di(IDK::Country)?.into(),
         },

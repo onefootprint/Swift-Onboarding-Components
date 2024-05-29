@@ -1,22 +1,37 @@
 use crate::counts::LineItem;
 use counts::LineItemPrice;
-use db::{
-    models::{billing_profile::BillingProfile as DbBillingProfile, tenant::Tenant},
-    DbError,
-};
+use db::models::billing_profile::BillingProfile as DbBillingProfile;
+use db::models::tenant::Tenant;
+use db::DbError;
 use interval::BillingInterval;
 use itertools::Itertools;
-use newtypes::{PiiString, StripeCustomerId, TenantId};
-use profile::BillingProfile;
-use rust_decimal::{
-    prelude::{FromPrimitive, ToPrimitive},
-    Decimal,
+use newtypes::{
+    PiiString,
+    StripeCustomerId,
+    TenantId,
 };
-use std::{collections::HashMap, str::FromStr};
+use profile::BillingProfile;
+use rust_decimal::prelude::{
+    FromPrimitive,
+    ToPrimitive,
+};
+use rust_decimal::Decimal;
+use std::collections::HashMap;
+use std::str::FromStr;
 pub use stripe::Client;
 use stripe::{
-    CreateCustomer, CreateInvoice, CreateInvoiceItem, Currency, Customer, CustomerId, Invoice, InvoiceItem,
-    InvoicePendingInvoiceItemsBehavior, InvoiceStatus, ListCustomers, ListInvoices,
+    CreateCustomer,
+    CreateInvoice,
+    CreateInvoiceItem,
+    Currency,
+    Customer,
+    CustomerId,
+    Invoice,
+    InvoiceItem,
+    InvoicePendingInvoiceItemsBehavior,
+    InvoiceStatus,
+    ListCustomers,
+    ListInvoices,
 };
 
 pub type BResult<T> = Result<T, Error>;

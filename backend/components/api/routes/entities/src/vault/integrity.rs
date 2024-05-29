@@ -1,25 +1,42 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    types::JsonApiResponse,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    telemetry::RootSpan,
-    types::ResponseData,
-    utils::{fp_id_path::FpIdPath, headers::InsightHeaders},
-};
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::telemetry::RootSpan;
+use api_core::types::ResponseData;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
 use newtypes::{
-    flat_api_object_map_type, FilterFunction, HmacSha256Args, IntegritySigningKey, PiiBytes, PiiJsonValue,
-    PreviewApi, VersionedDataIdentifier,
+    flat_api_object_map_type,
+    FilterFunction,
+    HmacSha256Args,
+    IntegritySigningKey,
+    PiiBytes,
+    PiiJsonValue,
+    PreviewApi,
+    VersionedDataIdentifier,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-use serde::{Deserialize, Serialize};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+    Apiv2Schema,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::collections::HashSet;
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct IntegrityRequest {
-    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
+    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
+    /// `custom.bank_account`
     fields: HashSet<VersionedDataIdentifier>,
     /// A hex-encoded key for computing `hmac-sha256` signatures
     signing_key: IntegritySigningKey,

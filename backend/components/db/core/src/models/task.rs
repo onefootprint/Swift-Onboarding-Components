@@ -1,16 +1,35 @@
-use std::collections::HashMap;
-
-use crate::{DbError, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::task;
-use diesel::{
-    prelude::*,
-    sql_query,
-    sql_types::{BigInt, Text, Timestamptz},
+use super::task_execution::{
+    TaskExecution,
+    TaskExecutionCreateArgs,
+    TaskExecutionUpdate,
 };
-use newtypes::{Locked, TaskData, TaskExecutionId, TaskId, TaskKind, TaskStatus};
-
-use super::task_execution::{TaskExecution, TaskExecutionCreateArgs, TaskExecutionUpdate};
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::task;
+use diesel::prelude::*;
+use diesel::sql_query;
+use diesel::sql_types::{
+    BigInt,
+    Text,
+    Timestamptz,
+};
+use newtypes::{
+    Locked,
+    TaskData,
+    TaskExecutionId,
+    TaskId,
+    TaskKind,
+    TaskStatus,
+};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName)]
 #[diesel(table_name = task)]
@@ -108,7 +127,7 @@ impl Task {
             SET status = $1, num_attempts = num_attempts + 1, last_leased_at = $3
             WHERE id IN (
                 SELECT id FROM task
-                WHERE 
+                WHERE
                     (status = $2 AND scheduled_for < $3{})
                     or (status = $1 AND now() > last_leased_at + max_lease_duration_s * interval '1 second')
                 ORDER BY scheduled_for ASC
@@ -210,12 +229,16 @@ impl Task {
 #[allow(unused_must_use)]
 mod tests {
     use super::*;
-    use crate::{
-        test_helpers::{assert_have_same_elements, have_same_elements},
-        tests::test_db_pool::TestDbPool,
+    use crate::test_helpers::{
+        assert_have_same_elements,
+        have_same_elements,
     };
+    use crate::tests::test_db_pool::TestDbPool;
     use macros::test_db_pool;
-    use newtypes::{LogMessageTaskArgs, LogNumTenantApiKeysArgs};
+    use newtypes::{
+        LogMessageTaskArgs,
+        LogNumTenantApiKeysArgs,
+    };
     use std::str::FromStr;
 
     fn task_data() -> TaskData {
@@ -234,7 +257,8 @@ mod tests {
                 let _task4 = Task::create(conn, Utc::now(), task_data())?;
 
                 let tasks = Task::poll(conn, 2, None)?;
-                // The oldest 2 scheduled tasks and returned + their status has changed to Running and their num_attempts is incremented
+                // The oldest 2 scheduled tasks and returned + their status has changed to Running and their
+                // num_attempts is incremented
                 assert!(have_same_elements(
                     vec![
                         (&task1.id, TaskStatus::Running, 1, &task1.id, 1),
@@ -341,7 +365,8 @@ mod tests {
         std::thread::sleep(std::time::Duration::from_secs(3));
         db_pool
             .db_transaction(move |conn| -> DbResult<()> {
-                // tasks now past their max lease duration and should be polled again, num_attempts incremented, and new task_execution's written
+                // tasks now past their max lease duration and should be polled again, num_attempts
+                // incremented, and new task_execution's written
                 let repolled_tasks = Task::poll(conn, 2, None)?;
                 assert!(have_same_elements(
                     vec![

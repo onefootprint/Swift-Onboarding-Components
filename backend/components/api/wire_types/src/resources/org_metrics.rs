@@ -1,7 +1,13 @@
-use chrono::{DateTime, Utc};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 

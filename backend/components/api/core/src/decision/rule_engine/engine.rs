@@ -1,37 +1,54 @@
-use std::collections::HashMap;
-
-use super::{
-    default_rules::base_kyc_rules,
-    eval::{self, Rule, RuleEvalConfig},
+use super::default_rules::base_kyc_rules;
+use super::eval::{
+    self,
+    Rule,
+    RuleEvalConfig,
 };
-use crate::{
-    decision::{onboarding::Decision, RuleError},
-    errors::ApiResult,
-    utils::vault_wrapper::{
-        bulk_decrypt, BulkDecryptReq, DecryptAccessEventInfo, EnclaveDecryptOperation, TenantVw,
-    },
-    State,
+use crate::decision::onboarding::Decision;
+use crate::decision::RuleError;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    bulk_decrypt,
+    BulkDecryptReq,
+    DecryptAccessEventInfo,
+    EnclaveDecryptOperation,
+    TenantVw,
 };
-use db::{
-    models::{
-        document_request::DocumentRequest,
-        insight_event::InsightEvent,
-        list_entry::ListWithDecryptedEntries,
-        ob_configuration::ObConfiguration,
-        risk_signal::RiskSignal,
-        rule_instance::{IncludeRules, RuleInstance},
-        rule_result::RuleResult,
-        rule_set_result::{NewRuleResultArgs, NewRuleSetResultArgs, RuleSetResult},
-        vault::Vault,
-    },
-    TxnPgConn,
+use crate::State;
+use db::models::document_request::DocumentRequest;
+use db::models::insight_event::InsightEvent;
+use db::models::list_entry::ListWithDecryptedEntries;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::RiskSignal;
+use db::models::rule_instance::{
+    IncludeRules,
+    RuleInstance,
 };
+use db::models::rule_result::RuleResult;
+use db::models::rule_set_result::{
+    NewRuleResultArgs,
+    NewRuleSetResultArgs,
+    RuleSetResult,
+};
+use db::models::vault::Vault;
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DocumentRequestKind, ListId, ObConfigurationId, ObConfigurationKind, PiiJsonValue,
-    RiskSignalGroupKind, RuleExpression, RuleSetResultId, RuleSetResultKind, ScopedVaultId, VaultKind,
+    DataIdentifier,
+    DocumentRequestKind,
+    ListId,
+    ObConfigurationId,
+    ObConfigurationKind,
+    PiiJsonValue,
+    RiskSignalGroupKind,
+    RuleExpression,
+    RuleSetResultId,
+    RuleSetResultKind,
+    ScopedVaultId,
+    VaultKind,
     WorkflowId,
 };
+use std::collections::HashMap;
 
 pub struct EvaluateWorkflowDecisionArgs<'a> {
     pub sv_id: &'a ScopedVaultId,
@@ -232,8 +249,9 @@ pub fn evaluate_rules(
             // the existing status.
             // One day, we should probably further generalize this to be a "collection-only"
             // playbook that just doesn't run rules
-            ObConfigurationKind::Document => true, // and theoretically, should have docs_to_collect.all(is_custom)
-            ObConfigurationKind::Kyc => false,     // We could support this some day for skip_kyc
+            ObConfigurationKind::Document => true, /* and theoretically, should have */
+            // docs_to_collect.all(is_custom)
+            ObConfigurationKind::Kyc => false, // We could support this some day for skip_kyc
             ObConfigurationKind::Kyb => {
                 (obc.skip_kyc && v.kind == VaultKind::Person)
                     || (obc.skip_kyb && v.kind == VaultKind::Business)
@@ -281,18 +299,27 @@ pub fn evaluate_rules(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use db::{
-        models::{rule_instance::NewRule, scoped_vault::ScopedVault},
-        test_helpers::assert_have_same_elements,
-        tests::{fixtures::ob_configuration::ObConfigurationOpts, prelude::*},
-    };
+    use db::models::rule_instance::NewRule;
+    use db::models::scoped_vault::ScopedVault;
+    use db::test_helpers::assert_have_same_elements;
+    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+    use db::tests::prelude::*;
     use diesel::prelude::*;
     use eval::tests::TRule;
     use macros::db_test_case;
     use newtypes::{
-        BooleanOperator as BO, DbActor, DecisionIntentKind, DocumentRequestKind, FootprintReasonCode as FRC,
-        RiskSignalGroupKind, RiskSignalId, RuleAction as RA, RuleExpression as RE,
-        RuleExpressionCondition as REC, RuleInstanceKind, VendorAPI,
+        BooleanOperator as BO,
+        DbActor,
+        DecisionIntentKind,
+        DocumentRequestKind,
+        FootprintReasonCode as FRC,
+        RiskSignalGroupKind,
+        RiskSignalId,
+        RuleAction as RA,
+        RuleExpression as RE,
+        RuleExpressionCondition as REC,
+        RuleInstanceKind,
+        VendorAPI,
     };
 
     #[db_test_case(vec![TRule(

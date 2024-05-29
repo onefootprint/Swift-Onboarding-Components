@@ -1,10 +1,13 @@
-use aws_sdk_rekognition::{
-    operation::compare_faces::CompareFacesOutput,
-    types::{CompareFacesMatch, ComparedSourceImageFace},
-};
-use serde::{Deserialize, Serialize};
-
 use crate::face::BoundingBox;
+use aws_sdk_rekognition::operation::compare_faces::CompareFacesOutput;
+use aws_sdk_rekognition::types::{
+    CompareFacesMatch,
+    ComparedSourceImageFace,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -51,10 +54,12 @@ impl FaceCompareDetails {
     }
 }
 
-/// Struct that represents our internal schema of the response from AWS Rekognition CompareFaces action
+/// Struct that represents our internal schema of the response from AWS Rekognition CompareFaces
+/// action
 ///
 /// We need this struct because:
-/// 1) aws gives us back the images detected, so we don't want to store those since these could be big objects
+/// 1) aws gives us back the images detected, so we don't want to store those since these could be
+///    big objects
 /// 2) aws types are not Ser/Deser :(
 ///
 /// IMPORTANT NOTE: please only _add_ optional fields to this struct

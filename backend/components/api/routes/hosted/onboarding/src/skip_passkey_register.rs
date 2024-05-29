@@ -1,15 +1,22 @@
-use crate::{
-    auth::user::UserAuthScope,
-    errors::ApiError,
-    types::{EmptyResponse, JsonApiResponse},
-    utils::headers::InsightHeaders,
-    State,
+use crate::auth::user::UserAuthScope;
+use crate::errors::ApiError;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
-use api_core::{auth::user::UserWfAuthContext, utils::actix::OptionalJson};
+use crate::utils::headers::InsightHeaders;
+use crate::State;
+use api_core::auth::user::UserWfAuthContext;
+use api_core::utils::actix::OptionalJson;
 use api_wire_types::SkipPasskeyRegisterRequest;
-use db::models::{insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent};
+use db::models::insight_event::CreateInsightEvent;
+use db::models::liveness_event::NewLivenessEvent;
 use newtypes::WorkflowGuard;
-use paperclip::actix::{api_v2_operation, post, web};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),

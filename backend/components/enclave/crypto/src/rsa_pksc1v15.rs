@@ -1,4 +1,8 @@
-use rsa::{pkcs8::DecodePublicKey, Pkcs1v15Encrypt, RsaPublicKey};
+use rsa::pkcs8::DecodePublicKey;
+use rsa::{
+    Pkcs1v15Encrypt,
+    RsaPublicKey,
+};
 
 pub type HexEncodedBytes = String;
 
@@ -24,9 +28,14 @@ pub fn encrypt(data: &[u8], public_key_der: &[u8]) -> Result<Vec<u8>, crate::Err
 
 #[cfg(test)]
 mod tests {
+    use rsa::pkcs8::{
+        DecodePublicKey,
+        EncodePublicKey,
+    };
     use rsa::{
-        pkcs8::{DecodePublicKey, EncodePublicKey},
-        Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey,
+        Pkcs1v15Encrypt,
+        RsaPrivateKey,
+        RsaPublicKey,
     };
 
     #[test]

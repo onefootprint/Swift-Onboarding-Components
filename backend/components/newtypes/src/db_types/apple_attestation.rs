@@ -1,6 +1,14 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-
-use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
+use strum_macros::{
+    AsRefStr,
+    Display,
+    EnumIter,
+    EnumString,
+};
 
 /// The type of requirement
 #[derive(

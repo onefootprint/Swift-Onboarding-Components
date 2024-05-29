@@ -1,28 +1,55 @@
-use crate::{
-    auth::tenant::{SecretTenantAuthContext, TenantGuard},
-    errors::ApiResult,
-    types::{EmptyResponse, JsonApiResponse},
-    utils::{headers::InsightHeaders, vault_wrapper::VaultWrapper},
-    State,
+use crate::auth::tenant::{
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    api_headers_schema,
-    auth::{
-        tenant::{CheckTenantGuard, ClientTenantAuthContext, TenantAuth, TenantSessionAuth},
-        CanVault, Either,
-    },
-    utils::{self, body_bytes::BodyBytes, file_upload::FileUpload, vault_wrapper::NewDocument},
+use crate::errors::ApiResult;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
-use db::models::{
-    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
-    scoped_vault::ScopedVault, vault::Vault,
+use crate::utils::headers::InsightHeaders;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::api_headers_schema;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    ClientTenantAuthContext,
+    TenantAuth,
+    TenantSessionAuth,
 };
+use api_core::auth::{
+    CanVault,
+    Either,
+};
+use api_core::utils::body_bytes::BodyBytes;
+use api_core::utils::file_upload::FileUpload;
+use api_core::utils::vault_wrapper::NewDocument;
+use api_core::utils::{
+    self,
+};
+use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
 use macros::route_alias;
 use newtypes::{
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DbActor,
-    DocumentDiKind, FpId, PiiBytes,
+    AccessEventKind,
+    AccessEventPurpose,
+    AuditEventDetail,
+    AuditEventId,
+    DataIdentifier,
+    DbActor,
+    DocumentDiKind,
+    FpId,
+    PiiBytes,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Path};
+use paperclip::actix::web::Path;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 api_headers_schema! {
     pub struct UploadHeaderParams {
@@ -35,7 +62,8 @@ api_headers_schema! {
     }
 }
 
-/// Limit upload to ~10MB (eventually we will support a multipart upload for arbitrarily large uploads)
+/// Limit upload to ~10MB (eventually we will support a multipart upload for arbitrarily large
+/// uploads)
 const TEN_MB: usize = 10 * 1024 * 1024;
 
 #[tracing::instrument(skip(state, body))]

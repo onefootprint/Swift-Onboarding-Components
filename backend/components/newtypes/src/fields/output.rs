@@ -1,6 +1,9 @@
 use derive_more::Deref;
 use itertools::Itertools;
-use std::fmt::{Debug, Display};
+use std::fmt::{
+    Debug,
+    Display,
+};
 
 /// Wraps a Vec<T> with a display implementation that joins Vec<T> with a ", ", using T's display
 /// implementation

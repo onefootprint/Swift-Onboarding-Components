@@ -1,4 +1,5 @@
-use crate::{models::tenant_user::TenantUser, TxnPgConn};
+use crate::models::tenant_user::TenantUser;
+use crate::TxnPgConn;
 use newtypes::OrgMemberEmail;
 
 pub fn create(conn: &mut TxnPgConn) -> TenantUser {

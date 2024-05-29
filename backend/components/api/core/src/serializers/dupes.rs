@@ -1,10 +1,10 @@
 use super::entity;
-use crate::{
-    auth::tenant::TenantAuth,
-    utils::{
-        db2api::DbToApi,
-        vault_wrapper::{Any, DecryptedData, TenantVw},
-    },
+use crate::auth::tenant::TenantAuth;
+use crate::utils::db2api::DbToApi;
+use crate::utils::vault_wrapper::{
+    Any,
+    DecryptedData,
+    TenantVw,
 };
 use newtypes::DupeKind;
 

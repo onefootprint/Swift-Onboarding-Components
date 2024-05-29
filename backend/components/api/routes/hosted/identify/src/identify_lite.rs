@@ -1,14 +1,23 @@
 use crate::GetIdentifyChallengeArgs;
-
-use api_core::{
-    auth::ob_config::ObConfigAuth,
-    telemetry::RootSpan,
-    types::{JsonApiResponse, ResponseData},
-    State,
+use api_core::auth::ob_config::ObConfigAuth;
+use api_core::telemetry::RootSpan;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
 };
-use api_wire_types::{IdentifyId, LiteIdentifyRequest, LiteIdentifyResponse};
+use api_core::State;
+use api_wire_types::{
+    IdentifyId,
+    LiteIdentifyRequest,
+    LiteIdentifyResponse,
+};
 use itertools::Itertools;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Identify, Hosted),

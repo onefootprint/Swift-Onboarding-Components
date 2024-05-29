@@ -1,5 +1,12 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use strum_macros::{Display, EnumString};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
+use strum_macros::{
+    Display,
+    EnumString,
+};
 
 #[derive(Debug, Eq, PartialEq, Display, Hash, Clone, Copy, AsExpression, FromSqlRow, EnumString)]
 #[strum(serialize_all = "snake_case")]

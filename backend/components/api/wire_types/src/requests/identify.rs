@@ -1,9 +1,16 @@
-use newtypes::{
-    email::Email, AuthMethodKind, ChallengeKind, ChallengeToken, DataIdentifier, IdentifyScope, PhoneNumber,
-    PiiString, SessionAuthToken, UserAuthScope,
-};
-
 use crate::*;
+use newtypes::email::Email;
+use newtypes::{
+    AuthMethodKind,
+    ChallengeKind,
+    ChallengeToken,
+    DataIdentifier,
+    IdentifyScope,
+    PhoneNumber,
+    PiiString,
+    SessionAuthToken,
+    UserAuthScope,
+};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -20,7 +27,8 @@ pub struct IdentifyRequest {
     pub identifier: Option<IdentifyId>,
     pub email: Option<Email>,
     pub phone_number: Option<PhoneNumber>,
-    /// Determines which scopes the issued auth token will have. Request the correct scopes for your use case in order to get the least permissions required
+    /// Determines which scopes the issued auth token will have. Request the correct scopes for your
+    /// use case in order to get the least permissions required
     pub scope: Option<IdentifyScope>,
 }
 
@@ -38,10 +46,13 @@ pub struct IdentifiedUser {
     pub token_scopes: Vec<UserAuthScope>,
     pub available_challenge_kinds: Vec<ChallengeKind>,
     pub auth_methods: Vec<IdentifyAuthMethod>,
-    /// Signals that one or more biometric credentials support syncing and may be available to use on desktop/other devices
+    /// Signals that one or more biometric credentials support syncing and may be available to use
+    /// on desktop/other devices
     pub has_syncable_passkey: bool,
     pub is_unverified: bool,
-    /// When true, allowed to create a new user via a signup challenge even when there's already an existing user with this contact info. Generally, a user can make a new vault IF they're not in a context logging into a tenant that they've already onboarded onto
+    /// When true, allowed to create a new user via a signup challenge even when there's already an
+    /// existing user with this contact info. Generally, a user can make a new vault IF they're not
+    /// in a context logging into a tenant that they've already onboarded onto
     pub can_initiate_signup_challenge: bool,
 
     pub scrubbed_phone: Option<PiiString>,
@@ -118,7 +129,8 @@ pub struct IdentifyVerifyRequest {
     /// Opaque challenge state token
     pub challenge_token: ChallengeToken,
     pub challenge_response: String,
-    /// Determines which scopes the issued auth token will have. Request the correct scopes for your use case in order to get the least permissions required
+    /// Determines which scopes the issued auth token will have. Request the correct scopes for your
+    /// use case in order to get the least permissions required
     pub scope: IdentifyScope,
 }
 

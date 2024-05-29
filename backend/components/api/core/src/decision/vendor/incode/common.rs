@@ -1,23 +1,27 @@
+use super::IncodeContext;
+use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::decision::vendor::verification_result::{
+    SaveVerificationResultArgs,
+    ShouldSaveVerificationRequest,
+};
+use crate::errors::ApiResult;
+use crate::State;
+use idv::incode::response::OnboardingStartResponse;
 use idv::incode::{
-    response::OnboardingStartResponse, IncodeClientErrorCustomFailureReasons, IncodeResponse,
+    IncodeClientErrorCustomFailureReasons,
+    IncodeResponse,
     IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    DecisionIntentId, DocumentId, IncodeConfigurationId, IncodeEnvironment, ScopedVaultId, VaultPublicKey,
+    DecisionIntentId,
+    DocumentId,
+    IncodeConfigurationId,
+    IncodeEnvironment,
+    ScopedVaultId,
+    VaultPublicKey,
     VendorAPI,
 };
-
-use crate::{
-    decision::vendor::{
-        map_to_api_error,
-        tenant_vendor_control::TenantVendorControl,
-        verification_result::{SaveVerificationResultArgs, ShouldSaveVerificationRequest},
-    },
-    errors::ApiResult,
-    State,
-};
-
-use super::IncodeContext;
 
 impl SaveVerificationResultArgs {
     pub fn new<T>(
@@ -106,7 +110,9 @@ pub async fn call_start_onboarding(
         credentials: tvc.incode_credentials(environment),
         configuration_id,
         session_id: None,
-        custom_name_fields: None, // TODO: this will be dropped from IncodeStartOnboardingRequest altogether. Was originally for doc scan but we decided we don't need even there
+        custom_name_fields: None, /* TODO: this will be dropped from IncodeStartOnboardingRequest
+                                   * altogether. Was originally for doc scan but we decided we don't need
+                                   * even there */
     };
     let res = state
         .vendor_clients

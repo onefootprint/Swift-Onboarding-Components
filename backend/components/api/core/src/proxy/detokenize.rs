@@ -1,18 +1,28 @@
-use crate::{
-    auth::tenant::TenantAuth,
-    errors::{tenant::TenantError, ApiResult, ValidationError},
-    utils::{
-        headers::InsightHeaders,
-        vault_wrapper::{
-            bulk_decrypt, BulkDecryptReq, DecryptAccessEventInfo, EnclaveDecryptOperation, TenantVw,
-            VaultWrapper,
-        },
-    },
-    State,
+use crate::auth::tenant::TenantAuth;
+use crate::errors::tenant::TenantError;
+use crate::errors::{
+    ApiResult,
+    ValidationError,
 };
-use db::models::{insight_event::CreateInsightEvent, scoped_vault::ScopedVault};
+use crate::utils::headers::InsightHeaders;
+use crate::utils::vault_wrapper::{
+    bulk_decrypt,
+    BulkDecryptReq,
+    DecryptAccessEventInfo,
+    EnclaveDecryptOperation,
+    TenantVw,
+    VaultWrapper,
+};
+use crate::State;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
-use newtypes::{AccessEventPurpose, FpId, PiiString, ProxyToken};
+use newtypes::{
+    AccessEventPurpose,
+    FpId,
+    PiiString,
+    ProxyToken,
+};
 use std::collections::HashMap;
 
 const MAX_NUM_FP_IDS_PER_BATCH: usize = 5_000;
@@ -21,7 +31,8 @@ const MAX_NUM_FP_IDS_PER_BATCH: usize = 5_000;
 /// TODO: depending on usage this function can be optimized greatly:
 ///     - concurrent async (dispatch concurrent all per-fpid)
 ///
-/// Big TODO: create a shared decryption utility instead of duplicating code across all the places we decrypt.
+/// Big TODO: create a shared decryption utility instead of duplicating code across all the places
+/// we decrypt.
 pub async fn detokenize(
     state: &State,
     auth: &dyn TenantAuth,

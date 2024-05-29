@@ -1,21 +1,34 @@
-use crate::{
-    decision::state::{
-        actions::Authorize,
-        test_utils::{
-            mock_idology_pa_hit, mock_incode, query_data, setup_data, AmlKind,
-            UserKind::{self},
-            WithHit,
-        },
-        WorkflowActions, WorkflowWrapper,
-    },
-    State,
+use crate::decision::state::actions::Authorize;
+use crate::decision::state::test_utils::UserKind::{
+    self,
 };
-use db::tests::{fixtures::ob_configuration::ObConfigurationOpts, MockFFClient};
+use crate::decision::state::test_utils::{
+    mock_idology_pa_hit,
+    mock_incode,
+    query_data,
+    setup_data,
+    AmlKind,
+    WithHit,
+};
+use crate::decision::state::{
+    WorkflowActions,
+    WorkflowWrapper,
+};
+use crate::State;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
 use macros::test_state_case;
+use newtypes::VendorAPI::{
+    IdologyExpectId,
+    IncodeWatchlistCheck,
+};
 use newtypes::{
-    DecisionStatus, EnhancedAmlOption, KycState, OnboardingStatus, VendorAPI,
-    VendorAPI::{IdologyExpectId, IncodeWatchlistCheck},
+    DecisionStatus,
+    EnhancedAmlOption,
+    KycState,
+    OnboardingStatus,
+    VendorAPI,
     WorkflowState,
 };
 use strum::IntoEnumIterator;
@@ -98,7 +111,8 @@ async fn test(
 
     let (wf, _, mrs, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
-    // TODO: This assertion will fail if enhanced_aml = Yes because we are not yet properly incorporating Incode Aml risk signals into rules decisioning!!!!!!!!!!
+    // TODO: This assertion will fail if enhanced_aml = Yes because we are not yet properly
+    // incorporating Incode Aml risk signals into rules decisioning!!!!!!!!!!
     assert_eq!(expected_status, wf.status.unwrap());
     let obd = obd.unwrap();
     if expected_status == OnboardingStatus::Fail {

@@ -1,14 +1,11 @@
-use std::pin::Pin;
-
+use crate::telemetry::RootSpan;
 use actix_web::FromRequest;
 use futures_util::Future;
 use newtypes::FpId;
-use paperclip::{
-    actix::{web::Path, OperationModifier},
-    v2::schema::Apiv2Schema,
-};
-
-use crate::telemetry::RootSpan;
+use paperclip::actix::web::Path;
+use paperclip::actix::OperationModifier;
+use paperclip::v2::schema::Apiv2Schema;
+use std::pin::Pin;
 
 /// Extractor to pull fp_id out of the path and log it in the root span
 pub struct FpIdPath<T = FpId>(T);

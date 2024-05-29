@@ -1,7 +1,12 @@
+use crate::{
+    AuthEventKind,
+    ChallengeKind,
+    DataIdentifier,
+    Error,
+    IdentityDataKind,
+};
 use paperclip::actix::Apiv2Schema;
 use strum_macros::Display;
-
-use crate::{AuthEventKind, ChallengeKind, DataIdentifier, Error, IdentityDataKind};
 
 #[derive(
     Debug,
@@ -27,6 +32,7 @@ pub enum AuthMethodKind {
 
 impl TryFrom<AuthEventKind> for AuthMethodKind {
     type Error = Error;
+
     fn try_from(value: AuthEventKind) -> Result<Self, Self::Error> {
         let value = match value {
             AuthEventKind::Email => Self::Email,

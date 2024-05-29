@@ -1,6 +1,9 @@
 use http::StatusCode;
 use newtypes::SessionAuthToken;
-use serde_json::{json, Value};
+use serde_json::{
+    json,
+    Value,
+};
 use strum::EnumMessage;
 use strum_macros;
 
@@ -132,7 +135,10 @@ impl std::fmt::Display for ErrorWithCode {
 mod tests {
     use super::ErrorWithCode;
     use itertools::Itertools;
-    use strum::{EnumMessage, IntoEnumIterator};
+    use strum::{
+        EnumMessage,
+        IntoEnumIterator,
+    };
 
     #[test]
     fn test_unique_error_codes() {

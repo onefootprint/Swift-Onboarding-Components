@@ -1,17 +1,29 @@
-use crate::{
-    diesel::RunQueryDsl,
-    models::ob_configuration::ObConfiguration,
-    test_helpers::assert_have_same_elements,
-    tests::{fixtures, fixtures::ob_configuration::ObConfigurationOpts, prelude::*},
-};
+use crate::diesel::RunQueryDsl;
+use crate::models::ob_configuration::ObConfiguration;
+use crate::test_helpers::assert_have_same_elements;
+use crate::tests::fixtures;
+use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use crate::tests::prelude::*;
 use chrono::Utc;
 use macros::db_test;
 use newtypes::{
-    AdverseMediaListKind, ApiKeyStatus, CipKind, CollectedDataOption, CountrySpecificDocumentMapping,
-    DocumentAndCountryConfiguration, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
-    Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId,
+    AdverseMediaListKind,
+    ApiKeyStatus,
+    CipKind,
+    CollectedDataOption,
+    CountrySpecificDocumentMapping,
+    DocumentAndCountryConfiguration,
+    DocumentCdoInfo,
+    EnhancedAmlOption,
+    IdDocKind,
+    Iso3166TwoDigitCountryCode,
+    ObConfigurationId,
+    ObConfigurationKey,
+    ObConfigurationKind,
+    TenantId,
 };
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
+use std::str::FromStr;
 use strum::IntoEnumIterator;
 use test_case::test_case;
 
@@ -302,12 +314,13 @@ fn test_supported_country_mapping_allow_international(
     residential_country: Option<Iso3166TwoDigitCountryCode>,
     international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
 ) {
-    // In this test we allow international, and therefore need to handle residential addresses that are non-US.
+    // In this test we allow international, and therefore need to handle residential addresses that are
+    // non-US.
     // - in the case we get an international residential address, we only accept passport.
     // - in the case we get a US residential address, we allow DL + passport
     //
-    // Note: international country restrictions do not affect the countries you can submit a passport for, this just controls
-    // residential address - there are integration tests testing this part
+    // Note: international country restrictions do not affect the countries you can submit a passport
+    // for, this just controls residential address - there are integration tests testing this part
     let obc = obc_with_doc_cdo(
         true,
         international_country_restrictions,

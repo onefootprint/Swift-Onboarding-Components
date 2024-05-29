@@ -1,8 +1,22 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::risk_signal_group;
-use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{RiskSignalGroupId, RiskSignalGroupKind, ScopedVaultId};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    RiskSignalGroupId,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = risk_signal_group)]

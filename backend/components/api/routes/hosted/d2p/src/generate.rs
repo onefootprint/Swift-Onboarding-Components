@@ -1,18 +1,31 @@
-use crate::{
-    auth::user::UserAuthContext,
-    errors::ApiError,
-    types::response::ResponseData,
-    utils::session::{HandoffRecord, JsonSession},
-    State,
+use crate::auth::user::UserAuthContext;
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use crate::utils::session::{
+    HandoffRecord,
+    JsonSession,
 };
-use api_core::{
-    auth::session::user::{NewUserSessionContext, TokenCreationPurpose},
-    errors::ApiResult,
+use crate::State;
+use api_core::auth::session::user::{
+    NewUserSessionContext,
+    TokenCreationPurpose,
 };
-use api_wire_types::{D2pGenerateRequest, D2pGenerateResponse};
+use api_core::errors::ApiResult;
+use api_wire_types::{
+    D2pGenerateRequest,
+    D2pGenerateResponse,
+};
 use chrono::Duration;
-use newtypes::{D2pSessionStatus, UserAuthScope};
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use newtypes::{
+    D2pSessionStatus,
+    UserAuthScope,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     operation_id = "hosted-onboarding-d2p-generate",

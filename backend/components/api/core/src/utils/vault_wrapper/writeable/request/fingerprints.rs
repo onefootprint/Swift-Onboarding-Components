@@ -1,23 +1,32 @@
-use std::collections::HashMap;
-
-use db::{
-    models::{
-        fingerprint::{Fingerprint as DbFingerprint, FingerprintDataValue, NewFingerprintArgs},
-        scoped_vault::ScopedVault,
-        vault_data::VaultData,
-    },
-    TxnPgConn,
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+    ValidationError,
 };
-use itertools::{chain, Itertools};
+use crate::utils::vault_wrapper::WriteableVw;
+use db::models::fingerprint::{
+    Fingerprint as DbFingerprint,
+    FingerprintDataValue,
+    NewFingerprintArgs,
+};
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault_data::VaultData;
+use db::TxnPgConn;
+use itertools::{
+    chain,
+    Itertools,
+};
+use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::{
-    fingerprint_salt::FingerprintSalt, CompositeFingerprint, CompositeFingerprintKind, DataLifetimeId,
-    Fingerprint, FingerprintKind, FingerprintScope, MissingFingerprint,
+    CompositeFingerprint,
+    CompositeFingerprintKind,
+    DataLifetimeId,
+    Fingerprint,
+    FingerprintKind,
+    FingerprintScope,
+    MissingFingerprint,
 };
-
-use crate::{
-    errors::{ApiResult, AssertionError, ValidationError},
-    utils::vault_wrapper::WriteableVw,
-};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, derive_more::Deref)]
 pub(in super::super) struct Fingerprints {

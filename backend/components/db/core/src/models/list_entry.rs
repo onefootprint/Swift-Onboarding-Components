@@ -1,18 +1,42 @@
-use std::collections::HashMap;
-
-use super::{
-    audit_event::NewAuditEvent, data_lifetime::DataLifetime, list::List,
-    list_entry_creation::ListEntryCreation,
+use super::audit_event::NewAuditEvent;
+use super::data_lifetime::DataLifetime;
+use super::list::List;
+use super::list_entry_creation::ListEntryCreation;
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
 };
-use crate::{DbError, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{list, list_entry};
-use diesel::{prelude::*, Insertable, Queryable};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    list,
+    list_entry,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use itertools::Itertools;
 use newtypes::{
-    AuditEventDetail, AuditEventId, DataLifetimeSeqno, DbActor, InsightEventId, ListEntryCreationId,
-    ListEntryId, ListId, Locked, PiiString, SealedVaultBytes, TenantId,
+    AuditEventDetail,
+    AuditEventId,
+    DataLifetimeSeqno,
+    DbActor,
+    InsightEventId,
+    ListEntryCreationId,
+    ListEntryId,
+    ListId,
+    Locked,
+    PiiString,
+    SealedVaultBytes,
+    TenantId,
 };
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = list_entry)]
@@ -176,7 +200,13 @@ impl ListEntry {
     }
 
     /// Retrieves all ListEntry's for all input ListEntryCreationId's
-    /// Note that this could potentially have a very large result set and we are not doing any limiting here. We are relying on the implicit assumptions that (1) any single ListEntryCreation has a reasonably bounded number of ListEntry's associated with it (ie because we have an API max payload size or we explicilty limit how many entries can be added at once) and (2) we would only call this with a reasonable number of ListEntryCreationId's (ie because we call this from a pagination list events endpoint and never retrieve more than a reasonable number of events at once)
+    /// Note that this could potentially have a very large result set and we are not doing any
+    /// limiting here. We are relying on the implicit assumptions that (1) any single
+    /// ListEntryCreation has a reasonably bounded number of ListEntry's associated with it (ie
+    /// because we have an API max payload size or we explicilty limit how many entries can be added
+    /// at once) and (2) we would only call this with a reasonable number of ListEntryCreationId's
+    /// (ie because we call this from a pagination list events endpoint and never retrieve more than
+    /// a reasonable number of events at once)
     #[tracing::instrument("ListEntry::bulk_list_by_creation_id", skip_all)]
     pub fn bulk_list_by_creation_id(
         conn: &mut PgConn,

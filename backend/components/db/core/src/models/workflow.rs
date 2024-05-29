@@ -1,33 +1,73 @@
-use super::{
-    insight_event::CreateInsightEvent,
-    manual_review::ManualReview,
-    ob_configuration::ObConfiguration,
-    onboarding_decision::{NewDecisionArgs, OnboardingDecision},
-    scoped_vault::{ScopedVault, ScopedVaultUpdate},
-    task::Task,
-    tenant::Tenant,
-    user_timeline::UserTimeline,
-    workflow_event::WorkflowEvent,
-    workflow_request::WorkflowRequest,
+use super::insight_event::CreateInsightEvent;
+use super::manual_review::ManualReview;
+use super::ob_configuration::ObConfiguration;
+use super::onboarding_decision::{
+    NewDecisionArgs,
+    OnboardingDecision,
 };
+use super::scoped_vault::{
+    ScopedVault,
+    ScopedVaultUpdate,
+};
+use super::task::Task;
+use super::tenant::Tenant;
+use super::user_timeline::UserTimeline;
+use super::workflow_event::WorkflowEvent;
+use super::workflow_request::WorkflowRequest;
+use crate::errors::ValidationError;
+use crate::models::billing_event::BillingEvent;
+use crate::models::vault::Vault;
 use crate::{
-    errors::ValidationError,
-    models::{billing_event::BillingEvent, vault::Vault},
-    DbResult, PgConn, TxnPgConn,
+    DbResult,
+    PgConn,
+    TxnPgConn,
 };
-use chrono::{DateTime, Utc};
-use db_schema::schema::{ob_configuration, workflow};
-use diesel::{
-    dsl::{count_star, not},
-    prelude::*,
+use chrono::{
+    DateTime,
+    Utc,
 };
+use db_schema::schema::{
+    ob_configuration,
+    workflow,
+};
+use diesel::dsl::{
+    count_star,
+    not,
+};
+use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, DbActor, DocumentConfig, DocumentState, FireWebhookArgs, InsightEventId, KybConfig,
-    KybState, KycConfig, KycState, Locked, ObConfigurationId, ObConfigurationKind,
-    OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload, ScopedVaultId, TaskData,
-    TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowConfig, WorkflowFixtureResult,
-    WorkflowId, WorkflowKind, WorkflowRequestConfig, WorkflowSource, WorkflowStartedInfo, WorkflowState,
+    AlpacaKycState,
+    DbActor,
+    DocumentConfig,
+    DocumentState,
+    FireWebhookArgs,
+    InsightEventId,
+    KybConfig,
+    KybState,
+    KycConfig,
+    KycState,
+    Locked,
+    ObConfigurationId,
+    ObConfigurationKind,
+    OnboardingCompletedPayload,
+    OnboardingStatus,
+    OnboardingStatusChangedPayload,
+    ScopedVaultId,
+    TaskData,
+    TenantId,
+    TenantScope,
+    VaultId,
+    VaultKind,
+    WebhookEvent,
+    WorkflowConfig,
+    WorkflowFixtureResult,
+    WorkflowId,
+    WorkflowKind,
+    WorkflowRequestConfig,
+    WorkflowSource,
+    WorkflowStartedInfo,
+    WorkflowState,
 };
 use std::collections::HashMap;
 
@@ -63,7 +103,8 @@ pub struct Workflow {
     /// Note, note all workflows are expected to be validated.
     /// And not all historical workflows will have this backfilled
     pub session_validated_at: Option<DateTime<Utc>>,
-    /// When we create an onboarding, we will determine if NeuroID data should be collected and run for the workflow
+    /// When we create an onboarding, we will determine if NeuroID data should be collected and run
+    /// for the workflow
     pub is_neuro_enabled: bool,
 }
 
@@ -417,7 +458,10 @@ impl Workflow {
         conn: &mut PgConn,
         id: T,
     ) -> DbResult<(Self, ScopedVault)> {
-        use db_schema::schema::{business_owner, scoped_vault};
+        use db_schema::schema::{
+            business_owner,
+            scoped_vault,
+        };
         let mut query = workflow::table.inner_join(scoped_vault::table).into_boxed();
         match id.into() {
             WorkflowIdentifier::Id { id } => query = query.filter(workflow::id.eq(id)),
@@ -461,7 +505,10 @@ impl Workflow {
 
     #[tracing::instrument("Workflow::get_with_vault", skip_all)]
     pub fn get_with_vault(conn: &mut PgConn, id: &WorkflowId) -> DbResult<(Self, Vault)> {
-        use db_schema::schema::{scoped_vault, vault};
+        use db_schema::schema::{
+            scoped_vault,
+            vault,
+        };
         let res = workflow::table
             .filter(workflow::id.eq(id))
             .inner_join(scoped_vault::table.inner_join(vault::table))
@@ -603,11 +650,13 @@ impl Workflow {
             // Must lock to make sure scoped vault status isn't stale
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
             let tenant = Tenant::get(conn, &sv.tenant_id)?;
-            // !! it's important that code in the same txn that is going to write a review does it before this update call
+            // !! it's important that code in the same txn that is going to write a review does it before this
+            // update call
             let requires_manual_review_after_update = !ManualReview::get_active(conn, &sv.id)?.is_empty();
-            // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics currently really mean we have to fire it when we make a
-            // decision for the first time or in a redo flow
-            // If the current Workflow status is not pass/fail but the new status is, fire OnboardingCompleted (ie anytime a Workflow completes)
+            // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics
+            // currently really mean we have to fire it when we make a decision for the first time
+            // or in a redo flow If the current Workflow status is not pass/fail but the new
+            // status is, fire OnboardingCompleted (ie anytime a Workflow completes)
             if !wf.status.map(|s| s.has_decision()).unwrap_or(false) && new_status.has_decision() {
                 let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                     fp_id: sv.fp_id.clone(),
@@ -636,7 +685,8 @@ impl Workflow {
 
             let new_sv_status = if status_has_changed && status_is_decision_or_was_previously_not_decision {
                 // Only set to non-decision status if the current status is a non-decision status
-                // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
+                // This has the effect of never letting the scoped vault status go from a decision to a
+                // non-decision status
                 let update = ScopedVaultUpdate {
                     status: Some(new_status),
                     ..Default::default()
@@ -650,7 +700,8 @@ impl Workflow {
             let old_composite_status = (sv.status, requires_manual_review_before_update);
             let new_composite_status = (new_sv_status, requires_manual_review_after_update);
             if new_composite_status != old_composite_status {
-                // Only fire a OnboardingStatusChanged webhook if the scoped vault status changes or requires_manual_review changes
+                // Only fire a OnboardingStatusChanged webhook if the scoped vault status changes or
+                // requires_manual_review changes
                 let webhook_event = WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {
                     fp_id: sv.fp_id.clone(),
                     timestamp: Utc::now(),
@@ -713,7 +764,10 @@ impl Workflow {
         end_date: DateTime<Utc>,
         kind: VaultKind,
     ) -> DbResult<i64> {
-        use db_schema::schema::{ob_configuration, scoped_vault};
+        use db_schema::schema::{
+            ob_configuration,
+            scoped_vault,
+        };
         let mut query = workflow::table
             .inner_join(scoped_vault::table)
             .inner_join(ob_configuration::table)
@@ -742,9 +796,14 @@ impl Workflow {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{models::workflow_event::WorkflowEvent, tests::prelude::*};
+    use crate::models::workflow_event::WorkflowEvent;
+    use crate::tests::prelude::*;
     use macros::db_test;
-    use newtypes::{KycConfig, KycState, WorkflowSource};
+    use newtypes::{
+        KycConfig,
+        KycState,
+        WorkflowSource,
+    };
     use std::str::FromStr;
 
     #[db_test]

@@ -1,8 +1,20 @@
-use crate::{DataIdentifier, DeviceInsightField, FootprintReasonCode, ListId, PiiString};
-use diesel::{AsExpression, FromSqlRow};
+use crate::{
+    DataIdentifier,
+    DeviceInsightField,
+    FootprintReasonCode,
+    ListId,
+    PiiString,
+};
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsJsonb, Eq, PartialEq, Apiv2Schema)]
 pub struct RuleExpression(pub Vec<RuleExpressionCondition>);
@@ -152,7 +164,10 @@ impl RuleExpressionCondition {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{FootprintReasonCode as FRC, IdentityDataKind};
+    use crate::{
+        FootprintReasonCode as FRC,
+        IdentityDataKind,
+    };
     use serde_json::json;
 
     #[test]

@@ -1,11 +1,28 @@
-use newtypes::{
-    ActionKind, AuthMethodKind, CollectedDataOption, DataIdentifier, DataLifetimeSeqno,
-    ExternalIntegrationKind, LabelKind, WorkflowRequestConfig,
-};
-
 use crate::{
-    Actor, Annotation, Apiv2Schema, DateTime, DocumentRequest, DocumentUploadedTimelineEvent, InsightEvent,
-    LivenessEvent, OnboardingDecision, Serialize, TimelinePlaybook, Utc, VaultCreated, WatchlistCheck,
+    Actor,
+    Annotation,
+    Apiv2Schema,
+    DateTime,
+    DocumentRequest,
+    DocumentUploadedTimelineEvent,
+    InsightEvent,
+    LivenessEvent,
+    OnboardingDecision,
+    Serialize,
+    TimelinePlaybook,
+    Utc,
+    VaultCreated,
+    WatchlistCheck,
+};
+use newtypes::{
+    ActionKind,
+    AuthMethodKind,
+    CollectedDataOption,
+    DataIdentifier,
+    DataLifetimeSeqno,
+    ExternalIntegrationKind,
+    LabelKind,
+    WorkflowRequestConfig,
 };
 
 /// Describes a liveness event that took place

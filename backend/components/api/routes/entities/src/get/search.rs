@@ -1,33 +1,56 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::{ApiError, ApiResult},
-    get::EntityListResponse,
-    types::{response::CursorPaginatedResponse, CursorPaginationRequest},
-    utils::vault_wrapper::VaultWrapper,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    auth::{tenant::TenantAuth, CanDecrypt, IsGuardMet},
-    errors::AssertionError,
-    types::CursorPaginatedResponseInner,
-    utils::{
-        actix::OptionalJson,
-        db2api::DbToApi,
-        search_utils::parse_search,
-        vault_wrapper::{
-            bulk_decrypt, Any, BulkDecryptReq, DecryptAccessEventInfo, DecryptedData,
-            EnclaveDecryptOperation, TenantVw,
-        },
-    },
+use crate::errors::{
+    ApiError,
+    ApiResult,
+};
+use crate::get::EntityListResponse;
+use crate::types::response::CursorPaginatedResponse;
+use crate::types::CursorPaginationRequest;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::auth::tenant::TenantAuth;
+use api_core::auth::{
+    CanDecrypt,
+    IsGuardMet,
+};
+use api_core::errors::AssertionError;
+use api_core::types::CursorPaginatedResponseInner;
+use api_core::utils::actix::OptionalJson;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::search_utils::parse_search;
+use api_core::utils::vault_wrapper::{
+    bulk_decrypt,
+    Any,
+    BulkDecryptReq,
+    DecryptAccessEventInfo,
+    DecryptedData,
+    EnclaveDecryptOperation,
+    TenantVw,
 };
 use api_wire_types::SearchEntitiesRequest;
-use db::{models::scoped_vault::ScopedVault, scoped_vault::ScopedVaultListQueryParams};
+use db::models::scoped_vault::ScopedVault;
+use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
 use newtypes::{
-    CardDataKind, CardInfo, CountArgs, DataIdentifier, FilterFunction, IdentityDataKind as IDK,
-    ScopedVaultCursorKind, ScopedVaultId, TimestampCursor,
+    CardDataKind,
+    CardInfo,
+    CountArgs,
+    DataIdentifier,
+    FilterFunction,
+    IdentityDataKind as IDK,
+    ScopedVaultCursorKind,
+    ScopedVaultId,
+    TimestampCursor,
 };
-use paperclip::actix::{api_v2_operation, post, web};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 use std::collections::HashMap;
 
 #[derive(serde::Deserialize, paperclip::actix::Apiv2Schema)]
@@ -44,7 +67,8 @@ pub struct ListEntitiesSearchRequest {
 )]
 #[post("/entities/search")]
 /// This doesn't actually have side effects despite being a POST. The request simply needs to be
-/// sent as an HTTP body since it contains PII, and many HTTP clients don't support GET with an HTTP body
+/// sent as an HTTP body since it contains PII, and many HTTP clients don't support GET with an HTTP
+/// body
 pub async fn post(
     state: web::Data<State>,
     body: OptionalJson<ListEntitiesSearchRequest>,

@@ -1,13 +1,21 @@
-use std::{net::SocketAddr, pin::Pin};
-
+use super::{
+    get_header,
+    TelemetryHeaders,
+};
 use actix_web::FromRequest;
-use chrono::{DateTime, Utc};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db::models::insight_event::CreateInsightEvent;
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
-
-use super::{get_header, TelemetryHeaders};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use std::net::SocketAddr;
+use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize)]
 pub struct InsightHeaders {

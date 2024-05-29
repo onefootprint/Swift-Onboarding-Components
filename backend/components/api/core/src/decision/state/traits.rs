@@ -1,12 +1,27 @@
-use super::{actions::WorkflowActions, StateError, WorkflowKind};
-use crate::{errors::ApiResult, task, State};
-use async_trait::async_trait;
-use db::{models::workflow::Workflow as DbWorkflow, TxnPgConn};
-use enum_dispatch::enum_dispatch;
-use newtypes::{Locked, WorkflowId};
-
+use super::actions::WorkflowActions;
 // These are needed for enum_dispatch to work properly
-use super::{document::*, kyb::*, kyc::*};
+use super::{
+    document::*,
+    kyb::*,
+    kyc::*,
+};
+use super::{
+    StateError,
+    WorkflowKind,
+};
+use crate::errors::ApiResult;
+use crate::{
+    task,
+    State,
+};
+use async_trait::async_trait;
+use db::models::workflow::Workflow as DbWorkflow;
+use db::TxnPgConn;
+use enum_dispatch::enum_dispatch;
+use newtypes::{
+    Locked,
+    WorkflowId,
+};
 
 #[enum_dispatch]
 /// Provides basic functionality that all WorkflowStates should have
@@ -16,13 +31,16 @@ pub(super) trait WorkflowState: std::marker::Send + std::marker::Sync + 'static 
     fn default_action(&self) -> Option<WorkflowActions>;
 }
 
-/// Implement this for a State to indicate that when in that State, the workflow responds to action A.
-/// When the action is triggered, a PG txn will be opened and the workflow in PG will be locked. The workflow's current state will be asserted
-/// (to confirm it hasn't been concurrently updated already) and then the workflow's state will be updated to the new state returned by `on_commit`.
+/// Implement this for a State to indicate that when in that State, the workflow responds to action
+/// A. When the action is triggered, a PG txn will be opened and the workflow in PG will be locked.
+/// The workflow's current state will be asserted (to confirm it hasn't been concurrently updated
+/// already) and then the workflow's state will be updated to the new state returned by `on_commit`.
 /// Other PG writes that need to occur atomically at the same time, can be done with the `conn`.
-/// If there are async actions that cannot be done within that conn, they can be specified in `execute_async_idempotent_actions`. This will execute first
-/// and the output of this will be passed into `on_commit`. The actions taken in this function should be (1) idempotent and (2) always leave
-/// PG data in a consistent/valid state for the current state the workflow is in, even in the case of errors
+/// If there are async actions that cannot be done within that conn, they can be specified in
+/// `execute_async_idempotent_actions`. This will execute first and the output of this will be
+/// passed into `on_commit`. The actions taken in this function should be (1) idempotent and (2)
+/// always leave PG data in a consistent/valid state for the current state the workflow is in, even
+/// in the case of errors
 #[async_trait]
 pub(super) trait OnAction<TAction, TWorkflow>: WorkflowState + Clone {
     type AsyncRes: std::marker::Send + 'static;
@@ -32,8 +50,9 @@ pub(super) trait OnAction<TAction, TWorkflow>: WorkflowState + Clone {
         action: TAction,
         state: &State,
     ) -> ApiResult<Self::AsyncRes>;
-    // TODO: maybe in future this could be modeled as Actions vs Transitions. So OnAction, you perform the action and then return a Transition
-    // which actually encapsulates the new state and whatever other writes need to occur for that state
+    // TODO: maybe in future this could be modeled as Actions vs Transitions. So OnAction, you perform
+    // the action and then return a Transition which actually encapsulates the new state and
+    // whatever other writes need to occur for that state
     fn on_commit(
         self,
         wf: Locked<DbWorkflow>,
@@ -43,7 +62,8 @@ pub(super) trait OnAction<TAction, TWorkflow>: WorkflowState + Clone {
 }
 
 #[async_trait]
-/// Provides an automatic implementation to handle a given TAction for types that implement OnAction<TAction>
+/// Provides an automatic implementation to handle a given TAction for types that implement
+/// OnAction<TAction>
 pub(super) trait DoAction<TAction, TWorkflow> {
     async fn do_action(self, state: &State, action: TAction, workflow_id: WorkflowId)
         -> ApiResult<TWorkflow>;
@@ -88,7 +108,8 @@ where
             })
             .await?;
         // Various workflows can do Workflow::update which creates Task's for webhooks
-        // Until we get comfortable with a proper daemon/worker machines executing these Tasks continually, we need to manually prompt execution
+        // Until we get comfortable with a proper daemon/worker machines executing these Tasks continually,
+        // we need to manually prompt execution
         task::execute_webhook_tasks(state.clone());
         Ok(result)
     }
@@ -96,7 +117,8 @@ where
 
 #[async_trait]
 #[enum_dispatch]
-/// Common functionality for all Workflows, which are bundles of WorkflowStates and the transistions between them
+/// Common functionality for all Workflows, which are bundles of WorkflowStates and the transistions
+/// between them
 pub trait Workflow: Clone + Into<WorkflowKind> + std::marker::Send + std::marker::Sync + 'static {
     fn default_action(&self) -> Option<WorkflowActions>;
 

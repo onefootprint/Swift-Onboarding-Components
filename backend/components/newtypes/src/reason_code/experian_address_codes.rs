@@ -1,10 +1,20 @@
-use strum_macros::{EnumIter, EnumString};
-
-use super::reason_code_helpers::{AddressAttribute::*, AddressGrouping::*, NameGrouping::*, *};
-use crate::{vendor_reason_codes_enum, FootprintReasonCode, MatchLevel::*};
+use super::reason_code_helpers::AddressAttribute::*;
+use super::reason_code_helpers::AddressGrouping::*;
+use super::reason_code_helpers::NameGrouping::*;
+use super::reason_code_helpers::*;
+use crate::MatchLevel::*;
+use crate::{
+    vendor_reason_codes_enum,
+    FootprintReasonCode,
+};
+use strum_macros::{
+    EnumIter,
+    EnumString,
+};
 
 // As of 2023-05-18 we consider Experian's "Level 5 and Level 4" matching.
-// If we receive a code that isn't covered here, we consider both the name and address to be not matching
+// If we receive a code that isn't covered here, we consider both the name and address to be not
+// matching
 vendor_reason_codes_enum! {
     #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, EnumIter, Hash)]
     pub enum ExperianAddressAndNameMatchReasonCodes {
@@ -873,9 +883,11 @@ vendor_reason_codes_enum! {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        ExperianAddressAndNameMatchReasonCodes,
+        FootprintReasonCode,
+    };
     use test_case::test_case;
-
-    use crate::{ExperianAddressAndNameMatchReasonCodes, FootprintReasonCode};
     use FootprintReasonCode::*;
 
     // TODO: add more tests

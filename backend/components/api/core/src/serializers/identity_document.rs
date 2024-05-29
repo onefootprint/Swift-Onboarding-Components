@@ -1,7 +1,7 @@
-use db::models::{document::Document, document_request::DocumentRequest};
-use newtypes::DeviceType;
-
 use crate::utils::db2api::DbToApi;
+use db::models::document::Document;
+use db::models::document_request::DocumentRequest;
+use newtypes::DeviceType;
 
 impl DbToApi<(Document, DocumentRequest)> for api_wire_types::DocumentUploadedTimelineEvent {
     fn from_db((identity_doc, document_request): (Document, DocumentRequest)) -> Self {

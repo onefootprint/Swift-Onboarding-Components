@@ -1,15 +1,38 @@
+use crate::util::impl_enum_str_diesel;
 use crate::{
-    util::impl_enum_str_diesel, DataIdentifier, DocumentDataId, ListEntryCreationId, ListEntryId, ListId,
-    ObConfigurationId, ScopedVaultId, TenantApiKeyId, TenantRoleId, TenantUserId,
+    DataIdentifier,
+    DocumentDataId,
+    ListEntryCreationId,
+    ListEntryId,
+    ListId,
+    ObConfigurationId,
+    ScopedVaultId,
+    TenantApiKeyId,
+    TenantRoleId,
+    TenantUserId,
 };
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use serde_json;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
 use strum::AsRefStr;
-use strum_macros::{Display, EnumDiscriminants, EnumString};
+use strum_macros::{
+    Display,
+    EnumDiscriminants,
+    EnumString,
+};
 
 /// Represents the required detail fields used to create new audit_event rows.
 #[derive(Display, Debug, Clone)]
@@ -320,9 +343,8 @@ impl_enum_str_diesel!(AuditEventName);
 
 #[cfg(test)]
 mod tests {
-    use crate::IdentityDataKind;
-
     use super::*;
+    use crate::IdentityDataKind;
 
     #[test]
     fn test_audit_event_metadata() {

@@ -1,25 +1,40 @@
-use crate::{
-    auth::{
-        tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth},
-        Either,
-    },
-    errors::ApiError,
-    types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::VaultWrapper,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::auth::Either;
+use crate::errors::ApiError;
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
 use actix_web::web::Query;
-use api_core::utils::{fp_id_path::FpIdPath, vault_wrapper::TenantVw};
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::{flat_api_object_map_type, input::Csv, DataIdentifier};
-use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
+use newtypes::input::Csv;
+use newtypes::{
+    flat_api_object_map_type,
+    DataIdentifier,
+};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+    Apiv2Schema,
+};
 use serde::Deserialize;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct FieldsParams {
-    /// Optionally, a comma-separated list of fields whose existence to check. For example, `id.first_name,id.ssn4,custom.bank_account`
+    /// Optionally, a comma-separated list of fields whose existence to check. For example,
+    /// `id.first_name,id.ssn4,custom.bank_account`
     #[openapi(example = "id.last_name, custom.ach_account, id.dob, id.ssn9")]
     fields: Option<Csv<DataIdentifier>>,
 }

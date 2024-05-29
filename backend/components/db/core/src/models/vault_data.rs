@@ -1,16 +1,38 @@
-use std::collections::HashMap;
-
-use crate::{errors::AssertionError, DbError, DbResult, HasLifetime, PgConn, TxnPgConn, VaultedData};
-use chrono::{DateTime, Utc};
+use super::data_lifetime::{
+    DataLifetime,
+    NewDataLifetimeArgs,
+};
+use crate::errors::AssertionError;
+use crate::{
+    DbError,
+    DbResult,
+    HasLifetime,
+    PgConn,
+    TxnPgConn,
+    VaultedData,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::vault_data;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DataLifetimeId, DataLifetimeSeqno, DataLifetimeSource, DbActor, PiiString, ScopedVaultId,
-    SealedVaultBytes, StorageType, VaultDataFormat, VaultId, VdId,
+    DataIdentifier,
+    DataLifetimeId,
+    DataLifetimeSeqno,
+    DataLifetimeSource,
+    DbActor,
+    PiiString,
+    ScopedVaultId,
+    SealedVaultBytes,
+    StorageType,
+    VaultDataFormat,
+    VaultId,
+    VdId,
 };
-
-use super::data_lifetime::{DataLifetime, NewDataLifetimeArgs};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = vault_data)]

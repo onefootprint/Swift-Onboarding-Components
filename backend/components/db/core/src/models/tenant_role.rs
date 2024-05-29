@@ -1,21 +1,47 @@
-use std::collections::HashMap;
-
 use super::ob_configuration::IsLive;
-use crate::{DbError, DbResult, NextPage, NonNullVec, OffsetPagination, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::tenant_role::{self, BoxedQuery};
+use crate::{
+    DbError,
+    DbResult,
+    NextPage,
+    NonNullVec,
+    OffsetPagination,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::tenant_role::{
+    self,
+    BoxedQuery,
+};
+use diesel::dsl::count_star;
+use diesel::prelude::*;
+use diesel::sql_types::{
+    Bool,
+    Nullable,
+};
 use diesel::{
-    dsl::count_star,
-    prelude::*,
-    sql_types::{Bool, Nullable},
-    Insertable, Queryable,
+    Insertable,
+    Queryable,
 };
 use itertools::Itertools;
 use newtypes::{
-    ApiKeyStatus, InvokeVaultProxyPermission, Locked, OrgIdentifierRef, PartnerTenantId, TenantId,
-    TenantKind, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantScope,
+    ApiKeyStatus,
+    InvokeVaultProxyPermission,
+    Locked,
+    OrgIdentifierRef,
+    PartnerTenantId,
+    TenantId,
+    TenantKind,
+    TenantRoleId,
+    TenantRoleKind,
+    TenantRoleKindDiscriminant,
+    TenantScope,
     TenantScopeDiscriminants,
 };
+use std::collections::HashMap;
 
 pub type IsImmutable = bool;
 pub type NumActiveUsers = i64;
@@ -261,7 +287,10 @@ impl TenantRole {
     ) -> DbResult<Self> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
-        use db_schema::schema::{tenant_api_key, tenant_rolebinding};
+        use db_schema::schema::{
+            tenant_api_key,
+            tenant_rolebinding,
+        };
         let role = Self::lock_active(conn, id, org_id)?.into_inner();
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
@@ -384,7 +413,10 @@ impl TenantRole {
         filters: &TenantRoleListFilters,
         pagination: OffsetPagination,
     ) -> DbResult<(Vec<TenantRoleInfo>, NextPage)> {
-        use db_schema::schema::{tenant_api_key, tenant_rolebinding};
+        use db_schema::schema::{
+            tenant_api_key,
+            tenant_rolebinding,
+        };
         let mut query = Self::list_active_query(filters)
             .order_by(tenant_role::name.asc())
             .limit(pagination.limit());

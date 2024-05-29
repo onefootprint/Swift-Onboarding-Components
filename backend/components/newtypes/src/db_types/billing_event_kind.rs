@@ -1,7 +1,14 @@
 use crate::util::impl_enum_string_diesel;
 use chrono::Duration;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use strum_macros::{Display, EnumString};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
+use strum_macros::{
+    Display,
+    EnumString,
+};
 
 #[derive(Debug, Display, Eq, PartialEq, Hash, Clone, Copy, EnumString, AsExpression, FromSqlRow)]
 #[strum(serialize_all = "snake_case")]

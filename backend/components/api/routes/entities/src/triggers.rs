@@ -1,29 +1,53 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{response::ResponseData, JsonApiResponse},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    auth::session::user::{NewUserSessionArgs, NewUserSessionContext, TokenCreationPurpose, UserSession},
-    config::LinkKind,
-    errors::{tenant::TenantError, user::UserError, ApiResult, ValidationError},
-    utils::{fp_id_path::FpIdPath, session::AuthSession},
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::session::user::{
+    NewUserSessionArgs,
+    NewUserSessionContext,
+    TokenCreationPurpose,
+    UserSession,
 };
-use api_wire_types::{CreateTokenResponse, TriggerRequest};
+use api_core::config::LinkKind;
+use api_core::errors::tenant::TenantError;
+use api_core::errors::user::UserError;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::session::AuthSession;
+use api_wire_types::{
+    CreateTokenResponse,
+    TriggerRequest,
+};
 use chrono::Duration;
-use db::models::{
-    ob_configuration::ObConfiguration,
-    scoped_vault::ScopedVault,
-    user_timeline::UserTimeline,
-    vault::Vault,
-    workflow::Workflow,
-    workflow_request::{NewWorkflowRequestArgs, WorkflowRequest},
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
+use db::models::workflow::Workflow;
+use db::models::workflow_request::{
+    NewWorkflowRequestArgs,
+    WorkflowRequest,
 };
 use newtypes::{
-    DbActor, DocumentRequestConfig, ObConfigurationKind, VaultKind, WorkflowRequestConfig,
+    DbActor,
+    DocumentRequestConfig,
+    ObConfigurationKind,
+    VaultKind,
+    WorkflowRequestConfig,
     WorkflowTriggeredInfo,
 };
-use paperclip::actix::{api_v2_operation, post, web};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     description = "Trigger a workflow for the provided user.",
@@ -133,7 +157,8 @@ fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> ApiR
             // Otherwise, the a document workflow could change a user's status to pass before any
             // KYC is run.
             // The frontend also disables these options.
-            // TODO: theoretically we should be checking risk signals here too or that there's an FP decision, but maybe not
+            // TODO: theoretically we should be checking risk signals here too or that there's an FP decision,
+            // but maybe not
             if !scoped_vault.status.map(|d| d.has_decision()).unwrap_or(false) {
                 return Err(UserError::NoCompleteOnboardings.into());
             }

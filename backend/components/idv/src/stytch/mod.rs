@@ -1,6 +1,5 @@
-use newtypes::PiiJsonValue;
-
 use self::response::LookupResponse;
+use newtypes::PiiJsonValue;
 
 pub mod client;
 pub mod error;

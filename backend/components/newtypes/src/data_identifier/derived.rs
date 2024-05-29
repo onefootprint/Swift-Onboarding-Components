@@ -1,9 +1,18 @@
-use itertools::chain;
-
 use crate::{
-    CardData, CardDataKind, CardExpiration, CardInfo, CardNumber, DataIdentifier, DataIdentifierValue,
-    IdentityData, IdentityDataKind, LuhnValidatedCardNumber, ParsedDataIdentifier, PiiString,
+    CardData,
+    CardDataKind,
+    CardExpiration,
+    CardInfo,
+    CardNumber,
+    DataIdentifier,
+    DataIdentifierValue,
+    IdentityData,
+    IdentityDataKind,
+    LuhnValidatedCardNumber,
+    ParsedDataIdentifier,
+    PiiString,
 };
+use itertools::chain;
 
 pub trait DeriveValues {
     fn derive_values(&self) -> Vec<DataIdentifierValue>;

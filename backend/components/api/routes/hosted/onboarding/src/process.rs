@@ -1,29 +1,54 @@
+use crate::auth::user::UserAuthScope;
+use crate::errors::onboarding::OnboardingError;
+use crate::types::response::ResponseData;
 use crate::{
-    auth::user::UserAuthScope, decision, errors::onboarding::OnboardingError, types::response::ResponseData,
+    decision,
     State,
 };
-use api_core::{
-    auth::user::{CheckUserWfAuthContext, UserWfAuthContext},
-    decision::state::{
-        actions::WorkflowActions, document::DocumentState, kyc::KycState, DocCollected,
-        RunIncodeMachineAndWorkflowResult, WorkflowKind, WorkflowWrapper,
-    },
-    errors::{onboarding::UnmetRequirements, workflow::WorkflowError, ApiResult},
-    types::{EmptyResponse, JsonApiResponse},
-    utils::{actix::OptionalJson, requirements::GetRequirementsArgs},
+use api_core::auth::user::{
+    CheckUserWfAuthContext,
+    UserWfAuthContext,
 };
+use api_core::decision::state::actions::WorkflowActions;
+use api_core::decision::state::document::DocumentState;
+use api_core::decision::state::kyc::KycState;
+use api_core::decision::state::{
+    DocCollected,
+    RunIncodeMachineAndWorkflowResult,
+    WorkflowKind,
+    WorkflowWrapper,
+};
+use api_core::errors::onboarding::UnmetRequirements;
+use api_core::errors::workflow::WorkflowError;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use api_core::utils::actix::OptionalJson;
+use api_core::utils::requirements::GetRequirementsArgs;
 use api_wire_types::ProcessRequest;
-use chrono::{Duration, Utc};
-use db::{
-    models::{task::Task, workflow::Workflow as DbWorkflow},
-    DbPool,
+use chrono::{
+    Duration,
+    Utc,
 };
+use db::models::task::Task;
+use db::models::workflow::Workflow as DbWorkflow;
+use db::DbPool;
 use decision::state::Authorize;
 use itertools::Itertools;
 use newtypes::{
-    OnboardingRequirement, RunIncodeStuckWorkflowArgs, TaskData, WorkflowFixtureResult, WorkflowId,
+    OnboardingRequirement,
+    RunIncodeStuckWorkflowArgs,
+    TaskData,
+    WorkflowFixtureResult,
+    WorkflowId,
 };
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),
@@ -47,7 +72,7 @@ pub async fn post(
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())
-        // Process requirement shouldn't block the process endpoint        
+        // Process requirement shouldn't block the process endpoint
         .filter(|r| !matches!(r, OnboardingRequirement::Process))
         .collect_vec();
     if !unmet_reqs.is_empty() {

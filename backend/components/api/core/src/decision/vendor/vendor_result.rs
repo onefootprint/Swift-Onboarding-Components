@@ -1,28 +1,38 @@
-use std::collections::HashMap;
-
-use crate::{enclave_client::EnclaveClient, errors::ApiError, utils::vault_wrapper::VaultWrapper, State};
-
-use crate::errors::ApiResult;
-use db::{
-    models::{
-        verification_request::{RequestAndMaybeResult, RequestAndResult, VerificationRequest},
-        verification_result::VerificationResult,
-    },
-    DbError,
-};
-use idv::{ParsedResponse, VendorResponse};
-use newtypes::{
-    EncryptedVaultPrivateKey, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId,
-};
-
 use super::verification_result::decrypt_verification_result_response;
+use crate::enclave_client::EnclaveClient;
+use crate::errors::{
+    ApiError,
+    ApiResult,
+};
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use db::models::verification_request::{
+    RequestAndMaybeResult,
+    RequestAndResult,
+    VerificationRequest,
+};
+use db::models::verification_result::VerificationResult;
+use db::DbError;
+use idv::{
+    ParsedResponse,
+    VendorResponse,
+};
+use newtypes::{
+    EncryptedVaultPrivateKey,
+    SealedVaultBytes,
+    VendorAPI,
+    VerificationRequestId,
+    VerificationResultId,
+};
+use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct VendorResult {
     pub response: VendorResponse,
     pub verification_result_id: VerificationResultId,
     pub verification_request_id: VerificationRequestId,
-    // TODO ^ might make more sense to just have these be VerificationRequest and VerificationResult directly rather than just strip off the id's
+    // TODO ^ might make more sense to just have these be VerificationRequest and VerificationResult directly
+    // rather than just strip off the id's
 }
 
 #[derive(Clone)]
@@ -53,7 +63,10 @@ impl RequestAndMaybeHydratedResult {
 }
 
 impl VendorResult {
-    // A convenience method that takes (vreq,vres)'s and decryptes and parses the vres (if present and non-error) into VendorResponse. Similar to from_verification_results_for_onboarding, but this method preserve the same (vreq, vres) list passed in instead of implicitly filtering to only non-None vres's
+    // A convenience method that takes (vreq,vres)'s and decryptes and parses the vres (if present and
+    // non-error) into VendorResponse. Similar to from_verification_results_for_onboarding, but this
+    // method preserve the same (vreq, vres) list passed in instead of implicitly filtering to only
+    // non-None vres's
     #[tracing::instrument(skip_all)]
     pub async fn hydrate_vendor_results(
         requests_and_results: Vec<RequestAndMaybeResult>,
@@ -243,7 +256,8 @@ fn deserialize_from_vendor_api(
             ParsedResponse::FootprintDeviceAttestation(serde_json::from_value(raw_response)?)
         }
         // Caution Note
-        // These json responses are subject to change, so for safety don't plan on ever using the deserialized version
+        // These json responses are subject to change, so for safety don't plan on ever using the deserialized
+        // version
         VendorAPI::AwsRekognition => ParsedResponse::AwsRekognition(raw_response.into()),
         VendorAPI::AwsTextract => ParsedResponse::AwsTextract(raw_response.into()),
         // End of Caution Note

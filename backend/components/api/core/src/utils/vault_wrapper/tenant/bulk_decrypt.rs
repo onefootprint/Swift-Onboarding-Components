@@ -1,25 +1,36 @@
-use db::models::audit_event::{AuditEvent, NewAuditEvent};
-use std::collections::HashMap;
-
-use db::models::{
-    access_event::{AccessEvent, NewAccessEventRow},
-    insight_event::CreateInsightEvent,
-};
-use itertools::Itertools;
-use newtypes::{
-    output::Csv, AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier,
-    DbActor, PiiJsonValue,
-};
-
-use crate::{
-    errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::{
-        batch_execute_decrypt_requests, decrypt::EnclaveDecryptOperation, Any, DecryptUncheckedResult,
-    },
-    State,
-};
-
 use super::TenantVw;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+};
+use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
+use crate::utils::vault_wrapper::{
+    batch_execute_decrypt_requests,
+    Any,
+    DecryptUncheckedResult,
+};
+use crate::State;
+use db::models::access_event::{
+    AccessEvent,
+    NewAccessEventRow,
+};
+use db::models::audit_event::{
+    AuditEvent,
+    NewAuditEvent,
+};
+use db::models::insight_event::CreateInsightEvent;
+use itertools::Itertools;
+use newtypes::output::Csv;
+use newtypes::{
+    AccessEventKind,
+    AccessEventPurpose,
+    AuditEventDetail,
+    AuditEventId,
+    DataIdentifier,
+    DbActor,
+    PiiJsonValue,
+};
+use std::collections::HashMap;
 
 /// Represents a request to decrypt targets for a specific VaultWrapper instance. Use the key to
 /// uniquely identify the VW

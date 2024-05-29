@@ -1,21 +1,40 @@
-use crate::{
-    models::{
-        onboarding_decision::NewDecisionArgs,
-        task::{NewTask, Task},
-        watchlist_check::{NewWatchlistCheck, WatchlistCheck},
-        workflow::{Workflow, WorkflowUpdate},
-    },
-    test_helpers::assert_have_same_elements,
-    tests::{fixtures, prelude::*},
+use super::fixtures::ob_configuration::ObConfigurationOpts;
+use crate::models::onboarding_decision::NewDecisionArgs;
+use crate::models::task::{
+    NewTask,
+    Task,
 };
-use chrono::{DateTime, Duration, Utc};
+use crate::models::watchlist_check::{
+    NewWatchlistCheck,
+    WatchlistCheck,
+};
+use crate::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
+use crate::test_helpers::assert_have_same_elements;
+use crate::tests::fixtures;
+use crate::tests::prelude::*;
+use chrono::{
+    DateTime,
+    Duration,
+    Utc,
+};
 use macros::db_test;
 use newtypes::{
-    DataLifetimeSeqno, DbActor, DecisionStatus, EnhancedAmlOption, ScopedVaultId, TaskData, TaskStatus,
-    TenantId, VaultKind, WatchlistCheckArgs, WatchlistCheckStatus, WatchlistCheckStatusKind,
+    DataLifetimeSeqno,
+    DbActor,
+    DecisionStatus,
+    EnhancedAmlOption,
+    ScopedVaultId,
+    TaskData,
+    TaskStatus,
+    TenantId,
+    VaultKind,
+    WatchlistCheckArgs,
+    WatchlistCheckStatus,
+    WatchlistCheckStatusKind,
 };
-
-use super::fixtures::ob_configuration::ObConfigurationOpts;
 
 #[db_test]
 fn test_watchlist_check(conn: &mut TestPgConn) {
@@ -213,7 +232,8 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
     assert_have_same_elements(vec![sv1, sv5, sv10, sv11, sv12, sv14], svids);
 }
 
-// arg not being able to re-use the api test fixtures here is kinda goofy. probably should just move all tests to api or something
+// arg not being able to re-use the api test fixtures here is kinda goofy. probably should just move
+// all tests to api or something
 fn make_vault(
     conn: &mut TestPgConn,
     tenant_id: &TenantId,

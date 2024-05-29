@@ -1,27 +1,42 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::response::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    errors::ApiResult,
-    types::JsonApiResponse,
-    utils::{
-        db2api::TryDbToApi,
-        fp_id_path::FpIdPath,
-        vault_wrapper::{Any, TenantVw, VaultWrapper},
-    },
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::errors::ApiResult;
+use api_core::types::JsonApiResponse;
+use api_core::utils::db2api::TryDbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::{
+    Any,
+    TenantVw,
+    VaultWrapper,
 };
-use db::models::{
-    document::{Document, DocumentImageArgs},
-    scoped_vault::ScopedVault,
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
 };
-use itertools::{chain, Itertools};
+use db::models::scoped_vault::ScopedVault;
+use itertools::{
+    chain,
+    Itertools,
+};
 use newtypes::{
-    CustomDocumentConfig, DataIdentifier, DocumentDiKind, DocumentKind, DocumentRequestConfig, DocumentSide,
+    CustomDocumentConfig,
+    DataIdentifier,
+    DocumentDiKind,
+    DocumentKind,
+    DocumentRequestConfig,
+    DocumentSide,
 };
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 #[api_v2_operation(
     description = "View the documents uploaded for this vault.",

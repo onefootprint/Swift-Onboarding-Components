@@ -1,26 +1,33 @@
-use std::collections::HashMap;
-
-use crate::{
-    models::{
-        compliance_doc::NewComplianceDoc,
-        compliance_doc_assignment::NewComplianceDocAssignment,
-        compliance_doc_request::NewComplianceDocRequest,
-        compliance_doc_review::NewComplianceDocReview,
-        compliance_doc_submission::NewComplianceDocSubmission,
-        compliance_doc_template::{ComplianceDocTemplate, NewComplianceDocTemplate},
-        compliance_doc_template_version::NewComplianceDocTemplateVersion,
-        partner_tenant::PartnerTenant,
-        tenant::Tenant,
-        tenant_compliance_partnership::{NewTenantCompliancePartnership, TenantCompliancePartnership},
-        tenant_user::TenantUser,
-    },
-    TxnPgConn,
+use crate::models::compliance_doc::NewComplianceDoc;
+use crate::models::compliance_doc_assignment::NewComplianceDocAssignment;
+use crate::models::compliance_doc_request::NewComplianceDocRequest;
+use crate::models::compliance_doc_review::NewComplianceDocReview;
+use crate::models::compliance_doc_submission::NewComplianceDocSubmission;
+use crate::models::compliance_doc_template::{
+    ComplianceDocTemplate,
+    NewComplianceDocTemplate,
 };
+use crate::models::compliance_doc_template_version::NewComplianceDocTemplateVersion;
+use crate::models::partner_tenant::PartnerTenant;
+use crate::models::tenant::Tenant;
+use crate::models::tenant_compliance_partnership::{
+    NewTenantCompliancePartnership,
+    TenantCompliancePartnership,
+};
+use crate::models::tenant_user::TenantUser;
+use crate::TxnPgConn;
 use chrono::Utc;
 use newtypes::{
-    ComplianceDocData, ComplianceDocReviewDecision, OrgMemberEmail, PartnerTenantId, S3Url,
-    SealedVaultDataKey, TenantId, TenantKind,
+    ComplianceDocData,
+    ComplianceDocReviewDecision,
+    OrgMemberEmail,
+    PartnerTenantId,
+    S3Url,
+    SealedVaultDataKey,
+    TenantId,
+    TenantKind,
 };
+use std::collections::HashMap;
 use std::iter::zip;
 
 pub fn create_resources<'a>(

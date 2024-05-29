@@ -1,8 +1,24 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::proxy_request_log;
-use diesel::{prelude::*, Identifiable, Insertable, Queryable};
-use newtypes::{ProxyConfigId, ProxyRequestLogId, SealedVaultBytes, TenantId};
+use diesel::prelude::*;
+use diesel::{
+    Identifiable,
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    ProxyConfigId,
+    ProxyRequestLogId,
+    SealedVaultBytes,
+    TenantId,
+};
 
 #[derive(Queryable, Debug, Clone, Identifiable)]
 #[diesel(table_name = proxy_request_log)]

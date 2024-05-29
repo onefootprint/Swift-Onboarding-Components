@@ -1,24 +1,34 @@
-use std::sync::Arc;
-
-use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
-use crate::{
-    auth::{
-        session::{get_is_live, AuthSessionData, ExtractableAuthSession, RequestInfo},
-        AuthError, SessionContext,
-    },
-    errors::ApiResult,
+use super::{
+    AuthActor,
+    CanCheckTenantGuard,
+    GetFirmEmployee,
+    TenantAuth,
 };
-use db::{
-    helpers::TenantOrPartnerTenant,
-    models::{
-        tenant::Tenant, tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding,
-        tenant_user::TenantUser,
-    },
-    PgConn,
+use crate::auth::session::{
+    get_is_live,
+    AuthSessionData,
+    ExtractableAuthSession,
+    RequestInfo,
 };
+use crate::auth::{
+    AuthError,
+    SessionContext,
+};
+use crate::errors::ApiResult;
+use db::helpers::TenantOrPartnerTenant;
+use db::models::tenant::Tenant;
+use db::models::tenant_role::TenantRole;
+use db::models::tenant_rolebinding::TenantRolebinding;
+use db::models::tenant_user::TenantUser;
+use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::{DataLifetimeSource, TenantScope, WorkosAuthMethod};
+use newtypes::{
+    DataLifetimeSource,
+    TenantScope,
+    WorkosAuthMethod,
+};
 use paperclip::actix::Apiv2Security;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 /// Represents all tenant info identified by a tenant RB session token. This struct is hydrated from

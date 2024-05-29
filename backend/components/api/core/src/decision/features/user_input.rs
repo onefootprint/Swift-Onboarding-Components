@@ -1,19 +1,37 @@
-use crate::{
-    enclave_client::EnclaveClient,
-    errors::ApiResult,
-    utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper},
-    ApiErrorKind,
+use crate::enclave_client::EnclaveClient;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    DecryptUncheckedResult,
+    VaultWrapper,
 };
-use chrono::{Days, NaiveDate, Utc};
-use db::models::{ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo};
+use crate::ApiErrorKind;
+use chrono::{
+    Days,
+    NaiveDate,
+    Utc,
+};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::NewRiskSignalInfo;
 use newtypes::{
-    AgeHelper, CollectedData, DataIdentifier, Declaration, FootprintReasonCode, IdentityDataKind as IDK,
-    InvestorProfileKind, PiiString, VendorAPI, VerificationResultId, VisaKind, DATE_FORMAT,
+    AgeHelper,
+    CollectedData,
+    DataIdentifier,
+    Declaration,
+    FootprintReasonCode,
+    IdentityDataKind as IDK,
+    InvestorProfileKind,
+    PiiString,
+    VendorAPI,
+    VerificationResultId,
+    VisaKind,
+    DATE_FORMAT,
 };
 use std::str::FromStr;
 
-// Note: vendor_api/vres_id passed in here is a complete hack because currently RiskSignal's require these and we are doing something hacky here by writing non-vendor
-// reason codes as RiskSignal's. The vendor_api/vres_id for the KYC call made should be what is passed in here and these risk signals will just be attached to that vendor call
+// Note: vendor_api/vres_id passed in here is a complete hack because currently RiskSignal's require
+// these and we are doing something hacky here by writing non-vendor reason codes as RiskSignal's.
+// The vendor_api/vres_id for the KYC call made should be what is passed in here and these risk
+// signals will just be attached to that vendor call
 pub async fn generate_user_input_risk_signals(
     enclave_client: &EnclaveClient,
     vw: &VaultWrapper,

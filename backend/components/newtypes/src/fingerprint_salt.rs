@@ -1,7 +1,18 @@
-use itertools::{chain, Itertools};
-use strum::{EnumIter, IntoEnumIterator};
-
-use crate::{BusinessDataKind as BDK, DataIdentifier, FingerprintScope, IdentityDataKind as IDK, TenantId};
+use crate::{
+    BusinessDataKind as BDK,
+    DataIdentifier,
+    FingerprintScope,
+    IdentityDataKind as IDK,
+    TenantId,
+};
+use itertools::{
+    chain,
+    Itertools,
+};
+use strum::{
+    EnumIter,
+    IntoEnumIterator,
+};
 
 impl DataIdentifier {
     /// Given a DataIdentifier and its corresponding data, returns the fingerprintable payloads
@@ -155,9 +166,13 @@ impl<'a> TryFrom<&'a DataIdentifier> for PartialFingerprintKind {
 #[cfg(test)]
 mod tests {
     use super::FingerprintSalt;
+    use crate::fingerprint_salt::{
+        GlobalFingerprintKind,
+        PartialFingerprintKind,
+    };
     use crate::{
-        fingerprint_salt::{GlobalFingerprintKind, PartialFingerprintKind},
-        IdentityDataKind as IDK, TenantId,
+        IdentityDataKind as IDK,
+        TenantId,
     };
     use test_case::test_case;
 

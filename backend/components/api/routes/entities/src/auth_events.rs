@@ -1,18 +1,24 @@
-use crate::{
-    auth::{
-        tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-        Either,
-    },
-    types::response::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    auth::tenant::SecretTenantAuthContext, errors::ApiResult, types::JsonApiResponse,
-    utils::fp_id_path::FpIdPath,
+use crate::auth::Either;
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::errors::ApiResult;
+use api_core::types::JsonApiResponse;
+use api_core::utils::fp_id_path::FpIdPath;
+use db::models::auth_event::AuthEvent;
+use db::models::scoped_vault::ScopedVault;
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
 };
-use db::models::{auth_event::AuthEvent, scoped_vault::ScopedVault};
-use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
     description = "View a user's recent device insights",

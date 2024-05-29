@@ -1,5 +1,11 @@
 use crate::*;
-use newtypes::{FpId, ModernAuthEventKind, ObConfigurationId, OnboardingStatus, SessionAuthToken};
+use newtypes::{
+    FpId,
+    ModernAuthEventKind,
+    ObConfigurationId,
+    OnboardingStatus,
+    SessionAuthToken,
+};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 pub struct ValidateRequest {
@@ -11,7 +17,8 @@ pub struct ValidateResponse {
     /// Information on the authenticated user and the auth method they used
     pub user_auth: UserAuthResponse,
     #[serde(skip_serializing_if = "Option::is_none")]
-    /// Information on the user and their onboarding session. Provided for KYC and KYB playbook sessions
+    /// Information on the user and their onboarding session. Provided for KYC and KYB playbook
+    /// sessions
     pub user: Option<EntityValidateResponse>,
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Information on the business and its onboarding session. Provided for KYB playbook sessions

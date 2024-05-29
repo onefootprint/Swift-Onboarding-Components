@@ -1,34 +1,44 @@
-use std::sync::Arc;
-
-use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        insight_event::InsightEvent,
-        risk_signal::RiskSignal,
-        scoped_vault::ScopedVault,
-        vault::Vault,
-        verification_request::VerificationRequest,
-        verification_result::VerificationResult,
-        workflow::{Workflow, WorkflowUpdate},
-        zip_code::ZipCode,
-    },
-    TxnPgConn,
+use super::sandbox;
+use super::vendor::{
+    self,
+};
+use crate::errors::onboarding::OnboardingError;
+use crate::errors::ApiResult;
+use db::models::decision_intent::DecisionIntent;
+use db::models::insight_event::InsightEvent;
+use db::models::risk_signal::RiskSignal;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
+use db::models::zip_code::ZipCode;
+use db::TxnPgConn;
+use feature_flag::{
+    BoolFlag,
+    FeatureFlagClient,
 };
 use newtypes::{
-    DecisionStatus, DocumentFixtureResult, OnboardingStatus, RiskSignalGroupKind, TenantId, VendorAPI,
-    WorkflowFixtureResult, WorkflowId,
+    DecisionStatus,
+    DocumentFixtureResult,
+    OnboardingStatus,
+    RiskSignalGroupKind,
+    TenantId,
+    VendorAPI,
+    WorkflowFixtureResult,
+    WorkflowId,
 };
-
-use super::{
-    sandbox,
-    vendor::{self},
-};
-use crate::errors::{onboarding::OnboardingError, ApiResult};
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use std::sync::Arc;
 
 pub type CreateManualReview = bool;
 pub type FixtureDecision = (DecisionStatus, CreateManualReview);
-use geoutils::{Distance, Location};
+use geoutils::{
+    Distance,
+    Location,
+};
 
 #[tracing::instrument(skip_all)]
 /// Determines whether production IDV requests should be made.
@@ -62,7 +72,8 @@ pub fn get_fixture_data_decision(
         Ok(Some(fixture_decision))
     } else {
         // If this is a prod user vault, we always send prod requests
-        // In order to create production UVs, customers need us to flip a bit for them in PG on `tenant` (sandbox_restricted -> false)
+        // In order to create production UVs, customers need us to flip a bit for them in PG on `tenant`
+        // (sandbox_restricted -> false)
         Ok(None)
     }
 }
@@ -88,13 +99,15 @@ pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow
 
 type ShouldInitiateRealDocumentRequests = bool;
 
-/// Determines whether production identity document requests should be made, and if not, what the outcome should be
+/// Determines whether production identity document requests should be made, and if not, what the
+/// outcome should be
 pub async fn should_initiate_requests_for_document(
     vault: &Vault,
     document_decision: Option<DocumentFixtureResult>,
 ) -> ApiResult<ShouldInitiateRealDocumentRequests> {
-    // We allow identity documents to be tested in sandbox against incode demo environment, if a tenant is flagged in
-    // We use a flag since not all tenants should have this enabled by default (they might need to sign incode terms and be advised that they can only do this for testing purposes)
+    // We allow identity documents to be tested in sandbox against incode demo environment, if a tenant
+    // is flagged in We use a flag since not all tenants should have this enabled by default (they
+    // might need to sign incode terms and be advised that they can only do this for testing purposes)
     if !vault.is_live {
         // TODO: ADD this assertion in main index.rs and remove fixture stuff from here
         // let d = document_decision
@@ -102,7 +115,8 @@ pub async fn should_initiate_requests_for_document(
         //     // requests for sandbox vaults
         //     .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
         Ok(matches!(document_decision, Some(DocumentFixtureResult::Real)))
-    // guard against prod vaults from providing document fixtures (we prevent this in the API route that starts the flow, but double checking never hurt nobody)
+    // guard against prod vaults from providing document fixtures (we prevent this in the API route
+    // that starts the flow, but double checking never hurt nobody)
     } else if document_decision.is_some() {
         Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into())
     } else {
@@ -122,8 +136,8 @@ pub fn decision_status(fixture_result: WorkflowFixtureResult) -> FixtureDecision
         WorkflowFixtureResult::Fail => (DecisionStatus::Fail, false),
         WorkflowFixtureResult::ManualReview => (DecisionStatus::Fail, true),
         WorkflowFixtureResult::StepUp => (DecisionStatus::StepUp, false),
-        // This isn't quite right, and will be ignored. We are running real rules on a real sandbox document vendor call
-        // but this fn is used in a lot of places and we should have it return something
+        // This isn't quite right, and will be ignored. We are running real rules on a real sandbox document
+        // vendor call but this fn is used in a lot of places and we should have it return something
         WorkflowFixtureResult::DocumentDecision => (DecisionStatus::Pass, false),
     }
 }

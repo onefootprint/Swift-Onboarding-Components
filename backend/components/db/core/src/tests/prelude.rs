@@ -1,7 +1,10 @@
-use diesel::Connection;
-
 pub use super::fixtures;
-use crate::{test_helpers::test_db_conn, PgConn, TxnPgConn};
+use crate::test_helpers::test_db_conn;
+use crate::{
+    PgConn,
+    TxnPgConn,
+};
+use diesel::Connection;
 
 /// Wrapper around TxnPgConnection that is used only in tests. Operations run on these connections
 /// occur inside of a DB transaction and are automatically rolled back at the end of the test.

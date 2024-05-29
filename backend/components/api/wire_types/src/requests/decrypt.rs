@@ -1,6 +1,10 @@
+use newtypes::{
+    flat_api_object_map_type,
+    DataIdentifier,
+    PiiJsonValue,
+    VersionedDataIdentifier,
+};
 use std::collections::HashMap;
-
-use newtypes::{flat_api_object_map_type, DataIdentifier, PiiJsonValue, VersionedDataIdentifier};
 
 flat_api_object_map_type!(
     DecryptResponse<VersionedDataIdentifier, Option<PiiJsonValue>>,

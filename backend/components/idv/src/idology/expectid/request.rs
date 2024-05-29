@@ -1,6 +1,12 @@
 use crate::idology::error as IdologyError;
-use chrono::{Datelike, NaiveDate};
-use newtypes::{IdvData, PiiString};
+use chrono::{
+    Datelike,
+    NaiveDate,
+};
+use newtypes::{
+    IdvData,
+    PiiString,
+};
 
 /// Idology request, we'll only use this for U.S. citizens for now
 /// as KYC requests differ for UK + other countries
@@ -24,7 +30,8 @@ pub(crate) struct RequestData {
     email: Option<PiiString>,
     /// this must be 10 digits
     telephone: Option<PiiString>,
-    // we use invoice field to pass through a tenant identifier so we can keep track of things on the idology side
+    // we use invoice field to pass through a tenant identifier so we can keep track of things on the idology
+    // side
     invoice: Option<String>,
 }
 
@@ -91,11 +98,12 @@ impl RequestData {
 
 #[cfg(test)]
 mod tests {
-    use serde_json::json;
-
-    use crate::idology::common::request::{IdologyRequestData, Request};
-
     use super::*;
+    use crate::idology::common::request::{
+        IdologyRequestData,
+        Request,
+    };
+    use serde_json::json;
 
     #[test]
     fn test_serialization_expect_id() {

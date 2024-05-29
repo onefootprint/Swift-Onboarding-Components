@@ -1,21 +1,40 @@
-use super::{DataLifetimeSources, FingerprintedDataRequest, PrefillKind, WriteableVw};
-use crate::{
-    errors::ApiResult,
-    utils::vault_wrapper::{Person, TenantVw, VaultWrapper},
-    State,
+use super::{
+    DataLifetimeSources,
+    FingerprintedDataRequest,
+    PrefillKind,
+    WriteableVw,
 };
-use db::{
-    models::{contact_info::ContactInfo, ob_configuration::ObConfiguration, scoped_vault::ScopedVault},
-    test_helpers::assert_have_same_elements,
-    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool},
-    TxnPgConn,
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Person,
+    TenantVw,
+    VaultWrapper,
 };
+use crate::State;
+use db::models::contact_info::ContactInfo;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::test_db_pool::TestDbPool;
+use db::TxnPgConn;
 use itertools::Itertools;
 use macros::test_state;
+use newtypes::fingerprint_salt::{
+    FingerprintSalt,
+    GlobalFingerprintKind,
+};
 use newtypes::{
-    fingerprint_salt::{FingerprintSalt, GlobalFingerprintKind},
-    CollectedDataOption as CDO, DataIdentifier, DataLifetimeSource, DataRequest, Fingerprint,
-    FingerprintScope, IdentityDataKind, IdentityDataKind as IDK, PiiString, ValidateArgs,
+    CollectedDataOption as CDO,
+    DataIdentifier,
+    DataLifetimeSource,
+    DataRequest,
+    Fingerprint,
+    FingerprintScope,
+    IdentityDataKind,
+    IdentityDataKind as IDK,
+    PiiString,
+    ValidateArgs,
 };
 use std::collections::HashMap;
 

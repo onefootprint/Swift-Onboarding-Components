@@ -1,7 +1,8 @@
 use crate::utils::db2api::DbToApi;
-use db::models::{
-    manual_review::ManualReview, scoped_vault::ScopedVault, vault::Vault, workflow_request::WorkflowRequest,
-};
+use db::models::manual_review::ManualReview;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
+use db::models::workflow_request::WorkflowRequest;
 
 impl DbToApi<(ScopedVault, Vault)> for api_wire_types::LiteUser {
     fn from_db((sv, vault): (ScopedVault, Vault)) -> Self {

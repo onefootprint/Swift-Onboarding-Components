@@ -1,26 +1,34 @@
 use super::waterfall;
+use crate::decision::state::test_utils::{
+    self,
+    WithScore,
+    WithSsnResultCode,
+};
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::errors::ApiResult;
 use crate::{
-    decision::{
-        state::test_utils::{self, WithScore, WithSsnResultCode},
-        vendor::vendor_result::VendorResult,
-    },
-    errors::ApiResult,
-    ApiErrorKind, State,
+    ApiErrorKind,
+    State,
 };
-use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        tenant_vendor::{TenantVendorControl as DbTenantVendorControl, UpdateTenantVendorControlArgs},
-        verification_result::VerificationResult,
-        waterfall_execution::WaterfallExecution,
-        waterfall_step::WaterfallStep,
-    },
-    tests::{fixtures::ob_configuration::ObConfigurationOpts, MockFFClient},
+use db::models::decision_intent::DecisionIntent;
+use db::models::tenant_vendor::{
+    TenantVendorControl as DbTenantVendorControl,
+    UpdateTenantVendorControlArgs,
 };
+use db::models::verification_result::VerificationResult;
+use db::models::waterfall_execution::WaterfallExecution;
+use db::models::waterfall_step::WaterfallStep;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::MockFFClient;
 use idv::ParsedResponse;
 use macros::test_state_case;
 use newtypes::{
-    DecisionIntentId, DecisionIntentKind, Vendor, VendorAPI, WaterfallExecutionId, WaterfallStepAction,
+    DecisionIntentId,
+    DecisionIntentKind,
+    Vendor,
+    VendorAPI,
+    WaterfallExecutionId,
+    WaterfallStepAction,
 };
 
 struct ExperianEnabled(bool);
@@ -248,8 +256,8 @@ async fn test_run_kyc_waterfall(
     )
     .await;
 
-    // Simulate re-running. Ones that suceeded already should noop. Ones that ended in error should remake vendor calls
-    // Mock Run 2
+    // Simulate re-running. Ones that suceeded already should noop. Ones that ended in error should
+    // remake vendor calls Mock Run 2
     let Run {
         0: experian_response2,
         1: idology_response2,
@@ -272,7 +280,9 @@ async fn test_run_kyc_waterfall(
 }
 
 fn mock_calls(state: &mut State, experian_response: ExperianResponse, idology_response: IdologyResponse) {
-    // TODO: maybe by default the state's mock_ff_client could respond to any flag and return their default value (since thats something we specify in enum). Oof but then we gotta solve the whole is_production dealiooo
+    // TODO: maybe by default the state's mock_ff_client could respond to any flag and return their
+    // default value (since thats something we specify in enum). Oof but then we gotta solve the whole
+    // is_production dealiooo
     let mut mock_ff_client = MockFFClient::new();
     mock_ff_client.mock(|c| {
         c.expect_flag().return_const(true);
@@ -285,7 +295,8 @@ fn mock_calls(state: &mut State, experian_response: ExperianResponse, idology_re
                 state,
                 test_utils::WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
             ),
-            Qualifiers::IdFlagged => unimplemented!(), // TODO: we don't generate this FRC for idology, but we could use thin file here
+            Qualifiers::IdFlagged => unimplemented!(), /* TODO: we don't generate this FRC for idology, but
+                                                        * we could use thin file here */
         },
         VR::Error => test_utils::mock_idology_parseable_error(state),
         VR::HardError => test_utils::mock_idology_hard_error(state),

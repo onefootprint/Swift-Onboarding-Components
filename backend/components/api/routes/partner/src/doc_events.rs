@@ -1,16 +1,33 @@
-use crate::{types::JsonApiResponse, State};
-use api_core::{
-    auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::{ApiResult, AssertionError},
-    types::ResponseData,
-    utils::db2api::TryDbToApi,
-    ApiErrorKind,
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    PartnerTenantGuard,
+    PartnerTenantSessionAuth,
 };
-use api_wire_types::{ComplianceDocEvent, ComplianceDocEventType};
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
+};
+use api_core::types::ResponseData;
+use api_core::utils::db2api::TryDbToApi;
+use api_core::ApiErrorKind;
+use api_wire_types::{
+    ComplianceDocEvent,
+    ComplianceDocEventType,
+};
 use db::helpers::ComplianceDocSummary;
 use itertools::Itertools;
-use newtypes::{ComplianceDocId, TenantCompliancePartnershipId, TenantKind};
-use paperclip::actix::{self, api_v2_operation, web};
+use newtypes::{
+    ComplianceDocId,
+    TenantCompliancePartnershipId,
+    TenantKind,
+};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Returns a list of timeline events for the given document",

@@ -1,25 +1,43 @@
-use super::vault_wrapper::{Any, PrefillData, TenantVw, VaultWrapper, WriteableVw};
-use crate::{
-    auth::tenant::AuthActor,
-    errors::{onboarding::OnboardingError, ApiResult},
+use super::vault_wrapper::{
+    Any,
+    PrefillData,
+    TenantVw,
+    VaultWrapper,
+    WriteableVw,
 };
-use db::{
-    models::{
-        business_owner::BusinessOwner,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        insight_event::CreateInsightEvent,
-        ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault,
-        vault::{NewVaultArgs, Vault},
-        workflow::{OnboardingWorkflowArgs, Workflow},
-        workflow_request::WorkflowRequest,
-    },
-    TxnPgConn,
+use crate::auth::tenant::AuthActor;
+use crate::errors::onboarding::OnboardingError;
+use crate::errors::ApiResult;
+use db::models::business_owner::BusinessOwner;
+use db::models::document_request::{
+    DocumentRequest,
+    NewDocumentRequestArgs,
 };
+use db::models::insight_event::CreateInsightEvent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::{
+    NewVaultArgs,
+    Vault,
+};
+use db::models::workflow::{
+    OnboardingWorkflowArgs,
+    Workflow,
+};
+use db::models::workflow_request::WorkflowRequest;
+use db::TxnPgConn;
 use itertools::chain;
 use newtypes::{
-    DocumentConfig, DocumentRequestConfig, EncryptedVaultPrivateKey, Selfie, VaultKind, VaultPublicKey,
-    WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
+    DocumentConfig,
+    DocumentRequestConfig,
+    EncryptedVaultPrivateKey,
+    Selfie,
+    VaultKind,
+    VaultPublicKey,
+    WorkflowConfig,
+    WorkflowId,
+    WorkflowRequestId,
+    WorkflowSource,
 };
 
 pub struct NewBusinessVaultArgs {
@@ -35,7 +53,9 @@ pub struct NewOnboardingArgs<'a> {
     pub sv: &'a ScopedVault,
     pub obc: &'a ObConfiguration,
     pub insight_event: Option<CreateInsightEvent>,
-    pub new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
+    pub new_biz_args: Option<NewBusinessVaultArgs>, /* has to be generated async outside the `conn`. We
+                                                     * also currently don't support KYB for NPV's but
+                                                     * could one day */
     pub source: WorkflowSource,
     pub actor: Option<AuthActor>,
     pub maybe_prefill_data: Option<PrefillData>,

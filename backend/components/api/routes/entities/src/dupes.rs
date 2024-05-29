@@ -1,29 +1,41 @@
-use std::collections::HashMap;
-
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
+    TenantSessionAuth,
+};
+use crate::auth::Either;
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
 use crate::{
-    auth::{
-        tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth},
-        Either,
-    },
     get,
-    types::{response::ResponseData, JsonApiResponse},
     State,
 };
-use api_core::{
-    decision::vendor::neuro_id::tenant_can_view_neuro,
-    errors::ApiResult,
-    utils::{
-        db2api::DbToApi,
-        fp_id_path::FpIdPath,
-        vault_wrapper::{TenantVw, VaultWrapper},
-    },
+use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
+use api_core::errors::ApiResult;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::{
+    TenantVw,
+    VaultWrapper,
 };
-use db::models::{
-    fingerprint::Fingerprint, neuro_id_analytics_event::NeuroIdAnalyticsEvent, scoped_vault::ScopedVault,
+use db::models::fingerprint::Fingerprint;
+use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
+use db::models::scoped_vault::ScopedVault;
+use itertools::{
+    chain,
+    Itertools,
 };
-use itertools::{chain, Itertools};
-use newtypes::{DupeKind, ScopedVaultId};
-use paperclip::actix::{api_v2_operation, get, web};
+use newtypes::{
+    DupeKind,
+    ScopedVaultId,
+};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
+use std::collections::HashMap;
 
 #[api_v2_operation(
     description = "Lists information about other vaults with duplicate information for a footprint vault.",

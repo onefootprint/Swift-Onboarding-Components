@@ -1,19 +1,39 @@
-use std::{collections::HashMap, str::FromStr};
-
-use crate::{
-    incode::{error::Error as IncodeError, IncodeClientErrorCustomFailureReasons},
-    test_fixtures::{self, DocTestOpts},
+use crate::incode::error::Error as IncodeError;
+use crate::incode::IncodeClientErrorCustomFailureReasons;
+use crate::test_fixtures::{
+    self,
+    DocTestOpts,
 };
-use chrono::{NaiveDate, NaiveDateTime, Utc};
+use chrono::{
+    NaiveDate,
+    NaiveDateTime,
+    Utc,
+};
 use itertools::Itertools;
-use newtypes::{
-    incode::{
-        IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType, IncodeStatus, IncodeTest,
-    },
-    DocumentFixtureResult, IdDocKind, IncodeFailureReason, IncodeVerificationSessionKind,
-    Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiString, ScrubbedPiiInt, ScrubbedPiiLong,
-    ScrubbedPiiString, UsState, UsStateFull, DATE_FORMAT,
+use newtypes::incode::{
+    IncodeDocumentRestriction,
+    IncodeDocumentSubType,
+    IncodeDocumentType,
+    IncodeStatus,
+    IncodeTest,
 };
+use newtypes::{
+    DocumentFixtureResult,
+    IdDocKind,
+    IncodeFailureReason,
+    IncodeVerificationSessionKind,
+    Iso3166ThreeDigitCountryCode,
+    Iso3166TwoDigitCountryCode,
+    PiiString,
+    ScrubbedPiiInt,
+    ScrubbedPiiLong,
+    ScrubbedPiiString,
+    UsState,
+    UsStateFull,
+    DATE_FORMAT,
+};
+use std::collections::HashMap;
+use std::str::FromStr;
 
 /// Response we get back from adding a document image
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -97,7 +117,8 @@ impl AddSideResponse {
     }
 
     pub fn document_sub_type(&self) -> Option<IncodeDocumentSubType> {
-        // note: DL's will have this last token be the state and not really a document subtype which is kinda annoying
+        // note: DL's will have this last token be the state and not really a document subtype which is
+        // kinda annoying
         self.issue_name
             .as_ref()
             .and_then(|i| i.split(' ').last())
@@ -321,7 +342,8 @@ pub struct FaceRecognition {
     pub mask_check: Option<ValueStatusKey>,
     pub face_brightness: Option<ValueStatusKey>,
     pub lenses_check: Option<ValueStatusKey>,
-    // Shows if the name matches the previously used (only in case the user is already approved in another session),
+    // Shows if the name matches the previously used (only in case the user is already approved in another
+    // session),
     pub name_match: Option<ValueStatusKey>,
     // Specific rule from rule engine for faceValidation:,
     pub applied_rule: Option<serde_json::Value>,
@@ -360,7 +382,8 @@ impl IncodeClientErrorCustomFailureReasons for AddConsentResponse {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AddSelfieResponse {
-    // Value can be 0 or 1. Value 0 means that person on photo is alive. We recommend capturing another photo if value is 1.
+    // Value can be 0 or 1. Value 0 means that person on photo is alive. We recommend capturing another photo
+    // if value is 1.
     pub confidence: Option<f32>,
     // We recommend capturing another photo if value is false.
     pub is_bright: Option<bool>,
@@ -377,7 +400,9 @@ impl AddSelfieResponse {
     pub fn failure_reasons(&self) -> Vec<IncodeFailureReason> {
         [
             (self.confidence == Some(1.0)).then_some(IncodeFailureReason::SelfieLowConfidence),
-            // currently Incode was a weird bug where if `confidence` is missing from the response then that indicates an internal "UNSATISFIED_BRIGHTNESS_LEVEL" error on their end. so for now we treat the same as brightness check failing
+            // currently Incode was a weird bug where if `confidence` is missing from the response then that
+            // indicates an internal "UNSATISFIED_BRIGHTNESS_LEVEL" error on their end. so for now we treat
+            // the same as brightness check failing
             (self.confidence.is_none()).then_some(IncodeFailureReason::SelfieTooDark),
             (self.is_bright == Some(false)).then_some(IncodeFailureReason::SelfieTooDark),
             (self.has_lenses == Some(true)).then_some(IncodeFailureReason::SelfieHasLenses),
@@ -437,8 +462,9 @@ pub struct FetchOCRResponse {
     pub checked_address_bean: Option<OCRAddress>,
     pub address_fields: Option<OCRAddress>,
     // Image was classified as one of the following:
-    // Unknown, Passport, Visa, DriversLicense, IdentificationCard, Permit, Currency, ResidenceDocument, TravelDocument, BirthCertificate, VehicleRegistration,
-    // Other, WeaponLicense, TribalIdentification, VoterIdentification, Military, TaxIdentification, FederalID, MedicalCard
+    // Unknown, Passport, Visa, DriversLicense, IdentificationCard, Permit, Currency, ResidenceDocument,
+    // TravelDocument, BirthCertificate, VehicleRegistration, Other, WeaponLicense, TribalIdentification,
+    // VoterIdentification, Military, TaxIdentification, FederalID, MedicalCard
     pub type_of_id: Option<IncodeDocumentType>,
     pub document_front_subtype: Option<PiiString>,
     pub document_back_subtype: Option<PiiString>,
@@ -486,7 +512,6 @@ pub struct FetchOCRResponse {
     pub mrz3: Option<ScrubbedPiiString>,
     //
     // Leaving a lot of these Values just in case they aren't consistent across diff countries...
-    //
     pub full_name_mrz: Option<serde_json::Value>,
     pub birth_place: Option<serde_json::Value>,
     pub numero_emision_credencial: Option<serde_json::Value>,
@@ -762,12 +787,14 @@ pub struct GetOnboardingStatusResponse {
 impl GetOnboardingStatusResponse {
     pub fn ready(&self, session_kind: &IncodeVerificationSessionKind, wait_for_selfie: bool) -> bool {
         match session_kind {
-            // When raised it's safe to get scores from the ID Validation Process.  It's also safe to get OCR data
+            // When raised it's safe to get scores from the ID Validation Process.  It's also safe to get OCR
+            // data
             IncodeVerificationSessionKind::IdDocument => {
                 (self.onboarding_status == *"ID_VALIDATION_FINISHED")
                     || (self.onboarding_status == *"POST_PROCESSING_FINISHED")
             }
-            // Safe to get scores for liveness, facial recognition and overall (if the flow is simply IDV/selfie)
+            // Safe to get scores for liveness, facial recognition and overall (if the flow is simply
+            // IDV/selfie)
             IncodeVerificationSessionKind::Selfie => {
                 if wait_for_selfie {
                     self.onboarding_status == *"FACE_VALIDATION_FINISHED"
@@ -930,20 +957,28 @@ pub struct OcrDataConfidence {
 
 #[cfg(test)]
 mod tests {
-    use newtypes::{
-        incode::{IncodeDocumentRestriction, IncodeDocumentType, IncodeStatus, IncodeTest},
-        IdDocKind, IncodeFailureReason, PiiLong, ScrubbedPiiLong,
-    };
-
-    use crate::{
-        incode::{
-            doc::response::{AddSelfieResponse, ProcessFaceResponse},
-            IncodeAPIResult,
-        },
-        test_fixtures::{self, DocTestOpts},
-    };
-
     use super::*;
+    use crate::incode::doc::response::{
+        AddSelfieResponse,
+        ProcessFaceResponse,
+    };
+    use crate::incode::IncodeAPIResult;
+    use crate::test_fixtures::{
+        self,
+        DocTestOpts,
+    };
+    use newtypes::incode::{
+        IncodeDocumentRestriction,
+        IncodeDocumentType,
+        IncodeStatus,
+        IncodeTest,
+    };
+    use newtypes::{
+        IdDocKind,
+        IncodeFailureReason,
+        PiiLong,
+        ScrubbedPiiLong,
+    };
 
     #[test]
     pub fn test_parse_fetch_scores() {

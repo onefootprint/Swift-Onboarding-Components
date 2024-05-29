@@ -1,17 +1,33 @@
-use crate::{types::JsonApiResponse, State};
-use api_core::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::{ApiResult, ValidationError},
-    types::{EmptyResponse, ResponseData},
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
+};
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::types::{
+    EmptyResponse,
+    ResponseData,
 };
 use chrono::Utc;
-use db::models::{
-    compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest,
-    compliance_doc_submission::NewComplianceDocSubmission,
-    tenant_compliance_partnership::TenantCompliancePartnership,
+use db::models::compliance_doc::ComplianceDoc;
+use db::models::compliance_doc_request::ComplianceDocRequest;
+use db::models::compliance_doc_submission::NewComplianceDocSubmission;
+use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
+use newtypes::{
+    ComplianceDocData,
+    ComplianceDocRequestId,
+    TenantCompliancePartnershipId,
 };
-use newtypes::{ComplianceDocData, ComplianceDocRequestId, TenantCompliancePartnershipId};
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Submit an external URL in response to a request",

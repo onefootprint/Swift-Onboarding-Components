@@ -1,42 +1,68 @@
-use chrono::Utc;
-use db::{
-    models::{
-        data_lifetime::DataLifetime,
-        decision_intent::DecisionIntent,
-        document::{Document, DocumentImageArgs},
-        document_request::DocumentRequest,
-        document_upload::{DocumentUpload, NewDocumentUploadArgs},
-        incode_verification_session::IncodeVerificationSession,
-        incode_verification_session_event::IncodeVerificationSessionEvent,
-        insight_event::InsightEvent,
-        risk_signal::RiskSignal,
-        user_consent::UserConsent,
-        verification_request::VerificationRequest,
-    },
-    test_helpers::assert_have_same_elements,
-    tests::fixtures::ob_configuration::ObConfigurationOpts,
-    DbError, DbResult,
-};
-use idv::{
-    footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
-    incode::{doc::response::FetchScoresResponse, IncodeAPIResult},
-};
-use macros::test_state_case;
-use newtypes::{
-    incode::{IncodeStatus, IncodeTest},
-    CollectedDataOption, CountryRestriction, DecisionIntentKind, DocTypeRestriction, DocVData,
-    DocumentCdoInfo, DocumentRequestKind, DocumentSide, DocumentStatus, IdDocKind, IncodeFailureReason,
-    IncodeVerificationSessionState, PiiString, RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie,
-    VendorAPI,
-};
-
 use super::IncodeContext;
-use crate::{
-    decision::{
-        tests::test_helpers::{create_kyc_user_and_wf, FixtureData},
-        vendor::incode::{get_config_id, images::*, IncodeStateMachine},
-    },
-    State,
+use crate::decision::tests::test_helpers::{
+    create_kyc_user_and_wf,
+    FixtureData,
+};
+use crate::decision::vendor::incode::images::*;
+use crate::decision::vendor::incode::{
+    get_config_id,
+    IncodeStateMachine,
+};
+use crate::State;
+use chrono::Utc;
+use db::models::data_lifetime::DataLifetime;
+use db::models::decision_intent::DecisionIntent;
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
+};
+use db::models::document_request::DocumentRequest;
+use db::models::document_upload::{
+    DocumentUpload,
+    NewDocumentUploadArgs,
+};
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::incode_verification_session_event::IncodeVerificationSessionEvent;
+use db::models::insight_event::InsightEvent;
+use db::models::risk_signal::RiskSignal;
+use db::models::user_consent::UserConsent;
+use db::models::verification_request::VerificationRequest;
+use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::{
+    DbError,
+    DbResult,
+};
+use idv::footprint_http_client::{
+    FootprintVendorHttpClient,
+    FpVendorClientArgs,
+};
+use idv::incode::doc::response::FetchScoresResponse;
+use idv::incode::IncodeAPIResult;
+use macros::test_state_case;
+use newtypes::incode::{
+    IncodeStatus,
+    IncodeTest,
+};
+use newtypes::{
+    CollectedDataOption,
+    CountryRestriction,
+    DecisionIntentKind,
+    DocTypeRestriction,
+    DocVData,
+    DocumentCdoInfo,
+    DocumentRequestKind,
+    DocumentSide,
+    DocumentStatus,
+    IdDocKind,
+    IncodeFailureReason,
+    IncodeVerificationSessionState,
+    PiiString,
+    RiskSignalGroupKind,
+    S3Url,
+    SealedVaultDataKey,
+    Selfie,
+    VendorAPI,
 };
 
 #[ignore]

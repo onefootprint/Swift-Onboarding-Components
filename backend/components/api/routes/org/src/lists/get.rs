@@ -1,14 +1,21 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiResult,
-    types::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-
-use db::models::{list::List, rule_instance::RuleInstance};
+use crate::errors::ApiResult;
+use crate::types::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use db::models::list::List;
+use db::models::rule_instance::RuleInstance;
 use newtypes::ListId;
-use paperclip::actix::{api_v2_operation, get, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 #[api_v2_operation(tags(Lists, Organization, Private), description = "Returns a blocklist.")]
 #[get("/org/lists/{list_id}")]

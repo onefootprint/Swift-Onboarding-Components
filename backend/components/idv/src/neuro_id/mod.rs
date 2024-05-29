@@ -1,4 +1,5 @@
-use newtypes::{vendor_credentials::NeuroIdCredentials, NeuroIdentityId};
+use newtypes::vendor_credentials::NeuroIdCredentials;
+use newtypes::NeuroIdentityId;
 
 pub mod client;
 pub mod error;

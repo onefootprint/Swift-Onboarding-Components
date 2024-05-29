@@ -1,19 +1,33 @@
-use crate::{auth::tenant::AuthActor, errors::ApiResult};
-use api_wire_types::{CreateAnnotationRequest, DecisionRequest};
-use db::{
-    models::{
-        annotation::Annotation,
-        data_lifetime::DataLifetime,
-        document::{Document, DocumentUpdate},
-        manual_review::{ManualReviewAction, ManualReviewArgs},
-        onboarding_decision::NewDecisionArgs,
-        scoped_vault::ScopedVault,
-        workflow::{Workflow, WorkflowUpdate},
-    },
-    TxnPgConn,
+use crate::auth::tenant::AuthActor;
+use crate::errors::ApiResult;
+use api_wire_types::{
+    CreateAnnotationRequest,
+    DecisionRequest,
 };
+use db::models::annotation::Annotation;
+use db::models::data_lifetime::DataLifetime;
+use db::models::document::{
+    Document,
+    DocumentUpdate,
+};
+use db::models::manual_review::{
+    ManualReviewAction,
+    ManualReviewArgs,
+};
+use db::models::onboarding_decision::NewDecisionArgs;
+use db::models::scoped_vault::ScopedVault;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
+use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{DbActor, DocumentReviewStatus, Locked, ManualReviewKind};
+use newtypes::{
+    DbActor,
+    DocumentReviewStatus,
+    Locked,
+    ManualReviewKind,
+};
 use strum::IntoEnumIterator;
 
 pub fn save_review_decision(

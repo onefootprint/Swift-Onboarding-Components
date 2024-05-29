@@ -1,16 +1,35 @@
-use super::tenant_role::{ImmutableRoleKind, TenantRole};
-use crate::{helpers::WorkosAuthIdentity, DbResult, NonNullVec, OptionalNonNullVec, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::partner_tenant;
-use diesel::{
-    insertable::CanInsertInSingleQuery,
-    pg::Pg,
-    prelude::*,
-    query_builder::{QueryFragment, QueryId},
-    Insertable,
+use super::tenant_role::{
+    ImmutableRoleKind,
+    TenantRole,
 };
+use crate::helpers::WorkosAuthIdentity;
+use crate::{
+    DbResult,
+    NonNullVec,
+    OptionalNonNullVec,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::partner_tenant;
+use diesel::insertable::CanInsertInSingleQuery;
+use diesel::pg::Pg;
+use diesel::prelude::*;
+use diesel::query_builder::{
+    QueryFragment,
+    QueryId,
+};
+use diesel::Insertable;
 use newtypes::{
-    EncryptedVaultPrivateKey, PartnerTenantId, TenantKind, TenantRoleKind, VaultPublicKey, WorkosAuthMethod,
+    EncryptedVaultPrivateKey,
+    PartnerTenantId,
+    TenantKind,
+    TenantRoleKind,
+    VaultPublicKey,
+    WorkosAuthMethod,
 };
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]

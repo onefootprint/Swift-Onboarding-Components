@@ -1,11 +1,30 @@
-use crate::{util::impl_enum_str_diesel, PiiString, S3Url, SealedVaultDataKey};
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use crate::util::impl_enum_str_diesel;
+use crate::{
+    PiiString,
+    S3Url,
+    SealedVaultDataKey,
+};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use serde_json;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum_macros::{AsRefStr, Display, EnumString};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum_macros::{
+    AsRefStr,
+    Display,
+    EnumString,
+};
 
 #[derive(
     Debug,

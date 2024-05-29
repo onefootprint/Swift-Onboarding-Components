@@ -1,4 +1,10 @@
-use crate::{Actor, Apiv2Schema, DateTime, Serialize, Utc};
+use crate::{
+    Actor,
+    Apiv2Schema,
+    DateTime,
+    Serialize,
+    Utc,
+};
 use newtypes::AnnotationId;
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

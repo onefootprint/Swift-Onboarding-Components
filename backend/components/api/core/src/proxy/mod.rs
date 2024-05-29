@@ -5,10 +5,19 @@ pub mod pii_parser;
 pub mod ssrf_protection;
 pub mod token_parser;
 pub mod tokenize;
-use enclave_proxy::{DataTransform, DataTransforms};
-use newtypes::{CountArgs, DateFormatArgs, EncryptArgs, FilterFunction, HmacSha256Args, ReplaceArgs};
-
 pub use self::config::ingress_rule::IngressRule;
+use enclave_proxy::{
+    DataTransform,
+    DataTransforms,
+};
+use newtypes::{
+    CountArgs,
+    DateFormatArgs,
+    EncryptArgs,
+    FilterFunction,
+    HmacSha256Args,
+    ReplaceArgs,
+};
 
 pub fn to_data_transforms(transforms: &[FilterFunction]) -> Vec<DataTransform> {
     transforms.iter().map(filter_function_to_transform).collect()

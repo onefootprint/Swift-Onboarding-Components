@@ -1,5 +1,10 @@
-use crate::{models::verification_result::VerificationResult, PgConn};
-use newtypes::{PiiJsonValue, SealedVaultBytes, VerificationRequestId};
+use crate::models::verification_result::VerificationResult;
+use crate::PgConn;
+use newtypes::{
+    PiiJsonValue,
+    SealedVaultBytes,
+    VerificationRequestId,
+};
 use serde_json::json;
 
 pub fn create(conn: &mut PgConn, vreq_id: &VerificationRequestId, is_error: bool) -> VerificationResult {

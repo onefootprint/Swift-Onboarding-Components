@@ -1,14 +1,24 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::tenant::TenantError,
-    types::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::types::{EmptyResponse, JsonApiResponse};
-use db::{models::tenant_frequent_note::TenantFrequentNote, DbResult};
+use crate::errors::tenant::TenantError;
+use crate::types::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use db::models::tenant_frequent_note::TenantFrequentNote;
+use db::DbResult;
 use newtypes::TenantFrequentNoteId;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Returns a list of frequent notes for the organization.",

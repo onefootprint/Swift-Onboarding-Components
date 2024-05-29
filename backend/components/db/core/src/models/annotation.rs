@@ -1,16 +1,37 @@
-use std::collections::HashMap;
-
-use crate::{actor, actor::SaturatedActor, models::scoped_vault::ScopedVault, DbError, DbResult, PgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{annotation, scoped_vault, user_timeline};
-use diesel::{dsl::not, prelude::*};
-use newtypes::{
-    AnnotationId, DbActor, DbUserTimelineEvent, FpId, OnboardingDecisionId, ScopedVaultId, TenantId,
-};
-
-use serde::{Deserialize, Serialize};
-
 use super::user_timeline::UserTimeline;
+use crate::actor::SaturatedActor;
+use crate::models::scoped_vault::ScopedVault;
+use crate::{
+    actor,
+    DbError,
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    annotation,
+    scoped_vault,
+    user_timeline,
+};
+use diesel::dsl::not;
+use diesel::prelude::*;
+use newtypes::{
+    AnnotationId,
+    DbActor,
+    DbUserTimelineEvent,
+    FpId,
+    OnboardingDecisionId,
+    ScopedVaultId,
+    TenantId,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Serialize, Deserialize)]
 #[diesel(table_name = annotation)]

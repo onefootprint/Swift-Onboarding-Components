@@ -3,10 +3,25 @@
 //!
 //! They usually will involve a combination of DB operations and other async
 //! operations (such as enclave, etc).
-use api_core::{errors::ApiResult, ApiErrorKind, State};
-use byteorder::{BigEndian, ReadBytesExt};
-use db::{DbError, DbResult, TxnPgConn};
-use diesel::{sql_query, sql_types::BigInt, RunQueryDsl};
+use api_core::errors::ApiResult;
+use api_core::{
+    ApiErrorKind,
+    State,
+};
+use byteorder::{
+    BigEndian,
+    ReadBytesExt,
+};
+use db::{
+    DbError,
+    DbResult,
+    TxnPgConn,
+};
+use diesel::sql_types::BigInt;
+use diesel::{
+    sql_query,
+    RunQueryDsl,
+};
 
 trait CustomMigration {
     type MigrationState;
@@ -64,7 +79,8 @@ where
     let result = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<()> {
-            // 1. take out the lock so no other servers can continue along the txn (we don't need to unlock it as it will be dropped after the txn)
+            // 1. take out the lock so no other servers can continue along the txn (we don't need to unlock it
+            //    as it will be dropped after the txn)
             let _ = sql_query("SELECT pg_advisory_xact_lock($1);")
                 .bind::<BigInt, _>(advisory_lock_value)
                 .execute(conn.conn())

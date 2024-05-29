@@ -1,7 +1,13 @@
-use std::{fmt::Display, str::Utf8Error};
-
-use crate::{api_schema_helper::string_api_data_type_alias, PiiString};
-use serde::{ser::Error, Deserialize, Serialize, Serializer};
+use crate::api_schema_helper::string_api_data_type_alias;
+use crate::PiiString;
+use serde::ser::Error;
+use serde::{
+    Deserialize,
+    Serialize,
+    Serializer,
+};
+use std::fmt::Display;
+use std::str::Utf8Error;
 
 #[derive(Clone, Default, PartialEq, Eq, Hash, Deserialize)]
 pub struct AlpacaPiiString(PiiString);

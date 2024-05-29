@@ -1,9 +1,15 @@
-use super::{
-    common::request::{IdologyRequestData, Request},
-    error as IdologyError,
-    expectid::{self},
+use super::common::request::{
+    IdologyRequestData,
+    Request,
 };
-use newtypes::{IdvData, PiiString};
+use super::error as IdologyError;
+use super::expectid::{
+    self,
+};
+use newtypes::{
+    IdvData,
+    PiiString,
+};
 
 #[derive(Debug, Clone)]
 pub struct IdologyClient {

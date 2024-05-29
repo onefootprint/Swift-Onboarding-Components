@@ -1,17 +1,36 @@
 use dashmap::DashMap;
 use futures::StreamExt;
-use hyper::{
-    body::Sender as BodySender,
-    http::Method,
-    server::conn::AddrIncoming,
-    service::{make_service_fn, service_fn},
-    Body, HeaderMap, Request, Response, Server,
+use hyper::body::Sender as BodySender;
+use hyper::http::Method;
+use hyper::server::conn::AddrIncoming;
+use hyper::service::{
+    make_service_fn,
+    service_fn,
 };
-use log::{error, info};
-use sha2::{Digest, Sha256};
-use std::{sync::Arc, time::Duration};
+use hyper::{
+    Body,
+    HeaderMap,
+    Request,
+    Response,
+    Server,
+};
+use log::{
+    error,
+    info,
+};
+use sha2::{
+    Digest,
+    Sha256,
+};
+use std::sync::Arc;
+use std::time::Duration;
 use thiserror::Error;
-use tokio::sync::mpsc::{channel, error::SendError, Receiver, Sender};
+use tokio::sync::mpsc::error::SendError;
+use tokio::sync::mpsc::{
+    channel,
+    Receiver,
+    Sender,
+};
 
 #[derive(Error, Debug)]
 pub enum Error {

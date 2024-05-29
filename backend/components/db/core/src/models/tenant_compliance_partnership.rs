@@ -1,8 +1,20 @@
-use crate::{DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::tenant_compliance_partnership;
 use diesel::prelude::*;
-use newtypes::{OrgIdentifierRef, PartnerTenantId, TenantCompliancePartnershipId, TenantId};
+use newtypes::{
+    OrgIdentifierRef,
+    PartnerTenantId,
+    TenantCompliancePartnershipId,
+    TenantId,
+};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Queryable, Selectable, Identifiable, Serialize)]

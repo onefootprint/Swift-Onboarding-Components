@@ -1,38 +1,55 @@
-use super::{DocumentState, MakeDecision};
-use crate::{
-    decision::{
-        self,
-        features::risk_signals::fetch_latest_risk_signals_map,
-        onboarding::Decision,
-        rule_engine::{
-            self,
-            engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
-        },
-        state::{
-            actions::{DocCollected, WorkflowActions},
-            common::{self, DecisionOutput},
-            OnAction, WorkflowState,
-        },
-        utils::should_execute_rules_for_document_only,
-        vendor::tenant_vendor_control::TenantVendorControl,
-    },
-    errors::ApiResult,
-    State,
+use super::{
+    DocumentState,
+    MakeDecision,
 };
+use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
+use crate::decision::onboarding::Decision;
+use crate::decision::rule_engine::engine::{
+    EvaluateWorkflowDecisionArgs,
+    VaultDataForRules,
+};
+use crate::decision::rule_engine::{
+    self,
+};
+use crate::decision::state::actions::{
+    DocCollected,
+    WorkflowActions,
+};
+use crate::decision::state::common::{
+    self,
+    DecisionOutput,
+};
+use crate::decision::state::{
+    OnAction,
+    WorkflowState,
+};
+use crate::decision::utils::should_execute_rules_for_document_only;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::decision::{
+    self,
+};
+use crate::errors::ApiResult;
+use crate::State;
 use async_trait::async_trait;
-use db::models::{
-    ob_configuration::ObConfiguration, rule_instance::IncludeRules, vault::Vault,
-    workflow::Workflow as DbWorkflow,
-};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_instance::IncludeRules;
+use db::models::vault::Vault;
+use db::models::workflow::Workflow as DbWorkflow;
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    DocumentConfig, Locked, RuleInstanceKind, RuleSetResultKind, ScopedVaultId, TenantId, WorkflowId,
+    DocumentConfig,
+    Locked,
+    RuleInstanceKind,
+    RuleSetResultKind,
+    ScopedVaultId,
+    TenantId,
+    WorkflowId,
 };
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
+use std::sync::Arc;
 
 ///
 /// States
-///
 
 #[derive(Clone)]
 pub struct DocumentDataCollection {
@@ -174,7 +191,8 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             vault_data: &VaultDataForRules::empty(), // TODO
             lists: &HashMap::new(),                  // TODO mb
             is_fixture: fixture_decision.is_some(),
-            include_rules: IncludeRules::Kind(RuleInstanceKind::Person), // TODO: change when maybe we have rules based on biz docs?
+            include_rules: IncludeRules::Kind(RuleInstanceKind::Person), /* TODO: change when maybe we have
+                                                                          * rules based on biz docs? */
         };
         let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
 

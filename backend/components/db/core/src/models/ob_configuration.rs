@@ -1,18 +1,57 @@
-use super::{rule_set_version::RuleSetVersion, tenant::Tenant, workflow::Workflow};
+use super::rule_set_version::RuleSetVersion;
+use super::tenant::Tenant;
+use super::workflow::Workflow;
+use crate::actor::SaturatedActor;
 use crate::{
-    actor, actor::SaturatedActor, DbError, DbResult, NextPage, NonNullVec, OffsetPagination,
-    OptionalNonNullVec, PgConn, TxnPgConn,
+    actor,
+    DbError,
+    DbResult,
+    NextPage,
+    NonNullVec,
+    OffsetPagination,
+    OptionalNonNullVec,
+    PgConn,
+    TxnPgConn,
 };
-use chrono::{DateTime, Utc};
-use db_schema::schema::{ob_configuration, ob_configuration::BoxedQuery, tenant};
-use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::ob_configuration::BoxedQuery;
+use db_schema::schema::{
+    ob_configuration,
+    tenant,
+};
+use diesel::pg::Pg;
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use itertools::Itertools;
 use newtypes::{
-    ApiKeyStatus, AppearanceId, AuthMethodKind, CipKind, CollectedDataOption as CDO,
-    DataIdentifierDiscriminant, DbActor, DocumentAndCountryConfiguration, DocumentCdoInfo,
-    DocumentRequestConfig, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, Locked,
-    ObConfigurationId, ObConfigurationKey, ObConfigurationKind, ScopedVaultId,
-    SupportedDocumentAndCountryMappingForBifrost, TenantId, VerificationCheck, VerificationCheckKind,
+    ApiKeyStatus,
+    AppearanceId,
+    AuthMethodKind,
+    CipKind,
+    CollectedDataOption as CDO,
+    DataIdentifierDiscriminant,
+    DbActor,
+    DocumentAndCountryConfiguration,
+    DocumentCdoInfo,
+    DocumentRequestConfig,
+    EnhancedAmlOption,
+    IdDocKind,
+    Iso3166TwoDigitCountryCode,
+    Locked,
+    ObConfigurationId,
+    ObConfigurationKey,
+    ObConfigurationKind,
+    ScopedVaultId,
+    SupportedDocumentAndCountryMappingForBifrost,
+    TenantId,
+    VerificationCheck,
+    VerificationCheckKind,
     WorkflowId,
 };
 use std::collections::HashMap;
@@ -112,7 +151,8 @@ impl ObConfiguration {
         let id_doc_kinds = if let Some(kinds) = self
             .restricted_id_doc_kinds()
             .or(self.optional_ssn_restricted_id_doc_kinds())
-        // we'll only ever have 1 of these, we prevent OBCs from being created with doc AND optional SSN doc stepup
+        // we'll only ever have 1 of these, we prevent OBCs from being created with doc
+        // AND optional SSN doc stepup
         {
             kinds
         } else {
@@ -139,19 +179,23 @@ impl ObConfiguration {
             .into_iter()
             .fold(HashMap::new(), |mut acc: HashMap<_, _>, (country, doc_type)| {
                 let is_passport = doc_type == IdDocKind::Passport;
-                // Don't allow non-passport if we are displaying possible document types for an international residential address
-                //   - This is the case _even if the person has a US document type that would have been supported had they been living in the US_
+                // Don't allow non-passport if we are displaying possible document types for an international
+                // residential address
+                //   - This is the case _even if the person has a US document type that would have been
+                //     supported had they been living in the US_
                 //
                 // For example:
                 //  * OBC has DL, passport, id card configured
                 //      * DL + id card are only possible for US (currently)
                 //  * OBC has residential country restrictions: US, MX
-                //  * I am living in Mexico, and submitted my MX address
-                //    ==> i have to provide a passport from any country (which includes US, where i'm from). even though i have an acceptable form of ID were I to be living in the US
+                //  * I am living in Mexico, and submitted my MX address ==> i have to provide a passport from
+                //    any country (which includes US, where i'm from). even though i have an acceptable form
+                //    of ID were I to be living in the US
                 //
                 //
-                // That is to say, international country restrictions do not affect the countries you can submit a passport for, this just controls
-                // residential address - there are integration tests testing this part
+                // That is to say, international country restrictions do not affect the countries you can
+                // submit a passport for, this just controls residential address - there are
+                // integration tests testing this part
                 if !is_passport
                     && residential_country
                         .map(|c| !c.is_us_including_territories())
@@ -225,7 +269,8 @@ impl ObConfiguration {
         self.document_cdo_for_optional_ssn().is_some()
     }
 
-    // Dumb temporary hack since we use Alpaca Cipkind in some pytets but aren't stricly enforcing that 'if alpaca then enhanced aml'
+    // Dumb temporary hack since we use Alpaca Cipkind in some pytets but aren't stricly enforcing that
+    // 'if alpaca then enhanced aml'
     pub fn enhanced_aml(&self) -> EnhancedAmlOption {
         if matches!(self.cip_kind, Some(CipKind::Alpaca))
             && matches!(self.enhanced_aml, EnhancedAmlOption::No)
@@ -670,8 +715,10 @@ impl ObConfiguration {
 
     #[tracing::instrument("ObConfiguration::get_enhanced_aml_obc_for_sv", skip_all)]
     pub fn get_enhanced_aml_obc_for_sv(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Option<Self>> {
-        // Get OBC for this scoped vault. This is a little funky now because you can theoretically onboard only multiple Workflow's and each could have a different OBC
-        // For now, we take the first completed WF by completed_at where enhanced_aml = Yes. If none of the WF's have enhanced AML, then we just take the first OBC.
+        // Get OBC for this scoped vault. This is a little funky now because you can theoretically onboard
+        // only multiple Workflow's and each could have a different OBC For now, we take the first
+        // completed WF by completed_at where enhanced_aml = Yes. If none of the WF's have enhanced AML,
+        // then we just take the first OBC.
         let wfs = Workflow::list_by_completed_at(conn, sv_id)?;
         let obc = if let Some((_, obc)) = wfs.iter().find(|(_, obc)| {
             obc.as_ref()
@@ -721,7 +768,8 @@ impl ObConfiguration {
             .any(|cdo| matches!(cdo, CDO::Document(_)))
     }
 
-    /// Returns true if this ob config requires collecting any CDO with the provided DataIdentifier kind
+    /// Returns true if this ob config requires collecting any CDO with the provided DataIdentifier
+    /// kind
     pub fn must_collect(&self, di_kind: DataIdentifierDiscriminant) -> bool {
         self.must_collect_data
             .iter()

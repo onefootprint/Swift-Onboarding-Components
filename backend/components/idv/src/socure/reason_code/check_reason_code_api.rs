@@ -1,6 +1,5 @@
-use newtypes::SocureReasonCode;
-
 use crate::socure::client::SocureClient;
+use newtypes::SocureReasonCode;
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct ReasonCodeDiscrepancies {
@@ -62,16 +61,15 @@ pub async fn query_socure_reason_code_endpoint_and_compare_against_enum(
 #[cfg(test)]
 mod tests {
 
+    use super::compare_enum_vs_latest_api_response;
+    use crate::socure::client::SocureClient;
+    use crate::socure::reason_code::check_reason_code_api::{
+        DifferingDescriptionReasonCode,
+        MissingReasonCode,
+    };
     use newtypes::SocureReasonCode;
     use serde_json::json;
     use tracing_test::traced_test;
-
-    use crate::socure::{
-        client::SocureClient,
-        reason_code::check_reason_code_api::{DifferingDescriptionReasonCode, MissingReasonCode},
-    };
-
-    use super::compare_enum_vs_latest_api_response;
 
     #[test]
     fn test_compare_enum_vs_latest_api_response() {
@@ -137,8 +135,9 @@ mod tests {
     #[ignore]
     #[traced_test]
     #[tokio::test]
-    // This test just provides an easy adhoc way to do what we would run on app start in main.rs. We can run this manually when needed to actually
-    //  ping the Socure Reason Code endpoint and compare for discrepenancies in our enum.
+    // This test just provides an easy adhoc way to do what we would run on app start in main.rs. We can
+    // run this manually when needed to actually  ping the Socure Reason Code endpoint and compare
+    // for discrepenancies in our enum.
     async fn query_reason_codes_and_compare() {
         let sdk_key = dotenv::var("SOCURE_CERTIFICATION_API_KEY").unwrap();
         let socure_client = SocureClient::new(sdk_key, false).unwrap();

@@ -1,26 +1,64 @@
+use crate::{
+    DbResult,
+    TxnPgConn,
+};
 use db_schema::schema::{
-    apple_device_attestation, auth_event, rule_result, rule_set_result, rule_set_result_risk_signal_junction,
+    apple_device_attestation,
+    auth_event,
+    rule_result,
+    rule_set_result,
+    rule_set_result_risk_signal_junction,
 };
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::VaultId;
 
-use crate::{DbResult, TxnPgConn};
-
 #[tracing::instrument(skip_all)]
 pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) -> DbResult<usize> {
-    // we register users within our integration tests. to avoid filling up our database with fake information,
-    // we clean up afterwards.
+    // we register users within our integration tests. to avoid filling up our database with fake
+    // information, we clean up afterwards.
 
     use db_schema::schema::{
-        access_event, annotation, audit_event, billing_event, business_owner, contact_info, data_lifetime,
-        decision_intent, document_data, document_request, document_upload, fingerprint, fingerprint_junction,
-        fingerprint_visit_event, identity_document, incode_verification_session,
-        incode_verification_session_event, liveness_event, manual_review, middesk_request,
-        onboarding_decision, onboarding_decision_verification_result_junction, risk_signal,
-        risk_signal_group, scoped_vault, socure_device_session, stytch_fingerprint_event, user_consent,
-        user_timeline, vault, vault_data, verification_request, verification_result, watchlist_check,
-        waterfall_execution, waterfall_step, webauthn_credential, workflow, workflow_event, workflow_request,
+        access_event,
+        annotation,
+        audit_event,
+        billing_event,
+        business_owner,
+        contact_info,
+        data_lifetime,
+        decision_intent,
+        document_data,
+        document_request,
+        document_upload,
+        fingerprint,
+        fingerprint_junction,
+        fingerprint_visit_event,
+        identity_document,
+        incode_verification_session,
+        incode_verification_session_event,
+        liveness_event,
+        manual_review,
+        middesk_request,
+        onboarding_decision,
+        onboarding_decision_verification_result_junction,
+        risk_signal,
+        risk_signal_group,
+        scoped_vault,
+        socure_device_session,
+        stytch_fingerprint_event,
+        user_consent,
+        user_timeline,
+        vault,
+        vault_data,
+        verification_request,
+        verification_result,
+        watchlist_check,
+        waterfall_execution,
+        waterfall_step,
+        webauthn_credential,
+        workflow,
+        workflow_event,
+        workflow_request,
     };
     let mut deleted_rows = 0;
 

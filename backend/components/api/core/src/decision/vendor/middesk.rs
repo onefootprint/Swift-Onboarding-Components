@@ -1,61 +1,104 @@
 #![allow(clippy::too_many_arguments)]
 
-use std::{collections::HashMap, sync::Arc};
-
-use self::vendor_api::{
-    loaders::load_response_for_vendor_api,
-    vendor_api_struct::{MiddeskBusinessUpdateWebhook, MiddeskGetBusiness},
+use self::vendor_api::loaders::load_response_for_vendor_api;
+use self::vendor_api::vendor_api_struct::{
+    MiddeskBusinessUpdateWebhook,
+    MiddeskGetBusiness,
 };
-
-use super::{vendor_trait::VendorAPIResponse, *};
-
-use crate::{
-    config::Config,
-    decision::{
-        self,
-        state::{actions::WorkflowActions, AsyncVendorCallsCompleted, WorkflowWrapper},
-    },
-    enclave_client::EnclaveClient,
-    errors::{ApiError, AssertionError},
-    utils::vault_wrapper::{Any, DataLifetimeSources, FingerprintedDataRequest, VaultWrapper},
-    vendor_clients::VendorClient,
-    State,
+use super::vendor_trait::VendorAPIResponse;
+use super::*;
+use crate::config::Config;
+use crate::decision::state::actions::WorkflowActions;
+use crate::decision::state::{
+    AsyncVendorCallsCompleted,
+    WorkflowWrapper,
+};
+use crate::decision::{
+    self,
+};
+use crate::enclave_client::EnclaveClient;
+use crate::errors::{
+    ApiError,
+    AssertionError,
+};
+use crate::utils::vault_wrapper::{
+    Any,
+    DataLifetimeSources,
+    FingerprintedDataRequest,
+    VaultWrapper,
+};
+use crate::vendor_clients::VendorClient;
+use crate::State;
+use db::models::billing_event::BillingEvent;
+use db::models::data_lifetime::DataLifetime;
+use db::models::decision_intent::DecisionIntent;
+use db::models::middesk_request::{
+    MiddeskRequest,
+    UpdateMiddeskRequest,
+};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::{
+    NewRiskSignalInfo,
+    RiskSignal,
+};
+use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::verification_request::{
+    VReqIdentifier,
+    VerificationRequest,
+};
+use db::models::verification_result::VerificationResult;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
 };
 use db::{
-    models::{
-        billing_event::BillingEvent,
-        data_lifetime::DataLifetime,
-        decision_intent::DecisionIntent,
-        middesk_request::{MiddeskRequest, UpdateMiddeskRequest},
-        ob_configuration::ObConfiguration,
-        risk_signal::{NewRiskSignalInfo, RiskSignal},
-        risk_signal_group::RiskSignalGroup,
-        verification_request::{VReqIdentifier, VerificationRequest},
-        verification_result::VerificationResult,
-        workflow::{Workflow, WorkflowUpdate},
-    },
-    DbError, DbPool,
+    DbError,
+    DbPool,
 };
-use feature_flag::{BoolFlag, FeatureFlagClient};
-
+use feature_flag::{
+    BoolFlag,
+    FeatureFlagClient,
+};
+use idv::middesk::response::business::BusinessResponse;
+use idv::middesk::response::webhook::{
+    MiddeskBusinessUpdateWebhookResponse,
+    MiddeskTinRetriedWebhookResponse,
+};
 use idv::middesk::{
     self,
-    response::{
-        business::BusinessResponse,
-        webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse},
-    },
-    MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, MiddeskGetBusinessRequest,
+    MiddeskCreateBusinessRequest,
+    MiddeskCreateBusinessResponse,
+    MiddeskGetBusinessRequest,
     MiddeskGetBusinessResponse,
 };
-
-use idv::{ParsedResponse, VendorResponse};
-
-use newtypes::{
-    BillingEventKind, BusinessDataForRequest, BusinessDataKind, DataIdentifier, DataLifetimeSource,
-    DataRequest, DecisionIntentKind, EinOnly, MiddeskRequestState, ObConfigurationKey, OnboardingStatus,
-    PiiJsonValue, PiiString, RiskSignalGroupKind, TenantId, ValidateArgs, VendorAPI, VerificationCheck,
-    VerificationCheckKind, WorkflowId,
+use idv::{
+    ParsedResponse,
+    VendorResponse,
 };
+use newtypes::{
+    BillingEventKind,
+    BusinessDataForRequest,
+    BusinessDataKind,
+    DataIdentifier,
+    DataLifetimeSource,
+    DataRequest,
+    DecisionIntentKind,
+    EinOnly,
+    MiddeskRequestState,
+    ObConfigurationKey,
+    OnboardingStatus,
+    PiiJsonValue,
+    PiiString,
+    RiskSignalGroupKind,
+    TenantId,
+    ValidateArgs,
+    VendorAPI,
+    VerificationCheck,
+    VerificationCheckKind,
+    WorkflowId,
+};
+use std::collections::HashMap;
+use std::sync::Arc;
 use strum_macros::EnumDiscriminants;
 
 #[derive(Debug)]
@@ -539,7 +582,6 @@ impl MiddeskState<Complete> {
                 .ok()
                 .ok_or(MiddeskError::AssertionError("No successful vres".into()))?;
 
-
                 let res = resp
                     .business_response()
                     .cloned()
@@ -555,7 +597,6 @@ impl MiddeskState<Complete> {
                 .into_iter()
                 .map(|rc| (rc, vendor_api, vres_id.clone()))
                 .collect();
-
 
         // write data from the business response into the business vault
         // currently just: formation state/date
@@ -580,7 +621,6 @@ impl MiddeskState<Complete> {
             let data = DataRequest::clean_and_validate(data, ValidateArgs::for_non_portable(sv.is_live))?;
             (dis, FingerprintedDataRequest::build(state, data, &sv.id).await?)
         };
-
 
         let obc_id = wf.ob_configuration_id.clone();
         state
@@ -663,7 +703,8 @@ pub async fn init_middesk_request(
     })
 }
 
-// Insertion point 2: We are receiving either a `business.updated` or `tin.retried` webhook from Middesk
+// Insertion point 2: We are receiving either a `business.updated` or `tin.retried` webhook from
+// Middesk
 pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Result<(), ApiError> {
     let webhook_res = middesk::response::webhook::parse_webhook(res.clone()).map_err(idv::Error::from)?;
     let business_id = webhook_res
@@ -734,7 +775,8 @@ async fn send_middesk_call(
             .await
             .map_err(|e| ApiError::from(idv::Error::from(e)))
     } else {
-        // TODO: the faked vendor response thing doesn't really work well for stuff like Middesk flow. Would need to rethink how to support this if its really needed.
+        // TODO: the faked vendor response thing doesn't really work well for stuff like Middesk flow. Would
+        // need to rethink how to support this if its really needed.
         let raw = serde_json::json!(
           {
             "object": "business",

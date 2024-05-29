@@ -1,6 +1,7 @@
-use db::models::{rule_instance::RuleInstance, rule_result::RuleResult, rule_set_result::RuleSetResult};
-
 use crate::utils::db2api::DbToApi;
+use db::models::rule_instance::RuleInstance;
+use db::models::rule_result::RuleResult;
+use db::models::rule_set_result::RuleSetResult;
 
 impl DbToApi<RuleInstance> for api_wire_types::Rule {
     fn from_db(rule: RuleInstance) -> Self {

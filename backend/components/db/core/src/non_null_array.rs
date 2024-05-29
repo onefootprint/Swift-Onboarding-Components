@@ -1,15 +1,16 @@
-use diesel::{
-    sql_types::{Array, Nullable},
-    Queryable,
+use diesel::sql_types::{
+    Array,
+    Nullable,
 };
+use diesel::Queryable;
 
 /// In postgres, all Array fields can have null values.
 /// In practice, most things in our application don't want arrays with null values. For fields
 /// where we use Vec<T> instead of Vec<Option<T>>, we'll never write null values and want to only
 /// read non-null values.
 /// This util can be used to deserialize postgres's Arrays of nullable T into a normal Vec<T>.
-/// This should be used on the Queryable model as a field-level attribute on your Vec<T>. For example:
-/// ```ignore
+/// This should be used on the Queryable model as a field-level attribute on your Vec<T>. For
+/// example: ```ignore
 /// #[derive(Queryable)]
 /// #[diesel(table_name = my_model)]
 /// pub struct MyModel {
@@ -50,8 +51,8 @@ impl<T> From<NonNullVec<T>> for Vec<T> {
 /// where we use Vec<T> instead of Vec<Option<T>>, we'll never write null values and want to only
 /// read non-null values.
 /// This util can be used to deserialize postgres's Arrays of nullable T into a normal Vec<T>.
-/// This should be used on the Queryable model as a field-level attribute on your Vec<T>. For example:
-/// ```ignore
+/// This should be used on the Queryable model as a field-level attribute on your Vec<T>. For
+/// example: ```ignore
 /// #[derive(Queryable)]
 /// #[diesel(table_name = my_model)]
 /// pub struct MyModel {

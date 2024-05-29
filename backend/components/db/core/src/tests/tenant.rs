@@ -1,5 +1,6 @@
 use super::fixtures;
-use crate::{models::tenant::Tenant, tests::prelude::*};
+use crate::models::tenant::Tenant;
+use crate::tests::prelude::*;
 use macros::db_test;
 
 #[db_test]

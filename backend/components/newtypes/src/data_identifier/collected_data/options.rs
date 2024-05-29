@@ -1,14 +1,34 @@
 use crate::{
-    BusinessDataKind as BDK, CollectedData, DataIdentifier, DocumentCdoInfo, DocumentDiKind as DK,
-    IdentityDataKind as IDK, InvestorProfileKind as IPK, Selfie, TenantScope,
+    BusinessDataKind as BDK,
+    CollectedData,
+    DataIdentifier,
+    DocumentCdoInfo,
+    DocumentDiKind as DK,
+    IdentityDataKind as IDK,
+    InvestorProfileKind as IPK,
+    Selfie,
+    TenantScope,
 };
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
 use std::collections::HashSet;
-use strum::{EnumDiscriminants, IntoEnumIterator};
-use strum_macros::{Display, EnumString};
+use strum::{
+    EnumDiscriminants,
+    IntoEnumIterator,
+};
+use strum_macros::{
+    Display,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -29,8 +49,9 @@ use strum_macros::{Display, EnumString};
 #[diesel(sql_type = Text)]
 /// Represent the options of allowed CollectedData.
 /// Some CollectedData variants only have a single allowable CollectedDataOption.
-/// Other CollectedData variants may have multiple Options of assortments of data that can be collected.
-/// Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by the CDO
+/// Other CollectedData variants may have multiple Options of assortments of data that can be
+/// collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by
+/// the CDO
 pub enum CollectedDataOption {
     Name,
     Dob,
@@ -178,7 +199,8 @@ impl CollectedDataOption {
             Self::BusinessBeneficialOwners => Some(vec![BDK::BeneficialOwners.into()]),
             Self::BusinessKycedBeneficialOwners => Some(vec![BDK::KycedBeneficialOwners.into()]),
             Self::BusinessCorporationType => Some(vec![BDK::CorporationType.into()]),
-            // Can we stick the investor profile identifier in here? Even if it's a different DI variant... cool
+            // Can we stick the investor profile identifier in here? Even if it's a different DI variant...
+            // cool
             Self::InvestorProfile => Some(
                 IPK::iter()
                     .map(|x| x.into())

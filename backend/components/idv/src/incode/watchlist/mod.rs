@@ -1,4 +1,8 @@
-use newtypes::{vendor_credentials::IncodeCredentialsWithToken, IdvData, IncodeWatchlistResultRef};
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
+use newtypes::{
+    IdvData,
+    IncodeWatchlistResultRef,
+};
 
 pub mod request;
 pub mod response;

@@ -1,14 +1,25 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::{ApiResult, ValidationError},
-    types::{EmptyResponse, JsonApiResponse},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::errors::{
+    ApiResult,
+    ValidationError,
+};
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use crate::State;
 use api_wire_types::UpdateListRequest;
-
 use db::models::list::List;
 use newtypes::ListId;
-use paperclip::actix::{api_v2_operation, patch, web};
+use paperclip::actix::{
+    api_v2_operation,
+    patch,
+    web,
+};
 
 #[api_v2_operation(description = "Updates an existing list", tags(Lists, Organization, Private))]
 #[patch("/org/lists/{list_id}")]

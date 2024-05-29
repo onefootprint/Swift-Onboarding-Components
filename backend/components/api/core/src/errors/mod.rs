@@ -1,18 +1,32 @@
-use self::{challenge::ChallengeError, error_with_code::ErrorWithCode, handoff::HandoffError};
-use crate::{
-    decision::vendor::{middesk, VendorAPIError},
-    types::error::{ApiResponseError, FpResponseErrorInfo},
-    utils::body_bytes::InvalidBodyError,
+use self::challenge::ChallengeError;
+use self::error_with_code::ErrorWithCode;
+use self::handoff::HandoffError;
+use crate::decision::vendor::{
+    middesk,
+    VendorAPIError,
 };
-use actix_web::{
-    error::{JsonPayloadError, QueryPayloadError, UrlencodedError},
-    http::StatusCode,
+use crate::types::error::{
+    ApiResponseError,
+    FpResponseErrorInfo,
 };
-use aws_sdk_pinpointsmsvoicev2::{
-    error::SdkError as SmsSdkError, operation::send_text_message::SendTextMessageError,
+use crate::utils::body_bytes::InvalidBodyError;
+use actix_web::error::{
+    JsonPayloadError,
+    QueryPayloadError,
+    UrlencodedError,
 };
+use actix_web::http::StatusCode;
+use aws_sdk_pinpointsmsvoicev2::error::SdkError as SmsSdkError;
+use aws_sdk_pinpointsmsvoicev2::operation::send_text_message::SendTextMessageError;
 use db::errors::DbError;
-use newtypes::{output::Csv, ContactInfoKind, DataIdentifier, ErrorMessage, FilterFunction, Uuid};
+use newtypes::output::Csv;
+use newtypes::{
+    ContactInfoKind,
+    DataIdentifier,
+    ErrorMessage,
+    FilterFunction,
+    Uuid,
+};
 use paperclip::actix::api_v2_errors;
 use strum::EnumMessage;
 use thiserror::Error;
@@ -327,7 +341,9 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::EnclaveDataTransformError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::EnclaveError(enclave::EnclaveError::Enclave(
                 enclave_proxy::EnclaveError::EnclaveError(err),
-            )) if err.starts_with("TransformError") => StatusCode::BAD_REQUEST, // a little hacky, but for future need structured errors from enclave!
+            )) if err.starts_with("TransformError") => StatusCode::BAD_REQUEST, /* a little hacky, but for */
+            // future need structured
+            // errors from enclave!
             ApiErrorKind::EnclaveError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::Database(e) => status_code_for_db_error(e),
             ApiErrorKind::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,

@@ -1,5 +1,12 @@
-use crate::{Apiv2Schema, Serialize};
-use newtypes::{FootprintReasonCode, WatchlistCheckId, WatchlistCheckStatusKind};
+use crate::{
+    Apiv2Schema,
+    Serialize,
+};
+use newtypes::{
+    FootprintReasonCode,
+    WatchlistCheckId,
+    WatchlistCheckStatusKind,
+};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct WatchlistCheck {

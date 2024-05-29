@@ -4,8 +4,16 @@ pub mod tenant;
 pub mod user;
 
 use crypto::aead::ScopedSealingKey;
-use newtypes::{HasSessionKind, SealedSessionBytes, SessionAuthTokenKind, SessionKind};
-use serde::{Deserialize, Serialize};
+use newtypes::{
+    HasSessionKind,
+    SealedSessionBytes,
+    SessionAuthTokenKind,
+    SessionKind,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 impl AuthSessionData {
     pub(crate) fn seal(&self, key: &ScopedSealingKey) -> Result<SealedSessionBytes, crypto::Error> {

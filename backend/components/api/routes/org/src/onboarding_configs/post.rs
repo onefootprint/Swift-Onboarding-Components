@@ -1,22 +1,44 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::{tenant::TenantError, ApiError, ApiResult},
-    onboarding_configs::validation::ObConfigurationArgsToValidate,
-    types::response::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::errors::tenant::TenantError;
+use crate::errors::{
+    ApiError,
+    ApiResult,
+};
+use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::decision::rule_engine;
-use db::models::{
-    ob_configuration::{get_verification_checks_for_legacy_compat, NewObConfigurationArgs, ObConfiguration},
-    rule_set_version::RuleSetVersion,
+use db::models::ob_configuration::{
+    get_verification_checks_for_legacy_compat,
+    NewObConfigurationArgs,
+    ObConfiguration,
 };
+use db::models::rule_set_version::RuleSetVersion;
 use newtypes::{
-    AdverseMediaListKind, CipKind, CollectedDataOption as CDO, DocumentAndCountryConfiguration,
-    DocumentRequestConfig, EnhancedAml, EnhancedAmlOption, Iso3166TwoDigitCountryCode, ObConfigurationKind,
-    TenantId, VerificationCheck,
+    AdverseMediaListKind,
+    CipKind,
+    CollectedDataOption as CDO,
+    DocumentAndCountryConfiguration,
+    DocumentRequestConfig,
+    EnhancedAml,
+    EnhancedAmlOption,
+    Iso3166TwoDigitCountryCode,
+    ObConfigurationKind,
+    TenantId,
+    VerificationCheck,
 };
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+    Apiv2Schema,
+};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

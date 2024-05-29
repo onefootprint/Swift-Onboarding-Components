@@ -1,6 +1,5 @@
-use newtypes::PiiString;
-
 use super::error;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone)]
 pub struct StytchClient {

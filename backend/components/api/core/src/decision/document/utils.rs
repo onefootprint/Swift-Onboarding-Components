@@ -1,14 +1,12 @@
-use db::{
-    models::{
-        document::{Document, DocumentImageArgs},
-        document_upload::DocumentUpload,
-    },
-    TxnPgConn,
+use crate::errors::ApiResult;
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
 };
+use db::models::document_upload::DocumentUpload;
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::DocumentSide;
-
-use crate::errors::ApiResult;
 
 #[derive(derive_more::Deref)]
 pub struct MissingSides(pub Vec<DocumentSide>);

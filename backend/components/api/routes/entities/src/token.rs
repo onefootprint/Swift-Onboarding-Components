@@ -1,30 +1,49 @@
-use std::collections::HashMap;
-
-use crate::{
-    auth::tenant::CheckTenantGuard,
-    types::{response::ResponseData, JsonApiResponse},
-    State,
+use crate::auth::tenant::CheckTenantGuard;
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::tenant::{
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    auth::tenant::{TenantGuard, TenantSessionAuth},
-    config::LinkKind,
-    errors::{user::UserError, ApiResult},
-    utils::{
-        email::SendgridClient,
-        fp_id_path::FpIdPath,
-        token::{create_token, CreateTokenArgs, CreateTokenResult},
-        vault_wrapper::{Any, TenantVw, VaultWrapper},
-    },
+use api_core::config::LinkKind;
+use api_core::errors::user::UserError;
+use api_core::errors::ApiResult;
+use api_core::utils::email::SendgridClient;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::token::{
+    create_token,
+    CreateTokenArgs,
+    CreateTokenResult,
 };
-use api_wire_types::{CreateEntityTokenRequest, CreateEntityTokenResponse};
+use api_core::utils::vault_wrapper::{
+    Any,
+    TenantVw,
+    VaultWrapper,
+};
+use api_wire_types::{
+    CreateEntityTokenRequest,
+    CreateEntityTokenResponse,
+};
 use chrono::Duration;
-use db::models::{scoped_vault::ScopedVault, workflow_request::WorkflowRequest};
+use db::models::scoped_vault::ScopedVault;
+use db::models::workflow_request::WorkflowRequest;
 use itertools::Itertools;
+use newtypes::sms_message::SmsMessage;
 use newtypes::{
-    sms_message::SmsMessage, ContactInfoKind, DocumentRequestConfig, PhoneNumber, PiiString,
+    ContactInfoKind,
+    DocumentRequestConfig,
+    PhoneNumber,
+    PiiString,
     WorkflowRequestConfig,
 };
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
+use std::collections::HashMap;
 
 #[api_v2_operation(
     description = "Create an identified token for the provided fp_id and a link to the hosted flow that allows the user to complete the requested flow.",

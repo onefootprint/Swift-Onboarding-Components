@@ -1,6 +1,6 @@
-use newtypes::{vendor_credentials::SambaSafetyCredentials, PiiString};
-
 use self::license_validation::CreateLVOrderAddress;
+use newtypes::vendor_credentials::SambaSafetyCredentials;
+use newtypes::PiiString;
 
 pub mod license_validation;
 

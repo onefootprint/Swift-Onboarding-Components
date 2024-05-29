@@ -1,12 +1,22 @@
-use api_wire_types::{DocumentRequest, WorkflowStartedEventKind};
-use db::models::{
-    scoped_vault_label::ScopedVaultLabel,
-    user_timeline::{SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo},
+use crate::utils::db2api::DbToApi;
+use api_wire_types::{
+    DocumentRequest,
+    WorkflowStartedEventKind,
+};
+use db::models::scoped_vault_label::ScopedVaultLabel;
+use db::models::user_timeline::{
+    SaturatedDataCollectedEvent,
+    SaturatedTimelineEvent,
+    UserTimeline,
+    UserTimelineInfo,
 };
 use itertools::Itertools;
-use newtypes::{AuthMethodUpdatedInfo, ExternalIntegrationInfo, WorkflowConfig, WorkflowRequestConfig};
-
-use crate::utils::db2api::DbToApi;
+use newtypes::{
+    AuthMethodUpdatedInfo,
+    ExternalIntegrationInfo,
+    WorkflowConfig,
+    WorkflowRequestConfig,
+};
 
 impl DbToApi<UserTimelineInfo> for api_wire_types::UserTimeline {
     fn from_db(target: UserTimelineInfo) -> Self {
@@ -126,7 +136,8 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 };
                 Self::WorkflowStarted(api_wire_types::WorkflowStarted {
                     kind,
-                    // Even though document workflows don't really use them, they are associated with playbooks
+                    // Even though document workflows don't really use them, they are associated with
+                    // playbooks
                     playbook: api_wire_types::TimelinePlaybook::from_db(pb),
                 })
             }

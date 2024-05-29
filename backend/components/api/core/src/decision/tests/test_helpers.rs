@@ -1,32 +1,49 @@
-use db::{
-    models::{
-        contact_info::{ContactInfo, VerificationLevel},
-        document_request::DocumentRequest,
-        insight_event::CreateInsightEvent,
-        ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault,
-        tenant::Tenant,
-        vault::Vault,
-        workflow::{Workflow, WorkflowUpdate},
-    },
-    tests::fixtures::{self, ob_configuration::ObConfigurationOpts},
-    TxnPgConn,
+use crate::decision::rule_engine;
+use crate::errors::ApiResult;
+use crate::tests::fixtures::lib::random_phone_number;
+use crate::utils::onboarding::{
+    NewBusinessVaultArgs,
+    NewOnboardingArgs,
 };
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+};
+use crate::utils::{
+    self,
+};
+use crate::State;
+use db::models::contact_info::{
+    ContactInfo,
+    VerificationLevel,
+};
+use db::models::document_request::DocumentRequest;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
+use db::models::vault::Vault;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::fixtures::{
+    self,
+};
+use db::TxnPgConn;
 use newtypes::{
-    BusinessDataKind, DataIdentifier, DocumentRequestKind, IdentityDataKind, PiiString, ScopedVaultId,
-    VaultKind, VerificationCheck, VerificationCheckKind, WorkflowFixtureResult, WorkflowSource,
-};
-
-use crate::{
-    decision::rule_engine,
-    errors::ApiResult,
-    tests::fixtures::lib::random_phone_number,
-    utils::{
-        self,
-        onboarding::{NewBusinessVaultArgs, NewOnboardingArgs},
-        vault_wrapper::{Any, VaultWrapper},
-    },
-    State,
+    BusinessDataKind,
+    DataIdentifier,
+    DocumentRequestKind,
+    IdentityDataKind,
+    PiiString,
+    ScopedVaultId,
+    VaultKind,
+    VerificationCheck,
+    VerificationCheckKind,
+    WorkflowFixtureResult,
+    WorkflowSource,
 };
 
 pub async fn create_user_and_onboarding(
@@ -64,7 +81,8 @@ pub async fn create_user_and_onboarding(
             };
             let obc = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
             let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
-            // TODO: need to rework our test utils so they use the same codepaths as our application logic to create things like OBC's and such
+            // TODO: need to rework our test utils so they use the same codepaths as our application logic to
+            // create things like OBC's and such
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, None).unwrap();
 
             let (uv, su) = create_user_and_populate_vault(conn, obc.clone(), kyc_fixture_result);

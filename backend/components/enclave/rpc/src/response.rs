@@ -1,8 +1,12 @@
+use crypto::seal::{
+    SealedChaCha20Poly1305DataKey,
+    SealedEciesP256KeyPair,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::fmt::Debug;
-
-use crypto::seal::{SealedChaCha20Poly1305DataKey, SealedEciesP256KeyPair};
-use serde::{Deserialize, Serialize};
-
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

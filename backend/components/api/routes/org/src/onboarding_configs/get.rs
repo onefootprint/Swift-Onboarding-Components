@@ -1,23 +1,34 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::response::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    errors::ApiResult,
-    types::{JsonApiResponse, OffsetPaginatedResponse, OffsetPaginationRequest},
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    JsonApiResponse,
+    OffsetPaginatedResponse,
+    OffsetPaginationRequest,
 };
 use api_wire_types::OnboardingConfigFilters;
+use db::models::ob_configuration::{
+    ObConfiguration,
+    ObConfigurationQuery,
+};
+use db::models::rule_set_version::RuleSetVersion;
 use db::{
-    models::{
-        ob_configuration::{ObConfiguration, ObConfigurationQuery},
-        rule_set_version::RuleSetVersion,
-    },
-    DbError, OffsetPagination,
+    DbError,
+    OffsetPagination,
 };
 use newtypes::ObConfigurationId;
-use paperclip::actix::{api_v2_operation, get, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 #[api_v2_operation(
     tags(Playbooks, Organization, Private),

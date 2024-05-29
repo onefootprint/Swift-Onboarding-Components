@@ -1,4 +1,7 @@
-use chrono::{DateTime, Utc};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Schema;
 

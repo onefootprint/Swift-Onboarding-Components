@@ -1,5 +1,12 @@
 use crate::*;
-use newtypes::{AppClipExperienceId, PiiString, PreviewApi, StripeCustomerId, TenantId, WorkosAuthMethod};
+use newtypes::{
+    AppClipExperienceId,
+    PiiString,
+    PreviewApi,
+    StripeCustomerId,
+    TenantId,
+    WorkosAuthMethod,
+};
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivateTenantFilters {

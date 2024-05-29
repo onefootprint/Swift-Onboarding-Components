@@ -1,9 +1,19 @@
-use newtypes::{PiiJsonValue, ScrubbedPiiJsonValue};
-use serde::{Deserialize, Serialize};
-use serde_with::DeserializeFromStr;
-use strum::{Display, EnumIter, EnumString, IntoEnumIterator};
-
 use super::error;
+use newtypes::{
+    PiiJsonValue,
+    ScrubbedPiiJsonValue,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use serde_with::DeserializeFromStr;
+use strum::{
+    Display,
+    EnumIter,
+    EnumString,
+    IntoEnumIterator,
+};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -65,7 +75,8 @@ pub struct NeuroProfile {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct NeuroSignal {
-    /// The classification label for the signal. E.g., for the Intent signal, the possible labels are genuine, neutral, risky, and insufficient data. For others, it's "true"
+    /// The classification label for the signal. E.g., for the Intent signal, the possible labels
+    /// are genuine, neutral, risky, and insufficient data. For others, it's "true"
     pub label: String,
     /// The name of the signal.
     model: String,
@@ -73,8 +84,8 @@ pub struct NeuroSignal {
     pub version: Option<String>,
     // The lower-level data elements used to arrive at the classification for a signal.
     // Only available for customers who have purchased ID Attributes.
-    // A block of associated attributes are added to each element in the signals array under the heading attributes.
-    // The keys of this map are strings, while the values could be different data types.
+    // A block of associated attributes are added to each element in the signals array under the heading
+    // attributes. The keys of this map are strings, while the values could be different data types.
     pub attributes: Option<serde_json::Value>,
     pub reason_codes: Option<serde_json::Value>,
 }
@@ -122,24 +133,30 @@ impl NeuroSignal {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")] // argh neuro
 pub struct InteractionAttributes {
-    // The number of distinct client_ids associated with a user_id; represents the number of different browsers/devices a user_id uses to interact with the application.
+    // The number of distinct client_ids associated with a user_id; represents the number of different
+    // browsers/devices a user_id uses to interact with the application.
     pub client_id_count: Option<i32>,
-    // The number of sessions a user_id is associated with; the session is defined as a set of interaction data bounded by 30 minutes of idle time; represents the number of interactions it takes a user_id to “complete” the application.
+    // The number of sessions a user_id is associated with; the session is defined as a set of interaction
+    // data bounded by 30 minutes of idle time; represents the number of interactions it takes a user_id to
+    // “complete” the application.
     pub session_id_count: Option<i32>,
     // The number of user identifiers set to the specific session.
     pub user_id_count: Option<i32>,
     // this has camelCase fields inside FYI
     pub ip_geolocation: Option<serde_json::Value>,
     // As of 2024-04-11 we haven't gotten the below ones yet
-    // Elapsed time from calling start() to the timestamp from the most recently processed event in milliseconds.
+    // Elapsed time from calling start() to the timestamp from the most recently processed event in
+    // milliseconds.
     pub elapsed_time_ms: Option<serde_json::Value>,
     // Total time spent interacting with the form fields in the application in milliseconds.
     pub interaction_time_ms: Option<serde_json::Value>,
     // The number of unique targets the user has interacted with up to this point in the application.
     pub unique_all_targets_count: Option<serde_json::Value>,
-    // The number of unique high-familiarity targets the user has interacted with up to this point in the application.
+    // The number of unique high-familiarity targets the user has interacted with up to this point in the
+    // application.
     pub unique_known_targets_count: Option<serde_json::Value>,
-    // The number of unique low-familiarity targets the user has interacted with up to this point in the application.
+    // The number of unique low-familiarity targets the user has interacted with up to this point in the
+    // application.
     pub unique_unknown_targets_count: Option<serde_json::Value>,
     pub fields_interacted_count: Option<serde_json::Value>,
 }
@@ -194,9 +211,11 @@ fn from_analytics_response_to_error(value: NeuroIdAnalyticsResponse) -> NeuroIdA
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum Status {
     Success,
-    // Data has been received for this profile though the signals have insufficient data to calculate a result
+    // Data has been received for this profile though the signals have insufficient data to calculate a
+    // result
     NotEnoughInteractionData,
-    // Data has been received for this profile though the site still needs to be configured to calculate an accurate result.
+    // Data has been received for this profile though the site still needs to be configured to calculate an
+    // accurate result.
     SiteNotConfigured,
     // Api key not correct
     UnauthorizedAccess,
@@ -212,7 +231,8 @@ pub enum Model {
     // Behavior:
     //   reference: https://neuro-id.readme.io/reference/behavior-analytics-1
     //
-    // provide information on how familiar a user is with the Personal Information data that they enter into your mobile/web application.
+    // provide information on how familiar a user is with the Personal Information data that they enter into
+    // your mobile/web application.
     Familiarity,
     // flags that this session has behavior associated to fraud ring activities
     FraudRingIndicator,
@@ -227,7 +247,8 @@ pub enum Model {
     //
     // signal identifies if an iOS device has been reset to the default factory settings
     FactoryReset,
-    // identifies if the location of a mobile device has been spoofed. Location spoofing is a common practice among fraudsters to fool fraud detection systems.
+    // identifies if the location of a mobile device has been spoofed. Location spoofing is a common
+    // practice among fraudsters to fool fraud detection systems.
     GpsSpoofing,
     // identifies if the public IP of the user is associated with a TOR (The Onion Router) exit node
     TorExitNode,
@@ -235,21 +256,25 @@ pub enum Model {
     PublicProxy,
     // signal identifies if the public IP of the user is associated with a VPN
     Vpn,
-    // identifies if the public IP of the user is associated with a blocklist you have provided or one of the available NeuroID blocklists
+    // identifies if the public IP of the user is associated with a blocklist you have provided or one of
+    // the available NeuroID blocklists
     IpBlocklist,
-    // identifies if the public IP of the user is associated with known IP address of various cloud providers (azure, aws, digital ocean etc)
+    // identifies if the public IP of the user is associated with known IP address of various cloud
+    // providers (azure, aws, digital ocean etc)
     IpAddressAssociation,
     // identifies if the web browser accessing your web application is being run in incognito mode.
     Incognito,
     // identifies if a device has properties that are typically associated with automation tools.
     BotFramework,
-    // identifies if a device has properties that suggest the device has been modified in a way that indicates the device is being used for fraudulent or bot activity
+    // identifies if a device has properties that suggest the device has been modified in a way that
+    // indicates the device is being used for fraudulent or bot activity
     SuspiciousDevice,
     // identifies the number of sessions associated with a device
     DeviceVelocity,
     // identifies the number of sessions associated with a device
     MultipleIdsPerDevice,
-    // identifies if the device is associated with a blocklist you have provided or one of the available NeuroID blocklists
+    // identifies if the device is associated with a blocklist you have provided or one of the available
+    // NeuroID blocklists
     DeviceReputation,
     Other,
 }
@@ -307,7 +332,8 @@ impl NeuroApiResponse {
                         serde_json::from_value(j.clone());
                     match deserialized {
                         Ok(d) => match d.status() {
-                            // if we are http 200, we shouldn't see anything other than success, but enums /shrug
+                            // if we are http 200, we shouldn't see anything other than success, but enums
+                            // /shrug
                             Status::Success => Self {
                                 result: NeuroAPIResult::Success(d),
                                 raw_response: j.into(),
@@ -643,7 +669,8 @@ impl NeuroAttributesBuilder {
                 Model::MultipleIdsPerDevice => self.model_multiple_ids_per_device_result = result,
                 Model::DeviceReputation => self.model_device_reputation_result = result,
                 Model::Other => (),
-                // TODO: these models use non-boolean fields to indicate flags, so we need to handle those when we go to use them
+                // TODO: these models use non-boolean fields to indicate flags, so we need to handle those
+                // when we go to use them
                 Model::CombinedDigitalIntent => (),
                 Model::Familiarity => (),
             }
@@ -704,9 +731,11 @@ impl NeuroIdAttributes {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_fixtures::{self, NeuroTestOpts};
-
     use super::*;
+    use crate::test_fixtures::{
+        self,
+        NeuroTestOpts,
+    };
 
     fn get_signal_for_model(res: &NeuroIdAnalyticsResponse, model: Model) -> Option<NeuroSignal> {
         res.signals().iter().find(|s| s.model() == model).cloned()
@@ -718,7 +747,8 @@ mod tests {
         let raw = test_fixtures::neuro_id_success_response(NeuroTestOpts::default());
         let parsed: NeuroIdAnalyticsResponse = serde_json::from_value(raw).unwrap();
 
-        // these are the signals neuro recommends using for their decision logic, so just checking we can deser
+        // these are the signals neuro recommends using for their decision logic, so just checking we can
+        // deser
         vec![
             FraudRingIndicator,
             AutomatedActivity,

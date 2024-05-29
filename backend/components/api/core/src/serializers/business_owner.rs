@@ -1,7 +1,9 @@
-use db::models::business_owner::{BusinessOwner, UserData};
-use newtypes::BusinessOwnerKind;
-
 use crate::utils::db2api::DbToApi;
+use db::models::business_owner::{
+    BusinessOwner,
+    UserData,
+};
+use newtypes::BusinessOwnerKind;
 
 pub type BusinessOwnerInfo = (Option<u32>, Option<BusinessOwner>, Option<UserData>);
 

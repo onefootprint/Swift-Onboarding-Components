@@ -1,33 +1,55 @@
-use std::collections::HashMap;
-
+use super::annotation::AnnotationInfo;
+use super::auth_event::AuthEvent;
+use super::data_lifetime::DataLifetime;
+use super::document::Document;
+use super::document_request::DocumentRequest;
+use super::insight_event::InsightEvent;
+use super::ob_configuration::ObConfiguration;
+use super::onboarding_decision::{
+    OnboardingDecision,
+    SaturatedOnboardingDecisionInfo,
+};
+use super::scoped_vault::ScopedVaultIdentifier;
+use super::scoped_vault_label::ScopedVaultLabel;
+use super::watchlist_check::WatchlistCheck;
+use super::workflow::Workflow;
+use super::workflow_request::WorkflowRequest;
+use crate::actor::{
+    saturate_actors,
+    SaturatedActor,
+};
+use crate::models::annotation::Annotation;
+use crate::models::liveness_event::LivenessEvent;
+use crate::models::scoped_vault::ScopedVault;
 use crate::{
-    actor::{saturate_actors, SaturatedActor},
-    models::{annotation::Annotation, liveness_event::LivenessEvent, scoped_vault::ScopedVault},
-    DbError, DbResult, PgConn, TxnPgConn,
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
 };
-use chrono::{DateTime, Utc};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::user_timeline;
-use diesel::{prelude::*, Insertable, Queryable};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use newtypes::{
-    AuthMethodUpdatedInfo, CollectedDataOption, DataIdentifier, DataLifetimeSeqno, DbUserTimelineEvent,
-    DbUserTimelineEventKind, ExternalIntegrationInfo, ScopedVaultId, UserTimelineId, VaultId,
+    AuthMethodUpdatedInfo,
+    CollectedDataOption,
+    DataIdentifier,
+    DataLifetimeSeqno,
+    DbUserTimelineEvent,
+    DbUserTimelineEventKind,
+    ExternalIntegrationInfo,
+    ScopedVaultId,
+    UserTimelineId,
+    VaultId,
 };
-
-use super::{
-    annotation::AnnotationInfo,
-    auth_event::AuthEvent,
-    data_lifetime::DataLifetime,
-    document::Document,
-    document_request::DocumentRequest,
-    insight_event::InsightEvent,
-    ob_configuration::ObConfiguration,
-    onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo},
-    scoped_vault::ScopedVaultIdentifier,
-    scoped_vault_label::ScopedVaultLabel,
-    watchlist_check::WatchlistCheck,
-    workflow::Workflow,
-    workflow_request::WorkflowRequest,
-};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = user_timeline)]
@@ -66,7 +88,8 @@ pub struct SaturatedDataCollectedEvent {
 }
 
 #[allow(clippy::large_enum_variant)]
-/// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than identifiers
+/// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than
+/// identifiers
 pub enum SaturatedTimelineEvent {
     DataCollected(SaturatedDataCollectedEvent),
     OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
@@ -358,18 +381,30 @@ impl UserTimeline {
 
 #[cfg(test)]
 mod tests {
-    use newtypes::DbActor;
-
     use super::*;
-    use crate::{actor::SaturatedActor, tests::prelude::*};
+    use crate::actor::SaturatedActor;
+    use crate::tests::prelude::*;
     // TODO modernize utils
     use crate::{
-        models::tenant_role::{ImmutableRoleKind, TenantRole},
-        test::{test_annotation, test_tenant_api_key, test_tenant_user},
-        tests::{fixtures, prelude::TestPgConn},
+        models::tenant_role::{
+            ImmutableRoleKind,
+            TenantRole,
+        },
+        test::{
+            test_annotation,
+            test_tenant_api_key,
+            test_tenant_user,
+        },
+        tests::{
+            fixtures,
+            prelude::TestPgConn,
+        },
     };
     use macros::db_test;
-    use newtypes::TenantRoleKind;
+    use newtypes::{
+        DbActor,
+        TenantRoleKind,
+    };
 
     #[db_test]
     fn test_list(conn: &mut TestPgConn) {

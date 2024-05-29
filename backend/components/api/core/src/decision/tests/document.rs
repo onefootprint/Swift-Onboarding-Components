@@ -1,27 +1,41 @@
-use super::{
-    document_test_utils::{mock_ff_client, mock_s3_put_object, UserKind},
-    test_helpers::FixtureData,
+use super::document_test_utils::{
+    mock_ff_client,
+    mock_s3_put_object,
+    UserKind,
 };
+use super::test_helpers::FixtureData;
+use crate::decision::document::meta_headers::MetaHeaders;
+use crate::decision::{
+    self,
+};
+use crate::errors::onboarding::OnboardingError;
+use crate::utils::file_upload::FileUpload;
 use crate::{
-    decision::{self, document::meta_headers::MetaHeaders},
-    errors::onboarding::OnboardingError,
-    utils::file_upload::FileUpload,
-    ApiErrorKind, State,
+    ApiErrorKind,
+    State,
 };
 use api_wire_types::CreateDocumentRequest;
 use chrono::Utc;
-use db::{
-    models::{
-        insight_event::{CreateInsightEvent, InsightEvent},
-        user_consent::UserConsent,
-    },
-    tests::fixtures::ob_configuration::ObConfigurationOpts,
-    DbResult,
+use db::models::insight_event::{
+    CreateInsightEvent,
+    InsightEvent,
 };
+use db::models::user_consent::UserConsent;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::DbResult;
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentFixtureResult,
-    DocumentSide, IdDocKind, Iso3166TwoDigitCountryCode, PiiBytes, Selfie, WorkflowFixtureResult,
+    CollectedDataOption,
+    CountryRestriction,
+    DocTypeRestriction,
+    DocumentCdoInfo,
+    DocumentFixtureResult,
+    DocumentSide,
+    IdDocKind,
+    Iso3166TwoDigitCountryCode,
+    PiiBytes,
+    Selfie,
+    WorkflowFixtureResult,
 };
 
 /// Test we require consent, or we'll error uploading a side

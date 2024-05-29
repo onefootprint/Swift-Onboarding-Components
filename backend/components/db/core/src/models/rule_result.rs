@@ -1,14 +1,33 @@
-use crate::{DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{rule_instance, rule_result};
-use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{RuleInstanceId, RuleResultId, RuleSetResultId};
-
 use super::rule_instance::RuleInstance;
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    rule_instance,
+    rule_result,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    RuleInstanceId,
+    RuleResultId,
+    RuleSetResultId,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_result)]
-// Result of evaluating a single user-facing Rule as part of some evaluation of all Rule's. For a single RuleSetResult row, there are multiple RuleResult rows. And a given Rule will only have one corresponding RuleResult per RuleSetResult
+// Result of evaluating a single user-facing Rule as part of some evaluation of all Rule's. For a
+// single RuleSetResult row, there are multiple RuleResult rows. And a given Rule will only have one
+// corresponding RuleResult per RuleSetResult
 pub struct RuleResult {
     pub id: RuleResultId,
     pub created_at: DateTime<Utc>,

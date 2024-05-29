@@ -1,20 +1,35 @@
-use std::collections::HashMap;
-
-use db_schema::schema;
-
-use crate::{DbError, DbResult};
-use db_schema::schema::{liveness_event, scoped_vault};
-
-use chrono::{DateTime, Utc};
-
-use crate::PgConn;
-use diesel::{prelude::*, Insertable, Queryable};
-
-use newtypes::{FpId, InsightEventId, LivenessAttributes, SkipLivenessContext};
-
-use newtypes::{LivenessEventId, LivenessSource, ScopedVaultId, TenantId, VaultId};
-
 use super::insight_event::InsightEvent;
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema;
+use db_schema::schema::{
+    liveness_event,
+    scoped_vault,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    FpId,
+    InsightEventId,
+    LivenessAttributes,
+    LivenessEventId,
+    LivenessSource,
+    ScopedVaultId,
+    SkipLivenessContext,
+    TenantId,
+    VaultId,
+};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = liveness_event)]

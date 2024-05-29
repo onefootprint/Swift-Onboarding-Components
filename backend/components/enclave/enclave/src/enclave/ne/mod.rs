@@ -4,9 +4,11 @@
 mod client;
 mod ffi;
 
+pub use self::client::{
+    decrypt as kms_decrypt,
+    Client,
+};
 use thiserror::Error;
-
-pub use self::client::{decrypt as kms_decrypt, Client};
 
 #[derive(Debug, Error)]
 pub enum Error {

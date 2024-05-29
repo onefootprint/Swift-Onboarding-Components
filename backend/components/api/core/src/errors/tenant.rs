@@ -1,4 +1,11 @@
-use newtypes::{output::Csv, CipKind, CollectedDataOption, DataIdentifier, FpId, ObConfigurationKind};
+use newtypes::output::Csv;
+use newtypes::{
+    CipKind,
+    CollectedDataOption,
+    DataIdentifier,
+    FpId,
+    ObConfigurationKind,
+};
 use thiserror::Error;
 
 #[derive(Debug, Error)]

@@ -1,19 +1,33 @@
 use crate::ProtectedAuth;
-use actix_web::{post, web, web::Json};
-use api_core::{
-    errors::{ApiResult, AssertionError},
-    types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::{VaultWrapper, VwArgs},
-    State,
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
 };
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
+};
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::vault_wrapper::{
+    VaultWrapper,
+    VwArgs,
+};
+use api_core::State;
 use api_wire_types::DocumentResponse;
-use db::models::{
-    decision_intent::DecisionIntent, document::Document,
-    incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
-    scoped_vault::ScopedVault,
-};
+use db::models::decision_intent::DecisionIntent;
+use db::models::document::Document;
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
 use newtypes::{
-    DecisionIntentKind, IncodeEnvironment, IncodeVerificationSessionId, IncodeVerificationSessionKind,
+    DecisionIntentKind,
+    IncodeEnvironment,
+    IncodeVerificationSessionId,
+    IncodeVerificationSessionKind,
 };
 
 #[derive(Debug, serde::Deserialize)]
@@ -58,7 +72,8 @@ pub async fn rerun_machine(
             let su = ScopedVault::get(conn, &dr.workflow_id)?;
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&su.id))?;
             let (obc, _) = ObConfiguration::get(conn, &dr.workflow_id)?;
-            // TODO mark the latest DocumentUpload as not deactivated. Right now this needs to be done manually
+            // TODO mark the latest DocumentUpload as not deactivated. Right now this needs to be done
+            // manually
             let di =
                 DecisionIntent::create(conn, DecisionIntentKind::DocScan, &su.id, Some(&dr.workflow_id))?;
             // Deactivate the old IVS

@@ -1,12 +1,18 @@
-use crate::{
-    auth::user::{UserAuth, UserAuthContext, UserAuthScope},
-    types::response::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::user::{
+    UserAuth,
+    UserAuthContext,
+    UserAuthScope,
 };
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::types::JsonApiResponse;
 use db::models::scoped_vault::ScopedVault;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 type AuthorizedOrgsResponse = Vec<api_wire_types::AuthorizedOrg>;
 

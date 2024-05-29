@@ -1,10 +1,18 @@
-use std::collections::HashMap;
-
-use crate::{IdDocKind, Iso3166TwoDigitCountryCode};
-use diesel::{AsExpression, FromSqlRow};
+use crate::{
+    IdDocKind,
+    Iso3166TwoDigitCountryCode,
+};
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
 // We currently use a similar looking map to drive bifrost requirements, so introduce a newtype here

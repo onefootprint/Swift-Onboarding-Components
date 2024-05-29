@@ -1,34 +1,56 @@
-use newtypes::{AuthMethodKind, ContactInfoKind, ObConfigurationKey, PiiString, SessionAuthToken};
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum_macros::{Display, EnumString};
-
 use crate::*;
+use newtypes::{
+    AuthMethodKind,
+    ContactInfoKind,
+    ObConfigurationKey,
+    PiiString,
+    SessionAuthToken,
+};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum_macros::{
+    Display,
+    EnumString,
+};
 
 #[derive(Default, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateTokenRequest {
     /// The kind of token to create.
-    /// - `onboard` creates a token that onboards the user onto a specific playbook, specified by the `key`.
-    /// - `reonboard` creates a token that reonboards the user onto the last playbook that they onboarded onto.
-    /// - `inherit` creates a token that inherits any operation previously requested via the dashboard.
-    /// - `user` simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.
-    /// - `update_auth_methods` creates a token that allows the user to update their contact info using the Footprint Auth SDK.
+    /// - `onboard` creates a token that onboards the user onto a specific playbook, specified by
+    ///   the `key`.
+    /// - `reonboard` creates a token that reonboards the user onto the last playbook that they
+    ///   onboarded onto.
+    /// - `inherit` creates a token that inherits any operation previously requested via the
+    ///   dashboard.
+    /// - `user` simply create a token for the user. A playbook key may be provided directly to the
+    ///   Footprint Verify SDK to trigger onboarding.
+    /// - `update_auth_methods` creates a token that allows the user to update their contact info
+    ///   using the Footprint Auth SDK.
     /// You can find more information on the options [here](https://docs.onefootprint.com/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).
     #[openapi(required)]
     // TODO make this non-optional once apiture has upgraded
     pub kind: Option<TokenOperationKind>,
 
     /// Can only be provided when the kind is `onboard`.
-    /// Optionally, the publishable key of the playbook onto which you would like this user to onboard. The user will be asked to provide any missing information required by playbook. If you provide the key here, you can omit providing it in the frontend Footprint.js SDK integration.
+    /// Optionally, the publishable key of the playbook onto which you would like this user to
+    /// onboard. The user will be asked to provide any missing information required by playbook. If
+    /// you provide the key here, you can omit providing it in the frontend Footprint.js SDK
+    /// integration.
     pub key: Option<ObConfigurationKey>,
 
-    /// Can only be provided when the kind is `update_auth_methods`. The set of auth methods that you would like to be allowed to be updated. When not provided, the token allows updating any auth method.
+    /// Can only be provided when the kind is `update_auth_methods`. The set of auth methods that
+    /// you would like to be allowed to be updated. When not provided, the token allows updating any
+    /// auth method.
     pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
 
     #[openapi(skip)]
     pub third_party_auth: Option<bool>,
 
-    /// Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be at least 1 minute, at most 1 day
+    /// Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be
+    /// at least 1 minute, at most 1 day
     #[openapi(example = "60")]
     pub ttl_min: Option<u32>,
 }
@@ -39,13 +61,15 @@ pub struct CreateTokenRequest {
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum TokenOperationKind {
-    /// Onboard onto a specific playbook, specified either through the key in this API or in the Verify SDK
+    /// Onboard onto a specific playbook, specified either through the key in this API or in the
+    /// Verify SDK
     Onboard,
     /// Reonboard onto the last playbook that the user onboarded onto
     Reonboard,
     /// Inherit any operation previously requested via the dashboard
     Inherit,
-    /// Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.
+    /// Simply create a token for the user. A playbook key may be provided directly to the Footprint
+    /// Verify SDK to trigger onboarding.
     User,
     /// Generate a token and link that allows the user to update their contact info
     UpdateAuthMethods,
@@ -81,9 +105,12 @@ pub struct CreateEntityTokenRequest {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateTokenResponse {
-    /// A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow. This is useful when you'd like to open a native interface inside your app for the user to complete the flow.
+    /// A short-lived token that can be passed into the Verify SDK to allow the user to complete the
+    /// flow. This is useful when you'd like to open a native interface inside your app for the user
+    /// to complete the flow.
     pub token: SessionAuthToken,
-    /// A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow. This is useful to send in an automated message to the end user.
+    /// A Footprint link embedding the `token` that can be sent to this user to allow them to
+    /// complete the flow. This is useful to send in an automated message to the end user.
     #[openapi(example = "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt")]
     pub link: PiiString,
     /// The time at which the token (and link) expire

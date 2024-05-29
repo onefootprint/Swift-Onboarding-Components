@@ -1,24 +1,35 @@
-use crate::utils::vault_wrapper::{Any, VaultWrapper};
-use db::{
-    models::{
-        ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault,
-        tenant::Tenant,
-        vault::Vault,
-        workflow::{Workflow, WorkflowUpdate},
-    },
-    tests::{fixtures, fixtures::ob_configuration::ObConfigurationOpts},
-    TxnPgConn,
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
 };
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
+use db::models::vault::Vault;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
+use db::tests::fixtures;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, IdentityDataKind as IDK, KycState, Locked, OnboardingStatus, PiiString, TenantId,
-    VaultKind, WorkflowState,
+    DataIdentifier,
+    IdentityDataKind as IDK,
+    KycState,
+    Locked,
+    OnboardingStatus,
+    PiiString,
+    TenantId,
+    VaultKind,
+    WorkflowState,
 };
 use rand::Rng;
 
-// Start of fixtures utils for setting up common sets of data (eg: make a user + onboarding + fill vault)
-// TODO: get DE and other tests to use these and continue to improve the APIs and make them more extensible
+// Start of fixtures utils for setting up common sets of data (eg: make a user + onboarding + fill
+// vault) TODO: get DE and other tests to use these and continue to improve the APIs and make them
+// more extensible
 
 pub fn random_phone_number() -> String {
     let mut rng = rand::thread_rng();

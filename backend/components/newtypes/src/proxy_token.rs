@@ -1,8 +1,10 @@
-use std::str::FromStr;
-
+use crate::{
+    DataIdentifier,
+    FilterFunction,
+    FpId,
+};
 use itertools::Itertools;
-
-use crate::{DataIdentifier, FilterFunction, FpId};
+use std::str::FromStr;
 
 /// A proxy token with zero or more applied filter functions:
 /// `<token> | filter1 | filter2 | ...`
@@ -26,7 +28,6 @@ use crate::{DataIdentifier, FilterFunction, FpId};
 ///
 ///
 /// Future work: support filters / transformations, i.e: :: <fp_id>.id.last_name | uppercase ::
-///
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ProxyToken {
     pub fp_id: FpId,
@@ -135,8 +136,14 @@ pub enum ProxyTokenError {
 
 #[cfg(test)]
 mod tests {
-    use super::{FilterFunction::*, *};
-    use crate::{CountArgs, DataIdentifier, FpId, IdentityDataKind as IDK};
+    use super::FilterFunction::*;
+    use super::*;
+    use crate::{
+        CountArgs,
+        DataIdentifier,
+        FpId,
+        IdentityDataKind as IDK,
+    };
     use test_case::test_case;
 
     fn tok<D: Into<DataIdentifier>>(

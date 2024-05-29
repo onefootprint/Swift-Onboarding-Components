@@ -1,5 +1,11 @@
-use newtypes::{PiiString, SambaReportId};
-use serde::{Deserialize, Serialize};
+use newtypes::{
+    PiiString,
+    SambaReportId,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -102,7 +108,8 @@ pub enum SambaBoolean {
 #[serde(rename_all = "PascalCase")]
 pub struct LicenseValidation {
     // Overall composite status of the validation
-    // Based on the constituent bools here + the configuration in the samba dashboard for which fields to include in the calculation
+    // Based on the constituent bools here + the configuration in the samba dashboard for which fields to
+    // include in the calculation
     pub document_validation_result: String,
     pub driver_license_number_match: Option<SambaBoolean>,
     pub birth_date_match: Option<SambaBoolean>,

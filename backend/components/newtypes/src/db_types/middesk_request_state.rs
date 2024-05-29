@@ -1,7 +1,13 @@
 use derive_more::Display;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-
-use strum_macros::{AsRefStr, EnumString};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
+use strum_macros::{
+    AsRefStr,
+    EnumString,
+};
 
 #[derive(
     Debug,

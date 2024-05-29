@@ -1,6 +1,12 @@
-use crate::{run_migrations, DbPool, PgConn, TxnPgConn};
+use crate::{
+    run_migrations,
+    DbPool,
+    PgConn,
+    TxnPgConn,
+};
 use diesel::Connection;
-use std::{sync::Once, time::Duration};
+use std::sync::Once;
+use std::time::Duration;
 
 /// Common DB test helpers for this crate and others
 static INIT: Once = Once::new();

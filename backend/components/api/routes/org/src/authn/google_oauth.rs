@@ -1,6 +1,12 @@
-use api_core::{errors::ApiError, State};
+use api_core::errors::ApiError;
+use api_core::State;
 use api_wire_types::GoogleOauthRedirectUrl;
-use paperclip::actix::{api_v2_operation, get, web, web::HttpResponse};
+use paperclip::actix::web::HttpResponse;
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 #[api_v2_operation(
     description = "Request to authenticate via Google OAuth.",

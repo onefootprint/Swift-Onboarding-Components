@@ -1,6 +1,13 @@
 use crate::auth::tenant::ClientTenantScope;
 use db::models::tenant_rolebinding::TenantRbLoginResult;
-use newtypes::{FpId, TenantApiKeyId, TenantId, TenantRolebindingId, TenantUserId, WorkosAuthMethod};
+use newtypes::{
+    FpId,
+    TenantApiKeyId,
+    TenantId,
+    TenantRolebindingId,
+    TenantUserId,
+    WorkosAuthMethod,
+};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// Basic auth used for dashboard sessions - this represents an authenticated TenantUser at a
@@ -48,9 +55,9 @@ pub struct WorkOsSession {
     pub auth_method: WorkosAuthMethod,
 }
 
-/// Short-lived token that temporarily gives a tenant's access to perform operations on a single user.
-/// For now, they are only allowed to be generated with a tenant API key that has admin permissions.
-/// Otherwise, we have to deal with the complexity of permissions
+/// Short-lived token that temporarily gives a tenant's access to perform operations on a single
+/// user. For now, they are only allowed to be generated with a tenant API key that has admin
+/// permissions. Otherwise, we have to deal with the complexity of permissions
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ClientTenantAuth {
     /// The scoped_vault_id belonging to this tenant

@@ -1,4 +1,7 @@
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -34,7 +37,8 @@ pub enum AppRecognitionVerdict {
     PlayRecognized,
     /// The certificate or package name does not match Google Play records
     UnrecognizedVersion,
-    /// Application integrity was not evaluated. A necessary requirement was missed, such as the device not being trustworthy enough
+    /// Application integrity was not evaluated. A necessary requirement was missed, such as the
+    /// device not being trustworthy enough
     Unevaluated,
     #[serde(other)]
     Unknown,
@@ -51,11 +55,17 @@ pub struct DeviceIntegrity {
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 
 pub enum DeviceRecognitionVerdict {
-    /// The app is running on an Android device powered by Google Play services. The device passes system integrity checks and meets Android compatibility requirements.
+    /// The app is running on an Android device powered by Google Play services. The device passes
+    /// system integrity checks and meets Android compatibility requirements.
     MeetsDeviceIntegrity,
-    /// The app is running on a device that passes basic system integrity checks. The device may not meet Android compatibility requirements and may not be approved to run Google Play services. For example, the device may be running an unrecognized version of Android, may have an unlocked bootloader, or may not have been certified by the manufacturer.
+    /// The app is running on a device that passes basic system integrity checks. The device may not
+    /// meet Android compatibility requirements and may not be approved to run Google Play services.
+    /// For example, the device may be running an unrecognized version of Android, may have an
+    /// unlocked bootloader, or may not have been certified by the manufacturer.
     MeetsBasicIntegrity,
-    /// The app is running on an Android device powered by Google Play services and has a strong guarantee of system integrity such as a hardware-backed proof of boot integrity. The device passes system integrity checks and meets Android compatibility requirements.
+    /// The app is running on an Android device powered by Google Play services and has a strong
+    /// guarantee of system integrity such as a hardware-backed proof of boot integrity. The device
+    /// passes system integrity checks and meets Android compatibility requirements.
     MeetsStrongIntegrity,
     #[serde(other)]
     Unknown,
@@ -71,9 +81,11 @@ pub struct AccountDetails {
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 
 pub enum AppLicensingVerdict {
-    /// The user has an app entitlement. In other words, the user installed or bought your app on Google Play
+    /// The user has an app entitlement. In other words, the user installed or bought your app on
+    /// Google Play
     Licensed,
-    /// The user doesn't have an app entitlement. This happens when, for example, the user sideloads your app or doesn't acquire it from Google Play
+    /// The user doesn't have an app entitlement. This happens when, for example, the user sideloads
+    /// your app or doesn't acquire it from Google Play
     Unlicensed,
     /// Licensing details were not evaluated because a necessary requirement was missed.
     /// This could happen for several reasons, including the following:

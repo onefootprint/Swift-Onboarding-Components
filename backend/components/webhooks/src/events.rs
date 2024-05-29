@@ -1,15 +1,29 @@
 pub use self::payloads::{
-    OnboardingCompletedPayload, OnboardingStatusChangedPayload, WatchlistCheckCompletedPayload,
+    OnboardingCompletedPayload,
+    OnboardingStatusChangedPayload,
+    WatchlistCheckCompletedPayload,
 };
-use chrono::{DateTime, Utc};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use newtypes::{
-    FpId, OnboardingCompletedPayload as NTOnboardingCompletedPayload, OnboardingStatus,
+    FpId,
+    OnboardingCompletedPayload as NTOnboardingCompletedPayload,
+    OnboardingStatus,
     OnboardingStatusChangedPayload as NTOnboardingStatusChangedPayload,
-    WatchlistCheckCompletedPayload as NTWatchlistCheckCompletedPayload, WebhookEvent as NTWebhookEvent,
+    WatchlistCheckCompletedPayload as NTWatchlistCheckCompletedPayload,
+    WebhookEvent as NTWebhookEvent,
 };
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-use strum::{EnumIter, EnumMessage};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use strum::{
+    EnumIter,
+    EnumMessage,
+};
 
 /// Defines supported webhook event types and payloads
 #[derive(Debug, strum::Display, Clone, Eq, PartialEq, Serialize, Deserialize, EnumIter, EnumMessage)]
@@ -30,9 +44,11 @@ pub enum WebhookEvent {
 
 /// all of the payload bodies
 mod payloads {
-    use newtypes::{WatchlistCheckError, WatchlistCheckStatusKind};
-
     use super::*;
+    use newtypes::{
+        WatchlistCheckError,
+        WatchlistCheckStatusKind,
+    };
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
     #[schemars(example = "OnboardingCompletedPayload::example")]

@@ -1,57 +1,109 @@
 use alpaca::{
-    AlpacaCip, CipRequest, CipResult, DataComparsionBreakDown, ImageIntegrityBreakdown, VisualAuthenticity,
+    AlpacaCip,
+    CipRequest,
+    CipResult,
+    DataComparsionBreakDown,
+    ImageIntegrityBreakdown,
+    VisualAuthenticity,
+};
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
+};
+use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
+use api_core::decision::features::{
+    self,
+};
+use api_core::decision::field_validations::create_field_validation_results;
+use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use api_core::decision::vendor::vendor_api::vendor_api_struct::{
+    vendor_api_enum_from_struct,
+    IncodeFetchOCR,
+    IncodeFetchScores,
+    IncodeWatchlistCheck,
+};
+use api_core::decision::{
+    self,
+};
+use api_core::errors::cip_error::CipError;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::{
+    DecryptUncheckedResult,
+    TenantVw,
+    VaultWrapper,
 };
 use api_core::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    decision::{
-        self,
-        features::{self, incode_docv::IncodeOcrComparisonDataFields},
-        field_validations::create_field_validation_results,
-        vendor::vendor_api::{
-            loaders::load_response_for_vendor_api,
-            vendor_api_struct::{
-                vendor_api_enum_from_struct, IncodeFetchOCR, IncodeFetchScores, IncodeWatchlistCheck,
-            },
-        },
-    },
-    errors::{cip_error::CipError, ApiResult},
-    types::{JsonApiResponse, ResponseData},
-    utils::{
-        fp_id_path::FpIdPath,
-        vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
-    },
-    ApiErrorKind, State,
+    ApiErrorKind,
+    State,
 };
-use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse, DeprecatedAlpacaCipRequest};
-use chrono::{DateTime, Utc};
-use db::{
-    actor::{saturate_actors, SaturatedActor},
-    models::{
-        annotation::Annotation,
-        document::Document,
-        document_request::DocumentRequest,
-        insight_event::InsightEvent,
-        manual_review::ManualReview,
-        ob_configuration::ObConfiguration,
-        onboarding_decision::OnboardingDecision,
-        risk_signal::{AtSeqno, RiskSignal},
-        scoped_vault::ScopedVault,
-        user_timeline::UserTimeline,
-        verification_request::VReqIdentifier,
-        workflow::Workflow,
-    },
+use api_wire_types::{
+    AlpacaCipRequest,
+    AlpacaCipResponse,
+    DeprecatedAlpacaCipRequest,
 };
-use idv::incode::{
-    doc::response::{FetchOCRResponse, FetchScoresResponse},
-    watchlist::response::WatchlistResultResponse,
+use chrono::{
+    DateTime,
+    Utc,
 };
+use db::actor::{
+    saturate_actors,
+    SaturatedActor,
+};
+use db::models::annotation::Annotation;
+use db::models::document::Document;
+use db::models::document_request::DocumentRequest;
+use db::models::insight_event::InsightEvent;
+use db::models::manual_review::ManualReview;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding_decision::OnboardingDecision;
+use db::models::risk_signal::{
+    AtSeqno,
+    RiskSignal,
+};
+use db::models::scoped_vault::ScopedVault;
+use db::models::user_timeline::UserTimeline;
+use db::models::verification_request::VReqIdentifier;
+use db::models::workflow::Workflow;
+use idv::incode::doc::response::{
+    FetchOCRResponse,
+    FetchScoresResponse,
+};
+use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::{
-    format_pii, pii, AlpacaPiiString, DataIdentifier, DecisionStatus, DocumentDiKind,
-    ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind, IdentityDataKind,
-    MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor,
+    format_pii,
+    pii,
+    AlpacaPiiString,
+    DataIdentifier,
+    DecisionStatus,
+    DocumentDiKind,
+    ExternalIntegrationInfo,
+    ExternalIntegrationKind,
+    FootprintReasonCode,
+    FpId,
+    IdDocKind,
+    IdentityDataKind,
+    MatchLevel,
+    OcrDataKind,
+    PiiJsonValue,
+    PiiString,
+    ReviewReason,
+    SignalScope,
+    TenantId,
+    Vendor,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 use std::collections::HashSet;
 use DataIdentifier::*;
 use DocumentDiKind::*;
@@ -430,7 +482,8 @@ fn kyc(
         review_reason_crs.sort();
         review_reason_crs.join(". ")
     } else {
-        // If there is no MR but there is an anotation (from the manual OBD) then we send this as approved_reason
+        // If there is no MR but there is an anotation (from the manual OBD) then we send this as
+        // approved_reason
         annotation
             .map(|annotation| annotation.note.clone())
             .unwrap_or("User was manually reviewed and data verified".to_owned())
@@ -451,7 +504,8 @@ fn kyc(
         if newtypes::UsLegalStatus::try_from(us_legal_status.leak()).ok()
             == Some(newtypes::UsLegalStatus::Citizen)
         {
-            Some(PiiString::from("US")) // for now we treat citizen as meaning nationality US. soon we will explicitly capture nationality for citizens too
+            Some(PiiString::from("US")) // for now we treat citizen as meaning nationality US. soon
+                                        // we will explicitly capture nationality for citizens too
         } else {
             None
         }
@@ -613,8 +667,8 @@ fn watchlist(
         tracing::error!("CIP endpoint ExpectedReviewReasonNotFound: WatchlistHit");
     }
 
-    // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist hits,
-    // so we pull them from the Vres on the fly here
+    // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist
+    // hits, so we pull them from the Vres on the fly here
 
     // For now, we just serialize the raw leaked json blob we get from Incode for each watchlist hit
     let leaked_hits =

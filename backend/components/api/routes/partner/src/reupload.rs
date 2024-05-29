@@ -1,16 +1,28 @@
-use crate::{types::JsonApiResponse, State};
-use api_core::{
-    auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::ApiResult,
-    types::{EmptyResponse, ResponseData},
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    PartnerTenantGuard,
+    PartnerTenantSessionAuth,
+};
+use api_core::errors::ApiResult;
+use api_core::types::{
+    EmptyResponse,
+    ResponseData,
 };
 use chrono::Utc;
-use db::models::{
-    compliance_doc::ComplianceDoc, compliance_doc_request::NewComplianceDocRequest,
-    tenant_compliance_partnership::TenantCompliancePartnership,
+use db::models::compliance_doc::ComplianceDoc;
+use db::models::compliance_doc_request::NewComplianceDocRequest;
+use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
+use newtypes::{
+    ComplianceDocId,
+    TenantCompliancePartnershipId,
 };
-use newtypes::{ComplianceDocId, TenantCompliancePartnershipId};
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(description = "Request reupload of a document.", tags(Compliance, Private))]
 #[actix::post("/partner/partnerships/{partnership_id}/documents/{document_id}/reupload")]

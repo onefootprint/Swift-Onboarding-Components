@@ -1,7 +1,6 @@
+use crate::utils::db2api::DbToApi;
 use api_wire_types::Actor;
 use db::actor::SaturatedActor;
-
-use crate::utils::db2api::DbToApi;
 
 impl DbToApi<SaturatedActor> for Actor {
     fn from_db(actor: SaturatedActor) -> Self {

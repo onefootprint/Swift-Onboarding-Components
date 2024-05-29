@@ -1,10 +1,11 @@
-use diesel::{
-    backend::Backend,
-    deserialize::{FromSql, FromSqlRow},
-    expression::AsExpression,
-    serialize::ToSql,
-    sql_types::BigInt,
+use diesel::backend::Backend;
+use diesel::deserialize::{
+    FromSql,
+    FromSqlRow,
 };
+use diesel::expression::AsExpression;
+use diesel::serialize::ToSql;
+use diesel::sql_types::BigInt;
 use paperclip::actix::Apiv2Schema;
 
 #[doc = "Sequence number used to order DataLifetimes"]

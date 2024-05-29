@@ -1,19 +1,21 @@
-use std::sync::Arc;
-
-use crate::{
-    auth::{
-        session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
-        AuthError, SessionContext,
-    },
-    errors::ApiResult,
+use crate::auth::session::{
+    AuthSessionData,
+    ExtractableAuthSession,
+    RequestInfo,
 };
-use db::{
-    models::{business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant},
-    PgConn,
+use crate::auth::{
+    AuthError,
+    SessionContext,
 };
+use crate::errors::ApiResult;
+use db::models::business_owner::BusinessOwner;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::tenant::Tenant;
+use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::ObConfigurationKind;
 use paperclip::actix::Apiv2Security;
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(

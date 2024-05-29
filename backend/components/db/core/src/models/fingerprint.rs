@@ -1,20 +1,41 @@
-use chrono::{DateTime, Utc};
-use db_schema::schema::{fingerprint, fingerprint_junction, scoped_vault};
-use diesel::{
-    dsl::{count_distinct, not},
-    prelude::*,
-    Queryable,
+use super::scoped_vault::ScopedVault;
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
 };
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    fingerprint,
+    fingerprint_junction,
+    scoped_vault,
+};
+use diesel::dsl::{
+    count_distinct,
+    not,
+};
+use diesel::prelude::*;
+use diesel::Queryable;
 use itertools::Itertools;
 use newtypes::{
-    CompositeFingerprintKind, DataIdentifier as DI, DataLifetimeId, Fingerprint as FingerprintData,
-    FingerprintId, FingerprintKind, FingerprintScope, FingerprintVersion, IdentityDataKind as IDK, PiiString,
-    ScopedVaultId, TenantId, VaultId,
+    CompositeFingerprintKind,
+    DataIdentifier as DI,
+    DataLifetimeId,
+    Fingerprint as FingerprintData,
+    FingerprintId,
+    FingerprintKind,
+    FingerprintScope,
+    FingerprintVersion,
+    IdentityDataKind as IDK,
+    PiiString,
+    ScopedVaultId,
+    TenantId,
+    VaultId,
 };
-
-use crate::{DbError, DbResult, PgConn, TxnPgConn};
-
-use super::scoped_vault::ScopedVault;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = fingerprint)]
@@ -187,7 +208,8 @@ impl Fingerprint {
 }
 
 pub struct FingerprintDupesResult {
-    /// The fingerprint rows belonging to other users in the same tenant that have matching duplicate data
+    /// The fingerprint rows belonging to other users in the same tenant that have matching
+    /// duplicate data
     pub internal: Vec<Fingerprint>,
     pub external: Option<ExternalDupes>,
 }

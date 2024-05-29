@@ -1,8 +1,13 @@
+use derive_more::{
+    From,
+    Into,
+};
+use serde::{
+    Deserialize,
+    Deserializer,
+    Serialize,
+};
 use std::str::FromStr;
-
-use derive_more::{From, Into};
-
-use serde::{Deserialize, Deserializer, Serialize};
 
 /// A secret api key wrapper around a string
 #[derive(Clone, Hash, PartialEq, Eq, From, Into, Default)]

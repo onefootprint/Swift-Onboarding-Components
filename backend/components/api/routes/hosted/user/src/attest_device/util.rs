@@ -1,4 +1,5 @@
-use api_core::{errors::ApiResult, utils::passkey::SavedAttestationData};
+use api_core::errors::ApiResult;
+use api_core::utils::passkey::SavedAttestationData;
 use newtypes::WebauthnCredentialId;
 
 /// helper function to link a webauthn cred to an attestation

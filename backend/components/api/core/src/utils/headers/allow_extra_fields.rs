@@ -1,9 +1,13 @@
 use super::get_bool_header;
-use actix_web::{http::header::HeaderMap, FromRequest};
+use actix_web::http::header::HeaderMap;
+use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize, Deref)]

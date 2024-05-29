@@ -1,16 +1,36 @@
-use super::{
-    utils::{self, validate_state},
-    Error, VResult,
+use super::utils::{
+    self,
+    validate_state,
 };
+use super::{
+    Error,
+    VResult,
+};
+use crate::email::Email;
 use crate::{
-    email::Email, AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, CleanAndValidate,
-    DataIdentifierValue, NtResult, PhoneNumber, PiiJsonValue, PiiString, ValidateArgs,
+    AllData,
+    BoLinkId,
+    BusinessDataKind as BDK,
+    BusinessOwnerKind,
+    CleanAndValidate,
+    DataIdentifierValue,
+    NtResult,
+    PhoneNumber,
+    PiiJsonValue,
+    PiiString,
+    ValidateArgs,
 };
 use itertools::Itertools;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use serde_with::DeserializeFromStr;
 use strum::EnumString;
-use url::{Host, Url};
+use url::{
+    Host,
+    Url,
+};
 
 impl CleanAndValidate for BDK {
     type Parsed = ();
@@ -216,11 +236,16 @@ fn clean_and_validate_website(input: PiiString) -> VResult<PiiString> {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
-
-    use super::{KycedBusinessOwnerData, BDK::*};
-    use crate::{BusinessDataKind as BDK, CleanAndValidate, PiiJsonValue, ValidateArgs};
+    use super::KycedBusinessOwnerData;
+    use super::BDK::*;
+    use crate::{
+        BusinessDataKind as BDK,
+        CleanAndValidate,
+        PiiJsonValue,
+        ValidateArgs,
+    };
     use serde_json::json;
+    use std::collections::HashMap;
     use test_case::test_case;
 
     #[test_case(Name, "Acme Bank" => Some("Acme Bank".to_owned()))]

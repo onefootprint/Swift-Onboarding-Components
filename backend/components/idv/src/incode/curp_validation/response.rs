@@ -1,7 +1,11 @@
-use std::str::FromStr;
-
 use crate::incode::IncodeClientErrorCustomFailureReasons;
-use newtypes::{IncodeFailureReason, PiiString, ScrubbedPiiJsonValue, ScrubbedPiiString};
+use newtypes::{
+    IncodeFailureReason,
+    PiiString,
+    ScrubbedPiiJsonValue,
+    ScrubbedPiiString,
+};
+use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -94,9 +98,12 @@ impl CurpError {
 //  - 01 06 - "La CURP no se encuentra en la base de datos." (The CURP is not found in the database)
 //  - 01 09 - "La llave de la CURP no está bien formada." (The CURP key is malformed)
 //  - 01 20 - "Más de una CURP para estos datos" (More than one CURP for this data)
-//  - 01 06 would be returned if the provided CURP code does not match any record in RENAPO's database.
-//  - 01 09 indicates the submitted CURP code is malformed or invalid (does not follow the 18-character structure).
-//  - 01 20 suggests that the personal data tied to the provided CURP matches multiple CURP records in their system, which should not occur since CURPs are meant to be unique.
+//  - 01 06 would be returned if the provided CURP code does not match any record in RENAPO's
+//    database.
+//  - 01 09 indicates the submitted CURP code is malformed or invalid (does not follow the
+//    18-character structure).
+//  - 01 20 suggests that the personal data tied to the provided CURP matches multiple CURP records
+//    in their system, which should not occur since CURPs are meant to be unique.
 #[derive(Clone, Debug, strum::EnumString, PartialEq, Eq)]
 pub enum RenapoError {
     // 01 - Changes not applied due to equality with previous version
@@ -181,11 +188,12 @@ impl IncodeClientErrorCustomFailureReasons for CurpValidationResponse {
 
 #[cfg(test)]
 mod tests {
-    use test_case::test_case;
-
+    use super::{
+        CurpValidationResponse,
+        RenapoError,
+    };
     use crate::test_fixtures;
-
-    use super::{CurpValidationResponse, RenapoError};
+    use test_case::test_case;
 
     #[test]
     fn test_serialization() {

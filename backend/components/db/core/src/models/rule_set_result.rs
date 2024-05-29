@@ -1,21 +1,47 @@
-use super::{
-    data_lifetime::DataLifetime,
-    risk_signal::RiskSignal,
-    rule_instance::RuleInstance,
-    rule_result::{NewRuleResult, RuleResult},
-    scoped_vault::ScopedVault,
-    vault::Vault,
+use super::data_lifetime::DataLifetime;
+use super::risk_signal::RiskSignal;
+use super::rule_instance::RuleInstance;
+use super::rule_result::{
+    NewRuleResult,
+    RuleResult,
 };
-use crate::{DbResult, OptionalNonNullVec, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use super::scoped_vault::ScopedVault;
+use super::vault::Vault;
+use crate::{
+    DbResult,
+    OptionalNonNullVec,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::{
-    risk_signal, rule_set_result, rule_set_result_risk_signal_junction, scoped_vault, vault, workflow,
+    risk_signal,
+    rule_set_result,
+    rule_set_result_risk_signal_junction,
+    scoped_vault,
+    vault,
+    workflow,
 };
-use diesel::{dsl::not, prelude::*, Insertable, Queryable};
+use diesel::dsl::not;
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, ObConfigurationId, RiskSignalId, RuleAction, RuleInstanceId, RuleSetResultId,
-    RuleSetResultKind, ScopedVaultId, WorkflowId,
+    DataLifetimeSeqno,
+    ObConfigurationId,
+    RiskSignalId,
+    RuleAction,
+    RuleInstanceId,
+    RuleSetResultId,
+    RuleSetResultKind,
+    ScopedVaultId,
+    WorkflowId,
 };
 
 #[derive(Debug, Clone, Queryable, Eq, PartialEq)]
@@ -26,14 +52,27 @@ pub struct RuleSetResult {
     pub created_seqno: DataLifetimeSeqno,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub ob_configuration_id: ObConfigurationId, // might later one day be rule_set_id if we add an explicit rule_set table. At the moment, a playbook just have 1 implicit set of rules so for now we use obc_id here
+    pub ob_configuration_id: ObConfigurationId, /* might later one day be rule_set_id if we add an
+                                                 * explicit rule_set table. At the moment, a playbook just
+                                                 * have 1 implicit set of rules so for now we use obc_id
+                                                 * here */
     pub scoped_vault_id: ScopedVaultId,
-    pub workflow_id: Option<WorkflowId>, // set if the rule evaluation was done within the context of a particular Workflow decision. This would be None for other cases like adhoc rule execution via internal endpoints or backtesting
-    pub kind: RuleSetResultKind, // indicates the general purpose or insertion point for this evaluation of rules. Enables us to differentiate rule evalution done as part of the Kyc waterfall vs the final workflow decision vs stuff like backtesting/adhoc evaluations
-    pub action_triggered: Option<RuleAction>, // the final chosen action based on the evaluation of all rules. None would indicate that no rules evaluated to true
-    // which actions were actually considered when picking the finaly `action_triggered`. eg: if we have already StepUp'd to an Identity doc for the current workflow
-    // then we can't repeat that action, so triggered rules with that action wouldn't actually cause the final rsr.action_triggered to be that repeated action
-    // Note: Not backfilled for all historical rules. `None` for historical non-backfilled cases.
+    pub workflow_id: Option<WorkflowId>, /* set if the rule evaluation was done within the context of a
+                                          * particular Workflow decision. This would be None for other
+                                          * cases like adhoc rule execution via internal endpoints or
+                                          * backtesting */
+    pub kind: RuleSetResultKind, /* indicates the general purpose or insertion point for this evaluation
+                                  * of rules. Enables us to differentiate rule evalution done as part of
+                                  * the Kyc waterfall vs the final workflow decision vs stuff like
+                                  * backtesting/adhoc evaluations */
+    pub action_triggered: Option<RuleAction>, /* the final chosen action based on the evaluation of all
+                                               * rules. None would indicate that no rules evaluated to
+                                               * true */
+    // which actions were actually considered when picking the finaly `action_triggered`. eg: if we have
+    // already StepUp'd to an Identity doc for the current workflow then we can't repeat that action, so
+    // triggered rules with that action wouldn't actually cause the final rsr.action_triggered to be that
+    // repeated action Note: Not backfilled for all historical rules. `None` for historical
+    // non-backfilled cases.
     #[diesel(deserialize_as = OptionalNonNullVec<RuleAction>)]
     pub allowed_actions: Option<Vec<RuleAction>>,
 }
@@ -164,8 +203,8 @@ impl RuleSetResult {
 
     /// Queries a sample of rule_set_results for use in a backtest
     /// Takes the first rule_set_result (ie if 2 exist because step-up occured) from the latest
-    /// workflow (that is complete/has a rule_set_result and part of the passed in playbook) per vault
-    /// Takes up to `limit` rows from the past 8 weeks
+    /// workflow (that is complete/has a rule_set_result and part of the passed in playbook) per
+    /// vault Takes up to `limit` rows from the past 8 weeks
     #[tracing::instrument("RuleSetResult::sample_for_eval", skip_all)]
     pub fn sample_for_eval(
         conn: &mut PgConn,
@@ -239,23 +278,33 @@ pub struct RuleSetResultSample {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        models::{
-            ob_configuration::ObConfiguration,
-            risk_signal::RiskSignal,
-            rule_instance::{NewRule, RuleInstance},
-            scoped_vault::ScopedVault,
-            workflow::{Workflow, WorkflowUpdate},
-        },
-        test_helpers::assert_have_same_elements,
-        tests::prelude::*,
+    use crate::models::ob_configuration::ObConfiguration;
+    use crate::models::risk_signal::RiskSignal;
+    use crate::models::rule_instance::{
+        NewRule,
+        RuleInstance,
     };
+    use crate::models::scoped_vault::ScopedVault;
+    use crate::models::workflow::{
+        Workflow,
+        WorkflowUpdate,
+    };
+    use crate::test_helpers::assert_have_same_elements;
+    use crate::tests::prelude::*;
     use chrono::Duration;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
     use newtypes::{
-        DbActor, DecisionIntentKind, DecisionStatus, FootprintReasonCode as FRC, KycState, Locked,
-        RiskSignalGroupKind, RuleInstanceKind, VendorAPI, WorkflowState,
+        DbActor,
+        DecisionIntentKind,
+        DecisionStatus,
+        FootprintReasonCode as FRC,
+        KycState,
+        Locked,
+        RiskSignalGroupKind,
+        RuleInstanceKind,
+        VendorAPI,
+        WorkflowState,
     };
 
     #[db_test]

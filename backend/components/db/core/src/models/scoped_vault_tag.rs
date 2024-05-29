@@ -1,13 +1,23 @@
-use db_schema::schema::scoped_vault_tag;
-use newtypes::{DataLifetimeSeqno, TagId};
-
-use chrono::{DateTime, Utc};
-use newtypes::ScopedVaultId;
-
-use crate::{DbError, PgConn};
-use diesel::{prelude::*, Insertable, Queryable};
-
 use super::data_lifetime::DataLifetime;
+use crate::{
+    DbError,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::scoped_vault_tag;
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    DataLifetimeSeqno,
+    ScopedVaultId,
+    TagId,
+};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = scoped_vault_tag)]

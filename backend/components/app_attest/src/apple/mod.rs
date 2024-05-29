@@ -1,9 +1,9 @@
-use openssl::x509::X509;
-
-use crate::{
-    constants::{APPLE_APP_ATTESTATION_ROOT_CA_PEM, APPLE_PUBLIC_ROOT_CERT_PEM},
-    error::AttestationError,
+use crate::constants::{
+    APPLE_APP_ATTESTATION_ROOT_CA_PEM,
+    APPLE_PUBLIC_ROOT_CERT_PEM,
 };
+use crate::error::AttestationError;
+use openssl::x509::X509;
 pub mod attestation;
 pub mod device_check;
 

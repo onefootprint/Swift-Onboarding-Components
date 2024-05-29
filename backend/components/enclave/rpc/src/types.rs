@@ -1,6 +1,8 @@
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::fmt::Debug;
-
-use serde::{Deserialize, Serialize};
 use strum_macros::EnumDiscriminants;
 
 #[derive(Clone, Serialize, Deserialize)]

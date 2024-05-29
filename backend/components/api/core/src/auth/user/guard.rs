@@ -1,5 +1,12 @@
-use crate::auth::{CanDecrypt, IsGuardMet};
-use newtypes::{DataIdentifier, IdentityDataKind as IDK, UserAuthScope};
+use crate::auth::{
+    CanDecrypt,
+    IsGuardMet,
+};
+use newtypes::{
+    DataIdentifier,
+    IdentityDataKind as IDK,
+    UserAuthScope,
+};
 
 impl IsGuardMet<UserAuthScope> for UserAuthScope {
     fn is_met(self, token_scopes: &[UserAuthScope]) -> bool {

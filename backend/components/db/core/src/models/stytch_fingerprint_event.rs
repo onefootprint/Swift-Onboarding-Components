@@ -1,10 +1,28 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::stytch_fingerprint_event;
-use diesel::{prelude::*, Insertable, Queryable};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use newtypes::{
-    ScopedVaultId, SessionId, StytchBrowserFingerprint, StytchBrowserId, StytchFingerprintEventId,
-    StytchHardwareFingerprint, StytchNetworkFingerprint, StytchVisitorFingerprint, StytchVisitorId, VaultId,
+    ScopedVaultId,
+    SessionId,
+    StytchBrowserFingerprint,
+    StytchBrowserId,
+    StytchFingerprintEventId,
+    StytchHardwareFingerprint,
+    StytchNetworkFingerprint,
+    StytchVisitorFingerprint,
+    StytchVisitorId,
+    VaultId,
     VerificationResultId,
 };
 

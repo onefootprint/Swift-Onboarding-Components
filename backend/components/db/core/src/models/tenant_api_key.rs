@@ -1,13 +1,39 @@
-use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{tenant_api_key, tenant_api_key::BoxedQuery, tenant_role};
-use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
+use super::ob_configuration::IsLive;
+use super::tenant::Tenant;
+use super::tenant_role::TenantRole;
+use crate::{
+    DbError,
+    DbResult,
+    NextPage,
+    OffsetPagination,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::tenant_api_key::BoxedQuery;
+use db_schema::schema::{
+    tenant_api_key,
+    tenant_role,
+};
+use diesel::pg::Pg;
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use newtypes::{
-    ApiKeyStatus, Fingerprint, OrgIdentifierRef, SealedVaultBytes, TenantApiKeyId, TenantId, TenantRoleId,
+    ApiKeyStatus,
+    Fingerprint,
+    OrgIdentifierRef,
+    SealedVaultBytes,
+    TenantApiKeyId,
+    TenantId,
+    TenantRoleId,
     TenantRoleKindDiscriminant,
 };
-
-use super::{ob_configuration::IsLive, tenant::Tenant, tenant_role::TenantRole};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant_api_key)]
@@ -269,7 +295,8 @@ impl TenantApiKey {
         let key = Self::get(conn, (&id, &tenant_id, is_live))?.0;
         let role_id_to_lock = update.role_id.as_ref().unwrap_or(&key.role_id);
         // Lock the role to make sure we don't deactivate it before we update this rolebinding.
-        // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
+        // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work
+        // on another tenant's role
         let new_role = TenantRole::lock_active(conn, role_id_to_lock, &tenant_id)?;
         if new_role.kind != TenantRoleKindDiscriminant::ApiKey || new_role.is_live != Some(is_live) {
             return Err(DbError::IncorrectTenantRoleKind);

@@ -1,11 +1,19 @@
-use newtypes::vendor_credentials::MiddeskCredentials;
-use reqwest::{header, Method, RequestBuilder, Url};
-
-use std::time::Duration;
-
+use super::{
+    response,
+    Error,
+    MiddeskCreateBusinessRequest,
+    MiddeskGetBusinessRequest,
+    MiddeskReqwestError,
+};
 use crate::middesk::request::business::BusinessRequest;
-
-use super::{response, Error, MiddeskCreateBusinessRequest, MiddeskGetBusinessRequest, MiddeskReqwestError};
+use newtypes::vendor_credentials::MiddeskCredentials;
+use reqwest::{
+    header,
+    Method,
+    RequestBuilder,
+    Url,
+};
+use std::time::Duration;
 
 #[derive(Clone)]
 pub struct MiddeskClient {
@@ -98,11 +106,17 @@ impl MiddeskClient {
 #[cfg(test)]
 mod tests {
 
-    use std::str::FromStr;
-
     use super::*;
     use dotenv;
-    use newtypes::{BoData, BusinessDataForRequest, BusinessDataFromVault, EinOnly, PiiString, TenantId};
+    use newtypes::{
+        BoData,
+        BusinessDataForRequest,
+        BusinessDataFromVault,
+        EinOnly,
+        PiiString,
+        TenantId,
+    };
+    use std::str::FromStr;
 
     #[ignore]
     #[tokio::test]

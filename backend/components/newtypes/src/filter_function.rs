@@ -1,9 +1,13 @@
+use crate::PiiBytes;
 use crypto::hex::ToHex;
 use itertools::Itertools;
-use std::{fmt::Display, str::FromStr, vec::IntoIter};
-use strum_macros::{EnumDiscriminants, EnumString};
-
-use crate::PiiBytes;
+use std::fmt::Display;
+use std::str::FromStr;
+use std::vec::IntoIter;
+use strum_macros::{
+    EnumDiscriminants,
+    EnumString,
+};
 
 /// Represents a data transform to apply to underlying plaintext behind a data identifier
 /// Proxy syntax example: `{{ id.first_name | to_lower_case }}
@@ -106,7 +110,10 @@ mod json_schema {
         }
 
         fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-            use paperclip::v2::models::{DataType, DefaultSchemaRaw};
+            use paperclip::v2::models::{
+                DataType,
+                DefaultSchemaRaw,
+            };
             DefaultSchemaRaw {
                 name: Some("FilterFunction".into()),
                 example: None,
@@ -289,7 +296,7 @@ impl Display for FilterFunction {
             }) => Some(format!(
                 "\"{}\",\"{}\"",
                 algorithm,
-                public_key.encode_hex::<String>(), /*algorithm, public_key*/
+                public_key.encode_hex::<String>(), /* algorithm, public_key */
             )),
         };
         if let Some(args) = args {
@@ -397,7 +404,11 @@ impl ArgParser {
 
 #[cfg(test)]
 mod tests {
-    use super::{FilterFunction as FF, FilterFunctionParsingError::*, *};
+    use super::FilterFunctionParsingError::*;
+    use super::{
+        FilterFunction as FF,
+        *,
+    };
     use crypto::hex::FromHex;
     use test_case::test_case;
 

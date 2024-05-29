@@ -5,14 +5,18 @@ mod state;
 mod state_machine;
 pub mod states;
 
+use crate::errors::onboarding::OnboardingError;
+use crate::errors::ApiResult;
+use crate::State;
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::{output::Csv, IdDocKind, IncodeConfigurationId, Iso3166TwoDigitCountryCode, TenantId};
-pub use state_machine::*;
-
-use crate::{
-    errors::{onboarding::OnboardingError, ApiResult},
-    State,
+use newtypes::output::Csv;
+use newtypes::{
+    IdDocKind,
+    IncodeConfigurationId,
+    Iso3166TwoDigitCountryCode,
+    TenantId,
 };
+pub use state_machine::*;
 
 #[cfg(test)]
 mod images;

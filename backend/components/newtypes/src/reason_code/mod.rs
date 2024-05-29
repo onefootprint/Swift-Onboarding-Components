@@ -8,8 +8,6 @@ mod reason_code_helpers;
 mod signal_attribute;
 mod socure;
 
-use std::str::FromStr;
-
 pub use experian::*;
 pub use experian_address_codes::*;
 pub use experian_phone_codes::*;
@@ -19,11 +17,14 @@ pub use lexis::*;
 pub use reason_code_helpers::*;
 pub use signal_attribute::*;
 pub use socure::*;
+use std::str::FromStr;
 
-// TODO: do these macros and our vendor enums need to be in newtypes? or could we move into decision or idv crate
+// TODO: do these macros and our vendor enums need to be in newtypes? or could we move into decision
+// or idv crate
 
 /// Used to define an enum representing some sort of set of reason codes from a vendor.
-/// This macro is for mapping 1 reason code to 0 or 1 FRC (see vendor_reason_code_enums for 1:N mapping)
+/// This macro is for mapping 1 reason code to 0 or 1 FRC (see vendor_reason_code_enums for 1:N
+/// mapping)
 #[macro_export]
 macro_rules! vendor_reason_code_enum {
     (
@@ -169,9 +170,8 @@ impl ToString for ReasonCode {
 
 #[cfg(test)]
 mod tests {
-    use test_case::test_case;
-
     use super::*;
+    use test_case::test_case;
 
     #[test_case("idphone.not.available" => ReasonCode::IDology(IDologyReasonCode::PhoneNumberIsUnlistedOrUnavailable))]
     #[test_case("resultcode.coppa.alert" => ReasonCode::IDology(IDologyReasonCode::CoppaAlert))]

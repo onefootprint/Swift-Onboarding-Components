@@ -1,28 +1,43 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext},
-    errors::ApiResult,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
 };
-
+use crate::errors::ApiResult;
+use crate::proxy::config::ProxyConfig;
+use crate::proxy::pii_parser::TokenizedIngress;
+use crate::proxy::token_parser::ProxyTokenParser;
+use crate::proxy::{
+    net_client,
+    pii_parser,
+    tokenize,
+};
+use crate::utils::headers::InsightHeaders;
 use crate::{
     proxy,
-    proxy::{
-        config::ProxyConfig, net_client, pii_parser, pii_parser::TokenizedIngress,
-        token_parser::ProxyTokenParser,
-    },
+    State,
 };
-
-use crate::{proxy::tokenize, utils::headers::InsightHeaders, State};
-use api_core::{auth::AuthError, telemetry::RootSpan, ApiErrorKind};
-
-use api_core::{
-    auth::tenant::TenantAuth,
-    proxy::config::{JitProxyHeaderParams, ProxyHeaderParams},
-    utils::body_bytes::BodyBytes,
+use api_core::auth::tenant::TenantAuth;
+use api_core::auth::AuthError;
+use api_core::proxy::config::{
+    JitProxyHeaderParams,
+    ProxyHeaderParams,
 };
-use newtypes::{AccessEventPurpose, InvokeVaultProxyPermission, ProxyConfigId};
+use api_core::telemetry::RootSpan;
+use api_core::utils::body_bytes::BodyBytes;
+use api_core::ApiErrorKind;
+use newtypes::{
+    AccessEventPurpose,
+    InvokeVaultProxyPermission,
+    ProxyConfigId,
+};
+use paperclip::actix::web::{
+    HttpRequest,
+    HttpResponse,
+};
 use paperclip::actix::{
-    api_v2_operation, post, web,
-    web::{HttpRequest, HttpResponse},
+    api_v2_operation,
+    post,
+    web,
 };
 use reqwest::StatusCode;
 

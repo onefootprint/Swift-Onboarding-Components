@@ -1,16 +1,31 @@
-use crate::{types::JsonApiResponse, State};
-use api_core::{
-    auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::{ApiResult, ValidationError},
-    types::{EmptyResponse, ResponseData},
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    PartnerTenantGuard,
+    PartnerTenantSessionAuth,
 };
-use db::models::{
-    compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest,
-    compliance_doc_submission::ComplianceDocSubmission,
-    tenant_compliance_partnership::TenantCompliancePartnership,
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
 };
-use newtypes::{ComplianceDocRequestId, TenantCompliancePartnershipId};
-use paperclip::actix::{self, api_v2_operation, web};
+use api_core::types::{
+    EmptyResponse,
+    ResponseData,
+};
+use db::models::compliance_doc::ComplianceDoc;
+use db::models::compliance_doc_request::ComplianceDocRequest;
+use db::models::compliance_doc_submission::ComplianceDocSubmission;
+use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
+use newtypes::{
+    ComplianceDocRequestId,
+    TenantCompliancePartnershipId,
+};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(description = "Retracts a document request.", tags(Compliance, Private))]
 #[actix::delete("/partner/partnerships/{partnership_id}/requests/{request_id}")]

@@ -1,13 +1,20 @@
-use api_wire_types::{DocumentImageError, UploadSource};
-use db::models::{
-    data_lifetime::DataLifetime, document::Document, document_request::DocumentRequest,
-    document_upload::DocumentUpload,
+use crate::errors::ApiResult;
+use crate::utils::db2api::{
+    DbToApi,
+    TryDbToApi,
 };
-use newtypes::{DeviceType, DocumentKind, DocumentSide};
-
-use crate::{
-    errors::ApiResult,
-    utils::db2api::{DbToApi, TryDbToApi},
+use api_wire_types::{
+    DocumentImageError,
+    UploadSource,
+};
+use db::models::data_lifetime::DataLifetime;
+use db::models::document::Document;
+use db::models::document_request::DocumentRequest;
+use db::models::document_upload::DocumentUpload;
+use newtypes::{
+    DeviceType,
+    DocumentKind,
+    DocumentSide,
 };
 
 /// Document info from Documents, created via hosted bifrost
@@ -123,7 +130,7 @@ impl DbToApi<(DocumentSide, DataLifetime)> for api_wire_types::DocumentUpload {
 impl DbToApi<Document> for api_wire_types::PublicDocument {
     fn from_db(id_doc: Document) -> Self {
         Self {
-            document_type: id_doc.vaulted_document_type.unwrap_or(id_doc.document_type), // unwrap_or for backwards compat
+            document_type: id_doc.vaulted_document_type.unwrap_or(id_doc.document_type), /* unwrap_or for backwards compat */
             created_at: id_doc.created_at,
         }
     }

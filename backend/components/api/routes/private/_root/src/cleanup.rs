@@ -1,25 +1,37 @@
-use actix_web::{post, web, web::Json};
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
+};
+use api_core::auth::custodian::CustodianAuthContext;
+use api_core::auth::tenant::FirmEmployeeAuthContext;
+use api_core::auth::Either;
+use api_core::errors::{
+    ApiError,
+    ApiResult,
+    AssertionError,
+};
+use api_core::types::response::ResponseData;
+use api_core::utils::headers::SandboxId;
+use api_core::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+};
 use api_core::{
-    auth::{custodian::CustodianAuthContext, tenant::FirmEmployeeAuthContext, Either},
-    errors::{ApiError, ApiResult, AssertionError},
-    types::response::ResponseData,
-    utils::{
-        headers::SandboxId,
-        vault_wrapper::{Any, VaultWrapper},
-    },
-    ApiErrorKind, State,
+    ApiErrorKind,
+    State,
 };
 use api_wire_types::IdentifyId;
-use db::{
-    errors::OptionalExtension,
-    models::{
-        scoped_vault::{ScopedVault, ScopedVaultIdentifier},
-        tenant::Tenant,
-        vault::Vault,
-    },
+use db::errors::OptionalExtension;
+use db::models::scoped_vault::{
+    ScopedVault,
+    ScopedVaultIdentifier,
 };
+use db::models::tenant::Tenant;
+use db::models::vault::Vault;
 use feature_flag::BoolFlag;
-use newtypes::{email::Email, PhoneNumber};
+use newtypes::email::Email;
+use newtypes::PhoneNumber;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]

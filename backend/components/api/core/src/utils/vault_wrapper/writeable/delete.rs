@@ -1,10 +1,10 @@
 use super::WriteableVw;
 use crate::errors::ApiResult;
-use db::{
-    models::{data_lifetime::DataLifetime, scoped_vault::ScopedVault},
-    TxnPgConn,
-};
-use newtypes::{output::Csv, DataIdentifier};
+use db::models::data_lifetime::DataLifetime;
+use db::models::scoped_vault::ScopedVault;
+use db::TxnPgConn;
+use newtypes::output::Csv;
+use newtypes::DataIdentifier;
 
 impl<Type> WriteableVw<Type> {
     /// soft "delete" an entire scoped vault, but not the corresponding data lifetimes.
@@ -48,15 +48,23 @@ impl<Type> WriteableVw<Type> {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::vault_wrapper::{Person, VaultWrapper};
-
     use super::*;
-    use db::{
-        models::vault_data::{NewVaultData, VaultData},
-        tests::prelude::*,
+    use crate::utils::vault_wrapper::{
+        Person,
+        VaultWrapper,
     };
+    use db::models::vault_data::{
+        NewVaultData,
+        VaultData,
+    };
+    use db::tests::prelude::*;
     use macros::db_test;
-    use newtypes::{DataLifetimeSource, IdentityDataKind as IDK, SealedVaultBytes, VaultDataFormat};
+    use newtypes::{
+        DataLifetimeSource,
+        IdentityDataKind as IDK,
+        SealedVaultBytes,
+        VaultDataFormat,
+    };
 
     #[db_test]
     fn test_soft_deletion(conn: &mut TestPgConn) {

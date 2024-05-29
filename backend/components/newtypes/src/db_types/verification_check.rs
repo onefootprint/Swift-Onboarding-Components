@@ -1,10 +1,14 @@
-use diesel::{AsExpression, FromSqlRow};
+use crate::AdverseMediaListKind;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-
-use strum::{AsRefStr, EnumDiscriminants};
-
-use crate::AdverseMediaListKind;
+use strum::{
+    AsRefStr,
+    EnumDiscriminants,
+};
 
 #[derive(
     Debug,

@@ -1,5 +1,8 @@
 use crate::socure::requirements::meets_requirements_for_idplus_request;
-use newtypes::{IdentityDataKind, VendorAPI};
+use newtypes::{
+    IdentityDataKind,
+    VendorAPI,
+};
 use strum::IntoEnumIterator;
 
 /// This struct represents the minimum requirements for sending a request to a specific VendorAPI
@@ -28,7 +31,8 @@ pub struct SocureRequirements {
     pub one_of: Vec<Vec<IdentityDataKind>>,
 }
 
-/// Based on the VendorAPI and the available data in the vault, determine if we are able make a request to a particular API
+/// Based on the VendorAPI and the available data in the vault, determine if we are able make a
+/// request to a particular API
 pub fn vendor_api_requirements_are_satisfied(
     vendor_api: &VendorAPI,
     present_data_lifetime_kinds: &[IdentityDataKind],
@@ -58,7 +62,8 @@ pub fn vendor_api_requirements_are_satisfied(
     };
 
     let lexis_flex_id_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
-        // technicaly Lexis doesn't seem to error if all of these are even missing but this is what they recommend and its in line with our other kyc reqs
+        // technicaly Lexis doesn't seem to error if all of these are even missing but this is what they
+        // recommend and its in line with our other kyc reqs
         required: vec![
             IdentityDataKind::FirstName,
             IdentityDataKind::LastName,

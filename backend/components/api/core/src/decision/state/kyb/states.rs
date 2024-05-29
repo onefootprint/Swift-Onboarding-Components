@@ -1,52 +1,78 @@
-use std::{collections::HashMap, sync::Arc};
-
 use super::{
-    KybAwaitingAsyncVendors, KybAwaitingBoKyc, KybComplete, KybDataCollection, KybDecisioning, KybState,
+    KybAwaitingAsyncVendors,
+    KybAwaitingBoKyc,
+    KybComplete,
+    KybDataCollection,
+    KybDecisioning,
+    KybState,
     KybVendorCalls,
 };
-use crate::{
-    decision::{
-        self,
-        onboarding::Decision,
-        risk,
-        rule_engine::{engine::VaultDataForRules, eval::RuleEvalConfig},
-        state::{
-            actions::{Authorize, WorkflowActions},
-            common, AsyncVendorCallsCompleted, BoKycCompleted, MakeDecision, MakeVendorCalls, OnAction,
-            WorkflowState,
-        },
-        utils::FixtureDecision,
-        RuleError,
-    },
-    errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper},
-    State,
+use crate::decision::onboarding::Decision;
+use crate::decision::rule_engine::engine::VaultDataForRules;
+use crate::decision::rule_engine::eval::RuleEvalConfig;
+use crate::decision::state::actions::{
+    Authorize,
+    WorkflowActions,
 };
+use crate::decision::state::{
+    common,
+    AsyncVendorCallsCompleted,
+    BoKycCompleted,
+    MakeDecision,
+    MakeVendorCalls,
+    OnAction,
+    WorkflowState,
+};
+use crate::decision::utils::FixtureDecision;
+use crate::decision::{
+    self,
+    risk,
+    RuleError,
+};
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+};
+use crate::State;
 use async_trait::async_trait;
-use db::models::{
-    data_lifetime::DataLifetime,
-    insight_event::InsightEvent,
-    list_entry::{ListEntry, ListWithDecryptedEntries},
-    ob_configuration::ObConfiguration,
-    onboarding_decision::OnboardingDecision,
-    risk_signal::RiskSignal,
-    risk_signal_group::RiskSignalGroup,
-    rule_instance::RuleInstance,
-    scoped_vault::ScopedVault,
-    vault::Vault,
-    workflow::{Workflow as DbWorkflow, WorkflowUpdate},
+use db::models::data_lifetime::DataLifetime;
+use db::models::insight_event::InsightEvent;
+use db::models::list_entry::{
+    ListEntry,
+    ListWithDecryptedEntries,
+};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding_decision::OnboardingDecision;
+use db::models::risk_signal::RiskSignal;
+use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::rule_instance::RuleInstance;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
+use db::models::workflow::{
+    Workflow as DbWorkflow,
+    WorkflowUpdate,
 };
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
-    DecisionStatus, FootprintReasonCode, KybConfig, ListId, Locked, OnboardingStatus, RiskSignalGroupKind,
+    DecisionStatus,
+    FootprintReasonCode,
+    KybConfig,
+    ListId,
+    Locked,
+    OnboardingStatus,
+    RiskSignalGroupKind,
     RuleSetResultKind,
 };
+use std::collections::HashMap;
+use std::sync::Arc;
 
 /////////////////////
 /// DataCollection
 /// ////////////////
-/// Starting state that indicates we are waiting for all business information to be entered + authorized
+/// Starting state that indicates we are waiting for all business information to be entered +
+/// authorized
 impl KybDataCollection {
     #[tracing::instrument("KybDataCollection::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
@@ -202,7 +228,8 @@ impl WorkflowState for KybAwaitingBoKyc {
 /////////////////////
 /// VendorCalls
 /// ////////////////
-/// In this state we initiate our asyncronous Middesk state machine. In the future we may also add syncronous KYB vendors here (eg: Lexis + Experian)
+/// In this state we initiate our asyncronous Middesk state machine. In the future we may also add
+/// syncronous KYB vendors here (eg: Lexis + Experian)
 impl KybVendorCalls {
     #[tracing::instrument("KybVendorCalls::init", skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
@@ -236,8 +263,9 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
         let fixture_decision =
             decision::utils::get_fixture_data_decision(state.ff_client.clone(), &v, &wf, &self.t_id)?;
         if fixture_decision.is_none() {
-            // TODO: later will refactor so we instead construct the BusinessData from the vault here, then make the CreateBusiness request to middesk
-            // and then in the on_commit txn save the vreq + vres + MiddeskRequest with the business_id from the response all at once.
+            // TODO: later will refactor so we instead construct the BusinessData from the vault here, then
+            // make the CreateBusiness request to middesk and then in the on_commit txn save the
+            // vreq + vres + MiddeskRequest with the business_id from the response all at once.
 
             // TODO: make this get_or_create
             let middesk_state =
@@ -386,7 +414,8 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
-                let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling a new seqno inside the RSR write itself
+                let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling
+                                                                    // a new seqno inside the RSR write itself
                 let vw =
                     VaultWrapper::<Any>::build_for_tenant_version(conn, &wf.scoped_vault_id, Some(seqno))?;
 

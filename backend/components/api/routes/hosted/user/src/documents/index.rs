@@ -1,11 +1,21 @@
-use crate::{auth::user::UserAuthScope, types::response::ResponseData, State};
-use api_core::{
-    auth::user::UserWfAuthContext, decision, types::JsonApiResponse, utils::headers::InsightHeaders,
+use crate::auth::user::UserAuthScope;
+use crate::types::response::ResponseData;
+use crate::State;
+use api_core::auth::user::UserWfAuthContext;
+use api_core::decision;
+use api_core::types::JsonApiResponse;
+use api_core::utils::headers::InsightHeaders;
+use api_wire_types::{
+    CreateDocumentRequest,
+    CreateDocumentResponse,
 };
-use api_wire_types::{CreateDocumentRequest, CreateDocumentResponse};
 use db::models::insight_event::CreateInsightEvent;
 use newtypes::WorkflowGuard;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Create a new identity document for this user's outstanding document request",

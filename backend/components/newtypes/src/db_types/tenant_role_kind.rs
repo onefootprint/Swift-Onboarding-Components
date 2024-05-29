@@ -1,7 +1,16 @@
 use crate::TenantKind;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumString};
+use strum_macros::{
+    AsRefStr,
+    Display,
+    EnumDiscriminants,
+    EnumString,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumDiscriminants)]
 #[strum_discriminants(derive(

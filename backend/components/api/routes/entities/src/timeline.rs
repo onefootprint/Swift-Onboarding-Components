@@ -1,13 +1,20 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{response::ResponseData, JsonApiResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::ListTimelineRequest;
 use db::models::user_timeline::UserTimeline;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 

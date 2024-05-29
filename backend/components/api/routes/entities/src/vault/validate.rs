@@ -1,27 +1,43 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    errors::ApiResult,
-    types::{EmptyResponse, JsonApiResponse},
-    utils::vault_wrapper::VaultWrapper,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    auth::{
-        tenant::{ClientTenantAuthContext, TenantAuth},
-        CanVault,
-    },
-    utils::{
-        fp_id_path::FpIdPath,
-        vault_wrapper::{DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, TenantVw},
-    },
+use crate::errors::ApiResult;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::auth::tenant::{
+    ClientTenantAuthContext,
+    TenantAuth,
+};
+use api_core::auth::CanVault;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::{
+    DataLifetimeSources,
+    DataRequestSource,
+    FingerprintedDataRequest,
+    TenantVw,
 };
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::{
-    put_data_request::{PatchDataRequest, RawDataRequest},
-    FpId, ValidateArgs,
+use newtypes::put_data_request::{
+    PatchDataRequest,
+    RawDataRequest,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use newtypes::{
+    FpId,
+    ValidateArgs,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[route_alias(
     actix::post(

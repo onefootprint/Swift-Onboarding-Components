@@ -9,11 +9,16 @@ pub mod stytch;
 pub mod twilio;
 
 use async_trait::async_trait;
-use idv::{ParsedResponse, VendorResponse};
-
+use idv::{
+    ParsedResponse,
+    VendorResponse,
+};
 #[cfg(test)]
 use mockall::automock;
-use newtypes::{PiiJsonValue, VendorAPI};
+use newtypes::{
+    PiiJsonValue,
+    VendorAPI,
+};
 
 pub trait VendorAPIResponse: Sized {
     fn vendor_api(&self) -> VendorAPI;

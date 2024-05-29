@@ -1,9 +1,22 @@
-use chrono::{DateTime, Utc};
-use db_schema::schema::{compliance_doc_template, compliance_doc_template_version};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    compliance_doc_template,
+    compliance_doc_template_version,
+};
 use diesel::prelude::*;
-use newtypes::{ComplianceDocTemplateId, ComplianceDocTemplateVersionId, PartnerTenantId, TenantUserId};
-
-use crate::{DbResult, PgConn};
+use newtypes::{
+    ComplianceDocTemplateId,
+    ComplianceDocTemplateVersionId,
+    PartnerTenantId,
+    TenantUserId,
+};
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = compliance_doc_template_version)]

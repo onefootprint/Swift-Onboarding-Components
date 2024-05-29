@@ -1,8 +1,16 @@
-use crate::incode::{response::Error, IncodeClientErrorCustomFailureReasons};
-use chrono::{DateTime, Utc};
+use crate::incode::response::Error;
+use crate::incode::IncodeClientErrorCustomFailureReasons;
+use chrono::{
+    DateTime,
+    Utc,
+};
 use derive_more::Deref;
 use newtypes::{
-    scrub_pii_value, IncodeFailureReason, IncodeWatchlistResultRef, PiiJsonValue, PiiString,
+    scrub_pii_value,
+    IncodeFailureReason,
+    IncodeWatchlistResultRef,
+    PiiJsonValue,
+    PiiString,
     ScrubbedPiiString,
 };
 
@@ -125,13 +133,15 @@ pub struct Media {
 ///
 /// LEAKED VERSIONS
 ///
-/// Below is a hack to enable serializing `Hit`'s with the internal PII leaked. By default, we mark pii fields of a vendor response struct
-/// with ScrubbedPiiString so that when we serialize the struct to save it in the plaintext `verification_result.response` field in PG, it contains no PII
-/// We currently have 1 other use case to serialize a vendor response struct which is to forward Incode's watchlist results in the Alpaca CIP.
-/// It's very likely we'll need to format this for the CIP differently and write custom logic to generate a JSON blob in their preferred format
-/// so this is possibly a temporary hack anyway.
-/// We make duplicate copies of `Hit` and its containing struct which have Pii* instead of ScrubbedPii* fields. In the Alpaca CIP, we can then call
-/// hit.leak() and get a LeakedHit which we can serialize with the PII leaked.
+/// Below is a hack to enable serializing `Hit`'s with the internal PII leaked. By default, we mark
+/// pii fields of a vendor response struct with ScrubbedPiiString so that when we serialize the
+/// struct to save it in the plaintext `verification_result.response` field in PG, it contains no
+/// PII We currently have 1 other use case to serialize a vendor response struct which is to forward
+/// Incode's watchlist results in the Alpaca CIP. It's very likely we'll need to format this for the
+/// CIP differently and write custom logic to generate a JSON blob in their preferred format so this
+/// is possibly a temporary hack anyway. We make duplicate copies of `Hit` and its containing struct
+/// which have Pii* instead of ScrubbedPii* fields. In the Alpaca CIP, we can then call hit.leak()
+/// and get a LeakedHit which we can serialize with the PII leaked.
 
 impl Hit {
     pub fn leak(self) -> LeakedHit {

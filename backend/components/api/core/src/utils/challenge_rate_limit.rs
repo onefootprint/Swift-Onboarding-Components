@@ -1,9 +1,14 @@
-use super::session::{JsonSession, RateLimitRecord};
-use crate::{
-    errors::{error_with_code::ErrorWithCode, ApiResult},
-    State,
+use super::session::{
+    JsonSession,
+    RateLimitRecord,
 };
-use chrono::{Duration, Utc};
+use crate::errors::error_with_code::ErrorWithCode;
+use crate::errors::ApiResult;
+use crate::State;
+use chrono::{
+    Duration,
+    Utc,
+};
 use newtypes::PiiString;
 
 fn compute_key(key: &PiiString, scope: &str) -> String {
@@ -31,7 +36,8 @@ impl<'a> RateLimit<'a> {
                 if let Some(session) = JsonSession::<RateLimitRecord>::get(conn, &rate_limit_key)? {
                     let time_since_last_sent = now - session.data.sent_at;
                     if time_since_last_sent < period {
-                        // num_seconds() only returns count of whole seconds, so we add one to avoid returning 0 seconds as time remaining
+                        // num_seconds() only returns count of whole seconds, so we add one to avoid returning
+                        // 0 seconds as time remaining
                         let time_remaining = (period - time_since_last_sent).num_seconds() + 1;
                         tracing::info!(%time_remaining, "Rate limited");
                         return Err(ErrorWithCode::RateLimited(time_remaining).into());

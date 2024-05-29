@@ -1,13 +1,26 @@
+use super::AuthSessionData;
+use crate::errors::user::UserError;
+use crate::errors::{
+    ApiResult,
+    ValidationError,
+};
 use itertools::Itertools;
 use newtypes::{
-    AuthEventId, AuthMethodKind, BoId, ContactInfoId, DataIdentifier, DataLifetimeSource, IdentifyScope,
-    ObConfigurationId, RequestedTokenScope, ScopedVaultId, UserAuthScope, VaultId, WorkflowId,
+    AuthEventId,
+    AuthMethodKind,
+    BoId,
+    ContactInfoId,
+    DataIdentifier,
+    DataLifetimeSource,
+    IdentifyScope,
+    ObConfigurationId,
+    RequestedTokenScope,
+    ScopedVaultId,
+    UserAuthScope,
+    VaultId,
+    WorkflowId,
     WorkflowRequestId,
 };
-
-use crate::errors::{user::UserError, ApiResult, ValidationError};
-
-use super::AuthSessionData;
 
 /// A user-specific auth session. Permissions for the session are defined by the set of scopes.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -287,7 +300,8 @@ impl UserSession {
         }
     }
 
-    /// Returns true if any token from which this token was derived was issued via tenant-facing API.
+    /// Returns true if any token from which this token was derived was issued via tenant-facing
+    /// API.
     pub fn is_from_api(&self) -> bool {
         self.purposes.iter().any(|p| p.is_from_api())
     }

@@ -1,10 +1,12 @@
-use api_core::{
-    types::{EmptyResponse, JsonApiResponse},
-    utils::magic_link::create_magic_link,
-    State,
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
+use api_core::utils::magic_link::create_magic_link;
+use api_core::State;
 use api_wire_types::LinkAuthRequest;
-use paperclip::actix::{web, web::Json};
+use paperclip::actix::web;
+use paperclip::actix::web::Json;
 
 pub async fn handler(
     state: web::Data<State>,

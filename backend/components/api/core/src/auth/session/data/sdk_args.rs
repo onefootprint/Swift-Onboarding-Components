@@ -1,19 +1,27 @@
-use db::{
-    models::{
-        appearance::Appearance, ob_configuration::ObConfiguration, tenant::Tenant,
-        tenant_client_config::TenantClientConfig,
-    },
-    PgConn,
+use crate::errors::{
+    ApiResult,
+    ValidationError,
 };
+use db::models::appearance::Appearance;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::tenant::Tenant;
+use db::models::tenant_client_config::TenantClientConfig;
+use db::PgConn;
 use newtypes::{
-    DataIdentifier, EncryptedVaultPrivateKey, ObConfigurationKey, PiiJsonValue, PiiString, SealedVaultBytes,
+    DataIdentifier,
+    EncryptedVaultPrivateKey,
+    ObConfigurationKey,
+    PiiJsonValue,
+    PiiString,
+    SealedVaultBytes,
     SessionAuthToken,
 };
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
-use strum_macros::{Display, EnumDiscriminants};
-
-use crate::errors::{ApiResult, ValidationError};
+use strum_macros::{
+    Display,
+    EnumDiscriminants,
+};
 
 pub type UserDataV1 = HashMap<DataIdentifier, PiiJsonValue>;
 
@@ -305,12 +313,10 @@ impl ValidateSdkArgs for SdkArgs {
 
 #[cfg(test)]
 mod test {
+    use super::SdkArgs;
+    use crate::auth::session::sdk_args::ValidateSdkArgs;
     use serde_json::json;
     use test_case::test_case;
-
-    use crate::auth::session::sdk_args::ValidateSdkArgs;
-
-    use super::SdkArgs;
 
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234", "public_key": "ob_1234", "user_data": {"id.first_name": "Hayes", "id.citizenships": ["US", "NO"], "id.state": "Invalid"}, "options": {"show_completion_page": true, "show_logo": false}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234"}}))]

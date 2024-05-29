@@ -1,13 +1,20 @@
-use std::collections::HashMap;
-
 use crate::{
-    CollectedDataOption, CustomDocumentConfig, DocumentKind, DocumentRequestId, DocumentRequestKind,
-    DocumentUploadMode, IdDocKind, Iso3166TwoDigitCountryCode,
+    CollectedDataOption,
+    CustomDocumentConfig,
+    DocumentKind,
+    DocumentRequestId,
+    DocumentRequestKind,
+    DocumentUploadMode,
+    IdDocKind,
+    Iso3166TwoDigitCountryCode,
 };
-use chrono::{DateTime, Utc};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
-
+use std::collections::HashMap;
 use strum::EnumDiscriminants;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants)]
@@ -33,7 +40,7 @@ pub enum OnboardingRequirement {
         missing_attributes: Vec<CollectedDataOption>,
         populated_attributes: Vec<CollectedDataOption>,
     },
-    /// Register a passkey    
+    /// Register a passkey
     #[serde(rename = "liveness")]
     #[strum(to_string = "liveness")]
     #[strum_discriminants(strum(to_string = "liveness"))]
@@ -44,7 +51,8 @@ pub enum OnboardingRequirement {
         upload_mode: DocumentUploadMode,
         config: CollectDocumentConfig,
     },
-    /// The client needs to display the authorization consent page and confirm the user authorizes access
+    /// The client needs to display the authorization consent page and confirm the user authorizes
+    /// access
     Authorize {
         fields_to_authorize: AuthorizeFields,
         authorized_at: Option<DateTime<Utc>>,
@@ -213,13 +221,20 @@ pub struct AuthorizeFields {
 
 #[cfg(test)]
 mod test {
-    use std::{collections::HashMap, str::FromStr};
-
     use crate::{
-        AuthorizeFields, CollectDocumentConfig, CustomDocumentConfig, DataIdentifier, DocumentRequestId,
-        DocumentRequestKind, DocumentUploadMode, OnboardingRequirement, OnboardingRequirementKind,
+        AuthorizeFields,
+        CollectDocumentConfig,
+        CustomDocumentConfig,
+        DataIdentifier,
+        DocumentRequestId,
+        DocumentRequestKind,
+        DocumentUploadMode,
+        OnboardingRequirement,
+        OnboardingRequirementKind,
     };
     use itertools::Itertools;
+    use std::collections::HashMap;
+    use std::str::FromStr;
     use strum::IntoEnumIterator;
     use test_case::test_case;
 

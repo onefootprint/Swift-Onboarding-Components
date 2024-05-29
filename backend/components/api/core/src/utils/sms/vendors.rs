@@ -1,7 +1,8 @@
 use super::client::SmsClient;
 use crate::errors::ApiResult;
 use async_trait::async_trait;
-use newtypes::{sms_message::SmsMessage, PiiString};
+use newtypes::sms_message::SmsMessage;
+use newtypes::PiiString;
 
 pub struct TwilioSms;
 

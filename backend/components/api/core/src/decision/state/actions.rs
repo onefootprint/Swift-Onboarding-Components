@@ -1,10 +1,12 @@
+use super::StateError;
 use crate::auth::tenant::AuthActor;
 use api_wire_types::DecisionRequest;
 use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
-use strum_macros::{EnumDiscriminants, EnumString};
-
-use super::StateError;
+use strum_macros::{
+    EnumDiscriminants,
+    EnumString,
+};
 
 #[derive(Debug)]
 pub struct Authorize;

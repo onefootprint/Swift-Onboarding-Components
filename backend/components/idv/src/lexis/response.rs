@@ -1,9 +1,11 @@
+use super::ResponseError;
 use crate::lexis;
 use newtypes::*;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::fmt::Debug;
-
-use super::ResponseError;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 #[serde(rename_all = "PascalCase")]
@@ -92,7 +94,8 @@ pub struct LResult {
     pub unique_id: Option<String>,
     /// Indicates whether the SSN is verified
     #[serde(rename = "VerifiedSSN")]
-    pub verified_ssn: Option<ScrubbedPiiString>, // TODO: not totally clear why this is a string, it appears to be last4 maybe...?
+    pub verified_ssn: Option<ScrubbedPiiString>, /* TODO: not totally clear why this is a string, it
+                                                  * appears to be last4 maybe...? */
     pub name_address_phone: Option<NameAddressPhone>,
     pub verified_element_summary: Option<VerifiedElementSummary>, // think we don't get this jawn with FlexId
     pub valid_element_summary: Option<ValidElementSummary>,
@@ -105,15 +108,21 @@ pub struct LResult {
     /// InstantID version that is used to generate the results
     #[serde(rename = "InstantIDVersion")]
     pub instant_id_version: Option<String>,
-    /// Indicates whether the NAS verification record is a LexisNexis Risk Solutions emerging identity record and does not have an assigned LexID number. The default value is 0. See your LexisNexis Risk Solutions account representative for details about using the EmergingId element.
+    /// Indicates whether the NAS verification record is a LexisNexis Risk Solutions emerging
+    /// identity record and does not have an assigned LexID number. The default value is 0. See your
+    /// LexisNexis Risk Solutions account representative for details about using the EmergingId
+    /// element.
     pub emerging_id: Option<bool>,
-    /// Type of secondary range mismatch between the input address and the address that was found in LexisNexis Risk Solutions records
-    /// Possible values:
-    /// • D (No secondary range was submitted as input, but a secondary range was found in LexisNexis Risk Solutions records)
-    /// • I (A secondary range was submitted as input, but a secondary range was not found in LexisNexis Risk Solutions records)
-    /// • M (A secondary range was submitted as input, but the secondary range does not match the secondary range that was found in LexisNexis Risk Solutions records)
-    /// • N (No secondary range was submitted as input, and no secondary range was found in or found in LexisNexis Risk Solutions records)
-    /// • V (Secondary range was verified, and the input secondary range matches records)
+    /// Type of secondary range mismatch between the input address and the address that was found in
+    /// LexisNexis Risk Solutions records Possible values:
+    /// • D (No secondary range was submitted as input, but a secondary range was found in
+    /// LexisNexis Risk Solutions records) • I (A secondary range was submitted as input, but a
+    /// secondary range was not found in LexisNexis Risk Solutions records) • M (A secondary
+    /// range was submitted as input, but the secondary range does not match the secondary range
+    /// that was found in LexisNexis Risk Solutions records) • N (No secondary range was
+    /// submitted as input, and no secondary range was found in or found in LexisNexis Risk
+    /// Solutions records) • V (Secondary range was verified, and the input secondary range
+    /// matches records)
     pub address_secondary_range_mismatch: Option<String>,
     // Indicates whether the SSN is not verified because the bureau deleted the record
     pub bureau_deleted: Option<bool>,
@@ -317,7 +326,7 @@ pub struct NameAddressPhone {
     /// Possible values:
     /// • A (Phone listing)
     /// • P (Phone records)
-    /// • U (Utility records)  
+    /// • U (Utility records)
     /// • S (Customer network)
     //  • I (Internal proprietary)
     #[serde(rename = "Type")]
@@ -483,7 +492,12 @@ impl FlexIdResponse {
                     None
                 }
             })
-            .unwrap_or(NameAddressPhoneSummary::NothingFound) // TODO: in general when an expected field is missing or we fail to parse, do we want produce a conservative FRC (like this unwrap_or) or do we want to just not produce any FRC at all?
+            .unwrap_or(NameAddressPhoneSummary::NothingFound) // TODO: in general when an expected
+                                                              // field is missing or we fail to
+                                                              // parse, do we want produce a
+                                                              // conservative FRC (like this
+                                                              // unwrap_or) or do we want to just
+                                                              // not produce any FRC at all?
     }
 
     pub fn name_address_ssn_summary(&self) -> NameAddressSsnSummary {
@@ -498,7 +512,11 @@ impl FlexIdResponse {
                     }
                 },
             )
-            .unwrap_or(NameAddressSsnSummary::NothingFound) // TODO: in general when an expected field is missing or we fail to parse, do we want produce a conservative FRC (like this unwrap_or) or do we want to just not produce any FRC at all?
+            .unwrap_or(NameAddressSsnSummary::NothingFound) // TODO: in general when an expected
+                                                            // field is missing or we fail to parse,
+                                                            // do we want produce a conservative FRC
+                                                            // (like this unwrap_or) or do we want
+                                                            // to just not produce any FRC at all?
     }
 
     pub fn dob_match_level(&self) -> DobMatchLevel {
@@ -512,7 +530,12 @@ impl FlexIdResponse {
                     None
                 }
             })
-            .unwrap_or(DobMatchLevel::NoDobFoundOrSubmitted) // TODO: in general when an expected field is missing or we fail to parse, do we want produce a conservative FRC (like this unwrap_or) or do we want to just not produce any FRC at all?
+            .unwrap_or(DobMatchLevel::NoDobFoundOrSubmitted) // TODO: in general when an expected
+                                                             // field is missing or we fail to
+                                                             // parse, do we want produce a
+                                                             // conservative FRC (like this
+                                                             // unwrap_or) or do we want to just not
+                                                             // produce any FRC at all?
     }
 
     pub fn valid_element_summary(&self) -> Option<ValidElementSummary> {
@@ -569,9 +592,8 @@ impl FlexIdResponse {
 
 #[cfg(test)]
 mod tests {
-    use crate::lexis;
-
     use super::*;
+    use crate::lexis;
     use serde_json::json;
 
     #[test]

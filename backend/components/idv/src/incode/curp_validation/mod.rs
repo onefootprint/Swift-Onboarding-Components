@@ -1,4 +1,5 @@
-use newtypes::{vendor_credentials::IncodeCredentialsWithToken, PiiString};
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
+use newtypes::PiiString;
 
 pub mod request;
 pub mod response;

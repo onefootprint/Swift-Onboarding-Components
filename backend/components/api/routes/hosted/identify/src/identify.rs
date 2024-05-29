@@ -1,28 +1,50 @@
-use std::str::FromStr;
-
-use crate::{GetIdentifyChallengeArgs, IdentifyChallengeContext, UserChallengeContext};
-
-use api_core::{
-    auth::{
-        ob_config::ObConfigAuth,
-        session::user::{NewUserSessionArgs, NewUserSessionContext, UserSession},
-        user::UserAuthContext,
-        Any,
-    },
-    errors::ApiResult,
-    telemetry::RootSpan,
-    types::{JsonApiResponse, ResponseData},
-    utils::{headers::SandboxId, session::AuthSession},
-    State,
+use crate::{
+    GetIdentifyChallengeArgs,
+    IdentifyChallengeContext,
+    UserChallengeContext,
 };
-use api_wire_types::{IdentifiedUser, IdentifyId, IdentifyRequest, IdentifyResponse};
+use api_core::auth::ob_config::ObConfigAuth;
+use api_core::auth::session::user::{
+    NewUserSessionArgs,
+    NewUserSessionContext,
+    UserSession,
+};
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::Any;
+use api_core::errors::ApiResult;
+use api_core::telemetry::RootSpan;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::headers::SandboxId;
+use api_core::utils::session::AuthSession;
+use api_core::State;
+use api_wire_types::{
+    IdentifiedUser,
+    IdentifyId,
+    IdentifyRequest,
+    IdentifyResponse,
+};
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
+use newtypes::email::Email;
 use newtypes::{
-    email::Email, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, PhoneNumber, SessionAuthToken,
-    UserAuthScope, VaultId,
+    DataIdentifier,
+    IdentifyScope,
+    IdentityDataKind as IDK,
+    PhoneNumber,
+    SessionAuthToken,
+    UserAuthScope,
+    VaultId,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
+use std::str::FromStr;
 
 #[api_v2_operation(
     tags(Identify, Hosted),
@@ -153,8 +175,9 @@ pub async fn post(
 }
 
 /// Creates an identified, unauthed token for the provided vault ID.
-/// The token may either explicitly specify a sv_id when vault has already onboarded onto the tenant,
-/// or it may specify a playbook id onto which the vault will be onboarded after they complete the auth.
+/// The token may either explicitly specify a sv_id when vault has already onboarded onto the
+/// tenant, or it may specify a playbook id onto which the vault will be onboarded after they
+/// complete the auth.
 pub(super) async fn create_identified_token(
     state: &State,
     v_id: VaultId,

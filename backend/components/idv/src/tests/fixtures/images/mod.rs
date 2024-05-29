@@ -1,7 +1,12 @@
+use image::{
+    self,
+    ImageOutputFormat,
+};
+use newtypes::{
+    Base64Data,
+    Base64EncodedString,
+};
 use std::io::Cursor;
-
-use image::{self, ImageOutputFormat};
-use newtypes::{Base64Data, Base64EncodedString};
 
 /// All images are assumed to be in `./images/ and are jpgs`
 #[allow(unused)]

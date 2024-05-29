@@ -1,11 +1,14 @@
 use derive_more::Display;
 use enum_variant_type::EnumVariantType;
 use newtypes::VendorAPI;
-use strum_macros::{EnumIter, EnumString};
+use strum_macros::{
+    EnumIter,
+    EnumString,
+};
 
-/// VendorAPI is a core concept in our codebase. Because (as of now) it's defined in `newtypes` with all the other
-/// db types, we have another "Wrapped" enum here so we can implement extra functionality that is
-/// helpful for working with VendorAPIs in application code
+/// VendorAPI is a core concept in our codebase. Because (as of now) it's defined in `newtypes` with
+/// all the other db types, we have another "Wrapped" enum here so we can implement extra
+/// functionality that is helpful for working with VendorAPIs in application code
 #[derive(Debug, Display, Clone, Copy, Hash, PartialEq, Eq, EnumIter, EnumString, EnumVariantType)]
 #[evt(module = "vendor_api_struct")]
 #[evt(derive(Clone, Hash, PartialEq, Eq, Debug))]

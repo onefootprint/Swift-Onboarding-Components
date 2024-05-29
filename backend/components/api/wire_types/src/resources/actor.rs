@@ -1,5 +1,8 @@
 use crate::*;
-use newtypes::{FpId, TenantApiKeyId};
+use newtypes::{
+    FpId,
+    TenantApiKeyId,
+};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

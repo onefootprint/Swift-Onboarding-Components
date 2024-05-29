@@ -1,29 +1,73 @@
-use super::{list::List, list_entry::ListEntry, list_entry_creation::ListEntryCreation};
-use crate::{
-    actor::{saturate_actors, HasActor, SaturatedActor},
-    models::{
-        document_data::DocumentData, insight_event::InsightEvent, ob_configuration::ObConfiguration,
-        scoped_vault::*, tenant::Tenant, tenant_api_key::TenantApiKey, tenant_role::TenantRole,
-        tenant_user::TenantUser,
-    },
-    DbResult, PgConn, TxnPgConn,
+use super::list::List;
+use super::list_entry::ListEntry;
+use super::list_entry_creation::ListEntryCreation;
+use crate::actor::{
+    saturate_actors,
+    HasActor,
+    SaturatedActor,
 };
-use chrono::{DateTime, Utc};
+use crate::models::document_data::DocumentData;
+use crate::models::insight_event::InsightEvent;
+use crate::models::ob_configuration::ObConfiguration;
+use crate::models::scoped_vault::*;
+use crate::models::tenant::Tenant;
+use crate::models::tenant_api_key::TenantApiKey;
+use crate::models::tenant_role::TenantRole;
+use crate::models::tenant_user::TenantUser;
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::{
-    audit_event, document_data, insight_event, list, list_entry, list_entry_creation, ob_configuration,
-    scoped_vault, tenant, tenant_api_key, tenant_role, tenant_user,
+    audit_event,
+    document_data,
+    insight_event,
+    list,
+    list_entry,
+    list_entry_creation,
+    ob_configuration,
+    scoped_vault,
+    tenant,
+    tenant_api_key,
+    tenant_role,
+    tenant_user,
+};
+use diesel::dsl::sql;
+use diesel::prelude::*;
+use diesel::sql_types::{
+    Array,
+    Bool,
+    Text,
 };
 use diesel::{
-    dsl::sql,
-    prelude::*,
-    sql_types::{Array, Bool, Text},
-    Insertable, Queryable,
+    Insertable,
+    Queryable,
 };
 use itertools::Itertools;
 use newtypes::{
-    AuditEventDetail, AuditEventId, AuditEventMetadata, AuditEventName, CommonAuditEventDetail,
-    DataIdentifier, DbActor, DocumentDataId, InsightEventId, ListEntryCreationId, ListEntryId, ListId,
-    ObConfigurationId, ScopedVaultId, TenantApiKeyId, TenantId, TenantRoleId, TenantUserId,
+    AuditEventDetail,
+    AuditEventId,
+    AuditEventMetadata,
+    AuditEventName,
+    CommonAuditEventDetail,
+    DataIdentifier,
+    DbActor,
+    DocumentDataId,
+    InsightEventId,
+    ListEntryCreationId,
+    ListEntryId,
+    ListId,
+    ObConfigurationId,
+    ScopedVaultId,
+    TenantApiKeyId,
+    TenantId,
+    TenantRoleId,
+    TenantUserId,
 };
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -336,8 +380,12 @@ impl AuditEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{fixtures::ob_configuration::ObConfigurationOpts, prelude::*};
-    use itertools::{sorted, Itertools};
+    use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
+    use crate::tests::prelude::*;
+    use itertools::{
+        sorted,
+        Itertools,
+    };
     use macros::db_test;
     use newtypes::DataIdentifier;
 

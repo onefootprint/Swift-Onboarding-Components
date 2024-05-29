@@ -5,18 +5,39 @@ pub mod pool;
 use async_trait::async_trait;
 pub use bb8;
 pub use config::Config;
+use pool::{
+    Stream,
+    StreamConnection,
+};
 use rpc::WireMessage;
 pub use rpc::{
-    DataTransform, DataTransformer, DataTransforms, DecryptRequest, DecryptThenSignRequest, Decryption,
-    EnclavePayload, EnclaveResponse, EncryptTransformAlgorithm, EnvelopeDecryptRequest,
-    EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest, Error as EnclaveError,
-    GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
-    GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
-    SignRequest, Signing, TransformError,
+    DataTransform,
+    DataTransformer,
+    DataTransforms,
+    DecryptRequest,
+    DecryptThenSignRequest,
+    Decryption,
+    EnclavePayload,
+    EnclaveResponse,
+    EncryptTransformAlgorithm,
+    EnvelopeDecryptRequest,
+    EnvelopeDecryptThenHmacSignRequest,
+    EnvelopeHmacSignRequest,
+    Error as EnclaveError,
+    GenerateDataKeypairRequest,
+    GenerateSymmetricDataKeyRequest,
+    GeneratedDataKeyPair,
+    GeneratedSealedDataKey,
+    HmacSignature,
+    KmsCredentials,
+    RpcPayload,
+    RpcRequest,
+    SealedIkek,
+    Sealing,
+    SignRequest,
+    Signing,
+    TransformError,
 };
-
-use pool::{Stream, StreamConnection};
-
 use thiserror::Error;
 use tokio::io::AsyncWriteExt;
 

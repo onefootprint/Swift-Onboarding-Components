@@ -1,37 +1,58 @@
-use crate::{
-    auth::user::{UserAuthContext, UserAuthScope},
-    types::{EmptyResponse, JsonApiResponse},
-    State,
+use crate::auth::user::{
+    UserAuthContext,
+    UserAuthScope,
 };
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use crate::State;
 use actix_web::web::Json;
+use api_core::auth::user::UserAuth;
+use api_core::decision::vendor;
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
+};
+use api_core::utils::headers::TelemetryHeaders;
 use api_core::{
-    auth::user::UserAuth,
     decision,
-    decision::vendor,
-    errors::{ApiResult, AssertionError},
-    utils::headers::TelemetryHeaders,
     ApiError,
 };
 use api_wire_types::hosted::stytch::StytchTelemetryRequest;
 use chrono::Utc;
-use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        risk_signal::RiskSignal,
-        stytch_fingerprint_event::{NewStytchFingerprintEvent, StytchFingerprintEvent},
-        vault::Vault,
-        verification_request::VerificationRequest,
-    },
-    TxnPgConn,
+use db::models::decision_intent::DecisionIntent;
+use db::models::risk_signal::RiskSignal;
+use db::models::stytch_fingerprint_event::{
+    NewStytchFingerprintEvent,
+    StytchFingerprintEvent,
 };
+use db::models::vault::Vault;
+use db::models::verification_request::VerificationRequest;
+use db::TxnPgConn;
 use either::Either;
 use feature_flag::BoolFlag;
-use idv::{
-    stytch::{StytchLookupRequest, StytchLookupResponse},
-    ParsedResponse, VendorResponse,
+use idv::stytch::{
+    StytchLookupRequest,
+    StytchLookupResponse,
 };
-use newtypes::{DecisionIntentKind, RiskSignalGroupKind, ScopedVaultId, VaultId, VaultPublicKey, VendorAPI};
-use paperclip::actix::{self, api_v2_operation, web};
+use idv::{
+    ParsedResponse,
+    VendorResponse,
+};
+use newtypes::{
+    DecisionIntentKind,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+    VaultId,
+    VaultPublicKey,
+    VendorAPI,
+};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),

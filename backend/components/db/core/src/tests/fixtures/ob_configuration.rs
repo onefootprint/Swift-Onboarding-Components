@@ -1,13 +1,20 @@
-use crate::{
-    models::ob_configuration::{get_verification_checks_for_legacy_compat, NewObConfigurationArgs},
-    PgConn,
+use crate::models::ob_configuration::{
+    get_verification_checks_for_legacy_compat,
+    NewObConfigurationArgs,
+    ObConfiguration,
 };
+use crate::PgConn;
 use newtypes::{
-    CipKind, CollectedDataOption as CDO, DbActor, DocumentAndCountryConfiguration, EnhancedAmlOption,
-    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId, VerificationCheck,
+    CipKind,
+    CollectedDataOption as CDO,
+    DbActor,
+    DocumentAndCountryConfiguration,
+    EnhancedAmlOption,
+    Iso3166TwoDigitCountryCode,
+    ObConfigurationKind,
+    TenantId,
+    VerificationCheck,
 };
-
-use crate::models::ob_configuration::ObConfiguration;
 
 pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfiguration {
     let args = NewObConfigurationArgs {

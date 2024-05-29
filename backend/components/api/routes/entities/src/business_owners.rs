@@ -1,21 +1,29 @@
-use api_core::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{response::ResponseData, JsonApiResponse},
-    State,
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    errors::ApiResult,
-    serializers::BusinessOwnerInfo,
-    utils::{
-        db2api::DbToApi,
-        fp_id_path::FpIdPath,
-        vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper},
-    },
+use api_core::errors::ApiResult;
+use api_core::serializers::BusinessOwnerInfo;
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::{
+    Business,
+    DecryptedBusinessOwners,
+    TenantVw,
+    VaultWrapper,
 };
+use api_core::State;
 use api_wire_types::BusinessOwner as ApiBusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 type BusinessOwnerListResponse = Vec<ApiBusinessOwner>;
 

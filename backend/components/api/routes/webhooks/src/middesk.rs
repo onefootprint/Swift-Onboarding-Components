@@ -1,14 +1,28 @@
-use actix_web::{web, FromRequest};
+use actix_web::{
+    web,
+    FromRequest,
+};
+use api_core::auth::AuthError;
+use api_core::decision::vendor::middesk::{
+    MiddeskError,
+    MiddeskStatesKind,
+};
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
 use api_core::{
-    auth::AuthError,
     decision,
-    decision::vendor::middesk::{MiddeskError, MiddeskStatesKind},
-    types::{EmptyResponse, JsonApiResponse},
-    ApiErrorKind, State,
+    ApiErrorKind,
+    State,
 };
 use crypto::hex;
 use futures_util::Future;
-use paperclip::actix::{api_v2_operation, post, Apiv2Header};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    Apiv2Header,
+};
 use std::pin::Pin;
 
 #[api_v2_operation(description = "Handles Middesk webhooks.", tags(Webhooks, Private))]
@@ -22,8 +36,9 @@ async fn handle_webhook(
     match res {
         Ok(_) => {}
         Err(err) => {
-            // We are sometimes getting extraneous webhooks for businesses we've already completed verification for. For these cases
-            // we still want to log the error, but we want to return a 200 response to middesk doesn't keep retrying the webhook
+            // We are sometimes getting extraneous webhooks for businesses we've already completed
+            // verification for. For these cases we still want to log the error, but we want to
+            // return a 200 response to middesk doesn't keep retrying the webhook
             if matches!(
                 err.kind(),
                 ApiErrorKind::MiddeskError(MiddeskError::UnexpectedState(MiddeskStatesKind::Complete, _, _))

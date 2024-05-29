@@ -1,4 +1,8 @@
-use newtypes::{IdentityDataKind, IdvData, PiiString};
+use newtypes::{
+    IdentityDataKind,
+    IdvData,
+    PiiString,
+};
 
 pub enum TestCaseOutcome {
     Pass,
@@ -38,8 +42,8 @@ impl ExperianSandboxTestCase {
     }
 }
 
-/// If sending to sandbox, ensure entire struct matches so we're sure we're sending the correct test data
-/// If sending to production, we need to check if it's fuzzy a test case
+/// If sending to sandbox, ensure entire struct matches so we're sure we're sending the correct test
+/// data If sending to production, we need to check if it's fuzzy a test case
 /// +---------------------+--------------+------------------+
 /// |                     |   Prod data  |  Sandbox data    |
 /// +---------------------+--------------+------------------+

@@ -1,16 +1,26 @@
 //! logic for integrating into risk signal/decision engine
-use crate::{decision, decision::vendor, errors::ApiResult};
-use db::{
-    models::{
-        apple_device_attest::AppleDeviceAttestation, decision_intent::DecisionIntent,
-        google_device_attest::GoogleDeviceAttestation, risk_signal::RiskSignal,
-        verification_request::VerificationRequest, verification_result::VerificationResult,
-    },
-    TxnPgConn,
+use crate::decision;
+use crate::decision::vendor;
+use crate::errors::ApiResult;
+use db::models::apple_device_attest::AppleDeviceAttestation;
+use db::models::decision_intent::DecisionIntent;
+use db::models::google_device_attest::GoogleDeviceAttestation;
+use db::models::risk_signal::RiskSignal;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::TxnPgConn;
+use idv::footprint::FootprintDeviceAttestationData;
+use idv::{
+    ParsedResponse,
+    VendorResponse,
 };
-use idv::{footprint::FootprintDeviceAttestationData, ParsedResponse, VendorResponse};
 use newtypes::{
-    DecisionIntentKind, PiiJsonValue, RiskSignalGroupKind, ScopedVaultId, VaultPublicKey, VendorAPI,
+    DecisionIntentKind,
+    PiiJsonValue,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+    VaultPublicKey,
+    VendorAPI,
     WorkflowId,
 };
 
@@ -92,8 +102,11 @@ pub fn save_vendor_result_and_risk_signals(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{decision::vendor::vendor_result::VendorResult, errors::ApiResult, State};
-    use db::tests::{fixtures, test_db_pool::TestDbPool};
+    use crate::decision::vendor::vendor_result::VendorResult;
+    use crate::errors::ApiResult;
+    use crate::State;
+    use db::tests::fixtures;
+    use db::tests::test_db_pool::TestDbPool;
     use macros::test_state;
 
     #[test_state]

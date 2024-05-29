@@ -1,24 +1,29 @@
+use self::tasks::fire_webhook_task::FireWebhookTask;
+use self::tasks::log_message_task::LogMessageTask;
+use self::tasks::log_num_tenant_api_keys_task::LogNumTenantApiKeysTask;
+use self::tasks::run_incode_stuck_workflow_task::RunIncodeStuckWorkflowTask;
+use self::tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask;
+use crate::errors::ApiError;
+use crate::State;
 use async_trait::async_trait;
+use db::models::task::Task;
+use db::models::task_execution::{
+    TaskExecution,
+    TaskExecutionUpdate,
+};
 use db::{
-    models::{
-        task::Task,
-        task_execution::{TaskExecution, TaskExecutionUpdate},
-    },
-    DbError, DbPool, DbResult,
+    DbError,
+    DbPool,
+    DbResult,
 };
-use tracing::Instrument;
-
-use newtypes::{TaskExecutionId, TaskId, TaskKind, TaskStatus};
+use newtypes::{
+    TaskExecutionId,
+    TaskId,
+    TaskKind,
+    TaskStatus,
+};
 use thiserror::Error;
-
-use crate::{errors::ApiError, State};
-
-use self::tasks::{
-    fire_webhook_task::FireWebhookTask, log_message_task::LogMessageTask,
-    log_num_tenant_api_keys_task::LogNumTenantApiKeysTask,
-    run_incode_stuck_workflow_task::RunIncodeStuckWorkflowTask,
-    watchlist_check::watchlist_check_task::WatchlistCheckTask,
-};
+use tracing::Instrument;
 
 mod tasks;
 
@@ -134,7 +139,8 @@ fn task_result_to_status(task: &Task, task_result: Result<(), TaskError>) -> Tas
             if task.num_attempts >= task.task_data.kind().max_attempts() {
                 TaskStatus::Failed
             } else {
-                // if we havent exceeded our max number of attempts, then we set the task back to pending so it will be re-polled and execution re-tried again in a future run
+                // if we havent exceeded our max number of attempts, then we set the task back to pending so
+                // it will be re-polled and execution re-tried again in a future run
                 TaskStatus::Pending
             }
         }
@@ -168,9 +174,13 @@ mod task_tests {
 
     use super::*;
     use chrono::Utc;
-    use db::{test_helpers::have_same_elements, tests::test_db_pool::TestDbPool};
+    use db::test_helpers::have_same_elements;
+    use db::tests::test_db_pool::TestDbPool;
     use macros::test_state;
-    use newtypes::{LogMessageTaskArgs, TaskData};
+    use newtypes::{
+        LogMessageTaskArgs,
+        TaskData,
+    };
 
     fn task_data(message: &str) -> TaskData {
         TaskData::LogMessage(LogMessageTaskArgs {
@@ -195,8 +205,9 @@ mod task_tests {
 
         // Test
         let executed_tasks = poll_and_execute_tasks(state, 2, None).await.unwrap();
-        // TODO: would be nice to actually assert the tasks did what they were supposed to do. Some dumb ideas: have a task which writes a Task to PG with a
-        // particular nonce as an arg and then confirm that was written. Or a task that writes to a tmp file and then we read and confirm
+        // TODO: would be nice to actually assert the tasks did what they were supposed to do. Some dumb
+        // ideas: have a task which writes a Task to PG with a particular nonce as an arg and then
+        // confirm that was written. Or a task that writes to a tmp file and then we read and confirm
         assert!(have_same_elements(
             vec![
                 (&tasks[0].id, TaskStatus::Completed, 1),

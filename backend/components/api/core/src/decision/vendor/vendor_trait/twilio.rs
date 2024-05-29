@@ -1,11 +1,17 @@
-use async_trait::async_trait;
-use idv::{
-    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
-    ParsedResponse,
+use super::{
+    VendorAPICall,
+    VendorAPIResponse,
 };
-use newtypes::{PiiJsonValue, VendorAPI};
-
-use super::{VendorAPICall, VendorAPIResponse};
+use async_trait::async_trait;
+use idv::twilio::{
+    TwilioLookupV2APIResponse,
+    TwilioLookupV2Request,
+};
+use idv::ParsedResponse;
+use newtypes::{
+    PiiJsonValue,
+    VendorAPI,
+};
 
 ////////////////////
 /// Twilio Impl

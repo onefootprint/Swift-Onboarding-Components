@@ -1,22 +1,25 @@
-use db::{
-    models::{
-        verification_request::{VReqIdentifier, VerificationRequest},
-        verification_result::VerificationResult,
-    },
-    DbResult,
+use super::vendor_parsable::{
+    AsParsedResponse,
+    VendorParsable,
 };
-use idv::VendorResponse;
-use newtypes::{EncryptedVaultPrivateKey, VerificationResultId};
-
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::decision::vendor::verification_result::decrypt_verification_result_response;
+use crate::errors::ApiResult;
 use crate::{
-    decision::vendor::{
-        vendor_result::VendorResult, verification_result::decrypt_verification_result_response,
-    },
-    errors::ApiResult,
-    ApiError, State,
+    ApiError,
+    State,
 };
-
-use super::vendor_parsable::{AsParsedResponse, VendorParsable};
+use db::models::verification_request::{
+    VReqIdentifier,
+    VerificationRequest,
+};
+use db::models::verification_result::VerificationResult;
+use db::DbResult;
+use idv::VendorResponse;
+use newtypes::{
+    EncryptedVaultPrivateKey,
+    VerificationResultId,
+};
 
 // Represents an attempt to load and deserialize a vendor API response
 pub enum LoadVendorResponseResult<T: AsParsedResponse> {
@@ -61,7 +64,8 @@ impl<T: AsParsedResponse> LoadVendorResponseResult<T> {
 // This method loads and deserializes the latest successful vendor response for a given VendorAPI
 // for the given workflow.
 //
-// TODO: It won't load the _actual_ latest response if the latest response was an error, so maybe we need to revisit this at some point, but I think it's prob fine
+// TODO: It won't load the _actual_ latest response if the latest response was an error, so maybe we
+// need to revisit this at some point, but I think it's prob fine
 #[tracing::instrument(skip(state, user_vault_private_key))]
 pub async fn load_response_for_vendor_api<T>(
     state: &State,
@@ -116,28 +120,31 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        decision::{
-            tests::test_helpers::{create_kyc_user_and_wf, FixtureData},
-            vendor::{
-                vendor_api::{loaders::load_response_for_vendor_api, vendor_api_struct::*},
-                verification_result::encrypt_verification_result_response,
-            },
-        },
-        State,
+    use crate::decision::tests::test_helpers::{
+        create_kyc_user_and_wf,
+        FixtureData,
     };
+    use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+    use crate::decision::vendor::vendor_api::vendor_api_struct::*;
+    use crate::decision::vendor::verification_result::encrypt_verification_result_response;
+    use crate::State;
     use chrono::Utc;
-    use db::{
-        models::{
-            decision_intent::DecisionIntent,
-            verification_request::NewVerificationRequestArgs,
-            verification_result::{NewVerificationResult, VerificationResult},
-        },
-        tests::fixtures::ob_configuration::ObConfigurationOpts,
+    use db::models::decision_intent::DecisionIntent;
+    use db::models::verification_request::NewVerificationRequestArgs;
+    use db::models::verification_result::{
+        NewVerificationResult,
+        VerificationResult,
     };
+    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use idv::test_fixtures::DocTestOpts;
     use macros::test_state_case;
-    use newtypes::{DecisionIntentId, DecisionIntentKind, ScopedVaultId, VendorAPI, WorkflowId};
+    use newtypes::{
+        DecisionIntentId,
+        DecisionIntentKind,
+        ScopedVaultId,
+        VendorAPI,
+        WorkflowId,
+    };
 
     #[test_state_case(VendorAPI::ExperianPreciseId)]
     #[test_state_case(VendorAPI::IncodeApproveSession)]

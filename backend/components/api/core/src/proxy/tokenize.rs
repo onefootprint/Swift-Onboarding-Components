@@ -1,25 +1,52 @@
-use super::{get_transformer, IngressRule};
+use super::{
+    get_transformer,
+    IngressRule,
+};
+use crate::auth::tenant::TenantAuth;
+use crate::errors::ApiResult;
+use crate::utils::headers::InsightHeaders;
+use crate::utils::vault_wrapper::{
+    Any,
+    DataLifetimeSources,
+    FingerprintedDataRequest,
+    Person,
+    VaultWrapper,
+};
+use crate::utils::{
+    self,
+};
 use crate::{
-    auth::tenant::TenantAuth,
-    errors::ApiResult,
-    utils::{
-        self,
-        headers::InsightHeaders,
-        vault_wrapper::{Any, DataLifetimeSources, FingerprintedDataRequest, Person, VaultWrapper},
-    },
-    ApiError, State,
+    ApiError,
+    State,
 };
-use db::models::{
-    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
-    scoped_vault::ScopedVault, vault::Vault,
-};
+use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
 use either::Either;
-use enclave_proxy::{DataTransformer, DataTransforms};
+use enclave_proxy::{
+    DataTransformer,
+    DataTransforms,
+};
 use futures::future::try_join_all;
 use itertools::Itertools;
 use newtypes::{
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DataRequest,
-    DbActor, DocumentDiKind, FpId, PiiBytes, PiiString, S3Url, SealedVaultDataKey, StorageType, TenantId,
+    AccessEventKind,
+    AccessEventPurpose,
+    AuditEventDetail,
+    AuditEventId,
+    DataIdentifier,
+    DataRequest,
+    DbActor,
+    DocumentDiKind,
+    FpId,
+    PiiBytes,
+    PiiString,
+    S3Url,
+    SealedVaultDataKey,
+    StorageType,
+    TenantId,
     ValidateArgs,
 };
 use std::collections::HashMap;

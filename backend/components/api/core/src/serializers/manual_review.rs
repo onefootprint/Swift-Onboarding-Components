@@ -1,7 +1,6 @@
+use crate::utils::db2api::DbToApi;
 use api_wire_types::ManualReviewReason;
 use db::models::manual_review::ManualReview;
-
-use crate::utils::db2api::DbToApi;
 
 impl DbToApi<ManualReview> for api_wire_types::ManualReview {
     fn from_db(mr: ManualReview) -> Self {

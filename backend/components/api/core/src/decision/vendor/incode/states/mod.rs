@@ -1,23 +1,33 @@
-use std::{str::FromStr, sync::Arc};
-
 use chrono::Utc;
-use db::models::{
-    decision_intent::DecisionIntent,
-    document::{Document, DocumentImageArgs},
-    document_upload::DocumentUpload,
-    incode_verification_session::IncodeVerificationSession,
-    ob_configuration::ObConfiguration,
-    verification_request::VerificationRequest,
+use db::models::decision_intent::DecisionIntent;
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
 };
+use db::models::document_upload::DocumentUpload;
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::verification_request::VerificationRequest;
+use std::str::FromStr;
+use std::sync::Arc;
 
 mod start_onboarding;
 
-use feature_flag::{BoolFlag, FeatureFlagClient};
-use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
-use newtypes::{
-    incode::{IncodeDocumentRestriction, IncodeDocumentSubType, IncodeDocumentType},
-    VendorValidatedCountryCode,
+use feature_flag::{
+    BoolFlag,
+    FeatureFlagClient,
 };
+use idv::incode::doc::response::{
+    FetchOCRResponse,
+    FetchScoresResponse,
+    IncodeOcrFixtureResponseFields,
+};
+use newtypes::incode::{
+    IncodeDocumentRestriction,
+    IncodeDocumentSubType,
+    IncodeDocumentType,
+};
+use newtypes::VendorValidatedCountryCode;
 pub use start_onboarding::*;
 
 mod add_front;
@@ -48,21 +58,39 @@ mod get_onboarding_status;
 pub use get_onboarding_status::*;
 
 mod process_face;
-pub use process_face::*;
-
-use super::{state::IncodeStateTransition, validate_doc_type_is_allowed, IncodeContext};
-use crate::{
-    decision::{features::incode_docv::IncodeOcrComparisonDataFields, vendor},
-    errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::VaultWrapper,
-    State,
+use super::state::IncodeStateTransition;
+use super::{
+    validate_doc_type_is_allowed,
+    IncodeContext,
 };
-use db::models::verification_result::{NewVerificationResult, VerificationResult};
+use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
+use crate::decision::vendor;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+};
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use db::models::verification_result::{
+    NewVerificationResult,
+    VerificationResult,
+};
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, IdDocKind, IncodeFailureReason,
-    IncodeVerificationSessionId, IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode,
-    Iso3166TwoDigitCountryCode, ScopedVaultId, ScrubbedPiiString, TenantId, VendorAPI, WorkflowId,
+    DecisionIntentKind,
+    IdDocKind,
+    IncodeFailureReason,
+    IncodeVerificationSessionId,
+    IncodeVerificationSessionKind,
+    Iso3166ThreeDigitCountryCode,
+    Iso3166TwoDigitCountryCode,
+    ScopedVaultId,
+    ScrubbedPiiString,
+    TenantId,
+    VendorAPI,
+    WorkflowId,
 };
+pub use process_face::*;
 
 #[derive(Clone)]
 pub struct VerificationSession {
@@ -216,8 +244,9 @@ pub async fn save_incode_fixtures(
     Ok(())
 }
 
-// Struct that represents a document kind that has been validated as the type indicated by a vendor, in this case incode
-// For example, we don't want to be vaulting something as a Passport that is in fact, a driver's license
+// Struct that represents a document kind that has been validated as the type indicated by a vendor,
+// in this case incode For example, we don't want to be vaulting something as a Passport that is in
+// fact, a driver's license
 #[derive(Clone, Copy)]
 pub struct ValidatedIdDocKind(IdDocKind);
 impl ValidatedIdDocKind {
@@ -262,7 +291,8 @@ fn parse_type_of_id(
     if id_doc_kind != expected_doc_type
         && validate_doc_type_is_allowed(&ctx.obc, id_doc_kind, ctx.vault_country, expected_country).is_err()
     {
-        // only throw DocTypeMismatch if the Incode doc type and the user specified doc type do not match AND the Incode doc type is not supportable according to the Tenant's OBC
+        // only throw DocTypeMismatch if the Incode doc type and the user specified doc type do not match
+        // AND the Incode doc type is not supportable according to the Tenant's OBC
         return Ok(Err(IncodeFailureReason::DocTypeMismatch));
     }
 
@@ -328,14 +358,13 @@ impl AddSideResponseHelper {
 #[cfg(test)]
 
 mod tests {
-    use std::str::FromStr;
-
+    use super::AddSideResponseHelper;
     use db::tests::MockFFClient;
     use feature_flag::BoolFlag;
-    use newtypes::{incode::IncodeDocumentRestriction, TenantId};
+    use newtypes::incode::IncodeDocumentRestriction;
+    use newtypes::TenantId;
+    use std::str::FromStr;
     use test_case::test_case;
-
-    use super::AddSideResponseHelper;
     #[test_case(false, false, false, 0 => vec![IncodeDocumentRestriction::ConservativeGlare, IncodeDocumentRestriction::ConservativeSharpness])]
     #[test_case(true, true, true, 0 => vec![IncodeDocumentRestriction::NoDriverLicensePermit])]
     #[test_case(false, false, true, 2 => vec![IncodeDocumentRestriction::NoDriverLicensePermit])]

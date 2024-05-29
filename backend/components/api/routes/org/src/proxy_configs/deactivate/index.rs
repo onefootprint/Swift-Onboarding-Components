@@ -1,11 +1,21 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{EmptyResponse, JsonApiResponse},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use db::{models::proxy_config::ProxyConfig, DbError};
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use crate::State;
+use db::models::proxy_config::ProxyConfig;
+use db::DbError;
 use newtypes::ProxyConfigId;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Delete organization's proxy configurations",

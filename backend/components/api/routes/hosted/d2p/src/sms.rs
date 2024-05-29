@@ -1,15 +1,31 @@
-use crate::{
-    auth::user::UserAuthContext,
-    errors::{ApiError, ApiResult},
-    types::response::ResponseData,
-    utils::vault_wrapper::{VaultWrapper, VwArgs},
-    State,
+use crate::auth::user::UserAuthContext;
+use crate::errors::{
+    ApiError,
+    ApiResult,
 };
-use api_core::{
-    auth::user::UserAuthScope, errors::user::UserError, utils::vault_wrapper::Person, ApiErrorKind,
+use crate::types::response::ResponseData;
+use crate::utils::vault_wrapper::{
+    VaultWrapper,
+    VwArgs,
 };
-use newtypes::{sms_message::SmsMessage, ContactInfoKind, PhoneNumber, PiiString};
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use crate::State;
+use api_core::auth::user::UserAuthScope;
+use api_core::errors::user::UserError;
+use api_core::utils::vault_wrapper::Person;
+use api_core::ApiErrorKind;
+use newtypes::sms_message::SmsMessage;
+use newtypes::{
+    ContactInfoKind,
+    PhoneNumber,
+    PiiString,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+    Apiv2Schema,
+};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct D2pSmsRequest {

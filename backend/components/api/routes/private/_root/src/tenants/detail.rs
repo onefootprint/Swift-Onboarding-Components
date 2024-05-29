@@ -1,10 +1,17 @@
-use actix_web::{get, web};
-use api_core::{
-    auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
-    types::{JsonApiResponse, ResponseData},
-    utils::db2api::DbToApi,
-    State,
+use actix_web::{
+    get,
+    web,
 };
+use api_core::auth::tenant::{
+    FirmEmployeeAuthContext,
+    FirmEmployeeGuard,
+};
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use db::models::tenant::Tenant;
 use newtypes::TenantId;
 

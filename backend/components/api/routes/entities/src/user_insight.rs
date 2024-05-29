@@ -1,19 +1,26 @@
-use api_core::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    decision::vendor::neuro_id::tenant_can_view_neuro,
-    serializers::user_insights,
-    types::{JsonApiResponse, ResponseData},
-    utils::fp_id_path::FpIdPath,
-    State,
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use db::{
-    models::{
-        insight_event::InsightEvent, neuro_id_analytics_event::NeuroIdAnalyticsEvent,
-        scoped_vault::ScopedVault, workflow::Workflow,
-    },
-    DbResult,
+use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
+use api_core::serializers::user_insights;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
 };
-use paperclip::actix::{api_v2_operation, get, web};
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::State;
+use db::models::insight_event::InsightEvent;
+use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
+use db::models::scoped_vault::ScopedVault;
+use db::models::workflow::Workflow;
+use db::DbResult;
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 type UserInsightResponse = Vec<api_wire_types::UserInsight>;
 

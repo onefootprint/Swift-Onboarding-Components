@@ -1,12 +1,14 @@
+use crate::errors::ApiResult;
 use actix_web::Responder;
 use newtypes::Base64Data;
-use paperclip::{
-    actix::{web::Json, Apiv2Schema},
-    v2::{models::DataType, schema::TypedData},
+use paperclip::actix::web::Json;
+use paperclip::actix::Apiv2Schema;
+use paperclip::v2::models::DataType;
+use paperclip::v2::schema::TypedData;
+use serde::{
+    Deserialize,
+    Serialize,
 };
-use serde::{Deserialize, Serialize};
-
-use crate::errors::ApiResult;
 
 /// return footprint api results
 pub type JsonApiResponse<T> = ApiResult<Json<ResponseData<T>>>;

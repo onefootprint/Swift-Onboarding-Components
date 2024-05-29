@@ -1,33 +1,51 @@
+use super::map_to_api_error;
+use super::tenant_vendor_control::TenantVendorControl;
+use super::vendor_result::VendorResult;
+use super::verification_result::{
+    SaveVerificationResultArgs,
+    ShouldSaveVerificationRequest,
+};
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+    VwArgs,
+};
 use crate::{
-    errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
-    ApiError, State,
+    ApiError,
+    State,
 };
-use db::models::{
-    decision_intent::DecisionIntent,
-    neuro_id_analytics_event::{NeuroIdAnalyticsEvent, NewNeuroIdAnalyticsEvent},
-    scoped_vault::ScopedVault,
-    verification_request::VerificationRequest,
+use db::models::decision_intent::DecisionIntent;
+use db::models::neuro_id_analytics_event::{
+    NeuroIdAnalyticsEvent,
+    NewNeuroIdAnalyticsEvent,
 };
+use db::models::scoped_vault::ScopedVault;
+use db::models::verification_request::VerificationRequest;
 use feature_flag::BoolFlag;
+use idv::neuro_id::response::{
+    NeuroApiResponse,
+    NeuroIdAnalyticsResponse,
+    NeuroIdAttributes,
+};
+use idv::neuro_id::NeuroIdAnalyticsRequest;
 use idv::{
-    neuro_id::{
-        response::{NeuroApiResponse, NeuroIdAnalyticsResponse, NeuroIdAttributes},
-        NeuroIdAnalyticsRequest,
-    },
-    ParsedResponse, VendorResponse,
+    ParsedResponse,
+    VendorResponse,
+};
+use newtypes::vendor_credentials::{
+    NeuroIdCredentials,
+    NeuroIdSiteId,
 };
 use newtypes::{
-    vendor_credentials::{NeuroIdCredentials, NeuroIdSiteId},
-    DecisionIntentId, NeuroIdentityId, ScopedVaultId, TenantId, VaultPublicKey, VendorAPI,
-    VerificationResultId, WorkflowId,
-};
-
-use super::{
-    map_to_api_error,
-    tenant_vendor_control::TenantVendorControl,
-    vendor_result::VendorResult,
-    verification_result::{SaveVerificationResultArgs, ShouldSaveVerificationRequest},
+    DecisionIntentId,
+    NeuroIdentityId,
+    ScopedVaultId,
+    TenantId,
+    VaultPublicKey,
+    VendorAPI,
+    VerificationResultId,
+    WorkflowId,
 };
 
 impl SaveVerificationResultArgs {
@@ -206,35 +224,39 @@ pub fn tenant_can_view_neuro(state: &State, tenant_id: &TenantId) -> bool {
 #[cfg(test)]
 
 mod tests {
-    use db::{
-        models::{
-            decision_intent::DecisionIntent, neuro_id_analytics_event::NeuroIdAnalyticsEvent,
-            scoped_vault::ScopedVault, tenant::Tenant,
-        },
-        test_helpers::assert_have_same_elements,
-        tests::{
-            fixtures::{self, ob_configuration::ObConfigurationOpts},
-            test_db_pool::TestDbPool,
-        },
+    use super::save_neuro_event;
+    use crate::decision::tests::test_helpers::{
+        create_kyc_user_and_wf,
+        FixtureData,
+    };
+    use crate::decision::vendor::verification_result::save_vreq_and_vres;
+    use crate::errors::ApiResult;
+    use crate::State;
+    use db::models::decision_intent::DecisionIntent;
+    use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
+    use db::models::scoped_vault::ScopedVault;
+    use db::models::tenant::Tenant;
+    use db::test_helpers::assert_have_same_elements;
+    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+    use db::tests::fixtures::{
+        self,
+    };
+    use db::tests::test_db_pool::TestDbPool;
+    use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+    use idv::test_fixtures::{
+        self,
+        NeuroTestOpts,
     };
     use idv::{
-        neuro_id::response::NeuroIdAnalyticsResponse,
-        test_fixtures::{self, NeuroTestOpts},
-        ParsedResponse, VendorResponse,
+        ParsedResponse,
+        VendorResponse,
     };
     use macros::test_state;
-    use newtypes::{DecisionIntentKind, DupeKind, NeuroIdentityId};
-
-    use crate::{
-        decision::{
-            tests::test_helpers::{create_kyc_user_and_wf, FixtureData},
-            vendor::verification_result::save_vreq_and_vres,
-        },
-        errors::ApiResult,
-        State,
+    use newtypes::{
+        DecisionIntentKind,
+        DupeKind,
+        NeuroIdentityId,
     };
-
-    use super::save_neuro_event;
 
     async fn create_neuro_event(
         state: &mut State,

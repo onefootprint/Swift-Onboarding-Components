@@ -1,4 +1,8 @@
-use newtypes::{BoId, ObConfigurationId, TenantId};
+use newtypes::{
+    BoId,
+    ObConfigurationId,
+    TenantId,
+};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// Short-lived session representing an ob config, instead of using the long-lived publishable keys

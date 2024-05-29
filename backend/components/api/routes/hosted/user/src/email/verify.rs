@@ -1,14 +1,22 @@
-use crate::{
-    auth::session::AuthSessionData,
-    errors::challenge::ChallengeError,
-    types::{response::ResponseData, EmptyResponse},
-    utils::session::AuthSession,
+use crate::auth::session::AuthSessionData;
+use crate::errors::challenge::ChallengeError;
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use crate::types::EmptyResponse;
+use crate::utils::session::AuthSession;
+use crate::State;
+use db::models::contact_info::{
+    ContactInfo,
+    VerificationLevel,
 };
-
-use crate::{errors::ApiError, State};
-use db::models::contact_info::{ContactInfo, VerificationLevel};
 use newtypes::SessionAuthToken;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+    Apiv2Schema,
+};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct EmailVerifyRequest {

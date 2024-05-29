@@ -1,35 +1,63 @@
-use newtypes::{
-    DataLifetimeSource, DecisionIntentKind, DocumentFixtureResult, DocumentId, DocumentRequestKind,
-    DocumentReviewStatus, DocumentSide, DocumentStatus, IdDocKind, ScopedVaultId, TenantId, WorkflowId,
+use super::meta_headers::MetaHeaders;
+use crate::errors::error_with_code::ErrorWithCode;
+use crate::errors::onboarding::OnboardingError;
+use crate::errors::{
+    ApiResult,
+    ValidationError,
 };
-
+use crate::utils::file_upload::FileUpload;
+use crate::utils::vault_wrapper::{
+    seal_file_and_upload_to_s3,
+    Any,
+    Person,
+    VaultWrapper,
+    VwArgs,
+};
 use crate::{
     decision,
-    errors::{error_with_code::ErrorWithCode, onboarding::OnboardingError, ApiResult, ValidationError},
-    utils::{file_upload::FileUpload, vault_wrapper::Any},
     State,
 };
-
-use crate::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VaultWrapper, VwArgs};
-use api_wire_types::{CreateDocumentRequest, DocumentResponse};
-use feature_flag::BoolFlag;
-
-use db::models::{
-    data_lifetime::DataLifetime,
-    decision_intent::DecisionIntent,
-    document::{Document, DocumentUpdate, NewDocumentArgs},
-    document_request::{DocumentRequest as DbDocumentRequest, DocumentRequestIdentifier},
-    document_upload::{DocumentUpload, NewDocumentUploadArgs},
-    incode_verification_session::IncodeVerificationSession,
-    insight_event::CreateInsightEvent,
-    ob_configuration::ObConfiguration,
-    user_consent::UserConsent,
-    user_timeline::UserTimeline,
-    vault::Vault,
-    workflow::Workflow,
+use api_wire_types::{
+    CreateDocumentRequest,
+    DocumentResponse,
 };
-
-use super::meta_headers::MetaHeaders;
+use db::models::data_lifetime::DataLifetime;
+use db::models::decision_intent::DecisionIntent;
+use db::models::document::{
+    Document,
+    DocumentUpdate,
+    NewDocumentArgs,
+};
+use db::models::document_request::{
+    DocumentRequest as DbDocumentRequest,
+    DocumentRequestIdentifier,
+};
+use db::models::document_upload::{
+    DocumentUpload,
+    NewDocumentUploadArgs,
+};
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::user_consent::UserConsent;
+use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
+use db::models::workflow::Workflow;
+use feature_flag::BoolFlag;
+use newtypes::{
+    DataLifetimeSource,
+    DecisionIntentKind,
+    DocumentFixtureResult,
+    DocumentId,
+    DocumentRequestKind,
+    DocumentReviewStatus,
+    DocumentSide,
+    DocumentStatus,
+    IdDocKind,
+    ScopedVaultId,
+    TenantId,
+    WorkflowId,
+};
 
 /// Route handler for "/hosted/user/documents"
 pub async fn handle_document_create(

@@ -1,4 +1,7 @@
-use crate::{Error, PiiString};
+use crate::{
+    Error,
+    PiiString,
+};
 use regex::Regex;
 
 lazy_static! {

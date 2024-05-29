@@ -1,4 +1,7 @@
-use strum_macros::{Display, EnumIter};
+use strum_macros::{
+    Display,
+    EnumIter,
+};
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter, Display, Ord, PartialOrd)]
 pub enum Product {
@@ -16,11 +19,13 @@ pub enum Product {
     ContinuousMonitoringPerYear,
     /// Number of KYB verifications ran this month
     Kyb,
-    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't finish onboarding
+    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't
+    /// finish onboarding
     IdDocs,
     /// Number of watchlist checks ran this month
     WatchlistChecks,
-    /// Total number user vaults with billable PII - either an authorized workflow OR created via API
+    /// Total number user vaults with billable PII - either an authorized workflow OR created via
+    /// API
     Pii,
     /// Number of vaults with non-card and non-custom data
     VaultsWithNonPci,

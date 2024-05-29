@@ -1,16 +1,30 @@
-use actix_web::{patch, web};
-use api_core::{
-    auth::protected_auth::ProtectedAuth,
-    errors::ApiResult,
-    types::{JsonApiResponse, ResponseData},
-    utils::db2api::DbToApi,
-    State,
+use actix_web::{
+    patch,
+    web,
 };
-use api_wire_types::{PrivateUpdateBillingProfile, PrivateUpdateTvc};
-use db::models::{
-    billing_profile::{BillingProfile, UpdateBillingProfile},
-    tenant::{PrivateUpdateTenant, Tenant},
-    tenant_vendor::{TenantVendorControl, UpdateTenantVendorControlArgs},
+use api_core::auth::protected_auth::ProtectedAuth;
+use api_core::errors::ApiResult;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
+use api_wire_types::{
+    PrivateUpdateBillingProfile,
+    PrivateUpdateTvc,
+};
+use db::models::billing_profile::{
+    BillingProfile,
+    UpdateBillingProfile,
+};
+use db::models::tenant::{
+    PrivateUpdateTenant,
+    Tenant,
+};
+use db::models::tenant_vendor::{
+    TenantVendorControl,
+    UpdateTenantVendorControlArgs,
 };
 use newtypes::TenantId;
 
@@ -134,7 +148,6 @@ fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBi
         monthly_minimum: monthly_minimum.to_changeset(),
     }
 }
-
 
 fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> ApiResult<UpdateTenantVendorControlArgs> {
     let PrivateUpdateTvc {

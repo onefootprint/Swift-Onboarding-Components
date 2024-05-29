@@ -1,4 +1,8 @@
-use idv::stytch::response::{Action, LookupResponse, Reason};
+use idv::stytch::response::{
+    Action,
+    LookupResponse,
+    Reason,
+};
 use itertools::Itertools;
 use newtypes::FootprintReasonCode;
 
@@ -63,10 +67,12 @@ pub fn lookup_response_to_footprint_reason_codes(res: &LookupResponse) -> Vec<Fo
 
 #[cfg(test)]
 mod test {
-    use idv::stytch::response::{Fingerprints, Verdict};
-    use test_case::test_case;
-
     use super::*;
+    use idv::stytch::response::{
+        Fingerprints,
+        Verdict,
+    };
+    use test_case::test_case;
 
     #[test_case(Action::Block, vec![] => vec![FootprintReasonCode::DeviceHighRisk])]
     #[test_case(Action::Challenge, vec![] => vec![FootprintReasonCode::DeviceMediumRisk])]

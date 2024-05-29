@@ -1,13 +1,21 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiError,
-    types::{response::ResponseData, JsonApiResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
 use newtypes::TenantAndroidAppMetaId;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     description = "Decrypts a specific android app metadata entry",

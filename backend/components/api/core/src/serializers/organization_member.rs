@@ -1,9 +1,9 @@
-use db::models::{
-    tenant::Tenant, tenant_role::TenantRole, tenant_rolebinding::TenantRolebinding, tenant_user::TenantUser,
-};
-use newtypes::TenantScope;
-
 use crate::utils::db2api::DbToApi;
+use db::models::tenant::Tenant;
+use db::models::tenant_role::TenantRole;
+use db::models::tenant_rolebinding::TenantRolebinding;
+use db::models::tenant_user::TenantUser;
+use newtypes::TenantScope;
 
 impl DbToApi<(TenantUser, Option<TenantRolebinding>, TenantRole)> for api_wire_types::OrganizationMember {
     fn from_db((user, rb, role): (TenantUser, Option<TenantRolebinding>, TenantRole)) -> Self {

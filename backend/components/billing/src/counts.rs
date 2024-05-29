@@ -1,13 +1,18 @@
+use crate::product::Product;
+use crate::profile::{
+    BillingProfile,
+    PriceInfo,
+};
 use crate::{
-    product::Product,
-    profile::{BillingProfile, PriceInfo},
-    BResult, Error,
+    BResult,
+    Error,
 };
 use strum::IntoEnumIterator;
 
 #[derive(Debug)]
 pub struct BillingCounts {
-    /// Total number user vaults with billable PII - either an authorized workflow OR created via API
+    /// Total number user vaults with billable PII - either an authorized workflow OR created via
+    /// API
     pub pii: i64,
     /// Number of KYC verifications ran this month
     pub kyc: i64,
@@ -15,7 +20,8 @@ pub struct BillingCounts {
     pub kyc_waterfall_third_vendor: Option<i64>,
     /// Number of KYB verifications ran this month
     pub kyb: i64,
-    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't finish onboarding
+    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't
+    /// finish onboarding
     pub id_docs: i64,
     /// Number of watchlist checks ran this month
     pub watchlist_checks: i64,

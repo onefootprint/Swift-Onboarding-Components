@@ -1,12 +1,12 @@
+use crate::errors::workos::WorkOsError;
+use crate::errors::ApiResult;
+use crate::State;
 use newtypes::PiiString;
 use workos::passwordless::{
-    CreatePasswordlessSession, CreatePasswordlessSessionParams, CreatePasswordlessSessionType,
+    CreatePasswordlessSession,
+    CreatePasswordlessSessionParams,
+    CreatePasswordlessSessionType,
     PasswordlessSessionType,
-};
-
-use crate::{
-    errors::{workos::WorkOsError, ApiResult},
-    State,
 };
 
 #[tracing::instrument(skip_all)]

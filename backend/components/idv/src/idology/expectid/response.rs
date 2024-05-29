@@ -1,9 +1,15 @@
-use crate::idology::{
-    common::response::{from_string_or_int, IDologyQualifiers, IdologyResponseHelpers, KeyResponse},
-    error as IdologyError,
-    IdologyError::RequestError,
+use crate::idology::common::response::{
+    from_string_or_int,
+    IDologyQualifiers,
+    IdologyResponseHelpers,
+    KeyResponse,
 };
-use newtypes::{DecisionStatus, FootprintReasonCode};
+use crate::idology::error as IdologyError;
+use crate::idology::IdologyError::RequestError;
+use newtypes::{
+    DecisionStatus,
+    FootprintReasonCode,
+};
 use std::collections::HashSet;
 
 // Given a raw response, deserialize
@@ -28,8 +34,9 @@ pub struct Response {
     pub id_number: Option<IdNumber>,
     pub id_scan: Option<String>,
     pub error: Option<String>,
-    // If the customer's name is located on any of the Patriot Act watchlists (or on THE OFAC list only, if that option is set in the IDCenter),
-    // then the ExpectID PA response will be enclosed in the <restriction> tag,
+    // If the customer's name is located on any of the Patriot Act watchlists (or on THE OFAC list only, if
+    // that option is set in the IDCenter), then the ExpectID PA response will be enclosed in the
+    // <restriction> tag,
     pub restriction: Option<Restriction>,
 }
 

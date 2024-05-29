@@ -1,16 +1,25 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{response::ResponseData, JsonApiResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
-use db::{
-    models::{rule_set_result::RuleSetResult, scoped_vault::ScopedVault},
-    DbResult,
+use db::models::rule_set_result::RuleSetResult;
+use db::models::scoped_vault::ScopedVault;
+use db::DbResult;
+use newtypes::{
+    FpId,
+    RuleSetResultId,
 };
-use newtypes::{FpId, RuleSetResultId};
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 // TODO: will deprecate this once the FE is no longer using in favor of the new API below
 #[api_v2_operation(

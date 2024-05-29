@@ -1,27 +1,45 @@
-use crate::{
-    auth::user::{UserAuthContext, UserAuthScope},
-    errors::ApiError,
-    types::{EmptyResponse, JsonApiResponse},
-    State,
+use crate::auth::user::{
+    UserAuthContext,
+    UserAuthScope,
 };
+use crate::errors::ApiError;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use crate::State;
 use actix_web::web::Json;
-use api_core::{
-    decision::vendor::fp_device_attestation::AttestationResult, errors::ApiResult, types::ResponseData,
-    utils::challenge::Challenge,
-};
-use app_attest::error::AttestationError::MissingTenant;
-
-use api_core::{decision::vendor, utils::headers::InsightHeaders};
+use api_core::decision::vendor;
+use api_core::decision::vendor::fp_device_attestation::AttestationResult;
+use api_core::errors::ApiResult;
+use api_core::types::ResponseData;
+use api_core::utils::challenge::Challenge;
+use api_core::utils::headers::InsightHeaders;
 use api_wire_types::hosted::device_attestation::{
-    CreateDeviceAttestationRequest, DeviceAttestationChallengeResponse, DeviceAttestationType,
+    CreateDeviceAttestationRequest,
+    DeviceAttestationChallengeResponse,
+    DeviceAttestationType,
     GetDeviceAttestationChallengeRequest,
 };
-use chrono::{Duration, Utc};
-use db::models::{
-    insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent, user_timeline::UserTimeline,
+use app_attest::error::AttestationError::MissingTenant;
+use chrono::{
+    Duration,
+    Utc,
 };
-use newtypes::{LivenessAttributes, LivenessInfo, LivenessIssuer};
-use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
+use db::models::insight_event::CreateInsightEvent;
+use db::models::liveness_event::NewLivenessEvent;
+use db::models::user_timeline::UserTimeline;
+use newtypes::{
+    LivenessAttributes,
+    LivenessInfo,
+    LivenessIssuer,
+};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+    Apiv2Schema,
+};
 
 mod android;
 mod ios;
@@ -145,8 +163,9 @@ pub async fn post_attestation(
                             is_live,
                         )?;
 
-                        // the iOS attestation, in conjuction with a passkey registration, also helps us prove liveness
-                        // so if the device attests it registered a passkey, we can confirm liveness too!
+                        // the iOS attestation, in conjuction with a passkey registration, also helps us prove
+                        // liveness so if the device attests it registered a passkey,
+                        // we can confirm liveness too!
                         if attestation.webauthn_credential_id.is_some() {
                             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
                             let liveness_event = NewLivenessEvent {
@@ -203,8 +222,9 @@ pub async fn post_attestation(
                             is_live,
                         )?;
 
-                        // the iOS attestation, in conjuction with a passkey registration, also helps us prove liveness
-                        // so if the device attests it registered a passkey, we can confirm liveness too!
+                        // the iOS attestation, in conjuction with a passkey registration, also helps us prove
+                        // liveness so if the device attests it registered a passkey,
+                        // we can confirm liveness too!
                         if attestation.webauthn_credential_id.is_some() {
                             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
                             let liveness_event = NewLivenessEvent {

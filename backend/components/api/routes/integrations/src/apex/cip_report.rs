@@ -1,15 +1,29 @@
-use api_core::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    types::{JsonApiResponse, ResponseData},
-    utils::fp_id_path::FpIdPath,
-    State,
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::State;
 use api_wire_types::{
-    ApexCheckedKycData, ApexCipReportRequest, ApexCipSummaryResults, ApexSelfReportedData, ApexWatchlist,
+    ApexCheckedKycData,
+    ApexCipReportRequest,
+    ApexCipSummaryResults,
+    ApexSelfReportedData,
+    ApexWatchlist,
     OldApexCipReportRequest,
 };
 use newtypes::PiiString;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
@@ -68,11 +82,12 @@ pub async fn post_inner(
     )
     .await?;
 
-    use newtypes::{
-        DataIdentifier::{Id, InvestorProfile as Ip},
-        IdentityDataKind::*,
-        InvestorProfileKind as IPK,
+    use newtypes::DataIdentifier::{
+        Id,
+        InvestorProfile as Ip,
     };
+    use newtypes::IdentityDataKind::*;
+    use newtypes::InvestorProfileKind as IPK;
     use IPK::*;
 
     // decrypt a few additional attributes for our apex cip report

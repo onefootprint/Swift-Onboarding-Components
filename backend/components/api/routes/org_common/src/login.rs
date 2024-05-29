@@ -1,33 +1,55 @@
 use actix_web::web;
-use api_core::{
-    auth::session::{
-        tenant::{TenantRbSession, WorkOsSession},
-        AuthSessionData,
-    },
-    errors::{tenant::TenantError, workos::WorkOsError, ApiResult},
-    utils::{db2api::DbToApi, email_domain, session::AuthSession},
-    State,
+use api_core::auth::session::tenant::{
+    TenantRbSession,
+    WorkOsSession,
 };
-use api_wire_types::{OrgLoginResponse, Organization, OrganizationMember, PartnerOrganization};
+use api_core::auth::session::AuthSessionData;
+use api_core::errors::tenant::TenantError;
+use api_core::errors::workos::WorkOsError;
+use api_core::errors::ApiResult;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::email_domain;
+use api_core::utils::session::AuthSession;
+use api_core::State;
+use api_wire_types::{
+    OrgLoginResponse,
+    Organization,
+    OrganizationMember,
+    PartnerOrganization,
+};
 use chrono::Duration;
-use db::{
-    helpers::TenantOrPartnerTenant,
-    models::{
-        partner_tenant::{NewPartnerTenant, PartnerTenant},
-        tenant::{NewTenant, Tenant},
-        tenant_rolebinding::{TenantRbLoginResult, TenantRolebinding},
-        tenant_user::TenantUser,
-    },
+use db::helpers::TenantOrPartnerTenant;
+use db::models::partner_tenant::{
+    NewPartnerTenant,
+    PartnerTenant,
 };
-use newtypes::{OrgIdentifier, OrgMemberEmail, TenantKind, TenantScope, WorkosAuthMethod};
+use db::models::tenant::{
+    NewTenant,
+    Tenant,
+};
+use db::models::tenant_rolebinding::{
+    TenantRbLoginResult,
+    TenantRolebinding,
+};
+use db::models::tenant_user::TenantUser;
+use newtypes::{
+    OrgIdentifier,
+    OrgMemberEmail,
+    TenantKind,
+    TenantScope,
+    WorkosAuthMethod,
+};
 use std::str::FromStr;
-use workos::{
-    sso::{
-        AuthorizationCode, ClientId, ConnectionType, GetProfileAndToken, GetProfileAndTokenParams,
-        GetProfileAndTokenResponse, Profile,
-    },
-    KnownOrUnknown,
+use workos::sso::{
+    AuthorizationCode,
+    ClientId,
+    ConnectionType,
+    GetProfileAndToken,
+    GetProfileAndTokenParams,
+    GetProfileAndTokenResponse,
+    Profile,
 };
+use workos::KnownOrUnknown;
 
 fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> ApiResult<WorkosAuthMethod> {
     // To protect against MagcicLink becoming a known type, check based on the string representation
@@ -138,7 +160,8 @@ where
         matching_rolebindings
             .into_iter()
             .find(|(_, t_pt)| t_pt.id() == org_id.into())
-        // .find(|(_, t_pt)| matches!(t_pt.id(), OrgIdentifierRef::TenantId(t_id) if *t_id == org_id))
+        // .find(|(_, t_pt)| matches!(t_pt.id(), OrgIdentifierRef::TenantId(t_id) if *t_id ==
+        // org_id))
     } else {
         // If there's only one rolebinding for this user, log into it
         (matching_rolebindings.len() == 1)
@@ -232,7 +255,8 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> ApiResult<(T
         }
     };
 
-    // create new tenant in the case of public email tenant user or existing private tenant with allow_domain_access = false
+    // create new tenant in the case of public email tenant user or existing private tenant with
+    // allow_domain_access = false
     tracing::info!("Creating new tenant with domain {:?}", domain);
     let tenant_name = domain.clone().unwrap_or_else(|| profile.email.to_string());
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
@@ -248,7 +272,8 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> ApiResult<(T
         is_prod_kyb_playbook_restricted: true,
         is_prod_auth_playbook_restricted: true,
         domains: domain.into_iter().collect(),
-        allow_domain_access: false, // false by default on creation, has to become true manually with PATCH /org
+        allow_domain_access: false, /* false by default on creation, has to become true manually with PATCH
+                                     * /org */
         super_tenant_id: None,
     };
     let tenant = state
@@ -265,7 +290,8 @@ async fn find_or_create_partner_tenant(
     let domain = email_domain::parse_private_email_domain(profile.email.as_str());
 
     if let Some(domain) = domain.as_ref() {
-        // Check if partner tenant already exists for user's domain. If so, automatically add new tenant user.
+        // Check if partner tenant already exists for user's domain. If so, automatically add new tenant
+        // user.
         let domain = domain.clone();
         let tenant = state
             .db_pool

@@ -1,16 +1,18 @@
-use std::str::FromStr;
-
-use newtypes::{
-    ExperianAddressAndNameMatchReasonCodes, ExperianDobMatchReasonCodes, ExperianFraudShieldCodes,
-    ExperianPhoneMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
-};
-
-use crate::experian::{
-    error::{CrossCoreResponseError, Error},
-    precise_id::response::PreciseIDAPIResponse,
-};
-
 use super::error_code::ErrorCode;
+use crate::experian::error::{
+    CrossCoreResponseError,
+    Error,
+};
+use crate::experian::precise_id::response::PreciseIDAPIResponse;
+use newtypes::{
+    ExperianAddressAndNameMatchReasonCodes,
+    ExperianDobMatchReasonCodes,
+    ExperianFraudShieldCodes,
+    ExperianPhoneMatchReasonCodes,
+    ExperianSSNReasonCodes,
+    ExperianWatchlistReasonCodes,
+};
+use std::str::FromStr;
 
 pub fn parse_response(response: serde_json::Value) -> Result<CrossCoreAPIResponse, Error> {
     let r: CrossCoreAPIResponse = serde_json::from_value(response)?;
@@ -118,7 +120,8 @@ impl CrossCoreAPIResponse {
             return Err(e);
         }
 
-        // Check precise match and precise ID model versions, otherwise our reason codes and score thresholds are not correct
+        // Check precise match and precise ID model versions, otherwise our reason codes and score
+        // thresholds are not correct
         if !(pm.precise_id_model_version_is_correct() && pm.precise_match_version_is_correct()) {
             return Err(Error::IncorrectPreciseIdVersion);
         }
@@ -252,8 +255,9 @@ impl DecisionElement {
 pub struct DecisionElementDecision {
     // This is unlikely to be an enum - no indication we can use that.
     pub element: Option<String>,
-    // This contains reason codes from across all the experian products, so will need to coalesce or have all reason codes in one enum (IEN, CrossCore, PreciseID etc)
-    // See the test_fixture response for an example
+    // This contains reason codes from across all the experian products, so will need to coalesce or have all
+    // reason codes in one enum (IEN, CrossCore, PreciseID etc) See the test_fixture response for an
+    // example
     pub value: Option<String>,
     pub reason: Option<String>,
 }
@@ -318,16 +322,14 @@ pub struct CCErrorResponse {
 
 #[cfg(test)]
 mod tests {
-    use newtypes::ExperianFraudShieldCodes;
-
     use super::*;
-    use crate::{
-        test_fixtures::{
-            cross_core_response_with_error, cross_core_response_with_fraud_shield_codes,
-            experian_cross_core_response,
-        },
-        tests::assert_have_same_elements,
+    use crate::test_fixtures::{
+        cross_core_response_with_error,
+        cross_core_response_with_fraud_shield_codes,
+        experian_cross_core_response,
     };
+    use crate::tests::assert_have_same_elements;
+    use newtypes::ExperianFraudShieldCodes;
 
     #[test]
     fn test_parses() {

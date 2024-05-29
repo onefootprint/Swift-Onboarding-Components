@@ -1,10 +1,23 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use macros::SerdeAttr;
 use paperclip::actix::Apiv2Schema;
-
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::{Display, IntoEnumIterator};
-use strum_macros::{AsRefStr, EnumIter, EnumString};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum::{
+    Display,
+    IntoEnumIterator,
+};
+use strum_macros::{
+    AsRefStr,
+    EnumIter,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -857,9 +870,11 @@ pub struct VendorValidatedCountryCode(pub Iso3166TwoDigitCountryCode);
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        Iso3166ThreeDigitCountryCode,
+        Iso3166TwoDigitCountryCode,
+    };
     use strum::IntoEnumIterator;
-
-    use crate::{Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode};
 
     #[test]
     fn test_country_codes_correct() {

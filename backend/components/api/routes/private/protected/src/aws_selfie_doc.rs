@@ -1,18 +1,31 @@
 //! Temporary tool to analyze selfie + doc comparison and over
 
-use std::collections::HashMap;
-
 use crate::ProtectedAuth;
-use actix_web::{post, web};
+use actix_web::{
+    post,
+    web,
+};
+use api_core::errors::ApiResult;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::vault_wrapper::{
+    EnclaveDecryptOperation,
+    Pii,
+    VaultWrapper,
+};
 use api_core::{
-    errors::ApiResult,
-    types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::{EnclaveDecryptOperation, Pii, VaultWrapper},
-    ApiErrorKind, State,
+    ApiErrorKind,
+    State,
 };
 use db::models::scoped_vault::ScopedVault;
-use newtypes::{DataIdentifier, FpId};
+use newtypes::{
+    DataIdentifier,
+    FpId,
+};
 use selfie_doc::analyze_id::AnalyzeIdResult;
+use std::collections::HashMap;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct CompareAnalyzeRequest {

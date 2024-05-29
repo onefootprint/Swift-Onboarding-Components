@@ -31,5 +31,7 @@ mod tests {
     }
 }
 
-pub use format_pii;
-pub use pii;
+pub use {
+    format_pii,
+    pii,
+};

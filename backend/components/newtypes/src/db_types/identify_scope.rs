@@ -1,8 +1,15 @@
 use chrono::Duration;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
 use serde_with::SerializeDisplay;
-use strum_macros::{Display, EnumString};
+use strum_macros::{
+    Display,
+    EnumString,
+};
 
 #[derive(
     Debug,

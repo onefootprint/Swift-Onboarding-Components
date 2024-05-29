@@ -1,19 +1,35 @@
-use crate::{interval::get_billing_interval, BResult, BillingClient, BillingCounts, BillingInfo};
-use chrono::NaiveDate;
-use db::{
-    models::{
-        access_event::AccessEvent,
-        billing_event::BillingEvent,
-        billing_profile::BillingProfile,
-        document::Document,
-        scoped_vault::{ScopedVault, ScopedVaultPiiFilters},
-        tenant::{Tenant, UpdateTenant},
-        watchlist_check::WatchlistCheck,
-        workflow::Workflow,
-    },
-    DbError, DbPool,
+use crate::interval::get_billing_interval;
+use crate::{
+    BResult,
+    BillingClient,
+    BillingCounts,
+    BillingInfo,
 };
-use newtypes::{AccessEventPurpose, BillingEventKind, StripeCustomerId, VaultKind};
+use chrono::NaiveDate;
+use db::models::access_event::AccessEvent;
+use db::models::billing_event::BillingEvent;
+use db::models::billing_profile::BillingProfile;
+use db::models::document::Document;
+use db::models::scoped_vault::{
+    ScopedVault,
+    ScopedVaultPiiFilters,
+};
+use db::models::tenant::{
+    Tenant,
+    UpdateTenant,
+};
+use db::models::watchlist_check::WatchlistCheck;
+use db::models::workflow::Workflow;
+use db::{
+    DbError,
+    DbPool,
+};
+use newtypes::{
+    AccessEventPurpose,
+    BillingEventKind,
+    StripeCustomerId,
+    VaultKind,
+};
 use strum::IntoEnumIterator;
 
 #[tracing::instrument(skip_all, fields(tenant_id=%tenant.id, billing_date))]

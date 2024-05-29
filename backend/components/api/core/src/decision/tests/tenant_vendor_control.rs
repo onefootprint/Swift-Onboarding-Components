@@ -1,16 +1,26 @@
-use crate::{
-    config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl,
-    enclave_client::EnclaveClient, State,
+use crate::config::Config;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::enclave_client::EnclaveClient;
+use crate::State;
+use db::models::tenant_vendor::{
+    TenantVendorControl as DbTenantVendorControl,
+    UpdateTenantVendorControlArgs,
 };
+use db::tests::test_db_pool::TestDbPool;
 use db::{
-    models::tenant_vendor::{TenantVendorControl as DbTenantVendorControl, UpdateTenantVendorControlArgs},
-    tests::test_db_pool::TestDbPool,
-    DbPool, DbResult,
+    DbPool,
+    DbResult,
 };
 use macros::test_state;
+use newtypes::vendor_credentials::{
+    ExperianCredentialBuilder,
+    ExperianCredentials,
+    IdologyCredentials,
+};
 use newtypes::{
-    vendor_credentials::{ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials},
-    EncryptedVaultPrivateKey, TenantId, VaultPublicKey,
+    EncryptedVaultPrivateKey,
+    TenantId,
+    VaultPublicKey,
 };
 
 #[allow(clippy::too_many_arguments)]
@@ -221,9 +231,10 @@ async fn test_update_credentials(state: &mut State) {
 }
 
 pub mod fixtures {
-    use db::models::{tenant::Tenant, tenant_vendor::TenantVendorControl as DbTenantVendorControl};
-
-    use crate::{decision::vendor::tenant_vendor_control::TenantVendorControl, State};
+    use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+    use crate::State;
+    use db::models::tenant::Tenant;
+    use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
 
     pub async fn create(
         state: &State,

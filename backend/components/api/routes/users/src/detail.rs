@@ -1,15 +1,25 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    types::{JsonApiResponse, ResponseData},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    errors::ApiResult,
-    utils::{db2api::DbToApi, fp_id_path::FpIdPath},
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
 };
-use db::models::{manual_review::ManualReview, scoped_vault::ScopedVault, workflow_request::WorkflowRequest};
+use crate::State;
+use api_core::errors::ApiResult;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
+use db::models::manual_review::ManualReview;
+use db::models::scoped_vault::ScopedVault;
+use db::models::workflow_request::WorkflowRequest;
 use newtypes::PreviewApi;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 #[api_v2_operation(
     description = "View details of a most recent onboarding status of user",

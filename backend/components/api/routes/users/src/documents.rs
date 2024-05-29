@@ -1,14 +1,23 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    types::response::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{errors::ApiResult, types::JsonApiResponse, utils::fp_id_path::FpIdPath};
-use db::models::{document::Document, scoped_vault::ScopedVault};
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::errors::ApiResult;
+use api_core::types::JsonApiResponse;
+use api_core::utils::fp_id_path::FpIdPath;
+use db::models::document::Document;
+use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::PreviewApi;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 #[api_v2_operation(
     description = "View the successfully uploaded documents uploaded for this user.",

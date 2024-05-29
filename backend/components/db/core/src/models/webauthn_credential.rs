@@ -1,8 +1,28 @@
-use crate::{diesel::ExpressionMethods, DbResult, PgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{self, webauthn_credential};
-use diesel::{Insertable, QueryDsl, Queryable, RunQueryDsl};
-use newtypes::{AttestationType, InsightEventId, VaultId, WebauthnCredentialId};
+use crate::diesel::ExpressionMethods;
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    self,
+    webauthn_credential,
+};
+use diesel::{
+    Insertable,
+    QueryDsl,
+    Queryable,
+    RunQueryDsl,
+};
+use newtypes::{
+    AttestationType,
+    InsightEventId,
+    VaultId,
+    WebauthnCredentialId,
+};
 
 // TODO handle when a user tries to add a second webauthn credential
 #[derive(Debug, Clone, Queryable, Identifiable)]

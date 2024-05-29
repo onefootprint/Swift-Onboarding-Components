@@ -1,9 +1,18 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use serde_with::SerializeDisplay;
-use strum_macros::{AsRefStr, EnumString};
+use strum_macros::{
+    AsRefStr,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -64,7 +73,8 @@ impl DocumentStatus {
 pub enum DocumentReviewStatus {
     /// The document has been created and a human or machine review has not occured.
     Unreviewed,
-    /// The document is uploaded and we've started the process of verifying the document via a machine
+    /// The document is uploaded and we've started the process of verifying the document via a
+    /// machine
     PendingMachineReview,
     /// The document has been automatically processed with a vendor
     ReviewedByMachine,

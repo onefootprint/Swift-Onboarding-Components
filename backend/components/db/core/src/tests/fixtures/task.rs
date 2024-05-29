@@ -1,7 +1,11 @@
+use crate::models::task::Task;
+use crate::TxnPgConn;
 use chrono::Utc;
-use newtypes::{ScopedVaultId, TaskData, WatchlistCheckArgs};
-
-use crate::{models::task::Task, TxnPgConn};
+use newtypes::{
+    ScopedVaultId,
+    TaskData,
+    WatchlistCheckArgs,
+};
 
 pub fn create_watchlist_check(conn: &mut TxnPgConn, svid: &ScopedVaultId) -> Task {
     Task::create(

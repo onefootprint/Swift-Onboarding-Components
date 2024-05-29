@@ -1,18 +1,25 @@
-use api_core::State;
-
-use actix_web::{post, web, web::Json};
-use api_core::{
-    decision::vendor,
-    types::{JsonApiResponse, ResponseData},
-    ApiErrorKind,
-};
-use db::{
-    models::{vault::Vault, verification_result::VerificationResult},
-    DbResult,
-};
-use newtypes::{PiiJsonValue, VerificationResultId};
-
 use crate::ProtectedAuth;
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
+};
+use api_core::decision::vendor;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::{
+    ApiErrorKind,
+    State,
+};
+use db::models::vault::Vault;
+use db::models::verification_result::VerificationResult;
+use db::DbResult;
+use newtypes::{
+    PiiJsonValue,
+    VerificationResultId,
+};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct DecryptVresRequest {

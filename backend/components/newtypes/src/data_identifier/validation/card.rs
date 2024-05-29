@@ -1,14 +1,32 @@
-use std::str::FromStr;
-
-use super::{utils, Error, VResult};
+use super::{
+    utils,
+    Error,
+    VResult,
+};
 use crate::{
-    AliasId, AllData, CardDataKind as CDK, CardInfo as CI, CleanAndValidate, DataIdentifierValue, NtResult,
-    PiiJsonValue, PiiString, ValidateArgs,
+    AliasId,
+    AllData,
+    CardDataKind as CDK,
+    CardInfo as CI,
+    CleanAndValidate,
+    DataIdentifierValue,
+    NtResult,
+    PiiJsonValue,
+    PiiString,
+    ValidateArgs,
 };
 use card_validate::Validate as CardValidate;
 use itertools::Itertools;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::{Display, EnumIter, EnumString};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use std::str::FromStr;
+use strum::{
+    Display,
+    EnumIter,
+    EnumString,
+};
 
 pub enum CardData {
     CardNumber(CardNumber),
@@ -312,14 +330,24 @@ fn validate_cc_cvc(value: PiiString, alias: &AliasId, all_data: &AllData) -> VRe
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
-
+    use super::CDK::{
+        self,
+        *,
+    };
     use super::{
         parse_expiration,
-        CDK::{self, *},
         CI,
     };
-    use crate::{AliasId, CardData, CleanAndValidate, DataIdentifier, PiiJsonValue, PiiString, ValidateArgs};
+    use crate::{
+        AliasId,
+        CardData,
+        CleanAndValidate,
+        DataIdentifier,
+        PiiJsonValue,
+        PiiString,
+        ValidateArgs,
+    };
+    use std::collections::HashMap;
     use test_case::test_case;
 
     // Invalid prefix

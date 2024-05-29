@@ -1,9 +1,13 @@
-use newtypes::{
-    input::deserialize_stringified_list, ExternalId, LabelKind, ObConfigurationId, OnboardingStatusFilter,
-    PiiString, VaultKind,
-};
-
 use crate::*;
+use newtypes::input::deserialize_stringified_list;
+use newtypes::{
+    ExternalId,
+    LabelKind,
+    ObConfigurationId,
+    OnboardingStatusFilter,
+    PiiString,
+    VaultKind,
+};
 
 #[derive(Default, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

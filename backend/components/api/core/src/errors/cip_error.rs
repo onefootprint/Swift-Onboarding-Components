@@ -1,5 +1,8 @@
 use alpaca::Error;
-use newtypes::{ReviewReason, VendorAPI};
+use newtypes::{
+    ReviewReason,
+    VendorAPI,
+};
 use reqwest::StatusCode;
 
 #[derive(Debug, thiserror::Error)]

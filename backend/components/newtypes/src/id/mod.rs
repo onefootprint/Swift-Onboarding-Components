@@ -3,7 +3,10 @@ mod basic;
 mod data_lifetime;
 mod prefix;
 mod tenant_utils;
-pub use self::{alias::*, basic::*, data_lifetime::*, tenant_utils::*};
+pub use self::alias::*;
+pub use self::basic::*;
+pub use self::data_lifetime::*;
+pub use self::tenant_utils::*;
 
 /// This macro generates an Id type that wraps a string
 macro_rules! define_newtype_id {
@@ -114,10 +117,9 @@ use impl_verified_prefix_for_nt_id;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use diesel::prelude::*;
     use std::str::FromStr;
-
-    use super::*;
     use uuid::Uuid;
 
     #[test]

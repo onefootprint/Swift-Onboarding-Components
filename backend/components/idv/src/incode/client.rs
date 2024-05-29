@@ -1,27 +1,40 @@
-use super::{
-    curp_validation::request::CurpValidationRequest,
-    doc::{
-        request::{AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, AddSelfieRequest, DocumentSide},
-        response::GetOnboardingStatusResponse,
-    },
-    government_validation::request::GovernmentValidationRequestQueryParams,
-    request::{OnboardingStartCustomNameFields, OnboardingStartRequest},
-    response::OnboardingStartResponse,
-    watchlist::request::WatchlistResultRequest,
-    IncodeAPIResult,
+use super::curp_validation::request::CurpValidationRequest;
+use super::doc::request::{
+    AddDocumentSideRequest,
+    AddMLConsent,
+    AddPrivacyConsent,
+    AddSelfieRequest,
+    DocumentSide,
 };
-use crate::{
-    footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
-    incode::error::Error as IncodeError,
+use super::doc::response::GetOnboardingStatusResponse;
+use super::government_validation::request::GovernmentValidationRequestQueryParams;
+use super::request::{
+    OnboardingStartCustomNameFields,
+    OnboardingStartRequest,
 };
+use super::response::OnboardingStartResponse;
+use super::watchlist::request::WatchlistResultRequest;
+use super::IncodeAPIResult;
+use crate::footprint_http_client::{
+    FootprintVendorHttpClient,
+    FpVendorClientArgs,
+};
+use crate::incode::error::Error as IncodeError;
+use newtypes::vendor_credentials::IncodeCredentials;
 use newtypes::{
-    vendor_credentials::IncodeCredentials, DocVData, DocumentKind, IdDocKind, IncodeConfigurationId,
-    IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind, IncodeWatchlistResultRef,
+    DocVData,
+    DocumentKind,
+    IdDocKind,
+    IncodeConfigurationId,
+    IncodeSessionId,
+    IncodeVerificationSessionId,
+    IncodeVerificationSessionKind,
+    IncodeWatchlistResultRef,
     PiiString,
 };
 use reqwest::header;
-
-use tokio_retry::{strategy::FixedInterval, RetryIf};
+use tokio_retry::strategy::FixedInterval;
+use tokio_retry::RetryIf;
 
 #[derive(Clone)]
 pub struct IncodeClientAdapter {
@@ -363,7 +376,8 @@ impl AuthenticatedIncodeClientAdapter {
         matches!(error, IncodeError::ResultsNotReady)
     }
 
-    // TODO: make this a reusable strategy across vendor requests, either on http client or on VendorAPICall
+    // TODO: make this a reusable strategy across vendor requests, either on http client or on
+    // VendorAPICall
     pub async fn poll_get_onboarding_status(
         &self,
         footprint_http_client: &FootprintVendorHttpClient,
@@ -543,35 +557,53 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 
 #[cfg(test)]
 mod tests {
+    use super::{
+        AuthenticatedIncodeClientAdapter,
+        IncodeClientAdapter,
+    };
+    use crate::footprint_http_client::{
+        FootprintVendorHttpClient,
+        FpVendorClientArgs,
+    };
+    use crate::incode::curp_validation::response::CurpValidationResponse;
+    use crate::incode::doc::request::DocumentSide;
+    use crate::incode::doc::response::{
+        AddCustomerResponse,
+        AddSideResponse,
+        FetchOCRResponse,
+        FetchScoresResponse,
+        ProcessFaceResponse,
+        ProcessIdResponse,
+    };
+    use crate::incode::government_validation::request::{
+        GovernmentValidationConfigByCountry,
+        MXRequestConfig,
+    };
+    use crate::incode::government_validation::response::{
+        GovernmentValidationResponse,
+        MXStatusCode,
+    };
+    use crate::incode::response::OnboardingStartResponse;
+    use crate::incode::watchlist::response::{
+        UpdatedWatchlistResultResponse,
+        WatchlistResultResponse,
+    };
+    use crate::incode::{
+        IncodeAPIResult,
+        IncodeResponse,
+    };
+    use crate::tests::fixtures::images::load_image_and_encode_as_b64;
+    use newtypes::incode::IncodeStatus;
+    use newtypes::vendor_credentials::IncodeCredentials;
     use newtypes::{
-        incode::IncodeStatus, vendor_credentials::IncodeCredentials, DocVData, IdDocKind,
-        IncodeConfigurationId, IncodeSessionId, IncodeVerificationSessionId, IncodeVerificationSessionKind,
+        DocVData,
+        IdDocKind,
+        IncodeConfigurationId,
+        IncodeSessionId,
+        IncodeVerificationSessionId,
+        IncodeVerificationSessionKind,
         PiiString,
     };
-
-    use crate::{
-        footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
-        incode::{
-            curp_validation::response::CurpValidationResponse,
-            doc::{
-                request::DocumentSide,
-                response::{
-                    AddCustomerResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
-                    ProcessFaceResponse, ProcessIdResponse,
-                },
-            },
-            government_validation::{
-                request::{GovernmentValidationConfigByCountry, MXRequestConfig},
-                response::{GovernmentValidationResponse, MXStatusCode},
-            },
-            response::OnboardingStartResponse,
-            watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
-            IncodeAPIResult, IncodeResponse,
-        },
-        tests::fixtures::images::load_image_and_encode_as_b64,
-    };
-
-    use super::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
     const INCODE_SANDBOX_SELFIE_FLOW_ID: &str = "643d8b43313fd2f4aa6b3b9f";
 
     pub fn load_client() -> IncodeClientAdapter {
@@ -737,7 +769,8 @@ mod tests {
             .await
             .expect("add customer failed");
 
-        // selfie is a monkey picture, so i think maybe incode doesn't store monkey pics since monkeys cannot consent to BIPA or GDPR
+        // selfie is a monkey picture, so i think maybe incode doesn't store monkey pics since monkeys
+        // cannot consent to BIPA or GDPR
         let customer_res = IncodeAPIResult::<AddCustomerResponse>::from_response(add_customer_res)
             .await
             .0

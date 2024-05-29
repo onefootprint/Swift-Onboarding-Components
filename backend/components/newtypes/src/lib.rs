@@ -2,7 +2,8 @@
 extern crate lazy_static;
 
 mod id;
-pub use self::{id::*, phone_number::*};
+pub use self::id::*;
+pub use self::phone_number::*;
 
 pub mod idv;
 pub use idv::*;
@@ -41,7 +42,10 @@ mod us_states;
 pub use us_states::*;
 
 mod b64;
-pub use b64::{Base64Data, Base64EncodedString};
+pub use b64::{
+    Base64Data,
+    Base64EncodedString,
+};
 pub use serde;
 use serde::ser::SerializeMap;
 
@@ -61,9 +65,8 @@ pub mod locked;
 pub use locked::*;
 
 pub mod vendor;
-pub use vendor::*;
-
 pub use uuid::Uuid;
+pub use vendor::*;
 
 pub mod proxy_token;
 pub use self::proxy_token::*;
@@ -291,16 +294,27 @@ pub mod util {
         };
     }
 
-    pub(crate) use impl_enum_str_diesel;
-    pub(crate) use impl_enum_string_diesel;
+    pub(crate) use {
+        impl_enum_str_diesel,
+        impl_enum_string_diesel,
+    };
     #[allow(clippy::extra_unused_lifetimes)]
     #[cfg(test)]
     mod tests {
         use super::impl_enum_str_diesel;
+        use diesel::connection::SimpleConnection;
+        use diesel::prelude::*;
+        use diesel::sql_types::Text;
         use diesel::{
-            connection::SimpleConnection, prelude::*, sql_types::Text, AsExpression, FromSqlRow, RunQueryDsl,
+            AsExpression,
+            FromSqlRow,
+            RunQueryDsl,
         };
-        use strum_macros::{AsRefStr, EnumIter, EnumString};
+        use strum_macros::{
+            AsRefStr,
+            EnumIter,
+            EnumString,
+        };
 
         #[derive(Debug, Clone, PartialEq, Eq, AsExpression, FromSqlRow, EnumString, AsRefStr, EnumIter)]
         #[strum(serialize_all = "PascalCase")]

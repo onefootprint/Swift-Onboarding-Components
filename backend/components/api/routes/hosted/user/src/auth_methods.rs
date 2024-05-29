@@ -1,15 +1,20 @@
-use crate::{
-    auth::user::{UserAuthContext, UserAuthScope},
-    types::response::ResponseData,
+use crate::auth::user::{
+    UserAuthContext,
+    UserAuthScope,
 };
-use api_core::{
-    auth::{session::user::TokenCreationPurpose, IsGuardMet},
-    types::JsonApiResponse,
-    utils::identify::get_user_challenge_context,
-    State,
-};
+use crate::types::response::ResponseData;
+use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::IsGuardMet;
+use api_core::types::JsonApiResponse;
+use api_core::utils::identify::get_user_challenge_context;
+use api_core::State;
 use itertools::Itertools;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(User, Hosted),

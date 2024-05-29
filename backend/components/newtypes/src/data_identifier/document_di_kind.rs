@@ -1,13 +1,31 @@
 use crate::{
-    AliasId, CollectedData, DataIdentifier, DocumentSide, IdDocKind, IsDataIdentifierDiscriminant,
+    AliasId,
+    CollectedData,
+    DataIdentifier,
+    DocumentSide,
+    IdDocKind,
+    IsDataIdentifierDiscriminant,
     StorageType,
 };
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use itertools::Itertools;
 use mime::Mime;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
 use strum::IntoEnumIterator;
-use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumIter, EnumString};
+use strum_macros::{
+    AsRefStr,
+    Display,
+    EnumDiscriminants,
+    EnumIter,
+    EnumString,
+};
 #[derive(
     Debug,
     Clone,
@@ -47,7 +65,8 @@ pub enum DocumentDiKind {
     /// Extracted OCR information from the image
     OcrData(IdDocKind, OcrDataKind),
 
-    /// Letter signed by a compliance officer granting permission to carry an account, required by FINFRA rules in certain cases
+    /// Letter signed by a compliance officer granting permission to carry an account, required by
+    /// FINFRA rules in certain cases
     #[strum_discriminants(strum(to_string = "finra_compliance_letter"))]
     FinraComplianceLetter,
     // .image suffix in case we one day have extracted attributes

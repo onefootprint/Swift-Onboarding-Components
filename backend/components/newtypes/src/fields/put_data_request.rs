@@ -1,12 +1,19 @@
-use std::collections::HashMap;
-
+use crate::{
+    flat_api_object_map_type,
+    CardDataKind,
+    DataIdentifier,
+    DataRequest,
+    DataValidationError,
+    DiValidationError,
+    DocumentDiKind,
+    NtResult,
+    PiiJsonValue,
+    PiiValueKind,
+    ValidateArgs,
+};
 use either::Either;
 use itertools::Itertools;
-
-use crate::{
-    flat_api_object_map_type, CardDataKind, DataIdentifier, DataRequest, DataValidationError,
-    DiValidationError, DocumentDiKind, NtResult, PiiJsonValue, PiiValueKind, ValidateArgs,
-};
+use std::collections::HashMap;
 
 flat_api_object_map_type!(
     RawDataRequest<DataIdentifier, PiiJsonValue>,

@@ -1,14 +1,24 @@
-use crate::{PiiString, SealedVaultBytes};
-use crypto::seal::EciesP256Sha256AesGcmSealed;
-use derive_more::{From, Into};
-use diesel::{
-    backend::Backend,
-    deserialize::{FromSql, FromSqlRow},
-    expression::AsExpression,
-    serialize::ToSql,
-    sql_types::Binary,
+use crate::{
+    PiiString,
+    SealedVaultBytes,
 };
-use serde::{Deserialize, Serialize};
+use crypto::seal::EciesP256Sha256AesGcmSealed;
+use derive_more::{
+    From,
+    Into,
+};
+use diesel::backend::Backend;
+use diesel::deserialize::{
+    FromSql,
+    FromSqlRow,
+};
+use diesel::expression::AsExpression;
+use diesel::serialize::ToSql;
+use diesel::sql_types::Binary;
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 /// Bytes of a vault public key
 #[derive(

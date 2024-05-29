@@ -1,42 +1,72 @@
-use crate::{
-    auth::{
-        tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantSessionAuth},
-        Either,
-    },
-    errors::ApiError,
-    types::{JsonApiResponse, ResponseData},
-    utils::{headers::InsightHeaders, vault_wrapper::VaultWrapper},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantSessionAuth,
 };
-use api_core::{
-    auth::{
-        tenant::{ClientTenantAuthContext, TenantAuth},
-        CanDecrypt,
-    },
-    errors::{tenant::TenantError, ApiResult, AssertionError},
-    telemetry::RootSpan,
-    utils::{
-        fp_id_path::FpIdPath,
-        vault_wrapper::{
-            bulk_decrypt, BulkDecryptReq, DecryptAccessEventInfo, EnclaveDecryptOperation, TenantVw,
-        },
-    },
+use crate::auth::Either;
+use crate::errors::ApiError;
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use crate::utils::headers::InsightHeaders;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::auth::tenant::{
+    ClientTenantAuthContext,
+    TenantAuth,
+};
+use api_core::auth::CanDecrypt;
+use api_core::errors::tenant::TenantError;
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
+};
+use api_core::telemetry::RootSpan;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::vault_wrapper::{
+    bulk_decrypt,
+    BulkDecryptReq,
+    DecryptAccessEventInfo,
+    EnclaveDecryptOperation,
+    TenantVw,
 };
 use api_wire_types::DecryptResponse;
-use db::models::{insight_event::CreateInsightEvent, scoped_vault::ScopedVault};
-use itertools::{chain, Itertools};
-use macros::route_alias;
-use newtypes::{
-    output::Csv, AccessEventPurpose, DataIdentifier, DataLifetimeSeqno, DocumentDiKind, FilterFunction, FpId,
-    PiiJsonValue, VersionedDataIdentifier,
+use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::ScopedVault;
+use itertools::{
+    chain,
+    Itertools,
 };
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use macros::route_alias;
+use newtypes::output::Csv;
+use newtypes::{
+    AccessEventPurpose,
+    DataIdentifier,
+    DataLifetimeSeqno,
+    DocumentDiKind,
+    FilterFunction,
+    FpId,
+    PiiJsonValue,
+    VersionedDataIdentifier,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+    Apiv2Schema,
+};
 use serde::Deserialize;
-use std::collections::{HashMap, HashSet};
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
 pub struct DecryptRequest {
-    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
+    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
+    /// `custom.bank_account`
     pub(super) fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
     pub(super) reason: String,
@@ -49,7 +79,8 @@ pub struct DecryptRequest {
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
 pub struct ClientDecryptRequest {
-    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
+    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,
+    /// `custom.bank_account`
     fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged.
     /// The reason must be provided either here or in the client token

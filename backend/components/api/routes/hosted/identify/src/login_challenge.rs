@@ -1,25 +1,53 @@
 use super::BiometricChallengeState;
 use crate::{
-    ChallengeData, ChallengeState, GetIdentifyChallengeArgs, IdentifyChallengeContext, State,
+    ChallengeData,
+    ChallengeState,
+    GetIdentifyChallengeArgs,
+    IdentifyChallengeContext,
+    State,
     UserChallengeContext,
 };
-use api_core::{
-    auth::{user::UserAuthContext, Any},
-    errors::{error_with_code::ErrorWithCode, onboarding::OnboardingError, ApiError},
-    telemetry::RootSpan,
-    types::{JsonApiResponse, ResponseData},
-    utils::{
-        challenge::Challenge, email::send_email_challenge_non_blocking, passkey::WebauthnConfig,
-        sms::rx_background_error,
-    },
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::Any;
+use api_core::errors::error_with_code::ErrorWithCode;
+use api_core::errors::onboarding::OnboardingError;
+use api_core::errors::ApiError;
+use api_core::telemetry::RootSpan;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
 };
-use api_wire_types::{LoginChallengeRequest, LoginChallengeResponse, UserChallengeData};
+use api_core::utils::challenge::Challenge;
+use api_core::utils::email::send_email_challenge_non_blocking;
+use api_core::utils::passkey::WebauthnConfig;
+use api_core::utils::sms::rx_background_error;
+use api_wire_types::{
+    LoginChallengeRequest,
+    LoginChallengeResponse,
+    UserChallengeData,
+};
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::{ChallengeKind, VaultId};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
-use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
-use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
+use newtypes::{
+    ChallengeKind,
+    VaultId,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
+use webauthn_rs_core::proto::{
+    Base64UrlSafeData,
+    Credential,
+    ParsedAttestation,
+    ParsedAttestationData,
+};
+use webauthn_rs_proto::{
+    RegisteredExtensions,
+    UserVerificationPolicy,
+};
 
 #[api_v2_operation(
     tags(Identify, Hosted),
@@ -171,7 +199,8 @@ async fn initiate_passkey_login_challenge(
                         data: ParsedAttestationData::None,
                         metadata: webauthn_rs_core::proto::AttestationMetadata::None,
                     }, // this doesn't matter for auth now
-                    attestation_format: webauthn_rs_core::AttestationFormat::None, // also doesn't matter for auth
+                    attestation_format: webauthn_rs_core::AttestationFormat::None, /* also doesn't matter
+                                                                                    * for auth */
                 })
                 .map_err(crypto::Error::from)
         })

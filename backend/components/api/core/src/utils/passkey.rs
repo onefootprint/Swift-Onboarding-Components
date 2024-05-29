@@ -1,26 +1,46 @@
-use crate::{
-    auth::user::{CheckedUserAuthContext, UserAuth},
-    config::Config,
-    errors::ApiResult,
+use crate::auth::user::{
+    CheckedUserAuthContext,
+    UserAuth,
 };
-use db::{
-    models::{
-        liveness_event::NewLivenessEvent,
-        user_timeline::UserTimeline,
-        webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
-    },
-    TxnPgConn,
+use crate::config::Config;
+use crate::errors::ApiResult;
+use db::models::liveness_event::NewLivenessEvent;
+use db::models::user_timeline::UserTimeline;
+use db::models::webauthn_credential::{
+    NewWebauthnCredential,
+    WebauthnCredential,
 };
-use newtypes::{AttestationType, InsightEventId, LivenessAttributes, LivenessInfo, LivenessIssuer, VaultId};
-use serde::{Deserialize, Serialize};
+use db::TxnPgConn;
+use newtypes::{
+    AttestationType,
+    InsightEventId,
+    LivenessAttributes,
+    LivenessInfo,
+    LivenessIssuer,
+    VaultId,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use webauthn_rs_core::error::WebauthnError;
+use webauthn_rs_core::proto::{
+    AttestationCaList,
+    AttestationMetadata,
+    Credential,
+    RegistrationState,
+};
 use webauthn_rs_core::{
-    error::WebauthnError,
-    proto::{AttestationCaList, AttestationMetadata, Credential, RegistrationState},
-    AttestationFormat, WebauthnCore,
+    AttestationFormat,
+    WebauthnCore,
 };
 use webauthn_rs_proto::{
-    AttestationConveyancePreference, AuthenticatorAttachment, COSEAlgorithm, CreationChallengeResponse,
-    RegisterPublicKeyCredential, UserVerificationPolicy,
+    AttestationConveyancePreference,
+    AuthenticatorAttachment,
+    COSEAlgorithm,
+    CreationChallengeResponse,
+    RegisterPublicKeyCredential,
+    UserVerificationPolicy,
 };
 
 pub struct WebauthnConfig {
@@ -267,10 +287,13 @@ fn is_android(client_data_json: &[u8]) -> ApiResult<bool> {
 
 #[cfg(test)]
 mod tests {
-    use webauthn_rs_core::{proto::AttestationCaList, verify_attestation_ca_chain, WebauthnCore};
-
     use super::is_android;
     use crate::utils::passkey::WebauthnConfig;
+    use webauthn_rs_core::proto::AttestationCaList;
+    use webauthn_rs_core::{
+        verify_attestation_ca_chain,
+        WebauthnCore,
+    };
 
     #[test]
     fn test_android_origin_workaround() {

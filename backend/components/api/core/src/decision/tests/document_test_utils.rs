@@ -1,27 +1,44 @@
-use std::sync::Arc;
-
-use crate::{decision::vendor::vendor_trait::MockVendorAPICall, State};
+use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+use crate::State;
 use crypto::aead::SealingKey;
-use db::{
-    models::document::{Document, DocumentImageArgs},
-    tests::MockFFClient,
-    DbResult,
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
 };
+use db::tests::MockFFClient;
+use db::DbResult;
 use feature_flag::BoolFlag;
+use idv::incode::doc::response::*;
+use idv::incode::doc::{
+    IncodeAddBackRequest,
+    IncodeAddFrontRequest,
+    IncodeAddMLConsentRequest,
+    IncodeAddPrivacyConsentRequest,
+    IncodeAddSelfieRequest,
+    IncodeFetchOCRRequest,
+    IncodeFetchScoresRequest,
+    IncodeGetOnboardingStatusRequest,
+    IncodeProcessFaceRequest,
+    IncodeProcessIdRequest,
+};
+use idv::incode::response::OnboardingStartResponse;
 use idv::incode::{
-    doc::{
-        response::*, IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
-        IncodeAddPrivacyConsentRequest, IncodeAddSelfieRequest, IncodeFetchOCRRequest,
-        IncodeFetchScoresRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
-        IncodeProcessIdRequest,
-    },
-    response::OnboardingStartResponse,
-    IncodeResponse, IncodeStartOnboardingRequest,
+    IncodeResponse,
+    IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestKind, DocumentSide,
-    EncryptedVaultPrivateKey, S3Url, SealedVaultBytes, Selfie, TenantId,
+    DocumentFixtureResult,
+    DocumentId,
+    DocumentKind,
+    DocumentRequestKind,
+    DocumentSide,
+    EncryptedVaultPrivateKey,
+    S3Url,
+    SealedVaultBytes,
+    Selfie,
+    TenantId,
 };
+use std::sync::Arc;
 
 #[derive(Clone, Copy)]
 pub enum UserKind {

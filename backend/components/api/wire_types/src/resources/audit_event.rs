@@ -1,6 +1,13 @@
 use crate::*;
 use newtypes::{
-    AuditEventId, AuditEventName, DataIdentifier, FpId, ListEntryCreationId, ListEntryId, ListId, TenantId,
+    AuditEventId,
+    AuditEventName,
+    DataIdentifier,
+    FpId,
+    ListEntryCreationId,
+    ListEntryId,
+    ListId,
+    TenantId,
 };
 use strum_macros::Display;
 

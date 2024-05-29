@@ -1,15 +1,23 @@
-use super::{AddFront, IncodeStateTransition};
-use crate::{
-    decision::vendor::{
-        incode::IncodeContext, map_to_api_error, verification_result::SaveVerificationResultArgs,
-    },
-    errors::ApiResult,
-    State,
+use super::{
+    AddFront,
+    IncodeStateTransition,
 };
-use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use idv::incode::{request::OnboardingStartCustomNameFields, IncodeStartOnboardingRequest};
+use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::errors::ApiResult;
+use crate::State;
+use db::models::incode_verification_session::{
+    IncodeVerificationSession,
+    UpdateIncodeVerificationSession,
+};
+use idv::incode::request::OnboardingStartCustomNameFields;
+use idv::incode::IncodeStartOnboardingRequest;
+use newtypes::vendor_credentials::IncodeCredentials;
 use newtypes::{
-    vendor_credentials::IncodeCredentials, IncodeAuthorizationToken, IncodeConfigurationId, IncodeSessionId,
+    IncodeAuthorizationToken,
+    IncodeConfigurationId,
+    IncodeSessionId,
     VendorAPI,
 };
 
@@ -53,7 +61,8 @@ impl StartOnboarding {
         args.save(&state.db_pool).await?;
 
         // Now ensure we don't have an error
-        // If we get an error here, the response does not include interviewId or anything else, so we just error here and will restart
+        // If we get an error here, the response does not include interviewId or anything else, so we just
+        // error here and will restart
         let successful_response = res
             .map_err(map_to_api_error)?
             .result

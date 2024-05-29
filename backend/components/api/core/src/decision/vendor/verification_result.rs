@@ -1,26 +1,40 @@
-use std::slice;
-
-use crate::{
-    decision::engine::VendorResults,
-    enclave_client::EnclaveClient,
-    errors::{ApiError, ApiResult},
+use super::make_request::VerificationRequestWithVendorResponse;
+use super::VendorAPIError;
+use crate::decision::engine::VendorResults;
+use crate::enclave_client::EnclaveClient;
+use crate::errors::{
+    ApiError,
+    ApiResult,
 };
 use chrono::Utc;
+use db::models::verification_request::{
+    NewVerificationRequestArgs,
+    VerificationRequest,
+};
+use db::models::verification_result::{
+    NewVerificationResult,
+    VerificationResult,
+};
 use db::{
-    models::{
-        verification_request::{NewVerificationRequestArgs, VerificationRequest},
-        verification_result::{NewVerificationResult, VerificationResult},
-    },
-    DbError, DbPool, PgConn,
+    DbError,
+    DbPool,
+    PgConn,
 };
 use idv::VendorResponse;
 use newtypes::{
-    DecisionIntentId, DocumentId, EncryptedVaultPrivateKey, PiiJsonValue, ScopedVaultId,
-    ScrubbedPiiJsonValue, SealedVaultBytes, VaultPublicKey, VendorAPI, VerificationRequestId,
+    DecisionIntentId,
+    DocumentId,
+    EncryptedVaultPrivateKey,
+    PiiJsonValue,
+    ScopedVaultId,
+    ScrubbedPiiJsonValue,
+    SealedVaultBytes,
+    VaultPublicKey,
+    VendorAPI,
+    VerificationRequestId,
     VerificationResultId,
 };
-
-use super::{make_request::VerificationRequestWithVendorResponse, VendorAPIError};
+use std::slice;
 
 /// Save a verification result, encrypting the response payload in the process
 pub fn save_verification_results(
@@ -50,8 +64,9 @@ pub fn save_verification_results(
     Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
 }
 
-/// Save a verification result for an errored VRes, encrypting the response payload in the process (if we got one back)
-/// For requests with no response payload, we will notate on VRes that the request was an error
+/// Save a verification result for an errored VRes, encrypting the response payload in the process
+/// (if we got one back) For requests with no response payload, we will notate on VRes that the
+/// request was an error
 pub fn save_error_verification_results(
     conn: &mut PgConn,
     vendor_responses_with_errors: &[(VerificationRequest, Option<PiiJsonValue>)],
@@ -65,7 +80,8 @@ pub fn save_error_verification_results(
                 let e_response = encrypt_verification_result_response(raw_json, user_vault_public_key)?;
                 (
                     Some(e_response),
-                    // there's a ton of PII potentially and it's too hard to keep this scrubbing stuff in sync with both success/error API responses
+                    // there's a ton of PII potentially and it's too hard to keep this scrubbing stuff in
+                    // sync with both success/error API responses
                     ScrubbedPiiJsonValue::from(serde_json::json!({})),
                 )
             } else {
@@ -237,23 +253,35 @@ impl SaveVerificationResultArgs {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{
-        decision::{
-            tests::test_helpers::{create_kyc_user_and_wf, FixtureData},
-            vendor::vendor_trait::{MockVendorAPICall, VendorAPICall, VendorAPIResponse},
-        },
-        State,
+    use crate::decision::tests::test_helpers::{
+        create_kyc_user_and_wf,
+        FixtureData,
     };
-    use db::{
-        models::decision_intent::DecisionIntent,
-        tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool},
+    use crate::decision::vendor::vendor_trait::{
+        MockVendorAPICall,
+        VendorAPICall,
+        VendorAPIResponse,
     };
-    use idv::{
-        idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
-        stytch::{StytchLookupRequest, StytchLookupResponse},
+    use crate::State;
+    use db::models::decision_intent::DecisionIntent;
+    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+    use db::tests::test_db_pool::TestDbPool;
+    use idv::idology::{
+        IdologyExpectIDAPIResponse,
+        IdologyExpectIDRequest,
+    };
+    use idv::stytch::{
+        StytchLookupRequest,
+        StytchLookupResponse,
     };
     use macros::test_state;
-    use newtypes::{vendor_credentials::IdologyCredentials, DecisionIntentKind, IdvData, Vendor, VendorAPI};
+    use newtypes::vendor_credentials::IdologyCredentials;
+    use newtypes::{
+        DecisionIntentKind,
+        IdvData,
+        Vendor,
+        VendorAPI,
+    };
     use serde_json::json;
 
     async fn test_save_vreq_and_vres<T, U, E>(

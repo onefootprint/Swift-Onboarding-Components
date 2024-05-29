@@ -1,14 +1,26 @@
-use super::{AppleAppAttestationVerifier, Config};
-use openssl::sha::sha256;
-
-use serde::{Deserialize, Serialize};
-use x509_parser::{der_parser, nom, oid_registry::Oid};
-
+use super::{
+    AppleAppAttestationVerifier,
+    Config,
+};
 use crate::error::AttestationError;
 use byteorder::ByteOrder;
-use der_parser::{der::*, error::BerError};
-use openssl::{bn::BigNumContext, ec::PointConversionForm, pkey::Id, x509::X509};
+use der_parser::der::*;
+use der_parser::error::BerError;
+use openssl::bn::BigNumContext;
+use openssl::ec::PointConversionForm;
+use openssl::pkey::Id;
+use openssl::sha::sha256;
+use openssl::x509::X509;
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use serde_bytes::ByteBuf;
+use x509_parser::oid_registry::Oid;
+use x509_parser::{
+    der_parser,
+    nom,
+};
 
 impl AppleAppAttestationVerifier {
     /// Attests an Apple App attestation

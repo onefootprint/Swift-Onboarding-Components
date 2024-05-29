@@ -1,7 +1,12 @@
 use crate::*;
 use newtypes::{
-    ComplianceDocReviewDecision, ComplianceDocSubmissionId, ComplianceDocTemplateVersionId, PartnerTenantId,
-    PiiString, TenantId, TenantUserId,
+    ComplianceDocReviewDecision,
+    ComplianceDocSubmissionId,
+    ComplianceDocTemplateVersionId,
+    PartnerTenantId,
+    PiiString,
+    TenantId,
+    TenantUserId,
 };
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]

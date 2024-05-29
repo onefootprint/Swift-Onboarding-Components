@@ -1,7 +1,10 @@
-use std::collections::HashSet;
-
 pub use newtypes::UserAuthScope;
-use newtypes::{AuthEventKind, RequestedTokenScope, VaultId};
+use newtypes::{
+    AuthEventKind,
+    RequestedTokenScope,
+    VaultId,
+};
+use std::collections::HashSet;
 
 mod session;
 pub use session::*;
@@ -19,7 +22,8 @@ pub trait UserAuth {
 /// - `scope`: the requested IdentifyScope
 /// - `is_explicit_auth`: whether the auth events at this tenant were performed explicitly and not
 ///   implicitly inherited.
-/// The result is the intersection of the scopes requested and the scopes allowed by the auth methods
+/// The result is the intersection of the scopes requested and the scopes allowed by the auth
+/// methods
 pub fn allowed_user_scopes(
     auth_events: Vec<AuthEventKind>,
     scope: RequestedTokenScope,
@@ -73,7 +77,10 @@ fn auth_event_to_scopes(k: &AuthEventKind) -> Vec<UserAuthScope> {
 
 #[cfg(test)]
 mod test {
-    use super::{RequestedTokenScope, UserAuthScope};
+    use super::{
+        RequestedTokenScope,
+        UserAuthScope,
+    };
     use newtypes::AuthEventKind;
     use test_case::test_case;
 

@@ -1,5 +1,14 @@
-use crate::{BResult, Error};
-use chrono::{DateTime, Datelike, Months, NaiveDate, Utc};
+use crate::{
+    BResult,
+    Error,
+};
+use chrono::{
+    DateTime,
+    Datelike,
+    Months,
+    NaiveDate,
+    Utc,
+};
 use std::ops::Add;
 
 #[derive(Debug)]
@@ -35,7 +44,10 @@ pub fn get_billing_interval(date: NaiveDate) -> BResult<BillingInterval> {
 #[cfg(test)]
 mod test {
     use super::get_billing_interval;
-    use chrono::{NaiveDate, Utc};
+    use chrono::{
+        NaiveDate,
+        Utc,
+    };
     use test_case::test_case;
 
     #[test_case("2023-02-01" => "2023-02".to_owned())]

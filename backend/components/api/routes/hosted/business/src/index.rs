@@ -1,16 +1,25 @@
-use crate::{errors::ApiResult, types::JsonApiResponse, State};
-use api_core::{
-    auth::ob_config::BoSessionAuth,
-    errors::business::BusinessError,
-    types::ResponseData,
-    utils::{
-        kyb_utils::{decrypt_basic_business_info, BasicBusinessInfo},
-        vault_wrapper::VaultWrapper,
-    },
+use crate::errors::ApiResult;
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::ob_config::BoSessionAuth;
+use api_core::errors::business::BusinessError;
+use api_core::types::ResponseData;
+use api_core::utils::kyb_utils::{
+    decrypt_basic_business_info,
+    BasicBusinessInfo,
 };
-use api_wire_types::hosted::business::{HostedBusiness, Invited, Inviter};
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_wire_types::hosted::business::{
+    HostedBusiness,
+    Invited,
+    Inviter,
+};
 use db::models::workflow::Workflow;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Get information about the business for which we started a KYC of a beneficial owner",

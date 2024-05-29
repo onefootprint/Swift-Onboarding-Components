@@ -1,24 +1,46 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{response::ResponseData, JsonApiResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{utils::fp_id_path::FpIdPath, ApiError, ApiErrorKind};
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::{
+    ApiError,
+    ApiErrorKind,
+};
 use api_wire_types::UserAiSummary;
-use db::models::{
-    annotation::Annotation,
-    auth_event::AuthEvent,
-    risk_signal::{AtSeqno, RiskSignal},
-    rule_set_result::RuleSetResult,
-    scoped_vault::ScopedVault,
+use db::models::annotation::Annotation;
+use db::models::auth_event::AuthEvent;
+use db::models::risk_signal::{
+    AtSeqno,
+    RiskSignal,
 };
-use newtypes::{ExternalId, FpId, OnboardingStatus};
+use db::models::rule_set_result::RuleSetResult;
+use db::models::scoped_vault::ScopedVault;
+use newtypes::{
+    ExternalId,
+    FpId,
+    OnboardingStatus,
+};
 use openai::chat::{
-    ChatCompletion, ChatCompletionMessage, ChatCompletionMessageRole, ChatCompletionResponseFormat,
+    ChatCompletion,
+    ChatCompletionMessage,
+    ChatCompletionMessageRole,
+    ChatCompletionResponseFormat,
 };
-use paperclip::actix::{api_v2_operation, post, web};
-use serde::{Deserialize, Serialize};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[api_v2_operation(
     description = "Computes a human-readable summary of the user's detail page.",

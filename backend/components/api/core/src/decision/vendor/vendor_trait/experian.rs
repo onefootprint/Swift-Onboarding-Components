@@ -1,12 +1,19 @@
-use async_trait::async_trait;
-use idv::{
-    experian::{self, ExperianCrossCoreRequest, ExperianCrossCoreResponse},
-    footprint_http_client::FootprintVendorHttpClient,
-    ParsedResponse,
+use super::{
+    VendorAPICall,
+    VendorAPIResponse,
 };
-use newtypes::{PiiJsonValue, VendorAPI};
-
-use super::{VendorAPICall, VendorAPIResponse};
+use async_trait::async_trait;
+use idv::experian::{
+    self,
+    ExperianCrossCoreRequest,
+    ExperianCrossCoreResponse,
+};
+use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::ParsedResponse;
+use newtypes::{
+    PiiJsonValue,
+    VendorAPI,
+};
 ////////////////////
 /// Experian Impl
 /// /// ////////////////

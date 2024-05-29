@@ -1,10 +1,20 @@
-use crate::{
-    errors::{ApiError, ApiResult},
-    ApiErrorKind,
+use crate::errors::{
+    ApiError,
+    ApiResult,
 };
-use derive_more::{Deref, DerefMut};
+use crate::ApiErrorKind;
+use derive_more::{
+    Deref,
+    DerefMut,
+};
+use newtypes::output::Csv;
 use newtypes::{
-    output::Csv, DataIdentifier, FilterFunction, PiiBytes, PiiJsonValue, PiiString, VaultDataFormat,
+    DataIdentifier,
+    FilterFunction,
+    PiiBytes,
+    PiiJsonValue,
+    PiiString,
+    VaultDataFormat,
 };
 use std::collections::HashMap;
 
@@ -83,9 +93,9 @@ impl DecryptUncheckedResult<Pii> {
             .into_iter()
             .map(|(k, v)| -> ApiResult<_> {
                 let pii = match v {
-                    // Since the value may be either JSON or a string, we map it into a string representation here
-                    // One day, the callers of this may actually want the full PiiJsonValue - then we'll
-                    // use the below map_to_piijsonvalues
+                    // Since the value may be either JSON or a string, we map it into a string representation
+                    // here One day, the callers of this may actually want the full
+                    // PiiJsonValue - then we'll use the below map_to_piijsonvalues
                     Pii::Value(s) => s.to_piistring()?,
                     Pii::Bytes(b) => {
                         if k.is_identity_transform() {
@@ -184,7 +194,12 @@ impl DecryptUncheckedResult {
 mod test {
     use super::*;
     use crypto::hex::FromHex;
-    use newtypes::{FilterFunction, HmacSha256Args, IdentityDataKind, PiiBytes};
+    use newtypes::{
+        FilterFunction,
+        HmacSha256Args,
+        IdentityDataKind,
+        PiiBytes,
+    };
     use test_case::test_case;
 
     #[test_case(EnclaveDecryptOperation::new(DataIdentifier::Id(IdentityDataKind::PhoneNumber), vec![]) => "id.phone_number".to_owned())]

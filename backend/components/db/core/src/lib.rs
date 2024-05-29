@@ -18,21 +18,24 @@ mod pagination;
 pub use pagination::*;
 mod instrumented_connection;
 
-use std::time::Duration;
-
 pub use crate::errors::DbError;
-use deadpool::managed::{Hook, HookError};
+use deadpool::managed::{
+    Hook,
+    HookError,
+};
 use deadpool_diesel::postgres::Runtime;
-use diesel::{connection::SimpleConnection, pg::PgConnection as DieselPgConnection, prelude::*};
+use diesel::connection::SimpleConnection;
+use diesel::pg::PgConnection as DieselPgConnection;
+use diesel::prelude::*;
 use errors::TransactionError;
+use std::time::Duration;
 
 pub mod access_event;
 pub mod actor;
 mod has_lifetime;
 pub mod scoped_vault;
-pub use has_lifetime::*;
-
 pub use db_schema::schema;
+pub use has_lifetime::*;
 
 mod cleanup;
 pub use cleanup::*;
@@ -50,8 +53,8 @@ pub mod test_helpers;
 
 pub mod tests;
 
-// Wrapper around diesel's PgConnection that allows us to swap out the underlying conn implementation
-// in one place
+// Wrapper around diesel's PgConnection that allows us to swap out the underlying conn
+// implementation in one place
 pub type PgConn = instrumented_connection::InstrumentedPgConnection;
 pub type DbResult<T> = Result<T, DbError>;
 pub use connection::TxnPgConn;

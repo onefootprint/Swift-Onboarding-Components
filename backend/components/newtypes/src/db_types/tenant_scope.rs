@@ -1,9 +1,18 @@
-use crate::{CollectedDataOption, InvokeVaultProxyPermission, TenantRoleKindDiscriminant};
-use diesel::{AsExpression, FromSqlRow};
+use crate::{
+    CollectedDataOption,
+    InvokeVaultProxyPermission,
+    TenantRoleKindDiscriminant,
+};
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-
-use strum::{AsRefStr, EnumDiscriminants};
+use strum::{
+    AsRefStr,
+    EnumDiscriminants,
+};
 
 #[derive(
     Debug,
@@ -35,14 +44,14 @@ pub enum TenantScope {
 
     //
     // Dashboard-user-only scopes
-    //
     /// Add, edit, and decrypt secret API keys and their roles
     ApiKeys,
     /// Create and update vault proxy configurations
     ManageVaultProxy,
     /// Configure webhook endpoints
     ManageWebhooks,
-    /// Perform review actions on users, like making a new decision, adding an annotation, or re-triggering KYC
+    /// Perform review actions on users, like making a new decision, adding an annotation, or
+    /// re-triggering KYC
     ManualReview,
     /// Create and update onboarding configurations
     OnboardingConfiguration,
@@ -53,7 +62,6 @@ pub enum TenantScope {
 
     //
     // API-KEY-ONLY SCOPES
-    //
     /// Forward identity data to a CIP integration
     CipIntegration,
     /// Invoke the specified vault proxies
@@ -66,7 +74,8 @@ pub enum TenantScope {
     TriggerKyc,
     /// Create an auth token that can be used to launch Footprint.js for a given user
     AuthToken,
-    /// Perform actions related to onboarding users - create short-lived onboarding sessions and validate tokens returned from Footprint.js
+    /// Perform actions related to onboarding users - create short-lived onboarding sessions and
+    /// validate tokens returned from Footprint.js
     Onboarding,
 
     /// Allows decrypting data attributes belonging to the listed CollectedDataOption
@@ -96,7 +105,6 @@ pub enum TenantScope {
 
     //
     // Compliance Partner Dashboard Scopes
-    //
     CompliancePartnerRead,
     CompliancePartnerAdmin,
     CompliancePartnerManageTemplates,

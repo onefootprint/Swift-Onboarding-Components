@@ -1,15 +1,30 @@
-use crate::{
-    errors::{tenant::TenantError, ApiError, ApiResult},
-    State,
+use crate::errors::tenant::TenantError;
+use crate::errors::{
+    ApiError,
+    ApiResult,
 };
-use api_core::errors::{AssertionError, ValidationError};
-use db::models::{ob_configuration::NewObConfigurationArgs, tenant::Tenant};
+use crate::State;
+use api_core::errors::{
+    AssertionError,
+    ValidationError,
+};
+use db::models::ob_configuration::NewObConfigurationArgs;
+use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{
-    output::Csv, CipKind, CollectedData as CD, CollectedDataOption as CDO, CollectedDataOptionKind as CDOK,
-    DataIdentifierDiscriminant as DID, DocumentRequestConfig, EnhancedAmlOption, ObConfigurationKind,
-    TenantId, VerificationCheck, VerificationCheckKind,
+    CipKind,
+    CollectedData as CD,
+    CollectedDataOption as CDO,
+    CollectedDataOptionKind as CDOK,
+    DataIdentifierDiscriminant as DID,
+    DocumentRequestConfig,
+    EnhancedAmlOption,
+    ObConfigurationKind,
+    TenantId,
+    VerificationCheck,
+    VerificationCheckKind,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -93,7 +108,8 @@ impl ObConfigurationArgsToValidate {
             }
 
             // it would be really difficult to support the doc-first flow (for now)
-            // since we won’t know what document kinds/countries to restrict to until we have the residential address
+            // since we won’t know what document kinds/countries to restrict to until we have the residential
+            // address
             if self.allow_international_residents {
                 return Err(TenantError::ValidationError(
                     "Cannot have is_doc_first and allow_international_residents".to_owned(),
@@ -460,7 +476,8 @@ impl ObConfigurationArgsToValidate {
         }
 
         let is_alpaca_tenant = state.ff_client.flag(BoolFlag::IsAlpacaTenant(tenant_id));
-        // TODO: throw error if is_alpaca_tenant and another cip_kind sent up? TODO: restrict cip_kind to integration tenants now?
+        // TODO: throw error if is_alpaca_tenant and another cip_kind sent up? TODO: restrict cip_kind to
+        // integration tenants now?
         let cip_kind = self.cip_kind.or(is_alpaca_tenant.then_some(CipKind::Alpaca));
 
         if let Some(cip_kind) = cip_kind {
@@ -592,7 +609,8 @@ impl ObConfigurationArgsToValidate {
                 let required_fields = if ein_only {
                     vec![CDOK::BusinessName, CDOK::BusinessTin]
                 } else {
-                    vec![CDOK::BusinessName, CDOK::BusinessAddress] // this is what we do for validating OBCKind, idk why
+                    vec![CDOK::BusinessName, CDOK::BusinessAddress] // this is what we do for
+                                                                    // validating OBCKind, idk why
                 };
                 let missing_required_fields: Vec<_> = required_fields
                     .into_iter()

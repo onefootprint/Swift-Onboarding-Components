@@ -1,14 +1,22 @@
 use crate::ProtectedAuth;
-use actix_web::{
-    post,
-    web::{self},
+use actix_web::post;
+use actix_web::web::{
+    self,
 };
-use api_core::{
-    types::{EmptyResponse, JsonApiResponse},
-    State,
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
-use billing::{create_bill_for_tenant, BResult};
-use chrono::{Duration, NaiveDate, Utc};
+use api_core::State;
+use billing::{
+    create_bill_for_tenant,
+    BResult,
+};
+use chrono::{
+    Duration,
+    NaiveDate,
+    Utc,
+};
 use db::models::tenant::Tenant;
 use futures::StreamExt;
 use newtypes::TenantId;
@@ -16,7 +24,8 @@ use newtypes::TenantId;
 #[derive(Debug, serde::Deserialize)]
 struct CreateInvoiceRequest {
     tenant_id: TenantId,
-    /// When provided, we'll generate the invoice as if this ran in the billing period containing this date
+    /// When provided, we'll generate the invoice as if this ran in the billing period containing
+    /// this date
     billing_date: Option<NaiveDate>,
 }
 
@@ -44,7 +53,8 @@ async fn post(
 
 #[derive(Debug, serde::Deserialize)]
 struct CreateInvoicesRequest {
-    /// When provided, we'll generate the invoice as if this ran in the billing period containing this date
+    /// When provided, we'll generate the invoice as if this ran in the billing period containing
+    /// this date
     billing_date: Option<NaiveDate>,
 }
 

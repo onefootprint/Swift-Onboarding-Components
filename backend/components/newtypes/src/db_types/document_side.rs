@@ -1,8 +1,17 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum_macros::{AsRefStr, EnumIter};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum_macros::{
+    AsRefStr,
+    EnumIter,
+};
 
 #[derive(
     Debug,
@@ -37,9 +46,8 @@ crate::util::impl_enum_str_diesel!(DocumentSide);
 
 #[cfg(test)]
 mod test {
-    use std::cmp::Ordering;
-
     use crate::DocumentSide;
+    use std::cmp::Ordering;
 
     #[test]
     fn test_ord() {

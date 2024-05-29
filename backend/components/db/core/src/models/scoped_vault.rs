@@ -1,30 +1,61 @@
-use std::collections::HashMap;
-
-use super::{
-    insight_event::InsightEvent,
-    manual_review::ManualReview,
-    ob_configuration::{IsLive, ObConfiguration},
-    scoped_vault_label::ScopedVaultLabel,
-    tenant::Tenant,
-    user_timeline::UserTimeline,
-    vault::{NewVaultArgs, Vault},
-    watchlist_check::WatchlistCheck,
-    workflow::Workflow,
-    workflow_request::WorkflowRequest,
+use super::insight_event::InsightEvent;
+use super::manual_review::ManualReview;
+use super::ob_configuration::{
+    IsLive,
+    ObConfiguration,
 };
-use crate::{models::data_lifetime::DataLifetime, DbError, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Duration, Utc};
-use db_schema::schema::scoped_vault::{self};
+use super::scoped_vault_label::ScopedVaultLabel;
+use super::tenant::Tenant;
+use super::user_timeline::UserTimeline;
+use super::vault::{
+    NewVaultArgs,
+    Vault,
+};
+use super::watchlist_check::WatchlistCheck;
+use super::workflow::Workflow;
+use super::workflow_request::WorkflowRequest;
+use crate::models::data_lifetime::DataLifetime;
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Duration,
+    Utc,
+};
+use db_schema::schema::scoped_vault::{
+    self,
+};
+use diesel::dsl::{
+    count_distinct,
+    not,
+};
+use diesel::prelude::*;
 use diesel::{
-    dsl::{count_distinct, not},
-    prelude::*,
-    Insertable, Queryable,
+    Insertable,
+    Queryable,
 };
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, DbActor, ExternalId, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus,
-    ScopedVaultId, TenantId, VaultCreatedInfo, VaultId, VaultKind, WorkflowId,
+    DataLifetimeSeqno,
+    DbActor,
+    ExternalId,
+    FpId,
+    IdempotencyId,
+    Locked,
+    ObConfigurationId,
+    OnboardingStatus,
+    ScopedVaultId,
+    TenantId,
+    VaultCreatedInfo,
+    VaultId,
+    VaultKind,
+    WorkflowId,
 };
+use std::collections::HashMap;
 
 /// Creates a unique identifier specific to each onboarding configuration.
 /// This allows one user to onboard onto multiple onboarding configurations at the same tenant
@@ -47,7 +78,8 @@ pub struct ScopedVault {
     /// are considered in progress if their KYC status is still incomplete
     pub last_heartbeat_at: DateTime<Utc>,
     /// The seqno at which the SV was created or refreshed.
-    /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the VW
+    /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the
+    /// VW
     pub snapshot_seqno: DataLifetimeSeqno,
     /// An optional external (customer-specified) identifier for the scoped vault
     pub external_id: Option<ExternalId>,
@@ -370,7 +402,12 @@ impl ScopedVault {
         ids: Vec<ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
         use db_schema::schema::{
-            insight_event, manual_review, scoped_vault_label, watchlist_check, workflow, workflow_request,
+            insight_event,
+            manual_review,
+            scoped_vault_label,
+            watchlist_check,
+            workflow,
+            workflow_request,
         };
         type ScopedVaultInfo = (
             ScopedVault,
@@ -518,7 +555,11 @@ impl ScopedVault {
     /// List all authorized onboardings for a given vault
     #[tracing::instrument("ScopedVault::list_authorized", skip_all)]
     pub fn list_authorized(conn: &mut PgConn, v_id: &VaultId) -> DbResult<Vec<AuthorizedTenant>> {
-        use db_schema::schema::{ob_configuration, tenant, workflow};
+        use db_schema::schema::{
+            ob_configuration,
+            tenant,
+            workflow,
+        };
         let results = workflow::table
             .inner_join(scoped_vault::table)
             .inner_join(ob_configuration::table)
@@ -591,7 +632,8 @@ pub enum ScopedVaultPiiFilters {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::{fixtures, prelude::*};
+    use crate::tests::fixtures;
+    use crate::tests::prelude::*;
     use macros::db_test;
 
     #[db_test]

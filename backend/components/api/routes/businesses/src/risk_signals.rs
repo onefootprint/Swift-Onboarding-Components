@@ -1,20 +1,29 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    types::{response::ResponseData, JsonApiResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
-use db::{
-    models::{
-        risk_signal::{AtSeqno, RiskSignal},
-        scoped_vault::ScopedVault,
-    },
-    DbResult,
+use db::models::risk_signal::{
+    AtSeqno,
+    RiskSignal,
 };
+use db::models::scoped_vault::ScopedVault;
+use db::DbResult;
 use itertools::Itertools;
-use newtypes::{FootprintReasonCode, PreviewApi};
-use paperclip::actix::{api_v2_operation, get, web};
+use newtypes::{
+    FootprintReasonCode,
+    PreviewApi,
+};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 type RiskSignalsListResponse = Vec<api_wire_types::PublicRiskSignal>;
 

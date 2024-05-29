@@ -1,14 +1,36 @@
+use super::utils::{
+    self,
+    validate_state,
+    AgeHelper,
+    PO_BOX,
+};
 use super::{
-    utils::{self, validate_state, AgeHelper, PO_BOX},
-    Error, VResult,
+    Error,
+    VResult,
+};
+use crate::email::Email;
+use crate::ssn::{
+    Ssn4,
+    Ssn9,
 };
 use crate::{
-    email::Email,
-    ssn::{Ssn4, Ssn9},
-    AllData, CleanAndValidate, DataIdentifierValue, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode,
-    NtResult, PhoneNumber, PiiJsonValue, PiiString, ValidateArgs, DATE_FORMAT,
+    AllData,
+    CleanAndValidate,
+    DataIdentifierValue,
+    IdentityDataKind as IDK,
+    Iso3166TwoDigitCountryCode,
+    NtResult,
+    PhoneNumber,
+    PiiJsonValue,
+    PiiString,
+    ValidateArgs,
+    DATE_FORMAT,
 };
-use chrono::{Datelike, NaiveDate, Utc};
+use chrono::{
+    Datelike,
+    NaiveDate,
+    Utc,
+};
 use serde_with::DeserializeFromStr;
 use std::str::FromStr;
 use strum_macros::EnumString;
@@ -252,10 +274,14 @@ pub enum VisaKind {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
-
     use super::IDK::*;
-    use crate::{CleanAndValidate, IdentityDataKind as IDK, PiiJsonValue, ValidateArgs};
+    use crate::{
+        CleanAndValidate,
+        IdentityDataKind as IDK,
+        PiiJsonValue,
+        ValidateArgs,
+    };
+    use std::collections::HashMap;
     use test_case::test_case;
 
     #[test_case(FirstName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]

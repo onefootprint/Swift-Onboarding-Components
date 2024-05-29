@@ -1,5 +1,11 @@
-use super::error::{Error, StytchError};
-use chrono::{DateTime, Utc};
+use super::error::{
+    Error,
+    StytchError,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use newtypes::PiiString;
 use serde::*;
 use serde_with::DeserializeFromStr;
@@ -156,9 +162,10 @@ mod tests {
     fn parse_success(json: serde_json::Value) -> (Action, Vec<Reason>) {
         let parsed = parse_response(json).unwrap();
 
-        // We currently read saved Vres's by decrypted e_response which is written from the direct json response that never goes through deser in Rust
-        // So there isn't an immediate use case for ensuring (raw json -> deser to Rust struct -> ser to json -> deser to Rust struct again) works, but
-        // this is a generally good thing to ensure to save us from dumb errors later
+        // We currently read saved Vres's by decrypted e_response which is written from the direct json
+        // response that never goes through deser in Rust So there isn't an immediate use case for
+        // ensuring (raw json -> deser to Rust struct -> ser to json -> deser to Rust struct again) works,
+        // but this is a generally good thing to ensure to save us from dumb errors later
         let reserialized = serde_json::to_value(parsed).unwrap();
         let reparsed: LookupResponse = serde_json::from_value(reserialized).unwrap();
 

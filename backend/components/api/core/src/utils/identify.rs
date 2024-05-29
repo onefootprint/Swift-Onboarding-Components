@@ -1,16 +1,24 @@
-use crate::{
-    auth::user::{CheckedUserAuthContext, UserIdentifier},
-    errors::ApiResult,
-    utils::vault_wrapper::{VaultWrapper, VwArgs},
-    State,
+use super::vault_wrapper::Person;
+use crate::auth::user::{
+    CheckedUserAuthContext,
+    UserIdentifier,
 };
-use db::models::{contact_info::ContactInfo, webauthn_credential::WebauthnCredential};
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    VaultWrapper,
+    VwArgs,
+};
+use crate::State;
+use db::models::contact_info::ContactInfo;
+use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
 use newtypes::{
-    AuthMethodKind, ChallengeKind, ContactInfoKind, DataIdentifier as DI, IdentityDataKind as IDK,
+    AuthMethodKind,
+    ChallengeKind,
+    ContactInfoKind,
+    DataIdentifier as DI,
+    IdentityDataKind as IDK,
 };
-
-use super::vault_wrapper::Person;
 
 pub struct UserChallengeContext {
     pub vw: VaultWrapper<Person>,

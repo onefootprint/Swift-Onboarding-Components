@@ -1,6 +1,6 @@
+use crate::socure::response::SocureIDPlusResponse;
+use crate::socure::SocureIDPlusAPIResponse;
 use newtypes::PiiJsonValue;
-
-use crate::socure::{response::SocureIDPlusResponse, SocureIDPlusAPIResponse};
 
 pub fn create_response() -> SocureIDPlusAPIResponse {
     let parsed_response = SocureIDPlusResponse {

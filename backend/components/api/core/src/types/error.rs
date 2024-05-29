@@ -1,4 +1,7 @@
-use newtypes::{ErrorMessage, Uuid};
+use newtypes::{
+    ErrorMessage,
+    Uuid,
+};
 use serde_json::Value;
 
 #[derive(Debug, Clone, serde::Serialize)]

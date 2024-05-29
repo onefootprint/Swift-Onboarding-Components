@@ -1,14 +1,31 @@
-use crate::{
-    decision::features::incode_utils::*,
-    enclave_client::EnclaveClient,
-    errors::ApiResult,
-    utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper},
+use crate::decision::features::incode_utils::*;
+use crate::enclave_client::EnclaveClient;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    DecryptUncheckedResult,
+    VaultWrapper,
 };
-use chrono::{NaiveDateTime, Utc};
-use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
+use chrono::{
+    NaiveDateTime,
+    Utc,
+};
+use idv::incode::doc::response::{
+    FetchOCRResponse,
+    FetchScoresResponse,
+    IncodeOcrFixtureResponseFields,
+};
+use newtypes::incode::{
+    IncodeRCH,
+    IncodeStatus,
+    IncodeTest,
+};
 use newtypes::{
-    incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    DataIdentifier, FootprintReasonCode, IdDocKind, IdentityDataKind, PiiString, VerificationResultId,
+    DataIdentifier,
+    FootprintReasonCode,
+    IdDocKind,
+    IdentityDataKind,
+    PiiString,
+    VerificationResultId,
 };
 
 #[derive(Default, Clone, PartialEq, Eq)]
@@ -80,14 +97,16 @@ impl IncodeOcrComparisonDataFields {
     }
 }
 
-/// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
+/// Struct to represent the elements (derived or pass through) that we use from IDology to make a
+/// decision
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IncodeDocumentFeatures {
     pub footprint_reason_codes: Vec<FootprintReasonCode>,
     pub verification_result_id: VerificationResultId,
 }
 
-// Once we move RiskSignals to being computed at the time are handling the VRes, we can use this method.
+// Once we move RiskSignals to being computed at the time are handling the VRes, we can use this
+// method.
 pub fn footprint_reason_codes(
     ocr: FetchOCRResponse,
     scores: FetchScoresResponse,
@@ -110,8 +129,8 @@ pub fn reason_codes_from_score_response(
 ) -> Vec<FootprintReasonCode> {
     // Overall score
     //
-    // We check for the existence of this at the vendor call layer, but our decisioning relies most heavily on the score (for now)
-    // and we should not proceed if we don't have it
+    // We check for the existence of this at the vendor call layer, but our decisioning relies most
+    // heavily on the score (for now) and we should not proceed if we don't have it
     let document_score_code = match scores_res.document_score().1 {
         Some(s) => {
             if s == IncodeStatus::Fail {
@@ -267,8 +286,10 @@ fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRRespon
         dk.expected_critical_ocr_data_kinds().into_iter().all(|odk| {
             let pif = parsed_odks.iter().find(|p| p.odk == odk);
             if let Some(pif) = pif {
-                // we don't have a lot of confidence (no pun intended) on Incode's consistency with producing these scores and for some fields its a little ambiguous which of several
-                // possible options should/could be used as the correct measure of confidence. So given this, if the confidence score is None, we treat this as passing OCR. (for now anyway)
+                // we don't have a lot of confidence (no pun intended) on Incode's consistency with producing
+                // these scores and for some fields its a little ambiguous which of several
+                // possible options should/could be used as the correct measure of confidence. So given this,
+                // if the confidence score is None, we treat this as passing OCR. (for now anyway)
                 pif.confidence
                     .map(|c| c > OCR_CONFIDENCE_SCORE_THRESHOLD)
                     .unwrap_or(true)
@@ -286,7 +307,8 @@ fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRRespon
         }
     };
 
-    // call OCR unsuccessful if either the overall confidence check in the scores response is FAIL or if any critical fields are missing or low confidence in the OCR response
+    // call OCR unsuccessful if either the overall confidence check in the scores response is FAIL or if
+    // any critical fields are missing or low confidence in the OCR response
     all_expected_fields_present_and_high_confidence && ocr_overall_confidence_passed
 }
 
@@ -320,85 +342,96 @@ fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintRe
 mod tests {
     use super::*;
     use db::test_helpers::assert_have_same_elements;
-    use idv::{
-        incode::doc::response::{FetchScoresResponse, OCRName, OcrDataConfidence},
-        test_fixtures::{self, DocTestOpts, OcrTestOpts},
+    use idv::incode::doc::response::{
+        FetchScoresResponse,
+        OCRName,
+        OcrDataConfidence,
+    };
+    use idv::test_fixtures::{
+        self,
+        DocTestOpts,
+        OcrTestOpts,
+    };
+    use newtypes::incode::IncodeStatus::*;
+    use newtypes::FootprintReasonCode::{
+        self,
+        *,
     };
     use newtypes::{
-        incode::IncodeStatus::*,
-        FootprintReasonCode::{self, *},
-        PiiLong, ScrubbedPiiLong, ScrubbedPiiString,
+        PiiLong,
+        ScrubbedPiiLong,
+        ScrubbedPiiString,
     };
     use std::collections::HashMap;
     use test_case::test_case;
 
     #[test_case(
-        ("Rob", "Roberto", "1990-01-01"), 
+        ("Rob", "Roberto", "1990-01-01"),
         (Some("Rob".into()),Some("Roberto".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]
     ; "name and dob match")]
     #[test_case(
-        ("ROB", "    roBERTo", "1990-01-01"), 
+        ("ROB", "    roBERTo", "1990-01-01"),
         (Some("rob".into()), Some("roberto".into()), Some("       1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]
     ; "whitespace/mixed case matches name")]
     #[test_case(
-        ("Robby", "Roberto", "1990-01-01"), 
+        ("Robby", "Roberto", "1990-01-01"),
         (Some("Bob".into()),Some("Roberto".into()), Some("1980-01-01".into())),
         vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "first name doesn't match and DOBs don't match"
     )]
     #[test_case(
-        ("Bob", "Roberti", "1990-01-01"), 
+        ("Bob", "Roberti", "1990-01-01"),
         (Some("Bob".into()),Some("Roberto".into()),Some("  1980-01-01".into())),
         vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameMatches, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "last name doesn't match and DOBs don't match"
     )]
     #[test_case(
-        ("Bob", "Roberto", "1990-01-01"), 
+        ("Bob", "Roberto", "1990-01-01"),
         (Some("Crob".into()),Some("Croberto".into()),Some("1980-01-01".into())),
         vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "all doesn't match"
     )]
     #[test_case(
-        ("Bob", "Roberto", "1990-01-01"), 
+        ("Bob", "Roberto", "1990-01-01"),
         (Some("Bob".into()),Some("Roberto".into()),None),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobCouldNotMatch, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "dob missing"
     )]
     #[test_case(
-        ("Bob", "Roberto", "1990-01-01"), 
+        ("Bob", "Roberto", "1990-01-01"),
         (None, Some("Roberto".into()), Some("1990-01-01".into())),
         vec![DocumentOcrNameCouldNotMatch, DocumentOcrNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "first name missing"
     )]
     #[test_case(
-        ("Rob", "Robèrto", "1990-01-01"), 
+        ("Rob", "Robèrto", "1990-01-01"),
         (Some("Rob".into()),Some("Roberto".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "unicode"
     )]
     #[test_case(
-        ("RöbÀÑ", "RÓbèrtõ", "1990-01-01"), 
+        ("RöbÀÑ", "RÓbèrtõ", "1990-01-01"),
         (Some("Roban".into()),Some("ROBERTO".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "more unicode"
     )]
     #[test_case(
-        ("B'ob", "Bo'berto", "1990-01-01"), 
+        ("B'ob", "Bo'berto", "1990-01-01"),
         (Some("B'ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in both names"
     )]
     #[test_case(
-        ("B'ob", "Bo'berto", "1990-01-01"), 
+        ("B'ob", "Bo'berto", "1990-01-01"),
         (Some("Bob".into()),Some("Boberto".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in OCR names"
     )]
     #[test_case(
-        ("Bob", "Boberto", "1990-01-01"), 
+        ("Bob", "Boberto", "1990-01-01"),
         (Some("B'ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in keyed in names"
     )]
     #[test_case(
-        ("Bob", "Bo'  berto", "1990-01-01"), 
+        ("Bob", "Bo'  berto", "1990-01-01"),
         (Some("B' ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies and spaces"
     )]
     #[test_case(
-        ("Bob", "Boberto-Jones", "1990-01-01"), 
+        ("Bob", "Boberto-Jones", "1990-01-01"),
         (Some("Bob".into()),Some("Boberto Jones".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch,]; "hyphen"
     )]
@@ -448,11 +481,11 @@ mod tests {
             DocumentNoImageAlterationFront,
             DocumentNoImageAlterationBack,
             DocumentFullNameCrosscheckMatches,
-            DocumentDobCrosscheckMatches, 
+            DocumentDobCrosscheckMatches,
             DocumentNumberCheckDigitMatches,
             DocumentDobCheckDigitMatches,
-            DocumentSexCrosscheckMatches, 
-            DocumentExpirationCheckDigitMatches, 
+            DocumentSexCrosscheckMatches,
+            DocumentExpirationCheckDigitMatches,
             DocumentNumberCrosscheckMatches,
             DocumentBarcodeContentMatches,
             DocumentNotExpired
@@ -473,7 +506,7 @@ mod tests {
                 lenses_and_mask_check: Fail,
                 cross_checks: Fail,
                 liveness: Fail
-            }, 
+            },
             vec![
                 DocumentPhotoIsScreenCapture,
                 DocumentVisiblePhotoFeaturesNotVerified,
@@ -490,11 +523,11 @@ mod tests {
                 DocumentSelfieGlasses,
                 DocumentSelfieMask,
                 DocumentFullNameCrosscheckDoesNotMatch,
-                DocumentDobCrosscheckDoesNotMatch, 
+                DocumentDobCrosscheckDoesNotMatch,
                 DocumentNumberCheckDigitDoesNotMatch,
                 DocumentDobCheckDigitDoesNotMatch,
-                DocumentSexCrosscheckDoesNotMatch, 
-                DocumentExpirationCheckDigitDoesNotMatch, 
+                DocumentSexCrosscheckDoesNotMatch,
+                DocumentExpirationCheckDigitDoesNotMatch,
                 DocumentSelfieNotLiveImage,
                 DocumentNumberCrosscheckDoesNotMatch, // barcode stuff is weird here
                 DocumentNotExpired
@@ -515,7 +548,7 @@ mod tests {
                 lenses_and_mask_check: Ok,
                 cross_checks: Ok,
                 liveness: Ok
-            }, 
+            },
             vec![
                 DocumentPhotoIsNotScreenCapture,
                 DocumentPhotoIsNotPaperCapture,
@@ -530,11 +563,11 @@ mod tests {
                 DocumentNoImageAlterationFront,
                 DocumentNoImageAlterationBack,
                 DocumentFullNameCrosscheckMatches,
-                DocumentDobCrosscheckMatches, 
+                DocumentDobCrosscheckMatches,
                 DocumentNumberCheckDigitMatches,
                 DocumentDobCheckDigitMatches,
-                DocumentSexCrosscheckMatches, 
-                DocumentExpirationCheckDigitMatches, 
+                DocumentSexCrosscheckMatches,
+                DocumentExpirationCheckDigitMatches,
                 DocumentNumberCrosscheckMatches,
                 DocumentNotExpired
             ], true; "mix of things")]
@@ -553,11 +586,11 @@ mod tests {
                     DocumentNoImageAlterationFront,
                     DocumentNoImageAlterationBack,
                     DocumentFullNameCrosscheckMatches,
-                    DocumentDobCrosscheckMatches, 
+                    DocumentDobCrosscheckMatches,
                     DocumentNumberCheckDigitMatches,
                     DocumentDobCheckDigitMatches,
-                    DocumentSexCrosscheckMatches, 
-                    DocumentExpirationCheckDigitMatches, 
+                    DocumentSexCrosscheckMatches,
+                    DocumentExpirationCheckDigitMatches,
                     DocumentNumberCrosscheckMatches,
                     DocumentBarcodeContentMatches,
                     DocumentNotExpired
@@ -662,8 +695,8 @@ mod tests {
     }
 
     #[test_case(
-        IdDocKind::DriversLicense, 
-        DocTestOpts::default(), 
+        IdDocKind::DriversLicense,
+        DocTestOpts::default(),
         FetchOCRResponse {
             name: Some(OCRName {
                 given_name: Some("bob".into()),
@@ -673,7 +706,7 @@ mod tests {
             birth_date: Some(ScrubbedPiiLong::new(PiiLong::new(529873860000))),
             document_number: Some("12354".into()),
             expire_at: Some("423123251".into()),
-            issued_at: Some("3231234521".into()),         
+            issued_at: Some("3231234521".into()),
             ocr_data_confidence: Some(OcrDataConfidence{
                 name_confidence: Some(1.0),
                 address_confidence: Some(1.0),
@@ -683,11 +716,11 @@ mod tests {
                 ..Default::default()
             }),
             ..Default::default()
-        } 
+        }
         => true)]
     #[test_case(
-        IdDocKind::DriversLicense, 
-        DocTestOpts::default(), 
+        IdDocKind::DriversLicense,
+        DocTestOpts::default(),
         FetchOCRResponse {
             name: Some(OCRName {
                 given_name: Some("bob".into()),
@@ -697,7 +730,7 @@ mod tests {
             birth_date: Some(ScrubbedPiiLong::new(PiiLong::new(529873860000))),
             document_number: Some("12354".into()),
             expire_at: Some("423123251".into()),
-            issued_at: Some("3231234521".into()),         
+            issued_at: Some("3231234521".into()),
             ocr_data_confidence: Some(OcrDataConfidence{
                 name_confidence: Some(1.0),
                 address_confidence: Some(1.0),
@@ -707,11 +740,11 @@ mod tests {
                 ..Default::default()
             }),
             ..Default::default()
-        } 
+        }
         => false)]
     #[test_case(
-        IdDocKind::DriversLicense, 
-        DocTestOpts::default(), 
+        IdDocKind::DriversLicense,
+        DocTestOpts::default(),
         FetchOCRResponse {
             name: Some(OCRName {
                 given_name: Some("bob".into()),
@@ -723,11 +756,11 @@ mod tests {
             expire_at: Some("423123251".into()),
             issued_at: Some("3231234521".into()),
             ..Default::default()
-        } 
+        }
         => true)]
     #[test_case(
-        IdDocKind::DriversLicense, 
-        DocTestOpts::default(), 
+        IdDocKind::DriversLicense,
+        DocTestOpts::default(),
         FetchOCRResponse {
             name: Some(OCRName {
                 given_name: Some("bob".into()),
@@ -739,43 +772,43 @@ mod tests {
             expire_at: None,
             issued_at: Some("3231234521".into()),
             ..Default::default()
-        } 
+        }
         => false)]
     #[test_case(
-        IdDocKind::IdCard, 
-        DocTestOpts::default(), 
+        IdDocKind::IdCard,
+        DocTestOpts::default(),
         FetchOCRResponse {
             name: Some(OCRName {
                 given_name: Some("bob".into()),
                 ..Default::default()
             }),
             ..Default::default()
-        } 
+        }
         => true)]
     #[test_case(
-        IdDocKind::Passport, 
-        DocTestOpts::default(), 
+        IdDocKind::Passport,
+        DocTestOpts::default(),
         FetchOCRResponse {
             name: Some(OCRName {
                 given_name: Some("bob".into()),
                 ..Default::default()
             }),
             ..Default::default()
-        } 
+        }
         => false)]
     #[test_case(
-        IdDocKind::IdCard, 
+        IdDocKind::IdCard,
         DocTestOpts {
             ocr_confidence: Fail,
-           ..Default::default() 
-        }, 
+           ..Default::default()
+        },
         FetchOCRResponse {
             name: Some(OCRName {
                 given_name: Some("bob".into()),
                 ..Default::default()
             }),
             ..Default::default()
-        } 
+        }
         => false)]
     fn test_ocr_was_successful(dk: IdDocKind, score_opts: DocTestOpts, ocr_res: FetchOCRResponse) -> bool {
         let scores_res: FetchScoresResponse =

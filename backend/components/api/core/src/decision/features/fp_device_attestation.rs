@@ -1,14 +1,17 @@
-use db::models::{
-    apple_device_attest::AppleDeviceAttestation, google_device_attest::GoogleDeviceAttestation,
+use db::models::apple_device_attest::AppleDeviceAttestation;
+use db::models::google_device_attest::GoogleDeviceAttestation;
+use newtypes::{
+    AndroidAppLicense,
+    AndroidDeviceIntegrityLevel,
+    FootprintReasonCode,
 };
-use newtypes::{AndroidAppLicense, AndroidDeviceIntegrityLevel, FootprintReasonCode};
 
 /// generates our risk signals for apple device attestation by footprint
 /// receipt metric value defined here: https://developer.apple.com/documentation/devicecheck/assessing_fraud_risk#3578868
-/// the ios device/app clip tries to use the SAME attestation key, which means unless device is reset/app-reinstalled/etc
-/// it should be the same, singular atttestation key
-/// if a bad actor is using the same device (without resetting it) we will see the same attestation key,
-/// so the `associated_vault_count` surfaces this case
+/// the ios device/app clip tries to use the SAME attestation key, which means unless device is
+/// reset/app-reinstalled/etc it should be the same, singular atttestation key
+/// if a bad actor is using the same device (without resetting it) we will see the same attestation
+/// key, so the `associated_vault_count` surfaces this case
 pub fn generate_apple_reason_codes(
     result: &AppleDeviceAttestation,
     associated_vault_count: i64,

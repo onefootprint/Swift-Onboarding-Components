@@ -1,21 +1,33 @@
-use crate::{config::Config, enclave_client::EnclaveClient, errors::ApiResult, utils};
+use crate::config::Config;
+use crate::enclave_client::EnclaveClient;
+use crate::errors::ApiResult;
+use crate::utils;
+use db::models::tenant::Tenant;
+use db::models::tenant_business_info::TenantBusinessInfo;
+use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
 use db::{
-    models::{
-        tenant::Tenant, tenant_business_info::TenantBusinessInfo,
-        tenant_vendor::TenantVendorControl as DbTenantVendorControl,
-    },
-    DbPool, DbResult,
+    DbPool,
+    DbResult,
 };
-use idv::{
-    experian::ExperianCrossCoreRequest,
-    idology::{pa::IdologyPaRequest, IdologyExpectIDRequest},
+use idv::experian::ExperianCrossCoreRequest;
+use idv::idology::pa::IdologyPaRequest;
+use idv::idology::IdologyExpectIDRequest;
+use newtypes::vendor_credentials::{
+    ExperianCredentialBuilder,
+    ExperianCredentials,
+    IdologyCredentials,
+    IncodeCredentials,
+    LexisCredentials,
+    MiddeskCredentials,
+    NeuroIdApiKeys,
 };
 use newtypes::{
-    vendor_credentials::{
-        ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials, IncodeCredentials,
-        LexisCredentials, MiddeskCredentials, NeuroIdApiKeys,
-    },
-    IdvData, IncodeEnvironment, PiiString, TenantId, Vendor, VendorAPI,
+    IdvData,
+    IncodeEnvironment,
+    PiiString,
+    TenantId,
+    Vendor,
+    VendorAPI,
 };
 
 #[derive(Clone, Debug, Default)]
@@ -129,7 +141,8 @@ impl TenantVendorControl {
     ) -> ApiResult<Self> {
         // As of 2023-06-28 we just use our default idology credentials for all tenants
         let idology_credentials = IdologyCredentials::from(config);
-        // TODO: we'll likely need to have diff site_ids in the future that we store on playbooks so we will refactor then
+        // TODO: we'll likely need to have diff site_ids in the future that we store on playbooks so we will
+        // refactor then
         let neuro_id_api_key = NeuroIdApiKeys::from(config);
 
         // For experian, we use the bulk of the same credentials, just need to update subscriber code
@@ -175,7 +188,8 @@ impl TenantVendorControl {
         // stash the enabled APIs on TVC
         let enabled_vendor_apis = Self::get_enabled_vendor_apis(&vendor_control, tbi.as_ref());
 
-        // eventually we'll want to do some validations here, like checking the db is configured for at least 1 KYC vendor, but for now let's not validate in constructor
+        // eventually we'll want to do some validations here, like checking the db is configured for at
+        // least 1 KYC vendor, but for now let's not validate in constructor
         let control = Self {
             idology_credentials,
             experian_credentials,

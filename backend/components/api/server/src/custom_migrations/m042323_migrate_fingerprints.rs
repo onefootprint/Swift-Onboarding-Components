@@ -1,22 +1,37 @@
 //! Migrates our old style fingerprints to the new algorithm, re-fingerprinting sealed data
 
-use api_core::{enclave_client::EnclaveClient, errors::ApiResult, State};
+use super::CustomMigration;
+use api_core::enclave_client::EnclaveClient;
+use api_core::errors::ApiResult;
+use api_core::State;
+use db::models::fingerprint::NewFingerprint;
+use db::models::vault::Vault;
+use db::models::vault_data::VaultData;
+use db::{
+    DbError,
+    TxnPgConn,
+};
+use db_schema::schema::{
+    data_lifetime,
+    fingerprint,
+    scoped_vault,
+    tenant,
+    vault,
+    vault_data,
+};
+use diesel::dsl::not;
+use diesel::prelude::*;
 use futures::future::try_join_all;
 use itertools::Itertools;
+use newtypes::fingerprinter::GlobalFingerprintKind;
+use newtypes::{
+    DataIdentifier,
+    FingerprintScopeKind,
+    ScopedVaultId,
+    TenantId,
+};
 use std::collections::HashMap;
 use tokio::runtime::Handle;
-
-use db::{
-    models::{fingerprint::NewFingerprint, vault::Vault, vault_data::VaultData},
-    DbError, TxnPgConn,
-};
-use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, tenant, vault, vault_data};
-use diesel::{dsl::not, prelude::*};
-use newtypes::{
-    fingerprinter::GlobalFingerprintKind, DataIdentifier, FingerprintScopeKind, ScopedVaultId, TenantId,
-};
-
-use super::CustomMigration;
 
 pub struct Migration;
 
@@ -137,7 +152,7 @@ async fn create_new_fingerprints(
 
     let global_scoped_vault_data = vds
         .into_iter()
-        // not all DIs are global, so need to enforce conversion and filter out bad ones even though 
+        // not all DIs are global, so need to enforce conversion and filter out bad ones even though
         // this should not have been possible, but it's possible the scope has changed since this code-enforced
         // not DB-enforced
         .filter_map(| vd| {

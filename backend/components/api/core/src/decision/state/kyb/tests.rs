@@ -1,40 +1,72 @@
-use crate::{
-    decision::{
-        state::{
-            actions::WorkflowActions,
-            kyb,
-            test_utils::{
-                mock_idology, mock_middesk, mock_webhooks, query_data, query_portablized_seqno,
-                query_risk_signals, query_rule_set_result, ExpectedRequiresManualReview, ExpectedStatus,
-                OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
-            },
-            Authorize, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowKind, WorkflowWrapper,
-        },
-        tests::test_helpers,
-    },
-    errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
-    State,
+use crate::decision::state::actions::WorkflowActions;
+use crate::decision::state::test_utils::{
+    mock_idology,
+    mock_middesk,
+    mock_webhooks,
+    query_data,
+    query_portablized_seqno,
+    query_risk_signals,
+    query_rule_set_result,
+    ExpectedRequiresManualReview,
+    ExpectedStatus,
+    OnboardingCompleted,
+    OnboardingStatusChanged,
+    UserKind,
+    WithQualifier,
 };
+use crate::decision::state::{
+    kyb,
+    Authorize,
+    BoKycCompleted,
+    MakeDecision,
+    MakeVendorCalls,
+    WorkflowKind,
+    WorkflowWrapper,
+};
+use crate::decision::tests::test_helpers;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+    VwArgs,
+};
+use crate::State;
 use api_wire_types::TerminalDecisionStatus;
-use db::{
-    models::{
-        ob_configuration::ObConfiguration,
-        rule_instance::{IncludeRules, RuleInstance},
-        rule_set_result::RuleSetResult,
-        tenant::Tenant,
-        workflow::Workflow as DbWorkflow,
-    },
-    test_helpers::assert_have_same_elements,
-    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool, MockFFClient},
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_instance::{
+    IncludeRules,
+    RuleInstance,
 };
+use db::models::rule_set_result::RuleSetResult;
+use db::models::tenant::Tenant;
+use db::models::workflow::Workflow as DbWorkflow;
+use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::test_db_pool::TestDbPool;
+use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use macros::{test_state, test_state_case};
+use macros::{
+    test_state,
+    test_state_case,
+};
 use newtypes::{
-    BusinessDataKind, CollectedDataOption as CDO, DataIdentifier, FootprintReasonCode, KybState, KycState,
-    ObConfigurationKind, OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleInstanceKind, SignalSeverity,
-    VendorAPI, VerificationCheck, WorkflowFixtureResult, WorkflowState,
+    BusinessDataKind,
+    CollectedDataOption as CDO,
+    DataIdentifier,
+    FootprintReasonCode,
+    KybState,
+    KycState,
+    ObConfigurationKind,
+    OnboardingStatus,
+    RiskSignalGroupKind,
+    RuleAction,
+    RuleInstanceKind,
+    SignalSeverity,
+    VendorAPI,
+    VerificationCheck,
+    WorkflowFixtureResult,
+    WorkflowState,
 };
 
 async fn setup(
@@ -280,7 +312,8 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
-    // In sandbox, we should go straight to Decisioning (ie skip AwaitingAsyncVendors state becuase we are mocking middesk)
+    // In sandbox, we should go straight to Decisioning (ie skip AwaitingAsyncVendors state becuase we
+    // are mocking middesk)
     assert!(matches!(
         ww.state,
         WorkflowKind::Kyb(kyb::KybState::Decisioning(_))
@@ -402,7 +435,8 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
-    // In sandbox, we should go straight to Decisioning (ie skip AwaitingAsyncVendors state becuase we are mocking middesk)
+    // In sandbox, we should go straight to Decisioning (ie skip AwaitingAsyncVendors state becuase we
+    // are mocking middesk)
     assert!(matches!(
         ww.state,
         WorkflowKind::Kyb(kyb::KybState::AwaitingAsyncVendors(_))
@@ -412,7 +446,8 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
     assert_eq!(WorkflowState::Kyb(KybState::AwaitingAsyncVendors), wf.state);
     assert!(rs.is_empty());
 
-    // Simulate Middesk webhook incoming. Middesk state machine should complete and then call the KYB workflow
+    // Simulate Middesk webhook incoming. Middesk state machine should complete and then call the KYB
+    // workflow
     let expected_rule_action = match terminal_status {
         // We simulate a wl hit when terminal status = Fail for these tests
         TerminalDecisionStatus::Fail => Some(RuleAction::ManualReview),
@@ -482,7 +517,6 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
             .map(|rs| (rs.vendor_api, rs.reason_code))
             .collect_vec()
     );
-
 
     // check that middesk populated formation DIs
     let vw = state

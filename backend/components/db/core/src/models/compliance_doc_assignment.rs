@@ -1,10 +1,22 @@
-use crate::{DbError, DbResult, TxnPgConn};
-use chrono::{DateTime, Utc};
+use super::compliance_doc::ComplianceDoc;
+use crate::{
+    DbError,
+    DbResult,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::compliance_doc_assignment;
 use diesel::prelude::*;
-use newtypes::{ComplianceDocAssignmentId, ComplianceDocId, Locked, TenantKind, TenantUserId};
-
-use super::compliance_doc::ComplianceDoc;
+use newtypes::{
+    ComplianceDocAssignmentId,
+    ComplianceDocId,
+    Locked,
+    TenantKind,
+    TenantUserId,
+};
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = compliance_doc_assignment)]

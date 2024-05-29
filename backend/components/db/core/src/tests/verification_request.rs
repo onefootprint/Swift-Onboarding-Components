@@ -1,15 +1,19 @@
-use crate::{
-    models::{
-        data_lifetime::DataLifetime,
-        verification_request::{RequestAndMaybeResult, VerificationRequest},
-        verification_result::VerificationResult,
-    },
-    test_helpers::assert_have_same_elements,
-    tests::prelude::*,
+use crate::models::data_lifetime::DataLifetime;
+use crate::models::verification_request::{
+    RequestAndMaybeResult,
+    VerificationRequest,
 };
+use crate::models::verification_result::VerificationResult;
+use crate::test_helpers::assert_have_same_elements;
+use crate::tests::prelude::*;
 use macros::db_test_case;
 use newtypes::{
-    DecisionIntentId, PiiJsonValue, ScopedVaultId, SealedVaultBytes, VendorAPI, VerificationRequestId,
+    DecisionIntentId,
+    PiiJsonValue,
+    ScopedVaultId,
+    SealedVaultBytes,
+    VendorAPI,
+    VerificationRequestId,
     VerificationResultId,
 };
 use serde_json::json;
@@ -33,7 +37,8 @@ fn test_get_requests_and_results_for_onboarding(
     let di_id = DecisionIntentId::from_str("di_123").unwrap();
     // To advance the seqno for every set of requests
 
-    // Creates VerificationRequest / VerificationResult's for each of the input's. Every Vec<VendorAPI> will have a different (increasing) seqno
+    // Creates VerificationRequest / VerificationResult's for each of the input's. Every Vec<VendorAPI>
+    // will have a different (increasing) seqno
     let mut input_requests_and_results: Vec<Vec<RequestAndMaybeResult>> = input_req_res
         .into_iter()
         .map(|vendor_apis| {

@@ -1,12 +1,27 @@
-use crate::{DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::{
-    compliance_doc, compliance_doc_request, compliance_doc_review, compliance_doc_submission,
+    compliance_doc,
+    compliance_doc_request,
+    compliance_doc_review,
+    compliance_doc_submission,
 };
 use diesel::prelude::*;
 use newtypes::{
-    ComplianceDocId, ComplianceDocRequestId, ComplianceDocReviewId, ComplianceDocSubmissionId,
-    ComplianceDocTemplateId, Locked, TenantCompliancePartnershipId,
+    ComplianceDocId,
+    ComplianceDocRequestId,
+    ComplianceDocReviewId,
+    ComplianceDocSubmissionId,
+    ComplianceDocTemplateId,
+    Locked,
+    TenantCompliancePartnershipId,
 };
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]

@@ -1,38 +1,58 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    types::{response::ResponseData, JsonApiResponse},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    errors::{
-        onboarding::{OnboardingError, UnmetRequirements},
-        tenant::TenantError,
-        ApiResult, ValidationError,
-    },
-    task,
-    telemetry::RootSpan,
-    utils::{
-        db2api::DbToApi,
-        fp_id_path::FpIdPath,
-        requirements::{GetRequirementsArgs, RequirementOpts},
-        vault_wrapper::{Any, VaultWrapper, VwArgs},
-    },
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::errors::onboarding::{
+    OnboardingError,
+    UnmetRequirements,
 };
-use api_wire_types::{EntityValidateResponse, TriggerKybRequest};
-use db::{
-    models::{
-        manual_review::ManualReview,
-        ob_configuration::ObConfiguration,
-        scoped_vault::ScopedVault,
-        workflow::{OnboardingWorkflowArgs, Workflow},
-    },
-    DbError,
+use api_core::errors::tenant::TenantError;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
 };
+use api_core::task;
+use api_core::telemetry::RootSpan;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::requirements::{
+    GetRequirementsArgs,
+    RequirementOpts,
+};
+use api_core::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+    VwArgs,
+};
+use api_wire_types::{
+    EntityValidateResponse,
+    TriggerKybRequest,
+};
+use db::models::manual_review::ManualReview;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::workflow::{
+    OnboardingWorkflowArgs,
+    Workflow,
+};
+use db::DbError;
 use itertools::Itertools;
 use newtypes::{
-    ObConfigurationKind, OnboardingRequirement, VaultKind, WorkflowFixtureResult, WorkflowSource,
+    ObConfigurationKind,
+    OnboardingRequirement,
+    VaultKind,
+    WorkflowFixtureResult,
+    WorkflowSource,
 };
-use paperclip::actix::{api_v2_operation, post, web};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     description = "Triggers KYB on the provided business.",
@@ -114,7 +134,8 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            // we currently only create WF's for Businesses at the same time that we create the Workflow for the primary BO. Here we need to manually create just a business WF
+            // we currently only create WF's for Businesses at the same time that we create the Workflow for
+            // the primary BO. Here we need to manually create just a business WF
             let ob_create_args = OnboardingWorkflowArgs {
                 scoped_vault_id: sb.id,
                 ob_configuration_id: obc.id.clone(),

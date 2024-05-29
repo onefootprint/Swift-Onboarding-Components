@@ -1,16 +1,32 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiResult,
-    types::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::errors::ApiResult;
+use crate::types::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::ApiError;
-use crypto::aead::{AeadSealedBytes, SealingKey};
-use db::models::{list::List, list_entry::ListEntry, tenant::Tenant};
+use crypto::aead::{
+    AeadSealedBytes,
+    SealingKey,
+};
+use db::models::list::List;
+use db::models::list_entry::ListEntry;
+use db::models::tenant::Tenant;
 use itertools::Itertools;
-use newtypes::{ListId, PiiBytes, PiiString};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use newtypes::{
+    ListId,
+    PiiBytes,
+    PiiString,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Retrieves all entries of a list",

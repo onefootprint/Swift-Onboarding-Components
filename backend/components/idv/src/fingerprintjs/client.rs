@@ -1,5 +1,8 @@
 use super::error;
-use newtypes::{FingerprintRequestId, PiiString};
+use newtypes::{
+    FingerprintRequestId,
+    PiiString,
+};
 
 #[derive(Debug, Clone)]
 pub struct FingerprintJSClient {
@@ -22,7 +25,8 @@ impl FingerprintJSClient {
         &self,
         request_id: FingerprintRequestId,
     ) -> Result<serde_json::Value, error::Error> {
-        // This endpoint allows you to get events with all the information from each activated product - BotD and Fingerprinting.
+        // This endpoint allows you to get events with all the information from each activated product -
+        // BotD and Fingerprinting.
         let url = format!("https://api.fpjs.io/events/{}", request_id);
         let response = self
             .client

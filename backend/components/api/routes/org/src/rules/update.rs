@@ -1,25 +1,43 @@
-use std::collections::HashSet;
-
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::ApiResult,
-    types::ResponseData,
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{decision::rule_engine::validation::validate_rule_expression, errors::ValidationError};
+use crate::errors::ApiResult;
+use crate::types::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::decision::rule_engine::validation::validate_rule_expression;
+use api_core::errors::ValidationError;
 use api_wire_types::MultiUpdateRuleRequest;
-use db::{
-    models::{
-        list::List,
-        ob_configuration::ObConfiguration,
-        rule_instance::{IncludeRules, MultiRuleUpdate, NewRule, RuleInstance, RuleInstanceUpdate},
-    },
-    PgConn,
+use db::models::list::List;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_instance::{
+    IncludeRules,
+    MultiRuleUpdate,
+    NewRule,
+    RuleInstance,
+    RuleInstanceUpdate,
 };
-use itertools::{chain, Itertools};
-use newtypes::{DocumentRequestConfig, ListId, ObConfigurationId, ObConfigurationKind, TenantId};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use db::PgConn;
+use itertools::{
+    chain,
+    Itertools,
+};
+use newtypes::{
+    DocumentRequestConfig,
+    ListId,
+    ObConfigurationId,
+    ObConfigurationKind,
+    TenantId,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
+use std::collections::HashSet;
 
 #[api_v2_operation(
     description = "Performs 1 or more edits (additions, deletions, edits) to rules for the playbooks",

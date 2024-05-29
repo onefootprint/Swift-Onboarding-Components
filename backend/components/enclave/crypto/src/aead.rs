@@ -1,9 +1,24 @@
-use std::{fmt::Debug, ops::Deref};
-
-use aead::{Aead, KeyInit, Payload};
-use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
-use rand_core::{OsRng, RngCore};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use aead::{
+    Aead,
+    KeyInit,
+    Payload,
+};
+use chacha20poly1305::{
+    Key,
+    XChaCha20Poly1305,
+    XNonce,
+};
+use rand_core::{
+    OsRng,
+    RngCore,
+};
+use serde::de::DeserializeOwned;
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use std::fmt::Debug;
+use std::ops::Deref;
 
 pub const CHA_CHA20_POLY1305_KEY_BYTES_LENGTH: usize = 32;
 pub type ChaCha20Poly1305KeyBytes = [u8; CHA_CHA20_POLY1305_KEY_BYTES_LENGTH];

@@ -1,6 +1,11 @@
 use crate::types::JsonApiResponse;
 use api_core::types::EmptyResponse;
-use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+    Apiv2Schema,
+};
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

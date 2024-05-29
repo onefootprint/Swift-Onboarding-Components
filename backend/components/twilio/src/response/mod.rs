@@ -1,8 +1,6 @@
-use serde::de::DeserializeOwned;
-
-use crate::error::Error;
-
 use self::lookup::LookupV2Response;
+use crate::error::Error;
+use serde::de::DeserializeOwned;
 
 pub mod lookup;
 pub mod message;

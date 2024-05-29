@@ -1,20 +1,33 @@
-use crate::{
-    types::{JsonApiResponse, ResponseData},
-    State,
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
 };
-use api_core::{
-    auth::{
-        sdk_args::SdkArgsContext,
-        session::sdk_args::{SdkArgs, SdkArgsData, SdkArgsKind, ValidateSdkArgs},
-    },
-    errors::ApiResult,
-    telemetry::RootSpan,
-    utils::{db2api::DbToApi, large_json::LargeJson, session::AuthSession},
+use crate::State;
+use api_core::auth::sdk_args::SdkArgsContext;
+use api_core::auth::session::sdk_args::{
+    SdkArgs,
+    SdkArgsData,
+    SdkArgsKind,
+    ValidateSdkArgs,
 };
-use api_wire_types::{CreateSdkArgsTokenResponse, PublicOnboardingConfiguration};
+use api_core::errors::ApiResult;
+use api_core::telemetry::RootSpan;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::large_json::LargeJson;
+use api_core::utils::session::AuthSession;
+use api_wire_types::{
+    CreateSdkArgsTokenResponse,
+    PublicOnboardingConfiguration,
+};
 use chrono::Duration;
 use newtypes::PiiString;
-use paperclip::actix::{api_v2_operation, get, post, web, Apiv2Schema};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    post,
+    web,
+    Apiv2Schema,
+};
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

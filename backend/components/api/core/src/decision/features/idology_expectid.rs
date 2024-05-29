@@ -1,11 +1,18 @@
-use std::str::FromStr;
-
-use idv::idology::{
-    common::response::{IDologyQualifiers, WarmAddressType},
-    expectid::response::{ExpectIDResponse, PaWatchlistHit},
+use idv::idology::common::response::{
+    IDologyQualifiers,
+    WarmAddressType,
+};
+use idv::idology::expectid::response::{
+    ExpectIDResponse,
+    PaWatchlistHit,
 };
 use itertools::Itertools;
-use newtypes::{idology_match_codes, FootprintReasonCode, IDologyReasonCode};
+use newtypes::{
+    idology_match_codes,
+    FootprintReasonCode,
+    IDologyReasonCode,
+};
+use std::str::FromStr;
 
 pub fn footprint_reason_codes(
     resp: ExpectIDResponse,
@@ -37,7 +44,8 @@ pub fn footprint_reason_codes(
     let out = if reason_codes.contains(&FootprintReasonCode::DobLocatedCoppaAlert) {
         reason_codes
     } else if !id_located {
-        // Important Note: When Idology does not locate an id, they do not provide additional match related signals specifying how identity attributes match.
+        // Important Note: When Idology does not locate an id, they do not provide additional match related
+        // signals specifying how identity attributes match.
         reason_codes
             .into_iter()
             .chain(vec![FootprintReasonCode::IdNotLocated])
@@ -154,15 +162,18 @@ fn qualifier_reason_codes(qualifiers: Option<&IDologyQualifiers>) -> Vec<Footpri
 
 #[cfg(test)]
 mod test {
+    use super::*;
     use idv::idology::expectid::response::ExpectIDResponse;
-    use newtypes::{
-        FootprintReasonCode::{self, *},
-        MatchLevel::{self, *},
+    use newtypes::FootprintReasonCode::{
+        self,
+        *,
+    };
+    use newtypes::MatchLevel::{
+        self,
+        *,
     };
     use serde_json::json;
     use test_case::test_case;
-
-    use super::*;
 
     #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "mail drop"}) => vec![AddressLocatedIsNotStandardMailDrop])]
     #[test_case(json!({"key": "resultcode.warm.address.alert","warm-address-list": "hospital"}) => vec![AddressLocatedIsNotStandardHospital])]

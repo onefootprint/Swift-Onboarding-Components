@@ -1,5 +1,9 @@
 use crate::*;
-use newtypes::{CompanySize, PartnerTenantId, TenantId};
+use newtypes::{
+    CompanySize,
+    PartnerTenantId,
+    TenantId,
+};
 
 /// Organization
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

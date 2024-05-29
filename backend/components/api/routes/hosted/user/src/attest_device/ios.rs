@@ -1,18 +1,18 @@
 use crate::State;
 use api_core::errors::ApiResult;
-
 use app_attest::apple::AppleAppAttestationVerifier;
 use crypto::base64;
-
-use db::{
-    models::{
-        apple_device_attest::{AppleDeviceMetadata, NewAppleDeviceAttestation},
-        tenant::Tenant,
-        tenant_ios_app_meta::{TenantIosAppFilters, TenantIosAppMeta},
-        webauthn_credential::WebauthnCredential,
-    },
-    DbResult,
+use db::models::apple_device_attest::{
+    AppleDeviceMetadata,
+    NewAppleDeviceAttestation,
 };
+use db::models::tenant::Tenant;
+use db::models::tenant_ios_app_meta::{
+    TenantIosAppFilters,
+    TenantIosAppMeta,
+};
+use db::models::webauthn_credential::WebauthnCredential;
+use db::DbResult;
 use newtypes::VaultId;
 
 #[derive(Debug, Clone, serde::Deserialize)]

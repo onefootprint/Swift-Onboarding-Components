@@ -1,8 +1,17 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::appearance;
 use diesel::prelude::*;
-use newtypes::{AppearanceId, TenantId};
+use newtypes::{
+    AppearanceId,
+    TenantId,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = appearance)]

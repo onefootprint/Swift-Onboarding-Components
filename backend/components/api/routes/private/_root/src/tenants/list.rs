@@ -1,16 +1,25 @@
-use actix_web::{get, web, web::Json};
-use api_core::{
-    auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
-    errors::ApiResult,
-    types::{OffsetPaginatedResponse, OffsetPaginationRequest},
-    utils::db2api::DbToApi,
-    State,
+use actix_web::web::Json;
+use actix_web::{
+    get,
+    web,
 };
+use api_core::auth::tenant::{
+    FirmEmployeeAuthContext,
+    FirmEmployeeGuard,
+};
+use api_core::errors::ApiResult;
+use api_core::types::{
+    OffsetPaginatedResponse,
+    OffsetPaginationRequest,
+};
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use api_wire_types::PrivateTenantFilters;
-use db::{
-    models::tenant::{PrivateTenantFilters as DbPrivateTenantFilters, Tenant},
-    OffsetPagination,
+use db::models::tenant::{
+    PrivateTenantFilters as DbPrivateTenantFilters,
+    Tenant,
 };
+use db::OffsetPagination;
 use itertools::Itertools;
 
 #[get("/private/tenants")]

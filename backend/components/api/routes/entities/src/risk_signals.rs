@@ -1,55 +1,78 @@
-use std::collections::HashMap;
-
-use crate::{
-    auth::{
-        tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth},
-        Either,
-    },
-    types::{response::ResponseData, JsonApiResponse},
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
+    TenantSessionAuth,
 };
-use api_core::{
-    auth::CanDecrypt, decision::vendor::neuro_id::tenant_can_view_neuro, utils::headers::InsightHeaders,
+use crate::auth::Either;
+use crate::types::response::ResponseData;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::auth::CanDecrypt;
+use api_core::decision;
+use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
+use api_core::decision::vendor::vendor_result::VendorResult;
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
 };
-use db::models::{
-    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
-    risk_signal::AtSeqno,
+use api_core::telemetry::RootSpan;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::headers::InsightHeaders;
+use api_core::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+    VwArgs,
 };
-use newtypes::{
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DbActor,
-    IdentityDataKind as IDK, VendorAPI,
+use api_wire_types::{
+    AmlHit,
+    AmlHitMedia,
+    RiskSignalFilters,
 };
-
-use crate::{utils::db2api::DbToApi, State};
-
-use api_core::{
-    decision,
-    decision::vendor::vendor_result::VendorResult,
-    errors::{ApiResult, AssertionError},
-    telemetry::RootSpan,
-    utils::{
-        fp_id_path::FpIdPath,
-        vault_wrapper::{Any, VaultWrapper, VwArgs},
-    },
+use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::{
+    AtSeqno,
+    RiskSignal,
 };
-use api_wire_types::{AmlHit, AmlHitMedia, RiskSignalFilters};
-use db::{
-    models::{
-        ob_configuration::ObConfiguration,
-        risk_signal::RiskSignal,
-        scoped_vault::ScopedVault,
-        vault::Vault,
-        verification_request::{RequestAndResult, VerificationRequest},
-        verification_result::VerificationResult,
-    },
-    DbResult,
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
+use db::models::verification_request::{
+    RequestAndResult,
+    VerificationRequest,
 };
-use idv::{incode::watchlist::response::UpdatedWatchlistResultResponse, ParsedResponse};
+use db::models::verification_result::VerificationResult;
+use db::DbResult;
+use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
+use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, EnhancedAmlOption, FootprintReasonCode, FpId, PiiJsonValue, RiskSignalId,
+    AccessEventKind,
+    AccessEventPurpose,
+    AuditEventDetail,
+    AuditEventId,
+    DataIdentifier,
+    DbActor,
+    EncryptedVaultPrivateKey,
+    EnhancedAmlOption,
+    FootprintReasonCode,
+    FpId,
+    IdentityDataKind as IDK,
+    PiiJsonValue,
+    RiskSignalId,
     TenantId,
+    VendorAPI,
 };
-use paperclip::actix::{api_v2_operation, get, post, web};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    post,
+    web,
+};
+use std::collections::HashMap;
 
 type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;
 
@@ -63,7 +86,8 @@ pub async fn get(
     request: FpIdPath,
     filters: web::Query<RiskSignalFilters>,
     version: web::Query<api_wire_types::GetHistoricalDataRequest>,
-    // TODO remove SecretTenantAuthContext here when everyone has migrated to the new GET /users/<>/risk_signals API
+    // TODO remove SecretTenantAuthContext here when everyone has migrated to the new GET
+    // /users/<>/risk_signals API
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     root_span: RootSpan,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
@@ -189,7 +213,9 @@ pub async fn decrypt_aml_hits(
     let is_live = read_auth.is_live()?;
     let (fp_id, risk_signal_id) = request.into_inner();
 
-    // TODO: assert decrypt permissions + write AccessEvent. maybe just shoehorn into existing structs as (FirstName, MiddleName, LastName, Dob) or need to rework some of this stuff to not be so DI dependent
+    // TODO: assert decrypt permissions + write AccessEvent. maybe just shoehorn into existing structs
+    // as (FirstName, MiddleName, LastName, Dob) or need to rework some of this stuff to not be so DI
+    // dependent
 
     let (_rs, aml_detail) =
         get_risk_signal_and_maybe_aml_detail(&state, risk_signal_id, fp_id, tenant_id.clone(), is_live)
@@ -198,7 +224,8 @@ pub async fn decrypt_aml_hits(
         Err(AssertionError("No AML hit data for risk signal"))?
     };
 
-    // Populate the vault with the seqno of the time of the AML call we made and figure out which of FirstName/LastName/Dob we would have sent to Incode
+    // Populate the vault with the seqno of the time of the AML call we made and figure out which of
+    // FirstName/LastName/Dob we would have sent to Incode
     let sv_id = vreq.scoped_vault_id.clone();
     let uvw = state
         .db_pool
@@ -217,7 +244,9 @@ pub async fn decrypt_aml_hits(
     ];
     dis_searched.retain(|i| uvw.has_field(i));
 
-    // check that auth has Decrypt permissions for these DIs. Note we don't check check_ob_config_access here- this seems unnecessary and we should never allow an OBC that makes AML calls but then doesn't allow the user to view the results
+    // check that auth has Decrypt permissions for these DIs. Note we don't check check_ob_config_access
+    // here- this seems unnecessary and we should never allow an OBC that makes AML calls but then
+    // doesn't allow the user to view the results
     let auth = auth.check_guard(CanDecrypt::new(dis_searched.clone()))?;
 
     // write an AccessEvent
@@ -281,7 +310,8 @@ async fn get_risk_signal_and_maybe_aml_detail(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
             let vreq_vres_key = if rs.reason_code.is_aml() {
-                // we only need to read the vres if it was an Aml risk signal and we need to populate the `aml` portion of the response
+                // we only need to read the vres if it was an Aml risk signal and we need to populate the
+                // `aml` portion of the response
                 let (vreq, vres) = VerificationResult::get(conn, &rs.verification_result_id)?;
                 let obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &vreq.scoped_vault_id)?;
                 if let Some(obc) = obc {

@@ -1,11 +1,18 @@
-use async_trait::async_trait;
-use idv::{
-    stytch::{client::StytchClient, StytchLookupRequest, StytchLookupResponse},
-    ParsedResponse,
+use super::{
+    VendorAPICall,
+    VendorAPIResponse,
 };
-use newtypes::{PiiJsonValue, VendorAPI};
-
-use super::{VendorAPICall, VendorAPIResponse};
+use async_trait::async_trait;
+use idv::stytch::client::StytchClient;
+use idv::stytch::{
+    StytchLookupRequest,
+    StytchLookupResponse,
+};
+use idv::ParsedResponse;
+use newtypes::{
+    PiiJsonValue,
+    VendorAPI,
+};
 
 #[async_trait]
 impl VendorAPICall<StytchLookupRequest, StytchLookupResponse, idv::stytch::error::Error> for StytchClient {

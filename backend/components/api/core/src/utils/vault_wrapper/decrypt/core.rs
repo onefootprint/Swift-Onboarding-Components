@@ -1,23 +1,36 @@
-use super::{super::VaultWrapper, DecryptUncheckedResult, EnclaveDecryptOperation, Pii};
-use crate::{
-    enclave_client::{DecryptReq, EnclaveClient},
-    errors::{enclave::EnclaveError, ApiResult},
-    proxy::get_transformer,
+use super::super::VaultWrapper;
+use super::{
+    DecryptUncheckedResult,
+    EnclaveDecryptOperation,
+    Pii,
 };
+use crate::enclave_client::{
+    DecryptReq,
+    EnclaveClient,
+};
+use crate::errors::enclave::EnclaveError;
+use crate::errors::ApiResult;
+use crate::proxy::get_transformer;
 use db::VaultedData;
 use either::Either;
 use enclave_proxy::DataTransformer;
 use futures_util::StreamExt;
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{
-    output::Csv, DataIdentifier, DocumentDiKind, EncryptedVaultPrivateKey, PiiBytes, PiiJsonValue, PiiString,
+    DataIdentifier,
+    DocumentDiKind,
+    EncryptedVaultPrivateKey,
+    PiiBytes,
+    PiiJsonValue,
+    PiiString,
     VaultDataFormat,
 };
 use std::collections::HashMap;
 
 impl<Type> VaultWrapper<Type> {
-    /// Util to transform decrypt a list of DataIdentifiers WITHOUT checking permissions or making an access
-    /// event.
+    /// Util to transform decrypt a list of DataIdentifiers WITHOUT checking permissions or making
+    /// an access event.
     ///
     /// Returns a hashmap of identifiers to their decrypted PiiString.
     /// Note: a provided id may not be included as a key in the resulting hashmap if the identifier
@@ -34,7 +47,8 @@ impl<Type> VaultWrapper<Type> {
         Ok(results)
     }
 
-    /// Same as decrypt_unchecked, but more modern version that returns PiiJsonValues instead of PiiStrings
+    /// Same as decrypt_unchecked, but more modern version that returns PiiJsonValues instead of
+    /// PiiStrings
     pub async fn decrypt_unchecked_value(
         &self,
         enclave_client: &EnclaveClient,
@@ -136,7 +150,8 @@ pub(in crate::utils::vault_wrapper) struct VwDecryptRequest<'a>(
 
 const BATCH_DECRYPT_CHUNK_SIZE: usize = 500;
 
-/// Executes a batch of decrypt requests for potentially multiple users, returning a hashmap of identifiers to their decrypted values
+/// Executes a batch of decrypt requests for potentially multiple users, returning a hashmap of
+/// identifiers to their decrypted values
 #[tracing::instrument("batch_execute_decrypt_requests", skip_all)]
 pub(in crate::utils::vault_wrapper) async fn batch_execute_decrypt_requests<'a, T>(
     enclave_client: &EnclaveClient,

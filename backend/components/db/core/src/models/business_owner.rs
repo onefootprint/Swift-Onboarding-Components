@@ -1,11 +1,31 @@
-use crate::{DbError, DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{business_owner, vault};
+use super::scoped_vault::ScopedVault;
+use super::vault::Vault;
+use super::workflow::Workflow;
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    business_owner,
+    vault,
+};
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{BoId, BoLinkId, BusinessOwnerKind, Locked, ObConfigurationId, TenantId, VaultId};
-
-use super::{scoped_vault::ScopedVault, vault::Vault, workflow::Workflow};
+use newtypes::{
+    BoId,
+    BoLinkId,
+    BusinessOwnerKind,
+    Locked,
+    ObConfigurationId,
+    TenantId,
+    VaultId,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = business_owner)]
@@ -102,7 +122,10 @@ impl BusinessOwner {
         uv_id: &VaultId,
         ob_config_id: &ObConfigurationId,
     ) -> DbResult<Vec<(BusinessOwner, (ScopedVault, Workflow))>> {
-        use db_schema::schema::{scoped_vault, workflow};
+        use db_schema::schema::{
+            scoped_vault,
+            workflow,
+        };
         let result = business_owner::table
             .inner_join(
                 scoped_vault::table

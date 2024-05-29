@@ -1,10 +1,23 @@
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use crate::{
+    DocumentRequestKind,
+    DocumentSide,
+    OcrDataKind as ODK,
+};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum_macros::{Display, EnumIter, EnumString};
-
-use crate::{DocumentRequestKind, DocumentSide, OcrDataKind as ODK};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum_macros::{
+    Display,
+    EnumIter,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -148,8 +161,10 @@ impl DocumentKind {
 }
 
 impl IdDocKind {
-    // Given the type of document, what are the expected/critical fields we expect to parse from that doc. If we don't parse (or have a very low confidence score)
-    // for one of these for a given doc, then we should produce the DocumentOcrNotSuccessful risk signal as a way to indicate to users/rules this
+    // Given the type of document, what are the expected/critical fields we expect to parse from that
+    // doc. If we don't parse (or have a very low confidence score) for one of these for a given
+    // doc, then we should produce the DocumentOcrNotSuccessful risk signal as a way to indicate to
+    // users/rules this
     pub fn expected_critical_ocr_data_kinds(&self) -> Vec<ODK> {
         match self {
             IdDocKind::IdCard => vec![ODK::FullName],
@@ -160,8 +175,15 @@ impl IdDocKind {
                 ODK::DocumentNumber,
                 ODK::ExpiresAt,
             ], // TODO: should Gender, IssuedAt be here too? These seem less "critical" but are still present
-            IdDocKind::Passport => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passports out there and stuff like DOB is def not ubiquitous
-            IdDocKind::PassportCard => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passport cards out there and stuff like DOB is def not ubiquitous
+            IdDocKind::Passport => vec![ODK::FullName, ODK::DocumentNumber], /* lots of different kinds of */
+            // passports out there and
+            // stuff like DOB is def not
+            // ubiquitous
+            IdDocKind::PassportCard => vec![ODK::FullName, ODK::DocumentNumber], /* lots of different */
+            // kinds of passport
+            // cards out there and
+            // stuff like DOB is def
+            // not ubiquitous
             IdDocKind::Permit => vec![
                 ODK::FullName,
                 ODK::Dob,

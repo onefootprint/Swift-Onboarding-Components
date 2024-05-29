@@ -1,9 +1,22 @@
-use super::{CanCheckTenantGuard, IsGuardMet};
-use crate::auth::{CanDecrypt, Either};
-use either::Either::{Left, Right};
+use super::{
+    CanCheckTenantGuard,
+    IsGuardMet,
+};
+use crate::auth::{
+    CanDecrypt,
+    Either,
+};
+use either::Either::{
+    Left,
+    Right,
+};
 use itertools::Itertools;
 use newtypes::{
-    CollectedDataOption as CDO, DataIdentifier, DocumentDiKind, DocumentSide, InvokeVaultProxyPermission,
+    CollectedDataOption as CDO,
+    DataIdentifier,
+    DocumentDiKind,
+    DocumentSide,
+    InvokeVaultProxyPermission,
     TenantScope,
 };
 use std::collections::HashSet;
@@ -199,11 +212,23 @@ where
 
 #[cfg(test)]
 mod test {
-    use super::{CanDecrypt, PartnerTenantGuard as PTG, TenantGuard as TG};
-    use crate::auth::{tenant::IsGuardMet, Any};
+    use super::{
+        CanDecrypt,
+        PartnerTenantGuard as PTG,
+        TenantGuard as TG,
+    };
+    use crate::auth::tenant::IsGuardMet;
+    use crate::auth::Any;
     use newtypes::{
-        BusinessDataKind as BDK, CollectedDataOption as CDO, DataIdentifier as DI, DocumentDiKind,
-        DocumentSide, IdDocKind, IdentityDataKind as IDK, KvDataKey, TenantScope as TS,
+        BusinessDataKind as BDK,
+        CollectedDataOption as CDO,
+        DataIdentifier as DI,
+        DocumentDiKind,
+        DocumentSide,
+        IdDocKind,
+        IdentityDataKind as IDK,
+        KvDataKey,
+        TenantScope as TS,
     };
     use std::str::FromStr;
     use test_case::test_case;
@@ -268,7 +293,6 @@ mod test {
     #[test_case(&[TS::CompliancePartnerAdmin, TS::CompliancePartnerRead], TG::Admin => false)]
     //
     // Test Or
-    //
     #[test_case(&[TS::OnboardingConfiguration], TG::OnboardingConfiguration.or(TG::Admin) => true)]
     #[test_case(&[TS::OnboardingConfiguration], TG::Admin.or(TG::OnboardingConfiguration) => true)]
     #[test_case(&[TS::Admin], TG::OnboardingConfiguration.or(TG::Admin) => true)]
@@ -282,7 +306,6 @@ mod test {
     #[test_case(&[TS::OrgSettings], TG::ApiKeys.or(TG::ManualReview).or(TG::OrgSettings) => true)]
     //
     // Test Any
-    //
     #[test_case(&[TS::ApiKeys], Any => true)]
     #[test_case(&[], Any => true)]
     #[test_case(&[TS::Decrypt{data: CDO::Ssn9}], Any => true)]

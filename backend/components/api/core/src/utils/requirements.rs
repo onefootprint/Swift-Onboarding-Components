@@ -1,34 +1,52 @@
-use std::str::FromStr;
-
-use crate::{
-    auth::user::CheckUserWfAuthContext,
-    errors::ApiResult,
-    utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper, VwArgs},
-    State,
+use super::vault_wrapper::Any;
+use crate::auth::user::CheckUserWfAuthContext;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    DecryptUncheckedResult,
+    VaultWrapper,
+    VwArgs,
 };
-use db::{
-    models::{
-        document::Document,
-        document_request::DocumentRequest,
-        liveness_event::LivenessEvent,
-        ob_configuration::ObConfiguration,
-        user_consent::UserConsent,
-        webauthn_credential::WebauthnCredential,
-        workflow::{Workflow, WorkflowIdentifier},
-    },
-    PgConn,
+use crate::State;
+use db::models::document::Document;
+use db::models::document_request::DocumentRequest;
+use db::models::liveness_event::LivenessEvent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::user_consent::UserConsent;
+use db::models::webauthn_credential::WebauthnCredential;
+use db::models::workflow::{
+    Workflow,
+    WorkflowIdentifier,
 };
+use db::PgConn;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, AuthorizeFields, CollectDocumentConfig, CollectedDataOption,
-    DataIdentifierDiscriminant as DID, Declaration, DocumentCdoInfo, DocumentDiKind, DocumentRequestConfig,
-    DocumentRequestKind, DocumentStatus, DocumentUploadMode, IdentityDataKind as IDK,
-    InvestorProfileKind as IPK, Iso3166TwoDigitCountryCode, KycState, LivenessSource, OnboardingRequirement,
-    OnboardingRequirementKind, ScopedVaultId, Selfie, UsLegalStatus, VaultId, WorkflowState,
+    AlpacaKycState,
+    AuthorizeFields,
+    CollectDocumentConfig,
+    CollectedDataOption,
+    DataIdentifierDiscriminant as DID,
+    Declaration,
+    DocumentCdoInfo,
+    DocumentDiKind,
+    DocumentRequestConfig,
+    DocumentRequestKind,
+    DocumentStatus,
+    DocumentUploadMode,
+    IdentityDataKind as IDK,
+    InvestorProfileKind as IPK,
+    Iso3166TwoDigitCountryCode,
+    KycState,
+    LivenessSource,
+    OnboardingRequirement,
+    OnboardingRequirementKind,
+    ScopedVaultId,
+    Selfie,
+    UsLegalStatus,
+    VaultId,
+    WorkflowState,
 };
-
-use super::vault_wrapper::Any;
+use std::str::FromStr;
 
 #[derive(Clone)]
 pub struct GetRequirementsArgs {
@@ -84,10 +102,10 @@ pub struct RequirementOpts {
 
 #[tracing::instrument(skip_all)]
 /// Gets a list of requirements for the Person Vault for the onboarding.
-/// If the Person Vault is the Primary BO of some ongoing Business onboarding, then this also includes the requirements of that Business Vault
-/// NOTE: this returns a list of both met and unmet requirements - you should check.
-/// TODO: for now, this is guaranteed to return all unmet requirements, but will only return some
-/// met requirements
+/// If the Person Vault is the Primary BO of some ongoing Business onboarding, then this also
+/// includes the requirements of that Business Vault NOTE: this returns a list of both met and unmet
+/// requirements - you should check. TODO: for now, this is guaranteed to return all unmet
+/// requirements, but will only return some met requirements
 pub async fn get_requirements_for_person_and_maybe_business(
     state: &State,
     args: GetRequirementsArgs,
@@ -154,7 +172,9 @@ pub async fn get_requirements_for_person_and_maybe_business(
 
             let business_requirements =
                 if let Some((bvw, business_workflow, business_decrypted_values)) = bvw_wf_decrypted_values {
-                    // Technically for this case, the business's OBC should be the same as the person's and it'd be a bit more clear to see business_obc here. But they should be same and this is the existing logic so may as well keep as is
+                    // Technically for this case, the business's OBC should be the same as the person's and
+                    // it'd be a bit more clear to see business_obc here. But they should be same and this is
+                    // the existing logic so may as well keep as is
                     get_requirements_inner(
                         conn,
                         bvw,
@@ -391,8 +411,8 @@ fn get_requirement_inner(
                     let declarations = decrypted_values.get_di(IPK::Declarations).ok();
                     let missing_document = if let Some(declarations) = declarations {
                         let declarations: Vec<Declaration> = declarations.deserialize()?;
-                        // The finra compliance doc is missing if any of the declarations require a doc and we don't
-                        // yet have one on file
+                        // The finra compliance doc is missing if any of the declarations require a doc and we
+                        // don't yet have one on file
                         declarations.iter().any(|d| d.requires_finra_compliance_doc())
                             && !vw.has_field(&DocumentDiKind::FinraComplianceLetter.into())
                     } else {
@@ -433,8 +453,9 @@ fn get_requirement_inner(
             } else {
                 let credentials = WebauthnCredential::list(conn, &vw.vault().id)?;
 
-                // Note: we should probably represent this another way, but for now we can determine if we want to skip passkey reg
-                // by checking for this liveness event on the scoped_vault
+                // Note: we should probably represent this another way, but for now we can determine if we
+                // want to skip passkey reg by checking for this liveness event on the
+                // scoped_vault
                 let liveness_skip_events = LivenessEvent::get_by_scoped_vault_id(conn, &wf.scoped_vault_id)?
                     .into_iter()
                     .filter(|evt| matches!(evt.liveness_source, LivenessSource::Skipped))
@@ -507,7 +528,8 @@ fn get_requirement_inner(
         }
         OnboardingRequirementKind::Authorize => {
             let (document_types, skipped_selfie) = if obc.can_access_document() {
-                // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
+                // Note: since we might have collected multiple documents in a given onboarding, and we'd like
+                // to authorize all of them
                 let docs = Document::list_by_wf_id(conn, &wf.id)?;
                 let doc_types = docs
                         .iter()

@@ -1,7 +1,8 @@
 use actix_web::get;
-use api_core::{
-    auth::protected_auth::ProtectedAuth,
-    types::{EmptyResponse, JsonApiResponse},
+use api_core::auth::protected_auth::ProtectedAuth;
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
 
 #[get("/private/panic")]

@@ -1,10 +1,24 @@
-use chrono::{DateTime, Utc};
+use crate::errors::{
+    ApiError,
+    ApiResult,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use crypto::sha256;
-use db::{models::session::Session, PgConn};
-use newtypes::{AuthTokenHash, Base64Data, D2pSessionStatus, HandoffMetadata, HasSessionKind, SessionKind};
-use serde::{de::DeserializeOwned, Serialize};
-
-use crate::errors::{ApiError, ApiResult};
+use db::models::session::Session;
+use db::PgConn;
+use newtypes::{
+    AuthTokenHash,
+    Base64Data,
+    D2pSessionStatus,
+    HandoffMetadata,
+    HasSessionKind,
+    SessionKind,
+};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RateLimitRecord {

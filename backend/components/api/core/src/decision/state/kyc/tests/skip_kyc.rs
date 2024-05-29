@@ -1,21 +1,40 @@
-use crate::{
-    decision::state::{
-        actions::Authorize,
-        test_utils::{
-            mock_incode_doc_collection, mock_webhooks, query_data, setup_data, DocumentOutcome as Doc,
-            ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
-            UserKind::{self, *},
-        },
-        WorkflowActions, WorkflowWrapper,
-    },
-    State,
+use crate::decision::state::actions::Authorize;
+use crate::decision::state::test_utils::UserKind::{
+    self,
+    *,
 };
+use crate::decision::state::test_utils::{
+    mock_incode_doc_collection,
+    mock_webhooks,
+    query_data,
+    setup_data,
+    DocumentOutcome as Doc,
+    ExpectedRequiresManualReview,
+    ExpectedStatus,
+    OnboardingCompleted,
+    OnboardingStatusChanged,
+};
+use crate::decision::state::{
+    WorkflowActions,
+    WorkflowWrapper,
+};
+use crate::State;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use macros::test_state_case;
+use newtypes::OnboardingStatus::{
+    self,
+    *,
+};
 use newtypes::{
-    CollectedDataOption as CDO, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, KycState,
-    OnboardingStatus::{self, *},
-    Selfie, SignalScope, WorkflowFixtureResult as Fixture, WorkflowState,
+    CollectedDataOption as CDO,
+    CountryRestriction,
+    DocTypeRestriction,
+    DocumentCdoInfo,
+    KycState,
+    Selfie,
+    SignalScope,
+    WorkflowFixtureResult as Fixture,
+    WorkflowState,
 };
 
 struct Review(bool);
@@ -68,8 +87,8 @@ async fn collect_doc_skip_kyc(
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    // No Idology/Experian KYC calls are mocked, we expect these to not be called because skip_kyc = true
-    // only Incode doc calls are mocked
+    // No Idology/Experian KYC calls are mocked, we expect these to not be called because skip_kyc =
+    // true only Incode doc calls are mocked
     mock_incode_doc_collection(
         state,
         svid2,

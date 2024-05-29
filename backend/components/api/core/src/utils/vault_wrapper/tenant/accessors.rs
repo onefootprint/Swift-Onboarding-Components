@@ -1,6 +1,8 @@
-use crate::auth::{CanDecrypt, IsGuardMet};
-
 use super::TenantVw;
+use crate::auth::{
+    CanDecrypt,
+    IsGuardMet,
+};
 use itertools::Itertools;
 use newtypes::DataIdentifier;
 

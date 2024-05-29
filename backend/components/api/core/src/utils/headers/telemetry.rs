@@ -1,11 +1,20 @@
-use std::pin::Pin;
-
-use super::{get_bool_header, get_header};
-use actix_web::{http::header::HeaderMap, FromRequest};
+use super::{
+    get_bool_header,
+    get_header,
+};
+use actix_web::http::header::HeaderMap;
+use actix_web::FromRequest;
 use futures_util::Future;
-use newtypes::{SessionId, Uuid};
+use newtypes::{
+    SessionId,
+    Uuid,
+};
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize)]
 pub struct TelemetryHeaders {

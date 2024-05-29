@@ -1,13 +1,21 @@
-use crate::{types::JsonApiResponse, State};
-use api_core::{
-    auth::tenant::{CheckTenantGuard, PartnerTenantGuard, PartnerTenantSessionAuth},
-    errors::ApiResult,
-    types::ResponseData,
-    utils::db2api::TryDbToApi,
+use crate::types::JsonApiResponse;
+use crate::State;
+use api_core::auth::tenant::{
+    CheckTenantGuard,
+    PartnerTenantGuard,
+    PartnerTenantSessionAuth,
 };
+use api_core::errors::ApiResult;
+use api_core::types::ResponseData;
+use api_core::utils::db2api::TryDbToApi;
 use api_wire_types::ListComplianceCompaniesResponse;
-use db::{helpers::ComplianceDocSummary, models::ob_configuration::ObConfiguration};
-use paperclip::actix::{self, api_v2_operation, web};
+use db::helpers::ComplianceDocSummary;
+use db::models::ob_configuration::ObConfiguration;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Returns a summary of partnered companies for a compliance partner.",

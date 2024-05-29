@@ -1,6 +1,9 @@
-use newtypes::{vendor_credentials::IdologyCredentials, IdvData, PiiJsonValue};
-
 use self::response::PaResponse;
+use newtypes::vendor_credentials::IdologyCredentials;
+use newtypes::{
+    IdvData,
+    PiiJsonValue,
+};
 
 pub(super) mod request;
 pub mod response;
@@ -19,14 +22,20 @@ pub struct IdologyPaAPIResponse {
 
 #[cfg(test)]
 mod test {
-    use newtypes::{IdvData, PiiString};
-
-    use crate::{
-        footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
-        idology::{expectid::response::Restriction, fixtures, standalone_pa},
-    };
-
     use super::*;
+    use crate::footprint_http_client::{
+        FootprintVendorHttpClient,
+        FpVendorClientArgs,
+    };
+    use crate::idology::expectid::response::Restriction;
+    use crate::idology::{
+        fixtures,
+        standalone_pa,
+    };
+    use newtypes::{
+        IdvData,
+        PiiString,
+    };
 
     #[ignore]
     #[tokio::test]

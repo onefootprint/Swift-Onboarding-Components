@@ -1,35 +1,51 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    errors::ApiResult,
-    types::JsonApiResponse,
-    utils::vault_wrapper::VaultWrapper,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    errors::ValidationError,
-    types::ResponseData,
-    utils::{
-        fp_id_path::FpIdPath,
-        headers::InsightHeaders,
-        vault_wrapper::{Any, WriteableVw},
-    },
+use crate::errors::ApiResult;
+use crate::types::JsonApiResponse;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::errors::ValidationError;
+use api_core::types::ResponseData;
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::headers::InsightHeaders;
+use api_core::utils::vault_wrapper::{
+    Any,
+    WriteableVw,
 };
-use db::models::{
-    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
-    scoped_vault::ScopedVault,
-};
+use db::models::access_event::NewAccessEventRow;
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
 use newtypes::{
-    flat_api_object_map_type, AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId,
-    DataIdentifier, DbActor,
+    flat_api_object_map_type,
+    AccessEventKind,
+    AccessEventPurpose,
+    AuditEventDetail,
+    AuditEventId,
+    DataIdentifier,
+    DbActor,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+    Apiv2Schema,
+};
 use serde::Deserialize;
-use std::collections::{HashMap, HashSet};
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct DeleteRequest {
-    /// List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
+    /// List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`,
+    /// `custom.bank_account`
     fields: Option<Vec<DataIdentifier>>,
     /// When true, deletes all data in the vault.
     delete_all: Option<bool>,

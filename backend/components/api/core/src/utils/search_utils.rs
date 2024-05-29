@@ -1,26 +1,39 @@
-use crate::{errors::ApiResult, State};
+use crate::errors::ApiResult;
+use crate::State;
 use db::scoped_vault::SearchQuery;
 use itertools::Itertools;
+use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::{
-    fingerprint_salt::FingerprintSalt, BusinessDataKind as BDK, CompositeFingerprint,
-    CompositeFingerprintKind, DataIdentifier, FingerprintKind, FpId, IdentityDataKind as IDK, PhoneNumber,
-    PiiString, TenantId,
+    BusinessDataKind as BDK,
+    CompositeFingerprint,
+    CompositeFingerprintKind,
+    DataIdentifier,
+    FingerprintKind,
+    FpId,
+    IdentityDataKind as IDK,
+    PhoneNumber,
+    PiiString,
+    TenantId,
 };
 
-/// Given a search string and fp_id, parse into the list of FingerprintQueries and fp_id by which to query
-/// for ScopedVaults
+/// Given a search string and fp_id, parse into the list of FingerprintQueries and fp_id by which to
+/// query for ScopedVaults
 pub async fn parse_search(
     state: &State,
     search: Option<PiiString>,
     tenant_id: &TenantId,
 ) -> ApiResult<(Option<SearchQuery>, Option<FpId>)> {
-    use DataIdentifier::{Business, Id};
+    use DataIdentifier::{
+        Business,
+        Id,
+    };
     let Some(search) = search else {
         return Ok((None, None));
     };
     let t_id = Some(tenant_id);
 
-    // A bit of a hack: if the user types query that looks like an fp_id, try to look up by identifier instead
+    // A bit of a hack: if the user types query that looks like an fp_id, try to look up by identifier
+    // instead
     if search.leak().starts_with("fp_id_") || search.leak().starts_with("fp_bid_") {
         let fp_id = Some(FpId::from(search.leak_to_string()));
         return Ok((None, fp_id));

@@ -1,7 +1,8 @@
-use crate::{
-    models::insight_event::{CreateInsightEvent, InsightEvent},
-    TxnPgConn,
+use crate::models::insight_event::{
+    CreateInsightEvent,
+    InsightEvent,
 };
+use crate::TxnPgConn;
 use chrono::Utc;
 
 pub fn create(conn: &mut TxnPgConn) -> InsightEvent {

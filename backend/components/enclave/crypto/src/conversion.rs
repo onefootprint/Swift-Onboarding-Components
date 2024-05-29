@@ -1,9 +1,9 @@
-use elliptic_curve::{pkcs8::DecodePublicKey, sec1::ToEncodedPoint};
-use sec1::{der::Decode, pkcs8::EncodePublicKey};
-
-use crate::aead::ScopedSealingKey;
-
 use self::ec_decode_helper::EcPrivateKeyWrapper;
+use crate::aead::ScopedSealingKey;
+use elliptic_curve::pkcs8::DecodePublicKey;
+use elliptic_curve::sec1::ToEncodedPoint;
+use sec1::der::Decode;
+use sec1::pkcs8::EncodePublicKey;
 
 pub fn public_key_der_to_raw_uncompressed(der_bytes: &[u8]) -> Result<Vec<u8>, crate::Error> {
     let pk =
@@ -49,14 +49,16 @@ mod ec_decode_helper {
     //! <https://www.secg.org/sec1-v2.pdf>
 
     use core::fmt;
-    use sec1::{
-        der::{
-            self,
-            asn1::{Any, OctetStringRef},
-            Decode, Reader,
-        },
-        EcPrivateKey,
+    use sec1::der::asn1::{
+        Any,
+        OctetStringRef,
     };
+    use sec1::der::{
+        self,
+        Decode,
+        Reader,
+    };
+    use sec1::EcPrivateKey;
 
     #[derive(Clone)]
     pub struct EcPrivateKeyWrapper<'a> {

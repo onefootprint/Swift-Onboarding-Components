@@ -1,11 +1,21 @@
 use crate::util::impl_enum_str_diesel;
 use derive_more::Display;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use strum::IntoEnumIterator;
-use strum_macros::{AsRefStr, EnumIter, EnumString};
+use strum_macros::{
+    AsRefStr,
+    EnumIter,
+    EnumString,
+};
 
 #[derive(
     Debug,
@@ -183,9 +193,8 @@ impl VendorAPI {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use super::*;
+    use std::str::FromStr;
 
     #[derive(serde::Serialize, serde::Deserialize)]
     pub struct SomeStruct {

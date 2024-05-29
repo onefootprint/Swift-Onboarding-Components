@@ -1,25 +1,45 @@
+use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
+use crate::decision::vendor::incode::{
+    get_config_id,
+    IncodeContext,
+    IncodeStateMachine,
+};
+use crate::errors::{
+    ApiError,
+    ApiResult,
+    AssertionError,
+};
+use crate::utils::vault_wrapper::{
+    Person,
+    VaultWrapper,
+};
 use crate::{
-    decision::vendor::{
-        build_request::build_docv_data_from_identity_doc,
-        incode::{get_config_id, IncodeContext, IncodeStateMachine},
-    },
-    errors::{ApiError, ApiResult, AssertionError},
-    utils::vault_wrapper::{Person, VaultWrapper},
-    ApiErrorKind, State,
+    ApiErrorKind,
+    State,
 };
-use api_wire_types::{DocumentImageError, DocumentResponse};
-use db::{
-    models::{
-        document::{Document, DocumentUpdate},
-        document_request::DocumentRequest,
-        incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession},
-        ob_configuration::ObConfiguration,
-    },
-    DbPool,
+use api_wire_types::{
+    DocumentImageError,
+    DocumentResponse,
 };
+use db::models::document::{
+    Document,
+    DocumentUpdate,
+};
+use db::models::document_request::DocumentRequest;
+use db::models::incode_verification_session::{
+    IncodeVerificationSession,
+    UpdateIncodeVerificationSession,
+};
+use db::models::ob_configuration::ObConfiguration;
+use db::DbPool;
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    DecisionIntentId, DocumentId, DocumentSide, DocumentStatus, IncodeVerificationSessionState, TenantId,
+    DecisionIntentId,
+    DocumentId,
+    DocumentSide,
+    DocumentStatus,
+    IncodeVerificationSessionState,
+    TenantId,
     WorkflowId,
 };
 use std::sync::Arc;
@@ -106,7 +126,8 @@ pub async fn handle_incode_request(
             IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
             IncodeVerificationSessionState::Fail => None,
             IncodeVerificationSessionState::Complete => None,
-            IncodeVerificationSessionState::GetOnboardingStatus => None, // this would indicate we timed out while polling Incode
+            IncodeVerificationSessionState::GetOnboardingStatus => None, /* this would indicate we timed
+                                                                           * out while polling Incode */
             // We shouldn't cleanly break from the machine in any other state
             s => {
                 return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into())

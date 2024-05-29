@@ -1,9 +1,15 @@
-use std::sync::Arc;
-
-use crate::task::{ExecuteTask, TaskError};
+use crate::task::{
+    ExecuteTask,
+    TaskError,
+};
 use async_trait::async_trait;
 use newtypes::FireWebhookArgs;
-use webhooks::{events::WebhookEvent, WebhookApp, WebhookClient};
+use std::sync::Arc;
+use webhooks::events::WebhookEvent;
+use webhooks::{
+    WebhookApp,
+    WebhookClient,
+};
 
 pub(crate) struct FireWebhookTask {
     webhook_client: Arc<dyn WebhookClient>,
@@ -33,12 +39,13 @@ impl ExecuteTask<FireWebhookArgs> for FireWebhookTask {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use db::tests::fixtures;
     use db::tests::test_db_pool::TestDbPool;
+    use db::DbResult;
     use macros::test_db_pool;
-
-    use db::{tests::fixtures, DbResult};
     use newtypes::{
-        OnboardingCompletedPayload as NTOnboardingCompletedPayload, OnboardingStatus,
+        OnboardingCompletedPayload as NTOnboardingCompletedPayload,
+        OnboardingStatus,
         WebhookEvent as NTWebhookEvent,
     };
     use webhooks::MockWebhookClient;

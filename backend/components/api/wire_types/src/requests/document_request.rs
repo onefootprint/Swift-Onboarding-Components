@@ -1,6 +1,13 @@
 use newtypes::{
-    DeviceType, DocumentFixtureResult, DocumentId, DocumentKind, DocumentRequestId, DocumentSide,
-    DocumentStatus, IncodeFailureReason, Iso3166TwoDigitCountryCode,
+    DeviceType,
+    DocumentFixtureResult,
+    DocumentId,
+    DocumentKind,
+    DocumentRequestId,
+    DocumentSide,
+    DocumentStatus,
+    IncodeFailureReason,
+    Iso3166TwoDigitCountryCode,
 };
 use paperclip::actix::Apiv2Schema;
 
@@ -41,7 +48,8 @@ impl From<DocumentStatus> for DocumentResponseStatus {
     }
 }
 
-/// Response for a identity document request. Errors are non-optional if the identity vendor. Requires additional images be collected.
+/// Response for a identity document request. Errors are non-optional if the identity vendor.
+/// Requires additional images be collected.
 #[derive(Debug, Apiv2Schema, serde::Serialize)]
 pub struct DocumentResponse {
     pub next_side_to_collect: Option<DocumentSide>,

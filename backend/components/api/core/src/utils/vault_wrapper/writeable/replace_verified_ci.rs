@@ -1,10 +1,21 @@
-use crate::errors::{ApiResult, AssertionError, ValidationError};
-use db::TxnPgConn;
-use newtypes::{DataIdentifier as DI, DataLifetimeSource, IdentityDataKind as IDK};
-
+use super::portablize_data::on_otp_verified;
 use super::{
-    portablize_data::on_otp_verified, DataLifetimeSources, DataRequestSource, FingerprintedDataRequest,
-    PatchDataResult, WriteableVw,
+    DataLifetimeSources,
+    DataRequestSource,
+    FingerprintedDataRequest,
+    PatchDataResult,
+    WriteableVw,
+};
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+    ValidationError,
+};
+use db::TxnPgConn;
+use newtypes::{
+    DataIdentifier as DI,
+    DataLifetimeSource,
+    IdentityDataKind as IDK,
 };
 
 impl<Type> WriteableVw<Type> {

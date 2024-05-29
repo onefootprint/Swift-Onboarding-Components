@@ -1,25 +1,34 @@
 use super::{
-    AddBack, AddConsent, AddSelfie, AddSideResponseHelper, IncodeStateTransition, VerificationSession,
+    AddBack,
+    AddConsent,
+    AddSelfie,
+    AddSideResponseHelper,
+    IncodeStateTransition,
+    VerificationSession,
 };
-use crate::{
-    decision::vendor::{
-        incode::{
-            state::{IncodeState, TransitionResult},
-            IncodeContext,
-        },
-        map_to_api_error,
-        verification_result::SaveVerificationResultArgs,
-    },
-    errors::ApiResult,
-    vendor_clients::IncodeClients,
+use crate::decision::vendor::incode::state::{
+    IncodeState,
+    TransitionResult,
 };
+use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::errors::ApiResult;
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-use db::{DbPool, TxnPgConn};
-
+use db::{
+    DbPool,
+    TxnPgConn,
+};
 use either::Either;
 use idv::incode::doc::IncodeAddFrontRequest;
-
-use newtypes::{DocVData, DocumentKind, DocumentSide, IncodeFailureReason, VendorAPI};
+use newtypes::{
+    DocVData,
+    DocumentKind,
+    DocumentSide,
+    IncodeFailureReason,
+    VendorAPI,
+};
 
 pub struct AddFront {
     add_side_response_helper: AddSideResponseHelper,

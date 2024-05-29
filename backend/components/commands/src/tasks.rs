@@ -1,17 +1,32 @@
-use anyhow::{anyhow, Result};
-use api_core::{config::Config, task, State};
-use clap::Parser;
-use tokio::{
-    select, signal,
-    time::{self, Duration},
+use anyhow::{
+    anyhow,
+    Result,
 };
-
-use tracing::{error, info};
+use api_core::config::Config;
+use api_core::{
+    task,
+    State,
+};
+use clap::Parser;
+use tokio::time::{
+    self,
+    Duration,
+};
+use tokio::{
+    select,
+    signal,
+};
+use tracing::{
+    error,
+    info,
+};
 
 // Test by running:
 //   cargo run -p api_server -- execute-tasks --batch-size 100 --poll-period-ms 1000
 // and then running:
-//   curl localhost:8000/private/protected/task/create_task -X POST -d '{"task_data": {"kind": "log_message", "data": {"message": "hi!"}}}' -H 'X-Fp-Protected-Custodian-Key: $PROTECTED_CUSTODIAN_KEY'
+//   curl localhost:8000/private/protected/task/create_task -X POST -d '{"task_data": {"kind":
+// "log_message", "data": {"message": "hi!"}}}' -H 'X-Fp-Protected-Custodian-Key:
+// $PROTECTED_CUSTODIAN_KEY'
 
 #[derive(Parser, Debug)]
 pub struct ExecuteTasks {

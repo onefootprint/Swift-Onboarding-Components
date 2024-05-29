@@ -1,5 +1,11 @@
 use crate::*;
-use newtypes::{ApiKeyStatus, DataIdentifier, PiiString, ProxyConfigSecretHeaderId, ProxyIngressContentType};
+use newtypes::{
+    ApiKeyStatus,
+    DataIdentifier,
+    PiiString,
+    ProxyConfigSecretHeaderId,
+    ProxyIngressContentType,
+};
 
 /// Create a new proxy configuration
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -27,10 +33,13 @@ pub struct CreateProxyConfigRequest {
     #[serde(default)]
     pub secret_headers: Vec<SecretCustomHeader>,
 
-    /// A certificate and key to authenticate via mTLS. Omit to skip client-certificate authentication
+    /// A certificate and key to authenticate via mTLS. Omit to skip client-certificate
+    /// authentication
     pub client_identity: Option<ClientIdentity>,
 
-    /// A list of PEM-encoded x509 certificates or chains that are either CAs or self-signed. These certificates will be used to verify the root-of-trust of the certificate presented by the proxy
+    /// A list of PEM-encoded x509 certificates or chains that are either CAs or self-signed. These
+    /// certificates will be used to verify the root-of-trust of the certificate presented by the
+    /// proxy
     #[serde(default)]
     pub pinned_server_certificates: Vec<String>,
 

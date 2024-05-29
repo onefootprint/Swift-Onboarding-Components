@@ -1,11 +1,31 @@
-use std::collections::HashMap;
-
-use crate::{DbError, DbResult, PgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{insight_event, workflow};
-use diesel::{prelude::*, Insertable, Queryable, RunQueryDsl};
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    insight_event,
+    workflow,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+    RunQueryDsl,
+};
 use itertools::Itertools;
-use newtypes::{DeviceType, InsightEventId, ObConfigurationId, ScopedVaultId, WorkflowId};
+use newtypes::{
+    DeviceType,
+    InsightEventId,
+    ObConfigurationId,
+    ScopedVaultId,
+    WorkflowId,
+};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default, Queryable, Insertable, Selectable)]
 #[diesel(table_name = insight_event)]

@@ -1,15 +1,28 @@
-use crate::{auth::user::UserAuthContext, errors::ApiError, types::response::ResponseData};
-use api_core::{
-    auth::{
-        session::user::AssociatedAuthEventKind,
-        user::{allowed_user_scopes, load_auth_events},
-        Any,
-    },
-    errors::{ApiResult, ValidationError},
-    State,
+use crate::auth::user::UserAuthContext;
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use api_core::auth::session::user::AssociatedAuthEventKind;
+use api_core::auth::user::{
+    allowed_user_scopes,
+    load_auth_events,
 };
-use api_wire_types::hosted::tokens::{CreateUserTokenRequest, CreateUserTokenResponse, GetUserTokenResponse};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use api_core::auth::Any;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::State;
+use api_wire_types::hosted::tokens::{
+    CreateUserTokenRequest,
+    CreateUserTokenResponse,
+    GetUserTokenResponse,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(User, Hosted),

@@ -1,29 +1,46 @@
-use itertools::{chain, Itertools};
-use newtypes::{
-    DbActor, DecisionStatus, DocumentRequestConfig, DocumentReviewStatus, ManualReviewKind, OnboardingStatus,
-    ReviewReason, RuleSetResultId, VerificationResultId, WorkflowId, WorkflowSource,
-};
-
-use db::{
-    models::{
-        data_lifetime::DataLifetime,
-        document::Document,
-        manual_review::{ManualReviewAction, ManualReviewArgs},
-        ob_configuration::ObConfiguration,
-        onboarding_decision::{FailedForDocReview, NewDecisionArgs},
-        scoped_vault::ScopedVault,
-        workflow::{Workflow, WorkflowUpdate},
-    },
-    TxnPgConn,
-};
-
 use super::onboarding::Decision;
-use crate::{errors::ApiResult, utils::vault_wrapper::VaultWrapper};
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::VaultWrapper;
+use db::models::data_lifetime::DataLifetime;
+use db::models::document::Document;
+use db::models::manual_review::{
+    ManualReviewAction,
+    ManualReviewArgs,
+};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding_decision::{
+    FailedForDocReview,
+    NewDecisionArgs,
+};
+use db::models::scoped_vault::ScopedVault;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
+use db::TxnPgConn;
+use itertools::{
+    chain,
+    Itertools,
+};
+use newtypes::{
+    DbActor,
+    DecisionStatus,
+    DocumentRequestConfig,
+    DocumentReviewStatus,
+    ManualReviewKind,
+    OnboardingStatus,
+    ReviewReason,
+    RuleSetResultId,
+    VerificationResultId,
+    WorkflowId,
+    WorkflowSource,
+};
 
-/// Create our final decision from the features we created, set final onboarding status, and emit risk signals
-/// assert_is_first_decision_for_onboarding determines if an error should be thrown if the onboarding already has a decision made
-///     we set this true to perform this check during the initial decisioning we make at the end of Bifrost.
-///     we also can make decisions post-Bifrost, when we manually trigger a running of decisioning and in those cases we would set this false
+/// Create our final decision from the features we created, set final onboarding status, and emit
+/// risk signals assert_is_first_decision_for_onboarding determines if an error should be thrown if
+/// the onboarding already has a decision made     we set this true to perform this check during the
+/// initial decisioning we make at the end of Bifrost.     we also can make decisions post-Bifrost,
+/// when we manually trigger a running of decisioning and in those cases we would set this false
 #[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip(conn))]
 pub fn save_final_decision(
@@ -130,10 +147,13 @@ fn get_final_decision_status(
 
 #[cfg(test)]
 mod test {
-    use crate::decision::onboarding::Decision;
-
     use super::get_final_decision_status;
-    use newtypes::{DecisionStatus, OnboardingStatus, RuleAction};
+    use crate::decision::onboarding::Decision;
+    use newtypes::{
+        DecisionStatus,
+        OnboardingStatus,
+        RuleAction,
+    };
     use test_case::test_case;
 
     fn rules_executed(action: Option<RuleAction>) -> Decision {
@@ -162,7 +182,8 @@ mod test {
     #[test_case(rules_executed(None), true, Some(OnboardingStatus::Pass) => DecisionStatus::Pass)]
     // Doc manual review doesn't matter much when there's a rule action.
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, Some(OnboardingStatus::Pass) => DecisionStatus::Fail)]
-    // This one is weird behavior - we should probably fail the user if there's a doc MR + PassWithManualReview. But just testing existing behavior for now
+    // This one is weird behavior - we should probably fail the user if there's a doc MR +
+    // PassWithManualReview. But just testing existing behavior for now
     #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, Some(OnboardingStatus::Pass) => DecisionStatus::Pass)]
     fn test_get_final_decision_status(
         decision: Decision,
@@ -185,7 +206,8 @@ mod test {
     #[test_case(Decision::RulesNotExecuted, true, Some(OnboardingStatus::Pass) => false)]
     // Doc manual review doesn't matter much when there's a rule action.
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, Some(OnboardingStatus::Pass) => false)]
-    // This one is weird behavior - we should probably fail the user if there's a doc MR + PassWithManualReview. But just testing existing behavior for now
+    // This one is weird behavior - we should probably fail the user if there's a doc MR +
+    // PassWithManualReview. But just testing existing behavior for now
     #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, Some(OnboardingStatus::Pass) => false)]
     fn test_get_final_decision_status_fail_for_mr(
         decision: Decision,

@@ -1,14 +1,28 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::expect_used)]
 
-use actix_web::{dev::Service, http::KeepAlive, HttpMessage};
-use api_core::{config::Config, utils::timeouts::ResponseDeadline, *};
-use clap::{Parser, Subcommand};
+use actix_web::dev::Service;
+use actix_web::http::KeepAlive;
+use actix_web::HttpMessage;
+use api_core::config::Config;
+use api_core::utils::timeouts::ResponseDeadline;
+use api_core::*;
+use clap::{
+    Parser,
+    Subcommand,
+};
 use std::time::Duration;
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
-use anyhow::{Context, Result};
-use paperclip::v2::models::{DefaultApiRaw, Info, Tag};
+use anyhow::{
+    Context,
+    Result,
+};
+use paperclip::v2::models::{
+    DefaultApiRaw,
+    Info,
+    Tag,
+};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

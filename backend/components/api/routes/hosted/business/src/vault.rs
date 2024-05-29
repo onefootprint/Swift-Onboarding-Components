@@ -1,20 +1,37 @@
-use crate::{
-    auth::user::UserAuthScope,
-    errors::ApiResult,
-    types::{EmptyResponse, JsonApiResponse},
-    utils::vault_wrapper::{Business, VaultWrapper},
-    State,
+use crate::auth::user::UserAuthScope;
+use crate::errors::ApiResult;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
-use api_core::{
-    auth::{user::UserWfAuthContext, AuthError},
-    types::ResponseData,
-    utils::vault_wrapper::{DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, TenantVw},
+use crate::utils::vault_wrapper::{
+    Business,
+    VaultWrapper,
+};
+use crate::State;
+use api_core::auth::user::UserWfAuthContext;
+use api_core::auth::AuthError;
+use api_core::types::ResponseData;
+use api_core::utils::vault_wrapper::{
+    DataLifetimeSources,
+    DataRequestSource,
+    FingerprintedDataRequest,
+    TenantVw,
+};
+use newtypes::put_data_request::{
+    PatchDataRequest,
+    RawDataRequest,
 };
 use newtypes::{
-    put_data_request::{PatchDataRequest, RawDataRequest},
-    ValidateArgs, WorkflowGuard,
+    ValidateArgs,
+    WorkflowGuard,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Checks if provided vault data is valid before adding it to the business vault",

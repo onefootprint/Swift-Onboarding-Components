@@ -1,13 +1,28 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{JsonApiResponse, ResponseData},
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use crate::State;
 use api_core::errors::ApiResult;
 use api_wire_types::OrgMetricsRequest;
-use db::scoped_vault::{count_for_tenant, ScopedVaultListQueryParams};
-use newtypes::{OnboardingStatusFilter, VaultKind};
-use paperclip::actix::{api_v2_operation, get, web};
+use db::scoped_vault::{
+    count_for_tenant,
+    ScopedVaultListQueryParams,
+};
+use newtypes::{
+    OnboardingStatusFilter,
+    VaultKind,
+};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+};
 
 #[api_v2_operation(
     tags(OrgSettings, Private),

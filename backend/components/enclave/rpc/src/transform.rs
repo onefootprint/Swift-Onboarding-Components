@@ -1,8 +1,9 @@
+use crate::{
+    DataTransform,
+    EncryptTransformAlgorithm,
+};
 use std::str::Utf8Error;
-
 use thiserror::Error;
-
-use crate::{DataTransform, EncryptTransformAlgorithm};
 
 #[derive(Error, Debug)]
 pub enum TransformError {
@@ -120,7 +121,8 @@ impl DataTransformer for DataTransforms {
 
 #[cfg(test)]
 mod tests {
-    use super::{DataTransform::*, *};
+    use super::DataTransform::*;
+    use super::*;
     use test_case::test_case;
 
     #[test_case(vec![], "Hi Hello 🎉" => "Hi Hello 🎉".to_string())]

@@ -1,33 +1,63 @@
+use crate::identify::create_identified_token;
 use crate::{
-    identify::create_identified_token, ChallengeData, ChallengeState, GetIdentifyChallengeArgs,
-    IdentifyChallengeContext, State,
+    ChallengeData,
+    ChallengeState,
+    GetIdentifyChallengeArgs,
+    IdentifyChallengeContext,
+    State,
 };
-use api_core::{
-    auth::ob_config::ObConfigAuth,
-    errors::{
-        challenge::ChallengeError, error_with_code::ErrorWithCode, user::UserError, ApiError, ApiResult,
-        ValidationError,
-    },
-    telemetry::RootSpan,
-    types::{response::ResponseData, JsonApiResponse},
-    utils::{
-        challenge::Challenge,
-        email::send_email_challenge_non_blocking,
-        headers::{IsComponentsSdk, SandboxId},
-        identify::UserChallengeContext,
-        sms::rx_background_error,
-        vault_wrapper::{FingerprintedDataRequest, VaultContext, VaultWrapper},
-    },
+use api_core::auth::ob_config::ObConfigAuth;
+use api_core::errors::challenge::ChallengeError;
+use api_core::errors::error_with_code::ErrorWithCode;
+use api_core::errors::user::UserError;
+use api_core::errors::{
+    ApiError,
+    ApiResult,
+    ValidationError,
+};
+use api_core::telemetry::RootSpan;
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
+use api_core::utils::challenge::Challenge;
+use api_core::utils::email::send_email_challenge_non_blocking;
+use api_core::utils::headers::{
+    IsComponentsSdk,
+    SandboxId,
+};
+use api_core::utils::identify::UserChallengeContext;
+use api_core::utils::sms::rx_background_error;
+use api_core::utils::vault_wrapper::{
+    FingerprintedDataRequest,
+    VaultContext,
+    VaultWrapper,
 };
 use api_wire_types::{
-    IdentifyId, SignupChallengeData, SignupChallengeRequest, SignupChallengeResponse, UserChallengeData,
+    IdentifyId,
+    SignupChallengeData,
+    SignupChallengeRequest,
+    SignupChallengeResponse,
+    UserChallengeData,
 };
-use itertools::{chain, Itertools};
+use itertools::{
+    chain,
+    Itertools,
+};
+use newtypes::email::Email;
 use newtypes::{
-    email::Email, ChallengeKind, DataLifetimeSource, DataRequest, IdentifyScope, IdentityDataKind as IDK,
-    PhoneNumber, ValidateArgs,
+    ChallengeKind,
+    DataLifetimeSource,
+    DataRequest,
+    IdentifyScope,
+    IdentityDataKind as IDK,
+    PhoneNumber,
+    ValidateArgs,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Identify, Hosted),

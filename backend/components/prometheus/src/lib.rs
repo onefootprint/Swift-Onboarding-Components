@@ -1,28 +1,52 @@
 //! Adapted from https://github.com/nlopes/actix-web-prom
 
-use std::{
-    collections::HashMap,
-    future::{ready, Future, Ready},
-    marker::PhantomData,
-    pin::Pin,
-    sync::Arc,
-    task::{Context, Poll},
-    time::Instant,
+use actix_web::body::{
+    BodySize,
+    EitherBody,
+    MessageBody,
 };
-
-use actix_web::{
-    body::{BodySize, EitherBody, MessageBody},
-    dev::{self, Service, ServiceRequest, ServiceResponse, Transform},
-    http::{
-        header::{HeaderValue, CONTENT_TYPE},
-        Method, StatusCode,
-    },
-    web::Bytes,
-    Error,
+use actix_web::dev::{
+    self,
+    Service,
+    ServiceRequest,
+    ServiceResponse,
+    Transform,
 };
+use actix_web::http::header::{
+    HeaderValue,
+    CONTENT_TYPE,
+};
+use actix_web::http::{
+    Method,
+    StatusCode,
+};
+use actix_web::web::Bytes;
+use actix_web::Error;
 use futures_core::ready;
 use pin_project_lite::pin_project;
-use prometheus::{Encoder, HistogramOpts, HistogramVec, IntCounterVec, Opts, Registry, TextEncoder};
+use prometheus::{
+    Encoder,
+    HistogramOpts,
+    HistogramVec,
+    IntCounterVec,
+    Opts,
+    Registry,
+    TextEncoder,
+};
+use std::collections::HashMap;
+use std::future::{
+    ready,
+    Future,
+    Ready,
+};
+use std::marker::PhantomData;
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{
+    Context,
+    Poll,
+};
+use std::time::Instant;
 
 #[derive(Debug)]
 /// Builder to create new PrometheusMetrics struct.HistogramVec

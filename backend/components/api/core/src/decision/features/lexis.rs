@@ -1,6 +1,14 @@
-use idv::lexis::response::{FlexIdResponse, ValidElementSummary};
+use idv::lexis::response::{
+    FlexIdResponse,
+    ValidElementSummary,
+};
 use itertools::Itertools;
-use newtypes::{FootprintReasonCode as FRC, LexisNAP, LexisNAS, RiskIndicatorCode};
+use newtypes::{
+    FootprintReasonCode as FRC,
+    LexisNAP,
+    LexisNAS,
+    RiskIndicatorCode,
+};
 use std::convert::Into;
 
 // 0 Nothing verified
@@ -56,7 +64,8 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<F
             codes.push(FRC::SubjectDeceased);
         }
         if address_po_box.unwrap_or(false) || address_cmra.unwrap_or(false) {
-            // CRMA is technically different from a PO Box but I think it's fine to keep the same single risk signal here?
+            // CRMA is technically different from a PO Box but I think it's fine to keep the same single risk
+            // signal here?
             codes.push(FRC::AddressInputIsPoBox);
             codes.push(FRC::AddressInputIsNonResidential);
         }
@@ -106,7 +115,9 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<F
 }
 
 fn name_match_codes(nas: &LexisNAS, risk_indicator_codes: &[RiskIndicatorCode]) -> Vec<FRC> {
-    // supposedly R76 only applies to last name and there is no way to know if first name was partial.. might have to require exact match on first name if we think distinguishing partial is critical here
+    // supposedly R76 only applies to last name and there is no way to know if first name was partial..
+    // might have to require exact match on first name if we think distinguishing partial is critical
+    // here
     let first_name_frc = match nas.first_name_match {
         true => FRC::NameFirstMatches,
         false => FRC::NameFirstDoesNotMatch,
@@ -176,10 +187,11 @@ fn phone_match_code(nap: &LexisNAP, risk_indicator_codes: &[RiskIndicatorCode]) 
 mod tests {
     use super::*;
     use db::test_helpers::assert_have_same_elements;
-    use newtypes::{
-        FootprintReasonCode::{self, *},
-        RiskIndicatorCode as RIC,
+    use newtypes::FootprintReasonCode::{
+        self,
+        *,
     };
+    use newtypes::RiskIndicatorCode as RIC;
     use test_case::test_case;
 
     #[test_case(true, true, vec![] => vec![FRC::NameFirstMatches, FRC::NameLastMatches, FRC::NameMatches])]
@@ -320,11 +332,11 @@ mod tests {
         example3(),
         true,
         vec![
-            NameFirstMatches, 
-            NameLastMatches, 
-            NameMatches, 
-            AddressMatches, 
-            DobMatches, 
+            NameFirstMatches,
+            NameLastMatches,
+            NameMatches,
+            AddressMatches,
+            DobMatches,
             SsnMatches,
             PhoneLocatedMatches
         ])

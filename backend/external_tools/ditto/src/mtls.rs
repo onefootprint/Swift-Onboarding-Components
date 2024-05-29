@@ -1,21 +1,45 @@
-use std::{io::Cursor, net::SocketAddr};
-
-use hyper::{
-    server::{
-        accept::Accept,
-        conn::{AddrIncoming, AddrStream},
-    },
-    service::{make_service_fn, service_fn},
-    Body, Method, Request, Response, Server, StatusCode,
+use core::task::{
+    Context,
+    Poll,
 };
-use std::sync::Mutex;
-use webpki::TrustAnchor;
-
-use core::task::{Context, Poll};
 use futures_util::ready;
-use std::{future::Future, io, pin::Pin, sync, sync::Arc, vec::Vec};
-use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
+use hyper::server::accept::Accept;
+use hyper::server::conn::{
+    AddrIncoming,
+    AddrStream,
+};
+use hyper::service::{
+    make_service_fn,
+    service_fn,
+};
+use hyper::{
+    Body,
+    Method,
+    Request,
+    Response,
+    Server,
+    StatusCode,
+};
+use std::future::Future;
+use std::io::Cursor;
+use std::net::SocketAddr;
+use std::pin::Pin;
+use std::sync::{
+    Arc,
+    Mutex,
+};
+use std::vec::Vec;
+use std::{
+    io,
+    sync,
+};
+use tokio::io::{
+    AsyncRead,
+    AsyncWrite,
+    ReadBuf,
+};
 use tokio_rustls::rustls::ServerConfig;
+use webpki::TrustAnchor;
 
 pub async fn serve(port: u16) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let addr = SocketAddr::from(([0, 0, 0, 0], port));

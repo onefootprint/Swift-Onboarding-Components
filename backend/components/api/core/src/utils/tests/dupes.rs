@@ -1,24 +1,33 @@
-use std::collections::HashMap;
-
-use crate::{
-    errors::ApiResult,
-    utils::vault_wrapper::{Any, DataLifetimeSources, FingerprintedDataRequest, VaultWrapper},
-    State,
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    DataLifetimeSources,
+    FingerprintedDataRequest,
+    VaultWrapper,
 };
-
-use db::{
-    models::{fingerprint::Fingerprint, ob_configuration::ObConfiguration, scoped_vault::ScopedVault},
-    test_helpers::assert_have_same_elements,
-    tests::fixtures,
-};
+use crate::State;
+use db::models::fingerprint::Fingerprint;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures;
 use itertools::Itertools;
 use macros::test_state_case;
+use newtypes::put_data_request::{
+    PatchDataRequest,
+    RawDataRequest,
+};
 use newtypes::{
-    put_data_request::{PatchDataRequest, RawDataRequest},
-    DataIdentifier, DataLifetimeSource, DupeKind as DK, IdentityDataKind as IDK, PiiJsonValue, ValidateArgs,
+    DataIdentifier,
+    DataLifetimeSource,
+    DupeKind as DK,
+    IdentityDataKind as IDK,
+    PiiJsonValue,
+    ValidateArgs,
     VaultId,
 };
 use serde_json::json;
+use std::collections::HashMap;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
@@ -173,7 +182,8 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
         .await
         .unwrap();
 
-    // create a vault for every input vault, and a SV for every tenant for every vault. Create a mapping of (V,T) -> SV
+    // create a vault for every input vault, and a SV for every tenant for every vault. Create a mapping
+    // of (V,T) -> SV
     let data2 = data.clone();
     let sv_map = state
         .db_pool

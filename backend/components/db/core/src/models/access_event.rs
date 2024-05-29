@@ -1,11 +1,30 @@
-use crate::{DbResult, NonNullVec, PgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbResult,
+    NonNullVec,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::access_event;
-use diesel::{dsl::count_distinct, prelude::*, Insertable, Queryable, RunQueryDsl};
+use diesel::dsl::count_distinct;
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+    RunQueryDsl,
+};
 use itertools::Itertools;
 use newtypes::{
-    AccessEventId, AccessEventKind, AccessEventPurpose, DataIdentifier, DbActor, InsightEventId,
-    ScopedVaultId, TenantId,
+    AccessEventId,
+    AccessEventKind,
+    AccessEventPurpose,
+    DataIdentifier,
+    DbActor,
+    InsightEventId,
+    ScopedVaultId,
+    TenantId,
 };
 
 #[derive(Debug, Clone, Queryable, Insertable)]

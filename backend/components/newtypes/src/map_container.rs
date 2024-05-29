@@ -43,7 +43,10 @@ pub mod declare_map_container {
                 }
 
                 fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-                    use paperclip::v2::models::{DataType, DefaultSchemaRaw};
+                    use paperclip::v2::models::{
+                        DataType,
+                        DefaultSchemaRaw,
+                    };
                     let mut schema = DefaultSchemaRaw {
                         name: Self::name(),
                         example: serde_json::from_str::<serde_json::Value>($example)
@@ -78,9 +81,8 @@ pub mod declare_map_container {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
     use super::declare_map_container::flat_api_object_map_type;
+    use std::collections::HashMap;
 
     flat_api_object_map_type!(GetFields<String, String>, description="test", example="example");
 

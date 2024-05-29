@@ -1,7 +1,14 @@
-use crate::types::{response::ResponseData, EmptyResponse, JsonApiResponse, StringResponse};
+use crate::types::response::ResponseData;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
+    StringResponse,
+};
 use actix_web::HttpRequest;
-
-use paperclip::actix::{api_v2_operation, get};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+};
 
 #[api_v2_operation(tags(Private))]
 #[tracing::instrument(name = "index")]

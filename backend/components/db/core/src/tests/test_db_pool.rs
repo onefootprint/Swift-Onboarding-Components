@@ -1,14 +1,16 @@
-use crate::DbResult;
-use std::{ops::Deref, time::Duration};
-
+use crate::diesel::{
+    Connection,
+    RunQueryDsl,
+};
+use crate::test_helpers::db_url;
+use crate::{
+    DbPool,
+    DbResult,
+};
 use diesel::PgConnection;
 use macros::test_db_pool;
-
-use crate::{
-    diesel::{Connection, RunQueryDsl},
-    test_helpers::db_url,
-    DbPool,
-};
+use std::ops::Deref;
+use std::time::Duration;
 
 pub struct TestDbPool {
     db_pool: DbPool,
@@ -109,7 +111,8 @@ impl Drop for TestDbPool {
     }
 }
 
-// A new test db will be created, and a new Tenant written to it but then the new test db will be dropped
+// A new test db will be created, and a new Tenant written to it but then the new test db will be
+// dropped
 #[test_db_pool]
 async fn example_test(db_pool: TestDbPool) {
     let _tenant = db_pool
@@ -118,7 +121,8 @@ async fn example_test(db_pool: TestDbPool) {
         .unwrap();
 }
 
-// A new test db will be created, and a new Tenant written to it, and the test database will be retained (won't be dropped)
+// A new test db will be created, and a new Tenant written to it, and the test database will be
+// retained (won't be dropped)
 #[ignore]
 #[test_db_pool(retain)]
 async fn example_test_retain_test_db(db_pool: TestDbPool) {

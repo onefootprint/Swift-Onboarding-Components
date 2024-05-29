@@ -1,5 +1,11 @@
 use crate::*;
-use newtypes::{FootprintReasonCode, OnboardingDecisionId, RiskSignalId, SignalScope, SignalSeverity};
+use newtypes::{
+    FootprintReasonCode,
+    OnboardingDecisionId,
+    RiskSignalId,
+    SignalScope,
+    SignalSeverity,
+};
 
 /// RiskSignal information, including severity, impacted scopes, and more.
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
@@ -25,7 +31,8 @@ pub struct PublicRiskSignal {
     pub timestamp: chrono::DateTime<Utc>,
 }
 
-/// Non-public RiskSignal serialization that has additional information (at the moment just AML stuff about specific hits)
+/// Non-public RiskSignal serialization that has additional information (at the moment just AML
+/// stuff about specific hits)
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct RiskSignalDetail {
     pub id: RiskSignalId,

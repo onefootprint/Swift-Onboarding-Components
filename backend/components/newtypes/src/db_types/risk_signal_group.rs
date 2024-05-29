@@ -1,9 +1,18 @@
 use crate::util::impl_enum_str_diesel;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
 use strum::AsRefStr;
-use strum_macros::{Display, EnumString};
+use strum_macros::{
+    Display,
+    EnumString,
+};
 
 #[derive(
     Display,

@@ -1,35 +1,60 @@
+use crate::config::Config;
+use crate::utils::headers::{
+    InsightHeaders,
+    TelemetryHeaders,
+};
 use actix_web::FromRequest;
-use chrono::{SecondsFormat, Utc};
+use anyhow::Result;
+use chrono::{
+    SecondsFormat,
+    Utc,
+};
 use futures_util::Future;
 use itertools::Itertools;
-use opentelemetry::{
-    global,
-    sdk::{
-        metrics::{controllers::BasicController, selectors},
-        propagation::TraceContextPropagator,
-    },
-    trace::{SpanId, TraceContextExt, TraceId},
+use opentelemetry::global;
+use opentelemetry::sdk::metrics::controllers::BasicController;
+use opentelemetry::sdk::metrics::selectors;
+use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::trace::{
+    SpanId,
+    TraceContextExt,
+    TraceId,
 };
 use opentelemetry_otlp::WithExportConfig;
-use serde::{ser::SerializeMap, Serializer};
-use std::{io, pin::Pin};
-use tracing::{Span, Subscriber};
-use tracing_actix_web::{root_span, DefaultRootSpanBuilder, RootSpanBuilder};
+use serde::ser::SerializeMap;
+use serde::Serializer;
+use std::io;
+use std::pin::Pin;
+use tracing::{
+    Span,
+    Subscriber,
+};
+use tracing_actix_web::{
+    root_span,
+    DefaultRootSpanBuilder,
+    RootSpanBuilder,
+};
 use tracing_core::Event;
 use tracing_opentelemetry::OtelData;
-use tracing_serde::{fields::AsMap, AsSerde};
+use tracing_serde::fields::AsMap;
+use tracing_serde::AsSerde;
+use tracing_subscriber::fmt::format::Writer;
+use tracing_subscriber::fmt::{
+    self,
+    FmtContext,
+    FormatEvent,
+    FormatFields,
+};
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::registry::{
+    LookupSpan,
+    SpanRef,
+};
 use tracing_subscriber::{
-    fmt::{self, format::Writer, FmtContext, FormatEvent, FormatFields},
-    layer::SubscriberExt,
-    registry::{LookupSpan, SpanRef},
-    EnvFilter, Layer, Registry,
+    EnvFilter,
+    Layer,
+    Registry,
 };
-
-use crate::{
-    config::Config,
-    utils::headers::{InsightHeaders, TelemetryHeaders},
-};
-use anyhow::Result;
 
 // Initialize `tracing` using `opentelemetry-tracing` and configure logging
 pub fn init(config: &Config) -> Result<Option<BasicController>> {
@@ -131,10 +156,10 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
 
         let server_git_hash = crate::GIT_HASH.to_string();
 
-        // Put on the root_span the properties that are must useful to query by/view in aggregate in honeycomb.
-        // We have almost every other attribute logged as an event, rather than as an attribute on the span.
-        // Note: It seems we can only provide a fixed number of args to the root_span - you may
-        // have to remove some if you add more.
+        // Put on the root_span the properties that are must useful to query by/view in aggregate in
+        // honeycomb. We have almost every other attribute logged as an event, rather than as an
+        // attribute on the span. Note: It seems we can only provide a fixed number of args to the
+        // root_span - you may have to remove some if you add more.
         // If we can increase the number of attributes on the span, maybe we can put everything here
         let span = root_span!(
             request,

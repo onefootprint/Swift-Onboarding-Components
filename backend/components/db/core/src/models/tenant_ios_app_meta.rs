@@ -1,8 +1,25 @@
-use crate::{DbError, DbResult, NonNullVec, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
+use crate::{
+    DbError,
+    DbResult,
+    NonNullVec,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db_schema::schema::tenant_ios_app_meta;
-use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{SealedVaultBytes, TenantId, TenantIosAppMetaId};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
+use newtypes::{
+    SealedVaultBytes,
+    TenantId,
+    TenantIosAppMetaId,
+};
 
 #[derive(Debug, Clone, Insertable, Queryable)]
 #[diesel(table_name = tenant_ios_app_meta)]

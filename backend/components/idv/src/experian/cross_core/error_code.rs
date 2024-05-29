@@ -68,9 +68,8 @@ pub enum ErrorCode {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use super::ErrorCode;
+    use std::str::FromStr;
     use test_case::test_case;
     #[test_case(
         "018",

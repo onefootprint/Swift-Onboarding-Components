@@ -1,10 +1,17 @@
-use std::{convert::Infallible, str::FromStr};
-
-use newtypes::{FootprintReasonCode, IDologyReasonCode, PiiString, ScrubbedPiiString};
-use serde::{Deserialize, Deserializer};
-use strum::EnumString;
-
 use crate::idology::IdologyError::RequestError;
+use newtypes::{
+    FootprintReasonCode,
+    IDologyReasonCode,
+    PiiString,
+    ScrubbedPiiString,
+};
+use serde::{
+    Deserialize,
+    Deserializer,
+};
+use std::convert::Infallible;
+use std::str::FromStr;
+use strum::EnumString;
 
 /// This file holds common structures used to work with Idology APIs
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

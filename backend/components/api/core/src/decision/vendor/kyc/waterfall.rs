@@ -1,37 +1,54 @@
-use std::collections::HashMap;
-
-use crate::{
-    decision::{
-        self,
-        rule_engine::{engine::VaultDataForRules, eval::RuleEvalConfig},
-        vendor::{
-            get_vendor_apis_for_verification_requests,
-            kyc::waterfall_rules::WaterfallRuleAction,
-            make_request,
-            tenant_vendor_control::TenantVendorControl,
-            vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
-        },
-    },
-    errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
-    ApiErrorKind, State,
+use super::waterfall_vendor_api::WaterfallVendorAPI;
+use crate::decision::rule_engine::engine::VaultDataForRules;
+use crate::decision::rule_engine::eval::RuleEvalConfig;
+use crate::decision::vendor::kyc::waterfall_rules::WaterfallRuleAction;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::decision::vendor::vendor_result::{
+    HydratedVerificationResult,
+    RequestAndMaybeHydratedResult,
+    VendorResult,
 };
-use db::models::{
-    billing_event::BillingEvent,
-    decision_intent::DecisionIntent,
-    ob_configuration::ObConfiguration,
-    scoped_vault::ScopedVault,
-    verification_request::VReqIdentifier,
-    waterfall_execution::{UpdateWaterfallExecution, WaterfallExecution},
-    waterfall_step::{UpdateWaterfallStep, WaterfallStep},
+use crate::decision::vendor::{
+    get_vendor_apis_for_verification_requests,
+    make_request,
+};
+use crate::decision::{
+    self,
+};
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+    VwArgs,
+};
+use crate::{
+    ApiErrorKind,
+    State,
+};
+use db::models::billing_event::BillingEvent;
+use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::verification_request::VReqIdentifier;
+use db::models::waterfall_execution::{
+    UpdateWaterfallExecution,
+    WaterfallExecution,
+};
+use db::models::waterfall_step::{
+    UpdateWaterfallStep,
+    WaterfallStep,
 };
 use itertools::Itertools;
 use newtypes::{
-    BillingEventKind, ObConfigurationId, ScopedVaultId, VerificationResultId, WaterfallExecutionId,
-    WaterfallStepAction, WorkflowId,
+    BillingEventKind,
+    ObConfigurationId,
+    ScopedVaultId,
+    VerificationResultId,
+    WaterfallExecutionId,
+    WaterfallStepAction,
+    WorkflowId,
 };
-
-use super::waterfall_vendor_api::WaterfallVendorAPI;
+use std::collections::HashMap;
 
 #[tracing::instrument(skip(state))]
 pub async fn run_kyc_waterfall(
@@ -86,8 +103,9 @@ pub async fn run_kyc_waterfall(
         WaterfallVendorAPI::get_all_vendor_results(state, id, &vw.vault.e_private_key).await?;
 
     // First, check if we already have a _successful_ (not a rule-passing) vendor result for this DI.
-    // If we do, this means we crashed somewhere after the waterfall started and we're now re-running it.
-    // Eventually we might want to try re-running rules and re-running the waterfall but for now, we just exit early
+    // If we do, this means we crashed somewhere after the waterfall started and we're now re-running
+    // it. Eventually we might want to try re-running rules and re-running the waterfall but for
+    // now, we just exit early
     if let Some(already_have_success_vr) =
         choose_best_waterfall_vendor_response(existing_successful_results, &vw, &obc)
     {
@@ -185,8 +203,9 @@ pub async fn run_kyc_waterfall(
     }
 }
 
-// We evaluate the rules twice in the waterfall - once to determine waterfalling control flow and the second time
-// to determine the "best" action. For example, IdNotLocated < IdFlagged (since IdFlagged gives a tenant more info on the user)
+// We evaluate the rules twice in the waterfall - once to determine waterfalling control flow and
+// the second time to determine the "best" action. For example, IdNotLocated < IdFlagged (since
+// IdFlagged gives a tenant more info on the user)
 #[tracing::instrument(skip_all)]
 fn choose_best_waterfall_vendor_response(
     final_results: Vec<VendorResult>,
@@ -298,15 +317,16 @@ pub(super) fn eval_waterfall_rules(
             .collect_vec();
 
     // Waterfall Rules Logic
-    //    At this point (2024-05-07), the goal of the waterfall is to do a best-effort at _locating_ an individual and matching important KYC fields like SSN
+    //    At this point (2024-05-07), the goal of the waterfall is to do a best-effort at _locating_ an
+    // individual and matching important KYC fields like SSN
     //
     // To that extent, we want to waterfall in 3 cases
-    // -  1. Identity was not located
-    // -  2. Identity was not *confidently* located (i.e. id_flagged)
-    // -  3. There is an SSN mismatch
+    // - 1. Identity was not located
+    // - 2. Identity was not *confidently* located (i.e. id_flagged)
+    // - 3. There is an SSN mismatch
     //
-    //  We evaluate the rules twice in the waterfall - once to determine waterfalling control flow and the second time
-    //  to determine the "best" action.
+    //  We evaluate the rules twice in the waterfall - once to determine waterfalling control flow and
+    // the second time  to determine the "best" action.
     // For example, IdNotLocated < IdFlagged (since IdFlagged gives a tenant more info on the user)
     //   Experian -> IdFlagged => we want to continue on the Idology to try and locate
     //   Idology -> IdNotLocated

@@ -1,17 +1,23 @@
-use itertools::Itertools;
-use newtypes::{
-    fingerprint_salt::FingerprintSalt, CompositeFingerprint, DataIdentifier, DataRequest, Fingerprint,
-    PiiString, ScopedVaultId, TenantId,
-};
-use std::{clone::Clone, collections::HashMap};
-
-use crate::{
-    errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper},
-    State,
-};
-
 use super::fingerprints::Fingerprints;
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+};
+use crate::State;
+use itertools::Itertools;
+use newtypes::fingerprint_salt::FingerprintSalt;
+use newtypes::{
+    CompositeFingerprint,
+    DataIdentifier,
+    DataRequest,
+    Fingerprint,
+    PiiString,
+    ScopedVaultId,
+    TenantId,
+};
+use std::clone::Clone;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, derive_more::Deref, derive_more::DerefMut)]
 /// A parsed and validated DataRequest of DataIdentifier -> PiiString
@@ -26,7 +32,8 @@ pub struct FingerprintedDataRequest {
 impl FingerprintedDataRequest {
     /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
     /// and returns a new DataRequest with the Fingerprints populated.
-    /// This gives us type safety that fingerprints are provided to the VW utils that add data to a vault
+    /// This gives us type safety that fingerprints are provided to the VW utils that add data to a
+    /// vault
     #[tracing::instrument("FingerprintedDataRequest::build", skip_all)]
     pub async fn build(state: &State, data: DataRequest, sv_id: &ScopedVaultId) -> ApiResult<Self> {
         let sv_id = sv_id.clone();
@@ -84,7 +91,8 @@ impl FingerprintedDataRequest {
         Ok(request)
     }
 
-    /// Used in cases where we don't want to asynchronously generate fingerprints for the underlying data
+    /// Used in cases where we don't want to asynchronously generate fingerprints for the underlying
+    /// data
     pub fn manual_fingerprints(data: DataRequest, fingerprints: Vec<(FingerprintSalt, Fingerprint)>) -> Self {
         Self {
             data: data.data,

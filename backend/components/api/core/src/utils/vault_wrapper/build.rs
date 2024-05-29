@@ -1,15 +1,31 @@
-use super::{portable_view::filter_dls_for_portable_view, PieceOfData, VaultData, VaultWrapper, VwArgs};
-use crate::errors::{ApiResult, AssertionError};
+use super::portable_view::filter_dls_for_portable_view;
+use super::{
+    PieceOfData,
+    VaultData,
+    VaultWrapper,
+    VwArgs,
+};
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+};
+use db::models::data_lifetime::DataLifetime;
+use db::models::document_data::DocumentData;
+use db::models::vault::Vault;
+use db::models::vault_data::VaultData as DbVaultData;
 use db::{
-    models::{
-        data_lifetime::DataLifetime, document_data::DocumentData, vault::Vault,
-        vault_data::VaultData as DbVaultData,
-    },
-    HasLifetime, PgConn,
+    HasLifetime,
+    PgConn,
 };
 use itertools::Itertools;
-use newtypes::{DataIdentifier, DataLifetimeSeqno, ScopedVaultId, VaultId};
-use std::{collections::HashMap, marker::PhantomData};
+use newtypes::{
+    DataIdentifier,
+    DataLifetimeSeqno,
+    ScopedVaultId,
+    VaultId,
+};
+use std::collections::HashMap;
+use std::marker::PhantomData;
 
 /// Sort data by:
 /// - created_seqno if added by this tenant

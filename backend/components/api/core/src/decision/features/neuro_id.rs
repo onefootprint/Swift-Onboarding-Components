@@ -1,5 +1,11 @@
-use idv::neuro_id::response::{Model, NeuroIdAnalyticsResponse};
-use newtypes::{DecisionStatus, FootprintReasonCode as FRC};
+use idv::neuro_id::response::{
+    Model,
+    NeuroIdAnalyticsResponse,
+};
+use newtypes::{
+    DecisionStatus,
+    FootprintReasonCode as FRC,
+};
 pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
     let mut frcs = vec![];
 
@@ -114,7 +120,8 @@ impl From<Model> for NeuroDecisionRiskLevel {
             Model::DeviceReputation => NeuroDecisionRiskLevel::High,
             Model::GpsSpoofing => NeuroDecisionRiskLevel::High,
             Model::TorExitNode => NeuroDecisionRiskLevel::High,
-            Model::IpBlocklist => NeuroDecisionRiskLevel::High, // unsure if this is client or global blocklist
+            Model::IpBlocklist => NeuroDecisionRiskLevel::High, /* unsure if this is client or global */
+            // blocklist
             Model::FactoryReset => NeuroDecisionRiskLevel::Medium,
             Model::PublicProxy => NeuroDecisionRiskLevel::Medium,
             Model::Vpn => NeuroDecisionRiskLevel::Medium,
@@ -158,17 +165,18 @@ fn model_to_frc(model: &Model) -> Vec<FRC> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use idv::{
-        test_fixtures::{self, NeuroTestOpts},
-        tests::assert_have_same_elements,
+    use idv::test_fixtures::{
+        self,
+        NeuroTestOpts,
     };
+    use idv::tests::assert_have_same_elements;
     use test_case::test_case;
 
     #[test_case(true, true, true, true, vec![FRC::BehaviorHighRisk,
         FRC::DeviceHighRisk,
         FRC::BehaviorFraudRingRisk,
         FRC::BehaviorAutomaticActivity,
-        FRC::DeviceBotRisk, 
+        FRC::DeviceBotRisk,
         FRC::DeviceFactoryReset
         ])]
     #[test_case(false, false, false, false, vec![FRC::BehaviorLowRisk, FRC::DeviceLowRisk])]

@@ -1,41 +1,80 @@
-use crate::{
-    decision::{
-        state::{
-            actions::{Authorize, MakeVendorCalls},
-            kyc,
-            test_utils::{
-                mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_portablized_seqno,
-                query_risk_signals, setup_data, DocumentCollectionKind, DocumentOutcome::*,
-                ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
-                UserKind, WithQualifier,
-            },
-            MakeDecision, WorkflowActions, WorkflowKind, WorkflowWrapper,
-        },
-        tests::test_helpers::{self, FixtureData},
-    },
-    State,
+use crate::decision::state::actions::{
+    Authorize,
+    MakeVendorCalls,
 };
+use crate::decision::state::test_utils::DocumentOutcome::*;
+use crate::decision::state::test_utils::{
+    mock_idology,
+    mock_incode_doc_collection,
+    mock_webhooks,
+    query_data,
+    query_portablized_seqno,
+    query_risk_signals,
+    setup_data,
+    DocumentCollectionKind,
+    ExpectedRequiresManualReview,
+    ExpectedStatus,
+    OnboardingCompleted,
+    OnboardingStatusChanged,
+    UserKind,
+    WithQualifier,
+};
+use crate::decision::state::{
+    kyc,
+    MakeDecision,
+    WorkflowActions,
+    WorkflowKind,
+    WorkflowWrapper,
+};
+use crate::decision::tests::test_helpers::{
+    self,
+    FixtureData,
+};
+use crate::State;
 use chrono::Utc;
-use db::{
-    models::{
-        onboarding_decision::OnboardingDecision,
-        risk_signal::RiskSignal,
-        rule_set_result::RuleSetResult,
-        workflow::{NewWorkflow, NewWorkflowArgs, Workflow, Workflow as DbWorkflow},
-        workflow_event::WorkflowEvent,
-    },
-    test_helpers::assert_have_same_elements,
-    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool, MockFFClient},
-    DbResult,
+use db::models::onboarding_decision::OnboardingDecision;
+use db::models::risk_signal::RiskSignal;
+use db::models::rule_set_result::RuleSetResult;
+use db::models::workflow::{
+    NewWorkflow,
+    NewWorkflowArgs,
+    Workflow,
+    Workflow as DbWorkflow,
 };
+use db::models::workflow_event::WorkflowEvent;
+use db::test_helpers::assert_have_same_elements;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::test_db_pool::TestDbPool;
+use db::tests::MockFFClient;
+use db::DbResult;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use macros::{test_state, test_state_case};
+use macros::{
+    test_state,
+    test_state_case,
+};
 use newtypes::{
-    CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus, DocTypeRestriction,
-    DocumentCdoInfo, FootprintReasonCode, KycConfig, KycState, ObConfigurationKey, OnboardingStatus,
-    RiskSignalGroupKind, Selfie, SignalSeverity, TenantId, VendorAPI, WorkflowConfig, WorkflowFixtureResult,
-    WorkflowId, WorkflowSource, WorkflowState,
+    CollectedDataOption as CDO,
+    CountryRestriction,
+    DbActor,
+    DecisionStatus,
+    DocTypeRestriction,
+    DocumentCdoInfo,
+    FootprintReasonCode,
+    KycConfig,
+    KycState,
+    ObConfigurationKey,
+    OnboardingStatus,
+    RiskSignalGroupKind,
+    Selfie,
+    SignalSeverity,
+    TenantId,
+    VendorAPI,
+    WorkflowConfig,
+    WorkflowFixtureResult,
+    WorkflowId,
+    WorkflowSource,
+    WorkflowState,
 };
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
@@ -560,7 +599,8 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         }
     }
 
-    // this combination of retrying kyc with a failed document isn't handled yet, so we need to special case it
+    // this combination of retrying kyc with a failed document isn't handled yet, so we need to special
+    // case it
     let doc_failed = document_requested
         .map(|o| o.doc_failed_for_some_reason())
         .unwrap_or(false);

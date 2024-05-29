@@ -1,4 +1,5 @@
-use crate::experian::{cross_core::response::CrossCoreAPIResponse, ExperianCrossCoreResponse};
+use crate::experian::cross_core::response::CrossCoreAPIResponse;
+use crate::experian::ExperianCrossCoreResponse;
 use newtypes::PiiJsonValue;
 
 pub fn create_response(ssn_result_code: Option<&str>, score: Option<&str>) -> ExperianCrossCoreResponse {

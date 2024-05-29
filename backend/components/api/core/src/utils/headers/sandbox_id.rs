@@ -1,13 +1,18 @@
 use super::get_header;
 use crate::errors::ApiResult;
-use actix_web::{http::header::HeaderMap, FromRequest};
+use actix_web::http::header::HeaderMap;
+use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
-use paperclip::v2::{
-    models::{DefaultSchemaRaw, Parameter},
-    schema::Apiv2Schema,
+use paperclip::v2::models::{
+    DefaultSchemaRaw,
+    Parameter,
 };
-use serde::{Deserialize, Serialize};
+use paperclip::v2::schema::Apiv2Schema;
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Deref)]

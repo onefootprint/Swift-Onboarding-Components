@@ -1,5 +1,7 @@
 use crate::utils::db2api::DbToApi;
-use db::models::{ob_configuration::ObConfiguration, scoped_vault::AuthorizedTenant, tenant::Tenant};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::AuthorizedTenant;
+use db::models::tenant::Tenant;
 
 impl DbToApi<AuthorizedTenant> for api_wire_types::AuthorizedOrg {
     fn from_db((_, _, obc, tenant): AuthorizedTenant) -> Self {

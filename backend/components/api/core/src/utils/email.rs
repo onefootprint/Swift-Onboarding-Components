@@ -1,21 +1,34 @@
-use crate::{
-    auth::session::{user::EmailVerifySession, AuthSessionData},
-    errors::{user::UserError, ApiError, ApiErrorKind, ApiResult},
-    State,
+use super::challenge_rate_limit::RateLimit;
+use super::session::AuthSession;
+use super::sms::PhoneEmailChallengeState;
+use crate::auth::session::user::EmailVerifySession;
+use crate::auth::session::AuthSessionData;
+use crate::errors::user::UserError;
+use crate::errors::{
+    ApiError,
+    ApiErrorKind,
+    ApiResult,
 };
+use crate::State;
 use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
-use newtypes::{email::Email, ContactInfoId, PiiString, SandboxId, TenantId, VaultId};
+use newtypes::email::Email;
+use newtypes::{
+    ContactInfoId,
+    PiiString,
+    SandboxId,
+    TenantId,
+    VaultId,
+};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
+use std::str::FromStr;
 use tracing::Instrument;
-
-use super::{challenge_rate_limit::RateLimit, session::AuthSession, sms::PhoneEmailChallengeState};
 
 #[derive(Debug, Clone)]
 pub struct SendgridClient {

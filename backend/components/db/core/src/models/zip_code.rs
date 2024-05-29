@@ -1,8 +1,10 @@
+use crate::{
+    DbResult,
+    PgConn,
+};
 use db_schema::schema::zip_code;
 use diesel::prelude::*;
 use newtypes::ZipCode as NTZipCode;
-
-use crate::{DbResult, PgConn};
 
 // PG version of https://download.geonames.org/
 #[derive(Debug, Clone, Queryable)]

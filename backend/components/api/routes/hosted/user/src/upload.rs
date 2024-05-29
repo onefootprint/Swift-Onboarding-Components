@@ -1,15 +1,33 @@
-use crate::{
-    auth::user::UserAuthScope,
-    errors::{ApiError, ApiResult},
-    types::response::{EmptyResponse, ResponseData},
-    utils::{self, file_upload, vault_wrapper::VaultWrapper},
-    State,
+use crate::auth::user::UserAuthScope;
+use crate::errors::{
+    ApiError,
+    ApiResult,
 };
+use crate::types::response::{
+    EmptyResponse,
+    ResponseData,
+};
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::{
+    self,
+    file_upload,
+};
+use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
-use newtypes::{DataIdentifier, DataLifetimeSource, DocumentDiKind, WorkflowGuard};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use newtypes::{
+    DataIdentifier,
+    DataLifetimeSource,
+    DocumentDiKind,
+    WorkflowGuard,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
 

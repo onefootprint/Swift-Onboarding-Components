@@ -1,38 +1,59 @@
-use crate::{
-    decision::vendor::vendor_trait::MockVendorAPICall,
-    errors::ApiResult,
-    task::{tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask, ExecuteTask, TaskError},
-    State,
+use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+use crate::errors::ApiResult;
+use crate::task::tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask;
+use crate::task::{
+    ExecuteTask,
+    TaskError,
 };
+use crate::State;
+use db::models::decision_intent::DecisionIntent;
+use db::models::risk_signal::RiskSignal;
+use db::models::scoped_vault::ScopedVault;
+use db::models::task::Task;
+use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
+use db::models::verification_request::{
+    RequestAndMaybeResult,
+    VerificationRequest,
+};
+use db::models::verification_result::VerificationResult;
+use db::models::watchlist_check::WatchlistCheck;
+use db::tests::fixtures;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        risk_signal::RiskSignal,
-        scoped_vault::ScopedVault,
-        task::Task,
-        user_timeline::UserTimeline,
-        vault::Vault,
-        verification_request::{RequestAndMaybeResult, VerificationRequest},
-        verification_result::VerificationResult,
-        watchlist_check::WatchlistCheck,
-    },
-    tests::{fixtures, fixtures::ob_configuration::ObConfigurationOpts},
-    DbPool, DbResult,
+    DbPool,
+    DbResult,
+};
+use idv::idology::pa::{
+    IdologyPaAPIResponse,
+    IdologyPaRequest,
+};
+use idv::incode::response::OnboardingStartResponse;
+use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
+use idv::incode::{
+    IncodeAPIResult,
+    IncodeResponse,
+    IncodeStartOnboardingRequest,
 };
 use idv::{
-    idology::pa::{IdologyPaAPIResponse, IdologyPaRequest},
-    incode::{
-        response::OnboardingStartResponse, watchlist::response::UpdatedWatchlistResultResponse,
-        IncodeAPIResult, IncodeResponse, IncodeStartOnboardingRequest,
-    },
-    ParsedResponse, VendorResponse,
+    ParsedResponse,
+    VendorResponse,
 };
 use newtypes::{
-    DecisionIntentKind, EnhancedAmlOption, IdentityDataKind as IDK, OnboardingStatus, RiskSignalGroupKind,
-    ScopedVaultId, TaskId, WatchlistCheckArgs, WatchlistCheckError, WatchlistCheckStatusKind,
+    DecisionIntentKind,
+    EnhancedAmlOption,
+    IdentityDataKind as IDK,
+    OnboardingStatus,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+    TaskId,
+    WatchlistCheckArgs,
+    WatchlistCheckError,
+    WatchlistCheckStatusKind,
 };
 use std::sync::Arc;
-use webhooks::{events::WebhookEvent, MockWebhookClient};
+use webhooks::events::WebhookEvent;
+use webhooks::MockWebhookClient;
 
 mod watchlist_check_task;
 
@@ -281,7 +302,8 @@ fn expect_webhook(state: &mut State, status: WatchlistCheckStatusKind, error: Op
         })
         .times(1)
         .return_once(|_, _, _| Ok(()));
-    // allow another other kind of webhooks (ie incidental OnboardingStatusChanged/OnboardingStatusCompleted that our fixturing might cause)
+    // allow another other kind of webhooks (ie incidental
+    // OnboardingStatusChanged/OnboardingStatusCompleted that our fixturing might cause)
     mock_webhook_client
         .expect_send_event_to_tenant()
         .withf(move |_, w, _| !matches!(w, WebhookEvent::WatchlistCheckCompleted(_p)))

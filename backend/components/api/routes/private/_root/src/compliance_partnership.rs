@@ -1,17 +1,24 @@
 use crate::State;
-use actix_web::{post, web, web::Json};
-use api_core::{
-    auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
-    errors::ApiResult,
-    types::{response::ResponseData, JsonApiResponse},
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
 };
+use api_core::auth::tenant::{
+    FirmEmployeeAuthContext,
+    FirmEmployeeGuard,
+};
+use api_core::errors::ApiResult;
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
 use api_wire_types::CompliancePartnershipRequest;
 use chrono::Utc;
-use db::models::{
-    compliance_doc::NewComplianceDoc,
-    compliance_doc_request::NewComplianceDocRequest,
-    compliance_doc_template::ComplianceDocTemplate,
-    tenant_compliance_partnership::{NewTenantCompliancePartnership, TenantCompliancePartnership},
+use db::models::compliance_doc::NewComplianceDoc;
+use db::models::compliance_doc_request::NewComplianceDocRequest;
+use db::models::compliance_doc_template::ComplianceDocTemplate;
+use db::models::tenant_compliance_partnership::{
+    NewTenantCompliancePartnership,
+    TenantCompliancePartnership,
 };
 
 #[post("/private/compliance/partnership")]

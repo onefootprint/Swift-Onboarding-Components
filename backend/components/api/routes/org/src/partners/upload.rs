@@ -1,30 +1,41 @@
-use actix_multipart::Multipart;
-use api_core::{
-    errors::{ApiResult, ValidationError},
-    types::EmptyResponse,
-    utils::file_upload::handle_file_upload,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use crate::State;
+use actix_multipart::Multipart;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::types::EmptyResponse;
+use api_core::utils::file_upload::handle_file_upload;
 use chrono::Utc;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
-use db::models::{
-    compliance_doc::ComplianceDoc, compliance_doc_request::ComplianceDocRequest,
-    compliance_doc_submission::NewComplianceDocSubmission,
-    tenant_compliance_partnership::TenantCompliancePartnership,
-};
+use db::models::compliance_doc::ComplianceDoc;
+use db::models::compliance_doc_request::ComplianceDocRequest;
+use db::models::compliance_doc_submission::NewComplianceDocSubmission;
+use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
 use newtypes::{
-    ComplianceDocData, ComplianceDocId, ComplianceDocRequestId, S3Url, SealedVaultDataKey,
+    ComplianceDocData,
+    ComplianceDocId,
+    ComplianceDocRequestId,
+    S3Url,
+    SealedVaultDataKey,
     TenantCompliancePartnershipId,
 };
-use paperclip::actix::{
-    self, api_v2_operation,
-    web::{self, HttpRequest},
+use paperclip::actix::web::{
+    self,
+    HttpRequest,
 };
-
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
-
-use crate::{
-    types::{JsonApiResponse, ResponseData},
-    State,
+use paperclip::actix::{
+    self,
+    api_v2_operation,
 };
 
 const MIN_DOCUMENT_SIZE_IN_BYTES: usize = 1;

@@ -1,19 +1,34 @@
 use super::WriteableVw;
-use crate::{
-    errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::{Person, VaultWrapper},
+use crate::errors::{
+    ApiResult,
+    AssertionError,
 };
-use db::{
-    models::{
-        contact_info::{ContactInfo, VerificationLevel},
-        data_lifetime::DataLifetime,
-        scoped_vault::{ScopedVault, ScopedVaultUpdate},
-        vault::Vault,
-    },
-    TxnPgConn,
+use crate::utils::vault_wrapper::{
+    Person,
+    VaultWrapper,
 };
-use newtypes::{CollectedDataOption, DataIdentifier, DataLifetimeSeqno, ScopedVaultId, VaultId};
-use std::collections::{HashMap, HashSet};
+use db::models::contact_info::{
+    ContactInfo,
+    VerificationLevel,
+};
+use db::models::data_lifetime::DataLifetime;
+use db::models::scoped_vault::{
+    ScopedVault,
+    ScopedVaultUpdate,
+};
+use db::models::vault::Vault;
+use db::TxnPgConn;
+use newtypes::{
+    CollectedDataOption,
+    DataIdentifier,
+    DataLifetimeSeqno,
+    ScopedVaultId,
+    VaultId,
+};
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 
 struct CurrentData {
     speculative: HashSet<CollectedDataOption>,
@@ -65,8 +80,8 @@ impl WriteableVw<Person> {
     /// Marks all speculative identity data data as portable.
     /// This makes the data available for prefill to future onboardings for this vault.
     /// Intentionally consumes the UVW to prevent using a stale reference.
-    /// NOTE: this DOES NOT portablize custom data or identity documents since we haven't figured out
-    /// the portability story for those types of data.
+    /// NOTE: this DOES NOT portablize custom data or identity documents since we haven't figured
+    /// out the portability story for those types of data.
     #[tracing::instrument("WriteableVw::portablize_identity_data", skip_all)]
     pub fn portablize_identity_data(self, conn: &mut TxnPgConn) -> ApiResult<DataLifetimeSeqno> {
         // TODO only portablize data collected by the ob config rather than all data
@@ -155,10 +170,12 @@ pub(super) fn on_otp_verified(
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashSet;
-
-    use super::{decide_data_to_portablize, CurrentData};
+    use super::{
+        decide_data_to_portablize,
+        CurrentData,
+    };
     use newtypes::CollectedDataOption;
+    use std::collections::HashSet;
     use test_case::test_case;
     use CollectedDataOption::*;
 

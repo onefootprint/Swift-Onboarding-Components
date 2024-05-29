@@ -1,8 +1,14 @@
-use newtypes::{EncryptedVaultPrivateKey, Locked, SandboxId, VaultKind, VaultPublicKey};
-
-use crate::{
-    models::vault::{NewVaultArgs, Vault},
-    TxnPgConn,
+use crate::models::vault::{
+    NewVaultArgs,
+    Vault,
+};
+use crate::TxnPgConn;
+use newtypes::{
+    EncryptedVaultPrivateKey,
+    Locked,
+    SandboxId,
+    VaultKind,
+    VaultPublicKey,
 };
 
 pub fn create_person(conn: &mut TxnPgConn, is_live: bool) -> Locked<Vault> {

@@ -1,6 +1,5 @@
-use db::models::insight_event::InsightEvent;
-
 use crate::utils::db2api::DbToApi;
+use db::models::insight_event::InsightEvent;
 
 impl DbToApi<InsightEvent> for api_wire_types::InsightEvent {
     fn from_db(e: InsightEvent) -> Self {

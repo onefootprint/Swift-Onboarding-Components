@@ -1,10 +1,15 @@
-use chrono::{Datelike, NaiveDate};
+use super::ConversionError;
+use chrono::{
+    Datelike,
+    NaiveDate,
+};
 use newtypes::*;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use serde_repr::*;
 use std::fmt::Debug;
-
-use super::ConversionError;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
@@ -27,16 +32,20 @@ pub(crate) struct FlexIdRequest {
 #[allow(non_snake_case)]
 pub(crate) struct Options {
     pub watchlists: Vec<Watchlist>,
-    /// Indicates whether the request considers only OFAC records where the DOB is within the number of years that are specified in DOBRadius (reduces false positives)
+    /// Indicates whether the request considers only OFAC records where the DOB is within the number
+    /// of years that are specified in DOBRadius (reduces false positives)
     #[serde(rename = "UseDOBFilter")]
     pub use_dob_filter: LBool,
-    /// Integer value for the number of years to consider for OFAC matches when UseDOBFilter is enabled. The default value is 2.
+    /// Integer value for the number of years to consider for OFAC matches when UseDOBFilter is
+    /// enabled. The default value is 2.
     #[serde(rename = "DOBRadius")]
     pub dob_radius: i32,
-    /// Indicates whether the request considers more than one SSN for an identity unacceptable and reduces the CVI to a 10
+    /// Indicates whether the request considers more than one SSN for an identity unacceptable and
+    /// reduces the CVI to a 10
     #[serde(rename = "IncludeMSOverride")]
     pub include_ms_override: LBool,
-    /// Indicates whether the request considers a PO Box address unacceptable under your CIP rules, and reduces the CVI to a 10
+    /// Indicates whether the request considers a PO Box address unacceptable under your CIP rules,
+    /// and reduces the CVI to a 10
     #[serde(rename = "PoBoxCompliance")]
     pub po_box_compliance: LBool,
     pub require_exact_match: RequireExactMatch,
@@ -52,9 +61,12 @@ pub(crate) struct Options {
     #[serde(rename = "DOBMatch")]
     pub dob_match: DobMatch,
     pub include_models: IncludeModels,
-    /// Integer value for the number of days since the input identity was last seen active at the input address to consider the address verified The default value is transaction date plus 365 days.
+    /// Integer value for the number of days since the input identity was last seen active at the
+    /// input address to consider the address verified The default value is transaction date plus
+    /// 365 days.
     pub last_seen_threshold: i32,
-    /// Indicates whether the request considers multiple identities for an input SSN unacceptable and reduces the CVI to a 10
+    /// Indicates whether the request considers multiple identities for an input SSN unacceptable
+    /// and reduces the CVI to a 10
     #[serde(rename = "IncludeMIOverride")]
     pub include_mi_override: LBool,
     /// Indicates whether the response returns the verified SSN data
@@ -89,7 +101,8 @@ pub(crate) struct RequireExactMatch {
     pub last_name: LBool,
     /// Indicates whether the request requires an exact match on first name
     pub first_name: LBool,
-    /// Indicates whether the request requires an exact match on first name, but considers a valid nickname to be an exact match
+    /// Indicates whether the request requires an exact match on first name, but considers a valid
+    /// nickname to be an exact match
     pub first_name_allow_nickname: LBool,
     /// Indicates whether the request requires an exact match on address
     pub address: LBool,
@@ -107,14 +120,16 @@ pub(crate) struct RequireExactMatch {
 #[allow(non_snake_case)]
 pub(crate) struct DobMatch {
     pub match_type: DobMatchType,
-    /// Integer value for the number of years to consider, if you select RadiusCCYY. Possible values: 0–3. Values that are greater than three are capped at three.
+    /// Integer value for the number of years to consider, if you select RadiusCCYY. Possible
+    /// values: 0–3. Values that are greater than three are capped at three.
     pub match_year_radius: i32,
 }
 
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DobMatchType {
-    FuzzyCCYYMMDD, // default, uses "mis key" fuzzy logic and considers Day as well (unlike the below option)
+    FuzzyCCYYMMDD, /* default, uses "mis key" fuzzy logic and considers Day as well (unlike the below
+                    * option) */
     FuzzyCCYYMM,
     RadiusCCYY,
     ExactCCYYMMDD,
@@ -168,14 +183,18 @@ pub(crate) struct CviCalculationOptions {
     /// Indicates whether verification of the input DOB is considered in the CVI calculation
     #[serde(rename = "IncludeDOB")]
     pub include_dob: LBool,
-    /// Indicates whether verification of the input driver license is considered in the CVI calculation
+    /// Indicates whether verification of the input driver license is considered in the CVI
+    /// calculation
     pub include_driver_license: LBool,
-    /// Indicates whether to disable the use of customer network information in the verification and the calculation of the CVI
+    /// Indicates whether to disable the use of customer network information in the verification and
+    /// the calculation of the CVI
     pub disable_customer_network_option: LBool,
-    /// Indicates whether to disable the invalid SSN score override to allow the input ITIN to return the calculated CVI score
+    /// Indicates whether to disable the invalid SSN score override to allow the input ITIN to
+    /// return the calculated CVI score
     #[serde(rename = "IncludeITIN")]
     pub include_itin: LBool,
-    /// Indicates whether to include a verified element compliance cap on the CVI calculation when IncludeDOB or IncludeDriverLicense is set to 1
+    /// Indicates whether to include a verified element compliance cap on the CVI calculation when
+    /// IncludeDOB or IncludeDriverLicense is set to 1
     pub include_compliance_cap: LBool,
 }
 
@@ -290,21 +309,27 @@ pub enum WatchlistKind {
     ALLV4,
     /// Australia Dept of Foreign Affairs and Trade*^
     ADFA,
-    /// HM Treasury Sanctions (formerly known as Her Majesty's Treasury's Consolidated List of Financial Sanctions Targets)
+    /// HM Treasury Sanctions (formerly known as Her Majesty's Treasury's Consolidated List of
+    /// Financial Sanctions Targets)
     BES,
     /// HM Treasury List
     UK,
-    /// Bureau of Industry and Security (formerly known as US Bureau of Industry and Security - Denied Entity List, US Bureau of Industry and Security - Denied Persons List, and US Bureau of Industry and Security - Unverified Entity List)
+    /// Bureau of Industry and Security (formerly known as US Bureau of Industry and Security -
+    /// Denied Entity List, US Bureau of Industry and Security - Denied Persons List, and US Bureau
+    /// of Industry and Security - Unverified Entity List)
     BIS,
-    /// Commodity Futures Trading Commission Sanctions (formerly known as Commodity and Futures Trading Commission List of Regulatory and Self-Regulatory and Authorities)
+    /// Commodity Futures Trading Commission Sanctions (formerly known as Commodity and Futures
+    /// Trading Commission List of Regulatory and Self-Regulatory and Authorities)
     CFTC,
     /// DTC Debarred Parties
     DTC,
-    /// EU Consolidated List (formerly known as European Union Designated Terrorist Groups + Individuals)
+    /// EU Consolidated List (formerly known as European Union Designated Terrorist Groups +
+    /// Individuals)
     EUDT,
     /// Foreign Agents Registration
     FAR,
-    /// FATF Financial Action Task Force*^ (formerly known as FATF Financial Action Task Force, Deficient Jurisdictions - Countries)
+    /// FATF Financial Action Task Force*^ (formerly known as FATF Financial Action Task Force,
+    /// Deficient Jurisdictions - Countries)
     FATF,
     /// FBI Top Ten Most Wanted
     FBI,
@@ -320,13 +345,16 @@ pub enum WatchlistKind {
     HKMA,
     /// Monetary Authority of Singapore*^
     MASI,
-    /// Unauthorized Banks (formerly known as Office of the Comptroller of the Currency Alerts - Unauthorized Banks)
+    /// Unauthorized Banks (formerly known as Office of the Comptroller of the Currency Alerts -
+    /// Unauthorized Banks)
     OCC,
-    /// OFAC Non-SDN Entities (formerly OFAC - Palestinian Legislative Council), OFAC Sanctions, OFAC SDN
+    /// OFAC Non-SDN Entities (formerly OFAC - Palestinian Legislative Council), OFAC Sanctions,
+    /// OFAC SDN
     OFAC,
     /// Offshore Financial Centers*^
     OFFC,
-    /// OSFI Consolidated List (formerly known as OSFI - Canada Individuals), OSFI Country (formerly known as OSFI - Canada Entities)
+    /// OSFI Consolidated List (formerly known as OSFI - Canada Individuals), OSFI Country (formerly
+    /// known as OSFI - Canada Entities)
     OSFI,
     /// Chiefs of State and Foreign Cabinet Members
     PEP,
@@ -380,8 +408,9 @@ impl LexisRequest {
             None
         };
 
-        // Only send phone if we have a valid 10 digit phone number and send it as such (without the country code)
-        // TODO: should we just not send phone at all if its a non-US phone? Need to answer this empiracally from performance we see with lexis on intl nums
+        // Only send phone if we have a valid 10 digit phone number and send it as such (without the country
+        // code) TODO: should we just not send phone at all if its a non-US phone? Need to answer
+        // this empiracally from performance we see with lexis on intl nums
         let phone_number = phone_number
             .and_then(|pn| PhoneNumber::parse(pn).ok())
             .map(|pn| pn.subscriber_number())
@@ -397,9 +426,20 @@ impl LexisRequest {
             flex_id_request: FlexIdRequest {
                 user: User {
                     reference_code: tenant_identifier,
-                    // TODO: check with Lexis if we should use 5 or mb 6 here for cases that are not stricly Bifrost
-                    glb_purpose: String::from("1"), // Transactions Authorized by Consumer—As necessary to effect, administer, or enforce a transaction requested or authorized by the consumer
-                    dl_purpose: String::from("3"), // Use in the Normal Course of Business—For use in the normal course of business but only to verify the accuracy of personal information submitted by the individual to the business; and if the submitted information is incorrect, to obtain the correct information, but only for the purposes of preventing fraud by, pursuing legal remedies against, or recovering on a debt or security interest against, the individual.
+                    // TODO: check with Lexis if we should use 5 or mb 6 here for cases that are not stricly
+                    // Bifrost
+                    glb_purpose: String::from("1"), /* Transactions Authorized by Consumer—As necessary to
+                                                     * effect, administer, or enforce a transaction
+                                                     * requested or authorized by the consumer */
+                    dl_purpose: String::from("3"), /* Use in the Normal Course of Business—For use in the
+                                                    * normal course of business but only to verify the
+                                                    * accuracy of personal information submitted by the
+                                                    * individual to the business; and if the submitted
+                                                    * information is incorrect, to obtain the correct
+                                                    * information, but only for the purposes of preventing
+                                                    * fraud by, pursuing legal remedies against, or
+                                                    * recovering on a debt or security interest against,
+                                                    * the individual. */
                     query_id: verification_request_id
                         .map(|v| v.to_string())
                         .unwrap_or(Uuid::new_v4().to_string()),
@@ -414,12 +454,17 @@ impl LexisRequest {
                 },
                 options: Options {
                     watchlists: vec![Watchlist {
-                        watchlist: WatchlistKind::ALLV4, // always ask for all available watchlists to be checked
+                        watchlist: WatchlistKind::ALLV4, /* always ask for all available watchlists to be
+                                                          * checked */
                     }],
-                    use_dob_filter: LBool::One, // by default optimize for precision a bit more since this is just best case "non-enhanced" aml checks
+                    use_dob_filter: LBool::One, /* by default optimize for precision a bit more since this
+                                                 * is just best case "non-enhanced" aml checks */
                     dob_radius: 2,
-                    include_ms_override: LBool::Zero, // for now, don't let multiple SSN's impact the CVI score. We'll just parse that reason code separately and not let it impact the score
-                    po_box_compliance: LBool::Zero, // for now, don't let this impact CVI score and we'll just parse that reason code separately
+                    include_ms_override: LBool::Zero, /* for now, don't let multiple SSN's impact the CVI
+                                                       * score. We'll just parse that reason code
+                                                       * separately and not let it impact the score */
+                    po_box_compliance: LBool::Zero, /* for now, don't let this impact CVI score and we'll
+                                                     * just parse that reason code separately */
                     require_exact_match: RequireExactMatch {
                         last_name: LBool::Zero,
                         first_name: LBool::Zero,
@@ -444,12 +489,14 @@ impl LexisRequest {
                         model_requests: vec![],
                     },
                     last_seen_threshold: 365, // Lexis's default but we can tweak later if we want
-                    include_mi_override: LBool::Zero, // probably? don't let this influence score for now and give us more flexbility to just use as a risk signal
+                    include_mi_override: LBool::Zero, /* probably? don't let this influence score for now
+                                               * and give us more flexbility to just use as a risk
+                                               * signal */
                     include_ssn_verification: LBool::Zero, // Don't have privelages for this :(
                     cvi_calculation_options: Some(CviCalculationOptions {
                         include_dob: LBool::One,
                         include_driver_license: LBool::Zero,
-                        disable_customer_network_option: LBool::Zero, // TODO: might need to fiddle with this and see how it impacts scores
+                        disable_customer_network_option: LBool::Zero, /* TODO: might need to fiddle with this and see how it impacts scores */
                         include_itin: LBool::One,
                         include_compliance_cap: LBool::Zero,
                     }),

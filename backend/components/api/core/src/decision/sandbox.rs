@@ -1,31 +1,43 @@
-use std::collections::HashMap;
-
+use super::onboarding::Decision;
+use super::utils::FixtureDecision;
+use super::vendor::vendor_result::VendorResult;
+use super::vendor::{
+    self,
+};
+use super::Error;
 use crate::errors::ApiResult;
-use db::{
-    models::{
-        decision_intent::DecisionIntent, ob_configuration::ObConfiguration, vault::Vault,
-        verification_request::VerificationRequest, verification_result::VerificationResult,
-        workflow::Workflow,
-    },
-    DbPool,
+use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::vault::Vault;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::models::workflow::Workflow;
+use db::DbPool;
+use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::{
+    ParsedResponse,
+    VendorResponse,
 };
-use idv::{incode::watchlist::response::WatchlistResultResponse, ParsedResponse, VendorResponse};
 use newtypes::{
-    CipKind, DecisionIntentId, DecisionStatus, FootprintReasonCode, RuleAction, ScopedVaultId,
-    SignalSeverity, VaultKind, VaultPublicKey, VendorAPI,
+    CipKind,
+    DecisionIntentId,
+    DecisionStatus,
+    FootprintReasonCode,
+    RuleAction,
+    ScopedVaultId,
+    SignalSeverity,
+    VaultKind,
+    VaultPublicKey,
+    VendorAPI,
 };
-use rand::{seq::SliceRandom, Rng};
+use rand::seq::SliceRandom;
+use rand::Rng;
+use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
-use super::{
-    onboarding::Decision,
-    utils::FixtureDecision,
-    vendor::{self, vendor_result::VendorResult},
-    Error,
-};
-
 // In future, this could take in FixtureDecision and determine the fixture vendor response to use.
-// But its a little tricky because if the sandbox selection is "Review" or "Stepup" thats a function of rules not just the individual vendor responses
+// But its a little tricky because if the sandbox selection is "Review" or "Stepup" thats a function
+// of rules not just the individual vendor responses
 fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> ApiResult<VendorResponse> {
     match vendor_api {
         VendorAPI::IdologyExpectId => {
@@ -103,7 +115,8 @@ pub fn get_fixture_kyc_reason_codes(
     obc: &ObConfiguration,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
     match obc.cip_kind {
-        // We produce specific fixtures for Alpaca to better simulate the 3 canonical use cases that Alpaca always asks for
+        // We produce specific fixtures for Alpaca to better simulate the 3 canonical use cases that Alpaca
+        // always asks for
         Some(CipKind::Alpaca) => get_fixture_reason_codes_alpaca(fixture_decision),
         // For non-alpaca cases, we just produce an assortment of reasonable random risk signals
         Some(CipKind::Apex) | None => {
@@ -133,7 +146,8 @@ pub fn make_random_kyc_reason_codes_for_fixture_decision(
         (DecisionStatus::Fail, true) => {
             choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3)
         }
-        // TODO: probably need to pass in Alpaca specific context here to get reason codes that make sense for that workflow
+        // TODO: probably need to pass in Alpaca specific context here to get reason codes that make sense for
+        // that workflow
         (DecisionStatus::StepUp, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3),
         // Approved
         (DecisionStatus::Pass, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4),
@@ -142,9 +156,10 @@ pub fn make_random_kyc_reason_codes_for_fixture_decision(
 
 // For AlpacaKYC workflow, we want fixtures to be:
 // #pass => KYC passes, no WL/AM hits (KYC reason_codes should just be strong matches)
-// #manualreview => KYC passes but then there is a watchlist hit (KYC reason_codes should be strong matches)
-// #stepup => KYC fails and there is no watchlist hit (KYC reason_code should be name/dob/address mismatch)
-// #fail => KYC hard fails (KYC reason_code should be SSN does not match or something else catastrophic)
+// #manualreview => KYC passes but then there is a watchlist hit (KYC reason_codes should be strong
+// matches) #stepup => KYC fails and there is no watchlist hit (KYC reason_code should be
+// name/dob/address mismatch) #fail => KYC hard fails (KYC reason_code should be SSN does not match
+// or something else catastrophic)
 pub fn get_fixture_reason_codes_alpaca(
     fixture_decision: FixtureDecision,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
@@ -243,7 +258,8 @@ pub fn get_fixture_aml_reason_codes(
                 _ => vec![],
             }
         }
-        // For non-alpaca cases, we don't really currently provide a way to fixture watchlist hits in particular
+        // For non-alpaca cases, we don't really currently provide a way to fixture watchlist hits in
+        // particular
         _ => {
             vec![]
         }
@@ -308,10 +324,16 @@ pub async fn save_fixture_incode_watchlist_result(
 
 #[cfg(test)]
 mod tests {
-    use newtypes::{SignalScope, SignalSeverity, VaultKind};
+    use super::{
+        build_reason_code_map,
+        choose_random_reason_codes,
+    };
+    use newtypes::{
+        SignalScope,
+        SignalSeverity,
+        VaultKind,
+    };
     use test_case::test_case;
-
-    use super::{build_reason_code_map, choose_random_reason_codes};
 
     #[test_case(3, SignalSeverity::High => 3)]
     #[test_case(10, SignalSeverity::Info => 10)]

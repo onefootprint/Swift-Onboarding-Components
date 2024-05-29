@@ -1,16 +1,24 @@
-use std::pin::Pin;
-
-use actix_web::{dev::Payload, web::Json, FromRequest, HttpRequest};
-use derive_more::{Deref, DerefMut};
-use futures_util::Future;
-use paperclip::{
-    actix::OperationModifier,
-    v2::{
-        models::{DefaultOperationRaw, Either, Parameter, ParameterIn},
-        schema::Apiv2Schema,
-    },
+use actix_web::dev::Payload;
+use actix_web::web::Json;
+use actix_web::{
+    FromRequest,
+    HttpRequest,
 };
+use derive_more::{
+    Deref,
+    DerefMut,
+};
+use futures_util::Future;
+use paperclip::actix::OperationModifier;
+use paperclip::v2::models::{
+    DefaultOperationRaw,
+    Either,
+    Parameter,
+    ParameterIn,
+};
+use paperclip::v2::schema::Apiv2Schema;
 use serde::de::DeserializeOwned;
+use std::pin::Pin;
 
 #[derive(Debug, Deref, DerefMut)]
 /// Optionally extracts json-serialized `T` from the request body.

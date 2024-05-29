@@ -1,25 +1,45 @@
-use crate::{
-    enclave_client::EnclaveClient,
-    errors::{business::BusinessError, ApiError, ApiResult},
-    utils::vault_wrapper::{Business, DecryptedBusinessOwners, Person, TenantVw, VaultWrapper, VwArgs},
-    State,
+use crate::enclave_client::EnclaveClient;
+use crate::errors::business::BusinessError;
+use crate::errors::{
+    ApiError,
+    ApiResult,
 };
-
-use db::{
-    models::{
-        document::{Document, DocumentImageArgs},
-        document_upload::DocumentUpload,
-        scoped_vault::ScopedVault,
-        verification_request::VerificationRequest,
-    },
-    DbPool,
+use crate::utils::vault_wrapper::{
+    Business,
+    DecryptedBusinessOwners,
+    Person,
+    TenantVw,
+    VaultWrapper,
+    VwArgs,
 };
+use crate::State;
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
+};
+use db::models::document_upload::DocumentUpload;
+use db::models::scoped_vault::ScopedVault;
+use db::models::verification_request::VerificationRequest;
+use db::DbPool;
+use newtypes::email::Email;
 use newtypes::{
-    email::Email, BoData, BusinessDataFromVault, BusinessDataKind as BDK, DataIdentifier, DocVData,
-    DocumentId, DocumentSide, EncryptedVaultPrivateKey, IdentityDataKind as IDK, IdvData, PhoneNumber,
-    PiiBytes, PiiString, ScopedVaultId,
+    BoData,
+    BusinessDataFromVault,
+    BusinessDataKind as BDK,
+    DataIdentifier,
+    DocVData,
+    DocumentId,
+    DocumentSide,
+    EncryptedVaultPrivateKey,
+    IdentityDataKind as IDK,
+    IdvData,
+    PhoneNumber,
+    PiiBytes,
+    PiiString,
+    ScopedVaultId,
 };
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
+use std::str::FromStr;
 use strum::IntoEnumIterator;
 
 #[tracing::instrument(skip_all)]
@@ -164,7 +184,8 @@ pub async fn build_business_data_from_verification_request(
         })
         .await?;
 
-    // Get FirstName + LastName for BO's. For Single-KYC, we get this from the JSON VaultData. For Multi_KYC, we get this from each BO's Vault
+    // Get FirstName + LastName for BO's. For Single-KYC, we get this from the JSON VaultData. For
+    // Multi_KYC, we get this from each BO's Vault
     let dbo = bvw
         .decrypt_business_owners(db_pool, enclave_client, &sv.tenant_id)
         .await?;
@@ -262,22 +283,24 @@ pub async fn build_business_data_from_verification_request(
 mod tests {
     use super::build_idv_data_from_verification_request;
     use crate::State;
-    use db::{models::verification_request::VerificationRequest, tests::test_db_pool::TestDbPool};
+    use db::models::verification_request::VerificationRequest;
+    use db::tests::test_db_pool::TestDbPool;
     use macros::test_state;
     use newtypes::VerificationRequestId;
 
     // Helper to debug IdvData being built from verification request while testing bifrost flows
     //
-    // Place a breakpoint on the line indicated below to view the struct (can't println since we scrub prints)
-    // #[ignore]
+    // Place a breakpoint on the line indicated below to view the struct (can't println since we
+    // scrub prints) #[ignore]
     // Manually commented out since #[test_state] doesn't support #[ignore] currently
     // #[test_state]
     // async fn debug_build_idv_data_from_verification_request(state: &mut State) {
     //     let vr = state.db_pool.db_query(move |conn| {
-    //         VerificationRequest::get(conn, VerificationRequestId::from("your vreq here".to_string())).unwrap()
-    //     }).await.unwrap();
+    //         VerificationRequest::get(conn, VerificationRequestId::from("your vreq
+    // here".to_string())).unwrap()     }).await.unwrap();
 
-    //     let b = build_idv_data_from_verification_request(&state.db_pool, &state.enclave_client, vr).await.unwrap();
+    //     let b = build_idv_data_from_verification_request(&state.db_pool, &state.enclave_client,
+    // vr).await.unwrap();
 
     //     // place breakpoint on the line below this
     //     assert!(b.first_name.is_none())

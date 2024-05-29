@@ -1,5 +1,8 @@
 use crate::*;
-use newtypes::{PiiJsonValue, PiiString};
+use newtypes::{
+    PiiJsonValue,
+    PiiString,
+};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct AmlDetail {

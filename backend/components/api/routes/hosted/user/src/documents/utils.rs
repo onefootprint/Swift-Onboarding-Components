@@ -1,11 +1,10 @@
 use api_core::errors::ApiResult;
-use db::{
-    models::{
-        document::{Document, DocumentImageArgs},
-        document_upload::DocumentUpload,
-    },
-    TxnPgConn,
+use db::models::document::{
+    Document,
+    DocumentImageArgs,
 };
+use db::models::document_upload::DocumentUpload;
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::DocumentSide;
 

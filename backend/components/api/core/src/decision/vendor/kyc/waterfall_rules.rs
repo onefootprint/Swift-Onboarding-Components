@@ -1,9 +1,17 @@
-use newtypes::{BooleanOperator, FootprintReasonCode, RuleExpression, RuleExpressionCondition};
+use crate::decision::rule_engine::eval::{
+    HasRule,
+    IsActionAllowed,
+    RuleEvalConfig,
+};
+use newtypes::{
+    BooleanOperator,
+    FootprintReasonCode,
+    RuleExpression,
+    RuleExpressionCondition,
+};
 use serde::Serialize;
 use serde_with::SerializeDisplay;
 use strum::Display;
-
-use crate::decision::rule_engine::eval::{HasRule, IsActionAllowed, RuleEvalConfig};
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, SerializeDisplay, Display)]
 #[strum(serialize_all = "snake_case")]
@@ -72,9 +80,8 @@ pub(super) fn waterfall_rules() -> Vec<WaterfallRule> {
 
 #[cfg(test)]
 mod tests {
-    use std::cmp::Ordering;
-
     use super::*;
+    use std::cmp::Ordering;
     use test_case::test_case;
     #[test_case(WaterfallRuleAction::IdFlagged, WaterfallRuleAction::RuleTriggered => Ordering::Less)]
     fn test_cmp_waterfall_rule_action(s1: WaterfallRuleAction, s2: WaterfallRuleAction) -> Ordering {

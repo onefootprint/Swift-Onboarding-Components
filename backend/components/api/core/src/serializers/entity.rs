@@ -1,21 +1,31 @@
-use crate::{
-    auth::{tenant::TenantAuth, CanDecrypt, IsGuardMet},
-    utils::{
-        db2api::DbToApi,
-        vault_wrapper::{Any, DecryptedData, TenantVw},
-    },
+use crate::auth::tenant::TenantAuth;
+use crate::auth::{
+    CanDecrypt,
+    IsGuardMet,
 };
-use api_wire_types::{DataAttributeKind, EntityAttribute, EntityStatus};
-use chrono::{Duration, Utc};
-use db::{
-    models::{
-        insight_event::InsightEvent,
-        scoped_vault::{ScopedVault, SerializableEntity},
-        vault::Vault,
-        workflow::Workflow,
-    },
-    VaultedData,
+use crate::utils::db2api::DbToApi;
+use crate::utils::vault_wrapper::{
+    Any,
+    DecryptedData,
+    TenantVw,
 };
+use api_wire_types::{
+    DataAttributeKind,
+    EntityAttribute,
+    EntityStatus,
+};
+use chrono::{
+    Duration,
+    Utc,
+};
+use db::models::insight_event::InsightEvent;
+use db::models::scoped_vault::{
+    ScopedVault,
+    SerializableEntity,
+};
+use db::models::vault::Vault;
+use db::models::workflow::Workflow;
+use db::VaultedData;
 use itertools::Itertools;
 use newtypes::OnboardingStatus;
 use std::collections::HashMap;
@@ -43,7 +53,8 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             .filter(|a| a.is_decryptable)
             .map(|a| a.identifier.clone())
             .collect();
-        use newtypes::{DataIdentifier::Id, IdentityDataKind as IDK};
+        use newtypes::DataIdentifier::Id;
+        use newtypes::IdentityDataKind as IDK;
         let decrypted_attributes = data
             .iter()
             // Don't show the decrypted first name value even though we have it

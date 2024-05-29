@@ -1,15 +1,20 @@
-use crate::{auth::user::UserIdentifier, errors::ApiResult};
-use db::{
-    models::{data_lifetime::DataLifetime, vault::Vault},
-    PgConn,
+use crate::auth::user::UserIdentifier;
+use crate::errors::ApiResult;
+use db::models::data_lifetime::DataLifetime;
+use db::models::vault::Vault;
+use db::PgConn;
+use newtypes::{
+    DataLifetimeSeqno,
+    ScopedVaultId,
+    VaultId,
 };
-use newtypes::{DataLifetimeSeqno, ScopedVaultId, VaultId};
 
 /// There are a lot of places we build VWs, under varying circumstances. Things to consider:
-///   - Portable and Speculative data:
-///       Does the flow need access to both portable AND speculative data?
-///   - If the flow needs access to portable data, has the requester been granted access to see the portable data?
-///     For example, a tenant shouldn't see portable data they didn't ask to collect (via an authorized OB config)
+///   - Portable and Speculative data: Does the flow need access to both portable AND speculative
+///     data?
+///   - If the flow needs access to portable data, has the requester been granted access to see the
+///     portable data? For example, a tenant shouldn't see portable data they didn't ask to collect
+///     (via an authorized OB config)
 ///
 /// The VwArgs variants below are used to construct a VaultWrapper specific to the use case.
 pub enum VwArgs<'a> {

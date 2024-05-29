@@ -1,18 +1,34 @@
-use chrono::{DateTime, Utc};
-use diesel::{
-    pg::Pg,
-    prelude::*,
-    sql_types::{self, Int8},
+use super::fingerprint::Fingerprint;
+use crate::{
+    nextval,
+    DbError,
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::data_lifetime::{
+    self,
+};
+use diesel::pg::Pg;
+use diesel::prelude::*;
+use diesel::sql_types::{
+    self,
+    Int8,
 };
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, DataLifetimeId, DataLifetimeSeqno, DataLifetimeSource, DbActor, ScopedVaultId, VaultId,
+    DataIdentifier,
+    DataLifetimeId,
+    DataLifetimeSeqno,
+    DataLifetimeSource,
+    DbActor,
+    ScopedVaultId,
+    VaultId,
 };
-
-use crate::{nextval, DbError, DbResult, PgConn, TxnPgConn};
-use db_schema::schema::data_lifetime::{self};
-
-use super::fingerprint::Fingerprint;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = data_lifetime)]
@@ -25,28 +41,34 @@ use super::fingerprint::Fingerprint;
 ///
 /// Ownership attributes:
 /// - `vault_id`: The user to which this piece of data belongs
-/// - `scoped_vault_id`: The scoped_vault that represents during onboarding to which tenant this data
-///   was added
+/// - `scoped_vault_id`: The scoped_vault that represents during onboarding to which tenant this
+///   data was added
 ///
 /// Lifecycle attributes:
 /// - `created_at`/`created_seqno`: When the data was created
 /// - `portablized_at`/`portablized_seqno`: When the data was committed and made portable. This is
-///   usually after is has been verified with data vendors. BUT, it is not synonymous with verified -
-///   we also make contact info like phone/email portable as soon as it is added
+///   usually after is has been verified with data vendors. BUT, it is not synonymous with verified
+///   - we also make contact info like phone/email portable as soon as it is added
 /// - `deactivated_at`/`deactivated_seqno`: When the data was archived and is no longer active. This
 ///   may happen if a piece of data is replaced with newer data.
 ///
 /// Access:
-/// In the case of portable data, DataLifetimes don't help in all cases with checking if the Tenant ever _requested_ access to that data
-/// during an onboarding (via a OB configuration). Since DataLifetimes do not speak in terms of accessing specific data attributes (`kind`s) previously collected,
-/// (which is a unique/distinct case from ownership) we associate each DataLifetime with a `kind`, which helps when retrieving data.
+/// In the case of portable data, DataLifetimes don't help in all cases with checking if the Tenant
+/// ever _requested_ access to that data during an onboarding (via a OB configuration). Since
+/// DataLifetimes do not speak in terms of accessing specific data attributes (`kind`s) previously
+/// collected, (which is a unique/distinct case from ownership) we associate each DataLifetime with
+/// a `kind`, which helps when retrieving data.
 ///
 /// For example:
-///   - Tenant A onboards User U, requesting data_lifetime_kind_1 and data_lifetime_kind_2 and both kinds become portable
-///   - Tenant B onboards User U, requesting *just* data_lifetime_kind_1. data_lifetime_kind_2 is portable, but Tenant B should not know of it's existence (or read it's value).
-///   As currently defined in the DataLifetime model, data_lifetime_kind_1 and data_lifetime_kind_2 are owned by U's user_vault, and Tenant A's scoped user for User U.
-///   There is no way in the DataLifetime model to keep an "ACL" with respect to Tenant B visibility of User U's portable data.
-///   Hence, we control this at the UVW level, where we can materialize individual data kinds based on lifetimes and check ACL based on ob configs
+///   - Tenant A onboards User U, requesting data_lifetime_kind_1 and data_lifetime_kind_2 and both
+///     kinds become portable
+///   - Tenant B onboards User U, requesting *just* data_lifetime_kind_1. data_lifetime_kind_2 is
+///     portable, but Tenant B should not know of it's existence (or read it's value).
+///   As currently defined in the DataLifetime model, data_lifetime_kind_1 and data_lifetime_kind_2
+/// are owned by U's user_vault, and Tenant A's scoped user for User U.   There is no way in the
+/// DataLifetime model to keep an "ACL" with respect to Tenant B visibility of User U's portable
+/// data.   Hence, we control this at the UVW level, where we can materialize individual data kinds
+/// based on lifetimes and check ACL based on ob configs
 ///
 /// Notably:
 /// Each lifecycle attribute is represented both with a human-readable timestamp AND with
@@ -142,7 +164,8 @@ impl DataLifetime {
         Ok(result.last_value)
     }
 
-    /// Creates a new DataLifetime rows with the same created_seqno and created_at for each kind in `kinds`
+    /// Creates a new DataLifetime rows with the same created_seqno and created_at for each kind in
+    /// `kinds`
     #[tracing::instrument("DataLifetime::bulk_create", skip_all)]
     pub(crate) fn bulk_create(
         conn: &mut TxnPgConn,
@@ -250,8 +273,8 @@ impl DataLifetime {
         Self::_bulk_deactivate(conn, filter, seqno)
     }
 
-    /// Deactivates the old DataLifetimes with the provided kinds associated with this (user, tenant).
-    /// This should only be used when replacing old data with new
+    /// Deactivates the old DataLifetimes with the provided kinds associated with this (user,
+    /// tenant). This should only be used when replacing old data with new
     #[tracing::instrument("DataLifetime::bulk_deactivate_kinds", skip_all)]
     pub fn bulk_deactivate_kinds(
         conn: &mut TxnPgConn,
@@ -290,7 +313,8 @@ impl DataLifetime {
     }
 
     /// Get the list of currently active DataLifetimeIds for the provided scoped_vault_id at a
-    /// given seqno. This allows reconstructing a snapshot of what a user vault looked like at a time.
+    /// given seqno. This allows reconstructing a snapshot of what a user vault looked like at a
+    /// time.
     #[tracing::instrument("DataLifetime::bulk_get_active_at", skip_all)]
     pub fn bulk_get_active_at(
         conn: &mut PgConn,
@@ -313,7 +337,8 @@ impl DataLifetime {
     }
 
     /// Get the list of portable DataLifetimes for the provided vault_id at the provided seqno.
-    /// This gets the view used in my1fp and used to prefill portable data during one-click onboardings
+    /// This gets the view used in my1fp and used to prefill portable data during one-click
+    /// onboardings
     #[tracing::instrument("DataLifetime::get_portable_at", skip_all)]
     pub fn get_portable_at(
         conn: &mut PgConn,

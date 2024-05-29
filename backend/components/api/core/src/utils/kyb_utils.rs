@@ -1,25 +1,44 @@
-use std::{collections::HashMap, pin::Pin};
-
-use crate::{
-    auth::session::ob_config::BoSession,
-    config::LinkKind,
-    decision::state::{Authorize, BoKycCompleted, WorkflowActions, WorkflowWrapper},
-    errors::{business::BusinessError, onboarding::OnboardingError, ApiResult},
-    utils::{
-        email::BoInviteEmailInfo,
-        session::AuthSession,
-        vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper},
-    },
-    State,
+use crate::auth::session::ob_config::BoSession;
+use crate::config::LinkKind;
+use crate::decision::state::{
+    Authorize,
+    BoKycCompleted,
+    WorkflowActions,
+    WorkflowWrapper,
 };
-use db::models::{
-    business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant, workflow::Workflow,
+use crate::errors::business::BusinessError;
+use crate::errors::onboarding::OnboardingError;
+use crate::errors::ApiResult;
+use crate::utils::email::BoInviteEmailInfo;
+use crate::utils::session::AuthSession;
+use crate::utils::vault_wrapper::{
+    Business,
+    DecryptedBusinessOwners,
+    TenantVw,
+    VaultWrapper,
 };
+use crate::State;
+use db::models::business_owner::BusinessOwner;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::tenant::Tenant;
+use db::models::workflow::Workflow;
 use itertools::Itertools;
+use newtypes::email::Email;
+use newtypes::sms_message::SmsMessage;
 use newtypes::{
-    email::Email, sms_message::SmsMessage, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, KybState,
-    KycedBusinessOwnerData, NtResult, OnboardingStatus, PhoneNumber, PiiString, WorkflowState,
+    BoLinkId,
+    BusinessDataKind as BDK,
+    BusinessOwnerKind,
+    KybState,
+    KycedBusinessOwnerData,
+    NtResult,
+    OnboardingStatus,
+    PhoneNumber,
+    PiiString,
+    WorkflowState,
 };
+use std::collections::HashMap;
+use std::pin::Pin;
 
 pub struct BasicBusinessInfo {
     pub business_name: PiiString,

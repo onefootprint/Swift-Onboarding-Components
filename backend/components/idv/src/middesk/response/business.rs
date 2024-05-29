@@ -1,6 +1,16 @@
-use chrono::{DateTime, Utc};
-use newtypes::{scrub_pii_value, PiiJsonValue, ScrubbedPiiString};
-use serde::{Deserialize, Serialize};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use newtypes::{
+    scrub_pii_value,
+    PiiJsonValue,
+    ScrubbedPiiString,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BusinessResponse {
@@ -25,7 +35,8 @@ pub struct BusinessResponse {
     pub documents: Option<Vec<Document>>,
     pub subscription: Option<Subscription>,
     #[serde(serialize_with = "scrub_pii_value")]
-    pub bankruptcies: Option<PiiJsonValue>, // This is a premium feature we aren't using, and the schema is also not really specified by Middesk
+    pub bankruptcies: Option<PiiJsonValue>, /* This is a premium feature we aren't using, and the schema
+                                             * is also not really specified by Middesk */
     pub phone_numers: Option<Vec<PhoneNumber>>,
     pub industry_classification: Option<IndustryClassification>,
     #[serde(serialize_with = "scrub_pii_value")]
@@ -242,7 +253,8 @@ pub struct Result {
     pub agency_information_url: Option<String>,
     pub score: Option<String>,
     #[serde(serialize_with = "scrub_pii_value")]
-    pub addresses: Option<PiiJsonValue>, // schema not specified in docs and wierdly its a vec of json objects
+    pub addresses: Option<PiiJsonValue>, /* schema not specified in docs and wierdly its a vec of json
+                                          * objects */
     pub url: Option<String>,
 }
 

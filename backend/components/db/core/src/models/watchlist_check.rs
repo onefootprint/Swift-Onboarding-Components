@@ -1,16 +1,42 @@
-use std::collections::HashMap;
-
-use crate::{DbResult, OptionalNonNullVec, PgConn, TxnPgConn};
-use chrono::{DateTime, Duration, Utc};
-use db_schema::schema::{ob_configuration, scoped_vault, task, watchlist_check, workflow};
-use diesel::{
-    dsl::{count, count_star, max, not},
-    prelude::*,
+use crate::{
+    DbResult,
+    OptionalNonNullVec,
+    PgConn,
+    TxnPgConn,
 };
+use chrono::{
+    DateTime,
+    Duration,
+    Utc,
+};
+use db_schema::schema::{
+    ob_configuration,
+    scoped_vault,
+    task,
+    watchlist_check,
+    workflow,
+};
+use diesel::dsl::{
+    count,
+    count_star,
+    max,
+    not,
+};
+use diesel::prelude::*;
 use newtypes::{
-    DecisionIntentId, FootprintReasonCode, Locked, ScopedVaultId, TaskId, TenantId, VaultKind,
-    WatchlistCheckId, WatchlistCheckStatus, WatchlistCheckStatusKind, WorkflowKind,
+    DecisionIntentId,
+    FootprintReasonCode,
+    Locked,
+    ScopedVaultId,
+    TaskId,
+    TenantId,
+    VaultKind,
+    WatchlistCheckId,
+    WatchlistCheckStatus,
+    WatchlistCheckStatusKind,
+    WorkflowKind,
 };
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = watchlist_check)]

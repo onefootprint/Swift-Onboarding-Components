@@ -1,29 +1,52 @@
-use crate::{
-    errors::ApiResult,
-    types::{EmptyResponse, JsonApiResponse},
-    utils::{email::send_email_challenge, headers::AllowExtraFieldsHeaders, vault_wrapper::VaultWrapper},
-    State,
+use crate::errors::ApiResult;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
-use api_core::{
-    auth::user::{UserAuthScope, UserWfAuthContext},
-    utils::{
-        headers::BootstrapFieldsHeader,
-        vault_wrapper::{
-            Any, DataLifetimeSources, DataRequestSource, FingerprintedDataRequest, Person, VwArgs,
-        },
-    },
+use crate::utils::email::send_email_challenge;
+use crate::utils::headers::AllowExtraFieldsHeaders;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::auth::user::{
+    UserAuthScope,
+    UserWfAuthContext,
 };
-use db::models::{
-    document_request::{DocumentRequest, NewDocumentRequestArgs},
-    ob_configuration::ObConfiguration,
+use api_core::utils::headers::BootstrapFieldsHeader;
+use api_core::utils::vault_wrapper::{
+    Any,
+    DataLifetimeSources,
+    DataRequestSource,
+    FingerprintedDataRequest,
+    Person,
+    VwArgs,
+};
+use db::models::document_request::{
+    DocumentRequest,
+    NewDocumentRequestArgs,
+};
+use db::models::ob_configuration::ObConfiguration;
+use newtypes::email::Email;
+use newtypes::put_data_request::{
+    PatchDataRequest,
+    RawDataRequest,
 };
 use newtypes::{
-    email::Email,
-    put_data_request::{PatchDataRequest, RawDataRequest},
-    DataIdentifier, DataLifetimeSource, DocumentRequestConfig, IdentityDataKind as IDK,
-    Iso3166TwoDigitCountryCode, ScopedVaultId, ValidateArgs, WorkflowGuard, WorkflowId,
+    DataIdentifier,
+    DataLifetimeSource,
+    DocumentRequestConfig,
+    IdentityDataKind as IDK,
+    Iso3166TwoDigitCountryCode,
+    ScopedVaultId,
+    ValidateArgs,
+    WorkflowGuard,
+    WorkflowId,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 use std::str::FromStr;
 
 #[api_v2_operation(

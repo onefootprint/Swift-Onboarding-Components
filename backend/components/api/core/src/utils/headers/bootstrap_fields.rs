@@ -1,12 +1,16 @@
-use crate::errors::ApiResult;
-
 use super::get_header;
-use actix_web::{http::header::HeaderMap, FromRequest};
+use crate::errors::ApiResult;
+use actix_web::http::header::HeaderMap;
+use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
-use newtypes::{input::parse_csv, DataIdentifier};
+use newtypes::input::parse_csv;
+use newtypes::DataIdentifier;
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize, Deref)]

@@ -1,20 +1,36 @@
-use super::super::{Business, VaultWrapper};
+use super::super::{
+    Business,
+    VaultWrapper,
+};
+use crate::enclave_client::EnclaveClient;
+use crate::errors::business::BusinessError;
+use crate::errors::ApiResult;
 use crate::{
-    enclave_client::EnclaveClient,
-    errors::{business::BusinessError, ApiResult},
-    ApiError, ApiErrorKind, State,
+    ApiError,
+    ApiErrorKind,
+    State,
 };
+use db::models::business_owner::{
+    BusinessOwner,
+    UserData,
+};
+use db::models::contact_info::ContactInfo;
+use db::models::data_lifetime::DataLifetime;
 use db::{
-    models::{
-        business_owner::{BusinessOwner, UserData},
-        contact_info::ContactInfo,
-        data_lifetime::DataLifetime,
-    },
-    DbError, DbPool,
+    DbError,
+    DbPool,
 };
+use newtypes::email::Email;
 use newtypes::{
-    email::Email, BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, ContactInfoKind,
-    IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, KycedBusinessOwnerData, PhoneNumber, PiiString,
+    BusinessDataKind as BDK,
+    BusinessOwnerData,
+    BusinessOwnerKind,
+    ContactInfoKind,
+    IdentityDataKind as IDK,
+    Iso3166TwoDigitCountryCode,
+    KycedBusinessOwnerData,
+    PhoneNumber,
+    PiiString,
     TenantId,
 };
 use std::str::FromStr;
@@ -85,15 +101,18 @@ pub enum DecryptedBusinessOwners {
     },
     /// The business vault was created via API and the BOS were added manually via API
     VaultedBos { bos: Vec<BusinessOwnerData> },
-    /// Single-KYC KYB flow after BO's information has been submitted. There is BDK::BeneficialOwners VaultData for both the Primary BO and the Secondary BO's
+    /// Single-KYC KYB flow after BO's information has been submitted. There is
+    /// BDK::BeneficialOwners VaultData for both the Primary BO and the Secondary BO's
     SingleKyc {
         primary_bo: BusinessOwner,
         primary_bo_vault: UserData,
         primary_bo_data: BusinessOwnerData,
         secondary_bos: Vec<BusinessOwnerData>,
     },
-    /// Multi-KYC KYB flow after BO's information has been submitted. There is BDK::KycedBeneficialOwners VaultData for both the Primary BO and the Secondary BO's
-    /// There are also BusinessOwner's for every Secondary BO. For Secondary BO's that have started Bifrost, we will have a Person Vault/ScopedVault/Onboarding.
+    /// Multi-KYC KYB flow after BO's information has been submitted. There is
+    /// BDK::KycedBeneficialOwners VaultData for both the Primary BO and the Secondary BO's
+    /// There are also BusinessOwner's for every Secondary BO. For Secondary BO's that have started
+    /// Bifrost, we will have a Person Vault/ScopedVault/Onboarding.
     MultiKyc {
         primary_bo: BusinessOwner,
         primary_bo_vault: UserData,

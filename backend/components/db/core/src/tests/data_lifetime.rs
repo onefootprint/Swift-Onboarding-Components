@@ -1,10 +1,18 @@
 use super::fixtures;
-use crate::{models::data_lifetime::DataLifetime, tests::prelude::*};
+use crate::models::data_lifetime::DataLifetime;
+use crate::tests::prelude::*;
 use itertools::Itertools;
 use macros::db_test;
 use newtypes::{
-    DataLifetimeId, DataLifetimeSeqno, DocumentDiKind, DocumentSide, IdDocKind, IdentityDataKind,
-    ScopedVaultId, TenantId, VaultId,
+    DataLifetimeId,
+    DataLifetimeSeqno,
+    DocumentDiKind,
+    DocumentSide,
+    IdDocKind,
+    IdentityDataKind,
+    ScopedVaultId,
+    TenantId,
+    VaultId,
 };
 use std::collections::HashSet;
 
@@ -174,7 +182,6 @@ fn test_my1fp_get_portable(conn: &mut TestPgConn) {
     let tests = vec![
         //
         // v1
-        //
         (&c.v1, c.seqno0, vec![]),
         (&c.v1, c.seqno1, vec![]),
         (&c.v1, c.seqno2, vec![]),
@@ -187,7 +194,6 @@ fn test_my1fp_get_portable(conn: &mut TestPgConn) {
         (&c.v1, c.seqno6, vec![&c.dl2, &c.dl3, &c.dl4]),
         //
         // v2
-        //
         (&c.v2, c.seqno0, vec![]),
         (&c.v2, c.seqno1, vec![]),
         (&c.v2, c.seqno2, vec![]),
@@ -198,7 +204,6 @@ fn test_my1fp_get_portable(conn: &mut TestPgConn) {
         (&c.v2, c.seqno6, vec![&c.dl6]),
         //
         // vx
-        //
         (&c.vx, c.seqno6, vec![]),
     ];
 
@@ -215,7 +220,6 @@ fn test_bulk_get_added_by_tenant(conn: &mut TestPgConn) {
     let tests = vec![
         //
         // su_id
-        //
         (&c.su, c.seqno0, vec![]),
         (&c.su, c.seqno1, vec![&c.dl1, &c.dl2, &c.dl3]),
         (&c.su, c.seqno2, vec![&c.dl1, &c.dl2, &c.dl3]),
@@ -225,13 +229,11 @@ fn test_bulk_get_added_by_tenant(conn: &mut TestPgConn) {
         (&c.su, c.seqno6, vec![&c.dl1, &c.dl2]),
         //
         // su2_id
-        //
         (&c.su2, c.seqno0, vec![]),
         (&c.su2, c.seqno1, vec![&c.dl5, &c.dl6]),
         (&c.su2, c.seqno6, vec![&c.dl5, &c.dl6]),
         //
         // su3_id
-        //
         (&c.su3, c.seqno0, vec![]),
         (&c.su3, c.seqno1, vec![&c.dl4]),
         (&c.su3, c.seqno6, vec![&c.dl4]),

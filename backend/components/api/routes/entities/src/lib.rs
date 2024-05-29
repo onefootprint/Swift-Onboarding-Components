@@ -4,6 +4,7 @@ use paperclip::actix::web;
 mod ai_summarize;
 mod annotations;
 mod auth_events;
+mod business_owners;
 mod client_token;
 mod data;
 mod decisions;
@@ -19,7 +20,6 @@ mod token;
 mod triggers;
 mod user_insight;
 mod vault;
-mod business_owners;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);

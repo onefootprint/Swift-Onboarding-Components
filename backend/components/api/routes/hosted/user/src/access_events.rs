@@ -1,10 +1,19 @@
-use crate::{
-    auth::user::UserAuthContext, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi,
-    State,
+use crate::auth::user::UserAuthContext;
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
+use crate::State;
+use api_core::auth::user::{
+    UserAuth,
+    UserAuthScope,
 };
-use api_core::auth::user::{UserAuth, UserAuthScope};
 use db::access_event::AccessEventListItemForUser;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 

@@ -1,12 +1,33 @@
-use crate::{
-    util::{impl_enum_str_diesel, impl_enum_string_diesel},
-    DecisionStatus, DocumentRequestConfig, DocumentRequestKind,
+use crate::util::{
+    impl_enum_str_diesel,
+    impl_enum_string_diesel,
 };
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::{actix::Apiv2Schema, v2::models::DataType};
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::{AsRefStr, IntoEnumIterator, ParseError};
-use strum_macros::{Display, EnumIter, EnumString};
+use crate::{
+    DecisionStatus,
+    DocumentRequestConfig,
+    DocumentRequestKind,
+};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
+use paperclip::actix::Apiv2Schema;
+use paperclip::v2::models::DataType;
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use strum::{
+    AsRefStr,
+    IntoEnumIterator,
+    ParseError,
+};
+use strum_macros::{
+    Display,
+    EnumIter,
+    EnumString,
+};
 
 #[derive(
     SerializeDisplay,
@@ -287,7 +308,8 @@ crate::util::impl_enum_string_diesel!(RuleInstanceKind);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{cmp::Ordering, str::FromStr};
+    use std::cmp::Ordering;
+    use std::str::FromStr;
     use test_case::test_case;
 
     #[test_case(RuleAction::Fail, "fail")]

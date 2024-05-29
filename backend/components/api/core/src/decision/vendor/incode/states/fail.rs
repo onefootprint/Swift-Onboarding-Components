@@ -1,25 +1,38 @@
-use super::{IncodeStateTransition, VerificationSession};
-use crate::{
-    decision::vendor::incode::{
-        state::{IncodeState, TransitionResult},
-        IncodeContext,
-    },
-    errors::{ApiErrorKind, ApiResult, AssertionError},
-    vendor_clients::IncodeClients,
+use super::{
+    IncodeStateTransition,
+    VerificationSession,
 };
-
+use crate::decision::vendor::incode::state::{
+    IncodeState,
+    TransitionResult,
+};
+use crate::decision::vendor::incode::IncodeContext;
+use crate::errors::{
+    ApiErrorKind,
+    ApiResult,
+    AssertionError,
+};
+use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
+use db::models::document::{
+    Document,
+    DocumentUpdate,
+};
+use db::models::risk_signal::RiskSignal;
+use db::models::user_timeline::UserTimeline;
+use db::models::verification_request::VerificationRequest;
 use db::{
-    models::{
-        document::{Document, DocumentUpdate},
-        risk_signal::RiskSignal,
-        user_timeline::UserTimeline,
-        verification_request::VerificationRequest,
-    },
-    DbPool, TxnPgConn,
+    DbPool,
+    TxnPgConn,
 };
 use newtypes::{
-    DecisionIntentId, DocumentId, DocumentStatus, FootprintReasonCode, ScopedVaultId, VaultId, VendorAPI,
+    DecisionIntentId,
+    DocumentId,
+    DocumentStatus,
+    FootprintReasonCode,
+    ScopedVaultId,
+    VaultId,
+    VendorAPI,
     VerificationResultId,
 };
 

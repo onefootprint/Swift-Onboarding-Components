@@ -1,7 +1,13 @@
-use api_wire_types::{AttestedDeviceData, DeviceFraudRiskLevel, DeviceType};
-use db::models::auth_event::{AuthEvent, LoadedAuthEvent};
-
 use crate::utils::db2api::DbToApi;
+use api_wire_types::{
+    AttestedDeviceData,
+    DeviceFraudRiskLevel,
+    DeviceType,
+};
+use db::models::auth_event::{
+    AuthEvent,
+    LoadedAuthEvent,
+};
 
 impl DbToApi<LoadedAuthEvent> for api_wire_types::AuthEvent {
     fn from_db(event: LoadedAuthEvent) -> Self {

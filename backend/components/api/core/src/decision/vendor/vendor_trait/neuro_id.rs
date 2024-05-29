@@ -1,10 +1,13 @@
-use super::{VendorAPICall, VendorAPIResponse};
-use async_trait::async_trait;
-use idv::{
-    footprint_http_client::FootprintVendorHttpClient,
-    neuro_id::{client::NeuroIdClient, response::NeuroApiResponse, NeuroIdAnalyticsRequest},
-    ParsedResponse,
+use super::{
+    VendorAPICall,
+    VendorAPIResponse,
 };
+use async_trait::async_trait;
+use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::neuro_id::client::NeuroIdClient;
+use idv::neuro_id::response::NeuroApiResponse;
+use idv::neuro_id::NeuroIdAnalyticsRequest;
+use idv::ParsedResponse;
 use newtypes::VendorAPI;
 
 #[async_trait]

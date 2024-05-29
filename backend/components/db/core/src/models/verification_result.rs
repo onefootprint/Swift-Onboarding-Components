@@ -1,15 +1,32 @@
-use crate::{DbError, DbResult, PgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{decision_intent, verification_request, verification_result};
-use diesel::{dsl::not, prelude::*, Insertable};
-use newtypes::{
-    ScopedVaultId, ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI, VerificationRequestId,
-    VerificationResultId,
+use super::decision_intent::DecisionIntent;
+use super::verification_request::{
+    RequestAndResult,
+    VerificationRequest,
 };
-
-use super::{
-    decision_intent::DecisionIntent,
-    verification_request::{RequestAndResult, VerificationRequest},
+use crate::{
+    DbError,
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    decision_intent,
+    verification_request,
+    verification_result,
+};
+use diesel::dsl::not;
+use diesel::prelude::*;
+use diesel::Insertable;
+use newtypes::{
+    ScopedVaultId,
+    ScrubbedPiiJsonValue,
+    SealedVaultBytes,
+    VendorAPI,
+    VerificationRequestId,
+    VerificationResultId,
 };
 
 #[derive(Debug, Clone, Queryable, Identifiable)]
@@ -36,7 +53,8 @@ impl VerificationResult {
 #[diesel(table_name = verification_result)]
 pub struct NewVerificationResult {
     pub request_id: VerificationRequestId,
-    // ScrubbedJson is so that we know that, although this is a serde_json::Value, some important fields have been scrubbed and you need to use the e_response
+    // ScrubbedJson is so that we know that, although this is a serde_json::Value, some important fields have
+    // been scrubbed and you need to use the e_response
     #[diesel(serialize_as = serde_json::Value)]
     pub response: ScrubbedPiiJsonValue,
     pub timestamp: DateTime<Utc>,

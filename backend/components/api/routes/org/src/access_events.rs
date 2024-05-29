@@ -1,14 +1,32 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    types::{request::CursorPaginationRequest, response::CursorPaginatedResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::types::request::CursorPaginationRequest;
+use crate::types::response::CursorPaginatedResponse;
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use api_core::types::CursorPaginatedResponseInner;
-use chrono::{DateTime, Utc};
-use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
-use newtypes::{input::deserialize_stringified_list, AccessEventKind, DataIdentifier};
-use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db::access_event::{
+    AccessEventListItemForTenant,
+    AccessEventListQueryParams,
+};
+use newtypes::input::deserialize_stringified_list;
+use newtypes::{
+    AccessEventKind,
+    DataIdentifier,
+};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    web,
+    Apiv2Schema,
+};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

@@ -1,9 +1,14 @@
-use std::{fmt::Display, str::FromStr};
-
+use crate::{
+    DataIdentifier,
+    DataLifetimeSeqno,
+};
 use itertools::Itertools;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
-
-use crate::{DataIdentifier, DataLifetimeSeqno};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use std::fmt::Display;
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, DeserializeFromStr, SerializeDisplay)]
 pub struct VersionedDataIdentifier {
@@ -18,7 +23,8 @@ impl VersionedDataIdentifier {
     }
 }
 
-// For now, we don't want to expose VersionedDI in the api docs, so just pass through to the DI implementation
+// For now, we don't want to expose VersionedDI in the api docs, so just pass through to the DI
+// implementation
 impl paperclip::v2::schema::Apiv2Schema for VersionedDataIdentifier {
     fn name() -> Option<String> {
         DataIdentifier::name()
@@ -91,10 +97,12 @@ impl Display for VersionedDataIdentifier {
 
 #[cfg(test)]
 mod test {
-    use std::str::FromStr;
-
     use super::VersionedDataIdentifier;
-    use crate::{DataLifetimeSeqno, IdentityDataKind as IDK};
+    use crate::{
+        DataLifetimeSeqno,
+        IdentityDataKind as IDK,
+    };
+    use std::str::FromStr;
     use test_case::test_case;
 
     #[test_case("id.ssn9:1234" => Some(VersionedDataIdentifier{di: IDK::Ssn9.into(), version: Some(DataLifetimeSeqno::from(1234))}))]

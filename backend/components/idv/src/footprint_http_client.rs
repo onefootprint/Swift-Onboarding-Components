@@ -1,9 +1,16 @@
-use std::time::Duration;
-
 use chrono::Utc;
-use reqwest_middleware::{ClientBuilder, ClientWithMiddleware, Middleware};
-use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
-use reqwest_tracing::{ReqwestOtelSpanBackend, TracingMiddleware};
+use reqwest_middleware::{
+    ClientBuilder,
+    ClientWithMiddleware,
+    Middleware,
+};
+use reqwest_retry::policies::ExponentialBackoff;
+use reqwest_retry::RetryTransientMiddleware;
+use reqwest_tracing::{
+    ReqwestOtelSpanBackend,
+    TracingMiddleware,
+};
+use std::time::Duration;
 
 #[derive(Clone)]
 pub struct FootprintVendorHttpClient {

@@ -25,12 +25,12 @@ mod is_components_sdk;
 pub use is_components_sdk::*;
 
 mod bootstrap_fields;
-pub use bootstrap_fields::*;
-
-use crate::{
-    errors::{ApiError, ApiResult},
-    ApiErrorKind,
+use crate::errors::{
+    ApiError,
+    ApiResult,
 };
+use crate::ApiErrorKind;
+pub use bootstrap_fields::*;
 
 pub fn get_header(name: &str, req: &HeaderMap) -> Option<String> {
     req.get(name).and_then(|h| h.to_str().ok()).map(|s| s.to_string())

@@ -1,14 +1,15 @@
-use db::{models::tenant::Tenant, tests::fixtures};
-use newtypes::{IdentityDataKind, Vendor, VendorAPI};
+use crate::decision::vendor::get_vendor_apis_for_verification_requests;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::State;
+use db::models::tenant::Tenant;
+use db::tests::fixtures;
+use newtypes::{
+    IdentityDataKind,
+    Vendor,
+    VendorAPI,
+};
 use strum::IntoEnumIterator;
 use test_case::test_case;
-
-use crate::{
-    decision::vendor::{
-        get_vendor_apis_for_verification_requests, tenant_vendor_control::TenantVendorControl,
-    },
-    State,
-};
 
 async fn create_tvc_for_requirements(
     state: &State,

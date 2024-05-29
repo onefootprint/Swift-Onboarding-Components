@@ -1,7 +1,16 @@
-use super::{utils, Error};
+use super::{
+    utils,
+    Error,
+};
 use crate::{
-    AllData, CleanAndValidate, DataIdentifierValue, InvestorProfileKind as IPK, NtResult, PiiJsonValue,
-    PiiString, ValidateArgs,
+    AllData,
+    CleanAndValidate,
+    DataIdentifierValue,
+    InvestorProfileKind as IPK,
+    NtResult,
+    PiiJsonValue,
+    PiiString,
+    ValidateArgs,
 };
 use itertools::Itertools;
 use serde_with::DeserializeFromStr;

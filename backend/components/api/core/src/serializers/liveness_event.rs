@@ -1,6 +1,6 @@
-use db::models::{insight_event::InsightEvent, liveness_event::LivenessEvent};
-
 use crate::utils::db2api::DbToApi;
+use db::models::insight_event::InsightEvent;
+use db::models::liveness_event::LivenessEvent;
 
 impl DbToApi<(LivenessEvent, Option<InsightEvent>)> for api_wire_types::LivenessEvent {
     fn from_db((event, insight_event): (LivenessEvent, Option<InsightEvent>)) -> Self {

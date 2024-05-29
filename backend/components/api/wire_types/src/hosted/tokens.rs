@@ -1,5 +1,12 @@
-use chrono::{DateTime, Utc};
-use newtypes::{RequestedTokenScope, SessionAuthToken, UserAuthScope};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use newtypes::{
+    RequestedTokenScope,
+    SessionAuthToken,
+    UserAuthScope,
+};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]

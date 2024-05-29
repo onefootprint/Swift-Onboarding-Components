@@ -1,8 +1,13 @@
-use newtypes::IdentityDataKind::{self, *};
-use strum::IntoEnumIterator;
-use strum_macros::{Display, EnumIter};
-
 use crate::requirements::SocureRequirements;
+use newtypes::IdentityDataKind::{
+    self,
+    *,
+};
+use strum::IntoEnumIterator;
+use strum_macros::{
+    Display,
+    EnumIter,
+};
 
 #[derive(Debug, Clone, EnumIter, PartialEq, Eq, Display)]
 #[strum(serialize_all = "lowercase")]
@@ -22,7 +27,8 @@ impl SocureModule {
     // Whether or not the Socure module requires certain pieces of PII data
     fn requires_pii_data(&self) -> bool {
         match self {
-            SocureModule::DeviceRisk => false, // Device risk is included if we have a deviceSessionId (which we theoretically should also always have)
+            SocureModule::DeviceRisk => false, /* Device risk is included if we have a deviceSessionId */
+            // (which we theoretically should also always have)
             _ => true,
         }
     }
@@ -120,7 +126,8 @@ pub fn modules_for_idplus_request(
     if device_session_id.is_some() {
         modules_meeting_requirement.push(SocureModule::DeviceRisk);
     }
-    // modules_meeting_requirement.push(SocureModule::Decision); //TODO: we aren't provisioned for this yet
+    // modules_meeting_requirement.push(SocureModule::Decision); //TODO: we aren't provisioned for this
+    // yet
 
     modules_meeting_requirement
 }
@@ -135,7 +142,10 @@ pub fn meets_requirements_for_idplus_request(present_data_kinds: &[IdentityDataK
 mod tests {
 
     use super::*;
-    use newtypes::{IdvData, PiiString};
+    use newtypes::{
+        IdvData,
+        PiiString,
+    };
     use SocureModule::*;
 
     #[test]

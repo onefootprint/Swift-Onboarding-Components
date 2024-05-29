@@ -1,31 +1,59 @@
-use async_trait::async_trait;
-use crypto::{
-    aead::{AeadSealedBytes, SealingKey},
-    hex,
-    seal::EciesP256Sha256AesGcmSealed,
+use crate::config::Config;
+use crate::errors::enclave::EnclaveError;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
 };
+use crate::proxy::to_data_transforms;
+use crate::s3::S3Client;
+use crate::ApiError;
+use async_trait::async_trait;
+use crypto::aead::{
+    AeadSealedBytes,
+    SealingKey,
+};
+use crypto::hex;
+use crypto::seal::EciesP256Sha256AesGcmSealed;
+use enclave_proxy::http_proxy::client::ProxyHttpClient;
 use enclave_proxy::{
-    http_proxy::client::ProxyHttpClient, DataTransform, DecryptRequest, DecryptThenSignRequest, Decryption,
-    EnclavePayload, EnvelopeDecryptRequest, EnvelopeDecryptThenHmacSignRequest, EnvelopeHmacSignRequest,
-    GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest, GeneratedDataKeyPair,
-    GeneratedSealedDataKey, HmacSignature, KmsCredentials, RpcPayload, RpcRequest, SealedIkek, Sealing,
-    SignRequest, Signing,
+    DataTransform,
+    DecryptRequest,
+    DecryptThenSignRequest,
+    Decryption,
+    EnclavePayload,
+    EnvelopeDecryptRequest,
+    EnvelopeDecryptThenHmacSignRequest,
+    EnvelopeHmacSignRequest,
+    GenerateDataKeypairRequest,
+    GenerateSymmetricDataKeyRequest,
+    GeneratedDataKeyPair,
+    GeneratedSealedDataKey,
+    HmacSignature,
+    KmsCredentials,
+    RpcPayload,
+    RpcRequest,
+    SealedIkek,
+    Sealing,
+    SignRequest,
+    Signing,
 };
 use futures::TryFutureExt;
 use itertools::Itertools;
+use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::{
-    fingerprint_salt::FingerprintSalt, EncryptedVaultPrivateKey, FilterFunction, Fingerprint, PiiBytes,
-    PiiString, S3Url, SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
+    EncryptedVaultPrivateKey,
+    FilterFunction,
+    Fingerprint,
+    PiiBytes,
+    PiiString,
+    S3Url,
+    SealedVaultBytes,
+    SealedVaultDataKey,
+    VaultPublicKey,
 };
-use std::{collections::HashMap, hash::Hash, sync::Arc};
-
-use crate::{
-    config::Config,
-    errors::{enclave::EnclaveError, ApiResult, AssertionError},
-    proxy::to_data_transforms,
-    s3::S3Client,
-    ApiError,
-};
+use std::collections::HashMap;
+use std::hash::Hash;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct EnclaveClient {
@@ -213,8 +241,8 @@ impl EnclaveClient {
             .ok_or(EnclaveError::InvalidEnclaveDecryptResponse)
     }
 
-    /// Util for batch decrypting many EciesP256Sha256AesGcmSealed values with the same key and transform
-    /// into PiiBytes
+    /// Util for batch decrypting many EciesP256Sha256AesGcmSealed values with the same key and
+    /// transform into PiiBytes
     #[tracing::instrument(skip_all)]
     pub async fn batch_decrypt_to_piibytes(
         &self,

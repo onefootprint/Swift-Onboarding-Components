@@ -1,11 +1,12 @@
 use crate::data_identifier::DiValidationError;
-use diesel::{
-    backend::Backend,
-    deserialize::{FromSql, FromSqlRow},
-    expression::AsExpression,
-    serialize::ToSql,
-    sql_types::Text,
+use diesel::backend::Backend;
+use diesel::deserialize::{
+    FromSql,
+    FromSqlRow,
 };
+use diesel::expression::AsExpression;
+use diesel::serialize::ToSql;
+use diesel::sql_types::Text;
 use regex::Regex;
 use std::str::FromStr;
 
@@ -174,11 +175,12 @@ where
 
 #[cfg(test)]
 mod test {
+    use crate::{
+        AliasId,
+        KvDataKey,
+    };
     use std::str::FromStr;
-
     use test_case::test_case;
-
-    use crate::{AliasId, KvDataKey};
 
     #[test_case("hayes" => true)]
     #[test_case("hayes.valley" => false)]

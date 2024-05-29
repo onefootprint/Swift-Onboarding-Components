@@ -1,12 +1,18 @@
-use newtypes::{
-    scrub_pii_value, scrub_value, ExperianDobMatchReasonCodes, ExperianFraudShieldCodes,
-    ExperianPhoneMatchReasonCodes, ExperianSSNReasonCodes, PiiJsonValue, ScrubbedPiiString,
-};
-
 use crate::experian::error::Error as ExperianError;
+use newtypes::{
+    scrub_pii_value,
+    scrub_value,
+    ExperianDobMatchReasonCodes,
+    ExperianFraudShieldCodes,
+    ExperianPhoneMatchReasonCodes,
+    ExperianSSNReasonCodes,
+    PiiJsonValue,
+    ScrubbedPiiString,
+};
 use std::str::FromStr;
 
-/// This is the top level response from PreciseID (which we receive embedded in the CrossCore API response)
+/// This is the top level response from PreciseID (which we receive embedded in the CrossCore API
+/// response)
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PreciseIDAPIResponse {
@@ -34,7 +40,8 @@ pub struct PreciseIDAPIResponse {
     #[serde(serialize_with = "scrub_pii_value")]
     pub ip_address: Option<PiiJsonValue>,
     // GLB refers to the Gramm-Leach-Bliley Act. Experian uses this terminology
-    // to refer to their data around consumers (as opposed to Credit-related-FCRA-regulated data. or something.)
+    // to refer to their data around consumers (as opposed to Credit-related-FCRA-regulated data. or
+    // something.)
     pub glb_detail: Option<GLBDetail>,
 
     pub error: Option<Error>,
@@ -213,8 +220,8 @@ pub struct Summary {
     #[serde(rename(deserialize = "transactionID"))]
     pub transaction_id: Option<String>,
     //   Code indicating the initial disposition of the transaction.
-    //       -> Refer to the Precise ID Summary & Appendix (Decision Codes) for a list of generic decision codes.
-    // NOTE: This object is not returned for a blocked file (deceased or consumer not found)
+    //       -> Refer to the Precise ID Summary & Appendix (Decision Codes) for a list of generic decision
+    // codes. NOTE: This object is not returned for a blocked file (deceased or consumer not found)
     //  See the blocked example in the “Exclusion Conditions” section.
     // 3 character in length
     pub initial_decision: Option<String>,
@@ -369,7 +376,8 @@ pub(crate) fn log_unknown_match_code(code: &str, attribute: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{experian::error::Error as ExperianError, test_fixtures::experian_precise_id_response};
+    use crate::experian::error::Error as ExperianError;
+    use crate::test_fixtures::experian_precise_id_response;
     use test_case::test_case;
 
     #[test_case("656" => PreciseIDParsedScore::Score(656))]

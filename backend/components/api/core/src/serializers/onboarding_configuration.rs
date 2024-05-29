@@ -1,17 +1,17 @@
-use std::sync::Arc;
-
-use api_wire_types::Actor;
-use db::{
-    actor::SaturatedActor,
-    models::{
-        appearance::Appearance, ob_configuration::ObConfiguration, rule_set_version::RuleSetVersion,
-        tenant::Tenant, tenant_client_config::TenantClientConfig,
-    },
-};
-use feature_flag::{BoolFlag, FeatureFlagClient};
-use newtypes::DataIdentifierDiscriminant;
-
 use crate::utils::db2api::DbToApi;
+use api_wire_types::Actor;
+use db::actor::SaturatedActor;
+use db::models::appearance::Appearance;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_set_version::RuleSetVersion;
+use db::models::tenant::Tenant;
+use db::models::tenant_client_config::TenantClientConfig;
+use feature_flag::{
+    BoolFlag,
+    FeatureFlagClient,
+};
+use newtypes::DataIdentifierDiscriminant;
+use std::sync::Arc;
 
 pub type ObConfigInfo = (
     ObConfiguration,

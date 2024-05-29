@@ -1,5 +1,8 @@
 use crate::State;
-use paperclip::actix::{web, Apiv2Schema};
+use paperclip::actix::{
+    web,
+    Apiv2Schema,
+};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 pub struct EmptyRequest {}

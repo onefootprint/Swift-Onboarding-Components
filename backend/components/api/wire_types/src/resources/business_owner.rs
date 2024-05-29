@@ -1,5 +1,12 @@
-use crate::{Apiv2Schema, Serialize};
-use newtypes::{BusinessOwnerKind, FpId, OnboardingStatus};
+use crate::{
+    Apiv2Schema,
+    Serialize,
+};
+use newtypes::{
+    BusinessOwnerKind,
+    FpId,
+    OnboardingStatus,
+};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct BusinessOwner {

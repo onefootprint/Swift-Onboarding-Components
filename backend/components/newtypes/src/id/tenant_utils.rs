@@ -1,4 +1,8 @@
-use crate::{PartnerTenantId, TenantId, TenantKind};
+use crate::{
+    PartnerTenantId,
+    TenantId,
+    TenantKind,
+};
 use derive_more::From;
 
 impl TenantId {

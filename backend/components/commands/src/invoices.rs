@@ -1,7 +1,18 @@
-use anyhow::{anyhow, Result};
-use api_core::{config::Config, State};
-use billing::{create_bill_for_tenant, BResult};
-use chrono::{Duration, NaiveDate, Utc};
+use anyhow::{
+    anyhow,
+    Result,
+};
+use api_core::config::Config;
+use api_core::State;
+use billing::{
+    create_bill_for_tenant,
+    BResult,
+};
+use chrono::{
+    Duration,
+    NaiveDate,
+    Utc,
+};
 use clap::Parser;
 use db::models::tenant::Tenant;
 use futures::StreamExt;

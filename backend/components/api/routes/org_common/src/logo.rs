@@ -1,11 +1,12 @@
 use actix_multipart::Multipart;
-use api_core::{
-    errors::{error_with_code::ErrorWithCode, ApiResult},
-    utils::{file_upload, file_upload::mime_type_to_extension},
-    State,
-};
+use api_core::errors::error_with_code::ErrorWithCode;
+use api_core::errors::ApiResult;
+use api_core::utils::file_upload;
+use api_core::utils::file_upload::mime_type_to_extension;
+use api_core::State;
 use newtypes::OrgIdentifierRef;
-use paperclip::actix::{web, web::HttpRequest};
+use paperclip::actix::web;
+use paperclip::actix::web::HttpRequest;
 
 const MAX_IMAGE_SIZE_BYTES: usize = 1_048_576;
 

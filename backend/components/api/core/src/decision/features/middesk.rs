@@ -1,9 +1,15 @@
 #![allow(clippy::enum_variant_names)]
-use idv::middesk::response::business::{BusinessResponse, Task};
+use idv::middesk::response::business::{
+    BusinessResponse,
+    Task,
+};
 use newtypes::FootprintReasonCode;
 use std::str::FromStr;
 use strum::Display;
-use strum_macros::{EnumDiscriminants, EnumString};
+use strum_macros::{
+    EnumDiscriminants,
+    EnumString,
+};
 
 macro_rules! task_enum {
     (
@@ -60,8 +66,10 @@ pub enum TaskKind {
     SosDomestic(SosDomesticTask),
     SosMatch(SosMatchTask),
     SosDomesticSubStatus(SosDomesticSubStatusTask),
-    Industry(IndustryTask), // premium feature we don't have turned on but still get response for some reason
-    Bankruptcies(BankruptciesTask), // premium feature we don't have turned on but still get response for some reason
+    Industry(IndustryTask), /* premium feature we don't have turned on but still get response for some
+                             * reason */
+    Bankruptcies(BankruptciesTask), /* premium feature we don't have turned on but still get response for
+                                     * some reason */
 }
 
 task_enum! {

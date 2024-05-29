@@ -1,5 +1,9 @@
 use crate::*;
-use newtypes::{FpId, PiiJsonValue, PiiString};
+use newtypes::{
+    FpId,
+    PiiJsonValue,
+    PiiString,
+};
 
 #[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct AlpacaCipRequest {
@@ -9,10 +13,12 @@ pub struct AlpacaCipRequest {
     /// API Secret to use with alpaca
     pub api_secret: PiiString,
 
-    /// The default approver name/email to use for automatically approved users. This will be overwritten if done by a manual reviewer
+    /// The default approver name/email to use for automatically approved users. This will be
+    /// overwritten if done by a manual reviewer
     pub default_approver: PiiString,
 
-    /// Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)
+    /// Alpaca Hostname to use (i.e. sandbox or production, like:
+    /// `broker-api.sandbox.alpaca.markets`)
     pub hostname: String,
 
     /// The associated user's alpaca account id
@@ -30,10 +36,12 @@ pub struct DeprecatedAlpacaCipRequest {
     /// API Secret to use with alpaca
     pub api_secret: PiiString,
 
-    /// The default approver name/email to use for automatically approved users. This will be overwritten if done by a manual reviewer
+    /// The default approver name/email to use for automatically approved users. This will be
+    /// overwritten if done by a manual reviewer
     pub default_approver: PiiString,
 
-    /// Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)
+    /// Alpaca Hostname to use (i.e. sandbox or production, like:
+    /// `broker-api.sandbox.alpaca.markets`)
     pub hostname: String,
 
     /// The associated user's alpaca account id

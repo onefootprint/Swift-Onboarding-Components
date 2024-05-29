@@ -1,12 +1,17 @@
-use newtypes::{
-    FpId, ListId, ObConfigurationId, OnboardingStatus, RuleAction, RuleExpression, RuleExpressionCondition,
-    RuleId, RuleInstanceKind,
-};
-use std::collections::HashMap;
-
-use serde_with::SerializeDisplay;
-
 use crate::*;
+use newtypes::{
+    FpId,
+    ListId,
+    ObConfigurationId,
+    OnboardingStatus,
+    RuleAction,
+    RuleExpression,
+    RuleExpressionCondition,
+    RuleId,
+    RuleInstanceKind,
+};
+use serde_with::SerializeDisplay;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Deserialize, Eq, PartialEq, Apiv2Schema)]
 pub struct UnvalidatedRuleExpression(pub Vec<RuleExpressionCondition>);
@@ -33,7 +38,8 @@ pub struct Rule {
 pub struct RuleSetResult {
     pub created_at: DateTime<Utc>,
     pub ob_configuration_id: ObConfigurationId,
-    // As of 2023-01-31, FE is still on legacy serialization of `step_up`, so we convert from internal RA to RSRA
+    // As of 2023-01-31, FE is still on legacy serialization of `step_up`, so we convert from internal RA to
+    // RSRA
     pub action_triggered: Option<RuleAction>,
     pub rule_results: Vec<RuleResult>,
 }

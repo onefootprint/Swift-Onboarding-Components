@@ -1,16 +1,28 @@
 use super::WriteableVw;
-use crate::{auth::tenant::AuthActor, errors::ApiResult};
-use db::{
-    models::{
-        contact_info::{ContactInfo, NewContactInfoArgs},
-        data_lifetime::DataLifetime,
-        vault_data::{NewVaultData, VaultData},
-    },
-    TxnPgConn,
+use crate::auth::tenant::AuthActor;
+use crate::errors::ApiResult;
+use db::models::contact_info::{
+    ContactInfo,
+    NewContactInfoArgs,
 };
+use db::models::data_lifetime::DataLifetime;
+use db::models::vault_data::{
+    NewVaultData,
+    VaultData,
+};
+use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{output::Csv, CollectedDataOption, ContactInfoPriority, DataIdentifier, DataLifetimeSeqno};
-use std::collections::{HashMap, HashSet};
+use newtypes::output::Csv;
+use newtypes::{
+    CollectedDataOption,
+    ContactInfoPriority,
+    DataIdentifier,
+    DataLifetimeSeqno,
+};
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 
 mod fingerprinted;
 mod fingerprints;
@@ -18,16 +30,22 @@ mod prefill;
 mod validation;
 
 use self::fingerprints::Fingerprints;
-
 pub use fingerprinted::FingerprintedDataRequest;
-pub use prefill::{PrefillData, PrefillKind};
-pub use validation::{DataLifetimeSources, DataRequestSource};
+pub use prefill::{
+    PrefillData,
+    PrefillKind,
+};
+pub use validation::{
+    DataLifetimeSources,
+    DataRequestSource,
+};
 
 /// DataRequest that has been validated through a UserVaultWrapper
 pub struct ValidatedDataRequest {
     pub(super) data: Vec<NewVaultData>,
     fingerprints: Fingerprints,
-    /// On prefilled ValidatedDataRequests, includes the existing CI for any phone/email being prefilled
+    /// On prefilled ValidatedDataRequests, includes the existing CI for any phone/email being
+    /// prefilled
     old_ci: HashMap<DataIdentifier, ContactInfo>,
     /// The list of precomputed fingerprints for the data being saved. Not all fingerprints here
     /// will be saved to the database directly, some are only used to compute composite fingerprints

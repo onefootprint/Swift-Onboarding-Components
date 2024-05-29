@@ -1,9 +1,8 @@
 pub mod client;
 mod request;
 pub mod response;
-use newtypes::PiiJsonValue;
-
 use self::response::FlexIdResponse;
+use newtypes::PiiJsonValue;
 
 pub fn parse_response(value: serde_json::Value) -> Result<FlexIdResponse, Error> {
     let res: FlexIdResponse = serde_json::value::from_value(value)?;
@@ -111,7 +110,10 @@ impl std::fmt::Debug for ErrorWithResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::{json, Value};
+    use serde_json::{
+        json,
+        Value,
+    };
 
     #[test]
     #[ignore]

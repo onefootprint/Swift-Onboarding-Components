@@ -1,16 +1,20 @@
-use api_core::{
-    auth::{
-        user::{UserAuthContext, UserAuthScope},
-        IsGuardMet,
-    },
-    errors::ValidationError,
-    types::{response::ResponseData, JsonApiResponse},
-    State,
+use api_core::auth::user::{
+    UserAuthContext,
+    UserAuthScope,
 };
+use api_core::auth::IsGuardMet;
+use api_core::errors::ValidationError;
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
+use api_core::State;
 use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::validate::HostedValidateResponse;
 use newtypes::ObConfigurationKind;
-use paperclip::actix::{self, api_v2_operation, web};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(User, Hosted),

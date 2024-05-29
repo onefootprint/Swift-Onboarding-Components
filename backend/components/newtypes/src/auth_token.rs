@@ -1,10 +1,18 @@
-use crypto::{random::gen_random_alphanumeric_code, sha256};
-use derive_more::{Display, Into};
+use crate::{
+    AuthTokenHash,
+    PiiString,
+};
+use crypto::random::gen_random_alphanumeric_code;
+use crypto::sha256;
+use derive_more::{
+    Display,
+    Into,
+};
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
-
-use crate::{AuthTokenHash, PiiString};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 /// An cryptographically generated auth token to authenticate a session
 #[derive(Clone, Hash, PartialEq, Eq, Display, Into, Serialize, Deserialize, Default, Apiv2Schema)]

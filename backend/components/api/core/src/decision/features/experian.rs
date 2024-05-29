@@ -1,10 +1,12 @@
-use idv::experian::{cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore};
+use idv::experian::cross_core::response::CrossCoreAPIResponse;
+use idv::experian::precise_id::response::PreciseIDParsedScore;
 use itertools::Itertools;
 use newtypes::FootprintReasonCode;
 
 const SCORE_THRESHOLD: i32 = 500;
 
-/// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
+/// Struct to represent the elements (derived or pass through) that we use from IDology to make a
+/// decision
 fn score_to_reason_code(score: PreciseIDParsedScore) -> Option<FootprintReasonCode> {
     match score {
         PreciseIDParsedScore::Deceased => Some(FootprintReasonCode::SubjectDeceased),
@@ -31,7 +33,8 @@ pub fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReason
         })
         .unwrap_or_default();
 
-    // As of 2023-05-23, our rough understanding of how experian matches information we provided to them is as follows:
+    // As of 2023-05-23, our rough understanding of how experian matches information we provided to them
+    // is as follows:
     //
     // experian_consumer_id = blackbox_experian_search(Name,DOB,Address,SSN,Phone);
     //
@@ -39,7 +42,8 @@ pub fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReason
     // address_result_codes = AddressSearch(experian_consumer_id)
     // dob_result_codes = DOBSearch(experian_consumer_id)
     //
-    // So they first locate a consumer_id row, then pull information from various databases that correspond to the matching codes below
+    // So they first locate a consumer_id row, then pull information from various databases that
+    // correspond to the matching codes below
     let dob_reason_codes = if let Ok(code) = resp.dob_match_reason_codes() {
         let dob_frc = std::convert::Into::<Option<FootprintReasonCode>>::into(&code);
         vec![dob_frc]
@@ -60,8 +64,9 @@ pub fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReason
         (true, vec![])
     };
 
-    // Since ssn codes include address and name information, and it's still unclear if they agree with one another, we only show the address codes
-    // if ssn wasn't provided (and as of 2023-05, we always get ssn)
+    // Since ssn codes include address and name information, and it's still unclear if they agree with
+    // one another, we only show the address codes if ssn wasn't provided (and as of 2023-05, we
+    // always get ssn)
     let mut name_and_address_reason_codes = vec![];
     if input_missing_ssn {
         name_and_address_reason_codes = if let Ok(code) = resp.name_and_address_match_reason_codes() {
@@ -106,11 +111,12 @@ pub fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReason
 #[cfg(test)]
 mod tests {
     use db::test_helpers::assert_have_same_elements;
-    use idv::experian::{
-        cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore,
-    };
+    use idv::experian::cross_core::response::CrossCoreAPIResponse;
+    use idv::experian::precise_id::response::PreciseIDParsedScore;
     use newtypes::{
-        ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
+        ExperianAddressAndNameMatchReasonCodes,
+        ExperianSSNReasonCodes,
+        ExperianWatchlistReasonCodes,
         FootprintReasonCode,
     };
     use test_case::test_case;

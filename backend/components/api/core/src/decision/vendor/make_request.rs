@@ -1,30 +1,56 @@
 #![allow(clippy::too_many_arguments)]
+use super::tenant_vendor_control::TenantVendorControl;
+use super::vendor_trait::VendorAPIResponse;
+use super::*;
+use crate::errors::ApiError;
+use crate::vendor_clients::VendorClient;
+use crate::State;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::vault::Vault;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
+use db::DbError;
+use feature_flag::{
+    BoolFlag,
+    FeatureFlagClient,
+};
+use idv::experian::error::Error as ExperianError;
+use idv::experian::{
+    ExperianCrossCoreRequest,
+    ExperianCrossCoreResponse,
+};
+use idv::idology::expectid::response::ExpectIDResponse;
+use idv::idology::{
+    IdologyExpectIDAPIResponse,
+    IdologyExpectIDRequest,
+};
+use idv::lexis::client::{
+    LexisFlexIdRequest,
+    LexisFlexIdResponse,
+};
+use idv::socure::{
+    SocureIDPlusAPIResponse,
+    SocureIDPlusRequest,
+};
+use idv::twilio::{
+    TwilioLookupV2APIResponse,
+    TwilioLookupV2Request,
+};
+use idv::{
+    ParsedResponse,
+    VendorResponse,
+};
+use newtypes::{
+    IdvData,
+    ObConfigurationKey,
+    PiiString,
+    VendorAPI,
+    WorkflowId,
+};
 use std::sync::Arc;
 
-use super::tenant_vendor_control::TenantVendorControl;
-
-use super::{vendor_trait::VendorAPIResponse, *};
-use crate::{errors::ApiError, vendor_clients::VendorClient, State};
-use db::{
-    models::{
-        ob_configuration::ObConfiguration, vault::Vault, verification_request::VerificationRequest,
-        verification_result::VerificationResult,
-    },
-    DbError,
-};
-use feature_flag::{BoolFlag, FeatureFlagClient};
-use idv::experian::error::Error as ExperianError;
-use idv::{
-    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
-    idology::{expectid::response::ExpectIDResponse, IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
-    lexis::client::{LexisFlexIdRequest, LexisFlexIdResponse},
-    socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
-    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
-    ParsedResponse, VendorResponse,
-};
-use newtypes::{IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
-
-// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call, and returns the success or error response
+// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call,
+// and returns the success or error response
 #[tracing::instrument(skip(state, tvc))]
 pub async fn make_idv_vendor_call_save_vreq_vres(
     state: &State,
@@ -71,7 +97,8 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
     Ok((vreq, vres, vendor_result))
 }
 
-// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call, and returns the success or error response
+// For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call,
+// and returns the success or error response
 #[tracing::instrument(skip(state, tvc))]
 pub async fn make_idv_vendor_call_save_vreq(
     state: &State,
@@ -171,7 +198,8 @@ pub async fn send_idv_request(
                 )
                 .await
             } else {
-                // shouldn't be possible since we check tvc.enabled_vendor_apis before attempting this function and that takes the presence of TBI into account
+                // shouldn't be possible since we check tvc.enabled_vendor_apis before attempting this
+                // function and that takes the presence of TBI into account
                 Err(idv::Error::AssertionError(
                     "Missing tenant_business_info".to_owned(),
                 ))
@@ -383,8 +411,8 @@ pub async fn make_idv_request(
 pub type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
 pub type VerificationRequestWithVendorError = (VerificationRequest, ApiError);
 
-#[tracing::instrument(skip_all, 
-    fields(vreqs = ?requests.iter().map(|r| r.id.clone()).collect::<Vec<_>>(), 
+#[tracing::instrument(skip_all,
+    fields(vreqs = ?requests.iter().map(|r| r.id.clone()).collect::<Vec<_>>(),
     vendors = ?requests.iter().map(|r| r.vendor).collect::<Vec<_>>()))
 ]
 pub async fn make_vendor_requests(
@@ -432,7 +460,8 @@ pub async fn make_vendor_requests(
                         log_msg
                     );
 
-                    Err((reqs[idx].clone(), ApiError::from(err))) // TODO: no need to wrap in ApiError
+                    Err((reqs[idx].clone(), ApiError::from(err))) // TODO: no need to wrap in
+                                                                  // ApiError
                 }
             }
         })
@@ -448,10 +477,11 @@ mod tests {
     use super::*;
     use crate::decision::vendor::vendor_trait::MockVendorAPICall;
     use db::tests::MockFFClient;
-    use idv::idology::{
-        expectid::response::{ExpectIDResponse, Response},
-        IdologyExpectIDAPIResponse,
+    use idv::idology::expectid::response::{
+        ExpectIDResponse,
+        Response,
     };
+    use idv::idology::IdologyExpectIDAPIResponse;
     use newtypes::PiiJsonValue;
     use serde_json::json;
     use std::str::FromStr;

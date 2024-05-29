@@ -1,25 +1,40 @@
-use std::str::FromStr;
-
 use crate::State;
-use actix_web::{post, web, web::Json};
-use api_core::{
-    auth::{custodian::CustodianAuthContext, session::tenant::TenantRbSession},
-    errors::{tenant::TenantError, ApiError, ApiResult},
-    types::response::ResponseData,
-    utils::{db2api::DbToApi, session::AuthSession},
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
 };
+use api_core::auth::custodian::CustodianAuthContext;
+use api_core::auth::session::tenant::TenantRbSession;
+use api_core::errors::tenant::TenantError;
+use api_core::errors::{
+    ApiError,
+    ApiResult,
+};
+use api_core::types::response::ResponseData;
+use api_core::utils::db2api::DbToApi;
+use api_core::utils::session::AuthSession;
 use chrono::Duration;
-use db::models::{
-    tenant::{NewIntegrationTestTenant, Tenant},
-    tenant_api_key::TenantApiKey,
-    tenant_role::{ImmutableRoleKind, TenantRole},
-    tenant_rolebinding::TenantRolebinding,
-    tenant_user::TenantUser,
+use db::models::tenant::{
+    NewIntegrationTestTenant,
+    Tenant,
 };
+use db::models::tenant_api_key::TenantApiKey;
+use db::models::tenant_role::{
+    ImmutableRoleKind,
+    TenantRole,
+};
+use db::models::tenant_rolebinding::TenantRolebinding;
+use db::models::tenant_user::TenantUser;
+use newtypes::secret_api_key::SecretApiKey;
 use newtypes::{
-    secret_api_key::SecretApiKey, OrgMemberEmail, SessionAuthToken, TenantId, TenantRoleKind,
+    OrgMemberEmail,
+    SessionAuthToken,
+    TenantId,
+    TenantRoleKind,
     WorkosAuthMethod,
 };
+use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct NewClientRequest {

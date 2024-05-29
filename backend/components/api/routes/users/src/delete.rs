@@ -1,22 +1,36 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
-    errors::ApiResult,
-    types::JsonApiResponse,
-    utils::vault_wrapper::VaultWrapper,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    SecretTenantAuthContext,
+    TenantGuard,
 };
-use api_core::{
-    types::{EmptyResponse, ResponseData},
-    utils::{
-        fp_id_path::FpIdPath,
-        headers::InsightHeaders,
-        vault_wrapper::{Person, WriteableVw},
-    },
+use crate::errors::ApiResult;
+use crate::types::JsonApiResponse;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::State;
+use api_core::types::{
+    EmptyResponse,
+    ResponseData,
 };
-use db::models::{audit_event::NewAuditEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault};
+use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::headers::InsightHeaders;
+use api_core::utils::vault_wrapper::{
+    Person,
+    WriteableVw,
+};
+use db::models::audit_event::NewAuditEvent;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::{AuditEventDetail, AuditEventId, DbActor};
-use paperclip::actix::{self, api_v2_operation, web};
+use newtypes::{
+    AuditEventDetail,
+    AuditEventId,
+    DbActor,
+};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[route_alias(actix::delete(
     "/businesses/{fp_bid}",

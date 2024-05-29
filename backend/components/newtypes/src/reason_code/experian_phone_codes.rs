@@ -1,7 +1,15 @@
-use strum_macros::{EnumIter, EnumString};
-
-use super::reason_code_helpers::{AddressGrouping::*, NameGrouping::*, *};
-use crate::{vendor_reason_codes_enum, FootprintReasonCode, MatchLevel::*};
+use super::reason_code_helpers::AddressGrouping::*;
+use super::reason_code_helpers::NameGrouping::*;
+use super::reason_code_helpers::*;
+use crate::MatchLevel::*;
+use crate::{
+    vendor_reason_codes_enum,
+    FootprintReasonCode,
+};
+use strum_macros::{
+    EnumIter,
+    EnumString,
+};
 
 vendor_reason_codes_enum! {
     #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, EnumIter, Hash)]
@@ -279,9 +287,11 @@ vendor_reason_codes_enum! {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        ExperianPhoneMatchReasonCodes,
+        FootprintReasonCode,
+    };
     use test_case::test_case;
-
-    use crate::{ExperianPhoneMatchReasonCodes, FootprintReasonCode};
     use FootprintReasonCode::*;
 
     #[test_case(ExperianPhoneMatchReasonCodes::EA => vec![PhoneLocatedMatches])]

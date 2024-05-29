@@ -19,15 +19,30 @@ mod tenant_rb;
 pub use self::tenant_rb::*;
 mod workos;
 pub use self::workos::*;
-
-use super::{Any, AuthError, Either, IsGuardMet, SessionContext};
-use crate::{
-    errors::{ApiError, ApiResult, ValidationError},
-    State,
+use super::{
+    Any,
+    AuthError,
+    Either,
+    IsGuardMet,
+    SessionContext,
 };
+use crate::errors::{
+    ApiError,
+    ApiResult,
+    ValidationError,
+};
+use crate::State;
 use async_trait::async_trait;
-use db::models::{tenant::Tenant, tenant_user::TenantUser};
-use newtypes::{DataLifetimeSource, DbActor, TenantApiKeyId, TenantScope, TenantUserId, WorkosAuthMethod};
+use db::models::tenant::Tenant;
+use db::models::tenant_user::TenantUser;
+use newtypes::{
+    DataLifetimeSource,
+    DbActor,
+    TenantApiKeyId,
+    TenantScope,
+    TenantUserId,
+    WorkosAuthMethod,
+};
 
 pub type TenantSessionAuth<const IS_SECONDARY: bool = false> =
     Either<TenantRbAuthContext<IS_SECONDARY>, FirmEmployeeAssumeAuthContext<IS_SECONDARY>>;
@@ -168,8 +183,8 @@ trait CanCheckTenantGuard: Sized {
 
 /// Implemented for tenant TAuthExtractors. Provides one function, check_permissions, that
 /// _must_ be called in order to use the tenant auth class.
-/// The implementation of this trait first checks that the TAuthExtractor tenant auth class's scopes are
-/// sufficient to meet the guard.
+/// The implementation of this trait first checks that the TAuthExtractor tenant auth class's scopes
+/// are sufficient to meet the guard.
 /// If so, returns a usable boxed TenantAuth. Otherwise, returns an AuthError.
 pub trait CheckTenantGuard: Sized {
     type Auth;

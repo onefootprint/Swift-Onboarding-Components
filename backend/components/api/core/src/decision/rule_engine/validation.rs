@@ -1,10 +1,27 @@
-use crate::errors::{ApiResult, AssertionError, ValidationError};
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+    ValidationError,
+};
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
 use newtypes::{
-    AllData, BusinessDataKind, CardDataKind, CleanAndValidate, DataIdentifier, DeviceInsightField,
-    DeviceInsightOperation, IdentityDataKind, ListId, ListKind, PiiJsonValue, RuleExpression,
-    RuleExpressionCondition, RuleInstanceKind, ValidateArgs, VaultOperation,
+    AllData,
+    BusinessDataKind,
+    CardDataKind,
+    CleanAndValidate,
+    DataIdentifier,
+    DeviceInsightField,
+    DeviceInsightOperation,
+    IdentityDataKind,
+    ListId,
+    ListKind,
+    PiiJsonValue,
+    RuleExpression,
+    RuleExpressionCondition,
+    RuleInstanceKind,
+    ValidateArgs,
+    VaultOperation,
 };
 use std::collections::HashMap;
 
@@ -211,17 +228,28 @@ pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) ->
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
-    use crate::ApiError;
-
     use super::*;
+    use crate::ApiError;
     use chrono::Utc;
+    use newtypes::data_identifier::Error as DiValidationError;
     use newtypes::{
-        data_identifier::Error as DiValidationError, AliasId, BooleanOperator, CardInfo,
-        DataIdentifier as DI, DataLifetimeSeqno, DbActor, Equals, Error as NewtypeError,
-        FootprintReasonCode as FRC, IsIn, ListAlias, ListId, ListKind, SealedVaultDataKey, TenantId,
+        AliasId,
+        BooleanOperator,
+        CardInfo,
+        DataIdentifier as DI,
+        DataLifetimeSeqno,
+        DbActor,
+        Equals,
+        Error as NewtypeError,
+        FootprintReasonCode as FRC,
+        IsIn,
+        ListAlias,
+        ListId,
+        ListKind,
+        SealedVaultDataKey,
+        TenantId,
     };
+    use std::str::FromStr;
     use test_case::test_case;
 
     fn test_list_id() -> ListId {

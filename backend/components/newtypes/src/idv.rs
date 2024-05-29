@@ -1,12 +1,18 @@
-use std::str::FromStr;
-
 use super::Error::AssertionError;
 use crate::{
-    BusinessOwnerData, IdentityDataKind, Iso3166TwoDigitCountryCode, PiiString, VerificationRequestId,
+    BusinessOwnerData,
+    IdentityDataKind,
+    Iso3166TwoDigitCountryCode,
+    PiiString,
+    VerificationRequestId,
     DATE_FORMAT,
 };
 use chrono::NaiveDate;
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use std::str::FromStr;
 use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -83,7 +89,8 @@ impl IdvData {
     }
 
     pub fn state_and_country_for_vendors(&self) -> IdvDataStateAndCountry {
-        // For some vendors, they expect US territory country codes to be sent in the "state" field but US territory code is vaulted in `id.country`
+        // For some vendors, they expect US territory country codes to be sent in the "state" field but US
+        // territory code is vaulted in `id.country`
         if self
             .country
             .as_ref()

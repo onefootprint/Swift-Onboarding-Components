@@ -1,5 +1,10 @@
-use super::{AuthActor, PartnerTenantAuth, TenantAuth};
-use crate::{auth::Either, errors::ApiResult};
+use super::{
+    AuthActor,
+    PartnerTenantAuth,
+    TenantAuth,
+};
+use crate::auth::Either;
+use crate::errors::ApiResult;
 use db::helpers::TenantOrPartnerTenantRef;
 use newtypes::OrgIdentifierRef;
 

@@ -1,23 +1,43 @@
-use crate::{
-    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
-    errors::{tenant::TenantError, ApiError},
-    types::{response::ResponseData, EmptyResponse, JsonApiResponse},
-    utils::db2api::DbToApi,
-    State,
+use crate::auth::tenant::{
+    CheckTenantGuard,
+    TenantGuard,
+    TenantSessionAuth,
 };
+use crate::errors::tenant::TenantError;
+use crate::errors::ApiError;
+use crate::types::response::ResponseData;
+use crate::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use crate::utils::db2api::DbToApi;
+use crate::State;
 use actix_web::web::Json;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_wire_types::{AnnotationFilters, CreateAnnotationRequest, UpdateAnnotationRequest};
-use db::{
-    models::{
-        annotation::{Annotation, AnnotationInfo},
-        scoped_vault::ScopedVault,
-        user_timeline::UserTimeline,
-    },
-    DbError,
+use api_wire_types::{
+    AnnotationFilters,
+    CreateAnnotationRequest,
+    UpdateAnnotationRequest,
 };
-use newtypes::{AnnotationId, FpId};
-use paperclip::actix::{api_v2_operation, get, patch, post, web, Apiv2Schema};
+use db::models::annotation::{
+    Annotation,
+    AnnotationInfo,
+};
+use db::models::scoped_vault::ScopedVault;
+use db::models::user_timeline::UserTimeline;
+use db::DbError;
+use newtypes::{
+    AnnotationId,
+    FpId,
+};
+use paperclip::actix::{
+    api_v2_operation,
+    get,
+    patch,
+    post,
+    web,
+    Apiv2Schema,
+};
 
 type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
 
@@ -117,8 +137,9 @@ pub fn post(
 
     let fp_id = fp_id.into_inner();
 
-    // TODO: should possibly make this route handler dumber and move these DB operations into a helper function, ie MakeAnnotation::call(note,is_pinned,fp_id,auth_actor)
-    //   we can call this from tests, from future spots where we want to create annotations (eg: decision engine)
+    // TODO: should possibly make this route handler dumber and move these DB operations into a helper
+    // function, ie MakeAnnotation::call(note,is_pinned,fp_id,auth_actor)   we can call this from
+    // tests, from future spots where we want to create annotations (eg: decision engine)
     let annotation: AnnotationInfo = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {

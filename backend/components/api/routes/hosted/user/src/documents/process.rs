@@ -1,8 +1,21 @@
-use crate::{auth::user::UserAuthScope, types::response::ResponseData};
-use api_core::{auth::user::UserWfAuthContext, decision, types::JsonApiResponse, State};
+use crate::auth::user::UserAuthScope;
+use crate::types::response::ResponseData;
+use api_core::auth::user::UserWfAuthContext;
+use api_core::types::JsonApiResponse;
+use api_core::{
+    decision,
+    State,
+};
 use api_wire_types::DocumentResponse;
-use newtypes::{DocumentId, WorkflowGuard};
-use paperclip::actix::{self, api_v2_operation, web};
+use newtypes::{
+    DocumentId,
+    WorkflowGuard,
+};
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     description = "Continue processing the ID doc, if any remaining",

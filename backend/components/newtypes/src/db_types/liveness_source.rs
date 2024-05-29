@@ -1,14 +1,26 @@
 use crate::util::impl_enum_str_diesel;
-use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use diesel::sql_types::Text;
+use diesel::{
+    AsExpression,
+    FromSqlRow,
+};
 use diesel_as_jsonb::AsJsonb;
 use macros::SerdeAttr;
 use paperclip::actix::Apiv2Schema;
-
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use serde_json;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
 use strum::Display;
-use strum_macros::{AsRefStr, EnumString};
+use strum_macros::{
+    AsRefStr,
+    EnumString,
+};
 
 #[derive(
     Eq,

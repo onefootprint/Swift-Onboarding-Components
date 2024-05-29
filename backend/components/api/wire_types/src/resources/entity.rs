@@ -1,15 +1,33 @@
-use std::collections::HashMap;
-
-use crate::{InsightEvent, WatchlistCheck};
-use chrono::{DateTime, Utc};
+use crate::{
+    InsightEvent,
+    WatchlistCheck,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, ExternalId, FilterFunction, FpId, LabelKind, ManualReviewKind,
-    ObConfigurationId, OnboardingStatus, PiiString, SandboxId, TenantId, VaultKind,
+    DataIdentifier,
+    DataLifetimeSource,
+    ExternalId,
+    FilterFunction,
+    FpId,
+    LabelKind,
+    ManualReviewKind,
+    ObConfigurationId,
+    OnboardingStatus,
+    PiiString,
+    SandboxId,
+    TenantId,
+    VaultKind,
 };
 use paperclip::actix::Apiv2Schema;
-
 use serde::Serialize;
-use serde_with::{DeserializeFromStr, SerializeDisplay};
+use serde_with::{
+    DeserializeFromStr,
+    SerializeDisplay,
+};
+use std::collections::HashMap;
 use strum_macros::EnumString;
 
 /// Details for a specific Entity

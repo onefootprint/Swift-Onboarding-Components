@@ -1,16 +1,30 @@
-use crate::{
-    task::{tasks::watchlist_check::tests::*, TaskError},
-    utils::vault_wrapper::{Any, VaultWrapper},
-    State,
+use crate::task::tasks::watchlist_check::tests::*;
+use crate::task::TaskError;
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
 };
-use chrono::{Duration, Utc};
-use db::{test_helpers::assert_have_same_elements, tests::MockFFClient, DbError};
+use crate::State;
+use chrono::{
+    Duration,
+    Utc,
+};
+use db::test_helpers::assert_have_same_elements;
+use db::tests::MockFFClient;
+use db::DbError;
 use db_schema::schema::verification_result;
 use diesel::prelude::*;
 use macros::test_state_case;
 use newtypes::{
-    FootprintReasonCode, IdentityDataKind as IDK, OnboardingStatus, PiiString, VendorAPI,
-    WatchlistCheckError, WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
+    FootprintReasonCode,
+    IdentityDataKind as IDK,
+    OnboardingStatus,
+    PiiString,
+    VendorAPI,
+    WatchlistCheckError,
+    WatchlistCheckNotNeededReason,
+    WatchlistCheckStatus,
+    WatchlistCheckStatusKind,
 };
 
 #[test_state_case(
@@ -167,7 +181,8 @@ async fn vendor_error(state: &mut State, vault_kind: VaultKind) {
 #[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()), OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
 #[test_state_case(VaultKind::NonPortable, OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
 #[test_state_case(VaultKind::NonPortable, OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
-// Non portable vaults always have checks run even if they are in non-Pass states. although.. TODO: we should probably still skip checks for NPV's that are Fail?
+// Non portable vaults always have checks run even if they are in non-Pass states. although.. TODO: we should
+// probably still skip checks for NPV's that are Fail?
 #[test_state_case(VaultKind::NonPortable, OnboardingStatus::Incomplete, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
 #[test_state_case(VaultKind::NonPortable, OnboardingStatus::Pending, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
 #[test_state_case(VaultKind::NonPortable, OnboardingStatus::Fail, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
@@ -187,7 +202,8 @@ async fn active_users(
     if vault_kind.expects_idology() {
         mock_idology_pa(state, &vendor_res);
     } else {
-        // Simulate there being an existing search we just need to re-ping, since this is the most common case
+        // Simulate there being an existing search we just need to re-ping, since this is the most common
+        // case
         save_existing_watchlist_check_vres(state, &sv.id).await;
 
         let mut mock_ff_client = MockFFClient::new();
@@ -220,7 +236,8 @@ async fn active_users(
         assert!(vreqs[0].1.is_some());
         assert!(!vreqs[0].1.as_ref().unwrap().is_error);
     } else {
-        assert_eq!(2, vreqs.len()); //1 for start onboarding, 1 for IncodeUpdatedWatchlistResultcall. NO calls to IncodeWatchlistCheck itself!
+        assert_eq!(2, vreqs.len()); //1 for start onboarding, 1 for IncodeUpdatedWatchlistResultcall. NO calls to IncodeWatchlistCheck
+                                    // itself!
         let vreq_vres = vreqs
             .iter()
             .find(|v| v.0.vendor_api == VendorAPI::IncodeUpdatedWatchlistResult)
@@ -297,7 +314,9 @@ async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
         }
     }
 
-    // No vres for IncodeWatchlistCheck exists! Theoretically an impossible scenario (cause we should have made such a call when the sv was onboarded) but still good to handle and this will be extended to handle 2 more cases where a fresh search must be performed: (1) if its been >365d
+    // No vres for IncodeWatchlistCheck exists! Theoretically an impossible scenario (cause we should
+    // have made such a call when the sv was onboarded) but still good to handle and this will be
+    // extended to handle 2 more cases where a fresh search must be performed: (1) if its been >365d
     let mut mock_ff_client = MockFFClient::new();
     mock_ff_client.mock(|c| {
         c.expect_flag().return_once(move |_| true);

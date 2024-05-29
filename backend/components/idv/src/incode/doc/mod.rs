@@ -1,5 +1,7 @@
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DocVData, IncodeVerificationSessionId,
+    DocVData,
+    IncodeVerificationSessionId,
     IncodeVerificationSessionKind,
 };
 

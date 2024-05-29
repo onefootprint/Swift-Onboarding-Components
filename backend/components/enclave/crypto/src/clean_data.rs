@@ -1,5 +1,6 @@
 /// Clean data before it is fingerprinted: lowercase, trim, and sha256
-/// IMPORTANT NOTE!: this must stay in sync with our algorithm for signing plaintext data and sealed data inside the enclave
+/// IMPORTANT NOTE!: this must stay in sync with our algorithm for signing plaintext data and sealed
+/// data inside the enclave
 pub fn clean_and_hash_data_for_fingerprinting(data: &[u8]) -> [u8; 32] {
     // 1.clean the data if possible
     let data = if let Ok(str_data) = std::str::from_utf8(data) {

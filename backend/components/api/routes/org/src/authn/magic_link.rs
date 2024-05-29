@@ -1,9 +1,15 @@
-use api_core::{
-    types::{EmptyResponse, JsonApiResponse},
-    State,
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
 };
+use api_core::State;
 use api_wire_types::LinkAuthRequest;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    api_v2_operation,
+    post,
+    web,
+};
 
 #[api_v2_operation(
     description = "Request to authenticate a user email. WorkOS will send the email a link to \

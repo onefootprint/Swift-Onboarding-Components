@@ -1,5 +1,7 @@
 use super::AuthSessionData;
-use crate::{auth::Either, errors::ApiResult, utils::session::AuthSession};
+use crate::auth::Either;
+use crate::errors::ApiResult;
+use crate::utils::session::AuthSession;
 use crypto::aead::ScopedSealingKey;
 use db::PgConn;
 

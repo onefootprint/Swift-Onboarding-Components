@@ -1,12 +1,33 @@
-use crate::{DbResult, PgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{apple_device_attestation, scoped_vault, vault};
-use diesel::{prelude::*, Insertable, Queryable};
+use crate::{
+    DbResult,
+    PgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    apple_device_attestation,
+    scoped_vault,
+    vault,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use diesel_as_jsonb::AsJsonb;
 use newtypes::{
-    AppleAttestationReceiptType, AppleDeviceAttestationId, ScopedVaultId, VaultId, WebauthnCredentialId,
+    AppleAttestationReceiptType,
+    AppleDeviceAttestationId,
+    ScopedVaultId,
+    VaultId,
+    WebauthnCredentialId,
 };
-use serde::{Deserialize, Serialize};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
 #[derive(Debug, Serialize, Clone, Queryable)]
 #[diesel(table_name = apple_device_attestation)]

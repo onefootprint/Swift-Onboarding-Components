@@ -1,7 +1,9 @@
-use std::collections::HashMap;
-
 use itertools::Itertools;
-use newtypes::{ScrubbedPiiString, SocureReasonCode};
+use newtypes::{
+    ScrubbedPiiString,
+    SocureReasonCode,
+};
+use std::collections::HashMap;
 
 // https://developer.socure.com/reference#tag/ID+
 // https://developer.socure.com/docs/idplus/modules/modules-overview
@@ -118,7 +120,8 @@ pub struct AlertListMatch {
 #[serde(rename_all = "camelCase")]
 pub struct GlobalWatchlist {
     pub reason_codes: Vec<String>,
-    pub matches: HashMap<String, Vec<GlobalWatchlistMatch>>, // key is the watchlist name (eg: "PEP Data", "OFAC SDN List")
+    pub matches: HashMap<String, Vec<GlobalWatchlistMatch>>, /* key is the watchlist name (eg: "PEP Data",
+                                                              * "OFAC SDN List") */
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

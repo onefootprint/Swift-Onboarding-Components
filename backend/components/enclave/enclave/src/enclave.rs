@@ -1,12 +1,22 @@
-use crypto::{
-    aead::ScopedSealingKey, clean_and_hash_data_for_fingerprinting, seal::SealedChaCha20Poly1305DataKey,
-};
+use crypto::aead::ScopedSealingKey;
+use crypto::clean_and_hash_data_for_fingerprinting;
+use crypto::seal::SealedChaCha20Poly1305DataKey;
 use once_cell::sync::Lazy;
 use rpc::{
-    DataTransformer, DataTransforms, DecryptThenSignRequest, EnvelopeDecryptThenHmacSignRequest,
-    EnvelopeHmacSignRequest, GenerateDataKeypairRequest, GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair, GeneratedSealedDataKey, HmacSignature, HmacSignatureSingle, SealedIkek,
-    SealedIkekId, SignRequest,
+    DataTransformer,
+    DataTransforms,
+    DecryptThenSignRequest,
+    EnvelopeDecryptThenHmacSignRequest,
+    EnvelopeHmacSignRequest,
+    GenerateDataKeypairRequest,
+    GenerateSymmetricDataKeyRequest,
+    GeneratedDataKeyPair,
+    GeneratedSealedDataKey,
+    HmacSignature,
+    HmacSignatureSingle,
+    SealedIkek,
+    SealedIkekId,
+    SignRequest,
 };
 use std::collections::HashMap;
 use thiserror::Error;
@@ -18,7 +28,13 @@ mod simulated;
 #[cfg(feature = "nitro")]
 mod ne;
 
-use crate::{log_info_t, Decryption, DecryptionSingle, EnvelopeDecryptRequest, KmsCredentials};
+use crate::{
+    log_info_t,
+    Decryption,
+    DecryptionSingle,
+    EnvelopeDecryptRequest,
+    KmsCredentials,
+};
 
 /// init the enclave sdk if needed
 pub fn init() {

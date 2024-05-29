@@ -1,26 +1,43 @@
-use super::{ExtractableAuthSession, GetSessionForUpdate};
-use crate::{
-    auth::{tenant::InvalidateAuth, AuthError},
-    errors::{ApiError, ApiResult, AssertionError},
-    utils::session::AuthSession,
-    State,
+use super::{
+    ExtractableAuthSession,
+    GetSessionForUpdate,
 };
-use actix_web::{http::header::HeaderMap, web, FromRequest};
+use crate::auth::tenant::InvalidateAuth;
+use crate::auth::AuthError;
+use crate::errors::{
+    ApiError,
+    ApiResult,
+    AssertionError,
+};
+use crate::utils::session::AuthSession;
+use crate::State;
+use actix_web::http::header::HeaderMap;
+use actix_web::{
+    web,
+    FromRequest,
+};
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db::models::session::Session;
 use derive_more::Deref;
 use futures_util::Future;
 use http::Method;
-use newtypes::{PiiString, SessionAuthToken};
-use paperclip::{
-    actix::OperationModifier,
-    v2::{
-        models::{DefaultSchemaRaw, Parameter, SecurityScheme},
-        schema::Apiv2Schema,
-    },
+use newtypes::{
+    PiiString,
+    SessionAuthToken,
 };
-use std::{marker::PhantomData, pin::Pin};
+use paperclip::actix::OperationModifier;
+use paperclip::v2::models::{
+    DefaultSchemaRaw,
+    Parameter,
+    SecurityScheme,
+};
+use paperclip::v2::schema::Apiv2Schema;
+use std::marker::PhantomData;
+use std::pin::Pin;
 use tracing_actix_web::RootSpan;
 
 /// Abstract Session Context Type
@@ -122,10 +139,10 @@ where
             let session = AuthSession::get(&state, &auth_token).await?;
 
             // Explicit type annotation here (T:: try_from) automatically ensures that a malicious user
-            // cannot re-use session tokens for different purposes -- the API endpoints declare the session type "T"
-            // that they allow (example: UserSession<OnboardingSessionData>)
-            // and if the session associated with the token cannot be converted to type T (in this case, OnboardingSession)
-            // we fail
+            // cannot re-use session tokens for different purposes -- the API endpoints declare the session
+            // type "T" that they allow (example: UserSession<OnboardingSessionData>)
+            // and if the session associated with the token cannot be converted to type T (in this case,
+            // OnboardingSession) we fail
             let raw_session_data = session.data.clone();
             let ff_client = state.ff_client.clone();
 
@@ -206,9 +223,13 @@ where
 #[cfg(test)]
 mod test {
     use super::SessionContext;
-    use crate::{auth::session::AuthSessionData, utils::session::AuthSession};
+    use crate::auth::session::AuthSessionData;
+    use crate::utils::session::AuthSession;
     use chrono::Utc;
-    use newtypes::{SessionAuthToken, SessionAuthTokenKind};
+    use newtypes::{
+        SessionAuthToken,
+        SessionAuthTokenKind,
+    };
     use std::marker::PhantomData;
 
     impl<T> SessionContext<T> {

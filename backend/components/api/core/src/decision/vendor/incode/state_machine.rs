@@ -1,36 +1,55 @@
-use std::sync::Arc;
-
-use super::{
-    get_config_id,
-    state::{IncodeState, IncodeStateTransition, RunTransition, StepResult},
-    states::*,
+use super::get_config_id;
+use super::state::{
+    IncodeState,
+    IncodeStateTransition,
+    RunTransition,
+    StepResult,
 };
+use super::states::*;
+use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
+use crate::decision::vendor::incode::states::VerificationSession;
+use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
+use crate::errors::user::UserError;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
+};
+use crate::utils::vault_wrapper::{
+    Person,
+    VaultWrapper,
+    VwArgs,
+};
+use crate::vendor_clients::IncodeClients;
 use crate::{
-    decision::vendor::{
-        build_request::build_docv_data_from_identity_doc, incode::states::VerificationSession,
-        tenant_vendor_control::TenantVendorControl,
-    },
-    errors::{user::UserError, ApiResult, AssertionError},
-    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
-    vendor_clients::IncodeClients,
-    ApiError, State,
+    ApiError,
+    State,
 };
-use db::{
-    models::{
-        decision_intent::DecisionIntent, document::Document,
-        incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
-        vault::Vault,
-    },
-    DbPool,
-};
+use db::models::decision_intent::DecisionIntent;
+use db::models::document::Document;
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::vault::Vault;
+use db::DbPool;
 use feature_flag::FeatureFlagClient;
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, DecisionIntentKind, DocVData,
-    DocumentId, DocumentRequestId, IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason,
-    IncodeVerificationSessionKind, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId,
-    TenantId, WorkflowId,
+    DecisionIntentId,
+    DecisionIntentKind,
+    DocVData,
+    DocumentId,
+    DocumentRequestId,
+    IncodeConfigurationId,
+    IncodeEnvironment,
+    IncodeFailureReason,
+    IncodeVerificationSessionKind,
+    IncodeVerificationSessionState,
+    Iso3166TwoDigitCountryCode,
+    ScopedVaultId,
+    TenantId,
+    WorkflowId,
 };
 use selfie_doc::AwsSelfieDocClient;
+use std::sync::Arc;
 
 pub type IsReady = bool;
 
@@ -51,7 +70,8 @@ pub struct IncodeContext {
     pub ff_client: Arc<dyn FeatureFlagClient>,
     pub failed_attempts_for_side: i64,
     pub disable_selfie: bool,
-    /// When true, the machine is running specifically inside the private, manual incode re-run endpoint
+    /// When true, the machine is running specifically inside the private, manual incode re-run
+    /// endpoint
     pub is_re_run: bool,
     pub aws_selfie_client: AwsSelfieDocClient,
 }
@@ -282,7 +302,11 @@ impl IncodeStateMachine {
             state: state.clone(),
             tenant_id: obc.tenant_id.clone(),
             ff_client: state.ff_client.clone(),
-            failed_attempts_for_side: 0, // !! this is the one thing that is hard coded here that would differ from the existing code path that inits a IVS. We could have this method pass in DocumentSide and calculate this for real and then also call this init method from /upload and consolidate code paths
+            failed_attempts_for_side: 0, /* !! this is the one thing that is hard coded here that would
+                                          * differ from the existing code path that inits a IVS. We could
+                                          * have this method pass in DocumentSide and calculate this for
+                                          * real and then also call this init method from /upload and
+                                          * consolidate code paths */
             disable_selfie,
             is_re_run: true,
             aws_selfie_client: state.aws_selfie_doc_client.clone(),

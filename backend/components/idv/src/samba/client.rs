@@ -1,13 +1,15 @@
-use newtypes::{vendor_credentials::SambaSafetyCredentials, PiiString, SambaOrderId, SambaReportId};
-use reqwest::header;
-
+use super::error::Error as SambaSafetyError;
+use super::request::license_validation::CreateLVOrderRequest;
+use super::request::SambaCreateLVOrderRequest;
+use super::response::auth::AuthenticationResponse;
 use crate::footprint_http_client::FootprintVendorHttpClient;
-
-use super::{
-    error::Error as SambaSafetyError,
-    request::{license_validation::CreateLVOrderRequest, SambaCreateLVOrderRequest},
-    response::auth::AuthenticationResponse,
+use newtypes::vendor_credentials::SambaSafetyCredentials;
+use newtypes::{
+    PiiString,
+    SambaOrderId,
+    SambaReportId,
 };
+use reqwest::header;
 
 type SambaResult<T> = Result<T, SambaSafetyError>;
 
@@ -148,7 +150,8 @@ impl AuthenticatedSambaSafetyClientAdapter {
         Ok(response)
     }
 
-    /// Get the status of a LicenseValidation Order, returns a report_id which we can use to fetch the results
+    /// Get the status of a LicenseValidation Order, returns a report_id which we can use to fetch
+    /// the results
     #[tracing::instrument(skip_all)]
     pub async fn get_license_validation_status(
         &self,
@@ -191,16 +194,18 @@ impl AuthenticatedSambaSafetyClientAdapter {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        footprint_http_client::FpVendorClientArgs,
-        samba::{
-            request::license_validation::CreateLVOrderAddress,
-            response::license_validation::{CheckLVOrderStatus, CreateLVOrderResponse, GetLVOrderResponse},
-        },
-    };
-
     use super::*;
-    use std::{thread, time};
+    use crate::footprint_http_client::FpVendorClientArgs;
+    use crate::samba::request::license_validation::CreateLVOrderAddress;
+    use crate::samba::response::license_validation::{
+        CheckLVOrderStatus,
+        CreateLVOrderResponse,
+        GetLVOrderResponse,
+    };
+    use std::{
+        thread,
+        time,
+    };
 
     async fn get_authed_client(creds: SambaSafetyCredentials) -> AuthenticatedSambaSafetyClientAdapter {
         let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();

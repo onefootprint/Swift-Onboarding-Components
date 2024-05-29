@@ -1,5 +1,8 @@
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Deserializer};
+use serde::{
+    Deserialize,
+    Deserializer,
+};
 
 #[derive(Debug, Apiv2Schema, Clone, Copy, Default)]
 /// NOTE: if you use this, the field must be annotated with `#[serde(default)]`.
@@ -66,7 +69,6 @@ where
         Option::deserialize(deserializer).map(Into::into)
     }
 }
-
 
 #[cfg(test)]
 mod test {

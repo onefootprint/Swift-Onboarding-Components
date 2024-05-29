@@ -1,7 +1,14 @@
-use chrono::{serde::ts_nanoseconds, DateTime, Utc};
+use chrono::serde::ts_nanoseconds;
+use chrono::{
+    DateTime,
+    Utc,
+};
 use macros::SerdeAttr;
 use paperclip::actix::Apiv2Schema;
-use strum_macros::{EnumDiscriminants, EnumString};
+use strum_macros::{
+    EnumDiscriminants,
+    EnumString,
+};
 
 #[derive(EnumDiscriminants)]
 #[strum_discriminants(name(ScopedVaultCursorKind))]

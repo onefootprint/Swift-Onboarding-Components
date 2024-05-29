@@ -1,14 +1,13 @@
-use rpc::KmsCredentials;
-
-use crate::now_millis;
-
-use super::{
-    ffi::{
-        self, aws_allocator, aws_nitro_enclaves_kms_client, aws_nitro_enclaves_kms_client_configuration,
-        aws_string,
-    },
-    Error,
+use super::ffi::{
+    self,
+    aws_allocator,
+    aws_nitro_enclaves_kms_client,
+    aws_nitro_enclaves_kms_client_configuration,
+    aws_string,
 };
+use super::Error;
+use crate::now_millis;
+use rpc::KmsCredentials;
 
 pub struct AwsString(pub *mut aws_string);
 unsafe impl Send for AwsString {}

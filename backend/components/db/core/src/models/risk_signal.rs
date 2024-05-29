@@ -1,17 +1,38 @@
-use crate::{DbResult, PgConn, TxnPgConn};
-use chrono::{DateTime, Utc};
-use db_schema::schema::{risk_signal, risk_signal_group};
-use diesel::{prelude::*, Insertable, Queryable};
+use super::data_lifetime::DataLifetime;
+use super::risk_signal_group::RiskSignalGroup;
+use crate::{
+    DbResult,
+    PgConn,
+    TxnPgConn,
+};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use db_schema::schema::{
+    risk_signal,
+    risk_signal_group,
+};
+use diesel::prelude::*;
+use diesel::{
+    Insertable,
+    Queryable,
+};
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, FootprintReasonCode, OnboardingDecisionId, RiskSignalGroupId, RiskSignalGroupKind,
-    RiskSignalId, ScopedVaultId, VendorAPI, VerificationResultId,
+    DataLifetimeSeqno,
+    FootprintReasonCode,
+    OnboardingDecisionId,
+    RiskSignalGroupId,
+    RiskSignalGroupKind,
+    RiskSignalId,
+    ScopedVaultId,
+    VendorAPI,
+    VerificationResultId,
 };
 use std::collections::HashMap;
 #[cfg(test)]
 use std::str::FromStr;
-
-use super::{data_lifetime::DataLifetime, risk_signal_group::RiskSignalGroup};
 
 #[derive(Debug, Clone, Queryable, Eq, PartialEq)]
 #[diesel(table_name = risk_signal)]
@@ -137,7 +158,8 @@ impl RiskSignal {
     ) -> DbResult<Vec<Self>> {
         let rsg = RiskSignalGroup::latest_by_kind(conn, scoped_vault_id, kind)?;
         if let Some(rsg) = rsg {
-            // hmm, we need unhidden as well i guess here bc we are decisioning before we decide which ones to unhide
+            // hmm, we need unhidden as well i guess here bc we are decisioning before we decide which ones to
+            // unhide
             let res = risk_signal::table
                 .filter(risk_signal::risk_signal_group_id.eq(rsg.id))
                 .get_results(conn)?;
@@ -219,10 +241,12 @@ impl RiskSignal {
 
 impl RiskSignal {
     // Historically, we were writing RiskSignal's with onboarding_decision_id as a foreign key.
-    // Now OBD_id is optional and soon new RiskSignal's will be created with onboarding_decision_id = None and instead have
-    // verification_result_id set
-    // This function currently preserves legacy behavior in that it will return RS's created within the context of a certain onboarding_decision_id.
-    // Legacy RS's will be retrieved as usual through rs.obd_id, but new RS's are retrieved via the onboarding_decision_verification_result_junction table
+    // Now OBD_id is optional and soon new RiskSignal's will be created with onboarding_decision_id =
+    // None and instead have verification_result_id set
+    // This function currently preserves legacy behavior in that it will return RS's created within the
+    // context of a certain onboarding_decision_id. Legacy RS's will be retrieved as usual through
+    // rs.obd_id, but new RS's are retrieved via the onboarding_decision_verification_result_junction
+    // table
     #[cfg(test)]
     #[tracing::instrument("RiskSignal::list_tenant_visible_by_onboarding_decision_id", skip_all)]
     fn list_tenant_visible_by_onboarding_decision_id(
@@ -295,8 +319,8 @@ impl RiskSignal {
     }
 }
 
-// temporary struct to differentiate our legacy way of writing all RS's from various Vres's at once when we create an OBD
-// vs our new way which will
+// temporary struct to differentiate our legacy way of writing all RS's from various Vres's at once
+// when we create an OBD vs our new way which will
 #[cfg(test)]
 enum NewRiskSignals {
     LegacyObd {
@@ -311,22 +335,30 @@ enum NewRiskSignals {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        models::{
-            decision_intent::DecisionIntent,
-            onboarding_decision::{NewDecisionArgs, OnboardingDecision},
-            scoped_vault::ScopedVault,
-            verification_request::VerificationRequest,
-            verification_result::VerificationResult,
-            workflow::{Workflow, WorkflowUpdate},
-        },
-        test_helpers::assert_have_same_elements,
-        tests::{fixtures, prelude::*},
+    use crate::models::decision_intent::DecisionIntent;
+    use crate::models::onboarding_decision::{
+        NewDecisionArgs,
+        OnboardingDecision,
     };
+    use crate::models::scoped_vault::ScopedVault;
+    use crate::models::verification_request::VerificationRequest;
+    use crate::models::verification_result::VerificationResult;
+    use crate::models::workflow::{
+        Workflow,
+        WorkflowUpdate,
+    };
+    use crate::test_helpers::assert_have_same_elements;
+    use crate::tests::fixtures;
+    use crate::tests::prelude::*;
     use itertools::Itertools;
     use macros::db_test_case;
     use newtypes::{
-        DataLifetimeSeqno, DbActor, DecisionIntentId, DecisionIntentKind, DecisionStatus, ScopedVaultId,
+        DataLifetimeSeqno,
+        DbActor,
+        DecisionIntentId,
+        DecisionIntentKind,
+        DecisionStatus,
+        ScopedVaultId,
     };
     use serde_json::json;
 

@@ -1,22 +1,42 @@
 use super::RegisterChallengeData;
-use crate::{challenge::RegisterChallenge, State};
-use api_core::{
-    auth::{
-        session::user::{AssociatedAuthEventKind, TokenCreationPurpose},
-        user::{load_auth_events, UserAuthContext, UserAuthScope},
-        IsGuardMet,
-    },
-    errors::{AssertionError, ValidationError},
-    types::{response::ResponseData, JsonApiResponse},
-    utils::{
-        challenge::Challenge, email::send_email_challenge_non_blocking, passkey::WebauthnConfig,
-        sms::rx_background_error,
-    },
+use crate::challenge::RegisterChallenge;
+use crate::State;
+use api_core::auth::session::user::{
+    AssociatedAuthEventKind,
+    TokenCreationPurpose,
 };
-use api_wire_types::{UserChallengeRequest, UserChallengeResponse};
+use api_core::auth::user::{
+    load_auth_events,
+    UserAuthContext,
+    UserAuthScope,
+};
+use api_core::auth::IsGuardMet;
+use api_core::errors::{
+    AssertionError,
+    ValidationError,
+};
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
+use api_core::utils::challenge::Challenge;
+use api_core::utils::email::send_email_challenge_non_blocking;
+use api_core::utils::passkey::WebauthnConfig;
+use api_core::utils::sms::rx_background_error;
+use api_wire_types::{
+    UserChallengeRequest,
+    UserChallengeResponse,
+};
 use itertools::Itertools;
-use newtypes::{ActionKind, AuthEventKind, AuthMethodKind};
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use newtypes::{
+    ActionKind,
+    AuthEventKind,
+    AuthMethodKind,
+};
+use paperclip::actix::web::Json;
+use paperclip::actix::{
+    self,
+    api_v2_operation,
+    web,
+};
 
 #[api_v2_operation(
     tags(Challenge, Hosted),
@@ -173,12 +193,14 @@ fn allowed_challenge_kinds(
 
 #[cfg(test)]
 mod test {
+    use super::allowed_challenge_kinds;
     use crate::challenge::ActionKind;
     use api_core::auth::session::user::AssociatedAuthEventKind;
-    use newtypes::{AuthEventKind, AuthMethodKind};
+    use newtypes::{
+        AuthEventKind,
+        AuthMethodKind,
+    };
     use test_case::test_case;
-
-    use super::allowed_challenge_kinds;
 
     #[test_case(ActionKind::AddPrimary, AuthEventKind::Passkey, AssociatedAuthEventKind::Implicit => Vec::<AuthMethodKind>::new(); "no-challenges-allowed-for-implicit")]
     #[test_case(ActionKind::Replace, AuthEventKind::ThirdParty, AssociatedAuthEventKind::Explicit => Vec::<AuthMethodKind>::new(); "no-challenges-allowed-for-3p")] // This isn't realistic since 3p auth is only ever implicit, but just testing in case

@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-
 use crate::PiiString;
+use std::collections::HashMap;
 
 #[derive(Clone, strum::EnumDiscriminants)]
 #[strum_discriminants(vis(pub), name(SmsMessageKind))]

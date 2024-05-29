@@ -1,23 +1,39 @@
-use super::{super::PatchDataResult, Fingerprints, WriteableVw};
-use crate::{
-    auth::tenant::AuthActor,
-    errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::{Any, PieceOfData, TenantVw, VaultWrapper},
-    State,
+use super::super::PatchDataResult;
+use super::{
+    Fingerprints,
+    WriteableVw,
 };
-use db::{
-    models::{
-        contact_info::ContactInfo, ob_configuration::ObConfiguration, scoped_vault::ScopedVault,
-        vault_data::NewVaultData,
-    },
-    TxnPgConn,
+use crate::auth::tenant::AuthActor;
+use crate::errors::{
+    ApiResult,
+    AssertionError,
 };
+use crate::utils::vault_wrapper::{
+    Any,
+    PieceOfData,
+    TenantVw,
+    VaultWrapper,
+};
+use crate::State;
+use db::models::contact_info::ContactInfo;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault_data::NewVaultData;
+use db::TxnPgConn;
 use itertools::Itertools;
+use newtypes::fingerprint_salt::FingerprintSalt;
+use newtypes::output::Csv;
 use newtypes::{
-    fingerprint_salt::FingerprintSalt, output::Csv, DataIdentifier, DataLifetimeId, DataLifetimeSource,
-    Fingerprint, IdentityDataKind as IDK, TenantId, VaultKind,
+    DataIdentifier,
+    DataLifetimeId,
+    DataLifetimeSource,
+    Fingerprint,
+    IdentityDataKind as IDK,
+    TenantId,
+    VaultKind,
 };
-use std::{collections::HashMap, marker::PhantomData};
+use std::collections::HashMap;
+use std::marker::PhantomData;
 
 /// Precomputed portable data from the user-scoped vault that we will use to prefill data for a new
 /// tenant.

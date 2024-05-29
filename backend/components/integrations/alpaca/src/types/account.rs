@@ -1,5 +1,12 @@
-use chrono::{DateTime, Utc};
-use newtypes::{AlpacaPiiString, Declaration, PiiJsonValue};
+use chrono::{
+    DateTime,
+    Utc,
+};
+use newtypes::{
+    AlpacaPiiString,
+    Declaration,
+    PiiJsonValue,
+};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -73,13 +80,17 @@ pub struct Identity {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-/// It is your responsibility as the service provider to denote if the account owner falls under each category defined by FINRA rules. We recommend asking these questions at any point of the onboarding process of each account owner in the form of Y/N and Radio Buttons.
+/// It is your responsibility as the service provider to denote if the account owner falls under
+/// each category defined by FINRA rules. We recommend asking these questions at any point of the
+/// onboarding process of each account owner in the form of Y/N and Radio Buttons.
 pub struct Disclosures {
-    /// Whether user holds a controlling position in a publicly traded company, member of the board of directors or has policy making abilities in a publicly traded company.
+    /// Whether user holds a controlling position in a publicly traded company, member of the board
+    /// of directors or has policy making abilities in a publicly traded company.
     pub is_control_person: bool, // false,
     pub is_affiliated_exchange_or_finra: bool, // true,
     pub is_politically_exposed: bool,          // false,
-    /// If your user’s immediate family member (sibling, husband/wife, child, parent) is either politically exposed or holds a control position.
+    /// If your user’s immediate family member (sibling, husband/wife, child, parent) is either
+    /// politically exposed or holds a control position.
     pub immediate_family_exposed: bool, // false,
     /// Information relevant to the user’s disclosure selection should be sent through this object.
     pub context: Option<Vec<DisclosureContext>>,
@@ -106,7 +117,9 @@ impl Disclosures {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-/// If you utilize Alpaca for KYCaaS, additional information will need to be submitted if the user identifies with any of the disclosures before the account can be approved. This information can be sent through the context object to speed up the time to approve their account.
+/// If you utilize Alpaca for KYCaaS, additional information will need to be submitted if the user
+/// identifies with any of the disclosures before the account can be approved. This information can
+/// be sent through the context object to speed up the time to approve their account.
 pub struct DisclosureContext {
     pub context_type: ContextType, // "AFFILIATE_FIRM",
     /// Required if context_type = AFFILIATE_FIRM or CONTROLLED_FIRM
@@ -128,7 +141,8 @@ pub struct DisclosureContext {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-/// In order to comply with Alpaca’s terms of service, each account owner must be presented the following agreements.
+/// In order to comply with Alpaca’s terms of service, each account owner must be presented the
+/// following agreements.
 pub struct Agreement {
     pub agreement: Agreements,
     /// string (timestamp)
@@ -138,7 +152,9 @@ pub struct Agreement {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-/// This model consists of a series of documents based on the KYC requirements. Documents are binary objects whose contents are encoded in base64. Each encoded content size is limited to 10MB if you use Alpaca for KYCaaS. If you perform your own KYC there are no document size limitations.
+/// This model consists of a series of documents based on the KYC requirements. Documents are binary
+/// objects whose contents are encoded in base64. Each encoded content size is limited to 10MB if
+/// you use Alpaca for KYCaaS. If you perform your own KYC there are no document size limitations.
 pub struct Document {
     pub document_type: DocumentType,
     pub document_sub_type: Option<String>, // "passport",
@@ -148,7 +164,8 @@ pub struct Document {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-/// This model input is optional. However, the client should make reasonable effort to obtain the trusted contact information. See more details in FINRA Notice 17-11
+/// This model input is optional. However, the client should make reasonable effort to obtain the
+/// trusted contact information. See more details in FINRA Notice 17-11
 pub struct TrustedContact {
     pub given_name: AlpacaPiiString,  //"Jane",
     pub family_name: AlpacaPiiString, // "Doe",
@@ -247,9 +264,11 @@ pub enum FundingSource {
 #[allow(non_camel_case_types)]
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 pub enum ContextType {
-    CONTROLLED_FIRM,          // Controlled firm. Recommened to use when is_control_person = true
-    AFFILIATE_FIRM,           //	Affiliated firm. Recommened to use when is_affiliated_exchange_or_finra = true
-    IMMEDIATE_FAMILY_EXPOSED, //	Immediate family exposed. Recommended to use when immediate_family_exposed = true
+    CONTROLLED_FIRM, // Controlled firm. Recommened to use when is_control_person = true
+    AFFILIATE_FIRM,  /* 	Affiliated firm. Recommened to use when is_affiliated_exchange_or_finra
+                      * = true */
+    IMMEDIATE_FAMILY_EXPOSED, /* 	Immediate family exposed. Recommended to use when
+                               * immediate_family_exposed = true */
 }
 
 #[allow(non_camel_case_types)]
@@ -284,7 +303,9 @@ pub enum DocumentType {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum AccountType {
-    Trading,      // Typical brokerage account
-    Custodial, // Trading account opened on behalf of a minor and ownership will be transferred to the minor when they reach the age of majority
-    DonorAdvised, // Trading account established at a public charity which allows donors to receive tax benefits from their charitable contributions
+    Trading, // Typical brokerage account
+    Custodial, /* Trading account opened on behalf of a minor and ownership will be transferred to the
+              * minor when they reach the age of majority */
+    DonorAdvised, /* Trading account established at a public charity which allows donors to receive tax
+                   * benefits from their charitable contributions */
 }

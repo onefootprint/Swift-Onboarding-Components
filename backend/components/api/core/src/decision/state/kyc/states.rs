@@ -1,58 +1,98 @@
-use std::{collections::HashMap, sync::Arc};
-
-use async_trait::async_trait;
-use db::models::{
-    data_lifetime::DataLifetime,
-    document_request::DocumentRequest,
-    list_entry::{ListEntry, ListWithDecryptedEntries},
-    ob_configuration::ObConfiguration,
-    risk_signal::{NewRiskSignalInfo, RiskSignal},
-    risk_signal_group::RiskSignalGroup,
-    rule_instance::RuleInstance,
-    vault::Vault,
-    workflow::{Workflow as DbWorkflow, WorkflowUpdate},
+use super::{
+    KycComplete,
+    KycDataCollection,
+    KycDecisioning,
+    KycDocCollection,
+    KycState,
+    KycVendorCalls,
+    MakeDecision,
+    MakeVendorCalls,
 };
-
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use crate::decision::features::risk_signals::risk_signal_group_struct::{
+    Aml,
+    Kyc,
+};
+use crate::decision::features::risk_signals::{
+    fetch_latest_risk_signals_map,
+    parse_reason_codes,
+    parse_reason_codes_from_vendor_result,
+    RiskSignalGroupStruct,
+};
+use crate::decision::features::{
+    self,
+};
+use crate::decision::onboarding::Decision;
+use crate::decision::rule_engine::engine::{
+    EvaluateWorkflowDecisionArgs,
+    VaultDataForRules,
+};
+use crate::decision::rule_engine::{
+    self,
+};
+use crate::decision::state::actions::{
+    Authorize,
+    WorkflowActions,
+};
+use crate::decision::state::common::{
+    self,
+    DecisionOutput,
+};
+use crate::decision::state::{
+    DocCollected,
+    OnAction,
+    WorkflowState,
+};
+use crate::decision::utils::should_execute_rules_for_document_only;
+use crate::decision::vendor::vendor_result::VendorResult;
+use crate::decision::{
+    self,
+};
+use crate::errors::ApiResult;
+use crate::utils::vault_wrapper::{
+    Any,
+    VaultWrapper,
+};
+use crate::State;
+use async_trait::async_trait;
+use db::models::data_lifetime::DataLifetime;
+use db::models::document_request::DocumentRequest;
+use db::models::list_entry::{
+    ListEntry,
+    ListWithDecryptedEntries,
+};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::{
+    NewRiskSignalInfo,
+    RiskSignal,
+};
+use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::rule_instance::RuleInstance;
+use db::models::vault::Vault;
+use db::models::workflow::{
+    Workflow as DbWorkflow,
+    WorkflowUpdate,
+};
+use feature_flag::{
+    BoolFlag,
+    FeatureFlagClient,
+};
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
 use newtypes::{
-    DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, ListId, Locked, OnboardingStatus,
-    RiskSignalGroupKind, RuleSetResultKind, VendorAPI, VerificationResultId,
+    DecisionStatus,
+    DocumentRequestKind,
+    EnhancedAmlOption,
+    KycConfig,
+    ListId,
+    Locked,
+    OnboardingStatus,
+    RiskSignalGroupKind,
+    RuleSetResultKind,
+    VendorAPI,
+    VerificationResultId,
 };
-
-use super::{
-    KycComplete, KycDataCollection, KycDecisioning, KycDocCollection, KycState, KycVendorCalls, MakeDecision,
-    MakeVendorCalls,
-};
-use crate::{
-    decision::{
-        self,
-        features::{
-            self,
-            risk_signals::{
-                fetch_latest_risk_signals_map, parse_reason_codes, parse_reason_codes_from_vendor_result,
-                risk_signal_group_struct::{Aml, Kyc},
-                RiskSignalGroupStruct,
-            },
-        },
-        onboarding::Decision,
-        rule_engine::{
-            self,
-            engine::{EvaluateWorkflowDecisionArgs, VaultDataForRules},
-        },
-        state::{
-            actions::{Authorize, WorkflowActions},
-            common::{self, DecisionOutput},
-            DocCollected, OnAction, WorkflowState,
-        },
-        utils::should_execute_rules_for_document_only,
-        vendor::vendor_result::VendorResult,
-    },
-    errors::ApiResult,
-    utils::vault_wrapper::{Any, VaultWrapper},
-    State,
-};
+use std::collections::HashMap;
+use std::sync::Arc;
 
 /////////////////////
 /// DataCollection
@@ -154,7 +194,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             })
             .await?;
 
-        // TODO: we should also skip if the UVW is non-US, but then we probably need to assert that doc was collected. Also need to clairfy tenant's understanding of this
+        // TODO: we should also skip if the UVW is non-US, but then we probably need to assert that doc was
+        // collected. Also need to clairfy tenant's understanding of this
         let (kyc_vendor_result, user_input_reason_codes) = if !obc.skip_kyc {
             let kyc_vendor_result = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
             let user_input_reason_codes = features::user_input::generate_user_input_risk_signals(
@@ -393,7 +434,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
-                let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling a new seqno inside the RSR write itself
+                let seqno = DataLifetime::get_current_seqno(conn)?; // TODO: should technically pass this seqno to RuleSetResult to store in pg instead of pulling
+                                                                    // a new seqno inside the RSR write itself
                 let vw = VaultWrapper::<Any>::build_for_tenant_version(conn, &svid, Some(seqno))?;
 
                 let lists = ListEntry::list_bulk(conn, &common::list_ids_from_rules(&rules))?;
@@ -429,7 +471,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
         let vres_ids = risk_signals.verification_result_ids();
 
-        // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision instead of the decision from these real Rules
+        // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision
+        // instead of the decision from these real Rules
         let args = EvaluateWorkflowDecisionArgs {
             sv_id: &wf.scoped_vault_id,
             obc_id: &obc.id,
@@ -442,14 +485,16 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             include_rules: self.include_rules,
         };
         let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
-        // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture decision
+        // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture
+        // decision
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
                 decision
             } else {
                 let doc_collected =
                     DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
-                // we'll hopefully support fixturing the post-stepup decision but for now we just always fail with review if we stepped up
+                // we'll hopefully support fixturing the post-stepup decision but for now we just always fail
+                // with review if we stepped up
                 let fixture_decision =
                     if matches!(fixture_decision.0, DecisionStatus::StepUp) && doc_collected {
                         (DecisionStatus::Fail, true)

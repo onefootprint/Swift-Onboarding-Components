@@ -1,34 +1,61 @@
+use super::{
+    idology,
+    incode,
+};
+use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyPa;
+use crate::errors::AssertionError;
+use crate::task::{
+    self,
+    ExecuteTask,
+    TaskError,
+};
+use crate::utils::vault_wrapper::{
+    Person,
+    VaultWrapper,
+    VwArgs,
+};
 use crate::{
-    decision::vendor::vendor_api::{loaders::load_response_for_vendor_api, vendor_api_struct::IdologyPa},
-    errors::AssertionError,
-    task::{self, ExecuteTask, TaskError},
-    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
-    ApiError, State,
+    ApiError,
+    State,
 };
 use async_trait::async_trait;
 use chrono::Utc;
+use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::risk_signal::{
+    NewRiskSignalInfo,
+    RiskSignal,
+};
+use db::models::scoped_vault::ScopedVault;
+use db::models::task::Task;
+use db::models::tenant::Tenant;
+use db::models::user_timeline::UserTimeline;
+use db::models::verification_request::VReqIdentifier;
+use db::models::watchlist_check::WatchlistCheck;
 use db::{
-    models::{
-        decision_intent::DecisionIntent,
-        ob_configuration::ObConfiguration,
-        risk_signal::{NewRiskSignalInfo, RiskSignal},
-        scoped_vault::ScopedVault,
-        task::Task,
-        tenant::Tenant,
-        user_timeline::UserTimeline,
-        verification_request::VReqIdentifier,
-        watchlist_check::WatchlistCheck,
-    },
-    DbResult, TxnPgConn,
+    DbResult,
+    TxnPgConn,
 };
 use newtypes::{
-    DecisionIntentKind, EnhancedAmlOption, FireWebhookArgs, OnboardingStatus, RiskSignalGroupKind,
-    ScopedVaultId, TaskData, TaskId, VendorAPI, WatchlistCheckArgs, WatchlistCheckCompletedPayload,
-    WatchlistCheckError, WatchlistCheckInfo, WatchlistCheckNotNeededReason, WatchlistCheckStatus,
-    WatchlistCheckStatusKind, WebhookEvent,
+    DecisionIntentKind,
+    EnhancedAmlOption,
+    FireWebhookArgs,
+    OnboardingStatus,
+    RiskSignalGroupKind,
+    ScopedVaultId,
+    TaskData,
+    TaskId,
+    VendorAPI,
+    WatchlistCheckArgs,
+    WatchlistCheckCompletedPayload,
+    WatchlistCheckError,
+    WatchlistCheckInfo,
+    WatchlistCheckNotNeededReason,
+    WatchlistCheckStatus,
+    WatchlistCheckStatusKind,
+    WebhookEvent,
 };
-
-use super::{idology, incode};
 
 pub(crate) struct WatchlistCheckTask {
     state: State,
@@ -76,15 +103,17 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         let sv_id = args.scoped_vault_id.clone();
         let task_id = self.task_id.clone();
 
-        // First we either create a new watchlist_check or we retrieve an existing one (ie if this is an idempotent re-run of a failed execution)
-        // If we create a new watchlist_check, we either:
+        // First we either create a new watchlist_check or we retrieve an existing one (ie if this is an
+        // idempotent re-run of a failed execution) If we create a new watchlist_check, we either:
         //  - Create it with state Pending and a decision_intent is created at the same time
-        //  - Create it with state NotNeeded and no decision_intent is written, meaning no vendor call is to be made
+        //  - Create it with state NotNeeded and no decision_intent is written, meaning no vendor call is to
+        //    be made
         let (tenant, sv, obc, uvw, wc) = self
             .state
             .db_pool
             .db_transaction(move |conn| -> Result<_, TaskError> {
-                // not strictly needed since we ever only execute a single task 1 at a time, but nice to be extra safe
+                // not strictly needed since we ever only execute a single task 1 at a time, but nice to be
+                // extra safe
                 let _task = Task::lock(conn, &task_id)?;
                 let sv = ScopedVault::get(conn, &sv_id)?;
                 let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
@@ -104,7 +133,9 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             .await?;
 
         // WC is initialized to either Pending or NotNeeded.
-        // Pass/Fail/Error indicate this Task already completed and we wrote that final state in the final txn in this Task. (Theoretically should never hit this case unless there was some system error right between the last txn of this Task and the txn that sets the Task's status to completed)
+        // Pass/Fail/Error indicate this Task already completed and we wrote that final state in the final
+        // txn in this Task. (Theoretically should never hit this case unless there was some system error
+        // right between the last txn of this Task and the txn that sets the Task's status to completed)
         // Hence, if the status here is not Pending, we can just immediatly return
         if !matches!(wc.status, WatchlistCheckStatusKind::Pending) {
             return Ok(());
@@ -181,7 +212,8 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         self.state
             .db_pool
             .db_transaction(move |conn| -> DbResult<()> {
-                // not strictly necessarily since we aren't currently running multiple instances of a single Task concurrently, but doesnt hurt
+                // not strictly necessarily since we aren't currently running multiple instances of a single
+                // Task concurrently, but doesnt hurt
                 let wc = WatchlistCheck::lock(conn, &wc_id)?;
                 if !matches!(wc.status, WatchlistCheckStatusKind::Pending) {
                     return Ok(()); //ie if we had somehow concurrently already run this txn

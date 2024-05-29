@@ -1,11 +1,11 @@
-use db::models::{incode_verification_session::IncodeVerificationSession, workflow::Workflow as DbWorkflow};
+use self::kyb::KybState;
+use crate::errors::ApiResult;
+use crate::State;
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
 use newtypes::WorkflowId;
 use thiserror::Error;
-
-use crate::{errors::ApiResult, State};
-
-use self::kyb::KybState;
 
 pub mod actions;
 pub use actions::*;
@@ -17,7 +17,12 @@ pub mod kyc;
 pub mod test_utils;
 pub mod traits;
 
-use traits::{DoAction, OnAction, Workflow, WorkflowState};
+use traits::{
+    DoAction,
+    OnAction,
+    Workflow,
+    WorkflowState,
+};
 
 #[derive(Debug, Error)]
 pub enum StateError {
@@ -40,10 +45,9 @@ pub enum StateError {
     WorkflowActionsConversionError(WorkflowActionsKind),
 }
 
+use super::vendor::incode::IncodeStateMachine;
 use document::DocumentState;
 use kyc::KycState;
-
-use super::vendor::incode::IncodeStateMachine;
 
 #[enum_dispatch(Workflow)]
 #[derive(Clone)]
@@ -145,7 +149,8 @@ pub async fn run_incode_machine_and_workflow(
     if let Some(ivs) = ivs {
         if !ivs.state.is_terminal() {
             let machine = IncodeStateMachine::init_from_existing(state, ivs).await?;
-            // TODO: should or could this call handle_incode_request instead..?  yeah def cause then it can do the new logic of setting latest_hard_error
+            // TODO: should or could this call handle_incode_request instead..?  yeah def cause then it can do
+            // the new logic of setting latest_hard_error
             let (machine, _) = machine
                 .run(&state.db_pool, &state.vendor_clients.incode)
                 .await

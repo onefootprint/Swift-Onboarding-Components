@@ -1,5 +1,11 @@
-use crate::{Apiv2Schema, Serialize};
-use newtypes::{DocumentRequestKind, RuleSetResultId};
+use crate::{
+    Apiv2Schema,
+    Serialize,
+};
+use newtypes::{
+    DocumentRequestKind,
+    RuleSetResultId,
+};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct DocumentRequest {

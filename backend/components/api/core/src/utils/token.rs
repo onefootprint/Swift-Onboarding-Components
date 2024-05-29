@@ -1,21 +1,33 @@
 use super::session::AuthSession;
-use crate::{
-    auth::session::user::{
-        AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, TokenCreationPurpose, UserSession,
-    },
-    errors::{onboarding::OnboardingError, ApiResult, ValidationError},
+use crate::auth::session::user::{
+    AssociatedAuthEvent,
+    NewUserSessionArgs,
+    NewUserSessionContext,
+    TokenCreationPurpose,
+    UserSession,
+};
+use crate::errors::onboarding::OnboardingError;
+use crate::errors::{
+    ApiResult,
+    ValidationError,
 };
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
-use db::{
-    models::{
-        ob_configuration::ObConfiguration, scoped_vault::ScopedVault, session::Session, vault::Vault,
-        workflow::Workflow, workflow_request::WorkflowRequest,
-    },
-    TxnPgConn,
+use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
+use db::models::session::Session;
+use db::models::vault::Vault;
+use db::models::workflow::Workflow;
+use db::models::workflow_request::WorkflowRequest;
+use db::TxnPgConn;
+use newtypes::{
+    AuthMethodKind,
+    ObConfigurationKey,
+    SessionAuthToken,
+    UserAuthScope,
+    VaultKind,
 };
-use newtypes::{AuthMethodKind, ObConfigurationKey, SessionAuthToken, UserAuthScope, VaultKind};
 
 pub struct CreateTokenArgs {
     pub sv: ScopedVault,

@@ -1,9 +1,15 @@
-use std::str::FromStr;
-
 use crate::utils::db2api::DbToApi;
-use api_wire_types::{OmittedSecretCustomHeader, PlainCustomHeader, ProxyIngressRule};
-use db::models::proxy_config::{DbProxyConfigAll, ProxyConfig};
+use api_wire_types::{
+    OmittedSecretCustomHeader,
+    PlainCustomHeader,
+    ProxyIngressRule,
+};
+use db::models::proxy_config::{
+    DbProxyConfigAll,
+    ProxyConfig,
+};
 use newtypes::DataIdentifier;
+use std::str::FromStr;
 
 impl DbToApi<ProxyConfig> for api_wire_types::ProxyConfigBasic {
     fn from_db(config: ProxyConfig) -> Self {
