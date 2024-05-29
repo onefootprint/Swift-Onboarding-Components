@@ -1,3 +1,4 @@
+import type { LinkButtonProps } from '@onefootprint/ui';
 import { LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -6,7 +7,10 @@ export type FieldsetProps = {
   children: React.ReactNode;
   cta?: {
     label: string;
-    onClick: () => void;
+    disabled?: boolean;
+    onClick?: () => void;
+    type?: LinkButtonProps['type'];
+    form?: string;
   };
   title: string;
 };
@@ -17,7 +21,16 @@ const Fieldset = ({ children, cta, title }: FieldsetProps) => (
       <Text variant="label-2" tag="div">
         {title}
       </Text>
-      {cta && <LinkButton onClick={cta.onClick}>{cta.label}</LinkButton>}
+      {cta && (
+        <LinkButton
+          onClick={cta.onClick}
+          disabled={cta.disabled}
+          type={cta.type}
+          form={cta.form}
+        >
+          {cta.label}
+        </LinkButton>
+      )}
     </Header>
     <Content>{children}</Content>
   </FieldsetContainer>
