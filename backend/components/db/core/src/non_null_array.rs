@@ -10,7 +10,8 @@ use diesel::Queryable;
 /// read non-null values.
 /// This util can be used to deserialize postgres's Arrays of nullable T into a normal Vec<T>.
 /// This should be used on the Queryable model as a field-level attribute on your Vec<T>. For
-/// example: ```ignore
+/// example:
+/// ```ignore
 /// #[derive(Queryable)]
 /// #[diesel(table_name = my_model)]
 /// pub struct MyModel {
@@ -52,7 +53,8 @@ impl<T> From<NonNullVec<T>> for Vec<T> {
 /// read non-null values.
 /// This util can be used to deserialize postgres's Arrays of nullable T into a normal Vec<T>.
 /// This should be used on the Queryable model as a field-level attribute on your Vec<T>. For
-/// example: ```ignore
+/// example:
+/// ```ignore
 /// #[derive(Queryable)]
 /// #[diesel(table_name = my_model)]
 /// pub struct MyModel {
