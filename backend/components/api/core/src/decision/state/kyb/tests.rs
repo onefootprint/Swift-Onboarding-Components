@@ -13,6 +13,7 @@ use crate::{
         tests::test_helpers,
     },
     errors::ApiResult,
+    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
     State,
 };
 use api_wire_types::TerminalDecisionStatus;
@@ -31,9 +32,9 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::{test_state, test_state_case};
 use newtypes::{
-    CollectedDataOption as CDO, FootprintReasonCode, KybState, KycState, ObConfigurationKind,
-    OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleInstanceKind, SignalSeverity, VendorAPI,
-    VerificationCheck, WorkflowFixtureResult, WorkflowState,
+    BusinessDataKind, CollectedDataOption as CDO, DataIdentifier, FootprintReasonCode, KybState, KycState,
+    ObConfigurationKind, OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleInstanceKind, SignalSeverity,
+    VendorAPI, VerificationCheck, WorkflowFixtureResult, WorkflowState,
 };
 
 async fn setup(
@@ -481,4 +482,33 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
             .map(|rs| (rs.vendor_api, rs.reason_code))
             .collect_vec()
     );
+
+
+    // check that middesk populated formation DIs
+    let vw = state
+        .db_pool
+        .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id)))
+        .await
+        .unwrap();
+
+    let formation_state = vw
+        .decrypt_unchecked_single(
+            &state.enclave_client,
+            DataIdentifier::Business(BusinessDataKind::FormationState),
+        )
+        .await
+        .unwrap()
+        .expect("missing formation_state");
+
+    let formation_date = vw
+        .decrypt_unchecked_single(
+            &state.enclave_client,
+            DataIdentifier::Business(BusinessDataKind::FormationDate),
+        )
+        .await
+        .unwrap()
+        .expect("missing formation_date");
+
+    assert_eq!(formation_state.leak(), "NY");
+    assert_eq!(formation_date.leak(), "2022-02-02");
 }

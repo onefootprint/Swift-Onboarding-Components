@@ -1,6 +1,6 @@
 #![allow(clippy::too_many_arguments)]
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use self::vendor_api::{
     loaders::load_response_for_vendor_api,
@@ -17,12 +17,14 @@ use crate::{
     },
     enclave_client::EnclaveClient,
     errors::{ApiError, AssertionError},
+    utils::vault_wrapper::{Any, DataLifetimeSources, FingerprintedDataRequest, VaultWrapper},
     vendor_clients::VendorClient,
     State,
 };
 use db::{
     models::{
         billing_event::BillingEvent,
+        data_lifetime::DataLifetime,
         decision_intent::DecisionIntent,
         middesk_request::{MiddeskRequest, UpdateMiddeskRequest},
         ob_configuration::ObConfiguration,
@@ -49,9 +51,10 @@ use idv::middesk::{
 use idv::{ParsedResponse, VendorResponse};
 
 use newtypes::{
-    BillingEventKind, BusinessDataForRequest, DecisionIntentKind, EinOnly, MiddeskRequestState,
-    ObConfigurationKey, OnboardingStatus, PiiJsonValue, RiskSignalGroupKind, TenantId, VendorAPI,
-    VerificationCheck, VerificationCheckKind, WorkflowId,
+    BillingEventKind, BusinessDataForRequest, BusinessDataKind, DataIdentifier, DataLifetimeSource,
+    DataRequest, DecisionIntentKind, EinOnly, MiddeskRequestState, ObConfigurationKey, OnboardingStatus,
+    PiiJsonValue, PiiString, RiskSignalGroupKind, TenantId, ValidateArgs, VendorAPI, VerificationCheck,
+    VerificationCheckKind, WorkflowId,
 };
 use strum_macros::EnumDiscriminants;
 
@@ -553,6 +556,32 @@ impl MiddeskState<Complete> {
                 .map(|rc| (rc, vendor_api, vres_id.clone()))
                 .collect();
 
+
+        // write data from the business response into the business vault
+        // currently just: formation state/date
+        let (dis_to_vault, vault_data_to_write) = {
+            let formation = business_response.formation.as_ref();
+            let data = vec![
+                formation
+                    .and_then(|f| f.formation_state.clone())
+                    .map(|state| PiiJsonValue::from_piistring(PiiString::from(state)))
+                    .map(|state| (DataIdentifier::Business(BusinessDataKind::FormationState), state)),
+                formation
+                    .and_then(|f| f.formation_date.clone())
+                    .map(|date| PiiJsonValue::from_piistring(PiiString::from(date)))
+                    .map(|date| (DataIdentifier::Business(BusinessDataKind::FormationDate), date)),
+            ]
+            .into_iter()
+            .flatten()
+            .collect::<HashMap<_, _>>();
+
+            let dis = data.keys().cloned().collect::<Vec<_>>();
+
+            let data = DataRequest::clean_and_validate(data, ValidateArgs::for_non_portable(sv.is_live))?;
+            (dis, FingerprintedDataRequest::build(state, data, &sv.id).await?)
+        };
+
+
         let obc_id = wf.ob_configuration_id.clone();
         state
             .db_pool
@@ -560,6 +589,23 @@ impl MiddeskState<Complete> {
                 let rsg = RiskSignalGroup::get_or_create(conn, &sv.id, RiskSignalGroupKind::Kyb)?;
                 RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)?;
                 BillingEvent::create(conn, &sv.id, obc_id.as_ref(), BillingEventKind::Kyb)?;
+
+                // note: there is an edge case here where the formation is null which
+                // means we should deactivate the old DIs. We should handle this properly
+                // with construct that knows when to clear vendor-written DIs like this
+                if !vault_data_to_write.is_empty() {
+                    // Clear all related data kinds
+                    let seqno = DataLifetime::get_current_seqno(conn)?;
+                    DataLifetime::bulk_deactivate_kinds(conn, &sv.id, dis_to_vault, seqno)?;
+
+                    // Then add new vault data
+                    let sources = DataLifetimeSources::single(DataLifetimeSource::Vendor);
+                    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
+
+                    //TODO: we should probably store the resulting seqno somewhere on the vres?
+                    let _ = uvw.patch_data(conn, vault_data_to_write, sources, None)?;
+                }
+
                 Ok(())
             })
             .await?;

@@ -1,6 +1,6 @@
 use crate::middesk::{
     response::{
-        business::{BusinessResponse, Review, Task},
+        business::{BusinessResponse, Formation, Review, Task},
         webhook::{BusinessData, MiddeskBusinessUpdateWebhookResponse},
     },
     MiddeskCreateBusinessResponse,
@@ -108,7 +108,13 @@ pub fn business_update_webhook(business_id: &str, watchlist_hit: bool) -> serde_
                 updated_at: None,
                 status: None,
                 tin: None,
-                formation: None,
+                formation: Some(Formation {
+                    entity_type: None,
+                    formation_date: Some("2022-02-02".to_string()),
+                    formation_state: Some("NY".to_string()),
+                    created_at: None,
+                    updated_at: None,
+                }),
                 registrations: None,
                 names: None,
                 addresses: None,

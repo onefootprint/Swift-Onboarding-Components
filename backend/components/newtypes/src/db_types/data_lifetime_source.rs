@@ -55,6 +55,8 @@ pub enum DataLifetimeSource {
     Ocr,
     /// Vaulted via portable data from another tenant
     Prefill,
+    /// Vaulted via data coming back from Vendor
+    Vendor,
 }
 
 crate::util::impl_enum_string_diesel!(DataLifetimeSource);
