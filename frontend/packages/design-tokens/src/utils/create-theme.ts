@@ -31,11 +31,6 @@ const createTheme = (t: Tokens): Theme => ({
   },
   backgroundColor: t.backgroundColor,
   borderColor: t.borderColor,
-  surfaceColor: {
-    1: t.surfaceColor[1],
-    2: t.surfaceColor[2],
-    3: t.surfaceColor[3],
-  },
   color: t.textColor,
   // TODO: Remove
   // https://linear.app/footprint/issue/FP-1728/bifrost-customization-remove-overlay-from-theme

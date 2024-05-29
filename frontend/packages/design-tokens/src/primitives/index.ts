@@ -1,6 +1,7 @@
 export { borderRadius, borderWidth } from './borders';
 export { default as breakpoint } from './breakpoint';
 export {
+  Blue25,
   Blue50,
   Blue100,
   Blue200,
@@ -29,6 +30,7 @@ export {
   Darkblue800,
   Darkblue900,
   Gray0,
+  Gray25,
   Gray50,
   Gray100,
   Gray150,
@@ -43,7 +45,9 @@ export {
   Gray850,
   Gray875,
   Gray900,
+  Gray950,
   Gray1000,
+  Green25,
   Green50,
   Green100,
   Green200,
@@ -53,6 +57,7 @@ export {
   Green600,
   Green700,
   Green800,
+  Purple25,
   Purple50,
   Purple100,
   Purple200,
@@ -62,6 +67,7 @@ export {
   Purple600,
   Purple700,
   Purple800,
+  Red25,
   Red50,
   Red100,
   Red200,
@@ -79,6 +85,7 @@ export {
   StaticSleep,
   StaticThink,
   StaticWhite,
+  Yellow25,
   Yellow50,
   Yellow100,
   Yellow200,
@@ -105,7 +112,6 @@ export {
   opacity1000,
   opacityTransparent,
 } from './opacity';
-export { onDark, onLight } from './overlay';
 export { buttonHeights, inputHeights, linkButtonHeights } from './sizes';
 export { spacing } from './spacing';
 export { fontFamily, typography, typographyExtra } from './typography';

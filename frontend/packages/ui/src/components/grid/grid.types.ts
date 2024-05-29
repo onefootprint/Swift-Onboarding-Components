@@ -46,7 +46,6 @@ export type GridStylesProps = {
   alignItems?: CSS.Property.AlignItems;
   justifyContent?: CSS.Property.JustifyContent;
   backgroundColor?: keyof Theme['backgroundColor'];
-  surfaceColor?: keyof Theme['surfaceColor'];
   borderColor?: keyof Theme['borderColor'];
   borderRadius?: keyof Theme['borderRadius'];
   borderWidth?: keyof Theme['borderWidth'];

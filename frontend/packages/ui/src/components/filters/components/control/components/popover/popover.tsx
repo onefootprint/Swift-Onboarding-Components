@@ -60,7 +60,7 @@ const Popover = ({ children, id, onClose, title }: PopoverProps) => {
 
 const PopoverContainer = styled.div`
   ${({ theme }) => css`
-    background-color: ${theme.surfaceColor[3]};
+    background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[3]};
     width: 300px;

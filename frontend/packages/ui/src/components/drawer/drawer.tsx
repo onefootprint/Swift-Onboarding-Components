@@ -94,7 +94,7 @@ const slideOut = keyframes`
 
 const DrawerSurface = styled(Box)`
   ${({ theme }) => css`
-    background-color: ${theme.surfaceColor[3]};
+    background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     height: 100%;
     overflow: hidden;

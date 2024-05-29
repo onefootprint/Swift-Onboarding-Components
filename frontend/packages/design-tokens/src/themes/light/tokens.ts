@@ -89,15 +89,6 @@ export const textColor = {
   neutralInverted: `${p.Gray50}`,
 };
 
-export const surfaceColor = {
-  1: `${p.Gray0}`,
-  11: `${p.Gray50}`,
-  2: `${p.Gray0}`,
-  3: `${p.Gray0}`,
-  4: `${p.Purple50}`,
-  41: `${p.Purple100}`,
-};
-
 export const elevation = {
   0: `${elevationLight.flat}`,
   1: `${elevationLight.low}`,
@@ -145,7 +136,6 @@ const tokens: Tokens = {
   destructiveBtnBackgroundColor,
   borderColor,
   textColor,
-  surfaceColor,
   elevation,
   inputFocus,
   overlay,
@@ -279,7 +269,7 @@ const tokens: Tokens = {
         padding: p.spacing[5],
       },
       container: {
-        bg: surfaceColor[3],
+        bg: backgroundColor.primary,
         border: `1px solid ${borderColor.tertiary}`,
         borderRadius: p.borderRadius.default,
         elevation: elevation[3],
@@ -398,7 +388,7 @@ const tokens: Tokens = {
       },
     },
     dropdown: {
-      bg: surfaceColor[1],
+      bg: backgroundColor.primary,
       borderColor: borderColor.tertiary,
       borderWidth: p.borderWidth[1],
       elevation: elevation[3],
@@ -546,31 +536,31 @@ const tokens: Tokens = {
       },
     },
     radioSelect: {
-      bg: surfaceColor[1],
+      bg: backgroundColor.primary,
       borderRadius: p.borderRadius.default,
       borderWidth: p.borderWidth[1],
       borderColor: borderColor.tertiary,
       color: textColor.primary,
       hover: {
         default: {
-          bg: surfaceColor[11],
+          bg: backgroundColor.primary,
           borderColor: borderColor.tertiary,
           color: textColor.primary,
         },
         selected: {
-          bg: surfaceColor[41],
+          bg: backgroundColor.primary,
           borderColor: borderColor.tertiary,
           color: textColor.accent,
         },
       },
       selected: {
         color: textColor.accent,
-        bg: surfaceColor[4],
+        bg: backgroundColor.primary,
         borderColor: borderColor.secondary,
       },
       disabled: {
         color: textColor.quaternary,
-        bg: surfaceColor[1],
+        bg: backgroundColor.primary,
         borderColor: borderColor.tertiary,
       },
       components: {

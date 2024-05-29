@@ -57,9 +57,9 @@ const Container = styled('div').attrs<{ as: GridTag }>(({ as }) => ({
     box-shadow: ${props.elevation
       ? theme.elevation[props.elevation]
       : undefined};
-    background-color: ${(props.backgroundColor &&
-      theme.backgroundColor[props.backgroundColor]) ||
-    (props.surfaceColor && theme.surfaceColor[props.surfaceColor])};
+    background-color: ${props.backgroundColor
+      ? theme.backgroundColor[props.backgroundColor]
+      : undefined};
     position: ${props.position || 'relative'};
     display: ${props.display};
     text-align: ${props.textAlign};

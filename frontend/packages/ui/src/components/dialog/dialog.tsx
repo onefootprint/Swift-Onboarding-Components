@@ -239,7 +239,7 @@ const DialogContainer = styled(Fade)<{
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }>`
   ${({ theme, disableResponsiveness, size, isConfirmation }) => css`
-    background-color: ${theme.surfaceColor[2]};
+    background-color: ${theme.backgroundColor.primary};
     display: flex;
     flex-direction: column;
     isolation: isolate;
@@ -256,6 +256,7 @@ const DialogContainer = styled(Fade)<{
       : 'inherit'};
     border-radius: ${size === 'full-screen' ? 0 : theme.borderRadius.default};
     top: ${getDistanceFromTop(isConfirmation, size) || theme.spacing[9]};
+    box-shadow: ${theme.elevation[2]};
     left: 50%;
     transform: ${isConfirmation
       ? 'translate(-50%, -50%)'
@@ -312,7 +313,7 @@ const Footer = styled.footer`
     padding: ${theme.spacing[4]} ${theme.spacing[7]} ${theme.spacing[5]}
       ${theme.spacing[7]};
     flex-shrink: 0;
-    background-color: ${theme.surfaceColor[2]};
+    background-color: ${theme.backgroundColor.primary};
     width: 100%;
     z-index: 1;
     position: sticky;

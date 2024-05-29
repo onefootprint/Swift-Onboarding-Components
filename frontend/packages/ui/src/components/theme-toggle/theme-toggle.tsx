@@ -154,7 +154,7 @@ const Button = styled(motion.button)<{
 
 const StyledIcoToggleKnob16 = styled(motion.div)`
   ${({ theme }) => css`
-    background: ${theme.surfaceColor[1]};
+    background: ${theme.backgroundColor.primary};
     box-shadow: ${theme.elevation[1]};
     border-radius: ${theme.borderRadius.full};
     display: flex;

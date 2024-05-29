@@ -134,7 +134,6 @@ export const styleKeyProps: string[] = [
   'risplay',
   'rowGap',
   'scrollBehavior',
-  'surfaceColor',
   'tableLayout',
   'tabSize',
   'textAlign',

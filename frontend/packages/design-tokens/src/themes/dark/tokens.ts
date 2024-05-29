@@ -3,8 +3,8 @@ import { elevationDark } from '../../primitives/elevation';
 import type { Tokens } from '../../types/tokens';
 
 export const backgroundColor = {
-  primary: `${p.Gray900}`,
-  secondary: `${p.Gray800}`,
+  primary: `${p.Gray950}`,
+  secondary: `${p.Gray900}`,
   tertiary: `${p.BrandSleep100}`,
   quaternary: `${p.BrandThink800}`,
   quinary: `${p.BrandGo800}`,
@@ -73,13 +73,13 @@ export const textColor = {
   septenary: `${p.BrandGo800}`,
   accent: `${p.Purple300}`,
   accentHover: `${p.Purple200}`,
-  error: `${p.Red50}`,
+  error: `${p.Red25}`,
   errorHover: `${p.Red100}`,
-  info: `${p.Blue50}`,
+  info: `${p.Blue25}`,
   infoHover: `${p.Blue100}`,
-  success: `${p.Green50}`,
+  success: `${p.Green25}`,
   successHover: `${p.Green100}`,
-  warning: `${p.Yellow100}`,
+  warning: `${p.Yellow25}`,
   warningHover: `${p.Yellow200}`,
   neutral: `${p.Gray50}`,
   successInverted: `${p.Green700}`,
@@ -87,15 +87,6 @@ export const textColor = {
   errorInverted: `${p.Red700}`,
   infoInverted: `${p.Blue700}`,
   neutralInverted: `${p.Gray800}`,
-};
-
-export const surfaceColor = {
-  1: `${p.Gray875}`,
-  11: `${p.Gray850}`,
-  2: `${p.Gray850}`,
-  3: `${p.Gray825}`,
-  4: `${p.Gray875}`,
-  41: `${p.Gray875}`,
 };
 
 export const elevation = {
@@ -145,7 +136,6 @@ const tokens: Tokens = {
   destructiveBtnBackgroundColor,
   borderColor,
   textColor,
-  surfaceColor,
   elevation,
   inputFocus,
   overlay,
@@ -279,7 +269,7 @@ const tokens: Tokens = {
         padding: p.spacing[5],
       },
       container: {
-        bg: surfaceColor[3],
+        bg: backgroundColor.primary,
         border: `1px solid ${borderColor.tertiary}`,
         borderRadius: p.borderRadius.default,
         elevation: elevation[3],
@@ -398,7 +388,7 @@ const tokens: Tokens = {
       },
     },
     dropdown: {
-      bg: surfaceColor[1],
+      bg: backgroundColor.primary,
       borderColor: borderColor.tertiary,
       borderWidth: p.borderWidth[1],
       elevation: elevation[3],
@@ -445,7 +435,7 @@ const tokens: Tokens = {
             elevation: inputFocus.none,
           },
           hover: {
-            bg: backgroundColor.primary,
+            bg: backgroundColor.secondary,
             border: borderColor.primaryHover,
             elevation: inputFocus.none,
           },
@@ -546,31 +536,31 @@ const tokens: Tokens = {
       },
     },
     radioSelect: {
-      bg: surfaceColor[1],
+      bg: backgroundColor.primary,
       borderRadius: p.borderRadius.default,
       borderWidth: p.borderWidth[1],
       borderColor: borderColor.tertiary,
       color: textColor.primary,
       hover: {
         default: {
-          bg: surfaceColor[3],
+          bg: backgroundColor.secondary,
           borderColor: borderColor.primary,
           color: textColor.primary,
         },
         selected: {
-          bg: surfaceColor[2],
+          bg: backgroundColor.primary,
           borderColor: borderColor.tertiary,
           color: textColor.primary,
         },
       },
       selected: {
         color: textColor.accent,
-        bg: surfaceColor[1],
+        bg: backgroundColor.primary,
         borderColor: borderColor.secondary,
       },
       disabled: {
         color: textColor.quaternary,
-        bg: surfaceColor[1],
+        bg: backgroundColor.secondary,
         borderColor: borderColor.tertiary,
       },
       components: {

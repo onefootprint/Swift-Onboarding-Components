@@ -88,14 +88,6 @@ export type Tokens = {
     infoInverted: CSS.Property.Color;
     neutralInverted: CSS.Property.Color;
   };
-  surfaceColor: {
-    1: CSS.Property.BackgroundColor;
-    11: CSS.Property.BackgroundColor;
-    2: CSS.Property.BackgroundColor;
-    3: CSS.Property.BackgroundColor;
-    4: CSS.Property.BackgroundColor;
-    41: CSS.Property.BackgroundColor;
-  };
   elevation: {
     0: CSS.Property.BoxShadow;
     1: CSS.Property.BoxShadow;

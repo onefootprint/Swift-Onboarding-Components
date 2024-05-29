@@ -162,7 +162,7 @@ const FaceId = styled.div<{ isHovered: boolean }>`
     position: absolute;
     bottom: calc(-1 * ${theme.spacing[4]});
     left: ${theme.spacing[6]};
-    background-color: ${theme.surfaceColor[3]};
+    background-color: ${theme.backgroundColor.primary};
     padding: ${theme.spacing[5]};
     border-radius: 12px;
     box-shadow: ${theme.elevation[3]};

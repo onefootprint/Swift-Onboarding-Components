@@ -167,7 +167,6 @@ export type BoxStyleProps = {
   paddingInline?: keyof Theme['spacing'];
   paddingBlock?: keyof Theme['spacing'];
   rowGap?: keyof Theme['spacing'];
-  surfaceColor?: keyof Theme['surfaceColor'];
 };
 
 export type BoxPrimitives<T = Element> = BoxStyleProps &

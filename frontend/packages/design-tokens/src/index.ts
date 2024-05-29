@@ -22,7 +22,6 @@ export type {
   Overlays,
   Spacing,
   Spacings,
-  SurfaceColor,
   Theme,
   ThemeKey,
   Typographies,
