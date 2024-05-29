@@ -43,9 +43,7 @@ def test_get_entities(sandbox_tenant, primary_bo, populated_business_data):
 
 def test_get_business_owners(sandbox_tenant, primary_bo):
     body = get(
-        f"businesses/{primary_bo.fp_bid}/owners",
-        None,
-        *sandbox_tenant.db_auths,
+        f"entities/{primary_bo.fp_bid}/business_owners", None, *sandbox_tenant.db_auths
     )
     assert len(body) == 2
     assert body[0]["id"] == primary_bo.fp_id

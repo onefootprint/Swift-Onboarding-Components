@@ -69,7 +69,7 @@ def test_vault_benficial_owners(sandbox_tenant):
     body = post("businesses/", data, sandbox_tenant.sk.key)
     fp_bid = body["id"]
 
-    body = get(f"businesses/{fp_bid}/owners", None, *sandbox_tenant.db_auths)
+    body = get(f"entities/{fp_bid}/business_owners", None, *sandbox_tenant.db_auths)
     assert body[0]["ownership_stake"] == 50
 
 

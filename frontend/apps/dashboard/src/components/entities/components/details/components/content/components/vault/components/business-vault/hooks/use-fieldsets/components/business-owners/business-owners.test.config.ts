@@ -69,7 +69,7 @@ export const entityFixture: Entity = {
 export const withBusinessOwnersError = (entity = entityFixture) =>
   mockRequest({
     method: 'get',
-    path: `/businesses/${entity.id}/owners`,
+    path: `/entities/${entity.id}/business_owners`,
     statusCode: 400,
     response: {
       error: {

@@ -80,7 +80,7 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
 
     # Validate the business owners
     tenant = kyb_sandbox_ob_config.tenant
-    body = get(f"businesses/{primary_bo.fp_bid}/owners", None, *tenant.db_auths)
+    body = get(f"entities/{primary_bo.fp_bid}/business_owners", None, *tenant.db_auths)
     assert len(body) == 2
     assert body[0]["kind"] == "primary"
     assert body[0]["id"] == primary_bo.fp_id

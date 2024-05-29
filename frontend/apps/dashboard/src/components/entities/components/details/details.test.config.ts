@@ -208,7 +208,7 @@ export const withAnnotations = (entity = entityFixture, response = []) =>
 export const withBusinessOwners = (entity = entityFixture) =>
   mockRequest({
     method: 'get',
-    path: `/businesses/${entity.id}/owners`,
+    path: `/entities/${entity.id}/business_owners`,
     response: businessOwnersFixture,
   });
 

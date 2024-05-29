@@ -13,7 +13,7 @@ const getBusinessOwners = async (
 ) => {
   const response = await request<GetBusinessOwnersResponse>({
     method: 'GET',
-    url: `/businesses/${id}/owners`,
+    url: `/entities/${id}/business_owners`,
     headers: authHeaders,
   });
 
