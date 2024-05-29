@@ -1,3 +1,6 @@
-export { default } from './machine';
-export * from './machine';
-export * from './types';
+export { createHandoffMachine, default } from './machine';
+export type {
+  InitContextUpdatedEvent,
+  MachineContext,
+  MachineEvents,
+} from './types';

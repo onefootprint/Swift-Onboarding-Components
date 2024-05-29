@@ -1,2 +1,6 @@
 export { default } from './use-handoff-machine';
-export * from 'src/utils/state-machine/types';
+export type {
+  InitContextUpdatedEvent,
+  MachineContext,
+  MachineEvents,
+} from 'src/utils/state-machine/types';

@@ -51,38 +51,16 @@ export const createHandoffMachine = () =>
                 target: 'idv',
                 cond: (context, event) => initContextComplete(context, event),
               },
-              {
-                actions: ['assignInitContext'],
-              },
+              { actions: ['assignInitContext'] },
             ],
-            d2pAlreadyCompleted: [
-              {
-                target: 'complete',
-              },
-            ],
-            d2pCanceled: [
-              {
-                target: 'canceled',
-              },
-            ],
+            d2pAlreadyCompleted: [{ target: 'complete' }],
+            d2pCanceled: [{ target: 'canceled' }],
           },
         },
-        idv: {
-          on: {
-            idvCompleted: {
-              target: 'complete',
-            },
-          },
-        },
-        expired: {
-          type: 'final',
-        },
-        canceled: {
-          type: 'final',
-        },
-        complete: {
-          type: 'final',
-        },
+        idv: { on: { idvCompleted: { target: 'complete' } } },
+        expired: { type: 'final' },
+        canceled: { type: 'final' },
+        complete: { type: 'final' },
       },
     },
     {

@@ -1,4 +1,5 @@
 import {
+  getLogger,
   InitShimmer,
   Logger,
   useGetD2PStatus,
@@ -16,6 +17,28 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
+const logContext = (data: GetD2PResponse) => {
+  const { meta } = data;
+  const opener = meta?.opener ?? 'unknown';
+  const bifrostSessionId = meta?.sessionId ?? '';
+  const locale = meta?.l10n?.locale ?? 'en-US';
+  Logger.identify({ opener, bifrostSessionId, locale });
+};
+
+const setupLogger = (config: PublicOnboardingConfig, orgIds: Set<string>) => {
+  const { orgName, orgId, key, isLive } = config;
+  if (isLive && !orgIds.has(orgId)) {
+    Logger.enableLogRocket();
+    Logger.identify({
+      orgName,
+      orgId,
+      publicKey: key,
+    });
+  }
+};
+
+const { logError, logWarn } = getLogger({ location: 'handoff-init' });
+
 const Init = () => {
   const [state, send] = useHandoffMachine();
   const { authToken = '' } = state.context;
@@ -28,32 +51,18 @@ const Init = () => {
       if (!state.done) {
         send({
           type: 'initContextUpdated',
-          payload: {
-            authToken: authTokenFromUrl,
-          },
+          payload: { authToken: authTokenFromUrl },
         });
       }
     },
     onError: () => {
-      Logger.error('Parsing handoff URL failed on init page', {
-        location: 'handoff-init',
-      });
+      logError('Parsing handoff URL failed on init page');
     },
   });
 
-  const logContext = (data: GetD2PResponse) => {
-    const { meta } = data;
-    const opener = meta?.opener ?? 'unknown';
-    const bifrostSessionId = meta?.sessionId ?? '';
-    const locale = meta?.l10n?.locale ?? 'en-US';
-    Logger.identify({ opener, bifrostSessionId, locale });
-  };
-
   const updateD2PStatus = () => {
     if (!authToken) {
-      Logger.error('Found empty auth token while updating d2p', {
-        location: 'handoff-init',
-      });
+      logError('Found empty auth token while updating d2p');
       return;
     }
     // Tell the api that d2p is in progress now
@@ -67,18 +76,14 @@ const Init = () => {
           if (!state.done) {
             send({
               type: 'initContextUpdated',
-              payload: {
-                updatedStatus: true,
-              },
+              payload: { updatedStatus: true },
             });
           }
         },
-        onError(error: unknown) {
-          Logger.warn(
-            `Updating the d2p status to in progress failed: ${getErrorMessage(
-              error,
-            )}`,
-            { location: 'handoff-init' },
+        onError(err: unknown) {
+          logWarn(
+            `Updating the d2p status to in progress failed: ${getErrorMessage(err)}`,
+            err,
           );
         },
       },
@@ -101,11 +106,7 @@ const Init = () => {
           const { sandboxIdDocOutcome: idDocOutcome } = meta;
           send({
             type: 'initContextUpdated',
-            payload: {
-              opener,
-              idDocOutcome,
-              l10n,
-            },
+            payload: { opener, idDocOutcome, l10n },
           });
 
           if (status === D2PStatus.waiting || status === D2PStatus.inProgress) {
@@ -114,61 +115,43 @@ const Init = () => {
             status === D2PStatus.completed ||
             status === D2PStatus.failed
           ) {
-            send({
-              type: 'd2pAlreadyCompleted',
-            });
+            send({ type: 'd2pAlreadyCompleted' });
           } else if (status === D2PStatus.canceled) {
-            send({
-              type: 'd2pCanceled',
-            });
+            send({ type: 'd2pCanceled' });
           }
         }
       },
-      onError: (error: unknown) => {
-        Logger.warn(
+      onError: (err: unknown) => {
+        logWarn(
           `Fetching d2p status failed on handoff init page: ${getErrorMessage(
-            error,
+            err,
           )}`,
-          { location: 'handoff-init' },
+          err,
         );
       },
     },
   });
-
-  const setupLogger = (config: PublicOnboardingConfig) => {
-    const { orgName, orgId, key, isLive } = config;
-    if (isLive && !orgIds.has(orgId)) {
-      Logger.enableLogRocket();
-      Logger.identify({
-        orgName,
-        orgId,
-        publicKey: key,
-      });
-    }
-  };
 
   useGetOnboardingStatus({
     enabled: !state.done,
     authToken,
     options: {
       onSuccess: ({ obConfiguration }) => {
-        setupLogger(obConfiguration);
+        setupLogger(obConfiguration, orgIds);
 
         if (!state.done) {
           send({
             type: 'initContextUpdated',
-            payload: {
-              onboardingConfig: obConfiguration,
-            },
+            payload: { onboardingConfig: obConfiguration },
           });
         }
       },
-      onError: (error: unknown) => {
-        Logger.warn(
+      onError: (err: unknown) => {
+        logWarn(
           `Fetching onboarding status failed on handoff init page: ${getErrorMessage(
-            error,
+            err,
           )}`,
-          { location: 'handoff-init' },
+          err,
         );
       },
     },

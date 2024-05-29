@@ -9,9 +9,9 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { GetD2PResponse } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import React from 'react';
-import Layout from 'src/components/layout';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
+import Layout from '../../components/layout';
 import Canceled from '../canceled';
 import Complete from '../complete';
 import Expired from '../expired';

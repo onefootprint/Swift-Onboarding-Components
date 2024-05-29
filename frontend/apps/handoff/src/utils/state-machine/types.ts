@@ -16,24 +16,13 @@ export type MachineContext = {
 
 export type MachineEvents =
   | InitContextUpdatedEvent
-  | {
-      type: 'd2pAlreadyCompleted';
-    }
-  | {
-      type: 'd2pCanceled';
-    }
+  | { type: 'd2pAlreadyCompleted' }
+  | { type: 'd2pCanceled' }
+  | { type: 'idvCompleted' }
+  | { type: 'reset' }
   | {
       type: 'statusReceived';
-      payload: {
-        isError?: boolean;
-        status?: D2PStatus;
-      };
-    }
-  | {
-      type: 'idvCompleted';
-    }
-  | {
-      type: 'reset';
+      payload: { isError?: boolean; status?: D2PStatus };
     };
 
 export type InitContextUpdatedEvent = {

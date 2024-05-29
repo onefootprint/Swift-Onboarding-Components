@@ -9,9 +9,7 @@ import useHandoffMachine from '../../hooks/use-handoff-machine';
 const Canceled = () => {
   const [state] = useHandoffMachine();
   const { opener } = state.context;
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.canceled',
-  });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.canceled' });
 
   return (
     <Container>
