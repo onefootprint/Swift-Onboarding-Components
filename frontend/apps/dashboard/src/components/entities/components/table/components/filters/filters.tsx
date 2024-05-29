@@ -42,12 +42,14 @@ const Filters = () => {
       <Stack gap={3} flexWrap="wrap">
         <ToggleGroup
           options={[{ value: 'all', label: 'All' }]}
+          groupId="all"
           value={isAll ? 'all' : undefined}
           onChange={() => {
             filters.push({ state: undefined, verification: undefined });
           }}
         />
         <ToggleGroup
+          groupId="state"
           value={filters.values.state}
           options={[
             { value: EntityStatus.complete, label: t('status.complete') },
@@ -66,6 +68,7 @@ const Filters = () => {
           }}
         />
         <ToggleGroup
+          groupId="verification"
           value={filters.values.verification}
           disabled={filters.values.state === EntityStatus.incomplete}
           options={[
