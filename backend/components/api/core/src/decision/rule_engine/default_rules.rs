@@ -12,7 +12,7 @@ use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
     BooleanOperator, CipKind, CollectedDataOption as CDO, DbActor, EnhancedAmlOption,
     FootprintReasonCode as FRC, Locked, ObConfigurationKind, RuleAction, RuleAction as RA, RuleExpression,
-    RuleExpressionCondition, RuleInstanceKind,
+    RuleExpressionCondition, RuleInstanceKind, VerificationCheck, VerificationCheckKind,
 };
 
 pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
@@ -80,10 +80,17 @@ pub fn alpaca_doc_field_validation_rules() -> Vec<(RuleExpression, RuleAction)> 
     ]
 }
 
-pub fn base_kyb_rules() -> Vec<(RuleExpression, RuleAction)> {
+fn ein_only_rules() -> Vec<(RuleExpression, RA)> {
     vec![
         (if_risk_signal(FRC::BeneficialOwnerFailedKyc), RA::ManualReview),
         (if_not_risk_signal(FRC::TinMatch), RA::ManualReview),
+    ]
+}
+
+pub fn base_kyb_rules(ein_only: bool) -> Vec<(RuleExpression, RA)> {
+    let base = ein_only_rules();
+
+    let full_kyb = vec![
         (
             RuleExpression(vec![
                 RuleExpressionCondition::RiskSignal {
@@ -120,7 +127,13 @@ pub fn base_kyb_rules() -> Vec<(RuleExpression, RuleAction)> {
             RA::ManualReview,
         ),
         (if_risk_signal(FRC::BusinessNameWatchlistHit), RA::ManualReview),
-    ]
+    ];
+
+    if ein_only {
+        base
+    } else {
+        base.into_iter().chain(full_kyb).collect()
+    }
 }
 
 #[tracing::instrument(skip_all)]
@@ -205,8 +218,13 @@ pub fn default_rules_for_obc(
     });
 
     // KYB
-    let business_rules = if !obc.skip_kyb && obc.kind == ObConfigurationKind::Kyb {
-        base_kyb_rules()
+    let business_rules = if let Some(VerificationCheck::Kyb { ein_only }) =
+        obc.get_verification_check(VerificationCheckKind::Kyb)
+    {
+        base_kyb_rules(ein_only)
+    } else if !obc.skip_kyb && obc.kind == ObConfigurationKind::Kyb {
+        // legacy, shouldn't hit this case
+        base_kyb_rules(false)
     } else {
         vec![]
     }
@@ -280,6 +298,10 @@ mod tests {
     use macros::db_test_case;
     use newtypes::{CountryRestriction, DocTypeRestriction, DocumentCdoInfo, Selfie};
 
+    fn kyb_vc(ein_only: bool) -> Option<Vec<VerificationCheck>> {
+        Some(vec![VerificationCheck::Kyb { ein_only }])
+    }
+
     #[db_test_case(ObConfigurationOpts { ..Default::default()}, [base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn),  RA::ManualReview)]].concat() ; "basic KYC")]
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], ..Default::default()}, [base_kyc_rules(), ssn_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "basic KYC with SSN")]
     #[db_test_case(ObConfigurationOpts { must_collect_data: vec![CDO::Ssn9], skip_kyc: true, ..Default::default()}, vec![]  ; "SSN but skip_kyc")]
@@ -293,9 +315,11 @@ mod tests {
     // doc only (indicated by `kind = Document`)
     #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Document, must_collect_data: vec![CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))],  ..Default::default()}, base_doc_rules(false); "Doc only")]
     // cip_kind = Alpaca
-    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB")]
-    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessBeneficialOwners, CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB, non-KYC BO")]
-    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, skip_kyc: true, must_collect_data: vec![CDO::BusinessTin],  ..Default::default()}, [base_kyb_rules()].concat() ; "KYB, no BOs")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(false), ..Default::default()}, [base_kyb_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessKycedBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(true), ..Default::default()}, [ein_only_rules(), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB EIN Only")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, must_collect_data: vec![CDO::BusinessBeneficialOwners, CDO::BusinessTin], verification_checks: kyb_vc(false),  ..Default::default()}, [base_kyb_rules(false), base_kyc_rules(), vec![(if_risk_signal(FRC::WatchlistHitOfac), RA::ManualReview), (if_risk_signal(FRC::WatchlistHitNonSdn), RA::ManualReview)]].concat() ; "KYB, non-KYC BO")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, skip_kyc: true, must_collect_data: vec![CDO::BusinessTin], verification_checks: kyb_vc(true), ..Default::default()}, [ein_only_rules()].concat() ; "KYB ein only, no BOs")]
+    #[db_test_case(ObConfigurationOpts { kind: ObConfigurationKind::Kyb, skip_kyc: true, must_collect_data: vec![CDO::BusinessTin], verification_checks: kyb_vc(false), ..Default::default()}, [base_kyb_rules(false)].concat() ; "KYB full, no BOs")]
     fn test_default_rules_for_obc(
         conn: &mut TestPgConn,
         obc_opts: ObConfigurationOpts,
