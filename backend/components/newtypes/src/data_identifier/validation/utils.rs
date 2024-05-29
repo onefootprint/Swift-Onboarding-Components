@@ -120,6 +120,13 @@ impl AgeHelper {
     }
 }
 
+
+/// validates simple date format in `YYYY-MM-DD` format
+pub fn clean_and_validate_formation_date(input: PiiString) -> VResult<PiiString> {
+    const DATE_FORMAT: &str = "%Y-%m-%d";
+    let dob = NaiveDate::parse_from_str(input.leak(), DATE_FORMAT).map_err(|_| Error::InvalidDate)?;
+    Ok(PiiString::new(dob.format(DATE_FORMAT).to_string()))
+}
 #[cfg(test)]
 mod tests {
     use super::*;

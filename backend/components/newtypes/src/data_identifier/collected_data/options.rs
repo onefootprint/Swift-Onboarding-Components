@@ -178,7 +178,6 @@ impl CollectedDataOption {
             Self::BusinessBeneficialOwners => Some(vec![BDK::BeneficialOwners.into()]),
             Self::BusinessKycedBeneficialOwners => Some(vec![BDK::KycedBeneficialOwners.into()]),
             Self::BusinessCorporationType => Some(vec![BDK::CorporationType.into()]),
-
             // Can we stick the investor profile identifier in here? Even if it's a different DI variant... cool
             Self::InvestorProfile => Some(
                 IPK::iter()
@@ -229,7 +228,6 @@ impl CollectedDataOption {
             Self::BusinessBeneficialOwners => vec![BDK::BeneficialOwners.into()],
             Self::BusinessKycedBeneficialOwners => vec![BDK::KycedBeneficialOwners.into()],
             Self::BusinessCorporationType => vec![BDK::CorporationType.into()],
-
             Self::InvestorProfile => IPK::iter()
                 .filter(|x| !x.is_optional())
                 .map(|x| x.into())

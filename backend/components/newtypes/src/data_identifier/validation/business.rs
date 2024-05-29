@@ -36,6 +36,10 @@ impl CleanAndValidate for BDK {
             BDK::BeneficialOwners => clean_and_validate_beneficial_owners(value)?,
             BDK::KycedBeneficialOwners => clean_and_validate_kyced_beneficial_owners(value, args)?,
             BDK::CorporationType => utils::parse_enum::<CorporationType>(value.as_string()?)?,
+            BDK::FormationState => {
+                utils::validate_state(value.as_string()?, all_data.get(&BDK::Country.into()))?
+            }
+            BDK::FormationDate => utils::clean_and_validate_formation_date(value.as_string()?)?,
         };
         let value = utils::validate_not_empty(value)?;
 

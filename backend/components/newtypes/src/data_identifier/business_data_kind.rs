@@ -25,6 +25,8 @@ pub enum BusinessDataKind {
     /// row in the database
     KycedBeneficialOwners,
     CorporationType,
+    FormationState,
+    FormationDate,
 }
 
 impl From<BusinessDataKind> for DataIdentifier {
@@ -61,6 +63,7 @@ impl IsDataIdentifierDiscriminant for BusinessDataKind {
             Self::BeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::KycedBeneficialOwners => CollectedData::BusinessBeneficialOwners,
             Self::CorporationType => CollectedData::BusinessCorporationType,
+            Self::FormationDate | Self::FormationState => return None,
         };
         Some(result)
     }

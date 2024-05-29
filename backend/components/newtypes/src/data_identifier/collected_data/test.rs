@@ -45,12 +45,15 @@ fn test_cdo_parent() {
 #[test_case(IDK::iter().collect_vec())]
 #[test_case(BDK::iter().collect_vec())]
 #[test_case(IPK::iter().collect_vec())]
-fn test_parent<T>(ids: Vec<T>)
+fn test_parent<T>(dis: Vec<T>)
 where
     T: IsDataIdentifierDiscriminant + std::fmt::Debug,
 {
-    for id in ids {
-        test_discriminant(id.into());
+    for di in dis {
+        if di.parent().is_none() {
+            continue;
+        }
+        test_discriminant(di.into());
     }
 }
 
