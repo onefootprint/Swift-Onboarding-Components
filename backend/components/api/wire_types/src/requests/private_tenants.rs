@@ -38,10 +38,8 @@ pub struct PrivateTenantDetail {
     pub is_prod_kyb_playbook_restricted: bool,
     pub is_prod_auth_playbook_restricted: bool,
 
-    // TODO support updating with the new PATCH
     pub supported_auth_methods: Option<Vec<WorkosAuthMethod>>,
     pub allowed_preview_apis: Vec<PreviewApi>,
-    // TODO support updating with the new PATCH
     pub pinned_api_version: Option<i32>,
     pub is_demo_tenant: bool,
 
@@ -127,9 +125,14 @@ pub struct PrivatePatchTenant {
     pub is_prod_kyb_playbook_restricted: Option<bool>,
     pub is_prod_auth_playbook_restricted: Option<bool>,
 
+    #[serde(default)]
+    pub supported_auth_methods: Patch<Vec<WorkosAuthMethod>>,
     pub allowed_preview_apis: Option<Vec<PreviewApi>>,
+    #[serde(default)]
+    pub pinned_api_version: Patch<i32>,
     pub is_demo_tenant: Option<bool>,
 
-    pub super_tenant_id: Option<TenantId>,
+    #[serde(default)]
+    pub super_tenant_id: Patch<TenantId>,
     pub billing_profile: Option<PrivateUpdateBillingProfile>,
 }

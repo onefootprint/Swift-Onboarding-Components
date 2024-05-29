@@ -407,8 +407,10 @@ pub struct PrivateUpdateTenant {
     pub is_prod_kyb_playbook_restricted: Option<bool>,
     pub is_prod_auth_playbook_restricted: Option<bool>,
 
+    pub supported_auth_methods: Option<Option<Vec<WorkosAuthMethod>>>,
     pub allowed_preview_apis: Option<Vec<PreviewApi>>,
+    pub pinned_api_version: Option<Option<i32>>,
     pub is_demo_tenant: Option<bool>,
 
-    pub super_tenant_id: Option<TenantId>,
+    pub super_tenant_id: Option<Option<TenantId>>,
 }

@@ -57,7 +57,9 @@ fn make_tenant_update(
         is_prod_kyc_playbook_restricted,
         is_prod_kyb_playbook_restricted,
         is_prod_auth_playbook_restricted,
+        supported_auth_methods,
         allowed_preview_apis,
+        pinned_api_version,
         is_demo_tenant,
         super_tenant_id,
         billing_profile,
@@ -70,9 +72,11 @@ fn make_tenant_update(
         is_prod_ob_config_restricted: is_prod_kyc_playbook_restricted,
         is_prod_kyb_playbook_restricted,
         is_prod_auth_playbook_restricted,
+        supported_auth_methods: supported_auth_methods.to_changeset(),
         allowed_preview_apis,
+        pinned_api_version: pinned_api_version.to_changeset(),
         is_demo_tenant,
-        super_tenant_id,
+        super_tenant_id: super_tenant_id.to_changeset(),
     };
     let billing_profile = billing_profile.map(make_billing_profile_update);
     (update, billing_profile)
