@@ -152,22 +152,16 @@ jobs:
           aws_region: ${{ secrets.AWS_REGION }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Setup Python # Set Python version
+      - name: Setup Python
         uses: actions/setup-python@v3
         with:
           python-version: "3.11"
 
-      - name: Install python dependencies
-        working-directory: ./backend/ci
-        run: |
-          set -ox pipefail
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
       - name: Run local integration tests
         working-directory: ./backend/ci
         run: |
-          set -ox pipefail
+          set -euxo pipefail
+          pip install -r requirements.txt
           pytest -n 6 tests/ 2>&1 | tee integration_test_output.txt
           kill ${{ steps.backend_run_local.outputs.server_pid }}
 

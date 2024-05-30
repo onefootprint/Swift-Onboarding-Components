@@ -45,9 +45,6 @@ jobs:
     name: remote integration tests
     runs-on: 8core
     environment: ${{ inputs.environment }}
-    strategy:
-      matrix:
-        python-version: ['3.11']
     env:
       TEST_URL: ${{ inputs.testUrl }}
       IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
@@ -69,21 +66,16 @@ jobs:
         with:
           commitHash: ${{ inputs.expectedCommitHash || github.sha }}
 
-      - name: Setup Python # Set Python version
+      - name: Setup Python
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        working-directory: ./backend/ci
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python-version: "3.11"
 
       - name: Integration testing
         working-directory: ./backend/ci
         run: |
-          set -o pipefail
+          set -euxo pipefail
+          pip install -r requirements.txt
           pytest -n 6 tests/ 2>&1 | tee integration_test_output.txt
         env:
           EXPECTED_SERVER_VERSION: ${{ steps.components.outputs.expectedServerVersion }}
