@@ -1,9 +1,17 @@
+use super::license_validation::{
+    OrderStatusLink,
+    OrderStatusLinks,
+    SambaLinkType,
+};
+use newtypes::{
+    SambaOrderId,
+    SambaWebhookEventType,
+};
+use serde::{
+    Deserialize,
+    Serialize,
+};
 use std::str::FromStr;
-
-use newtypes::{SambaOrderId, SambaWebhookEventType};
-use serde::{Deserialize, Serialize};
-
-use super::license_validation::{OrderStatusLink, OrderStatusLinks, SambaLinkType};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]

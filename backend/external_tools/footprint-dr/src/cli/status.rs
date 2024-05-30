@@ -1,5 +1,11 @@
-use super::api_client::{IsLive, VaultDrApiClient};
-use anyhow::{anyhow, Result};
+use super::api_client::{
+    IsLive,
+    VaultDrApiClient,
+};
+use anyhow::{
+    anyhow,
+    Result,
+};
 use log::debug;
 use reqwest::Url;
 
