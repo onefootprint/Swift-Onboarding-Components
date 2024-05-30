@@ -1,10 +1,8 @@
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
-from tests.utils import _gen_random_n_digit_number
+from tests.utils import _gen_random_n_digit_number, _gen_random_sandbox_id
 from tests.utils import post, get
-from tests.constants import FIXTURE_PHONE_NUMBER
-import json
 from alpaca.broker.client import BrokerClient
 import datetime
 from enum import Enum, auto
@@ -69,8 +67,8 @@ def cdos_for_nationality_config(nationality_config):
     "sandbox_outcome,manually_mark_as_verified,expected_error",
     [
         ("pass", False, None),
-        ("manualreview", True, None),
-        ("stepup", True, None),
+        ("manual_review", True, None),
+        ("step_up", True, None),
         (
             "fail",
             True,
@@ -88,8 +86,7 @@ def test_alpaca_cip(
 ):
     # create a new user that has onboarded
     # Alpaca doesn't allow duplicate emails, so we create a nonce'd one
-    seed = _gen_random_n_digit_number(10)
-    sandbox_id = f"{sandbox_outcome}{seed}"
+    sandbox_id = _gen_random_sandbox_id()
     email = f"footprint.user.dev.{_gen_random_n_digit_number(10)}@gmail.com"
     obc = alpaca_kyc_ob_config(
         sandbox_tenant,
@@ -108,6 +105,7 @@ def test_alpaca_cip(
         obc,
         override_sandbox_id=sandbox_id,
         override_email=email,
+        fixture_result=sandbox_outcome,
     )
     bifrost.vault_barcode_with_doc = False  # hack cause /vault barfs when trying to vault barcode during stepup because stepup workflow state only gives the AddDocument guard, not the AddData guard
 

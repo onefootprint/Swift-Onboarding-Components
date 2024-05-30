@@ -71,9 +71,8 @@ class SandboxId(BaseAuth):
 
     def __init__(self, value):
         # Don't send the fixture result in sandbox ID anymore so it is required to be sent in POST /process
-        value = (
-            value.replace("fail", "").replace("manualreview", "").replace("stepup", "")
-        )
+        if "fail" in value or "manualreview" in value or "stepup" in value:
+            assert False, "Legacy sandbox ID"
         super().__init__(value)
 
 

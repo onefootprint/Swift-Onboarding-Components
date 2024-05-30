@@ -4,7 +4,7 @@ from requests.auth import HTTPBasicAuth
 from tests.utils import post, get, patch, url
 from tests.constants import CUSTODIAN_AUTH
 from tests.bifrost_client import BifrostClient
-from tests.constants import FIXTURE_PHONE_NUMBER, ENVIRONMENT
+from tests.constants import ENVIRONMENT
 from tests.utils import _gen_random_n_digit_number
 
 
@@ -44,20 +44,18 @@ def test_basic_auth(sandbox_tenant):
 
 
 @pytest.mark.parametrize(
-    "sandbox_id,expected_status,expected_requires_manual_review",
+    "sandbox_outcome,expected_status,expected_requires_manual_review",
     [
         ("fail", "fail", False),
-        ("blah_123", "pass", False),
-        ("manualreview", "fail", True),
+        (None, "pass", False),
+        ("manual_review", "fail", True),
     ],
 )
 def test_get_user(
-    sandbox_tenant, sandbox_id, expected_status, expected_requires_manual_review
+    sandbox_tenant, sandbox_outcome, expected_status, expected_requires_manual_review
 ):
-    seed = _gen_random_n_digit_number(10)
-    sandbox_id = f"{sandbox_id}{seed}"
     bifrost = BifrostClient.new_user(
-        sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
+        sandbox_tenant.default_ob_config, fixture_result=sandbox_outcome
     )
     user = bifrost.run()
 
@@ -68,12 +66,7 @@ def test_get_user(
 
 
 def test_check_session(sandbox_tenant):
-    seed = _gen_random_n_digit_number(10)
-    sandbox_id = f"session_check_{seed}"
-
-    bifrost = BifrostClient.new_user(
-        sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
-    )
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     bifrost.run()
     body = get(f"hosted/check_session", None, bifrost.auth_token)
     assert body == "active"

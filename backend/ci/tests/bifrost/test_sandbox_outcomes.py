@@ -6,13 +6,13 @@ from tests.utils import _gen_random_n_digit_number
 
 
 @pytest.mark.parametrize(
-    "sandbox_id,expected_status,expected_requires_manual_review",
+    "sandbox_outcome,expected_status,expected_requires_manual_review",
     [
         ("fail", "fail", False),
-        ("blah_123", "pass", False),
-        ("manualreview12", "fail", True),
+        (None, "pass", False),
+        ("manual_review", "fail", True),
         (
-            "stepup12",
+            "step_up",
             "fail",
             True,
         ),  # for now, we always fail with review after stepup in sandbox. later we'll probably let users fixture the post-stepup decision as well
@@ -20,14 +20,12 @@ from tests.utils import _gen_random_n_digit_number
 )
 def test_deterministic_onboarding(
     sandbox_tenant,
-    sandbox_id,
+    sandbox_outcome,
     expected_status,
     expected_requires_manual_review,
 ):
-    seed = _gen_random_n_digit_number(10)
-    sandbox_id = f"{sandbox_id}{seed}"
     bifrost = BifrostClient.new_user(
-        sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
+        sandbox_tenant.default_ob_config, fixture_result=sandbox_outcome
     )
     bifrost.vault_barcode_with_doc = False  # hack cause /vault barfs when trying to vault barcode during stepup because stepup workflow state only gives the AddDocument guard, not the AddData guard
 

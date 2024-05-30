@@ -72,24 +72,10 @@ class BifrostClient:
         self.auth_token = auth_token
         self.sandbox_id = sandbox_id
 
-        # Extract the fixture result from the sandbox_id
-        # Bifrost today no longer does this, just haven't updated the BifrostClient to pass
-        # fixture results in another way
-        SANDBOX_OUTCOMES = {
-            "fail": "fail",
-            "manualreview": "manual_review",
-            "stepup": "step_up",
-            "document_decision": "document_decision",
-        }
         if sandbox_id is None:
             self.fixture_result = None
         else:
-            # TODO remove this logic to extract the fixture result from the sandbox ID
-            r = None
-            for prefix, result in SANDBOX_OUTCOMES.items():
-                if sandbox_id.startswith(prefix):
-                    r = result
-            self.fixture_result = fixture_result or r or "pass"
+            self.fixture_result = fixture_result or "pass"
 
         phone_number = override_phone or FIXTURE_PHONE_NUMBER
         email = override_email or FIXTURE_EMAIL
