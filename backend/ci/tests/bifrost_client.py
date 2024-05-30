@@ -32,39 +32,23 @@ class BifrostClient:
     FIXTURE_EMAIl
     """
 
-    def raw_auth(
-        ob_config,
-        auth_token,
-        sandbox_id,
-        override_phone=None,
-        override_email=None,
-        provide_playbook_auth=False,
-    ):
+    def raw_auth(ob_config, auth_token, sandbox_id, **kwargs):
         """
-        Create an instance of BifrostClient that uses the provided auth token.
+        Create an instance of BifrostClient that uses the provided auth token, skipping the identify flow in
+        favor of the provided auth.
         """
-        return BifrostClient(
-            ob_config,
-            auth_token,
-            sandbox_id,
-            override_phone,
-            override_email,
-            provide_playbook_auth,
-        )
+        return BifrostClient(ob_config, auth_token, sandbox_id, **kwargs)
 
-    def inherit_user(ob_config, sandbox_id, override_ob_config_auth=None):
+    def inherit_user(ob_config, sandbox_id, override_ob_config_auth=None, **kwargs):
         """
         Create an instance of BifrostClient that inherits the user with the provided phone number.
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         auth = IdentifyClient(ob_config_auth, sandbox_id).inherit()
-        return BifrostClient(ob_config, auth, sandbox_id)
+        return BifrostClient(ob_config, auth, sandbox_id, **kwargs)
 
     def new_user(
-        ob_config,
-        override_sandbox_id=None,
-        override_ob_config_auth=None,
-        override_email=None,
+        ob_config, override_sandbox_id=None, override_ob_config_auth=None, **kwargs
     ):
         """
         Create an instance of BifrostClient that creates a new sandbox user with the fixture phone number
@@ -72,7 +56,7 @@ class BifrostClient:
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = override_sandbox_id or _gen_random_sandbox_id()
         auth_token = IdentifyClient(ob_config_auth, sandbox_id).create_user()
-        return BifrostClient(ob_config, auth_token, sandbox_id, override_email)
+        return BifrostClient(ob_config, auth_token, sandbox_id, **kwargs)
 
     def __init__(
         self,
@@ -82,6 +66,7 @@ class BifrostClient:
         override_phone=None,
         override_email=None,
         provide_playbook_auth=False,
+        fixture_result=None,
     ):
         self.ob_config = ob_config
         self.auth_token = auth_token
@@ -99,11 +84,12 @@ class BifrostClient:
         if sandbox_id is None:
             self.fixture_result = None
         else:
+            # TODO remove this logic to extract the fixture result from the sandbox ID
             r = None
-            for prefix, fixture_result in SANDBOX_OUTCOMES.items():
+            for prefix, result in SANDBOX_OUTCOMES.items():
                 if sandbox_id.startswith(prefix):
-                    r = fixture_result
-            self.fixture_result = r or "pass"
+                    r = result
+            self.fixture_result = fixture_result or r or "pass"
 
         phone_number = override_phone or FIXTURE_PHONE_NUMBER
         email = override_email or FIXTURE_EMAIL
@@ -186,7 +172,8 @@ class BifrostClient:
         auths = [self.auth_token]
         if provide_playbook_auth:
             auths.append(self.ob_config.key)
-        return post("hosted/onboarding", None, *auths)
+        body = dict(fixture_result=self.fixture_result) if self.fixture_result else None
+        return post("hosted/onboarding", body, *auths)
 
     def get_status(self):
         return get("hosted/onboarding/status", None, self.auth_token)
@@ -383,8 +370,7 @@ class BifrostClient:
         post("hosted/onboarding/authorize", None, self.auth_token, **kwargs)
 
     def handle_process(self, **kwargs):
-        body = dict(fixture_result=self.fixture_result) if self.fixture_result else None
-        post("hosted/onboarding/process", body, self.auth_token, **kwargs)
+        post("hosted/onboarding/process", None, self.auth_token, **kwargs)
 
     def validate(self, **kwargs):
         return post("hosted/onboarding/validate", None, self.auth_token, **kwargs)

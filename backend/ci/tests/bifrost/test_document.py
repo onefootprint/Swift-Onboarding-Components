@@ -104,8 +104,7 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
         ],
     )
 
-    bifrost = BifrostClient.new_user(obc)
-    bifrost.fixture_result = "document_decision"
+    bifrost = BifrostClient.new_user(obc, fixture_result="document_decision")
     user = bifrost.run()
     assert any(
         r["kind"] == "collect_document" and r["config"]["kind"] == "custom"
@@ -158,8 +157,9 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
     We should leave the SV status untouched, but still be able to raise a manual review.
     """
     # First, make a user
-    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
-    bifrost.fixture_result = initial_fixture_result
+    bifrost = BifrostClient.new_user(
+        sandbox_tenant.default_ob_config, fixture_result=initial_fixture_result
+    )
     user = bifrost.run()
     assert bifrost.validate_response["user"]["status"] == initial_fixture_result
 
@@ -181,8 +181,9 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
     assert not body, "Non-id doc playbook should not have any rules"
 
     # Onboard the user to the doc-only playbook
-    bifrost = BifrostClient.inherit_user(doc_playbook, bifrost.sandbox_id)
-    bifrost.fixture_result = "document_decision"
+    bifrost = BifrostClient.inherit_user(
+        doc_playbook, bifrost.sandbox_id, fixture_result="document_decision"
+    )
     user2 = bifrost.run()
     # The initial status should remain unchanged
     assert bifrost.validate_response["user"]["status"] == initial_fixture_result

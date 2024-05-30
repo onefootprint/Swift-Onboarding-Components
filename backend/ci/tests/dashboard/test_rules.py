@@ -436,10 +436,8 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
         must_collect_data,
         can_access_data,
     )
-    bifrost = BifrostClient.new_user(obc)
-    bifrost.fixture_result = (
-        "document_decision"  # Misnomer, but just means we'll evaluate rules
-    )
+    # document_decision is a misnomer, but just means we'll evaluate rules
+    bifrost = BifrostClient.new_user(obc, fixture_result="document_decision")
     user = bifrost.run()
     fp_id = user.fp_id
 
@@ -483,10 +481,8 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     # Rerun Bifrost in a new sandbox.
-    bifrost = BifrostClient.new_user(obc)
-    bifrost.fixture_result = (
-        "document_decision"  # Misnomer, but just means we'll evaluate rules
-    )
+    # document_decision is a misnomer, but just means we'll evaluate rules
+    bifrost = BifrostClient.new_user(obc, fixture_result="document_decision")
     user = bifrost.run()
     fp_id = user.fp_id
 
