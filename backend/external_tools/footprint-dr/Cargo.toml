@@ -7,6 +7,9 @@ description = "CLI for interacting with the Footprint Vault Disaster Recovery sy
 edition.workspace = true
 
 [dependencies]
+anyhow =  { workspace = true }
 clap = { workspace = true }
 env_logger = { workspace = true }
 log = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
