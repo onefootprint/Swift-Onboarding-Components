@@ -234,6 +234,7 @@ impl Fingerprint {
         let sh_datas = fingerprint::table
             .filter(fingerprint::scoped_vault_id.eq(&sv.id))
             .filter(fingerprint::deactivated_at.is_null())
+            .filter(fingerprint::is_hidden.eq(false))
             .filter(fingerprint::kind.eq_any(Self::DUPLICATE_FINGERPRINT_KINDS))
             .filter(fingerprint::sh_data.is_not_null())
             .select(fingerprint::sh_data.assume_not_null())
@@ -243,6 +244,7 @@ impl Fingerprint {
             .filter(fingerprint::sh_data.is_not_null())
             .filter(fingerprint::sh_data.eq_any(&sh_datas))
             .filter(fingerprint::deactivated_at.is_null())
+            .filter(fingerprint::is_hidden.eq(false))
             .filter(fingerprint::is_live.eq(sv.is_live))
             .filter(fingerprint::vault_id.ne(&sv.vault_id))
             // TODO when we stop making unverified vaults after each signup challenge, remove this

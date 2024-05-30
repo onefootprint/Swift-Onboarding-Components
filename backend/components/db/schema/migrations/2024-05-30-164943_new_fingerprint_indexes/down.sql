@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY fingerprint_query_sh_data;

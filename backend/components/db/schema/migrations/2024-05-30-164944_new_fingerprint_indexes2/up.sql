@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS fingerprint_query_p_data ON fingerprint USING gin(is_live, p_data gin_trgm_ops, tenant_id) WHERE deactivated_at IS NULL AND p_data IS NOT NULL AND is_hidden = 'f';
