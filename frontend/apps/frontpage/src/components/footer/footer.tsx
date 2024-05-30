@@ -12,24 +12,20 @@ const linkSections = [
     title: 'product.title',
     links: [
       {
-        name: 'kyc',
-        textKey: 'product.kyc.text',
-        hrefKey: 'product.kyc.href',
+        textKey: 'product.kyc',
+        href: '/kyc',
       },
       {
-        name: 'kyb',
-        textKey: 'product.kyb.text',
-        hrefKey: 'product.kyb.href',
+        textKey: 'product.kyb',
+        href: '/kyb',
       },
       {
-        name: 'vaulting',
-        textKey: 'product.vaulting.text',
-        hrefKey: 'product.vaulting.href',
+        textKey: 'product.vaulting',
+        href: '/vaulting',
       },
       {
-        name: 'auth',
-        textKey: 'product.auth.text',
-        hrefKey: 'product.auth.href',
+        textKey: 'product.auth',
+        href: '/auth',
       },
     ],
   },
@@ -37,24 +33,20 @@ const linkSections = [
     title: 'industries.title',
     links: [
       {
-        name: 'real-estate',
-        textKey: 'industries.real-estate.text',
-        hrefKey: 'industries.real-estate.href',
+        textKey: 'industries.real-estate',
+        href: '/industries/real-estate',
       },
       {
-        name: 'auto',
-        textKey: 'industries.auto.text',
-        hrefKey: 'industries.auto.href',
+        textKey: 'industries.auto',
+        href: '/industries/auto',
       },
       {
-        name: 'fintech',
-        textKey: 'industries.fintech.text',
-        hrefKey: 'industries.fintech.href',
+        textKey: 'industries.fintech',
+        href: '/industries/fintech',
       },
       {
-        name: 'baas',
-        textKey: 'industries.baas.text',
-        hrefKey: 'industries.baas.href',
+        textKey: 'industries.baas',
+        href: '/industries/financial-institutions',
       },
     ],
   },
@@ -62,29 +54,24 @@ const linkSections = [
     title: 'company.title',
     links: [
       {
-        name: 'about',
-        textKey: 'company.about.text',
-        hrefKey: 'company.about.href',
+        textKey: 'company.about',
+        href: '/company',
       },
       {
-        name: 'blog',
-        textKey: 'company.blog.text',
-        hrefKey: 'company.blog.href',
+        textKey: 'company.blog',
+        href: '/blog',
       },
       {
-        name: 'investor-updates',
-        textKey: 'company.investor-updates.text',
-        hrefKey: 'company.investor-updates.href',
+        textKey: 'company.investor-updates',
+        href: '/investor-updates',
       },
       {
-        name: 'media',
-        textKey: 'company.media.text',
-        hrefKey: 'company.media.href',
+        textKey: 'company.media',
+        href: '/media',
       },
       {
-        name: 'customers',
-        textKey: 'company.customers.text',
-        hrefKey: 'company.customers.href',
+        textKey: 'company.customers',
+        href: '/customers',
       },
     ],
   },
@@ -92,14 +79,12 @@ const linkSections = [
     title: 'developers.title',
     links: [
       {
-        name: 'docs',
-        textKey: 'developers.docs.text',
-        hrefKey: 'developers.docs.href',
+        textKey: 'developers.docs',
+        href: 'https://docs.onefootprint.com',
       },
       {
-        name: 'status',
-        textKey: 'developers.status.text',
-        hrefKey: 'developers.status.href',
+        textKey: 'developers.status',
+        href: 'https://status.onefootprint.com/',
       },
     ],
   },
@@ -107,34 +92,28 @@ const linkSections = [
     title: 'resources.title',
     links: [
       {
-        name: 'terms-of-service',
-        textKey: 'resources.terms-of-service.text',
-        hrefKey: 'resources.terms-of-service.href',
+        textKey: 'resources.terms-of-service',
+        href: '/terms-of-service',
       },
       {
-        name: 'privacy-policy',
-        textKey: 'resources.privacy-policy.text',
-        hrefKey: 'resources.privacy-policy.href',
+        textKey: 'resources.privacy-policy',
+        href: '/privacy-policy',
       },
       {
-        name: 'faq',
-        textKey: 'resources.faq.text',
-        hrefKey: 'resources.faq.href',
+        textKey: 'resources.faq',
+        href: '/faq',
       },
       {
-        name: 'supported-id-documents',
-        textKey: 'resources.supported-id-documents.text',
-        hrefKey: 'resources.supported-id-documents.href',
+        textKey: 'resources.supported-id-documents',
+        href: '/supported-id-documents',
       },
       {
-        name: 'security-disclosure',
-        textKey: 'resources.security-disclosure.text',
-        hrefKey: 'resources.security-disclosure.href',
+        textKey: 'resources.security-disclosure',
+        href: '/security-disclosure',
       },
       {
-        name: 'idv-privacy',
-        textKey: 'resources.idv-privacy.text',
-        hrefKey: 'resources.idv-privacy.href',
+        textKey: 'resources.idv-privacy',
+        href: '/idv-privacy',
       },
     ],
   },
@@ -155,9 +134,9 @@ const Footer = () => {
               </Text>
               {section.links.map(link => (
                 <FooterLink
-                  key={link.name}
+                  key={link.textKey}
                   text={t(link.textKey as ParseKeys<'common'>)}
-                  href={t(link.hrefKey as ParseKeys<'common'>)}
+                  href={link.href}
                 />
               ))}
             </SectionColumn>

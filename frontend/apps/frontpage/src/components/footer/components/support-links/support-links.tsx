@@ -4,7 +4,6 @@ import {
   ThemedLogoFpCompact,
 } from '@onefootprint/icons';
 import { Box, createFontStyles, media, Stack, Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -16,8 +15,11 @@ const SUPPORT_EMAIL_ADDRESS = 'support@onefootprint.com';
 const currentYear = new Date().getFullYear();
 
 const socialLinks = [
-  { hrefKey: 'twitter.href', Icon: IcoX24 },
-  { hrefKey: 'linkedin.href', Icon: IcoLinkedin24 },
+  { href: 'https://twitter.com/footprint_hq', Icon: IcoX24 },
+  {
+    href: 'https://www.linkedin.com/company/onefootprint/',
+    Icon: IcoLinkedin24,
+  },
 ];
 
 const SuportLinks = () => {
@@ -35,10 +37,10 @@ const SuportLinks = () => {
         {SUPPORT_EMAIL_ADDRESS}
       </SupportMail>
       <SocialLinks>
-        {socialLinks.map(({ hrefKey, Icon }) => (
+        {socialLinks.map(({ href, Icon }) => (
           <StyledIconLink
-            key={hrefKey}
-            href={t(hrefKey as ParseKeys<'common'>)}
+            key={href}
+            href={href}
             rel="noopener noreferrer"
             target="_blank"
           >

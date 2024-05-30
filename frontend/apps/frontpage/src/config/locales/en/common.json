@@ -200,116 +200,41 @@
     },
     "footer": {
       "copyright": "One Footprint Inc.",
-      "twitter": {
-        "href": "https://twitter.com/footprint_hq",
-        "text": "Twitter"
-      },
-      "linkedin": {
-        "href": "https://www.linkedin.com/company/onefootprint/",
-        "text": "Linkedin"
-      },
       "product": {
         "title": "Platform",
-        "kyc": {
-          "text": "KYC",
-          "href": "/kyc"
-        },
-        "kyb": {
-          "text": "KYB",
-          "href": "/kyb"
-        },
-        "vaulting": {
-          "text": "Vaulting",
-          "href": "/vaulting"
-        },
-        "auth": {
-          "text": "Auth",
-          "href": "/auth"
-        }
+        "kyc": "KYC",
+        "kyb": "KYB",
+        "vaulting": "Vaulting",
+        "auth": "Auth"
       },
       "industries": {
         "title": "Industries",
-        "real-estate": {
-          "text": "Real estate",
-          "href": "/industries/real-estate"
-        },
-        "auto": {
-          "text": "Auto",
-          "href": "/industries/auto"
-        },
-        "fintech": {
-          "text": "Fintech",
-          "href": "/industries/fintech"
-        },
-        "baas": {
-          "text": "Financial Institutions",
-          "href": "/industries/financial-institutions"
-        }
+        "real-estate": "Real estate",
+        "auto": "Auto",
+        "fintech": "Fintech",
+        "baas": "Financial Institutions"
       },
       "company": {
         "title": "Company",
-        "about": {
-          "text": "About us",
-          "href": "/company"
-        },
-        "careers": {
-          "text": "Careers",
-          "href": "https://jobs.ashbyhq.com/footprint"
-        },
-        "blog": {
-          "text": "Blog",
-          "href": "/blog"
-        },
-        "investor-updates": {
-          "text": "Investor Updates",
-          "href": "/investor-updates"
-        },
-        "media": {
-          "text": "Media",
-          "href": "/media"
-        },
-        "customers": {
-          "text": "Customers",
-          "href": "/customers"
-        }
+        "about": "About us",
+        "blog": "Blog",
+        "investor-updates": "Investor Updates",
+        "media": "Media",
+        "customers": "Customers"
       },
       "resources": {
         "title": "Resources",
-        "terms-of-service": {
-          "href": "/terms-of-service",
-          "text": "Terms"
-        },
-        "privacy-policy": {
-          "href": "/privacy-policy",
-          "text": "Privacy"
-        },
-        "faq": {
-          "text": "FAQ",
-          "href": "/faq"
-        },
-        "supported-id-documents": {
-          "text": "Supported ID Documents",
-          "href": "/supported-id-documents"
-        },
-        "security-disclosure": {
-          "href": "/security-disclosure",
-          "text": "Security Disclosure"
-        },
-        "idv-privacy": {
-          "href": "idv-privacy",
-          "text": "IDV Privacy"
-        }
+        "terms-of-service": "Terms",
+        "privacy-policy": "Privacy",
+        "faq": "FAQ",
+        "supported-id-documents": "Supported ID Documents",
+        "security-disclosure": "Security Disclosure",
+        "idv-privacy": "IDV Privacy"
       },
       "developers": {
         "title": "Developers",
-        "docs": {
-          "href": "https://docs.onefootprint.com/",
-          "text": "Docs"
-        },
-        "status": {
-          "href": "https://status.onefootprint.com/",
-          "text": "Status"
-        }
+        "docs": "Docs",
+        "status": "Status"
       }
     },
     "copy-link": {
