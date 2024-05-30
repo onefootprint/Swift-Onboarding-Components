@@ -43,7 +43,7 @@ runs:
       uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84
       with:
         save-if: ${{ github.ref == 'refs/heads/master' }}
-        shared-key: backend-run-local
+        shared-key: backend-build
         cache-all-crates: true
         workspaces: |
           backend
