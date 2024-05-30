@@ -499,6 +499,7 @@
       "erase-search": "Erase search",
       "no-results": "No results found",
       "disabled": "Not enough permissions",
+      "discover": "Press ⌘ + K to access actions faster",
       "decrypt": {
         "title": "Decrypt",
         "decrypt-some": "Decrypt some fields",
