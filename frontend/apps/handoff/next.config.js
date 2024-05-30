@@ -49,7 +49,7 @@ const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
   connect-src 'self' data: ${DEV_CONNECT_SRC} vitals.vercel-insights.com vercel.live *.onefootprint.com *.pusher.com wss://*.pusher.com dvnfo.com maps.googleapis.com unpkg.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com https://*.fptls.com https://*.fptls2.com https://*.fptls3.com https://api.fpjs.io https://*.api.fpjs.io telemetry.stytch.com *.launchdarkly.com ${OBSERVE_CONNECT_SRC} ${LOG_ROCKET_CONNECT_SRC} ${SENTRY_CONNECT_SRC} ${DATADOG_SRC};
   default-src 'self' vitals.vercel-insights.com;
-  font-src 'self' fonts.googleapis.com fonts.gstatic.com;
+  font-src 'self' fonts.googleapis.com fonts.gstatic.com i.onefp.net;
   form-action 'self';
   frame-ancestors 'self';
   frame-src 'self' vercel.live;
