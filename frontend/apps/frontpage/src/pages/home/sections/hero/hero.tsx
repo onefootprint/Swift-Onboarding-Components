@@ -32,7 +32,7 @@ const Hero = () => {
       <Overflow>
         <HeroContainer>
           <TextContainer>
-            <Stack direction="column" gap={5}>
+            <Stack direction="column" gap={5} align="center">
               <Title tag="h1">{t('hero.title')}</Title>
               <Text
                 tag="h2"
