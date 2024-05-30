@@ -26,7 +26,7 @@ type SeoProps = {
 };
 
 const Seo = ({
-  description = 'One tool to unify onboarding, identity verification, and data security',
+  description = 'The single onboarding tool your company needs',
   image = '/og-img-home.png',
   keywords = 'footprint,foot,print,id,onefootprint,identity,kyc,verify,security',
   kind = 'product',
@@ -35,14 +35,12 @@ const Seo = ({
   og = {
     image: '/og-img-home.png',
     title: 'Footprint',
-    description:
-      'One tool to unify onboarding, identity verification, and data security',
+    description: 'The single onboarding tool your company needs',
     author: 'Footprint',
   },
   twitter = {
     title: 'Footprint',
-    description:
-      'One tool to unify onboarding, identity verification, and data security',
+    description: 'The single onboarding tool your company needs',
     image: '/og-img-home.png',
     extraData: [
       { label: 'Footprint', data: 'Footprint' },
@@ -56,15 +54,9 @@ const Seo = ({
     <meta name="description" content={description} />
     <meta name="keywords" content={keywords} />
     <meta property="og:type" content={kind} />
-    <meta name="title" property="og:title" content={og.title || title} />
-    <meta
-      name="description"
-      property="og:description"
-      content={og.description || description}
-    />
-    {og.author && (
-      <meta name="author" property="og:author" content={og.author} />
-    )}
+    <meta property="og:title" content={og.title || title} />
+    <meta property="og:description" content={og.description || description} />
+    {og.author && <meta property="og:author" content={og.author} />}
     <meta property="og:url" content={`https://onefootprint.com${slug}`} />
     <meta name="image" property="og:image" content={og.image || image} />
     <meta name="twitter:card" content="summary_large_image" />
