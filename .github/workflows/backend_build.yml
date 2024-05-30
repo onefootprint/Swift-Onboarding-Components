@@ -39,7 +39,7 @@ jobs:
       enclaveComponentVersion: '${{ steps.constants.outputs.enclaveComponentVersion }}'
     steps:
       # Need to checkout before running the referenced sub-action
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.commitHash }}
       - uses: ./.github/actions/backend_extract_commit_hash
@@ -53,7 +53,7 @@ jobs:
     needs: [extract_commit]
     if: success()
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.commitHash }}
 
@@ -137,7 +137,7 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
           docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} && docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} || echo "Image not found"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.commitHash }}
 

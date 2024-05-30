@@ -18,7 +18,7 @@ jobs:
     name: Determine if relevant files changed
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@affb29871ab1f927ecad0ee68c0989584101408f
         id: changes
         with:
@@ -53,7 +53,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libssl-dev libpq-dev
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: rust-toolchain
         uses: dtolnay/rust-toolchain@1.77.0
@@ -120,7 +120,7 @@ jobs:
       IT_PHONE_NUMBERS: '["+1 202 952 1443", "+1 202 831 8398", "+1 202 946 3154", "+1 202 937 0987", "+1 202 759 2344", "+1 202 946 1521", "+1 202 998 5931", "+1 202 952 9077", "+1 202 740 9135", "+1 202 519 1954"]'
       ENVIRONMENT: ci
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: ./.github/actions/backend_run_local
         id: backend_run_local
@@ -228,7 +228,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libssl-dev libpq-dev
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: rust-toolchain
         uses: dtolnay/rust-toolchain@1.77.0

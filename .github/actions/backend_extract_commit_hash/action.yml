@@ -13,7 +13,7 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: ${{ inputs.commitHash }}
         # We extract all commits here to make sure we're pulling the right commit hash

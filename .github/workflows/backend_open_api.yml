@@ -32,7 +32,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         # Default behavior of actions/checkout is horribly to check out a merge commit of the PR
         # merged into master...
         # This checks out the _actual_ commit in the PR
@@ -85,7 +85,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         # Default behavior of actions/checkout is horribly to check out a merge commit of the PR
         # merged into master...
         # This checks out the _actual_ commit in the PR
@@ -112,7 +112,7 @@ jobs:
           git log $MERGE_BASE -n 1
           echo "merge_base=$MERGE_BASE" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ steps.get_merge_base.outputs.merge_base }}
 

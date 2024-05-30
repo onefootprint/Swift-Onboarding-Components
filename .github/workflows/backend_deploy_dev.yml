@@ -34,7 +34,7 @@ jobs:
           commit_hash="${{ github.event.workflow_run.head_commit.id || github.sha }}"
           echo "commit hash we will deploy in this workflow: $commit_hash"
           echo "##[set-output name=commitHashToDeploy;]$(echo ${commit_hash})"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/backend_extract_commit_hash
         id: components
         with:
