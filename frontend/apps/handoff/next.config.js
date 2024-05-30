@@ -123,7 +123,7 @@ const nextConfig = {
     '@onefootprint/request',
     '@onefootprint/types',
     '@onefootprint/appearance',
-    '@radix-ui/react-dialog',
+    '@radix-ui',
   ],
   async headers() {
     return [

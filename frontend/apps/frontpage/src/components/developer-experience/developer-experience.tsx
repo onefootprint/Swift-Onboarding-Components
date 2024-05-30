@@ -4,7 +4,6 @@ import {
   LinkButton,
   media,
   Stack,
-  Tab,
   Tabs,
   Text,
 } from '@onefootprint/ui';
@@ -59,18 +58,7 @@ const DeveloperExperience = () => {
           {t('see-documentation')}
         </LinkButton>
       </TitleContainer>
-      <Tabs>
-        {options.map(({ value, label }) => (
-          <Tab
-            as="button"
-            key={value}
-            onClick={() => handleChange(value)}
-            selected={segment === value}
-          >
-            {label}
-          </Tab>
-        ))}
-      </Tabs>
+      <Tabs options={options} onChange={handleChange} />
       <ImageContainer justify="center" $imgSrc={imageSrc} />
     </StyledContainer>
   );

@@ -9,6 +9,8 @@ import styled, { css } from 'styled-components';
 import type { Period } from '../../plans-table-types';
 import { Periods } from '../../plans-table-types';
 
+const { Root: ToggleGroupRoot, Item: ToggleGroupItem } = ToggleGroupPrimitive;
+
 type ToggleProps = {
   onValueChange: (value: Period) => void;
   value: Period;
@@ -44,7 +46,7 @@ const Toggle = ({ onValueChange, value }: ToggleProps) => {
   );
 };
 
-const Container = styled(ToggleGroupPrimitive.Root)`
+const Container = styled(ToggleGroupRoot)`
   ${({ theme }) => css`
     all: unset;
     display: flex;
@@ -58,7 +60,7 @@ const Container = styled(ToggleGroupPrimitive.Root)`
   `}
 `;
 
-const Option = styled(ToggleGroupPrimitive.Item)`
+const Option = styled(ToggleGroupItem)`
   ${({ theme }) => css`
     all: unset;
     display: flex;

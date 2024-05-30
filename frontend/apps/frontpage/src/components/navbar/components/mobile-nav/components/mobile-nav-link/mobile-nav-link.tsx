@@ -9,13 +9,15 @@ type MobileNavLinkProps = {
   link: NavLink;
 };
 
+const { Link: NavigationMenuLink, Item: NavigationMenuItem } = NavigationMenu;
+
 const MobileNavLink = ({ link }: MobileNavLinkProps) => (
   <ItemContainer>
     <StyledLink href={link.href}>{link.text}</StyledLink>
   </ItemContainer>
 );
 
-const StyledLink = styled(NavigationMenu.Link)`
+const StyledLink = styled(NavigationMenuLink)`
   ${({ theme }) => css`
     ${createFontStyles('label-1')};
     color: ${theme.color.primary};
@@ -26,7 +28,7 @@ const StyledLink = styled(NavigationMenu.Link)`
   `}
 `;
 
-const ItemContainer = styled(NavigationMenu.Item)`
+const ItemContainer = styled(NavigationMenuItem)`
   display: flex;
   align-items: center;
   justify-content: space-between;

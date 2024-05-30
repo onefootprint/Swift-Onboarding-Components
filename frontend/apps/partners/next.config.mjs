@@ -32,10 +32,9 @@ const LOG_ROCKET_CONNECT_SRC = [
   'https://*.intake-lr.com',
 ].join(' ');
 
-const DEV_CONNECT_SRC = (IS_DEV ? [
-  'http://localhost:8000',
-  'http://127.0.0.1:8000',
-] : []).join(' ');
+const DEV_CONNECT_SRC = (
+  IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []
+).join(' ');
 
 const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
@@ -83,6 +82,7 @@ const nextConfig = {
     '@onefootprint/styled',
     '@onefootprint/types',
     '@onefootprint/ui',
+    '@radix-ui',
   ],
 };
 

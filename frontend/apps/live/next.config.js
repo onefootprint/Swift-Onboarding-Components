@@ -2,15 +2,11 @@
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 
-const DEV_CONNECT_SRC = (IS_DEV ? [
-  'http://localhost:8000',
-  'http://127.0.0.1:8000',
-] : []).join(' ');
+const DEV_CONNECT_SRC = (
+  IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []
+).join(' ');
 
-const DEV_FRAME_SRC = (IS_DEV ? [
-  'http://localhost:3000',
-] : []).join(' ');
-
+const DEV_FRAME_SRC = (IS_DEV ? ['http://localhost:3000'] : []).join(' ');
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
@@ -83,6 +79,6 @@ module.exports = {
     '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
-    '@radix-ui/react-dialog',
+    '@radix-ui',
   ],
 };

@@ -11,6 +11,12 @@ type DesktopNavbarMenuProps = {
   menu: NavMenu;
 };
 
+const {
+  Item: NavigationMenuItem,
+  Trigger: NavigationMenuTrigger,
+  Content: NavigationMenuContent,
+} = NavigationMenu;
+
 const DesktopNavMenu = ({ menu }: DesktopNavbarMenuProps) => {
   const items = menu.items.map(item => (
     <DesktopNavMenuItem item={item} key={item.text} />
@@ -29,7 +35,7 @@ const DesktopNavMenu = ({ menu }: DesktopNavbarMenuProps) => {
   );
 };
 
-const ItemContainer = styled(NavigationMenu.Item)`
+const ItemContainer = styled(NavigationMenuItem)`
   position: relative;
   display: flex;
 `;
@@ -43,7 +49,7 @@ const Title = styled.p`
   `}
 `;
 
-const StyledTrigger = styled(NavigationMenu.Trigger)`
+const StyledTrigger = styled(NavigationMenuTrigger)`
   ${({ theme }) => css`
     position: relative;
     all: unset;
@@ -76,7 +82,7 @@ const IconContainer = styled.div`
   `}
 `;
 
-const Content = styled(NavigationMenu.Content)`
+const Content = styled(NavigationMenuContent)`
   ${({ theme }) => css`
     position: absolute;
     left: 0;

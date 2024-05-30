@@ -2,7 +2,7 @@ import {
   type OnboardingConfig,
   OnboardingConfigKind,
 } from '@onefootprint/types';
-import { Tab, Tabs } from '@onefootprint/ui';
+import { Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -42,19 +42,11 @@ const CollectionAndScopes = ({
 
   return (
     <Container>
-      <TabsContainer data-is-disabled={isTabsDisabled}>
-        <Tabs>
-          {options.map(({ value, label }) => (
-            <Tab
-              key={value}
-              onClick={() => handleChange(value)}
-              selected={tab === value}
-            >
-              {label}
-            </Tab>
-          ))}
-        </Tabs>
-      </TabsContainer>
+      <Tabs
+        options={options}
+        onChange={handleChange}
+        disabled={isTabsDisabled}
+      />
       {tab === 'data' && <DataCollection playbook={playbook} />}
       {tab === 'authorized-scopes' && <AuthorizedScopes playbook={playbook} />}
       {tab === 'aml-monitoring' && <AmlMonitoring playbook={playbook} />}
@@ -74,14 +66,6 @@ const Container = styled.div`
     flex-direction: column;
     gap: ${theme.spacing[8]};
   `}
-`;
-
-const TabsContainer = styled.span`
-  &[data-is-disabled='true'] {
-    opacity: 0.5;
-    pointer-events: none;
-    user-select: none;
-  }
 `;
 
 export default CollectionAndScopes;

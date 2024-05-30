@@ -1,5 +1,5 @@
 import type { TenantDetail } from '@onefootprint/types';
-import { Stack, Tab, Tabs } from '@onefootprint/ui';
+import { Stack, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import BillingProfile from '../billing-profile';
@@ -15,9 +15,7 @@ enum TabOption {
 }
 
 const Content = ({ tenant }: ContentProps) => {
-  const [selectedTab, setSelectedTab] = useState<TabOption>(
-    TabOption.tenantInfo,
-  );
+  const [selectedTab, setSelectedTab] = useState<string>(TabOption.tenantInfo);
 
   const options = [
     {
@@ -30,19 +28,13 @@ const Content = ({ tenant }: ContentProps) => {
     },
   ];
 
+  const handleTabChange = (value: string) => {
+    setSelectedTab(value);
+  };
+
   return (
     <Stack direction="column" gap={7}>
-      <Tabs>
-        {options.map(option => (
-          <Tab
-            key={option.value}
-            onClick={() => setSelectedTab(option.value)}
-            selected={selectedTab === option.value}
-          >
-            {option.label}
-          </Tab>
-        ))}
-      </Tabs>
+      <Tabs options={options} onChange={handleTabChange} />
       {selectedTab === TabOption.tenantInfo && <TenantInfo tenant={tenant} />}
       {selectedTab === TabOption.billingProfile && (
         <BillingProfile tenant={tenant} />

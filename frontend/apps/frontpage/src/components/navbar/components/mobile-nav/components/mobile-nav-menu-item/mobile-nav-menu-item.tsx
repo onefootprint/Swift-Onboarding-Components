@@ -5,6 +5,8 @@ import styled, { css } from 'styled-components';
 
 import type { NavMenuItem } from '../../../../types';
 
+const { Link: NavigationMenuLink } = NavigationMenu;
+
 type MobileNavMenuItemProps = {
   item: NavMenuItem;
 };
@@ -13,7 +15,7 @@ const MobileNavMenuItem = ({ item }: MobileNavMenuItemProps) => (
   <StyledLink href={item.href}>{item.text}</StyledLink>
 );
 
-const StyledLink = styled(NavigationMenu.Link)`
+const StyledLink = styled(NavigationMenuLink)`
   ${({ theme }) => css`
     ${createFontStyles('body-1')};
     color: ${theme.color.secondary};

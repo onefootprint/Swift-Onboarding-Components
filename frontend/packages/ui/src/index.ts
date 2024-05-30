@@ -136,7 +136,6 @@ export {
   Stack,
   Stepper,
   SuccessCheck,
-  Tab,
   Table,
   Tabs,
   Tag,

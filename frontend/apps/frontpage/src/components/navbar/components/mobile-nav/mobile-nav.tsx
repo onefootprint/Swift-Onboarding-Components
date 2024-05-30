@@ -26,6 +26,8 @@ type MobileNavProps = {
   $isOnDarkSection?: boolean;
 };
 
+const { Root: NavigationMenuRoot, List: NavigationMenuList } = NavigationMenu;
+
 const MobileNav = ({
   onOpen,
   onClose,
@@ -86,7 +88,7 @@ const MobileNav = ({
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
           >
-            <NavigationMenu.Root>
+            <NavigationMenuRoot>
               <LinkList>
                 {entries.map(entry => {
                   if (isNavLink(entry)) {
@@ -98,7 +100,7 @@ const MobileNav = ({
                   return null;
                 })}
               </LinkList>
-            </NavigationMenu.Root>
+            </NavigationMenuRoot>
             <CtaContainer>
               <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>
                 {t('login')}
@@ -139,7 +141,7 @@ const Container = styled.div`
   `}
 `;
 
-const LinkList = styled(NavigationMenu.List)`
+const LinkList = styled(NavigationMenuList)`
   display: flex;
   flex-direction: column;
   width: 100%;

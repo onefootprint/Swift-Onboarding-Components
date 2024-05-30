@@ -120,7 +120,7 @@ export { default as Stepper } from './stepper';
 export type { TableProps, TableRow } from './table';
 export { default as Table } from './table';
 export type { TabsProps } from './tabs';
-export { Tab, Tabs } from './tabs';
+export { Tabs } from './tabs';
 export type { TagProps } from './tag';
 export { default as Tag } from './tag';
 export type { TextProps } from './text';

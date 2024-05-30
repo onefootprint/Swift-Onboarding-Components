@@ -1,5 +1,5 @@
 import { useQueryState } from '@onefootprint/hooks';
-import { Tab, Tabs } from '@onefootprint/ui';
+import { Tabs } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import DomainAccess from 'src/components/domain-access';
@@ -21,7 +21,7 @@ const TeamRoles = () => {
     keyPrefix: 'pages.settings.team-roles',
   });
   const orgQuery = useOrg();
-  const [tab, setTab] = useQueryState<TabName>({
+  const [tab, setTab] = useQueryState<string>({
     query: 'tab',
     defaultValue: TabName.members,
   });
@@ -33,23 +33,16 @@ const TeamRoles = () => {
       : []),
   ];
 
+  const handleTabChange = (value: string) => {
+    setTab(value as TabName);
+  };
+
   return (
     <section data-testid="team-roles-section">
       <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
         <div id="team-roles-actions" />
       </SectionHeader>
-      <Tabs>
-        {tabs.map(({ value, label }) => (
-          <Tab
-            as="button"
-            key={value}
-            onClick={() => setTab(value)}
-            selected={tab === value}
-          >
-            {label}
-          </Tab>
-        ))}
-      </Tabs>
+      <Tabs options={tabs} onChange={handleTabChange} />
       <Content>
         {tab === TabName.members && <Members />}
         {tab === TabName.roles && <Roles />}

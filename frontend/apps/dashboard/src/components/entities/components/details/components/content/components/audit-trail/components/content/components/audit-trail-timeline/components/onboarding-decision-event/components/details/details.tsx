@@ -1,4 +1,4 @@
-import { Drawer, LinkButton, Stack, Tab, Tabs } from '@onefootprint/ui';
+import { Drawer, LinkButton, Stack, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
@@ -59,17 +59,7 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
       >
         {showRulesTab ? (
           <Stack direction="column" gap={7}>
-            <Tabs>
-              {options.map(({ value, label }) => (
-                <Tab
-                  key={value}
-                  onClick={() => handleChange(value)}
-                  selected={tab === value}
-                >
-                  {label}
-                </Tab>
-              ))}
-            </Tabs>
+            <Tabs options={options} onChange={handleChange} />
             {tab === 'rules' && (
               <RuleSetResults
                 data={data}

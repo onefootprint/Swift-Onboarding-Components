@@ -16,6 +16,8 @@ type DesktopNavProps = {
   entries: NavEntry[];
 };
 
+const { Root: NavigationMenuRoot, List: NavigationMenuList } = NavigationMenu;
+
 const DesktopNav = ({ entries }: DesktopNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
 
@@ -53,7 +55,7 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
   );
 };
 
-const Container = styled(NavigationMenu.Root)`
+const Container = styled(NavigationMenuRoot)`
   ${({ theme }) => css`
     display: none;
 
@@ -67,7 +69,7 @@ const Container = styled(NavigationMenu.Root)`
   `}
 `;
 
-const MainNav = styled(NavigationMenu.List)`
+const MainNav = styled(NavigationMenuList)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
     align-items: center;
@@ -80,7 +82,7 @@ const MainNav = styled(NavigationMenu.List)`
   `}
 `;
 
-const SecondaryNav = styled(NavigationMenu.List)`
+const SecondaryNav = styled(NavigationMenuList)`
   ${({ theme }) => css`
     gap: ${theme.spacing[5]};
     display: flex;

@@ -7,6 +7,12 @@ import styled, { css } from 'styled-components';
 import type { NavMenu } from '../../../../types';
 import MobileNavMenuItem from '../mobile-nav-menu-item';
 
+const {
+  Item: NavigationMenuItem,
+  Trigger: NavigationMenuTrigger,
+  Content: NavigationMenuContent,
+} = NavigationMenu;
+
 type MobileNavMenuProps = {
   menu: NavMenu;
 };
@@ -27,7 +33,7 @@ const MobileNavMenu = ({ menu }: MobileNavMenuProps) => (
   </ItemContainer>
 );
 
-const ItemContainer = styled(NavigationMenu.Item)`
+const ItemContainer = styled(NavigationMenuItem)`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -48,7 +54,7 @@ const IconContainer = styled.div`
   `}
 `;
 
-const MenuTrigger = styled(NavigationMenu.Trigger)`
+const MenuTrigger = styled(NavigationMenuTrigger)`
   ${({ theme }) => css`
     all: unset;
     ${createFontStyles('label-1')};
@@ -69,7 +75,7 @@ const MenuTrigger = styled(NavigationMenu.Trigger)`
   `}
 `;
 
-const MenuContent = styled(NavigationMenu.Content)`
+const MenuContent = styled(NavigationMenuContent)`
   ${({ theme }) => css`
     width: 100%;
     margin-bottom: ${theme.spacing[4]};

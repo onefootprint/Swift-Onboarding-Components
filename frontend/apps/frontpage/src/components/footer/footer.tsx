@@ -100,10 +100,6 @@ const linkSections = [
         href: '/privacy-policy',
       },
       {
-        textKey: 'resources.faq',
-        href: '/faq',
-      },
-      {
         textKey: 'resources.supported-id-documents',
         href: '/supported-id-documents',
       },

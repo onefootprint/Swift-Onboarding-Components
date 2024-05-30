@@ -1,5 +1,5 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import { Tab, Tabs, Text } from '@onefootprint/ui';
+import { Tabs, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,21 +15,19 @@ const Soon = () => <Text variant="label-1">Coming soon</Text>;
 
 const AllComponents = () => {
   const { Auth, Form, Render, Verify, VerifyButton } = FootprintComponentKind;
-  const [kind, setKind] = useState<FootprintComponentKind>(VerifyButton);
+  const [kind, setKind] = useState<string>(VerifyButton);
 
   return (
     <Container>
-      <Tabs>
-        {Object.values(FootprintComponentKind)
+      <Tabs
+        options={Object.values(FootprintComponentKind)
           .filter(k => k !== Auth)
-          .map((k: FootprintComponentKind) => (
-            <Tab key={k} selected={k === kind} onClick={() => setKind(k)}>
-              <Text tag="span" variant="label-2">
-                {k}
-              </Text>
-            </Tab>
-          ))}
-      </Tabs>
+          .map(k => ({
+            label: k,
+            value: k,
+          }))}
+        onChange={(value: string) => setKind(value as FootprintComponentKind)}
+      />
       <Title>React integrations</Title>
       <Framework>
         {kind === Form && <FormReactIntegration />}

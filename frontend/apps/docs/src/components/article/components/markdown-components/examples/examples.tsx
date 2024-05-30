@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
-import { Grid, media, Tab, Tabs, Text } from '@onefootprint/ui';
+import { Grid, media, Tabs, Text } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
@@ -14,19 +14,21 @@ const Examples = () => {
   const [animatedList] = useAutoAnimate<HTMLDivElement>();
   const { theme } = useTheme();
 
+  const tabOptions = options.map(option => ({
+    label: option.name,
+    value: option.name,
+  }));
+
+  const handleTabChange = (value: string) => {
+    const selectedOption = options.find(option => option.name === value);
+    if (selectedOption) {
+      setTab(selectedOption);
+    }
+  };
+
   return (
     <>
-      <Tabs>
-        {Object.values(options).map(option => (
-          <Tab
-            key={option.name}
-            onClick={() => setTab(option)}
-            selected={tab.name === option.name}
-          >
-            {option.name}
-          </Tab>
-        ))}
-      </Tabs>
+      <Tabs onChange={handleTabChange} options={tabOptions} />
       <List
         gap={5}
         columns={['repeat(2,1fr)']}

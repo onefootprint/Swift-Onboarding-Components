@@ -5,6 +5,8 @@ import styled, { css } from 'styled-components';
 
 import type { NavLink } from '../../../../types';
 
+const { Link: NavigationMenuLink } = NavigationMenu;
+
 type DesktopNavLinkProps = {
   link: NavLink;
 };
@@ -14,7 +16,7 @@ const DesktopNavLink = ({ link }: DesktopNavLinkProps) => (
   </StyledLink>
 );
 
-const StyledLink = styled(NavigationMenu.Link)`
+const StyledLink = styled(NavigationMenuLink)`
   ${({ theme }) => css`
     position: relative;
     color: ${theme.color.primary};

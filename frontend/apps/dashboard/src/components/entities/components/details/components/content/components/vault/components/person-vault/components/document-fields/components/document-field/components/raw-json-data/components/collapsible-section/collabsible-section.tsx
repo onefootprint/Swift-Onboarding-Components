@@ -1,12 +1,18 @@
 import { IcoChevronDown24 } from '@onefootprint/icons';
 import { RawJsonKinds } from '@onefootprint/types';
 import { CodeBlock, Stack, Text } from '@onefootprint/ui';
-import * as Collapsible from '@radix-ui/react-collapsible';
+import * as RadixCollapsible from '@radix-ui/react-collapsible';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
+
+const {
+  Root: CollapsibleRoot,
+  Trigger: CollapsibleTrigger,
+  Content: CollapsibleContent,
+} = RadixCollapsible;
 
 type CollapsibleSectionProps = {
   rawJsonKind: RawJsonKinds;
@@ -28,7 +34,7 @@ const CollapsibleSection = ({
 
   return (
     <RawJsonDataContainer>
-      <Collapsible.Root
+      <CollapsibleRoot
         className="CollapsibleRoot"
         open={open}
         onOpenChange={setOpen}
@@ -45,7 +51,7 @@ const CollapsibleSection = ({
           </StyledTrigger>
           <AnimatePresence>
             {open && (
-              <Collapsible.Content forceMount asChild>
+              <CollapsibleContent forceMount asChild>
                 <CodeBlockContainer
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -59,11 +65,11 @@ const CollapsibleSection = ({
                     {rawJsonData}
                   </CodeBlock>
                 </CodeBlockContainer>
-              </Collapsible.Content>
+              </CollapsibleContent>
             )}
           </AnimatePresence>
         </JsonContainer>
-      </Collapsible.Root>
+      </CollapsibleRoot>
     </RawJsonDataContainer>
   );
 };
@@ -100,7 +106,7 @@ const IconContainer = styled(Stack)`
   }
 `;
 
-const StyledTrigger = styled(Collapsible.Trigger)`
+const StyledTrigger = styled(CollapsibleTrigger)`
   ${({ theme }) => css`
     all: unset;
     gap: ${theme.spacing[2]};

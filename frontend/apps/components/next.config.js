@@ -35,10 +35,9 @@ const LOG_ROCKET_CONNECT_SRC = [
 const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
 
-const DEV_CONNECT_SRC = (IS_DEV ? [
-  'http://localhost:8000',
-  'http://127.0.0.1:8000',
-] : []).join(' ');
+const DEV_CONNECT_SRC = (
+  IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []
+).join(' ');
 
 const ContentSecurityPolicy = `
   child-src blob: onefootprint.com;
@@ -108,7 +107,7 @@ const nextConfig = {
     '@onefootprint/request',
     '@onefootprint/types',
     '@onefootprint/appearance',
-    '@radix-ui/react-dialog',
+    '@radix-ui',
   ],
 };
 
