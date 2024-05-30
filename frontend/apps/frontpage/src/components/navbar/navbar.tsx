@@ -59,10 +59,16 @@ const Navbar = () => {
       text: t('entries.industries.text'),
       items: [
         {
-          text: t('entries.industries.links.real-estate.text'),
-          subtext: t('entries.industries.links.real-estate.subtext'),
-          href: t('entries.industries.links.real-estate.href'),
-          iconComponent: IcoBuilding24,
+          text: t('entries.industries.links.auto.text'),
+          subtext: t('entries.industries.links.auto.subtext'),
+          href: t('entries.industries.links.auto.href'),
+          iconComponent: IcoCar24,
+        },
+        {
+          text: t('entries.industries.links.financial-institutions.text'),
+          subtext: t('entries.industries.links.financial-institutions.subtext'),
+          href: t('entries.industries.links.financial-institutions.href'),
+          iconComponent: IcoBank24,
         },
         {
           text: t('entries.industries.links.fintech.text'),
@@ -71,16 +77,10 @@ const Navbar = () => {
           iconComponent: IcoDollar24,
         },
         {
-          text: t('entries.industries.links.auto.text'),
-          subtext: t('entries.industries.links.auto.subtext'),
-          href: t('entries.industries.links.auto.href'),
-          iconComponent: IcoCar24,
-        },
-        {
-          text: t('entries.industries.links.baas.text'),
-          subtext: t('entries.industries.links.baas.subtext'),
-          href: t('entries.industries.links.baas.href'),
-          iconComponent: IcoBank24,
+          text: t('entries.industries.links.real-estate.text'),
+          subtext: t('entries.industries.links.real-estate.subtext'),
+          href: t('entries.industries.links.real-estate.href'),
+          iconComponent: IcoBuilding24,
         },
       ],
     },

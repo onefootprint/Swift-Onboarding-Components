@@ -130,22 +130,22 @@
           "links": {
             "real-estate": {
               "text": "Real estate",
-              "subtext": "Rental applications, property management, and more",
+              "subtext": "Rental Apps for PMs and tenant screening",
               "href": "/industries/real-estate"
             },
             "auto": {
               "text": "Auto",
-              "subtext": "Car dealership, car financing, and more",
+              "subtext": "Car rental, leasing, and financing",
               "href": "/industries/auto"
             },
             "fintech": {
               "text": "Fintech",
-              "subtext": "Financial services, banking, and more",
+              "subtext": "Investment platforms, broker dealers, and startups",
               "href": "/industries/fintech"
             },
-            "baas": {
+            "financial-institutions": {
               "text": "Financial Institutions",
-              "subtext": "Banking, BaaS, and more",
+              "subtext": "Banks, BaaS, and credit unions",
               "href": "/industries/financial-institutions"
             }
           }
