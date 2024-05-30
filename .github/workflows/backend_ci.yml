@@ -64,10 +64,10 @@ jobs:
           make-default: false
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@dd05243424bd5c0e585e4b55eb2d7615cdd32f1f
+        uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84
         with:
-          # don't save cache from pull requests
-          save-if: github.event_name != 'pull_request'
+          save-if: ${{ github.ref == 'refs/heads/master' }}
+          cache-all-crates: true
           workspaces: |
             backend
 

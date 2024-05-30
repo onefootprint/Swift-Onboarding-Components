@@ -40,8 +40,11 @@ runs:
       uses: dtolnay/rust-toolchain@1.77.0
 
     - name: Rust Cache
-      uses: Swatinem/rust-cache@dd05243424bd5c0e585e4b55eb2d7615cdd32f1f
+      uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84
       with:
+        save-if: ${{ github.ref == 'refs/heads/master' }}
+        shared-key: backend-run-local
+        cache-all-crates: true
         workspaces: |
           backend
 
