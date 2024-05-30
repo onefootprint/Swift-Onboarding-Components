@@ -3,7 +3,7 @@ import typing
 from tests.dashboard.utils import latest_access_event_for
 from tests.bifrost_client import BifrostClient
 from tests.utils import get, post
-from tests.constants import BUSINESS_DATA, CDO_TO_DIS
+from tests.constants import BUSINESS_DATA, CDO_TO_DIS, BUSINESS_VAULT_DERIVED_DATA
 
 
 @pytest.fixture(scope="session")
@@ -12,7 +12,9 @@ def populated_business_data(kyb_cdos):
     The set of fields we expect to be populated on a business vault that onboarded onto an ob config
     with kyb_cdos
     """
-    return set(di for cdo in kyb_cdos for di in CDO_TO_DIS[cdo]) & set(BUSINESS_DATA)
+    return (
+        set(di for cdo in kyb_cdos for di in CDO_TO_DIS[cdo]) & set(BUSINESS_DATA)
+    ).union(set(BUSINESS_VAULT_DERIVED_DATA))
 
 
 @pytest.fixture(scope="session")

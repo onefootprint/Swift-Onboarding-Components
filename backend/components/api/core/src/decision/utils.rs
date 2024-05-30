@@ -1,4 +1,5 @@
 use super::sandbox;
+use super::vendor::middesk::MiddeskResponseDerivedVaultData;
 use super::vendor::{
     self,
 };
@@ -152,7 +153,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     let sb = ScopedVault::get(conn, biz_wf_id)?;
     // TODO should these state transitions be handled by the ww machines?
     let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
-    Workflow::update(biz_wf, conn, update)?;
+    let biz_wf = Workflow::update(biz_wf, conn, update)?;
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;
@@ -178,6 +179,14 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
         RiskSignalGroupKind::Kyb,
         false,
     )?;
+
+    // write fixture derived vault data
+    // if the decision likely would result in real derived data
+    if fixture_decision.0 == DecisionStatus::Pass || fixture_decision.1 {
+        let derived_vault_data = MiddeskResponseDerivedVaultData::fixture(&biz_wf.scoped_vault_id);
+        derived_vault_data.write(conn)?;
+    }
+
     Ok(())
 }
 

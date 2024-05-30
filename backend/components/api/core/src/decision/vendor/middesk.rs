@@ -42,6 +42,7 @@ use db::models::risk_signal::{
     RiskSignal,
 };
 use db::models::risk_signal_group::RiskSignalGroup;
+use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::{
     VReqIdentifier,
     VerificationRequest,
@@ -54,6 +55,7 @@ use db::models::workflow::{
 use db::{
     DbError,
     DbPool,
+    TxnPgConn,
 };
 use feature_flag::{
     BoolFlag,
@@ -598,29 +600,8 @@ impl MiddeskState<Complete> {
                 .map(|rc| (rc, vendor_api, vres_id.clone()))
                 .collect();
 
-        // write data from the business response into the business vault
-        // currently just: formation state/date
-        let (dis_to_vault, vault_data_to_write) = {
-            let formation = business_response.formation.as_ref();
-            let data = vec![
-                formation
-                    .and_then(|f| f.formation_state.clone())
-                    .map(|state| PiiJsonValue::from_piistring(PiiString::from(state)))
-                    .map(|state| (DataIdentifier::Business(BusinessDataKind::FormationState), state)),
-                formation
-                    .and_then(|f| f.formation_date.clone())
-                    .map(|date| PiiJsonValue::from_piistring(PiiString::from(date)))
-                    .map(|date| (DataIdentifier::Business(BusinessDataKind::FormationDate), date)),
-            ]
-            .into_iter()
-            .flatten()
-            .collect::<HashMap<_, _>>();
-
-            let dis = data.keys().cloned().collect::<Vec<_>>();
-
-            let data = DataRequest::clean_and_validate(data, ValidateArgs::for_non_portable(sv.is_live))?;
-            (dis, FingerprintedDataRequest::build(state, data, &sv.id).await?)
-        };
+        let derived_vault_data: MiddeskResponseDerivedVaultData =
+            MiddeskResponseDerivedVaultData::create(state, &business_response, &sv).await?;
 
         let obc_id = wf.ob_configuration_id.clone();
         state
@@ -630,21 +611,7 @@ impl MiddeskState<Complete> {
                 RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)?;
                 BillingEvent::create(conn, &sv.id, obc_id.as_ref(), BillingEventKind::Kyb)?;
 
-                // note: there is an edge case here where the formation is null which
-                // means we should deactivate the old DIs. We should handle this properly
-                // with construct that knows when to clear vendor-written DIs like this
-                if !vault_data_to_write.is_empty() {
-                    // Clear all related data kinds
-                    let seqno = DataLifetime::get_current_seqno(conn)?;
-                    DataLifetime::bulk_deactivate_kinds(conn, &sv.id, dis_to_vault, seqno)?;
-
-                    // Then add new vault data
-                    let sources = DataLifetimeSources::single(DataLifetimeSource::Vendor);
-                    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv.id)?;
-
-                    //TODO: we should probably store the resulting seqno somewhere on the vres?
-                    let _ = uvw.patch_data(conn, vault_data_to_write, sources, None)?;
-                }
+                derived_vault_data.write(conn)?;
 
                 Ok(())
             })
@@ -794,5 +761,92 @@ async fn send_middesk_call(
             raw_response: raw.into(),
             parsed_response: parsed,
         })
+    }
+}
+
+
+/// Abstracts the data to be written to the vault
+/// derived from the Middesk BusinessResponse
+pub struct MiddeskResponseDerivedVaultData {
+    scoped_vault_id: ScopedVaultId,
+    data_request: FingerprintedDataRequest,
+}
+impl MiddeskResponseDerivedVaultData {
+    pub const DATA_KINDS: &'static [BusinessDataKind] =
+        &[BusinessDataKind::FormationState, BusinessDataKind::FormationDate];
+
+    pub async fn create(
+        state: &State,
+        business_response: &BusinessResponse,
+        sv: &ScopedVault,
+    ) -> ApiResult<Self> {
+        let formation = business_response.formation.as_ref();
+        let data = vec![
+            formation
+                .and_then(|f| f.formation_state.clone())
+                .map(|state| PiiJsonValue::from_piistring(PiiString::from(state)))
+                .map(|state| (DataIdentifier::Business(BusinessDataKind::FormationState), state)),
+            formation
+                .and_then(|f| f.formation_date.clone())
+                .map(|date| PiiJsonValue::from_piistring(PiiString::from(date)))
+                .map(|date| (DataIdentifier::Business(BusinessDataKind::FormationDate), date)),
+        ]
+        .into_iter()
+        .flatten()
+        .collect::<HashMap<_, _>>();
+
+        let data = DataRequest::clean_and_validate(data, ValidateArgs::for_non_portable(sv.is_live))?;
+
+        Ok(Self {
+            scoped_vault_id: sv.id.clone(),
+            data_request: FingerprintedDataRequest::build(state, data, &sv.id).await?,
+        })
+    }
+
+    /// a fixture version of the data to be written to the vault
+    pub fn fixture(sv_id: &ScopedVaultId) -> Self {
+        let data = DataRequest {
+            data: HashMap::from_iter(vec![
+                (
+                    DataIdentifier::Business(BusinessDataKind::FormationState),
+                    PiiString::from("CA"),
+                ),
+                (
+                    DataIdentifier::Business(BusinessDataKind::FormationDate),
+                    PiiString::from("2024-02-02"),
+                ),
+            ]),
+            json_fields: vec![],
+        };
+
+        Self {
+            scoped_vault_id: sv_id.clone(),
+            data_request: FingerprintedDataRequest::manual_fingerprints(data, vec![]),
+        }
+    }
+
+    pub fn write(self, conn: &mut TxnPgConn) -> ApiResult<()> {
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+        let dis = Self::DATA_KINDS
+            .iter()
+            .map(|bdk| DataIdentifier::Business(*bdk))
+            .collect();
+
+        // Clear all derived data kinds
+        DataLifetime::bulk_deactivate_kinds(conn, &self.scoped_vault_id, dis, seqno)?;
+
+        // note: there is an edge case here where the formation is null which
+        // means we should deactivate the old DIs. We should handle this properly
+        // with construct that knows when to clear vendor-written DIs like this
+        if !self.data_request.is_empty() {
+            // Then add new vault data
+            let sources = DataLifetimeSources::single(DataLifetimeSource::Vendor);
+            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &self.scoped_vault_id)?;
+
+            //TODO: we should probably store the resulting seqno somewhere on the vres?
+            let _ = uvw.patch_data(conn, self.data_request, sources, None)?;
+        }
+
+        Ok(())
     }
 }

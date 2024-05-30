@@ -136,6 +136,11 @@ BUSINESS_DATA = {
     ],
 }
 
+BUSINESS_VAULT_DERIVED_DATA = {
+    "business.formation_state": "CA",
+    "business.formation_date": "2024-02-02",
+}
+
 IP_DATA = {
     "investor_profile.employment_status": "employed",
     "investor_profile.occupation": "Neurosurgeon",

@@ -365,6 +365,39 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
 
     assert!(mrs.is_empty());
     assert_eq!(expected_status, wf.status.unwrap());
+
+    // check that middesk populated formation DIs
+    if matches!(
+        fixture_result,
+        WorkflowFixtureResult::ManualReview | WorkflowFixtureResult::Pass
+    ) {
+        let vw: VaultWrapper = state
+            .db_pool
+            .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id)))
+            .await
+            .unwrap();
+
+        let formation_state = vw
+            .decrypt_unchecked_single(
+                &state.enclave_client,
+                DataIdentifier::Business(BusinessDataKind::FormationState),
+            )
+            .await
+            .unwrap()
+            .expect("missing formation_state");
+
+        let formation_date = vw
+            .decrypt_unchecked_single(
+                &state.enclave_client,
+                DataIdentifier::Business(BusinessDataKind::FormationDate),
+            )
+            .await
+            .unwrap()
+            .expect("missing formation_date");
+
+        assert_eq!(formation_state.leak(), "CA");
+        assert_eq!(formation_date.leak(), "2024-02-02");
+    }
 }
 
 #[test_state_case(TerminalDecisionStatus::Pass, false)]
