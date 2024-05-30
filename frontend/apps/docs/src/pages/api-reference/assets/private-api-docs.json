@@ -5796,6 +5796,33 @@
                 ]
             }
         },
+        "/org/vault_dr/status": {
+            "get": {
+                "tags": [
+                    "VaultDisasterRecovery",
+                    "Org",
+                    "Private"
+                ],
+                "description": "Returns the status of Vault Disaster Recovery for the authenticated organization",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VaultDrStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/org/webhook_portal": {
             "get": {
                 "tags": [
@@ -25218,6 +25245,25 @@
                     "event",
                     "seqno",
                     "timestamp"
+                ]
+            },
+            "VaultDrStatus": {
+                "type": "object",
+                "properties": {
+                    "is_live": {
+                        "type": "boolean"
+                    },
+                    "org_id": {
+                        "type": "string"
+                    },
+                    "org_name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "is_live",
+                    "org_id",
+                    "org_name"
                 ]
             },
             "WebhookPortalResponse": {

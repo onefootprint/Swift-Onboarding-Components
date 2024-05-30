@@ -20,6 +20,7 @@ mod roles;
 mod rules;
 mod sdk_args;
 mod sdk_telemetry;
+mod vault_dr;
 mod webhook_portal;
 
 // Temporary glob imports until api core is disbanded.
@@ -65,4 +66,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
     proxy_configs::routes(config);
     rules::routes(config);
     lists::routes(config);
+    vault_dr::routes(config);
 }

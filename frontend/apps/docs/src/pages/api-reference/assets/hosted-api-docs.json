@@ -435,6 +435,16 @@
                     "Hosted"
                 ],
                 "description": "Gets or creates the Onboarding for this (user, ob_config) pair.",
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostOnboardingRequest"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5042,6 +5052,21 @@
                     "all_requirements",
                     "ob_configuration"
                 ]
+            },
+            "PostOnboardingRequest": {
+                "type": "object",
+                "properties": {
+                    "fixture_result": {
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass",
+                            "manual_review",
+                            "step_up",
+                            "document_decision"
+                        ]
+                    }
+                }
             },
             "ProcessRequest": {
                 "type": "object",
