@@ -101,7 +101,7 @@
                     "Businesses",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTriggers KYB on the provided business. KYB can only be run once per Business vault.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTriggers KYB on the provided business.",
                 "parameters": [
                     {
                         "in": "path",
@@ -130,6 +130,61 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/EntityValidateResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/businesses/{fp_bid}/owners": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGets the beneficial owners of a business.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedBusinessOwner"
                                 }
                             }
                         }
@@ -1161,11 +1216,11 @@
                         "type": "string"
                     },
                     "default_approver": {
-                        "description": "The default approver name/email to use for automatically approved users. This will be overwritten if done by a manual reviewer",
+                        "description": "The default approver name/email to use for automatically approved users. This will be\n overwritten if done by a manual reviewer",
                         "type": "string"
                     },
                     "hostname": {
-                        "description": "Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)",
+                        "description": "Alpaca Hostname to use (i.e. sandbox or production, like:\n `broker-api.sandbox.alpaca.markets`)",
                         "type": "string"
                     }
                 },
@@ -1209,7 +1264,7 @@
                     "agreements": {
                         "type": "array",
                         "items": {
-                            "description": "In order to comply with Alpaca\u2019s terms of service, each account owner must be presented the following agreements.",
+                            "description": "In order to comply with Alpaca\u2019s terms of service, each account owner must be presented the\n following agreements.",
                             "type": "object",
                             "properties": {
                                 "agreement": {
@@ -1247,14 +1302,14 @@
                         "type": "string"
                     },
                     "disclosures": {
-                        "description": "It is your responsibility as the service provider to denote if the account owner falls under each category defined by FINRA rules. We recommend asking these questions at any point of the onboarding process of each account owner in the form of Y/N and Radio Buttons.",
+                        "description": "It is your responsibility as the service provider to denote if the account owner falls under\n each category defined by FINRA rules. We recommend asking these questions at any point of the\n onboarding process of each account owner in the form of Y/N and Radio Buttons.",
                         "type": "object",
                         "properties": {
                             "context": {
                                 "description": "Information relevant to the user\u2019s disclosure selection should be sent through this object.",
                                 "type": "array",
                                 "items": {
-                                    "description": "If you utilize Alpaca for KYCaaS, additional information will need to be submitted if the user identifies with any of the disclosures before the account can be approved. This information can be sent through the context object to speed up the time to approve their account.",
+                                    "description": "If you utilize Alpaca for KYCaaS, additional information will need to be submitted if the user\n identifies with any of the disclosures before the account can be approved. This information can\n be sent through the context object to speed up the time to approve their account.",
                                     "type": "object",
                                     "properties": {
                                         "company_city": {
@@ -1333,14 +1388,14 @@
                                 ]
                             },
                             "immediate_family_exposed": {
-                                "description": "If your user\u2019s immediate family member (sibling, husband/wife, child, parent) is either politically exposed or holds a control position.",
+                                "description": "If your user\u2019s immediate family member (sibling, husband/wife, child, parent) is either\n politically exposed or holds a control position.",
                                 "type": "boolean"
                             },
                             "is_affiliated_exchange_or_finra": {
                                 "type": "boolean"
                             },
                             "is_control_person": {
-                                "description": "Whether user holds a controlling position in a publicly traded company, member of the board of directors or has policy making abilities in a publicly traded company.",
+                                "description": "Whether user holds a controlling position in a publicly traded company, member of the board\n of directors or has policy making abilities in a publicly traded company.",
                                 "type": "boolean"
                             },
                             "is_politically_exposed": {
@@ -1365,11 +1420,11 @@
                         }
                     },
                     "hostname": {
-                        "description": "Alpaca Hostname to use (i.e. sandbox or production, like: `broker-api.sandbox.alpaca.markets`)",
+                        "description": "Alpaca Hostname to use (i.e. sandbox or production, like:\n `broker-api.sandbox.alpaca.markets`)",
                         "type": "string"
                     },
                     "trusted_contact": {
-                        "description": "This model input is optional. However, the client should make reasonable effort to obtain the trusted contact information. See more details in FINRA Notice 17-11",
+                        "description": "This model input is optional. However, the client should make reasonable effort to obtain the\n trusted contact information. See more details in FINRA Notice 17-11",
                         "type": "object",
                         "properties": {
                             "city": {
@@ -1435,7 +1490,7 @@
                 "type": "object",
                 "properties": {
                     "default_approver": {
-                        "description": "The default approver name/email to use for automatically approved users. This will be overwritten if done by a manual reviewer",
+                        "description": "The default approver name/email to use for automatically approved users. This will be\n overwritten if done by a manual reviewer",
                         "type": "string"
                     }
                 },
@@ -1733,11 +1788,11 @@
                 "type": "object",
                 "properties": {
                     "key": {
-                        "description": "Can only be provided when the kind is `onboard`.\n Optionally, the publishable key of the playbook onto which you would like this user to onboard. The user will be asked to provide any missing information required by playbook. If you provide the key here, you can omit providing it in the frontend Footprint.js SDK integration.",
+                        "description": "Can only be provided when the kind is `onboard`.\n Optionally, the publishable key of the playbook onto which you would like this user to\n onboard. The user will be asked to provide any missing information required by playbook. If\n you provide the key here, you can omit providing it in the frontend Footprint.js SDK\n integration.",
                         "type": "string"
                     },
                     "kind": {
-                        "description": "The kind of token to create.\n - `onboard` creates a token that onboards the user onto a specific playbook, specified by the `key`.\n - `reonboard` creates a token that reonboards the user onto the last playbook that they onboarded onto.\n - `inherit` creates a token that inherits any operation previously requested via the dashboard.\n - `user` simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.\n - `update_auth_methods` creates a token that allows the user to update their contact info using the Footprint Auth SDK.\n You can find more information on the options [here](https://docs.onefootprint.com/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).",
+                        "description": "The kind of token to create.\n - `onboard` creates a token that onboards the user onto a specific playbook, specified by\n   the `key`.\n - `reonboard` creates a token that reonboards the user onto the last playbook that they\n   onboarded onto.\n - `inherit` creates a token that inherits any operation previously requested via the\n   dashboard.\n - `user` simply create a token for the user. A playbook key may be provided directly to the\n   Footprint Verify SDK to trigger onboarding.\n - `update_auth_methods` creates a token that allows the user to update their contact info\n   using the Footprint Auth SDK.\n You can find more information on the options [here](https://docs.onefootprint.com/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).",
                         "type": "string",
                         "enum": [
                             "onboard",
@@ -1748,7 +1803,7 @@
                         ]
                     },
                     "limit_auth_methods": {
-                        "description": "Can only be provided when the kind is `update_auth_methods`. The set of auth methods that you would like to be allowed to be updated. When not provided, the token allows updating any auth method.",
+                        "description": "Can only be provided when the kind is `update_auth_methods`. The set of auth methods that\n you would like to be allowed to be updated. When not provided, the token allows updating any\n auth method.",
                         "type": "array",
                         "items": {
                             "type": "string",
@@ -1761,7 +1816,7 @@
                     },
                     "ttl_min": {
                         "example": 60,
-                        "description": "Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be at least 1 minute, at most 1 day",
+                        "description": "Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be\n at least 1 minute, at most 1 day",
                         "type": "integer",
                         "format": "int32"
                     }
@@ -1780,11 +1835,11 @@
                     },
                     "link": {
                         "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
-                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow. This is useful to send in an automated message to the end user.",
+                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to\n complete the flow. This is useful to send in an automated message to the end user.",
                         "type": "string"
                     },
                     "token": {
-                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow. This is useful when you'd like to open a native interface inside your app for the user to complete the flow.",
+                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the\n flow. This is useful when you'd like to open a native interface inside your app for the user\n to complete the flow.",
                         "type": "string"
                     }
                 },
@@ -1798,7 +1853,7 @@
                 "type": "object",
                 "properties": {
                     "annotation": {
-                        "description": "Human-readable explanation for the manual review that will be displayed in the user timeline on the dashboard.",
+                        "description": "Human-readable explanation for the manual review that will be displayed in the user timeline\n on the dashboard.",
                         "type": "string"
                     },
                     "status": {
@@ -1846,7 +1901,7 @@
                 "type": "object",
                 "properties": {
                     "fields": {
-                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
+                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
                             "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
@@ -1886,6 +1941,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -2130,6 +2187,8 @@
                             "business.beneficial_owners",
                             "business.kyced_beneficial_owners",
                             "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
                             "investor_profile.employment_status",
                             "investor_profile.occupation",
                             "investor_profile.employer",
@@ -2356,6 +2415,42 @@
                 },
                 "required": [
                     "session_token"
+                ]
+            },
+            "OffsetPaginatedBusinessOwner": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "fp_id": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "fp_id"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "description": "Alternative to OffsetPaginatedResponseMeta for queries that don't return a count",
+                        "type": "object",
+                        "properties": {
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
                 ]
             },
             "OffsetPaginatedPublicAuthEvent": {
@@ -2834,7 +2929,7 @@
                     "scopes": {
                         "type": "array",
                         "items": {
-                            "description": "Represents the granularity of data attributes that could be alerted on by a data vendor\n NOTE: this is not the same as \"data attributes we can collect from a user\". Please see `DataAttribute` for that",
+                            "description": "Represents the granularity of data attributes that could be alerted on by a data vendor\n NOTE: this is not the same as \"data attributes we can collect from a user\". Please see\n `DataAttribute` for that",
                             "type": "string",
                             "enum": [
                                 "name",
@@ -3236,7 +3331,7 @@
                         "description": "What the reason code applies to (Name, Document, Business, etc)",
                         "type": "array",
                         "items": {
-                            "description": "Represents the granularity of data attributes that could be alerted on by a data vendor\n NOTE: this is not the same as \"data attributes we can collect from a user\". Please see `DataAttribute` for that",
+                            "description": "Represents the granularity of data attributes that could be alerted on by a data vendor\n NOTE: this is not the same as \"data attributes we can collect from a user\". Please see\n `DataAttribute` for that",
                             "type": "string",
                             "enum": [
                                 "name",
@@ -3323,7 +3418,7 @@
                         ]
                     },
                     "key": {
-                        "description": "The publishable key of the playbook onto which you would like this business to onboard.\n The playbook will specify required information and the rules by which to make a KYB decision.",
+                        "description": "The publishable key of the playbook onto which you would like this business to onboard.\n The playbook will specify required information and the rules by which to make a KYB\n decision.",
                         "type": "string"
                     }
                 },
@@ -3344,7 +3439,7 @@
                         ]
                     },
                     "key": {
-                        "description": "The publishable key of the playbook onto which you would like this user to onboard. The playbook will specify required information and the rules by which to make a KYC decision.",
+                        "description": "The publishable key of the playbook onto which you would like this user to onboard. The\n playbook will specify required information and the rules by which to make a KYC decision.",
                         "type": "string"
                     }
                 },

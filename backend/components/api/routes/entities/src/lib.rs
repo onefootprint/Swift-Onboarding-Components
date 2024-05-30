@@ -23,7 +23,6 @@ mod vault;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);
-    business_owners::configure_get_aliases(config);
     config
         .service(client_token::post::post)
         .service(client_token::get::get)

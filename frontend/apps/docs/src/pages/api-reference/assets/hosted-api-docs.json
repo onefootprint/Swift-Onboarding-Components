@@ -1472,6 +1472,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -2041,6 +2043,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -2279,7 +2283,7 @@
                     "can_access_data": {
                         "type": "array",
                         "items": {
-                            "description": "Represent the options of allowed CollectedData.\n Some CollectedData variants only have a single allowable CollectedDataOption.\n Other CollectedData variants may have multiple Options of assortments of data that can be collected.\n Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by the CDO",
+                            "description": "Represent the options of allowed CollectedData.\n Some CollectedData variants only have a single allowable CollectedDataOption.\n Other CollectedData variants may have multiple Options of assortments of data that can be\n collected. Each CollectedDataOption maps to a list of IdentityDataKinds that are represented by\n the CDO",
                             "type": "string",
                             "enum": [
                                 "Name",
@@ -2902,6 +2906,8 @@
                             "business.beneficial_owners",
                             "business.kyced_beneficial_owners",
                             "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
                             "investor_profile.employment_status",
                             "investor_profile.occupation",
                             "investor_profile.employer",
@@ -3117,7 +3123,7 @@
                 ]
             },
             "DocumentResponse": {
-                "description": "Response for a identity document request. Errors are non-optional if the identity vendor. Requires additional images be collected.",
+                "description": "Response for a identity document request. Errors are non-optional if the identity vendor.\n Requires additional images be collected.",
                 "type": "object",
                 "properties": {
                     "errors": {
@@ -3319,7 +3325,7 @@
                                 "type": "string"
                             },
                             "required_auth_methods": {
-                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.",
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null\n does not mean that no auth is required - it just means the playbook doesn't care which\n method is used.",
                                 "type": "array",
                                 "items": {
                                     "type": "string",
@@ -3732,7 +3738,7 @@
                         "type": "string"
                     },
                     "scope": {
-                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for your use case in order to get the least permissions required",
+                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for your\n use case in order to get the least permissions required",
                         "type": "string",
                         "enum": [
                             "my1fp",
@@ -3784,11 +3790,11 @@
                                 }
                             },
                             "can_initiate_signup_challenge": {
-                                "description": "When true, allowed to create a new user via a signup challenge even when there's already an existing user with this contact info. Generally, a user can make a new vault IF they're not in a context logging into a tenant that they've already onboarded onto",
+                                "description": "When true, allowed to create a new user via a signup challenge even when there's already an\n existing user with this contact info. Generally, a user can make a new vault IF they're not\n in a context logging into a tenant that they've already onboarded onto",
                                 "type": "boolean"
                             },
                             "has_syncable_passkey": {
-                                "description": "Signals that one or more biometric credentials support syncing and may be available to use on desktop/other devices",
+                                "description": "Signals that one or more biometric credentials support syncing and may be available to use\n on desktop/other devices",
                                 "type": "boolean"
                             },
                             "is_unverified": {
@@ -3835,6 +3841,8 @@
                                         "business.beneficial_owners",
                                         "business.kyced_beneficial_owners",
                                         "business.corporation_type",
+                                        "business.formation_state",
+                                        "business.formation_date",
                                         "investor_profile.employment_status",
                                         "investor_profile.occupation",
                                         "investor_profile.employer",
@@ -4076,7 +4084,7 @@
                         "type": "string"
                     },
                     "scope": {
-                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for your use case in order to get the least permissions required",
+                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for your\n use case in order to get the least permissions required",
                         "type": "string",
                         "enum": [
                             "my1fp",
@@ -4314,7 +4322,7 @@
                                 "type": "string"
                             },
                             "required_auth_methods": {
-                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.",
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null\n does not mean that no auth is required - it just means the playbook doesn't care which\n method is used.",
                                 "type": "array",
                                 "items": {
                                     "type": "string",
@@ -4720,7 +4728,7 @@
                                 "type": "string"
                             },
                             "required_auth_methods": {
-                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.",
+                                "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null\n does not mean that no auth is required - it just means the playbook doesn't care which\n method is used.",
                                 "type": "array",
                                 "items": {
                                     "type": "string",
@@ -5125,7 +5133,7 @@
                         "type": "string"
                     },
                     "required_auth_methods": {
-                        "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null does not mean that no auth is required - it just means the playbook doesn't care which method is used.",
+                        "description": "When non-null, the provided auth methods are required to be verified by the playbook. Null\n does not mean that no auth is required - it just means the playbook doesn't care which\n method is used.",
                         "type": "array",
                         "items": {
                             "type": "string",
@@ -5480,6 +5488,8 @@
                             "business.beneficial_owners",
                             "business.kyced_beneficial_owners",
                             "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
                             "investor_profile.employment_status",
                             "investor_profile.occupation",
                             "investor_profile.employer",
@@ -5842,7 +5852,7 @@
                 "type": "object",
                 "properties": {
                     "action_kind": {
-                        "description": "Specifies whether to add the new auth method alongside existing auth methods or replace the existing method.",
+                        "description": "Specifies whether to add the new auth method alongside existing auth methods or replace the\n existing method.",
                         "type": "string",
                         "enum": [
                             "replace",
@@ -5915,7 +5925,7 @@
                 "type": "object",
                 "properties": {
                     "fields": {
-                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `business.name`",
+                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `business.name`",
                         "type": "array",
                         "items": {
                             "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
@@ -5955,6 +5965,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",

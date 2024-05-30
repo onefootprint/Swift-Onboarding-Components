@@ -55,6 +55,13 @@ def test_get_business_owners(sandbox_tenant, primary_bo):
     assert body[1]["kind"] == "secondary"
 
 
+def test_get_public_bos(sandbox_tenant, primary_bo):
+    body = get(f"businesses/{primary_bo.fp_bid}/owners", None, sandbox_tenant.sk.key)
+    assert len(body["data"]) == 1
+    assert body["data"][0]["fp_id"] == primary_bo.fp_id
+    # Missing second BO because there's no scoped vault for them
+
+
 def test_get_vault(sandbox_tenant, primary_bo, populated_business_data):
     body = get(
         f"entities/{primary_bo.fp_bid}/vault",

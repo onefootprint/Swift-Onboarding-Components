@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::serializers::BusinessOwnerInfo;
+use api_core::serializers::PrivateBusinessOwnerInfo;
 use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
@@ -16,23 +16,15 @@ use api_core::utils::vault_wrapper::{
     VaultWrapper,
 };
 use api_core::State;
-use api_wire_types::BusinessOwner as ApiBusinessOwner;
 use db::models::scoped_vault::ScopedVault;
-use macros::route_alias;
 use paperclip::actix::{
     api_v2_operation,
     get,
     web,
 };
 
-type BusinessOwnerListResponse = Vec<ApiBusinessOwner>;
+type BusinessOwnerListResponse = Vec<api_wire_types::PrivateBusinessOwner>;
 
-// TODO rm this
-#[route_alias(get(
-    "/businesses/{fp_id}/owners",
-    tags(Businesses, Private),
-    description = "Gets the beneficial owners of a business.",
-))]
 #[api_v2_operation(
     description = "Gets the beneficial owners of a business entity.",
     tags(EntityDetails, Private)
@@ -52,7 +44,6 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-
             let vw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             Ok((vw, sv))
         })
@@ -64,12 +55,12 @@ pub async fn get(
 
     let results = business_owner_infos(decrypted_bos)
         .into_iter()
-        .map(ApiBusinessOwner::from_db)
+        .map(api_wire_types::PrivateBusinessOwner::from_db)
         .collect();
     ResponseData::ok(results).json()
 }
 
-fn business_owner_infos(decrypted_bos: DecryptedBusinessOwners) -> Vec<BusinessOwnerInfo> {
+fn business_owner_infos(decrypted_bos: DecryptedBusinessOwners) -> Vec<PrivateBusinessOwnerInfo> {
     match decrypted_bos {
         DecryptedBusinessOwners::NoVaultedOrLinkedBos => vec![],
         DecryptedBusinessOwners::NoVaultedBos {

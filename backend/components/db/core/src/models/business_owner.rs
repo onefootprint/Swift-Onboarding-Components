@@ -4,6 +4,8 @@ use super::workflow::Workflow;
 use crate::{
     DbError,
     DbResult,
+    NextPage,
+    OffsetPagination,
     PgConn,
     TxnPgConn,
 };
@@ -13,6 +15,7 @@ use chrono::{
 };
 use db_schema::schema::{
     business_owner,
+    scoped_vault,
     vault,
 };
 use diesel::prelude::*;
@@ -92,15 +95,14 @@ impl BusinessOwner {
         Ok(result)
     }
 
-    #[tracing::instrument("BusinessOwner::list", skip_all)]
-    pub fn list(
+    #[tracing::instrument("BusinessOwner::list_all", skip_all)]
+    pub fn list_all(
         conn: &mut PgConn,
         bv_id: &VaultId,
         // by ob config ID?
         // we really want to just return workflows here
         tenant_id: &TenantId,
     ) -> DbResult<Vec<(Self, Option<UserData>)>> {
-        use db_schema::schema::scoped_vault;
         let result = business_owner::table
             .filter(business_owner::business_vault_id.eq(bv_id))
             .left_join(
@@ -168,5 +170,36 @@ impl BusinessOwner {
             .set(business_owner::user_vault_id.eq(user_vault_id))
             .get_result(conn)?;
         Ok(result)
+    }
+}
+
+pub struct BusinessOwnerQuery<'a> {
+    pub bv_id: &'a VaultId,
+    pub tenant_id: &'a TenantId,
+}
+
+impl BusinessOwner {
+    #[tracing::instrument("BusinessOwner::list", skip_all)]
+    pub fn list<'a>(
+        conn: &mut PgConn,
+        args: BusinessOwnerQuery<'a>,
+        pagination: OffsetPagination,
+    ) -> DbResult<(Vec<(Self, UserData)>, NextPage)> {
+        let BusinessOwnerQuery { bv_id, tenant_id } = args;
+        let mut query = business_owner::table
+            .filter(business_owner::business_vault_id.eq(bv_id))
+            .inner_join(
+                scoped_vault::table
+                    .on(scoped_vault::vault_id.eq(business_owner::user_vault_id.assume_not_null()))
+                    .inner_join(vault::table),
+            )
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            .into_boxed()
+            .limit(pagination.limit());
+        if let Some(offset) = pagination.offset() {
+            query = query.offset(offset)
+        }
+        let results = query.get_results(conn)?;
+        Ok(pagination.results(results))
     }
 }

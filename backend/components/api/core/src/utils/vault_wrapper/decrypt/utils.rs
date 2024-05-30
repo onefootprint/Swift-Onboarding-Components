@@ -132,7 +132,7 @@ impl VaultWrapper<Business> {
         let vid = self.vault().id.clone();
         let tid = tenant_id.clone();
         let mut bos = db_pool
-            .db_query(move |conn| BusinessOwner::list(conn, &vid, &tid))
+            .db_query(move |conn| BusinessOwner::list_all(conn, &vid, &tid))
             .await?;
 
         let dis = &[BDK::BeneficialOwners.into(), BDK::KycedBeneficialOwners.into()];

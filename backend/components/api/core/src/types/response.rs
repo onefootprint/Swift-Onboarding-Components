@@ -168,19 +168,28 @@ pub struct OffsetPaginatedResponseMeta {
     pub count: i64,
 }
 
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+/// Alternative to OffsetPaginatedResponseMeta for queries that don't return a count
+pub struct OffsetPaginatedResponseMetaNoCount {
+    #[openapi(example = "2")]
+    /// The `page` parameter to provide in order to request the next page of results
+    pub next_page: Option<usize>,
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 /// Wraps the response data with metadata needed for an offset-paginated result.
 /// Offset pagination requests take in a page number and page size and use postgres's OFFSET
 /// in order to fetch the requested page.
 /// Can be used alongside another actix web::Query extractor
-pub struct OffsetPaginatedResponse<T> {
+pub struct OffsetPaginatedResponse<T, TMeta = OffsetPaginatedResponseMeta> {
     pub data: Vec<T>,
-    pub meta: OffsetPaginatedResponseMeta,
+    pub meta: TMeta,
 }
 
-impl<T> paperclip::v2::schema::Apiv2Schema for OffsetPaginatedResponse<T>
+impl<T, TMeta> paperclip::v2::schema::Apiv2Schema for OffsetPaginatedResponse<T, TMeta>
 where
     T: paperclip::v2::schema::Apiv2Schema,
+    TMeta: paperclip::v2::schema::Apiv2Schema,
 {
     fn name() -> Option<String> {
         T::name().map(|n| format!("OffsetPaginated{}", n))
@@ -203,7 +212,7 @@ where
             .insert("data".into(), Vec::<T>::raw_schema().into());
         schema
             .properties
-            .insert("meta".into(), OffsetPaginatedResponseMeta::raw_schema().into());
+            .insert("meta".into(), TMeta::raw_schema().into());
         schema.required.insert("data".into());
         schema.required.insert("meta".into());
         schema
@@ -215,6 +224,15 @@ impl<T> OffsetPaginatedResponse<T> {
         Self {
             data,
             meta: OffsetPaginatedResponseMeta { next_page, count },
+        }
+    }
+}
+
+impl<T> OffsetPaginatedResponse<T, OffsetPaginatedResponseMetaNoCount> {
+    pub fn ok_no_count(data: Vec<T>, next_page: Option<usize>) -> Self {
+        Self {
+            data,
+            meta: OffsetPaginatedResponseMetaNoCount { next_page },
         }
     }
 }

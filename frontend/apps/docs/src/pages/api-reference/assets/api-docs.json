@@ -96,7 +96,7 @@
                     {
                         "in": "query",
                         "name": "fields",
-                        "description": "Optionally, a comma-separated list of fields whose existence to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
+                        "description": "Optionally, a comma-separated list of fields whose existence to check. For example,\n `id.first_name,id.ssn4,custom.bank_account`",
                         "schema": {
                             "type": "string"
                         },
@@ -611,6 +611,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -944,7 +946,7 @@
                     {
                         "in": "query",
                         "name": "fields",
-                        "description": "Optionally, a comma-separated list of fields whose existence to check. For example, `id.first_name,id.ssn4,custom.bank_account`",
+                        "description": "Optionally, a comma-separated list of fields whose existence to check. For example,\n `id.first_name,id.ssn4,custom.bank_account`",
                         "schema": {
                             "type": "string"
                         },
@@ -1226,6 +1228,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -1729,7 +1733,7 @@
                 "type": "object",
                 "properties": {
                     "fields": {
-                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
+                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
                             "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
@@ -1769,6 +1773,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -1994,7 +2000,7 @@
                         "type": "string"
                     },
                     "fields": {
-                        "description": "List of data identifiers to which this token will have access. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`.. Should not be specified when using the `vault_card` scope.",
+                        "description": "List of data identifiers to which this token will have access. For example, `id.first_name`,\n `id.ssn4`, `custom.bank_account`.. Should not be specified when using the `vault_card`\n scope.",
                         "type": "array",
                         "items": {
                             "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
@@ -2034,6 +2040,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -2236,7 +2244,7 @@
                     },
                     "ttl": {
                         "example": 300,
-                        "description": "Time to live until this token expires, provided in seconds. Defaults to 30 minutes. Must be at least 60 seconds, at most 1 day",
+                        "description": "Time to live until this token expires, provided in seconds. Defaults to 30 minutes. Must be\n at least 60 seconds, at most 1 day",
                         "type": "integer",
                         "format": "int32"
                     }
@@ -2295,6 +2303,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -2499,7 +2509,7 @@
                 "type": "object",
                 "properties": {
                     "fields": {
-                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
+                        "description": "List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
                             "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
@@ -2539,6 +2549,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -2802,6 +2814,8 @@
                             "business.beneficial_owners",
                             "business.kyced_beneficial_owners",
                             "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
                             "investor_profile.employment_status",
                             "investor_profile.occupation",
                             "investor_profile.employer",
@@ -3007,7 +3021,7 @@
                         "type": "boolean"
                     },
                     "fields": {
-                        "description": "List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`",
+                        "description": "List of data identifiers to delete. For example, `id.first_name`, `id.ssn4`,\n `custom.bank_account`",
                         "type": "array",
                         "items": {
                             "description": "Represents a piece of data stored inside the user vault.\n Mostly used in requests to decrypt a piece of data and in access events to show the log of decrypted items.",
@@ -3047,6 +3061,8 @@
                                 "business.beneficial_owners",
                                 "business.kyced_beneficial_owners",
                                 "business.corporation_type",
+                                "business.formation_state",
+                                "business.formation_date",
                                 "investor_profile.employment_status",
                                 "investor_profile.occupation",
                                 "investor_profile.employer",
@@ -3284,6 +3300,8 @@
                             "business.beneficial_owners",
                             "business.kyced_beneficial_owners",
                             "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
                             "investor_profile.employment_status",
                             "investor_profile.occupation",
                             "investor_profile.employer",
@@ -3530,6 +3548,8 @@
                             "business.beneficial_owners",
                             "business.kyced_beneficial_owners",
                             "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
                             "investor_profile.employment_status",
                             "investor_profile.occupation",
                             "investor_profile.employer",
@@ -3792,6 +3812,8 @@
                             "business.beneficial_owners",
                             "business.kyced_beneficial_owners",
                             "business.corporation_type",
+                            "business.formation_state",
+                            "business.formation_date",
                             "investor_profile.employment_status",
                             "investor_profile.occupation",
                             "investor_profile.employer",
@@ -4001,11 +4023,11 @@
                         "type": "string"
                     },
                     "requires_additional_info": {
-                        "description": "When non-null, there is additional info pending collection from this user. In this case, you may create a token for this user with the `inherited` operation. This token can be used to collect any outstanding information.",
+                        "description": "When non-null, there is additional info pending collection from this user. In this case, you\n may create a token for this user with the `inherited` operation. This token can be used to\n collect any outstanding information.",
                         "type": "object",
                         "properties": {
                             "note": {
-                                "description": "The human-readable note you provided in the dashboard when requesting additional info. You may choose to render this message in your own application.",
+                                "description": "The human-readable note you provided in the dashboard when requesting additional info. You\n may choose to render this message in your own application.",
                                 "type": "string"
                             },
                             "timestamp": {
@@ -4078,7 +4100,7 @@
                         ]
                     },
                     "user": {
-                        "description": "Information on the user and their onboarding session. Provided for KYC and KYB playbook sessions",
+                        "description": "Information on the user and their onboarding session. Provided for KYC and KYB playbook\n sessions",
                         "type": "object",
                         "properties": {
                             "fp_id": {
