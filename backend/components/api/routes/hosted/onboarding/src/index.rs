@@ -16,6 +16,7 @@ use api_core::auth::session::user::{
     TokenCreationPurpose,
 };
 use api_core::types::JsonApiResponse;
+use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::onboarding::{
     NewBusinessVaultArgs,
@@ -27,6 +28,7 @@ use api_core::utils::vault_wrapper::{
     VaultWrapper,
 };
 use api_wire_types::hosted::onboarding::OnboardingResponse;
+use api_wire_types::PostOnboardingRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -51,8 +53,10 @@ pub async fn post(
     user_auth: UserAuthContext,
     ob_pk_auth: Option<ObConfigAuth>,
     insights: InsightHeaders,
+    request: OptionalJson<PostOnboardingRequest>,
 ) -> JsonApiResponse<OnboardingResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+    let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
 
     let scoped_user_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
     let uv_id = user_auth.user_vault_id().clone();
@@ -111,6 +115,7 @@ pub async fn post(
                 insight_event: Some(insight_event.clone()),
                 new_biz_args: maybe_new_biz_args,
                 source: WorkflowSource::Hosted,
+                fixture_result,
                 actor: None,
                 maybe_prefill_data: Some(prefill_data),
                 is_neuro_enabled,

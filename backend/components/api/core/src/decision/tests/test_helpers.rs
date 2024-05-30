@@ -96,6 +96,7 @@ pub async fn create_user_and_onboarding(
                 insight_event: Some(CreateInsightEvent { ..Default::default() }),
                 new_biz_args: biz_args,
                 source: WorkflowSource::Hosted,
+                fixture_result: None,
                 actor: None,
                 maybe_prefill_data: None,
                 is_neuro_enabled: false,

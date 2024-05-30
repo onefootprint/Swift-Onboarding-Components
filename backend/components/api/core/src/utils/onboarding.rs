@@ -35,6 +35,7 @@ use newtypes::{
     VaultKind,
     VaultPublicKey,
     WorkflowConfig,
+    WorkflowFixtureResult,
     WorkflowId,
     WorkflowRequestId,
     WorkflowSource,
@@ -53,9 +54,10 @@ pub struct NewOnboardingArgs<'a> {
     pub sv: &'a ScopedVault,
     pub obc: &'a ObConfiguration,
     pub insight_event: Option<CreateInsightEvent>,
-    pub new_biz_args: Option<NewBusinessVaultArgs>, /* has to be generated async outside the `conn`. We
-                                                     * also currently don't support KYB for NPV's but
-                                                     * could one day */
+    // Has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could
+    // one day
+    pub new_biz_args: Option<NewBusinessVaultArgs>,
+    pub fixture_result: Option<WorkflowFixtureResult>,
     pub source: WorkflowSource,
     pub actor: Option<AuthActor>,
     pub maybe_prefill_data: Option<PrefillData>,
@@ -76,6 +78,7 @@ pub fn get_or_start_onboarding(
         insight_event,
         new_biz_args,
         source,
+        fixture_result,
         actor,
         maybe_prefill_data,
         is_neuro_enabled,
@@ -110,7 +113,7 @@ pub fn get_or_start_onboarding(
             // If this isn't a one click from another tenant, we can immediately mark the WF as authorized
             authorized: can_auto_authorize,
             source,
-            fixture_result: None,
+            fixture_result,
             is_one_click: is_first_wf && has_prefill_data,
             wfr: wfr.clone(),
             is_neuro_enabled,
@@ -168,7 +171,7 @@ pub fn get_or_start_onboarding(
                 authorized: true,
                 insight_event,
                 source,
-                fixture_result: None,
+                fixture_result,
                 is_one_click: false,
                 wfr: None,
                 is_neuro_enabled: false, // not now

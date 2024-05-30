@@ -153,15 +153,13 @@ pub async fn post(
                 insight_event: None,
                 new_biz_args: None, // currently dont support KYB for NPV
                 source: WorkflowSource::Tenant,
+                fixture_result: fixture_result.map(|fr| fr.into()),
                 actor: Some(actor),
                 maybe_prefill_data: None,
                 // can't run neuro if using this path
                 is_neuro_enabled: false,
             };
             let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
-            if let Some(fixture_result) = fixture_result {
-                Workflow::update_fixture_result(conn, &wf_id, fixture_result.into())?;
-            }
 
             // TODO: consolidate with /authorize code
             let wf = Workflow::lock(conn, &wf_id)?;
