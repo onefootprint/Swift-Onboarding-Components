@@ -5,27 +5,33 @@ import LogRocket from 'logrocket';
 
 import type { ExtraProps, PrimitiveData } from '../types';
 
-const OBSERVE_INGEST_TOKEN =
-  'ds1FFZo4VU4NEv9yYems:2b8XTbUIjt5vRarHo7bc716EXZSICoDi';
-const OBSERVE_INGEST_URL =
-  'https://189225732777.collect.observeinc.com/v1/http/?observe_token=ds1FFZo4VU4NEv9yYems:2b8XTbUIjt5vRarHo7bc716EXZSICoDi';
+const IS_OBSERVE_ENABLED =
+  process.env.NEXT_PUBLIC_IS_OBSERVE_ENABLED === 'true';
+const OBSERVE_INGEST_TOKEN = IS_OBSERVE_ENABLED
+  ? 'ds1FFZo4VU4NEv9yYems:2b8XTbUIjt5vRarHo7bc716EXZSICoDi'
+  : '';
+const OBSERVE_INGEST_URL = IS_OBSERVE_ENABLED
+  ? 'https://189225732777.collect.observeinc.com/v1/http/?observe_token=ds1FFZo4VU4NEv9yYems:2b8XTbUIjt5vRarHo7bc716EXZSICoDi'
+  : '';
 
-const sendObservePayload = async (data: Record<string, unknown>[]) => {
-  fetch(OBSERVE_INGEST_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OBSERVE_INGEST_TOKEN}`,
-      'Content-type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-    body: JSON.stringify(data),
-    mode: 'no-cors',
-    credentials: 'include',
-  }).catch(error => {
-    // Not too much we can do here.
-    console.log('Sending frontend telemetry to Observe failed: ', error); // eslint-disable-line no-console
-  });
-};
+const sendObservePayload = IS_OBSERVE_ENABLED
+  ? async (data: Record<string, unknown>[]) => {
+      fetch(OBSERVE_INGEST_URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${OBSERVE_INGEST_TOKEN}`,
+          'Content-type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify(data),
+        mode: 'no-cors',
+        credentials: 'include',
+      }).catch(error => {
+        // Not too much we can do here.
+        console.log('Sending frontend telemetry to Observe failed: ', error); // eslint-disable-line no-console
+      });
+    }
+  : (_: Record<string, unknown>[]) => Promise.resolve(); // eslint-disable-line @typescript-eslint/no-unused-vars
 
 const DEBOUNCE_INTERVAL = 10000; // 10 seconds
 const MAX_DEBOUNCE = 30000; // 30 seconds
@@ -34,10 +40,11 @@ const ObserveFactory = () => {
   const queue: Record<string, unknown>[] = [];
   let context: PrimitiveData = {};
 
-  const init = (appName: string) => {
+  const init = (appName: string): boolean => {
     context.sessionStartTimestamp = Date.now();
     context.appName = appName;
     context.sessionId = getSessionId();
+    return true;
   };
 
   const identify = (sessionId: string, newContext: PrimitiveData) => {
@@ -104,7 +111,15 @@ const ObserveFactory = () => {
   };
 };
 
-export const Observe = ObserveFactory();
+export const Observe = IS_OBSERVE_ENABLED
+  ? ObserveFactory()
+  : {
+      init: () => false,
+      identify: () => undefined,
+      log: () => undefined,
+      flush: () => undefined,
+      setLogRocketSessionUrl: () => undefined,
+    };
 
 export const observeErrorCauseEvent = (error: Error) =>
   Observe.log('error', {
@@ -128,8 +143,6 @@ export const observeWarnEvent = (msg: string, extra: ExtraProps) =>
 export const observeInfoEvent = (msg: string, extra: ExtraProps) =>
   Observe.log(msg, { level: 'info', extra });
 
-const initObserve = (appName: string) => {
-  Observe.init(appName);
-};
+const initObserve = (appName: string) => Observe.init(appName);
 
 export default initObserve;
