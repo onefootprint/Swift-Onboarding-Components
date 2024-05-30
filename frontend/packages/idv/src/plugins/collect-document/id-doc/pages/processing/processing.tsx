@@ -6,7 +6,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { Logger } from '../../../../../utils/logger';
+import { getLogger } from '../../../../../utils/logger';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';
@@ -14,8 +14,11 @@ import Success from '../../../components/success';
 import SLOW_CONNECTION_MESSAGE_TIMEOUT from '../../../constants/processing.constants';
 import useProcessDoc from '../../../hooks/use-process-doc';
 import useSubmitDoc from '../../../hooks/use-submit-doc';
+import { bytesToMegabytes } from '../../../utils/capture';
 import NextSide from '../../components/next-side';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
+
+const { logError, logInfo, logWarn } = getLogger({ location: 'processing' });
 
 const Processing = () => {
   const { t } = useTranslation('idv', {
@@ -52,9 +55,8 @@ const Processing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      Logger.error(
+      logWarn(
         `Image upload retry limit exceeded. Side: ${currSide}, doc id: ${id}`,
-        { location: 'processing' },
       );
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
@@ -88,17 +90,17 @@ const Processing = () => {
     });
   };
 
-  const handleProcessDocError = (error: unknown) => {
-    Logger.error(
-      `Error while processing id-doc image ${id}: ${getErrorMessage(error)}`,
-      { location: 'processing' },
+  const handleProcessDocError = (err: unknown) => {
+    handleError(err);
+    logError(
+      `Error while processing id-doc image ${id}: ${getErrorMessage(err)}`,
+      err,
     );
-    handleError(error);
   };
 
-  const handleSubmitDocError = (error: unknown) => {
-    const errorMessage = getErrorMessage(error);
-    const errorCode = getErrorCode(error);
+  const handleSubmitDocError = (err: unknown) => {
+    const errorMessage = getErrorMessage(err);
+    const errorCode = getErrorCode(err);
 
     // This part of code may seem a little counter-intuitive
     // Sometimes the processing request might erroneously fail although BE successfully processes it
@@ -110,12 +112,11 @@ const Processing = () => {
       setMode('success');
       return;
     }
-
-    Logger.error(
+    handleError(err);
+    logError(
       `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${errorMessage}`,
-      { location: 'processing' },
+      err,
     );
-    handleError(error);
   };
 
   const handleSubmitDocSuccess = () => {
@@ -146,7 +147,7 @@ const Processing = () => {
       }, country: ${country ? 'OK' : 'undefined'}, current side: ${
         currSide ? 'OK' : 'undefined'
       }, id: ${id || 'undefined'}`;
-      Logger.error(error, { location: 'processing' });
+      logError(error);
       return;
     }
 
@@ -160,9 +161,10 @@ const Processing = () => {
     }
 
     const { imageFile, extraCompressed, captureKind } = image;
-    Logger.info(
-      `Processing: size of the file to be sent in POST request is ${imageFile.size}, file type ${imageFile.type}`,
+    logInfo(
+      `Uploading image with size ${bytesToMegabytes(imageFile.size)} MB and type ${imageFile.type} in POST request`,
     );
+
     submitDocMutation.mutate(
       {
         authToken,

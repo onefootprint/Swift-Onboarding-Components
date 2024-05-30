@@ -32,19 +32,19 @@ const useParseUrl = (options: UseParseUrlParamOptions = {}) => {
       typeof type !== 'string' ||
       !Object.values(HostedUrlType).includes(type as HostedUrlType)
     ) {
-      onError?.(`Hosted app URL does not include type: ${router.asPath}`);
+      onError?.(`Missing 'type' query parameter: ${router.asPath}`);
       return;
     }
 
     const parts = router.asPath.split('#');
     if (parts.length < 2) {
-      onError?.(`Hosted app URL path does not contain token: ${router.asPath}`);
+      onError?.(`Missing 'token' query fragment: ${router.asPath}`);
       return;
     }
 
     const token = decodeURI(parts[1]);
     if (!token) {
-      onError?.(`Hosted app URL does not contain token: ${router.asPath}`);
+      onError?.(`Invalid 'token' query fragment: ${router.asPath}`);
       return;
     }
 

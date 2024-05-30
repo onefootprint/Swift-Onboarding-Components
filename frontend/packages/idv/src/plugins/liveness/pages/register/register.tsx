@@ -24,7 +24,7 @@ import {
   FPCustomEvents,
   sendCustomEvent,
 } from '../../../../utils/custom-event';
-import { Logger } from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import useBiometricInit, {
@@ -32,6 +32,9 @@ import useBiometricInit, {
 } from '../../hooks/use-register-biometric';
 
 const SUCCESS_TRANSITION_DELAY_MS = 1500;
+const { logError, logInfo, logTrack, logWarn } = getLogger({
+  location: 'liveness-register',
+});
 
 const Register = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'liveness.pages.register' });
@@ -64,6 +67,7 @@ const Register = () => {
       { authToken },
       {
         onSuccess({ deviceResponseJson }) {
+          logTrack('Passkeys registration succeeded');
           setTimeout(() => {
             sendCustomEvent(FPCustomEvents.receivedDeviceResponseJson, {
               deviceResponseJson,
@@ -81,9 +85,7 @@ const Register = () => {
           }
 
           const errorMessage = getErrorMessage(e);
-          Logger.warn(`Failed to register passkeys for user: ${errorMessage}`, {
-            location: 'liveness-register',
-          });
+          logWarn(`Failed to register passkeys for user: ${errorMessage}`, e);
           // Keep track of each failed attempt to register a passkey.
           // We will send this to the backend
           const passkeyFailure = {
@@ -103,9 +105,7 @@ const Register = () => {
     if (skipLivenessMutation.isLoading) {
       return;
     }
-    Logger.info('Skipping liveness after retrying registering passkeys', {
-      location: 'liveness-register',
-    });
+    logInfo('Skipping liveness after retrying registering passkeys');
     const context = {
       reason: SkipLivenessReason.failed,
       clientType: SkipLivenessClientType.web,
@@ -118,12 +118,10 @@ const Register = () => {
         onSuccess: () => {
           send({ type: 'skipped' });
         },
-        onError: (error: unknown) => {
-          Logger.error(
-            `Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(
-              error,
-            )}`,
-            { location: 'liveness-register' },
+        onError: (err: unknown) => {
+          logError(
+            `Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(err)}`,
+            err,
           );
         },
       },

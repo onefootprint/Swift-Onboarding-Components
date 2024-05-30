@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
-import { Logger } from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import {
   AUTOCAPTURE_RESTART_DELAY,
@@ -23,6 +23,7 @@ import {
   isFunction,
   isMobile,
   isNonPlayingVideoEvent,
+  isNotAllowedError,
   VideoEvents,
 } from '../../utils/capture';
 import CaptureButton from './components/capture-button';
@@ -91,8 +92,9 @@ const PLAY_CHECK_INTERVAL = 1500;
 const FORCED_UPLOAD_DELAY = 7000;
 const CAMERA_LOADING_FEEDBACK_DELAY = 4000;
 
-const logError = (e: string) => Logger.error(e, { location: 'camera' });
-const logWarn = (e: string) => Logger.warn(e, { location: 'camera' });
+const { logError, logInfo, logTrack, logWarn } = getLogger({
+  location: 'camera',
+});
 
 const videoElementStateListener =
   (
@@ -103,7 +105,7 @@ const videoElementStateListener =
   ) =>
   (event: Event) => {
     if (!videoElement) return;
-    logWarn(`Video element status: ${event.type}`);
+    logTrack(`Video event: ${event.type}`);
     if (
       isFunction(videoElement?.play) &&
       isNonPlayingVideoEvent(event) &&
@@ -113,17 +115,18 @@ const videoElementStateListener =
       videoElement
         .play()
         .then(() => {
-          logWarn('Video element status: playing');
+          logTrack('Video event: playing');
           setPlayingState(true);
         })
-        .catch(error => {
-          if ((error as DOMException).name === 'NotAllowedError') {
+        .catch(err => {
+          if (isNotAllowedError(err.name)) {
             onPlayNotAllowed();
             logWarn(
-              'Video element status: play not allowed - prompting user interaction',
+              'Video play event: not allowed - prompting user interaction',
+              err,
             );
           } else {
-            logError(`Error starting playing video: ${error}`);
+            logError(`Video play event: error`, err);
           }
         });
     }
@@ -222,36 +225,33 @@ const Camera = ({
   }
 
   const handlePlayError = (err: unknown) => {
-    const error = err as DOMException;
-    if (error.name === 'NotAllowedError') {
+    if (err instanceof Error && isNotAllowedError(err?.name)) {
       if (!showPlayAllowDialog) setShowPlayAllowDialog(true);
-      logWarn(
-        'Video element status: play not allowed - prompting user interaction',
-      );
+      logWarn('video play: not allowed - prompting user interaction', err);
     } else {
-      logError(`Error starting playing video: ${err}`);
+      logError(`video play: error`, err);
     }
   };
 
   const handleCanPlay = () => {
     setOnCanPlayTriggered(true);
-    logWarn('Video triggered onCanPlay');
+    logTrack('(onCanPlay) video triggered ');
     if (isVideoPlaying) {
-      logWarn('Video already playing: handleCanPlay');
+      logTrack('(onCanPlay) video already playing');
       return;
     }
     if (!videoRef.current) {
-      logError('Video ref not initialized: handleCanPlay');
+      logWarn('(onCanPlay) video ref not initialized');
       return;
     }
     if (videoRef.current.readyState < 2) {
-      logWarn('Video not ready to play: handleCanPlay');
+      logWarn('(onCanPlay) video not ready to play');
       return;
     }
     videoRef.current
       .play()
       .then(() => {
-        logWarn('Video element status: started playing: handleCanPlay');
+        logTrack('(onCanPlay) video element status: playing');
         setIsVideoPlaying(true);
       })
       .catch(handlePlayError);
@@ -259,27 +259,27 @@ const Camera = ({
 
   useInterval(
     () => {
-      logWarn(
-        `Loading video camera - mediaStream state: ${
+      logTrack(
+        `(interval) mediaStream state: ${
           mediaStream ? 'defined' : 'undefined'
         }, mediaStream active: ${mediaStream?.active}, onCanPlayTriggered: ${onCanPlayTriggered}, isVideoPlaying: ${isVideoPlaying}`,
       );
       if (isVideoPlaying) {
-        logWarn('Video already playing: useInterval');
+        logInfo('(interval) video already playing');
         return;
       }
       if (!videoRef.current) {
-        logError('Video ref not initialized: useInterval');
+        logError('(interval) video ref not initialized');
         return;
       }
       if (videoRef.current.readyState < 2) {
-        logWarn('Video not ready to play: useInterval');
+        logWarn('(interval) video not ready to play');
         return;
       }
       videoRef.current
         .play()
         .then(() => {
-          logWarn('Video element status: started playing: useInterval');
+          logWarn('(interval) video element status: started playing');
           setIsVideoPlaying(true);
         })
         .catch(handlePlayError);
@@ -289,6 +289,7 @@ const Camera = ({
 
   useTimeout(() => {
     if (!isCameraVisible) {
+      logWarn('camera not visible after timeout - forcing upload');
       onCameraStuck();
     }
   }, FORCED_UPLOAD_DELAY);
@@ -303,6 +304,7 @@ const Camera = ({
   };
 
   const handleClick = (captureKind: CaptureKind) => {
+    logTrack(`(handleClick) ${captureKind} clicked`);
     if (!canvasImageCaptureRef.current || !videoRef.current) {
       logError(
         `Video ref or canvas not initialized for camera capture for capture kind: ${captureKind}`,

@@ -9,7 +9,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { Logger } from '../../../../../utils/logger';
+import { getLogger } from '../../../../../utils/logger';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';
@@ -17,7 +17,12 @@ import Success from '../../../components/success';
 import SLOW_CONNECTION_MESSAGE_TIMEOUT from '../../../constants/processing.constants';
 import useProcessDoc from '../../../hooks/use-process-doc';
 import useSubmitDoc from '../../../hooks/use-submit-doc';
+import { bytesToMegabytes } from '../../../utils/capture';
 import { useNonIdDocMachine } from '../../components/machine-provider';
+
+const { logError, logInfo, logWarn } = getLogger({
+  location: 'non-id-doc-mobile-processing',
+});
 
 const MobileProcessing = () => {
   const { t } = useTranslation('idv', {
@@ -47,9 +52,8 @@ const MobileProcessing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      Logger.error(
+      logWarn(
         `Image upload retry limit exceeded. doc: ${documentRequestKind}, doc id: ${id}`,
-        { location: 'desktop-processing' },
       );
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === IdDocImageTypes.front) {
@@ -64,10 +68,7 @@ const MobileProcessing = () => {
     } else if (!nextSideToCollect) {
       setMode('success');
     } else {
-      Logger.error(
-        `Unexpected next side to collect in non-id-doc flow. Side: ${nextSideToCollect}`,
-        { location: 'mobile-processing' },
-      );
+      logError(`Unexpected next side to collect. Side: ${nextSideToCollect}`);
     }
   };
 
@@ -85,19 +86,17 @@ const MobileProcessing = () => {
     });
   };
 
-  const handleProcessDocError = (error: unknown) => {
-    Logger.error(
-      `Error while processing non id-doc image ${id}: ${getErrorMessage(
-        error,
-      )}`,
-      { location: 'processing' },
+  const handleProcessDocError = (err: unknown) => {
+    handleError(err);
+    logError(
+      `Error while processing image ${id}: ${getErrorMessage(err)}`,
+      err,
     );
-    handleError(error);
   };
 
-  const handleSubmitDocError = (error: unknown) => {
-    const errorCode = getErrorCode(error);
-    const errorMessage = getErrorMessage(error);
+  const handleSubmitDocError = (err: unknown) => {
+    const errorCode = getErrorCode(err);
+    const errorMessage = getErrorMessage(err);
 
     // This part of code may seem a little counter-intuitive
     // Sometimes the processing request might erroneously fail although BE successfully processes it
@@ -109,11 +108,11 @@ const MobileProcessing = () => {
       return;
     }
 
-    Logger.error(
-      `Non id-doc image submit failed on phone flow. Document kind: ${documentRequestKind}, upload session id: ${id}. Error: ${errorMessage}`,
-      { location: 'processing' },
+    logError(
+      `Submit failed on phone flow. Document kind: ${documentRequestKind}, upload session id: ${id}. Error: ${errorMessage}`,
+      err,
     );
-    handleError(error);
+    handleError(err);
   };
 
   const handleSubmitDocSuccess = () => {
@@ -137,12 +136,12 @@ const MobileProcessing = () => {
   useEffectOnce(() => {
     if (!document || !authToken || !id) {
       setIsMissingRequirements(true);
-      const error = `Desktop web flow - id-doc image could not be processed due to missing requirements. Requirements - document: ${
+      const error = `Mobile flow - id-doc image could not be processed due to missing requirements. Requirements - document: ${
         document ? 'OK' : 'undefined'
       }, auth token: ${authToken ? 'OK' : 'undefined'}, id: ${
         id ? 'OK' : 'undefined'
       }`;
-      Logger.error(error, { location: 'desktop-processing' });
+      logError(error);
       return;
     }
 
@@ -156,6 +155,9 @@ const MobileProcessing = () => {
     }
 
     const { imageFile, extraCompressed, captureKind } = document;
+    logInfo(
+      `Uploading image with size ${bytesToMegabytes(imageFile.size)} MB and type ${imageFile.type} in POST request`,
+    );
     submitDocMutation.mutate(
       {
         authToken,

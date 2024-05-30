@@ -12,7 +12,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { HeaderTitle } from '../../../../../components';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import { Logger } from '../../../../../utils/logger';
+import { getLogger } from '../../../../../utils/logger';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';
@@ -22,8 +22,13 @@ import SLOW_CONNECTION_MESSAGE_TIMEOUT from '../../../constants/processing.const
 import useProcessDoc from '../../../hooks/use-process-doc';
 import useSubmitDoc from '../../../hooks/use-submit-doc';
 import transformCase from '../../../id-doc/utils/transform-case';
+import { bytesToMegabytes } from '../../../utils/capture';
 import { useNonIdDocMachine } from '../../components/machine-provider';
 import useDocName from '../../hooks/use-doc-name';
+
+const { logError, logInfo, logWarn } = getLogger({
+  location: 'non-id-doc-desktop-processing',
+});
 
 const DesktopProcessing = () => {
   const { t } = useTranslation('idv', {
@@ -57,9 +62,8 @@ const DesktopProcessing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      Logger.error(
+      logWarn(
         `Image upload retry limit exceeded. doc: ${documentRequestKind}, doc id: ${id}`,
-        { location: 'desktop-processing' },
       );
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === IdDocImageTypes.front) {
@@ -74,9 +78,8 @@ const DesktopProcessing = () => {
     } else if (!nextSideToCollect) {
       setMode('success');
     } else {
-      Logger.error(
-        `Unexpected next side to collect in non-id-doc flow. Side: ${nextSideToCollect}`,
-        { location: 'desktop-processing' },
+      logError(
+        `Unexpected next side to collect flow. Side: ${nextSideToCollect}`,
       );
     }
   };
@@ -95,19 +98,14 @@ const DesktopProcessing = () => {
     });
   };
 
-  const handleProcessDocError = (error: unknown) => {
-    Logger.error(
-      `Error while processing non id-doc image ${id}: ${getErrorMessage(
-        error,
-      )}`,
-      { location: 'processing' },
-    );
-    handleError(error);
+  const handleProcessDocError = (err: unknown) => {
+    handleError(err);
+    logWarn(`Error while processing image ${id}: ${getErrorMessage(err)}`, err);
   };
 
-  const handleSubmitDocError = (error: unknown) => {
-    const errorCode = getErrorCode(error);
-    const errorMessage = getErrorMessage(error);
+  const handleSubmitDocError = (err: unknown) => {
+    const errorCode = getErrorCode(err);
+    const errorMessage = getErrorMessage(err);
 
     // This part of code may seem a little counter-intuitive
     // Sometimes the processing request might erroneously fail although BE successfully processes it
@@ -119,11 +117,10 @@ const DesktopProcessing = () => {
       return;
     }
 
-    Logger.error(
-      `Non id-doc image submit failed on phone flow. Document kind: ${documentRequestKind}, upload session id: ${id}. Error: ${errorMessage}`,
-      { location: 'processing' },
+    handleError(err);
+    logError(
+      `Submit failed on phone flow. Document kind: ${documentRequestKind}, upload session id: ${id}. Error: ${errorMessage}`,
     );
-    handleError(error);
   };
 
   const handleSubmitDocSuccess = () => {
@@ -152,7 +149,7 @@ const DesktopProcessing = () => {
       }, auth token: ${authToken ? 'OK' : 'undefined'}, id: ${
         id ? 'OK' : 'undefined'
       }`;
-      Logger.error(error, { location: 'desktop-processing' });
+      logError(error);
       return;
     }
 
@@ -166,6 +163,9 @@ const DesktopProcessing = () => {
     }
 
     const { imageFile, extraCompressed, captureKind } = document;
+    logInfo(
+      `Uploading image with size ${bytesToMegabytes(imageFile.size)} MB and type ${imageFile.type} in POST request`,
+    );
     submitDocMutation.mutate(
       {
         authToken,

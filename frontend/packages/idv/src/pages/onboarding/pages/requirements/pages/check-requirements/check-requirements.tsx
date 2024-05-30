@@ -1,17 +1,28 @@
 import { getErrorMessage } from '@onefootprint/request';
-import { type OnboardingStatusResponse } from '@onefootprint/types';
+import type { OnboardingStatusResponse } from '@onefootprint/types';
 
 import { useGetOnboardingStatus } from '../../../../../../hooks/api';
-import { Logger } from '../../../../../../utils/logger';
+import { getLogger, Logger } from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import computeRequirementsToShow from './utils/compute-requirements-to-show';
 
+const { logInfo } = getLogger({ location: 'onboarding-check-requirements' });
+
 const logOnboardingStatusResponse = (response: OnboardingStatusResponse) => {
-  // Just log requirements and whether they are met or not for now
-  Logger.info(
-    `Onboarding requirements: ${response.allRequirements
-      .map(x => `${x.kind}:${x.isMet ? 'done' : '-'}`)
-      .join(', ')}`,
+  logInfo(
+    `requirements status: ${response.allRequirements
+      .map(req => {
+        if (req.kind === 'collect_data') {
+          return `${req.kind}:${req.isMet ? 1 : 0} missing:[${req.missingAttributes.join(',')}] populated:[${req.populatedAttributes.join(',')}]`;
+        }
+
+        if (req.kind === 'collect_document' && req.config.kind === 'identity') {
+          return `${req.kind}:${req.isMet ? 1 : 0} uploadMode:${req.uploadMode} collectConsent:${req.config.shouldCollectConsent ? 1 : 0} collectSelfie:${req.config.shouldCollectSelfie ? 1 : 0}`;
+        }
+
+        return `${req.kind}:${req.isMet ? 1 : 0}`;
+      })
+      .join(',')}`,
   );
 };
 

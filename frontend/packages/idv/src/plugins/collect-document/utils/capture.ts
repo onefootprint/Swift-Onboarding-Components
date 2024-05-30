@@ -27,6 +27,7 @@ const nonPlayingVideoEventTypes = new Set([
 const isHtmlVideoElement = (x?: unknown): x is HTMLVideoElement =>
   Boolean(x) && x instanceof HTMLVideoElement;
 
+export const isNotAllowedError = (x?: unknown) => x === 'NotAllowedError';
 export const isDesktop = (x: unknown): x is 'desktop' => x === 'desktop';
 export const isDocument = (x: unknown): x is 'document' => x !== 'face';
 export const isFace = (x: unknown): x is 'face' => x === 'face';
@@ -81,3 +82,5 @@ export const clearCanvas = (
 
   context.clearRect(0, 0, ref.current.width, ref.current.height);
 };
+
+export const bytesToMegabytes = (b: number) => (b / (1024 * 1024)).toFixed(2);

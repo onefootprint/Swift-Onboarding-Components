@@ -11,7 +11,7 @@ import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import { Logger } from '../../../../../utils/logger';
+import { getLogger } from '../../../../../utils/logger';
 import DesktopHeader from '../../../components/desktop-header';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
@@ -21,9 +21,14 @@ import DESKTOP_INTERACTION_BOX_HEIGHT from '../../../constants/desktop-interacti
 import SLOW_CONNECTION_MESSAGE_TIMEOUT from '../../../constants/processing.constants';
 import useProcessDoc from '../../../hooks/use-process-doc';
 import useSubmitDoc from '../../../hooks/use-submit-doc';
+import { bytesToMegabytes } from '../../../utils/capture';
 import useDocName from '../../hooks/use-doc-name';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import transformCase from '../../utils/transform-case';
+
+const { logError, logInfo, logWarn } = getLogger({
+  location: 'desktop-processing',
+});
 
 const DeskTopProcessing = () => {
   const { t } = useTranslation('idv', {
@@ -67,19 +72,14 @@ const DeskTopProcessing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      Logger.error(
-        `Image upload retry limit exceeded. Side: ${currSide}, doc id: ${id}`,
-        { location: 'desktop-processing' },
+      logWarn(
+        `Image upload retry limit exceeded. Side: ${sideName}, doc id: ${id}, type: ${docName}`,
       );
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
       send({
         type: 'processingErrored',
-        payload: {
-          errors: errors.map(err => ({
-            errorType: err,
-          })),
-        },
+        payload: { errors: errors.map(err => ({ errorType: err })) },
       });
     } else if (!nextSideToCollect) {
       setMode('success');
@@ -103,17 +103,17 @@ const DeskTopProcessing = () => {
     });
   };
 
-  const handleProcessDocError = (error: unknown) => {
-    Logger.error(
-      `Error while processing id-doc image ${id}: ${getErrorMessage(error)}`,
-      { location: 'processing' },
+  const handleProcessDocError = (err: unknown) => {
+    handleError(err);
+    logError(
+      `Error while processing id-doc image ${id}: ${getErrorMessage(err)}`,
+      err,
     );
-    handleError(error);
   };
 
-  const handleSubmitDocError = (error: unknown) => {
-    const errorCode = getErrorCode(error);
-    const errorMessage = getErrorMessage(error);
+  const handleSubmitDocError = (err: unknown) => {
+    const errorCode = getErrorCode(err);
+    const errorMessage = getErrorMessage(err);
 
     // This part of code may seem a little counter-intuitive
     // Sometimes the processing request might erroneously fail although BE successfully processes it
@@ -126,11 +126,11 @@ const DeskTopProcessing = () => {
       return;
     }
 
-    Logger.error(
+    handleError(err);
+    logError(
       `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${errorMessage}`,
-      { location: 'processing' },
+      err,
     );
-    handleError(error);
   };
 
   const handleSubmitDocSuccess = () => {
@@ -161,7 +161,7 @@ const DeskTopProcessing = () => {
       }, country: ${country ? 'OK' : 'undefined'}, current side: ${
         currSide ? 'OK' : 'undefined'
       }, id: ${id ? 'OK' : 'undefined'}`;
-      Logger.error(error, { location: 'desktop-processing' });
+      logError(error);
       return;
     }
 
@@ -175,6 +175,9 @@ const DeskTopProcessing = () => {
     }
 
     const { imageFile, extraCompressed, captureKind } = image;
+    logInfo(
+      `Uploading image with size ${bytesToMegabytes(imageFile.size)} MB and type ${imageFile.type} in POST request`,
+    );
     submitDocMutation.mutate(
       {
         authToken,

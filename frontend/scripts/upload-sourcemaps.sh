@@ -47,5 +47,5 @@ if [ -z "$DATADOG_API_KEY" ]; then
   exit 0
 fi
 
-datadog-ci sourcemaps upload ./.next/static --disable-git --service=$SERVICE --release-version=$VERCEL_GIT_COMMIT_SHA --minified-path-prefix=$SOURCE_MAPS_PUBLIC_STATIC_PATH
+datadog-ci sourcemaps upload ./.next/static --disable-git --service=$SERVICE --release-version=${PREFIX}-${VERCEL_GIT_COMMIT_SHA} --minified-path-prefix=$SOURCE_MAPS_PUBLIC_STATIC_PATH
 
