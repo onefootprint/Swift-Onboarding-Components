@@ -213,33 +213,9 @@ jobs:
             ${{ steps.test_results.outputs.body }}
           edit-mode: replace
 
-      - name: Install diesel cli
-        run: cargo install diesel_cli --version 2.0.0 --no-default-features --features postgres
-
       - name: Check valid db migrations
-        working-directory: ./backend/components/db/schema
-        run: |
-          NUM_FILES=`ls migrations | wc -l`
-          NUM_TO_REVERT=$(( $NUM_FILES < 1 ? $NUM_FILES : 1 ))
-          echo "Reverting $NUM_TO_REVERT migrations"
-
-          for ((i=0; i<$NUM_TO_REVERT; i++))
-          do
-            echo $i
-            diesel migration revert
-            if [ $? -ne 0 ]; then
-              echo "failed to properly revert"
-              exit 1
-            fi
-          done
-
-          echo "Reverted $NUM_TO_REVERT migrations, running again"
-
-          diesel migration run
-          if [ $? -ne 0 ]; then
-            echo "failed to properly restore"
-            exit 1
-          fi
+        working-directory: ./backend/ci/scripts
+        run: ./check_db_migrations.sh
 
   # Branch protections require this job to pass. If any of the `needs` fail, then this job will fail.
   # Add all jobs in this workflow to this job's `needs`
