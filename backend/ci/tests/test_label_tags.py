@@ -7,7 +7,7 @@ from tests.bifrost_client import BifrostClient
 
 
 def test_create_label(sandbox_tenant):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
     data = {"kind": "active"}
@@ -41,7 +41,7 @@ def test_create_label(sandbox_tenant):
 
 
 def test_create_tag(sandbox_tenant):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
     data = {"tag": "delinquent"}
     tag = post(f"/users/{user.fp_id}/tags", data, sandbox_tenant.sk.key)

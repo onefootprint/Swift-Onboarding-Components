@@ -23,7 +23,7 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
     body = post("hosted/identify", identify_data, ob_config2.key, sandbox_id_h)
     assert not body["user"]
 
-    bifrost = BifrostClient.create(ob_config2, override_sandbox_id=sandbox_id)
+    bifrost = BifrostClient.new_user(ob_config2, override_sandbox_id=sandbox_id)
     bifrost.run()
     assert [i["kind"] for i in bifrost.handled_requirements] == [
         "collect_data",
@@ -48,7 +48,7 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
         body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
         assert body["user"]
 
-    bifrost2 = BifrostClient.inherit(sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost2 = BifrostClient.inherit_user(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost2.run()
     assert [i["kind"] for i in bifrost2.handled_requirements] == [
         "process",
@@ -65,12 +65,12 @@ def test_one_click_same_tenant_no_decryption_bleeding(sandbox_tenant, ob_config2
     # the second workflow, it would instantly grant decryption permissions to the second workflow
     # that the user didn't already have
     ob_config = sandbox_tenant.default_ob_config
-    bifrost = BifrostClient.create(ob_config)
+    bifrost = BifrostClient.new_user(ob_config)
     bifrost.run()
 
     # Now onboard onto second ob config. This ob config needs access to more data than is already
     # granted by the first ob config, so it cannot be automatically authorized
-    bifrost2 = BifrostClient.inherit(ob_config2, bifrost.sandbox_id)
+    bifrost2 = BifrostClient.inherit_user(ob_config2, bifrost.sandbox_id)
     bifrost2.run()
     assert [i["kind"] for i in bifrost2.handled_requirements] == [
         "authorize",

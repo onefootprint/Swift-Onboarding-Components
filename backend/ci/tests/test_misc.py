@@ -56,7 +56,7 @@ def test_get_user(
 ):
     seed = _gen_random_n_digit_number(10)
     sandbox_id = f"{sandbox_id}{seed}"
-    bifrost = BifrostClient.create(
+    bifrost = BifrostClient.new_user(
         sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
     )
     user = bifrost.run()
@@ -71,7 +71,7 @@ def test_check_session(sandbox_tenant):
     seed = _gen_random_n_digit_number(10)
     sandbox_id = f"session_check_{seed}"
 
-    bifrost = BifrostClient.create(
+    bifrost = BifrostClient.new_user(
         sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
     )
     bifrost.run()

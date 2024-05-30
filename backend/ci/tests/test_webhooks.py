@@ -65,7 +65,7 @@ def test_webhook_e2e(sandbox_tenant, run_id):
     p.start()
 
     # 3. fire off a codepath that triggers the webhook (i.e. an onboarding)
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
     # 4. Retrieve the webhook message and make sure it's correct

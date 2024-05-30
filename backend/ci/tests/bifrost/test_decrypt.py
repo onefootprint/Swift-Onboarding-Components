@@ -68,7 +68,7 @@ def test_decrypt_biometric(
 
 
 def test_bootstrapped_data(sandbox_tenant):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     data = {
         "id.first_name": "Hayes",
         "id.middle_name": "Best",

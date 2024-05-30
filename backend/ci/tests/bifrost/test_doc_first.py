@@ -4,7 +4,7 @@ from tests.bifrost_client import BifrostClient
 
 
 def test_doc_first(sandbox_tenant, doc_first_obc):
-    bifrost = BifrostClient.new(doc_first_obc)
+    bifrost = BifrostClient.new_user(doc_first_obc)
     user = bifrost.run()
 
     # These should be ordered
@@ -33,7 +33,7 @@ def test_doc_first(sandbox_tenant, doc_first_obc):
 
 
 def test_doc_first_edit_data(sandbox_tenant, doc_first_obc):
-    bifrost = BifrostClient.new(doc_first_obc)
+    bifrost = BifrostClient.new_user(doc_first_obc)
     bifrost.handle_requirements(kind="collect_document")
     # Update the information after populating it from OCR data
 

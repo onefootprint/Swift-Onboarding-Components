@@ -27,7 +27,7 @@ def user_with_token(sandbox_tenant, auth_playbook):
     """
     An existing user and an auth token for it that can be used to update the user's auth methods
     """
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
     return get_auth_token_for_ci_update(user, auth_playbook)
@@ -148,9 +148,7 @@ def test_add_phone(skip_phone_obc):
     bifrost = BifrostClient.raw_auth(
         skip_phone_obc,
         FpAuth(body["auth_token"]),
-        FIXTURE_PHONE_NUMBER,
         sandbox_id,
-        override_email=FIXTURE_EMAIL,
     )
     user = bifrost.run()
 
@@ -322,7 +320,7 @@ def test_replace_passkey(user_with_token):
 
 
 def test_add_passkey(sandbox_tenant, auth_playbook):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     # Skip registering a passkey during onboarding so we can add it later
     post("hosted/onboarding/skip_passkey_register", None, bifrost.auth_token)
     user = bifrost.run()

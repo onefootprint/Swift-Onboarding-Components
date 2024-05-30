@@ -8,7 +8,7 @@ from tests.integrations.test_alpaca import alpaca_kyc_ob_config
 def test_aml(sandbox_tenant, must_collect_data):
     sandbox_id = f"manualreview{_gen_random_n_digit_number(10)}"
     obc = alpaca_kyc_ob_config(sandbox_tenant, must_collect_data + ["investor_profile"])
-    bifrost = BifrostClient.create(obc, override_sandbox_id=sandbox_id)
+    bifrost = BifrostClient.new_user(obc, override_sandbox_id=sandbox_id)
     user = bifrost.run()
 
     risk_signals = get(

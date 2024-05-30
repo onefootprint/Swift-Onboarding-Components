@@ -4,7 +4,7 @@ from tests.utils import open_multipart_file
 
 
 def test_historical_data(sandbox_tenant):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
     data = get(f"entities/{user.fp_id}/data", None, *sandbox_tenant.db_auths)
@@ -70,7 +70,7 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
             )
         ],
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
     post(
         f"users/{user.fp_id}/vault/document.id_card.front.image/upload",
@@ -135,7 +135,7 @@ def test_historical_documents(sandbox_tenant, must_collect_data):
 
 
 def test_historical_risk_signals(sandbox_tenant):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
     body = get(f"entities/{user.fp_id}/risk_signals", None, *sandbox_tenant.db_auths)

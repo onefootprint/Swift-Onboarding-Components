@@ -86,7 +86,7 @@ def test_redo_kyc(sandbox_tenant, with_document, doc_first_obc):
         obc = doc_first_obc
     else:
         obc = sandbox_tenant.default_ob_config
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     sandbox_user = bifrost.run()
     fp_id = sandbox_user.fp_id
 
@@ -254,7 +254,7 @@ def test_retrigger_onboard(sandbox_tenant, must_collect_data):
     ],
 )
 def test_collect_document(document_configs, sandbox_tenant, expected_docs, expected_mr):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
 
     status = bifrost.validate_response["user"]["status"]
@@ -322,9 +322,8 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
     """
     Ensure we can initiate a trigger for a user that has only an incomplete workflow. We should error if an id doc is requested
     """
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     sandbox_id = bifrost.sandbox_id
-    phone_number = bifrost.data["id.phone_number"]
 
     # Don't finish onboarding. Grab fp_id from dashboard
     data = dict(pagination=dict(page_size=100))
@@ -347,7 +346,7 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
-        sandbox_tenant.default_ob_config, auth_token, phone_number, sandbox_id
+        sandbox_tenant.default_ob_config, auth_token, sandbox_id
     )
     bifrost.run()
 
@@ -356,7 +355,7 @@ def test_cant_make_multiple_wfs(sandbox_tenant):
     """
     Ensure we cannot reonboard multiple times using the link sent to the user
     """
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
 
     # Trigger redo KYC
@@ -382,7 +381,7 @@ def test_complete_trigger_w_user_specific_token(sandbox_tenant):
     Use a user-specific token to finish the redo flow. This should inherit the outstanding
     WorkflowRequest
     """
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
 
     # Trigger redo KYC

@@ -101,7 +101,7 @@ def vault2(sandbox_id, sandbox_tenant):
     """
     Tenant A - vault made via bifrost and fully onboarded/portablized
     """
-    bifrost = BifrostClient.create(
+    bifrost = BifrostClient.new_user(
         sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
     )
     bifrost.data["id.first_name"] = "From Tenant A"
@@ -197,7 +197,7 @@ def test_identify_priority(
         # by identify is to onboard it and check the PII
         # Maybe it would be nice to expose via API to integration tests the underlying vault ID
         # TODO test identifying on email
-        bifrost = BifrostClient.inherit(obc, sandbox_id)
+        bifrost = BifrostClient.inherit_user(obc, sandbox_id)
         fp_id = bifrost.run().fp_id
         data = dict(fields=["id.first_name"], reason="flerp")
         body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)
@@ -226,7 +226,7 @@ def test_identify_with_non_portable_api_vault(
     post("users", vault_data, tenant.s_sk, sandbox_id_h)
 
     vault2
-    bifrost = BifrostClient.inherit(tenant_sandbox_obc, sandbox_id)
+    bifrost = BifrostClient.inherit_user(tenant_sandbox_obc, sandbox_id)
     fp_id = bifrost.run().fp_id
     data = dict(fields=["id.first_name"], reason="flerp")
     body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)
@@ -297,7 +297,7 @@ def test_login_flow(sandbox_user, sandbox_tenant, must_collect_data):
 
 
 def test_login_flow_new_tenant(sandbox_tenant, sandbox_user, foo_sandbox_tenant):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
 
     obc = foo_sandbox_tenant.default_ob_config

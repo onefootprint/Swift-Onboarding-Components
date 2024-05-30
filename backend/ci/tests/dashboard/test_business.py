@@ -19,7 +19,7 @@ def populated_business_data(kyb_cdos):
 
 @pytest.fixture(scope="session")
 def primary_bo(kyb_sandbox_ob_config):
-    bifrost = BifrostClient.new(kyb_sandbox_ob_config)
+    bifrost = BifrostClient.new_user(kyb_sandbox_ob_config)
     user = bifrost.run()
     assert [i["kind"] for i in bifrost.handled_requirements] == [
         "collect_business_data",

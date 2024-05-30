@@ -22,7 +22,7 @@ def test_onboarded_vault(ob_config, sandbox_tenant):
     Test creating a token for a user who has already onboarded onto a KYC playbook.
     Run that token through bifrost onboarding onto a different playbook.
     """
-    bifrost = BifrostClient.new(ob_config)
+    bifrost = BifrostClient.new_user(ob_config)
     user = bifrost.run()
 
     # Go through onboarding with a token made from a user that already onboarded
@@ -140,7 +140,7 @@ def test_reonboard(ob_config, sandbox_tenant, operation_kind):
     Test creating a token to onboard a user onto the same KYC playbook they already onboarded onto.
     Once with the reonboard convenience operation alias and again with the onboard operation
     """
-    bifrost1 = BifrostClient.new(ob_config)
+    bifrost1 = BifrostClient.new_user(ob_config)
     user = bifrost1.run()
 
     # Onboard this user onto the same ob config twice. This should make two workflows and two decisions
@@ -176,7 +176,7 @@ def test_provide_publishable_key_on_client(sandbox_tenant, ob_config):
     Test omitting the publishable key when creating the user-specific token.
     Add the publishable key via POST /hosted/onboarding
     """
-    bifrost1 = BifrostClient.new(ob_config)
+    bifrost1 = BifrostClient.new_user(ob_config)
     user = bifrost1.run()
 
     # Create a token not linked to an OBC
@@ -248,7 +248,9 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     assert set(body["user"]["available_challenge_kinds"]) >= {"sms"}
 
     # Now, one-click onboard onto another tenant!
-    bifrost = BifrostClient.inherit(foo_sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost = BifrostClient.inherit_user(
+        foo_sandbox_tenant.default_ob_config, sandbox_id
+    )
     foo_user = bifrost.run()
     assert set(r["kind"] for r in foo_user.client.handled_requirements) == {
         "authorize",

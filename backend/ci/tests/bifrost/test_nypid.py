@@ -55,7 +55,9 @@ def test_portablize_nypid_via_auth(sandbox_tenant, foo_sandbox_tenant, auth_play
 
     # Now, when one-click onboarding onto another tenant, we should prefill this data instead of
     # using the data that is filled in by the Bifrost client
-    bifrost = BifrostClient.inherit(foo_sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost = BifrostClient.inherit_user(
+        foo_sandbox_tenant.default_ob_config, sandbox_id
+    )
     user = bifrost.run()
 
     # Double check the data was prefilled
@@ -92,7 +94,7 @@ def test_portablize_nypid_via_kyc(sandbox_tenant, foo_sandbox_tenant):
     assert all(not i["is_verified"] for i in body["user"]["auth_methods"])
 
     # Inherit the user via identify flow
-    bifrost = BifrostClient.inherit(sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost = BifrostClient.inherit_user(sandbox_tenant.default_ob_config, sandbox_id)
 
     # After we mark this API-created vault as verified after logging into it, it should still be
     # visible via identify by any tenant and should now have a verified auth method.
@@ -129,7 +131,9 @@ def test_portablize_nypid_via_kyc(sandbox_tenant, foo_sandbox_tenant):
 
     # Now, when one-click onboarding onto another tenant, we should prefill this data instead of
     # using the data that is filled in by the Bifrost client
-    bifrost = BifrostClient.inherit(foo_sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost = BifrostClient.inherit_user(
+        foo_sandbox_tenant.default_ob_config, sandbox_id
+    )
     user = bifrost.run()
     # Double check the data was prefilled
     body = get(f"entities/{user.fp_id}", None, *foo_sandbox_tenant.db_auths)
@@ -175,7 +179,9 @@ def test_portablize_nypid_by_email_then_phone(sandbox_tenant, foo_sandbox_tenant
 
     # Now, when one-click onboarding onto another tenant, we should prefill this data instead of
     # using the data that is filled in by the Bifrost client
-    bifrost = BifrostClient.inherit(foo_sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost = BifrostClient.inherit_user(
+        foo_sandbox_tenant.default_ob_config, sandbox_id
+    )
     user = bifrost.run()
 
     # Double check the data was prefilled

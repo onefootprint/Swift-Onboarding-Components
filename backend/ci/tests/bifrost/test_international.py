@@ -10,7 +10,7 @@ def test_international_address_req(sandbox_tenant, must_collect_data):
         must_collect_data,
         allow_international_residents=True,
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
 
     # Add address line 1 and country, which is sufficient ONLY if the country is non-US
     data = {"id.address_line1": "730 Hayes St", "id.country": "US"}
@@ -47,7 +47,7 @@ def test_user_without_documents_international(
         can_access_data,
         allow_international_residents=True,
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     status = bifrost.get_status()
     doc_requirement_before = get_requirement_from_requirements(
         "collect_document", status["all_requirements"]
@@ -90,7 +90,7 @@ def test_with_documents_handles_international_address(
         can_access_data + ["document_and_selfie"],
         allow_international_residents=True,
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     bifrost.data["id.country"] = "MX"
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
@@ -127,7 +127,7 @@ def test_with_documents_handles_international_address_restricted_documents(
         allow_international_residents=True,
         international_country_restrictions=["MX", "NO"],
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     bifrost.data["id.country"] = "MX"
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
@@ -164,7 +164,7 @@ def test_with_documents_handles_international_address_restricted_documents_with_
         allow_international_residents=True,
         international_country_restrictions=["US", "MX", "NO"],
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     status_before_address = bifrost.get_status()
     doc_requirement_before_address = get_requirement_from_requirements(
         "collect_document", status_before_address["all_requirements"]
@@ -220,7 +220,7 @@ def test_us_legal_status(sandbox_tenant):
         optional_data=[],
         allow_international_residents=True,
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
 
     status_before_address = bifrost.get_status()
     collect_data_requirement_before_address = get_requirement_from_requirements(

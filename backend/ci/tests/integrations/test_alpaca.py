@@ -104,7 +104,7 @@ def test_alpaca_cip(
         ]
         + cdos_for_nationality_config(nationality_config),
     )
-    bifrost = BifrostClient.create(
+    bifrost = BifrostClient.new_user(
         obc,
         override_sandbox_id=sandbox_id,
         override_email=email,
@@ -275,13 +275,13 @@ def test_alpaca_cip(
 
         # sanity check that we aren't accidently scrubbing PII in the alpaca CIP
         assert "SCRUBBED" not in str(body["alpaca_response"])
-        
-         # Make sure we have a timeline event for external integration being called
-        body = get(
-            f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths
-        )
+
+        # Make sure we have a timeline event for external integration being called
+        body = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
         cip_api_events = [
-            i["event"]["data"]["kind"] for i in body if i["event"]["kind"] == "external_integration_called"
+            i["event"]["data"]["kind"]
+            for i in body
+            if i["event"]["kind"] == "external_integration_called"
         ]
         assert cip_api_events == ["alpaca_cip"]
 

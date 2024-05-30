@@ -17,7 +17,7 @@ def user_with_documents(doc_request_sandbox_ob_config):
     Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
     with document info as well
     """
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
     user = bifrost.run()
     doc_requirement = next(
         r for r in bifrost.handled_requirements if r["kind"] == "collect_document"
@@ -150,7 +150,7 @@ def test_get_entity_documents_with_lots_of_docs(sandbox_tenant, must_collect_dat
             dict(kind="proof_of_ssn", data=dict()),
         ],
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
 
     # Then, also upload some docs via API
@@ -287,7 +287,7 @@ def test_legacy_poa_dis(sandbox_tenant, must_collect_data):
             dict(kind="proof_of_address", data=dict()),
         ],
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
 
     TESTS = [

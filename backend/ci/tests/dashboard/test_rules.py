@@ -178,7 +178,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
     rule1 = next(r for r in res if r["name"] == rule1["name"])
     rule2 = next(r for r in res if r["name"] == rule2["name"])
 
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
 
     timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
@@ -308,7 +308,7 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
         expected_status,
         expected_rule_results,
     ) in expected_rule_evals:
-        bifrost = BifrostClient.new(obc)
+        bifrost = BifrostClient.new_user(obc)
         patch("hosted/user/vault", vault_data, bifrost.auth_token)
         user = bifrost.run()
         fp_id = user.fp_id
@@ -436,7 +436,7 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
         must_collect_data,
         can_access_data,
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     bifrost.fixture_result = (
         "document_decision"  # Misnomer, but just means we'll evaluate rules
     )
@@ -483,7 +483,7 @@ def test_ip_address_rules(sandbox_tenant, must_collect_data, can_access_data):
     )
 
     # Rerun Bifrost in a new sandbox.
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     bifrost.fixture_result = (
         "document_decision"  # Misnomer, but just means we'll evaluate rules
     )

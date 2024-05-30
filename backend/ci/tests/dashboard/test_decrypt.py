@@ -72,7 +72,7 @@ def test_tenant_image_decrypt(
     sandbox_tenant,
     doc_request_sandbox_ob_config,
 ):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
     user = bifrost.run()
 
     data = {
@@ -120,7 +120,7 @@ def test_decrypt_optional(sandbox_tenant):
         ["phone_number"],
         optional_data=["ssn9"],
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
 
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)

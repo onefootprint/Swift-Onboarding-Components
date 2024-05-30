@@ -36,7 +36,7 @@ def restricted_doc_ob_config_only_international(
 
 
 def test_upload_documents(doc_request_sandbox_ob_config):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
     doc_requirement = bifrost.get_requirement("collect_document")
 
     # First, make a few upload sessions that are aborted
@@ -104,7 +104,7 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
         ],
     )
 
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     bifrost.fixture_result = "document_decision"
     user = bifrost.run()
     assert any(
@@ -158,7 +158,7 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
     We should leave the SV status untouched, but still be able to raise a manual review.
     """
     # First, make a user
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     bifrost.fixture_result = initial_fixture_result
     user = bifrost.run()
     assert bifrost.validate_response["user"]["status"] == initial_fixture_result
@@ -181,7 +181,7 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
     assert not body, "Non-id doc playbook should not have any rules"
 
     # Onboard the user to the doc-only playbook
-    bifrost = BifrostClient.inherit(doc_playbook, bifrost.sandbox_id)
+    bifrost = BifrostClient.inherit_user(doc_playbook, bifrost.sandbox_id)
     bifrost.fixture_result = "document_decision"
     user2 = bifrost.run()
     # The initial status should remain unchanged
@@ -192,7 +192,7 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
 def test_upload_documents_with_ob_config_restriction_legacy_version(
     restricted_doc_ob_config,
 ):
-    bifrost = BifrostClient.new(restricted_doc_ob_config)
+    bifrost = BifrostClient.new_user(restricted_doc_ob_config)
     doc_requirement = bifrost.get_requirement("collect_document")
 
     # Manually handle the document requirement with some invalid data
@@ -236,7 +236,7 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
 def test_upload_documents_with_ob_config_restriction(
     restricted_doc_ob_config_only_international,
 ):
-    bifrost = BifrostClient.new(restricted_doc_ob_config_only_international)
+    bifrost = BifrostClient.new_user(restricted_doc_ob_config_only_international)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     doc_requirement = bifrost.get_requirement("collect_document")
@@ -304,7 +304,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
             "country_specific": {"US": ["drivers_license"]},
         },
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     doc_requirement = bifrost.get_requirement("collect_document")
@@ -376,7 +376,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
 
 
 def test_user_skipping_selfie(doc_request_sandbox_ob_config):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     status = bifrost.get_status()
@@ -428,7 +428,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config):
 
 
 def test_upload_apis(doc_request_sandbox_ob_config):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
     doc_requirement = bifrost.get_requirement("collect_document")
 
     # consent
@@ -492,7 +492,7 @@ def test_upload_apis(doc_request_sandbox_ob_config):
 
 
 def test_user_uploading_small_image(doc_request_sandbox_ob_config):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     doc_requirement = bifrost.get_requirement("collect_document")
@@ -526,7 +526,7 @@ def test_user_uploading_small_image(doc_request_sandbox_ob_config):
 def test_user_having_trouble_with_their_mobile_camera(
     sandbox_tenant, doc_request_sandbox_ob_config
 ):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
+    bifrost = BifrostClient.new_user(doc_request_sandbox_ob_config)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     doc_requirement = bifrost.get_requirement("collect_document")
@@ -589,7 +589,7 @@ def test_no_documents_set_on_obc(sandbox_tenant, must_collect_data, can_access_d
         # thing under test, empty
         document_types_and_countries={"global": [], "country_specific": {}},
     )
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
     status = bifrost.get_status()
     doc_requirement = get_requirement_from_requirements(
         "collect_document", status["all_requirements"]

@@ -26,7 +26,7 @@ def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
             else None
         ),
     )
-    bifrost = BifrostClient.new(obc, override_ob_config_auth=None)
+    bifrost = BifrostClient.new_user(obc, override_ob_config_auth=None)
 
     collect_data_req = get_requirement_from_requirements(
         "collect_data", bifrost.get_status()["all_requirements"], is_met=False
@@ -117,7 +117,7 @@ def test_middle_name(sandbox_tenant, middle_name, can_access_name):
     )
 
     di = "id.middle_name"
-    bifrost = BifrostClient.new(obc)
+    bifrost = BifrostClient.new_user(obc)
 
     if middle_name:
         bifrost.data[di] = middle_name

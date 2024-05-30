@@ -26,7 +26,7 @@ def test_deterministic_onboarding(
 ):
     seed = _gen_random_n_digit_number(10)
     sandbox_id = f"{sandbox_id}{seed}"
-    bifrost = BifrostClient.create(
+    bifrost = BifrostClient.new_user(
         sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
     )
     bifrost.vault_barcode_with_doc = False  # hack cause /vault barfs when trying to vault barcode during stepup because stepup workflow state only gives the AddDocument guard, not the AddData guard

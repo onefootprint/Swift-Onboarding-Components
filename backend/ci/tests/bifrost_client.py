@@ -52,7 +52,7 @@ class BifrostClient:
             provide_playbook_auth,
         )
 
-    def inherit(ob_config, sandbox_id, override_ob_config_auth=None):
+    def inherit_user(ob_config, sandbox_id, override_ob_config_auth=None):
         """
         Create an instance of BifrostClient that inherits the user with the provided phone number.
         """
@@ -60,29 +60,19 @@ class BifrostClient:
         auth = IdentifyClient(ob_config_auth, sandbox_id).inherit()
         return BifrostClient(ob_config, auth, sandbox_id)
 
-    def create(
+    def new_user(
         ob_config,
         override_sandbox_id=None,
         override_ob_config_auth=None,
         override_email=None,
     ):
         """
-        Create an instance of BifrostClient that creates a new user with the provided phone number.
+        Create an instance of BifrostClient that creates a new sandbox user with the fixture phone number
         """
-        # TODO I realize this has evolved to be the same as BifrostClient.new(). We could consolidate
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = override_sandbox_id or _gen_random_sandbox_id()
         auth_token = IdentifyClient(ob_config_auth, sandbox_id).create_user()
         return BifrostClient(ob_config, auth_token, sandbox_id, override_email)
-
-    def new(ob_config, override_ob_config_auth=None):
-        """
-        Create an instance of BifrostClient that creates a new sandbox user with the fixture phone number
-        """
-        ob_config_auth = override_ob_config_auth or ob_config.key
-        sandbox_id = _gen_random_sandbox_id()
-        auth_token = IdentifyClient(ob_config_auth, sandbox_id).create_user()
-        return BifrostClient(ob_config, auth_token, sandbox_id)
 
     def __init__(
         self,

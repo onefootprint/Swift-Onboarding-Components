@@ -206,7 +206,7 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data, ky
         must_collect_data + kyb_cdos,
         can_access_data + kyb_cdos,
         kind="kyb",
-        verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}]
+        verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
     )
 
 
@@ -233,7 +233,7 @@ def sandbox_user(sandbox_tenant):
     """
     from tests.bifrost_client import BifrostClient
 
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
     # These should be ordered
     assert [i["kind"] for i in bifrost.handled_requirements] == [

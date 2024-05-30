@@ -18,6 +18,7 @@ impl DbToApi<PrivateBusinessOwnerInfo> for api_wire_types::PrivateBusinessOwner 
         } else {
             (None, None)
         };
+
         Self {
             status,
             id,
