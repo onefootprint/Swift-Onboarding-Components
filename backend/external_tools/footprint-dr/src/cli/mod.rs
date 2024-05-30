@@ -15,6 +15,7 @@ use std::path::PathBuf;
 
 mod api_client;
 mod login;
+mod status;
 mod wire_types;
 
 
@@ -186,6 +187,7 @@ pub fn run() -> Result<()> {
 
     match subcommand {
         Subcommand::Login { sandbox } => login::login_cmd(api_root, sandbox.live.into()),
+        Subcommand::Status { sandbox } => status::status_cmd(api_root, sandbox.live.into()),
         _ => {
             unimplemented!()
         }
