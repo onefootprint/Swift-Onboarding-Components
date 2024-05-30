@@ -11,5 +11,8 @@ anyhow =  { workspace = true }
 clap = { workspace = true }
 env_logger = { workspace = true }
 log = { workspace = true }
+rpassword = { workspace = true }
+keyring = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
+termcolor = { workspace = true }

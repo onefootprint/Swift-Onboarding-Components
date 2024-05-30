@@ -1,9 +1,10 @@
-#![allow(dead_code)]
 use super::wire_types::VaultDrStatus;
 use anyhow::{
+    Context,
     Ok,
     Result,
 };
+use keyring::Entry;
 use reqwest::blocking::{
     Client,
     RequestBuilder,
@@ -21,6 +22,7 @@ use std::fmt::{
     Display,
     Formatter,
 };
+use std::ops::Not;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub(crate) enum IsLive {
@@ -34,6 +36,17 @@ impl From<bool> for IsLive {
             IsLive::Live
         } else {
             IsLive::Sandbox
+        }
+    }
+}
+
+impl Not for IsLive {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self {
+            IsLive::Sandbox => IsLive::Live,
+            IsLive::Live => IsLive::Sandbox,
         }
     }
 }
@@ -92,6 +105,30 @@ impl VaultDrApiClient {
             api_key,
             client,
         })
+    }
+
+    fn keyring_entry(api_root: &Url, is_live: IsLive) -> Result<Entry> {
+        let service_name = match is_live {
+            IsLive::Sandbox => format!("footprint-dr sandbox: {}", api_root),
+            IsLive::Live => format!("footprint-dr live: {}", api_root),
+        };
+        Entry::new(&service_name, "api_key").with_context(|| "Failed to create keyring entry")
+    }
+
+    pub(crate) fn try_from_keyring(api_root: &Url, is_live: IsLive) -> Result<Self> {
+        let entry = Self::keyring_entry(api_root, is_live)?;
+        let secret_key = entry
+            .get_password()
+            .with_context(|| "Failed to retrieve API key from keyring")?;
+
+        Self::new(api_root.clone(), is_live, ApiKey::new(secret_key))
+    }
+
+    pub(crate) fn save_to_keyring(&self) -> Result<()> {
+        let entry = Self::keyring_entry(&self.api_root, self.is_live)?;
+        entry
+            .set_password(self.api_key.leak_ref())
+            .with_context(|| "Failed to save API key to keyring")
     }
 
     fn request(&self, method: Method, path: &str) -> Result<RequestBuilder> {

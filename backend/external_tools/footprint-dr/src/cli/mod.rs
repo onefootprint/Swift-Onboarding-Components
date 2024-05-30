@@ -14,6 +14,7 @@ use reqwest::Url;
 use std::path::PathBuf;
 
 mod api_client;
+mod login;
 mod wire_types;
 
 
@@ -182,8 +183,9 @@ pub fn run() -> Result<()> {
         Command::command().print_help()?;
         std::process::exit(1);
     };
-    #[allow(clippy::match_single_binding)]
+
     match subcommand {
+        Subcommand::Login { sandbox } => login::login_cmd(api_root, sandbox.live.into()),
         _ => {
             unimplemented!()
         }
