@@ -365,7 +365,9 @@
       "city": "City",
       "state": "State",
       "country": "Country",
-      "zip": "Zip code"
+      "zip": "Zip code",
+      "formation_state": "Formation state",
+      "formation_date": "Formation date"
     },
     "card": {
       "issuer": "Issuer",

@@ -36,6 +36,12 @@ const useFieldsets = (): Fieldset => {
         {
           di: BusinessDI.phoneNumber,
         },
+        {
+          di: BusinessDI.formationState,
+        },
+        {
+          di: BusinessDI.formationDate,
+        },
       ],
     },
     bos: {

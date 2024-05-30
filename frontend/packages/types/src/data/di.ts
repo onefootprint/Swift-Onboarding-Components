@@ -13,6 +13,8 @@ export enum BusinessDI {
   state = 'business.state',
   country = 'business.country',
   zip = 'business.zip',
+  formationState = 'business.formation_state',
+  formationDate = 'business.formation_date',
 }
 
 export enum InvestorProfileDI {

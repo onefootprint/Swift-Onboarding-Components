@@ -55,7 +55,7 @@ export const documentCdoFor = (
 
 export const CollectedKybDataOptionToRequiredAttributes: Record<
   CollectedKybDataOption,
-  BusinessDI[]
+  Exclude<BusinessDI, BusinessDI.formationDate | BusinessDI.formationState>[] // We only get formation date and state from Middesk
 > = {
   [CollectedKybDataOption.name]: [BusinessDI.name],
   [CollectedKybDataOption.tin]: [BusinessDI.tin],
