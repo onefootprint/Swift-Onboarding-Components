@@ -89,6 +89,7 @@ pub async fn create_bill_for_tenant(
             let counts = BillingCounts {
                 pii,
                 kyc,
+                one_click_kyc: billing_event_counts.get(&BillingEventKind::OneClickKyc).cloned(),
                 kyc_waterfall_second_vendor: billing_event_counts
                     .get(&BillingEventKind::KycWaterfallSecondVendor)
                     .cloned(),

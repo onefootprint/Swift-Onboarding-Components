@@ -215,6 +215,7 @@ async fn test_run_kyc_waterfall(
     )
     .await;
 
+    let sv_id = wf.scoped_vault_id.clone();
     let di = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -226,10 +227,7 @@ async fn test_run_kyc_waterfall(
             };
             DbTenantVendorControl::update_or_create(conn, &t.id, args).unwrap();
 
-            Ok(
-                DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &wf.scoped_vault_id, None)
-                    .unwrap(),
-            )
+            Ok(DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &sv_id, None).unwrap())
         })
         .await
         .unwrap();
@@ -243,7 +241,7 @@ async fn test_run_kyc_waterfall(
     } = run1;
     mock_calls(state, experian_response.clone(), idology_response.clone());
     // Function under test
-    let res = waterfall::run_kyc_waterfall(state, &di, &wf.id).await;
+    let res = waterfall::run_kyc_waterfall(state, &di, &wf).await;
     // Assertions
     assert_expected_result_with_wfe(
         state,
@@ -265,7 +263,7 @@ async fn test_run_kyc_waterfall(
     } = run2;
     mock_calls(state, experian_response2.clone(), idology_response2.clone());
     // Function under test
-    let res2 = waterfall::run_kyc_waterfall(state, &di, &wf.id).await;
+    let res2 = waterfall::run_kyc_waterfall(state, &di, &wf).await;
     // Assertions
     assert_expected_result_with_wfe(
         state,

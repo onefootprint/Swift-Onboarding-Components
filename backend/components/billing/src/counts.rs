@@ -14,8 +14,10 @@ pub struct BillingCounts {
     /// Total number user vaults with billable PII - either an authorized workflow OR created via
     /// API
     pub pii: i64,
-    /// Number of KYC verifications ran this month
+    /// Number of KYC verifications ran this month, not including one-click onboardings
     pub kyc: i64,
+    /// Number of KYC verifications ran from one-click onboardings
+    pub one_click_kyc: Option<i64>,
     pub kyc_waterfall_second_vendor: Option<i64>,
     pub kyc_waterfall_third_vendor: Option<i64>,
     /// Number of KYB verifications ran this month
@@ -60,6 +62,7 @@ impl BillingCounts {
         let &BillingCounts {
             pii,
             kyc,
+            one_click_kyc,
             kyc_waterfall_second_vendor,
             kyc_waterfall_third_vendor,
             kyb,
@@ -73,6 +76,7 @@ impl BillingCounts {
             continuous_monitoring_per_year,
         } = self;
         pii + kyc
+            + one_click_kyc.unwrap_or_default()
             + kyc_waterfall_second_vendor.unwrap_or_default()
             + kyc_waterfall_third_vendor.unwrap_or_default()
             + kyb
@@ -91,6 +95,7 @@ impl BillingCounts {
         match product {
             Product::Pii => Some(self.pii),
             Product::Kyc => Some(self.kyc),
+            Product::OneClickKyc => self.one_click_kyc,
             Product::KycWaterfallSecondVendor => self.kyc_waterfall_second_vendor,
             Product::KycWaterfallThirdVendor => self.kyc_waterfall_third_vendor,
             Product::Kyb => Some(self.kyb),

@@ -81,6 +81,7 @@ fn get_price_from(profile: Option<&DbBillingProfile>, product: Product) -> Optio
     match product {
         Product::Pii => profile.pii.as_deref(),
         Product::Kyc => profile.kyc.as_deref(),
+        Product::OneClickKyc => profile.one_click_kyc.as_deref(),
         Product::KycWaterfallSecondVendor => profile.kyc_waterfall_second_vendor.as_deref(),
         Product::KycWaterfallThirdVendor => profile.kyc_waterfall_third_vendor.as_deref(),
         Product::Kyb => profile.kyb.as_deref(),

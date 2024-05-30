@@ -5,8 +5,10 @@ use strum_macros::{
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter, Display, Ord, PartialOrd)]
 pub enum Product {
-    /// Number of KYC verifications ran this month
+    /// Number of KYC verifications ran this month, not including one-click onboardings
     Kyc,
+    /// Number of KYC verifications ran this month from one-click onboardings
+    OneClickKyc,
     /// Number of KYC verifications that contacted a second vendor in waterfall
     KycWaterfallSecondVendor,
     /// Number of KYC verifications that contacted a third vendor in waterfall
@@ -47,6 +49,7 @@ impl Product {
             Self::Kyb => "prod_NbtsYZ8CIBKWo2",
             Self::WatchlistChecks => "prod_NbtH04u60RlSWg",
             Self::Kyc => "prod_NPMdLP5c6udoVi",
+            Self::OneClickKyc => "prod_QC1i3DEeWac4Xy",
             Self::KycWaterfallSecondVendor => "prod_Q1mwTQQ0xcjBDu",
             Self::KycWaterfallThirdVendor => "prod_Q9b7G9YpzDznfs",
             Self::Pii => "prod_NPMd4yoHoFrHw7",
@@ -65,6 +68,7 @@ impl Product {
             Self::Kyb => "Uncontracted Kyb",
             Self::WatchlistChecks => "Uncontracted WatchlistChecks",
             Self::Kyc => "Uncontracted Kyc",
+            Self::OneClickKyc => "Uncontracted OneClickKyc",
             Self::KycWaterfallSecondVendor => "Uncontracted KycWaterfallSecondVendor",
             Self::KycWaterfallThirdVendor => "Uncontracted KycWaterfallThirdVendor",
             Self::Pii => "Uncontracted Pii",

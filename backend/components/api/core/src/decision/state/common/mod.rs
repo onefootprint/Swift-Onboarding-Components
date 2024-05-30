@@ -134,7 +134,7 @@ pub async fn run_kyc_vendor_calls(
     if fixture_decision.is_some() {
         Ok(decision::sandbox::save_fixture_vendor_result(&state.db_pool, &di, &wf).await?)
     } else {
-        vendor::kyc::waterfall::run_kyc_waterfall(state, &di, &wf.id).await
+        vendor::kyc::waterfall::run_kyc_waterfall(state, &di, &wf).await
     }
 }
 

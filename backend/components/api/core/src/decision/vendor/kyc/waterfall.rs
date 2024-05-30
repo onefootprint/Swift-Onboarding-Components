@@ -38,26 +38,21 @@ use db::models::waterfall_step::{
     UpdateWaterfallStep,
     WaterfallStep,
 };
+use db::models::workflow::Workflow;
 use itertools::Itertools;
 use newtypes::{
     BillingEventKind,
     ObConfigurationId,
-    ScopedVaultId,
     VerificationResultId,
     WaterfallExecutionId,
     WaterfallStepAction,
-    WorkflowId,
 };
 use std::collections::HashMap;
 
 #[tracing::instrument(skip(state))]
-pub async fn run_kyc_waterfall(
-    state: &State,
-    di: &DecisionIntent,
-    wf_id: &WorkflowId,
-) -> ApiResult<VendorResult> {
+pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow) -> ApiResult<VendorResult> {
     let svid = di.scoped_vault_id.clone();
-    let wf_id = wf_id.clone();
+    let wf_id = wf.id.clone();
     let (tenant_id, vw, obc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -109,7 +104,7 @@ pub async fn run_kyc_waterfall(
     if let Some(already_have_success_vr) =
         choose_best_waterfall_vendor_response(existing_successful_results, &vw, &obc)
     {
-        complete_waterfall_execution(state, &di.scoped_vault_id, &obc.id, &waterfall_execution.id).await?;
+        complete_waterfall_execution(state, wf, &obc.id, &waterfall_execution.id).await?;
 
         return Ok(already_have_success_vr.clone());
     }
@@ -192,7 +187,7 @@ pub async fn run_kyc_waterfall(
         }
     }
 
-    complete_waterfall_execution(state, &di.scoped_vault_id, &obc.id, &waterfall_execution.id).await?;
+    complete_waterfall_execution(state, wf, &obc.id, &waterfall_execution.id).await?;
     let final_result =
         choose_best_waterfall_vendor_response(final_results.into_iter().flatten().collect(), &vw, &obc);
 
@@ -227,12 +222,15 @@ fn choose_best_waterfall_vendor_response(
 #[tracing::instrument(skip_all)]
 async fn complete_waterfall_execution(
     state: &State,
-    sv_id: &ScopedVaultId,
+    wf: &Workflow,
     obc_id: &ObConfigurationId,
     execution_id: &WaterfallExecutionId,
 ) -> ApiResult<()> {
     let eid = execution_id.clone();
-    let sv_id = sv_id.clone();
+    let sv_id = wf.scoped_vault_id.clone();
+    // TODO: eventually, we'll want to distinguish between how much data is actually used to one
+    // click
+    let is_one_click = wf.is_one_click;
     let obc_id = obc_id.clone();
     state
         .db_pool
@@ -247,8 +245,13 @@ async fn complete_waterfall_execution(
                 .iter()
                 .filter(|ws| !ws.verification_result_is_error.unwrap_or_default())
                 .count();
+            let kyc_bek = if !is_one_click {
+                BillingEventKind::Kyc
+            } else {
+                BillingEventKind::OneClickKyc
+            };
             let kyc_billing_event_kinds = vec![
-                BillingEventKind::Kyc,
+                kyc_bek,
                 BillingEventKind::KycWaterfallSecondVendor,
                 BillingEventKind::KycWaterfallThirdVendor,
             ];
