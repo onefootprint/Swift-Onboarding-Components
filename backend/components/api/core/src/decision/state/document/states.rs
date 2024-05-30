@@ -60,7 +60,6 @@ pub struct DocumentDataCollection {
 
 #[derive(Clone)]
 pub struct DocumentDecisioning {
-    #[allow(unused)]
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     t_id: TenantId,

@@ -271,7 +271,7 @@ pub fn handle_rules_output(
         Workflow::update(wf, conn, update)?;
         Ok(DecisionOutput::NonTerminal)
     } else {
-        risk::save_final_decision(conn, &wf.id, vres_ids, rules_output, rsr_id, vec![])?;
+        risk::save_final_decision(conn, &wf.id, vres_ids, rules_output, rsr_id, review_reasons)?;
         Ok(DecisionOutput::Terminal)
     }
 }

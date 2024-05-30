@@ -47,9 +47,7 @@ pub struct KycVendorCalls {
 
 #[derive(Clone)]
 pub struct KycDecisioning {
-    #[allow(unused)]
     wf_id: WorkflowId,
-    #[allow(unused)]
     sv_id: ScopedVaultId,
     t_id: TenantId,
     include_rules: IncludeRules,

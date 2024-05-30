@@ -392,7 +392,6 @@ async fn mark_status_as_complete(credentials: IncodeCredentialsWithToken) -> Api
 }
 
 #[tracing::instrument(skip_all)]
-#[allow(unused)]
 async fn add_customer_and_save_session(
     db_pool: &DbPool,
     credentials: IncodeCredentialsWithToken,
