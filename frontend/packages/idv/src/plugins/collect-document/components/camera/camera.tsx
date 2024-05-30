@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
-import { getLogger } from '../../../../utils/logger';
+import { getLogger, uniqueLogger } from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import {
   AUTOCAPTURE_RESTART_DELAY,
@@ -95,6 +95,8 @@ const CAMERA_LOADING_FEEDBACK_DELAY = 4000;
 const { logError, logInfo, logTrack, logWarn } = getLogger({
   location: 'camera',
 });
+
+const uniqLogTrack = uniqueLogger(logTrack);
 
 const videoElementStateListener =
   (
@@ -259,10 +261,10 @@ const Camera = ({
 
   useInterval(
     () => {
-      logTrack(
+      uniqLogTrack(
         `(interval) mediaStream state: ${
-          mediaStream ? 'defined' : 'undefined'
-        }, mediaStream active: ${mediaStream?.active}, onCanPlayTriggered: ${onCanPlayTriggered}, isVideoPlaying: ${isVideoPlaying}`,
+          mediaStream ? 1 : 0
+        }, mediaStream active: ${mediaStream?.active ? 1 : 0}, onCanPlayTriggered: ${onCanPlayTriggered ? 1 : 0}, isVideoPlaying: ${isVideoPlaying ? 1 : 0}`,
       );
       if (isVideoPlaying) {
         logInfo('(interval) video already playing');
@@ -289,7 +291,7 @@ const Camera = ({
 
   useTimeout(() => {
     if (!isCameraVisible) {
-      logWarn('camera not visible after timeout - forcing upload');
+      logWarn('camera not visible after timeout');
       onCameraStuck();
     }
   }, FORCED_UPLOAD_DELAY);

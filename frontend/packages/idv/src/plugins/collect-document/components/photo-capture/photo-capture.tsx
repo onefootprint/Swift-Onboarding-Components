@@ -10,10 +10,16 @@ import {
   NavigationHeader,
   useLayoutOptions,
 } from '../../../../components';
-import { Logger } from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../types';
-import { isDesktop, isDocument, isFace, isMobile } from '../../utils/capture';
+import {
+  bytesToMegabytes,
+  isDesktop,
+  isDocument,
+  isFace,
+  isMobile,
+} from '../../utils/capture';
 import Camera from '../camera';
 import AutoCaptureDoc from '../camera/auto-capture-doc';
 import AutoCaptureFace from '../camera/auto-capture-face';
@@ -58,7 +64,7 @@ const DesktopNavProps: NavigationHeaderLeftButtonProps = {
   confirmClose: true,
 };
 
-const logWarn = (e: string) => Logger.warn(e, { location: 'photo-capture' });
+const { logWarn, logInfo } = getLogger({ location: 'photo-capture' });
 
 const PhotoCapture = ({
   autocaptureKind,
@@ -130,7 +136,9 @@ const PhotoCapture = ({
       logWarn('Captured kind could not be determined - retaking the image');
       return;
     }
-    Logger.info(`Photocapture: image URL length ${image.length}`);
+    logInfo(
+      `Photocapture: image URL length ${bytesToMegabytes(image.length)} MB`,
+    );
 
     setIsLoading(true);
     const processResult = await processImageUrl(image, hasBadConnectivity);
@@ -144,8 +152,8 @@ const PhotoCapture = ({
 
     setIsLoading(false);
     const { file, extraCompressed } = processResult;
-    Logger.info(
-      `Photocapture: size of the processed file to be sent in machine event type 'receivedImage' is ${file.size}, file type ${file.type}`,
+    logInfo(
+      `Photocapture: size of the processed file to be sent in machine event type 'receivedImage' is ${bytesToMegabytes(file.size)} MB, file type ${file.type}`,
     );
     onComplete(file, extraCompressed, captureKind);
   };
@@ -166,9 +174,7 @@ const PhotoCapture = ({
   const handleCameraStuck = () => {
     if (shouldFallbackToUpload) {
       onCameraStuck?.();
-      logWarn('Camera is stuck - prompting user to upload document');
-    } else {
-      logWarn('Camera is stuck');
+      logInfo('Photocapture: Camera stuck, fallback to doc upload');
     }
   };
 

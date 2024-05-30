@@ -194,4 +194,14 @@ export const getLogger = (
     Logger.error(err, { ...preExtra, ...extra }, msg),
 });
 
+export const uniqueLogger = (logger: (_: string) => void) => {
+  let prev = '';
+  return (curr: string) => {
+    if (prev === curr) return undefined;
+
+    prev = curr;
+    return logger(curr);
+  };
+};
+
 export default Logger;
