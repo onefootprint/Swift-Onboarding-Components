@@ -6,6 +6,8 @@ use serde::{
     Deserialize,
     Serialize,
 };
+use std::str::FromStr;
+use strum_macros::EnumString;
 
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -21,17 +23,46 @@ pub struct CheckLVOrderStatus {
     pub control_number: Option<serde_json::Value>,
     pub order_date_time: Option<serde_json::Value>,
     pub order_completed_date_time: Option<serde_json::Value>,
-    pub links: Vec<OrderStatusLink>,
+    pub links: OrderStatusLinks,
 }
 
 impl CheckLVOrderStatus {
     pub fn report_id(&self) -> Option<SambaReportId> {
         // would we have more reports here?
-        self.links.first().map(|l| l.report_id.clone().into())
+        self.links
+            .get_link(SambaLinkType::LicenseReports)
+            .map(|l| l.report_id.into())
     }
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(EnumString, PartialEq, Eq)]
+pub enum SambaLinkType {
+    #[strum(serialize = "order")]
+    Order,
+    #[strum(serialize = "activityhistory")]
+    ActivityHistory,
+    #[strum(serialize = "licensevalidation")]
+    LicenseValidation,
+    #[strum(serialize = "licensereports")]
+    LicenseReports,
+}
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct OrderStatusLinks(pub Vec<OrderStatusLink>);
+impl OrderStatusLinks {
+    pub fn get_link(&self, link_type: SambaLinkType) -> Option<OrderStatusLink> {
+        self.0
+            .iter()
+            .find(|osl| {
+                let link = osl.rel.clone();
+                SambaLinkType::from_str(link.as_str())
+                    .map(|l| l == link_type)
+                    .unwrap_or(false)
+            })
+            .cloned()
+    }
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct OrderStatusLink {
     pub rel: String,
