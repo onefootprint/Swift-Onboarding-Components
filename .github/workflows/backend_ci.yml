@@ -138,7 +138,6 @@ jobs:
         ports:
           - 5432:5432
     env:
-      PR_NUMBER: ${{ github.event.number }}
       TEST_URL: 'http://localhost:8000'
       EXPECTED_SERVER_VERSION: ${{ github.sha }}
       IT_PHONE_NUMBERS: '["+1 202 952 1443", "+1 202 831 8398", "+1 202 946 3154", "+1 202 937 0987", "+1 202 759 2344", "+1 202 946 1521", "+1 202 998 5931", "+1 202 952 9077", "+1 202 740 9135", "+1 202 519 1954"]'

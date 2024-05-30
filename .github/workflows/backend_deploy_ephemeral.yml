@@ -109,7 +109,6 @@ jobs:
       pull-requests: write
     with:
       testUrl: '${{ needs.deploy_ephemeral_stack.outputs.url }}'
-      prNumber: ${{ github.event.number }}
       waitForDeploy: true
       isPR: true
       environment: dev

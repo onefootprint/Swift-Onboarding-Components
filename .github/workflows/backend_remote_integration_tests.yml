@@ -8,11 +8,6 @@ on:
         type: string
         required: true
 
-      prNumber:
-        description: 'PR number to post results to'
-        type: string
-        required: false
-
       isPR:
         description: 'is this a PR? Only used for ephemeral'
         type: boolean
@@ -54,7 +49,6 @@ jobs:
       matrix:
         python-version: ['3.11']
     env:
-      PR_NUMBER: ${{ inputs.prNumber }}
       TEST_URL: ${{ inputs.testUrl }}
       IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
