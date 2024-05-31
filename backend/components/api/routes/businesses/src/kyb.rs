@@ -119,7 +119,10 @@ pub async fn post(
                 .map_err(|_| DbError::PlaybookNotFound)?;
             tracing::info!(playbook_key=%obc.key, "Post /kyb with playbook");
             if obc.kind != ObConfigurationKind::Kyb {
-                return Err(ValidationError("Must use playbook of kind KYB").into());
+                return ValidationError("Must use playbook of kind KYB").into();
+            }
+            if !obc.skip_kyc {
+                return ValidationError("Cannot manually trigger KYB on a playbook that requires KYC").into();
             }
 
             let unaccessable_cdos: Vec<_> = obc
@@ -172,6 +175,9 @@ pub async fn post(
         })
         .await?;
 
+    // TODO shouldn't we return errors running KYB here? otherwise hard to tell what went wrong.
+    // Maybe we just want to mask HTTP 500s as they could be retried by us?
+    // But an HTTP 400 could be fixed by the tenant
     api_core::utils::kyb_utils::run_kyb(&state, auth.tenant(), biz_wf.clone()).await?;
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
