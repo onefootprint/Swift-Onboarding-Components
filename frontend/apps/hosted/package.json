@@ -37,7 +37,6 @@
     "@onefootprint/ui": "*",
     "@radix-ui/react-popover": "1.0.3",
     "@radix-ui/react-select": "^2.0.0",
-    "@sentry/nextjs": "^7.105.0",
     "@tanstack/react-query": "^4.35.7",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",

@@ -1,4 +1,3 @@
-// import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 // @ts-ignore
 import * as setupLogRocketReact from 'logrocket-react';

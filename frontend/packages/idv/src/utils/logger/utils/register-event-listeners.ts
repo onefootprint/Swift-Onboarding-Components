@@ -1,5 +1,3 @@
-// import * as Sentry from '@sentry/nextjs';
-
 import { Observe } from './observe';
 
 export const registerUnloadHandler = () => {
@@ -7,7 +5,6 @@ export const registerUnloadHandler = () => {
 
   window.addEventListener('beforeunload', () => {
     Observe.flush();
-    // Sentry.flush();
   });
 };
 

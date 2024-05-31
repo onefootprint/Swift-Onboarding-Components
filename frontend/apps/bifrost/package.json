@@ -36,7 +36,6 @@
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
-    "@sentry/nextjs": "^7.105.0",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-locales-sync": "^2.0.1",

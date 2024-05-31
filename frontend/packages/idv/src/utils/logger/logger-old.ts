@@ -1,6 +1,5 @@
 import { getSessionId } from '@onefootprint/dev-tools';
 import { IS_BROWSER, IS_PROD } from '@onefootprint/global-constants';
-import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 // @ts-ignore
 import * as setupLogRocketReact from 'logrocket-react';
@@ -17,7 +16,6 @@ const IS_LOGGING_ENABLED =
 export const COMMIT_SHA = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
 export const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_VERCEL_URL;
 export const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
-export const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 export const VERCEL_ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
 
 type PrimitiveData = Record<string, string | number | boolean>;
@@ -149,38 +147,6 @@ const configureLogRocket = (appName: string) => {
       release: COMMIT_SHA ?? '',
     });
   });
-
-  // Tie sentry issues to logrocket recordings
-  LogRocket.getSessionURL(sessionURL => {
-    Sentry.configureScope(scope => {
-      scope.setExtra('sessionURL', sessionURL);
-    });
-  });
-};
-
-const configureSentry = () => {
-  if (SENTRY_DSN && COMMIT_SHA) {
-    Sentry.init({
-      dsn: SENTRY_DSN,
-      release: COMMIT_SHA,
-      environment: VERCEL_ENV,
-      beforeSend(rawEvent) {
-        if (!IS_LOGGING_ENABLED) {
-          return rawEvent;
-        }
-        const event = { ...rawEvent };
-        if (!event.extra) {
-          event.extra = {};
-        }
-        const logRocketSession = LogRocket.sessionURL;
-        if (logRocketSession) {
-          event.extra.LogRocket = logRocketSession;
-        }
-        event.extra.sessionId = getSessionId();
-        return event;
-      },
-    });
-  }
 };
 
 const setupLogRocket = (appName: string) => {
@@ -190,14 +156,6 @@ const setupLogRocket = (appName: string) => {
 
   configureLogRocket(appName);
   registerErrorHandlers();
-};
-
-const setupSentry = () => {
-  if (!IS_LOGGING_ENABLED) {
-    return;
-  }
-
-  configureSentry();
 };
 
 const info = (message: string, location: string = '') => {
@@ -240,7 +198,7 @@ const Logger = {
   error,
   warn,
   info,
-  setupSentry,
+  setupSentry: () => undefined,
   setupLogRocket,
   identify,
   track,

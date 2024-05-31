@@ -7,7 +7,6 @@ export const BASE_URL_DOMAIN = 'onefootprint.com';
 export const COMMIT_SHA = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || '';
 export const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_VERCEL_URL || '';
 export const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
-export const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN || '';
 export const API_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || '';
 export const { NODE_ENV } = process.env;

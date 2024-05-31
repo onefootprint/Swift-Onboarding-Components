@@ -37,7 +37,7 @@ const getEnvInfo = async (): Promise<PrimitiveData> => {
     release: COMMIT_SHA || 'local',
     environment: VERCEL_ENV,
     apiUrl: API_URL,
-    nodeEnv: NODE_ENV,
+    nodeEnv: NODE_ENV || '',
     vercelEnv: VERCEL_ENV,
     gitCommitRef: VERCEL_GIT_COMMIT_REF,
     deploymentUrl: VERCEL_URL,

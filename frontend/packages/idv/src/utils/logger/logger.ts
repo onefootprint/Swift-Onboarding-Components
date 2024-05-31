@@ -1,7 +1,6 @@
 import { datadogLogs } from '@datadog/browser-logs';
 import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
-// import * as Sentry from '@sentry/nextjs';
 import * as LogRocket from 'logrocket';
 
 import { IS_LOGGING_ENABLED } from './constants';
@@ -31,12 +30,6 @@ import {
   registerErrorHandlers,
   registerUnloadHandler,
 } from './utils/register-event-listeners';
-// import initSentry, {
-//   sentryErrorEvent,
-//   sentryInfoEvent,
-//   sentryTrackEvent,
-//   sentryWarnEvent,
-// } from './utils/sentry';
 
 /**
  * Filters out any traits that are null, undefined, or empty strings.
@@ -63,7 +56,6 @@ const LoggerFactory = () => {
     appName = app;
     isLogRocketEnabled = !disableLogRocket;
 
-    // initSentry(appName);
     isObserveEnabled = initObserve(appName);
     isDataDogEnabled = initDataDog(appName);
     if (isLogRocketEnabled) {
@@ -74,7 +66,6 @@ const LoggerFactory = () => {
     getEnvInfo().then(identify).catch(console.warn);
 
     const onError = (error: Error) => {
-      // sentryErrorEvent(error);
       if (isObserveEnabled) observeErrorCauseEvent(error);
       if (isLogRocketEnabled) logRocketErrorEvent(error);
       if (isDataDogEnabled) dataDogErrorEvent(error);
@@ -90,8 +81,6 @@ const LoggerFactory = () => {
     const filteredTraits = filterNonEmptyTraits(traits);
     const sessionId = getSessionId();
 
-    // Sentry.setUser({ id: sessionId });
-    // Sentry.setTags(filteredTraits);
     if (isObserveEnabled) Observe.identify(sessionId, filteredTraits);
     if (isLogRocketEnabled) LogRocket.identify(sessionId, filteredTraits);
     if (isDataDogEnabled)
@@ -144,7 +133,6 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
     const filteredExtra = filterNonEmptyTraits(extra || {});
 
-    // sentryWarnEvent(msg, filteredExtra);
     if (isObserveEnabled) observeWarnEvent(msg, filteredExtra);
     if (isLogRocketEnabled) logRocketWarnEvent(msg, filteredExtra);
     if (isDataDogEnabled) dataDogWarnEvent(msg, filteredExtra, err);
@@ -154,7 +142,6 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
     const filteredExtra = filterNonEmptyTraits(extra || {});
 
-    // sentryInfoEvent(msg, filteredExtra);
     if (isObserveEnabled) observeInfoEvent(msg, filteredExtra);
     if (isLogRocketEnabled) logRocketInfoEvent(msg, filteredExtra);
     if (isDataDogEnabled) dataDogInfoEvent(msg, filteredExtra);
