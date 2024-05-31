@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import BillingProfile from '../billing-profile';
 import TenantInfo from '../tenant-info';
+import VendorControl from '../vendor-control';
 
 type ContentProps = {
   tenant: TenantDetail;
@@ -12,6 +13,7 @@ type ContentProps = {
 enum TabOption {
   tenantInfo = 'tenantInfo',
   billingProfile = 'billingProfile',
+  vendorControl = 'vendorControl',
 }
 
 const Content = ({ tenant }: ContentProps) => {
@@ -26,6 +28,10 @@ const Content = ({ tenant }: ContentProps) => {
       value: TabOption.billingProfile,
       label: 'Billing profile',
     },
+    {
+      value: TabOption.vendorControl,
+      label: 'Vendor control',
+    },
   ];
 
   const handleTabChange = (value: string) => {
@@ -38,6 +44,9 @@ const Content = ({ tenant }: ContentProps) => {
       {selectedTab === TabOption.tenantInfo && <TenantInfo tenant={tenant} />}
       {selectedTab === TabOption.billingProfile && (
         <BillingProfile tenant={tenant} />
+      )}
+      {selectedTab === TabOption.vendorControl && (
+        <VendorControl tenant={tenant} />
       )}
     </Stack>
   );

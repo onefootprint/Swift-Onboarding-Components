@@ -9,6 +9,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
+export type UpdateTenantVendorControl = {
+  idologyEnabled?: boolean;
+  experianEnabled?: boolean;
+  lexisEnabled?: boolean;
+  experianSubscriberCode?: string | null;
+  middeskApiKey?: string | null;
+};
+
 export type PrivatePatchTenantRequest = {
   name?: string;
   superTenantId?: string | null;
@@ -26,6 +34,7 @@ export type PrivatePatchTenantRequest = {
   allowedPreviewApis?: TenantPreviewApi[];
 
   billingProfile?: TenantBillingProfile;
+  vendorControl?: UpdateTenantVendorControl;
 };
 
 const patchTenant = async (

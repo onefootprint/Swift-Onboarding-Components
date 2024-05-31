@@ -56,6 +56,14 @@ export type TenantBillingProfile = Record<
   string | undefined | null
 >;
 
+export type TenantVendorControl = {
+  idologyEnabled: boolean;
+  experianEnabled: boolean;
+  lexisEnabled: boolean;
+  experianSubscriberCode?: string;
+  middeskApiKeyExists: boolean;
+};
+
 export type TenantDetail = {
   id: string;
   name: string;
@@ -80,4 +88,5 @@ export type TenantDetail = {
   appClipExperienceId: string;
 
   billingProfile?: TenantBillingProfile;
+  vendorControl?: TenantVendorControl;
 };

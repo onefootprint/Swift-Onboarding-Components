@@ -6,13 +6,7 @@ import type {
 import type { SelectOption } from '@onefootprint/ui';
 import type { PrivatePatchTenantRequest } from 'src/pages/internal/tenants/components/detail-drawer/hooks/use-update-tenant';
 
-const ifChanged = <T>(a: T, b: T) => {
-  if (Array.isArray(a) && Array.isArray(b)) {
-    const isArrayEq = a.length === b.length && a.every(x => b.includes(x));
-    return !isArrayEq ? a : undefined;
-  }
-  return a !== b ? a : undefined;
-};
+import { ifChanged, strOrNull } from '../../../utils/form-data-utils';
 
 export type UpdateTenantFormData = {
   name: string;
@@ -36,9 +30,8 @@ export const convertFormData = (
   formData: UpdateTenantFormData,
 ): PrivatePatchTenantRequest => ({
   name: ifChanged(formData.name, tenant.name),
-  // Empty super tenant ID is serialized as null to clear out
   superTenantId: ifChanged(
-    formData.superTenantId || null,
+    strOrNull(formData.superTenantId),
     tenant.superTenantId,
   ),
   isDemoTenant: ifChanged(formData.isDemoTenant, tenant.isDemoTenant),
