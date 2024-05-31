@@ -111,8 +111,8 @@ jobs:
       testUrl: '${{ needs.deploy_ephemeral_stack.outputs.url }}'
       waitForDeploy: true
       isPR: true
-      environment: dev
       expectedCommitHash: ${{ needs.build_backend.outputs.expectedServerVersion }}
+      environment_name: ephemeral
     secrets:
       IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}

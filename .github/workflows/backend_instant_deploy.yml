@@ -91,7 +91,7 @@ jobs:
       expectedCommitHash: ${{ needs.instant_deploy_stack.outputs.versionLong }}
       isPR: false
       waitForDeploy: true
-      environment: production
+      environment_name: production
     secrets:
       IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}

@@ -77,7 +77,7 @@ jobs:
       isPR: false
       waitForDeploy: true
       expectedCommitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
-      environment: dev
+      environment_name: dev
     secrets:
       IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}

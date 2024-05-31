@@ -25,8 +25,8 @@ on:
         type: string
         required: false
 
-      environment:
-        description: 'secrets environment to use'
+      environment_name:
+        description: 'name of the environment in which tests are running, passed to integration tests'
         type: string
         required: true
 
@@ -44,7 +44,6 @@ jobs:
   run_tests:
     name: remote integration tests
     runs-on: 8core
-    environment: ${{ inputs.environment }}
 
     steps:
       - uses: actions/checkout@v4
@@ -77,7 +76,7 @@ jobs:
           IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
           DITTO_URL: 'https://ditto.footprint.dev'
           SVIX_AUTH_TOKEN: ${{ secrets.SVIX_AUTH_TOKEN }}
-          ENVIRONMENT: ${{ inputs.isPr && 'ephemeral' || inputs.environment }}
+          ENVIRONMENT: ${{ inputs.environment_name }}
 
       - name: Create PR comment
         if: ${{ inputs.isPR && (success() || failure()) }}
