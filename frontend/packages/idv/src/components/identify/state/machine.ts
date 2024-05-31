@@ -136,7 +136,9 @@ export const getMachineArgs = ({
     isLive,
     device,
     sandboxId:
-      config?.isLive === false ? sandboxId || getRandomID(13) : undefined,
+      config?.isLive === false && !initialAuthToken
+        ? sandboxId || getRandomID(13)
+        : undefined,
     email,
     phoneNumber,
     identify: {},

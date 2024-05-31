@@ -43,8 +43,12 @@ const getOnboardingConfig = (
   canMakeRealDocScanCallsInSandbox,
 });
 
-let submittedFormData = {
-  testID: '',
+let submittedFormData: {
+  testID?: string;
+  overallOutcome: OverallOutcome;
+  idDocOutcome: IdDocOutcome;
+} = {
+  testID: undefined,
   overallOutcome: OverallOutcome.fail,
   idDocOutcome: IdDocOutcome.fail,
 };
@@ -62,28 +66,34 @@ const mockHandleFormSubmit = jest
 const SandboxOutcomeWrapper = ({
   requiresIdDoc,
   allowRealDocOutcome,
+  collectTestId,
 }: {
   requiresIdDoc: boolean;
   allowRealDocOutcome?: boolean;
+  collectTestId?: boolean;
 }) => (
   <SandboxOutcomeContainer
     config={getOnboardingConfig(requiresIdDoc, allowRealDocOutcome)}
     onSubmit={mockHandleFormSubmit}
+    collectTestId={collectTestId}
   />
 );
 
 const renderSandbox = ({
   requiresIdDoc,
   allowRealDocOutcome = true,
+  collectTestId = true,
 }: {
   requiresIdDoc: boolean;
   allowRealDocOutcome?: boolean;
+  collectTestId?: boolean;
 }) => {
   customRender(
     <Layout onClose={() => {}}>
       <SandboxOutcomeWrapper
         requiresIdDoc={requiresIdDoc}
         allowRealDocOutcome={allowRealDocOutcome}
+        collectTestId={collectTestId}
       />
     </Layout>,
   );
@@ -215,6 +225,12 @@ describe('<SandboxOutcome/>', () => {
 
       const realOutcomeOption = screen.queryAllByLabelText('Real outcome');
       expect(realOutcomeOption).toHaveLength(0);
+    });
+
+    it("doesn't show test id input when collectTestId is false", () => {
+      renderSandbox({ collectTestId: false, requiresIdDoc: true });
+      const testIdInput = screen.queryAllByTestId('test-id-input');
+      expect(testIdInput).toHaveLength(0);
     });
   });
 

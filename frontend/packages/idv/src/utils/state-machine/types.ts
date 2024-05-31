@@ -68,7 +68,7 @@ export type MachineEvents =
       type: 'sandboxOutcomeSubmitted';
       payload: {
         idDocOutcome?: IdDocOutcome;
-        sandboxId: string;
+        sandboxId?: string;
         overallOutcome: OverallOutcome;
       };
     }

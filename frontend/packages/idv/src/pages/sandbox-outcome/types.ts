@@ -1,7 +1,7 @@
 import type { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
 
 export type SandboxOutcomeFormData = {
-  testID: string;
+  testID?: string;
   outcomes: {
     overallOutcome: {
       label: string;

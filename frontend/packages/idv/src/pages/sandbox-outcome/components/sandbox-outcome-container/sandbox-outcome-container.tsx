@@ -17,9 +17,11 @@ import TestIdInput from '../test-id-input';
 export const SandboxOutcomeContainer = ({
   onSubmit,
   config,
+  collectTestId,
 }: {
   onSubmit: (formData: SandboxOutcomeFormData) => void;
   config?: PublicOnboardingConfig;
+  collectTestId?: boolean;
 }) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'global.pages.sandbox-outcome',
@@ -43,7 +45,7 @@ export const SandboxOutcomeContainer = ({
             }
           : undefined,
       },
-      testID: getRandomID(),
+      testID: collectTestId ? getRandomID() : undefined,
     },
     mode: 'onChange',
   });
@@ -83,7 +85,7 @@ export const SandboxOutcomeContainer = ({
                 </Text>
               </InlineAlert>
             )}
-            <TestIdInput />
+            {collectTestId && <TestIdInput />}
           </OptionsContainer>
           <Button
             fullWidth

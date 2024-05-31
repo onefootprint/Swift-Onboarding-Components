@@ -6,7 +6,7 @@ import type { SandboxOutcomeFormData } from './types';
 
 const SandboxOutcome = () => {
   const [state, send] = useIdvMachine();
-  const { config } = state.context;
+  const { config, authToken } = state.context;
 
   const handleAfterSubmit = (formData: SandboxOutcomeFormData) => {
     const {
@@ -25,7 +25,11 @@ const SandboxOutcome = () => {
   };
 
   return (
-    <SandboxOutcomeContainer onSubmit={handleAfterSubmit} config={config} />
+    <SandboxOutcomeContainer
+      onSubmit={handleAfterSubmit}
+      config={config}
+      collectTestId={!authToken}
+    />
   );
 };
 
