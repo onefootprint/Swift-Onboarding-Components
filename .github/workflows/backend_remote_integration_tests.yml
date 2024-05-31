@@ -31,8 +31,6 @@ on:
         required: true
 
     secrets:
-      IT_PHONE_NUMBERS:
-        required: true
       IT_TWILIO_ACCOUNT_SID:
         required: true
       IT_TWILIO_SECRET_AUTH_TOKEN:
@@ -71,7 +69,6 @@ jobs:
         env:
           EXPECTED_SERVER_VERSION: ${{ steps.components.outputs.expectedServerVersion }}
           TEST_URL: ${{ inputs.testUrl }}
-          IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
           IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
           IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
           DITTO_URL: 'https://ditto.footprint.dev'

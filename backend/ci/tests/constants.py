@@ -24,10 +24,36 @@ url = lambda path: "{}/{}".format(TEST_URL, path)
 IT_TWILIO_ACCOUNT_SID = get_secret("IT_TWILIO_ACCOUNT_SID")
 IT_TWILIO_SECRET_AUTH_TOKEN = get_secret("IT_TWILIO_SECRET_AUTH_TOKEN")
 
-# This is a real phone number - we send real SMSes to this phone number.
-# This phone number exists on the twilio account defined by the credentials above.
-# Some environments with lots of concurrency have multiple phone numbers - select one randomly
-ALL_PHONE_NUMBERS = json.loads(get_secret("IT_PHONE_NUMBERS"))
+# These are real phone numbers - we send real SMSes to these phone number.
+# These phone number exists on the twilio account defined by the credentials above.
+# To reduce impacts of contention sending messages to one phone number, we have a library of numbers.
+# But over time, I've felt less like contention is the cause of flaky tests... We could probably get rid of
+# most of these numbers
+ALL_PHONE_NUMBERS = [
+    "+12029521443",
+    "+19163473876",
+    "+14253716498",
+    "+12028318398",
+    "+12029463154",
+    "+14255376958",
+    "+19168643701",
+    "+12029370987",
+    "+17605178879",
+    "+19163473915",
+    "+12027592344",
+    "+19282571781",
+    "+12029461521",
+    "+19285975629",
+    "+12029985931",
+    "+19287234566",
+    "+19285979867",
+    "+12029529077",
+    "+14253995156",
+    "+12027409135",
+    "+19164592363",
+    "+12025191954",
+]
+random.shuffle(ALL_PHONE_NUMBERS)
 
 NUM_WORKERS = os.environ.get("PYTEST_XDIST_WORKER_COUNT")
 if NUM_WORKERS is not None:
