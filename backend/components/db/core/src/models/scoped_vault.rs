@@ -467,12 +467,12 @@ impl ScopedVault {
         Ok(result_map)
     }
 
-    pub fn lock(conn: &mut PgConn, id: &ScopedVaultId) -> DbResult<Self> {
+    pub fn lock(conn: &mut PgConn, id: &ScopedVaultId) -> DbResult<Locked<Self>> {
         let result = scoped_vault::table
             .filter(scoped_vault::id.eq(id))
             .for_no_key_update()
             .get_result(conn)?;
-        Ok(result)
+        Ok(Locked::new(result))
     }
 
     #[tracing::instrument("ScopedVault::update", skip_all)]

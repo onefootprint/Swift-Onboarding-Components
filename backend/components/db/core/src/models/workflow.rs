@@ -266,7 +266,7 @@ impl Workflow {
             is_neuro_enabled,
         } = args;
 
-        let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
+        let sv = ScopedVault::lock(conn, &scoped_vault_id)?.into_inner();
         let v = Vault::get(conn.conn(), &scoped_vault_id)?;
 
         if !force_create {
@@ -648,7 +648,7 @@ impl Workflow {
         // Fire webhook
         if let Some(new_status) = new_status {
             // Must lock to make sure scoped vault status isn't stale
-            let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
+            let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?.into_inner();
             let tenant = Tenant::get(conn, &sv.tenant_id)?;
             // !! it's important that code in the same txn that is going to write a review does it before this
             // update call

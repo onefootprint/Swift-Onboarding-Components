@@ -19,6 +19,7 @@ use db::models::business_owner::{
 };
 use db::models::scoped_vault::ScopedVault;
 use db::OffsetPagination;
+use newtypes::PreviewApi;
 use paperclip::actix::{
     api_v2_operation,
     get,
@@ -39,6 +40,7 @@ pub async fn get(
     auth: SecretTenantAuthContext,
     pagination: web::Query<OffsetPaginationRequest>,
 ) -> ApiResult<Json<BusinessOwnersListResponse>> {
+    auth.check_preview_guard(PreviewApi::ListBusinessOwners)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

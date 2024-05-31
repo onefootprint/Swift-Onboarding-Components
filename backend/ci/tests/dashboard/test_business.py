@@ -2,7 +2,7 @@ import pytest
 import typing
 from tests.dashboard.utils import latest_access_event_for
 from tests.bifrost_client import BifrostClient
-from tests.utils import get, post
+from tests.utils import get, post, patch
 from tests.constants import BUSINESS_DATA, CDO_TO_DIS, BUSINESS_VAULT_DERIVED_DATA
 
 
@@ -57,11 +57,96 @@ def test_get_business_owners(sandbox_tenant, primary_bo):
     assert body[1]["kind"] == "secondary"
 
 
-def test_get_public_bos(sandbox_tenant, primary_bo):
+def test_public_bos(sandbox_tenant, primary_bo):
     body = get(f"businesses/{primary_bo.fp_bid}/owners", None, sandbox_tenant.sk.key)
     assert len(body["data"]) == 1
     assert body["data"][0]["fp_id"] == primary_bo.fp_id
     # Missing second BO because there's no scoped vault for them
+
+
+def test_link_bos(sandbox_tenant, sandbox_user):
+    body = post("businesses", None, sandbox_tenant.sk.key)
+    fp_bid = body["id"]
+    fp_id = sandbox_user.fp_id
+
+    body = get(f"businesses/{fp_bid}/owners", None, sandbox_tenant.sk.key)
+    assert not body["data"]
+
+    # Then, link a BO via API
+    data = dict(fp_id=fp_id)
+    post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
+    body = get(f"businesses/{fp_bid}/owners", None, sandbox_tenant.sk.key)
+    assert len(body["data"]) == 1
+    assert body["data"][0]["fp_id"] == fp_id
+
+    # Cannot add the same user as a BO twice
+    data = dict(fp_id=fp_id)
+    body = post(
+        f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert (
+        body["error"]["message"]
+        == "The provided user is already an owner of the provided business"
+    )
+
+    # Cannot add an owner to a user vault
+    data = dict(fp_id=fp_id)
+    body = post(
+        f"businesses/{fp_id}/owners", data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert (
+        body["error"]["message"] == "Provided fp_bid does not correspond to a business"
+    )
+
+    # Cannot set a business as an owner
+    data = dict(fp_id=fp_bid)
+    body = post(
+        f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert body["error"]["message"] == "Provided fp_id does not correspond to a person"
+
+
+def test_error_linking_bo(primary_bo, sandbox_tenant, sandbox_user):
+    # Cannot link a BO when the business was created via bifrost
+    fp_bid = primary_bo.fp_bid
+    data = dict(fp_id=sandbox_user.fp_id)
+    body = post(
+        f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert (
+        body["error"]["message"]
+        == "Provided business was created by onboarding onto a playbook. Business owners are managed automatically by the playbook, so they cannot be mutated."
+    )
+
+
+@pytest.mark.parametrize(
+    "bo_di",
+    [
+        "business.beneficial_owners",
+        "business.kyced_beneficial_owners",
+    ],
+)
+def test_error_linking_bo_with_vaulted_bos(bo_di, sandbox_tenant, sandbox_user):
+    body = post("businesses", None, sandbox_tenant.sk.key)
+    fp_bid = body["id"]
+    data = {bo_di: BUSINESS_DATA[bo_di]}
+    patch(f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key)
+
+    # Cannot link a BO when the business has vaulted BOs
+    data = dict(fp_id=sandbox_user.fp_id)
+    body = post(
+        f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert (
+        body["error"]["message"]
+        == f"Business already has {bo_di} vaulted. If you'd like to link a user as the beneficial owner of this business, please clear out {bo_di}"
+    )
+
+    # When we clear out the vaulted BOs, we can link
+    data = {bo_di: None}
+    patch(f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key)
+    data = dict(fp_id=sandbox_user.fp_id)
+    body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
 
 
 def test_get_vault(sandbox_tenant, primary_bo, populated_business_data):

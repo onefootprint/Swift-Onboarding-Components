@@ -195,6 +195,51 @@
                         "Secret API Key": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLink an existing fp_id to the provided business as a beneficial owner.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewBusinessOwnerRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
             }
         },
         "/businesses/{fp_id}/risk_signals": {
@@ -2403,6 +2448,17 @@
                 },
                 "required": [
                     "id"
+                ]
+            },
+            "NewBusinessOwnerRequest": {
+                "type": "object",
+                "properties": {
+                    "fp_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "fp_id"
                 ]
             },
             "ObConfigSessionToken": {

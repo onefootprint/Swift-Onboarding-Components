@@ -104,6 +104,31 @@ impl BusinessOwner {
         Ok(result)
     }
 
+    #[tracing::instrument("BusinessOwner::create", skip_all)]
+    pub fn create(conn: &mut TxnPgConn, sb: Locked<ScopedVault>, owner_vault_id: VaultId) -> DbResult<Self> {
+        let existing = business_owner::table
+            .filter(business_owner::business_vault_id.eq(&sb.vault_id))
+            .get_results::<Self>(conn.conn())?;
+        let kind = if existing.is_empty() {
+            BusinessOwnerKind::Primary
+        } else {
+            BusinessOwnerKind::Secondary
+        };
+        let new = NewBusinessOwnerRow {
+            user_vault_id: Some(owner_vault_id),
+            business_vault_id: sb.into_inner().vault_id,
+            kind,
+            // The link ID isn't used here
+            link_id: BoLinkId::generate(kind),
+            created_at: Utc::now(),
+            source: BusinessOwnerSource::Tenant,
+        };
+        let result = diesel::insert_into(business_owner::table)
+            .values(new)
+            .get_result(conn.conn())?;
+        Ok(result)
+    }
+
     #[tracing::instrument("BusinessOwner::list_all", skip_all)]
     pub fn list_all(
         conn: &mut PgConn,

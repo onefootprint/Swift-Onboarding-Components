@@ -7,6 +7,7 @@ use newtypes::{
     FpId,
     OnboardingStatus,
 };
+use serde::Deserialize;
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct PrivateBusinessOwner {
@@ -20,5 +21,10 @@ pub struct PrivateBusinessOwner {
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct BusinessOwner {
+    pub fp_id: FpId,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct NewBusinessOwnerRequest {
     pub fp_id: FpId,
 }
