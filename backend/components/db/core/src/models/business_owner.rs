@@ -24,6 +24,7 @@ use newtypes::{
     BoId,
     BoLinkId,
     BusinessOwnerKind,
+    BusinessOwnerSource,
     Locked,
     ObConfigurationId,
     TenantId,
@@ -43,6 +44,7 @@ pub struct BusinessOwner {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
+    pub source: BusinessOwnerSource,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -53,6 +55,7 @@ struct NewBusinessOwnerRow {
     kind: BusinessOwnerKind,
     link_id: BoLinkId,
     created_at: DateTime<Utc>,
+    source: BusinessOwnerSource,
 }
 
 pub type UserData = (ScopedVault, Vault);
@@ -70,6 +73,7 @@ impl BusinessOwner {
             kind: BusinessOwnerKind::Primary,
             link_id: BoLinkId::generate(BusinessOwnerKind::Primary),
             created_at: Utc::now(),
+            source: BusinessOwnerSource::Hosted,
         };
         let result = diesel::insert_into(business_owner::table)
             .values(new)
@@ -91,6 +95,7 @@ impl BusinessOwner {
                 kind: BusinessOwnerKind::Secondary,
                 link_id,
                 created_at: Utc::now(),
+                source: BusinessOwnerSource::Hosted,
             })
             .collect_vec();
         let result = diesel::insert_into(business_owner::table)

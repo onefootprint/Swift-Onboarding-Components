@@ -43,3 +43,34 @@ pub enum BusinessOwnerKind {
 }
 
 crate::util::impl_enum_str_diesel!(BusinessOwnerKind);
+
+
+#[derive(
+    Debug,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Display,
+    Hash,
+    Clone,
+    Copy,
+    SerializeDisplay,
+    DeserializeFromStr,
+    Apiv2Schema,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    macros::SerdeAttr,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum BusinessOwnerSource {
+    /// Created via a Footprint-hosted flow, bifrost
+    Hosted,
+    /// Created via tenant-facing API
+    Tenant,
+}
+
+crate::util::impl_enum_string_diesel!(BusinessOwnerSource);

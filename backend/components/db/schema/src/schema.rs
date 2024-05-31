@@ -171,6 +171,7 @@ diesel::table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
+        source -> Text,
     }
 }
 

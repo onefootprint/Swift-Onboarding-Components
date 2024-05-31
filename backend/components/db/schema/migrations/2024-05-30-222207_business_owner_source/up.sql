@@ -1,0 +1,2 @@
+ALTER TABLE business_owner ADD COLUMN source TEXT NOT NULL DEFAULT 'hosted';
+ALTER TABLE business_owner ALTER COLUMN source DROP DEFAULT;
