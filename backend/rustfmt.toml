@@ -57,8 +57,7 @@ disable_all_formatting = false
 skip_children = false
 hide_parse_errors = false
 error_on_line_overflow = false
-# TODO we should enable errors on unformatted soon
-error_on_unformatted = false
+error_on_unformatted = true
 ignore = []
 emit_mode = "Files"
 make_backup = false

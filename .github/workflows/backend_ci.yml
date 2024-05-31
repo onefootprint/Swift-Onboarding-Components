@@ -209,11 +209,65 @@ jobs:
         working-directory: ./backend/ci/scripts
         run: ./check_db_migrations.sh
 
+  rustfmt:
+    needs: [files-changed]
+    if: needs.files-changed.outputs.filesChanged == 'true'
+    runs-on: 16core
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: rust-toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - name: Run rustfmt
+        id: rustfmt
+        run: cargo +nightly fmt --manifest-path ./backend/Cargo.toml --all --check > rustfmt_output.txt
+
+      - name: Compose failure comment.txt
+        if: failure()
+        run: |
+          set -x
+          echo '### Rustfmt output:' > comment.txt
+          echo 'Rustfmt failed. Please run `cargo +nightly fmt --all` to fix.' >> comment.txt
+          echo '```diff' >> comment.txt
+          cat rustfmt_output.txt >> comment.txt
+          echo '```' >> comment.txt
+          cat comment.txt
+
+      - name: Compose success comment.txt
+        if: success()
+        run: |
+          set -x
+          echo '### Rustfmt output:' > comment.txt
+          echo 'Rustfmt succeeded' >> comment.txt
+          cat comment.txt
+
+      - name: Find local rustfmt comment
+        uses: peter-evans/find-comment@1769778a0c5bd330272d749d12c036d65e70d39d
+        if: ${{ github.ref != 'refs/heads/master' && (failure() || success()) }}
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: 'Rustfmt output'
+
+      - name: Create or update rustfmt comment
+        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666
+        if: ${{ github.ref != 'refs/heads/master' && (failure() || success()) }}
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: comment.txt
+          edit-mode: replace
+
   # Branch protections require this job to pass. If any of the `needs` fail, then this job will fail.
   # Add all jobs in this workflow to this job's `needs`
   backend-ci:
     runs-on: ubuntu-latest
-    needs: [test, clippy, integration_tests]
+    needs: [test, clippy, integration_tests, rustfmt]
     if: always()
     steps:
       - name: Success
