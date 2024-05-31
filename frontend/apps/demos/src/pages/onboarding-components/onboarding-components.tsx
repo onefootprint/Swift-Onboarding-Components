@@ -189,6 +189,11 @@ const BasicData = ({ onDone }: { onDone: () => void }) => {
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
+          <Fp.Field name="id.zip">
+            <Fp.Label>Zip</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
           <Divider marginBlock={3} />
           <Fp.Field name="id.ssn9">
             <Fp.Label>SSN</Fp.Label>
