@@ -51,8 +51,10 @@ use db::models::workflow::{
     WorkflowUpdate,
 };
 use db::DbError;
+use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
+    CollectedDataOption,
     DataIdentifierDiscriminant as DID,
     ObConfigurationKind,
     OnboardingRequirement,
@@ -122,6 +124,13 @@ pub async fn post(
 
     let tenant_id = auth.tenant().id.clone();
     let actor = auth.actor();
+
+    // allow FF'd tenants to not collect phone + email for API-only vaults
+    let allow_skipping_phone_email_reqs = state
+        .ff_client
+        .flag(BoolFlag::ApiKycSkipEmailAndPhoneRequirements(&tenant_id))
+        && uvw.vault.is_created_via_api;
+
     let wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -184,6 +193,7 @@ pub async fn post(
                 );
             }
 
+
             // /kyc endpoint currently does not properly handle IPK doc requirements!
             // Also does not check any requirements for the Business vault if this person is a primary BO for
             // a Business
@@ -194,6 +204,13 @@ pub async fn post(
                 .into_iter()
                 .filter(|r| !r.is_met())
                 .filter(|r| !matches!(r, OnboardingRequirement::Process))
+                .filter(|r| {
+                    !allow_skipping_phone_email_reqs
+                        || !r.is_missing_collect_data_subset(&[
+                            CollectedDataOption::Email,
+                            CollectedDataOption::PhoneNumber,
+                        ])
+                })
                 .collect_vec();
             if !unmet_reqs.is_empty() {
                 return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());

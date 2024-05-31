@@ -14,7 +14,10 @@ use chrono::{
 };
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
-use std::collections::HashMap;
+use std::collections::{
+    HashMap,
+    HashSet,
+};
 use strum::EnumDiscriminants;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants)]
@@ -209,6 +212,22 @@ impl OnboardingRequirement {
                 config,
             } => format!("Missing {} document", DocumentRequestKind::from(config)),
             Self::Process => "Onboarding pending".into(),
+        }
+    }
+
+    pub fn is_missing_collect_data_subset(&self, cdos: &[CollectedDataOption]) -> bool {
+        let cdos: HashSet<&CollectedDataOption> = HashSet::<&CollectedDataOption>::from_iter(cdos.iter());
+
+        match self {
+            Self::CollectData {
+                missing_attributes,
+                optional_attributes: _,
+                populated_attributes: _,
+            } => {
+                let missing = HashSet::from_iter(missing_attributes.iter());
+                missing.is_subset(&cdos)
+            }
+            _ => false,
         }
     }
 }
