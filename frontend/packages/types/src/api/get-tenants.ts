@@ -23,6 +23,8 @@ export enum TenantPreviewApi {
   ReonboardUser = 'reonboard_user',
   CreateUserDecision = 'create_user_decision',
   CreateUserToken = 'create_user_token',
+  CreateBusinessOwner = 'create_business_owner',
+  ListBusinessOwners = 'list_business_owners',
   Labels = 'labels',
   Tags = 'tags',
 }
