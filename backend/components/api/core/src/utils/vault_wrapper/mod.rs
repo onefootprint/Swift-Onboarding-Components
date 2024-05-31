@@ -8,6 +8,7 @@ use db::HasLifetime;
 use newtypes::{
     DataIdentifier,
     DataLifetimeSeqno,
+    ScopedVaultId,
 };
 use std::collections::HashMap;
 use std::marker::PhantomData;
@@ -33,21 +34,13 @@ pub struct Person;
 pub struct Business;
 #[derive(Debug, Clone)]
 pub struct Any;
-/// VaultWrapper represents the current "state" of the UserVault - the most up to date and complete
-/// information we have about a particular user.
-///
-/// In other words, the UserVault is a major dividing line in Footprint's product.
-///    1. the API routes and backend logic determine `OnboardingRequirements` that the frontend
-///       knows how to collect.
-///    2. The information collected is stashed in various tables (see the impls below for the actual
-///       locations)
-///    3. The decision engine and verification logic _only knows about what's in the UserVault_
-///         * it is the information we send to vendors (a UVW gets "serialized" in a
-///           `VerificationRequest` in the decision engine)
-///         * it is the source of truth to know what we datums we have collected from a User
+
+/// VaultWrapper represents the current "state" of a vault - the most up to date and complete
+/// information we have about a particular user or business.
 #[derive(Debug, Clone)]
 pub struct VaultWrapper<Type = Any> {
     pub vault: Vault,
+    sv_id: Option<ScopedVaultId>,
     /// All VaultDatas for each DataIdentifier.
     /// When there are multiple VaultDatas for one DI, the most recent VaultData comes first.
     /// Generally should use the .data() util instead of accessing this directly

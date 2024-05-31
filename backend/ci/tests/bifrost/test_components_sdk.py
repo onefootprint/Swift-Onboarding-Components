@@ -110,5 +110,5 @@ def test_components_sdk_cannot_add_auth_methods(sandbox_tenant):
     body = patch("hosted/user/vault", data, components_token, status_code=400)
     assert (
         body["error"]["message"]["id.email"]
-        == "Not allowed to add with this type of token"
+        == "Not allowed to add this piece of data here"
     )

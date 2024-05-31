@@ -127,7 +127,7 @@ pub enum Error {
     Custom(String),
     #[error("Cannot add to this type of vault")]
     IncompatibleDataIdentifier,
-    #[error("Not allowed to add with this type of token")]
+    #[error("Not allowed to add this piece of data here")]
     CannotAddDiWithSource,
     #[error("{0}")]
     EnumDotNotationError(#[from] EnumDotNotationError),
@@ -220,7 +220,7 @@ pub enum EnumDotNotationError {
 
 #[derive(Debug)]
 /// Shorthand to make it convenient to make an HTTP 400 validation error.
-pub(crate) struct ValidationError<'a>(pub &'a str);
+pub struct ValidationError<'a>(pub &'a str);
 
 impl<'a> From<ValidationError<'a>> for Error {
     fn from(value: ValidationError<'a>) -> Self {

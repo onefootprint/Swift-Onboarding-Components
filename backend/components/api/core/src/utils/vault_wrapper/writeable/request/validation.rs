@@ -9,15 +9,19 @@ use crate::utils::vault_wrapper::{
     VaultWrapper,
     WriteableVw,
 };
+use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault_data::NewVaultData;
 use db::PgConn;
 use itertools::Itertools;
 use newtypes::{
     BusinessDataKind as BDK,
+    BusinessOwnerSource,
     CollectedDataOption,
     DataIdentifier,
     DataLifetimeSource,
+    DataValidationError,
     DiValidationError,
     Error as NtError,
     IdentityDataKind as IDK,
@@ -31,6 +35,7 @@ use std::collections::{
     HashSet,
 };
 
+#[derive(Clone, Copy)]
 pub enum DataRequestSource {
     CreateVault,
     PatchVault,
@@ -48,12 +53,7 @@ impl<Type> VaultWrapper<Type> {
         actor: Option<AuthActor>,
         request_source: DataRequestSource,
     ) -> ApiResult<ValidatedDataRequest> {
-        assert_allowed_for_vault(&request, self.vault.kind)?;
-        if !matches!(request_source, DataRequestSource::CreateVault) {
-            // When a vault is being created, we support setting phone/email via the components SDK
-            // since this comes via the signup challenge API
-            assert_allowed_for_sources(&request, &sources)?;
-        }
+        self.assert_update_allowed(conn, &request, &sources, request_source)?;
         // Transform the request into a Vec<NewVaultData>
         let FingerprintedDataRequest {
             data,
@@ -218,16 +218,48 @@ impl<Type> VaultWrapper<Type> {
             }
         }
         if !validation_errors.is_empty() {
-            let validation_error = newtypes::DataValidationError::FieldValidationError(validation_errors);
+            let validation_error = DataValidationError::FieldValidationError(validation_errors);
             return Err(newtypes::Error::from(validation_error).into());
         }
 
         Ok(new_cdos)
     }
+
+    /// Checks that the provided DIs are allowed to be vaulted
+    fn assert_update_allowed(
+        &self,
+        conn: &mut PgConn,
+        request: &FingerprintedDataRequest,
+        sources: &DataLifetimeSources,
+        request_source: DataRequestSource,
+    ) -> ApiResult<()> {
+        assert_allowed_for_vault(request, self.vault.kind)?;
+        assert_allowed_for_sources(request, sources, request_source)?;
+
+        if self.vault.kind == VaultKind::Business {
+            if let Some(sv_id) = self.sv_id.as_ref() {
+                let sv = ScopedVault::get(conn, sv_id)?;
+                let has_linked_bos = BusinessOwner::list_all(conn, &self.vault.id, &sv.tenant_id)?
+                    .iter()
+                    .any(|(bo, _)| bo.source == BusinessOwnerSource::Tenant);
+                let request_has_vaulted_bos = request.contains_key(&BDK::BeneficialOwners.into());
+                if has_linked_bos && request_has_vaulted_bos {
+                    // We shouldn't allow BOs to be vaulted when the tenant has already linked BOs
+                    // via API
+                    let err = newtypes::ValidationError("Cannot vault beneficial owners when they are already linked via API. Please remove the linked beneficial owners via API before vaulting").into();
+                    let errs = HashMap::from_iter([(BDK::BeneficialOwners.into(), err)]);
+                    return Err(
+                        newtypes::Error::from(DataValidationError::FieldValidationError(errs)).into(),
+                    );
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
-pub fn assert_allowed_for_vault(request: &FingerprintedDataRequest, kind: VaultKind) -> NtResult<()> {
+fn assert_allowed_for_vault(request: &FingerprintedDataRequest, kind: VaultKind) -> NtResult<()> {
     // Keep full match statements here so we have to implement this any time there's a new
     // VaultKind or DataIdentifierDiscriminant
     let is_allowed = move |di: &DataIdentifier| -> bool {
@@ -256,25 +288,44 @@ pub fn assert_allowed_for_vault(request: &FingerprintedDataRequest, kind: VaultK
             .into_iter()
             .map(|di| (di.clone(), NtError::IncompatibleDataIdentifier))
             .collect();
-        return Err(newtypes::DataValidationError::FieldValidationError(field_errors).into());
+        return Err(DataValidationError::FieldValidationError(field_errors).into());
     }
+
     Ok(())
 }
 
 /// Enforce that this update only has the allowable set of DIs based on the vault kind
-pub fn assert_allowed_for_sources(
+fn assert_allowed_for_sources(
     request: &FingerprintedDataRequest,
     sources: &DataLifetimeSources,
+    request_source: DataRequestSource,
 ) -> NtResult<()> {
     let is_allowed = move |di: &DataIdentifier| -> bool {
         // Restrict the components SDK from adding phone or email
         let source = sources.get(di);
-        #[allow(clippy::match_like_matches_macro)]
-        match (source, di) {
-            (DataLifetimeSource::LikelyComponentsSdk, DataIdentifier::Id(IDK::PhoneNumber)) => false,
-            (DataLifetimeSource::LikelyComponentsSdk, DataIdentifier::Id(IDK::Email)) => false,
-            _ => true,
+        if !matches!(request_source, DataRequestSource::CreateVault) {
+            #[allow(clippy::match_like_matches_macro)]
+            match (source, di) {
+                // When a vault is being created, we support setting phone/email via the components SDK
+                // since this comes via the signup challenge API. But at any other time, the components SDK
+                // isn't allowed to vault these
+                (DataLifetimeSource::LikelyComponentsSdk, DataIdentifier::Id(IDK::PhoneNumber)) => {
+                    return false
+                }
+                (DataLifetimeSource::LikelyComponentsSdk, DataIdentifier::Id(IDK::Email)) => return false,
+                _ => (),
+            }
         }
+        #[allow(clippy::single_match)]
+        match (source, di) {
+            // Tenants cannot add KycedBeneficialOwners - this is only editable via bifrost.
+            // Tenants should either user BeneficialOwners or just link BOs via API
+            (DataLifetimeSource::Tenant, DataIdentifier::Business(BDK::KycedBeneficialOwners)) => {
+                return false
+            }
+            _ => (),
+        }
+        true
     };
 
     let disallowed_keys = request.keys().filter(|di| !is_allowed(di)).collect_vec();
@@ -283,7 +334,7 @@ pub fn assert_allowed_for_sources(
             .into_iter()
             .map(|di| (di.clone(), NtError::CannotAddDiWithSource))
             .collect();
-        return Err(newtypes::DataValidationError::FieldValidationError(field_errors).into());
+        return Err(DataValidationError::FieldValidationError(field_errors).into());
     }
     Ok(())
 }

@@ -169,18 +169,14 @@ def test_error_linking_bo(kyb_sandbox_ob_config, sandbox_tenant, sandbox_user):
     )
 
 
-@pytest.mark.parametrize(
-    "bo_di",
-    [
-        "business.beneficial_owners",
-        "business.kyced_beneficial_owners",
-    ],
-)
-def test_error_linking_bo_with_vaulted_bos(bo_di, sandbox_tenant, sandbox_user):
-    body = post("businesses", None, sandbox_tenant.sk.key)
-    fp_bid = body["id"]
+def test_error_linking_bo_with_vaulted_bos(sandbox_tenant, sandbox_user):
+    """
+    Make sure we can't add link BOs via API when there are already vaulted BOs
+    """
+    bo_di = "business.beneficial_owners"
     data = {bo_di: BUSINESS_DATA[bo_di]}
-    patch(f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key)
+    body = post("businesses", data, sandbox_tenant.sk.key)
+    fp_bid = body["id"]
 
     # Cannot link a BO when the business has vaulted BOs
     data = dict(fp_id=sandbox_user.fp_id)
@@ -196,4 +192,40 @@ def test_error_linking_bo_with_vaulted_bos(bo_di, sandbox_tenant, sandbox_user):
     data = {bo_di: None}
     patch(f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key)
     data = dict(fp_id=sandbox_user.fp_id)
+
     body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
+
+
+def test_cannot_vault_bos_when_linked(sandbox_tenant):
+    """
+    Make sure we can't add BOs via the vault when there are already linked BOs
+    """
+    body = post("businesses", None, sandbox_tenant.sk.key)
+    fp_bid = body["id"]
+    body = post("users", None, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    data = dict(fp_id=fp_id)
+    body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
+
+    # Cannot vault BOs because there are already linked BOs
+    data = {"business.beneficial_owners": BUSINESS_DATA["business.beneficial_owners"]}
+    body = patch(
+        f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert (
+        body["error"]["message"]["business.beneficial_owners"]
+        == "Cannot vault beneficial owners when they are already linked via API. Please remove the linked beneficial owners via API before vaulting"
+    )
+
+
+def test_cannot_vault_kyced_bos(sandbox_tenant, sandbox_user):
+    """
+    Make sure we can't vault the `business.kyced_beneficial_owners` DI via API. Only bifrost should vault this.
+    """
+    bo_di = "business.kyced_beneficial_owners"
+    data = {bo_di: BUSINESS_DATA[bo_di]}
+    body = post("businesses", data, sandbox_tenant.sk.key, status_code=400)
+    assert (
+        body["error"]["message"][bo_di] == "Not allowed to add this piece of data here"
+    )
