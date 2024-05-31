@@ -93,7 +93,6 @@ jobs:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
     runs-on: 16core
-    environment: dev
     steps:
       - uses: actions/checkout@v4
 
