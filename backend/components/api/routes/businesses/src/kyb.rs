@@ -175,9 +175,6 @@ pub async fn post(
         })
         .await?;
 
-    // TODO shouldn't we return errors running KYB here? otherwise hard to tell what went wrong.
-    // Maybe we just want to mask HTTP 500s as they could be retried by us?
-    // But an HTTP 400 could be fixed by the tenant
     api_core::utils::kyb_utils::run_kyb(&state, auth.tenant(), biz_wf.clone()).await?;
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 

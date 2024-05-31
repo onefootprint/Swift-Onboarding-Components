@@ -21,6 +21,7 @@ use crate::utils::vault_wrapper::{
     VaultWrapper,
 };
 use crate::State;
+use actix_web::ResponseError;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
@@ -220,6 +221,11 @@ pub async fn run_kyb(state: &State, tenant: &Tenant, biz_wf: Workflow) -> ApiRes
         match res {
             Ok(ww) => {
                 tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow BoKycCompleted");
+            }
+            Err(err) if !err.status_code().is_server_error() => {
+                // We want to expose HTTP 4xx errors to the client since they could be fixed by the client
+                tracing::error!(?err, "Non-server error running BoKycCompleted on KYB workflow");
+                return Err(err);
             }
             Err(err) => {
                 tracing::error!(?err, "Error running BoKycCompleted on KYB workflow");
