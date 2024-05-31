@@ -170,6 +170,7 @@ diesel::table! {
         link_id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
     }
 }
 

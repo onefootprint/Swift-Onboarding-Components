@@ -42,6 +42,7 @@ pub struct BusinessOwner {
     pub link_id: BoLinkId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -51,6 +52,7 @@ struct NewBusinessOwnerRow {
     business_vault_id: VaultId,
     kind: BusinessOwnerKind,
     link_id: BoLinkId,
+    created_at: DateTime<Utc>,
 }
 
 pub type UserData = (ScopedVault, Vault);
@@ -67,6 +69,7 @@ impl BusinessOwner {
             business_vault_id,
             kind: BusinessOwnerKind::Primary,
             link_id: BoLinkId::generate(BusinessOwnerKind::Primary),
+            created_at: Utc::now(),
         };
         let result = diesel::insert_into(business_owner::table)
             .values(new)
@@ -87,6 +90,7 @@ impl BusinessOwner {
                 business_vault_id: business_vault_id.clone(),
                 kind: BusinessOwnerKind::Secondary,
                 link_id,
+                created_at: Utc::now(),
             })
             .collect_vec();
         let result = diesel::insert_into(business_owner::table)
@@ -194,8 +198,9 @@ impl BusinessOwner {
                     .inner_join(vault::table),
             )
             .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .into_boxed()
-            .limit(pagination.limit());
+            .limit(pagination.limit())
+            .order_by(business_owner::created_at)
+            .into_boxed();
         if let Some(offset) = pagination.offset() {
             query = query.offset(offset)
         }
