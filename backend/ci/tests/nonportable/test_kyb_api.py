@@ -3,24 +3,6 @@ from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config, post, get, patch
 from tests.constants import BUSINESS_DATA, CDO_TO_DIS
 
-MUST_COLLECT_DATA = [
-    "business_name",
-    "business_tin",
-    "business_address",
-]
-
-
-@pytest.fixture
-def obc(sandbox_tenant):
-    return create_ob_config(
-        sandbox_tenant,
-        "Business-only config",
-        MUST_COLLECT_DATA,
-        MUST_COLLECT_DATA,
-        kind="kyb",
-        skip_kyc=True,
-    )
-
 
 @pytest.mark.parametrize(
     "sandbox_outcome,missing_data",
@@ -31,14 +13,20 @@ def obc(sandbox_tenant):
         ("fail", False),
     ],
 )
-def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data, obc):
-
+def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
     # make API-created Business vault with no BO data present
-    vault_data = {}
-    for cdo in MUST_COLLECT_DATA:
-        for di in CDO_TO_DIS[cdo]:
-            vault_data[di] = BUSINESS_DATA[di]
-
+    must_collect_data = ["business_name", "business_tin", "business_address"]
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Business-only config",
+        must_collect_data,
+        must_collect_data,
+        kind="kyb",
+        skip_kyc=True,
+    )
+    vault_data = {
+        di: BUSINESS_DATA[di] for cdo in must_collect_data for di in CDO_TO_DIS[cdo]
+    }
     expected_error = None
     if missing_data:
         vault_data.pop("business.name")
@@ -50,10 +38,7 @@ def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data, obc):
     # run KYB
     kyb = post(
         f"businesses/{fp_id}/kyb",
-        dict(
-            onboarding_config_key=obc.key.value,
-            fixture_result=sandbox_outcome,
-        ),
+        dict(key=obc.key.value, fixture_result=sandbox_outcome),
         sandbox_tenant.sk.key,
         status_code=200 if expected_error is None else 400,
     )
@@ -78,14 +63,36 @@ def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data, obc):
     assert len(obds) == 1
 
 
-def test_kyb_with_bos_linked_via_api(sandbox_tenant, obc):
-    vault_data = {}
-    for cdo in MUST_COLLECT_DATA:
-        for di in CDO_TO_DIS[cdo]:
-            vault_data[di] = BUSINESS_DATA[di]
+def test_kyb_with_bos_linked_via_api(sandbox_tenant):
+    """
+    Even on a playbook that requires business_beneficial_owners, the requirement should be met by the presence
+    of BOs linked via API
+    """
+    business_cdos = ["business_name", "business_tin", "business_address"]
+    bo_cdos = ["business_beneficial_owners", "name"]
+    must_collect_data = business_cdos + bo_cdos
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Business-only config",
+        must_collect_data,
+        must_collect_data,
+        kind="kyb",
+        skip_kyc=True,
+    )
+    vault_data = {
+        di: BUSINESS_DATA[di] for cdo in business_cdos for di in CDO_TO_DIS[cdo]
+    }
     body = post("businesses", vault_data, sandbox_tenant.sk.key)
     fp_bid = body["id"]
 
+    # Can't KYB without BOs
+    data = dict(key=obc.key.value, fixture_result="pass")
+    body = post(
+        f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert body["error"]["message"] == "Missing business_beneficial_owners"
+
+    # Link the BO, then should be able to KYB
     data = {
         "id.first_name": "Piip",
         "id.last_name": "Businessowner",
@@ -94,10 +101,10 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant, obc):
     data = dict(fp_id=body["id"])
     body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
 
-    data = dict(onboarding_config_key=obc.key.value, fixture_result="pass")
-    kyb = post(f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key)
-    assert kyb["requires_manual_review"] == False
-    assert kyb["status"] == "pass"
+    data = dict(key=obc.key.value, fixture_result="pass")
+    body = post(f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key)
+    assert body["requires_manual_review"] == False
+    assert body["status"] == "pass"
 
 
 def test_public_bos(sandbox_tenant, kyb_sandbox_ob_config):

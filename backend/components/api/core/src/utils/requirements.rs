@@ -7,10 +7,12 @@ use crate::utils::vault_wrapper::{
     VwArgs,
 };
 use crate::State;
+use db::models::business_owner::BusinessOwner;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::liveness_event::LivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::models::workflow::{
@@ -23,8 +25,9 @@ use itertools::Itertools;
 use newtypes::{
     AlpacaKycState,
     AuthorizeFields,
+    BusinessOwnerSource,
     CollectDocumentConfig,
-    CollectedDataOption,
+    CollectedDataOption as CDO,
     DataIdentifierDiscriminant as DID,
     Declaration,
     DocumentCdoInfo,
@@ -197,9 +200,9 @@ pub async fn get_requirements_for_person_and_maybe_business(
 }
 
 struct RequirementProgress {
-    populated_attributes: Vec<CollectedDataOption>,
-    missing_attributes: Vec<CollectedDataOption>,
-    optional_attributes: Vec<CollectedDataOption>,
+    populated_attributes: Vec<CDO>,
+    missing_attributes: Vec<CDO>,
+    optional_attributes: Vec<CDO>,
 }
 
 /// Returns if the provided CDO is met by the data in the VW. Some CDOs have conditional
@@ -207,7 +210,7 @@ struct RequirementProgress {
 /// values as well
 fn is_cdo_met<Type>(
     vw: &VaultWrapper<Type>,
-    cdo: &CollectedDataOption,
+    cdo: &CDO,
     decrypted_values: &DecryptUncheckedResultForReqs,
 ) -> bool {
     if should_skip_us_only_cdos(cdo, decrypted_values) {
@@ -217,7 +220,7 @@ fn is_cdo_met<Type>(
     let mut required_dis = cdo.required_data_identifiers();
     // Also check if optional DIs (based on selected values) are met
     match cdo {
-        CollectedDataOption::UsLegalStatus => {
+        CDO::UsLegalStatus => {
             let legal_status = decrypted_values
                 .get(&IDK::UsLegalStatus.into())
                 .and_then(|a| a.parse_into::<UsLegalStatus>().ok());
@@ -238,7 +241,7 @@ fn is_cdo_met<Type>(
                 None => (),
             }
         }
-        CollectedDataOption::FullAddress => {
+        CDO::FullAddress => {
             let country = decrypted_values
                 .get(&IDK::Country.into())
                 .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
@@ -262,12 +265,9 @@ fn is_cdo_met<Type>(
 }
 
 // these are CDOs only applicable to US
-pub(crate) fn should_skip_us_only_cdos(
-    cdo: &CollectedDataOption,
-    decrypted_values: &DecryptUncheckedResultForReqs,
-) -> bool {
+pub(crate) fn should_skip_us_only_cdos(cdo: &CDO, decrypted_values: &DecryptUncheckedResultForReqs) -> bool {
     match cdo {
-        CollectedDataOption::Ssn4 | CollectedDataOption::Ssn9 | CollectedDataOption::UsLegalStatus => {
+        CDO::Ssn4 | CDO::Ssn9 | CDO::UsLegalStatus => {
             let country = decrypted_values
                 .get(&IDK::Country.into())
                 .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
@@ -432,10 +432,18 @@ fn get_requirement_inner(
             .must_collect(DID::Business)
             .then(|| -> ApiResult<_> {
                 let RequirementProgress {
-                    populated_attributes,
+                    mut populated_attributes,
                     optional_attributes: _,
-                    missing_attributes,
+                    mut missing_attributes,
                 } = get_data_collection_progress(vw, obc, DID::Business, decrypted_values);
+                let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
+                let bos = BusinessOwner::list_all(conn, &vw.vault.id, &sv.tenant_id)?;
+                let has_tenant_linked_bos = bos.iter().any(|bo| bo.0.source == BusinessOwnerSource::Tenant);
+                if has_tenant_linked_bos && missing_attributes.contains(&CDO::BusinessBeneficialOwners) {
+                    // BOs linked manually via API meet the CDO::BeneficialOwners requirement
+                    missing_attributes.retain(|cdo| cdo != &CDO::BusinessBeneficialOwners);
+                    populated_attributes.push(CDO::BusinessBeneficialOwners);
+                }
                 Ok(OnboardingRequirement::CollectBusinessData {
                     missing_attributes,
                     populated_attributes,
@@ -557,10 +565,8 @@ fn get_requirement_inner(
                     }
                 })
                 .filter(|cdo| {
-                    !(matches!(
-                        cdo,
-                        CollectedDataOption::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie))
-                    ) && skipped_selfie)
+                    !matches!(cdo, CDO::Document(DocumentCdoInfo(_, _, Selfie::RequireSelfie)))
+                        || !skipped_selfie
                 })
                 .filter(|cdo| !should_skip_us_only_cdos(cdo, decrypted_values))
                 .cloned()
