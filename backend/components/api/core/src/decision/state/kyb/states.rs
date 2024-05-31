@@ -155,8 +155,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         _action: BoKycCompleted,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let bo_obds =
-            decision::biz_risk::get_bo_obds(&state.db_pool, &state.enclave_client, &self.wf_id).await?;
+        let bo_obds = decision::biz_risk::get_bo_obds(state, &self.wf_id).await?;
         Ok(bo_obds)
     }
 
@@ -272,16 +271,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
                 decision::vendor::middesk::init_middesk_request(&state.db_pool, self.wf_id.clone()).await?;
 
             // TODO: match on MiddeskStates and only call this if AwaitingBusinessUpdateWebhook
-            let _middesk_state = middesk_state
-                .make_create_business_call(
-                    &state.db_pool,
-                    &state.config,
-                    &state.enclave_client,
-                    state.ff_client.clone(),
-                    state.vendor_clients.middesk_create_business.clone(),
-                    &self.t_id,
-                )
-                .await?;
+            let _middesk_state = middesk_state.make_create_business_call(state, &self.t_id).await?;
         }
 
         Ok(fixture_decision)

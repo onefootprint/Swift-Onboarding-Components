@@ -1,71 +1,62 @@
-use crate::enclave_client::EnclaveClient;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{
     Business,
-    DecryptedBusinessOwners,
     VaultWrapper,
 };
-use crate::ApiError;
+use crate::{
+    ApiError,
+    State,
+};
+use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::workflow::Workflow;
-use db::DbPool;
-use newtypes::WorkflowId;
+use itertools::Itertools;
+use newtypes::{
+    BusinessOwnerKind,
+    WorkflowId,
+};
 
-pub async fn get_bo_obds(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-    biz_wf_id: &WorkflowId,
-) -> Result<Vec<OnboardingDecision>, ApiError> {
+pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> ApiResult<Vec<OnboardingDecision>> {
     let wfid = biz_wf_id.clone();
-    let (wf, sv, bvw) = db_pool
+    let (wf, sv, bvw, obc) = state
+        .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (wf, sv) = Workflow::get_all(conn, &wfid)?;
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sv.id)?;
-            Ok((wf, sv, bvw))
+            let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+            Ok((wf, sv, bvw, obc))
         })
         .await?;
 
-    let dbo = bvw
-        .decrypt_business_owners(db_pool, enclave_client, &sv.tenant_id)
-        .await?;
+    if obc.skip_kyc {
+        return Ok(vec![]);
+    }
 
-    let sv_ids = match dbo {
-        DecryptedBusinessOwners::NoVaultedOrLinkedBos
-        | DecryptedBusinessOwners::NoVaultedBos { .. }
-        | DecryptedBusinessOwners::VaultedBos { .. } => {
-            vec![]
-        }
-        DecryptedBusinessOwners::SingleKyc {
-            primary_bo: _,
-            primary_bo_vault,
-            primary_bo_data: _,
-            secondary_bos: _,
-        } => vec![primary_bo_vault.0.id],
-        DecryptedBusinessOwners::MultiKyc {
-            primary_bo: _,
-            primary_bo_vault,
-            primary_bo_data: _,
-            secondary_bos,
-        } => {
-            let mut v = vec![primary_bo_vault.0.id];
-            let secondary_bo_wfs: Vec<_> = secondary_bos
-                .into_iter()
-                .map(|b| {
-                    if let Some((sv, _)) = b.2 {
-                        Ok(sv.id)
-                    } else {
-                        Err(ApiError::from(OnboardingError::MissingBoOnboarding))
-                    }
-                })
-                .collect::<ApiResult<Vec<_>>>()?;
-            v.extend(secondary_bo_wfs);
-            v
-        }
-    };
+    let dbos = bvw.decrypt_business_owners(state, &sv.tenant_id).await?;
+    let dbos_expecting_kyc = dbos
+        .into_iter()
+        .filter(|bo| {
+            // We always KYC BOs from KycedBeneficialOwners.
+            // And otherwise, we always KYC the primary BO.
+            bo.from_kyced_beneficial_owners
+                || (bo.kind == BusinessOwnerKind::Primary && bo.linked_bo.is_some())
+        })
+        .collect_vec();
+
+    if dbos_expecting_kyc.iter().any(|bo| bo.scoped_user.is_none()) {
+        // A user whose KYC we need hasn't even started onboarding yet
+        return Err(OnboardingError::MissingBoOnboarding.into());
+    }
+    let sv_ids = dbos_expecting_kyc
+        .into_iter()
+        .flat_map(|bo| bo.scoped_user)
+        .map(|sv| sv.id)
+        .collect();
 
     let obc_id = wf.ob_configuration_id.ok_or(OnboardingError::NoObcForWorkflow)?;
-    let wfs = db_pool
+    let wfs = state
+        .db_pool
         .db_query(move |conn| Workflow::get_with_decisions(conn, sv_ids, &obc_id))
         .await?;
     let wfs_without_decision: Vec<_> = wfs

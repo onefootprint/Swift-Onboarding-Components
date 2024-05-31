@@ -265,28 +265,19 @@ impl MiddeskStates {
 impl MiddeskState<PendingCreateBusinessCall> {
     pub async fn make_create_business_call(
         self,
-        db_pool: &DbPool,
-        config: &Config,
-        enclave_client: &EnclaveClient,
-        ff_client: Arc<dyn FeatureFlagClient>,
-        middesk_client: VendorClient<
-            MiddeskCreateBusinessRequest,
-            MiddeskCreateBusinessResponse,
-            idv::middesk::Error,
-        >,
+        state: &State,
         tenant_id: &TenantId,
     ) -> Result<MiddeskState<AwaitingBusinessUpdateWebhook>, ApiError> {
         let vreq_id = self.state.create_business_vreq.id.clone();
         let wf_id = self.middesk_request.workflow_id;
 
-        let obc = db_pool
+        let (obc, _) = state
+            .db_pool
             .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
-            .await?
-            .0;
+            .await?;
 
         let business_data = build_request::build_business_data_from_verification_request(
-            db_pool,
-            enclave_client,
+            state,
             self.state.create_business_vreq.clone(),
         )
         .await?;
@@ -306,11 +297,11 @@ impl MiddeskState<PendingCreateBusinessCall> {
         // based on the check we're performing... validate the data
 
         let res = send_middesk_call(
-            db_pool,
-            &middesk_client,
-            ff_client,
-            config,
-            enclave_client,
+            &state.db_pool,
+            &state.vendor_clients.middesk_create_business.clone(),
+            state.ff_client.clone(),
+            &state.config,
+            &state.enclave_client,
             business_data_for_request,
             obc_key,
             tenant_id,
@@ -333,7 +324,8 @@ impl MiddeskState<PendingCreateBusinessCall> {
         let sv_id = self.state.create_business_vreq.scoped_vault_id.clone();
         let di_id = self.state.create_business_vreq.decision_intent_id;
         let middesk_request_id = self.middesk_request.id.clone();
-        let (udpated_middesk_request, business_update_webhook_vreq) = db_pool
+        let (udpated_middesk_request, business_update_webhook_vreq) = state
+            .db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let uv = VerificationRequest::get_user_vault(conn, vreq_id)?;
                 let _vres = verification_result::save_verification_result(conn, &vr, &uv.public_key)?;

@@ -3,11 +3,8 @@ use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
+use api_core::errors::ValidationError;
 use api_core::types::ResponseData;
-use api_core::utils::kyb_utils::{
-    decrypt_basic_business_info,
-    BasicBusinessInfo,
-};
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::hosted::business::{
     HostedBusiness,
@@ -15,6 +12,10 @@ use api_wire_types::hosted::business::{
     Inviter,
 };
 use db::models::workflow::Workflow;
+use newtypes::{
+    BusinessDataKind as BDK,
+    BusinessOwnerKind,
+};
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -26,39 +27,53 @@ use paperclip::actix::{
     tags(Businesses, Hosted)
 )]
 #[actix::get("/hosted/business")]
-pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonApiResponse<HostedBusiness> {
-    let bv_id = business_auth.bo.business_vault_id.clone();
-    let ob_config_id = business_auth.ob_config.id.clone();
-    let bvw = state
+pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> JsonApiResponse<HostedBusiness> {
+    let bv_id = bo_auth.bo.business_vault_id.clone();
+    let ob_config_id = bo_auth.ob_config.id.clone();
+    let (bvw, sb) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (_, sb) = Workflow::get_all(conn, (&bv_id, &ob_config_id))?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
-            Ok(bvw)
+            Ok((bvw, sb))
         })
         .await?;
 
-    let BasicBusinessInfo {
-        business_name,
-        primary_bo,
-        mut secondary_bos,
-    } = decrypt_basic_business_info(&state, &bvw).await?;
-
-    let invited_bo = secondary_bos
-        .remove(&business_auth.bo.link_id)
-        .ok_or(BusinessError::NoBos)?;
+    let dbos = bvw.decrypt_business_owners(&state, &sb.tenant_id).await?;
+    let primary_bo = dbos
+        .iter()
+        .find(|bo| bo.kind == BusinessOwnerKind::Primary)
+        .ok_or(BusinessError::PrimaryBoNotFound)?
+        .clone();
+    let invited_bo = dbos
+        .into_iter()
+        .find(|b| {
+            b.linked_bo
+                .as_ref()
+                .is_some_and(|b| b.link_id == bo_auth.bo.link_id)
+        })
+        .ok_or(BusinessError::BoNotFound)?;
 
     let inviter = Inviter {
-        first_name: primary_bo.first_name,
-        last_name: primary_bo.last_name,
+        first_name: primary_bo.first_name.ok_or(ValidationError("No phone"))?,
+        last_name: primary_bo.last_name.ok_or(ValidationError("No email"))?,
     };
     let invited = Invited {
-        email: invited_bo.email.into(),
-        phone_number: invited_bo.phone_number.e164(),
+        email: invited_bo
+            .email
+            .ok_or(ValidationError("Invited no email"))?
+            .into(),
+        phone_number: invited_bo
+            .phone_number
+            .ok_or(ValidationError("Invited no phone"))?
+            .e164(),
     };
 
+    let business_name = bvw
+        .get_p_data(&BDK::Name.into())
+        .ok_or(ValidationError("No business name"))?;
     let result = HostedBusiness {
-        name: business_name,
+        name: business_name.clone(),
         inviter,
         invited,
     };

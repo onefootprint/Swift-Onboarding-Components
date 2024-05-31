@@ -119,7 +119,7 @@ impl<Type> VaultWrapper<Type> {
         let result = Self {
             vault: user_vault,
             all_data: ordered_data,
-            _seqno: seqno,
+            seqno,
             is_hydrated: PhantomData,
         };
         Ok(result)

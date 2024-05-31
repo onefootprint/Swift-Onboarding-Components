@@ -6,7 +6,6 @@ use crate::errors::{
 };
 use crate::utils::vault_wrapper::{
     Business,
-    DecryptedBusinessOwners,
     Person,
     TenantVw,
     VaultWrapper,
@@ -36,7 +35,6 @@ use newtypes::{
     PhoneNumber,
     PiiBytes,
     PiiString,
-    ScopedVaultId,
 };
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -169,12 +167,11 @@ pub async fn build_docv_data_from_identity_doc(
 }
 
 pub async fn build_business_data_from_verification_request(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
+    state: &State,
     request: VerificationRequest,
 ) -> Result<BusinessDataFromVault, ApiError> {
-    let seqno = request.uvw_snapshot_seqno;
-    let (sv, bvw) = db_pool
+    let (sv, bvw) = state
+        .db_pool
         .db_query(move |conn| -> ApiResult<(ScopedVault, VaultWrapper<_>)> {
             let sv = ScopedVault::get(conn, &request.scoped_vault_id)?;
             let args = VwArgs::Historical(&request.scoped_vault_id, request.uvw_snapshot_seqno);
@@ -184,82 +181,28 @@ pub async fn build_business_data_from_verification_request(
         })
         .await?;
 
-    // Get FirstName + LastName for BO's. For Single-KYC, we get this from the JSON VaultData. For
-    // Multi_KYC, we get this from each BO's Vault
-    let dbo = bvw
-        .decrypt_business_owners(db_pool, enclave_client, &sv.tenant_id)
-        .await?;
-    let business_owners = match dbo {
-        DecryptedBusinessOwners::NoVaultedOrLinkedBos => vec![],
-        DecryptedBusinessOwners::NoVaultedBos {
-            primary_bo: _,
-            primary_bo_vault: _,
-        } => return Err(ApiError::from(BusinessError::BoOnboardingNotComplete)),
-        DecryptedBusinessOwners::VaultedBos { bos } => bos.into_iter().map(BoData::from).collect(),
-        DecryptedBusinessOwners::SingleKyc {
-            primary_bo: _,
-            primary_bo_vault: _,
-            primary_bo_data,
-            secondary_bos,
-        } => {
-            // I guess use vault_data for the primary BO too?
-            vec![primary_bo_data]
-                .into_iter()
-                .chain(secondary_bos)
-                .map(BoData::from)
-                .collect()
-        }
-        DecryptedBusinessOwners::MultiKyc {
-            primary_bo: _,
-            primary_bo_vault,
-            primary_bo_data: _,
-            secondary_bos,
-        } => {
-            let secondary_bo_vaults = secondary_bos
-                .into_iter()
-                .map(|b| b.2.ok_or(BusinessError::BoOnboardingNotComplete))
-                .collect::<Result<Vec<_>, _>>()?;
-            let vaults: Vec<_> = vec![primary_bo_vault]
-                .into_iter()
-                .chain(secondary_bo_vaults)
-                .map(|v| (v.0, v.1))
-                .collect();
-
-            let vws: HashMap<ScopedVaultId, TenantVw> = db_pool
-                .db_query(move |conn| VaultWrapper::multi_get_for_tenant(conn, vaults, Some(seqno)))
-                .await?;
-            // Future optimization would be to bulk decrypt multiple vaults data in one enclave call
-            let decrypt_futs = vws.into_values().map(|vw| async move {
-                let dis = &[IDK::FirstName.into(), IDK::LastName.into()];
-                let mut res = vw.decrypt_unchecked(enclave_client, dis).await?;
-                let first_name = res
-                    .remove(&IDK::FirstName.into())
-                    .ok_or(BusinessError::BoVaultMissingFirstName)?;
-                let last_name = res
-                    .remove(&IDK::LastName.into())
-                    .ok_or(BusinessError::BoVaultMissingLastName)?;
-
-                Ok::<_, ApiError>((first_name, last_name))
-            });
-            let res: Vec<(PiiString, PiiString)> = futures::future::join_all(decrypt_futs)
-                .await
-                .into_iter()
-                .collect::<Result<Vec<_>, _>>()?;
-            res.into_iter()
-                .map(|(first_name, last_name)| BoData {
-                    first_name,
-                    last_name,
-                })
-                .collect()
-        }
-    };
+    // Get FirstName + LastName for all BOs
+    let dbos = bvw.decrypt_business_owners(state, &sv.tenant_id).await?;
+    let business_owners = dbos
+        .into_iter()
+        .map(|bo| -> ApiResult<_> {
+            let Some((first_name, last_name)) = bo.first_name.zip(bo.last_name) else {
+                // The BO exists, but it doesn't have a name - means we haven't yet collected the BO's info
+                return Err(BusinessError::BoOnboardingNotComplete.into());
+            };
+            Ok(BoData {
+                first_name,
+                last_name,
+            })
+        })
+        .collect::<ApiResult<Vec<_>>>()?;
 
     // Get remaining Business vault data
     let all_bdks: Vec<_> = BDK::iter()
         .filter(|b| !matches!(b, BDK::BeneficialOwners | BDK::KycedBeneficialOwners))
         .map(DataIdentifier::from)
         .collect();
-    let mut decrypted_values = bvw.decrypt_unchecked(enclave_client, &all_bdks).await?;
+    let mut decrypted_values = bvw.decrypt_unchecked(&state.enclave_client, &all_bdks).await?;
 
     let bd = BusinessDataFromVault {
         name: decrypted_values.remove(&BDK::Name.into()),

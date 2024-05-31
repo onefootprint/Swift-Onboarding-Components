@@ -37,7 +37,6 @@ mod user_timeline;
 mod validate;
 mod watchlist_check;
 
-pub use business_owner::PrivateBusinessOwnerInfo;
 pub use entity::*;
 pub use organization::*;
 #[allow(unused_imports)]

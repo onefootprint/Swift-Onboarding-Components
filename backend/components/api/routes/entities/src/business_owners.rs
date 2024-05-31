@@ -4,14 +4,12 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::serializers::PrivateBusinessOwnerInfo;
 use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::{
     Business,
-    DecryptedBusinessOwners,
     TenantVw,
     VaultWrapper,
 };
@@ -49,63 +47,11 @@ pub async fn get(
         })
         .await?;
 
-    let decrypted_bos = vw
-        .decrypt_business_owners(&state.db_pool, &state.enclave_client, &sv.tenant_id)
-        .await?;
+    let decrypted_bos = vw.decrypt_business_owners(&state, &sv.tenant_id).await?;
 
-    let results = business_owner_infos(decrypted_bos)
+    let results = decrypted_bos
         .into_iter()
         .map(api_wire_types::PrivateBusinessOwner::from_db)
         .collect();
     ResponseData::ok(results).json()
-}
-
-fn business_owner_infos(decrypted_bos: DecryptedBusinessOwners) -> Vec<PrivateBusinessOwnerInfo> {
-    match decrypted_bos {
-        DecryptedBusinessOwners::NoVaultedOrLinkedBos => vec![],
-        DecryptedBusinessOwners::NoVaultedBos {
-            primary_bo,
-            primary_bo_vault,
-        } => vec![(None, Some(primary_bo), Some(primary_bo_vault))],
-        DecryptedBusinessOwners::VaultedBos { bos } => bos
-            .into_iter()
-            .map(|b| (Some(b.ownership_stake), None, None))
-            .collect(),
-        DecryptedBusinessOwners::SingleKyc {
-            primary_bo,
-            primary_bo_vault,
-            primary_bo_data,
-            secondary_bos,
-        } => {
-            let mut v = vec![(
-                Some(primary_bo_data.ownership_stake),
-                Some(primary_bo),
-                Some(primary_bo_vault),
-            )];
-            v.extend(
-                secondary_bos
-                    .into_iter()
-                    .map(|b| (Some(b.ownership_stake), None, None)),
-            );
-            v
-        }
-        DecryptedBusinessOwners::MultiKyc {
-            primary_bo,
-            primary_bo_vault,
-            primary_bo_data,
-            secondary_bos,
-        } => {
-            let mut v = vec![(
-                Some(primary_bo_data.ownership_stake),
-                Some(primary_bo),
-                Some(primary_bo_vault),
-            )];
-            v.extend(
-                secondary_bos
-                    .into_iter()
-                    .map(|b| (Some(b.0.ownership_stake), Some(b.1), b.2)),
-            );
-            v
-        }
-    }
 }

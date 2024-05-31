@@ -54,7 +54,7 @@ pub struct VaultWrapper<Type = Any> {
     all_data: HashMap<DataIdentifier, Vec<VaultData>>,
     /// The seqno used to reconstruct the UVW. May be the latest seqno if we're not constructing
     /// a historical view.
-    _seqno: DataLifetimeSeqno,
+    seqno: DataLifetimeSeqno,
     /// Represents whether we have fetched the appropriate data
     is_hydrated: PhantomData<Type>,
 }

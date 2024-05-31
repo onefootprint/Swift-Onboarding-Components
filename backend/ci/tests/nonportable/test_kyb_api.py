@@ -2,6 +2,24 @@ import pytest
 from tests.utils import create_ob_config, post, get
 from tests.constants import BUSINESS_DATA, CDO_TO_DIS
 
+MUST_COLLECT_DATA = [
+    "business_name",
+    "business_tin",
+    "business_address",
+]
+
+
+@pytest.fixture
+def obc(sandbox_tenant):
+    return create_ob_config(
+        sandbox_tenant,
+        "Business-only config",
+        MUST_COLLECT_DATA,
+        MUST_COLLECT_DATA,
+        kind="kyb",
+        skip_kyc=True,
+    )
+
 
 @pytest.mark.parametrize(
     "sandbox_outcome,missing_data",
@@ -12,24 +30,11 @@ from tests.constants import BUSINESS_DATA, CDO_TO_DIS
         ("fail", False),
     ],
 )
-def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
-    must_collect_data = [
-        "business_name",
-        "business_tin",
-        "business_address",
-    ]
-    obc = create_ob_config(
-        sandbox_tenant,
-        "Business-only config",
-        must_collect_data,
-        must_collect_data,
-        kind="kyb",
-        skip_kyc=True,
-    )
+def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data, obc):
 
     # make API-created Business vault with no BO data present
     vault_data = {}
-    for cdo in must_collect_data:
+    for cdo in MUST_COLLECT_DATA:
         for di in CDO_TO_DIS[cdo]:
             vault_data[di] = BUSINESS_DATA[di]
 
@@ -70,3 +75,25 @@ def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
     )
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
+
+
+def test_kyb_with_bos_linked_via_api(sandbox_tenant, obc):
+    vault_data = {}
+    for cdo in MUST_COLLECT_DATA:
+        for di in CDO_TO_DIS[cdo]:
+            vault_data[di] = BUSINESS_DATA[di]
+    body = post("businesses", vault_data, sandbox_tenant.sk.key)
+    fp_bid = body["id"]
+
+    data = {
+        "id.first_name": "Piip",
+        "id.last_name": "Businessowner",
+    }
+    body = post("users", data, sandbox_tenant.sk.key)
+    data = dict(fp_id=body["id"])
+    body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
+
+    data = dict(onboarding_config_key=obc.key.value, fixture_result="pass")
+    kyb = post(f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key)
+    assert kyb["requires_manual_review"] == False
+    assert kyb["status"] == "pass"

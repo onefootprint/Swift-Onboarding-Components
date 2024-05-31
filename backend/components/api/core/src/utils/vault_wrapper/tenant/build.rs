@@ -65,6 +65,9 @@ impl<Type> VaultWrapper<Type> {
         users: Vec<(ScopedVault, Vault)>,
         seqno: Option<DataLifetimeSeqno>,
     ) -> ApiResult<HashMap<ScopedVaultId, TenantVw<Type>>> {
+        if users.is_empty() {
+            return Ok(HashMap::new());
+        }
         let sv_ids: Vec<_> = users.iter().map(|(sv, _)| &sv.id).collect();
         let current_seqno = DataLifetime::get_current_seqno(conn)?;
         let reconstruction_seqno = seqno.unwrap_or(current_seqno);
