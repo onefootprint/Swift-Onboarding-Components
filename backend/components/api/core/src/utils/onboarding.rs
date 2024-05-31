@@ -144,7 +144,7 @@ pub fn get_or_start_onboarding(
 
     // If the ob config has business fields, create a business vault, scoped vault, and ob
     let biz_wf = if let Some(new_biz_args) = new_biz_args {
-        let existing_businesses = BusinessOwner::list_businesses(conn, &user_vault.id, &obc.id)?;
+        let existing_businesses = BusinessOwner::list_businesses_for_playbook(conn, &user_vault.id, &obc.id)?;
         let biz_wf = if let Some(existing) = existing_businesses.into_iter().next() {
             // If the user has already started onboarding their business onto this exact
             // ob config, we should locate it.

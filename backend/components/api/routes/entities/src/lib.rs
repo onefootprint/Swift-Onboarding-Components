@@ -5,6 +5,7 @@ mod ai_summarize;
 mod annotations;
 mod auth_events;
 mod business_owners;
+mod businesses;
 mod client_token;
 mod data;
 mod decisions;
@@ -46,6 +47,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(rule_set_result::get_latest_workflow_decision)
         .service(rule_set_result::get)
         .service(business_owners::get)
+        .service(businesses::get)
         .service(user_insight::get)
         .service(dupes::get_dupes)
         .service(ai_summarize::get);

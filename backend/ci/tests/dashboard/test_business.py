@@ -44,6 +44,7 @@ def test_get_entities(sandbox_tenant, primary_bo, populated_business_data):
 
 
 def test_get_business_owners(sandbox_tenant, primary_bo):
+    """Test the business -> users (owners) lookup"""
     body = get(
         f"entities/{primary_bo.fp_bid}/business_owners", None, *sandbox_tenant.db_auths
     )
@@ -55,6 +56,16 @@ def test_get_business_owners(sandbox_tenant, primary_bo):
     assert not body[1].get("id")
     assert body[1]["ownership_stake"] == 30
     assert body[1]["kind"] == "secondary"
+
+
+def test_get_businesses(sandbox_tenant, primary_bo):
+    """Test the user -> owned businesses lookup"""
+    body = get(
+        f"entities/{primary_bo.fp_id}/businesses", None, *sandbox_tenant.db_auths
+    )
+    assert len(body) == 1
+    assert body[0]["id"] == primary_bo.fp_bid
+    assert body[0]["status"] == "pass"
 
 
 def test_public_bos(sandbox_tenant, primary_bo):

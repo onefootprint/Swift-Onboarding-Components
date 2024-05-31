@@ -17,6 +17,7 @@ use db_schema::schema::{
     business_owner,
     scoped_vault,
     vault,
+    workflow,
 };
 use diesel::prelude::*;
 use itertools::Itertools;
@@ -152,16 +153,12 @@ impl BusinessOwner {
     }
 
     /// List the set of businesses belonging to this user onboarded onto the provided ob config
-    #[tracing::instrument("BusinessOwner::list_businesses", skip_all)]
-    pub fn list_businesses(
+    #[tracing::instrument("BusinessOwner::list_businesses_for_playbook", skip_all)]
+    pub fn list_businesses_for_playbook(
         conn: &mut PgConn,
         uv_id: &VaultId,
         ob_config_id: &ObConfigurationId,
     ) -> DbResult<Vec<(BusinessOwner, (ScopedVault, Workflow))>> {
-        use db_schema::schema::{
-            scoped_vault,
-            workflow,
-        };
         let result = business_owner::table
             .inner_join(
                 scoped_vault::table
@@ -172,6 +169,21 @@ impl BusinessOwner {
             // Only get the ScopedVault for the businesses that onboarded onto the
             // same ob config
             .filter(workflow::ob_configuration_id.eq(ob_config_id))
+            .get_results(conn)?;
+        Ok(result)
+    }
+
+    /// List the set of businesses belonging to this user
+    #[tracing::instrument("BusinessOwner::list_businesses", skip_all)]
+    pub fn list_businesses(
+        conn: &mut PgConn,
+        uv_id: &VaultId,
+        tenant_id: &TenantId,
+    ) -> DbResult<Vec<(BusinessOwner, ScopedVault)>> {
+        let result = business_owner::table
+            .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(business_owner::business_vault_id)))
+            .filter(business_owner::user_vault_id.eq(uv_id))
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
             .get_results(conn)?;
         Ok(result)
     }

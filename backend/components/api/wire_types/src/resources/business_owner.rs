@@ -20,6 +20,12 @@ pub struct PrivateBusinessOwner {
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct PrivateOwnedBusiness {
+    pub id: FpId,
+    pub status: Option<OnboardingStatus>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct BusinessOwner {
     pub fp_id: FpId,
 }

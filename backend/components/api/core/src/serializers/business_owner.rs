@@ -28,6 +28,16 @@ impl DbToApi<PrivateBusinessOwnerInfo> for api_wire_types::PrivateBusinessOwner 
     }
 }
 
+impl DbToApi<(BusinessOwner, ScopedVault)> for api_wire_types::PrivateOwnedBusiness {
+    fn from_db((_, sb): (BusinessOwner, ScopedVault)) -> Self {
+        // if BusinessOwner is None, that means we have a secondary BO from the Single KYC flow
+        let ScopedVault {
+            fp_id: id, status, ..
+        } = sb;
+        Self { id, status }
+    }
+}
+
 pub type BusinessOwnerInfo = (BusinessOwner, UserData);
 
 impl DbToApi<BusinessOwnerInfo> for api_wire_types::BusinessOwner {
