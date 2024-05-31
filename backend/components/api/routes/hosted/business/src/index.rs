@@ -52,7 +52,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> JsonApiResp
                 .as_ref()
                 .is_some_and(|b| b.link_id == bo_auth.bo.link_id)
         })
-        .ok_or(BusinessError::BoNotFound)?;
+        .ok_or(BusinessError::LinkedBoNotFound)?;
 
     let inviter = Inviter {
         first_name: primary_bo.first_name.ok_or(ValidationError("No phone"))?,

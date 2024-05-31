@@ -179,7 +179,7 @@ impl VaultWrapper<Business> {
                         .iter()
                         .find(|bo| bo.0.link_id == vault_bo.link_id)
                         .cloned()
-                        .ok_or(BusinessError::BoNotFound)?;
+                        .ok_or(BusinessError::LinkedBoNotFound)?;
                     Ok((vault_bo, linked_bo))
                 })
                 .map_ok(|(vault_bo, (linked_bo, linked_bo_data))| BusinessOwnerInfo {

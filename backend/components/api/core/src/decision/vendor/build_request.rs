@@ -1,8 +1,8 @@
 use crate::enclave_client::EnclaveClient;
-use crate::errors::business::BusinessError;
 use crate::errors::{
     ApiError,
     ApiResult,
+    ValidationError,
 };
 use crate::utils::vault_wrapper::{
     Business,
@@ -188,7 +188,7 @@ pub async fn build_business_data_from_verification_request(
         .map(|bo| -> ApiResult<_> {
             let Some((first_name, last_name)) = bo.first_name.zip(bo.last_name) else {
                 // The BO exists, but it doesn't have a name - means we haven't yet collected the BO's info
-                return Err(BusinessError::BoOnboardingNotComplete.into());
+                return ValidationError("BO is missing name").into();
             };
             Ok(BoData {
                 first_name,

@@ -95,8 +95,8 @@ pub async fn send_missing_secondary_bo_links(
         .find(|bo| bo.kind == BusinessOwnerKind::Primary)
         .ok_or(BusinessError::PrimaryBoNotFound)?
         .clone();
-    let first_name = primary_bo.first_name.ok_or(BusinessError::PrimaryBoNotFound)?;
-    let last_name = primary_bo.last_name.ok_or(BusinessError::PrimaryBoNotFound)?;
+    let first_name = primary_bo.first_name.ok_or(ValidationError("No first name"))?;
+    let last_name = primary_bo.last_name.ok_or(ValidationError("No last name"))?;
     let inviter = PiiString::new(format!("{} {}", first_name.leak(), last_name.leak()));
     let business_name = bvw
         .get_p_data(&BDK::Name.into())
@@ -108,7 +108,7 @@ pub async fn send_missing_secondary_bo_links(
             let bo_data = missing_kyc_secondary_bos
                 .iter()
                 .find(|bo| bo.linked_bo.as_ref().is_some_and(|bo| bo.link_id == l_id))
-                .ok_or(BusinessError::BoNotFound)?;
+                .ok_or(BusinessError::LinkedBoNotFound)?;
             let url = state
                 .config
                 .service_config
