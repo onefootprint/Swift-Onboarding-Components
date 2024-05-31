@@ -1,1 +1,1 @@
-DROP INDEX CONCURRENTLY fingerprint_dupes_query;
+DROP INDEX CONCURRENTLY IF EXISTS fingerprint_dupes_query;
