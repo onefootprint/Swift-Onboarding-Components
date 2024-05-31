@@ -89,48 +89,53 @@ on:
         required: true
 
 jobs:
-  push_containers:
-    name: Push built containers
+  copy_images:
+    name: Copy container images to the target environment
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
       - name: Configure AWS Credentials (Image Cache)
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 #1
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
           aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
-      - name: Fetch cached containers
-        run: |
-          account="$(aws sts get-caller-identity --query "Account" --output text)"
-          echo "account is ${account}"
+      - name: Login to Amazon ECR (Image Cache)
+        id: login-ecr-image-cache
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
+      - name: Configure AWS Credentials (Target Account)
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ inputs.apiComponentVersion }}
-          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ inputs.apiComponentVersion }} api:${{ inputs.apiComponentVersion }} 
+      - name: Login to Amazon ECR (Target Account)
+        id: login-ecr-target
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }}
-          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }} enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }}
+      - name: Install crane for copying images
+        uses: imjasonh/setup-crane@00c9e93efa4e1138c9a7a5c594acd6c75a2fbf0c # v0.3
 
-      - name: Push containers to Target ECR
-        run: |
-          account="$(aws sts get-caller-identity --query "Account" --output text)"
-          echo "account is ${account}"
-
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          apiComponentVersion="${{ inputs.apiComponentVersion }}"
-          enclaveComponentVersion="${{ inputs.enclaveComponentVersion }}"
-
-          docker tag api:${apiComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${apiComponentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${apiComponentVersion}
-
-          docker tag enclave_proxy_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${enclaveComponentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${enclaveComponentVersion}
+      - name: Copy API image to target ECR
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SRC_REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+          DST_REGISTRY: ${{ steps.login-ecr-target.outputs.registry }}
+          REPO: api
+          TAG: ${{ inputs.apiComponentVersion }}
+        run: |
+          crane cp ${SRC_REGISTRY}/${REPO}:${TAG} ${DST_REGISTRY}/${REPO}:${TAG}
+
+      - name: Copy Enclave image to target ECR
+        env:
+          SRC_REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+          DST_REGISTRY: ${{ steps.login-ecr-target.outputs.registry }}
+          REPO: enclave_proxy_pkg
+          TAG: ${{ inputs.enclaveComponentVersion }}
+        run: |
+          crane cp ${SRC_REGISTRY}/${REPO}:${TAG} ${DST_REGISTRY}/${REPO}:${TAG}
 
   sign_push_enclave:
     name: Sign and push enclave
@@ -193,7 +198,7 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
       url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
-    needs: [push_containers, sign_push_enclave]
+    needs: [copy_images, sign_push_enclave]
     if: success()
     steps:
       - uses: actions/checkout@v4
@@ -304,14 +309,14 @@ jobs:
               issue_number: context.issue.number,
             });
 
-            // Find any comment already made by the bot.                                                                                                    
+            // Find any comment already made by the bot.
             const botComment = comments.find(comment => comment.user.id === 41898282 && comment.body.includes('Deployed 🚀'));
             const commentBody = "**Deployed 🚀**\n\
             - URL: ${{ steps.pulumi_deploy.outputs.apiUrl }}\n\
             - Stack name: `${{ steps.pulumi_deploy.outputs.shortStackName }}`\n\
             - **api**: `${{ inputs.apiComponentVersion }}`\n\
             - **enclave**: `${{ inputs.enclaveComponentVersion }}`";
-                                                                  
+
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
