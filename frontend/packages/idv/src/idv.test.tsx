@@ -499,7 +499,7 @@ describe('<Idv />', () => {
       // Should render id doc requirement
       await waitFor(() => {
         expect(
-          screen.getByText('Scan or upload your ID document'),
+          screen.getByText('Capture or upload your ID document'),
         ).toBeInTheDocument();
       });
       expect(

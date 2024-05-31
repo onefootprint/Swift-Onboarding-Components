@@ -1282,7 +1282,7 @@
       },
       "components": {
         "id-doc-photo-prompt": {
-          "title": "Scan or upload the {{side}} of your {{type}} ({{country}})",
+          "title": "Capture or upload the {{side}} of your {{type}} ({{country}})",
           "camera-permission-name": "camera",
           "photo-lib-permission-name": "photo library",
           "guidelines": {
@@ -1333,7 +1333,7 @@
           }
         },
         "country-and-type-selection": {
-          "title": "Scan or upload your ID document",
+          "title": "Capture or upload your ID document",
           "subtitle": "We need some more information from you.",
           "form": {
             "country": "Country",

@@ -72,7 +72,7 @@ test('reverse-doc #ci', async ({ browser, isMobile, page }) => {
   await continueOnDesktop(frame);
   await page.waitForLoadState();
 
-  const scanText = frame.getByText(/scan or upload/i).first();
+  const scanText = frame.getByText(/capture or upload/i).first();
   await scanText.waitFor({ state: 'attached', timeout: 3000 });
 
   await clickOnContinue(frame);

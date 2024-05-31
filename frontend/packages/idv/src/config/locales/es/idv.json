@@ -1283,7 +1283,7 @@
       },
       "components": {
         "id-doc-photo-prompt": {
-          "title": "Escanea o sube el {{side}} de tu {{type}} ({{country}})",
+          "title": "Captura o sube el {{side}} de tu {{type}} ({{country}})",
           "camera-permission-name": "cámara",
           "photo-lib-permission-name": "biblioteca de fotos",
           "guidelines": {
@@ -1334,7 +1334,7 @@
           }
         },
         "country-and-type-selection": {
-          "title": "Escanear o subir tu documento de identificación",
+          "title": "Captura o subir tu documento de identificación",
           "subtitle": "Necesitamos más información de tu parte.",
           "form": {
             "country": "País",
