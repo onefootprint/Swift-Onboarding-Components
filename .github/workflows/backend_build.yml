@@ -48,7 +48,7 @@ jobs:
           commitHash: ${{ inputs.commitHash }}
 
   build_api:
-    name: Build API server container
+    name: Build API server image
     runs-on: 16core
     needs: [extract_commit]
     if: success()
@@ -73,44 +73,46 @@ jobs:
           sudo mv ~/docker-cache /var/lib/docker/volumes/cargo-cache
 
       - name: Configure AWS Credentials (Image Cache)
-        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a #4.0.1
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
           aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
-      - name: Fetch cached containers
-        run: |
-          account="$(aws sts get-caller-identity --query "Account" --output text)"
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ needs.extract_commit.outputs.apiComponentVersion }} && docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ needs.extract_commit.outputs.apiComponentVersion }} api:${{ needs.extract_commit.outputs.apiComponentVersion }} || echo "Image not found"
+      - name: Login to Amazon ECR (Image Cache)
+        id: login-ecr-image-cache
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-      # package and push the api image
-      - name: build api container
+      - name: Install crane
+        uses: imjasonh/setup-crane@00c9e93efa4e1138c9a7a5c594acd6c75a2fbf0c # v0.3
+
+      - name: Build api container if necessary
         working-directory: ./backend
+        env:
+          REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+          REPO: api
+          TAG: ${{ needs.extract_commit.outputs.apiComponentVersion }}
+          SERVER_GIT_HASH: ${{ needs.extract_commit.outputs.expectedServerVersion }}
+          RUST_VERSION: ${{ inputs.rustVersion }}
         run: |
-          rm .cargo/config.toml
-          componentVersion="${{ needs.extract_commit.outputs.apiComponentVersion }}"
-          serverGitHash="${{ needs.extract_commit.outputs.expectedServerVersion }}"
-          account="$(aws sts get-caller-identity --query "Account" --output text)"
-          echo "using account ${account}"
-          echo "create image tagged as ${componentVersion}"
+          set -euxo pipefail
 
-          function build_api {
-            echo "building release mode"
-            docker run --env GIT_HASH="${serverGitHash}" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p api_server --release
+          IMG_REF="${REGISTRY}/${REPO}:${TAG}"
+          echo "Image: ${IMG_REF}"
+
+          # Why?
+          rm .cargo/config.toml
+
+          function build_and_push_api {
+            echo "[release] building api"
+            docker run --env GIT_HASH="${SERVER_GIT_HASH}" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p api_server --release
             cp ./target/x86_64-unknown-linux-musl/release/api_server ./out/api_server
-            docker build -t "api:${componentVersion}" -f api.dockerfile .
+            docker build -t "${IMG_REF}" -f api.dockerfile .
+            docker push ${IMG_REF}
           }
 
-          # check cache or build
-          docker inspect api:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && build_api)
-
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker tag api:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}
-        env:
-          RUST_VERSION: ${{ inputs.rustVersion }}
+          # Build the image for this component version if it doesn't already exist in the image cache.
+          crane digest ${IMG_REF} && echo "Image already exists. Skipping build." || (echo "Image hasn't been built. Building..." && build_and_push_api)
 
       - name: cache permissions # workaround: move the cargo cache to somewhere it can be cached
         run: |
@@ -119,54 +121,56 @@ jobs:
           sudo chown -R $(whoami):$(whoami) ~/docker-cache
 
   build_enclave_proxy:
-    name: Build Enclave Proxy
+    name: Build Enclave Proxy image
     runs-on: 16core
     needs: [extract_commit]
     if: success()
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commitHash }}
+
       - name: Configure AWS Credentials (Image Cache)
-        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a #4.0.1
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
           aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
-      - name: Fetch cached containers
-        run: |
-          account="$(aws sts get-caller-identity --query "Account" --output text)"
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} && docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} || echo "Image not found"
+      - name: Login to Amazon ECR (Image Cache)
+        id: login-ecr-image-cache
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.commitHash }}
+      - name: Install crane
+        uses: imjasonh/setup-crane@00c9e93efa4e1138c9a7a5c594acd6c75a2fbf0c # v0.3
 
-      - name: build enclave proxy
+      - name: Build enclave proxy image if necessary
         working-directory: ./backend
+        env:
+          REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+          REPO: enclave_proxy_pkg
+          TAG: ${{ needs.extract_commit.outputs.enclaveComponentVersion }}
+          SERVER_GIT_HASH: ${{ needs.extract_commit.outputs.expectedServerVersion }}
+          RUST_VERSION: ${{ inputs.rustVersion }}
         run: |
-          git --version
-          rm .cargo/config.toml
-          componentVersion="${{ needs.extract_commit.outputs.enclaveComponentVersion }}"
-          serverGitHash="${{ needs.extract_commit.outputs.expectedServerVersion }}"
-          account="$(aws sts get-caller-identity --query "Account" --output text)"
-          echo "using account ${account}"
-          echo "create image tagged as ${componentVersion}"
+          set -euxo pipefail
 
-          function build_enclave_proxy {
+          IMG_REF="${REGISTRY}/${REPO}:${TAG}"
+          echo "Image: ${IMG_REF}"
+
+          # Why?
+          rm .cargo/config.toml
+
+          function build_and_push_enclave_proxy {
             echo "[release] building enclave-proxy"
             docker run --env GIT_HASH="${serverGitHash}" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p enclave_proxy --features vsock --release
             cp ./target/x86_64-unknown-linux-musl/release/enclave_proxy ./out/enclave_proxy
-            docker build -t "enclave_proxy_pkg:${componentVersion}" -f enclave_proxy_package.dockerfile .
+            docker build -t "${IMG_REF}" -f enclave_proxy_package.dockerfile .
+            docker push ${IMG_REF}
           }
 
-          # check cache or build
-          docker inspect enclave_proxy_pkg:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && build_enclave_proxy)
-
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${componentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${componentVersion}
-        env:
-          RUST_VERSION: ${{ inputs.rustVersion }}
+          # Build the image for this component version if it doesn't already exist in the image cache.
+          crane digest ${IMG_REF} && echo "Image already exists. Skipping build." || (echo "Image hasn't been built. Building..." && build_and_push_enclave_proxy)
 
   build_enclave:
     name: Build Enclave
