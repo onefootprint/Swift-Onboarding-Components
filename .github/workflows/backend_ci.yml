@@ -122,7 +122,7 @@ jobs:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
     runs-on: 16core
-    environment: backend_ci
+    environment: dev
     services:
       postgres:
         image: postgres:14.3
