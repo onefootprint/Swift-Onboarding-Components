@@ -85,8 +85,6 @@ jobs:
     secrets:
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
-      # None
-      IT_SVIX_API_KEY:
 
   notify_slack:
     needs: [deploy_stack_prod]
