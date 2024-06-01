@@ -81,4 +81,5 @@ jobs:
     secrets:
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
-      IT_SVIX_API_KEY: ${{ secrets.IT_SVIX_API_KEY }}
+      # None
+      IT_SVIX_API_KEY:
