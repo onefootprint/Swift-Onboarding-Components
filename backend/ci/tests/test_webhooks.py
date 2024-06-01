@@ -1,6 +1,6 @@
 import pytest
 import multiprocessing
-from tests.constants import SVIX_AUTH_TOKEN, ENVIRONMENT
+from tests.constants import IT_SVIX_API_KEY, ENVIRONMENT
 from tests.utils import EXPECTED_SERVER_VERSION_GIT_HASH, try_until_success
 from tests.utils import get
 from tests.bifrost_client import BifrostClient
@@ -24,7 +24,7 @@ def check_webhook(hooky_url, webhook_fpids):
 
 
 @pytest.mark.skipif(
-    ENVIRONMENT == "production",
+    ENVIRONMENT == "production" or ENVIRONMENT == "dev" or ENVIRONMENT == "ephemeral",
     reason="Cannot leak production svix key to integration tests",
 )
 @pytest.mark.flaky
@@ -36,7 +36,7 @@ def test_webhook_e2e(sandbox_tenant, run_id):
     app_id = body["app_id"]
 
     # 2. register a webhook for testing
-    svix = Svix(SVIX_AUTH_TOKEN)
+    svix = Svix(IT_SVIX_API_KEY)
     app = svix.application.get_or_create(
         ApplicationIn(
             name=f"{sandbox_tenant.name} ( Sandbox)", uid=f"{sandbox_tenant.id}_sandbox"

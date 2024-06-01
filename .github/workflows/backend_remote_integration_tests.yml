@@ -35,7 +35,7 @@ on:
         required: true
       IT_TWILIO_SECRET_AUTH_TOKEN:
         required: true
-      SVIX_AUTH_TOKEN:
+      IT_SVIX_API_KEY:
         required: true
 
 jobs:
@@ -72,7 +72,7 @@ jobs:
           IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
           IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
           DITTO_URL: 'https://ditto.footprint.dev'
-          SVIX_AUTH_TOKEN: ${{ secrets.SVIX_AUTH_TOKEN }}
+          IT_SVIX_API_KEY:${{ secrets.IT_SVIX_API_KEY }}
           ENVIRONMENT: ${{ inputs.environment_name }}
 
       - name: Create PR comment
