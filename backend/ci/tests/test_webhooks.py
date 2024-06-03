@@ -23,7 +23,10 @@ def check_webhook(hooky_url, webhook_fpids):
         webhook_fpids.append(fp_id)
 
 
-@pytest.mark.skip
+@pytest.mark.skipif(
+    ENVIRONMENT == "ephemeral",
+    reason="Cannot leak svix key in integration tests environment",
+)
 @pytest.mark.flaky
 def test_webhook_e2e(sandbox_tenant, run_id):
     # 1. get the svix app id
@@ -45,19 +48,19 @@ def test_webhook_e2e(sandbox_tenant, run_id):
     # Remove existing endpoints in svix from previous integration testing runs
     endpoints = svix.endpoint.list(app.id)
 
-    hooky_url = f"https://hooky.footprint.dev/fp_integ_{run_id}"
-    channels = (
-        [EXPECTED_SERVER_VERSION_GIT_HASH] if EXPECTED_SERVER_VERSION_GIT_HASH else None
-    )
-    endpoints = svix.endpoint.list(app_id)
-    for endpoint in endpoints.data:
-        print(f"Deleting svix endpoint {endpoint.id}")
-        svix.endpoint.delete(app.id, endpoint.id)
+    if ENVIRONMENT not in ("production", "dev"):
+        # Use a test-run-specific webhook callback URL
+        hooky_url = f"https://hooky.footprint.dev/fp_integ_{run_id}"
+        endpoints = svix.endpoint.list(app_id)
+        for endpoint in endpoints.data:
+            print(f"Deleting svix endpoint {endpoint.id}")
+            svix.endpoint.delete(app.id, endpoint.id)
 
-    print(f"Num endpoints: {len(endpoints.data)}")
-    endpoint = svix.endpoint.create(
-        app.id, EndpointIn(url=hooky_url, version=1, channels=channels)
-    )
+        print(f"Num endpoints: {len(endpoints.data)}")
+        endpoint = svix.endpoint.create(app.id, EndpointIn(url=hooky_url, version=1))
+    else:
+        # Use an environment-specific webhook callback URL. These have been manually configured in the SVIX UI
+        hooky_url = f"https://hooky.footprint.dev/fp_integ_{ENVIRONMENT}"
 
     # Start a background process to read all the fp_ids sent to hooky
     manager = multiprocessing.Manager()

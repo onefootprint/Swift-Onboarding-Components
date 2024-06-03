@@ -169,6 +169,7 @@ jobs:
         env:
           EXPECTED_SERVER_VERSION: ${{ github.sha }}
           TEST_URL: 'http://localhost:8000'
+          IT_SVIX_API_KEY: ${{ secrets.IT_SVIX_API_KEY }}
           ENVIRONMENT: ci
 
       - name: Create results for PR
