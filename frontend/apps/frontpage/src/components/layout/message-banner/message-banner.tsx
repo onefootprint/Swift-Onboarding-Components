@@ -1,5 +1,6 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { media, Portal, Stack, Text } from '@onefootprint/ui';
+import { media, Stack, Text } from '@onefootprint/ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,47 +8,89 @@ import styled, { css } from 'styled-components';
 
 type MessageBannerProps = {
   onClose: () => void;
+  showBanner: boolean;
   articleUrl: string;
   text: string;
 };
 
 export const CASE_STUDY_BANNER_PORTAL_ID = 'banner-portal';
 
-const MessageBanner = ({ onClose, articleUrl, text }: MessageBannerProps) => {
+const MessageBanner = ({
+  onClose,
+  articleUrl,
+  text,
+  showBanner,
+}: MessageBannerProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.message-banner',
   });
 
+  const containerVariants = {
+    initial: { opacity: 1, height: 'auto' },
+    animate: {
+      opacity: 1,
+      height: 'auto',
+      transition: { duration: 0.2 },
+    },
+    exit: {
+      opacity: 0,
+      height: 0,
+      transition: { duration: 0.1 },
+      transitionEnd: { display: 'none' },
+    },
+  };
+
+  const textVariants = {
+    initial: { opacity: 0, filter: 'blur(10px)' },
+    animate: {
+      opacity: 1,
+      filter: 'blur(0px)',
+      transition: { duration: 1, delay: 0 },
+    },
+  };
+
   return (
-    <Portal selector={`#${CASE_STUDY_BANNER_PORTAL_ID}`}>
-      <Container>
-        <Text variant="label-3">
-          {text}
-          <StyledLink href={articleUrl}>{t('cta')}</StyledLink>
-        </Text>
-        <CloseButtonContainer onClick={onClose}>
-          <IcoCloseSmall16 />
-        </CloseButtonContainer>
-      </Container>
-    </Portal>
+    <AnimatePresence>
+      {showBanner && (
+        <Container
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+        >
+          <motion.div
+            variants={textVariants}
+            initial="initial"
+            animate="animate"
+          >
+            <Text variant="label-3">
+              {text}
+              <StyledLink href={articleUrl}>{t('cta')}</StyledLink>
+            </Text>
+          </motion.div>
+          <CloseButtonContainer onClick={onClose}>
+            <IcoCloseSmall16 />
+          </CloseButtonContainer>
+        </Container>
+      )}
+    </AnimatePresence>
   );
 };
 
-const Container = styled(Stack)`
+const Container = styled(motion(Stack))`
   ${({ theme }) => css`
     align-items: center;
     justify-content: center;
-    display: inline-flex;
+    display: flex;
     position: relative;
+    padding: ${theme.spacing[3]} ${theme.spacing[9]};
     background-color: ${theme.backgroundColor.primary};
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[3]} ${theme.spacing[9]};
     text-align: center;
     width: 100%;
 
     ${media.greaterThan('md')`
       flex-direction: row;
-      height: ${theme.spacing[9]};
     `}
   `}
 `;

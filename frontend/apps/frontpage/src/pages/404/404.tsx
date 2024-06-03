@@ -10,7 +10,11 @@ const Page404 = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.404' });
   return (
     <>
-      <SEO title={t('html-title')} />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/404"
+      />
       <Container width="100%" justifyContent="center" alignItems="center">
         <EmptyState
           title={t('title')}

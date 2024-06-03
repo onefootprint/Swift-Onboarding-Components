@@ -13,7 +13,11 @@ const IdvPrivacy = () => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/idv-privacy" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/idv-privacy"
+      />
       <Hero>
         <Text variant="display-2" textAlign="center">
           {t('title')}

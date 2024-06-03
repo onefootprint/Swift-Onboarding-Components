@@ -1,4 +1,3 @@
-import { LoadFonts } from '@onefootprint/ui';
 import type { DocumentContext } from 'next/document';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
@@ -31,7 +30,6 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <LoadFonts />
           <meta name="app-commit-sha" content={COMMIT_SHA} />
           <meta name="app-deployment-url" content={DEPLOYMENT_URL} />
           <meta

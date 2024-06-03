@@ -14,7 +14,11 @@ const CustomerStories = () => {
   });
   return (
     <>
-      <Seo title={t('html-title')} description={t('description')} />
+      <Seo
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/customers"
+      />
       <Hero />
       <FeaturedCards />
       <OtherCustomers />

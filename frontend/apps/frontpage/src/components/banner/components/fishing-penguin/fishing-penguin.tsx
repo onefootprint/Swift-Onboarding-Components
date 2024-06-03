@@ -10,13 +10,14 @@ export const FishingPenguin = () => (
       alt="Fishing Penguin"
       width={275}
       height={275}
-      priority
+      loading="lazy"
     />
     <Bucket
       src="/banners/fishing-penguin/bucket.svg"
       alt="Fishing Bucket"
       width={100}
       height={100}
+      loading="lazy"
     />
   </IllustrationContainer>
 );

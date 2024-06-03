@@ -77,7 +77,7 @@ const WhatIsThisCard = ({ $isVisible, onClose }: WhatIsThisCardProps) => {
             animate="animate"
             exit="exit"
           >
-            <IconContainer onClick={onClose}>
+            <IconContainer onClick={onClose} aria-label="Close">
               <IcoCloseSmall16 />
             </IconContainer>
             <Text variant="label-2">{t('title')}</Text>

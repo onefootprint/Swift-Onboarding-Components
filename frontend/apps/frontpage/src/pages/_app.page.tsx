@@ -2,6 +2,7 @@ import '@onefootprint/footprint-js/dist/footprint-js.css';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
+import { DM_Sans } from 'next/font/google';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
@@ -31,6 +32,14 @@ const GlobalStyle = createGlobalStyle`
    }
  `}
 `;
+
+const DMSans = DM_Sans({
+  display: 'swap',
+  preload: true,
+  subsets: ['latin'],
+  variable: '--font-dm-sans',
+  fallback: ['Inter'],
+});
 
 const App = ({ Component, pageProps }: AppProps) => (
   <>
@@ -96,7 +105,9 @@ const App = ({ Component, pageProps }: AppProps) => (
         <GlobalStyle />
         <Layout>
           <MDXProvider>
-            <Component {...pageProps} />
+            <div className={DMSans.className}>
+              <Component {...pageProps} />
+            </div>
           </MDXProvider>
         </Layout>
       </CustomDesignSystemProvider>

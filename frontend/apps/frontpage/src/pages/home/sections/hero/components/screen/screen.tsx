@@ -1,4 +1,4 @@
-import { Box, media } from '@onefootprint/ui';
+import { media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
@@ -49,7 +49,6 @@ const screenVariants = {
     opacity: 1,
     transform: 'translateY(0px) scale(1)',
     filter: 'blur(0px)',
-    boxShadow: '0px 0px 25px 6px rgba(0,0,0,0.08)',
     transition: {
       type: 'spring',
       stiffness: 50,
@@ -59,13 +58,43 @@ const screenVariants = {
 
 const Screen = () => (
   <Container initial="hidden" animate="visible" variants={containerVariants}>
+    <DesktopMockup
+      variants={screenVariants}
+      initial="hidden"
+      animate="visible"
+      src="/home/hero/manual-review.png"
+      alt="ID Capture Desktop"
+      width={1000}
+      height={625}
+      priority
+    />
+    <TabletMockup
+      variants={screenVariants}
+      initial="hidden"
+      animate="visible"
+      src="/home/hero/playbook-ipad.png"
+      alt="ID Capture Tablet"
+      width={720}
+      height={496}
+      priority
+    />
+    <MobileMockup
+      variants={screenVariants}
+      initial="hidden"
+      animate="visible"
+      src="/home/hero/id-capture-phone.png"
+      alt="ID Capture Mobile"
+      width={240}
+      height={475}
+      priority
+    />
     <Wire03
       variants={itemVariants}
       src="/home/hero/wire-03.svg"
       alt="Wire 03"
       width={140}
       height={140}
-      priority
+      loading="lazy"
     />
     <Device02
       variants={itemVariants}
@@ -73,7 +102,7 @@ const Screen = () => (
       alt="Device 02"
       width={140}
       height={140}
-      priority
+      loading="lazy"
     />
     <Wire02
       variants={itemVariants}
@@ -81,7 +110,7 @@ const Screen = () => (
       alt="Wire 02"
       width={193}
       height={105}
-      priority
+      loading="lazy"
     />
     <Device03
       variants={itemVariants}
@@ -89,7 +118,7 @@ const Screen = () => (
       alt="Device 03"
       width={140}
       height={140}
-      priority
+      loading="lazy"
     />
     <Wire05
       variants={itemVariants}
@@ -97,7 +126,7 @@ const Screen = () => (
       alt="Wire 05"
       width={70}
       height={200}
-      priority
+      loading="lazy"
     />
     <Device04
       variants={itemVariants}
@@ -105,7 +134,7 @@ const Screen = () => (
       alt="Device 04"
       width={190}
       height={160}
-      priority
+      loading="lazy"
     />
     <Wire04
       variants={itemVariants}
@@ -113,7 +142,7 @@ const Screen = () => (
       alt="Wire 04"
       width={123}
       height={113}
-      priority
+      loading="lazy"
     />
     <Device05
       variants={itemVariants}
@@ -121,7 +150,7 @@ const Screen = () => (
       alt="Device 05"
       width={70}
       height={170}
-      priority
+      loading="lazy"
     />
     <Wire06
       variants={itemVariants}
@@ -129,7 +158,7 @@ const Screen = () => (
       alt="Wire 06"
       width={16}
       height={145}
-      priority
+      loading="lazy"
     />
     <Device06
       variants={itemVariants}
@@ -137,7 +166,7 @@ const Screen = () => (
       alt="Device 06"
       width={120}
       height={120}
-      priority
+      loading="lazy"
     />
     <Wire07
       variants={itemVariants}
@@ -145,7 +174,6 @@ const Screen = () => (
       alt="Wire 07"
       width={123}
       height={160}
-      priority
     />
     <Device09
       variants={itemVariants}
@@ -153,7 +181,7 @@ const Screen = () => (
       alt="Device 09"
       width={150}
       height={170}
-      priority
+      loading="lazy"
     />
     <Wire11
       variants={itemVariants}
@@ -161,7 +189,7 @@ const Screen = () => (
       alt="Wire 11"
       width={36}
       height={195}
-      priority
+      loading="lazy"
     />
     <Device10
       variants={itemVariants}
@@ -169,7 +197,7 @@ const Screen = () => (
       alt="Device 10"
       width={72}
       height={190}
-      priority
+      loading="lazy"
     />
     <Device08
       variants={itemVariants}
@@ -177,7 +205,7 @@ const Screen = () => (
       alt="Device 08"
       width={120}
       height={92}
-      priority
+      loading="lazy"
     />
     <Device07
       variants={itemVariants}
@@ -185,7 +213,7 @@ const Screen = () => (
       alt="Device 07"
       width={62}
       height={130}
-      priority
+      loading="lazy"
     />
     <motion.div variants={itemVariants}>
       <Bird
@@ -194,7 +222,7 @@ const Screen = () => (
         alt="Bird Icon"
         width={80}
         height={75}
-        priority
+        loading="lazy"
       />
     </motion.div>
     <Wire08
@@ -203,7 +231,6 @@ const Screen = () => (
       alt="Wire 08"
       width={97}
       height={62}
-      priority
     />
     <Wire10
       variants={itemVariants}
@@ -211,7 +238,7 @@ const Screen = () => (
       alt="Wire 10"
       width={81}
       height={94}
-      priority
+      loading="lazy"
     />
     <Penguin
       variants={itemVariants}
@@ -219,7 +246,7 @@ const Screen = () => (
       alt="Penguin"
       width={155}
       height={300}
-      priority
+      loading="lazy"
     />
     <Sparkles05
       variants={itemVariants}
@@ -227,7 +254,7 @@ const Screen = () => (
       alt="Sparkles 05"
       width={40}
       height={102}
-      priority
+      loading="lazy"
     />
     <Sparkles04
       variants={itemVariants}
@@ -235,51 +262,69 @@ const Screen = () => (
       alt="Sparkles 04"
       width={33}
       height={58}
-      priority
-    />
-    <ScreenContainer
-      variants={screenVariants}
-      initial="hidden"
-      animate="visible"
+      loading="lazy"
     />
   </Container>
 );
+
+const DesktopMockup = styled(motion(Image))`
+  ${({ theme }) => css`
+    display: none;
+    border-radius: ${theme.borderRadius.lg};
+    aspect-ratio: 16/10;
+    width: 1000px;
+    height: auto;
+    z-index: 3;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+    overflow: hidden;
+    box-shadow: ${theme.elevation[1]};
+
+    ${media.greaterThan('md')`
+      display: block;
+    `}
+  `}
+`;
+
+const TabletMockup = styled(motion(Image))`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadius.lg};
+    aspect-ratio: 33/23;
+    height: auto;
+    width: 720px;
+    z-index: 3;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
+    box-shadow: ${theme.elevation[1]};
+    overflow: hidden;
+    display: none;
+
+    ${media.greaterThan('sm')`
+      display: block;
+    `}
+
+    ${media.greaterThan('md')`
+      display: none;
+    `}
+  `}
+`;
+
+const MobileMockup = styled(motion(Image))`
+  border-radius: 40px;
+  aspect-ratio: 1/2;
+  height: auto;
+  width: 260px;
+  z-index: 3;
+  overflow: hidden;
+  display: block;
+
+  ${media.greaterThan('sm')`
+    display: none;
+  `}
+`;
 
 const Container = styled(motion.div)`
   position: relative;
 `;
 
-const ScreenContainer = styled(motion(Box))`
-  ${({ theme }) => css`
-    background: url('/home/hero/id-capture-phone.png') no-repeat center center;
-    border-radius: ${theme.borderRadius.lg};
-    background-position: center center;
-    aspect-ratio: 1/2;
-    width: 240px;
-    z-index: 3;
-    background-size: cover;
-    border-radius: 42px;
-    overflow: hidden;
-
-    ${media.greaterThan('sm')`
-    border-radius: ${theme.borderRadius.lg};
-      aspect-ratio: 33/23;
-      width: 720px;
-      background: url('/home/hero/playbook-ipad.png') no-repeat center center;
-      background-size: cover;
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-
-    `}
-    ${media.greaterThan('md')`
-      border-radius: ${theme.borderRadius.lg};
-      width: 1000px;
-      aspect-ratio: 16/10;
-      background: url('/home/hero/manual-review.png') no-repeat center center;
-      background-size: cover;
-      border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    `}
-  `}
-`;
 const Wire03 = styled(motion(Image))`
   position: absolute;
   top: 8px;
@@ -362,9 +407,14 @@ const Device06 = styled(motion(Image))`
 const Wire07 = styled(motion(Image))`
   position: absolute;
   top: 0px;
-  left: calc(100% - 47.5px);
-  transform: translateY(-30%) scale(0.9);
+  left: calc(100% - 65px);
+  transform: translateY(-30%) scaleX(1.2) scaleY(0.9);
   z-index: 0;
+
+  ${media.greaterThan('sm')`
+    left: calc(100% - 46px);
+    transform: translateY(-30%) scaleX(0.9) scaleY(0.9);
+  `}
 `;
 
 const Device09 = styled(motion(Image))`

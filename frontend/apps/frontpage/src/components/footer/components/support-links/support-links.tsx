@@ -15,10 +15,15 @@ const SUPPORT_EMAIL_ADDRESS = 'support@onefootprint.com';
 const currentYear = new Date().getFullYear();
 
 const socialLinks = [
-  { href: 'https://twitter.com/footprint_hq', Icon: IcoX24 },
+  {
+    href: 'https://twitter.com/footprint_hq',
+    Icon: IcoX24,
+    ariaLabel: 'Twitter',
+  },
   {
     href: 'https://www.linkedin.com/company/onefootprint/',
     Icon: IcoLinkedin24,
+    ariaLabel: 'LinkedIn',
   },
 ];
 
@@ -27,7 +32,7 @@ const SuportLinks = () => {
 
   return (
     <Container>
-      <Link href="/">
+      <Link href="/" aria-label="Go to homepage">
         <ThemedLogoFpCompact color="secondary" />
       </Link>
       <Text variant="body-3" color="tertiary">
@@ -37,12 +42,13 @@ const SuportLinks = () => {
         {SUPPORT_EMAIL_ADDRESS}
       </SupportMail>
       <SocialLinks>
-        {socialLinks.map(({ href, Icon }) => (
+        {socialLinks.map(({ href, Icon, ariaLabel }) => (
           <StyledIconLink
             key={href}
             href={href}
             rel="noopener noreferrer"
             target="_blank"
+            aria-label={ariaLabel}
           >
             <Icon color="tertiary" />
           </StyledIconLink>

@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import ContactUsBanner from './components/contact-us-banner/contact-us-banner';
+import ContactUsBanner from './components/contact-us-banner';
 
 const SupportedIdDocuments = () => {
   const { t } = useTranslation('common', {
@@ -45,7 +45,11 @@ const SupportedIdDocuments = () => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/supported-id-documents" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/supported-id-documents"
+      />
       <Container>
         <Grid.Container gap={5} marginBottom={10} textAlign="center">
           <Text variant="display-2" tag="h1">

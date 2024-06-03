@@ -175,7 +175,11 @@ const Company = () => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/company" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/company"
+      />
       <Container>
         <HeroContainer>
           <Text variant="display-2" tag="h1" marginBottom={5}>

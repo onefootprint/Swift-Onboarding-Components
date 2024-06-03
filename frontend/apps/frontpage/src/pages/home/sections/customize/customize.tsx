@@ -1,5 +1,6 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { Box, Container, media } from '@onefootprint/ui';
+import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -7,8 +8,9 @@ import styled, { css } from 'styled-components';
 import SectionTitle from '../../../../components/desktop-share-post/section-title';
 import ColorSelection from './components/color-selection';
 import CustomInput from './components/custom-input';
-import MockupScreen from './components/mockup-screen';
-import OutOfTheBox from './components/out-of-the-box';
+import OutOfTheBox from './components/out-of-the-box/out-of-the-box';
+
+const MockupScreen = dynamic(() => import('./components/mockup-screen'));
 
 const colorList = [
   { name: 'Red', hex: '#4A24DB', hover: '#3A1EB2' },

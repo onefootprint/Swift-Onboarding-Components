@@ -20,9 +20,7 @@ const RealEstate = () => {
       <SEO
         title={t('html-title')}
         slug="/industries/fintech"
-        og={{
-          image: '/og-img-fintech.png',
-        }}
+        image="/og-img-fintech.png"
       />
       <Hero
         title={t('hero.title')}

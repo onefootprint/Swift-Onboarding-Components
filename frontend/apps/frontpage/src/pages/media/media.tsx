@@ -16,7 +16,11 @@ const Media = ({ articles }: MediaProps) => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/media" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/media"
+      />
       <Container>
         <Grid.Container
           gap={5}

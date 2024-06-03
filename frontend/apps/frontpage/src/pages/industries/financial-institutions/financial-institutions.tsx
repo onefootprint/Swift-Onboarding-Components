@@ -20,9 +20,7 @@ const FinancialInstitutions = () => {
       <SEO
         title={t('html-title')}
         slug="/industries/baas"
-        og={{
-          image: '/og-img-financial-institutions.png',
-        }}
+        image="/og-img-financial-institutions.png"
       />
       <Hero
         title={t('hero.title')}

@@ -16,6 +16,7 @@ const QuoteCard = ({ company }: QuoteCardProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.home.quotes.quote-list',
   });
+
   return (
     <CardContainer>
       <LogoContainer>
@@ -45,7 +46,7 @@ const QuoteCard = ({ company }: QuoteCardProps) => {
         <Text variant="body-3" color="tertiary" tag="h5">
           {t(`${company}.role` as unknown as ParseKeys<'common'>)}
         </Text>
-        <AuthorImageContainer $rotation={Math.floor(Math.random() * 20) - 6}>
+        <AuthorImageContainer>
           <Image
             src={`/home/quotes/${company}/author.png`}
             alt={`${t(`${company}.name` as unknown as ParseKeys<'common'>)}'s headshot`}
@@ -71,10 +72,10 @@ const CardContainer = styled(Stack)`
   `}
 `;
 
-const AuthorImageContainer = styled(Box)<{ $rotation: number }>`
-  ${({ theme, $rotation }) => css`
+const AuthorImageContainer = styled(Box)`
+  ${({ theme }) => css`
     position: absolute;
-    transform: translateY(-50%) rotate(${$rotation}deg);
+    transform: translateY(-50%) rotate(-5deg);
     top: 50%;
     right: 0;
     border-radius: calc(${theme.borderRadius.default} + 2px);

@@ -27,7 +27,11 @@ const Blog = ({ posts }: BlogProps) => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/blog" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/blog"
+      />
       <Container>
         <BlogGrid>
           <TwitterBreadcrumb

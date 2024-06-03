@@ -8,27 +8,36 @@ import {
   Stack,
   Text,
 } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';
 import styled, { css } from 'styled-components';
 
 import CustomersLogos from './components/customers-logos';
-import Screen from './components/screen';
+
+const Screen = dynamic(() => import('./components/screen'));
 
 const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
 
 const Hero = () => {
   const [showDialog, setShowDialog] = useState(false);
 
-  const handleClickTrigger = () => {
+  const handleClickTrigger = useCallback(() => {
     setShowDialog(true);
-  };
+  }, []);
 
   const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
+
+  const signUpUrl = useMemo(
+    () => `${DASHBOARD_BASE_URL}/authentication/sign-up`,
+    [],
+  );
+
   return (
-    <Background>
+    <BackgroundContainer>
       <Overflow>
         <HeroContainer>
           <TextContainer>
@@ -47,12 +56,7 @@ const Hero = () => {
               <Button
                 variant="primary"
                 size="large"
-                onClick={() =>
-                  window.open(
-                    `${DASHBOARD_BASE_URL}/authentication/sign-up`,
-                    '_blank',
-                  )
-                }
+                onClick={() => window.open(signUpUrl, '_blank')}
               >
                 {t('hero.get-started')}
               </Button>
@@ -74,9 +78,27 @@ const Hero = () => {
         open={showDialog}
         onClose={() => setShowDialog(false)}
       />
-    </Background>
+      <Background
+        src="/home/hero/background-texture.png"
+        alt="background texture"
+        height={600}
+        width={600}
+        priority
+      />
+    </BackgroundContainer>
   );
 };
+
+const Background = styled(Image)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 60%;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.5;
+`;
 
 const Title = styled(Box)`
   ${createFontStyles('display-2')}
@@ -116,21 +138,8 @@ const TextContainer = styled(Stack)`
   `}
 `;
 
-const Background = styled.div`
+const BackgroundContainer = styled.div`
   position: relative;
-
-  &:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: url('/home/hero/background-texture.png') no-repeat center center;
-    background-size: cover;
-    width: 100vw;
-    height: 60%;
-    z-index: -1;
-    opacity: 0.5;
-  }
 `;
 
 export default Hero;

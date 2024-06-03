@@ -16,7 +16,11 @@ const Vaulting = () => {
 
   return (
     <Container>
-      <SEO title={t('html-title')} slug="/vaulting" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/vaulting"
+      />
       <Hero />
       <AllData />
       <AuditTrail />

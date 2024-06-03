@@ -12,19 +12,29 @@ import {
   IcoWriting24,
 } from '@onefootprint/icons';
 import { Container, media } from '@onefootprint/ui';
-import React from 'react';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { CASE_STUDY_BANNER_PORTAL_ID } from '../layout/message-banner';
+import MessageBanner from '../layout/message-banner';
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
 import type { NavEntry } from './types';
+
+const ARTICLE_URL = '/blog/footprint-13m-series-a-led-by-qed';
 
 const Navbar = () => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
   const hasScroll = useHasScroll();
+  const router = useRouter();
+  const isArticlePage = router.pathname.includes(ARTICLE_URL);
+
+  const [isBannerVisible, setIsBannerVisible] =
+    useState<boolean>(!isArticlePage);
+
+  const handleCloseBanner = () => setIsBannerVisible(false);
   const entries: NavEntry[] = [
     {
       text: t('entries.platform.text'),
@@ -112,7 +122,12 @@ const Navbar = () => {
 
   return (
     <Header $isFloating={hasScroll && isFloatingEnabled}>
-      <div id={CASE_STUDY_BANNER_PORTAL_ID} />
+      <MessageBanner
+        showBanner={isBannerVisible}
+        onClose={handleCloseBanner}
+        articleUrl={ARTICLE_URL}
+        text="Footprint raised $13M Series A led by QED Investors"
+      />
       <Container>
         <Inner id="navbar">
           <MobileNav

@@ -73,6 +73,7 @@ const ColorSelection: React.FC<ColorSelectionProps> = ({
             selected={activeHex === hex}
             color={hex}
             onClick={() => onChange(hex)}
+            aria-label={`Change color to ${name}`}
           />
         </Box>
       ))}

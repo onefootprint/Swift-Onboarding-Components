@@ -28,7 +28,11 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/investor-updates" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/investor-updates"
+      />
       <Container>
         <InvestorsContent>
           <TwitterBreadcrumb

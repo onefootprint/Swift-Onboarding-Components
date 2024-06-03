@@ -5,12 +5,12 @@ import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PostContent from 'src/components/post-content';
-import SEO from 'src/components/seo';
 import WritingLayout from 'src/components/writing-layout';
 import styled, { css } from 'styled-components';
 
 import DesktopSharePost from '../../../../components/desktop-share-post';
 import PostInfo from '../../../../components/post-info';
+import SEO from '../../../../components/seo';
 import type { PostDetails } from '../../../../utils/ghost/types';
 
 export type PostProps = {
@@ -24,26 +24,11 @@ const Post = ({ post }: PostProps) => {
   return (
     <>
       <SEO
+        title={post.title}
         description={post.meta_description}
         image={post.og_image}
         kind="article"
-        og={{
-          description: post.twitter_description || post.og_description,
-          image: post.twitter_image || post.og_image,
-          title: post.twitter_title,
-          author: post.primary_author.name,
-        }}
         slug={`/blog/${post.slug}`}
-        title={post.title}
-        twitter={{
-          description: post.twitter_description,
-          image: post.twitter_image,
-          title: post.twitter_title,
-          extraData: [
-            { label: 'Written by', data: post.primary_author.name },
-            { label: 'Reading time', data: `${post.reading_time} minutes` },
-          ],
-        }}
       />
       <article>
         <Container>

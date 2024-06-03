@@ -15,7 +15,11 @@ const KYB = () => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/kyb" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/kyb"
+      />
       <BackgroundGradient />
       <Hero />
       <IdentifyBusinesses />

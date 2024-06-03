@@ -46,7 +46,11 @@ const Changelog = ({ posts }: ChangelogProps) => {
 
   return (
     <>
-      <SEO title={t('html-title')} slug="/changelog" />
+      <SEO
+        title={t('html-title')}
+        description={t('html-description')}
+        slug="/changelog"
+      />
       <Container>
         <HeroContainer>
           <Chip>{t('microtitle')}</Chip>

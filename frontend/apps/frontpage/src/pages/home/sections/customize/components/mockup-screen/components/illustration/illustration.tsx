@@ -1,7 +1,7 @@
 import { Box, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import React from 'react';
+import React, { memo } from 'react';
 import styled, { css } from 'styled-components';
 
 const rightFootVariants = {
@@ -68,7 +68,7 @@ const Illustration = () => (
         width={50}
         height={50}
       />
-      <RightFootWrapper
+      <MemoizedRightFootWrapper
         variants={rightFootVariants}
         initial="initial"
         animate="rotate"
@@ -79,7 +79,7 @@ const Illustration = () => (
           width={50}
           height={50}
         />
-      </RightFootWrapper>
+      </MemoizedRightFootWrapper>
     </Characters>
     <Ground />
   </StyledContainer>
@@ -169,5 +169,7 @@ const RightFootWrapper = styled(motion(Box))`
   position: absolute;
   width: fit-content;
 `;
+
+const MemoizedRightFootWrapper = memo(RightFootWrapper);
 
 export default Illustration;

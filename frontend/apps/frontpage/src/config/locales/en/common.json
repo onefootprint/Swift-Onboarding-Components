@@ -508,6 +508,7 @@
     },
     "customers": {
       "html-title": "Footprint - Customers",
+      "html-description": "Footprint powers many product teams, from ambitious startups to multi-national companies.",
       "description": "Footprint powers many product teams, from ambitious startups to multi-national companies.",
       "hero": {
         "title": "Meet our happy customers",
@@ -908,6 +909,7 @@
     },
     "company": {
       "html-title": "Footprint - Company",
+      "html-description": "Get to know the team that is bringing back trust to the internet.",
       "title": "We are bringing back trust to the internet.",
       "subtitle": "At Footprint, we are putting people in control of their data to unlock a better internet built upon privacy and speed.",
       "values": {
@@ -956,6 +958,7 @@
     },
     "kyc": {
       "html-title": "Footprint - KYC",
+      "html-description": "Verify the people behind the device",
       "title": "Know Your Customer (KYC)",
       "subtitle": "Verify the people behind the device",
       "get-started": "Sign up for free",
@@ -1031,6 +1034,7 @@
     },
     "kyb": {
       "html-title": "Footprint - KYB",
+      "html-description": "Verify businesses, and the people behind the business quickly and securely.",
       "hero": {
         "title": "Know Your Business (KYB)",
         "subtitle": "Verify businesses, and the people behind the business quickly and securely.",
@@ -1059,6 +1063,7 @@
     },
     "media": {
       "html-title": "Footprint - Media",
+      "html-description": "See what the press has to say about us.",
       "title": "Media",
       "subtitle": "See what the press has to say about us."
     },
@@ -1107,6 +1112,7 @@
     },
     "pricing": {
       "html-title": "Footprint - Pricing",
+      "html-description": "Secure onboarding at lightning speed and minimum cost",
       "cta": "Get started",
       "contact-us": "Contact us for pricing",
       "soon": "Soon",
@@ -1178,109 +1184,6 @@
         "get-started": "Sign up for free"
       }
     },
-    "compare": {
-      "html-title": "Footprint - Compare",
-      "hero": {
-        "title": "Why Footprint is the best KYC + security solution for your business",
-        "subtitle": "Spoiler alert: it's frictionless, secure, and easy to integrate.",
-        "cta": "Sign up"
-      },
-      "introduction": "In 2015, VGS ushered in the idea of tokenizing PII data and Alloy introduced an orchestration tool to handle KYC requests in an automated fashion. Both wanted to help a new era of financial companies more easily onboard customers and store data. Footprint was founded seven years later to leverage brand-new technology to these early ideas into a more elegant, secure, and frictionless all-in-one solution that provides best-in-class KYC and PII vaulting.",
-      "table": {
-        "companies": {
-          "footprint": "Footprint",
-          "alloy": "Alloy",
-          "vgs": "VGS"
-        },
-        "features": {
-          "kyc-check": {
-            "title": "KYC + AML Check",
-            "footprint": true,
-            "alloy": true,
-            "vgs": false
-          },
-          "liveness": {
-            "title": "Liveness",
-            "footprint": true,
-            "alloy": true,
-            "vgs": false
-          },
-          "under-8-lines-of-code": {
-            "title": "Under 8 lines of code",
-            "footprint": true,
-            "alloy": false,
-            "vgs": false
-          },
-          "biometrics": {
-            "title": "Passkeys/Face ID Biometrics",
-            "footprint": true,
-            "alloy": false,
-            "vgs": false
-          },
-          "one-click-compatibility": {
-            "title": "Access Control",
-            "footprint": true,
-            "alloy": false,
-            "vgs": false
-          },
-          "tokenization": {
-            "title": "Tokenization",
-            "footprint": true,
-            "alloy": false,
-            "vgs": true
-          },
-          "pii-vaulting": {
-            "title": "PII Vaulting",
-            "footprint": true,
-            "alloy": false,
-            "vgs": true
-          },
-          "vault-proxy": {
-            "title": "Vault Proxying",
-            "footprint": true,
-            "alloy": false,
-            "vgs": true
-          }
-        }
-      },
-      "why-footptint": {
-        "title": "Why companies choose Footprint",
-        "user-experience": {
-          "title": "User experience: boost conversion with a flow that is 25% more streamlined",
-          "description": "Footprint is built to optimize conversion without compromising accuracy. We’re the only company to use FaceID for liveness to give users a seamless experience. Footprint will be the only KYC company to support one-click KYC. After a user signs up for an account using Footprint once, the next time it is as easy as them typing in their email and doing FaceID."
-        },
-        "biometrics": {
-          "title": "Improve accuracy with cutting-edge biometrics",
-          "description": "Footprint is the only KYC company that is built to be FIDO2 native and leverages passkeys. We use novel biometrics such as the FaceID built directly into peoples’ phones to get attestations of liveness. Passkeys also enable us to verify the user is on a non-jailbroken device, traffic is coming from non-spoofed IP addresses, and dozens of other device attributes."
-        },
-        "dev-exp": {
-          "title": "Developer experience: integrate in minutes",
-          "description": "Footprint is five lines of code. Our belief is that KYC should not be an arduous choose-your-own-adventure novel to set up; it should just work. Footprint is also designed to deliver a streamlined experience that feels native to your company. Our platform allows for easy customization of over 80 attributes so the UI will feel like your own.",
-          "cta": "Read the docs"
-        },
-        "vault-proxy": {
-          "title": "Vault Proxy PCI + PII",
-          "description": "Send information securely to the third parties who need it. Whether it is issuing a card number or transmitting tax information to the IRS, our simple API supports a variety of scopes and controls to maintain zero-trust, least-privilege principles. By offloading PCI, you can get PCI Certified by being out of scope. "
-        },
-        "security-design": {
-          "title": "Security by design",
-          "description": "In one embedded front-end flow, Footprint collects user data, verifies it, performs a liveness check, and then securely encrypts and tokenizes this entire user identity into a single token. To integrate Footprint, you simply need to store a single user token — the “footprint user token” — which gives you granular access rights to specified identity attributes of that user."
-        },
-        "pii-vaulting": {
-          "title": "PII Vaulting",
-          "description": "Generate credentials that have access to specific data attributes — or functions of those data attributes (like someone’s age versus their birthdate). All of this is invisible to your code or data model, and you only need to worry about a single footprint user token that can be stored easily in plain text."
-        },
-        "save-money": {
-          "title": "Save money by combining tools",
-          "description": "Vaulting companies charge per decrypt because that’s where the bulk of their revenue comes from. KYC platforms try to upsell modules on the KYC due to drawing their profits from onboarding. Footprint, in contrast, makes money by onboarding good actors and then securely storing that information across products. As a result, we can see companies save up to 50% of their costs across both KYC and PII Vaulting by unifying it into one tool. Not to mention all of the technical benefits!",
-          "cta": "Learn more"
-        }
-      },
-      "banner": {
-        "title": "The only solution you need KYC & security",
-        "cta": "Get started"
-      }
-    },
     "privacy-policy": {
       "html-title": "Footprint - Privacy Policy",
       "title": "Privacy Policy",
@@ -1298,6 +1201,7 @@
     },
     "blog": {
       "html-title": "Footprint - Blog",
+      "html-description": "Updates, announcements, knowledge sharing",
       "go-back": "Back",
       "breadcrumb": {
         "title": "Blog",
@@ -1310,6 +1214,7 @@
     },
     "investor-updates": {
       "html-title": "Footprint - Investor Updates",
+      "html-description": "Updates we share with our investors, but that you can read too.",
       "go-back": "Back",
       "header-title-prefix": "Investor Update #{{index}}",
       "breadcrumb": {
@@ -1325,6 +1230,7 @@
     },
     "supported-id-documents": {
       "html-title": "Footprint - Supported ID Documents",
+      "html-description": "Footprint KYC flows support document verification in 200+ countries and jurisdictions.",
       "title": "Supported ID Documents",
       "subtitle": "Footprint KYC flows support document verification in 200+ countries and jurisdictions.",
       "contact": {
@@ -1344,6 +1250,7 @@
     },
     "404": {
       "html-title": "Oops! Page not found.",
+      "html-description": "We're sorry, but the requested page doesn't exist or was removed.",
       "title": "Oops! Page not found.",
       "description": "We're sorry, but the requested page doesn't exist or was removed.",
       "image": {
@@ -1378,6 +1285,7 @@
     },
     "idv-privacy": {
       "html-title": "Footprint - IDV Privacy",
+      "html-description": "We care about your privacy. Here's how we use and protect your data.",
       "title": "ID Verification with Footprint",
       "subtitle": "We care about your privacy. Here's how we use and protect your data.",
       "how": {
@@ -1438,6 +1346,7 @@
     },
     "changelog": {
       "html-title": "Footprint - Changelog",
+      "html-description": "Fresh from the vault",
       "title": "Changelog",
       "microtitle": "Fresh from the vault",
       "load-more": "Load more",
@@ -1454,6 +1363,7 @@
     },
     "vaulting": {
       "html-title": "Footprint - Vaulting",
+      "html-description": "Footprint securely vaults three types of data: identity data, payment card data, and custom key-value data.",
       "hero": {
         "title": "Securely store customer data",
         "subtitle": "Footprint securely vaults three types of data: identity data, payment card data, and custom key-value data.",
@@ -1602,6 +1512,7 @@
     },
     "auth": {
       "html-title": "Footprint - Auth",
+      "html-description": "Leverage passkeys to allow for frictionless and secure log-in.",
       "hero": {
         "title": "Auth",
         "subtitle": "Leverage passkeys to allow for frictionless and secure log-in.",

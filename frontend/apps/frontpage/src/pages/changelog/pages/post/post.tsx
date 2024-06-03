@@ -35,23 +35,8 @@ const PostPage = ({ post }: PostProps) => {
         description={post.meta_description}
         image={post.og_image}
         kind="article"
-        og={{
-          description: post.og_description,
-          image: post.og_image,
-          title: post.og_title,
-          author: post.primary_author.name,
-        }}
         slug={`/blog/${post.slug}`}
         title={post.title}
-        twitter={{
-          description: post.twitter_description,
-          image: post.twitter_image,
-          title: post.twitter_title,
-          extraData: [
-            { label: 'Written by', data: post.primary_author.name },
-            { label: 'Reading time', data: `${post.reading_time} minutes` },
-          ],
-        }}
       />
       <Container>
         <HeroContainer>
