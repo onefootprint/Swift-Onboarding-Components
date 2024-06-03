@@ -11,7 +11,7 @@ import useCreateSandboxTenant from './hooks/use-create-sandbox-tenant';
 type CreateSandboxTenantFormData = {
   name: string;
   domain?: string;
-  superTenantId?: string;
+  superTenantId?: string | undefined;
 };
 
 const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
@@ -30,7 +30,7 @@ const useCleanUpUserForm = ({ formId }: ToolFormProps) => {
     const requestData = {
       name: data.name,
       domains: data.domain ? [data.domain] : [],
-      superTenantId: data.superTenantId,
+      superTenantId: data.superTenantId ? data.superTenantId : undefined,
     };
     createSandboxTenantMutation.mutate(requestData, {
       onSuccess: async ({ token }) => {
