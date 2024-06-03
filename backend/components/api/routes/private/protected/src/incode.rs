@@ -32,6 +32,7 @@ use api_wire_types::{
     CreateDocumentResponse,
     DocumentResponse,
 };
+use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::{
     Document,
@@ -45,6 +46,7 @@ use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::user_consent::UserConsent;
 use db::models::workflow::Workflow;
 use db::DbError;
 use newtypes::{
@@ -181,7 +183,7 @@ pub async fn adhoc_create_document_and_workflow(
 
     let doc_kind: DocumentRequestKind = document_type.into();
 
-    let (vw, document_request) = state
+    let (vw, document_request, wf_id) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -215,7 +217,8 @@ pub async fn adhoc_create_document_and_workflow(
                 DocumentRequest::get(conn, &wf_id, DocumentRequestIdentifier::Kind(doc_kind))?
                     .ok_or(AssertionError("No document request found"))?;
 
-            Ok((uvw, document_request))
+
+            Ok((uvw, document_request, wf_id))
         })
         .await?;
 
@@ -248,6 +251,17 @@ pub async fn adhoc_create_document_and_workflow(
             };
 
             let id_doc = Document::get_or_create(conn, args)?;
+
+            // create the user consent manually
+            let _ = UserConsent::create(
+                conn,
+                Utc::now(),
+                id_doc.insight_event_id.clone().unwrap(),
+                "default_manual".into(),
+                true,
+                wf_id,
+            )?;
+
             Ok(id_doc)
         })
         .await?;
