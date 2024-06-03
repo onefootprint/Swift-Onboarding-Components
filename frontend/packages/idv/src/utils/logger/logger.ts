@@ -78,16 +78,15 @@ const LoggerFactory = () => {
   const identify = (traits: PrimitiveData) => {
     if (!IS_LOGGING_ENABLED) return;
 
-    const filteredTraits = filterNonEmptyTraits(traits);
     const sessionId = getSessionId();
+    const contextProps = {
+      ...filterNonEmptyTraits(traits),
+      fp_session_id: sessionId,
+    };
 
-    if (isObserveEnabled) Observe.identify(sessionId, filteredTraits);
-    if (isLogRocketEnabled) LogRocket.identify(sessionId, filteredTraits);
-    if (isDataDogEnabled)
-      datadogLogs.setGlobalContext({
-        ...filteredTraits,
-        fp_session_id: sessionId,
-      });
+    if (isObserveEnabled) Observe.identify(sessionId, contextProps);
+    if (isLogRocketEnabled) LogRocket.identify(sessionId, contextProps);
+    if (isDataDogEnabled) datadogLogs.setGlobalContext(contextProps);
   };
 
   const enableLogRocket = () => {
