@@ -160,6 +160,7 @@ pub struct AdhocCreateDocumentRequest {
     pub fp_id: FpId,
     pub tenant_id: TenantId,
     pub is_live: bool,
+    pub perform_ocr_comparison: bool,
 }
 #[post("/private/incode/adhoc/documents")]
 pub async fn adhoc_create_document_and_workflow(
@@ -175,6 +176,7 @@ pub async fn adhoc_create_document_and_workflow(
         fp_id,
         tenant_id,
         is_live,
+        perform_ocr_comparison,
     } = request.into_inner();
 
     let doc_kind: DocumentRequestKind = document_type.into();
@@ -223,9 +225,12 @@ pub async fn adhoc_create_document_and_workflow(
     }
 
     // check we've vaulted the fields, could probably ignore this in the req maybe
-    let ocr_comparison_fields = IncodeOcrComparisonDataFields::compose(&state.enclave_client, &vw).await?;
-    if ocr_comparison_fields == IncodeOcrComparisonDataFields::default() {
-        return Err(AssertionError("id data not vaulted").into());
+    if perform_ocr_comparison {
+        let ocr_comparison_fields =
+            IncodeOcrComparisonDataFields::compose(&state.enclave_client, &vw).await?;
+        if ocr_comparison_fields == IncodeOcrComparisonDataFields::default() {
+            return Err(AssertionError("id data not vaulted").into());
+        }
     }
 
     // Create our identity document now
