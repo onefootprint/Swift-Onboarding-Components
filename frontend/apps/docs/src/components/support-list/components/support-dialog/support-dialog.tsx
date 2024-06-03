@@ -91,7 +91,7 @@ const SupportDialog = ({
       }}
     >
       <Grid.Container
-        as="form"
+        tag="form"
         gap={7}
         id="support-dialog-id"
         onSubmit={handleSubmit(onSubmit)}

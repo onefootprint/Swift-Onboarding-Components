@@ -36,13 +36,13 @@ const MultiSelectGroupedForm = ({
 
   return (
     <Grid.Container
-      as="form"
+      tag="form"
       gap={7}
       id="filter-form"
       onSubmit={handleSubmit(handleAfterSubmit)}
     >
       {options.map(group => (
-        <Grid.Container as="fieldset" gap={3} key={group.label}>
+        <Grid.Container tag="fieldset" gap={3} key={group.label}>
           <Text variant="label-3" marginBottom={3}>
             {group.label}
           </Text>

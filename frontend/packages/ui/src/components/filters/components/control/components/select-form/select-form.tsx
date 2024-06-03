@@ -47,9 +47,9 @@ const SelectForm = ({
   return (
     <Grid.Container
       gap={3}
-      as="form"
       id="filter-form"
       onSubmit={handleSubmit(handleAfterSubmit)}
+      tag="form"
     >
       {options.map(option => (
         <Fragment key={`${option.label}-${option.value}`}>

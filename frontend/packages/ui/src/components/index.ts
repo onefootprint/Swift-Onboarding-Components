@@ -73,6 +73,7 @@ export { default as FootprintButton } from './footprint-button';
 export { default as Form } from './form';
 export type { GoogleButtonProps } from './google-button';
 export { default as GoogleButton } from './google-button';
+export type { GridContainerProps, GridItemProps } from './grid';
 export { default as Grid } from './grid';
 export type { IconButtonProps } from './icon-button';
 export { default as IconButton } from './icon-button';

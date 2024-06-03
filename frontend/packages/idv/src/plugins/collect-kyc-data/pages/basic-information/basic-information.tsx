@@ -135,7 +135,7 @@ const BasicInformation = ({
       <FormProvider {...formMethods}>
         <Grid.Container
           gap={7}
-          as="form"
+          tag="form"
           onSubmit={formMethods.handleSubmit(onSubmitFormData)}
         >
           <Stack direction="column" gap={5}>

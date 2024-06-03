@@ -43,6 +43,8 @@ export type {
   FlagProps,
   FootprintButtonProps,
   GoogleButtonProps,
+  GridContainerProps,
+  GridItemProps,
   IconButtonProps,
   InlineAlertProps,
   InlineAlertVariant,

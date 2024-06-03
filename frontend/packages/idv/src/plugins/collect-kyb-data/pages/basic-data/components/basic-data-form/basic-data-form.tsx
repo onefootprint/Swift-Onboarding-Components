@@ -116,7 +116,7 @@ const BasicDataForm = ({
 
   return (
     <Grid.Container
-      as="form"
+      tag="form"
       gap={7}
       width="100%"
       onSubmit={handleSubmit(onSubmitFormData)}

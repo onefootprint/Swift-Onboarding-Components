@@ -1,4 +1,3 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type {
   BeneficialOwner,
   PublicOnboardingConfig,
@@ -35,7 +34,6 @@ const Form = ({
   requireMultiKyc,
   config,
 }: FormProps) => {
-  const [animate] = useAutoAnimate<HTMLFormElement>();
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form',
   });
@@ -135,11 +133,10 @@ const Form = ({
   return (
     <FormProvider {...methods}>
       <Grid.Container
-        as="form"
+        tag="form"
         gap={6}
         width="100%"
         onSubmit={handleSubmit(onSubmitFormData)}
-        ref={animate}
       >
         {fields.map((field, index) => (
           <React.Fragment key={field.id}>

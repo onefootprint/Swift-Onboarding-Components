@@ -125,7 +125,7 @@ const LegalStatus = ({
       )}
       <FormProvider {...methods}>
         <Grid.Container
-          as="form"
+          tag="form"
           onSubmit={methods.handleSubmit(handleBeforeSubmit)}
           marginTop={7}
           width="100%"

@@ -61,7 +61,7 @@ export const SandboxOutcomeContainer = ({
       <NavigationHeader leftButton={{ variant: 'close' }} />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <FormProvider {...formMethods}>
-        <Form as="form" onSubmit={handleSubmit(onSubmit)}>
+        <Form tag="form" onSubmit={handleSubmit(onSubmit)}>
           <OptionsContainer>
             <OverallOutcomeSelect config={config} />
             {shouldShowIdDocOutcome && (

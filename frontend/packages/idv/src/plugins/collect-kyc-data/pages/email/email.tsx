@@ -85,7 +85,7 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
           />
         </>
       )}
-      <Grid.Container gap={7} as="form" onSubmit={handleSubmit(onSubmitForm)}>
+      <Grid.Container gap={7} tag="form" onSubmit={handleSubmit(onSubmitForm)}>
         <Stack direction="column" gap={5}>
           <TextInput
             data-nid-target="email"

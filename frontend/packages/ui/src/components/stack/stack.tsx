@@ -38,4 +38,5 @@ const Stack = forwardRef<HTMLDivElement, StackProps>(
     </Box>
   ),
 );
+
 export default Stack;

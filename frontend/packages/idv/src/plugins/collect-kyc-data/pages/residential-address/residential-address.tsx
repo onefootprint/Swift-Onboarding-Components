@@ -102,7 +102,7 @@ const ResidentialAddress = ({
       {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
         <Grid.Container
-          as="form"
+          tag="form"
           gap={7}
           onSubmit={handleSubmit(onSubmitFormData)}
           width="100%"

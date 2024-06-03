@@ -2,7 +2,7 @@ import type { Story } from '@storybook/react';
 import React from 'react';
 
 import Grid from './grid';
-import type { GridContainerProps, ItemProps } from './grid.types';
+import type { GridContainerProps, GridItemProps } from './grid.types';
 
 export default {
   component: Grid,
@@ -41,14 +41,14 @@ export default {
   },
 };
 
-const Template: Story<GridContainerProps & ItemProps> = ({
+const Template: Story<GridContainerProps & GridItemProps> = ({
   columns,
   rowGap,
   columnGap,
   templateAreas,
   rows,
   gap,
-}: GridContainerProps & ItemProps) => (
+}: GridContainerProps & GridItemProps) => (
   <Grid.Container
     columns={columns}
     rows={rows}
@@ -79,6 +79,7 @@ const Template: Story<GridContainerProps & ItemProps> = ({
 
 export const Container = Template.bind({});
 Container.args = {
+  // @ts-ignore
   columns: ['1fr', '1fr', '200px'],
   rows: ['1fr', '100px', '1fr'],
   gap: 2,

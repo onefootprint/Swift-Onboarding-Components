@@ -9,17 +9,16 @@ type EncryptedCellProps = {
 
 const EncryptedCell = ({ prefix }: EncryptedCellProps) => (
   <Container
-    templateAreas={['icon value']}
-    columns={['16px', '1fr']}
-    rows={['1fr']}
     alignItems="center"
-    justifyContent="flex-end"
-    width="fit-content"
+    columns={['16px', '1fr']}
     gap={2}
+    justifyContent="flex-end"
     minWidth="88px"
-    as="span"
+    rows={['1fr']}
+    templateAreas={['icon value']}
+    width="fit-content"
   >
-    <Grid.Item gridArea="icon" align="center" justify="center" as="span">
+    <Grid.Item gridArea="icon" center>
       <IcoLock16 />
     </Grid.Item>
     <Grid.Item

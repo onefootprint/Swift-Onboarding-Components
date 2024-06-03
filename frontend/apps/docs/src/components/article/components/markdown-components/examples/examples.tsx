@@ -1,4 +1,3 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import { Grid, media, Tabs, Text } from '@onefootprint/ui';
 import Image from 'next/image';
@@ -11,7 +10,6 @@ import { defaultOption, options } from './examples.constants';
 
 const Examples = () => {
   const [tab, setTab] = useState(defaultOption);
-  const [animatedList] = useAutoAnimate<HTMLDivElement>();
   const { theme } = useTheme();
 
   const tabOptions = options.map(option => ({
@@ -35,7 +33,6 @@ const Examples = () => {
         marginTop={8}
         marginBottom={8}
         width="100%"
-        ref={animatedList}
       >
         {tab.links.map(({ name, img, href }) => {
           const parts = img.src.split('/');
@@ -76,8 +73,8 @@ const Examples = () => {
 
 const List = styled(Grid.Container)`
   ${media.greaterThan('md')`
-      grid-template-columns: repeat(3, 1fr);
-    `}
+    grid-template-columns: repeat(3, 1fr);
+  `}
 `;
 
 const Item = styled(Link)`

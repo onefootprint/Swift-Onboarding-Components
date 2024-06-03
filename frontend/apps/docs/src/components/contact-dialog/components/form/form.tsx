@@ -29,7 +29,7 @@ const Form = ({ onSubmit }: FormProps) => {
 
   return (
     <Grid.Container
-      as="form"
+      tag="form"
       gap={7}
       id={formId}
       onSubmit={handleSubmit(onSubmit)}

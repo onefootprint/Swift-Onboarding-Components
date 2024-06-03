@@ -10,14 +10,14 @@ export type InfoBoxProps = {
 
 const InfoBox = ({ items, variant }: InfoBoxProps) => (
   <Grid.Container
-    width="100%"
-    as="ul"
+    aria-label="infoBox"
     backgroundColor="secondary"
     borderRadius="default"
     data-variant={variant}
-    aria-label="infoBox"
     gap={variant === 'compact' ? 4 : 7}
     padding={variant === 'compact' ? 4 : 5}
+    tag="ul"
+    width="100%"
   >
     {items.map(({ title, description, Icon }) => (
       <Stack tag="li" direction="row" gap={3} title={title} key={title}>
