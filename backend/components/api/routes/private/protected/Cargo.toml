@@ -34,3 +34,4 @@ serde_cbor = { workspace = true }
 chrono = { workspace = true }
 itertools = { workspace = true }
 futures = { workspace = true }
+actix-multipart = { workspace = true }

@@ -24,6 +24,8 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(risk::save_risk_signals_for_vres)
         .service(task::create_task)
         .service(incode::rerun_machine)
+        .service(incode::adhoc_create_document_and_workflow)
+        .service(incode::adhoc_upload_and_process)
         .service(workflow::proceed)
         .service(token_reveal::post)
         .service(decrypt::post)

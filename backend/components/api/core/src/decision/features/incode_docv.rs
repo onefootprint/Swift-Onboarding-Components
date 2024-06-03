@@ -36,7 +36,7 @@ pub struct IncodeOcrAddress {
     pub street: Option<PiiString>,
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq, Eq)]
 pub struct IncodeOcrComparisonDataFields {
     pub first_name: Option<PiiString>,
     pub middle_name: Option<PiiString>,
