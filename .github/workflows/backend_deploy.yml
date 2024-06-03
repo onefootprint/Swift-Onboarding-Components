@@ -142,6 +142,9 @@ jobs:
     runs-on: eif-builder
     environment: ${{ inputs.environment }}
     steps:
+      # These GitHub Actions versions are old, but we can't update them as long
+      # as we are stuck on the long-lived nitro-devbox, which runs Amazon Linux
+      # 2, which can't run Node 20 actions due to the old glibc version.
       - name: Configure AWS Credentials (Image Cache)
         uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 #1
         with:
@@ -149,46 +152,61 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
-      - name: Fetch cached containers
-        run: |
-          account="$(aws sts get-caller-identity --query "Account" --output text)"
-          echo "account is ${account}"
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
+      - name: Login to Amazon ECR (Image Cache)
+        id: login-ecr-image-cache
+        uses: aws-actions/amazon-ecr-login@2fc7aceee09e9e4a7105c0d060c656fad0b4f63d # v1.7.0
 
-          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${{ inputs.enclaveComponentVersion }}
-          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave:${{ inputs.enclaveComponentVersion }} enclave:${{ inputs.enclaveComponentVersion }}
+      - name: Configure AWS Credentials (Target Account)
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 #1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Amazon ECR (Target Account)
+        id: login-ecr-target
+        uses: aws-actions/amazon-ecr-login@2fc7aceee09e9e4a7105c0d060c656fad0b4f63d # v1.7.0
+
+      - name: Fetch the enclave image for signing
+        env:
+          REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+          REPO: enclave
+          TAG: ${{ inputs.enclaveComponentVersion }}
+        run: |
+          docker pull ${REGISTRY}/${REPO}:${TAG}
 
       - name: Sign EIF and package
         working-directory: ./backend
+        env:
+          REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+          REPO: enclave
+          TAG: ${{ inputs.enclaveComponentVersion }}
+          # We package the EIF in a Docker image, even though it's not run as a container.
+          # In the future, we can use https://github.com/oras-project/oras to package the EIF more directly.
+          EIF_REGISTRY: ${{ steps.login-ecr-target.outputs.registry }}
+          EIF_REPO: enclave_pkg
+          EIF_TAG: ${{ inputs.enclaveComponentVersion }}
         run: |
+          set -euo pipefail
+          # Don't set -x to avoid leaking signing key to logs.
+
           echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
           echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
 
           rm -f ./out/enclave.eif
 
           # build the eif
-          nitro-cli build-enclave --docker-uri enclave:${{ inputs.enclaveComponentVersion }} --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
+          nitro-cli build-enclave --docker-uri ${REGISTRY}/${REPO}:${TAG} --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
 
           # package the eif in docker image
-          docker build -t "enclave_pkg:${{inputs.enclaveComponentVersion}}" -f enclave_eif_package.dockerfile .
+          docker build -t "${EIF_REGISTRY}/${EIF_REPO}:${EIF_TAG}" -f enclave_eif_package.dockerfile .
+          docker push "${EIF_REGISTRY}/${EIF_REPO}:${EIF_TAG}"
 
       # cleanup: remove keys
       - name: cleanup
         working-directory: ./backend
         if: always()
         run: rm -f ../enclavekey.pem
-
-      - name: Push containers to Target ECR
-        run: |
-          account="$(aws sts get-caller-identity --query "Account" --output text)"
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          enclaveComponentVersion="${{ inputs.enclaveComponentVersion }}"
-
-          docker tag enclave_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${enclaveComponentVersion}
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${enclaveComponentVersion}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   deploy_stack:
     name: deploy stack
