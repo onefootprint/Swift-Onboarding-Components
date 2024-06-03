@@ -55,6 +55,7 @@ type ChildrenProps = {
   outlineWidth: number;
   videoRef: VideoRef;
   videoSize: VideoSize | undefined;
+  switchCamera: () => void;
 };
 
 type CameraProps = {
@@ -210,7 +211,7 @@ const Camera = ({
 
   const getImageStringFromVideo = useGetImageString();
 
-  const mediaStream = useUserMedia(cameraKind, onError);
+  const { mediaStream, switchCamera } = useUserMedia(cameraKind, onError);
   const isCameraVisible = Boolean(mediaStream?.active) && isVideoPlaying;
   const { outlineWidth, outlineHeight } = getOutlineDimensions({
     videoSize,
@@ -225,6 +226,12 @@ const Camera = ({
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
     videoRef.current.srcObject = mediaStream;
   }
+
+  useEffect(() => {
+    if (mediaStream && videoRef.current) {
+      videoRef.current.srcObject = mediaStream;
+    }
+  }, [mediaStream]);
 
   const handlePlayError = (err: unknown) => {
     if (err instanceof Error && isNotAllowedError(err?.name)) {
@@ -473,6 +480,7 @@ const Camera = ({
                 outlineWidth,
                 videoRef,
                 videoSize,
+                switchCamera,
               })
             : null}
           {!isImageProcessing ? (

@@ -1,6 +1,7 @@
 export type CameraKind = 'front' | 'back';
 
-const getCameraOptions = (cameraKind: CameraKind) => {
+const getCameraOptions = (cameraKind: CameraKind, deviceId?: string) => {
+  // We ignore the deviceId for the front camera
   if (cameraKind === 'front') {
     return {
       audio: false,
@@ -8,7 +9,6 @@ const getCameraOptions = (cameraKind: CameraKind) => {
     };
   }
 
-  // If the device id is undefined, the facingMode will choose default back camera
   return {
     audio: false,
     video: {
@@ -16,6 +16,7 @@ const getCameraOptions = (cameraKind: CameraKind) => {
       zoom: 1,
       width: { ideal: 2560 },
       height: { ideal: 1920 },
+      deviceId,
     },
   };
 };

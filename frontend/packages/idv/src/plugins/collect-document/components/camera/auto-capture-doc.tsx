@@ -15,6 +15,7 @@ type AutoCaptureDocProps = {
   setAutocaptureFeedback: (x?: CaptureStatus) => void;
   videoRef: VideoRef;
   videoSize: VideoSize | undefined;
+  switchCamera: () => void;
 };
 
 const AutoCaptureDoc = ({
@@ -29,6 +30,7 @@ const AutoCaptureDoc = ({
   setAutocaptureFeedback,
   videoRef,
   videoSize,
+  switchCamera,
 }: AutoCaptureDocProps): null => {
   useAutoCaptureDoc({
     canvasRef: canvasAutoCaptureRef,
@@ -42,6 +44,7 @@ const AutoCaptureDoc = ({
     outlineWidth,
     videoRef,
     videoSize,
+    switchCamera,
   });
 
   return null;

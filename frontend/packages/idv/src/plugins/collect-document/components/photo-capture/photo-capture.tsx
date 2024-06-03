@@ -254,6 +254,7 @@ const PhotoCapture = ({
           outlineWidth,
           videoRef,
           videoSize,
+          switchCamera,
         }) => {
           if (isDocument(autocaptureKind)) {
             return (
@@ -269,6 +270,7 @@ const PhotoCapture = ({
                 setAutocaptureFeedback={setAutocaptureFeedback}
                 videoRef={videoRef}
                 videoSize={videoSize}
+                switchCamera={switchCamera}
               />
             );
           }
