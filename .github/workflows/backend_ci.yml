@@ -73,7 +73,7 @@ jobs:
             backend
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a #4.0.1
+        uses: aws-actions/configure-aws-credentials@43c891271eabca0b34d95f2453e2fe354928b16d #4.0.1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -82,6 +82,14 @@ jobs:
       - name: Set dot env
         working-directory: ./backend
         run: make set-dot-env
+
+      - name: Unset AWS Credentials
+        uses: aws-actions/configure-aws-credentials@43c891271eabca0b34d95f2453e2fe354928b16d #4.0.1
+        with:
+          unset-current-credentials: true
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Run tests
         working-directory: ./backend
@@ -122,7 +130,7 @@ jobs:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
     runs-on: 16core
-    environment: dev
+    environment: backend_ci
     services:
       postgres:
         image: postgres:14.3

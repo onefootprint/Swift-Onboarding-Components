@@ -20,7 +20,7 @@ runs:
         sudo apt-get install -y libssl-dev libpq-dev
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@43c891271eabca0b34d95f2453e2fe354928b16d #4.0.1
       with:
         aws-access-key-id: ${{ inputs.aws_access_key_id }}
         aws-region: ${{ inputs.aws_region }}
@@ -35,6 +35,14 @@ runs:
       working-directory: ./backend
       shell: bash
       run: make set-dot-env
+
+    - name: Unset AWS Credentials
+      uses: aws-actions/configure-aws-credentials@43c891271eabca0b34d95f2453e2fe354928b16d #4.0.1
+      with:
+        unset-current-credentials: true
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-region: ${{ inputs.aws_region }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
 
     - name: rust-toolchain
       uses: dtolnay/rust-toolchain@1.77.0
@@ -61,6 +69,11 @@ runs:
         cargo build -p enclave
         cargo build -p enclave_proxy
         cargo build -p api_server
+
+        # Export AWS credentials from the .env - we shouldn't use the AWS credentials available in CI to run the server
+        export $(grep ^AWS_REGION= .env)
+        export $(grep ^AWS_ACCESS_KEY_ID= .env)
+        export $(grep ^AWS_SECRET_ACCESS_KEY= .env)
 
         make run-local &> server_output.txt &
         server_pid=$!
