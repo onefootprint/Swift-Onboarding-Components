@@ -6,11 +6,12 @@ import type {
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
-import React, { createContext, useMemo, useState } from 'react';
+import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { Appearance } from '../../../@types';
 import configureI18n from '../../../config/initializers/i18next';
+import getOnboardingConfigReq from '../../../queries/get-onboarding-config';
 
 configureI18n();
 
@@ -83,11 +84,27 @@ const Provider = ({
     signupChallenge: null,
     userData,
   });
-
   const value = useMemo<[ContextData, UpdateContext]>(
     () => [context, setContext],
     [context],
   );
+
+  const getOnboardingConfig = async (pKey?: string) => {
+    if (!pKey) {
+      throw new Error('No publicKey found');
+    }
+
+    try {
+      const response = await getOnboardingConfigReq(pKey);
+      setContext(prev => ({ ...prev, onboardingConfig: response }));
+    } catch (error: unknown) {
+      throw new Error('Public key is invalid');
+    }
+  };
+
+  useEffect(() => {
+    getOnboardingConfig(publicKey);
+  }, [publicKey]);
 
   return (
     <Context.Provider value={value}>

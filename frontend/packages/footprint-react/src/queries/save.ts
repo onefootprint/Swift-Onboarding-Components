@@ -1,4 +1,8 @@
-import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
+import type {
+  PublicOnboardingConfig,
+  UserDataRequest,
+  UserDataResponse,
+} from '@onefootprint/types';
 
 import { AUTH_HEADER } from '../constants';
 import request from '../utils/request';
@@ -6,7 +10,10 @@ import request from '../utils/request';
 const removeEmpty = (obj: Record<string, unknown>) =>
   Object.fromEntries(Object.entries(obj).filter(e => !!e[1]));
 
-const save = async (payload: UserDataRequest) => {
+const save = async (
+  payload: UserDataRequest,
+  onboardingConfig: PublicOnboardingConfig,
+) => {
   const data = removeEmpty(payload.data);
   const hasData = Object.entries(data).length;
   if (!hasData) {
@@ -15,7 +22,10 @@ const save = async (payload: UserDataRequest) => {
 
   const response = await request<UserDataResponse>({
     method: 'PATCH',
-    url: '/hosted/user/vault',
+    url:
+      onboardingConfig.kind === 'kyc'
+        ? '/hosted/user/vault'
+        : '/hosted/business/vault',
     data,
     disableCaseConverter: true,
     headers: {

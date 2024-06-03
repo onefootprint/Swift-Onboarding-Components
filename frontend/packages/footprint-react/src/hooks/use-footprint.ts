@@ -12,7 +12,7 @@ import getVaultData from '../utils/get-vault-data';
 export const useFootprint = () => {
   const [context, setContext] = useContext(Context);
   const form = useFormContext<FootprintUserData>();
-  const [busy, setBusy] = useState<'save' | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
   const callbacks: {
     onError?: (error: unknown) => void;
     onComplete?: (validationToken: string) => void;
@@ -82,14 +82,20 @@ export const useFootprint = () => {
     onSuccess?: () => void;
     onError?: (error: unknown) => void;
   } = {}) => {
-    const { authToken } = context;
+    const { authToken, onboardingConfig } = context;
     if (!authToken) {
       throw new Error('No authToken found');
+    }
+    if (!onboardingConfig) {
+      throw new Error('No onboardingConfig found');
+    }
+    if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
+      throw new Error('Onboarding components only support kyc and kyb kind');
     }
     try {
       setBusy('save');
       const data = getVaultFormData();
-      await saveReq({ data, bootstrapDis: [], authToken });
+      await saveReq({ data, bootstrapDis: [], authToken }, onboardingConfig);
       onSuccess?.();
     } catch (error: unknown) {
       onError?.(error);
