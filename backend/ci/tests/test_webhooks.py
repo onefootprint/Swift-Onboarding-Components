@@ -1,10 +1,8 @@
 import pytest
 import multiprocessing
 from tests.constants import IT_SVIX_API_KEY, ENVIRONMENT
-from tests.utils import EXPECTED_SERVER_VERSION_GIT_HASH, try_until_success
 from tests.utils import get
 from tests.bifrost_client import BifrostClient
-import requests
 from svix.api import Svix, ApplicationIn, EndpointIn
 
 
@@ -29,27 +27,27 @@ def check_webhook(hooky_url, webhook_fpids):
 )
 @pytest.mark.flaky
 def test_webhook_e2e(sandbox_tenant, run_id):
-    # 1. get the svix app id
-    body = get("org/webhook_portal", None, *sandbox_tenant.db_auths)
-    assert body["url"]
-    assert body["app_id"]
-    app_id = body["app_id"]
-
-    # 2. register a webhook for testing
-    svix = Svix(IT_SVIX_API_KEY)
-    app = svix.application.get_or_create(
-        ApplicationIn(
-            name=f"{sandbox_tenant.name} ( Sandbox)", uid=f"{sandbox_tenant.id}_sandbox"
-        )
-    )
-    assert app.id == app_id  # ensure that we're creating app id's in svix properly
-    print(f"APP ID: {app.id}")
-
-    # Remove existing endpoints in svix from previous integration testing runs
-    endpoints = svix.endpoint.list(app.id)
-
     if ENVIRONMENT not in ("production", "dev"):
-        # Use a test-run-specific webhook callback URL
+        # When using the local svix environment, register specifically a new webhook URL for each integration
+        # test run
+        body = get("org/webhook_portal", None, *sandbox_tenant.db_auths)
+        assert body["url"]
+        assert body["app_id"]
+        app_id = body["app_id"]
+
+        print(IT_SVIX_API_KEY)
+        svix = Svix(IT_SVIX_API_KEY)
+        app = svix.application.get_or_create(
+            ApplicationIn(
+                name=f"{sandbox_tenant.name} ( Sandbox)",
+                uid=f"{sandbox_tenant.id}_sandbox",
+            )
+        )
+        assert app.id == app_id  # ensure that we're creating app id's in svix properly
+        print(f"APP ID: {app.id}")
+
+        # Remove existing endpoints in svix from previous integration testing runs
+        endpoints = svix.endpoint.list(app.id)
         hooky_url = f"https://hooky.footprint.dev/fp_integ_{run_id}"
         endpoints = svix.endpoint.list(app_id)
         for endpoint in endpoints.data:
@@ -68,11 +66,11 @@ def test_webhook_e2e(sandbox_tenant, run_id):
     p = multiprocessing.Process(target=check_webhook, args=(hooky_url, webhook_fpids))
     p.start()
 
-    # 3. fire off a codepath that triggers the webhook (i.e. an onboarding)
+    # Fire off a codepath that triggers the webhook (i.e. an onboarding)
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
-    # 4. Retrieve the webhook message and make sure it's correct
+    # Retrieve the webhook message and make sure it's correct
     # we expect 3 webhooks, 1 OnboardingStatusChanged from incomplete -> pending. Then an OnboardingCompleted and another OnboardingStatusChanged from pending -> pass
     # TODO but we stopped testing ^
     p.join(10)
