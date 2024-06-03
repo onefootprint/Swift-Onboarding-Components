@@ -156,7 +156,7 @@ pub async fn rerun_machine(
 pub struct AdhocCreateDocumentRequest {
     pub document_type: DocumentKind,
     pub playbook_key: ObConfigurationKey,
-    pub country_code: Iso3166TwoDigitCountryCode,
+    pub country_code: Option<Iso3166TwoDigitCountryCode>,
     pub fp_id: FpId,
     pub tenant_id: TenantId,
     pub is_live: bool,
@@ -235,7 +235,7 @@ pub async fn adhoc_create_document_and_workflow(
             let args = NewDocumentArgs {
                 request_id: document_request.id,
                 document_type,
-                country_code: Some(country_code),
+                country_code,
                 fixture_result: None,
                 skip_selfie: None,
                 device_type: None,
