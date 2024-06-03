@@ -1,13 +1,4 @@
-import { Observe } from './observe';
-
-export const registerUnloadHandler = () => {
-  if (typeof window === 'undefined') return;
-
-  window.addEventListener('beforeunload', () => {
-    Observe.flush();
-  });
-};
-
+/* eslint-disable import/prefer-default-export */
 export const registerErrorHandlers = (onError: (error: Error) => void) => {
   if (typeof window === 'undefined') return;
 

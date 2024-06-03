@@ -18,18 +18,7 @@ import initLogRocket, {
   logRocketTrackEvent,
   logRocketWarnEvent,
 } from './utils/log-rocket';
-import initObserve, {
-  Observe,
-  observeErrorCauseEvent,
-  observeErrorEvent,
-  observeInfoEvent,
-  observeTrackEvent,
-  observeWarnEvent,
-} from './utils/observe';
-import {
-  registerErrorHandlers,
-  registerUnloadHandler,
-} from './utils/register-event-listeners';
+import { registerErrorHandlers } from './utils/register-event-listeners';
 
 /**
  * Filters out any traits that are null, undefined, or empty strings.
@@ -48,7 +37,6 @@ const LoggerFactory = () => {
   let appName: string = '';
   let isLogRocketEnabled: boolean = false;
   let isDataDogEnabled: boolean = false;
-  let isObserveEnabled: boolean = false;
 
   const init = (app: string, disableLogRocket?: boolean) => {
     if (!IS_LOGGING_ENABLED) return;
@@ -56,23 +44,17 @@ const LoggerFactory = () => {
     appName = app;
     isLogRocketEnabled = !disableLogRocket;
 
-    isObserveEnabled = initObserve(appName);
     isDataDogEnabled = initDataDog(appName);
-    if (isLogRocketEnabled) {
-      initLogRocket(appName);
-      if (isObserveEnabled) Observe.setLogRocketSessionUrl();
-    }
+    if (isLogRocketEnabled) initLogRocket(appName);
 
     getEnvInfo().then(identify).catch(console.warn);
 
     const onError = (error: Error) => {
-      if (isObserveEnabled) observeErrorCauseEvent(error);
       if (isLogRocketEnabled) logRocketErrorEvent(error);
       if (isDataDogEnabled) dataDogErrorEvent(error);
     };
 
     registerErrorHandlers(onError);
-    registerUnloadHandler();
   };
 
   const identify = (traits: PrimitiveData) => {
@@ -84,7 +66,6 @@ const LoggerFactory = () => {
       fp_session_id: sessionId,
     };
 
-    if (isObserveEnabled) Observe.identify(sessionId, contextProps);
     if (isLogRocketEnabled) LogRocket.identify(sessionId, contextProps);
     if (isDataDogEnabled) datadogLogs.setGlobalContext(contextProps);
   };
@@ -94,7 +75,6 @@ const LoggerFactory = () => {
 
     isLogRocketEnabled = true;
     initLogRocket(appName);
-    if (isObserveEnabled) Observe.setLogRocketSessionUrl();
   };
 
   const track = (msg: string, extra: PrimitiveData) => {
@@ -102,8 +82,6 @@ const LoggerFactory = () => {
 
     const filteredExtra = filterNonEmptyTraits(extra);
 
-    // sentryTrackEvent(msg, filteredExtra);
-    if (isObserveEnabled) observeTrackEvent(msg, filteredExtra);
     if (isLogRocketEnabled) logRocketTrackEvent(msg, filteredExtra);
     if (isDataDogEnabled) dataDogTrackEvent(msg, filteredExtra);
   };
@@ -116,10 +94,6 @@ const LoggerFactory = () => {
     const errorObj: Error =
       err instanceof Error ? err : new Error(errorMessage);
 
-    // sentryErrorEvent(errorMessage, filteredExtra);
-    if (isObserveEnabled) {
-      observeErrorEvent(errorMessage, errorObj, filteredExtra);
-    }
     if (isLogRocketEnabled) {
       logRocketErrorEvent(errorObj, { ...filteredExtra, level: 'error' });
     }
@@ -132,7 +106,6 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
     const filteredExtra = filterNonEmptyTraits(extra || {});
 
-    if (isObserveEnabled) observeWarnEvent(msg, filteredExtra);
     if (isLogRocketEnabled) logRocketWarnEvent(msg, filteredExtra);
     if (isDataDogEnabled) dataDogWarnEvent(msg, filteredExtra, err);
   };
@@ -141,7 +114,6 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
     const filteredExtra = filterNonEmptyTraits(extra || {});
 
-    if (isObserveEnabled) observeInfoEvent(msg, filteredExtra);
     if (isLogRocketEnabled) logRocketInfoEvent(msg, filteredExtra);
     if (isDataDogEnabled) dataDogInfoEvent(msg, filteredExtra);
   };
