@@ -1,4 +1,4 @@
-import { Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,16 +23,18 @@ const Home = () => {
       <Text variant="heading-2" marginBottom={7}>
         {t('header.title')}
       </Text>
-      <SectionTitle>
-        <Text variant="label-1">{t('onboarding-metrics.title')}</Text>
-        <Stack gap={4}>
-          <DateFilter />
-          <PlaybooksFilter />
-        </Stack>
-      </SectionTitle>
-      {metrics.isLoading && <Loading />}
-      {metrics.error && <Error error={metrics.error} />}
-      {metrics.data && <Content metrics={metrics.data} />}
+      <Box aria-busy={metrics.isLoading}>
+        <SectionTitle>
+          <Text variant="label-1">{t('onboarding-metrics.title')}</Text>
+          <Stack gap={4}>
+            <DateFilter />
+            <PlaybooksFilter />
+          </Stack>
+        </SectionTitle>
+        {metrics.isLoading ? <Loading /> : null}
+        {metrics.error ? <Error error={metrics.error} /> : null}
+        {metrics.data ? <Content metrics={metrics.data} /> : null}
+      </Box>
     </>
   );
 };
