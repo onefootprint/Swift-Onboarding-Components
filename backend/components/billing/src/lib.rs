@@ -178,7 +178,7 @@ impl BillingClient {
         };
         let existing_invoices = Invoice::list(&self.client, &list_invoice).await?;
         let existing_invoice = existing_invoices.data.into_iter().find(|i| {
-            is_managed(&i.metadata) && i.metadata.get("billing-interval") == Some(&info.interval.label)
+            is_managed(&i.metadata) && i.metadata.get("billing-interval") == Some(&info.interval.label())
         });
         if let Some(i) = existing_invoice {
             // Delete the existing draft invoice that was created from a previous run.
@@ -227,7 +227,7 @@ impl BillingClient {
         }
 
         // Create the invoice, which will automatically include these billing items
-        let extra_metadata = [("billing-interval".to_owned(), info.interval.label)];
+        let extra_metadata = [("billing-interval".to_owned(), info.interval.label())];
         let metadata = extra_metadata.into_iter().chain(managed_metadata()).collect();
         let new_invoice = CreateInvoice {
             customer: Some(customer_id.clone()),

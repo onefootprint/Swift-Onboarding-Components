@@ -11,9 +11,8 @@ use chrono::{
 };
 use std::ops::Add;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct BillingInterval {
-    pub label: String,
     pub start: DateTime<Utc>,
     pub end: DateTime<Utc>,
 }
@@ -33,12 +32,17 @@ pub fn get_billing_interval(date: NaiveDate) -> BResult<BillingInterval> {
     let first_day_of_month = utc_timestamp_first_day_of_month(date)?;
     let first_day_of_next_month = utc_timestamp_first_day_of_month(date.add(Months::new(1)))?;
     let interval = BillingInterval {
-        label: first_day_of_month.format("%Y-%m").to_string(),
         start: first_day_of_month,
         end: first_day_of_next_month,
     };
 
     Ok(interval)
+}
+
+impl BillingInterval {
+    pub fn label(&self) -> String {
+        self.start.format("%Y-%m").to_string()
+    }
 }
 
 #[cfg(test)]
@@ -55,7 +59,7 @@ mod test {
     #[test_case("1999-12-31" => "1999-12".to_owned())]
     fn test_get_billing_interval_label(date: &str) -> String {
         let date = NaiveDate::parse_from_str(date, "%Y-%m-%d").unwrap();
-        get_billing_interval(date).unwrap().label
+        get_billing_interval(date).unwrap().label()
     }
 
     #[test_case("2023-02-01", "2023-02-01")]

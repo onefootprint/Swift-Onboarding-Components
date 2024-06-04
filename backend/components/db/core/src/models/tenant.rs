@@ -205,6 +205,7 @@ impl Tenant {
     pub fn list_billable(conn: &mut PgConn) -> DbResult<Vec<Self>> {
         let results = tenant::table
             .filter(tenant::sandbox_restricted.eq(false))
+            .filter(tenant::super_tenant_id.is_null())
             .get_results::<Self>(conn)?
             .into_iter()
             .filter(|t| !t.id.is_integration_test_tenant() && !t.is_demo_tenant)
