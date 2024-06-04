@@ -30,12 +30,14 @@ export enum TenantPreviewApi {
 }
 
 export const TENANT_BILLING_PROFILE_PRODUCTS = [
+  'monthlyPlatformFee',
   'kyc',
   'oneClickKyc',
   'kycWaterfallSecondVendor',
   'kycWaterfallThirdVendor',
   'idDocs',
   'kyb',
+  'curpVerification',
   'pii',
   'hotVaults',
   'hotProxyVaults',

@@ -53,6 +53,10 @@ const OTHER_VERIFICATIONS: BillingProfileField[] = [
     title: 'KYB',
     field: 'kyb',
   },
+  {
+    title: 'CURP verification',
+    field: 'curpVerification',
+  },
 ];
 
 const VAULTING: BillingProfileField[] = [
@@ -95,8 +99,12 @@ const WATCHLIST: BillingProfileField[] = [
 
 const OTHER: BillingProfileField[] = [
   {
-    title: 'Monthly minimum',
+    title: 'Monthly minimum on identity products',
     field: 'monthlyMinimum',
+  },
+  {
+    title: 'Monthly platform fee',
+    field: 'monthlyPlatformFee',
   },
 ];
 
