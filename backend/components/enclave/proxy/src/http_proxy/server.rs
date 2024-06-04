@@ -60,7 +60,7 @@ pub async fn build_server(config: Config) -> std::io::Result<(Server, u16)> {
     let port = config.port;
     let state = web::Data::new(State { pool, config });
 
-    log::info!("Starting enclave_parent on port {}", port);
+    log::info!("Starting enclave_proxy on port {}", port);
 
     let server = HttpServer::new(move || {
         // Support a larger payload size for a handful of large VReses that are decrypted in the
