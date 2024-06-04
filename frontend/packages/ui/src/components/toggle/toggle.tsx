@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-props-no-spreading */
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -5,12 +7,15 @@ import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 
-import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
-import useSX from '../../hooks/use-sx';
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
+import type { BoxProps } from '../box';
+import Box from '../box';
 import Stack from '../stack';
 
-export type ToggleProps = {
+export type ToggleProps = Omit<
+  BoxProps,
+  'children' | 'onBlur' | 'onChange' | 'onFocus'
+> & {
   checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
@@ -25,7 +30,6 @@ export type ToggleProps = {
   onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   required?: boolean;
   size?: 'default' | 'compact';
-  sx?: SXStyleProps;
 };
 
 const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
@@ -44,8 +48,8 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       onChange,
       onFocus,
       required,
-      sx,
       size = 'default',
+      ...props
     }: ToggleProps,
     ref,
   ) => {
@@ -54,7 +58,6 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
     const isControlled = typeof initialChecked !== 'undefined';
     const checked = isControlled ? initialChecked : defaultChecked || false;
     const localRef = useRef<HTMLInputElement>(null);
-    const sxStyles = useSX(sx);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
       // This will trigger a native change event, so we can use web standards
@@ -82,7 +85,7 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
         data-placement={labelPlacement}
         data-full-width={fullWidth}
         data-align-center={!hint}
-        sx={sxStyles}
+        {...props}
       >
         <Stack flex={1} direction="column">
           {label && (
@@ -141,9 +144,7 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
   },
 );
 
-const ToggleContainer = styled.div<{
-  sx: SXStyles;
-}>`
+const ToggleContainer = styled(Box)`
   ${({ theme }) => css`
     display: flex;
     gap: ${theme.spacing[4]};
@@ -169,9 +170,6 @@ const ToggleContainer = styled.div<{
     &[data-align-center='true'] {
       align-items: center;
     }
-  `}
-  ${({ sx }) => css`
-    ${sx}
   `}
 `;
 

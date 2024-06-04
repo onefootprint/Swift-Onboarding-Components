@@ -19,12 +19,7 @@ const PenguinBannerAuth = () => {
   });
 
   return (
-    <Container
-      sx={{
-        marginTop: 12,
-        marginBottom: 12,
-      }}
-    >
+    <Container marginTop={12} marginBottom={12}>
       <SectionVerticalSpacer />
       <Layout minHeight="320px">
         <Stack align="center" justify="center">

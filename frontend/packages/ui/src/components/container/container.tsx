@@ -1,62 +1,34 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
-import useSX from '../../hooks/use-sx';
 import media from '../../utils/media';
 import type { StackProps } from '../stack';
 import Stack from '../stack';
 
 export type ContainerProps = StackProps & {
-  as?: 'div' | 'section' | 'main' | 'article' | 'nav' | 'header' | 'footer';
-  children: React.ReactNode;
   fluid?: boolean;
-  id?: string;
-  sx?: SXStyleProps;
-  testID?: string;
-  className?: string;
 };
+
 const Container = forwardRef<HTMLDivElement, ContainerProps>(
-  (
-    {
-      id,
-      as,
-      sx,
-      children,
-      testID,
-      fluid = false,
-      className,
-      ...stackProps
-    }: ContainerProps,
-    ref,
-  ) => {
-    const sxStyles = useSX(sx);
-    return (
-      <StyledContainer
-        as={as}
-        data-testid={testID}
-        data-fluid={fluid}
-        id={id}
-        ref={ref}
-        sx={sxStyles}
-        direction="column"
-        className={className}
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        {...stackProps}
-      >
-        {children}
-      </StyledContainer>
-    );
-  },
+  ({ children, fluid = false, ...props }: ContainerProps, ref) => (
+    <StyledContainer
+      data-fluid={fluid}
+      display="flex"
+      flexDirection="column"
+      ref={ref}
+      {...props}
+    >
+      {children}
+    </StyledContainer>
+  ),
 );
 
-const StyledContainer = styled(Stack)<{ sx: SXStyles }>`
-  ${({ theme, sx }) => css`
+const StyledContainer = styled(Stack)`
+  ${({ theme }) => css`
     position: relative;
     margin-left: auto;
     margin-right: auto;
-
-    ${sx};
 
     &[data-fluid='true'] {
       width: 100%;

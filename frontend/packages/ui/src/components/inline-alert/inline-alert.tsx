@@ -1,18 +1,16 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
-import useSX from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
+import type { BoxProps } from '../box';
 import Box from '../box';
 import Stack from '../stack';
 import type { InlineAlertVariant } from './inline-alert.types';
 import { createVariantStyles, getIconForVariant } from './inline-alert.utils';
 
-export type InlineAlertProps = {
-  children: React.ReactNode;
+export type InlineAlertProps = BoxProps & {
   variant: InlineAlertVariant;
-  sx?: SXStyleProps;
   cta?: {
     label: string;
     onClick: () => void;
@@ -23,16 +21,16 @@ const InlineAlert = ({
   cta,
   children,
   variant = 'info',
-  sx,
+  ...props
 }: InlineAlertProps) => {
   const IconComponent = getIconForVariant(variant);
-  const sxStyles = useSX(sx);
+
   return (
-    <InlineAlertContainer sx={sxStyles} role="alert" variant={variant}>
+    <InlineAlertContainer role="alert" $variant={variant} {...props}>
       <Stack marginRight={3}>
         <IconComponent color={variant} />
       </Stack>
-      <ContentContainer variant={variant}>
+      <ContentContainer $variant={variant}>
         <Box>{children}</Box>
         {cta && (
           <button onClick={cta.onClick} type="button">
@@ -44,24 +42,12 @@ const InlineAlert = ({
   );
 };
 
-const ContentContainer = styled.div<{
-  variant: InlineAlertVariant;
+const InlineAlertContainer = styled(Box)<{
+  $variant: InlineAlertVariant;
 }>`
-  ${({ variant }) => css`
-    ${createVariantStyles(variant)};
-    display: inline-flex;
-    justify-content: space-between;
-    width: 100%;
-  `};
-`;
-
-const InlineAlertContainer = styled.div<{
-  variant: InlineAlertVariant;
-  sx: SXStyles;
-}>`
-  ${({ theme, variant }) => css`
+  ${({ theme, $variant }) => css`
     ${createFontStyles('body-3')};
-    ${createVariantStyles(variant)};
+    ${createVariantStyles($variant)};
     border-radius: ${theme.borderRadius.default};
     display: flex;
     padding: ${theme.spacing[4]} ${theme.spacing[5]};
@@ -89,12 +75,17 @@ const InlineAlertContainer = styled.div<{
       }
     }
   `};
+`;
 
-  ${({ sx }) =>
-    sx &&
-    css`
-      ${sx};
-    `}
+const ContentContainer = styled.div<{
+  $variant: InlineAlertVariant;
+}>`
+  ${({ $variant }) => css`
+    ${createVariantStyles($variant)};
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
+  `};
 `;
 
 export default InlineAlert;

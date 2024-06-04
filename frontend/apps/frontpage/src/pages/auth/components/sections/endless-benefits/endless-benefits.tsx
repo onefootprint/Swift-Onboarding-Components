@@ -11,11 +11,7 @@ const EndlessBenefits = () => {
   });
   return (
     <>
-      <Container
-        sx={{
-          marginTop: 12,
-        }}
-      >
+      <Container marginTop={12}>
         <Title
           iconSrc="/auth/icons/ico-illustrated-heart-40.svg"
           title={t('title')}

@@ -31,7 +31,7 @@ const ConfirmContinueOnDesktop = () => {
       />
       <Grid.Container gap={7} textAlign="center">
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        <InlineAlert variant="warning" sx={{ textAlign: 'left' }}>
+        <InlineAlert variant="warning" textAlign="left">
           {t('warning')}
         </InlineAlert>
         <Stack direction="column" gap={3} width="100%">

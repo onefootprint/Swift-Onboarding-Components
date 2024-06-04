@@ -8,7 +8,7 @@ type DocsInlineAlertProps = {
 };
 
 const DocsInlineAlert = ({ children, variant }: DocsInlineAlertProps) => (
-  <InlineAlert sx={{ marginTop: 6, marginBottom: 8 }} variant={variant}>
+  <InlineAlert marginTop={6} marginBottom={8} variant={variant}>
     {children}
   </InlineAlert>
 );
