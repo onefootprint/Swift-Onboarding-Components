@@ -385,18 +385,21 @@ impl Tenant {
 
     #[tracing::instrument("Tenant::get_with_parent", skip_all)]
     pub fn with_parent(self, conn: &mut PgConn) -> DbResult<TenantWithParent> {
-        if let Some(super_tenant_id) = &self.super_tenant_id {
+        let parent = if let Some(super_tenant_id) = &self.super_tenant_id {
             let parent = Tenant::get(conn, TenantIdentifier::Id(super_tenant_id))?;
-            Ok(TenantWithParent {
-                tenant: self,
-                parent: Some(parent),
-            })
+            Some(parent)
         } else {
-            Ok(TenantWithParent {
-                tenant: self,
-                parent: None,
-            })
-        }
+            None
+        };
+        Ok(TenantWithParent { tenant: self, parent })
+    }
+
+    #[tracing::instrument("Tenant::list_childre", skip_all)]
+    pub fn list_children(conn: &mut PgConn, id: &TenantId) -> DbResult<Vec<Self>> {
+        let results = tenant::table
+            .filter(tenant::super_tenant_id.eq(id))
+            .get_results::<Self>(conn)?;
+        Ok(results)
     }
 }
 

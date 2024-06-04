@@ -29,9 +29,10 @@ use newtypes::{
     VaultKind,
 };
 use rust_decimal_macros::dec;
+use std::ops::Add;
 use strum::IntoEnumIterator;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct BillingCounts {
     /// Total number user vaults with billable PII - either an authorized workflow OR created via
     /// API
@@ -254,5 +255,42 @@ impl BillingCounts {
                 .cloned(),
         };
         Ok(counts)
+    }
+}
+
+
+impl Add for BillingCounts {
+    type Output = BillingCounts;
+
+    fn add(self, b: BillingCounts) -> BillingCounts {
+        let add_opt = |a, b| match (a, b) {
+            (Some(a), Some(b)) => Some(a + b),
+            (Some(i), None) | (None, Some(i)) => Some(i),
+            (None, None) => None,
+        };
+        let a = self;
+        BillingCounts {
+            pii: a.pii + b.pii,
+            kyc: a.kyc + b.kyc,
+            one_click_kyc: add_opt(a.one_click_kyc, b.one_click_kyc),
+            kyc_waterfall_second_vendor: add_opt(
+                a.kyc_waterfall_second_vendor,
+                b.kyc_waterfall_second_vendor,
+            ),
+            kyc_waterfall_third_vendor: add_opt(a.kyc_waterfall_third_vendor, b.kyc_waterfall_third_vendor),
+            kyb: a.kyb + b.kyb,
+            id_docs: a.id_docs + b.id_docs,
+            curp_verifications: add_opt(a.curp_verifications, b.curp_verifications),
+            watchlist_checks: a.watchlist_checks + b.watchlist_checks,
+            hot_vaults: add_opt(a.hot_vaults, b.hot_vaults),
+            hot_proxy_vaults: add_opt(a.hot_proxy_vaults, b.hot_proxy_vaults),
+            vaults_with_non_pci: add_opt(a.vaults_with_non_pci, b.vaults_with_non_pci),
+            vaults_with_pci: add_opt(a.vaults_with_pci, b.vaults_with_pci),
+            adverse_media_per_user: add_opt(a.adverse_media_per_user, b.adverse_media_per_user),
+            continuous_monitoring_per_year: add_opt(
+                a.continuous_monitoring_per_year,
+                b.continuous_monitoring_per_year,
+            ),
+        }
     }
 }

@@ -11,7 +11,11 @@ use db::models::tenant::{
     Tenant,
     UpdateTenant,
 };
-use db::DbPool;
+use db::{
+    DbPool,
+    DbResult,
+};
+use itertools::chain;
 use newtypes::StripeCustomerId;
 
 #[tracing::instrument(skip_all, fields(tenant_id=%tenant.id, billing_date))]
@@ -33,8 +37,23 @@ pub async fn create_bill_for_tenant(
                     "Cannot generate invoice for subtenant".into(),
                 ));
             }
+            let children = Tenant::list_children(conn, &t_id)?;
             let billing_profile = BillingProfile::get(conn, &t_id)?;
-            let counts = BillingCounts::build_for_tenant(conn, &t_id, billing_profile.as_ref(), &i)?;
+            let bp = billing_profile.as_ref();
+
+            // Add up the count of each product used by the parent tenant and all children
+            let counts = chain!(Some(tenant), children)
+                .map(|t| BillingCounts::build_for_tenant(conn, &t.id, bp, &i).map(|counts| (t.id, counts)))
+                .collect::<DbResult<Vec<_>>>()?;
+            if counts.len() > 1 {
+                for (t_id, counts) in counts.iter() {
+                    tracing::info!(%t_id, ?counts, "Merging billing counts of children");
+                }
+            };
+            let counts = counts
+                .into_iter()
+                .map(|x| x.1)
+                .fold(BillingCounts::default(), |a, b| a + b);
             Ok((billing_profile, counts))
         })
         .await?;
