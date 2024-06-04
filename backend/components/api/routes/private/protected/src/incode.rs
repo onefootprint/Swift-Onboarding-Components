@@ -203,7 +203,7 @@ pub async fn adhoc_create_document_and_workflow(
             let (obc, _) = ObConfiguration::get_enabled(conn, (&playbook_key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
 
-            if obc.kind != ObConfigurationKind::Document || !obc.is_doc_first {
+            if obc.kind != ObConfigurationKind::Document && !obc.is_doc_first {
                 return Err(AssertionError("Must use playbook of kind Document or Document-First").into());
             }
 
