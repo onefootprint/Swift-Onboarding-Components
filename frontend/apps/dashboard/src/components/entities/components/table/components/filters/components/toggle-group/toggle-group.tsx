@@ -44,6 +44,7 @@ const ToggleGroup = ({
   groupId,
 }: ToggleGroupProps) => {
   const theme = useTheme();
+
   const getAnimate = (option: ToggleGroupOption) => {
     if (disabled) return 'disabled';
     if (value === option.value) return 'selected';
@@ -66,7 +67,6 @@ const ToggleGroup = ({
         >
           <Option
             disabled={disabled}
-            key={option.value}
             data-selected={value === option.value}
             onClick={() => {
               onChange?.(option.value);
