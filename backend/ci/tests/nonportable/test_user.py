@@ -130,10 +130,12 @@ def test_create_with_external_id_after_deactivate(tenant, sandbox_tenant):
         ),
         (
             [],
-            ["id.ssn9"],
-            "Missing ssn9",
-        ),  # TODO: these are not great user facing errors
+            ["id.first_name", "id.last_name", "id.ssn9"],
+            "Cannot run KYC on this user due to unmet requirements on the playbook. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9",
+        ),
     ],
+    # The third test's name is so long that it overflows the insight_event.user_agent column
+    ids=lambda d: f"{d}"[:10],
 )
 def test_kyc(
     sandbox_tenant,

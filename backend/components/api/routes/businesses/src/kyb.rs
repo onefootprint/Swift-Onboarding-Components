@@ -168,7 +168,7 @@ pub async fn post(
                 .filter(|r| !matches!(r, OnboardingRequirement::Process))
                 .collect_vec();
             if !unmet_reqs.is_empty() {
-                return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());
+                return Err(OnboardingError::CannotKybForMissingReq(UnmetRequirements(unmet_reqs)).into());
             }
 
             Ok(biz_wf)

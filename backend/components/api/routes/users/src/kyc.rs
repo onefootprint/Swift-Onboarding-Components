@@ -55,7 +55,6 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::{
     CollectedDataOption,
-    DataIdentifierDiscriminant as DID,
     ObConfigurationKind,
     OnboardingRequirement,
     VaultKind,
@@ -187,13 +186,6 @@ pub async fn post(
             }
             .insert(conn)?;
 
-            if obc.must_collect(DID::InvestorProfile) {
-                return Err(
-                    TenantError::UnsupportedObcForNpv("Investor Profile not allowed".to_owned()).into(),
-                );
-            }
-
-
             // /kyc endpoint currently does not properly handle IPK doc requirements!
             // Also does not check any requirements for the Business vault if this person is a primary BO for
             // a Business
@@ -213,7 +205,7 @@ pub async fn post(
                 })
                 .collect_vec();
             if !unmet_reqs.is_empty() {
-                return Err(OnboardingError::from(UnmetRequirements(unmet_reqs)).into());
+                return Err(OnboardingError::CannotKycForMissingReq(UnmetRequirements(unmet_reqs)).into());
             }
             Ok(wf)
         })

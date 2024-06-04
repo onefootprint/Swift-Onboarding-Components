@@ -71,6 +71,10 @@ pub enum OnboardingError {
     CannotOnboardOntoPlaybook(ObConfigurationKind),
     #[error("{0}")]
     UnmetRequirements(#[from] UnmetRequirements),
+    #[error("Cannot run KYC on this user due to unmet requirements on the playbook. {0}")]
+    CannotKycForMissingReq(UnmetRequirements),
+    #[error("Cannot run KYB on this business due to unmet requirements on the playbook. {0}")]
+    CannotKybForMissingReq(UnmetRequirements),
 }
 
 #[derive(Debug, Error)]

@@ -56,8 +56,6 @@ pub enum TenantError {
     CannotCreateProdPlaybook(ObConfigurationKind),
     #[error("Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: {0}")]
     MissingCanAccessCdos(Csv<CollectedDataOption>),
-    #[error("Invalid onboarding configuration for Vault. {0}")]
-    UnsupportedObcForNpv(String),
     #[error("Decryption reason must be provided")]
     NoDecryptionReasonProvided,
     #[error("{0} doesn't exist for user")]

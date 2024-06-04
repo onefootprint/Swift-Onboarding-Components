@@ -185,21 +185,25 @@ impl OnboardingRequirement {
     pub fn unmet_str(&self) -> String {
         match self {
             Self::CollectData {
-                missing_attributes,
+                missing_attributes: cdos,
                 optional_attributes: _,
                 populated_attributes: _,
             }
             | Self::CollectInvestorProfile {
-                missing_attributes,
+                missing_attributes: cdos,
                 missing_document: _,
                 populated_attributes: _,
             }
             | Self::CollectBusinessData {
-                missing_attributes,
+                missing_attributes: cdos,
                 populated_attributes: _,
             } => format!(
-                "Missing {}",
-                missing_attributes.iter().map(|c| c.to_string()).join(", ")
+                "Missing {}. At a minimum, the following vault data must be provided: {}",
+                cdos.iter().map(|c| c.to_string()).join(", "),
+                cdos.iter()
+                    .flat_map(|c| c.required_data_identifiers())
+                    .map(|c| c.to_string())
+                    .join(", ")
             ),
             Self::Authorize {
                 fields_to_authorize: _,

@@ -30,7 +30,7 @@ def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
     expected_error = None
     if missing_data:
         vault_data.pop("business.name")
-        expected_error = "Missing business_name"
+        expected_error = "Cannot run KYB on this business due to unmet requirements on the playbook. Missing business_name. At a minimum, the following vault data must be provided: business.name"
 
     vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
     fp_id = vault["id"]
@@ -90,7 +90,10 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     body = post(
         f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key, status_code=400
     )
-    assert body["error"]["message"] == "Missing business_beneficial_owners"
+    assert (
+        body["error"]["message"]
+        == "Cannot run KYB on this business due to unmet requirements on the playbook. Missing business_beneficial_owners. At a minimum, the following vault data must be provided: business.beneficial_owners"
+    )
 
     # Link the BO, then should be able to KYB
     data = {
