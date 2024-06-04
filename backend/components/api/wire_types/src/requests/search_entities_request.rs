@@ -27,6 +27,7 @@ pub struct SearchEntitiesRequest {
     #[serde(default)]
     pub labels: Vec<LabelKind>,
     pub playbook_ids: Option<Vec<ObConfigurationId>>,
+    pub external_id: Option<ExternalId>,
 }
 
 #[derive(Deserialize, Apiv2Schema)]

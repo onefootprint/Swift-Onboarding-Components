@@ -43,7 +43,12 @@ def test_external_id(tenant, sandbox_tenant):
 
     # test fetching the user by the external id
     body = get(f"users/?external_id={external_id}", None, tenant.sk.key)
-    print(body)
+    assert body["data"][0]["id"] == fp_id
+    assert body["data"][0]["external_id"] == external_id
+
+    # Can search in dashboard on external_id
+    data = dict(external_id=external_id)
+    body = post(f"entities/search", data, *tenant.db_auths)
     assert body["data"][0]["id"] == fp_id
     assert body["data"][0]["external_id"] == external_id
 

@@ -99,6 +99,7 @@ pub async fn post(
         has_outstanding_workflow_request,
         playbook_ids,
         labels,
+        external_id,
     } = filters;
     let cursor = pagination.cursor.as_ref().map(|c| c.into());
 
@@ -119,7 +120,7 @@ pub async fn post(
         only_active: !show_all.unwrap_or_default(),
         playbook_ids,
         has_outstanding_workflow_request,
-        external_id: None,
+        external_id,
         labels,
     };
     let (scoped_vaults, mut entities, vws, count) = state
