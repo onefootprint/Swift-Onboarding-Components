@@ -114,6 +114,7 @@ const Label = styled.label`
 const Input = styled(Grid.Container)<Pick<RadioProps, 'hasError'>>`
   ${({ theme }) => css`
     appearance: none;
+    position: relative;
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.spacing[4]};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
@@ -129,6 +130,10 @@ const Input = styled(Grid.Container)<Pick<RadioProps, 'hasError'>>`
       height: 0.55em;
       transform: scale(0);
       transition: 100ms transform ease-in-out;
+    }
+
+    &:not(:checked):hover:enabled {
+      background-color: ${theme.backgroundColor.secondary};
     }
 
     &:checked {

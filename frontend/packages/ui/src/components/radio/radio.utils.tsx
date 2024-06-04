@@ -31,8 +31,15 @@ export const createPseudoStyles = ({
 
 export const createCheckedStyled = (color: Color) => css`
   ${({ theme }) => css`
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background-color: ${theme.color[color]};
-    transform: scale(1);
-    clip-path: circle(42% at 50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
   `}
 `;
