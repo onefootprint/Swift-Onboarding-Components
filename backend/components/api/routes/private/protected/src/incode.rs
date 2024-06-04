@@ -7,7 +7,16 @@ use actix_web::{
     HttpRequest,
 };
 use api_core::decision::document::meta_headers::MetaHeaders;
+use api_core::decision::document::route_handler::{
+    IncodeConfigurationIdOverride,
+    IsRerun,
+};
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
+use api_core::decision::state::{
+    run_incode_machine_and_workflow,
+    RunIncodeMachineAndWorkflowResult,
+    WorkflowWrapper,
+};
 use api_core::errors::{
     ApiResult,
     AssertionError,
@@ -56,6 +65,7 @@ use newtypes::{
     DocumentRequestKind,
     DocumentSide,
     FpId,
+    IncodeConfigurationId,
     IncodeEnvironment,
     IncodeVerificationSessionId,
     IncodeVerificationSessionKind,
@@ -148,6 +158,7 @@ pub async fn rerun_machine(
         Some(0),
         true,
         vec![],
+        IncodeConfigurationIdOverride(None),
     )
     .await?;
     ResponseData::ok(response).json()
@@ -192,8 +203,8 @@ pub async fn adhoc_create_document_and_workflow(
             let (obc, _) = ObConfiguration::get_enabled(conn, (&playbook_key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
 
-            if obc.kind != ObConfigurationKind::Document {
-                return Err(AssertionError("Must use playbook of kind Document").into());
+            if obc.kind != ObConfigurationKind::Document || !obc.is_doc_first {
+                return Err(AssertionError("Must use playbook of kind Document or Document-First").into());
             }
 
             let args = NewOnboardingArgs {
@@ -268,8 +279,6 @@ pub async fn adhoc_create_document_and_workflow(
 
 
     ResponseData::ok(CreateDocumentResponse { id: doc_id.id }).json()
-
-    // create workflow
 }
 
 
@@ -316,12 +325,48 @@ pub async fn adhoc_upload_and_process(
         wf_id,
         tenant_id,
         iddoc.id.clone(),
+        IsRerun(true),
+        // TODO: don't hardcode this!!!! Not sure where best to encode it though..
+        IncodeConfigurationIdOverride(Some(IncodeConfigurationId::from(
+            "665f263f43396f459aea7cc5".to_string(),
+        ))),
     )
     .await?;
 
+
     if !response.errors.is_empty() {
-        tracing::info!(errors=?response.errors, ?side, document_id=%iddoc.id, sv_id=?sv_id,  "errors processing adhoc document");
+        // shouldn't have any errors if we set IsRerun(true)
+        return Err(AssertionError("unexpected errors received while processing side").into());
     }
 
     ResponseData::ok(EmptyResponse {}).json()
+}
+
+
+#[derive(serde::Serialize)]
+pub struct AdhocDocumentProcessResponse {
+    result: RunIncodeMachineAndWorkflowResult,
+}
+
+#[post("/private/incode/adhoc/{id}/process")]
+pub async fn adhoc_document_process(
+    state: web::Data<State>,
+    _: ProtectedAuth,
+    args: web::Path<DocumentId>,
+) -> JsonApiResponse<AdhocDocumentProcessResponse> {
+    let document_id = args.into_inner();
+
+    let wf = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let (_, doc_req) = Document::get(conn, &document_id)?;
+            let wf = Workflow::get(conn, &doc_req.workflow_id)?;
+            Ok(wf)
+        })
+        .await?;
+
+    let ww = WorkflowWrapper::init(&state, wf).await?;
+    let result = run_incode_machine_and_workflow(&state, ww).await?;
+
+    ResponseData::ok(AdhocDocumentProcessResponse { result }).json()
 }

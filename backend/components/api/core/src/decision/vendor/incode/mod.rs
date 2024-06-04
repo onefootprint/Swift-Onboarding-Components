@@ -18,10 +18,6 @@ use newtypes::{
 };
 pub use state_machine::*;
 
-#[cfg(test)]
-mod images;
-#[cfg(test)]
-mod test;
 
 // TEMP: will get this into State + TVC properly
 pub fn get_config_id(
@@ -29,22 +25,27 @@ pub fn get_config_id(
     is_selfie: bool,
     is_sandbox: bool,
     tenant_id: &TenantId,
+    override_id: Option<IncodeConfigurationId>,
 ) -> IncodeConfigurationId {
-    let use_demo_creds_in_livemode =
-        state
-            .ff_client
-            .flag(feature_flag::BoolFlag::UseIncodeDemoCredentialsInLivemode(
-                tenant_id,
-            ));
-    let use_demo_credentials = is_sandbox || use_demo_creds_in_livemode;
-
-    let id = if is_selfie {
-        state.config.incode.selfie_flow_id(use_demo_credentials)
+    if let Some(id) = override_id {
+        id
     } else {
-        state.config.incode.document_flow_id(use_demo_credentials)
-    };
+        let use_demo_creds_in_livemode =
+            state
+                .ff_client
+                .flag(feature_flag::BoolFlag::UseIncodeDemoCredentialsInLivemode(
+                    tenant_id,
+                ));
+        let use_demo_credentials = is_sandbox || use_demo_creds_in_livemode;
 
-    IncodeConfigurationId::from(id.leak_to_string())
+        let id = if is_selfie {
+            state.config.incode.selfie_flow_id(use_demo_credentials)
+        } else {
+            state.config.incode.document_flow_id(use_demo_credentials)
+        };
+
+        IncodeConfigurationId::from(id.leak_to_string())
+    }
 }
 
 // TODO: better home for this?

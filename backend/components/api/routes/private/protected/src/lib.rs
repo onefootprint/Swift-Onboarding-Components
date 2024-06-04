@@ -26,6 +26,7 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(incode::rerun_machine)
         .service(incode::adhoc_create_document_and_workflow)
         .service(incode::adhoc_upload_and_process)
+        .service(incode::adhoc_document_process)
         .service(workflow::proceed)
         .service(token_reveal::post)
         .service(decrypt::post)

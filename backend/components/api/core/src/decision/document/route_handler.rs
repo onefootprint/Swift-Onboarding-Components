@@ -54,6 +54,7 @@ use newtypes::{
     DocumentSide,
     DocumentStatus,
     IdDocKind,
+    IncodeConfigurationId,
     ScopedVaultId,
     TenantId,
     WorkflowId,
@@ -290,6 +291,10 @@ pub async fn handle_document_upload(
     Ok(())
 }
 
+// setting is_re_run skips any retries due to errors received from Incode
+pub struct IsRerun(pub bool);
+pub struct IncodeConfigurationIdOverride(pub Option<IncodeConfigurationId>);
+
 /// Route handler for /hosted/user/documents/{id}/process
 /// TODO: appclip special logic
 pub async fn handle_document_process(
@@ -298,6 +303,8 @@ pub async fn handle_document_process(
     wf_id: WorkflowId,
     tenant_id: TenantId,
     doc_id: DocumentId,
+    is_re_run: IsRerun,
+    configuration_id_override: IncodeConfigurationIdOverride,
 ) -> ApiResult<DocumentResponse> {
     let su_id = sv_id.clone();
     let wf_id2 = wf_id.clone();
@@ -357,8 +364,9 @@ pub async fn handle_document_process(
             &wf_id3,
             state.ff_client.clone(),
             failed_attempts,
-            false,
+            is_re_run.0,
             missing_sides.0,
+            configuration_id_override,
         )
         .await?
     } else {

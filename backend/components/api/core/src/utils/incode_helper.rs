@@ -1,3 +1,4 @@
+use crate::decision::document::route_handler::IncodeConfigurationIdOverride;
 use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use crate::decision::vendor::incode::{
     get_config_id,
@@ -61,6 +62,7 @@ pub async fn handle_incode_request(
     failed_attempts_for_side: Option<i64>,
     is_re_run: bool,
     missing_sides: Vec<DocumentSide>, //kinda dumb
+    configuration_id_override: IncodeConfigurationIdOverride,
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let vault_country = uvw.get_decrypted_country(state).await?;
@@ -92,7 +94,13 @@ pub async fn handle_incode_request(
         state,
         tenant_id.clone(),
         // TODO: upstream this somewhere based on OBC
-        get_config_id(state, should_collect_selfie, is_sandbox, &tenant_id),
+        get_config_id(
+            state,
+            should_collect_selfie,
+            is_sandbox,
+            &tenant_id,
+            configuration_id_override.0,
+        ),
         ctx,
         is_sandbox,
     )

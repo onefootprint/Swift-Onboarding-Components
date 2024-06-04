@@ -1,6 +1,10 @@
 use crate::auth::user::UserAuthScope;
 use crate::types::response::ResponseData;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::decision::document::route_handler::{
+    IncodeConfigurationIdOverride,
+    IsRerun,
+};
 use api_core::types::JsonApiResponse;
 use api_core::{
     decision,
@@ -39,6 +43,8 @@ pub async fn post(
         wf_id,
         t_id,
         doc_id.into_inner(),
+        IsRerun(false),
+        IncodeConfigurationIdOverride(None),
     )
     .await?;
 

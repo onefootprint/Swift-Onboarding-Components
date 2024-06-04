@@ -1,0 +1,645 @@
+[
+  {
+    "document_kind": "passport",
+    "front": "data/session_1/session_1_front.jpg",
+    "selfie": "data/session_1/session_1_face.jpg",
+    "session_id": 1,
+    "country_code": "CA"
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_2/session_2_front.jpg",
+    "selfie": "data/session_2/session_2_face.jpg",
+    "session_id": 2
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_3/session_3_front.jpg",
+    "selfie": "data/session_3/session_3_face.jpg",
+    "session_id": 3
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_4/session_4_front.jpg",
+    "selfie": "data/session_4/session_4_face.jpg",
+    "session_id": 4
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_5/session_5_front.jpg",
+    "selfie": "data/session_5/session_5_face.jpg",
+    "session_id": 5
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_6/session_6_front.jpg",
+    "selfie": "data/session_6/session_6_face.jpg",
+    "session_id": 6
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_7/session_7_front.jpg",
+    "selfie": "data/session_7/session_7_face.jpg",
+    "session_id": 7
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_8/session_8_front.jpg",
+    "selfie": "data/session_8/session_8_face.jpg",
+    "session_id": 8
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_9/session_9_front.jpg",
+    "selfie": "data/session_9/session_9_face.jpg",
+    "session_id": 9
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_10/session_10_front.jpg",
+    "selfie": "data/session_10/session_10_face.jpg",
+    "session_id": 10
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_11/session_11_front.jpg",
+    "selfie": "data/session_11/session_11_face.jpg",
+    "session_id": 11
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_12/session_12_front.jpg",
+    "selfie": "data/session_12/session_12_face.jpg",
+    "session_id": 12
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_13/session_13_front.jpg",
+    "selfie": "data/session_13/session_13_face.jpg",
+    "session_id": 13
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_14/session_14_front.jpg",
+    "selfie": "data/session_14/session_14_face.jpg",
+    "session_id": 14
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_15/session_15_front.jpg",
+    "selfie": "data/session_15/session_15_face.jpg",
+    "session_id": 15
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_16/session_16_front.jpg",
+    "selfie": "data/session_16/session_16_face.jpg",
+    "session_id": 16
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_17/session_17_front.jpg",
+    "selfie": "data/session_17/session_17_face.jpg",
+    "session_id": 17
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_18/session_18_front.jpg",
+    "selfie": "data/session_18/session_18_face.jpg",
+    "session_id": 18
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_19/session_19_front.jpg",
+    "selfie": "data/session_19/session_19_face.jpg",
+    "session_id": 19
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_20/session_20_front.jpg",
+    "selfie": "data/session_20/session_20_face.jpg",
+    "session_id": 20
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_21/session_21_front.jpg",
+    "selfie": "data/session_21/session_21_face.jpg",
+    "session_id": 21
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_22/session_22_front.jpg",
+    "selfie": "data/session_22/session_22_face.jpg",
+    "session_id": 22
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_23/session_23_front.jpg",
+    "selfie": "data/session_23/session_23_face.jpg",
+    "session_id": 23
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_24/session_24_front.jpg",
+    "selfie": "data/session_24/session_24_face.jpg",
+    "session_id": 24
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_25/session_25_front.jpg",
+    "selfie": "data/session_25/session_25_face.jpg",
+    "session_id": 25
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_26/session_26_front.jpg",
+    "selfie": "data/session_26/session_26_face.jpg",
+    "session_id": 26
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_27/session_27_front.jpg",
+    "selfie": "data/session_27/session_27_face.jpg",
+    "session_id": 27
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_28/session_28_front.jpg",
+    "selfie": "data/session_28/session_28_face.jpg",
+    "session_id": 28
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_29/session_29_front.jpg",
+    "selfie": "data/session_29/session_29_face.jpg",
+    "session_id": 29
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_30/session_30_front.jpg",
+    "selfie": "data/session_30/session_30_face.jpg",
+    "session_id": 30
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_31/session_31_front.jpg",
+    "selfie": "data/session_31/session_31_face.jpg",
+    "session_id": 31
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_32/session_32_front.jpg",
+    "selfie": "data/session_32/session_32_face.jpg",
+    "session_id": 32
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_33/session_33_front.jpg",
+    "selfie": "data/session_33/session_33_face.jpg",
+    "session_id": 33
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_34/session_34_front.jpg",
+    "selfie": "data/session_34/session_34_face.jpg",
+    "session_id": 34
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_35/session_35_front.jpg",
+    "selfie": "data/session_35/session_35_face.jpg",
+    "session_id": 35
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_36/session_36_front.jpg",
+    "selfie": "data/session_36/session_36_face.jpg",
+    "session_id": 36
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_37/session_37_front.jpg",
+    "selfie": "data/session_37/session_37_face.jpg",
+    "session_id": 37
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_38/session_38_front.jpg",
+    "selfie": "data/session_38/session_38_face.jpg",
+    "session_id": 38
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_39/session_39_front.jpg",
+    "selfie": "data/session_39/session_39_face.jpg",
+    "session_id": 39
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_40/session_40_front.jpg",
+    "selfie": "data/session_40/session_40_face.jpg",
+    "session_id": 40
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_41/session_41_front.jpg",
+    "selfie": "data/session_41/session_41_face.jpg",
+    "session_id": 41
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_42/session_42_front.jpg",
+    "selfie": "data/session_42/session_42_face.jpg",
+    "session_id": 42
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_43/session_43_front.jpg",
+    "selfie": "data/session_43/session_43_face.jpg",
+    "session_id": 43
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_44/session_44_front.jpg",
+    "back": "data/session_44/session_44_back.jpg",
+    "selfie": "data/session_44/session_44_face.jpg",
+    "session_id": 44
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_45/session_45_front.jpg",
+    "back": "data/session_45/session_45_back.jpg",
+    "selfie": "data/session_45/session_45_face.jpg",
+    "session_id": 45
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_46/session_46_front.jpg",
+    "back": "data/session_46/session_46_back.jpg",
+    "selfie": "data/session_46/session_46_face.jpg",
+    "session_id": 46
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_47/session_47_front.jpg",
+    "back": "data/session_47/session_47_back.jpg",
+    "selfie": "data/session_47/session_47_face.jpg",
+    "session_id": 47
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_48/session_48_front.jpg",
+    "back": "data/session_48/session_48_back.jpg",
+    "selfie": "data/session_48/session_48_face.jpg",
+    "session_id": 48
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_49/session_49_front.jpg",
+    "back": "data/session_49/session_49_back.jpg",
+    "selfie": "data/session_49/session_49_face.jpg",
+    "session_id": 49
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_50/session_50_front.jpg",
+    "back": "data/session_50/session_50_back.jpg",
+    "selfie": "data/session_50/session_50_face.jpg",
+    "session_id": 50
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_51/session_51_front.jpg",
+    "back": "data/session_51/session_51_back.jpg",
+    "selfie": "data/session_51/session_51_face.jpg",
+    "session_id": 51
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_52/session_52_front.jpg",
+    "back": "data/session_52/session_52_back.jpg",
+    "selfie": "data/session_52/session_52_face.jpg",
+    "session_id": 52
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_53/session_53_front.jpg",
+    "back": "data/session_53/session_53_back.jpg",
+    "selfie": "data/session_53/session_53_face.jpg",
+    "session_id": 53
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_54/session_54_front.jpg",
+    "selfie": "data/session_54/session_54_face.jpg",
+    "session_id": 54
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_55/session_55_front.jpg",
+    "back": "data/session_55/session_55_back.jpg",
+    "selfie": "data/session_55/session_55_face.jpg",
+    "session_id": 55
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_56/session_56_front.jpg",
+    "back": "data/session_56/session_56_back.jpg",
+    "selfie": "data/session_56/session_56_face.jpg",
+    "session_id": 56
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_57/session_57_front.jpg",
+    "back": "data/session_57/session_57_back.jpg",
+    "selfie": "data/session_57/session_57_face.jpg",
+    "session_id": 57
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_58/session_58_front.jpg",
+    "selfie": "data/session_58/session_58_face.jpg",
+    "session_id": 58
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_59/session_59_front.jpg",
+    "selfie": "data/session_59/session_59_face.jpg",
+    "session_id": 59
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_60/session_60_front.jpg",
+    "selfie": "data/session_60/session_60_face.jpg",
+    "session_id": 60
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_61/session_61_front.jpg",
+    "selfie": "data/session_61/session_61_face.jpg",
+    "session_id": 61
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_62/session_62_front.jpg",
+    "selfie": "data/session_62/session_62_face.jpg",
+    "session_id": 62
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_63/session_63_front.jpg",
+    "selfie": "data/session_63/session_63_face.jpg",
+    "session_id": 63
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_64/session_64_front.jpg",
+    "selfie": "data/session_64/session_64_face.jpg",
+    "session_id": 64
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_65/session_65_front.jpg",
+    "back": "data/session_65/session_65_back.jpg",
+    "selfie": "data/session_65/session_65_face.jpg",
+    "session_id": 65
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_66/session_66_front.jpg",
+    "selfie": "data/session_66/session_66_face.jpg",
+    "session_id": 66
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_67/session_67_front.jpg",
+    "back": "data/session_67/session_67_back.jpg",
+    "selfie": "data/session_67/session_67_face.jpg",
+    "session_id": 67
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_68/session_68_front.jpg",
+    "selfie": "data/session_68/session_68_face.jpg",
+    "session_id": 68
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_69/session_69_front.jpg",
+    "selfie": "data/session_69/session_69_face.jpg",
+    "session_id": 69
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_70/session_70_front.jpg",
+    "back": "data/session_70/session_70_back.jpg",
+    "selfie": "data/session_70/session_70_face.jpg",
+    "session_id": 70
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_71/session_71_front.jpg",
+    "back": "data/session_71/session_71_back.jpg",
+    "selfie": "data/session_71/session_71_face.jpg",
+    "session_id": 71
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_72/session_72_front.jpg",
+    "back": "data/session_72/session_72_back.jpg",
+    "selfie": "data/session_72/session_72_face.jpg",
+    "session_id": 72
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_73/session_73_front.jpg",
+    "back": "data/session_73/session_73_back.jpg",
+    "selfie": "data/session_73/session_73_face.jpg",
+    "session_id": 73
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_74/session_74_front.jpg",
+    "back": "data/session_74/session_74_back.jpg",
+    "selfie": "data/session_74/session_74_face.jpg",
+    "session_id": 74
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_75/session_75_front.jpg",
+    "back": "data/session_75/session_75_back.jpg",
+    "selfie": "data/session_75/session_75_face.jpg",
+    "session_id": 75
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_76/session_76_front.jpg",
+    "selfie": "data/session_76/session_76_face.jpg",
+    "session_id": 76
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_77/session_77_front.jpg",
+    "selfie": "data/session_77/session_77_face.jpg",
+    "session_id": 77
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_78/session_78_front.jpg",
+    "back": "data/session_78/session_78_back.jpg",
+    "selfie": "data/session_78/session_78_face.jpg",
+    "session_id": 78
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_79/session_79_front.jpg",
+    "selfie": "data/session_79/session_79_face.jpg",
+    "session_id": 79
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_80/session_80_front.jpg",
+    "back": "data/session_80/session_80_back.jpg",
+    "selfie": "data/session_80/session_80_face.jpg",
+    "session_id": 80
+  },
+  {
+    "document_kind": "passport",
+    "front": "data/session_81/session_81_front.jpg",
+    "selfie": "data/session_81/session_81_face.jpg",
+    "session_id": 81
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_82/session_82_front.jpg",
+    "back": "data/session_82/session_82_back.jpg",
+    "selfie": "data/session_82/session_82_face.jpg",
+    "session_id": 82
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_83/session_83_front.jpg",
+    "back": "data/session_83/session_83_back.jpg",
+    "selfie": "data/session_83/session_83_face.jpg",
+    "session_id": 83
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_84/session_84_front.jpg",
+    "back": "data/session_84/session_84_back.jpg",
+    "selfie": "data/session_84/session_84_face.jpg",
+    "session_id": 84
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_85/session_85_front.jpg",
+    "back": "data/session_85/session_85_back.jpg",
+    "selfie": "data/session_85/session_85_face.jpg",
+    "session_id": 85
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_86/session_86_front.jpg",
+    "back": "data/session_86/session_86_back.jpg",
+    "selfie": "data/session_86/session_86_face.jpg",
+    "session_id": 86
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_87/session_87_front.jpg",
+    "back": "data/session_87/session_87_back.jpg",
+    "selfie": "data/session_87/session_87_face.jpg",
+    "session_id": 87
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_88/session_88_front.jpg",
+    "back": "data/session_88/session_88_back.jpg",
+    "selfie": "data/session_88/session_88_face.jpg",
+    "session_id": 88
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_89/session_89_front.jpg",
+    "back": "data/session_89/session_89_back.jpg",
+    "selfie": "data/session_89/session_89_face.jpg",
+    "session_id": 89
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_90/session_90_front.jpg",
+    "back": "data/session_90/session_90_back.jpg",
+    "selfie": "data/session_90/session_90_face.jpg",
+    "session_id": 90
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_91/session_91_front.jpg",
+    "back": "data/session_91/session_91_back.jpg",
+    "selfie": "data/session_91/session_91_face.jpg",
+    "session_id": 91
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_92/session_92_front.jpg",
+    "back": "data/session_92/session_92_back.jpg",
+    "selfie": "data/session_92/session_92_face.jpg",
+    "session_id": 92
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_93/session_93_front.jpg",
+    "back": "data/session_93/session_93_back.jpg",
+    "selfie": "data/session_93/session_93_face.jpg",
+    "session_id": 93
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_94/session_94_front.jpg",
+    "back": "data/session_94/session_94_back.jpg",
+    "selfie": "data/session_94/session_94_face.jpg",
+    "session_id": 94
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_95/session_95_front.jpg",
+    "back": "data/session_95/session_95_back.jpg",
+    "selfie": "data/session_95/session_95_face.jpg",
+    "session_id": 95
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_96/session_96_front.jpg",
+    "back": "data/session_96/session_96_back.jpg",
+    "selfie": "data/session_96/session_96_face.jpg",
+    "session_id": 96
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_97/session_97_front.jpg",
+    "back": "data/session_97/session_97_back.jpg",
+    "selfie": "data/session_97/session_97_face.jpg",
+    "session_id": 97
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_98/session_98_front.jpg",
+    "back": "data/session_98/session_98_back.jpg",
+    "selfie": "data/session_98/session_98_face.jpg",
+    "session_id": 98
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_99/session_99_front.jpg",
+    "back": "data/session_99/session_99_back.jpg",
+    "selfie": "data/session_99/session_99_face.jpg",
+    "session_id": 99
+  },
+  {
+    "document_kind": "id_card",
+    "front": "data/session_100/session_100_front.jpg",
+    "back": "data/session_100/session_100_back.jpg",
+    "selfie": "data/session_100/session_100_face.jpg",
+    "session_id": 100
+  }
+]

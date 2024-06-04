@@ -315,7 +315,7 @@ impl IncodeStateMachine {
         Self::init(
             state,
             obc.tenant_id.clone(),
-            get_config_id(state, should_collect_selfie, is_sandbox, &obc.tenant_id),
+            get_config_id(state, should_collect_selfie, is_sandbox, &obc.tenant_id, None),
             ctx,
             is_sandbox,
         )

@@ -8,6 +8,10 @@ use super::document_test_utils::{
 };
 use super::test_helpers::FixtureData;
 use crate::decision::document::meta_headers::MetaHeaders;
+use crate::decision::document::route_handler::{
+    IncodeConfigurationIdOverride,
+    IsRerun,
+};
 use crate::decision::state::test_utils::query_risk_signals;
 use crate::decision::{
     self,
@@ -307,6 +311,8 @@ async fn upload_and_process_inner(
         workflow.id.clone(),
         tenant_id.clone(),
         document_id,
+        IsRerun(false),
+        IncodeConfigurationIdOverride(None),
     )
     .await
     .unwrap()
