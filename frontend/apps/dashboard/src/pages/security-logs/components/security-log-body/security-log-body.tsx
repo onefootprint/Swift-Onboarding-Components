@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent } from 'src/utils/user-agent';
+import styled from 'styled-components';
 
 type SecurityLogBodyProps = {
   accessEvent: AccessEvent;
@@ -24,11 +25,11 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
           <Text variant="body-4" color="tertiary">
             {t('footprint-token')}
           </Text>
-          <Grid.Item column="2 / span 3">
+          <Span2Cols>
             <CodeInline size="compact" isPrivate>
               {fpId}
             </CodeInline>
-          </Grid.Item>
+          </Span2Cols>
         </Grid.Container>
       </Stack>
       {insightEvent && (
@@ -79,5 +80,9 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
     </Stack>
   );
 };
+
+const Span2Cols = styled(Grid.Item)`
+  grid-column: span 2;
+`;
 
 export default SecurityLogBody;
