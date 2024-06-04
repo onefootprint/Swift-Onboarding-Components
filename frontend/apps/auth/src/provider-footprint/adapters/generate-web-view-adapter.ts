@@ -1,4 +1,8 @@
+import { getLogger } from '@onefootprint/idv';
+
 import type { WebViewAdapterReturn } from '../types';
+
+const { logTrack } = getLogger({ location: 'auth-webview' });
 
 const generateWebViewAdapter = (): WebViewAdapterReturn => {
   let isAdapterLoaded: boolean = false;
@@ -24,6 +28,7 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
       }),
     on: () => () => {},
     send: (event: string) => {
+      logTrack(`The ${event} event has been dispatched`);
       setLocation({ [event]: true });
     },
   };

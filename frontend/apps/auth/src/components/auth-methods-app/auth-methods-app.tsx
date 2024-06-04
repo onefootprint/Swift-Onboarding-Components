@@ -21,16 +21,12 @@ import type { NotificationProps } from '../notification';
 import Notification from '../notification';
 
 type VoidOr<T> = T | void | undefined | null;
-type AuthContainerProps = {
-  variant?: Variant | null;
-  Loading: JSX.Element;
-};
+type AuthContainerProps = { variant?: Variant | null; Loading: JSX.Element };
 
 const EmptyConfig = {} as PublicOnboardingConfig;
 const { canceled, closed, completed } = FootprintPublicEvent;
 
-const { logError } = getLogger({ location: 'auth-methods-app' });
-
+const { logError, logTrack } = getLogger({ location: 'auth-methods-app' });
 const initAuthToken = (): string =>
   !isEmbeddedInIframe()
     ? getSdkArgsToken(getWindowUrl().split('#')[1]) ?? ''
@@ -55,6 +51,7 @@ const UserMethodsApp = ({
       if (propAuthToken && propAuthToken !== authToken) {
         setAuthToken(propAuthToken);
       } else if (!propAuthToken && !authToken) {
+        logError('No auth token provided');
         setNotification({
           title: t('notification.404-token-title'),
           subtitle: t('notification.404-token-description'),
@@ -84,6 +81,7 @@ const UserMethodsApp = ({
               fpProvider.send(canceled);
               return;
             }
+            logTrack('auth methods app closed');
             router.push('/user/closed');
           },
         },
@@ -99,6 +97,7 @@ const UserMethodsApp = ({
         fpProvider.send(closed);
         return;
       }
+      logTrack('auth methods app done');
       router.push('/user/done');
     },
     [isFpProvidedDone.current], // eslint-disable-line react-hooks/exhaustive-deps
@@ -110,6 +109,7 @@ const UserMethodsApp = ({
       const modelToken = data?.model?.authToken;
       const validToken = modelToken ? getSdkArgsToken(modelToken) : undefined;
       if (validToken) {
+        logTrack('auth token received from provider');
         setAuthToken(validToken);
       }
     });

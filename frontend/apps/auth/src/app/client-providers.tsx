@@ -1,6 +1,7 @@
 'use client';
 
 import { AppearanceProvider } from '@onefootprint/appearance';
+import { Logger } from '@onefootprint/idv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
@@ -26,6 +27,7 @@ const fpClient = configureFootprint();
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
+Logger.init('auth', /* disableLogRocket */ true);
 
 const overrideThemeBackground = (theme: Theme) => {
   if (theme) {

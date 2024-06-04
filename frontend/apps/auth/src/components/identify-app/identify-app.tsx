@@ -5,14 +5,13 @@ import {
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import type { DeviceInfo } from '@onefootprint/idv';
-import { isAuth, useDeviceInfo } from '@onefootprint/idv';
+import { getLogger, isAuth, useDeviceInfo } from '@onefootprint/idv';
 import type { DoneArgs } from '@onefootprint/idv/src/components/identify';
 import {
   Identify,
   IdentifyVariant,
 } from '@onefootprint/idv/src/components/identify';
 import type { ObKeyHeader } from '@onefootprint/idv/src/components/identify/types';
-import { getErrorMessage } from '@onefootprint/request';
 import {
   CLIENT_PUBLIC_KEY_HEADER,
   type PublicOnboardingConfig,
@@ -32,22 +31,18 @@ import type { NotificationProps } from '../notification';
 import Notification from '../notification';
 
 type AuthDataPropsWithToken = FootprintAuthDataProps & { authToken?: string };
+type IdentifyAppProps = { variant?: Variant; fallback: JSX.Element };
 
 const voidObj: Record<string, never> = {};
-
 const { canceled, closed, completed } = FootprintPublicEvent;
+const { logError, logInfo } = getLogger({ location: 'identify-app' });
 
 const onValidationTokenError = (error: unknown) => {
-  console.error('Error while validating auth token', getErrorMessage(error));
+  logError('Error while validating auth token', error);
 };
 
 const getOnboardConfigurationKey = (key?: string): ObKeyHeader | undefined =>
   key ? { [CLIENT_PUBLIC_KEY_HEADER]: key } : undefined;
-
-type IdentifyAppProps = {
-  variant?: Variant;
-  fallback: JSX.Element;
-};
 
 const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
   const isDoneRef = useRef(false);
@@ -62,7 +57,11 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
   const [config, setConfig] = useState<PublicOnboardingConfig | undefined>();
   const { t } = useTranslation('common');
   const [device, setDevice] = useState<DeviceInfo>();
-  useDeviceInfo(setDevice);
+
+  useDeviceInfo(info => {
+    setDevice(info);
+    logInfo(`Webauthn support:${info.hasSupportForWebauthn}`, info);
+  });
 
   useProps<AuthDataPropsWithToken>(
     (authProps, authConfig) => {
@@ -71,11 +70,15 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
 
       if (notification) return;
       if (!isAuth(authConfig?.kind)) {
+        logError(`Invalid auth kind, ${authConfig?.kind}`);
         setNotification({
           title: t('notification.invalid-kind-title'),
           subtitle: t('notification.invalid-kind-description'),
         });
       } else if (!isSdkUrlAllowed(fpProvider, authConfig?.allowedOrigins)) {
+        logError(
+          `SDK URL not allowed, ${authConfig?.allowedOrigins?.join(', ')}`,
+        );
         setNotification({
           title: t('notification.invalid-domain-title'),
           subtitle: t('notification.invalid-domain-description'),
@@ -83,8 +86,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
       }
     },
     (error: unknown) => {
-      const base = 'Fetching onboarding config in auth init failed with error';
-      console.error(`${base}: ${getErrorMessage(error)}`);
+      logError('Error fetching auth sdk args', error);
       setNotification({
         title: t('notification.invalid-config-title'),
         subtitle: t('notification.invalid-config-subtitle'),

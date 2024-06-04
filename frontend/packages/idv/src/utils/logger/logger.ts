@@ -42,9 +42,9 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
 
     appName = app;
+    isDataDogEnabled = initDataDog(appName);
     isLogRocketEnabled = !disableLogRocket;
 
-    isDataDogEnabled = initDataDog(appName);
     if (isLogRocketEnabled) initLogRocket(appName);
 
     getEnvInfo().then(identify).catch(console.warn);

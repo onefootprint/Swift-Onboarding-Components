@@ -23,6 +23,11 @@ const appServiceMap: Record<
   string,
   { service: string; id?: string; token?: string }
 > = {
+  auth: {
+    service: 'auth',
+    id: process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_AUTH,
+    token: process.env.NEXT_PUBLIC_DDOG_CLIENT_TOKEN_AUTH,
+  },
   bifrost: {
     service: 'bifrost',
     id: process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_BIFROST,
