@@ -105,8 +105,9 @@ const Form = ({
           bo[BeneficialOwnerDataAttribute.firstName] &&
           bo[BeneficialOwnerDataAttribute.lastName] &&
           bo[BeneficialOwnerDataAttribute.ownershipStake] > 0 &&
-          // Only require email/phone for additional BOs
+          // Only require email/phone for additional BOs and if we are collecting business_kyced_benficial_owners
           (index === 0 ||
+            !requireMultiKyc ||
             !!bo[BeneficialOwnerDataAttribute.email] ||
             !!bo[BeneficialOwnerDataAttribute.phoneNumber]),
       )
@@ -145,6 +146,7 @@ const Form = ({
               onRemove={removeIndex}
               config={config}
               l10n={l10n}
+              requiresMultiKyc={requireMultiKyc}
             />
             {index === 0 && fields.length > 1 && <Divider />}
           </React.Fragment>

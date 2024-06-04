@@ -13,11 +13,12 @@ type PhoneProps = {
   index: number;
   config?: PublicOnboardingConfig;
   locale?: SupportedLocale;
+  requireMultiKyc?: boolean;
 };
 
 const PhoneFieldName = BeneficialOwnerDataAttribute.phoneNumber;
 
-const Phone = ({ index, config, locale }: PhoneProps) => {
+const Phone = ({ index, config, locale, requireMultiKyc }: PhoneProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form.fields.phone',
   });
@@ -26,7 +27,7 @@ const Phone = ({ index, config, locale }: PhoneProps) => {
     formState: { errors },
   } = useFormContext<FormData>();
 
-  const shouldHide = index === 0;
+  const shouldHide = index === 0 || !requireMultiKyc;
   const phoneErrors = errors.beneficialOwners?.[index]?.[PhoneFieldName];
 
   return shouldHide ? null : (

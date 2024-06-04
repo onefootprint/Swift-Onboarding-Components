@@ -14,11 +14,18 @@ import Phone from './components/phone';
 export type FieldsProps = {
   index: number;
   onRemove: (index: number) => void;
+  requiresMultiKyc?: boolean;
   config?: PublicOnboardingConfig;
   l10n?: L10n;
 };
 
-const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
+const Fields = ({
+  index,
+  onRemove,
+  config,
+  l10n,
+  requiresMultiKyc,
+}: FieldsProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form.fields',
   });
@@ -44,8 +51,13 @@ const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
         </InlineAlert>
       )}
       <Name index={index} />
-      <Email index={index} />
-      <Phone index={index} config={config} locale={l10n?.locale} />
+      <Email index={index} requireMultiKyc={requiresMultiKyc} />
+      <Phone
+        index={index}
+        config={config}
+        locale={l10n?.locale}
+        requireMultiKyc={requiresMultiKyc}
+      />
       <OwnershipStake index={index} />
     </Container>
   );

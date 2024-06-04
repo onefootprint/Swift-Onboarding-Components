@@ -18,7 +18,7 @@ import {
 } from './utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key = process.env.E2E_OB_KYB || 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg';
+const key = process.env.E2E_OB_KYB || 'pb_test_LMYOJWABaBuuXdHdkqYhWp';
 
 const firstName = 'Jane';
 const lastName = 'Doe';

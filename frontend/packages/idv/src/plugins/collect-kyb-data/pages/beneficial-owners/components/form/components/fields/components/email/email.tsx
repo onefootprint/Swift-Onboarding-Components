@@ -8,9 +8,10 @@ import type { FormData } from '../../../../types';
 
 type EmailProps = {
   index: number;
+  requireMultiKyc?: boolean;
 };
 
-const Email = ({ index }: EmailProps) => {
+const Email = ({ index, requireMultiKyc }: EmailProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form.fields.email',
   });
@@ -23,7 +24,7 @@ const Email = ({ index }: EmailProps) => {
     errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.email];
   const hasError = !!emailErrors;
   const hint = hasError ? emailErrors?.message : undefined;
-  const shouldHide = index === 0;
+  const shouldHide = index === 0 || !requireMultiKyc;
 
   return shouldHide ? null : (
     <TextInput
