@@ -1,6 +1,5 @@
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Analytics } from '@vercel/analytics/react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -47,7 +46,6 @@ const App = ({ Component, pageProps }: AppProps) => {
           </ReactQueryProvider>
         </CustomDesignSystemProvider>
       </ObserveCollectorProvider>
-      <Analytics />
     </>
   );
 };
