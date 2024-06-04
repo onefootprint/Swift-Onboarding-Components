@@ -15,7 +15,7 @@ use std::str::FromStr;
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct SambaWebhook {
+pub struct SambaWebhook {
     pub event_id: String,
     pub data: WebhookData,
     pub created_date_time: Option<String>,
