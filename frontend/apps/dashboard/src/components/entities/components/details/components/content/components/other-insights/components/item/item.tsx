@@ -22,7 +22,7 @@ const Item = ({
 
   return (
     <Stack direction="row" width="100%" padding={3} gap={3}>
-      <Text variant="body-3" maxWidth="50%" truncate display="flex" gap={2}>
+      <Text variant="body-3" maxWidth="50%" truncate display="flex" gap={2} tag="div">
         {name}
         {description && (
           <Tooltip text={description} position="bottom">
