@@ -3,12 +3,7 @@ name: Backend Build Master
 on:
   push:
     paths:
-      - 'backend/infra/**'
-      - 'backend/components/**'
-      - 'backend/*.dockerfile'
-      # Since tests are blocking deploys, sometimes only updating tests is what will fix a deploy
-      - 'backend/ci/**'
-      - '.github/workflows/backend_*.yml'
+      - 'backend/**'
 
     branches:
       - master
