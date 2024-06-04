@@ -783,7 +783,9 @@ footprint_reason_code_enum! {
         #[note = "Back of document has signs of digital alteration", severity = SignalSeverity::Medium,  description = "The back of the document has signs of being digitally manipulated or altered."]
         DocumentPossibleImageAlterationBack,
 
-
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document has signs of digital alteration", severity = SignalSeverity::High,  description = "Document has signs of being digitally manipulated or altered."]
+        DocumentPossibleImageAlteration,
 
         #[scope = SignalScope::Selfie, additional_scopes = vec![SignalScope::Document], match_level = None]
         #[note = "Selfie used with different information", severity = SignalSeverity::Medium,  description = "The face from the selfie image has been used with different information across Footprint's network."]

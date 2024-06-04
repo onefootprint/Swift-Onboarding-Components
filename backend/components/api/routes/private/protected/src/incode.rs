@@ -12,9 +12,11 @@ use api_core::decision::document::route_handler::{
     IsRerun,
 };
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
+use api_core::decision::state::kyc::KycState;
 use api_core::decision::state::{
-    run_incode_machine_and_workflow,
-    RunIncodeMachineAndWorkflowResult,
+    Authorize,
+    WorkflowActions,
+    WorkflowKind,
     WorkflowWrapper,
 };
 use api_core::errors::{
@@ -28,6 +30,11 @@ use api_core::types::{
 };
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::utils::onboarding::NewOnboardingArgs;
+use api_core::utils::requirements::{
+    get_requirements_inner,
+    GetRequirementsArgs,
+    RequirementOpts,
+};
 use api_core::utils::vault_wrapper::{
     Any,
     VaultWrapper,
@@ -53,10 +60,14 @@ use db::models::document_request::{
 };
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::liveness_event::NewLivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
-use db::models::workflow::Workflow;
+use db::models::workflow::{
+    Workflow,
+    WorkflowUpdate,
+};
 use db::DbError;
 use newtypes::{
     DecisionIntentKind,
@@ -72,6 +83,7 @@ use newtypes::{
     Iso3166TwoDigitCountryCode,
     ObConfigurationKey,
     ObConfigurationKind,
+    OnboardingRequirement,
     TenantId,
     WorkflowSource,
 };
@@ -343,30 +355,78 @@ pub async fn adhoc_upload_and_process(
 }
 
 
-#[derive(serde::Serialize)]
-pub struct AdhocDocumentProcessResponse {
-    result: RunIncodeMachineAndWorkflowResult,
-}
-
 #[post("/private/incode/adhoc/{id}/process")]
 pub async fn adhoc_document_process(
     state: web::Data<State>,
     _: ProtectedAuth,
     args: web::Path<DocumentId>,
-) -> JsonApiResponse<AdhocDocumentProcessResponse> {
+) -> JsonApiResponse<EmptyResponse> {
     let document_id = args.into_inner();
 
-    let wf = state
+    let (wf, uvw, obc) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let (_, doc_req) = Document::get(conn, &document_id)?;
-            let wf = Workflow::get(conn, &doc_req.workflow_id)?;
-            Ok(wf)
+            // authorize since this is a non-customer facing route
+            let wf = Workflow::lock(conn, &doc_req.workflow_id)?;
+            let wf = if wf.authorized_at.is_none() {
+                Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?
+            } else {
+                wf.into_inner()
+            };
+
+            let _ = NewLivenessEvent {
+                scoped_vault_id: wf.scoped_vault_id.clone(),
+                attributes: None,
+                liveness_source: newtypes::LivenessSource::Skipped,
+                insight_event_id: None,
+                skip_context: None,
+            }
+            .insert(conn)?;
+
+            let obc_id = wf
+                .ob_configuration_id
+                .clone()
+                .ok_or(AssertionError("no obc found"))?;
+            let (obc, _) =
+                ObConfiguration::get_enabled(conn, &obc_id).map_err(|_| DbError::PlaybookNotFound)?;
+
+            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id))?;
+
+            Ok((wf, uvw, obc))
         })
         .await?;
 
-    let ww = WorkflowWrapper::init(&state, wf).await?;
-    let result = run_incode_machine_and_workflow(&state, ww).await?;
+    // run the workflow to completion
+    let wf2 = wf.clone();
+    let ww = WorkflowWrapper::init(&state, wf2).await?;
+    if matches!(ww.state, WorkflowKind::Kyc(KycState::DataCollection(_))) {
+        ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
+    } else {
+        tracing::info!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "adhoc document process workflow in wrong state");
+        return Err(AssertionError("adhoc document process workflow in wrong state").into());
+    }
+    // log unmet reqs for debugging
+    let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
 
-    ResponseData::ok(AdhocDocumentProcessResponse { result }).json()
+    let unmet_requirements: Vec<_> = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let reqs =
+                get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, RequirementOpts::default())?;
+            Ok(reqs)
+        })
+        .await?
+        .into_iter()
+        .filter(|r| !r.is_met())
+        .filter(|r| !matches!(r, OnboardingRequirement::Process))
+        .collect();
+    if !unmet_requirements.is_empty() {
+        tracing::info!(
+            ?unmet_requirements,
+            "unmet requirements in adhoc document process"
+        );
+    }
+
+    ResponseData::ok(EmptyResponse {}).json()
 }

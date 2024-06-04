@@ -129,7 +129,6 @@ impl WorkflowWrapper {
     }
 }
 
-#[derive(serde::Serialize)]
 pub enum RunIncodeMachineAndWorkflowResult {
     IncodeStuck,
     WorkflowRan,

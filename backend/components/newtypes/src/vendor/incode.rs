@@ -97,6 +97,9 @@ incode_reason_code_enum! {
         #[ser = "idAlterationCheckBack"]
         #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNoImageAlterationBack, FRC::DocumentPossibleImageAlterationBack))]
         IdAlterationCheckBack,
+        #[ser = "idAlterationCheck"]
+        #[footprint_reason_code = Some(IncodeRCH::new_with_optional(None, Some(FRC::DocumentPossibleImageAlteration)))]
+        IdAlterationCheck,
         // this is the "selfie duplicate" check
         // this is done relative to all of footprint's sessions. If a tenant is having issues with duplicate fraud/malicious actors
         // we should provision them their own environment so the checks are on a smaller surface area and more signalful
@@ -301,6 +304,7 @@ impl IncodeTest {
             | IncodeTest::TwoDBarcodeContent
             | IncodeTest::Barcode2DDetected
             | IncodeTest::MrzLineFormatCheck
+            | IncodeTest::IdAlterationCheck
             | IncodeTest::LastNameMatch => false,
 
             // Tests relating to checking MRZ/Barcode against OCR
