@@ -82,44 +82,14 @@ pub enum LineItemPrice {
 }
 
 impl BillingCounts {
+    /// Returns true if this tenant has used zero products in the provided BillingCounts
     pub(crate) fn is_zero(&self) -> bool {
-        // Decompose to fail compiling when new count is added
-        let &BillingCounts {
-            pii,
-            kyc,
-            one_click_kyc,
-            kyc_waterfall_second_vendor,
-            kyc_waterfall_third_vendor,
-            kyb,
-            watchlist_checks,
-            id_docs,
-            curp_verifications,
-            hot_vaults,
-            hot_proxy_vaults,
-            vaults_with_non_pci,
-            vaults_with_pci,
-            adverse_media_per_user,
-            continuous_monitoring_per_year,
-        } = self;
-        pii + kyc
-            + one_click_kyc.unwrap_or_default()
-            + kyc_waterfall_second_vendor.unwrap_or_default()
-            + kyc_waterfall_third_vendor.unwrap_or_default()
-            + curp_verifications.unwrap_or_default()
-            + kyb
-            + id_docs
-            + watchlist_checks
-            + hot_vaults.unwrap_or_default()
-            + hot_proxy_vaults.unwrap_or_default()
-            + vaults_with_non_pci.unwrap_or_default()
-            + vaults_with_pci.unwrap_or_default()
-            + adverse_media_per_user.unwrap_or_default()
-            + continuous_monitoring_per_year.unwrap_or_default()
-            == 0
+        let total_count: i64 = self.raw_line_items().into_iter().map(|(_, c)| c).sum();
+        total_count == 0
     }
 
-    fn get_count(&self, product: Product) -> Option<i64> {
-        match product {
+    fn get_count(&self, product: Product) -> i64 {
+        let count = match product {
             Product::MonthlyPlatformFee => Some(1), // Always quantity one
             Product::Pii => Some(self.pii),
             Product::Kyc => Some(self.kyc),
@@ -136,7 +106,12 @@ impl BillingCounts {
             Product::VaultsWithPci => self.vaults_with_pci,
             Product::AdverseMediaPerOnboarding => self.adverse_media_per_user,
             Product::ContinuousMonitoringPerYear => self.continuous_monitoring_per_year,
-        }
+        };
+        count.unwrap_or_default()
+    }
+
+    fn raw_line_items(&self) -> Vec<(Product, i64)> {
+        Product::iter().map(|p| (p, self.get_count(p))).collect()
     }
 
     pub(crate) fn line_items(&self, profile: &BillingProfile) -> BResult<Vec<LineItem>> {
@@ -147,8 +122,10 @@ impl BillingCounts {
             ));
         }
 
-        let results = Product::iter()
-            .filter(|p| match p {
+        let results = self
+            .raw_line_items()
+            .into_iter()
+            .filter(|(p, _)| match p {
                 Product::MonthlyPlatformFee => tenant_has(Product::MonthlyPlatformFee),
                 // This is weird - there are two different products for effecitvely the same thing:
                 // watchlist checks billed per instance vs billed per user per year.
@@ -158,8 +135,6 @@ impl BillingCounts {
                 Product::ContinuousMonitoringPerYear => !tenant_has(Product::WatchlistChecks),
                 _ => true,
             })
-            .map(|product| (product, self.get_count(product)))
-            .filter_map(|(p, count)| count.map(|c| (p, c)))
             .filter(|(_, count)| count > &0)
             // Filter out line items that have a price of 0c explicitly in the billing profile
             .filter(|(product, _)| !profile.get(*product).is_some_and(|p| p.price_cents == dec!(0)))
