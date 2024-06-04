@@ -26,6 +26,7 @@ const useInitialFilters = (now = new Date()) => {
       labels: [],
       others: [],
       playbooks: {},
+      externalId: values.external_id,
       ...getFormDefaultValue(values.dateRange, { from: today, to: nextWeek }),
     };
     if (requestParams.labels) {

@@ -888,7 +888,9 @@
             "label": "Other filters",
             "on-watchlist": "On a watchlist",
             "has-outstanding-workflow-request": "Info requested",
-            "show-unverified": "Show unverified users"
+            "show-unverified": "Show unverified users",
+            "external-id-placeholder": "Search...",
+            "external-id": "External ID"
           },
           "reset": "Clear filters",
           "cta": "Apply"

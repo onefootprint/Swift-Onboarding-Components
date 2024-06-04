@@ -7,6 +7,7 @@ const transformFormDataToQuery = ({
   period,
   customDate,
   playbooks,
+  externalId,
 }: FormData) => {
   const getPeriod = () => {
     if (period === FiltersDateRange.Custom) {
@@ -31,6 +32,7 @@ const transformFormDataToQuery = ({
     has_outstanding_workflow_request: has('has_outstanding_workflow_request'),
     show_unverified: has('show_unverified'),
     playbook_ids: playbookIds,
+    external_id: externalId || undefined,
   };
 };
 

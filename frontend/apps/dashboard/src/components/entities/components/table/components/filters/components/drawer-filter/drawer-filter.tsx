@@ -9,6 +9,7 @@ import {
   LinkButton,
   Radio,
   Stack,
+  TextInput,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -66,6 +67,7 @@ const DrawerFilter = () => {
       show_unverified: undefined,
       labels: undefined,
       playbook_ids: undefined,
+      external_id: undefined,
     });
     close();
   };
@@ -167,6 +169,16 @@ const DrawerFilter = () => {
                       />
                     )}
                   </Stack>
+                </fieldset>
+                <fieldset>
+                  <Legend>{t('other.external-id')}</Legend>
+                  <TextInput
+                    placeholder={t('other.external-id-placeholder')}
+                    {...register('externalId')}
+                    autoCapitalize="off"
+                    autoComplete="off"
+                    autoCorrect="off"
+                  />
                 </fieldset>
               </Stack>
               <Footer justify="space-between" align="center" tag="footer">
