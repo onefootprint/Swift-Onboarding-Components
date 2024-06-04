@@ -1,34 +1,26 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import type { UIState } from '@onefootprint/design-tokens';
-import type { SXStyleProps } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
+import type { BoxProps } from '../box';
+import Box from '../box';
 
-export type BadgeProps = {
-  children: React.ReactNode;
-  testID?: string;
+export type BadgeProps = BoxProps & {
   variant: UIState;
-  sx?: SXStyleProps;
-  className?: string;
 };
 
-const Badge = ({ children, testID, variant, sx, className }: BadgeProps) => (
-  <StyledBadge
-    $variant={variant}
-    $sx={sx}
-    data-testid={testID}
-    className={className}
-  >
+const Badge = ({ children, variant, ...props }: BadgeProps) => (
+  <StyledBadge $variant={variant} tag="span" {...props}>
     {children}
   </StyledBadge>
 );
 
-const StyledBadge = styled.span<{
+const StyledBadge = styled(Box)<{
   $variant: UIState;
-  $sx?: SXStyleProps;
 }>`
-  ${({ theme, $variant, $sx }) => css`
+  ${({ theme, $variant }) => css`
     ${createFontStyles('caption-1')};
     align-items: center;
     background-color: ${theme.backgroundColor[$variant]};
@@ -38,7 +30,6 @@ const StyledBadge = styled.span<{
     display: inline-flex;
     justify-content: center;
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
-    ${$sx};
   `}
 `;
 

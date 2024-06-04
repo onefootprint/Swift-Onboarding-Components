@@ -27,7 +27,7 @@ const StatusBadge = ({
 
   return (
     <Stack align="center">
-      <Badge variant={badgeVariant} sx={{ whiteSpace: 'nowrap' }}>
+      <Badge variant={badgeVariant} whiteSpace="nowrap">
         <span>{t(status as ParseKeys<'common'>)}</span>
         {requiresManualReview && (
           <Stack marginLeft={2}>
