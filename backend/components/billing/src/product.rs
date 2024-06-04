@@ -26,6 +26,9 @@ pub enum Product {
     IdDocs,
     /// Number of watchlist checks ran this month
     WatchlistChecks,
+    /// Number of CURP verifications ran this month
+    CurpVerification,
+
     /// Total number user vaults with billable PII - either an authorized workflow OR created via
     /// API
     Pii,
@@ -57,6 +60,7 @@ impl Product {
             Self::VaultsWithPci => "prod_OXKHHjVIuWL7OV",
             Self::AdverseMediaPerOnboarding => "prod_P6nOzVVredzvo1",
             Self::ContinuousMonitoringPerYear => "prod_P6nPpoj4yjL3tj",
+            Self::CurpVerification => "prod_QE6roGU9hUeA6m",
         }
     }
 
@@ -76,6 +80,7 @@ impl Product {
             Self::VaultsWithPci => "Uncontracted VaultsWithPci",
             Self::AdverseMediaPerOnboarding => "Uncontracted AdverseMediaPerOnboarding",
             Self::ContinuousMonitoringPerYear => "Uncontracted ContinuousMonitoringPerYear",
+            Self::CurpVerification => "Uncontracted CurpVerification",
         }
     }
 }

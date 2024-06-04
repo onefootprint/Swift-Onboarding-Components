@@ -86,6 +86,7 @@ fn get_price_from(profile: Option<&DbBillingProfile>, product: Product) -> Optio
         Product::KycWaterfallThirdVendor => profile.kyc_waterfall_third_vendor.as_deref(),
         Product::Kyb => profile.kyb.as_deref(),
         Product::IdDocs => profile.id_docs.as_deref(),
+        Product::CurpVerification => profile.curp_verification.as_deref(),
         Product::WatchlistChecks => profile.watchlist.as_deref(),
         Product::HotVaults => profile.hot_vaults.as_deref(),
         Product::HotProxyVaults => profile.hot_proxy_vaults.as_deref(),

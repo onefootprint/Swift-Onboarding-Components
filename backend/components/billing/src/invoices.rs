@@ -98,6 +98,9 @@ pub async fn create_bill_for_tenant(
                     .cloned(),
                 kyb,
                 id_docs,
+                curp_verifications: billing_event_counts
+                    .get(&BillingEventKind::CurpValidation)
+                    .cloned(),
                 watchlist_checks,
                 hot_vaults,
                 hot_proxy_vaults,

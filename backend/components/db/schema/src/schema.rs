@@ -156,6 +156,8 @@ diesel::table! {
         kyc_waterfall_second_vendor -> Nullable<Text>,
         kyc_waterfall_third_vendor -> Nullable<Text>,
         one_click_kyc -> Nullable<Text>,
+        monthly_platform_fee -> Nullable<Text>,
+        curp_verification -> Nullable<Text>,
     }
 }
 

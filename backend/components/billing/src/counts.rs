@@ -26,6 +26,8 @@ pub struct BillingCounts {
     /// finish onboarding
     pub id_docs: i64,
     /// Number of watchlist checks ran this month
+    pub curp_verifications: Option<i64>,
+    /// Number of watchlist checks ran this month
     pub watchlist_checks: i64,
     /// Number of vaults with decrypts this month
     pub hot_vaults: Option<i64>,
@@ -68,6 +70,7 @@ impl BillingCounts {
             kyb,
             watchlist_checks,
             id_docs,
+            curp_verifications,
             hot_vaults,
             hot_proxy_vaults,
             vaults_with_non_pci,
@@ -79,6 +82,7 @@ impl BillingCounts {
             + one_click_kyc.unwrap_or_default()
             + kyc_waterfall_second_vendor.unwrap_or_default()
             + kyc_waterfall_third_vendor.unwrap_or_default()
+            + curp_verifications.unwrap_or_default()
             + kyb
             + id_docs
             + watchlist_checks
@@ -100,8 +104,8 @@ impl BillingCounts {
             Product::KycWaterfallThirdVendor => self.kyc_waterfall_third_vendor,
             Product::Kyb => Some(self.kyb),
             Product::IdDocs => Some(self.id_docs),
+            Product::CurpVerification => self.curp_verifications,
             Product::WatchlistChecks => Some(self.watchlist_checks),
-            // These optional counts won't cause uncontracted price errors
             Product::HotVaults => self.hot_vaults,
             Product::HotProxyVaults => self.hot_proxy_vaults,
             Product::VaultsWithNonPci => self.vaults_with_non_pci,

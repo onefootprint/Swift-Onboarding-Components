@@ -113,6 +113,8 @@ impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
             kyc_waterfall_second_vendor,
             kyc_waterfall_third_vendor,
             one_click_kyc,
+            monthly_platform_fee,
+            curp_verification,
 
             id: _,
             _created_at: _,
@@ -136,6 +138,8 @@ impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
             kyc_waterfall_second_vendor,
             kyc_waterfall_third_vendor,
             one_click_kyc,
+            monthly_platform_fee,
+            curp_verification,
         }
     }
 }

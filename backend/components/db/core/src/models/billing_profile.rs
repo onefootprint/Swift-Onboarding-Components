@@ -40,6 +40,8 @@ pub struct BillingProfile {
     pub kyc_waterfall_second_vendor: Option<String>,
     pub kyc_waterfall_third_vendor: Option<String>,
     pub one_click_kyc: Option<String>,
+    pub monthly_platform_fee: Option<String>,
+    pub curp_verification: Option<String>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -66,6 +68,8 @@ pub struct UpdateBillingProfile {
     pub kyc_waterfall_second_vendor: Option<Option<String>>,
     pub kyc_waterfall_third_vendor: Option<Option<String>>,
     pub one_click_kyc: Option<Option<String>>,
+    pub monthly_platform_fee: Option<Option<String>>,
+    pub curp_verification: Option<Option<String>>,
 }
 
 impl BillingProfile {

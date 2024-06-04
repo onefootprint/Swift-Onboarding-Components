@@ -68,6 +68,7 @@ pub struct PrivateBillingProfile {
 
     pub id_docs: Option<String>,
     pub kyb: Option<String>,
+    pub curp_verification: Option<String>,
 
     pub pii: Option<String>,
     pub hot_vaults: Option<String>,
@@ -80,6 +81,7 @@ pub struct PrivateBillingProfile {
     pub continuous_monitoring_per_year: Option<String>,
 
     pub monthly_minimum: Option<String>,
+    pub monthly_platform_fee: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -106,6 +108,8 @@ pub struct PrivateUpdateBillingProfile {
     pub id_docs: Patch<String>,
     #[serde(default)]
     pub kyb: Patch<String>,
+    #[serde(default)]
+    pub curp_verification: Patch<String>,
 
     #[serde(default)]
     pub pii: Patch<String>,
@@ -127,6 +131,8 @@ pub struct PrivateUpdateBillingProfile {
 
     #[serde(default)]
     pub monthly_minimum: Patch<String>,
+    #[serde(default)]
+    pub monthly_platform_fee: Patch<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]

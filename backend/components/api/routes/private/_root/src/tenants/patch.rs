@@ -120,6 +120,7 @@ fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBi
         kyc_waterfall_third_vendor,
         id_docs,
         kyb,
+        curp_verification,
         pii,
         hot_vaults,
         hot_proxy_vaults,
@@ -129,6 +130,7 @@ fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBi
         adverse_media_per_user,
         continuous_monitoring_per_year,
         monthly_minimum,
+        monthly_platform_fee,
     } = request;
     UpdateBillingProfile {
         kyc: kyc.to_changeset(),
@@ -138,6 +140,7 @@ fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBi
         id_docs: id_docs.to_changeset(),
         kyb: kyb.to_changeset(),
         pii: pii.to_changeset(),
+        curp_verification: curp_verification.to_changeset(),
         hot_vaults: hot_vaults.to_changeset(),
         hot_proxy_vaults: hot_proxy_vaults.to_changeset(),
         vaults_with_non_pci: vaults_with_non_pci.to_changeset(),
@@ -146,6 +149,7 @@ fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBi
         adverse_media_per_user: adverse_media_per_user.to_changeset(),
         continuous_monitoring_per_year: continuous_monitoring_per_year.to_changeset(),
         monthly_minimum: monthly_minimum.to_changeset(),
+        monthly_platform_fee: monthly_platform_fee.to_changeset(),
     }
 }
 
