@@ -167,15 +167,7 @@ jobs:
         id: login-ecr-target
         uses: aws-actions/amazon-ecr-login@2fc7aceee09e9e4a7105c0d060c656fad0b4f63d # v1.7.0
 
-      - name: Fetch the enclave image for signing
-        env:
-          REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
-          REPO: enclave
-          TAG: ${{ inputs.enclaveComponentVersion }}
-        run: |
-          docker pull ${REGISTRY}/${REPO}:${TAG}
-
-      - name: Sign EIF and package
+      - name: Sign EIF and package if necessary
         working-directory: ./backend
         env:
           REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
@@ -189,6 +181,11 @@ jobs:
         run: |
           set -euo pipefail
           # Don't set -x to avoid leaking signing key to logs.
+
+          docker manifest inspect "${EIF_REGISTRY}/${EIF_REPO}:${EIF_TAG}" && echo "EIF package already exists in remote registry. Skipping sign & push." && exit 0 || echo "EIF package found in remote registry. Proceeding with sign & push."
+
+          # Fetch the enclave image for signing
+          docker pull ${REGISTRY}/${REPO}:${TAG}
 
           echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
           echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
