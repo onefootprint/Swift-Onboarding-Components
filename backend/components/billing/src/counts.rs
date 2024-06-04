@@ -97,6 +97,7 @@ impl BillingCounts {
 
     fn get_count(&self, product: Product) -> Option<i64> {
         match product {
+            Product::MonthlyPlatformFee => Some(1), // Always quantity one
             Product::Pii => Some(self.pii),
             Product::Kyc => Some(self.kyc),
             Product::OneClickKyc => self.one_click_kyc,
@@ -116,9 +117,8 @@ impl BillingCounts {
     }
 
     pub(crate) fn line_items(&self, profile: &BillingProfile) -> BResult<Vec<LineItem>> {
-        let tenant_has_watchlist_product = profile.get(Product::WatchlistChecks).is_some();
-        let tenant_has_cm_product = profile.get(Product::ContinuousMonitoringPerYear).is_some();
-        if tenant_has_watchlist_product && tenant_has_cm_product {
+        let tenant_has = |p: Product| profile.get(p).is_some();
+        if tenant_has(Product::ContinuousMonitoringPerYear) && tenant_has(Product::WatchlistChecks) {
             return Err(Error::ValidationError(
                 "Tenant can't have both WatchlistChecks and ContinuousMonitoringPerYear".into(),
             ));
@@ -126,12 +126,13 @@ impl BillingCounts {
 
         let results = Product::iter()
             .filter(|p| match p {
+                Product::MonthlyPlatformFee => tenant_has(Product::MonthlyPlatformFee),
                 // This is weird - there are two different products for effecitvely the same thing:
                 // watchlist checks billed per instance vs billed per user per year.
                 // If the tenant has pricing set up for one of those products, don't bill for the
                 // other. We assert that a tenant can't have both prices.
-                Product::WatchlistChecks => !tenant_has_cm_product,
-                Product::ContinuousMonitoringPerYear => !tenant_has_watchlist_product,
+                Product::WatchlistChecks => !tenant_has(Product::ContinuousMonitoringPerYear),
+                Product::ContinuousMonitoringPerYear => !tenant_has(Product::WatchlistChecks),
                 _ => true,
             })
             .map(|product| (product, self.get_count(product)))

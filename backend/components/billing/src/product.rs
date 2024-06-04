@@ -3,8 +3,13 @@ use strum_macros::{
     EnumIter,
 };
 
+// NOTE: the order of these products is the order in which the line items are rendered in Stripe
+// invoices
 #[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter, Display, Ord, PartialOrd)]
 pub enum Product {
+    /// A fixed amount charged monthly
+    MonthlyPlatformFee,
+
     /// Number of KYC verifications ran this month, not including one-click onboardings
     Kyc,
     /// Number of KYC verifications ran this month from one-click onboardings
@@ -46,6 +51,7 @@ impl Product {
     /// The ProductId of the product in stripe's dashboard
     pub fn product_id(&self) -> &'static str {
         match self {
+            Self::MonthlyPlatformFee => "prod_QED8Zrp4vBxKRD",
             Self::HotProxyVaults => "prod_OVScZrizPqwPn7",
             Self::HotVaults => "prod_OVSbMYqHKSm9VT",
             Self::IdDocs => "prod_ON7rDKhCD3yVsw",
@@ -66,6 +72,7 @@ impl Product {
 
     pub fn uncontracted_description(&self) -> &'static str {
         match self {
+            Self::MonthlyPlatformFee => "Uncontracted MonthlyPlatformFee",
             Self::HotProxyVaults => "Uncontracted HotProxyVaults",
             Self::HotVaults => "Uncontracted HotVaults",
             Self::IdDocs => "Uncontracted IdDocs",

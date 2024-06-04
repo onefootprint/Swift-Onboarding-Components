@@ -79,6 +79,7 @@ impl BillingProfile {
 fn get_price_from(profile: Option<&DbBillingProfile>, product: Product) -> Option<&str> {
     let profile = profile?;
     match product {
+        Product::MonthlyPlatformFee => profile.monthly_platform_fee.as_deref(),
         Product::Pii => profile.pii.as_deref(),
         Product::Kyc => profile.kyc.as_deref(),
         Product::OneClickKyc => profile.one_click_kyc.as_deref(),
