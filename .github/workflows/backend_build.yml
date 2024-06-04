@@ -163,7 +163,7 @@ jobs:
 
           function build_and_push_enclave_proxy {
             echo "[release] building enclave-proxy"
-            docker run --env GIT_HASH="${serverGitHash}" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p enclave_proxy --features vsock --release
+            docker run --env GIT_HASH="${SERVER_GIT_HASH}" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p enclave_proxy --features vsock --release
             cp ./target/x86_64-unknown-linux-musl/release/enclave_proxy ./out/enclave_proxy
             docker build -t "${IMG_REF}" -f enclave_proxy_package.dockerfile .
             docker push ${IMG_REF}
