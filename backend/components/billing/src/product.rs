@@ -90,4 +90,27 @@ impl Product {
             Self::CurpVerification => "Uncontracted CurpVerification",
         }
     }
+
+    /// Only some products count towards the per-tenant monthly minimum on identity spend.
+    /// Generally, vaulting and auth products do not count toward the monthly minimum.
+    pub fn applies_to_monthly_minimum(&self) -> bool {
+        match self {
+            Self::IdDocs
+            | Self::Kyb
+            | Self::WatchlistChecks
+            | Self::Kyc
+            | Self::OneClickKyc
+            | Self::KycWaterfallSecondVendor
+            | Self::KycWaterfallThirdVendor
+            | Self::AdverseMediaPerOnboarding
+            | Self::ContinuousMonitoringPerYear
+            | Self::CurpVerification => true,
+            Self::MonthlyPlatformFee
+            | Self::HotProxyVaults
+            | Self::HotVaults
+            | Self::Pii
+            | Self::VaultsWithNonPci
+            | Self::VaultsWithPci => false,
+        }
+    }
 }
