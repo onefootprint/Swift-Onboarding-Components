@@ -25,7 +25,6 @@
     "start": "turbo run start",
     "test:ci:bun": "turbo run test:ci:bun",
     "test:ci": "turbo run test:ci",
-    "test:e2e:ci": "turbo run test:e2e:ci",
     "test:stress:ci": "turbo run test:stress:ci",
     "test:watch": "turbo run test:watch",
     "test": "turbo run test",

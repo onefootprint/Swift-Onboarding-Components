@@ -98,12 +98,6 @@
       "cache": false,
       "dependsOn": []
     },
-    "test:e2e:ci": {
-      "cache": false,
-      "dependsOn": [
-        "i18n:copy-en"
-      ]
-    },
     "test:stress:ci": {
       "cache": false,
       "dependsOn": [
