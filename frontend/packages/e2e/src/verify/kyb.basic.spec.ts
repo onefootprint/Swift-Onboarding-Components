@@ -34,7 +34,7 @@ const userTIN = '123456789';
 const beneficialOwner1Name = 'Bob';
 const beneficialOwner1LastName = 'Lee';
 const beneficialOwner1Email = 'boblee@acme.com';
-const beneficialOwner1Phone = '6178408644';
+const beneficialOwner1Phone = '6105579459';
 const businessName = 'Business name';
 const businessNameOptional = 'Optional name';
 
