@@ -118,7 +118,7 @@ const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
                     </Grid.Item>
                     <Box>
                       {!verifiedMethods || verifiedMethods?.isLoading ? (
-                        <Shimmer sx={{ height: '24px', width: '100%' }} />
+                        <Shimmer height="24px" width="100%" />
                       ) : (
                         <LinkButton onClick={onClick} disabled={isVerified}>
                           {isVerified ? t('verified') : t('verify')}

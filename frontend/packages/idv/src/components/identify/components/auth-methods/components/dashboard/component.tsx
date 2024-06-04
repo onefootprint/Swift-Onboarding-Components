@@ -39,7 +39,8 @@ type Props = {
 };
 
 const isEmpty = (x: unknown): x is 'empty' => x === 'empty';
-const ButtonLoading = () => <Shimmer sx={{ width: 'auto', height: '48px' }} />;
+
+const ButtonLoading = () => <Shimmer height="48px" width="auto" />;
 
 const Component = ({
   children,

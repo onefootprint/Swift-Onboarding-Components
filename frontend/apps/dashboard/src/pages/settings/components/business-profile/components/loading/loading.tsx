@@ -14,15 +14,15 @@ const Loading = () => (
 );
 
 const Avatar = () => (
-  <Shimmer sx={{ width: '40px', height: '40px', borderRadius: 'full' }} />
+  <Shimmer height="40px" width="40px" borderRadius="default" />
 );
 
 const Label = () => (
-  <Shimmer sx={{ width: '143px', height: '24px', borderRadius: 'default' }} />
+  <Shimmer height="24px" width="143px" borderRadius="default" />
 );
 
 const Value = () => (
-  <Shimmer sx={{ width: '168px', height: '20px', borderRadius: 'default' }} />
+  <Shimmer height="20px" width="168px" borderRadius="default" />
 );
 
 export default Loading;

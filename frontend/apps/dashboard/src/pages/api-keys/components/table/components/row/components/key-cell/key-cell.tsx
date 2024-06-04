@@ -9,7 +9,7 @@ type KeyCellProps = {
 
 const KeyCell = ({ value, isLoading }: KeyCellProps) => {
   if (isLoading) {
-    return <Shimmer sx={{ height: '24px', width: '280px' }} />;
+    return <Shimmer height="24px" width="280px" />;
   }
 
   return value ? (

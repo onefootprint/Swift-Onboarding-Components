@@ -67,41 +67,35 @@ const HitContainer = styled.div`
   `}
 `;
 
-const HitIcon = () => (
-  <Shimmer sx={{ width: '16px', height: '16px', marginBottom: 2 }} />
-);
+const HitIcon = () => <Shimmer width="16px" height="16px" marginBottom={2} />;
 
 const HitRowItem = ({ width, isLink }: { width: string; isLink?: boolean }) => (
   <Shimmer
-    sx={{
-      display: 'block',
-      height: '20px',
-      maxWidth: width,
-      textAlign: 'left',
-      flex: 1,
-      backgroundColor: isLink ? 'accent' : 'secondary',
-      opacity: isLink ? '0.05' : '1',
-    }}
+    display="block"
+    height="20px"
+    maxWidth={width}
+    textAlign="center"
+    flex={1}
+    backgroundColor={isLink ? 'accent' : 'secondary'}
+    opacity={isLink ? '0.05' : '1'}
   />
 );
 
 const SourceUrlLabel = () => (
-  <Shimmer sx={{ width: '81px', height: '20px', marginBottom: 3 }} />
+  <Shimmer width="81px" height="28px" marginBottom={3} />
 );
 
 const SourceUrlCopy = () => (
-  <Shimmer sx={{ width: '100%', height: '20px', marginBottom: 5 }} />
+  <Shimmer width="100%" height="20px" marginBottom={5} />
 );
 
 const SourceUrlLink = () => (
   <Shimmer
-    sx={{
-      width: '168px',
-      height: '20px',
-      marginBottom: 5,
-      backgroundColor: 'accent',
-      opacity: '0.05',
-    }}
+    width="168px"
+    height="20px"
+    marginBottom={5}
+    backgroundColor="accent"
+    opacity="0.05"
   />
 );
 

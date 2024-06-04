@@ -16,14 +16,12 @@ const Loading = () => (
   </Box>
 );
 
-const SecretKeyLabel = () => <Shimmer sx={{ height: '20px', width: '110' }} />;
+const SecretKeyLabel = () => <Shimmer height="20px" width="110px" />;
 
-const SecretKeyInput = () => (
-  <Shimmer sx={{ height: '40px', width: '395px' }} />
-);
+const SecretKeyInput = () => <Shimmer height="40px" width="395px" />;
 
-const RoleLabel = () => <Shimmer sx={{ height: '20px', width: '99px' }} />;
+const RoleLabel = () => <Shimmer height="20px" width="99px" />;
 
-const RoleInput = () => <Shimmer sx={{ height: '40px', width: '194px' }} />;
+const RoleInput = () => <Shimmer height="40px" width="194px" />;
 
 export default Loading;

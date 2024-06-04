@@ -17,8 +17,8 @@ const Loading = () => (
         paddingLeft={3}
         paddingRight={3}
       >
-        <Shimmer sx={{ height: '24px', width: '260px' }} />
-        <Shimmer sx={{ height: '24px', width: '24px' }} />
+        <Shimmer height="24px" width="260px" />
+        <Shimmer height="24px" width="24px" />
       </Stack>
     ))}
   </Stack>

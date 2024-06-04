@@ -3,18 +3,8 @@ import React from 'react';
 
 const Loading = () => (
   <Box aria-busy display="flex" justifyContent="space-between">
-    <Shimmer
-      sx={{
-        width: '122px',
-        height: '20px',
-      }}
-    />
-    <Shimmer
-      sx={{
-        width: '78px',
-        height: '20px',
-      }}
-    />
+    <Shimmer height="20px" width="122px" />
+    <Shimmer height="20px" width="78px" />
   </Box>
 );
 

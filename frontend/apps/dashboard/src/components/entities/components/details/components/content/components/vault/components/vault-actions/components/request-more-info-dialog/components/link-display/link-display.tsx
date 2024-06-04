@@ -50,8 +50,8 @@ const LinkDisplay = ({ linkData }: LinkDisplayProps) => {
         </>
       ) : (
         <>
-          <Shimmer sx={{ height: '32px', width: '100%' }} />
-          <Shimmer sx={{ height: '16px', width: '50%' }} />
+          <Shimmer width="100%" height="32px" />
+          <Shimmer width="50%" height="16px" />
         </>
       )}
     </Stack>

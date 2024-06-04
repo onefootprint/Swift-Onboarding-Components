@@ -18,16 +18,16 @@ const Loading = () => (
 
 const Header = () => (
   <Stack gap={2} justify="space-between">
-    <Shimmer sx={{ height: '25px', width: '150px' }} />
-    <Shimmer sx={{ height: '25px', width: '150px' }} />
+    <Shimmer height="25px" width="150px" />
+    <Shimmer height="25px" width="150px" />
   </Stack>
 );
 
 const Content = () => (
   <Box id="match-description">
-    <Shimmer sx={{ height: '25px', marginLeft: 10, marginBottom: 2 }} />
-    <Shimmer sx={{ height: '25px', marginLeft: 10, marginBottom: 2 }} />
-    <Shimmer sx={{ height: '25px', marginLeft: 10, marginBottom: 7 }} />
+    <Shimmer height="25px" marginLeft={10} marginBottom={2} />
+    <Shimmer height="25px" marginLeft={10} marginBottom={2} />
+    <Shimmer height="25px" marginLeft={10} marginBottom={7} />
   </Box>
 );
 

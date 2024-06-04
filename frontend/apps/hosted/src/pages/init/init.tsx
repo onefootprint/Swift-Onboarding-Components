@@ -96,19 +96,13 @@ const Init = () => {
   );
 };
 
-const Title = () => (
-  <Shimmer sx={{ width: '300px', height: '28px', maxWidth: '100%' }} />
-);
+const Title = () => <Shimmer height="28px" width="300px" maxWidth="100%" />;
 
-const Subtitle = () => (
-  <Shimmer sx={{ width: '350px', height: '24px', maxWidth: '100%' }} />
-);
+const Subtitle = () => <Shimmer height="24px" width="350px" maxWidth="100%" />;
 
-const Button = () => <Shimmer sx={{ width: '100%', height: '48px' }} />;
+const Button = () => <Shimmer height="48px" width="100%" />;
 
-const Avatar = () => (
-  <Shimmer sx={{ width: '72px', height: '72px', borderRadius: 'full' }} />
-);
+const Avatar = () => <Shimmer height="72px" width="72px" borderRadius="full" />;
 
 const Container = styled.div`
   ${({ theme }) => css`

@@ -8,7 +8,7 @@ type LoadingProps = {
 const Loading = ({ count }: LoadingProps) => (
   <>
     {Array.from({ length: count }).map(() => (
-      <Shimmer sx={{ width: '180px', height: '23px' }} key={Math.random()} />
+      <Shimmer height="23px" width="180px" key={Math.random()} />
     ))}
   </>
 );

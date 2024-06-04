@@ -5,9 +5,9 @@ import styled, { css } from 'styled-components';
 const Loading = () => (
   <Stack gap={4} direction="column">
     <Container>
-      <Shimmer sx={{ width: '300px', height: '27px' }} />
+      <Shimmer height="27px" width="300px" />
     </Container>
-    <Shimmer sx={{ width: '100%', height: '20px' }} />
+    <Shimmer height="20px" width="100%" />
   </Stack>
 );
 

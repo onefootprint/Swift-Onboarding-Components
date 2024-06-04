@@ -33,12 +33,10 @@ const LabelContainer = styled.div`
   `};
 `;
 
-const Label = () => <Shimmer sx={{ height: '20px', width: '117px' }} />;
+const Label = () => <Shimmer height="20px" width="117px" />;
 
-const Hint = () => <Shimmer sx={{ height: '16px', width: '388px' }} />;
+const Hint = () => <Shimmer height="16px" width="388px" />;
 
-const FieldOrPlaceholder = () => (
-  <Shimmer sx={{ height: '20px', width: '105px' }} />
-);
+const FieldOrPlaceholder = () => <Shimmer height="20px" width="105" />;
 
 export default Loading;

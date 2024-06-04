@@ -129,7 +129,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
           </Text>
         </StyledLi> */}
         {generateTokenMutation.isLoading ? (
-          <Shimmer sx={{ width: '100%', height: '32px' }} />
+          <Shimmer height="32px" width="100%" />
         ) : (
           <TextInput
             placeholder="https://auth.onefootprint.com#tok_okj3nppo1zyj6d7uJ9l49iLxY1uc2N4riz"

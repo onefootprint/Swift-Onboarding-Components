@@ -41,7 +41,8 @@ const ValueContainer = styled.div`
   `}
 `;
 
-const Label = () => <Shimmer sx={{ width: '80px', height: '40px' }} />;
-const Value = () => <Shimmer sx={{ width: '120px', height: '40px' }} />;
+const Label = () => <Shimmer width="80px" height="40px" />;
+
+const Value = () => <Shimmer width="120px" height="40px" />;
 
 export default Loading;

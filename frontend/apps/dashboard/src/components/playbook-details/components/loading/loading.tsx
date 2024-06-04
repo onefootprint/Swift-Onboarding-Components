@@ -24,78 +24,23 @@ const Loading = () => (
 );
 
 const Breadcrumb = () => (
-  <Shimmer
-    sx={{
-      width: '132px',
-      height: '20px',
-      marginBottom: 8,
-    }}
-  />
+  <Shimmer height="20px" width="132px" marginBottom={8} />
 );
 
-const Name = () => (
-  <Shimmer
-    sx={{
-      width: '100px',
-      height: '20px',
-      marginBottom: 4,
-    }}
-  />
-);
+const Name = () => <Shimmer height="20px" width="100px" marginBottom={4} />;
 
-const Kind = () => (
-  <Shimmer
-    sx={{
-      width: '30px',
-      height: '20px',
-    }}
-  />
-);
+const Kind = () => <Shimmer height="20px" width="30px" />;
 
-const PublicKey = () => (
-  <Shimmer
-    sx={{
-      width: '264px',
-      height: '20px',
-    }}
-  />
-);
+const PublicKey = () => <Shimmer height="20px" width="264px" />;
 
-const EditButton = () => (
-  <Shimmer
-    sx={{
-      width: '157px',
-      height: '20px',
-    }}
-  />
-);
+const EditButton = () => <Shimmer height="20px" width="157px" />;
 
 const Tabs = () => (
   <>
-    <Shimmer
-      sx={{
-        width: '105px',
-        height: '20px',
-      }}
-    />
-    <Shimmer
-      sx={{
-        width: '130px',
-        height: '20px',
-      }}
-    />
-    <Shimmer
-      sx={{
-        width: '110px',
-        height: '20px',
-      }}
-    />
-    <Shimmer
-      sx={{
-        width: '37px',
-        height: '20px',
-      }}
-    />
+    <Shimmer height="20px" width="105px" />
+    <Shimmer height="20px" width="130px" />
+    <Shimmer height="20px" width="110px" />
+    <Shimmer height="20px" width="37px" />
   </>
 );
 

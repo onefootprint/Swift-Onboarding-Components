@@ -66,7 +66,7 @@ const RequestOnboard = ({ visible }: RequestOnboardProps) => {
           )}
         />
       ) : (
-        <Shimmer sx={{ height: '38px', width: '100%' }} />
+        <Shimmer height="38px" width="100%" />
       )}
     </AnimatedContainer>
   );

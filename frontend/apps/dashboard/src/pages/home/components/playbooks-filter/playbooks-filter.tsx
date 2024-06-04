@@ -1,7 +1,6 @@
 import { SelectNew, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import ALL_PLAYBOOKS_ID from '../../constants';
 import useFilters from '../../hooks/use-filters';
@@ -38,7 +37,7 @@ const PlaybooksFilter = () => {
     <>
       {isLoading && <Loading />}
       {data && (
-        <StyledSelect
+        <SelectNew
           disabled={playbooksData.length === 1}
           onChange={handleChange}
           options={playbooksData}
@@ -50,8 +49,6 @@ const PlaybooksFilter = () => {
   );
 };
 
-const Loading = () => <Shimmer sx={{ width: '124px', height: '32px' }} />;
-
-const StyledSelect = styled(SelectNew)``;
+const Loading = () => <Shimmer height="32px" width="124px" />;
 
 export default PlaybooksFilter;

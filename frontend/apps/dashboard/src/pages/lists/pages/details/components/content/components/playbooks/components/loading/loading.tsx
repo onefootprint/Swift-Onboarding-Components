@@ -4,9 +4,9 @@ import styled, { css } from 'styled-components';
 
 const Loading = () => (
   <Container>
-    <Shimmer sx={{ width: '300px', height: '27px' }} />
-    <Shimmer sx={{ width: '100%', height: '20px' }} />
-    <Shimmer sx={{ width: '100%', height: '20px' }} />
+    <Shimmer height="27px" width="300px" />
+    <Shimmer height="20px" width="100%" />
+    <Shimmer height="20px" width="100%" />
   </Container>
 );
 

@@ -19,9 +19,7 @@ const Header = ({ hasRestrictions, isLoading }: HeaderProps) => {
           <Text variant="label-3">{t('header.title')}</Text>
         </Stack>
         {isLoading ? (
-          <Shimmer
-            sx={{ width: '145px', height: '26px', borderRadius: 'xl' }}
-          />
+          <Shimmer height="26px" width="145px" borderRadius="xl" />
         ) : (
           <Box>
             {hasRestrictions ? (

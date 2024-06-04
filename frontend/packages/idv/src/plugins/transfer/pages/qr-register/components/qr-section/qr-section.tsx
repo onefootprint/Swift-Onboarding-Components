@@ -23,9 +23,7 @@ const QRSection = ({ text, qrValue, isLoading }: QRSectionProps) => (
       {text}
     </Text>
     {isLoading || !qrValue ? (
-      <Shimmer
-        sx={{ height: `${QR_CODE_SIZE}px`, width: `${QR_CODE_SIZE}px` }}
-      />
+      <Shimmer height={`${QR_CODE_SIZE}px`} width={`${QR_CODE_SIZE}px`} />
     ) : (
       <QRContainer data-private="true" data-dd-privacy="mask">
         <QRCode size={QR_CODE_SIZE} value={qrValue} />

@@ -59,12 +59,7 @@ const PlaybookContext = ({ data }: WorkflowTriggeredEventHeaderProps) => {
   return playbook ? (
     <PlaybookLink playbook={playbook} />
   ) : (
-    <Shimmer
-      sx={{
-        width: '120px',
-        height: '20px',
-      }}
-    />
+    <Shimmer width="120px" height="20px" />
   );
 };
 

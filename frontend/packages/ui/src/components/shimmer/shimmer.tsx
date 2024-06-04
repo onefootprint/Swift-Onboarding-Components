@@ -1,42 +1,28 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import styled, { css, keyframes } from 'styled-components';
 
-import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
-import useSX from '../../hooks/use-sx';
+import type { BoxProps } from '../box';
+import Box from '../box';
 
-export type ShimmerProps = {
-  'aria-hidden'?: boolean;
-  'aria-valuetext'?: string;
-  sx?: SXStyleProps;
-  testID?: string;
-};
+export type ShimmerProps = BoxProps;
 
 const Shimmer = ({
   'aria-hidden': ariaHidden,
-  testID,
-  sx,
   'aria-valuetext': ariaValueText = 'Loading...',
-}: ShimmerProps) => {
-  const sxStyles = useSX(sx);
-  const { t } = useTranslation('ui');
-
-  return (
-    <ShimmerContainer
-      aria-hidden={ariaHidden}
-      aria-busy="true"
-      aria-valuemax={100}
-      aria-valuemin={0}
-      aria-valuetext={
-        ariaValueText ?? t('components.shimmer.aria-valuetext-default')
-      }
-      data-testid={testID}
-      role="progressbar"
-      $sx={sxStyles}
-      tabIndex={0}
-    />
-  );
-};
+  ...props
+}: ShimmerProps) => (
+  <ShimmerContainer
+    aria-busy="true"
+    aria-hidden={ariaHidden}
+    aria-valuemax={100}
+    aria-valuemin={0}
+    aria-valuetext={ariaValueText}
+    role="progressbar"
+    tabIndex={0}
+    {...props}
+  />
+);
 
 const blink = keyframes`
   100% {
@@ -44,7 +30,7 @@ const blink = keyframes`
   }
 `;
 
-const ShimmerContainer = styled.div<{ $sx: SXStyles }>`
+const ShimmerContainer = styled(Box)`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius.sm};
@@ -69,9 +55,6 @@ const ShimmerContainer = styled.div<{ $sx: SXStyles }>`
       );
       animation: ${blink} 2s infinite;
     }
-  `}
-  ${({ $sx }) => css`
-    ${$sx};
   `}
 `;
 

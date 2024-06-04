@@ -50,30 +50,22 @@ const Loading = () => (
 );
 
 const CloseButton = () => (
-  <Shimmer
-    sx={{ width: '30px', height: '30px', position: 'absolute', left: '20px' }}
-  />
+  <Shimmer height="30px" width="30px" position="absolute" left="20px" />
 );
 
-const Title = () => <Shimmer sx={{ width: '120px', height: '25px' }} />;
+const Title = () => <Shimmer height="25px" width="120px" />;
 
 const SectionTitle = () => (
-  <Shimmer sx={{ width: '120px', height: '25px', marginBottom: 4 }} />
+  <Shimmer height="25px" width="120px" marginBottom={4} />
 );
 
-const Label = () => (
-  <Shimmer sx={{ width: '70px', height: '20px', marginBottom: 3 }} />
-);
+const Label = () => <Shimmer height="20px" width="70px" marginBottom={3} />;
 
-const CardNumberInput = () => (
-  <Shimmer sx={{ width: '100%', height: '40px' }} />
-);
+const CardNumberInput = () => <Shimmer height="40px" width="100%" />;
 
-const CardExpDateInput = () => (
-  <Shimmer sx={{ width: '100%', height: '40px' }} />
-);
+const CardExpDateInput = () => <Shimmer height="40px" width="100%" />;
 
-const CardCvc = () => <Shimmer sx={{ width: '100%', height: '40px' }} />;
+const CardCvc = () => <Shimmer height="40px" width="100%" />;
 
 const Form = styled.div`
   ${({ theme }) => css`
@@ -82,7 +74,7 @@ const Form = styled.div`
   `}
 `;
 
-const Button = () => <Shimmer sx={{ width: '100px', height: '40px' }} />;
+const Button = () => <Shimmer height="40px" width="100px" />;
 
 const ButtonsContainer = styled.div`
   ${({ theme }) => css`

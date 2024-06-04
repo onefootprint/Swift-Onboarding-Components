@@ -41,7 +41,7 @@ const Header = () => {
           {data.name ? (
             <Text variant="label-1">{data.name}</Text>
           ) : (
-            <Shimmer sx={{ height: '27px', width: '75px' }} />
+            <Shimmer height="27px" width="75px" />
           )}
           <Text tag="span" variant="label-1">
             •
@@ -51,7 +51,7 @@ const Header = () => {
               {data.alias}
             </Text>
           ) : (
-            <Shimmer sx={{ height: '27px', width: '75px' }} />
+            <Shimmer height="27px" width="75px" />
           )}
         </Stack>
         <Stack align="center" gap={2}>

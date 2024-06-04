@@ -17,14 +17,14 @@ const Loading = () => (
   </Stack>
 );
 
-const EmailLabel = () => <Shimmer sx={{ height: '20px', width: '93px' }} />;
+const EmailLabel = () => <Shimmer height="20px" width="93px" />;
 
-const EmailInput = () => <Shimmer sx={{ height: '40px', width: '395px' }} />;
+const EmailInput = () => <Shimmer height="40px" width="395px" />;
 
-const RoleLabel = () => <Shimmer sx={{ height: '20px', width: '93px' }} />;
+const RoleLabel = () => <Shimmer height="20px" width="93px" />;
 
-const RoleInput = () => <Shimmer sx={{ height: '40px', width: '194px' }} />;
+const RoleInput = () => <Shimmer height="40px" width="194px" />;
 
-const AddMoreButton = () => <Shimmer sx={{ height: '21px', width: '86px' }} />;
+const AddMoreButton = () => <Shimmer height="21px" width="86px" />;
 
 export default Loading;

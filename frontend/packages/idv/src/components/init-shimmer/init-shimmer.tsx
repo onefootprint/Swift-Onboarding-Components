@@ -33,22 +33,16 @@ const NavHeader = styled.div`
   height: var(--navigation-header-height);
 `;
 
-const Title = () => (
-  <Shimmer sx={{ width: '120px', height: '28px', marginBottom: 3 }} />
-);
+const Title = () => <Shimmer height="28px" width="120px" marginBottom={3} />;
 
-const Subtitle = () => <Shimmer sx={{ width: '228px', height: '24px' }} />;
+const Subtitle = () => <Shimmer height="24px" width="228px" />;
 
-const Label = () => (
-  <Shimmer sx={{ width: '37px', height: '20px', marginBottom: 3 }} />
-);
+const Label = () => <Shimmer height="20px" width="37px" marginBottom={3} />;
 
-const Input = () => <Shimmer sx={{ width: '100%', height: '40px' }} />;
+const Input = () => <Shimmer height="40px" width="100%" />;
 
-const Button = () => (
-  <Shimmer sx={{ width: '100%', height: '48px', marginBottom: 5 }} />
-);
+const Button = () => <Shimmer height="48px" width="100%" marginBottom={5} />;
 
-const TermsOfService = () => <Shimmer sx={{ width: '100%', height: '30px' }} />;
+const TermsOfService = () => <Shimmer height="30px" width="100%" />;
 
 export default InitShimmer;

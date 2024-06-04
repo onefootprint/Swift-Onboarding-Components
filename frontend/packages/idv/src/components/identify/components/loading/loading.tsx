@@ -8,15 +8,15 @@ const Loading = ({ children }: LoadingProps): JSX.Element => (
   <Box testID="identify-init-shimmer">
     <NavHeader />
     <TitleContainer>
-      <Shimmer sx={{ width: '120px', height: '28px', marginBottom: 3 }} />
-      <Shimmer sx={{ width: '228px', height: '24px' }} />
+      <Shimmer height="28px" width="120px" marginBottom={3} />
+      <Shimmer height="24px" width="228px" />
     </TitleContainer>
     <Box marginBottom={5}>
-      <Shimmer sx={{ width: '37px', height: '20px', marginBottom: 3 }} />
-      <Shimmer sx={{ width: '100%', height: '40px' }} />
+      <Shimmer height="20px" width="37px" marginBottom={3} />
+      <Shimmer height="40px" width="100%" />
     </Box>
-    <Shimmer sx={{ width: '100%', height: '48px', marginBottom: 5 }} />
-    <Shimmer sx={{ width: '100%', height: '30px' }} />
+    <Shimmer height="48px" width="100%" marginBottom={5} />
+    <Shimmer height="30px" width="100%" />
     {children}
   </Box>
 );
