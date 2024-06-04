@@ -32,7 +32,7 @@ const TenantItem = ({ tenant, onClick, isSelected }: TenantItemProps) => {
             disabled={!tenant.isAuthMethodSupported}
             onClick={onClick}
             type="button"
-            isSelected={!!isSelected}
+            $isSelected={!!isSelected}
           >
             {tenant.name}
           </EllipsisButton>
@@ -61,9 +61,9 @@ const TenantCheckmarkContainer = styled.div`
   justify-content: space-between;
 `;
 
-const EllipsisButton = styled.button<{ isSelected: boolean }>`
-  ${({ isSelected }) => css`
-    width: ${isSelected ? '90%' : '100%'};
+const EllipsisButton = styled.button<{ $isSelected: boolean }>`
+  ${({ $isSelected }) => css`
+    width: ${$isSelected ? '90%' : '100%'};
     background: none;
     border: none;
     padding: 0;

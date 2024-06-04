@@ -40,14 +40,14 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
       <Container $size={size} direction="row" $variant={variant}>
         <MainButton
           disabled={disabled}
-          $loading={loading}
+          loading={loading}
+          loadingAriaLabel="Loading"
           onClick={activeOption.onSelect}
           ref={ref}
+          size={size}
+          tab-index={0}
           type={type}
           variant={variant}
-          loadingAriaLabel="Loading"
-          $size={size}
-          tab-index={0}
         >
           {activeOption.label}
         </MainButton>

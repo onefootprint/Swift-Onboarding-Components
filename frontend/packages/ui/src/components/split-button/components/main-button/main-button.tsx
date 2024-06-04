@@ -7,43 +7,43 @@ import Stack from '../../../stack';
 import type { ButtonSize, ButtonVariant } from '../../split-button.types';
 
 type MainButtonProps = {
-  $loading?: boolean;
+  children: React.ReactNode;
   disabled: boolean;
+  loading?: boolean;
+  loadingAriaLabel?: string;
   onClick?: () => void;
+  ref?: React.Ref<HTMLButtonElement>;
+  size?: ButtonSize;
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
-  loadingAriaLabel?: string;
-  children: React.ReactNode;
-  ref?: React.Ref<HTMLButtonElement>;
-  $size?: ButtonSize;
 };
 
 const MainButton = ({
-  $loading = false,
+  children,
   disabled,
+  loading = false,
+  loadingAriaLabel = 'Loading',
   onClick,
+  ref,
+  size,
   type = 'button',
   variant = 'secondary',
-  loadingAriaLabel = 'Loading',
-  children,
-  $size,
-  ref,
 }: MainButtonProps) => (
   <Container
     /** Do not change/remove these classes */
     className="fp-button fp-custom-appearance"
-    data-loading={$loading}
+    $loading={loading}
+    $size={size ?? 'compact'}
+    $variant={variant}
+    data-loading={loading}
     disabled={disabled}
     onClick={onClick}
     ref={ref}
     tabIndex={0}
     type={type}
-    variant={variant}
-    $loading={$loading}
-    $size={$size ?? 'compact'}
   >
     <Stack align="center" justify="center">
-      {$loading ? (
+      {loading ? (
         <AnimatedLoadingSpinner
           ariaLabel={loadingAriaLabel}
           color={variant === 'primary' ? 'quinary' : 'primary'}
@@ -57,11 +57,11 @@ const MainButton = ({
 );
 
 const Container = styled.button<{
-  variant: ButtonVariant;
+  $variant: ButtonVariant;
   $loading?: boolean;
   $size: ButtonSize;
 }>`
-  ${({ theme, variant, $loading, $size }) => {
+  ${({ theme, $variant, $loading, $size }) => {
     const { button } = theme.components;
 
     return css`
@@ -69,9 +69,9 @@ const Container = styled.button<{
       --animation-duration: 0.1s;
       --adapted-border-radius: calc(${button.borderRadius} - 1px);
       ${createText(button.size[$size].typography)}
-      background-color: ${button.variant[variant].bg};
+      background-color: ${button.variant[$variant].bg};
       border-radius: var(--adapted-border-radius) 0 0 var(--adapted-border-radius);
-      color: ${button.variant[variant].color};
+      color: ${button.variant[$variant].color};
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -87,40 +87,40 @@ const Container = styled.button<{
       transition: all var(--animation-duration) ease-in-out;
 
       &:hover:enabled {
-        background-color: ${button.variant[variant].hover.bg};
-        border-color: ${button.variant[variant].hover.borderColor};
-        color: ${button.variant[variant].hover.color};
-        box-shadow: ${button.variant[variant].hover.boxShadow};
+        background-color: ${button.variant[$variant].hover.bg};
+        border-color: ${button.variant[$variant].hover.borderColor};
+        color: ${button.variant[$variant].hover.color};
+        box-shadow: ${button.variant[$variant].hover.boxShadow};
       }
 
       &:active:enabled {
-        background-color: ${button.variant[variant].active.bg};
-        border-color: ${button.variant[variant].active.borderColor};
-        color: ${button.variant[variant].active.color};
-        box-shadow: ${button.variant[variant].active.boxShadow};
+        background-color: ${button.variant[$variant].active.bg};
+        border-color: ${button.variant[$variant].active.borderColor};
+        color: ${button.variant[$variant].active.color};
+        box-shadow: ${button.variant[$variant].active.boxShadow};
       }
 
       ${
         $loading &&
         css`
-          background-color: ${button.variant[variant].loading.bg};
-          color: ${button.variant[variant].loading.color};
+          background-color: ${button.variant[$variant].loading.bg};
+          color: ${button.variant[$variant].loading.color};
           pointer-events: none;
 
           path {
-            fill: ${button.variant[variant].loading.color};
+            fill: ${button.variant[$variant].loading.color};
           }
         `
       }
 
       &:disabled {
         cursor: not-allowed;
-        background-color: ${button.variant[variant].disabled.bg};
-        border-color: ${button.variant[variant].disabled.borderColor};
-        color: ${button.variant[variant].disabled.color};
+        background-color: ${button.variant[$variant].disabled.bg};
+        border-color: ${button.variant[$variant].disabled.borderColor};
+        color: ${button.variant[$variant].disabled.color};
 
         path {
-          fill: ${button.variant[variant].disabled.color};
+          fill: ${button.variant[$variant].disabled.color};
         }
       }
 
@@ -130,21 +130,21 @@ const Container = styled.button<{
 
       &:not([data-flat='true']) {
         box-shadow var(--animation-duration) ease-in-out;
-        box-shadow: ${button.variant[variant].boxShadow};
+        box-shadow: ${button.variant[$variant].boxShadow};
         clip-path: inset(-9999px 0 -9999px -9999px);
 
         &:hover {
           z-index: 0;
-          box-shadow: ${button.variant[variant].hover.boxShadow};
+          box-shadow: ${button.variant[$variant].hover.boxShadow};
         }
 
         &:active {
           z-index: 0;
-          box-shadow: ${button.variant[variant].active.boxShadow};
+          box-shadow: ${button.variant[$variant].active.boxShadow};
         }
 
         &:disabled {
-          box-shadow: ${button.variant[variant].disabled.boxShadow};
+          box-shadow: ${button.variant[$variant].disabled.boxShadow};
         }
       }
     `;
