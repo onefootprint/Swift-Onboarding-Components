@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   compute_open_api_head:
-    runs-on: 16core
+    runs-on: 16core24
     environment: backend_ci
     outputs:
       commit: '${{ steps.commit.outputs.commit }}'
@@ -67,7 +67,7 @@ jobs:
   
 
   compute_open_api_base:
-    runs-on: 16core
+    runs-on: 16core24
     environment: backend_ci
     outputs:
       commit: '${{ steps.commit.outputs.commit }}'
@@ -143,7 +143,7 @@ jobs:
 
 
   compare_open_api:
-    runs-on: 16core
+    runs-on: 16core24
     needs: [compute_open_api_head, compute_open_api_base]
     steps:
       - run: |
