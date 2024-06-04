@@ -23,7 +23,11 @@ export type DateSelectorSheetProps = {
   }) => void;
   onOpenChange?: (open: boolean) => void;
   onClickOutside?: () => void;
-  alignment?: 'start' | 'center' | 'end';
+  position?: {
+    alignment?: 'start' | 'center' | 'end';
+    side?: 'top' | 'right' | 'bottom' | 'left';
+    avoidCollisions?: boolean;
+  };
 };
 
 export enum DirectionChange {

@@ -18,6 +18,11 @@ export type DateRangeInputProps = {
   onOpenChange?: (open: boolean) => void;
   startDate?: Date;
   endDate?: Date;
+  dateSheetPosition?: {
+    alignment?: 'start' | 'center' | 'end';
+    side?: 'top' | 'right' | 'bottom' | 'left';
+    avoidCollisions?: boolean;
+  };
 };
 
 const DateRangeInput = ({
@@ -28,6 +33,11 @@ const DateRangeInput = ({
   startDate,
   endDate,
   placeholder = 'Select a date range',
+  dateSheetPosition = {
+    alignment: 'start',
+    side: 'bottom',
+    avoidCollisions: true,
+  },
   onOpenChange,
   onChange,
   size,
@@ -87,6 +97,7 @@ const DateRangeInput = ({
       onClickOutside={handleToggleDateSheet}
       open={openDateSheet}
       asChild
+      position={dateSheetPosition}
     >
       <Trigger
         onClick={handleToggleDateSheet}

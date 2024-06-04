@@ -1,4 +1,4 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { AnimatePresence } from 'framer-motion';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
@@ -21,7 +21,6 @@ type DateFormProps = {
 };
 
 const DateForm = ({ onSubmit, selectedOptions }: DateFormProps) => {
-  const [animateCustomDate] = useAutoAnimate<HTMLDivElement>();
   const options = useDateOptions();
   const { control, handleSubmit, register, watch } = useForm<FormData>({
     defaultValues: getFormDefaultValue(selectedOptions),
@@ -48,14 +47,16 @@ const DateForm = ({ onSubmit, selectedOptions }: DateFormProps) => {
           {...register('period')}
         />
       ))}
-      <div ref={animateCustomDate}>
-        {' '}
+      <AnimatePresence>
         {shouldShowDatePicker && (
           <Controller
             control={control}
             name="customDate"
             render={({ field }) => (
               <DateRangeInput
+                dateSheetPosition={{
+                  avoidCollisions: false,
+                }}
                 initialStartDate={
                   selectedOptions[0] ? new Date(selectedOptions[0]) : undefined
                 }
@@ -69,7 +70,7 @@ const DateForm = ({ onSubmit, selectedOptions }: DateFormProps) => {
             )}
           />
         )}
-      </div>
+      </AnimatePresence>
     </Form>
   );
 };

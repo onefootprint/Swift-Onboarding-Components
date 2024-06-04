@@ -41,7 +41,9 @@ const DateFilter = ({ dateRange, onChange }: DateFilterProps) => {
       onOpenChange={handleToggleDataSheet}
       onClickOutside={handleToggleDataSheet}
       open={open}
-      alignment="end"
+      position={{
+        alignment: 'end',
+      }}
       disableFutureDates
       asChild
     >
