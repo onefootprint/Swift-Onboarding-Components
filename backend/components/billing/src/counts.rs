@@ -7,6 +7,7 @@ use crate::{
     BResult,
     Error,
 };
+use rust_decimal_macros::dec;
 use strum::IntoEnumIterator;
 
 #[derive(Debug)]
@@ -138,6 +139,8 @@ impl BillingCounts {
             .map(|product| (product, self.get_count(product)))
             .filter_map(|(p, count)| count.map(|c| (p, c)))
             .filter(|(_, count)| count > &0)
+            // Filter out line items that have a price of 0c explicitly in the billing profile
+            .filter(|(product, _)| !profile.get(*product).is_some_and(|p| p.price_cents == dec!(0)))
             .map(|(product, count)| -> BResult<_> {
                 let price = if let Some(price) = profile.get(product) {
                     // If the BillingProfile for this tenant has a price set for the product, use it
