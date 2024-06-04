@@ -27,6 +27,8 @@ export enum TenantPreviewApi {
   ListBusinessOwners = 'list_business_owners',
   Labels = 'labels',
   Tags = 'tags',
+  VaultProxy = 'vault_proxy',
+  VaultProxyJit = 'vault_proxy_jit',
 }
 
 export const TENANT_BILLING_PROFILE_PRODUCTS = [
