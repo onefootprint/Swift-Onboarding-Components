@@ -19,6 +19,16 @@ export type Di = Partial<
     'id.citizenships': string[];
     'id.visa_kind': string;
     'id.visa_expiration_date': string;
+
+    'business.name': string;
+    'business.dba': string;
+    'business.tin': string;
+    'business.address_line1': string;
+    'business.address_line2': string;
+    'business.city': string;
+    'business.state': string;
+    'business.country': string;
+    'business.zip': string;
   } & {
     [key: `custom.${string}`]: string;
   }
