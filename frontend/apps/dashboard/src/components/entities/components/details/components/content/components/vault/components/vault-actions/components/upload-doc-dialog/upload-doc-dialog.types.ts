@@ -1,4 +1,4 @@
-import type { CustomDocumentIdentifier } from '@Onefootprint/types';
+import type { CustomDocumentIdentifier } from '@onefootprint/types';
 
 export type FormData = {
   identifier: CustomDocumentIdentifier;

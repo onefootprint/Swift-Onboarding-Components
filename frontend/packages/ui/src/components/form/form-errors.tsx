@@ -4,12 +4,12 @@ import styled, { css } from 'styled-components';
 import { createText } from '../../utils/mixins';
 
 export type FormErrorsProps = {
-  children?: React.ReactNode;
+  children?: unknown;
   className?: string;
 };
 
 const FormErrors = ({ children, className }: FormErrorsProps) =>
-  children ? (
+  children && typeof children === 'string' ? (
     <Text className={`${className} fp-hint fp-custom-appearance`}>
       {children}
     </Text>

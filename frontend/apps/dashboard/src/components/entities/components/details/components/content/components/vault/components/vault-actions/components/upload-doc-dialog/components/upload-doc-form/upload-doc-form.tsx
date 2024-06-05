@@ -51,15 +51,14 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
             <TextInput
               placeholder=""
               id="identifier"
+              hasError={!!errors.identifier}
               autoFocus
               {...register('identifier', {
                 required: t('form.identifier.errors.required'),
               })}
             />
           </Form.Group>
-          <Form.Errors>
-            {errors.identifier ? errors.identifier.message : null}
-          </Form.Errors>
+          <Form.Errors>{errors.identifier?.message}</Form.Errors>
         </Form.Field>
         <Form.Field>
           <Stack justifyContent="space-between" align="center">
@@ -107,7 +106,7 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
               </Text>
             </DocUpload>
           )}
-          <Form.Errors>{errors.file ? errors.file.message : null}</Form.Errors>
+          <Form.Errors>{errors.file?.message}</Form.Errors>
           <HiddenInput
             accept="image/*, application/pdf"
             type="file"
