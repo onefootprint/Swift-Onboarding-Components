@@ -141,27 +141,6 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
 
   const settings: TenantField[] = [
     {
-      title: 'Required login methods',
-      content: tenant.supportedAuthMethods?.length
-        ? tenant.supportedAuthMethods.join(', ')
-        : '-',
-      editModeContent: (
-        <Controller
-          control={control}
-          name="supportedAuthMethods"
-          render={({ field, fieldState: { error } }) => (
-            <MultiSelect
-              onBlur={field.onBlur}
-              options={AUTH_METHOD_OPTIONS}
-              onChange={field.onChange}
-              hasError={!!error}
-              value={field.value}
-            />
-          )}
-        />
-      ),
-    },
-    {
       title: 'Allowed preview APIs',
       content: tenant.allowedPreviewApis.length
         ? tenant.allowedPreviewApis.join(', ')
@@ -174,6 +153,27 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
             <MultiSelect
               onBlur={field.onBlur}
               options={PREVIEW_API_OPTIONS}
+              onChange={field.onChange}
+              hasError={!!error}
+              value={field.value}
+            />
+          )}
+        />
+      ),
+    },
+    {
+      title: 'Required login methods',
+      content: tenant.supportedAuthMethods?.length
+        ? tenant.supportedAuthMethods.join(', ')
+        : '-',
+      editModeContent: (
+        <Controller
+          control={control}
+          name="supportedAuthMethods"
+          render={({ field, fieldState: { error } }) => (
+            <MultiSelect
+              onBlur={field.onBlur}
+              options={AUTH_METHOD_OPTIONS}
               onChange={field.onChange}
               hasError={!!error}
               value={field.value}
