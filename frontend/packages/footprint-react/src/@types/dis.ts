@@ -23,6 +23,7 @@ export type Di = Partial<
     'business.name': string;
     'business.dba': string;
     'business.tin': string;
+    'business.website': string;
     'business.address_line1': string;
     'business.address_line2': string;
     'business.city': string;

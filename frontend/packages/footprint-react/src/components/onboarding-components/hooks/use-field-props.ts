@@ -269,6 +269,18 @@ const business: Record<string, Field> = {
       },
     },
   },
+  website: {
+    type: 'url',
+    placeholder: 'https://www.acme.com',
+    mask: {
+      numericOnly: true,
+      delimiters: ['-'],
+      blocks: [2, 7],
+    },
+    validations: {
+      required: 'Website cannot be empty',
+    },
+  },
 };
 
 const getProps = (name: string) => {
@@ -325,6 +337,9 @@ const getProps = (name: string) => {
   }
   if (name === 'business.tin') {
     return business.tin;
+  }
+  if (name === 'business.website') {
+    return business.website;
   }
 
   return null;
