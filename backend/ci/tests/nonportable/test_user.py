@@ -181,7 +181,7 @@ def test_kyc_missing_requirement(sandbox_tenant, must_collect_data):
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
         body["error"]["message"]
-        == "Cannot run KYC playbook due to unmet requirements. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9"
+        == "Cannot run kyc playbook due to unmet requirements. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9"
     )
     assert body["error"]["code"] == "T121"
 
