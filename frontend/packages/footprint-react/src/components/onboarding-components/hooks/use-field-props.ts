@@ -251,6 +251,9 @@ const business: Record<string, Field> = {
       required: 'Business name cannot be empty or is invalid',
     },
   },
+  dba: {
+    placeholder: 'Acme Bank',
+  },
 };
 
 const getProps = (name: string) => {
@@ -301,6 +304,9 @@ const getProps = (name: string) => {
   }
   if (name.startsWith('custom')) {
     return common.custom;
+  }
+  if (name === 'business.dba') {
+    return business.dba;
   }
 
   return null;
