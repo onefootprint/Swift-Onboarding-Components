@@ -36,7 +36,7 @@ impl Enclave {
     pub async fn bind(config: Config) -> std::io::Result<Self> {
         #[cfg(not(feature = "nitro"))]
         {
-            let listener = bind_tcp(&format!("0.0.0.0:{}", config.port)).await?;
+            let listener = bind_tcp(&format!("127.0.0.1:{}", config.port)).await?;
             Ok(Self {
                 port: listener.local_addr()?.port(),
                 listener,

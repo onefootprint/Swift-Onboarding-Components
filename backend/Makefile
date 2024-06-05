@@ -1,9 +1,22 @@
+.PHONY: api-release api-debug
+
 account := $(shell aws sts get-caller-identity --query "Account" --output text)
 branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r 's/_/-/g')
 commit := "$(branch)-$(shell git rev-parse --short HEAD)"
 commit_full := "$(shell git rev-parse HEAD)"
 
 RUST_VERSION := "1.77.0"
+
+# Builds the API crate into a musl binary
+api-release:
+	@echo "building release mode"
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p api_server --release
+	@cp ./target/x86_64-unknown-linux-musl/release/api_server ./out/api_server
+
+api-debug:
+	@echo "building debug mode"
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p api_server
+	@cp ./target/x86_64-unknown-linux-musl/debug/api_server ./out/api_server
 
 # Builds the actual enclave image
 build-enclave-docker:

@@ -11,8 +11,8 @@ pub struct Config {
     #[envconfig(from = "ENCLAVE_CID", default = "16")]
     pub enclave_cid: u32,
 
-    #[envconfig(from = "ENCLAVE_TCP_HOST")]
-    pub enclave_tcp_host: Option<String>,
+    #[envconfig(from = "LOCAL")]
+    pub use_local: Option<String>,
 
     #[envconfig(from = "ENCLAVE_PROXY_SECRET", default = "onefootprint")]
     pub proxy_secret: String,
@@ -28,20 +28,13 @@ impl crate::StreamConfig for Config {
     fn stream_type(&self) -> crate::StreamType {
         #[cfg(not(feature = "vsock"))]
         return crate::StreamType::Tcp {
-            address: format!(
-                "{}:{}",
-                self.enclave_tcp_host
-                    .as_ref()
-                    .map(|h| (*h).as_str())
-                    .unwrap_or("127.0.0.1"),
-                self.enclave_port
-            ),
+            address: format!("127.0.0.1:{}", self.enclave_port),
         };
 
         #[cfg(feature = "vsock")]
-        if self.enclave_tcp_host.is_some() {
+        if self.use_local.is_some() {
             crate::StreamType::Tcp {
-                address: format!("{}:{}", self.enclave_tcp_host, self.enclave_port),
+                address: format!("127.0.0.1:{}", self.enclave_port),
             }
         } else {
             crate::StreamType::Vsock {
