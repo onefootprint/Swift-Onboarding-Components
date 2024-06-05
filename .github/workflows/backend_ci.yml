@@ -29,6 +29,58 @@ jobs:
     outputs:
       filesChanged: ${{ steps.changes.outputs.src }}
 
+  build_images:
+    name: Build images
+    runs-on: 16core24
+    needs: [files-changed]
+    if: needs.files-changed.outputs.filesChanged == 'true'
+    strategy:
+      matrix:
+        include:
+          - name: api
+            args:
+              BUILD_PROFILE: release
+              GIT_HASH: ${{ github.sha }}
+          - name: enclave-proxy-dev
+            args: {}
+          - name: enclave
+            args: {}
+          - name: enclave-dev
+            args: {}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS Credentials (Image Cache)
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Amazon ECR (Image Cache)
+        id: login-ecr-image-cache
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Build image
+        env:
+          REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+          REPO: ${{ matrix.name }}
+          TAG: ${{ github.sha }}
+        working-directory: ./backend
+        run: |
+          set -euxo pipefail
+
+          docker buildx build \
+            --platform linux/amd64 \
+            --file ./images/${{ matrix.name}}/Dockerfile \
+            $(echo '${{toJSON(matrix.args) }}' | jq -r '. | to_entries | map("--build-arg \(.key)=\(.value)") | join(" ")') \
+            --tag $REGISTRY/$REPO:$TAG \
+            --push \
+            ${{ github.ref == 'refs/heads/master' && '--cache-to type=registry,ref=${REGISTRY}/build-cache:${REPO}-master,compression=zstd,mode=max' || '' }} \
+            --cache-from type=registry,ref=${REGISTRY}/build-cache:${REPO}-master \
+            .
+
   test:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
@@ -282,7 +334,7 @@ jobs:
   # Add all jobs in this workflow to this job's `needs`
   backend-ci:
     runs-on: ubuntu-latest
-    needs: [test, clippy, integration_tests, rustfmt]
+    needs: [build_images, test, clippy, integration_tests, rustfmt]
     if: always()
     steps:
       - name: Success
