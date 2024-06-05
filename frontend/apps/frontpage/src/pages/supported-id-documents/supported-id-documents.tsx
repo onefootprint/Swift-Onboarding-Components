@@ -1,6 +1,7 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoCheckSmall16, IcoInfo16 } from '@onefootprint/icons';
 import {
+  Box,
   createFontStyles,
   Grid,
   media,
@@ -65,54 +66,60 @@ const SupportedIdDocuments = () => {
           borderRadius="default"
           marginBottom={11}
           overflow="hidden"
+          tag="table"
         >
-          <Grid.Container
-            height="40px"
-            backgroundColor="secondary"
-            columns={[columnDimensions]}
-            borderPosition="bottom"
-            borderWidth={1}
-            borderColor="tertiary"
-          >
-            {headerOptions.map(({ key, value, tooltip }) => (
-              <HeaderElement
-                key={key}
-                data-align={value === 'country' ? 'left' : undefined}
-                tag="th"
-              >
-                {value}
-                {tooltip && (
-                  <Tooltip text={tooltip} position="bottom">
-                    <Stack>
-                      <IcoInfo16 color="secondary" />
-                    </Stack>
-                  </Tooltip>
-                )}
-              </HeaderElement>
-            ))}
-          </Grid.Container>
-          {COUNTRIES.map(({ label, passport, idCard, driversLicense }) => (
-            <TableRow
-              as="tr"
-              height="40px"
+          <thead>
+            <Grid.Container
+              backgroundColor="secondary"
               columns={[columnDimensions]}
-              key={label}
               borderPosition="bottom"
               borderWidth={1}
               borderColor="tertiary"
-              alignItems="center"
+              tag="tr"
             >
-              <TableCell data-align="left">
-                <Text variant="body-3">{label}</Text>
-              </TableCell>
-              <TableCell>{passport && <IcoCheckSmall16 />}</TableCell>
-              <TableCell>{idCard && <IcoCheckSmall16 />}</TableCell>
-              <TableCell>
-                {driversLicense ? <IcoCheckSmall16 /> : null}
-              </TableCell>
-            </TableRow>
-          ))}
+              {headerOptions.map(({ key, value, tooltip }) => (
+                <HeaderElement
+                  key={key}
+                  data-align={value === 'country' ? 'left' : undefined}
+                  tag="th"
+                >
+                  {value}
+                  {tooltip && (
+                    <Tooltip text={tooltip} position="bottom">
+                      <Stack>
+                        <IcoInfo16 color="secondary" />
+                      </Stack>
+                    </Tooltip>
+                  )}
+                </HeaderElement>
+              ))}
+            </Grid.Container>
+          </thead>
+          <tbody>
+            {COUNTRIES.map(({ label, passport, idCard, driversLicense }) => (
+              <TableRow
+                as="tr"
+                height="40px"
+                $columns={columnDimensions}
+                key={label}
+              >
+                <TableCell data-align="left" tag="th">
+                  <Text variant="body-3" textAlign="left">
+                    {label}
+                  </Text>
+                </TableCell>
+                <TableCell tag="td">
+                  {passport && <IcoCheckSmall16 />}
+                </TableCell>
+                <TableCell tag="td">{idCard && <IcoCheckSmall16 />}</TableCell>
+                <TableCell tag="td">
+                  {driversLicense ? <IcoCheckSmall16 /> : null}
+                </TableCell>
+              </TableRow>
+            ))}
+          </tbody>
         </Grid.Container>
+
         <ContactUsBanner
           title={t('contact.title')}
           subtitle={t('contact.subtitle')}
@@ -135,17 +142,30 @@ const Container = styled.div`
   `}
 `;
 
-const TableRow = styled(Grid.Container)`
+const TableRow = styled(Grid.Container)<{ $columns: string }>`
+  ${({ $columns, theme }) => css`
+    display: grid;
+    grid-template-columns: ${$columns};
+    height: auto;
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+
+    ${media.greaterThan('md')`
+      height: 40px;
+    `}
+  `}
+
   &:last-of-type {
     border-bottom: none;
   }
 `;
 
-const TableCell = styled.td`
+const TableCell = styled(Box)`
   ${({ theme }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    padding: ${theme.spacing[2]};
 
     &[data-align='left'] {
       justify-content: flex-start;
@@ -167,9 +187,10 @@ const HeaderElement = styled(Grid.Item)`
     text-align: center;
     align-items: center;
     justify-content: center;
-    white-space: nowrap;
+
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 40px;
 
     &[data-align='left'] {
       justify-content: flex-start;
@@ -178,6 +199,8 @@ const HeaderElement = styled(Grid.Item)`
 
       ${media.greaterThan('md')`
         padding-left: ${theme.spacing[6]};
+        white-space: nowrap;
+        height: 40px;
       `}
     }
   `}
