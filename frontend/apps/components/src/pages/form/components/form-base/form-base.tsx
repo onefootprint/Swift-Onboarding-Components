@@ -2,7 +2,7 @@ import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
-import { LoggerDeprecated } from '@onefootprint/idv';
+import { getLogger } from '@onefootprint/idv';
 import { Divider, useConfirmationDialog } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -46,6 +46,7 @@ export type FormBaseProps = {
 };
 
 const FORM_ID = 'secure-form';
+const { logTrack, logWarn } = getLogger({ location: 'form-base' });
 
 const FormBase = ({
   title,
@@ -85,13 +86,7 @@ const FormBase = ({
     }
     Object.entries(fieldErrors).forEach(([key, value]) => {
       const field = key as keyof FormData;
-      setError(
-        field,
-        { message: value },
-        {
-          shouldFocus: true,
-        },
-      );
+      setError(field, { message: value }, { shouldFocus: true });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fieldErrors]);
@@ -99,14 +94,12 @@ const FormBase = ({
   const triggerSave = async () => {
     const canSave = await trigger();
     if (!canSave) {
-      LoggerDeprecated.info(
-        'Triggered form save via ref but form has errors, so not saved.',
-      );
+      logWarn('Triggered form save via ref but form has errors, so not saved.');
       // There were some errors with inputs, don't trigger saving
       onSaveError?.(t('errors.invalid-data'));
       return;
     }
-    LoggerDeprecated.info('Triggered form save via ref');
+    logTrack('Triggered form save via ref');
     onSave?.(getValues(), true);
   };
 
@@ -116,6 +109,7 @@ const FormBase = ({
 
   const confirmClose = (callback?: () => void) => {
     if (!callback) {
+      logTrack('no callback passed to confirmClose');
       return;
     }
     if (!isDirty) {

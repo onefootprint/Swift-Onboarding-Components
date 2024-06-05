@@ -103,7 +103,6 @@ const nextConfig = {
     '@onefootprint/design-tokens',
     '@onefootprint/icons',
     '@onefootprint/global-constants',
-    '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
     '@onefootprint/appearance',

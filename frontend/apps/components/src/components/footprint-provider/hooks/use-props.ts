@@ -1,7 +1,6 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import { getSdkArgsToken, hasInvalidHashFragment } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import noop from 'lodash/noop';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -11,6 +10,7 @@ import useGetSdkArgs from './use-get-sdk-args';
 
 // Wait for a bit for post message to arrive before giving up
 const POST_MESSAGE_TIMEOUT = 500;
+const noop = () => undefined;
 
 type Obj = Record<string, unknown>;
 

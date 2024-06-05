@@ -1,4 +1,6 @@
-import { LoggerDeprecated } from '@onefootprint/idv';
+import { getLogger } from '@onefootprint/idv';
+
+const { logError } = getLogger({ location: 'get-card-alias' });
 
 const getCardAlias = (vaultFields?: string[]) => {
   if (!vaultFields?.length) {
@@ -14,7 +16,7 @@ const getCardAlias = (vaultFields?: string[]) => {
     const [, alias] = fieldParts;
     return alias || null;
   } catch (e) {
-    LoggerDeprecated.error('Could not get parse card alias from auth token');
+    logError('Could not get parse card alias from auth token', e);
     return null;
   }
 };

@@ -1,23 +1,23 @@
 import type { FootprintFormDataProps } from '@onefootprint/footprint-js';
-import { isObject, LoggerDeprecated } from '@onefootprint/idv';
+import { getLogger, isObject } from '@onefootprint/idv';
+
+const { logError } = getLogger({ location: 'are-props-valid' });
 
 const arePropsValid = (
   props?: Record<string, unknown>,
 ): props is FootprintFormDataProps => {
   if (!props || !isObject(props)) {
-    LoggerDeprecated.error('Received empty props');
+    logError('Received empty props');
     return false;
   }
 
   const { authToken, title } = props;
 
   const isAuthTokenValid = typeof authToken === 'string' && !!authToken;
-  if (!isAuthTokenValid)
-    LoggerDeprecated.error('Valid auth token is required.');
-
   const isTitleValid = typeof title === 'string' || title === undefined;
-  if (!isTitleValid)
-    LoggerDeprecated.error('Title must be a string or undefined.');
+
+  if (!isAuthTokenValid) logError('Valid auth token is required.');
+  if (!isTitleValid) logError('Title must be a string or undefined.');
 
   return isAuthTokenValid && isTitleValid;
 };

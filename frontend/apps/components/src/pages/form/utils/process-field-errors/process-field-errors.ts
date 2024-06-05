@@ -1,4 +1,4 @@
-import { LoggerDeprecated } from '@onefootprint/idv';
+import { getLogger } from '@onefootprint/idv';
 import type { DataIdentifier } from '@onefootprint/types';
 import { CardDIField } from '@onefootprint/types';
 
@@ -8,6 +8,8 @@ import type { NameData } from '../../components/form-base/components/name';
 import getCardDiField from '../get-card-di-field';
 
 type FormKeys = keyof NameData | keyof CardData | keyof PartialAddressData;
+
+const { logError } = getLogger({ location: 'process-field-errors' });
 
 export const FormFieldByDI: Partial<Record<CardDIField, FormKeys>> = {
   [CardDIField.name]: 'name',
@@ -22,6 +24,7 @@ const processFieldErrors = (
   error: Object,
 ): Partial<Record<FormKeys, string>> | undefined => {
   if (typeof error !== 'object') {
+    logError(`Unexpected error while vaulting field`, error);
     return undefined;
   }
 
@@ -32,9 +35,9 @@ const processFieldErrors = (
     if (field && cardDI) {
       validatedErrors[field] = value;
     } else {
-      LoggerDeprecated.error(
-        `Could not parse error while vaulting field ${key}: `,
-        value,
+      logError(
+        `Could not parse error while vaulting field ${key}:${value}`,
+        error,
       );
     }
   });

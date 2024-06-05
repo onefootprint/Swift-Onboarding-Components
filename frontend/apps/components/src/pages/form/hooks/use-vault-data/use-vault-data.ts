@@ -1,4 +1,4 @@
-import { LoggerDeprecated } from '@onefootprint/idv';
+import { getLogger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier, UsersVaultRequest } from '@onefootprint/types';
 import type { AxiosError } from 'axios';
@@ -18,6 +18,8 @@ export type UsersVaultArgs = UsersVaultRequest & {
   onError: (errorMessage: string | UsersVaultErrorMessage) => void;
 };
 
+const { logError } = getLogger({ location: 'use-vault-data' });
+
 const useVaultData = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.secure-form.errors',
@@ -32,7 +34,7 @@ const useVaultData = () => {
   }: UsersVaultArgs) => {
     if (!authToken) {
       onError(t('missing-auth-token'));
-      LoggerDeprecated.error('Found empty auth token while vaulting data.');
+      logError('Found empty auth token while vaulting data.');
       return;
     }
 
@@ -45,13 +47,14 @@ const useVaultData = () => {
         onSuccess,
         onError: (err: unknown) => {
           const fieldErrors = (err as AxiosError<UsersVaultError>)?.response
-            ?.data.error.message;
+            ?.data?.error?.message;
           if (fieldErrors && typeof fieldErrors === 'object') {
             onError(fieldErrors);
           } else {
             const errorMessage = getErrorMessage(err);
-            LoggerDeprecated.error(
+            logError(
               `Form encountered error while vaulting data: ${errorMessage}`,
+              err,
             );
             onError(errorMessage);
           }

@@ -1,5 +1,4 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
 
@@ -7,11 +6,9 @@ import Content from './components/content';
 import Loading from './components/loading';
 
 const Render = () => (
-  <ObserveCollectorProvider appName="render">
-    <Suspense fallback={<Loading />}>
-      <Content fallback={<Loading />} />
-    </Suspense>
-  </ObserveCollectorProvider>
+  <Suspense fallback={<Loading />}>
+    <Content fallback={<Loading />} />
+  </Suspense>
 );
 
 export const getServerSideProps: GetServerSideProps = async ({

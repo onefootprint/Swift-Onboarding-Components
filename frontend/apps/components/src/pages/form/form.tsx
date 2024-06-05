@@ -1,10 +1,5 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import {
-  ObserveCollectorProvider,
-  useObserveCollector,
-} from '@onefootprint/dev-tools';
-import { LoggerDeprecated } from '@onefootprint/idv';
-import * as LogRocket from 'logrocket';
+import { Logger } from '@onefootprint/idv';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -13,14 +8,8 @@ import Content from './components/content';
 import Loading from './components/loading';
 
 const Form = () => {
-  const observeCollector = useObserveCollector();
   useEffectOnce(() => {
-    LoggerDeprecated.setupLogRocket('form');
-    LogRocket.getSessionURL(logRocketSessionUrl => {
-      observeCollector.setAppContext({
-        logRocketSessionUrl,
-      });
-    });
+    Logger.enableLogRocket();
   });
 
   return (
@@ -30,11 +19,7 @@ const Form = () => {
   );
 };
 
-const FormWithProvider = () => (
-  <ObserveCollectorProvider appName="form">
-    <Form />
-  </ObserveCollectorProvider>
-);
+const FormWithProvider = () => <Form />;
 
 export const getServerSideProps: GetServerSideProps = async ({
   res,

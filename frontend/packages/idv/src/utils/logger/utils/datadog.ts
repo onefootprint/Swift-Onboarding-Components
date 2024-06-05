@@ -28,6 +28,11 @@ const appServiceMap: Record<
     id: process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_AUTH,
     token: process.env.NEXT_PUBLIC_DDOG_CLIENT_TOKEN_AUTH,
   },
+  components: {
+    service: 'components',
+    id: process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_COMPONENTS,
+    token: process.env.NEXT_PUBLIC_DDOG_CLIENT_TOKEN_COMPONENTS,
+  },
   bifrost: {
     service: 'bifrost',
     id: process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_BIFROST,

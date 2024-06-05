@@ -1,5 +1,5 @@
 import type { FootprintRenderDataProps } from '@onefootprint/footprint-js';
-import { LoggerDeprecated } from '@onefootprint/idv';
+import { getLogger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
@@ -13,14 +13,12 @@ import getMaskForId from '../../utils/get-mask-for-id';
 import Invalid from '../invalid';
 import RenderBase from '../render-base';
 
-type ContentProps = {
-  fallback: JSX.Element;
-};
+type ContentProps = { fallback: JSX.Element };
+
+const { logError, logTrack, logWarn } = getLogger({ location: 'content' });
 
 const Content = ({ fallback }: ContentProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.secure-render',
-  });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.secure-render' });
   const [props, setProps] = useState<FootprintRenderDataProps>();
   useProps<FootprintRenderDataProps>(setProps);
   const decryptMutation = useEntitiesVaultDecrypt();
@@ -64,7 +62,7 @@ const Content = ({ fallback }: ContentProps) => {
   };
 
   useEffect(() => {
-    LoggerDeprecated.info(
+    logTrack(
       `Received form props: id=${id}, label=${label}, canCopy=${
         canCopy ? 'true' : 'false'
       }, defaultHidden=${defaultHidden ? 'true' : 'false'}, showHiddenToggle=${
@@ -74,31 +72,30 @@ const Content = ({ fallback }: ContentProps) => {
   }, [authToken, id, label, canCopy, showHiddenToggle, defaultHidden]);
 
   if (isLoading) {
-    LoggerDeprecated.info('Fetching client token fields');
+    logTrack('Fetching client token fields');
     return fallback; // Default to a loading state here
   }
   if (!props) {
-    LoggerDeprecated.info('No props passed to secure form');
+    logWarn('No props passed to secure form');
     return fallback; // Default to a loading state here
   }
 
   const isValid = arePropsValid(props);
   if (!isValid) {
-    LoggerDeprecated.error('Invalid props passed to secure form');
+    logError('Invalid props passed to secure form');
     return <Invalid />;
   }
 
   if (isError) {
-    LoggerDeprecated.error(
+    logError(
       `Decrypting vault data failed with error: ${getErrorMessage(error)}`,
+      error,
     );
     return <Invalid />;
   }
 
   if (!data) {
-    LoggerDeprecated.error(
-      'Received empty response while decrypting vault data',
-    );
+    logError('Received empty response while decrypting vault data');
     return <Invalid />;
   }
 

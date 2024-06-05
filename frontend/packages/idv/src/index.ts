@@ -73,7 +73,6 @@ export {
   isUndefined,
   isValidTokenFormat,
   Logger,
-  LoggerDeprecated,
   default as media,
   shouldChallengeEmail,
   withProvider,
