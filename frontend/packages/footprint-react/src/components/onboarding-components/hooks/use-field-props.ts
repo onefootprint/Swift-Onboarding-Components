@@ -244,6 +244,15 @@ const common: Record<string, Field> = {
   },
 };
 
+const business: Record<string, Field> = {
+  name: {
+    placeholder: 'Acme Bank Inc.',
+    validations: {
+      required: 'Business name cannot be empty or is invalid',
+    },
+  },
+};
+
 const getProps = (name: string) => {
   if (name === 'id.phone_number') {
     return person.phoneNumber;
@@ -286,6 +295,9 @@ const getProps = (name: string) => {
   }
   if (name === 'id.zip' || name === 'business.zip') {
     return common.zip;
+  }
+  if (name === 'business.name') {
+    return business.name;
   }
   if (name.startsWith('custom')) {
     return common.custom;
