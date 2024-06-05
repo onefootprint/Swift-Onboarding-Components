@@ -190,7 +190,11 @@ jobs:
           sed -i 's/tests/* tests/g' out.txt
           echo '### Local integration tests' > test_out.txt
           cat out.txt >> test_out.txt
-          echo -e "$SHORT_SUMMARY" >> test_out.txt
+          if [ ! -z "$SHORT_SUMMARY" ]; then
+            echo '```' >> test_out.txt
+            echo -e "$SHORT_SUMMARY" >> test_out.txt
+            echo '```' >> test_out.txt
+          fi
           COMMENT="$(cat test_out.txt)"
           COMMENT="${COMMENT//'%'/'%25'}"
           COMMENT="${COMMENT//$'\n'/'%0A'}"
