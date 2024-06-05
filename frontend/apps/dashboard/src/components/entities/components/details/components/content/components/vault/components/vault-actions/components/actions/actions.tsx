@@ -14,19 +14,23 @@ import AddToListDialog from '../add-to-list-dialog';
 import RequestMoreInfoDialog from '../request-more-info-dialog';
 import SummarizeAiDialog from '../summarize-ai-dialog';
 import UpdateAuthDialog from '../update-auth-dialog';
+import UploadDocDialog from '../upload-doc-dialog';
 
 enum ActionDialog {
   auth,
   requestMoreInfo,
   addToList,
   summarize,
+  uploadDoc,
 }
 
 const Actions = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.actions' });
+  const { t: newT } = useTranslation('entity-details', {
+    keyPrefix: 'header.actions',
+  });
   const editControls = useEditControls();
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
-
   const shouldShowActionsDropdown = entity.kind === EntityKind.person;
   const { AiPreviewFeaturesEnabledOrgIds } = useFlags();
   const orgIds = new Set<string>(AiPreviewFeaturesEnabledOrgIds);
@@ -53,6 +57,10 @@ const Actions = ({ entity }: WithEntityProps) => {
     setOpenDialog(ActionDialog.summarize);
   };
 
+  const handleOpenUploadDocDialog = () => {
+    setOpenDialog(ActionDialog.uploadDoc);
+  };
+
   return shouldShowActionsDropdown ? (
     <>
       <Dropdown.Root>
@@ -66,6 +74,14 @@ const Actions = ({ entity }: WithEntityProps) => {
           >
             <Dropdown.Item onSelect={editControls.start}>
               {t('edit-user.label')}
+            </Dropdown.Item>
+          </PermissionGate>
+          <PermissionGate
+            scopeKind={RoleScopeKind.writeEntities}
+            fallbackText={newT('upload-doc.not-allowed')}
+          >
+            <Dropdown.Item onSelect={handleOpenUploadDocDialog}>
+              {newT('upload-doc.label')}
             </Dropdown.Item>
           </PermissionGate>
           <PermissionGate
@@ -113,6 +129,10 @@ const Actions = ({ entity }: WithEntityProps) => {
       />
       <SummarizeAiDialog
         open={openDialog === ActionDialog.summarize}
+        onClose={handleCloseDialog}
+      />
+      <UploadDocDialog
+        open={openDialog === ActionDialog.uploadDoc}
         onClose={handleCloseDialog}
       />
     </>

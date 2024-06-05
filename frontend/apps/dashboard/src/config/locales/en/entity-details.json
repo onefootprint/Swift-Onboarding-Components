@@ -1,4 +1,31 @@
 {
+  "header": {
+    "actions": {
+      "upload-doc": {
+        "label": "Upload document manually",
+        "not-allowed": "You're not allowed to upload documents",
+        "form": {
+          "identifier": {
+            "label": "Identifier",
+            "errors": {
+              "required": "Identifier is required"
+            }
+          },
+          "document": {
+            "label": "Document",
+            "upload-new": "Upload new",
+            "cta": "Choose file to upload",
+            "or-drag": "or drag and drop",
+            "supported-formats": "Supported formats: PNG, JPG (max size 5MB)",
+            "errors": {
+              "required": "Document is required"
+            },
+            "preview-alt": "Document preview"
+          }
+        }
+      }
+    }
+  },
   "other-insights": {
     "title": "Other insights",
     "onboarding": "Onboarding",

@@ -11,12 +11,12 @@ import useEntityId from '@/entity/hooks/use-entity-id';
 
 import useGenerateAiSummaryRequest from '../../hooks/use-ai-summarize';
 
-export type SummarizeAiDialogueProps = {
+export type SummarizeAiDialogProps = {
   open: boolean;
   onClose: () => void;
 };
 
-const SummarizeAiDialogue = ({ open, onClose }: SummarizeAiDialogueProps) => {
+const SummarizeAiDialog = ({ open, onClose }: SummarizeAiDialogProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.actions.summarize',
   });
@@ -157,4 +157,4 @@ const ResponseContainer = styled(motion(Stack))`
 
 const Section = styled(motion(Stack))``;
 
-export default SummarizeAiDialogue;
+export default SummarizeAiDialog;
