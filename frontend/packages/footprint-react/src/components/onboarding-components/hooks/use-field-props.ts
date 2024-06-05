@@ -20,6 +20,10 @@ type Field = React.InputHTMLAttributes<HTMLInputElement> & {
   mask?: CleaveOptions;
   validations?: {
     required?: boolean | string;
+    pattern?: {
+      value: RegExp;
+      message: string;
+    };
     validate?: (value: string) => string | boolean;
   };
 };
