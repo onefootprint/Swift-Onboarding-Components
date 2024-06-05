@@ -97,7 +97,11 @@ export const getAutoCompleteCity = (
       )
     : undefined;
 
-  return cityFromSecondaryText || localities.pop() || sublocalities.pop();
+  return (
+    cityFromSecondaryText ||
+    (localities.length > 0 ? localities[0] : undefined) ||
+    (sublocalities.length > 0 ? sublocalities[0] : undefined)
+  );
 };
 
 const getAddressLine1 = (
@@ -161,10 +165,16 @@ export const getAddressParts = (
   return parts;
 };
 
-const getAddressComponent = async (prediction: Prediction) => {
+const getAddressComponent = async (
+  prediction: Prediction,
+  country: CountryCode,
+) => {
   let addressComponents: AddressComponent[] = [];
+  let language: string | undefined;
+  if (country === 'US') language = 'en';
+  if (country === 'MX') language = 'es';
   try {
-    const result = await getDetails({ placeId: prediction.place_id });
+    const result = await getDetails({ placeId: prediction.place_id, language });
     if (typeof result !== 'object' || !result.address_components) {
       return null;
     }

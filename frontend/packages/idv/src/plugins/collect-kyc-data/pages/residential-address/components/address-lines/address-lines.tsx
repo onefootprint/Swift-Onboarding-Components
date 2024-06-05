@@ -39,7 +39,7 @@ const AddressLines = () => {
       setValue('addressLine1', formattedStreetAddress);
     }
 
-    const result = await getAddressComponent(prediction);
+    const result = await getAddressComponent(prediction, country.value);
     if (result) {
       if (result.addressLine1) {
         setValue('addressLine1', result.addressLine1);

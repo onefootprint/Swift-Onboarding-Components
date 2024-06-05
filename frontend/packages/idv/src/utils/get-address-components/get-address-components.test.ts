@@ -34,17 +34,17 @@ describe('getAddressComponents', () => {
       });
 
       it('should return the city', async () => {
-        const result = await getAddressComponents(fixtures.prediction);
+        const result = await getAddressComponents(fixtures.prediction, 'US');
         expect(result?.city).toBe('San Francisco');
       });
 
       it('should return the state', async () => {
-        const result = await getAddressComponents(fixtures.prediction);
+        const result = await getAddressComponents(fixtures.prediction, 'US');
         expect(result?.state).toBe('California');
       });
 
       it('should return the zip', async () => {
-        const result = await getAddressComponents(fixtures.prediction);
+        const result = await getAddressComponents(fixtures.prediction, 'US');
         expect(result?.zip).toBe('94110');
       });
     });
@@ -55,7 +55,7 @@ describe('getAddressComponents', () => {
       });
 
       it('should return nothing', async () => {
-        const result = await getAddressComponents(fixtures.prediction);
+        const result = await getAddressComponents(fixtures.prediction, 'US');
         expect(result).toBeNull();
       });
     });
@@ -67,7 +67,7 @@ describe('getAddressComponents', () => {
     });
 
     it('should return nothing', async () => {
-      const result = await getAddressComponents(fixtures.prediction);
+      const result = await getAddressComponents(fixtures.prediction, 'US');
       expect(result).toBeNull();
     });
   });
