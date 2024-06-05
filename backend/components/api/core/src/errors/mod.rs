@@ -19,6 +19,7 @@ use actix_web::http::StatusCode;
 use aws_sdk_pinpointsmsvoicev2::error::SdkError as SmsSdkError;
 use aws_sdk_pinpointsmsvoicev2::operation::send_text_message::SendTextMessageError;
 use db::errors::DbError;
+use error_with_code::CodedError;
 use newtypes::output::Csv;
 use newtypes::{
     ContactInfoKind,
@@ -28,7 +29,6 @@ use newtypes::{
     Uuid,
 };
 use paperclip::actix::api_v2_errors;
-use strum::EnumMessage;
 use thiserror::Error;
 use twilio::error::Error as TwilioError;
 use webauthn_rs_core::error::WebauthnError;
@@ -435,16 +435,16 @@ impl actix_web::ResponseError for ApiError {
         let support_id = Uuid::new_v4();
         let status_code = self.status_code().as_u16();
 
-        // in prod, omit 500 errors from the client
-        let (error_code, error_context, message) = if let ApiErrorKind::ErrorWithCode(error) = self.kind() {
-            let error_code = Some(error.get_message().unwrap_or_default().to_string());
-            let error_context = error.context();
-            let message = ErrorMessage::String(error.to_string());
-            (error_code, error_context, message)
-        } else {
-            (None, None, self.message())
+        // Some errors have specific error codes and context
+        let error_with_code = match self.kind() {
+            ApiErrorKind::ErrorWithCode(e) => Some(e as &dyn CodedError),
+            _ => None,
         };
+        let code = error_with_code.map(|e| e.code());
+        let context = error_with_code.and_then(|e| e.context());
+        let message = self.message();
 
+        // in prod, omit 500 errors from the client
         let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR
             && crate::config::SERVICE_CONFIG.is_production()
         {
@@ -480,8 +480,8 @@ impl actix_web::ResponseError for ApiError {
             error: FpResponseErrorInfo {
                 status_code,
                 message,
-                code: error_code,
-                context: error_context,
+                code,
+                context,
                 support_id,
             },
         })

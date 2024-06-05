@@ -4,74 +4,104 @@ use serde_json::{
     json,
     Value,
 };
-use strum::EnumMessage;
 use strum_macros;
 
-#[derive(Debug, strum_macros::EnumMessage, strum_macros::EnumIter)]
+#[derive(Debug, strum_macros::EnumDiscriminants, thiserror::Error)]
+#[strum_discriminants(name(ErrorWithCodeKind))]
+#[strum_discriminants(derive(strum_macros::Display, strum_macros::EnumIter))]
 pub enum ErrorWithCode {
-    #[strum(message = "E101", detailed_message = "Cannot transition status backwards")]
+    #[strum_discriminants(strum(serialize = "E101"))]
+    #[error("Cannot transition status backwards")]
     InvalidStatusTransition,
-    #[strum(message = "E102", detailed_message = "Incorrect PIN code")]
+    #[strum_discriminants(strum(serialize = "E102"))]
+    #[error("Incorrect PIN code")]
     IncorrectPin,
-    #[strum(
-        message = "E103",
-        detailed_message = "Challenge has timed out. Please try again"
-    )]
+    #[strum_discriminants(strum(serialize = "E103"))]
+    #[error("Challenge has timed out. Please try again")]
     ChallengeExpired,
-    #[strum(message = "E104", detailed_message = "Please wait a few more seconds")]
+    #[strum_discriminants(strum(serialize = "E104"))]
+    #[error("Please wait a few more seconds")]
     RateLimited(i64),
-    #[strum(
-        message = "E105",
-        detailed_message = "Cannot initiate a challenge of requested kind"
-    )]
+    #[strum_discriminants(strum(serialize = "E105"))]
+    #[error("Cannot initiate a challenge of requested kind")]
     UnsupportedChallengeKind(String),
-    #[strum(message = "E106", detailed_message = "Cannot register passkey")]
+    #[strum_discriminants(strum(serialize = "E106"))]
+    #[error("Cannot register passkey")]
     CannotRegisterPasskey,
-    #[strum(
-        message = "E107",
-        detailed_message = "Login challenge initiated for non-existent user vault"
-    )]
+    #[strum_discriminants(strum(serialize = "E107"))]
+    #[error("Login challenge initiated for non-existent user vault")]
     LoginChallengeUserNotFound,
-    #[strum(
-        message = "E108",
-        detailed_message = "Provide one user identifier to initiate a challenge"
-    )]
+    #[strum_discriminants(strum(serialize = "E108"))]
+    #[error("Provide one user identifier to initiate a challenge")]
     OnlyOneIdentifier,
-    #[strum(
-        message = "E109",
-        detailed_message = "Identity document is not pending upload"
-    )]
+    #[strum_discriminants(strum(serialize = "E109"))]
+    #[error("Identity document is not pending upload")]
     DocumentNotPending,
-    #[strum(message = "E110", detailed_message = "Invalid file upload: body missing")]
+    #[strum_discriminants(strum(serialize = "E110"))]
+    #[error("Invalid file upload: body missing")]
     InvalidFileUploadMissing,
-    #[strum(message = "E111", detailed_message = "Missing content type (mime)")]
+    #[strum_discriminants(strum(serialize = "E111"))]
+    #[error("Missing content type (mime)")]
     MissingMimeType,
-    #[strum(message = "E112", detailed_message = "Invalid file type")]
+    #[strum_discriminants(strum(serialize = "E112"))]
+    #[error("Invalid file type")]
     InvalidMimeType(String),
-    #[strum(message = "E113", detailed_message = "Invalid file upload, try another file")]
+    #[strum_discriminants(strum(serialize = "E113"))]
+    #[error("Invalid file upload, try another file")]
     MultipartError,
-    #[strum(message = "E114", detailed_message = "Image too large")]
+    #[strum_discriminants(strum(serialize = "E114"))]
+    #[error("Image too large")]
     FileTooLarge(usize),
-    #[strum(message = "E115", detailed_message = "Invalid content length")]
+    #[strum_discriminants(strum(serialize = "E115"))]
+    #[error("Invalid content length")]
     InvalidContentLength,
-    #[strum(message = "E116", detailed_message = "Missing filename")]
+    #[strum_discriminants(strum(serialize = "E116"))]
+    #[error("Missing filename")]
     MissingFilename,
-    #[strum(message = "E117", detailed_message = "Session does not exist")]
+    #[strum_discriminants(strum(serialize = "E117"))]
+    #[error("Session does not exist")]
     NoSessionFound,
-    #[strum(message = "E118", detailed_message = "Session is expired")]
+    #[strum_discriminants(strum(serialize = "E118"))]
+    #[error("Session is expired")]
     SessionExpired,
-    #[strum(message = "E119", detailed_message = "Session invalid")]
+    #[strum_discriminants(strum(serialize = "E119"))]
+    #[error("Session invalid")]
     CouldNotParseSession,
-    #[strum(message = "E120", detailed_message = "Please log into your existing account")]
+    #[strum_discriminants(strum(serialize = "E120"))]
+    #[error("Please log into your existing account")]
     ExistingVault(SessionAuthToken),
-    #[strum(message = "E121", detailed_message = "File upload exceeded time limit")]
+    #[strum_discriminants(strum(serialize = "E121"))]
+    #[error("File upload exceeded time limit")]
     FileUploadTimeout,
-    #[strum(message = "E122", detailed_message = "Image too small")]
+    #[strum_discriminants(strum(serialize = "E122"))]
+    #[error("Image too small")]
     FileTooSmall(usize),
 }
 
-impl ErrorWithCode {
-    pub fn status_code(&self) -> StatusCode {
+pub(crate) trait CodedError: std::error::Error {
+    fn context(&self) -> Option<Value>;
+    fn code(&self) -> String;
+    fn status_code(&self) -> StatusCode;
+}
+
+impl CodedError for ErrorWithCode {
+    fn context(&self) -> Option<Value> {
+        let context = match self {
+            Self::RateLimited(seconds) => json!({ "seconds": seconds }),
+            Self::UnsupportedChallengeKind(challenge_kind) => json!({ "challenge_kind": challenge_kind }),
+            Self::InvalidMimeType(file_type) => json!({ "file_type": file_type }),
+            Self::FileTooLarge(max_size) => json!({ "max_size": max_size }),
+            Self::ExistingVault(token) => json!({ "token": token }),
+            _ => return None,
+        };
+        Some(context)
+    }
+
+    fn code(&self) -> String {
+        ErrorWithCodeKind::from(self).to_string()
+    }
+
+    fn status_code(&self) -> StatusCode {
         match self {
             Self::InvalidStatusTransition => StatusCode::BAD_REQUEST,
             Self::IncorrectPin => StatusCode::BAD_REQUEST,
@@ -99,54 +129,17 @@ impl ErrorWithCode {
     }
 }
 
-macro_rules! context_macro {
-    ($($variant:ident($param:ident: $type:ty)),*) => {
-        impl ErrorWithCode {
-            pub fn context(&self) -> Option<Value> {
-                match self {
-                    $(
-                        Self::$variant($param) => {
-                            Some(json!({ stringify!($param): $param }))
-                        },
-                    )*
-                    _ => None,
-                }
-            }
-        }
-    };
-}
-
-context_macro!(
-    RateLimited(seconds: i64),
-    UnsupportedChallengeKind(challenge_kind: String),
-    InvalidMimeType(file_type: String),
-    FileTooLarge(max_size: usize),
-    ExistingVault(token: SessionAuthToken)
-);
-
-impl std::error::Error for ErrorWithCode {}
-impl std::fmt::Display for ErrorWithCode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.get_detailed_message().unwrap_or_default())
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::ErrorWithCode;
+    use crate::errors::error_with_code::ErrorWithCodeKind;
     use itertools::Itertools;
-    use strum::{
-        EnumMessage,
-        IntoEnumIterator,
-    };
+    use strum::IntoEnumIterator;
 
     #[test]
     fn test_unique_error_codes() {
-        let codes = ErrorWithCode::iter()
-            .filter_map(|e| e.get_message())
-            .unique()
-            .count();
-        let total = ErrorWithCode::iter().count();
+        assert!(ErrorWithCodeKind::iter().all(|e| !e.to_string().is_empty()));
+        let codes = ErrorWithCodeKind::iter().map(|e| e.to_string()).unique().count();
+        let total = ErrorWithCodeKind::iter().count();
         assert_eq!(codes, total, "Duplicate or missing error codes");
     }
 }
