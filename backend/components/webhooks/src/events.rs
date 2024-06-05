@@ -16,30 +16,53 @@ use newtypes::{
     WebhookEvent as NTWebhookEvent,
 };
 use schemars::JsonSchema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Serialize;
+use serde_with::SerializeDisplay;
 use strum::{
+    EnumDiscriminants,
     EnumIter,
     EnumMessage,
+    IntoEnumIterator,
 };
 
 /// Defines supported webhook event types and payloads
-#[derive(Debug, strum::Display, Clone, Eq, PartialEq, Serialize, Deserialize, EnumIter, EnumMessage)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, EnumDiscriminants)]
+#[strum_discriminants(name(WebhookEventKind))]
+#[strum_discriminants(derive(strum_macros::Display, SerializeDisplay, EnumMessage, EnumIter))]
 #[serde(untagged)]
 pub enum WebhookEvent {
-    #[strum(serialize = "footprint.onboarding.completed")]
-    #[strum(message = "An onboarding was just completed")]
+    #[strum_discriminants(strum(serialize = "footprint.onboarding.completed"))]
+    #[strum_discriminants(strum(message = "An onboarding was just completed"))]
     OnboardingCompleted(OnboardingCompletedPayload),
 
-    #[strum(serialize = "footprint.onboarding.status_changed")]
-    #[strum(message = "The status of an onboarding has changed")]
+    #[strum_discriminants(strum(serialize = "footprint.onboarding.status_changed"))]
+    #[strum_discriminants(strum(message = "The status of an onboarding has changed"))]
     OnboardingStatusChanged(OnboardingStatusChangedPayload),
 
-    #[strum(serialize = "footprint.watchlist_check.completed")]
-    #[strum(message = "A watchlist check has run for the vault")]
+    #[strum_discriminants(strum(serialize = "footprint.watchlist_check.completed"))]
+    #[strum_discriminants(strum(message = "A watchlist check has run for the vault"))]
     WatchlistCheckCompleted(WatchlistCheckCompletedPayload),
+}
+
+impl schemars::JsonSchema for WebhookEventKind {
+    fn schema_name() -> std::string::String {
+        "WebhookEventKind".to_owned()
+    }
+
+    fn schema_id() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed(std::concat!(std::module_path!(), "::", "WebhookEventKind"))
+    }
+
+    fn json_schema(_: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        schemars::_private::apply_metadata(
+            schemars::schema::Schema::Object(schemars::schema::SchemaObject {
+                instance_type: Some(schemars::schema::InstanceType::String.into()),
+                enum_values: Some(WebhookEventKind::iter().map(|k| k.to_string().into()).collect()),
+                ..Default::default()
+            }),
+            schemars::schema::Metadata { ..Default::default() },
+        )
+    }
 }
 
 /// all of the payload bodies
@@ -50,7 +73,7 @@ mod payloads {
         WatchlistCheckStatusKind,
     };
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
     #[schemars(example = "OnboardingCompletedPayload::example")]
     pub struct OnboardingCompletedPayload {
         /// the footprint id of the entity that completed onboarding
@@ -63,7 +86,7 @@ mod payloads {
         pub is_live: bool,
     }
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
     #[schemars(example = "OnboardingStatusChangedPayload::example")]
 
     pub struct OnboardingStatusChangedPayload {
@@ -77,7 +100,7 @@ mod payloads {
         pub is_live: bool,
     }
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
     #[schemars(example = "WatchlistCheckCompletedPayload::example")]
 
     pub struct WatchlistCheckCompletedPayload {
@@ -99,16 +122,12 @@ mod payloads {
     #[serde(rename_all = "snake_case")]
     enum OnboardingStatusShadow {
         #[allow(unused)]
-        /// Passed all checks
         Pass,
         #[allow(unused)]
-        /// Failed one or more check
         Fail,
         #[allow(unused)]
-        /// The user has not yet finished entering all information
         Incomplete,
         #[allow(unused)]
-        /// All required data has been collected. We are waiting for a firm decision
         Pending,
     }
 
@@ -179,7 +198,7 @@ mod examples {
 
 impl WebhookEvent {
     pub fn event_type(&self) -> String {
-        self.to_string()
+        WebhookEventKind::from(self).to_string()
     }
 }
 

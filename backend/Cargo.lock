@@ -9518,6 +9518,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "serde_with",
  "strum",
  "strum_macros",
  "svix",

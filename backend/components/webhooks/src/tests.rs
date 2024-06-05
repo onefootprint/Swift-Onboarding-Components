@@ -24,28 +24,25 @@ fn test_raw() {
     assert_eq!(evt.event_type().as_str(), "footprint.onboarding.completed");
 }
 
-/// NOTE: For now we manually run this test to generate schemas and synchronize them to SVIX
-/// but in the future we should push this automatically via CI
 #[test]
 #[ignore]
 fn generate_event_type_schema() {
-    for evt in WebhookEvent::iter() {
-        let name = evt.event_type();
+    for evt in WebhookEventKind::iter() {
         match evt {
-            WebhookEvent::OnboardingCompleted(p) => generate(&name, p),
-            WebhookEvent::OnboardingStatusChanged(p) => generate(&name, p),
-            WebhookEvent::WatchlistCheckCompleted(p) => generate(&name, p),
+            WebhookEventKind::OnboardingCompleted => generate::<OnboardingCompletedPayload>(evt),
+            WebhookEventKind::OnboardingStatusChanged => generate::<OnboardingStatusChangedPayload>(evt),
+            WebhookEventKind::WatchlistCheckCompleted => generate::<WatchlistCheckCompletedPayload>(evt),
         }
     }
 }
 
-fn generate<T: schemars::JsonSchema>(name: &str, _t: T) {
+fn generate<T: schemars::JsonSchema>(evt: WebhookEventKind) {
     let generator = schemars::gen::SchemaGenerator::new(SchemaSettings::draft07());
     let schema = generator.into_root_schema_for::<T>();
-    export_type_schema(schema, name);
+    export_type_schema(schema, evt.to_string().as_ref());
 }
 
-fn generate_json_value<T: schemars::JsonSchema>(_t: T) -> serde_json::Value {
+fn generate_json_value<T: schemars::JsonSchema>() -> serde_json::Value {
     let generator = schemars::gen::SchemaGenerator::new(SchemaSettings::draft07());
     let schema = generator.into_root_schema_for::<T>();
     serde_json::to_value(&schema).expect("serialize schema")
@@ -66,23 +63,26 @@ async fn sync_webhook_event_types() {
     let auth_token = std::env::var("SVIX_AUTH_TOKEN").expect("missing SVIX_AUTH_TOKEN env");
     let client = svix::api::Svix::new(auth_token, None);
 
-    for evt in WebhookEvent::iter() {
-        let name = evt.event_type();
+    for evt in WebhookEventKind::iter() {
         let description = evt.get_message().unwrap_or("").to_string();
         let schema = match evt {
-            WebhookEvent::OnboardingCompleted(p) => generate_json_value(p),
-            WebhookEvent::OnboardingStatusChanged(p) => generate_json_value(p),
-            WebhookEvent::WatchlistCheckCompleted(p) => generate_json_value(p),
+            WebhookEventKind::OnboardingCompleted => generate_json_value::<OnboardingCompletedPayload>(),
+            WebhookEventKind::OnboardingStatusChanged => {
+                generate_json_value::<OnboardingStatusChangedPayload>()
+            }
+            WebhookEventKind::WatchlistCheckCompleted => {
+                generate_json_value::<WatchlistCheckCompletedPayload>()
+            }
         };
 
         let schemas = HashMap::from_iter([("1".to_string(), schema)]);
-        let result = client.event_type().get(name.clone()).await;
+        let result = client.event_type().get(evt.to_string()).await;
         match &result {
             Ok(_) => {
                 client
                     .event_type()
                     .update(
-                        name.clone(),
+                        evt.to_string(),
                         svix::api::EventTypeUpdate {
                             archived: None,
                             feature_flag: None,
@@ -93,7 +93,7 @@ async fn sync_webhook_event_types() {
                     )
                     .await
                     .expect("failed to update");
-                eprintln!("Updated schema for: {}", name);
+                eprintln!("Updated schema for: {}", evt);
                 continue;
             }
             Err(svix::error::Error::Http(err)) => {
@@ -105,20 +105,20 @@ async fn sync_webhook_event_types() {
                                 archived: None,
                                 feature_flag: None,
                                 description,
-                                name: name.clone(),
+                                name: evt.to_string(),
                                 schemas: Some(schemas),
                             },
                             None,
                         )
                         .await
                         .expect("failed to create");
-                    eprintln!("Created schema for: {}", &name);
+                    eprintln!("Created schema for: {}", evt);
                     continue;
                 }
             }
             _ => {}
         }
 
-        let _ = result.unwrap_or_else(|_| panic!("Failed to sync webhook event type: {}", name));
+        let _ = result.unwrap_or_else(|_| panic!("Failed to sync webhook event type: {}", evt));
     }
 }

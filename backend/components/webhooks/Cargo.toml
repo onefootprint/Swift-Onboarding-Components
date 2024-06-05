@@ -24,3 +24,4 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 mockall = { workspace = true }
 schemars = { workspace = true, features = ["chrono"] }
+serde_with = { workspace = true }
