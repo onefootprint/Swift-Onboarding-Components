@@ -4,10 +4,12 @@ const apiKey = 'AIzaSyCgSmhug-DYfU5ozUNCyTfKyVX3VvPTSUs'; // process.env.GOOGLE_
 
 const getGoogleMapsAddressDetails = async (
   placeId: string,
+  lang?: 'spanish' | 'english',
 ): Promise<AddressPlace | null> => {
   try {
+    const languageParam = lang === 'spanish' ? '&language=es' : '';
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${apiKey}`,
+      `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${apiKey}${languageParam}`,
     );
     if (!response.ok) {
       throw new Error(`Google Maps API Error: ${response.status}`);

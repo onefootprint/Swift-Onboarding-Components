@@ -8,9 +8,12 @@ const getValue = (key: string, addressComponent: AddressGeocoder[]) => {
   return part ? part.long_name : null;
 };
 
-const getAddressComponent = async (placeId: string) => {
+const getAddressComponent = async (
+  placeId: string,
+  lang?: 'spanish' | 'english',
+) => {
   try {
-    const result = await getGoogleMapsAddressDetails(placeId);
+    const result = await getGoogleMapsAddressDetails(placeId, lang);
     if (typeof result === 'object' && result.address_components) {
       const addressComponents = result.address_components;
       return {
