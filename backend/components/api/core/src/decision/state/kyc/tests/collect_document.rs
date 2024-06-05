@@ -246,7 +246,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     assert!(obd.status == expected_status);
 
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert_eq!(doc_outcome.expected_onboarding_decision(), wf.status.unwrap());
+    assert_eq!(doc_outcome.expected_onboarding_decision(), wf.status);
     let expect_mr = doc_outcome.expect_manual_review();
     assert_eq!(expect_mr, !mrs.is_empty());
 
@@ -398,7 +398,7 @@ async fn redo_document_and_pass(
     assert!(obd.status == DecisionStatus::Pass);
     assert_eq!(expect_committed, portablized_seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pass, wf.status);
 
     // check RSG is different
     let rs_passing_doc = query_risk_signals(state, &svid2, RiskSignalGroupKind::Doc).await;

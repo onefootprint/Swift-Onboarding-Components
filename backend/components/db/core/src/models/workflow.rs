@@ -83,7 +83,7 @@ pub struct Workflow {
     pub state: WorkflowState,
     pub config: WorkflowConfig,
     pub fixture_result: Option<WorkflowFixtureResult>,
-    pub status: Option<OnboardingStatus>,
+    pub status: OnboardingStatus,
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
@@ -117,7 +117,7 @@ pub struct NewWorkflow {
     pub state: WorkflowState,
     pub config: WorkflowConfig,
     pub fixture_result: Option<WorkflowFixtureResult>,
-    pub status: Option<OnboardingStatus>,
+    pub status: OnboardingStatus,
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
@@ -382,7 +382,7 @@ impl Workflow {
             state: initial_state,
             config,
             fixture_result,
-            status: Some(OnboardingStatus::Incomplete),
+            status: OnboardingStatus::Incomplete,
             ob_configuration_id,
             insight_event_id,
             authorized_at: authorized.then_some(Utc::now()),
@@ -657,7 +657,7 @@ impl Workflow {
             // currently really mean we have to fire it when we make a decision for the first time
             // or in a redo flow If the current Workflow status is not pass/fail but the new
             // status is, fire OnboardingCompleted (ie anytime a Workflow completes)
-            if !wf.status.map(|s| s.has_decision()).unwrap_or(false) && new_status.has_decision() {
+            if !wf.status.has_decision() && new_status.has_decision() {
                 let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                     fp_id: sv.fp_id.clone(),
                     timestamp: Utc::now(),
@@ -820,7 +820,7 @@ mod tests {
                 state: wf_state,
                 config,
                 fixture_result: None,
-                status: Some(OnboardingStatus::Incomplete),
+                status: OnboardingStatus::Incomplete,
                 ob_configuration_id: None,
                 insight_event_id: None,
                 authorized_at: None,
@@ -848,7 +848,7 @@ mod tests {
                 state: s,
                 config,
                 fixture_result: None,
-                status: Some(OnboardingStatus::Incomplete),
+                status: OnboardingStatus::Incomplete,
                 ob_configuration_id: None,
                 insight_event_id: None,
                 authorized_at: None,

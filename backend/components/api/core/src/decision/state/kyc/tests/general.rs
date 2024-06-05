@@ -101,7 +101,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     state: s,
                     config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
                     fixture_result: None,
-                    status: Some(OnboardingStatus::Incomplete),
+                    status: OnboardingStatus::Incomplete,
                     ob_configuration_id: Some(obc.id),
                     insight_event_id: None,
                     authorized_at: None,
@@ -326,7 +326,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     let portablized_seqno = query_portablized_seqno(state, &svid).await.unwrap();
 
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
-    assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pass, wf.status);
     assert_eq!(obd.as_ref().unwrap().seqno.unwrap(), portablized_seqno);
     assert!(obd.unwrap().rule_set_result_id.is_some());
     assert!(mrs.is_empty());
@@ -551,7 +551,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert!(obd.rule_set_result_id.is_some());
-    assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Fail, wf.status);
     assert_eq!(expect_review, !mrs.is_empty());
 
     match user_kind {
@@ -723,7 +723,7 @@ async fn redo_and_pass(
     assert!(obd.seqno.is_some());
     assert!(obd.rule_set_result_id.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pass, wf.status);
 
     // check RSG is different
     let rs_passing = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;

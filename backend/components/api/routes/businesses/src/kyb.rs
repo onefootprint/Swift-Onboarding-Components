@@ -192,6 +192,8 @@ pub async fn post(
         })
         .await?;
 
-    let status = wf.status.ok_or(OnboardingError::NoStatusForWorkflow)?;
-    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((status, sv, mrs))).json()
+    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((
+        wf.status, sv, mrs,
+    )))
+    .json()
 }

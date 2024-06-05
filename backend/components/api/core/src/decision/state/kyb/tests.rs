@@ -227,7 +227,7 @@ async fn run_kyc_for_bo(
 
     let (wf, _, mrs, obd, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
-    assert_eq!(expected_ob_status, wf.status.unwrap());
+    assert_eq!(expected_ob_status, wf.status);
     let portablized_seqno = query_portablized_seqno(state, &svid).await;
     if matches!(expected_ob_status, OnboardingStatus::Pass) {
         let seq = portablized_seqno.unwrap();
@@ -305,7 +305,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
 
     let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
-    assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pending, wf.status);
 
     // MakeVendorCalls
     let (ww, _) = ww
@@ -364,7 +364,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
 
     assert!(mrs.is_empty());
-    assert_eq!(expected_status, wf.status.unwrap());
+    assert_eq!(expected_status, wf.status);
 
     // check that middesk populated formation DIs
     if matches!(
@@ -458,7 +458,7 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
 
     let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::VendorCalls), wf.state);
-    assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
+    assert_eq!(OnboardingStatus::Pending, wf.status);
 
     // MakeVendorCalls
     let business_id = "business123yo".to_owned();
@@ -532,11 +532,11 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
     match terminal_status {
         TerminalDecisionStatus::Pass => {
             assert!(mrs.is_empty());
-            assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
+            assert_eq!(OnboardingStatus::Pass, wf.status);
         }
         TerminalDecisionStatus::Fail => {
             assert!(!mrs.is_empty());
-            assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
+            assert_eq!(OnboardingStatus::Fail, wf.status);
             expected_rs.push((
                 VendorAPI::MiddeskBusinessUpdateWebhook,
                 FootprintReasonCode::BusinessNameWatchlistHit,

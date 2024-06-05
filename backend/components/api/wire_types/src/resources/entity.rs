@@ -92,7 +92,7 @@ pub enum DataAttributeKind {
 pub struct EntityWorkflow {
     pub created_at: DateTime<Utc>,
     pub playbook_id: Option<ObConfigurationId>,
-    pub status: Option<OnboardingStatus>,
+    pub status: OnboardingStatus,
     pub insight_event: Option<InsightEvent>,
 }
 

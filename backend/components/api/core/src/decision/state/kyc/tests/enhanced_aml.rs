@@ -113,7 +113,7 @@ async fn test(
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     // TODO: This assertion will fail if enhanced_aml = Yes because we are not yet properly
     // incorporating Incode Aml risk signals into rules decisioning!!!!!!!!!!
-    assert_eq!(expected_status, wf.status.unwrap());
+    assert_eq!(expected_status, wf.status);
     let obd = obd.unwrap();
     if expected_status == OnboardingStatus::Fail {
         assert!(!mrs.is_empty());

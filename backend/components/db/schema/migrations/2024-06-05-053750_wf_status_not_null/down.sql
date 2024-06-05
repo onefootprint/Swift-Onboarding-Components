@@ -1,0 +1,2 @@
+ALTER TABLE workflow
+    ALTER COLUMN status DROP NOT NULL;

@@ -125,18 +125,17 @@ pub async fn post(
             return Err(OnboardingError::InvalidSandboxState.into());
         }
         match kind {
-            VaultKind::Person => match wf.status {
-                None => return Err(OnboardingError::NonTerminalState.into()),
-                Some(s) if s.requires_user_input() => return Err(OnboardingError::NonTerminalState.into()),
-                _ => {}
-            },
+            VaultKind::Person => {
+                if wf.status.requires_user_input() {
+                    return Err(OnboardingError::NonTerminalState.into());
+                }
+            }
             // Businesses could still be in status = `incomplete` if we are still waiting for BO's to complete
             // KYC
             VaultKind::Business => {}
         }
 
-        let status = wf.status.ok_or(OnboardingError::NoStatusForWorkflow)?;
-        let response = api_wire_types::EntityValidateResponse::from_db((status, sv, mrs));
+        let response = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs));
         Ok(response)
     };
     let user_auth = UserAuthResponse {
