@@ -23,23 +23,23 @@ const Content = ({ list }: ContentProps) => {
   };
 
   return (
-    <>
+    <Stack direction="column" gap={7} marginTop={3}>
       {list.playbooks?.map(playbook => (
-        <Stack gap={3} direction="column" key={playbook.id} marginTop={2}>
+        <Stack gap={4} direction="column" key={playbook.id}>
           <Stack gap={3} direction="row">
-            <Text variant="label-2">{playbook.name}</Text>
+            <Text variant="label-3">{playbook.name}</Text>
             <Text tag="span" variant="label-2">
               •
             </Text>
             <LinkButton
               onClick={() => handleClickPlaybook(playbook.id)}
-              variant="label-2"
+              variant="label-3"
             >
               {t('details')}
             </LinkButton>
           </Stack>
-          <Stack gap={3} direction="row" alignItems="baseline">
-            <Text variant="label-4" color="tertiary" minWidth="44px">
+          <Stack gap={3} direction="row" alignItems="baseline" paddingLeft={5}>
+            <Text variant="label-3" color="tertiary" minWidth="44px">
               {t('in-rule')}
             </Text>
             <Stack gap={3} direction="column">
@@ -55,7 +55,7 @@ const Content = ({ list }: ContentProps) => {
           {t('empty')}
         </Text>
       )}
-    </>
+    </Stack>
   );
 };
 

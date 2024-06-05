@@ -186,7 +186,7 @@
     "playbooks": {
       "title": "Playbooks using {{alias}}",
       "empty": "There are no playbooks using this list",
-      "details": "See details",
+      "details": "Go to playbook",
       "in-rule": "In rule:",
       "if": "if",
       "and": "and"
