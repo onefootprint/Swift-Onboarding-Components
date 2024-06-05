@@ -3,48 +3,36 @@ from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config, post, get, patch
 from tests.constants import BUSINESS_DATA, CDO_TO_DIS
 
+MUST_COLLECT_DATA = ["business_name", "business_tin", "business_address"]
 
-@pytest.mark.parametrize(
-    "sandbox_outcome,missing_data",
-    [
-        ("pass", True),
-        ("pass", False),
-        ("manual_review", False),
-        ("fail", False),
-    ],
-)
-def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
-    # make API-created Business vault with no BO data present
-    must_collect_data = ["business_name", "business_tin", "business_address"]
-    obc = create_ob_config(
+
+@pytest.fixture
+def obc(sandbox_tenant):
+    return create_ob_config(
         sandbox_tenant,
         "Business-only config",
-        must_collect_data,
-        must_collect_data,
+        MUST_COLLECT_DATA,
+        MUST_COLLECT_DATA,
         kind="kyb",
         skip_kyc=True,
     )
-    vault_data = {
-        di: BUSINESS_DATA[di] for cdo in must_collect_data for di in CDO_TO_DIS[cdo]
-    }
-    expected_error = None
-    if missing_data:
-        vault_data.pop("business.name")
-        expected_error = "Cannot run KYB on this business due to unmet requirements on the playbook. Missing business_name. At a minimum, the following vault data must be provided: business.name"
 
+
+@pytest.mark.parametrize(
+    "sandbox_outcome",
+    ["pass", "manual_review", "fail"],
+)
+def test_no_bos(obc, sandbox_tenant, sandbox_outcome):
+    # make API-created Business vault with no BO data present
+    vault_data = {
+        di: BUSINESS_DATA[di] for cdo in MUST_COLLECT_DATA for di in CDO_TO_DIS[cdo]
+    }
     vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
     fp_id = vault["id"]
 
     # run KYB
-    kyb = post(
-        f"businesses/{fp_id}/kyb",
-        dict(key=obc.key.value, fixture_result=sandbox_outcome),
-        sandbox_tenant.sk.key,
-        status_code=200 if expected_error is None else 400,
-    )
-    if expected_error:
-        assert expected_error in kyb["error"]["message"]
-        return
+    data = dict(key=obc.key.value, fixture_result=sandbox_outcome)
+    kyb = post(f"businesses/{fp_id}/kyb", data, sandbox_tenant.sk.key)
 
     if sandbox_outcome == "manual_review":
         assert kyb["requires_manual_review"] == True
@@ -54,13 +42,26 @@ def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
         assert kyb["status"] == sandbox_outcome
 
     # confirm OBD timeline event created
-    timeline = get(
-        f"entities/{fp_id}/timeline",
-        None,
-        *sandbox_tenant.db_auths,
-    )
+    timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
+
+
+def test_kyb_missing_req(obc, sandbox_tenant):
+    vault_data = {
+        di: BUSINESS_DATA[di] for cdo in MUST_COLLECT_DATA for di in CDO_TO_DIS[cdo]
+    }
+    vault_data.pop("business.name")
+    vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
+    fp_id = vault["id"]
+
+    data = dict(key=obc.key.value, fixture_result="pass")
+    kyb = post(f"businesses/{fp_id}/kyb", data, sandbox_tenant.sk.key, status_code=400)
+    assert kyb["error"]["code"] == "T121"
+    assert (
+        kyb["error"]["message"]
+        == "Cannot run kyb playbook due to unmet requirements. Missing business_name. At a minimum, the following vault data must be provided: business.name"
+    )
 
 
 def test_kyb_with_bos_linked_via_api(sandbox_tenant):
@@ -92,7 +93,7 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
     )
     assert (
         body["error"]["message"]
-        == "Cannot run KYB on this business due to unmet requirements on the playbook. Missing business_beneficial_owners. At a minimum, the following vault data must be provided: business.beneficial_owners"
+        == "Cannot run kyb playbook due to unmet requirements. Missing business_beneficial_owners. At a minimum, the following vault data must be provided: business.beneficial_owners"
     )
 
     # Link the BO, then should be able to KYB
@@ -229,7 +230,7 @@ def test_cannot_vault_bos_when_linked(sandbox_tenant):
     )
 
 
-def test_cannot_vault_kyced_bos(sandbox_tenant, sandbox_user):
+def test_cannot_vault_kyced_bos(sandbox_tenant):
     """
     Make sure we can't vault the `business.kyced_beneficial_owners` DI via API. Only bifrost should vault this.
     """

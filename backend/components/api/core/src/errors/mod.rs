@@ -50,6 +50,8 @@ pub mod workos;
 pub use utils::*;
 mod dry_run;
 pub use dry_run::*;
+mod tenant_facing_error;
+pub use tenant_facing_error::*;
 
 pub type ApiResult<T> = Result<T, ApiError>;
 
@@ -85,6 +87,8 @@ where
 pub enum ApiErrorKind {
     #[error("{0}")]
     ErrorWithCode(#[from] error_with_code::ErrorWithCode),
+    #[error("{0}")]
+    TfError(#[from] TfError),
     #[error("{0}")]
     AuthError(#[from] crate::auth::AuthError),
     #[error("{0}")]
@@ -334,6 +338,7 @@ impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self.0.as_ref() {
             ApiErrorKind::ErrorWithCode(e) => e.status_code(),
+            ApiErrorKind::TfError(e) => e.status_code(),
             ApiErrorKind::AuthError(_) => StatusCode::UNAUTHORIZED,
             ApiErrorKind::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -438,6 +443,7 @@ impl actix_web::ResponseError for ApiError {
         // Some errors have specific error codes and context
         let error_with_code = match self.kind() {
             ApiErrorKind::ErrorWithCode(e) => Some(e as &dyn CodedError),
+            ApiErrorKind::TfError(e) => Some(e as &dyn CodedError),
             _ => None,
         };
         let code = error_with_code.map(|e| e.code());

@@ -20,6 +20,7 @@ use api_core::errors::onboarding::{
 use api_core::errors::tenant::TenantError;
 use api_core::errors::{
     ApiResult,
+    TfError,
     ValidationError,
 };
 use api_core::task;
@@ -205,7 +206,11 @@ pub async fn post(
                 })
                 .collect_vec();
             if !unmet_reqs.is_empty() {
-                return Err(OnboardingError::CannotKycForMissingReq(UnmetRequirements(unmet_reqs)).into());
+                let err = TfError::PlaybookMissingRequirements(
+                    ObConfigurationKind::Kyc,
+                    UnmetRequirements(unmet_reqs),
+                );
+                return Err(err.into());
             }
             Ok(wf)
         })

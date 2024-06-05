@@ -13,6 +13,7 @@ use api_core::errors::onboarding::{
 use api_core::errors::tenant::TenantError;
 use api_core::errors::{
     ApiResult,
+    TfError,
     ValidationError,
 };
 use api_core::task;
@@ -168,7 +169,11 @@ pub async fn post(
                 .filter(|r| !matches!(r, OnboardingRequirement::Process))
                 .collect_vec();
             if !unmet_reqs.is_empty() {
-                return Err(OnboardingError::CannotKybForMissingReq(UnmetRequirements(unmet_reqs)).into());
+                let err = TfError::PlaybookMissingRequirements(
+                    ObConfigurationKind::Kyb,
+                    UnmetRequirements(unmet_reqs),
+                );
+                return Err(err.into());
             }
 
             Ok(biz_wf)

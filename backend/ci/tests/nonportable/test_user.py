@@ -119,42 +119,16 @@ def test_create_with_external_id_after_deactivate(tenant, sandbox_tenant):
     assert body_1["external_id"] == body_2["external_id"] == external_id
 
 
-@pytest.mark.parametrize(
-    "missing_can_access_data,missing_vault_data,expected_error",
-    [
-        ([], [], None),
-        (
-            ["dob"],
-            [],
-            "Cannot run a playbook whose authorized scopes don't include all collected data.",
-        ),
-        (
-            [],
-            ["id.first_name", "id.last_name", "id.ssn9"],
-            "Cannot run KYC on this user due to unmet requirements on the playbook. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9",
-        ),
-    ],
-    # The third test's name is so long that it overflows the insight_event.user_agent column
-    ids=lambda d: f"{d}"[:10],
-)
 def test_kyc(
     sandbox_tenant,
     must_collect_data,
-    missing_can_access_data,
-    missing_vault_data,
-    expected_error,
 ):
     obc = create_ob_config(
         sandbox_tenant,
-        **{
-            "name": "Acme Bank Card",
-            "must_collect_data": must_collect_data,
-            "can_access_data": list(
-                set(must_collect_data) - set(missing_can_access_data)
-            ),
-        },
+        "Acme Bank Card",
+        must_collect_data,
+        must_collect_data,
     )
-
     # create NPV
     vault_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
@@ -162,40 +136,75 @@ def test_kyc(
         "id.ssn9": _gen_random_ssn(),
         **ID_DATA,
     }
-    [vault_data.pop(d) for d in missing_vault_data]
-
     body = post("users/", vault_data, sandbox_tenant.sk.key)
     fp_id = body["id"]
 
     # run KYC
-    body = post(
-        f"users/{fp_id}/kyc",
-        dict(onboarding_config_key=obc.key.value),
-        sandbox_tenant.sk.key,
-        status_code=200 if expected_error is None else 400,
-    )
-    if expected_error:
-        assert expected_error in body["error"]["message"]
-        return
+    data = dict(onboarding_config_key=obc.key.value)
+    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key)
 
     assert body["requires_manual_review"] == False
     assert body["status"] == "pass"
 
     # confirm OBD timeline event created
-    timeline = get(
-        f"entities/{fp_id}/timeline",
-        None,
-        *sandbox_tenant.db_auths,
-    )
+    timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
 
     # confirm we can still decrypt all fields
-    post(
-        f"entities/{fp_id}/vault/decrypt",
-        {
-            "fields": list(vault_data.keys()),
-            "reason": "i wanna",
-        },
-        sandbox_tenant.sk.key,
+    data = {
+        "fields": list(vault_data.keys()),
+        "reason": "i wanna",
+    }
+    post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+
+
+def test_kyc_missing_requirement(sandbox_tenant, must_collect_data):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Acme Bank Card",
+        must_collect_data,
+        must_collect_data,
+    )
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+        **ID_DATA,
+    }
+    for di in ["id.first_name", "id.last_name", "id.ssn9"]:
+        vault_data.pop(di)
+    body = post("users/", vault_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    data = dict(onboarding_config_key=obc.key.value)
+    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
+    assert (
+        body["error"]["message"]
+        == "Cannot run KYC playbook due to unmet requirements. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9"
+    )
+    assert body["error"]["code"] == "T121"
+
+
+def test_kyc_missing_derypt_perms(sandbox_tenant, must_collect_data, can_access_data):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Acme Bank Card",
+        must_collect_data,
+        can_access_data,
+    )
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+        **ID_DATA,
+    }
+    body = post("users/", vault_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    data = dict(onboarding_config_key=obc.key.value)
+    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
+    assert (
+        body["error"]["message"]
+        == "Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: dob"
     )

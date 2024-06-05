@@ -1,0 +1,45 @@
+use super::error_with_code::CodedError;
+use super::onboarding::UnmetRequirements;
+use http::StatusCode;
+use newtypes::ObConfigurationKind;
+use serde_json::Value;
+
+#[derive(Debug, strum_macros::EnumDiscriminants, thiserror::Error)]
+#[strum_discriminants(name(TfErrorKind))]
+#[strum_discriminants(derive(strum_macros::Display, strum_macros::EnumIter))]
+pub enum TfError {
+    #[strum_discriminants(strum(serialize = "T121"))]
+    #[error("Cannot run {0} playbook due to unmet requirements. {1}")]
+    PlaybookMissingRequirements(ObConfigurationKind, UnmetRequirements),
+}
+
+impl CodedError for TfError {
+    fn context(&self) -> Option<Value> {
+        None
+    }
+
+    fn code(&self) -> String {
+        TfErrorKind::from(self).to_string()
+    }
+
+    fn status_code(&self) -> StatusCode {
+        match self {
+            Self::PlaybookMissingRequirements(_, _) => StatusCode::BAD_REQUEST,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::TfErrorKind;
+    use itertools::Itertools;
+    use strum::IntoEnumIterator;
+
+    #[test]
+    fn test_unique_error_codes() {
+        assert!(TfErrorKind::iter().all(|e| !e.to_string().is_empty()));
+        let codes = TfErrorKind::iter().map(|e| e.to_string()).unique().count();
+        let total = TfErrorKind::iter().count();
+        assert_eq!(codes, total, "Duplicate or missing error codes");
+    }
+}
