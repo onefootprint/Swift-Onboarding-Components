@@ -254,6 +254,21 @@ const business: Record<string, Field> = {
   dba: {
     placeholder: 'Acme Bank',
   },
+  tin: {
+    placeholder: '12-3456789',
+    mask: {
+      numericOnly: true,
+      delimiters: ['-'],
+      blocks: [2, 7],
+    },
+    validations: {
+      required: 'TIN cannot be empty or is invalid',
+      pattern: {
+        value: /^\d{2}-\d{7}$/,
+        message: 'TIN must be in the format XX-XXXXXXX',
+      },
+    },
+  },
 };
 
 const getProps = (name: string) => {
@@ -307,6 +322,9 @@ const getProps = (name: string) => {
   }
   if (name === 'business.dba') {
     return business.dba;
+  }
+  if (name === 'business.tin') {
+    return business.tin;
   }
 
   return null;
