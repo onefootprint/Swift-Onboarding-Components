@@ -4,7 +4,7 @@ import type {
   TenantBillingProfile,
   TenantBillingProfileProduct,
 } from '@onefootprint/types/src/api/get-tenants';
-import { Stack, TextInput } from '@onefootprint/ui';
+import { Stack, Text, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Field, Fieldset } from 'src/components';
@@ -183,6 +183,15 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
     form: isEditing ? UPDATE_BP_FORM_ID : undefined,
     disabled: updateTenantMutation.isLoading,
   };
+
+  if (tenant.superTenantId) {
+    return (
+      <Text variant="body-3" color="tertiary">
+        Billing profile is inherited from parent tenant. Only one invoice is
+        generated for the parent tenant and its children.
+      </Text>
+    );
+  }
 
   const priceDisplay = (value?: string | null) =>
     value ? `${value} cents` : '-';
