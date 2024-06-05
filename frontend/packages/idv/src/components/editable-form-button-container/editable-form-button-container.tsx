@@ -1,23 +1,19 @@
-import { Button, LinkButton } from '@onefootprint/ui';
+import { Button } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 type EditableFormButtonContainerProps = {
   onCancel?: () => void;
-  onSkip?: () => void;
   isLoading: boolean;
   ctaLabel?: string;
-  skipLabel?: string;
   submitButtonTestID?: string;
 };
 
 const EditableFormButtonContainer = ({
   onCancel,
-  onSkip,
   isLoading,
   ctaLabel,
-  skipLabel,
   submitButtonTestID,
 }: EditableFormButtonContainerProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'global.components.cta' });
@@ -40,23 +36,6 @@ const EditableFormButtonContainer = ({
     );
   }
 
-  if (onSkip && skipLabel) {
-    return (
-      <VerticalButtons>
-        <Button
-          type="submit"
-          fullWidth
-          loading={isLoading}
-          testID={submitButtonTestID}
-          size="large"
-        >
-          {ctaLabel ?? t('continue')}
-        </Button>
-        <LinkButton onClick={onSkip}>{skipLabel}</LinkButton>
-      </VerticalButtons>
-    );
-  }
-
   return (
     <Button
       type="submit"
@@ -69,16 +48,6 @@ const EditableFormButtonContainer = ({
     </Button>
   );
 };
-
-const VerticalButtons = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-  `}
-`;
 
 const EndJustifiedButtons = styled.div`
   ${({ theme }) => css`

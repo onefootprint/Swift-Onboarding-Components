@@ -423,7 +423,8 @@
             "label": "SSN",
             "placeholder": "XXX-XX-XXXX",
             "error": "SSN cannot be empty or is invalid"
-          }
+          },
+          "skip-label": "I don't have a Social Security Number"
         },
         "last-four": {
           "title": "What are the last 4 digits of your Social Security Number?",
@@ -432,7 +433,8 @@
             "label": "SSN (last 4)",
             "placeholder": "XXXX",
             "error": "SSN cannot be empty or is invalid"
-          }
+          },
+          "skip-label": "I don't have a Social Security Number"
         },
         "skip": {
           "cta": "I don't have a Social Security Number",

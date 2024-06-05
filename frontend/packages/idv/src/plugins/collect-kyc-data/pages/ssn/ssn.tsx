@@ -1,6 +1,6 @@
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import { Grid, Stack, useConfirmationDialog } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -47,6 +47,7 @@ const SSN = ({
   const isOptional =
     requirement.optionalAttributes.includes(CollectedKycDataOption.ssn9) ||
     requirement.optionalAttributes.includes(CollectedKycDataOption.ssn4);
+  const [ssnSkipped, setSsnSkipped] = useState(false);
 
   const title = ssnKind === 'ssn9' ? t('full.title') : t('last-four.title');
   const subtitle =
@@ -119,30 +120,43 @@ const SSN = ({
     });
   };
 
+  const handleSubmit = (ev: React.FormEvent<HTMLDivElement>) => {
+    ev.preventDefault();
+    if (ssnSkipped) {
+      handleSkip();
+    } else {
+      methods.handleSubmit(onSubmitForm)(ev);
+    }
+  };
+
   return (
     <>
       {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
-        <Grid.Container
-          tag="form"
-          gap={7}
-          onSubmit={methods.handleSubmit(onSubmitForm)}
-          width="100%"
-        >
+        <Grid.Container tag="form" gap={7} width="100%" onSubmit={handleSubmit}>
           {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
           <Stack gap={7} direction="column">
             {ssnKind === 'ssn9' ? (
-              <SSN9 hideDisclaimer={hideDisclaimer} disabled={isSsn9Disabled} />
+              <SSN9
+                hideDisclaimer={hideDisclaimer}
+                disabled={isSsn9Disabled || ssnSkipped}
+                isOptional={isOptional}
+                onSkipChange={() => setSsnSkipped(prev => !prev)}
+                isSkipped={ssnSkipped}
+              />
             ) : (
-              <SSN4 disabled={isSsn4Disabled} />
+              <SSN4
+                disabled={isSsn4Disabled || ssnSkipped}
+                isOptional={isOptional}
+                onSkipChange={() => setSsnSkipped(prev => !prev)}
+                isSkipped={ssnSkipped}
+              />
             )}
           </Stack>
           <EditableFormButtonContainer
             isLoading={mutation.isLoading}
             onCancel={onCancel}
-            onSkip={isOptional ? handleSkip : undefined}
             ctaLabel={ctaLabel}
-            skipLabel={t('skip.cta')}
             submitButtonTestID="ssn-save-edit-button"
           />
         </Grid.Container>

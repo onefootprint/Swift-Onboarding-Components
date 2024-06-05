@@ -423,7 +423,8 @@
             "label": "SSN",
             "placeholder": "XXX-XX-XXXX",
             "error": "El campo 'SSN' no puede quedar vacío o ser inválido"
-          }
+          },
+          "skip-label": "No tengo un Número de Seguridad Social (SSN)"
         },
         "last-four": {
           "title": "¿Cuáles son los últimos 4 dígitos de tu Número de Seguridad Social (SSN)?",
@@ -432,7 +433,8 @@
             "label": "SSN (últimos 4)",
             "placeholder": "XXXX",
             "error": "El SSN no puede estar vacío o es inválido"
-          }
+          },
+          "skip-label": "No tengo un Número de Seguridad Social (SSN)"
         },
         "skip": {
           "cta": "No tengo un Número de Seguridad Social (SSN)",
