@@ -25,7 +25,10 @@ use db::models::workflow::{
     Workflow,
 };
 use db::models::workflow_request::WorkflowRequest;
-use db::TxnPgConn;
+use db::{
+    OffsetPagination,
+    TxnPgConn,
+};
 use itertools::chain;
 use newtypes::{
     DocumentConfig,
@@ -102,7 +105,8 @@ pub fn get_or_start_onboarding(
         // Make a new workflow. The workflow is created either for the playbook specified in the
         // auth token OR for the config specified in the WorkflowRequest
         let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-        let is_first_wf = Workflow::list(conn, &sv.id)?.is_empty();
+        let (wfs, _) = Workflow::list(conn, &sv.id, OffsetPagination::new(None, 10))?;
+        let is_first_wf = wfs.is_empty();
         let has_prefill_data = maybe_prefill_data.as_ref().is_some_and(|pd| !pd.data.is_empty());
         let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
         // Create the workflow for this scoped user

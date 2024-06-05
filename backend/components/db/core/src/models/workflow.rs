@@ -19,6 +19,8 @@ use crate::models::billing_event::BillingEvent;
 use crate::models::vault::Vault;
 use crate::{
     DbResult,
+    OffsetPaginatedResult,
+    OffsetPagination,
     PgConn,
     TxnPgConn,
 };
@@ -403,32 +405,27 @@ impl Workflow {
         Ok(res)
     }
 
-    #[tracing::instrument("Workflow::list_by_completed_at", skip_all)]
-    pub fn list_by_completed_at(
+    #[tracing::instrument("Workflow::list", skip_all)]
+    pub fn list(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
-    ) -> DbResult<Vec<(Self, Option<ObConfiguration>)>> {
-        let res = workflow::table
+        pagination: OffsetPagination,
+    ) -> DbResult<OffsetPaginatedResult<(Self, Option<ObConfiguration>)>> {
+        let mut query = workflow::table
             .filter(workflow::scoped_vault_id.eq(sv_id))
-            .filter(not(workflow::completed_at.is_null()))
+            .order_by(workflow::created_at.desc())
             .left_join(ob_configuration::table)
-            .order_by(workflow::completed_at.asc())
-            .get_results(conn)?;
-
-        Ok(res)
-    }
-
-    #[tracing::instrument("Workflow::list", skip_all)]
-    pub fn list(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
-        let res = workflow::table
-            .filter(workflow::scoped_vault_id.eq(sv_id))
-            .get_results(conn)?;
-
-        Ok(res)
+            .limit(pagination.limit())
+            .into_boxed();
+        if let Some(offset) = pagination.offset() {
+            query = query.offset(offset)
+        }
+        let results = query.get_results(conn)?;
+        Ok(pagination.results(results))
     }
 
     /// Gets the latest workflow that the user completed that is "reonboard-able"
-    #[tracing::instrument("Workflow::latest", skip_all)]
+    #[tracing::instrument("Workflow::latest_reonboardable", skip_all)]
     pub fn latest_reonboardable(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,

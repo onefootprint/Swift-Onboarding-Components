@@ -5840,7 +5840,6 @@
             "get": {
                 "tags": [
                     "VaultDisasterRecovery",
-                    "Org",
                     "Private"
                 ],
                 "description": "Returns the status of Vault Disaster Recovery for the authenticated organization",
@@ -7140,6 +7139,38 @@
                     "Private"
                 ],
                 "description": "Handles Middesk webhooks.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/webhooks/samba/handle_webhook": {
+            "post": {
+                "tags": [
+                    "Webhooks",
+                    "Private"
+                ],
+                "description": "Handles Samba Safety webhooks.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -12928,6 +12959,7 @@
                                         "document_no_image_alteration_back",
                                         "document_possible_image_alteration_front",
                                         "document_possible_image_alteration_back",
+                                        "document_possible_image_alteration",
                                         "document_selfie_used_with_different_information",
                                         "document_selfie_not_used_with_different_information",
                                         "document_selfie_mask",
@@ -13188,7 +13220,8 @@
                                 }
                             },
                             "required": [
-                                "created_at"
+                                "created_at",
+                                "status"
                             ]
                         }
                     }
@@ -14023,6 +14056,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -14418,6 +14452,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -14813,6 +14848,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -15208,6 +15244,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -15603,6 +15640,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -15998,6 +16036,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -16393,6 +16432,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -16788,6 +16828,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -17183,6 +17224,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -17578,6 +17620,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -17973,6 +18016,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -18368,6 +18412,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -18763,6 +18808,7 @@
                                                 "document_no_image_alteration_back",
                                                 "document_possible_image_alteration_front",
                                                 "document_possible_image_alteration_back",
+                                                "document_possible_image_alteration",
                                                 "document_selfie_used_with_different_information",
                                                 "document_selfie_not_used_with_different_information",
                                                 "document_selfie_mask",
@@ -19887,6 +19933,9 @@
             "ListEntitiesSearchRequest": {
                 "type": "object",
                 "properties": {
+                    "external_id": {
+                        "type": "string"
+                    },
                     "has_outstanding_workflow_request": {
                         "type": "boolean"
                     },
@@ -23865,6 +23914,7 @@
                             "document_no_image_alteration_back",
                             "document_possible_image_alteration_front",
                             "document_possible_image_alteration_back",
+                            "document_possible_image_alteration",
                             "document_selfie_used_with_different_information",
                             "document_selfie_not_used_with_different_information",
                             "document_selfie_mask",
@@ -24275,6 +24325,7 @@
                             "document_no_image_alteration_back",
                             "document_possible_image_alteration_front",
                             "document_possible_image_alteration_back",
+                            "document_possible_image_alteration",
                             "document_selfie_used_with_different_information",
                             "document_selfie_not_used_with_different_information",
                             "document_selfie_mask",

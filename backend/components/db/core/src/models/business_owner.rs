@@ -4,7 +4,7 @@ use super::workflow::Workflow;
 use crate::{
     DbError,
     DbResult,
-    NextPage,
+    OffsetPaginatedResult,
     OffsetPagination,
     PgConn,
     TxnPgConn,
@@ -230,7 +230,7 @@ impl BusinessOwner {
         conn: &mut PgConn,
         args: BusinessOwnerQuery<'a>,
         pagination: OffsetPagination,
-    ) -> DbResult<(Vec<(Self, UserData)>, NextPage)> {
+    ) -> DbResult<OffsetPaginatedResult<(Self, UserData)>> {
         let BusinessOwnerQuery { bv_id, tenant_id } = args;
         let mut query = business_owner::table
             .filter(business_owner::business_vault_id.eq(bv_id))

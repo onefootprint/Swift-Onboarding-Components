@@ -6,9 +6,15 @@ pub struct OffsetPagination {
 
 pub type NextPage = Option<usize>;
 
+pub type OffsetPaginatedResult<T> = (Vec<T>, NextPage);
+
 impl OffsetPagination {
     pub fn new(page: Option<usize>, page_size: usize) -> Self {
         Self { page, page_size }
+    }
+
+    pub fn page(page_size: usize) -> Self {
+        Self::new(None, page_size)
     }
 
     /// Constructs the value to pass to the SQL offset clause.

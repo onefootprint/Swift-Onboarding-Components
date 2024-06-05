@@ -11,6 +11,7 @@ mod label;
 mod list;
 mod liveness;
 mod match_signals;
+mod onboardings;
 mod post;
 mod risk_signals;
 mod tags;
@@ -33,6 +34,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(kyc::post)
         .service(label::get)
         .service(label::post)
+        .service(onboardings::get)
         .service(tags::get)
         .service(tags::post)
         .service(tags::delete);

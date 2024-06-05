@@ -156,3 +156,6 @@ pub use user_ai_summary::*;
 
 pub mod vault_dr;
 pub use self::vault_dr::*;
+
+mod onboarding;
+pub use self::onboarding::*;

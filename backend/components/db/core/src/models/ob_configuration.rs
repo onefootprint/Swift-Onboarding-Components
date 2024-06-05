@@ -719,24 +719,15 @@ impl ObConfiguration {
         // only multiple Workflow's and each could have a different OBC For now, we take the first
         // completed WF by completed_at where enhanced_aml = Yes. If none of the WF's have enhanced AML,
         // then we just take the first OBC.
-        let wfs = Workflow::list_by_completed_at(conn, sv_id)?;
-        let obc = if let Some((_, obc)) = wfs.iter().find(|(_, obc)| {
-            obc.as_ref()
-                .map(|o| {
-                    matches!(
-                        &o.enhanced_aml,
-                        EnhancedAmlOption::Yes {
-                            ofac: _,
-                            pep: _,
-                            adverse_media: _,
-                            continuous_monitoring: _,
-                            adverse_media_lists: _
-                        }
-                    )
-                })
-                .unwrap_or(false)
-        }) {
-            obc.clone()
+        let (wfs, _) = Workflow::list(conn, sv_id, OffsetPagination::page(20))?;
+        let obc = if let Some(obc) = wfs
+            .iter()
+            .filter(|(wf, _)| wf.completed_at.is_some())
+            .sorted_by_key(|(wf, _)| wf.completed_at)
+            .flat_map(|(_, obc)| obc)
+            .find(|obc| matches!(&obc.enhanced_aml, EnhancedAmlOption::Yes { .. }))
+        {
+            Some(obc.clone())
         } else {
             wfs.first().and_then(|(_, obc)| obc.clone())
         };

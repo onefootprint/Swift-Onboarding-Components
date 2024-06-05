@@ -284,7 +284,7 @@ def create_ob_config(
     tenant,
     name,
     must_collect_data,
-    can_access_data,
+    can_access_data=None,
     cip_kind=None,
     optional_data=None,
     is_no_phone_flow=False,
@@ -300,15 +300,16 @@ def create_ob_config(
     documents_to_collect=None,
     curp_validation_enabled=False,
     skip_kyc=False,
-    verification_checks=None
+    verification_checks=None,
 ):
-    kind = kind or 'kyc'
+    kind = kind or "kyc"
     checks = get_verification_checks(verification_checks, kind)
     ob_conf_data = {
         "name": name,
         "must_collect_data": must_collect_data,
         "optional_data": optional_data,
-        "can_access_data": can_access_data,
+        "can_access_data": can_access_data
+        or must_collect_data,  # Default to collecting the same data
         "cip_kind": cip_kind,
         "is_no_phone_flow": is_no_phone_flow,
         "is_doc_first_flow": is_doc_first_flow,
@@ -322,20 +323,20 @@ def create_ob_config(
         "documents_to_collect": documents_to_collect or [],
         "curp_validation_enabled": curp_validation_enabled,
         "skip_kyc": skip_kyc,
-        "verification_checks": checks
+        "verification_checks": checks,
     }
     auths = override_auths if override_auths else tenant.db_auths
     body = post("org/onboarding_configs", ob_conf_data, *auths)
     ob_config = ObConfiguration.from_response(body, tenant)
     return ob_config
 
+
 def get_verification_checks(verification_checks, kind):
     if verification_checks is not None:
         return verification_checks
-    
-    if kind == 'kyb':
-        return [{"kind": "kyb", "data": {"ein_only": False}}]
 
+    if kind == "kyb":
+        return [{"kind": "kyb", "data": {"ein_only": False}}]
 
 
 def clean_up_user(phone_number, email):

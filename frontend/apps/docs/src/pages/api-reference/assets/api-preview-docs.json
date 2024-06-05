@@ -965,6 +965,61 @@
                 ]
             }
         },
+        "/users/{fp_id}/onboardings": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of onboardings",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedPublicOnboarding"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/risk_signals": {
             "get": {
                 "tags": [
@@ -2609,6 +2664,57 @@
                     "meta"
                 ]
             },
+            "OffsetPaginatedPublicOnboarding": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "playbook_key": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string",
+                                    "enum": [
+                                        "pass",
+                                        "fail",
+                                        "incomplete",
+                                        "pending"
+                                    ]
+                                },
+                                "timestamp": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                }
+                            },
+                            "required": [
+                                "playbook_key",
+                                "status",
+                                "timestamp"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "description": "Alternative to OffsetPaginatedResponseMeta for queries that don't return a count",
+                        "type": "object",
+                        "properties": {
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
+                ]
+            },
             "PublicDocument": {
                 "type": "object",
                 "properties": {
@@ -2811,6 +2917,7 @@
                             "document_no_image_alteration_back",
                             "document_possible_image_alteration_front",
                             "document_possible_image_alteration_back",
+                            "document_possible_image_alteration",
                             "document_selfie_used_with_different_information",
                             "document_selfie_not_used_with_different_information",
                             "document_selfie_mask",
@@ -3212,6 +3319,7 @@
                             "document_no_image_alteration_back",
                             "document_possible_image_alteration_front",
                             "document_possible_image_alteration_back",
+                            "document_possible_image_alteration",
                             "document_selfie_used_with_different_information",
                             "document_selfie_not_used_with_different_information",
                             "document_selfie_mask",
