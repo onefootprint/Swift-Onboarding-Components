@@ -90,7 +90,7 @@ jobs:
               --file ./images/${{ matrix.dockerfile }}/Dockerfile \
               --tag $REGISTRY/$REPO:$TAG \
               --push \
-              ${{ github.ref == 'refs/heads/master' && '--cache-to type=registry,ref=${REGISTRY}/build-cache:${REPO}-master,compression=zstd,mode=max' || '' }} \
+              ${{ github.ref == 'refs/heads/master' && '--cache-to type=registry,ref=${REGISTRY}/build-cache:${REPO}-master,compression=zstd,mode=max,image-manifest=true,oci-mediatypes=true' || '' }} \
               --cache-from type=registry,ref=${REGISTRY}/build-cache:${REPO}-master \
               .
 
