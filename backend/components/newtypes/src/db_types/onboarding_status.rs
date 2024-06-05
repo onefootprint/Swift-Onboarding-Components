@@ -46,7 +46,7 @@ pub enum OnboardingStatus {
     Fail,
     /// The user has not yet finished entering all information
     Incomplete,
-    /// All required data has been collected. We are waiting for a firm decision
+    /// All required data has been collected. We are waiting for a decision
     Pending,
 }
 

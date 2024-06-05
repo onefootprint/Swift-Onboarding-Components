@@ -14,6 +14,7 @@ use strum::{
 #[test]
 fn test_raw() {
     let evt = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
+        event_kind: WebhookEventKind::OnboardingCompleted,
         fp_id: FpId::from("test".to_string()),
         timestamp: Utc::now(),
         status: OnboardingStatus::Pass,

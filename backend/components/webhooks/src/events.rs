@@ -76,7 +76,7 @@ mod payloads {
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
     #[schemars(example = "OnboardingCompletedPayload::example")]
     pub struct OnboardingCompletedPayload {
-        /// the footprint id of the entity that completed onboarding
+        pub event_kind: WebhookEventKind,
         #[schemars(with = "String")]
         pub fp_id: FpId,
         pub timestamp: DateTime<Utc>,
@@ -90,7 +90,7 @@ mod payloads {
     #[schemars(example = "OnboardingStatusChangedPayload::example")]
 
     pub struct OnboardingStatusChangedPayload {
-        /// the footprint id of the entity that completed onboarding
+        pub event_kind: WebhookEventKind,
         #[schemars(with = "String")]
         pub fp_id: FpId,
         pub timestamp: DateTime<Utc>,
@@ -104,7 +104,7 @@ mod payloads {
     #[schemars(example = "WatchlistCheckCompletedPayload::example")]
 
     pub struct WatchlistCheckCompletedPayload {
-        /// the footprint id of the entity that completed onboarding
+        pub event_kind: WebhookEventKind,
         #[schemars(with = "String")]
         pub fp_id: FpId,
         pub timestamp: DateTime<Utc>,
@@ -162,6 +162,7 @@ mod examples {
     impl OnboardingCompletedPayload {
         pub fn example() -> Self {
             OnboardingCompletedPayload {
+                event_kind: WebhookEventKind::OnboardingCompleted,
                 fp_id: FpId::test_data("fp_id_xyz".into()),
                 timestamp: Utc::now(),
                 status: Default::default(),
@@ -174,6 +175,7 @@ mod examples {
     impl OnboardingStatusChangedPayload {
         pub fn example() -> Self {
             OnboardingStatusChangedPayload {
+                event_kind: WebhookEventKind::OnboardingStatusChanged,
                 fp_id: FpId::test_data("fp_id_xyz".into()),
                 timestamp: Utc::now(),
                 new_status: Default::default(),
@@ -186,6 +188,7 @@ mod examples {
     impl WatchlistCheckCompletedPayload {
         pub fn example() -> Self {
             WatchlistCheckCompletedPayload {
+                event_kind: WebhookEventKind::WatchlistCheckCompleted,
                 fp_id: FpId::test_data("fp_id_xyz".into()),
                 timestamp: Utc::now(),
                 status: Default::default(),
@@ -215,6 +218,7 @@ impl From<NTWebhookEvent> for WebhookEvent {
 impl From<NTOnboardingCompletedPayload> for OnboardingCompletedPayload {
     fn from(value: NTOnboardingCompletedPayload) -> Self {
         Self {
+            event_kind: WebhookEventKind::OnboardingCompleted,
             fp_id: value.fp_id,
             timestamp: value.timestamp,
             status: value.status,
@@ -227,6 +231,7 @@ impl From<NTOnboardingCompletedPayload> for OnboardingCompletedPayload {
 impl From<NTOnboardingStatusChangedPayload> for OnboardingStatusChangedPayload {
     fn from(value: NTOnboardingStatusChangedPayload) -> Self {
         Self {
+            event_kind: WebhookEventKind::OnboardingStatusChanged,
             fp_id: value.fp_id,
             timestamp: value.timestamp,
             new_status: value.new_status,
@@ -239,6 +244,7 @@ impl From<NTOnboardingStatusChangedPayload> for OnboardingStatusChangedPayload {
 impl From<NTWatchlistCheckCompletedPayload> for WatchlistCheckCompletedPayload {
     fn from(value: NTWatchlistCheckCompletedPayload) -> Self {
         Self {
+            event_kind: WebhookEventKind::WatchlistCheckCompleted,
             fp_id: value.fp_id,
             timestamp: value.timestamp,
             status: value.status,
