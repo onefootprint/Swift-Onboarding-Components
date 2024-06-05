@@ -971,7 +971,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of onboardings",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of playbooks a user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be two separate onboardings.",
                 "parameters": [
                     {
                         "in": "query",

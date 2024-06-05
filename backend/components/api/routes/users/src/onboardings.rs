@@ -29,7 +29,10 @@ use paperclip::actix::{
 type OnboardingsListResponse =
     OffsetPaginatedResponse<api_wire_types::PublicOnboarding, OffsetPaginatedResponseMetaNoCount>;
 
-#[api_v2_operation(description = "Get the list of onboardings", tags(Users, Preview))]
+#[api_v2_operation(
+    description = "Get the list of playbooks a user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be two separate onboardings.",
+    tags(Users, Preview)
+)]
 #[get("/users/{fp_id}/onboardings")]
 pub async fn get(
     state: web::Data<State>,
