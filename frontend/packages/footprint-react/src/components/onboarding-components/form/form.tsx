@@ -1,9 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import type { FootprintUserData } from '@onefootprint/footprint-js';
 import cx from 'classnames';
 import type { FormHTMLAttributes } from 'react';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+
+import type { Di } from '../../../@types';
 
 export type FormProps = FormHTMLAttributes<HTMLFormElement> & {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ export type FormProps = FormHTMLAttributes<HTMLFormElement> & {
 };
 
 const Form = ({ className, children, onSubmit, ...props }: FormProps) => {
-  const { handleSubmit } = useFormContext<FootprintUserData>();
+  const { handleSubmit } = useFormContext<Di>();
 
   const handleBeforeSubmit = () => {
     onSubmit();

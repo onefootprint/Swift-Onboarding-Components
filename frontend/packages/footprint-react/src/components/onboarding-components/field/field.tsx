@@ -1,13 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import type { FootprintUserData } from '@onefootprint/footprint-js';
 import cx from 'classnames';
 import type { HTMLAttributes } from 'react';
 import React, { useId, useMemo } from 'react';
 
+import type { Di } from '../../../@types';
 import FieldContext from '../field-context';
 
 export type FieldProps = {
-  name: keyof FootprintUserData;
+  name: keyof Di;
   children?: React.ReactNode;
 } & HTMLAttributes<HTMLDivElement>;
 

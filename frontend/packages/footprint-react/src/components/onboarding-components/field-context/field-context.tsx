@@ -1,11 +1,11 @@
-import type { FootprintUserData } from '@onefootprint/footprint-js';
 import { createContext } from 'react';
 
+import type { Di } from '../../../@types';
+
 export default createContext<{
-  name: keyof FootprintUserData;
+  name: keyof Di;
   id: string;
 }>({
-  // TODO: Improve
-  name: 'id.address_line1',
-  id: '',
+  name: 'id.email',
+  id: 'email',
 });

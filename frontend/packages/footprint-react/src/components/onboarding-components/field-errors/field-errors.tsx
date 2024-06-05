@@ -4,8 +4,8 @@ import get from 'lodash/get';
 import type { HTMLAttributes } from 'react';
 import React, { useContext } from 'react';
 
-import { useFootprint } from '../../../hooks/use-footprint';
 import fieldContext from '../field-context';
+import { useFootprint } from '../hooks/use-footprint';
 
 export type FieldErrorsProps = HTMLAttributes<HTMLDivElement>;
 

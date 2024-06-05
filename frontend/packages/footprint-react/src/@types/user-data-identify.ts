@@ -1,7 +1,7 @@
-import type { FootprintUserData } from '@onefootprint/footprint-js';
+import type { Di } from './dis';
 
 export type UserDataError = {
   error: {
-    message: Partial<Record<keyof FootprintUserData, string>> | string;
+    message: Partial<Record<keyof Di, string>> | string;
   };
 };
