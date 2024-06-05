@@ -402,6 +402,7 @@ pub async fn adhoc_document_process(
     let ww = WorkflowWrapper::init(&state, wf2).await?;
     if matches!(ww.state, WorkflowKind::Kyc(KycState::DataCollection(_))) {
         ww.run(&state, WorkflowActions::Authorize(Authorize {})).await?;
+    } else if matches!(ww.state, WorkflowKind::Kyc(KycState::Complete(_))) {
     } else {
         tracing::info!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "adhoc document process workflow in wrong state");
         return Err(AssertionError("adhoc document process workflow in wrong state").into());

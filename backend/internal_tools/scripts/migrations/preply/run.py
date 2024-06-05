@@ -1,3 +1,4 @@
+import os
 import requests
 import csv
 import click
@@ -27,11 +28,44 @@ def main(
     with open(input_file, "r") as f:
         data = list(json.load(f))
 
-    run(data[0], tenant_id, playbook_key, api_base, api_key, custodian_key)
+    sessions_to_rerun = [
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        65,
+        67,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        78,
+        80,
+        82,
+        84,
+        88,
+        92,
+        93,
+        95,
+        99,
+    ]
+    for i in sessions_to_rerun:
+        run(data[i - 1], tenant_id, playbook_key, api_base, api_key, custodian_key)
 
 
 def run(session, tenant_id, playbook_key, api_base, api_key, custodian_key):
     session_id = session["session_id"]
+    document_type = session["document_kind"]
 
     # first create the vault
     resp = requests.post(
@@ -65,7 +99,7 @@ def run(session, tenant_id, playbook_key, api_base, api_key, custodian_key):
         "tenant_id": tenant_id,
         "is_live": True,
         "fp_id": fp_id,
-        "document_type": session["document_kind"],
+        "document_type": document_type,
         "country_code": session["country_code"],
         "perform_ocr_comparison": False,
     }
@@ -101,19 +135,69 @@ def run(session, tenant_id, playbook_key, api_base, api_key, custodian_key):
     upload_file(document_id, "front", session["front"])
 
     # upload back
-    if session["document_kind"] == "id_card":
-        upload_file(document_id, "back", session["front"])
+    if (
+        document_type != "passport"
+        and "back" in session
+        and os.path.exists(session["back"])
+    ):
+        upload_file(document_id, "back", session["back"])
 
     # upload selfie
-    upload_file(document_id, "selfie", session["selfie"])
+    if "selfie" in session:
+        upload_file(document_id, "selfie", session["selfie"])
 
     # finish and process
     resp = requests.post(
         f"{api_base}/private/incode/adhoc/{document_id}/process",
         headers={"X-Fp-Protected-Custodian-Key": custodian_key},
     )
-    resp.raise_for_status()
     print(f"Process document {resp.text}")
+
+    # fetch ocr data and then vault it
+    attr = lambda x: f"document.{document_type}.{x}"
+
+    resp = requests.post(
+        f"{api_base}/users/{fp_id}/vault/decrypt",
+        json={
+            "fields": [attr("full_name"), attr("dob"), attr("full_address")],
+            "reason": "Fetch OCR data",
+        },
+        headers={
+            "X-Footprint-Secret-Key": api_key,
+        },
+    )
+    print(resp.text)
+    resp.raise_for_status()
+
+    b = resp.json()
+    full_name = b[attr("full_name")]
+    dob = b[attr("dob")]
+    address = b[attr("full_address")]
+
+    if full_name is not None:
+        resp = requests.patch(
+            f"{api_base}/users/{fp_id}/vault",
+            json={
+                "id.first_name": full_name.split(" ")[0],
+                "id.last_name": " ".join(full_name.split(" ")[1:]),
+            },
+            headers={
+                "X-Footprint-Secret-Key": api_key,
+            },
+        )
+        print(resp.text)
+
+    if dob is not None:
+        resp = requests.patch(
+            f"{api_base}/users/{fp_id}/vault",
+            json={
+                "id.dob": dob,
+            },
+            headers={
+                "X-Footprint-Secret-Key": api_key,
+            },
+        )
+        print(resp.text)
 
 
 if __name__ == "__main__":
