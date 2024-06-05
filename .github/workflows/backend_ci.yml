@@ -38,14 +38,27 @@ jobs:
       matrix:
         include:
           - name: api
+            dockerfile: api
             args:
               BUILD_PROFILE: release
               GIT_HASH: ${{ github.sha }}
+          - name: enclave-proxy
+            dockerfile: enclave-proxy
+            args:
+              BUILD_PROFILE: release
+              CARGO_ARGS: "--features vsock"
+              GIT_HASH: ${{ github.sha }}
           - name: enclave-proxy-dev
-            args: {}
+            dockerfile: enclave-proxy
+            args:
+              BUILD_PROFILE: debug
+              CARGO_ARGS: ""
+              GIT_HASH: ${{ github.sha }}
           - name: enclave
+            dockerfile: enclave
             args: {}
           - name: enclave-dev
+            dockerfile: enclave-dev
             args: {}
     steps:
       - uses: actions/checkout@v4
@@ -71,15 +84,15 @@ jobs:
         run: |
           set -euxo pipefail
 
-          docker buildx build \
-            --platform linux/amd64 \
-            --file ./images/${{ matrix.name}}/Dockerfile \
-            $(echo '${{toJSON(matrix.args) }}' | jq -r '. | to_entries | map("--build-arg \(.key)=\(.value)") | join(" ")') \
-            --tag $REGISTRY/$REPO:$TAG \
-            --push \
-            ${{ github.ref == 'refs/heads/master' && '--cache-to type=registry,ref=${REGISTRY}/build-cache:${REPO}-master,compression=zstd,mode=max' || '' }} \
-            --cache-from type=registry,ref=${REGISTRY}/build-cache:${REPO}-master \
-            .
+          echo '${{toJSON(matrix.args) }}' | jq -r '. | to_entries | map("--build-arg \(.key)=\(.value | @sh)") | join(" ")' | \
+            xargs docker buildx build \
+              --platform linux/amd64 \
+              --file ./images/${{ matrix.dockerfile }}/Dockerfile \
+              --tag $REGISTRY/$REPO:$TAG \
+              --push \
+              ${{ github.ref == 'refs/heads/master' && '--cache-to type=registry,ref=${REGISTRY}/build-cache:${REPO}-master,compression=zstd,mode=max' || '' }} \
+              --cache-from type=registry,ref=${REGISTRY}/build-cache:${REPO}-master \
+              .
 
   test:
     needs: [files-changed]
@@ -180,6 +193,10 @@ jobs:
       - name: Clippy
         working-directory: ./backend
         run: cargo clippy --all --no-default-features --features simulate
+
+      - name: Clippy (vsock enabled)
+        working-directory: ./backend
+        run: cargo clippy -p enclave_proxy -p api_core --features vsock
 
   integration_tests:
     needs: [files-changed]

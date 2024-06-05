@@ -39,9 +39,9 @@ impl crate::StreamConfig for Config {
         };
 
         #[cfg(feature = "vsock")]
-        if self.enclave_tcp_host.is_some() {
+        if let Some(enclave_tcp_host) = self.enclave_tcp_host.as_ref() {
             crate::StreamType::Tcp {
-                address: format!("{}:{}", self.enclave_tcp_host, self.enclave_port),
+                address: format!("{}:{}", enclave_tcp_host, self.enclave_port),
             }
         } else {
             crate::StreamType::Vsock {

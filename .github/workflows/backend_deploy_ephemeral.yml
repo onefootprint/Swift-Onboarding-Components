@@ -38,7 +38,7 @@ jobs:
         run: |
           git --version
           code_hash="$(git log -n 1 --format="%h" ./)"
-          infra_hash="$(git log -n 1 --format="%h" ./backend/infra)"
+          infra_hash="$(git log -n 1 --format="%h" ./backend/infra ./backend/images)"
           infra_db_hash="$(git log -n 1 --format="%h" ./backend/infra/src/db.ts)"
           echo "code=${code_hash} infra=${infra_hash}"
 
