@@ -217,6 +217,7 @@ impl RuleSetResult {
             .inner_join(scoped_vault::table.inner_join(vault::table))
             .inner_join(rule_set_result::table)
             .filter(workflow::ob_configuration_id.eq(obc_id))
+            .filter(scoped_vault::is_active)
             .filter(not(workflow::completed_at.is_null()))
             .filter(workflow::completed_at.ge(start))
             .filter(workflow::completed_at.le(end))
