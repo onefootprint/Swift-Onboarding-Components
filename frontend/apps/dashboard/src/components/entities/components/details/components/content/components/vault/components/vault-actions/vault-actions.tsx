@@ -2,10 +2,10 @@ import { EntityStatus, RoleScopeKind } from '@onefootprint/types';
 import { Button, Portal, SplitButton, Stack, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import PermissionGate from 'src/components/permission-gate';
 import { useEffectOnce } from 'usehooks-ts';
 
+import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import {
   DECRYPT_VAULT_FORM_ID,
@@ -30,10 +30,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();
   const canDecrypt = !!entity.decryptableAttributes.length;
-  const { data, update: updateVault } = useEntityVaultWithTransforms(
-    entity.id,
-    entity,
-  );
+  const { data, update: updateVault } = useEntityVault(entity.id, entity);
   const entityVault = data?.vault;
 
   const handleDecryptSubmit = () => {

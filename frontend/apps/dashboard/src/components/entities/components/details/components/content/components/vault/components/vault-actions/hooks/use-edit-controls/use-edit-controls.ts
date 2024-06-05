@@ -1,7 +1,8 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
-import type { VaultType } from 'src/components/entities/hooks/use-entity-vault-with-transforms';
+
+import type { VaultType } from '@/entities/hooks/use-entity-vault';
 
 import { Event, State, useEditMachine } from '../../../../../edit-machine';
 import type { EditSubmitData } from '../../../../vault.types';

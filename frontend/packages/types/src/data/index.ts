@@ -58,6 +58,7 @@ export type { DecryptedDocument } from './decrypted-document';
 export type {
   CardDI,
   CustomDI,
+  CustomDocumentIdentifier,
   DataIdentifier,
   VersionedDocumentDI,
 } from './di';

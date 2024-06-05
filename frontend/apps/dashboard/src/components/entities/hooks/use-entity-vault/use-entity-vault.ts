@@ -43,7 +43,7 @@ const getVaultOrCreate = async (queryClient: QueryClient, entity: Entity) => {
   return possibleData || createInitialData();
 };
 
-const useEntityVaultWithTransforms = (entityId: string, entity?: Entity) => {
+const useEntityVault = (entityId?: string, entity?: Entity) => {
   const queryClient = useQueryClient();
 
   const update = (newData: VaultType) => {
@@ -81,10 +81,10 @@ const useEntityVaultWithTransforms = (entityId: string, entity?: Entity) => {
   const query = useQuery<VaultType>(
     ['entity', entityId, 'vault'],
     () => getVaultOrCreate(queryClient, entity as Entity),
-    { enabled: !!entity },
+    { enabled: !!entityId && !!entity },
   );
 
   return { ...query, update };
 };
 
-export default useEntityVaultWithTransforms;
+export default useEntityVault;

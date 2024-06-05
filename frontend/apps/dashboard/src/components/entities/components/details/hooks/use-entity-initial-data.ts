@@ -1,4 +1,4 @@
-import useEntityVaultWithTransforms from '../../../hooks/use-entity-vault-with-transforms';
+import useEntityVault from '../../../hooks/use-entity-vault';
 import useEntity from './use-entity';
 import useEntityAnnotations from './use-entity-annotations';
 import useEntityLiveness from './use-entity-auth-events';
@@ -11,7 +11,7 @@ const useEntityInitialData = () => {
   const id = useEntityId();
   const entityQuery = useEntity(id);
   const entityTimelineQuery = useEntityTimeline(id);
-  const entityVaultQuery = useEntityVaultWithTransforms(id, entityQuery.data);
+  const entityVaultQuery = useEntityVault(id, entityQuery.data);
   const entityRiskSignalsQuery = useEntityRiskSignals(id);
   const entityLivenessQuery = useEntityLiveness(id);
   const entityAnnotations = useEntityAnnotations(id);

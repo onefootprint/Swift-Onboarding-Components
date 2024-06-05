@@ -7,12 +7,12 @@ import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
-import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import createStringList, {
   createCapitalStringList,
 } from 'src/utils/create-string-list';
 import styled, { css } from 'styled-components';
 
+import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import Field from '../../../field';
@@ -24,7 +24,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.user.vault.investor-profile',
   });
-  const { data } = useEntityVaultWithTransforms(entity.id, entity);
+  const { data } = useEntityVault(entity.id, entity);
   const vaultData = data?.vault;
 
   return (

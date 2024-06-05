@@ -11,7 +11,7 @@
               "required": "Identifier is required"
             }
           },
-          "document": {
+          "file": {
             "label": "Document",
             "upload-new": "Upload new",
             "cta": "Choose file to upload",
@@ -21,6 +21,12 @@
               "required": "Document is required"
             },
             "preview-alt": "Document preview"
+          }
+        },
+        "feedback": {
+          "success": {
+            "title": "Success",
+            "description": "Document uploaded successfully."
           }
         }
       }

@@ -6,7 +6,8 @@ import {
 } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
+
+import useEntityVault from '@/entities/hooks/use-entity-vault';
 
 import {
   useDecryptControls,
@@ -15,10 +16,7 @@ import {
 
 const useField = (entity: Entity) => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
-  const entityVaultWithTransforms = useEntityVaultWithTransforms(
-    entity.id,
-    entity,
-  );
+  const entityVaultWithTransforms = useEntityVault(entity.id, entity);
 
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();

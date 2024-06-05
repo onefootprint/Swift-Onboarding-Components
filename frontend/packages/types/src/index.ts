@@ -276,6 +276,7 @@ export type {
   CountryCode,
   CountryCode3,
   CustomDI,
+  CustomDocumentIdentifier,
   D2PMeta,
   DataIdentifier,
   DecryptedDocument,

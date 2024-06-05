@@ -19,10 +19,8 @@ const CustomDocumentField = ({ field, entity }: CustomDocumentFieldProps) => {
   });
   const [isDocOpen, setIsDocOpen] = useState(false);
   const { value } = useField(entity)(field.di);
-
   const base64Data = typeof value === 'string' ? value : '';
   const { objectUrl, mimeType } = useObjectUrl(base64Data || null);
-
   const isPDF = mimeType === 'application/pdf';
 
   return objectUrl ? (

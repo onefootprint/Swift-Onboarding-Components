@@ -3,10 +3,10 @@ import { DataKind, isVaultDataDecrypted } from '@onefootprint/types';
 import { Box, CodeInline, Grid, LinkButton, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import { getCustomDIs } from 'src/components/entities/utils/get-dis';
 import styled, { css } from 'styled-components';
 
+import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import useDecryptForm from '../../../../hooks/use-decrypt-form';
@@ -32,10 +32,7 @@ const CustomDataFields = ({
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
   const getFieldProps = useField(entity);
-  const { data: vaultWithTransforms } = useEntityVaultWithTransforms(
-    entity.id,
-    entity,
-  );
+  const { data: vaultWithTransforms } = useEntityVault(entity.id, entity);
   const { vault: vaultData, dataKinds } = vaultWithTransforms || {};
   const customDIs = getCustomDIs(vaultData || {});
   const selectableFields = customDIs.filter(di => getFieldProps(di).canSelect);
