@@ -12,7 +12,7 @@ import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
 import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
-import { GOOGLE_MAPS_KEY } from '../config/constants';
+import { GOOGLE_MAPS_SRC } from '../config/constants';
 import configureI18n from '../config/initializers/i18next';
 import queryClient from '../config/initializers/react-query';
 
@@ -42,11 +42,9 @@ const App = ({ Component, pageProps }: AppProps) => {
           </BifrostMachineProvider>
         </AppearanceProvider>
       </QueryClientProvider>
-      <Script
-        async
-        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&loading=async&libraries=places&callback=Function.prototype`}
-        strategy="lazyOnload"
-      />
+      {GOOGLE_MAPS_SRC ? (
+        <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" />
+      ) : null}
     </>
   );
 };

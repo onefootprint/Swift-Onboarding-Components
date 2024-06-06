@@ -5,7 +5,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { L10nContextProvider } from './components/l10n-provider';
 import { MachineProvider } from './components/machine-provider';
-import { GOOGLE_MAPS_KEY } from './config/constants';
+import { GOOGLE_MAPS_SRC } from './config/constants';
 import Router from './pages/router';
 import type { IdvProps } from './types';
 import { checkIsInIframe } from './utils';
@@ -25,11 +25,9 @@ const App = ({ l10n, onIdentifyDone, isInIframe, ...props }: AppProps) => {
           <Router l10n={l10n} onIdentifyDone={onIdentifyDone} />
         </MachineProvider>
       </L10nContextProvider>
-      <Script
-        async
-        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&loading=async&libraries=places&callback=Function.prototype`}
-        strategy="lazyOnload"
-      />
+      {GOOGLE_MAPS_SRC ? (
+        <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" />
+      ) : null}
     </>
   );
 };

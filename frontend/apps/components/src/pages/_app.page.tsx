@@ -8,7 +8,7 @@ import FootprintProvider from 'src/components/footprint-provider';
 import configureFootprint from 'src/components/footprint-provider/adapters';
 import { createGlobalStyle } from 'styled-components';
 
-import { GOOGLE_MAPS_KEY } from '../config/constants';
+import { GOOGLE_MAPS_SRC } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 
@@ -31,10 +31,9 @@ const App = ({ Component, pageProps }: AppProps) => {
           </FootprintProvider>
         </AppearanceProvider>
       </QueryClientProvider>
-      <Script
-        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&callback=Function.prototype`}
-        strategy="lazyOnload"
-      />
+      {GOOGLE_MAPS_SRC ? (
+        <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" />
+      ) : null}
     </>
   );
 };
