@@ -17,7 +17,6 @@ use crate::{
     State,
 };
 use api_core::auth::tenant::TenantAuth;
-use api_core::auth::AuthError;
 use api_core::proxy::config::{
     JitProxyHeaderParams,
     ProxyHeaderParams,
@@ -28,6 +27,7 @@ use api_core::ApiErrorKind;
 use newtypes::{
     AccessEventPurpose,
     InvokeVaultProxyPermission,
+    PreviewApi,
     ProxyConfigId,
 };
 use paperclip::actix::web::{
@@ -60,16 +60,9 @@ pub async fn just_in_time(
     request: HttpRequest,
     root_span: RootSpan,
 ) -> ApiResult<HttpResponse> {
+    auth.check_preview_guard(PreviewApi::VaultProxyJit)?;
     let proxy_config = ProxyConfig::try_from((jit_params, opt_params, request.headers()))?;
     let auth = auth.check_guard(InvokeVaultProxyPermission::JustInTime)?;
-
-    let tenant_id = &auth.tenant().id;
-    if !state
-        .ff_client
-        .flag(feature_flag::BoolFlag::IsVaultProxyJitEndpointEnabled(tenant_id))
-    {
-        return Err(AuthError::ApiEndpointRequiresSupportEnablement.into());
-    }
 
     invoke_vault_proxy(
         state,
@@ -99,18 +92,9 @@ pub async fn id(
     request: HttpRequest,
     root_span: RootSpan,
 ) -> ApiResult<HttpResponse> {
+    auth.check_preview_guard(PreviewApi::VaultProxy)?;
     let id = proxy_config_id.into_inner();
     let auth = auth.check_guard(InvokeVaultProxyPermission::Id { id: id.clone() })?;
-
-    let tenant_id = &auth.tenant().id;
-    if !state
-        .ff_client
-        .flag(feature_flag::BoolFlag::IsVaultProxyPreConfiguredEndpointEnabled(
-            tenant_id,
-        ))
-    {
-        return Err(AuthError::ApiEndpointRequiresSupportEnablement.into());
-    }
 
     invoke_vault_proxy(
         state,

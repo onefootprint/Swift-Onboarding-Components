@@ -76,10 +76,6 @@ pub enum BoolFlag<'a> {
     StepUpOnAmlHit(&'a ObConfigurationKey),
     #[strum(to_string = "MakeLexisCall")]
     MakeLexisCall(&'a TenantId),
-    #[strum(to_string = "IsVaultProxyPreConfiguredEndpointEnabled")]
-    IsVaultProxyPreConfiguredEndpointEnabled(&'a TenantId),
-    #[strum(to_string = "IsVaultProxyJitEndpointEnabled")]
-    IsVaultProxyJitEndpointEnabled(&'a TenantId),
     #[strum(to_string = "IsNeuroEnabledForObc")]
     IsNeuroEnabledForObc(&'a ObConfigurationKey),
     #[strum(to_string = "RequireCaptureOnStepUp")]
@@ -142,8 +138,6 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
             Self::PreferWhatsapp(k) => Some(k.to_string()),
             Self::MakeLexisCall(k) => Some(k.to_string()),
-            Self::IsVaultProxyPreConfiguredEndpointEnabled(k) => Some(k.to_string()),
-            Self::IsVaultProxyJitEndpointEnabled(k) => Some(k.to_string()),
             Self::IsNeuroEnabledForObc(k) => Some(k.to_string()),
             Self::RequireCaptureOnStepUp(k) => Some(k.to_string()),
             Self::TenantCanViewNeuro(k) => Some(k.to_string()),
@@ -190,8 +184,6 @@ impl<'a> BoolFlag<'a> {
             Self::UseBackupTwilioCredentials(_) => false,
             Self::PreferWhatsapp(_) => false,
             Self::MakeLexisCall(_) => false,
-            Self::IsVaultProxyPreConfiguredEndpointEnabled(_) => false,
-            Self::IsVaultProxyJitEndpointEnabled(_) => false,
             Self::IsNeuroEnabledForObc(_) => false,
             Self::RequireCaptureOnStepUp(_) => false,
             Self::TenantCanViewNeuro(_) => false,
@@ -242,8 +234,6 @@ impl<'a> BoolFlag<'a> {
             | Self::CreateKycWorkflowForAlpacaOnboardings(_)
             | Self::StepUpOnAmlHit(_)
             | Self::MakeLexisCall(_)
-            | Self::IsVaultProxyPreConfiguredEndpointEnabled(_)
-            | Self::IsVaultProxyJitEndpointEnabled(_)
             | Self::IsNeuroEnabledForObc(_)
             | Self::RequireCaptureOnStepUp(_)
             | Self::UseKycWaterfallV2Rollout(_)
