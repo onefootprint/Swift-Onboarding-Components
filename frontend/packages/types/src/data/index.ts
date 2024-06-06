@@ -82,8 +82,6 @@ export type {
 export { DupeKind } from './duplicate-data';
 export type { Entity, EntityVault, EntityWorkflow } from './entity';
 export {
-  ApiEntityStatus,
-  augmentEntityWithOnboardingInfo,
   EntityKind,
   EntityLabel,
   EntityStatus,

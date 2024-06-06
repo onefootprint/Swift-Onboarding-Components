@@ -5,14 +5,14 @@ import {
   type GetDuplicateDataResponse,
   IdDI,
 } from '@onefootprint/types';
-import { ApiEntityStatus } from '@onefootprint/types/src/data';
+import { EntityStatus } from '@onefootprint/types/src/data';
 
 const duplicateDataFixturePopulated: GetDuplicateDataResponse = {
   sameTenant: [
     {
       dupeKinds: [DupeKind.email, DupeKind.ssn9],
       fpId: 'fp_id_test',
-      status: ApiEntityStatus.pass,
+      status: EntityStatus.pass,
       startTimestamp: '2024-10-30T16:38:20.506011Z',
       data: [
         {
@@ -46,7 +46,7 @@ const duplicateDataFixturePopulated: GetDuplicateDataResponse = {
     {
       dupeKinds: [DupeKind.phoneNumber],
       fpId: 'fp_id_test2',
-      status: ApiEntityStatus.fail,
+      status: EntityStatus.failed,
       startTimestamp: '2023-11-30T16:38:20.506011Z',
       data: [
         {

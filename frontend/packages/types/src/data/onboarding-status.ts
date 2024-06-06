@@ -3,6 +3,7 @@ enum OnboardingStatus {
   fail = 'fail',
   pending = 'pending',
   incomplete = 'incomplete',
+  none = 'none',
 }
 
 export default OnboardingStatus;

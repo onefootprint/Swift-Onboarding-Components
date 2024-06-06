@@ -1,7 +1,7 @@
-import type { ApiEntityStatus, Entity } from '../data';
+import type { Entity } from '../data';
 
 export type GetEntityRequest = {
   id: string;
 };
 
-export type GetEntityResponse = Entity<ApiEntityStatus | undefined>;
+export type GetEntityResponse = Entity;

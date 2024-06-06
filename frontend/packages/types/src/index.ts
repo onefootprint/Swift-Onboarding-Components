@@ -393,7 +393,6 @@ export type {
 export {
   AccessLogKind,
   ActorKind,
-  augmentEntityWithOnboardingInfo,
   AuthMethodKind,
   BacktestingRuleAction,
   BeneficialOwnerDataAttribute,

@@ -27,6 +27,17 @@ export type EntitiesQueryParams = {
   external_id?: string;
 };
 
+export enum EntityStatusFilter {
+  pass = 'pass',
+  failed = 'fail',
+  incomplete = 'incomplete',
+  inProgress = 'in_progress',
+  pending = 'pending',
+  none = 'none',
+  complete = 'complete',
+  manualReview = 'manual_review',
+}
+
 const defaultQueryParams: EntitiesQueryParams = {
   state: undefined,
   verification: undefined,
@@ -72,7 +83,7 @@ const useFilters = () => {
         requiresManualReview: false,
       };
     }
-    if (verification === EntityStatus.manualReview) {
+    if (verification === EntityStatusFilter.manualReview) {
       return {
         statuses: undefined,
         requiresManualReview: true,

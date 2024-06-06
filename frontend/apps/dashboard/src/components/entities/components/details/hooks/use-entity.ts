@@ -1,6 +1,5 @@
 import request from '@onefootprint/request';
 import type { GetEntityRequest, GetEntityResponse } from '@onefootprint/types';
-import { augmentEntityWithOnboardingInfo } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -28,8 +27,6 @@ const useEntity = (id: string) => {
     () => getEntity(authHeaders, { id }),
     {
       enabled: isReady && !!id,
-      select: (response: GetEntityResponse) =>
-        augmentEntityWithOnboardingInfo(response),
     },
   );
 };

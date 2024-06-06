@@ -1,4 +1,4 @@
-import type { ApiEntityStatus } from '../data';
+import type { EntityStatus } from '../data';
 
 export type GetEntityOwnedBusinessIdsRequest = {
   entityId: string;
@@ -6,5 +6,5 @@ export type GetEntityOwnedBusinessIdsRequest = {
 
 export type GetEntityOwnedBusinessIdsResponse = {
   id: string;
-  status: ApiEntityStatus | undefined;
+  status: EntityStatus;
 }[];

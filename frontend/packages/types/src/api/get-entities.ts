@@ -1,4 +1,4 @@
-import type { ApiEntityStatus, Entity, EntityKind } from '../data';
+import type { Entity, EntityKind } from '../data';
 
 export type GetEntitiesRequest = {
   kind?: EntityKind;
@@ -15,4 +15,4 @@ export type GetEntitiesRequest = {
   show_all?: boolean;
 };
 
-export type GetEntitiesResponse = Entity<ApiEntityStatus | undefined>[];
+export type GetEntitiesResponse = Entity[];

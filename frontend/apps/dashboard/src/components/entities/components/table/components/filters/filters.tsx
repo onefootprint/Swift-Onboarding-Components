@@ -1,9 +1,8 @@
-import { EntityStatus } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import useFilters from '../../../../hooks/use-filters';
+import useFilters, { EntityStatusFilter } from '../../../../hooks/use-filters';
 import DrawerFilter from './components/drawer-filter';
 import Info from './components/info';
 import ToggleGroup from './components/toggle-group';
@@ -52,12 +51,15 @@ const Filters = () => {
           groupId="state"
           value={filters.values.state}
           options={[
-            { value: EntityStatus.complete, label: t('status.complete') },
-            { value: EntityStatus.incomplete, label: t('status.incomplete') },
+            { value: EntityStatusFilter.complete, label: t('status.complete') },
+            {
+              value: EntityStatusFilter.incomplete,
+              label: t('status.incomplete'),
+            },
           ]}
           onChange={newValue => {
             const newVerification =
-              newValue === EntityStatus.incomplete
+              newValue === EntityStatusFilter.incomplete
                 ? undefined
                 : filters.values.verification;
 
@@ -70,13 +72,13 @@ const Filters = () => {
         <ToggleGroup
           groupId="verification"
           value={filters.values.verification}
-          disabled={filters.values.state === EntityStatus.incomplete}
+          disabled={filters.values.state === EntityStatusFilter.incomplete}
           options={[
-            { value: EntityStatus.pass, label: t('status.pass') },
-            { value: EntityStatus.failed, label: t('status.failed') },
-            { value: EntityStatus.none, label: t('status.none') },
+            { value: EntityStatusFilter.pass, label: t('status.pass') },
+            { value: EntityStatusFilter.failed, label: t('status.failed') },
+            { value: EntityStatusFilter.none, label: t('status.none') },
             {
-              value: EntityStatus.manualReview,
+              value: EntityStatusFilter.manualReview,
               label: t('status.manual-review'),
               count: manualReviewQuery.data?.meta.count,
             },
@@ -84,7 +86,7 @@ const Filters = () => {
           onChange={newValue => {
             filters.push({
               verification: newValue,
-              state: EntityStatus.complete,
+              state: EntityStatusFilter.complete,
             });
           }}
         />

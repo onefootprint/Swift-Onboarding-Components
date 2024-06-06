@@ -1,6 +1,5 @@
 import request from '@onefootprint/request';
 import {
-  EntityStatus,
   type GetDuplicateDataRequest,
   type GetDuplicateDataResponse,
 } from '@onefootprint/types';
@@ -25,13 +24,7 @@ const transformToDuplicateTableData = (
   duplicateData: GetDuplicateDataResponse,
 ) => {
   if (!duplicateData) return undefined;
-  const transformedSameTenantData = duplicateData.sameTenant.map(item => ({
-    ...item,
-    status: item.status
-      ? (item.status as unknown as EntityStatus)
-      : EntityStatus.none,
-  }));
-  transformedSameTenantData.sort((a, b) => {
+  duplicateData.sameTenant.sort((a, b) => {
     if (!a.startTimestamp || !b.startTimestamp) return 0;
     return (
       new Date(b.startTimestamp).getTime() -
@@ -40,7 +33,7 @@ const transformToDuplicateTableData = (
   });
 
   return {
-    sameTenant: transformedSameTenantData,
+    sameTenant: duplicateData.sameTenant,
     otherTenant: duplicateData.otherTenant,
   };
 };

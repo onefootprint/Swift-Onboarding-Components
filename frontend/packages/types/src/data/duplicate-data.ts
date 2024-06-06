@@ -1,4 +1,4 @@
-import type { ApiEntityStatus, Attribute, EntityStatus } from './entity';
+import type { Attribute, EntityStatus } from './entity';
 
 export enum DupeKind {
   ssn9 = 'ssn9',
@@ -9,17 +9,15 @@ export enum DupeKind {
   cookieId = 'cookie_id',
 }
 
-export type DuplicateDataItem<TStatus = EntityStatus> = {
+export type DuplicateDataItem = {
   dupeKinds: DupeKind[];
   fpId: string;
   startTimestamp: string;
-  status: TStatus;
+  status: EntityStatus;
   data: Attribute[];
 };
 
-export type SameTenantDuplicateData = DuplicateDataItem<
-  ApiEntityStatus | undefined
->[];
+export type SameTenantDuplicateData = DuplicateDataItem[];
 
 export type OtherTenantsDuplicateDataSummary = {
   numMatches: number;

@@ -1,7 +1,6 @@
 import { IcoEye16, IcoWarningSmall16 } from '@onefootprint/icons';
 import type { EntityStatus } from '@onefootprint/types';
 import { Badge, Stack, Text, Tooltip } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +27,7 @@ const StatusBadge = ({
   return (
     <Stack align="center">
       <Badge variant={badgeVariant} whiteSpace="nowrap">
-        <span>{t(status as ParseKeys<'common'>)}</span>
+        <span>{t(status)}</span>
         {requiresManualReview && (
           <Stack marginLeft={2}>
             <IcoWarningSmall16 color={badgeVariant} testID="manualReviewIcon" />

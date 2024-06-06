@@ -1,5 +1,5 @@
 import type { GetEntityResponse } from '@onefootprint/types';
-import { type ApiEntityStatus, BusinessDI } from '@onefootprint/types/src/data';
+import { BusinessDI, type EntityStatus } from '@onefootprint/types/src/data';
 import { useQueries } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 
@@ -8,7 +8,7 @@ import useGetEntityOwnedBusinessIds from './use-get-entity-owned-business-ids';
 
 export type EntityOwnedBusinessInfo = {
   id: string;
-  status: ApiEntityStatus | undefined;
+  status: EntityStatus;
   name: string;
 };
 

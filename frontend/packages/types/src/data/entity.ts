@@ -16,32 +16,18 @@ export enum EntityKind {
   person = 'person',
 }
 
-export enum ApiEntityStatus {
-  pass = 'pass',
-  fail = 'fail',
-  pending = 'pending',
-  incomplete = 'incomplete',
-  inProgress = 'in_progress',
-}
-
 export enum EntityLabel {
   active = 'active',
   offboard_fraud = 'offboard_fraud',
   offboard_other = 'offboard_other',
 }
 
-/// This type doesn't actually exist on the backend - it is a frontend-only representation of the
-/// status of an entity.
-/// Realistically, all but the `none` status exist on the backend as EntityStatuses
 export enum EntityStatus {
-  complete = 'complete',
+  pass = 'pass',
   failed = 'fail',
   incomplete = 'incomplete',
   inProgress = 'in_progress',
-  manualReview = 'manual_review',
-  pass = 'pass',
   pending = 'pending',
-  // Onboarding hasn't started for this vault
   none = 'none',
 }
 
@@ -58,7 +44,7 @@ export type Attribute = {
   transforms: Transforms;
 };
 
-export type Entity<TStatus = EntityStatus> = {
+export type Entity = {
   data: Attribute[];
   hasOutstandingWorkflowRequest: boolean;
   id: string;
@@ -69,7 +55,7 @@ export type Entity<TStatus = EntityStatus> = {
   requiresManualReview: boolean;
   sandboxId?: string;
   startTimestamp: string;
-  status: TStatus;
+  status: EntityStatus;
   watchlistCheck: WatchlistCheckEventData | null;
   workflows: EntityWorkflow[];
 
@@ -138,17 +124,3 @@ export const mostRecentWorkflow = (
   }
   return 0;
 };
-
-export const augmentEntityWithOnboardingInfo = (
-  entity: Entity<ApiEntityStatus | undefined>,
-) => ({
-  ...entity,
-  status: getEntityStatus(entity),
-});
-
-const getEntityStatus = (
-  entity: Entity<ApiEntityStatus | undefined>,
-): EntityStatus =>
-  entity.status
-    ? (entity.status as unknown as EntityStatus)
-    : EntityStatus.none;

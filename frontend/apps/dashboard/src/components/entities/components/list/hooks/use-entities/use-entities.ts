@@ -5,7 +5,6 @@ import type {
   GetEntitiesRequest,
   GetEntitiesResponse,
 } from '@onefootprint/types';
-import { augmentEntityWithOnboardingInfo } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useCursorPagination } from 'src/hooks/use-pagination';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -50,10 +49,6 @@ const useEntities = (
       }),
     {
       enabled: filters.isReady,
-      select: (response: PaginatedRequestResponse<GetEntitiesResponse>) => ({
-        meta: response.meta,
-        data: response.data.map(augmentEntityWithOnboardingInfo),
-      }),
     },
   );
   const pagination = useCursorPagination({
