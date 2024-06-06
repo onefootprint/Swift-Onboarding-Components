@@ -3,6 +3,7 @@ import type { ProviderReturn } from '@onefootprint/idv';
 import {
   checkIsInIframe,
   checkIsSocialMediaBrowser,
+  getLogger,
   InitShimmer,
   Logger,
   useGetOnboardingConfig,
@@ -25,6 +26,47 @@ type InitProps = { fpProvider: ProviderReturn };
 
 const STUCK_ON_SHIMMER_TIMEOUT = 5000;
 
+const { logError } = getLogger({ location: 'bifrost-init' });
+
+const isPropsSaved = (context: Record<string, unknown>) => {
+  const { bootstrapData, showCompletionPage, showLogo, l10n, authToken } =
+    context;
+  return (
+    bootstrapData !== undefined &&
+    showCompletionPage !== undefined &&
+    showLogo !== undefined &&
+    l10n !== undefined &&
+    authToken !== undefined
+  );
+};
+
+const setupLogger = async (
+  fpProvider: ProviderReturn,
+  orgIds: Set<string>,
+  config: PublicOnboardingConfig,
+) => {
+  const isInIframe = checkIsInIframe();
+  const sdkContextModel = await getSdkContext(fpProvider);
+
+  if (config.isLive && !orgIds.has(config.orgId)) {
+    Logger.enableLogRocket();
+    Logger.identify({
+      ...sdkContextModel,
+      appClipExperienceId: config.appClipExperienceId,
+      iframe: !!isInIframe,
+      isAppClipEnabled: config.isAppClipEnabled,
+      isInstantAppEnabled: config.isInstantAppEnabled,
+      isNoPhoneFlow: config.isNoPhoneFlow,
+      kind: String(config.kind),
+      orgId: config.orgId,
+      orgName: config.orgName,
+      publicKey: config.key,
+      requiresIdDoc: config.requiresIdDoc,
+      socialMedia: checkIsSocialMediaBrowser(),
+    });
+  }
+};
+
 const Init = ({ fpProvider }: InitProps) => {
   const [state, send] = useBifrostMachine();
   const {
@@ -34,38 +76,20 @@ const Init = ({ fpProvider }: InitProps) => {
   } = state.context;
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
+  const startMs = Date.now();
   const obConfigAuth = publicKeyContext
     ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext }
     : undefined;
 
-  const setupLogger = async (config: PublicOnboardingConfig) => {
-    const isInIframe = checkIsInIframe();
-    const { orgName, orgId, key, isLive } = config;
-    const sdkContextModel = await getSdkContext(fpProvider);
-
-    if (isLive && !orgIds.has(orgId)) {
-      Logger.enableLogRocket();
-      Logger.identify({
-        ...sdkContextModel,
-        orgName,
-        orgId,
-        publicKey: key,
-        iframe: !!isInIframe,
-        socialMedia: checkIsSocialMediaBrowser(),
-      });
-    }
-  };
-
   useTimeout(() => {
-    Logger.error(
-      `User is stuck on init shimmer screen for 5+ seconds. Known args: ${JSON.stringify(
-        {
-          publicKey: publicKeyContext,
-          config: configContext,
-          isPropsSaved: isPropsSaved(),
-        },
-      )}`,
-      { location: 'init-shimmer' },
+    logError(
+      `User is stuck on init shimmer screen for ${(Date.now() - startMs) / 1000} seconds`,
+      undefined,
+      {
+        config: JSON.stringify(configContext),
+        isPropsSaved: isPropsSaved(state.context),
+        publicKey: String(publicKeyContext),
+      },
     );
   }, STUCK_ON_SHIMMER_TIMEOUT);
 
@@ -75,43 +99,25 @@ const Init = ({ fpProvider }: InitProps) => {
     { obConfigAuth, authToken: authTokenContext },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
-        setupLogger(config);
-
+        setupLogger(fpProvider, orgIds, config);
         send({
           type: 'initContextUpdated',
-          payload: {
-            config: { ...config },
-          },
+          payload: { config: { ...config } },
         });
       },
-      onError: error => {
-        Logger.error(
-          `Fetching onboarding config in bifrost init failed with error: 
-        ${getErrorMessage(error)}`,
-          { location: 'bifrost-init' },
+      onError: err => {
+        logError(
+          `Fetching onboarding config failed: ${getErrorMessage(err)}`,
+          err,
         );
-        send({
-          type: 'configRequestFailed',
-        });
+        send({ type: 'configRequestFailed' });
       },
     },
   );
 
-  const isPropsSaved = () => {
-    const { bootstrapData, showCompletionPage, showLogo, l10n, authToken } =
-      state.context;
-    return (
-      bootstrapData !== undefined &&
-      showCompletionPage !== undefined &&
-      showLogo !== undefined &&
-      l10n !== undefined &&
-      authToken !== undefined
-    );
-  };
-
   useProps(
     (props: FootprintVerifyDataProps) => {
-      if (isPropsSaved()) {
+      if (isPropsSaved(state.context)) {
         return;
       }
 
@@ -138,9 +144,9 @@ const Init = ({ fpProvider }: InitProps) => {
       });
     },
     (error: unknown) => {
-      Logger.warn(
-        `Message: Failed to fetch initial properties ${getErrorMessage(error)}`,
-        { location: 'init-props' },
+      logError(
+        `Failed to fetch initial properties ${getErrorMessage(error)}`,
+        error,
       );
       send({ type: 'initError' });
     },

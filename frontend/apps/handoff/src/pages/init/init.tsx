@@ -17,22 +17,28 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
-const logContext = (data: GetD2PResponse) => {
-  const { meta } = data;
-  const opener = meta?.opener ?? 'unknown';
-  const bifrostSessionId = meta?.sessionId ?? '';
-  const locale = meta?.l10n?.locale ?? 'en-US';
-  Logger.identify({ opener, bifrostSessionId, locale });
+const logContext = ({ meta }: GetD2PResponse) => {
+  Logger.identify({
+    fp_session_id: String(meta?.sessionId),
+    l10n: JSON.stringify(meta?.l10n),
+    opener: String(meta?.opener),
+    redirectUrl: String(meta?.redirectUrl),
+  });
 };
 
 const setupLogger = (config: PublicOnboardingConfig, orgIds: Set<string>) => {
-  const { orgName, orgId, key, isLive } = config;
-  if (isLive && !orgIds.has(orgId)) {
+  if (config.isLive && !orgIds.has(config.orgId)) {
     Logger.enableLogRocket();
     Logger.identify({
-      orgName,
-      orgId,
-      publicKey: key,
+      appClipExperienceId: config.appClipExperienceId,
+      isAppClipEnabled: config.isAppClipEnabled,
+      isInstantAppEnabled: config.isInstantAppEnabled,
+      isNoPhoneFlow: config.isNoPhoneFlow,
+      kind: String(config.kind),
+      orgId: config.orgId,
+      orgName: config.orgName,
+      publicKey: config.key,
+      requiresIdDoc: config.requiresIdDoc,
     });
   }
 };

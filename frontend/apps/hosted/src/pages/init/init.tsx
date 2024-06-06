@@ -63,10 +63,19 @@ const Init = () => {
     { obConfigAuth, authToken },
     {
       onSuccess: onboardingConfig => {
-        const { orgName, orgId, key, isLive } = onboardingConfig;
-        if (isLive && !orgIds.has(orgId)) {
+        if (onboardingConfig.isLive && !orgIds.has(onboardingConfig.orgId)) {
           Logger.enableLogRocket();
-          Logger.identify({ orgName, orgId, publicKey: key });
+          Logger.identify({
+            appClipExperienceId: onboardingConfig.appClipExperienceId,
+            isAppClipEnabled: onboardingConfig.isAppClipEnabled,
+            isInstantAppEnabled: onboardingConfig.isInstantAppEnabled,
+            isNoPhoneFlow: onboardingConfig.isNoPhoneFlow,
+            kind: String(onboardingConfig.kind),
+            orgId: onboardingConfig.orgId,
+            orgName: onboardingConfig.orgName,
+            publicKey: onboardingConfig.key,
+            requiresIdDoc: onboardingConfig.requiresIdDoc,
+          });
         }
 
         send({
