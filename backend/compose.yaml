@@ -29,7 +29,11 @@ services:
   enclave_proxy:
     build:
       context: .
-      dockerfile: ./images/enclave-proxy-dev/Dockerfile
+      dockerfile: ./images/enclave-proxy/Dockerfile
+      args:
+        GIT_HASH: dummy-version
+        CARGO_FEATURES: ""
+        BUILD_PROFILE: debug
     networks:
       - footprint
     ports:

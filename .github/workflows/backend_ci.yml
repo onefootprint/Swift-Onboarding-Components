@@ -46,13 +46,13 @@ jobs:
             dockerfile: enclave-proxy
             args:
               BUILD_PROFILE: release
-              CARGO_ARGS: "--features vsock"
+              CARGO_FEATURES: "vsock"
               GIT_HASH: ${{ github.sha }}
           - name: enclave-proxy-dev
             dockerfile: enclave-proxy
             args:
               BUILD_PROFILE: debug
-              CARGO_ARGS: ""
+              CARGO_FEATURES: ""
               GIT_HASH: ${{ github.sha }}
           - name: enclave
             dockerfile: enclave
@@ -75,6 +75,9 @@ jobs:
         id: login-ecr-image-cache
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
+      - name: Expose GitHub env vars to Docker
+        uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3
+
       - name: Build image
         env:
           REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
@@ -95,8 +98,8 @@ jobs:
               --file ./images/${{ matrix.dockerfile }}/Dockerfile \
               --tag ${IMG_REF} \
               --push \
-              ${{ github.ref == 'refs/heads/master' && '--cache-to type=registry,ref=${REGISTRY}/build-cache:${REPO}-master,compression=zstd,mode=max,image-manifest=true,oci-mediatypes=true' || '' }} \
-              --cache-from type=registry,ref=${REGISTRY}/build-cache:${REPO}-master \
+              ${{ github.ref == 'refs/heads/master' && '--cache-to type=gha,scope=${REPO}-master,mode=max' || '' }} \
+              --cache-from type=gha,scope=${REPO}-master \
               .
 
   test:

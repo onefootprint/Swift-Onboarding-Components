@@ -6,3 +6,4 @@ target
 vscode-target
 .pytest_cache
 .vscode
+.env

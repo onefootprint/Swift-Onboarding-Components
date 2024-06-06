@@ -211,13 +211,37 @@ ENV PATH="/root/.cargo/bin:$PATH"
 
 # -------- END NITRO ENCLAVE BUILDER --------
 
-# -------- BEGIN FOOTPRINT ENCLAVE BUILDER --------
-FROM nitro_enclave_builder AS builder
+#############################
+# 1. Install cargo-chef     #
+#############################
+FROM nitro_enclave_builder AS chef
 
-RUN --mount=type=bind,source=.,target=.,readwrite \
-    --mount=type=cache,target=./target \
-    --mount=type=cache,target=/root/.cargo/registry \
-    cargo build -p enclave --no-default-features --features nitro --release && \
+RUN mkdir -p /build
+WORKDIR /build
+RUN cargo install cargo-chef --version "0.1.67" --locked
+
+#################################
+# 2. Plan dependencies to build #
+#################################
+FROM chef AS planner
+
+COPY . .
+RUN cargo chef prepare --bin enclave --recipe-path recipe.json
+
+#################################
+# 3a. Pre-build dependencies    #
+#################################
+FROM chef AS builder
+
+ARG CARGO_FLAGS="--no-default-features --features nitro --release"
+
+COPY --from=planner /build/recipe.json recipe.json
+RUN cargo chef cook --bin enclave --target $(uname -m)-unknown-linux-musl --recipe-path recipe.json ${CARGO_FLAGS}
+
+#################################
+# 3b. Build the binary          #
+#################################
+RUN cargo build --bin enclave ${CARGO_FLAGS} && \
     cp ./target/release/enclave /usr/bin/enclave
 
 RUN mkdir -p /rootfs
@@ -245,9 +269,11 @@ RUN mkdir -p /rootfs/bin/ && \
 
 RUN find /rootfs
 
-# -------- END FOOTPRINT ENCLAVE BUILDER --------
-
+#################################
+# 4. Build runtime image        #
+#################################
 FROM scratch
+
 COPY --from=builder /rootfs /
 
 ENV RUST_LOG=info
