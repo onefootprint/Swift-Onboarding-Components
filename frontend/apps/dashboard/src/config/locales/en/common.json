@@ -897,12 +897,12 @@
         },
         "info": {
           "cta": "Don't show again",
-          "complete": "{{kind}} in the ’Complete’ state finished the onboarding.",
-          "incomplete": "{{kind}} in the 'Incomplete' state either left without verifying their basic personal data or are still working on it.",
-          "failed": "{{kind}} in the 'Failed' status failed the onboarding.",
-          "pass": "{{kind}} in the 'Verified' status have successfully completed the onboarding.",
-          "none": "{{kind}} in the onboarding status 'None' have only linked their email and phone number to their accounts ",
-          "manual-review": "{{kind}} in the ’Manual review’ onboarding status need your assessment before they can be verified or marked as failed"
+          "complete": "{{kind}} with a ’Complete’ state finished onboarding.",
+          "incomplete": "{{kind}} with an 'Incomplete' state either dropped off or are still in progress.",
+          "failed": "{{kind}} with a 'Failed' status finished onboarding and received a fail outcome from your playbook's rules.",
+          "pass": "{{kind}} with a 'Verified' status have finished onboarding and received a pass outcome from your playbook's rules.",
+          "none": "{{kind}} with a status of 'None' have not run through a playbook's rules.",
+          "manual-review": "{{kind}} in ’Manual review’ need your review."
         }
       }
     },
