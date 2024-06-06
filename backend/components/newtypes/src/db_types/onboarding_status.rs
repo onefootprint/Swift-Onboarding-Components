@@ -62,6 +62,20 @@ impl OnboardingStatus {
             OnboardingStatus::None => false,
         }
     }
+
+    /// Returns true if we can transition into self from the previous `old_status`.
+    /// These transition rules protect against wiping a scoped vault's decision status with a
+    /// non-decision
+    pub fn can_transition_from(&self, old_status: &Self) -> bool {
+        let priority = |s: &Self| match s {
+            Self::None => 0,
+            Self::Incomplete => 1,
+            Self::Pending => 1,
+            Self::Fail => 2,
+            Self::Pass => 2,
+        };
+        priority(self) >= priority(old_status)
+    }
 }
 
 crate::util::impl_enum_str_diesel!(OnboardingStatus);
@@ -86,14 +100,8 @@ impl OnboardingStatus {
             OnboardingStatusFilter::Fail => Some(Self::Fail),
             OnboardingStatusFilter::Incomplete => Some(Self::Incomplete),
             OnboardingStatusFilter::Pending => Some(Self::Pending),
-            OnboardingStatusFilter::None => None,
+            OnboardingStatusFilter::None => Some(Self::None),
         }
-    }
-}
-
-impl Default for OnboardingStatus {
-    fn default() -> Self {
-        Self::Pass
     }
 }
 
@@ -104,5 +112,25 @@ impl From<DecisionStatus> for OnboardingStatus {
             DecisionStatus::Pass => OnboardingStatus::Pass,
             DecisionStatus::StepUp => OnboardingStatus::Incomplete,
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::OnboardingStatus::*;
+    use crate::OnboardingStatus;
+    use test_case::test_case;
+
+    #[test_case(None, Incomplete => true)]
+    #[test_case(Incomplete, Pending => true)]
+    #[test_case(Pending, Incomplete => true)]
+    #[test_case(None, Pass => true)]
+    #[test_case(Pass, Fail => true)]
+    #[test_case(Pass, Incomplete => false)]
+    #[test_case(Fail, Pending => false)]
+    #[test_case(Pass, None => false)]
+    #[test_case(Incomplete, None => false)]
+    fn test_transition(from: OnboardingStatus, to: OnboardingStatus) -> bool {
+        to.can_transition_from(&from)
     }
 }

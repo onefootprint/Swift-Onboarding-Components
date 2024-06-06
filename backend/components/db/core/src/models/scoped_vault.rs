@@ -116,7 +116,7 @@ struct NewScopedVault {
     last_activity_at: DateTime<Utc>,
     kind: VaultKind,
     is_active: bool,
-    status: Option<OnboardingStatus>,
+    status: OnboardingStatus,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset)]
@@ -181,7 +181,7 @@ pub type IsNew = bool;
 
 pub struct NewScopedVaultArgs {
     pub is_active: bool,
-    pub status: Option<OnboardingStatus>,
+    pub status: OnboardingStatus,
 }
 
 impl ScopedVault {
@@ -207,7 +207,7 @@ impl ScopedVault {
         // Row doesn't exist for vault_id, tenant_id - create a new one
         let args = NewScopedVaultArgs {
             is_active: true,
-            status: None,
+            status: OnboardingStatus::None,
         };
         let sv = Self::create_for_playbook(conn, uv, ob_config, args)?;
         Ok((sv, true))
@@ -303,7 +303,7 @@ impl ScopedVault {
                 snapshot_seqno: seqno,
                 external_id,
                 kind: uv.kind,
-                status: None,
+                status: OnboardingStatus::None,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)

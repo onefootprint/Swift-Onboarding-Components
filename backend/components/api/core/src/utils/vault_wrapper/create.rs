@@ -114,9 +114,9 @@ impl VaultWrapper<Person> {
         let uv = Vault::create(conn, new_user_vault)?;
         let status = match obc.kind {
             // For now, when auth playbooks are super lightweight, just mark them as no status
-            ObConfigurationKind::Auth => None,
+            ObConfigurationKind::Auth => OnboardingStatus::None,
             ObConfigurationKind::Kyb | ObConfigurationKind::Kyc | ObConfigurationKind::Document => {
-                Some(OnboardingStatus::Incomplete)
+                OnboardingStatus::Incomplete
             }
         };
         // The vault starts as inactive since the phone/email haven't been verified by the user.

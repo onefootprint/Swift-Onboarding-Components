@@ -4056,7 +4056,8 @@
                 },
                 "required": [
                     "id",
-                    "requires_manual_review"
+                    "requires_manual_review",
+                    "status"
                 ]
             },
             "ValidateRequest": {

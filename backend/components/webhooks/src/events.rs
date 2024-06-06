@@ -165,7 +165,7 @@ mod examples {
                 event_kind: WebhookEventKind::OnboardingCompleted,
                 fp_id: FpId::test_data("fp_id_xyz".into()),
                 timestamp: Utc::now(),
-                status: Default::default(),
+                status: OnboardingStatus::Pass,
                 requires_manual_review: false,
                 is_live: false,
             }
@@ -178,7 +178,7 @@ mod examples {
                 event_kind: WebhookEventKind::OnboardingStatusChanged,
                 fp_id: FpId::test_data("fp_id_xyz".into()),
                 timestamp: Utc::now(),
-                new_status: Default::default(),
+                new_status: OnboardingStatus::Pass,
                 requires_manual_review: false,
                 is_live: false,
             }
