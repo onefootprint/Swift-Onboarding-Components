@@ -9,12 +9,15 @@ import {
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import useEntityOwnedBusinesses from '@/entity/hooks/use-entity-owned-businesses';
+
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
 import CardFieldset from './components/card-fieldset';
 import CustomDataFields from './components/custom-data-fields';
 import DocumentsFields from './components/document-fields';
 import InvestorProfileFields from './components/investor-profile-fields';
+import OwnedBusinesses from './components/owned-businesses';
 import useFieldsets from './hooks/use-fieldsets';
 import getGridTemplateAreas from './utils/get-grid-template-areas';
 
@@ -38,9 +41,13 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
   const hasDocuments = hasEntityDocuments(entity);
   const hasInvestorProfile = hasEntityInvestorProfile(entity);
   const hasCustomData = hasEntityCustomData(entity);
+  const { ownedBusinesses, hasBusinesses } = useEntityOwnedBusinesses(
+    entity.id,
+  );
 
   // if there are three elements, we want to display as grid
-  const displayFirstSectionAsGrid = getGridTemplateAreas(entity) <= 3;
+  const displayFirstSectionAsGrid =
+    getGridTemplateAreas({ entity, hasBusinesses }) <= 3;
 
   const gridFirstSection = (
     <Grid>
@@ -132,6 +139,11 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
               title={cards.title}
               iconComponent={cards.iconComponent}
             />
+          </GridItem>
+        ) : null}
+        {hasBusinesses ? (
+          <GridItem>
+            <OwnedBusinesses businesses={ownedBusinesses} />
           </GridItem>
         ) : null}
         {hasCustomData ? (

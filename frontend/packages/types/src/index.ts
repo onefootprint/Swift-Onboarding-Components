@@ -79,6 +79,8 @@ export type {
   GetEntitiesResponse,
   GetEntityMatchSignalsRequest,
   GetEntityMatchSignalsResponse,
+  GetEntityOwnedBusinessIdsRequest,
+  GetEntityOwnedBusinessIdsResponse,
   GetEntityRequest,
   GetEntityResponse,
   GetEntityRiskSignalsRequest,

@@ -34,43 +34,43 @@ describe('getGridTemplateAreas', () => {
       IdDI.middleName,
       IdDI.lastName,
     ]);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(3);
   });
 
   it('should generate grid template areas with US legal status', () => {
     const entity = createEntity([IdDI.usLegalStatus]);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(4);
   });
 
   it('should generate grid template areas with card', () => {
     const entity = createEntity(['card.test.name']);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(4);
   });
 
   it('should generate grid template areas with documents', () => {
     const entity = createEntity([DocumentDI.latestPassport]);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(4);
   });
 
   it('should generate grid template areas with investor profile', () => {
     const entity = createEntity([InvestorProfileDI.annualIncome]);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(4);
   });
 
   it('should generate grid template areas with custom data', () => {
     const entity = createEntity(['custom.test']);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(4);
   });
 
   it('should generate grid template areas with US legal status data and card-data', () => {
     const entity = createEntity([IdDI.usLegalStatus, 'card.flerp.name']);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(5);
   });
 
@@ -80,7 +80,7 @@ describe('getGridTemplateAreas', () => {
       'custom.test',
       'card.flerp.name',
     ]);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(6);
   });
 
@@ -91,7 +91,7 @@ describe('getGridTemplateAreas', () => {
       'card.flerp.name',
       InvestorProfileDI.annualIncome,
     ]);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(7);
   });
 
@@ -103,7 +103,7 @@ describe('getGridTemplateAreas', () => {
       InvestorProfileDI.annualIncome,
       DocumentDI.latestPassport,
     ]);
-    const result = getGridTemplateAreas(entity);
+    const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(8);
   });
 });

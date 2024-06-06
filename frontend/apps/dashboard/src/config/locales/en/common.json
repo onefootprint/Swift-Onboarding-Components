@@ -1995,6 +1995,10 @@
         },
         "id-documents-and-selfie": {
           "title": "ID documents & Selfie"
+        },
+        "businesses": {
+          "title": "Businesses",
+          "link": "View profile"
         }
       }
     },

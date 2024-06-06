@@ -91,6 +91,10 @@ export type {
   GetEntityMatchSignalsResponse,
 } from './get-entity-match-signals';
 export type {
+  GetEntityOwnedBusinessIdsRequest,
+  GetEntityOwnedBusinessIdsResponse,
+} from './get-entity-owned-business-ids';
+export type {
   GetEntityRiskSignalsRequest,
   GetEntityRiskSignalsResponse,
 } from './get-entity-risk-signals';
