@@ -2,6 +2,8 @@ ARG RUST_TOOLCHAIN="1.77.0"
 
 FROM clux/muslrust:${RUST_TOOLCHAIN}-stable AS builder
 
+RUN apt-get update && apt-get install -y clang
+
 ARG GIT_HASH
 ARG BUILD_PROFILE
 ARG CARGO_ARGS

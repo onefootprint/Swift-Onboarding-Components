@@ -2,6 +2,8 @@ ARG RUST_TOOLCHAIN="1.77.0"
 
 FROM clux/muslrust:${RUST_TOOLCHAIN}-stable AS builder
 
+RUN apt-get update && apt-get install -y clang
+
 RUN --mount=type=bind,source=.,target=.,readwrite \
     --mount=type=cache,target=./target \
     --mount=type=cache,target=/root/.cargo/registry \

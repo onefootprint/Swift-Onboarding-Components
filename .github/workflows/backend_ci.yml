@@ -31,7 +31,7 @@ jobs:
 
   build_images:
     name: Build images
-    runs-on: 16core24
+    runs-on: 16core
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
     strategy:
@@ -102,7 +102,7 @@ jobs:
   test:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
-    runs-on: 16core24
+    runs-on: 16core
     environment: backend_ci
     services:
       postgres:
@@ -120,9 +120,6 @@ jobs:
     steps:
       - name: install deps
         run: |
-          # https://github.com/actions/runner-images/issues/9937
-          sudo apt remove needrestart
-
           sudo apt-get update
           sudo apt-get install -y libssl-dev libpq-dev
 
@@ -173,7 +170,7 @@ jobs:
   clippy:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
-    runs-on: 16core24
+    runs-on: 16core
     steps:
       - uses: actions/checkout@v4
 
@@ -206,7 +203,7 @@ jobs:
   integration_tests:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
-    runs-on: 16core24
+    runs-on: 16core
     environment: backend_ci
     services:
       postgres:
@@ -301,7 +298,7 @@ jobs:
   rustfmt:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
-    runs-on: 16core24
+    runs-on: 16core
 
     steps:
       - uses: actions/checkout@v3
