@@ -78,6 +78,7 @@ const ResendButton = ({
           <LinkButton
             disabled={resendClicked && countdown > 0}
             onClick={handleClick}
+            data-dd-action-name="pin:resend"
           >
             {texts.resendCta}
           </LinkButton>

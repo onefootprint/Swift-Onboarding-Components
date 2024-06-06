@@ -47,6 +47,7 @@ const Component = ({
         loading={isLoading}
         type="submit"
         size="large"
+        data-dd-action-name="challenge:continue"
       >
         {texts.cta}
       </Button>

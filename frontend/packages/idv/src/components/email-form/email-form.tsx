@@ -53,7 +53,13 @@ const EmailForm = ({
         />
       </Box>
       <Box marginBottom={5}>
-        <Button fullWidth loading={isLoading} type="submit" size="large">
+        <Button
+          fullWidth
+          loading={isLoading}
+          type="submit"
+          size="large"
+          data-dd-action-name="email:continue"
+        >
           {texts.cta}
         </Button>
       </Box>

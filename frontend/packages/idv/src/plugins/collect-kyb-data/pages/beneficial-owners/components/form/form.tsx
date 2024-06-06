@@ -163,6 +163,7 @@ const Form = ({
           onCancel={onCancel}
           isLoading={isLoading}
           ctaLabel={ctaLabel}
+          submitButtonTestID="kyb-bo"
         />
       </Grid.Container>
     </FormProvider>

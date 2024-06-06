@@ -25,6 +25,7 @@ const CaptureButton = ({
         onClick={onClick}
         disabled={disabled}
         size="large"
+        data-dd-action-name="doc:take-photo"
       >
         Take photo
       </Button>
@@ -35,12 +36,14 @@ const CaptureButton = ({
         data-disabled={disabled}
         onClick={onClick}
         outerRadius={DEFAULT_OUTER_RADIUS}
+        data-dd-action-name="doc:take-photo"
       >
         {variant === 'round' ? (
           <InnerCircle
             aria-disabled={disabled}
             data-disabled={disabled}
             innerRadius={DEFAULT_INNER_RADIUS}
+            data-dd-action-name="doc:take-photo"
           />
         ) : (
           <InnerSquare />

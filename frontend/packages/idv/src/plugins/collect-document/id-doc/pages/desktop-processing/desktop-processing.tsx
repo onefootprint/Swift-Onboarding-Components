@@ -257,6 +257,7 @@ const DeskTopProcessing = () => {
         disabled={mode === 'loading'}
         onClick={handleNextStep}
         size="large"
+        data-dd-action-name="doc:continue"
       >
         {t('continue')}
       </Button>

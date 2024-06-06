@@ -17,6 +17,7 @@ const EditableFormButtonContainer = ({
   submitButtonTestID,
 }: EditableFormButtonContainerProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'global.components.cta' });
+  const actionContext = submitButtonTestID || 'editable-form';
 
   if (onCancel) {
     return (
@@ -26,10 +27,16 @@ const EditableFormButtonContainer = ({
           type="button"
           onClick={onCancel}
           disabled={isLoading}
+          data-dd-action-name={`${actionContext}:cancel`}
         >
           {t('cancel')}
         </Button>
-        <Button type="submit" loading={isLoading} testID={submitButtonTestID}>
+        <Button
+          type="submit"
+          loading={isLoading}
+          testID={submitButtonTestID}
+          data-dd-action-name={`${actionContext}:save`}
+        >
           {t('save')}
         </Button>
       </EndJustifiedButtons>
@@ -43,6 +50,7 @@ const EditableFormButtonContainer = ({
       size="large"
       loading={isLoading}
       testID={submitButtonTestID}
+      data-dd-action-name={`${actionContext}:continue`}
     >
       {ctaLabel ?? t('continue')}
     </Button>

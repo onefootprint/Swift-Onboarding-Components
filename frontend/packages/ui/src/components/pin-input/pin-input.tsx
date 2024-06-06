@@ -103,6 +103,7 @@ const PinInput = ({
               /** Do not change/remove these classes */
               className="fp-pin-input fp-custom-appearance"
               data-nid-target={`otp${pinIndex + 1}`}
+              data-dd-action-name={`otp:click-${pinIndex + 1}`}
               hasError={hasError}
               inputMode="numeric"
               $isDisabled={disabled || isIndexDisabled}

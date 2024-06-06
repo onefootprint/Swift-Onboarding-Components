@@ -79,6 +79,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
       $paddingTop,
       $paddingInline,
       $paddingBlock,
+      ...props
     }: LinkButtonProps,
     ref,
   ) => {
@@ -89,6 +90,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
     // @ts-ignore
     return (
       <LinkButtonStyled
+        {...props}
         /** Do not change/remove these classes */
         className="fp-link-button fp-custom-appearance"
         role={href ? 'link' : 'button'}

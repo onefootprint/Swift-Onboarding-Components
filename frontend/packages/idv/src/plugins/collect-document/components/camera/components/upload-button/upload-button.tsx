@@ -96,6 +96,7 @@ const UploadButton = ({
         onClick={handleUploadClick}
         radius={BUTTON_RADIUS}
         disabled={isLoading}
+        data-dd-action-name="doc:upload-photo"
       >
         <IcoImages24 color="quinary" />
       </RoundButton>

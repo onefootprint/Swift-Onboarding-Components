@@ -86,7 +86,12 @@ const DesktopSelfieRetry = () => {
               sideName={sideName}
             />
           </ErrorContainer>
-          <Button fullWidth onClick={handleSelfieRetake} size="large">
+          <Button
+            fullWidth
+            onClick={handleSelfieRetake}
+            size="large"
+            data-dd-action-name="selfie:retry"
+          >
             {t('take-selfie-again')}
           </Button>
         </Container>

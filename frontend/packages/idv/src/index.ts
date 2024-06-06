@@ -59,6 +59,7 @@ export {
   getLogger,
   getRandomID,
   getSdkArgsToken,
+  getTracker,
   hasAuthMethodUnverifiedEmail,
   hasInvalidHashFragment,
   isAuth,

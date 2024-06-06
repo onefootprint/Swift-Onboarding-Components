@@ -12,7 +12,7 @@ export {
 export { default as getBiometricChallengeResponse } from './get-biometric-challenge-response';
 export { default as getCanChallengeBiometrics } from './get-can-challenge-biometrics';
 export { default as getRandomID } from './get-random-id';
-export { getLogger, Logger } from './logger';
+export { getLogger, getTracker, Logger } from './logger';
 export { default } from './media';
 export { default as shouldChallengeEmail } from './should-challenge-email';
 export type { DeviceResponseJsonPayload } from './state-machine/utils/custom-listener';

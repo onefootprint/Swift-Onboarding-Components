@@ -44,7 +44,12 @@ const DifferentAccountOption = () => {
         </Label>
       </DividerContainer>
       <Stack direction="row" justify="center" align="center" width="100%">
-        <LinkButton onClick={handleLoginWithDifferent}>{t('label')}</LinkButton>
+        <LinkButton
+          onClick={handleLoginWithDifferent}
+          data-dd-action-name="different-account:cta"
+        >
+          {t('label')}
+        </LinkButton>
       </Stack>
       <LegalFooter />
     </Container>

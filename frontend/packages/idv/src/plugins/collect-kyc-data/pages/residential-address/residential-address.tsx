@@ -126,6 +126,7 @@ const ResidentialAddress = ({
             isLoading={mutation.isLoading}
             onCancel={onCancel}
             ctaLabel={ctaLabel}
+            submitButtonTestID="kyc-res-address"
           />
         </Grid.Container>
       </FormProvider>

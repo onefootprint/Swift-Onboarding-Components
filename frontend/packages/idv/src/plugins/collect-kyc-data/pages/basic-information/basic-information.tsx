@@ -155,6 +155,7 @@ const BasicInformation = ({
             isLoading={mutation.isLoading}
             onCancel={onCancel}
             ctaLabel={ctaLabel}
+            submitButtonTestID="kyc-basic-information"
           />
         </Grid.Container>
       </FormProvider>

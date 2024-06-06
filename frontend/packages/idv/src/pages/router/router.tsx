@@ -12,7 +12,7 @@ import {
   useLogStateMachine,
   useValidateSession,
 } from '../../hooks';
-import { FPCustomEvents, getLogger } from '../../utils';
+import { FPCustomEvents, getLogger, getTracker } from '../../utils';
 import {
   createAuthTokenChangedPayload,
   createReceivedDeviceResponseJsonPayload,
@@ -29,6 +29,7 @@ type RouterProps = {
 
 const { receivedDeviceResponseJson, stepUpCompleted } = FPCustomEvents;
 const { logWarn } = getLogger({ location: 'idv-router' });
+const { trackAction } = getTracker();
 
 const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
   const [state, send] = useIdvMachine();
@@ -149,6 +150,8 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
               if (onIdentifyDone && payload) {
                 onIdentifyDone(payload);
               }
+
+              trackAction('identify:complete');
             }}
           />
         </L10nContextProvider>
@@ -167,7 +170,10 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onClose={onClose}
-          onDone={payload => send({ type: 'onboardingCompleted', payload })}
+          onDone={payload => {
+            send({ type: 'onboardingCompleted', payload });
+            trackAction('onboarding:complete');
+          }}
           l10n={l10n}
         />
       ) : null}

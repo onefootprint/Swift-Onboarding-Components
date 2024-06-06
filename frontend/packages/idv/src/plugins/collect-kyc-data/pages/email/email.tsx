@@ -109,6 +109,7 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
           onCancel={onCancel}
           isLoading={mutation.isLoading}
           ctaLabel={ctaLabel}
+          submitButtonTestID="kyc-email"
         />
       </Grid.Container>
     </Stack>

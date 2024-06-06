@@ -1,1 +1,7 @@
-export { default, getLogger, default as Logger, uniqueLogger } from './logger';
+export {
+  default,
+  getLogger,
+  getTracker,
+  default as Logger,
+  uniqueLogger,
+} from './logger';

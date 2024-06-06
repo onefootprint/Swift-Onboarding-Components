@@ -41,6 +41,7 @@ const InlineAction = ({
         disabled={isDisabled}
         variant="label-4"
         onClick={event => handleClick(event as EventClickType)}
+        data-dd-action-name={`inline-action:${labelCta}`}
       >
         {labelCta}
       </LinkButton>

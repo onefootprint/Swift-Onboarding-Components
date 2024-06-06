@@ -197,6 +197,7 @@ const DesktopPhotoPrompt = ({
         disabled={isLoading}
         onClick={isRetry ? handleUpload : handleError}
         size="large"
+        data-dd-action-name={`doc:${isRetry ? 'upload-photo-retry' : 'continue'}`}
       >
         {isRetry ? t('choose-different-file') : t('continue')}
       </Button>

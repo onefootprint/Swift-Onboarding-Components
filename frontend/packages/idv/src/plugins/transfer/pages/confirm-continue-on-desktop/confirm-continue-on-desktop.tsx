@@ -40,6 +40,7 @@ const ConfirmContinueOnDesktop = () => {
             variant="primary"
             onClick={handleMobile}
             size="large"
+            data-dd-action-name="transfer-mobile:cta"
           >
             {t('cta.mobile')}
           </Button>
@@ -48,6 +49,7 @@ const ConfirmContinueOnDesktop = () => {
             variant="secondary"
             onClick={handleDesktop}
             size="large"
+            data-dd-action-name="transfer-desktop:cta"
           >
             {t('cta.desktop')}
           </Button>

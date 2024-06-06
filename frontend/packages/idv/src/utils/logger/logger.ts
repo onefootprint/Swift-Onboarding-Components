@@ -6,6 +6,7 @@ import * as LogRocket from 'logrocket';
 import { IS_LOGGING_ENABLED } from './constants';
 import type { ExtraProps, PrimitiveData } from './types';
 import initDataDog, {
+  dataDogAction,
   dataDogErrorEvent,
   dataDogInfoEvent,
   dataDogTrackEvent,
@@ -119,13 +120,15 @@ const LoggerFactory = () => {
   };
 
   return {
-    init,
-    identify,
-    track,
-    error,
-    warn,
-    info,
     enableLogRocket,
+    error,
+    identify,
+    info,
+    init,
+    isDataDogEnabled,
+    isLogRocketEnabled,
+    track,
+    warn,
   };
 };
 
@@ -150,6 +153,10 @@ export const getLogger = (
 
   logError: (msg: string, err?: unknown, extra?: PrimitiveData) =>
     Logger.error(err, { ...preExtra, ...extra }, msg),
+});
+
+export const getTracker = () => ({
+  trackAction: Logger.isDataDogEnabled ? dataDogAction : () => undefined,
 });
 
 export const uniqueLogger = (logger: (_: string) => void) => {

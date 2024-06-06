@@ -95,6 +95,7 @@ const IdDocPhotoButtons = ({
           loading={isLoading && captureMethod === 'upload'}
           disabled={isLoading}
           size="large"
+          data-dd-action-name="doc:upload-photo"
         >
           {t('upload-file.title')}
         </Button>
@@ -105,6 +106,7 @@ const IdDocPhotoButtons = ({
           onClick={onTakePhoto}
           variant={uploadFirst ? 'secondary' : 'primary'}
           size="large"
+          data-dd-action-name="doc:take-photo"
         >
           {t('take-photo.title')}
         </Button>
@@ -117,6 +119,7 @@ const IdDocPhotoButtons = ({
           loading={isLoading && captureMethod === 'upload'}
           disabled={isLoading}
           size="large"
+          data-dd-action-name="doc:upload-photo"
         >
           {t('upload-photo.title')}
         </Button>

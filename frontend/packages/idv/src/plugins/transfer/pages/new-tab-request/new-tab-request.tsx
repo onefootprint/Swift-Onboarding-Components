@@ -85,6 +85,7 @@ const NewTabRequest = () => {
         onClick={handleClick}
         fullWidth
         disabled={mutation.isLoading || !scopedAuthToken}
+        data-dd-action-name="transfer-tab:cta"
       >
         {t('cta')}
       </Button>

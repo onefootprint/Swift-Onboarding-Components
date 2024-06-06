@@ -246,6 +246,7 @@ const BasicDataForm = ({
         onCancel={onCancel}
         isLoading={isLoading}
         ctaLabel={ctaLabel}
+        submitButtonTestID="kyb-basic"
       />
     </Grid.Container>
   );

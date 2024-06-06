@@ -58,7 +58,12 @@ const Processing = ({ title, subtitle, cta }: ProcessingProps) => {
       <Container>
         <HeaderTitle title={title} subtitle={subtitle} />
         <AnimatedLoadingSpinner animationStart />
-        <LinkButton onClick={handleCancelD2p}>{cta}</LinkButton>
+        <LinkButton
+          onClick={handleCancelD2p}
+          data-dd-action-name="transfer-processing:cancel"
+        >
+          {cta}
+        </LinkButton>
       </Container>
     </>
   );

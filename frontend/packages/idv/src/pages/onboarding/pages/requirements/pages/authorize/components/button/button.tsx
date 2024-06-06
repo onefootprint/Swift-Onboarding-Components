@@ -30,6 +30,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
         onClick={onClick}
         text={t('cta')}
         size="large"
+        data-dd-action-name="authorize:cta"
       />
       {privacyPolicyUrl && (
         <Text variant="label-4" color="secondary" textAlign="center">

@@ -185,6 +185,7 @@ const BusinessAddressForm = ({
           onCancel={onCancel}
           isLoading={isLoading}
           ctaLabel={ctaLabel}
+          submitButtonTestID="kyb-biss-address"
         />
       </Grid.Container>
     </FormProvider>

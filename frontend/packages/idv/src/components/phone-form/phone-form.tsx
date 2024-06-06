@@ -97,6 +97,7 @@ const PhoneForm = ({
         type="submit"
         prefixIcon={IcoSmartphone224}
         size="large"
+        data-dd-action-name="phone:continue"
       >
         {texts.cta}
       </Button>

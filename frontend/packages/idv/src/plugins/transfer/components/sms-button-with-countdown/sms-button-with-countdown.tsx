@@ -91,6 +91,7 @@ const SmsButtonWithCountdown = ({
         loading={isResend && isLoading}
         onClick={isDisabled ? undefined : handleResend}
         size="large"
+        data-dd-action-name="transfer:resend-sms"
       >
         {t('cta')}
       </Button>

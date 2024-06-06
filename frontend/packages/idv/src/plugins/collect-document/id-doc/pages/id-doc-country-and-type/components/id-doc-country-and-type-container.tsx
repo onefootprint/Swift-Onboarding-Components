@@ -236,6 +236,7 @@ const IdDocCountryAndTypeContainer = ({
             onClick={handleSubmit}
             loading={isDocTypeSubmissionLoading}
             size="large"
+            data-dd-action-name="country-doc:continue"
           >
             {t('form.cta')}
           </Button>

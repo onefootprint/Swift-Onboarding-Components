@@ -188,4 +188,12 @@ export const dataDogInfoEvent = (
     err instanceof Error ? err : undefined,
   );
 
+export const dataDogAction = (act: string, actContext?: object) => {
+  try {
+    return datadogRum.addAction(act, actContext);
+  } catch (e) {
+    return undefined;
+  }
+};
+
 export default initDataDog;
