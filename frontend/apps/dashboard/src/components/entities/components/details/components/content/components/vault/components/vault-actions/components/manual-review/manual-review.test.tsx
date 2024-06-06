@@ -58,7 +58,7 @@ describe('<ManualReview />', () => {
         const trigger = screen.getByRole('button', { name: 'Review user' });
         await userEvent.click(trigger);
 
-        const item = screen.getByText('Keep user as Verified');
+        const item = screen.getByText('Keep user as Pass');
         await userEvent.click(item);
 
         await waitFor(() => {
@@ -84,7 +84,7 @@ describe('<ManualReview />', () => {
           const trigger = screen.getByRole('button', { name: 'Review user' });
           await userEvent.click(trigger);
 
-          const item = screen.getByText('Keep user as Verified');
+          const item = screen.getByText('Keep user as Pass');
           await userEvent.click(item);
 
           await waitFor(() => {
@@ -116,7 +116,7 @@ describe('<ManualReview />', () => {
           const trigger = screen.getByRole('button', { name: 'Review user' });
           await userEvent.click(trigger);
 
-          const item = screen.getByText('Keep user as Verified');
+          const item = screen.getByText('Keep user as Pass');
           await userEvent.click(item);
 
           await waitFor(() => {

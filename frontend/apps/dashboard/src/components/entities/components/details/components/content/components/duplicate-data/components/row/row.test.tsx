@@ -59,7 +59,7 @@ describe('Duplicate data table row <Row />', () => {
     expect(screen.getByText('Phone number')).toBeInTheDocument();
     expect(screen.getByText('Email address')).toBeInTheDocument();
     expect(screen.getByText('SSN')).toBeInTheDocument();
-    expect(screen.getByText('Verified')).toBeInTheDocument();
+    expect(screen.getByText('Pass')).toBeInTheDocument();
     expect(screen.getByText('10/30/23, 4:38 PM')).toBeInTheDocument();
   });
 });

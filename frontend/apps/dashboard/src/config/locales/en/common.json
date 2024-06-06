@@ -29,8 +29,8 @@
     "cancel": "No"
   },
   "entity-statuses": {
-    "pass": "Verified",
-    "fail": "Failed",
+    "pass": "Pass",
+    "fail": "Fail",
     "none": "None",
     "incomplete": "Incomplete",
     "in_progress": "In progress",
@@ -508,13 +508,13 @@
       "review": {
         "title-user": "Review user",
         "title-business": "Review business",
-        "mark-as-failed": "Mark as Failed",
-        "mark-as-verified": "Mark as Verified",
+        "mark-as-failed": "Mark as Fail",
+        "mark-as-verified": "Mark as Pass",
         "mark-as": "Mark user as {{status}}",
         "keep-as": "Keep user as {{status}}",
         "status": {
-          "fail": "Failed",
-          "pass": "Verified"
+          "fail": "Fail",
+          "pass": "Pass"
         }
       },
       "actions": {
@@ -859,8 +859,8 @@
         "status": {
           "complete": "Complete",
           "incomplete": "Incomplete",
-          "pass": "Verified",
-          "failed": "Failed",
+          "pass": "Pass",
+          "failed": "Fail",
           "none": "None",
           "manual-review": "Manual review"
         },
@@ -899,8 +899,8 @@
           "cta": "Don't show again",
           "complete": "{{kind}} with a ’Complete’ state finished onboarding.",
           "incomplete": "{{kind}} with an 'Incomplete' state either dropped off or are still in progress.",
-          "failed": "{{kind}} with a 'Failed' status finished onboarding and received a fail outcome from your playbook's rules.",
-          "pass": "{{kind}} with a 'Verified' status have finished onboarding and received a pass outcome from your playbook's rules.",
+          "failed": "{{kind}} with a 'Fail' status finished onboarding and received a fail outcome from your playbook's rules.",
+          "pass": "{{kind}} with a 'Pass' status have finished onboarding and received a pass outcome from your playbook's rules.",
           "none": "{{kind}} with a status of 'None' have not run through a playbook's rules.",
           "manual-review": "{{kind}} in ’Manual review’ need your review."
         }
@@ -1246,14 +1246,14 @@
       },
       "manual-review": {
         "status": {
-          "pass": "Verified",
-          "fail": "Failed"
+          "pass": "Pass",
+          "fail": "Fail"
         },
         "button": {
           "review-person": "Review user",
           "review-business": "Review business",
-          "mark-as-verified": "Mark as Verified",
-          "mark-as-failed": "Mark as Failed"
+          "mark-as-verified": "Mark as Pass",
+          "mark-as-failed": "Mark as Fail"
         },
         "dropdown": {
           "mark-as": "Mark user as {{status}}",
@@ -1513,12 +1513,10 @@
           "onboarding-decision-event": {
             "verified-by": "Successfully completed",
             "not-verified-by": "Completed",
-            "verified": "Verified",
-            "not-verified": "Failed",
             "onboarded-onto": "Onboarded onto",
             "decision-status": {
-              "pass": "Verified",
-              "fail": "Failed",
+              "pass": "Pass",
+              "fail": "Fail",
               "step_up_required": "Step up required"
             },
             "with": " with ",

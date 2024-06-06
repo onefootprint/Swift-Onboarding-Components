@@ -37,7 +37,7 @@ describe('<StatusBadge />', () => {
       watchlistLabel: 'This user is on a watchlist',
     });
 
-    const statusText = screen.getByText('Failed');
+    const statusText = screen.getByText('Fail');
     expect(statusText).toBeInTheDocument();
   });
 

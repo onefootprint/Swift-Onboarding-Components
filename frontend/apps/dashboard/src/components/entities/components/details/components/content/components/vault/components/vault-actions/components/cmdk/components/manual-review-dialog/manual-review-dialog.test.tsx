@@ -56,12 +56,12 @@ describe('<ManualReviewDialog />', () => {
     it('should show correct status in prompt', () => {
       renderManualReviewDialog({ status: ReviewStatus.pass });
       expect(
-        screen.getByText('Why are you marking this user as Verified?'),
+        screen.getByText('Why are you marking this user as Pass?'),
       ).toBeInTheDocument();
 
       renderManualReviewDialog({ status: ReviewStatus.fail });
       expect(
-        screen.getByText('Why are you marking this user as Failed?'),
+        screen.getByText('Why are you marking this user as Fail?'),
       ).toBeInTheDocument();
     });
 

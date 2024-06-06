@@ -69,7 +69,7 @@ describe('<DuplicateData/>', () => {
     ).not.toBeInTheDocument();
     expect(within(firstRow).getByText('Email address')).toBeInTheDocument();
     expect(within(firstRow).getByText('SSN')).toBeInTheDocument();
-    expect(within(firstRow).getByText('Verified')).toBeInTheDocument();
+    expect(within(firstRow).getByText('Pass')).toBeInTheDocument();
     expect(within(firstRow).getByText('10/30/24, 4:38 PM')).toBeInTheDocument();
 
     // Get second row
@@ -82,7 +82,7 @@ describe('<DuplicateData/>', () => {
       within(secondRow).queryByText('Email address'),
     ).not.toBeInTheDocument();
     expect(within(secondRow).queryByText('SSN')).not.toBeInTheDocument();
-    expect(within(secondRow).getByText('Failed')).toBeInTheDocument();
+    expect(within(secondRow).getByText('Fail')).toBeInTheDocument();
     expect(
       within(secondRow).getByText('11/30/23, 4:38 PM'),
     ).toBeInTheDocument();

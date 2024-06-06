@@ -49,9 +49,9 @@ describe('<List />', () => {
     });
 
     it.each`
-      id                                 | status        | createdAt
-      ${'fp_bid_VXND11zUVRYQKKUxbUN3KD'} | ${'Verified'} | ${'3/27/23, 2:43 PM'}
-      ${'fp_id_tvfUNdGqmk2kJyyka9gX22'}  | ${'Failed'}   | ${'10/19/23, 3:38 AM'}
+      id                                 | status    | createdAt
+      ${'fp_bid_VXND11zUVRYQKKUxbUN3KD'} | ${'Pass'} | ${'3/27/23, 2:43 PM'}
+      ${'fp_id_tvfUNdGqmk2kJyyka9gX22'}  | ${'Fail'} | ${'10/19/23, 3:38 AM'}
     `(
       'should show the id, onboarding status, created and other details for id=$id, status=$status, createdAt=$createdAt',
       async ({ id, status, createdAt }) => {

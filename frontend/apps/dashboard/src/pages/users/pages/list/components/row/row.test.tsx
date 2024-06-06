@@ -33,16 +33,16 @@ describe('User table row <Row />', () => {
   });
 
   describe('when the user is verified', () => {
-    it('should show as "Verified"', () => {
+    it('should show as "Pass"', () => {
       renderRow(entityPassedFixture);
-      expect(screen.getByText('Verified')).toBeInTheDocument();
+      expect(screen.getByText('Pass')).toBeInTheDocument();
     });
   });
 
   describe('when the user could not be verified', () => {
-    it('should show "Failed"', () => {
+    it('should show "Fail"', () => {
       renderRow(entityFailedFixture);
-      expect(screen.getByText('Failed')).toBeInTheDocument();
+      expect(screen.getByText('Fail')).toBeInTheDocument();
     });
   });
 
