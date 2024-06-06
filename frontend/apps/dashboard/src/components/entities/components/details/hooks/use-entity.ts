@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const getEntity = async (
+export const getEntity = async (
   authHeaders: AuthHeaders,
   { id }: GetEntityRequest,
 ) => {
