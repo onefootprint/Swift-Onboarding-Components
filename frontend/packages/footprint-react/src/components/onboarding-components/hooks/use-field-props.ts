@@ -281,6 +281,21 @@ const business: Record<string, Field> = {
       required: 'Website cannot be empty',
     },
   },
+  phoneNumber: {
+    autoComplete: 'tel',
+    className: 'fp-phone-input',
+    placeholder: 'Phone',
+    type: 'tel',
+    validations: {
+      required: 'errors.required',
+      validate: (value: string) => {
+        if (!isPhoneNumber(value)) {
+          return 'errors.invalid';
+        }
+        return true;
+      },
+    },
+  },
 };
 
 const getProps = (name: string) => {
@@ -341,7 +356,9 @@ const getProps = (name: string) => {
   if (name === 'business.website') {
     return business.website;
   }
-
+  if (name === 'business.phone_number') {
+    return business.phoneNumber;
+  }
   return null;
 };
 
