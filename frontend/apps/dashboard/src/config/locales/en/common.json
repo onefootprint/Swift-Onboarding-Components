@@ -1517,7 +1517,7 @@
             "decision-status": {
               "pass": "Pass",
               "fail": "Fail",
-              "step_up_required": "Step up required"
+              "step_up": "Step up required"
             },
             "with": " with ",
             "org-overwrite": {

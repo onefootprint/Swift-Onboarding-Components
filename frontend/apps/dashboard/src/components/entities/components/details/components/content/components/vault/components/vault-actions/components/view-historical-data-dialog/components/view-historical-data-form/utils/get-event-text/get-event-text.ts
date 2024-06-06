@@ -122,7 +122,7 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
     const decisionText: Record<DecisionStatus, string> = {
       [DecisionStatus.pass]: 'Verified',
       [DecisionStatus.fail]: 'Failed',
-      [DecisionStatus.stepUpRequired]: 'Step up required',
+      [DecisionStatus.stepUp]: 'Step up required',
     };
     return `Manually reviewed and marked as ${
       decisionText[status]

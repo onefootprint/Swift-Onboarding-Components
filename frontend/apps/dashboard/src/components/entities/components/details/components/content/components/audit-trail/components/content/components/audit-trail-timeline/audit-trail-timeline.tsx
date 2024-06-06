@@ -127,7 +127,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as OnboardingDecisionEventData;
       const shouldShowBody =
         eventData.annotation ||
-        eventData.decision.status === DecisionStatus.stepUpRequired;
+        eventData.decision.status === DecisionStatus.stepUp;
       items.push({
         time,
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,

@@ -24,7 +24,7 @@ const OnboardingDecisionEventBody = ({
   if (annotation && source.kind !== ActorKind.footprint) {
     return <AnnotationNote annotation={annotation} />;
   }
-  if (status === DecisionStatus.stepUpRequired) {
+  if (status === DecisionStatus.stepUp) {
     return (
       <EventBodyEntry
         testID="onboarding-decision-event-body"

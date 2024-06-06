@@ -1,7 +1,7 @@
 enum DecisionStatus {
   pass = 'pass',
   fail = 'fail',
-  stepUpRequired = 'step_up_required',
+  stepUp = 'step_up',
 }
 
 export default DecisionStatus;

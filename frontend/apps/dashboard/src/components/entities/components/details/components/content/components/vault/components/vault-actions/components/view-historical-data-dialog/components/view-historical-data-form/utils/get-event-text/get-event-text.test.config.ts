@@ -125,7 +125,7 @@ export const onboardingDecisionEventFixture = {
     data: {
       decision: {
         id: 'decision_1',
-        status: DecisionStatus.stepUpRequired,
+        status: DecisionStatus.stepUp,
         timestamp: new Date('2022-11-08T20:21:53.769699Z'),
         source: {
           kind: ActorKind.footprint,
