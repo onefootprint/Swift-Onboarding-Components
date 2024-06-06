@@ -41,12 +41,11 @@ impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
             review_status,
             device_type,
             curp_completed_seqno,
-            vaulted_document_type,
             ..
         } = doc;
 
         let result = Self {
-            kind: vaulted_document_type.unwrap_or(document_type),
+            kind: document_type,
             started_at: Some(created_at),
             status: Some(status),
             review_status: Some(review_status),
