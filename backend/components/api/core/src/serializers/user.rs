@@ -3,6 +3,7 @@ use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow_request::WorkflowRequest;
+use newtypes::OnboardingStatus;
 
 impl DbToApi<(ScopedVault, Vault)> for api_wire_types::LiteUser {
     fn from_db((sv, vault): (ScopedVault, Vault)) -> Self {
@@ -21,9 +22,14 @@ impl DbToApi<(ScopedVault, Vault)> for api_wire_types::LiteUser {
 
 impl DbToApi<(ScopedVault, Vec<ManualReview>, Option<WorkflowRequest>)> for api_wire_types::User {
     fn from_db((sv, manual_reviews, wfr): (ScopedVault, Vec<ManualReview>, Option<WorkflowRequest>)) -> Self {
+        // TODO serialize `null` as `"none"` once confirmed with tenants that they're not using it
+        let status = match sv.status {
+            Some(OnboardingStatus::None) => None,
+            s => s,
+        };
         Self {
             id: sv.fp_id,
-            status: sv.status,
+            status,
             requires_manual_review: !manual_reviews.is_empty(),
             external_id: sv.external_id,
             requires_additional_info: wfr.map(api_wire_types::PublicWorkflowRequest::from_db),

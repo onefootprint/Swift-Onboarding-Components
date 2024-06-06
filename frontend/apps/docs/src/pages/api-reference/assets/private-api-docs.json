@@ -11931,7 +11931,8 @@
                                         "fail",
                                         "incomplete",
                                         "in_progress",
-                                        "pending"
+                                        "pending",
+                                        "none"
                                     ]
                                 }
                             },
@@ -11939,7 +11940,8 @@
                                 "data",
                                 "dupe_kinds",
                                 "fp_id",
-                                "start_timestamp"
+                                "start_timestamp",
+                                "status"
                             ]
                         }
                     }
@@ -12786,7 +12788,8 @@
                             "fail",
                             "incomplete",
                             "in_progress",
-                            "pending"
+                            "pending",
+                            "none"
                         ]
                     },
                     "watchlist_check": {
@@ -13215,7 +13218,8 @@
                                         "pass",
                                         "fail",
                                         "incomplete",
-                                        "pending"
+                                        "pending",
+                                        "none"
                                     ]
                                 }
                             },
@@ -13242,6 +13246,7 @@
                     "ordering_id",
                     "requires_manual_review",
                     "start_timestamp",
+                    "status",
                     "workflows"
                 ]
             },
@@ -23041,7 +23046,8 @@
                             "pass",
                             "fail",
                             "incomplete",
-                            "pending"
+                            "pending",
+                            "none"
                         ]
                     }
                 },
@@ -23061,12 +23067,14 @@
                             "pass",
                             "fail",
                             "incomplete",
-                            "pending"
+                            "pending",
+                            "none"
                         ]
                     }
                 },
                 "required": [
-                    "id"
+                    "id",
+                    "status"
                 ]
             },
             "ProxyConfigBasic": {
@@ -24634,7 +24642,8 @@
                                         "pass",
                                         "fail",
                                         "incomplete",
-                                        "pending"
+                                        "pending",
+                                        "none"
                                     ]
                                 },
                                 "fp_id": {
@@ -24654,6 +24663,7 @@
                                 }
                             },
                             "required": [
+                                "current_status",
                                 "fp_id"
                             ]
                         }

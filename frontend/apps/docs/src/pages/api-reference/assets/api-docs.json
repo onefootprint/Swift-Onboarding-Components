@@ -4049,7 +4049,8 @@
                             "pass",
                             "fail",
                             "incomplete",
-                            "pending"
+                            "pending",
+                            "none"
                         ]
                     }
                 },
@@ -4089,7 +4090,8 @@
                                     "pass",
                                     "fail",
                                     "incomplete",
-                                    "pending"
+                                    "pending",
+                                    "none"
                                 ]
                             }
                         },
@@ -4115,7 +4117,8 @@
                                     "pass",
                                     "fail",
                                     "incomplete",
-                                    "pending"
+                                    "pending",
+                                    "none"
                                 ]
                             }
                         },

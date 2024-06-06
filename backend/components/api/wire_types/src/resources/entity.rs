@@ -44,7 +44,7 @@ pub struct Entity {
     pub watchlist_check: Option<WatchlistCheck>,
     pub ordering_id: i64,
     // These are a representation of the associated workflows
-    pub status: Option<EntityStatus>,
+    pub status: EntityStatus,
     pub requires_manual_review: bool,
     pub manual_review_kinds: Vec<ManualReviewKind>,
     pub is_created_via_api: bool,
@@ -116,6 +116,7 @@ pub enum EntityStatus {
     Incomplete,
     InProgress,
     Pending,
+    None,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

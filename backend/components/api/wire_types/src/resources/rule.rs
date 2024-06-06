@@ -58,7 +58,7 @@ pub struct RuleEvalResults {
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct RuleEvalResult {
     pub fp_id: FpId,
-    pub current_status: Option<OnboardingStatus>,
+    pub current_status: OnboardingStatus,
     pub historical_action_triggered: Option<RuleAction>,
     pub backtest_action_triggered: Option<RuleAction>,
 }

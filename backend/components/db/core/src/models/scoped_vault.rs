@@ -73,6 +73,7 @@ pub struct ScopedVault {
     pub start_timestamp: DateTime<Utc>,
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,
+    // TODO make not null
     pub status: Option<OnboardingStatus>,
     /// Last time we logged a hosted API interacted with this scoped vault. Vaults touched recently
     /// are considered in progress if their KYC status is still incomplete

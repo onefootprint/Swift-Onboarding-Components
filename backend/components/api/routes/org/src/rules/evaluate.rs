@@ -46,6 +46,7 @@ use itertools::{
 use newtypes::{
     ListId,
     ObConfigurationId,
+    OnboardingStatus,
     RuleAction,
     RuleExpression,
     RuleId,
@@ -255,7 +256,7 @@ pub async fn evaluate_rule(
 
             Ok(api_wire_types::RuleEvalResult {
                 fp_id: sv.fp_id,
-                current_status: sv.status,
+                current_status: sv.status.unwrap_or(OnboardingStatus::None),
                 historical_action_triggered: rule_set_result.action_triggered,
                 backtest_action_triggered: action_triggered,
             })
@@ -313,31 +314,23 @@ mod tests {
     fn test_get_stats() {
         let results = vec![
             (
-                Some(OnboardingStatus::Pass),
+                OnboardingStatus::Pass,
                 Some(RuleAction::Fail),
                 Some(RuleAction::Fail),
             ),
-            (Some(OnboardingStatus::Pass), Some(RuleAction::Fail), None),
+            (OnboardingStatus::Pass, Some(RuleAction::Fail), None),
             (
-                Some(OnboardingStatus::Fail),
+                OnboardingStatus::Fail,
                 Some(RuleAction::Fail),
                 Some(RuleAction::Fail),
             ),
-            (Some(OnboardingStatus::Fail), Some(RuleAction::Fail), None),
-            (
-                Some(OnboardingStatus::Pass),
-                Some(RuleAction::identity_stepup()),
-                None,
-            ),
-            (
-                Some(OnboardingStatus::Pass),
-                Some(RuleAction::identity_stepup()),
-                None,
-            ),
-            (None, Some(RuleAction::identity_stepup()), None),
-            (None, Some(RuleAction::identity_stepup()), None),
-            (Some(OnboardingStatus::Pass), None, Some(RuleAction::Fail)),
-            (Some(OnboardingStatus::Pass), None, Some(RuleAction::Fail)),
+            (OnboardingStatus::Fail, Some(RuleAction::Fail), None),
+            (OnboardingStatus::Pass, Some(RuleAction::identity_stepup()), None),
+            (OnboardingStatus::Pass, Some(RuleAction::identity_stepup()), None),
+            (OnboardingStatus::None, Some(RuleAction::identity_stepup()), None),
+            (OnboardingStatus::None, Some(RuleAction::identity_stepup()), None),
+            (OnboardingStatus::Pass, None, Some(RuleAction::Fail)),
+            (OnboardingStatus::Pass, None, Some(RuleAction::Fail)),
         ]
         .into_iter()
         .map(make_rule_eval_result)
@@ -373,7 +366,7 @@ mod tests {
     }
 
     fn make_rule_eval_result(
-        t: (Option<OnboardingStatus>, Option<RuleAction>, Option<RuleAction>),
+        t: (OnboardingStatus, Option<RuleAction>, Option<RuleAction>),
     ) -> RuleEvalResult {
         let (current_status, historical_action_triggered, backtest_action_triggered) = t;
         RuleEvalResult {

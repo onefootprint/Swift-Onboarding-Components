@@ -23,7 +23,7 @@ pub struct Dupes {
 pub struct SameTenantDupe {
     pub dupe_kinds: Vec<DupeKind>,
     pub fp_id: FpId,
-    pub status: Option<EntityStatus>,
+    pub status: EntityStatus,
     pub start_timestamp: DateTime<Utc>,
     pub data: Vec<EntityAttribute>,
 }

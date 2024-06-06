@@ -41,7 +41,7 @@ def authed_user(auth_playbook, sandbox_tenant):
     # Check that this is the same user
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
     assert body["sandbox_id"] == sandbox_id
-    assert body["status"] is None
+    assert body["status"] == "none"
     return User(fp_id, sandbox_id, validate_response)
 
 
@@ -152,7 +152,7 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
 
     # Make sure we prefilled phone and email when this user one-click authed
     body = get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths)
-    assert body["status"] is None
+    assert body["status"] == "none"
     assert set(i["identifier"] for i in body["data"] if i["source"] == "prefill") == {
         "id.phone_number",
         "id.email",

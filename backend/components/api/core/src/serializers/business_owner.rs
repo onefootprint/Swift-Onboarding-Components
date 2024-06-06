@@ -5,6 +5,7 @@ use db::models::business_owner::{
     UserData,
 };
 use db::models::scoped_vault::ScopedVault;
+use newtypes::OnboardingStatus;
 
 impl DbToApi<BusinessOwnerInfo> for api_wire_types::PrivateBusinessOwner {
     fn from_db(bo: BusinessOwnerInfo) -> Self {
@@ -22,6 +23,7 @@ impl DbToApi<(BusinessOwner, ScopedVault)> for api_wire_types::PrivateOwnedBusin
         let ScopedVault {
             fp_id: id, status, ..
         } = sb;
+        let status = status.unwrap_or(OnboardingStatus::None);
         Self { id, status }
     }
 }

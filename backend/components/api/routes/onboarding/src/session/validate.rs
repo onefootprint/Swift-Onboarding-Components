@@ -30,6 +30,7 @@ use db::models::workflow::{
 };
 use newtypes::{
     ObConfigurationKind,
+    OnboardingStatus,
     VaultKind,
 };
 use paperclip::actix::{
@@ -126,7 +127,8 @@ pub async fn post(
         }
         match kind {
             VaultKind::Person => {
-                if wf.status.requires_user_input() {
+                if matches!(wf.status, OnboardingStatus::Incomplete | OnboardingStatus::None) {
+                    // For now, tenants aren't expecting these enum values in the response
                     return Err(OnboardingError::NonTerminalState.into());
                 }
             }

@@ -41,7 +41,7 @@ def test_dupes(sandbox_tenant):
     # Check dupe made via API
     dupe2 = next(d for d in dupes["same_tenant"] if d["fp_id"] == fp_id2)
     assert dupe2["dupe_kinds"] == ["email"]
-    assert dupe2["status"] is None
+    assert dupe2["status"] == "none"
     assert (
         next(d for d in dupe2["data"] if d["identifier"] == "id.first_name")["value"]
         == "Bob2"

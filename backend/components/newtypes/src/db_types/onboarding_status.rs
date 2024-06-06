@@ -48,24 +48,18 @@ pub enum OnboardingStatus {
     Incomplete,
     /// All required data has been collected. We are waiting for a decision
     Pending,
+    /// Rules have not executed for this user
+    None,
 }
 
 impl OnboardingStatus {
-    pub fn requires_user_input(&self) -> bool {
-        match self {
-            OnboardingStatus::Pass => false,
-            OnboardingStatus::Fail => false,
-            OnboardingStatus::Incomplete => true,
-            OnboardingStatus::Pending => false,
-        }
-    }
-
     pub fn has_decision(&self) -> bool {
         match self {
             OnboardingStatus::Pass => true,
             OnboardingStatus::Fail => true,
             OnboardingStatus::Incomplete => false,
             OnboardingStatus::Pending => false,
+            OnboardingStatus::None => false,
         }
     }
 }
