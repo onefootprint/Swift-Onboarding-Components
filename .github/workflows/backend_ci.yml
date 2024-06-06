@@ -84,11 +84,16 @@ jobs:
         run: |
           set -euxo pipefail
 
+          # The image may already exist in the registry if we are retrying the
+          # job after it already succeeded. Exit early in this case.
+          IMG_REF=${REGISTRY}/${REPO}:${TAG}
+          docker manifest inspect "${IMG_REF}" && echo "Image ${IMG_REF} has already been built. Skipping." && exit 0 || echo "Building ${IMG_REF}..."
+
           echo '${{toJSON(matrix.args) }}' | jq -r '. | to_entries | map("--build-arg \(.key)=\(.value | @sh)") | join(" ")' | \
             xargs docker buildx build \
               --platform linux/amd64 \
               --file ./images/${{ matrix.dockerfile }}/Dockerfile \
-              --tag $REGISTRY/$REPO:$TAG \
+              --tag ${IMG_REF} \
               --push \
               ${{ github.ref == 'refs/heads/master' && '--cache-to type=registry,ref=${REGISTRY}/build-cache:${REPO}-master,compression=zstd,mode=max,image-manifest=true,oci-mediatypes=true' || '' }} \
               --cache-from type=registry,ref=${REGISTRY}/build-cache:${REPO}-master \
