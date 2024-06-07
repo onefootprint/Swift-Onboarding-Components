@@ -9,10 +9,7 @@ import styled, { css } from 'styled-components';
 
 import { revalidatePathAction } from '@/app/actions';
 import { alertError } from '@/helpers';
-import {
-  type CreateReviewRequest,
-  postPartnerPartnershipsDocumentsReviews,
-} from '@/queries';
+import { type CreateReviewRequest, postPartnerPartnershipsDocumentsReviews } from '@/queries';
 
 import DialogReviewDocument from '../../../../app/components/dialog-review-document';
 
@@ -40,15 +37,7 @@ const downloadPdfFromIframe = (id: string) => {
   a.click();
 };
 
-const Header = ({
-  children,
-  documentId,
-  documentStatus,
-  iframeId,
-  kind,
-  partnerId,
-  submissionId,
-}: HeaderProps) => {
+const Header = ({ children, documentId, documentStatus, iframeId, kind, partnerId, submissionId }: HeaderProps) => {
   const router = useRouter();
   const params = useSearchParams();
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
@@ -86,12 +75,7 @@ const Header = ({
 
   return (
     <Container>
-      <Stack
-        alignItems="center"
-        justifyContent="space-between"
-        paddingBlock={3}
-        paddingInline={5}
-      >
+      <Stack alignItems="center" justifyContent="space-between" paddingBlock={3} paddingInline={5}>
         <Left>
           <IconButton aria-label="close" onClick={onCloseClick}>
             <IcoClose24 />
@@ -100,18 +84,12 @@ const Header = ({
         <Text variant="label-3">{children}</Text>
         <StackRight alignItems="center" justifyContent="space-between" gap={3}>
           {kind === 'file_upload' ? (
-            <Button
-              variant="secondary"
-              onClick={() => downloadPdfFromIframe(iframeId)}
-            >
+            <Button variant="secondary" onClick={() => downloadPdfFromIframe(iframeId)}>
               {t('download')}
             </Button>
           ) : null}
           {documentStatus === 'waiting_for_review' ? (
-            <Button
-              variant="primary"
-              onClick={() => setIsReviewDialogOpen(true)}
-            >
+            <Button variant="primary" onClick={() => setIsReviewDialogOpen(true)}>
               {t('review')}
             </Button>
           ) : null}

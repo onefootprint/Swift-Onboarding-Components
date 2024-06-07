@@ -2,15 +2,7 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoArrowTopRight16, IcoInfo16 } from '@onefootprint/icons';
 import { type DecryptResponse, type List, ListKind } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
-import {
-  Dialog,
-  LinkButton,
-  MultiSelect,
-  Select,
-  Stack,
-  Text,
-  useToast,
-} from '@onefootprint/ui';
+import { Dialog, LinkButton, MultiSelect, Select, Stack, Text, useToast } from '@onefootprint/ui';
 import React, { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -51,9 +43,7 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
 
   // Filter lists based on attributes the entity has
   const listById: Record<string, List> = useMemo(() => {
-    const applicableLists = (data?.data || []).filter(l =>
-      hasDataForListKind(l.kind, entity),
-    );
+    const applicableLists = (data?.data || []).filter(l => hasDataForListKind(l.kind, entity));
     return Object.fromEntries(applicableLists.map(l => [l.id, l]));
   }, [data, entity]);
 
@@ -69,12 +59,10 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
     if (!entity) {
       return [];
     }
-    return getIpAddressesFromWorkflows(entity.workflows).map(
-      (ipAddress: string) => ({
-        label: ipAddress,
-        value: ipAddress,
-      }),
-    );
+    return getIpAddressesFromWorkflows(entity.workflows).map((ipAddress: string) => ({
+      label: ipAddress,
+      value: ipAddress,
+    }));
   }, [entity]);
 
   const addEntries = (list: List, entries: string[]) => {
@@ -106,12 +94,7 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
       return;
     }
     if (list.kind === ListKind.ipAddress) {
-      const entries = getEntityDataForListKind(
-        list.kind,
-        entity.kind,
-        {},
-        entity.workflows,
-      );
+      const entries = getEntityDataForListKind(list.kind, entity.kind, {}, entity.workflows);
       if (!entries.length) {
         showRequestErrorToast();
         return;
@@ -133,12 +116,7 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
       },
       {
         onSuccess: (response: DecryptResponse) => {
-          const entries = getEntityDataForListKind(
-            list.kind,
-            entity.kind,
-            response,
-            entity.workflows,
-          );
+          const entries = getEntityDataForListKind(list.kind, entity.kind, response, entity.workflows);
           addEntries(list, entries);
         },
         onError: showRequestErrorToast,
@@ -211,12 +189,7 @@ const AddToListDialog = ({ open, onClose }: AddToListDialogProps) => {
             <Text variant="body-3" color="tertiary">
               {t('description')}
             </Text>
-            <LinkButton
-              variant="label-3"
-              iconComponent={IcoArrowTopRight16}
-              target="_blank"
-              href="/lists"
-            >
+            <LinkButton variant="label-3" iconComponent={IcoArrowTopRight16} target="_blank" href="/lists">
               {t('lists')}
             </LinkButton>
           </Stack>

@@ -12,21 +12,15 @@ type EmptyResponse = Record<string, never>;
  * @param {string} requestId - the request ID
  * @return {Promise<EmptyResponse>} a promise that resolves to an empty response or rejects with a TypeError
  */
-const deletePartnerPartnershipsRequests = async (
-  partnershipId: string,
-  requestId: string,
-) => {
+const deletePartnerPartnershipsRequests = async (partnershipId: string, requestId: string) => {
   const token = await getAuthCookie();
   if (!token) return Promise.reject(new TypeError('Missing auth token'));
 
   return partnershipId && requestId
-    ? baseFetch<EmptyResponse>(
-        `/partner/partnerships/${partnershipId}/requests/${requestId}`,
-        {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
-          method: 'DELETE',
-        },
-      )
+    ? baseFetch<EmptyResponse>(`/partner/partnerships/${partnershipId}/requests/${requestId}`, {
+        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
+        method: 'DELETE',
+      })
     : Promise.reject(new TypeError('Missing required parameters'));
 };
 

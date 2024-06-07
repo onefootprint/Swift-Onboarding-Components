@@ -1,5 +1,5 @@
 import { IcoCheckSmall16, IcoLang16 } from '@onefootprint/icons';
-import { createFontStyles, Text } from '@onefootprint/ui';
+import { Text, createFontStyles } from '@onefootprint/ui';
 import * as Select from '@radix-ui/react-select';
 import i18n from 'i18next';
 import React from 'react';

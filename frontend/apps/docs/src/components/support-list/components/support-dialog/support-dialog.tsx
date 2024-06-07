@@ -1,11 +1,4 @@
-import {
-  Dialog,
-  Grid,
-  Text,
-  TextArea,
-  TextInput,
-  useToast,
-} from '@onefootprint/ui';
+import { Dialog, Grid, Text, TextArea, TextInput, useToast } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -22,13 +15,7 @@ type SupportDialogProps = {
   description: string;
 };
 
-const SupportDialog = ({
-  url,
-  title,
-  description,
-  open,
-  onClose,
-}: SupportDialogProps) => {
+const SupportDialog = ({ url, title, description, open, onClose }: SupportDialogProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.support-dialog',
   });
@@ -62,12 +49,9 @@ const SupportDialog = ({
     );
   };
 
-  const getNameHint = () =>
-    errors.name ? t('form.name.errors.required') : undefined;
-  const getEmailHint = () =>
-    errors.email ? t('form.email.errors.required') : undefined;
-  const getMessageHint = () =>
-    errors.message ? t('form.message.errors.required') : undefined;
+  const getNameHint = () => (errors.name ? t('form.name.errors.required') : undefined);
+  const getEmailHint = () => (errors.email ? t('form.email.errors.required') : undefined);
+  const getMessageHint = () => (errors.message ? t('form.message.errors.required') : undefined);
 
   const formId = 'support-dialog-id';
   return (
@@ -90,12 +74,7 @@ const SupportDialog = ({
         disabled: submitFormMutation.isLoading,
       }}
     >
-      <Grid.Container
-        tag="form"
-        gap={7}
-        id="support-dialog-id"
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <Grid.Container tag="form" gap={7} id="support-dialog-id" onSubmit={handleSubmit(onSubmit)}>
         {submitFormMutation.isError && (
           <Text variant="body-2" color="error">
             {t('form.submit-error')}

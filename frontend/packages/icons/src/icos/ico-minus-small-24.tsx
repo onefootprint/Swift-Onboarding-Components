@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoMinusSmall24 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoMinusSmall24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -22,13 +17,7 @@ const IcoMinusSmall24 = ({
       role="img"
       data-colored={false}
     >
-      <path
-        d="M17 12H7"
-        stroke={theme.color[color]}
-        strokeWidth={1.7}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M17 12H7" stroke={theme.color[color]} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 };

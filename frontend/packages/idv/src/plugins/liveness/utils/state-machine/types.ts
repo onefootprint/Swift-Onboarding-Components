@@ -4,7 +4,4 @@ export type MachineContext = {
   idvContext: CommonIdvContext;
 };
 
-export type MachineEvents =
-  | { type: 'skipped' }
-  | { type: 'succeeded' }
-  | { type: 'completed' };
+export type MachineEvents = { type: 'skipped' } | { type: 'succeeded' } | { type: 'completed' };

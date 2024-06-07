@@ -1,9 +1,5 @@
 import type { DataIdentifier } from './di';
-import type {
-  IdDocImageTypes,
-  IdDocStatus,
-  SupportedIdDocTypes,
-} from './id-doc-type';
+import type { IdDocImageTypes, IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
 
 export type DocumentUpload = {
   version: number;

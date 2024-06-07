@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const ThemedLogoFpDefault = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const ThemedLogoFpDefault = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg

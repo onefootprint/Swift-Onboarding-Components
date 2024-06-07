@@ -17,8 +17,7 @@ const IntroDialog = () => {
   const { data: onboardings } = useOnboardingConfigs();
   const { data: entities } = useEntities(EntityKind.person);
   const router = useRouter();
-  const shouldShowDialog =
-    onboardings?.length === 0 && entities?.data?.length === 0;
+  const shouldShowDialog = onboardings?.length === 0 && entities?.data?.length === 0;
 
   useTimeout(() => {
     if (shouldShowDialog) {

@@ -32,17 +32,12 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
       { email: emailFromForm },
       {
         onError: error => {
-          logError(
-            'Error while identifying user on email-identification page:',
-            error,
-          );
+          logError('Error while identifying user on email-identification page:', error);
           showRequestErrorToast(error);
         },
         onSuccess: res => {
           const userFound = !!res.user;
-          const successfulIdentifiers = userFound
-            ? [SuccessfulIdentifier.email]
-            : undefined;
+          const successfulIdentifiers = userFound ? [SuccessfulIdentifier.email] : undefined;
           send({
             type: 'identifyResult',
             payload: {

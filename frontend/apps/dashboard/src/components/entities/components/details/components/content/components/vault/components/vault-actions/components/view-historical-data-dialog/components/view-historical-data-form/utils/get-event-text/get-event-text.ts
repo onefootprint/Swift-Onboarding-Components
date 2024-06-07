@@ -42,9 +42,7 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
 
   if (kind === TimelineEventKind.liveness) {
     const eventData = data as LivenessEventData;
-    return eventData.source === LivenessSource.skipped
-      ? 'Liveness check skipped'
-      : 'Liveness check succeeded';
+    return eventData.source === LivenessSource.skipped ? 'Liveness check skipped' : 'Liveness check succeeded';
   }
 
   if (kind === TimelineEventKind.labelAdded) {
@@ -65,9 +63,7 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
       let title = eventData.isPrefill ? 'Prefilled' : 'Collected';
       const actorText = getActorText(eventData.actor);
       title = actorText ? `${actorText} edited` : title;
-      const end = eventData.isPrefill
-        ? " from user's existing data in Footprint"
-        : '';
+      const end = eventData.isPrefill ? " from user's existing data in Footprint" : '';
       return `${title} data fields${end}`;
     }
   }
@@ -111,22 +107,16 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
     } = eventData;
     const isVerified = status === DecisionStatus.pass;
 
-    const isFootprintActor =
-      source.kind === ActorKind.firmEmployee ||
-      source.kind === ActorKind.footprint;
+    const isFootprintActor = source.kind === ActorKind.firmEmployee || source.kind === ActorKind.footprint;
     if (isFootprintActor) {
-      return `${isVerified ? 'Successfully completed' : 'Completed'} ${
-        obConfiguration.name
-      } playbook`;
+      return `${isVerified ? 'Successfully completed' : 'Completed'} ${obConfiguration.name} playbook`;
     }
     const decisionText: Record<DecisionStatus, string> = {
       [DecisionStatus.pass]: 'Verified',
       [DecisionStatus.fail]: 'Failed',
       [DecisionStatus.stepUp]: 'Step up required',
     };
-    return `Manually reviewed and marked as ${
-      decisionText[status]
-    } by ${getActorText(source)}`;
+    return `Manually reviewed and marked as ${decisionText[status]} by ${getActorText(source)}`;
   }
 
   if (kind === TimelineEventKind.combinedWatchlistChecks) {
@@ -153,9 +143,7 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
       actionText = 'reonboard onto playbook';
     } else if (config.kind === TriggerKind.Document) {
       const { configs } = config.data;
-      const customConfig = configs.find(
-        c => c.kind === DocumentRequestKind.Custom,
-      );
+      const customConfig = configs.find(c => c.kind === DocumentRequestKind.Custom);
       if (configs.some(c => c.kind === DocumentRequestKind.ProofOfAddress)) {
         actionText = 'provide proof of address';
       } else if (configs.some(c => c.kind === DocumentRequestKind.ProofOfSsn)) {
@@ -183,10 +171,7 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
   if (kind === TimelineEventKind.authMethodUpdated) {
     const eventData = data as AuthMethodUpdatedData;
 
-    const verb =
-      eventData.action === AuthMethodAction.replace
-        ? 'updated the'
-        : 'registered';
+    const verb = eventData.action === AuthMethodAction.replace ? 'updated the' : 'registered';
     const end =
       eventData.action === AuthMethodAction.replace
         ? 'used as a Footprint login method'

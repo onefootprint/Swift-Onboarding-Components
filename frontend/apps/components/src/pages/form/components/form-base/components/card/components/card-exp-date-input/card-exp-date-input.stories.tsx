@@ -20,8 +20,7 @@ export default {
     },
     invalidMessage: {
       control: 'text',
-      description:
-        'Message to display when the input is invalid. Useful for i18n',
+      description: 'Message to display when the input is invalid. Useful for i18n',
       required: false,
     },
     disabled: {
@@ -82,7 +81,7 @@ Base.args = {
   hasError: false,
   hint: '',
   invalidMessage: 'Date must be in the future',
-  onChange: () => {},
-  onChangeText: () => {},
+  onChange: () => undefined,
+  onChangeText: () => undefined,
   value: '',
 };

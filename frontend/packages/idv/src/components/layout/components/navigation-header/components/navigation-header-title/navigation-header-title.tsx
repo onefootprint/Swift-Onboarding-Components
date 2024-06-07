@@ -9,11 +9,7 @@ type NavigationHeaderTitleProps = {
   fontColor?: Color;
 };
 
-const NavigationHeaderTitle = ({
-  title,
-  fontVariant,
-  fontColor,
-}: NavigationHeaderTitleProps) =>
+const NavigationHeaderTitle = ({ title, fontVariant, fontColor }: NavigationHeaderTitleProps) =>
   title ? (
     <Container>
       <Text

@@ -12,37 +12,17 @@ type ListEntryCreatedEventHeaderProps = {
 
 const HEADER_HEIGHT = '32px';
 
-const ListEntryCreatedEventHeader = ({
-  user,
-  event,
-}: ListEntryCreatedEventHeaderProps) => {
+const ListEntryCreatedEventHeader = ({ user, event }: ListEntryCreatedEventHeaderProps) => {
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.activity-log.create-list-entry',
   });
 
   return (
-    <Stack
-      rowGap={2}
-      columnGap={3}
-      flexWrap="wrap"
-      align="center"
-      minHeight={HEADER_HEIGHT}
-    >
-      <Text
-        variant="label-3"
-        display="inline-flex"
-        alignItems="center"
-        height={HEADER_HEIGHT}
-      >
+    <Stack rowGap={2} columnGap={3} flexWrap="wrap" align="center" minHeight={HEADER_HEIGHT}>
+      <Text variant="label-3" display="inline-flex" alignItems="center" height={HEADER_HEIGHT}>
         {user}
       </Text>
-      <Text
-        variant="body-3"
-        color="tertiary"
-        display="inline-flex"
-        alignItems="center"
-        height={HEADER_HEIGHT}
-      >
+      <Text variant="body-3" color="tertiary" display="inline-flex" alignItems="center" height={HEADER_HEIGHT}>
         {t('verb')}
       </Text>
       {event.data.entries.map(e => (

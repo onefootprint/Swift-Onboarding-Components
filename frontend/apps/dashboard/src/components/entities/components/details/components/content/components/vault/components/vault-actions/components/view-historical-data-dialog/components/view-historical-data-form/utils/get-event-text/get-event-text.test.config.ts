@@ -133,11 +133,7 @@ export const onboardingDecisionEventFixture = {
         obConfiguration: {
           id: 'ob_config_1',
           name: 'My Playbook',
-          mustCollectData: [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.dob,
-            CollectedKycDataOption.ssn9,
-          ],
+          mustCollectData: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
         },
         vendors: [Vendor.idology],
       },

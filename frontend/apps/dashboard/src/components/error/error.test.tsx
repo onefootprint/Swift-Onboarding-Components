@@ -1,14 +1,14 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import Error from './error';
+import ErrorComponent from './error';
 
 describe('<Error />', () => {
   it('should display the error message', () => {
     const error = {
       message: 'Something went wrong',
     };
-    customRender(<Error error={error} />);
+    customRender(<ErrorComponent error={error} />);
 
     const errorMessage = screen.getByText('Something went wrong');
     expect(errorMessage).toBeInTheDocument();

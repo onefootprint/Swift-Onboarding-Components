@@ -8,11 +8,7 @@ type PlayPermissionDialogProps = {
   onAllow: () => void;
 };
 
-const PlayPermissionDialog = ({
-  open,
-  hide,
-  onAllow,
-}: PlayPermissionDialogProps) => {
+const PlayPermissionDialog = ({ open, hide, onAllow }: PlayPermissionDialogProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.components.camera.play-permission-dialog',
   });

@@ -1,9 +1,4 @@
-import {
-  enIdentifyJson,
-  enIdvJson,
-  esIdentifyJson,
-  esIdvJson,
-} from '@onefootprint/idv';
+import { enIdentifyJson, enIdvJson, esIdentifyJson, esIdvJson } from '@onefootprint/idv';
 import { enRequestJson, esRequestJson } from '@onefootprint/request';
 import { enUiJson, esUiJson } from '@onefootprint/ui';
 import i18next from 'i18next';
@@ -54,10 +49,7 @@ const configureI18n = () => {
       returnNull: false,
     });
 
-  i18next.services.formatter?.add(
-    'capitalize',
-    value => `${value.charAt(0).toUpperCase()}${value.slice(1)}`,
-  );
+  i18next.services.formatter?.add('capitalize', value => `${value.charAt(0).toUpperCase()}${value.slice(1)}`);
 
   i18next.services.formatter?.add('allCaps', value => value.toUpperCase());
 

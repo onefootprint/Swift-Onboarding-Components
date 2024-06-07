@@ -1,13 +1,6 @@
 import { IcoArrowRightSmall16, IcoCopy16 } from '@onefootprint/icons';
 import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
-import {
-  CopyButton,
-  createFontStyles,
-  LinkButton,
-  Stack,
-  Text,
-  useToast,
-} from '@onefootprint/ui';
+import { CopyButton, LinkButton, Stack, Text, createFontStyles, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -48,10 +41,7 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
     <MatchesSection data-is-decrypted={!!aml}>
       {!aml && (
         <>
-          <ProtectedDetails
-            onClick={handleDecrypt}
-            isLoading={decryptMutation.isLoading}
-          />
+          <ProtectedDetails onClick={handleDecrypt} isLoading={decryptMutation.isLoading} />
           <HitsShimmer />
         </>
       )}
@@ -63,11 +53,7 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
             </Text>
             <Stack align="center" justify="space-between">
               <SourceUrl>{aml.shareUrl}</SourceUrl>
-              <CopyButton
-                ariaLabel={t('source-url.copy')}
-                contentToCopy={aml.shareUrl}
-                tooltipPosition="bottom"
-              >
+              <CopyButton ariaLabel={t('source-url.copy')} contentToCopy={aml.shareUrl} tooltipPosition="bottom">
                 <IcoCopy16 />
               </CopyButton>
             </Stack>
@@ -85,11 +71,7 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
           </Stack>
         )}
         {aml?.hits.map((hit: AmlHit) => (
-          <HitItem
-            key={JSON.stringify(hit)}
-            hit={hit}
-            handleShowAmlMedia={handleShowAmlMedia}
-          />
+          <HitItem key={JSON.stringify(hit)} hit={hit} handleShowAmlMedia={handleShowAmlMedia} />
         ))}
       </AmlSection>
     </MatchesSection>

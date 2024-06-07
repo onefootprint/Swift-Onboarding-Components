@@ -10,7 +10,7 @@ import useLoggedOutStorage from 'src/hooks/use-logged-out-storage';
 import styled, { css } from 'styled-components';
 
 import Data from './components/data';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 
 const Organizations = () => {
@@ -40,13 +40,11 @@ const Organizations = () => {
               </Box>
               {isMissingAccessToRequestedOrg && (
                 <Box textAlign="center">
-                  <Text variant="body-3">
-                    {t('no-access-to-requested-org')}
-                  </Text>
+                  <Text variant="body-3">{t('no-access-to-requested-org')}</Text>
                 </Box>
               )}
               {isLoading && !isMissingAccessToRequestedOrg && <Loading />}
-              {error && <Error message={getErrorMessage(error)} />}
+              {error && <ErrorComponent message={getErrorMessage(error)} />}
               {data && (
                 <Data
                   authToken={authToken}
@@ -56,7 +54,7 @@ const Organizations = () => {
               )}
             </>
           ) : (
-            <Error message={t('errors.no-auth-token')} />
+            <ErrorComponent message={t('errors.no-auth-token')} />
           )}
         </Inner>
       </Container>

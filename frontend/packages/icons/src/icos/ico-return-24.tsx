@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoReturn24 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoReturn24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg

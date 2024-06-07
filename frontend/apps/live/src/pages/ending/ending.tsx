@@ -1,11 +1,5 @@
-import {
-  IcoCheckCircle24,
-  IcoDatabase24,
-  IcoEye24,
-  IcoLock24,
-  IcoShield40,
-} from '@onefootprint/icons';
-import { Box, Container, Grid, media, Stack, Text } from '@onefootprint/ui';
+import { IcoCheckCircle24, IcoDatabase24, IcoEye24, IcoLock24, IcoShield40 } from '@onefootprint/icons';
+import { Box, Container, Grid, Stack, Text, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -64,33 +58,17 @@ const Ending = () => {
           </Text>
           <Box marginBottom={5} />
           <FeaturesContainer>
-            <Stack
-              direction="column"
-              align="center"
-              justify="center"
-              textAlign="center"
-              gap={5}
-            >
+            <Stack direction="column" align="center" justify="center" textAlign="center" gap={5}>
               <IcoShield40 />
               <Text tag="h2" variant="heading-2">
                 {t('features.title')}
               </Text>
             </Stack>
-            <FeaturesGrid
-              columns={['repeat(1, 1fr)']}
-              paddingTop={4}
-              paddingBottom={4}
-            >
-              <FeatureCard
-                title={t('features.zero-trust.title')}
-                description={t('features.zero-trust.description')}
-              >
+            <FeaturesGrid columns={['repeat(1, 1fr)']} paddingTop={4} paddingBottom={4}>
+              <FeatureCard title={t('features.zero-trust.title')} description={t('features.zero-trust.description')}>
                 <IcoEye24 />
               </FeatureCard>
-              <FeatureCard
-                title={t('features.end-to-end.title')}
-                description={t('features.end-to-end.description')}
-              >
+              <FeatureCard title={t('features.end-to-end.title')} description={t('features.end-to-end.description')}>
                 <IcoLock24 />
               </FeatureCard>
               <FeatureCard

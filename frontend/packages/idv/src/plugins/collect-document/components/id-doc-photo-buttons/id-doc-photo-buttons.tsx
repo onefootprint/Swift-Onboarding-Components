@@ -41,9 +41,7 @@ const IdDocPhotoButtons = ({
   const showUploadButton = !hideUploadButton;
 
   const [isLoading, setIsLoading] = useState(false);
-  const [captureMethod, setCaptureMethod] = useState<
-    'take' | 'upload' | undefined
-  >();
+  const [captureMethod, setCaptureMethod] = useState<'take' | 'upload' | undefined>();
 
   const onProcessingDone = () => {
     setIsLoading(false);
@@ -63,10 +61,7 @@ const IdDocPhotoButtons = ({
 
     const processResult = await processImageFile(files[0], hasBadConnectivity);
     if (!processResult) {
-      Logger.error(
-        'Image upload failed. Uploaded image could not be processed',
-        { location: 'id-doc-photo-buttons' },
-      );
+      Logger.error('Image upload failed. Uploaded image could not be processed', { location: 'id-doc-photo-buttons' });
       onProcessingDone();
       return;
     }

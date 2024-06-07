@@ -1,4 +1,4 @@
-import { media, Stack } from '@onefootprint/ui';
+import { Stack, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -11,10 +11,7 @@ type MockupScreenProps = {
   $backgroundColor: string;
 };
 
-const MockupScreen = ({
-  $borderRadius,
-  $backgroundColor,
-}: MockupScreenProps) => (
+const MockupScreen = ({ $borderRadius, $backgroundColor }: MockupScreenProps) => (
   <Container direction="column" position="relative">
     <NavigationBar />
     <MainScreen>

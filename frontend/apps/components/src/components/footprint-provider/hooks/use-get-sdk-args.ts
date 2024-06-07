@@ -11,10 +11,7 @@ type GetSdkArgsResponse<T> = {
   obConfig?: PublicOnboardingConfig;
 };
 
-const getSdkArgs = async <T extends Obj>(
-  authToken: string,
-  fpProvider: ProviderReturn,
-) => {
+const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: ProviderReturn) => {
   let sdkVersion;
   try {
     const childApiRef = await fpProvider.load();
@@ -37,14 +34,9 @@ const getSdkArgs = async <T extends Obj>(
   return response;
 };
 
-const useGetSdkArgs = <T extends Obj>(
-  authToken: string,
-  fpProvider: ProviderReturn,
-) =>
-  useQuery(
-    [authToken, 'get-sdk-args'],
-    () => getSdkArgs<T>(authToken, fpProvider),
-    { enabled: isValidTokenFormat(authToken) },
-  );
+const useGetSdkArgs = <T extends Obj>(authToken: string, fpProvider: ProviderReturn) =>
+  useQuery([authToken, 'get-sdk-args'], () => getSdkArgs<T>(authToken, fpProvider), {
+    enabled: isValidTokenFormat(authToken),
+  });
 
 export default useGetSdkArgs;

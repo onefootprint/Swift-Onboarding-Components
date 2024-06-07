@@ -36,9 +36,7 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
             ]),
         })}
       >
-        <option value={EMPTY_SELECT_VALUE}>
-          {t('legal-status-mapping.none')}
-        </option>
+        <option value={EMPTY_SELECT_VALUE}>{t('legal-status-mapping.none')}</option>
         {Object.values(UsLegalStatus).map(status => (
           <option key={status} value={status}>
             {t(`legal-status-mapping.${status}` as ParseKeys<'common'>)}

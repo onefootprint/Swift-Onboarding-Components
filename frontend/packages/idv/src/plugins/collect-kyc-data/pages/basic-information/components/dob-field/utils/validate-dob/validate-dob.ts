@@ -11,10 +11,7 @@ export enum DobValidationError {
   INCORRECT_FORMAT,
 }
 
-const validateDob = (
-  dob: string,
-  inputMasks: Mask,
-): DobValidationError | undefined => {
+const validateDob = (dob: string, inputMasks: Mask): DobValidationError | undefined => {
   const { day, month, year } = getMonthYearDateString(dob, inputMasks);
   const formatError = validateFormat({ day, month, year });
   if (formatError) {

@@ -8,7 +8,7 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["./src/*"],
-      "@/identify/*": ["src/pages/identify-deprecated/*"],
+      "@/identify/*": ["src/pages/identify-deprecated/*"]
     }
-  },
+  }
 }

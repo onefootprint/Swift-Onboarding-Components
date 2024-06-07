@@ -14,11 +14,7 @@ describe('<Fieldset />', () => {
     resetUser();
   });
 
-  const renderFieldset = ({
-    label = 'Label',
-    value,
-    children = () => <div>children</div>,
-  }: Partial<FieldsetProps>) =>
+  const renderFieldset = ({ label = 'Label', value, children = () => <div>children</div> }: Partial<FieldsetProps>) =>
     customRender(
       <Fieldset label={label} value={value}>
         {children}
@@ -41,9 +37,7 @@ describe('<Fieldset />', () => {
     it('should render the add label', () => {
       renderFieldset({ label: 'Company name', value: null });
 
-      expect(
-        screen.getByRole('button', { name: 'Add company name' }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Add company name' })).toBeInTheDocument();
     });
 
     describe('when clicking on the add label', () => {
@@ -65,9 +59,7 @@ describe('<Fieldset />', () => {
     it('should render the edit label', () => {
       renderFieldset({ label: 'Company name', value: 'Footprint' });
 
-      expect(
-        screen.getByRole('button', { name: 'Edit company name' }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Edit company name' })).toBeInTheDocument();
     });
 
     describe('when clicking on the edit label', () => {

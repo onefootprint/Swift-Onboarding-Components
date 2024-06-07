@@ -56,9 +56,7 @@ const Declarations = () => {
             onError: (error: unknown) => {
               const fileType = files[0].type;
               Logger.error(
-                `Encountered error while uploading declarations files of type ${fileType}: ${getErrorMessage(
-                  error,
-                )}`,
+                `Encountered error while uploading declarations files of type ${fileType}: ${getErrorMessage(error)}`,
                 { location: 'investor-profile-declarations' },
               );
             },
@@ -66,10 +64,9 @@ const Declarations = () => {
         );
       },
       onError: (error: string) => {
-        Logger.error(
-          `Encountered error while vaulting data on investor profile declarations page: ${error}`,
-          { location: 'investor-profile-declarations' },
-        );
+        Logger.error(`Encountered error while vaulting data on investor profile declarations page: ${error}`, {
+          location: 'investor-profile-declarations',
+        });
       },
     });
   };
@@ -100,16 +97,11 @@ const Declarations = () => {
         isLoading={syncDataMutation.isLoading || uploadFileMutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDI.declarations]:
-            data?.[InvestorProfileDI.declarations],
-          [InvestorProfileDI.brokerageFirmEmployer]:
-            data?.[InvestorProfileDI.brokerageFirmEmployer],
-          [InvestorProfileDI.seniorExecutiveSymbols]:
-            data?.[InvestorProfileDI.seniorExecutiveSymbols],
-          [InvestorProfileDI.familyMemberNames]:
-            data?.[InvestorProfileDI.familyMemberNames],
-          [InvestorProfileDI.politicalOrganization]:
-            data?.[InvestorProfileDI.politicalOrganization],
+          [InvestorProfileDI.declarations]: data?.[InvestorProfileDI.declarations],
+          [InvestorProfileDI.brokerageFirmEmployer]: data?.[InvestorProfileDI.brokerageFirmEmployer],
+          [InvestorProfileDI.seniorExecutiveSymbols]: data?.[InvestorProfileDI.seniorExecutiveSymbols],
+          [InvestorProfileDI.familyMemberNames]: data?.[InvestorProfileDI.familyMemberNames],
+          [InvestorProfileDI.politicalOrganization]: data?.[InvestorProfileDI.politicalOrganization],
         }}
       />
     </>

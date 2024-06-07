@@ -26,9 +26,7 @@ describe('<PlaybookDetails />', () => {
 
   const renderDetailsAndWaitFinishLoading = async () => {
     renderDetails();
-    const loading = await screen.findByTestId(
-      'onboarding-configs-details-loading',
-    );
+    const loading = await screen.findByTestId('onboarding-configs-details-loading');
     await waitForElementToBeRemoved(loading);
   };
 
@@ -77,9 +75,7 @@ describe('<PlaybookDetails />', () => {
           name: 'Playbooks',
         }),
       ).toBeInTheDocument();
-      expect(
-        within(breadcrumb).getByText(playbookDetailsFixture.name),
-      ).toBeInTheDocument();
+      expect(within(breadcrumb).getByText(playbookDetailsFixture.name)).toBeInTheDocument();
     });
 
     it.skip('should preserve list pagination when navigating back using the breadcrumb', async () => {
@@ -144,11 +140,9 @@ describe('<PlaybookDetails />', () => {
           name: 'User details',
         }),
       ).toBeInTheDocument();
-      expect(
-        within(breadcrumb).getByText('Playbook details'),
-      ).toBeInTheDocument();
+      expect(within(breadcrumb).getByText('Playbook details')).toBeInTheDocument();
     });
 
-    it.skip('should preserve list filters when navigating back using the breadcrumb', async () => {});
+    it.skip('should preserve list filters when navigating back using the breadcrumb', async () => undefined);
   });
 });

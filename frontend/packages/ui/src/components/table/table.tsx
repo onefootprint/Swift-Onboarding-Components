@@ -64,25 +64,14 @@ const Table = <T,>({
   return (
     <>
       {shouldRenderFilters ? (
-        <TableFilters
-          initialValue={initialSearch}
-          onChangeText={onChangeSearchText}
-          placeholder={searchPlaceholder}
-        >
+        <TableFilters initialValue={initialSearch} onChangeText={onChangeSearchText} placeholder={searchPlaceholder}>
           {renderActions?.()}
         </TableFilters>
       ) : null}
-      <TableContainer
-        aria-live="polite"
-        aria-busy={isLoading}
-        aria-label={ariaLabel}
-      >
+      <TableContainer aria-live="polite" aria-busy={isLoading} aria-label={ariaLabel}>
         <colgroup>
           {columns.map(column => (
-            <col
-              key={column.id || column.text}
-              style={{ width: column.width }}
-            />
+            <col key={column.id || column.text} style={{ width: column.width }} />
           ))}
         </colgroup>
         {hideThead ? null : (
@@ -93,17 +82,8 @@ const Table = <T,>({
                   <TooltipContainer>
                     {column.text}
                     {column?.tooltip && (
-                      <Tooltip
-                        text={column.tooltip.text}
-                        alignment="end"
-                        position="bottom"
-                      >
-                        <InfoButton
-                          aria-label={
-                            column.tooltip?.triggerAriaLabel ??
-                            column?.tooltip.text
-                          }
-                        >
+                      <Tooltip text={column.tooltip.text} alignment="end" position="bottom">
+                        <InfoButton aria-label={column.tooltip?.triggerAriaLabel ?? column?.tooltip.text}>
                           <IcoInfo16 />
                         </InfoButton>
                       </Tooltip>
@@ -138,11 +118,7 @@ const Table = <T,>({
             {shouldShowData &&
               items.map((item: T, index: Number) => (
                 <Tr
-                  aria-label={
-                    getAriaLabelForRow
-                      ? getAriaLabelForRow(item)
-                      : getKeyForRow(item)
-                  }
+                  aria-label={getAriaLabelForRow ? getAriaLabelForRow(item) : getKeyForRow(item)}
                   data-clickable={!!onRowClick}
                   key={getKeyForRow(item)}
                   onClick={() => {

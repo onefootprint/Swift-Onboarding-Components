@@ -2,11 +2,7 @@ import type { Color } from '@onefootprint/design-tokens';
 import type { Liveness } from '@onefootprint/types';
 import { icoForUserAgent } from 'src/utils/user-agent';
 
-const getIconForLivenessEvent = (
-  liveness: Liveness,
-  color?: Color,
-  size?: 'small' | 'large',
-) => {
+const getIconForLivenessEvent = (liveness: Liveness, color?: Color, size?: 'small' | 'large') => {
   const {
     insight: { userAgent },
     linkedAttestations,

@@ -21,10 +21,7 @@ const Invalid = ({ onClose }: InvalidProps) => {
       header={
         onClose && (
           <CloseButton>
-            <IconButton
-              aria-label={t('form-dialog.header.close-aria-label')}
-              onClick={onClose}
-            >
+            <IconButton aria-label={t('form-dialog.header.close-aria-label')} onClick={onClose}>
               <IcoClose24 />
             </IconButton>
           </CloseButton>
@@ -34,14 +31,7 @@ const Invalid = ({ onClose }: InvalidProps) => {
       <Text tag="h2" color="primary" variant="heading-3" textAlign="center">
         {t('invalid.title')}
       </Text>
-      <Text
-        variant="body-2"
-        color="secondary"
-        tag="h3"
-        marginTop={3}
-        marginBottom={7}
-        textAlign="center"
-      >
+      <Text variant="body-2" color="secondary" tag="h3" marginTop={3} marginBottom={7} textAlign="center">
         {t('invalid.subtitle')}
       </Text>
     </Container>

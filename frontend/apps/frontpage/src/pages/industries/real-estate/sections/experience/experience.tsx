@@ -1,4 +1,4 @@
-import { Box, Container, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Container, Stack, Text, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

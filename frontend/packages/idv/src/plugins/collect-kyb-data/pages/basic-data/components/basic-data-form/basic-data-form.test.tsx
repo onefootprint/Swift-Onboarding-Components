@@ -1,11 +1,6 @@
 import '../../../../../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
 
@@ -17,7 +12,7 @@ describe('<BasicDataForm />', () => {
     defaultValues,
     optionalFields,
     isLoading = false,
-    onSubmit = () => {},
+    onSubmit = () => undefined,
     ctaLabel,
   }: Partial<BasicDataFormProps>) => {
     customRender(
@@ -149,14 +144,10 @@ describe('<BasicDataForm />', () => {
         expect(onSubmit).not.toHaveBeenCalled();
       });
       await waitFor(() => {
-        expect(
-          screen.getByText('Business name cannot be empty or is invalid'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Business name cannot be empty or is invalid')).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.getByText('TIN cannot be empty or is invalid'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('TIN cannot be empty or is invalid')).toBeInTheDocument();
       });
     });
 
@@ -171,14 +162,10 @@ describe('<BasicDataForm />', () => {
       await userEvent.click(continueButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Phone number cannot be empty'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Phone number cannot be empty')).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.getByText('Website cannot be empty or is invalid'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Website cannot be empty or is invalid')).toBeInTheDocument();
       });
     });
 

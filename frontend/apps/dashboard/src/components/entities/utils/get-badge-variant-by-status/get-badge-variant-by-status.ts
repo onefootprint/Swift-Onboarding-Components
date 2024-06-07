@@ -10,10 +10,7 @@ const statusToVariant: Record<EntityStatus, UIState> = {
   [EntityStatus.none]: 'neutral',
 };
 
-const getBadgeVariantByStatus = (
-  status: EntityStatus,
-  requiresManualReview?: boolean,
-): UIState => {
+const getBadgeVariantByStatus = (status: EntityStatus, requiresManualReview?: boolean): UIState => {
   if (status === EntityStatus.pass && requiresManualReview) {
     return 'warning';
   }

@@ -1,9 +1,9 @@
 import { screen } from '@onefootprint/test-utils';
 import React from 'react';
 
+import IdDocFrontPhotoRetry from '.';
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
-import IdDocFrontPhotoRetry from '.';
 import contextWithErrors from './id-doc-front-photo-retry.test.config';
 
 const renderFrontPhotoRetry = (context: MachineContext) =>
@@ -19,9 +19,7 @@ describe('<IdDocFrontPhotoRetry />', () => {
     const error2 = screen.getByText(
       "It looks like you uploaded the wrong side of your document. Please flip your ID and upload the front of your driver's license from United States of America.",
     );
-    const error3 = screen.getByText(
-      'The uploaded file type is not supported. Please upload image files only.',
-    );
+    const error3 = screen.getByText('The uploaded file type is not supported. Please upload image files only.');
 
     expect(error1).toBeInTheDocument();
     expect(error2).toBeInTheDocument();

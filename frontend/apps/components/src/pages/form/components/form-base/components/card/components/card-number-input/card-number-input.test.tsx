@@ -5,23 +5,10 @@ import { renderComponents } from '../../../../../../../../config/tests';
 import type { CardNumberInputProps } from './card-number-input';
 import CardNumberInput from './card-number-input';
 
-const renderCardNumberInput = ({
-  hasError,
-  hint,
-  label,
-  value,
-}: Partial<CardNumberInputProps>) =>
-  renderComponents(
-    <CardNumberInput
-      hasError={hasError}
-      hint={hint}
-      label={label}
-      value={value}
-    />,
-  );
+const renderCardNumberInput = ({ hasError, hint, label, value }: Partial<CardNumberInputProps>) =>
+  renderComponents(<CardNumberInput hasError={hasError} hint={hint} label={label} value={value} />);
 
-const getCardNumberInput = () =>
-  screen.getByLabelText('Card number') as HTMLInputElement;
+const getCardNumberInput = () => screen.getByLabelText('Card number') as HTMLInputElement;
 
 describe('<CardNumberInput />', () => {
   it('should render the label', () => {
@@ -119,9 +106,7 @@ describe('<CardNumberInput />', () => {
         const input = getCardNumberInput();
         await userEvent.type(input, '5555555555554444');
         await waitFor(() => {
-          expect(
-            screen.getByRole('img', { name: 'mastercard' }),
-          ).toBeInTheDocument();
+          expect(screen.getByRole('img', { name: 'mastercard' })).toBeInTheDocument();
         });
       });
     });
@@ -175,9 +160,7 @@ describe('<CardNumberInput />', () => {
         const input = getCardNumberInput();
         await userEvent.type(input, '6011111111111117');
         await waitFor(() => {
-          expect(
-            screen.getByRole('img', { name: 'discover' }),
-          ).toBeInTheDocument();
+          expect(screen.getByRole('img', { name: 'discover' })).toBeInTheDocument();
         });
       });
     });
@@ -201,9 +184,7 @@ describe('<CardNumberInput />', () => {
         const input = getCardNumberInput();
         await userEvent.type(input, '30569309025904');
         await waitFor(() => {
-          expect(
-            screen.getByRole('img', { name: 'dinersclub' }),
-          ).toBeInTheDocument();
+          expect(screen.getByRole('img', { name: 'dinersclub' })).toBeInTheDocument();
         });
       });
     });
@@ -251,9 +232,7 @@ describe('<CardNumberInput />', () => {
         const input = getCardNumberInput();
         await userEvent.type(input, '6200000000000005');
         await waitFor(() => {
-          expect(
-            screen.getByRole('img', { name: 'unionpay' }),
-          ).toBeInTheDocument();
+          expect(screen.getByRole('img', { name: 'unionpay' })).toBeInTheDocument();
         });
       });
     });

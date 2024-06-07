@@ -5,12 +5,9 @@ import { isError, isObject, isString } from '../type-guards';
 
 const isWebAuthApiSupported = (): boolean =>
   typeof PublicKeyCredential !== 'undefined' &&
-  typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable ===
-    'function';
+  typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function';
 
-const parseBiometricChallenge = (
-  str: string,
-): BiometricLoginChallengeJson | Error => {
+const parseBiometricChallenge = (str: string): BiometricLoginChallengeJson | Error => {
   try {
     const has = Object.prototype.hasOwnProperty;
     const parsedObj = JSON.parse(str);
@@ -31,9 +28,7 @@ const parseBiometricChallenge = (
   }
 };
 
-const getPublicKeyCredential = async (
-  str: string,
-): Promise<PublicKeyCredential> => {
+const getPublicKeyCredential = async (str: string): Promise<PublicKeyCredential> => {
   if (!isWebAuthApiSupported()) {
     throw new Error('WebAuthn API is not fully supported in this browser.');
   }

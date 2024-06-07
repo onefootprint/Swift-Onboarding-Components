@@ -12,12 +12,7 @@ const Author = ({ authorImg, authorName }: AuthorProps) => (
   <Container>
     {authorImg && (
       <AuthorImg>
-        <Image
-          alt={`Image of ${authorImg}`}
-          src={authorImg}
-          height={32}
-          width={32}
-        />
+        <Image alt={`Image of ${authorImg}`} src={authorImg} height={32} width={32} />
       </AuthorImg>
     )}
     <Text variant="label-3">{authorName}</Text>

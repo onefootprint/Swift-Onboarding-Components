@@ -1,33 +1,15 @@
 import '../../../../../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
-import {
-  InvestorProfileDeclaration,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { InvestorProfileDI, InvestorProfileDeclaration } from '@onefootprint/types';
 import React from 'react';
 
 import type { DeclarationsFormProps } from './declarations-form';
 import DeclarationsForm from './declarations-form';
 
 describe('<DeclarationsForm />', () => {
-  const renderForm = ({
-    defaultValues,
-    isLoading,
-    onSubmit = () => {},
-  }: Partial<DeclarationsFormProps>) => {
-    customRender(
-      <DeclarationsForm
-        defaultValues={defaultValues}
-        isLoading={isLoading}
-        onSubmit={onSubmit}
-      />,
-    );
+  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<DeclarationsFormProps>) => {
+    customRender(<DeclarationsForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
   };
 
   describe('when the user is affiliated or work with a broke dealer', () => {
@@ -35,9 +17,7 @@ describe('<DeclarationsForm />', () => {
       const onSubmit = jest.fn();
       renderForm({ onSubmit });
 
-      const broker = screen.getByLabelText(
-        'Affiliated or work with a US registered broker-dealer or FINRA',
-      );
+      const broker = screen.getByLabelText('Affiliated or work with a US registered broker-dealer or FINRA');
       await userEvent.click(broker);
 
       await waitFor(() => {
@@ -51,9 +31,7 @@ describe('<DeclarationsForm />', () => {
       });
       await userEvent.click(button);
 
-      const fileInput = screen.getByTestId(
-        'file-upload-input',
-      ) as HTMLInputElement;
+      const fileInput = screen.getByTestId('file-upload-input') as HTMLInputElement;
       const file = new File(['hello'], 'example.pdf', {
         type: 'application/pdf',
       });
@@ -65,9 +43,7 @@ describe('<DeclarationsForm />', () => {
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith(
           {
-            [InvestorProfileDI.declarations]: [
-              InvestorProfileDeclaration.affiliatedWithUsBroker,
-            ],
+            [InvestorProfileDI.declarations]: [InvestorProfileDeclaration.affiliatedWithUsBroker],
             [InvestorProfileDI.brokerageFirmEmployer]: 'Lorem Dolor',
           },
           expect.anything(),
@@ -97,9 +73,7 @@ describe('<DeclarationsForm />', () => {
       });
       await userEvent.click(button);
 
-      const fileInput = screen.getByTestId(
-        'file-upload-input',
-      ) as HTMLInputElement;
+      const fileInput = screen.getByTestId('file-upload-input') as HTMLInputElement;
       const file = new File(['hello'], 'example.pdf', {
         type: 'application/pdf',
       });
@@ -111,9 +85,7 @@ describe('<DeclarationsForm />', () => {
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith(
           {
-            [InvestorProfileDI.declarations]: [
-              InvestorProfileDeclaration.seniorExecutive,
-            ],
+            [InvestorProfileDI.declarations]: [InvestorProfileDeclaration.seniorExecutive],
             [InvestorProfileDI.seniorExecutiveSymbols]: ['AAPL', 'GOOG'],
           },
           expect.anything(),
@@ -127,24 +99,16 @@ describe('<DeclarationsForm />', () => {
       const onSubmit = jest.fn();
       renderForm({ onSubmit });
 
-      const seniorPoliticalFigure = screen.getByLabelText(
-        "I'm a senior political figure",
-      );
+      const seniorPoliticalFigure = screen.getByLabelText("I'm a senior political figure");
       await userEvent.click(seniorPoliticalFigure);
 
       await waitFor(() => {
-        expect(
-          screen.getByLabelText('Names of immediate family members'),
-        ).toBeInTheDocument();
+        expect(screen.getByLabelText('Names of immediate family members')).toBeInTheDocument();
       });
-      const familyMembers = screen.getByLabelText(
-        'Names of immediate family members',
-      );
+      const familyMembers = screen.getByLabelText('Names of immediate family members');
       await userEvent.type(familyMembers, 'Jane Doe, John Doe');
 
-      const politicalOrganization = screen.getByLabelText(
-        'Political organization',
-      );
+      const politicalOrganization = screen.getByLabelText('Political organization');
       await userEvent.type(politicalOrganization, 'The White House');
 
       const submitButton = screen.getByRole('button', { name: 'Continue' });
@@ -184,17 +148,13 @@ describe('<DeclarationsForm />', () => {
       ) as HTMLInputElement;
       expect(seniorExec.checked).toBe(true);
 
-      const seniorPoliticalFigure = screen.getByLabelText(
-        "I'm a senior political figure",
-      ) as HTMLInputElement;
+      const seniorPoliticalFigure = screen.getByLabelText("I'm a senior political figure") as HTMLInputElement;
       expect(seniorPoliticalFigure.checked).toBe(true);
 
       const companySymbols = screen.getByLabelText('Company symbols');
       expect(companySymbols).toHaveValue('AAPL,GOOG');
 
-      const familyMembers = screen.getByLabelText(
-        'Names of immediate family members',
-      );
+      const familyMembers = screen.getByLabelText('Names of immediate family members');
       expect(familyMembers).toHaveValue('Jane Doe');
     });
   });

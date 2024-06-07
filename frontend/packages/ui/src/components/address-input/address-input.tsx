@@ -144,12 +144,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
             value={value}
             data-private
             data-dd-privacy="mask"
-            ref={mergeRefs([
-              localRef,
-              inputProps.ref,
-              toggleButtonProps.ref,
-              ref,
-            ])}
+            ref={mergeRefs([localRef, inputProps.ref, toggleButtonProps.ref, ref])}
           />
           {isDropdownOpen ? (
             <Dropdown

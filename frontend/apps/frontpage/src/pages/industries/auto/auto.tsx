@@ -16,16 +16,8 @@ const RealEstate = () => {
   });
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        slug="/industries/auto"
-        image="/og-img-auto.png"
-      />
-      <Hero
-        title={t('hero.title')}
-        subtitle={t('hero.subtitle')}
-        illustration="/industries/illustrations/auto.svg"
-      />
+      <SEO title={t('html-title')} slug="/industries/auto" image="/og-img-auto.png" />
+      <Hero title={t('hero.title')} subtitle={t('hero.subtitle')} illustration="/industries/illustrations/auto.svg" />
       <FeaturedCards />
       <Problems />
       <Solutions />

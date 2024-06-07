@@ -20,11 +20,7 @@ export type OptionProps<
   isSelected: boolean;
 };
 
-const Option = <
-  Option extends BaseSelectOption,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
->({
+const Option = <Option extends BaseSelectOption, IsMulti extends boolean, Group extends GroupBase<Option>>({
   isSelected,
   selectProps,
   isFocused,

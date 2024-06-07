@@ -4,17 +4,14 @@ import React, { useEffect } from 'react';
 
 import useStableContainerId from '../../hooks/use-stable-container-id';
 
-export type FootprintFootprintRenderProps = Omit<
-  FootprintRenderProps,
-  'kind' | 'variant' | 'containerId'
->;
+export type FootprintFootprintRenderProps = Omit<FootprintRenderProps, 'kind' | 'variant' | 'containerId'>;
 
 const FootprintRender = (props: FootprintFootprintRenderProps) => {
   const containerId = useStableContainerId();
 
   useEffect(() => {
     if (!containerId) {
-      return () => {};
+      return () => undefined;
     }
 
     const component = footprint.init({

@@ -1,17 +1,9 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { BusinessOwnersProps } from './business-owners';
 import BusinessOwners from './business-owners';
-import {
-  entityFixture,
-  withBusinessOwnersError,
-} from './business-owners.test.config';
+import { entityFixture, withBusinessOwnersError } from './business-owners.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -25,9 +17,7 @@ describe('<BusinessOwners />', () => {
     });
   });
 
-  const renderBusinessOwners = ({
-    entity = entityFixture,
-  }: Partial<BusinessOwnersProps>) =>
+  const renderBusinessOwners = ({ entity = entityFixture }: Partial<BusinessOwnersProps>) =>
     customRender(<BusinessOwners entity={entity} />);
 
   describe("when the request to fetch the BO's fails", () => {

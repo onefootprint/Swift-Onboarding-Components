@@ -5,20 +5,17 @@ const usePinInputRefs = (pinInputCount: number) => {
   const [refs, setRefs] = useState<MutableRefObject<HTMLInputElement>[]>([]);
 
   const previous = useCallback(
-    (referenceIndex: number): HTMLInputElement | null | undefined =>
-      refs[referenceIndex - 1]?.current,
+    (referenceIndex: number): HTMLInputElement | null | undefined => refs[referenceIndex - 1]?.current,
     [refs],
   );
 
   const next = useCallback(
-    (referenceIndex: number): HTMLInputElement | null | undefined =>
-      refs[referenceIndex + 1]?.current,
+    (referenceIndex: number): HTMLInputElement | null | undefined => refs[referenceIndex + 1]?.current,
     [refs],
   );
 
   const get = useCallback(
-    (referenceIndex: number): HTMLInputElement | null | undefined =>
-      refs[referenceIndex]?.current,
+    (referenceIndex: number): HTMLInputElement | null | undefined => refs[referenceIndex]?.current,
     [refs],
   );
 
@@ -30,10 +27,7 @@ const usePinInputRefs = (pinInputCount: number) => {
     );
   }, [pinInputCount]);
 
-  return useMemo(
-    () => ({ refs, previous, next, get }),
-    [get, next, previous, refs],
-  );
+  return useMemo(() => ({ refs, previous, next, get }), [get, next, previous, refs]);
 };
 
 export default usePinInputRefs;

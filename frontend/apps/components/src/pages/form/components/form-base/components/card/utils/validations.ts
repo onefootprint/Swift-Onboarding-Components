@@ -1,8 +1,7 @@
 import creditcardutils from 'creditcardutils';
 import { isPast, isValid, parse } from 'date-fns';
 
-export const isCardNumberValid = (cardNumber: string) =>
-  cardNumber && creditcardutils.validateCardNumber(cardNumber);
+export const isCardNumberValid = (cardNumber: string) => cardNumber && creditcardutils.validateCardNumber(cardNumber);
 
 export const isCardExpiryValid = (dateValue: string) => {
   if (!dateValue) {

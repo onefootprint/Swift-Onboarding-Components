@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import type { Invitation } from '../../dialog.types';
 import AddButton from './components/add-button';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import InviteFields from './components/invite-fields';
 
 export type DataProps = {
@@ -65,11 +65,7 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
   return (
     <Box testID="members-roles-data">
       <FormProvider {...methods}>
-        <Form
-          id="members-invite-form"
-          onSubmit={handleSubmit(handleAfterSubmit)}
-          ref={animate}
-        >
+        <Form id="members-invite-form" onSubmit={handleSubmit(handleAfterSubmit)} ref={animate}>
           {fields.map((field, index) => (
             <InviteFields index={index} key={field.id} roles={roles} />
           ))}
@@ -77,14 +73,11 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
         <AddButton onClick={handleAddMore} />
         {user?.isFirmEmployee && (
           <Box marginTop={5}>
-            <Checkbox
-              label="Omit sending email invite"
-              {...register(`omitEmailInvite`, {})}
-            />
+            <Checkbox label="Omit sending email invite" {...register(`omitEmailInvite`, {})} />
           </Box>
         )}
       </FormProvider>
-      {shouldShowError && <Error>{t('form.errors.invalid')}</Error>}
+      {shouldShowError && <ErrorComponent>{t('form.errors.invalid')}</ErrorComponent>}
     </Box>
   );
 };

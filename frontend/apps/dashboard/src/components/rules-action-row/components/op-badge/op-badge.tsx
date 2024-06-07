@@ -14,9 +14,7 @@ const OpBadge = ({ defaultValue, isEditable, onClick }: OpBadgeProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row',
   });
-  const [isSelected, setIsSelected] = useState(
-    defaultValue === RiskSignalRuleOp.notEq,
-  );
+  const [isSelected, setIsSelected] = useState(defaultValue === RiskSignalRuleOp.notEq);
 
   useEffect(() => {
     setIsSelected(defaultValue === RiskSignalRuleOp.notEq);
@@ -31,11 +29,7 @@ const OpBadge = ({ defaultValue, isEditable, onClick }: OpBadgeProps) => {
   };
 
   return isEditable || isSelected ? (
-    <Badge
-      data-is-selected={isSelected}
-      data-is-editable={isEditable}
-      onClick={isEditable ? handleClick : undefined}
-    >
+    <Badge data-is-selected={isSelected} data-is-editable={isEditable} onClick={isEditable ? handleClick : undefined}>
       {t('not')}
     </Badge>
   ) : null;

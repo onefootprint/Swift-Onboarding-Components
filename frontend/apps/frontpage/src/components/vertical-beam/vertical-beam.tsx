@@ -35,25 +35,9 @@ const VerticalBeam = ({
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      <path
-        d={path}
-        stroke={strokeColor}
-        strokeLinecap="round"
-        strokeWidth="1"
-        strokeOpacity="0.2"
-      />
-      <path
-        d={path}
-        stroke={`url(#${id})`}
-        strokeLinecap="round"
-        strokeWidth="1"
-      />
-      <path
-        d={path}
-        stroke={`url(#${id}-back)`}
-        strokeLinecap="round"
-        strokeWidth="1"
-      />
+      <path d={path} stroke={strokeColor} strokeLinecap="round" strokeWidth="1" strokeOpacity="0.2" />
+      <path d={path} stroke={`url(#${id})`} strokeLinecap="round" strokeWidth="1" />
+      <path d={path} stroke={`url(#${id}-back)`} strokeLinecap="round" strokeWidth="1" />
       <defs>
         <motion.linearGradient
           key={id}

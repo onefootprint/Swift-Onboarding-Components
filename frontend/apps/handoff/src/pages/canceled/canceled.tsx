@@ -15,12 +15,7 @@ const Canceled = () => {
     <Container>
       <Box>
         <NavigationHeader />
-        <HeaderTitle
-          title={t('title')}
-          subtitle={
-            opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
-          }
-        />
+        <HeaderTitle title={t('title')} subtitle={opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')} />
       </Box>
     </Container>
   );

@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoSpinner16 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoSpinner16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -23,10 +18,7 @@ const IcoSpinner16 = ({
       data-colored={false}
     >
       <g clipPath="url(#prefix__a)">
-        <path
-          d="M8 0a8 8 0 0 1 8 8h-1.6A6.399 6.399 0 0 0 8 1.6V0Z"
-          fill={theme.color[color]}
-        />
+        <path d="M8 0a8 8 0 0 1 8 8h-1.6A6.399 6.399 0 0 0 8 1.6V0Z" fill={theme.color[color]} />
       </g>
       <defs>
         <clipPath id="prefix__a">

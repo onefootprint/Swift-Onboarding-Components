@@ -1,18 +1,12 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  CreateMembersRequest,
-  CreateMembersResponse,
-} from '@onefootprint/types';
+import type { CreateMembersRequest, CreateMembersResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const inviteMemberRequest = async (
-  authHeaders: AuthHeaders,
-  payload: CreateMembersRequest,
-) => {
+const inviteMemberRequest = async (authHeaders: AuthHeaders, payload: CreateMembersRequest) => {
   const response = await request<CreateMembersResponse>({
     method: 'POST',
     url: '/org/members',
@@ -32,8 +26,7 @@ const useInviteMembers = () => {
   const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation({
     mutationKey: ['inviteMember'],
-    mutationFn: (payload: CreateMembersRequest) =>
-      inviteMemberRequest(session.authHeaders, payload),
+    mutationFn: (payload: CreateMembersRequest) => inviteMemberRequest(session.authHeaders, payload),
   });
 
   const mutate = async (

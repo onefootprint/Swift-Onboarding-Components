@@ -37,36 +37,15 @@ const CcJcb24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
       />
     </g>
     <defs>
-      <linearGradient
-        id="prefix__b"
-        x1={14.524}
-        y1={8.48}
-        x2={18.612}
-        y2={8.48}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__b" x1={14.524} y1={8.48} x2={18.612} y2={8.48} gradientUnits="userSpaceOnUse">
         <stop stopColor="#007B40" />
         <stop offset={1} stopColor="#55B330" />
       </linearGradient>
-      <linearGradient
-        id="prefix__c"
-        x1={5.384}
-        y1={8.48}
-        x2={9.469}
-        y2={8.48}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__c" x1={5.384} y1={8.48} x2={9.469} y2={8.48} gradientUnits="userSpaceOnUse">
         <stop stopColor="#1D2970" />
         <stop offset={1} stopColor="#006DBA" />
       </linearGradient>
-      <linearGradient
-        id="prefix__d"
-        x1={9.961}
-        y1={8.589}
-        x2={14.048}
-        y2={8.589}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__d" x1={9.961} y1={8.589} x2={14.048} y2={8.589} gradientUnits="userSpaceOnUse">
         <stop stopColor="#6E2B2F" />
         <stop offset={1} stopColor="#E30138" />
       </linearGradient>

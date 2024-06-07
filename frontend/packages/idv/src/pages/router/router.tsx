@@ -7,11 +7,7 @@ import { AppErrorBoundary, SessionExpired } from '../../components';
 import { Identify, IdentifyVariant } from '../../components/identify';
 import { L10nContextProvider } from '../../components/l10n-provider';
 import LoadNeuroId from '../../components/load-neuro-id';
-import {
-  useIdvMachine,
-  useLogStateMachine,
-  useValidateSession,
-} from '../../hooks';
+import { useIdvMachine, useLogStateMachine, useValidateSession } from '../../hooks';
 import { FPCustomEvents, getLogger, getTracker } from '../../utils';
 import {
   createAuthTokenChangedPayload,
@@ -81,14 +77,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     }
 
     onComplete?.({ validationToken, authToken, deviceResponseJson });
-  }, [
-    authToken,
-    deviceResponseJson,
-    isDone,
-    isTransfer,
-    onComplete,
-    validationToken,
-  ]);
+  }, [authToken, deviceResponseJson, isDone, isTransfer, onComplete, validationToken]);
 
   useEffectOnce(() => {
     const authTokenListener = (e: Event) => {
@@ -101,17 +90,11 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     };
 
     document.addEventListener(stepUpCompleted, authTokenListener);
-    document.addEventListener(
-      receivedDeviceResponseJson,
-      deviceResponseJsonListener,
-    );
+    document.addEventListener(receivedDeviceResponseJson, deviceResponseJsonListener);
 
     return function cleanup() {
       document.removeEventListener(stepUpCompleted, authTokenListener);
-      document.removeEventListener(
-        receivedDeviceResponseJson,
-        deviceResponseJsonListener,
-      );
+      document.removeEventListener(receivedDeviceResponseJson, deviceResponseJsonListener);
     };
   });
 
@@ -177,9 +160,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
           l10n={l10n}
         />
       ) : null}
-      {state.matches('sessionExpired') ? (
-        <SessionExpired onRestart={() => send({ type: 'reset' })} />
-      ) : null}
+      {state.matches('sessionExpired') ? <SessionExpired onRestart={() => send({ type: 'reset' })} /> : null}
       {state.matches('configInvalid') ? <ConfigInvalid /> : null}
     </AppErrorBoundary>
   );

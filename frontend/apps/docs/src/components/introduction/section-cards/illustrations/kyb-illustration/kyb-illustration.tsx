@@ -13,60 +13,15 @@ const KybIllustration = ({ isHovered = false }: KybIllustrationProps) => (
     <StyledBackground isHovered={isHovered} />
     <CardBack isHovered={isHovered}>
       <Dots>
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="10px"
-          left="0%"
-          width={10}
-          height={10}
-        />
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="10px"
-          left="50%"
-          width={10}
-          height={10}
-        />
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="10px"
-          left="100%"
-          width={10}
-          height={10}
-        />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="0%" width={10} height={10} />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="50%" width={10} height={10} />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="100%" width={10} height={10} />
       </Dots>
       <Screen>
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="40px"
-          left="50%"
-          width={80}
-        />
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="60px"
-          left="50%"
-          width={100}
-        />
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="90px"
-          left="20%"
-          width={10}
-        />
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="90px"
-          left="50%"
-          width={120}
-        />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="40px" left="50%" width={80} />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="60px" left="50%" width={100} />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="90px" left="20%" width={10} />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="90px" left="50%" width={120} />
       </Screen>
     </CardBack>
   </Container>

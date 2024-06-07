@@ -12,13 +12,7 @@ type MicroFeatureCardProps = {
   icon?: Icon;
 };
 
-const MicroFeatureCard = ({
-  title,
-  subtitle,
-  gridArea,
-  isDark,
-  icon: Icon,
-}: MicroFeatureCardProps) => {
+const MicroFeatureCard = ({ title, subtitle, gridArea, isDark, icon: Icon }: MicroFeatureCardProps) => {
   const icon = Icon && <Icon color={isDark ? 'quinary' : 'primary'} />;
   return (
     <Container gridArea={gridArea} isDark={isDark}>
@@ -77,9 +71,7 @@ const Title = styled.span<{ isDark?: boolean }>`
       top: 0;
       height: 100%;
       width: ${theme.borderWidth[1]};
-      background: ${
-        isDark ? primitives.Purple300 : theme.backgroundColor.accent
-      };
+      background: ${isDark ? primitives.Purple300 : theme.backgroundColor.accent};
 
       ${media.greaterThan('md')`
         left: calc(-1 * ${theme.spacing[9]});

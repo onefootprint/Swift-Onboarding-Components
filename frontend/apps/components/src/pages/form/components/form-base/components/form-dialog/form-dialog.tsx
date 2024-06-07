@@ -30,19 +30,14 @@ const FormDialog = ({
   hideSaveButton,
   hideCancelButton,
 }: FormDialogProps) => {
-  const shouldHideFooter =
-    hideSaveButton && hideCancelButton && hideFootprintLogo;
+  const shouldHideFooter = hideSaveButton && hideCancelButton && hideFootprintLogo;
   const showHeader = variant === 'modal' || variant === 'drawer' || title;
 
   return (
     <Container
       testID={testID}
       data-variant={variant}
-      header={
-        showHeader && (
-          <Header variant={variant} onClose={onClose} title={title} />
-        )
-      }
+      header={showHeader && <Header variant={variant} onClose={onClose} title={title} />}
       footer={
         !shouldHideFooter && (
           <Footer

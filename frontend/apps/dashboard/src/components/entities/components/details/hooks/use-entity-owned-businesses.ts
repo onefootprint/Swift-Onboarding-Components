@@ -31,29 +31,18 @@ const useEntityOwnedBusinesses = (id: string) => {
         select: (response: GetEntityResponse): EntityOwnedBusinessInfo => ({
           id: response.id,
           status: response.status,
-          name:
-            (response.data.find(
-              attribute => attribute.identifier === BusinessDI.name,
-            )?.value as string) || '-',
+          name: (response.data.find(attribute => attribute.identifier === BusinessDI.name)?.value as string) || '-',
         }),
       })) || [],
   });
 
-  const isLoading =
-    businessIdsMutation.isLoading ||
-    businessQueries.some(query => query.isLoading);
-  const isError =
-    businessIdsMutation.error || businessQueries.some(query => query.isError);
-  const isSuccess =
-    businessIdsMutation.isSuccess &&
-    businessQueries.every(query => query.data !== undefined);
+  const isLoading = businessIdsMutation.isLoading || businessQueries.some(query => query.isLoading);
+  const isError = businessIdsMutation.error || businessQueries.some(query => query.isError);
+  const isSuccess = businessIdsMutation.isSuccess && businessQueries.every(query => query.data !== undefined);
 
-  const businesses = isSuccess
-    ? businessQueries.map(query => query.data as EntityOwnedBusinessInfo)
-    : undefined;
+  const businesses = isSuccess ? businessQueries.map(query => query.data as EntityOwnedBusinessInfo) : undefined;
 
-  const hasBusinesses =
-    isSuccess && !!businesses?.length && businesses.length > 0;
+  const hasBusinesses = isSuccess && !!businesses?.length && businesses.length > 0;
 
   return {
     hasBusinesses,

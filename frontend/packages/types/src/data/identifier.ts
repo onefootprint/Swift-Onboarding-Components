@@ -4,7 +4,4 @@ export type AuthTokenIdentifier = { authToken: string };
 
 export type EmailOrPhoneIdentifier = PhoneIdentifier | EmailIdentifier;
 
-export type Identifier =
-  | PhoneIdentifier
-  | EmailIdentifier
-  | AuthTokenIdentifier;
+export type Identifier = PhoneIdentifier | EmailIdentifier | AuthTokenIdentifier;

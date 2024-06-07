@@ -46,9 +46,7 @@ const StepPhone = ({ Header }: StepPhoneProps) => {
         },
         onSuccess: res => {
           const userFound = !!res.user;
-          const successfulIdentifiers = userFound
-            ? [SuccessfulIdentifier.phone]
-            : undefined;
+          const successfulIdentifiers = userFound ? [SuccessfulIdentifier.phone] : undefined;
           send({
             type: 'identifyResult',
             payload: {

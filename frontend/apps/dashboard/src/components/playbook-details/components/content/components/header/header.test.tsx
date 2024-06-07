@@ -1,9 +1,4 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { OnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, asUserWithScope, resetUser } from 'src/config/tests';
@@ -34,9 +29,7 @@ describe('<InfoSection />', () => {
     renderHeader(onboardingConfigFixture);
     expect(screen.getByText('KYC')).toBeInTheDocument();
     expect(screen.getByText('Test playbook')).toBeInTheDocument();
-    expect(
-      screen.getByText('ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm')).toBeInTheDocument();
   });
 
   it('should render form with expected values when editing', async () => {
@@ -62,9 +55,7 @@ describe('<InfoSection />', () => {
       const edit = screen.getByText('Edit playbook name');
       await userEvent.hover(edit);
       await waitFor(() => {
-        expect(
-          screen.getAllByText("You're not allowed to edit Playbooks").length,
-        ).toBeGreaterThan(0);
+        expect(screen.getAllByText("You're not allowed to edit Playbooks").length).toBeGreaterThan(0);
       });
 
       await userEvent.click(edit);

@@ -6,15 +6,13 @@
   "types": "./src/index.ts",
   "license": "MIT",
   "scripts": {
-    "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
-    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "bun test",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
     "test:ci:bun": "bun test --bail",
     "test:watch": "bun test --watch",
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
-    "typecheck": "yarn tsc --noEmit",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "test": "bun test",
+    "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
     "@onefootprint/design-tokens": "*",
@@ -26,7 +24,6 @@
   "devDependencies": {
     "@types/lodash": "^4.14.199",
     "bun-types": "^1.0.25",
-    "eslint-config-footprint": "*",
     "react": "^18",
     "react-dom": "^18",
     "tsconfig": "*",

@@ -16,9 +16,7 @@ type RowProps = {
 const Row = ({ riskSignal }: RowProps) => {
   const { t } = useTranslation('common');
   const uniqueScopes = Array.from(new Set(riskSignal.scopes));
-  const scopesList = uniqueScopes.map(scope =>
-    t(`signal-attributes.${scope}` as ParseKeys<'common'>),
-  );
+  const scopesList = uniqueScopes.map(scope => t(`signal-attributes.${scope}` as ParseKeys<'common'>));
 
   return (
     <>

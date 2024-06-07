@@ -4,14 +4,8 @@ import type { CountrySelectOption } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type {
-  SectionAction,
-  SectionItemProps,
-} from '../../../../../../components/confirm-collected-data';
-import {
-  Section,
-  SectionItem,
-} from '../../../../../../components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
+import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import isCountryUsOrTerritories from '../../../../utils/state-machine/utils/is-country-us-or-territories';
 import LegalStatus from '../../../legal-status';
@@ -55,9 +49,7 @@ const LegalStatusSection = () => {
       .filter((option): option is CountrySelectOption => !!option);
 
     if (citizenships) {
-      const formattedCitizenships = citizenships
-        .map(({ label }: { label: string }) => label)
-        .join(', ');
+      const formattedCitizenships = citizenships.map(({ label }: { label: string }) => label).join(', ');
       legalStatus.push({
         text: t('confirm.legal-status.text.citizenship'),
         subtext: formattedCitizenships,
@@ -85,24 +77,15 @@ const LegalStatusSection = () => {
     setEditing(false);
   };
 
-  const legalStatusItem = legalStatus.map(
-    ({ text, subtext, textColor }: SectionItemProps) => (
-      <SectionItem
-        key={text}
-        text={text}
-        subtext={subtext}
-        textColor={textColor}
-      />
-    ),
-  );
+  const legalStatusItem = legalStatus.map(({ text, subtext, textColor }: SectionItemProps) => (
+    <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
+  ));
 
   const getSectionContent = () => {
     if (!editing) {
       return legalStatusItem;
     }
-    return (
-      <LegalStatus onComplete={stopEditing} onCancel={stopEditing} hideHeader />
-    );
+    return <LegalStatus onComplete={stopEditing} onCancel={stopEditing} hideHeader />;
   };
 
   const actions: SectionAction[] = [];

@@ -12,10 +12,7 @@ import type { BoxProps } from '../box';
 import Box from '../box';
 import Stack from '../stack';
 
-export type ToggleProps = Omit<
-  BoxProps,
-  'children' | 'onBlur' | 'onChange' | 'onFocus'
-> & {
+export type ToggleProps = Omit<BoxProps, 'children' | 'onBlur' | 'onChange' | 'onFocus'> & {
   checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
@@ -67,10 +64,7 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       if (input) {
         const nextChecked = !checked;
         const inputProto = window.HTMLInputElement.prototype;
-        const descriptor = Object.getOwnPropertyDescriptor(
-          inputProto,
-          'checked',
-        ) as PropertyDescriptor;
+        const descriptor = Object.getOwnPropertyDescriptor(inputProto, 'checked') as PropertyDescriptor;
         const setChecked = descriptor.set;
         if (setChecked) {
           const checkEvent = new Event('click', { bubbles: true });
@@ -81,12 +75,7 @@ const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
     };
 
     return (
-      <ToggleContainer
-        data-placement={labelPlacement}
-        data-full-width={fullWidth}
-        data-align-center={!hint}
-        {...props}
-      >
+      <ToggleContainer data-placement={labelPlacement} data-full-width={fullWidth} data-align-center={!hint} {...props}>
         <Stack flex={1} direction="column">
           {label && (
             <Label htmlFor={id} data-size={size}>
@@ -225,10 +214,12 @@ const Button = styled(motion.button)<{
 
     &:disabled {
       border-color: ${theme.borderColor[checked ? 'transparent' : 'tertiary']};
-      ${checked &&
-      css`
+      ${
+        checked &&
+        css`
         opacity: 0.4;
-      `}
+      `
+      }
     }
   `}
 `;
@@ -245,11 +236,13 @@ const StyledIcoToggleKnob16 = styled(motion.div)<{
     height: ${size === 'compact' ? 12 : 16}px;
     width: ${size === 'compact' ? 12 : 16}px;
 
-    ${disabled &&
-    css`
+    ${
+      disabled &&
+      css`
       opacity: ${checked ? 1 : 0.3};
       background: ${theme.color[checked ? 'quinary' : 'quaternary']};
-    `}
+    `
+    }
   `}
 `;
 

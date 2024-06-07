@@ -3,18 +3,8 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 const HitsShimmer = () => {
-  const renderHitRow = (
-    labelWidth: string,
-    valueWidth: string,
-    isLink?: boolean,
-  ) => (
-    <Box
-      alignItems="center"
-      display="flex"
-      gap={9}
-      justifyContent="space-between"
-      width="100%"
-    >
+  const renderHitRow = (labelWidth: string, valueWidth: string, isLink?: boolean) => (
+    <Box alignItems="center" display="flex" gap={9} justifyContent="space-between" width="100%">
       <HitRowItem width={labelWidth} />
       <HitRowItem width={valueWidth} isLink={isLink} />
     </Box>
@@ -81,22 +71,12 @@ const HitRowItem = ({ width, isLink }: { width: string; isLink?: boolean }) => (
   />
 );
 
-const SourceUrlLabel = () => (
-  <Shimmer width="81px" height="28px" marginBottom={3} />
-);
+const SourceUrlLabel = () => <Shimmer width="81px" height="28px" marginBottom={3} />;
 
-const SourceUrlCopy = () => (
-  <Shimmer width="100%" height="20px" marginBottom={5} />
-);
+const SourceUrlCopy = () => <Shimmer width="100%" height="20px" marginBottom={5} />;
 
 const SourceUrlLink = () => (
-  <Shimmer
-    width="168px"
-    height="20px"
-    marginBottom={5}
-    backgroundColor="accent"
-    opacity="0.05"
-  />
+  <Shimmer width="168px" height="20px" marginBottom={5} backgroundColor="accent" opacity="0.05" />
 );
 
 export default HitsShimmer;

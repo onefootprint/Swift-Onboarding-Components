@@ -14,16 +14,7 @@ type CardBaseProps = {
   cta?: JSX.Element;
 };
 
-const CardBase = ({
-  id,
-  isSelected,
-  onSelect,
-  title,
-  headerIcon,
-  headerText,
-  rows,
-  cta,
-}: CardBaseProps) => {
+const CardBase = ({ id, isSelected, onSelect, title, headerIcon, headerText, rows, cta }: CardBaseProps) => {
   const handleSelect = () => {
     const card = document.getElementById(`device-insights-card-${id}`);
     const parent = card?.parentElement;
@@ -37,11 +28,7 @@ const CardBase = ({
   };
 
   return (
-    <Container
-      id={`device-insights-card-${id}`}
-      data-selected={!!isSelected}
-      onClick={handleSelect}
-    >
+    <Container id={`device-insights-card-${id}`} data-selected={!!isSelected} onClick={handleSelect}>
       {title && (
         <Header data-selected={!!isSelected}>
           <Text variant="caption-1">{title}</Text>

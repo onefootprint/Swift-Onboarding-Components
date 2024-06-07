@@ -5,11 +5,7 @@ import type { FieldsetProps } from './fieldset';
 import Fieldset from './fieldset';
 
 describe('<Fieldset />', () => {
-  const renderFieldset = ({
-    title = 'title',
-    children = 'children',
-    cta,
-  }: Partial<FieldsetProps>) => {
+  const renderFieldset = ({ title = 'title', children = 'children', cta }: Partial<FieldsetProps>) => {
     customRender(
       <Fieldset title={title} cta={cta}>
         {children}

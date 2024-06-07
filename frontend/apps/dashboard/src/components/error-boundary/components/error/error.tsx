@@ -9,7 +9,7 @@ type ErrorProps = {
   resetErrorBoundary: () => void;
 };
 
-const Error = ({ resetErrorBoundary }: ErrorProps) => {
+const ErrorComponent = ({ resetErrorBoundary }: ErrorProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'error' });
 
   return (
@@ -26,15 +26,7 @@ const Error = ({ resetErrorBoundary }: ErrorProps) => {
               label: t('cta'),
               onClick: resetErrorBoundary,
             }}
-            renderHeader={() => (
-              <Image
-                alt={t('image.alt')}
-                height={212.62}
-                src="/404.png"
-                width={298}
-                priority
-              />
-            )}
+            renderHeader={() => <Image alt={t('image.alt')} height={212.62} src="/404.png" width={298} priority />}
           />
         </Container>
       </ErrorContainer>
@@ -50,4 +42,4 @@ const ErrorContainer = styled.div`
   justify-content: center;
 `;
 
-export default Error;
+export default ErrorComponent;

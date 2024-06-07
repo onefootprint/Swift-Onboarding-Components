@@ -8,12 +8,7 @@ const PostEmpty = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.changelog' });
   return (
     <Container>
-      <Image
-        src="/home/banner/penguin.png"
-        alt="penguin"
-        height={240}
-        width={320}
-      />
+      <Image src="/home/banner/penguin.png" alt="penguin" height={240} width={320} />
       <Text variant="display-3">{t('empty.title')}</Text>
     </Container>
   );

@@ -12,14 +12,7 @@ type InputTextFormProps = {
   value?: string;
 };
 
-const InputTextForm = ({
-  formId,
-  label,
-  onSubmit,
-  placeholder,
-  requiredMsg,
-  value,
-}: InputTextFormProps) => {
+const InputTextForm = ({ formId, label, onSubmit, placeholder, requiredMsg, value }: InputTextFormProps) => {
   const { formState, handleSubmit, register } = useForm<State>({
     defaultValues: { input: value },
   });

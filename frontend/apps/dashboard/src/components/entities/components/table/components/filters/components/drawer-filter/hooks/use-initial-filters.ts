@@ -7,11 +7,7 @@ import { FiltersDateRange } from '../drawer-filter.type';
 const useInitialFilters = (now = new Date()) => {
   const { requestParams, values } = useFilters();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const nextWeek = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + 7,
-  );
+  const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
 
   const initialValues: FormData = {
     labels: [],

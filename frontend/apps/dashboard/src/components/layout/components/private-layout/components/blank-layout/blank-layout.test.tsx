@@ -1,8 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -12,9 +8,7 @@ import BlankLayout from './blank-layout';
 const useRouterSpy = createUseRouterSpy();
 
 describe('<BlankLayout />', () => {
-  const renderBlankLayout = ({
-    children = 'Blank Layout',
-  }: Partial<BlankLayoutProps>) =>
+  const renderBlankLayout = ({ children = 'Blank Layout' }: Partial<BlankLayoutProps>) =>
     customRender(<BlankLayout>{children}</BlankLayout>);
 
   beforeEach(() => {

@@ -38,14 +38,7 @@ const Template: Story<EmptyStateProps> = ({
   title,
 }: EmptyStateProps) => {
   const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
-  return (
-    <EmptyState
-      description={description}
-      iconComponent={SelectedIcon}
-      testID={testID}
-      title={title}
-    />
-  );
+  return <EmptyState description={description} iconComponent={SelectedIcon} testID={testID} title={title} />;
 };
 
 const HeaderTemplate: Story<EmptyStateProps> = ({
@@ -54,12 +47,7 @@ const HeaderTemplate: Story<EmptyStateProps> = ({
   testID,
   title,
 }: EmptyStateProps) => (
-  <EmptyState
-    description={description}
-    renderHeader={renderHeader}
-    testID={testID}
-    title={title}
-  />
+  <EmptyState description={description} renderHeader={renderHeader} testID={testID} title={title} />
 );
 
 export const Base = Template.bind({});

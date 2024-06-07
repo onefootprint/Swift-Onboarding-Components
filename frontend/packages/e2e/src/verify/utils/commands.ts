@@ -1,6 +1,6 @@
-import type { Browser, FrameLocator, Page } from '@playwright/test';
-import { expect, devices } from '@playwright/test';
 import path from 'path';
+import type { Browser, FrameLocator, Page } from '@playwright/test';
+import { devices, expect } from '@playwright/test';
 
 type WithFrame = { frame: FrameLocator | Page };
 type WithPage = { page: Page };
@@ -38,19 +38,12 @@ export const softCheckSupport = async (frame: FrameLocator) => {
     .catch(() => false);
 };
 
-export const selectOutcomeOptional = async (
-  parent: FrameLocator | Page,
-  outcome: Outcome,
-) => {
+export const selectOutcomeOptional = async (parent: FrameLocator | Page, outcome: Outcome) => {
   const successOption = parent.getByRole('button', { name: 'Success' }).first();
-  await successOption
-    .waitFor({ state: 'attached', timeout: 15000 })
-    .then(() => successOption.click());
+  await successOption.waitFor({ state: 'attached', timeout: 15000 }).then(() => successOption.click());
 
   const outcomeBtn = parent.getByRole('button', { name: outcome }).first();
-  return outcomeBtn
-    .waitFor({ state: 'attached', timeout: 15000 })
-    .then(() => outcomeBtn.click());
+  return outcomeBtn.waitFor({ state: 'attached', timeout: 15000 }).then(() => outcomeBtn.click());
 };
 
 /** @deprecated: Please use `verifyAppIframeClick()` with /components/verify route instead.  */
@@ -81,20 +74,14 @@ export const fillEmail = async (parent: FrameLocator | Page, str: string) => {
   return input.waitFor(attachedState).then(() => input.fill(str));
 };
 
-export const fillPhoneNumber = async (
-  parent: FrameLocator | Page,
-  str: string,
-) => {
+export const fillPhoneNumber = async (parent: FrameLocator | Page, str: string) => {
   const input = parent.locator('input[name="phoneNumber"]').first();
   return input /** locator.fill() needs a visible input, bypass using force:true */
     .waitFor(attachedState)
     .then(() => input.fill(str, { force: true })); // eslint-disable-line playwright/no-force-option,
 };
 
-export const sixDigitChallenger = async (
-  header: string,
-  { frame, page }: PageNFrame,
-) => {
+export const sixDigitChallenger = async (header: string, { frame, page }: PageNFrame) => {
   await expect(frame.getByText(header)).toBeAttached();
 
   // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -110,10 +97,7 @@ export const sixDigitChallenger = async (
 };
 
 export const verifyEmail = sixDigitChallenger.bind(null, 'Verify your email');
-export const verifyPhoneNumber = sixDigitChallenger.bind(
-  null,
-  'Verify your phone number',
-);
+export const verifyPhoneNumber = sixDigitChallenger.bind(null, 'Verify your phone number');
 
 export const fillNameAndDoB = async (
   frame: FrameLocator,
@@ -133,14 +117,8 @@ export const fillBasicDataKYB = async (
   },
 ) => {
   await frame.getByLabel('Business name').first().fill(payload.businessName);
-  await frame
-    .getByLabel('Doing Business As (optional)')
-    .first()
-    .fill(payload.businessNameOptional);
-  await frame
-    .getByLabel('Taxpayer Identification Number (TIN)')
-    .first()
-    .fill(payload.userTIN);
+  await frame.getByLabel('Doing Business As (optional)').first().fill(payload.businessNameOptional);
+  await frame.getByLabel('Taxpayer Identification Number (TIN)').first().fill(payload.userTIN);
 };
 
 export const fillAddress = async (
@@ -150,10 +128,7 @@ export const fillAddress = async (
   await frame.getByLabel('Address line 1').first().fill(payload.addressLine1);
   await frame.getByLabel('City').first().fill(payload.city);
   await frame.getByLabel('Zip code').first().fill(payload.zipCode);
-  await frame
-    .getByRole('button', { name: 'State', disabled: false, exact: true })
-    .first()
-    .click();
+  await frame.getByRole('button', { name: 'State', disabled: false, exact: true }).first().click();
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
 };
@@ -165,10 +140,7 @@ export const fillAddressKYB = async (
   await frame.getByLabel('Address line 1').first().fill(payload.addressLine1);
   await frame.getByLabel('City').first().fill(payload.city);
   await frame.getByLabel('Zip code').first().fill(payload.zipCode);
-  await frame
-    .getByRole('button', { name: 'Select', disabled: false })
-    .first()
-    .click();
+  await frame.getByRole('button', { name: 'Select', disabled: false }).first().click();
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
 };
@@ -184,58 +156,30 @@ export const fillBeneficialOwners = async (
     userLastName: string;
   },
 ) => {
-  await frame
-    .locator('input[name="beneficialOwners.0.first_name"]')
-    .first()
-    .fill(payload.userFirstName);
-  await frame
-    .locator('input[name="beneficialOwners.0.last_name"]')
-    .first()
-    .fill(payload.userLastName);
-  const share0 = frame
-    .locator('input[name="beneficialOwners.0.ownership_stake"]')
-    .first();
+  await frame.locator('input[name="beneficialOwners.0.first_name"]').first().fill(payload.userFirstName);
+  await frame.locator('input[name="beneficialOwners.0.last_name"]').first().fill(payload.userLastName);
+  const share0 = frame.locator('input[name="beneficialOwners.0.ownership_stake"]').first();
   await share0.clear();
   await share0.fill('50');
 
   await frame.getByRole('button', { name: 'Add more' }).first().click();
 
-  await frame
-    .locator('input[name="beneficialOwners.1.first_name"]')
-    .first()
-    .fill(payload.beneficialOwner1Name);
-  await frame
-    .locator('input[name="beneficialOwners.1.last_name"]')
-    .first()
-    .fill(payload.beneficialOwner1LastName);
-  await frame
-    .locator('input[name="beneficialOwners.1.email"]')
-    .first()
-    .fill(payload.beneficialOwner1Email);
-  await frame
-    .locator('input[name="beneficialOwners.1.phone_number"]')
-    .first()
-    .fill(payload.beneficialOwner1Phone);
-  const share1 = frame
-    .locator('input[name="beneficialOwners.1.ownership_stake"]')
-    .first();
+  await frame.locator('input[name="beneficialOwners.1.first_name"]').first().fill(payload.beneficialOwner1Name);
+  await frame.locator('input[name="beneficialOwners.1.last_name"]').first().fill(payload.beneficialOwner1LastName);
+  await frame.locator('input[name="beneficialOwners.1.email"]').first().fill(payload.beneficialOwner1Email);
+  await frame.locator('input[name="beneficialOwners.1.phone_number"]').first().fill(payload.beneficialOwner1Phone);
+  const share1 = frame.locator('input[name="beneficialOwners.1.ownership_stake"]').first();
   await share1.clear();
   await share1.fill('50');
 };
 
-export const fillSSN = async (
-  frame: FrameLocator,
-  payload: { ssn: string },
-) => {
+export const fillSSN = async (frame: FrameLocator, payload: { ssn: string }) => {
   const field = frame.getByLabel('SSN').first();
   await field.waitFor(attachedState).then(() => field.fill(payload.ssn));
 };
 
 export const fillVisa = async ({ frame, page }: PageNFrame) => {
-  await frame
-    .getByRole('radio', { name: 'I have a Visa', disabled: false })
-    .first()
-    .click();
+  await frame.getByRole('radio', { name: 'I have a Visa', disabled: false }).first().click();
 
   const citizenships = frame
     .getByRole('button', {
@@ -251,9 +195,7 @@ export const fillVisa = async ({ frame, page }: PageNFrame) => {
   await page.keyboard.press('ArrowDown');
   await page.keyboard.press('Enter');
 
-  const nationality = frame
-    .getByRole('button', { name: 'Select', disabled: false, exact: true })
-    .first();
+  const nationality = frame.getByRole('button', { name: 'Select', disabled: false, exact: true }).first();
   await nationality.scrollIntoViewIfNeeded();
   await nationality.click();
   await page.keyboard.press('ArrowDown');
@@ -265,9 +207,7 @@ export const fillVisa = async ({ frame, page }: PageNFrame) => {
     .first()
     .scrollIntoViewIfNeeded();
 
-  const visaKind = frame
-    .getByRole('button', { name: 'Select', disabled: false, exact: true })
-    .first();
+  const visaKind = frame.getByRole('button', { name: 'Select', disabled: false, exact: true }).first();
   await visaKind.scrollIntoViewIfNeeded();
   await visaKind.click();
   await frame.getByText('E-1').first().click();
@@ -309,9 +249,7 @@ export const confirmData = async (
   await expect(parent.getByText(payload.country).first()).toBeAttached();
   if (payload.ssn) {
     // SSN value should be scrubbed by default
-    await expect(
-      parent.getByText('•'.repeat(payload.ssn.length)).first(),
-    ).toBeAttached();
+    await expect(parent.getByText('•'.repeat(payload.ssn.length)).first()).toBeAttached();
   }
   if (payload.citizenship) {
     await expect(parent.getByText(payload.citizenship).first()).toBeAttached();
@@ -320,17 +258,13 @@ export const confirmData = async (
     await expect(parent.getByText(payload.nationality).first()).toBeAttached();
   }
   if (payload.usLegalStatus) {
-    await expect(
-      parent.getByText(payload.usLegalStatus).first(),
-    ).toBeAttached();
+    await expect(parent.getByText(payload.usLegalStatus).first()).toBeAttached();
   }
   if (payload.visaKind) {
     await expect(parent.getByText(payload.visaKind).first()).toBeAttached();
   }
   if (payload.visaExpirationDate) {
-    await expect(
-      parent.getByText(payload.visaExpirationDate).first(),
-    ).toBeAttached();
+    await expect(parent.getByText(payload.visaExpirationDate).first()).toBeAttached();
   }
 };
 
@@ -366,12 +300,8 @@ export const doTransferFromDesktop = async ({
   await popup.goto(handoffUrl);
   await popup.waitForLoadState();
 
-  const popupHeader = popup
-    .getByText('Please continue on your computer.')
-    .first();
-  await popupHeader
-    .waitFor({ state: 'attached', timeout: 5000 })
-    .catch(() => false); // Increasing the waiting time for CI
+  const popupHeader = popup.getByText('Please continue on your computer.').first();
+  await popupHeader.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false); // Increasing the waiting time for CI
 };
 
 export const doTransferFromSocialMediaBrowser = async ({
@@ -428,9 +358,7 @@ export const doTransferFromMobile = async ({
       exact: true,
     })
     .first();
-  await btn
-    .waitFor({ state: 'attached', timeout: 10000 })
-    .then(() => btn.click());
+  await btn.waitFor({ state: 'attached', timeout: 10000 }).then(() => btn.click());
 
   const newPage = await pagePromise;
   await newPage.waitForLoadState();

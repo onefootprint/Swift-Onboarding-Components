@@ -125,18 +125,22 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
       }
     }
 
-    ${size === 'compact' &&
-    css`
+    ${
+      size === 'compact' &&
+      css`
       padding: ${theme.spacing[2]} ${theme.spacing[3]};
       ${createFontStyles('caption-4')};
-    `}
+    `
+    }
 
-    ${size === 'tiny' &&
-    css`
+    ${
+      size === 'tiny' &&
+      css`
       padding: ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[2]}
         ${theme.spacing[3]};
       ${createFontStyles('caption-1')};
-    `}
+    `
+    }
   `}
 `;
 
@@ -188,18 +192,22 @@ const StyledSubTrigger = styled(RadixDropdown.SubTrigger)<{
       }
     }
 
-    ${size === 'compact' &&
-    css`
+    ${
+      size === 'compact' &&
+      css`
       padding: ${theme.spacing[2]} ${theme.spacing[3]};
       ${createFontStyles('caption-4')};
-    `}
+    `
+    }
 
-    ${size === 'tiny' &&
-    css`
+    ${
+      size === 'tiny' &&
+      css`
       padding: ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[2]}
         ${theme.spacing[3]};
       ${createFontStyles('caption-1')};
-    `}
+    `
+    }
   `}
 `;
 

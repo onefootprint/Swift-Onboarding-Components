@@ -22,16 +22,13 @@ const postPartnerPartnershipsDocumentsAssignments = async (
   if (!token) return Promise.reject(new TypeError('Missing auth token'));
 
   return partnershipId && documentId
-    ? baseFetch<EmptyResponse>(
-        `/partner/partnerships/${partnershipId}/documents/${documentId}/assignments`,
-        {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
-          method: 'POST',
-          body: JSON.stringify({
-            ...(userId != null && { user_id: userId }),
-          }),
-        },
-      )
+    ? baseFetch<EmptyResponse>(`/partner/partnerships/${partnershipId}/documents/${documentId}/assignments`, {
+        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
+        method: 'POST',
+        body: JSON.stringify({
+          ...(userId != null && { user_id: userId }),
+        }),
+      })
     : Promise.reject(new TypeError('Missing required parameters'));
 };
 

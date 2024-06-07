@@ -10,12 +10,7 @@ const OsProtected = () => {
   const isInView = useInView(ref, { once: false, amount: 'all' });
   return (
     <IllustrationContainer ref={ref}>
-      <StyledMobileDemoVideo
-        videoUrl="/auth/sections/passkeys.mp4"
-        shouldPlay={isInView}
-        hideReplay
-        hideNotch
-      />
+      <StyledMobileDemoVideo videoUrl="/auth/sections/passkeys.mp4" shouldPlay={isInView} hideReplay hideNotch />
     </IllustrationContainer>
   );
 };

@@ -1,6 +1,4 @@
-import createStringList, {
-  createCapitalStringList,
-} from './create-string-list';
+import createStringList, { createCapitalStringList } from './create-string-list';
 
 describe('createStringList', () => {
   it('empty list renders correctly', () => {
@@ -21,9 +19,7 @@ describe('createStringList', () => {
     const items = ['Apple', 'Pear', 'Berry'];
     expect(createStringList(items)).toEqual('Apple, Pear and Berry');
     expect(createCapitalStringList(items)).toEqual('Apple, pear and berry');
-    expect(createStringList(items, ' and ', ' and ')).toEqual(
-      'Apple and Pear and Berry',
-    );
+    expect(createStringList(items, ' and ', ' and ')).toEqual('Apple and Pear and Berry');
     expect(createStringList(items, ', ', ' & ')).toEqual('Apple, Pear & Berry');
     expect(createStringList(items, '-', '*')).toEqual('Apple-Pear*Berry');
   });

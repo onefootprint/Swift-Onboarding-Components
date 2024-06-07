@@ -17,12 +17,7 @@ type TranslationsProviderProps = {
   resources: InitProps['resources'];
 };
 
-const TranslationsProvider = ({
-  children,
-  locale,
-  namespaces,
-  resources,
-}: TranslationsProviderProps) => {
+const TranslationsProvider = ({ children, locale, namespaces, resources }: TranslationsProviderProps) => {
   const i18n = createInstance();
 
   initTranslations(locale, namespaces, i18n, resources);

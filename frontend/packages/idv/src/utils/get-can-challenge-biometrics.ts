@@ -10,9 +10,7 @@ const getCanChallengeBiometrics = (
   if (!device) {
     return false;
   }
-  const hasAvailableBiometricChallenge = availableChallengeKinds?.includes(
-    ChallengeKind.biometric,
-  );
+  const hasAvailableBiometricChallenge = availableChallengeKinds?.includes(ChallengeKind.biometric);
   if (!hasAvailableBiometricChallenge) {
     return false;
   }

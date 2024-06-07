@@ -1,8 +1,4 @@
-import type {
-  BackgroundColor,
-  Color,
-  Overlay,
-} from '@onefootprint/design-tokens';
+import type { BackgroundColor, Color, Overlay } from '@onefootprint/design-tokens';
 import { css } from 'styled-components';
 
 import { createOverlayBackground } from '../../utils/mixins';
@@ -13,11 +9,7 @@ type CreatePseudoStyles = {
   background: BackgroundColor;
 };
 
-export const createPseudoStyles = ({
-  hoverOverlay,
-  activeOverlay,
-  background,
-}: CreatePseudoStyles) => css`
+export const createPseudoStyles = ({ hoverOverlay, activeOverlay, background }: CreatePseudoStyles) => css`
   @media (hover: hover) {
     &:hover:enabled {
       ${createOverlayBackground(hoverOverlay, background)};

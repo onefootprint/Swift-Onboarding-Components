@@ -8,9 +8,7 @@ import { createVariantStyles } from './banner.utils';
 export type BannerProps = { children: React.ReactNode; variant: BannerVariant };
 type StyledProps = { children: React.ReactNode; $variant: BannerVariant };
 
-const Banner = ({ children, variant }: BannerProps) => (
-  <StyledDiv $variant={variant}>{children}</StyledDiv>
-);
+const Banner = ({ children, variant }: BannerProps) => <StyledDiv $variant={variant}>{children}</StyledDiv>;
 
 const StyledDiv = styled.div.attrs<StyledProps>({
   role: 'alert',

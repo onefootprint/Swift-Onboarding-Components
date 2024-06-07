@@ -4,10 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const decrypt = async (
-  { entityId, fields, reason }: DecryptRequest,
-  authHeaders: AuthHeaders,
-) => {
+const decrypt = async ({ entityId, fields, reason }: DecryptRequest, authHeaders: AuthHeaders) => {
   const response = await requestWithoutCaseConverter<DecryptResponse>({
     method: 'POST',
     url: `/entities/${entityId}/vault/decrypt`,

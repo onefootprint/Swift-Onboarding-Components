@@ -79,12 +79,7 @@ describe('getDocDis', () => {
     expect(
       getDocDis({
         dis: [DocumentDI.latestDriversLicenseFront],
-        documents: [
-          driversLicenseDocument1,
-          driversLicenseDocument2,
-          idCardDocument1,
-          idCardDocument2,
-        ],
+        documents: [driversLicenseDocument1, driversLicenseDocument2, idCardDocument1, idCardDocument2],
         vaultData: entityVaultWithIDCardAndDriversLicenseDIs,
       }),
     ).toEqual([

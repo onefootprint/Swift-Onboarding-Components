@@ -36,10 +36,7 @@ const useDocName = ({
   };
 
   const getSideName = () => {
-    if (
-      docType === SupportedIdDocTypes.passport ||
-      docType === SupportedIdDocTypes.visa
-    ) {
+    if (docType === SupportedIdDocTypes.passport || docType === SupportedIdDocTypes.visa) {
       return t('side.photo');
     }
     switch (imageType) {

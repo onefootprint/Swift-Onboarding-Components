@@ -11,8 +11,7 @@ import {
   waitForFormLoad,
 } from './utils/commands';
 
-const formAppUrl =
-  (process.env.E2E_COMPONENTS_BASE_URL || 'http://localhost:3010') + '/form';
+const formAppUrl = `${process.env.E2E_COMPONENTS_BASE_URL || 'http://localhost:3010'}/form`;
 
 const name = 'Piip Penguin';
 const number = '378282246310005';
@@ -40,9 +39,7 @@ test.describe('/components/form', () => {
     await clickOn(/custom save via ref/i, page);
     const errorToastTitle = page.getByText('Error').first();
     await errorToastTitle.waitFor({ state: 'attached', timeout: 1000 });
-    const errorToastDescription = page
-      .getByText('Please fix the inputs and try again.')
-      .first();
+    const errorToastDescription = page.getByText('Please fix the inputs and try again.').first();
     await errorToastDescription.waitFor({ state: 'attached', timeout: 1000 });
 
     const nameEmpty = frame.getByText('Name cannot be empty').first();
@@ -53,9 +50,7 @@ test.describe('/components/form', () => {
     await expiryEmpty.waitFor({ state: 'attached', timeout: 2000 });
     const cvcEmpty = frame.getByText('CVC cannot be empty').first();
     await cvcEmpty.waitFor({ state: 'attached', timeout: 2000 });
-    const zipEmptyOrInvalid = frame
-      .getByText('Zip code cannot be empty or is invalid')
-      .first();
+    const zipEmptyOrInvalid = frame.getByText('Zip code cannot be empty or is invalid').first();
     await zipEmptyOrInvalid.waitFor({ state: 'attached', timeout: 2000 });
 
     // Fill the form with invalid data and try to save it
@@ -86,15 +81,11 @@ test.describe('/components/form', () => {
 
     const numberInvalid = frame.getByText('Invalid card number').first();
     await numberInvalid.waitFor({ state: 'attached', timeout: 1000 });
-    const expiryInvalid = frame
-      .getByText('Date must be valid and in the future')
-      .first();
+    const expiryInvalid = frame.getByText('Date must be valid and in the future').first();
     await expiryInvalid.waitFor({ state: 'attached', timeout: 1000 });
     const cvcInvalid = frame.getByText('Invalid CVC').first();
     await cvcInvalid.waitFor({ state: 'attached', timeout: 1000 });
-    const zipInvalid = frame
-      .getByText('Zip code cannot be empty or is invalid')
-      .first();
+    const zipInvalid = frame.getByText('Zip code cannot be empty or is invalid').first();
     await zipInvalid.waitFor({ state: 'attached', timeout: 1000 });
 
     // Fix the inputs and save again
@@ -121,9 +112,7 @@ test.describe('/components/form', () => {
     const isZipInvalidVisible = await zipInvalid.isVisible();
     expect(isZipInvalidVisible).toBe(false);
 
-    const refSuccessToast = page
-      .getByText('Successfully saved via ref')
-      .first();
+    const refSuccessToast = page.getByText('Successfully saved via ref').first();
     await refSuccessToast.waitFor({ state: 'attached', timeout: 6000 });
     const completeToast = page.getByText('Successfully completed form').first();
     await completeToast.waitFor({ state: 'attached', timeout: 3000 });

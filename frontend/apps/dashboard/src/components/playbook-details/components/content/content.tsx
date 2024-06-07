@@ -14,10 +14,7 @@ const Content = ({ playbook }: ContentProps) => {
   return (
     <Box tag="section" testID="playbook-details-content">
       <Box marginBottom={7}>
-        <Breadcrumb
-          playbookName={playbook.name}
-          isDisabled={isHeadingDisabled}
-        />
+        <Breadcrumb playbookName={playbook.name} isDisabled={isHeadingDisabled} />
       </Box>
       <Box marginBottom={7}>
         <Header playbook={playbook} isDisabled={isHeadingDisabled} />

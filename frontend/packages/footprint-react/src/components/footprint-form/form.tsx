@@ -4,10 +4,7 @@ import React, { useEffect } from 'react';
 
 import useStableContainerId from '../../hooks/use-stable-container-id';
 
-export type FootprintFootprintFormProps = Omit<
-  FootprintFormProps,
-  'kind' | 'containerId'
->;
+export type FootprintFootprintFormProps = Omit<FootprintFormProps, 'kind' | 'containerId'>;
 
 const FootprintForm = (props: FootprintFootprintFormProps) => {
   const containerId = useStableContainerId();
@@ -15,7 +12,7 @@ const FootprintForm = (props: FootprintFootprintFormProps) => {
 
   useEffect(() => {
     if (!containerId) {
-      return () => {};
+      return () => undefined;
     }
 
     const component = footprint.init({

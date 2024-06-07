@@ -3,6 +3,6 @@
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
-    "types": ["bun-types", "./src/@types/i18next.d.ts"],
+    "types": ["bun-types", "./src/@types/i18next.d.ts"]
   }
 }

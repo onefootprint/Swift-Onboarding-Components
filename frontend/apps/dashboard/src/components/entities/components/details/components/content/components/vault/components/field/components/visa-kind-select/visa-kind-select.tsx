@@ -9,9 +9,7 @@ import styled, { css } from 'styled-components';
 
 import EMPTY_SELECT_VALUE from '../../../../constants';
 import editFormFieldName from '../utils/edit-form-field-name';
-import validateVisaKind, {
-  VisaKindValidationError,
-} from '../utils/validate-visa-kind';
+import validateVisaKind, { VisaKindValidationError } from '../utils/validate-visa-kind';
 
 export type VisaKindSelectProps = {
   value: VaultValue;
@@ -37,16 +35,11 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
     if (message && typeof message === 'string') {
       return message;
     }
-    const validationError = validateVisaKind(
-      getValues(formField),
-      formLegalStatus,
-    );
+    const validationError = validateVisaKind(getValues(formField), formLegalStatus);
     if (validationError !== undefined) {
       const errorByValidationError: Record<VisaKindValidationError, string> = {
         [VisaKindValidationError.REQUIRED]: t('errors.visa-kind.required'),
-        [VisaKindValidationError.SHOULD_BE_EMPTY]: t(
-          'errors.visa-kind.should-be-empty',
-        ),
+        [VisaKindValidationError.SHOULD_BE_EMPTY]: t('errors.visa-kind.should-be-empty'),
       };
       return errorByValidationError[validationError];
     }
@@ -60,13 +53,10 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
         aria-label="Visa type"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {
-          validate: (visaKindVal: string) =>
-            validateVisaKind(visaKindVal, formLegalStatus) === undefined,
+          validate: (visaKindVal: string) => validateVisaKind(visaKindVal, formLegalStatus) === undefined,
         })}
       >
-        <option value={EMPTY_SELECT_VALUE}>
-          {t('legal-status.visa-kind-mapping.none')}
-        </option>
+        <option value={EMPTY_SELECT_VALUE}>{t('legal-status.visa-kind-mapping.none')}</option>
         {Object.values(VisaKind).map(kind => (
           <option key={kind} value={kind}>
             {t(`legal-status.visa-kind-mapping.${kind}` as ParseKeys<'common'>)}

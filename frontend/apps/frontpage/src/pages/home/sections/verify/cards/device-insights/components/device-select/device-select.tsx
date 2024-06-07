@@ -14,20 +14,8 @@ type DeviceSelectProps = {
   };
 };
 
-const DeviceSelect = ({
-  icon = 'phone',
-  id,
-  $isActive,
-  onClick,
-  position,
-}: DeviceSelectProps) => (
-  <Container
-    $isActive={$isActive}
-    onClick={() => onClick(id)}
-    align="center"
-    justify="center"
-    position={position}
-  >
+const DeviceSelect = ({ icon = 'phone', id, $isActive, onClick, position }: DeviceSelectProps) => (
+  <Container $isActive={$isActive} onClick={() => onClick(id)} align="center" justify="center" position={position}>
     <IconWrapper>
       {icon === 'phone' ? (
         <IcoSmartphone216 color={$isActive ? 'quinary' : 'primary'} />
@@ -47,9 +35,7 @@ const Container = styled(Stack)<{
     border-radius: 50% 50% 50% 0;
     transform: rotate(-45deg);
     cursor: pointer;
-    background-color: ${$isActive
-      ? theme.backgroundColor.accent
-      : theme.backgroundColor.primary};
+    background-color: ${$isActive ? theme.backgroundColor.accent : theme.backgroundColor.primary};
     position: absolute;
     top: ${position.y};
     left: ${position.x};

@@ -2,10 +2,7 @@ import type { Document } from '@onefootprint/types';
 import { IdDocStatus, SupportedIdDocTypes } from '@onefootprint/types';
 import { DocumentReviewStatus } from '@onefootprint/types/src/data/document-type';
 
-import getDocumentStatus, {
-  computeSingleDocumentStatus,
-  DocumentStatus,
-} from './get-document-status';
+import getDocumentStatus, { computeSingleDocumentStatus, DocumentStatus } from './get-document-status';
 import {
   driversLicenseFailed,
   driversLicensePending,
@@ -69,13 +66,7 @@ describe('computeSingleDocumentStatus', () => {
 
 describe('getDocumentStatus', () => {
   it('should return pending if pending is the most recent', () => {
-    const documents = [
-      driversLicenseSuccess,
-      driversLicenseFailed,
-      driversLicensePending,
-      idCardSuccess,
-      idCardFail,
-    ];
+    const documents = [driversLicenseSuccess, driversLicenseFailed, driversLicensePending, idCardSuccess, idCardFail];
     expect(
       getDocumentStatus({
         documents,
@@ -112,12 +103,7 @@ describe('getDocumentStatus', () => {
   });
 
   it('should return undefined if is no document type', () => {
-    const documents = [
-      driversLicenseFailed,
-      driversLicensePending,
-      idCardSuccess,
-      idCardFail,
-    ];
+    const documents = [driversLicenseFailed, driversLicensePending, idCardSuccess, idCardFail];
     expect(
       getDocumentStatus({
         documents,

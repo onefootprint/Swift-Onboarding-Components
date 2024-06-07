@@ -21,9 +21,7 @@ const AddressLines = () => {
   });
   const isCountryUs = country.value === 'US';
 
-  const handleAddressSelect = async (
-    prediction?: google.maps.places.AutocompletePrediction | null,
-  ) => {
+  const handleAddressSelect = async (prediction?: google.maps.places.AutocompletePrediction | null) => {
     if (!prediction) {
       return;
     }
@@ -52,9 +50,7 @@ const AddressLines = () => {
       }
       if (result.state) {
         if (isCountryUs) {
-          const possibleState = STATES.find(
-            stateOption => stateOption.label === result.state,
-          );
+          const possibleState = STATES.find(stateOption => stateOption.label === result.state);
           if (possibleState) {
             setValue('state', possibleState);
           }
@@ -78,11 +74,7 @@ const AddressLines = () => {
         country={country.value}
         hasError={!!errors.addressLine1}
         hint={errors.addressLine1 && t('address-line-1.error')}
-        label={
-          isCountryUs
-            ? t('address-line-1.label')
-            : t('address-line-1.international-label')
-        }
+        label={isCountryUs ? t('address-line-1.label') : t('address-line-1.international-label')}
         onSelect={handleAddressSelect}
         placeholder={t('address-line-1.placeholder')}
         {...register('addressLine1', {
@@ -95,16 +87,8 @@ const AddressLines = () => {
         data-dd-privacy="mask"
         data-attribute="address-line-2"
         autoComplete="address-line2"
-        label={
-          isCountryUs
-            ? t('address-line-2.label')
-            : t('address-line-2.international-label')
-        }
-        placeholder={
-          isCountryUs
-            ? t('address-line-2.placeholder')
-            : t('address-line-2.international-placeholder')
-        }
+        label={isCountryUs ? t('address-line-2.label') : t('address-line-2.international-label')}
+        placeholder={isCountryUs ? t('address-line-2.placeholder') : t('address-line-2.international-placeholder')}
         {...register('addressLine2')}
       />
     </>

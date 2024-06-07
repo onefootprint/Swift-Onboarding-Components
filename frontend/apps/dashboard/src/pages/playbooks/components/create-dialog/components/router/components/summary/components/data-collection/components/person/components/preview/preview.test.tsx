@@ -1,15 +1,7 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import {
-  CollectedKybDataOption,
-  CollectedKycDataOption,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { CollectedKybDataOption, CollectedKycDataOption, SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
-import {
-  asAdminUser,
-  asAdminUserFirmEmployee,
-  asAdminUserInOrg,
-} from 'src/config/tests';
+import { asAdminUser, asAdminUserFirmEmployee, asAdminUserInOrg } from 'src/config/tests';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
@@ -17,9 +9,7 @@ import type { PreviewWithContextProps } from './preview.test.config';
 import PreviewWithContext from './preview.test.config';
 
 const renderForm = ({ startingValues, kind }: PreviewWithContextProps) => {
-  customRender(
-    <PreviewWithContext startingValues={startingValues} kind={kind} />,
-  );
+  customRender(<PreviewWithContext startingValues={startingValues} kind={kind} />);
 };
 
 describe('<Preview />', () => {
@@ -57,10 +47,7 @@ describe('<Preview />', () => {
       startingValues: {
         personal: {
           idDoc: true,
-          idDocKind: [
-            SupportedIdDocTypes.idCard,
-            SupportedIdDocTypes.driversLicense,
-          ],
+          idDocKind: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.driversLicense],
         },
       },
     });
@@ -87,17 +74,13 @@ describe('<Preview />', () => {
 
   it("should show beneficial owners collection option when it's a KYB flow", () => {
     renderForm({ kind: PlaybookKind.Kyb });
-    const collectBOText = screen.getByText(
-      'Collect beneficial owners’ information',
-    );
+    const collectBOText = screen.getByText('Collect beneficial owners’ information');
     expect(collectBOText).toBeInTheDocument();
   });
 
   it("should not show beneficial owners collection option when it's a KYC flow", () => {
     renderForm({ kind: PlaybookKind.Kyc });
-    const collectBOText = screen.queryByText(
-      'Collect beneficial owners’ information',
-    );
+    const collectBOText = screen.queryByText('Collect beneficial owners’ information');
     expect(collectBOText).not.toBeInTheDocument();
   });
 
@@ -215,10 +198,7 @@ describe('<Preview />', () => {
       startingValues: {
         personal: {
           idDoc: true,
-          idDocKind: [
-            SupportedIdDocTypes.driversLicense,
-            SupportedIdDocTypes.idCard,
-          ],
+          idDocKind: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard],
         },
       },
     });

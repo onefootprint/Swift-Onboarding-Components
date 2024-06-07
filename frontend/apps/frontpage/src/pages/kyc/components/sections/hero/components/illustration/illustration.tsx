@@ -30,47 +30,17 @@ const Illustration = () => {
     <IllustrationContainer>
       <Grid variants={containerVariants} initial="hidden" animate="show">
         <Waves>
-          <Image
-            alt=""
-            src="/kyc/hero/waves.svg"
-            height={400}
-            width={1400}
-            priority
-          />
+          <Image alt="" src="/kyc/hero/waves.svg" height={400} width={1400} priority />
         </Waves>
         <Col variants={columnVariants}>
-          <Image
-            alt=""
-            src="/kyc/hero/hey-there.png"
-            height={234}
-            width={283}
-            priority
-          />
-          <Image
-            alt=""
-            src="/kyc/hero/basic-data.png"
-            height={257}
-            width={283}
-            priority
-          />
+          <Image alt="" src="/kyc/hero/hey-there.png" height={234} width={283} priority />
+          <Image alt="" src="/kyc/hero/basic-data.png" height={257} width={283} priority />
         </Col>
         <Col variants={columnVariants}>
-          <Image
-            alt=""
-            src="/kyc/hero/address.png"
-            height={413}
-            width={283}
-            priority
-          />
+          <Image alt="" src="/kyc/hero/address.png" height={413} width={283} priority />
         </Col>
         <Col variants={columnVariants}>
-          <Image
-            alt=""
-            src="/kyc/hero/ssn.png"
-            height={383}
-            width={283}
-            priority
-          />
+          <Image alt="" src="/kyc/hero/ssn.png" height={383} width={283} priority />
         </Col>
       </Grid>
     </IllustrationContainer>

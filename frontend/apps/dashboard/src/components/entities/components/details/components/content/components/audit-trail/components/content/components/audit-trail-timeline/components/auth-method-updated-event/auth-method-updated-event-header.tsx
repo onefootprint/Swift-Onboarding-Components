@@ -1,5 +1,5 @@
 import type { AuthMethodUpdatedData } from '@onefootprint/types/src/data/timeline';
-import { createFontStyles, Text } from '@onefootprint/ui';
+import { Text, createFontStyles } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -10,9 +10,7 @@ type AuthMethodUpdatedEventHeaderProps = {
   data: AuthMethodUpdatedData;
 };
 
-const AuthMethodUpdatedEventHeader = ({
-  data,
-}: AuthMethodUpdatedEventHeaderProps) => {
+const AuthMethodUpdatedEventHeader = ({ data }: AuthMethodUpdatedEventHeaderProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.auth-method-updated',
   });
@@ -21,9 +19,7 @@ const AuthMethodUpdatedEventHeader = ({
 
   return (
     <>
-      <InsightEventPopover insightEvent={insightEvent}>
-        {t('user')}
-      </InsightEventPopover>
+      <InsightEventPopover insightEvent={insightEvent}>{t('user')}</InsightEventPopover>
       <Text variant="body-3" color="tertiary">
         <Trans
           i18nKey={actionLabel}

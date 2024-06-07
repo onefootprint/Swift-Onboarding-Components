@@ -8,11 +8,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-const {
-  Root: CollapsibleRoot,
-  Trigger: CollapsibleTrigger,
-  Content: CollapsibleContent,
-} = RadixCollapsible;
+const { Root: CollapsibleRoot, Trigger: CollapsibleTrigger, Content: CollapsibleContent } = RadixCollapsible;
 
 type CollapsibleSectionProps = {
   rawJsonKind: RawJsonKinds;
@@ -23,10 +19,7 @@ const jsonKindToTranslationKey: Record<RawJsonKinds, string> = {
   [RawJsonKinds.CurpValidationResponse]: 'curp-validation-response',
 };
 
-const CollapsibleSection = ({
-  rawJsonKind,
-  rawJsonData,
-}: CollapsibleSectionProps) => {
+const CollapsibleSection = ({ rawJsonKind, rawJsonData }: CollapsibleSectionProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document.drawer.raw-json-data',
   });
@@ -34,17 +27,10 @@ const CollapsibleSection = ({
 
   return (
     <RawJsonDataContainer>
-      <CollapsibleRoot
-        className="CollapsibleRoot"
-        open={open}
-        onOpenChange={setOpen}
-        asChild
-      >
+      <CollapsibleRoot className="CollapsibleRoot" open={open} onOpenChange={setOpen} asChild>
         <JsonContainer layoutRoot>
           <StyledTrigger>
-            <Text variant="body-3">
-              {t(jsonKindToTranslationKey[rawJsonKind] as ParseKeys)}
-            </Text>
+            <Text variant="body-3">{t(jsonKindToTranslationKey[rawJsonKind] as ParseKeys)}</Text>
             <IconContainer data-open={open}>
               <IcoChevronDown24 />
             </IconContainer>
@@ -52,16 +38,8 @@ const CollapsibleSection = ({
           <AnimatePresence>
             {open && (
               <CollapsibleContent forceMount asChild>
-                <CodeBlockContainer
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <CodeBlock
-                    language="javascript"
-                    disableCopy
-                    title={t('json')}
-                  >
+                <CodeBlockContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <CodeBlock language="javascript" disableCopy title={t('json')}>
                     {rawJsonData}
                   </CodeBlock>
                 </CodeBlockContainer>

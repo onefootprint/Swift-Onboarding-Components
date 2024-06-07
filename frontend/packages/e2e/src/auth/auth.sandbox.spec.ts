@@ -13,9 +13,7 @@ test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/auth?ob_key=${key}&app_url=${authAppUrl}&flow=${flowId}`,
-  );
+  await page.goto(`/components/auth?ob_key=${key}&app_url=${authAppUrl}&flow=${flowId}`);
   await page.waitForLoadState();
   await expect(page).toHaveURL(/.*auth/);
 
@@ -29,10 +27,7 @@ test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
   await expect(sandBoxEdit).toBeAttached();
   await sandBoxEdit.first().click();
 
-  await page
-    .frameLocator(iframeSelector)
-    .getByPlaceholder('Enter test ID')
-    .fill('aoy4lrqr9oqKb');
+  await page.frameLocator(iframeSelector).getByPlaceholder('Enter test ID').fill('aoy4lrqr9oqKb');
   await page.frameLocator(iframeSelector).getByLabel('Save').first().click();
 
   const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
@@ -49,9 +44,6 @@ test('Auth with sandbox email #ci', async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 
   await expect(
-    page
-      .frameLocator(iframeSelector)
-      .locator('button')
-      .filter({ hasText: 'Send code to +49 ••••• •••••' }),
+    page.frameLocator(iframeSelector).locator('button').filter({ hasText: 'Send code to +49 ••••• •••••' }),
   ).toBeAttached();
 });

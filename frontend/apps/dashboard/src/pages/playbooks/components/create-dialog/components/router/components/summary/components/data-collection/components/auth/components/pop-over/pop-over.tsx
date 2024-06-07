@@ -18,21 +18,13 @@ type PopOverProps = {
   triggerVariants: TriggerVariantsProps;
 };
 
-const PopOver = ({
-  label,
-  content,
-  triggerVariants,
-  videoSrc,
-}: PopOverProps) => {
+const PopOver = ({ label, content, triggerVariants, videoSrc }: PopOverProps) => {
   const hoverRef = useRef(null);
   const isHovered = useHover(hoverRef);
   return (
     <PopoverPrimitive.Root>
       <Trigger ref={hoverRef} isHovered={isHovered}>
-        <Text
-          variant={triggerVariants.variant}
-          color={isHovered ? 'primary' : triggerVariants.color}
-        >
+        <Text variant={triggerVariants.variant} color={isHovered ? 'primary' : triggerVariants.color}>
           {label}
         </Text>
       </Trigger>

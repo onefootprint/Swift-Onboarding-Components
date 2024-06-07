@@ -37,8 +37,7 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
       {...register('zip', {
         required: true,
         validate: isCountryUS
-          ? (value: string) =>
-              zipcode.pattern ? zipcode.pattern.test(value) : undefined
+          ? (value: string) => (zipcode.pattern ? zipcode.pattern.test(value) : undefined)
           : undefined,
       })}
     />

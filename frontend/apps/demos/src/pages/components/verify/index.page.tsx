@@ -9,15 +9,13 @@ import styled, { css } from 'styled-components';
 import fakeSdk from '../../../helpers/fake-sdk';
 import getQueryArgs, { isString } from '../../../helpers/get-query-args';
 
-const fallbackPKey =
-  process.env.NEXT_PUBLIC_TENANT_KEY || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
+const fallbackPKey = process.env.NEXT_PUBLIC_TENANT_KEY || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
 
 const getVerifyArgs = (o: ReturnType<typeof getQueryArgs>) => ({
   ...o,
   publicKey: isString(o.publicKey) ? o.publicKey : fallbackPKey,
   appUrl:
-    o.appUrl.startsWith('https://bifrost-') ||
-    o.appUrl.startsWith('http://localhost')
+    o.appUrl.startsWith('https://bifrost-') || o.appUrl.startsWith('http://localhost')
       ? o.appUrl
       : 'http://localhost:3000',
 });
@@ -31,9 +29,7 @@ const onComplete = (token: string) => {
 
 const VerifyDemo = () => {
   const router = useRouter();
-  const { appUrl, locale, publicKey, userData } = getVerifyArgs(
-    getQueryArgs(router),
-  );
+  const { appUrl, locale, publicKey, userData } = getVerifyArgs(getQueryArgs(router));
 
   const handleVerifyClick = () => {
     const component = fakeSdk.init({

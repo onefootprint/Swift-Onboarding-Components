@@ -8,10 +8,7 @@ import SmsButtonWithCountdown from './sms-button-with-countdown';
 import withD2PSms from './sms-button-with-countdown.test.config';
 
 describe('<SmsButtonWithCountdown />', () => {
-  const renderSmsButtonWithCountdown = ({
-    url,
-    authToken,
-  }: Partial<SmsButtonWithCountdownProps> = {}) =>
+  const renderSmsButtonWithCountdown = ({ url, authToken }: Partial<SmsButtonWithCountdownProps> = {}) =>
     customRender(<SmsButtonWithCountdown url={url} authToken={authToken} />);
 
   describe('when sending sms succeeds', () => {

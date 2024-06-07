@@ -1,7 +1,4 @@
-import type {
-  BacktestingRuleAction,
-  RuleBacktestingData,
-} from '@onefootprint/types';
+import type { BacktestingRuleAction, RuleBacktestingData } from '@onefootprint/types';
 import { Divider, Pagination, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -29,18 +26,14 @@ const Content = ({ data, dateRange, onFilter }: ContentProps) => {
   const initialPage = useMemo(
     () => ({
       hasNextPage:
-        data.results.filter(
-          ob => ob.historicalActionTriggered !== ob.backtestActionTriggered,
-        ).length > PAGE_SIZE,
+        data.results.filter(ob => ob.historicalActionTriggered !== ob.backtestActionTriggered).length > PAGE_SIZE,
       hasPrevPage: false,
       pageIndex: 0,
     }),
     [data.results],
   );
   const [pagination, setPagination] = useState<Page>(initialPage);
-  const affectedOnboardings = data.results.filter(
-    ob => ob.historicalActionTriggered !== ob.backtestActionTriggered,
-  );
+  const affectedOnboardings = data.results.filter(ob => ob.historicalActionTriggered !== ob.backtestActionTriggered);
   const numAffected = affectedOnboardings.length;
   const numTotal = data.stats.total;
 
@@ -105,48 +98,24 @@ const Content = ({ data, dateRange, onFilter }: ContentProps) => {
         />
       </Stack>
       <Divider marginTop={9} marginBottom={9} />
-      <Stack
-        direction="column"
-        marginBottom={9}
-        role="group"
-        aria-label={t('historical.heading')}
-      >
+      <Stack direction="column" marginBottom={9} role="group" aria-label={t('historical.heading')}>
         {renderHeading('historical')}
-        <ActionCard
-          data={data.stats.countByHistoricalActionTriggered}
-          numTotal={numTotal}
-        />
+        <ActionCard data={data.stats.countByHistoricalActionTriggered} numTotal={numTotal} />
       </Stack>
-      <Stack
-        direction="column"
-        marginBottom={9}
-        role="group"
-        aria-label={t('backtested.heading')}
-      >
+      <Stack direction="column" marginBottom={9} role="group" aria-label={t('backtested.heading')}>
         {renderHeading('backtested')}
-        <ActionCard
-          data={data.stats.countByBacktestActionTriggered}
-          numTotal={numTotal}
-        />
+        <ActionCard data={data.stats.countByBacktestActionTriggered} numTotal={numTotal} />
       </Stack>
       {!!numTotal && (
-        <Stack
-          direction="column"
-          role="group"
-          aria-label={t('correlation.heading')}
-        >
+        <Stack direction="column" role="group" aria-label={t('correlation.heading')}>
           {renderHeading('correlation')}
           <Stack direction="column" gap={5}>
-            {Object.keys(
-              data.stats.countByHistoricalAndBacktestActionTriggered,
-            ).map(sectionAction => (
+            {Object.keys(data.stats.countByHistoricalAndBacktestActionTriggered).map(sectionAction => (
               <CorrelationActionCard
                 key={sectionAction}
                 sectionAction={sectionAction as BacktestingRuleAction}
                 data={
-                  data.stats.countByHistoricalAndBacktestActionTriggered[
-                    sectionAction as BacktestingRuleAction
-                  ] || {}
+                  data.stats.countByHistoricalAndBacktestActionTriggered[sectionAction as BacktestingRuleAction] || {}
                 }
               />
             ))}

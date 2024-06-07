@@ -3,9 +3,7 @@ import { BusinessDI, IdDI, ListKind } from '@onefootprint/types';
 
 import { IP_ADDRESS_DATA_IDENTIFIER } from '../data-identifiers-for-list-kind';
 
-const listKindsForDataIdentifier = (
-  di?: DataIdentifier | string,
-): ListKind[] => {
+const listKindsForDataIdentifier = (di?: DataIdentifier | string): ListKind[] => {
   if (!di) {
     return Object.values(ListKind);
   }

@@ -54,9 +54,7 @@ const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
           },
         })}
       >
-        <option value={EMPTY_SELECT_VALUE}>
-          {t('legal-status.nationality-mapping.none')}
-        </option>
+        <option value={EMPTY_SELECT_VALUE}>{t('legal-status.nationality-mapping.none')}</option>
         {COUNTRIES.map(country => (
           <option key={country.value} value={country.value}>
             {country.label}

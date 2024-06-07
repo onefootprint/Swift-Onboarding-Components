@@ -19,11 +19,7 @@ const Form = ({ className, children, onSubmit, ...props }: FormProps) => {
   };
 
   return (
-    <form
-      className={cx('fp-form', className)}
-      {...props}
-      onSubmit={handleSubmit(handleBeforeSubmit)}
-    >
+    <form className={cx('fp-form', className)} {...props} onSubmit={handleSubmit(handleBeforeSubmit)}>
       {children}
     </form>
   );

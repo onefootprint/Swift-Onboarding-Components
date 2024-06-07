@@ -26,10 +26,7 @@ const useRequestParams = ({
       params.search = search;
     }
     if (dataAttributesBusiness.length || dataAttributesPersonal.length) {
-      const mergedAttrs = [
-        ...dataAttributesBusiness,
-        ...dataAttributesPersonal,
-      ];
+      const mergedAttrs = [...dataAttributesBusiness, ...dataAttributesPersonal];
       params.targets = mergedAttrs.join();
     }
     return params;

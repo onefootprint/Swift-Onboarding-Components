@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoIdFront24 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoIdFront24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -30,31 +25,9 @@ const IcoIdFront24 = ({
         strokeWidth={1.2}
         strokeLinecap="round"
       />
-      <rect
-        x={14.286}
-        y={14.286}
-        width={3.048}
-        height={1.016}
-        rx={0.508}
-        fill={theme.color[color]}
-      />
-      <rect
-        x={12.254}
-        y={16.317}
-        width={5.079}
-        height={1.016}
-        rx={0.508}
-        fill={theme.color[color]}
-      />
-      <rect
-        x={4}
-        y={4}
-        width={16}
-        height={16}
-        rx={2}
-        stroke={theme.color[color]}
-        strokeWidth={1.5}
-      />
+      <rect x={14.286} y={14.286} width={3.048} height={1.016} rx={0.508} fill={theme.color[color]} />
+      <rect x={12.254} y={16.317} width={5.079} height={1.016} rx={0.508} fill={theme.color[color]} />
+      <rect x={4} y={4} width={16} height={16} rx={2} stroke={theme.color[color]} strokeWidth={1.5} />
     </svg>
   );
 };

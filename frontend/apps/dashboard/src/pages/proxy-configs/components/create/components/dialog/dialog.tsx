@@ -74,9 +74,7 @@ const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
       open={open}
       size="compact"
       title={t('title')}
-      linkButton={
-        canSkip ? { label: allT('skip'), onClick: goForward } : undefined
-      }
+      linkButton={canSkip ? { label: allT('skip'), onClick: goForward } : undefined}
       primaryButton={{
         form: id,
         label: isLastStep ? allT('save') : allT('next'),

@@ -44,19 +44,8 @@ const CardMotionVariants = {
   },
 };
 
-const ColorSelection: React.FC<ColorSelectionProps> = ({
-  onChange,
-  title,
-  colorList,
-  activeHex,
-  className,
-}) => (
-  <Card
-    className={className}
-    variants={CardMotionVariants}
-    initial="floating"
-    animate="floating"
-  >
+const ColorSelection: React.FC<ColorSelectionProps> = ({ onChange, title, colorList, activeHex, className }) => (
+  <Card className={className} variants={CardMotionVariants} initial="floating" animate="floating">
     <Text variant="label-4">{title}</Text>
     <Stack direction="row" inline gap={2}>
       {colorList.map(({ name, hex }) => (
@@ -106,11 +95,13 @@ const ColorButton = styled.button<{ selected: boolean; color: string }>`
     background-color: ${color};
     transition: outline 0.09s ease-out;
 
-    ${selected &&
-    css`
+    ${
+      selected &&
+      css`
       outline: 2px solid ${theme.backgroundColor.primary};
       outline-offset: -4px;
-    `}
+    `
+    }
   `}
 `;
 

@@ -1,12 +1,5 @@
 import { IcoWarning16 } from '@onefootprint/icons';
-import {
-  Checkbox,
-  Divider,
-  Stack,
-  Text,
-  Toggle,
-  Tooltip,
-} from '@onefootprint/ui';
+import { Checkbox, Divider, Stack, Text, Toggle, Tooltip } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +16,7 @@ const AML = ({ showError, disabled }: AMLProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.verification-checks.aml-monitoring',
   });
-  const { register, watch, setValue } =
-    useFormContext<VerificationChecksFormData>();
+  const { register, watch, setValue } = useFormContext<VerificationChecksFormData>();
   const isAmlChecked = watch('amlFormData.enhancedAml');
 
   useEffect(() => {
@@ -41,10 +33,7 @@ const AML = ({ showError, disabled }: AMLProps) => {
         {t('title')}
       </Text>
       <Stack gap={5} direction="column">
-        <Tooltip
-          disabled={!disabled}
-          text={t('disabled-tooltip.must-collect-beneficial-owners')}
-        >
+        <Tooltip disabled={!disabled} text={t('disabled-tooltip.must-collect-beneficial-owners')}>
           <Toggle
             label={t('aml.label')}
             hint={t('aml.hint')}
@@ -56,16 +45,8 @@ const AML = ({ showError, disabled }: AMLProps) => {
         {isAmlChecked && (
           <>
             <Divider variant="secondary" />
-            <Checkbox
-              label={t('ofac.label')}
-              hint={t('ofac.hint')}
-              {...register('amlFormData.ofac')}
-            />
-            <Checkbox
-              label={t('pep.label')}
-              hint={t('pep.hint')}
-              {...register('amlFormData.pep')}
-            />
+            <Checkbox label={t('ofac.label')} hint={t('ofac.hint')} {...register('amlFormData.ofac')} />
+            <Checkbox label={t('pep.label')} hint={t('pep.hint')} {...register('amlFormData.pep')} />
             <Checkbox
               label={t('adverse-media.label')}
               hint={t('adverse-media.hint')}

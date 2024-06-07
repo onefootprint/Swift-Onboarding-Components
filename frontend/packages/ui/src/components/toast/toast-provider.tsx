@@ -23,32 +23,20 @@ const ToastManager = () => {
   return (
     <Portal selector="#footprint-toast-portal">
       <ToastContainer>
-        {toasts.map(
-          ({
-            closeAriaLabel,
-            cta,
-            description,
-            id,
-            leaving,
-            onClose,
-            testID,
-            title,
-            variant,
-          }) => (
-            <Toast
-              closeAriaLabel={closeAriaLabel}
-              cta={cta}
-              description={description}
-              id={id}
-              key={id}
-              leaving={leaving}
-              onClose={handleCloseClick(id, onClose)}
-              testID={testID}
-              title={title}
-              variant={variant}
-            />
-          ),
-        )}
+        {toasts.map(({ closeAriaLabel, cta, description, id, leaving, onClose, testID, title, variant }) => (
+          <Toast
+            closeAriaLabel={closeAriaLabel}
+            cta={cta}
+            description={description}
+            id={id}
+            key={id}
+            leaving={leaving}
+            onClose={handleCloseClick(id, onClose)}
+            testID={testID}
+            title={title}
+            variant={variant}
+          />
+        ))}
       </ToastContainer>
     </Portal>
   );

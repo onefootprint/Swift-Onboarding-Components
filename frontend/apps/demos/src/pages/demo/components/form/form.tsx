@@ -1,18 +1,7 @@
 import type { FootprintUserData } from '@onefootprint/footprint-js';
-import footprint, {
-  FootprintComponentKind,
-  identifyFootprintUser,
-} from '@onefootprint/footprint-js';
+import footprint, { FootprintComponentKind, identifyFootprintUser } from '@onefootprint/footprint-js';
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
-import {
-  Button,
-  Container,
-  createFontStyles,
-  Divider,
-  PhoneInput,
-  Text,
-  TextInput,
-} from '@onefootprint/ui';
+import { Button, Container, Divider, PhoneInput, Text, TextInput, createFontStyles } from '@onefootprint/ui';
 import debounce from 'lodash/debounce';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -120,20 +109,13 @@ const Form = ({ onSuccess }: FormProps) => {
           Help us verify your identity
         </Text>
         <Text variant="body-2">
-          We will need to collect some personal information to confirm and
-          protect your identity when you create your account at AcmeBank. To
-          learn more about how we process this data, please see our privacy
-          policy.
+          We will need to collect some personal information to confirm and protect your identity when you create your
+          account at AcmeBank. To learn more about how we process this data, please see our privacy policy.
         </Text>
       </Content>
       <FormContainer>
         <InputsContainer>
-          <TextInput
-            label="Full Name"
-            placeholder="Jane Doe"
-            type="text"
-            {...register('name')}
-          />
+          <TextInput label="Full Name" placeholder="Jane Doe" type="text" {...register('name')} />
           <TextInput
             label="Email address"
             placeholder="jane.doe@email.com"
@@ -145,10 +127,7 @@ const Form = ({ onSuccess }: FormProps) => {
           <Controller
             control={control}
             name="phoneNumber"
-            render={({
-              field: { onChange, onBlur, value, name },
-              fieldState: { error },
-            }) => (
+            render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
               <PhoneInput
                 name={name}
                 onBlur={onBlur}
@@ -164,12 +143,7 @@ const Form = ({ onSuccess }: FormProps) => {
             )}
           />
         </InputsContainer>
-        <Button
-          fullWidth
-          size="large"
-          variant="secondary"
-          onClick={showFootprint}
-        >
+        <Button fullWidth size="large" variant="secondary" onClick={showFootprint}>
           Continue
         </Button>
         <OrDivider>

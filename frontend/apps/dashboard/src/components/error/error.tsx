@@ -7,10 +7,10 @@ type ErrorProps = {
   testID?: string;
 };
 
-const Error = ({ error, testID }: ErrorProps) => (
+const ErrorComponent = ({ error, testID }: ErrorProps) => (
   <Box testID={testID}>
     <Text variant="body-3">{getErrorMessage(error)}</Text>
   </Box>
 );
 
-export default Error;
+export default ErrorComponent;

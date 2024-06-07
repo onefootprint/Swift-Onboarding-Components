@@ -23,28 +23,16 @@ const useHandleCameraError = () => {
     const error = err as DOMException;
     if (error instanceof TypeError) {
       showErrorToast(t('undefined-navigator'));
-    } else if (
-      error.name === 'NotFoundError' ||
-      error.name === 'DevicesNotFoundError'
-    ) {
+    } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
       // required track is missing
       showErrorToast(t('not-found'));
-    } else if (
-      error.name === 'NotReadableError' ||
-      error.name === 'TrackStartError'
-    ) {
+    } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
       // webcam or mic are already in use
       showErrorToast(t('already-in-use'));
-    } else if (
-      error.name === 'OverconstrainedError' ||
-      error.name === 'ConstraintNotSatisfiedError'
-    ) {
+    } else if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
       // constraints can not be satisfied by avb. devices
       showErrorToast(t('constraint'));
-    } else if (
-      error.name === 'NotAllowedError' ||
-      error.name === 'PermissionDeniedError'
-    ) {
+    } else if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
       // permission denied in browser
       missingPermissionsSheet.show({});
     } else if (error.name === 'TypeError' || error.name === 'TypeError') {
@@ -56,10 +44,7 @@ const useHandleCameraError = () => {
     }
 
     // Do not log permission errors since they create too much noise
-    if (
-      error.name === 'NotAllowedError' ||
-      error.name === 'PermissionDeniedError'
-    ) {
+    if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
       Logger.warn(`Camera error: ${err}`, { location: 'camera' });
     } else {
       Logger.error(`Camera error: ${err}`, { location: 'camera' });

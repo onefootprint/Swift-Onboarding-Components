@@ -22,22 +22,16 @@ export type ComplianceDocEvent = {
  * @param {string} documentId - The ID of the document.
  * @return {Promise<ComplianceDocEvent[]>} A Promise that resolves to an array of ComplianceDocEvent objects.
  */
-const getPartnerPartnershipsDocumentsEvents = async (
-  partnershipId: string,
-  documentId: string,
-) => {
+const getPartnerPartnershipsDocumentsEvents = async (partnershipId: string, documentId: string) => {
   const token = await getAuthCookie();
   if (!token) return Promise.reject(new TypeError('Missing auth token'));
 
   return partnershipId && documentId
-    ? baseFetch<ComplianceDocEvent[]>(
-        `/partner/partnerships/${partnershipId}/documents/${documentId}/events`,
-        {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
-          method: 'GET',
-          cache: 'no-store',
-        },
-      )
+    ? baseFetch<ComplianceDocEvent[]>(`/partner/partnerships/${partnershipId}/documents/${documentId}/events`, {
+        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
+        method: 'GET',
+        cache: 'no-store',
+      })
     : Promise.reject(new TypeError('Missing auth token parameter'));
 };
 

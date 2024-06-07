@@ -1,11 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  mockRequest,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 import {
@@ -17,11 +10,7 @@ import {
 } from 'src/config/tests';
 
 import DefaultLayout from './default-layout';
-import {
-  withEntities,
-  withOrgAuthRoles,
-  withRiskSignals,
-} from './default-layout.test.config';
+import { withEntities, withOrgAuthRoles, withRiskSignals } from './default-layout.test.config';
 
 const renderDefaultLayout = () =>
   customRender(
@@ -195,9 +184,7 @@ describe('<DefaultLayout />', () => {
         asAdminUserFirmEmployee();
         renderDefaultLayout();
 
-        expect(
-          screen.queryByText("You're logged into Acme in view-only mode"),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText("You're logged into Acme in view-only mode")).not.toBeInTheDocument();
       });
     });
 
@@ -206,9 +193,7 @@ describe('<DefaultLayout />', () => {
         asAssumedUser();
         renderDefaultLayout();
 
-        expect(
-          screen.getByText("You're logged into Acme in view-only mode"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("You're logged into Acme in view-only mode")).toBeInTheDocument();
       });
     });
 
@@ -225,9 +210,7 @@ describe('<DefaultLayout />', () => {
         asAssumedUser();
         renderDefaultLayout();
 
-        expect(
-          screen.getByText("You're logged into Acme in view-only mode"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("You're logged into Acme in view-only mode")).toBeInTheDocument();
         await waitFor(() => {
           expect(screen.getByText('Enable edit mode')).toBeEnabled();
         });

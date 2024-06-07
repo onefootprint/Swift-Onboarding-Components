@@ -14,10 +14,7 @@ type CreateSandboxTenantResponse = {
   token: string;
 };
 
-const submitCreateSandboxTenantRequest = async (
-  authHeaders: AuthHeaders,
-  data: CreateSandboxTenantRequest,
-) => {
+const submitCreateSandboxTenantRequest = async (authHeaders: AuthHeaders, data: CreateSandboxTenantRequest) => {
   const response = await request<CreateSandboxTenantResponse>({
     method: 'POST',
     url: `/private/sandbox_tenant`,
@@ -32,8 +29,7 @@ const useCreateSandboxTenant = () => {
   const { authHeaders } = useSession();
 
   return useMutation({
-    mutationFn: (data: CreateSandboxTenantRequest) =>
-      submitCreateSandboxTenantRequest(authHeaders, data),
+    mutationFn: (data: CreateSandboxTenantRequest) => submitCreateSandboxTenantRequest(authHeaders, data),
     onError: showErrorToast,
   });
 };

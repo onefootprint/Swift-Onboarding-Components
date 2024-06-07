@@ -7,7 +7,7 @@ const checkIsIframe = () => {
   }
   try {
     return window.self !== window.top;
-  } catch (e) {
+  } catch (_e) {
     return true;
   }
 };

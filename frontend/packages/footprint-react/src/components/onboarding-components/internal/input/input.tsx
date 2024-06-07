@@ -13,18 +13,7 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      containerClassName,
-      label,
-      message,
-      hasError,
-      className,
-      id: externalId,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ containerClassName, label, message, hasError, className, id: externalId, ...props }, ref) => {
     const internalId = useId();
     const id = externalId || internalId;
     const hintId = `${id}-description`;

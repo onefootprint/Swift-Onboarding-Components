@@ -1,10 +1,5 @@
 import { useIntl } from '@onefootprint/hooks';
-import {
-  IcoAppclip16,
-  IcoBolt16,
-  IcoCheckCircle16,
-  IcoClose16,
-} from '@onefootprint/icons';
+import { IcoAppclip16, IcoBolt16, IcoCheckCircle16, IcoClose16 } from '@onefootprint/icons';
 import type { Liveness } from '@onefootprint/types';
 import { EntityKind, LivenessKind } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
@@ -27,12 +22,7 @@ type InsightEventCardProps = {
   liveness: Liveness;
 };
 
-const InsightEventCard = ({
-  id,
-  liveness,
-  isSelected,
-  onSelect,
-}: InsightEventCardProps) => {
+const InsightEventCard = ({ id, liveness, isSelected, onSelect }: InsightEventCardProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.device-insights',
   });
@@ -53,24 +43,14 @@ const InsightEventCard = ({
   };
 
   const fullRegion = getRegion(city, region);
-  const headerText = displayForUserAgent(
-    userAgent ?? '',
-    deviceInfo.instantApp,
-    deviceInfo.appClip,
-  );
+  const headerText = displayForUserAgent(userAgent ?? '', deviceInfo.instantApp, deviceInfo.appClip);
 
   const rows: JSX.Element[] = [
-    <CardRow
-      key="date-time"
-      label={t('date-and-time')}
-      value={formatDateWithTime(new Date(timestamp))}
-    />,
+    <CardRow key="date-time" label={t('date-and-time')} value={formatDateWithTime(new Date(timestamp))} />,
   ];
 
   if (ipAddress) {
-    rows.push(
-      <CardRow key="ip-address" label={t('ip-address')} value={ipAddress} />,
-    );
+    rows.push(<CardRow key="ip-address" label={t('ip-address')} value={ipAddress} />);
   }
 
   if (deviceInfo.instantApp) {
@@ -133,9 +113,7 @@ const InsightEventCard = ({
       />,
     );
     if (fullRegion) {
-      rows.push(
-        <CardRow key="region" label={t('region')} value={fullRegion} />,
-      );
+      rows.push(<CardRow key="region" label={t('region')} value={fullRegion} />);
     }
     if (country) {
       rows.push(<CardRow key="country" label={t('country')} value={country} />);

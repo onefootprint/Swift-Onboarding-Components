@@ -7,8 +7,7 @@ const SANDBOX_NUMBER = '+1 555-555-0100';
 const checkIsPhoneValid = (phoneNumber: string, isSandbox?: boolean) => {
   const phoneUtils = PhoneNumberUtil.getInstance();
   const matchesSandboxNumber =
-    phoneUtils.isNumberMatch(phoneNumber, SANDBOX_NUMBER) ===
-    PhoneNumberUtil.MatchType.EXACT_MATCH;
+    phoneUtils.isNumberMatch(phoneNumber, SANDBOX_NUMBER) === PhoneNumberUtil.MatchType.EXACT_MATCH;
 
   if (isSandbox && matchesSandboxNumber) {
     return true;

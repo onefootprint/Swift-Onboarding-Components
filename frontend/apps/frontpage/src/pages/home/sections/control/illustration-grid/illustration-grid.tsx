@@ -1,4 +1,4 @@
-import { Grid, media, Stack } from '@onefootprint/ui';
+import { Grid, Stack, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

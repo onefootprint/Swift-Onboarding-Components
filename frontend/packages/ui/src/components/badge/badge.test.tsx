@@ -9,11 +9,7 @@ import type { BadgeProps } from './badge';
 import Badge from './badge';
 
 describe('<Badge />', () => {
-  const renderBadge = ({
-    children = 'Foo',
-    variant = 'info',
-    testID,
-  }: Partial<BadgeProps>) =>
+  const renderBadge = ({ children = 'Foo', variant = 'info', testID }: Partial<BadgeProps>) =>
     customRender(
       <Badge variant={variant} testID={testID}>
         {children}

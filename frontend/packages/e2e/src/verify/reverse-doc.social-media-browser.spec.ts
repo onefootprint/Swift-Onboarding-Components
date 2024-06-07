@@ -7,8 +7,7 @@ import {
   waitForVerifyButton,
 } from './utils/commands';
 
-const key =
-  process.env.E2E_OB_KYC_DOC_FIRST || 'pb_test_ZeSUWIlEteLWZByDjLITUL';
+const key = process.env.E2E_OB_KYC_DOC_FIRST || 'pb_test_ZeSUWIlEteLWZByDjLITUL';
 
 const userData = encodeURIComponent(
   JSON.stringify({
@@ -33,12 +32,7 @@ const SOCIAL_MEDIA_BROWSER_USER_AGENTS = [
 for (const { label, userAgent } of SOCIAL_MEDIA_BROWSER_USER_AGENTS) {
   test.use({ userAgent, isMobile: true });
 
-  test.skip(`reverse-doc.social-media-browser.${label} #ci`, async ({
-    browserName,
-    browser,
-    page,
-    isMobile,
-  }) => {
+  test.skip(`reverse-doc.social-media-browser.${label} #ci`, async ({ browserName, browser, page, isMobile }) => {
     // eslint-disable-next-line playwright/no-conditional-in-test
     if (!isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
     test.setTimeout(120000);

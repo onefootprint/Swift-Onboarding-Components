@@ -7,10 +7,7 @@ export const getDisplayPhone = (
   const { identify, phoneNumber } = context;
   const value = phoneNumber?.value;
   const isLoginChallenge = !!identify.user;
-  if (
-    isLoginChallenge &&
-    !identify.successfulIdentifiers?.includes(SuccessfulIdentifier.phone)
-  ) {
+  if (isLoginChallenge && !identify.successfulIdentifiers?.includes(SuccessfulIdentifier.phone)) {
     // The user was identified via something other the phone that was passed in, so we don't know
     // that the phoneNumber we have is the one on the vault. Instead, we'll use the scrubbed one
     // that belongs to the user
@@ -34,17 +31,12 @@ export const getDisplayPhone = (
   return (countryCode + number).replace(/ /g, '\u00A0').replace(/-/g, '\u2011');
 };
 
-export const getDisplayEmail = (
-  context: Pick<IdentifyMachineContext, 'identify' | 'email'>,
-): string | undefined => {
+export const getDisplayEmail = (context: Pick<IdentifyMachineContext, 'identify' | 'email'>): string | undefined => {
   const { identify, email } = context;
   const value = email?.value;
   const isLoginChallenge = !!identify.user;
 
-  if (
-    isLoginChallenge &&
-    !identify.successfulIdentifiers?.includes(SuccessfulIdentifier.email)
-  ) {
+  if (isLoginChallenge && !identify.successfulIdentifiers?.includes(SuccessfulIdentifier.email)) {
     // The user was identified via something other the email that was passed in, so we don't know
     // that the email we have is the one on the vault. Instead, we'll use the scrubbed email if
     // available

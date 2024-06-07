@@ -20,9 +20,7 @@ export const FormFieldByDI: Partial<Record<CardDIField, FormKeys>> = {
   [CardDIField.country]: 'country',
 };
 
-const processFieldErrors = (
-  error: Object,
-): Partial<Record<FormKeys, string>> | undefined => {
+const processFieldErrors = (error: Object): Partial<Record<FormKeys, string>> | undefined => {
   if (typeof error !== 'object') {
     logError(`Unexpected error while vaulting field`, error);
     return undefined;
@@ -35,10 +33,7 @@ const processFieldErrors = (
     if (field && cardDI) {
       validatedErrors[field] = value;
     } else {
-      logError(
-        `Could not parse error while vaulting field ${key}:${value}`,
-        error,
-      );
+      logError(`Could not parse error while vaulting field ${key}:${value}`, error);
     }
   });
 

@@ -41,10 +41,9 @@ const Init = () => {
         },
         onError: err => {
           const errorMsg = getErrorMessage(err);
-          Logger.error(
-            `Failed to submit non id-doc document type ${config.kind}. Error: ${errorMsg}`,
-            { location: 'id-doc-country-and-type-container' },
-          );
+          Logger.error(`Failed to submit non id-doc document type ${config.kind}. Error: ${errorMsg}`, {
+            location: 'id-doc-country-and-type-container',
+          });
         },
       },
     );
@@ -70,9 +69,7 @@ const Init = () => {
             </Text>
           )}
         </ErrorMessage>
-        {!retryLimitExceeded && (
-          <Button onClick={handleRetry}>{t('try-again')}</Button>
-        )}
+        {!retryLimitExceeded && <Button onClick={handleRetry}>{t('try-again')}</Button>}
       </ErrorContainer>
     );
   }

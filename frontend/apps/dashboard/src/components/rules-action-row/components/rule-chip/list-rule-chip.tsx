@@ -1,11 +1,5 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import type {
-  DataIdentifier,
-  List,
-  ListKind,
-  ListRuleField,
-  RiskSignalRuleField,
-} from '@onefootprint/types';
+import type { DataIdentifier, List, ListKind, ListRuleField, RiskSignalRuleField } from '@onefootprint/types';
 import { IconButton, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useEffect, useState } from 'react';
@@ -26,18 +20,11 @@ type ListRuleChipProps = {
   onChange?: (expression: RiskSignalRuleField | ListRuleField) => void;
 };
 
-const ListRuleChip = ({
-  isEditing,
-  defaultExpression,
-  lists = [],
-  onDelete,
-  onChange,
-}: ListRuleChipProps) => {
+const ListRuleChip = ({ isEditing, defaultExpression, lists = [], onDelete, onChange }: ListRuleChipProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row.rule-chip',
   });
-  const [ruleExpression, setRuleExpression] =
-    useState<ListRuleField>(defaultExpression);
+  const [ruleExpression, setRuleExpression] = useState<ListRuleField>(defaultExpression);
   const [selectedList, setSelectedList] = useState<List | undefined>(
     lists.find(({ id }) => id === ruleExpression.value),
   );
@@ -60,10 +47,7 @@ const ListRuleChip = ({
       // If the selected DI is not compatible with the already-selected List, wipe the List
       const isListIdValid =
         !currentExpression.value ||
-        (selectedList?.kind &&
-          listKindsForDataIdentifier(newField as DataIdentifier).includes(
-            selectedList.kind,
-          ));
+        (selectedList?.kind && listKindsForDataIdentifier(newField as DataIdentifier).includes(selectedList.kind));
       if (!isListIdValid) {
         newExpression.value = '';
       }
@@ -94,9 +78,7 @@ const ListRuleChip = ({
       // If the selected List is not compatible with the already-selected DI, wipe the DI
       const isDIValid =
         !currentExpression.field ||
-        dataIdentifiersForListKind(selectedList?.kind as ListKind).includes(
-          currentExpression.field,
-        );
+        dataIdentifiersForListKind(selectedList?.kind as ListKind).includes(currentExpression.field);
       if (!isDIValid) {
         newExpression.field = undefined;
       }
@@ -108,23 +90,10 @@ const ListRuleChip = ({
 
   return isEditing ? (
     <EditContainer>
-      <ExpressionContainer
-        role="group"
-        aria-label={ruleExpression.field}
-        data-is-editing={isEditing}
-      >
-        <DISelect
-          defaultDI={ruleExpression.field}
-          listKind={selectedList?.kind}
-          onChange={handleListFieldChange}
-        />
+      <ExpressionContainer role="group" aria-label={ruleExpression.field} data-is-editing={isEditing}>
+        <DISelect defaultDI={ruleExpression.field} listKind={selectedList?.kind} onChange={handleListFieldChange} />
         <OpSelect defaultOp={ruleExpression.op} onChange={handleOpChange} />
-        <Text
-          variant="caption-1"
-          color="tertiary"
-          paddingLeft={2}
-          paddingRight={2}
-        >
+        <Text variant="caption-1" color="tertiary" paddingLeft={2} paddingRight={2}>
           {t('list.in')}
         </Text>
         <ListSelect

@@ -11,12 +11,7 @@ const MobileIllustration = () => {
   return (
     <ImageFrame>
       <ImageContainer>
-        <Image
-          src="/kyb/securely-store/kyb.png"
-          width={1037}
-          height={739}
-          alt={t('title')}
-        />
+        <Image src="/kyb/securely-store/kyb.png" width={1037} height={739} alt={t('title')} />
       </ImageContainer>
     </ImageFrame>
   );

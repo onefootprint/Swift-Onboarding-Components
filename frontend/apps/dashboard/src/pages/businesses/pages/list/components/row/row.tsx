@@ -35,10 +35,7 @@ const Row = ({ entity }: RowProps) => (
       </Text>
     </td>
     <td aria-label="tags">
-      <Tags
-        onWatchlist={entity.watchlistCheck?.status === 'fail'}
-        onManualReview={entity.requiresManualReview}
-      />
+      <Tags onWatchlist={entity.watchlistCheck?.status === 'fail'} onManualReview={entity.requiresManualReview} />
     </td>
   </>
 );

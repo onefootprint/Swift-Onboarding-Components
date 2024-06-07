@@ -1,10 +1,7 @@
 import { IcoClock40 } from '@onefootprint/icons';
 import type { CountryCode, DocumentUploadMode } from '@onefootprint/types';
-import {
-  IdDocImageProcessingError,
-  IdDocImageUploadError,
-} from '@onefootprint/types';
-import { Box, Button, media, Stack, Text } from '@onefootprint/ui';
+import { IdDocImageProcessingError, IdDocImageUploadError } from '@onefootprint/types';
+import { Box, Button, Stack, Text, media } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -17,7 +14,7 @@ import transformCase from '../../id-doc/utils/transform-case';
 import type { CaptureKind, IdDocImageErrorType } from '../../types';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 import DesktopHeader from '../desktop-header/desktop-header';
-import Error from '../error';
+import ErrorComponent from '../error';
 import Loading from '../loading';
 import DraggableInputField from './components/draggable-input-field';
 import handleFileUpload from './utils/handle-file-upload';
@@ -79,9 +76,7 @@ const DesktopPhotoPrompt = ({
     if (!processResult) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
-      logError(
-        'The uploaded image could not be processed due to an unknown error.',
-      );
+      logError('The uploaded image could not be processed due to an unknown error.');
       return;
     }
 
@@ -113,24 +108,16 @@ const DesktopPhotoPrompt = ({
     uploadPhotoRef.current?.click();
   };
 
-  const onFileInputClick = (
-    ev: React.MouseEvent<HTMLInputElement, MouseEvent>,
-  ) => {
+  const onFileInputClick = (ev: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
     ev.stopPropagation();
   };
 
   return (
     <Container>
       <DesktopHeader
-        docName={
-          docName ? transformCase(docName, 'first-letter-upper-only') : docName
-        }
+        docName={docName ? transformCase(docName, 'first-letter-upper-only') : docName}
         country={country}
-        sideName={
-          sideName
-            ? transformCase(sideName, 'first-letter-upper-only')
-            : sideName
-        }
+        sideName={sideName ? transformCase(sideName, 'first-letter-upper-only') : sideName}
         isSelfie={isSelfie}
       />
       <DraggableInputField
@@ -143,10 +130,7 @@ const DesktopPhotoPrompt = ({
       >
         {showCameraFallbackText && (
           <>
-            <HeaderTitle
-              title={t('camera-fallback-text.title')}
-              icon={IcoClock40}
-            />
+            <HeaderTitle title={t('camera-fallback-text.title')} icon={IcoClock40} />
             <Text variant="body-2" color="quaternary">
               {t('camera-fallback-text.subtitle')}
             </Text>
@@ -154,12 +138,8 @@ const DesktopPhotoPrompt = ({
         )}
         {isRetry && (
           <Box paddingLeft={6} paddingRight={6}>
-            <Error
-              errors={
-                errors ?? [
-                  { errorType: IdDocImageProcessingError.unknownError },
-                ]
-              }
+            <ErrorComponent
+              errors={errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]}
               sideName={sideName}
               docName={docName}
               countryName={countryName ?? country}

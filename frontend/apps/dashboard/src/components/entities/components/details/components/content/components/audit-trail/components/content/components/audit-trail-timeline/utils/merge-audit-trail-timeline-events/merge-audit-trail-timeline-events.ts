@@ -1,8 +1,4 @@
-import type {
-  CombinedWatchlistChecksEvent,
-  TimelineEvent,
-  WatchlistCheckEvent,
-} from '@onefootprint/types';
+import type { CombinedWatchlistChecksEvent, TimelineEvent, WatchlistCheckEvent } from '@onefootprint/types';
 import { TimelineEventKind } from '@onefootprint/types';
 import type { TimelineItemTimeData } from 'src/components/timeline';
 
@@ -18,12 +14,9 @@ const processWatchlistEvent = (
   currIndex: number,
 ) => {
   const currentWatchlistEvent = event.event as WatchlistCheckEvent;
-  const latestWatchlistEvent =
-    combinedWatchlistChecksEvent.latestWatchlistEvent ?? currentWatchlistEvent;
+  const latestWatchlistEvent = combinedWatchlistChecksEvent.latestWatchlistEvent ?? currentWatchlistEvent;
   const latestWatchlistEventTimestamp =
-    combinedWatchlistChecksEvent.data.length > 0
-      ? combinedWatchlistChecksEvent.data[0].timestamp
-      : event.timestamp;
+    combinedWatchlistChecksEvent.data.length > 0 ? combinedWatchlistChecksEvent.data[0].timestamp : event.timestamp;
   combinedWatchlistChecksEvent.data.push({
     watchlistEvent: currentWatchlistEvent,
     timestamp: event.timestamp,
@@ -51,16 +44,11 @@ const processWatchlistEvent = (
   return {
     combinedWatchlistChecksEvent: newCombinedWatchlistCheckEvent,
     bufferTimeline: newBufferTimeline,
-    combinedWatchlistEventIndex:
-      combinedWatchlistEventIndex >= 0
-        ? combinedWatchlistEventIndex
-        : currIndex,
+    combinedWatchlistEventIndex: combinedWatchlistEventIndex >= 0 ? combinedWatchlistEventIndex : currIndex,
   };
 };
 
-const mergeAuditTrailTimelineEvents = (
-  events: TimelineEvent[],
-): AuditTrailTimelineEvent[] => {
+const mergeAuditTrailTimelineEvents = (events: TimelineEvent[]): AuditTrailTimelineEvent[] => {
   let bufferTimeline: AuditTrailTimelineEvent[] = [];
   let combinedWatchlistEventIndex = -1;
   let combinedWatchlistChecksEvent: CombinedWatchlistChecksEvent = {
@@ -70,11 +58,7 @@ const mergeAuditTrailTimelineEvents = (
   };
   events.forEach((event: TimelineEvent, i) => {
     if (event.event.kind === TimelineEventKind.watchlistCheck) {
-      ({
-        combinedWatchlistChecksEvent,
-        bufferTimeline,
-        combinedWatchlistEventIndex,
-      } = processWatchlistEvent(
+      ({ combinedWatchlistChecksEvent, bufferTimeline, combinedWatchlistEventIndex } = processWatchlistEvent(
         combinedWatchlistChecksEvent,
         bufferTimeline,
         event,

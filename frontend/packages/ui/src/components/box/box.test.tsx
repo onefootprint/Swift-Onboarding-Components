@@ -7,12 +7,7 @@ import Box from './box';
 import type { BoxProps } from './box.types';
 
 describe('<Box />', () => {
-  const renderBox = ({
-    as,
-    children = 'some content',
-    id,
-    testID,
-  }: Partial<BoxProps>) =>
+  const renderBox = ({ as, children = 'some content', id, testID }: Partial<BoxProps>) =>
     customRender(
       <Box as={as} testID={testID} id={id}>
         {children}

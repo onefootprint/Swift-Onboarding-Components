@@ -24,30 +24,19 @@ const Header = ({ entity }: HeaderProps) => {
   return (
     <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)}>
       <Stack align="center" gap={3}>
-        <Text variant="label-1">
-          {t(`${kind}.title` as ParseKeys<'common'>)}
-        </Text>
+        <Text variant="label-1">{t(`${kind}.title` as ParseKeys<'common'>)}</Text>
         <Stack gap={2}>
           <StatusBadge
             status={entity.status}
             requiresManualReview={entity.requiresManualReview}
             isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
             shouldShowWatchlistLabel
-            watchlistLabel={t(
-              `watchlist.on-watchlist-${kind}` as ParseKeys<'common'>,
-            )}
+            watchlistLabel={t(`watchlist.on-watchlist-${kind}` as ParseKeys<'common'>)}
           />
           <Tags entity={entity} />
         </Stack>
       </Stack>
-      <Stack
-        align="center"
-        flexWrap="wrap"
-        justify="space-between"
-        gap={3}
-        width="100%"
-        minHeight={theme.spacing[8]}
-      >
+      <Stack align="center" flexWrap="wrap" justify="space-between" gap={3} width="100%" minHeight={theme.spacing[8]}>
         <Stack align="center" justify="center" gap={3}>
           <CodeInline truncate isPrivate>
             {entity.id}

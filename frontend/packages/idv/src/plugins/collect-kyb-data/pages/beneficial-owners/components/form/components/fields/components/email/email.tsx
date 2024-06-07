@@ -20,8 +20,7 @@ const Email = ({ index, requireMultiKyc }: EmailProps) => {
     formState: { errors },
   } = useFormContext<FormData>();
 
-  const emailErrors =
-    errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.email];
+  const emailErrors = errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.email];
   const hasError = !!emailErrors;
   const hint = hasError ? emailErrors?.message : undefined;
   const shouldHide = index === 0 || !requireMultiKyc;
@@ -35,15 +34,12 @@ const Email = ({ index, requireMultiKyc }: EmailProps) => {
       placeholder={t('placeholder')}
       hasError={hasError}
       hint={hint}
-      {...register(
-        `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.email}`,
-        {
-          required: {
-            value: true,
-            message: t('errors.required'),
-          },
+      {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.email}`, {
+        required: {
+          value: true,
+          message: t('errors.required'),
         },
-      )}
+      })}
     />
   );
 };

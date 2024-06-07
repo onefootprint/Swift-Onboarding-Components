@@ -24,18 +24,9 @@ const options = [
 const Toggle = ({ onValueChange, value }: ToggleProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing.units' });
   return (
-    <Container
-      onValueChange={onValueChange}
-      type="single"
-      defaultValue={Periods.yearly}
-      orientation="horizontal"
-    >
+    <Container onValueChange={onValueChange} type="single" defaultValue={Periods.yearly} orientation="horizontal">
       {options.map(option => (
-        <Option
-          key={option.value}
-          value={option.value}
-          data-selected={value === option.value}
-        >
+        <Option key={option.value} value={option.value} data-selected={value === option.value}>
           <Text variant="label-3" data-selected={value === option.value}>
             {t(option.label).charAt(0).toUpperCase() + t(option.label).slice(1)}
           </Text>

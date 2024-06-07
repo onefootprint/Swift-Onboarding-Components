@@ -42,8 +42,7 @@ const InvestmentGoals = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDI.investmentGoals]:
-            data?.[InvestorProfileDI.investmentGoals],
+          [InvestorProfileDI.investmentGoals]: data?.[InvestorProfileDI.investmentGoals],
         }}
       />
     </>

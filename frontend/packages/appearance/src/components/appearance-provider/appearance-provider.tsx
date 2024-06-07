@@ -24,30 +24,18 @@ type AppearanceProviderProps =
       theme: Theme;
     };
 
-const AppearanceProvider = ({
-  appearance,
-  children,
-  options,
-  rules,
-  theme,
-}: AppearanceProviderProps) => {
+const AppearanceProvider = ({ appearance, children, options, rules, theme }: AppearanceProviderProps) => {
   if (theme) {
     return (
       <DesignSystemProvider theme={theme}>
         <LoadRules rules={rules} />
-        <AppearanceContext.Provider value={appearance}>
-          {children}
-        </AppearanceContext.Provider>
+        <AppearanceContext.Provider value={appearance}>{children}</AppearanceContext.Provider>
       </DesignSystemProvider>
     );
   }
 
   if (options) {
-    return (
-      <LoadAppearanceInBrowser options={options}>
-        {children}
-      </LoadAppearanceInBrowser>
-    );
+    return <LoadAppearanceInBrowser options={options}>{children}</LoadAppearanceInBrowser>;
   }
 
   return null;

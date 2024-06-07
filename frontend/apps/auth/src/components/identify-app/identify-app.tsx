@@ -1,21 +1,12 @@
 'use client';
 
-import {
-  type FootprintAuthDataProps,
-  FootprintPublicEvent,
-} from '@onefootprint/footprint-js';
+import { type FootprintAuthDataProps, FootprintPublicEvent } from '@onefootprint/footprint-js';
 import type { DeviceInfo } from '@onefootprint/idv';
 import { getLogger, isAuth, useDeviceInfo } from '@onefootprint/idv';
 import type { DoneArgs } from '@onefootprint/idv/src/components/identify';
-import {
-  Identify,
-  IdentifyVariant,
-} from '@onefootprint/idv/src/components/identify';
+import { Identify, IdentifyVariant } from '@onefootprint/idv/src/components/identify';
 import type { ObKeyHeader } from '@onefootprint/idv/src/components/identify/types';
-import {
-  CLIENT_PUBLIC_KEY_HEADER,
-  type PublicOnboardingConfig,
-} from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER, type PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,9 +40,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
   const confirmationDialog = useConfirmationDialog();
   const mutOnboardingValidate = useOnboardingValidate();
 
-  const [notification, setNotification] = useState<
-    NotificationProps | undefined
-  >();
+  const [notification, setNotification] = useState<NotificationProps | undefined>();
 
   const [props, setProps] = useState<AuthDataPropsWithToken>();
   const [config, setConfig] = useState<PublicOnboardingConfig | undefined>();
@@ -76,9 +65,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
           subtitle: t('notification.invalid-kind-description'),
         });
       } else if (!isSdkUrlAllowed(fpProvider, authConfig?.allowedOrigins)) {
-        logError(
-          `SDK URL not allowed, ${authConfig?.allowedOrigins?.join(', ')}`,
-        );
+        logError(`SDK URL not allowed, ${authConfig?.allowedOrigins?.join(', ')}`);
         setNotification({
           title: t('notification.invalid-domain-title'),
           subtitle: t('notification.invalid-domain-description'),
@@ -128,12 +115,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
     [], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  const {
-    authToken,
-    options = voidObj,
-    publicKey,
-    userData,
-  } = props || voidObj;
+  const { authToken, options = voidObj, publicKey, userData } = props || voidObj;
   const isSandbox = !config?.isLive;
 
   const fpProvider = useFootprintProvider();
@@ -142,16 +124,8 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
 
   if (notification) {
     return (
-      <Layout
-        config={config}
-        isSandbox={isSandbox}
-        onClose={handlers.confirmCloseAndCancel}
-        variant={paramVariant}
-      >
-        <Notification
-          subtitle={notification.subtitle}
-          title={notification.title}
-        />
+      <Layout config={config} isSandbox={isSandbox} onClose={handlers.confirmCloseAndCancel} variant={paramVariant}>
+        <Notification subtitle={notification.subtitle} title={notification.title} />
       </Layout>
     );
   }
@@ -161,12 +135,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
   }
 
   return (
-    <Layout
-      config={config}
-      isSandbox={isSandbox}
-      onClose={handlers.confirmCloseAndCancel}
-      variant={paramVariant}
-    >
+    <Layout config={config} isSandbox={isSandbox} onClose={handlers.confirmCloseAndCancel} variant={paramVariant}>
       <Identify
         variant={IdentifyVariant.auth}
         device={device}

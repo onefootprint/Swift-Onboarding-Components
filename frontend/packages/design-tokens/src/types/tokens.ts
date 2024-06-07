@@ -1,16 +1,6 @@
 import type * as CSS from 'csstype';
 
-import type {
-  Bifrost,
-  Button,
-  Dropdown,
-  Hint,
-  Input,
-  Label,
-  Link,
-  LinkButton,
-  RadioSelect,
-} from './components';
+import type { Bifrost, Button, Dropdown, Hint, Input, Label, Link, LinkButton, RadioSelect } from './components';
 import type { CodeHighlight } from './types';
 
 export type Tokens = {

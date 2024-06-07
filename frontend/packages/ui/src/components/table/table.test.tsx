@@ -1,11 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { TableProps } from './table';
@@ -61,9 +56,7 @@ describe('<Table />', () => {
     describe('when it is loading', () => {
       it('should show a loading indicator', () => {
         renderTable({ isLoading: true });
-        expect(
-          screen.getByRole('table').getAttribute('aria-busy'),
-        ).toBeTruthy();
+        expect(screen.getByRole('table').getAttribute('aria-busy')).toBeTruthy();
       });
     });
 
@@ -91,7 +84,7 @@ describe('<Table />', () => {
       it('should render the custom placeholder', () => {
         renderTable({
           searchPlaceholder: 'Search by name',
-          onChangeSearchText: () => {},
+          onChangeSearchText: () => undefined,
         });
 
         const search = screen.getByPlaceholderText('Search by name');

@@ -16,11 +16,7 @@ const Content = ({ metrics }: ContentProps) => {
 
   return (
     <div data-testid="onboarding-metrics-content">
-      <Grid.Container
-        gap={5}
-        columns={['repeat(3, 1fr)']}
-        templateAreas={Object.keys(metrics)}
-      >
+      <Grid.Container gap={5} columns={['repeat(3, 1fr)']} templateAreas={Object.keys(metrics)}>
         <AnimatePresence>
           {metrics.map(({ key, value }) => (
             <BorderBox
@@ -33,20 +29,12 @@ const Content = ({ metrics }: ContentProps) => {
                 filter: 'blur(1px)',
                 transition: { duration: 0.2 },
               }}
-              aria-label={t(
-                `onboarding-metrics.metrics.${key}` as ParseKeys<'common'>,
-              )}
+              aria-label={t(`onboarding-metrics.metrics.${key}` as ParseKeys<'common'>)}
             >
               <Grid.Item gridArea={key}>
                 <Stack direction="column" gap={7}>
-                  <Text variant="body-3">
-                    {t(
-                      `onboarding-metrics.metrics.${key}` as ParseKeys<'common'>,
-                    )}
-                  </Text>
-                  <Text variant="display-3">
-                    {value.toLocaleString('en-US')}
-                  </Text>
+                  <Text variant="body-3">{t(`onboarding-metrics.metrics.${key}` as ParseKeys<'common'>)}</Text>
+                  <Text variant="display-3">{value.toLocaleString('en-US')}</Text>
                 </Stack>
               </Grid.Item>
             </BorderBox>

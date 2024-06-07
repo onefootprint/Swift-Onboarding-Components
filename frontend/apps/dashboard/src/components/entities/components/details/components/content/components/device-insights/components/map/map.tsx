@@ -30,7 +30,7 @@ export type MapProps = {
   onSelect: (id: string) => void;
 };
 
-const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
+const MapComponent = ({ markers, selectedCoords, onSelect }: MapProps) => {
   const mapRef = useRef<MapRef>(null);
   const theme = useTheme();
   const isDark = theme.theme === 'dark';
@@ -62,9 +62,7 @@ const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
         // Find the midpoint of all markers and zoom out to see all markers
         const bounds = new google.maps.LatLngBounds();
         markers.forEach(marker => {
-          bounds.extend(
-            new google.maps.LatLng(marker.props.lat, marker.props.lng),
-          );
+          bounds.extend(new google.maps.LatLng(marker.props.lat, marker.props.lng));
         });
         const center = bounds.getCenter();
         const lat = center.lat();
@@ -83,11 +81,7 @@ const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
       <MapboxMap
         ref={mapRef}
         mapboxAccessToken={PUBLIC_MAP_BOX_TOKEN}
-        mapStyle={
-          isDark
-            ? 'mapbox://styles/mapbox/dark-v11'
-            : 'mapbox://styles/mapbox/streets-v12'
-        }
+        mapStyle={isDark ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/streets-v12'}
         style={{ width: '100%', height: '100%' }}
         initialViewState={{
           latitude: selectedCoords ? selectedCoords.lat : FALLBACK_LATITUDE,
@@ -103,11 +97,7 @@ const Map = ({ markers, selectedCoords, onSelect }: MapProps) => {
             longitude={marker.props.lng}
             latitude={marker.props.lat}
             anchor="bottom"
-            style={
-              marker.props.isSelected
-                ? { zIndex: themeStyles.zIndex.popover }
-                : { zIndex: 0 }
-            }
+            style={marker.props.isSelected ? { zIndex: themeStyles.zIndex.popover } : { zIndex: 0 }}
           >
             {React.cloneElement(marker, {
               onClick: () => handleMarkerClick(marker.props),
@@ -125,4 +115,4 @@ const Container = styled.div`
   height: 100%;
 `;
 
-export default Map;
+export default MapComponent;

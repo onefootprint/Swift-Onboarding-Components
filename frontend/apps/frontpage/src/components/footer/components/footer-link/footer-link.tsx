@@ -10,11 +10,7 @@ type FooterLinkProps = {
 };
 
 const FooterLink = ({ text, href, newWindow }: FooterLinkProps) => (
-  <StyledLink
-    href={href}
-    rel="noopener noreferrer"
-    target={newWindow ? '_blank' : undefined}
-  >
+  <StyledLink href={href} rel="noopener noreferrer" target={newWindow ? '_blank' : undefined}>
     {text}
   </StyledLink>
 );

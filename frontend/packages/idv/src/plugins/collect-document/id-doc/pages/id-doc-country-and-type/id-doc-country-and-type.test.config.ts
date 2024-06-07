@@ -26,11 +26,7 @@ export const initialContextAllDocTypes: MachineContext = {
       SupportedIdDocTypes.workPermit,
       SupportedIdDocTypes.voterIdentification,
     ],
-    CA: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
+    CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
   documentRequestId: 'id',
   idDoc: {
@@ -58,11 +54,7 @@ export const initialContextSomeDocTypes: MachineContext = {
     type: undefined,
   },
   supportedCountryAndDocTypes: {
-    US: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
+    US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
     CA: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
 };
@@ -86,11 +78,7 @@ export const initialContextOnlyUS: MachineContext = {
     type: undefined,
   },
   supportedCountryAndDocTypes: {
-    US: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
+    US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
 };
 
@@ -136,11 +124,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
     type: undefined,
   },
   supportedCountryAndDocTypes: {
-    US: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
+    US: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
 };
 

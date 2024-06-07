@@ -15,10 +15,7 @@ const getParamFromQuery = (param: string): string | null => {
   try {
     const isInIframe = window.frameElement !== null;
     const isInIframeTopCheck = window.self !== window.top;
-    const currentUrl =
-      isInIframe || isInIframeTopCheck
-        ? window?.top?.location.href
-        : window.location.href;
+    const currentUrl = isInIframe || isInIframeTopCheck ? window?.top?.location.href : window.location.href;
 
     return currentUrl ? getParamValue(param, currentUrl) : null;
   } catch {
@@ -34,7 +31,7 @@ const isSessionStorageAvailable = (): boolean => {
     sessionStorage.setItem(testKey, testKey);
     sessionStorage.removeItem(testKey);
     return true;
-  } catch (e) {
+  } catch (_e) {
     return false;
   }
 };

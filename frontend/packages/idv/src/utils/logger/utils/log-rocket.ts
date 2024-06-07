@@ -7,8 +7,7 @@ import type { ExtraProps } from '../types';
 
 const LOG_ROCKET_ORG_ID = 'lrswdg/footprint-bifrost-prod';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const initLogRocket = (appName: string) => {
+const initLogRocket = (_appName: string) => {
   LogRocket.init(LOG_ROCKET_ORG_ID, {
     release: COMMIT_SHA,
     rootHostname: BASE_URL_DOMAIN,
@@ -20,18 +19,13 @@ const initLogRocket = (appName: string) => {
       requestSanitizer: rawRequest => {
         // Don't log xhr requests, scripts, or data urls which are too large and irrelevant
         try {
-          const { entryType, initiatorType, url } = rawRequest as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-          if (
-            initiatorType === 'xmlhttprequest' ||
-            initiatorType === 'script' ||
-            url.startsWith('data:')
-          ) {
+          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          const { entryType, initiatorType, url } = rawRequest as any;
+          if (initiatorType === 'xmlhttprequest' || initiatorType === 'script' || url.startsWith('data:')) {
             return null;
           }
 
-          const isEmptyObject =
-            typeof entryType === 'object' &&
-            Object.keys(entryType).length === 0;
+          const isEmptyObject = typeof entryType === 'object' && Object.keys(entryType).length === 0;
           if (entryType === 'resource' || isEmptyObject) {
             return null;
           }
@@ -69,15 +63,12 @@ const initLogRocket = (appName: string) => {
 };
 
 export const logRocketErrorEvent = (error: Error, extra?: ExtraProps) =>
-  extra
-    ? LogRocket.captureException(error, { extra })
-    : LogRocket.captureException(error);
+  extra ? LogRocket.captureException(error, { extra }) : LogRocket.captureException(error);
 
 export const logRocketTrackEvent = (msg: string, extra: ExtraProps) =>
   LogRocket.track(msg, { level: 'track', ...extra });
 
-export const logRocketWarnEvent = (msg: string, extra: ExtraProps) =>
-  LogRocket.log(msg, { level: 'warn', ...extra });
+export const logRocketWarnEvent = (msg: string, extra: ExtraProps) => LogRocket.log(msg, { level: 'warn', ...extra });
 
 export const logRocketInfoEvent = (msg: string, extra: ExtraProps) => {
   LogRocket.log(msg, { level: 'info', ...extra });

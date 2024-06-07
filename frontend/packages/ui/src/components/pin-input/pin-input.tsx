@@ -19,14 +19,7 @@ export type PinInputProps = {
   autoFocus?: boolean;
 };
 
-const PinInput = ({
-  hasError = false,
-  hint,
-  onComplete,
-  testID,
-  disabled,
-  autoFocus,
-}: PinInputProps) => {
+const PinInput = ({ hasError = false, hint, onComplete, testID, disabled, autoFocus }: PinInputProps) => {
   const [enteredPin, setEnteredPin] = useState<string[]>([]);
   const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
 
@@ -44,8 +37,7 @@ const PinInput = ({
 
   const moveToNextOrComplete = (pin: string, index: number) => {
     const isLastIndex = index === INPUT_FIELDS_COUNT - 1;
-    const areAllTheFieldsFilled =
-      pin.length === INPUT_FIELDS_COUNT && Array.from(pin).every(identity);
+    const areAllTheFieldsFilled = pin.length === INPUT_FIELDS_COUNT && Array.from(pin).every(identity);
     if (isLastIndex && areAllTheFieldsFilled) {
       onComplete(pin);
     } else {
@@ -57,28 +49,25 @@ const PinInput = ({
     }
   };
 
-  const handleChange =
-    (pinIndex: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const eventValue = event.target.value;
-      const currentValue = enteredPin[pinIndex];
-      const nextValue = getNextValue(currentValue, eventValue);
-      if (nextValue === '') {
-        updatePin('', pinIndex);
+  const handleChange = (pinIndex: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const eventValue = event.target.value;
+    const currentValue = enteredPin[pinIndex];
+    const nextValue = getNextValue(currentValue, eventValue);
+    if (nextValue === '') {
+      updatePin('', pinIndex);
+    }
+    const wasPinPastedOrAutoCompleted = eventValue.length > 2;
+    if (wasPinPastedOrAutoCompleted) {
+      if (isNumber(eventValue)) {
+        const nextPin = Array.from(eventValue).filter((_, index) => index < INPUT_FIELDS_COUNT);
+        setEnteredPin(nextPin);
+        moveToNextOrComplete(nextPin.join(''), nextPin.length - 1);
       }
-      const wasPinPastedOrAutoCompleted = eventValue.length > 2;
-      if (wasPinPastedOrAutoCompleted) {
-        if (isNumber(eventValue)) {
-          const nextPin = Array.from(eventValue).filter(
-            (_, index) => index < INPUT_FIELDS_COUNT,
-          );
-          setEnteredPin(nextPin);
-          moveToNextOrComplete(nextPin.join(''), nextPin.length - 1);
-        }
-      } else if (isNumber(nextValue)) {
-        const nextPin = updatePin(nextValue, pinIndex);
-        moveToNextOrComplete(nextPin.join(''), pinIndex);
-      }
-    };
+    } else if (isNumber(nextValue)) {
+      const nextPin = updatePin(nextValue, pinIndex);
+      moveToNextOrComplete(nextPin.join(''), pinIndex);
+    }
+  };
 
   const handleKeyDown = (pinIndex: number) => (event: React.KeyboardEvent) => {
     const element = event.target as HTMLInputElement;
@@ -94,7 +83,7 @@ const PinInput = ({
   return (
     <Container data-testid={testID}>
       <PinContainer>
-        {pins.map((pinPosition, pinIndex) => {
+        {pins.map((_pinPosition, pinIndex) => {
           const key = pinIndex;
           const isIndexDisabled = pinIndex > enteredPin.length;
           return (

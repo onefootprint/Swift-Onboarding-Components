@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
-import { LinkButton, media, Text } from '@onefootprint/ui';
+import { LinkButton, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -9,11 +9,7 @@ type TwitterBreadcrumbProps = {
   twitterLabel: string;
 };
 
-const TwitterBreadcrumb = ({
-  title,
-  description,
-  twitterLabel,
-}: TwitterBreadcrumbProps) => (
+const TwitterBreadcrumb = ({ title, description, twitterLabel }: TwitterBreadcrumbProps) => (
   <BreadcrumbContainer>
     <Breadcrumb>
       <BreadcrumbTitleContainer>
@@ -24,11 +20,7 @@ const TwitterBreadcrumb = ({
           {description}
         </Text>
       </BreadcrumbTitleContainer>
-      <LinkButton
-        href="https://twitter.com/footprint_hq"
-        iconComponent={IcoArrowRightSmall24}
-        target="_blank"
-      >
+      <LinkButton href="https://twitter.com/footprint_hq" iconComponent={IcoArrowRightSmall24} target="_blank">
         {twitterLabel}
       </LinkButton>
     </Breadcrumb>

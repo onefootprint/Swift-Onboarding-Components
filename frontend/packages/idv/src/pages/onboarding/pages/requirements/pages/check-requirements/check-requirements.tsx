@@ -2,7 +2,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
 
 import { useGetOnboardingStatus } from '../../../../../../hooks/api';
-import { getLogger, Logger } from '../../../../../../utils/logger';
+import { Logger, getLogger } from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import computeRequirementsToShow from './utils/compute-requirements-to-show';
 
@@ -51,12 +51,9 @@ const CheckRequirements = () => {
         send({ type: 'onboardingRequirementsReceived', payload });
       },
       onError: (err: unknown) => {
-        Logger.error(
-          `Error while checking requirements from onboarding status: ${getErrorMessage(
-            err,
-          )}`,
-          { location: 'onboarding-check-requirements' },
-        );
+        Logger.error(`Error while checking requirements from onboarding status: ${getErrorMessage(err)}`, {
+          location: 'onboarding-check-requirements',
+        });
         send('error');
       },
     },

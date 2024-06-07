@@ -1,8 +1,4 @@
-import type {
-  BusinessBoKycData,
-  ObConfigAuth,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { BusinessBoKycData, ObConfigAuth, PublicOnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
   obConfigAuth?: ObConfigAuth;

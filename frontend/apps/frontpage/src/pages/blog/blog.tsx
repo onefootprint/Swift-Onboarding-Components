@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import SubscribeToNewsletter from 'src/components/writing-layout/components/subscribe-to-newsletter';
-import { getInitialPosts, PostType } from 'src/utils/ghost';
+import { PostType, getInitialPosts } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
@@ -27,11 +27,7 @@ const Blog = ({ posts }: BlogProps) => {
 
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/blog"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/blog" />
       <Container>
         <BlogGrid>
           <TwitterBreadcrumb
@@ -49,12 +45,8 @@ const Blog = ({ posts }: BlogProps) => {
               }))}
               primaryTag={featuredPost.primary_tag.name}
               featureImageUrl={featuredPost.feature_image}
-              featureImageAlt={
-                featuredPost.feature_image_alt || featuredPost.title
-              }
-              publishedAt={formatDateWithLongMonth(
-                new Date(featuredPost.published_at),
-              )}
+              featureImageAlt={featuredPost.feature_image_alt || featuredPost.title}
+              publishedAt={formatDateWithLongMonth(new Date(featuredPost.published_at))}
               excerpt={featuredPost.excerpt}
               key={featuredPost.uuid}
               title={featuredPost.title}
@@ -73,9 +65,7 @@ const Blog = ({ posts }: BlogProps) => {
                 primaryTag={post.primary_tag?.name}
                 featureImageUrl={post.feature_image}
                 featureImageAlt={post.feature_image_alt || post.title}
-                publishedAt={formatDateWithLongMonth(
-                  new Date(post.published_at),
-                )}
+                publishedAt={formatDateWithLongMonth(new Date(post.published_at))}
                 excerpt={post.excerpt}
                 key={post.uuid}
                 title={post.title}

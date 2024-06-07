@@ -20,9 +20,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  const isResponsive =
-    router.pathname === '/onboarding' ||
-    router.pathname.startsWith('/authentication/');
+  const isResponsive = router.pathname === '/onboarding' || router.pathname.startsWith('/authentication/');
 
   return (
     <>
@@ -64,10 +62,12 @@ const GlobalStyle = createGlobalStyle<{ $hasMinWidth: boolean }>`
     }
 
     body {
-      ${$hasMinWidth &&
-      css`
+      ${
+        $hasMinWidth &&
+        css`
         min-width: ${theme.grid.container.maxWidth.md}px;
-      `}
+      `
+      }
     }
   `}
 `;

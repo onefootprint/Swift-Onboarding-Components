@@ -20,18 +20,7 @@ export type ThemeToggleProps = {
 };
 
 const ThemeSwitch = forwardRef<HTMLInputElement, ThemeToggleProps>(
-  (
-    {
-      label,
-      checked: initialChecked,
-      defaultChecked,
-      name,
-      onBlur,
-      onChange,
-      onFocus,
-    }: ThemeToggleProps,
-    ref,
-  ) => {
+  ({ label, checked: initialChecked, defaultChecked, name, onBlur, onChange, onFocus }: ThemeToggleProps, ref) => {
     const id = useId();
     const isControlled = typeof initialChecked !== 'undefined';
     const checked = isControlled ? initialChecked : defaultChecked || false;
@@ -45,10 +34,7 @@ const ThemeSwitch = forwardRef<HTMLInputElement, ThemeToggleProps>(
       if (input) {
         const nextChecked = !checked;
         const inputProto = window.HTMLInputElement.prototype;
-        const descriptor = Object.getOwnPropertyDescriptor(
-          inputProto,
-          'checked',
-        ) as PropertyDescriptor;
+        const descriptor = Object.getOwnPropertyDescriptor(inputProto, 'checked') as PropertyDescriptor;
         const setChecked = descriptor.set;
         if (setChecked) {
           const checkEvent = new Event('click', { bubbles: true });

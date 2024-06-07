@@ -1,9 +1,6 @@
 import type { CreateProxyConfigRequest } from '@onefootprint/types';
 import React, { useState } from 'react';
-import type {
-  FormData,
-  StepProps,
-} from 'src/pages/proxy-configs/proxy-configs.types';
+import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
 
 import createPayload from './utils/create-payload';
 
@@ -16,14 +13,7 @@ type FormWizardProps = {
   onSubmit: (formData: CreateProxyConfigRequest) => void;
 };
 
-const FormWizard = ({
-  Component,
-  defaultValues,
-  id,
-  isLastStep,
-  onSubmit,
-  onForward,
-}: FormWizardProps) => {
+const FormWizard = ({ Component, defaultValues, id, isLastStep, onSubmit, onForward }: FormWizardProps) => {
   const [formData, setFormData] = useState<FormData>(defaultValues);
 
   const handleSubmit = (newData: FormData) => {

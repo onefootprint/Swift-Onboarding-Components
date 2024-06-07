@@ -1,10 +1,5 @@
 import type { BeneficialOwner } from '@onefootprint/types';
-import {
-  BeneficialOwnerDataAttribute,
-  BusinessDI,
-  CollectedKybDataOption,
-  IdDI,
-} from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption, IdDI } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,12 +19,7 @@ type BeneficialOwnersProps = {
   onCancel?: () => void;
 };
 
-const BeneficialOwners = ({
-  ctaLabel,
-  hideHeader,
-  onComplete,
-  onCancel,
-}: BeneficialOwnersProps) => {
+const BeneficialOwners = ({ ctaLabel, hideHeader, onComplete, onCancel }: BeneficialOwnersProps) => {
   const [state, send] = useCollectKybDataMachine();
   const {
     idvContext: { authToken },
@@ -43,9 +33,7 @@ const BeneficialOwners = ({
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners',
   });
-  const requireMultiKyc = missingAttributes.includes(
-    CollectedKybDataOption.kycedBeneficialOwners,
-  );
+  const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
 
   const handleSubmit = (beneficialOwners: BeneficialOwner[]) => {
     if (config?.isLive) {
@@ -68,10 +56,9 @@ const BeneficialOwners = ({
     };
 
     const handleError = (error: string) => {
-      Logger.error(
-        `Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`,
-        { location: 'kyb-beneficial-owners' },
-      );
+      Logger.error(`Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`, {
+        location: 'kyb-beneficial-owners',
+      });
     };
 
     if (!authToken) {
@@ -86,18 +73,14 @@ const BeneficialOwners = ({
     });
   };
 
-  const defaultData = requireMultiKyc
-    ? data?.[BusinessDI.kycedBeneficialOwners]
-    : data?.[BusinessDI.beneficialOwners];
+  const defaultData = requireMultiKyc ? data?.[BusinessDI.kycedBeneficialOwners] : data?.[BusinessDI.beneficialOwners];
   const defaultValues = defaultData ?? [
     {
       [BeneficialOwnerDataAttribute.firstName]: '',
       [BeneficialOwnerDataAttribute.middleName]: '',
       [BeneficialOwnerDataAttribute.lastName]: '',
-      [BeneficialOwnerDataAttribute.email]:
-        kycUserData?.[IdDI.email]?.value ?? '',
-      [BeneficialOwnerDataAttribute.phoneNumber]:
-        kycUserData?.[IdDI.phoneNumber]?.value ?? '',
+      [BeneficialOwnerDataAttribute.email]: kycUserData?.[IdDI.email]?.value ?? '',
+      [BeneficialOwnerDataAttribute.phoneNumber]: kycUserData?.[IdDI.phoneNumber]?.value ?? '',
       [BeneficialOwnerDataAttribute.ownershipStake]: 0,
     },
   ];
@@ -107,11 +90,7 @@ const BeneficialOwners = ({
       {!hideHeader && (
         <>
           <CollectKybDataNavigationHeader />
-          <HeaderTitle
-            title={t('title')}
-            subtitle={t('subtitle')}
-            marginBottom={7}
-          />
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} marginBottom={7} />
         </>
       )}
       <BeneficialOwnersForm

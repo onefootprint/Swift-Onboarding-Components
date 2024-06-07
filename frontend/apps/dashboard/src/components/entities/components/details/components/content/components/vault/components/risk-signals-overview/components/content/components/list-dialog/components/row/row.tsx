@@ -18,24 +18,12 @@ const Row = ({ riskSignal }: RowProps) => {
   return (
     <>
       <StyledTd>
-        {riskSignal.severity === RiskSignalSeverity.High && (
-          <Badge variant="error">{t('high')}</Badge>
-        )}
-        {riskSignal.severity === RiskSignalSeverity.Medium && (
-          <Badge variant="warning">{t('medium')}</Badge>
-        )}
-        {riskSignal.severity === RiskSignalSeverity.Low && (
-          <Badge variant="info">{t('low')}</Badge>
-        )}
+        {riskSignal.severity === RiskSignalSeverity.High && <Badge variant="error">{t('high')}</Badge>}
+        {riskSignal.severity === RiskSignalSeverity.Medium && <Badge variant="warning">{t('medium')}</Badge>}
+        {riskSignal.severity === RiskSignalSeverity.Low && <Badge variant="info">{t('low')}</Badge>}
       </StyledTd>
       <Stack tag="td" gap={2} width="100%">
-        <Stack
-          inline
-          align="center"
-          overflow="hidden"
-          whiteSpace="nowrap"
-          textOverflow="ellipsis"
-        >
+        <Stack inline align="center" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
           <Text variant="label-3">{riskSignal.note}</Text>
         </Stack>
         <Tooltip text={riskSignal.description}>

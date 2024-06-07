@@ -9,8 +9,7 @@ type FieldProps = {
   href?: string;
 };
 
-const formattedUrl = (url: string) =>
-  url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+const formattedUrl = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 
 const Field = ({ label, value, href }: FieldProps) => (
   <Container direction="column" gap={2}>

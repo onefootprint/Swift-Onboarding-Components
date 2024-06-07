@@ -11,8 +11,7 @@ import { DataIdentifierKeys } from '@onefootprint/types';
 
 export const isCardDI = (id: string): id is CardDI => id.startsWith('card.');
 
-export const isCustomDI = (id: string): id is CustomDI =>
-  id.startsWith('custom.');
+export const isCustomDI = (id: string): id is CustomDI => id.startsWith('custom.');
 
 const isValidDI = (id?: string) => {
   if (!id) {
@@ -24,9 +23,7 @@ const isValidDI = (id?: string) => {
   if (isCustomDI(id as DataIdentifier)) {
     return true;
   }
-  return DataIdentifierKeys.includes(
-    id as InvestorProfileDI | IdDI | BusinessDI | DocumentDI,
-  );
+  return DataIdentifierKeys.includes(id as InvestorProfileDI | IdDI | BusinessDI | DocumentDI);
 };
 
 export default isValidDI;

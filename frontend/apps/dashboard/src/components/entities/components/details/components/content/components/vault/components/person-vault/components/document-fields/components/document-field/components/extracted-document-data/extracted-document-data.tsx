@@ -1,9 +1,5 @@
 import { IcoFileText24 } from '@onefootprint/icons';
-import type {
-  DocumentDI,
-  EntityVault,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { DocumentDI, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { isVaultDataText } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
@@ -19,11 +15,7 @@ export type ExtractedDocumentDataProps = {
   activeDocumentVersion: string;
 };
 
-const ExtractedDocumentData = ({
-  vault,
-  documentType,
-  activeDocumentVersion,
-}: ExtractedDocumentDataProps) => {
+const ExtractedDocumentData = ({ vault, documentType, activeDocumentVersion }: ExtractedDocumentDataProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document',
   });
@@ -45,20 +37,13 @@ const ExtractedDocumentData = ({
     <Section>
       <LabelContainer>
         <IcoFileText24 />
-        <Text variant="label-2">
-          {t(`drawer.document-data.title` as ParseKeys<'common'>)}
-        </Text>
+        <Text variant="label-2">{t(`drawer.document-data.title` as ParseKeys<'common'>)}</Text>
       </LabelContainer>
       <DocumentDataFieldContainer>
         {relevantKeys.sort().map(key => (
           <DocumentDataField key={key}>
             <Text variant="body-3" color="tertiary" tag="label">
-              {t(
-                `drawer.document-data.labels.${getDataLabel(
-                  key,
-                  activeDocumentVersion,
-                )}` as ParseKeys<'common'>,
-              )}
+              {t(`drawer.document-data.labels.${getDataLabel(key, activeDocumentVersion)}` as ParseKeys<'common'>)}
             </Text>
             <Text variant="body-3" color="primary" textAlign="right">
               {getVaultValueString(key)}

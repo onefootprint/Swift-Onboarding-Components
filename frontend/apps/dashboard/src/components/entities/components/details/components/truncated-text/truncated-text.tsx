@@ -15,18 +15,11 @@ type TruncatedTextProps = {
   seeMoreButtonVariant?: LinkButtonVariant;
 };
 
-const TruncatedText = ({
-  text,
-  maxTextViewHeight,
-  textFontVariant,
-  textStyleProps,
-}: TruncatedTextProps) => {
-  const {
-    textContainerRef,
-    shownTextState,
-    currShownText,
-    showMoreOrLessText,
-  } = useTruncatedtext(text, maxTextViewHeight);
+const TruncatedText = ({ text, maxTextViewHeight, textFontVariant, textStyleProps }: TruncatedTextProps) => {
+  const { textContainerRef, shownTextState, currShownText, showMoreOrLessText } = useTruncatedtext(
+    text,
+    maxTextViewHeight,
+  );
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.truncated-text',
   });
@@ -35,14 +28,8 @@ const TruncatedText = ({
     <Text ref={textContainerRef} variant={textFontVariant} {...textStyleProps}>
       <bdi>{currShownText}</bdi>
       {shownTextState !== ShownTextState.FULL_WITHIN_MAX_HEIGHT && (
-        <LinkButton
-          variant="label-4"
-          onClick={showMoreOrLessText}
-          $marginLeft={2}
-        >
-          {shownTextState === ShownTextState.PARTIAL_WITHIN_MAX_HEIGHT
-            ? t('see-more')
-            : t('see-less')}
+        <LinkButton variant="label-4" onClick={showMoreOrLessText} $marginLeft={2}>
+          {shownTextState === ShownTextState.PARTIAL_WITHIN_MAX_HEIGHT ? t('see-more') : t('see-less')}
         </LinkButton>
       )}
     </Text>

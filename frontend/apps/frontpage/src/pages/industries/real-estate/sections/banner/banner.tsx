@@ -10,9 +10,7 @@ type PenguinBannerProps = {
   imgSrc?: string;
 };
 
-const PenguinBanner = ({
-  imgSrc = '/home/banner/penguin-complete.svg',
-}: PenguinBannerProps) => {
+const PenguinBanner = ({ imgSrc = '/home/banner/penguin-complete.svg' }: PenguinBannerProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.industries.real-estate.banner',
   });
@@ -20,19 +18,10 @@ const PenguinBanner = ({
   return (
     <Background>
       <BannerContainer>
-        <Illustration
-          src={imgSrc}
-          height={600}
-          width={600}
-          alt={t('alt-img')}
-        />
+        <Illustration src={imgSrc} height={600} width={600} alt={t('alt-img')} />
         <TextContainer>
           <Title>{t('title')}</Title>
-          <ContactButtons
-            primaryButton={t('primary-button')}
-            secondaryButton={t('secondary-button')}
-            justify="left"
-          />
+          <ContactButtons primaryButton={t('primary-button')} secondaryButton={t('secondary-button')} justify="left" />
         </TextContainer>
       </BannerContainer>
     </Background>

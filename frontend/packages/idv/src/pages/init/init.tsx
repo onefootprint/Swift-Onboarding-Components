@@ -33,12 +33,9 @@ const Init = () => {
         });
       },
       onError: error => {
-        Logger.error(
-          `Fetching onboarding config in IDV init page failed: ${getErrorMessage(
-            error,
-          )}`,
-          { location: 'idv-init' },
-        );
+        Logger.error(`Fetching onboarding config in IDV init page failed: ${getErrorMessage(error)}`, {
+          location: 'idv-init',
+        });
         send({
           type: 'configRequestFailed',
         });

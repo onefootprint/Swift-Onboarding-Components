@@ -8,54 +8,19 @@ type OtherComponentsIllustrationProps = {
   isHovered?: boolean;
 };
 
-const OtherComponentsIllustration = ({
-  isHovered = false,
-}: OtherComponentsIllustrationProps) => (
+const OtherComponentsIllustration = ({ isHovered = false }: OtherComponentsIllustrationProps) => (
   <Container>
     <StyledBackground isHovered={isHovered} />
     <CardBack isHovered={isHovered}>
       <Dots>
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="10px"
-          left="0%"
-          width={10}
-          height={10}
-        />
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="10px"
-          left="50%"
-          width={10}
-          height={10}
-        />
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="10px"
-          left="100%"
-          width={10}
-          height={10}
-        />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="0%" width={10} height={10} />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="50%" width={10} height={10} />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="10px" left="100%" width={10} height={10} />
       </Dots>
       <Screen isHovered={isHovered}>
-        <Line
-          darkColor="#303030"
-          lightColor="#CDCDCD"
-          top="40px"
-          left="50%"
-          width={80}
-        />
+        <Line darkColor="#303030" lightColor="#CDCDCD" top="40px" left="50%" width={80} />
         <Subsection>
-          <Line
-            darkColor="#A38BFF"
-            lightColor="#4A24DB"
-            top="14px"
-            left="80%"
-            width={40}
-          />
+          <Line darkColor="#A38BFF" lightColor="#4A24DB" top="14px" left="80%" width={40} />
         </Subsection>
       </Screen>
     </CardBack>
@@ -127,11 +92,13 @@ const CardBack = styled.div<{ isHovered: boolean }>`
     box-shadow: ${theme.elevation[2]};
     transition: all 0.2s ease-in-out;
 
-    ${isHovered &&
-    css`
+    ${
+      isHovered &&
+      css`
       box-shadow: ${theme.elevation[3]};
       transform: translateY(-2px);
-    `}
+    `
+    }
   `}
 `;
 
@@ -144,11 +111,13 @@ const Screen = styled.div<{ isHovered: boolean }>`
     background-color: ${theme.backgroundColor.primary};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
 
-    ${isHovered &&
-    css`
+    ${
+      isHovered &&
+      css`
       box-shadow: ${theme.elevation[1]};
       transform: translateY(-2px);
-    `}
+    `
+    }
   `}
 `;
 

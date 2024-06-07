@@ -1,11 +1,4 @@
-import {
-  startOfMonth,
-  startOfQuarter,
-  startOfToday,
-  startOfYear,
-  subDays,
-  subMonths,
-} from 'date-fns';
+import { startOfMonth, startOfQuarter, startOfToday, startOfYear, subDays, subMonths } from 'date-fns';
 import useBaseFilters from 'src/hooks/use-filters';
 
 import type { DateFilterPeriod } from '../../components/date-filter/date-filter.types';

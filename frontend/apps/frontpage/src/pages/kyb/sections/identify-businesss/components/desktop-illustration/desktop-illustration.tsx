@@ -6,18 +6,8 @@ import styled, { css } from 'styled-components';
 const DesktopIllustration = () => (
   <Grid>
     <ImageContainer data-grid-area="hey-there">
-      <Image
-        src="/kyb/verify-businesses/hey-there.png"
-        alt="Basic Data"
-        width={336.8}
-        height={265}
-      />
-      <Image
-        src="/kyb/verify-businesses/basic-data.png"
-        alt="Basic Data"
-        width={336.8}
-        height={358.75}
-      />
+      <Image src="/kyb/verify-businesses/hey-there.png" alt="Basic Data" width={336.8} height={265} />
+      <Image src="/kyb/verify-businesses/basic-data.png" alt="Basic Data" width={336.8} height={358.75} />
     </ImageContainer>
     <ImageContainer data-grid-area="business-address">
       <Image
@@ -29,12 +19,7 @@ const DesktopIllustration = () => (
       />
     </ImageContainer>
     <ImageContainer data-grid-area="bos">
-      <Image
-        src="/kyb/verify-businesses/bos.png"
-        alt="Residential Address"
-        width={336.8}
-        height={391}
-      />
+      <Image src="/kyb/verify-businesses/bos.png" alt="Residential Address" width={336.8} height={391} />
     </ImageContainer>
   </Grid>
 );

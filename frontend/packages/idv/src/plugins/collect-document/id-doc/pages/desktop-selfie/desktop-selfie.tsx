@@ -17,11 +17,7 @@ const DesktopSelfie = () => {
   const { orgId, uploadMode, hasBadConnectivity } = state.context;
   const permissionState = useCameraPermission();
 
-  const onComplete = (
-    imageFile: File | Blob,
-    extraCompressed: boolean,
-    captureKind: CaptureKind,
-  ) =>
+  const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
     send({
       type: 'receivedImage',
       payload: {

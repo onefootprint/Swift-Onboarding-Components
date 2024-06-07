@@ -15,15 +15,8 @@ const AmlCard = () => {
   };
   return (
     <CardContainer>
-      <Toggle
-        label={t('toggle.title')}
-        hint={t('toggle.subtitle')}
-        checked={isToggled}
-        onChange={handleToggle}
-      />
-      <CardAppearContent isVisible={isToggled}>
-        {t('extra-content')}
-      </CardAppearContent>
+      <Toggle label={t('toggle.title')} hint={t('toggle.subtitle')} checked={isToggled} onChange={handleToggle} />
+      <CardAppearContent isVisible={isToggled}>{t('extra-content')}</CardAppearContent>
     </CardContainer>
   );
 };

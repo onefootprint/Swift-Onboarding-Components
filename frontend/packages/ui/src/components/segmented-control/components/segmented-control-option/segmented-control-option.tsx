@@ -21,12 +21,7 @@ const SegmentedControlOption = ({
   selected,
   IconComponent,
 }: SegmentedControlOptionProps) => (
-  <OptionTrigger
-    role="button"
-    value={optionValue}
-    key={optionValue}
-    data-selected={selected}
-  >
+  <OptionTrigger role="button" value={optionValue} key={optionValue} data-selected={selected}>
     {IconComponent && (
       <IconContainer>
         <IconComponent color={selected ? 'quinary' : 'tertiary'} />
@@ -44,11 +39,13 @@ const IconContainer = styled.div<{ selected?: boolean }>`
     align-items: center;
     margin-right: ${theme.spacing[2]};
 
-    ${selected &&
-    css`
+    ${
+      selected &&
+      css`
       border: 0;
       color: ${theme.backgroundColor.primary};
-    `}
+    `
+    }
   `}
 `;
 

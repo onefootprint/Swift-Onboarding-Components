@@ -22,18 +22,11 @@ const Demo = () => {
       };
     }
 
-    const {
-      locale: localeString = 'en-US',
-      ob_key: obKey,
-      user_data: rawUserData = {},
-    } = query;
+    const { locale: localeString = 'en-US', ob_key: obKey, user_data: rawUserData = {} } = query;
     const key = typeof obKey === 'string' ? obKey : publicKeyEnv;
     let data = {};
     try {
-      data =
-        typeof rawUserData === 'string'
-          ? JSON.parse(decodeURIComponent(rawUserData))
-          : {};
+      data = typeof rawUserData === 'string' ? JSON.parse(decodeURIComponent(rawUserData)) : {};
     } catch (_) {
       // do nothing
     }

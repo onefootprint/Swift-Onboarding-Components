@@ -40,16 +40,11 @@ const CodeBlock = ({
         {!disableCopy && (
           <CopyButton
             contentToCopy={children}
-            tooltipText={
-              tooltipText ?? t('components.code-block.tooltip-text-default')
-            }
+            tooltipText={tooltipText ?? t('components.code-block.tooltip-text-default')}
             tooltipTextConfirmation={
-              tooltipTextConfirmation ??
-              t('components.code-inline.tooltip-text-confirmation-default')
+              tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default')
             }
-            ariaLabel={
-              ariaLabel ?? t('components.code-block.aria-label-default')
-            }
+            ariaLabel={ariaLabel ?? t('components.code-block.aria-label-default')}
           />
         )}
       </Header>

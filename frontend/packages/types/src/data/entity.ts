@@ -80,24 +80,17 @@ export type EntityWorkflow = {
 };
 
 export const hasEntityUsLegalStatus = (entity: Entity) =>
-  entity.attributes.some(attr =>
-    CdoToAllDisMap[CollectedKycDataOption.usLegalStatus].includes(attr),
-  );
+  entity.attributes.some(attr => CdoToAllDisMap[CollectedKycDataOption.usLegalStatus].includes(attr));
 
 export const hasEntityInvestorProfile = (entity: Entity) => {
   const values = Object.values(InvestorProfileDI);
-  return values.some(investorProfileDi =>
-    entity.attributes.some(attribute => attribute === investorProfileDi),
-  );
+  return values.some(investorProfileDi => entity.attributes.some(attribute => attribute === investorProfileDi));
 };
 
-export const hasEntityCards = (entity: Entity) =>
-  entity.attributes.some(attr => attr.startsWith('card'));
+export const hasEntityCards = (entity: Entity) => entity.attributes.some(attr => attr.startsWith('card'));
 
 export const hasEntityCustomData = (entity: Entity) =>
-  entity.attributes.some(
-    attr => attr.startsWith('custom') || attr.startsWith('document.custom'),
-  );
+  entity.attributes.some(attr => attr.startsWith('custom') || attr.startsWith('document.custom'));
 
 export const hasEntityDocuments = (entity: Entity) => {
   const values = Object.values(DocumentDI);
@@ -112,10 +105,7 @@ export const hasEntityDocuments = (entity: Entity) => {
   );
 };
 
-export const mostRecentWorkflow = (
-  wf1: EntityWorkflow,
-  wf2: EntityWorkflow,
-) => {
+export const mostRecentWorkflow = (wf1: EntityWorkflow, wf2: EntityWorkflow) => {
   if (wf1.createdAt > wf2.createdAt) {
     return -1;
   }

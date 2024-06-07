@@ -1,12 +1,5 @@
-import type {
-  AuthorizeRequirement,
-  CollectKycDataRequirement,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import type { AuthorizeRequirement, CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingRequirementKind } from '@onefootprint/types';
 
 import computeRequirementsToShow from './compute-requirements-to-show';
 
@@ -49,15 +42,8 @@ describe('computeRequirementsToShow', () => {
         hasRunCollectedKycData: false,
         isComponentsSdk: false,
       };
-      const remainingRequirements = computeRequirementsToShow(
-        context,
-        requirementsResponse,
-      );
-      expect(
-        remainingRequirements.some(
-          r => r.kind === OnboardingRequirementKind.collectKycData,
-        ),
-      ).toBeTruthy();
+      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeTruthy();
     });
     it('should return met KYC requirement when not yet shown and havent started collecting data', () => {
       const context = {
@@ -66,15 +52,8 @@ describe('computeRequirementsToShow', () => {
         hasRunCollectedKycData: false,
         isComponentsSdk: false,
       };
-      const remainingRequirements = computeRequirementsToShow(
-        context,
-        requirementsResponse,
-      );
-      expect(
-        remainingRequirements.some(
-          r => r.kind === OnboardingRequirementKind.collectKycData,
-        ),
-      ).toBeTruthy();
+      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeTruthy();
     });
     it('should not return met KYC requirement when in transfer', () => {
       const context = {
@@ -83,15 +62,8 @@ describe('computeRequirementsToShow', () => {
         hasRunCollectedKycData: false,
         isComponentsSdk: false,
       };
-      const remainingRequirements = computeRequirementsToShow(
-        context,
-        requirementsResponse,
-      );
-      expect(
-        remainingRequirements.some(
-          r => r.kind === OnboardingRequirementKind.collectKycData,
-        ),
-      ).toBeFalsy();
+      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeFalsy();
     });
     it('should not return met KYC requirement when already shown', () => {
       const context = {
@@ -100,15 +72,8 @@ describe('computeRequirementsToShow', () => {
         hasRunCollectedKycData: true,
         isComponentsSdk: false,
       };
-      const remainingRequirements = computeRequirementsToShow(
-        context,
-        requirementsResponse,
-      );
-      expect(
-        remainingRequirements.some(
-          r => r.kind === OnboardingRequirementKind.collectKycData,
-        ),
-      ).toBeFalsy();
+      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeFalsy();
     });
     it('should not return met KYC requirement when in components sdk', () => {
       const context = {
@@ -117,15 +82,8 @@ describe('computeRequirementsToShow', () => {
         hasRunCollectedKycData: false,
         isComponentsSdk: true,
       };
-      const remainingRequirements = computeRequirementsToShow(
-        context,
-        requirementsResponse,
-      );
-      expect(
-        remainingRequirements.some(
-          r => r.kind === OnboardingRequirementKind.collectKycData,
-        ),
-      ).toBeFalsy();
+      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeFalsy();
     });
   });
   describe('with met KYC requirement, no authorize', () => {
@@ -141,15 +99,8 @@ describe('computeRequirementsToShow', () => {
         hasRunCollectedKycData: false,
         isComponentsSdk: false,
       };
-      const remainingRequirements = computeRequirementsToShow(
-        context,
-        requirementsResponse,
-      );
-      expect(
-        remainingRequirements.some(
-          r => r.kind === OnboardingRequirementKind.collectKycData,
-        ),
-      ).toBeFalsy();
+      const remainingRequirements = computeRequirementsToShow(context, requirementsResponse);
+      expect(remainingRequirements.some(r => r.kind === OnboardingRequirementKind.collectKycData)).toBeFalsy();
     });
   });
 });

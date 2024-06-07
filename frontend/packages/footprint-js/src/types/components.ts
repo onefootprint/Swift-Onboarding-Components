@@ -64,12 +64,7 @@ export type VerifyProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
   readonly variant?: VerifyVariant;
 };
 
-type VerifyDataKeys =
-  | 'publicKey'
-  | 'userData'
-  | 'options'
-  | 'authToken'
-  | 'l10n';
+type VerifyDataKeys = 'publicKey' | 'userData' | 'options' | 'authToken' | 'l10n';
 // The subset of VerifyProps that are sent to the iframe via sdk_args
 export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys> & {
   isComponentsSdk?: boolean;
@@ -83,9 +78,7 @@ export type ComponentsSdkProps = VerifyPropsBase<VerifyPublicKey> & {
 };
 
 /** verify-button */
-export type VerifyButtonProps = VerifyPropsBase<
-  VerifyAuthToken | VerifyPublicKey
-> & {
+export type VerifyButtonProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
   readonly containerId: string;
   readonly dialogVariant?: VerifyVariant;
   readonly kind: ComponentKind.VerifyButton;
@@ -93,10 +86,7 @@ export type VerifyButtonProps = VerifyPropsBase<
   readonly onClick?: () => void;
   readonly variant: 'inline';
 };
-export type VerifyButtonDataProps = Pick<
-  VerifyButtonProps,
-  VerifyDataKeys | 'label'
->;
+export type VerifyButtonDataProps = Pick<VerifyButtonProps, VerifyDataKeys | 'label'>;
 
 /** render */
 export type RenderProps = PropsBase & {
@@ -113,12 +103,7 @@ export type RenderProps = PropsBase & {
 
 export type RenderDataProps = Pick<
   RenderProps,
-  | 'authToken'
-  | 'canCopy'
-  | 'defaultHidden'
-  | 'id'
-  | 'label'
-  | 'showHiddenToggle'
+  'authToken' | 'canCopy' | 'defaultHidden' | 'id' | 'label' | 'showHiddenToggle'
 >;
 
 /** form */
@@ -140,10 +125,7 @@ export type FormProps = PropsBase & {
   readonly title?: string;
   readonly variant?: Variant; // supports all variants, falls back to modal, so optional
 };
-export type FormDataProps = Pick<
-  FormProps,
-  'authToken' | 'options' | 'title' | 'l10n'
->;
+export type FormDataProps = Pick<FormProps, 'authToken' | 'options' | 'title' | 'l10n'>;
 
 /** auth */
 type AuthPropsBase = PropsBase & {
@@ -164,12 +146,7 @@ export type AuthProps = AuthPropsBase & {
 };
 export type AuthDataProps = Pick<
   AuthProps,
-  | 'authToken'
-  | 'updateLoginMethods'
-  | 'publicKey'
-  | 'userData'
-  | 'l10n'
-  | 'options'
+  'authToken' | 'updateLoginMethods' | 'publicKey' | 'userData' | 'l10n' | 'options'
 >;
 
 /** update_login_methods */
@@ -183,7 +160,4 @@ export type UpdateLoginMethodsProps = PropsBase & {
   readonly variant?: 'modal' | 'drawer';
   readonly authToken?: string;
 };
-export type UpdateLoginMethodsDataProps = Pick<
-  UpdateLoginMethodsProps,
-  'authToken' | 'userData' | 'l10n' | 'options'
->;
+export type UpdateLoginMethodsDataProps = Pick<UpdateLoginMethodsProps, 'authToken' | 'userData' | 'l10n' | 'options'>;

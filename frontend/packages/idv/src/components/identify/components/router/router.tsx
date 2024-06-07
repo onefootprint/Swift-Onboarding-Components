@@ -119,12 +119,7 @@ const Router = ({ onDone }: RouterProps): JSX.Element | null => {
     );
   }
   if (matches('authTokenInvalid')) {
-    return (
-      <Notification
-        title={t('notification.404-user-title')}
-        subtitle={t('notification.404-user-description')}
-      />
-    );
+    return <Notification title={t('notification.404-user-title')} subtitle={t('notification.404-user-description')} />;
   }
 
   return null;

@@ -1,10 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { useStore } from 'src/hooks/use-session';
 
@@ -44,9 +38,7 @@ describe('<Organizations />', () => {
       const loader = screen.queryByTestId('organizations-loading');
       expect(loader).not.toBeInTheDocument();
 
-      const errorMessage = screen.getByText(
-        'No auth token provided. Please, log in again.',
-      );
+      const errorMessage = screen.getByText('No auth token provided. Please, log in again.');
       expect(errorMessage).toBeInTheDocument();
     });
   });
@@ -88,9 +80,7 @@ describe('<Organizations />', () => {
       renderOrganizations();
       await waitFor(() => {
         getOrgAuthRoleFixture.forEach(organization => {
-          expect(
-            screen.getByRole('button', { name: organization.name }),
-          ).toBeInTheDocument();
+          expect(screen.getByRole('button', { name: organization.name })).toBeInTheDocument();
         });
         const [, secondOrg] = getOrgAuthRoleFixture;
         const secondOrgButton = screen.getByRole('button', {
@@ -110,9 +100,7 @@ describe('<Organizations />', () => {
           renderOrganizations();
           const [firstOrg] = getOrgAuthRoleFixture;
           await waitFor(() => {
-            expect(
-              screen.getByRole('button', { name: firstOrg.name }),
-            ).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: firstOrg.name })).toBeInTheDocument();
           });
 
           const firstOrgButton = screen.getByRole('button', {
@@ -135,9 +123,7 @@ describe('<Organizations />', () => {
           renderOrganizations();
           const [firstOrg] = getOrgAuthRoleFixture;
           await waitFor(() => {
-            expect(
-              screen.getByRole('button', { name: firstOrg.name }),
-            ).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: firstOrg.name })).toBeInTheDocument();
           });
 
           const firstOrgButton = screen.getByRole('button', {
@@ -146,9 +132,7 @@ describe('<Organizations />', () => {
           await userEvent.click(firstOrgButton);
 
           await waitFor(() => {
-            expect(
-              screen.getByText('Something went wrong'),
-            ).toBeInTheDocument();
+            expect(screen.getByText('Something went wrong')).toBeInTheDocument();
           });
         });
       });

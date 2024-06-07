@@ -1,14 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import type { FootprintButtonProps } from './types';
-import {
-  getClassName,
-  getLabel,
-  getVariant,
-  isAuth,
-  isUpdateLoginMethods,
-  isVerify,
-} from './utils';
+import { getClassName, getLabel, getVariant, isAuth, isUpdateLoginMethods, isVerify } from './utils';
 
 it('isAuth', () => {
   expect(isAuth({ kind: 'auth' })).toBe(true);
@@ -79,8 +72,6 @@ describe('getVariant', () => {
     { obj: { kind: 'verify', variant: 'drawer' }, x: 'drawer' },
     { obj: { kind: 'verify', variant: 'WWW' }, x: 'modal' },
   ])('case %#', ({ obj, x }) => {
-    expect(getVariant(obj as FootprintButtonProps)).toEqual(
-      x as 'modal' | 'drawer',
-    );
+    expect(getVariant(obj as FootprintButtonProps)).toEqual(x as 'modal' | 'drawer');
   });
 });

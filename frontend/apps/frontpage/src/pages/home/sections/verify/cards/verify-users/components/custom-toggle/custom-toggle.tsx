@@ -13,12 +13,7 @@ type CustomToggleProps = {
   className?: string;
 };
 
-export const CustomToggle = ({
-  onChange,
-  activeSection,
-  sections,
-  className,
-}: CustomToggleProps) => {
+export const CustomToggle = ({ onChange, activeSection, sections, className }: CustomToggleProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.home.verify.cards.verify.illustration',
   });
@@ -27,11 +22,7 @@ export const CustomToggle = ({
     <Container className={className}>
       <AnimatePresence>
         {sections.map(section => (
-          <StyledOption
-            as="button"
-            onClick={() => onChange && onChange(section.value)}
-            key={section.value}
-          >
+          <StyledOption as="button" onClick={() => onChange && onChange(section.value)} key={section.value}>
             {activeSection === section.value && (
               <SelectedMarker
                 initial={{ opacity: 0 }}
@@ -42,13 +33,8 @@ export const CustomToggle = ({
               />
             )}
             <Stack direction="row" gap={3} alignItems="center" zIndex={2}>
-              <section.icon
-                color={activeSection === section.value ? 'quinary' : 'primary'}
-              />
-              <Text
-                variant="label-3"
-                color={activeSection === section.value ? 'quinary' : 'primary'}
-              >
+              <section.icon color={activeSection === section.value ? 'quinary' : 'primary'} />
+              <Text variant="label-3" color={activeSection === section.value ? 'quinary' : 'primary'}>
                 {t(section.labelKey as unknown as ParseKeys<'common'>)}
               </Text>
             </Stack>

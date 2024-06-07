@@ -10,11 +10,7 @@ type BackgroundProps = {
   isHovered?: boolean;
 };
 
-const Background = ({
-  startColor = '#77d4ff',
-  endColor = '#89e568',
-  isHovered,
-}: BackgroundProps) => {
+const Background = ({ startColor = '#77d4ff', endColor = '#89e568', isHovered }: BackgroundProps) => {
   const [finalStartColor, setStartColor] = useState('#e1e1e1');
   const [finalEndColor, setEndColor] = useState('#e1e1e1');
 

@@ -22,11 +22,7 @@ const PdfThumbnail = ({ src, onClick }: PdfThumbnailProps) => {
   return (
     <Container ref={hoverRef} tag="button" onClick={onClick}>
       <IframeContainer $isHovering={isHovering}>
-        <iframe
-          ref={iframeRef}
-          src={`${src}#toolbar=0&navpanes=0`}
-          title="PDF Thumbnail"
-        />
+        <iframe ref={iframeRef} src={`${src}#toolbar=0&navpanes=0`} title="PDF Thumbnail" />
       </IframeContainer>
     </Container>
   );

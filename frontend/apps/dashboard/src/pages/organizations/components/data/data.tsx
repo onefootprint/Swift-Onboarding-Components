@@ -17,11 +17,7 @@ type DataProps = {
   isMissingAccessToRequestedOrg: boolean;
 };
 
-const Data = ({
-  authToken,
-  organizations,
-  isMissingAccessToRequestedOrg,
-}: DataProps) => {
+const Data = ({ authToken, organizations, isMissingAccessToRequestedOrg }: DataProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.organizations' });
   const { logIn } = useSession();
   const router = useRouter();
@@ -55,16 +51,8 @@ const Data = ({
 
   return (
     <>
-      <Text
-        variant="label-1"
-        color="primary"
-        marginTop={8}
-        marginBottom={3}
-        textAlign="center"
-      >
-        {!isMissingAccessToRequestedOrg
-          ? t('title')
-          : t('title-missing-access')}
+      <Text variant="label-1" color="primary" marginTop={8} marginBottom={3} textAlign="center">
+        {!isMissingAccessToRequestedOrg ? t('title') : t('title-missing-access')}
       </Text>
       <ButtonGroup>
         {organizations.map(organization => (

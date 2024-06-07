@@ -14,12 +14,7 @@ type CountryPickerProps = {
   prefix: string;
 };
 
-const CountryPicker = ({
-  prefix,
-  disabled,
-  code,
-  onClick,
-}: CountryPickerProps) => (
+const CountryPicker = ({ prefix, disabled, code, onClick }: CountryPickerProps) => (
   <Button onClick={onClick} type="button" disabled={disabled}>
     <Box marginLeft={4}>
       <Flag code={code} />

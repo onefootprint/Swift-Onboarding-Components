@@ -14,20 +14,10 @@ type DateInputProps = {
   onFocus: () => void;
 };
 
-const DateInput = ({
-  autoFocus,
-  value,
-  hasError,
-  onChange,
-  onFocus,
-}: DateInputProps) => {
+const DateInput = ({ autoFocus, value, hasError, onChange, onFocus }: DateInputProps) => {
   const [focused, setFocused] = useState(false);
-  const [month, setMonth] = useState(() =>
-    (value.getMonth() + 1).toString().padStart(2, '0'),
-  );
-  const [day, setDay] = useState(() =>
-    value.getDate().toString().padStart(2, '0'),
-  );
+  const [month, setMonth] = useState(() => (value.getMonth() + 1).toString().padStart(2, '0'));
+  const [day, setDay] = useState(() => value.getDate().toString().padStart(2, '0'));
   const [year, setYear] = useState(value.getFullYear().toString());
 
   useEffect(() => {

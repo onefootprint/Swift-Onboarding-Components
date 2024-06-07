@@ -7,10 +7,7 @@ import styled, { css } from 'styled-components';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
-import {
-  OnboardingTemplate,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import { OnboardingTemplate, PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import DocEditor from './components/doc-editor';
 import PreviewHeader from './components/doc-editor/preview-header';
@@ -27,38 +24,24 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   });
   const { getValues, register } = useFormContext();
   const values: Personal = getValues('personal');
-  const collectBO = getValues(
-    `businessInformation.${CollectedKybDataOption.beneficialOwners}`,
-  );
+  const collectBO = getValues(`businessInformation.${CollectedKybDataOption.beneficialOwners}`);
   const isKyb = meta.kind === PlaybookKind.Kyb;
-  const isIdDocFirstFlowEnabled = useIdDocFirstFlowEnabled(
-    meta.kind === PlaybookKind.Kyc,
-  );
+  const isIdDocFirstFlowEnabled = useIdDocFirstFlowEnabled(meta.kind === PlaybookKind.Kyc);
   const showNonUsResidentsEmptyState =
-    meta.residency?.allowInternationalResidents === false ||
-    meta.kind === PlaybookKind.Kyb;
+    meta.residency?.allowInternationalResidents === false || meta.kind === PlaybookKind.Kyb;
   const showUsResidentsEmptyState = meta.residency?.allowUsResidents === false;
-  const internationalOnly =
-    meta.residency?.allowInternationalResidents &&
-    !meta.residency.allowUsResidents;
-  const showIdDocScan =
-    values.idDocKind.length > 0 ||
-    Object.keys(values.countrySpecificIdDocKind).length > 0;
+  const internationalOnly = meta.residency?.allowInternationalResidents && !meta.residency.allowUsResidents;
+  const showIdDocScan = values.idDocKind.length > 0 || Object.keys(values.countrySpecificIdDocKind).length > 0;
   const [showIdDocEditor, setShowIdDocEditor] = useState(false);
   const isFixedPlaybook =
-    meta.onboardingTemplate === OnboardingTemplate.Alpaca ||
-    meta.onboardingTemplate === OnboardingTemplate.Apex;
+    meta.onboardingTemplate === OnboardingTemplate.Alpaca || meta.onboardingTemplate === OnboardingTemplate.Apex;
   const canEdit = !internationalOnly && !isFixedPlaybook;
   const allowUsTerritoryResidents = meta.residency?.allowUsTerritories;
 
   if (isKyb && !collectBO) {
     return (
       <Container>
-        <PreviewHeader
-          meta={meta}
-          canEdit={canEdit}
-          onStartEditing={onStartEditing}
-        />
+        <PreviewHeader meta={meta} canEdit={canEdit} onStartEditing={onStartEditing} />
         <CollectedInformation
           options={{
             businessBeneficialOwners: !!collectBO,
@@ -70,11 +53,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
 
   return (
     <Container>
-      <PreviewHeader
-        meta={meta}
-        canEdit={canEdit}
-        onStartEditing={onStartEditing}
-      />
+      <PreviewHeader meta={meta} canEdit={canEdit} onStartEditing={onStartEditing} />
       <FormElementsContainer>
         {isKyb && (
           <CollectedInformation
@@ -94,10 +73,7 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
           }}
         />
         {showUsResidentsEmptyState ? (
-          <CollectedInformation
-            title={t('us-residents.title')}
-            subtitle={t('us-residents.empty')}
-          />
+          <CollectedInformation title={t('us-residents.title')} subtitle={t('us-residents.empty')} />
         ) : (
           <CollectedInformation
             title={t('us-residents.title')}
@@ -108,24 +84,17 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
                 optional: values.ssnOptional,
               },
               usLegalStatus: values.us_legal_status,
-              ...(values.ssnDocScanStepUp
-                ? { ssnDocScanStepUp: values.ssnDocScanStepUp }
-                : {}),
+              ...(values.ssnDocScanStepUp ? { ssnDocScanStepUp: values.ssnDocScanStepUp } : {}),
             }}
           />
         )}
         {showNonUsResidentsEmptyState ? (
-          <CollectedInformation
-            title={t('non-us-residents.title')}
-            subtitle={t('non-us-residents.empty')}
-          />
+          <CollectedInformation title={t('non-us-residents.title')} subtitle={t('non-us-residents.empty')} />
         ) : (
           <CollectedInformation
             title={t('non-us-residents.title')}
             options={{
-              ...(meta.residency?.countryList
-                ? { countriesRestrictions: meta.residency?.countryList }
-                : {}),
+              ...(meta.residency?.countryList ? { countriesRestrictions: meta.residency?.countryList } : {}),
             }}
           />
         )}

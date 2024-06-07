@@ -1,8 +1,8 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { getLogger, Logger, useGetOnboardingConfig } from '@onefootprint/idv';
+import { Logger, getLogger, useGetOnboardingConfig } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
-import { media, Shimmer } from '@onefootprint/ui';
+import { Shimmer, media } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
@@ -21,10 +21,7 @@ const Init = () => {
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
 
   useParseUrl({
-    onSuccess: (
-      parsedObConfigAuth?: ObConfigAuth,
-      parsedAuthToken?: string,
-    ) => {
+    onSuccess: (parsedObConfigAuth?: ObConfigAuth, parsedAuthToken?: string) => {
       send({
         type: 'initContextUpdated',
         payload: {

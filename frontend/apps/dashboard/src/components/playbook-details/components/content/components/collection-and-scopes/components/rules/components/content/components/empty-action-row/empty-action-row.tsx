@@ -1,23 +1,11 @@
-import {
-  IcoBroadcast16,
-  IcoDotsHorizontal16,
-  IcoShuffle16,
-  IcoTrash16,
-} from '@onefootprint/icons';
-import type {
-  ListRuleField,
-  RiskSignalRuleField,
-  RuleAction,
-} from '@onefootprint/types';
+import { IcoBroadcast16, IcoDotsHorizontal16, IcoShuffle16, IcoTrash16 } from '@onefootprint/icons';
+import type { ListRuleField, RiskSignalRuleField, RuleAction } from '@onefootprint/types';
 import { ListRuleOp, RiskSignalRuleOp } from '@onefootprint/types';
 import { Button, IconButton, Stack, Text } from '@onefootprint/ui';
 import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ListRuleChip,
-  RiskSignalRuleChip,
-} from 'src/components/rules-action-row/components/rule-chip';
+import { ListRuleChip, RiskSignalRuleChip } from 'src/components/rules-action-row/components/rule-chip';
 import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -32,28 +20,19 @@ export type EmptyActionRowProps = {
   onDelete: (id: string) => void;
 };
 
-const EmptyActionRow = ({
-  action,
-  tempId,
-  onEdit,
-  onDelete,
-}: EmptyActionRowProps) => {
+const EmptyActionRow = ({ action, tempId, onEdit, onDelete }: EmptyActionRowProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row',
   });
   const { data: lists } = useLists();
-  const [expressions, setExpressions] = useState<
-    (RiskSignalRuleField | ListRuleField)[]
-  >([]);
+  const [expressions, setExpressions] = useState<(RiskSignalRuleField | ListRuleField)[]>([]);
 
   const ref = useRef<HTMLDivElement>(null);
   useEffectOnce(() => {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
-  const handleChange = (
-    newExpression: (RiskSignalRuleField | ListRuleField)[],
-  ) => {
+  const handleChange = (newExpression: (RiskSignalRuleField | ListRuleField)[]) => {
     onEdit({
       ruleAction: action,
       ruleExpression:
@@ -65,21 +44,18 @@ const EmptyActionRow = ({
   };
 
   // Using index instead of expression in case the rule has the same expression multiple times
-  const handleChangeExpression =
-    (index: number) => (newExpression: RiskSignalRuleField | ListRuleField) => {
-      setExpressions(currentExpressions => {
-        const newExpressions = [...currentExpressions];
-        newExpressions[index] = newExpression;
-        handleChange(newExpressions);
-        return newExpressions;
-      });
-    };
+  const handleChangeExpression = (index: number) => (newExpression: RiskSignalRuleField | ListRuleField) => {
+    setExpressions(currentExpressions => {
+      const newExpressions = [...currentExpressions];
+      newExpressions[index] = newExpression;
+      handleChange(newExpressions);
+      return newExpressions;
+    });
+  };
 
   const handleDeleteExpression = (index: number) => {
     setExpressions(currentExpressions => {
-      const newExpressions = currentExpressions
-        .slice(0, index)
-        .concat(currentExpressions.slice(index + 1));
+      const newExpressions = currentExpressions.slice(0, index).concat(currentExpressions.slice(index + 1));
       handleChange(newExpressions);
       return newExpressions;
     });
@@ -87,10 +63,7 @@ const EmptyActionRow = ({
 
   const handleAddRiskSignalExpression = () => {
     setExpressions(currentExpressions => {
-      const newExpressions = [
-        ...currentExpressions,
-        { field: '', op: RiskSignalRuleOp.eq, value: true },
-      ];
+      const newExpressions = [...currentExpressions, { field: '', op: RiskSignalRuleOp.eq, value: true }];
       handleChange(newExpressions);
       return newExpressions;
     });
@@ -125,8 +98,7 @@ const EmptyActionRow = ({
                     {t('and')}
                   </Text>
                 )}
-                {expression.op === ListRuleOp.isIn ||
-                expression.op === ListRuleOp.isNotIn ? (
+                {expression.op === ListRuleOp.isIn || expression.op === ListRuleOp.isNotIn ? (
                   <ListRuleChip
                     isEditing
                     defaultExpression={expression}
@@ -160,9 +132,7 @@ const EmptyActionRow = ({
         <Button
           variant="secondary"
           prefixIcon={IcoBroadcast16}
-          disabled={expressions.some(
-            expression => !expression.field || !expression.value,
-          )}
+          disabled={expressions.some(expression => !expression.field || !expression.value)}
           onClick={handleAddRiskSignalExpression}
         >
           {t('add-risk-signal')}
@@ -170,9 +140,7 @@ const EmptyActionRow = ({
         <Button
           variant="secondary"
           prefixIcon={IcoShuffle16}
-          disabled={expressions.some(
-            expression => !expression.field || !expression.value,
-          )}
+          disabled={expressions.some(expression => !expression.field || !expression.value)}
           onClick={handleAddListExpression}
         >
           {t('add-list')}

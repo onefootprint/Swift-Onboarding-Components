@@ -8,8 +8,6 @@ import AuditTrailTimeline from './components/audit-trail-timeline';
 type ContentProps = WithEntityProps & {
   timeline: Timeline;
 };
-const Content = ({ timeline, entity }: ContentProps) => (
-  <AuditTrailTimeline entity={entity} timeline={timeline} />
-);
+const Content = ({ timeline, entity }: ContentProps) => <AuditTrailTimeline entity={entity} timeline={timeline} />;
 
 export default Content;

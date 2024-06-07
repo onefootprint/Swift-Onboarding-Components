@@ -1,4 +1,4 @@
-import { Button, media, Text } from '@onefootprint/ui';
+import { Button, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

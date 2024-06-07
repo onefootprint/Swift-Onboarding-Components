@@ -1,12 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import {
-  createUseRouterSpy,
-  render,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, render, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
   CollectedKybDataOption,
@@ -16,11 +9,7 @@ import {
   OnboardingRequirementKind,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
-import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { Layout } from 'src/components/layout';
 
@@ -42,9 +31,9 @@ describe.skip('<CollectKybData />', () => {
   const queryClient = new QueryClient({
     queryCache,
     logger: {
-      log: () => {},
-      warn: () => {},
-      error: () => {},
+      log: () => undefined,
+      warn: () => undefined,
+      error: () => undefined,
     },
     defaultOptions: {
       queries: {
@@ -126,11 +115,7 @@ describe.skip('<CollectKybData />', () => {
           <DesignSystemProvider theme={themes.light}>
             <ToastProvider>
               <Layout>
-                <CollectKybData
-                  idvContext={idvContext}
-                  context={context}
-                  onDone={onDone}
-                />
+                <CollectKybData idvContext={idvContext} context={context} onDone={onDone} />
               </Layout>
             </ToastProvider>
           </DesignSystemProvider>
@@ -153,16 +138,8 @@ describe.skip('<CollectKybData />', () => {
       const onDone = jest.fn();
       renderPlugin(
         getContext(
-          [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.dob,
-            CollectedKycDataOption.ssn4,
-          ],
-          [
-            CollectedKybDataOption.name,
-            CollectedKybDataOption.tin,
-            CollectedKybDataOption.beneficialOwners,
-          ],
+          [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn4],
+          [CollectedKybDataOption.name, CollectedKybDataOption.tin, CollectedKybDataOption.beneficialOwners],
           onDone,
         ),
       );
@@ -180,9 +157,7 @@ describe.skip('<CollectKybData />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('We need some information about your business.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('We need some information about your business.')).toBeInTheDocument();
       });
 
       let businessName = screen.getByLabelText('Business name');
@@ -201,9 +176,7 @@ describe.skip('<CollectKybData />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Who are the beneficial owners?'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Who are the beneficial owners?')).toBeInTheDocument();
       });
 
       let firstName = screen.getByLabelText('First name');
@@ -216,9 +189,7 @@ describe.skip('<CollectKybData />', () => {
       expect(screen.getByPlaceholderText('Doe')).toBeInTheDocument();
       await userEvent.type(lastName, 'Doe');
 
-      let ownershipStake = screen.getByLabelText(
-        'Approximate ownership stake (%)',
-      );
+      let ownershipStake = screen.getByLabelText('Approximate ownership stake (%)');
       expect(ownershipStake).toBeInTheDocument();
       expect(screen.getByPlaceholderText('25')).toBeInTheDocument();
       await userEvent.type(ownershipStake, '50');
@@ -228,9 +199,7 @@ describe.skip('<CollectKybData />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Confirm your business data'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Confirm your business data')).toBeInTheDocument();
       });
 
       firstName = screen.getByText('John');
@@ -286,17 +255,12 @@ describe.skip('<CollectKybData />', () => {
 
       // edit a beneficial owner
       let beneficialOwnersSection = screen.getByTestId('beneficial-owners');
-      let beneficialOwnersEdit = within(beneficialOwnersSection).getByRole(
-        'button',
-        { name: 'Edit' },
-      );
+      let beneficialOwnersEdit = within(beneficialOwnersSection).getByRole('button', { name: 'Edit' });
       await userEvent.click(beneficialOwnersEdit);
 
       // check that we can edit approximate ownership, cancel the change, and the original value persists
       await waitFor(() => {
-        expect(
-          screen.getByLabelText('Approximate ownership stake (%)'),
-        ).toBeInTheDocument();
+        expect(screen.getByLabelText('Approximate ownership stake (%)')).toBeInTheDocument();
       });
       ownershipStake = screen.getByLabelText('Approximate ownership stake (%)');
       await userEvent.clear(ownershipStake);
@@ -310,10 +274,7 @@ describe.skip('<CollectKybData />', () => {
 
       // now, edit approximate ownership, save the change, and show that changed value persists
       beneficialOwnersSection = screen.getByTestId('beneficial-owners');
-      beneficialOwnersEdit = within(beneficialOwnersSection).getByRole(
-        'button',
-        { name: 'Edit' },
-      );
+      beneficialOwnersEdit = within(beneficialOwnersSection).getByRole('button', { name: 'Edit' });
       await userEvent.click(beneficialOwnersEdit);
 
       ownershipStake = screen.getByLabelText('Approximate ownership stake (%)');
@@ -331,10 +292,7 @@ describe.skip('<CollectKybData />', () => {
 
       // see if edit button shows up in beneficial owners section again (because we are done editing)
       beneficialOwnersSection = screen.getByTestId('beneficial-owners');
-      beneficialOwnersEdit = within(beneficialOwnersSection).getByRole(
-        'button',
-        { name: 'Edit' },
-      );
+      beneficialOwnersEdit = within(beneficialOwnersSection).getByRole('button', { name: 'Edit' });
       await waitFor(() => {
         expect(beneficialOwnersEdit).toBeInTheDocument();
       });
@@ -371,11 +329,7 @@ describe.skip('<CollectKybData />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'What are the last 4 digits of your Social Security Number?',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('What are the last 4 digits of your Social Security Number?')).toBeInTheDocument();
       });
 
       const ssn4 = screen.getByLabelText('SSN (last 4)');
@@ -387,9 +341,7 @@ describe.skip('<CollectKybData />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Confirm your personal data'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Confirm your personal data')).toBeInTheDocument();
       });
 
       firstName = screen.getByText('John');

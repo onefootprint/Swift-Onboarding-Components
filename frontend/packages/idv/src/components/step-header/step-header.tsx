@@ -15,20 +15,11 @@ type HeaderProps = {
   title: string | JSX.Element;
 };
 
-const StepHeader = ({
-  leftButton,
-  logoUrl,
-  orgName,
-  showLogo,
-  subtitle,
-  title,
-}: HeaderProps) => (
+const StepHeader = ({ leftButton, logoUrl, orgName, showLogo, subtitle, title }: HeaderProps) => (
   <>
     <NavigationHeader leftButton={leftButton} />
     <ContentHeader>
-      {showLogo && orgName ? (
-        <Logo orgName={orgName} logoUrl={logoUrl} />
-      ) : null}
+      {showLogo && orgName ? <Logo orgName={orgName} logoUrl={logoUrl} /> : null}
       <HeaderTitle title={title} subtitle={subtitle} />
     </ContentHeader>
   </>

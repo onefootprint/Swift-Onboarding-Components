@@ -10,9 +10,11 @@ const CardContainer = styled(motion(Stack))<{ size?: 'compact' | 'default' }>`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     background-color: ${theme.backgroundColor.primary};
     gap: ${size === 'compact' ? theme.spacing[5] : theme.spacing[7]};
-    padding: ${size === 'compact'
-      ? `${theme.spacing[5]} ${theme.spacing[7]}`
-      : `${theme.spacing[7]} ${theme.spacing[7]} ${theme.spacing[5]} ${theme.spacing[7]}`};
+    padding: ${
+      size === 'compact'
+        ? `${theme.spacing[5]} ${theme.spacing[7]}`
+        : `${theme.spacing[7]} ${theme.spacing[7]} ${theme.spacing[5]} ${theme.spacing[7]}`
+    };
   `}
 `;
 

@@ -13,12 +13,7 @@ export type SectionProps = {
   docScanForOptionalSsn?: string;
 };
 
-const Section = ({
-  canAccessData,
-  title,
-  displayScopes,
-  docScanForOptionalSsn,
-}: SectionProps) => {
+const Section = ({ canAccessData, title, displayScopes, docScanForOptionalSsn }: SectionProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.collected-data',
   });
@@ -29,12 +24,8 @@ const Section = ({
       displayScopes.includes(scope) && !scope.includes('document'),
   );
 
-  const documentString =
-    docScanForOptionalSsn ||
-    canAccessData.filter(scopes => scopes.includes('document'))?.[0];
-  const idDocKinds = Object.values(SupportedIdDocTypes).filter(v =>
-    documentString?.includes(v),
-  );
+  const documentString = docScanForOptionalSsn || canAccessData.filter(scopes => scopes.includes('document'))?.[0];
+  const idDocKinds = Object.values(SupportedIdDocTypes).filter(v => documentString?.includes(v));
   if (displayScopes.includes('document')) {
     dataToDisplay.push(...idDocKinds);
   }

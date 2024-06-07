@@ -19,14 +19,10 @@ const Content = ({ ruleResults, actionTriggered }: ContentProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
   });
-  const isStepUpSubsection = [
-    RuleAction.stepUpIdentity,
-    RuleAction.stepUpPoA,
-    RuleAction.stepUpIdentitySsn,
-  ].includes(actionTriggered);
-  const actionName = isStepUpSubsection
-    ? 'step-up'
-    : kebabCase(actionTriggered);
+  const isStepUpSubsection = [RuleAction.stepUpIdentity, RuleAction.stepUpPoA, RuleAction.stepUpIdentitySsn].includes(
+    actionTriggered,
+  );
+  const actionName = isStepUpSubsection ? 'step-up' : kebabCase(actionTriggered);
   const textColors: Record<string, Color> = {
     fail: 'error',
     'step-up': 'info',
@@ -46,11 +42,7 @@ const Content = ({ ruleResults, actionTriggered }: ContentProps) => {
         </Text>
       </ActionTriggered>
       {Object.values(RuleActionSection).map(actionSection => (
-        <ActionResultSection
-          key={actionSection}
-          actionSection={actionSection}
-          data={ruleResults}
-        />
+        <ActionResultSection key={actionSection} actionSection={actionSection} data={ruleResults} />
       ))}
     </Stack>
   );

@@ -13,16 +13,10 @@ const Loading = () => (
   </Box>
 );
 
-const Avatar = () => (
-  <Shimmer height="40px" width="40px" borderRadius="default" />
-);
+const Avatar = () => <Shimmer height="40px" width="40px" borderRadius="default" />;
 
-const Label = () => (
-  <Shimmer height="24px" width="143px" borderRadius="default" />
-);
+const Label = () => <Shimmer height="24px" width="143px" borderRadius="default" />;
 
-const Value = () => (
-  <Shimmer height="20px" width="168px" borderRadius="default" />
-);
+const Value = () => <Shimmer height="20px" width="168px" borderRadius="default" />;
 
 export default Loading;

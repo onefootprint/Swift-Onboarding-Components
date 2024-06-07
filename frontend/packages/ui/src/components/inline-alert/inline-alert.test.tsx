@@ -7,11 +7,7 @@ import type { InlineAlertProps } from './inline-alert';
 import InlineAlert from './inline-alert';
 
 describe('<InlineAlert />', () => {
-  const renderInlineAlert = ({
-    cta,
-    children = 'alert content',
-    variant = 'warning',
-  }: Partial<InlineAlertProps>) =>
+  const renderInlineAlert = ({ cta, children = 'alert content', variant = 'warning' }: Partial<InlineAlertProps>) =>
     customRender(
       <InlineAlert variant={variant} cta={cta}>
         {children}

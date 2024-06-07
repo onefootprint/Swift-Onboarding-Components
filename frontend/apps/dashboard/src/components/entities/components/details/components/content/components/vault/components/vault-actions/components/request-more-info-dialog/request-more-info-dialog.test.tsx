@@ -16,14 +16,14 @@ import {
   withPlaybooks,
 } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
+import type { RequestMoreInfoDialogProps } from './request-more-info-dialog';
+import RequestMoreInfoDialog from './request-more-info-dialog';
 import {
   entityFixture,
   entityFixtureWithIncompleteOnboarding,
   withEntity,
   withEntityWithIncompleteOnboarding,
 } from './request-more-info.test.config';
-import type { RequestMoreInfoDialogProps } from './request-more-info-dialog';
-import RequestMoreInfoDialog from './request-more-info-dialog';
 
 const defaultOptions = {
   open: true,
@@ -35,8 +35,7 @@ const useRouterSpy = createUseRouterSpy();
 const renderDialog = ({
   open = defaultOptions.open,
   onClose = defaultOptions.onClose,
-}: Partial<RequestMoreInfoDialogProps>) =>
-  customRender(<RequestMoreInfoDialog open={open} onClose={onClose} />);
+}: Partial<RequestMoreInfoDialogProps>) => customRender(<RequestMoreInfoDialog open={open} onClose={onClose} />);
 
 describe('<RequestMoreInfoDialog />', () => {
   beforeEach(() => {
@@ -75,9 +74,7 @@ describe('<RequestMoreInfoDialog />', () => {
     });
     await userEvent.click(nextButton);
     await waitFor(() => {
-      const documentWarning = screen.getByText(
-        'You must select a document type',
-      );
+      const documentWarning = screen.getByText('You must select a document type');
       expect(documentWarning).toBeInTheDocument();
     });
     const onboardingOption = screen.getByRole('radio', {
@@ -96,9 +93,7 @@ describe('<RequestMoreInfoDialog />', () => {
 
   describe('Incomplete onboarding', () => {
     beforeEach(() => {
-      withEntityWithIncompleteOnboarding(
-        entityFixtureWithIncompleteOnboarding.id,
-      );
+      withEntityWithIncompleteOnboarding(entityFixtureWithIncompleteOnboarding.id);
       withPlaybooks();
       withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
       useRouterSpy({
@@ -185,18 +180,14 @@ describe('<RequestMoreInfoDialog />', () => {
 
       // We should then render the link on the next page
       await waitFor(() => {
-        expect(
-          screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
-        ).toBeInTheDocument();
+        expect(screen.getByDisplayValue('http://footprint.link/#tok_xxx')).toBeInTheDocument();
       });
 
       // Can copy the link using the button
       const copyButton = screen.getByRole('button', { name: 'Copy link' });
       await userEvent.click(copyButton);
       await waitFor(() => {
-        expect(writeTestMockFn).toHaveBeenCalledWith(
-          'http://footprint.link/#tok_xxx',
-        );
+        expect(writeTestMockFn).toHaveBeenCalledWith('http://footprint.link/#tok_xxx');
       });
       expect(onCloseMockFn).toHaveBeenCalled();
       expect(true).toBe(true);
@@ -257,18 +248,14 @@ describe('<RequestMoreInfoDialog />', () => {
 
       // We should then render the link on the next page
       await waitFor(() => {
-        expect(
-          screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
-        ).toBeInTheDocument();
+        expect(screen.getByDisplayValue('http://footprint.link/#tok_xxx')).toBeInTheDocument();
       });
 
       // Can copy the link using the button
       const copyButton = screen.getByRole('button', { name: 'Copy link' });
       await userEvent.click(copyButton);
       await waitFor(() => {
-        expect(writeTestMockFn).toHaveBeenCalledWith(
-          'http://footprint.link/#tok_xxx',
-        );
+        expect(writeTestMockFn).toHaveBeenCalledWith('http://footprint.link/#tok_xxx');
       });
       expect(onCloseMockFn).toHaveBeenCalled();
     });
@@ -313,9 +300,7 @@ describe('<RequestMoreInfoDialog />', () => {
       });
       await userEvent.click(nextButton);
       await waitFor(() => {
-        expect(
-          screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
-        ).toBeInTheDocument();
+        expect(screen.getByDisplayValue('http://footprint.link/#tok_xxx')).toBeInTheDocument();
       });
 
       const sendButton = screen.getByRole('button', {
@@ -323,11 +308,7 @@ describe('<RequestMoreInfoDialog />', () => {
       });
       await userEvent.click(sendButton);
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'User will receive an email detailing the next steps shortly',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('User will receive an email detailing the next steps shortly')).toBeInTheDocument();
       });
     });
   });

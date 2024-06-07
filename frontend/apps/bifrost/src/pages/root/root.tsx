@@ -1,16 +1,8 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import {
-  FootprintPrivateEvent,
-  type FootprintVariant,
-} from '@onefootprint/footprint-js';
+import { FootprintPrivateEvent, type FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import type { IdvCompletePayload } from '@onefootprint/idv';
-import Idv, {
-  AppErrorBoundary,
-  getLogger,
-  useFootprintProvider,
-  useLogStateMachine,
-} from '@onefootprint/idv';
+import Idv, { AppErrorBoundary, getLogger, useFootprintProvider, useLogStateMachine } from '@onefootprint/idv';
 import { useIdentifyValidate } from '@onefootprint/idv/src/hooks/api';
 import { checkIsAndroid } from '@onefootprint/idv/src/utils';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
@@ -32,18 +24,8 @@ const { logError, logInfo } = getLogger({ location: 'bifrost-root' });
 const Root = ({ variant }: RootProps) => {
   const fpProvider = useFootprintProvider();
   const [state, send] = useBifrostMachine();
-  const {
-    bootstrapData,
-    l10n,
-    showCompletionPage,
-    showLogo,
-    authToken,
-    publicKey,
-    isComponentsSdk,
-  } = state.context;
-  const obConfigAuth = publicKey
-    ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey }
-    : undefined;
+  const { bootstrapData, l10n, showCompletionPage, showLogo, authToken, publicKey, isComponentsSdk } = state.context;
+  const obConfigAuth = publicKey ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey } : undefined;
 
   const isAndroidWebview = !checkIsIframe() && checkIsAndroid();
   const shouldShowCompletionPage = showCompletionPage || isAndroidWebview;
@@ -69,9 +51,7 @@ const Root = ({ variant }: RootProps) => {
     authToken: idvAuthToken,
     deviceResponseJson,
   }: IdvCompletePayload) => {
-    logInfo(
-      'IDV flow is complete, sending validation token back to the tenant',
-    );
+    logInfo('IDV flow is complete, sending validation token back to the tenant');
     if (validationToken) {
       if (!shouldShowCompletionPage) {
         fpProvider.complete({
@@ -102,8 +82,7 @@ const Root = ({ variant }: RootProps) => {
   let componentsSdkContext;
   if (isComponentsSdk) {
     componentsSdkContext = {
-      onRelayFromComponents: (cb: () => void) =>
-        fpProvider.on(FootprintPrivateEvent.relayFromComponents, cb),
+      onRelayFromComponents: (cb: () => void) => fpProvider.on(FootprintPrivateEvent.relayFromComponents, cb),
       relayToComponents: fpProvider.relayToComponents,
     };
   }
@@ -132,14 +111,8 @@ const Root = ({ variant }: RootProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({
-  query,
-  res,
-}) => {
-  res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=30, stale-while-revalidate=3600',
-  );
+export const getServerSideProps: GetServerSideProps = async ({ query, res }) => {
+  res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=3600');
 
   const obConfig = query.public_key as string | undefined;
   const language = query.lng as string | undefined;

@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import ContinueButton from './components/continue-button';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 
 type OptionsContainerProps = {
   children: React.ReactNode;
@@ -32,7 +32,7 @@ const CustomForm = ({
     <Container data-private data-dd-privacy="mask">
       {children}
     </Container>
-    {error && <Error label={error} />}
+    {error && <ErrorComponent label={error} />}
     <ContinueButton isLoading={isLoading} label={ctaLabel} />
   </Form>
 );

@@ -33,11 +33,7 @@ const Backtest = () => {
   return (
     <BaseCard overflow="hidden" ref={cardRef}>
       <CardTitle title={t('title')} subtitle={t('subtitle')} />
-      <TableContainer
-        initial="initial"
-        animate={isHover ? 'hover' : 'initial'}
-        variants={statusTableCardVariants}
-      >
+      <TableContainer initial="initial" animate={isHover ? 'hover' : 'initial'} variants={statusTableCardVariants}>
         <StatusTable />
       </TableContainer>
     </BaseCard>

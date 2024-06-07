@@ -1,18 +1,9 @@
 import type { Window } from './@types/global';
 import { RequiredCallbacksByComponent } from './constants/callbacks';
-import type {
-  ComponentKind,
-  Footprint,
-  Props,
-  Variant,
-} from './types/components';
+import type { ComponentKind, Footprint, Props, Variant } from './types/components';
 import { getAppearanceForVanilla } from './utils/appearance-utils';
 import getUniqueId from './utils/get-unique-id';
-import {
-  getDefaultVariantForKind,
-  validateComponentKind,
-  validateComponentVariant,
-} from './utils/prop-utils';
+import { getDefaultVariantForKind, validateComponentKind, validateComponentVariant } from './utils/prop-utils';
 
 const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
@@ -26,18 +17,14 @@ const vanillaIntegration = (footprint: Footprint) => {
   const getCallbacks = (kind: ComponentKind) => {
     const callbacks = (window as Window).footprintCallbacks ?? {};
     if (!isObject(callbacks)) {
-      throw Error(
-        '`window.footprintCallbacks` must be a valid mapping from callback names to functions.',
-      );
+      throw Error('`window.footprintCallbacks` must be a valid mapping from callback names to functions.');
     }
 
     // Make sure all expected callbacks for this component kind are provided
     const requiredCallbacks = RequiredCallbacksByComponent[kind];
     requiredCallbacks.forEach(callbackName => {
       if (!callbacks[callbackName]) {
-        throw Error(
-          `Callback '${callbackName}' must be defined in window.footprintCallbacks`,
-        );
+        throw Error(`Callback '${callbackName}' must be defined in window.footprintCallbacks`);
       }
     });
 
@@ -48,9 +35,7 @@ const vanillaIntegration = (footprint: Footprint) => {
     const kind = container.getAttribute('data-kind') as ComponentKind;
     validateComponentKind(kind);
 
-    const variant =
-      (container.getAttribute('data-variant') as Variant) ??
-      getDefaultVariantForKind(kind);
+    const variant = (container.getAttribute('data-variant') as Variant) ?? getDefaultVariantForKind(kind);
     validateComponentVariant(kind, variant);
 
     const appearance = getAppearanceForVanilla();
@@ -64,9 +49,7 @@ const vanillaIntegration = (footprint: Footprint) => {
       throw Error(`Could not parse \`data-props\` for footprint.`);
     }
     if (!isObject(props)) {
-      throw Error(
-        '`data-props` on the footprint element has to be a valid JSON object stringified.',
-      );
+      throw Error('`data-props` on the footprint element has to be a valid JSON object stringified.');
     }
     const containerId = getUniqueId();
     container.setAttribute('id', containerId);

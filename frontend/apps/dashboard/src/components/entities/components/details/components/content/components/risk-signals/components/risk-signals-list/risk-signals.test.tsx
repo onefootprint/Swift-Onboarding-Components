@@ -1,18 +1,8 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import React from 'react';
 
 import RiskSignalsList from '.';
-import {
-  withRiskSignals,
-  withRiskSignalsError,
-} from './risk-signals.test.config';
+import { withRiskSignals, withRiskSignalsError } from './risk-signals.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 const id = 'fp_id_yCZehsWNeywHnk5JqL20u';
@@ -56,9 +46,7 @@ describe('<RiskSignals />', () => {
 
       await waitFor(() => {
         const table = screen.getByRole('table');
-        expect(
-          within(table).getByText('Something went wrong'),
-        ).toBeInTheDocument();
+        expect(within(table).getByText('Something went wrong')).toBeInTheDocument();
       });
     });
   });

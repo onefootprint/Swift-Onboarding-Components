@@ -9,20 +9,14 @@ const key = process.env.E2E_AUTH_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
 const email = 'sandbox@onefootprint.com';
 const phoneNumber = '5555550100';
 
-test('Auth with email, fill phone number, verify phone #ci', async ({
-  browserName,
-  isMobile,
-  page,
-}) => {
+test('Auth with email, fill phone number, verify phone #ci', async ({ browserName, isMobile, page }) => {
   test.slow();
 
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/auth?ob_key=${key}&app_url=${authAppUrl}&flow=${flowId}`,
-  );
+  await page.goto(`/components/auth?ob_key=${key}&app_url=${authAppUrl}&flow=${flowId}`);
   await page.waitForLoadState();
   await expect(page).toHaveURL(/.*auth/);
 
@@ -45,9 +39,7 @@ test('Auth with email, fill phone number, verify phone #ci', async ({
 
   await page.waitForLoadState();
 
-  const phoneEl = page
-    .frameLocator(iframeSelector)
-    .locator('input[name="phoneNumber"]');
+  const phoneEl = page.frameLocator(iframeSelector).locator('input[name="phoneNumber"]');
   await phoneEl.waitFor({ state: 'attached', timeout });
   await phoneEl.fill(phoneNumber);
 

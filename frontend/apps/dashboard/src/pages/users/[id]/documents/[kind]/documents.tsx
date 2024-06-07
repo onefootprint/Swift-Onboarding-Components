@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import NotFound from 'src/components/404';
 
 import Content from './components/content';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import useDocument from './hooks/use-document';
 
@@ -24,7 +24,7 @@ const Documents = () => {
         <Box aria-busy={isLoading}>
           {data && <Content documents={data} meta={meta} />}
           {isLoading && <Loading />}
-          {errorMessage && <Error message={errorMessage} />}
+          {errorMessage && <ErrorComponent message={errorMessage} />}
         </Box>
       )}
     </>

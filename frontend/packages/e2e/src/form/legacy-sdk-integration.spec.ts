@@ -19,12 +19,7 @@ const missingConfig = findMissingConfig();
 test.describe('/components/form', () => {
   test.describe.configure({ retries: missingConfig !== undefined ? 0 : 2 });
 
-  test('form.legacy-sdk-integration', async ({
-    browserName,
-    isMobile,
-    page,
-    request,
-  }) => {
+  test('form.legacy-sdk-integration', async ({ browserName, isMobile, page, request }) => {
     expect(missingConfig, missingConfig?.message).toBe(undefined);
 
     test.setTimeout(120000);
@@ -47,9 +42,7 @@ test.describe('/components/form', () => {
     });
     await saveFormViaRef({ page });
     await expect(page.getByTestId('result').first()).toContainText('completed');
-    await expect(page.getByTestId('ref-result').first()).toContainText(
-      'saved via ref',
-    );
+    await expect(page.getByTestId('ref-result').first()).toContainText('saved via ref');
 
     await decryptData({
       api: 'prod',

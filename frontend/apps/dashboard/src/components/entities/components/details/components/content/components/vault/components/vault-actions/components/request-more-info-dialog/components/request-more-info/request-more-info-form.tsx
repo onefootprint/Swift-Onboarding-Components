@@ -21,22 +21,17 @@ type RequestMoreInfoFormProps = {
   formId: string;
 };
 
-const RequestMoreInfoForm = ({
-  onSubmit,
-  formId,
-}: RequestMoreInfoFormProps) => {
+const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.actions.request-more-info.form',
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
   const hasPriorOnboarding = !!entity.data?.workflows.some(
-    wf =>
-      wf.status === WorkflowStatus.pass || wf.status === WorkflowStatus.fail,
+    wf => wf.status === WorkflowStatus.pass || wf.status === WorkflowStatus.fail,
   );
   const defaultVariant = hasPriorOnboarding ? 'document' : 'onboard';
-  const [requestVariant, setRequestVariant] =
-    useState<RequestVariant>(defaultVariant);
+  const [requestVariant, setRequestVariant] = useState<RequestVariant>(defaultVariant);
 
   const methods = useForm<TriggerFormData>({
     defaultValues: {
@@ -93,10 +88,7 @@ const RequestMoreInfoForm = ({
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
         <Stack direction="column" gap={4}>
-          <Tooltip
-            text={t('kind.cannot-request-document')}
-            disabled={hasPriorOnboarding}
-          >
+          <Tooltip text={t('kind.cannot-request-document')} disabled={hasPriorOnboarding}>
             <Radio
               label={t('request-variant.document')}
               checked={requestVariant === 'document'}
@@ -113,9 +105,7 @@ const RequestMoreInfoForm = ({
         <Stack direction="column">
           <RequestDocument visible={requestVariant === 'document'} />
           <RequestOnboard visible={requestVariant === 'onboard'} />
-          {errors.kinds && (
-            <Hint hasError>{errors.kinds.message as string}</Hint>
-          )}
+          {errors.kinds && <Hint hasError>{errors.kinds.message as string}</Hint>}
         </Stack>
         <Divider variant="secondary" />
         <FrequentNotesTextArea

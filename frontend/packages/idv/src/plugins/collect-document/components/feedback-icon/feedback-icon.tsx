@@ -17,11 +17,7 @@ type FeedbackIconProps = {
 
 const FeedbackIcon = ({
   imageIcon: { component: ImageIcon, color: imageIconColor },
-  statusIndicator: {
-    component: statusIndicatorComponent,
-    status,
-    backgroundColor = 'primary',
-  },
+  statusIndicator: { component: statusIndicatorComponent, status, backgroundColor = 'primary' },
 }: FeedbackIconProps) => (
   <IconComponent>
     <ImageIcon color={imageIconColor} />

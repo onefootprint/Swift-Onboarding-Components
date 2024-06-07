@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  OrgAuthMagicLinkRequest,
-  OrgAuthMagicLinkResponse,
-} from '@onefootprint/types';
+import type { OrgAuthMagicLinkRequest, OrgAuthMagicLinkResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const login = async (payload: OrgAuthMagicLinkRequest) => {

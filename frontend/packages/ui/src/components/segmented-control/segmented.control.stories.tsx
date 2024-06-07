@@ -47,14 +47,7 @@ const Template: Story<SegmentedControlProps> = ({
     setSegment(value);
   }, [value]);
 
-  return (
-    <SegmentedControl
-      aria-label={ariaLabel}
-      onChange={handleChange}
-      options={options}
-      value={segment}
-    />
-  );
+  return <SegmentedControl aria-label={ariaLabel} onChange={handleChange} options={options} value={segment} />;
 };
 
 export const Base = Template.bind({});

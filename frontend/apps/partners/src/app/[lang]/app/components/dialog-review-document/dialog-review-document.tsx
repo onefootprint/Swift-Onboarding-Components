@@ -18,12 +18,7 @@ type DialogReviewDocumentProps = {
 const formId = 'form-review-doc-dialog';
 const getNote = getFormElementValue('textarea[name="optional-note"]');
 
-const DialogReviewDocument = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  options,
-}: DialogReviewDocumentProps) => {
+const DialogReviewDocument = ({ isOpen, onClose, onSubmit, options }: DialogReviewDocumentProps) => {
   const { t } = useTranslation('common');
   const [decision, setDecision] = useState<Option | undefined>(undefined);
 
@@ -64,11 +59,7 @@ const DialogReviewDocument = ({
           value={decision}
         />
         <Stack gap={1} flexDirection="column" marginTop={7}>
-          <TextArea
-            name="optional-note"
-            label={t('optional-note')}
-            placeholder={t('type-here')}
-          />
+          <TextArea name="optional-note" label={t('optional-note')} placeholder={t('type-here')} />
         </Stack>
       </form>
     </Dialog>

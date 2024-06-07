@@ -18,39 +18,28 @@ const entityVaultWithJustIDCardDIs: EntityVault = {
 };
 
 export const driversLicensePartialDIs: EntityVault = {
-  [`${DocumentDI.driversLicenseFullName}:456`]:
-    'test drivers license full name',
+  [`${DocumentDI.driversLicenseFullName}:456`]: 'test drivers license full name',
   [`${DocumentDI.driversLicenseDOB}:456`]: 'test drivers license DOB',
   [`${DocumentDI.driversLicenseGender}:456`]: 'test drivers license gender',
 };
 
 export const driversLicenseExtractedDIs: EntityVault = {
-  [`${DocumentDI.driversLicenseFullName}:456`]:
-    'test drivers license full name',
+  [`${DocumentDI.driversLicenseFullName}:456`]: 'test drivers license full name',
   [`${DocumentDI.driversLicenseDOB}:456`]: 'test drivers license DOB',
   [`${DocumentDI.driversLicenseGender}:456`]: 'test drivers license gender',
-  [`${DocumentDI.driversLicenseFullAddress}:456`]:
-    'test drivers license full address',
-  [`${DocumentDI.driversLicenseDocumentNumber}:456`]:
-    'test drivers license document number',
-  [`${DocumentDI.driversLicenseIssuedAt}:456`]:
-    'test drivers license issued at',
-  [`${DocumentDI.driversLicenseExpiresAt}:456`]:
-    'test drivers license expires at',
-  [`${DocumentDI.driversLicenseIssuingState}:456`]:
-    'test drivers license issuing state',
-  [`${DocumentDI.driversLicenseIssuingCountry}:456`]:
-    'test drivers license issuing country',
-  [`${DocumentDI.driversLicenseRefNumber}:456`]:
-    'test drivers license ref number',
+  [`${DocumentDI.driversLicenseFullAddress}:456`]: 'test drivers license full address',
+  [`${DocumentDI.driversLicenseDocumentNumber}:456`]: 'test drivers license document number',
+  [`${DocumentDI.driversLicenseIssuedAt}:456`]: 'test drivers license issued at',
+  [`${DocumentDI.driversLicenseExpiresAt}:456`]: 'test drivers license expires at',
+  [`${DocumentDI.driversLicenseIssuingState}:456`]: 'test drivers license issuing state',
+  [`${DocumentDI.driversLicenseIssuingCountry}:456`]: 'test drivers license issuing country',
+  [`${DocumentDI.driversLicenseRefNumber}:456`]: 'test drivers license ref number',
 };
 
 export const entityVaultWithJustDriverseLicenseDIs: EntityVault = {
-  [`${DocumentDI.latestDriversLicenseFront}:1738`]:
-    'test drivers license front',
+  [`${DocumentDI.latestDriversLicenseFront}:1738`]: 'test drivers license front',
   [`${DocumentDI.latestDriversLicenseBack}:1738`]: 'test drivers license back',
-  [`${DocumentDI.latestDriversLicenseSelfie}:1738`]:
-    'test drivers license selfie',
+  [`${DocumentDI.latestDriversLicenseSelfie}:1738`]: 'test drivers license selfie',
   ...driversLicenseExtractedDIs,
 };
 

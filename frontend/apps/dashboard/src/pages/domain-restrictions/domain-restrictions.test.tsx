@@ -1,10 +1,4 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
 import React from 'react';
 
 import {
@@ -122,11 +116,7 @@ describe('<DomainRestrictions />', () => {
       it('should show a success message and display in the table', async () => {
         await renderDomainRestrictionsAndWaitData();
         withAllowedDomains({
-          allowedOrigins: [
-            'https://www.onefootprint.com',
-            'https://www.acme.com',
-            'https://www.retro-bank.com',
-          ],
+          allowedOrigins: ['https://www.onefootprint.com', 'https://www.acme.com', 'https://www.retro-bank.com'],
           isLive: true,
         });
 

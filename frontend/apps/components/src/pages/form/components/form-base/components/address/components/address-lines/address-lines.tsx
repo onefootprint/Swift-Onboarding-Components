@@ -22,9 +22,7 @@ const AddressLines = ({ countryCode }: AddressLinesProps) => {
     keyPrefix: 'pages.secure-form.address.form',
   });
 
-  const handleAddressSelect = async (
-    prediction?: google.maps.places.AutocompletePrediction | null,
-  ) => {
+  const handleAddressSelect = async (prediction?: google.maps.places.AutocompletePrediction | null) => {
     if (!prediction) {
       return;
     }
@@ -47,9 +45,7 @@ const AddressLines = ({ countryCode }: AddressLinesProps) => {
       }
       if (result.state) {
         if (countryCode === 'US') {
-          const possibleState = STATES.find(
-            stateOption => stateOption.label === result.state,
-          );
+          const possibleState = STATES.find(stateOption => stateOption.label === result.state);
           if (possibleState) {
             setValue('state', possibleState);
           }

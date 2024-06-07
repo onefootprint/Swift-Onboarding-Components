@@ -11,10 +11,7 @@ import Text from '../text';
 import type { FootprintButtonSize } from './footprint-button.types';
 import footprintButtonFontVariantBySize from './footprint-button.utils';
 
-export type FootprintButtonProps = Omit<
-  ButtonProps,
-  'children' | 'variant' | 'size'
-> & {
+export type FootprintButtonProps = Omit<ButtonProps, 'children' | 'variant' | 'size'> & {
   text?: string;
   size?: FootprintButtonSize;
 };
@@ -34,11 +31,7 @@ const FootprintButton = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const className = buttonRef.current?.className;
   const isCustomAppearance = className?.includes('fp-custom-appearance');
-  const renderedIcon = () => (
-    <StyledIcoFootprint24
-      color={isCustomAppearance ? 'primary' : 'septenary'}
-    />
-  );
+  const renderedIcon = () => <StyledIcoFootprint24 color={isCustomAppearance ? 'primary' : 'septenary'} />;
 
   return (
     <Button

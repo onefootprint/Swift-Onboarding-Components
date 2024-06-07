@@ -58,13 +58,7 @@ const ruleTableContent: RuleTagProps[][] = [
 const RulesTable = () => (
   <TableContainer direction="column">
     {ruleTableContent.map((row, rowIndex) => (
-      <Row
-        direction="row"
-        align="center"
-        gap={3}
-        flexWrap="wrap"
-        key={uniqueId(`row-${rowIndex}-`)}
-      >
+      <Row direction="row" align="center" gap={3} flexWrap="wrap" key={uniqueId(`row-${rowIndex}-`)}>
         <Text variant="body-4" color="tertiary">
           if
         </Text>

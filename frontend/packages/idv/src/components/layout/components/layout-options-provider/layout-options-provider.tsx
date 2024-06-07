@@ -2,10 +2,7 @@ import constate from 'constate';
 import { useState } from 'react';
 
 import type { Options } from '../../types';
-import type {
-  NavigationHeaderBGVariant,
-  NavigationHeaderPositionTypes,
-} from '../navigation-header/types';
+import type { NavigationHeaderBGVariant, NavigationHeaderPositionTypes } from '../navigation-header/types';
 
 type Obj = Record<string, unknown>;
 type LayoutOptionsArgs = {
@@ -75,9 +72,7 @@ const useLocalLayoutOptions = ({ options, onClose }: LayoutOptionsArgs) => {
   };
 };
 
-const [LayoutOptionsProvider, useLayoutOptions] = constate(
-  useLocalLayoutOptions,
-);
+const [LayoutOptionsProvider, useLayoutOptions] = constate(useLocalLayoutOptions);
 
 export default LayoutOptionsProvider;
 export { useLayoutOptions };

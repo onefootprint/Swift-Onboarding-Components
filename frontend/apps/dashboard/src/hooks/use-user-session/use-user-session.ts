@@ -1,18 +1,12 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import type {
-  UserUpdateRequest,
-  UserUpdateResponse,
-} from '@onefootprint/types';
+import type { UserUpdateRequest, UserUpdateResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import type { AuthHeaders } from '../use-session';
 import useSession from '../use-session';
 
-const updateUser = async (
-  authHeaders: AuthHeaders,
-  data: UserUpdateRequest,
-) => {
+const updateUser = async (authHeaders: AuthHeaders, data: UserUpdateRequest) => {
   const response = await request<UserUpdateResponse>({
     data,
     headers: authHeaders,
@@ -30,8 +24,7 @@ const useUserSession = () => {
   const dangerouslyCastedData = session.dangerouslyCastedData.user;
 
   const mutation = useMutation({
-    mutationFn: (payload: UserUpdateRequest) =>
-      updateUser(session.authHeaders, payload),
+    mutationFn: (payload: UserUpdateRequest) => updateUser(session.authHeaders, payload),
     onSuccess: session.updateUserName,
     onError: showErrorToast,
   });

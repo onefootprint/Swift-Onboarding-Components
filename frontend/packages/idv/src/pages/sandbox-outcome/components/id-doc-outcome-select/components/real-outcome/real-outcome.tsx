@@ -40,11 +40,7 @@ const RealOutcome = ({ onSelect, isSelected }: RealOutcomeProps) => {
           />
         )}
       />
-      <Tooltip
-        text={t('real-outcome.description')}
-        alignment="start"
-        position="top"
-      >
+      <Tooltip text={t('real-outcome.description')} alignment="start" position="top">
         <IcoInfo16 />
       </Tooltip>
     </Container>

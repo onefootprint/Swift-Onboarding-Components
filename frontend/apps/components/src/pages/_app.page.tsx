@@ -31,9 +31,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           </FootprintProvider>
         </AppearanceProvider>
       </QueryClientProvider>
-      {GOOGLE_MAPS_SRC ? (
-        <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" />
-      ) : null}
+      {GOOGLE_MAPS_SRC ? <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" /> : null}
     </>
   );
 };

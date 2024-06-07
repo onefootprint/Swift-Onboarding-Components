@@ -3,14 +3,8 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type {
-  Content,
-  ContentSchema,
-} from '@/api-reference/api-reference.types';
-import {
-  getExample,
-  getSchemaFromComponent,
-} from '@/api-reference/utils/get-schemas';
+import type { Content, ContentSchema } from '@/api-reference/api-reference.types';
+import { getExample, getSchemaFromComponent } from '@/api-reference/utils/get-schemas';
 
 export type DemoCodeProps = {
   responses: Record<string, Content>;
@@ -22,15 +16,11 @@ const DemoCode = ({ requestBody, responses }: DemoCodeProps) => {
   const requestSchema = getSchemaFromComponent(requestBody);
   return (
     <Container>
-      {requestSchema && (
-        <Block title={t('request-example')} schema={requestSchema} />
-      )}
+      {requestSchema && <Block title={t('request-example')} schema={requestSchema} />}
       {responses
         ? Object.entries(responses).map(([code]) => {
             const schema = getSchemaFromComponent(responses[code]);
-            return schema ? (
-              <Block key={code} title={t('response-example')} schema={schema} />
-            ) : null;
+            return schema ? <Block key={code} title={t('response-example')} schema={schema} /> : null;
           })
         : null}
     </Container>

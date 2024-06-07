@@ -14,18 +14,13 @@ export const AdditionalDocumentsCard = () => {
 
   return (
     <CardContainer size="compact">
-      <CardTitle
-        type="add"
-        onClick={() => setIsExtraContentVisible(prev => !prev)}
-      >
+      <CardTitle type="add" onClick={() => setIsExtraContentVisible(prev => !prev)}>
         {t('title')}
       </CardTitle>
       <Text variant="body-3" color="tertiary">
         {t('subtitle')}
       </Text>
-      <CardAppearContent isVisible={isExtraContentVisible}>
-        {t('extra-content')}
-      </CardAppearContent>
+      <CardAppearContent isVisible={isExtraContentVisible}>{t('extra-content')}</CardAppearContent>
     </CardContainer>
   );
 };

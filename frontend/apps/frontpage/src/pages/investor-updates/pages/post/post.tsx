@@ -37,11 +37,7 @@ const Post = ({ post }: PostProps) => {
           <WritingLayout>
             <Box marginBottom={8}>
               <Link href="/investor-updates" passHref legacyBehavior>
-                <LinkButton
-                  iconPosition="left"
-                  iconComponent={IcoChevronLeftBig24}
-                  href="/investor-updates"
-                >
+                <LinkButton iconPosition="left" iconComponent={IcoChevronLeftBig24} href="/investor-updates">
                   {t('go-back')}
                 </LinkButton>
               </Link>

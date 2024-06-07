@@ -1,8 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { PinnedNoteProps } from './pinned-note';
@@ -20,20 +16,8 @@ describe('<PinnedNote />', () => {
     });
   });
 
-  const renderPinnedNote = ({
-    author,
-    note,
-    timestamp,
-    noteId,
-  }: PinnedNoteProps) =>
-    customRender(
-      <PinnedNote
-        author={author}
-        note={note}
-        timestamp={timestamp}
-        noteId={noteId}
-      />,
-    );
+  const renderPinnedNote = ({ author, note, timestamp, noteId }: PinnedNoteProps) =>
+    customRender(<PinnedNote author={author} note={note} timestamp={timestamp} noteId={noteId} />);
 
   it('should render the note correctly', () => {
     renderPinnedNote({

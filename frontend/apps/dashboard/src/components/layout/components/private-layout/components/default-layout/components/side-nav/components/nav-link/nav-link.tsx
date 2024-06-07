@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { createFontStyles, Stack } from '@onefootprint/ui';
+import { Stack, createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import type { Ref } from 'react';
 import React, { forwardRef } from 'react';
@@ -16,10 +16,7 @@ export type NavLinkProps = {
 };
 
 const NavLink = forwardRef(
-  (
-    { badgeCount, href, icon: Icon, selected, text }: NavLinkProps,
-    ref: Ref<HTMLAnchorElement>,
-  ) => (
+  ({ badgeCount, href, icon: Icon, selected, text }: NavLinkProps, ref: Ref<HTMLAnchorElement>) => (
     <Container href={href} selected={selected} ref={ref}>
       <Stack direction="row" gap={3} align="center" justify="flex-start">
         <Icon color={selected ? 'primary' : 'tertiary'} />
@@ -27,9 +24,7 @@ const NavLink = forwardRef(
       </Stack>
       {badgeCount ? (
         <Badge data-selected={selected} className="badge">
-          {badgeCount > BADGE_MAX_COUNT
-            ? `${`${BADGE_MAX_COUNT}+`}`
-            : badgeCount}
+          {badgeCount > BADGE_MAX_COUNT ? `${`${BADGE_MAX_COUNT}+`}` : badgeCount}
         </Badge>
       ) : null}
     </Container>
@@ -45,20 +40,20 @@ const Container = styled(Link)<{ selected: boolean }>`
     text-decoration: none;
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     border-radius: ${theme.borderRadius.default};
-    background-color: ${selected
-      ? theme.backgroundColor.secondary
-      : theme.backgroundColor.primary};
+    background-color: ${selected ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
 
     &:hover {
       background-color: ${theme.backgroundColor.secondary};
 
-      ${!selected &&
-      css`
+      ${
+        !selected &&
+        css`
         .badge {
           color: ${theme.color.secondary};
           background-color: ${theme.backgroundColor.senary};
         }
-      `}
+      `
+      }
     }
 
     .badge {

@@ -1,9 +1,5 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import {
-  IcoClose24,
-  IcoMenu24,
-  ThemedLogoFpCompact,
-} from '@onefootprint/icons';
+import { IcoClose24, IcoMenu24, ThemedLogoFpCompact } from '@onefootprint/icons';
 import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
@@ -23,9 +19,7 @@ const MobileNav = ({ onClick, isExpanded }: MobileNavProps) => {
         <NavTrigger
           type="button"
           onClick={onClick}
-          aria-label={
-            isExpanded ? t('nav.nav-toggle.close') : t('nav.nav-toggle.open')
-          }
+          aria-label={isExpanded ? t('nav.nav-toggle.close') : t('nav.nav-toggle.open')}
           aria-expanded={isExpanded}
         >
           {isExpanded ? <IcoClose24 /> : <IcoMenu24 />}
@@ -35,9 +29,7 @@ const MobileNav = ({ onClick, isExpanded }: MobileNavProps) => {
             <ThemedLogoFpCompact color="primary" />
           </LogoLink>
           <Divider />
-          <DocumentationLink href="/">
-            {t('nav.documentation')}
-          </DocumentationLink>
+          <DocumentationLink href="/">{t('nav.documentation')}</DocumentationLink>
         </MainLinks>
       </NavTriggerContainer>
     </Header>

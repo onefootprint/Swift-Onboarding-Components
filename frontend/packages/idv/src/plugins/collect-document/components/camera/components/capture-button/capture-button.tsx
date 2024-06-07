@@ -11,11 +11,7 @@ type CaptureButtonProps = {
   variant: 'default' | 'round' | 'stop';
 };
 
-const CaptureButton = ({
-  onClick,
-  disabled = false,
-  variant,
-}: CaptureButtonProps) => (
+const CaptureButton = ({ onClick, disabled = false, variant }: CaptureButtonProps) => (
   <>
     {variant === 'default' && (
       <Button

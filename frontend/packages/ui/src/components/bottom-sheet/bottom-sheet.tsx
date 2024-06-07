@@ -36,12 +36,8 @@ const BottomSheet = ({
 
   const PADDING_TOP = 40;
   const containerHeight = containerRef.current?.clientHeight;
-  const componentMaxHeight = containerHeight
-    ? `${containerHeight - PADDING_TOP}px`
-    : undefined;
-  const scrollAreaMaxHeight = containerHeight
-    ? `${containerHeight - HEADER_HEIGHT - PADDING_TOP}px`
-    : undefined;
+  const componentMaxHeight = containerHeight ? `${containerHeight - PADDING_TOP}px` : undefined;
+  const scrollAreaMaxHeight = containerHeight ? `${containerHeight - HEADER_HEIGHT - PADDING_TOP}px` : undefined;
 
   useEffect(() => {
     if (portalId) {
@@ -67,18 +63,11 @@ const BottomSheet = ({
         <Content role="dialog" onPointerDownOutside={onClose}>
           <Stack maxHeight={componentMaxHeight} direction="column">
             <Header
-              closeAriaLabel={
-                closeAriaLabel ??
-                t('components.bottom-sheet.close-aria-label-default')
-              }
+              closeAriaLabel={closeAriaLabel ?? t('components.bottom-sheet.close-aria-label-default')}
               onClose={onClose}
               title={title}
             />
-            <ScrollArea
-              hideBottomLine
-              padding={5}
-              maxHeight={scrollAreaMaxHeight}
-            >
+            <ScrollArea hideBottomLine padding={5} maxHeight={scrollAreaMaxHeight}>
               {children}
             </ScrollArea>
           </Stack>

@@ -36,13 +36,7 @@ const Row = ({ duplicateDataItem }: RowProps) => {
         <CodeInline truncate>{fpId}</CodeInline>
       </td>
       <td>
-        <Box
-          display="flex"
-          gap={2}
-          flexWrap="wrap"
-          paddingTop={4}
-          paddingBottom={4}
-        >
+        <Box display="flex" gap={2} flexWrap="wrap" paddingTop={4} paddingBottom={4}>
           {dupeKinds.map(kind => (
             <Tag key={kind}>{dupeKindToTranslation[kind]}</Tag>
           ))}

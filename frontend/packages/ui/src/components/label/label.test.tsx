@@ -1,11 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { LabelProps } from './label';
@@ -20,12 +15,7 @@ describe('<Label />', () => {
     tooltip = undefined,
   }: Partial<LabelProps>) =>
     customRender(
-      <Label
-        htmlFor={htmlFor}
-        hasError={hasError}
-        size={size}
-        tooltip={tooltip}
-      >
+      <Label htmlFor={htmlFor} hasError={hasError} size={size} tooltip={tooltip}>
         {children}
       </Label>,
     );

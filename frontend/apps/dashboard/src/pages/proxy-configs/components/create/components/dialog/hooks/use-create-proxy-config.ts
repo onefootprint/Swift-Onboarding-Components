@@ -1,18 +1,12 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  CreateProxyConfigRequest,
-  CreateProxyConfigResponse,
-} from '@onefootprint/types';
+import type { CreateProxyConfigRequest, CreateProxyConfigResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const createProxyConfig = async (
-  authHeaders: AuthHeaders,
-  payload: CreateProxyConfigRequest,
-) => {
+const createProxyConfig = async (authHeaders: AuthHeaders, payload: CreateProxyConfigRequest) => {
   const response = await request<CreateProxyConfigResponse>({
     method: 'POST',
     url: '/org/proxy_configs',
@@ -32,8 +26,7 @@ const useCreateProxyConfig = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateProxyConfigRequest) =>
-      createProxyConfig(session.authHeaders, payload),
+    mutationFn: (payload: CreateProxyConfigRequest) => createProxyConfig(session.authHeaders, payload),
     onError: (error: unknown) => {
       toast.show({
         title: t('error.title'),

@@ -1,4 +1,4 @@
-import { Container, media, Text } from '@onefootprint/ui';
+import { Container, Text, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,10 +20,7 @@ const MarkdownLayout = ({ children, meta }: MarkdownLayoutProps) => {
   const { t } = useTranslation('common');
   return (
     <>
-      <SEO
-        title={t(meta.htmlTitleKey as ParseKeys<'common'>)}
-        slug={meta.slug}
-      />
+      <SEO title={t(meta.htmlTitleKey as ParseKeys<'common'>)} slug={meta.slug} />
       <Container>
         <Inner>
           <Header>

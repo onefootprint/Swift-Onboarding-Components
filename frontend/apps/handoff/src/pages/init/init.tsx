@@ -1,17 +1,14 @@
 import {
-  getLogger,
   InitShimmer,
   Logger,
+  getLogger,
   useGetD2PStatus,
   useGetOnboardingStatus,
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
-import type {
-  GetD2PResponse,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { GetD2PResponse, PublicOnboardingConfig } from '@onefootprint/types';
 import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
@@ -87,10 +84,7 @@ const Init = () => {
           }
         },
         onError(err: unknown) {
-          logWarn(
-            `Updating the d2p status to in progress failed: ${getErrorMessage(err)}`,
-            err,
-          );
+          logWarn(`Updating the d2p status to in progress failed: ${getErrorMessage(err)}`, err);
         },
       },
     );
@@ -117,10 +111,7 @@ const Init = () => {
 
           if (status === D2PStatus.waiting || status === D2PStatus.inProgress) {
             updateD2PStatus();
-          } else if (
-            status === D2PStatus.completed ||
-            status === D2PStatus.failed
-          ) {
+          } else if (status === D2PStatus.completed || status === D2PStatus.failed) {
             send({ type: 'd2pAlreadyCompleted' });
           } else if (status === D2PStatus.canceled) {
             send({ type: 'd2pCanceled' });
@@ -128,12 +119,7 @@ const Init = () => {
         }
       },
       onError: (err: unknown) => {
-        logWarn(
-          `Fetching d2p status failed on handoff init page: ${getErrorMessage(
-            err,
-          )}`,
-          err,
-        );
+        logWarn(`Fetching d2p status failed on handoff init page: ${getErrorMessage(err)}`, err);
       },
     },
   });
@@ -153,12 +139,7 @@ const Init = () => {
         }
       },
       onError: (err: unknown) => {
-        logWarn(
-          `Fetching onboarding status failed on handoff init page: ${getErrorMessage(
-            err,
-          )}`,
-          err,
-        );
+        logWarn(`Fetching onboarding status failed on handoff init page: ${getErrorMessage(err)}`, err);
       },
     },
   });

@@ -35,18 +35,8 @@ export default {
   },
 } as ComponentMeta<typeof IconButton>;
 
-const Template: Story<IconButtonProps> = ({
-  'aria-label': ariaLabel,
-  disabled,
-  onClick,
-  testID,
-}: IconButtonProps) => (
-  <IconButton
-    aria-label={ariaLabel}
-    disabled={disabled}
-    onClick={onClick}
-    testID={testID}
-  >
+const Template: Story<IconButtonProps> = ({ 'aria-label': ariaLabel, disabled, onClick, testID }: IconButtonProps) => (
+  <IconButton aria-label={ariaLabel} disabled={disabled} onClick={onClick} testID={testID}>
     <IcoClose24 color="tertiary" />
   </IconButton>
 );

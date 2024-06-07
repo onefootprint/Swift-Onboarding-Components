@@ -5,10 +5,7 @@ import type {
   FootprintVerifyProps,
 } from '@onefootprint/footprint-js';
 
-export type SupportedProps =
-  | FootprintVerifyProps
-  | FootprintAuthProps
-  | FootprintUpdateLoginMethodsProps;
+export type SupportedProps = FootprintVerifyProps | FootprintAuthProps | FootprintUpdateLoginMethodsProps;
 
 export type PublicKeyOnly = { authToken?: never; publicKey: string };
 export type AuthTokenOnly = { authToken: string; publicKey?: never };
@@ -20,10 +17,7 @@ export type AuthConditional = 'publicKey' | 'authToken' | 'updateLoginMethods';
 
 export type BaseSupportedProps = Omit<SupportedProps, 'variant' | 'kind'>;
 
-export type UserDataEmailAndPhone = Pick<
-  Partial<FootprintUserData>,
-  'id.email' | 'id.phone_number'
->;
+export type UserDataEmailAndPhone = Pick<Partial<FootprintUserData>, 'id.email' | 'id.phone_number'>;
 
 type ButtonProps = {
   className?: string;

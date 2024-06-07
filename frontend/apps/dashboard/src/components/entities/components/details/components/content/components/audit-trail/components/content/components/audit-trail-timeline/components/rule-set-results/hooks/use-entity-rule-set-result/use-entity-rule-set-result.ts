@@ -1,9 +1,5 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  GetEntityRuleSetResultRequest,
-  GetEntityRuleSetResultResponse,
-  Rule,
-} from '@onefootprint/types';
+import type { GetEntityRuleSetResultRequest, GetEntityRuleSetResultResponse, Rule } from '@onefootprint/types';
 import { OnboardingDecisionRuleAction, RuleAction } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -14,10 +10,7 @@ type UseEntityRuleSetResultProps = {
   ruleSetResultId?: string;
 };
 
-const getRuleSetResult = async (
-  payload: GetEntityRuleSetResultRequest,
-  authHeaders: AuthHeaders,
-) => {
+const getRuleSetResult = async (payload: GetEntityRuleSetResultRequest, authHeaders: AuthHeaders) => {
   const { data: response } = await request<GetEntityRuleSetResultResponse>({
     headers: authHeaders,
     method: 'GET',
@@ -26,10 +19,7 @@ const getRuleSetResult = async (
   return response;
 };
 
-const useEntityRuleSetResult = ({
-  entityId,
-  ruleSetResultId,
-}: UseEntityRuleSetResultProps) => {
+const useEntityRuleSetResult = ({ entityId, ruleSetResultId }: UseEntityRuleSetResultProps) => {
   const { authHeaders } = useSession();
 
   const ruleSetResultQuery = useQuery(
@@ -46,10 +36,7 @@ const useEntityRuleSetResult = ({
           };
         }
 
-        const formattedRuleResults = {} as Record<
-          RuleAction,
-          Record<string, Rule[]>
-        >;
+        const formattedRuleResults = {} as Record<RuleAction, Record<string, Rule[]>>;
 
         Object.values(RuleAction).forEach(action => {
           formattedRuleResults[action] = {
@@ -65,17 +52,13 @@ const useEntityRuleSetResult = ({
           if (result) {
             (formattedRuleResults[rule.action].isPresent as Rule[]).push(rule);
           } else {
-            (formattedRuleResults[rule.action].isNotPresent as Rule[]).push(
-              rule,
-            );
+            (formattedRuleResults[rule.action].isNotPresent as Rule[]).push(rule);
           }
         });
 
         return {
           // On the backend, if there's a non-null API response, a null actionTriggered is an implied Pass
-          actionTriggered: response.actionTriggered
-            ? response.actionTriggered
-            : OnboardingDecisionRuleAction.pass,
+          actionTriggered: response.actionTriggered ? response.actionTriggered : OnboardingDecisionRuleAction.pass,
           obConfigurationId: response.obConfigurationId,
           ruleResults: formattedRuleResults,
         };

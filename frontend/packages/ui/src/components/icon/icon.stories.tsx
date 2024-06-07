@@ -19,10 +19,7 @@ export default {
   },
 } as ComponentMeta<typeof IcoChevronDown16>;
 
-export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
-  color,
-  testID,
-}) => (
+export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({ color, testID }) => (
   <Box>
     <Box marginBottom={10}>
       <Text color="primary" variant="heading-2" marginBottom={3}>

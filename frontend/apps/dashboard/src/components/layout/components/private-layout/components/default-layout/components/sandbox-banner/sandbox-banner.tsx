@@ -18,11 +18,7 @@ const SandboxBanner = () => {
         <Stack direction="row" align="center" justify="center">
           {t('title')}
           {sandbox.canToggle ? (
-            <button
-              type="button"
-              onClick={sandbox.toggle}
-              disabled={!sandbox.canToggle}
-            >
+            <button type="button" onClick={sandbox.toggle} disabled={!sandbox.canToggle}>
               {t('toggle')}
             </button>
           ) : (

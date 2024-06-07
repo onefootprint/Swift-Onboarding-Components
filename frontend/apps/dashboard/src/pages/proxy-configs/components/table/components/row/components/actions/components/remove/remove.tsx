@@ -15,58 +15,56 @@ export type RemoveProps = {
   proxyConfig: ProxyConfig;
 };
 
-const Remove = forwardRef<RemoveHandler, RemoveProps>(
-  ({ proxyConfig }, ref) => {
-    const { t } = useTranslation('common', {
-      keyPrefix: 'pages.proxy-configs.actions.remove',
-    });
-    const [open, setOpen] = useState(false);
-    const mutation = useRemoveProxyConfig(proxyConfig);
+const Remove = forwardRef<RemoveHandler, RemoveProps>(({ proxyConfig }, ref) => {
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.actions.remove',
+  });
+  const [open, setOpen] = useState(false);
+  const mutation = useRemoveProxyConfig(proxyConfig);
 
-    const showConfirmation = () => {
-      setOpen(true);
-    };
+  const showConfirmation = () => {
+    setOpen(true);
+  };
 
-    const hideConfirmation = () => {
-      setOpen(false);
-    };
+  const hideConfirmation = () => {
+    setOpen(false);
+  };
 
-    const remove = () => {
-      mutation.mutate();
-    };
+  const remove = () => {
+    mutation.mutate();
+  };
 
-    const handleRemove = () => {
-      showConfirmation();
-    };
+  const handleRemove = () => {
+    showConfirmation();
+  };
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        remove: handleRemove,
-      }),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [],
-    );
+  useImperativeHandle(
+    ref,
+    () => ({
+      remove: handleRemove,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
-    return (
-      <ConfirmationDialog
-        isLoading={mutation.isLoading}
-        onClose={hideConfirmation}
-        onConfirm={remove}
-        open={open}
-        title={t('confirmation.title')}
-      >
-        <Trans
-          i18nKey="pages.proxy-configs.actions.remove.confirmation.description"
-          components={{
-            b: <Bold />,
-          }}
-          values={{ name: proxyConfig.name }}
-        />
-      </ConfirmationDialog>
-    );
-  },
-);
+  return (
+    <ConfirmationDialog
+      isLoading={mutation.isLoading}
+      onClose={hideConfirmation}
+      onConfirm={remove}
+      open={open}
+      title={t('confirmation.title')}
+    >
+      <Trans
+        i18nKey="pages.proxy-configs.actions.remove.confirmation.description"
+        components={{
+          b: <Bold />,
+        }}
+        values={{ name: proxyConfig.name }}
+      />
+    </ConfirmationDialog>
+  );
+});
 
 const Bold = styled.b`
   ${createFontStyles('label-2')};

@@ -83,11 +83,7 @@ Container.args = {
   columns: ['1fr', '1fr', '200px'],
   rows: ['1fr', '100px', '1fr'],
   gap: 2,
-  templateAreas: [
-    'header header header',
-    'sidebar content content',
-    'footer footer footer',
-  ],
+  templateAreas: ['header header header', 'sidebar content content', 'footer footer footer'],
 };
 
 const items = [

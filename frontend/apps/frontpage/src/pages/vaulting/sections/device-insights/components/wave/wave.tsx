@@ -10,13 +10,7 @@ type WaveProps = {
   zIndex?: number;
 };
 
-const Wave = ({
-  initialDiameter,
-  finalDiameter,
-  duration,
-  delay,
-  zIndex,
-}: WaveProps) => (
+const Wave = ({ initialDiameter, finalDiameter, duration, delay, zIndex }: WaveProps) => (
   <WaveContainer
     initial={{
       width: initialDiameter,

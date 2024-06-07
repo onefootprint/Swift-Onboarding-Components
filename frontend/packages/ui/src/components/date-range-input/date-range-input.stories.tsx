@@ -17,16 +17,8 @@ export default {
     },
   },
 } as Meta<DateRangeInputProps>;
-const Template: Story<DateRangeInputProps> = ({
-  initialStartDate,
-  initialEndDate,
-  onChange,
-}) => (
-  <DateRangeInput
-    initialStartDate={initialStartDate}
-    initialEndDate={initialEndDate}
-    onChange={onChange}
-  />
+const Template: Story<DateRangeInputProps> = ({ initialStartDate, initialEndDate, onChange }) => (
+  <DateRangeInput initialStartDate={initialStartDate} initialEndDate={initialEndDate} onChange={onChange} />
 );
 
 export const Base = Template.bind({});

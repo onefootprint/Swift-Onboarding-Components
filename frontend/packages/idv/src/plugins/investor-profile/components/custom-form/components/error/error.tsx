@@ -7,7 +7,7 @@ type ErrorProps = {
   label: string;
 };
 
-const Error = ({ label }: ErrorProps) => (
+const ErrorComponent = ({ label }: ErrorProps) => (
   <Container>
     <IcoWarning16 color="error" />
     <Text variant="body-3" color="error">
@@ -24,4 +24,4 @@ const Container = styled.div`
   `}
 `;
 
-export default Error;
+export default ErrorComponent;

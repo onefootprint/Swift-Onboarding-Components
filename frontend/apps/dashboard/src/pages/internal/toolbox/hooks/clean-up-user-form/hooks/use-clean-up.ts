@@ -13,10 +13,7 @@ type CleanUpResponse = {
   numDeletedRows: number;
 };
 
-const submitCleanUpRqequest = async (
-  authHeaders: AuthHeaders,
-  data: CleanupRequest,
-) => {
+const submitCleanUpRqequest = async (authHeaders: AuthHeaders, data: CleanupRequest) => {
   const response = await request<CleanUpResponse>({
     method: 'POST',
     url: `/private/cleanup`,
@@ -31,8 +28,7 @@ const useCleanUp = () => {
   const { authHeaders } = useSession();
 
   return useMutation({
-    mutationFn: (data: CleanupRequest) =>
-      submitCleanUpRqequest(authHeaders, data),
+    mutationFn: (data: CleanupRequest) => submitCleanUpRqequest(authHeaders, data),
     onError: showErrorToast,
   });
 };

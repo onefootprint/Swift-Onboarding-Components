@@ -50,32 +50,12 @@ const idVariant = {
 const Illustration = () => (
   <IllustrationContainer>
     <Background />
-    <ModalContainer
-      initial="initial"
-      animate="animate"
-      variants={modalContainerVariants}
-    >
-      <MotionWrapper
-        variants={modalVariant}
-        initial="initial"
-        animate="animate"
-      >
-        <Modal
-          alt=""
-          src="/auth/hero/bifrost-dialog.png"
-          height={760}
-          width={670}
-          priority
-        />
+    <ModalContainer initial="initial" animate="animate" variants={modalContainerVariants}>
+      <MotionWrapper variants={modalVariant} initial="initial" animate="animate">
+        <Modal alt="" src="/auth/hero/bifrost-dialog.png" height={760} width={670} priority />
       </MotionWrapper>
       <MotionWrapper variants={idVariant} initial="initial" animate="animate">
-        <FaceID
-          alt=""
-          src="/auth/hero/id.png"
-          height={240}
-          width={240}
-          priority
-        />
+        <FaceID alt="" src="/auth/hero/id.png" height={240} width={240} priority />
       </MotionWrapper>
     </ModalContainer>
   </IllustrationContainer>

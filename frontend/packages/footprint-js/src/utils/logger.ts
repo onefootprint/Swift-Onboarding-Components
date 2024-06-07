@@ -11,7 +11,7 @@ export const logWarn = (kind: SdkKind, warning: string) => {
     let domain;
     try {
       domain = window.location.href;
-    } catch (e) {
+    } catch (_e) {
       // Safe to ignore if this throws, might happen in some environments
     }
     sendSdkTelemetry(kind, warning, 'warn', domain);
@@ -27,7 +27,7 @@ export const logError = (kind: SdkKind, error: string) => {
     let domain;
     try {
       domain = window.location.href;
-    } catch (e) {
+    } catch (_e) {
       // Safe to ignore if this throws, might happen in some environments
     }
     sendSdkTelemetry(kind, error, 'error', domain);

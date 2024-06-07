@@ -1,21 +1,10 @@
 import request from '@onefootprint/request';
-import type {
-  SubmitDocTypeRequest,
-  SubmitDocTypeResponse,
-} from '@onefootprint/types';
+import type { SubmitDocTypeRequest, SubmitDocTypeResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const submitDocType = async (payload: SubmitDocTypeRequest) => {
-  const {
-    authToken,
-    documentType,
-    requestId,
-    countryCode,
-    fixtureResult,
-    skipSelfie,
-    deviceType,
-  } = payload;
+  const { authToken, documentType, requestId, countryCode, fixtureResult, skipSelfie, deviceType } = payload;
   const response = await request<SubmitDocTypeResponse>({
     method: 'POST',
     url: '/hosted/user/documents',

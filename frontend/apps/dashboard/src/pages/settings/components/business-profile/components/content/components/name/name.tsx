@@ -16,11 +16,7 @@ const Name = ({ value }: NameProps) => {
   return (
     <Fieldset label={t('label')} value={value}>
       {({ id, handleSubmit }) => (
-        <Form
-          id={id}
-          onSubmit={(newName: string) => handleSubmit({ name: newName })}
-          value={value}
-        />
+        <Form id={id} onSubmit={(newName: string) => handleSubmit({ name: newName })} value={value} />
       )}
     </Fieldset>
   );

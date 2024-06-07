@@ -22,15 +22,8 @@ const QRRegister = () => {
     i18n: { language },
   } = useTranslation('idv');
   const [state, send] = useTransferMachine();
-  const {
-    authToken,
-    missingRequirements,
-    isContinuingOnDesktop,
-    device,
-    config,
-    scopedAuthToken,
-    idDocOutcome,
-  } = state.context;
+  const { authToken, missingRequirements, isContinuingOnDesktop, device, config, scopedAuthToken, idDocOutcome } =
+    state.context;
   const l10n = useL10nContext();
   const url = useCreateHandoffUrl({
     missingRequirements,
@@ -70,21 +63,14 @@ const QRRegister = () => {
     },
   });
 
-  const { title, linkSentToPhoneSubtitle } = useRequirementsTitle(
-    missingRequirements,
-    !!isContinuingOnDesktop,
-  );
+  const { title, linkSentToPhoneSubtitle } = useRequirementsTitle(missingRequirements, !!isContinuingOnDesktop);
 
   return (
     <>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Grid.Container textAlign="center">
         <Grid.Item paddingBottom={7} direction="column" gap={5}>
-          <HeaderTitle
-            title={title}
-            subtitle={linkSentToPhoneSubtitle}
-            icon={IcoSmartphone40}
-          />
+          <HeaderTitle title={title} subtitle={linkSentToPhoneSubtitle} icon={IcoSmartphone40} />
           <SmsButtonWithCountdown authToken={scopedAuthToken} url={urlStr} />
         </Grid.Item>
         <QRSection

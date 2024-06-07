@@ -9,8 +9,7 @@ type OverrideButtonProps = {
   children?: string;
 };
 
-export type GoogleButtonProps = Omit<ButtonProps, 'variant'> &
-  OverrideButtonProps;
+export type GoogleButtonProps = Omit<ButtonProps, 'variant'> & OverrideButtonProps;
 
 const GoogleButton = ({
   children,

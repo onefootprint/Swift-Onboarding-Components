@@ -26,10 +26,7 @@ const ClientCertificate = ({ proxyConfig }: ClientCertificateProps) => {
 
   return proxyConfig.clientCertificate ? (
     <Field label={t('certificate')}>
-      <LinkButton
-        iconComponent={IcoDownload16}
-        onClick={handleClick(proxyConfig.clientCertificate)}
-      >
+      <LinkButton iconComponent={IcoDownload16} onClick={handleClick(proxyConfig.clientCertificate)}>
         {t('download')}
       </LinkButton>
     </Field>

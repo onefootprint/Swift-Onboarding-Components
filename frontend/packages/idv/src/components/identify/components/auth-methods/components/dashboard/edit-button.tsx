@@ -1,5 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import { createFontStyles, Stack } from '@onefootprint/ui';
+import { Stack, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -17,14 +17,7 @@ type EditButtonProps = {
     verified: string;
   };
 };
-const EditButton = ({
-  label,
-  icon: Icon,
-  onClick,
-  isVerified,
-  isEmpty,
-  texts,
-}: EditButtonProps) => (
+const EditButton = ({ label, icon: Icon, onClick, isVerified, isEmpty, texts }: EditButtonProps) => (
   <Button type="button" onClick={onClick}>
     <Stack align="center" justify="center" height="24px" width="24px">
       <Icon />
@@ -32,11 +25,7 @@ const EditButton = ({
     <TextContainer data-private="true" data-dd-privacy="mask">
       {label}
     </TextContainer>
-    <EditButtonActions
-      shouldShowVerify={isVerified}
-      isEmpty={isEmpty}
-      texts={texts}
-    />
+    <EditButtonActions shouldShowVerify={isVerified} isEmpty={isEmpty} texts={texts} />
   </Button>
 );
 

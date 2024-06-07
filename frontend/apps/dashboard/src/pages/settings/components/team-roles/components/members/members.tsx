@@ -13,11 +13,7 @@ const Members = () => {
       <Portal selector="#team-roles-actions">
         <Invite />
       </Portal>
-      <MembersTable
-        data={response?.data}
-        errorMessage={errorMessage}
-        isLoading={isLoading}
-      />
+      <MembersTable data={response?.data} errorMessage={errorMessage} isLoading={isLoading} />
       {response && response.meta.count > 0 && (
         <Pagination
           hasNextPage={pagination.hasNextPage}

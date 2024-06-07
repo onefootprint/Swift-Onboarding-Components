@@ -1,9 +1,4 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { OrgFrequentNoteKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser } from 'src/config/tests';

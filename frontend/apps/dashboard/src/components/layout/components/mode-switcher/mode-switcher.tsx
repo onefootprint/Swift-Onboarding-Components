@@ -19,9 +19,7 @@ const ModeSwitcher = ({ children }: ModeSwitcherProps) => {
     const toggleMode = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const mode = urlParams.get('mode');
-      const isSameMode =
-        (mode === 'sandbox' && sandbox.isSandbox) ||
-        (mode === 'live' && !sandbox.isSandbox);
+      const isSameMode = (mode === 'sandbox' && sandbox.isSandbox) || (mode === 'live' && !sandbox.isSandbox);
       if (!mode || isSameMode || !sandbox.canToggle) return;
 
       await sandbox.toggle();

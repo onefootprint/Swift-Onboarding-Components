@@ -1,8 +1,8 @@
+import type { ParsedUrlQuery } from 'querystring';
 import identity from 'lodash/identity';
 import omitBy from 'lodash/omitBy';
 import pickBy from 'lodash/pickBy';
 import { useRouter } from 'next/router';
-import type { ParsedUrlQuery } from 'querystring';
 
 const useFilters = <T>(defaultQueryParams: ParsedUrlQuery) => {
   const router = useRouter();
@@ -60,10 +60,7 @@ export const queryToString = (value: string[]) => {
 };
 
 export const getSearchParams = (query: ParsedUrlQuery) => {
-  const queryWithoutUndefined = pickBy(query, identity) as Record<
-    string,
-    string
-  >;
+  const queryWithoutUndefined = pickBy(query, identity) as Record<string, string>;
   return new URLSearchParams(queryWithoutUndefined).toString();
 };
 

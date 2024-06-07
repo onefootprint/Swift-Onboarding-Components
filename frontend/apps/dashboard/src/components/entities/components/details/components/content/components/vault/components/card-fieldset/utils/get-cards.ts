@@ -6,10 +6,7 @@ type CardsBuffer = {
 };
 
 const getCards = (entity: Entity) => {
-  if (
-    Object.keys(entity.decryptedAttributes).length === 0 &&
-    Object.keys(entity.attributes).length === 0
-  ) {
+  if (Object.keys(entity.decryptedAttributes).length === 0 && Object.keys(entity.attributes).length === 0) {
     return [];
   }
 
@@ -28,9 +25,7 @@ const getCards = (entity: Entity) => {
     {} as Record<string, Record<string, VaultValue>>,
   );
 
-  const cardsDecryptedBuffer: CardsBuffer = Object.entries(
-    entity.decryptedAttributes,
-  ).reduce(
+  const cardsDecryptedBuffer: CardsBuffer = Object.entries(entity.decryptedAttributes).reduce(
     (acc, [key, value]) => {
       if (key.startsWith('card')) {
         const [, cardAlias, cardField] = key.split('.');
@@ -49,10 +44,7 @@ const getCards = (entity: Entity) => {
     return [];
   }
 
-  const cardsAggregatedBuffer = merge(
-    cardsEncryptedBuffer,
-    cardsDecryptedBuffer,
-  );
+  const cardsAggregatedBuffer = merge(cardsEncryptedBuffer, cardsDecryptedBuffer);
 
   return Object.entries(cardsAggregatedBuffer ?? {}).map(([alias, card]) => ({
     ...card,

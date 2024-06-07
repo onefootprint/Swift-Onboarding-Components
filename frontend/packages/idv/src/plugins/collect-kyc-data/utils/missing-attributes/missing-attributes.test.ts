@@ -1,9 +1,4 @@
-import {
-  CollectedKycDataOption,
-  IdDI,
-  UsLegalStatus,
-  VisaKind,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, UsLegalStatus, VisaKind } from '@onefootprint/types';
 
 import { isDiMissing } from './missing-attributes';
 
@@ -276,12 +271,9 @@ describe('isDiMissing for address', () => {
       }),
     ).toEqual(true);
     expect(
-      isDiMissing(
-        [CollectedKycDataOption.dob, CollectedKycDataOption.address],
-        {
-          [IdDI.zip]: { value: '94117' },
-        },
-      ),
+      isDiMissing([CollectedKycDataOption.dob, CollectedKycDataOption.address], {
+        [IdDI.zip]: { value: '94117' },
+      }),
     ).toEqual(true);
   });
 });
@@ -399,9 +391,7 @@ describe('isDiMissing for US legal status', () => {
   });
 
   it('should return true if the user is missing any of the us legal status attributes', () => {
-    expect(isDiMissing([CollectedKycDataOption.usLegalStatus], {})).toEqual(
-      true,
-    );
+    expect(isDiMissing([CollectedKycDataOption.usLegalStatus], {})).toEqual(true);
     expect(
       isDiMissing([CollectedKycDataOption.usLegalStatus], {
         [IdDI.nationality]: { value: 'CN' },
@@ -414,12 +404,9 @@ describe('isDiMissing for US legal status', () => {
       }),
     ).toEqual(true);
     expect(
-      isDiMissing(
-        [CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus],
-        {
-          [IdDI.visaExpirationDate]: { value: '01012030' },
-        },
-      ),
+      isDiMissing([CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus], {
+        [IdDI.visaExpirationDate]: { value: '01012030' },
+      }),
     ).toEqual(true);
   });
 });

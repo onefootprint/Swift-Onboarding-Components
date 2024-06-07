@@ -13,13 +13,7 @@ const ContinueButton = ({ label, isLoading }: ContinueButtonProps) => {
   });
 
   return (
-    <Button
-      type="submit"
-      fullWidth
-      loading={isLoading}
-      loadingAriaLabel={t('loading-aria-label')}
-      size="large"
-    >
+    <Button type="submit" fullWidth loading={isLoading} loadingAriaLabel={t('loading-aria-label')} size="large">
       {label || t('label')}
     </Button>
   );

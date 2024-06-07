@@ -7,15 +7,8 @@ import type { AvatarProps } from './avatar';
 import Avatar from './avatar';
 
 describe('<Avatar />', () => {
-  const renderAvatar = ({
-    loading = false,
-    name = 'Jane Doe',
-    size = 'default',
-    src,
-  }: Partial<AvatarProps>) =>
-    customRender(
-      <Avatar loading={loading} name={name} size={size} src={src} />,
-    );
+  const renderAvatar = ({ loading = false, name = 'Jane Doe', size = 'default', src }: Partial<AvatarProps>) =>
+    customRender(<Avatar loading={loading} name={name} size={size} src={src} />);
 
   describe('when the src is not defined', () => {
     it('should render the name first letter', () => {
@@ -43,10 +36,7 @@ describe('<Avatar />', () => {
       const image = screen.getByRole('img', { name: 'Jane Doe' });
 
       expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute(
-        'src',
-        'https://cdn.cdnlogo.com/logos/g/77/grampus-eight.svg',
-      );
+      expect(image).toHaveAttribute('src', 'https://cdn.cdnlogo.com/logos/g/77/grampus-eight.svg');
     });
 
     it('should show a loading state', () => {

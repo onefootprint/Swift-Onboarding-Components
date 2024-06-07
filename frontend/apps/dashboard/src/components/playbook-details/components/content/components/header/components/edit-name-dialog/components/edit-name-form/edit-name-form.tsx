@@ -14,11 +14,7 @@ type EditNameFormProps = {
   onSubmit: (data: EditNameFormData) => void;
 };
 
-const EditNameForm = ({
-  formId,
-  playbookName,
-  onSubmit,
-}: EditNameFormProps) => {
+const EditNameForm = ({ formId, playbookName, onSubmit }: EditNameFormProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.header.edit-name.form',
   });

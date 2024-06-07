@@ -83,12 +83,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             localRef.current?.focus();
           }}
         >
-          <CountryPicker
-            code={countryCode}
-            disabled={disabled}
-            onClick={selectTrigger?.onClick}
-            prefix={prefix}
-          />
+          <CountryPicker code={countryCode} disabled={disabled} onClick={selectTrigger?.onClick} prefix={prefix} />
           <RealInput
             {...props}
             autoComplete="tel-national"

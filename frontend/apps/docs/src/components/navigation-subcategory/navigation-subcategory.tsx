@@ -14,14 +14,9 @@ export type NavigationSubcategoryProps = {
   items: PageNavigationItem[];
 };
 
-const NavigationSubcategory = ({
-  title,
-  items,
-}: NavigationSubcategoryProps) => {
+const NavigationSubcategory = ({ title, items }: NavigationSubcategoryProps) => {
   const router = useRouter();
-  const [isSelected, setSelected] = useState(() =>
-    items.some(item => router.asPath.startsWith(item.slug)),
-  );
+  const [isSelected, setSelected] = useState(() => items.some(item => router.asPath.startsWith(item.slug)));
   const [animatedList] = useAutoAnimate<HTMLElement>();
 
   const handleTitleClick = () => {
@@ -30,16 +25,9 @@ const NavigationSubcategory = ({
 
   return (
     <NavigationSubcategoryContainer>
-      <TitleContainer
-        aria-selected={isSelected}
-        type="button"
-        onClick={handleTitleClick}
-      >
+      <TitleContainer aria-selected={isSelected} type="button" onClick={handleTitleClick}>
         <Text variant="label-4">{title}</Text>
-        <StyledChevron
-          color={isSelected ? 'primary' : 'tertiary'}
-          $isSelected={isSelected}
-        />
+        <StyledChevron color={isSelected ? 'primary' : 'tertiary'} $isSelected={isSelected} />
       </TitleContainer>
       <div ref={animatedList}>
         {isSelected && (

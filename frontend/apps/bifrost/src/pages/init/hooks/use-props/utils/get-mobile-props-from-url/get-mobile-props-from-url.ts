@@ -3,9 +3,7 @@ import { Logger } from '@onefootprint/idv';
 
 const FRAGMENT_DIVIDER = '__';
 
-const getParsedProps = (
-  props?: string,
-): Record<string, unknown> | undefined => {
+const getParsedProps = (props?: string): Record<string, unknown> | undefined => {
   if (!props) {
     return undefined;
   }
@@ -27,9 +25,7 @@ const getParsedProps = (
  * @param {String} path We expect URLs to be formatted like this: <URL_BASE>#<ENCODED_USER_DATA>__<ENCODED_OPTIONS>__<ENCODED_L10N>
  * @returns {BifrostProps | undefined} BifrostProps | undefined
  */
-const getMobilePropsFromUrl = (
-  path: string,
-): Partial<FootprintVerifyDataProps> | undefined => {
+const getMobilePropsFromUrl = (path: string): Partial<FootprintVerifyDataProps> | undefined => {
   const parts = path.split('#');
   if (parts.length < 2) {
     return undefined;

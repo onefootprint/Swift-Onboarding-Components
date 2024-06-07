@@ -32,13 +32,7 @@ const DropdownOptions = ({
   onOptionChange,
 }: DropdownOptionsProps) => (
   <DropdownPrimitive.Root>
-    <Trigger
-      variant={variant}
-      data-loading={loading}
-      disabled={disabled}
-      data-flat={flat}
-      $width={$width}
-    >
+    <Trigger variant={variant} data-loading={loading} disabled={disabled} data-flat={flat} $width={$width}>
       <IcoChevronDown16 color={variant === 'primary' ? 'quinary' : 'primary'} />
     </Trigger>
     <DropdownPrimitive.Portal>

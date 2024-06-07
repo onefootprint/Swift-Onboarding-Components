@@ -9,40 +9,24 @@ import type { FilterControl, FilterSelectedOption } from './filters.types';
 
 export type FiltersProps = {
   controls: FilterControl[];
-  onChange?: (
-    query: string,
-    options: FilterSelectedOption | FilterSelectedOption[],
-  ) => void;
+  onChange?: (query: string, options: FilterSelectedOption | FilterSelectedOption[]) => void;
   onClear?: () => void;
 };
 
-const Filters = ({
-  controls,
-  onChange = noop,
-  onClear = noop,
-}: FiltersProps) => {
+const Filters = ({ controls, onChange = noop, onClear = noop }: FiltersProps) => {
   const { t } = useTranslation('ui');
-  const hasSelectedOptions = controls.some(
-    control => control.selectedOptions && control.selectedOptions.length > 0,
-  );
+  const hasSelectedOptions = controls.some(control => control.selectedOptions && control.selectedOptions.length > 0);
 
   return (
     <FilterContainer>
       <Controls>
         {controls.map(control => (
-          <Control
-            control={control}
-            disabled={control.disabled}
-            key={control.query}
-            onChange={onChange}
-          />
+          <Control control={control} disabled={control.disabled} key={control.query} onChange={onChange} />
         ))}
       </Controls>
       {hasSelectedOptions && (
         <ClearFiltersContainer>
-          <LinkButton onClick={onClear}>
-            {t('components.filters.clear-filters')}
-          </LinkButton>
+          <LinkButton onClick={onClear}>{t('components.filters.clear-filters')}</LinkButton>
         </ClearFiltersContainer>
       )}
     </FilterContainer>

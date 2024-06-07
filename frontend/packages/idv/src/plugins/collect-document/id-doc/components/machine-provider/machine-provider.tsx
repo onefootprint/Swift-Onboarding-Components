@@ -12,7 +12,6 @@ export type IdDocMachineArgs = {
 const useLocalIdDocMachine = ({ args, initState }: IdDocMachineArgs) =>
   useMachine(() => createIdDocMachine(args, initState));
 
-export const [MachineProvider, useIdDocMachine] =
-  constate(useLocalIdDocMachine);
+export const [MachineProvider, useIdDocMachine] = constate(useLocalIdDocMachine);
 
 export default MachineProvider;

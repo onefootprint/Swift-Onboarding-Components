@@ -43,9 +43,7 @@ describe('<LinkButton />', () => {
       renderLinkButton({
         children: 'Link button',
       });
-      expect(
-        screen.getByRole('button', { name: 'Link button' }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Link button' })).toBeInTheDocument();
     });
 
     it('should assign an aria label', () => {
@@ -59,9 +57,7 @@ describe('<LinkButton />', () => {
     it('should trigger onClick event when clicking', async () => {
       const onClickMockFn = jest.fn();
       renderLinkButton({ children: 'Link button', onClick: onClickMockFn });
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Link button' }),
-      );
+      await userEvent.click(screen.getByRole('button', { name: 'Link button' }));
       expect(onClickMockFn).toHaveBeenCalledTimes(1);
     });
 
@@ -73,9 +69,7 @@ describe('<LinkButton />', () => {
           onClick: onClickMockFn,
           disabled: true,
         });
-        await userEvent.click(
-          screen.getByRole('button', { name: 'Link button' }),
-        );
+        await userEvent.click(screen.getByRole('button', { name: 'Link button' }));
         expect(onClickMockFn).not.toHaveBeenCalled();
       });
     });
@@ -135,9 +129,7 @@ describe('<LinkButton />', () => {
           children: 'foo',
           iconComponent: IcoArrowRightSmall24,
         });
-        expect(screen.getByRole('button', { name: 'foo' })).toContainHTML(
-          'svg',
-        );
+        expect(screen.getByRole('button', { name: 'foo' })).toContainHTML('svg');
       });
     });
   });

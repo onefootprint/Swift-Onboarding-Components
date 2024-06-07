@@ -1,8 +1,4 @@
-import type {
-  DataIdentifier,
-  EntityVault,
-  VaultValue,
-} from '@onefootprint/types';
+import type { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
 
@@ -27,10 +23,7 @@ const useDecryptFields = () => {
   const entityId = useEntityId();
   const { data: documents } = useDocuments(entityId);
 
-  const decryptFields = (
-    { reason = '', dis, vaultData }: DecryptPayload,
-    { onSuccess, onError }: DecryptCallbacks,
-  ) => {
+  const decryptFields = ({ reason = '', dis, vaultData }: DecryptPayload, { onSuccess, onError }: DecryptCallbacks) => {
     if (dis && dis.length) {
       const fields = getDocDis({ dis, documents, vaultData });
       decryptText

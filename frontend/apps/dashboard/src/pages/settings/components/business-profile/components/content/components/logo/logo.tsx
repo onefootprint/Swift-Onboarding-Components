@@ -30,24 +30,13 @@ const Logo = ({ organization }: LogoProps) => {
 
   return (
     <LogoContainer>
-      <Avatar
-        name={organization.name}
-        size="large"
-        src={organization.logoUrl}
-      />
+      <Avatar name={organization.name} size="large" src={organization.logoUrl} />
 
       <ButtonContainer>
-        <PermissionGate
-          scopeKind={RoleScopeKind.orgSettings}
-          fallbackText={t('not-allowed')}
-        >
+        <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
           <Label>
             {t('cta')}
-            <StyledInput
-              type="file"
-              accept="image/svg+xml, image/png, image/jpeg"
-              onChange={handleChange}
-            />
+            <StyledInput type="file" accept="image/svg+xml, image/png, image/jpeg" onChange={handleChange} />
           </Label>
         </PermissionGate>
       </ButtonContainer>
@@ -61,11 +50,13 @@ const Label = styled.label<{ disabled?: boolean }>`
     color: ${theme.color.accent};
     cursor: pointer;
 
-    ${disabled &&
-    css`
+    ${
+      disabled &&
+      css`
       pointer-events: none;
       opacity: 0.5;
-    `}
+    `
+    }
   `}
 `;
 

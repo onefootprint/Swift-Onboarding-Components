@@ -13,11 +13,7 @@ const flattenObject = (
   Object.keys(obj).forEach(key => {
     const newKey = parentKey ? `${parentKey}${sep}${key}` : key;
     if (isPlainObject(obj[key])) {
-      const flatObject = flattenObject(
-        obj[key] as Record<string, unknown>,
-        newKey,
-        sep,
-      );
+      const flatObject = flattenObject(obj[key] as Record<string, unknown>, newKey, sep);
       Object.keys(flatObject).forEach(x => {
         toReturn[x] = flatObject[x];
       });

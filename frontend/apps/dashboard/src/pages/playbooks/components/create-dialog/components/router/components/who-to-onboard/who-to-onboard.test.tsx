@@ -7,8 +7,7 @@ import { PlaybookKind } from '@/playbooks/utils/machine/types';
 import type { WhoToOnboardProps } from './who-to-onboard';
 import WhoToOnboard from './who-to-onboard';
 
-const renderWhoToOnboard = ({ onSubmit }: WhoToOnboardProps) =>
-  customRender(<WhoToOnboard onSubmit={onSubmit} />);
+const renderWhoToOnboard = ({ onSubmit }: WhoToOnboardProps) => customRender(<WhoToOnboard onSubmit={onSubmit} />);
 
 describe('<WhoToOnboard />', () => {
   beforeEach(() => {
@@ -31,9 +30,7 @@ describe('<WhoToOnboard />', () => {
   it('should submit KYB correctly', async () => {
     const onSubmit = jest.fn();
     renderWhoToOnboard({ onSubmit });
-    const option = screen.getByText(
-      'Onboard businesses and their beneficial owners',
-    );
+    const option = screen.getByText('Onboard businesses and their beneficial owners');
     await userEvent.click(option);
     const submit = screen.getByRole('button', { name: 'Next' });
     await userEvent.click(submit);
@@ -44,9 +41,7 @@ describe('<WhoToOnboard />', () => {
     const onSubmit = jest.fn();
     renderWhoToOnboard({ onSubmit });
     expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Back' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
   });
 
   describe('when in sandbox', () => {
@@ -60,12 +55,8 @@ describe('<WhoToOnboard />', () => {
       const onSubmit = jest.fn();
       renderWhoToOnboard({ onSubmit });
 
-      expect(screen.getByText('Onboard people')).not.toHaveAttribute(
-        'disabled',
-      );
-      expect(
-        screen.getByText('Onboard businesses and their beneficial owners'),
-      ).not.toHaveAttribute('disabled');
+      expect(screen.getByText('Onboard people')).not.toHaveAttribute('disabled');
+      expect(screen.getByText('Onboard businesses and their beneficial owners')).not.toHaveAttribute('disabled');
     });
   });
 
@@ -118,12 +109,8 @@ describe('<WhoToOnboard />', () => {
       const onSubmit = jest.fn();
       renderWhoToOnboard({ onSubmit });
 
-      expect(screen.getByText('Onboard people')).not.toHaveAttribute(
-        'disabled',
-      );
-      expect(
-        screen.getByText('Onboard businesses and their beneficial owners'),
-      ).not.toHaveAttribute('disabled');
+      expect(screen.getByText('Onboard people')).not.toHaveAttribute('disabled');
+      expect(screen.getByText('Onboard businesses and their beneficial owners')).not.toHaveAttribute('disabled');
     });
   });
 });

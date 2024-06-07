@@ -1,11 +1,4 @@
-import {
-  Box,
-  createFontStyles,
-  media,
-  Stack,
-  Text,
-  TextInput,
-} from '@onefootprint/ui';
+import { Box, Stack, Text, TextInput, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -41,17 +34,13 @@ const Form = ({ $borderRadius, $backgroundColor }: FormProps) => {
         <Box position="relative" width="100%">
           <TextInput type="text" label={t('first-name')} placeholder="Jane" />
           <BadgeAligner>
-            <ComponentNameBadge>
-              {generateComponentName(t('first-name'))}
-            </ComponentNameBadge>
+            <ComponentNameBadge>{generateComponentName(t('first-name'))}</ComponentNameBadge>
           </BadgeAligner>
         </Box>
         <Box position="relative" width="100%">
           <TextInput type="text" label={t('last-name')} placeholder="Doe" />
           <BadgeAligner>
-            <ComponentNameBadge>
-              {generateComponentName(t('last-name'))}
-            </ComponentNameBadge>
+            <ComponentNameBadge>{generateComponentName(t('last-name'))}</ComponentNameBadge>
           </BadgeAligner>
         </Box>
         <Box position="relative" width="100%">
@@ -69,10 +58,7 @@ const Form = ({ $borderRadius, $backgroundColor }: FormProps) => {
             <ComponentNameBadge>{'<DOBInput />'}</ComponentNameBadge>
           </BadgeAligner>
         </Box>
-        <StyledButton
-          $borderRadius={$borderRadius}
-          $backgroundColor={$backgroundColor}
-        >
+        <StyledButton $borderRadius={$borderRadius} $backgroundColor={$backgroundColor}>
           {t('cta')}
         </StyledButton>
       </FieldsContainer>

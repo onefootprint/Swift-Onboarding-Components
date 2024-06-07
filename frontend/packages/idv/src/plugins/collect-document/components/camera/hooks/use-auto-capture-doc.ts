@@ -4,17 +4,9 @@ import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { getLogger } from '../../../../../utils';
-import type {
-  CaptureStatus,
-  DocSrcDimensions,
-  VideoRef,
-  VideoSize,
-} from '../types';
+import type { CaptureStatus, DocSrcDimensions, VideoRef, VideoSize } from '../types';
 import computeSrcDimensions, { docDrawer } from '../utils/auto-capture';
-import {
-  CardCaptureStatus,
-  getCardCaptureStatus,
-} from '../utils/graphics-utils/graphics-processing-utils';
+import { CardCaptureStatus, getCardCaptureStatus } from '../utils/graphics-utils/graphics-processing-utils';
 import type { ParamsType } from '../utils/graphics-utils/params';
 import { params } from '../utils/graphics-utils/params';
 import { FaceStatus } from './use-face-detection';
@@ -50,14 +42,10 @@ const CountDownProps = {
 };
 
 const isCardOk = (x: unknown) => x === CardCaptureStatus.OK;
-const isNonZeroVideoSize = (v?: VideoSize): v is VideoSize =>
-  Boolean(v) && v?.width !== 0 && v?.height !== 0;
+const isNonZeroVideoSize = (v?: VideoSize): v is VideoSize => Boolean(v) && v?.width !== 0 && v?.height !== 0;
 
 // Bring the selected param to the front
-const moveParamToStart = (
-  selectedParamIndex: number,
-  oldParams: ParamsType[],
-) => {
+const moveParamToStart = (selectedParamIndex: number, oldParams: ParamsType[]) => {
   const [selectedParam] = oldParams.splice(selectedParamIndex, 1);
   return { params: [selectedParam, ...oldParams], currentIndex: 0 };
 };
@@ -97,15 +85,11 @@ const useAutoCaptureDoc = ({
   const successCountRef = useRef(0);
   const blurCountRef = useRef(0);
   const rearrangedParamsRef = useRef({ params, currentIndex: 0 });
-  const pastStatusRef = useRef<FaceStatus | CardCaptureStatus | undefined>(
-    FaceStatus.detecting,
-  );
-  const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] =
-    useState(false);
+  const pastStatusRef = useRef<FaceStatus | CardCaptureStatus | undefined>(FaceStatus.detecting);
+  const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] = useState(false);
 
   const { cv, loaded } = useOpenCv();
-  const [waitVal, { startCountdown, resetCountdown }] =
-    useCountdownCustom(CountDownProps);
+  const [waitVal, { startCountdown, resetCountdown }] = useCountdownCustom(CountDownProps);
 
   /**
    * Width and height of the image that will be used for detection algos
@@ -125,15 +109,7 @@ const useAutoCaptureDoc = ({
             outlineOffsetX,
           )
         : undefined,
-    [
-      videoSize,
-      outlineWidth,
-      outlineHeight,
-      outlineOffsetY,
-      videoRef,
-      mediaStream,
-      outlineOffsetX,
-    ],
+    [videoSize, outlineWidth, outlineHeight, outlineOffsetY, videoRef, mediaStream, outlineOffsetX],
   );
 
   const docImageDrawer = useCallback(
@@ -145,13 +121,7 @@ const useAutoCaptureDoc = ({
   );
 
   const detectAndCaptureDocument = useCallback((): void => {
-    if (
-      isCaptured ||
-      !cv ||
-      !videoRef.current ||
-      !isNonZeroVideoSize(videoSize) ||
-      !docImageDrawer
-    ) {
+    if (isCaptured || !cv || !videoRef.current || !isNonZeroVideoSize(videoSize) || !docImageDrawer) {
       return;
     }
 
@@ -175,14 +145,10 @@ const useAutoCaptureDoc = ({
     }
 
     if (isCardOk(cardCaptureStatus)) {
-      rearrangedParamsRef.current = moveParamToStart(
-        paramIndex,
-        rearrangedParamsRef.current.params,
-      );
+      rearrangedParamsRef.current = moveParamToStart(paramIndex, rearrangedParamsRef.current.params);
       blurCountRef.current = 0; // We reset the blur count if we get a successful detection, but not if we get a "Detecting" status
     } else {
-      rearrangedParamsRef.current.currentIndex =
-        getNextIndexForBatch(rearrangedParamsRef);
+      rearrangedParamsRef.current.currentIndex = getNextIndexForBatch(rearrangedParamsRef);
       if (cardCaptureStatus === CardCaptureStatus.blurry) {
         blurCountRef.current += 1;
         logTrack(`Detected blurry image: count=${blurCountRef.current}`);

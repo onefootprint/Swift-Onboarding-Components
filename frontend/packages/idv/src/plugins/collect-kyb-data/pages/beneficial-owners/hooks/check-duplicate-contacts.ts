@@ -10,9 +10,7 @@ const useCheckDuplicateContacts = () => {
   });
 
   return (beneficialOwners: BeneficialOwner[]) => {
-    const emails = beneficialOwners.map(
-      bo => bo[BeneficialOwnerDataAttribute.email],
-    );
+    const emails = beneficialOwners.map(bo => bo[BeneficialOwnerDataAttribute.email]);
     const emailsSet = new Set(emails);
     if (emails.length !== emailsSet.size) {
       toast.show({
@@ -23,9 +21,7 @@ const useCheckDuplicateContacts = () => {
       return true;
     }
 
-    const phoneNumbers = beneficialOwners.map(
-      bo => bo[BeneficialOwnerDataAttribute.phoneNumber],
-    );
+    const phoneNumbers = beneficialOwners.map(bo => bo[BeneficialOwnerDataAttribute.phoneNumber]);
     const phoneNumbersSet = new Set(phoneNumbers);
     if (phoneNumbers.length !== phoneNumbersSet.size) {
       toast.show({

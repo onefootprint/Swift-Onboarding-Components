@@ -5,18 +5,14 @@ const useCurrentSession = (documents: Document[]) => {
   const { query, push } = useRouter();
   const { session } = query;
 
-  const sessionIsValid = (sessionKey: string): boolean =>
-    documents.some(doc => doc.startedAt === sessionKey);
+  const sessionIsValid = (sessionKey: string): boolean => documents.some(doc => doc.startedAt === sessionKey);
 
   const getSessionValue = (): string => {
     const decodedSession = session ? decodeURIComponent(session as string) : '';
-    return sessionIsValid(decodedSession)
-      ? decodedSession
-      : documents[0]?.startedAt ?? '';
+    return sessionIsValid(decodedSession) ? decodedSession : documents[0]?.startedAt ?? '';
   };
 
-  const getCurrentDocument = () =>
-    documents.find(doc => doc.startedAt === getSessionValue());
+  const getCurrentDocument = () => documents.find(doc => doc.startedAt === getSessionValue());
 
   const updateSession = (newSession: string) => {
     if (sessionIsValid(newSession)) {

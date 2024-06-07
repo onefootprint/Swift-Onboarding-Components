@@ -1,8 +1,4 @@
-import type {
-  AddedRule,
-  EditedRule,
-  RuleBacktestingData,
-} from '@onefootprint/types';
+import type { AddedRule, EditedRule, RuleBacktestingData } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +8,7 @@ import useEvaluateRules from '../../hooks/use-evaluate-rules';
 import type { DateFilterRange } from './backtesting-dialog.types';
 import Content from './components/content';
 import DEFAULT_DATE_RANGE from './components/date-filter/utils/get-default-date-range';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 
 export type BacktestingDialogProps = {
@@ -24,30 +20,20 @@ export type BacktestingDialogProps = {
   onClose: () => void;
 };
 
-const BacktestingDialog = ({
-  open,
-  playbookId,
-  ruleEdits,
-  isSaveLoading,
-  onSave,
-  onClose,
-}: BacktestingDialogProps) => {
+const BacktestingDialog = ({ open, playbookId, ruleEdits, isSaveLoading, onSave, onClose }: BacktestingDialogProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.backtesting',
   });
   const [data, setData] = useState<RuleBacktestingData | undefined>(undefined);
   const [error, setError] = useState<unknown | undefined>(undefined);
-  const [dateRange, setDateRange] =
-    useState<DateFilterRange>(DEFAULT_DATE_RANGE);
+  const [dateRange, setDateRange] = useState<DateFilterRange>(DEFAULT_DATE_RANGE);
   const backtestMutation = useEvaluateRules();
 
   useEffectOnce(() => {
     handleBacktest();
   });
 
-  const handleBacktest = (
-    newDateRange: DateFilterRange = DEFAULT_DATE_RANGE,
-  ) => {
+  const handleBacktest = (newDateRange: DateFilterRange = DEFAULT_DATE_RANGE) => {
     const fields = {
       ...ruleEdits,
       startTimestamp: newDateRange.startDate?.toISOString() || '',
@@ -79,11 +65,9 @@ const BacktestingDialog = ({
         onClick: onSave,
       }}
     >
-      {data && (
-        <Content data={data} dateRange={dateRange} onFilter={handleBacktest} />
-      )}
+      {data && <Content data={data} dateRange={dateRange} onFilter={handleBacktest} />}
       {backtestMutation.isLoading && <Loading />}
-      {!!error && <Error error={error} />}
+      {!!error && <ErrorComponent error={error} />}
     </Dialog>
   );
 };

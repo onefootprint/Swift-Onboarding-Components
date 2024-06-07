@@ -1,4 +1,4 @@
-import { mockRequest, Wrapper } from '@onefootprint/test-utils';
+import { Wrapper, mockRequest } from '@onefootprint/test-utils';
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 

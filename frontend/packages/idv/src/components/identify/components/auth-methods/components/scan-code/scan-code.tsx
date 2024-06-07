@@ -16,10 +16,7 @@ const ScanCode = ({ children, Header }: ScanCodeProps) => {
   return (
     <>
       <Stack direction="column" gap={7}>
-        <Header
-          title={t('scan-code-to-log-in')}
-          subtitle={t('use-camera-or-qr-reader')}
-        />
+        <Header title={t('scan-code-to-log-in')} subtitle={t('use-camera-or-qr-reader')} />
         <CodePlaceholder>
           <AnimatedLoadingSpinner animationStart />
         </CodePlaceholder>

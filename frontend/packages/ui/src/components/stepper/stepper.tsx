@@ -20,19 +20,10 @@ export type StepperProps = {
   value: { option: StepperOption; subOption?: StepperOption };
 };
 
-const Stepper = ({
-  'aria-label': ariaLabel,
-  onChange,
-  options,
-  value: selected,
-}: StepperProps) => {
+const Stepper = ({ 'aria-label': ariaLabel, onChange, options, value: selected }: StepperProps) => {
   const { option: selectedOption, subOption: selectedSubOption } = selected;
-  const valueIndex = options.findIndex(
-    option => option.value === selectedOption.value,
-  );
-  const subValueIndex = selectedOption.options?.findIndex(
-    option => option.value === selectedSubOption?.value,
-  );
+  const valueIndex = options.findIndex(option => option.value === selectedOption.value);
+  const subValueIndex = selectedOption.options?.findIndex(option => option.value === selectedSubOption?.value);
 
   const handleClick = (option: StepperOption) => () => {
     onChange?.(option);
@@ -67,28 +58,16 @@ const Stepper = ({
                   {isNext && <DotNext>{position}</DotNext>}
                   {isSelected && <DotSelected>{position}</DotSelected>}
                 </IconContainer>
-                <button
-                  type="button"
-                  onClick={handleClick(option)}
-                  disabled={isNext}
-                >
+                <button type="button" onClick={handleClick(option)} disabled={isNext}>
                   {option.label}
                 </button>
               </Item>
-              {isLast ? null : (
-                <Connector
-                  data-completed={isCompleted}
-                  data-next={isNext}
-                  data-selected={isSelected}
-                />
-              )}
+              {isLast ? null : <Connector data-completed={isCompleted} data-next={isNext} data-selected={isSelected} />}
               {showSubOptions && (
                 <ul>
                   {subOptions.map((suboption, subIndex) => {
-                    const isSubOptionSelected =
-                      selectedSubOption?.value === suboption.value;
-                    const isSubOptionCompleted =
-                      (subValueIndex ?? 0) > subIndex;
+                    const isSubOptionSelected = selectedSubOption?.value === suboption.value;
+                    const isSubOptionCompleted = (subValueIndex ?? 0) > subIndex;
                     const isSubOptionNext = (subValueIndex ?? 0) < subIndex;
                     return (
                       <>
@@ -101,20 +80,12 @@ const Stepper = ({
                           <IconContainer>
                             <SmallDot />
                           </IconContainer>
-                          <button
-                            type="button"
-                            onClick={handleClick(suboption)}
-                            disabled={isSubOptionNext}
-                          >
+                          <button type="button" onClick={handleClick(suboption)} disabled={isSubOptionNext}>
                             {suboption.label}
                           </button>
                         </SubItem>
                         {isLast ? null : (
-                          <Connector
-                            data-completed={isCompleted}
-                            data-next={isNext}
-                            data-selected={isSelected}
-                          />
+                          <Connector data-completed={isCompleted} data-next={isNext} data-selected={isSelected} />
                         )}
                       </>
                     );

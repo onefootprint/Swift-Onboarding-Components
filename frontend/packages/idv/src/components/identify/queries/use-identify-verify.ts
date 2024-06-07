@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  IdentifyVerifyRequest,
-  IdentifyVerifyResponse,
-} from '@onefootprint/types';
+import type { IdentifyVerifyRequest, IdentifyVerifyResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
@@ -31,8 +28,7 @@ const requestFn = async (payload: Payload) => {
 
 const useIdentifyVerify = (basePayload: Pick<Payload, PayloadPartKey>) =>
   useMutation({
-    mutationFn: (restOfPayload: Omit<Payload, PayloadPartKey>) =>
-      requestFn({ ...basePayload, ...restOfPayload }),
+    mutationFn: (restOfPayload: Omit<Payload, PayloadPartKey>) => requestFn({ ...basePayload, ...restOfPayload }),
   });
 
 export default useIdentifyVerify;

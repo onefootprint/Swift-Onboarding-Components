@@ -8,9 +8,7 @@ describe('shouldChallengeEmail', () => {
     expect(shouldChallengeEmail(true, [])).toBe(true);
     expect(shouldChallengeEmail(true, [ChallengeKind.sms])).toBe(false);
     expect(shouldChallengeEmail(true, [ChallengeKind.biometric])).toBe(false);
-    expect(
-      shouldChallengeEmail(true, [ChallengeKind.sms, ChallengeKind.biometric]),
-    ).toBe(false);
+    expect(shouldChallengeEmail(true, [ChallengeKind.sms, ChallengeKind.biometric])).toBe(false);
     expect(shouldChallengeEmail(true, [ChallengeKind.email])).toBe(true);
   });
 
@@ -19,9 +17,7 @@ describe('shouldChallengeEmail', () => {
     expect(shouldChallengeEmail(false, [])).toBe(false);
     expect(shouldChallengeEmail(false, [ChallengeKind.sms])).toBe(false);
     expect(shouldChallengeEmail(false, [ChallengeKind.biometric])).toBe(false);
-    expect(
-      shouldChallengeEmail(false, [ChallengeKind.sms, ChallengeKind.biometric]),
-    ).toBe(false);
+    expect(shouldChallengeEmail(false, [ChallengeKind.sms, ChallengeKind.biometric])).toBe(false);
     expect(shouldChallengeEmail(false, [ChallengeKind.email])).toBe(false);
   });
 });

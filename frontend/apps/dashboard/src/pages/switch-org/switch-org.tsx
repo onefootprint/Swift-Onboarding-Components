@@ -14,13 +14,7 @@ const SwitchOrg = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Box
-        center
-        flexDirection="column"
-        height="100%"
-        marginTop={12}
-        width="100%"
-      >
+      <Box center flexDirection="column" height="100%" marginTop={12} width="100%">
         <AnimatedLoadingSpinner animationStart />
       </Box>
     </>

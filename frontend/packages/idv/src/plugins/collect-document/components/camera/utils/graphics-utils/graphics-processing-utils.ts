@@ -1,19 +1,9 @@
-import type {
-  Mat,
-  MatVector,
-  Point,
-  Rect,
-  RotatedRect,
-  useOpenCv,
-} from 'opencv-react-ts';
+import type { Mat, MatVector, Point, Rect, RotatedRect, useOpenCv } from 'opencv-react-ts';
 
 import { Logger } from '../../../../../../utils/logger';
 import type { ParamsType } from './params';
 
-export type OpenCVType = Exclude<
-  ReturnType<typeof useOpenCv>['cv'],
-  null | undefined
->;
+export type OpenCVType = Exclude<ReturnType<typeof useOpenCv>['cv'], null | undefined>;
 
 // The threshold value used for finding contours.
 // If the pixel value is less than the threshold, it will be set to 0
@@ -48,11 +38,7 @@ const isImageBlurry = (cv: OpenCVType, src: Mat) => {
   return isBlurry;
 };
 
-export const sharpenImage = (
-  cv: OpenCVType,
-  src: Mat,
-  shouldCleanUp: boolean,
-) => {
+export const sharpenImage = (cv: OpenCVType, src: Mat, shouldCleanUp: boolean) => {
   const dst = new cv.Mat();
 
   const kdata = [0, -1, 0, -1, 5, -1, 0, -1, 0]; // Another stronger convolution kernel to use [-1, -1, -1, -1, 9, -1, -1, -1, -1]
@@ -68,12 +54,7 @@ export const sharpenImage = (
   return dst;
 };
 
-export const getMedianBlur = (
-  cv: OpenCVType,
-  src: Mat,
-  kSize: number,
-  shouldCleanUp: boolean,
-) => {
+export const getMedianBlur = (cv: OpenCVType, src: Mat, kSize: number, shouldCleanUp: boolean) => {
   const dst = new cv.Mat();
   cv.medianBlur(src, dst, kSize); // Kernel with size 9x9 worked best during testing
 
@@ -99,25 +80,13 @@ export const getEdges = (
   return dst;
 };
 
-export const getDilatedImage = (
-  cv: OpenCVType,
-  src: Mat,
-  shouldCleanUp: boolean,
-) => {
+export const getDilatedImage = (cv: OpenCVType, src: Mat, shouldCleanUp: boolean) => {
   const dst = new cv.Mat();
   const numRowsAndCols = 5; // number of rows and cols in the kernel matrix
   const M = cv.Mat.ones(numRowsAndCols, numRowsAndCols, cv.CV_8U);
   const anchor = new cv.Point(-1, -1); // anchor position (-1, -1) means that the anchor is at the center
   const numIterations = 1;
-  cv.dilate(
-    src,
-    dst,
-    M,
-    anchor,
-    numIterations,
-    cv.BORDER_CONSTANT,
-    cv.morphologyDefaultBorderValue(),
-  );
+  cv.dilate(src, dst, M, anchor, numIterations, cv.BORDER_CONSTANT, cv.morphologyDefaultBorderValue());
 
   // cleanup
   if (shouldCleanUp) {
@@ -128,27 +97,11 @@ export const getDilatedImage = (
   return dst;
 };
 
-export const getExternalContours = (
-  cv: OpenCVType,
-  src: Mat,
-  shouldCleanUp: boolean,
-) => {
-  cv.threshold(
-    src,
-    src,
-    contouringThreshold,
-    contouringMaxPixelVal,
-    cv.THRESH_BINARY,
-  );
+export const getExternalContours = (cv: OpenCVType, src: Mat, shouldCleanUp: boolean) => {
+  cv.threshold(src, src, contouringThreshold, contouringMaxPixelVal, cv.THRESH_BINARY);
   const contours = new cv.MatVector();
   const hierarchy = new cv.Mat();
-  cv.findContours(
-    src,
-    contours,
-    hierarchy,
-    cv.RETR_EXTERNAL,
-    cv.CHAIN_APPROX_SIMPLE,
-  );
+  cv.findContours(src, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
   // cleanup
   if (shouldCleanUp) {
@@ -204,28 +157,17 @@ export const getIsHorizontallyAligned = ({
   return true;
 };
 
-export const coversOutlineSpace = (
-  uprightRect: Rect,
-  outlineWidth: number,
-  outlineHeight: number,
-) => {
+export const coversOutlineSpace = (uprightRect: Rect, outlineWidth: number, outlineHeight: number) => {
   const uprightWidth = uprightRect.width;
   const uprightHeight = uprightRect.height;
 
   // 30% error margin for width
   // 70% error margin for height
   // the height error margin is higher because backside on the US driver's licenses has a black stripe on it which reduces the contour height
-  const isWideEnough =
-    (Math.abs(uprightWidth - outlineWidth) * 100) / uprightWidth < 30;
-  const isHighEnough =
-    (Math.abs(uprightHeight - outlineHeight) * 100) / uprightHeight < 70;
+  const isWideEnough = (Math.abs(uprightWidth - outlineWidth) * 100) / uprightWidth < 30;
+  const isHighEnough = (Math.abs(uprightHeight - outlineHeight) * 100) / uprightHeight < 70;
 
-  return (
-    isWideEnough &&
-    isHighEnough &&
-    outlineWidth > uprightWidth &&
-    outlineHeight > uprightHeight
-  );
+  return isWideEnough && isHighEnough && outlineWidth > uprightWidth && outlineHeight > uprightHeight;
 };
 
 // If the card is over aligned, we probably misclassified something else as a card
@@ -265,30 +207,16 @@ export const detectCardStatus = (
   batchSize: number,
 ) => {
   const isBlurry = isImageBlurry(cv, src);
-  for (
-    let i = startParamIndex;
-    i < Math.min(params.length, startParamIndex + batchSize);
-    i += 1
-  ) {
+  for (let i = startParamIndex; i < Math.min(params.length, startParamIndex + batchSize); i += 1) {
     const { kSize, fThresh, sThresh, aperSize } = params[i];
     const medianBlurredImage = getMedianBlur(cv, src, kSize, false); // should not clean the src since we need it for every iteration of the loop
-    const edges = getEdges(
-      cv,
-      medianBlurredImage,
-      fThresh,
-      sThresh,
-      aperSize,
-      true,
-    );
+    const edges = getEdges(cv, medianBlurredImage, fThresh, sThresh, aperSize, true);
     const dilatedEdges = getDilatedImage(cv, edges, true);
     const contours = getExternalContours(cv, dilatedEdges, true);
     const boundingBoxes = getBoundingBoxes(cv, contours);
     const possibleCards: { minAreaRect: RotatedRect; uprightRect: Rect }[] = [];
     boundingBoxes.forEach(boundingBox => {
-      const topLeft = new cv.Point(
-        boundingBox.uprightRect.x,
-        boundingBox.uprightRect.y,
-      );
+      const topLeft = new cv.Point(boundingBox.uprightRect.x, boundingBox.uprightRect.y);
       const bottomRight = new cv.Point(
         boundingBox.uprightRect.x + boundingBox.uprightRect.width,
         boundingBox.uprightRect.y + boundingBox.uprightRect.height,
@@ -326,23 +254,14 @@ export const getCardCaptureStatus = (
   batchSize: number,
 ) => {
   if (!loaded) return { status: CardCaptureStatus.detecting, paramIndex: -1 }; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
-  if (imgSrc.width === 0 || imgSrc.height === 0)
-    return { status: CardCaptureStatus.detecting, paramIndex: -1 };
+  if (imgSrc.width === 0 || imgSrc.height === 0) return { status: CardCaptureStatus.detecting, paramIndex: -1 };
 
   // In order to avoid unexpected opencv related errors, we wrap the whole detection process in try-catch
   // If we catch an error, we return detecting status so that the user can move on to manual capture
   // We still log the error so that we can investigate it later
   try {
     const src = cv.imread(imgSrc);
-    return detectCardStatus(
-      cv,
-      src,
-      imgSrc.width,
-      imgSrc.height,
-      params,
-      startParamIndex,
-      batchSize,
-    );
+    return detectCardStatus(cv, src, imgSrc.width, imgSrc.height, params, startParamIndex, batchSize);
   } catch (err) {
     Logger.error(
       `Error in getCardCaptureStatus. Passed image width ${imgSrc.width}, image height ${imgSrc.height}. Error ${err}. Returning "detecting" status so that the user can move on with the flow and manually capture the card.`,

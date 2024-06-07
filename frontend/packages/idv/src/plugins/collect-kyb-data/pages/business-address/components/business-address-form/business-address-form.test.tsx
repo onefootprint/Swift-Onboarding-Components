@@ -20,7 +20,7 @@ describe('<BusinessAddressForm />', () => {
     defaultValues,
     isLoading = false,
     ctaLabel,
-    onSubmit = () => {},
+    onSubmit = () => undefined,
   }: Partial<BusinessAddressFormProps>) =>
     customRender(
       <BusinessAddressForm

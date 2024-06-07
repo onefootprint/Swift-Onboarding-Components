@@ -2,11 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IlluLightPhoneWithId = ({
-  'aria-label': ariaLabel,
-  className,
-  testID,
-}: IconProps) => (
+const IlluLightPhoneWithId = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
   <svg
     width={64}
     height={64}

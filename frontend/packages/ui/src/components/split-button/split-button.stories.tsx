@@ -47,23 +47,9 @@ export default {
   },
 } as Meta;
 
-const Template: Story<SplitButtonProps> = ({
-  disabled,
-  loading,
-  type,
-  variant,
-  options,
-  size,
-}: SplitButtonProps) => (
+const Template: Story<SplitButtonProps> = ({ disabled, loading, type, variant, options, size }: SplitButtonProps) => (
   <Stack align="center" justify="center" height="100vh" width="100vw">
-    <SplitButton
-      disabled={disabled}
-      loading={loading}
-      type={type}
-      variant={variant}
-      options={options}
-      size={size}
-    />
+    <SplitButton disabled={disabled} loading={loading} type={type} variant={variant} options={options} size={size} />
   </Stack>
 );
 

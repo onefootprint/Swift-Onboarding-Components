@@ -28,12 +28,7 @@ const Footer = () => {
             {t('footer.linkedin')}
           </Text>
         </Link>
-        <Image
-          src="/ending/soc-2-badge.png"
-          alt="SOC 2"
-          width={32}
-          height={32}
-        />
+        <Image src="/ending/soc-2-badge.png" alt="SOC 2" width={32} height={32} />
       </RightColumn>
     </Container>
   );

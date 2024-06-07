@@ -12,15 +12,7 @@ export type FormDialogProps = {
   title: string;
 };
 
-const FormDialog = ({
-  children,
-  id,
-  loading,
-  onClose,
-  onDeleteData,
-  open,
-  title,
-}: FormDialogProps) => {
+const FormDialog = ({ children, id, loading, onClose, onDeleteData, open, title }: FormDialogProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.settings.business-profile.dialog',
   });

@@ -1,8 +1,5 @@
 import type { BusinessDIData } from '@onefootprint/types';
-import {
-  CollectedKybDataOption,
-  CollectedKybDataOptionToRequiredAttributes,
-} from '@onefootprint/types';
+import { CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
 
 const BASIC_DATA_ATTRIBUTES = [
   CollectedKybDataOption.name,
@@ -28,10 +25,8 @@ const isMissing = (
     .flatMap(option => CollectedKybDataOptionToRequiredAttributes[option])
     .some(attr => !collectedData || !collectedData[attr]);
 
-export const isMissingBasicDataAttribute = (
-  mustCollect: CollectedKybDataOption[],
-  collectedData?: BusinessDIData,
-) => isMissing(BASIC_DATA_ATTRIBUTES, mustCollect, collectedData);
+export const isMissingBasicDataAttribute = (mustCollect: CollectedKybDataOption[], collectedData?: BusinessDIData) =>
+  isMissing(BASIC_DATA_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingBusinessAddressAttribute = (
   mustCollect: CollectedKybDataOption[],
@@ -43,12 +38,7 @@ export const isMissingBeneficialOwnerAttribute = (
   collectedData?: BusinessDIData,
 ) => isMissing(BENEFICIAL_OWNER_ATTRIBUTES, mustCollect, collectedData);
 
-export const hasMissingAttributes = (
-  mustCollect: CollectedKybDataOption[],
-  collectedData?: BusinessDIData,
-) =>
+export const hasMissingAttributes = (mustCollect: CollectedKybDataOption[], collectedData?: BusinessDIData) =>
   mustCollect.some(option =>
-    CollectedKybDataOptionToRequiredAttributes[option].some(
-      attr => !collectedData || !collectedData[attr],
-    ),
+    CollectedKybDataOptionToRequiredAttributes[option].some(attr => !collectedData || !collectedData[attr]),
   );

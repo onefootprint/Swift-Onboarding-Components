@@ -1,12 +1,6 @@
 import React, { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import type {
-  ActionMeta,
-  GroupBase,
-  InputActionMeta,
-  OptionsOrGroups,
-  PropsValue,
-} from 'react-select';
+import type { ActionMeta, GroupBase, InputActionMeta, OptionsOrGroups, PropsValue } from 'react-select';
 import Select from 'react-select';
 import { useTheme } from 'styled-components';
 
@@ -14,21 +8,12 @@ import { createText } from '../../utils';
 import Box from '../box';
 import Hint from '../internal/hint';
 import Label from '../label';
-import {
-  ClearIndicator,
-  DropdownIndicator,
-  IndicatorSeparator,
-  MultiValueRemove,
-  Option,
-} from './components';
+import { ClearIndicator, DropdownIndicator, IndicatorSeparator, MultiValueRemove, Option } from './components';
 import prependAllOption from './multi-select.utils';
 
 type OptionType = { value: string; label: string };
 
-export type MultiSelectProps<
-  Option extends OptionType,
-  Group extends GroupBase<Option> = GroupBase<Option>,
-> = {
+export type MultiSelectProps<Option extends OptionType, Group extends GroupBase<Option> = GroupBase<Option>> = {
   autoFocus?: boolean;
   defaultValue?: PropsValue<Option>;
   disabled?: boolean;
@@ -37,10 +22,7 @@ export type MultiSelectProps<
   label?: string;
   name?: string;
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
-  onChange?: (
-    option: readonly Option[],
-    actionMeta: ActionMeta<Option>,
-  ) => void;
+  onChange?: (option: readonly Option[], actionMeta: ActionMeta<Option>) => void;
   onFocus?: React.FocusEventHandler<HTMLInputElement>;
   onInputChange?: (newValue: string, actionMeta: InputActionMeta) => void;
   allOption?: Option;
@@ -53,10 +35,7 @@ export type MultiSelectProps<
   value?: readonly Option[];
 };
 
-const MultiSelect = <
-  Option extends OptionType,
-  Group extends GroupBase<Option>,
->({
+const MultiSelect = <Option extends OptionType, Group extends GroupBase<Option>>({
   autoFocus,
   defaultValue,
   disabled,
@@ -81,28 +60,18 @@ const MultiSelect = <
   const internalId = useId();
   const id = baseId || internalId;
   const theme = useTheme();
-  const options =
-    (prependAllOption(initialOptions, allOption) as OptionsOrGroups<
-      Option,
-      Group
-    >) || [];
+  const options = (prependAllOption(initialOptions, allOption) as OptionsOrGroups<Option, Group>) || [];
   const { dropdown, input } = theme.components;
-  const inputSize =
-    size === 'compact' ? input.size.compact : input.size.default;
+  const inputSize = size === 'compact' ? input.size.compact : input.size.default;
 
-  const handleChange = (
-    selectedOptions: readonly Option[],
-    meta: ActionMeta<Option>,
-  ) => {
+  const handleChange = (selectedOptions: readonly Option[], meta: ActionMeta<Option>) => {
     if (!allOption) {
       if (onChange) {
         onChange(selectedOptions, meta);
       }
     } else {
       const optionAll = allOption.value;
-      const isAllSelected = selectedOptions.some(
-        option => option.value === optionAll,
-      );
+      const isAllSelected = selectedOptions.some(option => option.value === optionAll);
       const wasAllSelected = value?.some(option => option.value === optionAll);
       let newOptions = selectedOptions;
 
@@ -111,9 +80,7 @@ const MultiSelect = <
       }
       if (isAllSelected && wasAllSelected) {
         if (selectedOptions.length > 1) {
-          newOptions = selectedOptions.filter(
-            option => option.value !== optionAll,
-          );
+          newOptions = selectedOptions.filter(option => option.value !== optionAll);
         }
       }
       if (onChange) {
@@ -122,8 +89,7 @@ const MultiSelect = <
     }
   };
 
-  const getNoOptionsMessage = () =>
-    emptyStateText ?? t('components.multi-select.empty-state-text-default');
+  const getNoOptionsMessage = () => emptyStateText ?? t('components.multi-select.empty-state-text-default');
 
   return (
     <Box>
@@ -159,9 +125,7 @@ const MultiSelect = <
         onInputChange={onInputChange}
         openMenuOnFocus
         options={options}
-        placeholder={
-          placeholder ?? t('components.multi-select.placeholder-default')
-        }
+        placeholder={placeholder ?? t('components.multi-select.placeholder-default')}
         required={required}
         value={value}
         styles={{
@@ -180,11 +144,9 @@ const MultiSelect = <
             ...base,
             borderRadius: input.global.borderRadius,
           }),
-          control: (base, { isFocused }) => ({
+          control: (_base, { isFocused }) => ({
             background: input.state.default.initial.bg,
-            borderColor: hasError
-              ? `${input.state.error.initial.border}`
-              : input.state.default.initial.border,
+            borderColor: hasError ? `${input.state.error.initial.border}` : input.state.default.initial.border,
             borderRadius: input.global.borderRadius,
             borderStyle: 'solid',
             borderWidth: input.global.borderWidth,
@@ -192,16 +154,12 @@ const MultiSelect = <
             ':hover': {
               ...(!isFocused && {
                 background: input.state.default.hover.bg,
-                borderColor: hasError
-                  ? `${input.state.error.initial.border}`
-                  : input.state.default.hover.border,
+                borderColor: hasError ? `${input.state.error.initial.border}` : input.state.default.hover.border,
               }),
             },
             ...(isFocused && {
               background: input.state.default.focus.bg,
-              borderColor: hasError
-                ? `${input.state.error.initial.border}`
-                : input.state.default.focus.border,
+              borderColor: hasError ? `${input.state.error.initial.border}` : input.state.default.focus.border,
               boxShadow: input.state.default.focus.elevation,
             }),
           }),
@@ -250,9 +208,7 @@ const MultiSelect = <
             ...base,
             color: input.global.color,
             ...createText(inputSize.typography),
-            margin: `${theme.spacing[1]} auto ${theme.spacing[1]} ${
-              theme.spacing[hasValue ? 1 : 3]
-            }`,
+            margin: `${theme.spacing[1]} auto ${theme.spacing[1]} ${theme.spacing[hasValue ? 1 : 3]}`,
           }),
           valueContainer: base => ({
             ...base,

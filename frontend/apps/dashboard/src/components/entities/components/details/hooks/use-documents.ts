@@ -10,10 +10,7 @@ type GetDocumentsRequest = {
 
 type GetDocumentsResponse = Document[];
 
-const getDocuments = async (
-  authHeaders: AuthHeaders,
-  { entityId }: GetDocumentsRequest,
-) => {
+const getDocuments = async (authHeaders: AuthHeaders, { entityId }: GetDocumentsRequest) => {
   const response = await request<GetDocumentsResponse>({
     method: 'GET',
     url: `/entities/${entityId}/documents`,
@@ -35,10 +32,7 @@ const useDocuments = (id: string) => {
       select: documents => {
         documents.sort((doc1, doc2) => {
           if (!doc1.startedAt || !doc2.startedAt) return 0;
-          return (
-            new Date(doc1.startedAt).getTime() -
-            new Date(doc2.startedAt).getTime()
-          );
+          return new Date(doc1.startedAt).getTime() - new Date(doc2.startedAt).getTime();
         });
         return documents;
       },

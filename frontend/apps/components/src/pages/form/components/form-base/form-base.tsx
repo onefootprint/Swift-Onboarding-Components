@@ -68,8 +68,7 @@ const FormBase = ({
     keyPrefix: 'pages.secure-form',
   });
   const confirmationDialog = useConfirmationDialog();
-  const hasCountry =
-    sections.includes('fullAddress') || sections.includes('partialAddress');
+  const hasCountry = sections.includes('fullAddress') || sections.includes('partialAddress');
   const defaultValues = hasCountry ? { country: DEFAULT_COUNTRY } : undefined;
   const methods = useForm<FormData>({ defaultValues, mode: 'onBlur' });
   const {
@@ -141,11 +140,7 @@ const FormBase = ({
     const content = [];
     if (sections.includes('name') || sections.includes('card')) {
       content.push(
-        <Title
-          key="card-title"
-          label={t('section-title.card-information')}
-          iconComponent={<IcoCreditcard24 />}
-        />,
+        <Title key="card-title" label={t('section-title.card-information')} iconComponent={<IcoCreditcard24 />} />,
       );
     }
     if (sections.includes('name')) {
@@ -154,17 +149,10 @@ const FormBase = ({
     if (sections.includes('card')) {
       content.push(<Card key="card" />);
     }
-    if (
-      sections.includes('fullAddress') ||
-      sections.includes('partialAddress')
-    ) {
+    if (sections.includes('fullAddress') || sections.includes('partialAddress')) {
       content.push(<StyledDivider key="address-divider" />);
       content.push(
-        <Title
-          key="address-title"
-          label={t('section-title.billing-address')}
-          iconComponent={<IcoBuilding24 />}
-        />,
+        <Title key="address-title" label={t('section-title.billing-address')} iconComponent={<IcoBuilding24 />} />,
       );
     }
     if (sections.includes('fullAddress')) {

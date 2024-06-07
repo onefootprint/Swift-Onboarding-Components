@@ -22,12 +22,7 @@ const Fieldset = ({ children, cta, title }: FieldsetProps) => (
         {title}
       </Text>
       {cta && (
-        <LinkButton
-          onClick={cta.onClick}
-          disabled={cta.disabled}
-          type={cta.type}
-          form={cta.form}
-        >
+        <LinkButton onClick={cta.onClick} disabled={cta.disabled} type={cta.type} form={cta.form}>
           {cta.label}
         </LinkButton>
       )}

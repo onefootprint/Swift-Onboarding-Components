@@ -1,9 +1,4 @@
-import {
-  mockRequest,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -15,9 +10,7 @@ afterAll(() => {
   resetUser();
 });
 
-export const withCreateProxyConfig = (
-  proxyConfig: Partial<ProxyConfigDetails>,
-) =>
+export const withCreateProxyConfig = (proxyConfig: Partial<ProxyConfigDetails>) =>
   mockRequest({
     method: 'post',
     path: '/org/proxy_configs',

@@ -5,25 +5,13 @@ type GridProps = {
 };
 
 const ComposerLogo = ({ color }: GridProps) => (
-  <svg
-    width="117"
-    height="20"
-    viewBox="0 0 117 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg width="117" height="20" viewBox="0 0 117 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3.44088 14.6236H0V18.2795H3.44088V14.6236Z" fill={color} />
     <path d="M8.38713 9.89258H4.94629V18.2797H8.38713V9.89258Z" fill={color} />
     <path d="M13.3334 4.94629H9.89258V18.2796H13.3334V4.94629Z" fill={color} />
     <path d="M18.2798 0H14.8389V18.2796H18.2798V0Z" fill={color} />
-    <path
-      d="M3.44129 9.89258H0.000406891V11.3979H3.44129V9.89258Z"
-      fill={color}
-    />
-    <path
-      d="M8.38758 4.94629H0.000406891V6.9893H8.38758V4.94629Z"
-      fill={color}
-    />
+    <path d="M3.44129 9.89258H0.000406891V11.3979H3.44129V9.89258Z" fill={color} />
+    <path d="M8.38758 4.94629H0.000406891V6.9893H8.38758V4.94629Z" fill={color} />
     <path d="M3.44088 0H0V2.36559H3.44088V0Z" fill={color} />
     <path d="M13.3335 0H4.94629V2.36559H13.3335V0Z" fill={color} />
     <path

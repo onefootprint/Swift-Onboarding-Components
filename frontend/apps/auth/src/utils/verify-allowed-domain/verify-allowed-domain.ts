@@ -1,12 +1,9 @@
 const isLocalhost = (s: string): boolean => /https?:\/\/localhost/gi.test(s);
-const isFootPrintPreview = (s: string): boolean =>
-  /https?:\/\/.*\.preview\.onefootprint\.com/gi.test(s);
+const isFootPrintPreview = (s: string): boolean => /https?:\/\/.*\.preview\.onefootprint\.com/gi.test(s);
 
-const isDomain = (s: string): boolean =>
-  /[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+/.test(s);
+const isDomain = (s: string): boolean => /[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+/.test(s);
 
-const extractCleanDomain = (s: string): string =>
-  s.replace(/(https?:\/\/)?(www\.)?/gi, '').split('/')[0];
+const extractCleanDomain = (s: string): string => s.replace(/(https?:\/\/)?(www\.)?/gi, '').split('/')[0];
 
 const isDomainAllowed = (url: string, list?: string[]): boolean => {
   if (!url) return false;

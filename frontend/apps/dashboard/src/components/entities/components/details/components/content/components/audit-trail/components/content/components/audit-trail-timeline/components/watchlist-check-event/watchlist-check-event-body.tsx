@@ -1,11 +1,5 @@
 import type { Color } from '@onefootprint/design-tokens';
-import {
-  IcoCheck16,
-  IcoClose16,
-  IcoDotSmall16,
-  IcoInfo16,
-  IcoWarning16,
-} from '@onefootprint/icons';
+import { IcoCheck16, IcoClose16, IcoDotSmall16, IcoInfo16, IcoWarning16 } from '@onefootprint/icons';
 import type { WatchlistCheckEventData } from '@onefootprint/types';
 import { WatchlistCheckStatus } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
@@ -40,11 +34,7 @@ const statusIcons = {
   [WatchlistCheckStatus.error]: IcoClose16,
 };
 
-const WatchlistCheckEventBody = ({
-  data,
-  lineHeight = 'large',
-  showIcons,
-}: WatchlistCheckEventBodyProps) => {
+const WatchlistCheckEventBody = ({ data, lineHeight = 'large', showIcons }: WatchlistCheckEventBodyProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
   });

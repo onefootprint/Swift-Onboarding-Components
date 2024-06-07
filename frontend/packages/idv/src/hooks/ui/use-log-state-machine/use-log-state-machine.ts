@@ -3,21 +3,18 @@ import type { State } from 'xstate';
 
 import { Logger } from '../../../utils/logger';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const useLogStateMachine = (name: string, state: any) => {
   useEffect(() => {
     // For now, only log the state value, the actions and whether done to prevent leaking PII.
     // We might expand this later
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const stateData = (state as State<any, any>).toJSON();
-    Logger.track(
-      `${stateData.done ? '(done)' : '(pending)'} ${name} ${state.value}`,
-      {
-        name,
-        value: state.value,
-        done: Boolean(stateData.done),
-      },
-    );
+    Logger.track(`${stateData.done ? '(done)' : '(pending)'} ${name} ${state.value}`, {
+      name,
+      value: state.value,
+      done: Boolean(stateData.done),
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.value, state.done]);
 };

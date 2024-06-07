@@ -1,14 +1,7 @@
 'use client';
 
 import { IcoFileText24 } from '@onefootprint/icons';
-import {
-  Box,
-  Breadcrumb,
-  Button,
-  Stack,
-  Text,
-  useToast,
-} from '@onefootprint/ui';
+import { Box, Breadcrumb, Button, Stack, Text, useToast } from '@onefootprint/ui';
 import Link from 'next/link';
 import type { ReadonlyURLSearchParams } from 'next/navigation';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -52,16 +45,12 @@ const resetBodyPointerEvents = () => {
   document.body.style.pointerEvents = '';
 };
 
-const hasAssignee = (x?: PartnerDocument): boolean =>
-  Boolean(x?.partnerTenantAssignee?.id || x?.tenantAssignee?.id);
+const hasAssignee = (x?: PartnerDocument): boolean => Boolean(x?.partnerTenantAssignee?.id || x?.tenantAssignee?.id);
 
-const doWithId =
-  (noIdFn: () => unknown) =>
-  (withIdFn: (id: string) => unknown) =>
-  (id?: string) => (id ? withIdFn(id) : noIdFn());
+const doWithId = (noIdFn: () => unknown) => (withIdFn: (id: string) => unknown) => (id?: string) =>
+  id ? withIdFn(id) : noIdFn();
 
-const omitDecisionParam = (params: ReadonlyURLSearchParams) =>
-  omitSearchParams(['rdecision'], params).toString();
+const omitDecisionParam = (params: ReadonlyURLSearchParams) => omitSearchParams(['rdecision'], params).toString();
 
 const CompanyPageContent = ({
   documents,
@@ -92,9 +81,7 @@ const CompanyPageContent = ({
   const onRowClick = (doc: PartnerDocument) => dialog.add('timeline', doc.id);
 
   const onDeleteClick = alertOr((id: string) =>
-    deletePartnerPartnershipsRequests(partnerId, id)
-      .then(router.refresh)
-      .catch(errorToast),
+    deletePartnerPartnershipsRequests(partnerId, id).then(router.refresh).catch(errorToast),
   );
 
   const goToDocView = (docId?: string, subId?: string) =>
@@ -123,10 +110,7 @@ const CompanyPageContent = ({
   return (
     <>
       <Box tag="main">
-        <Breadcrumb.List
-          aria-label={t('companies.company-details-breadcrumb')}
-          marginBottom={7}
-        >
+        <Breadcrumb.List aria-label={t('companies.company-details-breadcrumb')} marginBottom={7}>
           <Breadcrumb.Item href="/app/companies" as={Link}>
             {t('companies.companies')}
           </Breadcrumb.Item>
@@ -139,20 +123,14 @@ const CompanyPageContent = ({
               {t('documents')}
             </Text>
           </Stack>
-          <Button
-            variant="secondary"
-            size="compact"
-            onClick={() => dialog.add('additional')}
-          >
+          <Button variant="secondary" size="compact" onClick={() => dialog.add('additional')}>
             {t('doc.request-document')}
           </Button>
         </Stack>
         <Box marginBlock={5}>
           <Progress
             value={documentsStatus.percentage}
-            details={`${documentsStatus.accepted}/${documentsStatus.count} ${t(
-              'companies.completed-controls',
-            )}`}
+            details={`${documentsStatus.accepted}/${documentsStatus.count} ${t('companies.completed-controls')}`}
           />
         </Box>
         <Box marginBottom={8}>
@@ -178,9 +156,7 @@ const CompanyPageContent = ({
           onClose={dialog.reset}
           title={t('doc.request-document')}
           onSubmit={payload => {
-            postPartnerPartnershipsDocuments(partnerId, payload)
-              .then(router.refresh)
-              .catch(errorToast);
+            postPartnerPartnershipsDocuments(partnerId, payload).then(router.refresh).catch(errorToast);
             dialog.reset();
           }}
           options={templatesUnused}
@@ -231,19 +207,11 @@ const CompanyPageContent = ({
           onClose={dialog.reset}
           onSubmit={({ docId, userId }) => {
             dialog.reset();
-            postPartnerPartnershipsDocumentsAssignments(
-              partnerId,
-              docId,
-              userId,
-            )
+            postPartnerPartnershipsDocumentsAssignments(partnerId, docId, userId)
               .then(router.refresh)
               .catch(errorToast);
           }}
-          options={
-            hasAssignee(docDialog)
-              ? [{ label: t('unassign'), value: '' }].concat(members)
-              : members
-          }
+          options={hasAssignee(docDialog) ? [{ label: t('unassign'), value: '' }].concat(members) : members}
         />
       ) : null}
       <DrawerTimeline

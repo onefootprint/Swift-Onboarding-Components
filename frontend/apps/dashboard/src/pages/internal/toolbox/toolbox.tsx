@@ -107,12 +107,7 @@ const Tenants = () => {
           />
         ))}
       </Stack>
-      {selectedTool && (
-        <SelectedToolDialog
-          selectedTool={selectedTool}
-          handleDialogClose={handleDialogClose}
-        />
-      )}
+      {selectedTool && <SelectedToolDialog selectedTool={selectedTool} handleDialogClose={handleDialogClose} />}
     </>
   );
 };

@@ -20,10 +20,7 @@ const Router = ({ onDone }: RouterProps) => {
   const isDone = state.matches('complete');
   useLogStateMachine('transfer-mobile', state);
   const { t } = useTranslation('idv');
-  const { title } = useRequirementsTitle(
-    missingRequirements,
-    !!isContinuingOnDesktop,
-  );
+  const { title } = useRequirementsTitle(missingRequirements, !!isContinuingOnDesktop);
 
   useEffect(() => {
     if (isDone) {
@@ -41,9 +38,7 @@ const Router = ({ onDone }: RouterProps) => {
           cta={t('transfer.pages.qr-processing.cancel')}
         />
       )}
-      {state.matches('confirmContinueOnDesktop') && (
-        <ConfirmContinueOnDesktop />
-      )}
+      {state.matches('confirmContinueOnDesktop') && <ConfirmContinueOnDesktop />}
       {state.matches('newTabRequest') && <NewTabRequest />}
       {state.matches('newTabProcessing') && (
         <Processing

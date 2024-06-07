@@ -6,32 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 export type CardExpDateInputProps = Omit<
   InputProps,
-  | 'autoComplete'
-  | 'inputMode'
-  | 'mask'
-  | 'value'
-  | 'maxLength'
-  | 'minLength'
-  | 'placeholder'
-  | 'size'
-  | 'type'
+  'autoComplete' | 'inputMode' | 'mask' | 'value' | 'maxLength' | 'minLength' | 'placeholder' | 'size' | 'type'
 > & {
   invalidMessage?: string;
   value?: string;
 };
 
 const CardExpDateInput = forwardRef<HTMLInputElement, CardExpDateInputProps>(
-  (
-    {
-      hasError,
-      hint,
-      invalidMessage,
-      label,
-      value,
-      ...props
-    }: CardExpDateInputProps,
-    ref,
-  ) => {
+  ({ hasError, hint, invalidMessage, label, value, ...props }: CardExpDateInputProps, ref) => {
     const { t } = useTranslation('common', {
       keyPrefix: 'pages.secure-form.card.form.expiry',
     });

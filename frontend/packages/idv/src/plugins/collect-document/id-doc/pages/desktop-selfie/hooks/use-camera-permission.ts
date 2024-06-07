@@ -17,23 +17,17 @@ export type CameraPermissionState =
 const PERMISSION_CHECK_INTERVAL = 100;
 
 const useCameraPermission = () => {
-  const [permissionState, setPermissionState] =
-    useState<CameraPermissionState>('undetected');
-  const [permissionQueryPending, setPermissionQueryPending] =
-    useState<boolean>(false);
+  const [permissionState, setPermissionState] = useState<CameraPermissionState>('undetected');
+  const [permissionQueryPending, setPermissionQueryPending] = useState<boolean>(false);
   const shouldQueryPermission =
-    (permissionState === 'undetected' || permissionState === 'not-allowed') &&
-    !permissionQueryPending;
+    (permissionState === 'undetected' || permissionState === 'not-allowed') && !permissionQueryPending;
 
   const handlePermissionError = (err: unknown) => {
     const error = err as DOMException;
     setPermissionState(parsePermissionError(error));
     setPermissionQueryPending(false);
 
-    Logger.warn(
-      `Error while retrieving camera permission. Error: ${error.name}`,
-      { location: 'desktop-selfie' },
-    );
+    Logger.warn(`Error while retrieving camera permission. Error: ${error.name}`, { location: 'desktop-selfie' });
   };
 
   const promptPermission = () => {
@@ -65,10 +59,7 @@ const useCameraPermission = () => {
       setPermissionQueryPending(true);
 
       // Some browsers don't support permissions or query
-      if (
-        navigator.permissions &&
-        typeof navigator.permissions.query === 'function'
-      ) {
+      if (navigator.permissions && typeof navigator.permissions.query === 'function') {
         // We start by checking if the permission has already been granted
         navigator.permissions
           // @ts-expect-error: fix-me Type '"camera"' is not assignable to type 'PermissionName'.
@@ -85,9 +76,7 @@ const useCameraPermission = () => {
             // in that case, we set the permission state to "not-allowed"
             // If the permission was previously queried and set in a previous in interval, we keep the permission state as is
             // then we prompt the user for permission
-            setPermissionState(prev =>
-              prev === 'undetected' ? 'not-allowed' : prev,
-            );
+            setPermissionState(prev => (prev === 'undetected' ? 'not-allowed' : prev));
             promptPermission();
           })
           .catch(() => {

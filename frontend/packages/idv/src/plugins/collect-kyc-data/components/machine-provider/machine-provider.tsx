@@ -9,14 +9,9 @@ type CollectKycDataMachineArgs = {
   initState?: string;
 };
 
-const useLocalCollectKycDataMachine = ({
-  initialContext,
-  initState,
-}: CollectKycDataMachineArgs) =>
+const useLocalCollectKycDataMachine = ({ initialContext, initState }: CollectKycDataMachineArgs) =>
   useMachine(() => createCollectKycDataMachine(initialContext, initState));
 
-export const [MachineProvider, useCollectKycDataMachine] = constate(
-  useLocalCollectKycDataMachine,
-);
+export const [MachineProvider, useCollectKycDataMachine] = constate(useLocalCollectKycDataMachine);
 
 export default MachineProvider;

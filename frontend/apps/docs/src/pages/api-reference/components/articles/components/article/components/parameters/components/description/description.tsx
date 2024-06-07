@@ -25,10 +25,7 @@ const Description = ({ children }: DescriptionProps) => {
         elements.push(children.substring(startMarkerIndex));
         break;
       } else {
-        const codeText = children.substring(
-          startMarkerIndex + 1,
-          endMarkerIndex,
-        );
+        const codeText = children.substring(startMarkerIndex + 1, endMarkerIndex);
         elements.push(
           <CodeInline disabled key={endMarkerIndex}>
             {codeText}

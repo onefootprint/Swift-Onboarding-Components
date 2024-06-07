@@ -14,18 +14,12 @@ const SupportWebsite = ({ value }: SupportWebsiteProps) => {
   });
 
   return (
-    <Fieldset
-      label={t('label')}
-      value={value}
-      deleteKey={value ? 'clear_support_website' : undefined}
-    >
+    <Fieldset label={t('label')} value={value} deleteKey={value ? 'clear_support_website' : undefined}>
       {({ id, handleSubmit }) => (
         <Form
           id={id}
           value={value}
-          onSubmit={(newSupportWebsite: string) =>
-            handleSubmit({ supportWebsite: newSupportWebsite })
-          }
+          onSubmit={(newSupportWebsite: string) => handleSubmit({ supportWebsite: newSupportWebsite })}
         />
       )}
     </Fieldset>

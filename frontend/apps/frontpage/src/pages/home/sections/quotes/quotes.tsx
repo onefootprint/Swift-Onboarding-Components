@@ -14,11 +14,7 @@ const Quotes = () => {
   });
   return (
     <QuotesContainer align="center" justify="center" direction="column">
-      <SectionTitle
-        title={t('title')}
-        subtitle={t('subtitle')}
-        align="center"
-      />
+      <SectionTitle title={t('title')} subtitle={t('subtitle')} align="center" />
       <GridContainer>
         <Column>
           <QuoteCard company="apiture" />

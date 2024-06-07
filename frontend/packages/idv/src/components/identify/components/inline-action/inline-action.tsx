@@ -15,13 +15,7 @@ type InlineActionProps = {
 
 type EventClickType = React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>;
 
-const InlineAction = ({
-  className,
-  isDisabled,
-  label,
-  labelCta,
-  onClick,
-}: InlineActionProps): JSX.Element => {
+const InlineAction = ({ className, isDisabled, label, labelCta, onClick }: InlineActionProps): JSX.Element => {
   const handleClick = (event: EventClickType) => {
     if (!isDisabled) {
       onClick(event);
@@ -29,13 +23,7 @@ const InlineAction = ({
   };
 
   return (
-    <Text
-      tag="span"
-      className={className}
-      color="tertiary"
-      isPrivate
-      variant="label-4"
-    >
+    <Text tag="span" className={className} color="tertiary" isPrivate variant="label-4">
       {label}&nbsp;
       <LinkButton
         disabled={isDisabled}

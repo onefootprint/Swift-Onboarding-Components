@@ -1,9 +1,4 @@
-import type {
-  D2PStatus,
-  IdDocOutcome,
-  L10n,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { D2PStatus, IdDocOutcome, L10n, PublicOnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
   opener?: string;

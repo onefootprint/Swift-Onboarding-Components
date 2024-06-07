@@ -12,10 +12,7 @@ import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import useSession, { type AuthHeaders } from 'src/hooks/use-session';
 
-const copyPlaybook = async (
-  authHeaders: AuthHeaders,
-  { playbookId, name, isLive, tenantId }: CopyPlaybookRequest,
-) => {
+const copyPlaybook = async (authHeaders: AuthHeaders, { playbookId, name, isLive, tenantId }: CopyPlaybookRequest) => {
   const assumeResponse = await request<OrgAssumeRoleResponse>({
     method: 'POST',
     url: '/org/auth/assume_role',
@@ -51,10 +48,7 @@ const useCopyPlaybook = () => {
   const router = useRouter();
   const { authHeaders, isLive, setIsLive, data } = useSession();
 
-  const handleCtaClick = async (
-    playbook: OnboardingConfig,
-    payload: CopyPlaybookRequest,
-  ) => {
+  const handleCtaClick = async (playbook: OnboardingConfig, payload: CopyPlaybookRequest) => {
     const needsToAssumeTenant = payload.tenantId !== data.org?.id;
     const needsToSwitchMode = playbook.isLive !== isLive;
 
@@ -80,8 +74,7 @@ const useCopyPlaybook = () => {
   };
 
   return useMutation({
-    mutationFn: (payload: CopyPlaybookRequest) =>
-      copyPlaybook(authHeaders, payload),
+    mutationFn: (payload: CopyPlaybookRequest) => copyPlaybook(authHeaders, payload),
     onSuccess: (response, payload) => {
       toast.show({
         description: t('success.description', {

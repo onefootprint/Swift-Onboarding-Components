@@ -13,18 +13,14 @@ import {
 describe('Id Doc Machine Tests', () => {
   describe('Auto transition to the correct state after initState', () => {
     it('Should transition to country and doc type select state for mobile', () => {
-      const machine = interpret(
-        createIdDocMachine(getArgsRegularMobile()),
-      ).onTransition(state => {
+      const machine = interpret(createIdDocMachine(getArgsRegularMobile())).onTransition(state => {
         expect(state.value).toEqual('countryAndType');
       });
       machine.start();
       machine.stop();
     });
     it('Should transition to country and doc type select state for desktop', () => {
-      const machine = interpret(
-        createIdDocMachine(getArgsRegularDesktop()),
-      ).onTransition(state => {
+      const machine = interpret(createIdDocMachine(getArgsRegularDesktop())).onTransition(state => {
         expect(state.value).toEqual('countryAndType');
       });
       machine.start();
@@ -89,9 +85,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('frontImageCaptureMobile');
       expect(state.context.idDoc.country).toEqual('US');
 
-      expect(state.context.idDoc.type).toEqual(
-        SupportedIdDocTypes.driversLicense,
-      );
+      expect(state.context.idDoc.type).toEqual(SupportedIdDocTypes.driversLicense);
       state = machine.send({
         type: 'navigatedToPrev',
       });
@@ -194,9 +188,7 @@ describe('Id Doc Machine Tests', () => {
         type: 'navigatedToPrev',
       });
       expect(state.value).toEqual('countryAndType');
-      expect(state.context.idDoc.type).toEqual(
-        SupportedIdDocTypes.driversLicense,
-      );
+      expect(state.context.idDoc.type).toEqual(SupportedIdDocTypes.driversLicense);
 
       machine.send({
         type: 'receivedCountryAndType',

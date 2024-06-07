@@ -1,5 +1,5 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { createFontStyles, Dropdown, useToast } from '@onefootprint/ui';
+import { Dropdown, createFontStyles, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -14,8 +14,7 @@ const SupportLinksSelect = ({ config }: SupportLinksSelectProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.layout.app-footer',
   });
-  const shouldShowSupportLinks =
-    config?.supportEmail || config?.supportPhone || config?.supportWebsite;
+  const shouldShowSupportLinks = config?.supportEmail || config?.supportPhone || config?.supportWebsite;
 
   const copyToClipboard = (phoneNumber?: string) => {
     if (phoneNumber) {
@@ -83,11 +82,7 @@ const SupportLinksSelect = ({ config }: SupportLinksSelectProps) => {
       <StyledContent sideOffset={8}>
         {supportLinks.map(({ label, contactLink, type, onSelect }) =>
           label && contactLink ? (
-            <StyledItem
-              key={type}
-              size="tiny"
-              onSelect={() => onSelect(contactLink)}
-            >
+            <StyledItem key={type} size="tiny" onSelect={() => onSelect(contactLink)}>
               {label}
             </StyledItem>
           ) : null,

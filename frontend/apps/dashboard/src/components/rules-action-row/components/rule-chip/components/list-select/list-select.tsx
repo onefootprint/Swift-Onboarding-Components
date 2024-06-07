@@ -21,12 +21,8 @@ const ListSelect = ({ defaultList, di, lists = [], onChange }: ListProps) => {
     keyPrefix: 'pages.playbooks.details.rules.action-row.rule-chip.list',
   });
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedList, setSelectedList] = useState<List | undefined>(
-    defaultList,
-  );
-  const filteredLists = di
-    ? lists?.filter(({ kind }) => listKindsForDataIdentifier(di).includes(kind))
-    : lists;
+  const [selectedList, setSelectedList] = useState<List | undefined>(defaultList);
+  const filteredLists = di ? lists?.filter(({ kind }) => listKindsForDataIdentifier(di).includes(kind)) : lists;
 
   useEffect(() => {
     setSelectedList(defaultList);
@@ -45,12 +41,7 @@ const ListSelect = ({ defaultList, di, lists = [], onChange }: ListProps) => {
       open={isOpen}
       onOpenChange={setIsOpen}
     >
-      <ComboboxProvider
-        open={isOpen}
-        setOpen={setIsOpen}
-        resetValueOnHide
-        includesBaseElement={false}
-      >
+      <ComboboxProvider open={isOpen} setOpen={setIsOpen} resetValueOnHide includesBaseElement={false}>
         <CustomTrigger
           isOpen={isOpen}
           ariaLabel={t('value.trigger-aria-label')}
@@ -76,15 +67,8 @@ const ListSelect = ({ defaultList, di, lists = [], onChange }: ListProps) => {
             <ComboboxList role="listbox" aria-label={t('value.aria-label')}>
               <DropdownInner>
                 {filteredLists.map(({ id, alias }) => (
-                  <ComboboxItem
-                    key={id}
-                    role="option"
-                    aria-label={id}
-                    onClick={() => handleClick(id)}
-                  >
-                    <DropdownOption data-active-item={id === selectedList?.id}>
-                      {alias ?? id}
-                    </DropdownOption>
+                  <ComboboxItem key={id} role="option" aria-label={id} onClick={() => handleClick(id)}>
+                    <DropdownOption data-active-item={id === selectedList?.id}>{alias ?? id}</DropdownOption>
                   </ComboboxItem>
                 ))}
               </DropdownInner>

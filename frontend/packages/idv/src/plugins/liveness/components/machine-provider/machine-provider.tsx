@@ -11,8 +11,6 @@ type MachineArgs = {
 const useLocalLivenessMachine = ({ initialContext }: MachineArgs) =>
   useMachine(() => createLivenessMachine(initialContext));
 
-export const [MachineProvider, useLivenessMachine] = constate(
-  useLocalLivenessMachine,
-);
+export const [MachineProvider, useLivenessMachine] = constate(useLocalLivenessMachine);
 
 export default MachineProvider;

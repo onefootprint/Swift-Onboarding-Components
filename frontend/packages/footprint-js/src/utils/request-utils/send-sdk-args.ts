@@ -9,13 +9,7 @@ import type {
 } from '../../types/components';
 import { ComponentKind } from '../../types/components';
 import { isAuthUpdateLoginMethods, isUpdateLoginMethods } from '../type-guards';
-import {
-  API_BASE_URL,
-  SDK_NAME,
-  SDK_VERSION,
-  SdkKind,
-  SdkKindByComponentKind,
-} from './constants';
+import { API_BASE_URL, SDK_NAME, SDK_VERSION, SdkKind, SdkKindByComponentKind } from './constants';
 import transformKeys from './transform-keys';
 
 const NUM_RETRIES = 3;
@@ -39,9 +33,7 @@ type ArgsDataPayload =
   | undefined;
 
 export const getSdkKind = (props: Props): SdkKind =>
-  isUpdateLoginMethods(props)
-    ? SdkKind.UpdateAuthMethodsV1
-    : SdkKindByComponentKind[props.kind];
+  isUpdateLoginMethods(props) ? SdkKind.UpdateAuthMethodsV1 : SdkKindByComponentKind[props.kind];
 
 export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
   const { kind } = props;
@@ -112,15 +104,11 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
   return undefined;
 };
 
-const sendSdkArgsRecursive = async (
-  payload: SendSdkArgsRequest,
-  numRetries: number,
-): Promise<SendSdkArgsResponse> =>
+const sendSdkArgsRecursive = async (payload: SendSdkArgsRequest, numRetries: number): Promise<SendSdkArgsResponse> =>
   fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {
-      'x-fp-client-version':
-        `${SDK_NAME} ${SDK_VERSION} ${payload.kind}`.trim(),
+      'x-fp-client-version': `${SDK_NAME} ${SDK_VERSION} ${payload.kind}`.trim(),
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),

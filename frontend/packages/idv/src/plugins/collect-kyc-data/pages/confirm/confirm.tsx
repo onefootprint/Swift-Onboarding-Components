@@ -7,15 +7,10 @@ import { ConfirmCollectedData } from '../../../../components/confirm-collected-d
 import { useUserAuthMethods } from '../../../../components/identify';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
-import useSyncData, {
-  checkPhoneEmailBeforeSubmit,
-} from '../../hooks/use-sync-data';
+import useSyncData, { checkPhoneEmailBeforeSubmit } from '../../hooks/use-sync-data';
 import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
-import {
-  getVerifiedMap,
-  getVerifiedMethods,
-} from './components/basic-info-section/helpers';
+import { getVerifiedMap, getVerifiedMethods } from './components/basic-info-section/helpers';
 import IdentitySection from './components/identity-section';
 import LegalStatusSection from './components/legal-status-section';
 
@@ -23,13 +18,7 @@ const Confirm = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.confirm' });
 
   const [state, send] = useCollectKycDataMachine();
-  const {
-    authToken,
-    data,
-    requirement,
-    initialData,
-    dataCollectionScreensToShow,
-  } = state.context;
+  const { authToken, data, requirement, initialData, dataCollectionScreensToShow } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();
 
   const toast = useToast();
@@ -49,12 +38,7 @@ const Confirm = () => {
 
   const handleConfirm = () => {
     syncData({
-      data: checkPhoneEmailBeforeSubmit(
-        initialData,
-        data,
-        requirement,
-        verifiedMethods,
-      ),
+      data: checkPhoneEmailBeforeSubmit(initialData, data, requirement, verifiedMethods),
       onSuccess: () => send({ type: 'confirmed' }),
       onError: (fieldErrors: SyncDataFieldErrors) => {
         // We can't show the error messages as hints unless the sub-forms are in edit mode
@@ -70,9 +54,7 @@ const Confirm = () => {
           });
           return;
         }
-        const fields = Object.keys(fieldErrors).filter(di =>
-          Object.values(IdDI).includes(di as IdDI),
-        );
+        const fields = Object.keys(fieldErrors).filter(di => Object.values(IdDI).includes(di as IdDI));
         if (fields.length === 0) {
           toast.show({
             title: t('errors.invalid-inputs.title'),
@@ -81,9 +63,7 @@ const Confirm = () => {
           });
           return;
         }
-        const fieldNames = fields
-          .map(di => t(`di.${di}` as unknown as TemplateStringsArray))
-          .join(', ');
+        const fieldNames = fields.map(di => t(`di.${di}` as unknown as TemplateStringsArray)).join(', ');
         toast.show({
           title: t('errors.invalid-inputs.title'),
           description: t('errors.invalid-inputs.description-with-fields', {

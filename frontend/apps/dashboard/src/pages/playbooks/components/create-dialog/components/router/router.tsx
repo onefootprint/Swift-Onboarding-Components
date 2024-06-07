@@ -24,11 +24,7 @@ import VerificationChecks from './components/verification-checks';
 import WhoToOnboard from './components/who-to-onboard';
 import useCreatePlaybook from './hooks/use-create-playbook';
 import useOptions from './hooks/use-options';
-import {
-  getFixedAuthPlaybook,
-  getFixedIdDocPlaybook,
-  getFixedTemplatePlaybook,
-} from './utils/fixed-playbook';
+import { getFixedAuthPlaybook, getFixedIdDocPlaybook, getFixedTemplatePlaybook } from './utils/fixed-playbook';
 import getCurrentOption from './utils/get-current-option';
 import getDefaultValues from './utils/get-default-values';
 import processPlaybook from './utils/process-playbook';
@@ -56,11 +52,8 @@ const Router = ({ onCreate }: RouterProps) => {
   });
   const defaultValues = getDefaultValues(state.context);
   const idDocKinds = state.context.playbook?.personal.idDocKind;
-  const countrySpecificIdDocKinds =
-    state.context.playbook?.personal.countrySpecificIdDocKind;
-  const requiresIdDoc =
-    (idDocKinds ?? []).length > 0 ||
-    Object.keys(countrySpecificIdDocKinds ?? {}).length > 0;
+  const countrySpecificIdDocKinds = state.context.playbook?.personal.countrySpecificIdDocKind;
+  const requiresIdDoc = (idDocKinds ?? []).length > 0 || Object.keys(countrySpecificIdDocKinds ?? {}).length > 0;
 
   const createPlaybook = (
     context: MachineContext,
@@ -150,12 +143,7 @@ const Router = ({ onCreate }: RouterProps) => {
     verificationChecksForm: VerificationChecksFormData,
     formData: SummaryFormData,
   ) => {
-    const context = getFixedTemplatePlaybook(
-      state.context,
-      formData,
-      verificationChecksForm,
-      defaultValues,
-    );
+    const context = getFixedTemplatePlaybook(state.context, formData, verificationChecksForm, defaultValues);
     createPlaybook(context, verificationChecksForm);
   };
 
@@ -166,11 +154,7 @@ const Router = ({ onCreate }: RouterProps) => {
         skipKyc: true,
         amlFormData: defaultValues.aml,
       };
-      const idDocContext = getFixedIdDocPlaybook(
-        state.context,
-        formData,
-        verificationChecksForm,
-      );
+      const idDocContext = getFixedIdDocPlaybook(state.context, formData, verificationChecksForm);
       createPlaybook(idDocContext, verificationChecksForm);
       return;
     }
@@ -256,10 +240,8 @@ const Router = ({ onCreate }: RouterProps) => {
               const { allowInternationalResidents } = formData;
               if (allowInternationalResidents) {
                 defaultValues.playbook.personal.ssn = false;
-                (defaultValues.playbook.personal as Personal).ssnOptional =
-                  false;
-                (defaultValues.playbook.personal as Personal).ssnKind =
-                  undefined;
+                (defaultValues.playbook.personal as Personal).ssnOptional = false;
+                (defaultValues.playbook.personal as Personal).ssnKind = undefined;
               }
               send('residencySubmitted', {
                 payload: { formData },
@@ -309,14 +291,9 @@ const Router = ({ onCreate }: RouterProps) => {
             }}
             isLoading={mutation.isLoading}
             requiresDoc={requiresIdDoc}
-            allowInternationalResident={
-              state.context.residencyForm?.allowInternationalResidents
-            }
+            allowInternationalResident={state.context.residencyForm?.allowInternationalResidents}
             isKyb={state.context.kind === 'kyb'}
-            collectBO={
-              state.context.playbook?.businessInformation
-                ?.business_beneficial_owners
-            }
+            collectBO={state.context.playbook?.businessInformation?.business_beneficial_owners}
             businessInfo={state.context.playbook?.businessInformation}
           />
         )}

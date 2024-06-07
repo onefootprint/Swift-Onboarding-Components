@@ -9,18 +9,9 @@ type FieldsListProps = {
 };
 
 const FieldsList = ({ fields }: FieldsListProps) => (
-  <Grid.Container
-    columns={['1fr 1fr']}
-    rows={['1fr auto']}
-    width="100%"
-    gap={4}
-  >
+  <Grid.Container columns={['1fr 1fr']} rows={['1fr auto']} width="100%" gap={4}>
     {fields.map(field => (
-      <Field
-        key={field.label}
-        label={field.label}
-        IconComponent={field.IconComponent}
-      />
+      <Field key={field.label} label={field.label} IconComponent={field.IconComponent} />
     ))}
   </Grid.Container>
 );

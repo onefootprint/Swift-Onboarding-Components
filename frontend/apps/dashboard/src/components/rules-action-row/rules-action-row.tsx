@@ -14,15 +14,7 @@ import {
   RiskSignalRuleOp,
   type Rule,
 } from '@onefootprint/types';
-import {
-  Button,
-  createFontStyles,
-  IconButton,
-  Stack,
-  Text,
-  Tooltip,
-  useToast,
-} from '@onefootprint/ui';
+import { Button, IconButton, Stack, Text, Tooltip, createFontStyles, useToast } from '@onefootprint/ui';
 import { isEqual } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,23 +33,14 @@ export type RulesActionRowProps = {
   onUndoEdit?: (id: string) => void;
 };
 
-const RulesActionRow = ({
-  isEditing,
-  rule,
-  onDelete,
-  onEdit,
-  onUndoDelete,
-  onUndoEdit,
-}: RulesActionRowProps) => {
+const RulesActionRow = ({ isEditing, rule, onDelete, onEdit, onUndoDelete, onUndoEdit }: RulesActionRowProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row',
   });
   const { data: lists } = useLists();
   const [isPendingChange, setIsPendingChange] = useState(false);
   const [isPendingDeletion, setIsPendingDeletion] = useState(false);
-  const [expressions, setExpressions] = useState<
-    (RiskSignalRuleField | ListRuleField)[]
-  >(rule.ruleExpression);
+  const [expressions, setExpressions] = useState<(RiskSignalRuleField | ListRuleField)[]>(rule.ruleExpression);
   const toast = useToast();
 
   useEffect(() => {
@@ -66,9 +49,7 @@ const RulesActionRow = ({
     setIsPendingDeletion(false);
   }, [rule, isEditing]);
 
-  const handleEditRule = (
-    newExpression: (RiskSignalRuleField | ListRuleField)[],
-  ) => {
+  const handleEditRule = (newExpression: (RiskSignalRuleField | ListRuleField)[]) => {
     onEdit?.({
       ruleId: rule.ruleId,
       ruleExpression:
@@ -80,21 +61,18 @@ const RulesActionRow = ({
   };
 
   // Using index instead of expression in case the rule has the same expression multiple times
-  const handleChangeExpression =
-    (index: number) => (newExpression: RiskSignalRuleField | ListRuleField) => {
-      setExpressions(currentExpressions => {
-        const newExpressions = [...currentExpressions];
-        newExpressions[index] = newExpression;
-        handleEditRule(newExpressions);
-        return newExpressions;
-      });
-    };
+  const handleChangeExpression = (index: number) => (newExpression: RiskSignalRuleField | ListRuleField) => {
+    setExpressions(currentExpressions => {
+      const newExpressions = [...currentExpressions];
+      newExpressions[index] = newExpression;
+      handleEditRule(newExpressions);
+      return newExpressions;
+    });
+  };
 
   const handleDeleteExpression = (index: number) => {
     setExpressions(currentExpressions => {
-      const newExpressions = currentExpressions
-        .slice(0, index)
-        .concat(currentExpressions.slice(index + 1));
+      const newExpressions = currentExpressions.slice(0, index).concat(currentExpressions.slice(index + 1));
       handleEditRule(newExpressions);
       return newExpressions;
     });
@@ -102,10 +80,7 @@ const RulesActionRow = ({
 
   const handleAddRiskSignalExpression = () => {
     setExpressions(currentExpressions => {
-      const newExpressions = [
-        ...currentExpressions,
-        { field: '', op: RiskSignalRuleOp.eq, value: true },
-      ];
+      const newExpressions = [...currentExpressions, { field: '', op: RiskSignalRuleOp.eq, value: true }];
       setIsPendingChange(true);
       return newExpressions;
     });
@@ -148,10 +123,7 @@ const RulesActionRow = ({
   };
 
   return (
-    <RulesListItem
-      role="row"
-      aria-label={rule.ruleExpression.map(({ field }) => field).join(', ')}
-    >
+    <RulesListItem role="row" aria-label={rule.ruleExpression.map(({ field }) => field).join(', ')}>
       <Stack justify="space-between" align="start">
         <Stack align="center" gap={3} flexWrap="wrap">
           <Text variant="body-4">{t('if')}</Text>
@@ -164,8 +136,7 @@ const RulesActionRow = ({
                     {t('and')}
                   </Text>
                 )}
-                {expression.op === ListRuleOp.isIn ||
-                expression.op === ListRuleOp.isNotIn ? (
+                {expression.op === ListRuleOp.isIn || expression.op === ListRuleOp.isNotIn ? (
                   <ListRuleChip
                     isEditing={isPendingDeletion ? false : isEditing}
                     defaultExpression={expression}
@@ -213,31 +184,21 @@ const RulesActionRow = ({
               <Button
                 variant="secondary"
                 prefixIcon={IcoBroadcast16}
-                disabled={
-                  isPendingDeletion ||
-                  expressions.some(
-                    expression => !expression.field || !expression.value,
-                  )
-                }
+                disabled={isPendingDeletion || expressions.some(expression => !expression.field || !expression.value)}
                 onClick={handleAddRiskSignalExpression}
               >
                 {t('add-risk-signal')}
               </Button>
             </ButtonContainer>
             <ButtonContainer data-is-broadcast={false}>
-              <Tooltip
-                text={t('add-list-tooltip')}
-                disabled={!!lists?.data.length}
-              >
+              <Tooltip text={t('add-list-tooltip')} disabled={!!lists?.data.length}>
                 <Button
                   variant="secondary"
                   prefixIcon={IcoShuffle16}
                   disabled={
                     !lists?.data.length ||
                     isPendingDeletion ||
-                    expressions.some(
-                      expression => !expression.field || !expression.value,
-                    )
+                    expressions.some(expression => !expression.field || !expression.value)
                   }
                   onClick={handleAddListExpression}
                 >
@@ -249,11 +210,7 @@ const RulesActionRow = ({
           {(isPendingChange || isPendingDeletion) && (
             <Stack align="center" gap={2} width="fit-content">
               <IcoClockSmall16 color={isPendingChange ? 'tertiary' : 'error'} />
-              <Text
-                variant="caption-1"
-                color={isPendingChange ? 'tertiary' : 'error'}
-                width="max-content"
-              >
+              <Text variant="caption-1" color={isPendingChange ? 'tertiary' : 'error'} width="max-content">
                 {isPendingChange ? t('pending-change') : t('pending-deletion')}
               </Text>
             </Stack>

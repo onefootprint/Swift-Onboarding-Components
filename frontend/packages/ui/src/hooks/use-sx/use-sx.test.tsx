@@ -1,5 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import { renderHook, Wrapper } from '@onefootprint/test-utils';
+import { Wrapper, renderHook } from '@onefootprint/test-utils';
 
 import useSX from './use-sx';
 
@@ -15,11 +15,9 @@ describe('useSX', () => {
 
   describe('when the parameter is not empty', () => {
     it('should produce the expected style object', () => {
-      const { result } = renderHook(
-        () =>
-          useSX({ backgroundColor: 'primary', marginX: 3, display: 'flex' }),
-        { wrapper: Wrapper },
-      );
+      const { result } = renderHook(() => useSX({ backgroundColor: 'primary', marginX: 3, display: 'flex' }), {
+        wrapper: Wrapper,
+      });
       expect(result.current).toMatchObject({
         backgroundColor: theme.backgroundColor.primary,
         display: 'flex',

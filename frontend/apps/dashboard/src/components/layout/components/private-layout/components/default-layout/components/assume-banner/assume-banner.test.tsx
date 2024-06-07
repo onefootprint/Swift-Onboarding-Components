@@ -1,8 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAssumedUser, asUser, resetUser } from 'src/config/tests';
 

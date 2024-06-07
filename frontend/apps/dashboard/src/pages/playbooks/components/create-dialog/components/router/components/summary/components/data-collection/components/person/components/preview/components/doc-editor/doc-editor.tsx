@@ -14,23 +14,16 @@ const DocEditor = ({ onDone }: DocEditorProps) => {
   const { t: allT } = useTranslation('common');
   const { watch, setValue } = useFormContext();
   const selectedGlobalDocs = watch('personal.idDocKind');
-  const selectedCountrySpecificDocs = watch(
-    'personal.countrySpecificIdDocKind',
-  );
+  const selectedCountrySpecificDocs = watch('personal.countrySpecificIdDocKind');
   const [initialDocs] = useState({
     selectedGlobalDocs,
     selectedCountrySpecificDocs,
   });
-  const hasDocs =
-    selectedGlobalDocs.length > 0 ||
-    Object.keys(selectedCountrySpecificDocs).length > 0;
+  const hasDocs = selectedGlobalDocs.length > 0 || Object.keys(selectedCountrySpecificDocs).length > 0;
 
   const handleCancel = () => {
     setValue('personal.idDocKind', initialDocs.selectedGlobalDocs);
-    setValue(
-      'personal.countrySpecificIdDocKind',
-      initialDocs.selectedCountrySpecificDocs,
-    );
+    setValue('personal.countrySpecificIdDocKind', initialDocs.selectedCountrySpecificDocs);
     onDone();
   };
 

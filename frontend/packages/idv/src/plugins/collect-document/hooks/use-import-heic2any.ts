@@ -10,7 +10,7 @@ const loadHeic2AnyModule = async (retryCount = 0): Promise<Heic2AnyModule> => {
   try {
     const heic2any = (await import('heic2any')).default;
     return heic2any;
-  } catch (err) {
+  } catch (_e) {
     if (retryCount < 2) {
       return loadHeic2AnyModule(retryCount + 1);
     }

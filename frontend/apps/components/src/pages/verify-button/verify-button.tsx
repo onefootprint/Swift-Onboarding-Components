@@ -24,14 +24,7 @@ const VerifyButton = () => {
     return null;
   }
 
-  return (
-    <FootprintButton
-      disabled={!isValid}
-      text={isValid ? label : undefined}
-      onClick={handleClick}
-      fullWidth
-    />
-  );
+  return <FootprintButton disabled={!isValid} text={isValid ? label : undefined} onClick={handleClick} fullWidth />;
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {

@@ -1,8 +1,8 @@
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
-import { Grid, media, Tabs, Text } from '@onefootprint/ui';
+import { Grid, Tabs, Text, media } from '@onefootprint/ui';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useTheme } from 'next-themes';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -27,40 +27,18 @@ const Examples = () => {
   return (
     <>
       <Tabs onChange={handleTabChange} options={tabOptions} />
-      <List
-        gap={5}
-        columns={['repeat(2,1fr)']}
-        marginTop={8}
-        marginBottom={8}
-        width="100%"
-      >
+      <List gap={5} columns={['repeat(2,1fr)']} marginTop={8} marginBottom={8} width="100%">
         {tab.links.map(({ name, img, href }) => {
           const parts = img.src.split('/');
           const filename = parts.pop();
           const themedPath = `${parts.join('/')}/${theme}/${filename}`;
           return (
-            <Item
-              href={href}
-              key={name}
-              rel="noreferrer noopener"
-              target="_blank"
-            >
+            <Item href={href} key={name} rel="noreferrer noopener" target="_blank">
               <IconOpen color="accent" />
               <ImageContainer>
-                <Image
-                  alt={name}
-                  height={img.height}
-                  src={themedPath}
-                  width={img.width}
-                />
+                <Image alt={name} height={img.height} src={themedPath} width={img.width} />
               </ImageContainer>
-              <Text
-                color="secondary"
-                variant="body-3"
-                overflow="hidden"
-                textOverflow="ellipsis"
-                whiteSpace="nowrap"
-              >
+              <Text color="secondary" variant="body-3" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
                 {name}
               </Text>
             </Item>

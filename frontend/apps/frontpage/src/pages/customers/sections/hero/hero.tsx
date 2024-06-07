@@ -23,11 +23,7 @@ const Hero = () => {
   return (
     <HeroContainer>
       <Illustration />
-      <TitleContainer
-        initial="hidden"
-        animate="visible"
-        variants={titleVariants}
-      >
+      <TitleContainer initial="hidden" animate="visible" variants={titleVariants}>
         <Text variant="display-2" tag="h1">
           {t('title')}
         </Text>

@@ -1,20 +1,18 @@
 import { IcoForbid40 } from '@onefootprint/icons';
-import { type Entity, type Liveness } from '@onefootprint/types';
+import type { Entity, Liveness } from '@onefootprint/types';
 import { Divider, MultiSelect, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import Map from '../map';
+import MapComponent from '../map';
 import MapMarker from '../map/components/map-marker';
 import AddressCard from './components/address-card';
 import AddressType from './components/address-card/types';
 import ContainerWithToggle from './components/container-with-toggle';
 import InsightEventCard from './components/insight-event-card';
 import useEntries from './hooks/use-entries';
-import useMultiSelectOptions, {
-  MultiSelectOptionValue,
-} from './hooks/use-multi-select-options';
+import useMultiSelectOptions, { MultiSelectOptionValue } from './hooks/use-multi-select-options';
 
 export type ContentProps = {
   entity: Entity;
@@ -27,11 +25,9 @@ const Content = ({ entity, livenessData }: ContentProps) => {
   });
   const [detailsHidden, setDetailsHidden] = useState(false);
 
-  const { allOptions, selectedOptions, handleOptionsChange } =
-    useMultiSelectOptions(entity, livenessData);
+  const { allOptions, selectedOptions, handleOptionsChange } = useMultiSelectOptions(entity, livenessData);
 
-  const { entries, selectedCoords, selectedId, onSelectedIdChange } =
-    useEntries(entity, livenessData, selectedOptions);
+  const { entries, selectedCoords, selectedId, onSelectedIdChange } = useEntries(entity, livenessData, selectedOptions);
 
   const cards: JSX.Element[] = [];
   const markers: JSX.Element[] = [];
@@ -42,9 +38,7 @@ const Content = ({ entity, livenessData }: ContentProps) => {
       entry.type === MultiSelectOptionValue.residentialAddress
     ) {
       const type =
-        entry.type === MultiSelectOptionValue.businessAddress
-          ? AddressType.business
-          : AddressType.residential;
+        entry.type === MultiSelectOptionValue.businessAddress ? AddressType.business : AddressType.residential;
       cards.push(
         <AddressCard
           id={id}
@@ -96,14 +90,7 @@ const Content = ({ entity, livenessData }: ContentProps) => {
         style={{ width: '100%', height: '100%' }}
       >
         <IcoForbid40 />
-        <Stack
-          width="100%"
-          display="flex"
-          direction="column"
-          gap={3}
-          justifyContent="center"
-          alignItems="center"
-        >
+        <Stack width="100%" display="flex" direction="column" gap={3} justifyContent="center" alignItems="center">
           <Text variant="label-2">{t('empty.title')}</Text>
           <Text variant="body-2" textAlign="center">
             {t('empty.description')}
@@ -128,10 +115,7 @@ const Content = ({ entity, livenessData }: ContentProps) => {
 
   return (
     <Container>
-      <ContainerWithToggle
-        isHidden={detailsHidden}
-        onChangeHidden={setDetailsHidden}
-      >
+      <ContainerWithToggle isHidden={detailsHidden} onChangeHidden={setDetailsHidden}>
         <MultiSelect
           placeholder={t('select.placeholder')}
           options={allOptions}
@@ -142,11 +126,7 @@ const Content = ({ entity, livenessData }: ContentProps) => {
         <CardsContainer>{cards}</CardsContainer>
       </ContainerWithToggle>
       <MapContainer data-has-overlay={!detailsHidden}>
-        <Map
-          markers={markers}
-          selectedCoords={selectedCoords}
-          onSelect={handleSelectFromMap}
-        />
+        <MapComponent markers={markers} selectedCoords={selectedCoords} onSelect={handleSelectFromMap} />
       </MapContainer>
     </Container>
   );

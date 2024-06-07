@@ -57,43 +57,25 @@ export const createBifrostMachine = () =>
       actions: {
         resetContext: assign(() => ({})),
         assignInitContext: assign((context: MachineContext, event) => {
-          const {
-            bootstrapData,
-            config,
-            l10n,
-            showCompletionPage,
-            showLogo,
-            authToken,
-            publicKey,
-            isComponentsSdk,
-          } = event.payload;
+          const { bootstrapData, config, l10n, showCompletionPage, showLogo, authToken, publicKey, isComponentsSdk } =
+            event.payload;
 
           context.config = isUndefined(config) ? context.config : config;
           context.l10n = isUndefined(l10n) ? context.l10n : l10n;
 
-          context.bootstrapData = isUndefined(bootstrapData)
-            ? context.bootstrapData
-            : bootstrapData;
+          context.bootstrapData = isUndefined(bootstrapData) ? context.bootstrapData : bootstrapData;
 
           context.showCompletionPage = isUndefined(showCompletionPage)
             ? context.showCompletionPage
             : showCompletionPage;
 
-          context.showLogo = isUndefined(showLogo)
-            ? context.showLogo
-            : showLogo;
+          context.showLogo = isUndefined(showLogo) ? context.showLogo : showLogo;
 
-          context.authToken = isUndefined(authToken)
-            ? context.authToken
-            : authToken;
+          context.authToken = isUndefined(authToken) ? context.authToken : authToken;
 
-          context.publicKey = isUndefined(publicKey)
-            ? context.publicKey
-            : publicKey;
+          context.publicKey = isUndefined(publicKey) ? context.publicKey : publicKey;
 
-          context.isComponentsSdk = isUndefined(isComponentsSdk)
-            ? context.isComponentsSdk
-            : isComponentsSdk;
+          context.isComponentsSdk = isUndefined(isComponentsSdk) ? context.isComponentsSdk : isComponentsSdk;
 
           return context;
         }),

@@ -49,9 +49,7 @@ describe('AddressInput', () => {
     renderAddressInput({ label: 'Address', placeholder: 'Type your address' });
 
     expect(screen.getByLabelText('Address')).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText('Type your address'),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Type your address')).toBeInTheDocument();
   });
 
   it('should allow to pass arbitrary props to the input', () => {

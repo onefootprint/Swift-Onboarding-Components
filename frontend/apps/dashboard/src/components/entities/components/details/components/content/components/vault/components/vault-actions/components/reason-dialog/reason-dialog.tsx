@@ -13,12 +13,7 @@ type ReasonDialogProps = {
   onSubmit: () => void;
 };
 
-const ReasonDialog = ({
-  open,
-  loading,
-  onClose,
-  onSubmit,
-}: ReasonDialogProps) => {
+const ReasonDialog = ({ open, loading, onClose, onSubmit }: ReasonDialogProps) => {
   const { t } = useTranslation('common');
   const decryptControls = useDecryptControls();
 

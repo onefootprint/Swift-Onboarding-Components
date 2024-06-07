@@ -103,8 +103,7 @@ describe('getDefaultVariantForKind', () => {
   });
 
   test('should throw an exception when an invalid kind is provided', () => {
-    const fn = () =>
-      getDefaultVariantForKind('banana' as unknown as ComponentKind);
+    const fn = () => getDefaultVariantForKind('banana' as unknown as ComponentKind);
     expect(fn).toThrow('Invalid kind: banana');
   });
 });
@@ -130,14 +129,8 @@ describe('validateComponentVariant', () => {
   });
 
   test('should throw an exception', () => {
-    const fn = () =>
-      validateComponentVariant(
-        ComponentKind.Verify,
-        'banana' as unknown as Variant,
-      );
-    expect(fn).toThrow(
-      'Invalid variant: "banana". Valid variants for verify are modal, drawer',
-    );
+    const fn = () => validateComponentVariant(ComponentKind.Verify, 'banana' as unknown as Variant);
+    expect(fn).toThrow('Invalid variant: "banana". Valid variants for verify are modal, drawer');
   });
 });
 
@@ -156,8 +149,7 @@ describe('validateComponentKind', () => {
     const fn1 = () => validateComponentKind(null as unknown as ComponentKind);
     expect(fn1).toThrow('Kind is required');
 
-    const fn2 = () =>
-      validateComponentKind('banana' as unknown as ComponentKind);
+    const fn2 = () => validateComponentKind('banana' as unknown as ComponentKind);
     expect(fn2).toThrow(
       'Invalid kind: banana. Valid kinds are: auth, form, render, update_login_methods, verify, components, verify-button',
     );

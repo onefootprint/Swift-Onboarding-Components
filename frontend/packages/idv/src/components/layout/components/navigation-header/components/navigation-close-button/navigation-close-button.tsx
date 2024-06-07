@@ -6,18 +6,11 @@ import { useTranslation } from 'react-i18next';
 
 import type { NavigationHeaderCloseButtonProps } from '../../types';
 
-type NavigationCloseButtonProps = Omit<
-  NavigationHeaderCloseButtonProps,
-  'variant'
-> & {
+type NavigationCloseButtonProps = Omit<NavigationHeaderCloseButtonProps, 'variant'> & {
   onClose?: () => void;
   color?: Color;
 };
-const NavigationCloseButton = ({
-  onClose,
-  confirmClose,
-  color,
-}: NavigationCloseButtonProps) => {
+const NavigationCloseButton = ({ onClose, confirmClose, color }: NavigationCloseButtonProps) => {
   const confirmationDialog = useConfirmationDialog();
   const { t } = useTranslation('idv', {
     keyPrefix: 'global.components.confirmation-dialog',
@@ -43,11 +36,7 @@ const NavigationCloseButton = ({
   };
 
   return (
-    <IconButton
-      aria-label="Close"
-      onClick={handleClick}
-      testID="navigation-close-button"
-    >
+    <IconButton aria-label="Close" onClick={handleClick} testID="navigation-close-button">
       <IcoClose24 color={color} />
     </IconButton>
   );

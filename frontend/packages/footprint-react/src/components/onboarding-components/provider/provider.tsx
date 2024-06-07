@@ -1,9 +1,5 @@
 import type { Component } from '@onefootprint/footprint-js/src/types/components';
-import type {
-  OnboardingRequirement,
-  PublicOnboardingConfig,
-  SignupChallengeResponse,
-} from '@onefootprint/types';
+import type { OnboardingRequirement, PublicOnboardingConfig, SignupChallengeResponse } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -40,7 +36,7 @@ const Context = createContext<[ContextData, UpdateContext]>([
     signupChallenge: null,
     userData: {},
   },
-  () => {},
+  () => undefined,
 ]);
 
 export type ProviderProps = {
@@ -83,10 +79,7 @@ const Provider = ({
     signupChallenge: null,
     userData,
   });
-  const value = useMemo<[ContextData, UpdateContext]>(
-    () => [context, setContext],
-    [context],
-  );
+  const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
   const getOnboardingConfig = async (pKey?: string) => {
     if (!pKey) {
@@ -96,7 +89,7 @@ const Provider = ({
     try {
       const response = await getOnboardingConfigReq(pKey);
       setContext(prev => ({ ...prev, onboardingConfig: response }));
-    } catch (error: unknown) {
+    } catch (_e: unknown) {
       throw new Error('Public key is invalid');
     }
   };

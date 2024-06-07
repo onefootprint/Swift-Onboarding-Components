@@ -32,12 +32,7 @@ const OwnedBusinesses = ({ businesses }: OwnedBusinessesProps) => {
         <Content>
           {businesses.map(business => (
             <Field>
-              <Text
-                variant="body-3"
-                color="tertiary"
-                tag="label"
-                id={business.id}
-              >
+              <Text variant="body-3" color="tertiary" tag="label" id={business.id}>
                 {business.name}
               </Text>
               <Text color="accent" variant="label-3">

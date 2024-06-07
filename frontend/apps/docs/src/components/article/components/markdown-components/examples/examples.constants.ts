@@ -224,9 +224,6 @@ const getAllLinksAndRemovedDuplicated = () => {
   return [...new Map(links.map(item => [item.name, item])).values()];
 };
 
-export const options = [
-  { name: 'All', links: getAllLinksAndRemovedDuplicated() },
-  ...allOptions,
-];
+export const options = [{ name: 'All', links: getAllLinksAndRemovedDuplicated() }, ...allOptions];
 
 export const [defaultOption] = options;

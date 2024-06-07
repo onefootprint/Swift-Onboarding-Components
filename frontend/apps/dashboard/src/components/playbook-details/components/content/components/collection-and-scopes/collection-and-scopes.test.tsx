@@ -6,13 +6,7 @@ import CollectionAndScopes from './collection-and-scopes';
 import playbookFixture from './collection-and-scopes.test.config';
 
 const renderCollectionAndScopes = (playbook: OnboardingConfig) => {
-  customRender(
-    <CollectionAndScopes
-      playbook={playbook}
-      isTabsDisabled={false}
-      toggleDisableHeading={jest.fn()}
-    />,
-  );
+  customRender(<CollectionAndScopes playbook={playbook} isTabsDisabled={false} toggleDisableHeading={jest.fn()} />);
 };
 
 describe('<CollectionAndScopes />', () => {

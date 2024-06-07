@@ -1,9 +1,4 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { SessionSelectProps } from './session-select';
@@ -32,31 +27,18 @@ const renderSessionSelector = ({
 describe('<SessionSelector />', () => {
   it('should display all document sessions correctly', async () => {
     renderSessionSelector({
-      documents: [
-        driversLicenseDoc1,
-        driversLicenseDoc2,
-        driversLicenseDoc3,
-        driversLicenseDoc4,
-      ],
+      documents: [driversLicenseDoc1, driversLicenseDoc2, driversLicenseDoc3, driversLicenseDoc4],
       activeDocumentVersion: '4',
       onActiveDocumentVersionChange: jest.fn(),
     });
     const select = screen.getByRole('button');
-    expect(
-      screen.getByText('Session 4 (7/26/23, 12:00 AM)'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Session 4 (7/26/23, 12:00 AM)')).toBeInTheDocument();
     await userEvent.click(select);
     await waitFor(() => {
-      expect(
-        screen.getByText('Session 3 (7/25/23, 12:00 AM)'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Session 3 (7/25/23, 12:00 AM)')).toBeInTheDocument();
     });
-    expect(
-      screen.getByText('Session 2 (7/24/23, 12:00 AM)'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Session 1 (7/23/23, 12:00 AM)'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Session 2 (7/24/23, 12:00 AM)')).toBeInTheDocument();
+    expect(screen.getByText('Session 1 (7/23/23, 12:00 AM)')).toBeInTheDocument();
   });
 
   it('should display nothing when there are no sessions', async () => {

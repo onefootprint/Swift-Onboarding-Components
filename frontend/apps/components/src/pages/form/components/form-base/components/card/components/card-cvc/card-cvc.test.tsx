@@ -36,22 +36,8 @@ const Wrapper = ({
   );
 };
 
-const renderCardCvc = ({
-  hasError,
-  numDigits,
-  hint,
-  testID,
-  value,
-}: Partial<CardCvcProps>) =>
-  renderComponents(
-    <Wrapper
-      hasError={hasError}
-      numDigits={numDigits}
-      hint={hint}
-      testID={testID}
-      value={value}
-    />,
-  );
+const renderCardCvc = ({ hasError, numDigits, hint, testID, value }: Partial<CardCvcProps>) =>
+  renderComponents(<Wrapper hasError={hasError} numDigits={numDigits} hint={hint} testID={testID} value={value} />);
 
 describe('<CardCvc />', () => {
   it('should add a test id attribute', () => {

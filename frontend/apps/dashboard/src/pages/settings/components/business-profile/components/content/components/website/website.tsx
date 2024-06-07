@@ -16,13 +16,7 @@ const Website = ({ value }: WebsiteProps) => {
   return (
     <Fieldset label={t('label')} value={value}>
       {({ id, handleSubmit }) => (
-        <Form
-          id={id}
-          value={value}
-          onSubmit={(newWebsite: string) =>
-            handleSubmit({ websiteUrl: newWebsite })
-          }
-        />
+        <Form id={id} value={value} onSubmit={(newWebsite: string) => handleSubmit({ websiteUrl: newWebsite })} />
       )}
     </Fieldset>
   );

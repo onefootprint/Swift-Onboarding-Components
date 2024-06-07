@@ -26,28 +26,12 @@ type PlanColumnProps = {
   onButtonClick: () => void;
 };
 
-const PlanColumn = ({
-  price,
-  title,
-  features,
-  buttonLabel,
-  buttonVariant,
-  onButtonClick,
-}: PlanColumnProps) => {
+const PlanColumn = ({ price, title, features, buttonLabel, buttonVariant, onButtonClick }: PlanColumnProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
 
   return (
-    <Stack
-      direction="column"
-      paddingLeft={5}
-      paddingRight={5}
-      minWidth="410px"
-      maxWidth="410px"
-    >
-      <Header
-        title={t(`plans.${title}.title` as ParseKeys<'common'>)}
-        price={price}
-      />
+    <Stack direction="column" paddingLeft={5} paddingRight={5} minWidth="410px" maxWidth="410px">
+      <Header title={t(`plans.${title}.title` as ParseKeys<'common'>)} price={price} />
       <Stack direction="column" flexGrow={1} gap={3} padding={5}>
         {title !== Plans.startup && <EverythingAndBanner plan={title} />}
         {features.map(feature => (
@@ -57,12 +41,7 @@ const PlanColumn = ({
         ))}
       </Stack>
       <Stack padding={5}>
-        <Button
-          variant={buttonVariant}
-          onClick={onButtonClick}
-          fullWidth
-          size="large"
-        >
+        <Button variant={buttonVariant} onClick={onButtonClick} fullWidth size="large">
           {t(`plans.${title}.${buttonLabel}` as ParseKeys<'common'>)}
         </Button>
       </Stack>

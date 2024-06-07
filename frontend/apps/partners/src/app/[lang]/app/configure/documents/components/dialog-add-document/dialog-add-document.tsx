@@ -17,12 +17,7 @@ const formId = 'form-add-doc-dialog';
 const getDocName = getFormElementValue('input[type="text"][name="doc-name"]');
 const getDocDesc = getFormElementValue('textarea[name="doc-description"]');
 
-const DialogAddDocument = ({
-  initialValues,
-  isOpen,
-  onClose,
-  onSubmit,
-}: DialogAddDocumentProps) => {
+const DialogAddDocument = ({ initialValues, isOpen, onClose, onSubmit }: DialogAddDocumentProps) => {
   const { t } = useTranslation('common');
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {

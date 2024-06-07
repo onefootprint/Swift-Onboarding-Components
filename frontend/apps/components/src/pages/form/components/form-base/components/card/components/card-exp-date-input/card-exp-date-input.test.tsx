@@ -14,13 +14,7 @@ describe('CardExpDateInput', () => {
     label = 'Expiration date',
   }: Partial<CardExpDateInputProps>) =>
     renderComponents(
-      <CardExpDateInput
-        hasError={hasError}
-        hint={hint}
-        label={label}
-        invalidMessage={invalidMessage}
-        value={value}
-      />,
+      <CardExpDateInput hasError={hasError} hint={hint} label={label} invalidMessage={invalidMessage} value={value} />,
     );
 
   describe('when label is provided', () => {

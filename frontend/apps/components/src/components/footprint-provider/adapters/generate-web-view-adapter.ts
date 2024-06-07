@@ -22,7 +22,7 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
       Promise.resolve().then(() => {
         isAdapterLoaded = true;
       }),
-    on: () => () => {},
+    on: () => () => undefined,
     send: (event: string) => {
       setLocation({ [event]: true });
     },

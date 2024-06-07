@@ -47,12 +47,9 @@ const ResidentialAddress = ({
 
   let defaultCountry: CountryCode | undefined;
   const { supportedCountries } = config;
-  const hasSupportedCountries =
-    supportedCountries && supportedCountries.length > 0;
-  const isValidCountryInContext =
-    countryFromContext && isCountryCode(countryFromContext);
-  const isSupportedCountryInContext =
-    isValidCountryInContext && supportedCountries?.includes(countryFromContext);
+  const hasSupportedCountries = supportedCountries && supportedCountries.length > 0;
+  const isValidCountryInContext = countryFromContext && isCountryCode(countryFromContext);
+  const isSupportedCountryInContext = isValidCountryInContext && supportedCountries?.includes(countryFromContext);
 
   if (isSupportedCountryInContext) {
     defaultCountry = countryFromContext;
@@ -101,20 +98,10 @@ const ResidentialAddress = ({
     <>
       {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
-        <Grid.Container
-          tag="form"
-          gap={7}
-          onSubmit={handleSubmit(onSubmitFormData)}
-          width="100%"
-        >
-          {!hideHeader && (
-            <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-          )}
+        <Grid.Container tag="form" gap={7} onSubmit={handleSubmit(onSubmitFormData)} width="100%">
+          {!hideHeader && <HeaderTitle title={t('title')} subtitle={t('subtitle')} />}
           <Stack gap={5} direction="column">
-            <CountryField
-              disabled={disableCountry}
-              onChange={handleCountryChange}
-            />
+            <CountryField disabled={disableCountry} onChange={handleCountryChange} />
             <AddressLines />
             <Grid.Container columns={['1fr', '1fr']} gap={5}>
               <CityField />

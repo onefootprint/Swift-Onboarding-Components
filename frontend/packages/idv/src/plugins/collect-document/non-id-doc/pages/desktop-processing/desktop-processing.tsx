@@ -1,10 +1,7 @@
 import { useRequestError } from '@onefootprint/request';
 import type { ProcessDocResponse } from '@onefootprint/types';
-import {
-  IdDocImageProcessingError,
-  IdDocImageTypes,
-} from '@onefootprint/types';
-import { Button, media, Text } from '@onefootprint/ui';
+import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
+import { Button, Text, media } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -39,21 +36,15 @@ const DesktopProcessing = () => {
   const submitDocMutation = useSubmitDoc();
   const processDocMutation = useProcessDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
-  const [showSlowConnectionMessage, setShowSlowConnectionMessage] =
-    useState(false);
+  const [showSlowConnectionMessage, setShowSlowConnectionMessage] = useState(false);
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
-  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  ); // we only time the doc upload
+  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(null); // we only time the doc upload
 
   const { document, authToken, id, config } = state.context;
   const { kind: documentRequestKind } = config;
-  const documentName = transformCase(
-    useDocName(config),
-    'first-letter-upper-only',
-  );
+  const documentName = transformCase(useDocName(config), 'first-letter-upper-only');
 
   const handleProcessDocSuccess = (data: ProcessDocResponse) => {
     const { errors, nextSideToCollect, isRetryLimitExceeded } = data;
@@ -62,9 +53,7 @@ const DesktopProcessing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      logWarn(
-        `Image upload retry limit exceeded. doc: ${documentRequestKind}, doc id: ${id}`,
-      );
+      logWarn(`Image upload retry limit exceeded. doc: ${documentRequestKind}, doc id: ${id}`);
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === IdDocImageTypes.front) {
       send({
@@ -78,9 +67,7 @@ const DesktopProcessing = () => {
     } else if (!nextSideToCollect) {
       setMode('success');
     } else {
-      logError(
-        `Unexpected next side to collect flow. Side: ${nextSideToCollect}`,
-      );
+      logError(`Unexpected next side to collect flow. Side: ${nextSideToCollect}`);
     }
   };
 
@@ -146,9 +133,7 @@ const DesktopProcessing = () => {
       setIsMissingRequirements(true);
       const error = `Desktop web flow - id-doc image could not be processed due to missing requirements. Requirements - document: ${
         document ? 'OK' : 'undefined'
-      }, auth token: ${authToken ? 'OK' : 'undefined'}, id: ${
-        id ? 'OK' : 'undefined'
-      }`;
+      }, auth token: ${authToken ? 'OK' : 'undefined'}, id: ${id ? 'OK' : 'undefined'}`;
       logError(error);
       return;
     }
@@ -210,10 +195,7 @@ const DesktopProcessing = () => {
       </Text>
     );
   }
-  if (retryLimitExceeded)
-    return (
-      <RetryLimitExceeded onRetryLimitExceeded={handleRetryLimitExceeded} />
-    );
+  if (retryLimitExceeded) return <RetryLimitExceeded onRetryLimitExceeded={handleRetryLimitExceeded} />;
 
   return (
     <Container>
@@ -221,23 +203,13 @@ const DesktopProcessing = () => {
       <HeaderTitle title={documentName} />
       <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation
-          loadingComponent={
-            <Loading
-              step={step}
-              showSlowConnectionMessage={showSlowConnectionMessage}
-            />
-          }
+          loadingComponent={<Loading step={step} showSlowConnectionMessage={showSlowConnectionMessage} />}
           successComponent={<Success />}
           mode={mode}
           hasNextSide={false} // Although we might have next side, we don't want to show it in the animation for desktop
         />
       </FeedbackContainer>
-      <Button
-        fullWidth
-        disabled={mode === 'loading'}
-        onClick={handleSuccess}
-        size="large"
-      >
+      <Button fullWidth disabled={mode === 'loading'} onClick={handleSuccess} size="large">
         {t('continue')}
       </Button>
     </Container>

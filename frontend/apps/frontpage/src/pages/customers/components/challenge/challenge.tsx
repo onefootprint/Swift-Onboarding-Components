@@ -1,5 +1,5 @@
 import { IcoMountain24 } from '@onefootprint/icons';
-import { media, Stack } from '@onefootprint/ui';
+import { Stack, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -11,12 +11,7 @@ export type ChallengeProps = {
 };
 
 const ChallengeSolution = ({ children, type }: ChallengeProps) => (
-  <Container
-    backgroundColor="secondary"
-    direction="column"
-    borderRadius="default"
-    data-type={type}
-  >
+  <Container backgroundColor="secondary" direction="column" borderRadius="default" data-type={type}>
     <Stack gap={3} direction="column">
       <IconTitle icon={IcoMountain24}>Challenge</IconTitle>
       {children}

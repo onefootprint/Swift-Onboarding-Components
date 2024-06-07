@@ -1,9 +1,4 @@
-import type {
-  AuthMethodKind,
-  ChallengeKind,
-  DataIdentifier,
-  ObConfigAuth,
-} from '../data';
+import type { AuthMethodKind, ChallengeKind, DataIdentifier, ObConfigAuth } from '../data';
 import type { UserTokenScope } from './user-token';
 
 export const IS_COMPONENTS_SDK_HEADER = 'X-Fp-Is-Components-Sdk';

@@ -96,20 +96,13 @@ const getCustomAppearance = async ({
 };
 
 const appendClientSideStyles =
-  (
-    getCustomAppearanceFn: (
-      options: AppearanceOptions,
-    ) => Promise<AppearanceResponse>,
-  ) =>
+  (getCustomAppearanceFn: (options: AppearanceOptions) => Promise<AppearanceResponse>) =>
   async (options: AppearanceOptions) => {
     const appearance = await getCustomAppearanceFn(options);
     if (!appearance || !IS_BROWSER) return appearance;
 
     if (appearance.fontSrc) {
-      createStyle(
-        'footprint-custom-fonts',
-        `@import url('${appearance.fontSrc}');`,
-      );
+      createStyle('footprint-custom-fonts', `@import url('${appearance.fontSrc}');`);
     }
     if (appearance.rules) {
       createStyle('footprint-custom-rules', appearance.rules);

@@ -8,22 +8,12 @@ import Placemark from '../placemark';
 const MobileMap = () => (
   <Container>
     <MapContainer>
-      <PhoneImage
-        src="/vaulting/device-insights/mobile-map.png"
-        width={895}
-        height={2011}
-        alt=""
-      />
+      <PhoneImage src="/vaulting/device-insights/mobile-map.png" width={895} height={2011} alt="" />
       <PlacemarkContainer>
         <Placemark />
       </PlacemarkContainer>
     </MapContainer>
-    <Metrics
-      src="/vaulting/device-insights/card-data.png"
-      width={420}
-      height={381}
-      alt=""
-    />
+    <Metrics src="/vaulting/device-insights/card-data.png" width={420} height={381} alt="" />
   </Container>
 );
 

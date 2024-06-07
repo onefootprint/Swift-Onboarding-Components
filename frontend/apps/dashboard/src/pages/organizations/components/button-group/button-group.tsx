@@ -47,8 +47,9 @@ const ButtonGroup = styled.div<{ isLoading?: boolean }>`
       text-align: left;
       overflow: hidden;
 
-      ${!isLoading &&
-      css`
+      ${
+        !isLoading &&
+        css`
         @media (hover: hover) {
           &:hover {
             background-color: ${theme.backgroundColor.secondary};
@@ -57,7 +58,8 @@ const ButtonGroup = styled.div<{ isLoading?: boolean }>`
         &:focus {
           background-color: ${theme.backgroundColor.secondary};
         }
-      `}
+      `
+      }
     }
   `}
 `;

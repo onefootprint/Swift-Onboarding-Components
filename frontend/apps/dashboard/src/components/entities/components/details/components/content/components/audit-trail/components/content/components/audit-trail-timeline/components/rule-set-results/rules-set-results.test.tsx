@@ -1,28 +1,12 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { RuleSetResultsProps } from './rule-set-results';
 import RuleSetResults from './rule-set-results';
-import {
-  ruleResultResponseFixture,
-  selectRulesNotTriggered,
-  withLists,
-} from './rules-set-results.test.config';
+import { ruleResultResponseFixture, selectRulesNotTriggered, withLists } from './rules-set-results.test.config';
 
 const renderRules = ({ data, isLoading, errorMessage }: RuleSetResultsProps) =>
-  customRender(
-    <RuleSetResults
-      data={data}
-      isLoading={isLoading}
-      errorMessage={errorMessage}
-    />,
-  );
+  customRender(<RuleSetResults data={data} isLoading={isLoading} errorMessage={errorMessage} />);
 
 describe('<Rules />', () => {
   describe('when data is passed in', () => {
@@ -37,9 +21,7 @@ describe('<Rules />', () => {
         name: 'Fail',
       });
       expect(within(failSection).getAllByRole('row')).toHaveLength(2);
-      expect(
-        within(failSection).getByText('subject_deceased'),
-      ).toBeInTheDocument();
+      expect(within(failSection).getByText('subject_deceased')).toBeInTheDocument();
       expect(within(failSection).getByText('name_matches')).toBeInTheDocument();
 
       const stepUpSection = screen.getByRole('group', {
@@ -48,12 +30,8 @@ describe('<Rules />', () => {
       const identitySsnSubSection = within(stepUpSection).getByRole('group', {
         name: 'Identity document and Proof of SSN',
       });
-      expect(within(identitySsnSubSection).queryAllByRole('row')).toHaveLength(
-        0,
-      );
-      expect(
-        within(identitySsnSubSection).getByText('None'),
-      ).toBeInTheDocument();
+      expect(within(identitySsnSubSection).queryAllByRole('row')).toHaveLength(0);
+      expect(within(identitySsnSubSection).getByText('None')).toBeInTheDocument();
       const poaSubSection = within(stepUpSection).getByRole('group', {
         name: 'Proof of Address',
       });
@@ -86,9 +64,7 @@ describe('<Rules />', () => {
       });
       await userEvent.click(within(failSection).getByText('Rules present'));
       await waitFor(() => {
-        expect(
-          within(failSection).getByLabelText('Rule result groups'),
-        ).toBeInTheDocument();
+        expect(within(failSection).getByLabelText('Rule result groups')).toBeInTheDocument();
       });
       selectRulesNotTriggered();
       await waitFor(() => {
@@ -106,9 +82,7 @@ describe('<Rules />', () => {
       });
       await userEvent.click(within(stepUpSection).getByText('Rules present'));
       await waitFor(() => {
-        expect(
-          within(stepUpSection).getByLabelText('Rule result groups'),
-        ).toBeInTheDocument();
+        expect(within(stepUpSection).getByLabelText('Rule result groups')).toBeInTheDocument();
       });
       selectRulesNotTriggered();
       await waitFor(() => {
@@ -123,9 +97,7 @@ describe('<Rules />', () => {
         name: 'Identity document and Proof of SSN',
       });
       expect(within(identitySsnSubSection).getAllByRole('row')).toHaveLength(1);
-      expect(
-        within(identitySsnSubSection).getByText('dob_does_not_match'),
-      ).toBeInTheDocument();
+      expect(within(identitySsnSubSection).getByText('dob_does_not_match')).toBeInTheDocument();
 
       const poaSubSection = within(stepUpSection).getByRole('group', {
         name: 'Proof of Address',
@@ -144,9 +116,7 @@ describe('<Rules />', () => {
       });
       await userEvent.click(within(manRevSection).getByText('Rules present'));
       await waitFor(() => {
-        expect(
-          within(manRevSection).getByLabelText('Rule result groups'),
-        ).toBeInTheDocument();
+        expect(within(manRevSection).getByLabelText('Rule result groups')).toBeInTheDocument();
       });
       selectRulesNotTriggered();
       await waitFor(() => {
@@ -157,20 +127,14 @@ describe('<Rules />', () => {
         ).not.toBeInTheDocument();
       });
       expect(within(manRevSection).getAllByRole('row')).toHaveLength(1);
-      expect(
-        within(manRevSection).getByText('watchlist_hit_ofac'),
-      ).toBeInTheDocument();
+      expect(within(manRevSection).getByText('watchlist_hit_ofac')).toBeInTheDocument();
 
       const passManRevSection = screen.getByRole('group', {
         name: 'Pass + Manual review',
       });
-      await userEvent.click(
-        within(passManRevSection).getByText('Rules present'),
-      );
+      await userEvent.click(within(passManRevSection).getByText('Rules present'));
       await waitFor(() => {
-        expect(
-          within(passManRevSection).getByLabelText('Rule result groups'),
-        ).toBeInTheDocument();
+        expect(within(passManRevSection).getByLabelText('Rule result groups')).toBeInTheDocument();
       });
       selectRulesNotTriggered();
       await waitFor(() => {
@@ -181,11 +145,7 @@ describe('<Rules />', () => {
         ).not.toBeInTheDocument();
       });
       expect(within(passManRevSection).getAllByRole('row')).toHaveLength(1);
-      expect(
-        within(passManRevSection).getByText(
-          'document_is_permit_or_provisional_license',
-        ),
-      ).toBeInTheDocument();
+      expect(within(passManRevSection).getByText('document_is_permit_or_provisional_license')).toBeInTheDocument();
     });
   });
 

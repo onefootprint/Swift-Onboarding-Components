@@ -1,21 +1,10 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import type { RowProps } from './row';
 import Row from './row';
-import {
-  ApiKeyFixture,
-  RolesFixture,
-  withApiKeys,
-  withRoles,
-} from './row.test.config';
+import { ApiKeyFixture, RolesFixture, withApiKeys, withRoles } from './row.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 

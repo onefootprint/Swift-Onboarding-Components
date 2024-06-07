@@ -39,33 +39,17 @@ const CardMotionVariants = {
   },
 };
 
-const CustomInput = ({
-  title,
-  type,
-  value,
-  onChange,
-  className,
-}: CustomInputTypes) => {
+const CustomInput = ({ title, type, value, onChange, className }: CustomInputTypes) => {
   const inputId = `input-${title.replace(/\s+/g, '-').toLowerCase()}`;
 
   const formattedValue = type === 'text' ? `#${value}` : value;
 
   return (
-    <Card
-      className={className}
-      variants={CardMotionVariants}
-      initial="floating"
-      animate="floating"
-    >
+    <Card className={className} variants={CardMotionVariants} initial="floating" animate="floating">
       <label htmlFor={inputId}>
         <Text variant="label-4">{title}</Text>
       </label>
-      <StyledInput
-        id={inputId}
-        type={type}
-        onChange={onChange}
-        value={formattedValue}
-      />
+      <StyledInput id={inputId} type={type} onChange={onChange} value={formattedValue} />
     </Card>
   );
 };

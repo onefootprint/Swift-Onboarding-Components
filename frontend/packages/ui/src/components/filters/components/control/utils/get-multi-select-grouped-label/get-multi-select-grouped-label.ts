@@ -1,12 +1,6 @@
-import type {
-  FilterGroupOption,
-  FilterSelectedOption,
-} from '../../../../filters.types';
+import type { FilterGroupOption, FilterSelectedOption } from '../../../../filters.types';
 
-const getMultiSelectGroupedLabel = (
-  options: FilterGroupOption[],
-  selectedOptions: FilterSelectedOption[],
-) => {
+const getMultiSelectGroupedLabel = (options: FilterGroupOption[], selectedOptions: FilterSelectedOption[]) => {
   const labels: string[] = [];
   options.forEach(group => {
     group.options.forEach(option => {

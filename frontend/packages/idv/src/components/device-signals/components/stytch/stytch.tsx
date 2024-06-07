@@ -10,8 +10,7 @@ const IS_TEST = process.env.NODE_ENV === 'test';
 const IS_E2E = process.env.IS_E2E === 'true';
 const IS_CI = process.env.CI === 'true';
 const IS_VERCEL_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
-const IS_DISABLED =
-  IS_SERVER || IS_TEST || IS_E2E || IS_CI || IS_VERCEL_PREVIEW;
+const IS_DISABLED = IS_SERVER || IS_TEST || IS_E2E || IS_CI || IS_VERCEL_PREVIEW;
 
 export type StytchProps = {
   fpAuthToken: string;
@@ -41,19 +40,13 @@ const Stytch = ({ fpAuthToken }: StytchProps) => {
         sendTelemetry.mutate({ telemetryId });
       });
     } else {
-      Logger.warn(
-        'Stytch public token not available. Skipping sending Stytch telemetry',
-        { location: 'device-signals' },
-      );
+      Logger.warn('Stytch public token not available. Skipping sending Stytch telemetry', {
+        location: 'device-signals',
+      });
     }
   };
 
-  return (
-    <Script
-      src="https://elements.stytch.com/telemetry.js"
-      onReady={handleReady}
-    />
-  );
+  return <Script src="https://elements.stytch.com/telemetry.js" onReady={handleReady} />;
 };
 
 export default Stytch;

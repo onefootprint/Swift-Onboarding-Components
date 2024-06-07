@@ -1,7 +1,4 @@
-import {
-  InvestorProfileDeclaration,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import { InvestorProfileDI, InvestorProfileDeclaration } from '@onefootprint/types';
 import { Checkbox, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -34,17 +31,11 @@ const declarationKeys = [
   InvestorProfileDeclaration.seniorPoliticalFigure,
 ];
 
-const DeclarationsForm = ({
-  defaultValues,
-  isLoading,
-  onSubmit,
-}: DeclarationsFormProps) => {
+const DeclarationsForm = ({ defaultValues, isLoading, onSubmit }: DeclarationsFormProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'investor-profile.pages.declarations',
   });
-  const defaultEntries = (
-    defaultValues?.[InvestorProfileDI.declarations] ?? []
-  ).map(goal => [goal, true]);
+  const defaultEntries = (defaultValues?.[InvestorProfileDI.declarations] ?? []).map(goal => [goal, true]);
   const {
     handleSubmit,
     register,
@@ -54,24 +45,17 @@ const DeclarationsForm = ({
   } = useForm<FormData>({
     defaultValues: {
       ...Object.fromEntries(defaultEntries),
-      brokerageFirmEmployer:
-        defaultValues?.[InvestorProfileDI.brokerageFirmEmployer],
-      seniorExecutiveSymbols:
-        defaultValues?.[InvestorProfileDI.seniorExecutiveSymbols],
+      brokerageFirmEmployer: defaultValues?.[InvestorProfileDI.brokerageFirmEmployer],
+      seniorExecutiveSymbols: defaultValues?.[InvestorProfileDI.seniorExecutiveSymbols],
       familyMemberNames: defaultValues?.[InvestorProfileDI.familyMemberNames],
-      politicalOrganization:
-        defaultValues?.[InvestorProfileDI.politicalOrganization],
+      politicalOrganization: defaultValues?.[InvestorProfileDI.politicalOrganization],
     },
   });
 
   const checkboxes = watch(declarationKeys);
   const seniorExecutive = watch(InvestorProfileDeclaration.seniorExecutive);
-  const politicalFigure = watch(
-    InvestorProfileDeclaration.seniorPoliticalFigure,
-  );
-  const affiliatedWithUsBroker = watch(
-    InvestorProfileDeclaration.affiliatedWithUsBroker,
-  );
+  const politicalFigure = watch(InvestorProfileDeclaration.seniorPoliticalFigure);
+  const affiliatedWithUsBroker = watch(InvestorProfileDeclaration.affiliatedWithUsBroker);
   const showFirmEmployer = affiliatedWithUsBroker;
   const shouldRequireUpload = affiliatedWithUsBroker || seniorExecutive;
   const showCompanySymbols = seniorExecutive;
@@ -92,19 +76,11 @@ const DeclarationsForm = ({
       setShouldShowUploadError(true);
       return;
     }
-    const declarations = Object.fromEntries(
-      declarationKeys.map(key => [key, data[key]]),
-    );
+    const declarations = Object.fromEntries(declarationKeys.map(key => [key, data[key]]));
     const payload: DeclarationData = {
-      [InvestorProfileDI.declarations]: filterNonTruthy(
-        declarations,
-      ) as InvestorProfileDeclaration[],
-      [InvestorProfileDI.seniorExecutiveSymbols]: trimAndSplit(
-        data.seniorExecutiveSymbols,
-      ),
-      [InvestorProfileDI.familyMemberNames]: trimAndSplit(
-        data.familyMemberNames,
-      ),
+      [InvestorProfileDI.declarations]: filterNonTruthy(declarations) as InvestorProfileDeclaration[],
+      [InvestorProfileDI.seniorExecutiveSymbols]: trimAndSplit(data.seniorExecutiveSymbols),
+      [InvestorProfileDI.familyMemberNames]: trimAndSplit(data.familyMemberNames),
       [InvestorProfileDI.politicalOrganization]: data.politicalOrganization,
       [InvestorProfileDI.brokerageFirmEmployer]: data.brokerageFirmEmployer,
     };
@@ -128,9 +104,7 @@ const DeclarationsForm = ({
       }}
     >
       <Checkbox
-        label={t(
-          `options.${InvestorProfileDeclaration.affiliatedWithUsBroker}`,
-        )}
+        label={t(`options.${InvestorProfileDeclaration.affiliatedWithUsBroker}`)}
         {...register(InvestorProfileDeclaration.affiliatedWithUsBroker, {
           onChange: event => {
             if (!event.target.checked) {
@@ -143,9 +117,7 @@ const DeclarationsForm = ({
         <TextInput
           autoFocus
           hasError={!!errors.brokerageFirmEmployer}
-          hint={
-            errors.brokerageFirmEmployer && t('brokerage-firm-employer.error')
-          }
+          hint={errors.brokerageFirmEmployer && t('brokerage-firm-employer.error')}
           label={t('brokerage-firm-employer.label')}
           placeholder={t('brokerage-firm-employer.placeholder')}
           {...register('brokerageFirmEmployer', {
@@ -167,11 +139,7 @@ const DeclarationsForm = ({
         <TextInput
           autoFocus
           hasError={!!errors.seniorExecutiveSymbols}
-          hint={
-            errors.seniorExecutiveSymbols
-              ? t('company-symbols.error')
-              : t('company-symbols.hint')
-          }
+          hint={errors.seniorExecutiveSymbols ? t('company-symbols.error') : t('company-symbols.hint')}
           label={t('company-symbols.label')}
           placeholder={t('company-symbols.placeholder')}
           {...register('seniorExecutiveSymbols', {
@@ -195,11 +163,7 @@ const DeclarationsForm = ({
         <TextInput
           autoFocus
           hasError={!!errors.familyMemberNames}
-          hint={
-            errors.familyMemberNames
-              ? t('family-members.error')
-              : t('family-members.hint')
-          }
+          hint={errors.familyMemberNames ? t('family-members.error') : t('family-members.hint')}
           label={t('family-members.label')}
           placeholder={t('family-members.placeholder')}
           {...register('familyMemberNames', {
@@ -211,9 +175,7 @@ const DeclarationsForm = ({
       {showPoliticalOrganization && (
         <TextInput
           hasError={!!errors.politicalOrganization}
-          hint={
-            errors.politicalOrganization && t('political-organization.error')
-          }
+          hint={errors.politicalOrganization && t('political-organization.error')}
           label={t('political-organization.label')}
           placeholder={t('political-organization.placeholder')}
           {...register('politicalOrganization', {
@@ -221,12 +183,7 @@ const DeclarationsForm = ({
           })}
         />
       )}
-      {shouldRequireUpload && (
-        <UploadComplianceLetter
-          hasError={shouldShowUploadError}
-          onChange={handleUploadChange}
-        />
-      )}
+      {shouldRequireUpload && <UploadComplianceLetter hasError={shouldShowUploadError} onChange={handleUploadChange} />}
     </CustomForm>
   );
 };

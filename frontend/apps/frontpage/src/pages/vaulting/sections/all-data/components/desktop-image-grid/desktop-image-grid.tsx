@@ -33,9 +33,7 @@ const DesktopImageGrid = ({ isDecrypted }: DesktopImageGridProps) => (
       animate="animate"
     >
       <Image
-        src={`/vaulting/all-data/${
-          isDecrypted ? 'decrypted' : 'encrypted'
-        }/basic-data.png`}
+        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/basic-data.png`}
         width={632}
         height={211}
         alt=""
@@ -50,9 +48,7 @@ const DesktopImageGrid = ({ isDecrypted }: DesktopImageGridProps) => (
       animate="animate"
     >
       <Image
-        src={`/vaulting/all-data/${
-          isDecrypted ? 'decrypted' : 'encrypted'
-        }/id-data.png`}
+        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/id-data.png`}
         width={632}
         height={211}
         alt=""
@@ -67,9 +63,7 @@ const DesktopImageGrid = ({ isDecrypted }: DesktopImageGridProps) => (
       animate="animate"
     >
       <Image
-        src={`/vaulting/all-data/${
-          isDecrypted ? 'decrypted' : 'encrypted'
-        }/address.png`}
+        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/address.png`}
         width={632}
         height={306}
         alt=""
@@ -84,9 +78,7 @@ const DesktopImageGrid = ({ isDecrypted }: DesktopImageGridProps) => (
       animate="animate"
     >
       <Image
-        src={`/vaulting/all-data/${
-          isDecrypted ? 'decrypted' : 'encrypted'
-        }/payment-data.png`}
+        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/payment-data.png`}
         width={632}
         height={306}
         alt=""
@@ -101,9 +93,7 @@ const DesktopImageGrid = ({ isDecrypted }: DesktopImageGridProps) => (
       animate="animate"
     >
       <Image
-        src={`/vaulting/all-data/${
-          isDecrypted ? 'decrypted' : 'encrypted'
-        }/custom-data.png`}
+        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/custom-data.png`}
         width={1280}
         height={170}
         alt=""

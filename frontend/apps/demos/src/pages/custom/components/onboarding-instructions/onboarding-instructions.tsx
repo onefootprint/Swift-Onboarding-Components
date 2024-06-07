@@ -10,15 +10,9 @@ type CustomizationProps = {
   appearance: FootprintAppearance;
 };
 
-const customization = ({
-  appearance,
-}: CustomizationProps) => `import { FootprintAppearance } from '@onefootprint/footprint-js';
+const customization = ({ appearance }: CustomizationProps) => `import { FootprintAppearance } from '@onefootprint/footprint-js';
 export const publicKey = 'your-public-key';
-export const appearance: FootprintAppearance = ${JSON.stringify(
-  appearance,
-  null,
-  2,
-)}
+export const appearance: FootprintAppearance = ${JSON.stringify(appearance, null, 2)}
 `;
 
 const installation = `npm install @onefootprint/footprint-js
@@ -58,11 +52,7 @@ type TemplateProps = {
   tenantName: string;
 };
 
-const OnboardingInstructions = ({
-  appearance,
-  obKey,
-  tenantName,
-}: TemplateProps) => (
+const OnboardingInstructions = ({ appearance, obKey, tenantName }: TemplateProps) => (
   <>
     <Head>
       <title>Footprint ❤️ {tenantName}</title>
@@ -86,8 +76,7 @@ const OnboardingInstructions = ({
             and create a new Playbook:
           </Text>
           <Text variant="body-2">
-            2. Grab the Onboarding Publishable Key:{' '}
-            <CodeInline>{obKey}</CodeInline>
+            2. Grab the Onboarding Publishable Key: <CodeInline>{obKey}</CodeInline>
           </Text>
           <Text variant="body-2">3. Install Footprint dependencies:</Text>
           <CodeBlock language="bash">{installation}</CodeBlock>
@@ -99,9 +88,7 @@ const OnboardingInstructions = ({
             should already be very close to your brand's look and feel. Feel
             free to adjust as you wish.`}
           </Text>
-          <CodeBlock language="typescript">
-            {customization({ appearance })}
-          </CodeBlock>
+          <CodeBlock language="typescript">{customization({ appearance })}</CodeBlock>
         </Content>
         <MobileButtonContainer>
           <FootprintVerifyButton

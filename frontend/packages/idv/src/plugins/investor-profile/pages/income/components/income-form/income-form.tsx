@@ -1,8 +1,5 @@
 import type { InvestorProfileData } from '@onefootprint/types';
-import {
-  InvestorProfileAnnualIncome,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import { InvestorProfileAnnualIncome, InvestorProfileDI } from '@onefootprint/types';
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,19 +18,13 @@ type FormData = {
   income: InvestorProfileAnnualIncome;
 };
 
-const IncomeForm = ({
-  defaultValues,
-  isLoading,
-  onSubmit,
-}: IncomeFormProps) => {
+const IncomeForm = ({ defaultValues, isLoading, onSubmit }: IncomeFormProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'investor-profile.pages.income',
   });
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
-      income:
-        defaultValues?.[InvestorProfileDI.annualIncome] ??
-        InvestorProfileAnnualIncome.le25k,
+      income: defaultValues?.[InvestorProfileDI.annualIncome] ?? InvestorProfileAnnualIncome.le25k,
     },
   });
 

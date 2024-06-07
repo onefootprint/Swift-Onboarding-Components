@@ -5,8 +5,6 @@ import BifrostMachine from '../../utils/state-machine/machine';
 
 const useLocalBifrostMachine = () => useMachine(BifrostMachine);
 
-export const [BifrostMachineProvider, useBifrostMachine] = constate(
-  useLocalBifrostMachine,
-);
+export const [BifrostMachineProvider, useBifrostMachine] = constate(useLocalBifrostMachine);
 
 export default BifrostMachineProvider;

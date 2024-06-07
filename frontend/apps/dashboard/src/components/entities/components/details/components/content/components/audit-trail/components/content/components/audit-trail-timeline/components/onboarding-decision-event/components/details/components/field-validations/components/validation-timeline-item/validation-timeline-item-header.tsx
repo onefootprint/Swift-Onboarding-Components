@@ -24,20 +24,14 @@ const matchColors: MatchColorsType = {
   [MatchLevel.Partial]: 'warning',
 };
 
-const ValidationTimelineItemHeader = ({
-  attribute,
-  matchLevel,
-}: ValidationTimelineItemHeaderProps) => {
+const ValidationTimelineItemHeader = ({ attribute, matchLevel }: ValidationTimelineItemHeaderProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
+    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
   });
 
   return (
     <HeaderContainer>
-      <Text variant="label-3">
-        {t(`attributes.${attribute}` as ParseKeys<'common'>)}
-      </Text>
+      <Text variant="label-3">{t(`attributes.${attribute}` as ParseKeys<'common'>)}</Text>
       <Text variant="body-4" color={matchColors[matchLevel]}>
         {t(`match-level.${matchLevel}` as ParseKeys<'common'>)}
       </Text>

@@ -4,8 +4,7 @@
 import type { RefObject } from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
-const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 // MediaQueryList Event based useEventListener interface
 function useEventListener<K extends keyof MediaQueryListEventMap>(
@@ -24,10 +23,7 @@ function useEventListener<K extends keyof WindowEventMap>(
 ): void;
 
 // Element Event based useEventListener interface
-function useEventListener<
-  K extends keyof HTMLElementEventMap,
-  T extends HTMLElement = HTMLDivElement,
->(
+function useEventListener<K extends keyof HTMLElementEventMap, T extends HTMLElement = HTMLDivElement>(
   eventName: K,
   handler: (event: HTMLElementEventMap[K]) => void,
   element: RefObject<T>,
@@ -49,13 +45,7 @@ function useEventListener<
   T extends HTMLElement | MediaQueryList | void = void,
 >(
   eventName: KW | KH | KM,
-  handler: (
-    event:
-      | WindowEventMap[KW]
-      | HTMLElementEventMap[KH]
-      | MediaQueryListEventMap[KM]
-      | Event,
-  ) => void,
+  handler: (event: WindowEventMap[KW] | HTMLElementEventMap[KH] | MediaQueryListEventMap[KM] | Event) => void,
   element?: RefObject<T>,
   options?: boolean | AddEventListenerOptions,
 ) {

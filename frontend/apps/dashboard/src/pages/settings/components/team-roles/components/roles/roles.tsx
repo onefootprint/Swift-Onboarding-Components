@@ -7,12 +7,7 @@ import RolesTable from '../../../../../../components/roles/roles-table';
 import Create from './components/create';
 
 const Roles = () => {
-  const {
-    data: response,
-    errorMessage,
-    isLoading,
-    pagination,
-  } = useRoles(RoleKind.dashboardUser);
+  const { data: response, errorMessage, isLoading, pagination } = useRoles(RoleKind.dashboardUser);
 
   return (
     <Box testID="roles-table" tag="section">

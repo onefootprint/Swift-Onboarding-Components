@@ -1,9 +1,4 @@
-import {
-  IcoBook16,
-  IcoBook24,
-  IcoHelp16,
-  IcoHelp24,
-} from '@onefootprint/icons';
+import { IcoBook16, IcoBook24, IcoHelp16, IcoHelp24 } from '@onefootprint/icons';
 import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
@@ -151,15 +146,7 @@ const Template: Story<RadioSelectProps> = ({
     onChange?.(newValue);
   };
 
-  return (
-    <RadioSelect
-      options={options}
-      value={selectedValue}
-      onChange={handleChange}
-      testID={testID}
-      size={size}
-    />
-  );
+  return <RadioSelect options={options} value={selectedValue} onChange={handleChange} testID={testID} size={size} />;
 };
 
 export const Default = Template.bind({});

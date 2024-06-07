@@ -1,13 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type {
-  OnboardingConfig,
-  RuleBacktestingData,
-} from '@onefootprint/types';
-import {
-  OnboardingConfigKind,
-  OnboardingConfigStatus,
-  OnboardingStatus,
-} from '@onefootprint/types';
+import type { OnboardingConfig, RuleBacktestingData } from '@onefootprint/types';
+import { OnboardingConfigKind, OnboardingConfigStatus, OnboardingStatus } from '@onefootprint/types';
 import { OnboardingDecisionRuleAction } from '@onefootprint/types/src/data/rule';
 
 export const kycPlaybookFixture: OnboardingConfig = {
@@ -121,8 +114,7 @@ export const backtestedRulesFixture: RuleBacktestingData = {
       fpId: 'fp_9',
       currentStatus: OnboardingStatus.pass,
       historicalActionTriggered: null,
-      backtestActionTriggered:
-        OnboardingDecisionRuleAction.passWithManualReview,
+      backtestActionTriggered: OnboardingDecisionRuleAction.passWithManualReview,
     },
     {
       fpId: 'fp_10',
@@ -239,9 +231,7 @@ export const withEvaluateRules = (
     response,
   });
 
-export const withEvaluateRulesError = (
-  playbookId: string = kycPlaybookFixture.id,
-) =>
+export const withEvaluateRulesError = (playbookId: string = kycPlaybookFixture.id) =>
   mockRequest({
     method: 'post',
     path: `/org/onboarding_configs/${playbookId}/rules/evaluate`,

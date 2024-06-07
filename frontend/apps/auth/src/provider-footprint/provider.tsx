@@ -27,13 +27,8 @@ const FootprintContext = createContext<ProviderReturn>({
   },
 });
 
-const FootprintProvider = ({
-  children,
-  client,
-}: FootprintProviderProps): JSX.Element => (
-  <FootprintContext.Provider value={client}>
-    {children}
-  </FootprintContext.Provider>
+const FootprintProvider = ({ children, client }: FootprintProviderProps): JSX.Element => (
+  <FootprintContext.Provider value={client}>{children}</FootprintContext.Provider>
 );
 
 export default FootprintProvider;

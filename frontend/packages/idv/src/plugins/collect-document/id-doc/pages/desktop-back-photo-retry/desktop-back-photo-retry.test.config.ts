@@ -34,11 +34,7 @@ export const initialContextDL: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
-    CA: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
+    CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
 };
 

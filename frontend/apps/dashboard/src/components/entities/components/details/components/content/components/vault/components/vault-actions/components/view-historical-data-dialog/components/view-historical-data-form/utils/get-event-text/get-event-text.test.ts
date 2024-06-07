@@ -46,18 +46,14 @@ describe('getEventText', () => {
 
   describe('when an event with kind TimelineEventKind.onboardingDecision is passed in', () => {
     it('should return the correct text', () => {
-      const onboardingDecisionText = getEventText(
-        onboardingDecisionEventFixture,
-      );
+      const onboardingDecisionText = getEventText(onboardingDecisionEventFixture);
       expect(onboardingDecisionText).toEqual('Completed My Playbook playbook');
     });
   });
 
   describe('when an event with kind TimelineEventKind.combinedWatchlistChecks is passed in', () => {
     it('should return the correct text', () => {
-      const combinedWatchlistChecksText = getEventText(
-        combinedWatchlistChecksEventFixture,
-      );
+      const combinedWatchlistChecksText = getEventText(combinedWatchlistChecksEventFixture);
       expect(combinedWatchlistChecksText).toEqual('Watchlist check performed');
     });
   });
@@ -79,38 +75,28 @@ describe('getEventText', () => {
   describe('when an event with kind TimelineEventKind.workflowTriggered is passed in', () => {
     it('should return the correct text', () => {
       const workflowTriggeredText = getEventText(workflowTriggeredEventFixture);
-      expect(workflowTriggeredText).toEqual(
-        'Piip Penguin (piip@onefootprint.com) requested user to upload ID photo',
-      );
+      expect(workflowTriggeredText).toEqual('Piip Penguin (piip@onefootprint.com) requested user to upload ID photo');
     });
   });
 
   describe('when an event with kind TimelineEventKind.workflowStarted is passed in', () => {
     it('should return the correct text', () => {
       const workflowStartedText = getEventText(workflowStartedEventFixture);
-      expect(workflowStartedText).toEqual(
-        'Started onboarding onto My Playbook',
-      );
+      expect(workflowStartedText).toEqual('Started onboarding onto My Playbook');
     });
   });
 
   describe('when an event with kind TimelineEventKind.authMethodUpdated is passed in', () => {
     it('should return the correct text', () => {
       const authMethodUpdatedText = getEventText(authMethodUpdatedEventFixture);
-      expect(authMethodUpdatedText).toEqual(
-        'User registered Phone number as a Footprint login method',
-      );
+      expect(authMethodUpdatedText).toEqual('User registered Phone number as a Footprint login method');
     });
   });
 
   describe('when an event with kind TimelineEventKind.externalIntegrationCalled is passed in', () => {
     it('should return the correct text', () => {
-      const externalIntegrationCalledText = getEventText(
-        externalIntegrationCalledEventFixture,
-      );
-      expect(externalIntegrationCalledText).toEqual(
-        'Successfully submitted user to Alpaca CIP',
-      );
+      const externalIntegrationCalledText = getEventText(externalIntegrationCalledEventFixture);
+      expect(externalIntegrationCalledText).toEqual('Successfully submitted user to Alpaca CIP');
     });
   });
 

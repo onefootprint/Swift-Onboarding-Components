@@ -36,9 +36,7 @@ describe('<Pagination />', () => {
       pageSize: 10,
       totalNumResults: 20,
     });
-    expect(
-      screen.getByText('Showing 1 to 10 of 20 total results'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Showing 1 to 10 of 20 total results')).toBeInTheDocument();
   });
 
   it('should render the correct text when on the last page', () => {
@@ -49,9 +47,7 @@ describe('<Pagination />', () => {
       pageSize: 10,
       totalNumResults: 20,
     });
-    expect(
-      screen.getByText('Showing 11 to 20 of 20 total results'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Showing 11 to 20 of 20 total results')).toBeInTheDocument();
   });
 
   it('should call the onNextPage function when the next button is clicked', async () => {

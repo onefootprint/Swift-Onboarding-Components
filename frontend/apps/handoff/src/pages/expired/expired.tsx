@@ -22,9 +22,7 @@ const Expired = () => {
         <Grid.Container tag="form" gap={8}>
           <HeaderTitle
             title={t('title')}
-            subtitle={
-              opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
-            }
+            subtitle={opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')}
           />
           {opener === 'mobile' && (
             <Button onClick={handleClick} fullWidth>

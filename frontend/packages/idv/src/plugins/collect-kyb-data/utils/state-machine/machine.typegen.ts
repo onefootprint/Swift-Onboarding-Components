@@ -13,10 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignData:
-      | 'basicDataSubmitted'
-      | 'beneficialOwnersSubmitted'
-      | 'businessAddressSubmitted';
+    assignData: 'basicDataSubmitted' | 'beneficialOwnersSubmitted' | 'businessAddressSubmitted';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

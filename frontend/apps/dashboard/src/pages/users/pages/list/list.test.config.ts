@@ -1,12 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { Entity, GetOnboardingConfigsResponse } from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  EntityKind,
-  EntityStatus,
-  IdDI,
-  OnboardingConfigStatus,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, EntityKind, EntityStatus, IdDI, OnboardingConfigStatus } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
 export const entitiesFixture: Entity[] = [

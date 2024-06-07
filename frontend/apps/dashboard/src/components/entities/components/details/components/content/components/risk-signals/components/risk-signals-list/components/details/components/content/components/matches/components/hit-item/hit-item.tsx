@@ -24,9 +24,7 @@ const HitItem = ({ hit, handleShowAmlMedia }: HitItemProps) => {
 
     if (fields) {
       const numTotalFields = Object.keys(fields).length;
-      const numFieldsShown = isCollapsed
-        ? MAX_NUM_FIELDS_SHOWN
-        : numTotalFields;
+      const numFieldsShown = isCollapsed ? MAX_NUM_FIELDS_SHOWN : numTotalFields;
       const sortedFields = Object.keys(fields).sort().slice(0, numFieldsShown);
       sortedFields.forEach(key => {
         if (fields[key]) {
@@ -41,8 +39,7 @@ const HitItem = ({ hit, handleShowAmlMedia }: HitItemProps) => {
       }
     }
 
-    if (media && media.length)
-      sortedHit.push({ key: 'relevantMedia', value: media });
+    if (media && media.length) sortedHit.push({ key: 'relevantMedia', value: media });
 
     return sortedHit;
   };

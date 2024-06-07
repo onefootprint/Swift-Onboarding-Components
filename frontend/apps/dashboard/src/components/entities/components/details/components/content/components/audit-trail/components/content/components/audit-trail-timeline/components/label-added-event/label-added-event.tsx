@@ -1,5 +1,5 @@
 import type { LabelAddedEventData } from '@onefootprint/types';
-import { createFontStyles, Text } from '@onefootprint/ui';
+import { Text, createFontStyles } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

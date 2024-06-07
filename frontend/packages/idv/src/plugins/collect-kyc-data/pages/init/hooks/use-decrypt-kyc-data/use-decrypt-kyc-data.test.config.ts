@@ -1,9 +1,7 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { DataIdentifier, UserTokenScope } from '@onefootprint/types';
 
-export const withDecrypt = (
-  data: Partial<Record<DataIdentifier, string | undefined>>,
-) =>
+export const withDecrypt = (data: Partial<Record<DataIdentifier, string | undefined>>) =>
   mockRequest({
     method: 'post',
     path: '/hosted/user/vault/decrypt',

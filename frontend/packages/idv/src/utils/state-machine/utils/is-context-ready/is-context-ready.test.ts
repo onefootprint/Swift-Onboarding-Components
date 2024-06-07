@@ -1,8 +1,5 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import {
-  CLIENT_PUBLIC_KEY_HEADER,
-  OnboardingConfigStatus,
-} from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER, OnboardingConfigStatus } from '@onefootprint/types';
 
 import type { MachineContext, MachineEvents } from '../../types';
 import isContextReady from './is-context-ready';

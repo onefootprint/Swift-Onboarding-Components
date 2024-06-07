@@ -1,9 +1,4 @@
-import {
-  IcoCode24,
-  IcoDatabase24,
-  IcoKey24,
-  IcoUsers24,
-} from '@onefootprint/icons';
+import { IcoCode24, IcoDatabase24, IcoKey24, IcoUsers24 } from '@onefootprint/icons';
 import { Container, Grid, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
@@ -46,12 +41,7 @@ const Hero = () => {
         <SectionTitle variant="display-1">{t('title')}</SectionTitle>
         <SectionSubtitle maxWidth="640px">{t('subtitle')}</SectionSubtitle>
       </Title>
-      <FeatureCardsGrid
-        width="100%"
-        columns={['1fr']}
-        rows={['repeat(4, 1fr)']}
-        marginTop={11}
-      >
+      <FeatureCardsGrid width="100%" columns={['1fr']} rows={['repeat(4, 1fr)']} marginTop={11}>
         {featureCards.map(card => (
           <FeatureCard
             key={card.id}

@@ -3,7 +3,7 @@ import React from 'react';
 
 import useUpdateAllowedDomains from '../../hooks/use-update-allowed-domains';
 import Domain from './components/domain';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 
 export type ListProps = {
@@ -26,7 +26,7 @@ const List = ({ allowedDomains = [], error, isLoading }: ListProps) => {
   }
 
   if (error) {
-    return <Error error={error} />;
+    return <ErrorComponent error={error} />;
   }
 
   return allowedDomains.length ? (

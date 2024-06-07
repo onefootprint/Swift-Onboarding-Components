@@ -1,7 +1,4 @@
-import {
-  InvestorProfileDI,
-  InvestorProfileRiskTolerance,
-} from '@onefootprint/types';
+import { InvestorProfileDI, InvestorProfileRiskTolerance } from '@onefootprint/types';
 import React from 'react';
 
 import { Logger } from '../../../../utils/logger';
@@ -46,8 +43,7 @@ const RiskTolerance = () => {
         onSubmit={handleSubmit}
         defaultValues={{
           [InvestorProfileDI.riskTolerance]:
-            data?.[InvestorProfileDI.riskTolerance] ||
-            InvestorProfileRiskTolerance.conservative,
+            data?.[InvestorProfileDI.riskTolerance] || InvestorProfileRiskTolerance.conservative,
         }}
       />
     </>

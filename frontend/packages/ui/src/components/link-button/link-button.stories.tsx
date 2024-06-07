@@ -30,8 +30,7 @@ export default {
   argTypes: {
     ariaLabel: {
       control: 'text',
-      description:
-        'Aria Label for accessibility. It uses by the default the children content',
+      description: 'Aria Label for accessibility. It uses by the default the children content',
       name: 'aria-label',
       required: false,
     },

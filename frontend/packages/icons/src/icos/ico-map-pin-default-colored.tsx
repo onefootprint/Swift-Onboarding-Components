@@ -3,11 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoMapPinDefault = ({
-  'aria-label': ariaLabel,
-  className,
-  testID,
-}: IconProps) => {
+const IcoMapPinDefault = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => {
   const theme = useTheme();
 
   return (

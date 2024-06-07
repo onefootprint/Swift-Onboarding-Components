@@ -78,11 +78,7 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
       {hideHeader ? null : (
         <>
           <NavigationHeader />
-          <HeaderTitle
-            title={t('title')}
-            subtitle={t('subtitle')}
-            marginBottom={7}
-          />
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} marginBottom={7} />
         </>
       )}
       <Grid.Container gap={7} tag="form" onSubmit={handleSubmit(onSubmitForm)}>

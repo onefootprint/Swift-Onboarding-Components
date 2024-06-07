@@ -3,12 +3,7 @@ import React from 'react';
 
 import type { NavigationHeaderRightButtonProps } from '../../types';
 
-const NavigationIconButton = ({
-  icon: Icon,
-  onClick,
-  color,
-  label = '',
-}: NavigationHeaderRightButtonProps) => (
+const NavigationIconButton = ({ icon: Icon, onClick, color, label = '' }: NavigationHeaderRightButtonProps) => (
   <IconButton onClick={onClick} aria-label={label}>
     <Icon color={color} />
   </IconButton>

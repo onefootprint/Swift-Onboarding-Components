@@ -12,22 +12,13 @@ type ListEntryDeletedEventHeaderProps = {
 
 const HEADER_HEIGHT = '32px';
 
-const ListEntryDeletedEventHeader = ({
-  user,
-  event,
-}: ListEntryDeletedEventHeaderProps) => {
+const ListEntryDeletedEventHeader = ({ user, event }: ListEntryDeletedEventHeaderProps) => {
   const { t } = useTranslation('lists', {
     keyPrefix: 'details.activity-log.delete-list-entry',
   });
 
   return (
-    <Stack
-      rowGap={1}
-      columnGap={3}
-      flexWrap="wrap"
-      align="center"
-      minHeight={HEADER_HEIGHT}
-    >
+    <Stack rowGap={1} columnGap={3} flexWrap="wrap" align="center" minHeight={HEADER_HEIGHT}>
       <Text variant="label-3">{user}</Text>
       <Text variant="body-3" color="tertiary">
         {t('verb')}

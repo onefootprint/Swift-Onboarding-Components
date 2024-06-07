@@ -1,8 +1,5 @@
 import type { InvestorProfileData } from '@onefootprint/types';
-import {
-  InvestorProfileDI,
-  InvestorProfileInvestmentGoal,
-} from '@onefootprint/types';
+import { InvestorProfileDI, InvestorProfileInvestmentGoal } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,17 +16,11 @@ export type InvestmentGoalsFormProps = {
 
 type FormData = Record<InvestorProfileInvestmentGoal, boolean>;
 
-const InvestmentGoalsForm = ({
-  defaultValues,
-  isLoading,
-  onSubmit,
-}: InvestmentGoalsFormProps) => {
+const InvestmentGoalsForm = ({ defaultValues, isLoading, onSubmit }: InvestmentGoalsFormProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'investor-profile.pages.investment-goals',
   });
-  const defaultEntries = (
-    defaultValues?.[InvestorProfileDI.investmentGoals] ?? []
-  ).map(goal => [goal, true]);
+  const defaultEntries = (defaultValues?.[InvestorProfileDI.investmentGoals] ?? []).map(goal => [goal, true]);
 
   const { handleSubmit, register, watch } = useForm<FormData>({
     defaultValues: Object.fromEntries(defaultEntries),
@@ -41,13 +32,7 @@ const InvestmentGoalsForm = ({
   const speculation = watch(InvestorProfileInvestmentGoal.speculation);
   const diversification = watch(InvestorProfileInvestmentGoal.diversification);
   const other = watch(InvestorProfileInvestmentGoal.other);
-  const hasEmptySelection =
-    !growth &&
-    !income &&
-    !diversification &&
-    !preserve &&
-    !speculation &&
-    !other;
+  const hasEmptySelection = !growth && !income && !diversification && !preserve && !speculation && !other;
 
   const handleBeforeSubmit = (data: FormData) => {
     if (hasEmptySelection) {
@@ -72,14 +57,8 @@ const InvestmentGoalsForm = ({
       formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }}
       error={hasEmptySelection && showError ? t('empty-selection') : undefined}
     >
-      <Checkbox
-        label={t(InvestorProfileInvestmentGoal.growth)}
-        {...register(InvestorProfileInvestmentGoal.growth)}
-      />
-      <Checkbox
-        label={t(InvestorProfileInvestmentGoal.income)}
-        {...register(InvestorProfileInvestmentGoal.income)}
-      />
+      <Checkbox label={t(InvestorProfileInvestmentGoal.growth)} {...register(InvestorProfileInvestmentGoal.growth)} />
+      <Checkbox label={t(InvestorProfileInvestmentGoal.income)} {...register(InvestorProfileInvestmentGoal.income)} />
       <Checkbox
         label={t(InvestorProfileInvestmentGoal.preserveCapital)}
         {...register(InvestorProfileInvestmentGoal.preserveCapital)}
@@ -92,10 +71,7 @@ const InvestmentGoalsForm = ({
         label={t(InvestorProfileInvestmentGoal.diversification)}
         {...register(InvestorProfileInvestmentGoal.diversification)}
       />
-      <Checkbox
-        label={t(InvestorProfileInvestmentGoal.other)}
-        {...register(InvestorProfileInvestmentGoal.other)}
-      />
+      <Checkbox label={t(InvestorProfileInvestmentGoal.other)} {...register(InvestorProfileInvestmentGoal.other)} />
     </CustomForm>
   );
 };

@@ -38,9 +38,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
 
   const initiatePasskeyChallenge = () => {
     if (!user?.token) {
-      logError(
-        'No identifying token found while initiating login biometric challenge',
-      );
+      logError('No identifying token found while initiating login biometric challenge');
       return;
     }
 
@@ -55,12 +53,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       },
       {
         onError: error => {
-          logWarn(
-            `Error while requesting login biometric challenge: ${getErrorMessage(
-              error,
-            )}`,
-            error,
-          );
+          logWarn(`Error while requesting login biometric challenge: ${getErrorMessage(error)}`, error);
           showRequestErrorToast(error);
         },
         onSuccess: handleRequestChallengeSuccess,
@@ -68,16 +61,11 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
     );
   };
 
-  const handleRequestChallengeSuccess = async (
-    payload: LoginChallengeResponse,
-  ) => {
-    const { token, biometricChallengeJson, challengeToken, challengeKind } =
-      payload.challengeData || {};
+  const handleRequestChallengeSuccess = async (payload: LoginChallengeResponse) => {
+    const { token, biometricChallengeJson, challengeToken, challengeKind } = payload.challengeData || {};
 
     if (challengeKind !== ChallengeKind.biometric) {
-      logError(
-        'Received sms challenge after requesting login biometric challenge',
-      );
+      logError('Received sms challenge after requesting login biometric challenge');
       return;
     }
     if (!biometricChallengeJson || !challengeToken) {
@@ -87,16 +75,9 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
     setIsRunningWebauthn(true);
     let challengeResponse;
     try {
-      challengeResponse = await getBiometricChallengeResponse(
-        biometricChallengeJson,
-      );
+      challengeResponse = await getBiometricChallengeResponse(biometricChallengeJson);
     } catch (e) {
-      logWarn(
-        `Unable to generate biometric challenge response ${
-          typeof e === 'string' ? e : JSON.stringify(e)
-        }`,
-        e,
-      );
+      logWarn(`Unable to generate biometric challenge response ${typeof e === 'string' ? e : JSON.stringify(e)}`, e);
       toast.show({
         title: t('error.title'),
         description: t('error.description'),
@@ -122,12 +103,7 @@ const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
       {
         onSuccess,
         onError: (error: unknown) => {
-          logWarn(
-            `Error while verifying biometric challenge: ${getErrorMessage(
-              error,
-            )}`,
-            error,
-          );
+          logWarn(`Error while verifying biometric challenge: ${getErrorMessage(error)}`, error);
         },
         onSettled: () => {
           setIsRunningWebauthn(false);

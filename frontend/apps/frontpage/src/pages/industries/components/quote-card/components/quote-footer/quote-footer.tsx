@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { Box, LinkButton, media, Stack, Text } from '@onefootprint/ui';
+import { Box, LinkButton, Stack, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -11,12 +11,7 @@ type QuoteFooterProps = {
   caseStudyLink?: string;
 };
 
-const QuoteFooter = ({
-  author,
-  role,
-  company,
-  caseStudyLink,
-}: QuoteFooterProps) => {
+const QuoteFooter = ({ author, role, company, caseStudyLink }: QuoteFooterProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.industries.components',
   });

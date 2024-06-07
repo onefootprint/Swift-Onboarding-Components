@@ -8,14 +8,11 @@ type OnboardingRequirementsMachineProviderArgs = {
   args: OnboardingRequirementsMachineArgs;
 };
 
-const useLocalOnboardingRequirementsMachine = ({
-  args,
-}: OnboardingRequirementsMachineProviderArgs) =>
+const useLocalOnboardingRequirementsMachine = ({ args }: OnboardingRequirementsMachineProviderArgs) =>
   useMachine(() => createOnboardingRequirementsMachine(args));
 
-export const [
-  OnboardingRequirementsMachineProvider,
-  useOnboardingRequirementsMachine,
-] = constate(useLocalOnboardingRequirementsMachine);
+export const [OnboardingRequirementsMachineProvider, useOnboardingRequirementsMachine] = constate(
+  useLocalOnboardingRequirementsMachine,
+);
 
 export default OnboardingRequirementsMachineProvider;

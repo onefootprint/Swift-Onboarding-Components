@@ -2,24 +2,21 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
+  clickOnVerifyWithSms,
   confirmData,
+  doTransferFromDesktop,
   fillAddress,
-  fillNameAndDoB,
   fillEmail,
+  fillNameAndDoB,
   fillPhoneNumber,
   fillSSN,
   selectOutcomeOptional,
-  verifyPhoneNumber,
-  clickOnVerifyWithSms,
-  doTransferFromDesktop,
   verifyAppIframeClick,
+  verifyPhoneNumber,
 } from './utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
-const key =
-  process.env.E2E_OB_KYC ||
-  process.env.NEXT_PUBLIC_E2E_TENANT_PK ||
-  'ob_test_Gw8TsnS2xWOYazI0pugdxu';
+const key = process.env.E2E_OB_KYC || process.env.NEXT_PUBLIC_E2E_TENANT_PK || 'ob_test_Gw8TsnS2xWOYazI0pugdxu';
 
 const firstName = 'Jane';
 const lastName = 'Doe';
@@ -35,9 +32,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`,
-  );
+  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
@@ -49,11 +44,9 @@ test('Verify KYC #ci', async ({ page, browser, isMobile }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(
-    page
-      .frameLocator('iframe[name^="footprint-iframe-"]')
-      .getByText(/Sandbox Mode/i),
-  ).toBeVisible({ timeout });
+  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
+    timeout,
+  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   await selectOutcomeOptional(frame, 'Success');

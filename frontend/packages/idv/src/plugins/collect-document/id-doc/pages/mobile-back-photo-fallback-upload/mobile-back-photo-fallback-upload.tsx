@@ -40,20 +40,11 @@ const MobileBackPhotoFallbackUpload = () => {
   };
 
   const translationKey = docTypeTranslationKeyMap[docType];
-  const subtitle = t(
-    `subtitle.${translationKey}` as unknown as TemplateStringsArray,
-  ) as unknown as string;
+  const subtitle = t(`subtitle.${translationKey}` as unknown as TemplateStringsArray) as unknown as string;
 
   return (
-    <Container
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1, transition: { duration: 0.3 } }}
-      exit={{ opacity: 0 }}
-    >
-      <NavigationHeader
-        leftButton={{ variant: 'back', onBack: handleClickBack }}
-        position="floating"
-      />
+    <Container initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.3 } }} exit={{ opacity: 0 }}>
+      <NavigationHeader leftButton={{ variant: 'back', onBack: handleClickBack }} position="floating" />
       <HeaderTitle title={t('title')} subtitle={subtitle} icon={IcoClock40} />
       <IdDocPhotoButtons
         onComplete={onComplete}

@@ -1,16 +1,6 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
-import {
-  asAdminUserFirmEmployee,
-  asAdminUserInLive,
-  resetUser,
-} from 'src/config/tests';
+import { asAdminUserFirmEmployee, asAdminUserInLive, resetUser } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
 import SideNav from './side-nav';
@@ -79,9 +69,7 @@ describe('<SideNav />', () => {
 
         await waitFor(() => {
           getOrgAuthRoleFixture.slice(0, 2).forEach(tenant => {
-            expect(
-              screen.getByRole('button', { name: tenant.name }),
-            ).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
           });
 
           const tenantItems = screen.getAllByTestId('tenant-item');
@@ -106,9 +94,7 @@ describe('<SideNav />', () => {
         });
         await userEvent.hover(authSupportedTenant);
         await waitFor(() => {
-          const tooltipText = screen.queryByText(
-            AUTH_METHOD_NOT_SUPPORTED_TEXT('Acme'),
-          );
+          const tooltipText = screen.queryByText(AUTH_METHOD_NOT_SUPPORTED_TEXT('Acme'));
           expect(tooltipText).not.toBeInTheDocument();
         });
 
@@ -120,9 +106,7 @@ describe('<SideNav />', () => {
         });
         await userEvent.hover(authNotSupportedTenant);
         await waitFor(() => {
-          const tooltipText = screen.getAllByText(
-            AUTH_METHOD_NOT_SUPPORTED_TEXT('No Auth Tenant'),
-          );
+          const tooltipText = screen.getAllByText(AUTH_METHOD_NOT_SUPPORTED_TEXT('No Auth Tenant'));
           expect(tooltipText[0]).toBeInTheDocument();
         });
       });
@@ -137,9 +121,7 @@ describe('<SideNav />', () => {
 
         const tenant = getOrgAuthRoleFixture[2];
         await waitFor(() => {
-          expect(
-            screen.getByRole('button', { name: tenant.name }),
-          ).toBeInTheDocument();
+          expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
         });
         const tenantButton = screen.getByRole('button', {
           name: tenant.name,
@@ -161,9 +143,7 @@ describe('<SideNav />', () => {
 
         const tenant = getOrgAuthRoleFixture[2];
         await waitFor(() => {
-          expect(
-            screen.getByRole('button', { name: tenant.name }),
-          ).toBeInTheDocument();
+          expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
         });
         const tenantButton = screen.getByRole('button', {
           name: tenant.name,
@@ -188,9 +168,7 @@ describe('<SideNav />', () => {
         });
         await waitFor(() => {
           getOrgAuthRoleFixture.slice(0, 5).forEach(tenant => {
-            expect(
-              screen.getByRole('button', { name: tenant.name }),
-            ).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
           });
 
           const tenantItems = screen.getAllByTestId('tenant-item');
@@ -205,9 +183,7 @@ describe('<SideNav />', () => {
 
         await waitFor(() => {
           getOrgAuthRoleFixture.forEach(tenant => {
-            expect(
-              screen.getByRole('button', { name: tenant.name }),
-            ).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
           });
 
           const tenantItems = screen.getAllByTestId('tenant-item');
@@ -223,9 +199,7 @@ describe('<SideNav />', () => {
 
         await waitFor(() => {
           getOrgAuthRoleFixture.slice(0, 5).forEach(tenant => {
-            expect(
-              screen.getByRole('button', { name: tenant.name }),
-            ).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: tenant.name })).toBeInTheDocument();
           });
 
           const tenantItems = screen.getAllByTestId('tenant-item');

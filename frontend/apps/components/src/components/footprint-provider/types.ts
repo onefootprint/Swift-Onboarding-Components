@@ -26,12 +26,8 @@ export type IframeAdapterReturn = {
 };
 
 export type ProviderReturn = {
-  getAdapterResponse:
-    | IframeAdapterReturn['getAdapterResponse']
-    | WebViewAdapterReturn['getAdapterResponse'];
-  getLoadingStatus:
-    | IframeAdapterReturn['getLoadingStatus']
-    | WebViewAdapterReturn['getLoadingStatus'];
+  getAdapterResponse: IframeAdapterReturn['getAdapterResponse'] | WebViewAdapterReturn['getAdapterResponse'];
+  getLoadingStatus: IframeAdapterReturn['getLoadingStatus'] | WebViewAdapterReturn['getLoadingStatus'];
   load: WebViewAdapterReturn['load'] | IframeAdapterReturn['load'];
   on: WebViewAdapterReturn['on'] | IframeAdapterReturn['on'];
   send: WebViewAdapterReturn['send'] | IframeAdapterReturn['send'];

@@ -10,10 +10,7 @@ type IdentifierInputProps = {
 
 const IDENTIFIER_PREFIX = 'document.custom.';
 
-const IdentifierInput = ({
-  customDocIdentifierFormField,
-  disabled,
-}: IdentifierInputProps) => {
+const IdentifierInput = ({ customDocIdentifierFormField, disabled }: IdentifierInputProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.custom-doc-request-form.document-identifier',
   });
@@ -29,8 +26,7 @@ const IdentifierInput = ({
     if (!value) return t('errors.required');
     const sanitizedValue = value.replace(IDENTIFIER_PREFIX, '');
     if (sanitizedValue.length === 0) return t('errors.required');
-    if (!sanitizedValue.match(/^[A-Za-z0-9_-]+$/))
-      return t('errors.no-special-characters');
+    if (!sanitizedValue.match(/^[A-Za-z0-9_-]+$/)) return t('errors.no-special-characters');
     return undefined;
   };
 

@@ -1,13 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
-import {
-  Box,
-  Container,
-  LinkButton,
-  media,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Box, Container, LinkButton, Stack, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -47,32 +40,20 @@ const PostPage = ({ post }: PostProps) => {
         </HeroContainer>
         <PostContainer>
           <Link href="/changelog" passHref legacyBehavior>
-            <LinkButton
-              iconPosition="left"
-              iconComponent={IcoChevronLeftBig24}
-              href="/changelog"
-            >
+            <LinkButton iconPosition="left" iconComponent={IcoChevronLeftBig24} href="/changelog">
               {t('go-back')}
             </LinkButton>
           </Link>
           <Box marginBottom={8} />
           <ImageContainer>
-            <Image
-              src={post.feature_image}
-              height={900}
-              width={900}
-              alt={post.feature_image_alt || post.title}
-            />
+            <Image src={post.feature_image} height={900} width={900} alt={post.feature_image_alt || post.title} />
           </ImageContainer>
           <Stack marginTop={8} marginBottom={8} gap={4} direction="column">
             <Text variant="label-3" color="tertiary">
               {formattedDate}
             </Text>
             <Text variant="display-3">{post.title}</Text>
-            <Author
-              authorName={post.primary_author.name}
-              authorImg={post.primary_author.profile_image}
-            />
+            <Author authorName={post.primary_author.name} authorImg={post.primary_author.profile_image} />
           </Stack>
           {post.html && <HtmlContent html={post.html} />}
         </PostContainer>

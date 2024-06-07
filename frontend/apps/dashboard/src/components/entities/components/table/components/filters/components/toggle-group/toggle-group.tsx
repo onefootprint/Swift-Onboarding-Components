@@ -1,5 +1,5 @@
 import type { Theme } from '@onefootprint/design-tokens';
-import { createFontStyles, Stack } from '@onefootprint/ui';
+import { Stack, createFontStyles } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
@@ -35,14 +35,7 @@ const buttonVariants = (theme: Theme) => ({
   },
 });
 
-const ToggleGroup = ({
-  'aria-label': ariaLabel,
-  options,
-  value,
-  onChange,
-  disabled,
-  groupId,
-}: ToggleGroupProps) => {
+const ToggleGroup = ({ 'aria-label': ariaLabel, options, value, onChange, disabled, groupId }: ToggleGroupProps) => {
   const theme = useTheme();
 
   const getAnimate = (option: ToggleGroupOption) => {
@@ -52,19 +45,9 @@ const ToggleGroup = ({
   };
 
   return (
-    <ToggleGroupContainer
-      aria-label={ariaLabel}
-      data-disabled={disabled}
-      role="radiogroup"
-    >
+    <ToggleGroupContainer aria-label={ariaLabel} data-disabled={disabled} role="radiogroup">
       {options.map(option => (
-        <Stack
-          position="relative"
-          key={option.value}
-          height="100%"
-          align="center"
-          justify="center"
-        >
+        <Stack position="relative" key={option.value} height="100%" align="center" justify="center">
           <Option
             disabled={disabled}
             data-selected={value === option.value}
@@ -76,11 +59,7 @@ const ToggleGroup = ({
             animate={getAnimate(option)}
           >
             {option.label}
-            {option.count ? (
-              <Badge data-selected={value === option.value}>
-                {option.count}
-              </Badge>
-            ) : null}
+            {option.count ? <Badge data-selected={value === option.value}>{option.count}</Badge> : null}
           </Option>
           {value === option.value && (
             <SelectedIndicator

@@ -36,13 +36,7 @@ const Header = () => (
         <Shimmer height="24px" width="64px" borderRadius="xl" />
       </Box>
     </Stack>
-    <Stack
-      id="subheader"
-      direction="row"
-      gap={3}
-      height="32px"
-      justify="space-between"
-    >
+    <Stack id="subheader" direction="row" gap={3} height="32px" justify="space-between">
       <Stack align="center" direction="row" gap={3}>
         <Box id="entity-timestamp">
           <Shimmer height="20px" width="105px" />

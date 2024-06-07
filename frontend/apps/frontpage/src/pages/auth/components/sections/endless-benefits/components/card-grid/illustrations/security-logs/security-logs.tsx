@@ -18,10 +18,7 @@ const SecurityLogs = () => {
       <Background />
       <Events direction="column" gap={9}>
         {translations.map(translation => (
-          <Event
-            text={t(`logs.${translation}` as ParseKeys<'common'>)}
-            key={translation}
-          />
+          <Event text={t(`logs.${translation}` as ParseKeys<'common'>)} key={translation} />
         ))}
       </Events>
     </StyledIllustrationContainer>

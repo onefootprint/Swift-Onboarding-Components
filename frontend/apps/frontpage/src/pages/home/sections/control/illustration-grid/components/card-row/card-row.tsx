@@ -17,12 +17,7 @@ const CardRow = ({ title, value }: CardRowProps) => {
 
   return (
     <Stack direction="row" align="center">
-      <Text
-        variant="body-3"
-        display="inline-flex"
-        width="100%"
-        color="tertiary"
-      >
+      <Text variant="body-3" display="inline-flex" width="100%" color="tertiary">
         {title}
       </Text>
       {renderValue()}

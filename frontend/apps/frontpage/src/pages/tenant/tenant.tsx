@@ -1,12 +1,6 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import {
-  IcoCheckCircle24,
-  IcoDatabase24,
-  IcoEye24,
-  IcoLock24,
-  IcoShield40,
-} from '@onefootprint/icons';
-import { Grid, media, Stack, Text } from '@onefootprint/ui';
+import { IcoCheckCircle24, IcoDatabase24, IcoEye24, IcoLock24, IcoShield40 } from '@onefootprint/icons';
+import { Grid, Stack, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,14 +25,8 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
         {tenant.name ? (
           <>
             <title>{t('html-title-custom', { tenantName: tenant.name })}</title>
-            <meta
-              property="og:title"
-              content={t('html-title-custom', { tenantName: tenant.name })}
-            />
-            <meta
-              property="og:description"
-              content={t('html-description', { tenantName: tenant.name })}
-            />
+            <meta property="og:title" content={t('html-title-custom', { tenantName: tenant.name })} />
+            <meta property="og:description" content={t('html-description', { tenantName: tenant.name })} />
           </>
         ) : (
           <>
@@ -48,24 +36,11 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
           </>
         )}
         {tenant.logoUrl ? (
-          <meta
-            property="og:image"
-            content={`${FRONTPAGE_BASE_URL}/api/tenant-og?logo_url=${tenant.logoUrl}`}
-          />
+          <meta property="og:image" content={`${FRONTPAGE_BASE_URL}/api/tenant-og?logo_url=${tenant.logoUrl}`} />
         ) : null}
       </Head>
-      <StyledContainer
-        align="center"
-        justify="center"
-        direction="column"
-        gap={10}
-        paddingTop={10}
-        paddingBottom={12}
-      >
-        <PartnersLogos
-          tenantName={tenant.name}
-          tenantLogoUrl={tenant.logoUrl}
-        />
+      <StyledContainer align="center" justify="center" direction="column" gap={10} paddingTop={10} paddingBottom={12}>
+        <PartnersLogos tenantName={tenant.name} tenantLogoUrl={tenant.logoUrl} />
         <HeadingContainer
           align="center"
           justify="center"
@@ -93,45 +68,23 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
           borderRadius="default"
           gap={8}
         >
-          <Stack
-            direction="column"
-            align="center"
-            justify="center"
-            textAlign="center"
-            gap={5}
-          >
+          <Stack direction="column" align="center" justify="center" textAlign="center" gap={5}>
             <IcoShield40 />
             <Text tag="h2" variant="heading-2">
               {t('features.title')}
             </Text>
           </Stack>
-          <FeaturesGrid
-            columns={['repeat(1, 1fr)']}
-            paddingTop={4}
-            paddingBottom={4}
-          >
-            <FeatureCard
-              title={t('features.feature-1.title')}
-              description={t('features.feature-1.description')}
-            >
+          <FeaturesGrid columns={['repeat(1, 1fr)']} paddingTop={4} paddingBottom={4}>
+            <FeatureCard title={t('features.feature-1.title')} description={t('features.feature-1.description')}>
               <IcoEye24 />
             </FeatureCard>
-            <FeatureCard
-              title={t('features.feature-2.title')}
-              description={t('features.feature-2.description')}
-            >
+            <FeatureCard title={t('features.feature-2.title')} description={t('features.feature-2.description')}>
               <IcoLock24 />
             </FeatureCard>
-            <FeatureCard
-              title={t('features.feature-3.title')}
-              description={t('features.feature-3.description')}
-            >
+            <FeatureCard title={t('features.feature-3.title')} description={t('features.feature-3.description')}>
               <IcoDatabase24 />
             </FeatureCard>
-            <FeatureCard
-              title={t('features.feature-4.title')}
-              description={t('features.feature-4.description')}
-            >
+            <FeatureCard title={t('features.feature-4.title')} description={t('features.feature-4.description')}>
               <IcoCheckCircle24 />
             </FeatureCard>
           </FeaturesGrid>

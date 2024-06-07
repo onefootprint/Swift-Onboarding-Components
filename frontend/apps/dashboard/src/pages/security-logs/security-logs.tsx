@@ -19,10 +19,8 @@ const SecurityLogs = () => {
   const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
   const accessEvents =
-    (getAccessEvents.data?.pages || []).reduce(
-      (allPages, page) => [...allPages, ...page.data],
-      [] as AccessEvent[],
-    ) || [];
+    (getAccessEvents.data?.pages || []).reduce((allPages, page) => [...allPages, ...page.data], [] as AccessEvent[]) ||
+    [];
 
   const items = accessEvents.map(item => ({
     time: { timestamp: item.timestamp },
@@ -36,9 +34,7 @@ const SecurityLogs = () => {
     const mainContainer = document.getElementById(MAIN_PAGE_ID);
     if (!mainContainer) return;
     const offset = mainContainer.clientHeight * 0.25;
-    const reachedBottom =
-      mainContainer.scrollHeight - mainContainer.scrollTop <=
-      mainContainer.clientHeight + offset;
+    const reachedBottom = mainContainer.scrollHeight - mainContainer.scrollTop <= mainContainer.clientHeight + offset;
     if (reachedBottom) {
       if (!getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
         getAccessEvents.fetchNextPage();
@@ -72,12 +68,7 @@ const SecurityLogs = () => {
         />
         <SecurityLogsFilters />
       </FiltersContainer>
-      <Timeline
-        items={items}
-        isLoading={
-          getAccessEvents.isLoading || getAccessEvents.isFetchingNextPage
-        }
-      />
+      <Timeline items={items} isLoading={getAccessEvents.isLoading || getAccessEvents.isFetchingNextPage} />
     </>
   );
 };

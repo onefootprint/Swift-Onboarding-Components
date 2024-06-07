@@ -1,7 +1,4 @@
-import type {
-  OrgFrequentNote,
-  OrgFrequentNoteKind,
-} from '../data/org-frequent-note';
+import type { OrgFrequentNote, OrgFrequentNoteKind } from '../data/org-frequent-note';
 
 export type GetOrgFrequentNotesResponse = Array<OrgFrequentNote>;
 

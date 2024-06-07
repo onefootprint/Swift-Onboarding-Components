@@ -1,10 +1,7 @@
 import { useRequestError } from '@onefootprint/request';
 import type { ProcessDocResponse } from '@onefootprint/types';
-import {
-  IdDocImageProcessingError,
-  IdDocImageTypes,
-} from '@onefootprint/types';
-import { Button, media, Text } from '@onefootprint/ui';
+import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
+import { Button, Text, media } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -40,14 +37,11 @@ const DeskTopProcessing = () => {
   const processDocMutation = useProcessDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
   const [nextSide, setNextSide] = useState<IdDocImageTypes | undefined>();
-  const [showSlowConnectionMessage, setShowSlowConnectionMessage] =
-    useState(false);
+  const [showSlowConnectionMessage, setShowSlowConnectionMessage] = useState(false);
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
-  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  ); // we only time the doc upload
+  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(null); // we only time the doc upload
 
   const {
     idDoc: { type, country },
@@ -72,9 +66,7 @@ const DeskTopProcessing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      logWarn(
-        `Image upload retry limit exceeded. Side: ${sideName}, doc id: ${id}, type: ${docName}`,
-      );
+      logWarn(`Image upload retry limit exceeded. Side: ${sideName}, doc id: ${id}, type: ${docName}`);
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
       send({
@@ -105,10 +97,7 @@ const DeskTopProcessing = () => {
 
   const handleProcessDocError = (err: unknown) => {
     handleError(err);
-    logError(
-      `Error while processing id-doc image ${id}: ${getErrorMessage(err)}`,
-      err,
-    );
+    logError(`Error while processing id-doc image ${id}: ${getErrorMessage(err)}`, err);
   };
 
   const handleSubmitDocError = (err: unknown) => {
@@ -224,10 +213,7 @@ const DeskTopProcessing = () => {
       </Text>
     );
   }
-  if (retryLimitExceeded)
-    return (
-      <RetryLimitExceeded onRetryLimitExceeded={handleRetryLimitExceeded} />
-    );
+  if (retryLimitExceeded) return <RetryLimitExceeded onRetryLimitExceeded={handleRetryLimitExceeded} />;
   if (!type || !currSide) return null;
 
   return (
@@ -241,12 +227,7 @@ const DeskTopProcessing = () => {
       />
       <FeedbackContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
         <IdDocAnimation
-          loadingComponent={
-            <Loading
-              step={step}
-              showSlowConnectionMessage={showSlowConnectionMessage}
-            />
-          }
+          loadingComponent={<Loading step={step} showSlowConnectionMessage={showSlowConnectionMessage} />}
           successComponent={<Success />}
           mode={mode}
           hasNextSide={false} // Although we might have next side, we don't want to show it in the animation for desktop

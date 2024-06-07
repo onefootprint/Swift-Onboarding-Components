@@ -22,14 +22,7 @@ const Sms = () => {
   });
   useHandleD2PStatusUpdate();
   const [state, send] = useTransferMachine();
-  const {
-    config,
-    scopedAuthToken,
-    authToken,
-    device,
-    idDocOutcome,
-    missingRequirements,
-  } = state.context;
+  const { config, scopedAuthToken, authToken, device, idDocOutcome, missingRequirements } = state.context;
   const l10n = useL10nContext();
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,

@@ -1,11 +1,5 @@
 import { IcoArrowRightSmall16, IcoWarning16 } from '@onefootprint/icons';
-import {
-  endOfDay,
-  isAfter,
-  isBefore,
-  startOfDay,
-  startOfToday,
-} from 'date-fns';
+import { endOfDay, isAfter, isBefore, startOfDay, startOfToday } from 'date-fns';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -51,10 +45,7 @@ const RangeInputs = ({
   const handleStartChanged = (newStartDate: Date) => {
     if (disableFutureDates && isAfter(newStartDate, endOfDay(startOfToday()))) {
       setStartError(true);
-    } else if (
-      disablePastDates &&
-      isBefore(newStartDate, startOfDay(startOfToday()))
-    ) {
+    } else if (disablePastDates && isBefore(newStartDate, startOfDay(startOfToday()))) {
       setStartError(true);
     } else {
       setStartError(false);
@@ -77,10 +68,7 @@ const RangeInputs = ({
   const handleEndChanged = (newEndDate: Date) => {
     if (disableFutureDates && isAfter(newEndDate, endOfDay(startOfToday()))) {
       setEndError(true);
-    } else if (
-      disablePastDates &&
-      isBefore(newEndDate, startOfDay(startOfToday()))
-    ) {
+    } else if (disablePastDates && isBefore(newEndDate, startOfDay(startOfToday()))) {
       setEndError(true);
     } else {
       setEndError(false);
@@ -102,12 +90,7 @@ const RangeInputs = ({
 
   return (
     <>
-      <Container
-        backgroundColor="secondary"
-        direction="column"
-        padding={4}
-        gap={3}
-      >
+      <Container backgroundColor="secondary" direction="column" padding={4} gap={3}>
         <Stack gap={3} center>
           <DateInput
             autoFocus
@@ -119,12 +102,7 @@ const RangeInputs = ({
           <Stack center>
             <IcoArrowRightSmall16 />
           </Stack>
-          <DateInput
-            onChange={handleEndChanged}
-            onFocus={handleFocus('end')}
-            value={endDate}
-            hasError={endError}
-          />
+          <DateInput onChange={handleEndChanged} onFocus={handleFocus('end')} value={endDate} hasError={endError} />
         </Stack>
       </Container>
       <Portal selector="#error-message">
@@ -132,9 +110,7 @@ const RangeInputs = ({
           <ErrorMessage>
             <IcoWarning16 color="error" />
             <Text variant="body-4" color="error">
-              {disableFutureDates
-                ? t('components.date-range.error-past')
-                : t('components.date-range.error-future')}
+              {disableFutureDates ? t('components.date-range.error-past') : t('components.date-range.error-future')}
             </Text>
           </ErrorMessage>
         ) : null}

@@ -2,11 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoJcb24 = ({
-  'aria-label': ariaLabel,
-  className,
-  testID,
-}: IconProps) => (
+const IcoJcb24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
   <svg
     width={24}
     height={24}
@@ -18,10 +14,7 @@ const IcoJcb24 = ({
     role="img"
     data-colored
   >
-    <path
-      d="M23 17.058a3.42 3.42 0 0 1-3.416 3.416H1V6.946A3.42 3.42 0 0 1 4.416 3.53H23v13.528Z"
-      fill="#fff"
-    />
+    <path d="M23 17.058a3.42 3.42 0 0 1-3.416 3.416H1V6.946A3.42 3.42 0 0 1 4.416 3.53H23v13.528Z" fill="#fff" />
     <path
       d="M18.2 4.673a2.448 2.448 0 0 0-2.448 2.448v2.541h3.456c.08 0 .175 0 .242.014.78.04 1.358.443 1.358 1.143 0 .55-.39 1.022-1.116 1.116v.027c.793.053 1.398.497 1.398 1.183 0 .74-.672 1.224-1.56 1.224h-3.792v4.975h3.59a2.448 2.448 0 0 0 2.448-2.447V4.673H18.2Z"
       fill="url(#prefix__a)"
@@ -43,66 +36,31 @@ const IcoJcb24 = ({
       fill="url(#prefix__e)"
     />
     <defs>
-      <linearGradient
-        id="prefix__a"
-        x1={15.749}
-        y1={10.978}
-        x2={21.792}
-        y2={10.978}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__a" x1={15.749} y1={10.978} x2={21.792} y2={10.978} gradientUnits="userSpaceOnUse">
         <stop stopColor="#007940" />
         <stop offset={0.229} stopColor="#00873F" />
         <stop offset={0.743} stopColor="#40A737" />
         <stop offset={1} stopColor="#5CB531" />
       </linearGradient>
-      <linearGradient
-        id="prefix__b"
-        x1={15.749}
-        y1={10.978}
-        x2={21.792}
-        y2={10.978}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__b" x1={15.749} y1={10.978} x2={21.792} y2={10.978} gradientUnits="userSpaceOnUse">
         <stop stopColor="#007940" />
         <stop offset={0.229} stopColor="#00873F" />
         <stop offset={0.743} stopColor="#40A737" />
         <stop offset={1} stopColor="#5CB531" />
       </linearGradient>
-      <linearGradient
-        id="prefix__c"
-        x1={15.749}
-        y1={10.978}
-        x2={21.792}
-        y2={10.978}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__c" x1={15.749} y1={10.978} x2={21.792} y2={10.978} gradientUnits="userSpaceOnUse">
         <stop stopColor="#007940" />
         <stop offset={0.229} stopColor="#00873F" />
         <stop offset={0.743} stopColor="#40A737" />
         <stop offset={1} stopColor="#5CB531" />
       </linearGradient>
-      <linearGradient
-        id="prefix__d"
-        x1={2.221}
-        y1={12.003}
-        x2={8.357}
-        y2={12.003}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__d" x1={2.221} y1={12.003} x2={8.357} y2={12.003} gradientUnits="userSpaceOnUse">
         <stop stopColor="#1F286F" />
         <stop offset={0.475} stopColor="#004E94" />
         <stop offset={0.826} stopColor="#0066B1" />
         <stop offset={1} stopColor="#006FBC" />
       </linearGradient>
-      <linearGradient
-        id="prefix__e"
-        x1={8.953}
-        y1={12.003}
-        x2={14.913}
-        y2={12.003}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__e" x1={8.953} y1={12.003} x2={14.913} y2={12.003} gradientUnits="userSpaceOnUse">
         <stop stopColor="#6C2C2F" />
         <stop offset={0.173} stopColor="#882730" />
         <stop offset={0.573} stopColor="#BE1833" />

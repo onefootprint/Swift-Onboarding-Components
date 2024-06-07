@@ -8,8 +8,7 @@ type IdvMachineProviderArgs = {
   args: IdvMachineArgs;
 };
 
-const useLocalIdvMachine = ({ args }: IdvMachineProviderArgs) =>
-  useMachine(() => createIdvMachine(args));
+const useLocalIdvMachine = ({ args }: IdvMachineProviderArgs) => useMachine(() => createIdvMachine(args));
 
 export const [MachineProvider, useIdvMachine] = constate(useLocalIdvMachine);
 

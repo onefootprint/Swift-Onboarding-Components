@@ -35,8 +35,7 @@ export const getBasicDevice = () => {
 export const checkDeviceInfo = async () => {
   let hasSupportForWebauthn = false;
   if (window.PublicKeyCredential) {
-    hasSupportForWebauthn =
-      await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    hasSupportForWebauthn = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
   }
   const basicInfo = getBasicDevice();
   const info: DeviceInfo = {

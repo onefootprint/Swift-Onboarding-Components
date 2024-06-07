@@ -33,9 +33,7 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
     defaultValues: {
       name: organization.name,
       website: organization.websiteUrl || '',
-      size: SIZE_OPTIONS.find(
-        option => option.value === organization.companySize,
-      ),
+      size: SIZE_OPTIONS.find(option => option.value === organization.companySize),
     },
   });
 
@@ -58,39 +56,25 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
         <TextInput
           autoFocus
           hasError={!!errors.name}
-          hint={
-            errors.name
-              ? t('pages.onboarding.company-data.form.name.errors.required')
-              : undefined
-          }
+          hint={errors.name ? t('pages.onboarding.company-data.form.name.errors.required') : undefined}
           label={t('pages.onboarding.company-data.form.name.label')}
           placeholder={t('pages.onboarding.company-data.form.name.placeholder')}
           {...register('name', {
             required: {
               value: true,
-              message: t(
-                'pages.onboarding.company-data.form.name.errors.required',
-              ),
+              message: t('pages.onboarding.company-data.form.name.errors.required'),
             },
           })}
         />
         <TextInput
           label={t('pages.onboarding.company-data.form.website.label')}
           hasError={!!errors.website}
-          hint={
-            errors.website
-              ? t('pages.onboarding.company-data.form.website.errors.required')
-              : undefined
-          }
-          placeholder={t(
-            'pages.onboarding.company-data.form.website.placeholder',
-          )}
+          hint={errors.website ? t('pages.onboarding.company-data.form.website.errors.required') : undefined}
+          placeholder={t('pages.onboarding.company-data.form.website.placeholder')}
           {...register('website', {
             required: {
               value: true,
-              message: t(
-                'pages.onboarding.company-data.form.website.errors.required',
-              ),
+              message: t('pages.onboarding.company-data.form.website.errors.required'),
             },
           })}
         />
@@ -101,10 +85,7 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
           render={({ field, fieldState }) => (
             <Select
               hasError={!!fieldState.error}
-              hint={
-                fieldState.error &&
-                t('pages.onboarding.company-data.form.size.errors.required')
-              }
+              hint={fieldState.error && t('pages.onboarding.company-data.form.size.errors.required')}
               label={t('pages.onboarding.company-data.form.size.label')}
               onBlur={field.onBlur}
               onChange={field.onChange}
@@ -114,11 +95,7 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
           )}
         />
         <ButtonContainer>
-          <Button
-            disabled={mutation.isLoading}
-            onClick={onBack}
-            variant="secondary"
-          >
+          <Button disabled={mutation.isLoading} onClick={onBack} variant="secondary">
             {t('back')}
           </Button>
           <Button loading={mutation.isLoading} type="submit">

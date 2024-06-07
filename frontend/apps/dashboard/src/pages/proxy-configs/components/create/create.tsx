@@ -14,19 +14,12 @@ const Create = () => {
 
   return (
     <>
-      <PermissionGate
-        fallbackText={t('create.cta-not-allowed')}
-        scopeKind={RoleScopeKind.manageVaultProxy}
-      >
+      <PermissionGate fallbackText={t('create.cta-not-allowed')} scopeKind={RoleScopeKind.manageVaultProxy}>
         <Button variant="primary" onClick={open}>
           {t('create.cta')}
         </Button>
       </PermissionGate>
-      <Dialog
-        defaultValues={CREATE_DEFAULT_VALUES}
-        onClose={close}
-        open={isOpen}
-      />
+      <Dialog defaultValues={CREATE_DEFAULT_VALUES} onClose={close} open={isOpen} />
     </>
   );
 };

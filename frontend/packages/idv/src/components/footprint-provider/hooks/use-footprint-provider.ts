@@ -3,14 +3,9 @@ import useSendResultSdkArgs from './use-send-result-sdk-args';
 
 type UseFootprintProvider = { client: ProviderReturn };
 
-const useFootprintProvider = ({
-  client,
-}: UseFootprintProvider): ProviderReturn => {
+const useFootprintProvider = ({ client }: UseFootprintProvider): ProviderReturn => {
   const sendResultMutation = useSendResultSdkArgs();
-  const sendResult = async (
-    authToken: string,
-    deviceResponse: string,
-  ): Promise<string | undefined> => {
+  const sendResult = async (authToken: string, deviceResponse: string): Promise<string | undefined> => {
     if (!authToken || !deviceResponse) {
       return undefined;
     }

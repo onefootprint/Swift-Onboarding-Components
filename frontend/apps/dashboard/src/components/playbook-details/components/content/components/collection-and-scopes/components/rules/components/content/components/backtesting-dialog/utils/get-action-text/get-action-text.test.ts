@@ -12,15 +12,11 @@ describe('getActionText', () => {
   });
 
   it('should return the correct text when the manual_review action is passed in', () => {
-    expect(getActionText(BacktestingRuleAction.manualReview)).toEqual(
-      'Fail + Manual review',
-    );
+    expect(getActionText(BacktestingRuleAction.manualReview)).toEqual('Fail + Manual review');
   });
 
   it('should return the correct text when the pass_with_manual_review action is passed in', () => {
-    expect(getActionText(BacktestingRuleAction.passWithManualReview)).toEqual(
-      'Pass + Manual review',
-    );
+    expect(getActionText(BacktestingRuleAction.passWithManualReview)).toEqual('Pass + Manual review');
   });
 
   it('should return the correct text when the pass action is passed in', () => {

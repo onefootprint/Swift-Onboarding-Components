@@ -100,8 +100,7 @@ export default {
     },
     headerButton: {
       control: 'object',
-      description:
-        'The header button, which is rendered on the right of the title',
+      description: 'The header button, which is rendered on the right of the title',
       table: {
         type: { summary: 'object', required: true },
       },
@@ -137,10 +136,7 @@ const Template: Story<DialogProps> = ({
   isConfirmation,
 }: DialogProps) => {
   const [open, setOpen] = useState(initialOpen);
-  const SelectedIcon =
-    typeof HeaderIconComponent === 'string'
-      ? icos[HeaderIconComponent]
-      : HeaderIconComponent;
+  const SelectedIcon = typeof HeaderIconComponent === 'string' ? icos[HeaderIconComponent] : HeaderIconComponent;
 
   return (
     <>
@@ -220,10 +216,7 @@ const OnlyPrimaryTemplate: Story<DialogProps> = ({
   isConfirmation,
 }: DialogProps) => {
   const [open, setOpen] = useState(initialOpen);
-  const SelectedIcon =
-    typeof HeaderIconComponent === 'string'
-      ? icos[HeaderIconComponent]
-      : HeaderIconComponent;
+  const SelectedIcon = typeof HeaderIconComponent === 'string' ? icos[HeaderIconComponent] : HeaderIconComponent;
 
   return (
     <>

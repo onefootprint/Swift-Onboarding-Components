@@ -1,10 +1,4 @@
-import type {
-  ActorApiKey,
-  ActorFirmEmployee,
-  ActorFootprint,
-  ActorOrganization,
-  ActorUser,
-} from '@onefootprint/types';
+import type { ActorApiKey, ActorFirmEmployee, ActorFootprint, ActorOrganization, ActorUser } from '@onefootprint/types';
 import { ActorKind } from '@onefootprint/types';
 
 import getActorText from './get-actor-text';

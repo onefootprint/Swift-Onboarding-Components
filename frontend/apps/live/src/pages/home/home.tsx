@@ -1,6 +1,6 @@
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { LogoFpDefault } from '@onefootprint/icons';
-import { media, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text, media } from '@onefootprint/ui';
 import { easeIn, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -70,27 +70,12 @@ const Live = () => {
     <>
       <SEO title={t(`${translationsKey}.html-title`)} />
       <FullContainer direction="column">
-        <Stack
-          height={theme.spacing[10]}
-          width="100%"
-          align="center"
-          justify="center"
-        >
-          <Link
-            href="https://onefootprint.com/"
-            target="_blank"
-            rel="nonreferrer"
-          >
+        <Stack height={theme.spacing[10]} width="100%" align="center" justify="center">
+          <Link href="https://onefootprint.com/" target="_blank" rel="nonreferrer">
             <LogoFpDefault />
           </Link>
         </Stack>
-        <InnerContent
-          direction="row"
-          flexWrap="wrap-reverse"
-          align="center"
-          justify="center"
-          gap={10}
-        >
+        <InnerContent direction="row" flexWrap="wrap-reverse" align="center" justify="center" gap={10}>
           <TextContainer
             align="start"
             direction="column"
@@ -136,12 +121,7 @@ const Live = () => {
             <Illustration />
           </IllustrationContainer>
         </InnerContent>
-        <Stack
-          direction="row"
-          justify="center"
-          gap={5}
-          height={theme.spacing[9]}
-        >
+        <Stack direction="row" justify="center" gap={5} height={theme.spacing[9]}>
           <FooterLinks />
         </Stack>
       </FullContainer>

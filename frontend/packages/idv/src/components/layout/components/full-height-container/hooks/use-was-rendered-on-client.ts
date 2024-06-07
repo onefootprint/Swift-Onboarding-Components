@@ -7,8 +7,7 @@ import { isClient } from './utils/measure-height';
 // schedule a subsequent update and return the height measured on the client.
 // It's not needed for CSR-only apps, but is critical for SSR.
 const useWasRenderedOnClientAtLeastOnce = () => {
-  const [wasRenderedOnClientAtLeastOnce, setWasRenderedOnClientAtLeastOnce] =
-    useState(false);
+  const [wasRenderedOnClientAtLeastOnce, setWasRenderedOnClientAtLeastOnce] = useState(false);
 
   useEffect(() => {
     if (isClient()) {

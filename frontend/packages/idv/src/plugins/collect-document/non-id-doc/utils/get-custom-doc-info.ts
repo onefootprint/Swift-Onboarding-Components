@@ -1,7 +1,4 @@
-import type {
-  CustomDocumentRequirementConfig,
-  DocumentRequirementConfig,
-} from '@onefootprint/types';
+import type { CustomDocumentRequirementConfig, DocumentRequirementConfig } from '@onefootprint/types';
 import { DocumentRequestKind } from '@onefootprint/types';
 
 const getCustomDocInfo = (config: DocumentRequirementConfig) => {
@@ -10,8 +7,7 @@ const getCustomDocInfo = (config: DocumentRequirementConfig) => {
   let documentDescription: string | undefined;
   if (documentRequestKind === DocumentRequestKind.Custom) {
     documentName = (config as CustomDocumentRequirementConfig).name;
-    documentDescription = (config as CustomDocumentRequirementConfig)
-      .description;
+    documentDescription = (config as CustomDocumentRequirementConfig).description;
   }
 
   return {

@@ -68,11 +68,7 @@ const BuildRules = () => {
           </Stack>
           <RulesTable />
         </Illustration>
-        <motion.div
-          variants={grabbedChipVariants}
-          initial="initial"
-          animate={isHover ? 'hover' : 'initial'}
-        >
+        <motion.div variants={grabbedChipVariants} initial="initial" animate={isHover ? 'hover' : 'initial'}>
           <GrabbedChip />
         </motion.div>
       </Box>

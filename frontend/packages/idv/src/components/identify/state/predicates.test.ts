@@ -1,9 +1,6 @@
 import { ChallengeKind } from '@onefootprint/types';
 
-import {
-  requiresPhoneVerification,
-  shouldShowChallengeSelector,
-} from './predicates';
+import { requiresPhoneVerification, shouldShowChallengeSelector } from './predicates';
 import type { IdentifyContext, IdentifyMachineContext } from './types';
 import { IdentifyVariant } from './types';
 
@@ -33,13 +30,9 @@ describe('requiresPhoneVerification', () => {
       x: false,
     },
   ])('case %#', ({ config, user, method, x }) => {
-    expect(
-      requiresPhoneVerification(
-        config as unknown as Config,
-        user as unknown as User,
-        method as Method,
-      ),
-    ).toEqual(x);
+    expect(requiresPhoneVerification(config as unknown as Config, user as unknown as User, method as Method)).toEqual(
+      x,
+    );
   });
 });
 
@@ -85,11 +78,7 @@ describe('shouldShowChallengeSelector', () => {
         },
       },
       user: {
-        availableChallengeKinds: [
-          ChallengeKind.biometric,
-          ChallengeKind.sms,
-          ChallengeKind.email,
-        ],
+        availableChallengeKinds: [ChallengeKind.biometric, ChallengeKind.sms, ChallengeKind.email],
       },
       x: true,
     },
@@ -117,11 +106,7 @@ describe('shouldShowChallengeSelector', () => {
         },
       },
       user: {
-        availableChallengeKinds: [
-          ChallengeKind.biometric,
-          ChallengeKind.sms,
-          ChallengeKind.email,
-        ],
+        availableChallengeKinds: [ChallengeKind.biometric, ChallengeKind.sms, ChallengeKind.email],
       },
       x: true,
     },
@@ -146,10 +131,7 @@ describe('shouldShowChallengeSelector', () => {
 
   it.each(contexts)('case %#', ({ context, user, x }) => {
     expect(
-      shouldShowChallengeSelector(
-        context as IdentifyMachineContext,
-        user as unknown as IdentifyContext['user'],
-      ),
+      shouldShowChallengeSelector(context as IdentifyMachineContext, user as unknown as IdentifyContext['user']),
     ).toEqual(x);
   });
 });

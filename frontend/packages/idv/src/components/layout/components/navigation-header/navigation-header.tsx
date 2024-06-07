@@ -14,18 +14,9 @@ import NavigationHeaderTitle from './components/navigation-header-title';
 import NavigationIconButton from './components/navigation-icon-button';
 import { NAVIGATION_HEADER_PORTAL_SELECTOR } from './constants';
 import useContainerHasScroll from './hooks/use-container-has-scroll';
-import type {
-  NavigationHeaderPositionTypes,
-  NavigationHeaderProps,
-} from './types';
+import type { NavigationHeaderPositionTypes, NavigationHeaderProps } from './types';
 
-const NavigationHeader = ({
-  leftButton,
-  style,
-  content,
-  position,
-  rightButton,
-}: NavigationHeaderProps) => {
+const NavigationHeader = ({ leftButton, style, content, position, rightButton }: NavigationHeaderProps) => {
   const {
     onClose,
     header: { options, set: updateHeaderOptions },
@@ -49,8 +40,7 @@ const NavigationHeader = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backgroundVariant, position]);
 
-  const headerSticky =
-    headerPosition === 'sticky' || headerPosition === 'floating';
+  const headerSticky = headerPosition === 'sticky' || headerPosition === 'floating';
   const measuredRef = useCallback(
     (handler: HTMLDivElement) => {
       if (!handler || isStatic) {
@@ -70,10 +60,7 @@ const NavigationHeader = ({
     if (isStatic) {
       return;
     }
-    const {
-      containerId = LAYOUT_CONTAINER_ID,
-      headerTitleId = HEADER_TITLE_DEFAULT_ID,
-    } = content || {};
+    const { containerId = LAYOUT_CONTAINER_ID, headerTitleId = HEADER_TITLE_DEFAULT_ID } = content || {};
 
     // Includes nav header and potentially sandbox banner
     const headerSelector = NAVIGATION_HEADER_PORTAL_SELECTOR;
@@ -98,9 +85,7 @@ const NavigationHeader = ({
           if (entry.isIntersecting) {
             setDynamicTitle(undefined);
           } else {
-            const elem = document.querySelector(
-              headerTitleSelector,
-            ) as HTMLElement;
+            const elem = document.querySelector(headerTitleSelector) as HTMLElement;
             if (elem && headerSticky) {
               setDynamicTitle(elem.innerText);
             }
@@ -127,31 +112,14 @@ const NavigationHeader = ({
   return (
     <Portal selector={NAVIGATION_HEADER_PORTAL_SELECTOR}>
       <HeaderContent ref={isStatic ? null : measuredRef}>
-        <ButtonContainer
-          $headerPosition={position}
-          data-scrolling={hasScroll}
-          data-button-position="left"
-        >
+        <ButtonContainer $headerPosition={position} data-scrolling={hasScroll} data-button-position="left">
           {shouldShowClose && (
-            <NavigationCloseButton
-              confirmClose={leftButton.confirmClose}
-              onClose={onClose}
-              color={leftButton.color}
-            />
+            <NavigationCloseButton confirmClose={leftButton.confirmClose} onClose={onClose} color={leftButton.color} />
           )}
-          {shouldShowBack && (
-            <NavigationBackButton
-              onBack={leftButton.onBack}
-              color={leftButton.color}
-            />
-          )}
+          {shouldShowBack && <NavigationBackButton onBack={leftButton.onBack} color={leftButton.color} />}
         </ButtonContainer>
         {rightButton && (
-          <ButtonContainer
-            $headerPosition={position}
-            data-scrolling={hasScroll}
-            data-button-position="right"
-          >
+          <ButtonContainer $headerPosition={position} data-scrolling={hasScroll} data-button-position="right">
             <NavigationIconButton
               icon={rightButton.icon}
               onClick={rightButton.onClick}

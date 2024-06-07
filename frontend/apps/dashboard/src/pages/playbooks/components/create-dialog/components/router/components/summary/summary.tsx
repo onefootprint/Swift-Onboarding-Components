@@ -5,14 +5,8 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { isAuth, isIdDoc } from '@/playbooks/utils/kind';
-import type {
-  SummaryFormData,
-  SummaryMeta,
-} from '@/playbooks/utils/machine/types';
-import {
-  OnboardingTemplate,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import type { SummaryFormData, SummaryMeta } from '@/playbooks/utils/machine/types';
+import { OnboardingTemplate, PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import DataCollection from './components/data-collection';
 
@@ -25,14 +19,7 @@ type SummaryProps = {
   isLoading?: boolean;
 };
 
-const Summary = ({
-  meta,
-  onSubmit,
-  onBack,
-  defaultValues,
-  isLastStep,
-  isLoading,
-}: SummaryProps) => {
+const Summary = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLoading }: SummaryProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.summary',
@@ -54,37 +41,25 @@ const Summary = ({
     if (isIdDoc(meta.kind)) {
       return t('title.id-doc');
     }
-    const internationalOnly =
-      meta.residency?.allowInternationalResidents &&
-      !meta.residency.allowUsResidents;
-    const canEdit =
-      !internationalOnly &&
-      meta.onboardingTemplate === OnboardingTemplate.Custom;
-    return canEdit
-      ? t('title.default-editable')
-      : t('title.default-non-editable');
+    const internationalOnly = meta.residency?.allowInternationalResidents && !meta.residency.allowUsResidents;
+    const canEdit = !internationalOnly && meta.onboardingTemplate === OnboardingTemplate.Custom;
+    return canEdit ? t('title.default-editable') : t('title.default-non-editable');
   };
 
   const getSubtitle = (): string => {
     if (isAuth(meta.kind)) return t('subtitle.auth');
     if (isIdDoc(meta.kind)) return t('subtitle.id-doc');
 
-    const internationalOnly =
-      meta.residency?.allowInternationalResidents &&
-      !meta.residency.allowUsResidents;
+    const internationalOnly = meta.residency?.allowInternationalResidents && !meta.residency.allowUsResidents;
 
     if (internationalOnly) return t('subtitle.international-only');
-    return meta.onboardingTemplate
-      ? onboardingTemplateToSubtitleMap[meta.onboardingTemplate]
-      : t('subtitle.default');
+    return meta.onboardingTemplate ? onboardingTemplateToSubtitleMap[meta.onboardingTemplate] : t('subtitle.default');
   };
 
   const formMethods = useForm<SummaryFormData>({ defaultValues });
   const { handleSubmit, watch } = formMethods;
   const selectedGlobalDocs = watch('personal.idDocKind');
-  const selectedCountrySpecificDocs = watch(
-    'personal.countrySpecificIdDocKind',
-  );
+  const selectedCountrySpecificDocs = watch('personal.countrySpecificIdDocKind');
 
   const isNextDisabled = () => {
     if (
@@ -114,14 +89,8 @@ const Summary = ({
             <Button variant="secondary" onClick={onBack}>
               {allT('back')}
             </Button>
-            <Button
-              disabled={isNextDisabled()}
-              type="submit"
-              loading={isLoading && isLastStep}
-            >
-              {isLastStep
-                ? allT('pages.playbooks.create-button')
-                : allT('next')}
+            <Button disabled={isNextDisabled()} type="submit" loading={isLoading && isLastStep}>
+              {isLastStep ? allT('pages.playbooks.create-button') : allT('next')}
             </Button>
           </ButtonContainer>
         </Form>

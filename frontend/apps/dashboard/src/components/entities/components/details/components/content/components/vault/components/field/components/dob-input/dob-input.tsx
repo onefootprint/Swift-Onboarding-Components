@@ -46,9 +46,7 @@ const DobInput = ({ value }: DobInputProps) => {
       return t('pattern');
     }
     const validationError = validateDob(getValues(formField));
-    return errorByValidationError[
-      validationError ?? DobValidationError.INVALID
-    ];
+    return errorByValidationError[validationError ?? DobValidationError.INVALID];
   };
 
   return (

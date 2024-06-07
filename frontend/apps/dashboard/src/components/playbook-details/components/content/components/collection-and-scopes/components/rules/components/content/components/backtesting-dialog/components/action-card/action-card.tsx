@@ -14,8 +14,7 @@ export type ActionCardProps = {
 const ActionCard = ({ data, numTotal }: ActionCardProps) => (
   <Container>
     {Object.keys(BacktestingRuleAction).map((action, index) => {
-      const value =
-        BacktestingRuleAction[action as keyof typeof BacktestingRuleAction];
+      const value = BacktestingRuleAction[action as keyof typeof BacktestingRuleAction];
       const count = data[action as BacktestingRuleAction] || 0;
       return (
         <ActionRow
@@ -27,11 +26,7 @@ const ActionCard = ({ data, numTotal }: ActionCardProps) => (
           <Text variant="body-3" color={getActionVariant(value)}>
             {getActionText(value)}
           </Text>
-          {numTotal && (
-            <Text variant="body-3">{`${count} (${Math.round(
-              (count / numTotal) * 100,
-            )}%)`}</Text>
-          )}
+          {numTotal && <Text variant="body-3">{`${count} (${Math.round((count / numTotal) * 100)}%)`}</Text>}
         </ActionRow>
       );
     })}

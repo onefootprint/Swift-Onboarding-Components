@@ -1,5 +1,5 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Box, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -25,12 +25,7 @@ const LinkSent = () => {
             <ThemedLogoFpCompact color="primary" />
             <Stack center gap={5} direction="column" align="center">
               <Text variant="label-2">{t('title')}</Text>
-              <Text
-                variant="body-2"
-                textAlign="center"
-                color="secondary"
-                maxWidth="350px"
-              >
+              <Text variant="body-2" textAlign="center" color="secondary" maxWidth="350px">
                 <Trans
                   ns="authentication"
                   i18nKey="link-sent.instructions"

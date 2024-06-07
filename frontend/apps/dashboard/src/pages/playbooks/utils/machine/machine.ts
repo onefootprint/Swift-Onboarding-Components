@@ -40,9 +40,7 @@ export const createPlaybookMachine = () =>
               {
                 target: 'residency',
                 actions: ['assignOnboardingTemplate'],
-                cond: (_, event) =>
-                  event.payload.onboardingTemplate ===
-                  OnboardingTemplate.Custom,
+                cond: (_, event) => event.payload.onboardingTemplate === OnboardingTemplate.Custom,
               },
               {
                 target: 'nameYourPlaybook',
@@ -85,8 +83,7 @@ export const createPlaybookMachine = () =>
               {
                 target: 'residency',
                 cond: context =>
-                  context.kind === PlaybookKind.Kyc &&
-                  context.onboardingTemplate === OnboardingTemplate.Custom,
+                  context.kind === PlaybookKind.Kyc && context.onboardingTemplate === OnboardingTemplate.Custom,
               },
               {
                 target: 'onboardingTemplates',

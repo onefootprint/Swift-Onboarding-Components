@@ -1,11 +1,5 @@
-import type {
-  IdDocRequirement,
-  RegisterPasskeyRequirement,
-} from '@onefootprint/types';
-import {
-  DocumentRequestKind,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import type { IdDocRequirement, RegisterPasskeyRequirement } from '@onefootprint/types';
+import { DocumentRequestKind, OnboardingRequirementKind } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
 import createTransferMachine from './machine';
@@ -294,9 +288,7 @@ describe('Transfer machine tests', () => {
     });
 
     it('continue on desktop does not open transfer for liveness when not in iframe', () => {
-      const machine = interpret(
-        createTransferMachine(getDesktopArgs({ isInIframe: false })),
-      );
+      const machine = interpret(createTransferMachine(getDesktopArgs({ isInIframe: false })));
       machine.start();
       let state = machine.send([
         {

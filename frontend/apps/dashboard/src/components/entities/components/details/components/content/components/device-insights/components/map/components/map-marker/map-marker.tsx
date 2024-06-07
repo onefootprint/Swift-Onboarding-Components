@@ -13,26 +13,14 @@ export type MapMarkerProps = {
   onClick?: (id: string, lat: number, lng: number) => void;
 };
 
-const MapMarker = ({
-  id,
-  onClick,
-  lat,
-  lng,
-  isSelected,
-  getIcon,
-}: MapMarkerProps) => {
+const MapMarker = ({ id, onClick, lat, lng, isSelected, getIcon }: MapMarkerProps) => {
   const theme = useTheme();
   const isDark = theme.theme === 'dark';
   const iconColorDefault = isDark ? 'tertiary' : 'primary';
   const iconColorSelected = isDark ? 'primary' : 'quinary';
 
   return (
-    <MapMarkerContainer
-      id={id}
-      onClick={() => onClick?.(id, lat, lng)}
-      data-lat={lat}
-      data-lng={lng}
-    >
+    <MapMarkerContainer id={id} onClick={() => onClick?.(id, lat, lng)} data-lat={lat} data-lng={lng}>
       <Pin>{isSelected ? <IcoMapPinSelected /> : <IcoMapPinDefault />}</Pin>
       <Icon>{getIcon(isSelected ? iconColorSelected : iconColorDefault)}</Icon>
     </MapMarkerContainer>

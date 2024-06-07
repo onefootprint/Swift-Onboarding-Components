@@ -17,12 +17,7 @@ const ProxyConfigs = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Stack
-        align="center"
-        direction="row"
-        justify="space-between"
-        marginBottom={7}
-      >
+      <Stack align="center" direction="row" justify="space-between" marginBottom={7}>
         <Stack align="left" direction="column" gap={2}>
           <Text variant="heading-2">{t('header.title')}</Text>
           <Text variant="body-2" color="secondary">

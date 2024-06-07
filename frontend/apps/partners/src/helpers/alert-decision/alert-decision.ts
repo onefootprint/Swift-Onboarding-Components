@@ -2,11 +2,7 @@ import type { NextToast } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 
 const alertDecision =
-  (
-    t: TFunction<'common'>,
-    show: (toast: NextToast, hideMs?: number) => string,
-  ) =>
-  (str: string) => {
+  (t: TFunction<'common'>, show: (toast: NextToast, hideMs?: number) => string) => (str: string) => {
     let description: string;
 
     if (str === 'accepted') {

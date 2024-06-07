@@ -18,16 +18,8 @@ import Ssn from '../ssn';
 
 const { logWarn, logError } = getLogger({ location: 'collect-kyc-router' });
 
-const VerifyHeader: ComponentProps<typeof UpdateVerify>['Header'] = ({
-  title,
-  subtitle,
-  overrideLeftButton,
-}) => (
-  <StepHeader
-    leftButton={overrideLeftButton!}
-    subtitle={subtitle}
-    title={title}
-  />
+const VerifyHeader: ComponentProps<typeof UpdateVerify>['Header'] = ({ title, subtitle, overrideLeftButton }) => (
+  <StepHeader leftButton={overrideLeftButton!} subtitle={subtitle} title={title} />
 );
 
 const Router = ({ onDone }: { onDone: () => void }) => {

@@ -59,31 +59,19 @@ export const supportedRoleKinds: Record<RoleScopeKind, RoleKind[]> = {
   [RoleScopeKind.decrypt]: [RoleKind.dashboardUser, RoleKind.apiKey],
   [RoleScopeKind.decryptCustom]: [RoleKind.dashboardUser, RoleKind.apiKey],
 
-  [RoleScopeKind.compliancePartnerRead]: [
-    RoleKind.compliancePartnerDashboardUser,
-  ],
-  [RoleScopeKind.compliancePartnerAdmin]: [
-    RoleKind.compliancePartnerDashboardUser,
-  ],
-  [RoleScopeKind.compliancePartnerManageTemplates]: [
-    RoleKind.compliancePartnerDashboardUser,
-  ],
+  [RoleScopeKind.compliancePartnerRead]: [RoleKind.compliancePartnerDashboardUser],
+  [RoleScopeKind.compliancePartnerAdmin]: [RoleKind.compliancePartnerDashboardUser],
+  [RoleScopeKind.compliancePartnerManageTemplates]: [RoleKind.compliancePartnerDashboardUser],
 };
 
-export type BasicRoleScopeKind = Exclude<
-  RoleScopeKind,
-  RoleScopeKind.decrypt | RoleScopeKind.invokeVaultProxy
->;
+export type BasicRoleScopeKind = Exclude<RoleScopeKind, RoleScopeKind.decrypt | RoleScopeKind.invokeVaultProxy>;
 
 export type DecryptRoleScope = {
   kind: RoleScopeKind.decrypt;
   data: CollectedDataOption;
 };
 
-export type InvokeVaultProxyScopeData =
-  | { kind: 'any' }
-  | { kind: 'just_in_time' }
-  | { kind: 'id'; id: string };
+export type InvokeVaultProxyScopeData = { kind: 'any' } | { kind: 'just_in_time' } | { kind: 'id'; id: string };
 
 export type InvokeVaultProxyRoleScope = {
   kind: RoleScopeKind.invokeVaultProxy;
@@ -94,10 +82,7 @@ export type BasicRoleScope = {
   kind: BasicRoleScopeKind;
 };
 
-export type RoleScope =
-  | BasicRoleScope
-  | DecryptRoleScope
-  | InvokeVaultProxyRoleScope;
+export type RoleScope = BasicRoleScope | DecryptRoleScope | InvokeVaultProxyRoleScope;
 
 export type Role = {
   createdAt: string;

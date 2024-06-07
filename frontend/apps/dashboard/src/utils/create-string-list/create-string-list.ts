@@ -1,10 +1,6 @@
 import capitalize from 'lodash/capitalize';
 
-const createStringList = (
-  items: string[],
-  connector?: string,
-  finalConnector?: string,
-) => {
+const createStringList = (items: string[], connector?: string, finalConnector?: string) => {
   const conn = connector ?? ', ';
   // TODO oxford comma!
   const finalConn = finalConnector ?? ' and ';
@@ -31,7 +27,6 @@ const createStringList = (
   return list.join('');
 };
 
-export const createCapitalStringList = (items: string[]) =>
-  capitalize(createStringList(items));
+export const createCapitalStringList = (items: string[]) => capitalize(createStringList(items));
 
 export default createStringList;

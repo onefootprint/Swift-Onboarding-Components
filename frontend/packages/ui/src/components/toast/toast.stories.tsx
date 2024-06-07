@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import Button from '../button';
 import Stack from '../stack';
 import Toast from './toast';
-import type { ToastProps } from './toast.types';
 import { useToast } from './toast-provider';
+import type { ToastProps } from './toast.types';
 
 export default {
   component: Toast,

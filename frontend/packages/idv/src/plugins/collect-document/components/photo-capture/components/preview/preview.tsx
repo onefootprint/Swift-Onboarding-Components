@@ -16,14 +16,7 @@ type PreviewProps = {
   deviceKind: DeviceKind;
 };
 
-const Preview = ({
-  imageSrc,
-  onRetake,
-  onConfirm,
-  isLoading,
-  cameraKind,
-  deviceKind,
-}: PreviewProps) => {
+const Preview = ({ imageSrc, onRetake, onConfirm, isLoading, cameraKind, deviceKind }: PreviewProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.components.photo-capture.preview',
   });
@@ -41,23 +34,10 @@ const Preview = ({
       </PreviewContainer>
       <StickyBottomBox>
         <ButtonsContainer data-device-kind={deviceKind}>
-          <Button
-            fullWidth
-            onClick={onConfirm}
-            variant="primary"
-            loading={isLoading}
-            disabled={isLoading}
-            size="large"
-          >
+          <Button fullWidth onClick={onConfirm} variant="primary" loading={isLoading} disabled={isLoading} size="large">
             {t('confirm')}
           </Button>
-          <Button
-            fullWidth
-            onClick={onRetake}
-            variant="secondary"
-            disabled={isLoading}
-            size="large"
-          >
+          <Button fullWidth onClick={onRetake} variant="secondary" disabled={isLoading} size="large">
             {t('retake')}
           </Button>
         </ButtonsContainer>

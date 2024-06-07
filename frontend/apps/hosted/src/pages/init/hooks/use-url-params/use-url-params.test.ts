@@ -1,13 +1,5 @@
-import {
-  createUseRouterSpy,
-  renderHook,
-  waitFor,
-} from '@onefootprint/test-utils';
-import {
-  CLIENT_PUBLIC_KEY_HEADER,
-  HostedUrlType,
-  KYB_BO_SESSION_AUTHORIZATION_HEADER,
-} from '@onefootprint/types';
+import { createUseRouterSpy, renderHook, waitFor } from '@onefootprint/test-utils';
+import { CLIENT_PUBLIC_KEY_HEADER, HostedUrlType, KYB_BO_SESSION_AUTHORIZATION_HEADER } from '@onefootprint/types';
 
 import type { UseParseUrlParamOptions } from './use-url-params';
 import useParseUrl from './use-url-params';
@@ -16,8 +8,7 @@ describe('useUrlParams', () => {
   const useRouterSpy = createUseRouterSpy();
   const token = 'tok_123456';
 
-  const renderUseParseUrl = (options: UseParseUrlParamOptions) =>
-    renderHook(() => useParseUrl(options));
+  const renderUseParseUrl = (options: UseParseUrlParamOptions) => renderHook(() => useParseUrl(options));
 
   it('parses ob pk token correctly', async () => {
     useRouterSpy({

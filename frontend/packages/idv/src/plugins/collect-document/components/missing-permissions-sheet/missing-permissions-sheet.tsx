@@ -12,11 +12,7 @@ export type MissingPermissionsSheetProps = {
   onClose?: () => void;
 };
 
-const MissingPermissionsSheet = ({
-  device,
-  open,
-  onClose,
-}: MissingPermissionsSheetProps) => {
+const MissingPermissionsSheet = ({ device, open, onClose }: MissingPermissionsSheetProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.components.missing-permissions',
   });

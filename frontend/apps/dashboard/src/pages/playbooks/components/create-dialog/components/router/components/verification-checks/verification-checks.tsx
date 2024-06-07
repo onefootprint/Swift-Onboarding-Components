@@ -59,8 +59,7 @@ const VerificationChecks = ({
       // TODO: Migrate to runKyc
       skipKyc: !canRunKyc,
       amlFormData: defaultAmlValues,
-      kycOptionForBeneficialOwners:
-        isKyb && canRunKyc ? KycOptionsForBeneficialOwners.primary : undefined,
+      kycOptionForBeneficialOwners: isKyb && canRunKyc ? KycOptionsForBeneficialOwners.primary : undefined,
     },
   });
   const { watch } = form;
@@ -94,16 +93,8 @@ const VerificationChecks = ({
           </Text>
         </Header>
         <Stack direction="column" gap={9} marginBottom={8}>
-          {showSkipKyb && (
-            <KybChecks canRunFullKyb={initialKybKind === 'full'} />
-          )}
-          {showSkipKyc && (
-            <KycCheck
-              isKyb={isKyb}
-              collectBO={collectBO}
-              requiresDoc={requiresDoc}
-            />
-          )}
+          {showSkipKyb && <KybChecks canRunFullKyb={initialKybKind === 'full'} />}
+          {showSkipKyc && <KycCheck isKyb={isKyb} collectBO={collectBO} requiresDoc={requiresDoc} />}
           <Aml showError={showError} disabled={isAmlDisabled} />
         </Stack>
         <ButtonContainer>
@@ -119,10 +110,7 @@ const VerificationChecks = ({
   );
 };
 
-const getInitialKybKind = (
-  isKyb: boolean,
-  businessInfo?: BusinessInformation,
-): KybChecksKind | undefined => {
+const getInitialKybKind = (isKyb: boolean, businessInfo?: BusinessInformation): KybChecksKind | undefined => {
   if (!isKyb || !businessInfo) {
     return undefined;
   }

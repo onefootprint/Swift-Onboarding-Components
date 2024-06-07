@@ -59,10 +59,9 @@ const DesktopConsent = () => {
         });
       }
       if (!consentInfo) {
-        Logger.error(
-          'Could not submit consent - consent language is empty or undefined',
-          { location: 'consent-desktop' },
-        );
+        Logger.error('Could not submit consent - consent language is empty or undefined', {
+          location: 'consent-desktop',
+        });
       }
       return;
     }
@@ -78,10 +77,9 @@ const DesktopConsent = () => {
           });
         },
         onError: err => {
-          Logger.error(
-            `Could not submit consent language. Error: ${getErrorMessage(err)}`,
-            { location: 'consent-desktop' },
-          );
+          Logger.error(`Could not submit consent language. Error: ${getErrorMessage(err)}`, {
+            location: 'consent-desktop',
+          });
           requestErrorToast(err);
         },
       },
@@ -97,9 +95,7 @@ const DesktopConsent = () => {
 
   return (
     <>
-      <NavigationHeader
-        leftButton={{ variant: 'back', onBack: handleClickBack }}
-      />
+      <NavigationHeader leftButton={{ variant: 'back', onBack: handleClickBack }} />
       <ConsentBody aria-label="consent-body">
         <ImageConsent ref={consentRef} />
       </ConsentBody>
@@ -113,9 +109,7 @@ const DesktopConsent = () => {
           testID="consent-button"
           size="large"
         >
-          {fullyScrolled
-            ? t('submit-button.enabled-title')
-            : t('submit-button.disabled-title')}
+          {fullyScrolled ? t('submit-button.enabled-title') : t('submit-button.disabled-title')}
         </Button>
       </StickyBottomBox>
     </>

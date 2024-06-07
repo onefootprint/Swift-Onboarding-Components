@@ -1,10 +1,6 @@
 import { Box, Container, media } from '@onefootprint/ui';
 import React from 'react';
-import {
-  BloomLogo,
-  CobaLogo,
-  FlexcarLogo,
-} from 'src/components/company-logos/themed';
+import { BloomLogo, CobaLogo, FlexcarLogo } from 'src/components/company-logos/themed';
 import styled, { css } from 'styled-components';
 
 import Line from '../../components/line';
@@ -38,8 +34,7 @@ const FeaturedCards = () => (
   <GridContainer>
     <Line variant="horizontal" position={{ top: '0%' }} />
     {featuredCases.map(featuredCase => {
-      const isLast =
-        featuredCases.indexOf(featuredCase) === featuredCases.length - 1;
+      const isLast = featuredCases.indexOf(featuredCase) === featuredCases.length - 1;
       return (
         <Box position="relative" key={featuredCase.company}>
           <FeaturedCard

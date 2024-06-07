@@ -23,9 +23,7 @@ const UsLegalStatus = ({ di, entity }: UsLegalStatusType) => {
         if (isVaultDataDecrypted(value) && isVaultDataText(value)) {
           return (
             <Text variant="body-3" color="primary">
-              {t(
-                `us-legal-status.status.options.${value}` as ParseKeys<'common'>,
-              )}
+              {t(`us-legal-status.status.options.${value}` as ParseKeys<'common'>)}
             </Text>
           );
         }

@@ -6,18 +6,11 @@ import styled, { css } from 'styled-components';
 
 import SectionCore from '../../section-text';
 
-const bulletPointKets = [
-  'one-device',
-  'proprietary-approach',
-  'passkeys',
-  'waterfall',
-];
+const bulletPointKets = ['one-device', 'proprietary-approach', 'passkeys', 'waterfall'];
 
 const Confidence = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.kyc.confidence' });
-  const bulletPointContent = bulletPointKets.map(key =>
-    t(`bullets.${key}` as ParseKeys<'common'>),
-  );
+  const bulletPointContent = bulletPointKets.map(key => t(`bullets.${key}` as ParseKeys<'common'>));
   return (
     <Section>
       <SectionCore

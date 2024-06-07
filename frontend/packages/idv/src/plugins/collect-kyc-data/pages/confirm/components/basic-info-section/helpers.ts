@@ -1,12 +1,5 @@
-import type {
-  AuthMethodKind,
-  CollectKycDataRequirement,
-} from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  IdDI,
-  isCountryCode,
-} from '@onefootprint/types';
+import type { AuthMethodKind, CollectKycDataRequirement } from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, isCountryCode } from '@onefootprint/types';
 import type { TFunction } from 'i18next';
 
 import type { SectionItemProps as SectionItem } from '../../../../../../components/confirm-collected-data';
@@ -25,9 +18,8 @@ type WithIsVerified = { isVerified: boolean };
 type AuthMethodRes = WithIsVerified & { kind: `${AuthMethodKind}` };
 type AuthMethodMap = Record<VerifiableKind, boolean>;
 
-export const isUsLegalStatusRequired = (
-  req: CollectKycDataRequirement,
-): boolean => allAttributes(req).includes(CollectedKycDataOption.usLegalStatus);
+export const isUsLegalStatusRequired = (req: CollectKycDataRequirement): boolean =>
+  allAttributes(req).includes(CollectedKycDataOption.usLegalStatus);
 
 /**
  * Retrieves basic information items from the provided context data and returns them as an array of SectionItems.
@@ -63,27 +55,21 @@ export const getVerifiableItems = (t: T, data: ContextData) => {
     [IdDI.email, t('confirm.email.text'), 'email'],
   ];
 
-  return listOfPropsAndLabels.reduce<(SectionItem & WithKind)[]>(
-    (list, [key, text, kind]) => {
-      if (data[key]?.value) {
-        list.push({ kind, text, subtext: String(data[key]?.value) });
-      }
-      return list;
-    },
-    [],
-  );
+  return listOfPropsAndLabels.reduce<(SectionItem & WithKind)[]>((list, [key, text, kind]) => {
+    if (data[key]?.value) {
+      list.push({ kind, text, subtext: String(data[key]?.value) });
+    }
+    return list;
+  }, []);
 };
 
 export const getNationalityItems = (t: T, data: ContextData): SectionItem[] => {
   const country = data[IdDI.nationality]?.value;
-  const defaultCountry =
-    country && isCountryCode(country) ? country : undefined;
+  const defaultCountry = country && isCountryCode(country) ? country : undefined;
   const nationality = getInitialCountry(defaultCountry)?.label;
 
   if (country && nationality) {
-    return [
-      { text: t('confirm.basic-info.nationality'), subtext: nationality },
-    ];
+    return [{ text: t('confirm.basic-info.nationality'), subtext: nationality }];
   }
 
   return [];

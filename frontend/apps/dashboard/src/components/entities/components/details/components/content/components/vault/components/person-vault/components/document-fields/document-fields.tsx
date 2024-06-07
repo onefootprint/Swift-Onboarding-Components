@@ -31,22 +31,12 @@ const DocumentFields = ({ entity }: DocumentFieldsProps) => {
         return (
           <Box key={field.main}>
             {isVaultDataDecrypted(vault?.[field.main]) ? (
-              <DocumentField
-                label={field.label}
-                vault={vault}
-                documentType={docType}
-                documents={filteredDocs}
-              />
+              <DocumentField label={field.label} vault={vault} documentType={docType} documents={filteredDocs} />
             ) : (
               <Field
                 di={field.main}
                 entity={entity}
-                status={
-                  <DocumentStatusBadge
-                    documents={filteredDocs}
-                    documentType={docType}
-                  />
-                }
+                status={<DocumentStatusBadge documents={filteredDocs} documentType={docType} />}
               />
             )}
           </Box>

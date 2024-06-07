@@ -25,7 +25,7 @@ const CustomSaveButton = () => {
       await buttonRef.current?.save();
       // eslint-disable-next-line no-alert
       alert('success');
-    } catch (e) {
+    } catch (_e) {
       // eslint-disable-next-line no-alert
       alert('error');
     }

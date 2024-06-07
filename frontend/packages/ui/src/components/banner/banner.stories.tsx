@@ -22,10 +22,9 @@ export default {
   },
 } as Meta;
 
-const Template: Story<BannerProps> = ({
-  children,
-  variant: $variant,
-}: BannerProps) => <Banner variant={$variant}>{children}</Banner>;
+const Template: Story<BannerProps> = ({ children, variant: $variant }: BannerProps) => (
+  <Banner variant={$variant}>{children}</Banner>
+);
 
 export const Base = Template.bind({});
 Base.args = {

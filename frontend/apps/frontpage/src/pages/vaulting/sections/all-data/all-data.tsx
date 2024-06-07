@@ -32,17 +32,11 @@ const AllData = () => {
           <SectionTitle variant="display-2">{t('title')}</SectionTitle>
           <AnimatePresence>
             {isDecrypted ? (
-              <ToggleButton
-                isDecrypted={isDecrypted}
-                onClick={() => setIsDecrypted(!isDecrypted)}
-              >
+              <ToggleButton isDecrypted={isDecrypted} onClick={() => setIsDecrypted(!isDecrypted)}>
                 {t('decrypted')}
               </ToggleButton>
             ) : (
-              <ToggleButton
-                isDecrypted={isDecrypted}
-                onClick={() => setIsDecrypted(!isDecrypted)}
-              >
+              <ToggleButton isDecrypted={isDecrypted} onClick={() => setIsDecrypted(!isDecrypted)}>
                 {t('encrypted')}
               </ToggleButton>
             )}

@@ -3,8 +3,7 @@ import { CollectedDocumentDataOption } from '@onefootprint/types';
 import extractIdDocTypesFromCdo from './utils/extract-id-doc-types-from-cdo';
 
 const isDocumentDi = (cdo: string) => cdo.startsWith('document');
-const isDocumentAndSelfieDi = (cdo: string) =>
-  isDocumentDi(cdo) && cdo.indexOf('selfie') > -1;
+const isDocumentAndSelfieDi = (cdo: string) => isDocumentDi(cdo) && cdo.indexOf('selfie') > -1;
 
 const getCdos = (cdos: string[], singleDocument: boolean) => {
   const documentCdos: string[] = [];
@@ -18,9 +17,7 @@ const getCdos = (cdos: string[], singleDocument: boolean) => {
   });
 
   const compositeDocumentCdos = documentCdos.filter(
-    cdo =>
-      cdo.startsWith('document') &&
-      cdo !== CollectedDocumentDataOption.documentAndSelfie,
+    cdo => cdo.startsWith('document') && cdo !== CollectedDocumentDataOption.documentAndSelfie,
   );
 
   const processedDocumentCdos: string[] = [];

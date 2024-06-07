@@ -10,8 +10,7 @@ export default {
   argTypes: {
     name: {
       control: 'text',
-      description:
-        'Name of the avatar. Uses the first letter when src is not provided',
+      description: 'Name of the avatar. Uses the first letter when src is not provided',
       required: true,
     },
     size: {
@@ -21,8 +20,7 @@ export default {
     },
     src: {
       control: 'text',
-      description:
-        'Avatar image source | component meant to be used with company logos',
+      description: 'Avatar image source | component meant to be used with company logos',
       required: false,
     },
     loading: {
@@ -33,12 +31,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<AvatarProps> = ({
-  loading,
-  name,
-  size,
-  src,
-}: AvatarProps) => (
+const Template: Story<AvatarProps> = ({ loading, name, size, src }: AvatarProps) => (
   <Avatar loading={loading} name={name} size={size} src={src} />
 );
 

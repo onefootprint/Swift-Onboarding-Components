@@ -13,22 +13,13 @@ type ValidationError = {
   data?: string;
 };
 
-const formatCountryCode = (code: string) =>
-  code.toUpperCase().replace(/[^a-zA-Z]+$/, '');
+const formatCountryCode = (code: string) => code.toUpperCase().replace(/[^a-zA-Z]+$/, '');
 
-const validateCitizenships = (
-  maybeCountries: string,
-  legalStatus: string,
-): ValidationError | undefined => {
-  const citizenships = maybeCountries
-    .split(', ')
-    .filter((str: string) => str.length);
+const validateCitizenships = (maybeCountries: string, legalStatus: string): ValidationError | undefined => {
+  const citizenships = maybeCountries.split(', ').filter((str: string) => str.length);
 
   const empty = !citizenships.length;
-  const shouldBeEmpty = !(
-    legalStatus === UsLegalStatus.permanentResident ||
-    legalStatus === UsLegalStatus.visa
-  );
+  const shouldBeEmpty = !(legalStatus === UsLegalStatus.permanentResident || legalStatus === UsLegalStatus.visa);
   if (empty && shouldBeEmpty) {
     return undefined;
   }
@@ -45,9 +36,7 @@ const validateCitizenships = (
 
   const notFound = [] as string[];
   citizenships.forEach((str: string) => {
-    const found = COUNTRIES.find(
-      ({ value }) => value === formatCountryCode(str),
-    );
+    const found = COUNTRIES.find(({ value }) => value === formatCountryCode(str));
     if (!found) {
       notFound.push(str);
     }

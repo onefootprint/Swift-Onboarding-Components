@@ -1,4 +1,4 @@
-import { Badge, createFontStyles, Text } from '@onefootprint/ui';
+import { Badge, Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -23,9 +23,7 @@ const Responses = ({ responses }: ResponsesProps) => {
         return (
           <ResponseContainer key={code}>
             <Header>
-              <Badge variant={code === '200' ? 'success' : 'neutral'}>
-                {code}
-              </Badge>
+              <Badge variant={code === '200' ? 'success' : 'neutral'}>{code}</Badge>
               {schema?.type && (
                 <>
                   <Separator>·</Separator>

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import useRoles from 'src/hooks/use-roles';
 
 import Data from './components/data';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import type { Invitation } from './dialog.types';
 import useInviteMembers from './hooks/use-invite-members';
@@ -49,13 +49,9 @@ const Dialog = ({ onClose, open }: DialogProps) => {
       <>
         {rolesQuery.isLoading && <Loading />}
         {rolesQuery.data && (
-          <Data
-            roles={rolesQuery.options}
-            defaultRole={rolesQuery.options[0]}
-            onSubmit={handleSubmit}
-          />
+          <Data roles={rolesQuery.options} defaultRole={rolesQuery.options[0]} onSubmit={handleSubmit} />
         )}
-        {rolesQuery.errorMessage && <Error message={rolesQuery.errorMessage} />}
+        {rolesQuery.errorMessage && <ErrorComponent message={rolesQuery.errorMessage} />}
       </>
     </FPDialog>
   );

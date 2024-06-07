@@ -28,12 +28,7 @@ const Illustration = () => {
           </DialogContainer>
         )}
       </AnimatePresence>
-      <Lines
-        src="/ending/lines.svg"
-        alt="Decorative"
-        height={698}
-        width={924}
-      />
+      <Lines src="/ending/lines.svg" alt="Decorative" height={698} width={924} />
     </Container>
   );
 };

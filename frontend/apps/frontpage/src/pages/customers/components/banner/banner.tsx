@@ -35,11 +35,7 @@ const Banner = ({ children, cta, title }: BannerProps) => {
       <Button onClick={handleOpenDialog} type="button">
         {cta}
       </Button>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={handleClose}
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
       <PenguinContainer>
         <Penguin />
       </PenguinContainer>

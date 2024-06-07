@@ -1,20 +1,9 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
-import {
-  Box,
-  Checkbox,
-  Grid,
-  LinkButton,
-  Stack,
-  Text,
-  TextInput,
-} from '@onefootprint/ui';
+import { Box, Checkbox, Grid, LinkButton, Stack, Text, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type {
-  FormData,
-  StepProps,
-} from 'src/pages/proxy-configs/proxy-configs.types';
+import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
 
 import FormGrid from '../form-grid';
 
@@ -67,10 +56,7 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
               </Grid.Container>
             </Box>
             <Stack align="center" justify="space-between">
-              <Checkbox
-                label={t('secret.label')}
-                {...register(`headers.${index}.secret`)}
-              />
+              <Checkbox label={t('secret.label')} {...register(`headers.${index}.secret`)} />
               {fields.length >= 2 && (
                 <LinkButton onClick={handleRemove(index)} destructive>
                   {t('remove')}
@@ -80,11 +66,7 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
           </Box>
         ))}
       </FormGrid>
-      <LinkButton
-        iconComponent={IcoPlusSmall16}
-        iconPosition="left"
-        onClick={handleAdd}
-      >
+      <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={handleAdd}>
         {t('add-more')}
       </LinkButton>
     </form>

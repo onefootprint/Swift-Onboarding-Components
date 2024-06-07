@@ -42,12 +42,8 @@ const DateRangeInput = ({
   onChange,
   size,
 }: DateRangeInputProps) => {
-  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
-    initialStartDate,
-  );
-  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
-    initialEndDate,
-  );
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(initialStartDate);
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(initialEndDate);
   const [openDateSheet, setOpenDateSheet] = useState(false);
 
   useEffect(() => {
@@ -60,10 +56,7 @@ const DateRangeInput = ({
   const formattedRange = useMemo(
     () =>
       selectedStartDate && selectedEndDate
-        ? `${format(selectedStartDate, 'MM/dd/yy')} \u2013 ${format(
-            selectedEndDate,
-            'MM/dd/yy',
-          )}`
+        ? `${format(selectedStartDate, 'MM/dd/yy')} \u2013 ${format(selectedEndDate, 'MM/dd/yy')}`
         : '',
     [selectedStartDate, selectedEndDate],
   );
@@ -99,17 +92,8 @@ const DateRangeInput = ({
       asChild
       position={dateSheetPosition}
     >
-      <Trigger
-        onClick={handleToggleDateSheet}
-        type="button"
-        aria-label="Select Date Range"
-      >
-        <Input
-          placeholder={placeholder}
-          size={size}
-          value={formattedRange}
-          readOnly
-        />
+      <Trigger onClick={handleToggleDateSheet} type="button" aria-label="Select Date Range">
+        <Input placeholder={placeholder} size={size} value={formattedRange} readOnly />
       </Trigger>
     </DateSelectorSheet>
   );

@@ -1,5 +1,4 @@
-const stripBase64Prefix = (image: string) =>
-  image.replace(/data:.+?;base64,/i, '');
+const stripBase64Prefix = (image: string) => image.replace(/data:.+?;base64,/i, '');
 
 const imageFileToStrippedBase64 = (image: File): Promise<string> =>
   new Promise((resolve, reject) => {

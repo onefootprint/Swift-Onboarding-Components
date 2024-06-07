@@ -16,8 +16,7 @@ const useEditControls = () => {
   const toast = useToast();
   const isIdle = state.matches(State.idle);
   const isLoading = state.matches(State.savingEdit);
-  const inProgress =
-    state.matches(State.editingFields) || state.matches(State.savingEdit);
+  const inProgress = state.matches(State.editingFields) || state.matches(State.savingEdit);
 
   const start = () => {
     send(Event.started);

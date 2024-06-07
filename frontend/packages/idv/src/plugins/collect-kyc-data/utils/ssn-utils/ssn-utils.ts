@@ -4,8 +4,7 @@ import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import type { KycData } from '../data-types';
 
 export const getSsnKind = (requirement: CollectKycDataRequirement) => {
-  const { missingAttributes, optionalAttributes, populatedAttributes } =
-    requirement;
+  const { missingAttributes, optionalAttributes, populatedAttributes } = requirement;
   let ssnKind: 'ssn4' | 'ssn9' | undefined;
 
   if (
@@ -35,11 +34,7 @@ export const getSsnValue = (data: KycData, ssnKind?: 'ssn4' | 'ssn9') => {
   return undefined;
 };
 
-export const ssnFormatter = (
-  ssnKind: 'ssn4' | 'ssn9',
-  ssn?: string,
-  scrubbed?: boolean,
-) => {
+export const ssnFormatter = (ssnKind: 'ssn4' | 'ssn9', ssn?: string, scrubbed?: boolean) => {
   if (scrubbed) {
     const len = ssnKind === 'ssn9' ? 9 : 4;
     return '•'.repeat(len);

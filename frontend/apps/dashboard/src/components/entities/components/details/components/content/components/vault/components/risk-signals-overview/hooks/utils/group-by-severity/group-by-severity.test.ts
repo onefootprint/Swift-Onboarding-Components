@@ -14,9 +14,7 @@ describe('groupBySeverity', () => {
     expect(onlyLow.medium).toHaveLength(0);
     expect(onlyLow.high).toHaveLength(0);
 
-    const onlyMedium = groupBySeverity([
-      createRiskSignal(RiskSignalSeverity.Medium),
-    ]);
+    const onlyMedium = groupBySeverity([createRiskSignal(RiskSignalSeverity.Medium)]);
     expect(onlyMedium.low).toHaveLength(0);
     expect(onlyMedium.medium).toHaveLength(1);
     expect(onlyMedium.high).toHaveLength(0);

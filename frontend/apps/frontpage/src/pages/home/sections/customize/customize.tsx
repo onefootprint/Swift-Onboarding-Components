@@ -56,10 +56,7 @@ export const Customize = () => {
     <SectionContainer>
       <SectionTitle title={t('title')} subtitle={t('subtitle')} />
       <Box width="100%" position="relative">
-        <MockupScreen
-          $borderRadius={borderRadius}
-          $backgroundColor={backgroundColor}
-        />
+        <MockupScreen $borderRadius={borderRadius} $backgroundColor={backgroundColor} />
         <PositionedCustomInput
           title={t('components.border-radius')}
           type="number"

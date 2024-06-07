@@ -12,11 +12,7 @@ export type BreadcrumbProps = {
   separator?: string;
 } & BoxPrimitives<HTMLElement>;
 
-const Breadcrumb = ({
-  children,
-  separator = '/',
-  ...props
-}: BreadcrumbProps) => (
+const Breadcrumb = ({ children, separator = '/', ...props }: BreadcrumbProps) => (
   <Nav {...props} tag="nav">
     <ol>
       {React.Children.map(children, (child, index) => (

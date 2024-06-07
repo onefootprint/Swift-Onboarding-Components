@@ -1,8 +1,4 @@
-import {
-  type DataIdentifier,
-  type Entity,
-  type VaultValue,
-} from '@onefootprint/types';
+import { type DataIdentifier, type Entity, type VaultValue } from '@onefootprint/types';
 import { Box, Checkbox, Text, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -18,23 +14,12 @@ export type FieldProps = {
   entity: Entity;
   hint?: string;
   renderLabel?: () => React.ReactNode;
-  renderValue?: (
-    value: VaultValue,
-    isValueDecrypted: boolean,
-  ) => React.ReactNode;
+  renderValue?: (value: VaultValue, isValueDecrypted: boolean) => React.ReactNode;
   status?: React.ReactNode;
   skipRegisterFieldToDecryptForm?: boolean;
 };
 
-const Field = ({
-  di,
-  entity,
-  hint,
-  renderValue,
-  renderLabel,
-  status,
-  skipRegisterFieldToDecryptForm,
-}: FieldProps) => {
+const Field = ({ di, entity, hint, renderValue, renderLabel, status, skipRegisterFieldToDecryptForm }: FieldProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.decrypt' });
   const { register } = useFormContext();
   const field = useField(entity)(di);
@@ -43,18 +28,12 @@ const Field = ({
   const label = customLabel ?? field.label;
   const ariaLabel = typeof customLabel === 'string' ? customLabel : field.label;
   const isChecked = field.isDecrypted || decrypt.inProgressDecryptingAll;
-  const registerField = skipRegisterFieldToDecryptForm
-    ? undefined
-    : register(field.name);
+  const registerField = skipRegisterFieldToDecryptForm ? undefined : register(field.name);
 
   return (
     <Container role="row" aria-label={ariaLabel}>
       {field.showCheckbox ? (
-        <Tooltip
-          disabled={field.canDecrypt}
-          position="right"
-          text={t('not-allowed')}
-        >
+        <Tooltip disabled={field.canDecrypt} position="right" text={t('not-allowed')}>
           <Box>
             <Checkbox
               checked={isChecked || undefined}

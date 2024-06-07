@@ -52,22 +52,12 @@ const Content = ({ timeline }: ContentProps) => {
     if (kind === ListTimelineEventKind.createListEntry) {
       items.push({
         time: { timestamp },
-        headerComponent: (
-          <ListEntryCreatedHeader
-            user={principal.member}
-            event={detail as ListEntryCreatedEvent}
-          />
-        ),
+        headerComponent: <ListEntryCreatedHeader user={principal.member} event={detail as ListEntryCreatedEvent} />,
       });
     } else if (kind === ListTimelineEventKind.deleteListEntry) {
       items.push({
         time: { timestamp },
-        headerComponent: (
-          <ListEntryDeletedHeader
-            user={principal.member}
-            event={detail as ListEntryDeletedEvent}
-          />
-        ),
+        headerComponent: <ListEntryDeletedHeader user={principal.member} event={detail as ListEntryDeletedEvent} />,
       });
     }
   });

@@ -1,9 +1,6 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import type { IdvCompletePayload } from '@onefootprint/idv';
-import type {
-  IdvBootstrapData,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { IdvBootstrapData, PublicOnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
   authToken?: string;

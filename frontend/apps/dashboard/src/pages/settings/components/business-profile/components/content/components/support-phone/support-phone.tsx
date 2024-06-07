@@ -14,18 +14,12 @@ const SupportPhone = ({ value }: SupportPhoneProps) => {
   });
 
   return (
-    <Fieldset
-      label={t('label')}
-      value={value}
-      deleteKey={value ? 'clear_support_phone' : undefined}
-    >
+    <Fieldset label={t('label')} value={value} deleteKey={value ? 'clear_support_phone' : undefined}>
       {({ id, handleSubmit }) => (
         <Form
           id={id}
           value={value}
-          onSubmit={(newSupportPhone: string) =>
-            handleSubmit({ supportPhone: newSupportPhone })
-          }
+          onSubmit={(newSupportPhone: string) => handleSubmit({ supportPhone: newSupportPhone })}
         />
       )}
     </Fieldset>

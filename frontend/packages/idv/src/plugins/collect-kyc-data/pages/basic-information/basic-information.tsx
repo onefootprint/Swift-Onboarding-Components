@@ -1,8 +1,4 @@
-import {
-  CollectedKycDataOption,
-  IdDI,
-  isCountryCode,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, isCountryCode } from '@onefootprint/types';
 import { Grid, Stack } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -13,9 +9,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
-import useSyncData, {
-  checkPhoneEmailBeforeSubmit,
-} from '../../hooks/use-sync-data';
+import useSyncData, { checkPhoneEmailBeforeSubmit } from '../../hooks/use-sync-data';
 import type { VerifiedMethods } from '../../types';
 import allAttributes from '../../utils/all-attributes';
 import type { KycData } from '../../utils/data-types';
@@ -65,26 +59,18 @@ const BasicInformation = ({
   const attributes = allAttributes(requirement);
   const requiresName = attributes.includes(CollectedKycDataOption.name);
   const requiresDob = attributes.includes(CollectedKycDataOption.dob);
-  const requiresNationality = attributes.includes(
-    CollectedKycDataOption.nationality,
-  );
-  const requiresPhone =
-    !isTest && attributes.includes(CollectedKycDataOption.phoneNumber);
-  const requiresEmail =
-    !isTest && attributes.includes(CollectedKycDataOption.email);
+  const requiresNationality = attributes.includes(CollectedKycDataOption.nationality);
+  const requiresPhone = !isTest && attributes.includes(CollectedKycDataOption.phoneNumber);
+  const requiresEmail = !isTest && attributes.includes(CollectedKycDataOption.email);
 
-  const isNameDisabled =
-    data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
+  const isNameDisabled = data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
   const isNationalityDisabled = data?.[IdDI.nationality]?.disabled;
   const isDobDisabled = data?.[IdDI.dob]?.disabled;
   const isPhoneDisabled = data?.[IdDI.phoneNumber]?.disabled;
   const isEmailDisabled = data?.[IdDI.email]?.disabled;
 
   const nationalityValue = data?.[IdDI.nationality]?.value;
-  const defaultNationality =
-    nationalityValue && isCountryCode(nationalityValue)
-      ? nationalityValue
-      : undefined;
+  const defaultNationality = nationalityValue && isCountryCode(nationalityValue) ? nationalityValue : undefined;
   const formMethods = useForm<FormData>({
     defaultValues: {
       firstName: data[IdDI.firstName]?.value,
@@ -110,12 +96,7 @@ const BasicInformation = ({
 
   const onSubmitFormData = (formData: FormData) => {
     syncData({
-      data: checkPhoneEmailBeforeSubmit(
-        initialData,
-        convertFormData(formData),
-        requirement,
-        verifiedMethods,
-      ),
+      data: checkPhoneEmailBeforeSubmit(initialData, convertFormData(formData), requirement, verifiedMethods),
       onError: handleSyncDataError,
       onSuccess: cleanData => {
         send({ type: 'dataSubmitted', payload: cleanData });
@@ -133,17 +114,11 @@ const BasicInformation = ({
         </>
       )}
       <FormProvider {...formMethods}>
-        <Grid.Container
-          gap={7}
-          tag="form"
-          onSubmit={formMethods.handleSubmit(onSubmitFormData)}
-        >
+        <Grid.Container gap={7} tag="form" onSubmit={formMethods.handleSubmit(onSubmitFormData)}>
           <Stack direction="column" gap={5}>
             {requiresName ? <NameFields disabled={isNameDisabled} /> : null}
             {requiresDob ? <DobField disabled={isDobDisabled} /> : null}
-            {requiresNationality ? (
-              <NationalityField disabled={isNationalityDisabled} />
-            ) : null}
+            {requiresNationality ? <NationalityField disabled={isNationalityDisabled} /> : null}
             {phoneConfig?.visible && requiresPhone ? (
               <PhoneField disabled={phoneConfig?.disabled || isPhoneDisabled} />
             ) : null}

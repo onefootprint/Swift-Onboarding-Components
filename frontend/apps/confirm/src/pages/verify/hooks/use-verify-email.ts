@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  UserEmailVerifyRequest,
-  UserEmailVerifyResponse,
-} from '@onefootprint/types';
+import type { UserEmailVerifyRequest, UserEmailVerifyResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const userDataRequest = async (payload: UserEmailVerifyRequest) => {

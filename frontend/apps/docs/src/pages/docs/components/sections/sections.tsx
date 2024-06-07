@@ -1,5 +1,5 @@
 import { IcoFileText16 } from '@onefootprint/icons';
-import { Box, createFontStyles, media, Stack } from '@onefootprint/ui';
+import { Box, Stack, createFontStyles, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,9 +27,7 @@ const Sections = ({ sections }: SectionsProps) => {
   };
 
   const handleScroll = () => {
-    const anchoredSections = Array.from(
-      document.querySelectorAll('a[href^="#"]'),
-    ).filter(el => el.id) as HTMLElement[];
+    const anchoredSections = Array.from(document.querySelectorAll('a[href^="#"]')).filter(el => el.id) as HTMLElement[];
     const firstSectionInView = anchoredSections.find(el => {
       const rect = el.getBoundingClientRect();
       return rect.top >= 52 && rect.bottom <= window.innerHeight;
@@ -57,12 +55,7 @@ const Sections = ({ sections }: SectionsProps) => {
         <LinksContainer tag="ul" direction="column" layoutRoot>
           {sections.map(({ level, anchor, label, id }) => (
             <LinkContainer key={id}>
-              <StyledLink
-                $active={activeSectionID === id}
-                $level={level}
-                href={anchor}
-                onClick={scrollToArticle(id)}
-              >
+              <StyledLink $active={activeSectionID === id} $level={level} href={anchor} onClick={scrollToArticle(id)}>
                 {label}
               </StyledLink>
               {activeSectionID === id && <ActiveMarker id="marker" />}
@@ -114,10 +107,12 @@ const StyledLink = styled.a<{ $level: number; $active: boolean }>`
       ${createFontStyles('body-3')}
     }
 
-    ${$active &&
-    css`
+    ${
+      $active &&
+      css`
       color: ${theme.color.primary};
-    `}
+    `
+    }
   `};
 `;
 

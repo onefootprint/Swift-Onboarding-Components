@@ -39,13 +39,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
             i18nKey="onboarding.pages.authorize.footer"
             values={{ tenantName }}
             components={{
-              a: (
-                <Link
-                  href={privacyPolicyUrl}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                />
-              ),
+              a: <Link href={privacyPolicyUrl} rel="noopener noreferrer" target="_blank" />,
             }}
           />
         </Text>

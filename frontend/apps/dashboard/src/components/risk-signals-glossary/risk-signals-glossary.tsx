@@ -25,12 +25,8 @@ const RiskSignalsGlossary = ({ open, onClose }: RiskSignalsGlossaryProps) => {
     () =>
       riskSignalsQuery.data?.filter(
         riskSignal =>
-          riskSignal.reasonCode
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          riskSignal.description
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()),
+          riskSignal.reasonCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          riskSignal.description.toLowerCase().includes(searchTerm.toLowerCase()),
       ),
     [riskSignalsQuery.data, searchTerm],
   );
@@ -49,13 +45,7 @@ const RiskSignalsGlossary = ({ open, onClose }: RiskSignalsGlossaryProps) => {
           </Stack>
         )}
         {filteredRiskSignals?.map(riskSignal => (
-          <Stack
-            key={riskSignal.reasonCode}
-            direction="column"
-            gap={2}
-            paddingTop={2}
-            paddingBottom={2}
-          >
+          <Stack key={riskSignal.reasonCode} direction="column" gap={2} paddingTop={2} paddingBottom={2}>
             <Text variant="label-4">{riskSignal.reasonCode}</Text>
             <Text variant="body-4" color="tertiary">
               {riskSignal.description}

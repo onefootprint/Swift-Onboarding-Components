@@ -12,12 +12,7 @@ export type SegmentedControlProps = {
   onChange: (value: string) => void;
 };
 
-const SegmentedControl = ({
-  'aria-label': ariaLabel,
-  value,
-  options,
-  onChange,
-}: SegmentedControlProps) => (
+const SegmentedControl = ({ 'aria-label': ariaLabel, value, options, onChange }: SegmentedControlProps) => (
   <Tabs.Root value={value} onValueChange={onChange}>
     <OptionsContainer aria-label={ariaLabel}>
       {options.map(({ value: optionValue, label, IconComponent }) => (

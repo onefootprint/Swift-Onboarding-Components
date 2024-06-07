@@ -6,10 +6,7 @@ const isEmailStep = (x: StateValue) => x === 'emailIdentification';
 const isPhoneStep = (x: StateValue) => x === 'phoneIdentification';
 const isSmsStep = (x: StateValue) => x === 'smsChallenge';
 
-const sandboxIdEditRules = (
-  step: StateValue,
-  bootstrapData: IdentifyBootstrapData,
-): boolean =>
+const sandboxIdEditRules = (step: StateValue, bootstrapData: IdentifyBootstrapData): boolean =>
   (isEmailStep(step) && !bootstrapData.email && !bootstrapData.phoneNumber) ||
   (isEmailStep(step) && !bootstrapData.email && !!bootstrapData.phoneNumber) ||
   (isPhoneStep(step) && !!bootstrapData.email) ||

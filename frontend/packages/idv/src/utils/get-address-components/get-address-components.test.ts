@@ -1,8 +1,5 @@
 import fixtures from './__fixtures__';
-import getAddressComponents, {
-  getAddressParts,
-  getAutoCompleteCity,
-} from './get-address-components';
+import getAddressComponents, { getAddressParts, getAutoCompleteCity } from './get-address-components';
 import {
   ArgentinaAddressFixture1,
   ArgentinaAddressFixture2,

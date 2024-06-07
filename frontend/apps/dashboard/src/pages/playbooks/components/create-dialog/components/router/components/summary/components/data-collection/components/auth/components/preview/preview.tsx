@@ -1,5 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { createFontStyles, Text } from '@onefootprint/ui';
+import { Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

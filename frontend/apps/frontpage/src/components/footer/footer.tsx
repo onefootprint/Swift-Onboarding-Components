@@ -1,4 +1,4 @@
-import { Container, Divider, Grid, media, Stack, Text } from '@onefootprint/ui';
+import { Container, Divider, Grid, Stack, Text, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -129,11 +129,7 @@ const Footer = () => {
                 {t(section.title as ParseKeys<'common'>)}
               </Text>
               {section.links.map(link => (
-                <FooterLink
-                  key={link.textKey}
-                  text={t(link.textKey as ParseKeys<'common'>)}
-                  href={link.href}
-                />
+                <FooterLink key={link.textKey} text={t(link.textKey as ParseKeys<'common'>)} href={link.href} />
               ))}
             </SectionColumn>
           ))}

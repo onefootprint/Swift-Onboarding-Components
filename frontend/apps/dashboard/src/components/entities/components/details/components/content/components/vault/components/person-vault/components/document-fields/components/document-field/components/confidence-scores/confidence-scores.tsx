@@ -16,25 +16,15 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
     keyPrefix: 'pages.entity.fieldset.document.drawer.confidence-scores',
   });
 
-  const confidenceScores = [
-    document?.documentScore,
-    document?.ocrConfidenceScore,
-    document?.selfieScore,
-  ];
+  const confidenceScores = [document?.documentScore, document?.ocrConfidenceScore, document?.selfieScore];
 
-  const numScores = confidenceScores.filter(
-    score => score || score === 0,
-  ).length;
+  const numScores = confidenceScores.filter(score => score || score === 0).length;
 
   if (numScores === 0) {
     return null;
   }
 
-  const confidenceScoreLabels = [
-    t('labels.document'),
-    t('labels.extracted-data'),
-    t('labels.face-match'),
-  ];
+  const confidenceScoreLabels = [t('labels.document'), t('labels.extracted-data'), t('labels.face-match')];
 
   return (
     <Section>
@@ -45,15 +35,8 @@ const ConfidenceScores = ({ document }: ConfidenceScoresProps) => {
       <ScoresContainer>
         {confidenceScores.map((score, index) =>
           score || score === 0 ? (
-            <ScoreContainer
-              index={index}
-              numScores={numScores}
-              key={confidenceScoreLabels[index]}
-            >
-              <ConfidenceScore
-                label={confidenceScoreLabels[index]}
-                score={score}
-              />
+            <ScoreContainer index={index} numScores={numScores} key={confidenceScoreLabels[index]}>
+              <ConfidenceScore label={confidenceScoreLabels[index]} score={score} />
             </ScoreContainer>
           ) : null,
         )}
@@ -69,9 +52,7 @@ const ScoreContainer = styled.div<{ index: number; numScores: number }>`
     flex-direction: column;
     justify-content: flex-start;
     align-items: ${numScores > 1 ? 'flex-start' : 'center'};
-    border-right: ${index < numScores - 1
-      ? `${theme.borderWidth[1]} solid ${theme.borderColor.tertiary}`
-      : 'none'};
+    border-right: ${index < numScores - 1 ? `${theme.borderWidth[1]} solid ${theme.borderColor.tertiary}` : 'none'};
     width: 100%;
   `};
 `;

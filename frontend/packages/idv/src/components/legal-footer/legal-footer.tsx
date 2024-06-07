@@ -11,18 +11,10 @@ const LegalFooter = () => (
       i18nKey="email-step.legal-footer"
       components={{
         termsLink: (
-          <Link
-            href="https://www.onefootprint.com/terms-of-service"
-            rel="noopener noreferrer"
-            target="_blank"
-          />
+          <Link href="https://www.onefootprint.com/terms-of-service" rel="noopener noreferrer" target="_blank" />
         ),
         privacyPolicyLink: (
-          <Link
-            href="https://www.onefootprint.com/privacy-policy"
-            rel="noopener noreferrer"
-            target="_blank"
-          />
+          <Link href="https://www.onefootprint.com/privacy-policy" rel="noopener noreferrer" target="_blank" />
         ),
       }}
     />

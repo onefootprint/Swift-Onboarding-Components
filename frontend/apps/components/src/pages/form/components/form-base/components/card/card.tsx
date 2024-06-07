@@ -10,11 +10,7 @@ import styled from 'styled-components';
 import CardCvc, { CvcLength } from './components/card-cvc';
 import CardExpDateInput from './components/card-exp-date-input';
 import CardNumberInput from './components/card-number-input';
-import {
-  isCardCvcValid,
-  isCardExpiryValid,
-  isCardNumberValid,
-} from './utils/validations';
+import { isCardCvcValid, isCardExpiryValid, isCardNumberValid } from './utils/validations';
 
 export type CardData = {
   number: string;

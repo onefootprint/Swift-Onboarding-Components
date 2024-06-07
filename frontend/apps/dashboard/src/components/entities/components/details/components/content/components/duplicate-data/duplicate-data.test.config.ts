@@ -1,10 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import {
-  DataKind,
-  DupeKind,
-  type GetDuplicateDataResponse,
-  IdDI,
-} from '@onefootprint/types';
+import { DataKind, DupeKind, type GetDuplicateDataResponse, IdDI } from '@onefootprint/types';
 import { EntityStatus } from '@onefootprint/types/src/data';
 
 const duplicateDataFixturePopulated: GetDuplicateDataResponse = {

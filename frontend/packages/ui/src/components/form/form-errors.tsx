@@ -10,9 +10,7 @@ export type FormErrorsProps = {
 
 const FormErrors = ({ children, className }: FormErrorsProps) =>
   children && typeof children === 'string' ? (
-    <Text className={`${className} fp-hint fp-custom-appearance`}>
-      {children}
-    </Text>
+    <Text className={`${className} fp-hint fp-custom-appearance`}>{children}</Text>
   ) : null;
 
 const Text = styled.div`

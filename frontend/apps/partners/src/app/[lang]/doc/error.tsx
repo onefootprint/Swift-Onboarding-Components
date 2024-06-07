@@ -1,5 +1,5 @@
 'use client';
 
-import Error from '../app/components/error';
+import ErrorComponent from '../app/components/error';
 
-export default Error;
+export default ErrorComponent;

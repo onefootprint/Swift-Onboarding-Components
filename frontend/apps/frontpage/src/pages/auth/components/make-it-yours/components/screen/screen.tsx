@@ -6,13 +6,7 @@ import BifrostModals from '../desktop-banner/components/bifrost-modals';
 
 const Screen = () => (
   <OuterContainer direction="column" className="screen">
-    <Header
-      direction="row"
-      justify="start"
-      align="center"
-      gap={3}
-      paddingLeft={4}
-    >
+    <Header direction="row" justify="start" align="center" gap={3} paddingLeft={4}>
       <Dot />
       <Dot />
       <Dot />

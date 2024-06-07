@@ -13,17 +13,13 @@ const LinkDisplay = ({ linkData }: LinkDisplayProps) => {
     keyPrefix: 'pages.entity.actions.request-more-info',
   });
 
-  const expiresAt = linkData?.expiresAt
-    ? new Date(linkData.expiresAt)
-    : new Date();
+  const expiresAt = linkData?.expiresAt ? new Date(linkData.expiresAt) : new Date();
   const expiresInMs = expiresAt.getTime() - new Date().getTime();
   const expiresInDays = Math.round(expiresInMs / (1000 * 3600 * 24));
 
   return (
     <Stack gap={3} direction="column">
-      <Text variant="label-3">
-        {linkData ? t('link.header-generated') : t('link.header-generating')}
-      </Text>
+      <Text variant="label-3">{linkData ? t('link.header-generated') : t('link.header-generating')}</Text>
       <Text variant="body-3" color="secondary">
         {t('link.share-this-link')}
       </Text>

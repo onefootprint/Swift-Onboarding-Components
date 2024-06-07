@@ -7,11 +7,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
-import {
-  DECRYPT_VAULT_FORM_ID,
-  EDIT_VAULT_FORM_ID,
-  HEADER_ACTIONS_SELECTOR,
-} from '@/entity/constants';
+import { DECRYPT_VAULT_FORM_ID, EDIT_VAULT_FORM_ID, HEADER_ACTIONS_SELECTOR } from '@/entity/constants';
 import useCurrentEntity from '@/entity/hooks/use-current-entity';
 
 import Actions from './components/actions';
@@ -35,8 +31,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
 
   const handleDecryptSubmit = () => {
     decryptControls.decrypt(entity.id, entityVault, {
-      onSuccess: newData =>
-        updateVault({ vault: newData, transforms: {}, dataKinds: {} }), // Update vault will take care of this using the already existing transforms and dataKinds
+      onSuccess: newData => updateVault({ vault: newData, transforms: {}, dataKinds: {} }), // Update vault will take care of this using the already existing transforms and dataKinds
     });
   };
 
@@ -54,17 +49,13 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   });
 
-  const shouldRenderManualReview =
-    entityData && entityData.status !== EntityStatus.none;
+  const shouldRenderManualReview = entityData && entityData.status !== EntityStatus.none;
 
   return (
     <Portal selector={HEADER_ACTIONS_SELECTOR}>
       {editControls.isIdle && decryptControls.isIdle && (
         <Stack gap={3} align="center">
-          <Tooltip
-            disabled={canDecrypt}
-            text={t('pages.entity.decrypt.not-allowed')}
-          >
+          <Tooltip disabled={canDecrypt} text={t('pages.entity.decrypt.not-allowed')}>
             <SplitButton
               disabled={!canDecrypt}
               variant="secondary"
@@ -77,10 +68,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
                 {
                   label: t('pages.entity.decrypt.start-all'),
                   value: 'start-all',
-                  onSelect: () =>
-                    decryptControls.submitAllFields(
-                      entity.decryptableAttributes,
-                    ),
+                  onSelect: () => decryptControls.submitAllFields(entity.decryptableAttributes),
                 },
               ]}
             />
@@ -100,20 +88,12 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
         <Stack gap={3}>
           <Button
             variant="secondary"
-            onClick={
-              decryptControls.inProgress
-                ? decryptControls.cancel
-                : editControls.cancel
-            }
+            onClick={decryptControls.inProgress ? decryptControls.cancel : editControls.cancel}
           >
             {t('cancel')}
           </Button>
           <Button
-            form={
-              decryptControls.inProgress
-                ? DECRYPT_VAULT_FORM_ID
-                : EDIT_VAULT_FORM_ID
-            }
+            form={decryptControls.inProgress ? DECRYPT_VAULT_FORM_ID : EDIT_VAULT_FORM_ID}
             type="submit"
             loading={!!editControls.isLoading}
           >

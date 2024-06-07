@@ -1,8 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import {
-  SkipLivenessClientType,
-  SkipLivenessReason,
-} from '@onefootprint/types/src/api/skip-liveness';
+import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types/src/api/skip-liveness';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
@@ -54,12 +51,9 @@ const Unavailable = () => {
           });
         },
         onError: (error: unknown) => {
-          Logger.error(
-            `Error while skipping liveness in liveness unavailable page: ${getErrorMessage(
-              error,
-            )}`,
-            { location: 'liveness-unavailable' },
-          );
+          Logger.error(`Error while skipping liveness in liveness unavailable page: ${getErrorMessage(error)}`, {
+            location: 'liveness-unavailable',
+          });
         },
       },
     );

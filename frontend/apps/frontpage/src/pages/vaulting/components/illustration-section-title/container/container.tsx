@@ -42,8 +42,9 @@ const Outer = styled.div<{
     height: ${height}px;
     width: ${width}px;
 
-    ${!removeMask &&
-    css`
+    ${
+      !removeMask &&
+      css`
       mask: radial-gradient(
         100% 100% at 50% 0%,
         black 0%,
@@ -51,7 +52,8 @@ const Outer = styled.div<{
         transparent 100%
       );
       mask-mode: alpha;
-    `}
+    `
+    }
   `};
 `;
 

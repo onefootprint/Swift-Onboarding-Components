@@ -6,8 +6,7 @@ const isContextReady = (context: MachineContext, event: MachineEvents) => {
   }
   const authToken = context.authToken || event.payload.authToken;
   const obConfigAuth = context.obConfigAuth || event.payload.obConfigAuth;
-  const onboardingConfig =
-    context.onboardingConfig || event.payload.onboardingConfig;
+  const onboardingConfig = context.onboardingConfig || event.payload.onboardingConfig;
 
   if (!onboardingConfig) {
     return false;

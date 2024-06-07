@@ -1,5 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import type { BusinessDataResponse, BusinessDIData } from '@onefootprint/types';
+import type { BusinessDIData, BusinessDataResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -20,13 +20,7 @@ const useSyncData = () => {
   });
   const toast = useToast();
 
-  const syncData = ({
-    authToken,
-    data,
-    speculative,
-    onSuccess,
-    onError,
-  }: SyncDataArgs) => {
+  const syncData = ({ authToken, data, speculative, onSuccess, onError }: SyncDataArgs) => {
     if (!authToken) {
       toast.show({
         title: t('empty-auth-token.title'),

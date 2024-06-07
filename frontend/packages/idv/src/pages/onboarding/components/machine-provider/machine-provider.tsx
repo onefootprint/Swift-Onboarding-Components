@@ -10,14 +10,9 @@ type OnboardingMachineProviderArgs = {
   l10n?: L10n;
 };
 
-const useLocalOnboardingMachine = ({
-  args,
-  l10n,
-}: OnboardingMachineProviderArgs) =>
+const useLocalOnboardingMachine = ({ args, l10n }: OnboardingMachineProviderArgs) =>
   useMachine(() => createOnboardingMachine(args, l10n));
 
-export const [OnboardingMachineProvider, useOnboardingMachine] = constate(
-  useLocalOnboardingMachine,
-);
+export const [OnboardingMachineProvider, useOnboardingMachine] = constate(useLocalOnboardingMachine);
 
 export default OnboardingMachineProvider;

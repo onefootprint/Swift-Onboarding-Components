@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
+import { isAuthOrVerifyOrUpdateLogin, isAuthUpdateLoginMethods, isUpdateLoginMethods, isValidString } from '.';
 import type { Props } from '../../types/components';
-import {
-  isAuthOrVerifyOrUpdateLogin,
-  isAuthUpdateLoginMethods,
-  isUpdateLoginMethods,
-  isValidString,
-} from '.';
 
 describe('isAuthOrVerifyOrUpdateLogin', () => {
   it.each([

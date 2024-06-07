@@ -31,9 +31,7 @@ const initIframeManager = (): IframeManager => {
   const getOrCreate = (iframe: Iframe): Iframe => {
     const key = getIframeKey(iframe.props);
     // Don't re-add if already exists with same props
-    const existingEntry = Object.values(iframes).find(
-      iframeEntry => getIframeKey(iframeEntry.iframe.props) === key,
-    );
+    const existingEntry = Object.values(iframes).find(iframeEntry => getIframeKey(iframeEntry.iframe.props) === key);
     if (existingEntry) {
       return existingEntry.iframe;
     }
@@ -49,9 +47,7 @@ const initIframeManager = (): IframeManager => {
     const primaryKey = getIframeKey(primary.props);
     const secondaryKey = getIframeKey(secondary.props);
     if (!iframes[primaryKey]) {
-      throw new Error(
-        'iframe manager: primary iframe does not exist while adding secondary',
-      );
+      throw new Error('iframe manager: primary iframe does not exist while adding secondary');
     }
 
     const { secondaryIframes } = iframes[primaryKey];
@@ -85,9 +81,7 @@ const initIframeManager = (): IframeManager => {
     const primaryKey = getIframeKey(primary.props);
     const secondaryKey = getIframeKey(secondary.props);
     if (!iframes[primaryKey]) {
-      throw new Error(
-        'iframe manager: primary iframe does not exist while removing secondary',
-      );
+      throw new Error('iframe manager: primary iframe does not exist while removing secondary');
     }
 
     const { secondaryIframes } = iframes[primaryKey];

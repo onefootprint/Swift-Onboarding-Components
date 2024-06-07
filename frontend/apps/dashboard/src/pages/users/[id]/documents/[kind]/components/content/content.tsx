@@ -32,11 +32,7 @@ const Content = ({ documents, meta }: ContentProps) => {
         </Box>
       )}
       <Box marginBottom={7}>
-        <SessionSelect
-          onChange={setCurrentDocument}
-          options={documents}
-          selected={currentDocument}
-        />
+        <SessionSelect onChange={setCurrentDocument} options={documents} selected={currentDocument} />
       </Box>
       <Box marginBottom={7}>
         <Scores

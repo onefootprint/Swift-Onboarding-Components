@@ -13,13 +13,7 @@ export type TableProps = {
   searchPlaceholder: string;
 };
 
-const Table = ({
-  'aria-label': ariaLabel,
-  columns,
-  emptyStateText,
-  searchPlaceholder,
-  renderTr,
-}: TableProps) => {
+const Table = ({ 'aria-label': ariaLabel, columns, emptyStateText, searchPlaceholder, renderTr }: TableProps) => {
   const context = useEntitiesContext();
 
   return (

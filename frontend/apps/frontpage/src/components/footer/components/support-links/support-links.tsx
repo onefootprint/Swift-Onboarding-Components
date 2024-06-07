@@ -1,9 +1,5 @@
-import {
-  IcoLinkedin24,
-  IcoX24,
-  ThemedLogoFpCompact,
-} from '@onefootprint/icons';
-import { Box, createFontStyles, media, Stack, Text } from '@onefootprint/ui';
+import { IcoLinkedin24, IcoX24, ThemedLogoFpCompact } from '@onefootprint/icons';
+import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -38,29 +34,16 @@ const SuportLinks = () => {
       <Text variant="body-3" color="tertiary">
         © {currentYear} {t('copyright')}
       </Text>
-      <SupportMail href={`mailto:${SUPPORT_EMAIL_ADDRESS}`}>
-        {SUPPORT_EMAIL_ADDRESS}
-      </SupportMail>
+      <SupportMail href={`mailto:${SUPPORT_EMAIL_ADDRESS}`}>{SUPPORT_EMAIL_ADDRESS}</SupportMail>
       <SocialLinks>
         {socialLinks.map(({ href, Icon, ariaLabel }) => (
-          <StyledIconLink
-            key={href}
-            href={href}
-            rel="noopener noreferrer"
-            target="_blank"
-            aria-label={ariaLabel}
-          >
+          <StyledIconLink key={href} href={href} rel="noopener noreferrer" target="_blank" aria-label={ariaLabel}>
             <Icon color="tertiary" />
           </StyledIconLink>
         ))}
       </SocialLinks>
       <BadgesContainer>
-        <Image
-          src="/footer/soc-2-badge-vanta.svg"
-          height={40}
-          width={40}
-          alt="Soc2 badge"
-        />
+        <Image src="/footer/soc-2-badge-vanta.svg" height={40} width={40} alt="Soc2 badge" />
         <Image src="/footer/PCI.png" height={45} width={45} alt="PCI badge" />
       </BadgesContainer>
     </Container>

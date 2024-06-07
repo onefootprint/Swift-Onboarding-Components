@@ -22,10 +22,7 @@ const MenuList = ({ innerRef, options, children, getValue }: MenuListProps) => {
     return 0;
   };
 
-  const height =
-    length >= ROWS
-      ? OPTION_HEIGHT * ROWS - MARGIN
-      : length * OPTION_HEIGHT + 2 * MARGIN;
+  const height = length >= ROWS ? OPTION_HEIGHT * ROWS - MARGIN : length * OPTION_HEIGHT + 2 * MARGIN;
 
   return Array.isArray(children) ? (
     <StyledList

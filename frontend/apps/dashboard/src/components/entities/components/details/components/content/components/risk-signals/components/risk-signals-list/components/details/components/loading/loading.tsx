@@ -59,12 +59,7 @@ const Loading = () => (
       </Box>
     </Box>
     <Box id="raw-response-shimmer">
-      <Stack
-        id="raw-response-title-shimmer"
-        align="center"
-        justify="space-between"
-        marginBottom={6}
-      >
+      <Stack id="raw-response-title-shimmer" align="center" justify="space-between" marginBottom={6}>
         <Box>
           <Shimmer width="105px" height="24px" />
         </Box>

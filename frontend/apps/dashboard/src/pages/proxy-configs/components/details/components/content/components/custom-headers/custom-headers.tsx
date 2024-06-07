@@ -12,8 +12,7 @@ const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.proxy-configs.details.custom-headers',
   });
-  const shouldShow =
-    proxyConfig.headers.length > 0 || proxyConfig.secretHeaders.length > 0;
+  const shouldShow = proxyConfig.headers.length > 0 || proxyConfig.secretHeaders.length > 0;
 
   return shouldShow ? (
     <>

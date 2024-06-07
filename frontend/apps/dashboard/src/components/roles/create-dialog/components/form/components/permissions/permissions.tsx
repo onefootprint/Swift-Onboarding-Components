@@ -1,13 +1,7 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { RoleKind } from '@onefootprint/types';
 import { RoleScopeKind, supportedRoleKinds } from '@onefootprint/types';
-import {
-  Box,
-  Checkbox,
-  createFontStyles,
-  MultiSelect,
-  Text,
-} from '@onefootprint/ui';
+import { Box, Checkbox, MultiSelect, Text, createFontStyles } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -24,10 +18,8 @@ const Permissions = ({ kind }: PermissionsProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
   const { register, watch, control, setValue, formState } = useFormContext();
   const { errors } = formState;
-  const { options: decryptOptions, allOption: decryptAllOption } =
-    useDecryptOptions();
-  const { options: proxyOptions, allOption: proxyAllOption } =
-    useVaultProxyOptions();
+  const { options: decryptOptions, allOption: decryptAllOption } = useDecryptOptions();
+  const { options: proxyOptions, allOption: proxyAllOption } = useVaultProxyOptions();
   const showDecryptSelect = watch('showDecrypt');
   const showProxySelect = watch('showProxyConfigs');
 
@@ -60,16 +52,9 @@ const Permissions = ({ kind }: PermissionsProps) => {
       </Box>
       <ToggleContainer>
         {supportedScopeKinds.includes(RoleScopeKind.read) && (
-          <Checkbox
-            disabled
-            label={t('scopes.read')}
-            hint={t('scopes.hints.read')}
-            checked
-          />
+          <Checkbox disabled label={t('scopes.read')} hint={t('scopes.hints.read')} checked />
         )}
-        {supportedScopeKinds.includes(
-          RoleScopeKind.onboardingConfiguration,
-        ) && (
+        {supportedScopeKinds.includes(RoleScopeKind.onboardingConfiguration) && (
           <Checkbox
             label={t('scopes.onboarding_configuration')}
             hint={t('scopes.hints.playbooks')}
@@ -205,11 +190,7 @@ const Permissions = ({ kind }: PermissionsProps) => {
         )}
         {supportedScopeKinds.includes(RoleScopeKind.decrypt) && (
           <div>
-            <Checkbox
-              label={t('form.decrypt.label')}
-              hint={t('scopes.hints.decrypt')}
-              {...register('showDecrypt')}
-            />
+            <Checkbox label={t('form.decrypt.label')} hint={t('scopes.hints.decrypt')} {...register('showDecrypt')} />
             <div ref={animateDecryptSelect}>
               {showDecryptSelect && (
                 <MultiSelectContainer>

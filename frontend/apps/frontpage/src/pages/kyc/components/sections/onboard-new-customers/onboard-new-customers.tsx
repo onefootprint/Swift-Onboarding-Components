@@ -6,20 +6,13 @@ import styled, { css } from 'styled-components';
 
 import SectionCore from '../../section-text';
 
-const bulletPointKets = [
-  'user-experience',
-  'developer-experience',
-  'progressive-onboarding',
-  'one-click',
-];
+const bulletPointKets = ['user-experience', 'developer-experience', 'progressive-onboarding', 'one-click'];
 
 const OnboardNewCustomers = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.kyc.onboard-users',
   });
-  const bulletPointContent = bulletPointKets.map(key =>
-    t(`bullets.${key}` as ParseKeys<'common'>),
-  );
+  const bulletPointContent = bulletPointKets.map(key => t(`bullets.${key}` as ParseKeys<'common'>));
   return (
     <Section>
       <SectionCore

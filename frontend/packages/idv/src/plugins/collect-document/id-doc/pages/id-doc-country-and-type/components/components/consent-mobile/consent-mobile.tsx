@@ -36,10 +36,9 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
       }
 
       if (!consentInfo) {
-        Logger.error(
-          'Could not submit consent - consent language is empty or undefined',
-          { location: 'consent-mobile' },
-        );
+        Logger.error('Could not submit consent - consent language is empty or undefined', {
+          location: 'consent-mobile',
+        });
       }
       return;
     }
@@ -55,10 +54,9 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
       {
         onSuccess: onConsent,
         onError: err => {
-          Logger.error(
-            `Could not submit consent language. Error: ${getErrorMessage(err)}`,
-            { location: 'consent-mobile' },
-          );
+          Logger.error(`Could not submit consent language. Error: ${getErrorMessage(err)}`, {
+            location: 'consent-mobile',
+          });
           requestErrorToast(err);
         },
       },

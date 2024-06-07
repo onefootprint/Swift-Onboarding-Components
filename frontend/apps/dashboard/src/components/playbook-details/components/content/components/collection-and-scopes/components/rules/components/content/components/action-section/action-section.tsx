@@ -46,11 +46,9 @@ const ActionSection = ({
     setAddedRules([]);
   }, [rules, isEditing]);
 
-  const isStepUpSubsection = [
-    RuleAction.stepUpIdentity,
-    RuleAction.stepUpPoA,
-    RuleAction.stepUpIdentitySsn,
-  ].includes(action);
+  const isStepUpSubsection = [RuleAction.stepUpIdentity, RuleAction.stepUpPoA, RuleAction.stepUpIdentitySsn].includes(
+    action,
+  );
   const showStepUpTitle = action === RuleAction.stepUpIdentitySsn;
   const actionName = showStepUpTitle ? 'step-up' : kebabCase(action);
   const textColors: Record<string, Color> = {
@@ -60,12 +58,7 @@ const ActionSection = ({
     'pass-with-manual-review': 'success',
   };
   const actionTitle = (
-    <Stack
-      direction="column"
-      gap={1}
-      textAlign="left"
-      paddingBottom={showStepUpTitle ? 5 : 0}
-    >
+    <Stack direction="column" gap={1} textAlign="left" paddingBottom={showStepUpTitle ? 5 : 0}>
       <Text variant="label-3" color={textColors[actionName]}>
         {t(`${actionName}.title` as ParseKeys<'common'>)}
       </Text>
@@ -90,9 +83,7 @@ const ActionSection = ({
   const handleEditEmptyRow = (rule: AddedRuleWithId) => {
     setAddedRules(currentRules => {
       const newRules = cloneDeep(currentRules);
-      const tempId = newRules.findIndex(
-        (r: AddedRuleWithId) => r.tempId === rule.tempId,
-      );
+      const tempId = newRules.findIndex((r: AddedRuleWithId) => r.tempId === rule.tempId);
       newRules[tempId] = rule;
       onAdd(newRules);
       return newRules;
@@ -100,9 +91,7 @@ const ActionSection = ({
   };
 
   const handleDeleteNewRow = (tempId: string) => {
-    setAddedRules(currentRules =>
-      currentRules.filter(rule => rule.tempId !== tempId),
-    );
+    setAddedRules(currentRules => currentRules.filter(rule => rule.tempId !== tempId));
     onDeleteAdd(tempId);
   };
 
@@ -139,13 +128,7 @@ const ActionSection = ({
         {addedRules.length > 0 ? (
           emptyRows
         ) : (
-          <Text
-            variant="body-4"
-            paddingTop={3}
-            paddingBottom={3}
-            paddingLeft={4}
-            paddingRight={4}
-          >
+          <Text variant="body-4" paddingTop={3} paddingBottom={3} paddingLeft={4} paddingRight={4}>
             {t('empty-rules')}
           </Text>
         )}
@@ -165,16 +148,12 @@ const ActionSection = ({
         {isStepUpSubsection ? (
           <Stack align="center" gap={3}>
             <IcoFileText16 />
-            <Text variant="label-4">
-              {t(`step-up.${kebabCase(action)}` as ParseKeys<'common'>)}
-            </Text>
+            <Text variant="label-4">{t(`step-up.${kebabCase(action)}` as ParseKeys<'common'>)}</Text>
           </Stack>
         ) : (
           actionTitle
         )}
-        {isEditing && (
-          <LinkButton onClick={handleAddEmptyRow}>{t('add-rule')}</LinkButton>
-        )}
+        {isEditing && <LinkButton onClick={handleAddEmptyRow}>{t('add-rule')}</LinkButton>}
       </Stack>
       <RuleList data-is-empty={!rules.length}>{getRuleList()}</RuleList>
     </Stack>

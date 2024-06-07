@@ -1,9 +1,5 @@
 import type { Document } from '@onefootprint/types';
-import {
-  IdDocStatus,
-  SupportedIdDocTypes,
-  UploadSource,
-} from '@onefootprint/types';
+import { IdDocStatus, SupportedIdDocTypes, UploadSource } from '@onefootprint/types';
 
 const documentFixture: Document = {
   completedVersion: 1,

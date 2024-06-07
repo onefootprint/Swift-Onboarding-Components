@@ -1,19 +1,11 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { CollectKycDataRequirement } from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  IdDI,
-  OnboardingConfigStatus,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 
 import type { KycData } from '../../utils/data-types';
 import type { InitMachineArgs } from '../../utils/state-machine/machine';
 
-export const getInitialContext = (
-  data: KycData,
-  ssnKind: 'ssn4' | 'ssn9',
-): InitMachineArgs => ({
+export const getInitialContext = (data: KycData, ssnKind: 'ssn4' | 'ssn9'): InitMachineArgs => ({
   authToken: 'token',
   device: {
     type: 'mobile',
@@ -42,10 +34,7 @@ export const getInitialContext = (
   requirement: {
     kind: OnboardingRequirementKind.collectKycData,
     isMet: false,
-    missingAttributes:
-      ssnKind === 'ssn4'
-        ? [CollectedKycDataOption.ssn4]
-        : [CollectedKycDataOption.ssn9],
+    missingAttributes: ssnKind === 'ssn4' ? [CollectedKycDataOption.ssn4] : [CollectedKycDataOption.ssn9],
     populatedAttributes: [],
     optionalAttributes: [],
   } as CollectKycDataRequirement,

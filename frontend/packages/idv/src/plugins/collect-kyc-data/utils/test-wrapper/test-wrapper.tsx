@@ -14,11 +14,7 @@ type TestWrapperProps = {
   children: ReactNode;
 };
 
-const TestWrapper = ({
-  initialContext,
-  initState,
-  children,
-}: TestWrapperProps) => (
+const TestWrapper = ({ initialContext, initState, children }: TestWrapperProps) => (
   <ToastProvider>
     <Layout>
       <MachineProvider initialContext={initialContext} initState={initState}>

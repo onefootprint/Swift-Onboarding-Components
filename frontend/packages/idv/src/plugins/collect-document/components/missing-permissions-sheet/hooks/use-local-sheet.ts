@@ -3,13 +3,9 @@ import { useState } from 'react';
 import type { MissingPermissionsSheetProps } from '../missing-permissions-sheet';
 
 const useLocalSheet = () => {
-  const [sheet, setSheet] = useState<
-    Omit<MissingPermissionsSheetProps, 'device'> | undefined
-  >();
+  const [sheet, setSheet] = useState<Omit<MissingPermissionsSheetProps, 'device'> | undefined>();
 
-  const show = (
-    props: Omit<MissingPermissionsSheetProps, 'open' | 'device'>,
-  ) => {
+  const show = (props: Omit<MissingPermissionsSheetProps, 'open' | 'device'>) => {
     setSheet({ ...props, open: true });
   };
 

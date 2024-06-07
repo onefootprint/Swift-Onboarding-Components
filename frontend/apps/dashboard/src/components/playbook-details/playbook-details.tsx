@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Content from './components/content';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import usePlaybook from './hooks/use-playbook';
 
@@ -12,7 +12,7 @@ const PlaybookDetails = () => {
     <>
       {data && <Content playbook={data} />}
       {isLoading && <Loading />}
-      {errorMessage && <Error message={errorMessage} />}
+      {errorMessage && <ErrorComponent message={errorMessage} />}
     </>
   );
 };

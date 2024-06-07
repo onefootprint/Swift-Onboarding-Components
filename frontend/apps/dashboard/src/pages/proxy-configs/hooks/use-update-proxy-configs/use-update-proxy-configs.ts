@@ -6,10 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updateProxyConfig = async (
-  authHeaders: AuthHeaders,
-  payload: UpdateProxyConfigRequest,
-) => {
+const updateProxyConfig = async (authHeaders: AuthHeaders, payload: UpdateProxyConfigRequest) => {
   const { id, ...data } = payload;
   const response = await request({
     method: 'PATCH',
@@ -30,8 +27,7 @@ const useUpdateProxyConfig = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateProxyConfigRequest) =>
-      updateProxyConfig(session.authHeaders, payload),
+    mutationFn: (payload: UpdateProxyConfigRequest) => updateProxyConfig(session.authHeaders, payload),
 
     onError: (error: unknown) => {
       toast.show({

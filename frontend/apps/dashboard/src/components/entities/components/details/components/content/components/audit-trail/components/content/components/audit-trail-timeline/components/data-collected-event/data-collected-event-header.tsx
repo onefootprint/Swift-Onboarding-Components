@@ -1,5 +1,5 @@
 import type { CollectedDataEventData } from '@onefootprint/types';
-import { createFontStyles, Text } from '@onefootprint/ui';
+import { Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -17,11 +17,7 @@ const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
   });
   const { attributes } = data;
 
-  let title = (
-    <TertiaryColor>
-      {data.isPrefill ? t('title-prefill') : t('title')}
-    </TertiaryColor>
-  );
+  let title = <TertiaryColor>{data.isPrefill ? t('title-prefill') : t('title')}</TertiaryColor>;
   if (data.actor) {
     title = (
       <>

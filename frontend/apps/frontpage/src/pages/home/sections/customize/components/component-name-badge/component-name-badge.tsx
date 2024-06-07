@@ -1,4 +1,4 @@
-import { createFontStyles, Stack } from '@onefootprint/ui';
+import { Stack, createFontStyles } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
 const ComponentNameBadge = styled(Stack)<{ className?: string }>`

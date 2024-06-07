@@ -8,9 +8,7 @@
     "paths": {
       "src/*": ["./src/*"]
     },
-    "types": ["google.maps", "jest", "../../styled.d.ts"],
+    "types": ["google.maps", "jest", "../../styled.d.ts"]
   },
   "include": ["src", "next-env.d.ts"]
 }
-
-

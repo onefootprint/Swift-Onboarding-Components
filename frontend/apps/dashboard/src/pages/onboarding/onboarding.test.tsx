@@ -1,23 +1,10 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 import { useStore } from 'src/hooks/use-session';
 
 import Onboarding from './onboarding';
-import {
-  withInviteMember,
-  withOrg,
-  withRoles,
-  withUpdateOrg,
-  withUpdateUser,
-} from './onboarding.test.config';
+import { withInviteMember, withOrg, withRoles, withUpdateOrg, withUpdateUser } from './onboarding.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -101,16 +88,13 @@ describe('<Onboarding />', () => {
         screen.getByRole('button', { name: 'Go to dashboard' });
       });
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Go to dashboard' }),
-      );
+      await userEvent.click(screen.getByRole('button', { name: 'Go to dashboard' }));
       await waitFor(() => {
         expect(push).toHaveBeenCalled();
       });
 
       await waitFor(() => {
-        const requiresOnboarding =
-          useStore.getState().data?.meta.requiresOnboarding;
+        const requiresOnboarding = useStore.getState().data?.meta.requiresOnboarding;
         expect(requiresOnboarding).toBeFalsy();
       });
     });

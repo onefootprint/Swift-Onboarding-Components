@@ -1,10 +1,4 @@
-import {
-  CollectedKycDataOption,
-  IdDI,
-  OnboardingRequirementKind,
-  UsLegalStatus,
-  VisaKind,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, OnboardingRequirementKind, UsLegalStatus, VisaKind } from '@onefootprint/types';
 
 import getRequestData from './get-request-data';
 
@@ -66,10 +60,7 @@ describe('getRequestData', () => {
       },
       {
         kind: OnboardingRequirementKind.collectKycData,
-        missingAttributes: [
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.address,
-        ],
+        missingAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.address],
         populatedAttributes: [],
         optionalAttributes: [],
         isMet: false,
@@ -103,10 +94,7 @@ describe('getRequestData', () => {
       },
       {
         kind: OnboardingRequirementKind.collectKycData,
-        missingAttributes: [
-          CollectedKycDataOption.dob,
-          CollectedKycDataOption.name,
-        ],
+        missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.name],
         populatedAttributes: [],
         optionalAttributes: [],
         isMet: false,
@@ -149,10 +137,7 @@ describe('getRequestData', () => {
       },
       {
         kind: OnboardingRequirementKind.collectKycData,
-        missingAttributes: [
-          CollectedKycDataOption.dob,
-          CollectedKycDataOption.usLegalStatus,
-        ],
+        missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.usLegalStatus],
         populatedAttributes: [],
         optionalAttributes: [],
         isMet: false,
@@ -209,10 +194,7 @@ describe('getRequestData', () => {
       },
       {
         kind: OnboardingRequirementKind.collectKycData,
-        missingAttributes: [
-          CollectedKycDataOption.address,
-          CollectedKycDataOption.name,
-        ],
+        missingAttributes: [CollectedKycDataOption.address, CollectedKycDataOption.name],
         populatedAttributes: [],
         optionalAttributes: [CollectedKycDataOption.ssn4],
         isMet: false,
@@ -287,10 +269,7 @@ describe('getRequestData', () => {
         },
         {
           kind: OnboardingRequirementKind.collectKycData,
-          missingAttributes: [
-            CollectedKycDataOption.address,
-            CollectedKycDataOption.name,
-          ],
+          missingAttributes: [CollectedKycDataOption.address, CollectedKycDataOption.name],
           populatedAttributes: [],
           optionalAttributes: [CollectedKycDataOption.ssn4],
           isMet: false,
@@ -440,10 +419,7 @@ describe('getRequestData', () => {
       {
         kind: OnboardingRequirementKind.collectKycData,
         missingAttributes: [],
-        populatedAttributes: [
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.ssn4,
-        ],
+        populatedAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
         optionalAttributes: [],
         isMet: true,
       },
@@ -472,10 +448,7 @@ describe('getRequestData', () => {
       {
         kind: OnboardingRequirementKind.collectKycData,
         missingAttributes: [],
-        populatedAttributes: [
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.ssn4,
-        ],
+        populatedAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
         optionalAttributes: [],
         isMet: true,
       },
@@ -505,10 +478,7 @@ describe('getRequestData', () => {
       {
         kind: OnboardingRequirementKind.collectKycData,
         missingAttributes: [],
-        populatedAttributes: [
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.ssn4,
-        ],
+        populatedAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
         optionalAttributes: [],
         isMet: true,
       },

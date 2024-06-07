@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoFaceid16 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoFaceid16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -28,24 +23,8 @@ const IcoFaceid16 = ({
         strokeWidth={1.4}
         strokeLinecap="round"
       />
-      <rect
-        x={5.858}
-        y={5.902}
-        width={0.8}
-        height={0.8}
-        rx={0.4}
-        stroke={theme.color[color]}
-        strokeWidth={0.8}
-      />
-      <rect
-        x={9.258}
-        y={5.902}
-        width={0.8}
-        height={0.8}
-        rx={0.4}
-        stroke={theme.color[color]}
-        strokeWidth={0.8}
-      />
+      <rect x={5.858} y={5.902} width={0.8} height={0.8} rx={0.4} stroke={theme.color[color]} strokeWidth={0.8} />
+      <rect x={9.258} y={5.902} width={0.8} height={0.8} rx={0.4} stroke={theme.color[color]} strokeWidth={0.8} />
     </svg>
   );
 };

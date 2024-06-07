@@ -8,16 +8,10 @@ type ErrorProps = {
   error: unknown;
 };
 
-const Error = ({ error }: ErrorProps) => {
+const ErrorComponent = ({ error }: ErrorProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'notifications' });
 
-  return (
-    <EmptyState
-      description={getErrorMessage(error)}
-      iconComponent={IcoForbid40}
-      title={t('error')}
-    />
-  );
+  return <EmptyState description={getErrorMessage(error)} iconComponent={IcoForbid40} title={t('error')} />;
 };
 
-export default Error;
+export default ErrorComponent;

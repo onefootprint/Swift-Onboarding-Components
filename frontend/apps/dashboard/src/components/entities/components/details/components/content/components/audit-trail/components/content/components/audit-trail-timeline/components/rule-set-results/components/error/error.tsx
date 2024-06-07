@@ -5,10 +5,10 @@ type ErrorProps = {
   errorMessage: string;
 };
 
-const Error = ({ errorMessage }: ErrorProps) => (
+const ErrorComponent = ({ errorMessage }: ErrorProps) => (
   <Box>
     <Text variant="body-3">{errorMessage}</Text>
   </Box>
 );
 
-export default Error;
+export default ErrorComponent;

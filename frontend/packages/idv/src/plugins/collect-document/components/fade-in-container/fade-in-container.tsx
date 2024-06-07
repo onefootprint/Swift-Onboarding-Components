@@ -7,10 +7,7 @@ type FadeInConatinerProps = {
 };
 
 const FadeInContainer = ({ children }: FadeInConatinerProps) => (
-  <Container
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1, transition: { type: 'tween', duration: 0.7 } }}
-  >
+  <Container initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { type: 'tween', duration: 0.7 } }}>
     {children}
   </Container>
 );

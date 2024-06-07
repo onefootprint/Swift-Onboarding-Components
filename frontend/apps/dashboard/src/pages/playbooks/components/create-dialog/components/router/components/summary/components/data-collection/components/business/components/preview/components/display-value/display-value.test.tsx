@@ -12,10 +12,7 @@ type DisplayValueProps = {
   businessInformation: Partial<BusinessInformation>;
 };
 
-const renderDisplayValue = ({
-  field,
-  businessInformation,
-}: DisplayValueProps) => {
+const renderDisplayValue = ({ field, businessInformation }: DisplayValueProps) => {
   customRender(
     <DisplayValue
       field={field as keyof BusinessInformation}

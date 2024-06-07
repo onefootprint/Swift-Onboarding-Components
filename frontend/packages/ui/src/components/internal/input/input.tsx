@@ -67,21 +67,14 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
     };
 
     return (
-      <div
-        className="fp-input-container"
-        data-has-error={hasError}
-        data-size={size}
-        data-disabled={disabled}
-      >
+      <div className="fp-input-container" data-has-error={hasError} data-size={size} data-disabled={disabled}>
         {label && (
           <Label hasError={hasError} size={size} htmlFor={id}>
             {label}
           </Label>
         )}
         <InputContainer width={width}>
-          {prefixComponent && (
-            <PrefixContainer>{prefixComponent}</PrefixContainer>
-          )}
+          {prefixComponent && <PrefixContainer>{prefixComponent}</PrefixContainer>}
           <StyledField
             {...props}
             $sx={sxStyles}
@@ -106,9 +99,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             htmlRef={mask ? ref : undefined}
             data-has-suffix={!!suffixComponent}
           />
-          {suffixComponent && (
-            <SuffixContainer>{suffixComponent}</SuffixContainer>
-          )}
+          {suffixComponent && <SuffixContainer>{suffixComponent}</SuffixContainer>}
         </InputContainer>
         {hint && <Hint hasError={hasError}>{hint}</Hint>}
       </div>

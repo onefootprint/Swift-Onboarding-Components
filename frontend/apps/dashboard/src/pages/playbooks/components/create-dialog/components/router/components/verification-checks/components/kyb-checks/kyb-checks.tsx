@@ -1,12 +1,4 @@
-import {
-  Box,
-  Divider,
-  Radio,
-  Stack,
-  Text,
-  Toggle,
-  Tooltip,
-} from '@onefootprint/ui';
+import { Box, Divider, Radio, Stack, Text, Toggle, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,8 +10,7 @@ export type KybChecksProps = {
 
 const KybChecks = ({ canRunFullKyb }: KybChecksProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.kyb-checks' });
-  const { register, watch, control } =
-    useFormContext<VerificationChecksFormData>();
+  const { register, watch, control } = useFormContext<VerificationChecksFormData>();
   const showKind = Boolean(watch('runKyb'));
 
   return (
@@ -47,19 +38,9 @@ const KybChecks = ({ canRunFullKyb }: KybChecksProps) => {
           <Divider variant="secondary" marginBottom={5} marginTop={5} />
           <Stack gap={4} direction="column">
             <Tooltip disabled={canRunFullKyb} text={t('full.disabled')}>
-              <Radio
-                disabled={!canRunFullKyb}
-                label={t('full.label')}
-                value="full"
-                {...register('kybKind')}
-              />
+              <Radio disabled={!canRunFullKyb} label={t('full.label')} value="full" {...register('kybKind')} />
             </Tooltip>
-            <Radio
-              hint={t('ein.description')}
-              label={t('ein.label')}
-              value="ein"
-              {...register('kybKind')}
-            />
+            <Radio hint={t('ein.description')} label={t('ein.label')} value="ein" {...register('kybKind')} />
           </Stack>
         </Box>
       )}

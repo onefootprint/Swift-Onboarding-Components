@@ -13,16 +13,7 @@ export type IconButtonProps = {
 };
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  (
-    {
-      'aria-label': ariaLabel,
-      children,
-      onClick,
-      disabled,
-      testID,
-    }: IconButtonProps,
-    ref,
-  ) => (
+  ({ 'aria-label': ariaLabel, children, onClick, disabled, testID }: IconButtonProps, ref) => (
     <Container
       aria-label={ariaLabel}
       data-testid={testID}

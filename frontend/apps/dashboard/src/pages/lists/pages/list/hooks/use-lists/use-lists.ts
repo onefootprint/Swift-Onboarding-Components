@@ -17,9 +17,7 @@ const getLists = async (authHeaders: AuthHeaders) => {
 
 const useLists = () => {
   const { authHeaders } = useSession();
-  const listsQuery = useQuery(['lists', authHeaders], () =>
-    getLists(authHeaders),
-  );
+  const listsQuery = useQuery(['lists', authHeaders], () => getLists(authHeaders));
   const { error } = listsQuery;
   const errorMessage = error ? getErrorMessage(error) : undefined;
 

@@ -26,12 +26,7 @@ const useVaultData = () => {
   });
   const usersVaultMutation = useUsersVault();
 
-  const vaultData = ({
-    authToken,
-    data,
-    onSuccess,
-    onError,
-  }: UsersVaultArgs) => {
+  const vaultData = ({ authToken, data, onSuccess, onError }: UsersVaultArgs) => {
     if (!authToken) {
       onError(t('missing-auth-token'));
       logError('Found empty auth token while vaulting data.');
@@ -46,16 +41,12 @@ const useVaultData = () => {
       {
         onSuccess,
         onError: (err: unknown) => {
-          const fieldErrors = (err as AxiosError<UsersVaultError>)?.response
-            ?.data?.error?.message;
+          const fieldErrors = (err as AxiosError<UsersVaultError>)?.response?.data?.error?.message;
           if (fieldErrors && typeof fieldErrors === 'object') {
             onError(fieldErrors);
           } else {
             const errorMessage = getErrorMessage(err);
-            logError(
-              `Form encountered error while vaulting data: ${errorMessage}`,
-              err,
-            );
+            logError(`Form encountered error while vaulting data: ${errorMessage}`, err);
             onError(errorMessage);
           }
         },

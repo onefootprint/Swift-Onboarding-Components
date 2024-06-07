@@ -24,13 +24,7 @@ const SandboxOutcome = () => {
     });
   };
 
-  return (
-    <SandboxOutcomeContainer
-      onSubmit={handleAfterSubmit}
-      config={config}
-      collectTestId={!authToken}
-    />
-  );
+  return <SandboxOutcomeContainer onSubmit={handleAfterSubmit} config={config} collectTestId={!authToken} />;
 };
 
 export default SandboxOutcome;

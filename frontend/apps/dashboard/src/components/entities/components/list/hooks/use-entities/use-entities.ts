@@ -1,10 +1,6 @@
 import type { PaginatedRequestResponse } from '@onefootprint/request';
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  EntityKind,
-  GetEntitiesRequest,
-  GetEntitiesResponse,
-} from '@onefootprint/types';
+import type { EntityKind, GetEntitiesRequest, GetEntitiesResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { useCursorPagination } from 'src/hooks/use-pagination';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -12,16 +8,11 @@ import useSession from 'src/hooks/use-session';
 
 import useFilters from '../../../../hooks/use-filters';
 
-const getEntities = async (
-  authHeaders: AuthHeaders,
-  req: GetEntitiesRequest,
-) => {
+const getEntities = async (authHeaders: AuthHeaders, req: GetEntitiesRequest) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { cursor, page_size, ...filters } = req;
   const data = { pagination: { cursor, page_size }, ...filters };
-  const { data: response } = await request<
-    PaginatedRequestResponse<GetEntitiesResponse>
-  >({
+  const { data: response } = await request<PaginatedRequestResponse<GetEntitiesResponse>>({
     method: 'POST',
     url: '/entities/search',
     headers: authHeaders,
@@ -31,10 +22,7 @@ const getEntities = async (
   return response;
 };
 
-const useEntities = (
-  kind: EntityKind,
-  defaultFilters?: Record<string, unknown>,
-) => {
+const useEntities = (kind: EntityKind, defaultFilters?: Record<string, unknown>) => {
   const { authHeaders, isLive } = useSession();
   const filters = useFilters();
   const { requestParams } = filters;

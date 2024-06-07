@@ -1,10 +1,5 @@
 import type { MotionValue } from 'framer-motion';
-import {
-  motion,
-  useAnimationControls,
-  useMotionValueEvent,
-  useTransform,
-} from 'framer-motion';
+import { motion, useAnimationControls, useMotionValueEvent, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -61,29 +56,15 @@ const IllustrationAppClip = ({ scroll }: IllustrationAppClipProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAppClipVisible]);
 
-  const opacity = useTransform(
-    scroll,
-    [VISIBLE_RANGE.initial, VISIBLE_RANGE.initialMax],
-    ['0%', '100%'],
-  );
+  const opacity = useTransform(scroll, [VISIBLE_RANGE.initial, VISIBLE_RANGE.initialMax], ['0%', '100%']);
 
   return (
     <Container style={{ opacity }}>
       <PhoneContainer>
         <PhoneFrame src="/iphone.png" alt="" width={375} height={812} />
-        <BackgroundPhone
-          src="/kyc/sticky-rail/background.png"
-          alt=""
-          width={1596}
-          height={2496}
-        />
+        <BackgroundPhone src="/kyc/sticky-rail/background.png" alt="" width={1596} height={2496} />
         <AppClipSheetContainer animate={appClipSheetControls}>
-          <AppClipSheet
-            src="/kyc/sticky-rail/app-clip-sheet.png"
-            alt=""
-            width={1717}
-            height={1542}
-          />
+          <AppClipSheet src="/kyc/sticky-rail/app-clip-sheet.png" alt="" width={1717} height={1542} />
         </AppClipSheetContainer>
       </PhoneContainer>
     </Container>

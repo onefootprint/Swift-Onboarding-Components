@@ -21,10 +21,7 @@ import RangeInputs from './components/range-inputs';
 import WeekHeader from './components/week-header';
 import type { DateSelectorSheetProps } from './date-selector-sheet.types';
 import { DirectionChange } from './date-selector-sheet.types';
-import {
-  containerVariants,
-  getMoveVariants,
-} from './date-selector-sheet.utils';
+import { containerVariants, getMoveVariants } from './date-selector-sheet.utils';
 
 const today = startOfToday();
 
@@ -49,16 +46,11 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
     },
     ref,
   ) => {
-    const [movingDirection, setMovingDirection] = useState<
-      DirectionChange | undefined
-    >();
+    const [movingDirection, setMovingDirection] = useState<DirectionChange | undefined>();
     const [visibleMonth, setVisibleMonth] = useState<string>(
       endDate ? format(endDate, 'MMM-yyyy') : format(today, 'MMM-yyyy'),
     );
-    const firstDayCurrentMonth = useMemo(
-      () => parse(visibleMonth, 'MMM-yyyy', new Date()),
-      [visibleMonth],
-    );
+    const firstDayCurrentMonth = useMemo(() => parse(visibleMonth, 'MMM-yyyy', new Date()), [visibleMonth]);
     const days = useMemo(
       () =>
         eachDayOfInterval({
@@ -165,9 +157,7 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
                   initial={movingDirection ? 'initial' : false}
                   animate={movingDirection ? 'animate' : false}
                   exit="exit"
-                  variants={
-                    movingDirection ? getMoveVariants(movingDirection) : {}
-                  }
+                  variants={movingDirection ? getMoveVariants(movingDirection) : {}}
                   transition={{ duration: 0.5 }}
                 >
                   {days.map(day => (
@@ -179,8 +169,7 @@ const DateSelectorSheet = forwardRef<HTMLDivElement, DateSelectorSheetProps>(
                       activeStartDate={startDate}
                       activeEndDate={endDate}
                       disabled={
-                        (disableFutureDates && isAfter(day, today)) ||
-                        (disablePastDates && isBefore(day, today))
+                        (disableFutureDates && isAfter(day, today)) || (disablePastDates && isBefore(day, today))
                       }
                     />
                   ))}

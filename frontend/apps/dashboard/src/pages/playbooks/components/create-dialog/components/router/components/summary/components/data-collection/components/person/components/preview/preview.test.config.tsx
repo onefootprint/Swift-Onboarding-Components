@@ -1,16 +1,8 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type {
-  BusinessInformation,
-  Personal,
-  SummaryFormData,
-} from '@/playbooks/utils/machine/types';
-import {
-  defaultPlaybookValuesKYC,
-  OnboardingTemplate,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import type { BusinessInformation, Personal, SummaryFormData } from '@/playbooks/utils/machine/types';
+import { OnboardingTemplate, PlaybookKind, defaultPlaybookValuesKYC } from '@/playbooks/utils/machine/types';
 
 import Preview from './preview';
 
@@ -22,10 +14,7 @@ export type PreviewWithContextProps = {
   kind?: PlaybookKind;
 };
 
-const PreviewWithContext = ({
-  startingValues,
-  kind,
-}: PreviewWithContextProps) => {
+const PreviewWithContext = ({ startingValues, kind }: PreviewWithContextProps) => {
   const formMethods = useForm<SummaryFormData>({
     defaultValues: {
       ...defaultPlaybookValuesKYC,
@@ -42,7 +31,7 @@ const PreviewWithContext = ({
     <FormProvider {...formMethods}>
       <form>
         <Preview
-          onStartEditing={() => {}}
+          onStartEditing={() => undefined}
           meta={{
             kind: kind || PlaybookKind.Kyc,
             onboardingTemplate: OnboardingTemplate.Custom,

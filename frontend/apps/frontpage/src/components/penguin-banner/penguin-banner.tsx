@@ -1,10 +1,4 @@
-import {
-  Box,
-  Container,
-  createFontStyles,
-  media,
-  Stack,
-} from '@onefootprint/ui';
+import { Box, Container, Stack, createFontStyles, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React from 'react';
@@ -33,20 +27,8 @@ const PenguinBanner = ({
     <StyledContainer>
       <SectionVerticalSpacer />
       <Stack direction="column" gap={11} align="center" justify="center">
-        <Illustration
-          src={imgSrc}
-          height={600}
-          width={900}
-          alt={t(`${section}.alt-img` as ParseKeys<'common'>)}
-        />
-        <Stack
-          direction="column"
-          gap={9}
-          textAlign="center"
-          align="center"
-          justify="center"
-          maxWidth="960px"
-        >
+        <Illustration src={imgSrc} height={600} width={900} alt={t(`${section}.alt-img` as ParseKeys<'common'>)} />
+        <Stack direction="column" gap={9} textAlign="center" align="center" justify="center" maxWidth="960px">
           <Title isDarkTheme={isDarkTheme} tag="h2" maxWidth="720px">
             {t(`${section}.title` as ParseKeys<'common'>)}
           </Title>

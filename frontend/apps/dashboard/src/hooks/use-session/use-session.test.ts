@@ -58,16 +58,12 @@ describe('useSession', () => {
       expect(result.current.isLoggedIn).toBeTruthy();
       // Make sure the user and org are updated
       expect(result.current.data.user).toBeDefined();
-      expect(result.current.data.user?.id).toEqual(
-        'orguser_LHX6Nbt32W2gbDrXacVyU',
-      );
+      expect(result.current.data.user?.id).toEqual('orguser_LHX6Nbt32W2gbDrXacVyU');
       expect(result.current.data.user?.email).toEqual('hi@onefootprint.com');
       expect(result.current.data.user?.firstName).toEqual('Piip');
       expect(result.current.data.user?.lastName).toEqual('Penguin');
       expect(result.current.data.user?.isAssumedSession).toEqual(false);
-      expect(result.current.data.user?.scopes[0].kind).toEqual(
-        RoleScopeKind.admin,
-      );
+      expect(result.current.data.user?.scopes[0].kind).toEqual(RoleScopeKind.admin);
       expect(result.current.data.org).toEqual({
         isLive: false,
         isSandboxRestricted: false,
@@ -151,12 +147,8 @@ describe('useSession', () => {
         await result.current.logIn(loginPayload);
       });
 
-      expect(result.current.dangerouslyCastedData.user.firstName).toEqual(
-        'Piip',
-      );
-      expect(result.current.dangerouslyCastedData.user.lastName).toEqual(
-        'Penguin',
-      );
+      expect(result.current.dangerouslyCastedData.user.firstName).toEqual('Piip');
+      expect(result.current.dangerouslyCastedData.user.lastName).toEqual('Penguin');
 
       act(() => {
         result.current.updateUserName({
@@ -164,12 +156,8 @@ describe('useSession', () => {
           lastName: 'Ipsum',
         });
       });
-      expect(result.current.dangerouslyCastedData.user.firstName).toEqual(
-        'Lorem',
-      );
-      expect(result.current.dangerouslyCastedData.user.lastName).toEqual(
-        'Ipsum',
-      );
+      expect(result.current.dangerouslyCastedData.user.firstName).toEqual('Lorem');
+      expect(result.current.dangerouslyCastedData.user.lastName).toEqual('Ipsum');
     });
   });
 });

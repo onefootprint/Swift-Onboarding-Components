@@ -1,22 +1,9 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import type { SelectOption } from '@onefootprint/ui';
-import {
-  Dialog,
-  Grid,
-  LinkButton,
-  Select,
-  Stack,
-  Text,
-  TextInput,
-} from '@onefootprint/ui';
+import { Dialog, Grid, LinkButton, Select, Stack, Text, TextInput } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import React from 'react';
-import {
-  Controller,
-  FormProvider,
-  useFieldArray,
-  useForm,
-} from 'react-hook-form';
+import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -45,13 +32,7 @@ const getEmailRequired = (t: T) => ({
   required: { value: true, message: t('email-required') },
 });
 
-const OverlayInvite = ({
-  defaultRole,
-  isOpen,
-  onClose,
-  onSubmit,
-  roles,
-}: OverlayInviteProps) => {
+const OverlayInvite = ({ defaultRole, isOpen, onClose, onSubmit, roles }: OverlayInviteProps) => {
   const { t } = useTranslation('common');
 
   const formMethods = useForm({
@@ -106,10 +87,7 @@ const OverlayInvite = ({
     >
       <Stack testID="members-roles-data" flexDirection="column" gap={2}>
         <FormProvider {...formMethods}>
-          <VerticalFlexForm
-            id="members-invite-form"
-            onSubmit={handleSubmit(handleAfterSubmit)}
-          >
+          <VerticalFlexForm id="members-invite-form" onSubmit={handleSubmit(handleAfterSubmit)}>
             {fields.map((field, index) => {
               const isFirstIndex = index === 0;
               return (
@@ -118,10 +96,7 @@ const OverlayInvite = ({
                     type="email"
                     label={isFirstIndex ? t('auth.email-address') : undefined}
                     placeholder={t('email-placeholder')}
-                    {...register(
-                      `invitations.${index}.email`,
-                      isFirstIndex ? getEmailRequired(t) : undefined,
-                    )}
+                    {...register(`invitations.${index}.email`, isFirstIndex ? getEmailRequired(t) : undefined)}
                   />
                   <Controller
                     control={control}
@@ -130,11 +105,7 @@ const OverlayInvite = ({
                     render={select => (
                       <Select
                         hasError={!!select.fieldState.error}
-                        hint={
-                          select.fieldState.error
-                            ? t('role-required')
-                            : undefined
-                        }
+                        hint={select.fieldState.error ? t('role-required') : undefined}
                         label={isFirstIndex ? t('role') : undefined}
                         onBlur={select.field.onBlur}
                         onChange={select.field.onChange}
@@ -149,12 +120,7 @@ const OverlayInvite = ({
               );
             })}
           </VerticalFlexForm>
-          <LinkButton
-            iconComponent={IcoPlusSmall16}
-            iconPosition="left"
-            onClick={handleAddMore}
-            $marginTop={5}
-          >
+          <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={handleAddMore} $marginTop={5}>
             {t('add-more')}
           </LinkButton>
         </FormProvider>

@@ -6,7 +6,7 @@ import useRoles from 'src/hooks/use-roles';
 
 import Header from '../header';
 import Content from './components/content';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 
 export type InviteProps = {
@@ -34,9 +34,7 @@ const Invite = ({ onBack, onComplete }: InviteProps) => {
           roles={rolesQuery.options}
         />
       )}
-      {(rolesQuery.error || orgQuery.error) && (
-        <Error error={rolesQuery.error || orgQuery.error} />
-      )}
+      {(rolesQuery.error || orgQuery.error) && <ErrorComponent error={rolesQuery.error || orgQuery.error} />}
     </>
   );
 };

@@ -26,9 +26,7 @@ const ConfirmContinueOnDesktop = () => {
 
   return (
     <>
-      <NavigationHeader
-        leftButton={{ variant: 'back', onBack: handleMobile }}
-      />
+      <NavigationHeader leftButton={{ variant: 'back', onBack: handleMobile }} />
       <Grid.Container gap={7} textAlign="center">
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <InlineAlert variant="warning" textAlign="left">

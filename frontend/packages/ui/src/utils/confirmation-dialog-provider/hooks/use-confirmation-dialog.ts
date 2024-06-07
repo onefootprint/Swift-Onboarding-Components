@@ -15,8 +15,7 @@ export type ConfirmationDialog = {
 };
 
 const useLocalConfirmationDialog = () => {
-  const [confirmationDialog, setConfirmationDialog] =
-    useState<ConfirmationDialog | null>(null);
+  const [confirmationDialog, setConfirmationDialog] = useState<ConfirmationDialog | null>(null);
 
   const open = (nextConfirmationDialog: ConfirmationDialog) => {
     setConfirmationDialog(nextConfirmationDialog);

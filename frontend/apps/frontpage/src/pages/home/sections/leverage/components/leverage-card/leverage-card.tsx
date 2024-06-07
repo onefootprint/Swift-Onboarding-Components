@@ -6,7 +6,7 @@ import {
   IcoSparkles24,
   IcoUserCircle24,
 } from '@onefootprint/icons';
-import { Box, createFontStyles, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -73,18 +73,10 @@ const LeverageCard = ({ variant, videoSrc, $inverted }: LeverageCardProps) => {
               {t(`${variant}.subtitle` as unknown as ParseKeys<'common'>)}
             </Text>
           </Stack>
-          <Stack
-            direction="column"
-            gap={3}
-            paddingTop={2}
-            width="100%"
-            tag="ul"
-          >
+          <Stack direction="column" gap={3} paddingTop={2} width="100%" tag="ul">
             {bullets.map(bullet => (
               <Bullet key={bullet.translationKey} icon={bullet.icon}>
-                {t(
-                  `${variant}.${bullet.translationKey}` as unknown as ParseKeys<'common'>,
-                )}
+                {t(`${variant}.${bullet.translationKey}` as unknown as ParseKeys<'common'>)}
               </Bullet>
             ))}
           </Stack>
@@ -94,8 +86,7 @@ const LeverageCard = ({ variant, videoSrc, $inverted }: LeverageCardProps) => {
   );
 };
 
-const getGridArea = ($inverted: boolean | undefined) =>
-  $inverted ? 'text video' : 'video text';
+const getGridArea = ($inverted: boolean | undefined) => ($inverted ? 'text video' : 'video text');
 
 const CardContainer = styled(Box)<{ $inverted?: boolean }>`
   ${({ theme, $inverted }) => {
@@ -132,9 +123,7 @@ const Chip = styled(Box)<{ variant: 'app-clip' | 'passkeys' }>`
   ${({ theme, variant }) => css`
     ${createFontStyles('label-2')}
     color: ${variant === 'app-clip' ? theme.color.info : theme.color.success};
-    border-color: ${variant === 'app-clip'
-      ? theme.color.info
-      : theme.color.success};
+    border-color: ${variant === 'app-clip' ? theme.color.info : theme.color.success};
     width: fit-content;
   `}
 `;

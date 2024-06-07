@@ -18,11 +18,9 @@ const WaitForComponentsSdk = ({ onDone }: WaitForComponentsProps) => {
 
   useEffectOnceStrict(() => {
     if (!componentsSdkContext) {
-      Logger.error(
-        'Reached WaitForComponentsSdk while componentsSdkContext is null',
-      );
+      Logger.error('Reached WaitForComponentsSdk while componentsSdkContext is null');
       onDone();
-      return () => {};
+      return () => undefined;
     }
 
     // First, register a listener to wait for the components SDK to tell us it is done

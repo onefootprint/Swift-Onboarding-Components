@@ -21,12 +21,7 @@ const EncryptedCell = ({ prefix }: EncryptedCellProps) => (
     <Grid.Item gridArea="icon" center>
       <IcoLock16 />
     </Grid.Item>
-    <Grid.Item
-      fontStyle="body-3"
-      color="primary"
-      gridArea="value"
-      justify="right"
-    >
+    <Grid.Item fontStyle="body-3" color="primary" gridArea="value" justify="right">
       {`${prefix ? `${prefix}` : '••'}••••••••••`}
     </Grid.Item>
   </Container>

@@ -40,10 +40,7 @@ export enum CollectedDocumentDataOption {
   documentAndSelfie = 'document_and_selfie',
 }
 
-export const documentCdoFor = (
-  collectDocument: boolean,
-  collectSelfie: boolean,
-) => {
+export const documentCdoFor = (collectDocument: boolean, collectSelfie: boolean) => {
   if (collectDocument && collectSelfie) {
     return CollectedDocumentDataOption.documentAndSelfie;
   }
@@ -70,26 +67,15 @@ export const CollectedKybDataOptionToRequiredAttributes: Record<
   [CollectedKybDataOption.website]: [BusinessDI.website],
   [CollectedKybDataOption.corporationType]: [BusinessDI.corporationType],
   [CollectedKybDataOption.beneficialOwners]: [BusinessDI.beneficialOwners],
-  [CollectedKybDataOption.kycedBeneficialOwners]: [
-    BusinessDI.kycedBeneficialOwners,
-  ],
+  [CollectedKybDataOption.kycedBeneficialOwners]: [BusinessDI.kycedBeneficialOwners],
 };
 
-export const CollectedKycDataOptionToRequiredAttributes: Record<
-  CollectedKycDataOption,
-  IdDI[]
-> = {
+export const CollectedKycDataOptionToRequiredAttributes: Record<CollectedKycDataOption, IdDI[]> = {
   [CollectedKycDataOption.name]: [IdDI.firstName, IdDI.lastName],
   [CollectedKycDataOption.dob]: [IdDI.dob],
   [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
   [CollectedKycDataOption.ssn9]: [IdDI.ssn9],
-  [CollectedKycDataOption.address]: [
-    IdDI.addressLine1,
-    IdDI.city,
-    IdDI.state,
-    IdDI.zip,
-    IdDI.country,
-  ],
+  [CollectedKycDataOption.address]: [IdDI.addressLine1, IdDI.city, IdDI.state, IdDI.zip, IdDI.country],
   [CollectedKycDataOption.email]: [IdDI.email],
   [CollectedKycDataOption.phoneNumber]: [IdDI.phoneNumber],
   [CollectedKycDataOption.nationality]: [IdDI.nationality],

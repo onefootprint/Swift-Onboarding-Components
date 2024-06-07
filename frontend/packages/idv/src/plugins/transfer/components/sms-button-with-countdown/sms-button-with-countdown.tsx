@@ -15,10 +15,7 @@ export type SmsButtonWithCountdownProps = {
   url?: string;
 };
 
-const SmsButtonWithCountdown = ({
-  url,
-  authToken,
-}: SmsButtonWithCountdownProps) => {
+const SmsButtonWithCountdown = ({ url, authToken }: SmsButtonWithCountdownProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'transfer.components.sms-button-with-countdown',
   });

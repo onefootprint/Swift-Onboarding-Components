@@ -1,14 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoCheckSmall16, IcoInfo16 } from '@onefootprint/icons';
-import {
-  Box,
-  createFontStyles,
-  Grid,
-  media,
-  Stack,
-  Text,
-  Tooltip,
-} from '@onefootprint/ui';
+import { Box, Grid, Stack, Text, Tooltip, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -21,8 +13,7 @@ const SupportedIdDocuments = () => {
     keyPrefix: 'pages.supported-id-documents',
   });
 
-  const columnDimensions =
-    'minmax(116px, 2fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)';
+  const columnDimensions = 'minmax(116px, 2fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)';
 
   const headerOptions = [
     {
@@ -46,11 +37,7 @@ const SupportedIdDocuments = () => {
 
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/supported-id-documents"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/supported-id-documents" />
       <Container>
         <Grid.Container gap={5} marginBottom={10} textAlign="center">
           <Text variant="display-2" tag="h1">
@@ -78,11 +65,7 @@ const SupportedIdDocuments = () => {
               tag="tr"
             >
               {headerOptions.map(({ key, value, tooltip }) => (
-                <HeaderElement
-                  key={key}
-                  data-align={value === 'country' ? 'left' : undefined}
-                  tag="th"
-                >
+                <HeaderElement key={key} data-align={value === 'country' ? 'left' : undefined} tag="th">
                   {value}
                   {tooltip && (
                     <Tooltip text={tooltip} position="bottom">
@@ -97,34 +80,21 @@ const SupportedIdDocuments = () => {
           </thead>
           <tbody>
             {COUNTRIES.map(({ label, passport, idCard, driversLicense }) => (
-              <TableRow
-                as="tr"
-                height="40px"
-                $columns={columnDimensions}
-                key={label}
-              >
+              <TableRow as="tr" height="40px" $columns={columnDimensions} key={label}>
                 <TableCell data-align="left" tag="th">
                   <Text variant="body-3" textAlign="left">
                     {label}
                   </Text>
                 </TableCell>
-                <TableCell tag="td">
-                  {passport && <IcoCheckSmall16 />}
-                </TableCell>
+                <TableCell tag="td">{passport && <IcoCheckSmall16 />}</TableCell>
                 <TableCell tag="td">{idCard && <IcoCheckSmall16 />}</TableCell>
-                <TableCell tag="td">
-                  {driversLicense ? <IcoCheckSmall16 /> : null}
-                </TableCell>
+                <TableCell tag="td">{driversLicense ? <IcoCheckSmall16 /> : null}</TableCell>
               </TableRow>
             ))}
           </tbody>
         </Grid.Container>
 
-        <ContactUsBanner
-          title={t('contact.title')}
-          subtitle={t('contact.subtitle')}
-          cta={t('contact.cta')}
-        />
+        <ContactUsBanner title={t('contact.title')} subtitle={t('contact.subtitle')} cta={t('contact.cta')} />
       </Container>
     </>
   );

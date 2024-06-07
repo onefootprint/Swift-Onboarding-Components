@@ -5,9 +5,7 @@ import parse from '../parse';
 const AUTH_HEADER = 'x-fp-authorization';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const getD2PStatus = async (
-  authToken: string,
-): Promise<FootprintAppearance> => {
+const getD2PStatus = async (authToken: string): Promise<FootprintAppearance> => {
   const response = await fetch(`${API_BASE_URL}/hosted/onboarding/d2p/status`, {
     method: 'GET',
     headers: {
@@ -30,9 +28,7 @@ const getD2PStatus = async (
   };
 };
 
-const useStyleParams = async (
-  authToken: string = '',
-): Promise<FootprintAppearance | null> => {
+const useStyleParams = async (authToken: string = ''): Promise<FootprintAppearance | null> => {
   if (!authToken) return null;
 
   try {

@@ -22,11 +22,7 @@ type Entry = {
   liveness?: Liveness;
 };
 
-const useEntries = (
-  entity: Entity,
-  livenessData: Liveness[],
-  options: MultiSelectOption[],
-) => {
+const useEntries = (entity: Entity, livenessData: Liveness[], options: MultiSelectOption[]) => {
   const {
     data: businessData,
     isLoading: businessCoordLoading,
@@ -46,16 +42,10 @@ const useEntries = (
 
     livenessData
       .filter(liveness => {
-        if (
-          !selectedOptionsSet.has(MultiSelectOptionValue.onboarding) &&
-          liveness.scope === IdentifyScope.onboarding
-        ) {
+        if (!selectedOptionsSet.has(MultiSelectOptionValue.onboarding) && liveness.scope === IdentifyScope.onboarding) {
           return false;
         }
-        if (
-          !selectedOptionsSet.has(MultiSelectOptionValue.auth) &&
-          liveness.scope === IdentifyScope.auth
-        ) {
+        if (!selectedOptionsSet.has(MultiSelectOptionValue.auth) && liveness.scope === IdentifyScope.auth) {
           return false;
         }
         return true;
@@ -78,16 +68,13 @@ const useEntries = (
                 id,
                 lat,
                 lng,
-                getIcon: (color?: Color) =>
-                  getIconForLivenessEvent(liveness, color, 'small'),
+                getIcon: (color?: Color) => getIconForLivenessEvent(liveness, color, 'small'),
               }
             : undefined,
         };
       });
 
-    const isBusinessAddressSelected = selectedOptionsSet.has(
-      MultiSelectOptionValue.businessAddress,
-    );
+    const isBusinessAddressSelected = selectedOptionsSet.has(MultiSelectOptionValue.businessAddress);
     if (isBusinessAddressSelected) {
       const { lat: businessLat, lng: businessLng } = businessData || {};
       const hasCoords = businessLat !== undefined && businessLng !== undefined;
@@ -95,44 +82,34 @@ const useEntries = (
       innerEntries[id] = {
         id,
         type: MultiSelectOptionValue.businessAddress,
-        coordinates: hasCoords
-          ? { lat: businessLat, lng: businessLng }
-          : undefined,
+        coordinates: hasCoords ? { lat: businessLat, lng: businessLng } : undefined,
         cardIsLoading: businessCoordLoading && !businessError,
         marker: hasCoords
           ? {
               id,
               lat: businessLat,
               lng: businessLng,
-              getIcon: (color?: Color) =>
-                getIconForAddress(AddressType.business, color, 'small'),
+              getIcon: (color?: Color) => getIconForAddress(AddressType.business, color, 'small'),
             }
           : undefined,
       };
     }
-    const isResidentialAddressSelected = selectedOptionsSet.has(
-      MultiSelectOptionValue.residentialAddress,
-    );
+    const isResidentialAddressSelected = selectedOptionsSet.has(MultiSelectOptionValue.residentialAddress);
     if (isResidentialAddressSelected) {
-      const { lat: residentialLat, lng: residentialLng } =
-        residentialData || {};
-      const hasCoords =
-        residentialLat !== undefined && residentialLng !== undefined;
+      const { lat: residentialLat, lng: residentialLng } = residentialData || {};
+      const hasCoords = residentialLat !== undefined && residentialLng !== undefined;
       const id = 'residential';
       innerEntries[id] = {
         id,
         type: MultiSelectOptionValue.residentialAddress,
-        coordinates: hasCoords
-          ? { lat: residentialLat, lng: residentialLng }
-          : undefined,
+        coordinates: hasCoords ? { lat: residentialLat, lng: residentialLng } : undefined,
         cardIsLoading: residentialCoordLoading && !residentialError,
         marker: hasCoords
           ? {
               id,
               lat: residentialLat,
               lng: residentialLng,
-              getIcon: (color?: Color) =>
-                getIconForAddress(AddressType.residential, color, 'small'),
+              getIcon: (color?: Color) => getIconForAddress(AddressType.residential, color, 'small'),
             }
           : undefined,
       };
@@ -152,15 +129,11 @@ const useEntries = (
 
   const getDefaultSelectedId = useCallback(() => {
     // Find the first entry with coordinates and select that by default
-    const entryWithCoords = Object.values(entries).find(
-      entry => entry.coordinates !== undefined,
-    );
+    const entryWithCoords = Object.values(entries).find(entry => entry.coordinates !== undefined);
     return entryWithCoords ? entryWithCoords.id : null;
   }, [entries]);
 
-  const [selectedId, setSelectedId] = useState<string | null>(
-    getDefaultSelectedId(),
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(getDefaultSelectedId());
   const onSelectedIdChange = (id: string) => {
     if (selectedId !== id) {
       setSelectedId(id);
@@ -174,9 +147,7 @@ const useEntries = (
     }
   }, [getDefaultSelectedId, entries, selectedId]);
 
-  const selectedCoords = selectedId
-    ? entries[selectedId]?.coordinates
-    : undefined;
+  const selectedCoords = selectedId ? entries[selectedId]?.coordinates : undefined;
 
   return { entries, selectedCoords, selectedId, onSelectedIdChange };
 };

@@ -1,20 +1,13 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request from '@onefootprint/request';
-import type {
-  UpdateAnnotationRequest,
-  UpdateAnnotationResponse,
-} from '@onefootprint/types';
+import type { UpdateAnnotationRequest, UpdateAnnotationResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
 import useEntityId from './use-entity-id';
 
-const updateAnnotation = async (
-  authHeaders: AuthHeaders,
-  payload: UpdateAnnotationRequest,
-  id: string,
-) => {
+const updateAnnotation = async (authHeaders: AuthHeaders, payload: UpdateAnnotationRequest, id: string) => {
   const { annotationId, isPinned } = payload;
   const response = await request<UpdateAnnotationResponse>({
     headers: authHeaders,
@@ -35,8 +28,7 @@ const useCurrentEntityUpdateAnnotation = () => {
   const id = useEntityId();
 
   return useMutation(
-    (updateAnnotationRequest: UpdateAnnotationRequest) =>
-      updateAnnotation(authHeaders, updateAnnotationRequest, id),
+    (updateAnnotationRequest: UpdateAnnotationRequest) => updateAnnotation(authHeaders, updateAnnotationRequest, id),
     {
       onSuccess: () => {
         queryClient.refetchQueries();

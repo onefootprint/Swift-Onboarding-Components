@@ -1,8 +1,6 @@
 import type { BusinessOwnerDecryptedData } from '../../content.types';
 
-const isVaultDataBusinessOwner = (
-  data: unknown,
-): data is BusinessOwnerDecryptedData[] => {
+const isVaultDataBusinessOwner = (data: unknown): data is BusinessOwnerDecryptedData[] => {
   if (!Array.isArray(data)) {
     return false;
   }

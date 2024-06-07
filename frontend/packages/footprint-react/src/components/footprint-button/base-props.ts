@@ -5,18 +5,11 @@ import type {
 } from '@onefootprint/footprint-js';
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
 
-import type {
-  AuthConditional,
-  BaseSupportedProps,
-  UserDataEmailAndPhone,
-  VerifyConditional,
-} from './types';
+import type { AuthConditional, BaseSupportedProps, UserDataEmailAndPhone, VerifyConditional } from './types';
 import { getVariant } from './utils';
 
 export const getUserEmailAndPhone = (
-  p:
-    | Omit<FootprintAuthProps, AuthConditional>
-    | FootprintUpdateLoginMethodsProps,
+  p: Omit<FootprintAuthProps, AuthConditional> | FootprintUpdateLoginMethodsProps,
 ): UserDataEmailAndPhone | undefined =>
   p.userData
     ? {

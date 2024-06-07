@@ -1,7 +1,7 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import type { AmlHitMedia } from '@onefootprint/types';
-import { createFontStyles, LinkButton, Stack, Text } from '@onefootprint/ui';
+import { LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,40 +40,19 @@ const HitsMedia = ({ mediaList }: HitsMediaProps) => {
         {mediaList.map((media: AmlHitMedia, index: number) => {
           const { date, title, snippet, url } = media;
           return (
-            <MediaItem
-              key={JSON.stringify(media)}
-              ref={index === 0 ? firstMediaRef : null}
-              role="group"
-            >
-              {renderMediaRow(
-                t('date'),
-                date ? formatDateWithShortMonth(new Date(date)) : '-',
-              )}
+            <MediaItem key={JSON.stringify(media)} ref={index === 0 ? firstMediaRef : null} role="group">
+              {renderMediaRow(t('date'), date ? formatDateWithShortMonth(new Date(date)) : '-')}
               {renderMediaRow(t('title'), title ?? '-')}
               {snippet && (
                 <Stack direction="column" gap={3}>
-                  <Text
-                    variant="body-3"
-                    color="tertiary"
-                    textAlign="left"
-                    width="fit-content"
-                  >
+                  <Text variant="body-3" color="tertiary" textAlign="left" width="fit-content">
                     {t('snippet')}
                   </Text>
-                  <TruncatedText
-                    text={snippet}
-                    maxTextViewHeight={215}
-                    textFontVariant="body-3"
-                  />
+                  <TruncatedText text={snippet} maxTextViewHeight={215} textFontVariant="body-3" />
                 </Stack>
               )}
               {url && (
-                <LinkButton
-                  iconComponent={IcoArrowRightSmall16}
-                  iconPosition="right"
-                  href={url}
-                  target="_blank"
-                >
+                <LinkButton iconComponent={IcoArrowRightSmall16} iconPosition="right" href={url} target="_blank">
                   {t('url')}
                 </LinkButton>
               )}

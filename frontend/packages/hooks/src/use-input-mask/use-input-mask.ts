@@ -69,7 +69,6 @@ const masks: Record<SupportedLocale, Mask> = {
   },
 };
 
-export const useInputMask = (bcp47Code: SupportedLocale = 'en-US'): Mask =>
-  masks[bcp47Code] || masks['en-US'];
+export const useInputMask = (bcp47Code: SupportedLocale = 'en-US'): Mask => masks[bcp47Code] || masks['en-US'];
 
 export default useInputMask;

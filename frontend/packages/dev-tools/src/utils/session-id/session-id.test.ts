@@ -17,10 +17,7 @@ describe('getSessionId', () => {
 
     it('should store session id in sessionStorage', () => {
       const sessionId = getSessionId();
-      expect(global.sessionStorage.setItem).toHaveBeenCalledWith(
-        'fp-session-id',
-        sessionId,
-      );
+      expect(global.sessionStorage.setItem).toHaveBeenCalledWith('fp-session-id', sessionId);
     });
 
     it('should retrieve session id from sessionStorage', () => {

@@ -11,16 +11,11 @@ const FeedbackIcon = ({ variant }: FeedbackIconProps) => (
   <Container variant={variant}>
     {variant === 'success' && <SuccessCheck size={24} animationStart />}
     {variant === 'error' && <IcoWarning16 color="error" />}
-    {variant === 'loading' && (
-      <AnimatedLoadingSpinner size={24} animationStart />
-    )}
+    {variant === 'loading' && <AnimatedLoadingSpinner size={24} animationStart />}
   </Container>
 );
 
-const getBackgroundColor = (
-  variant: FeedbackIconProps['variant'],
-  theme: Theme,
-) => {
+const getBackgroundColor = (variant: FeedbackIconProps['variant'], theme: Theme) => {
   switch (variant) {
     case 'success':
       return theme.backgroundColor.success;

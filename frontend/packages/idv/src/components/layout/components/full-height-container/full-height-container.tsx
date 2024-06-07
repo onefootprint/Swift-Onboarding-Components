@@ -17,25 +17,18 @@ type FullHeightContainerProps = HTMLAttributes<HTMLDivElement> & {
 // See: https://bugs.webkit.org/show_bug.cgi?id=141832#c5
 // Apple engineers replied saying 'it is a feature, not a bug'.
 // This component resizes itself to the actual height of the screen.
-const FullHeightContainer = forwardRef<
-  HTMLDivElement,
-  FullHeightContainerProps
->(({ variant = 'modal', id, hasBorderRadius, children }, ref) => {
-  const viewportHeight = use100vh();
-  const height = viewportHeight ? `${viewportHeight}px` : '100vh';
+const FullHeightContainer = forwardRef<HTMLDivElement, FullHeightContainerProps>(
+  ({ variant = 'modal', id, hasBorderRadius, children }, ref) => {
+    const viewportHeight = use100vh();
+    const height = viewportHeight ? `${viewportHeight}px` : '100vh';
 
-  return (
-    <Container
-      id={id}
-      ref={ref}
-      $hasBorderRadius={!!hasBorderRadius}
-      height={height}
-      data-variant={variant}
-    >
-      {children}
-    </Container>
-  );
-});
+    return (
+      <Container id={id} ref={ref} $hasBorderRadius={!!hasBorderRadius} height={height} data-variant={variant}>
+        {children}
+      </Container>
+    );
+  },
+);
 
 const Container = styled.div<{ $hasBorderRadius: boolean; height: string }>`
   ${({ theme, height }) => css`

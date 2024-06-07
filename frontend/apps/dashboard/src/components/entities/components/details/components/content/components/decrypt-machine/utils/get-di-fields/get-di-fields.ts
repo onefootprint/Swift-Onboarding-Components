@@ -2,9 +2,7 @@ import { type DataIdentifier } from '@onefootprint/types';
 import flat from 'flat';
 import get from 'lodash/get';
 
-const getDiFields = (
-  fields: Partial<Record<DataIdentifier, boolean | null | undefined>>,
-) => {
+const getDiFields = (fields: Partial<Record<DataIdentifier, boolean | null | undefined>>) => {
   const result: DataIdentifier[] = [];
   const flatFieldsArray = Object.keys(flat(fields));
   flatFieldsArray.forEach(value => {

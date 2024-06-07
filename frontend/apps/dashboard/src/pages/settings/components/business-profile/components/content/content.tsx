@@ -39,9 +39,7 @@ const Content = ({ organization }: ContentProps) => {
           <Text variant="label-2">{t('title')}</Text>
           <Stack direction="row" inline gap={2} align="center">
             <Text variant="body-3">{t('subtitle')}</Text>
-            <LinkButton onClick={handleHelpDialogOpen}>
-              {t('more-details')}
-            </LinkButton>
+            <LinkButton onClick={handleHelpDialogOpen}>{t('more-details')}</LinkButton>
             <HelpDialog open={helpDialogOpen} onClose={handleHelpDialogClose} />
           </Stack>
         </Stack>

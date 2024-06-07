@@ -69,10 +69,7 @@ type AssumePartnerRoleResponse = {
  * @param {string} partnerTenantId - The partner tenant ID.
  * @return {Promise<AssumePartnerRoleResponse>} A promise that resolves with the response after posting the authentication.
  */
-const postPartnerAuthAssumeRole = async (
-  token: string,
-  partnerTenantId: string,
-) =>
+const postPartnerAuthAssumeRole = async (token: string, partnerTenantId: string) =>
   token && partnerTenantId
     ? baseFetch<AssumePartnerRoleResponse>('/partner/auth/assume_role', {
         headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },

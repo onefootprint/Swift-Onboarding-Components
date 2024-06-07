@@ -6,8 +6,6 @@ type DeviceSignalsProps = {
   fpAuthToken: string;
 };
 
-const DeviceSignals = ({ fpAuthToken }: DeviceSignalsProps) => (
-  <Stytch fpAuthToken={fpAuthToken} />
-);
+const DeviceSignals = ({ fpAuthToken }: DeviceSignalsProps) => <Stytch fpAuthToken={fpAuthToken} />;
 
 export default DeviceSignals;

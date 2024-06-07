@@ -10,18 +10,8 @@ const IllustrationOnboard = () => {
   return (
     <Container>
       <PhoneContainer width={PHONE_WIDTH} height={PHONE_HEIGHT}>
-        <PhoneFrameImage
-          src="/iphone.png"
-          alt=""
-          width={PHONE_WIDTH}
-          height={PHONE_HEIGHT}
-        />
-        <Screen
-          src="/kyc/sticky-rail/welcome-back.png"
-          width={222}
-          height={490}
-          alt=""
-        />
+        <PhoneFrameImage src="/iphone.png" alt="" width={PHONE_WIDTH} height={PHONE_HEIGHT} />
+        <Screen src="/kyc/sticky-rail/welcome-back.png" width={222} height={490} alt="" />
       </PhoneContainer>
       <CirclesContainer>
         <Circle diameter={340}>

@@ -1,5 +1,5 @@
 import { IcoChevronRight16 } from '@onefootprint/icons';
-import { Box, CodeInline, createFontStyles, Text } from '@onefootprint/ui';
+import { Box, CodeInline, Text, createFontStyles } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
@@ -21,13 +21,7 @@ export type PropertyProps = {
 // One day we could have better logic  here
 const plural = (v: string) => `${v}s`;
 
-const ObjectProperties = ({
-  isRequired,
-  title,
-  schema,
-  level = 0,
-  isArray = false,
-}: PropertyProps) => {
+const ObjectProperties = ({ isRequired, title, schema, level = 0, isArray = false }: PropertyProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const [expanded, setExpanded] = useState(false);
 
@@ -61,15 +55,7 @@ const ObjectProperties = ({
   const hasDescription = schema.description || schema.enum;
 
   if (schema.items) {
-    return (
-      <ObjectProperties
-        schema={schema.items}
-        title={title}
-        isRequired={isRequired}
-        level={level}
-        isArray
-      />
-    );
+    return <ObjectProperties schema={schema.items} title={title} isRequired={isRequired} level={level} isArray />;
   }
 
   return (
@@ -77,11 +63,7 @@ const ObjectProperties = ({
       <TitleContainer>
         <Header>
           <Button disabled={!schema.properties} onClick={handleToggle}>
-            <Connector
-              aria-hidden
-              data-has-children={!!schema.properties}
-              data-level={level}
-            />
+            <Connector aria-hidden data-has-children={!!schema.properties} data-level={level} />
             {schema.properties && (
               <IconBounds expanded={expanded}>
                 <IcoChevronRight16 color="tertiary" />
@@ -98,9 +80,7 @@ const ObjectProperties = ({
         </Header>
         {hasDescription && (
           <Content data-level={level}>
-            {schema.description && (
-              <Description>{schema.description}</Description>
-            )}
+            {schema.description && <Description>{schema.description}</Description>}
             {schema.enum && <Enum enums={schema.enum} />}
           </Content>
         )}

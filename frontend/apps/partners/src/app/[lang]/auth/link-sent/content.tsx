@@ -20,9 +20,7 @@ const MagicLinkSentContent = ({ email }: { email: string }) => {
         <Text variant="label-1" color="primary">
           {t('magic-link-sent')}
         </Text>
-        <Text variant="body-2">
-          {t('magic-link-sent-instructions', { email })}
-        </Text>
+        <Text variant="body-2">{t('magic-link-sent-instructions', { email })}</Text>
         <Button onClick={() => router.push(DEFAULT_PUBLIC_ROUTE)} fullWidth>
           {t('back')}
         </Button>

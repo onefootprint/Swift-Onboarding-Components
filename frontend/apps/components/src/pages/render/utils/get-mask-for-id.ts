@@ -16,7 +16,7 @@ const getCardDIField = (id: DataIdentifier): CardDIField | null => {
   try {
     const [, , ...field] = id.split('.');
     return field.join('.') as CardDIField;
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
 };

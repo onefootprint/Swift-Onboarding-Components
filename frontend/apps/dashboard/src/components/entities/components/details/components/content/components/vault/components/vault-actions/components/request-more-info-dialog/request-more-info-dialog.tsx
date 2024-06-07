@@ -1,8 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import type {
-  DocumentRequestConfig,
-  WorkflowRequestConfig,
-} from '@onefootprint/types';
+import type { DocumentRequestConfig, WorkflowRequestConfig } from '@onefootprint/types';
 import { DocumentRequestKind, TriggerKind } from '@onefootprint/types';
 import type { DialogButton } from '@onefootprint/ui';
 import { Dialog } from '@onefootprint/ui';
@@ -27,10 +24,7 @@ enum DialogState {
   link = 'link',
 }
 
-const RequestMoreInfoDialog = ({
-  open,
-  onClose,
-}: RequestMoreInfoDialogProps) => {
+const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.actions.request-more-info',
   });
@@ -51,22 +45,12 @@ const RequestMoreInfoDialog = ({
   });
 
   const handleGenerateLink = (data: TriggerFormData) => {
-    const {
-      kinds: triggerKinds,
-      collectSelfie,
-      note,
-      playbook,
-      customDocument,
-    } = data;
+    const { kinds: triggerKinds, collectSelfie, note, playbook, customDocument } = data;
     if (!triggerKinds.length) {
       return;
     }
     let trigger: WorkflowRequestConfig;
-    if (
-      triggerKinds.length === 1 &&
-      triggerKinds[0] === RequestMoreInfoKind.Onboard &&
-      playbook
-    ) {
+    if (triggerKinds.length === 1 && triggerKinds[0] === RequestMoreInfoKind.Onboard && playbook) {
       // For playbooks, there can be only one kind in the list
       trigger = {
         kind: TriggerKind.Onboard,
@@ -92,10 +76,7 @@ const RequestMoreInfoDialog = ({
             kind: DocumentRequestKind.ProofOfAddress,
             data: {},
           });
-        } else if (
-          kind === RequestMoreInfoKind.CustomDocument &&
-          customDocument
-        ) {
+        } else if (kind === RequestMoreInfoKind.CustomDocument && customDocument) {
           customDocument.forEach(doc => {
             configs.push({
               kind: DocumentRequestKind.Custom,
@@ -145,12 +126,7 @@ const RequestMoreInfoDialog = ({
       onClick: handleClose,
       disabled: submitTriggerMutation.isLoading,
     };
-    component = (
-      <RequestMoreInfoForm
-        formId="request-more-info-form"
-        onSubmit={handleGenerateLink}
-      />
-    );
+    component = <RequestMoreInfoForm formId="request-more-info-form" onSubmit={handleGenerateLink} />;
   } else {
     ({ primaryButton, secondaryButton, component } = displayLinkDialogProps);
   }

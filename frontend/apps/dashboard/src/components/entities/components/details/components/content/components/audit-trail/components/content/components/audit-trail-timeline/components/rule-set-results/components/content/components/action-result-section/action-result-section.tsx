@@ -1,11 +1,7 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoCheck16, IcoChevronDown16 } from '@onefootprint/icons';
 import type { Rule } from '@onefootprint/types';
-import {
-  RuleAction,
-  RuleActionSection,
-  RuleResultGroup,
-} from '@onefootprint/types';
+import { RuleAction, RuleActionSection, RuleResultGroup } from '@onefootprint/types';
 import { Dropdown, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import { kebabCase } from 'lodash';
@@ -20,22 +16,14 @@ export type ActionResultSectionProps = {
   data: Record<RuleAction, Record<string, Rule[]>>;
 };
 
-const ActionResultSection = ({
-  actionSection,
-  data,
-}: ActionResultSectionProps) => {
+const ActionResultSection = ({ actionSection, data }: ActionResultSectionProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.rule-set-results',
   });
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedResultGroup, setSelectedResultGroup] =
-    useState<RuleResultGroup>(RuleResultGroup.isPresent);
+  const [selectedResultGroup, setSelectedResultGroup] = useState<RuleResultGroup>(RuleResultGroup.isPresent);
   const actionName = kebabCase(actionSection);
-  const stepUpActions = [
-    RuleAction.stepUpIdentitySsn,
-    RuleAction.stepUpPoA,
-    RuleAction.stepUpIdentity,
-  ];
+  const stepUpActions = [RuleAction.stepUpIdentitySsn, RuleAction.stepUpPoA, RuleAction.stepUpIdentity];
   const textColors: Record<string, Color> = {
     fail: 'error',
     'step-up': 'info',
@@ -53,12 +41,7 @@ const ActionResultSection = ({
   };
 
   return (
-    <Stack
-      direction="column"
-      gap={5}
-      role="group"
-      aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
-    >
+    <Stack direction="column" gap={5} role="group" aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}>
       <Stack align="center" justify="space-between">
         <Text variant="label-3" color={textColors[actionName]}>
           {t(`${actionName}.title` as ParseKeys<'common'>)}
@@ -66,9 +49,7 @@ const ActionResultSection = ({
         <Dropdown.Root open={isOpen} onOpenChange={toggleDropdown}>
           <CustomDropdownTrigger aria-label="Rule result groups">
             <Stack align="center">
-              <Text variant="body-3">
-                {t(kebabCase(selectedResultGroup) as ParseKeys<'common'>)}
-              </Text>
+              <Text variant="body-3">{t(kebabCase(selectedResultGroup) as ParseKeys<'common'>)}</Text>
               <Stack align="center" justify="center" marginLeft={2}>
                 <IcoChevronDown16 />
               </Stack>
@@ -79,12 +60,7 @@ const ActionResultSection = ({
               {Object.values(RuleResultGroup).map(group => {
                 const label = t(kebabCase(group) as ParseKeys<'common'>);
                 return (
-                  <DropdownOption
-                    key={group}
-                    role="option"
-                    aria-label={label}
-                    onClick={() => onChange(group)}
-                  >
+                  <DropdownOption key={group} role="option" aria-label={label} onClick={() => onChange(group)}>
                     <Text variant="body-3">{label}</Text>
                     {group === selectedResultGroup && <IcoCheck16 />}
                   </DropdownOption>
@@ -96,11 +72,7 @@ const ActionResultSection = ({
       </Stack>
       {actionSection === RuleActionSection.stepUp ? (
         stepUpActions.map(action => (
-          <RuleList
-            key={action}
-            rules={data[action][selectedResultGroup]}
-            stepUpAction={action}
-          />
+          <RuleList key={action} rules={data[action][selectedResultGroup]} stepUpAction={action} />
         ))
       ) : (
         <RuleList rules={data[actionSection][selectedResultGroup]} />

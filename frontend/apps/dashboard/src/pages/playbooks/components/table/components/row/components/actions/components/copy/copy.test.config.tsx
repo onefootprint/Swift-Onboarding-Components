@@ -1,9 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type {
-  GetAuthRoleResponse,
-  OnboardingConfig,
-  OrgAssumeRoleResponse,
-} from '@onefootprint/types';
+import type { GetAuthRoleResponse, OnboardingConfig, OrgAssumeRoleResponse } from '@onefootprint/types';
 import {
   CollectedKycDataOption,
   OnboardingConfigKind,
@@ -53,8 +49,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
   {
     id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
     name: 'Footprint Live',
-    logoUrl:
-      'https://i.onefp.net/ol/thFVfsCGMpAx0my0NpP2C8VvR8EZmIO9OUOZdFfnvRQ/cRF5Xhzq6fvXiYRz5vUSk8.png',
+    logoUrl: 'https://i.onefp.net/ol/thFVfsCGMpAx0my0NpP2C8VvR8EZmIO9OUOZdFfnvRQ/cRF5Xhzq6fvXiYRz5vUSk8.png',
     isSandboxRestricted: false,
     websiteUrl: 'https://live.onefootprint.com',
     domains: ['onefootprint.com'],
@@ -72,8 +67,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
   {
     id: 'org_hyZP3ksCvsT0AlLqMZsgrI',
     name: 'Acme Inc.',
-    logoUrl:
-      'https://i.onefp.net/ol/lwjLynvXuFnhXT6iIMZR8NagJaK258Yb1cpLuEcq9L0/mETX8r3MFwBH8DPiRk3GKE.png',
+    logoUrl: 'https://i.onefp.net/ol/lwjLynvXuFnhXT6iIMZR8NagJaK258Yb1cpLuEcq9L0/mETX8r3MFwBH8DPiRk3GKE.png',
     isSandboxRestricted: false,
     websiteUrl: 'https://acme.com',
     domains: ['footprint.dev'],
@@ -91,8 +85,7 @@ export const authRolesFixture: GetAuthRoleResponse = [
   {
     id: 'org_UT091oogB4RJv1QbBesp2h',
     name: 'Retro Bank',
-    logoUrl:
-      'https://i.onefp.net/ol/m9IjQQ7_cqcDSOmnFJYs98pFGxYv81xjILx-mOpuzLk/Wn4KS4sJpxmpLUmL2usPBl.png',
+    logoUrl: 'https://i.onefp.net/ol/m9IjQQ7_cqcDSOmnFJYs98pFGxYv81xjILx-mOpuzLk/Wn4KS4sJpxmpLUmL2usPBl.png',
     isSandboxRestricted: true,
     websiteUrl: 'https://retro-bank.com',
     domains: [],
@@ -137,8 +130,7 @@ export const orgAssumeRoleFixture: OrgAssumeRoleResponse = {
   tenant: {
     id: 'org_UT091oogB4RJv1QbBesp2h',
     name: 'Retro Bank',
-    logoUrl:
-      'https://i.onefp.net/ol/m9IjQQ7_cqcDSOmnFJYs98pFGxYv81xjILx-mOpuzLk/Wn4KS4sJpxmpLUmL2usPBl.png',
+    logoUrl: 'https://i.onefp.net/ol/m9IjQQ7_cqcDSOmnFJYs98pFGxYv81xjILx-mOpuzLk/Wn4KS4sJpxmpLUmL2usPBl.png',
     isSandboxRestricted: true,
     websiteUrl: 'https://retro-bank.com',
     domains: [],
@@ -205,9 +197,7 @@ export const withModes = () => {
   });
 };
 
-export const withAuthRoles = (
-  response: GetAuthRoleResponse = authRolesFixture,
-) => {
+export const withAuthRoles = (response: GetAuthRoleResponse = authRolesFixture) => {
   mockRequest({
     method: 'get',
     path: '/org/auth/roles',
@@ -215,9 +205,7 @@ export const withAuthRoles = (
   });
 };
 
-export const CopyWithButton = ({
-  playbook = playbookFixture,
-}: Partial<CopyProps>) => {
+export const CopyWithButton = ({ playbook = playbookFixture }: Partial<CopyProps>) => {
   const ref = React.useRef<CopyHandler>(null);
 
   return (

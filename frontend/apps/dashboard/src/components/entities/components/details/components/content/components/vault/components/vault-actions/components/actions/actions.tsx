@@ -68,73 +68,29 @@ const Actions = ({ entity }: WithEntityProps) => {
           <IcoDotsHorizontal24 />
         </StyledTrigger>
         <Dropdown.Content align="end" sideOffset={8}>
-          <PermissionGate
-            scopeKind={RoleScopeKind.writeEntities}
-            fallbackText={t('edit-user.not-allowed')}
-          >
-            <Dropdown.Item onSelect={editControls.start}>
-              {t('edit-user.label')}
-            </Dropdown.Item>
+          <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-user.not-allowed')}>
+            <Dropdown.Item onSelect={editControls.start}>{t('edit-user.label')}</Dropdown.Item>
           </PermissionGate>
-          <PermissionGate
-            scopeKind={RoleScopeKind.writeEntities}
-            fallbackText={newT('upload-doc.not-allowed')}
-          >
-            <Dropdown.Item onSelect={handleOpenUploadDocDialog}>
-              {newT('upload-doc.label')}
-            </Dropdown.Item>
+          <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={newT('upload-doc.not-allowed')}>
+            <Dropdown.Item onSelect={handleOpenUploadDocDialog}>{newT('upload-doc.label')}</Dropdown.Item>
           </PermissionGate>
-          <PermissionGate
-            scopeKind={RoleScopeKind.manualReview}
-            fallbackText={t('request-more-info.not-allowed')}
-          >
-            <Dropdown.Item onSelect={handleOpenRequestMoreInfoDialog}>
-              {t('request-more-info.label')}
-            </Dropdown.Item>
+          <PermissionGate scopeKind={RoleScopeKind.manualReview} fallbackText={t('request-more-info.not-allowed')}>
+            <Dropdown.Item onSelect={handleOpenRequestMoreInfoDialog}>{t('request-more-info.label')}</Dropdown.Item>
           </PermissionGate>
-          <PermissionGate
-            scopeKind={RoleScopeKind.manualReview}
-            fallbackText={t('update-auth-methods.not-allowed')}
-          >
-            <Dropdown.Item onSelect={handleOpenAuthMethodsDialog}>
-              {t('update-auth-methods.label')}
-            </Dropdown.Item>
+          <PermissionGate scopeKind={RoleScopeKind.manualReview} fallbackText={t('update-auth-methods.not-allowed')}>
+            <Dropdown.Item onSelect={handleOpenAuthMethodsDialog}>{t('update-auth-methods.label')}</Dropdown.Item>
           </PermissionGate>
-          <PermissionGate
-            scopeKind={RoleScopeKind.writeLists}
-            fallbackText={t('add-to-list.not-allowed')}
-          >
-            <Dropdown.Item onSelect={handleOpenAddToListDialog}>
-              {t('add-to-list.label')}
-            </Dropdown.Item>
+          <PermissionGate scopeKind={RoleScopeKind.writeLists} fallbackText={t('add-to-list.not-allowed')}>
+            <Dropdown.Item onSelect={handleOpenAddToListDialog}>{t('add-to-list.label')}</Dropdown.Item>
           </PermissionGate>
-          {showAiFeatures && (
-            <Dropdown.Item onSelect={handleOpenSummarizeDialog}>
-              {t('summarize.label')}
-            </Dropdown.Item>
-          )}
+          {showAiFeatures && <Dropdown.Item onSelect={handleOpenSummarizeDialog}>{t('summarize.label')}</Dropdown.Item>}
         </Dropdown.Content>
       </Dropdown.Root>
-      <RequestMoreInfoDialog
-        open={openDialog === ActionDialog.requestMoreInfo}
-        onClose={handleCloseDialog}
-      />
-      <UpdateAuthDialog
-        open={openDialog === ActionDialog.auth}
-        onClose={handleCloseDialog}
-      />
-      <AddToListDialog
-        open={openDialog === ActionDialog.addToList}
-        onClose={handleCloseDialog}
-      />
-      <SummarizeAiDialog
-        open={openDialog === ActionDialog.summarize}
-        onClose={handleCloseDialog}
-      />
-      <UploadDocDialog
-        open={openDialog === ActionDialog.uploadDoc}
-        onClose={handleCloseDialog}
-      />
+      <RequestMoreInfoDialog open={openDialog === ActionDialog.requestMoreInfo} onClose={handleCloseDialog} />
+      <UpdateAuthDialog open={openDialog === ActionDialog.auth} onClose={handleCloseDialog} />
+      <AddToListDialog open={openDialog === ActionDialog.addToList} onClose={handleCloseDialog} />
+      <SummarizeAiDialog open={openDialog === ActionDialog.summarize} onClose={handleCloseDialog} />
+      <UploadDocDialog open={openDialog === ActionDialog.uploadDoc} onClose={handleCloseDialog} />
     </>
   ) : null;
 };

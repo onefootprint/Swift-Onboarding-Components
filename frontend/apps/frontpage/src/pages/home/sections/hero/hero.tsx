@@ -1,13 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import {
-  Box,
-  Button,
-  Container,
-  createFontStyles,
-  media,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Box, Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -31,10 +23,7 @@ const Hero = () => {
 
   const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
 
-  const signUpUrl = useMemo(
-    () => `${DASHBOARD_BASE_URL}/authentication/sign-up`,
-    [],
-  );
+  const signUpUrl = useMemo(() => `${DASHBOARD_BASE_URL}/authentication/sign-up`, []);
 
   return (
     <BackgroundContainer>
@@ -43,28 +32,15 @@ const Hero = () => {
           <TextContainer>
             <Stack direction="column" gap={5} align="center">
               <Title tag="h1">{t('hero.title')}</Title>
-              <Text
-                tag="h2"
-                variant="display-4"
-                maxWidth="700px"
-                textAlign="center"
-              >
+              <Text tag="h2" variant="display-4" maxWidth="700px" textAlign="center">
                 {t('hero.subtitle')}
               </Text>
             </Stack>
             <Stack direction="row" gap={5}>
-              <Button
-                variant="primary"
-                size="large"
-                onClick={() => window.open(signUpUrl, '_blank')}
-              >
+              <Button variant="primary" size="large" onClick={() => window.open(signUpUrl, '_blank')}>
                 {t('hero.get-started')}
               </Button>
-              <Button
-                variant="secondary"
-                size="large"
-                onClick={handleClickTrigger}
-              >
+              <Button variant="secondary" size="large" onClick={handleClickTrigger}>
                 {t('hero.book-a-call')}
               </Button>
             </Stack>
@@ -73,18 +49,8 @@ const Hero = () => {
           <CustomersLogos />
         </HeroContainer>
       </Overflow>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={() => setShowDialog(false)}
-      />
-      <Background
-        src="/home/hero/background-texture.png"
-        alt="background texture"
-        height={600}
-        width={600}
-        priority
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={() => setShowDialog(false)} />
+      <Background src="/home/hero/background-texture.png" alt="background texture" height={600} width={600} priority />
     </BackgroundContainer>
   );
 };

@@ -19,21 +19,13 @@ const Form = ({ onSubmit }: FormProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<ContactDialogData>();
-  const getNameHint = () =>
-    errors[FormField.name] ? t('name.errors.required') : undefined;
-  const getEmailHint = () =>
-    errors[FormField.email] ? t('email.errors.required') : undefined;
-  const getMessageHint = () =>
-    errors[FormField.message] ? t('message.errors.required') : undefined;
+  const getNameHint = () => (errors[FormField.name] ? t('name.errors.required') : undefined);
+  const getEmailHint = () => (errors[FormField.email] ? t('email.errors.required') : undefined);
+  const getMessageHint = () => (errors[FormField.message] ? t('message.errors.required') : undefined);
   const formId = 'support-dialog-id';
 
   return (
-    <Grid.Container
-      gap={7}
-      id={formId}
-      tag="form"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <Grid.Container gap={7} id={formId} tag="form" onSubmit={handleSubmit(onSubmit)}>
       <Text variant="body-2">{t('description')}</Text>
       <TextInput
         hasError={!!errors[FormField.name]}

@@ -8,11 +8,7 @@ import type { RadioSelectProps } from './radio-select';
 import RadioSelect from './radio-select';
 
 describe('<RadioSelect />', () => {
-  const renderRadioSelect = ({
-    value,
-    testID,
-    onChange = () => {},
-  }: Partial<RadioSelectProps>) => {
+  const renderRadioSelect = ({ value, testID, onChange = () => undefined }: Partial<RadioSelectProps>) => {
     const options = [
       {
         title: 'Item 1',
@@ -28,14 +24,7 @@ describe('<RadioSelect />', () => {
       },
     ];
 
-    return customRender(
-      <RadioSelect
-        options={options}
-        value={value}
-        onChange={onChange}
-        testID={testID}
-      />,
-    );
+    return customRender(<RadioSelect options={options} value={value} onChange={onChange} testID={testID} />);
   };
 
   describe('<RadioSelect />', () => {
@@ -88,11 +77,7 @@ describe('<RadioSelect />', () => {
 });
 
 describe('<GroupedRadioSelect />', () => {
-  const renderGroupedRadioSelect = ({
-    value,
-    testID,
-    onChange = () => {},
-  }: Partial<RadioSelectProps>) => {
+  const renderGroupedRadioSelect = ({ value, testID, onChange = () => undefined }: Partial<RadioSelectProps>) => {
     const groupedOptions = [
       {
         label: 'Group 1',
@@ -130,14 +115,7 @@ describe('<GroupedRadioSelect />', () => {
       },
     ];
 
-    return customRender(
-      <RadioSelect
-        options={groupedOptions}
-        value={value}
-        onChange={onChange}
-        testID={testID}
-      />,
-    );
+    return customRender(<RadioSelect options={groupedOptions} value={value} onChange={onChange} testID={testID} />);
   };
 
   describe('<GroupedRadioSelect />', () => {

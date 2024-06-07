@@ -14,9 +14,7 @@ type RetryLimitExceededProps = {
   onRetryLimitExceeded: () => void;
 };
 
-const RetryLimitExceeded = ({
-  onRetryLimitExceeded,
-}: RetryLimitExceededProps) => {
+const RetryLimitExceeded = ({ onRetryLimitExceeded }: RetryLimitExceededProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.components.retry-limit-exceeded',
   });

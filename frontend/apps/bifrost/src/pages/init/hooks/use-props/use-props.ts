@@ -1,11 +1,6 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
-import {
-  getSdkArgsToken,
-  hasInvalidHashFragment,
-  Logger,
-  useFootprintProvider,
-} from '@onefootprint/idv';
+import { Logger, getSdkArgsToken, hasInvalidHashFragment, useFootprintProvider } from '@onefootprint/idv';
 import noop from 'lodash/noop';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -22,10 +17,7 @@ import getPublicKeyFromUrl from './utils/get-public-key-from-url';
 // TODO: delete when all customers migrate to v3.8.0+
 export const POST_MESSAGE_TIMEOUT = 1000;
 
-const useProps = (
-  onSuccess: (props: FootprintVerifyDataProps) => void,
-  onError?: (error: unknown) => void,
-) => {
+const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void, onError?: (error: unknown) => void) => {
   // For legacy web SDKs that only pass args via postMessage
   // TODO: delete when all customers migrate to v3.8.0+
   const fpProvider = useFootprintProvider();
@@ -84,11 +76,7 @@ const useProps = (
     }
     const mobileProps = getMobilePropsFromUrl(router.asPath);
     if (mobileProps) {
-      Logger.info(
-        `Mobile props received from URL fragment with keys: ${Object.keys(
-          mobileProps,
-        ).join(', ')}`,
-      );
+      Logger.info(`Mobile props received from URL fragment with keys: ${Object.keys(mobileProps).join(', ')}`);
       complete({
         publicKey: publicKeyFromUrl,
         ...mobileProps,
@@ -103,23 +91,18 @@ const useProps = (
     }
 
     Logger.info('Subscribing to post messages for props');
-    const unsubscribe = fpProvider.on(
-      FootprintPrivateEvent.propsReceived,
-      (props: unknown) => {
-        if (typeof props === 'object') {
-          const keys = Object.keys(props ?? {});
-          Logger.info(
-            `Found props in post message with keys: ${keys.join(', ')}`,
-          );
-        }
+    const unsubscribe = fpProvider.on(FootprintPrivateEvent.propsReceived, (props: unknown) => {
+      if (typeof props === 'object') {
+        const keys = Object.keys(props ?? {});
+        Logger.info(`Found props in post message with keys: ${keys.join(', ')}`);
+      }
 
-        clearTimeout(timerId.current);
-        complete({
-          publicKey: publicKeyFromUrl,
-          ...(props as Partial<FootprintVerifyDataProps>),
-        });
-      },
-    );
+      clearTimeout(timerId.current);
+      complete({
+        publicKey: publicKeyFromUrl,
+        ...(props as Partial<FootprintVerifyDataProps>),
+      });
+    });
 
     timerId.current = setTimeout(() => {
       Logger.info('Timed out waiting for props from post message');
@@ -134,13 +117,7 @@ const useProps = (
       clearTimeout(timerId.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isAdapterLoaded,
-    router.isReady,
-    router.query,
-    router.asPath,
-    isSdkArgsLoading,
-  ]);
+  }, [isAdapterLoaded, router.isReady, router.query, router.asPath, isSdkArgsLoading]);
 };
 
 export default useProps;

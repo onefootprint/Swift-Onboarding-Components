@@ -1,9 +1,4 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { InviteProps } from './invite';
@@ -19,12 +14,9 @@ import {
 
 describe('<Invite />', () => {
   const renderInvite = ({ onComplete = jest.fn() }: Partial<InviteProps>) =>
-    customRender(<Invite onComplete={onComplete} onBack={() => {}} />);
+    customRender(<Invite onComplete={onComplete} onBack={() => undefined} />);
 
-  const renderInviteAndWaitData = async ({
-    onBack = jest.fn(),
-    onComplete = jest.fn(),
-  }: Partial<InviteProps>) => {
+  const renderInviteAndWaitData = async ({ onBack = jest.fn(), onComplete = jest.fn() }: Partial<InviteProps>) => {
     renderInvite({ onComplete, onBack });
     await waitFor(() => {
       screen.getByTestId('onboarding-invite-content');

@@ -1,4 +1,4 @@
-import { createFontStyles, media, Text } from '@onefootprint/ui';
+import { Text, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -7,18 +7,15 @@ type FeatureCardProps = {
   title: string;
   description: string;
   // @ts-ignore: fix me
-  trans?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  trans?: any;
 };
 
 const FeatureCard = ({ title, description, trans }: FeatureCardProps) => (
   <Container>
     <Title>{title}</Title>
     <Text variant="body-2">
-      {trans ? (
-        <Trans i18nKey={trans.i18nKey} components={trans.components} />
-      ) : (
-        description
-      )}
+      {trans ? <Trans i18nKey={trans.i18nKey} components={trans.components} /> : description}
     </Text>
   </Container>
 );

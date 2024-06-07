@@ -1,19 +1,9 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser } from 'src/config/tests';
 
 import Playbooks from './playbooks';
-import {
-  withListDetails,
-  withListDetailsNoPlaybooks,
-  withListError,
-  withLists,
-} from './playbooks.test.config';
+import { withListDetails, withListDetailsNoPlaybooks, withListError, withLists } from './playbooks.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -52,9 +42,7 @@ describe('<Playbooks />', () => {
       renderPlaybooks();
 
       await waitFor(() => {
-        expect(
-          screen.getByText('There are no playbooks using this list'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('There are no playbooks using this list')).toBeInTheDocument();
       });
     });
   });

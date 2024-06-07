@@ -14,9 +14,7 @@ const SandboxFooter = (): JSX.Element | null => {
   const { t } = useTranslation('identify');
   const [state, send] = useIdentifyMachine();
   const { overallOutcome } = state.context;
-  const [sandboxId, setSandboxId] = useState<string>(
-    state.context.sandboxId || '',
-  );
+  const [sandboxId, setSandboxId] = useState<string>(state.context.sandboxId || '');
   const { isLive, bootstrapData, variant } = state.context;
 
   if (isLive) {
@@ -24,10 +22,7 @@ const SandboxFooter = (): JSX.Element | null => {
     return null;
   }
 
-  if (
-    sandboxIdEditRules(state.value, bootstrapData || voidObj) &&
-    variant !== IdentifyVariant.verify
-  ) {
+  if (sandboxIdEditRules(state.value, bootstrapData || voidObj) && variant !== IdentifyVariant.verify) {
     return (
       <>
         <DashedLine variant="secondary" />
@@ -54,13 +49,7 @@ const SandboxFooter = (): JSX.Element | null => {
       </>
     );
   }
-  return (
-    <Content
-      label={t('sandbox.label')}
-      sandboxId={sandboxId}
-      overallOutcome={overallOutcome}
-    />
-  );
+  return <Content label={t('sandbox.label')} sandboxId={sandboxId} overallOutcome={overallOutcome} />;
 };
 
 export default SandboxFooter;

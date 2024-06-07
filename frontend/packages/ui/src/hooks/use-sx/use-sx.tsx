@@ -2,11 +2,7 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { useTheme } from 'styled-components';
 
-import {
-  customPropNativeMapper,
-  customPropStyles,
-  customPropThemeMapper,
-} from './use-sx.constants';
+import { customPropNativeMapper, customPropStyles, customPropThemeMapper } from './use-sx.constants';
 import type { CustomStyleProps, SXStyleProps, SXStyles } from './use-sx.types';
 
 const useSX = (sx: SXStyleProps = {}) => {

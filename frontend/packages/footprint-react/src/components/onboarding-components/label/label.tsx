@@ -14,11 +14,7 @@ const Label = ({ className, children, htmlFor, ...props }: LabelProps) => {
   }
 
   return (
-    <label
-      htmlFor={htmlFor || id}
-      className={cx('fp-label', className)}
-      {...props}
-    >
+    <label htmlFor={htmlFor || id} className={cx('fp-label', className)} {...props}>
       {children}
     </label>
   );

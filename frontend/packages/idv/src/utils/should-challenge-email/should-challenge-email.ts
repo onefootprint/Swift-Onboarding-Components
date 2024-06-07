@@ -1,9 +1,6 @@
 import { ChallengeKind } from '@onefootprint/types';
 
-const shouldChallengeEmail = (
-  isNoPhoneFlow: boolean,
-  availableChallengeKinds?: ChallengeKind[],
-): boolean => {
+const shouldChallengeEmail = (isNoPhoneFlow: boolean, availableChallengeKinds?: ChallengeKind[]): boolean => {
   // If the user is not in the no-phone flow, don't go to email challenge
   if (!isNoPhoneFlow) {
     return false;

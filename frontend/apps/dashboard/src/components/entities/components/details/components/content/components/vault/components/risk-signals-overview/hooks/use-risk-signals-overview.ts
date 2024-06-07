@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  GetEntityRiskSignalsRequest,
-  GetEntityRiskSignalsResponse,
-} from '@onefootprint/types';
+import type { GetEntityRiskSignalsRequest, GetEntityRiskSignalsResponse } from '@onefootprint/types';
 import type { RiskSignal } from '@onefootprint/types/src/data/risk-signal';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -12,10 +9,7 @@ import type { RiskSignalsSummary } from '../risk-signals-overview.types';
 import groupBySection from './utils/group-by-section';
 import groupBySeverity from './utils/group-by-severity';
 
-const getRiskSignals = async (
-  { id }: GetEntityRiskSignalsRequest,
-  authHeaders: AuthHeaders,
-) => {
+const getRiskSignals = async ({ id }: GetEntityRiskSignalsRequest, authHeaders: AuthHeaders) => {
   const { data: response } = await request<GetEntityRiskSignalsResponse>({
     headers: authHeaders,
     method: 'GET',
@@ -25,9 +19,7 @@ const getRiskSignals = async (
   return groupBySectionAndSeverity(response);
 };
 
-export const groupBySectionAndSeverity = (
-  signals: RiskSignal[],
-): RiskSignalsSummary => {
+export const groupBySectionAndSeverity = (signals: RiskSignal[]): RiskSignalsSummary => {
   const sections = groupBySection(signals);
   return {
     basic: groupBySeverity(sections.basic),
@@ -40,11 +32,9 @@ export const groupBySectionAndSeverity = (
 const useRiskSignalsOverview = (id: string) => {
   const { authHeaders } = useSession();
 
-  return useQuery(
-    ['entity', id, 'risk-signals-overview'],
-    () => getRiskSignals({ id }, authHeaders),
-    { enabled: !!id },
-  );
+  return useQuery(['entity', id, 'risk-signals-overview'], () => getRiskSignals({ id }, authHeaders), {
+    enabled: !!id,
+  });
 };
 
 export default useRiskSignalsOverview;

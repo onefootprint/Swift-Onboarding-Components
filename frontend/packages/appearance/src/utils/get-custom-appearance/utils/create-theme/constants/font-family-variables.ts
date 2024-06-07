@@ -1,7 +1,4 @@
-const textVariables = new Map<
-  string,
-  { var: string; assignDefault?: string[] }
->([
+const textVariables = new Map<string, { var: string; assignDefault?: string[] }>([
   [
     'fontFamily',
     {

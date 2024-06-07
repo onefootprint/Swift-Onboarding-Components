@@ -31,13 +31,10 @@ const Processing = () => {
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
   const [nextSide, setNextSide] = useState<IdDocImageTypes | undefined>();
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
-  const [showSlowConnectionMessage, setShowSlowConnectionMessage] =
-    useState(false);
+  const [showSlowConnectionMessage, setShowSlowConnectionMessage] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
-  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  ); // we only time the doc upload
+  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(null); // we only time the doc upload
 
   const {
     idDoc: { type, country },
@@ -55,9 +52,7 @@ const Processing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      logWarn(
-        `Image upload retry limit exceeded. Side: ${currSide}, doc id: ${id}`,
-      );
+      logWarn(`Image upload retry limit exceeded. Side: ${currSide}, doc id: ${id}`);
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
       send({
@@ -92,10 +87,7 @@ const Processing = () => {
 
   const handleProcessDocError = (err: unknown) => {
     handleError(err);
-    logError(
-      `Error while processing id-doc image ${id}: ${getErrorMessage(err)}`,
-      err,
-    );
+    logError(`Error while processing id-doc image ${id}: ${getErrorMessage(err)}`, err);
   };
 
   const handleSubmitDocError = (err: unknown) => {
@@ -218,42 +210,15 @@ const Processing = () => {
       </Text>
     );
   }
-  if (retryLimitExceeded)
-    return (
-      <RetryLimitExceeded onRetryLimitExceeded={handleRetryLimitExceeded} />
-    );
+  if (retryLimitExceeded) return <RetryLimitExceeded onRetryLimitExceeded={handleRetryLimitExceeded} />;
   if (!type || !currSide) return null;
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      height="100%"
-    >
+    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
       <IdDocAnimation
-        loadingComponent={
-          <Loading
-            step={step}
-            showSlowConnectionMessage={showSlowConnectionMessage}
-          />
-        }
-        successComponent={
-          <Success
-            onComplete={
-              mode === 'success' && !nextSide ? onSuccessComplete : undefined
-            }
-          />
-        }
-        nextSideComponent={
-          nextSide && (
-            <NextSide
-              nextSideImageType={nextSide}
-              onComplete={onNextSideComplete}
-            />
-          )
-        }
+        loadingComponent={<Loading step={step} showSlowConnectionMessage={showSlowConnectionMessage} />}
+        successComponent={<Success onComplete={mode === 'success' && !nextSide ? onSuccessComplete : undefined} />}
+        nextSideComponent={nextSide && <NextSide nextSideImageType={nextSide} onComplete={onNextSideComplete} />}
         mode={mode}
         hasNextSide={!!nextSide}
       />

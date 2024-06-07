@@ -32,23 +32,15 @@ const VariantsByKind: Record<ComponentKind, Variant[]> = {
 };
 
 const publicEventList: PublicEvent[] = Object.values(PublicEvent);
-const noop = (...args: unknown[]) => undefined; // eslint-disable-line @typescript-eslint/no-unused-vars
+const noop = (..._args: unknown[]) => undefined;
 
-const validateContainerIdForVariant = (
-  variant: Variant,
-  containerId?: string,
-): void | never => {
+const validateContainerIdForVariant = (variant: Variant, containerId?: string): void | never => {
   if (variant === 'inline' && !containerId) {
-    throw new Error(
-      `Inline component requires a containerId. Received ${containerId}`,
-    );
+    throw new Error(`Inline component requires a containerId. Received ${containerId}`);
   }
 };
 
-export const validateComponentVariant = (
-  kind: ComponentKind,
-  variant?: Variant,
-): void | never => {
+export const validateComponentVariant = (kind: ComponentKind, variant?: Variant): void | never => {
   if (!variant) {
     return;
   }
@@ -57,16 +49,12 @@ export const validateComponentVariant = (
   const isValid = supportedVariants.includes(variant);
   if (!isValid) {
     throw new Error(
-      `Invalid variant: ${JSON.stringify(
-        variant,
-      )}. Valid variants for ${kind} are ${supportedVariants.join(', ')}`,
+      `Invalid variant: ${JSON.stringify(variant)}. Valid variants for ${kind} are ${supportedVariants.join(', ')}`,
     );
   }
 };
 
-export const getDefaultVariantForKind = (
-  kind: ComponentKind,
-): Variant | never => {
+export const getDefaultVariantForKind = (kind: ComponentKind): Variant | never => {
   const supportedVariants = VariantsByKind[kind] ?? [];
   if (!supportedVariants.length) {
     throw new Error(`Invalid kind: ${kind}`);
@@ -81,24 +69,13 @@ export const validateComponentKind = (kind: ComponentKind): void | never => {
   const validKinds = Object.values(ComponentKind);
   const isValid = validKinds.includes(kind);
   if (!isValid) {
-    throw new Error(
-      `Invalid kind: ${kind}. Valid kinds are: ${validKinds.join(', ')}`,
-    );
+    throw new Error(`Invalid kind: ${kind}. Valid kinds are: ${validKinds.join(', ')}`);
   }
 };
 
 export const transformVerifyButtonProps = (props: Props): Props | undefined => {
   if (props.kind === ComponentKind.VerifyButton) {
-    const {
-      kind,
-      appearance,
-      variant,
-      dialogVariant,
-      onClick,
-      label,
-      containerId,
-      ...restProps
-    } = props;
+    const { kind, appearance, variant, dialogVariant, onClick, label, containerId, ...restProps } = props;
     return {
       ...restProps,
       variant: dialogVariant,
@@ -111,15 +88,9 @@ export const transformVerifyButtonProps = (props: Props): Props | undefined => {
 
 export const getRefProps = ({ kind }: Props) => RefsByComponent[kind] ?? [];
 
-export const getCallbackFunction = (
-  obj: PossibleCallbacks,
-  key: CallbackKeys,
-) => {
+export const getCallbackFunction = (obj: PossibleCallbacks, key: CallbackKeys) => {
   const callbackFunction =
-    Object.prototype.hasOwnProperty.call(obj, key) &&
-    typeof obj[key] === 'function'
-      ? obj[key]
-      : undefined;
+    Object.prototype.hasOwnProperty.call(obj, key) && typeof obj[key] === 'function' ? obj[key] : undefined;
 
   return callbackFunction || noop;
 };
@@ -147,13 +118,9 @@ export const getCallbackProps = (
     // Even if the user didn't specify a callback, we might still
     // need to listen for events that should trigger other things
     const callback = getCallbackFunction(props, callbackPropName);
-    const shouldDestroy =
-      publicEvent === PublicEvent.closed ||
-      publicEvent === PublicEvent.canceled;
+    const shouldDestroy = publicEvent === PublicEvent.closed || publicEvent === PublicEvent.canceled;
 
-    const shouldLaunchChild =
-      kind === ComponentKind.VerifyButton &&
-      publicEvent === PublicEvent.clicked;
+    const shouldLaunchChild = kind === ComponentKind.VerifyButton && publicEvent === PublicEvent.clicked;
 
     // Make sure to pass any callback arguments through
     modifiedCallbacks[publicEvent] = (callbackArgs?: unknown) => {

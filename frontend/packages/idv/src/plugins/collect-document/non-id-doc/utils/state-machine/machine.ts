@@ -150,11 +150,7 @@ const createNonIdDocMachine = (args: MachineContext) =>
           return context;
         }),
         assignHasBadConnectivity: assign((context, event) => {
-          if (
-            event.payload.errors.find(
-              e => e.errorType === IdDocImageProcessingError.networkError,
-            )
-          ) {
+          if (event.payload.errors.find(e => e.errorType === IdDocImageProcessingError.networkError)) {
             context.hasBadConnectivity = true;
           }
           return context;

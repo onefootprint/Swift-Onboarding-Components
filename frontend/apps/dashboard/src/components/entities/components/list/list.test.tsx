@@ -13,11 +13,7 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Table from '../table';
 import List from './list';
-import {
-  entitiesFixture,
-  withEntities,
-  withEntitiesError,
-} from './list.test.config';
+import { entitiesFixture, withEntities, withEntitiesError } from './list.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -41,11 +37,7 @@ describe.skip('<List />', () => {
     ];
 
     return customRender(
-      <List
-        title="Entities list"
-        kind={EntityKind.business}
-        basePath="entities"
-      >
+      <List title="Entities list" kind={EntityKind.business} basePath="entities">
         <Table
           aria-label="Entities table"
           searchPlaceholder="Search..."
@@ -138,11 +130,7 @@ describe.skip('<List />', () => {
         await userEvent.type(searchField, 'Koch Inc');
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith(
-            { query: { search: 'Koch Inc' } },
-            undefined,
-            expect.anything(),
-          );
+          expect(push).toHaveBeenCalledWith({ query: { search: 'Koch Inc' } }, undefined, expect.anything());
         });
       });
     });
@@ -163,11 +151,7 @@ describe.skip('<List />', () => {
         });
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith(
-            { query: { status: ['fail'] } },
-            undefined,
-            expect.anything(),
-          );
+          expect(push).toHaveBeenCalledWith({ query: { status: ['fail'] } }, undefined, expect.anything());
         });
       });
     });
@@ -188,11 +172,7 @@ describe.skip('<List />', () => {
         });
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith(
-            { query: { date_range: ['last-7-days'] } },
-            undefined,
-            expect.anything(),
-          );
+          expect(push).toHaveBeenCalledWith({ query: { date_range: ['last-7-days'] } }, undefined, expect.anything());
         });
       });
     });
@@ -213,11 +193,7 @@ describe.skip('<List />', () => {
         });
 
         await waitFor(() => {
-          expect(push).toHaveBeenCalledWith(
-            { query: { watchlist_hit: 'true' } },
-            undefined,
-            expect.anything(),
-          );
+          expect(push).toHaveBeenCalledWith({ query: { watchlist_hit: 'true' } }, undefined, expect.anything());
         });
       });
     });
@@ -240,11 +216,7 @@ describe.skip('<List />', () => {
       });
 
       await waitFor(() => {
-        expect(push).toHaveBeenCalledWith(
-          { query: { requires_manual_review: 'true' } },
-          undefined,
-          expect.anything(),
-        );
+        expect(push).toHaveBeenCalledWith({ query: { requires_manual_review: 'true' } }, undefined, expect.anything());
       });
     });
   });

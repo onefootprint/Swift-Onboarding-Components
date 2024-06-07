@@ -24,8 +24,7 @@ const useCreateHandoffUrl = ({
       return undefined;
     }
 
-    const { isAppClipEnabled, isInstantAppEnabled, appClipExperienceId } =
-      onboardingConfig;
+    const { isAppClipEnabled, isInstantAppEnabled, appClipExperienceId } = onboardingConfig;
     const newUrl = new URL(baseUrl);
 
     if (hasAppClipMissingCapability(missingRequirements)) {
@@ -55,11 +54,7 @@ const useCreateHandoffUrl = ({
     return newUrl;
   }, [authToken, onboardingConfig, baseUrl, language, missingRequirements]);
 
-const hasAppClipMissingCapability = (
-  missingRequirements: TransferRequirements,
-) =>
-  !missingRequirements.documents
-    .filter(d => !d.isMet)
-    .some(d => d.config.kind !== DocumentRequestKind.Identity);
+const hasAppClipMissingCapability = (missingRequirements: TransferRequirements) =>
+  !missingRequirements.documents.filter(d => !d.isMet).some(d => d.config.kind !== DocumentRequestKind.Identity);
 
 export default useCreateHandoffUrl;

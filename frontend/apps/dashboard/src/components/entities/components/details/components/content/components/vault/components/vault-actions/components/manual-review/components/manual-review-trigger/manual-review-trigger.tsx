@@ -12,12 +12,7 @@ type ManualReviewTriggerProps = {
   disabled?: boolean;
 };
 
-const ManualReviewTrigger = ({
-  kind,
-  status,
-  onSelect,
-  disabled,
-}: ManualReviewTriggerProps) => {
+const ManualReviewTrigger = ({ kind, status, onSelect, disabled }: ManualReviewTriggerProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.manual-review',
   });
@@ -27,11 +22,7 @@ const ManualReviewTrigger = ({
   return (
     <Dropdown.Root>
       <DropdownTrigger asChild disabled={disabled}>
-        <Button>
-          {kind === EntityKind.person
-            ? t('button.review-person')
-            : t('button.review-business')}
-        </Button>
+        <Button>{kind === EntityKind.person ? t('button.review-person') : t('button.review-business')}</Button>
       </DropdownTrigger>
       <Dropdown.Portal>
         <DropdownContent align="end" sideOffset={12}>

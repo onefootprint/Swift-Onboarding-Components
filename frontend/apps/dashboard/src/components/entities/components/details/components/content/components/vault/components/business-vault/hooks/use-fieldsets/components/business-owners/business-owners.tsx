@@ -1,6 +1,6 @@
 import type { Entity } from '@onefootprint/types';
 import React from 'react';
-import { Error } from 'src/components';
+import { ErrorComponent } from 'src/components';
 
 import Content from './components/content';
 import Loading from './components/loading';
@@ -16,7 +16,7 @@ const BusinessOwners = ({ entity }: BusinessOwnersProps) => {
     return <Loading />;
   }
   if (error) {
-    return <Error error={error} />;
+    return <ErrorComponent error={error} />;
   }
   if (data) {
     return <Content businessOwners={data} entity={entity} />;

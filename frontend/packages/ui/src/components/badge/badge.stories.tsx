@@ -22,11 +22,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<BadgeProps> = ({
-  children,
-  variant,
-  testID,
-}: BadgeProps) => (
+const Template: Story<BadgeProps> = ({ children, variant, testID }: BadgeProps) => (
   <Badge variant={variant} testID={testID}>
     {children}
   </Badge>

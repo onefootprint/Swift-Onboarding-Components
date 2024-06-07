@@ -6,9 +6,7 @@ import type {
 } from '@onefootprint/types/src/api/onboarding-validate';
 import { useMutation } from '@tanstack/react-query';
 
-const onboardingValidateRequest = async (
-  payload: OnboardingValidateRequest,
-) => {
+const onboardingValidateRequest = async (payload: OnboardingValidateRequest) => {
   const response = await request<OnboardingValidateResponse>({
     method: 'POST',
     url: '/hosted/onboarding/validate',

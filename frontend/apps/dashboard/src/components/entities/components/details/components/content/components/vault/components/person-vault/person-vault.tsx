@@ -27,27 +27,16 @@ type PersonVaultProps = {
 
 const PersonVault = ({ entity }: PersonVaultProps) => {
   const hasUsLegalStatus = hasEntityUsLegalStatus(entity);
-  const {
-    basic,
-    address,
-    usLegalStatus,
-    identity,
-    investorProfile,
-    documents,
-    cards,
-    custom,
-  } = useFieldsets(hasUsLegalStatus);
+  const { basic, address, usLegalStatus, identity, investorProfile, documents, cards, custom } =
+    useFieldsets(hasUsLegalStatus);
   const hasCards = hasEntityCards(entity);
   const hasDocuments = hasEntityDocuments(entity);
   const hasInvestorProfile = hasEntityInvestorProfile(entity);
   const hasCustomData = hasEntityCustomData(entity);
-  const { ownedBusinesses, hasBusinesses } = useEntityOwnedBusinesses(
-    entity.id,
-  );
+  const { ownedBusinesses, hasBusinesses } = useEntityOwnedBusinesses(entity.id);
 
   // if there are three elements, we want to display as grid
-  const displayFirstSectionAsGrid =
-    getGridTemplateAreas({ entity, hasBusinesses }) <= 3;
+  const displayFirstSectionAsGrid = getGridTemplateAreas({ entity, hasBusinesses }) <= 3;
 
   const gridFirstSection = (
     <Grid>
@@ -135,10 +124,7 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
         ) : null}
         {hasCards ? (
           <GridItem>
-            <CardFieldset
-              title={cards.title}
-              iconComponent={cards.iconComponent}
-            />
+            <CardFieldset title={cards.title} iconComponent={cards.iconComponent} />
           </GridItem>
         ) : null}
         {hasBusinesses ? (
@@ -148,11 +134,7 @@ const PersonVault = ({ entity }: PersonVaultProps) => {
         ) : null}
         {hasCustomData ? (
           <WideGridItem>
-            <CustomDataFields
-              entity={entity}
-              title={custom.title}
-              iconComponent={custom.iconComponent}
-            />
+            <CustomDataFields entity={entity} title={custom.title} iconComponent={custom.iconComponent} />
           </WideGridItem>
         ) : null}
         {hasInvestorProfile ? (

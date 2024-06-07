@@ -6,22 +6,13 @@ import {
   waitFor,
   waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
-import {
-  EntityKind,
-  EntityStatus,
-  OrgFrequentNoteKind,
-} from '@onefootprint/types';
+import { EntityKind, EntityStatus, OrgFrequentNoteKind } from '@onefootprint/types';
 import React from 'react';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
 import type { ManualReviewProps } from './manual-review';
 import ManualReview from './manual-review';
-import {
-  entityFixture,
-  withDecision,
-  withDecisionError,
-  withEntity,
-} from './manual-review.test.config';
+import { entityFixture, withDecision, withDecisionError, withEntity } from './manual-review.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -37,10 +28,7 @@ describe('<ManualReview />', () => {
     });
   });
 
-  const renderManualReview = ({
-    status = EntityStatus.pass,
-    kind = EntityKind.person,
-  }: Partial<ManualReviewProps>) =>
+  const renderManualReview = ({ status = EntityStatus.pass, kind = EntityKind.person }: Partial<ManualReviewProps>) =>
     customRender(<ManualReview status={status} kind={kind} />);
 
   describe('when entity is a person', () => {

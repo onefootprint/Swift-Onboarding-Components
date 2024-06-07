@@ -1,7 +1,4 @@
-import type {
-  OrgAuthLoginRequest,
-  OrgAuthLoginResponse,
-} from '@onefootprint/types';
+import type { OrgAuthLoginRequest, OrgAuthLoginResponse } from '@onefootprint/types';
 import { OrgAuthLoginTarget } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
@@ -71,9 +68,7 @@ const Auth = () => {
               },
             });
             waitForAnimation(() => {
-              router.push(
-                requiresOnboarding ? '/onboarding' : DEFAULT_PUBLIC_ROUTE,
-              );
+              router.push(requiresOnboarding ? '/onboarding' : DEFAULT_PUBLIC_ROUTE);
             });
           }
         },

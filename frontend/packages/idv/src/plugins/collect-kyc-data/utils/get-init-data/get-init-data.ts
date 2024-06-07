@@ -6,11 +6,7 @@ import type { UserData } from '../../../../types';
 import allAttributes from '../all-attributes';
 import type { KycData } from '../data-types';
 
-const getInitData = (
-  requirement: CollectKycDataRequirement,
-  userData: UserData,
-  disabledFields?: IdDI[],
-): KycData => {
+const getInitData = (requirement: CollectKycDataRequirement, userData: UserData, disabledFields?: IdDI[]): KycData => {
   const cdos = allAttributes(requirement);
   const data: KycData = {};
   Object.entries(userData).forEach(([key, value]) => {
@@ -46,12 +42,8 @@ const getInitData = (
 
   // Filter out fields that are not in the ob config
   // For now we only support bootstrapping KYC fields
-  const configKycAttributes = cdos.flatMap(
-    cdo => CdoToAllDisMap[cdo],
-  ) as IdDI[];
-  const filteredData = pickBy(data, (_, key) =>
-    configKycAttributes.includes(key as IdDI),
-  );
+  const configKycAttributes = cdos.flatMap(cdo => CdoToAllDisMap[cdo]) as IdDI[];
+  const filteredData = pickBy(data, (_, key) => configKycAttributes.includes(key as IdDI));
 
   return filteredData;
 };

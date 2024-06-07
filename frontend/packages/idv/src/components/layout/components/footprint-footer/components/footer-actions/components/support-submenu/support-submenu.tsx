@@ -69,25 +69,17 @@ const SupportSubmenu = ({ config }: SupportSubmenuProps) => {
       onSelect: openLink,
     },
   ];
-  const shouldRenderSubmenu =
-    config?.supportEmail || config?.supportPhone || config?.supportWebsite;
+  const shouldRenderSubmenu = config?.supportEmail || config?.supportPhone || config?.supportWebsite;
 
   return shouldRenderSubmenu ? (
     <Dropdown.Sub open={submenuOpen}>
-      <Dropdown.SubTrigger
-        onPointerDown={() => setSubmenuOpen(!submenuOpen)}
-        size="tiny"
-      >
+      <Dropdown.SubTrigger onPointerDown={() => setSubmenuOpen(!submenuOpen)} size="tiny">
         {`${t('support.label')}...`}
       </Dropdown.SubTrigger>
       <StyledSubcontent onPointerDownOutside={() => setSubmenuOpen(false)}>
         {supportLinks.map(({ label, contactLink, onSelect }) =>
           label && contactLink ? (
-            <Dropdown.Item
-              key={label}
-              onSelect={() => onSelect(contactLink)}
-              size="tiny"
-            >
+            <Dropdown.Item key={label} onSelect={() => onSelect(contactLink)} size="tiny">
               {label}
             </Dropdown.Item>
           ) : null,

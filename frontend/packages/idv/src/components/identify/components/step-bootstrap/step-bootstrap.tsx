@@ -30,10 +30,7 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
         phoneNumber: phoneNumber?.value,
       })
       .catch((error: unknown) => {
-        logError(
-          'Identifying user by bootstrap data failed in identify',
-          error,
-        );
+        logError('Identifying user by bootstrap data failed in identify', error);
         return undefined;
       });
     const { user } = identifyResult || {};

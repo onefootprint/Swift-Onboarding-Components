@@ -12,11 +12,7 @@ type PreviewHeaderProps = {
   onStartEditing: () => void;
 };
 
-const PreviewHeader = ({
-  meta,
-  canEdit,
-  onStartEditing,
-}: PreviewHeaderProps) => {
+const PreviewHeader = ({ meta, canEdit, onStartEditing }: PreviewHeaderProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.summary.person',
   });
@@ -26,11 +22,7 @@ const PreviewHeader = ({
       {meta.kind === PlaybookKind.Kyb ? (
         <TitleContainer>
           <Text variant="label-3">{t('title.kyb.main')}</Text>
-          <Tooltip
-            alignment="center"
-            position="right"
-            text={t('title.kyb.tooltip')}
-          >
+          <Tooltip alignment="center" position="right" text={t('title.kyb.tooltip')}>
             <IcoInfo16 testID="info-tooltip" />
           </Tooltip>
         </TitleContainer>
@@ -38,12 +30,7 @@ const PreviewHeader = ({
         <Text variant="label-3">{t('title.kyc')}</Text>
       )}
       {canEdit && (
-        <LinkButton
-          iconComponent={IcoPencil16}
-          iconPosition="left"
-          onClick={onStartEditing}
-          variant="label-4"
-        >
+        <LinkButton iconComponent={IcoPencil16} iconPosition="left" onClick={onStartEditing} variant="label-4">
           {t('edit')}
         </LinkButton>
       )}

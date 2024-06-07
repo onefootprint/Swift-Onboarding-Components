@@ -1,29 +1,18 @@
 import type { FootprintProps } from '@onefootprint/footprint-js';
-import {
-  FootprintPrivateEvent,
-  FootprintPublicEvent,
-} from '@onefootprint/footprint-js';
+import { FootprintPrivateEvent, FootprintPublicEvent } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
 
 import { getLogger } from '../../../utils/logger';
-import type {
-  CompletePayload,
-  CustomChildAPI,
-  IframeAdapterReturn,
-} from '../types';
+import type { CompletePayload, CustomChildAPI, IframeAdapterReturn } from '../types';
 import generateEventEmitter from '../utils/generate-event-emitter';
 
-const { auth, canceled, closed, completed, relayToComponents } =
-  FootprintPublicEvent;
+const { auth, canceled, closed, completed, relayToComponents } = FootprintPublicEvent;
 const { propsReceived, started, relayFromComponents } = FootprintPrivateEvent;
 const { logError, logInfo, logWarn } = getLogger({
   location: 'bifrost-iframe-adapter',
 });
 
-const getSpecificEvent = (
-  event: string,
-  childRef: CustomChildAPI | null,
-): string => {
+const getSpecificEvent = (event: string, childRef: CustomChildAPI | null): string => {
   const sdkInitId = childRef?.model?.initId;
   return sdkInitId?.length ? `${sdkInitId}:${event}` : event;
 };
@@ -40,9 +29,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
       postmateChildApiRef.emit(specificEvent, data);
       logInfo(`The ${eventName} event has been dispatched`);
     } else {
-      logWarn(
-        `Footprint.js must be initialized in order to dispatch the event "${event}"`,
-      );
+      logWarn(`Footprint.js must be initialized in order to dispatch the event "${event}"`);
     }
   };
 

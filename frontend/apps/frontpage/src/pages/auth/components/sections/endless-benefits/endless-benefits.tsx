@@ -12,11 +12,7 @@ const EndlessBenefits = () => {
   return (
     <>
       <Container marginTop={12}>
-        <Title
-          iconSrc="/auth/icons/ico-illustrated-heart-40.svg"
-          title={t('title')}
-          subtitle={t('subtitle')}
-        />
+        <Title iconSrc="/auth/icons/ico-illustrated-heart-40.svg" title={t('title')} subtitle={t('subtitle')} />
       </Container>
       <CardGrid />
     </>

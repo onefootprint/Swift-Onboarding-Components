@@ -8,10 +8,8 @@ type MachineArgs = {
   initialContext: MachineContext;
 };
 
-const useLocalMachine = ({ initialContext }: MachineArgs) =>
-  useMachine(() => createTransferMachine(initialContext));
+const useLocalMachine = ({ initialContext }: MachineArgs) => useMachine(() => createTransferMachine(initialContext));
 
-export const [TransferMachineProvider, useTransferMachine] =
-  constate(useLocalMachine);
+export const [TransferMachineProvider, useTransferMachine] = constate(useLocalMachine);
 
 export default TransferMachineProvider;

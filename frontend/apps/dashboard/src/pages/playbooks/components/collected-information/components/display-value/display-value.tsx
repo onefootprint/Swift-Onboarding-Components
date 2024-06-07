@@ -22,17 +22,11 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
   });
 
   if (typeof value === 'boolean') {
-    return value ? (
-      <IcoCheck24 aria-label={t('enabled')} />
-    ) : (
-      <IcoCloseSmall24 aria-label={t('disabled')} />
-    );
+    return value ? <IcoCheck24 aria-label={t('enabled')} /> : <IcoCloseSmall24 aria-label={t('disabled')} />;
   }
 
   if (name === 'idDocKind') {
-    return (
-      <IdDocDisplay idDocKind={value as SupportedIdDocTypes[]} threshold={2} />
-    );
+    return <IdDocDisplay idDocKind={value as SupportedIdDocTypes[]} threshold={2} />;
   }
 
   if (name === 'ssn') {
@@ -40,8 +34,7 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
     if (ssnValue.active) {
       return (
         <Text variant="body-3">
-          {t(`${ssnValue.kind}` as ParseKeys<'common'>)}{' '}
-          {ssnValue.optional ? t('optional') : ''}
+          {t(`${ssnValue.kind}` as ParseKeys<'common'>)} {ssnValue.optional ? t('optional') : ''}
         </Text>
       );
     }
@@ -49,9 +42,7 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
   }
 
   if (name === 'internationalCountryRestrictions') {
-    const countries = value as NonNullable<
-      Option['internationalCountryRestrictions']
-    >;
+    const countries = value as NonNullable<Option['internationalCountryRestrictions']>;
     if (!countries || countries.length === 0) {
       return <Text variant="body-3">{t('none')}</Text>;
     }
@@ -59,9 +50,7 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
     return (
       <ListValue
         value={countries.map(countryCode => {
-          const countryFound = COUNTRIES.find(
-            country => country.value === countryCode,
-          );
+          const countryFound = COUNTRIES.find(country => country.value === countryCode);
           if (countryFound) return countryFound.label;
           return countryCode;
         })}
@@ -72,12 +61,7 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
 
   if (name === 'countriesRestrictions' && value) {
     const countries = value as NonNullable<Option['countriesRestrictions']>;
-    return (
-      <ListValue
-        value={countries.map(country => country.label)}
-        threshold={2}
-      />
-    );
+    return <ListValue value={countries.map(country => country.label)} threshold={2} />;
   }
 
   return null;

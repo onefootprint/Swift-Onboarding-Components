@@ -23,8 +23,7 @@ const getCurrentOption = ({ value, options }: GetStepProps) => {
     }
   });
 
-  const isLastStep =
-    currentOption && options.indexOf(currentOption) === options.length - 1;
+  const isLastStep = currentOption && options.indexOf(currentOption) === options.length - 1;
 
   return { currentOption, currentSubOption, isLastStep };
 };

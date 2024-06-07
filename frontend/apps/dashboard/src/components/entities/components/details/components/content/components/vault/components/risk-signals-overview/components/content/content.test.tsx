@@ -1,10 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  within,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, within } from '@onefootprint/test-utils';
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 import React from 'react';
 
@@ -52,8 +46,7 @@ describe('<Content />', () => {
             scopes: [RiskSignalAttribute.phoneNumber],
             reasonCode: 'phone_number_located_is_voip',
             note: 'VOIP phone number',
-            description:
-              "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+            description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
             onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
             timestamp: '2022-10-24T21:56:12.682238Z',
             hasAmlHits: false,
@@ -74,8 +67,7 @@ describe('<Content />', () => {
             scopes: [RiskSignalAttribute.phoneNumber],
             reasonCode: 'phone_number_located_is_voip',
             note: 'VOIP phone number',
-            description:
-              "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+            description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
             onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
             timestamp: '2022-10-24T21:56:12.682238Z',
             hasAmlHits: false,
@@ -87,8 +79,7 @@ describe('<Content />', () => {
             onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
             reasonCode: 'email_domain_corporate',
             note: 'Corporate email domain',
-            description:
-              'The domain of the email address has been identified as belonging to a corporate entity.',
+            description: 'The domain of the email address has been identified as belonging to a corporate entity.',
             severity: RiskSignalSeverity.Low,
             scopes: [RiskSignalAttribute.email],
             timestamp: '2022-10-24T21:56:12.682238Z',
@@ -130,8 +121,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -175,8 +165,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -199,8 +188,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -210,8 +198,7 @@ describe('<Content />', () => {
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               reasonCode: 'email_domain_corporate',
               note: 'Corporate email domain',
-              description:
-                'The domain of the email address has been identified as belonging to a corporate entity.',
+              description: 'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Low,
               scopes: [RiskSignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -236,8 +223,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -260,8 +246,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -271,8 +256,7 @@ describe('<Content />', () => {
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               reasonCode: 'email_domain_corporate',
               note: 'Corporate email domain',
-              description:
-                'The domain of the email address has been identified as belonging to a corporate entity.',
+              description: 'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Medium,
               scopes: [RiskSignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -297,8 +281,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -321,8 +304,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -332,8 +314,7 @@ describe('<Content />', () => {
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               reasonCode: 'email_domain_corporate',
               note: 'Corporate email domain',
-              description:
-                'The domain of the email address has been identified as belonging to a corporate entity.',
+              description: 'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.High,
               scopes: [RiskSignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -360,8 +341,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -373,8 +353,7 @@ describe('<Content />', () => {
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               reasonCode: 'email_domain_corporate',
               note: 'Corporate email domain',
-              description:
-                'The domain of the email address has been identified as belonging to a corporate entity.',
+              description: 'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Low,
               scopes: [RiskSignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -398,8 +377,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -412,8 +390,7 @@ describe('<Content />', () => {
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               reasonCode: 'email_domain_corporate',
               note: 'Corporate email domain',
-              description:
-                'The domain of the email address has been identified as belonging to a corporate entity.',
+              description: 'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Low,
               scopes: [RiskSignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -437,8 +414,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -450,8 +426,7 @@ describe('<Content />', () => {
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               severity: RiskSignalSeverity.Medium,
               scopes: [RiskSignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -476,8 +451,7 @@ describe('<Content />', () => {
               scopes: [RiskSignalAttribute.phoneNumber],
               reasonCode: 'phone_number_located_is_voip',
               note: 'VOIP phone number',
-              description:
-                "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+              description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               timestamp: '2022-10-24T21:56:12.682238Z',
               hasAmlHits: false,
@@ -489,8 +463,7 @@ describe('<Content />', () => {
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               reasonCode: 'email_domain_corporate',
               note: 'Corporate email domain',
-              description:
-                'The domain of the email address has been identified as belonging to a corporate entity.',
+              description: 'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Medium,
               scopes: [RiskSignalAttribute.email],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -503,8 +476,7 @@ describe('<Content />', () => {
               onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
               reasonCode: 'email_domain_corporate',
               note: 'Corporate email domain',
-              description:
-                'The domain of the email address has been identified as belonging to a corporate entity.',
+              description: 'The domain of the email address has been identified as belonging to a corporate entity.',
               severity: RiskSignalSeverity.Low,
               scopes: [RiskSignalAttribute.name],
               timestamp: '2022-10-24T21:56:12.682238Z',
@@ -514,9 +486,7 @@ describe('<Content />', () => {
         });
 
         const text = screen.getByText('risk signal', { exact: false });
-        expect(text.textContent).toEqual(
-          '1 High, 1 Medium and 1 Low risk signals',
-        );
+        expect(text.textContent).toEqual('1 High, 1 Medium and 1 Low risk signals');
       });
     });
   });

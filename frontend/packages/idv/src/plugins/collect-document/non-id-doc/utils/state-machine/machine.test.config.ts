@@ -1,8 +1,4 @@
-import {
-  DocumentRequestKind,
-  IdDocImageProcessingError,
-  IdDocImageUploadError,
-} from '@onefootprint/types';
+import { DocumentRequestKind, IdDocImageProcessingError, IdDocImageUploadError } from '@onefootprint/types';
 
 import type { MachineContext } from './types';
 
@@ -22,8 +18,7 @@ export const argsRegularMobile: MachineContext = {
   },
 };
 
-export const getArgsRegularMobile = () =>
-  JSON.parse(JSON.stringify(argsRegularMobile));
+export const getArgsRegularMobile = () => JSON.parse(JSON.stringify(argsRegularMobile));
 
 export const argsRegularDesktop: MachineContext = {
   authToken: 'token',
@@ -41,16 +36,13 @@ export const argsRegularDesktop: MachineContext = {
   },
 };
 
-export const getArgsRegularDesktop = () =>
-  JSON.parse(JSON.stringify(argsRegularDesktop));
+export const getArgsRegularDesktop = () => JSON.parse(JSON.stringify(argsRegularDesktop));
 
 export const processingErrors = [
   { errorType: IdDocImageProcessingError.countryCodeMismatch },
   { errorType: IdDocImageProcessingError.wrongDocumentSide },
 ];
-export const uploadErrors = [
-  { errorType: IdDocImageUploadError.fileTypeNotAllowed },
-];
+export const uploadErrors = [{ errorType: IdDocImageUploadError.fileTypeNotAllowed }];
 
 export const testFile = new File(['foo'], 'foo.txt', {
   type: 'text/plain',

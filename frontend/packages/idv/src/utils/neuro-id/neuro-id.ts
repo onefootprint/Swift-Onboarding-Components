@@ -6,11 +6,7 @@ declare global {
     nid: {
       (command: 'identify', authToken: string): void;
       (command: 'applicationSubmit'): void;
-      (
-        command: 'setVariable',
-        variableName: string,
-        variableValue: string,
-      ): void;
+      (command: 'setVariable', variableName: string, variableValue: string): void;
     };
   }
 }
@@ -33,7 +29,7 @@ const identify = async (authToken: string) => {
         },
       });
       window.nid('identify', data.id);
-    } catch (e) {
+    } catch (_e) {
       // Do nothing
     }
   }

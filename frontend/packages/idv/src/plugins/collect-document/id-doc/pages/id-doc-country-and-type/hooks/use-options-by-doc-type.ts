@@ -64,9 +64,7 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
       value: SupportedIdDocTypes.residenceDocument,
     };
   }
-  if (
-    supportedDocumentTypes?.includes(SupportedIdDocTypes.voterIdentification)
-  ) {
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.voterIdentification)) {
     optionsByDocType[SupportedIdDocTypes.voterIdentification] = {
       title: t('form.type.voterIdentification.title'),
       IconComponent: IcoVoter24,

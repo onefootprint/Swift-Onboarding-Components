@@ -1,10 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-  waitForElementToBeRemoved,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor, waitForElementToBeRemoved } from '@onefootprint/test-utils';
 import React from 'react';
 
 import Documents from './documents';
@@ -18,9 +12,7 @@ describe('Documents', () => {
   const renderDocumentsAndWait = async () => {
     renderDocuments();
 
-    await waitForElementToBeRemoved(() =>
-      screen.queryByRole('progressbar', { name: 'Loading documents' }),
-    );
+    await waitForElementToBeRemoved(() => screen.queryByRole('progressbar', { name: 'Loading documents' }));
   };
 
   describe('when the document is not found', () => {
@@ -62,9 +54,7 @@ describe('Documents', () => {
         await renderDocumentsAndWait();
 
         await waitFor(() => {
-          const banner = screen.getByText(
-            'This data is encrypted for this user. Please decrypt to reveal.',
-          );
+          const banner = screen.getByText('This data is encrypted for this user. Please decrypt to reveal.');
           expect(banner).toBeInTheDocument();
         });
       });

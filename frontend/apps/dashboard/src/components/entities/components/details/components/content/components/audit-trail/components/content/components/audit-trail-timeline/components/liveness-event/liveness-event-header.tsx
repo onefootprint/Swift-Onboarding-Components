@@ -16,9 +16,7 @@ const LivenessEventHeader = ({ data }: LivenessEventHeaderProps) => {
 
   return (
     <Text variant="label-3" testID="liveness-event-header">
-      {source === LivenessSource.skipped
-        ? t('skipped-title')
-        : t('success-title')}
+      {source === LivenessSource.skipped ? t('skipped-title') : t('success-title')}
     </Text>
   );
 };

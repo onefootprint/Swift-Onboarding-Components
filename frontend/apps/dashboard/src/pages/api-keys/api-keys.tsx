@@ -12,8 +12,7 @@ import Table from './components/table';
 
 const ApiKeys = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys' });
-  const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
-    useToggle(false);
+  const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] = useToggle(false);
 
   return (
     <>
@@ -28,10 +27,7 @@ const ApiKeys = () => {
               {t('header.subtitle')}
             </Text>
           </Stack>
-          <PermissionGate
-            fallbackText={t('header.cta-not-allowed')}
-            scopeKind={RoleScopeKind.apiKeys}
-          >
+          <PermissionGate fallbackText={t('header.cta-not-allowed')} scopeKind={RoleScopeKind.apiKeys}>
             <Button onClick={openCreateDialog} variant="primary">
               {t('header.cta')}
             </Button>

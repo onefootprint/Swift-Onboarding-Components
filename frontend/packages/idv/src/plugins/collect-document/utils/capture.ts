@@ -16,16 +16,9 @@ export const VideoEvents = [
   'stalled', // The user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
   'suspend', // The suspend event is fired when media data loading has been suspended.
 ];
-const nonPlayingVideoEventTypes = new Set([
-  'ended',
-  'error',
-  'pause',
-  'stalled',
-  'suspend',
-]);
+const nonPlayingVideoEventTypes = new Set(['ended', 'error', 'pause', 'stalled', 'suspend']);
 
-const isHtmlVideoElement = (x?: unknown): x is HTMLVideoElement =>
-  Boolean(x) && x instanceof HTMLVideoElement;
+const isHtmlVideoElement = (x?: unknown): x is HTMLVideoElement => Boolean(x) && x instanceof HTMLVideoElement;
 
 export const isNotAllowedError = (x?: unknown) => x === 'NotAllowedError';
 export const isDesktop = (x: unknown): x is 'desktop' => x === 'desktop';
@@ -35,23 +28,18 @@ export const isMobile = (x: unknown): x is 'mobile' => x === 'mobile';
 export const isString = (x: unknown): x is string => typeof x === 'string';
 export const isBlob = (x: unknown): x is Blob => x instanceof Blob;
 export const isFile = (x: unknown): x is File => x instanceof File;
-export const isFileOrBlob = (x: unknown): x is File | Blob =>
-  isFile(x) || isBlob(x);
+export const isFileOrBlob = (x: unknown): x is File | Blob => isFile(x) || isBlob(x);
 
-export const isFunction = (x?: unknown): x is Function =>
-  typeof x === 'function';
+export const isFunction = (x?: unknown): x is Function => typeof x === 'function';
 
-export const isNonPlayingVideoEvent = (e: Event): boolean =>
-  nonPlayingVideoEventTypes.has(e.type);
+export const isNonPlayingVideoEvent = (e: Event): boolean => nonPlayingVideoEventTypes.has(e.type);
 
 export const hasFileReaderSupport = (): boolean => {
   if (typeof window === 'undefined') return false;
   return 'FileReader' in window && 'readAsDataURL' in new FileReader();
 };
 
-export const getHtmlVideoElement = (
-  x: ForwardVideoRef,
-): HTMLVideoElement | undefined => {
+export const getHtmlVideoElement = (x: ForwardVideoRef): HTMLVideoElement | undefined => {
   if (!x) return undefined;
 
   if (isFunction(x)) {
@@ -59,10 +47,7 @@ export const getHtmlVideoElement = (
     return isHtmlVideoElement(res) ? res : undefined;
   }
 
-  return Object.prototype.hasOwnProperty.call(x, 'current') &&
-    isHtmlVideoElement(x.current)
-    ? x.current
-    : undefined;
+  return Object.prototype.hasOwnProperty.call(x, 'current') && isHtmlVideoElement(x.current) ? x.current : undefined;
 };
 
 export const clearCanvas = (

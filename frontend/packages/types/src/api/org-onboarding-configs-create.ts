@@ -1,8 +1,5 @@
 import type { CollectedDataOption } from '../data/collected-data-option';
-import type {
-  DocumentTypesAndCountries,
-  OnboardingConfigKind,
-} from '../data/onboarding-config';
+import type { DocumentTypesAndCountries, OnboardingConfigKind } from '../data/onboarding-config';
 
 type VerificationCheck = {
   kind: string;

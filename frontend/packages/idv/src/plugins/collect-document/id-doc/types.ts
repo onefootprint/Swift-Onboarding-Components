@@ -1,8 +1,4 @@
-import type {
-  DocumentUploadMode,
-  IdDocOutcome,
-  IdDocRequirementConfig,
-} from '@onefootprint/types';
+import type { DocumentUploadMode, IdDocOutcome, IdDocRequirementConfig } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../hooks';
 

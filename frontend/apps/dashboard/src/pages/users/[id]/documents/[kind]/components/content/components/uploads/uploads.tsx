@@ -23,10 +23,7 @@ const Uploads = () => {
         <Upload
           attempts={1}
           source="desktop"
-          srcs={[
-            'https://i.imgur.com/6ECWeRg.png',
-            'https://i.imgur.com/6ECWeRg.png',
-          ]}
+          srcs={['https://i.imgur.com/6ECWeRg.png', 'https://i.imgur.com/6ECWeRg.png']}
           status="error"
           title="ID doc"
           when="03:29 pm"

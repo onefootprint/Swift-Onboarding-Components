@@ -57,12 +57,7 @@ const MobileDemoVideo = ({
 
   return (
     <PhoneContainer className={className}>
-      <PhoneFrameImage
-        src={hideNotch ? '/iphone-no-notch.png' : '/iphone.png'}
-        alt=""
-        width={width}
-        height={height}
-      />
+      <PhoneFrameImage src={hideNotch ? '/iphone-no-notch.png' : '/iphone.png'} alt="" width={width} height={height} />
       {hasWindow && (
         <ReactPlayer
           url={videoUrl}

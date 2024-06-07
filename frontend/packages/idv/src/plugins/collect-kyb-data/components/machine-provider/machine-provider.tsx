@@ -11,8 +11,6 @@ type CollectKybDataMachineArgs = {
 const useLocalCollectKybDataMachine = ({ args }: CollectKybDataMachineArgs) =>
   useMachine(() => createCollectKybDataMachine(args));
 
-export const [MachineProvider, useCollectKybDataMachine] = constate(
-  useLocalCollectKybDataMachine,
-);
+export const [MachineProvider, useCollectKybDataMachine] = constate(useLocalCollectKybDataMachine);
 
 export default MachineProvider;

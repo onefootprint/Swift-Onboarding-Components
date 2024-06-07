@@ -16,15 +16,7 @@ const Page404 = () => {
           <EmptyState
             title={t('title')}
             description={t('description')}
-            renderHeader={() => (
-              <Image
-                alt={t('image.alt')}
-                src="/404.png"
-                height={212}
-                width={298}
-                priority
-              />
-            )}
+            renderHeader={() => <Image alt={t('image.alt')} src="/404.png" height={212} width={298} priority />}
           />
         </Inner>
       </Container>

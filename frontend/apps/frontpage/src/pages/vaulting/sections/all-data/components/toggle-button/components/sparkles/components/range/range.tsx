@@ -1,9 +1,9 @@
 const range = (start: number, end: number | undefined, step = 1) => {
   const output = [];
   if (typeof end === 'undefined') {
-    // eslint-disable-next-line no-param-reassign
+    // biome-ignore lint/style/noParameterAssign: <explanation>
     end = start;
-    // eslint-disable-next-line no-param-reassign
+    // biome-ignore lint/style/noParameterAssign: <explanation>
     start = 0;
   }
   for (let i = start; i < end; i += step) {

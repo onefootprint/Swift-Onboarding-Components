@@ -1,35 +1,14 @@
 import themes from '@onefootprint/design-tokens';
-import {
-  createUseRouterSpy,
-  render,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, render, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  IdDI,
-  OnboardingConfigStatus,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
-import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { Layout } from 'src/components/layout';
 
 import CollectKycData from './index';
-import {
-  withIdentify,
-  withOnboardingConfig,
-  withUserToken,
-  withUserVault,
-} from './index.test.config';
+import { withIdentify, withOnboardingConfig, withUserToken, withUserVault } from './index.test.config';
 import type { CollectKycDataProps } from './types';
 
 describe('<CollectKycData />', () => {
@@ -38,9 +17,9 @@ describe('<CollectKycData />', () => {
   const queryClient = new QueryClient({
     queryCache,
     logger: {
-      log: () => {},
-      warn: () => {},
-      error: () => {},
+      log: () => undefined,
+      warn: () => undefined,
+      error: () => undefined,
     },
     defaultOptions: {
       queries: {
@@ -66,11 +45,7 @@ describe('<CollectKycData />', () => {
           <DesignSystemProvider theme={themes.light}>
             <ToastProvider>
               <Layout>
-                <CollectKycData
-                  idvContext={idvContext}
-                  context={context}
-                  onDone={onDone}
-                />
+                <CollectKycData idvContext={idvContext} context={context} onDone={onDone} />
               </Layout>
             </ToastProvider>
           </DesignSystemProvider>
@@ -96,10 +71,7 @@ describe('<CollectKycData />', () => {
     allowInternationalResidents: false,
   };
 
-  const getContext = (
-    attributes: CollectedKycDataOption[],
-    onDone: () => void,
-  ): CollectKycDataProps => ({
+  const getContext = (attributes: CollectedKycDataOption[], onDone: () => void): CollectKycDataProps => ({
     idvContext: {
       authToken: 'token',
       device: {
@@ -140,14 +112,7 @@ describe('<CollectKycData />', () => {
       const onDone = jest.fn();
 
       renderPlugin(
-        getContext(
-          [
-            CollectedKycDataOption.name,
-            CollectedKycDataOption.dob,
-            CollectedKycDataOption.ssn4,
-          ],
-          onDone,
-        ),
+        getContext([CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn4], onDone),
       );
 
       await waitFor(() => {
@@ -179,11 +144,7 @@ describe('<CollectKycData />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'What are the last 4 digits of your Social Security Number?',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('What are the last 4 digits of your Social Security Number?')).toBeInTheDocument();
       });
 
       let ssn4 = screen.getByLabelText('SSN (last 4)');
@@ -195,9 +156,7 @@ describe('<CollectKycData />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Confirm your personal data'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Confirm your personal data')).toBeInTheDocument();
       });
 
       firstName = screen.getByText('Piip');

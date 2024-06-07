@@ -4,10 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { isAuth, isIdDoc, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
 import styled, { css } from 'styled-components';
 
-import {
-  OnboardingTemplate,
-  type SummaryMeta,
-} from '@/playbooks/utils/machine/types';
+import { OnboardingTemplate, type SummaryMeta } from '@/playbooks/utils/machine/types';
 
 import Auth from './components/auth';
 import Business from './components/business';
@@ -46,9 +43,7 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
       {isKyb(meta.kind) && <Business />}
       <Person meta={meta} />
       {isKyc(meta.kind) && isCustom && <Investor />}
-      {isKyb(meta.kind) && (
-        <InlineAlert variant="info">{t('alert')}</InlineAlert>
-      )}
+      {isKyb(meta.kind) && <InlineAlert variant="info">{t('alert')}</InlineAlert>}
     </Container>
   );
 };

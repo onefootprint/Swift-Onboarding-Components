@@ -41,11 +41,7 @@ const OverlayFieldSet = ({
           <IcoPencil16 />
         </IconButton>
       </Stack>
-      {value ? (
-        <Text variant="body-3">{value}</Text>
-      ) : (
-        <LinkButton onClick={openDialog}>{label}</LinkButton>
-      )}
+      {value ? <Text variant="body-3">{value}</Text> : <LinkButton onClick={openDialog}>{label}</LinkButton>}
       <DialogWrapper
         id={id}
         labelLink={dialogDelete}

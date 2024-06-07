@@ -361,9 +361,7 @@ describe('Collect KYB Data Machine Tests', () => {
           [BusinessDI.zip]: '023123',
         },
       });
-      expect(state.context.data[BusinessDI.addressLine1]).toEqual(
-        '222 Main St',
-      );
+      expect(state.context.data[BusinessDI.addressLine1]).toEqual('222 Main St');
       expect(state.context.data[BusinessDI.addressLine2]).toEqual('Apt 2');
       expect(state.context.data[BusinessDI.city]).toEqual('Boston');
       expect(state.context.data[BusinessDI.state]).toEqual('MA');

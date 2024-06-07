@@ -1,10 +1,6 @@
 import { primitives } from '@onefootprint/design-tokens';
-import {
-  IcoCheckSmall16,
-  IcoPlusSmall16,
-  IcoTrash16,
-} from '@onefootprint/icons';
-import { Button, createFontStyles, Stack, Text } from '@onefootprint/ui';
+import { IcoCheckSmall16, IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
+import { Button, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,13 +15,7 @@ type OptionProps = {
   isEdit?: boolean;
 };
 
-const Option = ({
-  children,
-  value,
-  onClick,
-  onDelete,
-  isEdit,
-}: OptionProps) => {
+const Option = ({ children, value, onClick, onDelete, isEdit }: OptionProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.frequent-notes',
   });
@@ -33,8 +23,7 @@ const Option = ({
   const isHovered = useHover(hoverRef);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const [hideCheckTimeout, setHideCheckTimeout] =
-    useState<ReturnType<typeof setTimeout>>();
+  const [hideCheckTimeout, setHideCheckTimeout] = useState<ReturnType<typeof setTimeout>>();
 
   const handleOnClick = () => {
     if (isEdit) {
@@ -73,12 +62,7 @@ const Option = ({
   };
 
   return (
-    <Container
-      ref={hoverRef}
-      $isHovered={isHovered}
-      $isCopied={isCopied}
-      onClick={handleOnClick}
-    >
+    <Container ref={hoverRef} $isHovered={isHovered} $isCopied={isCopied} onClick={handleOnClick}>
       <Stack direction="row" gap={3} padding={4} align="start">
         <IconContainer
           isHovered={isHovered}
@@ -91,12 +75,7 @@ const Option = ({
         >
           {renderIcon()}
         </IconContainer>
-        <TextContainer
-          padding={2}
-          align="start"
-          justify="start"
-          color={isHovered ? 'primary' : 'secondary'}
-        >
+        <TextContainer padding={2} align="start" justify="start" color={isHovered ? 'primary' : 'secondary'}>
           <p>{children}</p>
         </TextContainer>
       </Stack>
@@ -135,11 +114,13 @@ const Container = styled(motion.div)<{
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     max-width: 100%;
 
-    ${isHovered &&
-    !isCopied &&
-    css`
+    ${
+      isHovered &&
+      !isCopied &&
+      css`
       border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    `}
+    `
+    }
   `};
 `;
 
@@ -154,28 +135,34 @@ const IconContainer = styled(Stack)<{
     margin-top: ${theme.spacing[2]};
     background-color: ${theme.backgroundColor.secondary};
 
-    ${isEdit &&
-    !isHovered &&
-    css`
+    ${
+      isEdit &&
+      !isHovered &&
+      css`
       background-color: ${theme.backgroundColor.secondary};
-    `}
+    `
+    }
 
-    ${isHovered &&
-    !isEdit &&
-    css`
+    ${
+      isHovered &&
+      !isEdit &&
+      css`
       background-color: ${theme.backgroundColor.senary};
-    `}
+    `
+    }
 
-    ${isHovered &&
-    isEdit &&
-    css`
+    ${
+      isHovered &&
+      isEdit &&
+      css`
       background-color: ${theme.backgroundColor.error};
       svg {
         path {
           fill: ${theme.color.error};
         }
       }
-    `}
+    `
+    }
   `};
 `;
 

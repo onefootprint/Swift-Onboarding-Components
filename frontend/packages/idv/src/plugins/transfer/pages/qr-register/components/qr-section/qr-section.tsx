@@ -12,13 +12,7 @@ type QRSectionProps = {
 };
 
 const QRSection = ({ text, qrValue, isLoading }: QRSectionProps) => (
-  <Container
-    paddingTop={7}
-    paddingBottom={7}
-    direction="column"
-    align="center"
-    gap={5}
-  >
+  <Container paddingTop={7} paddingBottom={7} direction="column" align="center" gap={5}>
     <Text variant="body-2" color="secondary">
       {text}
     </Text>

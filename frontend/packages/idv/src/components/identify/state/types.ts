@@ -60,12 +60,11 @@ export enum SuccessfulIdentifier {
   authToken = 'authToken',
 }
 
-export type TransitionsFor<EVENT extends EventObject> =
-  TransitionConfigOrTarget<
-    IdentifyMachineContext,
-    EVENT,
-    IdentifyMachineEvents
-  >;
+export type TransitionsFor<EVENT extends EventObject> = TransitionConfigOrTarget<
+  IdentifyMachineContext,
+  EVENT,
+  IdentifyMachineEvents
+>;
 
 export enum IdentifyVariant {
   auth = 'auth',

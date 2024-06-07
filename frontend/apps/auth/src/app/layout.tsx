@@ -5,11 +5,7 @@ import { DM_Sans } from 'next/font/google';
 import Script from 'next/script';
 import React from 'react';
 
-import {
-  COMMIT_SHA,
-  DEPLOYMENT_URL,
-  GOOGLE_MAPS_KEY,
-} from '../config/constants';
+import { COMMIT_SHA, DEPLOYMENT_URL, GOOGLE_MAPS_KEY } from '../config/constants';
 
 type RootLayoutProps = {
   children: React.ReactNode;
@@ -42,23 +38,9 @@ const RootLayout = ({ children }: RootLayoutProps) => (
   <html lang="en" className={DMSans.variable}>
     <head>
       <link rel="shortcut icon" href="/favicon.ico" />
-      <link
-        href="/apple-touch-icon.png"
-        rel="apple-touch-icon"
-        sizes="180x180"
-      />
-      <link
-        href="/favicon-32x32.png"
-        rel="icon"
-        sizes="32x32"
-        type="image/png"
-      />
-      <link
-        href="/favicon-16x16.png"
-        rel="icon"
-        sizes="16x16"
-        type="image/png"
-      />
+      <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
+      <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
+      <link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" />
     </head>
     <body>{children}</body>
     {mapsSrc ? <Script src={mapsSrc} strategy="lazyOnload" /> : null}

@@ -11,12 +11,7 @@ export type OrgLoginResponse = {
   requiresOnboarding: boolean;
   tenant?: {
     allowDomainAccess: boolean;
-    companySize?:
-      | 's1_to10'
-      | 's11_to50'
-      | 's51_to100'
-      | 's101_to1000'
-      | 's1001_plus';
+    companySize?: 's1_to10' | 's11_to50' | 's51_to100' | 's101_to1000' | 's1001_plus';
     domains: Array<string>;
     id: string;
     isAuthMethodSupported?: boolean;

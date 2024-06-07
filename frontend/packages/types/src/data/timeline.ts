@@ -12,10 +12,7 @@ import type { EntityLabel } from './entity';
 import type { IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
 import type { InsightEvent } from './insight-event';
 import type { LivenessAttribute, LivenessSource } from './liveness';
-import type {
-  OnboardingDecision,
-  TimelinePlaybook,
-} from './onboarding-decision';
+import type { OnboardingDecision, TimelinePlaybook } from './onboarding-decision';
 
 export enum TimelineEventKind {
   labelAdded = 'label_added',
@@ -50,11 +47,7 @@ export type CollectedDataEvent = {
 
 export type CollectedDataEventData = {
   isPrefill: boolean;
-  attributes: (
-    | CollectedKybDataOption
-    | CollectedKycDataOption
-    | CollectedInvestorProfileDataOption
-  )[];
+  attributes: (CollectedKybDataOption | CollectedKycDataOption | CollectedInvestorProfileDataOption)[];
   actor?: Actor;
 };
 

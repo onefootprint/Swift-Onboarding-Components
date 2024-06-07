@@ -1,9 +1,9 @@
 import { screen } from '@onefootprint/test-utils';
 import React from 'react';
 
+import DesktopProcessing from '.';
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
-import DesktopProcessing from '.';
 import {
   initialContextBD,
   initialContextDL,

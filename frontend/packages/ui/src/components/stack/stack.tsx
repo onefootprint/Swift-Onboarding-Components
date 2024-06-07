@@ -13,18 +13,7 @@ export type StackProps = Omit<BoxPrimitives<HTMLDivElement>, 'direction'> & {
 };
 
 const Stack = forwardRef<HTMLDivElement, StackProps>(
-  (
-    {
-      align,
-      children,
-      direction,
-      inline,
-      justify,
-      right,
-      ...props
-    }: StackProps,
-    ref,
-  ) => (
+  ({ align, children, direction, inline, justify, right, ...props }: StackProps, ref) => (
     <Box
       alignItems={align}
       display={inline ? 'inline-flex' : 'flex'}

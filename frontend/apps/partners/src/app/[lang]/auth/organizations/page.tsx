@@ -11,9 +11,7 @@ export const metadata: Metadata = {
 
 type OrganizationsPageProps = { searchParams: { token: string } };
 
-const OrganizationsPage = async ({
-  searchParams: { token },
-}: OrganizationsPageProps) => {
+const OrganizationsPage = async ({ searchParams: { token } }: OrganizationsPageProps) => {
   const orgs = await getPartnerAuthRoles(token);
 
   return <OrganizationsPageContent token={token} orgs={orgs} />;

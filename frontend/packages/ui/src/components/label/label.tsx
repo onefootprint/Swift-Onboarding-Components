@@ -21,14 +21,7 @@ export type LabelProps = {
   tooltip?: LabelTooltipProps;
 };
 
-const Label = ({
-  children,
-  hasError = false,
-  htmlFor,
-  id,
-  size = 'default',
-  tooltip = undefined,
-}: LabelProps) => (
+const Label = ({ children, hasError = false, htmlFor, id, size = 'default', tooltip = undefined }: LabelProps) => (
   <LabelContainer>
     <StyledLabel
       /** Do not change/remove these classes */

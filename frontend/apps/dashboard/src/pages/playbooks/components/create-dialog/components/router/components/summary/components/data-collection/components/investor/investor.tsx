@@ -8,14 +8,12 @@ import styled, { css } from 'styled-components';
 
 const InvestorProfile = () => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.playbooks.dialog.summary.data-collection.investor-profile',
+    keyPrefix: 'pages.playbooks.dialog.summary.data-collection.investor-profile',
   });
   const { register, setValue, watch } = useFormContext();
 
   const added = watch(CollectedInvestorProfileDataOption.investorProfile);
-  const handleClick = () =>
-    setValue(CollectedInvestorProfileDataOption.investorProfile, !added);
+  const handleClick = () => setValue(CollectedInvestorProfileDataOption.investorProfile, !added);
 
   return (
     <Container>
@@ -40,12 +38,7 @@ const InvestorProfile = () => {
           </LinkButton>
         )}
         {!added && (
-          <LinkButton
-            iconComponent={IcoPlusSmall16}
-            iconPosition="left"
-            onClick={handleClick}
-            variant="label-4"
-          >
+          <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={handleClick} variant="label-4">
             {t('toggle.add')}
           </LinkButton>
         )}

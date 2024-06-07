@@ -1,5 +1,5 @@
 import { IcoCheck16 } from '@onefootprint/icons';
-import { Box, createFontStyles, media, Text } from '@onefootprint/ui';
+import { Box, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -13,9 +13,7 @@ type SectionTextProps = {
 
 const SectionText = ({ title, subtitle, items, iconSrc }: SectionTextProps) => (
   <Container>
-    {iconSrc && (
-      <Image src={iconSrc} alt="section icon" width={80} height={80} />
-    )}
+    {iconSrc && <Image src={iconSrc} alt="section icon" width={80} height={80} />}
     <TitleContainer>
       <Title tag="h3">{title}</Title>
       <Subtitle tag="h4">{subtitle}</Subtitle>

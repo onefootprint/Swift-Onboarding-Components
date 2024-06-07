@@ -10,9 +10,7 @@ type OnboardingDecisionEventBodyProps = {
   data: OnboardingDecisionEventData;
 };
 
-const OnboardingDecisionEventBody = ({
-  data,
-}: OnboardingDecisionEventBodyProps) => {
+const OnboardingDecisionEventBody = ({ data }: OnboardingDecisionEventBodyProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
   });
@@ -25,12 +23,7 @@ const OnboardingDecisionEventBody = ({
     return <AnnotationNote annotation={annotation} />;
   }
   if (status === DecisionStatus.stepUp) {
-    return (
-      <EventBodyEntry
-        testID="onboarding-decision-event-body"
-        content={t(`decision-status.${status}`)}
-      />
-    );
+    return <EventBodyEntry testID="onboarding-decision-event-body" content={t(`decision-status.${status}`)} />;
   }
   return null;
 };

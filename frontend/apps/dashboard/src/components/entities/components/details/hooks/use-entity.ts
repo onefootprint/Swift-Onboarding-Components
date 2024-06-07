@@ -5,10 +5,7 @@ import { useRouter } from 'next/router';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-export const getEntity = async (
-  authHeaders: AuthHeaders,
-  { id }: GetEntityRequest,
-) => {
+export const getEntity = async (authHeaders: AuthHeaders, { id }: GetEntityRequest) => {
   const response = await request<GetEntityResponse>({
     method: 'GET',
     url: `/entities/${id}`,
@@ -22,13 +19,9 @@ const useEntity = (id: string) => {
   const isReady = useRouter();
   const { authHeaders } = useSession();
 
-  return useQuery(
-    ['entity', id, authHeaders],
-    () => getEntity(authHeaders, { id }),
-    {
-      enabled: isReady && !!id,
-    },
-  );
+  return useQuery(['entity', id, authHeaders], () => getEntity(authHeaders, { id }), {
+    enabled: isReady && !!id,
+  });
 };
 
 export default useEntity;

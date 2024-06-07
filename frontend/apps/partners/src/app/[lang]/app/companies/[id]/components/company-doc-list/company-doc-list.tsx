@@ -1,25 +1,13 @@
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { TableRow } from '@onefootprint/ui';
-import {
-  Box,
-  Dropdown,
-  Table,
-  Text,
-  useConfirmationDialog,
-} from '@onefootprint/ui';
+import { Box, Dropdown, Table, Text, useConfirmationDialog } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import type { SyntheticEvent } from 'react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { Lang } from '@/app/types';
-import {
-  confirmDocSubmission,
-  dateFormatter,
-  getDocStatus,
-  getOr,
-  searchByPaths,
-} from '@/helpers';
+import { confirmDocSubmission, dateFormatter, getDocStatus, getOr, searchByPaths } from '@/helpers';
 import { LangFallback } from '@/i18n';
 import type { PartnerDocument } from '@/queries/get-partner-partnerships-documents';
 
@@ -51,18 +39,10 @@ const getDataSubId = getOr<Maybe<string>>(undefined, 'target.dataset.subId');
 const isAccepted = (x: string) => normalizeStr(x) === 'accepted';
 const isNotRequested = (x: string) => normalizeStr(x) === 'notrequested';
 const isRejected = (x: string) => normalizeStr(x) === 'rejected';
-const isWaitingForReview = (x: string) =>
-  normalizeStr(x) === 'waitingforreview';
+const isWaitingForReview = (x: string) => normalizeStr(x) === 'waitingforreview';
 
-const getAssignedTo = ({
-  partnerTenantAssignee,
-  tenantAssignee,
-}: PartnerDocument): string => {
-  if (partnerTenantAssignee)
-    return join(
-      partnerTenantAssignee.firstName,
-      partnerTenantAssignee.lastName,
-    ).trim();
+const getAssignedTo = ({ partnerTenantAssignee, tenantAssignee }: PartnerDocument): string => {
+  if (partnerTenantAssignee) return join(partnerTenantAssignee.firstName, partnerTenantAssignee.lastName).trim();
 
   if (tenantAssignee) {
     return join(tenantAssignee.firstName, tenantAssignee.lastName).trim();
@@ -89,11 +69,7 @@ const clientSearch = searchByPaths<PartnerDocument>([
   'tenantAssignee.lastName',
 ]);
 
-const CompanyDocList = ({
-  documents,
-  handlers,
-  lang = LangFallback,
-}: CompanyDocListProps) => {
+const CompanyDocList = ({ documents, handlers, lang = LangFallback }: CompanyDocListProps) => {
   const { t } = useTranslation('common');
   const [search, setSearch] = useState<string>('');
   const confirmationDialog = useConfirmationDialog();
@@ -117,12 +93,7 @@ const CompanyDocList = ({
   );
 };
 
-const renderTr = (
-  t: T,
-  lang: Lang,
-  handlers: Handlers,
-  withConfirm: WithConfirm,
-) =>
+const renderTr = (t: T, lang: Lang, handlers: Handlers, withConfirm: WithConfirm) =>
   function Tr({ item }: TableRow<PartnerDocument>) {
     const status = getDocStatus(t, item.status);
     return (
@@ -138,9 +109,7 @@ const renderTr = (
         {isNotRequested(item.status) ? (
           <Box tag="td" display="grid" justifyContent="end" alignItems="center">
             <Dropdown.Root>
-              <Dropdown.Trigger
-                aria-label={`${t('open-actions-for')} ${item.name}`}
-              >
+              <Dropdown.Trigger aria-label={`${t('open-actions-for')} ${item.name}`}>
                 <IcoDotsHorizontal24 />
               </Dropdown.Trigger>
               <Dropdown.Content align="end">
@@ -157,9 +126,7 @@ const renderTr = (
         ) : (
           <Box tag="td" display="grid" justifyContent="end" alignItems="center">
             <Dropdown.Root>
-              <Dropdown.Trigger
-                aria-label={`${t('open-actions-for')} ${item.name}`}
-              >
+              <Dropdown.Trigger aria-label={`${t('open-actions-for')} ${item.name}`}>
                 <IcoDotsHorizontal24 />
               </Dropdown.Trigger>
               <Dropdown.Content align="end">
@@ -168,9 +135,7 @@ const renderTr = (
                     data-id={item.id}
                     data-sub-id={item.activeSubmissionId}
                     onClick={stopPropagation}
-                    onSelect={e =>
-                      handlers.onViewClick(getDataId(e), getDataSubId(e))
-                    }
+                    onSelect={e => handlers.onViewClick(getDataId(e), getDataSubId(e))}
                   >
                     {t('view')}
                   </Dropdown.Item>
@@ -180,9 +145,7 @@ const renderTr = (
                     data-id={item.id}
                     data-sub-id={item.activeSubmissionId}
                     onClick={stopPropagation}
-                    onSelect={e =>
-                      handlers.onReviewClick(getDataId(e), getDataSubId(e))
-                    }
+                    onSelect={e => handlers.onReviewClick(getDataId(e), getDataSubId(e))}
                   >
                     {t('review')}
                   </Dropdown.Item>
@@ -196,8 +159,7 @@ const renderTr = (
                     {t('assign')}
                   </Dropdown.Item>
                 )}
-                {isAccepted(item.status) ||
-                isWaitingForReview(item.status) ? null : (
+                {isAccepted(item.status) || isWaitingForReview(item.status) ? null : (
                   <Dropdown.Item
                     data-id={item.id}
                     onClick={stopPropagation}
@@ -206,22 +168,17 @@ const renderTr = (
                     {t('modify-request')}
                   </Dropdown.Item>
                 )}
-                {isAccepted(item.status) ||
-                isWaitingForReview(item.status) ? null : (
+                {isAccepted(item.status) || isWaitingForReview(item.status) ? null : (
                   <Dropdown.Item
                     data-id={item.activeRequestId}
                     onClick={stopPropagation}
-                    onSelect={withConfirm(item.name, e =>
-                      handlers.onDeleteClick(getDataId(e)),
-                    )}
+                    onSelect={withConfirm(item.name, e => handlers.onDeleteClick(getDataId(e)))}
                     variant="destructive"
                   >
                     {t('doc.cancel-submission')}
                   </Dropdown.Item>
                 )}
-                {isAccepted(item.status) ||
-                isRejected(item.status) ||
-                isWaitingForReview(item.status) ? (
+                {isAccepted(item.status) || isRejected(item.status) || isWaitingForReview(item.status) ? (
                   <Dropdown.Item
                     data-id={item.id}
                     onClick={stopPropagation}

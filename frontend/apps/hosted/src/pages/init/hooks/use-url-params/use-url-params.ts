@@ -1,9 +1,5 @@
 import type { ObConfigAuth } from '@onefootprint/types';
-import {
-  CLIENT_PUBLIC_KEY_HEADER,
-  HostedUrlType,
-  KYB_BO_SESSION_AUTHORIZATION_HEADER,
-} from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER, HostedUrlType, KYB_BO_SESSION_AUTHORIZATION_HEADER } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -27,11 +23,7 @@ const useParseUrl = (options: UseParseUrlParamOptions = {}) => {
     }
 
     const { type } = router.query ?? {};
-    if (
-      !type ||
-      typeof type !== 'string' ||
-      !Object.values(HostedUrlType).includes(type as HostedUrlType)
-    ) {
+    if (!type || typeof type !== 'string' || !Object.values(HostedUrlType).includes(type as HostedUrlType)) {
       onError?.(`Missing 'type' query parameter: ${router.asPath}`);
       return;
     }

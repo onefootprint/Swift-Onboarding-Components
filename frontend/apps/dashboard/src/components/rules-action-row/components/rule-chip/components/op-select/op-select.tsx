@@ -1,6 +1,6 @@
 import { ComboboxItem, ComboboxList, ComboboxProvider } from '@ariakit/react';
 import { ListRuleOp, RiskSignalRuleOp } from '@onefootprint/types';
-import { createOverlayBackground, Text } from '@onefootprint/ui';
+import { Text, createOverlayBackground } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,11 +18,8 @@ const OpSelect = ({ defaultOp, onChange }: OpSelectProps) => {
     keyPrefix: 'pages.playbooks.details.rules.action-row.rule-chip.op',
   });
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOp, setSelectedOp] = useState<RiskSignalRuleOp | ListRuleOp>(
-    defaultOp,
-  );
-  const isList =
-    defaultOp === ListRuleOp.isIn || defaultOp === ListRuleOp.isNotIn;
+  const [selectedOp, setSelectedOp] = useState<RiskSignalRuleOp | ListRuleOp>(defaultOp);
+  const isList = defaultOp === ListRuleOp.isIn || defaultOp === ListRuleOp.isNotIn;
 
   useEffect(() => {
     setSelectedOp(defaultOp);
@@ -41,40 +38,22 @@ const OpSelect = ({ defaultOp, onChange }: OpSelectProps) => {
       open={isOpen}
       onOpenChange={setIsOpen}
     >
-      <ComboboxProvider
-        open={isOpen}
-        setOpen={setIsOpen}
-        resetValueOnHide
-        includesBaseElement={false}
-      >
+      <ComboboxProvider open={isOpen} setOpen={setIsOpen} resetValueOnHide includesBaseElement={false}>
         <CustomTrigger isOpen={isOpen} ariaLabel={t('trigger-aria-label')}>
           {t(selectedOp)}
         </CustomTrigger>
         <Content position="popper" sideOffset={4} align="end">
           <ComboboxList role="listbox" aria-label={t('aria-label')}>
             <DropdownInner>
-              {Object.values(isList ? ListRuleOp : RiskSignalRuleOp).map(
-                value => (
-                  <ComboboxItem
-                    key={value}
-                    role="option"
-                    aria-label={t(value)}
-                    onClick={() => handleClick(value)}
-                  >
-                    <DropdownOption data-active-item={value === selectedOp}>
-                      <Text
-                        variant="caption-1"
-                        paddingLeft={5}
-                        paddingRight={5}
-                        paddingTop={2}
-                        paddingBottom={2}
-                      >
-                        {t(value)}
-                      </Text>
-                    </DropdownOption>
-                  </ComboboxItem>
-                ),
-              )}
+              {Object.values(isList ? ListRuleOp : RiskSignalRuleOp).map(value => (
+                <ComboboxItem key={value} role="option" aria-label={t(value)} onClick={() => handleClick(value)}>
+                  <DropdownOption data-active-item={value === selectedOp}>
+                    <Text variant="caption-1" paddingLeft={5} paddingRight={5} paddingTop={2} paddingBottom={2}>
+                      {t(value)}
+                    </Text>
+                  </DropdownOption>
+                </ComboboxItem>
+              ))}
             </DropdownInner>
           </ComboboxList>
         </Content>

@@ -14,17 +14,8 @@ type DefaultLayoutProps = {
 };
 
 const DefaultLayout = ({ children }: DefaultLayoutProps) => (
-  <DefaultLayoutContainer
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    initial={{ opacity: 0 }}
-  >
-    <Stack
-      data-testid="private-default-layout"
-      direction="column"
-      align="center"
-      justify="center"
-    >
+  <DefaultLayoutContainer animate={{ opacity: 1 }} exit={{ opacity: 0 }} initial={{ opacity: 0 }}>
+    <Stack data-testid="private-default-layout" direction="column" align="center" justify="center">
       <AssumeBanner />
       <SandboxBanner />
       <TopMenuBar />

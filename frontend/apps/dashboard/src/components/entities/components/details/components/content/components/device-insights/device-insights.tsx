@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Error } from 'src/components';
+import { ErrorComponent } from 'src/components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import useCurrentEntityAuthEvents from '@/entity/hooks/use-current-entity-auth-events';
@@ -18,7 +18,7 @@ const DeviceInsights = ({ entity }: ContentProps) => {
 
   return (
     <Section title={t('title')}>
-      {error && <Error error={error} />}
+      {error && <ErrorComponent error={error} />}
       {isSuccess && <Content entity={entity} livenessData={data} />}
     </Section>
   );

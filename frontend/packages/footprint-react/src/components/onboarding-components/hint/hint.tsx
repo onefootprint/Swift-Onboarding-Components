@@ -8,11 +8,7 @@ export type HintProps = {
 } & HTMLAttributes<HTMLParagraphElement>;
 
 const Hint = ({ className, hasError, ...props }: HintProps) => (
-  <p
-    className={cx('fp-message', className)}
-    aria-invalid={hasError ? 'true' : 'false'}
-    {...props}
-  />
+  <p className={cx('fp-message', className)} aria-invalid={hasError ? 'true' : 'false'} {...props} />
 );
 
 export default Hint;

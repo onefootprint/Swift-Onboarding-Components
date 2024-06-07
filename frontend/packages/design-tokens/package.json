@@ -18,19 +18,16 @@
   },
   "scripts": {
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
     "generate:styles": "node ./src/scripts/generate-styles.js",
     "generate:tokens": "node ./src/scripts/generate-tokens.js",
     "generate": "yarn generate:tokens && yarn generate:styles",
-    "lint:ci": "eslint src",
-    "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
-    "lint": "eslint src --fix",
-    "postgenerate": "yarn format:fix && yarn lint:fix",
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
+    "postgenerate": "yarn lint",
     "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
     "csstype": "^3.1.2",
-    "eslint-config-footprint": "*",
     "polished": "^4.2.2",
     "typescript": "^5"
   }

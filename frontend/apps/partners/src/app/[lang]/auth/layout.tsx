@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { LangProp } from '@/app/types';
 import type { Namespaces } from '@/i18n';
-import { initTranslations, LangFallback, TranslationsProvider } from '@/i18n';
+import { LangFallback, TranslationsProvider, initTranslations } from '@/i18n';
 
 import AuthLayoutClient from './layout-client';
 
@@ -14,11 +14,7 @@ const AuthLayout = async ({ children, params }: AuthLayoutProps) => {
   const { resources } = await initTranslations(lang, i18nNamespaces);
 
   return (
-    <TranslationsProvider
-      locale={lang}
-      namespaces={i18nNamespaces}
-      resources={resources}
-    >
+    <TranslationsProvider locale={lang} namespaces={i18nNamespaces} resources={resources}>
       <AuthLayoutClient>{children}</AuthLayoutClient>
     </TranslationsProvider>
   );

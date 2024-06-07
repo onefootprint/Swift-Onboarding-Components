@@ -4,7 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { NavigationHeader } from '../../../../../components';
-import Error from '../../../components/error';
+import ErrorComponent from '../../../components/error';
 import FadeInContainer from '../../../components/fade-in-container';
 import IdDocPhotoButtons from '../../../components/id-doc-photo-buttons';
 import type { CaptureKind } from '../../../types';
@@ -46,17 +46,9 @@ const MobileRetry = () => {
 
   return (
     <FadeInContainer>
-      <NavigationHeader
-        leftButton={{ variant: 'back', onBack: handleClickBack }}
-        position="floating"
-      />
-      <PromptContainer
-        direction="column"
-        gap={7}
-        align="center"
-        justify="center"
-      >
-        <Error docName={docName} errors={errors || []} />
+      <NavigationHeader leftButton={{ variant: 'back', onBack: handleClickBack }} position="floating" />
+      <PromptContainer direction="column" gap={7} align="center" justify="center">
+        <ErrorComponent docName={docName} errors={errors || []} />
         <IdDocPhotoButtons
           onComplete={handleComplete}
           hideUploadButton={hideUploadButton}

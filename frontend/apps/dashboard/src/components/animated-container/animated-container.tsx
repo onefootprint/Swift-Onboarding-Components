@@ -8,19 +8,10 @@ type AnimatedContainerProps = BoxProps & {
   children: React.ReactNode;
 };
 
-const AnimatedContainer = ({
-  isExpanded,
-  children,
-  marginLeft,
-  marginTop,
-}: AnimatedContainerProps) => {
+const AnimatedContainer = ({ isExpanded, children, marginLeft, marginTop }: AnimatedContainerProps) => {
   const [animate] = useAutoAnimate<HTMLDivElement>();
   return (
-    <Box
-      ref={animate}
-      display={isExpanded ? 'flex' : 'none'}
-      flexDirection="column"
-    >
+    <Box ref={animate} display={isExpanded ? 'flex' : 'none'} flexDirection="column">
       {isExpanded && (
         <Box marginLeft={marginLeft} marginTop={marginTop}>
           {children}

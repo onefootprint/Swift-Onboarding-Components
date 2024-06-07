@@ -55,12 +55,7 @@ const MockupVideo = ({
   return (
     <PlayerContainer>
       <PhoneContainer className={className}>
-        <PhoneFrameImage
-          src="/iphone-no-notch.png"
-          alt=""
-          width={width}
-          height={height}
-        />
+        <PhoneFrameImage src="/iphone-no-notch.png" alt="" width={width} height={height} />
         {hasWindow && (
           <ReactPlayer
             url={videoSrc}

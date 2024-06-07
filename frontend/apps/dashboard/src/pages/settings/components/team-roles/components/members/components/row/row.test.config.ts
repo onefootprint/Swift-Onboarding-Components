@@ -68,9 +68,7 @@ export const RolesFixture: Role[] = [
   },
 ];
 
-export const roleToSelectOnEdit = RolesFixture.find(
-  role => role.name === 'Member',
-) as Role;
+export const roleToSelectOnEdit = RolesFixture.find(role => role.name === 'Member') as Role;
 
 export const withRoles = (Roles: Role[] = RolesFixture) =>
   mockRequest({

@@ -3,10 +3,7 @@ import { Box, Divider, Text, TextArea } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type {
-  FormData,
-  StepProps,
-} from 'src/pages/proxy-configs/proxy-configs.types';
+import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
 
 import UploadFile from '../upload-file';
 
@@ -51,11 +48,7 @@ const ClientIdentity = ({ id, onSubmit, values }: StepProps) => {
         label={t('key.label')}
         onChange={value => setValue('clientIdentity.key', value)}
       >
-        <TextArea
-          placeholder={t('key.placeholder')}
-          id="key"
-          {...register('clientIdentity.key')}
-        />
+        <TextArea placeholder={t('key.placeholder')} id="key" {...register('clientIdentity.key')} />
       </UploadFile>
     </form>
   );

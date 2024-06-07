@@ -26,7 +26,7 @@ const getServerSideProps: GetServerSideProps = async context => {
         },
       },
     };
-  } catch (e) {
+  } catch (_e) {
     return { notFound: true };
   }
 };

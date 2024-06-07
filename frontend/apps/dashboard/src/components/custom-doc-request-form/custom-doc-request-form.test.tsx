@@ -1,9 +1,4 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { CustomDI } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
@@ -39,8 +34,7 @@ const CustomDocRequestFormWithFromProvider = () => {
   );
 };
 
-const renderCustomDocRequestForm = () =>
-  customRender(<CustomDocRequestFormWithFromProvider />);
+const renderCustomDocRequestForm = () => customRender(<CustomDocRequestFormWithFromProvider />);
 
 describe('CustomDocRequestForm', () => {
   it('should error when there is no document name', async () => {
@@ -66,9 +60,7 @@ describe('CustomDocRequestForm', () => {
     await userEvent.type(descriptionInput, 'description input');
     await userEvent.click(submitButton);
     await waitFor(() => {
-      const errorMessage = screen.getByText(
-        'Please enter a document identifier',
-      );
+      const errorMessage = screen.getByText('Please enter a document identifier');
       expect(errorMessage).toBeInTheDocument();
     });
   });
@@ -101,9 +93,7 @@ describe('CustomDocRequestForm', () => {
     await userEvent.type(descriptionInput, 'description input');
     await userEvent.click(submitButton);
     await waitFor(() => {
-      const errorMessage = screen.getByText(
-        'Only letters, numbers, underscores, and hyphens are allowed',
-      );
+      const errorMessage = screen.getByText('Only letters, numbers, underscores, and hyphens are allowed');
       expect(errorMessage).toBeInTheDocument();
     });
   });
@@ -119,9 +109,7 @@ describe('CustomDocRequestForm', () => {
     await userEvent.type(descriptionInput, 'description input');
     await userEvent.click(submitButton);
     await waitFor(() => {
-      const errorMessage = screen.getByText(
-        'Only letters, numbers, underscores, and hyphens are allowed',
-      );
+      const errorMessage = screen.getByText('Only letters, numbers, underscores, and hyphens are allowed');
       expect(errorMessage).toBeInTheDocument();
     });
   });

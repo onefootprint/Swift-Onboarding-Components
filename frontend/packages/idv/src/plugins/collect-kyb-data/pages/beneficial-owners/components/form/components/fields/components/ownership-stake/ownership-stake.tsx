@@ -19,10 +19,7 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
     formState: { errors },
   } = useFormContext<FormData>();
 
-  const ownershipStakeErrors =
-    errors.beneficialOwners?.[index]?.[
-      BeneficialOwnerDataAttribute.ownershipStake
-    ];
+  const ownershipStakeErrors = errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.ownershipStake];
   const hasError = !!ownershipStakeErrors;
   const hint = hasError ? ownershipStakeErrors?.message : undefined;
 
@@ -35,23 +32,20 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
       hint={hint}
       label={t('label')}
       placeholder={t('placeholder')}
-      {...register(
-        `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.ownershipStake}`,
-        {
-          required: {
-            value: true,
-            message: t('errors.required'),
-          },
-          min: {
-            value: 1,
-            message: t('errors.min'),
-          },
-          max: {
-            value: 100,
-            message: t('errors.max'),
-          },
+      {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.ownershipStake}`, {
+        required: {
+          value: true,
+          message: t('errors.required'),
         },
-      )}
+        min: {
+          value: 1,
+          message: t('errors.min'),
+        },
+        max: {
+          value: 100,
+          message: t('errors.max'),
+        },
+      })}
     />
   );
 };

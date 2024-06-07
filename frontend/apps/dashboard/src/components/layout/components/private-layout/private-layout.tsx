@@ -9,10 +9,6 @@ type PrivateLayoutProps = {
 };
 
 const PrivateLayout = ({ children, name }: PrivateLayoutProps) =>
-  name === 'default' ? (
-    <DefaultLayout>{children}</DefaultLayout>
-  ) : (
-    <BlankLayout>{children}</BlankLayout>
-  );
+  name === 'default' ? <DefaultLayout>{children}</DefaultLayout> : <BlankLayout>{children}</BlankLayout>;
 
 export default PrivateLayout;

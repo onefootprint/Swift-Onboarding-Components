@@ -1,11 +1,5 @@
-import {
-  IcoAppclip24,
-  IcoCheckCircle16,
-  IcoCloseSmall16,
-  IcoLaptop16,
-  IcoSmartphone216,
-} from '@onefootprint/icons';
-import { LinkButton, media, Stack, Text } from '@onefootprint/ui';
+import { IcoAppclip24, IcoCheckCircle16, IcoCloseSmall16, IcoLaptop16, IcoSmartphone216 } from '@onefootprint/icons';
+import { LinkButton, Stack, Text, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,19 +36,9 @@ const cardAnimation = {
   },
 };
 
-const DeviceCard = ({
-  icon,
-  deviceName,
-  date,
-  ip,
-  biometric,
-  appClip,
-  id,
-  onWhatsThisClick,
-}: DeviceCardProps) => {
+const DeviceCard = ({ icon, deviceName, date, ip, biometric, appClip, id, onWhatsThisClick }: DeviceCardProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.home.verify.cards.behavior-and-device-insights.illustration',
+    keyPrefix: 'pages.home.verify.cards.behavior-and-device-insights.illustration',
   });
 
   const renderBiometricStatus = () => (
@@ -92,69 +76,37 @@ const DeviceCard = ({
   );
 
   return (
-    <CardContainer
-      variants={cardAnimation}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      key={id}
-    >
+    <CardContainer variants={cardAnimation} initial="initial" animate="animate" exit="exit" key={id}>
       <Stack direction="column" align="center" justify="center" gap={5}>
         <IconContainer>
-          {icon === 'phone' ? (
-            <IcoSmartphone216 color="quinary" />
-          ) : (
-            <IcoLaptop16 color="quinary" />
-          )}
+          {icon === 'phone' ? <IcoSmartphone216 color="quinary" /> : <IcoLaptop16 color="quinary" />}
         </IconContainer>
         <Text variant="label-2">{deviceName}</Text>
       </Stack>
       <Stack direction="column" align="center" justify="center" gap={5}>
-        <Stack
-          direction="row"
-          width="100%"
-          align="center"
-          justify="space-between"
-        >
+        <Stack direction="row" width="100%" align="center" justify="space-between">
           <Text variant="body-2" color="tertiary">
             {t('date-and-time')}
           </Text>
           <Text variant="label-2">{date}</Text>
         </Stack>
-        <Stack
-          direction="row"
-          width="100%"
-          align="center"
-          justify="space-between"
-        >
+        <Stack direction="row" width="100%" align="center" justify="space-between">
           <Text variant="body-2" color="tertiary">
             {t('ip-address')}
           </Text>
           <Text variant="label-2">{ip}</Text>
         </Stack>
-        <Stack
-          direction="row"
-          width="100%"
-          align="center"
-          justify="space-between"
-        >
+        <Stack direction="row" width="100%" align="center" justify="space-between">
           <Text variant="body-2" color="tertiary">
             {t('biometric')}
           </Text>
           {renderBiometricStatus()}
         </Stack>
-        <Stack
-          direction="row"
-          width="100%"
-          align="center"
-          justify="space-between"
-        >
+        <Stack direction="row" width="100%" align="center" justify="space-between">
           {renderAppClipInfo()}
           <Stack direction="row" align="center" justify="center" gap={2}>
             <IcoAppclip24 />
-            <Text variant="label-2">
-              {appClip ? t('app-clip.yes') : t('app-clip.no')}
-            </Text>
+            <Text variant="label-2">{appClip ? t('app-clip.yes') : t('app-clip.no')}</Text>
           </Stack>
         </Stack>
       </Stack>

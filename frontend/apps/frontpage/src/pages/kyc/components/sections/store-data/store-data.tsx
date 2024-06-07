@@ -1,12 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import {
-  Container,
-  LinkButton,
-  media,
-  Stack,
-  Tabs,
-  Text,
-} from '@onefootprint/ui';
+import { Container, LinkButton, Stack, Tabs, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,23 +39,13 @@ const StoreData = () => {
         <Text variant="display-4" color="secondary">
           {t('subtitle')}
         </Text>
-        <LinkButton
-          iconComponent={IcoArrowRightSmall16}
-          href="/vaulting"
-          target="_blank"
-        >
+        <LinkButton iconComponent={IcoArrowRightSmall16} href="/vaulting" target="_blank">
           {t('learn-more')}
         </LinkButton>
       </TitleContainer>
       <Tabs options={options} onChange={handleChange} />
       <ImageContainer>
-        <Image
-          src={imageSrc}
-          alt={segment}
-          height={838}
-          width={1280}
-          priority
-        />
+        <Image src={imageSrc} alt={segment} height={838} width={1280} priority />
       </ImageContainer>
     </SectionContainer>
   );

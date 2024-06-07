@@ -1,9 +1,7 @@
 import { IDV_BODY_CONTENT_CONTAINER_ID } from '../../../../../components/layout/components/content';
 
 const getVideoHeight = () => {
-  const idvBodyElementsContainer = document.getElementById(
-    IDV_BODY_CONTENT_CONTAINER_ID,
-  );
+  const idvBodyElementsContainer = document.getElementById(IDV_BODY_CONTENT_CONTAINER_ID);
   if (!idvBodyElementsContainer) return 0;
 
   return idvBodyElementsContainer.offsetHeight;

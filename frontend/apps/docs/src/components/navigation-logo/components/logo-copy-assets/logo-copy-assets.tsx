@@ -64,10 +64,7 @@ const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
   return (
     <Dropdown.Root open={showOptions}>
       <Dropdown.Trigger aria-label={t('aria-label')} asChild>
-        <Trigger
-          onClick={handleButtonClick}
-          onContextMenu={handleButtonContextMenu}
-        >
+        <Trigger onClick={handleButtonClick} onContextMenu={handleButtonContextMenu}>
           <ThemedLogoFpCompact color="primary" />
         </Trigger>
       </Dropdown.Trigger>
@@ -80,10 +77,7 @@ const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
         {assetsToCopy.map(asset => (
           <StyledItem key={asset.label} onClick={handleSave(asset.label)}>
             <IcoDownload16 color="tertiary" />
-            <Text variant="body-2">
-              {' '}
-              {t(asset.label as ParseKeys<'common'>)}{' '}
-            </Text>
+            <Text variant="body-2"> {t(asset.label as ParseKeys<'common'>)} </Text>
           </StyledItem>
         ))}
       </Dropdown.Content>

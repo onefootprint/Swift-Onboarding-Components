@@ -24,14 +24,8 @@ const magicNumbers = {
 };
 
 const detectMimeType = (bytes: Buffer): string => {
-  for (const [mimeType, { signature, offset }] of Object.entries(
-    magicNumbers,
-  )) {
-    if (
-      bytes
-        .subarray(offset, offset + signature.length)
-        .every((byte, i) => byte === signature[i])
-    ) {
+  for (const [mimeType, { signature, offset }] of Object.entries(magicNumbers)) {
+    if (bytes.subarray(offset, offset + signature.length).every((byte, i) => byte === signature[i])) {
       return mimeType;
     }
   }

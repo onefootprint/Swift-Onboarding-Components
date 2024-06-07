@@ -1,9 +1,4 @@
-import {
-  Combobox,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxProvider,
-} from '@ariakit/react';
+import { Combobox, ComboboxItem, ComboboxList, ComboboxProvider } from '@ariakit/react';
 import type { DataIdentifier, ListKind } from '@onefootprint/types';
 import { createFontStyles, createOverlayBackground } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
@@ -27,9 +22,7 @@ const DISelect = ({ defaultDI, listKind, onChange }: DISelectProps) => {
   });
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const [selectedDI, setSelectedDI] = useState<DataIdentifier | undefined>(
-    defaultDI,
-  );
+  const [selectedDI, setSelectedDI] = useState<DataIdentifier | undefined>(defaultDI);
 
   useEffect(() => {
     setSelectedDI(defaultDI);
@@ -91,24 +84,15 @@ const DISelect = ({ defaultDI, listKind, onChange }: DISelectProps) => {
             <ComboboxList role="listbox" aria-label={t('field.aria-label')}>
               <DropdownInner>
                 {matches.map(di => (
-                  <ComboboxItem
-                    key={di}
-                    role="option"
-                    aria-label={di}
-                    onClick={() => onChange(di)}
-                  >
-                    <DropdownOption data-active-item={di === selectedDI}>
-                      {di}
-                    </DropdownOption>
+                  <ComboboxItem key={di} role="option" aria-label={di} onClick={() => onChange(di)}>
+                    <DropdownOption data-active-item={di === selectedDI}>{di}</DropdownOption>
                   </ComboboxItem>
                 ))}
               </DropdownInner>
             </ComboboxList>
           ) : (
             <DropdownOption data-empty>
-              {dataIdentifiersForListKind(listKind).length
-                ? t('field.search-empty')
-                : t('field.empty')}
+              {dataIdentifiersForListKind(listKind).length ? t('field.search-empty') : t('field.empty')}
             </DropdownOption>
           )}
         </Content>

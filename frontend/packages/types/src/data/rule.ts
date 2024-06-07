@@ -96,17 +96,10 @@ export type BacktestedOnboarding = {
 export type RuleBacktestingData = {
   results: BacktestedOnboarding[];
   stats: {
-    countByHistoricalActionTriggered: Partial<
-      Record<BacktestingRuleAction, number>
-    >;
-    countByBacktestActionTriggered: Partial<
-      Record<BacktestingRuleAction, number>
-    >;
+    countByHistoricalActionTriggered: Partial<Record<BacktestingRuleAction, number>>;
+    countByBacktestActionTriggered: Partial<Record<BacktestingRuleAction, number>>;
     countByHistoricalAndBacktestActionTriggered: Partial<
-      Record<
-        BacktestingRuleAction,
-        Partial<Record<BacktestingRuleAction, number>>
-      >
+      Record<BacktestingRuleAction, Partial<Record<BacktestingRuleAction, number>>>
     >;
     total: number;
   };

@@ -1,27 +1,12 @@
-import {
-  customRender,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { CompanyDataProps } from './company-data';
 import CompanyData from './company-data';
-import {
-  orgFixture,
-  withOrg,
-  withOrgError,
-  withUpdateOrg,
-  withUpdateOrgError,
-} from './company-data.test.config';
+import { orgFixture, withOrg, withOrgError, withUpdateOrg, withUpdateOrgError } from './company-data.test.config';
 
 describe('<CompanyData />', () => {
-  const renderCompanyData = ({
-    onBack = jest.fn(),
-    onComplete = jest.fn(),
-  }: Partial<CompanyDataProps>) => {
+  const renderCompanyData = ({ onBack = jest.fn(), onComplete = jest.fn() }: Partial<CompanyDataProps>) => {
     customRender(<CompanyData onComplete={onComplete} onBack={onBack} />);
   };
 

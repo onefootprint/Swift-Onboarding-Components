@@ -23,11 +23,7 @@ export type FieldsetProps = WithEntityProps & {
   title: string;
 };
 
-const Fieldset = ({
-  entity,
-  title,
-  iconComponent: IconComponent,
-}: FieldsetProps) => {
+const Fieldset = ({ entity, title, iconComponent: IconComponent }: FieldsetProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset',
   });
@@ -46,8 +42,7 @@ const Fieldset = ({
   const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
-  const getCardTitle = (count: number) =>
-    `${title} ${t('cards.title', { count })}`;
+  const getCardTitle = (count: number) => `${title} ${t('cards.title', { count })}`;
 
   const handleSelectAll = () => {
     decryptForm.set(selectableFields, true);
@@ -58,9 +53,7 @@ const Fieldset = ({
   };
 
   const renderCardIssuer = (value: VaultValue) => {
-    const changedValue = t(
-      `cards.card-brands.${value}` as ParseKeys<'common'>,
-    ) as string;
+    const changedValue = t(`cards.card-brands.${value}` as ParseKeys<'common'>) as string;
     return <FieldOrPlaceholder data={changedValue} />;
   };
 
@@ -79,14 +72,7 @@ const Fieldset = ({
         />
       );
     }
-    return (
-      <Field
-        key={di}
-        di={di}
-        entity={entity}
-        renderLabel={() => tAll(tKeyWithoutAlias as ParseKeys<'common'>)}
-      />
-    );
+    return <Field key={di} di={di} entity={entity} renderLabel={() => tAll(tKeyWithoutAlias as ParseKeys<'common'>)} />;
   };
 
   return (
@@ -100,16 +86,10 @@ const Fieldset = ({
             </Text>
           </Title>
           {!decrypt.inProgress && cards.length > 1 && (
-            <CardHeader
-              cards={cards}
-              selectedCard={selectedCard}
-              onChange={setSelectedCard}
-            />
+            <CardHeader cards={cards} selectedCard={selectedCard} onChange={setSelectedCard} />
           )}
           {shouldShowSelectAll && (
-            <LinkButton
-              onClick={allSelected ? handleDeselectAll : handleSelectAll}
-            >
+            <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
               {allSelected ? t('deselect-all') : t('select-all')}
             </LinkButton>
           )}

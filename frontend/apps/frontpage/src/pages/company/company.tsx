@@ -6,7 +6,7 @@ import {
   IcoLeaf40,
   IcoShield40,
 } from '@onefootprint/icons';
-import { Divider, media, Text } from '@onefootprint/ui';
+import { Divider, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -175,11 +175,7 @@ const Company = () => {
 
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/company"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/company" />
       <Container>
         <HeroContainer>
           <Text variant="display-2" tag="h1" marginBottom={5}>
@@ -193,18 +189,10 @@ const Company = () => {
           <CompanyPhotos photos={companyPhotos} />
         </CompanyPhotosContainer>
         <ValuesContainer>
-          <Values
-            title={t('values.title')}
-            description={t('values.description')}
-            items={values}
-          />
+          <Values title={t('values.title')} description={t('values.description')} items={values} />
         </ValuesContainer>
         <TeamContainer>
-          <Team
-            description={t('team.description')}
-            items={team}
-            title={t('team.title')}
-          />
+          <Team description={t('team.description')} items={team} title={t('team.title')} />
         </TeamContainer>
         <Divider />
         <JoinUs />

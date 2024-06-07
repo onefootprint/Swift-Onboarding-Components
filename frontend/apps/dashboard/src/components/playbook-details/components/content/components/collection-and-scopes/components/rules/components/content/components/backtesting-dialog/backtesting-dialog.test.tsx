@@ -75,13 +75,9 @@ describe('<BacktestingDialog />', () => {
       it('should show a table of results that paginates correctly', async () => {
         await renderDialogAndWaitFinishLoading();
 
+        expect(screen.getByText('11 out of 14 total onboardings matched')).toBeInTheDocument();
         expect(
-          screen.getByText('11 out of 14 total onboardings matched'),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByText(
-            "If these rules existed in the selected period they would've affected 11 onboardings.",
-          ),
+          screen.getByText("If these rules existed in the selected period they would've affected 11 onboardings."),
         ).toBeInTheDocument();
 
         Array.from({ length: 9 }, (_, i) => i + 1).forEach(num =>
@@ -95,9 +91,7 @@ describe('<BacktestingDialog />', () => {
         // fp_13 isn't shown because of pagination
         expect(screen.queryByText('fp_13')).not.toBeInTheDocument();
 
-        const paginationText = screen.getByText(
-          'Showing 1 to 10 of 11 total results',
-        );
+        const paginationText = screen.getByText('Showing 1 to 10 of 11 total results');
         const prevPaginationButton = screen.getByRole('button', {
           name: 'Previous',
         });
@@ -121,9 +115,7 @@ describe('<BacktestingDialog />', () => {
         const originalSection = screen.getByRole('group', {
           name: 'Original rule outcomes',
         });
-        expect(
-          within(originalSection).getByText('Original rule outcomes'),
-        ).toBeInTheDocument();
+        expect(within(originalSection).getByText('Original rule outcomes')).toBeInTheDocument();
         expect(
           within(originalSection).getByText(
             'Rule outcomes based on existing rules at the time of the onboardings above.',
@@ -138,16 +130,10 @@ describe('<BacktestingDialog />', () => {
           'Pass + Manual review': '0 (0%)',
           Pass: '13 (93%)',
         };
-        Object.entries(ruleOutcomes).forEach(
-          ([outcomeName, outcomeCount], index) => {
-            expect(
-              within(outcomeRows[index]).getByText(outcomeName),
-            ).toBeInTheDocument();
-            expect(
-              within(outcomeRows[index]).getByText(outcomeCount),
-            ).toBeInTheDocument();
-          },
-        );
+        Object.entries(ruleOutcomes).forEach(([outcomeName, outcomeCount], index) => {
+          expect(within(outcomeRows[index]).getByText(outcomeName)).toBeInTheDocument();
+          expect(within(outcomeRows[index]).getByText(outcomeCount)).toBeInTheDocument();
+        });
       });
 
       it('should show a section detailing backtested rule outcomes', async () => {
@@ -156,9 +142,7 @@ describe('<BacktestingDialog />', () => {
         const backtestedSection = screen.getByRole('group', {
           name: 'Backtested rule outcomes',
         });
-        expect(
-          within(backtestedSection).getByText('Backtested rule outcomes'),
-        ).toBeInTheDocument();
+        expect(within(backtestedSection).getByText('Backtested rule outcomes')).toBeInTheDocument();
         expect(
           within(backtestedSection).getByText(
             "If the rules that are being tested existed at the time of the onboardings above, the rule outcomes would've been these instead:",
@@ -173,16 +157,10 @@ describe('<BacktestingDialog />', () => {
           'Pass + Manual review': '1 (7%)',
           Pass: '2 (14%)',
         };
-        Object.entries(ruleOutcomes).forEach(
-          ([outcomeName, outcomeCount], index) => {
-            expect(
-              within(outcomeRows[index]).getByText(outcomeName),
-            ).toBeInTheDocument();
-            expect(
-              within(outcomeRows[index]).getByText(outcomeCount),
-            ).toBeInTheDocument();
-          },
-        );
+        Object.entries(ruleOutcomes).forEach(([outcomeName, outcomeCount], index) => {
+          expect(within(outcomeRows[index]).getByText(outcomeName)).toBeInTheDocument();
+          expect(within(outcomeRows[index]).getByText(outcomeCount)).toBeInTheDocument();
+        });
       });
 
       it('should show a section detailing the correlation between original and backtested rule outcomes', async () => {
@@ -192,14 +170,10 @@ describe('<BacktestingDialog />', () => {
           name: 'Original rule outcomes to Backtested rule outcomes',
         });
         expect(
-          within(correlationSection).getByText(
-            'Original rule outcomes to Backtested rule outcomes',
-          ),
+          within(correlationSection).getByText('Original rule outcomes to Backtested rule outcomes'),
         ).toBeInTheDocument();
         expect(
-          within(correlationSection).getByText(
-            'Correlation between original and backtested rule outcomes.',
-          ),
+          within(correlationSection).getByText('Correlation between original and backtested rule outcomes.'),
         ).toBeInTheDocument();
 
         const passSection = within(correlationSection).getByRole('group', {
@@ -213,16 +187,10 @@ describe('<BacktestingDialog />', () => {
           'Fail + Manual review': '2',
           'Pass + Manual review': '1',
         };
-        Object.entries(originallyPassedOutcomes).forEach(
-          ([outcomeName, outcomeCount], index) => {
-            expect(
-              within(passSectionRows[index]).getByText(outcomeName),
-            ).toBeInTheDocument();
-            expect(
-              within(passSectionRows[index]).getByText(outcomeCount),
-            ).toBeInTheDocument();
-          },
-        );
+        Object.entries(originallyPassedOutcomes).forEach(([outcomeName, outcomeCount], index) => {
+          expect(within(passSectionRows[index]).getByText(outcomeName)).toBeInTheDocument();
+          expect(within(passSectionRows[index]).getByText(outcomeCount)).toBeInTheDocument();
+        });
 
         const failSection = within(correlationSection).getByRole('group', {
           name: 'fail correlation card',
@@ -235,16 +203,10 @@ describe('<BacktestingDialog />', () => {
           'Pass + Manual review': '0',
           Pass: '0',
         };
-        Object.entries(originallyFailedOutcomes).forEach(
-          ([outcomeName, outcomeCount], index) => {
-            expect(
-              within(failSectionRows[index]).getByText(outcomeName),
-            ).toBeInTheDocument();
-            expect(
-              within(failSectionRows[index]).getByText(outcomeCount),
-            ).toBeInTheDocument();
-          },
-        );
+        Object.entries(originallyFailedOutcomes).forEach(([outcomeName, outcomeCount], index) => {
+          expect(within(failSectionRows[index]).getByText(outcomeName)).toBeInTheDocument();
+          expect(within(failSectionRows[index]).getByText(outcomeCount)).toBeInTheDocument();
+        });
       });
     });
 
@@ -256,9 +218,7 @@ describe('<BacktestingDialog />', () => {
       it('should show a no onboardings affected message', async () => {
         await renderDialogAndWaitFinishLoading();
 
-        expect(
-          screen.getByText("No onboardings would've been affected."),
-        ).toBeInTheDocument();
+        expect(screen.getByText("No onboardings would've been affected.")).toBeInTheDocument();
         const prevPaginationButton = screen.queryByRole('button', {
           name: 'Previous',
         });
@@ -283,16 +243,10 @@ describe('<BacktestingDialog />', () => {
           'Pass + Manual review': '0 (0%)',
           Pass: '2 (67%)',
         };
-        Object.entries(ruleOutcomes).forEach(
-          ([outcomeName, outcomeCount], index) => {
-            expect(
-              within(outcomeRows[index]).getByText(outcomeName),
-            ).toBeInTheDocument();
-            expect(
-              within(outcomeRows[index]).getByText(outcomeCount),
-            ).toBeInTheDocument();
-          },
-        );
+        Object.entries(ruleOutcomes).forEach(([outcomeName, outcomeCount], index) => {
+          expect(within(outcomeRows[index]).getByText(outcomeName)).toBeInTheDocument();
+          expect(within(outcomeRows[index]).getByText(outcomeCount)).toBeInTheDocument();
+        });
       });
 
       it('should show a section detailing backtested rule outcomes', async () => {
@@ -309,16 +263,10 @@ describe('<BacktestingDialog />', () => {
           'Pass + Manual review': '0 (0%)',
           Pass: '2 (67%)',
         };
-        Object.entries(ruleOutcomes).forEach(
-          ([outcomeName, outcomeCount], index) => {
-            expect(
-              within(outcomeRows[index]).getByText(outcomeName),
-            ).toBeInTheDocument();
-            expect(
-              within(outcomeRows[index]).getByText(outcomeCount),
-            ).toBeInTheDocument();
-          },
-        );
+        Object.entries(ruleOutcomes).forEach(([outcomeName, outcomeCount], index) => {
+          expect(within(outcomeRows[index]).getByText(outcomeName)).toBeInTheDocument();
+          expect(within(outcomeRows[index]).getByText(outcomeCount)).toBeInTheDocument();
+        });
       });
 
       it('should show a section detailing the correlation between original and backtested rule outcomes', async () => {
@@ -338,16 +286,10 @@ describe('<BacktestingDialog />', () => {
           'Fail + Manual review': '0',
           'Pass + Manual review': '0',
         };
-        Object.entries(originallyPassedOutcomes).forEach(
-          ([outcomeName, outcomeCount], index) => {
-            expect(
-              within(passSectionRows[index]).getByText(outcomeName),
-            ).toBeInTheDocument();
-            expect(
-              within(passSectionRows[index]).getByText(outcomeCount),
-            ).toBeInTheDocument();
-          },
-        );
+        Object.entries(originallyPassedOutcomes).forEach(([outcomeName, outcomeCount], index) => {
+          expect(within(passSectionRows[index]).getByText(outcomeName)).toBeInTheDocument();
+          expect(within(passSectionRows[index]).getByText(outcomeCount)).toBeInTheDocument();
+        });
 
         const failSection = within(correlationSection).getByRole('group', {
           name: 'fail correlation card',
@@ -360,16 +302,10 @@ describe('<BacktestingDialog />', () => {
           'Pass + Manual review': '0',
           Pass: '0',
         };
-        Object.entries(originallyFailedOutcomes).forEach(
-          ([outcomeName, outcomeCount], index) => {
-            expect(
-              within(failSectionRows[index]).getByText(outcomeName),
-            ).toBeInTheDocument();
-            expect(
-              within(failSectionRows[index]).getByText(outcomeCount),
-            ).toBeInTheDocument();
-          },
-        );
+        Object.entries(originallyFailedOutcomes).forEach(([outcomeName, outcomeCount], index) => {
+          expect(within(failSectionRows[index]).getByText(outcomeName)).toBeInTheDocument();
+          expect(within(failSectionRows[index]).getByText(outcomeCount)).toBeInTheDocument();
+        });
       });
     });
 

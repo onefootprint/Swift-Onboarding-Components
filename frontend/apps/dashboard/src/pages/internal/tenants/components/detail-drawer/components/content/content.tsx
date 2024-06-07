@@ -41,12 +41,8 @@ const Content = ({ tenant }: ContentProps) => {
     <Stack direction="column" gap={7}>
       <Tabs options={TAB_OPTIONS} onChange={handleTabChange} />
       {selectedTab === TabOption.tenantInfo && <TenantInfo tenant={tenant} />}
-      {selectedTab === TabOption.billingProfile && (
-        <BillingProfile tenant={tenant} />
-      )}
-      {selectedTab === TabOption.vendorControl && (
-        <VendorControl tenant={tenant} />
-      )}
+      {selectedTab === TabOption.billingProfile && <BillingProfile tenant={tenant} />}
+      {selectedTab === TabOption.vendorControl && <VendorControl tenant={tenant} />}
     </Stack>
   );
 };

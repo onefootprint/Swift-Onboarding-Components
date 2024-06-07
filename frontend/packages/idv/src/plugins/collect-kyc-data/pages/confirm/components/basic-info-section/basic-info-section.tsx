@@ -1,13 +1,5 @@
 import { IcoFileText24, IcoInfo16 } from '@onefootprint/icons';
-import {
-  Box,
-  Divider,
-  Grid,
-  LinkButton,
-  media,
-  Shimmer,
-  Text,
-} from '@onefootprint/ui';
+import { Box, Divider, Grid, LinkButton, Shimmer, Text, media } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import type { ComponentProps } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -15,19 +7,11 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { SectionItemProps } from '../../../../../../components/confirm-collected-data';
-import {
-  Section,
-  SectionItem,
-} from '../../../../../../components/confirm-collected-data';
+import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import type { VerifiedMethods } from '../../../../types';
 import BasicInformation from '../../../basic-information';
-import {
-  getBasicInfoItems,
-  getNationalityItems,
-  getVerifiableItems,
-  isUsLegalStatusRequired,
-} from './helpers';
+import { getBasicInfoItems, getNationalityItems, getVerifiableItems, isUsLegalStatusRequired } from './helpers';
 
 type T = TFunction<'idv', 'kyc.pages'>;
 type VerifiableItem = SectionItemProps & {
@@ -61,8 +45,7 @@ const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
       const stopEditing = () => setIsEditing(false);
       const hasBasic = basicList.length > 0;
       const hasVerifiable = verifiableList.length > 0;
-      const showVerifyHint =
-        hasVerifiable && verifiableList.some(x => !x.isVerified);
+      const showVerifyHint = hasVerifiable && verifiableList.some(x => !x.isVerified);
 
       if (isEditing) {
         return (
@@ -88,46 +71,28 @@ const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
           {hasBasic ? (
             <ResponsiveGridContainer>
               {basicList.map(({ text, subtext, textColor }) => (
-                <SectionItem
-                  key={text + subtext}
-                  text={text}
-                  subtext={subtext}
-                  textColor={textColor}
-                />
+                <SectionItem key={text + subtext} text={text} subtext={subtext} textColor={textColor} />
               ))}
             </ResponsiveGridContainer>
           ) : null}
-          {hasBasic && hasVerifiable ? (
-            <StyledDivider variant="secondary" />
-          ) : null}
+          {hasBasic && hasVerifiable ? <StyledDivider variant="secondary" /> : null}
           {hasVerifiable
-            ? verifiableList.map(
-                ({ isVerified, onClick, subtext, text, textColor }) => (
-                  <Grid.Container
-                    key={text + subtext}
-                    paddingTop={7}
-                    width="100%"
-                    columns={['1fr auto']}
-                  >
-                    <Grid.Item width="100%" overflow="hidden">
-                      <SectionItem
-                        text={text}
-                        subtext={subtext}
-                        textColor={textColor}
-                      />
-                    </Grid.Item>
-                    <Box>
-                      {!verifiedMethods || verifiedMethods?.isLoading ? (
-                        <Shimmer height="24px" width="100%" />
-                      ) : (
-                        <LinkButton onClick={onClick} disabled={isVerified}>
-                          {isVerified ? t('verified') : t('verify')}
-                        </LinkButton>
-                      )}
-                    </Box>
-                  </Grid.Container>
-                ),
-              )
+            ? verifiableList.map(({ isVerified, onClick, subtext, text, textColor }) => (
+                <Grid.Container key={text + subtext} paddingTop={7} width="100%" columns={['1fr auto']}>
+                  <Grid.Item width="100%" overflow="hidden">
+                    <SectionItem text={text} subtext={subtext} textColor={textColor} />
+                  </Grid.Item>
+                  <Box>
+                    {!verifiedMethods || verifiedMethods?.isLoading ? (
+                      <Shimmer height="24px" width="100%" />
+                    ) : (
+                      <LinkButton onClick={onClick} disabled={isVerified}>
+                        {isVerified ? t('verified') : t('verify')}
+                      </LinkButton>
+                    )}
+                  </Box>
+                </Grid.Container>
+              ))
             : null}
           {showVerifyHint ? (
             <>
@@ -145,9 +110,7 @@ const BasicInfoSection = ({ verifiedMethods }: BasicInfoSectionProps) => {
     return null;
   }
 
-  const actions = !isEditing
-    ? [{ label: t('confirm.summary.edit'), onClick: () => setIsEditing(true) }]
-    : [];
+  const actions = !isEditing ? [{ label: t('confirm.summary.edit'), onClick: () => setIsEditing(true) }] : [];
 
   return (
     <Section

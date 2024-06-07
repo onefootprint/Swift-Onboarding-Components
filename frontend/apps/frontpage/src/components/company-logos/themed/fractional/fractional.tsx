@@ -5,13 +5,7 @@ type FindigsLogoProps = {
 };
 
 const FindigsLogo = ({ color }: FindigsLogoProps) => (
-  <svg
-    width="126"
-    height="24"
-    viewBox="0 0 126 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg width="126" height="24" viewBox="0 0 126 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3665_67262)">
       <path
         opacity="0.5"
@@ -108,20 +102,10 @@ const FindigsLogo = ({ color }: FindigsLogoProps) => (
     </g>
     <defs>
       <clipPath id="clip0_3665_67262">
-        <rect
-          width="24"
-          height="24"
-          fill="white"
-          transform="translate(0.48584)"
-        />
+        <rect width="24" height="24" fill="white" transform="translate(0.48584)" />
       </clipPath>
       <clipPath id="clip1_3665_67262">
-        <rect
-          width="90.6"
-          height="15"
-          fill="white"
-          transform="translate(34.4858 4.5)"
-        />
+        <rect width="90.6" height="15" fill="white" transform="translate(34.4858 4.5)" />
       </clipPath>
     </defs>
   </svg>

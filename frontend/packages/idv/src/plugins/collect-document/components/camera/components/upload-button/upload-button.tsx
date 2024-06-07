@@ -12,11 +12,7 @@ const BUTTON_RADIUS = 56;
 type UploadButtonProps = {
   onUploadBtnClick: () => void;
   onUploadChangeDone: () => void;
-  onUploadSuccess: (
-    imageFile: File | Blob,
-    extraCompressed: boolean,
-    captureKind: CaptureKind,
-  ) => void;
+  onUploadSuccess: (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) => void;
   allowPdf: boolean;
   hasBadConnectivity?: boolean;
 };
@@ -50,9 +46,7 @@ const UploadButton = ({
     onUploadChangeDone();
   };
 
-  const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsLoading(true);
     onUploadBtnClick();
     const { files } = event.target;
@@ -80,11 +74,7 @@ const UploadButton = ({
     }
 
     logProcessedFile(processResult);
-    onUploadSuccess(
-      processResult.file,
-      processResult.extraCompressed,
-      'upload',
-    );
+    onUploadSuccess(processResult.file, processResult.extraCompressed, 'upload');
     onProcessingDone();
   };
 

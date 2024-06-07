@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { LangProp } from '@/app/types';
-import { initTranslations, LangFallback } from '@/i18n';
+import { LangFallback, initTranslations } from '@/i18n';
 import {
   getPartnerDocTemplates,
   getPartnerMembers,
@@ -37,9 +37,7 @@ const PartnerDocsPage = async ({ params }: PartnerDocsPageProps) => {
   const { t } = await initTranslations(lang, ['common']);
 
   const [documents, templates, company, members] = await Promise.all([
-    getPartnerPartnershipsDocuments(partnerId).then(list =>
-      list.sort(sortByLastUpdatedDesc),
-    ),
+    getPartnerPartnershipsDocuments(partnerId).then(list => list.sort(sortByLastUpdatedDesc)),
     getPartnerDocTemplates()
       .then(list => list.map(getDocLabelValue))
       .catch(() => []),

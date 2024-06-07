@@ -1,8 +1,5 @@
 import type { CollectKycDataRequirement } from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingRequirementKind } from '@onefootprint/types';
 import type { DeviceInfo } from 'src/hooks';
 import type { KycData } from 'src/plugins/collect-kyc-data/utils/data-types';
 import type { InitMachineArgs } from 'src/plugins/collect-kyc-data/utils/state-machine/machine';
@@ -15,11 +12,7 @@ type GetInitialContextArgs = {
   data?: KycData;
 };
 
-const getInitialContext = ({
-  device,
-  requirement,
-  data,
-}: GetInitialContextArgs = {}): InitMachineArgs => ({
+const getInitialContext = ({ device, requirement, data }: GetInitialContextArgs = {}): InitMachineArgs => ({
   authToken: 'token',
   device: device ?? {
     type: 'mobile',

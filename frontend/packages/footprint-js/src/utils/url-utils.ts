@@ -2,17 +2,11 @@ import type { Props } from '../types/components';
 import { ComponentKind } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
 import { getDefaultVariantForKind } from './prop-utils';
-import {
-  isAuthOrVerifyOrUpdateLogin,
-  isUpdateLoginMethods,
-  isValidString,
-} from './type-guards';
+import { isAuthOrVerifyOrUpdateLogin, isUpdateLoginMethods, isValidString } from './type-guards';
 
 /** @deprecated: import from `@onefootprint/core` */
 export const getWindowUrl = (): string =>
-  typeof window !== 'undefined'
-    ? window.location?.href || window.location.toString()
-    : '';
+  typeof window !== 'undefined' ? window.location?.href || window.location.toString() : '';
 
 export const getSearchParams = (props: Props, token: string): string => {
   const { appearance, kind, l10n, variant } = props;
@@ -39,9 +33,7 @@ const getURL = (props: Props, token: string): string => {
       url = process.env.BIFROST_URL;
       break;
     case ComponentKind.Auth:
-      url = isUpdateLoginMethods(props)
-        ? `${process.env.AUTH_URL}/user`
-        : process.env.AUTH_URL;
+      url = isUpdateLoginMethods(props) ? `${process.env.AUTH_URL}/user` : process.env.AUTH_URL;
       break;
     default:
       url = process.env.COMPONENTS_URL;

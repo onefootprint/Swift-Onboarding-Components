@@ -11,10 +11,7 @@ const useDocName = (config: DocumentRequirementConfig): string => {
   });
   if (docKind === DocumentRequestKind.Identity) return '';
 
-  const docKindToDocName: Record<
-    Exclude<DocumentRequestKind, 'identity'>,
-    string
-  > = {
+  const docKindToDocName: Record<Exclude<DocumentRequestKind, 'identity'>, string> = {
     [DocumentRequestKind.ProofOfAddress]: t('proof-of-address'),
     [DocumentRequestKind.ProofOfSsn]: t('proof-of-ssn'),
     [DocumentRequestKind.Custom]: getCustomDocInfo(config).documentName || '',

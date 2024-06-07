@@ -12,13 +12,7 @@ export type ContainerProps = StackProps & {
 
 const Container = forwardRef<HTMLDivElement, ContainerProps>(
   ({ children, fluid = false, ...props }: ContainerProps, ref) => (
-    <StyledContainer
-      data-fluid={fluid}
-      display="flex"
-      flexDirection="column"
-      ref={ref}
-      {...props}
-    >
+    <StyledContainer data-fluid={fluid} display="flex" flexDirection="column" ref={ref} {...props}>
       {children}
     </StyledContainer>
   ),

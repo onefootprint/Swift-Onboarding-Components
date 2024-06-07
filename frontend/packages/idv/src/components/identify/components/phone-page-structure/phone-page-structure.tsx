@@ -47,13 +47,7 @@ const PhonePageStructure = ({
   return (
     <Stack direction="column" gap={8}>
       <Header title={headerTitle} subtitle={headerSubtitle} />
-      {email ? (
-        <EmailPreview
-          email={email}
-          onChange={onChangeEmailClick || noop}
-          textCta={emailChangeCta}
-        />
-      ) : null}
+      {email ? <EmailPreview email={email} onChange={onChangeEmailClick || noop} textCta={emailChangeCta} /> : null}
       <PhoneForm
         l10n={l10n}
         defaultPhone={defaultPhone}

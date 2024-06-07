@@ -1,11 +1,6 @@
 import { mockRequest, screen, userEvent } from '@onefootprint/test-utils';
 import type { Rule } from '@onefootprint/types';
-import {
-  ActorKind,
-  ListKind,
-  RiskSignalRuleOp,
-  RuleAction,
-} from '@onefootprint/types';
+import { ActorKind, ListKind, RiskSignalRuleOp, RuleAction } from '@onefootprint/types';
 
 export const entityIdFixure = 'fp_id_yCZehsWNeywHnk5JqL20u';
 export const obcIdFixure = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';

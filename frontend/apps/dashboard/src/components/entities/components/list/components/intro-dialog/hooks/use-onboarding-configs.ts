@@ -6,9 +6,7 @@ import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
 const getOnboardingConfigs = async (authHeaders: AuthHeaders) => {
-  const { data: response } = await request<
-    PaginatedRequestResponse<GetOnboardingConfigsResponse>
-  >({
+  const { data: response } = await request<PaginatedRequestResponse<GetOnboardingConfigsResponse>>({
     method: 'GET',
     url: '/org/onboarding_configs',
     headers: authHeaders,
@@ -19,9 +17,7 @@ const getOnboardingConfigs = async (authHeaders: AuthHeaders) => {
 
 const useOnboardingConfigs = () => {
   const { authHeaders } = useSession();
-  return useQuery(['entities', 'onboarding-configurations', authHeaders], () =>
-    getOnboardingConfigs(authHeaders),
-  );
+  return useQuery(['entities', 'onboarding-configurations', authHeaders], () => getOnboardingConfigs(authHeaders));
 };
 
 export default useOnboardingConfigs;

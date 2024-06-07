@@ -7,7 +7,7 @@ type ErrorProps = {
   error: unknown;
 };
 
-const Error = ({ error }: ErrorProps) => (
+const ErrorComponent = ({ error }: ErrorProps) => (
   <Stack marginLeft={13} align="center">
     <IcoWarning16 />
     <Text variant="body-3" marginLeft={2}>
@@ -16,4 +16,4 @@ const Error = ({ error }: ErrorProps) => (
   </Stack>
 );
 
-export default Error;
+export default ErrorComponent;

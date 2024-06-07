@@ -16,21 +16,14 @@ const Vaulting = () => {
 
   return (
     <Container>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/vaulting"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/vaulting" />
       <Hero />
       <AllData />
       <AuditTrail />
       <VaultProxy />
       <DeviceInsights />
       <AllFeatures />
-      <PenguinBanner
-        section="vaulting"
-        imgSrc="/vaulting/penguin-banner/vaulting.svg"
-      />
+      <PenguinBanner section="vaulting" imgSrc="/vaulting/penguin-banner/vaulting.svg" />
     </Container>
   );
 };

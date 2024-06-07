@@ -1,10 +1,4 @@
-import {
-  IcoCheck24,
-  IcoClose24,
-  IcoCopy24,
-  IcoInfo16,
-  IcoPencil24,
-} from '@onefootprint/icons';
+import { IcoCheck24, IcoClose24, IcoCopy24, IcoInfo16, IcoPencil24 } from '@onefootprint/icons';
 import { Box, CopyButton, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import Hint from '@onefootprint/ui/src/components/internal/hint';
 import React, { useState } from 'react';
@@ -48,11 +42,7 @@ const TestIdInput = () => {
     <InputContainer>
       <InputTitle>
         <Text variant="label-2">{t('test-id.label')}</Text>
-        <Tooltip
-          text={t('test-id.description')}
-          alignment="start"
-          position="top"
-        >
+        <Tooltip text={t('test-id.description')} alignment="start" position="top">
           <IcoInfo16 testID="infoIcon" />
         </Tooltip>
       </InputTitle>

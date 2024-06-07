@@ -1,9 +1,4 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser, asUser, resetUser } from 'src/config/tests';
 
@@ -21,10 +16,7 @@ describe('<UserData />', () => {
     resetUser();
   });
 
-  const renderUserData = ({
-    onBack = jest.fn(),
-    onComplete = jest.fn(),
-  }: Partial<UserDataProps>) => {
+  const renderUserData = ({ onBack = jest.fn(), onComplete = jest.fn() }: Partial<UserDataProps>) => {
     customRender(<UserData onComplete={onComplete} onBack={onBack} />);
   };
 
@@ -54,9 +46,7 @@ describe('<UserData />', () => {
 
       const submitButton = screen.getByRole('button', { name: 'Next' });
       await userEvent.click(submitButton);
-      const firstNameError = await screen.findByText(
-        'Please enter a first name',
-      );
+      const firstNameError = await screen.findByText('Please enter a first name');
       expect(firstNameError).toBeInTheDocument();
       const lastNameError = await screen.findByText('Please enter a last name');
       expect(lastNameError).toBeInTheDocument();

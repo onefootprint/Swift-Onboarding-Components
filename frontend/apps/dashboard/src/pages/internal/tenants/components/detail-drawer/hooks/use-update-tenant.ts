@@ -37,11 +37,7 @@ export type PrivatePatchTenantRequest = {
   vendorControl?: UpdateTenantVendorControl;
 };
 
-const patchTenant = async (
-  authHeaders: AuthHeaders,
-  id: string,
-  data: PrivatePatchTenantRequest,
-) => {
+const patchTenant = async (authHeaders: AuthHeaders, id: string, data: PrivatePatchTenantRequest) => {
   const response = await request<TenantDetail>({
     method: 'PATCH',
     url: `/private/tenants/${id}`,
@@ -57,8 +53,7 @@ const useUpdateTenant = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: PrivatePatchTenantRequest) =>
-      patchTenant(authHeaders, id, data),
+    mutationFn: (data: PrivatePatchTenantRequest) => patchTenant(authHeaders, id, data),
     onSuccess: () => {
       queryClient.invalidateQueries();
     },

@@ -1,11 +1,6 @@
 import { IcoBolt24, IcoUser24 } from '@onefootprint/icons';
 import type { MotionValue } from 'framer-motion';
-import {
-  motion,
-  useInView,
-  useMotionValueEvent,
-  useTransform,
-} from 'framer-motion';
+import { motion, useInView, useMotionValueEvent, useTransform } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import MobileDemoVideo from 'src/components/mobile-demo-video';
 import styled, { css } from 'styled-components';
@@ -26,11 +21,7 @@ const IllustrationOnboard = ({ scroll }: IllustrationOnboardProps) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 'all' });
 
-  const opacity = useTransform(
-    scroll,
-    [0, VISIBLE_RANGE.maxInitial, VISIBLE_RANGE.maxFinal],
-    ['100%', '100%', '0%'],
-  );
+  const opacity = useTransform(scroll, [0, VISIBLE_RANGE.maxInitial, VISIBLE_RANGE.maxFinal], ['100%', '100%', '0%']);
   const scaleOutCircle = useTransform(scroll, [0, 1], [1, 3]);
   const scaleCenterCircle = useTransform(scroll, [0, 1], [1, 2]);
   const scaleInnerCircle = useTransform(scroll, [0, 1], [1, 1.5]);
@@ -45,10 +36,7 @@ const IllustrationOnboard = ({ scroll }: IllustrationOnboardProps) => {
 
   return isVisible ? (
     <Container style={{ opacity }} ref={ref}>
-      <MobileDemoVideo
-        videoUrl="/kyc/sticky-rail/onboarding.mp4"
-        shouldPlay={isInView}
-      />
+      <MobileDemoVideo videoUrl="/kyc/sticky-rail/onboarding.mp4" shouldPlay={isInView} />
       <motion.span
         animate={{
           rotate: [0, 360],

@@ -2,11 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoAppclip16 = ({
-  'aria-label': ariaLabel,
-  className,
-  testID,
-}: IconProps) => (
+const IcoAppclip16 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
   <svg
     width={17}
     height={17}

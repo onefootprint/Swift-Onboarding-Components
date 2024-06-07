@@ -15,10 +15,7 @@ const hasDataForListKind = (listKind?: ListKind, entity?: Entity) => {
 
     case ListKind.phoneCountryCode:
     case ListKind.phoneNumber: {
-      return (
-        decryptableAttributes.includes(IdDI.phoneNumber) ||
-        decryptableAttributes.includes(BusinessDI.phoneNumber)
-      );
+      return decryptableAttributes.includes(IdDI.phoneNumber) || decryptableAttributes.includes(BusinessDI.phoneNumber);
     }
 
     case ListKind.ssn9: {
@@ -26,14 +23,8 @@ const hasDataForListKind = (listKind?: ListKind, entity?: Entity) => {
     }
 
     case ListKind.ipAddress: {
-      const insightEvents = (
-        entity.workflows
-          .map(wf => wf.insightEvent)
-          .filter(ie => !!ie) as InsightEvent[]
-      ).flat();
-      const ipAddresses = insightEvents
-        .map(event => event.ipAddress)
-        .filter(ip => !!ip) as string[];
+      const insightEvents = (entity.workflows.map(wf => wf.insightEvent).filter(ie => !!ie) as InsightEvent[]).flat();
+      const ipAddresses = insightEvents.map(event => event.ipAddress).filter(ip => !!ip) as string[];
       return ipAddresses.length > 0;
     }
 

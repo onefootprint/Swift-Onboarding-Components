@@ -14,10 +14,7 @@ export type PostAssumeResponse = {
   tenant: Organization;
 };
 
-const postAssumeTenantReadOnly = async (
-  authHeaders: AuthHeaders,
-  tenantId: string,
-) => {
+const postAssumeTenantReadOnly = async (authHeaders: AuthHeaders, tenantId: string) => {
   const { data } = await request<PostAssumeResponse>({
     method: 'POST',
     url: '/private/assume',
@@ -33,15 +30,11 @@ const useAssumeTenant = () => {
   const { authHeaders } = useSession();
   const showErrorToast = useRequestErrorToast();
 
-  return useMutation(
-    (data: PostAssumeRequest) =>
-      postAssumeTenantReadOnly(authHeaders, data.tenantId),
-    {
-      onError: (error: unknown) => {
-        showErrorToast(error);
-      },
+  return useMutation((data: PostAssumeRequest) => postAssumeTenantReadOnly(authHeaders, data.tenantId), {
+    onError: (error: unknown) => {
+      showErrorToast(error);
     },
-  );
+  });
 };
 
 export default useAssumeTenant;

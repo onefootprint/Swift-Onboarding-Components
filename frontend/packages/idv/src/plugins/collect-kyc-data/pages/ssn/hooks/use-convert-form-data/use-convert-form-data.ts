@@ -12,18 +12,13 @@ const { logError } = getLogger({ location: 'ssn-use-convert-form-data' });
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
-  const requiresSsn9 = allAttributes(requirement).includes(
-    CollectedKycDataOption.ssn9,
-  );
+  const requiresSsn9 = allAttributes(requirement).includes(CollectedKycDataOption.ssn9);
 
   return (formData: FormData, isSkipped?: boolean) => {
     const convertedData: KycData = {};
     const { ssn4, ssn9 } = formData;
     if (isSkipped) {
-      if (
-        !!convertedData[IdDI.ssn9]?.value ||
-        !!convertedData[IdDI.ssn4]?.value
-      ) {
+      if (!!convertedData[IdDI.ssn9]?.value || !!convertedData[IdDI.ssn4]?.value) {
         // TODO this is a bug... we won't actually send the empty SSN to the backend even though
         // the user is skipping SSN collection. It's a little hard to fix.
         // More context in https://github.com/onefootprint/monorepo/pull/9091

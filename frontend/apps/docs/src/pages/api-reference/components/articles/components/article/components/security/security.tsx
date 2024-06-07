@@ -1,5 +1,5 @@
 import { IcoChevronDown16, IcoShield16 } from '@onefootprint/icons';
-import { CodeInline, createFontStyles, Divider } from '@onefootprint/ui';
+import { CodeInline, Divider, createFontStyles } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -30,10 +30,7 @@ const Security = ({ type }: SecurityProps) => {
             {securityComponentContent[type].description}
             <br />
             <Example>
-              {t('example')}:{' '}
-              <CodeInline disabled>
-                {`${securityComponentContent[type].name} : 1234`}
-              </CodeInline>
+              {t('example')}: <CodeInline disabled>{`${securityComponentContent[type].name} : 1234`}</CodeInline>
             </Example>
           </Description>
         </>

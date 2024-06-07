@@ -1,8 +1,7 @@
 // Copied from https://github.com/juliencrn/usehooks-ts/blob/master/packages/usehooks-ts/src/useImageOnLoad/useImageOnLoad.ts
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
-const useIsomorphicLayoutEffect =
-  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export default (callback: () => void, delay: number | null) => {
   const savedCallback = useRef(callback);

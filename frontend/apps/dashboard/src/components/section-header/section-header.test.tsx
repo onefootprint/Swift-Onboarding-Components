@@ -28,9 +28,7 @@ describe('<SectionHeader />', () => {
       subtitle: 'Manage who is a member of your team and their roles',
     });
 
-    expect(
-      screen.getByText('Manage who is a member of your team and their roles'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Manage who is a member of your team and their roles')).toBeInTheDocument();
   });
 
   it('should render the children', () => {

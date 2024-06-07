@@ -5,9 +5,7 @@ type PublicLayoutProps = {
   children: React.ReactNode;
 };
 
-const PublicLayout = ({ children }: PublicLayoutProps) => (
-  <Container data-testid="public-layout">{children}</Container>
-);
+const PublicLayout = ({ children }: PublicLayoutProps) => <Container data-testid="public-layout">{children}</Container>;
 
 const Container = styled.div`
   ${({ theme }) => css`

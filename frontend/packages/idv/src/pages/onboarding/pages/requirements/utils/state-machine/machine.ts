@@ -1,18 +1,11 @@
-import type {
-  IdDocOutcome,
-  OverallOutcome,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { IdDocOutcome, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { UserData } from '../../../../../../types';
 import { Logger } from '../../../../../../utils/logger';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 import isRepeatRequirement from '../is-repeat-requirement';
-import {
-  NextRequirementTargets,
-  RequirementCompletedTransition,
-} from './machine.utils';
+import { NextRequirementTargets, RequirementCompletedTransition } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
@@ -75,9 +68,7 @@ const createOnboardingRequirementsMachine = ({
             initialized: [
               {
                 target: 'waitForComponentsSdk',
-                cond: ctx =>
-                  !!ctx.idvContext.isInIframe &&
-                  !!ctx.idvContext.componentsSdkContext,
+                cond: ctx => !!ctx.idvContext.isInIframe && !!ctx.idvContext.componentsSdkContext,
                 description:
                   'If we are running bifrost for the components SDK, wait for the components SDK to finish handling its requirements',
               },
@@ -147,17 +138,13 @@ const createOnboardingRequirementsMachine = ({
     {
       actions: {
         assignRequirements: assign((context, event) => {
-          const isRepeat = isRepeatRequirement(
-            context.lastHandledRequirement,
-            event.payload[0],
-          );
+          const isRepeat = isRepeatRequirement(context.lastHandledRequirement, event.payload[0]);
           if (isRepeat) {
             // If the highest priority requirement hasn't changed after a refetch, the user is
             // stuck on a screen
-            Logger.error(
-              `User is stuck on ${context.lastHandledRequirement?.kind} requirement`,
-              { location: 'requirements' },
-            );
+            Logger.error(`User is stuck on ${context.lastHandledRequirement?.kind} requirement`, {
+              location: 'requirements',
+            });
           }
           return {
             ...context,

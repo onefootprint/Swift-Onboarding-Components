@@ -41,20 +41,9 @@ const Toast = ({
       <Stack align="center" justify="center" marginTop={1}>
         <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
       </Stack>
-      <Stack
-        flexGrow={1}
-        align="start"
-        justify="flex-start"
-        height="fit-content"
-        direction="column"
-        gap={4}
-      >
+      <Stack flexGrow={1} align="start" justify="flex-start" height="fit-content" direction="column" gap={4}>
         <Stack direction="column">
-          <Text
-            color={variant === 'error' ? 'error' : 'primary'}
-            variant="label-3"
-            marginBottom={2}
-          >
+          <Text color={variant === 'error' ? 'error' : 'primary'} variant="label-3" marginBottom={2}>
             {title}
           </Text>
           <Text color="tertiary" variant="body-3">
@@ -73,9 +62,7 @@ const Toast = ({
         )}
       </Stack>
       <button
-        aria-label={
-          closeAriaLabel ?? t('components.toast.close-aria-label-default')
-        }
+        aria-label={closeAriaLabel ?? t('components.toast.close-aria-label-default')}
         onClick={handleClose}
         tabIndex={0}
         type="button"

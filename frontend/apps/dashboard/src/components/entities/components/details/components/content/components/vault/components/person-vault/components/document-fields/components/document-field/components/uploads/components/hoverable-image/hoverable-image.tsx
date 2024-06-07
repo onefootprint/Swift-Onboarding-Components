@@ -1,9 +1,4 @@
-import {
-  IcoCheckSmall16,
-  IcoCloseSmall16,
-  IcoMaximize24,
-  IcoMinimize24,
-} from '@onefootprint/icons';
+import { IcoCheckSmall16, IcoCloseSmall16, IcoMaximize24, IcoMinimize24 } from '@onefootprint/icons';
 import { Stack, useObjectUrl } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -19,11 +14,7 @@ type HoverableImageProps = {
   documentName: string;
 };
 
-const HoverableImage = ({
-  base64Data,
-  isSuccess,
-  documentName,
-}: HoverableImageProps) => {
+const HoverableImage = ({ base64Data, isSuccess, documentName }: HoverableImageProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document.drawer.uploads',
   });
@@ -52,20 +43,12 @@ const HoverableImage = ({
       <StyledImage src={objectUrl} width={0} height={0} alt={t('image-alt')} />
       <>
         <ToggleContainer onClick={handleToggleExpanded} className="toggle">
-          {isExpanded ? (
-            <IcoMinimize24 color="primary" />
-          ) : (
-            <IcoMaximize24 color="primary" />
-          )}
+          {isExpanded ? <IcoMinimize24 color="primary" /> : <IcoMaximize24 color="primary" />}
         </ToggleContainer>
         <HoverImageMask onClick={handleToggleExpanded} />
       </>
       <IconContainer data-success={isSuccess}>
-        {isSuccess ? (
-          <IcoCheckSmall16 color="quinary" />
-        ) : (
-          <IcoCloseSmall16 color="quinary" />
-        )}
+        {isSuccess ? <IcoCheckSmall16 color="quinary" /> : <IcoCloseSmall16 color="quinary" />}
       </IconContainer>
     </ImageContainer>
   );

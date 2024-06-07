@@ -3,21 +3,15 @@ import isObject from 'lodash/isObject';
 import snakeCase from 'lodash/snakeCase';
 import transform from 'lodash/transform';
 
-type CaseTransformed<T> =
-  T extends Array<infer U>
-    ? Array<CaseTransformed<U>>
-    : T extends {}
-      ? {
-          [K in keyof T as K extends string ? string : never]: CaseTransformed<
-            T[K]
-          >;
-        }
-      : T;
+type CaseTransformed<T> = T extends Array<infer U>
+  ? Array<CaseTransformed<U>>
+  : T extends {}
+    ? {
+        [K in keyof T as K extends string ? string : never]: CaseTransformed<T[K]>;
+      }
+    : T;
 
-const keysToCamelCase = <T extends Record<string, unknown>>(
-  obj: T,
-  disabled?: boolean,
-): CaseTransformed<T> | T => {
+const keysToCamelCase = <T extends Record<string, unknown>>(obj: T, disabled?: boolean): CaseTransformed<T> | T => {
   if (disabled) {
     return obj;
   }
@@ -26,17 +20,11 @@ const keysToCamelCase = <T extends Record<string, unknown>>(
     (result: Record<string, unknown>, value: unknown, key: string) => {
       let newValue: unknown;
 
-      if (
-        isObject(value) &&
-        !Array.isArray(value) &&
-        !(value instanceof Date)
-      ) {
+      if (isObject(value) && !Array.isArray(value) && !(value instanceof Date)) {
         newValue = keysToCamelCase(value as Record<string, unknown>);
       } else if (Array.isArray(value)) {
         newValue = value.map(item =>
-          isObject(item) && !(item instanceof Date)
-            ? keysToCamelCase(item as Record<string, unknown>)
-            : item,
+          isObject(item) && !(item instanceof Date) ? keysToCamelCase(item as Record<string, unknown>) : item,
         );
       } else {
         newValue = value;
@@ -49,10 +37,7 @@ const keysToCamelCase = <T extends Record<string, unknown>>(
   ) as CaseTransformed<T>;
 };
 
-const keysToSnakeCase = <T extends Record<string, unknown>>(
-  obj: T,
-  disabled?: boolean,
-): CaseTransformed<T> | T => {
+const keysToSnakeCase = <T extends Record<string, unknown>>(obj: T, disabled?: boolean): CaseTransformed<T> | T => {
   if (disabled) {
     return obj;
   }
@@ -61,17 +46,11 @@ const keysToSnakeCase = <T extends Record<string, unknown>>(
     (result: Record<string, unknown>, value: unknown, key: string) => {
       let newValue: unknown;
 
-      if (
-        isObject(value) &&
-        !Array.isArray(value) &&
-        !(value instanceof Date)
-      ) {
+      if (isObject(value) && !Array.isArray(value) && !(value instanceof Date)) {
         newValue = keysToSnakeCase(value as Record<string, unknown>);
       } else if (Array.isArray(value)) {
         newValue = value.map(item =>
-          isObject(item) && !(item instanceof Date)
-            ? keysToSnakeCase(item as Record<string, unknown>)
-            : item,
+          isObject(item) && !(item instanceof Date) ? keysToSnakeCase(item as Record<string, unknown>) : item,
         );
       } else {
         newValue = value;

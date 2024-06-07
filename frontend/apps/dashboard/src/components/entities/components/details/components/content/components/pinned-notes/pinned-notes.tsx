@@ -1,6 +1,6 @@
 import { IcoArrowDown16, IcoPin24 } from '@onefootprint/icons';
 import { ActorKind } from '@onefootprint/types';
-import { createFontStyles, Divider, Stack, Text } from '@onefootprint/ui';
+import { Divider, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,15 +34,11 @@ const PinnedNotes = () => {
     }
   }, [data, sortDirection]);
 
-  const sortDataAscending = (
-    a: { timestamp: string },
-    b: { timestamp: string },
-  ) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+  const sortDataAscending = (a: { timestamp: string }, b: { timestamp: string }) =>
+    new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
 
-  const sortDataDescending = (
-    a: { timestamp: string },
-    b: { timestamp: string },
-  ) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+  const sortDataDescending = (a: { timestamp: string }, b: { timestamp: string }) =>
+    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
 
   const handleSortData = () => {
     if (sortDirection === SortOrder.descending) {
@@ -64,21 +60,11 @@ const PinnedNotes = () => {
           <Text variant="label-2">{t('title')}</Text>
         </Stack>
         {data.length > 1 ? (
-          <SortButton
-            as="button"
-            onClick={() => handleSortData()}
-            ref={sortButtonRef}
-            data-hover={isHover}
-          >
+          <SortButton as="button" onClick={() => handleSortData()} ref={sortButtonRef} data-hover={isHover}>
             <Stack direction="row" gap={3} align="center" justify="center">
-              {sortDirection === SortOrder.descending
-                ? t('sort-ascending')
-                : t('sort-descending')}
+              {sortDirection === SortOrder.descending ? t('sort-ascending') : t('sort-descending')}
               <Stack height="100%">
-                <StyledIconArrow
-                  direction={sortDirection}
-                  color={isHover ? 'primary' : 'tertiary'}
-                />
+                <StyledIconArrow direction={sortDirection} color={isHover ? 'primary' : 'tertiary'} />
               </Stack>
             </Stack>
           </SortButton>
@@ -91,9 +77,7 @@ const PinnedNotes = () => {
               author={
                 source.kind === ActorKind.organization
                   ? source.member
-                  : t(
-                      `note-added-by-source.${source.kind}` as ParseKeys<'common'>,
-                    )
+                  : t(`note-added-by-source.${source.kind}` as ParseKeys<'common'>)
               }
               key={id}
               note={note}
@@ -125,9 +109,7 @@ const SortButton = styled(Stack)`
 
 const StyledIconArrow = styled(IcoArrowDown16)<{ direction: SortOrder }>`
   ${({ direction }) => css`
-    transform: ${direction === SortOrder.descending
-      ? 'rotate(180deg)'
-      : 'rotate(0deg)'};
+    transform: ${direction === SortOrder.descending ? 'rotate(180deg)' : 'rotate(0deg)'};
     transition: transform 0.2s ease-in-out;
   `}
 `;

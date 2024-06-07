@@ -1,7 +1,4 @@
-import type {
-  IdvBootstrapData,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { IdvBootstrapData, PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDI, OnboardingConfigStatus } from '@onefootprint/types';
 import { interpret } from 'xstate';
 

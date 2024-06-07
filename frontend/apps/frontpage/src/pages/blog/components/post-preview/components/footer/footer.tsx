@@ -1,4 +1,4 @@
-import { createFontStyles, Grid, media } from '@onefootprint/ui';
+import { Grid, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -14,20 +14,12 @@ const Footer = ({ authors, publishedAt }: FooterProps) => {
     <Container verticalStack={verticalStack}>
       <AvatarGroup count={authors.length}>
         {authors.map(author => (
-          <Avatar
-            key={author.id}
-            alt={author.name}
-            height={20}
-            src={author.avatarImgUrl}
-            width={20}
-          />
+          <Avatar key={author.id} alt={author.name} height={20} src={author.avatarImgUrl} width={20} />
         ))}
       </AvatarGroup>
-      <AuthorsName verticalStack={verticalStack}>
-        {authors.map(author => author.name).join(' & ')}
-      </AuthorsName>
+      <AuthorsName verticalStack={verticalStack}>{authors.map(author => author.name).join(' & ')}</AuthorsName>
       {!verticalStack && <Separator>·</Separator>}
-      <Date>{publishedAt}</Date>
+      <DateComponent>{publishedAt}</DateComponent>
     </Container>
   );
 };
@@ -39,8 +31,9 @@ const Container = styled(Grid.Container)<{ verticalStack: boolean }>`
     grid-template-rows: 1fr;
     grid-template-areas: 'avatars name separator date';
 
-    ${verticalStack &&
-    css`
+    ${
+      verticalStack &&
+      css`
       grid-template-columns: max-content 1fr;
       grid-template-rows: repeat(3, max-content);
       align-items: flex-start;
@@ -54,7 +47,8 @@ const Container = styled(Grid.Container)<{ verticalStack: boolean }>`
         grid-template-rows: 1fr;
         grid-template-areas: 'avatars name date';
       `}
-    `}
+    `
+    }
   `}
 `;
 
@@ -98,7 +92,7 @@ const AuthorsName = styled.div<{ verticalStack: boolean }>`
   `}
 `;
 
-const Date = styled.time`
+const DateComponent = styled.time`
   ${({ theme }) => css`
     ${createFontStyles('body-4')};
     color: ${theme.color.tertiary};

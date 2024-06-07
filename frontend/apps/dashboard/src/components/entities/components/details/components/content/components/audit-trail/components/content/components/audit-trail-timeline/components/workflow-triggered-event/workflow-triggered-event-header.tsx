@@ -1,7 +1,4 @@
-import {
-  TriggerKind,
-  type WorkflowTriggeredEventData,
-} from '@onefootprint/types';
+import { TriggerKind, type WorkflowTriggeredEventData } from '@onefootprint/types';
 import { Shimmer, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,9 +12,7 @@ type WorkflowTriggeredEventHeaderProps = {
   data: WorkflowTriggeredEventData;
 };
 
-const WorkflowTriggeredEventHeader = ({
-  data,
-}: WorkflowTriggeredEventHeaderProps) => {
+const WorkflowTriggeredEventHeader = ({ data }: WorkflowTriggeredEventHeaderProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
   });
@@ -43,8 +38,7 @@ const PlaybookContext = ({ data }: WorkflowTriggeredEventHeaderProps) => {
     keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
   });
 
-  const playbookId =
-    data.config.kind === TriggerKind.Onboard ? data.config.data.playbookId : '';
+  const playbookId = data.config.kind === TriggerKind.Onboard ? data.config.data.playbookId : '';
   const { data: playbook, isError } = usePlaybook(playbookId);
   if (!playbookId) {
     return null;
@@ -56,11 +50,7 @@ const PlaybookContext = ({ data }: WorkflowTriggeredEventHeaderProps) => {
       </Text>
     );
   }
-  return playbook ? (
-    <PlaybookLink playbook={playbook} />
-  ) : (
-    <Shimmer width="120px" height="20px" />
-  );
+  return playbook ? <PlaybookLink playbook={playbook} /> : <Shimmer width="120px" height="20px" />;
 };
 
 export default WorkflowTriggeredEventHeader;

@@ -17,11 +17,7 @@ import CountryOfBirthField from './components/country-of-birth-field';
 import StatusFields from './components/status-fields';
 import VisaFields from './components/visa-fields';
 import useConvertFormData from './hooks/use-convert-form-data';
-import type {
-  CountrySelectOptionOrPlaceholder,
-  FormData,
-  VisaFormData,
-} from './types';
+import type { CountrySelectOptionOrPlaceholder, FormData, VisaFormData } from './types';
 import getCountrySelectOption from './utils/get-country-select-option';
 
 type LegalStatusProps = {
@@ -31,12 +27,7 @@ type LegalStatusProps = {
   onCancel?: () => void;
 };
 
-const LegalStatus = ({
-  ctaLabel,
-  hideHeader,
-  onComplete,
-  onCancel,
-}: LegalStatusProps) => {
+const LegalStatus = ({ ctaLabel, hideHeader, onComplete, onCancel }: LegalStatusProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { data } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -52,9 +43,7 @@ const LegalStatus = ({
   const emptyFieldValues: FormData = {
     usLegalStatus: UsLegalStatus.citizen,
     nationality: usCountrySelectOption,
-    citizenships: [
-      { label: '', value: undefined },
-    ] as CountrySelectOptionOrPlaceholder[],
+    citizenships: [{ label: '', value: undefined }] as CountrySelectOptionOrPlaceholder[],
   };
 
   const citizenshipsValue = data[IdDI.citizenships]?.value;
@@ -74,11 +63,8 @@ const LegalStatus = ({
     expirationDate: data?.[IdDI.visaExpirationDate]?.value,
   };
 
-  const usLegalStatus =
-    data[IdDI.usLegalStatus]?.value ?? emptyFieldValues.usLegalStatus;
-  const nationality =
-    getCountrySelectOption(data[IdDI.nationality]?.value) ??
-    emptyFieldValues.nationality;
+  const usLegalStatus = data[IdDI.usLegalStatus]?.value ?? emptyFieldValues.usLegalStatus;
+  const nationality = getCountrySelectOption(data[IdDI.nationality]?.value) ?? emptyFieldValues.nationality;
   const methods = useForm<FormData>({
     defaultValues: {
       usLegalStatus,
@@ -93,9 +79,7 @@ const LegalStatus = ({
   const handleStatusChange = (newStatus: UsLegalStatus) => {
     setValue(
       'nationality',
-      newStatus === UsLegalStatus.citizen
-        ? usCountrySelectOption
-        : { label: '', value: undefined },
+      newStatus === UsLegalStatus.citizen ? usCountrySelectOption : { label: '', value: undefined },
     );
     setValue('citizenships', emptyFieldValues.citizenships);
     setValue('visa', emptyFieldValues.visa);
@@ -134,9 +118,7 @@ const LegalStatus = ({
           <StatusFields handleStatusChange={handleStatusChange} />
           <Divider />
           <CountryOfBirthField />
-          {selectedOption && selectedOption !== UsLegalStatus.citizen && (
-            <CitizenshipFields />
-          )}
+          {selectedOption && selectedOption !== UsLegalStatus.citizen && <CitizenshipFields />}
           {selectedOption === UsLegalStatus.visa && <VisaFields />}
           <EditableFormButtonContainer
             isLoading={mutation.isLoading}

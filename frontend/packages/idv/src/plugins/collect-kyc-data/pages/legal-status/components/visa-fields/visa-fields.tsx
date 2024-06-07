@@ -85,9 +85,7 @@ const VisaFields = () => {
           validate: {
             invalid: input => input && isValid(new Date(input)),
             invalidTimeframe: input =>
-              input &&
-              new Date(input).getFullYear() > 1900 &&
-              new Date(input).getFullYear() < 3000,
+              input && new Date(input).getFullYear() > 1900 && new Date(input).getFullYear() < 3000,
           },
         })}
         testID="visa-expiration-textinput"

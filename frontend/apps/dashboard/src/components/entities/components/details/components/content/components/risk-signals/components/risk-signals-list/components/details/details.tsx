@@ -3,7 +3,7 @@ import type { AmlHitMedia } from '@onefootprint/types';
 import { Drawer } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Error } from 'src/components';
+import { ErrorComponent } from 'src/components';
 import { createCapitalStringList } from 'src/utils/create-string-list';
 
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
@@ -24,9 +24,7 @@ const Details = () => {
       if (data.scopes?.length) {
         const scopesTitle = createCapitalStringList(data.scopes);
         return amlMedia.length
-          ? `${t(
-              'pages.entity.risk-signals.details.matches.hits-media.drawer-title',
-            )} • ${scopesTitle}`
+          ? `${t('pages.entity.risk-signals.details.matches.hits-media.drawer-title')} • ${scopesTitle}`
           : scopesTitle;
       }
       return data.note;
@@ -50,15 +48,9 @@ const Details = () => {
       closeIconComponent={amlMedia.length ? IcoChevronLeft24 : IcoClose24}
     >
       <>
-        {data && (
-          <Content
-            riskSignal={data}
-            handleShowAmlMedia={setAmlMedia}
-            amlMedia={amlMedia}
-          />
-        )}
+        {data && <Content riskSignal={data} handleShowAmlMedia={setAmlMedia} amlMedia={amlMedia} />}
         {isLoading && <Loading />}
-        {error && <Error error={error} />}
+        {error && <ErrorComponent error={error} />}
       </>
     </Drawer>
   );

@@ -1,13 +1,10 @@
-import { Box, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
 import styled, { css } from 'styled-components';
 
-import type {
-  Article as ApiReferenceArticle,
-  SecurityTypes,
-} from '@/api-reference/api-reference.types';
+import type { Article as ApiReferenceArticle, SecurityTypes } from '@/api-reference/api-reference.types';
 
 import TypeBadge from '../../../type-badge/type-badge';
 import DemoCode from './components/demo-code';
@@ -27,16 +24,7 @@ const CONTENT_WIDTH = 900;
 
 const Article = ({ article }: ArticleProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
-  const {
-    id,
-    parameters,
-    description,
-    method,
-    path,
-    security,
-    responses,
-    requestBody,
-  } = article;
+  const { id, parameters, description, method, path, security, responses, requestBody } = article;
   const encodedId = encodeURIComponent(id);
 
   return (
@@ -65,9 +53,7 @@ const Article = ({ article }: ArticleProps) => {
                 {t('request')}
               </Text>
               {security?.map((element: SecurityTypes) =>
-                Object.keys(element).map(type => (
-                  <Security key={type} type={type as SecurityTypes} />
-                )),
+                Object.keys(element).map(type => <Security key={type} type={type as SecurityTypes} />),
               )}
               <Box marginTop={2} marginBottom={2} />
               <Schema>
@@ -79,11 +65,7 @@ const Article = ({ article }: ArticleProps) => {
           )}
         </ContentWidth>
       </ContentColumn>
-      <CodeColumn>
-        {responses && (
-          <DemoCode requestBody={requestBody} responses={responses} />
-        )}
-      </CodeColumn>
+      <CodeColumn>{responses && <DemoCode requestBody={requestBody} responses={responses} />}</CodeColumn>
     </ArticleContainer>
   );
 };

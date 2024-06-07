@@ -156,9 +156,7 @@ const useSession = () => {
     reset();
   };
 
-  const updateUserName = (
-    nextUser: Pick<UserSession, 'firstName' | 'lastName'>,
-  ) => {
+  const updateUserName = (nextUser: Pick<UserSession, 'firstName' | 'lastName'>) => {
     if (!data.user) return;
     update({
       user: {

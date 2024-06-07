@@ -33,9 +33,7 @@ const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
     <Container>
       <Header>
         <TitleContainer>
-          <Text variant="label-3">
-            {author && t('title-by-author', { author })}
-          </Text>
+          <Text variant="label-3">{author && t('title-by-author', { author })}</Text>
           <Text variant="label-3" marginLeft={2}>
             &middot;
           </Text>

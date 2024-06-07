@@ -1,25 +1,8 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
-import type {
-  EditedRule,
-  ListRuleField,
-  OnboardingConfig,
-  RiskSignalRuleField,
-  Rule,
-} from '@onefootprint/types';
-import {
-  OnboardingConfigKind,
-  RoleScopeKind,
-  RuleAction,
-} from '@onefootprint/types';
-import {
-  Button,
-  InlineAlert,
-  Stack,
-  Text,
-  Tooltip,
-  useToast,
-} from '@onefootprint/ui';
+import type { EditedRule, ListRuleField, OnboardingConfig, RiskSignalRuleField, Rule } from '@onefootprint/types';
+import { OnboardingConfigKind, RoleScopeKind, RuleAction } from '@onefootprint/types';
+import { Button, InlineAlert, Stack, Text, Tooltip, useToast } from '@onefootprint/ui';
 import { cloneDeep, flatten, isEqual, partition } from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,13 +29,7 @@ export type AddedRuleWithId = {
   ruleExpression: (RiskSignalRuleField | ListRuleField)[];
 };
 
-const Content = ({
-  hasRules,
-  playbook,
-  shouldAllowEditing,
-  actionRules,
-  toggleDisableHeading,
-}: ContentProps) => {
+const Content = ({ hasRules, playbook, shouldAllowEditing, actionRules, toggleDisableHeading }: ContentProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules',
@@ -94,39 +71,27 @@ const Content = ({
   };
 
   const handleDeleteAddedRule = (tempId: string) => {
-    setAddedRules(currentRules =>
-      currentRules.filter(rule => rule.tempId !== tempId),
-    );
+    setAddedRules(currentRules => currentRules.filter(rule => rule.tempId !== tempId));
   };
 
   const handleDeleteRule = (id: string) => {
     setDeletedRuleIds(currentIds => [...currentIds, id]);
     if (editedRules.map(({ ruleId }) => ruleId).includes(id)) {
-      setEditedRules(currentRules =>
-        currentRules.filter(({ ruleId }) => ruleId !== id),
-      );
+      setEditedRules(currentRules => currentRules.filter(({ ruleId }) => ruleId !== id));
     }
   };
 
   const handleUndoDeleteRule = (id: string) => {
-    setDeletedRuleIds(currentIds =>
-      currentIds.filter(currentId => currentId !== id),
-    );
+    setDeletedRuleIds(currentIds => currentIds.filter(currentId => currentId !== id));
   };
 
   const handleEditRule = (rule: EditedRule) => {
     setEditedRules(currentRules => {
       // If the rule is the same as it was originally, don't log it in editedRules
-      const oldRule = flatten(Object.values(actionRules)).find(
-        r => r.ruleId === rule.ruleId,
-      );
-      const index = currentRules.findIndex(
-        (r: EditedRule) => r.ruleId === rule.ruleId,
-      );
+      const oldRule = flatten(Object.values(actionRules)).find(r => r.ruleId === rule.ruleId);
+      const index = currentRules.findIndex((r: EditedRule) => r.ruleId === rule.ruleId);
       if (isEqual(rule.ruleExpression, oldRule?.ruleExpression)) {
-        return index === -1
-          ? currentRules
-          : currentRules.filter((_, i) => i !== index);
+        return index === -1 ? currentRules : currentRules.filter((_, i) => i !== index);
       }
 
       const newRules = cloneDeep(currentRules);
@@ -140,9 +105,7 @@ const Content = ({
   };
 
   const handleUndoEditRule = (id: string) => {
-    setEditedRules(currentRules =>
-      currentRules.filter(rule => rule.ruleId !== id),
-    );
+    setEditedRules(currentRules => currentRules.filter(rule => rule.ruleId !== id));
   };
 
   const resetEdits = () => {
@@ -164,9 +127,8 @@ const Content = ({
         delete newRule['tempId' as keyof AddedRuleWithId];
         return newRule;
       });
-    const [nonEmptyEditedRules, emptyEditedRules] = partition(
-      editedRules,
-      rule => rule.ruleExpression.some(ruleField => ruleField.field),
+    const [nonEmptyEditedRules, emptyEditedRules] = partition(editedRules, rule =>
+      rule.ruleExpression.some(ruleField => ruleField.field),
     );
     return {
       add,
@@ -213,11 +175,7 @@ const Content = ({
               fallbackText={t('cta-not-allowed')}
               tooltipPosition="left"
             >
-              <Button
-                variant="secondary"
-                disabled={editMutation.isLoading}
-                onClick={handleStartEdit}
-              >
+              <Button variant="secondary" disabled={editMutation.isLoading} onClick={handleStartEdit}>
                 {allT('edit')}
               </Button>
             </PermissionGate>
@@ -258,9 +216,7 @@ const Content = ({
                   {allT('cancel')}
                 </Button>
                 <Button
-                  disabled={[addedRules, deletedRuleIds, editedRules].every(
-                    arr => arr.length === 0,
-                  )}
+                  disabled={[addedRules, deletedRuleIds, editedRules].every(arr => arr.length === 0)}
                   onClick={() => setOpen(true)}
                 >
                   {t('edit-bar.test-changes')}

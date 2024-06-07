@@ -59,13 +59,7 @@ const SSN4 = ({ disabled, isOptional, isSkipped, onSkipChange }: SSN4Props) => {
           pattern: /^((?!(0000))\d{4})$/,
         })}
       />
-      {isOptional && (
-        <Toggle
-          checked={isSkipped}
-          label={t('skip-label')}
-          onChange={onSkipChange}
-        />
-      )}
+      {isOptional && <Toggle checked={isSkipped} label={t('skip-label')} onChange={onSkipChange} />}
     </>
   );
 };

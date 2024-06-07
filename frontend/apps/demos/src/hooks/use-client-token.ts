@@ -14,13 +14,8 @@ export type ClientTokenResponse = {
 };
 
 const clientToken = async (payload: ClientTokenRequest) => {
-  const { secretKey, userId, cardAlias, collectName, collectPartialAddress } =
-    payload;
-  const fields = [
-    `card.${cardAlias}.number`,
-    `card.${cardAlias}.cvc`,
-    `card.${cardAlias}.expiration`,
-  ];
+  const { secretKey, userId, cardAlias, collectName, collectPartialAddress } = payload;
+  const fields = [`card.${cardAlias}.number`, `card.${cardAlias}.cvc`, `card.${cardAlias}.expiration`];
   if (collectName) {
     fields.push(`card.${cardAlias}.name`);
   }

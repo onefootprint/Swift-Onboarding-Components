@@ -16,9 +16,7 @@ async function* streamReader(reader: ReadableStreamDefaultReader<Uint8Array>) {
   } while (!result.done);
 }
 
-const convertStreamToObject = async (
-  reader?: ReadableStreamDefaultReader<Uint8Array>,
-) => {
+const convertStreamToObject = async (reader?: ReadableStreamDefaultReader<Uint8Array>) => {
   let jsonStr = '';
   if (!reader) return {};
 
@@ -59,21 +57,15 @@ afterAll(() => server.close());
 
 describe('identifyUser', () => {
   it('should throw an exception when nothing is passed', async () => {
-    await expect(identifyUser()).rejects.toEqual(
-      new Error('User data must be passed in order to identify an user'),
-    );
+    await expect(identifyUser()).rejects.toEqual(new Error('User data must be passed in order to identify an user'));
   });
 
   it('should be true when only email is passed and user is found', async () => {
-    await expect(
-      identifyUser({ 'id.email': 'userfound@email.com' }),
-    ).resolves.toEqual(true);
+    await expect(identifyUser({ 'id.email': 'userfound@email.com' })).resolves.toEqual(true);
   });
 
   it('should be true when only phoneNumber is passed and user is found', async () => {
-    await expect(
-      identifyUser({ 'id.phone_number': '+1-202-555-0130' }),
-    ).resolves.toEqual(true);
+    await expect(identifyUser({ 'id.phone_number': '+1-202-555-0130' })).resolves.toEqual(true);
   });
 
   it('should be true when email and phoneNumber are passed, and user is found with the phoneNumber', async () => {
@@ -86,9 +78,7 @@ describe('identifyUser', () => {
   });
 
   it('should be false when only email is passed and user is not found', async () => {
-    await expect(
-      identifyUser({ 'id.email': 'jane.doe@acme.com' }),
-    ).resolves.toEqual(false);
+    await expect(identifyUser({ 'id.email': 'jane.doe@acme.com' })).resolves.toEqual(false);
   });
 
   it('should return false when email and phoneNumber are passed and user is not found', async () => {

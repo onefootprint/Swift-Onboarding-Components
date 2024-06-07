@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import useFilters from '../../hooks/use-filters';
 import Content from './components/content';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import useProxyConfig from './hooks/use-proxy-config';
 
@@ -27,7 +27,7 @@ const Details = () => {
       <>
         {data && <Content proxyConfig={data} />}
         {isLoading && <Loading />}
-        {error && <Error message={getErrorMessage(error)} />}
+        {error && <ErrorComponent message={getErrorMessage(error)} />}
       </>
     </Drawer>
   );

@@ -1,20 +1,9 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
-import {
-  Box,
-  Form,
-  Grid,
-  LinkButton,
-  NativeSelect,
-  Text,
-  TextInput,
-} from '@onefootprint/ui';
+import { Box, Form, Grid, LinkButton, NativeSelect, Text, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type {
-  FormData,
-  StepProps,
-} from 'src/pages/proxy-configs/proxy-configs.types';
+import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
 
 import FormGrid from '../form-grid';
 
@@ -29,9 +18,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
       ingressSettings: {
         contentType: 'none',
         // Always default to having at least one rule
-        rules: values.ingressSettings.rules.length
-          ? values.ingressSettings.rules
-          : [defaultRule],
+        rules: values.ingressSettings.rules.length ? values.ingressSettings.rules : [defaultRule],
       },
     },
   });
@@ -57,10 +44,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
       <Box marginBottom={8}>
         <Form.Field>
           <Form.Label htmlFor="method">{t('content-type.label')}</Form.Label>
-          <NativeSelect
-            id="method"
-            {...register('ingressSettings.contentType')}
-          >
+          <NativeSelect id="method" {...register('ingressSettings.contentType')}>
             <option value="none">None</option>
             <option value="json">JSON</option>
           </NativeSelect>
@@ -76,33 +60,23 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
               <Box key={field.id}>
                 <Grid.Container gap={5} marginBottom={3}>
                   <Form.Field>
-                    <Form.Label htmlFor={`token-${index}`}>
-                      {t('vaulting-rules.token.label')}
-                    </Form.Label>
+                    <Form.Label htmlFor={`token-${index}`}>{t('vaulting-rules.token.label')}</Form.Label>
                     <TextInput
                       autoFocus
                       id={`token-${index}`}
                       placeholder={t('vaulting-rules.token.placeholder')}
                       {...register(`ingressSettings.rules.${index}.token`, {
-                        ...createValidationOptions(
-                          index,
-                          t('vaulting-rules.token.errors.required'),
-                        ),
+                        ...createValidationOptions(index, t('vaulting-rules.token.errors.required')),
                       })}
                     />
                   </Form.Field>
                   <Form.Field>
-                    <Form.Label htmlFor={`target-${index}`}>
-                      {t('vaulting-rules.target.label')}
-                    </Form.Label>
+                    <Form.Label htmlFor={`target-${index}`}>{t('vaulting-rules.target.label')}</Form.Label>
                     <TextInput
                       id={`target-${index}`}
                       placeholder={t('vaulting-rules.target.placeholder')}
                       {...register(`ingressSettings.rules.${index}.target`, {
-                        ...createValidationOptions(
-                          index,
-                          t('vaulting-rules.target.errors.required'),
-                        ),
+                        ...createValidationOptions(index, t('vaulting-rules.target.errors.required')),
                       })}
                     />
                   </Form.Field>
@@ -115,11 +89,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
               </Box>
             ))}
           </FormGrid>
-          <LinkButton
-            iconComponent={IcoPlusSmall16}
-            iconPosition="left"
-            onClick={handleAdd}
-          >
+          <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={handleAdd}>
             {t('add-more')}
           </LinkButton>
         </>

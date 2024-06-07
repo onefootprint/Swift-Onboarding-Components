@@ -9,20 +9,12 @@ const FooterLinks = () => {
 
   return (
     <Container direction="row" gap={5}>
-      <Link
-        href="https://www.onefootprint.com/privacy-policy"
-        target="_blank"
-        rel="noreferrer"
-      >
+      <Link href="https://www.onefootprint.com/privacy-policy" target="_blank" rel="noreferrer">
         <Text variant="body-2" color="tertiary">
           {t('privacy-policy.title')}
         </Text>
       </Link>
-      <Link
-        href="https://www.onefootprint.com/terms-of-service"
-        target="_blank"
-        rel="noreferrer"
-      >
+      <Link href="https://www.onefootprint.com/terms-of-service" target="_blank" rel="noreferrer">
         <Text variant="body-2" color="tertiary">
           {t('terms-of-service.title')}
         </Text>

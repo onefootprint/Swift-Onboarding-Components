@@ -12,19 +12,14 @@ type ExistingCountryDocMappingsProps = {
   onEdit: (country: CountryCode) => void;
 };
 
-const ExistingCountryDocMappings = ({
-  onEdit,
-  countryDocMappings,
-}: ExistingCountryDocMappingsProps) => {
+const ExistingCountryDocMappings = ({ onEdit, countryDocMappings }: ExistingCountryDocMappingsProps) => {
   const existingCountries = Object.keys(countryDocMappings);
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.summary.id-doc',
   });
 
   const getDocNames = (docTypes: SupportedIdDocTypes[]) =>
-    docTypes
-      .map(docType => t(docType as unknown as ParseKeys<`common`>))
-      .join(', ');
+    docTypes.map(docType => t(docType as unknown as ParseKeys<`common`>)).join(', ');
 
   return (
     <Stack direction="column" gap={1}>

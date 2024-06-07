@@ -9,9 +9,7 @@ const GIT_COMMIT_SHA = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
 const IS_DDOG_ENABLED = process.env.NEXT_PUBLIC_IS_DDOG_ENABLED === 'true';
 const rumPercentage = Number(process.env.NEXT_PUBLIC_DDOG_RUM_PERCENTAGE);
 const DDOG_RUM_PERCENTAGE =
-  Number.isNaN(rumPercentage) || rumPercentage < 0 || rumPercentage > 100
-    ? 100
-    : rumPercentage;
+  Number.isNaN(rumPercentage) || rumPercentage < 0 || rumPercentage > 100 ? 100 : rumPercentage;
 
 /**
  * For each application, we need to set the service name and application ID in the Datadog configuration.
@@ -19,10 +17,7 @@ const DDOG_RUM_PERCENTAGE =
  * 2. Include ENV in turbo.json
  * 3. Include in the list below
  */
-const appServiceMap: Record<
-  string,
-  { service: string; id?: string; token?: string }
-> = {
+const appServiceMap: Record<string, { service: string; id?: string; token?: string }> = {
   auth: {
     service: 'auth',
     id: process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_AUTH,
@@ -89,10 +84,7 @@ const initDataDogLogs = (config: LogsInitConfiguration): void => {
       // Discard 200 network logs
       if (log.http && log.http.status_code === 200) return false;
 
-      if (
-        hasMessageToOmit(log.message) ||
-        hasMessageToOmit(log.error?.message)
-      ) {
+      if (hasMessageToOmit(log.message) || hasMessageToOmit(log.error?.message)) {
         return false;
       }
 
@@ -153,45 +145,23 @@ const initDataDog = (appName: string): boolean => {
   return true;
 };
 
-export const dataDogErrorEvent = (
-  err: Error,
-  msg = 'unhandledrejection',
-  msgContext?: object,
-) => datadogLogs.logger.error(msg, msgContext, err);
+export const dataDogErrorEvent = (err: Error, msg = 'unhandledrejection', msgContext?: object) =>
+  datadogLogs.logger.error(msg, msgContext, err);
 
-export const dataDogTrackEvent = (
-  msg: string,
-  msgContext?: object,
-  err?: Error,
-) => datadogLogs.logger.debug(msg, msgContext, err);
+export const dataDogTrackEvent = (msg: string, msgContext?: object, err?: Error) =>
+  datadogLogs.logger.debug(msg, msgContext, err);
 
-export const dataDogWarnEvent = (
-  msg: string,
-  msgContext?: object,
-  err?: unknown,
-) => {
-  datadogLogs.logger.warn(
-    msg,
-    msgContext,
-    err instanceof Error ? err : undefined,
-  );
+export const dataDogWarnEvent = (msg: string, msgContext?: object, err?: unknown) => {
+  datadogLogs.logger.warn(msg, msgContext, err instanceof Error ? err : undefined);
 };
 
-export const dataDogInfoEvent = (
-  msg: string,
-  msgContext?: object,
-  err?: unknown,
-) =>
-  datadogLogs.logger.info(
-    msg,
-    msgContext,
-    err instanceof Error ? err : undefined,
-  );
+export const dataDogInfoEvent = (msg: string, msgContext?: object, err?: unknown) =>
+  datadogLogs.logger.info(msg, msgContext, err instanceof Error ? err : undefined);
 
 export const dataDogAction = (act: string, actContext?: object) => {
   try {
     return datadogRum.addAction(act, actContext);
-  } catch (e) {
+  } catch (_e) {
     return undefined;
   }
 };

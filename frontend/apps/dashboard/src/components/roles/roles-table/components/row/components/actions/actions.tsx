@@ -39,10 +39,7 @@ const Actions = ({ role }: ActionsProps) => {
   return (
     <Stack justify="flex-end">
       <Dropdown.Root open={openDropdown} onOpenChange={setOpenDropdown}>
-        <PermissionGate
-          scopeKind={RoleScopeKind.orgSettings}
-          fallbackText={t('not-allowed')}
-        >
+        <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
           <Dropdown.Trigger aria-label={t('aria-label', { name })}>
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>

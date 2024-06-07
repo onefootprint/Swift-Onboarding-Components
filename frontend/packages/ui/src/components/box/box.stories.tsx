@@ -23,13 +23,7 @@ export default {
     },
     backgroundColor: {
       control: 'select',
-      options: [
-        'primary',
-        'secondary',
-        'tertiary',
-        'quaternary',
-        'transparent',
-      ],
+      options: ['primary', 'secondary', 'tertiary', 'quaternary', 'transparent'],
       description: 'Background color',
       table: { defaultValue: { summary: 'transparent' } },
     },

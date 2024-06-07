@@ -1,13 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IdDI, TokenKind } from '@onefootprint/types';
-import {
-  Dialog,
-  Shimmer,
-  Stack,
-  Text,
-  TextInput,
-  useToast,
-} from '@onefootprint/ui';
+import { Dialog, Shimmer, Stack, Text, TextInput, useToast } from '@onefootprint/ui';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useEntity from 'src/components/entities/components/details/hooks/use-entity';
@@ -32,9 +25,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const entityId = useEntityId();
-  const userHasPhone = useEntity(entityId).data?.attributes?.includes(
-    IdDI.phoneNumber,
-  );
+  const userHasPhone = useEntity(entityId).data?.attributes?.includes(IdDI.phoneNumber);
 
   const handleClose = useCallback(() => {
     generateTokenMutation.reset();
@@ -50,8 +41,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
   };
 
   useEffect(() => {
-    const shouldGenerateToken =
-      open && !generateTokenMutation.isLoading && !generateTokenMutation.data;
+    const shouldGenerateToken = open && !generateTokenMutation.isLoading && !generateTokenMutation.data;
     if (!shouldGenerateToken) {
       return;
     }
@@ -68,13 +58,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
         },
       },
     );
-  }, [
-    open,
-    generateTokenMutation,
-    entityId,
-    handleClose,
-    showRequestErrorToast,
-  ]);
+  }, [open, generateTokenMutation, entityId, handleClose, showRequestErrorToast]);
 
   const handleCopyLink = () => {
     if (!generateTokenMutation.data?.link) {

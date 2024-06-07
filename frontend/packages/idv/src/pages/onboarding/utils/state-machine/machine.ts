@@ -1,9 +1,5 @@
 import type { L10n } from '@onefootprint/footprint-js';
-import type {
-  IdDocOutcome,
-  OverallOutcome,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { IdDocOutcome, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { UserData } from '../../../../types';
@@ -21,14 +17,7 @@ export type OnboardingMachineArgs = {
 };
 
 const createOnboardingMachine = (
-  {
-    config,
-    userData,
-    idvContext,
-    idDocOutcome,
-    overallOutcome,
-    onClose,
-  }: OnboardingMachineArgs,
+  { config, userData, idvContext, idDocOutcome, overallOutcome, onClose }: OnboardingMachineArgs,
   l10n?: L10n,
 ) =>
   createMachine(

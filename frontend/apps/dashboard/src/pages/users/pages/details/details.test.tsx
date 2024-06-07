@@ -7,13 +7,7 @@ import {
   waitFor,
   within,
 } from '@onefootprint/test-utils';
-import {
-  DocumentDI,
-  IdDI,
-  InvestorProfileDI,
-  UsLegalStatus,
-  VisaKind,
-} from '@onefootprint/types';
+import { DocumentDI, IdDI, InvestorProfileDI, UsLegalStatus, VisaKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -205,12 +199,7 @@ describe.skip('<Details />', () => {
 
           it('should allow to decrypt the data', async () => {
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'First name',
-              'Last name',
-              'Email',
-              'Phone number',
-            ]);
+            await decryptFields(['First name', 'Last name', 'Email', 'Phone number']);
             const container = screen.getByRole('group', {
               name: 'Basic data',
             });
@@ -624,13 +613,7 @@ describe.skip('<Details />', () => {
 
           it('should allow to decrypt the data', async () => {
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'Country',
-              'Address line 1',
-              'City',
-              'Zip code',
-              'State',
-            ]);
+            await decryptFields(['Country', 'Address line 1', 'City', 'Zip code', 'State']);
             const container = screen.getByRole('group', {
               name: 'Address data',
             });
@@ -695,13 +678,7 @@ describe.skip('<Details />', () => {
 
           it('should prefill input fields with current data', async () => {
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'Country',
-              'Address line 1',
-              'City',
-              'Zip code',
-              'State',
-            ]);
+            await decryptFields(['Country', 'Address line 1', 'City', 'Zip code', 'State']);
             await openEditView();
             const container = screen.getByRole('group', {
               name: 'Address data',
@@ -757,13 +734,7 @@ describe.skip('<Details />', () => {
               [IdDI.state]: 'CA',
             });
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'Country',
-              'Address line 1',
-              'City',
-              'Zip code',
-              'State',
-            ]);
+            await decryptFields(['Country', 'Address line 1', 'City', 'Zip code', 'State']);
             await openEditView();
             const container = screen.getByRole('group', {
               name: 'Address data',
@@ -880,13 +851,7 @@ describe.skip('<Details />', () => {
               [IdDI.state]: 'Canillo',
             });
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'Country',
-              'Address line 1',
-              'City',
-              'Zip code',
-              'State',
-            ]);
+            await decryptFields(['Country', 'Address line 1', 'City', 'Zip code', 'State']);
             await openEditView();
             const container = screen.getByRole('group', {
               name: 'Address data',
@@ -1017,13 +982,7 @@ describe.skip('<Details />', () => {
               [IdDI.zip]: '',
             });
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'Country',
-              'Address line 1',
-              'City',
-              'Zip code',
-              'State',
-            ]);
+            await decryptFields(['Country', 'Address line 1', 'City', 'Zip code', 'State']);
             await openEditView();
             const container = screen.getByRole('group', {
               name: 'Address data',
@@ -1264,11 +1223,7 @@ describe.skip('<Details />', () => {
 
           it('should allow to decrypt the data', async () => {
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'SSN (Full)',
-              'SSN (Last 4)',
-              'Date of birth',
-            ]);
+            await decryptFields(['SSN (Full)', 'SSN (Last 4)', 'Date of birth']);
             const container = screen.getByRole('group', {
               name: 'Identity data',
             });
@@ -1310,11 +1265,7 @@ describe.skip('<Details />', () => {
               [IdDI.dob]: '1967-09-29',
             });
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'SSN (Full)',
-              'SSN (Last 4)',
-              'Date of birth',
-            ]);
+            await decryptFields(['SSN (Full)', 'SSN (Last 4)', 'Date of birth']);
             await openEditView();
             const container = screen.getByRole('group', {
               name: 'Identity data',
@@ -2527,8 +2478,7 @@ describe.skip('<Details />', () => {
             await waitFor(() => {
               const declarations = getTextByRow({
                 name: 'Declaration(s)',
-                value:
-                  'Affiliated or work with a us registered broker-dealer or finra',
+                value: 'Affiliated or work with a us registered broker-dealer or finra',
                 container,
               });
               expect(declarations).toBeInTheDocument();
@@ -2644,9 +2594,7 @@ describe.skip('<Details />', () => {
         });
 
         await waitFor(() => {
-          const noResults = within(container).getByText(
-            'No risk signals found',
-          );
+          const noResults = within(container).getByText('No risk signals found');
           expect(noResults).toBeInTheDocument();
         });
       });
@@ -2659,9 +2607,7 @@ describe.skip('<Details />', () => {
           name: 'Device insights',
         });
 
-        const agent = within(container).getByText(
-          'Apple Macintosh, Mac OS 10.15.7',
-        );
+        const agent = within(container).getByText('Apple Macintosh, Mac OS 10.15.7');
 
         expect(agent).toBeInTheDocument();
       });

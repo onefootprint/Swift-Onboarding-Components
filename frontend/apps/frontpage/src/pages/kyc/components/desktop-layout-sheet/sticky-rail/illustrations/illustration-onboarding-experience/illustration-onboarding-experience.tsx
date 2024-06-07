@@ -15,46 +15,20 @@ const VISIBLE_RANGE = {
   final: 0.8,
 };
 
-const IllustrationOnboardingExperience = ({
-  scroll,
-}: IllustrationOnboardingExperienceProps) => {
-  const y = useTransform(
-    scroll,
-    [VISIBLE_RANGE.initialMax, VISIBLE_RANGE.finalMax],
-    ['-25%', '25%'],
-  );
+const IllustrationOnboardingExperience = ({ scroll }: IllustrationOnboardingExperienceProps) => {
+  const y = useTransform(scroll, [VISIBLE_RANGE.initialMax, VISIBLE_RANGE.finalMax], ['-25%', '25%']);
   const opacity = useTransform(
     scroll,
-    [
-      VISIBLE_RANGE.initial,
-      VISIBLE_RANGE.initialMax,
-      VISIBLE_RANGE.finalMax,
-      VISIBLE_RANGE.final,
-    ],
+    [VISIBLE_RANGE.initial, VISIBLE_RANGE.initialMax, VISIBLE_RANGE.finalMax, VISIBLE_RANGE.final],
     ['0%', '100%', '100%', '0%'],
   );
 
   return (
     <Container style={{ opacity }}>
       <Elevator style={{ y }}>
-        <Image
-          src="/kyc/onboarding-experience/top.png"
-          alt=""
-          height={365}
-          width={457}
-        />
-        <Image
-          src="/kyc/onboarding-experience/center.png"
-          alt=""
-          height={365}
-          width={457}
-        />
-        <Image
-          src="/kyc/onboarding-experience/bottom.png"
-          alt=""
-          height={365}
-          width={457}
-        />
+        <Image src="/kyc/onboarding-experience/top.png" alt="" height={365} width={457} />
+        <Image src="/kyc/onboarding-experience/center.png" alt="" height={365} width={457} />
+        <Image src="/kyc/onboarding-experience/bottom.png" alt="" height={365} width={457} />
       </Elevator>
     </Container>
   );

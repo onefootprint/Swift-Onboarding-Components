@@ -7,8 +7,7 @@ const usePermissions = () => {
   const scopes = session.data.user?.scopes || [];
   const isAdmin = scopes.some(s => s.kind === RoleScopeKind.admin);
 
-  const hasPermission = (scopeKind: RoleScopeKind) =>
-    isAdmin || scopes.some(s => s.kind === scopeKind);
+  const hasPermission = (scopeKind: RoleScopeKind) => isAdmin || scopes.some(s => s.kind === scopeKind);
 
   return {
     hasPermission,

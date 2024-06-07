@@ -48,7 +48,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   searchPlaceholder?: string;
   size?: BaseSelectSize;
   value?: Option;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   OptionComponent?: React.ComponentType<OptionProps<any, false, any>>;
   testID?: string;
   MobileOptionComponent?: React.ComponentType<ItemProps>;
@@ -80,8 +80,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   const [isOpen, setOpen] = useState(false);
   const theme = useTheme();
   const { dropdown, input } = theme.components;
-  const [referenceElement, setReferenceElement] =
-    useState<HTMLElement | null>();
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>();
   const [popperElement, setPopperElement] = useState<HTMLElement | null>();
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     strategy: 'fixed',
@@ -136,9 +135,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
     closeDropdown();
   };
 
-  const localizedEmptyStateText =
-    emptyStateText ??
-    t('components.internal.base-select.empty-state-text-default');
+  const localizedEmptyStateText = emptyStateText ?? t('components.internal.base-select.empty-state-text-default');
   const renderEmptyState = useCallback(
     () => <EmptyState>{localizedEmptyStateText}</EmptyState>,
     [localizedEmptyStateText],
@@ -238,10 +235,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
             onChange={handleChange}
             onMenuClose={closeDropdown}
             options={options}
-            placeholder={
-              searchPlaceholder ??
-              t('components.internal.base-select.search-placeholder-default')
-            }
+            placeholder={searchPlaceholder ?? t('components.internal.base-select.search-placeholder-default')}
             value={updatedValue}
           />
         </div>

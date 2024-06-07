@@ -1,10 +1,4 @@
-import {
-  customRender,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser } from 'src/config/tests';
 
@@ -13,9 +7,7 @@ import CreateDialog from './create-dialog';
 import { withCreateList, withLists } from './create-dialog.test.config';
 
 describe('<CreateDialog />', () => {
-  const renderCreateDialog = ({
-    onClose = jest.fn(),
-  }: Partial<CreateDialogProps>) => {
+  const renderCreateDialog = ({ onClose = jest.fn() }: Partial<CreateDialogProps>) => {
     customRender(<CreateDialog open onClose={onClose} />);
   };
 
@@ -45,9 +37,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        const errorMessage = screen.getByText(
-          'Please enter a name for the list.',
-        );
+        const errorMessage = screen.getByText('Please enter a name for the list.');
         expect(errorMessage).toBeInTheDocument();
       });
     });
@@ -86,9 +76,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('List created successfully.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('List created successfully.')).toBeInTheDocument();
       });
     });
   });
@@ -104,9 +92,7 @@ describe('<CreateDialog />', () => {
       const kindSelect = screen.getByRole('button', { name: 'Select' });
       await selectEvents.select(kindSelect, 'Email address');
 
-      const entriesTextArea = screen.getByLabelText(
-        'Enter values manually',
-      ) as HTMLInputElement;
+      const entriesTextArea = screen.getByLabelText('Enter values manually') as HTMLInputElement;
       await userEvent.click(entriesTextArea);
       await userEvent.type(entriesTextArea, 'invalid email');
       expect(entriesTextArea.value).toBe('invalid email');
@@ -115,9 +101,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Please enter a valid email address.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument();
       });
 
       await userEvent.click(entriesTextArea);
@@ -127,9 +111,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.queryByText('Please enter a valid email address.'),
-        ).toBeNull();
+        expect(screen.queryByText('Please enter a valid email address.')).toBeNull();
       });
     });
 
@@ -151,9 +133,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Please enter a valid email domain.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Please enter a valid email domain.')).toBeInTheDocument();
       });
 
       await userEvent.click(entriesTextArea);
@@ -163,9 +143,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.queryByText('Please enter a valid email domain.'),
-        ).toBeNull();
+        expect(screen.queryByText('Please enter a valid email domain.')).toBeNull();
       });
     });
 
@@ -187,9 +165,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Please enter a valid SSN.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Please enter a valid SSN.')).toBeInTheDocument();
       });
 
       await userEvent.click(entriesTextArea);
@@ -221,9 +197,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Please enter a valid phone number.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Please enter a valid phone number.')).toBeInTheDocument();
       });
 
       await userEvent.click(entriesTextArea);
@@ -233,9 +207,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.queryByText('Please enter a valid phone number.'),
-        ).toBeNull();
+        expect(screen.queryByText('Please enter a valid phone number.')).toBeNull();
       });
     });
 
@@ -257,9 +229,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Please enter a valid phone country code.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Please enter a valid phone country code.')).toBeInTheDocument();
       });
 
       await userEvent.click(entriesTextArea);
@@ -269,9 +239,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.queryByText('Please enter a valid phone country code.'),
-        ).toBeNull();
+        expect(screen.queryByText('Please enter a valid phone country code.')).toBeNull();
       });
     });
 
@@ -293,9 +261,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Please enter a valid IP address.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Please enter a valid IP address.')).toBeInTheDocument();
       });
 
       await userEvent.click(entriesTextArea);
@@ -305,9 +271,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.queryByText('Please enter a valid IP address.'),
-        ).toBeNull();
+        expect(screen.queryByText('Please enter a valid IP address.')).toBeNull();
       });
     });
   });

@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "lint:ci": "eslint src",
-    "lint": "eslint src --fix",
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
     "postinstall": "npx playwright install",
     "test:e2e:debug": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#debug\"",
     "test:e2e:generate": "npx playwright codegen http://localhost:3002/e2e?ob_key=ob_test_yHlPBcaJ6lnxwkkD1YLStx&locale=es-MX",
     "test:e2e:real": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --project chromium --debug -g \"#real\"",
-    "test:e2e:trace": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --workers 16 --reporter=html --trace on --retries=0 -g \"#ci\"",
     "test:e2e:show-report": "npx playwright show-report",
+    "test:e2e:trace": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --workers 16 --reporter=html --trace on --retries=0 -g \"#ci\"",
     "test:e2e:ui": "E2E_DEMOS_BASE_URL=http://localhost:3002 npx playwright test --ui",
     "test:stress:ci": "npx playwright test -g \"#stress\""
   },
@@ -25,7 +25,6 @@
   },
   "devDependencies": {
     "@types/node": "^20",
-    "eslint-config-footprint": "*",
     "typescript": "^5"
   }
 }

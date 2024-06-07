@@ -3,9 +3,7 @@ import { keysToCamelCase, keysToSnakeCase } from './utils/transform-data';
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  (process.env.NODE_ENV === 'development'
-    ? 'https://api.dev.onefootprint.com'
-    : 'https://api.onefootprint.com');
+  (process.env.NODE_ENV === 'development' ? 'https://api.dev.onefootprint.com' : 'https://api.onefootprint.com');
 
 type Options = Omit<RequestInit, 'headers'> & {
   baseURL?: string;
@@ -16,9 +14,7 @@ type Options = Omit<RequestInit, 'headers'> & {
   disableCaseConverter?: boolean;
 };
 
-function convertToRecordString(
-  input: Record<string, unknown>,
-): Record<string, string> {
+function convertToRecordString(input: Record<string, unknown>): Record<string, string> {
   const output: Record<string, string> = {};
   for (const key in input) {
     if (Object.hasOwnProperty.call(input, key)) {
@@ -29,25 +25,11 @@ function convertToRecordString(
 }
 
 async function request<T>(options: Options): Promise<T> {
-  const {
-    baseURL = API_BASE_URL,
-    url,
-    headers = {},
-    params,
-    data,
-    disableCaseConverter,
-    ...otherOptions
-  } = options;
+  const { baseURL = API_BASE_URL, url, headers = {}, params, data, disableCaseConverter, ...otherOptions } = options;
 
-  const snakeCaseData = data
-    ? keysToSnakeCase(data, disableCaseConverter)
-    : undefined;
-  const snakeCaseParams = params
-    ? keysToSnakeCase(params, disableCaseConverter)
-    : {};
-  const queryParams = new URLSearchParams(
-    convertToRecordString(snakeCaseParams),
-  );
+  const snakeCaseData = data ? keysToSnakeCase(data, disableCaseConverter) : undefined;
+  const snakeCaseParams = params ? keysToSnakeCase(params, disableCaseConverter) : {};
+  const queryParams = new URLSearchParams(convertToRecordString(snakeCaseParams));
   const requestHeaders = new Headers({
     'Content-Type': 'application/json',
     Accept: 'application/json',

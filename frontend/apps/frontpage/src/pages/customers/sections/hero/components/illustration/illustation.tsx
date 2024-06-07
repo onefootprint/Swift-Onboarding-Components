@@ -37,11 +37,7 @@ const smokeAppearVariants = {
 };
 
 const Illustration = () => (
-  <IllustrationContainer
-    variants={containerVariants}
-    initial="hidden"
-    animate="visible"
-  >
+  <IllustrationContainer variants={containerVariants} initial="hidden" animate="visible">
     <Cloud
       src="/customers/section/cloud.svg"
       alt="Cloud"

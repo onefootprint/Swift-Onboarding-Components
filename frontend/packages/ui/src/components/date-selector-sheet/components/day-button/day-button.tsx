@@ -17,20 +17,9 @@ import styled, { css } from 'styled-components';
 import { createFontStyles } from '../../../../utils';
 import type { DayButtonProps } from '../../date-selector-sheet.types';
 
-const DayButton = ({
-  day,
-  activeStartDate,
-  activeEndDate,
-  visibleMonth,
-  onClick,
-  disabled,
-}: DayButtonProps) => {
+const DayButton = ({ day, activeStartDate, activeEndDate, visibleMonth, onClick, disabled }: DayButtonProps) => {
   const firstDayCurrentMonth = parse(visibleMonth, 'MMM-yyyy', new Date());
-  const isInRange =
-    activeEndDate &&
-    isBefore(day, activeEndDate) &&
-    activeStartDate &&
-    isAfter(day, activeStartDate);
+  const isInRange = activeEndDate && isBefore(day, activeEndDate) && activeStartDate && isAfter(day, activeStartDate);
   const isStart = activeStartDate && isSameDay(day, activeStartDate);
   const isEnd = activeEndDate && isSameDay(day, activeEndDate);
   const getRow = (targetDay: Date) => {
@@ -125,12 +114,14 @@ const Container = styled.button<{
       grid-column: ${$column + 1};
       grid-row: ${$row + 1};
 
-      ${disabled &&
-      css`
+      ${
+        disabled &&
+        css`
         cursor: not-allowed;
         pointer-events: none;
         opacity: 0.25;
-      `}
+      `
+      }
 
       &[data-is-in-range='false'] {
         &:hover {

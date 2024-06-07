@@ -1,9 +1,9 @@
 import { screen } from '@onefootprint/test-utils';
 import React from 'react';
 
+import DesktopBackPhoto from '.';
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
-import DesktopBackPhoto from '.';
 import {
   initialContextBD,
   initialContextDL,
@@ -37,9 +37,7 @@ describe('<DesktopBackPhoto />', () => {
 
     it('Contains upload input', async () => {
       renderDesktopBackPhoto(initialContextDL);
-      const uploadInput = screen.getByLabelText(
-        'file-input',
-      ) as HTMLInputElement;
+      const uploadInput = screen.getByLabelText('file-input') as HTMLInputElement;
       expect(uploadInput).toBeInTheDocument();
       expect(uploadInput.getAttribute('accept')).toEqual('image/*');
     });

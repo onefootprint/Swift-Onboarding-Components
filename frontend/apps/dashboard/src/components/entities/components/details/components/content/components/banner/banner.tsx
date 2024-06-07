@@ -19,9 +19,7 @@ const Banner = ({ entity }: BannerProps) => {
 
   if (entity.requiresManualReview && entity.status !== EntityStatus.none) {
     return (
-      <InlineAlert
-        variant={entity.status === EntityStatus.failed ? 'error' : 'warning'}
-      >
+      <InlineAlert variant={entity.status === EntityStatus.failed ? 'error' : 'warning'}>
         {entity.status === EntityStatus.failed
           ? t('manual-review.failed-needs-review')
           : t('manual-review.verified-needs-review')}

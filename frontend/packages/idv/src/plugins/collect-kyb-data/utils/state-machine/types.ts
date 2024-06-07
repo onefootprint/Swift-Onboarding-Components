@@ -9,15 +9,10 @@ import type {
 import type { UserData } from '../../../../types';
 import type { CommonIdvContext } from '../../../../utils/state-machine';
 
-export type BasicData = Required<
-  Pick<BusinessDIData, BusinessDI.name | BusinessDI.tin>
-> &
+export type BasicData = Required<Pick<BusinessDIData, BusinessDI.name | BusinessDI.tin>> &
   Pick<
     BusinessDIData,
-    | BusinessDI.doingBusinessAs
-    | BusinessDI.corporationType
-    | BusinessDI.phoneNumber
-    | BusinessDI.website
+    BusinessDI.doingBusinessAs | BusinessDI.corporationType | BusinessDI.phoneNumber | BusinessDI.website
   >;
 
 export type BusinessAddressData = Required<

@@ -1,19 +1,9 @@
-import isDob, {
-  isDobInTheFuture,
-  isDobTooOld,
-  isDobTooYoung,
-  isValidDate,
-} from './is-dob';
+import isDob, { isDobInTheFuture, isDobTooOld, isDobTooYoung, isValidDate } from './is-dob';
 
 describe('DOB Validator', () => {
   describe('isValidDate', () => {
     it('should return true for valid dates', () => {
-      const validDates = [
-        '2024-01-01',
-        '2024-12-31',
-        '2024-02-29',
-        '2024-02-28',
-      ];
+      const validDates = ['2024-01-01', '2024-12-31', '2024-02-29', '2024-02-28'];
 
       validDates.forEach(date => {
         expect(isValidDate(date)).toBe(true);

@@ -1,9 +1,4 @@
-import type {
-  CollectKycDataRequirement,
-  InvestorProfileDI,
-  UserDataError,
-  VaultValue,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement, InvestorProfileDI, UserDataError, VaultValue } from '@onefootprint/types';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { AxiosError } from 'axios';
@@ -26,8 +21,7 @@ type SyncDataArgs = {
   onError?: (errors: SyncDataFieldErrors) => void;
 };
 
-const onlyNumericAndPlus = (s?: unknown): string =>
-  typeof s === 'string' ? s.trim().replace(/[^0-9+]/g, '') : '';
+const onlyNumericAndPlus = (s?: unknown): string => (typeof s === 'string' ? s.trim().replace(/[^0-9+]/g, '') : '');
 
 const { logError } = getLogger({ location: 'kyc-use-sync-data' });
 
@@ -43,11 +37,7 @@ const useSyncData = () => {
   const userDataMutation = useUserData();
   const toast = useToast();
 
-  const syncData = async ({
-    data: rawData,
-    onSuccess,
-    onError,
-  }: SyncDataArgs): Promise<void> => {
+  const syncData = async ({ data: rawData, onSuccess, onError }: SyncDataArgs): Promise<void> => {
     if (!authToken) {
       toast.show({
         title: t('empty-auth-token.title'),
@@ -71,26 +61,19 @@ const useSyncData = () => {
         description: t('request-data.description'),
         variant: 'error',
       });
-      logError(
-        `Unable to generate a valid request data obj because of incomplete/dangling DIs. ${e}`,
-      );
+      logError(`Unable to generate a valid request data obj because of incomplete/dangling DIs. ${e}`);
       return;
     }
 
     const handleError = (err: unknown) => {
-      const errors = (err as AxiosError<UserDataError>)?.response?.data.error
-        .message;
+      const errors = (err as AxiosError<UserDataError>)?.response?.data.error.message;
       if (typeof errors === 'string') {
         showRequestErrorToast(err);
         logError('Kyc useSyncData encountered error while syncing data', err);
         return;
       }
       const validDis = new Set(Object.values(IdDI));
-      const fieldErrors = Object.fromEntries(
-        Object.entries(errors || {}).filter(([key]) =>
-          validDis.has(key as IdDI),
-        ),
-      );
+      const fieldErrors = Object.fromEntries(Object.entries(errors || {}).filter(([key]) => validDis.has(key as IdDI)));
       if (Object.keys(fieldErrors).length > 0) {
         onError?.(fieldErrors);
       } else {
@@ -99,10 +82,7 @@ const useSyncData = () => {
           description: t('invalid-inputs.description'),
           variant: 'error',
         });
-        logError(
-          'Kyc useSyncData encountered invalid inputs error while syncing data',
-          err,
-        );
+        logError('Kyc useSyncData encountered invalid inputs error while syncing data', err);
       }
     };
 
@@ -135,8 +115,7 @@ const useSyncData = () => {
   return { syncData, mutation: userDataMutation };
 };
 
-export const omitPhoneAndEmail = <T extends ObjWithValue>(data: T) =>
-  omit(data, [IdDI.phoneNumber, IdDI.email]);
+export const omitPhoneAndEmail = <T extends ObjWithValue>(data: T) => omit(data, [IdDI.phoneNumber, IdDI.email]);
 
 export const checkPhoneEmailBeforeSubmit = <T extends ObjWithValue>(
   initial: T,
@@ -151,12 +130,9 @@ export const checkPhoneEmailBeforeSubmit = <T extends ObjWithValue>(
     phone: Boolean(verifiedMethods?.phone),
   };
   const valueHasNotChanged = {
-    email:
-      String(initial[IdDI.email]?.value).trim() ===
-      String(current[IdDI.email]?.value).trim(),
+    email: String(initial[IdDI.email]?.value).trim() === String(current[IdDI.email]?.value).trim(),
     phone:
-      onlyNumericAndPlus(initial[IdDI.phoneNumber]?.value) ===
-      onlyNumericAndPlus(current[IdDI.phoneNumber]?.value),
+      onlyNumericAndPlus(initial[IdDI.phoneNumber]?.value) === onlyNumericAndPlus(current[IdDI.phoneNumber]?.value),
   };
 
   // If a piece of data hasn't changed or the backend already has it verified, remove it from the

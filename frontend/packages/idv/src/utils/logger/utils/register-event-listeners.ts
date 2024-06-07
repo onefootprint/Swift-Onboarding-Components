@@ -5,8 +5,7 @@ export const registerErrorHandlers = (onError: (error: Error) => void) => {
   window.addEventListener(
     'unhandledrejection',
     (event: PromiseRejectionEvent) => {
-      const error =
-        event.reason || new Error("Unhandled rejection, missing 'reason'");
+      const error = event.reason || new Error("Unhandled rejection, missing 'reason'");
       onError(error);
     },
     { passive: true },

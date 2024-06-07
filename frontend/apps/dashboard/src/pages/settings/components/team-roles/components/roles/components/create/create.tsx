@@ -17,19 +17,12 @@ const Create = () => {
 
   return (
     <Box>
-      <PermissionGate
-        scopeKind={RoleScopeKind.orgSettings}
-        fallbackText={t('not-allowed')}
-      >
+      <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
         <Button onClick={handleOpen} variant="secondary">
           {t('title')}
         </Button>
       </PermissionGate>
-      <CreateDialog
-        open={open}
-        handleClose={() => setOpen(false)}
-        kind={RoleKind.dashboardUser}
-      />
+      <CreateDialog open={open} handleClose={() => setOpen(false)} kind={RoleKind.dashboardUser} />
     </Box>
   );
 };

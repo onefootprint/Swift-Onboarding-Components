@@ -9,9 +9,7 @@ import type { FormData } from '../types';
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
-  const requiresEmail = allAttributes(requirement).includes(
-    CollectedKycDataOption.email,
-  );
+  const requiresEmail = allAttributes(requirement).includes(CollectedKycDataOption.email);
 
   return (formData: FormData) => {
     const convertedData: KycData = {};

@@ -5,10 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updateOrgLogoRequest = async (
-  authHeaders: AuthHeaders,
-  formData: FormData,
-) => {
+const updateOrgLogoRequest = async (authHeaders: AuthHeaders, formData: FormData) => {
   const { data } = await request<UpdateOrgResponse>({
     method: 'PUT',
     url: '/org/logo',
@@ -28,8 +25,7 @@ const useUpdateOrgLogo = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: FormData) =>
-      updateOrgLogoRequest(session.authHeaders, payload),
+    mutationFn: (payload: FormData) => updateOrgLogoRequest(session.authHeaders, payload),
     onError: showErrorToast,
     onSuccess: (response: UpdateOrgResponse) => {
       queryClient.invalidateQueries(['org']);

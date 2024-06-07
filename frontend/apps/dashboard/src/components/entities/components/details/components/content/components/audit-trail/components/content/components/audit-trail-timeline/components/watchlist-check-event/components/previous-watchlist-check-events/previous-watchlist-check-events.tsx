@@ -10,9 +10,7 @@ type PreviousWatchlistCheckEventsProps = {
   data: PreviousWatchlistChecksEventData;
 };
 
-const PreviousWatchlistCheckEvents = ({
-  data,
-}: PreviousWatchlistCheckEventsProps) => {
+const PreviousWatchlistCheckEvents = ({ data }: PreviousWatchlistCheckEventsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
   });

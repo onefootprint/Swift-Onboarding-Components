@@ -1,19 +1,11 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import { useStore } from '../../hooks/use-session';
 import type { LayoutProps } from './layout';
 import Layout from './layout';
-import {
-  withEntities,
-  withOrgAuthRoles,
-  withRiskSignals,
-} from './layout.test.config';
+import { withEntities, withOrgAuthRoles, withRiskSignals } from './layout.test.config';
 
 const originalState = useStore.getState();
 

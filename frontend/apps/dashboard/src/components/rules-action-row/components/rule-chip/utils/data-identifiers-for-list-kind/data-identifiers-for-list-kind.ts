@@ -1,16 +1,9 @@
 import type { DataIdentifier } from '@onefootprint/types';
-import {
-  BusinessDI,
-  DataIdentifierKeys,
-  IdDI,
-  ListKind,
-} from '@onefootprint/types';
+import { BusinessDI, DataIdentifierKeys, IdDI, ListKind } from '@onefootprint/types';
 
 export const IP_ADDRESS_DATA_IDENTIFIER = 'ip_address';
 
-const dataIdentifiersForListKind = (
-  listKind?: ListKind,
-): (DataIdentifier | string)[] => {
+const dataIdentifiersForListKind = (listKind?: ListKind): (DataIdentifier | string)[] => {
   if (!listKind) {
     return [...DataIdentifierKeys, IP_ADDRESS_DATA_IDENTIFIER].sort();
   }

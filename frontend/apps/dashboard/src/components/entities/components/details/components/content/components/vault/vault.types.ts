@@ -1,15 +1,7 @@
 import type { Icon } from '@onefootprint/icons';
-import type {
-  DataIdentifier,
-  Entity,
-  VaultEmptyData,
-  VaultEncryptedData,
-  VaultValue,
-} from '@onefootprint/types';
+import type { DataIdentifier, Entity, VaultEmptyData, VaultEncryptedData, VaultValue } from '@onefootprint/types';
 
-export type DecryptFormData = Partial<
-  Record<DataIdentifier, boolean | VaultEncryptedData | VaultEmptyData>
->;
+export type DecryptFormData = Partial<Record<DataIdentifier, boolean | VaultEncryptedData | VaultEmptyData>>;
 
 export type EditFormData = Record<string, VaultValue>;
 
@@ -23,7 +15,4 @@ export type DiField = {
   }) => React.ReactNode;
 };
 
-export type Fieldset = Record<
-  string,
-  { fields: DiField[]; iconComponent: Icon; title: string }
->;
+export type Fieldset = Record<string, { fields: DiField[]; iconComponent: Icon; title: string }>;

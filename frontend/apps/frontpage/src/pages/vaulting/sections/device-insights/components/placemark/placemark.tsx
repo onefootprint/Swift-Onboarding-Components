@@ -5,9 +5,7 @@ type PlacemarkProps = {
   zIndex?: number;
 };
 
-const Placemark = ({ zIndex }: PlacemarkProps) => (
-  <PlacemarkItem zIndex={zIndex} />
-);
+const Placemark = ({ zIndex }: PlacemarkProps) => <PlacemarkItem zIndex={zIndex} />;
 
 const PlacemarkItem = styled.div<{ zIndex?: number }>`
   ${({ theme, zIndex }) => css`

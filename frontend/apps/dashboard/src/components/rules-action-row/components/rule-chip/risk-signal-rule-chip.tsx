@@ -1,9 +1,5 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import type {
-  ListRuleField,
-  RiskSignalRuleField,
-  RiskSignalRuleOp,
-} from '@onefootprint/types';
+import type { ListRuleField, RiskSignalRuleField, RiskSignalRuleOp } from '@onefootprint/types';
 import { IconButton, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useEffect, useState } from 'react';
@@ -20,17 +16,11 @@ type RiskSignalRuleChipProps = {
   onChange?: (expression: RiskSignalRuleField | ListRuleField) => void;
 };
 
-const RiskSignalRuleChip = ({
-  isEditing,
-  defaultExpression,
-  onDelete,
-  onChange,
-}: RiskSignalRuleChipProps) => {
+const RiskSignalRuleChip = ({ isEditing, defaultExpression, onDelete, onChange }: RiskSignalRuleChipProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.rules.action-row.rule-chip',
   });
-  const [ruleExpression, setRuleExpression] =
-    useState<RiskSignalRuleField>(defaultExpression);
+  const [ruleExpression, setRuleExpression] = useState<RiskSignalRuleField>(defaultExpression);
 
   useEffect(() => {
     setRuleExpression(defaultExpression);
@@ -60,15 +50,8 @@ const RiskSignalRuleChip = ({
 
   return isEditing ? (
     <EditContainer>
-      <ExpressionContainer
-        role="group"
-        aria-label={ruleExpression.field}
-        data-is-editing={isEditing}
-      >
-        <RiskSignalSelect
-          value={ruleExpression.field}
-          onChange={handleFieldChange}
-        />
+      <ExpressionContainer role="group" aria-label={ruleExpression.field} data-is-editing={isEditing}>
+        <RiskSignalSelect value={ruleExpression.field} onChange={handleFieldChange} />
         <OpSelect defaultOp={ruleExpression.op} onChange={handleOpChange} />
         <Text variant="caption-1" color="tertiary" paddingLeft={2}>
           {t('risk-signal.value-placeholder')}

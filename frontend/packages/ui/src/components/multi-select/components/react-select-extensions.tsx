@@ -16,19 +16,11 @@ import styled, { css } from 'styled-components';
 import { createFontStyles } from '../../../utils/mixins';
 import Checkbox from '../../checkbox';
 
-export const ClearIndicator = <
-  Option,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
->(
+export const ClearIndicator = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>(
   props: ClearIndicatorProps<Option, IsMulti, Group>,
 ) => {
   const { innerProps, ...restProps } = props;
-  const {
-    onMouseDown: originalOnMouseDown,
-    onTouchEnd: originalOnTouchEnd,
-    ...restInnerProps
-  } = innerProps || {};
+  const { onMouseDown: originalOnMouseDown, onTouchEnd: originalOnTouchEnd, ...restInnerProps } = innerProps || {};
   const onMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     if (originalOnMouseDown) {
@@ -44,41 +36,26 @@ export const ClearIndicator = <
   };
 
   return (
-    <components.ClearIndicator
-      {...restProps}
-      innerProps={{ ...restInnerProps, onMouseDown, onTouchEnd }}
-    >
+    <components.ClearIndicator {...restProps} innerProps={{ ...restInnerProps, onMouseDown, onTouchEnd }}>
       <IcoCloseSmall16 color="primary" />
     </components.ClearIndicator>
   );
 };
 
-export const IndicatorSeparator = <
-  Option,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
->(
+export const IndicatorSeparator = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>(
   props: IndicatorSeparatorProps<Option, IsMulti, Group>,
 ) => {
   const { hasValue } = props;
   return hasValue ? <components.IndicatorSeparator {...props} /> : null;
 };
 
-export const DropdownIndicator = <
-  Option,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
->({
+export const DropdownIndicator = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>({
   children,
   innerProps,
 }: DropdownIndicatorProps<Option, IsMulti, Group>) => (
   <div {...innerProps}>{children || <IcoChevronDown16 color="primary" />}</div>
 );
-export const MultiValueRemove = <
-  Option,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
->({
+export const MultiValueRemove = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>({
   children,
   innerProps,
 }: MultiValueRemoveProps<Option, IsMulti, Group>) => (
@@ -86,22 +63,10 @@ export const MultiValueRemove = <
     {children || <IcoCloseSmall16 color="tertiary" />}
   </div>
 );
-export const Option = <
-  Option,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
->(
+export const Option = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>(
   props: OptionProps<Option, IsMulti, Group>,
 ) => {
-  const {
-    children,
-    isDisabled,
-    isFocused,
-    isSelected,
-    innerRef,
-    selectProps,
-    innerProps,
-  } = props;
+  const { children, isDisabled, isFocused, isSelected, innerRef, selectProps, innerProps } = props;
   // TODO: https://linear.app/footprint/issue/FP-4512/fix-ts-on-multi-select
   // @ts-ignore
   const { value, allOption } = selectProps;
@@ -119,12 +84,7 @@ export const Option = <
       role="option"
       {...innerProps}
     >
-      <Checkbox
-        checked={isSelected || isAllChecked}
-        disabled={isDisabled}
-        id={innerProps.id}
-        onChange={noop}
-      />
+      <Checkbox checked={isSelected || isAllChecked} disabled={isDisabled} id={innerProps.id} onChange={noop} />
       {children}
     </CustomOption>
   );

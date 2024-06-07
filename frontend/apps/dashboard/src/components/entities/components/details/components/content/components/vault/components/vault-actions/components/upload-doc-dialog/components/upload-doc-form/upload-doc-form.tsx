@@ -43,9 +43,7 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
     <form id="upload-doc-form" onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={7} direction="column">
         <Form.Field>
-          <Form.Label htmlFor="identifier">
-            {t('form.identifier.label')}
-          </Form.Label>
+          <Form.Label htmlFor="identifier">{t('form.identifier.label')}</Form.Label>
           <Form.Group>
             <Form.Addon>document.custom.</Form.Addon>
             <TextInput
@@ -64,11 +62,7 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
           <Stack justifyContent="space-between" align="center">
             <Form.Label htmlFor="title">{t('form.file.label')}</Form.Label>
             {doc && (
-              <LinkButton
-                variant="label-4"
-                onClick={handleOpenFile}
-                $marginBottom={3}
-              >
+              <LinkButton variant="label-4" onClick={handleOpenFile} $marginBottom={3}>
                 {t('form.file.upload-new')}
               </LinkButton>
             )}
@@ -78,18 +72,12 @@ const UploadDocForm = ({ onSubmit }: UploadDocFormProps) => {
               {isPdf(doc.file) ? (
                 <DocPreviewContainer>
                   <DocSheet>
-                    <DocPreview
-                      src={`${doc.url}#page=1&view=FitH&toolbar=0&toolbar=0&navpanes=0&scrollbar=0`}
-                    />
+                    <DocPreview src={`${doc.url}#page=1&view=FitH&toolbar=0&toolbar=0&navpanes=0&scrollbar=0`} />
                   </DocSheet>
                 </DocPreviewContainer>
               ) : (
                 <ImagePreviewContainer>
-                  <ImagePreview
-                    alt={t('form.file.preview-alt')}
-                    fill
-                    src={doc.url}
-                  />
+                  <ImagePreview alt={t('form.file.preview-alt')} fill src={doc.url} />
                 </ImagePreviewContainer>
               )}
               <Text variant="caption-4" marginTop={3} color="tertiary">

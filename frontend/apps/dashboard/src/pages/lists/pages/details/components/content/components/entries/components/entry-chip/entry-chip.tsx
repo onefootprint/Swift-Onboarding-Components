@@ -61,11 +61,7 @@ const EntryChip = ({ entry, disabled }: EntryChipProps) => {
           <AnimatedLoadingSpinner animationStart size={16} />
         </Close>
       ) : (
-        <Close
-          aria-label={`Delete ${data}`}
-          onClick={disabled ? undefined : handleDelete}
-          data-disabled={disabled}
-        >
+        <Close aria-label={`Delete ${data}`} onClick={disabled ? undefined : handleDelete} data-disabled={disabled}>
           <IcoCloseSmall16 />
         </Close>
       )}

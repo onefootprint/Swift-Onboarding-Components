@@ -22,11 +22,7 @@ const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
   if (hasOnlyLowRisks) {
     return (
       <Text variant="label-3">
-        <Trans
-          components={{ a: <Intensity data-level="low" /> }}
-          count={low.length}
-          i18nKey="pages.entity.risks.low"
-        />
+        <Trans components={{ a: <Intensity data-level="low" /> }} count={low.length} i18nKey="pages.entity.risks.low" />
       </Text>
     );
   }

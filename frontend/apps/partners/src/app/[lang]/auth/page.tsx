@@ -6,17 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 import { createAuthCookie } from '@/app/actions';
 import type { LangProp } from '@/app/types';
-import {
-  DEFAULT_PRIVATE_ROUTE,
-  DEFAULT_PUBLIC_ROUTE,
-} from '@/config/constants';
+import { DEFAULT_PRIVATE_ROUTE, DEFAULT_PUBLIC_ROUTE } from '@/config/constants';
 import { getErrorMessage } from '@/helpers';
 import type { Session } from '@/hooks';
 import { useClientStore, useEffectOnce } from '@/hooks';
 import type { OrgLoginResponse } from '@/queries';
 import postPartnerAuthLogin from '@/queries/post-partner-auth-login';
 
-import Error from './error';
+import ErrorComponent from './error';
 import getUserPayload from './get-user-payload';
 
 type AuthPageProps = {
@@ -24,17 +21,8 @@ type AuthPageProps = {
   searchParams: { code?: string; error?: string; state?: string };
 };
 
-const setLoginSession = (
-  update: (x: Partial<Session>) => void,
-  res: OrgLoginResponse,
-) => {
-  const {
-    authToken,
-    createdNewTenant,
-    isFirstLogin,
-    requiresOnboarding,
-    user,
-  } = res;
+const setLoginSession = (update: (x: Partial<Session>) => void, res: OrgLoginResponse) => {
+  const { authToken, createdNewTenant, isFirstLogin, requiresOnboarding, user } = res;
   update({
     auth: authToken,
     user: user ? getUserPayload(user) : undefined,
@@ -69,34 +57,22 @@ const AuthPage = ({ searchParams }: AuthPageProps) => {
         });
       })
       .catch(err => {
-        setLoginError(
-          err.response?.status === 401
-            ? getErrorMessage(err)
-            : t('session-expired'),
-        );
+        setLoginError(err.response?.status === 401 ? getErrorMessage(err) : t('session-expired'));
       });
   });
 
   if (state === 'openedByInvite') {
     return (
-      <Error
-        header={t('welcome')}
-        goToLabel={t('login')}
-        goToPath={DEFAULT_PUBLIC_ROUTE}
-      >
+      <ErrorComponent header={t('welcome')} goToLabel={t('login')} goToPath={DEFAULT_PUBLIC_ROUTE}>
         {t('invite-accept')}
-      </Error>
+      </ErrorComponent>
     );
   }
   if (!code || loginError || (!code && !error && !state)) {
     return (
-      <Error
-        header={t('please-try-again')}
-        goToLabel={t('try-again')}
-        goToPath={DEFAULT_PUBLIC_ROUTE}
-      >
+      <ErrorComponent header={t('please-try-again')} goToLabel={t('try-again')} goToPath={DEFAULT_PUBLIC_ROUTE}>
         {loginError || t('session-expired')}
-      </Error>
+      </ErrorComponent>
     );
   }
 

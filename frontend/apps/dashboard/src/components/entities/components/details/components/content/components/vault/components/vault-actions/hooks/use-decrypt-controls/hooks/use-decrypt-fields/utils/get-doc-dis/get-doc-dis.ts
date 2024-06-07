@@ -1,10 +1,5 @@
 import type { DataIdentifier, Document, VaultValue } from '@onefootprint/types';
-import {
-  DocumentDI,
-  isVaultDataEmpty,
-  RawJsonKinds,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { DocumentDI, RawJsonKinds, SupportedIdDocTypes, isVaultDataEmpty } from '@onefootprint/types';
 
 import { filterDocumentsByKind } from '../../../../../../../person-vault/components/document-fields/utils';
 
@@ -14,10 +9,8 @@ const mainDIs: Partial<Record<DocumentDI, SupportedIdDocTypes>> = {
   [DocumentDI.latestPassport]: SupportedIdDocTypes.passport,
   [DocumentDI.latestVisa]: SupportedIdDocTypes.visa,
   [DocumentDI.latestWorkPermitFront]: SupportedIdDocTypes.workPermit,
-  [DocumentDI.latestResidenceDocumentFront]:
-    SupportedIdDocTypes.residenceDocument,
-  [DocumentDI.latestVoterIdentificationFront]:
-    SupportedIdDocTypes.voterIdentification,
+  [DocumentDI.latestResidenceDocumentFront]: SupportedIdDocTypes.residenceDocument,
+  [DocumentDI.latestVoterIdentificationFront]: SupportedIdDocTypes.voterIdentification,
   [DocumentDI.ssnCard]: SupportedIdDocTypes.ssnCard,
   [DocumentDI.latestLeaseFront]: SupportedIdDocTypes.lease,
   [DocumentDI.latestBankStatementFront]: SupportedIdDocTypes.bankStatement,
@@ -173,11 +166,7 @@ const getDocDis = ({ dis, documents, vaultData }: GetDocDIsProps) => {
         const extractedDIs = extractedDIsBase[idDocType];
         // get the extracted DIs for each document
         extractedDIs?.forEach(di => {
-          if (
-            vaultData &&
-            !isVaultDataEmpty(vaultData[di]) &&
-            completedVersion
-          ) {
+          if (vaultData && !isVaultDataEmpty(vaultData[di]) && completedVersion) {
             if (di.includes(RawJsonKinds.CurpValidationResponse)) {
               const curpVersion = document.curpCompletedVersion ?? '';
               const versionedCurpDI = curpVersion ? `${di}:${curpVersion}` : di;

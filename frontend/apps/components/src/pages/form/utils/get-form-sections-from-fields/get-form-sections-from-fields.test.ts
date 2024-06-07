@@ -2,13 +2,9 @@ import getFormSectionsFromFields from './get-form-sections-from-fields';
 
 describe('getFormSectionsFromFields', () => {
   it('extracts field names correctly', () => {
-    expect(
-      getFormSectionsFromFields([
-        'card.primary.number',
-        'card.primary.cvc',
-        'card.primary.expiration',
-      ]),
-    ).toEqual(['card']);
+    expect(getFormSectionsFromFields(['card.primary.number', 'card.primary.cvc', 'card.primary.expiration'])).toEqual([
+      'card',
+    ]);
 
     expect(
       getFormSectionsFromFields([

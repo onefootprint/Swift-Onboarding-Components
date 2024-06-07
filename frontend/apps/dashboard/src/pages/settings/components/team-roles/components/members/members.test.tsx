@@ -1,7 +1,7 @@
 import {
+  MockDate,
   createUseRouterSpy,
   customRender,
-  MockDate,
   screen,
   userEvent,
   waitFor,
@@ -13,11 +13,11 @@ import React from 'react';
 
 import Members from './members';
 import {
-  membersFixture,
-  membersRelativeTimeFixture,
+  RolesFixture,
   memberToEdit,
   memberToEditRole,
-  RolesFixture,
+  membersFixture,
+  membersRelativeTimeFixture,
   withCreateMembers,
   withCreateMembersError,
   withEditMember,
@@ -103,9 +103,7 @@ describe('<Members />', () => {
         const email = screen.getByText(member.email);
         expect(email).toBeInTheDocument();
 
-        const relativeTime = screen.getByText(
-          membersRelativeTimeFixture[index],
-        );
+        const relativeTime = screen.getByText(membersRelativeTimeFixture[index]);
         expect(relativeTime).toBeInTheDocument();
       });
     });
@@ -218,9 +216,7 @@ describe('<Members />', () => {
             const dialog = screen.getByRole('dialog', {
               name: 'Invite teammates',
             });
-            const errorMessage = within(dialog).getByText(
-              'Something went wrong',
-            );
+            const errorMessage = within(dialog).getByText('Something went wrong');
 
             expect(errorMessage).toBeInTheDocument();
           });
@@ -283,9 +279,7 @@ describe('<Members />', () => {
           await waitForElementToBeRemoved(dialog);
 
           await waitFor(() => {
-            const successMessage = screen.getByText(
-              'Invitation sent successfully.',
-            );
+            const successMessage = screen.getByText('Invitation sent successfully.');
             expect(successMessage).toBeInTheDocument();
           });
 
@@ -476,9 +470,7 @@ describe('<Members />', () => {
             expect(confirmationMessage).toBeInTheDocument();
           });
 
-          const userRemovedName = screen.queryByText(
-            `${userToRemove.firstName} ${userToRemove.lastName}`,
-          );
+          const userRemovedName = screen.queryByText(`${userToRemove.firstName} ${userToRemove.lastName}`);
           await waitForElementToBeRemoved(userRemovedName);
         });
       });

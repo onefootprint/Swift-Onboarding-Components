@@ -11,16 +11,12 @@ import getOr from '../get-or/get-or';
 type StringPathOf<T> = T extends object
   ? {
       [K in keyof T]-?: K extends string | number
-        ? `${K}${StringPathOf<NonNullable<T[K]>> extends ''
-            ? ''
-            : '.'}${StringPathOf<NonNullable<T[K]>>}`
+        ? `${K}${StringPathOf<NonNullable<T[K]>> extends '' ? '' : '.'}${StringPathOf<NonNullable<T[K]>>}`
         : never;
     }[keyof T]
   : '';
 
-function searchByPaths<Data extends Record<string, unknown>>(
-  paths: StringPathOf<Data>[],
-) {
+function searchByPaths<Data extends Record<string, unknown>>(paths: StringPathOf<Data>[]) {
   return (list: Data[], searchStr: string): Data[] => {
     if (!searchStr || list.length < 2) return list;
     const rExp = new RegExp(searchStr, 'i');

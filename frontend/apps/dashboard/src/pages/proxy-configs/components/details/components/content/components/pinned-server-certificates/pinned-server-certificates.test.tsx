@@ -8,9 +8,7 @@ import {
   configWithPinnedServerCertificate,
 } from './pinned-server-certificates.test.config';
 
-const renderPinnedServerCertificates = ({
-  proxyConfig,
-}: PinnedServerCertificatesProps) =>
+const renderPinnedServerCertificates = ({ proxyConfig }: PinnedServerCertificatesProps) =>
   customRender(<PinnedServerCertificates proxyConfig={proxyConfig} />);
 
 describe('<PinnedServerCertificates />', () => {
@@ -18,17 +16,13 @@ describe('<PinnedServerCertificates />', () => {
     renderPinnedServerCertificates({
       proxyConfig: configWithPinnedServerCertificate,
     });
-    expect(
-      screen.getByText('Download pinned server certificate'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Download pinned server certificate')).toBeInTheDocument();
   });
 
   it('should display empty text when no pinned server certificate exists', () => {
     renderPinnedServerCertificates({
       proxyConfig: configWithNoPinnedServerCertificate,
     });
-    expect(
-      screen.getByText('There are no pinned server certificates'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('There are no pinned server certificates')).toBeInTheDocument();
   });
 });

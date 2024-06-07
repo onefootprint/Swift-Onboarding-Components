@@ -28,8 +28,7 @@ const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
   const options =
     fieldName === IdDI.middleName || !fieldValue
       ? {
-          validate: (value: string) =>
-            validateName(value) !== NameValidationError.SPECIAL_CHARS,
+          validate: (value: string) => validateName(value) !== NameValidationError.SPECIAL_CHARS,
         }
       : {
           required: true,

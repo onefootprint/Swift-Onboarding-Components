@@ -1,8 +1,4 @@
-import type {
-  ObConfigAuth,
-  OverallOutcome,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { ObConfigAuth, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 import { ChallengeKind as Kind } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
@@ -60,14 +56,12 @@ const LOGIN_CHALLENGE_TRANSITIONS: TransitionsFor<IdentifiedEvent> = [
   },
   // Otherwise, go directly to the SMS or phone screen
   {
-    cond: (c, ev) =>
-      isUserFoundWithSingleChallenge(c.device, ev.payload.user, Kind.email),
+    cond: (c, ev) => isUserFoundWithSingleChallenge(c.device, ev.payload.user, Kind.email),
     target: 'emailChallenge',
     actions: ['assignIdentifyResult'],
   },
   {
-    cond: (c, ev) =>
-      isUserFoundWithSingleChallenge(c.device, ev.payload.user, Kind.sms),
+    cond: (c, ev) => isUserFoundWithSingleChallenge(c.device, ev.payload.user, Kind.sms),
     target: 'smsChallenge',
     actions: ['assignIdentifyResult'],
   },
@@ -83,15 +77,13 @@ const BACK_FROM_CHALLENGE_TRANSITIONS: TransitionsFor<NavigatedToPrevPage> = [
   // If we didn't show the challenge selector screen, go back to the respective identification screen
   // If they were identified by email, go back to the email screen
   {
-    cond: c =>
-      !!c.identify.successfulIdentifiers?.includes(SuccessfulIdentifier.email),
+    cond: c => !!c.identify.successfulIdentifiers?.includes(SuccessfulIdentifier.email),
     target: 'emailIdentification',
     actions: ['resetIdentifyState'],
   },
   // If the user had only one available challenge kind, go back to the phone input screen
   {
-    cond: c =>
-      !!c.identify.successfulIdentifiers?.includes(SuccessfulIdentifier.phone),
+    cond: c => !!c.identify.successfulIdentifiers?.includes(SuccessfulIdentifier.phone),
     target: 'phoneIdentification',
     actions: ['resetIdentifyState'],
   },
@@ -100,12 +92,10 @@ const BACK_FROM_CHALLENGE_TRANSITIONS: TransitionsFor<NavigatedToPrevPage> = [
 const SUCCESS_TRANSITIONS: TransitionsFor<ChallengeSucceededEvent> = [
   {
     /** If the playbook requires phone and the user doesn't have a phone, add it */
-    cond: (c, ev) =>
-      requiresPhoneVerification(c.config, c.identify.user, ev.payload.kind),
+    cond: (c, ev) => requiresPhoneVerification(c.config, c.identify.user, ev.payload.kind),
     target: 'addPhone',
     actions: ['assignAuthToken'],
-    description:
-      'Register phone as a login method when it is required by the playbook',
+    description: 'Register phone as a login method when it is required by the playbook',
   },
   {
     target: 'success',
@@ -135,10 +125,7 @@ export const getMachineArgs = ({
     config,
     isLive,
     device,
-    sandboxId:
-      config?.isLive === false && !initialAuthToken
-        ? sandboxId || getRandomID(13)
-        : undefined,
+    sandboxId: config?.isLive === false && !initialAuthToken ? sandboxId || getRandomID(13) : undefined,
     email,
     phoneNumber,
     identify: {},
@@ -179,8 +166,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             {
               cond: ctx => !!ctx.email || !!ctx.phoneNumber,
               target: 'initBootstrap',
-              description:
-                'If bootstrap phone or email is provided and valid, try to identify',
+              description: 'If bootstrap phone or email is provided and valid, try to identify',
             },
             {
               cond: ctx => !ctx.email,
@@ -203,8 +189,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               {
                 cond: ctx => !!ctx.phoneNumber && !!ctx.email,
                 target: 'smsChallenge',
-                description:
-                  'If we didnt locate a user but have phone and email, go straight to SMS signup challenge',
+                description: 'If we didnt locate a user but have phone and email, go straight to SMS signup challenge',
               },
               {
                 cond: ctx => !ctx.email,
@@ -292,10 +277,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             navigatedToPrevPage: [
               // User was identified via email, so go back to the email page
               {
-                cond: c =>
-                  !!c.identify?.successfulIdentifiers?.includes(
-                    SuccessfulIdentifier.email,
-                  ),
+                cond: c => !!c.identify?.successfulIdentifiers?.includes(SuccessfulIdentifier.email),
                 target: 'emailIdentification',
                 actions: ['resetIdentifyState'],
               },
@@ -366,8 +348,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
           if (!phoneNumber) {
             return context;
           }
-          const isPhoneChanged =
-            phoneNumber && context.phoneNumber?.value !== phoneNumber;
+          const isPhoneChanged = phoneNumber && context.phoneNumber?.value !== phoneNumber;
           if (isPhoneChanged) {
             // challengeData becomes invalid if the phone changes
             context.challenge.challengeData = undefined;
@@ -399,8 +380,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
 
           // challengeData becomes invalid if the phone or email changes
           const isEmailChanged = email && context.email?.value !== email;
-          const isPhoneChanged =
-            phoneNumber && context.phoneNumber?.value !== phoneNumber;
+          const isPhoneChanged = phoneNumber && context.phoneNumber?.value !== phoneNumber;
           if (isEmailChanged || isPhoneChanged) {
             context.challenge.challengeData = undefined;
           }

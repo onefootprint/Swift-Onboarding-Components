@@ -1,10 +1,5 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import { CountryRestriction } from '@/playbooks/utils/machine/types';
@@ -17,13 +12,7 @@ const renderResidencyForm = ({
   onBack = jest.fn(),
   defaultValues,
 }: Partial<ResidencyFormWithContextProps>) => {
-  customRender(
-    <ResidencyFormWithContext
-      onSubmit={onSubmit}
-      onBack={onBack}
-      defaultValues={defaultValues}
-    />,
-  );
+  customRender(<ResidencyFormWithContext onSubmit={onSubmit} onBack={onBack} defaultValues={defaultValues} />);
 };
 
 describe('<Residency />', () => {

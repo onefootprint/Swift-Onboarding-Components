@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import Text from '../text';
 
 export type BreadcrumbItemProps = {
-  as?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  as?: any;
   href?: string;
   children: string;
 };

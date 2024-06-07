@@ -17,18 +17,14 @@ import { getChallengeTitleByKind, getMethods, getSubTitle } from './utils';
 type InnerComponentProps = ComponentProps<typeof Component>;
 type ChallengeSelectOrPasskeyProps = Pick<InnerComponentProps, 'Header'>;
 
-const ChallengeSelectOrPasskey = ({
-  Header,
-}: ChallengeSelectOrPasskeyProps) => {
+const ChallengeSelectOrPasskey = ({ Header }: ChallengeSelectOrPasskeyProps) => {
   const [state, send] = useIdentifyMachine();
   const { device, identify, variant, phoneNumber, email } = state.context;
   const { t } = useTranslation('identify');
   const tryAnotherWay = useTryAnotherWay(t);
   const headerTitle = useGetHeaderText();
   const headerSubtitle = getSubTitle(t, variant);
-  const [selectedChallenge, setSelectedChallenge] = useState<Kind | undefined>(
-    undefined,
-  );
+  const [selectedChallenge, setSelectedChallenge] = useState<Kind | undefined>(undefined);
 
   const runPasskey = useRunPasskey({
     onSuccess: ({ authToken }) => {

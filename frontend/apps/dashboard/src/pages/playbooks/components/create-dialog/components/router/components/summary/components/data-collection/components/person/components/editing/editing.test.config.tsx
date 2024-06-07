@@ -1,15 +1,8 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type {
-  BusinessInformation,
-  Personal,
-  SummaryFormData,
-} from '@/playbooks/utils/machine/types';
-import {
-  defaultPlaybookValuesKYC,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import type { BusinessInformation, Personal, SummaryFormData } from '@/playbooks/utils/machine/types';
+import { PlaybookKind, defaultPlaybookValuesKYC } from '@/playbooks/utils/machine/types';
 
 import Editing from './editing';
 
@@ -21,10 +14,7 @@ export type EditingWithContextProps = {
   kind?: PlaybookKind;
 };
 
-const EditingWithContext = ({
-  kind,
-  startingValues,
-}: EditingWithContextProps) => {
+const EditingWithContext = ({ kind, startingValues }: EditingWithContextProps) => {
   const formMethods = useForm<SummaryFormData>({
     defaultValues: {
       ...defaultPlaybookValuesKYC,
@@ -41,7 +31,7 @@ const EditingWithContext = ({
     <FormProvider {...formMethods}>
       <form>
         <Editing
-          onStopEditing={() => {}}
+          onStopEditing={() => undefined}
           meta={{
             kind: kind ?? PlaybookKind.Kyc,
             residency: {

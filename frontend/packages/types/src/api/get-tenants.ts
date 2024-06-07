@@ -52,16 +52,12 @@ export const TENANT_BILLING_PROFILE_PRODUCTS = [
   'monthlyMinimum',
 ];
 
-export type TenantBillingProfileProduct =
-  (typeof TENANT_BILLING_PROFILE_PRODUCTS)[number];
+export type TenantBillingProfileProduct = (typeof TENANT_BILLING_PROFILE_PRODUCTS)[number];
 
 /**
  * The price of each product for this tenant, set in cents.
  */
-export type TenantBillingProfile = Record<
-  TenantBillingProfileProduct,
-  string | undefined | null
->;
+export type TenantBillingProfile = Record<TenantBillingProfileProduct, string | undefined | null>;
 
 export type TenantVendorControl = {
   idologyEnabled: boolean;

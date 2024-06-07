@@ -1,10 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor, within } from '@onefootprint/test-utils';
 import React from 'react';
 
 import DuplicateData from './duplicate-data';
@@ -64,9 +58,7 @@ describe('<DuplicateData/>', () => {
     expect(firstRow).toBeInTheDocument();
     expect(within(firstRow).getByText('Jane D.')).toBeInTheDocument();
     expect(within(firstRow).getByText('fp_id_test')).toBeInTheDocument();
-    expect(
-      within(firstRow).queryByText('Phone number'),
-    ).not.toBeInTheDocument();
+    expect(within(firstRow).queryByText('Phone number')).not.toBeInTheDocument();
     expect(within(firstRow).getByText('Email address')).toBeInTheDocument();
     expect(within(firstRow).getByText('SSN')).toBeInTheDocument();
     expect(within(firstRow).getByText('Pass')).toBeInTheDocument();
@@ -78,14 +70,10 @@ describe('<DuplicateData/>', () => {
     expect(within(secondRow).getByText('John T.')).toBeInTheDocument();
     expect(within(secondRow).getByText('fp_id_test2')).toBeInTheDocument();
     expect(within(secondRow).getByText('Phone number')).toBeInTheDocument();
-    expect(
-      within(secondRow).queryByText('Email address'),
-    ).not.toBeInTheDocument();
+    expect(within(secondRow).queryByText('Email address')).not.toBeInTheDocument();
     expect(within(secondRow).queryByText('SSN')).not.toBeInTheDocument();
     expect(within(secondRow).getByText('Fail')).toBeInTheDocument();
-    expect(
-      within(secondRow).getByText('11/30/23, 4:38 PM'),
-    ).toBeInTheDocument();
+    expect(within(secondRow).getByText('11/30/23, 4:38 PM')).toBeInTheDocument();
   });
 
   it('Should render the other tenant data correctly when same tenant data populated', async () => {
@@ -97,9 +85,7 @@ describe('<DuplicateData/>', () => {
       expect(table.getAttribute('aria-busy')).toEqual('false');
     });
 
-    expect(screen.getByTestId('other-tenant-summary')).toHaveTextContent(
-      'Plus 20 more matches in 10 other companies',
-    );
+    expect(screen.getByTestId('other-tenant-summary')).toHaveTextContent('Plus 20 more matches in 10 other companies');
   });
 
   it('Should render correctly when same tenant data is empty', async () => {
@@ -116,9 +102,7 @@ describe('<DuplicateData/>', () => {
     expect(firstRow).toBeInTheDocument();
     expect(within(firstRow).getByText('No matches in')).toBeInTheDocument();
 
-    expect(screen.getByTestId('other-tenant-summary')).toHaveTextContent(
-      '20 matches in 10 other companies',
-    );
+    expect(screen.getByTestId('other-tenant-summary')).toHaveTextContent('20 matches in 10 other companies');
   });
 
   it('Should render correctly when there is an error', async () => {
@@ -133,8 +117,6 @@ describe('<DuplicateData/>', () => {
     // Get first row
     const firstRow = screen.getAllByRole('row')[1];
     expect(firstRow).toBeInTheDocument();
-    expect(
-      within(firstRow).getByText('Something went wrong'),
-    ).toBeInTheDocument();
+    expect(within(firstRow).getByText('Something went wrong')).toBeInTheDocument();
   });
 });

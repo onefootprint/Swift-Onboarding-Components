@@ -27,11 +27,7 @@ type FormErrors = Partial<{ [K in keyof FormData]: { message?: string } }>;
 
 export type BasicDataFormProps = {
   defaultValues?: Partial<FormData>;
-  optionalFields?: (
-    | BusinessDI.corporationType
-    | BusinessDI.phoneNumber
-    | BusinessDI.website
-  )[];
+  optionalFields?: (BusinessDI.corporationType | BusinessDI.phoneNumber | BusinessDI.website)[];
   isLoading: boolean;
   onSubmit: (data: BasicData) => void;
   onCancel?: () => void;
@@ -82,11 +78,7 @@ const BasicDataForm = ({
 
   const getFormPhoneState = (value?: string): boolean => {
     if (value && !checkIsPhoneValid(value, !config?.isLive)) {
-      setError(
-        'phoneNumber',
-        { message: t('phone-number.errors.pattern') },
-        { shouldFocus: true },
-      );
+      setError('phoneNumber', { message: t('phone-number.errors.pattern') }, { shouldFocus: true });
       return false;
     }
     return true;
@@ -95,9 +87,7 @@ const BasicDataForm = ({
   const onSubmitFormData = (formData: FormData) => {
     const basicData = {
       [BusinessDI.name]: formData.name,
-      [BusinessDI.doingBusinessAs]: formData.doingBusinessAs
-        ? formData.doingBusinessAs
-        : undefined,
+      [BusinessDI.doingBusinessAs]: formData.doingBusinessAs ? formData.doingBusinessAs : undefined,
       [BusinessDI.tin]: formData.tin,
       [BusinessDI.corporationType]: formData.corporationType?.value,
       [BusinessDI.phoneNumber]: formData.phoneNumber,
@@ -115,12 +105,7 @@ const BasicDataForm = ({
   }));
 
   return (
-    <Grid.Container
-      tag="form"
-      gap={7}
-      width="100%"
-      onSubmit={handleSubmit(onSubmitFormData)}
-    >
+    <Grid.Container tag="form" gap={7} width="100%" onSubmit={handleSubmit(onSubmitFormData)}>
       <Stack gap={5} direction="column">
         <TextInput
           autoFocus
@@ -172,10 +157,7 @@ const BasicDataForm = ({
                 message: t('corporation-type.error'),
               },
             }}
-            render={({
-              field: { onChange, onBlur, value, name },
-              fieldState: { error },
-            }) => (
+            render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
               <Select<{ label: string; value: string }>
                 data-private
                 data-dd-privacy="mask"
@@ -219,10 +201,7 @@ const BasicDataForm = ({
                 message: t('phone-number.errors.required'),
               },
             }}
-            render={({
-              field: { onChange, onBlur, value, name },
-              fieldState: { error },
-            }) => (
+            render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
               <PhoneInput
                 data-private
                 data-dd-privacy="mask"

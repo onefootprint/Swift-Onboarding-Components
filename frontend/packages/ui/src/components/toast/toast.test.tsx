@@ -14,7 +14,7 @@ describe('<Toast />', () => {
     description = 'description',
     id = '1',
     leaving = false,
-    onClose = () => {},
+    onClose = () => undefined,
     testID,
     title = 'title',
     variant,

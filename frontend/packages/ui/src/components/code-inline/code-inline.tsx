@@ -45,13 +45,8 @@ const CodeInline = ({
     <CopyButton
       contentToCopy={children}
       ariaLabel={ariaLabel ?? t('components.code-inline.aria-label-default')}
-      tooltipText={
-        tooltipText ?? t('components.code-inline.tooltip-text-default')
-      }
-      tooltipTextConfirmation={
-        tooltipTextConfirmation ??
-        t('components.code-inline.tooltip-text-confirmation-default')
-      }
+      tooltipText={tooltipText ?? t('components.code-inline.tooltip-text-default')}
+      tooltipTextConfirmation={tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default')}
     >
       <CodeContent
         data-truncate={truncate}
@@ -67,9 +62,7 @@ const CodeInline = ({
 
 const CodeContent = styled.code<{ size?: 'default' | 'compact' }>`
   ${({ theme, size }) => css`
-    ${size === 'compact'
-      ? createFontStyles('snippet-3', 'code')
-      : createFontStyles('snippet-2', 'code')};
+    ${size === 'compact' ? createFontStyles('snippet-3', 'code') : createFontStyles('snippet-2', 'code')};
     text-align: left;
     white-space: break-spaces;
     word-break: break-word;

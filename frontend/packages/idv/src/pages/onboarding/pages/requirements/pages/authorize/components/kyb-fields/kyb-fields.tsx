@@ -1,10 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
-import {
-  IcoBuilding24,
-  IcoFileText24,
-  IcoPhone24,
-  IcoUserCircle24,
-} from '@onefootprint/icons';
+import { IcoBuilding24, IcoFileText24, IcoPhone24, IcoUserCircle24 } from '@onefootprint/icons';
 import { CollectedKybDataOption } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
 import React from 'react';
@@ -38,19 +33,11 @@ const KybFields = ({ data, showTitle }: KybFieldsProps) => {
     [CollectedKybDataOption.name]: t('data-labels.business-name'),
     [CollectedKybDataOption.tin]: t('data-labels.business-tin'),
     [CollectedKybDataOption.address]: t('data-labels.business-address'),
-    [CollectedKybDataOption.phoneNumber]: t(
-      'data-labels.business-phone-number',
-    ),
+    [CollectedKybDataOption.phoneNumber]: t('data-labels.business-phone-number'),
     [CollectedKybDataOption.website]: t('data-labels.business-website'),
-    [CollectedKybDataOption.corporationType]: t(
-      'data-labels.business-corporation-type',
-    ),
-    [CollectedKybDataOption.beneficialOwners]: t(
-      'data-labels.business-beneficial-owners',
-    ),
-    [CollectedKybDataOption.kycedBeneficialOwners]: t(
-      'data-labels.kyced-business-beneficial-owners',
-    ),
+    [CollectedKybDataOption.corporationType]: t('data-labels.business-corporation-type'),
+    [CollectedKybDataOption.beneficialOwners]: t('data-labels.business-beneficial-owners'),
+    [CollectedKybDataOption.kycedBeneficialOwners]: t('data-labels.kyced-business-beneficial-owners'),
   };
 
   const fields: FieldProps[] = [];

@@ -10,11 +10,7 @@ import {
 import React from 'react';
 
 import Details from './details';
-import {
-  proxyConfigDetailsFixture,
-  withProxyConfigDetails,
-  withProxyConfigDetailsError,
-} from './details.test.config';
+import { proxyConfigDetailsFixture, withProxyConfigDetails, withProxyConfigDetailsError } from './details.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 const fileSaverSpy = createFileSaverSpy();
@@ -76,17 +72,13 @@ describe('<Details />', () => {
       const httpRow = screen.getByRole('row', {
         name: 'HTTP Method',
       });
-      const httpValue = within(httpRow).getByText(
-        proxyConfigDetailsFixture.method,
-      );
+      const httpValue = within(httpRow).getByText(proxyConfigDetailsFixture.method);
       expect(httpValue).toBeInTheDocument();
 
       const accessReasonRow = screen.getByRole('row', {
         name: 'Access reason',
       });
-      const accessReasonValue = within(accessReasonRow).getByText(
-        proxyConfigDetailsFixture.accessReason,
-      );
+      const accessReasonValue = within(accessReasonRow).getByText(proxyConfigDetailsFixture.accessReason);
       expect(accessReasonValue).toBeInTheDocument();
 
       proxyConfigDetailsFixture.secretHeaders.forEach(header => {

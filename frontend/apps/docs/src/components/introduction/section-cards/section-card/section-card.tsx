@@ -15,24 +15,13 @@ type SectionCardProps = {
   children?: React.ReactNode;
 };
 
-const SectionCard = ({
-  title,
-  subtitle,
-  icon: Icon,
-  imageSrc,
-  gridArea,
-  children,
-  href,
-}: SectionCardProps) => {
+const SectionCard = ({ title, subtitle, icon: Icon, imageSrc, gridArea, children, href }: SectionCardProps) => {
   const renderedIcon = Icon && <Icon />;
 
   return (
     <Container href={href} gridArea={gridArea}>
       <IllustrationContainer>
-        {children ||
-          (imageSrc && (
-            <Image src={imageSrc} alt={title} height={194} width={350} />
-          ))}
+        {children || (imageSrc && <Image src={imageSrc} alt={title} height={194} width={350} />)}
       </IllustrationContainer>
       <TextContainer>
         <TitleContainer>

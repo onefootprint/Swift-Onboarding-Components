@@ -123,9 +123,7 @@ const UploadBox = styled.div<{
     justify-content: center;
     align-items: center;
     min-height: ${height}px;
-    background-color: ${dragActive
-      ? activeBackgroundColorCode
-      : theme.backgroundColor.secondary};
+    background-color: ${dragActive ? activeBackgroundColorCode : theme.backgroundColor.secondary};
     border: 1px dashed
       ${dragActive ? theme.borderColor.secondary : theme.borderColor.primary};
     border-radius: ${theme.borderRadius.default};

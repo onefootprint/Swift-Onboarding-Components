@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { LinkButton, media, Text } from '@onefootprint/ui';
+import { LinkButton, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -15,14 +15,7 @@ type InvestorUpdatePreviewProps = {
   image?: string;
 };
 
-const InvestorUpdatePreview = ({
-  index,
-  publishedAt,
-  excerpt,
-  href,
-  title,
-  image,
-}: InvestorUpdatePreviewProps) => {
+const InvestorUpdatePreview = ({ index, publishedAt, excerpt, href, title, image }: InvestorUpdatePreviewProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.investor-updates',
   });
@@ -49,12 +42,7 @@ const InvestorUpdatePreview = ({
               {title}
             </Text>
             <Text variant="body-2">{excerpt}</Text>
-            <LinkButton
-              $marginTop={7}
-              iconComponent={IcoArrowRightSmall16}
-              iconPosition="right"
-              href={href}
-            >
+            <LinkButton $marginTop={7} iconComponent={IcoArrowRightSmall16} iconPosition="right" href={href}>
               {t('read-more')}
             </LinkButton>
           </ArticleDetails>

@@ -23,36 +23,20 @@ const GlobalIdDocPicker = () => {
             label={t('drivers_license')}
             {...register('personal.idDocKind')}
           />
-          <Checkbox
-            value={SupportedIdDocTypes.idCard}
-            label={t('id_card')}
-            {...register('personal.idDocKind')}
-          />
-          <Checkbox
-            value={SupportedIdDocTypes.passport}
-            label={t('passport')}
-            {...register('personal.idDocKind')}
-          />
+          <Checkbox value={SupportedIdDocTypes.idCard} label={t('id_card')} {...register('personal.idDocKind')} />
+          <Checkbox value={SupportedIdDocTypes.passport} label={t('passport')} {...register('personal.idDocKind')} />
           <Checkbox
             value={SupportedIdDocTypes.passportCard}
             label={t('passport_card')}
             {...register('personal.idDocKind')}
           />
-          <Checkbox
-            value={SupportedIdDocTypes.visa}
-            label={t('visa')}
-            {...register('personal.idDocKind')}
-          />
+          <Checkbox value={SupportedIdDocTypes.visa} label={t('visa')} {...register('personal.idDocKind')} />
           <Checkbox
             value={SupportedIdDocTypes.residenceDocument}
             label={t('residence_document')}
             {...register('personal.idDocKind')}
           />
-          <Checkbox
-            value={SupportedIdDocTypes.workPermit}
-            label={t('permit')}
-            {...register('personal.idDocKind')}
-          />
+          <Checkbox value={SupportedIdDocTypes.workPermit} label={t('permit')} {...register('personal.idDocKind')} />
           <Checkbox
             value={SupportedIdDocTypes.voterIdentification}
             label={t('voter_identification')}

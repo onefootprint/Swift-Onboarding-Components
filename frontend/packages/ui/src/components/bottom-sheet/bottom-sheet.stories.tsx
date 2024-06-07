@@ -49,8 +49,7 @@ export default {
     },
     onClose: {
       control: 'function',
-      description:
-        'Function called when the user requests to close the bottom sheet',
+      description: 'Function called when the user requests to close the bottom sheet',
       table: {
         type: { summary: 'function', required: false },
       },
@@ -58,12 +57,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<BottomSheetProps> = ({
-  children,
-  onClose,
-  open: initialOpen,
-  title,
-}: BottomSheetProps) => {
+const Template: Story<BottomSheetProps> = ({ children, onClose, open: initialOpen, title }: BottomSheetProps) => {
   const [open, setOpen] = useState(initialOpen);
 
   return (
@@ -103,11 +97,7 @@ OnlyPrimary.args = {
   },
 };
 
-const LinkTemplate: Story<BottomSheetProps> = ({
-  title,
-  onClose,
-  open: initialVisibility,
-}: BottomSheetProps) => {
+const LinkTemplate: Story<BottomSheetProps> = ({ title, onClose, open: initialVisibility }: BottomSheetProps) => {
   const [open, setOpen] = useState(initialVisibility);
 
   return (

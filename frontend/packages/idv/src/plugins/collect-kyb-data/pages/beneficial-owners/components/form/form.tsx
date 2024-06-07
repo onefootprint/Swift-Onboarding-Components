@@ -1,7 +1,4 @@
-import type {
-  BeneficialOwner,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { BeneficialOwner, PublicOnboardingConfig } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { Divider, Grid, Text, useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -25,15 +22,7 @@ export type FormProps = {
   config?: PublicOnboardingConfig;
 };
 
-const Form = ({
-  defaultValues,
-  isLoading,
-  onSubmit,
-  onCancel,
-  ctaLabel,
-  requireMultiKyc,
-  config,
-}: FormProps) => {
+const Form = ({ defaultValues, isLoading, onSubmit, onCancel, ctaLabel, requireMultiKyc, config }: FormProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form',
   });
@@ -65,8 +54,7 @@ const Form = ({
     name: 'beneficialOwners',
     rules: { minLength: 1 },
   });
-  const shouldShowError =
-    !!errors?.beneficialOwners && errors?.beneficialOwners?.[0];
+  const shouldShowError = !!errors?.beneficialOwners && errors?.beneficialOwners?.[0];
   const shouldShowMultiKyc = requireMultiKyc && fields.length > 1;
 
   const handleAddMore = () => {
@@ -114,18 +102,13 @@ const Form = ({
       .map(bo => ({
         ...bo,
         // Send undefined instead of empty string for unknown middle name
-        [BeneficialOwnerDataAttribute.middleName]:
-          bo[BeneficialOwnerDataAttribute.middleName] || undefined,
+        [BeneficialOwnerDataAttribute.middleName]: bo[BeneficialOwnerDataAttribute.middleName] || undefined,
         // Send undefined instead of empty string for unknown phone/email. The primary BO is allowed
         // to have no phone / email
-        [BeneficialOwnerDataAttribute.phoneNumber]:
-          bo[BeneficialOwnerDataAttribute.phoneNumber] || undefined,
-        [BeneficialOwnerDataAttribute.email]:
-          bo[BeneficialOwnerDataAttribute.email] || undefined,
+        [BeneficialOwnerDataAttribute.phoneNumber]: bo[BeneficialOwnerDataAttribute.phoneNumber] || undefined,
+        [BeneficialOwnerDataAttribute.email]: bo[BeneficialOwnerDataAttribute.email] || undefined,
         // Parse ownership stake from string to number
-        [BeneficialOwnerDataAttribute.ownershipStake]: Number(
-          bo[BeneficialOwnerDataAttribute.ownershipStake],
-        ),
+        [BeneficialOwnerDataAttribute.ownershipStake]: Number(bo[BeneficialOwnerDataAttribute.ownershipStake]),
       }));
 
     onSubmit(beneficialOwners);
@@ -133,12 +116,7 @@ const Form = ({
 
   return (
     <FormProvider {...methods}>
-      <Grid.Container
-        tag="form"
-        gap={6}
-        width="100%"
-        onSubmit={handleSubmit(onSubmitFormData)}
-      >
+      <Grid.Container tag="form" gap={6} width="100%" onSubmit={handleSubmit(onSubmitFormData)}>
         {fields.map((field, index) => (
           <React.Fragment key={field.id}>
             <Fields

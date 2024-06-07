@@ -1,10 +1,6 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
-import {
-  asAdminUserInLive,
-  asAdminUserInSandbox,
-  resetUser,
-} from 'src/config/tests';
+import { asAdminUserInLive, asAdminUserInSandbox, resetUser } from 'src/config/tests';
 
 import SandboxBanner from './sandbox-banner';
 

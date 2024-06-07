@@ -1,11 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { BottomSheetProps } from './bottom-sheet';
@@ -14,7 +9,7 @@ import BottomSheet from './bottom-sheet';
 describe('<BottomSheet />', () => {
   const renderBottomSheet = ({
     open = true,
-    onClose = () => {},
+    onClose = () => undefined,
     title: headerTitle = 'title',
     children = 'content',
   }: Partial<BottomSheetProps>) =>

@@ -7,11 +7,9 @@ const INLINE_CONTAINER_ID_PREFIX = INLINE_CONTAINER_CLASS;
 const OVERLAY_ID_PREFIX = OVERLAY_CLASS;
 const LOADING_INDICATOR_ID_PREFIX = 'footprint-loading-indicator';
 
-export const getOverlayContainerId = (uniqueId: string) =>
-  `${OVERLAY_CONTAINER_ID_PREFIX}-${uniqueId}`;
+export const getOverlayContainerId = (uniqueId: string) => `${OVERLAY_CONTAINER_ID_PREFIX}-${uniqueId}`;
 
-export const getDomElementId = (elementId: string, uniqueId: string) =>
-  `${elementId}-${uniqueId}`;
+export const getDomElementId = (elementId: string, uniqueId: string) => `${elementId}-${uniqueId}`;
 
 export const removeDOMElements = async (uniqueId: string) => {
   removeLoader(uniqueId);
@@ -38,9 +36,7 @@ const removeOverlayContainer = async (uniqueId: string) => {
   if (!overlayContainer) {
     return;
   }
-  const drawerIframe = overlayContainer.querySelector(
-    'iframe.footprint-drawer',
-  );
+  const drawerIframe = overlayContainer.querySelector('iframe.footprint-drawer');
   if (drawerIframe) {
     drawerIframe?.classList.add('footprint-drawer-closing');
     await new Promise(resolve => {
@@ -70,10 +66,7 @@ const removeOverlayContainer = async (uniqueId: string) => {
   document.body.classList.remove(BODY_LOCKED_CLASS);
 };
 
-export const createInlineContainer = (
-  uniqueId: string,
-  clientParentContainer: HTMLElement,
-) => {
+export const createInlineContainer = (uniqueId: string, clientParentContainer: HTMLElement) => {
   const id = getDomElementId(INLINE_CONTAINER_ID_PREFIX, uniqueId);
   const inlineContainer = document.createElement('div');
   inlineContainer.classList.add(INLINE_CONTAINER_CLASS);

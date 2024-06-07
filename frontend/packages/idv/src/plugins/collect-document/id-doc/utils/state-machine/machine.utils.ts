@@ -8,10 +8,7 @@ type MachineTarget = {
   actions?: (context: MachineContext, event: ProccessingSucceededEvent) => void;
 };
 
-const assignCurrSide = (
-  context: MachineContext,
-  event: ProccessingSucceededEvent,
-) => {
+const assignCurrSide = (context: MachineContext, event: ProccessingSucceededEvent) => {
   context.currSide = event.payload.nextSideToCollect as IdDocImageTypes;
   context.errors = [];
 };
@@ -19,35 +16,32 @@ const assignCurrSide = (
 export const NextSideTargetsMobile: MachineTarget[] = [
   {
     target: 'mobileFrontPhotoFallback',
-    cond: (context, event) =>
-      event.payload.nextSideToCollect === 'front' && !!context.forceUpload,
+    cond: (context, event) => event.payload.nextSideToCollect === 'front' && !!context.forceUpload,
     actions: assignCurrSide,
   },
   {
     target: 'frontImageCaptureMobile',
-    cond: (context, event) => event.payload.nextSideToCollect === 'front',
+    cond: (_context, event) => event.payload.nextSideToCollect === 'front',
     actions: assignCurrSide,
   },
   {
     target: 'mobileBackPhotoFallback',
-    cond: (context, event) =>
-      event.payload.nextSideToCollect === 'back' && !!context.forceUpload,
+    cond: (context, event) => event.payload.nextSideToCollect === 'back' && !!context.forceUpload,
     actions: assignCurrSide,
   },
   {
     target: 'backImageCaptureMobile',
-    cond: (context, event) => event.payload.nextSideToCollect === 'back',
+    cond: (_context, event) => event.payload.nextSideToCollect === 'back',
     actions: assignCurrSide,
   },
   {
     target: 'mobileSelfieFallback',
-    cond: (context, event) =>
-      event.payload.nextSideToCollect === 'selfie' && !!context.forceUpload,
+    cond: (context, event) => event.payload.nextSideToCollect === 'selfie' && !!context.forceUpload,
     actions: assignCurrSide,
   },
   {
     target: 'selfieImageMobile',
-    cond: (context, event) => event.payload.nextSideToCollect === 'selfie',
+    cond: (_context, event) => event.payload.nextSideToCollect === 'selfie',
     actions: assignCurrSide,
   },
   {
@@ -58,23 +52,22 @@ export const NextSideTargetsMobile: MachineTarget[] = [
 export const NextSideTargetsDesktop: MachineTarget[] = [
   {
     target: 'frontImageDesktop',
-    cond: (context, event) => event.payload.nextSideToCollect === 'front',
+    cond: (_context, event) => event.payload.nextSideToCollect === 'front',
     actions: assignCurrSide,
   },
   {
     target: 'backImageDesktop',
-    cond: (context, event) => event.payload.nextSideToCollect === 'back',
+    cond: (_context, event) => event.payload.nextSideToCollect === 'back',
     actions: assignCurrSide,
   },
   {
     target: 'desktopSelfieFallback',
-    cond: (context, event) =>
-      event.payload.nextSideToCollect === 'selfie' && !!context.forceUpload,
+    cond: (context, event) => event.payload.nextSideToCollect === 'selfie' && !!context.forceUpload,
     actions: assignCurrSide,
   },
   {
     target: 'selfieImageDesktop',
-    cond: (context, event) => event.payload.nextSideToCollect === 'selfie',
+    cond: (_context, event) => event.payload.nextSideToCollect === 'selfie',
     actions: assignCurrSide,
   },
   {
@@ -89,7 +82,6 @@ export const isSingleDocCountryMap = (context: MachineContext) => {
   if (numCountries !== 1) {
     return false;
   }
-  const numDocTypes =
-    supportedCountryAndDocTypes[supportedCountries[0] as CountryCode]?.length;
+  const numDocTypes = supportedCountryAndDocTypes[supportedCountries[0] as CountryCode]?.length;
   return numDocTypes === 1;
 };

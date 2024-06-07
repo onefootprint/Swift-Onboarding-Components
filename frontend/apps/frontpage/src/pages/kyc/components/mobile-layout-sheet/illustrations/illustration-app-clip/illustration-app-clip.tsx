@@ -6,12 +6,7 @@ import styled, { css } from 'styled-components';
 const IllustrationAppClip = () => (
   <Container>
     <PhoneContainer>
-      <PhoneFrame
-        src="/kyc/sticky-rail/app-clip.png"
-        alt=""
-        width={375 * 0.75}
-        height={812 * 0.75}
-      />
+      <PhoneFrame src="/kyc/sticky-rail/app-clip.png" alt="" width={375 * 0.75} height={812 * 0.75} />
     </PhoneContainer>
   </Container>
 );

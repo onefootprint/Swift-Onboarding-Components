@@ -26,11 +26,7 @@ const CompanyPhotosMobile = ({ photos }: CompanyPhotosMobileProps) => {
         priority
       />
       <PagerContainer>
-        <Pager
-          max={photos.length}
-          onClick={carousel.goToIndex}
-          value={carousel.index}
-        />
+        <Pager max={photos.length} onClick={carousel.goToIndex} value={carousel.index} />
       </PagerContainer>
     </Container>
   );

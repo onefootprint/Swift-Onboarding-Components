@@ -41,10 +41,12 @@ const Container = styled(Stack)<{ hasBorder: boolean }>`
     padding: ${theme.spacing[3]};
     width: 100%;
 
-    ${hasBorder &&
-    css`
+    ${
+      hasBorder &&
+      css`
       border-bottom: 1px solid ${theme.borderColor.tertiary};
-    `}
+    `
+    }
   `}
 `;
 

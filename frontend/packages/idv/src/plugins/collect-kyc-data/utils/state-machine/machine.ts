@@ -25,11 +25,7 @@ const ORDERED_SCREENS: Screen[] = [
   },
   {
     screen: 'basicInformation',
-    cdos: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.dob,
-      CollectedKycDataOption.nationality,
-    ],
+    cdos: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.nationality],
   },
   {
     screen: 'residentialAddress',
@@ -51,27 +47,18 @@ const ORDERED_SCREENS: Screen[] = [
   },
 ];
 
-const getScreenOrder = (screen: StateValue) =>
-  ORDERED_SCREENS.findIndex(s => s.screen === screen) ?? -1;
+const getScreenOrder = (screen: StateValue) => ORDERED_SCREENS.findIndex(s => s.screen === screen) ?? -1;
 
 /**
  * Given the CollectKycDataRequirement and initial data, computes the static set of screens we
  * might show. The state machine transitions will only navigate forward and backward through this
  * set of static pages of data that need to be collected.
  */
-const getDataCollectionScreensToShow = (
-  req: CollectKycDataRequirement,
-  initialData: KycData,
-): StateValue[] => {
-  const missingAttributes = [
-    ...req.missingAttributes,
-    ...req.optionalAttributes,
-  ];
-  return ORDERED_SCREENS.filter(
-    s =>
-      isMissing(s.cdos, missingAttributes, initialData) ||
-      s.screen === 'confirm',
-  ).map(s => s.screen);
+const getDataCollectionScreensToShow = (req: CollectKycDataRequirement, initialData: KycData): StateValue[] => {
+  const missingAttributes = [...req.missingAttributes, ...req.optionalAttributes];
+  return ORDERED_SCREENS.filter(s => isMissing(s.cdos, missingAttributes, initialData) || s.screen === 'confirm').map(
+    s => s.screen,
+  );
 };
 
 /**
@@ -123,15 +110,9 @@ const prevScreenTransitions = (currentScreen: StateValue) => {
   }));
 };
 
-export type InitMachineArgs = Omit<
-  MachineContext,
-  'dataCollectionScreensToShow'
->;
+export type InitMachineArgs = Omit<MachineContext, 'dataCollectionScreensToShow'>;
 
-const createCollectKycDataMachine = (
-  initialContext: InitMachineArgs,
-  initState?: string,
-) =>
+const createCollectKycDataMachine = (initialContext: InitMachineArgs, initState?: string) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -147,10 +128,7 @@ const createCollectKycDataMachine = (
         ...initialContext,
         // Snapshot the set of data we have before starting to collect from users. This helps us
         // decide the pages to visit when navigated forward and backward
-        dataCollectionScreensToShow: getDataCollectionScreensToShow(
-          initialContext.requirement,
-          initialContext.data,
-        ),
+        dataCollectionScreensToShow: getDataCollectionScreensToShow(initialContext.requirement, initialContext.data),
       },
       states: {
         init: {
@@ -213,11 +191,11 @@ const createCollectKycDataMachine = (
             },
             addVerification: [
               {
-                cond: (c, { payload }) => payload === 'phone',
+                cond: (_c, { payload }) => payload === 'phone',
                 target: 'addVerificationPhone',
               },
               {
-                cond: (c, { payload }) => payload === 'email',
+                cond: (_c, { payload }) => payload === 'email',
                 target: 'addVerificationEmail',
               },
             ],

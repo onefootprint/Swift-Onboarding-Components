@@ -8,23 +8,19 @@ import styled, { css } from 'styled-components';
 import fakeSdk from '../../../helpers/fake-sdk';
 import getQueryArgs, { isString } from '../../../helpers/get-query-args';
 
-const fallbackPKey =
-  process.env.NEXT_PUBLIC_TENANT_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
+const fallbackPKey = process.env.NEXT_PUBLIC_TENANT_KEY || 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
 const getAuthArgs = (o: ReturnType<typeof getQueryArgs>) => ({
   ...o,
   publicKey: isString(o.publicKey) ? o.publicKey : fallbackPKey,
   appUrl:
-    o.appUrl.startsWith('https://auth-') ||
-    o.appUrl.startsWith('http://localhost')
+    o.appUrl.startsWith('https://auth-') || o.appUrl.startsWith('http://localhost')
       ? o.appUrl
       : 'http://localhost:3011',
 });
 
 const AuthDemo = () => {
   const router = useRouter();
-  const { appUrl, authToken, publicKey, userData } = getAuthArgs(
-    getQueryArgs(router),
-  );
+  const { appUrl, authToken, publicKey, userData } = getAuthArgs(getQueryArgs(router));
 
   const handleAuthenticateClick = () => {
     const component = fakeSdk.init({

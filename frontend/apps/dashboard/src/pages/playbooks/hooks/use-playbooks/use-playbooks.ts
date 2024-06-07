@@ -1,9 +1,6 @@
 import type { PaginatedRequestResponse } from '@onefootprint/request';
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  GetOnboardingConfigsRequest,
-  GetOnboardingConfigsResponse,
-} from '@onefootprint/types';
+import type { GetOnboardingConfigsRequest, GetOnboardingConfigsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import usePagination from 'src/hooks/use-pagination';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -11,13 +8,8 @@ import useSession from 'src/hooks/use-session';
 
 import useFilters from '../use-filters';
 
-const getPlaybooks = async (
-  authHeaders: AuthHeaders,
-  params: GetOnboardingConfigsRequest,
-) => {
-  const { data: response } = await request<
-    PaginatedRequestResponse<GetOnboardingConfigsResponse>
-  >({
+const getPlaybooks = async (authHeaders: AuthHeaders, params: GetOnboardingConfigsRequest) => {
+  const { data: response } = await request<PaginatedRequestResponse<GetOnboardingConfigsResponse>>({
     method: 'GET',
     url: '/org/onboarding_configs',
     headers: authHeaders,

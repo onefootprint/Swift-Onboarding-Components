@@ -5,8 +5,8 @@ import React from 'react';
 import Row from './row';
 import {
   entityFailedFixture,
-  entityIncompleteFixture,
   entityInProgressFixture,
+  entityIncompleteFixture,
   entityManualReviewFixture,
   entityOnWatchlistFixture,
   entityPassedFixture,
@@ -27,9 +27,7 @@ describe('User table row <Row />', () => {
 
   it('should show the FP token', () => {
     renderRow(entityPassedFixture);
-    expect(
-      screen.getByText('fp_bid_VXND11zUVRYQKKUxbUN3KD'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('fp_bid_VXND11zUVRYQKKUxbUN3KD')).toBeInTheDocument();
   });
 
   describe('when the user is verified', () => {

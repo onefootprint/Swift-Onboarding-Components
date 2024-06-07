@@ -1,12 +1,5 @@
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import {
-  CopyButton,
-  createFontStyles,
-  Grid,
-  media,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { CopyButton, Grid, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -37,12 +30,7 @@ const Card = ({ post, hideLine }: CardProps) => {
           {formattedDate}
         </Text>
       </DateRail>
-      <LineContainer
-        gridArea="line"
-        direction="column"
-        align="center"
-        position="relative"
-      >
+      <LineContainer gridArea="line" direction="column" align="center" position="relative">
         <DotContainer>
           <IcoDotSmall16 />
         </DotContainer>
@@ -51,33 +39,16 @@ const Card = ({ post, hideLine }: CardProps) => {
       {post.feature_image && (
         <Grid.Item direction="column" gap={7} gridArea="image" align="center">
           <ImageContainer>
-            <Image
-              src={post.feature_image}
-              height={900}
-              width={900}
-              alt={post.feature_image_alt || post.title}
-            />
+            <Image src={post.feature_image} height={900} width={900} alt={post.feature_image_alt || post.title} />
           </ImageContainer>
         </Grid.Item>
       )}
       <TextContent gridArea="content" direction="column" width="100%" gap={7}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          gap={3}
-        >
+        <Stack direction="row" justifyContent="space-between" alignItems="center" gap={3}>
           <Title href={`/changelog/${post.slug}`}>{post.title}</Title>
-          <CopyButton
-            ariaLabel={t('cta')}
-            tooltipText={t('cta')}
-            contentToCopy={`${BASE_URL}/${post.slug}`}
-          />
+          <CopyButton ariaLabel={t('cta')} tooltipText={t('cta')} contentToCopy={`${BASE_URL}/${post.slug}`} />
         </Stack>
-        <Author
-          authorImg={post.primary_author.profile_image}
-          authorName={post.primary_author.name}
-        />
+        <Author authorImg={post.primary_author.profile_image} authorName={post.primary_author.name} />
         {post.html && <HtmlContent html={post.html} />}
       </TextContent>
     </PostContainer>

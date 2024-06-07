@@ -7,9 +7,8 @@ const Success = () => (
       Onboarding complete!
     </Text>
     <Text color="secondary" variant="body-1" tag="div">
-      Thanks for trying Footprint. If you have any questions or want to learn
-      more about our product, please contact us and we will get back to you as
-      soon as possible.
+      Thanks for trying Footprint. If you have any questions or want to learn more about our product, please contact us
+      and we will get back to you as soon as possible.
     </Text>
   </Box>
 );

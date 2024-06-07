@@ -388,10 +388,7 @@ export const documentsFixture: Document[] = [
   },
 ];
 
-export const withDocuments = (
-  entity = entityFixture,
-  response = documentsFixture,
-) =>
+export const withDocuments = (entity = entityFixture, response = documentsFixture) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entity.id}/documents`,

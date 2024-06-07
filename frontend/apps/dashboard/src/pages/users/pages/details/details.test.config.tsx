@@ -1,17 +1,5 @@
-import {
-  mockRequest,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
-import type {
-  DataIdentifier,
-  Entity,
-  Liveness,
-  Timeline,
-  VaultValue,
-} from '@onefootprint/types';
+import { mockRequest, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import type { DataIdentifier, Entity, Liveness, Timeline, VaultValue } from '@onefootprint/types';
 import {
   ActorKind,
   CollectedKycDataOption,
@@ -243,10 +231,7 @@ export const withEntityError = (entityId = entityFixture.id) =>
     },
   });
 
-export const withTimeline = (
-  entity = entityFixture,
-  response = timelineFixture,
-) =>
+export const withTimeline = (entity = entityFixture, response = timelineFixture) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entity.id}/timeline`,
@@ -267,20 +252,14 @@ export const withDocuments = (entity = entityFixture, response = []) =>
     response,
   });
 
-export const withAuthEvents = (
-  entity = entityFixture,
-  response = livenessFixture,
-) =>
+export const withAuthEvents = (entity = entityFixture, response = livenessFixture) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entity.id}/auth_events`,
     response,
   });
 
-export const withDecrypt = (
-  entityId: string,
-  decryptedData: Partial<Record<DataIdentifier, VaultValue>>,
-) =>
+export const withDecrypt = (entityId: string, decryptedData: Partial<Record<DataIdentifier, VaultValue>>) =>
   mockRequest({
     method: 'post',
     path: `/entities/${entityId}/vault/decrypt`,
@@ -289,10 +268,7 @@ export const withDecrypt = (
     },
   });
 
-export const withEdit = (
-  entityId: string,
-  response: Partial<Record<DataIdentifier, VaultValue>>,
-) =>
+export const withEdit = (entityId: string, response: Partial<Record<DataIdentifier, VaultValue>>) =>
   mockRequest({
     method: 'patch',
     path: `/entities/${entityId}/vault`,

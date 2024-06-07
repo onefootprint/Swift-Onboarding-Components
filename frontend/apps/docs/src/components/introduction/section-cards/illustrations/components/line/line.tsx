@@ -11,25 +11,10 @@ type LineProps = {
   left: string;
 };
 
-const Line = ({
-  lightColor,
-  darkColor,
-  width,
-  height = 8,
-  top,
-  left,
-}: LineProps) => {
+const Line = ({ lightColor, darkColor, width, height = 8, top, left }: LineProps) => {
   const { theme } = useTheme();
   const color = theme === 'light' ? lightColor : darkColor;
-  return (
-    <Container
-      color={color}
-      width={width}
-      height={height}
-      top={top}
-      left={left}
-    />
-  );
+  return <Container color={color} width={width} height={height} top={top} left={left} />;
 };
 
 const Container = styled.div<{

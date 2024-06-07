@@ -31,10 +31,7 @@ const Content = ({ list }: ContentProps) => {
             <Text tag="span" variant="label-2">
               •
             </Text>
-            <LinkButton
-              onClick={() => handleClickPlaybook(playbook.id)}
-              variant="label-3"
-            >
+            <LinkButton onClick={() => handleClickPlaybook(playbook.id)} variant="label-3">
               {t('details')}
             </LinkButton>
           </Stack>

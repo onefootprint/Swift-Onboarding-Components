@@ -1,8 +1,4 @@
-import {
-  COUNTRIES_WITH_PROVINCES,
-  COUNTRIES_WITH_STATES,
-  STATES,
-} from '@onefootprint/global-constants';
+import { COUNTRIES_WITH_PROVINCES, COUNTRIES_WITH_STATES, STATES } from '@onefootprint/global-constants';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -24,8 +20,7 @@ const StateField = () => {
   const isCountryUs = country.value === 'US';
 
   const shouldCollect =
-    COUNTRIES_WITH_STATES.includes(country.value) ||
-    COUNTRIES_WITH_PROVINCES.includes(country.value);
+    COUNTRIES_WITH_STATES.includes(country.value) || COUNTRIES_WITH_PROVINCES.includes(country.value);
   if (!shouldCollect) {
     return null;
   }

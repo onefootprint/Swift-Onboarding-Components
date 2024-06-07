@@ -50,17 +50,9 @@ const DomainRestrictions = () => {
           padding={5}
         >
           <Header hasRestrictions={hasRestrictions} isLoading={isLoading} />
-          <List
-            allowedDomains={data?.allowedOrigins}
-            error={error}
-            isLoading={isLoading}
-          />
+          <List allowedDomains={data?.allowedOrigins} error={error} isLoading={isLoading} />
         </Stack>
-        <CreateDialog
-          allowedDomains={data?.allowedOrigins}
-          onClose={handleClose}
-          open={addDialogOpen}
-        />
+        <CreateDialog allowedDomains={data?.allowedOrigins} onClose={handleClose} open={addDialogOpen} />
       </Box>
     </>
   );

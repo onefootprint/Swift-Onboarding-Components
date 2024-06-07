@@ -1,7 +1,4 @@
-import {
-  InvestorProfileAnnualIncome,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import { InvestorProfileAnnualIncome, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import { Logger } from '../../../../utils/logger';
@@ -30,10 +27,9 @@ const Income = () => {
         });
       },
       onError: (error: string) => {
-        Logger.error(
-          `Encountered error while speculatively syncing data on investor profile income page: ${error}`,
-          { location: 'investor-profile-income' },
-        );
+        Logger.error(`Encountered error while speculatively syncing data on investor profile income page: ${error}`, {
+          location: 'investor-profile-income',
+        });
       },
     });
   };
@@ -45,9 +41,7 @@ const Income = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDI.annualIncome]:
-            data?.[InvestorProfileDI.annualIncome] ||
-            InvestorProfileAnnualIncome.le25k,
+          [InvestorProfileDI.annualIncome]: data?.[InvestorProfileDI.annualIncome] || InvestorProfileAnnualIncome.le25k,
         }}
       />
     </>

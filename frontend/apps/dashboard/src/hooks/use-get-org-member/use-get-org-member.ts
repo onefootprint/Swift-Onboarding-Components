@@ -13,11 +13,7 @@ type GetOrgMemberRequest = {
   isAssumedSessionEditMode: boolean;
 };
 
-export const getOrgMemberRequest = async ({
-  auth,
-  isLive,
-  isAssumedSessionEditMode,
-}: GetOrgMemberRequest) => {
+export const getOrgMemberRequest = async ({ auth, isLive, isAssumedSessionEditMode }: GetOrgMemberRequest) => {
   const headers = {
     [DASHBOARD_AUTHORIZATION_HEADER]: auth,
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(isLive),

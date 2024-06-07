@@ -1,4 +1,4 @@
-import { type Icon, IcoWarning16 } from '@onefootprint/icons';
+import { IcoWarning16, type Icon } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -23,11 +23,7 @@ const PromptWithGuidelines = ({
   <Container>
     {Icon && <Icon color={variant === 'error' ? 'error' : 'primary'} />}
     <Stack direction="column" gap={3}>
-      <Text
-        variant="label-1"
-        color={variant === 'error' ? 'error' : 'primary'}
-        textAlign="center"
-      >
+      <Text variant="label-1" color={variant === 'error' ? 'error' : 'primary'} textAlign="center">
         {title}
       </Text>
       {description && (
@@ -45,14 +41,7 @@ const PromptWithGuidelines = ({
             </Text>
           ) : (
             guidelines.map(guideline => (
-              <Text
-                key={guideline}
-                variant="body-2"
-                color="secondary"
-                tag="li"
-                textAlign="left"
-                width="100%"
-              >
+              <Text key={guideline} variant="body-2" color="secondary" tag="li" textAlign="left" width="100%">
                 {guideline}
               </Text>
             ))

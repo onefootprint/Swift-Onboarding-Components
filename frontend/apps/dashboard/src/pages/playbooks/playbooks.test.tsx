@@ -1,9 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import Playbooks from './playbooks';
@@ -54,21 +49,18 @@ describe('<Playbooks />', () => {
           key: 'ob_test_QhzzskOCGDZjvIKNzx91tY',
         },
       ],
-    ])(
-      'should render the name, kind, key and status',
-      async ({ name, kind, key }) => {
-        await renderPlaybooksAndWait();
+    ])('should render the name, kind, key and status', async ({ name, kind, key }) => {
+      await renderPlaybooksAndWait();
 
-        const rowName = screen.getByText(name);
-        expect(rowName).toBeInTheDocument();
+      const rowName = screen.getByText(name);
+      expect(rowName).toBeInTheDocument();
 
-        const rowKind = screen.getByText(kind);
-        expect(rowKind).toBeInTheDocument();
+      const rowKind = screen.getByText(kind);
+      expect(rowKind).toBeInTheDocument();
 
-        const rowKey = screen.getByText(key);
-        expect(rowKey).toBeInTheDocument();
-      },
-    );
+      const rowKey = screen.getByText(key);
+      expect(rowKey).toBeInTheDocument();
+    });
   });
 
   describe('when the request to fetch playbooks fails', () => {

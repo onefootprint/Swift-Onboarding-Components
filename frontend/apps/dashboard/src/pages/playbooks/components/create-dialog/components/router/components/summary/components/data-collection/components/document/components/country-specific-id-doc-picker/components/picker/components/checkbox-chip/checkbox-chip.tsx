@@ -9,24 +9,9 @@ type CheckboxChipProps = {
   value: string;
 };
 
-const CheckboxChip = ({
-  isSelected,
-  onChange,
-  label,
-  value,
-}: CheckboxChipProps) => (
-  <Container
-    direction="row"
-    borderRadius="default"
-    align="center"
-    data-is-selected={isSelected}
-  >
-    <Checkbox
-      value={value}
-      label={label}
-      checked={isSelected}
-      onChange={onChange}
-    />
+const CheckboxChip = ({ isSelected, onChange, label, value }: CheckboxChipProps) => (
+  <Container direction="row" borderRadius="default" align="center" data-is-selected={isSelected}>
+    <Checkbox value={value} label={label} checked={isSelected} onChange={onChange} />
   </Container>
 );
 

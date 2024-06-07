@@ -9,13 +9,7 @@ const BOOTSTRAP_FIELDS_HEADER = 'X-Fp-Bootstrapped-Fields';
 const { logInfo } = getLogger({ location: 'use-user-data' });
 
 const userDataRequest = async (payload: UserDataRequest) => {
-  const {
-    data: rawData,
-    bootstrapDis,
-    authToken,
-    allowExtraFields,
-    speculative,
-  } = payload;
+  const { data: rawData, bootstrapDis, authToken, allowExtraFields, speculative } = payload;
   const data = Object.fromEntries(
     Object.entries(rawData).filter(
       // Don't send null or undefined or empty values

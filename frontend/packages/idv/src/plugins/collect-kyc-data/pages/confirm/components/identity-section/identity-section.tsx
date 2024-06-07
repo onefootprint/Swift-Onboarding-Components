@@ -6,24 +6,14 @@ import { useToast } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type {
-  SectionAction,
-  SectionItemProps,
-} from '../../../../../../components/confirm-collected-data';
-import {
-  Section,
-  SectionItem,
-} from '../../../../../../components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
+import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import { FPCustomEvents, sendCustomEvent } from '../../../../../../utils';
 import { Logger } from '../../../../../../utils/logger';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
 import type { KycData } from '../../../../utils/data-types';
-import {
-  getSsnKind,
-  getSsnValue,
-  ssnFormatter,
-} from '../../../../utils/ssn-utils';
+import { getSsnKind, getSsnValue, ssnFormatter } from '../../../../utils/ssn-utils';
 import isCountryUsOrTerritories from '../../../../utils/state-machine/utils/is-country-us-or-territories';
 import Ssn from '../../../ssn';
 import useStepUp from './hooks/use-step-up';
@@ -65,10 +55,7 @@ const IdentitySection = () => {
         ? t('confirm.identity.ssn-skipped-subtext')
         : ssnFormatter(ssnKind, ssn?.value, ssnValueType === SsnValue.hidden);
 
-    const text =
-      ssnKind === 'ssn9'
-        ? t('confirm.identity.ssn9')
-        : t('confirm.identity.ssn4');
+    const text = ssnKind === 'ssn9' ? t('confirm.identity.ssn9') : t('confirm.identity.ssn4');
 
     return [{ text, subtext: ssnDisplayVal }];
   };
@@ -90,26 +77,12 @@ const IdentitySection = () => {
 
   const getSectionContent = () => {
     if (!editing) {
-      const identityItems = identity.map(
-        ({ text, subtext, textColor }: SectionItemProps) => (
-          <SectionItem
-            key={text}
-            text={text}
-            subtext={subtext}
-            textColor={textColor}
-          />
-        ),
-      );
+      const identityItems = identity.map(({ text, subtext, textColor }: SectionItemProps) => (
+        <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
+      ));
       return identityItems;
     }
-    return (
-      <Ssn
-        onCancel={stopEditing}
-        onComplete={stopEditing}
-        hideHeader
-        hideDisclaimer
-      />
-    );
+    return <Ssn onCancel={stopEditing} onComplete={stopEditing} hideHeader hideDisclaimer />;
   };
 
   const handleDecryptSuccess = (payload: DecryptUserResponse) => {
@@ -164,12 +137,9 @@ const IdentitySection = () => {
       {
         onSuccess: handleDecryptSuccess,
         onError: (error: unknown) => {
-          Logger.error(
-            `Decrypting SSN after step up failed in kyc confirm page. ${getErrorMessage(
-              error,
-            )}`,
-            { location: 'kyc-confirm' },
-          );
+          Logger.error(`Decrypting SSN after step up failed in kyc confirm page. ${getErrorMessage(error)}`, {
+            location: 'kyc-confirm',
+          });
           showErrorToast();
         },
       },
@@ -186,10 +156,7 @@ const IdentitySection = () => {
     device,
     onSuccess: handleStepUpSuccess,
     onError: (error: unknown) => {
-      Logger.warn(
-        `useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`,
-        { location: 'kyc-confirm' },
-      );
+      Logger.warn(`useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`, { location: 'kyc-confirm' });
       showErrorToast();
     },
   });
@@ -201,10 +168,9 @@ const IdentitySection = () => {
     } else if (shouldTriggerStepUp) {
       stepUp();
     } else {
-      Logger.error(
-        'Attempted to reveal SSN on confirm page when step up is not available',
-        { location: 'kyc-confirm' },
-      );
+      Logger.error('Attempted to reveal SSN on confirm page when step up is not available', {
+        location: 'kyc-confirm',
+      });
     }
   };
 

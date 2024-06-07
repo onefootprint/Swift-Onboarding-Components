@@ -1,18 +1,9 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUserFirmEmployee, resetUser } from 'src/config/tests';
 
 import Tenants from './tenants';
-import {
-  tenantsFixture,
-  withTenants,
-  withTenantsError,
-} from './tenants.test.config';
+import { tenantsFixture, withTenants, withTenantsError } from './tenants.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 

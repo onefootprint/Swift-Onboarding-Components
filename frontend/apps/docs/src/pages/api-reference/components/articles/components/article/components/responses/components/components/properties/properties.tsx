@@ -1,10 +1,11 @@
-import { CodeInline, createFontStyles, Text } from '@onefootprint/ui';
+import { CodeInline, Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 type PropertiesProps = {
-  properties: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  properties: Record<string, any>;
   title: string;
 };
 
@@ -22,10 +23,7 @@ const Properties = ({ properties, title }: PropertiesProps) => {
         )}
       </Title>
       {properties.description && (
-        <Description>
-          {properties.description.charAt(0).toUpperCase() +
-            properties.description.slice(1)}
-        </Description>
+        <Description>{properties.description.charAt(0).toUpperCase() + properties.description.slice(1)}</Description>
       )}
       {properties.enum && (
         <AllowedValues>

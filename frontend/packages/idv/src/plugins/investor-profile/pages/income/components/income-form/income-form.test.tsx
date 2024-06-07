@@ -1,33 +1,15 @@
 import '../../../../../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
-import {
-  InvestorProfileAnnualIncome,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { InvestorProfileAnnualIncome, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import type { IncomeFormProps } from './income-form';
 import IncomeForm from './income-form';
 
 describe('<IncomeForm />', () => {
-  const renderForm = ({
-    defaultValues,
-    isLoading,
-    onSubmit = () => {},
-  }: Partial<IncomeFormProps>) => {
-    customRender(
-      <IncomeForm
-        defaultValues={defaultValues}
-        isLoading={isLoading}
-        onSubmit={onSubmit}
-      />,
-    );
+  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<IncomeFormProps>) => {
+    customRender(<IncomeForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
   };
 
   it('onSubmit is called when form is submitted', async () => {

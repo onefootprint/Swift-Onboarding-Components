@@ -9,9 +9,7 @@ type WorkflowTriggeredEventBodyProps = {
   data: ExternalIntegrationCalledData;
 };
 
-const WorkflowTriggeredEventBody = ({
-  data,
-}: WorkflowTriggeredEventBodyProps) => {
+const WorkflowTriggeredEventBody = ({ data }: WorkflowTriggeredEventBodyProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.external-integration-called',
   });

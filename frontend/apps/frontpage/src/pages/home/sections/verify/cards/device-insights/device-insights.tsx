@@ -75,10 +75,7 @@ const DeviceInsights = () => {
   const [showWhatsThis, setShowWhatsThis] = useState(false);
 
   return (
-    <BaseCard
-      backgroundImage="/home/verify-cards/custom-map.png"
-      overflow="hidden"
-    >
+    <BaseCard backgroundImage="/home/verify-cards/custom-map.png" overflow="hidden">
       <CardTitle title={t('title')} subtitle={t('subtitle')} />
       <Box position="relative" width="100%" height="100%" minHeight="260px">
         {deviceCards.map(card => (
@@ -103,10 +100,7 @@ const DeviceInsights = () => {
             onWhatsThisClick={() => setShowWhatsThis(true)}
           />
         )}
-        <WhatIsThisCard
-          $isVisible={showWhatsThis}
-          onClose={() => setShowWhatsThis(false)}
-        />
+        <WhatIsThisCard $isVisible={showWhatsThis} onClose={() => setShowWhatsThis(false)} />
       </Box>
     </BaseCard>
   );

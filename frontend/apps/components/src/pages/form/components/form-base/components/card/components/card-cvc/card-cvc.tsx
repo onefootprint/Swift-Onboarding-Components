@@ -11,15 +11,7 @@ export enum CvcLength {
 
 export type CardCvcProps = Omit<
   InputProps,
-  | 'autoComplete'
-  | 'inputMode'
-  | 'mask'
-  | 'value'
-  | 'maxLength'
-  | 'minLength'
-  | 'placeholder'
-  | 'size'
-  | 'type'
+  'autoComplete' | 'inputMode' | 'mask' | 'value' | 'maxLength' | 'minLength' | 'placeholder' | 'size' | 'type'
 > & {
   numDigits: CvcLength;
   invalidMessage?: string;
@@ -27,19 +19,7 @@ export type CardCvcProps = Omit<
 };
 
 const CardCvc = forwardRef<HTMLInputElement, CardCvcProps>(
-  (
-    {
-      numDigits,
-      hasError,
-      hint,
-      onChange,
-      onBlur,
-      label,
-      value,
-      ...props
-    }: CardCvcProps,
-    ref,
-  ) => {
+  ({ numDigits, hasError, hint, onChange, onBlur, label, value, ...props }: CardCvcProps, ref) => {
     const { t } = useTranslation('common', {
       keyPrefix: 'pages.secure-form.card.form.cvc',
     });

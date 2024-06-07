@@ -55,11 +55,7 @@ const Tooltip = ({
           <TriggerContainer data-tooltip-trigger>{children}</TriggerContainer>
         </TooltipPrimitive.Trigger>
         {(open || controlledOpen) && !disabled ? (
-          <TooltipContainer
-            side={position}
-            align={alignment}
-            sideOffset={sideOffset}
-          >
+          <TooltipContainer side={position} align={alignment} sideOffset={sideOffset}>
             {text}
           </TooltipContainer>
         ) : null}

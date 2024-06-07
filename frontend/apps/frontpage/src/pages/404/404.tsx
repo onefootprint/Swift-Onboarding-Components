@@ -10,24 +10,12 @@ const Page404 = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.404' });
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/404"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/404" />
       <Container width="100%" justifyContent="center" alignItems="center">
         <EmptyState
           title={t('title')}
           description={t('description')}
-          renderHeader={() => (
-            <Image
-              alt={t('image.alt')}
-              height={212}
-              src="/404.png"
-              width={298}
-              priority
-            />
-          )}
+          renderHeader={() => <Image alt={t('image.alt')} height={212} src="/404.png" width={298} priority />}
         />
       </Container>
     </>

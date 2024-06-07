@@ -34,10 +34,7 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
       { authToken },
       {
         onError: e => {
-          logError(
-            'Identifying user by auth token failed in init-auth-token page in identify',
-            e,
-          );
+          logError('Identifying user by auth token failed in init-auth-token page in identify', e);
           send({ type: 'authTokenInvalid' });
         },
         onSuccess: res => {
@@ -45,10 +42,7 @@ const InitAuthToken = ({ authToken, children }: InitAuthTokenProps) => {
             // Require the user to re-auth if either the token has no scopes or the Identify
             // variant requires a scope and the token doesn't have it
             const needsAuth =
-              !res.user.tokenScopes.length ||
-              requiredScopes[variant].some(
-                s => !res.user?.tokenScopes.includes(s),
-              );
+              !res.user.tokenScopes.length || requiredScopes[variant].some(s => !res.user?.tokenScopes.includes(s));
             if (!needsAuth) {
               send({
                 type: 'identifiedWithSufficientScopes',

@@ -11,16 +11,16 @@ export const evaluateSchemaRef = (ref: string) => {
 };
 
 const getSchema = (schemaKey: string) => {
-  const schema = staticAPIData.components.schemas[
-    schemaKey as keyof typeof staticAPIData.components.schemas
-  ] as ContentSchema | undefined;
+  const schema = staticAPIData.components.schemas[schemaKey as keyof typeof staticAPIData.components.schemas] as
+    | ContentSchema
+    | undefined;
   const previewSchema = staticPreviewData.components.schemas[
     schemaKey as keyof typeof staticPreviewData.components.schemas
   ] as ContentSchema | undefined;
   // TODO this logic is pretty messy... we shouldn't do this with globals
-  const hostedSchemas = hostedApiData.components.schemas[
-    schemaKey as keyof typeof hostedApiData.components.schemas
-  ] as ContentSchema | undefined;
+  const hostedSchemas = hostedApiData.components.schemas[schemaKey as keyof typeof hostedApiData.components.schemas] as
+    | ContentSchema
+    | undefined;
   const privateSchema = privateApiData.components.schemas[
     schemaKey as keyof typeof privateApiData.components.schemas
   ] as ContentSchema | undefined;
@@ -47,11 +47,7 @@ const DefaultFieldValues: Record<string, string> = {
   ip_address: '192.168.1.1',
 };
 
-export const getExample = (
-  schema?: ContentSchema,
-  name?: string,
-  index = 0,
-): unknown => {
+export const getExample = (schema?: ContentSchema, name?: string, index = 0): unknown => {
   if (!schema) {
     return null;
   }

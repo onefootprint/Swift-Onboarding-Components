@@ -1,9 +1,6 @@
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
-import type {
-  OrgAuthLoginRequest,
-  OrgAuthLoginResponse,
-} from '@onefootprint/types';
+import type { OrgAuthLoginRequest, OrgAuthLoginResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/router';

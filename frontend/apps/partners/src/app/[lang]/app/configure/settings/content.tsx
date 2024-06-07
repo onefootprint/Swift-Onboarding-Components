@@ -23,22 +23,11 @@ import styled from 'styled-components';
 
 import type { Lang } from '@/app/types';
 import type { WithConfirm } from '@/helpers';
-import {
-  alertError,
-  confirmDeletion,
-  dateFormatter,
-  getErrorMessage,
-  searchByPaths,
-} from '@/helpers';
+import { alertError, confirmDeletion, dateFormatter, getErrorMessage, searchByPaths } from '@/helpers';
 import type { Session } from '@/hooks';
 import { useClientStore } from '@/hooks';
 import type { OrganizationMember, PartnerOrganization } from '@/queries';
-import {
-  patchPartner,
-  patchPartnerMembers,
-  postPartnerMembers,
-  postPartnerMembersDeactivate,
-} from '@/queries';
+import { patchPartner, patchPartnerMembers, postPartnerMembers, postPartnerMembersDeactivate } from '@/queries';
 
 import { InputTextForm, LogoManager, OverlayFieldSet } from '../../components';
 import OverlayInvite from './components/overlay-invite';
@@ -61,22 +50,12 @@ const getColumns = (t: T) => [
   { id: 'actions', text: '', width: '5%' },
 ];
 
-const clientSearch = searchByPaths<OrganizationMember>([
-  'firstName',
-  'lastName',
-  'email',
-  'role.name',
-]);
+const clientSearch = searchByPaths<OrganizationMember>(['firstName', 'lastName', 'email', 'role.name']);
 
 const amIAdmin = (data?: Session): boolean =>
   data?.user?.scopes.some(x => x.kind === 'compliance_partner_admin') || false;
 
-const SettingsPageContent = ({
-  lang,
-  members,
-  partner,
-  roles,
-}: SettingsPageContentProps) => {
+const SettingsPageContent = ({ lang, members, partner, roles }: SettingsPageContentProps) => {
   const { t } = useTranslation('common');
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [search, setSearch] = useState<string>('');
@@ -140,11 +119,7 @@ const SettingsPageContent = ({
         <LogoManager organization={partner} />
         <Stack gap={11} flexWrap="wrap">
           <OverlayFieldSet
-            dialogHeader={
-              companyName
-                ? t('companies.edit-company-name')
-                : t('companies.add-company-name')
-            }
+            dialogHeader={companyName ? t('companies.edit-company-name') : t('companies.add-company-name')}
             dialogCancel={t('cancel')}
             dialogDelete={t('delete')}
             dialogSave={t('save')}
@@ -157,21 +132,12 @@ const SettingsPageContent = ({
                 label={t('companies.company-name')}
                 requiredMsg={t('required')}
                 value={companyName}
-                onSubmit={name =>
-                  patchPartner({ name })
-                    .then(closeDialog)
-                    .then(route.refresh)
-                    .catch(errorToast)
-                }
+                onSubmit={name => patchPartner({ name }).then(closeDialog).then(route.refresh).catch(errorToast)}
               />
             )}
           </OverlayFieldSet>
           <OverlayFieldSet
-            dialogHeader={
-              companyWebsiteUrl
-                ? t('companies.edit-company-website')
-                : t('companies.add-company-website')
-            }
+            dialogHeader={companyWebsiteUrl ? t('companies.edit-company-website') : t('companies.add-company-website')}
             dialogCancel={t('cancel')}
             dialogDelete={t('delete')}
             dialogSave={t('save')}
@@ -183,10 +149,7 @@ const SettingsPageContent = ({
                 formId={id}
                 label={t('companies.company-website')}
                 onSubmit={websiteUrl =>
-                  patchPartner({ websiteUrl })
-                    .then(closeDialog)
-                    .then(route.refresh)
-                    .catch(errorToast)
+                  patchPartner({ websiteUrl }).then(closeDialog).then(route.refresh).catch(errorToast)
                 }
                 requiredMsg={t('required')}
                 value={companyWebsiteUrl}
@@ -236,10 +199,7 @@ const SettingsPageContent = ({
       />
       <OverlayInvite
         roles={roles}
-        defaultRole={
-          roles.find(x => x.label.includes('Member')) ||
-          roles[0] || { label: '', value: '' }
-        }
+        defaultRole={roles.find(x => x.label.includes('Member')) || roles[0] || { label: '', value: '' }}
         isOpen={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
         onSubmit={invitations => {
@@ -314,21 +274,12 @@ const renderTr = ({
         ) : (
           <Td>{member.role.name}</Td>
         )}
-        <Td>
-          {!lastLoginAt && <Badge variant="warning">{t('pending')}</Badge>}
-        </Td>
+        <Td>{!lastLoginAt && <Badge variant="warning">{t('pending')}</Badge>}</Td>
         {isAdmin ? (
           <Td>
-            <Box
-              tag="div"
-              display="grid"
-              justifyContent="end"
-              alignItems="center"
-            >
+            <Box tag="div" display="grid" justifyContent="end" alignItems="center">
               <Dropdown.Root>
-                <Dropdown.Trigger
-                  aria-label={`${t('open-actions-for')} ${member.email}`}
-                >
+                <Dropdown.Trigger aria-label={`${t('open-actions-for')} ${member.email}`}>
                   <IcoDotsHorizontal24 />
                 </Dropdown.Trigger>
                 <Dropdown.Content align="end">

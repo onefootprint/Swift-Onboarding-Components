@@ -10,10 +10,7 @@ type OtherTenantSummaryProps = {
   isSameTenantDataEmpty?: boolean;
 };
 
-const OtherTenantSummary = ({
-  isSameTenantDataEmpty,
-  summary,
-}: OtherTenantSummaryProps) => {
+const OtherTenantSummary = ({ isSameTenantDataEmpty, summary }: OtherTenantSummaryProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.duplicate-data.other-tenants-summary',
   });

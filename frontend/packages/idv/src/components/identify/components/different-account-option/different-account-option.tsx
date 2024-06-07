@@ -1,4 +1,4 @@
-import { createFontStyles, Divider, LinkButton, Stack } from '@onefootprint/ui';
+import { Divider, LinkButton, Stack, createFontStyles } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,8 +28,7 @@ const DifferentAccountOption = () => {
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const { ShouldHideBootstrappedLoginWithDifferent } = useFlags();
   const orgIds = new Set<string>(ShouldHideBootstrappedLoginWithDifferent);
-  const showLoginWithDifferentOption =
-    config && !orgIds.has(config.orgId) && isBootstrap;
+  const showLoginWithDifferentOption = config && !orgIds.has(config.orgId) && isBootstrap;
 
   if (!showLoginWithDifferentOption) {
     return null;
@@ -44,10 +43,7 @@ const DifferentAccountOption = () => {
         </Label>
       </DividerContainer>
       <Stack direction="row" justify="center" align="center" width="100%">
-        <LinkButton
-          onClick={handleLoginWithDifferent}
-          data-dd-action-name="different-account:cta"
-        >
+        <LinkButton onClick={handleLoginWithDifferent} data-dd-action-name="different-account:cta">
           {t('label')}
         </LinkButton>
       </Stack>

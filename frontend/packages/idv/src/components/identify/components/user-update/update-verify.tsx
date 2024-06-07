@@ -52,9 +52,7 @@ const UpdateVerify = ({
   const toast = useToast();
   const mutUserChallenge = useUserChallenge();
   const mutUserChallengeVerify = useUserChallengeVerify();
-  const [challengeData, setChallengeData] = useState<
-    UserChallengeResponse | undefined
-  >(undefined);
+  const [challengeData, setChallengeData] = useState<UserChallengeResponse | undefined>(undefined);
   const isChallengePending = mutUserChallenge.isLoading || !challengeData;
 
   const handleRequestReplace = (payload: UserChallengeBody) => {
@@ -105,9 +103,7 @@ const UpdateVerify = ({
           if (identifyVariant === IdentifyVariant.updateLoginMethods) {
             toast.show({
               title: t('success'),
-              description: t(
-                `${challengePayload.kind}-update-success` as ParseKeys<'identify'>,
-              ),
+              description: t(`${challengePayload.kind}-update-success` as ParseKeys<'identify'>),
             });
           }
           setTimeout(onChallengeVerificationSuccess, SUCCESS_EVENT_DELAY_MS);
@@ -117,10 +113,7 @@ const UpdateVerify = ({
   };
 
   const handleOnResendClick = () => {
-    const shouldResend = shouldRequestNewChallenge(
-      challengeData,
-      challengePayload.kind,
-    );
+    const shouldResend = shouldRequestNewChallenge(challengeData, challengePayload.kind);
     if (shouldResend) {
       handleRequestReplace({ ...challengePayload, actionKind });
     }
@@ -148,9 +141,7 @@ const UpdateVerify = ({
         isResendLoading={mutUserChallenge.isLoading}
         isSuccess={mutUserChallengeVerify.isSuccess}
         isVerifying={mutUserChallengeVerify.isLoading}
-        onComplete={
-          mutUserChallengeVerify.isLoading ? noop : handleOnPinInputCompletion
-        }
+        onComplete={mutUserChallengeVerify.isLoading ? noop : handleOnPinInputCompletion}
         onResend={handleOnResendClick}
         resendDisabledUntil={challengeData?.retryDisabledUntil}
         texts={{

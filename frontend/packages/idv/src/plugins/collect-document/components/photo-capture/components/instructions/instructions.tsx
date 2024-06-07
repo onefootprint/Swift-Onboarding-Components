@@ -1,10 +1,5 @@
 import type { IconProps } from '@onefootprint/icons';
-import {
-  IcoLayer0124,
-  IcoSmartphone224,
-  IcoSparkles24,
-  IcoSquareFrame24,
-} from '@onefootprint/icons';
+import { IcoLayer0124, IcoSmartphone224, IcoSparkles24, IcoSquareFrame24 } from '@onefootprint/icons';
 import { BottomSheet } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,11 +13,7 @@ type InstructionProps = {
   autocaptureKind: AutocaptureKind;
 };
 
-const Instructions = ({
-  onClose,
-  isOpen,
-  autocaptureKind,
-}: InstructionProps) => {
+const Instructions = ({ onClose, isOpen, autocaptureKind }: InstructionProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.components.photo-capture.instructions',
   });

@@ -7,9 +7,7 @@ type DescriptionProps = {
   children: string;
 };
 
-const Description = ({ children }: DescriptionProps) => (
-  <Content>{parseElements(children)}</Content>
-);
+const Description = ({ children }: DescriptionProps) => <Content>{parseElements(children)}</Content>;
 
 /**
  * The descriptions of fields may include markdown-esque syntax for a few common elements,

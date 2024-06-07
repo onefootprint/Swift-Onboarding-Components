@@ -175,13 +175,9 @@ export const RolesFixture: Role[] = [
   },
 ];
 
-export const memberToEdit = membersFixture.find(
-  member => member.email === 'jane.doe@acme.com',
-) as Member;
+export const memberToEdit = membersFixture.find(member => member.email === 'jane.doe@acme.com') as Member;
 
-export const memberToEditRole = RolesFixture.find(
-  role => role.name === 'Developer',
-) as Role;
+export const memberToEditRole = RolesFixture.find(role => role.name === 'Developer') as Role;
 
 export const withMembers = (members: Member[] = membersFixture) =>
   mockRequest({

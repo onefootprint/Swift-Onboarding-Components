@@ -20,8 +20,7 @@ const getSdkArgs = async (authToken: string, fpProvider: ProviderReturn) => {
     url: '/org/sdk_args',
     headers: sdkContextModel
       ? {
-          'x-fp-client-version':
-            `footprint-js ${sdkContextModel.sdkVersion} ${sdkContextModel.sdkUrl}`.trim(),
+          'x-fp-client-version': `footprint-js ${sdkContextModel.sdkVersion} ${sdkContextModel.sdkUrl}`.trim(),
           'x-fp-sdk-args-token': authToken,
         }
       : { 'x-fp-sdk-args-token': authToken },
@@ -38,14 +37,10 @@ const useGetSdkArgs = (
     onError: (error: RequestError) => void;
   },
 ) =>
-  useQuery(
-    [authToken, 'get-sdk-args'],
-    () => getSdkArgs(authToken, fpProvider),
-    {
-      enabled: isValidTokenFormat(authToken),
-      onSuccess: options?.onSuccess,
-      onError: options?.onError,
-    },
-  );
+  useQuery([authToken, 'get-sdk-args'], () => getSdkArgs(authToken, fpProvider), {
+    enabled: isValidTokenFormat(authToken),
+    onSuccess: options?.onSuccess,
+    onError: options?.onError,
+  });
 
 export default useGetSdkArgs;

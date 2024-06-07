@@ -35,9 +35,7 @@ const Tenants = () => {
   const { logIn } = useSession();
   const router = useRouter();
 
-  const [drawerTenantId, setDrawerTenantId] = useState<string | undefined>(
-    undefined,
-  );
+  const [drawerTenantId, setDrawerTenantId] = useState<string | undefined>(undefined);
 
   const handleAssumeTenant = (tenant: Tenant) => {
     useAssumeTenantMutation.mutate(
@@ -79,9 +77,7 @@ const Tenants = () => {
           isLoading={isLoading}
           items={response?.data}
           onChangeSearchText={handleSearchChange}
-          renderTr={tenant => (
-            <Row tenant={tenant.item} onAssumeTenant={handleAssumeTenant} />
-          )}
+          renderTr={tenant => <Row tenant={tenant.item} onAssumeTenant={handleAssumeTenant} />}
           onRowClick={handleOpenDrawer}
           searchPlaceholder={searchPlaceholder}
         />

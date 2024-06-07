@@ -24,10 +24,7 @@ const Label = ({ children, cta }: LabelProps) => {
         {children}
       </Text>
       {cta && (
-        <PermissionGate
-          scopeKind={RoleScopeKind.orgSettings}
-          fallbackText={t('not-allowed')}
-        >
+        <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
           <IconButton aria-label={cta.label} onClick={cta.onClick}>
             <IcoPencil16 />
           </IconButton>

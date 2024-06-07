@@ -17,17 +17,13 @@ const groupBySection = (risksSignals: RiskSignal[]) => {
     if (riskSignal.scopes.some(signalAttribute => isBasic(signalAttribute))) {
       sections.basic.push(riskSignal);
     }
-    if (
-      riskSignal.scopes.some(signalAttribute => isIdentity(signalAttribute))
-    ) {
+    if (riskSignal.scopes.some(signalAttribute => isIdentity(signalAttribute))) {
       sections.identity.push(riskSignal);
     }
     if (riskSignal.scopes.some(signalAttribute => isAddress(signalAttribute))) {
       sections.address.push(riskSignal);
     }
-    if (
-      riskSignal.scopes.some(signalAttribute => isDocument(signalAttribute))
-    ) {
+    if (riskSignal.scopes.some(signalAttribute => isDocument(signalAttribute))) {
       sections.document.push(riskSignal);
     }
   });
@@ -46,10 +42,7 @@ const isBasic = (signalAttribute: RiskSignalAttribute) => {
 };
 
 const isIdentity = (signalAttribute: RiskSignalAttribute) => {
-  if (
-    signalAttribute === RiskSignalAttribute.ssn ||
-    signalAttribute === RiskSignalAttribute.dob
-  ) {
+  if (signalAttribute === RiskSignalAttribute.ssn || signalAttribute === RiskSignalAttribute.dob) {
     return true;
   }
   return false;
@@ -70,7 +63,6 @@ const isAddress = (signalAttribute: RiskSignalAttribute) => {
 };
 
 const isDocument = (signalAttribute: RiskSignalAttribute) =>
-  signalAttribute === RiskSignalAttribute.document ||
-  signalAttribute === RiskSignalAttribute.selfie;
+  signalAttribute === RiskSignalAttribute.document || signalAttribute === RiskSignalAttribute.selfie;
 
 export default groupBySection;

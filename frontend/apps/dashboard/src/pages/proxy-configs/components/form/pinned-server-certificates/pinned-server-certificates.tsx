@@ -3,10 +3,7 @@ import { LinkButton, Text, TextArea } from '@onefootprint/ui';
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import type {
-  FormData,
-  StepProps,
-} from 'src/pages/proxy-configs/proxy-configs.types';
+import type { FormData, StepProps } from 'src/pages/proxy-configs/proxy-configs.types';
 
 import FormGrid from '../form-grid';
 import UploadFile from '../upload-file';
@@ -49,9 +46,7 @@ const PinnedServerCertificates = ({ id, onSubmit, values }: StepProps) => {
             id={`certificate.${index}`}
             key={field.id}
             label={t('certificate.label')}
-            onChange={value =>
-              setValue(`pinnedServerCertificates.${index}.certificate`, value)
-            }
+            onChange={value => setValue(`pinnedServerCertificates.${index}.certificate`, value)}
             onRemove={fields.length >= 2 ? handleRemove(index) : undefined}
           >
             <TextArea
@@ -63,11 +58,7 @@ const PinnedServerCertificates = ({ id, onSubmit, values }: StepProps) => {
           </UploadFile>
         ))}
       </FormGrid>
-      <LinkButton
-        iconComponent={IcoPlusSmall16}
-        iconPosition="left"
-        onClick={handleAdd}
-      >
+      <LinkButton iconComponent={IcoPlusSmall16} iconPosition="left" onClick={handleAdd}>
         {t('add-more')}
       </LinkButton>
     </form>

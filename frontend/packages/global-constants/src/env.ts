@@ -1,8 +1,6 @@
-const getBranchSlug = (branchName: string) =>
-  branchName.toLowerCase().split('/').join('-');
+const getBranchSlug = (branchName: string) => branchName.toLowerCase().split('/').join('-');
 
-export const IS_VERCEL_PREVIEW =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
+export const IS_VERCEL_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
 export const IS_TEST = process.env.NODE_ENV === 'test';
 export const IS_E2E = process.env.IS_E2E === 'true';
 export const IS_CI = process.env.CI === 'true';
@@ -88,12 +86,9 @@ export const DOCS_BASE_URL = createGetProjectUrl({
 })(env, branchName);
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-const LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD =
-  process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD;
-const LAUNCH_DARKLY_CLIENT_SIDE_ID_PREVIEW =
-  process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_PREVIEW;
-const LAUNCH_DARKLY_CLIENT_SIDE_ID_DEV =
-  process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_DEV;
+const LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD = process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD;
+const LAUNCH_DARKLY_CLIENT_SIDE_ID_PREVIEW = process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_PREVIEW;
+const LAUNCH_DARKLY_CLIENT_SIDE_ID_DEV = process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_DEV;
 
 const getLaunchDarklyClientSideId = () => {
   const baseUrl = API_BASE_URL ?? '';

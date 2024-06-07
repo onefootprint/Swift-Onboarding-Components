@@ -7,10 +7,7 @@ import type { BreadcrumbItemProps } from './breadcrumb-item';
 import BreadcrumbItem from './breadcrumb-item';
 
 describe('<BreadcrumbItem />', () => {
-  const renderBreadcrumbItem = ({
-    children = 'lorem',
-    href = '#',
-  }: Partial<BreadcrumbItemProps>) =>
+  const renderBreadcrumbItem = ({ children = 'lorem', href = '#' }: Partial<BreadcrumbItemProps>) =>
     customRender(<BreadcrumbItem href={href}>{children}</BreadcrumbItem>);
 
   it('should render the content', () => {

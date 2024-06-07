@@ -5,8 +5,7 @@ export type LoadRulesProps = {
   rules?: string | null;
 };
 
-const LoadRules = ({ rules }: LoadRulesProps) =>
-  rules ? <CustomRules rules={rules} /> : null;
+const LoadRules = ({ rules }: LoadRulesProps) => (rules ? <CustomRules rules={rules} /> : null);
 
 const CustomRules = createGlobalStyle<{
   rules?: string;

@@ -46,11 +46,7 @@ const List = () => {
         </Wrapper>
       </HeaderContainer>
       <Stack direction="column">
-        <Table
-          data={response?.data}
-          errorMessage={errorMessage}
-          isLoading={isLoading}
-        />
+        <Table data={response?.data} errorMessage={errorMessage} isLoading={isLoading} />
       </Stack>
       <CreateDialog open={dialogOpen} onClose={handleClose} />
     </Container>

@@ -1,9 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { clickOnAction } from 'src/config/tests';
 
@@ -160,9 +155,7 @@ describe('<ProxyConfigs />', () => {
           ]);
 
           await waitFor(() => {
-            const feedback = screen.getByText(
-              'Vault proxy configuration updated',
-            );
+            const feedback = screen.getByText('Vault proxy configuration updated');
             expect(feedback).toBeInTheDocument();
           });
 
@@ -210,9 +203,7 @@ describe('<ProxyConfigs />', () => {
           withProxyConfigs([]);
 
           await waitFor(() => {
-            const feedback = screen.getByText(
-              'Vault proxy configuration removed',
-            );
+            const feedback = screen.getByText('Vault proxy configuration removed');
             expect(feedback).toBeInTheDocument();
           });
         });

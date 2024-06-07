@@ -26,10 +26,9 @@ export default {
   },
 } as Meta;
 
-const Template: Story<ShimmerProps> = ({
-  'aria-valuetext': ariaValueText,
-  testID,
-}: ShimmerProps) => <Shimmer testID={testID} aria-valuetext={ariaValueText} />;
+const Template: Story<ShimmerProps> = ({ 'aria-valuetext': ariaValueText, testID }: ShimmerProps) => (
+  <Shimmer testID={testID} aria-valuetext={ariaValueText} />
+);
 
 export const Base = Template.bind({});
 Base.args = {

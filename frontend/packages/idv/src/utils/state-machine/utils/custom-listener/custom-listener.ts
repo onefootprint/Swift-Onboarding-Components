@@ -21,9 +21,7 @@ export type DeviceResponseJsonPayload = {
  * @returns {Payload | undefined} - The payload for 'receivedDeviceResponseJson' event,
  *                                  or undefined if the event does not meet the criteria.
  */
-export const createReceivedDeviceResponseJsonPayload = (
-  e: Event,
-): DeviceResponseJsonPayload | undefined => {
+export const createReceivedDeviceResponseJsonPayload = (e: Event): DeviceResponseJsonPayload | undefined => {
   if (e.type !== FPCustomEvents.receivedDeviceResponseJson) return undefined;
   if (!isCustomEvent<{ deviceResponseJson: string }>(e)) return undefined;
   if (!e.detail) return undefined;
@@ -41,9 +39,7 @@ export const createReceivedDeviceResponseJsonPayload = (
  * @returns {Payload | undefined} - The payload for 'authTokenChanged' event,
  *                                  or undefined if the event does not meet the criteria.
  */
-export const createAuthTokenChangedPayload = (
-  e: Event,
-): AuthTokenPayload | undefined => {
+export const createAuthTokenChangedPayload = (e: Event): AuthTokenPayload | undefined => {
   if (e.type !== FPCustomEvents.stepUpCompleted) return undefined;
   if (!isCustomEvent<{ authToken: string }>(e)) return undefined;
   if (!e.detail) return undefined;

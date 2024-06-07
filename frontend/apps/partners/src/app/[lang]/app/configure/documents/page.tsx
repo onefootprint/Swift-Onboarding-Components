@@ -8,9 +8,7 @@ import ConfigureDocumentsContent from './content';
 
 type ConfigureDocumentsPageProps = { params: LangProp };
 
-const ConfigureDocumentsPage = async ({
-  params: { lang = LangFallback },
-}: ConfigureDocumentsPageProps) => {
+const ConfigureDocumentsPage = async ({ params: { lang = LangFallback } }: ConfigureDocumentsPageProps) => {
   const templates = await getPartnerDocTemplates();
   return <ConfigureDocumentsContent lang={lang} templates={templates} />;
 };

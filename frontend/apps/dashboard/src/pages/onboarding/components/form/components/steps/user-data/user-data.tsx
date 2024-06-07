@@ -53,11 +53,7 @@ const UserData = ({ onBack, onComplete }: UserDataProps) => {
           <TextInput
             autoFocus
             hasError={!!errors.firstName}
-            hint={
-              errors.firstName
-                ? t('form.first-name.errors.required')
-                : undefined
-            }
+            hint={errors.firstName ? t('form.first-name.errors.required') : undefined}
             label={t('form.first-name.label')}
             placeholder={t('form.first-name.placeholder')}
             {...register('firstName', {
@@ -69,9 +65,7 @@ const UserData = ({ onBack, onComplete }: UserDataProps) => {
           />
           <TextInput
             hasError={!!errors.lastName}
-            hint={
-              errors.lastName ? t('form.last-name.errors.required') : undefined
-            }
+            hint={errors.lastName ? t('form.last-name.errors.required') : undefined}
             label={t('form.last-name.label')}
             placeholder={t('form.last-name.placeholder')}
             {...register('lastName', {
@@ -83,11 +77,7 @@ const UserData = ({ onBack, onComplete }: UserDataProps) => {
           />
         </Grid.Container>
         <ButtonContainer>
-          <Button
-            disabled={mutation.isLoading}
-            onClick={onBack}
-            variant="secondary"
-          >
+          <Button disabled={mutation.isLoading} onClick={onBack} variant="secondary">
             {allT('back')}
           </Button>
           <Button loading={mutation.isLoading} type="submit">

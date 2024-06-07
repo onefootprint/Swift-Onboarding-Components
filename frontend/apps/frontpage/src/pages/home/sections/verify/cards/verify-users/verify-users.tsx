@@ -1,5 +1,5 @@
 import { IcoIdCard16, IcoUser16 } from '@onefootprint/icons';
-import { media, Stack } from '@onefootprint/ui';
+import { Stack, media } from '@onefootprint/ui';
 import { motion, useAnimation } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -67,18 +67,11 @@ const VerifyUsers = () => {
     <BaseCard overflow="hidden" backgroundImage="/home/verify-cards/paper.png">
       <CardTitle title={t('title')} subtitle={t('subtitle')} />
       <Stack direction="column" align="center">
-        <CustomToggle
-          sections={sections}
-          onChange={handleToggleChange}
-          activeSection={activeSection}
-        />
+        <CustomToggle sections={sections} onChange={handleToggleChange} activeSection={activeSection} />
         <Container>
           <FieldsContainer>
             <Field label="Name" firstString="Percy Littlefeet" />
-            <motion.div
-              initial={{ opacity: 0, filter: 'blur(5px)' }}
-              animate={controls}
-            >
+            <motion.div initial={{ opacity: 0, filter: 'blur(5px)' }} animate={controls}>
               <Field
                 label="Address"
                 firstString={inputData().firstString}
@@ -87,10 +80,7 @@ const VerifyUsers = () => {
               />
             </motion.div>
           </FieldsContainer>
-          <PositionedUserPhoto
-            src={getSrc()}
-            rotate={activeSection === 'user-input-data' ? 10 : -5}
-          />
+          <PositionedUserPhoto src={getSrc()} rotate={activeSection === 'user-input-data' ? 10 : -5} />
         </Container>
       </Stack>
     </BaseCard>

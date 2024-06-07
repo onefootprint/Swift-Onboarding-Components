@@ -1,17 +1,9 @@
 import { assign, createMachine } from 'xstate';
 
 import { UpdateAuthMethodActionKind } from '../../../types';
-import {
-  assignDecryptedData,
-  assignUpdateMethod,
-  assignUserDashboard,
-  assignVerifyToken,
-} from './assigners';
+import { assignDecryptedData, assignUpdateMethod, assignUserDashboard, assignVerifyToken } from './assigners';
 import type { Typegen0 } from './machine.typegen';
-import type {
-  AuthMethodsMachineContext,
-  AuthMethodsMachineEvents,
-} from './types';
+import type { AuthMethodsMachineContext, AuthMethodsMachineEvents } from './types';
 
 export type AuthMethodsMachineArgs = {
   authToken: string;

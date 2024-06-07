@@ -13,20 +13,12 @@ export type NotificationProps = {
 
 const VariantIcon = ({ variant }: { variant: Variant }): JSX.Element => (
   <VariantWrapper>
-    {variant === 'success' ? (
-      <IcoCheckCircle40 color={variant} />
-    ) : (
-      <IcoWarning40 color={variant} />
-    )}
+    {variant === 'success' ? <IcoCheckCircle40 color={variant} /> : <IcoWarning40 color={variant} />}
     <Box marginBottom={3} />
   </VariantWrapper>
 );
 
-const Notification = ({
-  subtitle,
-  title,
-  variant,
-}: NotificationProps): JSX.Element => (
+const Notification = ({ subtitle, title, variant }: NotificationProps): JSX.Element => (
   <>
     {variant ? <VariantIcon variant={variant} /> : null}
     <NavigationHeader leftButton={{ variant: 'close' }} />

@@ -1,10 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor, within } from '@onefootprint/test-utils';
 import { BusinessDI, EntityKind } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
@@ -241,13 +235,7 @@ describe.skip('<Details />', () => {
 
           it('should allow to decrypt the data', async () => {
             await renderDetailsAndWaitData();
-            await decryptFields([
-              'Country',
-              'Address line 1',
-              'City',
-              'Zip code',
-              'State',
-            ]);
+            await decryptFields(['Country', 'Address line 1', 'City', 'Zip code', 'State']);
 
             const container = screen.getByRole('group', {
               name: 'Registered business address',
@@ -319,9 +307,7 @@ describe.skip('<Details />', () => {
           });
 
           await waitFor(() => {
-            const secondary = within(container).getByText(
-              'Owns 50% of the business',
-            );
+            const secondary = within(container).getByText('Owns 50% of the business');
             expect(secondary).toBeInTheDocument();
           });
         });
@@ -350,9 +336,7 @@ describe.skip('<Details />', () => {
             const link = within(container).getByRole('link', {
               name: 'View profile',
             }) as HTMLAnchorElement;
-            const url = link.href.endsWith(
-              '/users/fp_id_XW3pNYPpV4Niup1PgFZBg6',
-            );
+            const url = link.href.endsWith('/users/fp_id_XW3pNYPpV4Niup1PgFZBg6');
             expect(url).toBeTruthy();
           });
         });
@@ -399,9 +383,7 @@ describe.skip('<Details />', () => {
         });
 
         await waitFor(() => {
-          const noResults = within(container).getByText(
-            'No risk signals found',
-          );
+          const noResults = within(container).getByText('No risk signals found');
           expect(noResults).toBeInTheDocument();
         });
       });
@@ -415,9 +397,7 @@ describe.skip('<Details />', () => {
           name: 'Device insights',
         });
 
-        const agent = within(container).getByText(
-          'Apple Macintosh, Mac OS 10.15.7',
-        );
+        const agent = within(container).getByText('Apple Macintosh, Mac OS 10.15.7');
 
         expect(agent).toBeInTheDocument();
       });

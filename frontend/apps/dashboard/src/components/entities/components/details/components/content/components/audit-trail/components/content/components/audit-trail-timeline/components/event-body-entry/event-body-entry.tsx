@@ -1,7 +1,7 @@
 import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import { createFontStyles, Stack } from '@onefootprint/ui';
+import { Stack, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

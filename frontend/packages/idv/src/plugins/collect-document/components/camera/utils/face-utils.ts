@@ -16,8 +16,7 @@ export const isHeadStraight = (angle: {
   yaw: number | undefined;
 }) => {
   const { roll, pitch, yaw } = angle;
-  if (roll === undefined || pitch === undefined || yaw === undefined)
-    return false;
+  if (roll === undefined || pitch === undefined || yaw === undefined) return false;
   if (Math.abs(roll) > MAX_HEAD_ROLL) return false;
   if (Math.abs(pitch) > MAX_HEAD_PITCH) return false;
   if (Math.abs(yaw) > MAX_HEAD_YAW) return false;
@@ -33,8 +32,7 @@ export const isFaceCloseEnough = (dimensions: {
 }) => {
   const { frameWidth, frameHeight, faceWidth, faceHeight } = dimensions;
   if (!frameWidth || !frameHeight || !faceWidth || !faceHeight) return false;
-  if (faceWidth < 0.5 * frameWidth && faceHeight < 0.5 * frameHeight)
-    return false;
+  if (faceWidth < 0.5 * frameWidth && faceHeight < 0.5 * frameHeight) return false;
   return true;
 };
 
@@ -82,14 +80,10 @@ export const isFaceInTheFrame = (dimensions: {
   const bottomOffset = frameBottom - faceBottom;
 
   // 5% error margin
-  if (leftOffset < 0 && Math.abs((leftOffset * 100) / faceWidth) > 5)
-    return false;
-  if (rightOffset < 0 && Math.abs((rightOffset * 100) / faceWidth) > 5)
-    return false;
-  if (topOffset < 0 && Math.abs((topOffset * 100) / faceHeight) > 5)
-    return false;
-  if (bottomOffset < 0 && Math.abs((bottomOffset * 100) / faceHeight) > 5)
-    return false;
+  if (leftOffset < 0 && Math.abs((leftOffset * 100) / faceWidth) > 5) return false;
+  if (rightOffset < 0 && Math.abs((rightOffset * 100) / faceWidth) > 5) return false;
+  if (topOffset < 0 && Math.abs((topOffset * 100) / faceHeight) > 5) return false;
+  if (bottomOffset < 0 && Math.abs((bottomOffset * 100) / faceHeight) > 5) return false;
 
   return true;
 };
@@ -97,10 +91,8 @@ export const isFaceInTheFrame = (dimensions: {
 export const calculateFaceAngle = (mesh: FaceLandmarks68) => {
   // Helper to convert radians to degrees
   const degrees = (radians: number) => (radians * 180) / Math.PI;
-  const calcLengthBetweenTwoPoints = (
-    a: Point | { x: number; y: number },
-    b: Point | { x: number; y: number },
-  ) => Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+  const calcLengthBetweenTwoPoints = (a: Point | { x: number; y: number }, b: Point | { x: number; y: number }) =>
+    Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 
   const angle = {
     roll: <number | undefined>undefined,

@@ -1,7 +1,4 @@
-import type {
-  BusinessBoKycData,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { BusinessBoKycData, PublicOnboardingConfig } from '@onefootprint/types';
 import {
   CLIENT_PUBLIC_KEY_HEADER,
   KYB_BO_SESSION_AUTHORIZATION_HEADER,

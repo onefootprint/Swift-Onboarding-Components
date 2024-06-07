@@ -11,7 +11,7 @@ type DemoOnboardingComponentsProps = {
 };
 
 const Step1 = () => (
-  <Fp.Form onSubmit={() => {}}>
+  <Fp.Form onSubmit={() => undefined}>
     <Fp.Field name="id.email">
       <Fp.Label>Email</Fp.Label>
       <Fp.Input />
@@ -27,7 +27,7 @@ const Step1 = () => (
 );
 
 const Step2 = () => (
-  <Fp.Form onSubmit={() => {}}>
+  <Fp.Form onSubmit={() => undefined}>
     <Fp.Field name="id.email">
       <Fp.Label>Your email</Fp.Label>
       <Fp.Input placeholder="lorem@footprint.com" />
@@ -45,7 +45,7 @@ const Step2 = () => (
 const Step3 = () => (
   <>
     <Styles />
-    <Fp.Form onSubmit={() => {}} className="fp-c-form">
+    <Fp.Form onSubmit={() => undefined} className="fp-c-form">
       <Fp.Field name="id.email" className="fp-c-field">
         <Fp.Label className="fp-c-label">Your email</Fp.Label>
         <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
@@ -123,10 +123,7 @@ const Step5 = () => {
         <Fp.Form onSubmit={identify} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
-            <Fp.Input
-              className="fp-c-input"
-              placeholder="lorem@footprint.com"
-            />
+            <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.phone_number" className="fp-c-field">
@@ -172,9 +169,7 @@ const Step5 = () => {
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.address_line2" className="fp-c-field">
-            <Fp.Label className="fp-c-label">
-              Address line 2 (optional)
-            </Fp.Label>
+            <Fp.Label className="fp-c-label">Address line 2 (optional)</Fp.Label>
             <Fp.Input className="fp-c-input" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
@@ -237,10 +232,7 @@ const Step6 = () => {
         <Fp.Form onSubmit={identify} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
-            <Fp.Input
-              className="fp-c-input"
-              placeholder="lorem@footprint.com"
-            />
+            <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.phone_number" className="fp-c-field">
@@ -286,9 +278,7 @@ const Step6 = () => {
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.address_line2" className="fp-c-field">
-            <Fp.Label className="fp-c-label">
-              Address line 2 (optional)
-            </Fp.Label>
+            <Fp.Label className="fp-c-label">Address line 2 (optional)</Fp.Label>
             <Fp.Input className="fp-c-input" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
@@ -355,13 +345,7 @@ const DemoObWithProvider = ({ step }: DemoOnboardingComponentsProps) => (
 );
 
 const Paper = ({ children }: React.PropsWithChildren) => (
-  <Box
-    padding={5}
-    borderWidth={1}
-    borderColor="primary"
-    borderStyle="solid"
-    borderRadius="default"
-  >
+  <Box padding={5} borderWidth={1} borderColor="primary" borderStyle="solid" borderRadius="default">
     {children}
   </Box>
 );

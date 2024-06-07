@@ -1,12 +1,7 @@
 import { useAppearance } from '@onefootprint/appearance';
 import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
-import type {
-  D2PGenerateResponse,
-  IdDocOutcome,
-  L10n,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { D2PGenerateResponse, IdDocOutcome, L10n, PublicOnboardingConfig } from '@onefootprint/types';
 import { useEffect } from 'react';
 
 import useD2PGenerate from '../../../hooks/api/hosted/onboarding/d2p/use-d2p-generate';
@@ -74,14 +69,7 @@ const useGenerateScopedAuthToken = ({
 
     generateScopedAuthToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    authToken,
-    styleParams,
-    sessionId,
-    d2pGenerateMutation.isLoading,
-    d2pGenerateMutation.isSuccess,
-    onSuccess,
-  ]);
+  }, [authToken, styleParams, sessionId, d2pGenerateMutation.isLoading, d2pGenerateMutation.isSuccess, onSuccess]);
 
   return { mutation: d2pGenerateMutation, generateScopedAuthToken };
 };

@@ -13,36 +13,16 @@ const MobileIllustration = () => (
       maxWidth="100%"
     >
       <ImageContainer gridArea="hey-there">
-        <Image
-          src="/kyb/verify-businesses/hey-there.png"
-          alt="Basic Data"
-          width={336.8}
-          height={265}
-        />
+        <Image src="/kyb/verify-businesses/hey-there.png" alt="Basic Data" width={336.8} height={265} />
       </ImageContainer>
       <ImageContainer gridArea="basic-data">
-        <Image
-          src="/kyb/verify-businesses/basic-data.png"
-          alt="Basic Data"
-          width={336.8}
-          height={358.75}
-        />
+        <Image src="/kyb/verify-businesses/basic-data.png" alt="Basic Data" width={336.8} height={358.75} />
       </ImageContainer>
       <ImageContainer gridArea="bos">
-        <Image
-          src="/kyb/verify-businesses/bos.png"
-          alt="Residential Address"
-          width={336.8}
-          height={391}
-        />
+        <Image src="/kyb/verify-businesses/bos.png" alt="Residential Address" width={336.8} height={391} />
       </ImageContainer>
       <ImageContainer gridArea="business-address">
-        <Image
-          src="/kyb/verify-businesses/business-address.png"
-          alt="App Clip"
-          width={336.8}
-          height={497.7}
-        />
+        <Image src="/kyb/verify-businesses/business-address.png" alt="App Clip" width={336.8} height={497.7} />
       </ImageContainer>
     </Grid.Container>
   </Container>

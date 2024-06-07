@@ -2,10 +2,7 @@ import { ComponentKind } from '../types/components';
 import type { CallbackKeys } from '../types/events';
 import { PublicEvent } from '../types/events';
 
-export const ComponentCallbacksByEvent: Record<
-  ComponentKind,
-  Partial<Record<PublicEvent, CallbackKeys>>
-> = {
+export const ComponentCallbacksByEvent: Record<ComponentKind, Partial<Record<PublicEvent, CallbackKeys>>> = {
   [ComponentKind.Auth]: {
     [PublicEvent.canceled]: 'onCancel',
     [PublicEvent.closed]: 'onClose',

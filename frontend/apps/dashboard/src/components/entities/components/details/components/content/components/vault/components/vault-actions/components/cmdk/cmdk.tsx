@@ -1,5 +1,5 @@
 import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
-import { createFontStyles, Overlay } from '@onefootprint/ui';
+import { Overlay, createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,16 +36,12 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const canDecrypt = !!entity.decryptableAttributes.length;
 
   const [hasOpenedOnce, setHasOpenedOnce] = useState(false);
-  const [timesOpened, setTimesOpened] = useState(
-    parseInt(localStorage.getItem('timesOpened') || '0', 10),
-  );
+  const [timesOpened, setTimesOpened] = useState(parseInt(localStorage.getItem('timesOpened') || '0', 10));
 
-  const shouldRenderManualReview =
-    entityData && entityData.status !== EntityStatus.none;
+  const shouldRenderManualReview = entityData && entityData.status !== EntityStatus.none;
 
   const shouldShowDiscoverFeature =
-    shouldRenderManualReview &&
-    (hasOpenedOnce ? false : timesOpened < SHOW_TIMES_LIMIT);
+    shouldRenderManualReview && (hasOpenedOnce ? false : timesOpened < SHOW_TIMES_LIMIT);
 
   const resetSearch = () => {
     setSearch('');
@@ -103,11 +99,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
 
   const actions = [
     {
-      title: t(
-        `components.cmdk.review.${
-          kind === EntityKind.business ? 'title-business' : 'title-user'
-        }`,
-      ),
+      title: t(`components.cmdk.review.${kind === EntityKind.business ? 'title-business' : 'title-user'}`),
       type: ActionType.REVIEW,
       actions: [
         {
@@ -170,8 +162,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         {
           label: t('components.cmdk.decrypt.decrypt-all'),
           value: 'decrypt-all',
-          onSelect: () =>
-            decryptControls.submitAllFields(entity.decryptableAttributes),
+          onSelect: () => decryptControls.submitAllFields(entity.decryptableAttributes),
           closeAfterSelect: true,
           disabled: !canDecrypt,
         },
@@ -181,39 +172,17 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
 
   return (
     <>
-      <DialogContainer
-        open={open}
-        onOpenChange={setOpen}
-        label={t('components.cmdk.decrypt.title')}
-      >
-        <SearchInput
-          value={search}
-          onValueChange={setSearch}
-          onErase={resetSearch}
-        />
-        <ActionList
-          actionsArray={actions}
-          setOpen={setOpen}
-          hasReview={shouldRenderManualReview}
-        />
+      <DialogContainer open={open} onOpenChange={setOpen} label={t('components.cmdk.decrypt.title')}>
+        <SearchInput value={search} onValueChange={setSearch} onErase={resetSearch} />
+        <ActionList actionsArray={actions} setOpen={setOpen} hasReview={shouldRenderManualReview} />
         <Footer />
       </DialogContainer>
-      <RequestMoreInfoDialog
-        open={retrigerDialogOpen}
-        onClose={handleRetrigerDialogClose}
-      />
+      <RequestMoreInfoDialog open={retrigerDialogOpen} onClose={handleRetrigerDialogClose} />
       {dialogOpen && reviewStatus && (
-        <ManualReviewDialog
-          status={reviewStatus}
-          open={dialogOpen}
-          onClose={handleCloseDialog}
-        />
+        <ManualReviewDialog status={reviewStatus} open={dialogOpen} onClose={handleCloseDialog} />
       )}
       <Overlay isVisible={open} />
-      <DiscoverFeatureChip
-        isVisible={shouldShowDiscoverFeature}
-        text={t('components.cmdk.discover')}
-      />
+      <DiscoverFeatureChip isVisible={shouldShowDiscoverFeature} text={t('components.cmdk.discover')} />
     </>
   );
 };

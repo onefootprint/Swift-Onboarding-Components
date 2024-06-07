@@ -6,10 +6,7 @@ import type { InputProps as BaseInputProps } from '../internal/input';
 
 export type InputProps = Omit<BaseInputProps, 'mask' | 'placeholder'>;
 
-export type PhoneInputProps = Omit<
-  InputProps,
-  'placeholder' | 'minLength' | 'maxLength' | 'type' | 'autoComplete'
-> & {
+export type PhoneInputProps = Omit<InputProps, 'placeholder' | 'minLength' | 'maxLength' | 'type' | 'autoComplete'> & {
   defaultValue?: string;
   locale?: SupportedLocale;
   onReset?: () => void;

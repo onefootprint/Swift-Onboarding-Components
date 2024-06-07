@@ -40,10 +40,7 @@ const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
           <BracketContainer
             isInBrackets={isInBrackets}
             key={title}
-            data-last-child={
-              Object.keys(properties).indexOf(title) ===
-              Object.keys(properties).length - 1
-            }
+            data-last-child={Object.keys(properties).indexOf(title) === Object.keys(properties).length - 1}
             data-first-child={Object.keys(properties).indexOf(title) === 0}
           >
             <Grid>
@@ -53,9 +50,7 @@ const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
                 isRequired={required.length > 0 && required.includes(title)}
                 isInBrackets={isInBrackets}
               />
-              {property.description && (
-                <Description>{property.description}</Description>
-              )}
+              {property.description && <Description>{property.description}</Description>}
               <Properties schema={property} />
             </Grid>
           </BracketContainer>
@@ -77,8 +72,9 @@ const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
     flex-direction: column;
     position: relative;
 
-    ${isInBrackets &&
-    css`
+    ${
+      isInBrackets &&
+      css`
       padding-left: ${theme.spacing[4]};
 
       &[data-first-child='true'] {
@@ -104,7 +100,8 @@ const BracketContainer = styled.div<{ isInBrackets?: boolean }>`
           top: 20px;
         }
       }
-    `}
+    `
+    }
   `}
 `;
 

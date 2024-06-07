@@ -31,12 +31,6 @@ export const convertFormData = (
   idologyEnabled: ifChanged(formData.idologyEnabled, tvc?.idologyEnabled),
   experianEnabled: ifChanged(formData.experianEnabled, tvc?.experianEnabled),
   lexisEnabled: ifChanged(formData.lexisEnabled, tvc?.lexisEnabled),
-  experianSubscriberCode: ifChanged(
-    strOrNull(formData.experianSubscriberCode),
-    strOrNull(tvc?.experianSubscriberCode),
-  ),
-  middeskApiKey: newMiddeskApiKey(
-    formData.middeskApiKey,
-    !!tvc?.middeskApiKeyExists,
-  ),
+  experianSubscriberCode: ifChanged(strOrNull(formData.experianSubscriberCode), strOrNull(tvc?.experianSubscriberCode)),
+  middeskApiKey: newMiddeskApiKey(formData.middeskApiKey, !!tvc?.middeskApiKeyExists),
 });

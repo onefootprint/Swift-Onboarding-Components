@@ -32,14 +32,7 @@ const screens = [
 const BifrostModals = () => (
   <>
     {screens.map(({ url, height, width, left, top, zIndex }) => (
-      <ImageContainer
-        zIndex={zIndex}
-        left={left}
-        top={top}
-        height={height}
-        width={width}
-        key={url}
-      >
+      <ImageContainer zIndex={zIndex} left={left} top={top} height={height} width={width} key={url}>
         <Image key={url} src={url} height={height} width={width} alt="" />
       </ImageContainer>
     ))}

@@ -1,10 +1,7 @@
 import { useIntl } from '@onefootprint/hooks';
 import type { PaginatedRequestResponse } from '@onefootprint/request';
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  GetTenantsRequest,
-  GetTenantsResponse,
-} from '@onefootprint/types';
+import type { GetTenantsRequest, GetTenantsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import usePagination from 'src/hooks/use-pagination';
 import type { AuthHeaders } from 'src/hooks/use-session';
@@ -12,10 +9,7 @@ import useSession from 'src/hooks/use-session';
 
 import useFilters from './use-filters';
 
-const getTenants = async (
-  authHeaders: AuthHeaders,
-  params: GetTenantsRequest,
-) => {
+const getTenants = async (authHeaders: AuthHeaders, params: GetTenantsRequest) => {
   const response = await request<PaginatedRequestResponse<GetTenantsResponse>>({
     method: 'GET',
     url: '/private/tenants',

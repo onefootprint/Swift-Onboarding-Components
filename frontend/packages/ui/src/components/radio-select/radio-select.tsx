@@ -5,10 +5,7 @@ import styled, { css } from 'styled-components';
 import Label from '../label';
 import Stack from '../stack';
 import Text from '../text';
-import type {
-  GroupedRadioSelectOptionFields,
-  RadioSelectOptionFields,
-} from './components/radio-select-option';
+import type { GroupedRadioSelectOptionFields, RadioSelectOptionFields } from './components/radio-select-option';
 import RadioSelectOption from './components/radio-select-option';
 
 export type RadioSelectProps = {
@@ -20,14 +17,7 @@ export type RadioSelectProps = {
   value?: string;
 };
 
-const RadioSelect = ({
-  label,
-  onChange,
-  options,
-  size,
-  testID,
-  value,
-}: RadioSelectProps) => (
+const RadioSelect = ({ label, onChange, options, size, testID, value }: RadioSelectProps) => (
   <Stack direction="column">
     {label && <Label>{label}</Label>}
     <OptionsContainer data-testid={testID} direction="column" gap={3}>
@@ -35,10 +25,7 @@ const RadioSelect = ({
         if ('label' in option) {
           return (
             <GroupContainer key={option.label} direction="column" gap={4}>
-              <Text
-                variant={size === 'compact' ? 'label-3' : 'label-2'}
-                color="secondary"
-              >
+              <Text variant={size === 'compact' ? 'label-3' : 'label-2'} color="secondary">
                 {option.label}
               </Text>
               {option.options.map(subOption => (
@@ -50,11 +37,7 @@ const RadioSelect = ({
                   IconComponent={subOption.IconComponent}
                   disabled={subOption.disabled}
                   disabledHint={subOption.disabledHint}
-                  onClick={
-                    subOption.disabled
-                      ? noop
-                      : () => onChange?.(subOption.value)
-                  }
+                  onClick={subOption.disabled ? noop : () => onChange?.(subOption.value)}
                   selected={subOption.value === value}
                   size={size}
                 />

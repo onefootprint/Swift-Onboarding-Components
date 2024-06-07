@@ -32,9 +32,7 @@ import {
 
 const useRouterSpy = createUseRouterSpy();
 
-const renderRules = ({
-  playbook = kycPlaybookFixture,
-}: Partial<RulesProps>) => {
+const renderRules = ({ playbook = kycPlaybookFixture }: Partial<RulesProps>) => {
   customRender(<Rules playbook={playbook} toggleDisableHeading={jest.fn()} />);
 };
 
@@ -91,24 +89,16 @@ describe('<Rules />', () => {
 
         // Check alphabetical sorting and that "not" precedes the correct field
         expect(within(failRows[0]).getByText('id_flagged')).toBeInTheDocument();
-        expect(
-          within(failRows[1]).getByText('id_not_located'),
-        ).toBeInTheDocument();
-        expect(
-          within(failRows[1]).getByText('name_matches'),
-        ).toBeInTheDocument();
+        expect(within(failRows[1]).getByText('id_not_located')).toBeInTheDocument();
+        expect(within(failRows[1]).getByText('name_matches')).toBeInTheDocument();
         expect(
           isNotTriggered({
             row: failRows[1],
             text: 'name_matches',
           }),
         ).toEqual(true);
-        expect(
-          within(failRows[1]).getByText('watchlist_hit_ofac'),
-        ).toBeInTheDocument();
-        expect(
-          within(failRows[2]).getByText('subject_deceased'),
-        ).toBeInTheDocument();
+        expect(within(failRows[1]).getByText('watchlist_hit_ofac')).toBeInTheDocument();
+        expect(within(failRows[2]).getByText('subject_deceased')).toBeInTheDocument();
         expect(within(failRows[3]).getByText('id.email')).toBeInTheDocument();
         expect(within(failRows[3]).getByText('1')).toBeInTheDocument();
 
@@ -117,20 +107,14 @@ describe('<Rules />', () => {
         });
         const manRevRows = within(manualRevSection).getAllByRole('row');
         expect(manRevRows).toHaveLength(1);
-        expect(
-          within(manRevRows[0]).getByText('watchlist_hit_ofac'),
-        ).toBeInTheDocument();
+        expect(within(manRevRows[0]).getByText('watchlist_hit_ofac')).toBeInTheDocument();
 
         const passSection = screen.getByRole('group', {
           name: 'Pass + Manual review',
         });
         const passRows = within(passSection).getAllByRole('row');
         expect(passRows).toHaveLength(1);
-        expect(
-          within(passRows[0]).getByText(
-            'document_is_permit_or_provisional_license',
-          ),
-        ).toBeInTheDocument();
+        expect(within(passRows[0]).getByText('document_is_permit_or_provisional_license')).toBeInTheDocument();
       });
 
       it('should change the display correctly once editing', async () => {
@@ -231,9 +215,7 @@ describe('<Rules />', () => {
         });
         await selectOption('is not');
         await waitFor(() => {
-          expect(
-            within(failRow).getByText('Pending change'),
-          ).toBeInTheDocument();
+          expect(within(failRow).getByText('Pending change')).toBeInTheDocument();
         });
 
         const failSelectTrigger = within(failRow).getByText('id_flagged');
@@ -257,9 +239,7 @@ describe('<Rules />', () => {
           expect(addFieldButton).toBeDisabled();
         });
         await waitFor(() => {
-          expect(
-            within(failRow).getByText('Pending change'),
-          ).toBeInTheDocument();
+          expect(within(failRow).getByText('Pending change')).toBeInTheDocument();
         });
 
         const newOpTrigger = within(passRow).getAllByText('is')[1];
@@ -304,9 +284,7 @@ describe('<Rules />', () => {
           expect(failRows).toHaveLength(4);
         });
         await waitFor(() => {
-          expect(
-            within(failRows[0]).getByText('address_alert_longevity'),
-          ).toBeInTheDocument();
+          expect(within(failRows[0]).getByText('address_alert_longevity')).toBeInTheDocument();
         });
         await waitFor(() => {
           expect(
@@ -322,15 +300,11 @@ describe('<Rules />', () => {
         });
         const newPassRow = within(editedPassSection).getByRole('row');
         await waitFor(() => {
-          const newRiskSignal = within(newPassRow).getByText(
-            'document_is_permit_or_provisional_license',
-          );
+          const newRiskSignal = within(newPassRow).getByText('document_is_permit_or_provisional_license');
           expect(newRiskSignal).toBeInTheDocument();
         });
         await waitFor(() => {
-          expect(
-            within(newPassRow).getByText('name_matches'),
-          ).toBeInTheDocument();
+          expect(within(newPassRow).getByText('name_matches')).toBeInTheDocument();
         });
         await waitFor(() => {
           expect(
@@ -353,9 +327,7 @@ describe('<Rules />', () => {
           {
             ...manualReviewRuleFixture,
             ruleId: 'newId',
-            ruleExpression: [
-              { field: 'id_flagged', op: RiskSignalRuleOp.eq, value: true },
-            ],
+            ruleExpression: [{ field: 'id_flagged', op: RiskSignalRuleOp.eq, value: true }],
           },
         ]);
         withEvaluateRules();
@@ -372,8 +344,7 @@ describe('<Rules />', () => {
         });
         await userEvent.click(failRowDeleteButton);
         await waitFor(() => {
-          const pendingDeleteText =
-            within(failRow).getByText('Pending deletion');
+          const pendingDeleteText = within(failRow).getByText('Pending deletion');
           expect(pendingDeleteText).toBeInTheDocument();
         });
 
@@ -387,8 +358,7 @@ describe('<Rules />', () => {
         });
         await userEvent.click(passRowDeleteButton);
         await waitFor(() => {
-          const pendingDeleteText =
-            within(passRow).getByText('Pending deletion');
+          const pendingDeleteText = within(passRow).getByText('Pending deletion');
           expect(pendingDeleteText).toBeInTheDocument();
         });
 
@@ -463,9 +433,9 @@ describe('<Rules />', () => {
         const editedStepUpSection = screen.getByRole('group', {
           name: 'Step-up',
         });
-        const newStepUpRiskSignal = within(
-          within(editedStepUpSection).getByRole('row'),
-        ).getByText('dob_does_not_match');
+        const newStepUpRiskSignal = within(within(editedStepUpSection).getByRole('row')).getByText(
+          'dob_does_not_match',
+        );
         expect(newStepUpRiskSignal).toBeInTheDocument();
 
         const editedManRevSection = screen.getByRole('group', {
@@ -473,9 +443,7 @@ describe('<Rules />', () => {
         });
         const manRevRows = within(editedManRevSection).getAllByRole('row');
         expect(manRevRows.length).toEqual(2);
-        expect(
-          within(manRevRows[1]).getByText('id_flagged'),
-        ).toBeInTheDocument();
+        expect(within(manRevRows[1]).getByText('id_flagged')).toBeInTheDocument();
       });
 
       it('should undo edits and deletions and delete added rule rows correctly', async () => {
@@ -498,9 +466,7 @@ describe('<Rules />', () => {
         });
         await selectOption('is not');
         await waitFor(() => {
-          const pendingChangeText = within(failRows[0]).getByText(
-            'Pending change',
-          );
+          const pendingChangeText = within(failRows[0]).getByText('Pending change');
           expect(pendingChangeText).toBeInTheDocument();
         });
 
@@ -533,9 +499,7 @@ describe('<Rules />', () => {
         });
         await userEvent.click(deleteButton);
         await waitFor(() => {
-          const pendingDeleteText = within(failRows[2]).getByText(
-            'Pending deletion',
-          );
+          const pendingDeleteText = within(failRows[2]).getByText('Pending deletion');
           expect(pendingDeleteText).toBeInTheDocument();
         });
 
@@ -599,9 +563,7 @@ describe('<Rules />', () => {
         });
         await selectOption('is not');
         await waitFor(() => {
-          const pendingChangeText = within(failRows[0]).getByText(
-            'Pending change',
-          );
+          const pendingChangeText = within(failRows[0]).getByText('Pending change');
           expect(pendingChangeText).toBeInTheDocument();
         });
 
@@ -618,9 +580,7 @@ describe('<Rules />', () => {
         });
         await userEvent.click(failRowDeleteButton);
         await waitFor(() => {
-          const pendingDeleteText = within(failRows[2]).getByText(
-            'Pending deletion',
-          );
+          const pendingDeleteText = within(failRows[2]).getByText('Pending deletion');
           expect(pendingDeleteText).toBeInTheDocument();
         });
 
@@ -634,8 +594,7 @@ describe('<Rules />', () => {
         });
         await userEvent.click(passRowDeleteButton);
         await waitFor(() => {
-          const pendingDeleteText =
-            within(passRow).getByText('Pending deletion');
+          const pendingDeleteText = within(passRow).getByText('Pending deletion');
           expect(pendingDeleteText).toBeInTheDocument();
         });
 
@@ -648,9 +607,7 @@ describe('<Rules />', () => {
         });
         await userEvent.click(stepUpAddButton);
         await waitFor(() => {
-          const noRulesText = within(stepUpSection).queryByText(
-            'No rule has been configured.',
-          );
+          const noRulesText = within(stepUpSection).queryByText('No rule has been configured.');
           expect(noRulesText).not.toBeInTheDocument();
         });
 
@@ -681,16 +638,12 @@ describe('<Rules />', () => {
 
         expect(within(failSection).getAllByRole('row')).toHaveLength(4);
         expect(within(failRows[0]).getByText('id_flagged')).toBeInTheDocument();
-        expect(
-          within(failRows[2]).getByText('subject_deceased'),
-        ).toBeInTheDocument();
+        expect(within(failRows[2]).getByText('subject_deceased')).toBeInTheDocument();
 
         const passRows = within(passSection).getAllByRole('row');
         expect(passRows).toHaveLength(1);
 
-        expect(
-          within(stepUpSection).getByText('No rule has been configured.'),
-        ).toBeInTheDocument();
+        expect(within(stepUpSection).getByText('No rule has been configured.')).toBeInTheDocument();
       });
     });
   });
@@ -712,9 +665,7 @@ describe('<Rules />', () => {
       await renderRules({ playbook: kybPlaybookFixture });
 
       await waitFor(() => {
-        const alert = screen.getByText(
-          "These rules are only applied when verifying a Business Owner's identity.",
-        );
+        const alert = screen.getByText("These rules are only applied when verifying a Business Owner's identity.");
         expect(alert).toBeInTheDocument();
       });
     });

@@ -16,6 +16,7 @@ const PostContent = ({ html }: PostContentProps) => {
     });
   }, []);
   return (
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
     <Content dangerouslySetInnerHTML={{ __html: html }} ref={contentRef} />
   );
 };

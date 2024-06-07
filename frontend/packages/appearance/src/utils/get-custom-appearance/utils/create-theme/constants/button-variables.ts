@@ -15,22 +15,14 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     'buttonPrimaryBg',
     {
       var: 'components.button.variant.primary.bg',
-      assignDefault: [
-        'buttonPrimaryHoverBg',
-        'buttonPrimaryActiveBg',
-        'buttonPrimaryLoadingBg',
-      ],
+      assignDefault: ['buttonPrimaryHoverBg', 'buttonPrimaryActiveBg', 'buttonPrimaryLoadingBg'],
     },
   ],
   [
     'buttonPrimaryColor',
     {
       var: 'components.button.variant.primary.color',
-      assignDefault: [
-        'buttonPrimaryHoverColor',
-        'buttonPrimaryActiveColor',
-        'buttonPrimaryLoadingColor',
-      ],
+      assignDefault: ['buttonPrimaryHoverColor', 'buttonPrimaryActiveColor', 'buttonPrimaryLoadingColor'],
     },
   ],
   [
@@ -50,14 +42,8 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
       var: 'components.button.variant.primary.hover.bg',
     },
   ],
-  [
-    'buttonPrimaryHoverColor',
-    { var: 'components.button.variant.primary.hover.color' },
-  ],
-  [
-    'buttonPrimaryHoverBorderColor',
-    { var: 'components.button.variant.primary.hover.borderColor' },
-  ],
+  ['buttonPrimaryHoverColor', { var: 'components.button.variant.primary.hover.color' }],
+  ['buttonPrimaryHoverBorderColor', { var: 'components.button.variant.primary.hover.borderColor' }],
   [
     'buttonPrimaryActiveBg',
     {

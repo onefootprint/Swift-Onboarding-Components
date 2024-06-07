@@ -7,10 +7,7 @@ type ClearButtonProps = {
   onClick: () => void;
 };
 
-const ClearButton = ({
-  'aria-label': ariaLabel,
-  onClick,
-}: ClearButtonProps) => (
+const ClearButton = ({ 'aria-label': ariaLabel, onClick }: ClearButtonProps) => (
   <ClearButtonContainer onClick={onClick} aria-label={ariaLabel}>
     <IcoCloseSmall16 />
   </ClearButtonContainer>

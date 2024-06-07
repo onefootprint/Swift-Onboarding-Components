@@ -35,12 +35,7 @@ const EmailPageStructure = ({
   return (
     <>
       <Header title={headerTitle} subtitle={headerSubtitle} />
-      <EmailForm
-        defaultEmail={defaultEmail}
-        isLoading={isLoading}
-        onSubmit={handleFormSubmit}
-        texts={formTexts}
-      />
+      <EmailForm defaultEmail={defaultEmail} isLoading={isLoading} onSubmit={handleFormSubmit} texts={formTexts} />
       {Footer}
       {children}
     </>

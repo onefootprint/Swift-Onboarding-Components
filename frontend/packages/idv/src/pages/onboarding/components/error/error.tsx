@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import { NavigationHeader } from '../../../../components/layout';
 
-const Error = () => {
+const ErrorComponent = () => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'onboarding.components.error',
   });
@@ -46,4 +46,4 @@ const Container = styled.div`
   `}
 `;
 
-export default Error;
+export default ErrorComponent;

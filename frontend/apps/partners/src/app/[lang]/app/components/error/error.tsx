@@ -12,13 +12,7 @@ type ErrorProps = {
   header?: React.ReactNode;
 };
 
-const Error = ({
-  children,
-  error,
-  goToLabel,
-  goToPath,
-  header,
-}: ErrorProps) => {
+const ErrorComponent = ({ children, error, goToLabel, goToPath, header }: ErrorProps) => {
   const router = useRouter();
 
   return (
@@ -37,10 +31,7 @@ const Error = ({
         </Text>
       ) : null}
       {goToLabel && goToPath ? (
-        <Button
-          variant="secondary"
-          onClick={() => router.push(goToPath, { scroll: false })}
-        >
+        <Button variant="secondary" onClick={() => router.push(goToPath, { scroll: false })}>
           {goToLabel}
         </Button>
       ) : null}
@@ -48,4 +39,4 @@ const Error = ({
   );
 };
 
-export default Error;
+export default ErrorComponent;

@@ -14,17 +14,13 @@ const NavigationLogo = () => {
   });
   const router = useRouter();
 
-  const section = router.asPath.includes('/api-reference')
-    ? 'api-reference'
-    : 'documentation';
+  const section = router.asPath.includes('/api-reference') ? 'api-reference' : 'documentation';
 
   return (
     <MainLinks>
       <LogoCopyAssets />
       <Line />
-      <SectionTitle
-        href={section === 'api-reference' ? API_REFERENCE_PATH : '/'}
-      >
+      <SectionTitle href={section === 'api-reference' ? API_REFERENCE_PATH : '/'}>
         {section === 'api-reference' ? t('api-reference') : t('documentation')}
       </SectionTitle>
     </MainLinks>

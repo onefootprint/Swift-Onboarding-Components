@@ -2,11 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const CcGeneric24 = ({
-  'aria-label': ariaLabel,
-  className,
-  testID,
-}: IconProps) => (
+const CcGeneric24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
   <svg
     width={24}
     height={16}

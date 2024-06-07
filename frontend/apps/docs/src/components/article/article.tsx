@@ -89,15 +89,8 @@ const overrides: MarkdownToJSX.Overrides = {
 
 const ArticlePage = ({ article }: ArticleProps) => (
   <>
-    <SEO
-      description={article.data.meta.description}
-      slug={article.data.slug}
-      title={article.data.meta.title}
-    />
-    <ArticleHeader
-      title={article.data.title}
-      subtitle={article.data.readingTime.text}
-    />
+    <SEO description={article.data.meta.description} slug={article.data.slug} title={article.data.meta.title} />
+    <ArticleHeader title={article.data.title} subtitle={article.data.readingTime.text} />
     <Container options={{ overrides }} id="article-content">
       {article.content}
     </Container>

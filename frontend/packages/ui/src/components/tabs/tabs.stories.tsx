@@ -22,9 +22,7 @@ const options: TabOption[] = [
   { label: 'Settings', value: '/settings' },
 ];
 
-const Template: Story<TabsProps> = () => (
-  <Tabs options={options} onChange={value => console.log(value)} />
-);
+const Template: Story<TabsProps> = () => <Tabs options={options} onChange={value => console.log(value)} />;
 
 export const Base = Template.bind({});
 Base.args = {};

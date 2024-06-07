@@ -1,4 +1,4 @@
-import { Box, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text, media } from '@onefootprint/ui';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
@@ -61,12 +61,8 @@ const SolutionsViewer = ({ keys }: { keys: SolutionKey[] }) => {
     setSelectedKey(getNextKey());
   };
 
-  const backgroundPath = `${
-    keys.find(k => k.key === selectedKey)?.imgPath || ''
-  }/background.png`;
-  const foregroundPath = `${
-    keys.find(k => k.key === selectedKey)?.imgPath || ''
-  }/front.svg`;
+  const backgroundPath = `${keys.find(k => k.key === selectedKey)?.imgPath || ''}/background.png`;
+  const foregroundPath = `${keys.find(k => k.key === selectedKey)?.imgPath || ''}/front.svg`;
 
   return (
     <ViewerContainer ref={containerRef}>
@@ -84,9 +80,7 @@ const SolutionsViewer = ({ keys }: { keys: SolutionKey[] }) => {
           src={foregroundPath}
           alt="foreground"
           width={keys.find(k => k.key === selectedKey)?.frontImgSize.width || 0}
-          height={
-            keys.find(k => k.key === selectedKey)?.frontImgSize.height || 0
-          }
+          height={keys.find(k => k.key === selectedKey)?.frontImgSize.height || 0}
           $position={keys.find(k => k.key === selectedKey)?.frontImgPosition}
         />
       </ImageContainer>

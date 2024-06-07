@@ -1,5 +1,5 @@
 import { IcoLinkedin24, IcoTwitter24 } from '@onefootprint/icons';
-import { media, Text } from '@onefootprint/ui';
+import { Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -30,13 +30,7 @@ const Team = ({ title, description, items }: TeamProps) => (
       {items.map(item => (
         <Item key={item.name}>
           <AvatarContainer>
-            <Image
-              alt={item.name}
-              height={160}
-              src={item.avatarSrc}
-              width={160}
-              priority
-            />
+            <Image alt={item.name} height={160} src={item.avatarSrc} width={160} priority />
           </AvatarContainer>
           <Text variant="heading-3">{item.name}</Text>
           <Text variant="body-1" marginBottom={7}>

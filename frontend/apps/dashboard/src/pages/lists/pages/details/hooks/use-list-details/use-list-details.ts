@@ -1,9 +1,5 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  GetListDetailsRequest,
-  GetListDetailsResponse,
-  ListDetails,
-} from '@onefootprint/types';
+import type { GetListDetailsRequest, GetListDetailsResponse, ListDetails } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 
@@ -19,9 +15,7 @@ const getListDetails = async ({ authHeaders, id }: GetListDetailsRequest) => {
 
 const useListDetails = (id = '') => {
   const { authHeaders } = useSession();
-  const query = useQuery<ListDetails>(['lists', id, authHeaders], () =>
-    getListDetails({ authHeaders, id }),
-  );
+  const query = useQuery<ListDetails>(['lists', id, authHeaders], () => getListDetails({ authHeaders, id }));
   const { error } = query;
   const errorMessage = error ? getErrorMessage(error) : undefined;
 

@@ -5,25 +5,9 @@ import styled from 'styled-components';
 
 const Illustration = () => (
   <Container>
-    <Sky
-      src="/home/banner/sky.svg"
-      alt="sky"
-      width={600}
-      height={600}
-      className="sky"
-    />
-    <Penguin
-      src="/home/banner/penguin.svg"
-      alt="penguin"
-      width={600}
-      height={400}
-    />
-    <Cloud2
-      src="/home/banner/cloud-2.svg"
-      alt="cloud"
-      width={158}
-      height={52}
-    />
+    <Sky src="/home/banner/sky.svg" alt="sky" width={600} height={600} className="sky" />
+    <Penguin src="/home/banner/penguin.svg" alt="penguin" width={600} height={400} />
+    <Cloud2 src="/home/banner/cloud-2.svg" alt="cloud" width={158} height={52} />
     <Cloud src="/home/banner/cloud.svg" alt="cloud" width={70} height={20} />
     <Sun src="/home/banner/sun.svg" alt="sun" width={50} height={50} />
   </Container>

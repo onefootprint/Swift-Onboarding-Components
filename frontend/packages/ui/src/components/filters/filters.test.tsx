@@ -1,13 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-  within,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor, waitForElementToBeRemoved, within } from '@onefootprint/test-utils';
 import MockDate from 'mockdate';
 import React from 'react';
 
@@ -42,10 +35,7 @@ describe('<Filters />', () => {
     ],
     onChange,
     onClear,
-  }: Partial<FiltersProps>) =>
-    customRender(
-      <Filters controls={controls} onChange={onChange} onClear={onClear} />,
-    );
+  }: Partial<FiltersProps>) => customRender(<Filters controls={controls} onChange={onChange} onClear={onClear} />);
 
   it('should not render the clear button when there is no selectedOption', () => {
     renderFilters({});
@@ -451,10 +441,7 @@ describe('<Filters />', () => {
 
         const submitButton = screen.getByRole('button', { name: 'Apply' });
         await userEvent.click(submitButton);
-        expect(onChange).toHaveBeenCalledWith('date', [
-          '2023-01-05T00:00:00.000Z',
-          '2023-01-12T00:00:00.000Z',
-        ]);
+        expect(onChange).toHaveBeenCalledWith('date', ['2023-01-05T00:00:00.000Z', '2023-01-12T00:00:00.000Z']);
 
         await waitForElementToBeRemoved(screen.queryByRole('dialog'));
         const popover = screen.queryByRole('dialog');

@@ -7,20 +7,19 @@
   "sideEffects": false,
   "license": "MIT",
   "scripts": {
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
-    "typecheck": "yarn tsc --noEmit",
-    "test": "bun test",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
     "test:ci:bun": "bun test --bail",
     "test:watch": "bun test --watch",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "test": "bun test",
+    "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
     "@types/uuid": "^9.0.0",
     "bun-types": "^1.0.25",
-    "eslint-config-footprint": "*",
     "tsconfig": "*",
     "typescript": "^5"
   },

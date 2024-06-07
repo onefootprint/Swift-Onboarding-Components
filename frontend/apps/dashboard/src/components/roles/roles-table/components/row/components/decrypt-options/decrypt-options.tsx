@@ -9,10 +9,7 @@ export type DecryptOptionProps<T extends React.ElementType> = {
   as?: T;
 };
 
-const DecryptOptions = <T extends React.ElementType>({
-  options,
-  as,
-}: DecryptOptionProps<T>) => {
+const DecryptOptions = <T extends React.ElementType>({ options, as }: DecryptOptionProps<T>) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
   const Component = as || 'span';
   if (options.length === 1) {
@@ -27,11 +24,7 @@ const DecryptOptions = <T extends React.ElementType>({
   }
   if (options.length > 1) {
     return (
-      <Tooltip
-        text={options
-          .map(scope => t(`scopes.decrypt.${scope}` as ParseKeys<'common'>))
-          .join(', ')}
-      >
+      <Tooltip text={options.map(scope => t(`scopes.decrypt.${scope}` as ParseKeys<'common'>)).join(', ')}>
         <Component>
           {t(`scopes.decrypt_fields_other`, {
             count: options.length,

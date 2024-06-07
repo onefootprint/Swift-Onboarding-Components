@@ -10,10 +10,7 @@ const validateUserData = (email?: string, phoneNumber?: string) => {
     try {
       const parsedPhoneNumber = phoneUtils.parseAndKeepRawInput(phoneNumber);
       const region = phoneUtils.getRegionCodeForNumber(parsedPhoneNumber);
-      isPhoneValid = phoneUtils.isValidNumberForRegion(
-        parsedPhoneNumber,
-        region,
-      );
+      isPhoneValid = phoneUtils.isValidNumberForRegion(parsedPhoneNumber, region);
     } catch (_) {
       // do nothing
     }

@@ -1,5 +1,5 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { media, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import React from 'react';
@@ -15,12 +15,7 @@ type MessageBannerProps = {
 
 export const CASE_STUDY_BANNER_PORTAL_ID = 'banner-portal';
 
-const MessageBanner = ({
-  onClose,
-  articleUrl,
-  text,
-  showBanner,
-}: MessageBannerProps) => {
+const MessageBanner = ({ onClose, articleUrl, text, showBanner }: MessageBannerProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.message-banner',
   });
@@ -52,17 +47,8 @@ const MessageBanner = ({
   return (
     <AnimatePresence>
       {showBanner && (
-        <Container
-          variants={containerVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-        >
-          <motion.div
-            variants={textVariants}
-            initial="initial"
-            animate="animate"
-          >
+        <Container variants={containerVariants} initial="initial" animate="animate" exit="exit">
+          <motion.div variants={textVariants} initial="initial" animate="animate">
             <Text variant="label-3">
               {text}
               <StyledLink href={articleUrl}>{t('cta')}</StyledLink>

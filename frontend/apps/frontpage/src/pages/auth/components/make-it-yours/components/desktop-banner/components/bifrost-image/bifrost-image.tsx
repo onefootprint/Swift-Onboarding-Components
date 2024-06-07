@@ -12,13 +12,7 @@ type BifrostImageProps = {
   zIndex?: number;
 };
 
-const BifrostImage = ({
-  src,
-  height,
-  width,
-  zIndex = 1,
-  variants,
-}: BifrostImageProps) => {
+const BifrostImage = ({ src, height, width, zIndex = 1, variants }: BifrostImageProps) => {
   const ref = useRef(null);
   const isInView = useInView(ref, {
     once: true,

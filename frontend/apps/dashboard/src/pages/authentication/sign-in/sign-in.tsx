@@ -1,5 +1,5 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Box, Divider, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Divider, Stack, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
@@ -41,12 +41,7 @@ const Login = () => {
               <Divider />
             </Stack>
             <EmailForm />
-            <Text
-              color="secondary"
-              variant="body-4"
-              gap={2}
-              display="inline-flex"
-            >
+            <Text color="secondary" variant="body-4" gap={2} display="inline-flex">
               <span>{t('do-not-have-an-account')}</span>
               <Link href="/authentication/sign-up">{t('sign-up')}</Link>
             </Text>

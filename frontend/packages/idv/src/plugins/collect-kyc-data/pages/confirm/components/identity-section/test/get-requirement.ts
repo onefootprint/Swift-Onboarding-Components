@@ -1,7 +1,4 @@
-import type {
-  CollectedKycDataOption,
-  CollectKycDataRequirement,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement, CollectedKycDataOption } from '@onefootprint/types';
 import { OnboardingRequirementKind } from '@onefootprint/types';
 
 type GetRequirementArgs = {

@@ -2,16 +2,7 @@
 
 import { LogoFpCompact } from '@onefootprint/icons';
 import type { NextToast } from '@onefootprint/ui';
-import {
-  Box,
-  Button,
-  Divider,
-  GoogleButton,
-  Stack,
-  Text,
-  TextInput,
-  useToast,
-} from '@onefootprint/ui';
+import { Box, Button, Divider, GoogleButton, Stack, Text, TextInput, useToast } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -52,7 +43,7 @@ const SignInContent = () => {
       const redirect = `${window.location.origin}/auth`;
       const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/partner/auth/google_oauth?redirect_url=${redirect}`;
       window.location.href = url;
-    } catch (err) {
+    } catch (_e) {
       toast.show(getFailedGoogleTexts(t));
     } finally {
       setIsLoginInProgress(false);
@@ -70,7 +61,7 @@ const SignInContent = () => {
         await authMagicLink(email);
         router.push(`/auth/link-sent?email=${email}`);
       }
-    } catch (err) {
+    } catch (_e) {
       toast.show(getFailedEmailTexts(t));
     } finally {
       setIsLoginInProgress(false);
@@ -87,13 +78,7 @@ const SignInContent = () => {
       elevation={1}
       position="relative"
     >
-      <PenguinImage
-        alt={t('penguin')}
-        height={115}
-        priority
-        src={PngPenguinLogin}
-        width={99}
-      />
+      <PenguinImage alt={t('penguin')} height={115} priority src={PngPenguinLogin} width={99} />
       <Stack width="398px" direction="column" gap={7}>
         <LogoFpCompact />
         <Text variant="label-2">{t('sign-in-to-footprint')}</Text>
@@ -119,13 +104,7 @@ const SignInContent = () => {
               placeholder={t('email-placeholder')}
               type="email"
             />
-            <Button
-              disabled={isLoginInProgress}
-              fullWidth
-              loading={isLoginInProgress}
-              size="large"
-              type="submit"
-            >
+            <Button disabled={isLoginInProgress} fullWidth loading={isLoginInProgress} size="large" type="submit">
               {t('continue-with-email')}
             </Button>
           </Stack>

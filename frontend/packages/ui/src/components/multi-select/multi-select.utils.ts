@@ -3,9 +3,7 @@ import type { GroupBase, OptionsOrGroups } from 'react-select';
 type OptionType = { value: string; label: string };
 
 const prependAllOption = (
-  initialOptions:
-    | OptionsOrGroups<OptionType, GroupBase<OptionType>>
-    | undefined,
+  initialOptions: OptionsOrGroups<OptionType, GroupBase<OptionType>> | undefined,
   selectAllOption?: OptionType,
 ): OptionsOrGroups<OptionType, GroupBase<OptionType>> | undefined => {
   if (!selectAllOption) {
@@ -16,10 +14,7 @@ const prependAllOption = (
     return [selectAllOption];
   }
 
-  if (
-    'options' in initialOptions[0] &&
-    !Array.isArray(initialOptions[0].options)
-  ) {
+  if ('options' in initialOptions[0] && !Array.isArray(initialOptions[0].options)) {
     return [selectAllOption, ...(initialOptions as OptionType[])];
   }
 

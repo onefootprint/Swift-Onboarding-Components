@@ -1,7 +1,4 @@
-import type {
-  FootprintAuthProps,
-  FootprintVariant,
-} from '@onefootprint/footprint-js';
+import type { FootprintAuthProps, FootprintVariant } from '@onefootprint/footprint-js';
 
 export type Variant = FootprintVariant;
 export type FootprintAuthDataProps = Omit<

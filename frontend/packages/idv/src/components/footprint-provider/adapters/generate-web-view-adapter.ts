@@ -1,9 +1,5 @@
 import { Logger } from '../../../utils/logger';
-import type {
-  CompletePayload,
-  SendResultCallback,
-  WebViewAdapterReturn,
-} from '../types';
+import type { CompletePayload, SendResultCallback, WebViewAdapterReturn } from '../types';
 
 const generateWebViewAdapter = (): WebViewAdapterReturn => {
   let sendResultCallback: SendResultCallback | undefined;
@@ -41,23 +37,16 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
     setLocation({ canceled: true });
   };
 
-  const on = () => () => {};
+  const on = () => () => undefined;
 
   const setCompleteTimeout = (location: Record<string, string>, delay = 0) => {
     setTimeout(() => {
-      Logger.info(
-        'Closing footprint after complete timeout from web view adapter',
-      );
+      Logger.info('Closing footprint after complete timeout from web view adapter');
       setLocation(location);
     }, delay);
   };
 
-  const complete = ({
-    validationToken,
-    delay = 0,
-    authToken,
-    deviceResponse,
-  }: CompletePayload): void => {
+  const complete = ({ validationToken, delay = 0, authToken, deviceResponse }: CompletePayload): void => {
     Logger.info('Completing footprint from web view adapter');
     const location: Record<string, string> = {
       validation_token: validationToken,

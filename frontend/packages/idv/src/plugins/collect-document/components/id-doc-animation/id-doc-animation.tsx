@@ -68,31 +68,18 @@ const IdDocAnimation = ({
   return (
     <>
       <AnimatePresence>
-        {mode === 'loading' && (
-          <motion.div exit={{ opacity: 0 }}>{loadingComponent}</motion.div>
-        )}
+        {mode === 'loading' && <motion.div exit={{ opacity: 0 }}>{loadingComponent}</motion.div>}
       </AnimatePresence>
       <AnimatePresence>
         {isShowingSuccess && (
-          <SuccessFeedbackContainer
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            variants={successFeedbackVariants}
-          >
+          <SuccessFeedbackContainer initial="hidden" animate="visible" exit="exit" variants={successFeedbackVariants}>
             {successComponent}
           </SuccessFeedbackContainer>
         )}
       </AnimatePresence>
       <AnimatePresence>
         {isShowingNextSide && (
-          <NextSideContainer
-            style={{}}
-            initial="hiddenBelow"
-            animate="slideIn"
-            exit="exit"
-            variants={nextSideVariants}
-          >
+          <NextSideContainer style={{}} initial="hiddenBelow" animate="slideIn" exit="exit" variants={nextSideVariants}>
             {nextSideComponent}
           </NextSideContainer>
         )}

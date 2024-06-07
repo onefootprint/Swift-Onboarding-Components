@@ -155,11 +155,8 @@ describe('convertFormData', () => {
       },
     },
   ])('.', ({ data, tenant, x }) => {
-    expect(
-      convertFormData(
-        tenant as unknown as TenantDetail,
-        data as unknown as UpdateTenantFormData,
-      ),
-    ).toStrictEqual(x);
+    expect(convertFormData(tenant as unknown as TenantDetail, data as unknown as UpdateTenantFormData)).toStrictEqual(
+      x,
+    );
   });
 });

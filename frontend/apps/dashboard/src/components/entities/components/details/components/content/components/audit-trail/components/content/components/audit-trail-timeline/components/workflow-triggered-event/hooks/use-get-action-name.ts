@@ -17,9 +17,7 @@ const useGetActionName = () => {
       // TODO when we start supporting requesting multiple documents, adjust the timeline event
       // accordingly
       const { configs } = config.data;
-      const customConfig = configs.find(
-        c => c.kind === DocumentRequestKind.Custom,
-      );
+      const customConfig = configs.find(c => c.kind === DocumentRequestKind.Custom);
       if (configs.some(c => c.kind === DocumentRequestKind.ProofOfAddress)) {
         action = t(`actions.proof_of_address`);
       } else if (configs.some(c => c.kind === DocumentRequestKind.ProofOfSsn)) {

@@ -1,9 +1,7 @@
 import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
-import type {
-  DefaultValues,
-  MachineContext,
-} from '@/playbooks/utils/machine/types';
+import type { DefaultValues, MachineContext } from '@/playbooks/utils/machine/types';
 import {
+  OnboardingTemplate,
   defaultAmlFormData,
   defaultAmlFormDataAlpaca,
   defaultAmlFormDataApex,
@@ -26,7 +24,6 @@ import {
   defaultResidencyFormDataCarRental,
   defaultResidencyFormDataCreditCard,
   defaultResidencyFormDataTenantScreening,
-  OnboardingTemplate,
 } from '@/playbooks/utils/machine/types';
 
 const templateToDefaultValuesKYC = {
@@ -57,8 +54,7 @@ const templateToDefaultResidency = {
 };
 
 const getDefaultValues = (context: MachineContext): DefaultValues => {
-  const onboardingTemplate =
-    context.onboardingTemplate || OnboardingTemplate.Custom;
+  const onboardingTemplate = context.onboardingTemplate || OnboardingTemplate.Custom;
   if (isAuth(context.kind)) {
     return {
       ...defaultPlaybookValuesAuth,

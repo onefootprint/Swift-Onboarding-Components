@@ -16,11 +16,7 @@ export type ManualReviewDialogProps = {
   status: ReviewStatus;
 };
 
-const ManualReviewDialog = ({
-  open,
-  onClose,
-  status,
-}: ManualReviewDialogProps) => {
+const ManualReviewDialog = ({ open, onClose, status }: ManualReviewDialogProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.manual-review',
   });

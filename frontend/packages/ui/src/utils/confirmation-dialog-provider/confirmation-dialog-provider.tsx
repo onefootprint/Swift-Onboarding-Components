@@ -36,15 +36,11 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
           onClose={hide}
           primaryButton={{
             label: confirmationDialog.primaryButton.label,
-            onClick: handleButtonClick(
-              confirmationDialog.primaryButton.onClick,
-            ),
+            onClick: handleButtonClick(confirmationDialog.primaryButton.onClick),
           }}
           secondaryButton={{
             label: confirmationDialog.secondaryButton.label,
-            onClick: handleButtonClick(
-              confirmationDialog.secondaryButton.onClick,
-            ),
+            onClick: handleButtonClick(confirmationDialog.secondaryButton.onClick),
           }}
         >
           <Text variant="body-2" color="secondary" textAlign="center">
@@ -56,9 +52,7 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
   );
 };
 
-const ConfirmationDialogProvider = ({
-  children,
-}: ConfirmationDialogProviderProps) => (
+const ConfirmationDialogProvider = ({ children }: ConfirmationDialogProviderProps) => (
   <Provider>
     <ConfirmationDialog>{children}</ConfirmationDialog>
   </Provider>

@@ -4,9 +4,7 @@ type UseFootprintProvider = {
   client: ProviderReturn;
 };
 
-const useFootprintProvider = ({
-  client,
-}: UseFootprintProvider): ProviderReturn => ({
+const useFootprintProvider = ({ client }: UseFootprintProvider): ProviderReturn => ({
   getAdapterResponse: client.getAdapterResponse,
   getLoadingStatus: client.getLoadingStatus,
   load: client.load,

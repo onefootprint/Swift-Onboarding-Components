@@ -1,8 +1,5 @@
 import type { IdDocImageUploadError } from '@onefootprint/types';
-import {
-  IdDocImageProcessingError,
-  IdDocImageTypes,
-} from '@onefootprint/types';
+import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +8,7 @@ import styled, { css } from 'styled-components';
 import { NavigationHeader } from '../../../../../components';
 import DesktopHeader from '../../../components/desktop-header';
 import DesktopPhotoPrompt from '../../../components/desktop-photo-prompt';
-import Error from '../../../components/error';
+import ErrorComponent from '../../../components/error';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../../constants/desktop-interaction-box.constants';
 import type { CaptureKind } from '../../../types';
 import useDocName from '../../hooks/use-doc-name';
@@ -64,34 +61,20 @@ const DesktopSelfieRetry = () => {
           uploadMode={uploadMode}
           onUploadSuccess={handleUploadSuccess}
           onUploadError={handleUploadError}
-          errors={
-            errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]
-          }
+          errors={errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]}
           isRetry
           isSelfie
         />
       ) : (
         <Container>
-          <DesktopHeader
-            sideName={transformCase(sideName, 'first-letter-upper-only')}
-            isSelfie
-          />
+          <DesktopHeader sideName={transformCase(sideName, 'first-letter-upper-only')} isSelfie />
           <ErrorContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
-            <Error
-              errors={
-                errors ?? [
-                  { errorType: IdDocImageProcessingError.unknownError },
-                ]
-              }
+            <ErrorComponent
+              errors={errors ?? [{ errorType: IdDocImageProcessingError.unknownError }]}
               sideName={sideName}
             />
           </ErrorContainer>
-          <Button
-            fullWidth
-            onClick={handleSelfieRetake}
-            size="large"
-            data-dd-action-name="selfie:retry"
-          >
+          <Button fullWidth onClick={handleSelfieRetake} size="large" data-dd-action-name="selfie:retry">
             {t('take-selfie-again')}
           </Button>
         </Container>

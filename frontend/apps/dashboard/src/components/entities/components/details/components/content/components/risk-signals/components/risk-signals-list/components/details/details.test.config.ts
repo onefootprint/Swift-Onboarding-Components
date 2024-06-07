@@ -1,13 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { AmlDetail, Entity, RiskSignal } from '@onefootprint/types';
-import {
-  DataKind,
-  EntityKind,
-  EntityStatus,
-  IdDI,
-  RiskSignalAttribute,
-  RiskSignalSeverity,
-} from '@onefootprint/types';
+import { DataKind, EntityKind, EntityStatus, IdDI, RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 
 export const entityIdFixture = 'fp_id_yCZehsWNeywHnk5JqL20u';
 
@@ -95,8 +88,7 @@ export const riskSignalDetailsFixture: RiskSignal = {
   onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
   reasonCode: 'phone_number_located_is_voip',
   note: 'VOIP phone number',
-  description:
-    "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+  description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
   severity: RiskSignalSeverity.Low,
   scopes: [RiskSignalAttribute.phoneNumber, RiskSignalAttribute.dob],
   timestamp: '2022-10-24T21:56:12.682238Z',
@@ -151,9 +143,7 @@ export const amlDetailFixture: AmlDetail = {
   ],
 };
 
-export const withRiskSignalDetails = (
-  riskSignal: RiskSignal = riskSignalDetailsFixture,
-) =>
+export const withRiskSignalDetails = (riskSignal: RiskSignal = riskSignalDetailsFixture) =>
   mockRequest({
     method: 'get',
     path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_ryxauTlDX8hIm3wVRmm',
@@ -172,9 +162,7 @@ export const withRiskSignalDetailsError = () =>
     },
   });
 
-export const withDecryptRiskSignalAmlHits = (
-  aml: AmlDetail = amlDetailFixture,
-) =>
+export const withDecryptRiskSignalAmlHits = (aml: AmlDetail = amlDetailFixture) =>
   mockRequest({
     method: 'post',
     path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/decrypt_aml_hits/sig_ryxauTlDX8hIm3wVRmm',

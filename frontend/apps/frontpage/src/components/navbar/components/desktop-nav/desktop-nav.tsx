@@ -36,18 +36,8 @@ const DesktopNav = ({ entries }: DesktopNavProps) => {
         })}
       </MainNav>
       <SecondaryNav>
-        <Login href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>
-          {t('login')}
-        </Login>
-        <Button
-          onClick={() =>
-            window.open(
-              `${DASHBOARD_BASE_URL}/authentication/sign-up`,
-              '_blank',
-            )
-          }
-          size="compact"
-        >
+        <Login href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>{t('login')}</Login>
+        <Button onClick={() => window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank')} size="compact">
           {t('sign-up')}
         </Button>
       </SecondaryNav>

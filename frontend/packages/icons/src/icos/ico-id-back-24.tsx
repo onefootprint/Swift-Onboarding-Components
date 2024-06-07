@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoIdBack24 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoIdBack24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -30,22 +25,8 @@ const IcoIdBack24 = ({
         stroke={theme.color[color]}
         strokeWidth={1.5}
       />
-      <rect
-        x={6.667}
-        y={6.933}
-        width={10.667}
-        height={1.28}
-        rx={0.64}
-        fill={theme.color[color]}
-      />
-      <rect
-        x={9.867}
-        y={9.6}
-        width={7.467}
-        height={1.28}
-        rx={0.64}
-        fill={theme.color[color]}
-      />
+      <rect x={6.667} y={6.933} width={10.667} height={1.28} rx={0.64} fill={theme.color[color]} />
+      <rect x={9.867} y={9.6} width={7.467} height={1.28} rx={0.64} fill={theme.color[color]} />
       <path
         d="M6.667 15.048c0-.505.53-.915 1.185-.915h8.296c.655 0 1.185.41 1.185.915v1.371c0 .505-.53.914-1.185.914H7.852c-.655 0-1.185-.409-1.185-.914v-1.371Z"
         fill={theme.color[color]}

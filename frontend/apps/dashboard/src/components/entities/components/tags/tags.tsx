@@ -8,12 +8,7 @@ export type TagsProps = {
 };
 
 const Tags = ({
-  entity: {
-    watchlistCheck,
-    requiresManualReview,
-    hasOutstandingWorkflowRequest,
-    label,
-  },
+  entity: { watchlistCheck, requiresManualReview, hasOutstandingWorkflowRequest, label },
 }: TagsProps) => {
   const { t } = useTranslation('users', { keyPrefix: 'table.row.status' });
   const onWatchlist = watchlistCheck?.status === 'fail';
@@ -32,9 +27,7 @@ const Tags = ({
 
   return (
     <Stack gap={2}>
-      {hasOutstandingWorkflowRequest && (
-        <Tag>{t('outstanding-workflow-request')}</Tag>
-      )}
+      {hasOutstandingWorkflowRequest && <Tag>{t('outstanding-workflow-request')}</Tag>}
       {onWatchlist && <Tag>{t('on-watchlist')}</Tag>}
       {requiresManualReview && <Tag>{t('on-review')}</Tag>}
       {label && <Tag>{getLabel()}</Tag>}

@@ -1,19 +1,19 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  clickOnContinue,
-  confirmData,
   clickOnAgree,
+  clickOnContinue,
+  clickOnVerifyWithSms,
+  confirmData,
+  continueOnDesktop,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
   fillPhoneNumber,
   fillSSN,
   uploadImage,
-  verifyPhoneNumber,
-  clickOnVerifyWithSms,
-  continueOnDesktop,
   verifyAppIframeClick,
+  verifyPhoneNumber,
 } from './utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
@@ -33,36 +33,26 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`,
-  );
+  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
   await page.waitForLoadState();
 });
 
-test('E2E.KYC.DriverDocOnly.Real #real', async ({
-  page,
-  browser,
-  isMobile,
-}) => {
+test('E2E.KYC.DriverDocOnly.Real #real', async ({ page, browser, isMobile }) => {
   test.slow();
   test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
   const context = await browser.newContext({ permissions: ['camera'] });
 
-  await expect(
-    page
-      .frameLocator('iframe[name^="footprint-iframe-"]')
-      .getByText(/Sandbox Mode/i),
-  ).toBeVisible({ timeout });
+  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
+    timeout,
+  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   const realOutcomeBtn = frame.getByLabel('Real outcome').first();
-  await realOutcomeBtn
-    .waitFor({ state: 'attached', timeout })
-    .then(() => realOutcomeBtn.click());
+  await realOutcomeBtn.waitFor({ state: 'attached', timeout }).then(() => realOutcomeBtn.click());
 
   await clickOnContinue(frame);
   await page.waitForLoadState();
@@ -119,33 +109,19 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({
   await page.waitForLoadState();
 
   //# region Front side blurred
-  await uploadImage(
-    { frame, page, isMobile },
-    /Choose file to upload/i,
-    'driver-front.blurred.png',
-  );
+  await uploadImage({ frame, page, isMobile }, /Choose file to upload/i, 'driver-front.blurred.png');
 
-  await expect(
-    frame.getByText("We couldn't process your image").first(),
-  ).toBeAttached();
+  await expect(frame.getByText("We couldn't process your image").first()).toBeAttached();
   //# endregion
 
   //# region Front side
-  await uploadImage(
-    { frame, page, isMobile },
-    /different file/i,
-    'driver-front.png',
-  );
+  await uploadImage({ frame, page, isMobile }, /different file/i, 'driver-front.png');
   await clickOnContinue(frame);
   await page.waitForLoadState();
   //# endregion
 
   //# region Back side
-  await uploadImage(
-    { frame, page, isMobile },
-    /Choose file to upload/i,
-    'driver-back.png',
-  );
+  await uploadImage({ frame, page, isMobile }, /Choose file to upload/i, 'driver-back.png');
   await clickOnContinue(frame);
   await page.waitForLoadState();
   //# endregion

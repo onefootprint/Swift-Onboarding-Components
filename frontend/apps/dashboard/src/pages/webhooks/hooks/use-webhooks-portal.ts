@@ -27,9 +27,8 @@ const getWebhookPortal = async ({ authHeaders }: GetWebhooksPortalRequest) => {
 const useWebhookPortal = () => {
   const { authHeaders } = useSession();
 
-  return useQuery<GetWebhooksPortalResponse, RequestError>(
-    ['webhook-portal', authHeaders],
-    () => getWebhookPortal({ authHeaders }),
+  return useQuery<GetWebhooksPortalResponse, RequestError>(['webhook-portal', authHeaders], () =>
+    getWebhookPortal({ authHeaders }),
   );
 };
 

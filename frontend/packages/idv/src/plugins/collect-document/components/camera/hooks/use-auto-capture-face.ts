@@ -28,8 +28,7 @@ const CountDownProps = {
 };
 
 const isFaceOk = (x: unknown) => x === FaceStatus.OK;
-const isNonZeroVideoSize = (v?: VideoSize): v is VideoSize =>
-  Boolean(v) && v?.width !== 0 && v?.height !== 0;
+const isNonZeroVideoSize = (v?: VideoSize): v is VideoSize => Boolean(v) && v?.width !== 0 && v?.height !== 0;
 
 const useAutoCaptureFace = ({
   canvasRef,
@@ -44,23 +43,14 @@ const useAutoCaptureFace = ({
   videoSize,
 }: AutoCaptureFaceProps) => {
   const successCountRef = useRef(0);
-  const pastStatusRef = useRef<FaceStatus | CardCaptureStatus | undefined>(
-    FaceStatus.detecting,
-  );
-  const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] =
-    useState(false);
+  const pastStatusRef = useRef<FaceStatus | CardCaptureStatus | undefined>(FaceStatus.detecting);
+  const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] = useState(false);
 
   const { getFaceStatus } = useFaceDetection();
-  const [waitVal, { startCountdown, resetCountdown }] =
-    useCountdownCustom(CountDownProps);
+  const [waitVal, { startCountdown, resetCountdown }] = useCountdownCustom(CountDownProps);
 
   const detectAndCaptureFace = useCallback(async (): Promise<void> => {
-    if (
-      isCaptured ||
-      !videoRef.current ||
-      !canvasRef.current ||
-      !isNonZeroVideoSize(videoSize)
-    ) {
+    if (isCaptured || !videoRef.current || !canvasRef.current || !isNonZeroVideoSize(videoSize)) {
       return;
     }
 
@@ -70,17 +60,12 @@ const useAutoCaptureFace = ({
       return;
     }
 
-    const faceStatus = await getFaceStatus(
-      videoRef.current,
-      videoSize.width,
-      videoSize.height,
-      {
-        width: outlineWidth,
-        height: outlineWidth,
-        frameOffsetX: outlineOffsetX ?? 0,
-        frameOffsetY: outlineOffsetY ?? 0,
-      },
-    );
+    const faceStatus = await getFaceStatus(videoRef.current, videoSize.width, videoSize.height, {
+      width: outlineWidth,
+      height: outlineWidth,
+      frameOffsetX: outlineOffsetX ?? 0,
+      frameOffsetY: outlineOffsetY ?? 0,
+    });
     if (isFaceOk(faceStatus)) {
       successCountRef.current += 1;
       onStatusChange(FaceStatus.OK);

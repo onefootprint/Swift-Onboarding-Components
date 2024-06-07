@@ -1,25 +1,11 @@
-import {
-  Combobox,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxProvider,
-} from '@ariakit/react';
-import {
-  createFontStyles,
-  createOverlayBackground,
-  Text,
-} from '@onefootprint/ui';
+import { Combobox, ComboboxItem, ComboboxList, ComboboxProvider } from '@ariakit/react';
+import { Text, createFontStyles, createOverlayBackground } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { matchSorter } from 'match-sorter';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ListRowProps } from 'react-virtualized';
-import {
-  AutoSizer,
-  CellMeasurer,
-  CellMeasurerCache,
-  List,
-} from 'react-virtualized';
+import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
 import styled, { css } from 'styled-components';
 
 import useRiskSignals from '../../../../../../hooks/use-risk-signals';
@@ -75,13 +61,7 @@ const RiskSignalSelect = ({ value, onChange }: RiskSignalSelectProps) => {
     if (!option) return null;
 
     return (
-      <CellMeasurer
-        key={key}
-        cache={cache.current}
-        parent={parent}
-        columnIndex={0}
-        rowIndex={index}
-      >
+      <CellMeasurer key={key} cache={cache.current} parent={parent} columnIndex={0} rowIndex={index}>
         <Item
           asChild
           key={option.value}
@@ -122,11 +102,7 @@ const RiskSignalSelect = ({ value, onChange }: RiskSignalSelectProps) => {
           setSearchValue(nextValue);
         }}
       >
-        <CustomTrigger
-          isOpen={open}
-          ariaLabel={t('aria-label')}
-          color={selectedSignal ? 'primary' : 'tertiary'}
-        >
+        <CustomTrigger isOpen={open} ariaLabel={t('aria-label')} color={selectedSignal ? 'primary' : 'tertiary'}>
           {selectedSignal || t('placeholder')}
         </CustomTrigger>
         <Content position="popper" sideOffset={4} align="end">

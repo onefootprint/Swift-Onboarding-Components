@@ -7,11 +7,7 @@ import styled, { css } from 'styled-components';
 import type { NavMenu } from '../../../../types';
 import MobileNavMenuItem from '../mobile-nav-menu-item';
 
-const {
-  Item: NavigationMenuItem,
-  Trigger: NavigationMenuTrigger,
-  Content: NavigationMenuContent,
-} = NavigationMenu;
+const { Item: NavigationMenuItem, Trigger: NavigationMenuTrigger, Content: NavigationMenuContent } = NavigationMenu;
 
 type MobileNavMenuProps = {
   menu: NavMenu;

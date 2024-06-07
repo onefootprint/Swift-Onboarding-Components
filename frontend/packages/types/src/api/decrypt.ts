@@ -6,6 +6,4 @@ export type DecryptRequest = {
   reason: string;
 };
 
-export type DecryptResponse = Partial<
-  Record<DataIdentifier, string | undefined>
->;
+export type DecryptResponse = Partial<Record<DataIdentifier, string | undefined>>;

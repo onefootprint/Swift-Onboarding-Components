@@ -1,6 +1,6 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { media, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text, media } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -19,11 +19,7 @@ type FootprintFooterProps = {
   config?: PublicOnboardingConfig;
 };
 
-const FootprintFooter = ({
-  hideOnDesktop,
-  onWhatsThisClick,
-  config,
-}: FootprintFooterProps) => {
+const FootprintFooter = ({ hideOnDesktop, onWhatsThisClick, config }: FootprintFooterProps) => {
   const { t /* i18n */ } = useTranslation('idv', {
     keyPrefix: 'global.components.layout',
   });
@@ -58,12 +54,7 @@ const FootprintFooter = ({
           </Text>
         </WhatsThisButton>
         <div>
-          <a
-            href={`${FRONTPAGE_BASE_URL}/privacy-policy`}
-            target="_blank"
-            rel="noreferrer"
-            className="footer-link"
-          >
+          <a href={`${FRONTPAGE_BASE_URL}/privacy-policy`} target="_blank" rel="noreferrer" className="footer-link">
             <Text variant="caption-1" color="secondary" tag="span">
               {t('privacy')}
             </Text>

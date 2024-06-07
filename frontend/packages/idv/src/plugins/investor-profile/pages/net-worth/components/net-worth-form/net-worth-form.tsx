@@ -1,8 +1,5 @@
 import type { InvestorProfileData } from '@onefootprint/types';
-import {
-  InvestorProfileDI,
-  InvestorProfileNetWorth,
-} from '@onefootprint/types';
+import { InvestorProfileDI, InvestorProfileNetWorth } from '@onefootprint/types';
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,19 +18,13 @@ type FormData = {
   netWorth: InvestorProfileNetWorth;
 };
 
-const NetWorthForm = ({
-  isLoading,
-  defaultValues,
-  onSubmit,
-}: NetWorthFormProps) => {
+const NetWorthForm = ({ isLoading, defaultValues, onSubmit }: NetWorthFormProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'investor-profile.pages.net-worth',
   });
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
-      netWorth:
-        defaultValues?.[InvestorProfileDI.netWorth] ??
-        InvestorProfileNetWorth.le50k,
+      netWorth: defaultValues?.[InvestorProfileDI.netWorth] ?? InvestorProfileNetWorth.le50k,
     },
   });
 

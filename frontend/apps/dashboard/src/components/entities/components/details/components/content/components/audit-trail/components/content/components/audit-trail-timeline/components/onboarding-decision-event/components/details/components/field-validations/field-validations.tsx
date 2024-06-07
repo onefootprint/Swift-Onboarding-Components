@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
 import styled from 'styled-components';
 
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import {
   ValidationTimelineItemBody,
@@ -19,8 +19,7 @@ export type FieldValidationsProps = {
 
 const FieldValidations = ({ entityId }: FieldValidationsProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.drawer',
+    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.drawer',
   });
   const { data, isError, error, isLoading } = useEntityMatchSignals({
     id: entityId,
@@ -31,12 +30,7 @@ const FieldValidations = ({ entityId }: FieldValidationsProps) => {
       const timelineItems = data.map(validationEntry => {
         const { attribute, matchLevel, signals } = validationEntry;
         return {
-          headerComponent: (
-            <ValidationTimelineItemHeader
-              attribute={attribute}
-              matchLevel={matchLevel}
-            />
-          ),
+          headerComponent: <ValidationTimelineItemHeader attribute={attribute} matchLevel={matchLevel} />,
           bodyComponent: <ValidationTimelineItemBody signals={signals} />,
           iconComponent: <ValidationTimelineItemIcon attribute={attribute} />,
         };
@@ -55,7 +49,7 @@ const FieldValidations = ({ entityId }: FieldValidationsProps) => {
 
   return (
     <Container>
-      {isError && <Error error={error} />}
+      {isError && <ErrorComponent error={error} />}
       {isLoading && <Loading />}
       {!isError && !isLoading && getContent()}
     </Container>

@@ -5,7 +5,7 @@ import type {
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
-import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
+import { OnboardingRequirementKind, getRequirement } from '@onefootprint/types';
 import { Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,12 +14,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
 import { Logger } from '../../../../../../utils/logger';
-import {
-  isDocCdo,
-  isInvestorProfileCdo,
-  isKybCdo,
-  isKycCdo,
-} from '../../../../utils/cdo-utils';
+import { isDocCdo, isInvestorProfileCdo, isKybCdo, isKycCdo } from '../../../../utils/cdo-utils';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 import useOnboardingProcess from '../../hooks/use-onboarding-process';
 import Button from './components/button';
@@ -41,38 +36,26 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     onboardingContext: { config, overallOutcome },
     requirements,
   } = state.context;
-  const authorizeRequirement = getRequirement(
-    requirements,
-    OnboardingRequirementKind.authorize,
-  );
-  const processRequirement = getRequirement(
-    requirements,
-    OnboardingRequirementKind.process,
-  );
+  const authorizeRequirement = getRequirement(requirements, OnboardingRequirementKind.authorize);
+  const processRequirement = getRequirement(requirements, OnboardingRequirementKind.process);
   const onboardingAuthorizeMutation = useOnboardingAuthorize();
   const processMutation = useOnboardingProcess();
-  const isLoading =
-    onboardingAuthorizeMutation.isLoading || processMutation.isLoading;
+  const isLoading = onboardingAuthorizeMutation.isLoading || processMutation.isLoading;
   const toast = useToast();
 
   if (!authorizeRequirement) {
     return null;
   }
 
-  const { collectedData, documentTypes } =
-    authorizeRequirement.fieldsToAuthorize;
+  const { collectedData, documentTypes } = authorizeRequirement.fieldsToAuthorize;
   const { orgName: tenantName } = config;
-  const kycData = collectedData.filter(
-    data => isKycCdo(data) || isDocCdo(data) || isInvestorProfileCdo(data),
-  ) as (
+  const kycData = collectedData.filter(data => isKycCdo(data) || isDocCdo(data) || isInvestorProfileCdo(data)) as (
     | CollectedKycDataOption
     | CollectedDocumentDataOption
     | CollectedInvestorProfileDataOption
   )[];
 
-  const kybData = collectedData.filter(data =>
-    isKybCdo(data),
-  ) as CollectedKybDataOption[];
+  const kybData = collectedData.filter(data => isKybCdo(data)) as CollectedKybDataOption[];
   const hasBothSections = kycData.length > 0 && kybData.length > 0;
 
   const handleAuthorizeSuccess = () => {
@@ -90,12 +73,9 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       {
         onSuccess: onDone,
         onError: (error: unknown) => {
-          Logger.error(
-            `Error while processing onboarding on authorize page: ${getErrorMessage(
-              error,
-            )}`,
-            { location: 'onboarding-authorize' },
-          );
+          Logger.error(`Error while processing onboarding on authorize page: ${getErrorMessage(error)}`, {
+            location: 'onboarding-authorize',
+          });
           send('error');
         },
       },
@@ -112,12 +92,9 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       {
         onSuccess: handleAuthorizeSuccess,
         onError: (error: unknown) => {
-          Logger.error(
-            `Error while authorizing onboarding on authorize page: ${getErrorMessage(
-              error,
-            )}`,
-            { location: 'onboarding-authorize' },
-          );
+          Logger.error(`Error while authorizing onboarding on authorize page: ${getErrorMessage(error)}`, {
+            location: 'onboarding-authorize',
+          });
           toast.show({
             title: t('onboarding-complete-error.title'),
             description: t('onboarding-complete-error.description'),
@@ -132,15 +109,8 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   return (
     <Container>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <HeaderTitle
-        title={t('title')}
-        subtitle={t('subtitle', { tenantName })}
-      />
-      <KycFields
-        showTitle={hasBothSections}
-        data={kycData}
-        documentTypes={documentTypes}
-      />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle', { tenantName })} />
+      <KycFields showTitle={hasBothSections} data={kycData} documentTypes={documentTypes} />
       {hasBothSections && <Divider />}
       <KybFields showTitle={hasBothSections} data={kybData} />
       <Button isLoading={isLoading} onClick={handleClick} />

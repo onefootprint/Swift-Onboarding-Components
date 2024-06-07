@@ -64,18 +64,8 @@ const VerticalBeam = ({
         strokeWidth="1"
         strokeOpacity="0.2"
       />
-      <path
-        d={path}
-        stroke={`url(#${id})`}
-        strokeLinecap="round"
-        strokeWidth="1"
-      />
-      <path
-        d={path}
-        stroke={`url(#${id}-back)`}
-        strokeLinecap="round"
-        strokeWidth="1"
-      />
+      <path d={path} stroke={`url(#${id})`} strokeLinecap="round" strokeWidth="1" />
+      <path d={path} stroke={`url(#${id}-back)`} strokeLinecap="round" strokeWidth="1" />
       <defs>
         <motion.linearGradient
           key={id}

@@ -4,14 +4,14 @@ import {
   clickOnContinue,
   clickOnVerifyWithSms,
   confirmData,
+  continueOnDesktop,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
   fillPhoneNumber,
   selectOutcomeOptional,
-  continueOnDesktop,
-  verifyPhoneNumber,
   verifyAppIframeClick,
+  verifyPhoneNumber,
 } from './utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
@@ -31,9 +31,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/verify?ob_key=${key}&locale=${locale}&app_url=${appUrl}&f=${flowId}`,
-  );
+  await page.goto(`/components/verify?ob_key=${key}&locale=${locale}&app_url=${appUrl}&f=${flowId}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
@@ -45,11 +43,9 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ isMobile, page }) => {
   test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(
-    page
-      .frameLocator('iframe[name^="footprint-iframe-"]')
-      .getByText(/Sandbox Mode/i),
-  ).toBeVisible({ timeout });
+  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
+    timeout,
+  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   await selectOutcomeOptional(frame, 'Success');

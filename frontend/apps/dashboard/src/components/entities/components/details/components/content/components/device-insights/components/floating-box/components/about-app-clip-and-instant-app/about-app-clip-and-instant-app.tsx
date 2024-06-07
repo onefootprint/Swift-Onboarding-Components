@@ -8,9 +8,7 @@ type AboutAppClipAndInstantAppProps = {
   kind: 'app-clip' | 'instant-app';
 };
 
-const AboutAppClipAndInstantApp = ({
-  kind,
-}: AboutAppClipAndInstantAppProps) => {
+const AboutAppClipAndInstantApp = ({ kind }: AboutAppClipAndInstantAppProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: `pages.entity.device-insights.${kind}`,
   });
@@ -23,20 +21,12 @@ const AboutAppClipAndInstantApp = ({
   return (
     <>
       <LinkButton onClick={() => setIsOpen(true)}>{t('about')}</LinkButton>
-      <Dialog
-        onClose={handleClose}
-        open={isOpen}
-        size="compact"
-        title={t('dialog.title')}
-      >
+      <Dialog onClose={handleClose} open={isOpen} size="compact" title={t('dialog.title')}>
         <Text variant="body-2">{t('dialog.content')}</Text>
         <InstructionsContainer>
           <Text variant="body-2">{t('dialog.demo')}</Text>
           <Box marginTop={5} marginBottom={5}>
-            <QRCode
-              value="https://handoff.onefootprint.com/appclip?demo=true#1234512345"
-              size={128}
-            />
+            <QRCode value="https://handoff.onefootprint.com/appclip?demo=true#1234512345" size={128} />
           </Box>
           <Text variant="body-2" color="secondary">
             {t('dialog.instructions')}

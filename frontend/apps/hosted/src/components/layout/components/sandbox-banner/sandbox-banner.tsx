@@ -12,11 +12,7 @@ const SandboxBanner = () => {
 
   return (
     <SandboxBannerContainer>
-      {isSandbox && (
-        <Banner variant="warning">
-          {t('components.layout.sandbox-banner')}
-        </Banner>
-      )}
+      {isSandbox && <Banner variant="warning">{t('components.layout.sandbox-banner')}</Banner>}
     </SandboxBannerContainer>
   );
 };

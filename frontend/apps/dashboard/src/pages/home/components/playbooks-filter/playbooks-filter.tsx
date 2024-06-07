@@ -19,9 +19,7 @@ const PlaybooksFilter = () => {
   };
   const playbooksData = [allPlaybooksOption, ...(data || [])];
 
-  const playbooksFilterValue = playbooksData?.find(
-    ({ value }) => value === filters.values.playbook_id,
-  ) ?? {
+  const playbooksFilterValue = playbooksData?.find(({ value }) => value === filters.values.playbook_id) ?? {
     label: t('all-playbooks'),
     value: ALL_PLAYBOOKS_ID,
   };

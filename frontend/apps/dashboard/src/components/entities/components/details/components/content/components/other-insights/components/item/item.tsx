@@ -11,25 +11,13 @@ type ItemProps = {
   unit: UserInsightsUnit;
 };
 
-const Item = ({
-  name: rawName,
-  value: rawValue,
-  description,
-  unit: rawUnit,
-}: ItemProps) => {
+const Item = ({ name: rawName, value: rawValue, description, unit: rawUnit }: ItemProps) => {
   const name = capitalizeFirstLetter(rawName);
   const { unit, value } = formatValue(rawValue, rawUnit);
 
   return (
     <Stack direction="row" width="100%" padding={3} gap={3}>
-      <Text
-        variant="body-3"
-        maxWidth="50%"
-        truncate
-        display="flex"
-        gap={2}
-        tag="div"
-      >
+      <Text variant="body-3" maxWidth="50%" truncate display="flex" gap={2} tag="div">
         {name}
         {description && (
           <Tooltip text={description} position="bottom">
@@ -50,8 +38,7 @@ const Item = ({
   );
 };
 
-const capitalizeFirstLetter = (string: string) =>
-  string.charAt(0).toUpperCase() + string.slice(1);
+const capitalizeFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1);
 
 const formatValue = (value: string, unit: UserInsightsUnit) => {
   if (unit === UserInsightsUnit.TimeInMs) {

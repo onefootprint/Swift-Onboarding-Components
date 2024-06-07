@@ -1,9 +1,4 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { CardHeaderProps } from './card-header';
@@ -11,13 +6,7 @@ import { CardHeader } from './card-header';
 import defaultCard from './card-header.config';
 
 const renderCardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =>
-  customRender(
-    <CardHeader
-      cards={cards}
-      selectedCard={selectedCard}
-      onChange={onChange}
-    />,
-  );
+  customRender(<CardHeader cards={cards} selectedCard={selectedCard} onChange={onChange} />);
 
 describe('<CardHeader />', () => {
   describe('should display topCard properly', () => {
@@ -32,7 +21,7 @@ describe('<CardHeader />', () => {
       renderCardHeader({
         cards: [currentCard],
         selectedCard: currentCard,
-        onChange: () => {},
+        onChange: () => undefined,
       });
 
       expect(screen.getByText('(Hayes)')).toBeInTheDocument();
@@ -49,7 +38,7 @@ describe('<CardHeader />', () => {
       renderCardHeader({
         cards: [currentCard],
         selectedCard: currentCard,
-        onChange: () => {},
+        onChange: () => undefined,
       });
 
       expect(screen.getByText('••••1234')).toBeInTheDocument();
@@ -66,7 +55,7 @@ describe('<CardHeader />', () => {
       renderCardHeader({
         cards: [currentCard],
         selectedCard: currentCard,
-        onChange: () => {},
+        onChange: () => undefined,
       });
 
       expect(screen.getByText('••••')).toBeInTheDocument();
@@ -84,7 +73,7 @@ describe('<CardHeader />', () => {
           { ...defaultCard, alias: 'Haight-Ashbury', issuer: 'discover' },
         ],
         selectedCard: firstCard,
-        onChange: () => {},
+        onChange: () => undefined,
       });
 
       const dropdownTrigger = screen.getByLabelText('Open card options');
@@ -124,7 +113,7 @@ describe('<CardHeader />', () => {
           },
         ],
         selectedCard: firstCard,
-        onChange: () => {},
+        onChange: () => undefined,
       });
 
       const dropdownTrigger = screen.getByLabelText('Open card options');

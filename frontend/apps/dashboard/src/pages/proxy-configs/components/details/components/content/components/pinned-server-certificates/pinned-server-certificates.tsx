@@ -11,9 +11,7 @@ export type PinnedServerCertificatesProps = {
   proxyConfig: ProxyConfigDetails;
 };
 
-const PinnedServerCertificates = ({
-  proxyConfig,
-}: PinnedServerCertificatesProps) => {
+const PinnedServerCertificates = ({ proxyConfig }: PinnedServerCertificatesProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.proxy-configs.details.pinned-server-certificates',
   });
@@ -31,10 +29,7 @@ const PinnedServerCertificates = ({
 
   return shouldShow ? (
     <Field label={t('certificate')}>
-      <LinkButton
-        iconComponent={IcoDownload16}
-        onClick={handleClick(proxyConfig.pinnedServerCertificates)}
-      >
+      <LinkButton iconComponent={IcoDownload16} onClick={handleClick(proxyConfig.pinnedServerCertificates)}>
         {t('download', {
           count: proxyConfig.pinnedServerCertificates.length,
         })}

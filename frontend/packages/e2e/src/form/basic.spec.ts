@@ -1,18 +1,17 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { clickOnCancel, clickOnYes } from '../verify/utils/commands';
 import {
-  findMissingConfig,
+  createUser,
   decryptData,
   fillCardData,
+  findMissingConfig,
   initializeForm,
   saveForm,
   waitForFormLoad,
-  createUser,
 } from './utils/commands';
 
-const formAppUrl =
-  (process.env.E2E_COMPONENTS_BASE_URL || 'http://localhost:3010') + '/form';
+const formAppUrl = `${process.env.E2E_COMPONENTS_BASE_URL || 'http://localhost:3010'}/form`;
 
 const name = 'Piip Penguin';
 const number = '378282246310005';

@@ -1,17 +1,8 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import ActivityLog from './activity-log';
-import {
-  withListDetails,
-  withListTimeline,
-  withListTimelineError,
-} from './activity-log.test.config';
+import { withListDetails, withListTimeline, withListTimelineError } from './activity-log.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -47,9 +38,7 @@ describe('<ActivityLog />', () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Belce Dogru (belce@onefootprint.com)'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Belce Dogru (belce@onefootprint.com)')).toBeInTheDocument();
       });
       await waitFor(() => {
         expect(screen.getByText('added')).toBeInTheDocument();

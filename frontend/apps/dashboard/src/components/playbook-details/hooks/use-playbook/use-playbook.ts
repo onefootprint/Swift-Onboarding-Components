@@ -21,13 +21,9 @@ const usePlaybook = (overrideId?: string) => {
   const id = overrideId ?? selectedId;
   const { authHeaders } = useSession();
 
-  const onboardingConfigQuery = useQuery(
-    ['onboarding_configs', id],
-    () => getPlaybook(authHeaders, id),
-    {
-      enabled: !!id,
-    },
-  );
+  const onboardingConfigQuery = useQuery(['onboarding_configs', id], () => getPlaybook(authHeaders, id), {
+    enabled: !!id,
+  });
   const { error, data } = onboardingConfigQuery;
 
   return {

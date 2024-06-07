@@ -9,19 +9,17 @@ import {
 } from '@onefootprint/types';
 import {
   CountryRestriction,
+  PlaybookKind,
   defaultBusinessInformation,
   defaultNameFormData,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
-  PlaybookKind,
 } from 'src/pages/playbooks/utils/machine/types';
 
 import processPlaybook from './process-playbook';
 
-const setsEqual = (
-  a: CollectedDataOption[],
-  b: CollectedDataOption[],
-): boolean => a.length === b.length && a.every(i => b.includes(i));
+const setsEqual = (a: CollectedDataOption[], b: CollectedDataOption[]): boolean =>
+  a.length === b.length && a.every(i => b.includes(i));
 
 describe('processPlaybook', () => {
   describe('KYC', () => {
@@ -69,9 +67,7 @@ describe('processPlaybook', () => {
       expect(optionalData).toContain(CollectedKycDataOption.ssn9);
       expect(optionalData).not.toContain(CollectedKycDataOption.ssn4);
       expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
-      expect(
-        setsEqual(canAccessData, mustCollectData.concat(optionalData)),
-      ).toBeTruthy();
+      expect(setsEqual(canAccessData, mustCollectData.concat(optionalData))).toBeTruthy();
     });
 
     it('should include SSN last 4 in optional data but not mustCollectData if it is optional', () => {
@@ -96,9 +92,7 @@ describe('processPlaybook', () => {
       expect(optionalData).not.toContain(CollectedKycDataOption.ssn9);
       expect(canAccessData).toContain(CollectedKycDataOption.ssn4);
       expect(canAccessData).not.toContain(CollectedKycDataOption.ssn9);
-      expect(
-        setsEqual(canAccessData, mustCollectData.concat(optionalData)),
-      ).toBeTruthy();
+      expect(setsEqual(canAccessData, mustCollectData.concat(optionalData))).toBeTruthy();
     });
 
     it('should include full SSN in mustCollectData if required', () => {
@@ -157,9 +151,7 @@ describe('processPlaybook', () => {
         verificationChecks: {},
       });
 
-      expect(mustCollectData).toContain(
-        CollectedInvestorProfileDataOption.investorProfile,
-      );
+      expect(mustCollectData).toContain(CollectedInvestorProfileDataOption.investorProfile);
     });
 
     it('should handle canAccessData as expected for default KYC values', () => {
@@ -178,9 +170,7 @@ describe('processPlaybook', () => {
       expect(canAccessData).not.toContain(CollectedKycDataOption.ssn4);
       expect(canAccessData).toContain(CollectedKycDataOption.ssn9);
       // tk document case
-      expect(canAccessData).not.toContain(
-        CollectedInvestorProfileDataOption.investorProfile,
-      );
+      expect(canAccessData).not.toContain(CollectedInvestorProfileDataOption.investorProfile);
       expect(setsEqual(canAccessData, mustCollectData)).toBeTruthy();
     });
 
@@ -210,10 +200,7 @@ describe('processPlaybook', () => {
           personal: {
             ...defaultPlaybookValuesKYC.personal,
             idDoc: true,
-            idDocKind: [
-              SupportedIdDocTypes.passport,
-              SupportedIdDocTypes.driversLicense,
-            ],
+            idDocKind: [SupportedIdDocTypes.passport, SupportedIdDocTypes.driversLicense],
             selfie: false,
           },
         },
@@ -251,10 +238,7 @@ describe('processPlaybook', () => {
           personal: {
             ...defaultPlaybookValuesKYC.personal,
             idDoc: true,
-            idDocKind: [
-              SupportedIdDocTypes.passport,
-              SupportedIdDocTypes.driversLicense,
-            ],
+            idDocKind: [SupportedIdDocTypes.passport, SupportedIdDocTypes.driversLicense],
             selfie: true,
           },
         },
@@ -273,10 +257,7 @@ describe('processPlaybook', () => {
           personal: {
             ...defaultPlaybookValuesKYC.personal,
             idDoc: true,
-            idDocKind: [
-              SupportedIdDocTypes.passport,
-              SupportedIdDocTypes.driversLicense,
-            ],
+            idDocKind: [SupportedIdDocTypes.passport, SupportedIdDocTypes.driversLicense],
             idDocFirst: true,
             selfie: true,
           },
@@ -296,10 +277,7 @@ describe('processPlaybook', () => {
           personal: {
             ...defaultPlaybookValuesKYC.personal,
             idDoc: true,
-            idDocKind: [
-              SupportedIdDocTypes.passport,
-              SupportedIdDocTypes.driversLicense,
-            ],
+            idDocKind: [SupportedIdDocTypes.passport, SupportedIdDocTypes.driversLicense],
             selfie: true,
           },
         },
@@ -318,10 +296,7 @@ describe('processPlaybook', () => {
           personal: {
             ...defaultPlaybookValuesKYC.personal,
             idDoc: true,
-            idDocKind: [
-              SupportedIdDocTypes.passport,
-              SupportedIdDocTypes.driversLicense,
-            ],
+            idDocKind: [SupportedIdDocTypes.passport, SupportedIdDocTypes.driversLicense],
             selfie: true,
             idDocFirst: false,
           },
@@ -488,9 +463,7 @@ describe('processPlaybook', () => {
 
       describe('when "US Residents", "International" and "Restrict onboarding to specific countries" is selected', () => {
         it('should generate the payload correctly', () => {
-          const chile = COUNTRIES.find(
-            country => country.label === 'Chile',
-          ) as CountryRecord;
+          const chile = COUNTRIES.find(country => country.label === 'Chile') as CountryRecord;
 
           const {
             allowUsResidents,
@@ -520,9 +493,7 @@ describe('processPlaybook', () => {
 
       describe('when "US Residents" is unselected and "International" and is selected', () => {
         it('should process restricted US-inclusive international config properly', () => {
-          const chile = COUNTRIES.find(
-            country => country.label === 'Chile',
-          ) as CountryRecord;
+          const chile = COUNTRIES.find(country => country.label === 'Chile') as CountryRecord;
 
           const {
             allowUsResidents,
@@ -671,9 +642,7 @@ describe('processPlaybook', () => {
         },
       });
 
-      expect(mustCollectData).not.toContain(
-        CollectedKybDataOption.corporationType,
-      );
+      expect(mustCollectData).not.toContain(CollectedKybDataOption.corporationType);
     });
 
     it('should include website type if required', () => {
@@ -787,10 +756,7 @@ describe('processPlaybook', () => {
             },
           });
 
-          const isFull = verificationChecks?.find(
-            ({ kind, data }) =>
-              kind === 'kyb' && data && data.einOnly === false,
-          );
+          const isFull = verificationChecks?.find(({ kind, data }) => kind === 'kyb' && data && data.einOnly === false);
           expect(isFull).toBeTruthy();
         });
       });
@@ -817,9 +783,7 @@ describe('processPlaybook', () => {
             },
           });
 
-          const isEin = verificationChecks?.find(
-            ({ kind, data }) => kind === 'kyb' && data?.einOnly,
-          );
+          const isEin = verificationChecks?.find(({ kind, data }) => kind === 'kyb' && data?.einOnly);
 
           expect(isEin).toBeTruthy();
         });

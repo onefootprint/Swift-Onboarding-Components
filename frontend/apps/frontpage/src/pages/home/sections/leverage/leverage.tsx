@@ -1,4 +1,4 @@
-import { Container, media, Stack } from '@onefootprint/ui';
+import { Container, Stack, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -12,17 +12,9 @@ export const Leverage = () => {
   });
   return (
     <SectionContainer>
-      <SectionTitle
-        title={t('title')}
-        subtitle={t('subtitle')}
-        align="center"
-      />
+      <SectionTitle title={t('title')} subtitle={t('subtitle')} align="center" />
       <CardsContainer>
-        <LeverageCard
-          variant="app-clip"
-          videoSrc="/home/videos/id-scan.mp4"
-          $inverted
-        />
+        <LeverageCard variant="app-clip" videoSrc="/home/videos/id-scan.mp4" $inverted />
         <LeverageCard variant="passkeys" videoSrc="/home/videos/qr-scan.mp4" />
       </CardsContainer>
     </SectionContainer>

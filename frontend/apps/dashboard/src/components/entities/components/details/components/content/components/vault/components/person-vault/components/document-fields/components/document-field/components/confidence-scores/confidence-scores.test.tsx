@@ -10,8 +10,7 @@ import documentFixture, {
   documentWithZeroScores,
 } from './confidence-scores.test.config';
 
-const renderConfidenceScores = (document: Document) =>
-  customRender(<ConfidenceScores document={document} />);
+const renderConfidenceScores = (document: Document) => customRender(<ConfidenceScores document={document} />);
 
 describe('<ConfidenceScores />', () => {
   it('should render all labels properly', () => {

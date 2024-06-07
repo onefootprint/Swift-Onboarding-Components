@@ -25,9 +25,7 @@ const FIVE_MINUTES = 1000 * 60 * 5; // challenges expire after 5 mins
 
 const getQueryKey = (payload: UserChallengeBody) => {
   const { kind, email, phoneNumber, actionKind } = payload;
-  return ['user-challenge', kind, email, phoneNumber, actionKind].filter(
-    Boolean,
-  );
+  return ['user-challenge', kind, email, phoneNumber, actionKind].filter(Boolean);
 };
 
 const requestFn = async ({
@@ -63,8 +61,7 @@ const useUserChallenge = () => {
   return useMutation({
     mutationFn: (payload: UserChallengeBody) => {
       const queryKey = getQueryKey(payload);
-      const queryState =
-        queryClient.getQueryState<UserChallengeResponse>(queryKey);
+      const queryState = queryClient.getQueryState<UserChallengeResponse>(queryKey);
       if (!queryState) {
         return requestFn(payload);
       }

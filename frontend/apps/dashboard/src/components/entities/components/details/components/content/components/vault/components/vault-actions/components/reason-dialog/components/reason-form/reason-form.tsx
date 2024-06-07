@@ -54,10 +54,7 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
         defaultValue={t('form.reason.options.customer-verification')}
         {...register('reason', {
           required: true,
-          onChange: ({ target }) =>
-            setShowCustomReason(
-              target.value === t('form.reason.options.other'),
-            ),
+          onChange: ({ target }) => setShowCustomReason(target.value === t('form.reason.options.other')),
         })}
       >
         {options.map(option => (
@@ -66,18 +63,14 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
           </option>
         ))}
       </NativeSelect>
-      {hasError && (
-        <Hint hasError={hasError}>{t('form.reason.errors.required')}</Hint>
-      )}
+      {hasError && <Hint hasError={hasError}>{t('form.reason.errors.required')}</Hint>}
 
       {showCustomReason && (
         <Box marginTop={4}>
           <TextArea
             autoFocus
             hasError={!!errors.customReason}
-            hint={
-              errors.customReason && t('form.custom-reason.errors.required')
-            }
+            hint={errors.customReason && t('form.custom-reason.errors.required')}
             placeholder={t('form.custom-reason.placeholder')}
             {...register('customReason', { required: true })}
           />

@@ -5,8 +5,7 @@ import { ARYEO_AUTH_TOKEN } from 'src/config/constants';
 import ComponentsInstructions from './components/components-instructions';
 
 const appearance: FootprintAppearance = {
-  fontSrc:
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+  fontSrc: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
   variables: {
     fontFamily:
       'BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif',

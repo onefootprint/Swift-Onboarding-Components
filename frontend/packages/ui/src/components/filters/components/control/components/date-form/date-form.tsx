@@ -57,12 +57,8 @@ const DateForm = ({ onSubmit, selectedOptions }: DateFormProps) => {
                 dateSheetPosition={{
                   avoidCollisions: false,
                 }}
-                initialStartDate={
-                  selectedOptions[0] ? new Date(selectedOptions[0]) : undefined
-                }
-                initialEndDate={
-                  selectedOptions[1] ? new Date(selectedOptions[1]) : undefined
-                }
+                initialStartDate={selectedOptions[0] ? new Date(selectedOptions[0]) : undefined}
+                initialEndDate={selectedOptions[1] ? new Date(selectedOptions[1]) : undefined}
                 onChange={(newDateStart, newDateEnd) => {
                   field.onChange({ from: newDateStart, to: newDateEnd });
                 }}

@@ -22,10 +22,7 @@ i18n.use(initReactI18next).init({
   },
 });
 
-i18n.services.formatter?.add(
-  'capitalize',
-  value => `${value.charAt(0).toUpperCase()}${value.slice(1)}`,
-);
+i18n.services.formatter?.add('capitalize', value => `${value.charAt(0).toUpperCase()}${value.slice(1)}`);
 
 i18n.services.formatter?.add('allCaps', value => value.toUpperCase());
 

@@ -8,7 +8,6 @@ const variantToTokenScope: Record<IdentifyVariant, IdentifyTokenScope> = {
   [IdentifyVariant.verify]: IdentifyTokenScope.onboarding,
 };
 
-const getTokenScope = (variant: IdentifyVariant): IdentifyTokenScope =>
-  variantToTokenScope[variant];
+const getTokenScope = (variant: IdentifyVariant): IdentifyTokenScope => variantToTokenScope[variant];
 
 export default getTokenScope;

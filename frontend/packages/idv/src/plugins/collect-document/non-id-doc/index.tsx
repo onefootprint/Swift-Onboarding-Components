@@ -9,12 +9,7 @@ import type { MachineContext } from './utils/state-machine';
 type NonIdDocFlowProps = {
   initialContext: Pick<
     MachineContext,
-    | 'authToken'
-    | 'device'
-    | 'orgId'
-    | 'uploadMode'
-    | 'config'
-    | 'documentRequestId'
+    'authToken' | 'device' | 'orgId' | 'uploadMode' | 'config' | 'documentRequestId'
   >;
   onDone: () => void;
 };

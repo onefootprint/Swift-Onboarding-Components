@@ -1,4 +1,4 @@
-import { Grid, media, Stack, Text } from '@onefootprint/ui';
+import { Grid, Stack, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -16,11 +16,7 @@ const Media = ({ articles }: MediaProps) => {
 
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/media"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/media" />
       <Container>
         <Grid.Container
           gap={5}

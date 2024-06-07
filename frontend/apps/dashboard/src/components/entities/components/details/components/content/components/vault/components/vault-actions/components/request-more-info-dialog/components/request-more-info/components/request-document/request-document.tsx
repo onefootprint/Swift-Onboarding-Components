@@ -23,26 +23,15 @@ const RequestDocument = ({ visible }: RequestDocumentProps) => {
       <Stack direction="column" gap={5}>
         <Text variant="label-4">{t('title')}</Text>
         <Stack direction="column" gap={4}>
-          <Checkbox
-            label={t('id-photo.title')}
-            value={RequestMoreInfoKind.IdDocument}
-            {...register('kinds')}
-          />
-          <AnimatedContainer
-            isExpanded={triggerKinds.includes(RequestMoreInfoKind.IdDocument)}
-            marginLeft={7}
-          >
+          <Checkbox label={t('id-photo.title')} value={RequestMoreInfoKind.IdDocument} {...register('kinds')} />
+          <AnimatedContainer isExpanded={triggerKinds.includes(RequestMoreInfoKind.IdDocument)} marginLeft={7}>
             <Checkbox
               label={t('id-photo.collect-selfie')}
               checked={watch('collectSelfie')}
               {...register('collectSelfie')}
             />
           </AnimatedContainer>
-          <Checkbox
-            label={t('proof-of-ssn.title')}
-            value={RequestMoreInfoKind.ProofOfSsn}
-            {...register('kinds')}
-          />
+          <Checkbox label={t('proof-of-ssn.title')} value={RequestMoreInfoKind.ProofOfSsn} {...register('kinds')} />
           <Checkbox
             label={t('proof-of-address.title')}
             value={RequestMoreInfoKind.ProofOfAddress}

@@ -5,40 +5,22 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 
 import type { NavigationHeaderLeftButtonProps } from '../../../../components';
-import {
-  HeaderTitle,
-  NavigationHeader,
-  useLayoutOptions,
-} from '../../../../components';
+import { HeaderTitle, NavigationHeader, useLayoutOptions } from '../../../../components';
 import { getLogger } from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../types';
-import {
-  bytesToMegabytes,
-  isDesktop,
-  isDocument,
-  isFace,
-  isMobile,
-} from '../../utils/capture';
+import { bytesToMegabytes, isDesktop, isDocument, isFace, isMobile } from '../../utils/capture';
 import Camera from '../camera';
 import AutoCaptureDoc from '../camera/auto-capture-doc';
 import AutoCaptureFace from '../camera/auto-capture-face';
-import type {
-  AutocaptureKind,
-  CaptureStatus,
-  DeviceKind,
-} from '../camera/types';
+import type { AutocaptureKind, CaptureStatus, DeviceKind } from '../camera/types';
 import type { CameraKind } from '../camera/utils/get-camera-options';
 import Loading from '../loading';
 import Instructions from './components/instructions';
 import Preview from './components/preview';
 
 type HeaderTextType = { camera: string; preview: string };
-type OnComplete = (
-  imageFile: File | Blob,
-  extraCompressed: boolean,
-  captureKind: CaptureKind,
-) => void;
+type OnComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) => void;
 
 type PhotoCaptureProps = {
   autocaptureKind: AutocaptureKind;
@@ -92,9 +74,7 @@ const PhotoCapture = ({
   const [captureKind, setCaptureKind] = useState<CaptureKind>();
   const [showInstructions, setShowInstructions] = useState(false);
   const [isCaptured, setIsCaptured] = useState(false);
-  const [autocaptureFeedback, setAutocaptureFeedback] = useState<
-    CaptureStatus | undefined
-  >('detecting');
+  const [autocaptureFeedback, setAutocaptureFeedback] = useState<CaptureStatus | undefined>('detecting');
   const {
     footer: { set: updateFooter },
   } = useLayoutOptions();
@@ -104,7 +84,7 @@ const PhotoCapture = ({
 
   useLayoutEffect(() => {
     if (isMobile(deviceKind)) {
-      return () => {};
+      return () => undefined;
     }
     // Only hide footer when we are in camera mode
     if (image) {
@@ -126,9 +106,7 @@ const PhotoCapture = ({
 
   const handleConfirm = async () => {
     if (!image) {
-      logWarn(
-        'Captured image could not be confirmed and submitted - retaking the image',
-      );
+      logWarn('Captured image could not be confirmed and submitted - retaking the image');
       return;
     }
 
@@ -136,9 +114,7 @@ const PhotoCapture = ({
       logWarn('Captured kind could not be determined - retaking the image');
       return;
     }
-    logInfo(
-      `Photocapture: image URL length ${bytesToMegabytes(image.length)} MB`,
-    );
+    logInfo(`Photocapture: image URL length ${bytesToMegabytes(image.length)} MB`);
 
     setIsLoading(true);
     const processResult = await processImageUrl(image, hasBadConnectivity);
@@ -197,13 +173,7 @@ const PhotoCapture = ({
         </>
       )}
       {isMobile(deviceKind) && (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          height="100%"
-        >
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
           <Loading step="process" />
         </Box>
       )}

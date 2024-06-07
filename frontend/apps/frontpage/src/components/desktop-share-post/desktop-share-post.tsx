@@ -1,8 +1,4 @@
-import {
-  IcoFacebook24,
-  IcoLinkedin24,
-  IcoTwitter24,
-} from '@onefootprint/icons';
+import { IcoFacebook24, IcoLinkedin24, IcoTwitter24 } from '@onefootprint/icons';
 import { media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -47,11 +43,7 @@ const DesktopSharePost = ({ title, url }: DesktopSharePostProps) => (
       href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
       onClick={event => {
         event.preventDefault();
-        window.open(
-          `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-          'share-facebook',
-          'width=555,height=745',
-        );
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, 'share-facebook', 'width=555,height=745');
       }}
     >
       <IcoFacebook24 color="tertiary" />

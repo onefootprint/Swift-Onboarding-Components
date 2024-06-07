@@ -10,13 +10,7 @@ type FieldProps = {
   className?: string;
 };
 
-const Field = ({
-  label,
-  firstString,
-  diff,
-  secondString,
-  className,
-}: FieldProps) => (
+const Field = ({ label, firstString, diff, secondString, className }: FieldProps) => (
   <Stack direction="column" gap={3} className={className}>
     <Text variant="caption-1" color="tertiary">
       {label}

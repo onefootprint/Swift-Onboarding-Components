@@ -65,11 +65,7 @@ const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
 };
 
 type KycFieldsProps = {
-  data: (
-    | CollectedKycDataOption
-    | CollectedDocumentDataOption
-    | CollectedInvestorProfileDataOption
-  )[];
+  data: (CollectedKycDataOption | CollectedDocumentDataOption | CollectedInvestorProfileDataOption)[];
   documentTypes: SupportedIdDocTypes[];
   showTitle?: boolean;
 };
@@ -94,14 +90,10 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [SupportedIdDocTypes.idCard]: t('data-labels.id-card'),
     [SupportedIdDocTypes.passport]: t('data-labels.passport'),
     [SupportedIdDocTypes.driversLicense]: t('data-labels.driversLicense'),
-    [SupportedIdDocTypes.residenceDocument]: t(
-      'data-labels.residence-document',
-    ),
+    [SupportedIdDocTypes.residenceDocument]: t('data-labels.residence-document'),
     [SupportedIdDocTypes.workPermit]: t('data-labels.work-permit'),
     [SupportedIdDocTypes.visa]: t('data-labels.visa'),
-    [SupportedIdDocTypes.voterIdentification]: t(
-      'data-labels.voterIdentification',
-    ),
+    [SupportedIdDocTypes.voterIdentification]: t('data-labels.voterIdentification'),
     [SupportedIdDocTypes.ssnCard]: t('data-labels.ssnCard'),
     [SupportedIdDocTypes.lease]: t('data-labels.lease'),
     [SupportedIdDocTypes.bankStatement]: t('data-labels.bankStatement'),
@@ -112,34 +104,26 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
   };
 
   const fields: FieldProps[] = [];
-  data.forEach(
-    (
-      cdo:
-        | CollectedKycDataOption
-        | CollectedDocumentDataOption
-        | CollectedInvestorProfileDataOption,
-    ) => {
-      if (isKycCdo(cdo)) {
-        fields.push({
-          IconComponent:
-            IconByCollectedKycDataOption[cdo as CollectedKycDataOption],
-          label: collectedKycDataOptionLabels[cdo as CollectedKycDataOption],
-        });
-      }
-      if (cdo === CollectedDocumentDataOption.documentAndSelfie) {
-        fields.push({
-          IconComponent: IcoSelfie24,
-          label: t('data-labels.selfie'),
-        });
-      }
-      if (cdo === CollectedInvestorProfileDataOption.investorProfile) {
-        fields.push({
-          IconComponent: IcoDollar24,
-          label: t('data-labels.investor-profile'),
-        });
-      }
-    },
-  );
+  data.forEach((cdo: CollectedKycDataOption | CollectedDocumentDataOption | CollectedInvestorProfileDataOption) => {
+    if (isKycCdo(cdo)) {
+      fields.push({
+        IconComponent: IconByCollectedKycDataOption[cdo as CollectedKycDataOption],
+        label: collectedKycDataOptionLabels[cdo as CollectedKycDataOption],
+      });
+    }
+    if (cdo === CollectedDocumentDataOption.documentAndSelfie) {
+      fields.push({
+        IconComponent: IcoSelfie24,
+        label: t('data-labels.selfie'),
+      });
+    }
+    if (cdo === CollectedInvestorProfileDataOption.investorProfile) {
+      fields.push({
+        IconComponent: IcoDollar24,
+        label: t('data-labels.investor-profile'),
+      });
+    }
+  });
 
   documentTypes.forEach(docType => {
     fields.push({

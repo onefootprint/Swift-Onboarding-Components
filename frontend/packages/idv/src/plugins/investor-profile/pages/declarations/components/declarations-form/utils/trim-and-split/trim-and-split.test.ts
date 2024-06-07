@@ -14,9 +14,6 @@ describe('trimAndSplit', () => {
   });
 
   it('should return an array with split values', () => {
-    expect(trimAndSplit('Jane Doe, John Doe')).toEqual([
-      'Jane Doe',
-      'John Doe',
-    ]);
+    expect(trimAndSplit('Jane Doe, John Doe')).toEqual(['Jane Doe', 'John Doe']);
   });
 });

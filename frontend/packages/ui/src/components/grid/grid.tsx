@@ -7,19 +7,8 @@ import Stack from '../stack';
 import type { GridContainerProps, GridItemProps } from './grid.types';
 import { createColumns, createRows } from './grid.utils';
 
-const Container = ({
-  columns,
-  rows,
-  templateAreas,
-  children,
-  ...props
-}: GridContainerProps) => (
-  <StyledContainer
-    $columns={columns}
-    $rows={rows}
-    $templateAreas={templateAreas}
-    {...props}
-  >
+const Container = ({ columns, rows, templateAreas, children, ...props }: GridContainerProps) => (
+  <StyledContainer $columns={columns} $rows={rows} $templateAreas={templateAreas} {...props}>
     {children}
   </StyledContainer>
 );
@@ -35,15 +24,11 @@ const StyledContainer = styled(Stack)<
     display: grid;
     grid-template-columns: ${createColumns($columns)};
     grid-template-rows: ${createRows($rows)};
-    grid-template-areas: ${$templateAreas
-      ? `"${$templateAreas.join('"\n"')}"`
-      : undefined};
+    grid-template-areas: ${$templateAreas ? `"${$templateAreas.join('"\n"')}"` : undefined};
   `}
 `;
 
-const Item = ({ column, row, children, ...props }: GridItemProps) => (
-  <StyledItem {...props}>{children}</StyledItem>
-);
+const Item = ({ column, row, children, ...props }: GridItemProps) => <StyledItem {...props}>{children}</StyledItem>;
 
 const StyledItem = styled(Stack)<
   StackProps & {

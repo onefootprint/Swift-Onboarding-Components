@@ -1,10 +1,7 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { BusinessDI, EntityKind, IdDI, ListKind } from '@onefootprint/types';
 
-const getAttributeForListKind = (
-  listKind?: ListKind,
-  entity?: Entity,
-): DataIdentifier | undefined => {
+const getAttributeForListKind = (listKind?: ListKind, entity?: Entity): DataIdentifier | undefined => {
   if (!entity || !listKind) {
     return undefined;
   }
@@ -12,36 +9,22 @@ const getAttributeForListKind = (
 
   switch (listKind) {
     case ListKind.emailAddress: {
-      return decryptableAttributes.includes(IdDI.email)
-        ? IdDI.email
-        : undefined;
+      return decryptableAttributes.includes(IdDI.email) ? IdDI.email : undefined;
     }
 
     case ListKind.emailDomain: {
-      return decryptableAttributes.includes(IdDI.email)
-        ? IdDI.email
-        : undefined;
+      return decryptableAttributes.includes(IdDI.email) ? IdDI.email : undefined;
     }
 
     case ListKind.phoneNumber: {
-      const rawAttribute =
-        kind === EntityKind.business
-          ? BusinessDI.phoneNumber
-          : IdDI.phoneNumber;
-      const attribute = decryptableAttributes.includes(rawAttribute)
-        ? rawAttribute
-        : undefined;
+      const rawAttribute = kind === EntityKind.business ? BusinessDI.phoneNumber : IdDI.phoneNumber;
+      const attribute = decryptableAttributes.includes(rawAttribute) ? rawAttribute : undefined;
       return attribute;
     }
 
     case ListKind.phoneCountryCode: {
-      const rawAttribute =
-        kind === EntityKind.business
-          ? BusinessDI.phoneNumber
-          : IdDI.phoneNumber;
-      const attribute = decryptableAttributes.includes(rawAttribute)
-        ? rawAttribute
-        : undefined;
+      const rawAttribute = kind === EntityKind.business ? BusinessDI.phoneNumber : IdDI.phoneNumber;
+      const attribute = decryptableAttributes.includes(rawAttribute) ? rawAttribute : undefined;
       return attribute;
     }
 

@@ -2,11 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoDiscover24 = ({
-  'aria-label': ariaLabel,
-  className,
-  testID,
-}: IconProps) => (
+const IcoDiscover24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
   <svg
     width={24}
     height={24}
@@ -50,14 +46,7 @@ const IcoDiscover24 = ({
         <stop offset={0.76} stopColor="#BF4B23" stopOpacity={0.75} />
         <stop offset={1} stopColor="#7D3017" />
       </radialGradient>
-      <linearGradient
-        id="prefix__a"
-        x1={11.461}
-        y1={10.375}
-        x2={13.945}
-        y2={13.375}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__a" x1={11.461} y1={10.375} x2={13.945} y2={13.375} gradientUnits="userSpaceOnUse">
         <stop stopColor="#E6772F" />
         <stop offset={1} stopColor="#EA9D2C" />
       </linearGradient>

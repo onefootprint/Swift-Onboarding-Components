@@ -1,19 +1,7 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  createUseRouterSpy,
-  customRender,
-  mockRequest,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
-import {
-  ChallengeKind,
-  CLIENT_PUBLIC_KEY_HEADER,
-  IdDI,
-  UserTokenScope,
-} from '@onefootprint/types';
+import { createUseRouterSpy, customRender, mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { CLIENT_PUBLIC_KEY_HEADER, ChallengeKind, IdDI, UserTokenScope } from '@onefootprint/types';
 import * as React from 'react';
 
 import { Layout } from '../layout';
@@ -71,11 +59,14 @@ describe('<Identify />', () => {
     bootstrapPhone?: string;
     initialAuthToken?: string;
     isComponentsSdk?: boolean;
-    config: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-    device?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    config: any;
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    device?: any;
     onDone?: () => void;
   }) => {
-    const userData: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    const userData: any = {};
     if (bootstrapEmail) {
       userData.email = bootstrapEmail;
     }
@@ -83,16 +74,14 @@ describe('<Identify />', () => {
       userData.phoneNumber = bootstrapPhone;
     }
     return customRender(
-      <Layout onClose={() => {}}>
+      <Layout onClose={() => undefined}>
         <Identify
           variant={IdentifyVariant.verify}
           config={config}
           isLive={config.isLive}
           isComponentsSdk={isComponentsSdk}
           obConfigAuth={{ [CLIENT_PUBLIC_KEY_HEADER]: 'pk' }}
-          bootstrapData={
-            bootstrapEmail || bootstrapPhone ? userData : undefined
-          }
+          bootstrapData={bootstrapEmail || bootstrapPhone ? userData : undefined}
           initialAuthToken={initialAuthToken}
           device={
             device || {
@@ -101,7 +90,7 @@ describe('<Identify />', () => {
               osName: 'iOS',
             }
           }
-          onDone={onDone ?? (() => {})}
+          onDone={onDone ?? (() => undefined)}
         />
       </Layout>,
     );
@@ -118,9 +107,7 @@ describe('<Identify />', () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Enter your email to get started.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Enter your email to get started.')).toBeInTheDocument();
       });
 
       await fillIdentifyEmail();
@@ -162,9 +149,7 @@ describe('<Identify />', () => {
         });
 
         await waitFor(() => {
-          expect(
-            screen.getByText('The link you opened is invalid'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('The link you opened is invalid')).toBeInTheDocument();
         });
       });
     });
@@ -181,9 +166,7 @@ describe('<Identify />', () => {
         });
 
         await waitFor(() => {
-          expect(
-            screen.getByText('The link you opened is invalid'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('The link you opened is invalid')).toBeInTheDocument();
         });
       });
     });
@@ -237,17 +220,11 @@ describe('<Identify />', () => {
 
         await expectShimmer();
         await waitFor(() => {
-          expect(
-            screen.getByText('Verify your phone number'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('Verify your phone number')).toBeInTheDocument();
         });
         expect(screen.queryByText('Welcome back! 🎉')).toBeNull();
-        expect(
-          screen.getByTestId('navigation-close-button'),
-        ).toBeInTheDocument();
-        expect(
-          screen.queryByText('Log in with a different account'),
-        ).not.toBeInTheDocument();
+        expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
+        expect(screen.queryByText('Log in with a different account')).not.toBeInTheDocument();
 
         await fillChallengePin();
         await waitFor(() => {
@@ -302,16 +279,12 @@ describe('<Identify />', () => {
 
           await expectShimmer();
           await waitFor(() => {
-            expect(
-              screen.getByText('piip@onefootprint.com'),
-            ).toBeInTheDocument();
+            expect(screen.getByText('piip@onefootprint.com')).toBeInTheDocument();
           });
           await fillIdentifyPhone();
 
           await waitFor(() => {
-            expect(
-              screen.getByTestId('navigation-back-button'),
-            ).toBeInTheDocument();
+            expect(screen.getByTestId('navigation-back-button')).toBeInTheDocument();
           });
           await fillChallengePin();
 
@@ -377,9 +350,7 @@ describe('<Identify />', () => {
           await waitFor(() => {
             expect(screen.getByText('Phone number')).toBeInTheDocument();
           });
-          expect(
-            screen.getByDisplayValue('(234) 567-8999'),
-          ).toBeInTheDocument();
+          expect(screen.getByDisplayValue('(234) 567-8999')).toBeInTheDocument();
           await userEvent.click(screen.getByText('Verify with SMS'));
 
           await fillChallengePin();
@@ -469,16 +440,10 @@ describe('<Identify />', () => {
         await fillIdentifyEmail();
         await fillIdentifyPhone();
         await waitFor(() => {
-          expect(
-            screen.getByText('Verify your phone number'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('Verify your phone number')).toBeInTheDocument();
         });
-        expect(
-          screen.queryByText('Log in with a different account'),
-        ).not.toBeInTheDocument();
-        expect(
-          screen.getByTestId('navigation-back-button'),
-        ).toBeInTheDocument();
+        expect(screen.queryByText('Log in with a different account')).not.toBeInTheDocument();
+        expect(screen.getByTestId('navigation-back-button')).toBeInTheDocument();
 
         await fillChallengePin();
         await waitFor(() => {
@@ -498,16 +463,11 @@ describe('<Identify />', () => {
 
         // Wait until the login challenge request succeeds
         await waitFor(() => {
-          expect(screen.getByRole('presentation')).toHaveAttribute(
-            'data-pending',
-            'false',
-          );
+          expect(screen.getByRole('presentation')).toHaveAttribute('data-pending', 'false');
         });
         await userEvent.click(screen.getByText('Resend code'));
         await waitFor(() => {
-          expect(
-            screen.getByText('We sent you a new code.'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('We sent you a new code.')).toBeInTheDocument();
         });
       });
     });
@@ -534,12 +494,8 @@ describe('<Identify />', () => {
         await waitFor(() => {
           expect(screen.getByText('Add a phone number')).toBeInTheDocument();
         });
-        expect(
-          screen.getByText('Enter your phone number to proceed.'),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByTestId('navigation-close-button'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Enter your phone number to proceed.')).toBeInTheDocument();
+        expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
 
         await fillIdentifyPhone();
         await fillChallengePin();
@@ -604,16 +560,11 @@ describe('<Identify />', () => {
 
           // Wait until the login challenge request succeeds
           await waitFor(() => {
-            expect(screen.getByRole('presentation')).toHaveAttribute(
-              'data-pending',
-              'false',
-            );
+            expect(screen.getByRole('presentation')).toHaveAttribute('data-pending', 'false');
           });
           await userEvent.click(screen.getByText('Resend code'));
           await waitFor(() => {
-            expect(
-              screen.getByText('We sent you a new code.'),
-            ).toBeInTheDocument();
+            expect(screen.getByText('We sent you a new code.')).toBeInTheDocument();
           });
         });
       });
@@ -664,16 +615,11 @@ describe('<Identify />', () => {
 
           // Wait until the login challenge request succeeds
           await waitFor(() => {
-            expect(screen.getByRole('presentation')).toHaveAttribute(
-              'data-pending',
-              'false',
-            );
+            expect(screen.getByRole('presentation')).toHaveAttribute('data-pending', 'false');
           });
           await userEvent.click(screen.getByText('Resend code'));
           await waitFor(() => {
-            expect(
-              screen.getByText('We sent you a new code.'),
-            ).toBeInTheDocument();
+            expect(screen.getByText('We sent you a new code.')).toBeInTheDocument();
           });
         });
       });
@@ -695,13 +641,9 @@ describe('<Identify />', () => {
 
         await fillIdentifyEmail();
         await waitFor(() => {
-          expect(
-            screen.getByText('Verify your email address'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('Verify your email address')).toBeInTheDocument();
         });
-        expect(
-          screen.queryByText('Log in with a different account'),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('Log in with a different account')).not.toBeInTheDocument();
         await fillChallengePin();
         await waitFor(() => {
           expect(onDone).toHaveBeenCalled();
@@ -734,16 +676,11 @@ describe('<Identify />', () => {
 
         // Wait until the login challenge request succeeds
         await waitFor(() => {
-          expect(screen.getByRole('presentation')).toHaveAttribute(
-            'data-pending',
-            'false',
-          );
+          expect(screen.getByRole('presentation')).toHaveAttribute('data-pending', 'false');
         });
         await userEvent.click(screen.getByText('Resend code'));
         await waitFor(() => {
-          expect(
-            screen.getByText('We sent you a new code.'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('We sent you a new code.')).toBeInTheDocument();
         });
       });
     });
@@ -752,11 +689,7 @@ describe('<Identify />', () => {
   describe('when has multiple challenge options', () => {
     beforeEach(() => {
       withIdentify({
-        challengeKinds: [
-          ChallengeKind.email,
-          ChallengeKind.sms,
-          ChallengeKind.biometric,
-        ],
+        challengeKinds: [ChallengeKind.email, ChallengeKind.sms, ChallengeKind.biometric],
         matchingFps: [IdDI.email],
       });
       withIdentifyVerify();
@@ -772,9 +705,7 @@ describe('<Identify />', () => {
 
       await fillIdentifyEmail();
       await waitFor(() => {
-        expect(
-          screen.getByText('Log in using one of the options below.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Log in using one of the options below.')).toBeInTheDocument();
       });
       await userEvent.click(screen.getByText('••99', { exact: false }));
       await userEvent.click(screen.getByText('Continue'));
@@ -795,9 +726,7 @@ describe('<Identify />', () => {
 
       await fillIdentifyEmail();
       await waitFor(() => {
-        expect(
-          screen.getByText('Log in using one of the options below.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Log in using one of the options below.')).toBeInTheDocument();
       });
       await userEvent.click(
         screen.getByText('piip@onefootprint.com'), // Send code to <span data-private="true" data-dd-privacy="mask">piip@onefootprint.com</span>
@@ -821,9 +750,7 @@ describe('<Identify />', () => {
 
       await fillIdentifyEmail();
       await waitFor(() => {
-        expect(
-          screen.getByText('Log in using one of the options below.'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Log in using one of the options below.')).toBeInTheDocument();
       });
       await userEvent.click(screen.getByText('Log in with passkey'));
       await userEvent.click(screen.getByText('Continue'));
@@ -849,13 +776,9 @@ describe('<Identify />', () => {
 
         await fillIdentifyEmail();
         await waitFor(() => {
-          expect(
-            screen.getByText('Log in using one of the options below.'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('Log in using one of the options below.')).toBeInTheDocument();
         });
-        expect(
-          screen.queryByText('Log in with passkey'),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('Log in with passkey')).not.toBeInTheDocument();
         await userEvent.click(screen.getByText('••99', { exact: false }));
         await userEvent.click(screen.getByText('Continue'));
         await fillChallengePin();
@@ -1054,9 +977,7 @@ describe('<Identify />', () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Send code to email instead'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Send code to email instead')).toBeInTheDocument();
       });
       await userEvent.click(screen.getByText('Send code to email instead'));
       const inputPhone = screen.getByText('Phone number');
@@ -1070,11 +991,7 @@ describe('<Identify />', () => {
       await userEvent.type(inputPhone, '6504600799');
       await userEvent.click(screen.getByText('Continue'));
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Enter the 6-digit code sent to sandbox@onefootprint.com.',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Enter the 6-digit code sent to sandbox@onefootprint.com.')).toBeInTheDocument();
       });
       await fillChallengePin();
 

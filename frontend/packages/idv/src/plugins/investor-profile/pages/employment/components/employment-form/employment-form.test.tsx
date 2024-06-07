@@ -1,12 +1,6 @@
 import '../../../../../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
@@ -14,18 +8,8 @@ import type { EmploymentFormProps } from './employment-form';
 import EmploymentForm from './employment-form';
 
 describe('<EmploymentForm />', () => {
-  const renderForm = ({
-    defaultValues,
-    isLoading,
-    onSubmit = () => {},
-  }: Partial<EmploymentFormProps>) => {
-    customRender(
-      <EmploymentForm
-        defaultValues={defaultValues}
-        isLoading={isLoading}
-        onSubmit={onSubmit}
-      />,
-    );
+  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<EmploymentFormProps>) => {
+    customRender(<EmploymentForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
   };
 
   describe('when selecting an employed status', () => {

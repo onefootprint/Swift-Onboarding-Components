@@ -14,10 +14,7 @@ const getQueryArgs = (query: RouterReturn['query']) => {
   const publicKey = typeof obKey === 'string' ? obKey : envPublicKey;
   let userData = {};
   try {
-    userData =
-      typeof rawUserData === 'string'
-        ? JSON.parse(decodeURIComponent(rawUserData))
-        : {};
+    userData = typeof rawUserData === 'string' ? JSON.parse(decodeURIComponent(rawUserData)) : {};
   } catch (_) {
     // do nothing
   }
@@ -40,9 +37,7 @@ const AuthButtonReact = () => {
         label="Auth with Footprint (modal)"
         onCancel={() => console.log('cancel')}
         onClose={() => console.log('close')}
-        onComplete={(validationToken: string) =>
-          console.log('complete ', validationToken)
-        }
+        onComplete={(validationToken: string) => console.log('complete ', validationToken)}
       />
     </Container>
   );

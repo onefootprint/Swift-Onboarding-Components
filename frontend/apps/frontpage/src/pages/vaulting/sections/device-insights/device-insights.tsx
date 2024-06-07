@@ -17,12 +17,7 @@ const DeviceInsights = () => {
     <StyledContainer>
       <Title>
         <DeviceInsightsImage>
-          <Image
-            src="/vaulting/device-insights/device-insights-section.png"
-            width={339}
-            height={360}
-            alt=""
-          />
+          <Image src="/vaulting/device-insights/device-insights-section.png" width={339} height={360} alt="" />
         </DeviceInsightsImage>
         <TitleContainer>
           <SectionTitle variant="display-2">{t('title')}</SectionTitle>

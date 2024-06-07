@@ -1,9 +1,6 @@
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
-import type {
-  GetOnboardingConfigRequest,
-  GetPublicOnboardingConfigResponse,
-} from '@onefootprint/types';
+import type { GetOnboardingConfigRequest, GetPublicOnboardingConfigResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
@@ -29,15 +26,11 @@ const useGetOnboardingConfig = (
 ) => {
   const { obConfigAuth, authToken } = payload;
 
-  return useQuery(
-    ['get-onboarding-config', obConfigAuth, authToken],
-    () => getOnboardingConfig(payload),
-    {
-      enabled: !!obConfigAuth || !!authToken,
-      onSuccess: options.onSuccess,
-      onError: options.onError,
-    },
-  );
+  return useQuery(['get-onboarding-config', obConfigAuth, authToken], () => getOnboardingConfig(payload), {
+    enabled: !!obConfigAuth || !!authToken,
+    onSuccess: options.onSuccess,
+    onError: options.onError,
+  });
 };
 
 export default useGetOnboardingConfig;

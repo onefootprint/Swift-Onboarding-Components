@@ -5,10 +5,7 @@ import getOr from './get-or';
 describe('getOr', () => {
   it('returns the fallback value when the input object is not an object or the input string is empty', () => {
     const fallback = 'fallback';
-    const result = getOr(
-      fallback,
-      '',
-    )(null as unknown as Record<string, unknown>);
+    const result = getOr(fallback, '')(null as unknown as Record<string, unknown>);
     expect(result).toBe(fallback);
   });
 

@@ -1,10 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import type {
-  LoggedOutStorageState,
-  Session,
-} from './use-logged-out-storage.types';
+import type { LoggedOutStorageState, Session } from './use-logged-out-storage.types';
 import { defaultSession } from './use-logged-out-storage.types';
 
 // TODO Should we just reuse useSession?

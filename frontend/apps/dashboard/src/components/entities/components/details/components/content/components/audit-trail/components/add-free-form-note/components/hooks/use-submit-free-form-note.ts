@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  SubmitFreeFormNoteRequest,
-  SubmitFreeFormNoteResponse,
-} from '@onefootprint/types';
+import type { SubmitFreeFormNoteRequest, SubmitFreeFormNoteResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
@@ -27,8 +24,7 @@ const useSubmitFreeFormNote = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: SubmitFreeFormNoteRequest) =>
-      submitFreeFormNote(authHeaders, data),
+    mutationFn: (data: SubmitFreeFormNoteRequest) => submitFreeFormNote(authHeaders, data),
     onSuccess: () => {
       queryClient.refetchQueries();
     },

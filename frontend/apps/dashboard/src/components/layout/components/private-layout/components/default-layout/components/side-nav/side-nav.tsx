@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoUserCircle16 } from '@onefootprint/icons';
-import { Box, createFontStyles, Divider, Stack, Text } from '@onefootprint/ui';
+import { Box, Divider, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -27,10 +27,7 @@ const Nav = () => {
   const tenantsQuery = useAuthRoles(dangerouslyCastedData.auth);
   const currTenantId = dangerouslyCastedData.org.id;
   const { firstName, lastName, email } = dangerouslyCastedData.user;
-  const userName =
-    firstName || lastName
-      ? `${firstName || ''} ${lastName || ''}`.trim()
-      : undefined;
+  const userName = firstName || lastName ? `${firstName || ''} ${lastName || ''}`.trim() : undefined;
   const tenants = moveTenantToFront(tenantsQuery.data ?? [], currTenantId);
 
   const onAssumeTenant = (tenantId: string) => {
@@ -51,9 +48,7 @@ const Nav = () => {
     <NavContainer>
       <Links direction="column">
         {routes
-          .filter(
-            ({ employeesOnly }) => !employeesOnly || !!user?.isFirmEmployee,
-          )
+          .filter(({ employeesOnly }) => !employeesOnly || !!user?.isFirmEmployee)
           .map(({ title, items }) => (
             <TabGroup key={title}>
               {title && <Title>{title}</Title>}
@@ -87,13 +82,7 @@ const Nav = () => {
         <Box>
           <IcoUserCircle16 color="tertiary" />
         </Box>
-        <Text
-          variant="label-4"
-          color="tertiary"
-          truncate
-          width="100%"
-          marginBottom={1}
-        >
+        <Text variant="label-4" color="tertiary" truncate width="100%" marginBottom={1}>
           {userName || email}
         </Text>
         <Box>

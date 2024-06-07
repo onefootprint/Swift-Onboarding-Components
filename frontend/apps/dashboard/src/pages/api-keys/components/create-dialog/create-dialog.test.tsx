@@ -1,18 +1,8 @@
-import {
-  customRender,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import CreateDialog from './create-dialog';
-import {
-  withApiKeys,
-  withCreateApiKeys,
-  withRoles,
-} from './create-dialog.test.config';
+import { withApiKeys, withCreateApiKeys, withRoles } from './create-dialog.test.config';
 
 describe('<CreateDialog />', () => {
   const renderCreateDialog = () => {
@@ -37,9 +27,7 @@ describe('<CreateDialog />', () => {
         await userEvent.click(submitButton);
 
         await waitFor(() => {
-          const errorMessage = screen.getByText(
-            'Please enter a name for your secret key.',
-          );
+          const errorMessage = screen.getByText('Please enter a name for your secret key.');
           expect(errorMessage).toBeInTheDocument();
         });
       });
@@ -53,9 +41,7 @@ describe('<CreateDialog />', () => {
 
         // make sure roles are loaded
         await waitFor(() => {
-          expect(
-            screen.queryByTestId('members-roles-loading'),
-          ).not.toBeInTheDocument();
+          expect(screen.queryByTestId('members-roles-loading')).not.toBeInTheDocument();
         });
 
         const submitButton = screen.getByRole('button', { name: 'Create' });
@@ -76,9 +62,7 @@ describe('<CreateDialog />', () => {
       await userEvent.type(secretKeyName, 'test name');
 
       await waitFor(() => {
-        expect(
-          screen.queryByTestId('members-roles-loading'),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId('members-roles-loading')).not.toBeInTheDocument();
       });
 
       const roleSelect = screen.getByRole('button', { name: 'Select role' });
@@ -88,9 +72,7 @@ describe('<CreateDialog />', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByLabelText('Creating secret key...'),
-        ).toBeInTheDocument();
+        expect(screen.getByLabelText('Creating secret key...')).toBeInTheDocument();
       });
     });
   });

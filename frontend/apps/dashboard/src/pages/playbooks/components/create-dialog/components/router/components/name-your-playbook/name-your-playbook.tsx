@@ -18,12 +18,7 @@ type NameYourPlaybookProps = {
   defaultValues: NameFormData;
 };
 
-const NameYourPlaybook = ({
-  kind = PlaybookKind.Kyc,
-  onSubmit,
-  onBack,
-  defaultValues,
-}: NameYourPlaybookProps) => {
+const NameYourPlaybook = ({ kind = PlaybookKind.Kyc, onSubmit, onBack, defaultValues }: NameYourPlaybookProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.name-your-playbook',
@@ -44,9 +39,7 @@ const NameYourPlaybook = ({
     setValue('kind', kind);
   }, [setValue, kind]);
 
-  const kindString = t(
-    kind as unknown as ParseKeys<'common'>,
-  ) as unknown as string;
+  const kindString = t(kind as unknown as ParseKeys<'common'>) as unknown as string;
   const placeholder = getPlaceholder({
     tenantName: org?.name || '',
     kindString,

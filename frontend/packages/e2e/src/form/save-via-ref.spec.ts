@@ -1,17 +1,16 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  findMissingConfig,
+  createUser,
   decryptData,
   fillCardData,
+  findMissingConfig,
   initializeForm,
   saveFormViaRef,
   waitForFormLoad,
-  createUser,
 } from './utils/commands';
 
-const formAppUrl =
-  (process.env.E2E_COMPONENTS_BASE_URL || 'http://localhost:3010') + '/form';
+const formAppUrl = `${process.env.E2E_COMPONENTS_BASE_URL || 'http://localhost:3010'}/form`;
 
 const name = 'Piip Penguin';
 const number = '378282246310005';
@@ -20,12 +19,7 @@ const zip = '12345';
 const missingConfig = findMissingConfig();
 
 test.describe('/components/form', () => {
-  test('form.save-via-ref #ci', async ({
-    browserName,
-    isMobile,
-    page,
-    request,
-  }) => {
+  test('form.save-via-ref #ci', async ({ browserName, isMobile, page, request }) => {
     expect(missingConfig, missingConfig?.message).toBe(undefined);
 
     test.setTimeout(120000);
@@ -46,9 +40,7 @@ test.describe('/components/form', () => {
       data: { name, number, cvc, expiration: '12/35', zip, country: 'US' },
     });
     await saveFormViaRef({ page });
-    const refSuccessToast = page
-      .getByText('Successfully saved via ref')
-      .first();
+    const refSuccessToast = page.getByText('Successfully saved via ref').first();
     await refSuccessToast.waitFor({ state: 'attached', timeout: 6000 });
     const completeToast = page.getByText('Successfully completed form').first();
     await completeToast.waitFor({ state: 'attached', timeout: 3000 });

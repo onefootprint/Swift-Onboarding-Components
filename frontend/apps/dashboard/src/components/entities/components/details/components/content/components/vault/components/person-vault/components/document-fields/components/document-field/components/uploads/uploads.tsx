@@ -1,13 +1,8 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoIdFront16, IcoInfo16, IcoUpload24 } from '@onefootprint/icons';
-import type {
-  DataIdentifier,
-  Document,
-  DocumentUpload,
-  EntityVault,
-} from '@onefootprint/types';
+import type { DataIdentifier, Document, DocumentUpload, EntityVault } from '@onefootprint/types';
 import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
-import { createFontStyles, Text, Tooltip } from '@onefootprint/ui';
+import { Text, Tooltip, createFontStyles } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,8 +22,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
   const { formatTime } = useIntl();
 
   const getImgBase64Data = (upload: DocumentUpload) => {
-    const vaultIndex =
-      `${upload.identifier}:${upload.version}` as DataIdentifier;
+    const vaultIndex = `${upload.identifier}:${upload.version}` as DataIdentifier;
     const hasVaultValue = vaultIndex in vault;
     if (hasVaultValue) {
       const vaultValue = vault[vaultIndex];
@@ -47,9 +41,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
     const { kind } = currentDocument;
     // "Selfie successfully uploaded"
     if (relevantUpload.side === IdDocImageTypes.selfie) {
-      return `${t(`${relevantUpload.side}`)} ${t(
-        relevantUpload.failureReasons.length ? 'failed' : 'success',
-      )}`;
+      return `${t(`${relevantUpload.side}`)} ${t(relevantUpload.failureReasons.length ? 'failed' : 'success')}`;
     }
     // "Proof of Address successfully uploaded"
     if (kind === SupportedIdDocTypes.proofOfAddress) {
@@ -70,9 +62,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
   );
 
   const getFailureReasons = (relevantUpload: DocumentUpload) => {
-    const reasons = relevantUpload.failureReasons.map(reason =>
-      t(`failure-reasons.${reason}` as ParseKeys<'common'>),
-    );
+    const reasons = relevantUpload.failureReasons.map(reason => t(`failure-reasons.${reason}` as ParseKeys<'common'>));
     const reasonsWithBullets = reasons.map(reason => `- ${reason}`).join('\n');
     return reasons.length > 1 ? reasonsWithBullets : reasons[0];
   };
@@ -88,9 +78,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
           <DocumentUploadContainer>
             <IcoInfo16 color="info" />
             <Text color="info" variant="body-4" whiteSpace="nowrap">
-              {`${t('uploaded-from')} ${t(
-                `upload-source.${uploadSource}` as ParseKeys<'common'>,
-              )}`}
+              {`${t('uploaded-from')} ${t(`upload-source.${uploadSource}` as ParseKeys<'common'>)}`}
             </Text>
           </DocumentUploadContainer>
         )}
@@ -130,9 +118,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
             <HoverableImage
               isSuccess={upload.failureReasons.length === 0}
               base64Data={getImgBase64Data(upload)}
-              documentName={t(
-                `document-types.${currentDocument.kind}` as ParseKeys<'common'>,
-              )}
+              documentName={t(`document-types.${currentDocument.kind}` as ParseKeys<'common'>)}
             />
           </Content>
         </Row>

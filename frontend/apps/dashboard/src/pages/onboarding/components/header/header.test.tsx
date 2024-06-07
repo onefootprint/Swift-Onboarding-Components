@@ -5,7 +5,7 @@ import Header from './header';
 
 describe('<Header />', () => {
   it('should render the email of the logged user', () => {
-    customRender(<Header userEmail="jane.doe@acme.com" onLogout={() => {}} />);
+    customRender(<Header userEmail="jane.doe@acme.com" onLogout={() => undefined} />);
     expect(screen.getByText('jane.doe@acme.com')).toBeInTheDocument();
   });
 

@@ -18,16 +18,13 @@ const getFormSectionsFromFields = (vaultFields?: string[]): FormSection[] => {
     return [];
   }
 
-  const vaultFieldNames = vaultFields
-    .map(field => getCardDiField(field))
-    .filter(field => field) as CardDIField[];
+  const vaultFieldNames = vaultFields.map(field => getCardDiField(field)).filter(field => field) as CardDIField[];
 
   const sections: FormSection[] = [];
   Object.keys(SectionsByFields).forEach(key => {
     const section = key as FormSection;
     const fields = SectionsByFields[section];
-    const isSectionInVault =
-      fields && fields.every(field => vaultFieldNames.includes(field));
+    const isSectionInVault = fields && fields.every(field => vaultFieldNames.includes(field));
     if (isSectionInVault) {
       sections.push(section);
     }

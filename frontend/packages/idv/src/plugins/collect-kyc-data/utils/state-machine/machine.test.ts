@@ -32,11 +32,7 @@ describe('Collect KYC Data Machine Tests', () => {
     allowInternationalResidents: false,
   };
 
-  const createMachine = (
-    missingAttributes: CollectedKycDataOption[],
-    data: KycData = {},
-    deviceType?: string,
-  ) => {
+  const createMachine = (missingAttributes: CollectedKycDataOption[], data: KycData = {}, deviceType?: string) => {
     const initialContext: InitMachineArgs = {
       authToken: 'authToken',
       requirement: {
@@ -214,15 +210,8 @@ describe('Collect KYC Data Machine Tests', () => {
     });
 
     it('Skips states without missing attributes', () => {
-      const machine = createMachine([
-        CollectedKycDataOption.name,
-        CollectedKycDataOption.ssn9,
-      ]);
-      expect(machine.state.context.dataCollectionScreensToShow).toEqual([
-        'basicInformation',
-        'ssn',
-        'confirm',
-      ]);
+      const machine = createMachine([CollectedKycDataOption.name, CollectedKycDataOption.ssn9]);
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual(['basicInformation', 'ssn', 'confirm']);
       machine.send({ type: 'initialized', payload: {} });
 
       let { state } = machine;
@@ -504,15 +493,8 @@ describe('Collect KYC Data Machine Tests', () => {
     });
 
     it('Skips states without missing attributes', () => {
-      const machine = createMachine([
-        CollectedKycDataOption.email,
-        CollectedKycDataOption.ssn9,
-      ]);
-      expect(machine.state.context.dataCollectionScreensToShow).toEqual([
-        'email',
-        'ssn',
-        'confirm',
-      ]);
+      const machine = createMachine([CollectedKycDataOption.email, CollectedKycDataOption.ssn9]);
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual(['email', 'ssn', 'confirm']);
       machine.send({ type: 'initialized', payload: {} });
       let { state } = machine;
       let { context } = state;
@@ -586,10 +568,7 @@ describe('Collect KYC Data Machine Tests', () => {
         { [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true } },
         'sandboxTest',
       );
-      expect(machine.state.context.dataCollectionScreensToShow).toEqual([
-        'ssn',
-        'confirm',
-      ]);
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual(['ssn', 'confirm']);
       machine.send({ type: 'initialized', payload: {} });
       let { state } = machine;
       let { context } = state;
@@ -621,11 +600,7 @@ describe('Collect KYC Data Machine Tests', () => {
   describe('When user has bootstrapped/decrypted/disabled data', () => {
     it('if no attributes are missing at the start', () => {
       const machine = createMachine(
-        [
-          CollectedKycDataOption.email,
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.address,
-        ],
+        [CollectedKycDataOption.email, CollectedKycDataOption.name, CollectedKycDataOption.address],
         {
           [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
           [IdDI.firstName]: { value: 'John', bootstrap: true },
@@ -637,9 +612,7 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.country]: { value: 'US', disabled: true },
         },
       );
-      expect(machine.state.context.dataCollectionScreensToShow).toEqual([
-        'confirm',
-      ]);
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual(['confirm']);
       machine.send({
         type: 'initialized',
         payload: {
@@ -677,11 +650,7 @@ describe('Collect KYC Data Machine Tests', () => {
 
     it('if some attributes are missing at the start', () => {
       const machine = createMachine(
-        [
-          CollectedKycDataOption.email,
-          CollectedKycDataOption.address,
-          CollectedKycDataOption.dob,
-        ],
+        [CollectedKycDataOption.email, CollectedKycDataOption.address, CollectedKycDataOption.dob],
         {
           [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
@@ -691,10 +660,7 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.country]: { value: 'US', disabled: true },
         },
       );
-      expect(machine.state.context.dataCollectionScreensToShow).toEqual([
-        'basicInformation',
-        'confirm',
-      ]);
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual(['basicInformation', 'confirm']);
       machine.send({
         type: 'initialized',
         payload: {
@@ -1027,11 +993,7 @@ describe('Collect KYC Data Machine Tests', () => {
 
     it('Skips pages that were completed by decrypted/bootstrapped data', () => {
       const machine = createMachine(
-        [
-          CollectedKycDataOption.email,
-          CollectedKycDataOption.dob,
-          CollectedKycDataOption.address,
-        ],
+        [CollectedKycDataOption.email, CollectedKycDataOption.dob, CollectedKycDataOption.address],
         {
           [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
           [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
@@ -1041,10 +1003,7 @@ describe('Collect KYC Data Machine Tests', () => {
           [IdDI.country]: { value: 'US', disabled: true },
         },
       );
-      expect(machine.state.context.dataCollectionScreensToShow).toEqual([
-        'basicInformation',
-        'confirm',
-      ]);
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual(['basicInformation', 'confirm']);
       machine.send({
         type: 'initialized',
         payload: {

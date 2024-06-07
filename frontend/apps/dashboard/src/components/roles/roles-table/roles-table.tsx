@@ -14,12 +14,7 @@ type RolesTableProps = {
   kind: RoleKind;
 };
 
-const RolesTable = ({
-  data,
-  errorMessage,
-  isLoading,
-  kind,
-}: RolesTableProps) => {
+const RolesTable = ({ data, errorMessage, isLoading, kind }: RolesTableProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
   const filters = useRolesFilters();
   const columns = [

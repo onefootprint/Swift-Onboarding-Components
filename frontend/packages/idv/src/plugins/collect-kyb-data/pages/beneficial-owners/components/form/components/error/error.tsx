@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-const Error = () => {
+const ErrorComponent = () => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form.errors',
   });
@@ -27,4 +27,4 @@ const Container = styled.div`
   `}
 `;
 
-export default Error;
+export default ErrorComponent;

@@ -4,5 +4,4 @@ export const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_VERCEL_URL;
 export const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 export const UNIFY_API_KEY = process.env.NEXT_PUBLIC_UNIFY_API_KEY;
 
-export const FATHOM_TRACKING_CODE =
-  process.env.NEXT_PUBLIC_FATHOM_TRACKING_CODE;
+export const FATHOM_TRACKING_CODE = process.env.NEXT_PUBLIC_FATHOM_TRACKING_CODE;

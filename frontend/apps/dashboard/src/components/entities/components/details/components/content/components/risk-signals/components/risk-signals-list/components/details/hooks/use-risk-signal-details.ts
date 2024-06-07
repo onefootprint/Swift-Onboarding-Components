@@ -1,18 +1,11 @@
 import request from '@onefootprint/request';
-import type {
-  GetRiskSignalDetailsRequest,
-  GetRiskSignalDetailsResponse,
-} from '@onefootprint/types';
+import type { GetRiskSignalDetailsRequest, GetRiskSignalDetailsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-const getRiskSignalDetails = async ({
-  authHeaders,
-  entityId,
-  riskSignalId,
-}: GetRiskSignalDetailsRequest) => {
+const getRiskSignalDetails = async ({ authHeaders, entityId, riskSignalId }: GetRiskSignalDetailsRequest) => {
   const { data: response } = await request<GetRiskSignalDetailsResponse>({
     headers: authHeaders,
     method: 'GET',

@@ -1,8 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import type {
-  InvestorProfileData,
-  UserDataResponse,
-} from '@onefootprint/types';
+import type { InvestorProfileData, UserDataResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -23,22 +20,14 @@ const useSyncData = () => {
   });
   const toast = useToast();
 
-  const syncData = ({
-    authToken,
-    data,
-    speculative,
-    onSuccess,
-    onError,
-  }: SyncDataArgs) => {
+  const syncData = ({ authToken, data, speculative, onSuccess, onError }: SyncDataArgs) => {
     if (!authToken) {
       toast.show({
         title: t('sync-data-error.empty-auth-token.title'),
         description: t('sync-data-error.empty-auth-token.description'),
         variant: 'error',
       });
-      onError?.(
-        'Found empty auth token while syncing investor profile data fields.',
-      );
+      onError?.('Found empty auth token while syncing investor profile data fields.');
       return;
     }
 

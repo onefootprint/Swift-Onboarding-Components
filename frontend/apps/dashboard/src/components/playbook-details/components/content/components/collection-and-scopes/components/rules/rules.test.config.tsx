@@ -1,16 +1,5 @@
-import {
-  fireEvent,
-  mockRequest,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
-import type {
-  OnboardingConfig,
-  Rule,
-  RuleBacktestingData,
-} from '@onefootprint/types';
+import { fireEvent, mockRequest, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import type { OnboardingConfig, Rule, RuleBacktestingData } from '@onefootprint/types';
 import {
   ActorKind,
   IdDI,
@@ -320,10 +309,7 @@ export const isNotTriggered = ({
   return isNotIndex === fieldIndex + 1;
 };
 
-export const withRules = (
-  playbookId: string = kycPlaybookFixture.id,
-  response: Rule[] = rulesFixture,
-) =>
+export const withRules = (playbookId: string = kycPlaybookFixture.id, response: Rule[] = rulesFixture) =>
   mockRequest({
     method: 'get',
     path: `/org/onboarding_configs/${playbookId}/rules`,
@@ -342,20 +328,14 @@ export const withRulesError = (playbookId: string = kycPlaybookFixture.id) =>
     },
   });
 
-export const withEditRules = (
-  response?: Rule[],
-  playbookId: string = kycPlaybookFixture.id,
-) =>
+export const withEditRules = (response?: Rule[], playbookId: string = kycPlaybookFixture.id) =>
   mockRequest({
     method: 'patch',
     path: `/org/onboarding_configs/${playbookId}/rules`,
     response: response ?? [],
   });
 
-export const withAddRule = (
-  response: Rule,
-  playbookId: string = kycPlaybookFixture.id,
-) =>
+export const withAddRule = (response: Rule, playbookId: string = kycPlaybookFixture.id) =>
   mockRequest({
     method: 'post',
     path: `/org/onboarding_configs/${playbookId}/rules`,
@@ -369,8 +349,7 @@ export const withRiskSignals = () => {
     response: [
       {
         id: '1',
-        description:
-          'The individual has lived at their current address for a short time.',
+        description: 'The individual has lived at their current address for a short time.',
         note: 'Address longevity alert',
         reasonCode: 'address_alert_longevity',
         scopes: ['address'],
@@ -403,8 +382,7 @@ export const withRiskSignals = () => {
       },
       {
         id: '5',
-        description:
-          'Identity could not be located with the information provided',
+        description: 'Identity could not be located with the information provided',
         note: 'Identity not located',
         reasonCode: 'id_not_located',
         scopes: ['ssn', 'name', 'dob', 'address'],
@@ -420,8 +398,7 @@ export const withRiskSignals = () => {
       },
       {
         id: '7',
-        description:
-          'Records indicate that the subject in question is deceased.',
+        description: 'Records indicate that the subject in question is deceased.',
         note: 'Subject deceased',
         reasonCode: 'subject_deceased',
         scopes: ['ssn'],
@@ -429,8 +406,7 @@ export const withRiskSignals = () => {
       },
       {
         id: '8',
-        description:
-          'A strong potential match on a governmental OFAC watchlist',
+        description: 'A strong potential match on a governmental OFAC watchlist',
         note: 'OFAC watchlist hit',
         reasonCode: 'watchlist_hit_ofac',
         scopes: ['name', 'dob'],
@@ -438,8 +414,7 @@ export const withRiskSignals = () => {
       },
       {
         id: '9',
-        description:
-          "The document provided was a provisional license or learner's permit",
+        description: "The document provided was a provisional license or learner's permit",
         note: "Document is a learner's permit or provisional driver's license",
         reasonCode: 'document_is_permit_or_provisional_license',
         scopes: ['document'],

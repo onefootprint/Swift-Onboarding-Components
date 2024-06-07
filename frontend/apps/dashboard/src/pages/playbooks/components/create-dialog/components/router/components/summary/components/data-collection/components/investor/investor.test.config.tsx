@@ -11,9 +11,7 @@ export type InvestorProfileWithContextProps = {
   investorProfileAdded: boolean;
 };
 
-const InvestorProfileWithContext = ({
-  investorProfileAdded,
-}: InvestorProfileWithContextProps) => {
+const InvestorProfileWithContext = ({ investorProfileAdded }: InvestorProfileWithContextProps) => {
   const defaultValues = {
     ...defaultPlaybookValuesKYC,
     [CollectedInvestorProfileDataOption.investorProfile]: investorProfileAdded,

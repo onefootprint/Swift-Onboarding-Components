@@ -7,25 +7,17 @@ type CustomDesignSystemProviderProps = {
   children: React.ReactNode;
 };
 
-const CustomDesignSystemProvider = ({
-  children,
-}: CustomDesignSystemProviderProps) => (
+const CustomDesignSystemProvider = ({ children }: CustomDesignSystemProviderProps) => (
   <ThemeProvider defaultTheme="light" enableSystem={false}>
     <DesignSystemProviderWrapper>{children}</DesignSystemProviderWrapper>
   </ThemeProvider>
 );
 
-const DesignSystemProviderWrapper = ({
-  children,
-}: CustomDesignSystemProviderProps) => {
+const DesignSystemProviderWrapper = ({ children }: CustomDesignSystemProviderProps) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  return (
-    <DesignSystemProvider theme={themes[isDark ? 'dark' : 'light']}>
-      {children}
-    </DesignSystemProvider>
-  );
+  return <DesignSystemProvider theme={themes[isDark ? 'dark' : 'light']}>{children}</DesignSystemProvider>;
 };
 
 export default CustomDesignSystemProvider;

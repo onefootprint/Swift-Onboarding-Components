@@ -18,8 +18,7 @@ const KycChecks = ({ isKyb, collectBO, requiresDoc }: KycChecksProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.verification-checks.kyc-checks',
   });
-  const { watch, setValue, register } =
-    useFormContext<VerificationChecksFormData>();
+  const { watch, setValue, register } = useFormContext<VerificationChecksFormData>();
   const shouldRunKyc = watch('skipKyc') !== true;
   const [isChecked, setIsChecked] = useState(shouldRunKyc);
   const isKybWithBo = isKyb && collectBO;
@@ -35,17 +34,11 @@ const KycChecks = ({ isKyb, collectBO, requiresDoc }: KycChecksProps) => {
         {t('title')}
       </Text>
       <Tooltip
-        text={
-          isKyb
-            ? t('disabled-tooltip.must-collect-beneficial-owners')
-            : t('disabled-tooltip.must-collect-id-doc')
-        }
+        text={isKyb ? t('disabled-tooltip.must-collect-beneficial-owners') : t('disabled-tooltip.must-collect-id-doc')}
         disabled={!toggleDisabled}
       >
         <Toggle
-          label={
-            isKyb ? t('toggle.business.label') : t('toggle.personal.label')
-          }
+          label={isKyb ? t('toggle.business.label') : t('toggle.personal.label')}
           hint={isKyb ? t('toggle.business.hint') : t('toggle.personal.hint')}
           checked={isChecked}
           disabled={toggleDisabled}

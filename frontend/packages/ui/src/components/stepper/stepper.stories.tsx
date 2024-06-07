@@ -59,9 +59,7 @@ const Template: Story<StepperProps> = ({
               nextIndex = i;
               nextSubIndex = 0;
             } else if (option.options) {
-              const subOptionIndex = option.options.findIndex(
-                subOption => subOption.value === newValue.value,
-              );
+              const subOptionIndex = option.options.findIndex(subOption => subOption.value === newValue.value);
               if (subOptionIndex !== -1) {
                 nextIndex = i;
                 nextSubIndex = subOptionIndex;

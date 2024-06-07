@@ -79,10 +79,7 @@ const Template: Story<DrawerProps> = ({
   title,
 }: DrawerProps) => {
   const [open, setOpen] = useState(initialOpen);
-  const SelectedIcon =
-    typeof CloseIconComponent === 'string'
-      ? icos[CloseIconComponent]
-      : CloseIconComponent;
+  const SelectedIcon = typeof CloseIconComponent === 'string' ? icos[CloseIconComponent] : CloseIconComponent;
 
   return (
     <>

@@ -19,12 +19,7 @@ const formId = 'form-add-additional-doc-dialog';
 const getDocName = getFormElementValue('input[name="doc-name"]');
 const getDocDesc = getFormElementValue('textarea[name="doc-description"]');
 
-const DialogReSubmit = ({
-  docDialog,
-  isOpen,
-  onClose,
-  onSubmit,
-}: DialogReSubmitProps) => {
+const DialogReSubmit = ({ docDialog, isOpen, onClose, onSubmit }: DialogReSubmitProps) => {
   const { t } = useTranslation('common');
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -47,9 +42,7 @@ const DialogReSubmit = ({
       title={t('doc.request-new-submission')}
     >
       <Stack marginBottom={6}>
-        <InlineAlert variant="info">
-          {t('doc.request-new-submission-info')}
-        </InlineAlert>
+        <InlineAlert variant="info">{t('doc.request-new-submission-info')}</InlineAlert>
       </Stack>
       <form onSubmit={handleFormSubmit} id={formId}>
         <TextInput

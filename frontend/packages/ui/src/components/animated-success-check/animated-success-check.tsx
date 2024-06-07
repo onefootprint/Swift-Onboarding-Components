@@ -70,11 +70,7 @@ const explodeCircleVariants = (index: number) => ({
   },
 });
 
-const AnimatedSuccessCheck = ({
-  onComplete,
-  animationStart,
-  size = 32,
-}: AnimatedSuccessCheckProps) => {
+const AnimatedSuccessCheck = ({ onComplete, animationStart, size = 32 }: AnimatedSuccessCheckProps) => {
   const theme = useTheme();
   useTimeout(
     () => {
@@ -107,9 +103,7 @@ const AnimatedSuccessCheck = ({
                 9.39584 * scale
               }C${3.0626 * scale} ${10.7606 * scale} ${4.99533 * scale} ${
                 10.8551 * scale
-              } ${5.75385 * scale} ${9.53316 * scale}L${10.0737 * scale} ${
-                2.00464 * scale
-              }`}
+              } ${5.75385 * scale} ${9.53316 * scale}L${10.0737 * scale} ${2.00464 * scale}`}
               stroke={theme.color.success}
               strokeWidth={3 * scale}
               strokeLinecap="round"
@@ -143,7 +137,7 @@ const AnimatedSuccessCheck = ({
             />
             {translationOptions.map((_, index) => (
               <motion.circle
-                // eslint-disable-next-line react/no-array-index-key
+                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                 key={index}
                 cx="50%"
                 cy="50%"

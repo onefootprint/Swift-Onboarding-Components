@@ -21,9 +21,6 @@ describe('searchByPaths', () => {
     const list = [{ name: 'John' }, { name: 'Jane' }, { name: 'John Doe' }];
     const searchStr = 'john';
     const paths = ['name']; /** @ts-expect-error: argument types */
-    expect(searchByPaths(paths)(list, searchStr)).toEqual([
-      { name: 'John' },
-      { name: 'John Doe' },
-    ]);
+    expect(searchByPaths(paths)(list, searchStr)).toEqual([{ name: 'John' }, { name: 'John Doe' }]);
   });
 });

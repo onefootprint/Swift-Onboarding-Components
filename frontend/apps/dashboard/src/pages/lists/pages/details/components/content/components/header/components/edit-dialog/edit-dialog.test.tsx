@@ -1,30 +1,17 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser } from 'src/config/tests';
 
 import type { EditDialogProps } from './edit-dialog';
 import EditDialog from './edit-dialog';
-import {
-  withListDetails,
-  withListUpdate,
-  withListUpdateError,
-} from './edit-dialog.test.config';
+import { withListDetails, withListUpdate, withListUpdateError } from './edit-dialog.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
 describe('<EditDialog />', () => {
   const listId = 'list_1';
 
-  const renderEditDialog = ({
-    onClose = jest.fn(),
-    onEdit = jest.fn(),
-  }: Partial<EditDialogProps>) =>
+  const renderEditDialog = ({ onClose = jest.fn(), onEdit = jest.fn() }: Partial<EditDialogProps>) =>
     customRender(<EditDialog open onClose={onClose} onEdit={onEdit} />);
 
   beforeEach(() => {
@@ -57,9 +44,7 @@ describe('<EditDialog />', () => {
       const onEdit = jest.fn();
       renderEditDialog({ onEdit });
 
-      const listName = screen.getByPlaceholderText(
-        'e.g. Blocked users',
-      ) as HTMLInputElement;
+      const listName = screen.getByPlaceholderText('e.g. Blocked users') as HTMLInputElement;
       await userEvent.click(listName);
       await userEvent.clear(listName);
       await userEvent.type(listName, 'test name');
@@ -86,9 +71,7 @@ describe('<EditDialog />', () => {
       const onEdit = jest.fn();
       renderEditDialog({ onEdit });
 
-      const listName = screen.getByPlaceholderText(
-        'e.g. Blocked users',
-      ) as HTMLInputElement;
+      const listName = screen.getByPlaceholderText('e.g. Blocked users') as HTMLInputElement;
       await userEvent.click(listName);
       await userEvent.clear(listName);
       await userEvent.type(listName, 'test name');

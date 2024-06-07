@@ -18,12 +18,7 @@ type BusinessAddressProps = {
   hideHeader?: boolean;
 };
 
-const BusinessAddress = ({
-  ctaLabel,
-  onComplete,
-  onCancel,
-  hideHeader,
-}: BusinessAddressProps) => {
+const BusinessAddress = ({ ctaLabel, onComplete, onCancel, hideHeader }: BusinessAddressProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.business-address',
   });
@@ -46,10 +41,9 @@ const BusinessAddress = ({
     };
 
     const handleError = (error: string) => {
-      Logger.error(
-        `Speculatively vaulting data failed in kyb business-address page: ${error}`,
-        { location: 'kyb-business-address' },
-      );
+      Logger.error(`Speculatively vaulting data failed in kyb business-address page: ${error}`, {
+        location: 'kyb-business-address',
+      });
     };
 
     syncData({
@@ -75,11 +69,7 @@ const BusinessAddress = ({
       {!hideHeader && (
         <>
           <CollectKybDataNavigationHeader />
-          <HeaderTitle
-            title={t('title')}
-            subtitle={t('subtitle')}
-            marginBottom={7}
-          />
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} marginBottom={7} />
         </>
       )}
       <BusinessAddressForm

@@ -4,14 +4,8 @@ export const withGoogleMaps = (type: string, data?: unknown) => {
       places: {
         // @ts-ignore
         PlacesService: class {
-          getDetails = (
-            _: unknown,
-            cb: (dataArg: unknown, status: string) => void,
-          ) => {
-            cb(
-              type === 'success' ? data : null,
-              type === 'success' ? 'OK' : 'ERROR',
-            );
+          getDetails = (_: unknown, cb: (dataArg: unknown, status: string) => void) => {
+            cb(type === 'success' ? data : null, type === 'success' ? 'OK' : 'ERROR');
           };
         },
       },
@@ -336,8 +330,7 @@ export const MexicoAddressFixture1 = {
 
 export const MexicoAddressFixture2 = {
   mainText: '16 de Septiembre 79',
-  secondaryText:
-    'Centro Histórico de la Ciudad de México, Centro, Ciudad de México, Distrito Federal, México',
+  secondaryText: 'Centro Histórico de la Ciudad de México, Centro, Ciudad de México, Distrito Federal, México',
   addressComponents: [
     {
       long_name: '79',

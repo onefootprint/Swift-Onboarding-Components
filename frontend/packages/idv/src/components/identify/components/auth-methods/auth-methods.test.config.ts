@@ -1,9 +1,4 @@
-import {
-  mockRequest,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { AuthMethodKind, ChallengeKind } from '@onefootprint/types';
 
 export const withUserAuthMethods = (data?: unknown) =>
@@ -79,10 +74,7 @@ export const withIdentify = (
 export const fillChallengePin = async () => {
   // Wait until the login challenge request succeeds
   await waitFor(() => {
-    expect(screen.getByRole('presentation')).toHaveAttribute(
-      'data-pending',
-      'false',
-    );
+    expect(screen.getByRole('presentation')).toHaveAttribute('data-pending', 'false');
   });
   // expect(screen.getByTestId('navigation-back-button')).toBeInTheDocument();
   const firstInput = document.getElementsByTagName('input')[0];

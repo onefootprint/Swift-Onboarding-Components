@@ -12,11 +12,7 @@ export type ResidencyFormWithContextProps = {
   defaultValues?: ResidencyFormData;
 };
 
-const ResidencyFormWithContext = ({
-  onSubmit,
-  onBack,
-  defaultValues,
-}: ResidencyFormWithContextProps) => {
+const ResidencyFormWithContext = ({ onSubmit, onBack, defaultValues }: ResidencyFormWithContextProps) => {
   const formMethods = useForm<ResidencyFormData>({
     defaultValues: defaultResidencyFormData,
   });
@@ -28,11 +24,7 @@ const ResidencyFormWithContext = ({
 
   return (
     <FormProvider {...formMethods}>
-      <Residency
-        onBack={onBack}
-        onSubmit={onSubmit}
-        defaultValues={defaultResidencyValues}
-      />
+      <Residency onBack={onBack} onSubmit={onSubmit} defaultValues={defaultResidencyValues} />
     </FormProvider>
   );
 };

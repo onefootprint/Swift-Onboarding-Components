@@ -24,61 +24,17 @@ const rightFootVariants = {
 
 const Illustration = () => (
   <StyledContainer>
-    <Logo
-      src="/home/customize-illustration/logo.svg"
-      alt="Logo"
-      width={140}
-      height={65}
-    />
-    <MountainLeft
-      src="/home/customize-illustration/mountain left.svg"
-      alt="Mountain"
-      width={500}
-      height={280}
-    />
-    <MountainRight
-      src="/home/customize-illustration/mountain-right.svg"
-      alt="Mountain"
-      width={520}
-      height={290}
-    />
+    <Logo src="/home/customize-illustration/logo.svg" alt="Logo" width={140} height={65} />
+    <MountainLeft src="/home/customize-illustration/mountain left.svg" alt="Mountain" width={500} height={280} />
+    <MountainRight src="/home/customize-illustration/mountain-right.svg" alt="Mountain" width={520} height={290} />
 
-    <CloudRight
-      src="/home/customize-illustration/cloud-right.svg"
-      alt="Cloud"
-      width={100}
-      height={100}
-    />
-    <CloudLeft
-      src="/home/customize-illustration/cloud-left.svg"
-      alt="Cloud"
-      width={100}
-      height={100}
-    />
+    <CloudRight src="/home/customize-illustration/cloud-right.svg" alt="Cloud" width={100} height={100} />
+    <CloudLeft src="/home/customize-illustration/cloud-left.svg" alt="Cloud" width={100} height={100} />
     <Characters>
-      <Image
-        src="/home/customize-illustration/characters.svg"
-        alt="Characters"
-        width={500}
-        height={650}
-      />
-      <LeftFoot
-        src="/home/customize-illustration/right-foot.svg"
-        alt="Left Foot"
-        width={50}
-        height={50}
-      />
-      <MemoizedRightFootWrapper
-        variants={rightFootVariants}
-        initial="initial"
-        animate="rotate"
-      >
-        <Image
-          src="/home/customize-illustration/right-foot.svg"
-          alt="Right Foot"
-          width={50}
-          height={50}
-        />
+      <Image src="/home/customize-illustration/characters.svg" alt="Characters" width={500} height={650} />
+      <LeftFoot src="/home/customize-illustration/right-foot.svg" alt="Left Foot" width={50} height={50} />
+      <MemoizedRightFootWrapper variants={rightFootVariants} initial="initial" animate="rotate">
+        <Image src="/home/customize-illustration/right-foot.svg" alt="Right Foot" width={50} height={50} />
       </MemoizedRightFootWrapper>
     </Characters>
     <Ground />

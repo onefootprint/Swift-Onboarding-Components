@@ -25,10 +25,7 @@ import getSingleSelectLabel from './utils/get-single-select-label';
 export type ControlProps = {
   control: FilterControl;
   disabled?: boolean;
-  onChange: (
-    query: string,
-    newSelectedOptions: FilterSelectedOption | FilterSelectedOption[],
-  ) => void;
+  onChange: (query: string, newSelectedOptions: FilterSelectedOption | FilterSelectedOption[]) => void;
 };
 
 const Control = ({ control, disabled, onChange }: ControlProps) => {
@@ -51,9 +48,7 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
     onChange(query, []);
   };
 
-  const handleSubmit = (
-    newSelectedOptions: FilterSelectedOption | FilterSelectedOption[],
-  ) => {
+  const handleSubmit = (newSelectedOptions: FilterSelectedOption | FilterSelectedOption[]) => {
     onChange(query, newSelectedOptions);
     setOpen(false);
   };
@@ -65,11 +60,7 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
           <ClearPill onClick={clear} disabled={disabled}>
             {label}
           </ClearPill>
-          <SelectedPillMotion
-            isVisible={hasSelectedOptions}
-            from="left"
-            to="right"
-          >
+          <SelectedPillMotion isVisible={hasSelectedOptions} from="left" to="right">
             <SelectedPill
               aria-controls={popoverId}
               aria-expanded={open}
@@ -77,12 +68,9 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
               disabled={disabled}
               onClick={handleToggle}
             >
-              {kind === 'single-select' &&
-                getSingleSelectLabel(options, selectedOptions)}
-              {kind === 'multi-select' &&
-                getMultiSelectLabel(options, selectedOptions)}
-              {kind === 'multi-select-grouped' &&
-                getMultiSelectGroupedLabel(options, selectedOptions)}
+              {kind === 'single-select' && getSingleSelectLabel(options, selectedOptions)}
+              {kind === 'multi-select' && getMultiSelectLabel(options, selectedOptions)}
+              {kind === 'multi-select-grouped' && getMultiSelectGroupedLabel(options, selectedOptions)}
               {kind === 'date' && getDateLabel(dateOptions, selectedOptions)}
             </SelectedPill>
           </SelectedPillMotion>
@@ -99,21 +87,10 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
         </AddPill>
       )}
       {open ? (
-        <StyledFade
-          isVisible={open}
-          from="center"
-          to="center"
-          ref={setPopperElement}
-          {...attributes.popper}
-        >
+        <StyledFade isVisible={open} from="center" to="center" ref={setPopperElement} {...attributes.popper}>
           <Popover id={popoverId} onClose={close} title={label}>
             {loading ? (
-              <AnimatedLoadingSpinner
-                color="secondary"
-                ariaLabel={`Loading ${label}`}
-                size={24}
-                animationStart
-              />
+              <AnimatedLoadingSpinner color="secondary" ariaLabel={`Loading ${label}`} size={24} animationStart />
             ) : (
               <>
                 {kind === 'single-select' && (
@@ -133,18 +110,9 @@ const Control = ({ control, disabled, onChange }: ControlProps) => {
                   />
                 )}
                 {kind === 'multi-select-grouped' && (
-                  <MultiSelectGroupedForm
-                    onSubmit={handleSubmit}
-                    options={options}
-                    selectedOptions={selectedOptions}
-                  />
+                  <MultiSelectGroupedForm onSubmit={handleSubmit} options={options} selectedOptions={selectedOptions} />
                 )}
-                {kind === 'date' && (
-                  <DateForm
-                    onSubmit={handleSubmit}
-                    selectedOptions={selectedOptions}
-                  />
-                )}
+                {kind === 'date' && <DateForm onSubmit={handleSubmit} selectedOptions={selectedOptions} />}
               </>
             )}
           </Popover>

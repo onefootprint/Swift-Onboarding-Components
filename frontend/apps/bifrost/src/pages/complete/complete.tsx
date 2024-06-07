@@ -1,10 +1,5 @@
 import { IcoCheckCircle40 } from '@onefootprint/icons';
-import {
-  HeaderTitle,
-  Logger,
-  NavigationHeader,
-  useFootprintProvider,
-} from '@onefootprint/idv';
+import { HeaderTitle, Logger, NavigationHeader, useFootprintProvider } from '@onefootprint/idv';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
 import checkIsMobile from '@onefootprint/idv/src/utils/check-is-mobile';
 import { Box, Button, LinkButton } from '@onefootprint/ui';
@@ -24,9 +19,7 @@ const Complete = () => {
   const { idvCompletePayload } = state.context;
 
   const handleComplete = (delay?: number) => {
-    Logger.info(
-      'IDV flow is complete, sending validation token back to the tenant from Bifrost completion page',
-    );
+    Logger.info('IDV flow is complete, sending validation token back to the tenant from Bifrost completion page');
     if (idvCompletePayload && idvCompletePayload.validationToken) {
       fpProvider.complete({
         validationToken: idvCompletePayload.validationToken,
@@ -43,9 +36,7 @@ const Complete = () => {
 
   return (
     <Container>
-      <NavigationHeader
-        leftButton={isWebview ? undefined : { variant: 'close' }}
-      />
+      <NavigationHeader leftButton={isWebview ? undefined : { variant: 'close' }} />
       {!isWebview && <IcoCheckCircle40 color="success" />}
       <Box marginBottom={4} />
       <HeaderTitle
@@ -63,9 +54,7 @@ const Complete = () => {
             {t('cta.webview')}
           </Button>
         ) : (
-          <LinkButton onClick={() => handleComplete()}>
-            {t('cta.browser')}
-          </LinkButton>
+          <LinkButton onClick={() => handleComplete()}>{t('cta.browser')}</LinkButton>
         )}
       </Box>
     </Container>

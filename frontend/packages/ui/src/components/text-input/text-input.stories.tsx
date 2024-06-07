@@ -10,8 +10,7 @@ export default {
   argTypes: {
     mask: {
       control: 'object',
-      description:
-        'Specify a mask using Cleave.js (https://github.com/nosir/cleave.js/tree/master/doc)',
+      description: 'Specify a mask using Cleave.js (https://github.com/nosir/cleave.js/tree/master/doc)',
       required: false,
     },
     disabled: {

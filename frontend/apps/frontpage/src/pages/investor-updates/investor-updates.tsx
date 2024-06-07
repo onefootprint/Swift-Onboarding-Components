@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import SubscribeToNewsletter from 'src/components/writing-layout/components/subscribe-to-newsletter';
-import { getInitialPosts, PostType } from 'src/utils/ghost';
+import { PostType, getInitialPosts } from 'src/utils/ghost';
 import type { Post } from 'src/utils/ghost/types';
 import styled from 'styled-components';
 
@@ -28,11 +28,7 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
 
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/investor-updates"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/investor-updates" />
       <Container>
         <InvestorsContent>
           <TwitterBreadcrumb
@@ -45,9 +41,7 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
               <InvestorUpdatePreview
                 index={posts.length - index}
                 href={`/investor-updates/${post.slug}`}
-                publishedAt={formatDateWithLongMonth(
-                  new Date(post.published_at),
-                )}
+                publishedAt={formatDateWithLongMonth(new Date(post.published_at))}
                 excerpt={post.excerpt}
                 key={post.uuid}
                 title={post.title}

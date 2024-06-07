@@ -1,8 +1,5 @@
 import type { OnboardingConfig } from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  OnboardingConfigStatus,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfigStatus } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
 const playbookFixture: OnboardingConfig = {

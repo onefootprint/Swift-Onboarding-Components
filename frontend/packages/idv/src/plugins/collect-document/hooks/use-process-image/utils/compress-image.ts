@@ -14,10 +14,7 @@ const QUALITY = 90;
 export const COMPRESS_EXTRA_MAX_SIZE_MB = 0.3;
 
 // Input: Non-HEIC Image File. Output: Compressed JPEG Image File.
-const compressImage = async (
-  fileOrBlob: File | Blob,
-  extraCompress?: boolean,
-): Promise<File | undefined> => {
+const compressImage = async (fileOrBlob: File | Blob, extraCompress?: boolean): Promise<File | undefined> => {
   const options = {
     maxSizeMB: extraCompress ? COMPRESS_EXTRA_MAX_SIZE_MB : MAX_SIZE_MB,
     intialQuality: QUALITY,
@@ -26,11 +23,10 @@ const compressImage = async (
   };
 
   const file = isBlob(fileOrBlob)
-    ? new File(
-        Array.isArray(fileOrBlob) ? fileOrBlob : [fileOrBlob],
-        'file-to-compress',
-        { type: JPEG, lastModified: new Date().getTime() },
-      )
+    ? new File(Array.isArray(fileOrBlob) ? fileOrBlob : [fileOrBlob], 'file-to-compress', {
+        type: JPEG,
+        lastModified: new Date().getTime(),
+      })
     : fileOrBlob;
 
   return imageCompression(file, options);

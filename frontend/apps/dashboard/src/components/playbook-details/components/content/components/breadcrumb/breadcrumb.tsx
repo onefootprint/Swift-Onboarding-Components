@@ -23,10 +23,7 @@ const Breadcrumb = ({ playbookName, isDisabled }: BreadcrumbProps) => {
           <UIBreadcrumb.Item href="/users" as={Link}>
             {t('users')}
           </UIBreadcrumb.Item>
-          <UIBreadcrumb.Item
-            href={asPath.replace(/\/playbook\/[^?]+/, '')}
-            as={Link}
-          >
+          <UIBreadcrumb.Item href={asPath.replace(/\/playbook\/[^?]+/, '')} as={Link}>
             {t('user-details')}
           </UIBreadcrumb.Item>
           <UIBreadcrumb.Item>{t('playbook-details')}</UIBreadcrumb.Item>

@@ -6,10 +6,10 @@ type ErrorProps = {
   error: unknown;
 };
 
-const Error = ({ error }: ErrorProps) => (
+const ErrorComponent = ({ error }: ErrorProps) => (
   <Text variant="body-2" color="secondary">
     {getErrorMessage(error)}
   </Text>
 );
 
-export default Error;
+export default ErrorComponent;

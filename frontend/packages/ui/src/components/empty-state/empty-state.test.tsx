@@ -1,12 +1,7 @@
 import '../../config/initializers/i18next-test';
 
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { EmptyStateProps } from './empty-state';
@@ -14,7 +9,7 @@ import EmptyState from './empty-state';
 
 describe('<EmptyState />', () => {
   const renderEmptyState = ({
-    cta = { label: 'cta', onClick: () => {} },
+    cta = { label: 'cta', onClick: () => undefined },
     description = 'warning',
     iconComponent,
     renderHeader,
@@ -38,21 +33,16 @@ describe('<EmptyState />', () => {
   it('should render the title', () => {
     renderEmptyState({ title: "Oops! User couldn't be found." });
 
-    expect(
-      screen.getByText("Oops! User couldn't be found."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Oops! User couldn't be found.")).toBeInTheDocument();
   });
 
   it('should render the description', () => {
     renderEmptyState({
-      description:
-        "We're sorry, but it looks like the user you're looking for doesn't exist.",
+      description: "We're sorry, but it looks like the user you're looking for doesn't exist.",
     });
 
     expect(
-      screen.getByText(
-        "We're sorry, but it looks like the user you're looking for doesn't exist.",
-      ),
+      screen.getByText("We're sorry, but it looks like the user you're looking for doesn't exist."),
     ).toBeInTheDocument();
   });
 

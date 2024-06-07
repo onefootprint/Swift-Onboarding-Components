@@ -43,9 +43,7 @@ const linesCore = [
   },
 ];
 
-const VaultingIllustration = ({
-  isHovered = false,
-}: VaultingIllustrationProps) => (
+const VaultingIllustration = ({ isHovered = false }: VaultingIllustrationProps) => (
   <Container>
     <StyledBackground isHovered={isHovered} />
     <Screen isHovered={isHovered}>
@@ -137,11 +135,13 @@ const Screen = styled.div<{ isHovered: boolean }>`
     overflow: hidden;
     transition: all 0.2s ease-in-out;
 
-    ${isHovered &&
-    css`
+    ${
+      isHovered &&
+      css`
       box-shadow: ${theme.elevation[3]};
       transform: translateY(-2px);
-    `}
+    `
+    }
   `}
 `;
 

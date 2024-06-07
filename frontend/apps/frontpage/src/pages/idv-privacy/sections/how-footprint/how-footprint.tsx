@@ -17,11 +17,7 @@ const keys = [
       i18nKey: 'pages.idv-privacy.how.match-photos.description',
       components: {
         biometricIdLink: (
-          <Link
-            href="https://en.wikipedia.org/wiki/Biometrics"
-            target="_blank"
-            rel="noopener noreferrer"
-          />
+          <Link href="https://en.wikipedia.org/wiki/Biometrics" target="_blank" rel="noopener noreferrer" />
         ),
       },
     },

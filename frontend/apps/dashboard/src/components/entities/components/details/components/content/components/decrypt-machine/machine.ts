@@ -84,7 +84,7 @@ export const createDecryptStateMachine = () =>
     },
     {
       guards: {
-        [Guard.hasAtLeastOneFieldSelected]: (context, event) => {
+        [Guard.hasAtLeastOneFieldSelected]: (_context, event) => {
           if (event.type === Event.submittedFields) {
             const dis = getDiFields(event.payload.fields);
             return dis.length > 0;

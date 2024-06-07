@@ -13,11 +13,7 @@ type ContentProps = {
   amlMedia: AmlHitMedia[];
 };
 
-const Content = ({
-  riskSignal,
-  handleShowAmlMedia,
-  amlMedia,
-}: ContentProps) => {
+const Content = ({ riskSignal, handleShowAmlMedia, amlMedia }: ContentProps) => {
   if (amlMedia.length) {
     return <HitsMedia mediaList={amlMedia} />;
   }
@@ -26,18 +22,11 @@ const Content = ({
     <AnimatePresence>
       <motion.div animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
         <Stack direction="column" height="100%">
-          <Overview
-            description={riskSignal.description}
-            scopes={riskSignal.scopes}
-            severity={riskSignal.severity}
-          />
+          <Overview description={riskSignal.description} scopes={riskSignal.scopes} severity={riskSignal.severity} />
           {riskSignal.hasAmlHits && (
             <>
               <Divider />
-              <Matches
-                riskSignalId={riskSignal.id}
-                handleShowAmlMedia={handleShowAmlMedia}
-              />
+              <Matches riskSignalId={riskSignal.id} handleShowAmlMedia={handleShowAmlMedia} />
             </>
           )}
         </Stack>

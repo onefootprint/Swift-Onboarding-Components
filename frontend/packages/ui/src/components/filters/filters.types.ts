@@ -39,12 +39,7 @@ export type FilterControl = {
   loading?: boolean;
   query: string;
   label: string;
-} & (
-  | FilterSingleSelect
-  | FilterMultiSelect
-  | FilterMultiSelectGrouped
-  | FilterDate
-);
+} & (FilterSingleSelect | FilterMultiSelect | FilterMultiSelectGrouped | FilterDate);
 
 export enum FilterDateRange {
   AllTime = 'all-time',

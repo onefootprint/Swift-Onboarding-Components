@@ -12,14 +12,7 @@ const Progress = ({ details, value }: ProgressProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'companies' });
 
   return (
-    <Stack
-      backgroundColor="secondary"
-      borderRadius="sm"
-      direction="column"
-      gap={4}
-      padding={5}
-      width="100%"
-    >
+    <Stack backgroundColor="secondary" borderRadius="sm" direction="column" gap={4} padding={5} width="100%">
       <Stack gap={3} justify="space-between" width="100%">
         <Text variant="label-3" color="secondary">
           {`${value.toFixed(0)}${t('percentage-completed')}`}

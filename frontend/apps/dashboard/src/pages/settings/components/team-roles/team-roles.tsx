@@ -28,9 +28,7 @@ const TeamRoles = () => {
   const tabs = [
     { label: t('tabs.members'), value: TabName.members },
     { label: t('tabs.roles'), value: TabName.roles },
-    ...(orgQuery.data?.domains.length
-      ? [{ label: t('tabs.access'), value: TabName.domainAccess }]
-      : []),
+    ...(orgQuery.data?.domains.length ? [{ label: t('tabs.access'), value: TabName.domainAccess }] : []),
   ];
 
   const handleTabChange = (value: string) => {
@@ -46,9 +44,7 @@ const TeamRoles = () => {
       <Content>
         {tab === TabName.members && <Members />}
         {tab === TabName.roles && <Roles />}
-        {tab === TabName.domainAccess && orgQuery.data && (
-          <DomainAccess org={orgQuery.data} />
-        )}
+        {tab === TabName.domainAccess && orgQuery.data && <DomainAccess org={orgQuery.data} />}
       </Content>
     </section>
   );

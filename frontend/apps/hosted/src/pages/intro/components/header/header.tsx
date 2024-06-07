@@ -30,16 +30,8 @@ const Header = () => {
         />
       ) : (
         <HeaderTitle
-          title={
-            isKyb
-              ? t('kyb.title', { tenantName })
-              : t('kyc.title', { tenantName })
-          }
-          subtitle={
-            isKyb
-              ? t('kyb.subtitle', { tenantName })
-              : t('kyc.subtitle', { tenantName })
-          }
+          title={isKyb ? t('kyb.title', { tenantName }) : t('kyc.title', { tenantName })}
+          subtitle={isKyb ? t('kyb.subtitle', { tenantName }) : t('kyc.subtitle', { tenantName })}
           marginTop={4}
         />
       )}

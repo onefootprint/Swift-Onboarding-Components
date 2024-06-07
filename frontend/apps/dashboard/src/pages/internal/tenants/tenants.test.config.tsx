@@ -67,9 +67,7 @@ export const orgFixture: Organization = {
   parent: null,
 };
 
-export const withTenants = (
-  response: PaginatedRequestResponse<GetTenantsResponse> = tenantsFixture,
-) =>
+export const withTenants = (response: PaginatedRequestResponse<GetTenantsResponse> = tenantsFixture) =>
   mockRequest({
     method: 'get',
     path: '/private/tenants',

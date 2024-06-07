@@ -52,12 +52,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
     return (
       <Stack direction="column">
-        <Label
-          aria-describedby={hint && `${id}-hint`}
-          data-testid={testID}
-          hasError={hasError}
-          htmlFor={id}
-        >
+        <Label aria-describedby={hint && `${id}-hint`} data-testid={testID} hasError={hasError} htmlFor={id}>
           <Input
             aria-checked={checked}
             aria-disabled={disabled}

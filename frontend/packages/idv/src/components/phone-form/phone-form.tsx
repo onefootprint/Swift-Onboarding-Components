@@ -21,15 +21,7 @@ type PhoneFormProps = {
   };
 };
 
-const PhoneForm = ({
-  defaultPhone,
-  isLoading,
-  l10n,
-  onSubmit,
-  options,
-  texts,
-  validator,
-}: PhoneFormProps) => {
+const PhoneForm = ({ defaultPhone, isLoading, l10n, onSubmit, options, texts, validator }: PhoneFormProps) => {
   const {
     control,
     setValue,
@@ -42,11 +34,7 @@ const PhoneForm = ({
 
   const handleBeforeSubmit = (formData: PhoneFormData) => {
     if (validator && !validator(formData.phoneNumber)) {
-      setError(
-        'phoneNumber',
-        { message: texts.phoneInvalid },
-        { shouldFocus: true },
-      );
+      setError('phoneNumber', { message: texts.phoneInvalid }, { shouldFocus: true });
       return;
     }
     onSubmit(formData);
@@ -67,10 +55,7 @@ const PhoneForm = ({
             message: texts.phoneRequired,
           },
         }}
-        render={({
-          field: { onChange, onBlur, value, name },
-          fieldState: { error },
-        }) => (
+        render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
           <PhoneInput
             autoFocus
             data-nid-target="phone-number"

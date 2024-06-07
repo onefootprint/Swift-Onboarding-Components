@@ -48,15 +48,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story = ({
-  position,
-  alignment,
-  content,
-  children,
-  disabled,
-  open,
-  onOpenChange,
-}) => (
+const Template: Story = ({ position, alignment, content, children, disabled, open, onOpenChange }) => (
   <Aligner>
     <Tooltip
       position={position}

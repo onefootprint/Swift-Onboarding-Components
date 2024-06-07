@@ -11,16 +11,12 @@ import Table from './components/table';
 
 const Roles = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys.roles' });
-  const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
-    useToggle(false);
+  const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] = useToggle(false);
 
   return (
     <>
       <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
-        <PermissionGate
-          fallbackText={t('header.cta-not-allowed')}
-          scopeKind={RoleScopeKind.apiKeys}
-        >
+        <PermissionGate fallbackText={t('header.cta-not-allowed')} scopeKind={RoleScopeKind.apiKeys}>
           <Button variant="secondary" onClick={openCreateDialog}>
             {t('header.cta')}
           </Button>
@@ -30,11 +26,7 @@ const Roles = () => {
         <Divider />
       </Box>
       <Table />
-      <CreateDialog
-        open={isCreateDialogOpen}
-        handleClose={closeCreateDialog}
-        kind={RoleKind.apiKey}
-      />
+      <CreateDialog open={isCreateDialogOpen} handleClose={closeCreateDialog} kind={RoleKind.apiKey} />
     </>
   );
 };

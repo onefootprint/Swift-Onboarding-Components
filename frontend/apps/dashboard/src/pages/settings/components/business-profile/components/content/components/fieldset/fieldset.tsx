@@ -50,9 +50,7 @@ const Fieldset = ({ children, label, value, deleteKey }: FieldsetProps) => {
 
   return (
     <Stack direction="column" gap={1} justify="center">
-      <Label cta={value ? { label: editText, onClick: openDialog } : undefined}>
-        {label}
-      </Label>
+      <Label cta={value ? { label: editText, onClick: openDialog } : undefined}>{label}</Label>
       <Value cta={{ label: addText, onClick: openDialog }}>{value}</Value>
       <FormDialog
         id={id}

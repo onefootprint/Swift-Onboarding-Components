@@ -16,10 +16,7 @@ const useToast = () => {
 
   const show = (nextToast: NextToast, hideTimeout = HIDE_TIMEOUT) => {
     const id = createRandomId();
-    setToasts(currentToasts => [
-      ...currentToasts,
-      { ...nextToast, id, leaving: false },
-    ]);
+    setToasts(currentToasts => [...currentToasts, { ...nextToast, id, leaving: false }]);
     scheduleToHide(id, hideTimeout);
     return id;
   };

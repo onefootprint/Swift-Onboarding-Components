@@ -28,9 +28,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`,
-  );
+  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
@@ -42,11 +40,9 @@ test('KYC E2E.NoPhoneFlow #ci', async ({ page, isMobile }) => {
   test.skip(isMobile, 'Mobile <Select /> bug'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(
-    page
-      .frameLocator('iframe[name^="footprint-iframe-"]')
-      .getByText(/Sandbox Mode/i),
-  ).toBeVisible({ timeout });
+  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
+    timeout,
+  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   await selectOutcomeOptional(frame, 'Success');

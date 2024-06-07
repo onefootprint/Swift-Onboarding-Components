@@ -23,10 +23,7 @@ describe('convertFormData', () => {
     },
   ])('.', ({ data, bp, x }) => {
     expect(
-      convertFormData(
-        bp as unknown as TenantBillingProfile | undefined,
-        data as unknown as BillingProfileFormData,
-      ),
+      convertFormData(bp as unknown as TenantBillingProfile | undefined, data as unknown as BillingProfileFormData),
     ).toEqual(x);
   });
 });

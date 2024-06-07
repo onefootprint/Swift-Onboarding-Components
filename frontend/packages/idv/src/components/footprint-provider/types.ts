@@ -40,10 +40,7 @@ export type EmptyAdapterReturn = {
   on: () => () => void;
 };
 
-export type SendResultCallback = (
-  authToken: string,
-  deviceResponse: string,
-) => Promise<string | undefined>;
+export type SendResultCallback = (authToken: string, deviceResponse: string) => Promise<string | undefined>;
 
 export type WebViewAdapterReturn = {
   auth: (token: string) => void;
@@ -59,33 +56,15 @@ export type WebViewAdapterReturn = {
 export type ProviderReturn = {
   getAdapterResponse?: IframeAdapterReturn['getAdapterResponse'];
   getLoadingStatus?: IframeAdapterReturn['getLoadingStatus'];
-  auth:
-    | EmptyAdapterReturn['auth']
-    | IframeAdapterReturn['auth']
-    | WebViewAdapterReturn['auth'];
+  auth: EmptyAdapterReturn['auth'] | IframeAdapterReturn['auth'] | WebViewAdapterReturn['auth'];
   setSendResultCallback?: WebViewAdapterReturn['setSendResultCallback'];
   relayToComponents:
     | EmptyAdapterReturn['relayToComponents']
     | IframeAdapterReturn['relayToComponents']
     | WebViewAdapterReturn['relayToComponents'];
-  cancel:
-    | EmptyAdapterReturn['cancel']
-    | IframeAdapterReturn['cancel']
-    | WebViewAdapterReturn['cancel'];
-  close:
-    | EmptyAdapterReturn['close']
-    | IframeAdapterReturn['close']
-    | WebViewAdapterReturn['close'];
-  complete:
-    | EmptyAdapterReturn['complete']
-    | IframeAdapterReturn['complete']
-    | WebViewAdapterReturn['complete'];
-  load:
-    | EmptyAdapterReturn['load']
-    | IframeAdapterReturn['load']
-    | WebViewAdapterReturn['load'];
-  on:
-    | EmptyAdapterReturn['on']
-    | IframeAdapterReturn['on']
-    | WebViewAdapterReturn['on'];
+  cancel: EmptyAdapterReturn['cancel'] | IframeAdapterReturn['cancel'] | WebViewAdapterReturn['cancel'];
+  close: EmptyAdapterReturn['close'] | IframeAdapterReturn['close'] | WebViewAdapterReturn['close'];
+  complete: EmptyAdapterReturn['complete'] | IframeAdapterReturn['complete'] | WebViewAdapterReturn['complete'];
+  load: EmptyAdapterReturn['load'] | IframeAdapterReturn['load'] | WebViewAdapterReturn['load'];
+  on: EmptyAdapterReturn['on'] | IframeAdapterReturn['on'] | WebViewAdapterReturn['on'];
 };

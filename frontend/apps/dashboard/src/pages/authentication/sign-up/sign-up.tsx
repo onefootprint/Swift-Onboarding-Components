@@ -1,5 +1,5 @@
 import { ThemedLogoFpCompact } from '@onefootprint/icons';
-import { Box, Divider, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Divider, Stack, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
@@ -35,12 +35,7 @@ const Signup = () => {
               <Divider />
             </Stack>
             <EmailForm />
-            <Text
-              color="secondary"
-              variant="body-4"
-              gap={2}
-              display="inline-flex"
-            >
+            <Text color="secondary" variant="body-4" gap={2} display="inline-flex">
               <span>{t('already-have-an-account')}</span>
               <Link href="/authentication/sign-in">{t('sign-in')}</Link>
             </Text>
@@ -50,28 +45,13 @@ const Signup = () => {
             <PenguinWink />
           </PenguinImageContainer>
         </Container>
-        <Text
-          variant="caption-3"
-          color="secondary"
-          width="350px"
-          textAlign="center"
-        >
+        <Text variant="caption-3" color="secondary" width="350px" textAlign="center">
           <Trans
             ns="authentication"
             i18nKey="sign-up.terms"
             components={{
-              terms: (
-                <Link
-                  href="https://onefootprint.com/terms-of-service"
-                  target="_blank"
-                />
-              ),
-              privacy: (
-                <Link
-                  href="https://onefootprint.com/privacy-policy"
-                  target="_blank"
-                />
-              ),
+              terms: <Link href="https://onefootprint.com/terms-of-service" target="_blank" />,
+              privacy: <Link href="https://onefootprint.com/privacy-policy" target="_blank" />,
             }}
           />
         </Text>

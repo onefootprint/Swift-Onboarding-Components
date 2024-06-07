@@ -1,15 +1,8 @@
-import {
-  createUseRouterSpy,
-  customRenderHook,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRenderHook, waitFor } from '@onefootprint/test-utils';
 import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
 
 import useRiskSignalsOverview from './use-risk-signals-overview';
-import {
-  createRiskSignal,
-  withRiskSignals,
-} from './use-risk-signals-overview.test.config';
+import { createRiskSignal, withRiskSignals } from './use-risk-signals-overview.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 

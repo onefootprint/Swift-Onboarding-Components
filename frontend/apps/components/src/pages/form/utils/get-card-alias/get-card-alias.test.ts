@@ -2,12 +2,8 @@ import getCardAlias from './get-card-alias';
 
 describe('getCardAlias', () => {
   it('should return correct alias', () => {
-    expect(getCardAlias(['card.primary.number, card.primary.cvc'])).toBe(
-      'primary',
-    );
-    expect(getCardAlias(['card.3453-2342242-dfkefec.number'])).toBe(
-      '3453-2342242-dfkefec',
-    );
+    expect(getCardAlias(['card.primary.number, card.primary.cvc'])).toBe('primary');
+    expect(getCardAlias(['card.3453-2342242-dfkefec.number'])).toBe('3453-2342242-dfkefec');
   });
 
   it('should return null if no alias provided', () => {

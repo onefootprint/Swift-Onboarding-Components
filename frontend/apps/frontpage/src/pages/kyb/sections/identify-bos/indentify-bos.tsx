@@ -14,12 +14,7 @@ const IdentifyBos = () => {
   return (
     <TimelineLayout iconSrc="/kyb/icons/ico-illustrated-ID-40.svg">
       <Content>
-        <TimelineTitle
-          title={t('title')}
-          subtitle={t('subtitle')}
-          cta={t('cta')}
-          href="/kyc"
-        />
+        <TimelineTitle title={t('title')} subtitle={t('subtitle')} cta={t('cta')} href="/kyc" />
         <DesktopIllustration />
         <MobileIllustration />
       </Content>

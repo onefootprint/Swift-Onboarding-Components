@@ -1,5 +1,5 @@
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
-import { media, TextInput } from '@onefootprint/ui';
+import { TextInput, media } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,12 +20,10 @@ const Name = ({ index }: NameProps) => {
     formState: { errors },
   } = useFormContext<FormData>();
 
-  const firstNameErrors =
-    errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.firstName];
+  const firstNameErrors = errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.firstName];
   const hasFirstNameError = !!firstNameErrors;
 
-  const lastNameErrors =
-    errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.lastName];
+  const lastNameErrors = errors.beneficialOwners?.[index]?.[BeneficialOwnerDataAttribute.lastName];
   const hasLastNameError = !!lastNameErrors;
 
   return (
@@ -39,10 +37,7 @@ const Name = ({ index }: NameProps) => {
           hint={hasFirstNameError ? t('first-name.error') : undefined}
           label={t('first-name.label')}
           placeholder={t('first-name.placeholder')}
-          {...register(
-            `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.firstName}`,
-            { required: true },
-          )}
+          {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.firstName}`, { required: true })}
         />
 
         <TextInput
@@ -50,9 +45,7 @@ const Name = ({ index }: NameProps) => {
           data-dd-privacy="mask"
           label={t('middle-name.label')}
           placeholder={t('middle-name.placeholder')}
-          {...register(
-            `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.middleName}`,
-          )}
+          {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.middleName}`)}
         />
       </Row>
       <Row columns={1}>
@@ -63,10 +56,7 @@ const Name = ({ index }: NameProps) => {
           hint={hasLastNameError ? t('last-name.error') : undefined}
           label={t('last-name.label')}
           placeholder={t('last-name.placeholder')}
-          {...register(
-            `beneficialOwners.${index}.${BeneficialOwnerDataAttribute.lastName}`,
-            { required: true },
-          )}
+          {...register(`beneficialOwners.${index}.${BeneficialOwnerDataAttribute.lastName}`, { required: true })}
         />
       </Row>
     </>

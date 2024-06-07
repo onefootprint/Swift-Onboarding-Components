@@ -42,21 +42,9 @@ const CloudIcon = ({ className }: CloudIconProps) => (
         <feOffset dy="5" />
         <feGaussianBlur stdDeviation="6" />
         <feComposite in2="hardAlpha" operator="out" />
-        <feColorMatrix
-          type="matrix"
-          values="0 0 0 0 0.0383125 0 0 0 0 0.02125 0 0 0 0 0.1 0 0 0 0.16 0"
-        />
-        <feBlend
-          mode="darken"
-          in2="BackgroundImageFix"
-          result="effect1_dropShadow_4787_2560"
-        />
-        <feBlend
-          mode="normal"
-          in="SourceGraphic"
-          in2="effect1_dropShadow_4787_2560"
-          result="shape"
-        />
+        <feColorMatrix type="matrix" values="0 0 0 0 0.0383125 0 0 0 0 0.02125 0 0 0 0 0.1 0 0 0 0.16 0" />
+        <feBlend mode="darken" in2="BackgroundImageFix" result="effect1_dropShadow_4787_2560" />
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_4787_2560" result="shape" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -66,15 +54,8 @@ const CloudIcon = ({ className }: CloudIconProps) => (
         <feOffset dx="-4" dy="4" />
         <feGaussianBlur stdDeviation="2.5" />
         <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-        <feColorMatrix
-          type="matrix"
-          values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.17 0"
-        />
-        <feBlend
-          mode="luminosity"
-          in2="shape"
-          result="effect2_innerShadow_4787_2560"
-        />
+        <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.17 0" />
+        <feBlend mode="luminosity" in2="shape" result="effect2_innerShadow_4787_2560" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -84,15 +65,8 @@ const CloudIcon = ({ className }: CloudIconProps) => (
         <feOffset dx="8" dy="-4" />
         <feGaussianBlur stdDeviation="10" />
         <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-        <feColorMatrix
-          type="matrix"
-          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"
-        />
-        <feBlend
-          mode="darken"
-          in2="effect2_innerShadow_4787_2560"
-          result="effect3_innerShadow_4787_2560"
-        />
+        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0" />
+        <feBlend mode="darken" in2="effect2_innerShadow_4787_2560" result="effect3_innerShadow_4787_2560" />
       </filter>
     </defs>
   </svg>

@@ -1,27 +1,16 @@
 import type { SupportedLocale } from '@onefootprint/footprint-js';
-import type {
-  CollectedKycDataOption,
-  CollectKycDataRequirement,
-} from '@onefootprint/types';
-import {
-  CdoToAllDisMap,
-  CollectedKycDataOptionToRequiredAttributes,
-  IdDI,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement, CollectedKycDataOption } from '@onefootprint/types';
+import { CdoToAllDisMap, CollectedKycDataOptionToRequiredAttributes, IdDI } from '@onefootprint/types';
 
 import { getLogger } from '../../../../../../utils/logger';
-import {
-  fromUSDateToISO8601Format,
-  strInputToUSDate,
-} from '../../../../../../utils/string';
+import { fromUSDateToISO8601Format, strInputToUSDate } from '../../../../../../utils/string';
 import { isString } from '../../../../../../utils/type-guards';
 import allAttributes from '../../../../utils/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 
 const { logInfo } = getLogger({ location: 'use-user-data' });
 
-const isDate = (di: string) =>
-  di === IdDI.dob || di === IdDI.visaExpirationDate;
+const isDate = (di: string) => di === IdDI.dob || di === IdDI.visaExpirationDate;
 
 type RequestData = {
   data: Partial<Record<IdDI, string | string[]>>;
@@ -52,54 +41,47 @@ const getRequestData = (
   // Make sure there are no dangling DIs in the filteredData. If there are,
   // add in the rest of the associated DIs (even though they may be
   // decrypted directly from backend), otherwise the backend will error
-  Object.keys(CollectedKycDataOptionToRequiredAttributes).forEach(
-    (cdoKey: string) => {
-      // Detect whether any part of the cdo is in request data
-      const cdo = cdoKey as CollectedKycDataOption;
-      const allDisForCdo = CdoToAllDisMap[cdo] as IdDI[];
-      // "" is a valid value to save to the backend, so only check for undefined
-      if (
-        cdos.indexOf(cdo) === -1 ||
-        !allDisForCdo.some(di => typeof filteredData[di]?.value !== 'undefined')
-      ) {
-        return;
+  Object.keys(CollectedKycDataOptionToRequiredAttributes).forEach((cdoKey: string) => {
+    // Detect whether any part of the cdo is in request data
+    const cdo = cdoKey as CollectedKycDataOption;
+    const allDisForCdo = CdoToAllDisMap[cdo] as IdDI[];
+    // "" is a valid value to save to the backend, so only check for undefined
+    if (cdos.indexOf(cdo) === -1 || !allDisForCdo.some(di => typeof filteredData[di]?.value !== 'undefined')) {
+      return;
+    }
+
+    // For each required DI, either try to add the value to the request data, or mark it as missing
+    const requiredDisForCdo = CollectedKycDataOptionToRequiredAttributes[cdo];
+    const missingDis = new Set<string>();
+    requiredDisForCdo.forEach(di => {
+      const value = data[di];
+      if (typeof value?.value === 'undefined') {
+        missingDis.add(di);
+      } else if (!filteredData[di]?.value) {
+        filteredData[di] = value;
       }
+    });
 
-      // For each required DI, either try to add the value to the request data, or mark it as missing
-      const requiredDisForCdo = CollectedKycDataOptionToRequiredAttributes[cdo];
-      const missingDis = new Set<string>();
-      requiredDisForCdo.forEach(di => {
-        const value = data[di];
-        if (typeof value?.value === 'undefined') {
-          missingDis.add(di);
-        } else if (!filteredData[di]?.value) {
-          filteredData[di] = value;
-        }
-      });
+    // Ignore missing state & zip DIs if address is international
+    const isInternational = filteredData[IdDI.country]?.value !== 'US';
+    if (isInternational) {
+      missingDis.delete(IdDI.state);
+      missingDis.delete(IdDI.zip);
+    }
 
-      // Ignore missing state & zip DIs if address is international
-      const isInternational = filteredData[IdDI.country]?.value !== 'US';
-      if (isInternational) {
-        missingDis.delete(IdDI.state);
-        missingDis.delete(IdDI.zip);
+    // If the missing DIs form cdo groups that are all already populated in the backend, ignore
+    requirement.populatedAttributes.forEach(populatedCdo => {
+      const populatedDis = CdoToAllDisMap[populatedCdo];
+      const allInMissingDis = populatedDis.every(di => missingDis.has(di));
+      if (allInMissingDis) {
+        populatedDis.forEach(di => missingDis.delete(di));
       }
+    });
 
-      // If the missing DIs form cdo groups that are all already populated in the backend, ignore
-      requirement.populatedAttributes.forEach(populatedCdo => {
-        const populatedDis = CdoToAllDisMap[populatedCdo];
-        const allInMissingDis = populatedDis.every(di => missingDis.has(di));
-        if (allInMissingDis) {
-          populatedDis.forEach(di => missingDis.delete(di));
-        }
-      });
-
-      if (missingDis.size > 0) {
-        throw new Error(
-          `Missing required DIs: ${Array.from(missingDis).join(', ')}`,
-        );
-      }
-    },
-  );
+    if (missingDis.size > 0) {
+      throw new Error(`Missing required DIs: ${Array.from(missingDis).join(', ')}`);
+    }
+  });
 
   // Construct the request data and make sure data formats are correct
   const bootstrapDis = Object.entries(filteredData)
@@ -109,9 +91,7 @@ const getRequestData = (
   Object.entries(filteredData).forEach(([key, value]) => {
     const di = key as IdDI;
     if (isDate(di)) {
-      const dateInputValue = isString(value.value)
-        ? strInputToUSDate(locale, value.value)
-        : undefined;
+      const dateInputValue = isString(value.value) ? strInputToUSDate(locale, value.value) : undefined;
 
       requestData[di] = fromUSDateToISO8601Format(dateInputValue);
     } else {

@@ -2,11 +2,7 @@ import { customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import Create from './create';
-import {
-  filloutForm,
-  withCreateProxyConfig,
-  withCreateProxyConfigError,
-} from './create.test.config';
+import { filloutForm, withCreateProxyConfig, withCreateProxyConfigError } from './create.test.config';
 
 describe('<Create />', () => {
   const renderCreate = () => customRender(<Create />);

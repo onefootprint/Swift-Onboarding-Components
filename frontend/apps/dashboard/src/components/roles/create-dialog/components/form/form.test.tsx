@@ -11,10 +11,7 @@ describe('<Form />', () => {
     withProxyConfigs();
   });
 
-  const renderForm = ({
-    onSubmit = jest.fn(),
-    kind = RoleKind.dashboardUser,
-  }: Partial<FormProps>) =>
+  const renderForm = ({ onSubmit = jest.fn(), kind = RoleKind.dashboardUser }: Partial<FormProps>) =>
     customRender(<Form onSubmit={onSubmit} kind={kind} />);
 
   it('should render the read-only as checked by default', () => {

@@ -1,14 +1,6 @@
+import { afterAll, afterEach, beforeAll, describe, expect, it, mock } from 'bun:test';
 import { cleanup, render, screen } from '@testing-library/react'; // eslint-disable-line testing-library/no-manual-cleanup
 import userEvent from '@testing-library/user-event';
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  describe,
-  expect,
-  it,
-  mock,
-} from 'bun:test';
 import React from 'react';
 
 import { nextHeaders } from '@/test/modules';
@@ -37,8 +29,8 @@ describe('DrawerTimeline', () => {
         docStatus="accepted"
         isOpen
         lang="en"
-        onClose={() => {}}
-        onViewSubmissionClick={() => {}}
+        onClose={() => undefined}
+        onViewSubmissionClick={() => undefined}
       />,
     );
 
@@ -74,9 +66,6 @@ describe('DrawerTimeline', () => {
     const viewLink = await screen.findByText(/View Submission/i);
     await userEvent.click(viewLink);
 
-    expect(onViewSubmissionClickMock.mock.lastCall).toEqual([
-      'submitted_3',
-      'sub_12',
-    ]);
+    expect(onViewSubmissionClickMock.mock.lastCall).toEqual(['submitted_3', 'sub_12']);
   });
 });

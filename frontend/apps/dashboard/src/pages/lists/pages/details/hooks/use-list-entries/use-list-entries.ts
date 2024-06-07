@@ -1,15 +1,9 @@
 import request from '@onefootprint/request';
-import type {
-  GetListEntriesRequest,
-  GetListEntriesResponse,
-} from '@onefootprint/types';
+import type { GetListEntriesRequest, GetListEntriesResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import useSession from 'src/hooks/use-session';
 
-const getListEntries = async ({
-  authHeaders,
-  listId,
-}: GetListEntriesRequest) => {
+const getListEntries = async ({ authHeaders, listId }: GetListEntriesRequest) => {
   const { data: response } = await request<GetListEntriesResponse>({
     headers: authHeaders,
     method: 'GET',
@@ -22,13 +16,9 @@ const getListEntries = async ({
 const useListEntries = (listId = '') => {
   const { authHeaders } = useSession();
 
-  return useQuery(
-    ['list-entries', listId, authHeaders],
-    () => getListEntries({ authHeaders, listId }),
-    {
-      enabled: !!listId,
-    },
-  );
+  return useQuery(['list-entries', listId, authHeaders], () => getListEntries({ authHeaders, listId }), {
+    enabled: !!listId,
+  });
 };
 
 export default useListEntries;

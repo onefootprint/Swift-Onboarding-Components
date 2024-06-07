@@ -1,12 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { SelectProps } from './select';
@@ -204,9 +198,7 @@ describe('<Select />', () => {
 
   describe('when it has description', () => {
     it('should render the description', async () => {
-      const options = [
-        { value: 'Step up', label: 'step_up', description: 'Lorem ipsum' },
-      ];
+      const options = [{ value: 'Step up', label: 'step_up', description: 'Lorem ipsum' }];
       renderSelect({ options });
       const trigger = screen.getByRole('button', { name: 'Select' });
       await userEvent.click(trigger);

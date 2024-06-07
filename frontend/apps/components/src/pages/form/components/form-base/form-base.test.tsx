@@ -1,13 +1,13 @@
 import '../../../../config/initializers/react-i18next-test';
 
 import {
+  Wrapper,
   createGoogleMapsSpy,
   getPlacePredictions,
   render,
   screen,
   userEvent,
   waitFor,
-  Wrapper,
 } from '@onefootprint/test-utils';
 import React from 'react';
 import FootprintProvider from 'src/components/footprint-provider';
@@ -71,33 +71,23 @@ describe('<FormBase />', () => {
 
     it('should show cancel button if onCancel is provided', async () => {
       renderFormBase({ onCancel: jest.fn() });
-      expect(
-        screen.getByRole('button', { name: 'Cancel' }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
     it('should hide both buttons', () => {
       renderFormBase({ hideSaveButton: true, hideCancelButton: true });
-      expect(
-        screen.queryByRole('button', { name: 'Save' }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('button', { name: 'Cancel' }),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
     });
 
     it('should hide cancel button', () => {
       renderFormBase({ hideCancelButton: true });
       expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
-      expect(
-        screen.queryByRole('button', { name: 'Cancel' }),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
     });
     it('should hide footprint logo', () => {
       renderFormBase({ hideFootprintLogo: true });
-      expect(
-        screen.queryByTestId('secured-by-footprint'),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId('secured-by-footprint')).not.toBeInTheDocument();
     });
 
     it('should show title', () => {
@@ -130,18 +120,9 @@ describe('<FormBase />', () => {
       const onSave = jest.fn();
       renderFormBase({ onSave });
       // Fill card number, cvc and expiration
-      await userEvent.type(
-        screen.getByRole('textbox', { name: 'Card number' }),
-        '378282246310005',
-      );
-      await userEvent.type(
-        screen.getByRole('textbox', { name: 'CVC' }),
-        '1234',
-      );
-      await userEvent.type(
-        screen.getByRole('textbox', { name: 'Expiry date' }),
-        '09/29',
-      );
+      await userEvent.type(screen.getByRole('textbox', { name: 'Card number' }), '378282246310005');
+      await userEvent.type(screen.getByRole('textbox', { name: 'CVC' }), '1234');
+      await userEvent.type(screen.getByRole('textbox', { name: 'Expiry date' }), '09/29');
 
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
       await waitFor(() => {
@@ -156,37 +137,25 @@ describe('<FormBase />', () => {
       // Try saving empty form
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
       await waitFor(() => {
-        expect(
-          screen.getByText('Card number cannot be empty'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Card number cannot be empty')).toBeInTheDocument();
       });
       await waitFor(() => {
         expect(screen.getByText('CVC cannot be empty')).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.getByText('Expiry date cannot be empty'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Expiry date cannot be empty')).toBeInTheDocument();
       });
 
-      await userEvent.type(
-        screen.getByRole('textbox', { name: 'Card number' }),
-        '42',
-      );
+      await userEvent.type(screen.getByRole('textbox', { name: 'Card number' }), '42');
 
       // Fill with expired date, invalid card number
-      await userEvent.type(
-        screen.getByRole('textbox', { name: 'Expiry date' }),
-        '09/21',
-      );
+      await userEvent.type(screen.getByRole('textbox', { name: 'Expiry date' }), '09/21');
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
       await waitFor(() => {
         expect(screen.getByText('Invalid card number')).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.getByText('Date must be valid and in the future'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Date must be valid and in the future')).toBeInTheDocument();
       });
     });
   });
@@ -196,9 +165,7 @@ describe('<FormBase />', () => {
       const onCancel = jest.fn();
       renderFormBase({ onCancel });
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-      expect(
-        screen.getByRole('button', { name: 'Cancel' }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
 
       await waitFor(() => {
         expect(onCancel).toHaveBeenCalled();
@@ -220,10 +187,7 @@ describe('<FormBase />', () => {
       const onClose = jest.fn();
       renderFormBase({ onClose });
       // Fill card number, cvc and expiration
-      await userEvent.type(
-        screen.getByRole('textbox', { name: 'Card number' }),
-        '378282246310005',
-      );
+      await userEvent.type(screen.getByRole('textbox', { name: 'Card number' }), '378282246310005');
 
       await userEvent.click(screen.getByTestId('close-button'));
       await waitFor(() => {
@@ -242,10 +206,7 @@ describe('<FormBase />', () => {
       const onCancel = jest.fn();
       renderFormBase({ onCancel });
       // Fill card number, cvc and expiration
-      await userEvent.type(
-        screen.getByRole('textbox', { name: 'Card number' }),
-        '378282246310005',
-      );
+      await userEvent.type(screen.getByRole('textbox', { name: 'Card number' }), '378282246310005');
 
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
       await waitFor(() => {

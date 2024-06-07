@@ -6,19 +6,11 @@ import styled, { css } from 'styled-components';
 
 import SectionCore from '../../section-text';
 
-const bulletPointKets = [
-  'native-app',
-  'fast-reliable',
-  'brings-joy',
-  'conversion',
-  'no-download',
-];
+const bulletPointKets = ['native-app', 'fast-reliable', 'brings-joy', 'conversion', 'no-download'];
 
 const AppClip = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.kyc.app-clip' });
-  const bulletPointContent = bulletPointKets.map(key =>
-    t(`bullets.${key}` as ParseKeys<'common'>),
-  );
+  const bulletPointContent = bulletPointKets.map(key => t(`bullets.${key}` as ParseKeys<'common'>));
   return (
     <Section>
       <SectionCore

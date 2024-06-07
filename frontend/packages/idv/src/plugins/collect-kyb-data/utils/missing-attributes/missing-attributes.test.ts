@@ -1,8 +1,4 @@
-import {
-  BeneficialOwnerDataAttribute,
-  BusinessDI,
-  CollectedKybDataOption,
-} from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption } from '@onefootprint/types';
 
 import {
   hasMissingAttributes,
@@ -17,9 +13,7 @@ describe('MissingAttributes tests', () => {
 
     expect(isMissingBasicDataAttribute([], {})).toBe(false);
 
-    expect(isMissingBasicDataAttribute([CollectedKybDataOption.name])).toBe(
-      true,
-    );
+    expect(isMissingBasicDataAttribute([CollectedKybDataOption.name])).toBe(true);
 
     expect(
       isMissingBasicDataAttribute([CollectedKybDataOption.name], {
@@ -27,9 +21,7 @@ describe('MissingAttributes tests', () => {
       }),
     ).toBe(false);
 
-    expect(isMissingBasicDataAttribute([CollectedKybDataOption.tin])).toBe(
-      true,
-    );
+    expect(isMissingBasicDataAttribute([CollectedKybDataOption.tin])).toBe(true);
 
     expect(
       isMissingBasicDataAttribute([CollectedKybDataOption.tin], {
@@ -37,18 +29,14 @@ describe('MissingAttributes tests', () => {
       }),
     ).toBe(false);
 
-    expect(isMissingBasicDataAttribute([CollectedKybDataOption.website])).toBe(
-      true,
-    );
+    expect(isMissingBasicDataAttribute([CollectedKybDataOption.website])).toBe(true);
     expect(
       isMissingBasicDataAttribute([CollectedKybDataOption.website], {
         [BusinessDI.website]: 'https://acme.com',
       }),
     ).toBe(false);
 
-    expect(
-      isMissingBasicDataAttribute([CollectedKybDataOption.phoneNumber]),
-    ).toBe(true);
+    expect(isMissingBasicDataAttribute([CollectedKybDataOption.phoneNumber])).toBe(true);
 
     expect(
       isMissingBasicDataAttribute([CollectedKybDataOption.phoneNumber], {
@@ -109,9 +97,7 @@ describe('MissingAttributes tests', () => {
 
     expect(isMissingBusinessAddressAttribute([], {})).toBe(false);
 
-    expect(
-      isMissingBusinessAddressAttribute([CollectedKybDataOption.address]),
-    ).toBe(true);
+    expect(isMissingBusinessAddressAttribute([CollectedKybDataOption.address])).toBe(true);
 
     expect(
       isMissingBusinessAddressAttribute([CollectedKybDataOption.address], {
@@ -142,13 +128,10 @@ describe('MissingAttributes tests', () => {
     ).toBe(true);
 
     expect(
-      isMissingBusinessAddressAttribute(
-        [CollectedKybDataOption.name, CollectedKybDataOption.address],
-        {
-          [BusinessDI.addressLine1]: '123 Main St',
-          [BusinessDI.addressLine2]: 'Suite 1',
-        },
-      ),
+      isMissingBusinessAddressAttribute([CollectedKybDataOption.name, CollectedKybDataOption.address], {
+        [BusinessDI.addressLine1]: '123 Main St',
+        [BusinessDI.addressLine2]: 'Suite 1',
+      }),
     ).toBe(true);
   });
 
@@ -157,27 +140,20 @@ describe('MissingAttributes tests', () => {
 
     expect(isMissingBeneficialOwnerAttribute([], {})).toBe(false);
 
-    expect(
-      isMissingBeneficialOwnerAttribute([
-        CollectedKybDataOption.beneficialOwners,
-      ]),
-    ).toBe(true);
+    expect(isMissingBeneficialOwnerAttribute([CollectedKybDataOption.beneficialOwners])).toBe(true);
 
     expect(
-      isMissingBeneficialOwnerAttribute(
-        [CollectedKybDataOption.beneficialOwners],
-        {
-          [BusinessDI.beneficialOwners]: [
-            {
-              [BeneficialOwnerDataAttribute.firstName]: 'John',
-              [BeneficialOwnerDataAttribute.lastName]: 'Doe',
-              [BeneficialOwnerDataAttribute.ownershipStake]: 50,
-              [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
-              [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
-            },
-          ],
-        },
-      ),
+      isMissingBeneficialOwnerAttribute([CollectedKybDataOption.beneficialOwners], {
+        [BusinessDI.beneficialOwners]: [
+          {
+            [BeneficialOwnerDataAttribute.firstName]: 'John',
+            [BeneficialOwnerDataAttribute.lastName]: 'Doe',
+            [BeneficialOwnerDataAttribute.ownershipStake]: 50,
+            [BeneficialOwnerDataAttribute.email]: 'john@gmail.com',
+            [BeneficialOwnerDataAttribute.phoneNumber]: '1234567890',
+          },
+        ],
+      }),
     ).toBe(false);
   });
 

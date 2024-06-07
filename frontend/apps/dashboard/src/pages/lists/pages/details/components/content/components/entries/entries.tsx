@@ -4,7 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Error } from 'src/components';
+import { ErrorComponent } from 'src/components';
 import PermissionGate from 'src/components/permission-gate';
 import styled, { css } from 'styled-components';
 
@@ -31,17 +31,13 @@ const Entries = () => {
 
   const filteredEntries: ListEntry[] = useMemo(() => {
     if (filters.values.search) {
-      return (data || []).filter((entry: ListEntry) =>
-        entry.data.includes(filters.values.search),
-      );
+      return (data || []).filter((entry: ListEntry) => entry.data.includes(filters.values.search));
     }
     return data || [];
   }, [data, filters.values]);
 
   const displayedEntries: ListEntry[] = useMemo(() => {
-    const sortedEntries = [...filteredEntries].sort((a, b) =>
-      a.data.localeCompare(b.data),
-    );
+    const sortedEntries = [...filteredEntries].sort((a, b) => a.data.localeCompare(b.data));
     if (showAllEntries) {
       return sortedEntries;
     }
@@ -64,7 +60,7 @@ const Entries = () => {
   };
 
   if (error) {
-    return <Error error={error} />;
+    return <ErrorComponent error={error} />;
   }
 
   return isLoading ? null : (
@@ -134,11 +130,7 @@ const Entries = () => {
           )}
         </ButtonContainer>
       )}
-      <AddEntriesDialog
-        open={showAddEntryDialog}
-        onClose={handleCloseDialog}
-        onAdd={handleNewEntryAdded}
-      />
+      <AddEntriesDialog open={showAddEntryDialog} onClose={handleCloseDialog} onAdd={handleNewEntryAdded} />
     </Stack>
   );
 };

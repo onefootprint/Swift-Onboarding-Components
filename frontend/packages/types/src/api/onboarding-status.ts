@@ -115,32 +115,26 @@ export type OnboardingStatusResponse = {
   obConfiguration: PublicOnboardingConfig;
 };
 
-export type RequirementForKind<K> =
-  K extends OnboardingRequirementKind.registerPasskey
-    ? RegisterPasskeyRequirement
-    : K extends OnboardingRequirementKind.idDoc
-      ? IdDocRequirement
-      : K extends OnboardingRequirementKind.collectKycData
-        ? CollectKycDataRequirement
-        : K extends OnboardingRequirementKind.collectKybData
-          ? CollectKybDataRequirement
-          : K extends OnboardingRequirementKind.investorProfile
-            ? CollectInvestorProfileRequirement
-            : K extends OnboardingRequirementKind.authorize
-              ? AuthorizeRequirement
-              : K extends OnboardingRequirementKind.process
-                ? ProcessRequirement
-                : never;
+export type RequirementForKind<K> = K extends OnboardingRequirementKind.registerPasskey
+  ? RegisterPasskeyRequirement
+  : K extends OnboardingRequirementKind.idDoc
+    ? IdDocRequirement
+    : K extends OnboardingRequirementKind.collectKycData
+      ? CollectKycDataRequirement
+      : K extends OnboardingRequirementKind.collectKybData
+        ? CollectKybDataRequirement
+        : K extends OnboardingRequirementKind.investorProfile
+          ? CollectInvestorProfileRequirement
+          : K extends OnboardingRequirementKind.authorize
+            ? AuthorizeRequirement
+            : K extends OnboardingRequirementKind.process
+              ? ProcessRequirement
+              : never;
 
-export const getRequirement = <K extends OnboardingRequirementKind>(
-  reqs: OnboardingRequirement[],
-  kind: K,
-) => getRequirements(reqs, kind)[0];
+export const getRequirement = <K extends OnboardingRequirementKind>(reqs: OnboardingRequirement[], kind: K) =>
+  getRequirements(reqs, kind)[0];
 
-export const getRequirements = <K extends OnboardingRequirementKind>(
-  reqs: OnboardingRequirement[],
-  kind: K,
-) => {
+export const getRequirements = <K extends OnboardingRequirementKind>(reqs: OnboardingRequirement[], kind: K) => {
   const found = reqs.filter(req => req.kind === kind);
   return found as RequirementForKind<K>[];
 };

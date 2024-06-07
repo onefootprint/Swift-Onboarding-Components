@@ -41,38 +41,18 @@ const WhatsThisContent = ({ config }: WhatsThisContentProps) => {
     <Stack direction="column" gap={5}>
       <Stack direction="column" gap={2} textAlign="center" align="center">
         {config?.logoUrl && (
-          <Stack
-            align="center"
-            borderRadius="full"
-            overflow="hidden"
-            width="48px"
-            height="48px"
-            marginBottom={4}
-          >
-            <Image
-              src={config.logoUrl}
-              alt={config?.name}
-              width={48}
-              height={48}
-            />
+          <Stack align="center" borderRadius="full" overflow="hidden" width="48px" height="48px" marginBottom={4}>
+            <Image src={config.logoUrl} alt={config?.name} width={48} height={48} />
           </Stack>
         )}
         <Text variant="label-1">{localTranslations.title}</Text>
         <Text variant="body-3" color="secondary">
-          {localTranslations.subtitle.replace(
-            '{{tenant}}',
-            config?.orgName ? config.orgName : 'this company',
-          )}
+          {localTranslations.subtitle.replace('{{tenant}}', config?.orgName ? config.orgName : 'this company')}
         </Text>
       </Stack>
       <Stack direction="column" gap={5}>
         {localTranslations.cards.map(({ cardTitle, subtitle, icon }) => (
-          <FeatureCard
-            title={cardTitle}
-            subtitle={subtitle}
-            icon={icon}
-            key={cardTitle}
-          />
+          <FeatureCard title={cardTitle} subtitle={subtitle} icon={icon} key={cardTitle} />
         ))}
       </Stack>
     </Stack>

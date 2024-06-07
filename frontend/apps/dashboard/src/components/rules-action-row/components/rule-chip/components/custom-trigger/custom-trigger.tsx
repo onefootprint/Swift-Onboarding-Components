@@ -1,6 +1,6 @@
 import type { Color } from '@onefootprint/design-tokens';
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import { createFontStyles, Stack } from '@onefootprint/ui';
+import { Stack, createFontStyles } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
@@ -13,12 +13,7 @@ type CustomTriggerProps = {
   color?: Color;
 };
 
-const CustomTrigger: React.FC<CustomTriggerProps> = ({
-  isOpen,
-  children,
-  ariaLabel,
-  color = 'primary',
-}) => {
+const CustomTrigger: React.FC<CustomTriggerProps> = ({ isOpen, children, ariaLabel, color = 'primary' }) => {
   const hoverRef = useRef<HTMLButtonElement>(null);
   const isHovered = useHover(hoverRef);
 
@@ -33,12 +28,7 @@ const CustomTrigger: React.FC<CustomTriggerProps> = ({
     >
       <>
         {children}
-        <ChevronContainer
-          data-open={isOpen}
-          align="center"
-          justify="center"
-          data-is-hovered={isHovered}
-        >
+        <ChevronContainer data-open={isOpen} align="center" justify="center" data-is-hovered={isHovered}>
           <IcoChevronDown16 color={isHovered ? 'primary' : 'secondary'} />
         </ChevronContainer>
       </>

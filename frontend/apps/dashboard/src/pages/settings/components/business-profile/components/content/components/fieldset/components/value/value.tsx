@@ -20,10 +20,7 @@ const Value = ({ children, cta }: ValueProps) => {
   return children ? (
     <Text variant="body-3">{children}</Text>
   ) : (
-    <PermissionGate
-      scopeKind={RoleScopeKind.orgSettings}
-      fallbackText={t('not-allowed')}
-    >
+    <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
       <LinkButton onClick={cta.onClick}>{cta.label}</LinkButton>
     </PermissionGate>
   );

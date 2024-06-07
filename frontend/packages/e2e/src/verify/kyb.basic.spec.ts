@@ -1,20 +1,20 @@
 import { expect, test } from '@playwright/test';
 
 import {
-  confirmData,
-  fillSSN,
   clickOnContinue,
+  clickOnVerifyWithSms,
+  confirmData,
+  doTransferFromDesktop,
   fillAddress,
   fillAddressKYB,
   fillBasicDataKYB,
   fillBeneficialOwners,
   fillEmail,
   fillPhoneNumber,
+  fillSSN,
   selectOutcomeOptional,
-  verifyPhoneNumber,
-  clickOnVerifyWithSms,
-  doTransferFromDesktop,
   verifyAppIframeClick,
+  verifyPhoneNumber,
 } from './utils/commands';
 
 const appUrl = process.env.E2E_BIFROST_BASE_URL || 'http://localhost:3000';
@@ -42,9 +42,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`,
-  );
+  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
@@ -56,11 +54,9 @@ test('KYB verification #ci', async ({ browser, page, isMobile }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(
-    page
-      .frameLocator('iframe[name^="footprint-iframe-"]')
-      .getByText(/Sandbox Mode/i),
-  ).toBeVisible({ timeout });
+  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
+    timeout,
+  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   await selectOutcomeOptional(frame, 'Success');
@@ -107,17 +103,13 @@ test('KYB verification #ci', async ({ browser, page, isMobile }) => {
   await page.waitForLoadState();
 
   const confirmH2 = frame.getByText('Confirm your business data').first();
-  await confirmH2
-    .waitFor({ state: 'attached', timeout: 3000 })
-    .catch(() => false);
+  await confirmH2.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
   await clickOnContinue(frame);
   await page.waitForLoadState();
   // #endregion
 
   const basicH2 = frame.getByText('Basic data').first();
-  await basicH2
-    .waitFor({ state: 'attached', timeout: 3000 })
-    .catch(() => false);
+  await basicH2.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
 
   const dobField = frame.getByLabel('Date of Birth').first();
   await dobField.waitFor({ state: 'attached', timeout: 3000 });

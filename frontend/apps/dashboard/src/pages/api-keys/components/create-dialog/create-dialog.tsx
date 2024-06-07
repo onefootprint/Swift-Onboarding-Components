@@ -68,10 +68,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
       onClose={handleClose}
       open={open}
     >
-      <form
-        onSubmit={handleSubmit(handleBeforeSubmit)}
-        id="create-secret-key-form"
-      >
+      <form onSubmit={handleSubmit(handleBeforeSubmit)} id="create-secret-key-form">
         <Grid.Container columns={['1fr', '2fr']} gap={7}>
           <TextInput
             autoFocus
@@ -96,10 +93,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
                 <Select
                   label={t('form.access-control.label')}
                   hasError={!!select.fieldState.error}
-                  hint={
-                    select.fieldState.error &&
-                    t('form.access-control.errors.required')
-                  }
+                  hint={select.fieldState.error && t('form.access-control.errors.required')}
                   options={rolesQuery.options}
                   onBlur={select.field.onBlur}
                   onChange={select.field.onChange}

@@ -20,8 +20,7 @@ const initTranslations = async (
   if (!resources) {
     instance.use(
       resourcesToBackend(
-        (language: string, namespace: string) =>
-          import(`@/config/locales/${language}/${namespace}.json`),
+        (language: string, namespace: string) => import(`@/config/locales/${language}/${namespace}.json`),
       ),
     );
   }

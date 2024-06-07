@@ -26,9 +26,7 @@ const getAuthHeaders = (payload: OnboardingConfigRequestType) => {
   return headers;
 };
 
-const getOnboardingConfig = async (
-  authHeaders: Record<string, string>,
-): Promise<GetPublicOnboardingConfigResponse> => {
+const getOnboardingConfig = async (authHeaders: Record<string, string>): Promise<GetPublicOnboardingConfigResponse> => {
   const response = await fetch(`${API_BASE_URL}/org/onboarding_config`, {
     method: 'GET',
     headers: {
@@ -43,9 +41,7 @@ const getOnboardingConfig = async (
   return tenant;
 };
 
-const getAppearanceFromObConfig = async (
-  payload: OnboardingConfigRequestType,
-): Promise<FootprintAppearance | null> => {
+const getAppearanceFromObConfig = async (payload: OnboardingConfigRequestType): Promise<FootprintAppearance | null> => {
   const authHeaders = getAuthHeaders(payload);
   if (!Object.values(authHeaders).length) {
     return null;

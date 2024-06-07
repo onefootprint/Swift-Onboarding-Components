@@ -10,20 +10,8 @@ const TermsAndConditions = () => (
       <Trans
         i18nKey="components.terms-and-conditions.text"
         components={{
-          a1: (
-            <Link
-              href="https://onefootprint.com/terms-of-service"
-              target="_blank"
-              rel="noopener noreferrer"
-            />
-          ),
-          a2: (
-            <Link
-              href="https://onefootprint.com/privacy-policy"
-              target="_blank"
-              rel="noopener noreferrer"
-            />
-          ),
+          a1: <Link href="https://onefootprint.com/terms-of-service" target="_blank" rel="noopener noreferrer" />,
+          a2: <Link href="https://onefootprint.com/privacy-policy" target="_blank" rel="noopener noreferrer" />,
         }}
       />
     </Text>

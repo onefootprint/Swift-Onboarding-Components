@@ -22,17 +22,12 @@ const Introduction = () => {
   return (
     <Container>
       <CollectKybDataNavigationHeader />
-      <HeaderTitle
-        title={t('introduction.title')}
-        subtitle={t('introduction.subtitle')}
-      />
+      <HeaderTitle title={t('introduction.title')} subtitle={t('introduction.subtitle')} />
       <InfoBox
         items={[
           {
             title: t('introduction.guidelines.beneficial-owner.title'),
-            description: t(
-              'introduction.guidelines.beneficial-owner.description',
-            ),
+            description: t('introduction.guidelines.beneficial-owner.description'),
             Icon: IcoStore24,
           },
           {

@@ -5,13 +5,7 @@ type GridProps = {
 };
 
 const GridLogo = ({ color }: GridProps) => (
-  <svg
-    width="79"
-    height="20"
-    viewBox="0 0 79 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg width="79" height="20" viewBox="0 0 79 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3665_67237)">
       <path
         d="M10.5437 0C11.7582 0 12.922 0.216483 13.9989 0.612964V6.45594H7.00008V13.4555H1.15682C0.760242 12.3786 0.543701 11.2146 0.543701 10C0.543701 4.47715 5.02085 0 10.5437 0Z"
@@ -40,12 +34,7 @@ const GridLogo = ({ color }: GridProps) => (
     </g>
     <defs>
       <clipPath id="clip0_3665_67237">
-        <rect
-          width="77.6923"
-          height="20"
-          fill="white"
-          transform="translate(0.543701)"
-        />
+        <rect width="77.6923" height="20" fill="white" transform="translate(0.543701)" />
       </clipPath>
     </defs>
   </svg>

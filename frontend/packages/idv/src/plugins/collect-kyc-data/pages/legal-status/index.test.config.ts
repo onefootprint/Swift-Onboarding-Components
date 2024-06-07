@@ -1,9 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 
-export const withIdentify = (
-  availableChallengeKinds?: string[],
-  hasSyncablePasskey?: boolean,
-) =>
+export const withIdentify = (availableChallengeKinds?: string[], hasSyncablePasskey?: boolean) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify',

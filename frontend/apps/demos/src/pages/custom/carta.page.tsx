@@ -1,7 +1,5 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import footprint, {
-  FootprintVerifyButton,
-} from '@onefootprint/footprint-react';
+import footprint, { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -15,8 +13,7 @@ const handleOpen = () => {
     kind: FootprintComponentKind.Verify,
     publicKey,
     appearance: {
-      fontSrc:
-        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+      fontSrc: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
       variables: {
         // global
         fontFamily: 'Inter, sans-serif',
@@ -50,8 +47,7 @@ const handleOpen = () => {
           padding: '10px',
           outline: 'none',
           transitionDuration: '60ms',
-          transitionProperty:
-            'background-color, border-color, box-shadow, color',
+          transitionProperty: 'background-color, border-color, box-shadow, color',
           transitionTimingFunction: 'ease-in',
         },
         'input:focus': {

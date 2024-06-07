@@ -10,23 +10,12 @@ export type RowProps = {
 };
 
 const Row = ({ role }: RowProps) => {
-  const {
-    name,
-    scopes,
-    isImmutable,
-    createdAt,
-    numActiveUsers,
-    numActiveApiKeys,
-  } = role;
+  const { name, scopes, isImmutable, createdAt, numActiveUsers, numActiveApiKeys } = role;
 
   return (
     <>
       <td>{name}</td>
-      {role.kind === RoleKind.dashboardUser ? (
-        <td>{numActiveUsers}</td>
-      ) : (
-        <td>{numActiveApiKeys}</td>
-      )}
+      {role.kind === RoleKind.dashboardUser ? <td>{numActiveUsers}</td> : <td>{numActiveApiKeys}</td>}
       <td aria-label="scopes">
         <Scopes scopes={scopes} />
       </td>

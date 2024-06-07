@@ -1,91 +1,55 @@
 {
-  "extends": [
-    "//"
-  ],
+  "extends": ["//"],
   "pipeline": {
     "i18n:sync": {
-      "outputs": [
-        "./src/config/locales/**"
-      ]
+      "outputs": ["./src/config/locales/**"]
     },
     "i18n:copy": {
-      "outputs": [
-        "public/locales/**"
-      ]
+      "outputs": ["public/locales/**"]
     },
     "i18n:copy-en": {
-      "outputs": [
-        "public/locales/**"
-      ]
+      "outputs": ["public/locales/**"]
     },
     "i18n:copy-watch": {
-      "outputs": [
-        "public/locales/**"
-      ]
+      "outputs": ["public/locales/**"]
     },
     "i18n:build": {
-      "dependsOn": [
-        "i18n:sync",
-        "i18n:copy"
-      ]
+      "dependsOn": ["i18n:sync", "i18n:copy"]
     },
     "i18n:dev": {
-      "dependsOn": [
-        "i18n:sync",
-        "i18n:copy-watch"
-      ]
+      "dependsOn": ["i18n:sync", "i18n:copy-watch"]
     },
     "i18n:clean": {
       "cache": false
     },
     "build": {
-      "dependsOn": [
-        "^build",
-        "i18n:build"
-      ]
+      "dependsOn": ["^build", "i18n:build"]
     },
     "build:analyze": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "test:ci": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "test:watch": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "lint": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "lint:ci": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
-    "format:fix": {},
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "clean": {
       "cache": false,
       "persistent": true,
-      "dependsOn": [
-        "i18n:clean"
-      ]
+      "dependsOn": ["i18n:clean"]
     }
   }
 }

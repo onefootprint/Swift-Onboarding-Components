@@ -9,8 +9,9 @@ type LineProps = {
 const Line = styled(Box)<LineProps>`
   ${({ theme, variant, position: { top, bottom, left, right } }) => css`
     position: absolute;
-    ${variant === 'vertical'
-      ? `
+    ${
+      variant === 'vertical'
+        ? `
       top: 50%;
       left: ${left || undefined};
       right: ${right || undefined};
@@ -23,7 +24,7 @@ const Line = styled(Box)<LineProps>`
         transparent 100%
       );
     `
-      : `
+        : `
       top: ${top || undefined};
       bottom: ${bottom || undefined};
       left: 0;
@@ -35,7 +36,8 @@ const Line = styled(Box)<LineProps>`
         ${theme.borderColor.tertiary} 0%,
         transparent 100%
       );
-    `}
+    `
+    }
   `}
 `;
 

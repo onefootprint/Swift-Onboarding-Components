@@ -1,4 +1,4 @@
-import { Avatar, createFontStyles, Stack, useToast } from '@onefootprint/ui';
+import { Avatar, Stack, createFontStyles, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -30,20 +30,12 @@ const LogoManager = ({ organization }: LogoManagerProps) => {
 
   return (
     <Stack gap={5}>
-      <Avatar
-        name={organization.name}
-        size="large"
-        src={organization.logoUrl}
-      />
+      <Avatar name={organization.name} size="large" src={organization.logoUrl} />
 
       <Stack alignItems="center" justifyContent="center">
         <CtaLabel>
           {t('change-logo')}
-          <InvisibleInput
-            type="file"
-            accept="image/svg+xml, image/png, image/jpeg"
-            onChange={handleChange}
-          />
+          <InvisibleInput type="file" accept="image/svg+xml, image/png, image/jpeg" onChange={handleChange} />
         </CtaLabel>
       </Stack>
     </Stack>
@@ -56,11 +48,13 @@ const CtaLabel = styled.label<{ disabled?: boolean }>`
     color: ${theme.color.accent};
     cursor: pointer;
 
-    ${disabled &&
-    css`
+    ${
+      disabled &&
+      css`
       pointer-events: none;
       opacity: 0.5;
-    `}
+    `
+    }
   `}
 `;
 

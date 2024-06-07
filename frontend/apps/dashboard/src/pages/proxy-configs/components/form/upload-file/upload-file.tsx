@@ -1,15 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoTrash16 } from '@onefootprint/icons';
-import {
-  Box,
-  Button,
-  createFontStyles,
-  Divider,
-  IconButton,
-  LinkButton,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Box, Button, Divider, IconButton, LinkButton, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -109,12 +100,7 @@ const UploadFile = ({
           </>
         )}
       </Box>
-      <HiddenInput
-        accept={accept}
-        ref={inputRef}
-        type="file"
-        onChange={handleChange}
-      />
+      <HiddenInput accept={accept} ref={inputRef} type="file" onChange={handleChange} />
     </Box>
   );
 };

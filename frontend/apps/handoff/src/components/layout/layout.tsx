@@ -15,11 +15,7 @@ const Layout = ({ children, variant }: LayoutProps) => {
   const isSandbox = onboardingConfig?.isLive === false;
 
   return (
-    <AppLayout
-      variant={variant}
-      isSandbox={isSandbox}
-      config={onboardingConfig}
-    >
+    <AppLayout variant={variant} isSandbox={isSandbox} config={onboardingConfig}>
       {children}
     </AppLayout>
   );

@@ -1,14 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { type OrgFrequentNoteKind, RoleScopeKind } from '@onefootprint/types';
-import {
-  Box,
-  createText,
-  LinkButton,
-  Stack,
-  TextArea as UnstyledTextArea,
-  useToast,
-} from '@onefootprint/ui';
+import { Box, LinkButton, Stack, TextArea as UnstyledTextArea, createText, useToast } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import React, { useEffect, useRef, useState } from 'react';
@@ -17,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
 import styled, { css } from 'styled-components';
 
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Option from './components/option';
 import useCreateOrgFrequentNote from './hooks/use-create-org-frequent-note';
 import useDeleteOrgFrequentNote from './hooks/use-delete-org-frequent-note';
@@ -37,13 +30,7 @@ type FrequentNotesTextAreaProps = {
   required?: boolean;
 };
 
-const FrequentNotesTextArea = ({
-  kind,
-  formField,
-  label,
-  placeholder,
-  required,
-}: FrequentNotesTextAreaProps) => {
+const FrequentNotesTextArea = ({ kind, formField, label, placeholder, required }: FrequentNotesTextAreaProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.frequent-notes',
   });
@@ -75,8 +62,7 @@ const FrequentNotesTextArea = ({
     }
   }, [notes]);
 
-  const isLoading =
-    getQuery.isLoading || createMutation.isLoading || deleteMutation.isLoading;
+  const isLoading = getQuery.isLoading || createMutation.isLoading || deleteMutation.isLoading;
   const hasEditPermissions = hasPermission(RoleScopeKind.orgSettings);
   const showSave = !(notes && notes.find(n => n.content === value)) && value;
 
@@ -170,24 +156,15 @@ const FrequentNotesTextArea = ({
             transition={{ duration: 0.1 }}
           >
             <Stack direction="column" gap={3}>
-              <Stack
-                direction="row"
-                justify="space-between"
-                align="center"
-                marginRight={2}
-                marginTop={3}
-              >
+              <Stack direction="row" justify="space-between" align="center" marginRight={2} marginTop={3}>
                 <Title>{t('title')}</Title>
                 {hasEditPermissions && (
-                  <LinkButton
-                    disabled={isLoading}
-                    onClick={() => setIsEdit(!isEdit)}
-                  >
+                  <LinkButton disabled={isLoading} onClick={() => setIsEdit(!isEdit)}>
                     {t(`${isEdit ? 'done' : 'edit'}` as ParseKeys<'common'>)}
                   </LinkButton>
                 )}
               </Stack>
-              {error && <Error message={getErrorMessage(error)} />}
+              {error && <ErrorComponent message={getErrorMessage(error)} />}
               <AnimatePresence initial={false}>
                 {notes &&
                   notes.map(note => (

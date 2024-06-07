@@ -18,10 +18,7 @@ import Component from './component';
 type T = TFunction<'identify'>;
 type TComponentProps = ComponentProps<typeof Component>;
 type Texts = TComponentProps['texts'];
-type MethodsMap = Record<
-  AuthMethodKind,
-  Pick<UserAuthMethodsResponse[0], 'isVerified'>
->;
+type MethodsMap = Record<AuthMethodKind, Pick<UserAuthMethodsResponse[0], 'isVerified'>>;
 type DashboardProps = Pick<TComponentProps, 'children' | 'Header'> & {
   isEditing: boolean;
   onDone: React.MouseEventHandler<HTMLButtonElement>;

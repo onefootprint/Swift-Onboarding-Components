@@ -8,10 +8,7 @@ import {
   removeOverlayAndLoading,
 } from '@onefootprint/core';
 import type { FootprintProps as Props } from '@onefootprint/footprint-js';
-import {
-  getSdkArgsDataPayload,
-  getSdkKind,
-} from '@onefootprint/footprint-js/src/utils/request-utils/send-sdk-args';
+import { getSdkArgsDataPayload, getSdkKind } from '@onefootprint/footprint-js/src/utils/request-utils/send-sdk-args';
 import transformKeys from '@onefootprint/footprint-js/src/utils/request-utils/transform-keys';
 import { isUpdateLoginMethods } from '@onefootprint/footprint-js/src/utils/type-guards';
 import { getSearchParams } from '@onefootprint/footprint-js/src/utils/url-utils';
@@ -34,8 +31,7 @@ const getPostmate = async (
     container,
     name: `footprint-iframe-${uId}`,
     url,
-    allow:
-      'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
+    allow: 'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
     model: {
       authToken,
       initId: uId,
@@ -89,87 +85,76 @@ const fakeSdk = (() => ({
     };
 
     return {
-      render: once(
-        async (appUrl?: string): Promise<void | Postmate.ParentAPI | null> => {
-          if (isRendered) return console.error('Already rendered');
+      render: once(async (appUrl?: string): Promise<void | Postmate.ParentAPI | null> => {
+        if (isRendered) return console.error('Already rendered');
 
-          if (!appUrl) {
-            destroy();
-            return console.error('No app url provided');
-          }
-          isRendered = true;
-          const container = hasOverlay
-            ? appendOverlayContainer(uId)
-            : appendInlineContainer(uId, containerId);
+        if (!appUrl) {
+          destroy();
+          return console.error('No app url provided');
+        }
+        isRendered = true;
+        const container = hasOverlay ? appendOverlayContainer(uId) : appendInlineContainer(uId, containerId);
 
-          if (hasOverlay) {
-            appendLoadingElements(uId, container);
-          } else {
-            appendInlineLoader(uId, container);
-          }
+        if (hasOverlay) {
+          appendLoadingElements(uId, container);
+        } else {
+          appendInlineLoader(uId, container);
+        }
 
-          const token = await sendSdkArgs(props);
-          if (!token) {
-            destroy();
-            return console.error('Failed to send sdk args');
-          }
+        const token = await sendSdkArgs(props);
+        if (!token) {
+          destroy();
+          return console.error('Failed to send sdk args');
+        }
 
-          const base = isUpdateLoginMethods(props) ? `${appUrl}/user` : appUrl;
-          const url = `${base}?${getSearchParams(props, token)}`.trim();
+        const base = isUpdateLoginMethods(props) ? `${appUrl}/user` : appUrl;
+        const url = `${base}?${getSearchParams(props, token)}`.trim();
 
-          parentApi = await getPostmate(
-            container,
-            variant || 'modal',
-            uId,
-            url,
-            props.authToken,
-          )
-            .then(api => {
-              const on = (event: string, callback?: (x?: unknown) => void) =>
-                api.on(event, x => destroy(callback?.(x)));
+        parentApi = await getPostmate(container, variant || 'modal', uId, url, props.authToken)
+          .then(api => {
+            const on = (event: string, callback?: (x?: unknown) => void) => api.on(event, x => destroy(callback?.(x)));
 
-              /** @ts-ignore */
-              api.on(`${uId}:auth`, props?.onAuth); /** @ts-ignore */
+            /** @ts-ignore */
+            api.on(`${uId}:auth`, props?.onAuth); /** @ts-ignore */
 
-              api.on(`${uId}:completed`, props?.onComplete); /** @ts-ignore */
-              api.on('completed', props?.onComplete); /** @ts-ignore */
+            api.on(`${uId}:completed`, props?.onComplete); /** @ts-ignore */
+            api.on('completed', props?.onComplete); /** @ts-ignore */
 
-              on(`${uId}:canceled`, props?.onCancel); /** @ts-ignore */
-              on('canceled', props?.onCancel); /** @ts-ignore */
+            on(`${uId}:canceled`, props?.onCancel); /** @ts-ignore */
+            on('canceled', props?.onCancel); /** @ts-ignore */
 
-              on(`${uId}:closed`, props?.onClose); /** @ts-ignore */
-              on('closed', props?.onClose); /** @ts-ignore */
+            on(`${uId}:closed`, props?.onClose); /** @ts-ignore */
+            on('closed', props?.onClose); /** @ts-ignore */
 
-              return api;
-            })
-            .then(api => {
-              if (props.kind !== 'form' || !props.getRef) return api;
+            return api;
+          })
+          .then(api => {
+            if (props.kind !== 'form' || !props.getRef) return api;
 
-              const setUpFormRefs = () => {
-                const ref: { save: () => Promise<void> } = {
-                  save: () =>
-                    new Promise((resolve, reject) => {
-                      parentApi?.on(`${uId}:formSaveComplete`, resolve);
-                      parentApi?.on('formSaveComplete', resolve);
+            const setUpFormRefs = () => {
+              const ref: { save: () => Promise<void> } = {
+                save: () =>
+                  new Promise((resolve, reject) => {
+                    parentApi?.on(`${uId}:formSaveComplete`, resolve);
+                    parentApi?.on('formSaveComplete', resolve);
 
-                      parentApi?.on(`${uId}:formSaveFailed`, reject);
-                      parentApi?.on('formSaveFailed', reject);
+                    parentApi?.on(`${uId}:formSaveFailed`, reject);
+                    parentApi?.on('formSaveFailed', reject);
 
-                      parentApi?.call('formSaved');
-                    }),
-                };
-                props.getRef?.(ref);
+                    parentApi?.call('formSaved');
+                  }),
               };
+              props.getRef?.(ref);
+            };
 
-              api.on('started', setUpFormRefs);
-              api.on(`${uId}:setUpFormRefs`, setUpFormRefs);
+            api.on('started', setUpFormRefs);
+            api.on(`${uId}:setUpFormRefs`, setUpFormRefs);
 
-              return api;
-            });
+            return api;
+          });
 
-          return parentApi;
-        },
-      ),
+        return parentApi;
+      }),
       destroy,
     };
   },

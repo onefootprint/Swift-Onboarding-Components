@@ -15,19 +15,11 @@ export type AvatarProps = {
   src?: string | null;
 };
 
-const Avatar = ({
-  loading = false,
-  name,
-  size = 'default',
-  src,
-}: AvatarProps) => {
+const Avatar = ({ loading = false, name, size = 'default', src }: AvatarProps) => {
   if (loading) {
     return (
       <Fallback data-size={size} data-variant={src ? 'secondary' : 'primary'}>
-        <AnimatedLoadingSpinner
-          animationStart
-          size={loadingIndicatorSize[size]}
-        />
+        <AnimatedLoadingSpinner animationStart size={loadingIndicatorSize[size]} />
       </Fallback>
     );
   }
@@ -50,10 +42,7 @@ const sizes: Record<AvatarSize, CSS.Property.Width | CSS.Property.Height> = {
   xlarge: '72px',
 };
 
-export const loadingIndicatorSize: Record<
-  AvatarSize,
-  AnimatedLoadingSpinnerProps['size']
-> = {
+export const loadingIndicatorSize: Record<AvatarSize, AnimatedLoadingSpinnerProps['size']> = {
   compact: 20,
   default: 24,
   large: 32,

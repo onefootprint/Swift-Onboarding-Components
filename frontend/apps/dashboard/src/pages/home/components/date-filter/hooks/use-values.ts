@@ -5,13 +5,9 @@ import useOptions from './use-options';
 const useValues = () => {
   const filters = useFilters();
   const options = useOptions();
-  const isValidPeriod = options.some(
-    ({ value }) => value === filters.values.period,
-  );
+  const isValidPeriod = options.some(({ value }) => value === filters.values.period);
 
-  const period = isValidPeriod
-    ? filters.values.period
-    : DEFAULT_DATE_FILTER_PERIOD;
+  const period = isValidPeriod ? filters.values.period : DEFAULT_DATE_FILTER_PERIOD;
 
   return {
     period,

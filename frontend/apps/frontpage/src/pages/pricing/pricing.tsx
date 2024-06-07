@@ -24,11 +24,7 @@ const Pricing = () => {
 
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/pricing"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/pricing" />
       <Container>
         <Stack direction="column" align="center" justify="center" gap={9}>
           <Heading title={t('hero.title')} subtitle={t('hero.subtitle')} />
@@ -39,17 +35,11 @@ const Pricing = () => {
             primaryButton={t('banner.schedule-call')}
             secondaryButton={t('banner.get-started')}
             onClickPrimaryButton={handleClickTrigger}
-            onClickSecondaryButton={() =>
-              router.push(`${DASHBOARD_BASE_URL}/authentication/sign-up`)
-            }
+            onClickSecondaryButton={() => router.push(`${DASHBOARD_BASE_URL}/authentication/sign-up`)}
           />
         </Stack>
       </Container>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={handleClose}
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
     </>
   );
 };

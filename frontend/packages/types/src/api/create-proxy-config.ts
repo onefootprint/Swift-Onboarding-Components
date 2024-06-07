@@ -1,9 +1,4 @@
-import type {
-  ProxyConfigDetails,
-  ProxyConfigHeader,
-  ProxyConfigIngressRule,
-  ProxyConfigMethod,
-} from '../data';
+import type { ProxyConfigDetails, ProxyConfigHeader, ProxyConfigIngressRule, ProxyConfigMethod } from '../data';
 
 export type CreateProxyConfigRequest = {
   accessReason: string;

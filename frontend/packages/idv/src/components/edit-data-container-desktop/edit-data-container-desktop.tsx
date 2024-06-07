@@ -10,16 +10,9 @@ type EditDataContainerDesktopProps = {
   onClickPrev: () => void;
 };
 
-const EditDataContainerDesktop = ({
-  title,
-  children,
-  onClickPrev,
-}: EditDataContainerDesktopProps) => (
+const EditDataContainerDesktop = ({ title, children, onClickPrev }: EditDataContainerDesktopProps) => (
   <>
-    <NavigationHeader
-      leftButton={{ variant: 'back', onBack: onClickPrev }}
-      content={{ kind: 'static', title }}
-    />
+    <NavigationHeader leftButton={{ variant: 'back', onBack: onClickPrev }} content={{ kind: 'static', title }} />
     <StyledDivider />
     <Container>{children}</Container>
   </>

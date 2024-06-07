@@ -5,21 +5,17 @@ import type {
   CombinedWatchlistChecksEvent,
   DocumentUploadedEventData,
   Entity,
+  Timeline as EntityTimeline,
   ExternalIntegrationCalledData,
   LivenessEventData,
   OnboardingDecisionEventData,
   PreviousWatchlistChecksEventData,
   StepUpEventData,
-  Timeline as EntityTimeline,
   VaultCreatedEventData,
   WatchlistCheckEventData,
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
-import {
-  DecisionStatus,
-  EntityStatus,
-  TimelineEventKind,
-} from '@onefootprint/types';
+import { DecisionStatus, EntityStatus, TimelineEventKind } from '@onefootprint/types';
 import type {
   AuthMethodUpdatedData,
   LabelAddedEventData,
@@ -42,24 +38,12 @@ import {
   ExternalIntegrationCalledEventHeader,
 } from './components/external-integration-called-event';
 import LabelAddedEventHeader from './components/label-added-event';
-import {
-  LivenessEventBody,
-  LivenessEventHeader,
-} from './components/liveness-event';
-import {
-  OnboardingDecisionEventBody,
-  OnboardingDecisionEventHeader,
-} from './components/onboarding-decision-event';
+import { LivenessEventBody, LivenessEventHeader } from './components/liveness-event';
+import { OnboardingDecisionEventBody, OnboardingDecisionEventHeader } from './components/onboarding-decision-event';
 import { StepUpEventBody, StepUpEventHeader } from './components/step-up-event';
-import {
-  WatchlistCheckEventBody,
-  WatchlistCheckEventHeader,
-} from './components/watchlist-check-event';
+import { WatchlistCheckEventBody, WatchlistCheckEventHeader } from './components/watchlist-check-event';
 import WorkflowStartedEventHeader from './components/workflow-started-event';
-import {
-  WorkflowTriggeredEventBody,
-  WorkflowTriggeredEventHeader,
-} from './components/workflow-triggered-event';
+import { WorkflowTriggeredEventBody, WorkflowTriggeredEventHeader } from './components/workflow-triggered-event';
 import type { AuditTrailTimelineEvent } from './utils/merge-audit-trail-timeline-events';
 import mergeAuditTrailTimelineEvents from './utils/merge-audit-trail-timeline-events';
 
@@ -125,28 +109,20 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       });
     } else if (kind === TimelineEventKind.onboardingDecision) {
       const eventData = data as OnboardingDecisionEventData;
-      const shouldShowBody =
-        eventData.annotation ||
-        eventData.decision.status === DecisionStatus.stepUp;
+      const shouldShowBody = eventData.annotation || eventData.decision.status === DecisionStatus.stepUp;
       items.push({
         time,
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,
-        bodyComponent: shouldShowBody && (
-          <OnboardingDecisionEventBody data={eventData} />
-        ),
+        bodyComponent: shouldShowBody && <OnboardingDecisionEventBody data={eventData} />,
       });
     } else if (kind === TimelineEventKind.combinedWatchlistChecks) {
       const eventData = data as PreviousWatchlistChecksEventData;
-      const combinedWatchlistEvent =
-        event.event as CombinedWatchlistChecksEvent;
-      const latestWatchlistEventData = combinedWatchlistEvent
-        .latestWatchlistEvent?.data as WatchlistCheckEventData;
+      const combinedWatchlistEvent = event.event as CombinedWatchlistChecksEvent;
+      const latestWatchlistEventData = combinedWatchlistEvent.latestWatchlistEvent?.data as WatchlistCheckEventData;
       items.push({
         time,
         headerComponent: <WatchlistCheckEventHeader data={eventData} />,
-        bodyComponent: (
-          <WatchlistCheckEventBody data={latestWatchlistEventData} />
-        ),
+        bodyComponent: <WatchlistCheckEventBody data={latestWatchlistEventData} />,
       });
     } else if (kind === TimelineEventKind.freeFormNote) {
       const eventData = data as Annotation;
@@ -171,9 +147,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
             <Text variant="body-3" color="tertiary">
               {t('timeline.vault-created-event.user-created-by')}
             </Text>
-            <LinkButton href="/api-keys">
-              {(eventData.actor as ActorApiKey).name}
-            </LinkButton>
+            <LinkButton href="/api-keys">{(eventData.actor as ActorApiKey).name}</LinkButton>
           </>
         ),
       });
@@ -182,9 +156,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       items.push({
         time,
         headerComponent: <WorkflowTriggeredEventHeader data={eventData} />,
-        bodyComponent: (
-          <WorkflowTriggeredEventBody data={eventData} entityId={entity.id} />
-        ),
+        bodyComponent: <WorkflowTriggeredEventBody data={eventData} entityId={entity.id} />,
       });
     } else if (kind === TimelineEventKind.workflowStarted) {
       const eventData = data as WorkflowStartedEventData;
@@ -202,9 +174,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as ExternalIntegrationCalledData;
       items.push({
         time,
-        headerComponent: (
-          <ExternalIntegrationCalledEventHeader data={eventData} />
-        ),
+        headerComponent: <ExternalIntegrationCalledEventHeader data={eventData} />,
         bodyComponent: <ExternalIntegrationCalledEventBody data={eventData} />,
       });
     } else if (kind === TimelineEventKind.stepUp) {
@@ -217,11 +187,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
     }
   });
 
-  return items.length > 0 ? (
-    <Timeline items={items} />
-  ) : (
-    <Text variant="body-3">{t('empty')}</Text>
-  );
+  return items.length > 0 ? <Timeline items={items} /> : <Text variant="body-3">{t('empty')}</Text>;
 };
 
 export default AuditTrailTimeline;

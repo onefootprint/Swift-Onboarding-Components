@@ -24,17 +24,14 @@ const postPartnerPartnershipsDocumentsReupload = async (
 
   const { name, description } = payload;
   return partnershipId && documentId && name
-    ? baseFetch<EmptyResponse>(
-        `/partner/partnerships/${partnershipId}/documents/${documentId}/reupload`,
-        {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
-          method: 'POST',
-          body: JSON.stringify({
-            name,
-            ...(description != null && { description }),
-          }),
-        },
-      )
+    ? baseFetch<EmptyResponse>(`/partner/partnerships/${partnershipId}/documents/${documentId}/reupload`, {
+        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          ...(description != null && { description }),
+        }),
+      })
     : Promise.reject(new TypeError('Missing required parameters'));
 };
 

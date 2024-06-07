@@ -3,7 +3,7 @@ import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const Error = () => {
+const ErrorComponent = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entities.filters.drawer.playbooks',
   });
@@ -20,4 +20,4 @@ const Error = () => {
   );
 };
 
-export default Error;
+export default ErrorComponent;

@@ -28,10 +28,7 @@ const CustomDocRequestForm = ({
   return (
     <>
       <Form.Field>
-        <Form.Label
-          htmlFor={`document-name-${id}`}
-          tooltip={{ text: t('document-name.tooltip') }}
-        >
+        <Form.Label htmlFor={`document-name-${id}`} tooltip={{ text: t('document-name.tooltip') }}>
           {t('document-name.label')}
         </Form.Label>
         <TextInput
@@ -45,22 +42,12 @@ const CustomDocRequestForm = ({
         />
         <Form.Errors>{nameFieldState.error?.message}</Form.Errors>
       </Form.Field>
-      <IdentifierInput
-        customDocIdentifierFormField={customDocIdentifierFormField}
-        disabled={disabled}
-      />
+      <IdentifierInput customDocIdentifierFormField={customDocIdentifierFormField} disabled={disabled} />
       <Form.Field>
-        <Form.Label
-          htmlFor={`document-description-${id}`}
-          tooltip={{ text: t('document-description.tooltip') }}
-        >
+        <Form.Label htmlFor={`document-description-${id}`} tooltip={{ text: t('document-description.tooltip') }}>
           {t('document-description.label')}
         </Form.Label>
-        <TextArea
-          id={`document-description-${id}`}
-          disabled={disabled}
-          {...register(customDocDescriptionFormField)}
-        />
+        <TextArea id={`document-description-${id}`} disabled={disabled} {...register(customDocDescriptionFormField)} />
       </Form.Field>
     </>
   );

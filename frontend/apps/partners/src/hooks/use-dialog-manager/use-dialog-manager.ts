@@ -1,9 +1,4 @@
-import {
-  type ReadonlyURLSearchParams as Params,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { type ReadonlyURLSearchParams as Params, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 
 import omitSearchParams from '../../helpers/omit-search-params';
@@ -16,13 +11,7 @@ const reset = (params: Params, path: string, router: Router) => {
   router.replace(`${path}?${omitDialog(params).toString()}`);
 };
 
-const add = (
-  params: Params,
-  path: string,
-  router: Router,
-  name: string,
-  id?: string,
-) => {
+const add = (params: Params, path: string, router: Router, name: string, id?: string) => {
   const out = omitDialog(params);
   if (id) {
     out.append('dialogId', id);

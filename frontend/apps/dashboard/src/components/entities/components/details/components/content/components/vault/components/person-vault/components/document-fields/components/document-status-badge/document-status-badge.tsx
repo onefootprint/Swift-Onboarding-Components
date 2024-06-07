@@ -22,10 +22,7 @@ const DocStatusToUIState: Record<DocumentStatus, keyof UIStates> = {
   [DocumentStatus.ReviewedByHuman]: 'neutral',
 };
 
-const DocumentStatusBadge = ({
-  documents,
-  documentType,
-}: DocumentBadgeStatusProps) => {
+const DocumentStatusBadge = ({ documents, documentType }: DocumentBadgeStatusProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.decrypt.status',
   });
@@ -33,11 +30,7 @@ const DocumentStatusBadge = ({
 
   return status ? (
     <Badge variant={DocStatusToUIState[status]}>
-      <Text
-        variant="caption-1"
-        color={DocStatusToUIState[status]}
-        whiteSpace="nowrap"
-      >
+      <Text variant="caption-1" color={DocStatusToUIState[status]} whiteSpace="nowrap">
         {t(status)}
       </Text>
     </Badge>

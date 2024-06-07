@@ -15,13 +15,7 @@ type SSN9Props = {
   isSkipped: boolean;
 };
 
-const SSN9 = ({
-  hideDisclaimer,
-  disabled,
-  isOptional,
-  onSkipChange,
-  isSkipped,
-}: SSN9Props) => {
+const SSN9 = ({ hideDisclaimer, disabled, isOptional, onSkipChange, isSkipped }: SSN9Props) => {
   const inputMasks = useInputMask('en-US');
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.ssn.full' });
   const {
@@ -71,13 +65,7 @@ const SSN9 = ({
           pattern: /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/,
         })}
       />
-      {isOptional && (
-        <Toggle
-          checked={isSkipped}
-          label={t('skip-label')}
-          onChange={onSkipChange}
-        />
-      )}
+      {isOptional && <Toggle checked={isSkipped} label={t('skip-label')} onChange={onSkipChange} />}
       {!hideDisclaimer && (
         <InfoBox
           items={[

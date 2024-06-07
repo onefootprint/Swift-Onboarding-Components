@@ -5,10 +5,10 @@ import React from 'react';
 import ClientProviders from '../client-providers';
 import Loading from './loading';
 
-const AuthMethodsApp = dynamic(
-  () => import('@/src/components/auth-methods-app'),
-  { ssr: false, loading: () => <Loading isRoot /> },
-);
+const AuthMethodsApp = dynamic(() => import('@/src/components/auth-methods-app'), {
+  ssr: false,
+  loading: () => <Loading isRoot />,
+});
 
 type UserPageProps = {
   params: Record<string, string>;

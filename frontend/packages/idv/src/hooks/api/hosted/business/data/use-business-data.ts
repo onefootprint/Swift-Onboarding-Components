@@ -1,16 +1,11 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import type {
-  BusinessDataRequest,
-  BusinessDataResponse,
-} from '@onefootprint/types';
+import type { BusinessDataRequest, BusinessDataResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const businessDataRequest = async (payload: BusinessDataRequest) => {
   // Don't send null values
-  const data = Object.fromEntries(
-    Object.entries(payload.data).filter(e => !!e[1]),
-  );
+  const data = Object.fromEntries(Object.entries(payload.data).filter(e => !!e[1]));
 
   let method;
   let url;

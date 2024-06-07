@@ -1,9 +1,5 @@
 import { useToggle } from '@onefootprint/hooks';
-import type {
-  Document,
-  EntityVault,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { Document, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { Drawer, LinkButton, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
@@ -26,12 +22,7 @@ export type DocumentFieldProps = {
   documents: Document[];
 };
 
-const DocumentField = ({
-  label,
-  documentType,
-  vault,
-  documents,
-}: DocumentFieldProps) => {
+const DocumentField = ({ label, documentType, vault, documents }: DocumentFieldProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document',
   });
@@ -41,10 +32,7 @@ const DocumentField = ({
   );
   const { inProgress: showEditView } = useEditControls();
 
-  let currentDocument = documents.find(
-    document =>
-      document?.completedVersion?.toString() === activeDocumentVersion,
-  );
+  let currentDocument = documents.find(document => document?.completedVersion?.toString() === activeDocumentVersion);
   if (!currentDocument) {
     const docIndex = +activeDocumentVersion.replace('incomplete_', ''); // If the status/version of the document is "null", we use the format "incomplete_<array index>" as active version
     if (!Number.isNaN(docIndex) && documents.length > docIndex) {
@@ -60,10 +48,7 @@ const DocumentField = ({
           <Text variant="body-3" color="tertiary" tag="label">
             {label}
           </Text>
-          <DocumentStatusBadge
-            documents={documents}
-            documentType={documentType}
-          />
+          <DocumentStatusBadge documents={documents} documentType={documentType} />
         </LabelContainer>
         {showEditView ? (
           <Text variant="body-3" color="tertiary">
@@ -76,9 +61,7 @@ const DocumentField = ({
       <Drawer
         closeAriaLabel={t('close-aria-label')}
         open={isDrawerOpen}
-        title={
-          t(`drawer.${documentType}.title` as ParseKeys<'common'>) as string
-        }
+        title={t(`drawer.${documentType}.title` as ParseKeys<'common'>) as string}
         onClose={hide}
         headerComponent={
           <SessionSelect
@@ -96,11 +79,7 @@ const DocumentField = ({
             activeDocumentVersion={activeDocumentVersion}
           />
           <Uploads currentDocument={currentDocument} vault={vault} />
-          <RawJsonData
-            vault={vault}
-            documentType={documentType}
-            curpCompletedVersion={curpCompletedVersion}
-          />
+          <RawJsonData vault={vault} documentType={documentType} curpCompletedVersion={curpCompletedVersion} />
         </DrawerItems>
       </Drawer>
     </Container>

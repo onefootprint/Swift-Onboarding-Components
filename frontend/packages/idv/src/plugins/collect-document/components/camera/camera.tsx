@@ -1,5 +1,5 @@
 import { useCountdownCustom, useInterval } from '@onefootprint/hooks';
-import { AnimatedLoadingSpinner, media, Stack, Text } from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Stack, Text, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
@@ -16,6 +16,7 @@ import {
 } from '../../constants/transition-delay.constants';
 import type { CaptureKind } from '../../types';
 import {
+  VideoEvents,
   clearCanvas,
   getHtmlVideoElement,
   isDesktop,
@@ -24,7 +25,6 @@ import {
   isMobile,
   isNonPlayingVideoEvent,
   isNotAllowedError,
-  VideoEvents,
 } from '../../utils/capture';
 import CaptureButton from './components/capture-button';
 import CountdownTimer from './components/countdown-timer';
@@ -35,13 +35,7 @@ import UploadButton from './components/upload-button';
 import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
-import type {
-  AutocaptureKind,
-  CaptureStatus,
-  DeviceKind,
-  VideoRef,
-  VideoSize,
-} from './types';
+import type { AutocaptureKind, CaptureStatus, DeviceKind, VideoRef, VideoSize } from './types';
 import type { CameraKind } from './utils/get-camera-options';
 import getOutlineDimensions from './utils/get-outline-dimensions';
 
@@ -67,11 +61,7 @@ type CameraProps = {
   docName?: string;
   sideName?: string;
   onCapture: (image: string, captureKind: CaptureKind) => void;
-  onUpload: (
-    imageFile: File | Blob,
-    extraCompressed: boolean,
-    captureKind: CaptureKind,
-  ) => void;
+  onUpload: (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) => void;
   hasBadConnectivity?: boolean;
   onError?: () => void;
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
@@ -102,18 +92,14 @@ const uniqLogTrack = uniqueLogger(logTrack);
 const videoElementStateListener =
   (
     setPlayingState: (state: boolean) => void,
-    isPlaying: boolean,
+    _isPlaying: boolean,
     onPlayNotAllowed: () => void,
     videoElement: HTMLVideoElement,
   ) =>
   (event: Event) => {
     if (!videoElement) return;
     logTrack(`Video event: ${event.type}`);
-    if (
-      isFunction(videoElement?.play) &&
-      isNonPlayingVideoEvent(event) &&
-      videoElement.readyState >= 2
-    ) {
+    if (isFunction(videoElement?.play) && isNonPlayingVideoEvent(event) && videoElement.readyState >= 2) {
       setPlayingState(false);
       videoElement
         .play()
@@ -124,10 +110,7 @@ const videoElementStateListener =
         .catch(err => {
           if (isNotAllowedError(err.name)) {
             onPlayNotAllowed();
-            logWarn(
-              'Video play event: not allowed - prompting user interaction',
-              err,
-            );
+            logWarn('Video play event: not allowed - prompting user interaction', err);
           } else {
             logError(`Video play event: error`, err);
           }
@@ -136,9 +119,7 @@ const videoElementStateListener =
   };
 
 const getPositionFromBottom = (kind: DeviceKind): 150 | 50 =>
-  kind === 'mobile'
-    ? FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
-    : FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
+  kind === 'mobile' ? FEEFBACK_POSITION_FROM_BOTTOM_MOBILE : FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
 
 const getPositionFromTop = (kind: DeviceKind, size?: VideoSize): number =>
   kind === 'mobile'
@@ -200,14 +181,10 @@ const Camera = ({
   const [shouldDetect, setShouldDetect] = useState(false); // auto-detect control
   const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
   const [onCanPlayTriggered, setOnCanPlayTriggered] = useState(false);
-  const [showCameraLoadingFeedback, setShowCameraLoadingFeedback] =
-    useState(false);
+  const [showCameraLoadingFeedback, setShowCameraLoadingFeedback] = useState(false);
 
   const videoSize = useSize(videoRef);
-  const [
-    autoCaptureTimerVal,
-    { startCountdown, stopCountdown, resetCountdown },
-  ] = useCountdownCustom(CountDownProps);
+  const [autoCaptureTimerVal, { startCountdown, stopCountdown, resetCountdown }] = useCountdownCustom(CountDownProps);
 
   const getImageStringFromVideo = useGetImageString();
 
@@ -315,17 +292,13 @@ const Camera = ({
   const handleClick = (captureKind: CaptureKind) => {
     logTrack(`(handleClick) ${captureKind} clicked`);
     if (!canvasImageCaptureRef.current || !videoRef.current) {
-      logError(
-        `Video ref or canvas not initialized for camera capture for capture kind: ${captureKind}`,
-      );
+      logError(`Video ref or canvas not initialized for camera capture for capture kind: ${captureKind}`);
       return;
     }
 
     const context = canvasImageCaptureRef.current.getContext('2d');
     if (!context) {
-      logError(
-        `Canvas context is undefined for camera capture for capture kind: ${captureKind}`,
-      );
+      logError(`Canvas context is undefined for camera capture for capture kind: ${captureKind}`);
       return;
     }
 
@@ -374,10 +347,7 @@ const Camera = ({
     if (isTimerRunning) {
       handleResetDetectionTimer();
       setShouldDetect(false); // We can cancel the countdown
-      const restartTimeout = setTimeout(
-        () => setShouldDetect(true),
-        AUTOCAPTURE_RESTART_DELAY,
-      ); // We wait 1s before re-detecting and starting the countdown again
+      const restartTimeout = setTimeout(() => setShouldDetect(true), AUTOCAPTURE_RESTART_DELAY); // We wait 1s before re-detecting and starting the countdown again
       autocaptureRestartTimeoutRef.current = restartTimeout;
     } else {
       handleClick('manual');
@@ -395,10 +365,7 @@ const Camera = ({
   };
 
   // We don't detect for 3 seconds so the camera has time to focus
-  useTimeout(
-    () => setShouldDetect(true),
-    isCameraVisible ? AUTOCAPTURE_START_DELAY : null,
-  );
+  useTimeout(() => setShouldDetect(true), isCameraVisible ? AUTOCAPTURE_START_DELAY : null);
 
   useEffect(() => {
     if (autoCaptureTimerVal <= 0) {
@@ -436,10 +403,7 @@ const Camera = ({
   return (
     <>
       {!isCameraVisible ? (
-        <LoadingContainer
-          data-device-kind={deviceKind}
-          desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}
-        >
+        <LoadingContainer data-device-kind={deviceKind} desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}>
           <AnimatePresence>
             <AnimatedLoadingSpinner animationStart />
             {showCameraLoadingFeedback && (
@@ -492,9 +456,7 @@ const Camera = ({
                 captureKind={autocaptureKind}
                 outlineWidth={outlineWidth}
                 outlineHeight={outlineHeight}
-                timerAnimationVal={
-                  isTimerRunning ? autoCaptureTimerVal : undefined
-                }
+                timerAnimationVal={isTimerRunning ? autoCaptureTimerVal : undefined}
               />
               <Canvas
                 ref={canvasImageCaptureRef as React.Ref<HTMLCanvasElement>}
@@ -529,10 +491,7 @@ const Camera = ({
               )}
               {isTimerRunning ? (
                 <TimerContainer height={positionFromTop}>
-                  <CountdownTimer
-                    current={autoCaptureTimerVal}
-                    start={AUTOCAPTURE_TIMER_START_VAL}
-                  />
+                  <CountdownTimer current={autoCaptureTimerVal} start={AUTOCAPTURE_TIMER_START_VAL} />
                 </TimerContainer>
               ) : null}
             </>

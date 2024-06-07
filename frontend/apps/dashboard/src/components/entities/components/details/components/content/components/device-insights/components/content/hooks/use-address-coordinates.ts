@@ -11,9 +11,7 @@ type Coordinates = {
   lng: number | undefined;
 };
 
-const getCoordinatesFromAddress = async (
-  address: string,
-): Promise<Coordinates | undefined> => {
+const getCoordinatesFromAddress = async (address: string): Promise<Coordinates | undefined> => {
   try {
     await GoogleMapsLoader.importLibrary('geocoding');
     const geocoder = new google.maps.Geocoder();
@@ -22,19 +20,13 @@ const getCoordinatesFromAddress = async (
       lat: result.results[0].geometry.location.lat(),
       lng: result.results[0].geometry.location.lng(),
     };
-  } catch (error) {
+  } catch (_e) {
     return undefined;
   }
 };
 
-const getAddressCoordinates = async (
-  queryClient: QueryClient,
-  entity: Entity,
-  type: AddressType,
-  address: string,
-) => {
-  const getFromCache = () =>
-    queryClient.getQueryData<Coordinates>(['device-insights', entity.id, type]);
+const getAddressCoordinates = async (queryClient: QueryClient, entity: Entity, type: AddressType, address: string) => {
+  const getFromCache = () => queryClient.getQueryData<Coordinates>(['device-insights', entity.id, type]);
 
   const createInitialData = async (): Promise<Coordinates> => {
     const coordinates = await getCoordinatesFromAddress(address);
@@ -51,11 +43,7 @@ const useAddressCoordinates = (entity: Entity, type: AddressType) => {
   const queryClient = useQueryClient();
   const { getAddressFieldsProps } = useAddressFieldsProps(entity);
   const update = (newData: Coordinates) => {
-    const prevData = queryClient.getQueryData<Coordinates>([
-      'device-insights',
-      entity.id,
-      type,
-    ]);
+    const prevData = queryClient.getQueryData<Coordinates>(['device-insights', entity.id, type]);
     queryClient.setQueryData(['device-insights', entity.id, type], {
       ...prevData,
       lat: newData.lat,
@@ -69,19 +57,13 @@ const useAddressCoordinates = (entity: Entity, type: AddressType) => {
   const decryptableFields = encryptedFields.filter(
     field => !field || (decryptableSet.has(field.name) && field.canDecrypt),
   );
-  const hasCompleteAddress =
-    addressProps.length > 0 && decryptableFields.length === 0;
+  const hasCompleteAddress = addressProps.length > 0 && decryptableFields.length === 0;
   const completeAddress = addressProps
     .map(prop => prop.value)
     .filter(v => !!v)
     .join(', ');
-  const addressTypeRequired =
-    entity.kind === 'business' ? AddressType.business : AddressType.residential;
-  const enabled =
-    !!entity &&
-    type === addressTypeRequired &&
-    hasCompleteAddress &&
-    !!completeAddress;
+  const addressTypeRequired = entity.kind === 'business' ? AddressType.business : AddressType.residential;
+  const enabled = !!entity && type === addressTypeRequired && hasCompleteAddress && !!completeAddress;
 
   const query = useQuery<Coordinates>(
     ['device-insights', entity.id, type],

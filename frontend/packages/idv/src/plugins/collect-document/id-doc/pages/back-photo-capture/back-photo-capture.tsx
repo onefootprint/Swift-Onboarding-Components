@@ -32,11 +32,7 @@ const BackPhotoCapture = () => {
   const docNameCapitalized = transformCase(docName, 'first-letter-upper-only');
   const sideName = getSideName();
   const sideNameCapitalized = transformCase(sideName, 'upper');
-  const onComplete = (
-    imageFile: File | Blob,
-    extraCompressed: boolean,
-    captureKind: CaptureKind,
-  ) =>
+  const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
     send({
       type: 'receivedImage',
       payload: {

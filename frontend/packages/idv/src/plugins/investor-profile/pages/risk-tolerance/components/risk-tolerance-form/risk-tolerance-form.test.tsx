@@ -1,33 +1,15 @@
 import '../../../../../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
-import {
-  InvestorProfileDI,
-  InvestorProfileRiskTolerance,
-} from '@onefootprint/types';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { InvestorProfileDI, InvestorProfileRiskTolerance } from '@onefootprint/types';
 import React from 'react';
 
 import type { RiskToleranceFormProps } from './risk-tolerance-form';
 import RiskToleranceForm from './risk-tolerance-form';
 
 describe('<RiskToleranceForm />', () => {
-  const renderForm = ({
-    defaultValues,
-    isLoading,
-    onSubmit = () => {},
-  }: Partial<RiskToleranceFormProps>) => {
-    customRender(
-      <RiskToleranceForm
-        defaultValues={defaultValues}
-        isLoading={isLoading}
-        onSubmit={onSubmit}
-      />,
-    );
+  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<RiskToleranceFormProps>) => {
+    customRender(<RiskToleranceForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
   };
 
   it('should trigger onSubmit when form is submitted', async () => {
@@ -45,8 +27,7 @@ describe('<RiskToleranceForm />', () => {
     const button = screen.getByRole('button', { name: 'Continue' });
     await userEvent.click(button);
     expect(onSubmit).toHaveBeenCalledWith({
-      [InvestorProfileDI.riskTolerance]:
-        InvestorProfileRiskTolerance.aggressive,
+      [InvestorProfileDI.riskTolerance]: InvestorProfileRiskTolerance.aggressive,
     });
   });
 
@@ -73,8 +54,7 @@ describe('<RiskToleranceForm />', () => {
     it('when there are defaults', async () => {
       renderForm({
         defaultValues: {
-          [InvestorProfileDI.riskTolerance]:
-            InvestorProfileRiskTolerance.moderate,
+          [InvestorProfileDI.riskTolerance]: InvestorProfileRiskTolerance.moderate,
         },
       });
 

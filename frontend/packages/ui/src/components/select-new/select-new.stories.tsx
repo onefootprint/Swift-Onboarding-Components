@@ -72,14 +72,7 @@ const options = [
   { label: 'Very long Option 4', value: '4' },
 ];
 
-const Template: Story<SelectNewProps> = ({
-  size,
-  disabled,
-  label,
-  hint,
-  triggerWidth,
-  contentWidth,
-}) => (
+const Template: Story<SelectNewProps> = ({ size, disabled, label, hint, triggerWidth, contentWidth }) => (
   <SelectNew
     size={size}
     disabled={disabled}

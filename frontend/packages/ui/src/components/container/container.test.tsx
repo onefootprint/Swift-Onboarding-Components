@@ -7,11 +7,7 @@ import type { ContainerProps } from './container';
 import Container from './container';
 
 describe('<Container />', () => {
-  const renderContainer = ({
-    tag = 'div',
-    children = 'Foo',
-    testID,
-  }: Partial<ContainerProps>) =>
+  const renderContainer = ({ tag = 'div', children = 'Foo', testID }: Partial<ContainerProps>) =>
     customRender(
       <Container tag={tag} testID={testID}>
         {children}

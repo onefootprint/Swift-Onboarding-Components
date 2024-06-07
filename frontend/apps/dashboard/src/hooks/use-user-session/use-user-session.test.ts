@@ -2,10 +2,7 @@ import { customRenderHook, screen, waitFor } from '@onefootprint/test-utils';
 import { asAdminUserInSandbox, resetUser } from 'src/config/tests';
 
 import useUserSession from './use-user-session';
-import {
-  withUpdateUser,
-  withUpdateUserError,
-} from './use-user-session.test.config';
+import { withUpdateUser, withUpdateUserError } from './use-user-session.test.config';
 
 describe('useUserSession', () => {
   beforeEach(() => {

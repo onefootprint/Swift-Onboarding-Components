@@ -12,12 +12,7 @@ type ComplianceDocSummary = {
   lastUpdated?: string;
   name: string;
   partnerTenantAssignee?: { firstName?: string; id: string; lastName?: string };
-  status:
-    | 'not_requested'
-    | 'waiting_for_upload'
-    | 'waiting_for_review'
-    | 'accepted'
-    | 'rejected';
+  status: 'not_requested' | 'waiting_for_upload' | 'waiting_for_review' | 'accepted' | 'rejected';
   templateId?: string;
   tenantAssignee?: { firstName?: string; id: string; lastName?: string };
 };
@@ -35,13 +30,10 @@ const getPartnerPartnershipsDocuments = async (partnershipId: string) => {
   if (!token) return Promise.reject(new TypeError('Missing auth token'));
 
   return partnershipId
-    ? baseFetch<PartnerDocument[]>(
-        `/partner/partnerships/${partnershipId}/documents`,
-        {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
-          method: 'GET',
-        },
-      )
+    ? baseFetch<PartnerDocument[]>(`/partner/partnerships/${partnershipId}/documents`, {
+        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
+        method: 'GET',
+      })
     : Promise.reject(new TypeError('Missing required parameters'));
 };
 

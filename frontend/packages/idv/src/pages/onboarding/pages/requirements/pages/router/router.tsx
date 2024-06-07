@@ -1,4 +1,4 @@
-import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
+import { OnboardingRequirementKind, getRequirement } from '@onefootprint/types';
 import { getRequirements } from '@onefootprint/types/src/api/onboarding-status';
 import React, { useEffect } from 'react';
 
@@ -12,7 +12,7 @@ import {
   Transfer,
 } from '../../../../../../plugins';
 import { Logger } from '../../../../../../utils/logger';
-import Error from '../../../../components/error';
+import ErrorComponent from '../../../../components/error';
 import WaitForComponentsSdk from '../../components/wait-for-components-sdk';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import Authorize from '../authorize';
@@ -34,22 +34,10 @@ const Router = ({ onDone }: RouterProps) => {
     requirements,
   } = state.context;
   const { orgId } = config;
-  const kyb = getRequirement(
-    requirements,
-    OnboardingRequirementKind.collectKybData,
-  );
-  const kyc = getRequirement(
-    requirements,
-    OnboardingRequirementKind.collectKycData,
-  );
-  const liveness = getRequirement(
-    requirements,
-    OnboardingRequirementKind.registerPasskey,
-  );
-  const idDocReqs = getRequirements(
-    requirements,
-    OnboardingRequirementKind.idDoc,
-  );
+  const kyb = getRequirement(requirements, OnboardingRequirementKind.collectKybData);
+  const kyc = getRequirement(requirements, OnboardingRequirementKind.collectKycData);
+  const liveness = getRequirement(requirements, OnboardingRequirementKind.registerPasskey);
+  const idDocReqs = getRequirements(requirements, OnboardingRequirementKind.idDoc);
   const isDone = state.matches('success');
   useLogStateMachine('onboarding-requirements', state);
   const kycUserData = getKycBootstrapData(userData);
@@ -131,9 +119,7 @@ const Router = ({ onDone }: RouterProps) => {
     );
   }
   if (state.matches('liveness')) {
-    return (
-      <Liveness idvContext={idvContext} onDone={handleRequirementCompleted} />
-    );
+    return <Liveness idvContext={idvContext} onDone={handleRequirementCompleted} />;
   }
   if (state.matches('idDoc') && idDocReqs.length) {
     return (
@@ -156,7 +142,7 @@ const Router = ({ onDone }: RouterProps) => {
     return <Process onDone={handleRequirementCompleted} />;
   }
   if (state.matches('error')) {
-    return <Error />;
+    return <ErrorComponent />;
   }
 
   return null;

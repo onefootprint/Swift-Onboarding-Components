@@ -31,8 +31,7 @@ const Navbar = () => {
   const router = useRouter();
   const isArticlePage = router.pathname.includes(ARTICLE_URL);
 
-  const [isBannerVisible, setIsBannerVisible] =
-    useState<boolean>(!isArticlePage);
+  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
 
   const handleCloseBanner = () => setIsBannerVisible(false);
   const entries: NavEntry[] = [
@@ -130,11 +129,7 @@ const Navbar = () => {
       />
       <Container>
         <Inner id="navbar">
-          <MobileNav
-            onOpen={disableFloating}
-            onClose={enableFloating}
-            entries={entries}
-          />
+          <MobileNav onOpen={disableFloating} onClose={enableFloating} entries={entries} />
           <DesktopNav entries={entries} />
         </Inner>
       </Container>
@@ -153,13 +148,15 @@ const Header = styled.header<{
     transition: background 200ms ease 0s;
     z-index: ${theme.zIndex.overlay};
 
-    ${$isFloating &&
-    css`
+    ${
+      $isFloating &&
+      css`
       -webkit-backdrop-filter: blur(15px) saturate(125%);
       backdrop-filter: blur(15px) saturate(125%);
       background-color: rgba(${theme.backgroundColor.primary}, 0.75);
       border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    `}
+    `
+    }
   `}
 `;
 

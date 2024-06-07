@@ -26,11 +26,7 @@ const Footer = ({
   });
 
   if (hideSaveButton && hideCancelButton) {
-    return (
-      <Container hideFootprintLogo={hideFootprintLogo}>
-        {!hideFootprintLogo && <SecuredByFootprint />}
-      </Container>
-    );
+    return <Container hideFootprintLogo={hideFootprintLogo}>{!hideFootprintLogo && <SecuredByFootprint />}</Container>;
   }
 
   return (

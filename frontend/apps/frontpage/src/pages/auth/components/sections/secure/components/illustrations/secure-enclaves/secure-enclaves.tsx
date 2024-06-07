@@ -9,20 +9,8 @@ import IllustrationContainer from '../../illustration-container';
 
 const SecureEnclaves = () => (
   <IllustrationContainer isDark>
-    <Spider
-      src="/auth/sections/spider-01.svg"
-      height={300}
-      width={400}
-      alt="decorative"
-      position="right"
-    />
-    <Spider
-      src="/auth/sections/spider-02.svg"
-      height={300}
-      width={400}
-      alt="decorative"
-      position="left"
-    />
+    <Spider src="/auth/sections/spider-01.svg" height={300} width={400} alt="decorative" position="right" />
+    <Spider src="/auth/sections/spider-02.svg" height={300} width={400} alt="decorative" position="left" />
     <Icons justify="center" position="absolute" gap={8}>
       <IconContainer size="small" position="left">
         <IcoLock24 />
@@ -59,20 +47,16 @@ const IconContainer = styled.div<{
     transform: scale(${size === 'large' ? 3 : 2});
     z-index: ${position === 'center' ? 4 : 3};
     border-radius: ${theme.borderRadius.full};
-    background-color: ${position === 'center'
-      ? '#090909'
-      : primitives.Gray1000};
-    box-shadow: ${position === 'center'
-      ? '0px 0px 8px rgba(100, 100, 100, 0.1)'
-      : '0px 0px 32px rgba(255, 255, 255, 0.11)'};
+    background-color: ${position === 'center' ? '#090909' : primitives.Gray1000};
+    box-shadow: ${
+      position === 'center' ? '0px 0px 8px rgba(100, 100, 100, 0.1)' : '0px 0px 32px rgba(255, 255, 255, 0.11)'
+    };
     filter: drop-shadow(0px 0px 32px rgba(255, 255, 255, 0.18))
       drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.08));
 
     svg {
       path {
-        fill: ${position === 'center'
-          ? primitives.Gray100
-          : primitives.Gray200};
+        fill: ${position === 'center' ? primitives.Gray100 : primitives.Gray200};
       }
     }
   `}

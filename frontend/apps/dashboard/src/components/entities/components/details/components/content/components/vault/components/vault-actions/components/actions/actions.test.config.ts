@@ -1,12 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { Entity } from '@onefootprint/types';
-import {
-  ActorKind,
-  EntityKind,
-  EntityStatus,
-  IdDI,
-  ListKind,
-} from '@onefootprint/types';
+import { ActorKind, EntityKind, EntityStatus, IdDI, ListKind } from '@onefootprint/types';
 
 export const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 export const entityWithPhoneFixture: Entity = {

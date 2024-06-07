@@ -1,18 +1,15 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import type { ProviderReturn } from '@onefootprint/idv';
 import {
+  InitShimmer,
+  Logger,
   checkIsInIframe,
   checkIsSocialMediaBrowser,
   getLogger,
-  InitShimmer,
-  Logger,
   useGetOnboardingConfig,
 } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
-import type {
-  IdvBootstrapData,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { IdvBootstrapData, PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
@@ -29,8 +26,7 @@ const STUCK_ON_SHIMMER_TIMEOUT = 5000;
 const { logError } = getLogger({ location: 'bifrost-init' });
 
 const isPropsSaved = (context: Record<string, unknown>) => {
-  const { bootstrapData, showCompletionPage, showLogo, l10n, authToken } =
-    context;
+  const { bootstrapData, showCompletionPage, showLogo, l10n, authToken } = context;
   return (
     bootstrapData !== undefined &&
     showCompletionPage !== undefined &&
@@ -40,11 +36,7 @@ const isPropsSaved = (context: Record<string, unknown>) => {
   );
 };
 
-const setupLogger = async (
-  fpProvider: ProviderReturn,
-  orgIds: Set<string>,
-  config: PublicOnboardingConfig,
-) => {
+const setupLogger = async (fpProvider: ProviderReturn, orgIds: Set<string>, config: PublicOnboardingConfig) => {
   const isInIframe = checkIsInIframe();
   const sdkContextModel = await getSdkContext(fpProvider);
 
@@ -69,28 +61,18 @@ const setupLogger = async (
 
 const Init = ({ fpProvider }: InitProps) => {
   const [state, send] = useBifrostMachine();
-  const {
-    authToken: authTokenContext,
-    publicKey: publicKeyContext,
-    config: configContext,
-  } = state.context;
+  const { authToken: authTokenContext, publicKey: publicKeyContext, config: configContext } = state.context;
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const startMs = Date.now();
-  const obConfigAuth = publicKeyContext
-    ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext }
-    : undefined;
+  const obConfigAuth = publicKeyContext ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext } : undefined;
 
   useTimeout(() => {
-    logError(
-      `User is stuck on init shimmer screen for ${(Date.now() - startMs) / 1000} seconds`,
-      undefined,
-      {
-        config: JSON.stringify(configContext),
-        isPropsSaved: isPropsSaved(state.context),
-        publicKey: String(publicKeyContext),
-      },
-    );
+    logError(`User is stuck on init shimmer screen for ${(Date.now() - startMs) / 1000} seconds`, undefined, {
+      config: JSON.stringify(configContext),
+      isPropsSaved: isPropsSaved(state.context),
+      publicKey: String(publicKeyContext),
+    });
   }, STUCK_ON_SHIMMER_TIMEOUT);
 
   // TODO: delete this when all customers migrate to footprint-js v 3.8+
@@ -106,10 +88,7 @@ const Init = ({ fpProvider }: InitProps) => {
         });
       },
       onError: err => {
-        logError(
-          `Fetching onboarding config failed: ${getErrorMessage(err)}`,
-          err,
-        );
+        logError(`Fetching onboarding config failed: ${getErrorMessage(err)}`, err);
         send({ type: 'configRequestFailed' });
       },
     },
@@ -121,14 +100,7 @@ const Init = ({ fpProvider }: InitProps) => {
         return;
       }
 
-      const {
-        userData = {},
-        options = {},
-        l10n = {},
-        authToken = '',
-        publicKey = '',
-        isComponentsSdk = false,
-      } = props;
+      const { userData = {}, options = {}, l10n = {}, authToken = '', publicKey = '', isComponentsSdk = false } = props;
       const { showCompletionPage = false, showLogo = false } = options || {};
       send({
         type: 'initContextUpdated',
@@ -144,10 +116,7 @@ const Init = ({ fpProvider }: InitProps) => {
       });
     },
     (error: unknown) => {
-      logError(
-        `Failed to fetch initial properties ${getErrorMessage(error)}`,
-        error,
-      );
+      logError(`Failed to fetch initial properties ${getErrorMessage(error)}`, error);
       send({ type: 'initError' });
     },
   );

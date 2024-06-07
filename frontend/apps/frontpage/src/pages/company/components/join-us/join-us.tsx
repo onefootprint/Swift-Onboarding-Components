@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { LinkButton, media, Text } from '@onefootprint/ui';
+import { LinkButton, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,12 +12,7 @@ const JoinUs = () => {
   return (
     <Container id="join-us">
       <ImageContainer>
-        <Image
-          src="/company/penguin.png"
-          height={800}
-          width={800}
-          alt={t('title')}
-        />
+        <Image src="/company/penguin.png" height={800} width={800} alt={t('title')} />
       </ImageContainer>
       <TextContainer>
         <Text variant="heading-1" color="primary" tag="h2">
@@ -32,10 +27,7 @@ const JoinUs = () => {
             <Text variant="body-1" color="secondary" tag="p">
               {t('pre-cta')}
             </Text>
-            <LinkButton
-              href={`mailto:${t('email-address')}`}
-              iconComponent={IcoArrowRightSmall16}
-            >
+            <LinkButton href={`mailto:${t('email-address')}`} iconComponent={IcoArrowRightSmall16}>
               {t('cta')}
             </LinkButton>
           </CtaContainer>

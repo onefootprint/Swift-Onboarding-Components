@@ -16,14 +16,7 @@ type CitizenshipFieldProps = {
   hint?: string;
 };
 
-const CitizenshipField = ({
-  field,
-  onChange,
-  hasDeleteButton,
-  onDelete,
-  hasError,
-  hint,
-}: CitizenshipFieldProps) => {
+const CitizenshipField = ({ field, onChange, hasDeleteButton, onDelete, hasError, hint }: CitizenshipFieldProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyc.pages.legal-status.form',
   });
@@ -44,11 +37,7 @@ const CitizenshipField = ({
 
   if (hasDeleteButton) {
     const deleteButton = (
-      <IconButton
-        aria-label={t('citizenship.delete-aria')}
-        onClick={onDelete}
-        testID="citizenship-delete-button"
-      >
+      <IconButton aria-label={t('citizenship.delete-aria')} onClick={onDelete} testID="citizenship-delete-button">
         <IcoTrash24 color="error" />
       </IconButton>
     );

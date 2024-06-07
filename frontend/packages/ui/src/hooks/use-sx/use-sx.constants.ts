@@ -78,10 +78,7 @@ export const customPropThemeMapper: Record<keyof CustomStyleProps, ThemeKey> = {
   rowGap: 'spacing',
 } as const;
 
-export const customPropNativeMapper: Record<
-  keyof CustomStyleProps,
-  SXStylesKeys[]
-> = {
+export const customPropNativeMapper: Record<keyof CustomStyleProps, SXStylesKeys[]> = {
   backgroundColor: ['backgroundColor'],
   borderBottomColor: ['borderBottomColor'],
   borderBottomLeftRadius: ['borderBottomLeftRadius'],

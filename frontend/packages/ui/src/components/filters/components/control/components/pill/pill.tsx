@@ -5,15 +5,7 @@ import { createFontStyles } from '../../../../../../utils/mixins';
 export type PillProps = {
   'aria-controls'?: string;
   'aria-expanded'?: boolean;
-  'aria-haspopup'?:
-    | boolean
-    | 'grid'
-    | 'dialog'
-    | 'menu'
-    | 'true'
-    | 'false'
-    | 'listbox'
-    | 'tree';
+  'aria-haspopup'?: boolean | 'grid' | 'dialog' | 'menu' | 'true' | 'false' | 'listbox' | 'tree';
   children?: React.ReactNode;
   disabled?: boolean;
   label?: () => void;

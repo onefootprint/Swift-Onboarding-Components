@@ -12,11 +12,7 @@ type ToggleButtonProps = {
   children: React.ReactNode;
 };
 
-const ToggleButton = ({
-  children,
-  isDecrypted,
-  onClick,
-}: ToggleButtonProps) => (
+const ToggleButton = ({ children, isDecrypted, onClick }: ToggleButtonProps) => (
   <Container
     key={isDecrypted ? 'button' : 'button2'}
     initial={{ opacity: 0, y: 20 }}

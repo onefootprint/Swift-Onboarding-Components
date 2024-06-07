@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoSmartphone216 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoSmartphone216 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -22,10 +17,7 @@ const IcoSmartphone216 = ({
       role="img"
       data-colored={false}
     >
-      <path
-        d="M7.773 11.527a.75.75 0 0 0 0 1.5h.45a.75.75 0 1 0 0-1.5h-.45Z"
-        fill={theme.color[color]}
-      />
+      <path d="M7.773 11.527a.75.75 0 0 0 0 1.5h.45a.75.75 0 1 0 0-1.5h-.45Z" fill={theme.color[color]} />
       <path
         fillRule="evenodd"
         clipRule="evenodd"

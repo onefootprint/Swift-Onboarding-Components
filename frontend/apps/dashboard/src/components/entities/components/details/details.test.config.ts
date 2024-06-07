@@ -1,18 +1,5 @@
-import {
-  mockRequest,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
-import type {
-  BusinessOwner,
-  DataIdentifier,
-  Entity,
-  Timeline,
-  VaultValue,
-} from '@onefootprint/types';
+import { mockRequest, screen, selectEvents, userEvent, waitFor, within } from '@onefootprint/test-utils';
+import type { BusinessOwner, DataIdentifier, Entity, Timeline, VaultValue } from '@onefootprint/types';
 import {
   ActorKind,
   BusinessDI,
@@ -174,10 +161,7 @@ export const withEntityError = (entityId = entityFixture.id) =>
     },
   });
 
-export const withTimeline = (
-  entity = entityFixture,
-  response = timelineFixture,
-) =>
+export const withTimeline = (entity = entityFixture, response = timelineFixture) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entity.id}/timeline`,
@@ -212,10 +196,7 @@ export const withBusinessOwners = (entity = entityFixture) =>
     response: businessOwnersFixture,
   });
 
-export const withEntityDecrypt = (
-  entityId: string,
-  decryptedData: Partial<Record<DataIdentifier, VaultValue>>,
-) =>
+export const withEntityDecrypt = (entityId: string, decryptedData: Partial<Record<DataIdentifier, VaultValue>>) =>
   mockRequest({
     method: 'post',
     path: `/entities/${entityId}/vault/decrypt`,
@@ -263,9 +244,7 @@ export const decryptFields = async (fields: string[]) => {
   await userEvent.click(nextButton);
 
   await waitFor(() => {
-    expect(
-      screen.getByRole('dialog', { name: 'Decrypt data' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Decrypt data' })).toBeInTheDocument();
   });
 
   const dialog = screen.getByRole('dialog', { name: 'Decrypt data' });

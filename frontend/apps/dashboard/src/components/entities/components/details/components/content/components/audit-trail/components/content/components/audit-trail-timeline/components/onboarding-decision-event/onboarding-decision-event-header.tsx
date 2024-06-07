@@ -13,9 +13,7 @@ type OnboardingDecisionEventHeaderProps = {
   data: OnboardingDecisionEventData;
 };
 
-const OnboardingDecisionEventHeader = ({
-  data,
-}: OnboardingDecisionEventHeaderProps) => {
+const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
   });
@@ -26,9 +24,7 @@ const OnboardingDecisionEventHeader = ({
   const color = isVerified ? 'success' : 'error';
 
   // Text differs slightly based on whether Footprint or the tenant made the decision
-  const isFootprintActor =
-    source.kind === ActorKind.firmEmployee ||
-    source.kind === ActorKind.footprint;
+  const isFootprintActor = source.kind === ActorKind.firmEmployee || source.kind === ActorKind.footprint;
   let text;
   let link;
   if (isFootprintActor) {

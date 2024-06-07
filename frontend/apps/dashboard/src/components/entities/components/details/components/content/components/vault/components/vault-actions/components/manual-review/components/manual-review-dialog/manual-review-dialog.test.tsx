@@ -1,10 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { OrgFrequentNoteKind, ReviewStatus } from '@onefootprint/types';
 import React from 'react';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
@@ -36,9 +30,7 @@ describe('<ManualReviewDialog />', () => {
     onClose = defaultOptions.onClose,
     status = defaultOptions.status,
   }: Partial<ManualReviewDialogProps>) =>
-    customRender(
-      <ManualReviewDialog open={open} onClose={onClose} status={status} />,
-    );
+    customRender(<ManualReviewDialog open={open} onClose={onClose} status={status} />);
 
   describe('when clicking on the cancel button', () => {
     it('should call close callback', async () => {
@@ -55,14 +47,10 @@ describe('<ManualReviewDialog />', () => {
   describe('when completing', () => {
     it('should show correct status in prompt', () => {
       renderManualReviewDialog({ status: ReviewStatus.pass });
-      expect(
-        screen.getByText('Why are you marking this user as Pass?'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Why are you marking this user as Pass?')).toBeInTheDocument();
 
       renderManualReviewDialog({ status: ReviewStatus.fail });
-      expect(
-        screen.getByText('Why are you marking this user as Fail?'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Why are you marking this user as Fail?')).toBeInTheDocument();
     });
 
     it('should show error if no note input', async () => {

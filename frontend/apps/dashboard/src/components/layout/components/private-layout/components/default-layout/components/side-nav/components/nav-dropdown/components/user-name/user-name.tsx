@@ -18,11 +18,7 @@ const UserName = ({ name, lastName, email }: UserNameProps) => {
           {name} {lastName}
         </Text>
       )}
-      <Text
-        variant={!hasName ? 'label-3' : 'body-3'}
-        color={!hasName ? 'primary' : 'secondary'}
-        truncate
-      >
+      <Text variant={!hasName ? 'label-3' : 'body-3'} color={!hasName ? 'primary' : 'secondary'} truncate>
         {email}
       </Text>
     </UserDropdownItem>

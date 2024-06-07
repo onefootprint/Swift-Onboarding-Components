@@ -31,10 +31,7 @@ type ComplianceDocTemplate = {
  * @param {string} templateId - the ID of the compliance document template to update
  * @return {Promise<ComplianceDocTemplate>} a promise that resolves to the updated compliance document template
  */
-const putPartnerDocTemplates = async (
-  payload: CreateComplianceDocTemplateRequest,
-  templateId: string,
-) => {
+const putPartnerDocTemplates = async (payload: CreateComplianceDocTemplateRequest, templateId: string) => {
   const token = await getAuthCookie();
   if (!token) return Promise.reject(new TypeError('Missing auth token'));
 

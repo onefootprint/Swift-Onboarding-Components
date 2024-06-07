@@ -14,14 +14,9 @@ import type { KycData } from '../../utils/data-types';
 import type { InitMachineArgs } from '../../utils/state-machine/machine';
 import TestWrapper from '../../utils/test-wrapper';
 import ResidentialAddress from './residential-address';
-import getInitialContext, {
-  withUserVault,
-} from './residential-address.test.config';
+import getInitialContext, { withUserVault } from './residential-address.test.config';
 
-const renderResidentialAddress = (
-  initialContext: InitMachineArgs,
-  onComplete?: (args: KycData) => void,
-) =>
+const renderResidentialAddress = (initialContext: InitMachineArgs, onComplete?: (args: KycData) => void) =>
   customRender(
     <TestWrapper initialContext={initialContext} initState="residentialAddress">
       <ResidentialAddress onComplete={onComplete} />
@@ -64,9 +59,7 @@ describe('<ResidentialAddress />', () => {
 
         await waitFor(() => {
           expect(
-            screen.queryByText(
-              'Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)',
-            ),
+            screen.queryByText('Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)'),
           ).toBeNull();
         });
       });
@@ -101,9 +94,7 @@ describe('<ResidentialAddress />', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(
-              'Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)',
-            ),
+            screen.getByText('Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)'),
           ).toBeInTheDocument();
         });
       });
@@ -133,11 +124,7 @@ describe('<ResidentialAddress />', () => {
       renderResidentialAddress(initialContext);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Only addresses in United States of America are accepted',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Only addresses in United States of America are accepted')).toBeInTheDocument();
       });
 
       const continueButton = screen.getByRole('button', { name: 'Continue' });
@@ -145,17 +132,13 @@ describe('<ResidentialAddress />', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(
-            'Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)',
-          ),
+          screen.getByText('Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)'),
         ).toBeInTheDocument();
       });
 
       expect(screen.getByText('City cannot be empty')).toBeInTheDocument();
       expect(screen.getByText('State cannot be empty')).toBeInTheDocument();
-      expect(
-        screen.getByText('Zip code cannot be empty or is invalid'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Zip code cannot be empty or is invalid')).toBeInTheDocument();
     });
 
     it('should allow bootstrapping data', async () => {
@@ -366,9 +349,7 @@ describe('<ResidentialAddress />', () => {
         renderResidentialAddress(initialContext);
 
         await waitFor(() => {
-          expect(
-            screen.getByText('Only addresses in Mexico are accepted'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('Only addresses in Mexico are accepted')).toBeInTheDocument();
         });
 
         const continueButton = screen.getByRole('button', { name: 'Continue' });
@@ -376,9 +357,7 @@ describe('<ResidentialAddress />', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(
-              'Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)',
-            ),
+            screen.getByText('Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)'),
           ).toBeInTheDocument();
         });
         expect(screen.getByText('City cannot be empty')).toBeInTheDocument();
@@ -390,9 +369,7 @@ describe('<ResidentialAddress />', () => {
           supportedCountries: ['MX'],
         });
         renderResidentialAddress(initialContext);
-        expect(
-          screen.getByRole('textbox', { name: 'State/province' }),
-        ).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'State/province' })).toBeInTheDocument();
       });
 
       it('hides state field if country does not have states', async () => {
@@ -402,9 +379,7 @@ describe('<ResidentialAddress />', () => {
         });
         renderResidentialAddress(initialContext);
         expect(screen.queryByRole('button', { name: 'State' })).toBeNull();
-        expect(
-          screen.queryByRole('textbox', { name: 'State/province' }),
-        ).toBeNull();
+        expect(screen.queryByRole('textbox', { name: 'State/province' })).toBeNull();
       });
     });
   });

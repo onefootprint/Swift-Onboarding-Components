@@ -1,4 +1,4 @@
-import { Container, createFontStyles, Tag } from '@onefootprint/ui';
+import { Container, Tag, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

@@ -20,10 +20,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<BreadcrumbProps> = ({
-  separator,
-  'aria-label': ariaLabel,
-}: BreadcrumbProps) => (
+const Template: Story<BreadcrumbProps> = ({ separator, 'aria-label': ariaLabel }: BreadcrumbProps) => (
   <Breadcrumb separator={separator} aria-label={ariaLabel}>
     <BreadcrumbItem href="#">Footprint</BreadcrumbItem>
     <BreadcrumbItem href="#">UI</BreadcrumbItem>

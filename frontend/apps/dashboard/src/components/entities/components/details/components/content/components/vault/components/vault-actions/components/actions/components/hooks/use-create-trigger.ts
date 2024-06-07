@@ -4,10 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const submitTrigger = async (
-  authHeaders: AuthHeaders,
-  { entityId, ...data }: TriggerRequest,
-) => {
+const submitTrigger = async (authHeaders: AuthHeaders, { entityId, ...data }: TriggerRequest) => {
   const response = await request<TriggerResponse>({
     method: 'POST',
     url: `/entities/${entityId}/triggers`,

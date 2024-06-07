@@ -12,11 +12,7 @@ type EditButtonActionsProps = {
   };
 };
 
-const EditButtonActions = ({
-  shouldShowVerify,
-  isEmpty,
-  texts,
-}: EditButtonActionsProps) => (
+const EditButtonActions = ({ shouldShowVerify, isEmpty, texts }: EditButtonActionsProps) => (
   <Stack direction="row" align="center" gap={3} justify="flex-end">
     {shouldShowVerify ? (
       <>

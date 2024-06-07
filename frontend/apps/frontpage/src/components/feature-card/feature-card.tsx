@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { createFontStyles, LinkButton, media, Text } from '@onefootprint/ui';
+import { LinkButton, Text, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -28,18 +28,11 @@ const FeatureCard = ({
     {children}
     <TextContainer>
       <Title size={size}>{title}</Title>
-      <Text
-        variant={size === 'compact' ? 'body-2' : 'body-1'}
-        color="secondary"
-      >
+      <Text variant={size === 'compact' ? 'body-2' : 'body-1'} color="secondary">
         {subtitle}
       </Text>
       {cta && (
-        <LinkButton
-          iconComponent={IcoArrowRightSmall16}
-          href={href}
-          target="_blank"
-        >
+        <LinkButton iconComponent={IcoArrowRightSmall16} href={href} target="_blank">
           {cta}
         </LinkButton>
       )}
@@ -97,9 +90,7 @@ const Container = styled.div<{
 
 const Title = styled.span<{ size: 'compact' | 'default' }>`
   ${({ theme, size }) => css`
-    ${size === 'compact'
-      ? createFontStyles('label-2')
-      : createFontStyles('label-1')}
+    ${size === 'compact' ? createFontStyles('label-2') : createFontStyles('label-1')}
     color: ${theme.color.primary};
     position: relative;
 

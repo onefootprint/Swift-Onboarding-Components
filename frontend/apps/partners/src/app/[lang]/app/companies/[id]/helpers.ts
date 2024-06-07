@@ -12,25 +12,13 @@ export const EmptyCompany = {
   numControlsTotal: 0,
 };
 
-export const sortByLastUpdatedDesc = (
-  a: { lastUpdated?: string },
-  b: { lastUpdated?: string },
-) =>
-  a.lastUpdated && b.lastUpdated
-    ? new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
-    : 0;
-export const sortByTimestampDesc = (
-  a: { timestamp?: string },
-  b: { timestamp?: string },
-) =>
-  a.timestamp && b.timestamp
-    ? new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    : 0;
+export const sortByLastUpdatedDesc = (a: { lastUpdated?: string }, b: { lastUpdated?: string }) =>
+  a.lastUpdated && b.lastUpdated ? new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime() : 0;
+export const sortByTimestampDesc = (a: { timestamp?: string }, b: { timestamp?: string }) =>
+  a.timestamp && b.timestamp ? new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime() : 0;
 
 export const percentageCalc = (c: typeof EmptyCompany): number =>
-  c.numControlsTotal === 0
-    ? 0
-    : (100 * c.numControlsComplete) / c.numControlsTotal;
+  c.numControlsTotal === 0 ? 0 : (100 * c.numControlsComplete) / c.numControlsTotal;
 
 export const getDocLabelValue = (x: DocTemplate): TemplateOption => ({
   label: x.latestVersion.name,
@@ -56,7 +44,5 @@ export const getUnusedTemplates = (
     return set;
   }, new Set());
 
-  return templates
-    .filter(x => !setOfTemplateIds.has(x.templateId))
-    .map(x => ({ value: x.value, label: x.label }));
+  return templates.filter(x => !setOfTemplateIds.has(x.templateId)).map(x => ({ value: x.value, label: x.label }));
 };

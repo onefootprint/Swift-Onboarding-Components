@@ -1,7 +1,4 @@
-import {
-  type OnboardingConfig,
-  OnboardingConfigKind,
-} from '@onefootprint/types';
+import { type OnboardingConfig, OnboardingConfigKind } from '@onefootprint/types';
 import { Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,11 +15,7 @@ export type CollectionAndScopesProps = {
   toggleDisableHeading: (disable: boolean) => void;
 };
 
-const CollectionAndScopes = ({
-  playbook,
-  isTabsDisabled,
-  toggleDisableHeading,
-}: CollectionAndScopesProps) => {
+const CollectionAndScopes = ({ playbook, isTabsDisabled, toggleDisableHeading }: CollectionAndScopesProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details',
   });
@@ -30,9 +23,7 @@ const CollectionAndScopes = ({
     { value: 'data', label: t('tabs.data-collection') },
     { value: 'authorized-scopes', label: t('tabs.authorized-scopes') },
     { value: 'aml-monitoring', label: t('tabs.aml-monitoring') },
-    ...(playbook.kind !== OnboardingConfigKind.auth
-      ? [{ value: 'rules', label: t('tabs.rules') }]
-      : []),
+    ...(playbook.kind !== OnboardingConfigKind.auth ? [{ value: 'rules', label: t('tabs.rules') }] : []),
   ];
   const [tab, setTab] = useState(options[0].value);
 
@@ -42,20 +33,11 @@ const CollectionAndScopes = ({
 
   return (
     <Container>
-      <Tabs
-        options={options}
-        onChange={handleChange}
-        disabled={isTabsDisabled}
-      />
+      <Tabs options={options} onChange={handleChange} disabled={isTabsDisabled} />
       {tab === 'data' && <DataCollection playbook={playbook} />}
       {tab === 'authorized-scopes' && <AuthorizedScopes playbook={playbook} />}
       {tab === 'aml-monitoring' && <AmlMonitoring playbook={playbook} />}
-      {tab === 'rules' && (
-        <Rules
-          playbook={playbook}
-          toggleDisableHeading={toggleDisableHeading}
-        />
-      )}
+      {tab === 'rules' && <Rules playbook={playbook} toggleDisableHeading={toggleDisableHeading} />}
     </Container>
   );
 };

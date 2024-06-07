@@ -22,11 +22,7 @@ const Loading = ({ step, showSlowConnectionMessage }: LoadingProps) => {
         <Text variant="label-1" marginTop={5} textAlign="center">
           {t(`title.${step}`)}
         </Text>
-        <Text
-          variant="body-2"
-          textAlign="center"
-          color={showSlowConnectionMessage ? 'error' : 'secondary'}
-        >
+        <Text variant="body-2" textAlign="center" color={showSlowConnectionMessage ? 'error' : 'secondary'}>
           {showSlowConnectionMessage ? t('slow-connection') : t('subtitle')}
         </Text>
       </Stack>

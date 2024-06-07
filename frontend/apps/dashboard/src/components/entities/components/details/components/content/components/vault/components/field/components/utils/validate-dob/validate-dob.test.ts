@@ -11,21 +11,13 @@ describe('ValidateDob', () => {
 
   it('should reject dates that are younger than MIN_VALID_AGE', () => {
     const youngYear = new Date().getFullYear() - (MIN_VALID_AGE - 1);
-    expect(validateDob(`01/01/${youngYear}`)).toBe(
-      DobValidationError.TOO_YOUNG,
-    );
+    expect(validateDob(`01/01/${youngYear}`)).toBe(DobValidationError.TOO_YOUNG);
 
     const youngDob = new Date(new Date().getTime() - 13 * 1000 * 3600 * 24);
-    const youngDobMonth =
-      youngDob.getMonth() > 8
-        ? youngDob.getMonth() + 1
-        : `0${youngDob.getMonth() + 1}`; // JS Date months starts at month 0 for January
-    const youngDobDay =
-      youngDob.getDate() > 9 ? youngDob.getDate() : `0${youngDob.getDate()}`;
+    const youngDobMonth = youngDob.getMonth() > 8 ? youngDob.getMonth() + 1 : `0${youngDob.getMonth() + 1}`; // JS Date months starts at month 0 for January
+    const youngDobDay = youngDob.getDate() > 9 ? youngDob.getDate() : `0${youngDob.getDate()}`;
     const youngDobYear = youngDob.getFullYear();
-    expect(validateDob(`${youngDobMonth}/${youngDobDay}/${youngDobYear}`)).toBe(
-      DobValidationError.TOO_YOUNG,
-    );
+    expect(validateDob(`${youngDobMonth}/${youngDobDay}/${youngDobYear}`)).toBe(DobValidationError.TOO_YOUNG);
   });
 
   it('should reject dates in the future', () => {

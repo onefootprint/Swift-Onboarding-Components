@@ -38,9 +38,7 @@ describe('useCreateHandoffUrl', () => {
         }),
       );
 
-      expect(result.current.hash).toBe(
-        '#tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
-      );
+      expect(result.current.hash).toBe('#tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN');
       expect(result.current.searchParams.get('r')).toMatch(/^\d{1,3}$/);
       expect(result.current.origin).toBe('https://handoff.onefootprint.com');
     });
@@ -59,9 +57,7 @@ describe('useCreateHandoffUrl', () => {
         }),
       );
 
-      expect(result.current.pathname).toBe(
-        '/appclip/app_exp_9KlTyouGLSNKMgJmpUdBAF',
-      );
+      expect(result.current.pathname).toBe('/appclip/app_exp_9KlTyouGLSNKMgJmpUdBAF');
     });
   });
 
@@ -96,9 +92,7 @@ describe('useCreateHandoffUrl', () => {
         }),
       );
 
-      expect(result.current.pathname).toBe(
-        '/appclip-instant/app_exp_9KlTyouGLSNKMgJmpUdBAF',
-      );
+      expect(result.current.pathname).toBe('/appclip-instant/app_exp_9KlTyouGLSNKMgJmpUdBAF');
     });
   });
 

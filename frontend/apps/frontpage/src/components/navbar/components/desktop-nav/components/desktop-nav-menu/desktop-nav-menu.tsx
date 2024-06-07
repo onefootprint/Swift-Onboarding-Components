@@ -11,16 +11,10 @@ type DesktopNavbarMenuProps = {
   menu: NavMenu;
 };
 
-const {
-  Item: NavigationMenuItem,
-  Trigger: NavigationMenuTrigger,
-  Content: NavigationMenuContent,
-} = NavigationMenu;
+const { Item: NavigationMenuItem, Trigger: NavigationMenuTrigger, Content: NavigationMenuContent } = NavigationMenu;
 
 const DesktopNavMenu = ({ menu }: DesktopNavbarMenuProps) => {
-  const items = menu.items.map(item => (
-    <DesktopNavMenuItem item={item} key={item.text} />
-  ));
+  const items = menu.items.map(item => <DesktopNavMenuItem item={item} key={item.text} />);
 
   return (
     <ItemContainer>

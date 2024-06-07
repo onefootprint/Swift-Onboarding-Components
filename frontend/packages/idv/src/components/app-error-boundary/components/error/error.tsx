@@ -9,7 +9,7 @@ type ErrorProps = {
   resetErrorBoundary: () => void;
 };
 
-const Error = ({ resetErrorBoundary }: ErrorProps) => {
+const ErrorComponent = ({ resetErrorBoundary }: ErrorProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'global.errors.uncaught-error',
   });
@@ -30,4 +30,4 @@ const Error = ({ resetErrorBoundary }: ErrorProps) => {
   );
 };
 
-export default Error;
+export default ErrorComponent;

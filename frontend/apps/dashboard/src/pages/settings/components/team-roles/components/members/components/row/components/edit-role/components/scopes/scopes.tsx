@@ -12,21 +12,14 @@ export type ScopesListProps = {
 
 const ScopesList = ({ scopes }: ScopesListProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
-  const { isAdmin, decryptOptions, basicScopes, vaultProxyOptions } =
-    groupScopes(scopes);
+  const { isAdmin, decryptOptions, basicScopes, vaultProxyOptions } = groupScopes(scopes);
 
   return isAdmin ? (
     <span>{t('scopes.admin')}</span>
   ) : (
     <>
       {basicScopes.map(scope => (
-        <span key={scope.kind}>
-          {
-            t(
-              `scopes.${scope.kind}` as unknown as ParseKeys<'common'>,
-            ) as unknown as string
-          }
-        </span>
+        <span key={scope.kind}>{t(`scopes.${scope.kind}` as unknown as ParseKeys<'common'>) as unknown as string}</span>
       ))}
       <DecryptOptions options={decryptOptions} />
       <VaultProxyOptions options={vaultProxyOptions} />

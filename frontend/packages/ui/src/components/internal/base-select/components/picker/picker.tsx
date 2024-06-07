@@ -94,9 +94,7 @@ const Picker = ({
 
   const filteredOptions = useMemo(() => {
     if (!search) return options;
-    return options?.filter(option =>
-      option?.label.toLowerCase().includes(search.toLowerCase()),
-    );
+    return options?.filter(option => option?.label.toLowerCase().includes(search.toLowerCase()));
   }, [search, options]);
 
   useEffect(() => {
@@ -110,12 +108,7 @@ const Picker = ({
   return visibleState === State.closed ? null : (
     <FocusTrap active={open}>
       <span>
-        <Sheet
-          className={visibleState}
-          role="dialog"
-          ref={bottomSheetRef}
-          height={height}
-        >
+        <Sheet className={visibleState} role="dialog" ref={bottomSheetRef} height={height}>
           <Header>
             <CloseContainer onClick={onClose}>
               <IconButton aria-label="close" onClick={onClose}>
@@ -140,11 +133,7 @@ const Picker = ({
             <OptionsContainer maxHeight={height - 100} onScroll={handleScroll}>
               {filteredOptions?.length
                 ? filteredOptions.map(option => (
-                    <OptionComponent
-                      option={option}
-                      value={value}
-                      onSelect={() => onChange(option)}
-                    />
+                    <OptionComponent option={option} value={value} onSelect={() => onChange(option)} />
                   ))
                 : renderEmptyState()}
             </OptionsContainer>
@@ -217,10 +206,12 @@ const Input = styled(SearchInput)`
 const SearchContainer = styled.div<{ hasScroll: boolean }>`
   ${({ theme, hasScroll }) => css`
     padding-bottom: ${theme.spacing[5]};
-    ${hasScroll &&
-    css`
+    ${
+      hasScroll &&
+      css`
       border-bottom: 1px solid ${theme.borderColor.tertiary};
-    `}
+    `
+    }
   `}
 `;
 

@@ -22,10 +22,7 @@ export default new Map<string, { var: string; assignDefault?: string[] }>([
     'linkButtonDestructiveColor',
     {
       var: 'components.linkButton.destructive.color.text.initial',
-      assignDefault: [
-        'linkButtonDestructiveHoverColor',
-        'linkButtonDestructiveActiveColor',
-      ],
+      assignDefault: ['linkButtonDestructiveHoverColor', 'linkButtonDestructiveActiveColor'],
     },
   ],
   [

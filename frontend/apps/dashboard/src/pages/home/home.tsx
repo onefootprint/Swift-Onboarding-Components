@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import Content from './components/content';
 import DateFilter from './components/date-filter';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import PlaybooksFilter from './components/playbooks-filter';
 import useOrgMetrics from './hooks/use-org-metrics';
@@ -32,7 +32,7 @@ const Home = () => {
           </Stack>
         </SectionTitle>
         {metrics.isLoading ? <Loading /> : null}
-        {metrics.error ? <Error error={metrics.error} /> : null}
+        {metrics.error ? <ErrorComponent error={metrics.error} /> : null}
         {metrics.data ? <Content metrics={metrics.data} /> : null}
       </Box>
     </>

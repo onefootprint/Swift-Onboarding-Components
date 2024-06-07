@@ -1,8 +1,4 @@
-import type {
-  EntityKind,
-  EntityStatus,
-  ReviewStatus,
-} from '@onefootprint/types';
+import type { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import ManualReviewDialog from './components/manual-review-dialog';
@@ -31,19 +27,8 @@ const ManualReview = ({ kind, status, disabled }: ManualReviewProps) => {
 
   return (
     <>
-      <ManualReviewTrigger
-        status={status}
-        kind={kind}
-        onSelect={handleSelect}
-        disabled={disabled}
-      />
-      {shouldShowDialog && (
-        <ManualReviewDialog
-          status={reviewStatus}
-          open={dialogOpen}
-          onClose={handleCloseDialog}
-        />
-      )}
+      <ManualReviewTrigger status={status} kind={kind} onSelect={handleSelect} disabled={disabled} />
+      {shouldShowDialog && <ManualReviewDialog status={reviewStatus} open={dialogOpen} onClose={handleCloseDialog} />}
     </>
   );
 };

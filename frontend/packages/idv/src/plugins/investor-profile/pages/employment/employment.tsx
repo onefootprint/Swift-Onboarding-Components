@@ -20,9 +20,7 @@ const Employment = () => {
   // Only show the animation if this is the first time we are rendering this page
   // If user saved data, and navigated prev to this page, don't animate again
   const hasCollectedData = Object.keys(data).length > 0;
-  const [showAnimation, setShowAnimation] = useState(
-    showTransition && !hasCollectedData,
-  );
+  const [showAnimation, setShowAnimation] = useState(showTransition && !hasCollectedData);
 
   const handleSubmit = (employmentData: EmploymentData) => {
     syncData({
@@ -52,9 +50,7 @@ const Employment = () => {
         firstIcon={IcoUser40}
         secondIcon={IcoDollar40}
         firstText={t('investor-profile.components.transition-animation.source')}
-        secondText={t(
-          'investor-profile.components.transition-animation.destination',
-        )}
+        secondText={t('investor-profile.components.transition-animation.destination')}
         timeout={4000}
         onAnimationEnd={() => setShowAnimation(false)}
       />
@@ -66,8 +62,7 @@ const Employment = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDI.employmentStatus]:
-            data?.[InvestorProfileDI.employmentStatus],
+          [InvestorProfileDI.employmentStatus]: data?.[InvestorProfileDI.employmentStatus],
           [InvestorProfileDI.occupation]: data?.[InvestorProfileDI.occupation],
           [InvestorProfileDI.employer]: data?.[InvestorProfileDI.employer],
         }}

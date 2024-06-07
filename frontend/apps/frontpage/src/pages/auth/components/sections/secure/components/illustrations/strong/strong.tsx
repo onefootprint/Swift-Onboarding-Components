@@ -8,12 +8,7 @@ import IllustrationContainer from '../../illustration-container/illustration-con
 const Strong = () => (
   <IllustrationContainer>
     <ImageContainer>
-      <Image
-        src="/auth/sections/strong.png"
-        alt="Strong"
-        width={767}
-        height={500}
-      />
+      <Image src="/auth/sections/strong.png" alt="Strong" width={767} height={500} />
     </ImageContainer>
   </IllustrationContainer>
 );

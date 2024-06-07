@@ -48,9 +48,7 @@ const Fields = styled.div`
   `};
 `;
 
-const BasicConfigurationHeader = () => (
-  <Shimmer height="24px" width="147px" marginBottom={6} />
-);
+const BasicConfigurationHeader = () => <Shimmer height="24px" width="147px" marginBottom={6} />;
 
 const UrlFields = () => (
   <Box>
@@ -88,13 +86,9 @@ const SecretHttpHeadersFields = () => (
   </Box>
 );
 
-const CustomHeadersHeader = () => (
-  <Shimmer height="24px" width="168px" marginBottom={6} />
-);
+const CustomHeadersHeader = () => <Shimmer height="24px" width="168px" marginBottom={6} />;
 
-const ClientCertificateHeader = () => (
-  <Shimmer height="24px" width="300px" marginBottom={6} />
-);
+const ClientCertificateHeader = () => <Shimmer height="24px" width="300px" marginBottom={6} />;
 
 const Download = () => (
   <Box>

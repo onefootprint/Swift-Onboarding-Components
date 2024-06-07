@@ -20,8 +20,7 @@ const Table = ({ children }: TableProps) => {
           clientWidth: containerClientWidth,
           scrollLeft,
         } = containerRef.current;
-        const scrollRight =
-          containerScrollWidth - containerClientWidth - scrollLeft;
+        const scrollRight = containerScrollWidth - containerClientWidth - scrollLeft;
 
         setOverflowRight(scrollRight > 0);
         setOverflowLeft(scrollLeft > 0);
@@ -35,10 +34,7 @@ const Table = ({ children }: TableProps) => {
   }, []);
 
   return (
-    <Container
-      data-overflow-right={overflowRight}
-      data-overflow-left={overflowLeft}
-    >
+    <Container data-overflow-right={overflowRight} data-overflow-left={overflowLeft}>
       <TableWrapper ref={containerRef}>
         <Content ref={tableRef}>{children}</Content>
       </TableWrapper>

@@ -42,15 +42,7 @@ const isEmpty = (x: unknown): x is 'empty' => x === 'empty';
 
 const ButtonLoading = () => <Shimmer height="48px" width="auto" />;
 
-const Component = ({
-  children,
-  cta,
-  entryEmail,
-  entryPasskey,
-  entryPhone,
-  Header,
-  texts,
-}: Props) => (
+const Component = ({ children, cta, entryEmail, entryPasskey, entryPhone, Header, texts }: Props) => (
   <>
     <Stack direction="column" marginBottom={7}>
       <Header subtitle={texts.headerSubtitle} title={texts.headerTitle} />
@@ -91,14 +83,7 @@ const Component = ({
         />
       ) : null}
     </Stack>
-    <Button
-      type="button"
-      size="large"
-      fullWidth
-      loading={cta.isLoading}
-      onClick={cta.onClick}
-      variant={cta.variant}
-    >
+    <Button type="button" size="large" fullWidth loading={cta.isLoading} onClick={cta.onClick} variant={cta.variant}>
       {texts.cta}
     </Button>
     {children}

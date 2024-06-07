@@ -27,19 +27,13 @@ const getEntityDataForListKind = (
     }
 
     case ListKind.phoneNumber: {
-      const rawAttribute =
-        entityKind === EntityKind.business
-          ? BusinessDI.phoneNumber
-          : IdDI.phoneNumber;
+      const rawAttribute = entityKind === EntityKind.business ? BusinessDI.phoneNumber : IdDI.phoneNumber;
       const phoneNumber = vaultData[rawAttribute] as string | undefined;
       return phoneNumber ? [phoneNumber] : [];
     }
 
     case ListKind.phoneCountryCode: {
-      const rawAttribute =
-        entityKind === EntityKind.business
-          ? BusinessDI.phoneNumber
-          : IdDI.phoneNumber;
+      const rawAttribute = entityKind === EntityKind.business ? BusinessDI.phoneNumber : IdDI.phoneNumber;
       const phoneNumber = vaultData[rawAttribute] as string | undefined;
       const match = phoneNumber?.match(/\+(\d{1,3})?(\d{10})/);
       const countryCode = match && match.length > 1 ? match[1] : '';

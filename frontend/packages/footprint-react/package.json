@@ -10,21 +10,19 @@
   "style": "./dist/footprint-react.css",
   "sideEffects": false,
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
-    "test": "bun test --bail",
+    "build": "tsup",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "tsup --watch",
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
     "pretest:ci:bun": "cd ../footprint-js && bun run tsup",
+    "publish:local": "yarn && yarn build && yalc publish",
     "test:ci:bun": "bun test --bail",
     "test:watch": "bun test --watch",
-    "dev": "tsup --watch",
-    "build": "tsup",
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
-    "typecheck": "yarn tsc --noEmit",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "publish:local": "yarn && yarn build && yalc publish"
+    "test": "bun test --bail",
+    "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
     "@onefootprint/core": "*",
@@ -34,7 +32,6 @@
     "@types/classnames": "^2.3.1",
     "@types/cleave.js": "^1.4.6",
     "bun-types": "^1.0.26",
-    "eslint-config-footprint": "*",
     "react-dom": "^18",
     "react": "^18",
     "tsconfig": "*",

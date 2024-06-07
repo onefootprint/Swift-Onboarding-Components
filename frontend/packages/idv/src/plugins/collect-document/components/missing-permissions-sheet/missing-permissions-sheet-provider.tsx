@@ -21,18 +21,11 @@ const SheetManager = ({ device }: { device: DeviceInfo }) => {
   };
 
   return sheet ? (
-    <MissingPermissionsSheet
-      device={device}
-      open={sheet.open}
-      onClose={handleClose(sheet.onClose)}
-    />
+    <MissingPermissionsSheet device={device} open={sheet.open} onClose={handleClose(sheet.onClose)} />
   ) : null;
 };
 
-const MissingPermissionsSheetProvider = ({
-  device,
-  children,
-}: MissingPermissionsSheetProviderProps) => (
+const MissingPermissionsSheetProvider = ({ device, children }: MissingPermissionsSheetProviderProps) => (
   <Provider>
     <SheetManager device={device} />
     {children}

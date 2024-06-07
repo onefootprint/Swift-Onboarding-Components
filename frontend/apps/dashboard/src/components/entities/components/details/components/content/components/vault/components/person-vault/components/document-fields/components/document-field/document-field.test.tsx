@@ -1,37 +1,18 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
 import TestWrapper from '../../../../../utils/test-wrapper';
 import type { DocumentFieldProps } from './document-field';
 import DocumentField from './document-field';
-import driversLicensePartialDIs, {
-  entityId,
-} from './document-field.test.config';
+import driversLicensePartialDIs, { entityId } from './document-field.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
-const renderDocumentField = ({
-  vault,
-  label,
-  documentType,
-  documents,
-}: DocumentFieldProps) =>
+const renderDocumentField = ({ vault, label, documentType, documents }: DocumentFieldProps) =>
   customRender(
     <TestWrapper>
-      <DocumentField
-        vault={vault}
-        label={label}
-        documentType={documentType}
-        documents={documents}
-      />
-      ,
+      <DocumentField vault={vault} label={label} documentType={documentType} documents={documents} />,
     </TestWrapper>,
   );
 

@@ -21,11 +21,7 @@ type CustomDataFieldsProps = WithEntityProps & {
   title: string;
 };
 
-const CustomDataFields = ({
-  entity,
-  iconComponent: IconComponent,
-  title,
-}: CustomDataFieldsProps) => {
+const CustomDataFields = ({ entity, iconComponent: IconComponent, title }: CustomDataFieldsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset',
   });
@@ -73,9 +69,7 @@ const CustomDataFields = ({
             <Text variant="label-3">{title}</Text>
           </Title>
           {shouldShowSelectAll && (
-            <LinkButton
-              onClick={allSelected ? handleDeselectAll : handleSelectAll}
-            >
+            <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
               {allSelected ? t('deselect-all') : t('select-all')}
             </LinkButton>
           )}

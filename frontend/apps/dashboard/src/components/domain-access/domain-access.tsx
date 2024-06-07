@@ -20,9 +20,7 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
   });
   const updateOrgMutation = useUpdateOrg();
   const showRequestErrorToast = useRequestErrorToast();
-  const [allowDomainAccess, setAllowDomainAccess] = useState(
-    org.allowDomainAccess,
-  );
+  const [allowDomainAccess, setAllowDomainAccess] = useState(org.allowDomainAccess);
   // If the domain is claimed by another tenant, we disable the ability to enable domain access
   const disableTogle = !!org.isDomainAlreadyClaimed && !allowDomainAccess;
 
@@ -55,11 +53,7 @@ const DomainAccess = ({ org }: DomainAccessProps) => {
     <Container data-testid="domain-access">
       <HeaderContainer>
         <Header>
-          {allowDomainAccess ? (
-            <IcoLockOpen24 testID="lock-open" />
-          ) : (
-            <IcoLock24 testID="lock-closed" />
-          )}
+          {allowDomainAccess ? <IcoLockOpen24 testID="lock-open" /> : <IcoLock24 testID="lock-closed" />}
           <Text variant="label-3">{t('title')}</Text>
         </Header>
         <Text color="secondary" variant="body-3">

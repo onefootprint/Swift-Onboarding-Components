@@ -18,13 +18,7 @@ export type SectionProps = {
   testID?: string;
 };
 
-const Section = ({
-  title,
-  IconComponent,
-  actions,
-  content,
-  testID,
-}: SectionProps) => {
+const Section = ({ title, IconComponent, actions, content, testID }: SectionProps) => {
   const hasActions = actions && actions?.length > 0;
 
   return (
@@ -42,12 +36,7 @@ const Section = ({
               isLoading ? (
                 <AnimatedLoadingSpinner key={label} animationStart />
               ) : (
-                <LinkButton
-                  key={label}
-                  onClick={onClick}
-                  disabled={isLoading}
-                  testID={actionTestID}
-                >
+                <LinkButton key={label} onClick={onClick} disabled={isLoading} testID={actionTestID}>
                   {label}
                 </LinkButton>
               ),

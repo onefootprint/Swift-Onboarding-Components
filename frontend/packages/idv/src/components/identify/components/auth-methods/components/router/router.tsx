@@ -2,16 +2,11 @@ import { AuthMethodKind } from '@onefootprint/types';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Identify, IdentifyVariant, UpdateEmail, UpdatePhone } from '../../../..';
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
 import { useDeviceInfo } from '../../../../../../hooks/ui/use-device-info';
 import type { NavigationHeaderLeftButtonProps } from '../../../../../layout';
 import StepHeader from '../../../../../step-header';
-import {
-  Identify,
-  IdentifyVariant,
-  UpdateEmail,
-  UpdatePhone,
-} from '../../../..';
 import type { HeaderProps } from '../../../../types';
 import Notification from '../../../notification';
 import type { AuthMethodsMachineContext as MachineContext } from '../../state';
@@ -25,23 +20,14 @@ type AuthMethodsRouterProps = {
 };
 
 const getHeader = (
-  ctx: MachineContext,
+  _ctx: MachineContext,
   leftButton: NavigationHeaderLeftButtonProps,
 ): ((props: HeaderProps) => JSX.Element) =>
   function Header({ title, subtitle, overrideLeftButton }): JSX.Element {
-    return (
-      <StepHeader
-        leftButton={overrideLeftButton || leftButton}
-        subtitle={subtitle}
-        title={title}
-      />
-    );
+    return <StepHeader leftButton={overrideLeftButton || leftButton} subtitle={subtitle} title={title} />;
   };
 
-const AuthMethodsRouter = ({
-  Loading,
-  onDone,
-}: AuthMethodsRouterProps): JSX.Element | null => {
+const AuthMethodsRouter = ({ Loading, onDone }: AuthMethodsRouterProps): JSX.Element | null => {
   const [state, send] = useAuthMethodsMachine();
   const { context, matches } = state;
   const { t } = useTranslation('identify');
@@ -58,9 +44,7 @@ const AuthMethodsRouter = ({
         variant={IdentifyVariant.updateLoginMethods}
         device={device}
         initialAuthToken={context.authToken}
-        onDone={({ authToken }) =>
-          send({ type: 'setVerifyToken', payload: authToken })
-        }
+        onDone={({ authToken }) => send({ type: 'setVerifyToken', payload: authToken })}
         // Since we don't have a playbook for this flow, always treat it as live
         // TODO would be more correct to fetch whether the user defined by the auth token is
         // live or sandbox
@@ -119,10 +103,7 @@ const AuthMethodsRouter = ({
   }
   if (matches('notFoundChallenge')) {
     return (
-      <Notification
-        title={t('notification.404-token-title')}
-        subtitle={t('notification.404-token-description')}
-      />
+      <Notification title={t('notification.404-token-title')} subtitle={t('notification.404-token-description')} />
     );
   }
 

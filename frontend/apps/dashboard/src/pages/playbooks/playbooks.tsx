@@ -16,12 +16,7 @@ const Playbooks = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [hasHadPlaybook, setHasHadPlaybook] = useState(false);
-  const {
-    data: response,
-    errorMessage,
-    isLoading,
-    pagination,
-  } = usePlaybooks();
+  const { data: response, errorMessage, isLoading, pagination } = usePlaybooks();
   const filters = useFilters();
 
   const handleOpen = () => {
@@ -67,28 +62,15 @@ const Playbooks = () => {
         </Title>
         <Wrapper>
           <Stack position="relative">
-            {!hasHadPlaybook && (
-              <Highlighter
-                variants={highlighterAnimation}
-                initial="initial"
-                animate="animate"
-              />
-            )}
-            <PermissionGate
-              fallbackText={t('cta-not-allowed')}
-              scopeKind={RoleScopeKind.onboardingConfiguration}
-            >
+            {!hasHadPlaybook && <Highlighter variants={highlighterAnimation} initial="initial" animate="animate" />}
+            <PermissionGate fallbackText={t('cta-not-allowed')} scopeKind={RoleScopeKind.onboardingConfiguration}>
               <Button onClick={handleOpen}>{t('create-button')}</Button>
             </PermissionGate>
           </Stack>
         </Wrapper>
       </HeaderContainer>
       <Stack direction="column">
-        <Table
-          data={response?.data}
-          errorMessage={errorMessage}
-          isLoading={isLoading}
-        />
+        <Table data={response?.data} errorMessage={errorMessage} isLoading={isLoading} />
         {response && response.meta.count > 0 && (
           <Pagination
             hasNextPage={pagination.hasNextPage}
@@ -101,11 +83,7 @@ const Playbooks = () => {
           />
         )}
       </Stack>
-      <CreateDialog
-        open={dialogOpen}
-        onClose={handleClose}
-        onCreate={handleCreate}
-      />
+      <CreateDialog open={dialogOpen} onClose={handleClose} onCreate={handleCreate} />
     </Container>
   );
 };

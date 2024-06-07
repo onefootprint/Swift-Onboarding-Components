@@ -1,12 +1,6 @@
-import type {
-  FilterOption,
-  FilterSelectedOption,
-} from '../../../../filters.types';
+import type { FilterOption, FilterSelectedOption } from '../../../../filters.types';
 
-const getMultiSelectLabel = (
-  options: FilterOption[],
-  selectedOptions: FilterSelectedOption[],
-) => {
+const getMultiSelectLabel = (options: FilterOption[], selectedOptions: FilterSelectedOption[]) => {
   const labels: string[] = [];
   options.forEach(option => {
     if (selectedOptions.includes(option.value)) {

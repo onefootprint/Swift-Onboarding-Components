@@ -1,6 +1,6 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import type { OnboardingConfigKind } from '@onefootprint/types';
-import { Box, FootprintButton, media, Text } from '@onefootprint/ui';
+import { Box, FootprintButton, Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -21,9 +21,7 @@ const Preview = ({ obConfig }: PreviewProps) => {
 
   const handleOpen = () => {
     const fp = footprint.init({
-      kind: isAuth
-        ? FootprintComponentKind.Auth
-        : FootprintComponentKind.Verify,
+      kind: isAuth ? FootprintComponentKind.Auth : FootprintComponentKind.Verify,
       publicKey: obConfig.key,
       onComplete: (validationToken: string) => {
         console.log('validationToken', validationToken);

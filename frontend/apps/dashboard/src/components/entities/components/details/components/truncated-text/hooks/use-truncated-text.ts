@@ -11,9 +11,7 @@ const OFFSET_FOR_SEE_MORE_BUTTON = 30;
 const useTruncatedtext = (text: string, maxTextViewHeight: number) => {
   const textContainerRef = useRef(null);
   const [currShownText, setCurrShownText] = useState(text);
-  const [shownTextState, setShownTextLength] = useState(
-    ShownTextState.FULL_WITHIN_MAX_HEIGHT,
-  );
+  const [shownTextState, setShownTextLength] = useState(ShownTextState.FULL_WITHIN_MAX_HEIGHT);
 
   useEffect(() => {
     const calculateTruncatedText = () => {
@@ -22,14 +20,8 @@ const useTruncatedtext = (text: string, maxTextViewHeight: number) => {
 
       const { scrollHeight } = noteTextContainer;
       if (scrollHeight > maxTextViewHeight) {
-        const appxTextLength =
-          (maxTextViewHeight / scrollHeight) * currShownText.length;
-        setCurrShownText(
-          prevText =>
-            `${prevText
-              .substring(0, appxTextLength - OFFSET_FOR_SEE_MORE_BUTTON)
-              .trim()}...`,
-        );
+        const appxTextLength = (maxTextViewHeight / scrollHeight) * currShownText.length;
+        setCurrShownText(prevText => `${prevText.substring(0, appxTextLength - OFFSET_FOR_SEE_MORE_BUTTON).trim()}...`);
         setShownTextLength(ShownTextState.PARTIAL_WITHIN_MAX_HEIGHT);
       }
     };

@@ -31,9 +31,7 @@ describe('usePermissions', () => {
     it('should return falsy when checking with "onboarding_configuration"', () => {
       asUserWithScope([RoleScopeKind.apiKeys]);
       const { result } = customRenderHook(() => usePermissions());
-      expect(
-        result.current.hasPermission(RoleScopeKind.orgSettings),
-      ).toBeFalsy();
+      expect(result.current.hasPermission(RoleScopeKind.orgSettings)).toBeFalsy();
     });
   });
 });

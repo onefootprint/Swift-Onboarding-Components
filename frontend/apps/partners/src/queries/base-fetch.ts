@@ -53,9 +53,7 @@ const camelCaseTransform = (json: JsonValue): JsonValue => {
     const camelCasedObj: JsonObject = {};
     for (const key in json) {
       if (Object.prototype.hasOwnProperty.call(json, key)) {
-        const camelCasedKey = key.replace(/_([a-z])/g, (_, letter) =>
-          letter.toUpperCase(),
-        );
+        const camelCasedKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
         camelCasedObj[camelCasedKey] = camelCaseTransform(json[key]);
       }
     }
@@ -64,15 +62,13 @@ const camelCaseTransform = (json: JsonValue): JsonValue => {
   return json;
 };
 
-const getResponseBody = async (
-  response: Response,
-): Promise<JsonValue | string | undefined> => {
+const getResponseBody = async (response: Response): Promise<JsonValue | string | undefined> => {
   if (response.status !== 204) {
     try {
       const contentType = response.headers.get('Content-Type');
       if (contentType) {
-        const isJson = ['application/json', 'application/problem+json'].some(
-          type => contentType.toLowerCase().startsWith(type),
+        const isJson = ['application/json', 'application/problem+json'].some(type =>
+          contentType.toLowerCase().startsWith(type),
         );
         if (isJson) {
           const json = await response.json();

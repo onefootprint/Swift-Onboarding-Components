@@ -13,10 +13,7 @@ export type PathProps = {
   type: string;
 };
 
-export type SecurityTypes =
-  | 'Secret API Key'
-  | 'Client Token'
-  | 'Dashboard Token';
+export type SecurityTypes = 'Secret API Key' | 'Client Token' | 'Dashboard Token';
 
 export type SecurityProps = {
   type: SecurityTypes;

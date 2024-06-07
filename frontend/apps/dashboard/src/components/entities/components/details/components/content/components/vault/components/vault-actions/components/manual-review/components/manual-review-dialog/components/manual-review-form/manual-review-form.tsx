@@ -39,13 +39,8 @@ const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
   };
 
   return (
-    <StyledForm
-      id="manual-review-form"
-      onSubmit={handleSubmit(handleBeforeSubmit)}
-    >
-      <Text variant="label-2">
-        {t('dialog.form.prompt', { status: t(`status.${status}`) })}
-      </Text>
+    <StyledForm id="manual-review-form" onSubmit={handleSubmit(handleBeforeSubmit)}>
+      <Text variant="label-2">{t('dialog.form.prompt', { status: t(`status.${status}`) })}</Text>
       <TextArea
         label={t('dialog.form.note.label')}
         placeholder={t('dialog.form.note.placeholder')}

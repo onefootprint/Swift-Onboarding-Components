@@ -7,19 +7,18 @@
   "sideEffects": false,
   "license": "MIT",
   "scripts": {
-    "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
-    "i18n:copy": "../../scripts/i18n/i18n-copy.sh -dep ui,request",
-    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -dep ui,request",
-    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui,request",
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
     "i18n:clean": "rm -rf ./public/locales/",
-    "test": "jest --passWithNoTests",
+    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui,request",
+    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -dep ui,request",
+    "i18n:copy": "../../scripts/i18n/i18n-copy.sh -dep ui,request",
+    "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
     "test:ci": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
-    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "typecheck": "yarn tsc --noEmit",
-    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
+    "test": "jest --passWithNoTests",
+    "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
     "@datadog/browser-logs": "^5.18.0",
@@ -74,7 +73,6 @@
     "@types/logrocket-react": "^3.0.1",
     "@types/styled-components": "^5.1.26",
     "copy-and-watch": "^0.1.6",
-    "eslint-config-footprint": "*",
     "i18next": "^23.7.16",
     "i18next-locales-sync": "^2.0.1",
     "jest-canvas-mock": "^2.5.0",
@@ -92,15 +90,11 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": [
-      "<rootDir>/src/config/initializers/i18next-test.ts"
-    ],
+    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"],
     "moduleNameMapper": {
       "@/investor-profile/(.*)": "<rootDir>/src/plugins/investor-profile/$1",
       "@/identify/(.*)": "<rootDir>/src/pages/identify/$1"
     },
-    "setupFilesAfterEnv": [
-      "<rootDir>/src/utils/tests/setupTests.js"
-    ]
+    "setupFilesAfterEnv": ["<rootDir>/src/utils/tests/setupTests.js"]
   }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Error } from 'src/components';
+import { ErrorComponent } from 'src/components';
 
 import { AUDIT_TRAILS_ID } from '@/entity/constants';
 import useCurrentEntityTimeline from '@/entity/hooks/use-current-entity-timeline';
@@ -16,13 +16,9 @@ const AuditTrail = () => {
   const { data, error } = useCurrentEntityTimeline();
 
   return (
-    <Section
-      title={t('title')}
-      id={AUDIT_TRAILS_ID}
-      suffixActions={<AddFreeFormNote />}
-    >
+    <Section title={t('title')} id={AUDIT_TRAILS_ID} suffixActions={<AddFreeFormNote />}>
       <>
-        {error && <Error error={error} />}
+        {error && <ErrorComponent error={error} />}
         {data && <Content timeline={data} />}
       </>
     </Section>

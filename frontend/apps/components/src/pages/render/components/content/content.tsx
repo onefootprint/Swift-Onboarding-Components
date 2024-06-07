@@ -22,22 +22,9 @@ const Content = ({ fallback }: ContentProps) => {
   const [props, setProps] = useState<FootprintRenderDataProps>();
   useProps<FootprintRenderDataProps>(setProps);
   const decryptMutation = useEntitiesVaultDecrypt();
-  const {
-    data,
-    isError,
-    error,
-    isSuccess,
-    isLoading: isMutationLoading,
-  } = decryptMutation;
+  const { data, isError, error, isSuccess, isLoading: isMutationLoading } = decryptMutation;
 
-  const {
-    authToken = '',
-    id = '',
-    label,
-    canCopy,
-    showHiddenToggle,
-    defaultHidden,
-  } = props || {};
+  const { authToken = '', id = '', label, canCopy, showHiddenToggle, defaultHidden } = props || {};
 
   const [isHidden, setIsHidden] = useState(defaultHidden);
   const isLoading = !isHidden && isMutationLoading; // Only show loading indicator if the value is not hidden
@@ -87,10 +74,7 @@ const Content = ({ fallback }: ContentProps) => {
   }
 
   if (isError) {
-    logError(
-      `Decrypting vault data failed with error: ${getErrorMessage(error)}`,
-      error,
-    );
+    logError(`Decrypting vault data failed with error: ${getErrorMessage(error)}`, error);
     return <Invalid />;
   }
 

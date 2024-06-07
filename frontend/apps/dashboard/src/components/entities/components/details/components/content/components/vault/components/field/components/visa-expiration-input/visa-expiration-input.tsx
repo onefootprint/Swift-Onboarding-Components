@@ -6,9 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import editFormFieldName from '../utils/edit-form-field-name';
-import validateVisaExpiration, {
-  VisaExpirationValidationError,
-} from '../utils/validate-visa-expiration';
+import validateVisaExpiration, { VisaExpirationValidationError } from '../utils/validate-visa-expiration';
 
 export type VisaExpirationInputProps = {
   value: VaultValue;
@@ -39,20 +37,13 @@ const VisaExpirationInput = ({ value }: VisaExpirationInputProps) => {
     if (errors[formField]?.type === 'pattern') {
       return t('pattern');
     }
-    const validationError = validateVisaExpiration(
-      getValues(formField),
-      formLegalStatus,
-    );
+    const validationError = validateVisaExpiration(getValues(formField), formLegalStatus);
     if (validationError !== undefined) {
-      const errorByValidationError: Record<
-        VisaExpirationValidationError,
-        string
-      > = {
+      const errorByValidationError: Record<VisaExpirationValidationError, string> = {
         [VisaExpirationValidationError.REQUIRED]: t('required'),
         [VisaExpirationValidationError.SHOULD_BE_EMPTY]: t('should-be-empty'),
         [VisaExpirationValidationError.INVALID]: t('invalid'),
-        [VisaExpirationValidationError.INVALID_TIMEFRAME]:
-          t('invalid-timeframe'),
+        [VisaExpirationValidationError.INVALID_TIMEFRAME]: t('invalid-timeframe'),
       };
       return errorByValidationError[validationError];
     }
@@ -71,8 +62,7 @@ const VisaExpirationInput = ({ value }: VisaExpirationInputProps) => {
         {...register(formField, {
           // YYYY-MM-DD or YYYY/MM/DD
           pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
-          validate: (expiration: string) =>
-            validateVisaExpiration(expiration, formLegalStatus) === undefined,
+          validate: (expiration: string) => validateVisaExpiration(expiration, formLegalStatus) === undefined,
         })}
       />
     </ValueContainer>

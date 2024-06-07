@@ -1,11 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { RowProps } from './row';

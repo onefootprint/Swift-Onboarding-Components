@@ -9,12 +9,8 @@ const useIdDocFirstFlowEnabled = (isKyc: boolean) => {
   const hasIdDoc = watch('personal.idDocKind').length > 0;
 
   const hasUserPermission = user?.isFirmEmployee;
-  const hasOrgPermissionForIdDocFirst = org?.name
-    .toLowerCase()
-    .includes('flexcar');
-  return (
-    hasIdDoc && isKyc && (hasUserPermission || hasOrgPermissionForIdDocFirst)
-  );
+  const hasOrgPermissionForIdDocFirst = org?.name.toLowerCase().includes('flexcar');
+  return hasIdDoc && isKyc && (hasUserPermission || hasOrgPermissionForIdDocFirst);
 };
 
 export default useIdDocFirstFlowEnabled;

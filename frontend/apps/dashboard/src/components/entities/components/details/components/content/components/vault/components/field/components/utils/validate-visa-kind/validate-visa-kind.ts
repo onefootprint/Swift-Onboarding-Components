@@ -7,10 +7,7 @@ export enum VisaKindValidationError {
   REQUIRED,
 }
 
-const validateVisaKind = (
-  visaKind: string,
-  legalStatus: string,
-): VisaKindValidationError | undefined => {
+const validateVisaKind = (visaKind: string, legalStatus: string): VisaKindValidationError | undefined => {
   if (legalStatus === UsLegalStatus.visa && visaKind === EMPTY_SELECT_VALUE) {
     return VisaKindValidationError.REQUIRED;
   }

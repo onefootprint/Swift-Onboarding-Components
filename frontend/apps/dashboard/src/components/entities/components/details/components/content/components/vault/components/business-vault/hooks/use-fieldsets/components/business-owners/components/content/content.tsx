@@ -1,9 +1,5 @@
 import type { BusinessOwner, Entity } from '@onefootprint/types';
-import {
-  BusinessDI,
-  isVaultDataEmpty,
-  isVaultDataEncrypted,
-} from '@onefootprint/types';
+import { BusinessDI, isVaultDataEmpty, isVaultDataEncrypted } from '@onefootprint/types';
 import { Box, Grid, Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
@@ -40,21 +36,13 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
   const { label, value } = field(di);
 
   const renderValue = (index: number) => {
-    if (
-      isVaultDataEncrypted(value) ||
-      isVaultDataEmpty(value) ||
-      !isVaultDataBusinessOwner(value)
-    ) {
+    if (isVaultDataEncrypted(value) || isVaultDataEmpty(value) || !isVaultDataBusinessOwner(value)) {
       return <FieldOrPlaceholder data={value} />;
     }
 
     if (isVaultDataBusinessOwner(value)) {
       const bo = value[index];
-      return (
-        <FieldOrPlaceholder
-          data={getFullName(bo.first_name, bo.middle_name, bo.last_name)}
-        />
-      );
+      return <FieldOrPlaceholder data={getFullName(bo.first_name, bo.middle_name, bo.last_name)} />;
     }
 
     return null;
@@ -85,19 +73,14 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
         stake: businessOwner.ownershipStake,
       }) as string;
     }
-    return businessOwner.kind === 'primary'
-      ? (t(`hint.primary_no_stake` as ParseKeys<'common'>) as string)
-      : '';
+    return businessOwner.kind === 'primary' ? (t(`hint.primary_no_stake` as ParseKeys<'common'>) as string) : '';
   };
 
   return (
     <Box testID="business-owners-content">
       <Grid.Container gap={4}>
         {businessOwners.map((businessOwner, index) => (
-          <FieldContainer
-            key={businessOwner.id || index}
-            hideCheckbox={index !== 0}
-          >
+          <FieldContainer key={businessOwner.id || index} hideCheckbox={index !== 0}>
             <Field
               entity={entity}
               di={di}

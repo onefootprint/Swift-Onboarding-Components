@@ -1,9 +1,4 @@
-import {
-  IcoClose16,
-  IcoPencil16,
-  IcoUpload16,
-  IcoUser16,
-} from '@onefootprint/icons';
+import { IcoClose16, IcoPencil16, IcoUpload16, IcoUser16 } from '@onefootprint/icons';
 import { Drawer, LinkButton, Stack, Text } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import React, { useEffect, useState } from 'react';
@@ -98,12 +93,7 @@ const DrawerTimeline = ({
   };
 
   return isOpen ? (
-    <Drawer
-      onClickOutside={handleClose}
-      onClose={handleClose}
-      open={isOpen}
-      title={t('doc.document-history')}
-    >
+    <Drawer onClickOutside={handleClose} onClose={handleClose} open={isOpen} title={t('doc.document-history')}>
       {isLoading ? (
         <Loading />
       ) : (
@@ -135,71 +125,44 @@ const DrawerTimeline = ({
               return (
                 <Stack flexDirection="row" gap={4} key={i.timestamp}>
                   <VerticalLine>
-                    {isRequested(kind) || isSubmitted(kind) ? (
-                      <IcoUpload16 />
-                    ) : null}
+                    {isRequested(kind) || isSubmitted(kind) ? <IcoUpload16 /> : null}
                     {isAssigned(kind) ? <IcoUser16 /> : null}
                     {isRetracted(kind) ? <IcoClose16 /> : null}
                     {isReviewed(kind) ? <IcoPencil16 /> : null}
                   </VerticalLine>
                   <Stack flexDirection="column" flexGrow={1}>
-                    <Stack
-                      flexDirection="row"
-                      justifyContent="space-between"
-                      paddingBottom={isReviewed(kind) ? 2 : 6}
-                    >
+                    <Stack flexDirection="row" justifyContent="space-between" paddingBottom={isReviewed(kind) ? 2 : 6}>
                       <DivWithRightPadding>
                         {actorName ? (
                           <>
                             {!isAssigned(kind) ? (
-                              <Text
-                                tag="strong"
-                                variant="label-3"
-                                color="primary"
-                                display="inline-block"
-                              >
+                              <Text tag="strong" variant="label-3" color="primary" display="inline-block">
                                 {actorName}&nbsp;
                               </Text>
                             ) : null}
-                            {isOrgRequired(kind) ? (
-                              <From span={t('from')} strong={actorOrg} />
-                            ) : null}
+                            {isOrgRequired(kind) ? <From span={t('from')} strong={actorOrg} /> : null}
                             <Text tag="span" variant="body-3" color="tertiary">
                               {getPersonalAction(t, kind)}
                             </Text>
                           </>
                         ) : null}
                         {isSubmitted(kind) ? (
-                          <LinkButton
-                            variant="label-3"
-                            onClick={() =>
-                              onViewSubmissionClick(docId, submissionId(i))
-                            }
-                          >
+                          <LinkButton variant="label-3" onClick={() => onViewSubmissionClick(docId, submissionId(i))}>
                             {t('doc.view-submission')}
                           </LinkButton>
                         ) : null}
                         <Text tag="strong" variant="label-3" color="primary">
                           {isRequested(kind) && docName ? `${docName} ` : ''}
-                          {isAssigned(kind)
-                            ? `${getEndName(i) || t('no-assignee')} `
-                            : ''}
+                          {isAssigned(kind) ? `${getEndName(i) || t('no-assignee')} ` : ''}
                         </Text>
-                        {isAssigned(kind) ? (
-                          <From span={t('from')} strong={assignedToOrg(i)} />
-                        ) : null}
+                        {isAssigned(kind) ? <From span={t('from')} strong={assignedToOrg(i)} /> : null}
                         {!actorName ? (
                           <Text tag="span" variant="body-3" color="tertiary">
                             {getNonPersonal(t, kind)}
                           </Text>
                         ) : null}
                       </DivWithRightPadding>
-                      <Text
-                        tag="span"
-                        variant="body-4"
-                        color="tertiary"
-                        flexShrink={0}
-                      >
+                      <Text tag="span" variant="body-4" color="tertiary" flexShrink={0}>
                         {dateFormatter(lang, i.timestamp)}
                       </Text>
                     </Stack>
@@ -212,14 +175,8 @@ const DrawerTimeline = ({
                         >
                           ·
                         </TextWithSideMargin>
-                        <Text
-                          tag="span"
-                          variant="body-3"
-                          color={isRejected(decision(i)) ? 'error' : 'success'}
-                        >
-                          {isRejected(decision(i))
-                            ? t('doc.rejected')
-                            : t('doc.accepted')}
+                        <Text tag="span" variant="body-3" color={isRejected(decision(i)) ? 'error' : 'success'}>
+                          {isRejected(decision(i)) ? t('doc.rejected') : t('doc.accepted')}
                         </Text>
                         {note(i) ? (
                           <TextWithPadding
@@ -280,12 +237,7 @@ const From = ({
       <Text tag="span" variant="body-3" color="tertiary" display="inline-block">
         {span}&nbsp;
       </Text>
-      <Text
-        tag="strong"
-        variant="label-3"
-        color="primary"
-        display="inline-block"
-      >
+      <Text tag="strong" variant="label-3" color="primary" display="inline-block">
         {strong}&nbsp;
       </Text>
     </>

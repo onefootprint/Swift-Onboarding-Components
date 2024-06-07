@@ -19,9 +19,7 @@ const Demo = () => {
         <title>Footprint Demo</title>
       </Head>
       <Container>
-        <Inner>
-          {showConfirmation ? <Success /> : <Form onSuccess={handleSuccess} />}
-        </Inner>
+        <Inner>{showConfirmation ? <Success /> : <Form onSuccess={handleSuccess} />}</Inner>
       </Container>
     </>
   );

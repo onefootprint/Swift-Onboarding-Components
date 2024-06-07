@@ -15,14 +15,7 @@ type MultiSectionProps = {
   testID?: string;
 };
 
-const MultiSection = ({
-  title,
-  editLabel,
-  onEdit,
-  sections,
-  IconComponent,
-  testID,
-}: MultiSectionProps) => (
+const MultiSection = ({ title, editLabel, onEdit, sections, IconComponent, testID }: MultiSectionProps) => (
   <Container data-testid={testID}>
     <Header>
       <TitleContainer>
@@ -36,12 +29,7 @@ const MultiSection = ({
     <Sections>
       {sections.map((section: SectionProps, index: number) => (
         <React.Fragment key={section.title}>
-          <Section
-            actions={section.actions}
-            key={section.title}
-            title={section.title}
-            content={section.content}
-          />
+          <Section actions={section.actions} key={section.title} title={section.title} content={section.content} />
           {index !== sections.length - 1 && <Divider />}
         </React.Fragment>
       ))}

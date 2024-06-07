@@ -23,15 +23,7 @@ const getIconColor = (disabled: boolean | undefined, selected: boolean) => {
   return selected ? 'quinary' : 'primary';
 };
 
-const Content = ({
-  size,
-  selected,
-  disabled,
-  IconComponent,
-  title,
-  description,
-  onClick,
-}: ContentProps) => {
+const Content = ({ size, selected, disabled, IconComponent, title, description, onClick }: ContentProps) => {
   const optionRef = useRef(null);
   const hovered = useHover(optionRef);
 
@@ -46,35 +38,16 @@ const Content = ({
       ref={optionRef}
       type="button"
     >
-      <Stack
-        padding={size === 'compact' ? 4 : 5}
-        gap={4}
-        alignItems="center"
-        justify="left"
-      >
-        <IconContainer
-          $disabled={disabled}
-          $hovered={hovered}
-          $selected={selected}
-          $size={size}
-        >
+      <Stack padding={size === 'compact' ? 4 : 5} gap={4} alignItems="center" justify="left">
+        <IconContainer $disabled={disabled} $hovered={hovered} $selected={selected} $size={size}>
           <IconComponent color={getIconColor(disabled, selected)} />
         </IconContainer>
         <OptionLabel>
-          <Title
-            $disabled={disabled}
-            $hovered={hovered}
-            $selected={selected}
-            $size={size}
-          >
+          <Title $disabled={disabled} $hovered={hovered} $selected={selected} $size={size}>
             {title}
           </Title>
           {size === 'default' && (
-            <Subtitle
-              $selected={selected}
-              $hovered={hovered}
-              $disabled={disabled}
-            >
+            <Subtitle $selected={selected} $hovered={hovered} $disabled={disabled}>
               {description}
             </Subtitle>
           )}
@@ -108,18 +81,22 @@ const Container = styled.button<{
         cursor: pointer;
         pointer-events: auto;
 
-        ${$selected &&
-        css`
+        ${
+          $selected &&
+          css`
           background-color: ${radioSelect.selected.bg};
           border-color: ${radioSelect.selected.borderColor};
-        `}
+        `
+        }
 
-        ${$hovered &&
-        !$selected &&
-        css`
+        ${
+          $hovered &&
+          !$selected &&
+          css`
           background-color: ${radioSelect.hover.default.bg};
           border-color: ${radioSelect.hover.default.borderColor};
-        `}
+        `
+        }
 
       &:focus {
           border-color: ${radioSelect.selected.borderColor};
@@ -149,27 +126,31 @@ const Title = styled.div<{
     } = theme;
 
     return css`
-      ${$size === 'compact'
-        ? createFontStyles('label-3')
-        : createFontStyles('label-2')};
+      ${$size === 'compact' ? createFontStyles('label-3') : createFontStyles('label-2')};
 
       color: ${radioSelect.color};
 
-      ${$selected &&
-      css`
+      ${
+        $selected &&
+        css`
         color: ${radioSelect.selected.color};
-      `};
+      `
+      };
 
-      ${!$selected &&
-      $hovered &&
-      css`
+      ${
+        !$selected &&
+        $hovered &&
+        css`
         color: ${radioSelect.hover.default.color};
-      `};
+      `
+      };
 
-      ${$disabled &&
-      css`
+      ${
+        $disabled &&
+        css`
         color: ${radioSelect.disabled.color};
-      `};
+      `
+      };
     `;
   }}
 `;
@@ -188,21 +169,27 @@ const Subtitle = styled.p<{
       ${createFontStyles('body-4')}
       color: ${radioSelect.color};
 
-      ${$selected &&
-      css`
+      ${
+        $selected &&
+        css`
         color: ${radioSelect.color};
-      `};
+      `
+      };
 
-      ${!$selected &&
-      $hovered &&
-      css`
+      ${
+        !$selected &&
+        $hovered &&
+        css`
         color: ${radioSelect.hover.default.color};
-      `};
+      `
+      };
 
-      ${$disabled &&
-      css`
+      ${
+        $disabled &&
+        css`
         color: ${radioSelect.disabled.color};
-      `};
+      `
+      };
     `;
   }}
 `;
@@ -226,20 +213,26 @@ const IconContainer = styled(Stack)<{
       margin-top: ${$size === 'compact' ? 0 : theme.spacing[1]};
       background-color: ${radioSelect.components.icon.bg};
 
-      ${$hovered &&
-      css`
+      ${
+        $hovered &&
+        css`
         background-color: ${radioSelect.components.icon.hover.bg};
-      `}
+      `
+      }
 
-      ${$selected &&
-      css`
+      ${
+        $selected &&
+        css`
         background-color: ${radioSelect.components.icon.selected.bg};
-      `}
+      `
+      }
 
-      ${$disabled &&
-      css`
+      ${
+        $disabled &&
+        css`
         background-color: ${radioSelect.components.icon.disabled.bg};
-      `}
+      `
+      }
     `;
   }}
 `;

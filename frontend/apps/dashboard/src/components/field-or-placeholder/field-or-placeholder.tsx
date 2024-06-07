@@ -1,10 +1,5 @@
 import type { VaultValue } from '@onefootprint/types';
-import {
-  isVaultDataDocument,
-  isVaultDataEmpty,
-  isVaultDataEncrypted,
-  isVaultDataText,
-} from '@onefootprint/types';
+import { isVaultDataDocument, isVaultDataEmpty, isVaultDataEncrypted, isVaultDataText } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import { LinkButton, Text } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';

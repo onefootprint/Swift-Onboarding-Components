@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoIdFront16 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoIdFront16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -31,31 +26,9 @@ const IcoIdFront16 = ({
           strokeWidth={1.3}
           strokeLinecap="round"
         />
-        <rect
-          x={9.857}
-          y={9.857}
-          width={2.476}
-          height={1}
-          rx={0.5}
-          fill={theme.color[color]}
-        />
-        <rect
-          x={8.206}
-          y={11.508}
-          width={4.127}
-          height={1}
-          rx={0.5}
-          fill={theme.color[color]}
-        />
-        <rect
-          x={1.5}
-          y={1.5}
-          width={13}
-          height={13}
-          rx={2}
-          stroke={theme.color[color]}
-          strokeWidth={1.5}
-        />
+        <rect x={9.857} y={9.857} width={2.476} height={1} rx={0.5} fill={theme.color[color]} />
+        <rect x={8.206} y={11.508} width={4.127} height={1} rx={0.5} fill={theme.color[color]} />
+        <rect x={1.5} y={1.5} width={13} height={13} rx={2} stroke={theme.color[color]} strokeWidth={1.5} />
       </g>
       <defs>
         <clipPath id="prefix__a">

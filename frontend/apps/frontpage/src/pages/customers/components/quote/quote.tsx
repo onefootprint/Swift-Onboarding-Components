@@ -1,4 +1,4 @@
-import { createFontStyles, media, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -14,12 +14,7 @@ const Quote = ({ children, author, role }: QuoteProps) => (
     <blockquote>{children}</blockquote>
     <SignatureContainer>
       <LogoContainer flex={1}>
-        <Image
-          src="/customers-logos/bloom.png"
-          alt="Bloom"
-          height={32}
-          width={110}
-        />
+        <Image src="/customers-logos/bloom.png" alt="Bloom" height={32} width={110} />
       </LogoContainer>
       <Divider />
       <Stack direction="column" align="start" flex={1}>

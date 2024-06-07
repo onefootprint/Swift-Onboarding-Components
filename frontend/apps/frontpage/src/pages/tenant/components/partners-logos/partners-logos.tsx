@@ -15,11 +15,7 @@ const PartnersLogos = ({ tenantName, tenantLogoUrl }: PartnersLogosProps) => (
     </Blur>
     <IcoHeart24 className="icon" />
     <Blur blurColor="#dfd6ff">
-      <Avatar
-        name="Footprint"
-        src="/footprint-logos/isotype.png"
-        size="xlarge"
-      />
+      <Avatar name="Footprint" src="/footprint-logos/isotype.png" size="xlarge" />
     </Blur>
   </LogosContainer>
 );

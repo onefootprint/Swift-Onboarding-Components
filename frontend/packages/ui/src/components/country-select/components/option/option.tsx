@@ -4,10 +4,7 @@ import Highlighter from 'react-highlight-words';
 import type { CommonPropsAndClassName, GroupBase } from 'react-select';
 import styled, { css, useTheme } from 'styled-components';
 
-import {
-  createFontStyles,
-  createOverlayBackground,
-} from '../../../../utils/mixins';
+import { createFontStyles, createOverlayBackground } from '../../../../utils/mixins';
 import Flag from '../../../flag';
 import type { CountrySelectOption } from '../../country-select.types';
 
@@ -23,11 +20,7 @@ export interface OptionProps<
   isSelected: boolean;
 }
 
-const Option = <
-  Option,
-  IsMulti extends boolean,
-  Group extends GroupBase<Option>,
->({
+const Option = <Option, IsMulti extends boolean, Group extends GroupBase<Option>>({
   innerRef,
   isFocused,
   isSelected,
@@ -94,10 +87,12 @@ const OptionContainer = styled.div<{
     width: 100%;
     height: 100%;
 
-    ${highlighted &&
-    css`
+    ${
+      highlighted &&
+      css`
       ${createOverlayBackground('darken-1', 'primary')};
-    `}
+    `
+    }
   `}
 `;
 

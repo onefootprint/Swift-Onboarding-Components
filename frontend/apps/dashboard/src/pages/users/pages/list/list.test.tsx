@@ -1,19 +1,9 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-  within,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor, within } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
 import List from './list';
-import {
-  withEntities,
-  withEntitiesError,
-  withOnboardingConfigs,
-} from './list.test.config';
+import { withEntities, withEntitiesError, withOnboardingConfigs } from './list.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 

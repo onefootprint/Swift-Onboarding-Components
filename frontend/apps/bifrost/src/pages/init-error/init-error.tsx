@@ -8,10 +8,7 @@ const InitError = () => {
   return (
     <>
       <NavigationHeader leftButton={{ variant: 'close' }} />
-      <HeaderTitle
-        title={t('invalid-config-title')}
-        subtitle={t('invalid-config-description')}
-      />
+      <HeaderTitle title={t('invalid-config-title')} subtitle={t('invalid-config-description')} />
     </>
   );
 };

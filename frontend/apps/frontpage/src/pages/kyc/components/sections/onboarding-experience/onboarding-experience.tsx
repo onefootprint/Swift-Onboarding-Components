@@ -12,9 +12,7 @@ const OnboardingExperience = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.kyc.onboarding-experience',
   });
-  const bulletPointContent = bulletPointKets.map(key =>
-    t(`bullets.${key}` as ParseKeys<'common'>),
-  );
+  const bulletPointContent = bulletPointKets.map(key => t(`bullets.${key}` as ParseKeys<'common'>));
   return (
     <Section>
       <SectionCore

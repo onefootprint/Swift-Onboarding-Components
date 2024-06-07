@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoBankCheck40 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoBankCheck40 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -22,54 +17,12 @@ const IcoBankCheck40 = ({
       role="img"
       data-colored={false}
     >
-      <rect
-        x={7}
-        y={15.4}
-        width={20}
-        height={2.4}
-        rx={1.2}
-        fill={theme.color[color]}
-      />
-      <rect
-        x={7}
-        y={11}
-        width={14}
-        height={2.4}
-        rx={1.2}
-        fill={theme.color[color]}
-      />
-      <rect
-        x={7}
-        y={27.5}
-        width={3}
-        height={2}
-        rx={1}
-        fill={theme.color[color]}
-      />
-      <rect
-        x={11}
-        y={27.5}
-        width={3}
-        height={2}
-        rx={1}
-        fill={theme.color[color]}
-      />
-      <rect
-        x={15}
-        y={27.5}
-        width={3}
-        height={2}
-        rx={1}
-        fill={theme.color[color]}
-      />
-      <rect
-        x={19}
-        y={27.5}
-        width={3}
-        height={2}
-        rx={1}
-        fill={theme.color[color]}
-      />
+      <rect x={7} y={15.4} width={20} height={2.4} rx={1.2} fill={theme.color[color]} />
+      <rect x={7} y={11} width={14} height={2.4} rx={1.2} fill={theme.color[color]} />
+      <rect x={7} y={27.5} width={3} height={2} rx={1} fill={theme.color[color]} />
+      <rect x={11} y={27.5} width={3} height={2} rx={1} fill={theme.color[color]} />
+      <rect x={15} y={27.5} width={3} height={2} rx={1} fill={theme.color[color]} />
+      <rect x={19} y={27.5} width={3} height={2} rx={1} fill={theme.color[color]} />
       <rect
         width={36}
         height={28}

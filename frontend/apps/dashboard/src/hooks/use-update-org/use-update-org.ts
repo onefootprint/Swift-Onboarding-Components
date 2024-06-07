@@ -5,10 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updateOrgRequest = async (
-  authHeaders: AuthHeaders,
-  payload: UpdateOrgRequest,
-) => {
+const updateOrgRequest = async (authHeaders: AuthHeaders, payload: UpdateOrgRequest) => {
   const { data } = await request<UpdateOrgResponse>({
     method: 'PATCH',
     url: '/org',
@@ -25,8 +22,7 @@ const useUpdateOrg = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateOrgRequest) =>
-      updateOrgRequest(session.authHeaders, payload),
+    mutationFn: (payload: UpdateOrgRequest) => updateOrgRequest(session.authHeaders, payload),
     onError: showErrorToast,
     onSuccess: (response: UpdateOrgResponse) => {
       queryClient.invalidateQueries(['org']);

@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   try {
     const obConfig = await getOnboardingConfig({ key: query.ob_key as string });
     return { props: { obConfig } };
-  } catch (error) {
+  } catch (_e) {
     return { notFound: true };
   }
 };

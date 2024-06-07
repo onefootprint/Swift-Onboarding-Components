@@ -1,7 +1,7 @@
 import {
+  MockDate,
   createUseRouterSpy,
   customRender,
-  MockDate,
   screen,
   userEvent,
   waitFor,
@@ -15,11 +15,11 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Roles from './roles';
 import {
+  roleToEdit,
+  roleWithoutActiveUsers,
   rolesCreatedAtFixture,
   rolesFixture,
   rolesScopesFixture,
-  roleToEdit,
-  roleWithoutActiveUsers,
   withCreateRole,
   withCreateRoleError,
   withDisableRole,
@@ -167,10 +167,7 @@ describe('<Roles />', () => {
           withCreateRole({
             id: 'Role_aExxJ6XgSBpvqIJ2VcHH6X',
             name: 'Customer Support',
-            scopes: [
-              { kind: RoleScopeKind.read },
-              { kind: RoleScopeKind.apiKeys },
-            ],
+            scopes: [{ kind: RoleScopeKind.read }, { kind: RoleScopeKind.apiKeys }],
             isImmutable: false,
             createdAt: '2022-09-19T16:24:35.367322Z',
             numActiveUsers: 0,
@@ -185,10 +182,7 @@ describe('<Roles />', () => {
             {
               id: 'Role_aExxJ6XgSBpvqIJ2VcHH6X',
               name: 'Customer Support',
-              scopes: [
-                { kind: RoleScopeKind.read },
-                { kind: RoleScopeKind.apiKeys },
-              ],
+              scopes: [{ kind: RoleScopeKind.read }, { kind: RoleScopeKind.apiKeys }],
               isImmutable: false,
               createdAt: '2022-09-19T16:24:35.367322Z',
               numActiveUsers: 0,
@@ -220,9 +214,7 @@ describe('<Roles />', () => {
           });
           await userEvent.click(decryptField);
 
-          const attributesSelect = screen.getByLabelText(
-            'Permissible attributes',
-          );
+          const attributesSelect = screen.getByLabelText('Permissible attributes');
           await userEvent.click(attributesSelect);
 
           const fullNameOption = screen.getByText('Full name');
@@ -234,9 +226,7 @@ describe('<Roles />', () => {
           await userEvent.click(submitButton);
 
           await waitFor(() => {
-            const confirmationMessage = screen.getByText(
-              'Role Customer Support was created successfully.',
-            );
+            const confirmationMessage = screen.getByText('Role Customer Support was created successfully.');
             expect(confirmationMessage).toBeInTheDocument();
           });
 
@@ -294,15 +284,9 @@ describe('<Roles />', () => {
     describe('when updating a role', () => {
       const updatedRole: Role = {
         ...roleToEdit,
-        scopes: [
-          { kind: RoleScopeKind.read },
-          { kind: RoleScopeKind.apiKeys },
-          { kind: RoleScopeKind.manualReview },
-        ],
+        scopes: [{ kind: RoleScopeKind.read }, { kind: RoleScopeKind.apiKeys }, { kind: RoleScopeKind.manualReview }],
       };
-      const rolesWithoutUpdatedRole = rolesFixture.filter(
-        role => role.id !== roleToEdit.id,
-      );
+      const rolesWithoutUpdatedRole = rolesFixture.filter(role => role.id !== roleToEdit.id);
 
       describe('when the request to update a role succeeds', () => {
         beforeEach(() => {
@@ -342,9 +326,7 @@ describe('<Roles />', () => {
           await waitForElementToBeRemoved(dialog);
 
           await waitFor(() => {
-            const confirmationMessage = screen.getByText(
-              `Role ${roleToEdit.name} was updated successfully.`,
-            );
+            const confirmationMessage = screen.getByText(`Role ${roleToEdit.name} was updated successfully.`);
             expect(confirmationMessage).toBeInTheDocument();
           });
         });

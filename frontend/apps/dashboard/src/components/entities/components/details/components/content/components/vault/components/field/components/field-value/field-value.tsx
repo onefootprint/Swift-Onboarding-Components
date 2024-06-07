@@ -1,9 +1,5 @@
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
-import {
-  IdDI,
-  isVaultDataDecrypted,
-  isVaultDataEmpty,
-} from '@onefootprint/types';
+import { IdDI, isVaultDataDecrypted, isVaultDataEmpty } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import { Text } from '@onefootprint/ui';
 import React from 'react';
@@ -26,32 +22,13 @@ import VisaKindSelect from '../visa-kind-select';
 import ZipInput from '../zip-input';
 
 export type FieldValueProps = {
-  field: Record<
-    string,
-    | boolean
-    | string
-    | DataIdentifier
-    | VaultValue
-    | Transforms
-    | null
-    | undefined
-  >;
-  renderValue?: (
-    value: VaultValue,
-    isValueDecrypted: boolean,
-  ) => React.ReactNode;
+  field: Record<string, boolean | string | DataIdentifier | VaultValue | Transforms | null | undefined>;
+  renderValue?: (value: VaultValue, isValueDecrypted: boolean) => React.ReactNode;
 };
 
 const FieldValue = ({ field, renderValue }: FieldValueProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
-  const {
-    value,
-    showEditView,
-    canEditField,
-    isDecrypted,
-    name: di,
-    transforms,
-  } = field;
+  const { value, showEditView, canEditField, isDecrypted, name: di, transforms } = field;
   const name = di as string;
 
   if (showEditView) {
@@ -65,11 +42,7 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
     if (!isDecrypted && !isVaultDataEmpty(value)) {
       return <EncryptedInput />;
     }
-    if (
-      name === IdDI.firstName ||
-      name === IdDI.lastName ||
-      name === IdDI.middleName
-    ) {
+    if (name === IdDI.firstName || name === IdDI.lastName || name === IdDI.middleName) {
       return <NameInput fieldName={name} fieldValue={value} />;
     }
     if (name === IdDI.dob) {
@@ -112,9 +85,7 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
   }
 
   if (isVaultDataEmpty(value) || !renderValue) {
-    return (
-      <FieldOrPlaceholder data={value} transforms={transforms as Transforms} />
-    );
+    return <FieldOrPlaceholder data={value} transforms={transforms as Transforms} />;
   }
 
   return renderValue(value, isVaultDataDecrypted(value)) as JSX.Element;

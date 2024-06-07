@@ -6,10 +6,7 @@ import generateEventEmitter from '../utils/generate-event-emitter';
 
 const { propsReceived, formSaved, started } = FootprintPrivateEvent;
 
-const getSpecificEvent = (
-  event: string,
-  childRef: CustomChildAPI | null,
-): string => {
+const getSpecificEvent = (event: string, childRef: CustomChildAPI | null): string => {
   const sdkInitId = childRef?.model?.initId;
   return sdkInitId?.length ? `${sdkInitId}:${event}` : event;
 };
@@ -30,8 +27,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
 
       const crossContextModel = {
         [formSaved]: () => eventEmitter.emit(formSaved),
-        [propsReceived]: (data?: unknown) =>
-          eventEmitter.emit(propsReceived, data),
+        [propsReceived]: (data?: unknown) => eventEmitter.emit(propsReceived, data),
       };
 
       try {
@@ -51,9 +47,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
       const specificEvent = getSpecificEvent(event, postmateChildApiRef);
       return postmateChildApiRef
         ? postmateChildApiRef.emit(specificEvent, data)
-        : console.warn(
-            `Footprint.js must be initialized in order to dispatch the event "${event}"`,
-          );
+        : console.warn(`Footprint.js must be initialized in order to dispatch the event "${event}"`);
     },
   };
 };

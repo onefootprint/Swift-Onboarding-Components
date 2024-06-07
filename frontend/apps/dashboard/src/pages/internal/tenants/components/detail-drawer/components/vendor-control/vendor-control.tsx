@@ -18,9 +18,7 @@ type BillingProfileProps = {
 
 const UPDATE_TVC_FORM_ID = 'update-tvc-form';
 
-const getDefaultValues = (
-  tvc?: TenantVendorControl,
-): TenantVendorControlFormData => ({
+const getDefaultValues = (tvc?: TenantVendorControl): TenantVendorControlFormData => ({
   idologyEnabled: tvc?.idologyEnabled || false,
   experianEnabled: tvc?.experianEnabled || false,
   lexisEnabled: tvc?.lexisEnabled || false,
@@ -37,8 +35,7 @@ const VendorControl = ({ tenant }: BillingProfileProps) => {
   });
   const { register, reset, handleSubmit } = editMethods;
 
-  const checkbox = (value: boolean | undefined) =>
-    value ? <IcoCheck24 /> : <IcoCloseSmall24 />;
+  const checkbox = (value: boolean | undefined) => (value ? <IcoCheck24 /> : <IcoCloseSmall24 />);
   const FIELDS = [
     {
       title: 'Idology Enabled',
@@ -58,19 +55,12 @@ const VendorControl = ({ tenant }: BillingProfileProps) => {
     {
       title: 'Experian Subscriber Code',
       content: tvc?.experianSubscriberCode || '-',
-      editModeContent: (
-        <TextInput
-          placeholder="1234567"
-          {...register('experianSubscriberCode')}
-        />
-      ),
+      editModeContent: <TextInput placeholder="1234567" {...register('experianSubscriberCode')} />,
     },
     {
       title: 'Middesk API key',
       content: tvc?.middeskApiKeyExists ? <EncryptedCell /> : '-',
-      editModeContent: (
-        <TextInput placeholder="key" {...register('middeskApiKey')} />
-      ),
+      editModeContent: <TextInput placeholder="key" {...register('middeskApiKey')} />,
     },
   ];
 
@@ -123,9 +113,7 @@ const VendorControl = ({ tenant }: BillingProfileProps) => {
           <Stack direction="column" gap={5}>
             {FIELDS.map(f => (
               <Field label={f.title} key={f.title}>
-                {!isEditing || !f.editModeContent
-                  ? f.content
-                  : f.editModeContent}
+                {!isEditing || !f.editModeContent ? f.content : f.editModeContent}
               </Field>
             ))}
           </Stack>

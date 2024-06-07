@@ -20,28 +20,17 @@ const RuleList = ({ rules, stepUpAction }: RuleListProps) => {
   const actionName = kebabCase(stepUpAction);
 
   return (
-    <Stack
-      direction="column"
-      gap={5}
-      role="group"
-      aria-label={t(`step-up.${actionName}` as ParseKeys<'common'>)}
-    >
+    <Stack direction="column" gap={5} role="group" aria-label={t(`step-up.${actionName}` as ParseKeys<'common'>)}>
       {stepUpAction && (
         <Stack align="center" gap={3}>
           <IcoFileText16 />
-          <Text variant="label-4">
-            {t(`step-up.${actionName}` as ParseKeys<'common'>)}
-          </Text>
+          <Text variant="label-4">{t(`step-up.${actionName}` as ParseKeys<'common'>)}</Text>
         </Stack>
       )}
       {rules.length ? (
         <List>
           {rules.map(rule => (
-            <RulesActionRow
-              key={JSON.stringify(rule)}
-              isEditing={false}
-              rule={rule}
-            />
+            <RulesActionRow key={JSON.stringify(rule)} isEditing={false} rule={rule} />
           ))}
         </List>
       ) : (

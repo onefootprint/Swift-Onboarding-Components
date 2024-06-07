@@ -1,11 +1,5 @@
 import type { Document, EntityVault } from '@onefootprint/types';
-import {
-  DocumentDI,
-  IdDocImageTypes,
-  IdDocStatus,
-  SupportedIdDocTypes,
-  UploadSource,
-} from '@onefootprint/types';
+import { DocumentDI, IdDocImageTypes, IdDocStatus, SupportedIdDocTypes, UploadSource } from '@onefootprint/types';
 
 export const entityVaultWithJustIDCardDIs: EntityVault = {
   [DocumentDI.latestIdCardFront]: '',

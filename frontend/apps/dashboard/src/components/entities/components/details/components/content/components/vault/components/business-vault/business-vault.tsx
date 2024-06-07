@@ -14,11 +14,7 @@ const BusinessVault = () => {
   const { basic, bos, address } = useFieldsets();
 
   return (
-    <Grid.Container
-      gap={5}
-      columns={['repeat(2, 1fr)']}
-      templateAreas={['basic address', 'bos address']}
-    >
+    <Grid.Container gap={5} columns={['repeat(2, 1fr)']} templateAreas={['basic address', 'bos address']}>
       <Basic>
         <Fieldset
           fields={basic.fields}

@@ -15,20 +15,7 @@ type FadeProps = {
 };
 
 const Fade = forwardRef<HTMLDivElement, FadeProps>(
-  (
-    {
-      'aria-label': ariaLabel,
-      children,
-      className,
-      from,
-      isVisible,
-      role,
-      testID,
-      to,
-      onClick,
-    },
-    ref,
-  ) => {
+  ({ 'aria-label': ariaLabel, children, className, from, isVisible, role, testID, to, onClick }, ref) => {
     let initialX = 0;
     let initialY = 0;
     let finalX = 0;

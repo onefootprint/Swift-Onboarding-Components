@@ -40,18 +40,11 @@ const createIcoComponent = async icoPath => {
         role: 'img',
         'data-colored': isColored,
       },
-      plugins: [
-        '@svgr/plugin-svgo',
-        '@svgr/plugin-jsx',
-        '@svgr/plugin-prettier',
-      ],
+      plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx', '@svgr/plugin-prettier'],
     },
     { componentName },
   );
-  fs.promises.writeFile(
-    path.join(OUTPUT_PATH, fileName.replace('.svg', '.tsx')),
-    SvgComponent,
-  );
+  fs.promises.writeFile(path.join(OUTPUT_PATH, fileName.replace('.svg', '.tsx')), SvgComponent);
 };
 
 const createTypesFile = async icoNames => {
@@ -60,14 +53,7 @@ const createTypesFile = async icoNames => {
     `/**
     * THIS IS AN AUTO-GENERATED FILE, DO NOT EDIT MANUALLY
     */
-    ${icoNames
-      .map(
-        icoName =>
-          `export { default as ${getComponentName(
-            icoName,
-          )}} from "./${icoName}";\n`,
-      )
-      .join('')}
+    ${icoNames.map(icoName => `export { default as ${getComponentName(icoName)}} from "./${icoName}";\n`).join('')}
     `,
   );
 };
@@ -75,8 +61,6 @@ const createTypesFile = async icoNames => {
 glob(INPUT_SVG_PATH, (err, icoPaths) => {
   if (err) throw Error('Icon generation error', err);
   icoPaths.forEach(createIcoComponent);
-  const svgNames = icoPaths.map(icoPath =>
-    getFileName(icoPath).replace('.svg', ''),
-  );
+  const svgNames = icoPaths.map(icoPath => getFileName(icoPath).replace('.svg', ''));
   createTypesFile(svgNames);
 });

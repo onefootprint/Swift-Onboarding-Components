@@ -11,10 +11,7 @@ type UploadComplianceLetterProps = {
   onChange: (files: File[]) => void;
 };
 
-const UploadComplianceLetter = ({
-  hasError,
-  onChange,
-}: UploadComplianceLetterProps) => {
+const UploadComplianceLetter = ({ hasError, onChange }: UploadComplianceLetterProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'investor-profile.pages.declarations.doc-upload',
   });

@@ -1,10 +1,5 @@
 import type { MotionValue } from 'framer-motion';
-import {
-  motion,
-  useAnimationControls,
-  useMotionValueEvent,
-  useTransform,
-} from 'framer-motion';
+import { motion, useAnimationControls, useMotionValueEvent, useTransform } from 'framer-motion';
 import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
@@ -34,12 +29,7 @@ const IllustrationConfidence = ({ scroll }: IllustrationConfidenceProps) => {
   });
   const opacity = useTransform(
     scroll,
-    [
-      VISIBLE_RANGE.initial,
-      VISIBLE_RANGE.maxInitial,
-      VISIBLE_RANGE.maxFinal,
-      VISIBLE_RANGE.final,
-    ],
+    [VISIBLE_RANGE.initial, VISIBLE_RANGE.maxInitial, VISIBLE_RANGE.maxFinal, VISIBLE_RANGE.final],
     ['0%', '100%', '100%', '0%'],
   );
 
@@ -76,20 +66,10 @@ const IllustrationConfidence = ({ scroll }: IllustrationConfidenceProps) => {
 
   return (
     <Container style={{ opacity }}>
-      <Squares
-        src="/kyc/sticky-rail/squares.svg"
-        height={700}
-        width={1500}
-        alt=""
-      />
+      <Squares src="/kyc/sticky-rail/squares.svg" height={700} width={1500} alt="" />
       <TagList>
         {tagKeys.map(({ key, icon: Icon, order }) => (
-          <motion.span
-            custom={order}
-            animate={controlsTags}
-            initial={{ opacity: 0 }}
-            key={key}
-          >
+          <motion.span custom={order} animate={controlsTags} initial={{ opacity: 0 }} key={key}>
             <Tag key={key} icon={Icon}>
               {t(key as ParseKeys<'common'>)}
             </Tag>

@@ -3,13 +3,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 const NavigationBar = () => (
-  <Container
-    direction="row"
-    align="center"
-    justify="flex-start"
-    gap={3}
-    padding={5}
-  >
+  <Container direction="row" align="center" justify="flex-start" gap={3} padding={5}>
     <Dot />
     <Dot />
     <Dot />

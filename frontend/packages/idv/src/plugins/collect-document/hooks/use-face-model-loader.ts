@@ -18,10 +18,7 @@ const useFaceModelLoader = ({ selfieRequired }: FaceModelLoaderType) => {
   useEffectOnce(() => {
     const loadModels = async () => {
       if (selfieRequired) {
-        Promise.all([
-          nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-          nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-        ])
+        Promise.all([nets.tinyFaceDetector.loadFromUri(MODEL_URL), nets.faceLandmark68Net.loadFromUri(MODEL_URL)])
           .then(() => {
             setModelsLoaded(true);
           })

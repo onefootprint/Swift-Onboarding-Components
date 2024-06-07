@@ -41,9 +41,7 @@ const Row = ({ member }: RowProps) => {
           member.role.name
         )}
       </Td>
-      <Td>
-        {!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}
-      </Td>
+      <Td>{!lastLoginAt && <Badge variant="warning">{t('pending-invite')}</Badge>}</Td>
       <Td>{shouldShowActions && <Actions member={member} />}</Td>
     </>
   );

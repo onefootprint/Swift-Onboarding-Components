@@ -19,13 +19,7 @@ export enum PrivateEvent {
   relayFromComponents = 'relayFromComponents',
 }
 
-export type CallbackKeys =
-  | 'onAuth'
-  | 'onCancel'
-  | 'onClick'
-  | 'onClose'
-  | 'onComplete'
-  | 'onRelayToComponents';
+export type CallbackKeys = 'onAuth' | 'onCancel' | 'onClick' | 'onClose' | 'onComplete' | 'onRelayToComponents';
 
 export type ExtractOnProps<T> = {
   [K in keyof T as K extends `on${string}` ? K : never]: Function;

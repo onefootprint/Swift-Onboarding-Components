@@ -91,11 +91,7 @@ export type ListTimelineEvent = {
     member: string;
   };
   insightEvent: InsightEvent;
-  detail:
-    | ListCreatedEvent
-    | ListUpdatedEvent
-    | ListEntryCreatedEvent
-    | ListEntryDeletedEvent;
+  detail: ListCreatedEvent | ListUpdatedEvent | ListEntryCreatedEvent | ListEntryDeletedEvent;
 };
 
 export type ListTimeline = ListTimelineEvent[];

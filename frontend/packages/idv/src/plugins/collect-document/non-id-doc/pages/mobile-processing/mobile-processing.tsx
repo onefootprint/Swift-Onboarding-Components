@@ -1,9 +1,6 @@
 import { useRequestError } from '@onefootprint/request';
 import type { ProcessDocResponse } from '@onefootprint/types';
-import {
-  IdDocImageProcessingError,
-  IdDocImageTypes,
-} from '@onefootprint/types';
+import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
 import { Box, Text } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,14 +30,11 @@ const MobileProcessing = () => {
   const submitDocMutation = useSubmitDoc();
   const processDocMutation = useProcessDoc();
   const [mode, setMode] = useState<'loading' | 'success'>('loading');
-  const [showSlowConnectionMessage, setShowSlowConnectionMessage] =
-    useState(false);
+  const [showSlowConnectionMessage, setShowSlowConnectionMessage] = useState(false);
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
-  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  ); // we only time the doc upload
+  const slowConnectionTimer = useRef<ReturnType<typeof setTimeout> | null>(null); // we only time the doc upload
 
   const { document, authToken, id, config } = state.context;
   const { kind: documentRequestKind } = config;
@@ -52,9 +46,7 @@ const MobileProcessing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      logWarn(
-        `Image upload retry limit exceeded. doc: ${documentRequestKind}, doc id: ${id}`,
-      );
+      logWarn(`Image upload retry limit exceeded. doc: ${documentRequestKind}, doc id: ${id}`);
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === IdDocImageTypes.front) {
       send({
@@ -88,10 +80,7 @@ const MobileProcessing = () => {
 
   const handleProcessDocError = (err: unknown) => {
     handleError(err);
-    logError(
-      `Error while processing image ${id}: ${getErrorMessage(err)}`,
-      err,
-    );
+    logError(`Error while processing image ${id}: ${getErrorMessage(err)}`, err);
   };
 
   const handleSubmitDocError = (err: unknown) => {
@@ -138,9 +127,7 @@ const MobileProcessing = () => {
       setIsMissingRequirements(true);
       const error = `Mobile flow - id-doc image could not be processed due to missing requirements. Requirements - document: ${
         document ? 'OK' : 'undefined'
-      }, auth token: ${authToken ? 'OK' : 'undefined'}, id: ${
-        id ? 'OK' : 'undefined'
-      }`;
+      }, auth token: ${authToken ? 'OK' : 'undefined'}, id: ${id ? 'OK' : 'undefined'}`;
       logError(error);
       return;
     }
@@ -203,26 +190,12 @@ const MobileProcessing = () => {
     });
   };
 
-  if (retryLimitExceeded)
-    return (
-      <RetryLimitExceeded onRetryLimitExceeded={handleRetryLimitExceeded} />
-    );
+  if (retryLimitExceeded) return <RetryLimitExceeded onRetryLimitExceeded={handleRetryLimitExceeded} />;
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      height="100%"
-    >
+    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
       <IdDocAnimation
-        loadingComponent={
-          <Loading
-            step={step}
-            showSlowConnectionMessage={showSlowConnectionMessage}
-          />
-        }
+        loadingComponent={<Loading step={step} showSlowConnectionMessage={showSlowConnectionMessage} />}
         successComponent={<Success onComplete={handleSuccess} />}
         mode={mode}
         hasNextSide={false}

@@ -1,14 +1,7 @@
-import {
-  Button,
-  Container,
-  Divider,
-  media,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Button, Container, Divider, Stack, Text, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getInitialPosts, PostType } from 'src/utils/ghost';
+import { PostType, getInitialPosts } from 'src/utils/ghost';
 import type { PostDetails } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
@@ -38,19 +31,13 @@ const Changelog = ({ posts }: ChangelogProps) => {
 
   const RECAP_TAG = 'recap';
 
-  const regularPosts = posts.map(post =>
-    !post.tags.some(tag => tag.slug === RECAP_TAG) ? post : null,
-  );
+  const regularPosts = posts.map(post => (!post.tags.some(tag => tag.slug === RECAP_TAG) ? post : null));
 
   const truncatedRegularPosts = regularPosts.slice(0, postNumber);
 
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/changelog"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/changelog" />
       <Container>
         <HeroContainer>
           <Chip>{t('microtitle')}</Chip>
@@ -65,13 +52,7 @@ const Changelog = ({ posts }: ChangelogProps) => {
             <Timeline direction="column">
               {truncatedRegularPosts.map(
                 (post, index) =>
-                  post && (
-                    <Card
-                      post={post}
-                      hideLine={truncatedRegularPosts.length !== index + 1}
-                      key={post.uuid}
-                    />
-                  ),
+                  post && <Card post={post} hideLine={truncatedRegularPosts.length !== index + 1} key={post.uuid} />,
               )}
             </Timeline>
             <Divider variant="secondary" />

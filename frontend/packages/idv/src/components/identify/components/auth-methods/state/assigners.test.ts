@@ -1,10 +1,6 @@
 import { AuthMethodKind } from '@onefootprint/types';
 
-import {
-  assignDecryptedData,
-  assignUserDashboard,
-  assignVerifyToken,
-} from './assigners';
+import { assignDecryptedData, assignUserDashboard, assignVerifyToken } from './assigners';
 import type { AuthMethodsMachineContext as MachineContext } from './types';
 
 describe('should pass the entire payload', () => {
@@ -13,11 +9,7 @@ describe('should pass the entire payload', () => {
     const ctx = {} as MachineContext;
     const meta = {} as Meta;
 
-    const result = assignVerifyToken(
-      ctx,
-      { type: 'setVerifyToken', payload: 'token' },
-      meta,
-    );
+    const result = assignVerifyToken(ctx, { type: 'setVerifyToken', payload: 'token' }, meta);
 
     expect(result.verifyToken).toEqual('token');
     expect(ctx.verifyToken).toEqual('token');

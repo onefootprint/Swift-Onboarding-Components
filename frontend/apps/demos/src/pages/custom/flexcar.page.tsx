@@ -1,7 +1,5 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import footprint, {
-  FootprintVerifyButton,
-} from '@onefootprint/footprint-react';
+import footprint, { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { CodeBlock, CodeInline, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -113,8 +111,7 @@ const handleOpen = () => {
       showCompletionPage: true,
     },
     appearance: {
-      fontSrc:
-        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&display=swap',
+      fontSrc: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;800&display=swap',
       variables: {
         fontFamily:
           '"Inter", Arial, ui-sans-serif, system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji',
@@ -130,8 +127,7 @@ const handleOpen = () => {
         buttonPrimaryBg: '#1a0066',
         buttonPrimaryColor: '#FFFFFF',
         buttonPrimaryBorderColor: 'unset',
-        buttonElevation:
-          'rgba(10, 0, 41, 0.1) 0px 18px 50px, rgba(42, 0, 165, 0.06) 0px 8px 30px;',
+        buttonElevation: 'rgba(10, 0, 41, 0.1) 0px 18px 50px, rgba(42, 0, 165, 0.06) 0px 8px 30px;',
         buttonPrimaryHoverBg: '#27039e',
         buttonBorderRadius: '32px',
         buttonPrimaryActiveBg: '#27039e',
@@ -203,8 +199,7 @@ const Flexcar = () => (
           </Text>
           <span>
             <Text variant="body-2">
-              2. Grab the Onboarding Publishable Key, for example{' '}
-              <CodeInline>{publicKey}</CodeInline>.
+              2. Grab the Onboarding Publishable Key, for example <CodeInline>{publicKey}</CodeInline>.
             </Text>
           </span>
           <Text variant="body-2">3. Install Footprint dependencies:</Text>

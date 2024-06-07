@@ -1,9 +1,5 @@
 import { IcoFileText24 } from '@onefootprint/icons';
-import type {
-  DocumentDI,
-  EntityVault,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { DocumentDI, EntityVault, SupportedIdDocTypes } from '@onefootprint/types';
 import { RawJsonKinds } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
@@ -18,11 +14,7 @@ type RawJsonDataProps = {
   curpCompletedVersion?: string | null;
 };
 
-const getRawJsonData = ({
-  vault,
-  documentType,
-  curpCompletedVersion,
-}: RawJsonDataProps) => {
+const getRawJsonData = ({ vault, documentType, curpCompletedVersion }: RawJsonDataProps) => {
   const rawJsonKinds: RawJsonKinds[] = Object.values(RawJsonKinds);
   const rawJsonData: {
     rawJsonKind: RawJsonKinds;
@@ -31,8 +23,7 @@ const getRawJsonData = ({
   rawJsonKinds.forEach(kind => {
     let di = `document.${documentType}.${kind}` as DocumentDI;
     if (curpCompletedVersion) {
-      di =
-        `document.${documentType}.${kind}:${curpCompletedVersion}` as DocumentDI;
+      di = `document.${documentType}.${kind}:${curpCompletedVersion}` as DocumentDI;
     }
     if (typeof vault[di] === 'string') {
       rawJsonData.push({
@@ -44,11 +35,7 @@ const getRawJsonData = ({
   return rawJsonData;
 };
 
-const RawJsonData = ({
-  vault,
-  documentType,
-  curpCompletedVersion,
-}: RawJsonDataProps) => {
+const RawJsonData = ({ vault, documentType, curpCompletedVersion }: RawJsonDataProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document.drawer.raw-json-data',
   });

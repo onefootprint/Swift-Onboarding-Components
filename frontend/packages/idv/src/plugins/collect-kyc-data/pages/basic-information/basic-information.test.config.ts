@@ -1,11 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { CollectKycDataRequirement } from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  IdDI,
-  OnboardingConfigStatus,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 
 import type { KycData } from '../../utils/data-types';
 import type { InitMachineArgs } from '../../utils/state-machine/machine';
@@ -39,10 +34,7 @@ export const getInitialContext = (data: KycData): InitMachineArgs => ({
   requirement: {
     kind: OnboardingRequirementKind.collectKycData,
     isMet: false,
-    missingAttributes: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.dob,
-    ],
+    missingAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.dob],
     populatedAttributes: [],
     optionalAttributes: [],
   } as CollectKycDataRequirement,

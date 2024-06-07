@@ -31,13 +31,7 @@ const Tabs = ({ onChange, options, disabled }: TabsProps) => {
     <TabsRoot onValueChange={handleChange} defaultValue={firstOptionValue}>
       <Container data-is-disabled={disabled}>
         {options.map(({ label, value }) => (
-          <TabContainer
-            key={value}
-            position="relative"
-            marginBottom={2}
-            layoutRoot
-            layout
-          >
+          <TabContainer key={value} position="relative" marginBottom={2} layoutRoot layout>
             <Tab key={value} value={value}>
               {label}
             </Tab>

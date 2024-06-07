@@ -43,11 +43,7 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
           setDrawerOpen(false);
         }}
       >
-        <RuleSetResults
-          data={data}
-          errorMessage={errorMessage}
-          isLoading={isLoading}
-        />
+        <RuleSetResults data={data} errorMessage={errorMessage} isLoading={isLoading} />
       </Drawer>
     </>
   );

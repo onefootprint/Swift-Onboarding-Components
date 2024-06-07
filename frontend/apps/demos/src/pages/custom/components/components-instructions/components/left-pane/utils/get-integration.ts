@@ -1,5 +1,4 @@
-export const getReactIntegration =
-  () => `import '@onefootprint/footprint-js/dist/footprint-js.css';
+export const getReactIntegration = () => `import '@onefootprint/footprint-js/dist/footprint-js.css';
 import './app.css';
 import { appearance } from './config';
 import { FootprintForm } from '@onefootprint/footprint-react';

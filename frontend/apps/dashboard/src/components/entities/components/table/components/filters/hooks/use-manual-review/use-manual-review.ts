@@ -6,9 +6,7 @@ import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
 const getManualReview = async (authHeaders: AuthHeaders) => {
-  const { data: response } = await request<
-    PaginatedRequestResponse<GetEntitiesResponse>
-  >({
+  const { data: response } = await request<PaginatedRequestResponse<GetEntitiesResponse>>({
     method: 'POST',
     url: '/entities/search',
     headers: authHeaders,
@@ -23,11 +21,9 @@ const USE_MANUAL_REVIEW_FETCH_INTERVAL = 30000;
 const useManualReview = () => {
   const { authHeaders, isLive } = useSession();
 
-  return useQuery(
-    ['entities', 'user', 'manual-review', authHeaders, isLive],
-    () => getManualReview(authHeaders),
-    { refetchInterval: USE_MANUAL_REVIEW_FETCH_INTERVAL },
-  );
+  return useQuery(['entities', 'user', 'manual-review', authHeaders, isLive], () => getManualReview(authHeaders), {
+    refetchInterval: USE_MANUAL_REVIEW_FETCH_INTERVAL,
+  });
 };
 
 export default useManualReview;

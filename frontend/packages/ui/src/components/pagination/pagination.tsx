@@ -26,10 +26,7 @@ const Pagination = ({
   totalNumResults,
 }: PaginationProps) => {
   const lowerBoundShownResults = pageIndex * pageSize + 1;
-  const upperBoundShownResults = Math.min(
-    (pageIndex + 1) * pageSize,
-    totalNumResults,
-  );
+  const upperBoundShownResults = Math.min((pageIndex + 1) * pageSize, totalNumResults);
   const { t } = useTranslation('ui', {
     keyPrefix: 'components.pagination',
   });
@@ -47,18 +44,10 @@ const Pagination = ({
           </Text>
         </Stack>
         <ButtonContainer>
-          <Button
-            disabled={!hasPrevPage}
-            onClick={onPrevPage}
-            variant="secondary"
-          >
+          <Button disabled={!hasPrevPage} onClick={onPrevPage} variant="secondary">
             {t('previous')}
           </Button>
-          <Button
-            disabled={!hasNextPage}
-            onClick={onNextPage}
-            variant="secondary"
-          >
+          <Button disabled={!hasNextPage} onClick={onNextPage} variant="secondary">
             {t('next')}
           </Button>
         </ButtonContainer>

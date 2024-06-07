@@ -1,9 +1,5 @@
 import { isLogoutError } from '@onefootprint/request';
-import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
@@ -39,9 +35,7 @@ const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
     },
   });
 
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };
 
 export default ReactQueryProvider;

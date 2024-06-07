@@ -1,4 +1,4 @@
-import { Button, media, Stack, Text } from '@onefootprint/ui';
+import { Button, Stack, Text, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';
@@ -12,11 +12,7 @@ type ContactUsBannerProps = {
 
 const GET_FORM_URL = 'https://api.getform.io/v1/forms/pbygomeb';
 
-const ContactUsBanner: React.FC<ContactUsBannerProps> = ({
-  title,
-  subtitle,
-  cta,
-}) => {
+const ContactUsBanner: React.FC<ContactUsBannerProps> = ({ title, subtitle, cta }) => {
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const handleClick = (): void => {
     setShowDialog(true);
@@ -25,13 +21,7 @@ const ContactUsBanner: React.FC<ContactUsBannerProps> = ({
     setShowDialog(false);
   };
   return (
-    <ContactContainer
-      align="center"
-      direction="column"
-      marginBottom={10}
-      textAlign="center"
-      backgroundColor="primary"
-    >
+    <ContactContainer align="center" direction="column" marginBottom={10} textAlign="center" backgroundColor="primary">
       <Text variant="label-1" marginBottom={3}>
         {title}
       </Text>
@@ -39,11 +29,7 @@ const ContactUsBanner: React.FC<ContactUsBannerProps> = ({
         {subtitle}
       </Text>
       <Button onClick={handleClick}>{cta}</Button>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={handleClose}
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
     </ContactContainer>
   );
 };

@@ -8,12 +8,7 @@ import { SideNav, TopBar } from './components';
 
 const AppLayoutClient = ({ children }: React.PropsWithChildren) => (
   <Stack direction="column" height="100vh">
-    <Stack
-      data-testid="private-default-layout"
-      direction="column"
-      align="center"
-      justify="center"
-    >
+    <Stack data-testid="private-default-layout" direction="column" align="center" justify="center">
       <TopBar />
     </Stack>
     <Grid>

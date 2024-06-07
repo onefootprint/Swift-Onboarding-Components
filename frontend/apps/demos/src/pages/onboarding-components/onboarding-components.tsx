@@ -1,13 +1,5 @@
 import { Fp, useFootprint } from '@onefootprint/footprint-react';
-import {
-  Box,
-  Button,
-  Container,
-  Divider,
-  Stack,
-  Stepper,
-  Text,
-} from '@onefootprint/ui';
+import { Box, Button, Container, Divider, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
@@ -30,8 +22,7 @@ const steps = [
   },
 ];
 
-const publicKeyEnv =
-  process.env.NEXT_PUBLIC_TENANT_KEY || 'pb_test_B1Q1ubKxYEpx3uKdGaXLQ2';
+const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY || 'pb_test_B1Q1ubKxYEpx3uKdGaXLQ2';
 
 const Demo = () => {
   const [option, setOption] = useState(steps[0]);
@@ -55,12 +46,7 @@ const Demo = () => {
         <Header>Onboarding</Header>
         <Container>
           <Stack marginTop={7} gap={8}>
-            <Stepper
-              onChange={() => {}}
-              value={{ option }}
-              aria-label="Steps"
-              options={steps}
-            />
+            <Stepper onChange={() => undefined} value={{ option }} aria-label="Steps" options={steps} />
             <Box>
               {isIdentify && (
                 <Identify

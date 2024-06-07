@@ -6,15 +6,9 @@ import React from 'react';
 
 import type { DeviceInfo } from '../../../../hooks';
 import { isBiometric } from '../../../../utils';
-import type {
-  IdentifyContext,
-  IdentifyMachineContext,
-} from '../../state/types';
+import type { IdentifyContext, IdentifyMachineContext } from '../../state/types';
 import { IdentifyVariant } from '../../state/types';
-import {
-  getDisplayEmail,
-  getDisplayPhone,
-} from '../../utils/get-display-contact-info';
+import { getDisplayEmail, getDisplayPhone } from '../../utils/get-display-contact-info';
 
 type T = TFunction<'identify'>;
 type TitleMap = Record<ChallengeKind, string | JSX.Element>;
@@ -30,19 +24,14 @@ const challengePriority: Record<ChallengeKind, number> = {
   [ChallengeKind.email]: 2,
 };
 
-const sortChallenges = (a: ChallengeKind, b: ChallengeKind) =>
-  challengePriority[a] - challengePriority[b];
+const sortChallenges = (a: ChallengeKind, b: ChallengeKind) => challengePriority[a] - challengePriority[b];
 
 export const getSubTitle = (t: T, variant: IdentifyVariant): string =>
   variant !== IdentifyVariant.updateLoginMethods
     ? t('challenge-select-or-biometric.log-in-options')
     : t('challenge-select-or-biometric.log-in-to-modify-details');
 
-export const getMethods = (
-  identify: IdentifyContext,
-  device: DeviceInfo,
-  titleMap: TitleMap,
-) => {
+export const getMethods = (identify: IdentifyContext, device: DeviceInfo, titleMap: TitleMap) => {
   const { type, hasSupportForWebauthn } = device;
   const { user } = identify;
   const kinds = user?.availableChallengeKinds || [];
@@ -51,9 +40,7 @@ export const getMethods = (
     .sort(sortChallenges)
     .filter(kind => {
       if (isBiometric(kind)) {
-        return type === 'mobile'
-          ? hasSupportForWebauthn
-          : hasSupportForWebauthn && user?.hasSyncablePasskey;
+        return type === 'mobile' ? hasSupportForWebauthn : hasSupportForWebauthn && user?.hasSyncablePasskey;
       }
 
       return true;

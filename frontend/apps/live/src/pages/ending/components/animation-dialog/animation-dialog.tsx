@@ -68,12 +68,7 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
     <>
       <AnimatePresence>
         {showIdAnimation && (
-          <AnimationContainer
-            variants={messageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
+          <AnimationContainer variants={messageVariants} initial="initial" animate="animate" exit="exit">
             <IconContainer>
               <Rive src="/animations/face-id.riv" />
             </IconContainer>
@@ -85,12 +80,7 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
       </AnimatePresence>
       <AnimatePresence>
         {showSuccessMessage && (
-          <AnimationContainer
-            variants={messageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
+          <AnimationContainer variants={messageVariants} initial="initial" animate="animate" exit="exit">
             <IcoCheck24 />
             <Text tag="p" variant="label-4" color="secondary" marginTop={4}>
               {t('animation.success')}
@@ -101,12 +91,7 @@ const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
       <AnimatePresence>
         {showEndMessage && (
           <Sparkles color="#76FB8F">
-            <AnimationContainer
-              variants={messageVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-            >
+            <AnimationContainer variants={messageVariants} initial="initial" animate="animate" exit="exit">
               <Text tag="p" variant="label-3" color="secondary">
                 {t('animation.end')}
               </Text>

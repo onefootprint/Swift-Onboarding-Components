@@ -23,10 +23,7 @@ const ImageConsentWrapper = ({ onSubmit }: ImageConsentWrapperProps) => {
   return (
     <>
       <ImageConsent ref={consentRef} />
-      <Button
-        onClick={() => onSubmit(consentRef.current?.getConsentInfo())}
-        testID="test-submit-button"
-      >
+      <Button onClick={() => onSubmit(consentRef.current?.getConsentInfo())} testID="test-submit-button">
         Button
       </Button>
     </>
@@ -43,9 +40,7 @@ describe('<ImageConsent/>', () => {
       submittedConsentInfo = { ...consentInfo };
     };
     renderImageConsent(onConsentSubmit);
-    const optionalConsentCheckbox = screen.getByTestId(
-      'third-party-consent',
-    ) as HTMLInputElement;
+    const optionalConsentCheckbox = screen.getByTestId('third-party-consent') as HTMLInputElement;
     await userEvent.click(optionalConsentCheckbox);
 
     const button = screen.getByTestId('test-submit-button');

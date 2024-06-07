@@ -9,26 +9,18 @@ type IconFeatureCardProps = {
   description: string;
   icon: Icon;
   // @ts-ignore: fix me
-  trans?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  trans?: any;
 };
 
-const IconFeatureCard = ({
-  title,
-  description,
-  icon: Icon,
-  trans,
-}: IconFeatureCardProps) => {
+const IconFeatureCard = ({ title, description, icon: Icon, trans }: IconFeatureCardProps) => {
   const icon = Icon && <Icon />;
   return (
     <Container>
       <IconContainer>{icon}</IconContainer>
       <Text variant="label-2">{title}</Text>
       <Text variant="body-2" color="secondary">
-        {trans ? (
-          <Trans i18nKey={trans.i18nKey} components={trans.components} />
-        ) : (
-          description
-        )}
+        {trans ? <Trans i18nKey={trans.i18nKey} components={trans.components} /> : description}
       </Text>
     </Container>
   );

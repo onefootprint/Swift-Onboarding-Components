@@ -1,4 +1,4 @@
-import { CodeInline, createFontStyles, Stack, Text } from '@onefootprint/ui';
+import { CodeInline, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ContentSchema } from 'src/pages/api-reference/api-reference.types';
@@ -74,8 +74,9 @@ const Column = styled.div<{ isInBrackets?: boolean }>`
     gap: ${theme.spacing[2]};
     position: relative;
 
-    ${isInBrackets &&
-    css`
+    ${
+      isInBrackets &&
+      css`
       &:before {
         content: '';
         background: ${theme.borderColor.tertiary};
@@ -86,7 +87,8 @@ const Column = styled.div<{ isInBrackets?: boolean }>`
         transform: translateY(-50%);
         top: 50%;
       }
-    `}
+    `
+    }
   `}
 `;
 

@@ -5,12 +5,8 @@ import { useEffect, useState } from 'react';
 
 type DocSelectorOptionType = { value: SupportedIdDocTypes; label: string };
 
-const useSelectedDocuments = (
-  preselectedDocs: DocSelectorOptionType[],
-  selectedCountry: CountryRecord,
-) => {
-  const [selectedDocuments, setSelectedDocuments] =
-    useState<DocSelectorOptionType[]>(preselectedDocs);
+const useSelectedDocuments = (preselectedDocs: DocSelectorOptionType[], selectedCountry: CountryRecord) => {
+  const [selectedDocuments, setSelectedDocuments] = useState<DocSelectorOptionType[]>(preselectedDocs);
 
   useEffect(() => {
     const sortFn = (

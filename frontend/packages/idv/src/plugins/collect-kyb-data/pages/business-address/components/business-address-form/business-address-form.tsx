@@ -43,13 +43,7 @@ export type BusinessAddressFormProps = {
   ctaLabel?: string;
 };
 
-const BusinessAddressForm = ({
-  defaultValues,
-  isLoading,
-  ctaLabel,
-  onSubmit,
-  onCancel,
-}: BusinessAddressFormProps) => {
+const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onCancel }: BusinessAddressFormProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.business-address.form',
   });
@@ -78,8 +72,7 @@ const BusinessAddressForm = ({
 
   const onSubmitFormData = (formData: FormData) => {
     const stateData = formData.state;
-    const stateStr =
-      typeof stateData === 'object' ? stateData.value : stateData;
+    const stateStr = typeof stateData === 'object' ? stateData.value : stateData;
 
     onSubmit({
       [BusinessDI.addressLine1]: formData.addressLine1,
@@ -104,9 +97,7 @@ const BusinessAddressForm = ({
     resetFieldsExcludingCountry();
   };
 
-  const handleAddressSelect = async (
-    prediction?: google.maps.places.AutocompletePrediction | null,
-  ) => {
+  const handleAddressSelect = async (prediction?: google.maps.places.AutocompletePrediction | null) => {
     if (!prediction) {
       return;
     }
@@ -125,9 +116,7 @@ const BusinessAddressForm = ({
       }
       if (result.state) {
         if (country.value === 'US') {
-          const possibleState = STATES.find(
-            stateOption => stateOption.label === result.state,
-          );
+          const possibleState = STATES.find(stateOption => stateOption.label === result.state);
           if (possibleState) {
             setValue('state', possibleState);
           }
@@ -143,18 +132,9 @@ const BusinessAddressForm = ({
 
   return (
     <FormProvider {...methods}>
-      <Grid.Container
-        tag="form"
-        gap={7}
-        width="100%"
-        onSubmit={handleSubmit(onSubmitFormData)}
-      >
+      <Grid.Container tag="form" gap={7} width="100%" onSubmit={handleSubmit(onSubmitFormData)}>
         <Stack gap={5} direction="column">
-          <CountryField
-            onChange={handleCountryChange}
-            data-private
-            data-dd-privacy="mask"
-          />
+          <CountryField onChange={handleCountryChange} data-private data-dd-privacy="mask" />
           <AddressInput
             autoFocus
             data-private

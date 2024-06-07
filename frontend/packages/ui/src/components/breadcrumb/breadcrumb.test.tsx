@@ -8,10 +8,7 @@ import Breadcrumb from './breadcrumb';
 import BreadcrumbItem from './breadcrumb-item';
 
 describe('<Breadcrumb />', () => {
-  const renderBreadcrumb = ({
-    'aria-label': ariaLabel = 'breadcrumb',
-    separator = '/',
-  }: Partial<BreadcrumbProps>) =>
+  const renderBreadcrumb = ({ 'aria-label': ariaLabel = 'breadcrumb', separator = '/' }: Partial<BreadcrumbProps>) =>
     customRender(
       <Breadcrumb aria-label={ariaLabel} separator={separator}>
         <BreadcrumbItem href="#">Lorem</BreadcrumbItem>

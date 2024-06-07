@@ -46,9 +46,7 @@ const initIframe = (rawProps: Props): Iframe => {
 
   const registerCallbackProps = () => {
     if (!parentApi) {
-      handleError(
-        'Footprint should be initialized in order to register callback props',
-      );
+      handleError('Footprint should be initialized in order to register callback props');
       return;
     }
 
@@ -71,9 +69,7 @@ const initIframe = (rawProps: Props): Iframe => {
     // If rendering inline, find the client parent div
     const clientParent = document.getElementById(containerId);
     if (!clientParent) {
-      handleError(
-        `Could not find container with id ${containerId} while rendering footprint`,
-      );
+      handleError(`Could not find container with id ${containerId} while rendering footprint`);
       return undefined;
     }
     return createInlineContainer(initId, clientParent);
@@ -131,18 +127,12 @@ const initIframe = (rawProps: Props): Iframe => {
 
   const render = async () => {
     if (isRendered) {
-      logWarn(
-        SdkKindByComponentKind[props.kind],
-        'Footprint component is already rendered',
-      );
+      logWarn(SdkKindByComponentKind[props.kind], 'Footprint component is already rendered');
       return;
     }
     const container = getOrCreateContainer();
     if (!container) {
-      logWarn(
-        SdkKindByComponentKind[props.kind],
-        'Unable to create container for Footprint component',
-      );
+      logWarn(SdkKindByComponentKind[props.kind], 'Unable to create container for Footprint component');
       return;
     }
     if (container.hasChildNodes()) {
@@ -161,15 +151,11 @@ const initIframe = (rawProps: Props): Iframe => {
     const url = getURL(props, sdkArgsToken || '');
     try {
       parentApi = await new Postmate({
-        classListArray: [
-          `footprint-${variant}`,
-          `footprint-${variant}-loading`,
-        ],
+        classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`],
         container,
         name: `footprint-iframe-${initId}`,
         url,
-        allow:
-          'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
+        allow: 'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
         model: {
           authToken: props.authToken,
           initId,

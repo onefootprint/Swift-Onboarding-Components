@@ -38,9 +38,7 @@ export const SandboxOutcomeContainer = ({
         overallOutcome: overallOutcomeSuccess,
         idDocOutcome: shouldShowIdDocOutcome
           ? {
-              label: t(
-                'id-doc-outcome.simulated-outcome.options.success.title',
-              ),
+              label: t('id-doc-outcome.simulated-outcome.options.success.title'),
               value: IdDocOutcome.success,
             }
           : undefined,
@@ -65,9 +63,7 @@ export const SandboxOutcomeContainer = ({
           <OptionsContainer>
             <OverallOutcomeSelect config={config} />
             {shouldShowIdDocOutcome && (
-              <IdDocOutcomeSelect
-                allowRealOutcome={config?.canMakeRealDocScanCallsInSandbox}
-              />
+              <IdDocOutcomeSelect allowRealOutcome={config?.canMakeRealDocScanCallsInSandbox} />
             )}
             {watchIdDocOutcome?.value === IdDocOutcome.real && (
               <InlineAlert variant="info">
@@ -79,20 +75,13 @@ export const SandboxOutcomeContainer = ({
             {watchIdDocOutcome?.value === IdDocOutcome.fail && (
               <InlineAlert variant="info">
                 <Text variant="body-3" color="info">
-                  {t(
-                    'id-doc-outcome.simulated-outcome.options.fail.description',
-                  )}
+                  {t('id-doc-outcome.simulated-outcome.options.fail.description')}
                 </Text>
               </InlineAlert>
             )}
             {collectTestId && <TestIdInput />}
           </OptionsContainer>
-          <Button
-            fullWidth
-            type="submit"
-            disabled={!!errors?.testID}
-            size="large"
-          >
+          <Button fullWidth type="submit" disabled={!!errors?.testID} size="large">
             {t('cta')}
           </Button>
         </Form>

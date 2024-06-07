@@ -8,11 +8,7 @@ const uToken = process.env.E2E_UPDATE_UTOKEN || '';
 
 const email = 'sandbox@onefootprint.com';
 
-test('Update auth methods by providing email #ci', async ({
-  browserName,
-  isMobile,
-  page,
-}) => {
+test('Update auth methods by providing email #ci', async ({ browserName, isMobile, page }) => {
   test.slow();
   test.skip(!isMobile, 'It will only run in mobile'); // eslint-disable-line playwright/no-skipped-test
   expect(uToken, 'Missing E2E_UPDATE_UTOKEN').toBeTruthy();
@@ -24,9 +20,7 @@ test('Update auth methods by providing email #ci', async ({
   if (isMobile) test.setTimeout(90000); // eslint-disable-line playwright/no-conditional-in-test
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/auth?ob_key=1&app_url=${authAppUrl}&flow=${flowId}#${uToken}`,
-  );
+  await page.goto(`/components/auth?ob_key=1&app_url=${authAppUrl}&flow=${flowId}#${uToken}`);
   await page.waitForLoadState();
   await expect(page).toHaveURL(/.*auth/);
 
@@ -36,9 +30,7 @@ test('Update auth methods by providing email #ci', async ({
     .first()
     .click();
 
-  const loginDesc = page
-    .frameLocator(iframeSelector)
-    .getByText('Log in to modify your account details.');
+  const loginDesc = page.frameLocator(iframeSelector).getByText('Log in to modify your account details.');
   await loginDesc.waitFor(attached);
   await expect(loginDesc.first()).toBeAttached();
 
@@ -63,11 +55,7 @@ test('Update auth methods by providing email #ci', async ({
   await emailEntryText.waitFor(attached);
   await expect(emailEntryText.first()).toBeAttached();
 
-  await page
-    .frameLocator(iframeSelector)
-    .getByRole('button', { name: email })
-    .first()
-    .click();
+  await page.frameLocator(iframeSelector).getByRole('button', { name: email }).first().click();
   await page.waitForLoadState();
 
   const emailEl = page.frameLocator(iframeSelector).getByLabel(/email/i);
@@ -85,9 +73,7 @@ test('Update auth methods by providing email #ci', async ({
   await verifyEmail({ frame: page.frameLocator(iframeSelector), page });
   await page.waitForLoadState();
 
-  const finish = page
-    .frameLocator(iframeSelector)
-    .getByRole('button', { name: 'Finish' });
+  const finish = page.frameLocator(iframeSelector).getByRole('button', { name: 'Finish' });
   await finish.waitFor(attached);
   await expect(finish.first()).toBeAttached();
 });

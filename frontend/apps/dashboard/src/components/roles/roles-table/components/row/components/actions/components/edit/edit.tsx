@@ -28,9 +28,7 @@ const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
   const [open, setOpen] = useState(false);
   const editRoleMutation = useEditRole(role.id);
   const { allOptions: allVaultProxyOptions } = useVaultProxyOptions();
-  const { decryptOptions, basicScopes, vaultProxyOptions } = groupScopes(
-    role.scopes,
-  );
+  const { decryptOptions, basicScopes, vaultProxyOptions } = groupScopes(role.scopes);
 
   const selectedVaultProxyOptions: VaultProxySelectOption[] = [];
   vaultProxyOptions.forEach(opt => {

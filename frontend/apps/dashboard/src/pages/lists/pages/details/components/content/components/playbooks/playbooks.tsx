@@ -2,7 +2,7 @@ import { Stack } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Error } from 'src/components';
+import { ErrorComponent } from 'src/components';
 
 import useListDetails from '../../../../hooks/use-list-details';
 import SectionTitle from '../section-title';
@@ -21,7 +21,7 @@ const Playbooks = () => {
     <Stack gap={5} direction="column">
       <SectionTitle title={t('title', { alias: data?.alias })} />
       {isLoading && <Loading />}
-      {error ? <Error error={error} /> : null}
+      {error ? <ErrorComponent error={error} /> : null}
       {data && <Content list={data} />}
     </Stack>
   );

@@ -20,10 +20,7 @@ const groupScopes = (scopes: RoleScope[]) => {
       decryptOptions.push(decryptOption);
     } else if (proxyOption) {
       vaultProxyOptions.push(proxyOption);
-    } else if (
-      scope.kind !== RoleScopeKind.decrypt &&
-      scope.kind !== RoleScopeKind.invokeVaultProxy
-    ) {
+    } else if (scope.kind !== RoleScopeKind.decrypt && scope.kind !== RoleScopeKind.invokeVaultProxy) {
       basicScopes.push(scope);
     }
   });

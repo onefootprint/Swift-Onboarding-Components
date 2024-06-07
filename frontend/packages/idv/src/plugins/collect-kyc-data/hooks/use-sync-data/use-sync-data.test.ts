@@ -1,23 +1,11 @@
 import { customRenderHook, screen, waitFor } from '@onefootprint/test-utils';
-import type {
-  CollectKycDataRequirement,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  IdDI,
-  OnboardingConfigStatus,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import type { KycData } from '../../utils/data-types';
 import useSyncData from './use-sync-data';
-import {
-  getCustomWrapper,
-  withUserVault,
-  withUserVaultError,
-} from './use-sync-data.test.utils';
+import { getCustomWrapper, withUserVault, withUserVaultError } from './use-sync-data.test.utils';
 
 describe('useSyncData', () => {
   const testDevice: DeviceInfo = {
@@ -48,10 +36,7 @@ describe('useSyncData', () => {
   const testRequirement: CollectKycDataRequirement = {
     kind: OnboardingRequirementKind.collectKycData,
     isMet: false,
-    missingAttributes: [
-      CollectedKycDataOption.dob,
-      CollectedKycDataOption.address,
-    ],
+    missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.address],
     populatedAttributes: [CollectedKycDataOption.name],
     optionalAttributes: [CollectedKycDataOption.ssn4],
   };
@@ -171,10 +156,7 @@ describe('useSyncData', () => {
         data: {},
         initialData: testInitialData,
       };
-      const { result } = customRenderHook(
-        () => useSyncData(),
-        getCustomWrapper(initialContext),
-      );
+      const { result } = customRenderHook(() => useSyncData(), getCustomWrapper(initialContext));
       const { syncData } = result.current;
       const onSuccess = jest.fn();
       const onError = jest.fn();
@@ -206,10 +188,7 @@ describe('useSyncData', () => {
         data: {},
         initialData: testInitialData,
       };
-      const { result } = customRenderHook(
-        () => useSyncData(),
-        getCustomWrapper(initialContext),
-      );
+      const { result } = customRenderHook(() => useSyncData(), getCustomWrapper(initialContext));
       const { syncData } = result.current;
       const onSuccess = jest.fn();
       const onError = jest.fn();
@@ -238,10 +217,7 @@ describe('useSyncData', () => {
         data: {},
         initialData: testInitialData,
       };
-      const { result } = customRenderHook(
-        () => useSyncData(),
-        getCustomWrapper(initialContext),
-      );
+      const { result } = customRenderHook(() => useSyncData(), getCustomWrapper(initialContext));
       const { syncData } = result.current;
       const onSuccess = jest.fn();
       const onError = jest.fn();

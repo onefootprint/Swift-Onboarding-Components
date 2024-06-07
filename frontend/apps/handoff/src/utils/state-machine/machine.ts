@@ -25,18 +25,16 @@ export const createHandoffMachine = () =>
         statusReceived: [
           {
             target: 'expired',
-            cond: (context, event) => !!event.payload.isError,
+            cond: (_context, event) => !!event.payload.isError,
           },
           {
             target: 'canceled',
-            cond: (context, event) =>
-              event.payload.status === D2PStatus.canceled,
+            cond: (_context, event) => event.payload.status === D2PStatus.canceled,
           },
           {
             target: 'complete',
-            cond: (context, event) =>
-              event.payload.status === D2PStatus.completed ||
-              event.payload.status === D2PStatus.failed,
+            cond: (_context, event) =>
+              event.payload.status === D2PStatus.completed || event.payload.status === D2PStatus.failed,
           },
         ],
       },
@@ -45,8 +43,7 @@ export const createHandoffMachine = () =>
           on: {
             initContextUpdated: [
               {
-                description:
-                  'Only transition to next state if all required info is collected',
+                description: 'Only transition to next state if all required info is collected',
                 actions: ['assignInitContext'],
                 target: 'idv',
                 cond: (context, event) => initContextComplete(context, event),
@@ -66,27 +63,12 @@ export const createHandoffMachine = () =>
     {
       actions: {
         assignInitContext: assign((context, event) => {
-          const {
-            authToken,
-            opener,
-            onboardingConfig,
-            idDocOutcome,
-            l10n: locale,
-            updatedStatus,
-          } = event.payload;
+          const { authToken, opener, onboardingConfig, idDocOutcome, l10n: locale, updatedStatus } = event.payload;
           context.opener = opener !== undefined ? opener : context.opener;
-          context.authToken =
-            authToken !== undefined ? authToken : context.authToken;
-          context.onboardingConfig =
-            onboardingConfig !== undefined
-              ? onboardingConfig
-              : context.onboardingConfig;
-          context.idDocOutcome =
-            idDocOutcome !== undefined
-              ? event.payload.idDocOutcome
-              : context.idDocOutcome;
-          context.updatedStatus =
-            updatedStatus !== undefined ? updatedStatus : context.updatedStatus;
+          context.authToken = authToken !== undefined ? authToken : context.authToken;
+          context.onboardingConfig = onboardingConfig !== undefined ? onboardingConfig : context.onboardingConfig;
+          context.idDocOutcome = idDocOutcome !== undefined ? event.payload.idDocOutcome : context.idDocOutcome;
+          context.updatedStatus = updatedStatus !== undefined ? updatedStatus : context.updatedStatus;
           context.l10n = locale !== undefined ? locale : context.l10n;
           return context;
         }),

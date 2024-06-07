@@ -29,9 +29,7 @@ import { registerErrorHandlers } from './utils/register-event-listeners';
  */
 const filterNonEmptyTraits = (traits: PrimitiveData): ExtraProps =>
   Object.fromEntries(
-    Object.entries(traits).filter(
-      ([, value]) => value !== null && value !== undefined && value !== '',
-    ),
+    Object.entries(traits).filter(([, value]) => value !== null && value !== undefined && value !== ''),
   );
 
 const LoggerFactory = () => {
@@ -92,8 +90,7 @@ const LoggerFactory = () => {
 
     const filteredExtra = filterNonEmptyTraits(extra || {});
     const errorMessage = msg || getErrorMessage(err);
-    const errorObj: Error =
-      err instanceof Error ? err : new Error(errorMessage);
+    const errorObj: Error = err instanceof Error ? err : new Error(errorMessage);
 
     if (isLogRocketEnabled) {
       logRocketErrorEvent(errorObj, { ...filteredExtra, level: 'error' });
@@ -142,17 +139,13 @@ export const getLogger = (
   logInfo: (msg: string, extra?: PrimitiveData) => void;
   logTrack: (msg: string, extra?: PrimitiveData) => void;
 } => ({
-  logTrack: (msg: string, extra?: PrimitiveData) =>
-    Logger.track(msg, { ...preExtra, ...extra }),
+  logTrack: (msg: string, extra?: PrimitiveData) => Logger.track(msg, { ...preExtra, ...extra }),
 
-  logInfo: (msg: string, extra?: PrimitiveData) =>
-    Logger.info(msg, { ...preExtra, ...extra }),
+  logInfo: (msg: string, extra?: PrimitiveData) => Logger.info(msg, { ...preExtra, ...extra }),
 
-  logWarn: (msg: string, err?: unknown, extra?: PrimitiveData) =>
-    Logger.warn(msg, { ...preExtra, ...extra }, err),
+  logWarn: (msg: string, err?: unknown, extra?: PrimitiveData) => Logger.warn(msg, { ...preExtra, ...extra }, err),
 
-  logError: (msg: string, err?: unknown, extra?: PrimitiveData) =>
-    Logger.error(err, { ...preExtra, ...extra }, msg),
+  logError: (msg: string, err?: unknown, extra?: PrimitiveData) => Logger.error(err, { ...preExtra, ...extra }, msg),
 });
 
 export const getTracker = () => ({

@@ -6,7 +6,7 @@ import { useEffectOnce } from 'usehooks-ts';
 import { useOnboardingValidate } from '../../../../hooks';
 import Logger from '../../../../utils/logger/logger';
 import nid from '../../../../utils/neuro-id';
-import Error from '../../components/error';
+import ErrorComponent from '../../components/error';
 import { useOnboardingMachine } from '../../components/machine-provider';
 
 const Validate = () => {
@@ -40,7 +40,7 @@ const Validate = () => {
   });
 
   return isError ? (
-    <Error />
+    <ErrorComponent />
   ) : (
     <Container>
       <AnimatedLoadingSpinner animationStart />

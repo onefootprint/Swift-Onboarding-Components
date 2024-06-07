@@ -51,11 +51,13 @@ const StyledItem = styled(Select.Item)<{ size?: string; disabled?: boolean }>`
       outline: none;
     }
 
-    ${disabled &&
-    css`
+    ${
+      disabled &&
+      css`
       cursor: initial;
       color: ${theme.color.quaternary};
-    `}
+    `
+    }
   `}
 `;
 

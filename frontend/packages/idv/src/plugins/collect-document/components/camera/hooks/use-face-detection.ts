@@ -1,18 +1,8 @@
-import {
-  detectSingleFace,
-  matchDimensions,
-  resizeResults,
-  TinyFaceDetectorOptions,
-} from 'face-api.js';
+import { TinyFaceDetectorOptions, detectSingleFace, matchDimensions, resizeResults } from 'face-api.js';
 
 import { Logger } from '../../../../../utils/logger';
 import { useFaceModel } from '../../../hooks/use-face-model-loader';
-import {
-  calculateFaceAngle,
-  isFaceCloseEnough,
-  isFaceInTheFrame,
-  isHeadStraight,
-} from '../utils/face-utils';
+import { calculateFaceAngle, isFaceCloseEnough, isFaceInTheFrame, isHeadStraight } from '../utils/face-utils';
 
 export enum FaceStatus {
   OK = 'ok',
@@ -43,10 +33,7 @@ const useFaceDetection = () => {
     }
 
     matchDimensions(videoElement, { width, height });
-    const result = await detectSingleFace(
-      videoElement,
-      options,
-    ).withFaceLandmarks();
+    const result = await detectSingleFace(videoElement, options).withFaceLandmarks();
 
     if (!result) return FaceStatus.detecting;
 
@@ -63,12 +50,7 @@ const useFaceDetection = () => {
       return FaceStatus.detecting;
     }
 
-    const {
-      width: frameWidth,
-      height: frameHeight,
-      frameOffsetX,
-      frameOffsetY,
-    } = frameDimensions;
+    const { width: frameWidth, height: frameHeight, frameOffsetX, frameOffsetY } = frameDimensions;
 
     const resizedDetections = resizeResults(detection, { width, height });
     const face = resizedDetections.box;
@@ -79,8 +61,7 @@ const useFaceDetection = () => {
 
     // Order matters
     // First priority: face should be close enough
-    if (!isFaceCloseEnough({ frameWidth, frameHeight, faceWidth, faceHeight }))
-      return FaceStatus.faceTooFar;
+    if (!isFaceCloseEnough({ frameWidth, frameHeight, faceWidth, faceHeight })) return FaceStatus.faceTooFar;
 
     // Second priority: face should be inside the frame
     if (

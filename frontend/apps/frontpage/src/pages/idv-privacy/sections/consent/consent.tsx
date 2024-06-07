@@ -1,10 +1,5 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import {
-  IcoEyeCrossed24,
-  IcoFaceid24,
-  IcoHelp24,
-  IcoImages24,
-} from '@onefootprint/icons';
+import { IcoEyeCrossed24, IcoFaceid24, IcoHelp24, IcoImages24 } from '@onefootprint/icons';
 import { Container } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
@@ -24,23 +19,10 @@ const verifyCards = [
     key: 'biometric-identifiers',
     icon: IcoEyeCrossed24,
     trans: {
-      i18nKey:
-        'pages.idv-privacy.consent.verify.cards.biometric-identifiers.description',
+      i18nKey: 'pages.idv-privacy.consent.verify.cards.biometric-identifiers.description',
       components: {
-        mailLinkFootprint: (
-          <Link
-            href="mailto:privacy@onefootprint.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          />
-        ),
-        mailLinkIncode: (
-          <Link
-            href="mailto:dataprotection@incode.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          />
-        ),
+        mailLinkFootprint: <Link href="mailto:privacy@onefootprint.com" target="_blank" rel="noopener noreferrer" />,
+        mailLinkIncode: <Link href="mailto:dataprotection@incode.com" target="_blank" rel="noopener noreferrer" />,
       },
     },
   },
@@ -55,23 +37,10 @@ const improveVendorCards = [
     key: 'captured-images',
     icon: IcoFaceid24,
     trans: {
-      i18nKey:
-        'pages.idv-privacy.consent.optional.cards.captured-images.description',
+      i18nKey: 'pages.idv-privacy.consent.optional.cards.captured-images.description',
       components: {
-        mailLinkFootprint: (
-          <Link
-            href="mailto:privacy@onefootprint.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          />
-        ),
-        mailLinkIncode: (
-          <Link
-            href="mailto:dataprotection@incode.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          />
-        ),
+        mailLinkFootprint: <Link href="mailto:privacy@onefootprint.com" target="_blank" rel="noopener noreferrer" />,
+        mailLinkIncode: <Link href="mailto:dataprotection@incode.com" target="_blank" rel="noopener noreferrer" />,
       },
     },
   },
@@ -79,15 +48,10 @@ const improveVendorCards = [
     key: 'comfortable',
     icon: IcoHelp24,
     trans: {
-      i18nKey:
-        'pages.idv-privacy.consent.optional.cards.comfortable.description',
+      i18nKey: 'pages.idv-privacy.consent.optional.cards.comfortable.description',
       components: {
         privacyPolicyLink: (
-          <Link
-            href={`${FRONTPAGE_BASE_URL}/privacy-policy`}
-            target="_blank"
-            rel="noopener noreferrer"
-          />
+          <Link href={`${FRONTPAGE_BASE_URL}/privacy-policy`} target="_blank" rel="noopener noreferrer" />
         ),
       },
     },
@@ -110,9 +74,7 @@ const Consent = () => {
               key={card.key}
               icon={card.icon}
               title={t(`verify.cards.${card.key}.title` as ParseKeys<'common'>)}
-              description={t(
-                `verify.cards.${card.key}.description` as ParseKeys<'common'>,
-              )}
+              description={t(`verify.cards.${card.key}.description` as ParseKeys<'common'>)}
               trans={card.trans}
             />
           ))}
@@ -126,12 +88,8 @@ const Consent = () => {
             <IconFeatureCard
               key={card.key}
               icon={card.icon}
-              title={t(
-                `optional.cards.${card.key}.title` as ParseKeys<'common'>,
-              )}
-              description={t(
-                `optional.cards.${card.key}.description` as ParseKeys<'common'>,
-              )}
+              title={t(`optional.cards.${card.key}.title` as ParseKeys<'common'>)}
+              description={t(`optional.cards.${card.key}.description` as ParseKeys<'common'>)}
               trans={card.trans}
             />
           ))}

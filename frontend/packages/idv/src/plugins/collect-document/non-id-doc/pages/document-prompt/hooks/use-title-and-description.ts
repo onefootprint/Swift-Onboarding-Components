@@ -16,19 +16,13 @@ const useTitleAndDescription = (config: DocumentRequirementConfig) => {
     };
   }
   const { documentName, documentDescription } = getCustomDocInfo(config);
-  const docKindToTitle: Record<
-    Exclude<DocumentRequestKind, 'identity'>,
-    string
-  > = {
+  const docKindToTitle: Record<Exclude<DocumentRequestKind, 'identity'>, string> = {
     [DocumentRequestKind.ProofOfAddress]: t('proof-of-address.title'),
     [DocumentRequestKind.ProofOfSsn]: t('proof-of-ssn.title'),
     [DocumentRequestKind.Custom]: t('custom.title', { documentName }),
   };
 
-  const docKindToDescription: Record<
-    Exclude<DocumentRequestKind, 'identity'>,
-    string
-  > = {
+  const docKindToDescription: Record<Exclude<DocumentRequestKind, 'identity'>, string> = {
     [DocumentRequestKind.ProofOfAddress]: t('proof-of-address.description'),
     [DocumentRequestKind.ProofOfSsn]: t('proof-of-ssn.description'),
     [DocumentRequestKind.Custom]: t('custom.description', {

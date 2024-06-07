@@ -1,4 +1,4 @@
-import { Container, media, Text } from '@onefootprint/ui';
+import { Container, Text, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -19,18 +19,10 @@ const MoreAbout = () => {
             i18nKey="pages.idv-privacy.more-about.description"
             components={{
               computerVisionLink: (
-                <Link
-                  href="https://en.wikipedia.org/wiki/Computer_vision"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
+                <Link href="https://en.wikipedia.org/wiki/Computer_vision" target="_blank" rel="noopener noreferrer" />
               ),
               biometricIdLink: (
-                <Link
-                  href="https://en.wikipedia.org/wiki/Biometrics"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
+                <Link href="https://en.wikipedia.org/wiki/Biometrics" target="_blank" rel="noopener noreferrer" />
               ),
             }}
           />

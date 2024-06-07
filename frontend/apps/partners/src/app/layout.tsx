@@ -44,23 +44,9 @@ const RootLayout = ({ children, params }: RootLayoutProps) => {
     <html lang={lang} dir={dir(lang)} className={DMSans.variable}>
       <head>
         <link rel="shortcut icon" href="/favicon.ico" />
-        <link
-          href="/apple-touch-icon.png"
-          rel="apple-touch-icon"
-          sizes="180x180"
-        />
-        <link
-          href="/favicon-32x32.png"
-          rel="icon"
-          sizes="32x32"
-          type="image/png"
-        />
-        <link
-          href="/favicon-16x16.png"
-          rel="icon"
-          sizes="16x16"
-          type="image/png"
-        />
+        <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
+        <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
+        <link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" />
       </head>
       <body>
         <ClientProviders>{children}</ClientProviders>

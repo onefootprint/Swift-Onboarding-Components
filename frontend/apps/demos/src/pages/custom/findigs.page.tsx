@@ -7,8 +7,7 @@ import OnboardingInstructions from './components/onboarding-instructions';
 const publicKey = 'ob_test_KYA0PU0awxnHKjzh9M849Y';
 
 const findigsAppearance: FootprintAppearance = {
-  fontSrc:
-    'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap',
+  fontSrc: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap',
   variables: {
     fontFamily: 'Open Sans, sans-serif',
     linkColor: '#000000',
@@ -41,12 +40,6 @@ const findigsAppearance: FootprintAppearance = {
   },
 };
 
-const Findigs = () => (
-  <OnboardingInstructions
-    appearance={findigsAppearance}
-    obKey={publicKey}
-    tenantName="Findigs"
-  />
-);
+const Findigs = () => <OnboardingInstructions appearance={findigsAppearance} obKey={publicKey} tenantName="Findigs" />;
 
 export default Findigs;

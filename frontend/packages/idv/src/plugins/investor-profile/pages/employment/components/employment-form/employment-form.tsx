@@ -20,11 +20,7 @@ type FormData = {
   employer?: string;
 };
 
-const EmploymentForm = ({
-  defaultValues,
-  isLoading,
-  onSubmit,
-}: EmploymentFormProps) => {
+const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'investor-profile.pages.employment',
   });
@@ -47,10 +43,7 @@ const EmploymentForm = ({
     },
   ];
 
-  const defaultStatus = options.find(
-    ({ value }) =>
-      value === defaultValues?.[InvestorProfileDI.employmentStatus],
-  );
+  const defaultStatus = options.find(({ value }) => value === defaultValues?.[InvestorProfileDI.employmentStatus]);
   const defaultOccupation = defaultValues?.[InvestorProfileDI.occupation];
   const defaultEmployer = defaultValues?.[InvestorProfileDI.employer];
 

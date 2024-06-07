@@ -1,15 +1,7 @@
 'use client';
 
 import { LogoFpCompact } from '@onefootprint/icons';
-import {
-  Box,
-  Button,
-  Divider,
-  GoogleButton,
-  Stack,
-  Text,
-  TextInput,
-} from '@onefootprint/ui';
+import { Box, Button, Divider, GoogleButton, Stack, Text, TextInput } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -32,13 +24,7 @@ const SignupContent = () => {
       elevation={1}
       position="relative"
     >
-      <PenguinImage
-        alt={t('penguin')}
-        height={90}
-        priority
-        src={PngPenguinCreate}
-        width={135}
-      />
+      <PenguinImage alt={t('penguin')} height={90} priority src={PngPenguinCreate} width={135} />
       <Stack width="398px" direction="column" gap={7}>
         <LogoFpCompact />
         <Text variant="label-2">{t('create-your-account')}</Text>
@@ -51,10 +37,7 @@ const SignupContent = () => {
           <Divider />
         </Stack>
         <Stack direction="column" gap={4}>
-          <TextInput
-            label={t('email-address')}
-            placeholder={t('email-placeholder')}
-          />
+          <TextInput label={t('email-address')} placeholder={t('email-placeholder')} />
           <Button size="large" fullWidth>
             {t('continue-with-email')}
           </Button>

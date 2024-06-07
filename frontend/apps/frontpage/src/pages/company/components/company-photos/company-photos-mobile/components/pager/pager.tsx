@@ -17,12 +17,7 @@ const Pager = ({ max, value, onClick }: PagerProps) => {
   };
 
   return (
-    <Container
-      aria-valuemax={max}
-      aria-valuemin={0}
-      aria-valuenow={activeCount}
-      role="progressbar"
-    >
+    <Container aria-valuemax={max} aria-valuemin={0} aria-valuenow={activeCount} role="progressbar">
       {times(max).map(index => (
         <Button
           active={index === value}
@@ -63,10 +58,12 @@ const Button = styled.button<{ active: boolean }>`
     padding: 0;
     width: ${theme.spacing[3]};
 
-    ${active &&
-    css`
+    ${
+      active &&
+      css`
       opacity: 1;
-    `}
+    `
+    }
   `}
 `;
 

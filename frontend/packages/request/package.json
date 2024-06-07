@@ -6,18 +6,18 @@
   "types": "./src/index.ts",
   "license": "MIT",
   "scripts": {
-    "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
-    "i18n:copy": "../../scripts/i18n/i18n-copy.sh",
-    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch",
-    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "i18n:clean": "rm -rf ./public/locales/",
-    "test": "jest",
+    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en",
+    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch",
+    "i18n:copy": "../../scripts/i18n/i18n-copy.sh",
+    "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
     "test:ci": "jest --ci --bail --runInBand",
     "test:watch": "jest --watch",
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
-    "typecheck": "yarn tsc --noEmit",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "test": "jest",
+    "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
     "@onefootprint/dev-tools": "*",
@@ -26,7 +26,6 @@
     "@testing-library/react": "^13.3.0",
     "axios": "^1.6.5",
     "axios-case-converter": "^1.1.0",
-    "eslint-config-footprint": "*",
     "i18next": "^23.7.16",
     "i18next-locales-sync": "^2.0.1",
     "react-i18next": "^14.0.0",
@@ -39,8 +38,6 @@
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
-    "setupFiles": [
-      "<rootDir>/src/config/initializers/i18next-test.ts"
-    ]
+    "setupFiles": ["<rootDir>/src/config/initializers/i18next-test.ts"]
   }
 }

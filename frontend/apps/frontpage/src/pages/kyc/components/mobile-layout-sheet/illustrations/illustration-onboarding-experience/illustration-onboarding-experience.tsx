@@ -13,24 +13,9 @@ const IllustrationOnboardingExperience = () => {
   return (
     <Container ref={ref}>
       <Elevator style={{ y }}>
-        <Image
-          src="/kyc/onboarding-experience/top.png"
-          alt=""
-          height={273}
-          width={342.75}
-        />
-        <Image
-          src="/kyc/onboarding-experience/center.png"
-          alt=""
-          height={273}
-          width={342.75}
-        />
-        <Image
-          src="/kyc/onboarding-experience/bottom.png"
-          alt=""
-          height={273}
-          width={342.75}
-        />
+        <Image src="/kyc/onboarding-experience/top.png" alt="" height={273} width={342.75} />
+        <Image src="/kyc/onboarding-experience/center.png" alt="" height={273} width={342.75} />
+        <Image src="/kyc/onboarding-experience/bottom.png" alt="" height={273} width={342.75} />
       </Elevator>
     </Container>
   );

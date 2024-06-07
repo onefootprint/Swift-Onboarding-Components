@@ -59,9 +59,7 @@ export const proxyConfigDetailsFixture: ProxyConfigDetails = {
   ],
 };
 
-export const withProxyConfigs = (
-  proxyConfigs: ProxyConfig[] = proxyConfigsFixture,
-) =>
+export const withProxyConfigs = (proxyConfigs: ProxyConfig[] = proxyConfigsFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/proxy_configs',
@@ -80,10 +78,7 @@ export const withProxyConfigsError = () =>
     },
   });
 
-export const withProxyConfigDetails = (
-  id: string,
-  response = proxyConfigDetailsFixture,
-) =>
+export const withProxyConfigDetails = (id: string, response = proxyConfigDetailsFixture) =>
   mockRequest({
     method: 'get',
     path: `/org/proxy_configs/${id}`,
@@ -102,10 +97,7 @@ export const withProxyConfigDetailsError = (id: string) =>
     },
   });
 
-export const withEditProxyConfig = (
-  proxyConfig: ProxyConfigDetails,
-  newProxyConfig: Partial<ProxyConfigDetails>,
-) =>
+export const withEditProxyConfig = (proxyConfig: ProxyConfigDetails, newProxyConfig: Partial<ProxyConfigDetails>) =>
   mockRequest({
     method: 'patch',
     path: `/org/proxy_configs/${proxyConfig.id}`,

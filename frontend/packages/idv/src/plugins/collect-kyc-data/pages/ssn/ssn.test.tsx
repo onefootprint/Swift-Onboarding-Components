@@ -1,25 +1,13 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import type { InitMachineArgs } from '../../utils/state-machine/machine';
 import TestWrapper from '../../utils/test-wrapper';
 import Ssn from './ssn';
-import {
-  getInitialContext,
-  withUserVault,
-  withUserVaultError,
-} from './ssn.test.config';
+import { getInitialContext, withUserVault, withUserVaultError } from './ssn.test.config';
 
-const renderSsn = (
-  initialContext: InitMachineArgs,
-  onComplete?: () => void,
-) => {
+const renderSsn = (initialContext: InitMachineArgs, onComplete?: () => void) => {
   customRender(
     <TestWrapper initialContext={initialContext} initState="confirm">
       <Ssn onComplete={onComplete} />
@@ -53,11 +41,7 @@ describe('Ssn', () => {
       renderSsn(initialContext, onComplete);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'What are the last 4 digits of your Social Security Number?',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('What are the last 4 digits of your Social Security Number?')).toBeInTheDocument();
       });
 
       const ssn = screen.getByLabelText('SSN (last 4)');
@@ -82,9 +66,7 @@ describe('Ssn', () => {
       renderSsn(initialContext, onComplete);
 
       await waitFor(() => {
-        expect(
-          screen.getByText("What's your Social Security Number?"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("What's your Social Security Number?")).toBeInTheDocument();
       });
 
       const ssn = screen.getByLabelText('SSN');
@@ -105,20 +87,14 @@ describe('Ssn', () => {
       renderSsn(initialContext, onComplete);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'What are the last 4 digits of your Social Security Number?',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('What are the last 4 digits of your Social Security Number?')).toBeInTheDocument();
       });
 
       const submitButton = screen.getByRole('button', { name: 'Continue' });
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('SSN cannot be empty or is invalid'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('SSN cannot be empty or is invalid')).toBeInTheDocument();
       });
       expect(onComplete).not.toHaveBeenCalled();
     });
@@ -129,18 +105,14 @@ describe('Ssn', () => {
       renderSsn(initialContext, onComplete);
 
       await waitFor(() => {
-        expect(
-          screen.getByText("What's your Social Security Number?"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("What's your Social Security Number?")).toBeInTheDocument();
       });
 
       const submitButton = screen.getByRole('button', { name: 'Continue' });
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('SSN cannot be empty or is invalid'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('SSN cannot be empty or is invalid')).toBeInTheDocument();
       });
       expect(onComplete).not.toHaveBeenCalled();
     });
@@ -151,11 +123,7 @@ describe('Ssn', () => {
       renderSsn(initialContext, onComplete);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'What are the last 4 digits of your Social Security Number?',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('What are the last 4 digits of your Social Security Number?')).toBeInTheDocument();
       });
 
       const ssn = screen.getByLabelText('SSN (last 4)');
@@ -165,9 +133,7 @@ describe('Ssn', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('SSN cannot be empty or is invalid'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('SSN cannot be empty or is invalid')).toBeInTheDocument();
       });
       expect(onComplete).not.toHaveBeenCalled();
     });
@@ -178,9 +144,7 @@ describe('Ssn', () => {
       renderSsn(initialContext, onComplete);
 
       await waitFor(() => {
-        expect(
-          screen.getByText("What's your Social Security Number?"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("What's your Social Security Number?")).toBeInTheDocument();
       });
 
       const ssn = screen.getByLabelText('SSN');
@@ -190,9 +154,7 @@ describe('Ssn', () => {
       await userEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(
-          screen.getByText('SSN cannot be empty or is invalid'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('SSN cannot be empty or is invalid')).toBeInTheDocument();
       });
       expect(onComplete).not.toHaveBeenCalled();
     });
@@ -209,11 +171,7 @@ describe('Ssn', () => {
       renderSsn(initialContext, onComplete);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(
-            'What are the last 4 digits of your Social Security Number?',
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText('What are the last 4 digits of your Social Security Number?')).toBeInTheDocument();
       });
 
       const ssn = screen.getByLabelText('SSN (last 4)');
@@ -241,9 +199,7 @@ describe('Ssn', () => {
       renderSsn(initialContext, onComplete);
 
       await waitFor(() => {
-        expect(
-          screen.getByText("What's your Social Security Number?"),
-        ).toBeInTheDocument();
+        expect(screen.getByText("What's your Social Security Number?")).toBeInTheDocument();
       });
 
       const ssn = screen.getByLabelText('SSN');

@@ -31,10 +31,7 @@ const MobileNav = ({ navigation }: MobileNavProps) => {
       <Box ref={animateNavMenu}>
         {isExpanded && navigation && (
           <NavMenu>
-            <MenuLinks
-              navigation={navigation}
-              onNavItemClick={handleNavItemClick}
-            />
+            <MenuLinks navigation={navigation} onNavItemClick={handleNavItemClick} />
           </NavMenu>
         )}
       </Box>

@@ -1,12 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  createClipboardSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createClipboardSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import ToastProvider from '../toast/toast-provider';
@@ -81,9 +75,7 @@ describe('<CodeInline />', () => {
         });
         expect(confirmationTooltip).toBeInTheDocument();
       });
-      expect(writeTestMockFn).toHaveBeenCalledWith(
-        'fp_xm7T6MqhfRBkxL0DPOpfwM4',
-      );
+      expect(writeTestMockFn).toHaveBeenCalledWith('fp_xm7T6MqhfRBkxL0DPOpfwM4');
     });
   });
 

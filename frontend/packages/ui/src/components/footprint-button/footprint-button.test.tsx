@@ -31,9 +31,7 @@ describe('<FootprintButton />', () => {
 
   it('should render the text', () => {
     renderFootprintButton({});
-    expect(
-      screen.getByText('Verify with Footprint', { exact: false }),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Verify with Footprint', { exact: false })).toBeInTheDocument();
   });
 
   it('should fire an event when pressing', async () => {

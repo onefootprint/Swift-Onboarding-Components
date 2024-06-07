@@ -14,17 +14,13 @@ export type InsightEventPopoverProps = {
   children: string;
 };
 
-const InsightEventPopover = ({
-  insightEvent,
-  children,
-}: InsightEventPopoverProps) => {
+const InsightEventPopover = ({ insightEvent, children }: InsightEventPopoverProps) => {
   const [showPopover, setShowPopover] = useState(false);
   const popOverRef = useRef(null);
   const { t } = useTranslation('common', {
     keyPrefix: 'components.insight-event-popover',
   });
-  const { city, country, ipAddress, region, userAgent, postalCode } =
-    insightEvent;
+  const { city, country, ipAddress, region, userAgent, postalCode } = insightEvent;
   const fullRegion = getRegion(city, region);
   const insightList = [
     {

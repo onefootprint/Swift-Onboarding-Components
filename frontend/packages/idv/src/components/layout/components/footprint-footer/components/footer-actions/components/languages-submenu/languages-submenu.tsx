@@ -22,19 +22,12 @@ const LanguagesSubmenu = () => {
 
   return i18n.languages.length > 1 ? (
     <Dropdown.Sub open={submenuOpen}>
-      <Dropdown.SubTrigger
-        size="tiny"
-        onPointerDown={() => setSubmenuOpen(!submenuOpen)}
-      >
+      <Dropdown.SubTrigger size="tiny" onPointerDown={() => setSubmenuOpen(!submenuOpen)}>
         {`${t('languages')}...`}
       </Dropdown.SubTrigger>
       <StyledSubcontent onPointerDownOutside={() => setSubmenuOpen(false)}>
         {i18n.languages.map(language => (
-          <StyledItem
-            key={language}
-            onSelect={() => handleLanguageChange(language)}
-            size="tiny"
-          >
+          <StyledItem key={language} onSelect={() => handleLanguageChange(language)} size="tiny">
             {languageLabels[language as keyof typeof languageLabels]}
             {language === i18n.language && (
               <Stack align="center" justify="center">

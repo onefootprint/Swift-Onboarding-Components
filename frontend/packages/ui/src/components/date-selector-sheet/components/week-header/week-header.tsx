@@ -6,15 +6,7 @@ import Grid from '../../../grid';
 import Stack from '../../../stack';
 import Text from '../../../text';
 
-const dayTranslations = [
-  'sunday',
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-];
+const dayTranslations = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
 const WeekHeader = () => {
   const { t } = useTranslation('ui');

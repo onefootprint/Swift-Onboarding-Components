@@ -39,9 +39,7 @@ describe('Onboarding Machine Tests', () => {
     browser: 'Mobile Safari',
   };
 
-  const createMachine = ({
-    userData = defaultBootstrapData,
-  }: Partial<OnboardingMachineArgs> = {}) => {
+  const createMachine = ({ userData = defaultBootstrapData }: Partial<OnboardingMachineArgs> = {}) => {
     const machine = interpret(
       createOnboardingMachine({
         userData,

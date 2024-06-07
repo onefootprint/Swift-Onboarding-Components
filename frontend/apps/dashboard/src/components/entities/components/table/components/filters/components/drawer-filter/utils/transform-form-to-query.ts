@@ -1,14 +1,7 @@
 import type { FormData } from '../drawer-filter.type';
 import { FiltersDateRange } from '../drawer-filter.type';
 
-const transformFormDataToQuery = ({
-  labels,
-  others,
-  period,
-  customDate,
-  playbooks,
-  externalId,
-}: FormData) => {
+const transformFormDataToQuery = ({ labels, others, period, customDate, playbooks, externalId }: FormData) => {
   const getPeriod = () => {
     if (period === FiltersDateRange.Custom) {
       const newFrom = customDate.from.toISOString();

@@ -4,13 +4,7 @@ import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { IcoTrash16 } from '@onefootprint/icons';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
-import {
-  Button,
-  CountrySelect,
-  Divider,
-  LinkButton,
-  Stack,
-} from '@onefootprint/ui';
+import { Button, CountrySelect, Divider, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -27,53 +21,30 @@ type PickerProps = {
   onCancel: () => void;
 };
 
-const Picker = ({
-  editingCountryDocMap,
-  onSave,
-  onRemove,
-  onCancel,
-}: PickerProps) => {
+const Picker = ({ editingCountryDocMap, onSave, onRemove, onCancel }: PickerProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.playbooks.dialog.summary.id-doc.sections.country-specific',
+    keyPrefix: 'pages.playbooks.dialog.summary.id-doc.sections.country-specific',
   });
   const { watch } = useFormContext();
   const countryDocMap = watch('personal.countrySpecificIdDocKind');
   const globalDocs = watch('personal.idDocKind');
-  const editingCountry = editingCountryDocMap
-    ? Object.keys(editingCountryDocMap)[0]
-    : null;
-  const editingCountryRecord = COUNTRIES.find(
-    country => country.value === editingCountry,
-  );
-  const editingDocs = editingCountryDocMap
-    ? editingCountryDocMap[editingCountry as CountryCode]
-    : null;
+  const editingCountry = editingCountryDocMap ? Object.keys(editingCountryDocMap)[0] : null;
+  const editingCountryRecord = COUNTRIES.find(country => country.value === editingCountry);
+  const editingDocs = editingCountryDocMap ? editingCountryDocMap[editingCountry as CountryCode] : null;
   const existingCountries = Object.keys(countryDocMap);
   const countryOptions = COUNTRIES.filter(
-    country =>
-      country.value === editingCountry ||
-      !existingCountries.includes(country.value),
+    country => country.value === editingCountry || !existingCountries.includes(country.value),
   );
-  const [selectedCountry, setSelectedCountry] = useState<CountryRecord>(
-    editingCountryRecord ?? countryOptions[0],
-  );
+  const [selectedCountry, setSelectedCountry] = useState<CountryRecord>(editingCountryRecord ?? countryOptions[0]);
   const documentOptions = useIdDocOptions(selectedCountry);
-  const globalDocOptions = documentOptions.filter(doc =>
-    globalDocs?.includes(doc.value),
-  );
+  const globalDocOptions = documentOptions.filter(doc => globalDocs?.includes(doc.value));
   let preselectedDocs = documentOptions.filter(
-    doc =>
-      selectedCountry.value === editingCountry &&
-      editingDocs?.includes(doc.value),
+    doc => selectedCountry.value === editingCountry && editingDocs?.includes(doc.value),
   );
   if (preselectedDocs.length === 0) {
     preselectedDocs = globalDocOptions;
   }
-  const { selectedDocuments, setSelectedDocuments } = useSelectedDocuments(
-    preselectedDocs,
-    selectedCountry,
-  );
+  const { selectedDocuments, setSelectedDocuments } = useSelectedDocuments(preselectedDocs, selectedCountry);
 
   const handleCountryChange = (field: CountryRecord) => {
     setSelectedCountry(field);
@@ -87,13 +58,9 @@ const Picker = ({
   };
 
   const handleCheckboxChange = doc => {
-    const isSelected = selectedDocuments.some(
-      selectedDoc => selectedDoc.value === doc.value,
-    );
+    const isSelected = selectedDocuments.some(selectedDoc => selectedDoc.value === doc.value);
     if (isSelected) {
-      setSelectedDocuments(
-        selectedDocuments.filter(d => d.value !== doc.value),
-      );
+      setSelectedDocuments(selectedDocuments.filter(d => d.value !== doc.value));
     } else {
       setSelectedDocuments([...selectedDocuments, { ...doc }]);
     }
@@ -102,13 +69,7 @@ const Picker = ({
   return (
     <Container direction="column">
       <Stack direction="column" paddingTop={2} paddingBottom={2}>
-        <CountrySelectContainer
-          paddingTop={4}
-          paddingBottom={4}
-          paddingLeft={5}
-          paddingRight={5}
-          width="100%"
-        >
+        <CountrySelectContainer paddingTop={4} paddingBottom={4} paddingLeft={5} paddingRight={5} width="100%">
           <CountrySelect
             data-private
             label="Country"
@@ -127,9 +88,7 @@ const Picker = ({
           paddingRight={5}
         >
           {documentOptions.map(doc => {
-            const isSelected = selectedDocuments.some(
-              selectedDoc => selectedDoc.value === doc.value,
-            );
+            const isSelected = selectedDocuments.some(selectedDoc => selectedDoc.value === doc.value);
             return (
               <CheckboxChip
                 key={doc.value}
@@ -143,20 +102,9 @@ const Picker = ({
         </Stack>
       </Stack>
       <Divider variant="secondary" />
-      <Stack
-        align="center"
-        justify="space-between"
-        paddingTop={4}
-        paddingBottom={4}
-        paddingLeft={5}
-        paddingRight={5}
-      >
+      <Stack align="center" justify="space-between" paddingTop={4} paddingBottom={4} paddingLeft={5} paddingRight={5}>
         <Stack gap={3}>
-          <Button
-            onClick={handleSave}
-            variant="primary"
-            disabled={selectedDocuments.length === 0}
-          >
+          <Button onClick={handleSave} variant="primary" disabled={selectedDocuments.length === 0}>
             {t('save')}
           </Button>
           <Button onClick={onCancel} variant="secondary">

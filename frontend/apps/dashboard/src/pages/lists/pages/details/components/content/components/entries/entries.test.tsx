@@ -1,10 +1,4 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser } from 'src/config/tests';
 
@@ -52,9 +46,7 @@ describe('<Entries />', () => {
         expect(screen.queryByText('test@onefootprint.com')).toBe(null);
       });
 
-      const searchInput = screen.getByPlaceholderText(
-        'Find...',
-      ) as HTMLInputElement;
+      const searchInput = screen.getByPlaceholderText('Find...') as HTMLInputElement;
       await waitFor(() => {
         expect(searchInput).toHaveValue('test2');
       });
@@ -173,9 +165,7 @@ describe('<Entries />', () => {
 
       withListEntriesError(listId);
 
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Delete test@onefootprint.com' }),
-      );
+      await userEvent.click(screen.getByRole('button', { name: 'Delete test@onefootprint.com' }));
 
       await waitFor(() => {
         expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -201,17 +191,13 @@ describe('<Entries />', () => {
       });
 
       withListEntries(listId, entriesFixture.slice(1));
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Delete test@onefootprint.com' }),
-      );
+      await userEvent.click(screen.getByRole('button', { name: 'Delete test@onefootprint.com' }));
 
       await waitFor(() => {
         expect(screen.getByText('Deletion successful')).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.queryByText('test@onefootprint.com'),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('test@onefootprint.com')).not.toBeInTheDocument();
       });
     });
   });

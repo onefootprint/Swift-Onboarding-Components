@@ -9,13 +9,7 @@ type CodeProps = {
   inline?: boolean;
 };
 
-const Code = ({
-  children,
-  className,
-  filename,
-  highlight = '',
-  inline,
-}: CodeProps) => {
+const Code = ({ children, className, filename, highlight = '', inline }: CodeProps) => {
   const language = className && className.replace('lang-', '');
   const highlightLines = highlight.split(',');
 

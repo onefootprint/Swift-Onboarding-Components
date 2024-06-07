@@ -37,9 +37,7 @@ const getSectionTitle = (entry: unknown) => {
     sectionTitle = 'Users (Client)';
   } else {
     // Split CamelCase into separate words
-    sectionTitle = sectionTitle
-      .replace(/[A-Z]/g, (l: string) => ` ${l.toLowerCase()}`)
-      .trim();
+    sectionTitle = sectionTitle.replace(/[A-Z]/g, (l: string) => ` ${l.toLowerCase()}`).trim();
   }
   return sectionTitle;
 };
@@ -50,8 +48,7 @@ const methodPriority = (method: string) => {
   return prio !== undefined ? prio : Infinity;
 };
 
-const sectionPriority = (section: string) =>
-  section.toLowerCase().replace(' ', '-');
+const sectionPriority = (section: string) => section.toLowerCase().replace(' ', '-');
 
 // TODO: FP-6527 add openapi-typescript for TS generation
 const getArticles = (data: Record<string, unknown>): Article[] =>

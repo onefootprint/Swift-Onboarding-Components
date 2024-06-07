@@ -1,9 +1,6 @@
 import fixtures from './__fixtures__';
 import getAddressComponents from './get-address-components';
-import {
-  withGoogleMaps,
-  withGoogleMapsError,
-} from './get-address-components.test.config';
+import { withGoogleMaps, withGoogleMapsError } from './get-address-components.test.config';
 
 describe('getAddressComponents', () => {
   describe('when it returns the response with success', () => {

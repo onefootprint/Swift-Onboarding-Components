@@ -5,11 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updateList = async (
-  listId: string,
-  payload: UpdateListRequest,
-  authHeaders: AuthHeaders,
-) => {
+const updateList = async (listId: string, payload: UpdateListRequest, authHeaders: AuthHeaders) => {
   const response = await request({
     method: 'PATCH',
     url: `/org/lists/${listId}`,
@@ -25,16 +21,13 @@ const useUpdateList = (listId: string) => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
-  return useMutation(
-    (payload: UpdateListRequest) => updateList(listId, payload, authHeaders),
-    {
-      onError: showErrorToast,
-      onSuccess: () => {
-        queryClient.invalidateQueries(['lists', listId, authHeaders]);
-        queryClient.invalidateQueries(['list-timeline', listId, authHeaders]);
-      },
+  return useMutation((payload: UpdateListRequest) => updateList(listId, payload, authHeaders), {
+    onError: showErrorToast,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['lists', listId, authHeaders]);
+      queryClient.invalidateQueries(['list-timeline', listId, authHeaders]);
     },
-  );
+  });
 };
 
 export default useUpdateList;

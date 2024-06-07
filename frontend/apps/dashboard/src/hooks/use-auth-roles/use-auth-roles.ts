@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  GetAuthRoleResponse,
-  GetAuthRolesRequest,
-} from '@onefootprint/types';
+import type { GetAuthRoleResponse, GetAuthRolesRequest } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import { DASHBOARD_AUTHORIZATION_HEADER } from 'src/config/constants';
 

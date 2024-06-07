@@ -15,10 +15,7 @@ export type FreeFormNoteEntryDialogProps = {
   onClose: () => void;
 };
 
-const FreeFormNoteEntryDialog = ({
-  open,
-  onClose,
-}: FreeFormNoteEntryDialogProps) => {
+const FreeFormNoteEntryDialog = ({ open, onClose }: FreeFormNoteEntryDialogProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.free-form-note',
   });

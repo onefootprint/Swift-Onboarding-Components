@@ -7,7 +7,7 @@ type ErrorProps = {
   children: React.ReactNode;
 };
 
-const Error = ({ children }: ErrorProps) => (
+const ErrorComponent = ({ children }: ErrorProps) => (
   <Container>
     <IcoWarning16 color="error" />
     <Text variant="body-3" color="error">
@@ -25,4 +25,4 @@ const Container = styled.div`
   `}
 `;
 
-export default Error;
+export default ErrorComponent;

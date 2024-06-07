@@ -1,8 +1,4 @@
-import type {
-  VaultEmptyData,
-  VaultEncryptedData,
-  VaultTextData,
-} from './vault';
+import type { VaultEmptyData, VaultEncryptedData, VaultTextData } from './vault';
 
 type VaultValue = VaultTextData | VaultEncryptedData | VaultEmptyData;
 

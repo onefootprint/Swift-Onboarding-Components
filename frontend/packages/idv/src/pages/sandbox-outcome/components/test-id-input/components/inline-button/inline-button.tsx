@@ -11,13 +11,7 @@ type InlineButtonProps = {
   ariaLabel?: string;
 };
 
-const InlineButton = ({
-  icon: Icon,
-  tooltipText,
-  onClick,
-  disabled,
-  ariaLabel,
-}: InlineButtonProps) => {
+const InlineButton = ({ icon: Icon, tooltipText, onClick, disabled, ariaLabel }: InlineButtonProps) => {
   const icon = Icon && <Icon color={disabled ? 'quaternary' : 'primary'} />;
 
   return onClick ? (

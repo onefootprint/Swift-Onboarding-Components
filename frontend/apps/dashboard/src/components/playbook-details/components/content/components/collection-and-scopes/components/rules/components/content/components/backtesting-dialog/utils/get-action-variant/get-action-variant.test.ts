@@ -12,15 +12,11 @@ describe('getActionVariant', () => {
   });
 
   it('should return the info variant when the manual_review action is passed in', () => {
-    expect(getActionVariant(BacktestingRuleAction.manualReview)).toEqual(
-      'warning',
-    );
+    expect(getActionVariant(BacktestingRuleAction.manualReview)).toEqual('warning');
   });
 
   it('should return the success variant when the pass_with_manual_review action is passed in', () => {
-    expect(
-      getActionVariant(BacktestingRuleAction.passWithManualReview),
-    ).toEqual('success');
+    expect(getActionVariant(BacktestingRuleAction.passWithManualReview)).toEqual('success');
   });
 
   it('should return the neutral variant when the pass action is passed in', () => {

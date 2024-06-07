@@ -9,11 +9,7 @@ type UserChallengeVerifyBody = {
 };
 type UserChallengeVerifyResponse = {};
 
-const requestFn = async ({
-  authToken,
-  challengeResponse,
-  challengeToken,
-}: UserChallengeVerifyBody) => {
+const requestFn = async ({ authToken, challengeResponse, challengeToken }: UserChallengeVerifyBody) => {
   const headers: Record<string, string> = { [AUTH_HEADER]: authToken };
 
   const response = await request<UserChallengeVerifyResponse>({

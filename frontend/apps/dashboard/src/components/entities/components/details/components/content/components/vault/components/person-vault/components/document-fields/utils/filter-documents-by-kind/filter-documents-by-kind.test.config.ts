@@ -1,9 +1,5 @@
 import type { Document } from '@onefootprint/types';
-import {
-  IdDocStatus,
-  SupportedIdDocTypes,
-  UploadSource,
-} from '@onefootprint/types';
+import { IdDocStatus, SupportedIdDocTypes, UploadSource } from '@onefootprint/types';
 
 export const driversLicenseDocument1: Document = {
   completedVersion: 1,

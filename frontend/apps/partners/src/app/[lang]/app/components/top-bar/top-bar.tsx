@@ -17,14 +17,7 @@ const TopBar = () => (
     borderStyle="solid"
   >
     <Link href={DEFAULT_PRIVATE_ROUTE} aria-label="Home">
-      <Box
-        tag="span"
-        position="relative"
-        display="flex"
-        alignItems="center"
-        paddingTop={4}
-        paddingBottom={4}
-      >
+      <Box tag="span" position="relative" display="flex" alignItems="center" paddingTop={4} paddingBottom={4}>
         <ThemedLogoFpCompact color="primary" />
         <Pipe />
         <Text variant="label-3">Partners</Text>

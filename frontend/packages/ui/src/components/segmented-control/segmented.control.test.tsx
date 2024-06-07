@@ -23,23 +23,12 @@ describe('<SegmentedControl />', () => {
     ],
     value = 'option-1',
   }: Partial<SegmentedControlProps>) =>
-    customRender(
-      <SegmentedControl
-        aria-label={ariaLabel}
-        onChange={onChange}
-        options={options}
-        value={value}
-      />,
-    );
+    customRender(<SegmentedControl aria-label={ariaLabel} onChange={onChange} options={options} value={value} />);
 
   it('should render the options', () => {
     renderSegmentedControl({});
-    expect(
-      screen.getByRole('button', { name: 'Option 1' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Option 2' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Option 1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Option 2' })).toBeInTheDocument();
   });
 
   describe('when an option is selected', () => {

@@ -1,15 +1,5 @@
-import {
-  mockRequest,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
-import {
-  AuthMethodKind,
-  ChallengeKind,
-  IdDI,
-  OnboardingConfigStatus,
-} from '@onefootprint/types';
+import { mockRequest, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { AuthMethodKind, ChallengeKind, IdDI, OnboardingConfigStatus } from '@onefootprint/types';
 
 import * as getBiometricChallengeResponse from '../../utils/get-biometric-challenge-response';
 
@@ -27,9 +17,7 @@ const mockGenerateBiometricResponse = (): Promise<string> =>
   });
 
 export const mockGetBiometricChallengeResponse = () =>
-  jest
-    .spyOn(getBiometricChallengeResponse, 'default')
-    .mockImplementation(mockGenerateBiometricResponse);
+  jest.spyOn(getBiometricChallengeResponse, 'default').mockImplementation(mockGenerateBiometricResponse);
 
 export const getOnboardingConfig = (isLive?: boolean, noPhone?: boolean) => ({
   name: 'Acme Bank',
@@ -76,8 +64,7 @@ export const withIdentify = (context?: {
   matchingFps?: string[];
 }) => {
   const userFound = !!context;
-  const { challengeKinds, isUnverified, tokenScopes, matchingFps } =
-    context ?? {};
+  const { challengeKinds, isUnverified, tokenScopes, matchingFps } = context ?? {};
   const availableChallengeKinds = challengeKinds ?? ['sms', 'biometric'];
   const authMethodKind: Record<string, string> = {
     [ChallengeKind.biometric]: AuthMethodKind.passkey,
@@ -123,7 +110,7 @@ export const withLoginChallenge = (challengeKind: string) =>
 
 export const withSignupChallenge = (
   challengeKind?: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   onRequest?: (args: any) => void,
 ) =>
   mockRequest({
@@ -207,10 +194,7 @@ export const fillIdentifyPhone = async () => {
 export const fillChallengePin = async () => {
   // Wait until the login challenge request succeeds
   await waitFor(() => {
-    expect(screen.getByRole('presentation')).toHaveAttribute(
-      'data-pending',
-      'false',
-    );
+    expect(screen.getByRole('presentation')).toHaveAttribute('data-pending', 'false');
   });
   // expect(screen.getByTestId('navigation-back-button')).toBeInTheDocument();
   const firstInput = document.getElementsByTagName('input')[0];
@@ -231,17 +215,11 @@ export const fillChallengePin = async () => {
 
 export const bootstrapNewUser = async (isNoPhone: boolean) => {
   await waitFor(() => {
-    expect(
-      screen.getByText(
-        isNoPhone ? 'Verify your email address' : 'Verify your phone number',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(isNoPhone ? 'Verify your email address' : 'Verify your phone number')).toBeInTheDocument();
   });
   expect(screen.queryByText('Welcome back! 🎉')).toBeNull();
   expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
-  expect(
-    screen.getByText('Log in with a different account'),
-  ).toBeInTheDocument();
+  expect(screen.getByText('Log in with a different account')).toBeInTheDocument();
   await fillChallengePin();
 };
 
@@ -250,9 +228,7 @@ export const fillChallengePinExistingUser = async () => {
     expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
   });
   expect(screen.getByTestId('navigation-back-button')).toBeInTheDocument();
-  expect(
-    screen.queryByText('Log in with a different account'),
-  ).not.toBeInTheDocument();
+  expect(screen.queryByText('Log in with a different account')).not.toBeInTheDocument();
   await fillChallengePin();
 };
 
@@ -261,9 +237,7 @@ export const bootstrapExistingUser = async () => {
     expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
   });
   expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
-  expect(
-    screen.getByText('Log in with a different account'),
-  ).toBeInTheDocument();
+  expect(screen.getByText('Log in with a different account')).toBeInTheDocument();
   await fillChallengePin();
 };
 

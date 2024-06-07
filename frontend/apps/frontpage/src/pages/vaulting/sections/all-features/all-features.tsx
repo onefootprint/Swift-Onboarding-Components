@@ -8,7 +8,7 @@ import {
   IcoUser24,
   IcoWarning24,
 } from '@onefootprint/icons';
-import { Container, Grid, media, Stack } from '@onefootprint/ui';
+import { Container, Grid, Stack, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

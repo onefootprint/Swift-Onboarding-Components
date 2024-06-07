@@ -13,10 +13,7 @@ const isString = (x: unknown): x is string => typeof x === 'string';
  *     strInputToUSDate('es-MX', '25/12/1997') -> '12/25/1997'
  *     strInputToUSDate('en-US', falsy) -> ''
  */
-export const strInputToUSDate = (
-  locale: SupportedLocale,
-  str: string,
-): string => {
+export const strInputToUSDate = (locale: SupportedLocale, str: string): string => {
   if (!str || !isString(str) || !locale) return '';
 
   const now = new Date();
@@ -32,9 +29,7 @@ export const strInputToUSDate = (
 
   if (!day || !month || !year) return '';
 
-  return strFormat === 'day/month/year'
-    ? `${month}/${day}/${year}`
-    : `${day}/${month}/${year}`;
+  return strFormat === 'day/month/year' ? `${month}/${day}/${year}` : `${day}/${month}/${year}`;
 };
 
 /**
@@ -45,13 +40,9 @@ export const strInputToUSDate = (
  *     fromUSDateToISO8601Format('12/25/1997') -> '1997-12-25'
  *     fromUSDateToISO8601Format(falsy) -> undefined
  */
-export const fromUSDateToISO8601Format = (
-  date?: string | string[],
-): string | undefined => {
+export const fromUSDateToISO8601Format = (date?: string | string[]): string | undefined => {
   if (!date || !isString(date) || Array.isArray(date)) return undefined;
 
   const [month, day, year] = date.trim().split('/');
-  return !day || !month || !year
-    ? undefined
-    : `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  return !day || !month || !year ? undefined : `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 };

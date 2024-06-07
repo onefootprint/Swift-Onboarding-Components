@@ -1,12 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import {
-  Container,
-  LinkButton,
-  media,
-  Stack,
-  Tabs,
-  Text,
-} from '@onefootprint/ui';
+import { Container, LinkButton, Stack, Tabs, Text, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -31,9 +24,7 @@ const DeveloperExperience = () => {
   ];
 
   const [segment, setSegment] = useState(options[0].value);
-  const [imageSrc, setImageSrc] = useState(
-    `/developer-experience/${segment}.png`,
-  );
+  const [imageSrc, setImageSrc] = useState(`/developer-experience/${segment}.png`);
 
   const handleChange = (value: string) => {
     setSegment(value);

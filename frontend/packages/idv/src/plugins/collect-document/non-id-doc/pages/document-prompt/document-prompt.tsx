@@ -20,13 +20,7 @@ const DocumentPrompt = () => {
     keyPrefix: 'document-flow.non-id-doc.pages.document-prompt',
   });
   const [state, send] = useNonIdDocMachine();
-  const {
-    device,
-    config,
-    hasBadConnectivity,
-    uploadMode,
-    obConfigSupportedCountries,
-  } = state.context;
+  const { device, config, hasBadConnectivity, uploadMode, obConfigSupportedCountries } = state.context;
   const allowPdf = uploadMode === 'allow_upload';
   const isMobile = device.type === 'mobile';
   const { kind: documentRequestKind } = config;
@@ -63,12 +57,7 @@ const DocumentPrompt = () => {
   return (
     <FadeInContainer>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <PromptContainer
-        direction="column"
-        gap={7}
-        align="center"
-        justify="center"
-      >
+      <PromptContainer direction="column" gap={7} align="center" justify="center">
         <PromptWithGuidelines
           title={title}
           icon={IcoShieldFlash24}

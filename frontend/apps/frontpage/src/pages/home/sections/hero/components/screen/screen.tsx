@@ -120,14 +120,7 @@ const Screen = () => (
       height={140}
       loading="lazy"
     />
-    <Wire05
-      variants={itemVariants}
-      src="/home/hero/wire-05.svg"
-      alt="Wire 05"
-      width={70}
-      height={200}
-      loading="lazy"
-    />
+    <Wire05 variants={itemVariants} src="/home/hero/wire-05.svg" alt="Wire 05" width={70} height={200} loading="lazy" />
     <Device04
       variants={itemVariants}
       src="/home/hero/device-04.svg"
@@ -152,14 +145,7 @@ const Screen = () => (
       height={170}
       loading="lazy"
     />
-    <Wire06
-      variants={itemVariants}
-      src="/home/hero/wire-06.svg"
-      alt="Wire 06"
-      width={16}
-      height={145}
-      loading="lazy"
-    />
+    <Wire06 variants={itemVariants} src="/home/hero/wire-06.svg" alt="Wire 06" width={16} height={145} loading="lazy" />
     <Device06
       variants={itemVariants}
       src="/home/hero/device-06.svg"
@@ -168,13 +154,7 @@ const Screen = () => (
       height={120}
       loading="lazy"
     />
-    <Wire07
-      variants={itemVariants}
-      src="/home/hero/wire-07.svg"
-      alt="Wire 07"
-      width={123}
-      height={160}
-    />
+    <Wire07 variants={itemVariants} src="/home/hero/wire-07.svg" alt="Wire 07" width={123} height={160} />
     <Device09
       variants={itemVariants}
       src="/home/hero/device-09.svg"
@@ -183,14 +163,7 @@ const Screen = () => (
       height={170}
       loading="lazy"
     />
-    <Wire11
-      variants={itemVariants}
-      src="/home/hero/wire-11.svg"
-      alt="Wire 11"
-      width={36}
-      height={195}
-      loading="lazy"
-    />
+    <Wire11 variants={itemVariants} src="/home/hero/wire-11.svg" alt="Wire 11" width={36} height={195} loading="lazy" />
     <Device10
       variants={itemVariants}
       src="/home/hero/device-10.svg"
@@ -216,30 +189,10 @@ const Screen = () => (
       loading="lazy"
     />
     <motion.div variants={itemVariants}>
-      <Bird
-        variants={birdVariants}
-        src="/home/hero/bird.svg"
-        alt="Bird Icon"
-        width={80}
-        height={75}
-        loading="lazy"
-      />
+      <Bird variants={birdVariants} src="/home/hero/bird.svg" alt="Bird Icon" width={80} height={75} loading="lazy" />
     </motion.div>
-    <Wire08
-      variants={itemVariants}
-      src="/home/hero/wire-08.svg"
-      alt="Wire 08"
-      width={97}
-      height={62}
-    />
-    <Wire10
-      variants={itemVariants}
-      src="/home/hero/wire-10.svg"
-      alt="Wire 10"
-      width={81}
-      height={94}
-      loading="lazy"
-    />
+    <Wire08 variants={itemVariants} src="/home/hero/wire-08.svg" alt="Wire 08" width={97} height={62} />
+    <Wire10 variants={itemVariants} src="/home/hero/wire-10.svg" alt="Wire 10" width={81} height={94} loading="lazy" />
     <Penguin
       variants={itemVariants}
       src="/home/hero/penguin.svg"

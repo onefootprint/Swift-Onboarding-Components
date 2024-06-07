@@ -17,12 +17,7 @@ export type InlineAlertProps = BoxProps & {
   };
 };
 
-const InlineAlert = ({
-  cta,
-  children,
-  variant = 'info',
-  ...props
-}: InlineAlertProps) => {
+const InlineAlert = ({ cta, children, variant = 'info', ...props }: InlineAlertProps) => {
   const IconComponent = getIconForVariant(variant);
 
   return (

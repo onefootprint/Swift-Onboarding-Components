@@ -3,9 +3,7 @@ import { getLogger, isObject } from '@onefootprint/idv';
 
 const { logError } = getLogger({ location: 'are-props-valid' });
 
-const arePropsValid = (
-  props?: Record<string, unknown>,
-): props is FootprintFormDataProps => {
+const arePropsValid = (props?: Record<string, unknown>): props is FootprintFormDataProps => {
   if (!props || !isObject(props)) {
     logError('Received empty props');
     return false;

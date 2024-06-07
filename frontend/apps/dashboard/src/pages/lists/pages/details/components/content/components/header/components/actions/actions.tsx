@@ -50,9 +50,7 @@ const Actions = ({ disabled }: ActionsProps) => {
         <IcoDotsHorizontal24 />
       </StyledTrigger>
       <Dropdown.Content align="end" sideOffset={8}>
-        <Dropdown.Item onSelect={launchDeleteConfirmation}>
-          {t('delete')}
-        </Dropdown.Item>
+        <Dropdown.Item onSelect={launchDeleteConfirmation}>{t('delete')}</Dropdown.Item>
       </Dropdown.Content>
     </Dropdown.Root>
   );

@@ -18,26 +18,24 @@ import { createFontStyles } from '../../utils/mixins';
 import type { BoxProps, BoxStyleProps } from './box.types';
 import { filterProps } from './box.utils';
 
-const Box = forwardRef<HTMLDivElement, BoxProps>(
-  ({ center, typography, tag, testID, isPrivate, ...props }, ref) => {
-    const { styleProps, ...allProps } = filterProps(props);
+const Box = forwardRef<HTMLDivElement, BoxProps>(({ center, typography, tag, testID, isPrivate, ...props }, ref) => {
+  const { styleProps, ...allProps } = filterProps(props);
 
-    return (
-      <SB
-        $center={center}
-        $styleProps={styleProps}
-        $typography={typography}
-        as={tag}
-        data-private={isPrivate ? 'true' : undefined}
-        data-dd-privacy={isPrivate ? 'mask' : 'allow'}
-        data-testid={testID}
-        ref={ref}
-        className={props.className}
-        {...allProps}
-      />
-    );
-  },
-);
+  return (
+    <SB
+      $center={center}
+      $styleProps={styleProps}
+      $typography={typography}
+      as={tag}
+      data-private={isPrivate ? 'true' : undefined}
+      data-dd-privacy={isPrivate ? 'mask' : 'allow'}
+      data-testid={testID}
+      ref={ref}
+      className={props.className}
+      {...allProps}
+    />
+  );
+});
 
 const SB = styled.div<
   HTMLAttributes<HTMLDivElement> & {
@@ -80,9 +78,7 @@ const SB = styled.div<
         }
 
         if (prop === 'backgroundColor') {
-          return `background-color: ${
-            theme.backgroundColor[value as BackgroundColor]
-          };`;
+          return `background-color: ${theme.backgroundColor[value as BackgroundColor]};`;
         }
         if (prop === 'color') {
           return `color: ${theme.color[value as Color]};`;

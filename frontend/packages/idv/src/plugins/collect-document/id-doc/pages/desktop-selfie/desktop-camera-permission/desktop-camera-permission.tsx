@@ -11,20 +11,15 @@ type DesktopCameraPermissionProps = {
   permissionState: Exclude<CameraPermissionState, 'allowed'>;
 };
 
-const DesktopCameraPermission = ({
-  permissionState,
-}: DesktopCameraPermissionProps) => {
+const DesktopCameraPermission = ({ permissionState }: DesktopCameraPermissionProps) => {
   const { t } = useTranslation('idv', {
-    keyPrefix:
-      'document-flow.id-doc.pages.desktop-selfie.desktop-camera-permission',
+    keyPrefix: 'document-flow.id-doc.pages.desktop-selfie.desktop-camera-permission',
   });
 
   return (
     <Container>
       <Box>
-        <NavigationHeader
-          leftButton={{ variant: 'close', confirmClose: true }}
-        />
+        <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
         <HeaderTitle title={t('take-selfie')} />
       </Box>
       <CameraStateContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>

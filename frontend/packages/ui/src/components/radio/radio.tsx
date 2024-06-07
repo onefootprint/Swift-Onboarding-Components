@@ -51,12 +51,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 
     return (
       <Container>
-        <Label
-          aria-describedby={hint && `${id}-hint`}
-          data-testid={testID}
-          data-has-error={hasError}
-          htmlFor={id}
-        >
+        <Label aria-describedby={hint && `${id}-hint`} data-testid={testID} data-has-error={hasError} htmlFor={id}>
           <Input
             aria-checked={checked}
             aria-disabled={disabled}

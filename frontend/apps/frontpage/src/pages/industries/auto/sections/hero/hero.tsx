@@ -18,13 +18,7 @@ const Hero = ({ title, subtitle, illustration }: HeroProps) => (
       <Text variant="display-2" maxWidth="770px" textAlign="center" tag="h1">
         {title}
       </Text>
-      <Text
-        variant="display-4"
-        color="secondary"
-        maxWidth="660px"
-        textAlign="center"
-        tag="h4"
-      >
+      <Text variant="display-4" color="secondary" maxWidth="660px" textAlign="center" tag="h4">
         {subtitle}
       </Text>
     </TextContainer>

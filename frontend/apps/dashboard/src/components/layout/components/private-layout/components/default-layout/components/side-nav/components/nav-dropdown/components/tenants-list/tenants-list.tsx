@@ -21,9 +21,7 @@ const TenantsList = ({ tenants, currTenantId, onSelect }: TenantsListProps) => {
   });
   const [shouldShowAllTenants, setShouldShowAllTenants] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState(currTenantId);
-  const displayList = shouldShowAllTenants
-    ? tenants
-    : tenants.slice(0, NUM_TENANTS_IN_DROPDOWN);
+  const displayList = shouldShowAllTenants ? tenants : tenants.slice(0, NUM_TENANTS_IN_DROPDOWN);
 
   const handleClick = (tenantId: string) => {
     setSelectedTenant(tenantId);
@@ -46,17 +44,8 @@ const TenantsList = ({ tenants, currTenantId, onSelect }: TenantsListProps) => {
         />
       ))}
       {tenants.length > NUM_TENANTS_IN_DROPDOWN && (
-        <LinkButton
-          $paddingLeft={5}
-          $paddingBottom={3}
-          $paddingTop={3}
-          onClick={toggleShowAll}
-        >
-          {t(
-            shouldShowAllTenants
-              ? 'tenants-list.show-less'
-              : 'tenants-list.show-all',
-          )}
+        <LinkButton $paddingLeft={5} $paddingBottom={3} $paddingTop={3} onClick={toggleShowAll}>
+          {t(shouldShowAllTenants ? 'tenants-list.show-less' : 'tenants-list.show-all')}
         </LinkButton>
       )}
     </SectionContainer>

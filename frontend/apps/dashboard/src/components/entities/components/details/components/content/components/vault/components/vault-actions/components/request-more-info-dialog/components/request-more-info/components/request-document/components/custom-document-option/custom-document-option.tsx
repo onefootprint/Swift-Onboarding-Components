@@ -11,8 +11,7 @@ import { RequestMoreInfoKind } from '../../../../types';
 
 const CustomDocumentOption = () => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.entity.actions.request-more-info.form.document.custom-document',
+    keyPrefix: 'pages.entity.actions.request-more-info.form.document.custom-document',
   });
   const { register, watch, control, unregister, trigger } = useFormContext();
   const {
@@ -47,15 +46,9 @@ const CustomDocumentOption = () => {
     // Unregister custom document field after remove to remove the error state associated with the field
     // This is due to a bug in react-hook-form where the error state is not removed
     // https://github.com/orgs/react-hook-form/discussions/9875
-    unregister(
-      `customDocument.${customDocumentFields.length}.customDocumentName`,
-    );
-    unregister(
-      `customDocument.${customDocumentFields.length}.customDocumentIdentifier`,
-    );
-    unregister(
-      `customDocument.${customDocumentFields.length}.customDocumentDescription`,
-    );
+    unregister(`customDocument.${customDocumentFields.length}.customDocumentName`);
+    unregister(`customDocument.${customDocumentFields.length}.customDocumentIdentifier`);
+    unregister(`customDocument.${customDocumentFields.length}.customDocumentDescription`);
   }, [customDocumentFields.length, unregister]);
 
   return (
@@ -68,9 +61,7 @@ const CustomDocumentOption = () => {
         onChange={handleCustomDocumentChange}
         ref={ref}
       />
-      <AnimatedContainer
-        isExpanded={triggerKinds.includes(RequestMoreInfoKind.CustomDocument)}
-      >
+      <AnimatedContainer isExpanded={triggerKinds.includes(RequestMoreInfoKind.CustomDocument)}>
         <Stack direction="column" gap={7}>
           {customDocumentFields.map((field, index) => (
             <Stack key={field.id} direction="column" gap={5}>
@@ -91,18 +82,17 @@ const CustomDocumentOption = () => {
                   customDocDescriptionFormField={`customDocument.${index}.customDocumentDescription`}
                 />
               </Stack>
-              {customDocumentFields.length > 1 &&
-                index < customDocumentFields.length - 1 && (
-                  <LinkButton
-                    onClick={() => handleRemoveCustomDocument(index)}
-                    iconComponent={IcoTrash16}
-                    $marginLeft={7}
-                    iconPosition="left"
-                    destructive
-                  >
-                    {t('remove')}
-                  </LinkButton>
-                )}
+              {customDocumentFields.length > 1 && index < customDocumentFields.length - 1 && (
+                <LinkButton
+                  onClick={() => handleRemoveCustomDocument(index)}
+                  iconComponent={IcoTrash16}
+                  $marginLeft={7}
+                  iconPosition="left"
+                  destructive
+                >
+                  {t('remove')}
+                </LinkButton>
+              )}
             </Stack>
           ))}
         </Stack>

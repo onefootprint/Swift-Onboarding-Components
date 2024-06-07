@@ -16,9 +16,7 @@ const mockGenerateBiometricResponse = (): Promise<string> =>
   });
 
 export const mockGetBiometricChallengeResponse = () =>
-  jest
-    .spyOn(getBiometricChallengeResponse, 'default')
-    .mockImplementation(mockGenerateBiometricResponse);
+  jest.spyOn(getBiometricChallengeResponse, 'default').mockImplementation(mockGenerateBiometricResponse);
 
 export const withUserToken = (scopes: string[]) =>
   mockRequest({
@@ -41,10 +39,7 @@ export const withUserTokenError = () =>
     },
   });
 
-export const withIdentify = (
-  availableChallengeKinds?: string[],
-  hasSyncablePasskey?: boolean,
-) =>
+export const withIdentify = (_availableChallengeKinds?: string[], hasSyncablePasskey?: boolean) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify',

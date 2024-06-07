@@ -1,19 +1,12 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  UpdateMemberRequest,
-  UpdateMemberResponse,
-} from '@onefootprint/types';
+import type { UpdateMemberRequest, UpdateMemberResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updateMemberRequest = async (
-  authHeaders: AuthHeaders,
-  id: string,
-  payload: UpdateMemberRequest,
-) => {
+const updateMemberRequest = async (authHeaders: AuthHeaders, id: string, payload: UpdateMemberRequest) => {
   const { data } = await request<UpdateMemberResponse>({
     method: 'patch',
     url: `/org/members/${id}`,
@@ -33,8 +26,7 @@ const useUpdateMember = (memberId: string) => {
   const toast = useToast();
 
   return useMutation({
-    mutationFn: (payload: UpdateMemberRequest) =>
-      updateMemberRequest(session.authHeaders, memberId, payload),
+    mutationFn: (payload: UpdateMemberRequest) => updateMemberRequest(session.authHeaders, memberId, payload),
     onError: (error: unknown) => {
       toast.show({
         title: t('error.title'),

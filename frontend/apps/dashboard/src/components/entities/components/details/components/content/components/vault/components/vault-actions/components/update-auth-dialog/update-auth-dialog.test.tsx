@@ -24,8 +24,7 @@ const useRouterSpy = createUseRouterSpy();
 const renderDialog = ({
   open = defaultOptions.open,
   onClose = defaultOptions.onClose,
-}: Partial<UpdateAuthDialogProps>) =>
-  customRender(<UpdateAuthDialog open={open} onClose={onClose} />);
+}: Partial<UpdateAuthDialogProps>) => customRender(<UpdateAuthDialog open={open} onClose={onClose} />);
 
 describe('<UpdateAuthDialog />', () => {
   beforeEach(() => {
@@ -54,17 +53,13 @@ describe('<UpdateAuthDialog />', () => {
     renderDialog({ onClose: onCloseMockFn });
 
     await waitFor(() => {
-      expect(
-        screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
-      ).toBeInTheDocument();
+      expect(screen.getByDisplayValue('http://footprint.link/#tok_xxx')).toBeInTheDocument();
     });
 
     const copyButton = screen.getByRole('button', { name: 'Copy link' });
     await userEvent.click(copyButton);
     await waitFor(() => {
-      expect(writeTestMockFn).toHaveBeenCalledWith(
-        'http://footprint.link/#tok_xxx',
-      );
+      expect(writeTestMockFn).toHaveBeenCalledWith('http://footprint.link/#tok_xxx');
     });
     expect(onCloseMockFn).toHaveBeenCalled();
   });
@@ -90,9 +85,7 @@ describe('<UpdateAuthDialog />', () => {
     renderDialog({ onClose: onCloseMockFn });
 
     await waitFor(() => {
-      expect(
-        screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
-      ).toBeInTheDocument();
+      expect(screen.getByDisplayValue('http://footprint.link/#tok_xxx')).toBeInTheDocument();
     });
 
     mockRequest({
@@ -110,11 +103,7 @@ describe('<UpdateAuthDialog />', () => {
     await userEvent.click(sendLinkButton);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          'User will receive an email detailing the next steps shortly',
-        ),
-      ).toBeInTheDocument();
+      expect(screen.getByText('User will receive an email detailing the next steps shortly')).toBeInTheDocument();
     });
     expect(onCloseMockFn).toHaveBeenCalled();
   });

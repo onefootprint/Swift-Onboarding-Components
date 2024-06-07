@@ -34,9 +34,7 @@ const Template: Story<SelectProps> = ({
   size,
   value,
 }: SelectProps) => {
-  const [selectedOption, setSelectedOption] = useState<
-    SelectOption | undefined
-  >(value);
+  const [selectedOption, setSelectedOption] = useState<SelectOption | undefined>(value);
 
   const handleSelect = (newOption: SelectOption) => {
     setSelectedOption(newOption);
@@ -110,8 +108,7 @@ Custom.args = {
     {
       label: 'Step up',
       value: 'step_up',
-      description:
-        'Users will upload ID photos if not initially required by the configuration.',
+      description: 'Users will upload ID photos if not initially required by the configuration.',
     },
   ],
   placeholder: 'Select',

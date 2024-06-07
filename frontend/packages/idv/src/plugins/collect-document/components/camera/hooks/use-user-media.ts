@@ -25,30 +25,23 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
     const populateDeviceIds = async (deviceId?: string) => {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoInputDevices = devices.filter(
-          device => device.kind === 'videoinput',
-        );
-        const desiredFacingMode =
-          cameraKind === 'front' ? 'user' : 'environment';
+        const videoInputDevices = devices.filter(device => device.kind === 'videoinput');
+        const desiredFacingMode = cameraKind === 'front' ? 'user' : 'environment';
         const desiredDevices = videoInputDevices.filter(device =>
-          (device as InputDeviceInfo)
-            .getCapabilities()
-            .facingMode?.includes(desiredFacingMode),
+          (device as InputDeviceInfo).getCapabilities().facingMode?.includes(desiredFacingMode),
         );
         deviceIds.current = desiredDevices.map(device => ({
           id: device.deviceId,
           used: device.deviceId === deviceId,
         }));
-      } catch (err) {
-        logWarn('Error while populating device ids');
+      } catch (e) {
+        logWarn('Error while populating device ids', e);
       }
     };
 
     const initStreamAndPopulateDeviceIds = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia(
-          getCameraOptions(cameraKind),
-        );
+        const stream = await navigator.mediaDevices.getUserMedia(getCameraOptions(cameraKind));
         const { deviceId } = stream.getVideoTracks()[0].getSettings();
         await populateDeviceIds(deviceId);
         setMediaStream(stream);
@@ -63,9 +56,7 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
       const deviceId = deviceIds.current.find(device => !device.used)?.id;
       if (!deviceId) return;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia(
-          getCameraOptions(cameraKind, deviceId),
-        );
+        const stream = await navigator.mediaDevices.getUserMedia(getCameraOptions(cameraKind, deviceId));
         deviceIds.current.forEach(device => {
           // eslint-disable-next-line no-param-reassign
           if (device.id === deviceId) device.used = true;
@@ -108,8 +99,7 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
 
   const switchCamera = () => {
     // If all cameras have been used, don't switch anymore
-    if (deviceIds.current.length - 1 > switchCameraCount)
-      setSwitchCameraCount(prevCount => prevCount + 1);
+    if (deviceIds.current.length - 1 > switchCameraCount) setSwitchCameraCount(prevCount => prevCount + 1);
     else logWarn('All cameras have been used, cannot switch anymore');
   };
 

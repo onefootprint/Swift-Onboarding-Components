@@ -13,9 +13,7 @@ const Schema = ({ schema }: { schema: string }) => {
   return (
     <Container>
       {properties &&
-        Object.keys(properties).map(key => (
-          <Properties key={key} title={key} properties={properties[key]} />
-        ))}
+        Object.keys(properties).map(key => <Properties key={key} title={key} properties={properties[key]} />)}
     </Container>
   );
 };

@@ -9,10 +9,7 @@ import type {
 import type * as CSS from 'csstype';
 import { css } from 'styled-components';
 
-export const createFontStyles = (
-  variant: FontVariant,
-  fontFamily?: FontFamily,
-) => css`
+export const createFontStyles = (variant: FontVariant, fontFamily?: FontFamily) => css`
   ${({ theme }) => css`
     font-family: ${fontFamily ? theme.fontFamily[fontFamily] : 'inherit'};
     font-weight: ${theme.typography[variant].fontWeight};
@@ -21,9 +18,7 @@ export const createFontStyles = (
   `}
 `;
 
-const convertDeprecatedTypography = (
-  typography: DeprecatedTypography,
-): Typography => {
+const convertDeprecatedTypography = (typography: DeprecatedTypography): Typography => {
   const parts = typography.split(' ');
   if (parts.length < 2) {
     throw new Error('Invalid typography');
@@ -38,10 +33,7 @@ const convertDeprecatedTypography = (
 };
 
 export const createText = (typography: Typography | DeprecatedTypography) => {
-  const resolvedTypography =
-    typeof typography === 'string'
-      ? convertDeprecatedTypography(typography)
-      : typography;
+  const resolvedTypography = typeof typography === 'string' ? convertDeprecatedTypography(typography) : typography;
   return {
     fontFamily: 'inherit',
     fontSize: resolvedTypography.fontSize,
@@ -50,10 +42,7 @@ export const createText = (typography: Typography | DeprecatedTypography) => {
   };
 };
 
-export const createOverlayBackground = (
-  overlay: Overlay,
-  background: BackgroundColor,
-) => css`
+export const createOverlayBackground = (overlay: Overlay, background: BackgroundColor) => css`
   ${({ theme }) => css`
     background: linear-gradient(
         ${theme.overlay[overlay]},

@@ -31,13 +31,7 @@ const MobileImageGrid = ({ isDecrypted }: MobileImageGridProps) => (
       gap={5}
       rows={['auto']}
       columns={['340px']}
-      templateAreas={[
-        'basic-data',
-        'id-data',
-        'address',
-        'payment-data',
-        'custom-data',
-      ]}
+      templateAreas={['basic-data', 'id-data', 'address', 'payment-data', 'custom-data']}
     >
       <ImageContainer
         gridArea="basic-data"
@@ -47,9 +41,7 @@ const MobileImageGrid = ({ isDecrypted }: MobileImageGridProps) => (
         animate="animate"
       >
         <Image
-          src={`/vaulting/all-data/${
-            isDecrypted ? 'decrypted' : 'encrypted'
-          }/basic-data.png`}
+          src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/basic-data.png`}
           width={632}
           height={211}
           alt=""
@@ -64,9 +56,7 @@ const MobileImageGrid = ({ isDecrypted }: MobileImageGridProps) => (
         animate="animate"
       >
         <Image
-          src={`/vaulting/all-data/${
-            isDecrypted ? 'decrypted' : 'encrypted'
-          }/id-data.png`}
+          src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/id-data.png`}
           width={632}
           height={211}
           alt=""
@@ -81,9 +71,7 @@ const MobileImageGrid = ({ isDecrypted }: MobileImageGridProps) => (
         animate="animate"
       >
         <Image
-          src={`/vaulting/all-data/${
-            isDecrypted ? 'decrypted' : 'encrypted'
-          }/address.png`}
+          src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/address.png`}
           width={632}
           height={306}
           alt=""
@@ -98,9 +86,7 @@ const MobileImageGrid = ({ isDecrypted }: MobileImageGridProps) => (
         animate="animate"
       >
         <Image
-          src={`/vaulting/all-data/${
-            isDecrypted ? 'decrypted' : 'encrypted'
-          }/payment-data.png`}
+          src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/payment-data.png`}
           width={632}
           height={306}
           alt=""
@@ -115,9 +101,7 @@ const MobileImageGrid = ({ isDecrypted }: MobileImageGridProps) => (
         animate="animate"
       >
         <Image
-          src={`/vaulting/all-data/${
-            isDecrypted ? 'decrypted' : 'encrypted'
-          }/custom-data.png`}
+          src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/custom-data.png`}
           width={1280}
           height={170}
           alt=""

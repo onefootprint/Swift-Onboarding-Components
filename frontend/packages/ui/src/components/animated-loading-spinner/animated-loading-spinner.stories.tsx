@@ -20,33 +20,17 @@ export default {
   },
 } as ComponentMeta<typeof AnimatedLoadingSpinner>;
 
-const Template: ComponentStory<typeof AnimatedLoadingSpinner> = ({
-  size,
-  color,
-}) => {
+const Template: ComponentStory<typeof AnimatedLoadingSpinner> = ({ size, color }) => {
   const [animationStart, setAnimationStart] = useState(false);
 
   return (
     <Stack dir="column" gap={5}>
-      <AnimatedLoadingSpinner
-        animationStart={animationStart}
-        size={size}
-        color={color}
-      />
+      <AnimatedLoadingSpinner animationStart={animationStart} size={size} color={color} />
       <Stack gap={3}>
-        <Button
-          type="button"
-          size="compact"
-          onClick={() => setAnimationStart(true)}
-        >
+        <Button type="button" size="compact" onClick={() => setAnimationStart(true)}>
           Start Animation
         </Button>
-        <Button
-          type="button"
-          size="compact"
-          onClick={() => setAnimationStart(false)}
-          variant="secondary"
-        >
+        <Button type="button" size="compact" onClick={() => setAnimationStart(false)} variant="secondary">
           Stop Animation
         </Button>
       </Stack>

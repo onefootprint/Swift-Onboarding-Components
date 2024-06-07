@@ -1,7 +1,7 @@
 import type { EntityKind } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
-import { Error } from 'src/components';
+import { ErrorComponent } from 'src/components';
 
 import Content from './components/content';
 import Loading from './components/loading';
@@ -26,7 +26,7 @@ const Details = ({ kind, listPath }: DetailsProps) => {
           {isLoading && <Loading />}
           {error && !isLoading && (
             <TenantSwitcher entityId={id} Loading={Loading}>
-              <Error error={error} />
+              <ErrorComponent error={error} />
             </TenantSwitcher>
           )}
           {data && !isLoading && <Content />}

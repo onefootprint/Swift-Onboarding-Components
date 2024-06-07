@@ -1,7 +1,6 @@
 import type { ProviderReturn } from '@onefootprint/idv';
 
-const extractCleanDomain = (s: string): string =>
-  s.replace(/(https?:\/\/)?(www\.)?/gi, '').split(/[/?#]/)[0];
+const extractCleanDomain = (s: string): string => s.replace(/(https?:\/\/)?(www\.)?/gi, '').split(/[/?#]/)[0];
 
 const getSdkContext = async (
   fpProvider: ProviderReturn,

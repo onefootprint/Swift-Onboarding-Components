@@ -3,13 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import useSession from '../use-session';
 
 const useOrgSession = () => {
-  const {
-    data: sessionData,
-    dangerouslyCastedData: dangerouslySessionData,
-    isLive,
-    setIsLive,
-    logIn,
-  } = useSession();
+  const { data: sessionData, dangerouslyCastedData: dangerouslySessionData, isLive, setIsLive, logIn } = useSession();
   const queryClient = useQueryClient();
   const dangerouslyCastedData = dangerouslySessionData.org;
   const data = sessionData.org;

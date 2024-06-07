@@ -5,19 +5,11 @@ import type {
   LoginChallengeResponse,
   UserTokenResponse,
 } from '@onefootprint/types';
-import {
-  ChallengeKind,
-  IdentifyTokenScope,
-  UserTokenScope,
-} from '@onefootprint/types';
+import { ChallengeKind, IdentifyTokenScope, UserTokenScope } from '@onefootprint/types';
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import {
-  useIdentify,
-  useIdentifyVerify,
-  useLoginChallenge,
-} from '../../../../../../../../components/identify/queries';
+import { useIdentify, useIdentifyVerify, useLoginChallenge } from '../../../../../../../../components/identify/queries';
 import { useUserToken } from '../../../../../../../../hooks/api';
 import type { DeviceInfo } from '../../../../../../../../hooks/ui/use-device-info';
 import getBiometricChallengeResponse from './utils/get-biometric-challenge-response';
@@ -33,13 +25,8 @@ const isStepUpPossible = (
   { type, hasSupportForWebauthn }: DeviceInfo,
   response: IdentifyResponse | undefined,
 ): boolean => {
-  const serverSide = response?.user?.availableChallengeKinds.includes(
-    ChallengeKind.biometric,
-  );
-  const clientSide =
-    hasSupportForWebauthn && type === 'desktop'
-      ? response?.user?.hasSyncablePasskey
-      : true;
+  const serverSide = response?.user?.availableChallengeKinds.includes(ChallengeKind.biometric);
+  const clientSide = hasSupportForWebauthn && type === 'desktop' ? response?.user?.hasSyncablePasskey : true;
 
   return Boolean(serverSide) && Boolean(clientSide);
 };
@@ -47,23 +34,14 @@ const isStepUpPossible = (
 const isStepUpNeeded = (data?: Pick<UserTokenResponse, 'scopes'>) =>
   !data?.scopes.includes(UserTokenScope.sensitiveProfile);
 
-const useStepUp = ({
-  authToken,
-  device,
-  onSuccess,
-  onError,
-}: UseStepUpArgs) => {
+const useStepUp = ({ authToken, device, onSuccess, onError }: UseStepUpArgs) => {
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
 
   const userTokenQuery = useUserToken(
     { authToken },
     {
       onError: (error: unknown) => {
-        onError?.(
-          `Failed to get user token info for step up. ${getErrorMessage(
-            error,
-          )}`,
-        );
+        onError?.(`Failed to get user token info for step up. ${getErrorMessage(error)}`);
       },
     },
   );
@@ -86,30 +64,21 @@ const useStepUp = ({
       { authToken },
       {
         onError: (error: unknown) => {
-          onError?.(
-            `Failed to identify user for step up, ${getErrorMessage(error)}`,
-          );
+          onError?.(`Failed to identify user for step up, ${getErrorMessage(error)}`);
         },
       },
     );
   });
 
-  const handleLoginChallengeSuccess = async (
-    payload: LoginChallengeResponse,
-  ) => {
+  const handleLoginChallengeSuccess = async (payload: LoginChallengeResponse) => {
     if (!payload?.challengeData) {
-      onError?.(
-        `Missing challenge data in response. Challenge kind received: ${payload.challengeData.challengeKind}`,
-      );
+      onError?.(`Missing challenge data in response. Challenge kind received: ${payload.challengeData.challengeKind}`);
       return;
     }
-    const { biometricChallengeJson, challengeToken, challengeKind } =
-      payload.challengeData;
+    const { biometricChallengeJson, challengeToken, challengeKind } = payload.challengeData;
 
     if (challengeKind !== ChallengeKind.biometric) {
-      onError?.(
-        `Received ${challengeKind} challenge after requesting login biometric challenge`,
-      );
+      onError?.(`Received ${challengeKind} challenge after requesting login biometric challenge`);
       return;
     }
 
@@ -121,9 +90,7 @@ const useStepUp = ({
     setIsRunningWebauthn(true);
     let challengeResponse;
     try {
-      challengeResponse = await getBiometricChallengeResponse(
-        biometricChallengeJson,
-      );
+      challengeResponse = await getBiometricChallengeResponse(biometricChallengeJson);
     } catch (e) {
       onError?.(`Failed to get biometric challenge response, ${e}`);
     }
@@ -144,17 +111,11 @@ const useStepUp = ({
         authToken: payload.challengeData.token,
       },
       {
-        onSuccess: ({
-          authToken: steppedUpAuthToken,
-        }: IdentifyVerifyResponse) => {
+        onSuccess: ({ authToken: steppedUpAuthToken }: IdentifyVerifyResponse) => {
           onSuccess?.(steppedUpAuthToken);
         },
         onError: (error: unknown) => {
-          onError?.(
-            `Encountered error while verifying login challenge for step up: ${getErrorMessage(
-              error,
-            )}`,
-          );
+          onError?.(`Encountered error while verifying login challenge for step up: ${getErrorMessage(error)}`);
         },
         onSettled: () => {
           setIsRunningWebauthn(false);
@@ -188,11 +149,7 @@ const useStepUp = ({
       {
         onSuccess: handleLoginChallengeSuccess,
         onError: (error: unknown) => {
-          onError?.(
-            `Encountered error while requesting login challenge for step up: ${getErrorMessage(
-              error,
-            )}`,
-          );
+          onError?.(`Encountered error while requesting login challenge for step up: ${getErrorMessage(error)}`);
         },
       },
     );

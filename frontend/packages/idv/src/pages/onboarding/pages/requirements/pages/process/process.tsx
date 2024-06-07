@@ -26,12 +26,9 @@ const Process = ({ onDone }: ProcessProps) => {
       {
         onSuccess: onDone,
         onError: (error: unknown) => {
-          Logger.error(
-            `Error while processing onboarding on authorize page. ${getErrorMessage(
-              error,
-            )}`,
-            { location: 'onboarding-process' },
-          );
+          Logger.error(`Error while processing onboarding on authorize page. ${getErrorMessage(error)}`, {
+            location: 'onboarding-process',
+          });
           send('error');
         },
       },

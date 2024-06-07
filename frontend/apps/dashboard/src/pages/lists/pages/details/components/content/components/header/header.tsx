@@ -31,18 +31,10 @@ const Header = () => {
   };
 
   return (
-    <Stack
-      aria-label={data.name}
-      direction="row"
-      justifyContent="space-between"
-    >
+    <Stack aria-label={data.name} direction="row" justifyContent="space-between">
       <Stack display="flex" direction="column">
         <Stack gap={3}>
-          {data.name ? (
-            <Text variant="label-1">{data.name}</Text>
-          ) : (
-            <Shimmer height="27px" width="75px" />
-          )}
+          {data.name ? <Text variant="label-1">{data.name}</Text> : <Shimmer height="27px" width="75px" />}
           <Text tag="span" variant="label-1">
             •
           </Text>
@@ -64,26 +56,16 @@ const Header = () => {
         </Stack>
       </Stack>
       <Stack align="center" gap={3}>
-        <PermissionGate
-          fallbackText={t('cta-edit-not-allowed')}
-          scopeKind={RoleScopeKind.writeLists}
-        >
+        <PermissionGate fallbackText={t('cta-edit-not-allowed')} scopeKind={RoleScopeKind.writeLists}>
           <Button variant="secondary" onClick={launchEditDialog}>
             {t('edit')}
           </Button>
         </PermissionGate>
-        <PermissionGate
-          fallbackText={t('cta-delete-not-allowed')}
-          scopeKind={RoleScopeKind.writeLists}
-        >
+        <PermissionGate fallbackText={t('cta-delete-not-allowed')} scopeKind={RoleScopeKind.writeLists}>
           <Actions />
         </PermissionGate>
       </Stack>
-      <EditDialog
-        open={isEditDialogOpen}
-        onClose={closeDialog}
-        onEdit={closeDialog}
-      />
+      <EditDialog open={isEditDialogOpen} onClose={closeDialog} onEdit={closeDialog} />
     </Stack>
   );
 };

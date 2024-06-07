@@ -1,10 +1,5 @@
 import type { Entity } from '@onefootprint/types';
-import {
-  EntityKind,
-  EntityStatus,
-  WatchlistCheckReasonCode,
-  WatchlistCheckStatus,
-} from '@onefootprint/types';
+import { EntityKind, EntityStatus, WatchlistCheckReasonCode, WatchlistCheckStatus } from '@onefootprint/types';
 
 export const entityPassedFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',

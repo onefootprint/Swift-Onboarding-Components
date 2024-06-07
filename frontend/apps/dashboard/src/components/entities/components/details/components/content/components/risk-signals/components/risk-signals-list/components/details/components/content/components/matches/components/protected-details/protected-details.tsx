@@ -12,25 +12,14 @@ type ProtectedDetailsProps = {
   isLoading: boolean;
 };
 
-const REQUIRED_DECRYPTABLE_ATTRS = [
-  IdDI.firstName,
-  IdDI.middleName,
-  IdDI.lastName,
-  IdDI.dob,
-];
+const REQUIRED_DECRYPTABLE_ATTRS = [IdDI.firstName, IdDI.middleName, IdDI.lastName, IdDI.dob];
 
-const ProtectedDetails = ({
-  entity,
-  onClick,
-  isLoading,
-}: ProtectedDetailsProps) => {
+const ProtectedDetails = ({ entity, onClick, isLoading }: ProtectedDetailsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.risk-signals.details.matches.protected-details',
   });
   const canDecrypt = REQUIRED_DECRYPTABLE_ATTRS.every(
-    di =>
-      !entity.attributes.includes(di) ||
-      entity.decryptableAttributes.includes(di),
+    di => !entity.attributes.includes(di) || entity.decryptableAttributes.includes(di),
   );
 
   return (
@@ -49,11 +38,7 @@ const ProtectedDetails = ({
           <Text variant="body-4" color="tertiary">
             {t('no-permission.message')}
           </Text>
-          <LinkButton
-            href={`${DASHBOARD_BASE_URL}/settings`}
-            target="_blank"
-            $marginTop={3}
-          >
+          <LinkButton href={`${DASHBOARD_BASE_URL}/settings`} target="_blank" $marginTop={3}>
             {t('no-permission.button')}
           </LinkButton>
         </InstructionsBox>

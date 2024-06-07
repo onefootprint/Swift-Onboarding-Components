@@ -11,13 +11,7 @@ type SectionProps = {
   actions?: React.ReactNode;
 };
 
-const Section = ({
-  children,
-  IconComponent,
-  title,
-  id,
-  actions,
-}: SectionProps) => (
+const Section = ({ children, IconComponent, title, id, actions }: SectionProps) => (
   <Box aria-label={title} id={id} role="group">
     <Header>
       <Text tag="h2" variant="label-1" gap={3} display="flex">

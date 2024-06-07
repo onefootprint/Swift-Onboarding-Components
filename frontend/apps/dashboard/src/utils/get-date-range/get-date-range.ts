@@ -17,29 +17,17 @@ const getDateRange = (dateRange?: string | string[], now = new Date()) => {
   }
 
   if (period === FilterDateRange.Today) {
-    const today = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    ).toISOString();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
     return { from: today, to: undefined };
   }
 
   if (period === FilterDateRange.Last7Days) {
-    const lastWeek = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - 7,
-    );
+    const lastWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
     return { from: lastWeek, to: undefined };
   }
 
   if (period === FilterDateRange.Last30Days) {
-    const lastMonth = new Date(
-      now.getFullYear(),
-      now.getMonth() - 1,
-      now.getDate(),
-    );
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
     return { from: lastMonth, to: undefined };
   }
   return { from: undefined, to: undefined };

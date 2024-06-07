@@ -7,8 +7,8 @@ import type { Typegen0 } from './machine.typegen';
 
 type WithArgs = { args: AuthMethodsMachineArgs };
 
-export const [AuthMethodsMachineProvider, useAuthMethodsMachine] = constate(
-  ({ args }: WithArgs) => useMachine(() => createAuthMethodsMachine(args)),
+export const [AuthMethodsMachineProvider, useAuthMethodsMachine] = constate(({ args }: WithArgs) =>
+  useMachine(() => createAuthMethodsMachine(args)),
 );
 
 export type AuthMethodsMachineHook = ReturnType<typeof useAuthMethodsMachine>;

@@ -1,15 +1,9 @@
-import {
-  DocumentDI,
-  InvestorProfileDI,
-  isVaultDataEmpty,
-} from '@onefootprint/types';
+import { DocumentDI, InvestorProfileDI, isVaultDataEmpty } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
-import createStringList, {
-  createCapitalStringList,
-} from 'src/utils/create-string-list';
+import createStringList, { createCapitalStringList } from 'src/utils/create-string-list';
 import styled, { css } from 'styled-components';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
@@ -38,11 +32,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               !isValueDecrypted ? (
                 <FieldOrPlaceholder data={value} />
               ) : (
-                <FieldOrPlaceholder
-                  data={t(
-                    `employment-status.options.${value}` as ParseKeys<'common'>,
-                  )}
-                />
+                <FieldOrPlaceholder data={t(`employment-status.options.${value}` as ParseKeys<'common'>)} />
               )
             }
           />
@@ -59,11 +49,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               !isValueDecrypted ? (
                 <FieldOrPlaceholder data={value} />
               ) : (
-                <FieldOrPlaceholder
-                  data={t(
-                    `annual-income.options.${value}` as ParseKeys<'common'>,
-                  )}
-                />
+                <FieldOrPlaceholder data={t(`annual-income.options.${value}` as ParseKeys<'common'>)} />
               )
             }
           />
@@ -76,9 +62,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               !isValueDecrypted ? (
                 <FieldOrPlaceholder data={value} />
               ) : (
-                <FieldOrPlaceholder
-                  data={t(`net-worth.options.${value}` as ParseKeys<'common'>)}
-                />
+                <FieldOrPlaceholder data={t(`net-worth.options.${value}` as ParseKeys<'common'>)} />
               )
             }
           />
@@ -95,11 +79,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
                 return (
                   <FieldOrPlaceholder
                     data={createCapitalStringList(
-                      value.map(option =>
-                        t(
-                          `investment-goals.options.${option}` as ParseKeys<'common'>,
-                        ),
-                      ),
+                      value.map(option => t(`investment-goals.options.${option}` as ParseKeys<'common'>)),
                     )}
                   />
                 );
@@ -116,11 +96,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               !isValueDecrypted ? (
                 <FieldOrPlaceholder data={value} />
               ) : (
-                <FieldOrPlaceholder
-                  data={t(
-                    `risk-tolerance.options.${value}` as ParseKeys<'common'>,
-                  )}
-                />
+                <FieldOrPlaceholder data={t(`risk-tolerance.options.${value}` as ParseKeys<'common'>)} />
               )
             }
           />
@@ -132,18 +108,12 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
             renderValue={value => {
               if (Array.isArray(value)) {
                 if (value.length === 0) {
-                  return (
-                    <FieldOrPlaceholder data={t('declarations.options.none')} />
-                  );
+                  return <FieldOrPlaceholder data={t('declarations.options.none')} />;
                 }
                 return (
                   <FieldOrPlaceholder
                     data={createCapitalStringList(
-                      value.map(option =>
-                        t(
-                          `declarations.options.${option}` as ParseKeys<'common'>,
-                        ),
-                      ),
+                      value.map(option => t(`declarations.options.${option}` as ParseKeys<'common'>)),
                     )}
                   />
                 );
@@ -151,61 +121,37 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               return <FieldOrPlaceholder data={value} />;
             }}
           />
-          {isVaultDataEmpty(
-            vaultData?.[InvestorProfileDI.brokerageFirmEmployer],
-          ) ? null : (
-            <Field
-              di={InvestorProfileDI.brokerageFirmEmployer}
-              entity={entity}
-            />
+          {isVaultDataEmpty(vaultData?.[InvestorProfileDI.brokerageFirmEmployer]) ? null : (
+            <Field di={InvestorProfileDI.brokerageFirmEmployer} entity={entity} />
           )}
-          {isVaultDataEmpty(
-            vaultData?.[InvestorProfileDI.seniorExecutiveSymbols],
-          ) ? null : (
+          {isVaultDataEmpty(vaultData?.[InvestorProfileDI.seniorExecutiveSymbols]) ? null : (
             <Field
               di={InvestorProfileDI.seniorExecutiveSymbols}
               entity={entity}
               renderValue={value => {
                 if (Array.isArray(value)) {
-                  return (
-                    <FieldOrPlaceholder
-                      data={createStringList(value as string[])}
-                    />
-                  );
+                  return <FieldOrPlaceholder data={createStringList(value as string[])} />;
                 }
                 return <FieldOrPlaceholder data={value} />;
               }}
             />
           )}
-          {isVaultDataEmpty(
-            vaultData?.[InvestorProfileDI.familyMemberNames],
-          ) ? null : (
+          {isVaultDataEmpty(vaultData?.[InvestorProfileDI.familyMemberNames]) ? null : (
             <Field
               di={InvestorProfileDI.familyMemberNames}
               entity={entity}
               renderValue={value => {
                 if (Array.isArray(value)) {
-                  return (
-                    <FieldOrPlaceholder
-                      data={createStringList(value as string[])}
-                    />
-                  );
+                  return <FieldOrPlaceholder data={createStringList(value as string[])} />;
                 }
                 return <FieldOrPlaceholder data={value} />;
               }}
             />
           )}
-          {isVaultDataEmpty(
-            vaultData?.[InvestorProfileDI.politicalOrganization],
-          ) ? null : (
-            <Field
-              di={InvestorProfileDI.politicalOrganization}
-              entity={entity}
-            />
+          {isVaultDataEmpty(vaultData?.[InvestorProfileDI.politicalOrganization]) ? null : (
+            <Field di={InvestorProfileDI.politicalOrganization} entity={entity} />
           )}
-          {isVaultDataEmpty(
-            vaultData?.[DocumentDI.finraComplianceLetter],
-          ) ? null : (
+          {isVaultDataEmpty(vaultData?.[DocumentDI.finraComplianceLetter]) ? null : (
             <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
           )}
         </FieldSection>

@@ -7,6 +7,7 @@ type ChangelogContentProps = {
 };
 
 const HtmlContent = ({ html }: ChangelogContentProps) => (
+  // biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
   <Content dangerouslySetInnerHTML={{ __html: html }} />
 );
 

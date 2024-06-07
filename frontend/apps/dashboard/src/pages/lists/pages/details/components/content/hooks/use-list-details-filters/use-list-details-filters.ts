@@ -1,10 +1,7 @@
 import useFilters from 'src/hooks/use-filters';
 
 import useFilterValues from './hooks/use-filter-values';
-import type {
-  ListDetailsFilterValues,
-  ListDetailsQueryString,
-} from './use-list-details-filters.types';
+import type { ListDetailsFilterValues, ListDetailsQueryString } from './use-list-details-filters.types';
 
 const defaultQueryString: ListDetailsQueryString = {
   search: undefined,

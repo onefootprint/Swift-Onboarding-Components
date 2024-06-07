@@ -77,9 +77,7 @@ describe('createAppearanceRules', () => {
           backgroundColor: 'red',
           transform: 'rotateZ(45deg)',
         }),
-      ).toEqual(
-        'width:1px;height:1px;background-color:red;transform:rotateZ(45deg);',
-      );
+      ).toEqual('width:1px;height:1px;background-color:red;transform:rotateZ(45deg);');
       expect(
         convertObjectToCSS({
           width: '100%',

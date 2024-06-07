@@ -5,12 +5,8 @@ import React from 'react';
 import type { BusinessInformationWithContext } from './business.test.config';
 import BusinesssInformationWithContext from './business.test.config';
 
-const renderBusinessInformation = ({
-  startingValues,
-}: BusinessInformationWithContext) => {
-  customRender(
-    <BusinesssInformationWithContext startingValues={startingValues} />,
-  );
+const renderBusinessInformation = ({ startingValues }: BusinessInformationWithContext) => {
+  customRender(<BusinesssInformationWithContext startingValues={startingValues} />);
 };
 describe('<BusinessInformation />', () => {
   it('when removing legal entity type and cancelling, should not save progress', async () => {

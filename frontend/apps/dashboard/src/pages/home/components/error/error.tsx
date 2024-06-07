@@ -9,7 +9,7 @@ type ErrorProps = {
   error: unknown;
 };
 
-const Error = ({ error }: ErrorProps) => (
+const ErrorComponent = ({ error }: ErrorProps) => (
   <Container>
     {`${getErrorMessage(error)}. `}
     <Trans
@@ -17,11 +17,7 @@ const Error = ({ error }: ErrorProps) => (
       components={{
         refresh: (
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
-          <Link
-            onClick={() => window.location.reload()}
-            href=""
-            style={{ textDecoration: 'none', color: '#4A24DB' }}
-          />
+          <Link onClick={() => window.location.reload()} href="" style={{ textDecoration: 'none', color: '#4A24DB' }} />
         ),
       }}
     />
@@ -36,4 +32,4 @@ const Container = styled.p`
   `}
 `;
 
-export default Error;
+export default ErrorComponent;

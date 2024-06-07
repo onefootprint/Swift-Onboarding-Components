@@ -22,15 +22,10 @@ const getLeftNavButton = (
   // If true, we've been given information with which to identify the user, so we generally don't
   // want to allow going back to the email/phone input screens
   const identifyStartedWithBootstrapOrAuthToken =
-    bootstrapData?.email ||
-    bootstrapData?.phoneNumber ||
-    context.initialAuthToken;
+    bootstrapData?.email || bootstrapData?.phoneNumber || context.initialAuthToken;
 
   // When true, there is a challenge selector screen before the SMS and email challenge screens
-  const hasChallengeSelector = shouldShowChallengeSelector(
-    context,
-    context.identify.user,
-  );
+  const hasChallengeSelector = shouldShowChallengeSelector(context, context.identify.user);
 
   if (matches('smsChallenge')) {
     if (hasChallengeSelector) {

@@ -5,16 +5,11 @@ import set from 'lodash/set';
 
 import variablesMap from './constants/variables-map';
 
-export const createTheme = (
-  baseTheme: Theme,
-  variables?: FootprintAppearanceVariables,
-): Theme => {
+export const createTheme = (baseTheme: Theme, variables?: FootprintAppearanceVariables): Theme => {
   const clonedBasedTheme = cloneDeep(baseTheme);
-  if (!variables || Object.keys(variables).length === 0)
-    return clonedBasedTheme;
+  if (!variables || Object.keys(variables).length === 0) return clonedBasedTheme;
   return Object.entries(variables).reduce(
-    (theme, [tokenName, tokenValue]) =>
-      iterateOverVariables({ theme, variables, tokenName, tokenValue }),
+    (theme, [tokenName, tokenValue]) => iterateOverVariables({ theme, variables, tokenName, tokenValue }),
     clonedBasedTheme,
   );
 };

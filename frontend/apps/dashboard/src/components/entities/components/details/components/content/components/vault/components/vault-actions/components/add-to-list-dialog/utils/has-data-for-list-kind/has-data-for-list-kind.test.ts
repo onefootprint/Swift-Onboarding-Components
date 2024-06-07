@@ -32,9 +32,7 @@ describe('hasDataForListKind', () => {
 
     expect(hasDataForListKind(ListKind.emailAddress, userEntity)).toBe(false);
     expect(hasDataForListKind(ListKind.emailDomain, userEntity)).toBe(false);
-    expect(hasDataForListKind(ListKind.phoneCountryCode, userEntity)).toBe(
-      true,
-    );
+    expect(hasDataForListKind(ListKind.phoneCountryCode, userEntity)).toBe(true);
     expect(hasDataForListKind(ListKind.phoneNumber, userEntity)).toBe(true);
     expect(hasDataForListKind(ListKind.ssn9, userEntity)).toBe(false);
     expect(hasDataForListKind(ListKind.ipAddress, userEntity)).toBe(false);
@@ -47,15 +45,9 @@ describe('hasDataForListKind', () => {
       workflows: [],
     } as unknown as Entity;
 
-    expect(hasDataForListKind(ListKind.emailAddress, businessEntity)).toBe(
-      false,
-    );
-    expect(hasDataForListKind(ListKind.emailDomain, businessEntity)).toBe(
-      false,
-    );
-    expect(hasDataForListKind(ListKind.phoneCountryCode, businessEntity)).toBe(
-      true,
-    );
+    expect(hasDataForListKind(ListKind.emailAddress, businessEntity)).toBe(false);
+    expect(hasDataForListKind(ListKind.emailDomain, businessEntity)).toBe(false);
+    expect(hasDataForListKind(ListKind.phoneCountryCode, businessEntity)).toBe(true);
     expect(hasDataForListKind(ListKind.phoneNumber, businessEntity)).toBe(true);
     expect(hasDataForListKind(ListKind.ssn9, businessEntity)).toBe(false);
     expect(hasDataForListKind(ListKind.ipAddress, businessEntity)).toBe(false);

@@ -1,13 +1,7 @@
 import React from 'react';
 
 const Penguin = () => (
-  <svg
-    width="124"
-    height="78"
-    viewBox="0 0 124 78"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg width="124" height="78" viewBox="0 0 124 78" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M11.4349 81.3498L25.6362 61.4383L35.7226 29.3226L42.6223 12.8629L56.8236 4.50049L73.0181 7.55453L79.2548 16.0496L81.2439 29.19L80.9787 42.5916L78.4591 54.9364L79.6526 65.0228L83.2371 77.6327L84.0327 81.3498H11.4349Z"
       fill="white"

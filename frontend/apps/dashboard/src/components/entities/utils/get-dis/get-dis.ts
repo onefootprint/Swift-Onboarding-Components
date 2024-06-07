@@ -9,19 +9,10 @@ const order: Record<string, number> = {
   billing_address: 6,
 };
 
-const filter = (
-  attributes: DataIdentifier[],
-  search: string | null | undefined,
-) => {
-  const hiddenAttributes = [
-    'expiration_month',
-    'expiration_year',
-    'number_last4',
-  ];
+const filter = (attributes: DataIdentifier[], search: string | null | undefined) => {
+  const hiddenAttributes = ['expiration_month', 'expiration_year', 'number_last4'];
   return attributes.filter(
-    attr =>
-      attr.includes(`card.${search}`) &&
-      !hiddenAttributes.some(hiddenAttr => attr.includes(hiddenAttr)),
+    attr => attr.includes(`card.${search}`) && !hiddenAttributes.some(hiddenAttr => attr.includes(hiddenAttr)),
   );
 };
 
@@ -46,16 +37,11 @@ const sort = (attributes: DataIdentifier[]) =>
 
 export const getCustomDIs = (data: EntityVault) => {
   const attributes = Object.keys(data);
-  const filtered = attributes.filter(
-    attr => attr.startsWith('custom') || attr.startsWith('document.custom'),
-  );
+  const filtered = attributes.filter(attr => attr.startsWith('custom') || attr.startsWith('document.custom'));
   return filtered as DataIdentifier[];
 };
 
-const getDis = (
-  attributes: DataIdentifier[],
-  search: string | null | undefined,
-) => {
+const getDis = (attributes: DataIdentifier[], search: string | null | undefined) => {
   const filtered = filter(attributes, search);
   const sorted = sort(filtered);
   return sorted;

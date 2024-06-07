@@ -1,10 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 
-import {
-  appendLoadingElements,
-  appendOverlayContainer,
-  removeOverlayAndLoading,
-} from './overlay-and-loading';
+import { appendLoadingElements, appendOverlayContainer, removeOverlayAndLoading } from './overlay-and-loading';
 
 describe('appendLoadingElements', () => {
   let container: HTMLElement;
@@ -21,9 +17,7 @@ describe('appendLoadingElements', () => {
   it('should append loading indicator and overlay to the container', () => {
     const uId = 'test';
     appendLoadingElements(uId, container);
-    const loadingIndicator = container.querySelector(
-      '.footprint-loading-indicator',
-    );
+    const loadingIndicator = container.querySelector('.footprint-loading-indicator');
     const overlay = container.querySelector('.footprint-overlay');
     expect(loadingIndicator).toBeTruthy();
     expect(overlay).toBeTruthy();
@@ -32,9 +26,7 @@ describe('appendLoadingElements', () => {
   it('should not append loading indicator or overlay if container is null', () => {
     const uId = 'test'; // @ts-expect-error: null is not a valid HTMLElement
     appendLoadingElements(uId, null);
-    const loadingIndicator = container.querySelector(
-      '.footprint-loading-indicator',
-    );
+    const loadingIndicator = container.querySelector('.footprint-loading-indicator');
     const overlay = container.querySelector('.footprint-overlay');
     expect(loadingIndicator).toBeFalsy();
     expect(overlay).toBeFalsy();
@@ -44,9 +36,7 @@ describe('appendLoadingElements', () => {
 describe('appendOverlayContainer', () => {
   afterEach(() => {
     // Clean up any created elements after each test
-    const overlayContainer = document.getElementById(
-      'footprint-overlay-container-test',
-    );
+    const overlayContainer = document.getElementById('footprint-overlay-container-test');
     if (overlayContainer) {
       document.body.removeChild(overlayContainer);
     }
@@ -63,10 +53,7 @@ describe('appendOverlayContainer', () => {
   it('should reuse an existing overlay container element and clear its innerHTML', () => {
     const uId = 'test';
     const existingOverlayContainer = document.createElement('div');
-    existingOverlayContainer.setAttribute(
-      'id',
-      'footprint-overlay-container-test',
-    );
+    existingOverlayContainer.setAttribute('id', 'footprint-overlay-container-test');
     document.body.appendChild(existingOverlayContainer);
     existingOverlayContainer.innerHTML = '<p>Existing content</p>';
 

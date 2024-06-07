@@ -47,12 +47,7 @@ describe('Name Validation', () => {
     });
 
     it('should be case insensitive and handle international characters', () => {
-      const specialNames = [
-        'Søren Kierkegaard',
-        'François Hollande',
-        'Jürgen Habermas',
-        'José Mourinho',
-      ];
+      const specialNames = ['Søren Kierkegaard', 'François Hollande', 'Jürgen Habermas', 'José Mourinho'];
 
       specialNames.forEach(name => {
         expect(isName(name)).toBe(true);

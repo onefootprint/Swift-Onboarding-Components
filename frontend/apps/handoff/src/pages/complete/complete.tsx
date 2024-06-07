@@ -1,10 +1,5 @@
 import { useCountdown } from '@onefootprint/hooks';
-import {
-  getBasicDevice,
-  HeaderTitle,
-  NavigationHeader,
-  useUpdateD2PStatus,
-} from '@onefootprint/idv';
+import { HeaderTitle, NavigationHeader, getBasicDevice, useUpdateD2PStatus } from '@onefootprint/idv';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
@@ -51,12 +46,9 @@ const Complete = () => {
           title={t('title')}
           subtitle={
             isHandoffOnSameDevice
-              ? t(
-                  countdown === 1
-                    ? 'subtitle.with-countdown-singular'
-                    : 'subtitle.with-countdown',
-                  { seconds: countdown },
-                )
+              ? t(countdown === 1 ? 'subtitle.with-countdown-singular' : 'subtitle.with-countdown', {
+                  seconds: countdown,
+                })
               : t('subtitle.without-countdown')
           }
         />

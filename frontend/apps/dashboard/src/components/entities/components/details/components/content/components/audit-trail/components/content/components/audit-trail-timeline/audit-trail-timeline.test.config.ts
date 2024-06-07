@@ -1,11 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type {
-  Entity,
-  GetEntityRuleSetResultResponse,
-  RuleResult,
-  Timeline,
-  TimelineEvent,
-} from '@onefootprint/types';
+import type { Entity, GetEntityRuleSetResultResponse, RuleResult, Timeline, TimelineEvent } from '@onefootprint/types';
 import {
   ActorKind,
   CollectedKycDataOption,
@@ -348,9 +342,7 @@ export const ruleResultFixture: GetEntityRuleSetResultResponse = {
   ruleResults: ruleResultsFixture,
 };
 
-export const withRuleSetResult = (
-  response: GetEntityRuleSetResultResponse = ruleResultFixture,
-) =>
+export const withRuleSetResult = (response: GetEntityRuleSetResultResponse = ruleResultFixture) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entityIdFixure}/rule_set_result`,

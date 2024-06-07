@@ -13,14 +13,9 @@ type LoadAppearanceInBrowserProps = {
   children: React.ReactNode;
 };
 
-const LoadAppearanceInBrowser = ({
-  options,
-  children,
-}: LoadAppearanceInBrowserProps) => {
+const LoadAppearanceInBrowser = ({ options, children }: LoadAppearanceInBrowserProps) => {
   const [theme, setTheme] = useState<Theme | null>(null);
-  const [appearance, setAppearance] = useState<FootprintAppearance | null>(
-    null,
-  );
+  const [appearance, setAppearance] = useState<FootprintAppearance | null>(null);
 
   const getAuthToken = () => {
     const url = new URL(window.location.href);
@@ -57,9 +52,7 @@ const LoadAppearanceInBrowser = ({
 
   return theme ? (
     <DesignSystemProvider theme={theme}>
-      <AppearanceContext.Provider value={appearance}>
-        {children}
-      </AppearanceContext.Provider>
+      <AppearanceContext.Provider value={appearance}>{children}</AppearanceContext.Provider>
     </DesignSystemProvider>
   ) : null;
 };

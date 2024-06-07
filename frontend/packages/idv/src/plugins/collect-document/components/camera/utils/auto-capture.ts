@@ -13,10 +13,7 @@ const getDesiredImgSize = (
   outlineOffsetY: number | undefined,
 ) => ({
   width: Math.min(outlineWidth + WIDTH_ERROR_OFFSET, videoSize.width),
-  height: Math.min(
-    outlineHeight + HEIGHT_ERROR_OFFSET,
-    videoSize.height + (outlineOffsetY ?? 0) * 2,
-  ),
+  height: Math.min(outlineHeight + HEIGHT_ERROR_OFFSET, videoSize.height + (outlineOffsetY ?? 0) * 2),
 });
 
 const computeSrcDimensions = (
@@ -28,12 +25,7 @@ const computeSrcDimensions = (
   mediaStream: MediaStream | null,
   outlineOffsetX: number | undefined,
 ) => {
-  const desired = getDesiredImgSize(
-    videoSize,
-    outlineWidth,
-    outlineHeight,
-    outlineOffsetY,
-  );
+  const desired = getDesiredImgSize(videoSize, outlineWidth, outlineHeight, outlineOffsetY);
 
   // Get the dimensions in video source that corresponds to the frame outline with some cushion
   const sourceDimensions = getSourceDimensions({

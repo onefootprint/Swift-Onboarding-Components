@@ -6,11 +6,7 @@ import type {
 import footprint from '@onefootprint/footprint-js';
 import React, { forwardRef } from 'react';
 
-import {
-  getBaseAuthProps,
-  getBaseUpdateLoginMethodsProps,
-  getBaseVerifyProps,
-} from './base-props';
+import { getBaseAuthProps, getBaseUpdateLoginMethodsProps, getBaseVerifyProps } from './base-props';
 import {
   getConditionalAuthProps,
   getConditionalUpdateLoginMethodsProps,
@@ -26,14 +22,7 @@ import type {
   SupportedProps,
   VerifyConditional,
 } from './types';
-import {
-  getClassName,
-  getLabel,
-  isAuth,
-  isError,
-  isUpdateLoginMethods,
-  isVerify,
-} from './utils';
+import { getClassName, getLabel, isAuth, isError, isUpdateLoginMethods, isVerify } from './utils';
 
 const getBaseProps = (
   p: FootprintButtonProps,
@@ -59,9 +48,7 @@ const getBaseProps = (
   return new TypeError('Invalid parameters');
 };
 
-function getConditionalProps(
-  p: FootprintButtonProps,
-): TypeError | AuthTokenOnly | PublicKeyOnly {
+function getConditionalProps(p: FootprintButtonProps): TypeError | AuthTokenOnly | PublicKeyOnly {
   if (isAuth(p)) return getConditionalAuthProps(p);
   if (isVerify(p)) return getConditionalVerifyProps(p);
   if (isUpdateLoginMethods(p)) return getConditionalUpdateLoginMethodsProps(p);
@@ -79,10 +66,7 @@ function getConfig(props: FootprintButtonProps): SupportedProps {
   return { ...baseRes, ...conditionalRes } as SupportedProps;
 }
 
-const FootprintButton = (
-  props: FootprintButtonProps,
-  ref?: React.Ref<HTMLButtonElement>,
-) => {
+const FootprintButton = (props: FootprintButtonProps, ref?: React.Ref<HTMLButtonElement>) => {
   const { className, label, onClick, testID } = props;
   const config = getConfig(props);
 
@@ -103,6 +87,4 @@ const FootprintButton = (
   );
 };
 
-export default forwardRef<HTMLButtonElement, FootprintButtonProps>(
-  FootprintButton,
-);
+export default forwardRef<HTMLButtonElement, FootprintButtonProps>(FootprintButton);

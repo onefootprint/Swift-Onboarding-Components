@@ -1,11 +1,5 @@
 import { IcoDotSmall16 } from '@onefootprint/icons';
-import {
-  AnimatedLoadingSpinner,
-  Box,
-  Grid,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, Box, Grid, Stack, Text } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -60,18 +54,9 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
               rows={[`${HEADER_HEIGHT} auto`]}
               alignItems="start"
               justifyContent="start"
-              templateAreas={[
-                'time icon content',
-                'empty line content',
-                'empty line content',
-              ]}
+              templateAreas={['time icon content', 'empty line content', 'empty line content']}
             >
-              <Grid.Item
-                grid="time"
-                direction="row"
-                gap={2}
-                height={HEADER_HEIGHT}
-              >
+              <Grid.Item grid="time" direction="row" gap={2} height={HEADER_HEIGHT}>
                 {item.time && <TimelineItemTime time={item.time} />}
               </Grid.Item>
               {!last && <Line data-last={last} gridArea="line" />}
@@ -105,14 +90,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
                   {headerComponent}
                 </Grid.Item>
                 {bodyComponent ? (
-                  <Grid.Item
-                    gridArea="body"
-                    direction="column"
-                    gap={2}
-                    width="100%"
-                    paddingBottom={7}
-                    paddingLeft={3}
-                  >
+                  <Grid.Item gridArea="body" direction="column" gap={2} width="100%" paddingBottom={7} paddingLeft={3}>
                     {bodyComponent}
                   </Grid.Item>
                 ) : (

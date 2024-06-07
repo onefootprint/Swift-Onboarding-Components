@@ -1,15 +1,9 @@
-import type {
-  ContentSchema,
-  ParameterProps,
-} from '@/api-reference/api-reference.types';
+import type { ContentSchema, ParameterProps } from '@/api-reference/api-reference.types';
 
 const filterByIn = (parameters: ParameterProps[], inValue: string) =>
   parameters.filter(parameter => parameter.in === inValue);
 
-const createSchema = (
-  parameter: ParameterProps[],
-  inValue: string,
-): ContentSchema => {
+const createSchema = (parameter: ParameterProps[], inValue: string): ContentSchema => {
   const params = filterByIn(parameter, inValue);
   const properties: Record<string, ContentSchema> = {};
   const requiredForSchema: string[] = [];
@@ -46,9 +40,7 @@ const useParametersGroupedBySection = (parameters: ParameterProps[]) => {
       title: 'header-parameters',
       parameters: createSchema(parameters, 'header'),
     },
-  ].filter(
-    section => Object.keys(section.parameters.properties || []).length !== 0,
-  );
+  ].filter(section => Object.keys(section.parameters.properties || []).length !== 0);
   return sections;
 };
 

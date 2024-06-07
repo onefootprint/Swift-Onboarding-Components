@@ -23,11 +23,7 @@ const NeedHelp = () => {
 
   return (
     <>
-      <SupportListItem
-        label={t('label')}
-        IconComponent={IcoHelp16}
-        onClick={handleClickTrigger}
-      />
+      <SupportListItem label={t('label')} IconComponent={IcoHelp16} onClick={handleClickTrigger} />
       <SupportDialog
         title={t('dialog.title')}
         description={t('dialog.description')}

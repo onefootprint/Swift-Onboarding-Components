@@ -30,14 +30,7 @@ const SettingsPage = async ({ params }: PartnerDocsPageProps) => {
       ),
   ]);
 
-  return (
-    <SettingsPageContent
-      lang={params.lang || LangFallback}
-      members={members}
-      partner={partner}
-      roles={roles}
-    />
-  );
+  return <SettingsPageContent lang={params.lang || LangFallback} members={members} partner={partner} roles={roles} />;
 };
 
 export default SettingsPage;

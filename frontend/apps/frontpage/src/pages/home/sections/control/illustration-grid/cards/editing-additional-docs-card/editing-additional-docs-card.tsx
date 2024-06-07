@@ -13,8 +13,7 @@ const EditingAdditionalDocsCard = () => {
   const [proofOfSSNChecked, setProofOfSSNChecked] = useState(false);
   const [customDocChecked, setCustomDocChecked] = useState(false);
 
-  const isExtraContentVisible =
-    proofOfAddressChecked || proofOfSSNChecked || customDocChecked;
+  const isExtraContentVisible = proofOfAddressChecked || proofOfSSNChecked || customDocChecked;
 
   return (
     <CardContainer>
@@ -39,9 +38,7 @@ const EditingAdditionalDocsCard = () => {
           onChange={() => setCustomDocChecked(!customDocChecked)}
         />
       </Stack>
-      <CardAppearContent isVisible={isExtraContentVisible}>
-        {t('extra-content')}
-      </CardAppearContent>
+      <CardAppearContent isVisible={isExtraContentVisible}>{t('extra-content')}</CardAppearContent>
     </CardContainer>
   );
 };

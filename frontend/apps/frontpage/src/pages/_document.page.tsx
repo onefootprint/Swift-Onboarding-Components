@@ -32,10 +32,7 @@ export default class MyDocument extends Document {
         <Head>
           <meta name="app-commit-sha" content={COMMIT_SHA} />
           <meta name="app-deployment-url" content={DEPLOYMENT_URL} />
-          <meta
-            name="google-site-verification"
-            content="amEnHUXNw2Sy0Ei1yrxvGARYS2XwOhI1HnU0LG25UqQ"
-          />
+          <meta name="google-site-verification" content="amEnHUXNw2Sy0Ei1yrxvGARYS2XwOhI1HnU0LG25UqQ" />
         </Head>
         <body>
           <Main />

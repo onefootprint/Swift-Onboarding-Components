@@ -40,9 +40,7 @@ interface CountdownControllers {
  *
  * @deprecated new useCountdown interface is already available (see https://usehooks-ts.com/react-hook/use-countdown), the old version will retire on usehooks-ts@3
  */
-export function useCountdown(
-  countdownOption: UseCountdownType,
-): [number, CountdownHelpers];
+export function useCountdown(countdownOption: UseCountdownType): [number, CountdownHelpers];
 
 /**
  * New interface with default value
@@ -54,9 +52,7 @@ export function useCountdown(
  * @param  {?boolean} countdownOption.isIncrement - `false` by default, true if the countdown is increment.
  * @returns [counter, CountdownControllers]
  */
-export function useCountdown(
-  countdownOption: CountdownOption,
-): [number, CountdownControllers];
+export function useCountdown(countdownOption: CountdownOption): [number, CountdownControllers];
 
 export function useCountdown(
   countdownOption: UseCountdownType | CountdownOption,
@@ -86,18 +82,11 @@ export function useCountdown(
   }
 
   // default values
-  intervalMs =
-    intervalMs !== undefined && intervalMs !== null ? intervalMs : 1000;
-  isIncrement =
-    isIncrement !== undefined && isIncrement !== null ? isIncrement : false;
+  intervalMs = intervalMs !== undefined && intervalMs !== null ? intervalMs : 1000;
+  isIncrement = isIncrement !== undefined && isIncrement !== null ? isIncrement : false;
   countStop = countStop !== undefined && countStop !== null ? countStop : 0;
 
-  const {
-    count,
-    increment,
-    decrement,
-    reset: resetCounter,
-  } = useCounter(countStart);
+  const { count, increment, decrement, reset: resetCounter } = useCounter(countStart);
 
   /**
    * Note: used to control the useInterval
@@ -105,11 +94,7 @@ export function useCountdown(
    * start: Should set running true to trigger interval
    * stop: Should set running false to remove interval
    */
-  const {
-    value: isCountdownRunning,
-    setTrue: startCountdown,
-    setFalse: stopCountdown,
-  } = useBoolean(false);
+  const { value: isCountdownRunning, setTrue: startCountdown, setFalse: stopCountdown } = useBoolean(false);
 
   /**
    * Will set running false and reset the seconds to initial value

@@ -28,20 +28,8 @@ export type EmptyStateProps = {
   testID?: string;
 } & (OnlyIcon | OnlyImage | NoIconOrImage);
 
-const EmptyState = ({
-  cta,
-  description,
-  iconComponent: Icon,
-  renderHeader,
-  title,
-  testID,
-}: EmptyStateProps) => (
-  <Stack
-    data-testid={testID}
-    align="center"
-    justify="center"
-    direction="column"
-  >
+const EmptyState = ({ cta, description, iconComponent: Icon, renderHeader, title, testID }: EmptyStateProps) => (
+  <Stack data-testid={testID} align="center" justify="center" direction="column">
     {Icon && (
       <Box marginBottom={7}>
         <Icon color="error" />

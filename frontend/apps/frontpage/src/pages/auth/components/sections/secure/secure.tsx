@@ -22,11 +22,7 @@ const Secure = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.auth.sections' });
   return (
     <Container marginTop={10} direction="column">
-      <Title
-        iconSrc="/auth/icons/ico-illustrated-chip-40.svg"
-        title={t('title')}
-        subtitle={t('subtitle')}
-      />
+      <Title iconSrc="/auth/icons/ico-illustrated-chip-40.svg" title={t('title')} subtitle={t('subtitle')} />
       <Stack direction="column" gap={isMobile ? 4 : 12} paddingTop={11}>
         {sections.map(({ translations, illustration }, index) => (
           <Section

@@ -10,12 +10,7 @@ type TimelineLayoutProps = {
 
 const TimelineLayout = ({ iconSrc, children }: TimelineLayoutProps) => (
   <Container>
-    <Grid.Container
-      columns={['48px', '1fr']}
-      gap={9}
-      paddingBottom={7}
-      templateAreas={['line content']}
-    >
+    <Grid.Container columns={['48px', '1fr']} gap={9} paddingBottom={7} templateAreas={['line content']}>
       <Line gridArea="line" align="flex-start" justify="center">
         <Stack backgroundColor="primary" borderRadius="full">
           {iconSrc && <Image src={iconSrc} alt="" width={80} height={80} />}

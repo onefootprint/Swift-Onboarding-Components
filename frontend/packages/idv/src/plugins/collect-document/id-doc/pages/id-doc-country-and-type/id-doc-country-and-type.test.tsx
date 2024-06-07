@@ -1,11 +1,5 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import {
-  fireEvent,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { fireEvent, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import { noop } from 'lodash';
@@ -43,10 +37,7 @@ const handleSubmitDocTypeSuccess = (
 const renderFrontCountryAndDoc = (context: MachineContext) =>
   renderPage(
     context,
-    <IdDocCountryAndTypeContainer
-      onSubmitDocTypeSuccess={handleSubmitDocTypeSuccess}
-      onConsentSubmit={noop}
-    />,
+    <IdDocCountryAndTypeContainer onSubmitDocTypeSuccess={handleSubmitDocTypeSuccess} onConsentSubmit={noop} />,
   );
 
 describe('<IdDocCountryAndType/>', () => {
@@ -111,9 +102,7 @@ describe('<IdDocCountryAndType/>', () => {
       const visa = screen.queryAllByText('Visa');
       expect(visa).toHaveLength(0);
 
-      const residenceCard = screen.queryAllByText(
-        'Residence card / Green card',
-      );
+      const residenceCard = screen.queryAllByText('Residence card / Green card');
       expect(residenceCard).toHaveLength(0);
 
       const workPermit = screen.queryAllByText('Work permit / EAD card');
@@ -138,9 +127,7 @@ describe('<IdDocCountryAndType/>', () => {
       const visa = screen.queryAllByText('Visa');
       expect(visa).toHaveLength(0);
 
-      const residenceCard = screen.queryAllByText(
-        'Residence card / Green card',
-      );
+      const residenceCard = screen.queryAllByText('Residence card / Green card');
       expect(residenceCard).toHaveLength(0);
 
       const workPermit = screen.queryAllByText('Work permit / EAD card');
@@ -162,9 +149,7 @@ describe('<IdDocCountryAndType/>', () => {
       const visaUS = screen.queryAllByText('Visa');
       expect(visaUS).toHaveLength(0);
 
-      const residenceCardUS = screen.queryAllByText(
-        'Residence card / Green card',
-      );
+      const residenceCardUS = screen.queryAllByText('Residence card / Green card');
       expect(residenceCardUS).toHaveLength(0);
 
       const workPermitUS = screen.queryAllByText('Work permit / EAD card');
@@ -196,9 +181,7 @@ describe('<IdDocCountryAndType/>', () => {
       const visaCA = screen.queryAllByText('Visa');
       expect(visaCA).toHaveLength(0);
 
-      const residenceCardCA = screen.queryAllByText(
-        'Residence card / Green card',
-      );
+      const residenceCardCA = screen.queryAllByText('Residence card / Green card');
       expect(residenceCardCA).toHaveLength(0);
 
       const workPermitCA = screen.queryAllByText('Work permit / EAD card');
@@ -230,9 +213,7 @@ describe('<IdDocCountryAndType/>', () => {
     });
     it('Country selector is disabled for only US', async () => {
       renderFrontCountryAndDoc(initialContextOnlyUS);
-      const onlyUSWarning = screen.getByText(
-        'Only documents issued by United States of America are accepted',
-      );
+      const onlyUSWarning = screen.getByText('Only documents issued by United States of America are accepted');
       expect(onlyUSWarning).toBeInTheDocument();
 
       const trigger = screen.getByRole('button', {
@@ -255,9 +236,7 @@ describe('<IdDocCountryAndType/>', () => {
 
     it("When a country doesn't have any supported doc type", async () => {
       renderFrontCountryAndDoc(initialContextNoSupportedDoc);
-      const onlyUSWarning = screen.getByText(
-        "Sorry, we don't support IDs for your country yet.",
-      );
+      const onlyUSWarning = screen.getByText("Sorry, we don't support IDs for your country yet.");
       expect(onlyUSWarning).toBeInTheDocument();
     });
   });

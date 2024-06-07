@@ -10,7 +10,7 @@ export type ImageConsentHandler = {
   getConsentInfo: () => { consentLanguageText: string; mlConsent: boolean };
 };
 
-const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
+const ImageConsent = forwardRef<ImageConsentHandler, {}>((_props, ref) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.id-doc.components.image-consent',
   });

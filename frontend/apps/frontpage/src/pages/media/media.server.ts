@@ -13,8 +13,7 @@ const getStaticProps: GetStaticProps = () => {
       publishedAt: 'May 21, 2024',
       title:
         "Here's the pitch deck Footprint, a startup helping Wall Street verify customer identities, used to raise $13 million from VCs like QED and Index Ventures",
-      excerpt:
-        'Footprint raised $13 million in a Series A, announced today, that was led by QED Investors.',
+      excerpt: 'Footprint raised $13 million in a Series A, announced today, that was led by QED Investors.',
     },
     {
       id: '13',
@@ -24,8 +23,7 @@ const getStaticProps: GetStaticProps = () => {
       imageAlt: 'Footprint Raised 13M in Series A led by QED',
       publishedAt: 'May 21, 2024',
       title: 'Why QED invested in Footprint',
-      excerpt:
-        'QED invested in Footprint to help solve the problem of how to verify a person’s identity online.',
+      excerpt: 'QED invested in Footprint to help solve the problem of how to verify a person’s identity online.',
     },
     {
       id: '12',
@@ -79,8 +77,7 @@ const getStaticProps: GetStaticProps = () => {
       imageAlt: 'Our founder and CEO, Eli Wachs.',
       publishedAt: 'Jan 7, 2023',
       website: 'Fast Company',
-      title:
-        'This Gen-Z tech CEO wants to build the Apple Pay of identity—a one-stop shop for your data',
+      title: 'This Gen-Z tech CEO wants to build the Apple Pay of identity—a one-stop shop for your data',
       excerpt:
         'Eli Wachs, cofounder of Footprint, is finding success in the verification business at a time when consumer trust is increasingly hard to come by.',
     },
@@ -103,8 +100,7 @@ const getStaticProps: GetStaticProps = () => {
         'Young Asian woman using face recognition software via smartphone, in front of colourful neon signboards in busy downtown city street at night. Biometric verification and artificial intelligence concept',
       publishedAt: 'Aug 3, 2022',
       website: 'TechCrunch',
-      title:
-        'Footprint wants to change how companis collect, store and share personal data',
+      title: 'Footprint wants to change how companis collect, store and share personal data',
       excerpt:
         'Anyone who has ever applied for an apartment or a mortgage knows that these companies tend to collect much more information than they need to determine if you can afford the monthly payment...',
     },
@@ -137,8 +133,7 @@ const getStaticProps: GetStaticProps = () => {
       imageUrl: '/media/lerer-hippeau.png',
       publishedAt: 'Aug 3, 2022',
       website: 'Lerer Hippeau',
-      title:
-        'Please welcome Footprint, the last identity form you’ll ever fill out',
+      title: 'Please welcome Footprint, the last identity form you’ll ever fill out',
       excerpt:
         'Being a digital citizen requires using identity credentials, including SSN, DL, DOB, education and employment history, income, and more, online. Current verification processes are broken, though. They add...',
     },

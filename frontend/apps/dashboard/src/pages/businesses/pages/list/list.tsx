@@ -21,11 +21,7 @@ const List = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <EntitiesList
-        basePath="businesses"
-        kind={EntityKind.business}
-        title={t('header.title')}
-      >
+      <EntitiesList basePath="businesses" kind={EntityKind.business} title={t('header.title')}>
         <EntitiesTable
           aria-label={t('table.aria-label')}
           columns={columns}

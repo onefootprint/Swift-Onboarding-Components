@@ -1,4 +1,4 @@
-import { Container, media, Stack, Text } from '@onefootprint/ui';
+import { Container, Stack, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

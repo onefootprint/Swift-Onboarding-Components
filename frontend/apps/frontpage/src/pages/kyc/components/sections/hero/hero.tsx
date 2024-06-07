@@ -21,11 +21,7 @@ const Hero = () => {
     setShowDialog(false);
   };
   return (
-    <HeroContainer
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeInOut' }}
-    >
+    <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
       <Illustration />
       <TitleContainer>
         <Text variant="display-2" textAlign="center" tag="h1">
@@ -39,12 +35,7 @@ const Hero = () => {
         <Button
           variant="primary"
           size="large"
-          onClick={() =>
-            window.open(
-              `${DASHBOARD_BASE_URL}/authentication/sign-up`,
-              '_blank',
-            )
-          }
+          onClick={() => window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank')}
         >
           {t('get-started')}
         </Button>
@@ -52,11 +43,7 @@ const Hero = () => {
           {t('book-a-demo')}
         </Button>
       </Stack>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={handleClose}
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
     </HeroContainer>
   );
 };

@@ -1,18 +1,5 @@
-import {
-  IcoCheck24,
-  IcoClose24,
-  IcoCopy24,
-  IcoInfo16,
-  IcoPencil24,
-} from '@onefootprint/icons';
-import {
-  Box,
-  CopyButton,
-  Stack,
-  Text,
-  TextInput,
-  Tooltip,
-} from '@onefootprint/ui';
+import { IcoCheck24, IcoClose24, IcoCopy24, IcoInfo16, IcoPencil24 } from '@onefootprint/icons';
+import { Box, CopyButton, Stack, Text, TextInput, Tooltip } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -33,13 +20,7 @@ type SandboxInputProps = {
   };
 };
 
-const SandboxInput = ({
-  label,
-  placeholder,
-  setValue,
-  texts,
-  value,
-}: SandboxInputProps) => {
+const SandboxInput = ({ label, placeholder, setValue, texts, value }: SandboxInputProps) => {
   const [innerValue, setInnerValue] = useState(() => value || '');
   const [isInputLocked, setIsInputLocked] = useState(true);
   const handleSaveOrEdit = () => setIsInputLocked(prev => !prev);
@@ -102,12 +83,7 @@ const SandboxInput = ({
               onClick={handleSave}
               tooltipText={texts.save}
             />
-            <InlineButton
-              ariaLabel={texts.reset}
-              icon={IcoClose24}
-              onClick={handleReset}
-              tooltipText={texts.reset}
-            />
+            <InlineButton ariaLabel={texts.reset} icon={IcoClose24} onClick={handleReset} tooltipText={texts.reset} />
           </InlineButtonsLayout>
         )}
       </InputControls>

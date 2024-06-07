@@ -30,9 +30,4 @@ export type ActorApiKey = {
   name: string;
 };
 
-export type Actor =
-  | ActorUser
-  | ActorFootprint
-  | ActorFirmEmployee
-  | ActorOrganization
-  | ActorApiKey;
+export type Actor = ActorUser | ActorFootprint | ActorFirmEmployee | ActorOrganization | ActorApiKey;

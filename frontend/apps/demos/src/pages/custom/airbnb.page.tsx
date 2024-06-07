@@ -14,8 +14,7 @@ const handleOpen = () => {
       showCompletionPage: true,
     },
     appearance: {
-      fontSrc:
-        'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap',
+      fontSrc: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap',
       variables: {
         linkColor: '#000000',
         colorError: '#C13515',
@@ -35,8 +34,7 @@ const handleOpen = () => {
       rules: {
         button: {
           transition: 'transform 0.1s ease',
-          backgroundImage:
-            'linear-gradient(to right,#E61E4D 0%,#E31C5F 50%,#D70466 100%)',
+          backgroundImage: 'linear-gradient(to right,#E61E4D 0%,#E31C5F 50%,#D70466 100%)',
         },
         'button:active': {
           transform: 'scale(0.96)',

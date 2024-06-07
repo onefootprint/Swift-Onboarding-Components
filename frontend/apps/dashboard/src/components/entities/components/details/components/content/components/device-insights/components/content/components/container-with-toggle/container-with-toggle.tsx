@@ -8,18 +8,11 @@ type ContainerWithToggleProps = {
   children: React.ReactNode;
 };
 
-const ContainerWithToggle = ({
-  isHidden,
-  onChangeHidden,
-  children,
-}: ContainerWithToggleProps) => (
+const ContainerWithToggle = ({ isHidden, onChangeHidden, children }: ContainerWithToggleProps) => (
   <DetailsContainer data-hidden={isHidden}>
     <DetailsWithToggle>
       {children}
-      <DetailsToggle
-        data-hidden={isHidden}
-        onClick={() => onChangeHidden(!isHidden)}
-      >
+      <DetailsToggle data-hidden={isHidden} onClick={() => onChangeHidden(!isHidden)}>
         <IcoChevronLeft16 />
       </DetailsToggle>
     </DetailsWithToggle>

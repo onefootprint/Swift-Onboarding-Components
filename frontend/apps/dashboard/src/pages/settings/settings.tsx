@@ -1,6 +1,6 @@
 import { Box, Text, ThemeToggle } from '@onefootprint/ui';
-import Head from 'next/head';
 import { useTheme } from 'next-themes';
+import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -26,11 +26,7 @@ const Settings = () => {
         <Text variant="heading-2" tag="h2">
           {t('header.title')}
         </Text>
-        <ThemeToggle
-          label={t('header.theme')}
-          onChange={handleToggleTheme}
-          checked={theme === 'dark'}
-        />
+        <ThemeToggle label={t('header.theme')} onChange={handleToggleTheme} checked={theme === 'dark'} />
       </Header>
       <Box marginBottom={10}>
         <BusinessProfile />

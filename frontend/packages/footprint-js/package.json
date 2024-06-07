@@ -10,24 +10,19 @@
   "style": "./dist/footprint-js.css",
   "sideEffects": false,
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "kyc",
-    "identity verification"
-  ],
+  "files": ["dist"],
+  "keywords": ["kyc", "identity verification"],
   "scripts": {
-    "test": "bun test --bail",
+    "build": "tsup",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "tsup --watch",
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
+    "publish:local": "yarn && yarn build && yalc publish",
     "test:ci:bun": "bun test --bail",
     "test:watch": "bun test --watch",
-    "dev": "tsup --watch",
-    "build": "tsup",
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
-    "typecheck": "yarn tsc --noEmit",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "publish:local": "yarn && yarn build && yalc publish"
+    "test": "bun test --bail",
+    "typecheck": "yarn tsc --noEmit"
   },
   "dependencies": {
     "@onefootprint/postmate": "2.1.0"
@@ -35,7 +30,6 @@
   "devDependencies": {
     "bun-types": "^1.0.25",
     "csstype": "^3.1.2",
-    "eslint-config-footprint": "*",
     "msw": "^2.1.2",
     "tsconfig": "*",
     "tsup": "^6.5.0",

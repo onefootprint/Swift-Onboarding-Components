@@ -7,13 +7,7 @@ const Loading = () => {
 
   return (
     <Stack testID="organizations-loading" center direction="column">
-      <Text
-        variant="label-1"
-        color="primary"
-        marginTop={8}
-        marginBottom={6}
-        textAlign="center"
-      >
+      <Text variant="label-1" color="primary" marginTop={8} marginBottom={6} textAlign="center">
         {t('title')}
       </Text>
       <AnimatedLoadingSpinner animationStart />

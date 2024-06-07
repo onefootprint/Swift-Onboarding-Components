@@ -7,8 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 const ExtraRequirements = () => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.playbooks.dialog.summary.id-doc.sections.extra-requirements',
+    keyPrefix: 'pages.playbooks.dialog.summary.id-doc.sections.extra-requirements',
   });
   const { register } = useFormContext();
 
@@ -16,10 +15,7 @@ const ExtraRequirements = () => {
     <>
       <Text variant="label-3">{t('title')}</Text>
       <Box paddingLeft={5}>
-        <Checkbox
-          label={t('request-selfie')}
-          {...register('personal.selfie')}
-        />
+        <Checkbox label={t('request-selfie')} {...register('personal.selfie')} />
       </Box>
     </>
   );

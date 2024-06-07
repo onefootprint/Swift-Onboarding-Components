@@ -1,11 +1,7 @@
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
-import type {
-  ControllerRenderProps,
-  FieldError,
-  FieldValues,
-} from 'react-hook-form';
+import type { ControllerRenderProps, FieldError, FieldValues } from 'react-hook-form';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -37,15 +33,10 @@ const CitizenshipFields = () => {
     return undefined;
   };
 
-  const renderAddButton = (
-    index: number,
-    value: string,
-    error?: FieldError,
-  ) => {
+  const renderAddButton = (index: number, value: string, error?: FieldError) => {
     // Allow additional citizenships if user has filled out at least 1, with a maximum of 3
     const isLastCitizenship = index === fields.length - 1;
-    const correctNumCitizenships =
-      (!!value || fields.length > 1) && fields.length < 3;
+    const correctNumCitizenships = (!!value || fields.length > 1) && fields.length < 3;
     return isLastCitizenship && correctNumCitizenships ? (
       <LinkButton
         disabled={!!error || !value}
@@ -101,9 +92,7 @@ const CitizenshipFields = () => {
               usCitizen: ({ value }) => value !== 'US',
             },
           }}
-          render={({ field, fieldState: { error } }) =>
-            renderCitizenshipField(index, field, error)
-          }
+          render={({ field, fieldState: { error } }) => renderCitizenshipField(index, field, error)}
         />
       ))}
     </>

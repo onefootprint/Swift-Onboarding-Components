@@ -3,10 +3,7 @@ import React from 'react';
 
 import type { CustomHeadersProps } from '.';
 import CustomHeaders from '.';
-import {
-  configWithHeaders,
-  configWithoutHeaders,
-} from './custom-headers.test.config';
+import { configWithHeaders, configWithoutHeaders } from './custom-headers.test.config';
 
 const renderCustomHeaders = ({ proxyConfig }: CustomHeadersProps) =>
   customRender(<CustomHeaders proxyConfig={proxyConfig} />);
@@ -23,8 +20,6 @@ describe('<CustomHeaders />', () => {
   it('should display empty text when no custom headers exists', () => {
     renderCustomHeaders({ proxyConfig: configWithoutHeaders });
 
-    expect(
-      screen.getByText('There are no custom header values'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('There are no custom header values')).toBeInTheDocument();
   });
 });

@@ -52,11 +52,7 @@ const EditNameDialog = ({ open, playbook, onClose }: EditNameDialogProps) => {
       onClose={onClose}
       open={open}
     >
-      <EditNameForm
-        formId="edit-playbook-form"
-        playbookName={playbook.name}
-        onSubmit={handleSubmit}
-      />
+      <EditNameForm formId="edit-playbook-form" playbookName={playbook.name} onSubmit={handleSubmit} />
     </Dialog>
   );
 };

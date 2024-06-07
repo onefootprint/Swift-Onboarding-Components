@@ -1,17 +1,8 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import OtherInsights from './other-insights';
-import {
-  withOtherInsights,
-  withOtherInsightsEmpty,
-  withOtherInsightsError,
-} from './other-insights.test.config';
+import { withOtherInsights, withOtherInsightsEmpty, withOtherInsightsError } from './other-insights.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 const id = 'fp_id_yCZehsWNeywHnk5JqL20u';

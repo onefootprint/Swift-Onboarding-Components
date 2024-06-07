@@ -1,9 +1,4 @@
-import {
-  createFileSaverSpy,
-  customRender,
-  screen,
-  userEvent,
-} from '@onefootprint/test-utils';
+import { createFileSaverSpy, customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { FieldOrPlaceholderProps } from './field-or-placeholder';

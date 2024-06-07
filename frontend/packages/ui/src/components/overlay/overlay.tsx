@@ -11,21 +11,13 @@ const overlayVariants = {
   visible: { opacity: 1 },
 };
 
-const Overlay = forwardRef<HTMLDivElement, OverlayProps>(
-  ({ isVisible = false }: OverlayProps, ref) => (
-    <AnimatePresence>
-      {isVisible && (
-        <OverlayLayer
-          ref={ref}
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-        />
-      )}
-    </AnimatePresence>
-  ),
-);
+const Overlay = forwardRef<HTMLDivElement, OverlayProps>(({ isVisible = false }: OverlayProps, ref) => (
+  <AnimatePresence>
+    {isVisible && (
+      <OverlayLayer ref={ref} variants={overlayVariants} initial="hidden" animate="visible" exit="hidden" />
+    )}
+  </AnimatePresence>
+));
 
 const OverlayLayer = styled(motion.div)`
   ${({ theme }) => css`

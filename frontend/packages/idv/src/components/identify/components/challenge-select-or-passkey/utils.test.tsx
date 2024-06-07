@@ -82,10 +82,7 @@ describe('getChallengeTitleByKind', () => {
     {
       identify: {
         user: { scrubbedPhone: '+4***' },
-        successfulIdentifiers: [
-          SuccessfulIdentifier.email,
-          SuccessfulIdentifier.phone,
-        ],
+        successfulIdentifiers: [SuccessfulIdentifier.email, SuccessfulIdentifier.phone],
       },
       email: 'a@b.com',
       phoneNumber: '+123',
@@ -209,11 +206,7 @@ describe('getMethods', () => {
       ],
     },
   ])('case %#', ({ identify, device, x }) => {
-    const result = getMethods(
-      identify as Identify,
-      device as DeviceInfo,
-      titleMap,
-    );
+    const result = getMethods(identify as Identify, device as DeviceInfo, titleMap);
     expect(result).toEqual(x);
   });
 });

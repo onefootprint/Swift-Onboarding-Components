@@ -10,11 +10,7 @@ export type CreateInvestorProfileArgs = {
   showTransition?: boolean;
 };
 
-const createCollectInvestorProfileDataMachine = ({
-  device,
-  authToken,
-  showTransition,
-}: CreateInvestorProfileArgs) =>
+const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransition }: CreateInvestorProfileArgs) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -39,8 +35,7 @@ const createCollectInvestorProfileDataMachine = ({
               {
                 target: 'income',
                 actions: 'assignData',
-                cond: (context, event) =>
-                  !!event.payload[InvestorProfileDI.occupation],
+                cond: (_context, event) => !!event.payload[InvestorProfileDI.occupation],
               },
               {
                 target: 'income',

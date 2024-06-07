@@ -1,21 +1,11 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import {
-  Button,
-  Checkbox,
-  Divider,
-  MultiSelect,
-  Radio,
-  Text,
-} from '@onefootprint/ui';
+import { Button, Checkbox, Divider, MultiSelect, Radio, Text } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import {
-  CountryRestriction,
-  type ResidencyFormData,
-} from '@/playbooks/utils/machine/types';
+import { CountryRestriction, type ResidencyFormData } from '@/playbooks/utils/machine/types';
 
 export type ResidencyProps = {
   defaultValues: ResidencyFormData;
@@ -28,14 +18,12 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.dialog.residency',
   });
-  const { handleSubmit, register, watch, control, setValue } =
-    useForm<ResidencyFormData>({
-      defaultValues,
-    });
+  const { handleSubmit, register, watch, control, setValue } = useForm<ResidencyFormData>({
+    defaultValues,
+  });
   const usResidentsChecked = watch('allowUsResidents');
   const internationalChecked = watch('allowInternationalResidents');
-  const restrictCountriesChecked =
-    watch('restrictCountries') === CountryRestriction.restrict;
+  const restrictCountriesChecked = watch('restrictCountries') === CountryRestriction.restrict;
 
   const handleResidencyChange = () => {
     setValue('allowUsResidents', !usResidentsChecked);
@@ -58,17 +46,10 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
       </Header>
       <Form onSubmit={handleSubmit(submit)}>
         <OptionContainer>
-          <Radio
-            label={t('us-residents')}
-            checked={usResidentsChecked}
-            onChange={handleResidencyChange}
-          />
+          <Radio label={t('us-residents')} checked={usResidentsChecked} onChange={handleResidencyChange} />
           {usResidentsChecked && (
             <UsTerritoriesContainer>
-              <Checkbox
-                label={t('us-territories')}
-                {...register('allowUsTerritories')}
-              />
+              <Checkbox label={t('us-territories')} {...register('allowUsTerritories')} />
             </UsTerritoriesContainer>
           )}
           <Radio
@@ -93,11 +74,7 @@ const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
                   </Text>
                 </AllCountriesHint>
               </AllCountriesContainer>
-              <Radio
-                label={t('restrict')}
-                value={CountryRestriction.restrict}
-                {...register('restrictCountries')}
-              />
+              <Radio label={t('restrict')} value={CountryRestriction.restrict} {...register('restrictCountries')} />
               {restrictCountriesChecked && (
                 <>
                   <Divider />

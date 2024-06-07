@@ -48,8 +48,7 @@ export default {
     },
     placeholder: {
       control: 'text',
-      description:
-        'Text to be displayed in the select when there are options selected',
+      description: 'Text to be displayed in the select when there are options selected',
       required: false,
       table: { defaultValue: { summary: 'Select' } },
     },
@@ -84,9 +83,7 @@ const Template: Story<CountrySelectProps> = ({
   value,
   locale,
 }: CountrySelectProps) => {
-  const [selectedOption, setSelectedOption] = useState<
-    CountrySelectOption | undefined
-  >(value);
+  const [selectedOption, setSelectedOption] = useState<CountrySelectOption | undefined>(value);
 
   const handleSelect = (nextOption: CountrySelectOption) => {
     setSelectedOption(nextOption);

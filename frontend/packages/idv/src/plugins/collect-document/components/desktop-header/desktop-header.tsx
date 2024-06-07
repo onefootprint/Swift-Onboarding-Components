@@ -12,12 +12,7 @@ type DesktopHeaderProps = {
   isSelfie?: boolean;
 };
 
-const DesktopHeader = ({
-  docName,
-  sideName,
-  country,
-  isSelfie,
-}: DesktopHeaderProps) => {
+const DesktopHeader = ({ docName, sideName, country, isSelfie }: DesktopHeaderProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'document-flow.components.desktop-header',
   });

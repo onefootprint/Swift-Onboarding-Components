@@ -1,5 +1,5 @@
 import type { StepperOption } from '@onefootprint/ui';
-import { media, Stepper } from '@onefootprint/ui';
+import { Stepper, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -26,9 +26,7 @@ const Form = ({ onComplete }: FormProps) => {
   const maxStep = options.length - 1;
 
   const handleChange = (newOption: StepperOption) => {
-    const newStepIndex = options.findIndex(
-      option => option.value === newOption.value,
-    );
+    const newStepIndex = options.findIndex(option => option.value === newOption.value);
     setStepIndex(newStepIndex);
   };
 
@@ -58,15 +56,9 @@ const Form = ({ onComplete }: FormProps) => {
       </StepperContainer>
       <Content>
         {step.value === 'welcome' && <Welcome onComplete={handleComplete} />}
-        {step.value === 'user' && (
-          <UserData onComplete={handleComplete} onBack={handleBack} />
-        )}
-        {step.value === 'company' && (
-          <CompanyData onComplete={handleComplete} onBack={handleBack} />
-        )}
-        {step.value === 'invite' && (
-          <Invite onComplete={handleComplete} onBack={handleBack} />
-        )}
+        {step.value === 'user' && <UserData onComplete={handleComplete} onBack={handleBack} />}
+        {step.value === 'company' && <CompanyData onComplete={handleComplete} onBack={handleBack} />}
+        {step.value === 'invite' && <Invite onComplete={handleComplete} onBack={handleBack} />}
       </Content>
     </Container>
   );

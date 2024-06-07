@@ -52,17 +52,11 @@ const filterPosts = <T extends PostsOrPages>(posts: T, type?: PostType) => {
   if (type === PostType.blog) {
     return posts.filter(post => {
       const name = post.primary_tag?.name;
-      return (
-        name !== INVESTOR_UPDATES_TAG &&
-        name !== LIBRARY_TAG &&
-        name !== CHANGELOG_TAG
-      );
+      return name !== INVESTOR_UPDATES_TAG && name !== LIBRARY_TAG && name !== CHANGELOG_TAG;
     });
   }
   if (type === PostType.investorUpdate) {
-    return posts.filter(
-      post => post.primary_tag?.name === INVESTOR_UPDATES_TAG,
-    );
+    return posts.filter(post => post.primary_tag?.name === INVESTOR_UPDATES_TAG);
   }
   if (type === PostType.library) {
     return posts.filter(post => post.primary_tag?.name === LIBRARY_TAG);
@@ -76,10 +70,7 @@ const filterPosts = <T extends PostsOrPages>(posts: T, type?: PostType) => {
 
 export async function getPostBySlug(slug: string) {
   try {
-    const post = await ghost.posts.read(
-      { slug },
-      { formats: ['html'], include: ['tags', 'authors'] },
-    );
+    const post = await ghost.posts.read({ slug }, { formats: ['html'], include: ['tags', 'authors'] });
     return post;
   } catch (_) {
     return null;

@@ -46,9 +46,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
         postmateChildApiRef.emit(name, data);
         logTrack(`The ${name} event has been dispatched`);
       } else {
-        logWarn(
-          `Footprint.js must be initialized in order to dispatch the event "${name}"`,
-        );
+        logWarn(`Footprint.js must be initialized in order to dispatch the event "${name}"`);
       }
     },
   };

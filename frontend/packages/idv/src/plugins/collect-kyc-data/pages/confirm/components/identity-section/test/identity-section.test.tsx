@@ -1,9 +1,5 @@
 import { screen, userEvent, waitFor } from '@onefootprint/test-utils';
-import {
-  ChallengeKind,
-  CollectedKycDataOption,
-  IdDI,
-} from '@onefootprint/types';
+import { ChallengeKind, CollectedKycDataOption, IdDI } from '@onefootprint/types';
 
 import getInitialContext from './get-initial-context';
 import getRequirement from './get-requirement';
@@ -19,15 +15,10 @@ import {
 } from './identity-section.test.config';
 import { renderIdentitySection } from './render-identity-section';
 
-jest.mock(
-  '../hooks/use-step-up/utils/get-biometric-challenge-response',
-  () => ({
-    __esModule: true,
-    ...jest.requireActual(
-      '../hooks/use-step-up/utils/get-biometric-challenge-response',
-    ),
-  }),
-);
+jest.mock('../hooks/use-step-up/utils/get-biometric-challenge-response', () => ({
+  __esModule: true,
+  ...jest.requireActual('../hooks/use-step-up/utils/get-biometric-challenge-response'),
+}));
 
 describe('IdentitySection', () => {
   beforeEach(() => {
@@ -62,9 +53,7 @@ describe('IdentitySection', () => {
         expect(screen.getByText('•'.repeat(4))).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.getByTestId('identity-reveal-button'),
-        ).toBeInTheDocument();
+        expect(screen.getByTestId('identity-reveal-button')).toBeInTheDocument();
       });
     });
 
@@ -126,9 +115,7 @@ describe('IdentitySection', () => {
         expect(screen.getByText('•'.repeat(4))).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.getByTestId('identity-reveal-button'),
-        ).toBeInTheDocument();
+        expect(screen.getByTestId('identity-reveal-button')).toBeInTheDocument();
       });
     });
   });
@@ -161,9 +148,7 @@ describe('IdentitySection', () => {
         expect(screen.getByText('•'.repeat(9))).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.getByTestId('identity-reveal-button'),
-        ).toBeInTheDocument();
+        expect(screen.getByTestId('identity-reveal-button')).toBeInTheDocument();
       });
     });
 
@@ -261,9 +246,7 @@ describe('IdentitySection', () => {
         expect(screen.getByText('•'.repeat(4))).toBeInTheDocument();
       });
       await waitFor(() => {
-        expect(
-          screen.getByTestId('identity-reveal-button'),
-        ).toBeInTheDocument();
+        expect(screen.getByTestId('identity-reveal-button')).toBeInTheDocument();
       });
     });
   });

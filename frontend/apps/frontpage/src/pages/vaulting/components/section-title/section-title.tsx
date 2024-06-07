@@ -9,18 +9,9 @@ type SectionTitleProps = {
   children: React.ReactNode;
 };
 
-const SectionTitle = ({
-  variant,
-  maxWidth,
-  children,
-  multiline,
-}: SectionTitleProps) => (
+const SectionTitle = ({ variant, maxWidth, children, multiline }: SectionTitleProps) => (
   <Container maxWidth={maxWidth}>
-    <Title
-      variant={variant}
-      multiline={multiline}
-      tag={variant === 'display-1' ? 'h1' : 'h2'}
-    >
+    <Title variant={variant} multiline={multiline} tag={variant === 'display-1' ? 'h1' : 'h2'}>
       {children}
     </Title>
   </Container>

@@ -1,7 +1,4 @@
-import type {
-  enIdentifyJson as identifyResource,
-  enIdvJson as idvResource,
-} from '@onefootprint/idv';
+import type { enIdentifyJson as identifyResource, enIdvJson as idvResource } from '@onefootprint/idv';
 import type { enRequestJson as requestResource } from '@onefootprint/request';
 import type { enUiJson as uiResource } from '@onefootprint/ui';
 

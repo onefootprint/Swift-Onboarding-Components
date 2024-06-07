@@ -14,8 +14,7 @@ type RouterProps = ComponentProps<typeof Router>;
 type AppProps = IdvProps & RouterProps;
 
 const App = ({ l10n, onIdentifyDone, isInIframe, ...props }: AppProps) => {
-  const newIsInIframe =
-    isInIframe === undefined ? checkIsInIframe() : isInIframe;
+  const newIsInIframe = isInIframe === undefined ? checkIsInIframe() : isInIframe;
   const args = { ...props, isInIframe: newIsInIframe };
   return (
     <>
@@ -25,9 +24,7 @@ const App = ({ l10n, onIdentifyDone, isInIframe, ...props }: AppProps) => {
           <Router l10n={l10n} onIdentifyDone={onIdentifyDone} />
         </MachineProvider>
       </L10nContextProvider>
-      {GOOGLE_MAPS_SRC ? (
-        <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" />
-      ) : null}
+      {GOOGLE_MAPS_SRC ? <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" /> : null}
     </>
   );
 };

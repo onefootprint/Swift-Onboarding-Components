@@ -5,6 +5,4 @@ export type EntitiesVaultDecryptRequest = {
   field: DataIdentifier;
 };
 
-export type EntitiesVaultDecryptResponse = Partial<
-  Record<DataIdentifier, string | undefined>
->;
+export type EntitiesVaultDecryptResponse = Partial<Record<DataIdentifier, string | undefined>>;

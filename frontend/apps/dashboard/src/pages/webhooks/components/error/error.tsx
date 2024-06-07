@@ -5,10 +5,10 @@ type ErrorProps = {
   message: string;
 };
 
-const Error = ({ message }: ErrorProps) => (
+const ErrorComponent = ({ message }: ErrorProps) => (
   <Text color="secondary" variant="body-2">
     {message}
   </Text>
 );
 
-export default Error;
+export default ErrorComponent;

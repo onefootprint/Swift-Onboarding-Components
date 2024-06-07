@@ -1,18 +1,12 @@
 import request from '@onefootprint/request';
-import type {
-  GetOrgMetricsRequest,
-  GetOrgMetricsResponse,
-} from '@onefootprint/types';
+import type { GetOrgMetricsRequest, GetOrgMetricsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
 import useFilters from '../use-filters';
 
-const getOrgMetrics = async (
-  authHeaders: AuthHeaders,
-  params: GetOrgMetricsRequest,
-) => {
+const getOrgMetrics = async (authHeaders: AuthHeaders, params: GetOrgMetricsRequest) => {
   const { data: response } = await request<GetOrgMetricsResponse>({
     method: 'GET',
     url: `/org/metrics`,
@@ -37,11 +31,8 @@ const useOrgMetrics = () => {
         const passRateValue =
           data.successfulUserOnboardings === 0
             ? 0
-            : (data.successfulUserOnboardings /
-                (data.successfulUserOnboardings + data.failedUserOnboardings)) *
-              100;
-        const passRate =
-          passRateValue % 1 === 0 ? passRateValue : passRateValue.toFixed(1);
+            : (data.successfulUserOnboardings / (data.successfulUserOnboardings + data.failedUserOnboardings)) * 100;
+        const passRate = passRateValue % 1 === 0 ? passRateValue : passRateValue.toFixed(1);
 
         formattedMetrics.push(
           {

@@ -1,7 +1,5 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import footprint, {
-  FootprintVerifyButton,
-} from '@onefootprint/footprint-react';
+import footprint, { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { CodeBlock, CodeInline, Text } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -103,8 +101,7 @@ const handleOpen = () => {
       'id.email': 'rafael@onefootprint.com',
     },
     appearance: {
-      fontSrc:
-        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
+      fontSrc: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
       variant: 'drawer',
       variables: {
         fontFamily:
@@ -112,8 +109,7 @@ const handleOpen = () => {
         colorAccent: '#3F83F7',
         containerWidth: '500px',
         containerBorder: '1px solid #101516',
-        containerElevation:
-          '0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.24) 0px 4px 24px 0px',
+        containerElevation: '0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.24) 0px 4px 24px 0px',
         linkColor: '#3F83F7',
         borderRadius: '3px',
         linkButtonColor: '#3F83F7',
@@ -171,8 +167,7 @@ const Composer = () => (
             and create a new Playbook:
           </Text>
           <Text variant="body-2">
-            2. Grab the Onboarding Publishable Key, for example{' '}
-            <CodeInline>ob_test_VMooXd04EUlnu3AvMYKjMW</CodeInline>.
+            2. Grab the Onboarding Publishable Key, for example <CodeInline>ob_test_VMooXd04EUlnu3AvMYKjMW</CodeInline>.
           </Text>
           <Text variant="body-2">3. Install Footprint dependencies:</Text>
           <CodeBlock language="bash">{installation}</CodeBlock>
@@ -187,10 +182,7 @@ const Composer = () => (
           <CodeBlock language="typescript">{customization}</CodeBlock>
           <Text variant="body-2">
             6. You can find more information {` `}
-            <Link
-              href="https://docs.onefootprint.com/kyc-with-pii/react"
-              target="_blank"
-            >
+            <Link href="https://docs.onefootprint.com/kyc-with-pii/react" target="_blank">
               here
             </Link>
             .

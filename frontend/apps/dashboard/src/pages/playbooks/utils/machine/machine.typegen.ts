@@ -20,10 +20,7 @@ export interface Typegen0 {
     assignVerificationChecks: 'verificationChecksSubmitted';
     assignWhoToOnboard: 'whoToOnboardSubmitted';
     resetKind: 'navigationBackward' | 'whoToOnboardSelected';
-    resetOnboardingTemplate:
-      | 'navigationBackward'
-      | 'templateSelected'
-      | 'whoToOnboardSelected';
+    resetOnboardingTemplate: 'navigationBackward' | 'templateSelected' | 'whoToOnboardSelected';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

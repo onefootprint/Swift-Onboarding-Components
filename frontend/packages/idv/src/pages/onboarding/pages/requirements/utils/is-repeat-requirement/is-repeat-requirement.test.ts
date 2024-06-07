@@ -1,8 +1,5 @@
 import type { OnboardingRequirement } from '@onefootprint/types';
-import {
-  DocumentRequestKind,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import { DocumentRequestKind, OnboardingRequirementKind } from '@onefootprint/types';
 
 import isRepeatRequirement from './is-repeat-requirement';
 
@@ -88,11 +85,6 @@ describe('isRepeatRequirement', () => {
       x: false,
     },
   ])('.', ({ a, b, x }) => {
-    expect(
-      isRepeatRequirement(
-        a as OnboardingRequirement,
-        b as OnboardingRequirement | undefined,
-      ),
-    ).toBe(x);
+    expect(isRepeatRequirement(a as OnboardingRequirement, b as OnboardingRequirement | undefined)).toBe(x);
   });
 });

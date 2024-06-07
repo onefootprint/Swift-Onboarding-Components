@@ -13,25 +13,13 @@ const useConvertFormData = () => {
     const convertedData: KycData = {};
     const { addressLine1, addressLine2, city, state, zip, country } = formData;
 
-    convertedData[IdDI.addressLine1] = updateDataValue(
-      addressLine1,
-      data[IdDI.addressLine1],
-    );
-    convertedData[IdDI.addressLine2] = updateDataValue(
-      addressLine2,
-      data[IdDI.addressLine2],
-    );
+    convertedData[IdDI.addressLine1] = updateDataValue(addressLine1, data[IdDI.addressLine1]);
+    convertedData[IdDI.addressLine2] = updateDataValue(addressLine2, data[IdDI.addressLine2]);
     convertedData[IdDI.city] = updateDataValue(city, data[IdDI.city]);
     const newStateValue = typeof state === 'object' ? state.value : state;
-    convertedData[IdDI.state] = updateDataValue(
-      newStateValue,
-      data[IdDI.state],
-    );
+    convertedData[IdDI.state] = updateDataValue(newStateValue, data[IdDI.state]);
     convertedData[IdDI.zip] = updateDataValue(zip, data[IdDI.zip]);
-    convertedData[IdDI.country] = updateDataValue(
-      country.value,
-      data[IdDI.country],
-    );
+    convertedData[IdDI.country] = updateDataValue(country.value, data[IdDI.country]);
     return convertedData;
   };
 };

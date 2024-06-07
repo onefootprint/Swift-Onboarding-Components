@@ -1,16 +1,7 @@
 import { expect } from '@playwright/test';
 import type { APIRequestContext, FrameLocator, Page } from '@playwright/test';
-import {
-  clickOn,
-  clickOnContinue,
-  clickOnSave,
-} from '../../verify/utils/commands';
-import {
-  API_BASE_URL_DEV,
-  API_BASE_URL_PROD,
-  API_SECRET_KEY_DEV,
-  API_SECRET_KEY_PROD,
-} from './constants';
+import { clickOn, clickOnContinue, clickOnSave } from '../../verify/utils/commands';
+import { API_BASE_URL_DEV, API_BASE_URL_PROD, API_SECRET_KEY_DEV, API_SECRET_KEY_PROD } from './constants';
 
 type CardData = {
   name: string;
@@ -27,20 +18,16 @@ export const findMissingConfig = (): Error | undefined => {
   }
 
   if (!API_SECRET_KEY_DEV && !API_SECRET_KEY_DEV) {
-    return new Error(
-      'Empty values for API_SECRET_KEY_DEV and API_SECRET_KEY_DEV',
-    );
+    return new Error('Empty values for API_SECRET_KEY_DEV and API_SECRET_KEY_DEV');
   }
 
   return undefined;
 };
 
 export const waitForFormLoad = async (page: Page): Promise<FrameLocator> => {
-  await expect(
-    page
-      .frameLocator('iframe[name^="footprint-iframe-"]')
-      .getByText(/Card information/i),
-  ).toBeVisible({ timeout: 60000 });
+  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Card information/i)).toBeVisible({
+    timeout: 60000,
+  });
 
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
   const header = frame.getByText(/Card information/i).first();
@@ -70,15 +57,11 @@ export const createUser = async ({
   api?: 'dev' | 'prod';
   request: APIRequestContext;
 }) => {
-  const response = await request.post(
-    `${api === 'dev' ? API_BASE_URL_DEV : API_BASE_URL_PROD}/users`,
-    {
-      headers: {
-        'X-Footprint-Secret-Key':
-          api == 'dev' ? API_SECRET_KEY_DEV : API_SECRET_KEY_PROD,
-      },
+  const response = await request.post(`${api === 'dev' ? API_BASE_URL_DEV : API_BASE_URL_PROD}/users`, {
+    headers: {
+      'X-Footprint-Secret-Key': api === 'dev' ? API_SECRET_KEY_DEV : API_SECRET_KEY_PROD,
     },
-  );
+  });
   const body = await response.json();
   return body.id;
 };
@@ -88,7 +71,7 @@ export const decryptData = async ({
   request,
   cardAlias,
   fpUserId,
-  data: data,
+  data,
 }: {
   api?: 'dev' | 'prod';
   request: APIRequestContext;
@@ -97,9 +80,7 @@ export const decryptData = async ({
   data: CardData;
 }) => {
   const response = await request.post(
-    `${
-      api === 'dev' ? API_BASE_URL_DEV : API_BASE_URL_PROD
-    }/users/${fpUserId}/vault/decrypt`,
+    `${api === 'dev' ? API_BASE_URL_DEV : API_BASE_URL_PROD}/users/${fpUserId}/vault/decrypt`,
     {
       data: {
         fields: [
@@ -113,8 +94,7 @@ export const decryptData = async ({
         reason: 'E2E Form Basic test',
       },
       headers: {
-        'X-Footprint-Secret-Key':
-          api == 'dev' ? API_SECRET_KEY_DEV : API_SECRET_KEY_PROD,
+        'X-Footprint-Secret-Key': api === 'dev' ? API_SECRET_KEY_DEV : API_SECRET_KEY_PROD,
       },
     },
   );

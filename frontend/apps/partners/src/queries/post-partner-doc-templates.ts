@@ -30,9 +30,7 @@ type ComplianceDocTemplate = {
  * @param {CreateComplianceDocTemplateRequest} payload - The payload containing the data for the new template.
  * @return {Promise<ComplianceDocTemplate>} A promise that resolves to the created template if successful, or rejects with an error if the required parameters are missing.
  */
-const postPartnerDocTemplates = async (
-  payload: CreateComplianceDocTemplateRequest,
-) => {
+const postPartnerDocTemplates = async (payload: CreateComplianceDocTemplateRequest) => {
   const token = await getAuthCookie();
   if (!token) return Promise.reject(new TypeError('Missing auth token'));
 

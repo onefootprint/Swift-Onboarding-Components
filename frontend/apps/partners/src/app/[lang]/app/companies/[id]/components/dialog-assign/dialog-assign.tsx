@@ -15,13 +15,7 @@ type DialogAssignProps = {
 
 const formId = 'form-assign-doc-dialog';
 
-const DialogAssign = ({
-  docId,
-  isOpen,
-  onClose,
-  onSubmit,
-  options,
-}: DialogAssignProps) => {
+const DialogAssign = ({ docId, isOpen, onClose, onSubmit, options }: DialogAssignProps) => {
   const { t } = useTranslation('common');
   const [member, setMember] = useState<Option>();
 

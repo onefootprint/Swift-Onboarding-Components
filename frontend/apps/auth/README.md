@@ -42,10 +42,6 @@ http://localhost:3011/user?variant=modal#tok_TOKEN
    - Description: Initiates the i18n watch process and starts the Next.js development server on port 3011.
    - Command: `yarn i18n:copy-watch & next dev -p 3011`
 
-5. **format:fix**
-
-   - Description: Formats TypeScript, TypeScript React, and Markdown files using Prettier with automatic fixes.
-   - Command: `prettier --write "**/*.{ts,tsx,md}"`
 
 6. **i18n:copy-en**
 

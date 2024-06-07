@@ -11,14 +11,7 @@ export type ConfirmationDialogProps = {
   title: string;
 };
 
-const ConfirmationDialog = ({
-  children,
-  isLoading,
-  onClose,
-  onConfirm,
-  open,
-  title,
-}: ConfirmationDialogProps) => {
+const ConfirmationDialog = ({ children, isLoading, onClose, onConfirm, open, title }: ConfirmationDialogProps) => {
   const { t } = useTranslation();
 
   return (

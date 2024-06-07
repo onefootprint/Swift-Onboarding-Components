@@ -19,10 +19,7 @@ const CcMir24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
         d="M1.23.77h21.54C23.45.77 24 1.32 24 2v12.923c0 .68-.55 1.23-1.23 1.23H1.23c-.68 0-1.23-.55-1.23-1.23V2C0 1.32.55.77 1.23.77Z"
         fill="#fff"
       />
-      <path
-        d="M16.741 8.17v3.322h1.846V9.523h2.093a2.048 2.048 0 0 0 1.91-1.354h-5.849Z"
-        fill="#37A72E"
-      />
+      <path d="M16.741 8.17v3.322h1.846V9.523h2.093a2.048 2.048 0 0 0 1.91-1.354h-5.849Z" fill="#37A72E" />
       <path
         d="M16.495 5.43c.108 1.358 1.394 2.432 2.963 2.432h3.21a2.046 2.046 0 0 0-1.994-2.43h-4.179Z"
         fill="url(#prefix__b)"
@@ -33,14 +30,7 @@ const CcMir24 = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
       />
     </g>
     <defs>
-      <linearGradient
-        id="prefix__b"
-        x1={16.496}
-        y1={6.646}
-        x2={22.704}
-        y2={6.646}
-        gradientUnits="userSpaceOnUse"
-      >
+      <linearGradient id="prefix__b" x1={16.496} y1={6.646} x2={22.704} y2={6.646} gradientUnits="userSpaceOnUse">
         <stop stopColor="#00A0E5" />
         <stop offset={1} stopColor="#0077C3" />
       </linearGradient>

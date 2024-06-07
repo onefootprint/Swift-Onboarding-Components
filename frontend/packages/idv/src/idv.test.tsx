@@ -2,16 +2,11 @@
 import './config/initializers/i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import {
-  createUseRouterSpy,
-  render,
-  screen,
-  userEvent,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, render, screen, userEvent } from '@onefootprint/test-utils';
 import type { OnboardingRequirement } from '@onefootprint/types';
 import {
-  ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
+  ChallengeKind,
   CollectedKycDataOption,
   D2PStatus,
   DocumentRequestKind,
@@ -20,20 +15,16 @@ import {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
-import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 import { Layout } from './components';
 import Idv from './idv';
 import {
+  TestAuthorizeRequirement,
   authorizeData,
   confirmKycData,
   getKycOnboardingConfig,
-  TestAuthorizeRequirement,
   waitFor,
   withAuthorize,
   withCheckSession,
@@ -71,11 +62,7 @@ const mobileDevice = {
 const collectKycDataRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.collectKycData,
   isMet: false,
-  missingAttributes: [
-    CollectedKycDataOption.name,
-    CollectedKycDataOption.dob,
-    CollectedKycDataOption.ssn9,
-  ],
+  missingAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
   populatedAttributes: [],
   optionalAttributes: [],
 };
@@ -98,11 +85,7 @@ const idDocRequirement: OnboardingRequirement = {
         SupportedIdDocTypes.visa,
         SupportedIdDocTypes.workPermit,
       ],
-      ca: [
-        SupportedIdDocTypes.driversLicense,
-        SupportedIdDocTypes.idCard,
-        SupportedIdDocTypes.passport,
-      ],
+      ca: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
     },
   },
 };
@@ -112,7 +95,11 @@ describe('<Idv />', () => {
   const queryCache = new QueryCache();
   const queryClient = new QueryClient({
     queryCache,
-    logger: { log: () => {}, warn: () => {}, error: () => {} },
+    logger: {
+      log: () => undefined,
+      warn: () => undefined,
+      error: () => undefined,
+    },
     defaultOptions: {
       queries: {
         retry: false,
@@ -260,9 +247,7 @@ describe('<Idv />', () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText(/Log in using one of the options below/i),
-        ).toBeInTheDocument();
+        expect(screen.getByText(/Log in using one of the options below/i)).toBeInTheDocument();
       });
     });
   });
@@ -291,9 +276,7 @@ describe('<Idv />', () => {
         });
 
         await waitFor(() => {
-          expect(
-            screen.getByText("What's your Social Security Number?"),
-          ).toBeInTheDocument();
+          expect(screen.getByText("What's your Social Security Number?")).toBeInTheDocument();
         });
         // Fill SSN
         const ssn = screen.getByLabelText('SSN');
@@ -317,10 +300,7 @@ describe('<Idv />', () => {
           {
             kind: OnboardingRequirementKind.collectKycData,
             isMet: false,
-            missingAttributes: [
-              CollectedKycDataOption.dob,
-              CollectedKycDataOption.ssn9,
-            ],
+            missingAttributes: [CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
             populatedAttributes: [CollectedKycDataOption.name],
             optionalAttributes: [],
           },
@@ -367,9 +347,7 @@ describe('<Idv />', () => {
         });
 
         await waitFor(() => {
-          expect(
-            screen.getByText("What's your Social Security Number?"),
-          ).toBeInTheDocument();
+          expect(screen.getByText("What's your Social Security Number?")).toBeInTheDocument();
         });
 
         // Fill in SSN
@@ -418,9 +396,7 @@ describe('<Idv />', () => {
       await authorizeData();
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Scan or upload ID document'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Scan or upload ID document')).toBeInTheDocument();
       });
     });
   });
@@ -445,14 +421,10 @@ describe('<Idv />', () => {
       });
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Scan or upload ID document'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Scan or upload ID document')).toBeInTheDocument();
       });
       expect(
-        screen.getByText(
-          'Open the link sent to your phone and follow the prompts to upload your ID document.',
-        ),
+        screen.getByText('Open the link sent to your phone and follow the prompts to upload your ID document.'),
       ).toBeInTheDocument();
     });
   });
@@ -498,13 +470,9 @@ describe('<Idv />', () => {
 
       // Should render id doc requirement
       await waitFor(() => {
-        expect(
-          screen.getByText('Capture or upload your ID document'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Capture or upload your ID document')).toBeInTheDocument();
       });
-      expect(
-        screen.getByText('We need some more information from you.'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('We need some more information from you.')).toBeInTheDocument();
     });
   });
 
@@ -523,11 +491,7 @@ describe('<Idv />', () => {
       const metCollectKycDataRequirement: OnboardingRequirement = {
         kind: OnboardingRequirementKind.collectKycData,
         isMet: true,
-        populatedAttributes: [
-          CollectedKycDataOption.name,
-          CollectedKycDataOption.dob,
-          CollectedKycDataOption.ssn9,
-        ],
+        populatedAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
         missingAttributes: [],
         optionalAttributes: [],
       };
@@ -554,17 +518,14 @@ describe('<Idv />', () => {
       // Skips identify, goes straight to waitForComponentsSdk
       await waitFor(() => {
         // Make sure the downscoped token is relayed back, not the token with full scopes
-        expect(componentsSdkContext.relayToComponents).toHaveBeenCalledWith(
-          'downscoped_token_xxxx',
-        );
+        expect(componentsSdkContext.relayToComponents).toHaveBeenCalledWith('downscoped_token_xxxx');
       });
       expect(componentsSdkContext.relayToComponents).toHaveBeenCalledTimes(1);
 
       // For some reason, this is being called twice in tests, but not in prod
       // expect(componentsSdkContext.onRelayFromComponents).toHaveBeenCalledTimes(1);
       // Simulate the parent sending a postmessage to relay control back to idv
-      const onRelayFromComponentsCb =
-        componentsSdkContext.onRelayFromComponents.mock.calls[0][0];
+      const onRelayFromComponentsCb = componentsSdkContext.onRelayFromComponents.mock.calls[0][0];
       onRelayFromComponentsCb();
 
       // Should skip confirm and go straight to the transfer app to open passkey requirement on mobile/new tab
@@ -574,9 +535,7 @@ describe('<Idv />', () => {
       await userEvent.click(screen.getByText('Continue on desktop'));
       await waitFor(() => {
         expect(
-          screen.getByText(
-            'To continue, we need to open a new browser window. Please tap the button below.',
-          ),
+          screen.getByText('To continue, we need to open a new browser window. Please tap the button below.'),
         ).toBeInTheDocument();
       });
     });

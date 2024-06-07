@@ -49,15 +49,11 @@ const Loading = () => (
   </Container>
 );
 
-const CloseButton = () => (
-  <Shimmer height="30px" width="30px" position="absolute" left="20px" />
-);
+const CloseButton = () => <Shimmer height="30px" width="30px" position="absolute" left="20px" />;
 
 const Title = () => <Shimmer height="25px" width="120px" />;
 
-const SectionTitle = () => (
-  <Shimmer height="25px" width="120px" marginBottom={4} />
-);
+const SectionTitle = () => <Shimmer height="25px" width="120px" marginBottom={4} />;
 
 const Label = () => <Shimmer height="20px" width="70px" marginBottom={3} />;
 

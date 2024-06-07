@@ -21,8 +21,8 @@ import TestWrapper from '../../../utils/test-wrapper';
 import Actions from './actions';
 import {
   entityId,
-  entityWithoutPhoneFixture,
   entityWithPhoneFixture,
+  entityWithoutPhoneFixture,
   withEntity,
   withLists,
   withTokenSendLink,
@@ -35,9 +35,7 @@ const useRouterSpy = createUseRouterSpy();
 const renderActions = async (isNoPhone?: boolean) =>
   customRender(
     <TestWrapper>
-      <Actions
-        entity={isNoPhone ? entityWithoutPhoneFixture : entityWithPhoneFixture}
-      />
+      <Actions entity={isNoPhone ? entityWithoutPhoneFixture : entityWithPhoneFixture} />
     </TestWrapper>,
   );
 
@@ -121,9 +119,7 @@ describe('<Actions />', () => {
 
           // We should then render the link on the next page
           await waitFor(() => {
-            expect(
-              screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
-            ).toBeInTheDocument();
+            expect(screen.getByDisplayValue('http://footprint.link/#tok_xxx')).toBeInTheDocument();
           });
           const sendButton = screen.getByRole('button', {
             name: 'Send via email',
@@ -133,9 +129,7 @@ describe('<Actions />', () => {
           await waitForElementToBeRemoved(dialog);
 
           await waitFor(() => {
-            const successConfirmation = screen.getByText(
-              'User will receive an email detailing the next steps shortly',
-            );
+            const successConfirmation = screen.getByText('User will receive an email detailing the next steps shortly');
             expect(successConfirmation).toBeInTheDocument();
           });
         });
@@ -194,9 +188,7 @@ describe('<Actions />', () => {
 
           // We should then render the link on the next page
           await waitFor(() => {
-            expect(
-              screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
-            ).toBeInTheDocument();
+            expect(screen.getByDisplayValue('http://footprint.link/#tok_xxx')).toBeInTheDocument();
           });
           const sendButton = screen.getByRole('button', {
             name: 'Send via SMS',
@@ -206,9 +198,7 @@ describe('<Actions />', () => {
           await waitForElementToBeRemoved(dialog);
 
           await waitFor(() => {
-            const successConfirmation = screen.getByText(
-              'User will receive an SMS detailing the next steps shortly',
-            );
+            const successConfirmation = screen.getByText('User will receive an SMS detailing the next steps shortly');
             expect(successConfirmation).toBeInTheDocument();
           });
         });

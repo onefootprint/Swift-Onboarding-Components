@@ -54,9 +54,7 @@ describe.skip('<ApiKeys />', () => {
 
         await waitFor(() => {
           const table = screen.getByRole('table');
-          expect(
-            within(table).getByText('Something went wrong'),
-          ).toBeInTheDocument();
+          expect(within(table).getByText('Something went wrong')).toBeInTheDocument();
         });
       });
     });
@@ -138,9 +136,7 @@ describe.skip('<ApiKeys />', () => {
         await userEvent.type(input, keyName);
 
         await waitFor(() => {
-          expect(
-            screen.queryByTestId('members-roles-loading'),
-          ).not.toBeInTheDocument();
+          expect(screen.queryByTestId('members-roles-loading')).not.toBeInTheDocument();
         });
 
         const roleSelect = screen.getByRole('button', { name: 'Select role' });
@@ -149,9 +145,7 @@ describe.skip('<ApiKeys />', () => {
         const submitButton = screen.getByRole('button', { name: 'Create' });
         await userEvent.click(submitButton);
 
-        const submitButtonLoading = screen.getByLabelText(
-          'Creating secret key...',
-        );
+        const submitButtonLoading = screen.getByLabelText('Creating secret key...');
         await waitFor(() => {
           expect(submitButtonLoading).toBeInTheDocument();
         });
@@ -182,9 +176,7 @@ describe.skip('<ApiKeys />', () => {
         await userEvent.type(input, keyName);
 
         await waitFor(() => {
-          expect(
-            screen.queryByTestId('members-roles-loading'),
-          ).not.toBeInTheDocument();
+          expect(screen.queryByTestId('members-roles-loading')).not.toBeInTheDocument();
         });
 
         const roleSelect = screen.getByRole('button', { name: 'Select role' });
@@ -195,9 +187,7 @@ describe.skip('<ApiKeys />', () => {
 
         withApiKeys([...listApiKeysFixture, createdApiKeyFixture]);
 
-        const submitButtonLoading = screen.getByLabelText(
-          'Creating secret key...',
-        );
+        const submitButtonLoading = screen.getByLabelText('Creating secret key...');
         await waitFor(() => {
           expect(submitButtonLoading).toBeInTheDocument();
         });

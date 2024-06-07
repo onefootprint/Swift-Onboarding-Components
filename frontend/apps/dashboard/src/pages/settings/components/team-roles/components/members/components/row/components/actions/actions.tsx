@@ -1,13 +1,6 @@
 import type { Member } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
-import {
-  Box,
-  createFontStyles,
-  Dialog,
-  Dropdown,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Box, Dialog, Dropdown, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import OverflowButton from 'src/components/overflow-button';
@@ -52,10 +45,7 @@ const Actions = ({ member }: ActionsProps) => {
   return (
     <Stack justify="flex-end">
       <Dropdown.Root>
-        <PermissionGate
-          scopeKind={RoleScopeKind.orgSettings}
-          fallbackText={t('not-allowed')}
-        >
+        <PermissionGate scopeKind={RoleScopeKind.orgSettings} fallbackText={t('not-allowed')}>
           <OverflowButton ariaLabel={t('aria-label', { email })} />
         </PermissionGate>
         <Dropdown.Content align="end">

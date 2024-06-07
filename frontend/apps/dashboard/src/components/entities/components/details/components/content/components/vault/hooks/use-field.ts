@@ -1,18 +1,11 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import {
-  IdDI,
-  isVaultDataDecrypted,
-  isVaultDataEncrypted,
-} from '@onefootprint/types';
+import { IdDI, isVaultDataDecrypted, isVaultDataEncrypted } from '@onefootprint/types';
 import type { ParseKeys } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 
-import {
-  useDecryptControls,
-  useEditControls,
-} from '../components/vault-actions';
+import { useDecryptControls, useEditControls } from '../components/vault-actions';
 
 const useField = (entity: Entity) => {
   const { t } = useTranslation('common', { keyPrefix: 'di' });
@@ -23,8 +16,7 @@ const useField = (entity: Entity) => {
 
   const showCheckbox = decryptControls.inProgress;
 
-  const canDecryptField = (di: DataIdentifier) =>
-    entity.decryptableAttributes.includes(di);
+  const canDecryptField = (di: DataIdentifier) => entity.decryptableAttributes.includes(di);
 
   const canSelect = (di: DataIdentifier) => {
     const value = entityVaultWithTransforms.data?.vault[di];

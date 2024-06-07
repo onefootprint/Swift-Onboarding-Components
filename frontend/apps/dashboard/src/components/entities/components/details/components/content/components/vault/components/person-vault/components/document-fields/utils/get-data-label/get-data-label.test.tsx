@@ -9,10 +9,7 @@ describe('getDataLabel', () => {
   });
 
   it('should return the correct label for drivers license DI', () => {
-    const label = getDataLabel(
-      `${DocumentDI.driversLicenseFullName}:12345`,
-      '12345',
-    );
+    const label = getDataLabel(`${DocumentDI.driversLicenseFullName}:12345`, '12345');
     expect(label).toEqual('full_name');
   });
 

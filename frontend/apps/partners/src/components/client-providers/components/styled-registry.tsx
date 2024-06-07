@@ -19,11 +19,7 @@ const StyledComponentsRegistry = ({ children }: React.PropsWithChildren) => {
     return <>{children}</>;
   }
 
-  return (
-    <StyleSheetManager sheet={styledComponentsStyleSheet.instance}>
-      {children}
-    </StyleSheetManager>
-  );
+  return <StyleSheetManager sheet={styledComponentsStyleSheet.instance}>{children}</StyleSheetManager>;
 };
 
 export default StyledComponentsRegistry;

@@ -1,4 +1,4 @@
-import { media, Text } from '@onefootprint/ui';
+import { Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -7,15 +7,7 @@ import type { Article } from '../../media.types';
 
 type ArticleItemProps = Article;
 
-const ArticleItem = ({
-  publishedAt,
-  excerpt,
-  imageAlt,
-  imageUrl,
-  title,
-  url,
-  website,
-}: ArticleItemProps) => (
+const ArticleItem = ({ publishedAt, excerpt, imageAlt, imageUrl, title, url, website }: ArticleItemProps) => (
   <article>
     <Anchor href={url} target="_blank" rel="noreferrer">
       <Content>

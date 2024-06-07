@@ -1,9 +1,9 @@
 import { screen } from '@onefootprint/test-utils';
 import React from 'react';
 
+import DesktopSelfieRetry from '.';
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
-import DesktopSelfieRetry from '.';
 import initialContextWithErrors from './desktop-selfie-retry.test.config';
 
 const renderDesktopSelfieRetry = (context: MachineContext) =>
@@ -27,9 +27,7 @@ describe('<DesktopSelfieRetry />', () => {
   it('Contains the correct error messages', () => {
     renderDesktopSelfieRetry(initialContextWithErrors);
 
-    const error = screen.getByText(
-      'Your selfie had too much glare. Please adjust the lighting and try again.',
-    );
+    const error = screen.getByText('Your selfie had too much glare. Please adjust the lighting and try again.');
 
     expect(error).toBeInTheDocument();
   });

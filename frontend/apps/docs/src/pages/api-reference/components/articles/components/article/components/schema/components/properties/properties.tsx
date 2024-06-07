@@ -35,12 +35,7 @@ const Properties = ({ schema }: PropertiesProps) => {
     return (
       <Container>
         {Object.entries(schema.properties).map(([title, property]) => (
-          <ObjectProperties
-            key={title}
-            schema={property}
-            title={title}
-            isRequired={schema.required?.includes(title)}
-          />
+          <ObjectProperties key={title} schema={property} title={title} isRequired={schema.required?.includes(title)} />
         ))}
       </Container>
     );

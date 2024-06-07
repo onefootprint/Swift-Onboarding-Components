@@ -28,8 +28,7 @@ const PhoneKbaChallenge = ({ Header }: PhoneKbaChallengeProps) => {
   const l10n = useL10nContext();
   const options = COUNTRIES;
 
-  const handlePhoneValidation = (phone: string) =>
-    checkIsPhoneValid(phone, config?.isLive === false);
+  const handlePhoneValidation = (phone: string) => checkIsPhoneValid(phone, config?.isLive === false);
 
   const handleSubmit = (phoneFromForm: string) => {
     if (!user?.token) {

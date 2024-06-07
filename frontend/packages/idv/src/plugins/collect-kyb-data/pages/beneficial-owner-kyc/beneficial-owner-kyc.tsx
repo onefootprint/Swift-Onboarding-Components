@@ -1,9 +1,4 @@
-import {
-  BeneficialOwnerDataAttribute,
-  BusinessDI,
-  CollectedKybDataOption,
-  IdDI,
-} from '@onefootprint/types';
+import { BeneficialOwnerDataAttribute, BusinessDI, CollectedKybDataOption, IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import CollectKycData from '../../../collect-kyc-data';
@@ -29,9 +24,7 @@ const BeneficialOwnerKyc = () => {
     });
   };
 
-  const requireMultiKyc = missingAttributes.includes(
-    CollectedKybDataOption.kycedBeneficialOwners,
-  );
+  const requireMultiKyc = missingAttributes.includes(CollectedKybDataOption.kycedBeneficialOwners);
   const primaryBeneficialOwner = requireMultiKyc
     ? data?.[BusinessDI.kycedBeneficialOwners]?.[0]
     : data?.[BusinessDI.beneficialOwners]?.[0];
@@ -44,15 +37,9 @@ const BeneficialOwnerKyc = () => {
             isBootstrap: false,
           }
         : undefined;
-    userData[IdDI.firstName] = userDatum(
-      primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName],
-    );
-    userData[IdDI.middleName] = userDatum(
-      primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName],
-    );
-    userData[IdDI.lastName] = userDatum(
-      primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName],
-    );
+    userData[IdDI.firstName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.firstName]);
+    userData[IdDI.middleName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.middleName]);
+    userData[IdDI.lastName] = userDatum(primaryBeneficialOwner[BeneficialOwnerDataAttribute.lastName]);
   }
 
   return (

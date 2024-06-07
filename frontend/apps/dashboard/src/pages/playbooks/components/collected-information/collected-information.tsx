@@ -17,11 +17,7 @@ type CollectedInformationProps = {
   subtitle?: string;
   options?: Option;
 };
-const CollectedInformation = ({
-  title,
-  subtitle,
-  options,
-}: CollectedInformationProps) => {
+const CollectedInformation = ({ title, subtitle, options }: CollectedInformationProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.collected-data',
   });
@@ -43,25 +39,16 @@ const CollectedInformation = ({
               return (
                 <CountrySpecificDocDisplay
                   key={name}
-                  countryDocMappings={
-                    value as Partial<Record<CountryCode, SupportedIdDocTypes[]>>
-                  }
+                  countryDocMappings={value as Partial<Record<CountryCode, SupportedIdDocTypes[]>>}
                 />
               );
             }
             return (
-              <OptionItem
-                key={name}
-                role="row"
-                aria-label={t(kebabCase(name) as ParseKeys<'common'>)}
-              >
+              <OptionItem key={name} role="row" aria-label={t(kebabCase(name) as ParseKeys<'common'>)}>
                 <Label variant="body-3" color="tertiary">
                   {t(kebabCase(name) as ParseKeys<'common'>)}
                 </Label>
-                <DisplayValue
-                  name={name as DisplayValueProps['name']}
-                  value={value}
-                />
+                <DisplayValue name={name as DisplayValueProps['name']} value={value} />
               </OptionItem>
             );
           })}

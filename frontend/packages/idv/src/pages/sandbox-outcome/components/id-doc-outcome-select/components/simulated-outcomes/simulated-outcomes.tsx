@@ -13,11 +13,7 @@ type SimulatedOutcomesProps = {
   allowRealOutcome?: boolean;
 };
 
-const SimulatedOutcomes = ({
-  onSelect,
-  isSelected,
-  allowRealOutcome,
-}: SimulatedOutcomesProps) => {
+const SimulatedOutcomes = ({ onSelect, isSelected, allowRealOutcome }: SimulatedOutcomesProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'global.pages.sandbox-outcome.id-doc-outcome',
   });
@@ -49,18 +45,10 @@ const SimulatedOutcomes = ({
               control={control}
               name="outcomes.idDocOutcome"
               render={() => (
-                <Radio
-                  label={t('simulated-outcome.title')}
-                  onChange={handleOutcomeTypeChange}
-                  checked={isSelected}
-                />
+                <Radio label={t('simulated-outcome.title')} onChange={handleOutcomeTypeChange} checked={isSelected} />
               )}
             />
-            <Tooltip
-              text={t('simulated-outcome.description')}
-              alignment="start"
-              position="top"
-            >
+            <Tooltip text={t('simulated-outcome.description')} alignment="start" position="top">
               <IcoInfo16 />
             </Tooltip>
           </Box>

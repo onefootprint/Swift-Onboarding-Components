@@ -4,14 +4,8 @@ import { IdDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type {
-  SectionAction,
-  SectionItemProps,
-} from '../../../../../../components/confirm-collected-data';
-import {
-  Section,
-  SectionItem,
-} from '../../../../../../components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
+import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import Address from '../../../residential-address';
 import createAddressLine from './utils/create-address-line';
@@ -30,14 +24,7 @@ const AddressSection = () => {
   const zip = data[IdDI.zip]?.value;
   const [editing, setEditing] = useState(false);
 
-  if (
-    !addressLine1 &&
-    !addressLine2 &&
-    !city &&
-    !stateName &&
-    !country &&
-    !zip
-  ) {
+  if (!addressLine1 && !addressLine2 && !city && !stateName && !country && !zip) {
     return null;
   }
 
@@ -47,16 +34,9 @@ const AddressSection = () => {
     textColor: 'primary' as Color,
   });
 
-  const addressItem = address.map(
-    ({ text, subtext, textColor }: SectionItemProps) => (
-      <SectionItem
-        key={text}
-        text={text}
-        subtext={subtext}
-        textColor={textColor}
-      />
-    ),
-  );
+  const addressItem = address.map(({ text, subtext, textColor }: SectionItemProps) => (
+    <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
+  ));
 
   const stopEditing = () => {
     setEditing(false);
@@ -66,14 +46,7 @@ const AddressSection = () => {
     if (!editing) {
       return addressItem;
     }
-    return (
-      <Address
-        onCancel={stopEditing}
-        onComplete={stopEditing}
-        hideHeader
-        disableCountry
-      />
-    );
+    return <Address onCancel={stopEditing} onComplete={stopEditing} hideHeader disableCountry />;
   };
 
   const actions: SectionAction[] = [];

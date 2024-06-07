@@ -1,16 +1,10 @@
 import { useIntl } from '@onefootprint/hooks';
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import type {
-  DecryptUserRequest,
-  DecryptUserResponse,
-} from '@onefootprint/types';
+import type { DecryptUserRequest, DecryptUserResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-const decryptUser = async (
-  { fields, authToken }: DecryptUserRequest,
-  formatUtcDate: (date: Date) => string,
-) => {
+const decryptUser = async ({ fields, authToken }: DecryptUserRequest, formatUtcDate: (date: Date) => string) => {
   const response = await requestWithoutCaseConverter<DecryptUserResponse>({
     method: 'POST',
     url: '/hosted/user/vault/decrypt',
@@ -30,9 +24,7 @@ const decryptUser = async (
 
 const useDecryptUser = () => {
   const { formatUtcDate } = useIntl();
-  return useMutation((data: DecryptUserRequest) =>
-    decryptUser(data, formatUtcDate),
-  );
+  return useMutation((data: DecryptUserRequest) => decryptUser(data, formatUtcDate));
 };
 
 export default useDecryptUser;

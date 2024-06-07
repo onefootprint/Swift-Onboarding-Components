@@ -1,9 +1,5 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
-import {
-  configureFootprint,
-  FootprintProvider,
-  Logger,
-} from '@onefootprint/idv';
+import { FootprintProvider, Logger, configureFootprint } from '@onefootprint/idv';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -27,10 +23,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <>
       <Head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
       <QueryClientProvider client={queryClient}>
         <AppearanceProvider appearance={appearance} theme={theme} rules={rules}>
@@ -42,9 +35,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           </BifrostMachineProvider>
         </AppearanceProvider>
       </QueryClientProvider>
-      {GOOGLE_MAPS_SRC ? (
-        <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" />
-      ) : null}
+      {GOOGLE_MAPS_SRC ? <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" /> : null}
     </>
   );
 };

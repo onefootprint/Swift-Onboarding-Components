@@ -27,10 +27,7 @@ const SectionTitle = ({ title, button }: SectionTitleProps) => {
 
     if (button.role) {
       buttonComponent = (
-        <PermissionGate
-          fallbackText={button.role.fallbackText}
-          scopeKind={button.role.scopeKind}
-        >
+        <PermissionGate fallbackText={button.role.fallbackText} scopeKind={button.role.scopeKind}>
           {buttonComponent}
         </PermissionGate>
       );

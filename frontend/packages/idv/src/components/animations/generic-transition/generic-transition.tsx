@@ -93,12 +93,7 @@ const GenericTransition = ({
           ) : null}
         </AnimatePresence>
       </Stack>
-      <Stack
-        minHeight="60px"
-        width="100%"
-        textAlign="center"
-        direction="column"
-      >
+      <Stack minHeight="60px" width="100%" textAlign="center" direction="column">
         {renderFirstIcon ? (
           <MotionStack variants={firstTextVariantTransition}>
             <Text variant="label-1">{firstText}</Text>
@@ -121,9 +116,7 @@ const AnimationWrapper = styled(Stack)<{
     overflow: hidden;
     padding: ${theme.spacing[11]} ${theme.spacing[3]} ${theme.spacing[3]}
       ${theme.spacing[3]};
-    background-color: ${isSecondaryBackground
-      ? theme.backgroundColor.secondary
-      : theme.backgroundColor.primary};
+    background-color: ${isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
   `}
 `;
 
@@ -135,14 +128,10 @@ const FeedbackIconContainer = styled(motion.div)<{
   isSecondaryBackground?: boolean;
 }>`
   ${({ theme, isSecondaryBackground }) => css`
-    background-color: ${isSecondaryBackground
-      ? theme.backgroundColor.secondary
-      : theme.backgroundColor.primary};
+    background-color: ${isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.full};
     border: 4px solid
-      ${isSecondaryBackground
-        ? theme.backgroundColor.secondary
-        : theme.backgroundColor.primary};
+      ${isSecondaryBackground ? theme.backgroundColor.secondary : theme.backgroundColor.primary};
   `}
 `;
 

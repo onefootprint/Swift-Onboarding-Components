@@ -1,8 +1,4 @@
-import type {
-  BackgroundColor,
-  FontVariant,
-  Theme,
-} from '@onefootprint/design-tokens';
+import type { BackgroundColor, FontVariant, Theme } from '@onefootprint/design-tokens';
 import type * as CSS from 'csstype';
 import type { HTMLAttributes } from 'react';
 

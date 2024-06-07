@@ -11,13 +11,7 @@ const CustomersLogos = () => {
   });
   return (
     <Container direction="column" gap={9} align="center">
-      <Stack
-        direction="column"
-        gap={6}
-        align="center"
-        maxWidth="540px"
-        textAlign="center"
-      >
+      <Stack direction="column" gap={6} align="center" maxWidth="540px" textAlign="center">
         <IcoSparkles40 color="secondary" />
         <Text tag="h4" variant="display-4">
           {t('title')}

@@ -5,11 +5,7 @@ import kebabCase from 'lodash/kebabCase';
 import readingTime from 'reading-time';
 
 import type { Article } from '../types/article';
-import type {
-  PageNavigation,
-  PageNavigationCategory,
-  PageNavigationItem,
-} from '../types/page';
+import type { PageNavigation, PageNavigationCategory, PageNavigationItem } from '../types/page';
 import getSectionMeta from './section';
 
 const getFilesPath = (filesPath: string): Promise<string[]> =>
@@ -46,10 +42,7 @@ const replaceContent = (content: string) => {
       const label = line.split('#').join('').trim();
       const id = kebabCase(label);
       const level = line.split('#').length - 1;
-      while (
-        parentSections.length &&
-        parentSections[parentSections.length - 1].level >= level
-      ) {
+      while (parentSections.length && parentSections[parentSections.length - 1].level >= level) {
         parentSections.pop();
       }
       parentSections.push({ level, id });
@@ -80,10 +73,7 @@ const getAllMarkdownFiles = (contentPaths: string[]): Promise<Article[]> =>
           data: {
             ...matterFile.data,
             readingTime: readingTime(content),
-            sections: [
-              getSectionMeta(`#${matterFile.data.title}`),
-              ...getSections(content),
-            ],
+            sections: [getSectionMeta(`#${matterFile.data.title}`), ...getSections(content)],
           },
         };
       } catch (e) {
@@ -104,9 +94,7 @@ export const getArticlesByPage = async (page: string): Promise<Article[]> => {
   return articles.filter(article => article.data.page === page);
 };
 
-export const getArticleBySlug = async (
-  slug: string,
-): Promise<Article | undefined> => {
+export const getArticleBySlug = async (slug: string): Promise<Article | undefined> => {
   const articles = await getAllArticles();
   return articles.find(article => article.data.slug === slug);
 };
@@ -127,9 +115,7 @@ const findOrCreateSubcategory = (
 ): PageNavigationItem | PageNavigationCategory => {
   if (!subcategory) return categoryItem;
 
-  let subcategoryItem = categoryItem.items.find(
-    item => item.title === subcategory,
-  ) as PageNavigationItem;
+  let subcategoryItem = categoryItem.items.find(item => item.title === subcategory) as PageNavigationItem;
 
   if (!subcategoryItem) {
     subcategoryItem = {
@@ -142,30 +128,23 @@ const findOrCreateSubcategory = (
   return subcategoryItem;
 };
 
-export const getNavigationByPage = async (
-  page: string,
-): Promise<PageNavigation> => {
+export const getNavigationByPage = async (page: string): Promise<PageNavigation> => {
   const navigation = new Map<string, PageNavigationCategory>();
   const articles = await getArticlesByPage(page);
 
-  articles.forEach(
-    ({ data: { category, subcategory, title, slug, hidden } }) => {
-      if (hidden) return;
+  articles.forEach(({ data: { category, subcategory, title, slug, hidden } }) => {
+    if (hidden) return;
 
-      const navigationCategory = findOrCreateSubcategory(
-        findOrCreateCategory(navigation, category),
-        subcategory,
-      );
+    const navigationCategory = findOrCreateSubcategory(findOrCreateCategory(navigation, category), subcategory);
 
-      if (navigationCategory.items) {
-        navigationCategory.items.push({
-          title,
-          slug,
-          items: null,
-        });
-      }
-    },
-  );
+    if (navigationCategory.items) {
+      navigationCategory.items.push({
+        title,
+        slug,
+        items: null,
+      });
+    }
+  });
 
   const res = Array.from(navigation.values()).map(({ name, items }) => ({
     name,

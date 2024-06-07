@@ -19,18 +19,14 @@ const validateBootstrapData = (bootstrapData?: IdentifyBootstrapData) => {
   if (phoneNumber) {
     const phoneUtils = PhoneNumberUtil.getInstance();
     const matchesSandboxNumber =
-      phoneUtils.isNumberMatch(phoneNumber, SANDBOX_NUMBER) ===
-      PhoneNumberUtil.MatchType.EXACT_MATCH;
+      phoneUtils.isNumberMatch(phoneNumber, SANDBOX_NUMBER) === PhoneNumberUtil.MatchType.EXACT_MATCH;
     if (matchesSandboxNumber) {
       isPhoneValid = true;
     } else {
       try {
         const parsedPhoneNumber = phoneUtils.parseAndKeepRawInput(phoneNumber);
         const region = phoneUtils.getRegionCodeForNumber(parsedPhoneNumber);
-        isPhoneValid = phoneUtils.isValidNumberForRegion(
-          parsedPhoneNumber,
-          region,
-        );
+        isPhoneValid = phoneUtils.isValidNumberForRegion(parsedPhoneNumber, region);
       } catch (_) {
         // do nothing
       }

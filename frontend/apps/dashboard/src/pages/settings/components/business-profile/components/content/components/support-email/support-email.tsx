@@ -13,18 +13,12 @@ const SupportEmail = ({ value }: SupportEmailProps) => {
   });
 
   return (
-    <Fieldset
-      label={t('label')}
-      value={value}
-      deleteKey={value ? 'clear_support_email' : undefined}
-    >
+    <Fieldset label={t('label')} value={value} deleteKey={value ? 'clear_support_email' : undefined}>
       {({ id, handleSubmit }) => (
         <Form
           id={id}
           value={value || ''}
-          onSubmit={(newSupportEmail: string) =>
-            handleSubmit({ supportEmail: newSupportEmail })
-          }
+          onSubmit={(newSupportEmail: string) => handleSubmit({ supportEmail: newSupportEmail })}
         />
       )}
     </Fieldset>

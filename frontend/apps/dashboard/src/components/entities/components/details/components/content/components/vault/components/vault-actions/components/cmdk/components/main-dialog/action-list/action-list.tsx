@@ -9,16 +9,14 @@ import { type ActionListProps, ActionType } from '../../../cmdk.types';
 const ActionList = ({ actionsArray, setOpen, hasReview }: ActionListProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.cmdk' });
 
-  const handleOnSelect =
-    (onSelect: { (): void; (): void }, closeAfterSelect: boolean | undefined) =>
-    () => {
-      if (onSelect) {
-        onSelect();
-      }
-      if (closeAfterSelect) {
-        setOpen(false);
-      }
-    };
+  const handleOnSelect = (onSelect: { (): void; (): void }, closeAfterSelect: boolean | undefined) => () => {
+    if (onSelect) {
+      onSelect();
+    }
+    if (closeAfterSelect) {
+      setOpen(false);
+    }
+  };
 
   return (
     <List>
@@ -27,19 +25,17 @@ const ActionList = ({ actionsArray, setOpen, hasReview }: ActionListProps) => {
         actionsArray.map(({ title, actions, type }) =>
           !hasReview && type === ActionType.REVIEW ? null : (
             <Group key={title} heading={title}>
-              {actions.map(
-                ({ label, value, onSelect, closeAfterSelect, disabled }) => (
-                  <Option
-                    key={value}
-                    value={value}
-                    onSelect={handleOnSelect(onSelect, closeAfterSelect)}
-                    disabled={disabled}
-                  >
-                    {label}
-                    <span>{disabled && t('disabled')}</span>
-                  </Option>
-                ),
-              )}
+              {actions.map(({ label, value, onSelect, closeAfterSelect, disabled }) => (
+                <Option
+                  key={value}
+                  value={value}
+                  onSelect={handleOnSelect(onSelect, closeAfterSelect)}
+                  disabled={disabled}
+                >
+                  {label}
+                  <span>{disabled && t('disabled')}</span>
+                </Option>
+              ))}
             </Group>
           ),
         )}

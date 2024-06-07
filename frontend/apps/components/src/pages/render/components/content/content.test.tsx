@@ -1,30 +1,16 @@
 import '../../../../config/initializers/react-i18next-test';
 
 import themes from '@onefootprint/design-tokens';
-import {
-  createUseRouterSpy,
-  render,
-  screen,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, render, screen, waitFor } from '@onefootprint/test-utils';
 import { DesignSystemProvider } from '@onefootprint/ui';
-import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import type { ProviderReturn } from 'src/components/footprint-provider';
 import FootprintProvider from 'src/components/footprint-provider';
 
 import Loading from '../loading';
 import Content from './content';
-import {
-  withDecrypt,
-  withDecryptError,
-  withSdkArgs,
-  withSdkArgsError,
-} from './content.test.config';
+import { withDecrypt, withDecryptError, withSdkArgs, withSdkArgsError } from './content.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -41,9 +27,9 @@ describe('<Content />', () => {
   const queryClient = new QueryClient({
     queryCache,
     logger: {
-      log: () => {},
-      warn: () => {},
-      error: () => {},
+      log: () => undefined,
+      warn: () => undefined,
+      error: () => undefined,
     },
     defaultOptions: {
       queries: {

@@ -9,14 +9,7 @@ type BackgroundScreenProps = {
 const BackgroundScreen = ({ className }: BackgroundScreenProps) => (
   <Container className={className}>
     <Stack direction="column" align="start">
-      <Stack
-        direction="row"
-        gap={2}
-        height="40px"
-        justify="start"
-        align="center"
-        marginLeft={5}
-      >
+      <Stack direction="row" gap={2} height="40px" justify="start" align="center" marginLeft={5}>
         <Dot />
         <Dot />
         <Dot />

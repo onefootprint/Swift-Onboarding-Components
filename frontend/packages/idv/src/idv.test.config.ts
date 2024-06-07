@@ -1,14 +1,5 @@
-import {
-  mockRequest,
-  screen,
-  userEvent,
-  waitFor as waitForOriginal,
-} from '@onefootprint/test-utils';
-import type {
-  D2PStatus,
-  DataIdentifier,
-  OnboardingRequirement,
-} from '@onefootprint/types';
+import { mockRequest, screen, userEvent, waitFor as waitForOriginal } from '@onefootprint/test-utils';
+import type { D2PStatus, DataIdentifier, OnboardingRequirement } from '@onefootprint/types';
 import {
   AuthMethodKind,
   ChallengeKind,
@@ -20,18 +11,13 @@ import {
 
 // These tests take so long that a lot of them time out - this does a blanket replace on waitFor
 // to allow each step of the tests to run for a little longer
-export const waitFor = <T>(callback: () => Promise<T> | T) =>
-  waitForOriginal(callback, { timeout: 2000 });
+export const waitFor = <T>(callback: () => Promise<T> | T) => waitForOriginal(callback, { timeout: 2000 });
 
 export const TestAuthorizeRequirement: OnboardingRequirement = {
   kind: OnboardingRequirementKind.authorize,
   isMet: false,
   fieldsToAuthorize: {
-    collectedData: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.dob,
-      CollectedKycDataOption.ssn9,
-    ],
+    collectedData: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
     documentTypes: [],
   },
 };
@@ -78,11 +64,7 @@ const RequirementsFixture: OnboardingRequirement[] = [
   {
     kind: OnboardingRequirementKind.collectKycData,
     isMet: false,
-    missingAttributes: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.dob,
-      CollectedKycDataOption.ssn9,
-    ],
+    missingAttributes: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
     populatedAttributes: [],
     optionalAttributes: [],
   },
@@ -107,22 +89,15 @@ export const withRequirements = (allRequirements = RequirementsFixture) => {
   });
 };
 
-export const withDecrypt = (
-  data: Partial<Record<DataIdentifier, string | undefined>>,
-) =>
+export const withDecrypt = (data: Partial<Record<DataIdentifier, string | undefined>>) =>
   mockRequest({
     method: 'post',
     path: '/hosted/user/vault/decrypt',
     response: data,
   });
 
-export const withIdentify = (
-  userFound?: boolean,
-  sufficientScopes?: boolean,
-) => {
-  const tokenScopes = sufficientScopes
-    ? [UserTokenScope.signup, UserTokenScope.sensitiveProfile]
-    : [];
+export const withIdentify = (userFound?: boolean, sufficientScopes?: boolean) => {
+  const tokenScopes = sufficientScopes ? [UserTokenScope.signup, UserTokenScope.sensitiveProfile] : [];
   mockRequest({
     method: 'post',
     path: '/hosted/identify',
@@ -249,10 +224,7 @@ const fillIdentifyPhone = async () => {
 const fillSmsPin = async () => {
   // Wait until the login challenge request succeeds
   await waitFor(() => {
-    expect(screen.getByRole('presentation')).toHaveAttribute(
-      'data-pending',
-      'false',
-    );
+    expect(screen.getByRole('presentation')).toHaveAttribute('data-pending', 'false');
   });
 
   const firstInput = document.getElementsByTagName('input')[0];
@@ -274,9 +246,7 @@ export const identifyUserByPhone = async () => {
     expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
   });
   await waitFor(() => {
-    expect(
-      screen.getByText('Enter the 6-digit code sent to +1 (•••) •••-••99.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Enter the 6-digit code sent to +1 (•••) •••-••99.')).toBeInTheDocument();
   });
 
   withIdentifyVerify();
@@ -296,9 +266,7 @@ export const identifyUserByEmail = async () => {
     expect(screen.getByText('Welcome back! 🎉')).toBeInTheDocument();
   });
   await waitFor(() => {
-    expect(
-      screen.getByText('Enter the 6-digit code sent to +1 (•••) •••-••99.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Enter the 6-digit code sent to +1 (•••) •••-••99.')).toBeInTheDocument();
   });
 
   withIdentifyVerify();
@@ -321,9 +289,7 @@ export const identifyNewUser = async () => {
     expect(screen.getByText('Verify your phone number')).toBeInTheDocument();
   });
   await waitFor(() => {
-    expect(
-      screen.getByText('Enter the 6-digit code sent to +1 (•••) •••-••99.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Enter the 6-digit code sent to +1 (•••) •••-••99.')).toBeInTheDocument();
   });
 
   withIdentifyVerify();
@@ -351,9 +317,7 @@ export const completeKyc = async () => {
   await userEvent.click(submitButton);
 
   await waitFor(() => {
-    expect(
-      screen.getByText("What's your Social Security Number?"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("What's your Social Security Number?")).toBeInTheDocument();
   });
 
   const ssn4 = screen.getByLabelText('SSN');

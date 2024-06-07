@@ -8,11 +8,8 @@ export type NonIdDocMachineArgs = {
   args: MachineContext;
 };
 
-const useLocalNonIdDocMachine = ({ args }: NonIdDocMachineArgs) =>
-  useMachine(() => createNonIdDocMachine(args));
+const useLocalNonIdDocMachine = ({ args }: NonIdDocMachineArgs) => useMachine(() => createNonIdDocMachine(args));
 
-export const [MachineProvider, useNonIdDocMachine] = constate(
-  useLocalNonIdDocMachine,
-);
+export const [MachineProvider, useNonIdDocMachine] = constate(useLocalNonIdDocMachine);
 
 export default MachineProvider;

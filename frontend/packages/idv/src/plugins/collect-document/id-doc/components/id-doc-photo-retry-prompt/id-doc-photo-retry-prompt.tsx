@@ -5,7 +5,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { NavigationHeader } from '../../../../../components';
-import Error from '../../../components/error';
+import ErrorComponent from '../../../components/error';
 import FadeInContainer from '../../../components/fade-in-container';
 import IdDocPhotoButtons from '../../../components/id-doc-photo-buttons';
 import type { CaptureKind, IdDocImageErrorType } from '../../../types';
@@ -40,8 +40,7 @@ const IdDocPhotoRetryPrompt = ({
   const sideName = getSideName();
 
   const hideCaptureButton = !!forceUpload;
-  const hideUpload =
-    hideUploadButton || (uploadMode === 'capture_only' && !forceUpload);
+  const hideUpload = hideUploadButton || (uploadMode === 'capture_only' && !forceUpload);
   const allowPdf = uploadMode === 'allow_upload';
 
   const handleClickBack = () => {
@@ -59,25 +58,11 @@ const IdDocPhotoRetryPrompt = ({
   return (
     <FadeInContainer>
       <NavigationHeader
-        leftButton={
-          imageType !== IdDocImageTypes.selfie
-            ? { variant: 'back', onBack: handleClickBack }
-            : undefined
-        }
+        leftButton={imageType !== IdDocImageTypes.selfie ? { variant: 'back', onBack: handleClickBack } : undefined}
         position="floating"
       />
-      <PromptContainer
-        direction="column"
-        gap={7}
-        align="center"
-        justify="center"
-      >
-        <Error
-          docName={docName}
-          sideName={sideName}
-          errors={errors}
-          countryName={countryName}
-        />
+      <PromptContainer direction="column" gap={7} align="center" justify="center">
+        <ErrorComponent docName={docName} sideName={sideName} errors={errors} countryName={countryName} />
         <IdDocPhotoButtons
           onComplete={onComplete}
           hideCaptureButton={hideCaptureButton}

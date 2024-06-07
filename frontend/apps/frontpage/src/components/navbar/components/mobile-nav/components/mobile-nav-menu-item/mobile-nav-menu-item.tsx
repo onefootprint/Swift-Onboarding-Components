@@ -11,9 +11,7 @@ type MobileNavMenuItemProps = {
   item: NavMenuItem;
 };
 
-const MobileNavMenuItem = ({ item }: MobileNavMenuItemProps) => (
-  <StyledLink href={item.href}>{item.text}</StyledLink>
-);
+const MobileNavMenuItem = ({ item }: MobileNavMenuItemProps) => <StyledLink href={item.href}>{item.text}</StyledLink>;
 
 const StyledLink = styled(NavigationMenuLink)`
   ${({ theme }) => css`

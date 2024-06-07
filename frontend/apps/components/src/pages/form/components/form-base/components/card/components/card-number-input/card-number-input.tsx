@@ -9,24 +9,13 @@ import CardIcon from './components/card-icon';
 
 export type CardNumberInputProps = Omit<
   InputProps,
-  | 'autoComplete'
-  | 'inputMode'
-  | 'mask'
-  | 'value'
-  | 'maxLength'
-  | 'minLength'
-  | 'placeholder'
-  | 'size'
-  | 'type'
+  'autoComplete' | 'inputMode' | 'mask' | 'value' | 'maxLength' | 'minLength' | 'placeholder' | 'size' | 'type'
 > & {
   value?: string;
 };
 
 const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
-  (
-    { hasError, hint, onChange, label, value, ...props }: CardNumberInputProps,
-    ref,
-  ) => {
+  ({ hasError, hint, onChange, label, value, ...props }: CardNumberInputProps, ref) => {
     const { t } = useTranslation('common', {
       keyPrefix: 'pages.secure-form.card.form.number',
     });

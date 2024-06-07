@@ -17,25 +17,17 @@ type ValidationTimelineItemIconProps = {
   attribute: string;
 };
 
-const ValidationTimelineItemIcon = ({
-  attribute,
-}: ValidationTimelineItemIconProps) => {
+const ValidationTimelineItemIcon = ({ attribute }: ValidationTimelineItemIconProps) => {
   if (attribute === MatchSignalAttribute.name) {
     return <IcoUser16 />;
   }
   if (attribute === MatchSignalAttribute.email) {
     return <IcoEmail16 />;
   }
-  if (
-    attribute === MatchSignalAttribute.phone ||
-    attribute === MatchSignalAttribute.businessPhoneNumber
-  ) {
+  if (attribute === MatchSignalAttribute.phone || attribute === MatchSignalAttribute.businessPhoneNumber) {
     return <IcoPhone16 />;
   }
-  if (
-    attribute === MatchSignalAttribute.address ||
-    attribute === MatchSignalAttribute.businessAddress
-  ) {
+  if (attribute === MatchSignalAttribute.address || attribute === MatchSignalAttribute.businessAddress) {
     return <IcoBuilding16 />;
   }
   if (attribute === MatchSignalAttribute.dob) {

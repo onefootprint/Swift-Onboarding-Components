@@ -2,11 +2,11 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
-  selectOutcomeOptional,
-  verifyPhoneNumber,
   confirmData,
   doTransferFromDesktop,
   doTransferFromMobile,
+  selectOutcomeOptional,
+  verifyPhoneNumber,
 } from './utils/commands';
 
 const email = 'piip@onefootprint.com';
@@ -59,21 +59,14 @@ const Sdks = [
 ];
 
 for (const { version, baseUrl } of Sdks) {
-  test(`E2E.WebSDKIntegration.${version}`, async ({
-    browserName,
-    page,
-    browser,
-    isMobile,
-  }) => {
+  test(`E2E.WebSDKIntegration.${version}`, async ({ browserName, page, browser, isMobile }) => {
     test.setTimeout(120000);
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
     await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
     const publicKey = 'pb_test_kZerd69hBocbsmHqAuYBE1';
 
-    await page.goto(
-      `${baseUrl}/?ob_key=${publicKey}&user_data=${userData}&flow=${flowId}`,
-    );
+    await page.goto(`${baseUrl}/?ob_key=${publicKey}&user_data=${userData}&flow=${flowId}`);
 
     await page.waitForLoadState();
 
@@ -83,11 +76,9 @@ for (const { version, baseUrl } of Sdks) {
 
     await page.waitForLoadState();
 
-    await expect(
-      page
-        .frameLocator('iframe[name^="footprint-iframe-"]')
-        .getByText(/Sandbox Mode/i),
-    ).toBeVisible({ timeout: 40000 });
+    await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
+      timeout: 40000,
+    });
     const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
     await selectOutcomeOptional(frame, 'Success');

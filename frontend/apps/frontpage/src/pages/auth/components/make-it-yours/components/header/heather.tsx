@@ -11,13 +11,7 @@ type HeatherProps = {
 const Heather = ({ title, subtitle }: HeatherProps) => (
   <Stack direction="column" gap={5} align="center">
     <BirdIcon />
-    <Stack
-      direction="column"
-      gap={3}
-      align="center"
-      maxWidth="600px"
-      textAlign="center"
-    >
+    <Stack direction="column" gap={3} align="center" maxWidth="600px" textAlign="center">
       <Text variant="display-3">{title}</Text>
       <Text variant="display-4" color="tertiary">
         {subtitle}

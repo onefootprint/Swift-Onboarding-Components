@@ -1,13 +1,12 @@
 import { fireEvent, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
+import DesktopConsent from '.';
 import renderPage from '../../test-utils/render-page';
 import type { MachineContext } from '../../utils/state-machine';
-import DesktopConsent from '.';
 import contextDesktopConsent from './desktop-consent.test.config';
 
-const renderDesktopConsent = (context: MachineContext) =>
-  renderPage(context, <DesktopConsent />, 'consentDesktop');
+const renderDesktopConsent = (context: MachineContext) => renderPage(context, <DesktopConsent />, 'consentDesktop');
 
 describe('<DesktopConsent />', () => {
   beforeEach(() => {
@@ -43,9 +42,7 @@ describe('<DesktopConsent />', () => {
 
   it('Consent button initially asks to scroll and is disables', () => {
     renderDesktopConsent(contextDesktopConsent);
-    const consentButton = screen.getByTestId(
-      'consent-button',
-    ) as HTMLButtonElement;
+    const consentButton = screen.getByTestId('consent-button') as HTMLButtonElement;
     const consentButtonText = screen.getByText('Scroll to agree');
     expect(consentButton).toBeInTheDocument();
     expect(consentButtonText).toBeInTheDocument();
@@ -61,9 +58,7 @@ describe('<DesktopConsent />', () => {
       const consentButtonText = screen.getByText('Agree and continue');
       expect(consentButtonText).toBeInTheDocument();
     });
-    const consentButton = screen.getByTestId(
-      'consent-button',
-    ) as HTMLButtonElement;
+    const consentButton = screen.getByTestId('consent-button') as HTMLButtonElement;
     expect(consentButton).toBeInTheDocument();
     expect(consentButton.disabled).toBeFalsy();
   });

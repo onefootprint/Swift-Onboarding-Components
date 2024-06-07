@@ -10,8 +10,6 @@ const useLocalInvestorProfileMachine = ({
   args: CreateInvestorProfileArgs;
 }) => useMachine(() => investorProfileMachine(args));
 
-export const [MachineProvider, useInvestorProfileMachine] = constate(
-  useLocalInvestorProfileMachine,
-);
+export const [MachineProvider, useInvestorProfileMachine] = constate(useLocalInvestorProfileMachine);
 
 export default MachineProvider;

@@ -1,8 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type {
-  GetAuthRoleResponse,
-  OrgAssumeRoleResponse,
-} from '@onefootprint/types';
+import type { GetAuthRoleResponse, OrgAssumeRoleResponse } from '@onefootprint/types';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 
 export const getOrgAuthRoleFixture: GetAuthRoleResponse = [

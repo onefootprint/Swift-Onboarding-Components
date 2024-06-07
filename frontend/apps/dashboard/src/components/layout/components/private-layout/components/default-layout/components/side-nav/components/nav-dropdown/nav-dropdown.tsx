@@ -1,6 +1,6 @@
 import { DOCS_BASE_URL } from '@onefootprint/global-constants';
 import { IcoArrowUpRight16, IcoDotsHorizontal16 } from '@onefootprint/icons';
-import { createFontStyles, Dropdown } from '@onefootprint/ui';
+import { Dropdown, createFontStyles } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,12 +31,7 @@ const helpLinks: HelpLink[] = [
   },
 ];
 
-const NavDropdown = ({
-  tenants,
-  currTenantId,
-  onAssumeTenant,
-  user,
-}: NavDropdownProps) => {
+const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
   const { t } = useTranslation('common', {
@@ -71,17 +66,9 @@ const NavDropdown = ({
         {isOpen && (
           <Dropdown.Portal forceMount>
             <NavDropdownContent forceMount sideOffset={8}>
-              <UserName
-                name={user.firstName}
-                lastName={user.lastName}
-                email={user.email}
-              />
+              <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
               {tenants?.length > 1 && (
-                <TenantsList
-                  tenants={tenants}
-                  currTenantId={currTenantId}
-                  onSelect={handleTenantChange}
-                />
+                <TenantsList tenants={tenants} currTenantId={currTenantId} onSelect={handleTenantChange} />
               )}
               <SectionContainer>
                 {helpLinks.map(link => (
@@ -102,10 +89,7 @@ const NavDropdown = ({
           </Dropdown.Portal>
         )}
       </Dropdown.Root>
-      <RiskSignalsGlossary
-        open={isGlossaryOpen}
-        onClose={() => setIsGlossaryOpen(false)}
-      />
+      <RiskSignalsGlossary open={isGlossaryOpen} onClose={() => setIsGlossaryOpen(false)} />
     </>
   );
 };

@@ -1,11 +1,6 @@
 import '../../../../../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import React from 'react';
 
@@ -16,7 +11,7 @@ describe('<Form />', () => {
   const renderForm = ({
     defaultValues,
     isLoading = false,
-    onSubmit = () => {},
+    onSubmit = () => undefined,
     ctaLabel,
     requireMultiKyc,
   }: Partial<FormProps>) => {
@@ -72,9 +67,7 @@ describe('<Form />', () => {
       expect(lastNameFields[0]).toHaveValue('Doe');
       expect(lastNameFields[1]).toHaveValue('Doey');
 
-      const ownershipStakeFields = screen.getAllByLabelText(
-        'Approximate ownership stake (%)',
-      );
+      const ownershipStakeFields = screen.getAllByLabelText('Approximate ownership stake (%)');
       expect(ownershipStakeFields).toHaveLength(2);
       expect(ownershipStakeFields[0]).toHaveValue(50);
       expect(ownershipStakeFields[1]).toHaveValue(25);
@@ -115,9 +108,7 @@ describe('<Form />', () => {
     await userEvent.type(lastNameFields[1], 'Smith');
 
     const emailFields = screen.getAllByLabelText('Email');
-    expect(
-      screen.getByPlaceholderText('jane.doe@acme.com'),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('jane.doe@acme.com')).toBeInTheDocument();
     expect(emailFields).toHaveLength(1);
     await userEvent.type(emailFields[0], 'Lily@smith.com');
 
@@ -126,9 +117,7 @@ describe('<Form />', () => {
     expect(phoneFields).toHaveLength(1);
     await userEvent.type(phoneFields[0], '5555550100');
 
-    const ownershipStakeFields = screen.getAllByLabelText(
-      'Approximate ownership stake (%)',
-    );
+    const ownershipStakeFields = screen.getAllByLabelText('Approximate ownership stake (%)');
     expect(ownershipStakeFields).toHaveLength(2);
     await userEvent.type(ownershipStakeFields[0], '50');
     await userEvent.type(ownershipStakeFields[1], '50');
@@ -173,9 +162,7 @@ describe('<Form />', () => {
     expect(lastNameField).toHaveLength(1);
     expect(lastNameField[0]).toHaveValue('Doe');
 
-    const ownershipStakeField = screen.getAllByLabelText(
-      'Approximate ownership stake (%)',
-    );
+    const ownershipStakeField = screen.getAllByLabelText('Approximate ownership stake (%)');
     expect(ownershipStakeField).toHaveLength(1);
     expect(ownershipStakeField[0]).toHaveValue(50);
 
@@ -241,15 +228,11 @@ describe('<Form />', () => {
         expect(onSubmit).not.toHaveBeenCalled();
 
         await waitFor(() => {
-          const error = screen.getByText(
-            'First name cannot be empty or is invalid',
-          );
+          const error = screen.getByText('First name cannot be empty or is invalid');
           expect(error).toBeInTheDocument();
         });
         await waitFor(() => {
-          const error = screen.getByText(
-            'Last name cannot be empty or is invalid',
-          );
+          const error = screen.getByText('Last name cannot be empty or is invalid');
           expect(error).toBeInTheDocument();
         });
       });
@@ -274,9 +257,7 @@ describe('<Form />', () => {
         });
 
         await waitFor(() => {
-          expect(
-            screen.getByText('Phone number is required'),
-          ).toBeInTheDocument();
+          expect(screen.getByText('Phone number is required')).toBeInTheDocument();
         });
       });
     });
@@ -289,13 +270,9 @@ describe('<Form />', () => {
         const continueButton = screen.getByRole('button', { name: 'Continue' });
         await userEvent.click(continueButton);
 
-        const ownershipStakeField = screen.getByLabelText(
-          'Approximate ownership stake (%)',
-        );
+        const ownershipStakeField = screen.getByLabelText('Approximate ownership stake (%)');
         await userEvent.type(ownershipStakeField, '0');
-        expect(
-          screen.getByText('Ownership stake cannot be smaller than 1%'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Ownership stake cannot be smaller than 1%')).toBeInTheDocument();
       });
     });
 
@@ -318,9 +295,7 @@ describe('<Form />', () => {
         const emailFields = screen.getAllByLabelText('Email');
         await userEvent.type(emailFields[0], 'Lily@smith.com');
 
-        const ownershipStakeFields = screen.getAllByLabelText(
-          'Approximate ownership stake (%)',
-        );
+        const ownershipStakeFields = screen.getAllByLabelText('Approximate ownership stake (%)');
         await userEvent.type(ownershipStakeFields[0], '70');
         await userEvent.type(ownershipStakeFields[1], '70');
 
@@ -351,9 +326,7 @@ describe('<Form />', () => {
         const lastName = screen.getByLabelText('Last name');
         await userEvent.type(lastName, 'Doe');
 
-        const ownershipStake = screen.getByLabelText(
-          'Approximate ownership stake (%)',
-        );
+        const ownershipStake = screen.getByLabelText('Approximate ownership stake (%)');
         await userEvent.type(ownershipStake, '50');
 
         const continueButton = screen.getByRole('button', { name: 'Continue' });

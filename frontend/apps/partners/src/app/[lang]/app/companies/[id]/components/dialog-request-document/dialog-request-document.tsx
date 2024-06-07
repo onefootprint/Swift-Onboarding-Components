@@ -1,11 +1,4 @@
-import {
-  Dialog,
-  Radio,
-  Stack,
-  Text,
-  TextArea,
-  TextInput,
-} from '@onefootprint/ui';
+import { Dialog, Radio, Stack, Text, TextArea, TextInput } from '@onefootprint/ui';
 import { Select } from '@onefootprint/ui/src/components';
 import type { FormEvent } from 'react';
 import React, { useState } from 'react';
@@ -48,9 +41,7 @@ const DialogRequestDocument = ({
   const isRadioDisabled = Boolean(docDialog?.name);
   const { t } = useTranslation('common');
   const [template, setTemplate] = useState<Option>();
-  const [radio, setRadio] = useState<RadioValue>(() =>
-    prevName ? 'new' : 'template',
-  );
+  const [radio, setRadio] = useState<RadioValue>(() => (prevName ? 'new' : 'template'));
 
   const handleClose = () => {
     setRadio('template');

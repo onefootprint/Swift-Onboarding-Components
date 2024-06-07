@@ -1,16 +1,5 @@
-import {
-  CollectedKybDataOption,
-  CollectedKycDataOption,
-} from '@onefootprint/types';
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  Radio,
-  Text,
-  Toggle,
-} from '@onefootprint/ui';
+import { CollectedKybDataOption, CollectedKycDataOption } from '@onefootprint/types';
+import { Box, Button, Checkbox, Divider, Radio, Text, Toggle } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -41,19 +30,14 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const ssnKind = watch('personal.ssnKind');
   const shouldCollectIdDoc = watch('personal.idDoc');
   const selectedGlobalDocs = watch('personal.idDocKind');
-  const selectedCountrySpecificDocs = watch(
-    'personal.countrySpecificIdDocKind',
-  );
+  const selectedCountrySpecificDocs = watch('personal.countrySpecificIdDocKind');
   const isSsnOptional = !!watch('personal.ssnOptional');
   const shouldStepUpIdDoc = !!watch('personal.ssnDocScanStepUp');
-  const collectBO = !!watch(
-    `businessInformation.${CollectedKybDataOption.beneficialOwners}`,
-  );
+  const collectBO = !!watch(`businessInformation.${CollectedKybDataOption.beneficialOwners}`);
   const isKyb = kind === PlaybookKind.Kyb;
 
   const showNoPhoneFlow =
-    (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) &&
-    kind === PlaybookKind.Kyc;
+    (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) && kind === PlaybookKind.Kyc;
   const showSsnDocStepUp = isSsnOptional;
 
   // need to store this so we don't re-fetch on add'l renders
@@ -64,8 +48,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const handleSave = () => {
     if (
       (shouldCollectIdDoc || shouldStepUpIdDoc) &&
-      (selectedGlobalDocs?.length >= 1 ||
-        Object.keys(selectedCountrySpecificDocs).length >= 1)
+      (selectedGlobalDocs?.length >= 1 || Object.keys(selectedCountrySpecificDocs).length >= 1)
     ) {
       onStopEditing();
     } else if (!shouldCollectIdDoc && !shouldStepUpIdDoc) {
@@ -133,12 +116,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
           />
         </Section>
         <ButtonContainer>
-          <Button
-            fullWidth
-            variant="primary"
-            onClick={handleSave}
-            disabled={isSaveDisabled()}
-          >
+          <Button fullWidth variant="primary" onClick={handleSave} disabled={isSaveDisabled()}>
             {allT('save')}
           </Button>
           <Button variant="secondary" fullWidth onClick={handleCancel}>
@@ -225,16 +203,8 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
           <>
             <Subsection>
               <OptionsContainer>
-                <Radio
-                  label={t('ssn.full')}
-                  value={CollectedKycDataOption.ssn9}
-                  {...register('personal.ssnKind')}
-                />
-                <Radio
-                  label={t('ssn.last4')}
-                  value={CollectedKycDataOption.ssn4}
-                  {...register('personal.ssnKind')}
-                />
+                <Radio label={t('ssn.full')} value={CollectedKycDataOption.ssn9} {...register('personal.ssnKind')} />
+                <Radio label={t('ssn.last4')} value={CollectedKycDataOption.ssn4} {...register('personal.ssnKind')} />
               </OptionsContainer>
             </Subsection>
             <Subsection>
@@ -313,12 +283,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         )}
       </Section>
       <ButtonContainer>
-        <Button
-          fullWidth
-          variant="primary"
-          onClick={handleSave}
-          disabled={isSaveDisabled()}
-        >
+        <Button fullWidth variant="primary" onClick={handleSave} disabled={isSaveDisabled()}>
           {allT('save')}
         </Button>
         <Button variant="secondary" fullWidth onClick={handleCancel}>

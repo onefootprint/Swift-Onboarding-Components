@@ -9,9 +9,7 @@ const getFormattedRange = (range: DateFilterRange): string => {
   }
 
   const startText =
-    startDate.getFullYear() === endDate.getFullYear()
-      ? format(startDate, 'MMM dd')
-      : format(startDate, 'MMM dd, yyyy');
+    startDate.getFullYear() === endDate.getFullYear() ? format(startDate, 'MMM dd') : format(startDate, 'MMM dd, yyyy');
   const endText = format(endDate, 'MMM dd, yyyy');
 
   return `${startText} \u2013 ${endText}`;

@@ -18,12 +18,7 @@ const HelpDialog = ({ open, onClose }: HelpDialogProps) => {
       <Stack direction="column" gap={4}>
         <Text variant="body-3">{t('body')}</Text>
         <ImageContainer>
-          <StyledImage
-            alt={t('img-alt')}
-            src="/settings/support-links.png"
-            width={548}
-            height={244}
-          />
+          <StyledImage alt={t('img-alt')} src="/settings/support-links.png" width={548} height={244} />
         </ImageContainer>
       </Stack>
     </Dialog>

@@ -20,41 +20,25 @@ const Preview = ({ onStartEditing }: PreviewProps) => {
     keyPrefix: 'pages.playbooks.dialog.summary.business-information.preview',
   });
   const { getValues } = useFormContext();
-  const businessInformation: BusinessInformation = getValues(
-    'businessInformation',
-  );
-  const formValues = Object.keys(businessInformation).filter(
-    cdo => cdo !== CollectedKybDataOption.beneficialOwners,
-  );
+  const businessInformation: BusinessInformation = getValues('businessInformation');
+  const formValues = Object.keys(businessInformation).filter(cdo => cdo !== CollectedKybDataOption.beneficialOwners);
 
   return (
     <Container>
       <Header>
         <Text variant="label-3">{t('title')}</Text>
-        <LinkButton
-          onClick={onStartEditing}
-          iconComponent={IcoPencil16}
-          iconPosition="left"
-        >
+        <LinkButton onClick={onStartEditing} iconComponent={IcoPencil16} iconPosition="left">
           {t('edit')}
         </LinkButton>
       </Header>
       <CollectedInformationContainer>
         {formValues.map(field => (
           <CollectedInformation key={field}>
-            <Text
-              variant="body-3"
-              color="tertiary"
-              whiteSpace="nowrap"
-              textAlign="right"
-            >
+            <Text variant="body-3" color="tertiary" whiteSpace="nowrap" textAlign="right">
               {t(field as ParseKeys<'common'>)}
             </Text>
             <ValueContainer>
-              <DisplayValue
-                field={field as keyof BusinessInformation}
-                businessInformation={businessInformation}
-              />
+              <DisplayValue field={field as keyof BusinessInformation} businessInformation={businessInformation} />
             </ValueContainer>
           </CollectedInformation>
         ))}

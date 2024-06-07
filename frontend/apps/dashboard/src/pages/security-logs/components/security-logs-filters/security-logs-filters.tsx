@@ -96,9 +96,7 @@ const SecurityLogsFilters = () => {
               label: t('attributes.id.legal-status.title'),
               options: [
                 {
-                  label: allT(
-                    `di.${IdDI.usLegalStatus}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${IdDI.usLegalStatus}` as ParseKeys<'common'>),
                   value: IdDI.usLegalStatus,
                 },
                 {
@@ -114,9 +112,7 @@ const SecurityLogsFilters = () => {
                   value: IdDI.visaKind,
                 },
                 {
-                  label: allT(
-                    `di.${IdDI.visaExpirationDate}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${IdDI.visaExpirationDate}` as ParseKeys<'common'>),
                   value: IdDI.visaExpirationDate,
                 },
               ],
@@ -137,9 +133,7 @@ const SecurityLogsFilters = () => {
                   value: BusinessDI.name,
                 },
                 {
-                  label: allT(
-                    `di.${BusinessDI.doingBusinessAs}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${BusinessDI.doingBusinessAs}` as ParseKeys<'common'>),
                   value: BusinessDI.doingBusinessAs,
                 },
                 {
@@ -147,27 +141,19 @@ const SecurityLogsFilters = () => {
                   value: BusinessDI.tin,
                 },
                 {
-                  label: allT(
-                    `di.${BusinessDI.corporationType}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${BusinessDI.corporationType}` as ParseKeys<'common'>),
                   value: BusinessDI.corporationType,
                 },
                 {
-                  label: allT(
-                    `di.${BusinessDI.phoneNumber}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${BusinessDI.phoneNumber}` as ParseKeys<'common'>),
                   value: BusinessDI.phoneNumber,
                 },
                 {
-                  label: allT(
-                    `di.${BusinessDI.website}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${BusinessDI.website}` as ParseKeys<'common'>),
                   value: BusinessDI.website,
                 },
                 {
-                  label: allT(
-                    `di.${BusinessDI.beneficialOwners}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${BusinessDI.beneficialOwners}` as ParseKeys<'common'>),
                   value: BusinessDI.beneficialOwners,
                 },
               ],
@@ -176,15 +162,11 @@ const SecurityLogsFilters = () => {
               label: t('attributes.business.address.title'),
               options: [
                 {
-                  label: allT(
-                    `di.${BusinessDI.addressLine1}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${BusinessDI.addressLine1}` as ParseKeys<'common'>),
                   value: BusinessDI.addressLine1,
                 },
                 {
-                  label: allT(
-                    `di.${BusinessDI.addressLine2}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${BusinessDI.addressLine2}` as ParseKeys<'common'>),
                   value: BusinessDI.addressLine2,
                 },
                 {
@@ -200,9 +182,7 @@ const SecurityLogsFilters = () => {
                   value: BusinessDI.state,
                 },
                 {
-                  label: allT(
-                    `di.${BusinessDI.country}` as ParseKeys<'common'>,
-                  ),
+                  label: allT(`di.${BusinessDI.country}` as ParseKeys<'common'>),
                   value: BusinessDI.country,
                 },
               ],

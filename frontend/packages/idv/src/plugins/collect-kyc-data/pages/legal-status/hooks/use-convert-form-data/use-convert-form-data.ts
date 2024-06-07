@@ -18,14 +18,8 @@ const useConvertFormData = () => {
     const { usLegalStatus, nationality, citizenships, visa } = formData;
 
     const convertedData: KycData = {
-      [IdDI.usLegalStatus]: updateDataValue(
-        usLegalStatus,
-        data[IdDI.usLegalStatus],
-      ),
-      [IdDI.nationality]: updateDataValue(
-        nationality.value,
-        data[IdDI.nationality],
-      ),
+      [IdDI.usLegalStatus]: updateDataValue(usLegalStatus, data[IdDI.usLegalStatus]),
+      [IdDI.nationality]: updateDataValue(nationality.value, data[IdDI.nationality]),
       [IdDI.citizenships]: {
         value: undefined,
       },
@@ -42,9 +36,7 @@ const useConvertFormData = () => {
     }
 
     const citizenshipValues = uniq(
-      citizenships
-        ?.filter(({ value }) => !!value)
-        .map(({ value }) => value as CountryCode),
+      citizenships?.filter(({ value }) => !!value).map(({ value }) => value as CountryCode),
     );
     if (citizenshipValues && citizenshipValues.length > 0) {
       convertedData[IdDI.citizenships] = updateDataValue(
@@ -60,16 +52,10 @@ const useConvertFormData = () => {
 
     if (usLegalStatus === UsLegalStatus.visa) {
       if (visa?.expirationDate) {
-        convertedData[IdDI.visaExpirationDate] = updateDataValue(
-          visa.expirationDate,
-          data[IdDI.visaExpirationDate],
-        );
+        convertedData[IdDI.visaExpirationDate] = updateDataValue(visa.expirationDate, data[IdDI.visaExpirationDate]);
       }
       if (visa?.kind) {
-        convertedData[IdDI.visaKind] = updateDataValue(
-          visa.kind.value,
-          data[IdDI.visaKind],
-        );
+        convertedData[IdDI.visaKind] = updateDataValue(visa.kind.value, data[IdDI.visaKind]);
       }
     }
 

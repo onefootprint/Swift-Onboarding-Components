@@ -1,12 +1,5 @@
 import { IcoClose16, IcoSearch24 } from '@onefootprint/icons';
-import {
-  createFontStyles,
-  Grid,
-  IconButton,
-  Overlay,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Grid, IconButton, Overlay, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -12,11 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 import { getLogger } from '../../../../utils';
 import useEffectOnceStrict from '../../hooks/use-effect-once-strict';
-import {
-  useIdentifyVerify,
-  useLoginChallenge,
-  useSignupChallenge,
-} from '../../queries';
+import { useIdentifyVerify, useLoginChallenge, useSignupChallenge } from '../../queries';
 import { useIdentifyMachine } from '../../state';
 import shouldRequestNewChallenge from '../../utils/should-request-challenge';
 import getTokenScope from '../../utils/token-scope';
@@ -65,9 +61,7 @@ const PinVerification = ({
   const mutIdentifyVerify = useIdentifyVerify({ scope });
 
   const challengeData: ChallengeData | undefined =
-    data ||
-    mutLoginChallenge.data?.challengeData ||
-    mutSignupChallenge.data?.challengeData;
+    data || mutLoginChallenge.data?.challengeData || mutSignupChallenge.data?.challengeData;
 
   const isLoading = mutLoginChallenge.isLoading || mutSignupChallenge.isLoading;
   const isPending = isLoading || !challengeData;
@@ -98,9 +92,7 @@ const PinVerification = ({
     );
   };
 
-  const handleRequestChallengeSuccess = (
-    payload: LoginChallengeResponse | SignupChallengeResponse,
-  ) => {
+  const handleRequestChallengeSuccess = (payload: LoginChallengeResponse | SignupChallengeResponse) => {
     // Check whether is resend, but isResend state might not have updated yet
     if (payload.error) {
       showRequestErrorToast(payload.error);
@@ -118,9 +110,7 @@ const PinVerification = ({
 
   const initiateSignupChallenge = () => {
     if (!obConfigAuth) {
-      logError(
-        'Cannot initiate signup challenge challenge without obConfigAuth',
-      );
+      logError('Cannot initiate signup challenge challenge without obConfigAuth');
       return;
     }
     if (mutSignupChallenge.isLoading) {
@@ -134,13 +124,10 @@ const PinVerification = ({
       },
       {
         onError: (error: unknown) => {
-          const isExistingVaultError =
-            requestError.getErrorCode(error) === 'E120';
+          const isExistingVaultError = requestError.getErrorCode(error) === 'E120';
           const { token } = requestError.getErrorContext(error);
           if (isExistingVaultError && token) {
-            logWarn(
-              'Entered signup challenge when the user already has a vault. Initiating login challenge',
-            );
+            logWarn('Entered signup challenge when the user already has a vault. Initiating login challenge');
             initiatePhoneOrEmailLoginChallenge(token);
             return;
           }
@@ -174,10 +161,7 @@ const PinVerification = ({
   };
 
   const handleRequestChallenge = () => {
-    const canSendNewRequest = shouldRequestNewChallenge(
-      challengeData,
-      preferredChallengeKind,
-    );
+    const canSendNewRequest = shouldRequestNewChallenge(challengeData, preferredChallengeKind);
     if (!canSendNewRequest) return;
 
     if (identifyToken) {

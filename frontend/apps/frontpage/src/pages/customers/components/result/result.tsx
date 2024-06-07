@@ -6,9 +6,7 @@ type ResultsProps = {
   children: React.ReactNode;
 };
 
-const Results = ({ children }: ResultsProps) => (
-  <Container>{children}</Container>
-);
+const Results = ({ children }: ResultsProps) => <Container>{children}</Container>;
 
 const Container = styled(Stack)`
   ${({ theme }) => css`

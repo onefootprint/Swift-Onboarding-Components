@@ -1,5 +1,5 @@
 import React from 'react';
-import { Error } from 'src/components';
+import { ErrorComponent } from 'src/components';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
@@ -20,7 +20,7 @@ const RiskSignalsOverview = ({ type }: RiskSignalsOverviewProps) => {
     return <Loading />;
   }
   if (error) {
-    return <Error error={error} />;
+    return <ErrorComponent error={error} />;
   }
   if (data) {
     const { high, medium, low } = data[type];

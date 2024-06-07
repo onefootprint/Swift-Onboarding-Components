@@ -1,7 +1,4 @@
-import {
-  getCountryFromPhoneNumber,
-  getNationalNumber,
-} from './phone-input.utils';
+import { getCountryFromPhoneNumber, getNationalNumber } from './phone-input.utils';
 
 describe('getCountryFromPhoneNumber', () => {
   it.each`

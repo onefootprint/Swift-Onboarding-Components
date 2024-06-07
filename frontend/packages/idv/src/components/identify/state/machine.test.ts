@@ -1,12 +1,8 @@
-import type {
-  ChallengeData,
-  PublicOnboardingConfig,
-  UserTokenScope,
-} from '@onefootprint/types';
+import type { ChallengeData, PublicOnboardingConfig, UserTokenScope } from '@onefootprint/types';
 import {
   AuthMethodKind,
-  ChallengeKind,
   CLIENT_PUBLIC_KEY_HEADER,
+  ChallengeKind,
   IdDI,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
@@ -30,10 +26,7 @@ const CHALLENGE_DATA: ChallengeData = {
   challengeKind: ChallengeKind.sms,
 };
 
-const getFixtureUser = (
-  availableChallengeKinds: ChallengeKind[],
-  tokenScopes?: UserTokenScope[],
-): IdentifiedUser => ({
+const getFixtureUser = (availableChallengeKinds: ChallengeKind[], tokenScopes?: UserTokenScope[]): IdentifiedUser => ({
   token: 'utok_xxx',
   isUnverified: false,
   availableChallengeKinds,
@@ -46,10 +39,7 @@ const getFixtureUser = (
   matchingFps: [IdDI.phoneNumber],
 });
 
-const getOnboardingConfig = (
-  isLive = true,
-  isNoPhoneFlow = false,
-): PublicOnboardingConfig => ({
+const getOnboardingConfig = (isLive = true, isNoPhoneFlow = false): PublicOnboardingConfig => ({
   isLive,
   logoUrl: 'url',
   privacyPolicyUrl: 'url',
@@ -65,9 +55,7 @@ const getOnboardingConfig = (
   key: 'key',
   isKyb: false,
   allowInternationalResidents: false,
-  requiredAuthMethods: [
-    isNoPhoneFlow ? AuthMethodKind.email : AuthMethodKind.phone,
-  ],
+  requiredAuthMethods: [isNoPhoneFlow ? AuthMethodKind.email : AuthMethodKind.phone],
 });
 
 const getDevice = (): DeviceInfo => ({
@@ -1112,11 +1100,7 @@ describe('Identify Machine Tests', () => {
       const machine = createMachine({
         config: getOnboardingConfig(),
       });
-      const user = getFixtureUser([
-        ChallengeKind.biometric,
-        ChallengeKind.sms,
-        ChallengeKind.email,
-      ]);
+      const user = getFixtureUser([ChallengeKind.biometric, ChallengeKind.sms, ChallengeKind.email]);
 
       // First, identify via email
       let state = machine.send({

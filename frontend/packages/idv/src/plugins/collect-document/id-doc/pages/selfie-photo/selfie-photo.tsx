@@ -14,11 +14,7 @@ const SelfiePhoto = () => {
   const [state, send] = useIdDocMachine();
   const { orgId, uploadMode, hasBadConnectivity } = state.context;
 
-  const onComplete = (
-    imageFile: File | Blob,
-    extraCompressed: boolean,
-    captureKind: CaptureKind,
-  ) =>
+  const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
     send({
       type: 'receivedImage',
       payload: {

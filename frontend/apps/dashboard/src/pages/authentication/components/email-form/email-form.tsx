@@ -49,12 +49,7 @@ const EmailForm = () => {
           type="email"
           {...register('email', { required: t('form.email.errors.required') })}
         />
-        <Button
-          fullWidth
-          loading={mutateLoginEmail.isLoading}
-          size="large"
-          type="submit"
-        >
+        <Button fullWidth loading={mutateLoginEmail.isLoading} size="large" type="submit">
           {t('cta')}
         </Button>
       </Stack>

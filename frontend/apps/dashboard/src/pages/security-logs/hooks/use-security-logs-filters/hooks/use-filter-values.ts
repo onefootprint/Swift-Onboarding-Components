@@ -2,14 +2,9 @@ import { IdDI } from '@onefootprint/types';
 import { useMemo } from 'react';
 import { queryToArray } from 'src/hooks/use-filters';
 
-import type {
-  SecurityLogsFilterValues,
-  SecurityLogsQueryString,
-} from '../use-security-logs-filters.types';
+import type { SecurityLogsFilterValues, SecurityLogsQueryString } from '../use-security-logs-filters.types';
 
-const useFilterValues = (
-  query: SecurityLogsQueryString,
-): SecurityLogsFilterValues => {
+const useFilterValues = (query: SecurityLogsQueryString): SecurityLogsFilterValues => {
   const filterValues = useMemo(() => {
     const search = query.search || '';
     const dateRange = queryToArray(query.date_range);
@@ -26,12 +21,7 @@ const useFilterValues = (
       search,
       dateRange,
     };
-  }, [
-    query.data_attributes_business,
-    query.data_attributes_personal,
-    query.date_range,
-    query.search,
-  ]);
+  }, [query.data_attributes_business, query.data_attributes_personal, query.date_range, query.search]);
   return filterValues;
 };
 

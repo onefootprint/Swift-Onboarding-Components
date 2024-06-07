@@ -12,11 +12,7 @@ type GetInitialContextArgs = {
   data?: KycData;
 };
 
-const getInitialContext = ({
-  device,
-  requirement,
-  data,
-}: GetInitialContextArgs = {}): InitMachineArgs => ({
+const getInitialContext = ({ device, requirement, data }: GetInitialContextArgs = {}): InitMachineArgs => ({
   authToken: 'token',
   device: device ?? {
     type: 'mobile',

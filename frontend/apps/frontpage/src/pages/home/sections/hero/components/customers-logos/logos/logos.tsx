@@ -1,4 +1,4 @@
-import { media, Stack } from '@onefootprint/ui';
+import { Stack, media } from '@onefootprint/ui';
 import React from 'react';
 import ApitureLogo from 'src/components/company-logos/themed/apiture';
 import BloomLogo from 'src/components/company-logos/themed/bloom/bloom';

@@ -4,14 +4,8 @@ export const withGoogleMaps = (type: string, data?: unknown) => {
       places: {
         // @ts-ignore
         PlacesService: class {
-          getDetails = (
-            _: unknown,
-            cb: (dataArg: unknown, status: string) => void,
-          ) => {
-            cb(
-              type === 'success' ? data : null,
-              type === 'success' ? 'OK' : 'ERROR',
-            );
+          getDetails = (_: unknown, cb: (dataArg: unknown, status: string) => void) => {
+            cb(type === 'success' ? data : null, type === 'success' ? 'OK' : 'ERROR');
           };
         },
       },

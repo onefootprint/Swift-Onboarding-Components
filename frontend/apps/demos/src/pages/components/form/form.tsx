@@ -1,4 +1,4 @@
-import { media, Text } from '@onefootprint/ui';
+import { Text, media } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -18,11 +18,7 @@ const SecureFormDemo = () => {
         <Text variant="heading-2" marginBottom={7}>
           Secure Form Demo
         </Text>
-        {authToken ? (
-          <DemoForm authToken={authToken} />
-        ) : (
-          <CredsForm onSubmit={setAuthToken} />
-        )}
+        {authToken ? <DemoForm authToken={authToken} /> : <CredsForm onSubmit={setAuthToken} />}
       </Inner>
     </Container>
   );

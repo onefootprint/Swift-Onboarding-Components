@@ -26,9 +26,7 @@ const CustomDocumentField = ({ field, entity }: CustomDocumentFieldProps) => {
   return objectUrl ? (
     <Container>
       <CodeInline disabled>{field.di}</CodeInline>
-      <LinkButton onClick={() => setIsDocOpen(true)}>
-        {t('see-document')}
-      </LinkButton>
+      <LinkButton onClick={() => setIsDocOpen(true)}>{t('see-document')}</LinkButton>
       <Dialog
         open={isDocOpen}
         onClose={() => setIsDocOpen(false)}
@@ -40,12 +38,7 @@ const CustomDocumentField = ({ field, entity }: CustomDocumentFieldProps) => {
             <iframe title="pdf" src={objectUrl} width="100%" height="100%" />
           </PdfContainer>
         ) : (
-          <StyledImage
-            src={objectUrl}
-            width={0}
-            height={0}
-            alt="custom document image"
-          />
+          <StyledImage src={objectUrl} width={0} height={0} alt="custom document image" />
         )}
       </Dialog>
     </Container>

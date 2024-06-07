@@ -12,8 +12,7 @@ import Picker from './components/picker';
 
 const CountrySpecificIdDocPicker = () => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.playbooks.dialog.summary.id-doc.sections.country-specific',
+    keyPrefix: 'pages.playbooks.dialog.summary.id-doc.sections.country-specific',
   });
   const { watch, setValue } = useFormContext();
   const countryDocMap = watch('personal.countrySpecificIdDocKind');
@@ -38,10 +37,7 @@ const CountrySpecificIdDocPicker = () => {
     setShowPicker(true);
   };
 
-  const handleSave = (
-    newCountry: CountryCode,
-    newDocs: SupportedIdDocTypes[],
-  ) => {
+  const handleSave = (newCountry: CountryCode, newDocs: SupportedIdDocTypes[]) => {
     setShowPicker(false);
     const newMap = { ...countryDocMap, [newCountry]: newDocs };
     setEditingCountryDocMap(undefined);
@@ -70,12 +66,7 @@ const CountrySpecificIdDocPicker = () => {
         <Text variant="body-4">{t('subtitle')}</Text>
       </Stack>
       <Stack direction="column" gap={4}>
-        {!isEmptyMap && (
-          <ExistingCountryDocMappings
-            countryDocMappings={countryDocMap}
-            onEdit={handleEdit}
-          />
-        )}
+        {!isEmptyMap && <ExistingCountryDocMappings countryDocMappings={countryDocMap} onEdit={handleEdit} />}
         {showPicker ? (
           <Picker
             editingCountryDocMap={editingCountryDocMap}
@@ -84,11 +75,7 @@ const CountrySpecificIdDocPicker = () => {
             onRemove={handleRemove}
           />
         ) : (
-          <LinkButton
-            onClick={handleAdd}
-            iconComponent={IcoPlusSmall16}
-            iconPosition="left"
-          >
+          <LinkButton onClick={handleAdd} iconComponent={IcoPlusSmall16} iconPosition="left">
             {isEmptyMap ? t('add') : t('add-more')}
           </LinkButton>
         )}

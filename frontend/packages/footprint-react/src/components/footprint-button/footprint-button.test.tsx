@@ -1,7 +1,7 @@
+import { beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 import React from 'react';
 
 import FootprintButton from './footprint-button';
@@ -16,18 +16,14 @@ mock.module('@onefootprint/footprint-js', () => ({
 
 describe('When error is expected', () => {
   beforeEach(() => {
-    spyOn(console, 'error').mockImplementation(() => {});
+    spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   it('should throw Invalid parameters when only button properties are given', () => {
     expect(() =>
       render(
         /* @ts-ignore: insufficient-parameters */
-        <FootprintButton
-          className="insufficient-parameters"
-          label="Insufficient Parameters"
-          testID="no-id"
-        />,
+        <FootprintButton className="insufficient-parameters" label="Insufficient Parameters" testID="no-id" />,
       ),
     ).toThrow('Invalid parameters');
   });
@@ -36,29 +32,18 @@ describe('When error is expected', () => {
     expect(() =>
       render(
         /* @ts-ignore: insufficient-parameters */
-        <FootprintButton
-          label="Insufficient Parameters Auth"
-          kind={FootprintComponentKind.Auth}
-        />,
+        <FootprintButton label="Insufficient Parameters Auth" kind={FootprintComponentKind.Auth} />,
       ),
-    ).toThrow(
-      'Missing parameter. Please add "authToken" with "updateLoginMethods" or "publicKey"',
-    );
+    ).toThrow('Missing parameter. Please add "authToken" with "updateLoginMethods" or "publicKey"');
   });
 
   it('should throw when insufficient parameters for auth is given 2', () => {
     expect(() =>
       render(
         /* @ts-ignore: insufficient-parameters */
-        <FootprintButton
-          label="Insufficient Parameters Auth"
-          kind={FootprintComponentKind.Auth}
-          authToken="tok_"
-        />,
+        <FootprintButton label="Insufficient Parameters Auth" kind={FootprintComponentKind.Auth} authToken="tok_" />,
       ),
-    ).toThrow(
-      'Missing parameter. Please add "authToken" with "updateLoginMethods" or "publicKey"',
-    );
+    ).toThrow('Missing parameter. Please add "authToken" with "updateLoginMethods" or "publicKey"');
   });
 
   it('should throw when insufficient parameters for update_login_methods is given', () => {
@@ -77,10 +62,7 @@ describe('When error is expected', () => {
     expect(() =>
       render(
         /* @ts-ignore: insufficient-parameters */
-        <FootprintButton
-          label="Insufficient Parameters UpdateLoginMethods"
-          kind={FootprintComponentKind.Verify}
-        />,
+        <FootprintButton label="Insufficient Parameters UpdateLoginMethods" kind={FootprintComponentKind.Verify} />,
       ),
     ).toThrow('Missing parameter. Please add "authToken" or "publicKey"');
   });
@@ -223,9 +205,7 @@ describe('UpdateLoginMethods', () => {
     /* footprint.init(fpInitArgs) */
     expect(fpInitMock).toHaveBeenCalledTimes(1);
     const fpInitArgs = JSON.stringify(fpInitMock.mock.calls[0], null, 0);
-    expect(fpInitArgs).toEqual(
-      '[{"kind":"update_login_methods","variant":"modal","authToken":"tok_"}]',
-    );
+    expect(fpInitArgs).toEqual('[{"kind":"update_login_methods","variant":"modal","authToken":"tok_"}]');
 
     /* footprint.init(fpInitArgs) */
     expect(fpRenderMock).toHaveBeenCalledTimes(1);
@@ -264,9 +244,7 @@ describe('Verify', () => {
     /* footprint.init(fpInitArgs) */
     expect(fpInitMock).toHaveBeenCalledTimes(1);
     const fpInitArgs = JSON.stringify(fpInitMock.mock.calls[0], null, 0);
-    expect(fpInitArgs).toEqual(
-      '[{"kind":"verify","variant":"modal","publicKey":"pk_"}]',
-    );
+    expect(fpInitArgs).toEqual('[{"kind":"verify","variant":"modal","publicKey":"pk_"}]');
 
     /* footprint.init(fpInitArgs) */
     expect(fpRenderMock).toHaveBeenCalledTimes(1);
@@ -303,9 +281,7 @@ describe('Verify', () => {
     /* footprint.init(fpInitArgs) */
     expect(fpInitMock).toHaveBeenCalledTimes(1);
     const fpInitArgs = JSON.stringify(fpInitMock.mock.calls[0], null, 0);
-    expect(fpInitArgs).toEqual(
-      '[{"kind":"verify","variant":"modal","authToken":"tok_"}]',
-    );
+    expect(fpInitArgs).toEqual('[{"kind":"verify","variant":"modal","authToken":"tok_"}]');
 
     /* footprint.init(fpInitArgs) */
     expect(fpRenderMock).toHaveBeenCalledTimes(1);

@@ -1,10 +1,5 @@
-import {
-  IcoCheck16,
-  IcoClock16,
-  IcoRefresh16,
-  IcoUpload16,
-} from '@onefootprint/icons';
-import { createFontStyles, Stack, Text } from '@onefootprint/ui';
+import { IcoCheck16, IcoClock16, IcoRefresh16, IcoUpload16 } from '@onefootprint/icons';
+import { Stack, Text, createFontStyles } from '@onefootprint/ui';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -19,9 +14,9 @@ type ItemProps = {
 };
 
 const Upload = ({ title, srcs, status, attempts, source, when }: ItemProps) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // biome-ignore lint/correctness/noUnusedVariables: <explanation>
   const [front, cover] = srcs;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // biome-ignore lint/correctness/noUnusedVariables: <explanation>
   const [img, setImage] = useState(front);
 
   return (

@@ -53,17 +53,10 @@ const ComponentsInstructions = ({
 
   const handleComplete = () => {
     const dashboardUrl = `https://dashboard.onefootprint.com/users/${userId}`;
-    const dashboardLink = (
-      <Link href={dashboardUrl}>your Footprint dashboard</Link>
-    );
+    const dashboardLink = <Link href={dashboardUrl}>your Footprint dashboard</Link>;
     toast.show({
       title: 'Payment method saved',
-      description: (
-        <span>
-          User saved the payment method form. Please visit {dashboardLink} to
-          decrypt and view.
-        </span>
-      ),
+      description: <span>User saved the payment method form. Please visit {dashboardLink} to decrypt and view.</span>,
     });
   };
 

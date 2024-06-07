@@ -22,9 +22,7 @@ const ContinueOnDesktop = () => {
       <Text variant="body-3" color="tertiary">
         {t('continue-on-desktop.title')}
       </Text>
-      <LinkButton onClick={handleContinueOnDesktop}>
-        {t('continue-on-desktop.cta')}
-      </LinkButton>
+      <LinkButton onClick={handleContinueOnDesktop}>{t('continue-on-desktop.cta')}</LinkButton>
     </Container>
   );
 };

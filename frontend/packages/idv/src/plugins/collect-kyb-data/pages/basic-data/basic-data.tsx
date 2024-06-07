@@ -1,8 +1,4 @@
-import {
-  BusinessDI,
-  CollectedKybDataOption,
-  CollectedKybDataOptionToRequiredAttributes,
-} from '@onefootprint/types';
+import { BusinessDI, CollectedKybDataOption, CollectedKybDataOptionToRequiredAttributes } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,12 +18,7 @@ type BasicDataProps = {
   onCancel?: () => void;
 };
 
-const BasicData = ({
-  ctaLabel,
-  hideHeader,
-  onComplete,
-  onCancel,
-}: BasicDataProps) => {
+const BasicData = ({ ctaLabel, hideHeader, onComplete, onCancel }: BasicDataProps) => {
   const [state, send] = useCollectKybDataMachine();
   const {
     idvContext: { authToken },
@@ -51,10 +42,9 @@ const BasicData = ({
     };
 
     const handleError = (error: string) => {
-      Logger.error(
-        `Speculatively vaulting data failed in kyb basic-data page: ${error}`,
-        { location: 'kyb-basic-data' },
-      );
+      Logger.error(`Speculatively vaulting data failed in kyb basic-data page: ${error}`, {
+        location: 'kyb-basic-data',
+      });
     };
 
     syncData({
@@ -91,11 +81,7 @@ const BasicData = ({
         attr === CollectedKybDataOption.website,
     )
     .map(attr => CollectedKybDataOptionToRequiredAttributes[attr])
-    .flat() as (
-    | BusinessDI.corporationType
-    | BusinessDI.phoneNumber
-    | BusinessDI.website
-  )[];
+    .flat() as (BusinessDI.corporationType | BusinessDI.phoneNumber | BusinessDI.website)[];
 
   return (
     <Stack direction="column" gap={7} width="100%">

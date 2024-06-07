@@ -1,5 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Button, Container, media, Text } from '@onefootprint/ui';
+import { Button, Container, Text, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,11 +21,7 @@ const Hero = () => {
     setShowDialog(false);
   };
   return (
-    <HeroContainer
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeInOut' }}
-    >
+    <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, ease: 'easeInOut' }}>
       <Illustration />
       <TitleContainer>
         <Text variant="display-2" textAlign="center">
@@ -39,12 +35,7 @@ const Hero = () => {
         <Button
           variant="primary"
           size="large"
-          onClick={() =>
-            window.open(
-              `${DASHBOARD_BASE_URL}/authentication/sign-up`,
-              '_blank',
-            )
-          }
+          onClick={() => window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank')}
         >
           {t('sign-up-for-free')}
         </Button>
@@ -52,11 +43,7 @@ const Hero = () => {
           {t('book-a-demo')}
         </Button>
       </Buttons>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={handleClose}
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
     </HeroContainer>
   );
 };

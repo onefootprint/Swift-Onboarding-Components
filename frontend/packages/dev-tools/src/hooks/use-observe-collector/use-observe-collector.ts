@@ -113,11 +113,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
     addToQueue(payload);
   };
 
-  const logError = (
-    event: Event | string,
-    error: Error,
-    extra?: Record<string, unknown>,
-  ) => {
+  const logError = (event: Event | string, error: Error, extra?: Record<string, unknown>) => {
     const info = {
       ...getErrorEventInfo(event, error),
       ...extra,
@@ -126,8 +122,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
       ({ action, data }) =>
         action === 'error' &&
         // @ts-ignore fix me: Spread types may only be created from object types
-        JSON.stringify({ ...data, errorId: '' }) ===
-          JSON.stringify({ ...info, errorId: '' }),
+        JSON.stringify({ ...data, errorId: '' }) === JSON.stringify({ ...info, errorId: '' }),
     );
     if (existingIndex > -1) {
       queue.splice(existingIndex, 1, info);
@@ -146,10 +141,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedSendQueue = useCallback(
-    debounce(sendQueue, DEBOUNCE_INTERVAL, { maxWait: MAX_DEBOUNCE }),
-    [queue],
-  );
+  const debouncedSendQueue = useCallback(debounce(sendQueue, DEBOUNCE_INTERVAL, { maxWait: MAX_DEBOUNCE }), [queue]);
 
   useEffectOnce(() => {
     // So that we can calculate session duration
@@ -180,9 +172,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
   useEventListener(
     'unhandledrejection',
     (event: PromiseRejectionEvent) => {
-      const error =
-        (event.reason as Error) ||
-        new Error("Unhandled rejection, missing 'reason'");
+      const error = (event.reason as Error) || new Error("Unhandled rejection, missing 'reason'");
       logError(event, error);
     },
     undefined,

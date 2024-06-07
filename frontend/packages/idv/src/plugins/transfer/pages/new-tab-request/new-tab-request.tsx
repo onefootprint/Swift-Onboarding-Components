@@ -19,14 +19,7 @@ const NewTabRequest = () => {
     keyPrefix: 'transfer.pages.new-tab-requested',
   });
   const [state, send] = useTransferMachine();
-  const {
-    authToken,
-    device,
-    config,
-    scopedAuthToken,
-    idDocOutcome,
-    missingRequirements,
-  } = state.context;
+  const { authToken, device, config, scopedAuthToken, idDocOutcome, missingRequirements } = state.context;
   const l10n = useL10nContext();
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,

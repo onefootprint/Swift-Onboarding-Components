@@ -5,10 +5,7 @@ import getInitialCountry from '../../../../utils/get-initial-country';
 
 const getCountrySelectOption = (maybeCountryCode?: string) => {
   if (maybeCountryCode && isCountryCode(maybeCountryCode)) {
-    const fullCountryData = getInitialCountry(
-      maybeCountryCode as CountryCode,
-      false,
-    );
+    const fullCountryData = getInitialCountry(maybeCountryCode as CountryCode, false);
     return { label: fullCountryData?.label, value: fullCountryData?.value };
   }
   return undefined;

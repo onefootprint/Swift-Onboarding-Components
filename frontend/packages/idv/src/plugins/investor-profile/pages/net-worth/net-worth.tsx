@@ -1,7 +1,4 @@
-import {
-  InvestorProfileDI,
-  InvestorProfileNetWorth,
-} from '@onefootprint/types';
+import { InvestorProfileDI, InvestorProfileNetWorth } from '@onefootprint/types';
 import React from 'react';
 
 import { Logger } from '../../../../utils/logger';
@@ -45,8 +42,7 @@ const NetWorth = () => {
         isLoading={mutation.isLoading}
         onSubmit={handleSubmit}
         defaultValues={{
-          [InvestorProfileDI.netWorth]:
-            data?.[InvestorProfileDI.netWorth] || InvestorProfileNetWorth.le50k,
+          [InvestorProfileDI.netWorth]: data?.[InvestorProfileDI.netWorth] || InvestorProfileNetWorth.le50k,
         }}
       />
     </>

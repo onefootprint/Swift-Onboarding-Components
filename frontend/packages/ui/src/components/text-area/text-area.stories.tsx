@@ -63,9 +63,7 @@ const Template: Story<TextAreaProps> = ({
   placeholder,
   value: initialValue = '',
 }: TextAreaProps) => {
-  const [value, setValue] = useState<
-    string | ReadonlyArray<string> | number | undefined
-  >(initialValue);
+  const [value, setValue] = useState<string | ReadonlyArray<string> | number | undefined>(initialValue);
   const handleChangeText = (text: string) => {
     setValue(text);
     if (onChangeText) onChangeText(text);

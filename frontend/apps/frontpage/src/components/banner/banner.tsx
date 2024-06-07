@@ -1,12 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import {
-  Button,
-  Container,
-  createFontStyles,
-  media,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -38,30 +31,17 @@ const Banner = ({ title }: BannerProps) => {
             <Button
               variant="primary"
               size="large"
-              onClick={() =>
-                window.open(
-                  `${DASHBOARD_BASE_URL}/authentication/sign-up`,
-                  '_blank',
-                )
-              }
+              onClick={() => window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank')}
             >
               {t('get-started')}
             </Button>
-            <Button
-              variant="secondary"
-              size="large"
-              onClick={() => setShowDialog(true)}
-            >
+            <Button variant="secondary" size="large" onClick={() => setShowDialog(true)}>
               {t('book-a-demo')}
             </Button>
           </ButtonContainer>
         </TextContainer>
       </BannerContainer>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={() => setShowDialog(false)}
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={() => setShowDialog(false)} />
     </>
   );
 };

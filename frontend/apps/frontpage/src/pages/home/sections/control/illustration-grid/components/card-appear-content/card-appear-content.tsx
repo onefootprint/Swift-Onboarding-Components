@@ -1,5 +1,5 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { createFontStyles, Divider, Stack } from '@onefootprint/ui';
+import { Divider, Stack, createFontStyles } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -24,11 +24,7 @@ type CardAppearContentProps = {
   onClose?: () => void;
 };
 
-const CardAppearContent = ({
-  isVisible,
-  children,
-  onClose,
-}: CardAppearContentProps) => {
+const CardAppearContent = ({ isVisible, children, onClose }: CardAppearContentProps) => {
   const [localVisible, setLocalVisible] = useState(isVisible);
 
   useEffect(() => {
@@ -45,13 +41,7 @@ const CardAppearContent = ({
       {localVisible && (
         <Stack gap={5} direction="column">
           <Divider variant="secondary" />
-          <Container
-            initial="initial"
-            animate="visible"
-            exit="exit"
-            variants={cardVariants}
-            position="relative"
-          >
+          <Container initial="initial" animate="visible" exit="exit" variants={cardVariants} position="relative">
             {onClose && (
               <CloseButton onClick={handleClose}>
                 <IcoCloseSmall16 color="tertiary" />

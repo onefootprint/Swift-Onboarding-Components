@@ -11,11 +11,7 @@ import { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
 // Used as a comprehensive list of CDOs to all associated DIs
 const CdoToAllDisMap: Record<CollectedDataOption, DataIdentifier[]> = {
   // Id
-  [CollectedKycDataOption.name]: [
-    IdDI.firstName,
-    IdDI.middleName,
-    IdDI.lastName,
-  ],
+  [CollectedKycDataOption.name]: [IdDI.firstName, IdDI.middleName, IdDI.lastName],
   [CollectedKycDataOption.dob]: [IdDI.dob],
   [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
   [CollectedKycDataOption.ssn9]: [IdDI.ssn9],
@@ -53,9 +49,7 @@ const CdoToAllDisMap: Record<CollectedDataOption, DataIdentifier[]> = {
   [CollectedKybDataOption.website]: [BusinessDI.website],
   [CollectedKybDataOption.corporationType]: [BusinessDI.corporationType],
   [CollectedKybDataOption.beneficialOwners]: [BusinessDI.beneficialOwners],
-  [CollectedKybDataOption.kycedBeneficialOwners]: [
-    BusinessDI.kycedBeneficialOwners,
-  ],
+  [CollectedKybDataOption.kycedBeneficialOwners]: [BusinessDI.kycedBeneficialOwners],
 
   // Documents
   [CollectedDocumentDataOption.document]: [
@@ -65,9 +59,7 @@ const CdoToAllDisMap: Record<CollectedDataOption, DataIdentifier[]> = {
     DocumentDI.latestIdCardBack,
     DocumentDI.latestIdCardFront,
   ],
-  [CollectedDocumentDataOption.documentAndSelfie]: [
-    ...Object.values(DocumentDI).map(value => value),
-  ],
+  [CollectedDocumentDataOption.documentAndSelfie]: [...Object.values(DocumentDI).map(value => value)],
 
   // Investor Profile
   [CollectedInvestorProfileDataOption.investorProfile]: [

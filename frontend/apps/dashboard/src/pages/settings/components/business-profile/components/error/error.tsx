@@ -7,9 +7,9 @@ export type ErrorProps = {
   message: string;
 };
 
-const Error = ({ message }: ErrorProps) => {
+const ErrorComponent = ({ message }: ErrorProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'notifications' });
   return <Fieldset label={t('error')} value={message} />;
 };
 
-export default Error;
+export default ErrorComponent;

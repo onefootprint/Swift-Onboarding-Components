@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  LoginChallengeRequest,
-  LoginChallengeResponse,
-} from '@onefootprint/types';
+import type { LoginChallengeRequest, LoginChallengeResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -31,9 +28,7 @@ const requestFn = async ({ authToken, preferredChallengeKind }: Payload) => {
     headers,
   });
   const { challengeData, ...restOfResponse } = { ...response.data };
-  challengeData.retryDisabledUntil = calculateRetryTime(
-    challengeData.timeBeforeRetryS ?? 0,
-  );
+  challengeData.retryDisabledUntil = calculateRetryTime(challengeData.timeBeforeRetryS ?? 0);
 
   return {
     challengeData,
@@ -47,8 +42,7 @@ const useLoginChallenge = () => {
   return useMutation({
     mutationFn: ({ isResend, ...payload }: Payload) => {
       const queryKey = getQueryKeyForPayload(payload);
-      const queryState =
-        queryClient.getQueryState<LoginChallengeResponse>(queryKey);
+      const queryState = queryClient.getQueryState<LoginChallengeResponse>(queryKey);
       if (!queryState) {
         return requestFn(payload);
       }

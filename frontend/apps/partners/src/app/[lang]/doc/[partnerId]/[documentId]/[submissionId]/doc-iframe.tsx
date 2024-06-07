@@ -13,15 +13,7 @@ type Props = {
 const DocIFrame = ({ id, fileName, base64Data }: Props) => {
   const { objectUrl } = useObjectUrl(base64Data || null);
 
-  return objectUrl ? (
-    <iframe
-      id={id}
-      title={fileName}
-      width="100%"
-      height="100%"
-      src={objectUrl}
-    />
-  ) : null;
+  return objectUrl ? <iframe id={id} title={fileName} width="100%" height="100%" src={objectUrl} /> : null;
 };
 
 export default DocIFrame;

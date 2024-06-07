@@ -7,7 +7,7 @@ import useOrg from 'src/hooks/use-org';
 import styled, { css } from 'styled-components';
 
 import Content from './components/content';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 
 const BusinessProfile = () => {
@@ -18,17 +18,14 @@ const BusinessProfile = () => {
 
   return (
     <section>
-      <SectionHeader
-        title={t('header.title')}
-        subtitle={t('header.subtitle')}
-      />
+      <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')} />
       <Box marginBottom={5}>
         <StyledDivider />
       </Box>
       <Container aria-busy={isLoading} aria-live="polite">
         <>
           {isLoading && <Loading />}
-          {error && <Error message={getErrorMessage(error)} />}
+          {error && <ErrorComponent message={getErrorMessage(error)} />}
           {data && <Content organization={data} />}
         </>
       </Container>

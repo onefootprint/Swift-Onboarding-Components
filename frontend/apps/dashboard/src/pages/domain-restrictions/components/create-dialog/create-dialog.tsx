@@ -15,11 +15,7 @@ type FormData = {
   url: string;
 };
 
-const CreateDialog = ({
-  open,
-  onClose,
-  allowedDomains = [],
-}: CreateDialogProps) => {
+const CreateDialog = ({ open, onClose, allowedDomains = [] }: CreateDialogProps) => {
   const { t } = useTranslation('domain-restrictions');
   const domainMutation = useUpdateAllowedDomains();
   const toast = useToast();

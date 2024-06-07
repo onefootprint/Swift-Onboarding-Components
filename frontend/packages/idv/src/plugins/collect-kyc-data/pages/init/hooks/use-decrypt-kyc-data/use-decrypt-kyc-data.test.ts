@@ -1,17 +1,8 @@
 import { customRenderHook, waitFor } from '@onefootprint/test-utils';
-import {
-  CollectedKycDataOption,
-  IdDI,
-  UserTokenScope,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, IdDI, UserTokenScope } from '@onefootprint/types';
 
 import useDecryptKycData from './use-decrypt-kyc-data';
-import {
-  withDecrypt,
-  withDecryptError,
-  withUserToken,
-  withUserTokenError,
-} from './use-decrypt-kyc-data.test.config';
+import { withDecrypt, withDecryptError, withUserToken, withUserTokenError } from './use-decrypt-kyc-data.test.config';
 
 describe.skip('useDecryptKycData', () => {
   it('when auth token scope includes only basic data, should decrypt only basic attributes', async () => {
@@ -24,15 +15,9 @@ describe.skip('useDecryptKycData', () => {
     const onSuccess = jest.fn();
     const onError = jest.fn();
     const authToken = 'token';
-    const populatedCdos = [
-      CollectedKycDataOption.email,
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.ssn4,
-    ];
+    const populatedCdos = [CollectedKycDataOption.email, CollectedKycDataOption.name, CollectedKycDataOption.ssn4];
 
-    customRenderHook(() =>
-      useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }),
-    );
+    customRenderHook(() => useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }));
     await waitFor(() => {
       expect(onSuccess).toHaveBeenCalledWith({
         [IdDI.ssn4]: {
@@ -70,15 +55,9 @@ describe.skip('useDecryptKycData', () => {
     const onSuccess = jest.fn();
     const onError = jest.fn();
     const authToken = 'token';
-    const populatedCdos = [
-      CollectedKycDataOption.email,
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.ssn4,
-    ];
+    const populatedCdos = [CollectedKycDataOption.email, CollectedKycDataOption.name, CollectedKycDataOption.ssn4];
 
-    customRenderHook(() =>
-      useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }),
-    );
+    customRenderHook(() => useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }));
 
     await waitFor(() => {
       expect(onSuccess).toHaveBeenCalledWith({
@@ -112,15 +91,9 @@ describe.skip('useDecryptKycData', () => {
     const onSuccess = jest.fn();
     const onError = jest.fn();
     const authToken = 'token';
-    const populatedCdos = [
-      CollectedKycDataOption.email,
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.ssn4,
-    ];
+    const populatedCdos = [CollectedKycDataOption.email, CollectedKycDataOption.name, CollectedKycDataOption.ssn4];
 
-    customRenderHook(() =>
-      useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }),
-    );
+    customRenderHook(() => useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }));
 
     await waitFor(() => {
       expect(onSuccess).toHaveBeenCalledWith({
@@ -153,15 +126,9 @@ describe.skip('useDecryptKycData', () => {
     const onSuccess = jest.fn();
     const onError = jest.fn();
     const authToken = 'token';
-    const populatedCdos = [
-      CollectedKycDataOption.email,
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.ssn4,
-    ];
+    const populatedCdos = [CollectedKycDataOption.email, CollectedKycDataOption.name, CollectedKycDataOption.ssn4];
 
-    customRenderHook(() =>
-      useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }),
-    );
+    customRenderHook(() => useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }));
 
     await waitFor(() => {
       expect(onError).toHaveBeenCalled();
@@ -174,15 +141,9 @@ describe.skip('useDecryptKycData', () => {
     const onSuccess = jest.fn();
     const onError = jest.fn();
     const authToken = 'token';
-    const populatedCdos = [
-      CollectedKycDataOption.email,
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.ssn4,
-    ];
+    const populatedCdos = [CollectedKycDataOption.email, CollectedKycDataOption.name, CollectedKycDataOption.ssn4];
 
-    customRenderHook(() =>
-      useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }),
-    );
+    customRenderHook(() => useDecryptKycData({ authToken, populatedCdos, onSuccess, onError }));
 
     await waitFor(() => {
       expect(onError).toHaveBeenCalled();

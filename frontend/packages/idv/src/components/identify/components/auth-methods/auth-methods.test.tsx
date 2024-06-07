@@ -1,12 +1,6 @@
 import '../../../../config/initializers/i18next-test';
 
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import * as React from 'react';
 
 import { Layout } from '../../../layout';
@@ -38,7 +32,7 @@ const renderAuthMethods = ({
         authToken={authToken}
         initialMachineState={initialMachineState}
         Loading={<span />}
-        onDone={onDone ?? (() => {})}
+        onDone={onDone ?? (() => undefined)}
       />
     </Layout>,
   );
@@ -67,12 +61,8 @@ describe('<AuthMethods />', () => {
         onDone,
       });
 
-      expect(
-        screen.getByText(/Revise your authentication details/i),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/You can edit the details in your account/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Revise your authentication details/i)).toBeInTheDocument();
+      expect(screen.getByText(/You can edit the details in your account/i)).toBeInTheDocument();
       expect(screen.getByText(/Email/i)).toBeInTheDocument();
       expect(screen.getByText(/Phone number/i)).toBeInTheDocument();
       expect(screen.getByText(/Finish/i)).toBeInTheDocument();

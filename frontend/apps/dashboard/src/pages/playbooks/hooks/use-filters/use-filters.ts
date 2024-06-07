@@ -20,9 +20,7 @@ const useFilters = () => {
   const { query } = filters;
   const values = {
     status: query.onboarding_configs_status,
-    page: query.onboarding_configs_page
-      ? parseInt(query.onboarding_configs_page, 10)
-      : 0,
+    page: query.onboarding_configs_page ? parseInt(query.onboarding_configs_page, 10) : 0,
     id: query.onboarding_config_id,
     search: query.onboarding_configs_search,
   };

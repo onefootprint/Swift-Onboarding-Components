@@ -11,9 +11,7 @@ type CountrySpecificDocDisplayProps = {
   countryDocMappings: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
 };
 
-const CountrySpecificDocDisplay = ({
-  countryDocMappings,
-}: CountrySpecificDocDisplayProps) => {
+const CountrySpecificDocDisplay = ({ countryDocMappings }: CountrySpecificDocDisplayProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.collected-data',
   });
@@ -31,10 +29,7 @@ const CountrySpecificDocDisplay = ({
               <Label variant="body-3" color="tertiary">
                 {countryName}
               </Label>
-              <IdDocDisplay
-                idDocKind={docs as SupportedIdDocTypes[]}
-                threshold={2}
-              />
+              <IdDocDisplay idDocKind={docs as SupportedIdDocTypes[]} threshold={2} />
             </Row>
           );
         })}

@@ -7,8 +7,7 @@ import { useTranslation } from 'react-i18next';
 import ContactDialog from 'src/components/contact-dialog';
 import styled, { css } from 'styled-components';
 
-const GET_FORM_URL =
-  'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
+const GET_FORM_URL = 'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
 
 const Banner = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.home.banner' });
@@ -41,11 +40,7 @@ const Banner = () => {
           {t('contact-us')}
         </Button>
       </Buttons>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={handleClose}
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
     </Container>
   );
 };

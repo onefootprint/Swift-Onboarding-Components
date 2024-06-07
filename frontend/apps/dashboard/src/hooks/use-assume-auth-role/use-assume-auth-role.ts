@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  OrgAssumeRoleRequest,
-  OrgAssumeRoleResponse,
-} from '@onefootprint/types/src/api/org-assume-role';
+import type { OrgAssumeRoleRequest, OrgAssumeRoleResponse } from '@onefootprint/types/src/api/org-assume-role';
 import { useMutation } from '@tanstack/react-query';
 import { DASHBOARD_AUTHORIZATION_HEADER } from 'src/config/constants';
 

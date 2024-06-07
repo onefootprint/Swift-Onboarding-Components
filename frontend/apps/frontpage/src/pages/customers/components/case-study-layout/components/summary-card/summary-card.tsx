@@ -1,4 +1,4 @@
-import { media, Stack } from '@onefootprint/ui';
+import { Stack, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -14,22 +14,11 @@ enum Labels {
   Website = 'Website',
 }
 
-const SummaryCard = ({
-  name,
-  logo,
-  industry,
-  customerSince,
-  website,
-}: CompanyDetailsProps) => (
+const SummaryCard = ({ name, logo, industry, customerSince, website }: CompanyDetailsProps) => (
   <Container direction="column">
     <Header align="center" justify="center" padding={5}>
       {logo && (
-        <LogoContainer
-          gap={7}
-          direction="column"
-          align="center"
-          justify="center"
-        >
+        <LogoContainer gap={7} direction="column" align="center" justify="center">
           <Image src={logo} alt={name} width={100} height={100} />
         </LogoContainer>
       )}
@@ -37,12 +26,8 @@ const SummaryCard = ({
     <Stack gap={7} direction="column" padding={7}>
       {name && <Field label={Labels.Name} value={name} />}
       {industry && <Field label={Labels.Industry} value={industry} />}
-      {customerSince && (
-        <Field label={Labels.CustomerSince} value={customerSince} />
-      )}
-      {website && (
-        <Field label={Labels.Website} value={website} href={website} />
-      )}
+      {customerSince && <Field label={Labels.CustomerSince} value={customerSince} />}
+      {website && <Field label={Labels.Website} value={website} href={website} />}
     </Stack>
   </Container>
 );

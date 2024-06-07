@@ -18,8 +18,7 @@ type Override = {
 
 type ClientProvidersProps = {
   children: React.ReactNode;
-  loadedStyle: Omit<AppearanceResponse, 'children' | 'rules' | 'appearance'> &
-    Override;
+  loadedStyle: Omit<AppearanceResponse, 'children' | 'rules' | 'appearance'> & Override;
 };
 
 configureI18n();
@@ -35,10 +34,7 @@ const overrideThemeBackground = (theme: Theme) => {
       ...theme,
       backgroundColor: {
         ...theme.backgroundColor,
-        primary:
-          theme.backgroundColor.primary === '#ffffff'
-            ? 'transparent'
-            : theme.backgroundColor.primary,
+        primary: theme.backgroundColor.primary === '#ffffff' ? 'transparent' : theme.backgroundColor.primary,
       },
     };
   }

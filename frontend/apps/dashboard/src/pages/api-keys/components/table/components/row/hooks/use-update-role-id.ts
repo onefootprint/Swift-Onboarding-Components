@@ -1,17 +1,10 @@
 import request from '@onefootprint/request';
-import type {
-  ApiKey,
-  OrgApiKeyUpdateRequest,
-  OrgApiKeyUpdateResponse,
-} from '@onefootprint/types';
+import type { ApiKey, OrgApiKeyUpdateRequest, OrgApiKeyUpdateResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updateApiKey = async (
-  authHeaders: AuthHeaders,
-  params: OrgApiKeyUpdateRequest,
-) => {
+const updateApiKey = async (authHeaders: AuthHeaders, params: OrgApiKeyUpdateRequest) => {
   const response = await request<OrgApiKeyUpdateResponse>({
     headers: authHeaders,
     method: 'PATCH',
@@ -27,36 +20,27 @@ const useUpdateRoleId = () => {
   const queryClient = useQueryClient();
   const { authHeaders } = useSession();
 
-  const mutation = useMutation(
-    (data: OrgApiKeyUpdateRequest) => updateApiKey(authHeaders, data),
-    {
-      onMutate: async updatedApiKey => {
-        await queryClient.cancelQueries(['api-keys', authHeaders]);
-        const previousApiKeys: ApiKey[] | undefined = queryClient.getQueryData([
-          'api-keys',
-          authHeaders,
-        ]);
-        queryClient.setQueryData(['api-keys', authHeaders], () => {
-          const apiKeys = previousApiKeys?.map(_apiKey => {
-            if (_apiKey.id === updatedApiKey.id) {
-              return updatedApiKey;
-            }
-            return _apiKey;
-          });
-          return apiKeys;
+  const mutation = useMutation((data: OrgApiKeyUpdateRequest) => updateApiKey(authHeaders, data), {
+    onMutate: async updatedApiKey => {
+      await queryClient.cancelQueries(['api-keys', authHeaders]);
+      const previousApiKeys: ApiKey[] | undefined = queryClient.getQueryData(['api-keys', authHeaders]);
+      queryClient.setQueryData(['api-keys', authHeaders], () => {
+        const apiKeys = previousApiKeys?.map(_apiKey => {
+          if (_apiKey.id === updatedApiKey.id) {
+            return updatedApiKey;
+          }
+          return _apiKey;
         });
-        return { previousApiKeys };
-      },
-      onError: (err, updatedApiKey, context) => {
-        if (context?.previousApiKeys) {
-          queryClient.setQueryData(
-            ['api-keys', authHeaders],
-            context.previousApiKeys,
-          );
-        }
-      },
+        return apiKeys;
+      });
+      return { previousApiKeys };
     },
-  );
+    onError: (_err, _updatedApiKey, context) => {
+      if (context?.previousApiKeys) {
+        queryClient.setQueryData(['api-keys', authHeaders], context.previousApiKeys);
+      }
+    },
+  });
 
   return mutation;
 };

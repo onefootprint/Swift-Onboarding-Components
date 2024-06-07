@@ -32,24 +32,13 @@ const Row = ({ apiKey }: RowProps) => {
       <td>{apiKey.lastUsedAt || '--'}</td>
       <td>{apiKey.createdAt}</td>
       <td>
-        <Badge variant={isEnabled ? 'success' : 'error'}>
-          {t(`statuses.${apiKey.status}`)}
-        </Badge>
+        <Badge variant={isEnabled ? 'success' : 'error'}>{t(`statuses.${apiKey.status}`)}</Badge>
       </td>
-      <td>
-        {hasPermission(RoleScopeKind.orgSettings) ? (
-          <EditRole apiKey={apiKey} />
-        ) : (
-          apiKey.role.name
-        )}
-      </td>
+      <td>{hasPermission(RoleScopeKind.orgSettings) ? <EditRole apiKey={apiKey} /> : apiKey.role.name}</td>
       <td>
         <Stack justify="flex-end">
           <Dropdown.Root>
-            <PermissionGate
-              scopeKind={RoleScopeKind.apiKeys}
-              fallbackText={t('manage.not-allowed')}
-            >
+            <PermissionGate scopeKind={RoleScopeKind.apiKeys} fallbackText={t('manage.not-allowed')}>
               <Dropdown.Trigger aria-label={t('manage.aria-label')}>
                 <IcoDotsHorizontal24 />
               </Dropdown.Trigger>
@@ -59,9 +48,7 @@ const Row = ({ apiKey }: RowProps) => {
                 {apiKey.key ? t('manage.reveal.hide') : t('manage.reveal.show')}
               </Dropdown.Item>
               <Dropdown.Item onSelect={status.toggle}>
-                {isEnabled
-                  ? t('manage.status.disable')
-                  : t('manage.status.enable')}
+                {isEnabled ? t('manage.status.disable') : t('manage.status.enable')}
               </Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>

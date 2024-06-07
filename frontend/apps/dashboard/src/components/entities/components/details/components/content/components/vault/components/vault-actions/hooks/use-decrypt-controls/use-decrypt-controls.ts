@@ -1,15 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import type {
-  DataIdentifier,
-  EntityVault,
-  VaultValue,
-} from '@onefootprint/types';
+import type { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
 
-import {
-  Event,
-  State,
-  useDecryptMachine,
-} from '../../../../../decrypt-machine';
+import { Event, State, useDecryptMachine } from '../../../../../decrypt-machine';
 import type { DecryptFormData } from '../../../../vault.types';
 import useDecryptFields from './hooks/use-decrypt-fields';
 
@@ -24,17 +16,14 @@ const useDecryptControls = () => {
     state.matches(State.decrypting) ||
     state.matches(State.decryptingAll);
   const isIdle = state.matches(State.idle);
-  const isLoading =
-    state.matches(State.decrypting) || state.matches(State.decryptingAll);
+  const isLoading = state.matches(State.decrypting) || state.matches(State.decryptingAll);
   const inProgress =
     state.matches(State.selectingFields) ||
     state.matches(State.confirmingReason) ||
     state.matches(State.confirmingDecryptAllReason) ||
     state.matches(State.decrypting) ||
     state.matches(State.decryptingAll);
-  const inProgressDecryptingAll =
-    state.matches(State.confirmingDecryptAllReason) ||
-    state.matches(State.decryptingAll);
+  const inProgressDecryptingAll = state.matches(State.confirmingDecryptAllReason) || state.matches(State.decryptingAll);
 
   const start = () => {
     send(Event.started);

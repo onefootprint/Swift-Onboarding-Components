@@ -110,10 +110,7 @@ const Dialog = ({
           <Header>
             <CloseContainer>
               <IconButton
-                aria-label={
-                  headerIconAriaLabel ??
-                  t('components.dialog.header-icon.aria-label-default')
-                }
+                aria-label={headerIconAriaLabel ?? t('components.dialog.header-icon.aria-label-default')}
                 onClick={onHeaderIconClick}
               >
                 <HeaderIconComponent />
@@ -150,11 +147,7 @@ const Dialog = ({
             <Footer ref={footerRef}>
               <Box>
                 {linkButton && (
-                  <LinkButton
-                    onClick={linkButton.onClick}
-                    type={linkButton.type}
-                    form={linkButton.form}
-                  >
+                  <LinkButton onClick={linkButton.onClick} type={linkButton.type} form={linkButton.form}>
                     {linkButton.label}
                   </LinkButton>
                 )}
@@ -245,34 +238,28 @@ const DialogContainer = styled(Fade)<{
     isolation: isolate;
     justify-content: stretch;
     position: fixed;
-    z-index: ${isConfirmation
-      ? theme.zIndex.confirmationDialog
-      : theme.zIndex.dialog};
+    z-index: ${isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
     width: ${getSize(size, isConfirmation)};
     max-width: ${size !== 'full-screen' ? '90%' : '100%'};
     height: ${size === 'full-screen' ? '100vh' : 'inherit'};
-    max-height: ${size !== 'full-screen'
-      ? `calc(100vh - 2 * ${theme.spacing[9]})`
-      : 'inherit'};
+    max-height: ${size !== 'full-screen' ? `calc(100vh - 2 * ${theme.spacing[9]})` : 'inherit'};
     border-radius: ${size === 'full-screen' ? 0 : theme.borderRadius.default};
     top: ${getDistanceFromTop(isConfirmation, size) || theme.spacing[9]};
     box-shadow: ${theme.elevation[2]};
     left: 50%;
-    transform: ${isConfirmation
-      ? 'translate(-50%, -50%)'
-      : 'translate(-50%, 0%)'} !important;
-    z-index: ${isConfirmation
-      ? theme.zIndex.confirmationDialog
-      : theme.zIndex.dialog};
+    transform: ${isConfirmation ? 'translate(-50%, -50%)' : 'translate(-50%, 0%)'} !important;
+    z-index: ${isConfirmation ? theme.zIndex.confirmationDialog : theme.zIndex.dialog};
 
-    ${!disableResponsiveness &&
-    media.lessThan('sm')`
+    ${
+      !disableResponsiveness &&
+      media.lessThan('sm')`
         top: 0;
         max-height: none;
         width: 100vw;
         height: 100vh;
         border-radius: 0;
-    `};
+    `
+    };
   `}
 `;
 
@@ -332,10 +319,12 @@ const ButtonsContainer = styled.div`
 
 const StyledOverlay = styled(Overlay)<{ isConfirmation: boolean }>`
   ${({ theme, isConfirmation }) => css`
-    ${isConfirmation &&
-    `
+    ${
+      isConfirmation &&
+      `
       z-index: ${theme.zIndex.confirmationOverlay};
-    `};
+    `
+    };
   `}
 `;
 

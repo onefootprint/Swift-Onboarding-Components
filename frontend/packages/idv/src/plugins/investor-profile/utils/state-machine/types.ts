@@ -1,36 +1,21 @@
-import type {
-  InvestorProfileData,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import type { InvestorProfileDI, InvestorProfileData } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 
 export type EmploymentData = Pick<
   InvestorProfileData,
-  | InvestorProfileDI.employmentStatus
-  | InvestorProfileDI.occupation
-  | InvestorProfileDI.employer
+  InvestorProfileDI.employmentStatus | InvestorProfileDI.occupation | InvestorProfileDI.employer
 >;
 
-export type IncomeData = Required<
-  Pick<InvestorProfileData, InvestorProfileDI.annualIncome>
->;
+export type IncomeData = Required<Pick<InvestorProfileData, InvestorProfileDI.annualIncome>>;
 
-export type NetWorthData = Required<
-  Pick<InvestorProfileData, InvestorProfileDI.netWorth>
->;
+export type NetWorthData = Required<Pick<InvestorProfileData, InvestorProfileDI.netWorth>>;
 
-export type InvestmentGoalsData = Required<
-  Pick<InvestorProfileData, InvestorProfileDI.investmentGoals>
->;
+export type InvestmentGoalsData = Required<Pick<InvestorProfileData, InvestorProfileDI.investmentGoals>>;
 
-export type RiskToleranceData = Required<
-  Pick<InvestorProfileData, InvestorProfileDI.riskTolerance>
->;
+export type RiskToleranceData = Required<Pick<InvestorProfileData, InvestorProfileDI.riskTolerance>>;
 
-export type DeclarationData = Required<
-  Pick<InvestorProfileData, InvestorProfileDI.declarations>
-> &
+export type DeclarationData = Required<Pick<InvestorProfileData, InvestorProfileDI.declarations>> &
   Partial<
     Pick<
       InvestorProfileData,

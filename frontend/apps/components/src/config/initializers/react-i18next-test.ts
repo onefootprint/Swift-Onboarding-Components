@@ -1,7 +1,4 @@
-import {
-  enIdentifyJson as identify,
-  enIdvJson as idv,
-} from '@onefootprint/idv';
+import { enIdentifyJson as identify, enIdvJson as idv } from '@onefootprint/idv';
 import { enUiJson as ui } from '@onefootprint/ui';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';

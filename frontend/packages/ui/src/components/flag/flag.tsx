@@ -9,10 +9,7 @@ export type FlagProps = {
 };
 
 const Flag = ({ code, testID, className = '' }: FlagProps) => (
-  <NotAnimatedFlagShimmer
-    className={`fp-f f-${code} ${className}`}
-    data-testid={testID}
-  />
+  <NotAnimatedFlagShimmer className={`fp-f f-${code} ${className}`} data-testid={testID} />
 );
 
 const NotAnimatedFlagShimmer = styled.div`

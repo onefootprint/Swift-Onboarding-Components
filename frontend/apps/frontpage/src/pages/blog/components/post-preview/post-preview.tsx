@@ -1,4 +1,4 @@
-import { media, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -32,20 +32,10 @@ const PostPreview = ({
   <Container>
     <StyledLink href={href}>
       <FeatureImageDesktopContainer data-type={type}>
-        <Image
-          alt={featureImageAlt}
-          height={228}
-          src={featureImageUrl}
-          width={468}
-        />
+        <Image alt={featureImageAlt} height={228} src={featureImageUrl} width={468} />
       </FeatureImageDesktopContainer>
       <FeatureImageMobileContainer data-type={type}>
-        <Image
-          height={228}
-          width={358}
-          alt={featureImageAlt}
-          src={featureImageUrl}
-        />
+        <Image height={228} width={358} alt={featureImageAlt} src={featureImageUrl} />
       </FeatureImageMobileContainer>
       <Content>
         <Header>

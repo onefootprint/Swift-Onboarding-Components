@@ -1,7 +1,7 @@
-import type { GetStaticProps } from 'next';
 import type { ParsedUrlQuery } from 'querystring';
+import type { GetStaticProps } from 'next';
 
-import { getAllPosts, getPostBySlug, PostType } from '../../utils/ghost';
+import { PostType, getAllPosts, getPostBySlug } from '../../utils/ghost';
 
 export async function getStaticPaths() {
   const posts = await getAllPosts(PostType.investorUpdate);
@@ -13,10 +13,7 @@ type Params = ParsedUrlQuery & {
   slug: string;
 };
 
-export const getStaticProps: GetStaticProps<
-  Record<string, unknown>,
-  Params
-> = async context => {
+export const getStaticProps: GetStaticProps<Record<string, unknown>, Params> = async context => {
   const { slug } = context.params!;
   const post = await getPostBySlug(slug);
   return { props: { post } };

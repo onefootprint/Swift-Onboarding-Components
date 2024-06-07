@@ -17,9 +17,7 @@ export default {
   },
 } as ComponentMeta<typeof Divider>;
 
-const Template: Story<DividerProps> = ({ variant }: DividerProps) => (
-  <Divider variant={variant} />
-);
+const Template: Story<DividerProps> = ({ variant }: DividerProps) => <Divider variant={variant} />;
 
 export const Default = Template.bind({});
 Default.args = {

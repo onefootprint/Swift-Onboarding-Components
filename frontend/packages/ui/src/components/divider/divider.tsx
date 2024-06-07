@@ -10,12 +10,7 @@ export type DividerProps = {
 } & BoxPrimitives<HTMLElement>;
 
 const Divider = ({ variant = 'primary', ...props }: DividerProps) => (
-  <StyledDivider
-    $variant={variant}
-    aria-orientation="horizontal"
-    role="separator"
-    {...props}
-  />
+  <StyledDivider $variant={variant} aria-orientation="horizontal" role="separator" {...props} />
 );
 
 const StyledDivider = styled(Box)<{ $variant: 'primary' | 'secondary' }>`

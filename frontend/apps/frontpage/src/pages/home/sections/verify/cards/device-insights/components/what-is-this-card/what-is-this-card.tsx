@@ -1,5 +1,5 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { media, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,8 +49,7 @@ const blurAppearVariants = {
 
 const WhatIsThisCard = ({ $isVisible, onClose }: WhatIsThisCardProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.home.verify.cards.behavior-and-device-insights.illustration.app-clip.what-is-this',
+    keyPrefix: 'pages.home.verify.cards.behavior-and-device-insights.illustration.app-clip.what-is-this',
   });
 
   useEffect(() => {
@@ -71,12 +70,7 @@ const WhatIsThisCard = ({ $isVisible, onClose }: WhatIsThisCardProps) => {
     <AnimatePresence>
       {$isVisible && (
         <>
-          <CardContainer
-            variants={cardAppearVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
+          <CardContainer variants={cardAppearVariants} initial="initial" animate="animate" exit="exit">
             <IconContainer onClick={onClose} aria-label="Close">
               <IcoCloseSmall16 />
             </IconContainer>
@@ -85,12 +79,7 @@ const WhatIsThisCard = ({ $isVisible, onClose }: WhatIsThisCardProps) => {
               {t('description')}
             </Text>
           </CardContainer>
-          <BlurBackground
-            variants={blurAppearVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          />
+          <BlurBackground variants={blurAppearVariants} initial="initial" animate="animate" exit="exit" />
         </>
       )}
     </AnimatePresence>

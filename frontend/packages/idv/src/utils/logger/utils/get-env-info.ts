@@ -1,13 +1,6 @@
 import { UAParser } from 'ua-parser-js';
 
-import {
-  API_URL,
-  COMMIT_SHA,
-  NODE_ENV,
-  VERCEL_ENV,
-  VERCEL_GIT_COMMIT_REF,
-  VERCEL_URL,
-} from '../constants';
+import { API_URL, COMMIT_SHA, NODE_ENV, VERCEL_ENV, VERCEL_GIT_COMMIT_REF, VERCEL_URL } from '../constants';
 import type { PrimitiveData } from '../types';
 
 const getEnvInfo = async (): Promise<PrimitiveData> => {
@@ -21,8 +14,7 @@ const getEnvInfo = async (): Promise<PrimitiveData> => {
 
   let hasSupportForWebauthn = false;
   if (window.PublicKeyCredential) {
-    hasSupportForWebauthn =
-      await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    hasSupportForWebauthn = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
   }
 
   const data: Record<string, string> = {
@@ -45,9 +37,7 @@ const getEnvInfo = async (): Promise<PrimitiveData> => {
   };
 
   // Filter data to remove entries with empty values
-  return Object.fromEntries(
-    Object.entries(data).filter(([, value]) => !!value && value.length > 0),
-  );
+  return Object.fromEntries(Object.entries(data).filter(([, value]) => !!value && value.length > 0));
 };
 
 export default getEnvInfo;

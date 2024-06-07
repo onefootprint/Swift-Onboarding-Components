@@ -4,10 +4,9 @@ import styled, { css } from 'styled-components';
 import { createText } from '../../utils';
 import Label from '../label';
 
-export type NativeSelectProps =
-  React.SelectHTMLAttributes<HTMLSelectElement> & {
-    label?: string;
-  };
+export type NativeSelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
+  label?: string;
+};
 
 const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
   ({ children, id: baseId, label, ...props }: NativeSelectProps, ref) => {

@@ -5,10 +5,7 @@ type UseQueryStateParams<T> = {
   defaultValue: T;
 };
 
-const useQueryState = <T extends string>({
-  query,
-  defaultValue,
-}: UseQueryStateParams<T>) => {
+const useQueryState = <T extends string>({ query, defaultValue }: UseQueryStateParams<T>) => {
   const [value, setTab] = useNextQueryState(query, {
     defaultValue,
     history: 'push',

@@ -8,28 +8,13 @@ const GAP = 56;
 const MobileIllustration = () => (
   <Grid>
     <ImageContainer layer={0}>
-      <Image
-        src="/kyb/verify-people/basic-data.png"
-        alt="Basic Data"
-        width={320}
-        height={650}
-      />
+      <Image src="/kyb/verify-people/basic-data.png" alt="Basic Data" width={320} height={650} />
     </ImageContainer>
     <ImageContainer layer={1}>
-      <Image
-        src="/kyb/verify-people/residential-address.png"
-        alt="Residential Address"
-        width={320}
-        height={650}
-      />
+      <Image src="/kyb/verify-people/residential-address.png" alt="Residential Address" width={320} height={650} />
     </ImageContainer>
     <ImageContainer layer={2}>
-      <Image
-        src="/kyb/verify-people/app-clip.png"
-        alt="App Clip"
-        width={320}
-        height={650}
-      />
+      <Image src="/kyb/verify-people/app-clip.png" alt="App Clip" width={320} height={650} />
     </ImageContainer>
   </Grid>
 );

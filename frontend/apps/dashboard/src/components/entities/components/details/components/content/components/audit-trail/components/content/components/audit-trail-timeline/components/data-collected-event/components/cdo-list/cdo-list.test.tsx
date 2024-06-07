@@ -12,8 +12,7 @@ import React from 'react';
 import CdoList from './cdo-list';
 
 describe('<CdoList />', () => {
-  const renderCdoList = (cdos: CollectedDataOption[]) =>
-    customRender(<CdoList cdos={cdos} />);
+  const renderCdoList = (cdos: CollectedDataOption[]) => customRender(<CdoList cdos={cdos} />);
 
   it('should list 1 item in correct order', () => {
     renderCdoList([CollectedKycDataOption.name]);
@@ -47,11 +46,7 @@ describe('<CdoList />', () => {
   });
 
   it('should show ID docs correctly', () => {
-    const items = [
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.idCard,
-      'selfie',
-    ];
+    const items = [SupportedIdDocTypes.passport, SupportedIdDocTypes.idCard, 'selfie'];
     renderCdoList(items);
     expect(screen.getByText('Passport, ID card, Selfie')).toBeInTheDocument();
   });

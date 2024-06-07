@@ -1,7 +1,4 @@
-import type {
-  FilterOption,
-  FilterSelectedOption,
-} from '../../../../filters.types';
+import type { FilterOption, FilterSelectedOption } from '../../../../filters.types';
 
 const isValidDate = (possibleDate: string) => {
   const date = Date.parse(possibleDate);
@@ -17,10 +14,7 @@ const formatDate = (date: Date) =>
     year: 'numeric',
   }).format(date);
 
-const getDateLabel = (
-  options: FilterOption[],
-  selectedOptions: FilterSelectedOption[],
-) => {
+const getDateLabel = (options: FilterOption[], selectedOptions: FilterSelectedOption[]) => {
   const isRange = selectedOptions.length === 2;
   if (isRange) {
     const [from, to] = selectedOptions;

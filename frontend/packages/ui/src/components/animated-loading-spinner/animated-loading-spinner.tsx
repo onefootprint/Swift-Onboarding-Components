@@ -45,14 +45,7 @@ const AnimatedLoadingSpinner = ({
   const spinnerVariants = getSpinnerVariants(adjustedCircumference);
 
   return (
-    <Container
-      $height={size}
-      $width={size}
-      align="center"
-      justify="center"
-      aria-label={ariaLabel}
-      role="progressbar"
-    >
+    <Container $height={size} $width={size} align="center" justify="center" aria-label={ariaLabel} role="progressbar">
       <AnimatePresence>
         {animationStart && (
           <motion.svg
@@ -69,11 +62,7 @@ const AnimatedLoadingSpinner = ({
               cx={size / 2}
               cy={size / 2}
               r={radius}
-              stroke={
-                color
-                  ? theme.backgroundColor.transparent
-                  : theme.backgroundColor.secondary
-              }
+              stroke={color ? theme.backgroundColor.transparent : theme.backgroundColor.secondary}
               strokeWidth={strokeWidth}
             />
             <motion.circle

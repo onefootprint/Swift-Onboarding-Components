@@ -30,19 +30,9 @@ const AuditTrail = () => {
           <SectionSubtitle maxWidth="500px">{t('subtitle')}</SectionSubtitle>
         </TitleContainer>
       </Title>
-      <DesktopTimeline
-        src="/vaulting/audit-trail/audit-trail-timeline.png"
-        width={874}
-        height={320}
-        alt=""
-      />
+      <DesktopTimeline src="/vaulting/audit-trail/audit-trail-timeline.png" width={874} height={320} alt="" />
       <MobileTimeline>
-        <Image
-          src="/vaulting/audit-trail/audit-trail-timeline.png"
-          width={874}
-          height={320}
-          alt=""
-        />
+        <Image src="/vaulting/audit-trail/audit-trail-timeline.png" width={874} height={320} alt="" />
       </MobileTimeline>
     </StyledContainer>
   );

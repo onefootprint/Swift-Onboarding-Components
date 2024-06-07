@@ -1,7 +1,4 @@
-import type {
-  OtherTenantsDuplicateDataSummary,
-  SameTenantDuplicateData,
-} from '../data';
+import type { OtherTenantsDuplicateDataSummary, SameTenantDuplicateData } from '../data';
 
 export type GetDuplicateDataRequest = {
   id: string;

@@ -1,11 +1,7 @@
 import type { Color, FontVariant } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 
-export type NavigationHeaderBGVariant =
-  | 'primary'
-  | 'transparent'
-  | 'dark-glass'
-  | 'light-glass';
+export type NavigationHeaderBGVariant = 'primary' | 'transparent' | 'dark-glass' | 'light-glass';
 
 // For rendering a dynamic title text in the nav header
 export type NavigationHeaderDynamicContent = {
@@ -19,9 +15,7 @@ export type NavigationHeaderStaticContent = {
   title?: string; // Renders the title text directly in the nav header
 };
 
-export type NavigationHeaderLeftButtonProps =
-  | NavigationHeaderBackButtonProps
-  | NavigationHeaderCloseButtonProps;
+export type NavigationHeaderLeftButtonProps = NavigationHeaderBackButtonProps | NavigationHeaderCloseButtonProps;
 
 export type NavigationHeaderBackButtonProps = {
   variant: 'back';
@@ -49,11 +43,7 @@ export type Style = {
   backgroundVariant?: NavigationHeaderBGVariant;
 };
 
-export type NavigationHeaderPositionTypes =
-  | 'sticky'
-  | 'nonSticky'
-  | 'floating'
-  | 'button-only';
+export type NavigationHeaderPositionTypes = 'sticky' | 'nonSticky' | 'floating' | 'button-only';
 
 export type NavigationHeaderProps = {
   leftButton?: NavigationHeaderLeftButtonProps; // defaults to no button.

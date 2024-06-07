@@ -7,9 +7,11 @@ const BaseCard = styled(Box)<{
 }>`
   ${({ theme, overflow, backgroundImage }) => css`
     position: relative;
-    background: ${backgroundImage
-      ? `linear-gradient(${theme.backgroundColor.primary}, transparent), url(${backgroundImage}), ${theme.backgroundColor.primary}`
-      : theme.backgroundColor.primary};
+    background: ${
+      backgroundImage
+        ? `linear-gradient(${theme.backgroundColor.primary}, transparent), url(${backgroundImage}), ${theme.backgroundColor.primary}`
+        : theme.backgroundColor.primary
+    };
     background-size: cover;
     display: flex;
     flex-direction: column;

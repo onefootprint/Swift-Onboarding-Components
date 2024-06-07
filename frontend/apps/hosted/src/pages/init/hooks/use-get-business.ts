@@ -21,9 +21,7 @@ const useGetBusiness = (
   } = {},
 ) => {
   useQuery(['get-business', payload], () => getBusinessRequest(payload), {
-    enabled:
-      !!payload?.obConfigAuth &&
-      KYB_BO_SESSION_AUTHORIZATION_HEADER in payload.obConfigAuth,
+    enabled: !!payload?.obConfigAuth && KYB_BO_SESSION_AUTHORIZATION_HEADER in payload.obConfigAuth,
     onSuccess: options.onSuccess,
     onError: options.onError,
   });

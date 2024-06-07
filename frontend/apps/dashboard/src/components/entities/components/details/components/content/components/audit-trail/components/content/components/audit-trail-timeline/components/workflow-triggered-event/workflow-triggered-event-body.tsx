@@ -1,9 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
-import type {
-  Annotation,
-  WorkflowTriggeredEventData,
-} from '@onefootprint/types';
+import type { Annotation, WorkflowTriggeredEventData } from '@onefootprint/types';
 import { RoleScopeKind, TokenKind } from '@onefootprint/types';
 import { Dialog, LinkButton, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -20,10 +17,7 @@ type WorkflowTriggeredEventBodyProps = {
   entityId: string;
 };
 
-const WorkflowTriggeredEventBody = ({
-  data,
-  entityId,
-}: WorkflowTriggeredEventBodyProps) => {
+const WorkflowTriggeredEventBody = ({ data, entityId }: WorkflowTriggeredEventBodyProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
   });
@@ -33,11 +27,10 @@ const WorkflowTriggeredEventBody = ({
     setIsDialogOpen(false);
   };
   const showErrorToast = useRequestErrorToast();
-  const { title, primaryButton, secondaryButton, component } =
-    useDisplayLinkDialog({
-      linkData: generateTokenMutation.data,
-      onClose: handleClose,
-    });
+  const { title, primaryButton, secondaryButton, component } = useDisplayLinkDialog({
+    linkData: generateTokenMutation.data,
+    onClose: handleClose,
+  });
 
   const shouldShowGenerateLinkButton = data.requestIsActive;
 
@@ -85,12 +78,7 @@ const WorkflowTriggeredEventBody = ({
               </Text>
               {shouldShowGenerateLinkButton && (
                 <>
-                  <Stack
-                    align="center"
-                    justify="center"
-                    marginLeft={1}
-                    marginRight={1}
-                  >
+                  <Stack align="center" justify="center" marginLeft={1} marginRight={1}>
                     ·
                   </Stack>
                   <PermissionGate
@@ -98,11 +86,7 @@ const WorkflowTriggeredEventBody = ({
                     fallbackText={t('create-link.no-permission')}
                     tooltipPosition="left"
                   >
-                    <LinkButton
-                      onClick={openLinkDialog}
-                      disabled={generateTokenMutation.isLoading}
-                      variant="label-4"
-                    >
+                    <LinkButton onClick={openLinkDialog} disabled={generateTokenMutation.isLoading} variant="label-4">
                       {t('create-link.label')}
                     </LinkButton>
                   </PermissionGate>

@@ -56,10 +56,7 @@ describe('groupBySection', () => {
     expect(oneOfEach.address).toHaveLength(1);
 
     const basicAndAddress = groupBySection([
-      createRiskSignal([
-        RiskSignalAttribute.streetAddress,
-        RiskSignalAttribute.name,
-      ]),
+      createRiskSignal([RiskSignalAttribute.streetAddress, RiskSignalAttribute.name]),
     ]);
     expect(basicAndAddress.basic).toHaveLength(1);
     expect(basicAndAddress.identity).toHaveLength(0);

@@ -1,8 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
-import type {
-  CollectedKycDataOption,
-  UserTokenResponse,
-} from '@onefootprint/types';
+import type { CollectedKycDataOption, UserTokenResponse } from '@onefootprint/types';
 import { CdoToAllDisMap, IdDI, UserTokenScope } from '@onefootprint/types';
 
 import useUserToken from '../../../../../../hooks/api/hosted/user/use-user-token';
@@ -12,15 +9,8 @@ import type { KycData } from '../../../../utils/data-types';
 
 // These fields are decryptable with any auth token. Other fields are only decryptable if authed
 // with biometric
-const SENSITIVE_DIS: IdDI[] = [
-  IdDI.ssn4,
-  IdDI.ssn9,
-  IdDI.email,
-  IdDI.phoneNumber,
-];
-const BASIC_PROFILE_DIS: IdDI[] = [...Object.values(IdDI)].filter(
-  di => !SENSITIVE_DIS.includes(di),
-);
+const SENSITIVE_DIS: IdDI[] = [IdDI.ssn4, IdDI.ssn9, IdDI.email, IdDI.phoneNumber];
+const BASIC_PROFILE_DIS: IdDI[] = [...Object.values(IdDI)].filter(di => !SENSITIVE_DIS.includes(di));
 
 type UseDecryptKycDataArgs = {
   authToken: string;
@@ -29,20 +19,11 @@ type UseDecryptKycDataArgs = {
   onError: (error: unknown) => void;
 };
 
-const useDecryptKycData = ({
-  authToken,
-  populatedCdos,
-  onSuccess,
-  onError,
-}: UseDecryptKycDataArgs) => {
+const useDecryptKycData = ({ authToken, populatedCdos, onSuccess, onError }: UseDecryptKycDataArgs) => {
   const decryptUserMutation = useDecryptUser();
-  const populatedDis = populatedCdos.flatMap(
-    cdo => CdoToAllDisMap[cdo],
-  ) as IdDI[];
+  const populatedDis = populatedCdos.flatMap(cdo => CdoToAllDisMap[cdo]) as IdDI[];
 
-  const handleDecryptedData = (
-    decryptedData: Partial<Record<IdDI, string | string[] | undefined>>,
-  ) => {
+  const handleDecryptedData = (decryptedData: Partial<Record<IdDI, string | string[] | undefined>>) => {
     const data: KycData = {};
 
     // Create scrubbed entries for populated attributes that weren't decrypted - this allows us
@@ -71,12 +52,8 @@ const useDecryptKycData = ({
 
   const handleTokenSuccess = (response: UserTokenResponse) => {
     const { scopes } = response;
-    const canDecryptBasic =
-      scopes.includes(UserTokenScope.signup) ||
-      scopes.includes(UserTokenScope.basicProfile);
-    const canDecryptSensitive = scopes.includes(
-      UserTokenScope.sensitiveProfile,
-    );
+    const canDecryptBasic = scopes.includes(UserTokenScope.signup) || scopes.includes(UserTokenScope.basicProfile);
+    const canDecryptSensitive = scopes.includes(UserTokenScope.sensitiveProfile);
 
     let fields: IdDI[] = populatedDis;
     if (!canDecryptSensitive) {
@@ -99,9 +76,7 @@ const useDecryptKycData = ({
         onSuccess: handleDecryptedData,
         onError: (error: unknown) => {
           Logger.error(
-            `useDecryptKycData failed to decrypt user data (${fields.join(
-              ', ',
-            )}) for KYC, ${getErrorMessage(error)}`,
+            `useDecryptKycData failed to decrypt user data (${fields.join(', ')}) for KYC, ${getErrorMessage(error)}`,
             { location: 'kyc-confirm' },
           );
           onError(error);
@@ -115,12 +90,9 @@ const useDecryptKycData = ({
     {
       onSuccess: handleTokenSuccess,
       onError: (error: unknown) => {
-        Logger.error(
-          `useDecryptKycData failed to fetch user token info, ${getErrorMessage(
-            error,
-          )}`,
-          { location: 'kyc-confirm' },
-        );
+        Logger.error(`useDecryptKycData failed to fetch user token info, ${getErrorMessage(error)}`, {
+          location: 'kyc-confirm',
+        });
         onError(error);
       },
     },

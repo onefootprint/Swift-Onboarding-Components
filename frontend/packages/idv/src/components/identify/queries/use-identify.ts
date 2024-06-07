@@ -7,14 +7,7 @@ type PayloadPartial = 'obConfigAuth' | 'sandboxId' | 'scope';
 type BasePayload = Pick<IdentifyRequest, PayloadPartial>;
 export type IdentifyRestOfPayload = Omit<IdentifyRequest, PayloadPartial>;
 
-const requestFn = async ({
-  phoneNumber,
-  email,
-  authToken,
-  obConfigAuth,
-  sandboxId,
-  scope,
-}: IdentifyRequest) => {
+const requestFn = async ({ phoneNumber, email, authToken, obConfigAuth, sandboxId, scope }: IdentifyRequest) => {
   const headers: Record<string, string> = { ...obConfigAuth };
   const data: Partial<IdentifyRequest> = { scope, email, phoneNumber };
 

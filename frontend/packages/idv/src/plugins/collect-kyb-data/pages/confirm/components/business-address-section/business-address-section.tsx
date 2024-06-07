@@ -4,14 +4,8 @@ import { BusinessDI } from '@onefootprint/types';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type {
-  SectionAction,
-  SectionItemProps,
-} from '../../../../../../components/confirm-collected-data';
-import {
-  Section,
-  SectionItem,
-} from '../../../../../../components/confirm-collected-data';
+import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
+import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import BusinessAddress from '../../../business-address/business-address';
 
@@ -35,14 +29,7 @@ const BusinessAddressSection = () => {
 
   const [editing, setEditing] = useState(false);
 
-  if (
-    !addressLine1 &&
-    !addressLine2 &&
-    !city &&
-    !stateName &&
-    !country &&
-    !zip
-  ) {
+  if (!addressLine1 && !addressLine2 && !city && !stateName && !country && !zip) {
     return null;
   }
 
@@ -54,16 +41,9 @@ const BusinessAddressSection = () => {
     },
   ];
 
-  const viewItems = address.map(
-    ({ text, subtext, textColor }: SectionItemProps) => (
-      <SectionItem
-        key={text}
-        text={text}
-        subtext={subtext}
-        textColor={textColor}
-      />
-    ),
-  );
+  const viewItems = address.map(({ text, subtext, textColor }: SectionItemProps) => (
+    <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
+  ));
 
   const stopEditing = () => {
     setEditing(false);

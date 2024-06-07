@@ -21,22 +21,9 @@ const options: Option[] = [
 ];
 
 describe('SplitButton', () => {
-  const renderSplitButton = ({
-    disabled,
-    loading,
-    type,
-    variant,
-    size,
-  }: Partial<SplitButtonProps>) =>
+  const renderSplitButton = ({ disabled, loading, type, variant, size }: Partial<SplitButtonProps>) =>
     customRender(
-      <SplitButton
-        disabled={disabled}
-        loading={loading}
-        type={type}
-        variant={variant}
-        options={options}
-        size={size}
-      />,
+      <SplitButton disabled={disabled} loading={loading} type={type} variant={variant} options={options} size={size} />,
     );
 
   it('should show the first option as the main button label', () => {

@@ -55,9 +55,7 @@ describe('<SearchInput />', () => {
         onChangeText: onChangeTextMockFn,
         value: 'lorem',
       });
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Clear content' }),
-      );
+      await userEvent.click(screen.getByRole('button', { name: 'Clear content' }));
       expect(onChangeTextMockFn).toHaveBeenCalledWith('');
     });
 
@@ -68,9 +66,7 @@ describe('<SearchInput />', () => {
         onReset: onResetMockFn,
         value: 'lorem',
       });
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Clear content' }),
-      );
+      await userEvent.click(screen.getByRole('button', { name: 'Clear content' }));
       expect(onResetMockFn).toHaveBeenCalled();
     });
   });

@@ -144,9 +144,7 @@ describe('<Details />', () => {
         );
 
         await waitFor(() => {
-          const sourceUrlValue = screen.getByText(
-            `${amlDetailFixture.shareUrl}`,
-          );
+          const sourceUrlValue = screen.getByText(`${amlDetailFixture.shareUrl}`);
           expect(sourceUrlValue).toBeInTheDocument();
         });
 
@@ -162,27 +160,21 @@ describe('<Details />', () => {
           const matchTypesRow = screen.getByRole('group', {
             name: 'matchTypes',
           });
-          expect(
-            within(matchTypesRow).getByText('Name exact'),
-          ).toBeInTheDocument();
+          expect(within(matchTypesRow).getByText('Name exact')).toBeInTheDocument();
         });
 
         await waitFor(() => {
           const showAllRow = screen.getByRole('group', {
             name: 'showAll',
           });
-          expect(
-            within(showAllRow).getByText('2 more data matches'),
-          ).toBeInTheDocument();
+          expect(within(showAllRow).getByText('2 more data matches')).toBeInTheDocument();
         });
 
         await waitFor(() => {
           const relevantMediaRow = screen.getByRole('group', {
             name: 'relevantMedia',
           });
-          expect(
-            within(relevantMediaRow).getByText('Relevant media'),
-          ).toBeInTheDocument();
+          expect(within(relevantMediaRow).getByText('Relevant media')).toBeInTheDocument();
         });
 
         await waitFor(() => {
@@ -226,9 +218,7 @@ describe('<Details />', () => {
           const locationurlRow = screen.getByRole('group', {
             name: 'locationurl',
           });
-          expect(
-            within(locationurlRow).getByText('https://locationurl.com'),
-          ).toBeInTheDocument();
+          expect(within(locationurlRow).getByText('https://locationurl.com')).toBeInTheDocument();
         });
       });
 

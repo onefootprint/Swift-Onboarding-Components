@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { LangProp } from '@/app/types';
 import type { Namespaces } from '@/i18n';
-import { initTranslations, LangFallback, TranslationsProvider } from '@/i18n';
+import { LangFallback, TranslationsProvider, initTranslations } from '@/i18n';
 
 import DocRootLayoutClient from './layout-client';
 
@@ -14,11 +14,7 @@ const DocRootLayout = async ({ children, params }: DocRootLayoutProps) => {
   const { resources } = await initTranslations(lang, i18nNamespaces);
 
   return (
-    <TranslationsProvider
-      locale={lang}
-      namespaces={i18nNamespaces}
-      resources={resources}
-    >
+    <TranslationsProvider locale={lang} namespaces={i18nNamespaces} resources={resources}>
       <DocRootLayoutClient>{children}</DocRootLayoutClient>
     </TranslationsProvider>
   );

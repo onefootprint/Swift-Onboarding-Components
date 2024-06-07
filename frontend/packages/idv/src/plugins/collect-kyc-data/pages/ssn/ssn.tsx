@@ -30,13 +30,7 @@ const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
   [IdDI.ssn9]: 'ssn9',
 };
 
-const SSN = ({
-  hideDisclaimer,
-  ctaLabel,
-  hideHeader,
-  onComplete,
-  onCancel,
-}: SSNProps) => {
+const SSN = ({ hideDisclaimer, ctaLabel, hideHeader, onComplete, onCancel }: SSNProps) => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.ssn' });
   const confirmationDialog = useConfirmationDialog();
   const [state, send] = useCollectKycDataMachine();
@@ -50,8 +44,7 @@ const SSN = ({
   const [ssnSkipped, setSsnSkipped] = useState(false);
 
   const title = ssnKind === 'ssn9' ? t('full.title') : t('last-four.title');
-  const subtitle =
-    ssnKind === 'ssn9' ? t('full.subtitle') : t('last-four.subtitle');
+  const subtitle = ssnKind === 'ssn9' ? t('full.subtitle') : t('last-four.subtitle');
 
   const hasDocStepup = config.requiresIdDoc;
 

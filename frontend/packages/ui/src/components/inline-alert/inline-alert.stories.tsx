@@ -23,11 +23,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<InlineAlertProps> = ({
-  children,
-  variant,
-  cta,
-}: InlineAlertProps) => (
+const Template: Story<InlineAlertProps> = ({ children, variant, cta }: InlineAlertProps) => (
   <InlineAlert cta={cta} variant={variant}>
     {children}
   </InlineAlert>
@@ -57,7 +53,7 @@ WithCta.args = {
   variant: 'info',
   cta: {
     label: 'Dismiss',
-    onClick: () => {},
+    onClick: () => undefined,
   },
 };
 

@@ -22,10 +22,7 @@ const Row = ({ entity }: RowProps) => (
       </CodeInline>
     </td>
     <td aria-label="status badge">
-      <StatusBadge
-        status={entity.status}
-        requiresManualReview={entity.requiresManualReview}
-      />
+      <StatusBadge status={entity.status} requiresManualReview={entity.requiresManualReview} />
     </td>
     <td>
       <Text variant="body-3" color="primary" truncate>

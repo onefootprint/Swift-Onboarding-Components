@@ -9,7 +9,7 @@ import useUpdateOrg from 'src/hooks/use-update-org';
 import styled, { css } from 'styled-components';
 
 import AddButton from './components/add-button';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import InviteFields from './components/invite-fields';
 import useInviteMembers from './hooks/use-invite-members';
 
@@ -25,13 +25,7 @@ type FormData = {
   invitations: { email: string; role: SelectOption }[];
 };
 
-const Content = ({
-  defaultRole,
-  onBack,
-  onComplete,
-  org,
-  roles,
-}: ContentProps) => {
+const Content = ({ defaultRole, onBack, onComplete, org, roles }: ContentProps) => {
   const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.onboarding.invite',
@@ -82,23 +76,16 @@ const Content = ({
           ))}
           <AddButton onClick={handleAddMore} />
           {!!org.domains.length && <DomainAccess org={org} />}
-          {shouldShowError && <Error>{t('form.errors.invalid')}</Error>}
+          {shouldShowError && <ErrorComponent>{t('form.errors.invalid')}</ErrorComponent>}
           <ButtonContainer>
             <Button
-              disabled={
-                inviteMembersMutations.isLoading || updateOrgMutation.isLoading
-              }
+              disabled={inviteMembersMutations.isLoading || updateOrgMutation.isLoading}
               onClick={onBack}
               variant="secondary"
             >
               {allT('back')}
             </Button>
-            <Button
-              loading={
-                inviteMembersMutations.isLoading || updateOrgMutation.isLoading
-              }
-              type="submit"
-            >
+            <Button loading={inviteMembersMutations.isLoading || updateOrgMutation.isLoading} type="submit">
               {t('cta')}
             </Button>
           </ButtonContainer>

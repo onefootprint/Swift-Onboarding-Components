@@ -11,12 +11,7 @@ type MachineContext = {
 /// Given the list of requirements from the backend and some information about which requirements
 /// we've already displayed, computes the frontend
 const computeRequirementsToShow = (
-  {
-    hasRunCollectedKycData,
-    startedDataCollection,
-    isTransfer,
-    isComponentsSdk,
-  }: MachineContext,
+  { hasRunCollectedKycData, startedDataCollection, isTransfer, isComponentsSdk }: MachineContext,
   response: OnboardingStatusResponse,
 ) => {
   const { allRequirements } = response;

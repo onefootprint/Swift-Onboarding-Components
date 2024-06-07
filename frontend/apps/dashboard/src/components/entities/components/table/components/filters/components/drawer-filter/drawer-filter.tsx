@@ -3,13 +3,13 @@ import { EntityLabel } from '@onefootprint/types';
 import {
   Button,
   Checkbox,
-  createFontStyles,
   DateRangeInput,
   Drawer,
   LinkButton,
   Radio,
   Stack,
   TextInput,
+  createFontStyles,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -81,21 +81,12 @@ const DrawerFilter = () => {
       <Drawer title={t('title')} open={open} onClose={close}>
         <FormProvider {...methods}>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Stack
-              direction="column"
-              justify="space-between"
-              height="100%"
-              gap={7}
-            >
+            <Stack direction="column" justify="space-between" height="100%" gap={7}>
               <Stack direction="column" gap={7}>
                 <fieldset>
                   <Legend>{t('labels.label')}</Legend>
                   <Stack direction="column" gap={3}>
-                    <Checkbox
-                      label={t('labels.options.active')}
-                      value={EntityLabel.active}
-                      {...register('labels')}
-                    />
+                    <Checkbox label={t('labels.options.active')} value={EntityLabel.active} {...register('labels')} />
                     <Checkbox
                       label={t('labels.options.fraud')}
                       value={EntityLabel.offboard_fraud}
@@ -128,10 +119,7 @@ const DrawerFilter = () => {
                             <DateRangeInput
                               startDate={field.value.from}
                               endDate={field.value.to}
-                              onChange={(
-                                nextStartDate?: Date,
-                                nextEndDate?: Date,
-                              ) => {
+                              onChange={(nextStartDate?: Date, nextEndDate?: Date) => {
                                 field.onChange({
                                   from: nextStartDate,
                                   to: nextEndDate,
@@ -151,22 +139,14 @@ const DrawerFilter = () => {
                 <fieldset>
                   <Legend>{t('other.label')}</Legend>
                   <Stack direction="column" gap={3}>
-                    <Checkbox
-                      label={t('other.on-watchlist')}
-                      value="watchlist_hit"
-                      {...register('others')}
-                    />
+                    <Checkbox label={t('other.on-watchlist')} value="watchlist_hit" {...register('others')} />
                     <Checkbox
                       label={t('other.has-outstanding-workflow-request')}
                       value="has_outstanding_workflow_request"
                       {...register('others')}
                     />
                     {user?.isFirmEmployee && (
-                      <Checkbox
-                        label={t('other.show-unverified')}
-                        value="show_unverified"
-                        {...register('others')}
-                      />
+                      <Checkbox label={t('other.show-unverified')} value="show_unverified" {...register('others')} />
                     )}
                   </Stack>
                 </fieldset>

@@ -10,11 +10,10 @@ export type SelectOption<T extends StringOrNumber = string> = {
   description?: string;
 };
 
-export type SelectProps<Option extends SelectOption = SelectOption> =
-  BaseSelectProps<Option> & {
-    placeholder?: string;
-    isPrivate?: boolean;
-  };
+export type SelectProps<Option extends SelectOption = SelectOption> = BaseSelectProps<Option> & {
+  placeholder?: string;
+  isPrivate?: boolean;
+};
 
 type StringOrNumber = string | number;
 
@@ -37,13 +36,7 @@ const Select = <Option extends SelectOption = SelectOption>({
   size = 'default',
   testID,
   value,
-  renderTrigger = ({
-    onClick,
-    isOpen,
-    selectedOption,
-    testID: triggerTestID,
-    hasIcon,
-  }) => (
+  renderTrigger = ({ onClick, isOpen, selectedOption, testID: triggerTestID, hasIcon }) => (
     <BaseSelectTrigger
       disabled={disabled}
       hasError={hasError}

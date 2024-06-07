@@ -35,12 +35,7 @@ const Component = ({
   <form onSubmit={onSubmit}>
     <Stack direction="column" gap={6}>
       <Header subtitle={texts.headerSubtitle} title={texts.headerTitle} />
-      <RadioSelect
-        onChange={onMethodChange}
-        options={methodOptions}
-        size="compact"
-        value={methodSelected}
-      />
+      <RadioSelect onChange={onMethodChange} options={methodOptions} size="compact" value={methodSelected} />
       <Button
         disabled={isCtaDisabled}
         fullWidth

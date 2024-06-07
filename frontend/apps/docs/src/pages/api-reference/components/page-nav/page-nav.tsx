@@ -1,12 +1,5 @@
 import { IcoCode216, IcoFlask16 } from '@onefootprint/icons';
-import {
-  createFontStyles,
-  Divider,
-  media,
-  Stack,
-  ThemeToggle,
-  Tooltip,
-} from '@onefootprint/ui';
+import { Divider, Stack, ThemeToggle, Tooltip, createFontStyles, media } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React, { forwardRef, useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
@@ -41,9 +34,7 @@ const CHARACTER_LIMIT_FOR_TOOLTIP = 35;
 const groupBySection = (articles: Article[]) => {
   const sections: Section[] = [];
   articles.forEach(a => {
-    const currentSection = sections.length
-      ? sections[sections.length - 1]
-      : undefined;
+    const currentSection = sections.length ? sections[sections.length - 1] : undefined;
     if (currentSection?.title === a.section) {
       currentSection.subsections.push(a);
     } else {
@@ -87,33 +78,19 @@ const PageNav = forwardRef<HTMLElement, PageNavProps>(({ sections }, ref) => {
         <NavigationLogo />
         <ThemeToggle onChange={handleToggleTheme} checked={theme === 'dark'} />
       </Header>
-      <NavContainer
-        ref={navInnerScrollRef}
-        onScroll={handleNavInnerScroll}
-        id="nav-container"
-      >
+      <NavContainer ref={navInnerScrollRef} onScroll={handleNavInnerScroll} id="nav-container">
         <nav>
           {sections.map((s, i) => (
             <React.Fragment key={s.title}>
               <SectionTitle>
-                {s.isPreview ? (
-                  <IcoFlask16 color="tertiary" />
-                ) : (
-                  <IcoCode216 color="tertiary" />
-                )}
+                {s.isPreview ? <IcoFlask16 color="tertiary" /> : <IcoCode216 color="tertiary" />}
                 {s.title}
               </SectionTitle>
               {groupBySection(s.articles).map(({ title, subsections }) => (
                 <Group key={title}>
                   <NavigationSectionTitle>{title}</NavigationSectionTitle>
                   {subsections.map(({ method, path, id }) => (
-                    <Tooltip
-                      key={id}
-                      text={path}
-                      alignment="center"
-                      position="top"
-                      disabled={analyzeLength(path)}
-                    >
+                    <Tooltip key={id} text={path} alignment="center" position="top" disabled={analyzeLength(path)}>
                       <NavigationScrollLink id={id}>
                         <Stack justify="center">
                           <TypeBadge skinny type={method} />

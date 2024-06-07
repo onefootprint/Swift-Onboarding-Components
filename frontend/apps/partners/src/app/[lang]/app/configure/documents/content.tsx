@@ -9,11 +9,7 @@ import type { Lang } from '@/app/types';
 import { DEFAULT_PUBLIC_ROUTE } from '@/config/constants';
 import { alertError } from '@/helpers';
 import { useClientStore } from '@/hooks';
-import {
-  deletePartnerDocTemplates,
-  postPartnerDocTemplates,
-  putPartnerDocTemplates,
-} from '@/queries';
+import { deletePartnerDocTemplates, postPartnerDocTemplates, putPartnerDocTemplates } from '@/queries';
 import type { DocTemplate } from '@/queries/get-partner-doc-templates';
 
 import DialogAddDocument from './components/dialog-add-document';
@@ -27,10 +23,7 @@ type ConfigureDocumentsContentProps = { lang: Lang; templates: DocTemplate[] };
 const EmptyDoc: DocPayload = { name: '', description: '' };
 const initState: AddDocDialog = { isOpen: false, ...EmptyDoc };
 
-const ConfigureDocumentsContent = ({
-  lang,
-  templates,
-}: ConfigureDocumentsContentProps) => {
+const ConfigureDocumentsContent = ({ lang, templates }: ConfigureDocumentsContentProps) => {
   const router = useRouter();
   const { t } = useTranslation('common');
   const { data } = useClientStore(x => x);
@@ -51,12 +44,8 @@ const ConfigureDocumentsContent = ({
     ({ id, ...payload }: DocPayload) => {
       if (!authToken) return router.push(DEFAULT_PUBLIC_ROUTE);
       return id
-        ? putPartnerDocTemplates(payload, id)
-            .then(router.refresh)
-            .catch(errorToast)
-        : postPartnerDocTemplates(payload)
-            .then(router.refresh)
-            .catch(errorToast);
+        ? putPartnerDocTemplates(payload, id).then(router.refresh).catch(errorToast)
+        : postPartnerDocTemplates(payload).then(router.refresh).catch(errorToast);
     },
     [authToken, errorToast, router],
   );
@@ -76,11 +65,7 @@ const ConfigureDocumentsContent = ({
             {t('doc.documents-template-overview')}
           </Text>
         </Stack>
-        <Button
-          onClick={() => setAddDocDialog({ ...EmptyDoc, isOpen: true })}
-          size="compact"
-          variant="secondary"
-        >
+        <Button onClick={() => setAddDocDialog({ ...EmptyDoc, isOpen: true })} size="compact" variant="secondary">
           {t('doc.add-document')}
         </Button>
       </Stack>
@@ -89,8 +74,7 @@ const ConfigureDocumentsContent = ({
         lang={lang}
         templates={templates}
         handlers={{
-          onDeleteClick: (id?: string) =>
-            !id ? errorToast(t('doc.missing-doc-id')) : handleDocDeletion(id),
+          onDeleteClick: (id?: string) => (!id ? errorToast(t('doc.missing-doc-id')) : handleDocDeletion(id)),
           onEditClick: (id?: string) => {
             if (!id) return errorToast(t('doc.missing-doc-id'));
 

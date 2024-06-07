@@ -14,21 +14,9 @@ import type { MachineContext } from './utils/state-machine';
 
 const App = ({ initialContext, onDone }: IdDocProps) => {
   const l10n = useL10nContext();
-  const {
-    authToken,
-    device,
-    sandboxOutcome,
-    config,
-    orgId,
-    documentRequestId,
-    uploadMode,
-  } = initialContext;
+  const { authToken, device, sandboxOutcome, config, orgId, documentRequestId, uploadMode } = initialContext;
 
-  const {
-    shouldCollectSelfie,
-    shouldCollectConsent,
-    supportedCountryAndDocTypes,
-  } = config;
+  const { shouldCollectSelfie, shouldCollectConsent, supportedCountryAndDocTypes } = config;
 
   const context: MachineContext = {
     authToken,

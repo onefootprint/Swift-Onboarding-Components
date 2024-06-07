@@ -1,7 +1,7 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { SecuredByFootprint } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { media, Text } from '@onefootprint/ui';
+import { Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,12 +41,7 @@ const Footer = ({ config }: FootprintFooterProps) => {
         <WhatsThisPopover config={config} />
         {links.map(({ href, label }) => (
           <li key={label}>
-            <a
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              className="footer-link"
-            >
+            <a href={href} target="_blank" rel="noreferrer" className="footer-link">
               <Text variant="caption-1" color="secondary" tag="span">
                 {label}
               </Text>
@@ -55,12 +50,7 @@ const Footer = ({ config }: FootprintFooterProps) => {
         ))}
         <LanguageSelect />
         <li>
-          <Image
-            src="/footer/soc-2-badge.png"
-            height={32}
-            width={32}
-            alt="Soc2 badge"
-          />
+          <Image src="/footer/soc-2-badge.png" height={32} width={32} alt="Soc2 badge" />
         </li>
       </LinksContainer>
     </Container>

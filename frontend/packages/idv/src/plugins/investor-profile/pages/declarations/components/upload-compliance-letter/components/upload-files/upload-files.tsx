@@ -65,13 +65,7 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
 
   return (
     <Stack direction="column" gap={3}>
-      <Box
-        backgroundColor="secondary"
-        padding={5}
-        borderRadius="default"
-        gap={5}
-        display="grid"
-      >
+      <Box backgroundColor="secondary" padding={5} borderRadius="default" gap={5} display="grid">
         <Box>
           <Button
             fullWidth

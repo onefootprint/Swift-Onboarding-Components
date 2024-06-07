@@ -12,9 +12,7 @@ type WrapperProps = {
 
 const i18n = configureReactI18next();
 
-export const CustomWrapper = ({ children }: WrapperProps) => (
-  <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
-);
+export const CustomWrapper = ({ children }: WrapperProps) => <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 
 export const renderComponents = (Component?: React.ReactNode) =>
   customRender(<CustomWrapper>{Component}</CustomWrapper>);

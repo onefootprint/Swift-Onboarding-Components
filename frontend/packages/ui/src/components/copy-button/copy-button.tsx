@@ -64,11 +64,8 @@ const CopyButton = ({
   };
 
   const handleText = () => {
-    const tooltip =
-      tooltipText ?? t('components.copy-button.tooltip-text-default');
-    const confirmation =
-      tooltipTextConfirmation ??
-      t('components.copy-button.tooltip-text-confirmation-default');
+    const tooltip = tooltipText ?? t('components.copy-button.tooltip-text-default');
+    const confirmation = tooltipTextConfirmation ?? t('components.copy-button.tooltip-text-confirmation-default');
     if (isMobile) {
       return confirmation;
     }

@@ -38,20 +38,12 @@ describe('getMobilePropsFromUrl', () => {
 
     expect(getMobilePropsFromUrl('a')).toEqual(undefined);
 
-    expect(getMobilePropsFromUrl('/path#FragmentIdentifierHash')).toEqual(
-      undefined,
-    );
+    expect(getMobilePropsFromUrl('/path#FragmentIdentifierHash')).toEqual(undefined);
+
+    expect(getMobilePropsFromUrl('/path#ENCODED_LEGACY_USER_DATA__ENCODED_LEGACY_OPTIONS')).toEqual(undefined);
 
     expect(
-      getMobilePropsFromUrl(
-        '/path#ENCODED_LEGACY_USER_DATA__ENCODED_LEGACY_OPTIONS',
-      ),
-    ).toEqual(undefined);
-
-    expect(
-      getMobilePropsFromUrl(
-        '/path#ENCODED_LEGACY_USER_DATA__ENCODED_LEGACY_OPTIONS__ENCODED_LEGACY_L10N',
-      ),
+      getMobilePropsFromUrl('/path#ENCODED_LEGACY_USER_DATA__ENCODED_LEGACY_OPTIONS__ENCODED_LEGACY_L10N'),
     ).toEqual(undefined);
   });
 

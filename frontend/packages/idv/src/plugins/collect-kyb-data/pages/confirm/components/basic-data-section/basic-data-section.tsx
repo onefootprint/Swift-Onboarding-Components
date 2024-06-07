@@ -4,10 +4,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { SectionAction } from '../../../../../../components/confirm-collected-data';
-import {
-  Section,
-  SectionItem,
-} from '../../../../../../components/confirm-collected-data';
+import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import type { SectionItemProps } from '../../../../../../components/confirm-collected-data/components/section-item';
 import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-machine';
 import BasicData from '../../../basic-data';
@@ -48,9 +45,7 @@ const BasicDataSection = () => {
   if (corporationType) {
     basicInfo.push({
       text: t('confirm.basic-data.corporation-type'),
-      subtext: t(
-        `basic-data.form.corporation-type.mapping.${corporationType}` as unknown as TemplateStringsArray,
-      ),
+      subtext: t(`basic-data.form.corporation-type.mapping.${corporationType}` as unknown as TemplateStringsArray),
     });
   }
 
@@ -81,12 +76,7 @@ const BasicDataSection = () => {
   const basicInfoDetails = basicInfo.map(
     // @ts-ignore:next-line
     ({ text, subtext, textColor }: SectionItemProps) => (
-      <SectionItem
-        key={text}
-        text={text}
-        subtext={subtext}
-        textColor={textColor}
-      />
+      <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
     ),
   );
 
@@ -95,12 +85,7 @@ const BasicDataSection = () => {
       return basicInfoDetails;
     }
     return (
-      <BasicData
-        hideHeader
-        ctaLabel={t('confirm.summary.save')}
-        onComplete={stopEditing}
-        onCancel={stopEditing}
-      />
+      <BasicData hideHeader ctaLabel={t('confirm.summary.save')} onComplete={stopEditing} onCancel={stopEditing} />
     );
   };
 

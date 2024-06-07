@@ -2,9 +2,7 @@ import type { FootprintAppearance } from '@onefootprint/footprint-js';
 
 import parse from '../parse';
 
-const getAppearanceFromUrl = (
-  params: Record<string, string | undefined>,
-): FootprintAppearance | null => {
+const getAppearanceFromUrl = (params: Record<string, string | undefined>): FootprintAppearance | null => {
   const { font_src: fontSrc, variables, rules, variant } = params;
   if (!variables && !rules) {
     return null;

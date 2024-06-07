@@ -67,8 +67,7 @@ const getFootprint = (): Footprint => {
   };
 };
 
-const isComponentsSdkProps = (p: Props): p is ComponentsSdkProps =>
-  p.kind === ComponentKind.Components;
+const isComponentsSdkProps = (p: Props): p is ComponentsSdkProps => p.kind === ComponentKind.Components;
 
 const footprint = getFootprint();
 export default footprint;

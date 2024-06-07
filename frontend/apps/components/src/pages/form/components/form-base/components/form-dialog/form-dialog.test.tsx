@@ -84,9 +84,7 @@ describe('<FormDialog />', () => {
   it('should hide footprint logo when hideFootprintLogo is true', async () => {
     renderFormDialog({ hideFootprintLogo: true });
     await waitFor(() => {
-      expect(
-        screen.queryByTestId('secured-by-footprint'),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId('secured-by-footprint')).not.toBeInTheDocument();
     });
   });
 
@@ -94,8 +92,7 @@ describe('<FormDialog />', () => {
     renderFormDialog({ hideSaveButton: true, hideCancelButton: true });
     await waitFor(() => {
       expect(
-        screen.queryByRole('button', { name: 'Primary' }) &&
-          screen.queryByRole('button', { name: 'Secondary' }),
+        screen.queryByRole('button', { name: 'Primary' }) && screen.queryByRole('button', { name: 'Secondary' }),
       ).not.toBeInTheDocument();
     });
   });

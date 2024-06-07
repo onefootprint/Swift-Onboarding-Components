@@ -1,11 +1,4 @@
-import {
-  IcoCheckCircle16,
-  IcoFaceid16,
-  IcoFileText16,
-  IcoLock16,
-  IcoShield24,
-  IcoUser16,
-} from '@onefootprint/icons';
+import { IcoCheckCircle16, IcoFaceid16, IcoFileText16, IcoLock16, IcoShield24, IcoUser16 } from '@onefootprint/icons';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,11 +23,7 @@ const CheckItem = ({ label, Icon, value }: CheckItemProps) => (
       <Icon />
       <Text variant="body-3">{label}</Text>
     </Stack>
-    {value ? (
-      <IcoCheckCircle16 color="success" />
-    ) : (
-      <IcoCheckCircle16 color="error" />
-    )}
+    {value ? <IcoCheckCircle16 color="success" /> : <IcoCheckCircle16 color="error" />}
   </Stack>
 );
 

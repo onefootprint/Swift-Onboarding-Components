@@ -1,7 +1,7 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { createOverlayBackground, Dropdown } from '@onefootprint/ui';
+import { Dropdown, createOverlayBackground } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -32,10 +32,7 @@ const FooterActions = ({ onWhatsThisClick, config }: FooterActionsProps) => {
         <Dropdown.Item onClick={onWhatsThisClick} size="tiny">
           {t('whats-this')}
         </Dropdown.Item>
-        <Dropdown.Item
-          onClick={() => handleRedirect(`${FRONTPAGE_BASE_URL}/privacy-policy`)}
-          size="tiny"
-        >
+        <Dropdown.Item onClick={() => handleRedirect(`${FRONTPAGE_BASE_URL}/privacy-policy`)} size="tiny">
           {t('privacy')}
         </Dropdown.Item>
         <LanguagesSubmenu />

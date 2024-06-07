@@ -1,11 +1,5 @@
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import {
-  DocumentDI,
-  EntityKind,
-  EntityStatus,
-  IdDI,
-  InvestorProfileDI,
-} from '@onefootprint/types';
+import { DocumentDI, EntityKind, EntityStatus, IdDI, InvestorProfileDI } from '@onefootprint/types';
 
 import getGridTemplateAreas from './get-grid-template-areas';
 
@@ -29,11 +23,7 @@ describe('getGridTemplateAreas', () => {
   });
 
   it('should generate grid template areas for basic, address and identity', () => {
-    const entity = createEntity([
-      IdDI.firstName,
-      IdDI.middleName,
-      IdDI.lastName,
-    ]);
+    const entity = createEntity([IdDI.firstName, IdDI.middleName, IdDI.lastName]);
     const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(3);
   });
@@ -75,22 +65,13 @@ describe('getGridTemplateAreas', () => {
   });
 
   it('should generate grid template areas with US legal status data, card-data, and custom data', () => {
-    const entity = createEntity([
-      IdDI.usLegalStatus,
-      'custom.test',
-      'card.flerp.name',
-    ]);
+    const entity = createEntity([IdDI.usLegalStatus, 'custom.test', 'card.flerp.name']);
     const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(6);
   });
 
   it('should generate grid template areas with US legal status data, custom data, card-data, and investor profile', () => {
-    const entity = createEntity([
-      IdDI.usLegalStatus,
-      'custom.test',
-      'card.flerp.name',
-      InvestorProfileDI.annualIncome,
-    ]);
+    const entity = createEntity([IdDI.usLegalStatus, 'custom.test', 'card.flerp.name', InvestorProfileDI.annualIncome]);
     const result = getGridTemplateAreas({ entity });
     expect(result).toEqual(7);
   });

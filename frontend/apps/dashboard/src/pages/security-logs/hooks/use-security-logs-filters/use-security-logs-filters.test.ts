@@ -113,11 +113,7 @@ describe('useSecurityLogsFilters', () => {
       useRouterSpy({
         pathname: '/security-logs',
         query: {
-          data_attributes_personal: [
-            'id.first_name',
-            'id.last_name',
-            'id.phone_number',
-          ],
+          data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
         },
         push: pushMockFn,
       });
@@ -144,11 +140,7 @@ describe('useSecurityLogsFilters', () => {
       useRouterSpy({
         pathname: '/security-logs',
         query: {
-          data_attributes_business: [
-            'business.website',
-            'business.name',
-            'business.dba',
-          ],
+          data_attributes_business: ['business.website', 'business.name', 'business.dba'],
         },
         push: pushMockFn,
       });
@@ -177,16 +169,8 @@ describe('useSecurityLogsFilters', () => {
       useRouterSpy({
         pathname: '/security-logs',
         query: {
-          data_attributes_personal: [
-            'id.first_name',
-            'id.last_name',
-            'id.phone_number',
-          ],
-          data_attributes_business: [
-            'business.website',
-            'business.name',
-            'business.dba',
-          ],
+          data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
+          data_attributes_business: ['business.website', 'business.name', 'business.dba'],
         },
         push: pushMockFn,
       });
@@ -202,11 +186,7 @@ describe('useSecurityLogsFilters', () => {
           query: {
             // all personal attributes should remain unchanged — only business data should change
             data_attributes_business: ['business.dba'],
-            data_attributes_personal: [
-              'id.first_name',
-              'id.last_name',
-              'id.phone_number',
-            ],
+            data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
           },
         },
         undefined,
@@ -219,16 +199,8 @@ describe('useSecurityLogsFilters', () => {
       useRouterSpy({
         pathname: '/security-logs',
         query: {
-          data_attributes_business: [
-            'business.website',
-            'business.name',
-            'business.dba',
-          ],
-          data_attributes_personal: [
-            'id.first_name',
-            'id.last_name',
-            'id.phone_number',
-          ],
+          data_attributes_business: ['business.website', 'business.name', 'business.dba'],
+          data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
         },
         push: pushMockFn,
       });
@@ -244,11 +216,7 @@ describe('useSecurityLogsFilters', () => {
           query: {
             // all personal attributes should remain unchanged — only business data should change
             data_attributes_personal: ['id.phone_number'],
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
           },
         },
         undefined,
@@ -263,11 +231,7 @@ describe('useSecurityLogsFilters', () => {
       useRouterSpy({
         pathname: '/security-logs',
         query: {
-          data_attributes_personal: [
-            'id.first_name',
-            'id.last_name',
-            'id.phone_number',
-          ],
+          data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
         },
         push: pushMockFn,
       });
@@ -294,11 +258,7 @@ describe('useSecurityLogsFilters', () => {
       useRouterSpy({
         pathname: '/security-logs',
         query: {
-          data_attributes_business: [
-            'business.website',
-            'business.name',
-            'business.dba',
-          ],
+          data_attributes_business: ['business.website', 'business.name', 'business.dba'],
         },
         push: pushMockFn,
       });
@@ -327,16 +287,8 @@ describe('useSecurityLogsFilters', () => {
       useRouterSpy({
         pathname: '/security-logs',
         query: {
-          data_attributes_business: [
-            'business.website',
-            'business.name',
-            'business.dba',
-          ],
-          data_attributes_personal: [
-            'id.first_name',
-            'id.last_name',
-            'id.phone_number',
-          ],
+          data_attributes_business: ['business.website', 'business.name', 'business.dba'],
+          data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
         },
         push: pushMockFn,
       });
@@ -349,11 +301,7 @@ describe('useSecurityLogsFilters', () => {
       expect(pushMockFn).toHaveBeenCalledWith(
         {
           query: {
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             data_attributes_personal: [],
           },
         },
@@ -367,16 +315,8 @@ describe('useSecurityLogsFilters', () => {
       useRouterSpy({
         pathname: '/security-logs',
         query: {
-          data_attributes_business: [
-            'business.website',
-            'business.name',
-            'business.dba',
-          ],
-          data_attributes_personal: [
-            'id.first_name',
-            'id.last_name',
-            'id.phone_number',
-          ],
+          data_attributes_business: ['business.website', 'business.name', 'business.dba'],
+          data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
         },
         push: pushMockFn,
       });
@@ -389,11 +329,7 @@ describe('useSecurityLogsFilters', () => {
       expect(pushMockFn).toHaveBeenCalledWith(
         {
           query: {
-            data_attributes_personal: [
-              'id.first_name',
-              'id.last_name',
-              'id.phone_number',
-            ],
+            data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
             data_attributes_business: [],
           },
         },
@@ -410,11 +346,7 @@ describe('useSecurityLogsFilters', () => {
         useRouterSpy({
           pathname: '/security-logs',
           query: {
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             data_attributes_personal: ['id.phone_number'],
             date_range: ['last-7-days'],
           },
@@ -423,26 +355,14 @@ describe('useSecurityLogsFilters', () => {
 
         const { result } = customRenderHook(() => useSecurityLogsFilters());
         result.current.push({
-          data_attributes_personal: [
-            'id.first_name',
-            'id.last_name',
-            'id.phone_number',
-          ],
+          data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
         });
 
         expect(pushMockFn).toHaveBeenCalledWith(
           {
             query: {
-              data_attributes_personal: [
-                'id.first_name',
-                'id.last_name',
-                'id.phone_number',
-              ],
-              data_attributes_business: [
-                'business.website',
-                'business.name',
-                'business.dba',
-              ],
+              data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
+              data_attributes_business: ['business.website', 'business.name', 'business.dba'],
               date_range: ['last-7-days'],
             },
           },
@@ -456,11 +376,7 @@ describe('useSecurityLogsFilters', () => {
         useRouterSpy({
           pathname: '/security-logs',
           query: {
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             data_attributes_personal: ['id.phone_number'],
             date_range: ['last-7-days'],
           },
@@ -490,11 +406,7 @@ describe('useSecurityLogsFilters', () => {
         useRouterSpy({
           pathname: '/security-logs',
           query: {
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             data_attributes_personal: ['id.phone_number'],
             date_range: ['last-7-days'],
           },
@@ -526,11 +438,7 @@ describe('useSecurityLogsFilters', () => {
         useRouterSpy({
           pathname: '/security-logs',
           query: {
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             data_attributes_personal: ['id.phone_number'],
             search: ['Test search'],
           },
@@ -539,26 +447,14 @@ describe('useSecurityLogsFilters', () => {
 
         const { result } = customRenderHook(() => useSecurityLogsFilters());
         result.current.push({
-          data_attributes_personal: [
-            'id.first_name',
-            'id.last_name',
-            'id.phone_number',
-          ],
+          data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
         });
 
         expect(pushMockFn).toHaveBeenCalledWith(
           {
             query: {
-              data_attributes_personal: [
-                'id.first_name',
-                'id.last_name',
-                'id.phone_number',
-              ],
-              data_attributes_business: [
-                'business.website',
-                'business.name',
-                'business.dba',
-              ],
+              data_attributes_personal: ['id.first_name', 'id.last_name', 'id.phone_number'],
+              data_attributes_business: ['business.website', 'business.name', 'business.dba'],
               search: ['Test search'],
             },
           },
@@ -572,11 +468,7 @@ describe('useSecurityLogsFilters', () => {
         useRouterSpy({
           pathname: '/security-logs',
           query: {
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             data_attributes_personal: ['id.phone_number'],
             search: ['Test search'],
           },
@@ -606,11 +498,7 @@ describe('useSecurityLogsFilters', () => {
         useRouterSpy({
           pathname: '/security-logs',
           query: {
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             data_attributes_personal: ['id.phone_number'],
             search: ['Test search'],
           },
@@ -643,11 +531,7 @@ describe('useSecurityLogsFilters', () => {
           pathname: '/security-logs',
           query: {
             data_attributes_personal: ['id.phone_number'],
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             date_range: ['last-7-days'],
             search: ['Test search'],
           },
@@ -662,11 +546,7 @@ describe('useSecurityLogsFilters', () => {
         expect(pushMockFn).toHaveBeenCalledWith(
           {
             query: {
-              data_attributes_business: [
-                'business.website',
-                'business.name',
-                'business.dba',
-              ],
+              data_attributes_business: ['business.website', 'business.name', 'business.dba'],
               data_attributes_personal: ['id.phone_number'],
               date_range: ['last-30-days'],
               search: ['Test search'],
@@ -683,11 +563,7 @@ describe('useSecurityLogsFilters', () => {
           pathname: '/security-logs',
           query: {
             data_attributes_personal: ['id.phone_number'],
-            data_attributes_business: [
-              'business.website',
-              'business.name',
-              'business.dba',
-            ],
+            data_attributes_business: ['business.website', 'business.name', 'business.dba'],
             date_range: ['last-30-days'],
           },
           push: pushMockFn,
@@ -702,11 +578,7 @@ describe('useSecurityLogsFilters', () => {
           {
             query: {
               data_attributes_personal: ['id.phone_number'],
-              data_attributes_business: [
-                'business.website',
-                'business.name',
-                'business.dba',
-              ],
+              data_attributes_business: ['business.website', 'business.name', 'business.dba'],
               date_range: ['last-30-days'],
               search: ['Test search'],
             },

@@ -10,11 +10,7 @@ type TenantSwitcherProps = {
   Loading: () => JSX.Element;
 };
 
-const TenantSwitcher = ({
-  children,
-  entityId,
-  Loading,
-}: TenantSwitcherProps) => {
+const TenantSwitcher = ({ children, entityId, Loading }: TenantSwitcherProps) => {
   const {
     data: { user },
   } = useSession();
@@ -24,11 +20,7 @@ const TenantSwitcher = ({
     isFirmEmployee,
   });
 
-  return isFirmEmployee && (isLoading || isSuccess) ? (
-    <Loading />
-  ) : (
-    <Box>{children}</Box>
-  );
+  return isFirmEmployee && (isLoading || isSuccess) ? <Loading /> : <Box>{children}</Box>;
 };
 
 export default TenantSwitcher;

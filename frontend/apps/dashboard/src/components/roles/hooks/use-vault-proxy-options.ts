@@ -13,28 +13,18 @@ export enum VaultProxyOptionKind {
 
 export type VaultProxyOption = VaultProxyOptionKind | string;
 
-export const vaultProxyOptionFromScope = (
-  scope: RoleScope,
-): VaultProxyOption | undefined => {
+export const vaultProxyOptionFromScope = (scope: RoleScope): VaultProxyOption | undefined => {
   if (scope.kind !== RoleScopeKind.invokeVaultProxy) {
     return undefined;
   }
-  if (
-    scope.data.kind === VaultProxyOptionKind.all ||
-    scope.data.kind === VaultProxyOptionKind.jit
-  ) {
+  if (scope.data.kind === VaultProxyOptionKind.all || scope.data.kind === VaultProxyOptionKind.jit) {
     return scope.data.kind;
   }
   return scope.data.id;
 };
 
-export const scopeFromVaultProxyOption = (
-  option: VaultProxyOption,
-): InvokeVaultProxyRoleScope => {
-  if (
-    option === VaultProxyOptionKind.all ||
-    option === VaultProxyOptionKind.jit
-  ) {
+export const scopeFromVaultProxyOption = (option: VaultProxyOption): InvokeVaultProxyRoleScope => {
+  if (option === VaultProxyOptionKind.all || option === VaultProxyOptionKind.jit) {
     return { kind: RoleScopeKind.invokeVaultProxy, data: { kind: option } };
   }
   return {

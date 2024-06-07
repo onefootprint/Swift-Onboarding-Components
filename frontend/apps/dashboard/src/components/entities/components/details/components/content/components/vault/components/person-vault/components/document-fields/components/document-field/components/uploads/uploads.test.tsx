@@ -16,10 +16,8 @@ const renderUploads = ({ vault, currentDocument }: UploadsProps) =>
   customRender(<Uploads vault={vault} currentDocument={currentDocument} />);
 
 describe('<Uploads />', () => {
-  window.URL.createObjectURL = jest.fn(
-    () => 'http://127.0.0.1:0000/a-blob-url',
-  );
-  window.URL.revokeObjectURL = jest.fn(() => {});
+  window.URL.createObjectURL = jest.fn(() => 'http://127.0.0.1:0000/a-blob-url');
+  window.URL.revokeObjectURL = jest.fn(() => undefined);
 
   it('should show correct labels for each upload if successful', () => {
     renderUploads({
@@ -27,15 +25,9 @@ describe('<Uploads />', () => {
       currentDocument: successfulIDCardDocument,
     });
 
-    expect(
-      screen.getByText('ID (FRONT) successfully uploaded'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('ID (BACK) successfully uploaded'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Selfie successfully uploaded'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('ID (FRONT) successfully uploaded')).toBeInTheDocument();
+    expect(screen.getByText('ID (BACK) successfully uploaded')).toBeInTheDocument();
+    expect(screen.getByText('Selfie successfully uploaded')).toBeInTheDocument();
   });
 
   it('should show correct labels for each upload if failed', () => {
@@ -65,9 +57,7 @@ describe('<Uploads />', () => {
       vault: entityVaultWithIdCard,
       currentDocument: successfulIDCardDocument,
     });
-    const images = screen
-      .getAllByRole('img')
-      .filter(el => el.tagName === 'IMG') as HTMLImageElement[];
+    const images = screen.getAllByRole('img').filter(el => el.tagName === 'IMG') as HTMLImageElement[];
 
     expect(images).toHaveLength(3);
     expect(images[0]?.src).toContain('a-blob-url');

@@ -11,33 +11,27 @@ type SandboxBannerProps = {
   hideOnDesktop?: boolean;
 };
 
-const SandboxBanner = forwardRef<SandboxBannerHandler, SandboxBannerProps>(
-  ({ hideOnDesktop }, ref) => {
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const getHeight = () => containerRef.current?.clientHeight ?? 0;
-    const { t } = useTranslation('idv', {
-      keyPrefix: 'global.components.layout',
-    });
+const SandboxBanner = forwardRef<SandboxBannerHandler, SandboxBannerProps>(({ hideOnDesktop }, ref) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const getHeight = () => containerRef.current?.clientHeight ?? 0;
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.components.layout',
+  });
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        getHeight,
-      }),
-      [],
-    );
+  useImperativeHandle(
+    ref,
+    () => ({
+      getHeight,
+    }),
+    [],
+  );
 
-    return (
-      <SandboxBannerContainer
-        ref={containerRef}
-        $hideOnDesktop={!!hideOnDesktop}
-        data-testid="sandbox-banner"
-      >
-        <Banner variant="warning">{t('sandbox-banner')}</Banner>
-      </SandboxBannerContainer>
-    );
-  },
-);
+  return (
+    <SandboxBannerContainer ref={containerRef} $hideOnDesktop={!!hideOnDesktop} data-testid="sandbox-banner">
+      <Banner variant="warning">{t('sandbox-banner')}</Banner>
+    </SandboxBannerContainer>
+  );
+});
 
 const SandboxBannerContainer = styled.div<{
   $hideOnDesktop: boolean;

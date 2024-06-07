@@ -73,10 +73,7 @@ const CredsForm = ({ onSubmit }: CredsFormProps) => {
       />
       <Text variant="body-3">Optional card fields to collect</Text>
       <Checkbox label="Name" {...register('collectName')} />
-      <Checkbox
-        label="Partial Address"
-        {...register('collectPartialAddress')}
-      />
+      <Checkbox label="Partial Address" {...register('collectPartialAddress')} />
       <Button loading={clientTokenMutation.isLoading} type="submit">
         Continue
       </Button>

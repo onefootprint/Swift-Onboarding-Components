@@ -1,16 +1,7 @@
 import type { FormData } from 'src/pages/proxy-configs/proxy-configs.types';
 
 const getDataInExpectedMode = (data: FormData) => {
-  const {
-    clientIdentity,
-    name,
-    method,
-    url,
-    accessReason,
-    ingressSettings,
-    pinnedServerCertificates,
-    headers,
-  } = data;
+  const { clientIdentity, name, method, url, accessReason, ingressSettings, pinnedServerCertificates, headers } = data;
   const filteredHeaders = headers.filter(header => header.value && header.name);
 
   return {

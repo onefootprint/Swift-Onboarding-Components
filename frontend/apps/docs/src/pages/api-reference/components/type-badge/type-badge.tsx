@@ -32,9 +32,7 @@ const TypeBadge = ({ type, skinny = false }: TypeBadgeProps) => {
 const StyledBadge = styled(Badge)<{ skinny: boolean }>`
   ${({ theme, skinny }) => css`
     ${createFontStyles(skinny ? 'snippet-3' : 'caption-3')}
-    padding: ${skinny
-      ? theme.spacing[2]
-      : `${theme.spacing[2]} ${theme.spacing[3]}`};
+    padding: ${skinny ? theme.spacing[2] : `${theme.spacing[2]} ${theme.spacing[3]}`};
     border-radius: ${theme.borderRadius.sm};
     width: fit-content;
     text-transform: uppercase;

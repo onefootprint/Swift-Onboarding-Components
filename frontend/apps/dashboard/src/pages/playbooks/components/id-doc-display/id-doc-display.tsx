@@ -40,9 +40,7 @@ const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
       `${kebabCase(idDocKind[0])}` as ParseKeys<'common'>,
     )}, ${t(`${kebabCase(idDocKind[1])}` as ParseKeys<'common'>)}, ${t('and')}`;
 
-    const displayStringFirst = `${t(
-      `${kebabCase(idDocKind[0])}` as ParseKeys<'common'>,
-    )} ${t('and')}`;
+    const displayStringFirst = `${t(`${kebabCase(idDocKind[0])}` as ParseKeys<'common'>)} ${t('and')}`;
 
     return (
       <DocPreviewContainer>
@@ -57,9 +55,7 @@ const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
       </DocPreviewContainer>
     );
   }
-  const possibleIdDocs = idDocKind
-    .map(k => t(`${kebabCase(k as string)}` as ParseKeys<'common'>))
-    .join(', ');
+  const possibleIdDocs = idDocKind.map(k => t(`${kebabCase(k as string)}` as ParseKeys<'common'>)).join(', ');
   return <Text variant="body-3">{possibleIdDocs}</Text>;
 };
 

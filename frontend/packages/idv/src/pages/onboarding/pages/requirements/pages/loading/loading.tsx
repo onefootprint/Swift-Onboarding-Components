@@ -6,14 +6,7 @@ import type { StateValue } from 'xstate';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 
 const isLoadingState = (state: StateValue) => {
-  const loadingStates = [
-    'init',
-    'startOnboarding',
-    'waitForComponentsSdk',
-    'checkRequirements',
-    'router',
-    'process',
-  ];
+  const loadingStates = ['init', 'startOnboarding', 'waitForComponentsSdk', 'checkRequirements', 'router', 'process'];
   return loadingStates.some(s => state === s);
 };
 

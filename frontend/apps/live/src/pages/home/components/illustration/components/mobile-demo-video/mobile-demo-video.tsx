@@ -16,12 +16,7 @@ type MobileDemoVideoProps = {
 
 const FACTOR_PHONE_SCREEN = 1.2971246006;
 
-const MobileDemoVideo = ({
-  videoUrl,
-  height = 812,
-  width = 375,
-  className,
-}: MobileDemoVideoProps) => {
+const MobileDemoVideo = ({ videoUrl, height = 812, width = 375, className }: MobileDemoVideoProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasWindow, setHasWindow] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(true);
@@ -48,13 +43,7 @@ const MobileDemoVideo = ({
 
   return (
     <PhoneContainer className={className}>
-      <PhoneFrameImage
-        src="/iphone.png"
-        alt=""
-        width={width}
-        height={height}
-        priority
-      />
+      <PhoneFrameImage src="/iphone.png" alt="" width={width} height={height} priority />
       {hasWindow && (
         <ReactPlayer
           url={videoUrl}
@@ -81,12 +70,7 @@ const MobileDemoVideo = ({
         />
       )}
       {!isPlaying && !isFirstTime && (
-        <Replay
-          onClick={handleReplay}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <Replay onClick={handleReplay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
           <IcoCirclePlay24 color="accent" />
           <Text variant="label-1" color="accent">
             Replay

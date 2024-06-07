@@ -1,26 +1,12 @@
 import themes from '@onefootprint/design-tokens';
-import {
-  createUseRouterSpy,
-  render,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, render, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { DesignSystemProvider, ToastProvider } from '@onefootprint/ui';
-import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { Layout } from 'src/components/layout';
 
 import InvestorProfile from './index';
-import {
-  withOnboardingConfig,
-  withUserVault,
-  withUserVaultValidate,
-} from './index.test.config';
+import { withOnboardingConfig, withUserVault, withUserVaultValidate } from './index.test.config';
 import type { InvestorProfileProps } from './investor-profile.types';
 
 describe('<InvestorProfile />', () => {
@@ -29,9 +15,9 @@ describe('<InvestorProfile />', () => {
   const queryClient = new QueryClient({
     queryCache,
     logger: {
-      log: () => {},
-      warn: () => {},
-      error: () => {},
+      log: () => undefined,
+      warn: () => undefined,
+      error: () => undefined,
     },
     defaultOptions: {
       queries: {
@@ -69,11 +55,7 @@ describe('<InvestorProfile />', () => {
           <DesignSystemProvider theme={themes.light}>
             <ToastProvider>
               <Layout>
-                <InvestorProfile
-                  idvContext={idvContext}
-                  context={{}}
-                  onDone={onDone}
-                />
+                <InvestorProfile idvContext={idvContext} context={{}} onDone={onDone} />
               </Layout>
             </ToastProvider>
           </DesignSystemProvider>
@@ -90,9 +72,7 @@ describe('<InvestorProfile />', () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByText("What's your employment status and occupation?"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("What's your employment status and occupation?")).toBeInTheDocument();
     });
     expect(screen.getByText('Employed')).toBeInTheDocument();
 
@@ -106,9 +86,7 @@ describe('<InvestorProfile />', () => {
     await userEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("What's your annual income?"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("What's your annual income?")).toBeInTheDocument();
     });
 
     submitButton = screen.getByText('Continue');
@@ -122,14 +100,10 @@ describe('<InvestorProfile />', () => {
     await userEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(
-        screen.getByText('What are your investment goals?'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('What are your investment goals?')).toBeInTheDocument();
     });
 
-    const longTerm = screen.getByLabelText(
-      'Preserve capital',
-    ) as HTMLInputElement;
+    const longTerm = screen.getByLabelText('Preserve capital') as HTMLInputElement;
     expect(longTerm.checked).toBe(false);
     await userEvent.click(longTerm);
     expect(longTerm.checked).toBe(true);
@@ -138,9 +112,7 @@ describe('<InvestorProfile />', () => {
     await userEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(
-        screen.getByText('How would you describe your risk tolerance?'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('How would you describe your risk tolerance?')).toBeInTheDocument();
     });
 
     submitButton = screen.getByText('Continue');
@@ -148,9 +120,7 @@ describe('<InvestorProfile />', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(
-          'Do any of the following apply to you or a member of your immediate family?',
-        ),
+        screen.getByText('Do any of the following apply to you or a member of your immediate family?'),
       ).toBeInTheDocument();
     });
 

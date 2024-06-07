@@ -16,8 +16,7 @@ type SparkleProps = {
   style: React.CSSProperties;
 };
 
-const random = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min)) + min;
+const random = (min: number, max: number) => Math.floor(Math.random() * (max - min)) + min;
 
 const generateSparkle = (color: string) => {
   const sparkle = {
@@ -62,9 +61,7 @@ const sparkAnimation = {
 };
 
 const Sparkles = ({ color, children, ...delegated }: SparklesProps) => {
-  const [sparkles, setSparkles] = useState(() =>
-    range(3, 3).map(() => generateSparkle(color)),
-  );
+  const [sparkles, setSparkles] = useState(() => range(3, 3).map(() => generateSparkle(color)));
 
   useInterval(() => {
     const sparkle = generateSparkle(color);
@@ -80,12 +77,7 @@ const Sparkles = ({ color, children, ...delegated }: SparklesProps) => {
     // eslint-disable-next-line react/jsx-props-no-spreading
     <Container {...delegated}>
       {sparkles.map(sparkle => (
-        <Sparkle
-          key={sparkle.id}
-          color={sparkle.color}
-          size={sparkle.size}
-          style={sparkle.style}
-        />
+        <Sparkle key={sparkle.id} color={sparkle.color} size={sparkle.size} style={sparkle.style} />
       ))}
       <ChildContainer>{children}</ChildContainer>
     </Container>
@@ -97,13 +89,7 @@ const Sparkle = ({ size, color, style }: SparkleProps) => {
     'M26.5 25.5C19.0043 33.3697 0 34 0 34C0 34 19.1013 35.3684 26.5 43.5C33.234 50.901 34 68 34 68C34 68 36.9884 50.7065 44.5 43.5C51.6431 36.647 68 34 68 34C68 34 51.6947 32.0939 44.5 25.5C36.5605 18.2235 34 0 34 0C34 0 33.6591 17.9837 26.5 25.5Z';
   return (
     <AnimatePresence>
-      <SparkleContainer
-        style={style}
-        initial="initial"
-        variants={sparkAnimation}
-        animate="animate"
-        exit="exit"
-      >
+      <SparkleContainer style={style} initial="initial" variants={sparkAnimation} animate="animate" exit="exit">
         <SparkleSvg width={size} height={size} viewBox="0 0 68 68" fill="none">
           <path d={path} fill={color} />
         </SparkleSvg>

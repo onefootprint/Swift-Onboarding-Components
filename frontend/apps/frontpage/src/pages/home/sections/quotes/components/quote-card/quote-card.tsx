@@ -33,13 +33,7 @@ const QuoteCard = ({ company }: QuoteCardProps) => {
           {t(`${company}.quote` as unknown as ParseKeys<'common'>)}&quot;
         </Text>
       </Stack>
-      <Stack
-        direction="column"
-        align="flex-start"
-        justify="flex-start"
-        position="relative"
-        gap={2}
-      >
+      <Stack direction="column" align="flex-start" justify="flex-start" position="relative" gap={2}>
         <Text variant="label-3" tag="h4">
           {t(`${company}.name` as unknown as ParseKeys<'common'>)}
         </Text>

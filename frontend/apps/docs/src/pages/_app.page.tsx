@@ -7,10 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
 import CustomDesignSystemProvider from '../components/custom-design-system-provider';
-import {
-  API_REFERENCE_PATH,
-  INTERNAL_API_REFERENCE_PATH,
-} from '../config/constants';
+import { API_REFERENCE_PATH, INTERNAL_API_REFERENCE_PATH } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 import ApiReference from './api-reference';
@@ -22,9 +19,7 @@ configureReactI18next();
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   const isApiReference = router.asPath.startsWith(API_REFERENCE_PATH);
-  const isInternalApiReference = router.asPath.startsWith(
-    INTERNAL_API_REFERENCE_PATH,
-  );
+  const isInternalApiReference = router.asPath.startsWith(INTERNAL_API_REFERENCE_PATH);
   // TODO
   const isDocsSite = !isApiReference && !isInternalApiReference;
   const [mounted, setMounted] = useState(false);
@@ -35,23 +30,9 @@ const App = ({ Component, pageProps }: AppProps) => {
     <>
       <Head>
         <link rel="shortcut icon" href="/favicon.ico" />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png"
-        />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       </Head>
       <QueryClientProvider client={queryClient}>
         <CustomDesignSystemProvider>
@@ -59,10 +40,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           {isApiReference && <ApiReference />}
           {isInternalApiReference && <InternalApiReference />}
           {isDocsSite && (
-            <Docs
-              article={pageProps.article}
-              navigation={pageProps.page?.navigation}
-            >
+            <Docs article={pageProps.article} navigation={pageProps.page?.navigation}>
               <Component {...pageProps} />
             </Docs>
           )}

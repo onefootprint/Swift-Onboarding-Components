@@ -32,18 +32,9 @@ const Header = ({ playbook, isDisabled }: HeaderProps) => {
   return (
     <HeaderContainer data-is-disabled={isDisabled}>
       <Text variant="label-1">{playbook.name}</Text>
-      <Stack
-        align="center"
-        flexWrap="wrap"
-        justify="space-between"
-        gap={3}
-        width="100%"
-        minHeight={theme.spacing[8]}
-      >
+      <Stack align="center" flexWrap="wrap" justify="space-between" gap={3} width="100%" minHeight={theme.spacing[8]}>
         <Stack align="center" justify="center" gap={3}>
-          <Text variant="body-3">
-            {t(`type.${playbook.kind}` as ParseKeys<'common'>)}
-          </Text>
+          <Text variant="body-3">{t(`type.${playbook.kind}` as ParseKeys<'common'>)}</Text>
           <span>·</span>
           <CodeInline truncate isPrivate>
             {playbook.key}
@@ -61,11 +52,7 @@ const Header = ({ playbook, isDisabled }: HeaderProps) => {
           </PermissionGate>
         )}
       </Stack>
-      <EditNameDialog
-        open={isFormOpen}
-        onClose={handleCloseForm}
-        playbook={playbook}
-      />
+      <EditNameDialog open={isFormOpen} onClose={handleCloseForm} playbook={playbook} />
     </HeaderContainer>
   );
 };

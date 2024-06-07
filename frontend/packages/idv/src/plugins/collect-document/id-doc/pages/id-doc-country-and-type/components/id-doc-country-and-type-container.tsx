@@ -3,17 +3,8 @@ import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { getErrorMessage } from '@onefootprint/request';
 import type { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types/src/data/id-doc-type';
-import type {
-  CountrySelectOption,
-  RadioSelectOptionFields,
-} from '@onefootprint/ui';
-import {
-  Button,
-  CountrySelect,
-  Divider,
-  RadioSelect,
-  Text,
-} from '@onefootprint/ui';
+import type { CountrySelectOption, RadioSelectOptionFields } from '@onefootprint/ui';
+import { Button, CountrySelect, Divider, RadioSelect, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -32,18 +23,11 @@ import useOptionsByDocType from '../hooks/use-options-by-doc-type';
 import ConsentMobile from './components/consent-mobile';
 
 type IdDocCountryAndTypeContainerProps = {
-  onSubmitDocTypeSuccess: (
-    data: SubmitDocTypeResponse,
-    country: CountryRecord,
-    docType: SupportedIdDocTypes,
-  ) => void;
+  onSubmitDocTypeSuccess: (data: SubmitDocTypeResponse, country: CountryRecord, docType: SupportedIdDocTypes) => void;
   onConsentSubmit: () => void;
 };
 
-const getDefaultCountry = (
-  supportedCountries: Set<CountryCode>,
-  supportedCountryRecords: CountryRecord[],
-) => {
+const getDefaultCountry = (supportedCountries: Set<CountryCode>, supportedCountryRecords: CountryRecord[]) => {
   let defaultCountry;
   if (supportedCountries.has('US')) {
     defaultCountry = getCountryFromCode('US');
@@ -53,8 +37,7 @@ const getDefaultCountry = (
   return defaultCountry;
 };
 
-const getRecordKeys = <T extends object>(object: T) =>
-  Object.keys(object) as (keyof T)[];
+const getRecordKeys = <T extends object>(object: T) => Object.keys(object) as (keyof T)[];
 
 const IdDocCountryAndTypeContainer = ({
   onSubmitDocTypeSuccess,
@@ -78,42 +61,25 @@ const IdDocCountryAndTypeContainer = ({
     documentRequestId,
   } = state.context;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
-  const supportedCountries = new Set(
-    getRecordKeys(supportedCountryAndDocTypes),
-  );
-  const supportedCountryRecords = COUNTRIES.filter(country =>
-    supportedCountries.has(country.value),
-  );
-  const defaultSupportedCountry = getDefaultCountry(
-    supportedCountries,
-    supportedCountryRecords,
-  );
+  const supportedCountries = new Set(getRecordKeys(supportedCountryAndDocTypes));
+  const supportedCountryRecords = COUNTRIES.filter(country => supportedCountries.has(country.value));
+  const defaultSupportedCountry = getDefaultCountry(supportedCountries, supportedCountryRecords);
   const { type: deviceType } = device;
 
   const requestErrorToast = useIdvRequestErrorToast();
-  const [country, setCountry] = useState<CountryRecord>(
-    getCountryFromCode(defaultCountry) ?? defaultSupportedCountry,
-  );
+  const [country, setCountry] = useState<CountryRecord>(getCountryFromCode(defaultCountry) ?? defaultSupportedCountry);
 
-  const types: SupportedIdDocTypes[] =
-    supportedCountryAndDocTypes[country.value] ?? [];
-  const firstTypeFromOptions = types.length
-    ? types[0]
-    : SupportedIdDocTypes.passport;
-  const [docType, setDocType] = useState<SupportedIdDocTypes>(
-    defaultType ?? firstTypeFromOptions,
-  );
+  const types: SupportedIdDocTypes[] = supportedCountryAndDocTypes[country.value] ?? [];
+  const firstTypeFromOptions = types.length ? types[0] : SupportedIdDocTypes.passport;
+  const [docType, setDocType] = useState<SupportedIdDocTypes>(defaultType ?? firstTypeFromOptions);
 
   const handleCountryChange = (option: CountrySelectOption) => {
     const nextCountry = getCountryFromCode(option.value);
     // Update both selected country and type
     if (nextCountry) {
       setCountry(nextCountry);
-      const typesForNextCountry =
-        supportedCountryAndDocTypes[nextCountry.value as CountryCode] ?? [];
-      const nextType = typesForNextCountry.length
-        ? typesForNextCountry[0]
-        : SupportedIdDocTypes.passport;
+      const typesForNextCountry = supportedCountryAndDocTypes[nextCountry.value as CountryCode] ?? [];
+      const nextType = typesForNextCountry.length ? typesForNextCountry[0] : SupportedIdDocTypes.passport;
       setDocType(nextType);
     }
   };
@@ -123,8 +89,7 @@ const IdDocCountryAndTypeContainer = ({
   };
 
   const handleSubmit = async () => {
-    const selectedCountry =
-      getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value;
+    const selectedCountry = getCountryFromCode(country.value)?.value ?? DEFAULT_COUNTRY.value;
     const hasWebcam = await detectWebcam();
     if (submitDocTypeMutation.isLoading) {
       return;
@@ -177,13 +142,7 @@ const IdDocCountryAndTypeContainer = ({
 
   return (
     <Container data-mobile={device.type === 'mobile'}>
-      <NavigationHeader
-        leftButton={
-          device.type !== 'mobile'
-            ? { variant: 'close', confirmClose: true }
-            : undefined
-        }
-      />
+      <NavigationHeader leftButton={device.type !== 'mobile' ? { variant: 'close', confirmClose: true } : undefined} />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <InputsContainer>
         <CountrySelect
@@ -214,21 +173,12 @@ const IdDocCountryAndTypeContainer = ({
             size="compact"
           />
         ) : (
-          <Text
-            variant="body-4"
-            textAlign="center"
-            marginLeft={5}
-            marginRight={5}
-          >
+          <Text variant="body-4" textAlign="center" marginLeft={5} marginRight={5}>
             {t('form.not-supported')}
           </Text>
         )}
       </InputsContainer>
-      <ConsentMobile
-        open={consentVisible}
-        onClose={handleConsentClose}
-        onConsent={handleConsent}
-      />
+      <ConsentMobile open={consentVisible} onClose={handleConsentClose} onConsent={handleConsent} />
       {options.length > 0 && (
         <StickyBottomBox>
           <Button

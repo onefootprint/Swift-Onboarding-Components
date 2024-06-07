@@ -1,19 +1,12 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import type {
-  UpdateRoleRequest,
-  UpdateRoleResponse,
-} from '@onefootprint/types';
+import type { UpdateRoleRequest, UpdateRoleResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updateRoleRequest = async (
-  authHeaders: AuthHeaders,
-  id: string,
-  payload: UpdateRoleRequest,
-) => {
+const updateRoleRequest = async (authHeaders: AuthHeaders, id: string, payload: UpdateRoleRequest) => {
   const { data } = await request<UpdateRoleResponse>({
     method: 'patch',
     url: `/org/roles/${id}`,
@@ -33,8 +26,7 @@ const useEditRole = (id: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: UpdateRoleRequest) =>
-      updateRoleRequest(session.authHeaders, id, payload),
+    mutationFn: (payload: UpdateRoleRequest) => updateRoleRequest(session.authHeaders, id, payload),
     onError: (error: unknown) => {
       toast.show({
         title: t('error.title'),

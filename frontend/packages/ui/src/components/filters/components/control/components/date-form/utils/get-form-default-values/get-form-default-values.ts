@@ -9,16 +9,9 @@ type Response = {
   };
 };
 
-const getFormDefaultValue = (
-  selectedOptions: FilterSelectedOption[],
-  now = new Date(),
-): Response => {
+const getFormDefaultValue = (selectedOptions: FilterSelectedOption[], now = new Date()): Response => {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const nextWeek = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + 7,
-  );
+  const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
   const defaultCustomDate = {
     from: today,
     to: nextWeek,

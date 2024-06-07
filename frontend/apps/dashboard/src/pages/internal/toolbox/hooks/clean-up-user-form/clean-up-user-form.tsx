@@ -60,9 +60,7 @@ const useCleanUpUserForm = ({ formId, onClose }: ToolFormProps) => {
   const component = (
     <FormProvider {...methods}>
       <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-        <Text variant="label-3">
-          {`Enter the identifier for the user you'd like to delete`}
-        </Text>
+        <Text variant="label-3">{`Enter the identifier for the user you'd like to delete`}</Text>
         <TextInput
           label="Identifier"
           placeholder="+15555550100"
@@ -78,10 +76,7 @@ const useCleanUpUserForm = ({ formId, onClose }: ToolFormProps) => {
               isPrivate
               label="Identifier kind"
               onBlur={field.onBlur}
-              options={[
-                makeOption(IdentifierType.phoneNumber),
-                makeOption(IdentifierType.email),
-              ]}
+              options={[makeOption(IdentifierType.phoneNumber), makeOption(IdentifierType.email)]}
               onChange={field.onChange}
               hint={error && 'Invalid'}
               hasError={!!error}

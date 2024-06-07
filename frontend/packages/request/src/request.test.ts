@@ -1,10 +1,7 @@
 import { renderHook } from '@testing-library/react';
 
 import type { RequestError } from './request';
-import {
-  getErrorMessage as getErrorMessageStandAlone,
-  useRequestError,
-} from './request';
+import { getErrorMessage as getErrorMessageStandAlone, useRequestError } from './request';
 
 describe('@onefootprint/request', () => {
   describe('getErrorMessage', () => {
@@ -19,17 +16,14 @@ describe('@onefootprint/request', () => {
         },
       };
 
-      expect(getErrorMessageStandAlone(error as RequestError)).toBe(
-        'error message',
-      );
+      expect(getErrorMessageStandAlone(error as RequestError)).toBe('error message');
     });
 
     it('should return the error message 2/3', () => {
       const error = {
         code: null,
         message: {
-          error:
-            'Message delivery failed. Please try resending the message or use a different phone number.',
+          error: 'Message delivery failed. Please try resending the message or use a different phone number.',
         },
         context: null,
         status_code: 400,
@@ -49,8 +43,7 @@ describe('@onefootprint/request', () => {
             error: {
               error: {
                 error: {
-                  error:
-                    'Message delivery failed. Please try resending the message or use a different phone number.',
+                  error: 'Message delivery failed. Please try resending the message or use a different phone number.',
                 },
               },
             },
@@ -71,9 +64,7 @@ describe('@onefootprint/request', () => {
         new Error('test'),
       )}`;
 
-      expect(str).toBe(
-        'Fetching onboarding config in bifrost init failed with error: test',
-      );
+      expect(str).toBe('Fetching onboarding config in bifrost init failed with error: test');
       expect(getErrorMessageStandAlone(str)).toBe(str);
     });
   });
@@ -94,9 +85,7 @@ describe('@onefootprint/request', () => {
       const { result } = renderHook(() => useRequestError());
       const { getErrorMessage, getErrorCode } = result.current;
       expect(getErrorCode(error)).toEqual('E101');
-      expect(getErrorMessage(error)).toEqual(
-        'Cannot transition status backwards',
-      );
+      expect(getErrorMessage(error)).toEqual('Cannot transition status backwards');
     });
 
     it('should handle unknown types correctly', () => {
@@ -108,9 +97,7 @@ describe('@onefootprint/request', () => {
       expect(getErrorCode({})).toEqual(undefined);
       expect(getErrorMessage({})).toEqual('Something went wrong');
 
-      expect(
-        getErrorCode({ response: { data: { error: { code: 'A100' } } } }),
-      ).toEqual('A100');
+      expect(getErrorCode({ response: { data: { error: { code: 'A100' } } } })).toEqual('A100');
       expect(
         getErrorMessage({
           response: { data: { error: { code: 'blah' } } },

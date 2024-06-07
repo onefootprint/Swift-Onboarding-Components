@@ -73,30 +73,14 @@ type IdAnimationProps = {
 };
 
 const IdAnimation = ({ src, firstText, secondText }: IdAnimationProps) => (
-  <AnimationWrapper
-    animate="finish"
-    initial="initial"
-    variants={containerAnimationVariants}
-  >
-    <CanvasWrapper
-      animate="finish"
-      variants={canvasAnimationVariants}
-      initial="initial"
-    >
+  <AnimationWrapper animate="finish" initial="initial" variants={containerAnimationVariants}>
+    <CanvasWrapper animate="finish" variants={canvasAnimationVariants} initial="initial">
       <RiveComponent src={src} />
     </CanvasWrapper>
-    <motion.div
-      animate="finish"
-      variants={textAnimationVariants}
-      initial="initial"
-    >
+    <motion.div animate="finish" variants={textAnimationVariants} initial="initial">
       <Text variant="label-2">{firstText}</Text>
     </motion.div>
-    <motion.div
-      animate="finish"
-      variants={secondTextAnimationVariants}
-      initial="initial"
-    >
+    <motion.div animate="finish" variants={secondTextAnimationVariants} initial="initial">
       <Text variant="label-2">{secondText}</Text>
     </motion.div>
   </AnimationWrapper>

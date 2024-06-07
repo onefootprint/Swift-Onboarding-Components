@@ -1,28 +1,19 @@
 import type { Assigner } from 'xstate';
 
 import { isObject, isString } from '../../../../../utils';
-import type {
-  AuthMethodsMachineContext as MachineContext,
-  AuthMethodsMachineEvents as Events,
-} from './types';
+import type { AuthMethodsMachineEvents as Events, AuthMethodsMachineContext as MachineContext } from './types';
 
 type Obj = Record<string, unknown>;
 type MCtx<T extends Events> = Assigner<MachineContext, T>;
-type MEvent<T, U> = T extends { type: U; payload: infer P }
-  ? { type: U; payload: P }
-  : never;
+type MEvent<T, U> = T extends { type: U; payload: infer P } ? { type: U; payload: P } : never;
 
 type DecryptUserDone = MCtx<MEvent<Events, 'decryptUserDone'>>;
 type SetVerifyToken = MCtx<MEvent<Events, 'setVerifyToken'>>;
 type UpdateUserDashboard = MCtx<MEvent<Events, 'updateUserDashboard'>>;
-type UpdateMethodActionKind = MCtx<
-  MEvent<Events, 'updateEmail' | 'updatePhone' | 'updatePasskey'>
->;
+type UpdateMethodActionKind = MCtx<MEvent<Events, 'updateEmail' | 'updatePhone' | 'updatePasskey'>>;
 
 const getIdValue = (key: string, obj: Obj): string | undefined =>
-  isObject(obj) &&
-  Object.prototype.hasOwnProperty.call(obj, key) &&
-  isString(obj[key])
+  isObject(obj) && Object.prototype.hasOwnProperty.call(obj, key) && isString(obj[key])
     ? (obj[key] as string)
     : undefined;
 
@@ -50,12 +41,8 @@ const assignDecryptedData: DecryptUserDone = (ctx, { payload }) => {
 
   ctx.userDashboard = {
     ...ctx.userDashboard,
-    email: labelEmail
-      ? { status: 'set', label: labelEmail }
-      : ctx.userDashboard.email,
-    phone: labelPhone
-      ? { status: 'set', label: labelPhone }
-      : ctx.userDashboard.phone,
+    email: labelEmail ? { status: 'set', label: labelEmail } : ctx.userDashboard.email,
+    phone: labelPhone ? { status: 'set', label: labelPhone } : ctx.userDashboard.phone,
   };
 
   return ctx;
@@ -66,9 +53,4 @@ const assignUpdateMethod: UpdateMethodActionKind = (ctx, { payload }) => {
   return ctx;
 };
 
-export {
-  assignDecryptedData,
-  assignUpdateMethod,
-  assignUserDashboard,
-  assignVerifyToken,
-};
+export { assignDecryptedData, assignUpdateMethod, assignUserDashboard, assignVerifyToken };

@@ -20,12 +20,7 @@ const Breadcrumb = ({ items, activeRoute }: ItemsProps) => (
       const isActive = item.href === activeRoute;
       return (
         <>
-          <Link
-            key={item.href}
-            href={item.href}
-            data-is-last={isLast}
-            data-is-active={isActive}
-          >
+          <Link key={item.href} href={item.href} data-is-last={isLast} data-is-active={isActive}>
             <Text variant="label-3" color={isActive ? 'primary' : 'quaternary'}>
               {item.label}
             </Text>

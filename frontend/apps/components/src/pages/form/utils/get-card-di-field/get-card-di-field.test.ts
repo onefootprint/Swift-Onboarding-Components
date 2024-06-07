@@ -12,12 +12,8 @@ describe('getCardDIField', () => {
 
     expect(getCardDIField('card.345t43543.expiration')).toEqual('expiration');
 
-    expect(getCardDIField('card.345t43543.billing_address.country')).toEqual(
-      'billing_address.country',
-    );
+    expect(getCardDIField('card.345t43543.billing_address.country')).toEqual('billing_address.country');
 
-    expect(getCardDIField('card.345t43543.billing_address.zip')).toEqual(
-      'billing_address.zip',
-    );
+    expect(getCardDIField('card.345t43543.billing_address.zip')).toEqual('billing_address.zip');
   });
 });

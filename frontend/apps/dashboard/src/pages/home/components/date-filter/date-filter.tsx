@@ -1,11 +1,5 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import {
-  Box,
-  DateSelectorSheet,
-  SelectNew,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Box, DateSelectorSheet, SelectNew, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -60,12 +54,7 @@ const DateFilter = () => {
 
   return (
     <Stack direction="row" align="center" justify="center">
-      <StyledSelectNew
-        onChange={handleSelectChange}
-        options={options}
-        size="compact"
-        value={values.period}
-      />
+      <StyledSelectNew onChange={handleSelectChange} options={options} size="compact" value={values.period} />
       <Line />
       <DateSelectorSheet
         startDate={values.start}
@@ -88,11 +77,7 @@ const DateFilter = () => {
           >
             {getFormattedRange(values.start, values.end)}
           </Text>
-          <IconContainer
-            align="center"
-            data-is-open={isDateSheetOpen}
-            justify="center"
-          >
+          <IconContainer align="center" data-is-open={isDateSheetOpen} justify="center">
             <IcoChevronDown16 />
           </IconContainer>
         </Range>

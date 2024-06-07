@@ -6,10 +6,7 @@ import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-const edit = async (
-  { entityId, fields }: EditRequest,
-  authHeaders: AuthHeaders,
-) => {
+const edit = async ({ entityId, fields }: EditRequest, authHeaders: AuthHeaders) => {
   const response = await requestWithoutCaseConverter<EditResponse>({
     method: 'PATCH',
     url: `/entities/${entityId}/vault`,
@@ -28,12 +25,7 @@ const useEdit = () => {
 
   return useMutation((data: EditRequest) => edit(data, authHeaders), {
     onSuccess: () => {
-      queryClient.invalidateQueries([
-        'entity',
-        entityId,
-        'timeline',
-        authHeaders,
-      ]);
+      queryClient.invalidateQueries(['entity', entityId, 'timeline', authHeaders]);
     },
   });
 };

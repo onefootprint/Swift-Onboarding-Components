@@ -19,13 +19,7 @@ type ManualNoteEntryFormProps = {
   frequentNoteKind: OrgFrequentNoteKind;
 };
 
-const ManualNoteEntryForm = ({
-  formId,
-  prompt,
-  placeholder,
-  onSubmit,
-  frequentNoteKind,
-}: ManualNoteEntryFormProps) => {
+const ManualNoteEntryForm = ({ formId, prompt, placeholder, onSubmit, frequentNoteKind }: ManualNoteEntryFormProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.manual-note-entry-form',
   });

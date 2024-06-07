@@ -10,12 +10,7 @@ type FeatureCardProps = {
   gridArea?: string;
 };
 
-const FeatureCard = ({
-  icon: Icon,
-  title,
-  subtitle,
-  gridArea,
-}: FeatureCardProps) => {
+const FeatureCard = ({ icon: Icon, title, subtitle, gridArea }: FeatureCardProps) => {
   const renderedIcon = Icon && <Icon />;
 
   return (

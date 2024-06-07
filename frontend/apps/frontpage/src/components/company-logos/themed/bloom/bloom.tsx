@@ -6,13 +6,7 @@ type BloomLogoProps = {
 };
 
 const BloomLogo = ({ color }: BloomLogoProps) => (
-  <StyledSvg
-    width="361"
-    height="102"
-    viewBox="0 0 361 102"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <StyledSvg width="361" height="102" viewBox="0 0 361 102" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       fillRule="evenodd"
       clipRule="evenodd"

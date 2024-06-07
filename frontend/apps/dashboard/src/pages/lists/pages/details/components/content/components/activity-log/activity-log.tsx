@@ -2,7 +2,7 @@ import { Stack } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Error from 'src/components/error';
+import ErrorComponent from 'src/components/error';
 
 import useListDetails from '../../../../hooks/use-list-details';
 import SectionTitle from '../section-title';
@@ -16,16 +16,8 @@ const ActivityLog = () => {
   });
   const router = useRouter();
   const id = router.query.id as string;
-  const {
-    isLoading: detailsLoading,
-    error: detailsError,
-    data: details,
-  } = useListDetails(id);
-  const {
-    isLoading: timelineLoading,
-    error: timelineError,
-    data: timeline,
-  } = useListTimeline(id);
+  const { isLoading: detailsLoading, error: detailsError, data: details } = useListDetails(id);
+  const { isLoading: timelineLoading, error: timelineError, data: timeline } = useListTimeline(id);
   const isLoading = timelineLoading || detailsLoading;
   const error = timelineError || detailsError;
 
@@ -34,7 +26,7 @@ const ActivityLog = () => {
   ) : (
     <Stack gap={4} direction="column">
       <SectionTitle title={t('title', { alias: details?.alias })} />
-      {error ? <Error error={error} /> : null}
+      {error ? <ErrorComponent error={error} /> : null}
       {timeline && <Content timeline={timeline?.data} />}
     </Stack>
   );

@@ -75,13 +75,7 @@ const Copy = forwardRef<CopyHandler, CopyProps>(({ playbook }, ref) => {
       size="compact"
       title={t('title')}
     >
-      {tenantsQuery.data && (
-        <Form
-          onSubmit={handleSubmit}
-          playbook={playbook}
-          tenants={tenantsQuery.data}
-        />
-      )}
+      {tenantsQuery.data && <Form onSubmit={handleSubmit} playbook={playbook} tenants={tenantsQuery.data} />}
     </Dialog>
   );
 });

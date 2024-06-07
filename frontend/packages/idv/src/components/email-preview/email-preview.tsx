@@ -9,11 +9,7 @@ export type EmailPreviewProps = {
   textCta?: string;
 };
 
-const EmailPreview = ({
-  email,
-  onChange,
-  textCta,
-}: EmailPreviewProps): JSX.Element | null =>
+const EmailPreview = ({ email, onChange, textCta }: EmailPreviewProps): JSX.Element | null =>
   email ? (
     <EmailCard>
       <EmailCardContent>

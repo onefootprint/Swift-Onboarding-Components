@@ -1,7 +1,4 @@
-import {
-  IdDocImageProcessingError,
-  IdDocImageTypes,
-} from '@onefootprint/types';
+import { IdDocImageProcessingError, IdDocImageTypes } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import { Logger } from '../../../../../utils/logger';
@@ -28,23 +25,17 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               {
                 target: 'mobileFrontPhotoFallback',
                 cond: context =>
-                  context.device.type === 'mobile' &&
-                  !context.shouldCollectConsent &&
-                  !!context.forceUpload,
+                  context.device.type === 'mobile' && !context.shouldCollectConsent && !!context.forceUpload,
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
               {
                 target: 'frontImageCaptureMobile',
-                cond: context =>
-                  context.device.type === 'mobile' &&
-                  !context.shouldCollectConsent,
+                cond: context => context.device.type === 'mobile' && !context.shouldCollectConsent,
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
               {
                 target: 'frontImageDesktop',
-                cond: context =>
-                  context.device.type !== 'mobile' &&
-                  !context.shouldCollectConsent,
+                cond: context => context.device.type !== 'mobile' && !context.shouldCollectConsent,
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
               {
@@ -377,11 +368,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           return context;
         }),
         assignHasBadConnectivity: assign((context, event) => {
-          if (
-            event.payload.errors.find(
-              e => e.errorType === IdDocImageProcessingError.networkError,
-            )
-          ) {
+          if (event.payload.errors.find(e => e.errorType === IdDocImageProcessingError.networkError)) {
             context.hasBadConnectivity = true;
           }
           return context;

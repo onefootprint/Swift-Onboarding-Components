@@ -59,9 +59,7 @@ const Filters = () => {
           ]}
           onChange={newValue => {
             const newVerification =
-              newValue === EntityStatusFilter.incomplete
-                ? undefined
-                : filters.values.verification;
+              newValue === EntityStatusFilter.incomplete ? undefined : filters.values.verification;
 
             filters.push({
               state: newValue,

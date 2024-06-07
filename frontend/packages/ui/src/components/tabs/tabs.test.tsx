@@ -20,8 +20,7 @@ const options = [
 ];
 
 describe('<Tabs />', () => {
-  const renderTab = (onChange: TabsProps['onChange']) =>
-    customRender(<Tabs options={options} onChange={onChange} />);
+  const renderTab = (onChange: TabsProps['onChange']) => customRender(<Tabs options={options} onChange={onChange} />);
 
   it('should render the tab items', () => {
     renderTab(value => console.log(value));

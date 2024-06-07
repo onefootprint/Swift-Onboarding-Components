@@ -1,9 +1,4 @@
-import type {
-  IdDocOutcome,
-  OnboardingRequirement,
-  OverallOutcome,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { IdDocOutcome, OnboardingRequirement, OverallOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { UserData } from '../../../../../../types';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';

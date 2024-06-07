@@ -1,7 +1,4 @@
-import {
-  type WorkflowStartedEventData,
-  WorkflowStartedEventKind,
-} from '@onefootprint/types/src/data/timeline';
+import { type WorkflowStartedEventData, WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline';
 import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,9 +9,7 @@ type WorkflowStartedEventHeaderProps = {
   data: WorkflowStartedEventData;
 };
 
-const WorkflowStartedEventHeader = ({
-  data,
-}: WorkflowStartedEventHeaderProps) => {
+const WorkflowStartedEventHeader = ({ data }: WorkflowStartedEventHeaderProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.workflow-started-event',
   });

@@ -1,9 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type {
-  Organization,
-  Role,
-  UserUpdateResponse,
-} from '@onefootprint/types';
+import type { Organization, Role, UserUpdateResponse } from '@onefootprint/types';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 
 export const userFixture: UserUpdateResponse = {

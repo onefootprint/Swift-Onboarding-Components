@@ -26,8 +26,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
           always: [
             {
               target: 'introduction',
-              cond: context =>
-                hasMissingAttributes(context.kybRequirement.missingAttributes),
+              cond: context => hasMissingAttributes(context.kybRequirement.missingAttributes),
             },
             {
               target: 'completed',
@@ -39,24 +38,15 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             introductionCompleted: [
               {
                 target: 'basicData',
-                cond: context =>
-                  isMissingBasicDataAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBasicDataAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'businessAddress',
-                cond: context =>
-                  isMissingBusinessAddressAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBusinessAddressAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'beneficialOwners',
-                cond: context =>
-                  isMissingBeneficialOwnerAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBeneficialOwnerAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'confirm',
@@ -70,18 +60,12 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
               {
                 target: 'businessAddress',
                 actions: 'assignData',
-                cond: context =>
-                  isMissingBusinessAddressAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBusinessAddressAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'beneficialOwners',
                 actions: 'assignData',
-                cond: context =>
-                  isMissingBeneficialOwnerAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBeneficialOwnerAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'confirm',
@@ -99,10 +83,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
               {
                 target: 'beneficialOwners',
                 actions: 'assignData',
-                cond: context =>
-                  isMissingBeneficialOwnerAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBeneficialOwnerAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'confirm',
@@ -112,10 +93,7 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             navigatedToPrevPage: [
               {
                 target: 'basicData',
-                cond: context =>
-                  isMissingBasicDataAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBasicDataAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'introduction',
@@ -134,17 +112,11 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             navigatedToPrevPage: [
               {
                 target: 'businessAddress',
-                cond: context =>
-                  isMissingBusinessAddressAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBusinessAddressAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'basicData',
-                cond: context =>
-                  isMissingBasicDataAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBasicDataAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'introduction',
@@ -175,24 +147,15 @@ const createCollectKybDataMachine = (initialContext: MachineContext) =>
             navigatedToPrevPage: [
               {
                 target: 'beneficialOwners',
-                cond: context =>
-                  isMissingBeneficialOwnerAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBeneficialOwnerAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'businessAddress',
-                cond: context =>
-                  isMissingBusinessAddressAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBusinessAddressAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'basicData',
-                cond: context =>
-                  isMissingBasicDataAttribute(
-                    context.kybRequirement.missingAttributes,
-                  ),
+                cond: context => isMissingBasicDataAttribute(context.kybRequirement.missingAttributes),
               },
               {
                 target: 'introduction',

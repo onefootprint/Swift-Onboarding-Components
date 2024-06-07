@@ -11,12 +11,7 @@ type GetSourceDImensionsProps = {
 
 const ERROR_MARGIN = -10; // to avoid rouding error
 
-const getScalingFactor = (
-  mediaWidth: number,
-  mediaHeight: number,
-  clientWidth: number,
-  clientHeight: number,
-) => {
+const getScalingFactor = (mediaWidth: number, mediaHeight: number, clientWidth: number, clientHeight: number) => {
   // First we find two possible scaling factors
   const k1 = clientWidth / mediaWidth;
   const k2 = clientHeight / mediaHeight;
@@ -50,20 +45,12 @@ const getSourceDimensions = ({
     return initialDimensions;
   }
 
-  const { clientWidth, clientHeight, videoWidth, videoHeight } =
-    videoRef.current;
+  const { clientWidth, clientHeight, videoWidth, videoHeight } = videoRef.current;
 
-  const { width: mediaWidth, height: mediaHeight } = mediaStream
-    .getVideoTracks()[0]
-    .getSettings();
+  const { width: mediaWidth, height: mediaHeight } = mediaStream.getVideoTracks()[0].getSettings();
   if (!mediaWidth || !mediaHeight) return initialDimensions;
 
-  const scalingFactor = getScalingFactor(
-    mediaWidth,
-    mediaHeight,
-    clientWidth,
-    clientHeight,
-  );
+  const scalingFactor = getScalingFactor(mediaWidth, mediaHeight, clientWidth, clientHeight);
 
   // If the aspect ratio of the medaistream isn't same as aspect ratio of the container
   // the CSS rule "object-fit: cover" automatically clips the image to fit the container
@@ -79,14 +66,8 @@ const getSourceDimensions = ({
   // We use the mid-point of the original video, go half the desired image height (scaled) to left
   // and go half the desired image height (scaled) to upward direction
   // and we get our sx, sy
-  let sx = Math.ceil(
-    ((scaledWidth - desiredImageWidth) / 2 + centerOffsetX) *
-      (videoWidth / scaledWidth),
-  );
-  let sy = Math.ceil(
-    ((scaledHeight - desiredImageHeight) / 2 + centerOffsetY) *
-      (videoHeight / scaledHeight),
-  );
+  let sx = Math.ceil(((scaledWidth - desiredImageWidth) / 2 + centerOffsetX) * (videoWidth / scaledWidth));
+  let sy = Math.ceil(((scaledHeight - desiredImageHeight) / 2 + centerOffsetY) * (videoHeight / scaledHeight));
 
   // Just in case any fractional calculation yielded small negative numbers
   if (sx < ERROR_MARGIN) sx = 0;

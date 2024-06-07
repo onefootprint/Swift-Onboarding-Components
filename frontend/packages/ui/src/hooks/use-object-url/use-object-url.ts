@@ -6,15 +6,13 @@ import { useEffect, useState } from 'react';
 import detectMimeType from '../../utils/detect-mime-type';
 
 const useObjectUrl = (initialBase64Data: string | null) => {
-  const [base64Data, setBase64Data] = useState<string | null>(
-    initialBase64Data,
-  );
+  const [base64Data, setBase64Data] = useState<string | null>(initialBase64Data);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState<string | null>(null);
 
   useEffect((): (() => void) => {
     if (!base64Data) {
-      return () => {};
+      return () => undefined;
     }
 
     const buff = Buffer.from(base64Data, 'base64');

@@ -1,8 +1,5 @@
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
-import {
-  CollectedKycDataOption,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, SupportedIdDocTypes } from '@onefootprint/types';
 import { Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,20 +11,14 @@ export type DisplayValueProps = {
   optionalData?: string[];
 };
 
-const DisplayValue = ({
-  field,
-  mustCollectData,
-  optionalData = [],
-}: DisplayValueProps) => {
+const DisplayValue = ({ field, mustCollectData, optionalData = [] }: DisplayValueProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.data-collection',
   });
 
   if (field === 'document') {
     const documentString = mustCollectData.find(a => a.match('document'));
-    const idDocKinds = Object.values(SupportedIdDocTypes).filter(k =>
-      documentString?.includes(k),
-    );
+    const idDocKinds = Object.values(SupportedIdDocTypes).filter(k => documentString?.includes(k));
     if (idDocKinds.length > 0) {
       return <IdDocDisplay idDocKind={idDocKinds} threshold={2} />;
     }

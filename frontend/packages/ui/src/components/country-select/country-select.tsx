@@ -7,20 +7,14 @@ import styled, { css } from 'styled-components';
 
 import { getCountryCodeFromLocale } from '../../utils';
 import Flag from '../flag';
-import type {
-  BaseSelectOption,
-  BaseSelectProps,
-} from '../internal/base-select';
+import type { BaseSelectOption, BaseSelectProps } from '../internal/base-select';
 import BaseSelect from '../internal/base-select';
 import BaseSelectTrigger from '../internal/base-select-trigger';
 import MobileOption from './components/mobile-option';
 import Option from './components/option';
 import type { CountrySelectOption } from './country-select.types';
 
-export type CountrySelectProps = Omit<
-  BaseSelectProps<CountrySelectOption>,
-  'options' | 'renderTrigger'
-> & {
+export type CountrySelectProps = Omit<BaseSelectProps<CountrySelectOption>, 'options' | 'renderTrigger'> & {
   locale?: SupportedLocale;
   options?: CountrySelectOption[];
   placeholder?: string;
@@ -54,12 +48,8 @@ const CountrySelect = ({
 
   const localizedOptions = getCountriesWithLocalizedLabels();
 
-  const currentValue =
-    !value && locale
-      ? localizedOptions.find(o => o.value === localeCountry)
-      : value;
-  const placeholderText =
-    placeholder ?? t('components.country-select.placeholder-default');
+  const currentValue = !value && locale ? localizedOptions.find(o => o.value === localeCountry) : value;
+  const placeholderText = placeholder ?? t('components.country-select.placeholder-default');
 
   const getLocalizedOption = (countryCode?: CountryCode) =>
     countryCode ? localizedOptions.find(o => o.value === countryCode) : null;
@@ -78,12 +68,7 @@ const CountrySelect = ({
       OptionComponent={Option}
       MobileOptionComponent={MobileOption}
       options={localizedOptions}
-      renderTrigger={({
-        isOpen,
-        onClick,
-        selectedOption,
-        testID: triggerTestID,
-      }) => {
+      renderTrigger={({ isOpen, onClick, selectedOption, testID: triggerTestID }) => {
         const localizedOption = getLocalizedOption(selectedOption?.value);
 
         return (
@@ -97,12 +82,8 @@ const CountrySelect = ({
             testID={triggerTestID}
             hasIcon
           >
-            {localizedOption?.value && (
-              <StyledFlag code={localizedOption.value} disabled={disabled} />
-            )}
-            <LabelContainer>
-              {localizedOption?.label ?? placeholderText}
-            </LabelContainer>
+            {localizedOption?.value && <StyledFlag code={localizedOption.value} disabled={disabled} />}
+            <LabelContainer>{localizedOption?.label ?? placeholderText}</LabelContainer>
           </BaseSelectTrigger>
         );
       }}
@@ -124,10 +105,12 @@ const StyledFlag = styled(Flag)<{ disabled?: boolean }>`
     margin-right: ${theme.spacing[4]};
     min-width: 20px;
 
-    ${disabled &&
-    css`
+    ${
+      disabled &&
+      css`
       opacity: 0.4;
-    `};
+    `
+    };
   `}
 `;
 

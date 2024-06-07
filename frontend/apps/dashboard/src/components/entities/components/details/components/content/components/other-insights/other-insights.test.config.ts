@@ -7,8 +7,7 @@ const listResponseFixture: UserInsights[] = [
     name: 'Fraud Ring Indicator',
     value: 'false',
     scope: 'behavior',
-    description:
-      'This session has behavior associated to fraud ring activities',
+    description: 'This session has behavior associated to fraud ring activities',
     unit: UserInsightsUnit.Boolean,
   },
   {

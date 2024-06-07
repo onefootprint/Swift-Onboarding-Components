@@ -1,9 +1,4 @@
-import type {
-  CreateRoleRequest,
-  RoleKind,
-  RoleScope,
-  UpdateRoleRequest,
-} from '@onefootprint/types';
+import type { CreateRoleRequest, RoleKind, RoleScope, UpdateRoleRequest } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
@@ -45,21 +40,13 @@ const Form = ({
 
   const handleAfterSubmit = (formData: FormData) => {
     const { name, scopeKinds, decryptOptions, vaultProxyConfigs } = formData;
-    const decryptScopes = decryptOptions.map(
-      ({ value }) => DecryptOptionToRoleScope[value],
-    );
-    const vaultProxyScopes: RoleScope[] = vaultProxyConfigs.map(({ value }) =>
-      scopeFromVaultProxyOption(value),
-    );
+    const decryptScopes = decryptOptions.map(({ value }) => DecryptOptionToRoleScope[value]);
+    const vaultProxyScopes: RoleScope[] = vaultProxyConfigs.map(({ value }) => scopeFromVaultProxyOption(value));
     if (!scopeKinds.includes(RoleScopeKind.read)) {
       scopeKinds.push(RoleScopeKind.read);
     }
     const scopes = scopeKinds.map(s => ({ kind: s }));
-    const allScopes: RoleScope[] = [
-      ...scopes,
-      ...decryptScopes,
-      ...vaultProxyScopes,
-    ];
+    const allScopes: RoleScope[] = [...scopes, ...decryptScopes, ...vaultProxyScopes];
     onSubmit({
       name,
       scopes: allScopes,

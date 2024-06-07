@@ -5,8 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { t } from 'i18next';
 
 const submitDoc = async (payload: SubmitDocRequest) => {
-  const { authToken, image, side, id, meta, extraCompress, forceUpload } =
-    payload;
+  const { authToken, image, side, id, meta, extraCompress, forceUpload } = payload;
   const formData = new FormData();
   formData.set('upload', image);
   const response = await request<SubmitDocResponse>({

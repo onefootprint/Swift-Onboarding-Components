@@ -1,9 +1,5 @@
 import type { RoleScope } from '@onefootprint/types';
-import {
-  CollectedInvestorProfileDataOption,
-  CollectedKycDataOption,
-  RoleScopeKind,
-} from '@onefootprint/types';
+import { CollectedInvestorProfileDataOption, CollectedKycDataOption, RoleScopeKind } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
 // These aren't sent to the API - just used to represent all the options of decryptable things in
@@ -25,12 +21,8 @@ export enum DecryptOption {
 }
 
 /// Reverse lookup of DecryptOptionToRoleScope
-export const decryptOptionFromScope = (
-  scope: RoleScope,
-): DecryptOption | undefined => {
-  const result = Object.entries(DecryptOptionToRoleScope).find(opt =>
-    scopeEqual(opt[1], scope),
-  );
+export const decryptOptionFromScope = (scope: RoleScope): DecryptOption | undefined => {
+  const result = Object.entries(DecryptOptionToRoleScope).find(opt => scopeEqual(opt[1], scope));
   return result?.[0] as DecryptOption;
 };
 
@@ -40,11 +32,7 @@ const scopeEqual = (a: RoleScope, b: RoleScope) => {
     return true;
   }
   // For decrypt scopes, check that the data matches
-  if (
-    a.kind === RoleScopeKind.decrypt &&
-    b.kind === RoleScopeKind.decrypt &&
-    a.data === b.data
-  ) {
+  if (a.kind === RoleScopeKind.decrypt && b.kind === RoleScopeKind.decrypt && a.data === b.data) {
     return true;
   }
   return false;

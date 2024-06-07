@@ -168,8 +168,7 @@ export const appendInlineContainer = (uId: string, containerId?: string) => {
   if (!containerId) throw new Error('No element id provided');
 
   const clientParent = document.getElementById(containerId);
-  if (!clientParent)
-    throw new Error(`Could not find element with id ${containerId}`);
+  if (!clientParent) throw new Error(`Could not find element with id ${containerId}`);
 
   const id = `footprint-inline-container-${uId}`;
   const inlineContainer = document.createElement('div');

@@ -27,15 +27,9 @@ const EmptyConfig = {} as PublicOnboardingConfig;
 const { canceled, closed, completed } = FootprintPublicEvent;
 
 const { logError, logTrack } = getLogger({ location: 'auth-methods-app' });
-const initAuthToken = (): string =>
-  !isEmbeddedInIframe()
-    ? getSdkArgsToken(getWindowUrl().split('#')[1]) ?? ''
-    : '';
+const initAuthToken = (): string => (!isEmbeddedInIframe() ? getSdkArgsToken(getWindowUrl().split('#')[1]) ?? '' : '');
 
-const UserMethodsApp = ({
-  variant,
-  Loading,
-}: AuthContainerProps): JSX.Element | null => {
+const UserMethodsApp = ({ variant, Loading }: AuthContainerProps): JSX.Element | null => {
   const isFpProvidedDone = useRef(false);
   const fpProvider = useFootprintProvider();
   const router = useRouter();
@@ -118,26 +112,9 @@ const UserMethodsApp = ({
   if (searchParams.has('done')) return null;
 
   return (
-    <Layout
-      config={EmptyConfig}
-      onClose={handleOnCloseClick}
-      variant={variant || undefined}
-    >
-      {notification ? (
-        <Notification
-          title={notification.title}
-          subtitle={notification.subtitle}
-        />
-      ) : null}
-      {authToken ? (
-        <AuthMethods
-          authToken={authToken}
-          Loading={Loading}
-          onDone={handleOnDoneClick}
-        />
-      ) : (
-        Loading
-      )}
+    <Layout config={EmptyConfig} onClose={handleOnCloseClick} variant={variant || undefined}>
+      {notification ? <Notification title={notification.title} subtitle={notification.subtitle} /> : null}
+      {authToken ? <AuthMethods authToken={authToken} Loading={Loading} onDone={handleOnDoneClick} /> : Loading}
     </Layout>
   );
 };

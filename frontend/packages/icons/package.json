@@ -8,15 +8,13 @@
   "sideEffects": false,
   "license": "MIT",
   "scripts": {
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
-    "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
-    "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
-    "typecheck": "yarn tsc --noEmit",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "generate:icos": "node ./src/scripts/icos/generate.js",
     "generate": "yarn generate:icos",
-    "postgenerate": "yarn lint:fix && yarn format:fix",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "lint:ci": "biome ci src",
+    "lint": "biome check --fix src",
+    "postgenerate": "yarn lint",
+    "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
     "@onefootprint/design-tokens": "*",
@@ -27,7 +25,6 @@
     "@svgr/plugin-svgo": "^6.2.0",
     "@types/glob": "^7.2.0",
     "@types/react-dom": "^18",
-    "eslint-config-footprint": "*",
     "glob": "^8.0.3",
     "lodash": "^4.17.21",
     "react": "^18",

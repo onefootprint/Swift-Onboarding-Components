@@ -55,9 +55,7 @@ const DesktopBackPhoto = () => {
 
   return (
     <>
-      <NavigationHeader
-        leftButton={{ variant: 'back', onBack: handleClickBack }}
-      />
+      <NavigationHeader leftButton={{ variant: 'back', onBack: handleClickBack }} />
       <DesktopPhotoPrompt
         docName={docName}
         sideName={sideName}

@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  GetEntityMatchSignalsRequest,
-  GetEntityMatchSignalsResponse,
-} from '@onefootprint/types';
+import type { GetEntityMatchSignalsRequest, GetEntityMatchSignalsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
@@ -13,10 +10,7 @@ type UseEntityMatchSignalsProps = {
   id: string;
 };
 
-const getMatchSignals = async (
-  payload: GetEntityMatchSignalsRequest,
-  authHeaders: AuthHeaders,
-) => {
+const getMatchSignals = async (payload: GetEntityMatchSignalsRequest, authHeaders: AuthHeaders) => {
   const { id } = payload;
   const { data: response } = await request<GetEntityMatchSignalsResponse>({
     headers: authHeaders,
@@ -29,13 +23,9 @@ const getMatchSignals = async (
 const useEntityMatchSignals = ({ id }: UseEntityMatchSignalsProps) => {
   const { authHeaders } = useSession();
 
-  return useQuery(
-    ['entity', id, 'match_signals'],
-    () => getMatchSignals({ id }, authHeaders),
-    {
-      select: transformResponse,
-    },
-  );
+  return useQuery(['entity', id, 'match_signals'], () => getMatchSignals({ id }, authHeaders), {
+    select: transformResponse,
+  });
 };
 
 export default useEntityMatchSignals;

@@ -1,17 +1,12 @@
+import { afterEach, describe, expect, it, mock } from 'bun:test';
 import { cleanup, render, screen } from '@testing-library/react'; // eslint-disable-line testing-library/no-manual-cleanup
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, mock } from 'bun:test';
 import React from 'react';
 
 import type { PartnerDocument } from '@/queries';
 import { nextNavigation, replaceMock } from '@/test/modules';
 import { withTranslations } from '@/test/providers';
-import {
-  documents,
-  members,
-  securityChecks,
-  unusedTemplates,
-} from '@/test/responses';
+import { documents, members, securityChecks, unusedTemplates } from '@/test/responses';
 
 import CompanyPageContent from './content';
 
@@ -54,8 +49,6 @@ describe('PartnerDocsPageContent Component', () => {
 
     // Supposed to open the "timeline" dialog
     await userEvent.click(screen.getByText('Document A'));
-    expect(replaceMock.mock.lastCall).toEqual([
-      'test/path?dialogId=cd_4s7f7xgLTTp7wzznuP7077&dialog=timeline',
-    ]);
+    expect(replaceMock.mock.lastCall).toEqual(['test/path?dialogId=cd_4s7f7xgLTTp7wzznuP7077&dialog=timeline']);
   });
 });

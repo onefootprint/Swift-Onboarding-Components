@@ -1,11 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import {
-  Button,
-  Container,
-  createFontStyles,
-  media,
-  Stack,
-} from '@onefootprint/ui';
+import { Button, Container, Stack, createFontStyles, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 /* eslint-disable import/no-extraneous-dependencies */
@@ -31,24 +25,14 @@ const Hero = () => {
           <Subtitle>{t('subtitle')}</Subtitle>
         </TitleContainer>
         <Stack gap={4}>
-          <Button
-            size="large"
-            variant="primary"
-            onClick={() =>
-              window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')
-            }
-          >
+          <Button size="large" variant="primary" onClick={() => window.open(`${DASHBOARD_BASE_URL}/sign-up`, '_blank')}>
             {t('get-started')}
           </Button>
           <Button variant="secondary" size="large" onClick={handleClickTrigger}>
             {t('book-a-demo')}
           </Button>
         </Stack>
-        <ContactDialog
-          url={GET_FORM_URL}
-          open={showDialog}
-          onClose={handleClose}
-        />
+        <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
       </SectionContainer>
     </Container>
   );

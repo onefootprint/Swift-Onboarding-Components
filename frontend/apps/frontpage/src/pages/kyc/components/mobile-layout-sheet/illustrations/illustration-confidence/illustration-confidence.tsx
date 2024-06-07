@@ -41,20 +41,10 @@ const IllustrationConfidence = () => {
 
   return (
     <Container ref={ref}>
-      <Squares
-        src="/kyc/sticky-rail/squares.svg"
-        height={700}
-        width={1500}
-        alt=""
-      />
+      <Squares src="/kyc/sticky-rail/squares.svg" height={700} width={1500} alt="" />
       <TagList>
         {tagKeys.map(({ key, icon: Icon, order }) => (
-          <motion.span
-            custom={order}
-            animate={controlsTags}
-            initial={{ opacity: 0 }}
-            key={key}
-          >
+          <motion.span custom={order} animate={controlsTags} initial={{ opacity: 0 }} key={key}>
             <Tag key={key} icon={Icon}>
               {t(key as ParseKeys<'common'>)}
             </Tag>

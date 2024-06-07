@@ -28,8 +28,7 @@ const Actions = ({ playbook }: ActionsProps) => {
   const editNameRef = useRef<EditNameHandler>(null);
   const copyRef = useRef<CopyHandler>(null);
   const copyLinkRef = useRef<CopyLinkHandler>(null);
-  const canShowLink =
-    kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
+  const canShowLink = kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
 
   const handleToggleStatus = () => {
     statusRef.current?.toggle();
@@ -50,37 +49,22 @@ const Actions = ({ playbook }: ActionsProps) => {
   return (
     <Stack justify="flex-end">
       <Dropdown.Root>
-        <PermissionGate
-          scopeKind={RoleScopeKind.onboardingConfiguration}
-          fallbackText={t('not-allowed')}
-        >
+        <PermissionGate scopeKind={RoleScopeKind.onboardingConfiguration} fallbackText={t('not-allowed')}>
           <Dropdown.Trigger aria-label={t('aria-label', { name })}>
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>
         </PermissionGate>
         <Dropdown.Content align="end">
           {canShowLink && (
-            <Dropdown.Item
-              onSelect={copyLinkToClipboard}
-              onClick={event => event.stopPropagation()}
-            >
+            <Dropdown.Item onSelect={copyLinkToClipboard} onClick={event => event.stopPropagation()}>
               {t('get-link')}
             </Dropdown.Item>
           )}
-          <Dropdown.Item
-            onSelect={launchEditName}
-            onClick={event => event.stopPropagation()}
-          >
+          <Dropdown.Item onSelect={launchEditName} onClick={event => event.stopPropagation()}>
             {t('edit-name.cta')}
           </Dropdown.Item>
-          <PermissionGate
-            scopeKind={RoleScopeKind.onboardingConfiguration}
-            fallbackText={t('not-allowed')}
-          >
-            <Dropdown.Item
-              onSelect={launchCopy}
-              onClick={event => event.stopPropagation()}
-            >
+          <PermissionGate scopeKind={RoleScopeKind.onboardingConfiguration} fallbackText={t('not-allowed')}>
+            <Dropdown.Item onSelect={launchCopy} onClick={event => event.stopPropagation()}>
               {t('copy')}
             </Dropdown.Item>
           </PermissionGate>
@@ -89,9 +73,7 @@ const Actions = ({ playbook }: ActionsProps) => {
             onClick={event => event.stopPropagation()}
             variant={playbook.status === 'enabled' ? 'destructive' : undefined}
           >
-            {playbook.status === 'enabled'
-              ? t('status.disable.cta')
-              : t('status.enable.cta')}
+            {playbook.status === 'enabled' ? t('status.disable.cta') : t('status.enable.cta')}
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>

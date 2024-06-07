@@ -12,10 +12,7 @@ describe('listKindsForDataIdentifier', () => {
 
   describe('when id.email is inputted', () => {
     it('should return ListKind.emailAddress', () => {
-      expect(listKindsForDataIdentifier(IdDI.email)).toEqual([
-        ListKind.emailDomain,
-        ListKind.emailAddress,
-      ]);
+      expect(listKindsForDataIdentifier(IdDI.email)).toEqual([ListKind.emailDomain, ListKind.emailAddress]);
     });
   });
 
@@ -27,10 +24,7 @@ describe('listKindsForDataIdentifier', () => {
 
   describe('when IdDI.phoneNumber is inputted', () => {
     it('should return ListKind.phoneNumber and ListKind.phoneCountryCode', () => {
-      expect(listKindsForDataIdentifier(IdDI.phoneNumber)).toEqual([
-        ListKind.phoneCountryCode,
-        ListKind.phoneNumber,
-      ]);
+      expect(listKindsForDataIdentifier(IdDI.phoneNumber)).toEqual([ListKind.phoneCountryCode, ListKind.phoneNumber]);
     });
   });
 
@@ -45,9 +39,7 @@ describe('listKindsForDataIdentifier', () => {
 
   describe('when IP_ADDRESS_DATA_IDENTIFIER is inputted', () => {
     it('should return ListKind.ipAddress', () => {
-      expect(listKindsForDataIdentifier(IP_ADDRESS_DATA_IDENTIFIER)).toEqual([
-        ListKind.ipAddress,
-      ]);
+      expect(listKindsForDataIdentifier(IP_ADDRESS_DATA_IDENTIFIER)).toEqual([ListKind.ipAddress]);
     });
   });
 });

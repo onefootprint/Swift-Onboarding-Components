@@ -1,10 +1,4 @@
-import {
-  BusinessDI,
-  type Entity,
-  IdDI,
-  IdentifyScope,
-  type Liveness,
-} from '@onefootprint/types';
+import { BusinessDI, type Entity, IdDI, IdentifyScope, type Liveness } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,25 +22,18 @@ const useMultiSelectOptions = (entity: Entity, livenessData: Liveness[]) => {
   const allOptions: MultiSelectOption[] = [];
 
   if (livenessData.length) {
-    const scopes: IdentifyScope[] = Array.from(
-      new Set(livenessData.map(liveness => liveness.scope)),
-    );
+    const scopes: IdentifyScope[] = Array.from(new Set(livenessData.map(liveness => liveness.scope)));
     scopes.forEach(scope => {
       if (scope === IdentifyScope.onboarding || scope === IdentifyScope.auth) {
         allOptions.push({
-          value:
-            scope === IdentifyScope.onboarding
-              ? MultiSelectOptionValue.onboarding
-              : MultiSelectOptionValue.auth,
+          value: scope === IdentifyScope.onboarding ? MultiSelectOptionValue.onboarding : MultiSelectOptionValue.auth,
           label: t(`scope.${scope}`),
         });
       }
     });
   }
 
-  const hasBusinessAddress = entity.attributes.includes(
-    BusinessDI.addressLine1,
-  );
+  const hasBusinessAddress = entity.attributes.includes(BusinessDI.addressLine1);
   if (hasBusinessAddress) {
     allOptions.push({
       value: MultiSelectOptionValue.businessAddress,
@@ -61,8 +48,7 @@ const useMultiSelectOptions = (entity: Entity, livenessData: Liveness[]) => {
     });
   }
 
-  const [selectedOptions, setSelectedOptions] =
-    useState<MultiSelectOption[]>(allOptions);
+  const [selectedOptions, setSelectedOptions] = useState<MultiSelectOption[]>(allOptions);
   const handleOptionsChange = (newOptions: readonly MultiSelectOption[]) => {
     setSelectedOptions([...newOptions]);
   };

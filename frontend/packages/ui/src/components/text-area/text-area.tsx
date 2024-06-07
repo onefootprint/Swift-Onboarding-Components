@@ -16,16 +16,7 @@ export type TextAreaProps = {
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   (
-    {
-      hasError = false,
-      hint,
-      id: baseID,
-      label,
-      onChange,
-      onChangeText,
-      placeholder,
-      ...props
-    }: TextAreaProps,
+    { hasError = false, hint, id: baseID, label, onChange, onChangeText, placeholder, ...props }: TextAreaProps,
     ref,
   ) => {
     const internalId = useId();

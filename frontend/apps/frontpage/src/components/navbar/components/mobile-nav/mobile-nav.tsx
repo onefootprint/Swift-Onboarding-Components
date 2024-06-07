@@ -1,9 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import {
-  IcoClose24,
-  IcoMenu24,
-  ThemedLogoFpDefault,
-} from '@onefootprint/icons';
+import { IcoClose24, IcoMenu24, ThemedLogoFpDefault } from '@onefootprint/icons';
 import { createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -28,12 +24,7 @@ type MobileNavProps = {
 
 const { Root: NavigationMenuRoot, List: NavigationMenuList } = NavigationMenu;
 
-const MobileNav = ({
-  onOpen,
-  onClose,
-  entries,
-  $isOnDarkSection,
-}: MobileNavProps) => {
+const MobileNav = ({ onOpen, onClose, entries, $isOnDarkSection }: MobileNavProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
   const [isOpen, setOpen] = useState(false);
@@ -74,11 +65,7 @@ const MobileNav = ({
             <Logo href="/" onClick={handleLinkClick}>
               <ThemedLogoFpDefault color="primary" />
             </Logo>
-            <NavTriggerButton
-              aria-label={t('nav-toggle.open')}
-              onClick={handleToggle}
-              type="button"
-            >
+            <NavTriggerButton aria-label={t('nav-toggle.open')} onClick={handleToggle} type="button">
               <IcoClose24 />
             </NavTriggerButton>
           </Header>
@@ -102,27 +89,17 @@ const MobileNav = ({
               </LinkList>
             </NavigationMenuRoot>
             <CtaContainer>
-              <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>
-                {t('login')}
-              </LoginLink>
-              <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>
-                {t('sign-up')}
-              </LinkButton>
+              <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>{t('login')}</LoginLink>
+              <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>{t('sign-up')}</LinkButton>
             </CtaContainer>
           </Content>
         </Menu>
       ) : (
         <Container>
           <Logo href="/" onClick={handleLinkClick}>
-            <ThemedLogoFpDefault
-              color={$isOnDarkSection ? 'quinary' : 'primary'}
-            />
+            <ThemedLogoFpDefault color={$isOnDarkSection ? 'quinary' : 'primary'} />
           </Logo>
-          <NavTriggerButton
-            aria-label={t('nav-toggle.close')}
-            onClick={handleToggle}
-            type="button"
-          >
+          <NavTriggerButton aria-label={t('nav-toggle.close')} onClick={handleToggle} type="button">
             <IcoMenu24 color={$isOnDarkSection ? 'quinary' : 'primary'} />
           </NavTriggerButton>
         </Container>

@@ -1,16 +1,10 @@
 import request from '@onefootprint/request';
-import type {
-  OrgOnboardingConfigUpdateRequest,
-  OrgOnboardingConfigUpdateResponse,
-} from '@onefootprint/types';
+import type { OrgOnboardingConfigUpdateRequest, OrgOnboardingConfigUpdateResponse } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
-const updatePlaybook = async (
-  authHeaders: AuthHeaders,
-  playbook: OrgOnboardingConfigUpdateRequest,
-) => {
+const updatePlaybook = async (authHeaders: AuthHeaders, playbook: OrgOnboardingConfigUpdateRequest) => {
   const response = await request<OrgOnboardingConfigUpdateResponse>({
     headers: authHeaders,
     method: 'PATCH',
@@ -29,8 +23,7 @@ const useUpdatePlaybook = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: OrgOnboardingConfigUpdateRequest) =>
-      updatePlaybook(session.authHeaders, payload),
+    mutationFn: (payload: OrgOnboardingConfigUpdateRequest) => updatePlaybook(session.authHeaders, payload),
 
     onSuccess: () => {
       queryClient.invalidateQueries();

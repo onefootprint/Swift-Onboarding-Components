@@ -83,9 +83,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
     }: LinkButtonProps,
     ref,
   ) => {
-    const renderedIcon = Icon && (
-      <Icon color={!destructive ? 'accent' : 'error'} />
-    );
+    const renderedIcon = Icon && <Icon color={!destructive ? 'accent' : 'error'} />;
     // TODO: https://linear.app/footprint/issue/FP-1479/split-linkbutton-and-link-component
     // @ts-ignore
     return (
@@ -163,31 +161,19 @@ export const LinkButtonStyled = styled.button<StyledProps>`
     return css`
       ${createFontStyles($variant)}
       margin: ${$margin ? theme.spacing[$margin] : '0'};
-      margin-inline: ${$marginInline
-        ? theme.spacing[$marginInline]
-        : undefined};
+      margin-inline: ${$marginInline ? theme.spacing[$marginInline] : undefined};
       margin-block: ${$marginBlock ? theme.spacing[$marginBlock] : undefined};
-      margin-bottom: ${$marginBottom
-        ? theme.spacing[$marginBottom]
-        : undefined};
+      margin-bottom: ${$marginBottom ? theme.spacing[$marginBottom] : undefined};
       margin-left: ${$marginLeft ? theme.spacing[$marginLeft] : undefined};
       margin-right: ${$marginRight ? theme.spacing[$marginRight] : undefined};
       margin-top: ${$marginTop ? theme.spacing[$marginTop] : undefined};
       padding: ${$padding ? theme.spacing[$padding] : '0'};
-      padding-bottom: ${$paddingBottom
-        ? theme.spacing[$paddingBottom]
-        : undefined};
+      padding-bottom: ${$paddingBottom ? theme.spacing[$paddingBottom] : undefined};
       padding-left: ${$paddingLeft ? theme.spacing[$paddingLeft] : undefined};
-      padding-right: ${$paddingRight
-        ? theme.spacing[$paddingRight]
-        : undefined};
+      padding-right: ${$paddingRight ? theme.spacing[$paddingRight] : undefined};
       padding-top: ${$paddingTop ? theme.spacing[$paddingTop] : undefined};
-      padding-inline: ${$paddingInline
-        ? theme.spacing[$paddingInline]
-        : undefined};
-      padding-block: ${$paddingBlock
-        ? theme.spacing[$paddingBlock]
-        : undefined};
+      padding-inline: ${$paddingInline ? theme.spacing[$paddingInline] : undefined};
+      padding-block: ${$paddingBlock ? theme.spacing[$paddingBlock] : undefined};
       align-items: center;
       background: transparent;
       border: none;
@@ -196,9 +182,7 @@ export const LinkButtonStyled = styled.button<StyledProps>`
       display: inline-flex;
       text-decoration: none;
       width: fit-content;
-      gap: ${smallSizes.includes($variant)
-        ? theme.spacing[1]
-        : theme.spacing[2]};
+      gap: ${smallSizes.includes($variant) ? theme.spacing[1] : theme.spacing[2]};
 
       &:hover,
       &:hover path {

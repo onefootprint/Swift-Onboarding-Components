@@ -38,11 +38,7 @@ const StatusBadge = ({
         {isOnWatchlist && (
           <>
             <Tooltip text={watchlistLabel} disabled={shouldShowWatchlistLabel}>
-              <Stack
-                align="center"
-                marginLeft={watchlistLabel ? 5 : 2}
-                data-testid="watchlistFailIcon"
-              >
+              <Stack align="center" marginLeft={watchlistLabel ? 5 : 2} data-testid="watchlistFailIcon">
                 <IcoEye16 color="error" />
               </Stack>
             </Tooltip>

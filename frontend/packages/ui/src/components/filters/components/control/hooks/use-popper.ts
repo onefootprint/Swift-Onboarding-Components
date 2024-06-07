@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { usePopper as useBasePopper } from 'react-popper';
 
 const usePopper = () => {
-  const [referenceElement, setReferenceElement] =
-    useState<HTMLElement | null>();
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>();
   const [popperElement, setPopperElement] = useState<HTMLDivElement | null>();
   const popper = useBasePopper(referenceElement, popperElement, {
     placement: 'bottom-start',

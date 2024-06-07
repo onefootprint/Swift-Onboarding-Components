@@ -11,9 +11,7 @@ export type FieldTagListProps = {
 const FieldTagList = ({ targets }: FieldTagListProps) => {
   const { t } = useTranslation('common');
 
-  const tags = targets
-    .map((target: string) => t(getDI(target) as ParseKeys<'common'>))
-    .filter(tag => tag.length > 0);
+  const tags = targets.map((target: string) => t(getDI(target) as ParseKeys<'common'>)).filter(tag => tag.length > 0);
 
   return (
     <>

@@ -9,7 +9,7 @@ import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import { UpdateAuthMethodActionKind } from '../../types';
 import PhonePageStructure from '../phone-page-structure';
-import { isCollectScreen, ScreenState } from './helpers';
+import { ScreenState, isCollectScreen } from './helpers';
 import UpdateVerifyPhone from './update-verify-phone';
 
 type UpdatePhoneProps = {
@@ -25,21 +25,12 @@ const isTest = process.env.NODE_ENV === 'test';
 const isSandbox = isTest || !isProd;
 const handlePhoneValidation = (s: string) => checkIsPhoneValid(s, isSandbox);
 
-const getHeaderTitle = (
-  t: TFunction<'identify'>,
-  kind: UpdateAuthMethodActionKind,
-): string =>
+const getHeaderTitle = (t: TFunction<'identify'>, kind: UpdateAuthMethodActionKind): string =>
   kind === UpdateAuthMethodActionKind.replace // Maybe add some information that the company requires primary phone?
     ? t('phone-step.replace-title')
     : t('phone-step.add-primary-title');
 
-const UpdatePhone = ({
-  Header,
-  authToken,
-  actionKind,
-  onSuccess,
-  identifyVariant,
-}: UpdatePhoneProps) => {
+const UpdatePhone = ({ Header, authToken, actionKind, onSuccess, identifyVariant }: UpdatePhoneProps) => {
   const { t } = useTranslation('identify');
   const [screen, setScreen] = useState<ScreenState>(ScreenState.collect);
   const [phone, setPhone] = useState<string>('');

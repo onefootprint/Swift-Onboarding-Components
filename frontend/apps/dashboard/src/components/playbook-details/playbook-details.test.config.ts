@@ -1,9 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 import type { OnboardingConfig } from '@onefootprint/types';
-import {
-  CollectedKycDataOption,
-  OnboardingConfigStatus,
-} from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfigStatus } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
 export const entityIdFixture: string = 'fp_id_wL6XIWe26cRinucZrRK1yn';
@@ -42,10 +39,7 @@ export const playbookDetailsFixture: OnboardingConfig = {
   },
 };
 
-export const withPlaybookDetails = (
-  id: string,
-  response = playbookDetailsFixture,
-) =>
+export const withPlaybookDetails = (id: string, response = playbookDetailsFixture) =>
   mockRequest({
     method: 'get',
     path: `/org/onboarding_configs/${id}`,

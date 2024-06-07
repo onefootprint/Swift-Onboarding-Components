@@ -28,18 +28,15 @@ const postPartnerPartnershipsDocumentsReviews = async (
 
   const { decision, note, submissionId } = payload;
   return partnershipId && documentId && decision
-    ? baseFetch<EmptyResponse>(
-        `/partner/partnerships/${partnershipId}/documents/${documentId}/reviews`,
-        {
-          headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
-          method: 'POST',
-          body: JSON.stringify({
-            decision,
-            ...(note != null && { note }),
-            ...(submissionId != null && { submission_id: submissionId }),
-          }),
-        },
-      )
+    ? baseFetch<EmptyResponse>(`/partner/partnerships/${partnershipId}/documents/${documentId}/reviews`, {
+        headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },
+        method: 'POST',
+        body: JSON.stringify({
+          decision,
+          ...(note != null && { note }),
+          ...(submissionId != null && { submission_id: submissionId }),
+        }),
+      })
     : Promise.reject(new TypeError('Missing required parameters'));
 };
 

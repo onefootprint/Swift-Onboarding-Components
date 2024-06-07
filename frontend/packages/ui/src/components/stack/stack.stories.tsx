@@ -33,14 +33,7 @@ export default {
       description: 'Justify content',
       name: 'justify',
       control: {
-        options: [
-          'center',
-          'flex-start',
-          'flex-end',
-          'space-between',
-          'space-around',
-          'unset',
-        ],
+        options: ['center', 'flex-start', 'flex-end', 'space-between', 'space-around', 'unset'],
         type: 'select',
       },
     },
@@ -52,20 +45,8 @@ export default {
   },
 };
 
-const Template: Story<StackProps> = ({
-  gap,
-  direction,
-  align,
-  justify,
-  flexWrap,
-}) => (
-  <Stack
-    gap={gap}
-    direction={direction}
-    align={align}
-    justify={justify}
-    flexWrap={flexWrap}
-  >
+const Template: Story<StackProps> = ({ gap, direction, align, justify, flexWrap }) => (
+  <Stack gap={gap} direction={direction} align={align} justify={justify} flexWrap={flexWrap}>
     <div>😊</div>
     <div>🤠</div>
     <div>😎</div>

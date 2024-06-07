@@ -44,10 +44,7 @@ const Phone = ({ index, config, locale, requireMultiKyc }: PhoneProps) => {
           return isInvalid ? t('errors.pattern') : undefined;
         },
       }}
-      render={({
-        field: { onChange, onBlur, value, name },
-        fieldState: { error },
-      }) => (
+      render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
         <PhoneInput
           data-private
           data-dd-privacy="mask"

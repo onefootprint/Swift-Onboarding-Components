@@ -36,10 +36,7 @@ type ProcessPlaybookProps = {
   };
 };
 
-const getRequiredKybCollectFields = () => [
-  CollectedKybDataOption.name,
-  CollectedKybDataOption.tin,
-];
+const getRequiredKybCollectFields = () => [CollectedKybDataOption.name, CollectedKybDataOption.tin];
 
 const getRequiredKycCollectFields = () => [
   CollectedKycDataOption.email,
@@ -74,14 +71,11 @@ const processPlaybook = ({
   if (isKyb(kind) && businessInformation) {
     const requiredKybFields = getRequiredKybCollectFields();
     mustCollectData.push(...requiredKybFields);
-    const collectBO =
-      businessInformation[CollectedKybDataOption.beneficialOwners];
+    const collectBO = businessInformation[CollectedKybDataOption.beneficialOwners];
     if (collectBO && !skipKyc) {
       if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.all) {
         mustCollectData.push(CollectedKybDataOption.kycedBeneficialOwners);
-      } else if (
-        kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.primary
-      ) {
+      } else if (kycOptionForBeneficialOwners === KycOptionsForBeneficialOwners.primary) {
         mustCollectData.push(CollectedKybDataOption.beneficialOwners);
       }
     } else if (collectBO && skipKyc) {
@@ -97,8 +91,7 @@ const processPlaybook = ({
     });
   }
   const omitBeneficialOwnersKycForKybPlaybook =
-    isKyb(kind) &&
-    !businessInformation?.[CollectedKybDataOption.beneficialOwners];
+    isKyb(kind) && !businessInformation?.[CollectedKybDataOption.beneficialOwners];
   if (omitBeneficialOwnersKycForKybPlaybook) {
     return {
       ...getNoBoKycOptions({
@@ -135,23 +128,12 @@ const processPlaybook = ({
   if (personal[CollectedKycDataOption.phoneNumber]) {
     mustCollectData.push(CollectedKycDataOption.phoneNumber);
   }
-  const isNoPhoneFlow =
-    !personal[CollectedKycDataOption.phoneNumber] && !isIdDoc(kind);
+  const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber] && !isIdDoc(kind);
 
   // id doc handling
-  const {
-    idDoc,
-    idDocKind,
-    selfie,
-    idDocFirst,
-    ssnDocScanStepUp,
-    countrySpecificIdDocKind,
-  } = personal;
+  const { idDoc, idDocKind, selfie, idDocFirst, ssnDocScanStepUp, countrySpecificIdDocKind } = personal;
   const docString = selfie ? 'document_and_selfie' : 'document';
-  if (
-    idDoc &&
-    (idDocKind?.length > 0 || Object.keys(countrySpecificIdDocKind).length > 0)
-  ) {
+  if (idDoc && (idDocKind?.length > 0 || Object.keys(countrySpecificIdDocKind).length > 0)) {
     mustCollectData.push(docString);
   }
 
@@ -160,14 +142,10 @@ const processPlaybook = ({
     docScanForOptionalSsn = docString;
   }
 
-  const isDocFirstFlow =
-    (idDocFirst && idDoc && idDocKind?.length > 0) ?? false;
+  const isDocFirstFlow = (idDocFirst && idDoc && idDocKind?.length > 0) ?? false;
 
   // investor profile handling
-  if (
-    playbook?.[CollectedInvestorProfileDataOption.investorProfile] &&
-    isKyc(kind)
-  ) {
+  if (playbook?.[CollectedInvestorProfileDataOption.investorProfile] && isKyc(kind)) {
     mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
 
@@ -231,13 +209,8 @@ const getResidency = (residencyForm?: ResidencyFormData) => {
   if (!residencyForm) {
     return {};
   }
-  const {
-    allowUsResidents,
-    allowUsTerritories,
-    allowInternationalResidents,
-    restrictCountries,
-    countryList,
-  } = residencyForm;
+  const { allowUsResidents, allowUsTerritories, allowInternationalResidents, restrictCountries, countryList } =
+    residencyForm;
 
   if (restrictCountries === CountryRestriction.restrict && countryList) {
     const internationalCountryRestrictions: string[] = [];
@@ -252,9 +225,7 @@ const getResidency = (residencyForm?: ResidencyFormData) => {
   }
   return {
     allowUsResidents,
-    allowUsTerritories: allowInternationalResidents
-      ? false
-      : allowUsTerritories,
+    allowUsTerritories: allowInternationalResidents ? false : allowUsTerritories,
     allowInternationalResidents,
     internationalCountryRestrictions: null,
   };

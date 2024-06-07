@@ -1,21 +1,11 @@
-import {
-  createUseRouterSpy,
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { createUseRouterSpy, customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
-import {
-  asAdminUser,
-  asAdminUserRestrictedToSandbox,
-  resetUser,
-} from 'src/config/tests';
+import { asAdminUser, asAdminUserRestrictedToSandbox, resetUser } from 'src/config/tests';
 
 import { type CopyProps } from './copy';
 import {
-  authRolesFixture,
   CopyWithButton,
+  authRolesFixture,
   playbookFixture,
   withAssumeRole,
   withAuthRoles,
@@ -44,9 +34,7 @@ describe('<Copy />', () => {
     resetUser();
   });
 
-  const renderCopy = async ({
-    playbook = playbookFixture,
-  }: Partial<CopyProps> = {}) => {
+  const renderCopy = async ({ playbook = playbookFixture }: Partial<CopyProps> = {}) => {
     customRender(<CopyWithButton playbook={playbook} />);
     await userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
@@ -197,8 +185,7 @@ describe('<Copy />', () => {
             pathname: '/switch-org',
             query: {
               mode: 'live',
-              redirect_url:
-                '/playbooks/ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
+              redirect_url: '/playbooks/ob_config_id_7TU1EGLHwjoioStPuRyWpm_copy',
               tenant_id: 'org_e2FHVfOM5Hd3Ce492o5Aat',
             },
           });

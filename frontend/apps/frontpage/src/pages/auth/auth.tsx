@@ -13,11 +13,7 @@ const KYC = () => {
 
   return (
     <>
-      <SEO
-        title={t('html-title')}
-        description={t('html-description')}
-        slug="/auth"
-      />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/auth" />
       <Hero />
       <Secure />
       <MakeItYours />

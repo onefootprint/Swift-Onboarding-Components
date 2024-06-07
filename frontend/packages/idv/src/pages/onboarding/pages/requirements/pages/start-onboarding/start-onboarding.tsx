@@ -22,10 +22,9 @@ const StartOnboarding = () => {
           send('initialized');
         },
         onError: (err: unknown) => {
-          Logger.error(
-            `Error while initiating onboarding. ${getErrorMessage(err)}`,
-            { location: 'onboarding-check-requirements' },
-          );
+          Logger.error(`Error while initiating onboarding. ${getErrorMessage(err)}`, {
+            location: 'onboarding-check-requirements',
+          });
           send('error');
         },
       },

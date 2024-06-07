@@ -3,12 +3,7 @@ import isSSN9 from './is-ssn9';
 describe('isSSN9', () => {
   describe('valid SSNs', () => {
     it('should return true for valid SSNs', () => {
-      const validSSNs = [
-        '123-45-6789',
-        '001-02-3456',
-        '078-05-1120',
-        '078051120',
-      ];
+      const validSSNs = ['123-45-6789', '001-02-3456', '078-05-1120', '078051120'];
 
       validSSNs.forEach(ssn => {
         expect(isSSN9(ssn)).toBe(true);

@@ -4,15 +4,8 @@ import partial from 'lodash/fp/partial';
 
 import { getLogger } from '../../../../utils/logger';
 import { useImgProcessorsContext } from '../../components/image-processors';
-import {
-  bytesToMegabytes,
-  hasFileReaderSupport,
-  isFileOrBlob,
-  isString,
-} from '../../utils/capture';
-import compressImage, {
-  COMPRESS_EXTRA_MAX_SIZE_MB,
-} from './utils/compress-image';
+import { bytesToMegabytes, hasFileReaderSupport, isFileOrBlob, isString } from '../../utils/capture';
+import compressImage, { COMPRESS_EXTRA_MAX_SIZE_MB } from './utils/compress-image';
 import imageFileToStrippedBase64 from './utils/image-file-to-stripped-base64';
 import resizeImage from './utils/resize-image';
 
@@ -46,21 +39,17 @@ const stringify = (x: unknown): string => {
   }
 };
 
-const errorHandler =
-  (toast: Toast) => (step: ImageProcessingStepError, error?: unknown) => {
-    if (error) {
-      logError(stringify(error), error);
-    }
-    toast.show({
-      title: 'Uh-oh',
-      description: `${step}.`,
-    });
-  };
+const errorHandler = (toast: Toast) => (step: ImageProcessingStepError, error?: unknown) => {
+  if (error) {
+    logError(stringify(error), error);
+  }
+  toast.show({
+    title: 'Uh-oh',
+    description: `${step}.`,
+  });
+};
 
-const convertImageFileToStrippedBase64 = async (
-  onError: HandleError,
-  file: File,
-): Promise<string | undefined> => {
+const convertImageFileToStrippedBase64 = async (onError: HandleError, file: File): Promise<string | undefined> => {
   try {
     return await imageFileToStrippedBase64(file);
   } catch (error) {
@@ -95,10 +84,7 @@ const stepHeicConversion = async (
   }
 };
 
-const stepImageResize = async (
-  onError: HandleError,
-  file: File,
-): Promise<File | Blob | Error> => {
+const stepImageResize = async (onError: HandleError, file: File): Promise<File | Blob | Error> => {
   try {
     const resized = await resizeImage(file);
     return resized || new Error('resize processing failed');
@@ -148,9 +134,7 @@ const runProcessFileScript = async (
     return { file, extraCompressed: false };
   }
 
-  const heicOutput = isHeicType(file.type)
-    ? await stepHeicConversion(onError, imageProcessors, file)
-    : file;
+  const heicOutput = isHeicType(file.type) ? await stepHeicConversion(onError, imageProcessors, file) : file;
 
   if (!isError(heicOutput)) {
     logInfo(`file HEIC: ${bytesToMegabytes(heicOutput.size)} MB`);
@@ -174,11 +158,7 @@ const runProcessFileScript = async (
 
   const prevFile = [resizeOutput, heicOutput].find(isFileOrBlob);
   const compressionInput = prevFile && !isError(prevFile) ? prevFile : file;
-  const compressOutput = await stepImageCompression(
-    onError,
-    compressionInput,
-    extraCompressFlag,
-  );
+  const compressOutput = await stepImageCompression(onError, compressionInput, extraCompressFlag);
 
   if (isError(compressOutput)) {
     logWarn(`Proceeding with uncompressed image: ${stringify(compressOutput)}`);
@@ -199,9 +179,7 @@ const runProcessFileScript = async (
   if (!final || isError(final)) {
     onError(ImageProcessingStepError.final);
   }
-  return final && !isError(final)
-    ? { file: final, extraCompressed }
-    : undefined;
+  return final && !isError(final) ? { file: final, extraCompressed } : undefined;
 };
 
 const processImageUrl = async (
@@ -219,16 +197,9 @@ const processImageUrl = async (
     logError('Image file is undefined after image compression');
     return undefined;
   }
-  logInfo(
-    `(getFilefromDataUrl) file from url: ${bytesToMegabytes(file.size)} MB ${file.type}`,
-  );
+  logInfo(`(getFilefromDataUrl) file from url: ${bytesToMegabytes(file.size)} MB ${file.type}`);
 
-  const output = await runProcessFileScript(
-    onError,
-    undefined,
-    file,
-    extraCompress,
-  );
+  const output = await runProcessFileScript(onError, undefined, file, extraCompress);
   return output;
 };
 
@@ -246,14 +217,8 @@ const useProcessImage = (options?: { allowPdf?: boolean }) => {
   }
 
   return {
-    convertImageFileToStrippedBase64: partial(
-      convertImageFileToStrippedBase64,
-      [handleError],
-    ),
-    processImageFile: partial(runProcessFileScript, [
-      handleError,
-      imageProcessors,
-    ]),
+    convertImageFileToStrippedBase64: partial(convertImageFileToStrippedBase64, [handleError]),
+    processImageFile: partial(runProcessFileScript, [handleError, imageProcessors]),
     processImageUrl: partial(processImageUrl, [handleError]),
     acceptedFileFormats: acceptedFileFormats.join(','),
   };

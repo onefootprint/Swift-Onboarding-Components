@@ -24,8 +24,7 @@ export type PaginatedRequestResponse<T> = {
   };
 };
 
-const uuidPattern =
-  /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g;
+const uuidPattern = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/g;
 
 const clientVersion = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
   ? `frontend-${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`
@@ -33,11 +32,7 @@ const clientVersion = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
 
 const LOGOUT_ERROR_CODES = ['E117', 'E118', 'E119'];
 // TODO (belce): retire matching on exact error string
-const LOGOUT_ERRORS = [
-  'Session does not exist',
-  'Session is expired',
-  'Session invalid',
-];
+const LOGOUT_ERRORS = ['Session does not exist', 'Session is expired', 'Session invalid'];
 
 const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
 const isString = (x: unknown): x is string => typeof x === 'string' && !!x;
@@ -51,14 +46,9 @@ export const isFootprintError = (err: unknown): err is RequestError =>
   'data' in err.response;
 
 export const isUnhandledError = (err: unknown): err is Error =>
-  typeof err === 'object' &&
-  err != null &&
-  'message' in err &&
-  typeof err.message === 'string';
+  typeof err === 'object' && err != null && 'message' in err && typeof err.message === 'string';
 
-export const isFootprintServerError = (
-  error: unknown,
-): FootprintServerError | undefined => {
+export const isFootprintServerError = (error: unknown): FootprintServerError | undefined => {
   if (!isFootprintError(error)) return undefined;
   const err = error?.response?.data?.error;
   return err?.message && err?.statusCode && err?.supportId ? err : undefined;
@@ -69,12 +59,8 @@ export const isLogoutError = (error: unknown) => {
   if (serverError?.statusCode !== 401) {
     return false;
   }
-  const codeMatches = LOGOUT_ERROR_CODES.some(
-    code => serverError?.code === code,
-  );
-  const messageMatches = LOGOUT_ERRORS.some(e =>
-    serverError?.message?.includes(e),
-  );
+  const codeMatches = LOGOUT_ERROR_CODES.some(code => serverError?.code === code);
+  const messageMatches = LOGOUT_ERRORS.some(e => serverError?.message?.includes(e));
   return codeMatches || messageMatches;
 };
 
@@ -123,12 +109,9 @@ export const getErrorMessage = (error?: unknown | Error): string => {
 export const useRequestError = () => {
   const { t, i18n } = useTranslation('request', { keyPrefix: 'errors' });
 
-  const isValidErrorCode = (code?: string) =>
-    !!code?.match(/^E[0-9]+$/g) && i18n.exists(`request:errors.${code}`);
+  const isValidErrorCode = (code?: string) => !!code?.match(/^E[0-9]+$/g) && i18n.exists(`request:errors.${code}`);
 
-  const getContext = (
-    error?: unknown | Error,
-  ): Partial<Record<string, string>> => {
+  const getContext = (error?: unknown | Error): Partial<Record<string, string>> => {
     if (isFootprintError(error)) {
       const data = error?.response?.data?.error;
       const errorContext = data?.context;
@@ -183,10 +166,7 @@ export const useRequestError = () => {
   };
 };
 
-const getRequestOptions = (
-  requestConfig: AxiosRequestConfig,
-  extraOptions: { omitSessionId?: boolean } = {},
-) => {
+const getRequestOptions = (requestConfig: AxiosRequestConfig, extraOptions: { omitSessionId?: boolean } = {}) => {
   const sessionId = getSessionId();
   return {
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -203,11 +183,9 @@ const getRequestOptions = (
 
 // Disable transformation when the string matched or satisfied the condition.
 // https://github.com/mpyw/axios-case-converter#preservedkeys-string--function
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const preservedKeys = (input: any) =>
-  [...DataIdentifierKeys].includes(input) ||
-  input.startsWith('card') ||
-  isCountryCode(input);
+  [...DataIdentifierKeys].includes(input) || input.startsWith('card') || isCountryCode(input);
 
 const request = <Response = unknown>(
   requestConfig: AxiosRequestConfig = {},
@@ -218,9 +196,7 @@ const request = <Response = unknown>(
   return client.request<Response>(options);
 };
 
-export const requestWithoutCaseConverter = <Response = unknown>(
-  requestConfig: AxiosRequestConfig = {},
-) => {
+export const requestWithoutCaseConverter = <Response = unknown>(requestConfig: AxiosRequestConfig = {}) => {
   const client = axios.create();
   const options = getRequestOptions(requestConfig);
   return client.request<Response>(options);

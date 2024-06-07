@@ -1,11 +1,5 @@
-import type {
-  FootprintFormDataProps,
-  FootprintVariant,
-} from '@onefootprint/footprint-js';
-import {
-  FootprintPrivateEvent,
-  FootprintPublicEvent,
-} from '@onefootprint/footprint-js';
+import type { FootprintFormDataProps, FootprintVariant } from '@onefootprint/footprint-js';
+import { FootprintPrivateEvent, FootprintPublicEvent } from '@onefootprint/footprint-js';
 import { getLogger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { useRouter } from 'next/router';
@@ -41,12 +35,8 @@ const Content = ({ fallback }: ContentProps) => {
   useProps<FootprintFormDataProps>(setProps);
   const router = useRouter();
   const variant = router.query.variant as FootprintVariant;
-  const [fieldErrors, setFieldErrors] = useState<
-    Partial<Record<keyof FormData, string>> | undefined
-  >(undefined);
-  const [formErrorMessage, setFormErrorMessage] = useState<
-    string | undefined
-  >();
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormData, string>> | undefined>(undefined);
+  const [formErrorMessage, setFormErrorMessage] = useState<string | undefined>();
 
   const { authToken = '', title, options = {} } = props || {};
   const { hideFootprintLogo, hideCancelButton, hideButtons } = options;
@@ -128,13 +118,9 @@ const Content = ({ fallback }: ContentProps) => {
     }
     const { vaultFields } = clientTokenFields.data;
     const cardAlias = getCardAlias(vaultFields);
-    logInfo(
-      `Received vaultFields: ${vaultFields.join(', ')}. Card alias is ${cardAlias}`,
-    );
+    logInfo(`Received vaultFields: ${vaultFields.join(', ')}. Card alias is ${cardAlias}`);
     if (!cardAlias) {
-      logError(
-        'Cannot extract cardAlias from auth token. Please verify auth token has correct fields set on it.',
-      );
+      logError('Cannot extract cardAlias from auth token. Please verify auth token has correct fields set on it.');
       return;
     }
 
@@ -162,10 +148,7 @@ const Content = ({ fallback }: ContentProps) => {
   }
 
   if (isError) {
-    logError(
-      `Fetching client token fields failed with error: ${getErrorMessage(error)}.`,
-      error,
-    );
+    logError(`Fetching client token fields failed with error: ${getErrorMessage(error)}.`, error);
     return <Invalid onClose={handleClose} />;
   }
 

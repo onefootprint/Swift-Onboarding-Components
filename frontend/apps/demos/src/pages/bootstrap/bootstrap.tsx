@@ -1,7 +1,5 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
-import footprint, {
-  FootprintVerifyButton,
-} from '@onefootprint/footprint-react';
+import footprint, { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';

@@ -1,4 +1,4 @@
-import { Box, media, Text } from '@onefootprint/ui';
+import { Box, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,14 +15,7 @@ type QuoteCardProps = {
   authorImage: string;
 };
 
-const QuoteCard = ({
-  quote,
-  author,
-  role,
-  company,
-  caseStudyLink,
-  authorImage,
-}: QuoteCardProps) => (
+const QuoteCard = ({ quote, author, role, company, caseStudyLink, authorImage }: QuoteCardProps) => (
   <CardContainer>
     <AuthorImage src={authorImage} alt={`${author}'s headshot`} />
     <QuoteContainer>
@@ -32,12 +25,7 @@ const QuoteCard = ({
         </QuoteIconContainer>
         <Text variant="body-2" tag="blockquote">{`${quote}"`}</Text>
       </Box>
-      <QuoteFooter
-        author={author}
-        role={role}
-        company={company}
-        caseStudyLink={caseStudyLink}
-      />
+      <QuoteFooter author={author} role={role} company={company} caseStudyLink={caseStudyLink} />
     </QuoteContainer>
   </CardContainer>
 );

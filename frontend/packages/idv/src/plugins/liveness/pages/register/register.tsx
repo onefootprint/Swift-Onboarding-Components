@@ -1,18 +1,8 @@
 import { IcoPasskey40, IcoWarning40 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import type { PasskeyAttemptContext } from '@onefootprint/types/src/api/skip-liveness';
-import {
-  SkipLivenessClientType,
-  SkipLivenessReason,
-} from '@onefootprint/types/src/api/skip-liveness';
-import {
-  BottomSheet,
-  Box,
-  Button,
-  LinkButton,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types/src/api/skip-liveness';
+import { BottomSheet, Box, Button, LinkButton, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -20,16 +10,11 @@ import styled from 'styled-components';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useSkipLiveness } from '../../../../hooks';
-import {
-  FPCustomEvents,
-  sendCustomEvent,
-} from '../../../../utils/custom-event';
+import { FPCustomEvents, sendCustomEvent } from '../../../../utils/custom-event';
 import { getLogger } from '../../../../utils/logger';
 import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
-import useBiometricInit, {
-  isRegisterPasskeyError,
-} from '../../hooks/use-register-biometric';
+import useBiometricInit, { isRegisterPasskeyError } from '../../hooks/use-register-biometric';
 
 const SUCCESS_TRANSITION_DELAY_MS = 1500;
 const { logError, logInfo, logTrack, logWarn } = getLogger({
@@ -46,9 +31,7 @@ const Register = () => {
   const biometricInitMutation = useBiometricInit();
   const skipLivenessMutation = useSkipLiveness();
 
-  const [passkeyRegisterAttempts, setPasskeyRegisterAttempts] = useState<
-    PasskeyAttemptContext[]
-  >([]);
+  const [passkeyRegisterAttempts, setPasskeyRegisterAttempts] = useState<PasskeyAttemptContext[]>([]);
 
   const handleOpenBottomSheet = () => {
     setShowBottomSheet(true);
@@ -92,10 +75,7 @@ const Register = () => {
             errorMessage,
             elapsedTimeInOsPromptMs,
           };
-          setPasskeyRegisterAttempts([
-            ...passkeyRegisterAttempts,
-            passkeyFailure,
-          ]);
+          setPasskeyRegisterAttempts([...passkeyRegisterAttempts, passkeyFailure]);
         },
       },
     );
@@ -119,10 +99,7 @@ const Register = () => {
           send({ type: 'skipped' });
         },
         onError: (err: unknown) => {
-          logError(
-            `Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(err)}`,
-            err,
-          );
+          logError(`Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(err)}`, err);
         },
       },
     );
@@ -164,10 +141,7 @@ const Register = () => {
           {primaryButtonText && (
             <Button
               loading={biometricInitMutation.isLoading}
-              disabled={
-                biometricInitMutation.isLoading ||
-                skipLivenessMutation.isLoading
-              }
+              disabled={biometricInitMutation.isLoading || skipLivenessMutation.isLoading}
               onClick={handleRegister}
               fullWidth
               size="large"
@@ -178,10 +152,7 @@ const Register = () => {
           {secondaryButtonText && (
             <Button
               loading={skipLivenessMutation.isLoading}
-              disabled={
-                biometricInitMutation.isLoading ||
-                skipLivenessMutation.isLoading
-              }
+              disabled={biometricInitMutation.isLoading || skipLivenessMutation.isLoading}
               onClick={handleSkip}
               fullWidth
               size="large"
@@ -191,22 +162,11 @@ const Register = () => {
             </Button>
           )}
           {!biometricInitMutation.isSuccess && (
-            <Stack
-              alignItems="center"
-              width="100%"
-              justify="center"
-              paddingTop={3}
-            >
-              <LinkButton onClick={handleOpenBottomSheet}>
-                {t('learn-more.cta')}
-              </LinkButton>
+            <Stack alignItems="center" width="100%" justify="center" paddingTop={3}>
+              <LinkButton onClick={handleOpenBottomSheet}>{t('learn-more.cta')}</LinkButton>
             </Stack>
           )}
-          <BottomSheet
-            open={showBottomSheet}
-            onClose={handleCloseBottomSheet}
-            title={t('learn-more.title')}
-          >
+          <BottomSheet open={showBottomSheet} onClose={handleCloseBottomSheet} title={t('learn-more.title')}>
             <Stack gap={3} direction="column" marginBottom={5}>
               <Text variant="body-3" whiteSpace="pre-wrap">
                 {t('learn-more.content-1')}

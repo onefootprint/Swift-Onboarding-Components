@@ -11,7 +11,8 @@ const createRules = (rules?: FootprintAppearanceRules) => {
 };
 
 export const filterNonWhitelistRules = (
-  rules: Record<string, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  rules: Record<string, any>,
   whitelist: string[] = rulesWhitelist,
 ) => {
   const clonedRules = { ...rules };
@@ -23,10 +24,7 @@ export const filterNonWhitelistRules = (
   return clonedRules;
 };
 
-export const getSelector = (
-  selector: string,
-  selectors: Record<string, string> = footprintClassNamesMap,
-) => {
+export const getSelector = (selector: string, selectors: Record<string, string> = footprintClassNamesMap) => {
   if (selector.includes(':')) {
     const separatorPosition = selector.indexOf(':');
     const component = selector.slice(0, separatorPosition);
@@ -36,7 +34,7 @@ export const getSelector = (
   return `.fp-custom-appearance${selectors[selector]}`;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const convertObjectToCSS = (rules: Record<string, any>) => {
   const toKebabCase = (selector: string) =>
     selector
@@ -51,16 +49,12 @@ export const convertObjectToCSS = (rules: Record<string, any>) => {
   };
 
   return Object.keys(rules).reduce(
-    (acc, selector) =>
-      `${acc + toKebabCase(selector)}:${formatValue(
-        selector,
-        rules[selector],
-      )};`,
+    (acc, selector) => `${acc + toKebabCase(selector)}:${formatValue(selector, rules[selector])};`,
     '',
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const createStylesFromRules = (rules: Record<string, any>) => {
   let styles = ` `;
   Object.entries(rules).forEach(([selector, stylesObject]) => {

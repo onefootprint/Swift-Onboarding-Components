@@ -9,8 +9,7 @@ export const riskSignalsFixture: RiskSignal[] = [
     scopes: [RiskSignalAttribute.phoneNumber],
     reasonCode: 'phone_number_located_is_voip',
     note: 'VOIP phone number',
-    description:
-      "The consumer's phone number could be tied to an answering service, page, or VoIP.",
+    description: "The consumer's phone number could be tied to an answering service, page, or VoIP.",
     onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
     timestamp: '2022-10-24T21:56:12.682238Z',
     hasAmlHits: false,
@@ -20,8 +19,7 @@ export const riskSignalsFixture: RiskSignal[] = [
     onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
     reasonCode: 'email_domain_corporate',
     note: 'Corporate email domain',
-    description:
-      'The domain of the email address has been identified as belonging to a corporate entity.',
+    description: 'The domain of the email address has been identified as belonging to a corporate entity.',
     severity: RiskSignalSeverity.Low,
     scopes: [RiskSignalAttribute.email],
     timestamp: '2022-10-24T21:56:12.682238Z',

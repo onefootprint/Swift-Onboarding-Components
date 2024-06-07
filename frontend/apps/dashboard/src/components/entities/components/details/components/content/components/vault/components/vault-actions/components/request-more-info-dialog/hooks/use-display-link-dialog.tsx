@@ -15,19 +15,14 @@ type UseDisplayLinkDialogProps = {
   onClose: () => void;
 };
 
-const useDisplayLinkDialog = ({
-  linkData,
-  onClose,
-}: UseDisplayLinkDialogProps) => {
+const useDisplayLinkDialog = ({ linkData, onClose }: UseDisplayLinkDialogProps) => {
   const sendLinkMutation = useSendTokenLinkMutation();
   const toast = useToast();
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.actions.request-more-info',
   });
   const entityId = useEntityId();
-  const userHasPhone = useEntity(entityId).data?.attributes?.includes(
-    IdDI.phoneNumber,
-  );
+  const userHasPhone = useEntity(entityId).data?.attributes?.includes(IdDI.phoneNumber);
 
   const component = <LinkDisplay linkData={linkData} />;
 

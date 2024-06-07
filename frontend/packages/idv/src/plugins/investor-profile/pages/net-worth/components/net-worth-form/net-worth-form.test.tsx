@@ -1,33 +1,15 @@
 import '../../../../../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
-import {
-  InvestorProfileDI,
-  InvestorProfileNetWorth,
-} from '@onefootprint/types';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { InvestorProfileDI, InvestorProfileNetWorth } from '@onefootprint/types';
 import React from 'react';
 
 import type { NetWorthFormProps } from './net-worth-form';
 import NetWorthForm from './net-worth-form';
 
 describe('<NetWorthForm />', () => {
-  const renderForm = ({
-    defaultValues,
-    isLoading,
-    onSubmit = () => {},
-  }: Partial<NetWorthFormProps>) => {
-    customRender(
-      <NetWorthForm
-        defaultValues={defaultValues}
-        isLoading={isLoading}
-        onSubmit={onSubmit}
-      />,
-    );
+  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<NetWorthFormProps>) => {
+    customRender(<NetWorthForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
   };
 
   it('onSubmit is called when form is submitted', async () => {

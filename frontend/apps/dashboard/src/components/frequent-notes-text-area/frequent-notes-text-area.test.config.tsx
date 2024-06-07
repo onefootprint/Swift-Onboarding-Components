@@ -1,8 +1,5 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type {
-  CreateOrgFrequentNoteResponse,
-  GetOrgFrequentNotesResponse,
-} from '@onefootprint/types';
+import type { CreateOrgFrequentNoteResponse, GetOrgFrequentNotesResponse } from '@onefootprint/types';
 import { OrgFrequentNoteKind } from '@onefootprint/types';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -13,21 +10,12 @@ export const Form = () => {
   const methods = useForm();
   return (
     <FormProvider {...methods}>
-      <FrequentNotesTextArea
-        kind={OrgFrequentNoteKind.Annotation}
-        formField="note"
-        label="Note"
-        required
-      />
+      <FrequentNotesTextArea kind={OrgFrequentNoteKind.Annotation} formField="note" label="Note" required />
     </FormProvider>
   );
 };
 
-export const withFrequentNotes = (
-  kind: OrgFrequentNoteKind,
-  resp: GetOrgFrequentNotesResponse,
-  once?: boolean,
-) => {
+export const withFrequentNotes = (kind: OrgFrequentNoteKind, resp: GetOrgFrequentNotesResponse, once?: boolean) => {
   mockRequest({
     method: 'get',
     path: '/org/frequent_notes',

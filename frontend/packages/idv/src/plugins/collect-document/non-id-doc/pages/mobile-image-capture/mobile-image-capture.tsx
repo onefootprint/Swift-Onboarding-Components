@@ -20,11 +20,7 @@ const MobileImageCapture = () => {
   const toast = useToast();
   const docName = useDocName(config);
 
-  const onComplete = (
-    imageFile: File | Blob,
-    extraCompressed: boolean,
-    captureKind: CaptureKind,
-  ) =>
+  const onComplete = (imageFile: File | Blob, extraCompressed: boolean, captureKind: CaptureKind) =>
     send({
       type: 'receivedDocument',
       payload: {

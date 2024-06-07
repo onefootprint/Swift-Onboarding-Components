@@ -6,28 +6,13 @@ import styled, { css } from 'styled-components';
 const DesktopIllustration = () => (
   <Grid>
     <ImageContainer>
-      <Image
-        src="/kyb/verify-people/basic-data.png"
-        alt="Basic Data"
-        width={320}
-        height={650}
-      />
+      <Image src="/kyb/verify-people/basic-data.png" alt="Basic Data" width={320} height={650} />
     </ImageContainer>
     <ImageContainer>
-      <Image
-        src="/kyb/verify-people/residential-address.png"
-        alt="Residential Address"
-        width={320}
-        height={650}
-      />
+      <Image src="/kyb/verify-people/residential-address.png" alt="Residential Address" width={320} height={650} />
     </ImageContainer>
     <ImageContainer>
-      <Image
-        src="/kyb/verify-people/app-clip.png"
-        alt="App Clip"
-        width={320}
-        height={650}
-      />
+      <Image src="/kyb/verify-people/app-clip.png" alt="App Clip" width={320} height={650} />
     </ImageContainer>
   </Grid>
 );

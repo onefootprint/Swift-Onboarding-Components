@@ -1,5 +1,5 @@
 import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
-import { createFontStyles, Text } from '@onefootprint/ui';
+import { Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -10,15 +10,9 @@ type WatchlistCheckEventHeaderProps = {
   data: PreviousWatchlistChecksEventData;
 };
 
-const WatchlistCheckEventHeader = ({
-  data,
-}: WatchlistCheckEventHeaderProps) => (
+const WatchlistCheckEventHeader = ({ data }: WatchlistCheckEventHeaderProps) => (
   <>
-    <Text
-      variant="body-3"
-      color="tertiary"
-      testID="watchlist-check-event-header"
-    >
+    <Text variant="body-3" color="tertiary" testID="watchlist-check-event-header">
       <Trans
         i18nKey="pages.entity.audit-trail.timeline.watchlist-check-event.title"
         components={{

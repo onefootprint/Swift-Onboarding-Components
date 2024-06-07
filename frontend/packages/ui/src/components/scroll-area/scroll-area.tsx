@@ -44,8 +44,7 @@ const ScrollArea = ({
   const [showTopLine, setShowTopLine] = useState(false);
 
   const noOverflow = viewportHeight <= scrollAreaHeight;
-  const scrolledToBottom =
-    scrollTop > 0 && scrollTop + scrollAreaHeight >= viewportHeight;
+  const scrolledToBottom = scrollTop > 0 && scrollTop + scrollAreaHeight >= viewportHeight;
   const scrolledToTop = scrollTop === 0;
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -152,26 +151,14 @@ const StyledViewport = styled(ScrollAreaRadix.Viewport)<{
   $maxWidth?: string;
   $maxHeight?: string;
 }>`
-  ${({
-    $padding,
-    $paddingTop,
-    $paddingRight,
-    $paddingBottom,
-    $paddingLeft,
-    $maxWidth,
-    $maxHeight,
-  }) => css`
+  ${({ $padding, $paddingTop, $paddingRight, $paddingBottom, $paddingLeft, $maxWidth, $maxHeight }) => css`
     ${({ theme }) => css`
       height: 100%;
       width: 100%;
       padding: ${$padding ? theme.spacing[$padding] : undefined};
       padding-top: ${$paddingTop ? theme.spacing[$paddingTop] : undefined};
-      padding-right: ${$paddingRight
-        ? theme.spacing[$paddingRight]
-        : undefined};
-      padding-bottom: ${$paddingBottom
-        ? theme.spacing[$paddingBottom]
-        : undefined};
+      padding-right: ${$paddingRight ? theme.spacing[$paddingRight] : undefined};
+      padding-bottom: ${$paddingBottom ? theme.spacing[$paddingBottom] : undefined};
       padding-left: ${$paddingLeft ? theme.spacing[$paddingLeft] : undefined};
       max-width: ${$maxWidth};
       max-height: ${$maxHeight};

@@ -36,9 +36,7 @@ describe.skip('useStepUp', () => {
     const onSuccess = jest.fn();
     const onError = jest.fn();
 
-    const { result } = customRenderHook(() =>
-      useStepUp({ device, authToken, onSuccess, onError }),
-    );
+    const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
     await waitFor(() => {
       expect(result.current.needsStepUp).toBe(true);
@@ -75,9 +73,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       await waitFor(() => {
         expect(onError).toHaveBeenCalled();
@@ -98,9 +94,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       await waitFor(() => {
         expect(onError).toHaveBeenCalled();
@@ -122,9 +116,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      const { result } = customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       const { stepUp } = result.current;
       await stepUp();
@@ -149,9 +141,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      const { result } = customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       const { stepUp } = result.current;
       await stepUp();
@@ -177,9 +167,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      const { result } = customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       await waitFor(() => {
         expect(result.current.canStepUp).toBe(true);
@@ -200,9 +188,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      const { result } = customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       await waitFor(() => {
         expect(result.current.canStepUp).toBe(true);
@@ -223,9 +209,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      const { result } = customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       await waitFor(() => {
         expect(result.current.canStepUp).toBe(false);
@@ -252,9 +236,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      const { result } = customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       await waitFor(() => {
         expect(result.current.canStepUp).toBe(false);
@@ -281,9 +263,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      const { result } = customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       await waitFor(() => {
         expect(result.current.canStepUp).toBe(false);
@@ -310,9 +290,7 @@ describe.skip('useStepUp', () => {
       const onSuccess = jest.fn();
       const onError = jest.fn();
 
-      const { result } = customRenderHook(() =>
-        useStepUp({ device, authToken, onSuccess, onError }),
-      );
+      const { result } = customRenderHook(() => useStepUp({ device, authToken, onSuccess, onError }));
 
       await waitFor(() => {
         expect(result.current.needsStepUp).toBe(false);

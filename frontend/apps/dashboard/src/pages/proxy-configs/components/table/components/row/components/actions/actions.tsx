@@ -34,28 +34,16 @@ const Actions = ({ proxyConfig }: ActionsProps) => {
   return (
     <Stack justify="flex-end">
       <Dropdown.Root>
-        <PermissionGate
-          scopeKind={RoleScopeKind.manageVaultProxy}
-          fallbackText={t('not-allowed')}
-        >
+        <PermissionGate scopeKind={RoleScopeKind.manageVaultProxy} fallbackText={t('not-allowed')}>
           <Dropdown.Trigger aria-label={t('aria-label', { name })}>
             <IcoDotsHorizontal24 />
           </Dropdown.Trigger>
         </PermissionGate>
         <Dropdown.Content align="end">
-          <Dropdown.Item
-            onSelect={handleToggleStatus}
-            onClick={event => event.stopPropagation()}
-          >
-            {proxyConfig.status === 'enabled'
-              ? t('status.disable.cta')
-              : t('status.enable.cta')}
+          <Dropdown.Item onSelect={handleToggleStatus} onClick={event => event.stopPropagation()}>
+            {proxyConfig.status === 'enabled' ? t('status.disable.cta') : t('status.enable.cta')}
           </Dropdown.Item>
-          <Dropdown.Item
-            onSelect={handleRemove}
-            onClick={event => event.stopPropagation()}
-            variant="destructive"
-          >
+          <Dropdown.Item onSelect={handleRemove} onClick={event => event.stopPropagation()} variant="destructive">
             {t('remove.cta')}
           </Dropdown.Item>
         </Dropdown.Content>

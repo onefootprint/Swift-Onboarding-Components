@@ -1,9 +1,5 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import {
-  DocumentRequestKind,
-  OnboardingConfigStatus,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import { DocumentRequestKind, OnboardingConfigStatus, OnboardingRequirementKind } from '@onefootprint/types';
 
 import type { TransferRequirements } from '../../types';
 

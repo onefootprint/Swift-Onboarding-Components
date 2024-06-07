@@ -25,12 +25,9 @@ const useCancelD2P = ({
       {
         onSuccess,
         onError: (error: unknown) => {
-          Logger.error(
-            `Failed to cancel D2P session from mobile bifrost. ${getErrorMessage(
-              error,
-            )}`,
-            { location: 'transfer' },
-          );
+          Logger.error(`Failed to cancel D2P session from mobile bifrost. ${getErrorMessage(error)}`, {
+            location: 'transfer',
+          });
           onError?.();
         },
       },

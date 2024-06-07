@@ -1,22 +1,13 @@
 import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 
-import {
-  defaultPlaybookValuesKYB,
-  defaultPlaybookValuesKYC,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import { PlaybookKind, defaultPlaybookValuesKYB, defaultPlaybookValuesKYC } from '@/playbooks/utils/machine/types';
 
 import type { DataCollectionWithContextProps } from './summary.test.config';
 import DataCollectionWithContext from './summary.test.config';
 
-const renderSummary = ({
-  startingValues,
-  kind,
-}: DataCollectionWithContextProps) => {
-  customRender(
-    <DataCollectionWithContext kind={kind} startingValues={startingValues} />,
-  );
+const renderSummary = ({ startingValues, kind }: DataCollectionWithContextProps) => {
+  customRender(<DataCollectionWithContext kind={kind} startingValues={startingValues} />);
 };
 describe('<Summary />', () => {
   it('should show investor profile questions in KYC', async () => {
@@ -32,9 +23,7 @@ describe('<Summary />', () => {
         businessInformation: defaultPlaybookValuesKYB.businessInformation,
       },
     });
-    expect(
-      screen.queryByText('Investor profile questions'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Investor profile questions')).not.toBeInTheDocument();
   });
 
   it('should show BO info alert for KYB', async () => {

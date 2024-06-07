@@ -28,19 +28,9 @@ export default {
   },
 } as ComponentMeta<typeof Container>;
 
-const Template: Story<ContainerProps> = ({
-  as,
-  children,
-  testID,
-}: Partial<ContainerProps>) => (
+const Template: Story<ContainerProps> = ({ as, children, testID }: Partial<ContainerProps>) => (
   <Container as={as} testID={testID}>
-    <Box
-      width="100%"
-      height="100vh"
-      backgroundColor="tertiary"
-      borderRadius="sm"
-      padding={6}
-    >
+    <Box width="100%" height="100vh" backgroundColor="tertiary" borderRadius="sm" padding={6}>
       <Text variant="label-1" color="quaternary">
         {children}
       </Text>

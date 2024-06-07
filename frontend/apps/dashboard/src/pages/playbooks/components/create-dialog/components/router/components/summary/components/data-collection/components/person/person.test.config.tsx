@@ -1,15 +1,8 @@
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
-import type {
-  Personal,
-  SummaryFormData,
-  SummaryMeta,
-} from '@/playbooks/utils/machine/types';
-import {
-  defaultPlaybookValuesKYC,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import type { Personal, SummaryFormData, SummaryMeta } from '@/playbooks/utils/machine/types';
+import { PlaybookKind, defaultPlaybookValuesKYC } from '@/playbooks/utils/machine/types';
 
 import PersonalInfoAndDocs from './person';
 

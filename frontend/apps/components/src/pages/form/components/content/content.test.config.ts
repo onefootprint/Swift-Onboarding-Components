@@ -41,11 +41,7 @@ export const withClientTokenFields = () =>
     method: 'get',
     path: '/entities/client_token',
     response: {
-      vault_fields: [
-        'card.primary.number',
-        'card.primary.cvc',
-        'card.primary.expiration',
-      ],
+      vault_fields: ['card.primary.number', 'card.primary.cvc', 'card.primary.expiration'],
       expires_at: new Date(),
     },
   });

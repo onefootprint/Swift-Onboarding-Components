@@ -6,9 +6,7 @@ import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
 const getRolesRequest = async (authHeaders: AuthHeaders, kind: RoleKind) => {
-  const { data: response } = await request<
-    PaginatedRequestResponse<GetRolesResponse>
-  >({
+  const { data: response } = await request<PaginatedRequestResponse<GetRolesResponse>>({
     method: 'GET',
     url: '/org/roles',
     headers: authHeaders,
@@ -24,9 +22,7 @@ const getRolesRequest = async (authHeaders: AuthHeaders, kind: RoleKind) => {
 
 const useRoles = (kind: RoleKind) => {
   const { authHeaders } = useSession();
-  const rolesQuery = useQuery(['members', 'roles', kind, authHeaders], () =>
-    getRolesRequest(authHeaders, kind),
-  );
+  const rolesQuery = useQuery(['members', 'roles', kind, authHeaders], () => getRolesRequest(authHeaders, kind));
   const { error, data = [] } = rolesQuery;
   const options = data.map(role => ({ label: role.name, value: role.id }));
   return {

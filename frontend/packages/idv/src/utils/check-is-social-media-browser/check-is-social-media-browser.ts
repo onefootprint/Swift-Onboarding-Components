@@ -24,7 +24,7 @@ const checkIsIframe = () => {
   }
   try {
     return window.self !== window.top;
-  } catch (e) {
+  } catch (_e) {
     return true;
   }
 };
@@ -37,13 +37,7 @@ type SocialMediaCheckArgs = {
   isIframe?: boolean;
 };
 
-export const socialMediaCheck = ({
-  ua,
-  browserName,
-  browserVersion,
-  isMobile,
-  isIframe,
-}: SocialMediaCheckArgs) => {
+export const socialMediaCheck = ({ ua, browserName, browserVersion, isMobile, isIframe }: SocialMediaCheckArgs) => {
   const lowUserAgent = ua.toLowerCase();
   const lowBrowserName = browserName?.toLowerCase();
   const lowBrowserVersion = browserVersion?.toLowerCase();
@@ -52,16 +46,10 @@ export const socialMediaCheck = ({
   if (socialMediaTerms.some(term => lowUserAgent.includes(term))) {
     return true;
   }
-  if (
-    lowBrowserName &&
-    socialMediaTerms.some(term => lowBrowserName.includes(term))
-  ) {
+  if (lowBrowserName && socialMediaTerms.some(term => lowBrowserName.includes(term))) {
     return true;
   }
-  if (
-    lowBrowserVersion &&
-    socialMediaTerms.some(term => lowBrowserVersion.includes(term))
-  ) {
+  if (lowBrowserVersion && socialMediaTerms.some(term => lowBrowserVersion.includes(term))) {
     return true;
   }
 

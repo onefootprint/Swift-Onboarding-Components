@@ -23,9 +23,7 @@ const Loading = () => (
   </Box>
 );
 
-const Breadcrumb = () => (
-  <Shimmer height="20px" width="132px" marginBottom={8} />
-);
+const Breadcrumb = () => <Shimmer height="20px" width="132px" marginBottom={8} />;
 
 const Name = () => <Shimmer height="20px" width="100px" marginBottom={4} />;
 

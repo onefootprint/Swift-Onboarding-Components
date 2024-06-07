@@ -25,12 +25,8 @@ const Row = ({ proxyConfig }: RowProps) => {
       <td>{method}</td>
       <td>{formatDateWithTime(new Date(createdAt))}</td>
       <td>
-        {status === 'enabled' && (
-          <Badge variant="success">{t('status.enabled')}</Badge>
-        )}
-        {status === 'disabled' && (
-          <Badge variant="error">{t('status.disabled')}</Badge>
-        )}
+        {status === 'enabled' && <Badge variant="success">{t('status.enabled')}</Badge>}
+        {status === 'disabled' && <Badge variant="error">{t('status.disabled')}</Badge>}
       </td>
       <td aria-label="actions">
         <Actions proxyConfig={proxyConfig} />

@@ -21,12 +21,7 @@ const VaultProxy = () => {
   return (
     <StyledContainer>
       <VaultProxyImage>
-        <Image
-          src="/vaulting/vault-proxy/vault-proxy-section.png"
-          width={360}
-          height={180}
-          alt=""
-        />
+        <Image src="/vaulting/vault-proxy/vault-proxy-section.png" width={360} height={180} alt="" />
       </VaultProxyImage>
       <TitleContainer>
         <SectionTitle variant="display-2">{t('title')}</SectionTitle>
@@ -38,9 +33,7 @@ const VaultProxy = () => {
           <MicroFeatureCard
             key={translation}
             title={t(`bullets.${translation}.title` as ParseKeys<'common'>)}
-            subtitle={t(
-              `bullets.${translation}.subtitle` as ParseKeys<'common'>,
-            )}
+            subtitle={t(`bullets.${translation}.subtitle` as ParseKeys<'common'>)}
             icon={icons[index]}
           />
         ))}

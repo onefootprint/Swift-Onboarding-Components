@@ -1,14 +1,7 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import {
-  CollectedKybDataOption,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { CollectedKybDataOption, SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
-import {
-  asAdminUser,
-  asAdminUserFirmEmployee,
-  asAdminUserInOrg,
-} from 'src/config/tests';
+import { asAdminUser, asAdminUserFirmEmployee, asAdminUserInOrg } from 'src/config/tests';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
@@ -16,9 +9,7 @@ import type { EditingWithContextProps } from './editing.test.config';
 import EditingWithContext from './editing.test.config';
 
 const renderEditing = ({ kind, startingValues }: EditingWithContextProps) => {
-  customRender(
-    <EditingWithContext startingValues={startingValues} kind={kind} />,
-  );
+  customRender(<EditingWithContext startingValues={startingValues} kind={kind} />);
 };
 
 describe('<Editing />', () => {
@@ -31,9 +22,7 @@ describe('<Editing />', () => {
         name: 'Allow users without an SSN to proceed with the verification',
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('They will need to be manually reviewed by you.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('They will need to be manually reviewed by you.')).toBeInTheDocument();
   });
 
   it('should disable save button if ID doc not selected', async () => {
@@ -54,9 +43,7 @@ describe('<Editing />', () => {
       },
     });
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-    expect(
-      screen.queryByText('You must select at least one ID document type.'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('You must select at least one ID document type.')).not.toBeInTheDocument();
   });
 
   it('save button should be disabled if ID doc not selected', async () => {
@@ -71,16 +58,12 @@ describe('<Editing />', () => {
     renderEditing({
       startingValues: { personal: { idDoc: true, idDocKind: [] } },
     });
-    expect(
-      screen.getByText('Request a selfie after ID upload'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Request a selfie after ID upload')).toBeInTheDocument();
   });
 
   it('should show correct title for KYC', async () => {
     renderEditing({ kind: PlaybookKind.Kyc });
-    expect(
-      screen.getByText('Edit personal information & docs'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Edit personal information & docs')).toBeInTheDocument();
   });
 
   it('should show correct title for KYB', async () => {
@@ -165,9 +148,7 @@ describe('<Editing />', () => {
     it('should show the "Do document scan step-up" option', async () => {
       renderEditing({});
 
-      const ssnOptional = screen.getByLabelText(
-        'Allow users without an SSN to proceed with the verification',
-      );
+      const ssnOptional = screen.getByLabelText('Allow users without an SSN to proceed with the verification');
       await userEvent.click(ssnOptional);
 
       const stepUp = screen.getByLabelText('Do document scan step-up');
@@ -177,9 +158,7 @@ describe('<Editing />', () => {
     it('should disable the option to do regular id doc scan', async () => {
       renderEditing({});
 
-      const ssnOptional = screen.getByLabelText(
-        'Allow users without an SSN to proceed with the verification',
-      );
+      const ssnOptional = screen.getByLabelText('Allow users without an SSN to proceed with the verification');
       await userEvent.click(ssnOptional);
 
       const docStepUp = screen.getByRole('checkbox', {
@@ -197,9 +176,7 @@ describe('<Editing />', () => {
       it('should show the list of id docs', async () => {
         renderEditing({});
 
-        const ssnOptional = screen.getByLabelText(
-          'Allow users without an SSN to proceed with the verification',
-        );
+        const ssnOptional = screen.getByLabelText('Allow users without an SSN to proceed with the verification');
         await userEvent.click(ssnOptional);
 
         const stepUp = screen.getByLabelText('Do document scan step-up');
@@ -236,9 +213,7 @@ describe('<Editing />', () => {
         it('should reset the "Do document scan step-up" option', async () => {
           renderEditing({});
 
-          const ssnOptional = screen.getByLabelText(
-            'Allow users without an SSN to proceed with the verification',
-          );
+          const ssnOptional = screen.getByLabelText('Allow users without an SSN to proceed with the verification');
           await userEvent.click(ssnOptional);
 
           const stepUp = screen.getByLabelText('Do document scan step-up');
@@ -259,9 +234,7 @@ describe('<Editing />', () => {
         it('should unselect any id doc that was previously selected', async () => {
           renderEditing({});
 
-          const ssnOptional = screen.getByLabelText(
-            'Allow users without an SSN to proceed with the verification',
-          );
+          const ssnOptional = screen.getByLabelText('Allow users without an SSN to proceed with the verification');
           await userEvent.click(ssnOptional);
 
           const stepUp = screen.getByLabelText('Do document scan step-up');

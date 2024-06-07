@@ -37,8 +37,7 @@ const TopMenuBar = () => {
   const router = useRouter();
 
   const userWouldBeRedirected =
-    router.pathname.startsWith('/users/[id]') ||
-    router.pathname.startsWith('/businesses/[id]');
+    router.pathname.startsWith('/users/[id]') || router.pathname.startsWith('/businesses/[id]');
   return (
     <Container direction="row" justify="space-between" align="center">
       <Link href={DEFAULT_PUBLIC_ROUTE} aria-label={t('home')}>
@@ -48,11 +47,7 @@ const TopMenuBar = () => {
       </Link>
       <Tooltip
         disabled={!userWouldBeRedirected && sandbox.canToggle}
-        text={
-          userWouldBeRedirected
-            ? tooltipInfoText
-            : t('sandbox-mode.tooltip-disabled')
-        }
+        text={userWouldBeRedirected ? tooltipInfoText : t('sandbox-mode.tooltip-disabled')}
         alignment="end"
         position="bottom"
       >

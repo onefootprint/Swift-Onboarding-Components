@@ -1,9 +1,6 @@
 import type { MachineContext, MachineEvents } from '../../types';
 
-const isContextReady = (
-  context: MachineContext,
-  event: MachineEvents,
-): boolean => {
+const isContextReady = (context: MachineContext, event: MachineEvents): boolean => {
   if (event.type !== 'initContextUpdated') {
     return false;
   }

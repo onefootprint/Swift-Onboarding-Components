@@ -36,15 +36,11 @@ const Form = ({ onSubmit, playbook, tenants }: FormProps) => {
     defaultValues: {
       name: t('form.name.base', { name: playbook.name }),
       mode: 'sandbox',
-      tenantId: tenants.find(
-        tenant => tenant.value === org.dangerouslyCastedData.id,
-      )?.value,
+      tenantId: tenants.find(tenant => tenant.value === org.dangerouslyCastedData.id)?.value,
     },
   });
   const selectedTenantId = form.watch('tenantId');
-  const selectedTenant = tenants.find(
-    tenant => tenant.value === selectedTenantId,
-  );
+  const selectedTenant = tenants.find(tenant => tenant.value === selectedTenantId);
 
   const handleSubmit = (data: FormData) => {
     onSubmit({ ...data, tenantName: selectedTenant?.label || '' });
@@ -65,10 +61,7 @@ const Form = ({ onSubmit, playbook, tenants }: FormProps) => {
           {...form.register('name', { required: true })}
         />
         {tenants.length > 1 && (
-          <NativeSelect
-            {...form.register('tenantId', { required: true })}
-            label={t('form.tenant.label')}
-          >
+          <NativeSelect {...form.register('tenantId', { required: true })} label={t('form.tenant.label')}>
             {tenants.map(tenant => (
               <option key={tenant.value} value={tenant.value}>
                 {tenant.label}

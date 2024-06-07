@@ -14,12 +14,7 @@ const Trigger = ({
   ariaLabel,
   className,
 }: TriggerProps & { className?: string }) => (
-  <StyledTrigger
-    size={size}
-    width={triggerWidth}
-    aria-label={ariaLabel}
-    className={className}
-  >
+  <StyledTrigger size={size} width={triggerWidth} aria-label={ariaLabel} className={className}>
     <ValueContainer>
       <Select.Value placeholder={placeholder} />
     </ValueContainer>
@@ -73,19 +68,23 @@ const StyledTrigger = styled(Select.Trigger)<{
         color: ${input.state.disabled.color};
       }
 
-      ${size === 'compact' &&
-      css`
+      ${
+        size === 'compact' &&
+        css`
         ${createFontStyles('body-4')}
         height: ${input.size.compact.height};
         padding: ${theme.spacing[2]} ${theme.spacing[3]};
-      `}
+      `
+      }
 
-      ${size === 'default' &&
-      css`
+      ${
+        size === 'default' &&
+        css`
         ${createFontStyles('body-3')}
         height: ${input.size.default.height};
         padding: ${theme.spacing[3]} ${theme.spacing[4]};
-      `}
+      `
+      }
     `;
   }};
 `;

@@ -14,12 +14,7 @@ const CustomizationPreview = () => {
     <Container>
       <IframeContainer>
         {themes.map(theme => (
-          <Iframe
-            key={theme.name}
-            name={theme.name}
-            selected={theme.name === selectedTheme.name}
-            src={theme.src}
-          />
+          <Iframe key={theme.name} name={theme.name} selected={theme.name === selectedTheme.name} src={theme.src} />
         ))}
       </IframeContainer>
       <Content>

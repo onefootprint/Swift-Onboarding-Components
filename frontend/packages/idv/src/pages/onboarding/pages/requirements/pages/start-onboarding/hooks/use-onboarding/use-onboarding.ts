@@ -1,8 +1,5 @@
 import request from '@onefootprint/request';
-import type {
-  OnboardingRequest,
-  OnboardingResponse,
-} from '@onefootprint/types';
+import type { OnboardingRequest, OnboardingResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 

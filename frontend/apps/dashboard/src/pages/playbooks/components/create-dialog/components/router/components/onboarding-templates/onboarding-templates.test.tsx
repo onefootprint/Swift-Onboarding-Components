@@ -5,10 +5,7 @@ import { OnboardingTemplate } from 'src/pages/playbooks/utils/machine/types';
 import OnboardingTemplates from '.';
 import type { OnboardingTemplatesProps } from './onboarding-templates';
 
-const renderOnboardingTemplates = ({
-  onSubmit,
-  onBack,
-}: OnboardingTemplatesProps) =>
+const renderOnboardingTemplates = ({ onSubmit, onBack }: OnboardingTemplatesProps) =>
   customRender(<OnboardingTemplates onSubmit={onSubmit} onBack={onBack} />);
 
 describe('<OnboardingTemplates />', () => {
@@ -16,11 +13,7 @@ describe('<OnboardingTemplates />', () => {
     const onSubmit = jest.fn();
     const onBack = jest.fn();
     renderOnboardingTemplates({ onSubmit, onBack });
-    expect(
-      screen.getByText(
-        'Configure your own KYC settings or select a pre-defined template.',
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Configure your own KYC settings or select a pre-defined template.')).toBeInTheDocument();
     const customPlaybookOption = screen.getByRole('button', {
       name: 'Custom',
     });

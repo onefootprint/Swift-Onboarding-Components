@@ -19,26 +19,20 @@ export const isEqArray: Comparator = (a, b) => {
   return sortedA.every((x, idx) => x === sortedB[idx]);
 };
 
-const mergeInitialData = (
-  initData: KycData,
-  decryptedFields: KycData,
-): KycData => {
-  const newValues = Object.entries(decryptedFields).reduce<KycData>(
-    (obj, [k, val]) => {
-      const initValue = initData?.[k as IdDI]?.value;
-      const decryptedValue = val.value;
-      const hasEqValue = Array.isArray(decryptedValue) ? isEqArray : isEqual;
+const mergeInitialData = (initData: KycData, decryptedFields: KycData): KycData => {
+  const newValues = Object.entries(decryptedFields).reduce<KycData>((obj, [k, val]) => {
+    const initValue = initData?.[k as IdDI]?.value;
+    const decryptedValue = val.value;
+    const hasEqValue = Array.isArray(decryptedValue) ? isEqArray : isEqual;
 
-      /** Don't allow replacing bootstrap data with decrypted data. The bootstrap data should take precedent */
-      if (!(k in initData) || hasEqValue(initValue, decryptedValue)) {
-        /* @ts-ignore: key string vs enum comparison */
-        obj[k] = val; // eslint-disable-line no-param-reassign
-      }
+    /** Don't allow replacing bootstrap data with decrypted data. The bootstrap data should take precedent */
+    if (!(k in initData) || hasEqValue(initValue, decryptedValue)) {
+      /* @ts-ignore: key string vs enum comparison */
+      obj[k] = val; // eslint-disable-line no-param-reassign
+    }
 
-      return obj;
-    },
-    {},
-  );
+    return obj;
+  }, {});
 
   return {
     ...initData,

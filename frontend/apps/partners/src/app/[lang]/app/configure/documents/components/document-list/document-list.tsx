@@ -8,12 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { Lang } from '@/app/types';
 import type { WithConfirm } from '@/helpers';
-import {
-  confirmDeletion,
-  dateFormatter,
-  getOr,
-  searchByPaths,
-} from '@/helpers';
+import { confirmDeletion, dateFormatter, getOr, searchByPaths } from '@/helpers';
 import type { DocTemplate } from '@/queries/get-partner-doc-templates';
 
 type T = TFunction<'common'>;
@@ -23,10 +18,7 @@ type ListProps = { handlers: Handlers; lang: Lang; templates: DocTemplate[] };
 
 const stopPropagation = (e: SyntheticEvent<unknown>) => e.stopPropagation();
 const getDataId = getOr<undefined | string>(undefined, 'target.dataset.id');
-const clientSearch = searchByPaths<DocTemplate>([
-  'latestVersion.name',
-  'latestVersion.description',
-]);
+const clientSearch = searchByPaths<DocTemplate>(['latestVersion.name', 'latestVersion.description']);
 
 const getTableColumns = (t: T) => [
   { text: t('document'), width: '35%' },
@@ -57,12 +49,7 @@ const DocumentList = ({ handlers, lang, templates }: ListProps) => {
   );
 };
 
-const renderTr = (
-  t: T,
-  lang: Lang,
-  handlers: Handlers,
-  withConfirm: WithConfirm,
-) =>
+const renderTr = (t: T, lang: Lang, handlers: Handlers, withConfirm: WithConfirm) =>
   function Tr({ item }: TableRow<DocTemplate>) {
     return (
       <>
@@ -70,9 +57,7 @@ const renderTr = (
         <td>{dateFormatter(lang, item.latestVersion.createdAt)}</td>
         <Box tag="td" display="grid" justifyContent="end" alignItems="center">
           <Dropdown.Root>
-            <Dropdown.Trigger
-              aria-label={`${t('open-actions-for')} ${item.latestVersion.name}`}
-            >
+            <Dropdown.Trigger aria-label={`${t('open-actions-for')} ${item.latestVersion.name}`}>
               <IcoDotsHorizontal24 />
             </Dropdown.Trigger>
             <Dropdown.Content align="end">
@@ -85,9 +70,7 @@ const renderTr = (
               </Dropdown.Item>
               <Dropdown.Item
                 data-id={item.id}
-                onSelect={withConfirm(e =>
-                  handlers.onDeleteClick(getDataId(e)),
-                )}
+                onSelect={withConfirm(e => handlers.onDeleteClick(getDataId(e)))}
                 onClick={stopPropagation}
                 variant="destructive"
               >

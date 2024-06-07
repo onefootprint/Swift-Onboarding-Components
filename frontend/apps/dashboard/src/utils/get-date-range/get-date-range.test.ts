@@ -10,11 +10,7 @@ describe('getDateRange', () => {
   describe('when the period is today', () => {
     it('returns the start of today', () => {
       const now = new Date();
-      const today = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-      ).toISOString();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       expect(getDateRange(['today'], now)).toEqual({
         from: today,
         to: undefined,

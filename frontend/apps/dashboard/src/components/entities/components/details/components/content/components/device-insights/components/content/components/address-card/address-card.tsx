@@ -1,10 +1,5 @@
 import type { Entity } from '@onefootprint/types';
-import {
-  AnimatedLoadingSpinner,
-  LinkButton,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { AnimatedLoadingSpinner, LinkButton, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
@@ -25,33 +20,20 @@ type AddressCardProps = {
   isLoading?: boolean;
 };
 
-const AddressCard = ({
-  id,
-  type,
-  entity,
-  isSelected,
-  onSelect,
-  isLoading,
-}: AddressCardProps) => {
+const AddressCard = ({ id, type, entity, isSelected, onSelect, isLoading }: AddressCardProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.device-insights.address-card',
   });
 
-  const { getAddressFieldsProps, getAddressDis } =
-    useAddressFieldsProps(entity);
+  const { getAddressFieldsProps, getAddressDis } = useAddressFieldsProps(entity);
 
-  const headerText =
-    type === 'business'
-      ? t('business.header-text')
-      : t('residential.header-text');
+  const headerText = type === 'business' ? t('business.header-text') : t('residential.header-text');
 
   const rows = getAddressFieldsProps(type).map(prop => (
     <CardRow
       key={prop.label}
       label={prop.label}
-      value={
-        <FieldOrPlaceholder data={prop.value} transforms={prop.transforms} />
-      }
+      value={<FieldOrPlaceholder data={prop.value} transforms={prop.transforms} />}
     />
   ));
 
@@ -62,9 +44,7 @@ const AddressCard = ({
 
   const decryptableSet = new Set(entity.decryptableAttributes);
 
-  const encryptedFields = getAddressFieldsProps(type).filter(
-    prop => !prop.isDecrypted,
-  );
+  const encryptedFields = getAddressFieldsProps(type).filter(prop => !prop.isDecrypted);
   const decryptableFields = encryptedFields.filter(
     field => !field || (decryptableSet.has(field.name) && field.canDecrypt),
   );
@@ -75,9 +55,7 @@ const AddressCard = ({
   let ctaElem;
   if (isCtaVisible) {
     if (isCtaLoading) {
-      ctaElem = (
-        <AnimatedLoadingSpinner animationStart size={22} color="accent" />
-      );
+      ctaElem = <AnimatedLoadingSpinner animationStart size={22} color="accent" />;
     } else {
       ctaElem = (
         <Stack width="100%" direction="column" align="flex-start" zIndex={2}>
@@ -85,9 +63,7 @@ const AddressCard = ({
             <Trans
               i18nKey="pages.entity.device-insights.address-card.cta.text"
               components={{
-                link: (
-                  <LinkButton onClick={handleClick}>{t('cta.link')}</LinkButton>
-                ),
+                link: <LinkButton onClick={handleClick}>{t('cta.link')}</LinkButton>,
               }}
             />
           </Text>

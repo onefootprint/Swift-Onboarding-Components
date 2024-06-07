@@ -6,11 +6,7 @@ type ApitureLogoProps = {
 };
 
 const ApitureLogo = ({ color }: ApitureLogoProps) => (
-  <StyledSvg
-    enableBackground="new 0 0 500.9 75"
-    viewBox="0 0 500.9 75"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <StyledSvg enableBackground="new 0 0 500.9 75" viewBox="0 0 500.9 75" xmlns="http://www.w3.org/2000/svg">
     <g fill={color}>
       <path d="m211.8 65.5 1.2 8.5h-9.5l-1.2-7.6h-.2c-3.4 5.3-10.3 8.7-18.1 8.7-15.3 0-25.8-12.2-25.8-27.5s10.5-27.5 25.8-27.5c8 0 14.8 3.6 18.1 8.7h.2v-28.8h9.5zm-9-17.9c0-10.6-6.8-18.7-17.3-18.7-10.6 0-17.4 8-17.4 18.7s6.9 18.7 17.4 18.7c10.6-.1 17.3-8.2 17.3-18.7z" />
       <path d="m290.5 7.5h-8.8v13.9h-13.7v8.8h13.7v16.7c0 14.9 12.1 27 27 27h1v-8c-10.6 0-19.2-8.6-19.2-19.2v-16.5h13.9v-8.8h-13.9z" />

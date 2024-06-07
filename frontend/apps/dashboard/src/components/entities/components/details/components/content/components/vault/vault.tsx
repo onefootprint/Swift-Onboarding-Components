@@ -1,8 +1,4 @@
-import type {
-  DataIdentifier,
-  EntityVault,
-  VaultValue,
-} from '@onefootprint/types';
+import type { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
 import { EntityKind, IdDI } from '@onefootprint/types';
 import React from 'react';
 
@@ -14,10 +10,7 @@ import BusinessVault from './components/business-vault';
 import DecryptForm from './components/decrypt-form';
 import EditForm from './components/edit-form';
 import PersonVault from './components/person-vault';
-import VaultActionControls, {
-  useDecryptControls,
-  useEditControls,
-} from './components/vault-actions';
+import VaultActionControls, { useDecryptControls, useEditControls } from './components/vault-actions';
 import EMPTY_SELECT_VALUE from './constants';
 import type { EditFormData, EditSubmitData } from './vault.types';
 
@@ -30,18 +23,14 @@ const Vault = ({ entity }: VaultProps) => {
   const vaultWithTransforms = useEntityVault(entity.id, entity);
   const showEditForm = context.kind === EntityKind.person && edit.inProgress;
 
-  const convertFormData = (
-    formData: EditFormData,
-    previousData?: EntityVault,
-  ) => {
+  const convertFormData = (formData: EditFormData, previousData?: EntityVault) => {
     const convertedData = {} as EditSubmitData;
     Object.keys(formData).forEach((key: string) => {
       const di = `id.${key}` as DataIdentifier; // Currently only IdDI data is editable
       let value = formData[key];
 
       // TODO: this logic depends on the fact that we only can edit IdDI data for now. Need to make it more generic
-      if (typeof value === 'object' && !Array.isArray(value) && value !== null)
-        return;
+      if (typeof value === 'object' && !Array.isArray(value) && value !== null) return;
       if (value === (EMPTY_SELECT_VALUE as VaultValue)) {
         value = null;
       }
@@ -51,9 +40,7 @@ const Vault = ({ entity }: VaultProps) => {
 
       const stayedEmpty = (!previousData || !previousData[di]) && !value;
       const wasDeleted = previousData && previousData[di] && !value;
-      let wasEdited =
-        (previousData && previousData[di] !== value) ||
-        ((!previousData || !previousData[di]) && value);
+      let wasEdited = (previousData && previousData[di] !== value) || ((!previousData || !previousData[di]) && value);
       if (di === IdDI.citizenships && previousData && previousData[di]) {
         wasEdited = JSON.stringify(previousData[di]) !== JSON.stringify(value);
       }
@@ -74,12 +61,7 @@ const Vault = ({ entity }: VaultProps) => {
 
     // Deletion quirk: if status is changed, unchanged legal status-related fields are overwritten
     if (convertedData[IdDI.usLegalStatus]) {
-      const legalStatusDIs = [
-        IdDI.nationality,
-        IdDI.citizenships,
-        IdDI.visaKind,
-        IdDI.visaExpirationDate,
-      ];
+      const legalStatusDIs = [IdDI.nationality, IdDI.citizenships, IdDI.visaKind, IdDI.visaExpirationDate];
       legalStatusDIs.forEach(di => {
         const hadPreviousValue = previousData && previousData[di];
         const wasUnchanged = !(di in convertedData);
@@ -110,11 +92,7 @@ const Vault = ({ entity }: VaultProps) => {
         </EditForm>
       ) : (
         <DecryptForm onSubmit={decrypt.submitFields}>
-          {context.kind === EntityKind.business ? (
-            <BusinessVault />
-          ) : (
-            <PersonVault />
-          )}
+          {context.kind === EntityKind.business ? <BusinessVault /> : <PersonVault />}
         </DecryptForm>
       )}
     </>

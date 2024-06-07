@@ -1,25 +1,13 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import { IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import type { InitMachineArgs } from '../../utils/state-machine/machine';
 import TestWrapper from '../../utils/test-wrapper';
 import BasicInformation from './basic-information';
-import {
-  getInitialContext,
-  withUserVault,
-  withUserVaultError,
-} from './basic-information.test.config';
+import { getInitialContext, withUserVault, withUserVaultError } from './basic-information.test.config';
 
-const renderBasicInformation = (
-  initialContext: InitMachineArgs,
-  onComplete?: () => void,
-) => {
+const renderBasicInformation = (initialContext: InitMachineArgs, onComplete?: () => void) => {
   customRender(
     <TestWrapper initialContext={initialContext} initState="confirm">
       <BasicInformation onComplete={onComplete} />

@@ -1,19 +1,9 @@
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { RouterProps } from './router';
 import Router from './router';
-import {
-  createPlaybook,
-  enterName,
-  moveForward,
-  withCreateOnboardingConfigs,
-} from './router.test.config';
+import { createPlaybook, enterName, moveForward, withCreateOnboardingConfigs } from './router.test.config';
 
 const renderRouter = (
   { onCreate }: RouterProps = {
@@ -49,9 +39,7 @@ describe('<Router />', () => {
         await createPlaybook();
 
         await waitFor(() => {
-          const confirmation = screen.getByText(
-            'Playbook created successfully.',
-          );
+          const confirmation = screen.getByText('Playbook created successfully.');
           expect(confirmation).toBeInTheDocument();
         });
 
@@ -73,9 +61,7 @@ describe('<Router />', () => {
         await userEvent.click(back);
 
         // Who to onboard
-        const title = screen.getByText(
-          'What type of playbook would you like to create?',
-        );
+        const title = screen.getByText('What type of playbook would you like to create?');
         expect(title).toBeInTheDocument();
       });
 
@@ -90,9 +76,7 @@ describe('<Router />', () => {
         await userEvent.click(next);
 
         // Residency
-        const title = screen.getByText(
-          'Select the countries from which your users may onboard.',
-        );
+        const title = screen.getByText('Select the countries from which your users may onboard.');
         expect(title).toBeInTheDocument();
       });
 
@@ -124,9 +108,7 @@ describe('<Router />', () => {
         await userEvent.click(back);
 
         // Who to onboard
-        const title = screen.getByText(
-          'What type of playbook would you like to create?',
-        );
+        const title = screen.getByText('What type of playbook would you like to create?');
         expect(title).toBeInTheDocument();
       });
     });
@@ -149,9 +131,7 @@ describe('<Router />', () => {
         await userEvent.click(back);
 
         // Residency
-        const title = screen.getByText(
-          'Select the countries from which your users may onboard.',
-        );
+        const title = screen.getByText('Select the countries from which your users may onboard.');
         expect(title).toBeInTheDocument();
       });
 
@@ -170,9 +150,7 @@ describe('<Router />', () => {
         await userEvent.click(back);
 
         // Templates
-        const title = screen.getByText(
-          'Configure your own KYC settings or select a pre-defined template.',
-        );
+        const title = screen.getByText('Configure your own KYC settings or select a pre-defined template.');
         expect(title).toBeInTheDocument();
       });
     });
@@ -265,9 +243,7 @@ describe('<Router />', () => {
         await createPlaybook();
 
         await waitFor(() => {
-          const confirmation = screen.getByText(
-            'Playbook created successfully.',
-          );
+          const confirmation = screen.getByText('Playbook created successfully.');
           expect(confirmation).toBeInTheDocument();
         });
       });
@@ -289,9 +265,7 @@ describe('<Router />', () => {
         await userEvent.click(back);
 
         // Who to onboard
-        const title = screen.getByText(
-          'What type of playbook would you like to create?',
-        );
+        const title = screen.getByText('What type of playbook would you like to create?');
         expect(title).toBeInTheDocument();
       });
     });

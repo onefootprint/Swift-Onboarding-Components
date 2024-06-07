@@ -1,7 +1,7 @@
 import { IcoClose16 } from '@onefootprint/icons';
 import { WhatsThisContent } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { createFontStyles, IconButton, Stack } from '@onefootprint/ui';
+import { IconButton, Stack, createFontStyles } from '@onefootprint/ui';
 import * as Popover from '@radix-ui/react-popover';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,13 +19,7 @@ const WhatsThisPopover = ({ config }: WhatsThisPopoverProps) => {
     <Popover.Root>
       <Trigger>{t('links.what-is-this')}</Trigger>
       <PopoverContent sideOffset={8}>
-        <Stack
-          direction="row"
-          align="center"
-          height="52px"
-          justify="start"
-          marginLeft={3}
-        >
+        <Stack direction="row" align="center" height="52px" justify="start" marginLeft={3}>
           <CloseBounds asChild>
             <IconButton aria-label="close">
               <IcoClose16 />
@@ -36,13 +30,7 @@ const WhatsThisPopover = ({ config }: WhatsThisPopoverProps) => {
           <WhatsThisContent config={config} />
         </Stack>
         <Popover.Arrow asChild>
-          <StyledSvg
-            width="16"
-            height="8"
-            viewBox="0 0 16 8"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <StyledSvg width="16" height="8" viewBox="0 0 16 8" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M16 0H0L8 8L16 0Z" fill="white" />
           </StyledSvg>
         </Popover.Arrow>

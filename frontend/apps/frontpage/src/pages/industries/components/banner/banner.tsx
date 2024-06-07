@@ -23,11 +23,7 @@ const PenguinBanner = ({
       <Illustration src={imgSrc} height={600} width={900} alt={title} />
       <TextContainer>
         <Title>{title}</Title>
-        <ContactButtons
-          primaryButton={primaryButton}
-          secondaryButton={secondaryButton}
-          justify="left"
-        />
+        <ContactButtons primaryButton={primaryButton} secondaryButton={secondaryButton} justify="left" />
       </TextContainer>
     </BannerContainer>
   </Background>

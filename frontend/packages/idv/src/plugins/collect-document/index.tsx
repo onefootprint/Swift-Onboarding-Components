@@ -41,12 +41,7 @@ const App = ({ idvContext, context, onDone }: IdDocProps) => {
     );
   }
 
-  return (
-    <NonIdDoc
-      initialContext={{ ...nonIdDocInitialContext }}
-      onDone={handleFlowCompletion}
-    />
-  );
+  return <NonIdDoc initialContext={{ ...nonIdDocInitialContext }} onDone={handleFlowCompletion} />;
 };
 
 export default App;

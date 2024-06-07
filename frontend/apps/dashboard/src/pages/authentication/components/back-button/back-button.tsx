@@ -12,11 +12,7 @@ const BackButton = () => {
 
   return (
     <Container>
-      <LinkButton
-        iconComponent={IcoChevronLeft16}
-        iconPosition="left"
-        onClick={handleClick}
-      >
+      <LinkButton iconComponent={IcoChevronLeft16} iconPosition="left" onClick={handleClick}>
         Back
       </LinkButton>
     </Container>

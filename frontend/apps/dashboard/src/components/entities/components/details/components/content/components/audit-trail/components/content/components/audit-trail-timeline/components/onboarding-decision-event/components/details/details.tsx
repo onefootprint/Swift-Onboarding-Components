@@ -15,8 +15,7 @@ type DetailsProps = {
 
 const Details = ({ ruleSetResultId }: DetailsProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details',
+    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details',
   });
   const { isLive } = useSession();
   const entityId = useEntityId();
@@ -60,16 +59,8 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
         {showRulesTab ? (
           <Stack direction="column" gap={7}>
             <Tabs options={options} onChange={handleChange} />
-            {tab === 'rules' && (
-              <RuleSetResults
-                data={data}
-                errorMessage={errorMessage}
-                isLoading={isLoading}
-              />
-            )}
-            {tab === 'field-validations' && (
-              <FieldValidations entityId={entityId} />
-            )}
+            {tab === 'rules' && <RuleSetResults data={data} errorMessage={errorMessage} isLoading={isLoading} />}
+            {tab === 'field-validations' && <FieldValidations entityId={entityId} />}
           </Stack>
         ) : (
           <FieldValidations entityId={entityId} />

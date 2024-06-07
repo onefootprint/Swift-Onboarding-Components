@@ -1,8 +1,4 @@
-import type {
-  CollectKycDataRequirement,
-  IdDI,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { CollectKycDataRequirement, IdDI, PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { UserData } from '../../types';
 import type { CommonIdvContext } from '../../utils/state-machine';

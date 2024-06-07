@@ -1,5 +1,5 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { media, Stack } from '@onefootprint/ui';
+import { Stack, media } from '@onefootprint/ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -36,8 +36,7 @@ const Content = ({ children, isSandbox, config }: ContentProps) => {
       const layoutContainer = document.getElementById(LAYOUT_CONTAINER_ID);
       if (!layoutContainer) return;
 
-      const isOverflowing =
-        layoutContainer.scrollHeight > layoutContainer.clientHeight;
+      const isOverflowing = layoutContainer.scrollHeight > layoutContainer.clientHeight;
       setBodyContentOverflowing(isOverflowing);
     };
 
@@ -70,22 +69,9 @@ const Content = ({ children, isSandbox, config }: ContentProps) => {
 
   return (
     <Stack direction="column" height="100%" position="relative">
-      {isSandbox && (
-        <SandboxBanner
-          ref={measuredRef}
-          hideOnDesktop={hideDesktopSandboxBanner}
-        />
-      )}
-      <NavigationHeaderContainer
-        top={sandboxBannerHeight}
-        containerId={LAYOUT_CONTAINER_ID}
-      />
-      <Stack
-        direction="column"
-        position="relative"
-        flexGrow={1}
-        id={IDV_BODY_CONTENT_CONTAINER_ID}
-      >
+      {isSandbox && <SandboxBanner ref={measuredRef} hideOnDesktop={hideDesktopSandboxBanner} />}
+      <NavigationHeaderContainer top={sandboxBannerHeight} containerId={LAYOUT_CONTAINER_ID} />
+      <Stack direction="column" position="relative" flexGrow={1} id={IDV_BODY_CONTENT_CONTAINER_ID}>
         <BodyContent>{children}</BodyContent>
       </Stack>
       <BottomActionContainer

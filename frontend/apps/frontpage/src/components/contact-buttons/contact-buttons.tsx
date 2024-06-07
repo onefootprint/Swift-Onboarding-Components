@@ -1,5 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Button, media, Stack } from '@onefootprint/ui';
+import { Button, Stack, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -13,11 +13,7 @@ type ContactButtonsProps = {
 
 const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
 
-const ContactButtons = ({
-  signUpButton,
-  bookADemoButton,
-  justify = 'left',
-}: ContactButtonsProps) => {
+const ContactButtons = ({ signUpButton, bookADemoButton, justify = 'left' }: ContactButtonsProps) => {
   const [showDialog, setShowDialog] = useState(false);
 
   const handleClickTrigger = () => {
@@ -34,12 +30,7 @@ const ContactButtons = ({
         <Button
           variant="primary"
           size="large"
-          onClick={() =>
-            window.open(
-              `${DASHBOARD_BASE_URL}/authentication/sign-up`,
-              '_blank',
-            )
-          }
+          onClick={() => window.open(`${DASHBOARD_BASE_URL}/authentication/sign-up`, '_blank')}
         >
           {signUpButton}
         </Button>
@@ -47,11 +38,7 @@ const ContactButtons = ({
           {bookADemoButton}
         </Button>
       </Buttons>
-      <ContactDialog
-        url={GET_FORM_URL}
-        open={showDialog}
-        onClose={handleClose}
-      />
+      <ContactDialog url={GET_FORM_URL} open={showDialog} onClose={handleClose} />
     </>
   );
 };

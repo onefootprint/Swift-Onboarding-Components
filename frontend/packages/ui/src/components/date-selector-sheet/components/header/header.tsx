@@ -7,18 +7,10 @@ import styled, { css } from 'styled-components';
 import IconButton from '../../../icon-button';
 import Stack from '../../../stack';
 import Text from '../../../text';
-import {
-  DirectionChange,
-  type HeaderProps,
-} from '../../date-selector-sheet.types';
+import { DirectionChange, type HeaderProps } from '../../date-selector-sheet.types';
 import { getMoveVariants } from '../../date-selector-sheet.utils';
 
-const Header = ({
-  handleMonthChange,
-  firstDayCurrentMonth,
-  movingDirection,
-  setMovingDirection,
-}: HeaderProps) => {
+const Header = ({ handleMonthChange, firstDayCurrentMonth, movingDirection, setMovingDirection }: HeaderProps) => {
   const handleDirectionChange = (newDirection: DirectionChange) => {
     handleMonthChange(newDirection);
     setMovingDirection(newDirection);
@@ -26,10 +18,7 @@ const Header = ({
 
   return (
     <Container justify="space-between" align="center">
-      <IconButton
-        aria-label="Previous month"
-        onClick={() => handleDirectionChange(DirectionChange.previous)}
-      >
+      <IconButton aria-label="Previous month" onClick={() => handleDirectionChange(DirectionChange.previous)}>
         <IcoChevronLeft24 />
       </IconButton>
       <TextContainer
@@ -40,14 +29,9 @@ const Header = ({
         variants={movingDirection ? getMoveVariants(movingDirection) : {}}
         transition={{ duration: 0.5 }}
       >
-        <Text variant="label-2">
-          {format(firstDayCurrentMonth, 'MMMM yyyy')}
-        </Text>
+        <Text variant="label-2">{format(firstDayCurrentMonth, 'MMMM yyyy')}</Text>
       </TextContainer>
-      <IconButton
-        aria-label="Next month"
-        onClick={() => handleDirectionChange(DirectionChange.next)}
-      >
+      <IconButton aria-label="Next month" onClick={() => handleDirectionChange(DirectionChange.next)}>
         <IcoChevronRight24 />
       </IconButton>
     </Container>

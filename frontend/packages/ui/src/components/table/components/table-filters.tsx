@@ -13,12 +13,7 @@ type TableFilterProps = {
   placeholder: string;
 };
 
-const TableFilter = ({
-  children,
-  onChangeText,
-  initialValue = '',
-  placeholder,
-}: TableFilterProps) => {
+const TableFilter = ({ children, onChangeText, initialValue = '', placeholder }: TableFilterProps) => {
   const [search, setSearch] = useState(initialValue);
 
   useEffect(() => {

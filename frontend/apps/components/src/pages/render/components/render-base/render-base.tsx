@@ -16,14 +16,7 @@ export type RenderBaseProps = {
   canCopy?: boolean;
 };
 
-const RenderBase = ({
-  isHidden,
-  label,
-  mask,
-  onToggleHidden,
-  value,
-  canCopy,
-}: RenderBaseProps) => {
+const RenderBase = ({ isHidden, label, mask, onToggleHidden, value, canCopy }: RenderBaseProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.secure-render',
   });
@@ -79,9 +72,7 @@ const RenderBase = ({
       {isHidden && (
         <IconButton
           onClick={onToggleHidden}
-          aria-label={
-            isHidden ? t('toggle.show-aria-label') : t('toggle.hide-aria-label')
-          }
+          aria-label={isHidden ? t('toggle.show-aria-label') : t('toggle.hide-aria-label')}
         >
           {isHidden ? <IcoEye16 /> : <IcoEyeCrossed16 />}
         </IconButton>
@@ -120,13 +111,15 @@ const ValueContainer = styled.div`
 
 const Value = styled(Text)<{ isHidden: boolean }>`
   ${({ theme, isHidden }) => css`
-    ${isHidden &&
-    css`
+    ${
+      isHidden &&
+      css`
       color: red !important;
       letter-spacing: ${theme.spacing[2]};
       pointer-events: none;
       user-select: none;
-    `}
+    `
+    }
   `}
 `;
 

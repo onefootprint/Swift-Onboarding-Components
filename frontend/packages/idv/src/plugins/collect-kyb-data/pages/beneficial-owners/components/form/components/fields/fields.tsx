@@ -19,13 +19,7 @@ export type FieldsProps = {
   l10n?: L10n;
 };
 
-const Fields = ({
-  index,
-  onRemove,
-  config,
-  l10n,
-  requiresMultiKyc,
-}: FieldsProps) => {
+const Fields = ({ index, onRemove, config, l10n, requiresMultiKyc }: FieldsProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'kyb.pages.beneficial-owners.form.fields',
   });
@@ -35,13 +29,7 @@ const Fields = ({
   };
 
   return (
-    <Container
-      gap={4}
-      padding={5}
-      borderWidth={1}
-      borderColor="tertiary"
-      borderRadius="default"
-    >
+    <Container gap={4} padding={5} borderWidth={1} borderColor="tertiary" borderRadius="default">
       <Header shouldShowRemove={index > 0} onRemove={handleRemove} />
       {index === 0 && (
         <InlineAlert variant="info">
@@ -52,12 +40,7 @@ const Fields = ({
       )}
       <Name index={index} />
       <Email index={index} requireMultiKyc={requiresMultiKyc} />
-      <Phone
-        index={index}
-        config={config}
-        locale={l10n?.locale}
-        requireMultiKyc={requiresMultiKyc}
-      />
+      <Phone index={index} config={config} locale={l10n?.locale} requireMultiKyc={requiresMultiKyc} />
       <OwnershipStake index={index} />
     </Container>
   );

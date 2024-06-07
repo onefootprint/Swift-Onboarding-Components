@@ -3,7 +3,7 @@ import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import { Logger } from '../../utils/logger';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 
 type AppErrorBoundaryProps = {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ type AppErrorBoundaryProps = {
 
 const AppErrorBoundary = ({ children, onReset }: AppErrorBoundaryProps) => (
   <ErrorBoundary
-    FallbackComponent={Error}
+    FallbackComponent={ErrorComponent}
     onError={(error, stack) => {
       // TODO: polish stack trace logging
       Logger.error(`${getErrorMessage(error)}, stack: ${stack.componentStack}`);

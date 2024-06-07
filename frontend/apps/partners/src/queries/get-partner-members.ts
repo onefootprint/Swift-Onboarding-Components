@@ -95,9 +95,7 @@ const getPartnerMembers = async (args?: GetComplianceMembersArgs) => {
   if (!token) return Promise.reject(new TypeError('Missing auth token'));
 
   const queryString = getQueryString(args);
-  const path = queryString
-    ? `/partner/members?${queryString}`
-    : '/partner/members';
+  const path = queryString ? `/partner/members?${queryString}` : '/partner/members';
 
   return baseFetch<OffsetPaginatedOrganizationMember>(path, {
     headers: { [DASHBOARD_AUTHORIZATION_HEADER]: token },

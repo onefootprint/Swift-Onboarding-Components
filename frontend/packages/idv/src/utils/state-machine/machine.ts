@@ -1,19 +1,10 @@
-import type {
-  IdDocOutcome,
-  IdvBootstrapData,
-  ObConfigAuth,
-} from '@onefootprint/types';
+import type { IdDocOutcome, IdvBootstrapData, ObConfigAuth } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks/ui/use-device-info';
 import type { UserData } from '../../types';
-import type {
-  CompletePayload,
-  ComponentsSdkContext,
-  MachineContext,
-  MachineEvents,
-} from './types';
+import type { CompletePayload, ComponentsSdkContext, MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldShowIdentify from './utils/should-show-identify';
 import shouldShowSandbox from './utils/should-show-sandbox';
@@ -85,16 +76,12 @@ const createIdvMachine = (args: IdvMachineArgs) =>
               {
                 target: 'sandboxOutcome',
                 actions: ['assignInitContext'],
-                cond: (context, event) =>
-                  isContextReady(context, event) &&
-                  shouldShowSandbox(context, event),
+                cond: (context, event) => isContextReady(context, event) && shouldShowSandbox(context, event),
               },
               {
                 target: 'identify',
                 actions: ['assignInitContext'],
-                cond: (context, event) =>
-                  isContextReady(context, event) &&
-                  shouldShowIdentify(context, event),
+                cond: (context, event) => isContextReady(context, event) && shouldShowIdentify(context, event),
               },
               {
                 target: 'onboarding',

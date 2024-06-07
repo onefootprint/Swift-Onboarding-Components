@@ -29,12 +29,7 @@ const Overlay = ({
   <Container width={width} height={height} videoHeight={videoHeight}>
     {captureKind === 'face' && (
       <>
-        <FullFrameOutline
-          width={width}
-          height={height}
-          $outlineWidth={outlineWidth}
-          $outlineHeight={outlineHeight}
-        >
+        <FullFrameOutline width={width} height={height} $outlineWidth={outlineWidth} $outlineHeight={outlineHeight}>
           {timerAnimationVal ? (
             <TimerAnimation
               key={timerAnimationVal}
@@ -136,28 +131,32 @@ const CornerOutline = styled.div<{
       height: ${$outlineHeight / 4}px;
       top: ${corner === 'top-left' || corner === 'top-right' ? 0 : 'auto'};
       left: ${corner === 'top-left' || corner === 'bottom-left' ? 0 : 'auto'};
-      right: ${corner === 'top-right' || corner === 'bottom-right'
-        ? 0
-        : 'auto'};
-      bottom: ${corner === 'bottom-left' || corner === 'bottom-right'
-        ? 0
-        : 'auto'};
+      right: ${corner === 'top-right' || corner === 'bottom-right' ? 0 : 'auto'};
+      bottom: ${corner === 'bottom-left' || corner === 'bottom-right' ? 0 : 'auto'};
       border-radius: ${corner === 'top-left' ? theme.borderRadius.xl : 0}
         ${corner === 'top-right' ? theme.borderRadius.xl : 0}
         ${corner === 'bottom-right' ? theme.borderRadius.xl : 0}
         ${corner === 'bottom-left' ? theme.borderRadius.xl : 0};
-      border-top: ${corner === 'top-left' || corner === 'top-right'
-        ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
-        : 0};
-      border-left: ${corner === 'top-left' || corner === 'bottom-left'
-        ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
-        : 0};
-      border-right: ${corner === 'top-right' || corner === 'bottom-right'
-        ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
-        : 0};
-      border-bottom: ${corner === 'bottom-left' || corner === 'bottom-right'
-        ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
-        : 0};
+      border-top: ${
+        corner === 'top-left' || corner === 'top-right'
+          ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
+          : 0
+      };
+      border-left: ${
+        corner === 'top-left' || corner === 'bottom-left'
+          ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
+          : 0
+      };
+      border-right: ${
+        corner === 'top-right' || corner === 'bottom-right'
+          ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
+          : 0
+      };
+      border-bottom: ${
+        corner === 'bottom-left' || corner === 'bottom-right'
+          ? `${theme.spacing[2]} solid ${theme.backgroundColor.primary}`
+          : 0
+      };
     }
   `}
 `;

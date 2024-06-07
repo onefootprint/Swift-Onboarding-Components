@@ -1,4 +1,4 @@
-import { media, Stack } from '@onefootprint/ui';
+import { Stack, media } from '@onefootprint/ui';
 import styled, { css } from 'styled-components';
 
 type EmptyCardProps = {

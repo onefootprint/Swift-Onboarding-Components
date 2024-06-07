@@ -51,12 +51,7 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
 
   return (
     <Container>
-      <Header
-        data-private
-        data-dd-privacy="mask"
-        title={headerTitle}
-        subtitle={headerSubtitle}
-      />
+      <Header data-private data-dd-privacy="mask" title={headerTitle} subtitle={headerSubtitle} />
       <PinVerification
         onChallengeSucceed={handleChallengeSucceed}
         onNewChallengeRequested={handleNewChallengeRequested}

@@ -1,6 +1,6 @@
 import { IcoCheck24, IcoChevronDown24 } from '@onefootprint/icons';
 import type { EntityCard } from '@onefootprint/types';
-import { Dropdown, media, Text } from '@onefootprint/ui';
+import { Dropdown, Text, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -12,11 +12,7 @@ export type CardHeaderProps = {
   onChange: (newCard: EntityCard) => void;
 };
 
-export const CardHeader = ({
-  cards,
-  selectedCard,
-  onChange,
-}: CardHeaderProps) => {
+export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const toggleDropdown = () => {
@@ -34,11 +30,7 @@ export const CardHeader = ({
         <CustomDropdownTrigger aria-label="Open card options">
           <CardIcon issuer={selectedCard?.issuer || ''} />
           <CardLine>
-            <Text variant="body-4">
-              {selectedCard?.number_last4
-                ? `••••${selectedCard.number_last4}`
-                : `••••`}
-            </Text>
+            <Text variant="body-4">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : `••••`}</Text>
             <Text variant="body-4">({selectedCard.alias})</Text>
           </CardLine>
           <IcoChevronDown24 />
@@ -52,28 +44,16 @@ export const CardHeader = ({
         >
           <DropdownInner>
             {cards.map(card => (
-              <CardDropdownElement
-                key={`${card?.number_last4}-${card.alias}`}
-                onClick={() => changeCard(card)}
-              >
+              <CardDropdownElement key={`${card?.number_last4}-${card.alias}`} onClick={() => changeCard(card)}>
                 <CardAndNumber>
-                  <CardIcon
-                    key={card.issuer || ''}
-                    issuer={card.issuer || ''}
-                  />
-                  <Text variant="body-4">
-                    {card?.number_last4 ? `••••${card.number_last4}` : `••••`}
-                  </Text>
+                  <CardIcon key={card.issuer || ''} issuer={card.issuer || ''} />
+                  <Text variant="body-4">{card?.number_last4 ? `••••${card.number_last4}` : `••••`}</Text>
                 </CardAndNumber>
                 <AliasAndCheckmark>
                   <Text variant="body-4" color="tertiary">
                     {card.alias}
                   </Text>
-                  {card.alias === selectedCard.alias ? (
-                    <IcoCheck24 />
-                  ) : (
-                    <BlankIcon />
-                  )}
+                  {card.alias === selectedCard.alias ? <IcoCheck24 /> : <BlankIcon />}
                 </AliasAndCheckmark>
               </CardDropdownElement>
             ))}

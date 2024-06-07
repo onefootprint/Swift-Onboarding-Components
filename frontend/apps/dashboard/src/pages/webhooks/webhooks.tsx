@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Content from './components/content';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import useFakeSpinnerTimeout from './hooks/use-fake-spinner-timeout';
 import useWebhookPortal from './hooks/use-webhooks-portal';
@@ -29,7 +29,7 @@ const Webhooks = () => {
         </Stack>
         <Box display={showSpinner ? 'none' : 'block'}>
           {data && <Content data={data} />}
-          {error && <Error message={getErrorMessage(error)} />}
+          {error && <ErrorComponent message={getErrorMessage(error)} />}
           {isLoading && <Loading />}
         </Box>
         {showSpinner && <Loading />}

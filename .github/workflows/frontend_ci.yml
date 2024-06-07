@@ -82,29 +82,6 @@ jobs:
         working-directory: ./frontend
         run: yarn lint:ci
 
-  format:
-    needs: install-dependencies
-    strategy:
-      matrix:
-        node-version: [18.x]
-    runs-on: frontend_runner
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-
-      - name: Restore yarn dependencies
-        uses: actions/cache@v4
-        id: cache-dependencies
-        with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Prettier
-        working-directory: ./frontend
-        run: yarn format
-
   test:
     needs: install-dependencies
     strategy:
@@ -198,7 +175,6 @@ jobs:
         files-changed,
         install-dependencies,
         lint,
-        format,
         test,
         typecheck,
         audit,

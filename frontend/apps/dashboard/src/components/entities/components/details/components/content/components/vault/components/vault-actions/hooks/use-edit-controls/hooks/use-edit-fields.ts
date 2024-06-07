@@ -19,10 +19,7 @@ const useEditFields = () => {
   const editText = useEditText();
   const entityId = useEntityId();
 
-  const editFields = (
-    { vaultData }: EditPayload,
-    { onSuccess, onError }: EditCallbacks,
-  ) => {
+  const editFields = ({ vaultData }: EditPayload, { onSuccess, onError }: EditCallbacks) => {
     if (vaultData) {
       editText
         .mutateAsync({

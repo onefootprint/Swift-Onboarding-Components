@@ -1,9 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { TenantDetail } from '@onefootprint/types';
-import type {
-  TenantBillingProfile,
-  TenantBillingProfileProduct,
-} from '@onefootprint/types/src/api/get-tenants';
+import type { TenantBillingProfile, TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
 import { Stack, Text, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -131,8 +128,7 @@ const SECTIONS = [
   },
 ];
 
-const getDefaultValues = (bp?: TenantBillingProfile): BillingProfileFormData =>
-  bp || ({} as BillingProfileFormData);
+const getDefaultValues = (bp?: TenantBillingProfile): BillingProfileFormData => bp || ({} as BillingProfileFormData);
 
 const BillingProfile = ({ tenant }: BillingProfileProps) => {
   const bp = tenant.billingProfile;
@@ -187,31 +183,24 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
   if (tenant.superTenantId) {
     return (
       <Text variant="body-3" color="tertiary">
-        Billing profile is inherited from parent tenant. Only one invoice is
-        generated for the parent tenant and its children.
+        Billing profile is inherited from parent tenant. Only one invoice is generated for the parent tenant and its
+        children.
       </Text>
     );
   }
 
-  const priceDisplay = (value?: string | null) =>
-    value ? `${value} cents` : '-';
+  const priceDisplay = (value?: string | null) => (value ? `${value} cents` : '-');
   return (
     <FormProvider {...editMethods}>
       <form id={UPDATE_BP_FORM_ID} onSubmit={handleSubmit(handleFormSubmit)}>
         <Stack direction="column">
           {SECTIONS.map((section, i) => (
-            <Fieldset
-              title={section.title}
-              key={section.title}
-              cta={i === 0 ? headerCta : undefined}
-            >
+            <Fieldset title={section.title} key={section.title} cta={i === 0 ? headerCta : undefined}>
               <Stack direction="column" gap={5}>
                 {section.fields.map(f => (
                   <Field label={f.title} key={f.title}>
                     {!isEditing && priceDisplay(bp?.[f.field])}
-                    {isEditing && (
-                      <TextInput placeholder="0" {...register(f.field)} />
-                    )}
+                    {isEditing && <TextInput placeholder="0" {...register(f.field)} />}
                   </Field>
                 ))}
               </Stack>

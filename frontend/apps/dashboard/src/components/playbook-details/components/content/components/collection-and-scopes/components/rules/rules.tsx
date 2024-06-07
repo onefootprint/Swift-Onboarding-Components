@@ -1,9 +1,9 @@
-import { type OnboardingConfig } from '@onefootprint/types';
+import type { OnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
 
 import Content from './components/content';
-import Error from './components/error';
+import ErrorComponent from './components/error';
 import Loading from './components/loading';
 import useRules from './hooks/use-rules';
 
@@ -28,7 +28,7 @@ const Rules = ({ playbook, toggleDisableHeading }: RulesProps) => {
         />
       )}
       {isLoading && <Loading />}
-      {error && <Error error={error} />}
+      {error && <ErrorComponent error={error} />}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { Box, createFontStyles, media, Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -8,26 +8,13 @@ type SectionTitleProps = {
   align?: 'center' | 'left';
 };
 
-const SectionTitle = ({
-  title,
-  subtitle,
-  align = 'center',
-}: SectionTitleProps) => (
-  <Stack
-    direction="column"
-    gap={4}
-    align={align === 'left' ? 'flex-start' : 'center'}
-  >
+const SectionTitle = ({ title, subtitle, align = 'center' }: SectionTitleProps) => (
+  <Stack direction="column" gap={4} align={align === 'left' ? 'flex-start' : 'center'}>
     <Title textAlign={align} tag="h3">
       {title}
     </Title>
     {subtitle && (
-      <Text
-        tag="h4"
-        variant="body-1"
-        maxWidth="600px"
-        textAlign={align === 'left' ? 'left' : 'center'}
-      >
+      <Text tag="h4" variant="body-1" maxWidth="600px" textAlign={align === 'left' ? 'left' : 'center'}>
         {subtitle}
       </Text>
     )}

@@ -19,23 +19,11 @@ export type ListProps = {
   defaultFilters?: Record<string, unknown>;
 };
 
-const List = ({
-  children,
-  title,
-  subtitle,
-  kind,
-  basePath,
-  defaultFilters,
-}: ListProps) => {
+const List = ({ children, title, subtitle, kind, basePath, defaultFilters }: ListProps) => {
   const router = useRouter();
   const filters = useFilters();
   const session = useSession();
-  const {
-    data: response,
-    isLoading,
-    errorMessage,
-    pagination,
-  } = useEntities(kind, defaultFilters);
+  const { data: response, isLoading, errorMessage, pagination } = useEntities(kind, defaultFilters);
 
   const handleRowClick = (entity: Entity) => {
     const mode = session.isLive ? 'live' : 'sandbox';

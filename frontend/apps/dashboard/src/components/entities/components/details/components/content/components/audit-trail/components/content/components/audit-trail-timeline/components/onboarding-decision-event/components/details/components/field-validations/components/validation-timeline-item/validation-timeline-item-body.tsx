@@ -1,4 +1,4 @@
-import { createFontStyles, Text } from '@onefootprint/ui';
+import { Text, createFontStyles } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,12 +10,9 @@ type ValidationTimelineItemBodyProps = {
   signals: SignalShortInfoType[];
 };
 
-const ValidationTimelineItemBody = ({
-  signals,
-}: ValidationTimelineItemBodyProps) => {
+const ValidationTimelineItemBody = ({ signals }: ValidationTimelineItemBodyProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix:
-      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
+    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
   });
 
   return (
@@ -28,9 +25,7 @@ const ValidationTimelineItemBody = ({
               •
             </Text>
             <Text variant="body-3" width="100%">
-              <Title>{`${t(
-                `match-level.${matchLevel}` as ParseKeys<'common'>,
-              )}:`}</Title>
+              <Title>{`${t(`match-level.${matchLevel}` as ParseKeys<'common'>)}:`}</Title>
               {description}
             </Text>
           </Container>

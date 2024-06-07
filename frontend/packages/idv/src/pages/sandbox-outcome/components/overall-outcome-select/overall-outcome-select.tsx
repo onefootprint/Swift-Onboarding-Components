@@ -45,19 +45,13 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
   useEffect(() => {
     // We change the overall outcome selection to fail if id-doc outcome is selected to be fail
     // However, if we are showing id-doc outcome because step-up was selected for overall outcome, we keep the overall outcome selection as step-up
-    if (
-      watchIdDocOutcome?.value === IdDocOutcome.fail &&
-      watchOverallOutcome.value !== OverallOutcome.stepUp
-    ) {
+    if (watchIdDocOutcome?.value === IdDocOutcome.fail && watchOverallOutcome.value !== OverallOutcome.stepUp) {
       setValue('outcomes.overallOutcome', overallOutcomeFail);
       return;
     }
     // We change the overall outcome selection to document-decision if id-doc outcome is selected to be real
     // However, if we are showing id-doc outcome because step-up was selected for overall outcome, we keep the overall outcome selection as step-up
-    if (
-      watchIdDocOutcome?.value === IdDocOutcome.real &&
-      watchOverallOutcome.value !== OverallOutcome.stepUp
-    ) {
+    if (watchIdDocOutcome?.value === IdDocOutcome.real && watchOverallOutcome.value !== OverallOutcome.stepUp) {
       setValue('outcomes.overallOutcome', overallOutcomeDocumentDecision);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,18 +62,14 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
     // We don't do it (show id doc on step up select) yet since BE isn't ready
     // TODO: update the comment when it's fully implemented
     if (watchOverallOutcome.value === OverallOutcome.stepUp) {
-      if (watchIdDocOutcome?.value === undefined)
-        setValue('outcomes.idDocOutcome', idDocOutcomeSuccess);
+      if (watchIdDocOutcome?.value === undefined) setValue('outcomes.idDocOutcome', idDocOutcomeSuccess);
     } else if (!requiresIdDoc) setValue('outcomes.idDocOutcome', undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue, watchIdDocOutcome, watchOverallOutcome]);
 
-  const getOption = (value: OverallOutcome) =>
-    options.find(option => option.value === value);
+  const getOption = (value: OverallOutcome) => options.find(option => option.value === value);
 
-  const isDisabled =
-    watchIdDocOutcome?.value === IdDocOutcome.fail ||
-    watchIdDocOutcome?.value === IdDocOutcome.real;
+  const isDisabled = watchIdDocOutcome?.value === IdDocOutcome.fail || watchIdDocOutcome?.value === IdDocOutcome.real;
 
   return (
     <Container>

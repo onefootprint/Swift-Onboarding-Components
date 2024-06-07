@@ -1,4 +1,4 @@
-import { Box, createFontStyles, media, Text } from '@onefootprint/ui';
+import { Box, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,32 +17,19 @@ export type PostInfoProps = {
   publishedAt?: string;
 };
 
-const PostInfo = ({
-  authors,
-  publishedAt,
-  readingTime,
-  tag,
-}: PostInfoProps) => {
+const PostInfo = ({ authors, publishedAt, readingTime, tag }: PostInfoProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.blog' });
 
   return (
     <Container>
       <AvatarGroup count={authors.length}>
         {authors.map(author => (
-          <Avatar
-            key={author.id}
-            alt={author.name}
-            height={44}
-            src={author.profileImage}
-            width={44}
-          />
+          <Avatar key={author.id} alt={author.name} height={44} src={author.profileImage} width={44} />
         ))}
       </AvatarGroup>
       <Box>
         <Header>
-          <AuthorsName>
-            {authors.map(author => author.name).join(' & ')}
-          </AuthorsName>
+          <AuthorsName>{authors.map(author => author.name).join(' & ')}</AuthorsName>
           <Separator />
           <Text variant="label-2">{tag.name}</Text>
         </Header>

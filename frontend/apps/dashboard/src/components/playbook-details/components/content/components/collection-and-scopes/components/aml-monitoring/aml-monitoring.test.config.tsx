@@ -1,8 +1,4 @@
-import {
-  type OnboardingConfig,
-  OnboardingConfigKind,
-  OnboardingConfigStatus,
-} from '@onefootprint/types';
+import { type OnboardingConfig, OnboardingConfigKind, OnboardingConfigStatus } from '@onefootprint/types';
 
 const onboardingConfig: OnboardingConfig = {
   id: 'ob_config_id_Vwyu5yLZbnXFwrC4RwFnDp',

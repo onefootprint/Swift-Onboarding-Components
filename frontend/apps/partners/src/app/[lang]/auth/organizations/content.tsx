@@ -1,13 +1,7 @@
 'use client';
 
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
-import {
-  createFontStyles,
-  Stack,
-  Text,
-  Tooltip,
-  useToast,
-} from '@onefootprint/ui';
+import { Stack, Text, Tooltip, createFontStyles, useToast } from '@onefootprint/ui';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -73,11 +67,7 @@ const OrganizationsPageContent = ({
             position="right"
             disabled={org.isAuthMethodSupported}
           >
-            <EllipsisButton
-              disabled={!org.isAuthMethodSupported}
-              onClick={handleClick(org.id)}
-              type="button"
-            >
+            <EllipsisButton disabled={!org.isAuthMethodSupported} onClick={handleClick(org.id)} type="button">
               {org.name}
             </EllipsisButton>
           </Tooltip>

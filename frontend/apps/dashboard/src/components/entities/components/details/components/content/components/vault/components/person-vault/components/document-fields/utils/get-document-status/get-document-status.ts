@@ -23,10 +23,7 @@ export enum DocumentStatus {
 /**
  * Given the list of documents of one type, determines what we should show in the status badge.
  */
-const getDocumentStatus = ({
-  documents,
-  documentType,
-}: GetDocumentStatusProps) => {
+const getDocumentStatus = ({ documents, documentType }: GetDocumentStatusProps) => {
   const relevantDocuments = filterDocumentsByKind(documents, documentType);
   const mostRecentDocument = relevantDocuments.sort((a, b) => {
     if (!a.startedAt || !b.startedAt) return 0;
@@ -54,15 +51,10 @@ export const computeSingleDocumentStatus = (document: Document) => {
   if (!document.reviewStatus) {
     return DocumentStatus.UploadIncomplete;
   }
-  const reviewStatusToDocumentStatus: Record<
-    DocumentReviewStatus,
-    DocumentStatus
-  > = {
+  const reviewStatusToDocumentStatus: Record<DocumentReviewStatus, DocumentStatus> = {
     [DocumentReviewStatus.Unreviewed]: DocumentStatus.UploadIncomplete,
-    [DocumentReviewStatus.PendingHumanReview]:
-      DocumentStatus.PendingHumanReview,
-    [DocumentReviewStatus.PendingMachineReview]:
-      DocumentStatus.PendingMachineReview,
+    [DocumentReviewStatus.PendingHumanReview]: DocumentStatus.PendingHumanReview,
+    [DocumentReviewStatus.PendingMachineReview]: DocumentStatus.PendingMachineReview,
     [DocumentReviewStatus.ReviewedByMachine]: DocumentStatus.ReviewedByMachine,
     [DocumentReviewStatus.ReviewedByHuman]: DocumentStatus.ReviewedByHuman,
   };

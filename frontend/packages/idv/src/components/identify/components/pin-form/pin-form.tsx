@@ -45,11 +45,7 @@ const PinForm = ({
   if (isVerifying) return <Verifying text={texts.verifying} />;
 
   return (
-    <StyledForm
-      autoComplete="off"
-      role="presentation"
-      data-pending={!!isPending}
-    >
+    <StyledForm autoComplete="off" role="presentation" data-pending={!!isPending}>
       {title && (
         <Text isPrivate variant="body-2" color="secondary" tag="h3">
           {title}
@@ -63,14 +59,7 @@ const PinForm = ({
         testID="verification-form-pin-input"
         autoFocus
       />
-      <Stack
-        direction="column"
-        width="100%"
-        align="center"
-        justify="center"
-        gap={3}
-        marginBottom={5}
-      >
+      <Stack direction="column" width="100%" align="center" justify="center" gap={3} marginBottom={5}>
         <ResendButton
           isResendLoading={isResendLoading}
           onResend={onResend}

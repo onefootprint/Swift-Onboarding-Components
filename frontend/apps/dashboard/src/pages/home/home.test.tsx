@@ -10,12 +10,7 @@ import React from 'react';
 import { asAdminUser } from 'src/config/tests';
 
 import Home from './home';
-import {
-  emptyOrgMetricsFixture,
-  withOrgMetrics,
-  withOrgMetricsError,
-  withPlaybooks,
-} from './home.test.config';
+import { emptyOrgMetricsFixture, withOrgMetrics, withOrgMetricsError, withPlaybooks } from './home.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -77,9 +72,7 @@ describe('<Home />', () => {
         const successfulOnboardings = screen.getByRole('group', {
           name: 'Successful onboardings',
         });
-        expect(
-          within(successfulOnboardings).getByText('0'),
-        ).toBeInTheDocument();
+        expect(within(successfulOnboardings).getByText('0')).toBeInTheDocument();
 
         const failedOnboardings = screen.getByRole('group', {
           name: 'Failed onboardings',
@@ -89,9 +82,7 @@ describe('<Home />', () => {
         const incompleteOnboardings = screen.getByRole('group', {
           name: 'Incomplete onboardings',
         });
-        expect(
-          within(incompleteOnboardings).getByText('0'),
-        ).toBeInTheDocument();
+        expect(within(incompleteOnboardings).getByText('0')).toBeInTheDocument();
       });
 
       it('should show the second row of metrics with values of 0', async () => {
@@ -131,23 +122,17 @@ describe('<Home />', () => {
         const successfulOnboardings = screen.getByRole('group', {
           name: 'Successful onboardings',
         });
-        expect(
-          within(successfulOnboardings).getByText('1,036,817'),
-        ).toBeInTheDocument();
+        expect(within(successfulOnboardings).getByText('1,036,817')).toBeInTheDocument();
 
         const failedOnboardings = screen.getByRole('group', {
           name: 'Failed onboardings',
         });
-        expect(
-          within(failedOnboardings).getByText('17,187'),
-        ).toBeInTheDocument();
+        expect(within(failedOnboardings).getByText('17,187')).toBeInTheDocument();
 
         const incompleteOnboardings = screen.getByRole('group', {
           name: 'Incomplete onboardings',
         });
-        expect(
-          within(incompleteOnboardings).getByText('4,810'),
-        ).toBeInTheDocument();
+        expect(within(incompleteOnboardings).getByText('4,810')).toBeInTheDocument();
       });
 
       it('should show the second row of metrics with correct values', async () => {
@@ -156,9 +141,7 @@ describe('<Home />', () => {
         const totalOnboardings = screen.getByRole('group', {
           name: 'Total onboardings',
         });
-        expect(
-          within(totalOnboardings).getByText('1,058,814'),
-        ).toBeInTheDocument();
+        expect(within(totalOnboardings).getByText('1,058,814')).toBeInTheDocument();
 
         const passRate = screen.getByRole('group', {
           name: 'Pass rate',

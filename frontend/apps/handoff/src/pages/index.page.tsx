@@ -16,14 +16,8 @@ export default withLDProvider({
   },
 })(Router);
 
-export const getServerSideProps: GetServerSideProps = async ({
-  query,
-  res,
-}) => {
-  res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=30, stale-while-revalidate=3600',
-  );
+export const getServerSideProps: GetServerSideProps = async ({ query, res }) => {
+  res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=3600');
 
   return { props: { language: query.lng ?? 'en' } };
 };

@@ -1,9 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import {
-  OnboardingTemplate,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import { OnboardingTemplate, PlaybookKind } from '@/playbooks/utils/machine/types';
 
 type UseOptionsProps = {
   template?: OnboardingTemplate;
@@ -11,9 +8,7 @@ type UseOptionsProps = {
 
 const useOptions = ({ template }: UseOptionsProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
-  const isEditableKycTemplate =
-    template !== OnboardingTemplate.Apex &&
-    template !== OnboardingTemplate.Alpaca;
+  const isEditableKycTemplate = template !== OnboardingTemplate.Apex && template !== OnboardingTemplate.Alpaca;
 
   const defaultOptions = [
     { value: 'whoToOnboard', label: t('dialog.who-to-onboard.nav') },

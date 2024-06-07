@@ -1,5 +1,5 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
-import { createFontStyles, LinkButton, media, Stack } from '@onefootprint/ui/';
+import { LinkButton, Stack, createFontStyles, media } from '@onefootprint/ui/';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,11 +15,7 @@ const TimelineTitle = ({ title, subtitle, cta, href }: TimelineTitleProps) => (
     <Title>{title}</Title>
     <Subtitle>{subtitle}</Subtitle>
     {cta && (
-      <LinkButton
-        href={href}
-        iconComponent={IcoArrowRightSmall16}
-        target="_blank"
-      >
+      <LinkButton href={href} iconComponent={IcoArrowRightSmall16} target="_blank">
         {cta}
       </LinkButton>
     )}

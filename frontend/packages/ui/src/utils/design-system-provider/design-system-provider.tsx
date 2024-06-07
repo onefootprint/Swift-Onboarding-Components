@@ -1,6 +1,6 @@
 import type { Theme } from '@onefootprint/design-tokens';
 import React from 'react';
-import { createGlobalStyle, css, ThemeProvider } from 'styled-components';
+import { ThemeProvider, createGlobalStyle, css } from 'styled-components';
 
 import ToastProvider from '../../components/toast/toast-provider';
 import ConfirmationDialogProvider from '../confirmation-dialog-provider';
@@ -99,9 +99,11 @@ const GlobalStyle = createGlobalStyle`
      border: 0;
      font-size: 100%;
      vertical-align: baseline;
-     font-family: ${theme.fontFamily.default === 'DM Sans'
-       ? `var(--font-dm-sans, ${theme.fontFamily.default})`
-       : theme.fontFamily.default};
+     font-family: ${
+       theme.fontFamily.default === 'DM Sans'
+         ? `var(--font-dm-sans, ${theme.fontFamily.default})`
+         : theme.fontFamily.default
+     };
    }
    code,
    pre {
@@ -192,10 +194,7 @@ const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
     <div id="footprint-portal" />
     <div id="footprint-toast-portal" />
     {process.env.NODE_ENV === 'test' ? null : (
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/rafaelmotta/footprint-flags/sprite.css"
-      />
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rafaelmotta/footprint-flags/sprite.css" />
     )}
   </ThemeProvider>
 );

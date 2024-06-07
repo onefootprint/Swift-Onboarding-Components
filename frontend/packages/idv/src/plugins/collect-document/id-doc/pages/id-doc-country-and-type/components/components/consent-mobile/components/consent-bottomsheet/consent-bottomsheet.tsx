@@ -43,8 +43,7 @@ const ConsentBottomSheet = ({
   testID,
 }: ConsentBottomSheetProps) => {
   const { t } = useTranslation('idv', {
-    keyPrefix:
-      'document-flow.id-doc.components.id-doc-photo-prompt.consent-mobile.consent-bottomsheet',
+    keyPrefix: 'document-flow.id-doc.components.id-doc-photo-prompt.consent-mobile.consent-bottomsheet',
   });
   const bottomSheetRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(bottomSheetRef, () => {
@@ -89,22 +88,14 @@ const ConsentBottomSheet = ({
 
   const handleScroll = (e: React.UIEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
-    const isBottom =
-      target.scrollHeight - target.scrollTop <=
-      target.clientHeight + SCROLL_OFFSET; // 10px allowed offset
+    const isBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + SCROLL_OFFSET; // 10px allowed offset
     if (!fullyScrolled) setFullyScrolled(isBottom);
   };
 
   return visibleState === State.closed ? null : (
     <FocusTrap active={open}>
       <span>
-        <Sheet
-          onClick={handleClick}
-          className={visibleState}
-          role="dialog"
-          data-testid={testID}
-          ref={bottomSheetRef}
-        >
+        <Sheet onClick={handleClick} className={visibleState} role="dialog" data-testid={testID} ref={bottomSheetRef}>
           <Header>
             <CloseContainer onClick={onClose}>
               <IconButton aria-label={closeAriaLabel} onClick={onClose}>
@@ -117,16 +108,8 @@ const ConsentBottomSheet = ({
           </Body>
           <Divider />
           <SubmitButtonContainer>
-            <Button
-              fullWidth
-              onClick={onComplete}
-              loading={isLoading}
-              disabled={!fullyScrolled}
-              size="large"
-            >
-              {fullyScrolled
-                ? t('submit-button.enabled-title')
-                : t('submit-button.disabled-title')}
+            <Button fullWidth onClick={onComplete} loading={isLoading} disabled={!fullyScrolled} size="large">
+              {fullyScrolled ? t('submit-button.enabled-title') : t('submit-button.disabled-title')}
             </Button>
           </SubmitButtonContainer>
         </Sheet>

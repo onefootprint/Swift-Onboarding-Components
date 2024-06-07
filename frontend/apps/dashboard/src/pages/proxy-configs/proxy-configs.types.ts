@@ -1,7 +1,4 @@
-import type {
-  ProxyConfigIngressRule,
-  ProxyConfigMethod,
-} from '@onefootprint/types';
+import type { ProxyConfigIngressRule, ProxyConfigMethod } from '@onefootprint/types';
 
 export type FormData = {
   accessReason: string;

@@ -1,18 +1,9 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import type { TenantDetail } from '@onefootprint/types';
-import {
-  TenantPreviewApi,
-  TenantSupportedAuthMethod,
-} from '@onefootprint/types/src/api/get-tenants';
+import { TenantPreviewApi, TenantSupportedAuthMethod } from '@onefootprint/types/src/api/get-tenants';
 import type { SelectOption } from '@onefootprint/ui';
-import {
-  Checkbox,
-  CodeInline,
-  MultiSelect,
-  Stack,
-  TextInput,
-} from '@onefootprint/ui';
+import { Checkbox, CodeInline, MultiSelect, Stack, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { Field, Fieldset } from 'src/components';
@@ -34,18 +25,17 @@ type TenantField = {
 
 const UPDATE_TENANT_FORM_ID = 'update-tenant-form';
 
-const PREVIEW_API_OPTIONS: SelectOption<TenantPreviewApi>[] = Object.values(
-  TenantPreviewApi,
-).map(value => ({
+const PREVIEW_API_OPTIONS: SelectOption<TenantPreviewApi>[] = Object.values(TenantPreviewApi).map(value => ({
   label: value,
   value,
 }));
 
-const AUTH_METHOD_OPTIONS: SelectOption<TenantSupportedAuthMethod>[] =
-  Object.values(TenantSupportedAuthMethod).map(value => ({
+const AUTH_METHOD_OPTIONS: SelectOption<TenantSupportedAuthMethod>[] = Object.values(TenantSupportedAuthMethod).map(
+  value => ({
     label: value,
     value,
-  }));
+  }),
+);
 
 const getDefaultValues = (tenant: TenantDetail): UpdateTenantFormData => ({
   name: tenant.name,
@@ -57,12 +47,8 @@ const getDefaultValues = (tenant: TenantDetail): UpdateTenantFormData => ({
   notIsProdKycPlaybookRestricted: !tenant.isProdKycPlaybookRestricted,
   notIsProdKybPlaybookRestricted: !tenant.isProdKybPlaybookRestricted,
   notIsProdAuthPlaybookRestricted: !tenant.isProdAuthPlaybookRestricted,
-  supportedAuthMethods: AUTH_METHOD_OPTIONS.filter(o =>
-    tenant.supportedAuthMethods?.includes(o.value),
-  ),
-  allowedPreviewApis: PREVIEW_API_OPTIONS.filter(o =>
-    tenant.allowedPreviewApis.includes(o.value),
-  ),
+  supportedAuthMethods: AUTH_METHOD_OPTIONS.filter(o => tenant.supportedAuthMethods?.includes(o.value)),
+  allowedPreviewApis: PREVIEW_API_OPTIONS.filter(o => tenant.allowedPreviewApis.includes(o.value)),
 });
 
 const TenantInfo = ({ tenant }: TenantInfoProps) => {
@@ -72,8 +58,7 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
 
   const { control, register, reset, handleSubmit } = editMethods;
 
-  const checkbox = (value: boolean) =>
-    value ? <IcoCheck24 /> : <IcoCloseSmall24 />;
+  const checkbox = (value: boolean) => (value ? <IcoCheck24 /> : <IcoCloseSmall24 />);
 
   const basic: TenantField[] = [
     {
@@ -82,14 +67,8 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     },
     {
       title: 'Parent ID',
-      content: tenant.superTenantId ? (
-        <CodeInline>{tenant.superTenantId}</CodeInline>
-      ) : (
-        '-'
-      ),
-      editModeContent: (
-        <TextInput placeholder="org_xxx" {...register('superTenantId')} />
-      ),
+      content: tenant.superTenantId ? <CodeInline>{tenant.superTenantId}</CodeInline> : '-',
+      editModeContent: <TextInput placeholder="org_xxx" {...register('superTenantId')} />,
     },
     {
       title: 'Is demo tenant',
@@ -99,9 +78,7 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     {
       title: 'Domains',
       content: tenant.domains.length ? tenant.domains.join(', ') : 'No domains',
-      editModeContent: (
-        <TextInput placeholder="acme.ai,acme.io" {...register('domains')} />
-      ),
+      editModeContent: <TextInput placeholder="acme.ai,acme.io" {...register('domains')} />,
     },
     {
       title: 'Domain access enabled',
@@ -119,32 +96,24 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     {
       title: 'KYC playbooks',
       content: checkbox(!tenant.isProdKycPlaybookRestricted),
-      editModeContent: (
-        <Checkbox {...register(`notIsProdKycPlaybookRestricted`, {})} />
-      ),
+      editModeContent: <Checkbox {...register(`notIsProdKycPlaybookRestricted`, {})} />,
     },
     {
       title: 'KYB playbooks',
       content: checkbox(!tenant.isProdKybPlaybookRestricted),
-      editModeContent: (
-        <Checkbox {...register(`notIsProdKybPlaybookRestricted`, {})} />
-      ),
+      editModeContent: <Checkbox {...register(`notIsProdKybPlaybookRestricted`, {})} />,
     },
     {
       title: 'Auth playbooks',
       content: checkbox(!tenant.isProdAuthPlaybookRestricted),
-      editModeContent: (
-        <Checkbox {...register(`notIsProdAuthPlaybookRestricted`, {})} />
-      ),
+      editModeContent: <Checkbox {...register(`notIsProdAuthPlaybookRestricted`, {})} />,
     },
   ];
 
   const settings: TenantField[] = [
     {
       title: 'Allowed preview APIs',
-      content: tenant.allowedPreviewApis.length
-        ? tenant.allowedPreviewApis.join(', ')
-        : '-',
+      content: tenant.allowedPreviewApis.length ? tenant.allowedPreviewApis.join(', ') : '-',
       editModeContent: (
         <Controller
           control={control}
@@ -163,9 +132,7 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
     },
     {
       title: 'Required login methods',
-      content: tenant.supportedAuthMethods?.length
-        ? tenant.supportedAuthMethods.join(', ')
-        : '-',
+      content: tenant.supportedAuthMethods?.length ? tenant.supportedAuthMethods.join(', ') : '-',
       editModeContent: (
         <Controller
           control={control}
@@ -242,23 +209,14 @@ const TenantInfo = ({ tenant }: TenantInfoProps) => {
 
   return (
     <FormProvider {...editMethods}>
-      <form
-        id={UPDATE_TENANT_FORM_ID}
-        onSubmit={handleSubmit(handleFormSubmit)}
-      >
+      <form id={UPDATE_TENANT_FORM_ID} onSubmit={handleSubmit(handleFormSubmit)}>
         <Stack direction="column">
           {fieldsets.map((fieldset, i) => (
-            <Fieldset
-              title={fieldset.title}
-              key={fieldset.title}
-              cta={i === 0 ? headerCta : undefined}
-            >
+            <Fieldset title={fieldset.title} key={fieldset.title} cta={i === 0 ? headerCta : undefined}>
               <Stack direction="column" gap={5}>
                 {fieldset.fields.map(f => (
                   <Field label={f.title} key={f.title}>
-                    {!isEditing || !f.editModeContent
-                      ? f.content
-                      : f.editModeContent}
+                    {!isEditing || !f.editModeContent ? f.content : f.editModeContent}
                   </Field>
                 ))}
               </Stack>

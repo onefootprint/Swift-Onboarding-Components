@@ -1,5 +1,5 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import { CodeInline, createFontStyles, Stack, Text } from '@onefootprint/ui';
+import { CodeInline, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';

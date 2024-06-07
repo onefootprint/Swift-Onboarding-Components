@@ -12,14 +12,7 @@ type CompanyPhotosDesktopProps = {
 const CompanyPhotosDesktop = ({ photos }: CompanyPhotosDesktopProps) => (
   <Container>
     {photos.map(photo => (
-      <StyledImage
-        alt={photo.alt}
-        height={500}
-        key={photo.alt}
-        priority
-        src={photo.src}
-        width={628}
-      />
+      <StyledImage alt={photo.alt} height={500} key={photo.alt} priority src={photo.src} width={628} />
     ))}
   </Container>
 );

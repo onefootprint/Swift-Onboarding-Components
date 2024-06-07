@@ -14,18 +14,10 @@ const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
 
   return (
     <>
-      {severity === RiskSignalSeverity.High && (
-        <Badge variant="error">{t('high')}</Badge>
-      )}
-      {severity === RiskSignalSeverity.Medium && (
-        <Badge variant="warning">{t('medium')}</Badge>
-      )}
-      {severity === RiskSignalSeverity.Low && (
-        <Badge variant="info">{t('low')}</Badge>
-      )}
-      {severity === RiskSignalSeverity.Info && (
-        <Badge variant="neutral">{t('info')}</Badge>
-      )}
+      {severity === RiskSignalSeverity.High && <Badge variant="error">{t('high')}</Badge>}
+      {severity === RiskSignalSeverity.Medium && <Badge variant="warning">{t('medium')}</Badge>}
+      {severity === RiskSignalSeverity.Low && <Badge variant="info">{t('low')}</Badge>}
+      {severity === RiskSignalSeverity.Info && <Badge variant="neutral">{t('info')}</Badge>}
     </>
   );
 };

@@ -15,72 +15,56 @@ export type CopyLinkProps = {
   playbook: OnboardingConfig;
 };
 
-const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(
-  ({ playbook }, ref) => {
-    const [open, setOpen] = useState(false);
-    const permanentLink = getPermanentLink(playbook);
-    const [showSuccess, setShowSuccess] = useState(false);
+const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) => {
+  const [open, setOpen] = useState(false);
+  const permanentLink = getPermanentLink(playbook);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-    const { t } = useTranslation('common', {
-      keyPrefix: 'pages.playbooks.table.actions.copy-link',
-    });
-    useImperativeHandle(
-      ref,
-      () => ({
-        launch: () => setOpen(true),
-      }),
-      [],
-    );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.table.actions.copy-link',
+  });
+  useImperativeHandle(
+    ref,
+    () => ({
+      launch: () => setOpen(true),
+    }),
+    [],
+  );
 
-    const handleCopyToClipboard = (
-      event: React.MouseEvent<HTMLButtonElement>,
-    ) => {
-      event.stopPropagation();
-      navigator.clipboard.writeText(permanentLink);
-      setShowSuccess(true);
-      scheduleToHideConfirmation();
-    };
+  const handleCopyToClipboard = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    navigator.clipboard.writeText(permanentLink);
+    setShowSuccess(true);
+    scheduleToHideConfirmation();
+  };
 
-    const scheduleToHideConfirmation = () => {
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 600);
-    };
+  const scheduleToHideConfirmation = () => {
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 600);
+  };
 
-    const handleClose = () => {
-      setOpen(false);
-    };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-    const copyButtonLabel = showSuccess ? t('copied') : t('copy-link');
+  const copyButtonLabel = showSuccess ? t('copied') : t('copy-link');
 
-    return (
-      <Dialog
-        size="compact"
-        title={t(`${playbook.kind}.title` as ParseKeys<'common'>)}
-        open={open}
-        onClose={handleClose}
-      >
-        <Content>
-          <Text variant="body-2">
-            {t(`${playbook.kind}.description` as ParseKeys<'common'>)}
-          </Text>
-          <InputContainer>
-            <TextInput
-              autoFocus
-              value={permanentLink}
-              placeholder={permanentLink}
-              size="compact"
-            />
+  return (
+    <Dialog size="compact" title={t(`${playbook.kind}.title` as ParseKeys<'common'>)} open={open} onClose={handleClose}>
+      <Content>
+        <Text variant="body-2">{t(`${playbook.kind}.description` as ParseKeys<'common'>)}</Text>
+        <InputContainer>
+          <TextInput autoFocus value={permanentLink} placeholder={permanentLink} size="compact" />
 
-            <Button variant="primary" onClick={handleCopyToClipboard}>
-              <Box minWidth="62px">{copyButtonLabel}</Box>
-            </Button>
-          </InputContainer>
-        </Content>
-      </Dialog>
-    );
-  },
-);
+          <Button variant="primary" onClick={handleCopyToClipboard}>
+            <Box minWidth="62px">{copyButtonLabel}</Box>
+          </Button>
+        </InputContainer>
+      </Content>
+    </Dialog>
+  );
+});
 
 const Content = styled.div`
   ${({ theme }) => css`

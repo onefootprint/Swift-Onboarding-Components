@@ -15,8 +15,7 @@ type SparklesProps = {
   children: React.ReactNode;
 };
 
-const random = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min)) + min;
+const random = (min: number, max: number) => Math.floor(Math.random() * (max - min)) + min;
 
 const generateSparkle = (color: string) => {
   const sparkle = {
@@ -33,9 +32,7 @@ const generateSparkle = (color: string) => {
 };
 
 const Sparkles = ({ color, children, ...delegated }: SparklesProps) => {
-  const [sparkles, setSparkles] = useState(() =>
-    range(3, 3).map(() => generateSparkle(color)),
-  );
+  const [sparkles, setSparkles] = useState(() => range(3, 3).map(() => generateSparkle(color)));
 
   useInterval(() => {
     const sparkle = generateSparkle(color);
@@ -51,12 +48,7 @@ const Sparkles = ({ color, children, ...delegated }: SparklesProps) => {
     // eslint-disable-next-line react/jsx-props-no-spreading
     <Container {...delegated}>
       {sparkles.map(sparkle => (
-        <Sparkle
-          key={sparkle.id}
-          color={sparkle.color}
-          size={sparkle.size}
-          style={sparkle.style}
-        />
+        <Sparkle key={sparkle.id} color={sparkle.color} size={sparkle.size} style={sparkle.style} />
       ))}
       <ChildContainer>{children}</ChildContainer>
     </Container>

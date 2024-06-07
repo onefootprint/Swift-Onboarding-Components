@@ -1,20 +1,20 @@
 {
-    "recommendations": [
-        "ms-vscode.vscode-typescript-next",
-        "steoates.autoimport",
-        "formulahendry.auto-rename-tag",
-        "streetsidesoftware.code-spell-checker",
-        "naumovs.color-highlight",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "wayou.vscode-todo-highlight",
-        "edonet.vscode-command-runner",
-        "styled-components.vscode-styled-components",
-        "ms-python.black-formatter",
-        "ms-azuretools.vscode-docker",
-        "vadimcn.vscode-lldb",
-        "rust-lang.rust-analyzer",
-        "github.vscode-github-actions",
-        "graphite.gti-vscode"
-    ]
+  "recommendations": [
+    "biomejs.biome",
+    "dbaeumer.vscode-eslint",
+    "edonet.vscode-command-runner",
+    "formulahendry.auto-rename-tag",
+    "github.vscode-github-actions",
+    "graphite.gti-vscode",
+    "ms-azuretools.vscode-docker",
+    "ms-python.black-formatter",
+    "ms-vscode.vscode-typescript-next",
+    "naumovs.color-highlight",
+    "rust-lang.rust-analyzer",
+    "steoates.autoimport",
+    "streetsidesoftware.code-spell-checker",
+    "styled-components.vscode-styled-components",
+    "vadimcn.vscode-lldb",
+    "wayou.vscode-todo-highlight"
+  ]
 }

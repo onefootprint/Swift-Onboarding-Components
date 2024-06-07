@@ -1,11 +1,7 @@
-import { media, TextInput } from '@onefootprint/ui';
+import { TextInput, media } from '@onefootprint/ui';
 import type { TFunction } from 'i18next';
 import React from 'react';
-import type {
-  FieldErrors,
-  FieldValues,
-  UseFormGetValues,
-} from 'react-hook-form';
+import type { FieldErrors, FieldValues, UseFormGetValues } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -37,11 +33,7 @@ const getFirstNameHint = (
   return undefined;
 };
 
-const getMiddleNameHint = (
-  t: T,
-  getValues: UseFormGetValues<FieldValues>,
-  errors: FieldErrors<FieldValues>,
-) => {
+const getMiddleNameHint = (t: T, getValues: UseFormGetValues<FieldValues>, errors: FieldErrors<FieldValues>) => {
   if (!errors.middleName) {
     return undefined;
   }
@@ -56,11 +48,7 @@ const getMiddleNameHint = (
   return undefined;
 };
 
-const getLastNameHint = (
-  t: T,
-  getValues: UseFormGetValues<FieldValues>,
-  errors: FieldErrors<FieldValues>,
-) => {
+const getLastNameHint = (t: T, getValues: UseFormGetValues<FieldValues>, errors: FieldErrors<FieldValues>) => {
   if (!errors.lastName) {
     return undefined;
   }
@@ -116,8 +104,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
           label={t('middle-name.label')}
           placeholder={t('middle-name.placeholder')}
           {...register('middleName', {
-            validate: (value: string) =>
-              validateName(value) !== NameValidationError.SPECIAL_CHARS,
+            validate: (value: string) => validateName(value) !== NameValidationError.SPECIAL_CHARS,
           })}
         />
       </Row>

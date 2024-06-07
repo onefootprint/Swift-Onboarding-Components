@@ -1,8 +1,4 @@
-import type {
-  MachineContext,
-  SummaryFormData,
-  VerificationChecksFormData,
-} from '@/playbooks/utils/machine/types';
+import type { MachineContext, SummaryFormData, VerificationChecksFormData } from '@/playbooks/utils/machine/types';
 
 export const getFixedIdDocPlaybook = (
   context: MachineContext,

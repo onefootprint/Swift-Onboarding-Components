@@ -30,10 +30,7 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
   };
 
   const disable = () => {
-    const status =
-      playbook.status === 'enabled'
-        ? OnboardingConfigStatus.disabled
-        : OnboardingConfigStatus.enabled;
+    const status = playbook.status === 'enabled' ? OnboardingConfigStatus.disabled : OnboardingConfigStatus.enabled;
 
     mutation.mutate(
       {
@@ -72,11 +69,7 @@ const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
       onClose={hideConfirmation}
       onConfirm={disable}
       open={open}
-      title={
-        playbook.status === 'enabled'
-          ? t('disable.confirmation.title')
-          : t('enable.confirmation.title')
-      }
+      title={playbook.status === 'enabled' ? t('disable.confirmation.title') : t('enable.confirmation.title')}
     >
       <Trans
         i18nKey={

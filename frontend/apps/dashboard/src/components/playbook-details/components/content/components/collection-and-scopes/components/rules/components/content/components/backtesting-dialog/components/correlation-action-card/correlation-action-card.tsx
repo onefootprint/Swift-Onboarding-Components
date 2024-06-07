@@ -1,6 +1,6 @@
 import type { FontVariant, UIState } from '@onefootprint/design-tokens';
 import { BacktestingRuleAction } from '@onefootprint/types';
-import { createFontStyles, Stack, Text } from '@onefootprint/ui';
+import { Stack, Text, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -13,15 +13,9 @@ export type CorrelationActionCardProps = {
   data: Partial<Record<BacktestingRuleAction, number>>;
 };
 
-const CorrelationActionCard = ({
-  sectionAction,
-  data,
-}: CorrelationActionCardProps) => {
-  const sectionActionValue =
-    BacktestingRuleAction[sectionAction as keyof typeof BacktestingRuleAction];
-  const rowActions = Object.keys(BacktestingRuleAction).filter(
-    rowAction => rowAction !== sectionAction,
-  );
+const CorrelationActionCard = ({ sectionAction, data }: CorrelationActionCardProps) => {
+  const sectionActionValue = BacktestingRuleAction[sectionAction as keyof typeof BacktestingRuleAction];
+  const rowActions = Object.keys(BacktestingRuleAction).filter(rowAction => rowAction !== sectionAction);
 
   return (
     <Container role="group" aria-label={`${sectionAction} correlation card`}>
@@ -29,12 +23,7 @@ const CorrelationActionCard = ({
         <Trans
           i18nKey="pages.playbooks.details.rules.backtesting.correlation.action-list"
           components={{
-            color: (
-              <ActionText
-                variant="label-4"
-                color={getActionVariant(sectionActionValue)}
-              />
-            ),
+            color: <ActionText variant="label-4" color={getActionVariant(sectionActionValue)} />,
           }}
           values={{ action: getActionText(sectionActionValue) }}
         />
@@ -44,12 +33,7 @@ const CorrelationActionCard = ({
           <Trans
             i18nKey="pages.playbooks.details.rules.backtesting.correlation.same"
             components={{
-              color: (
-                <ActionText
-                  variant="body-3"
-                  color={getActionVariant(sectionActionValue)}
-                />
-              ),
+              color: <ActionText variant="body-3" color={getActionVariant(sectionActionValue)} />,
             }}
             values={{ action: getActionText(sectionActionValue) }}
           />
@@ -57,35 +41,21 @@ const CorrelationActionCard = ({
         <Text variant="body-3">{data[sectionAction] || 0}</Text>
       </ActionRow>
       {rowActions.map((rowAction, index) => {
-        const rowActionValue =
-          BacktestingRuleAction[
-            rowAction as keyof typeof BacktestingRuleAction
-          ];
+        const rowActionValue = BacktestingRuleAction[rowAction as keyof typeof BacktestingRuleAction];
         return (
-          <ActionRow
-            key={rowAction}
-            data-is-last={index === rowActions.length - 1}
-            role="row"
-          >
+          <ActionRow key={rowAction} data-is-last={index === rowActions.length - 1} role="row">
             <Text variant="body-3">
               <Trans
                 i18nKey="pages.playbooks.details.rules.backtesting.correlation.changed"
                 components={{
-                  color: (
-                    <ActionText
-                      variant="body-3"
-                      color={getActionVariant(rowActionValue)}
-                    />
-                  ),
+                  color: <ActionText variant="body-3" color={getActionVariant(rowActionValue)} />,
                 }}
                 values={{
                   action: getActionText(rowActionValue),
                 }}
               />
             </Text>
-            <Text variant="body-3">
-              {data[rowAction as BacktestingRuleAction] || 0}
-            </Text>
+            <Text variant="body-3">{data[rowAction as BacktestingRuleAction] || 0}</Text>
           </ActionRow>
         );
       })}

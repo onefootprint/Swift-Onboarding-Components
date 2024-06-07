@@ -10,9 +10,7 @@ const NavigationLink = styled.div<{ $isSelected?: boolean }>`
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     text-decoration: none;
     color: ${$isSelected ? theme.color.primary : theme.color.tertiary};
-    background-color: ${$isSelected
-      ? theme.backgroundColor.secondary
-      : 'transparent'};
+    background-color: ${$isSelected ? theme.backgroundColor.secondary : 'transparent'};
 
     &:hover {
       background-color: ${!$isSelected && theme.backgroundColor.secondary};

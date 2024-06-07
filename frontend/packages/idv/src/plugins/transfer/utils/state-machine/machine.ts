@@ -20,9 +20,7 @@ const createTransferMachine = (initialContext: MachineContext) =>
           always: [
             {
               description: 'If not running on mobile or tablet',
-              cond: context =>
-                context.device.type !== 'mobile' &&
-                context.device.type !== 'tablet',
+              cond: context => context.device.type !== 'mobile' && context.device.type !== 'tablet',
               target: 'qrRegister',
             },
             {
@@ -38,9 +36,7 @@ const createTransferMachine = (initialContext: MachineContext) =>
           always: [
             {
               target: 'newTabRequest',
-              cond: context =>
-                !!context.missingRequirements.liveness &&
-                context.device.hasSupportForWebauthn,
+              cond: context => !!context.missingRequirements.liveness && context.device.hasSupportForWebauthn,
             },
             {
               target: 'complete',
@@ -103,19 +99,14 @@ const createTransferMachine = (initialContext: MachineContext) =>
                 target: 'confirmContinueOnDesktop',
                 cond: ctx =>
                   !!ctx.missingRequirements.documents.length &&
-                  ctx.missingRequirements.documents.some(
-                    req => req.uploadMode !== 'allow_upload',
-                  ),
+                  ctx.missingRequirements.documents.some(req => req.uploadMode !== 'allow_upload'),
                 description:
                   'The document upload experience is better on mobile, so if the user is trying to upload on desktop, warn them we recommend they continue on mobile.',
               },
               {
                 target: 'newTabRequest',
                 actions: ['assignIsContinuingOnDesktop'],
-                cond: ctx =>
-                  !!ctx.missingRequirements.liveness &&
-                  ctx.isInIframe &&
-                  ctx.device.hasSupportForWebauthn,
+                cond: ctx => !!ctx.missingRequirements.liveness && ctx.isInIframe && ctx.device.hasSupportForWebauthn,
                 description:
                   'If the user wants to continue on desktop, and we have a passkey requirement in an iframe, open a new tab',
               },
@@ -131,10 +122,7 @@ const createTransferMachine = (initialContext: MachineContext) =>
               {
                 target: 'newTabRequest',
                 actions: ['assignIsContinuingOnDesktop'],
-                cond: ctx =>
-                  !!ctx.missingRequirements.liveness &&
-                  ctx.isInIframe &&
-                  ctx.device.hasSupportForWebauthn,
+                cond: ctx => !!ctx.missingRequirements.liveness && ctx.isInIframe && ctx.device.hasSupportForWebauthn,
                 description:
                   'If the user wants to continue on desktop, and we have a passkey requirement in an iframe, open a new tab',
               },

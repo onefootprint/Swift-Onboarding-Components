@@ -20,11 +20,7 @@ const RequestOnboard = ({ visible }: RequestOnboardProps) => {
   const { control, watch, setValue } = useFormContext();
   const selectedPlaybook = watch('playbook');
   const { data: playbooksData } = usePlaybookOptions({
-    kinds: [
-      OnboardingConfigKind.document,
-      OnboardingConfigKind.kyb,
-      OnboardingConfigKind.kyc,
-    ],
+    kinds: [OnboardingConfigKind.document, OnboardingConfigKind.kyb, OnboardingConfigKind.kyc],
   });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
@@ -32,11 +28,8 @@ const RequestOnboard = ({ visible }: RequestOnboardProps) => {
   useEffect(() => {
     // Once the playbooks load, select the playbook the user last onboarded onto as the default
     // selected option
-    const defaultPlaybookId =
-      entity.data?.workflows.sort(mostRecentWorkflow)[0]?.playbookId;
-    const defaultPlaybookValue = playbooksData?.find(
-      p => p.value === defaultPlaybookId,
-    );
+    const defaultPlaybookId = entity.data?.workflows.sort(mostRecentWorkflow)[0]?.playbookId;
+    const defaultPlaybookValue = playbooksData?.find(p => p.value === defaultPlaybookId);
     if (!defaultPlaybookValue || !defaultPlaybookId || selectedPlaybook) {
       return;
     }

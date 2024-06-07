@@ -1,8 +1,4 @@
-import type {
-  AuthMethodKind,
-  CollectKycDataRequirement,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { AuthMethodKind, CollectKycDataRequirement, PublicOnboardingConfig } from '@onefootprint/types';
 import type { StateValue } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';

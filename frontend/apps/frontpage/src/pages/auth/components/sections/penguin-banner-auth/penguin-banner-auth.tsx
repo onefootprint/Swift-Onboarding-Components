@@ -1,11 +1,4 @@
-import {
-  Container,
-  createFontStyles,
-  Grid,
-  media,
-  Stack,
-  Text,
-} from '@onefootprint/ui';
+import { Container, Grid, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,28 +16,14 @@ const PenguinBannerAuth = () => {
       <SectionVerticalSpacer />
       <Layout minHeight="320px">
         <Stack align="center" justify="center">
-          <Image
-            src="/auth/banner/safe.png"
-            width={256}
-            height={195}
-            alt="safe"
-          />
+          <Image src="/auth/banner/safe.png" width={256} height={195} alt="safe" />
         </Stack>
-        <TextContainer
-          direction="column"
-          align="start"
-          justify="center"
-          maxWidth="800px"
-          gap={5}
-        >
+        <TextContainer direction="column" align="start" justify="center" maxWidth="800px" gap={5}>
           <Title>{t('title')}</Title>
           <Text variant="display-4" tag="h2" color="secondary" marginBottom={5}>
             {t('subtitle')}
           </Text>
-          <ContactButtons
-            bookADemoButton={t('book-a-demo')}
-            signUpButton={t('sign-up-for-free')}
-          />
+          <ContactButtons bookADemoButton={t('book-a-demo')} signUpButton={t('sign-up-for-free')} />
         </TextContainer>
       </Layout>
       <SectionVerticalSpacer />

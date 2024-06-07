@@ -11,10 +11,7 @@ type GetSdkArgsResponse<T> = {
   obConfig?: PublicOnboardingConfig;
 };
 
-const getSdkArgs = async <T extends Obj>(
-  authToken: string,
-  fpProvider: ProviderReturn,
-) => {
+const getSdkArgs = async <T extends Obj>(authToken: string, fpProvider: ProviderReturn) => {
   let optionalSdkVersion;
   try {
     optionalSdkVersion = (await fpProvider.load())?.model?.sdkVersion;
@@ -36,10 +33,7 @@ const getSdkArgs = async <T extends Obj>(
   return response;
 };
 
-const useGetSdkArgs = <T extends Obj>(
-  authToken: string,
-  fpProvider: ProviderReturn,
-) =>
+const useGetSdkArgs = <T extends Obj>(authToken: string, fpProvider: ProviderReturn) =>
   useQuery({
     queryKey: [authToken, 'get-sdk-args'],
     queryFn: () => getSdkArgs<T>(authToken, fpProvider),

@@ -2,12 +2,12 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
-  selectOutcomeOptional,
-  verifyPhoneNumber,
+  clickOnVerifyWithSms,
   confirmData,
   fillEmail,
   fillPhoneNumber,
-  clickOnVerifyWithSms,
+  selectOutcomeOptional,
+  verifyPhoneNumber,
 } from './utils/commands';
 import getMobileSdkBifrostUrlFragment from './utils/get-mobile-sdk-bifrost-url-fragment';
 
@@ -57,8 +57,7 @@ const SdkUrls = [
     hasUserData: true,
   },
   {
-    format:
-      '/?public_key=<PUBLIC_KEY>#<ENCODED_USER_DATA>__<ENCODED_OPTIONS>__<ENCODED_LOCALE>',
+    format: '/?public_key=<PUBLIC_KEY>#<ENCODED_USER_DATA>__<ENCODED_OPTIONS>__<ENCODED_LOCALE>',
     urlFragment: getMobileSdkBifrostUrlFragment({
       userData: testUserData,
       options: testOptions,
@@ -69,11 +68,7 @@ const SdkUrls = [
 ];
 
 for (const { format, urlFragment, hasUserData } of SdkUrls) {
-  test(`E2E.MobileSDKIntegration.${format} #ci`, async ({
-    browserName,
-    page,
-    isMobile,
-  }) => {
+  test(`E2E.MobileSDKIntegration.${format} #ci`, async ({ browserName, page, isMobile }) => {
     // eslint-disable-next-line playwright/no-conditional-in-test
     if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
 
@@ -81,9 +76,7 @@ for (const { format, urlFragment, hasUserData } of SdkUrls) {
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
     await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
     const publicKey = 'ob_test_Twvblr3NUeDzPuFteI1OCh';
-    await page.goto(
-      `${bifrostUrl}/?public_key=${publicKey}&flow=${flowId}${urlFragment}`,
-    );
+    await page.goto(`${bifrostUrl}/?public_key=${publicKey}&flow=${flowId}${urlFragment}`);
 
     await page.waitForLoadState();
 

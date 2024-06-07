@@ -16,12 +16,12 @@ import { asAdminUser } from 'src/config/tests';
 import AuditTrailTimeline from './audit-trail-timeline';
 import {
   DocumentWorkflowStarted,
+  TimelineFixture,
+  WorkflowTriggeredWithLinkEvent,
   entityFixture,
   entityIdFixure,
   obcIdFixture,
-  TimelineFixture,
   withRuleSetResult,
-  WorkflowTriggeredWithLinkEvent,
 } from './audit-trail-timeline.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -40,9 +40,7 @@ describe('<AuditTrailTimeline />', () => {
   });
 
   const renderAuditTrailTimeline = (timeline: TimelineEvent[]) =>
-    customRender(
-      <AuditTrailTimeline entity={entityFixture} timeline={timeline} />,
-    );
+    customRender(<AuditTrailTimeline entity={entityFixture} timeline={timeline} />);
 
   describe('when timeline data is loaded', () => {
     it('should render label added event correctly', () => {
@@ -58,9 +56,7 @@ describe('<AuditTrailTimeline />', () => {
       const header = screen.getByTestId('data-collected-event-header');
       expect(header).toBeInTheDocument();
       expect(
-        within(header).getByText(
-          'Full name, Email, Address, Date of birth, Phone number, SSN (Full)',
-        ),
+        within(header).getByText('Full name, Email, Address, Date of birth, Phone number, SSN (Full)'),
       ).toBeInTheDocument();
     });
 
@@ -86,9 +82,7 @@ describe('<AuditTrailTimeline />', () => {
       expect(headers.length).toEqual(2);
 
       const header = headers[0];
-      expect(
-        within(header).getByText('Successfully completed'),
-      ).toBeInTheDocument();
+      expect(within(header).getByText('Successfully completed')).toBeInTheDocument();
       expect(within(header).getByText('My Playbook')).toBeInTheDocument();
 
       const bodies = screen.getAllByTestId('onboarding-decision-event-body');
@@ -103,23 +97,13 @@ describe('<AuditTrailTimeline />', () => {
 
     it('should render workflow trigger event properly', () => {
       renderAuditTrailTimeline(TimelineFixture);
-      expect(
-        screen.getByText('Piip Penguin (piip@onefootprint.com)'),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText('requested user to upload ID photo'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Piip Penguin (piip@onefootprint.com)')).toBeInTheDocument();
+      expect(screen.getByText('requested user to upload ID photo')).toBeInTheDocument();
 
       const body = screen.getByTestId('workflow-triggered-event-body');
       expect(body).toBeInTheDocument();
-      expect(
-        within(body).getByText(
-          'Generated a link for the user to complete this task',
-        ),
-      ).toBeInTheDocument();
-      expect(
-        within(body).queryByText('Create new link'),
-      ).not.toBeInTheDocument();
+      expect(within(body).getByText('Generated a link for the user to complete this task')).toBeInTheDocument();
+      expect(within(body).queryByText('Create new link')).not.toBeInTheDocument();
     });
 
     describe('when rendering workflow trigger event with link', () => {
@@ -137,31 +121,21 @@ describe('<AuditTrailTimeline />', () => {
         });
 
         renderAuditTrailTimeline([WorkflowTriggeredWithLinkEvent]);
-        expect(
-          screen.getByText('Piip Penguin (piip@onefootprint.com)'),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByText('requested user to onboard onto'),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Piip Penguin (piip@onefootprint.com)')).toBeInTheDocument();
+        expect(screen.getByText('requested user to onboard onto')).toBeInTheDocument();
         await waitFor(() => {
           expect(screen.getByText('My playbook')).toBeInTheDocument();
         });
 
         const body = screen.getByTestId('workflow-triggered-event-body');
         expect(body).toBeInTheDocument();
-        expect(
-          within(body).getByText(
-            'Generated a link for the user to complete this task',
-          ),
-        ).toBeInTheDocument();
+        expect(within(body).getByText('Generated a link for the user to complete this task')).toBeInTheDocument();
         const createLinkButton = within(body).getByText('Create new link');
         expect(createLinkButton).toBeInTheDocument();
         await userEvent.click(createLinkButton);
 
         await waitFor(() => {
-          expect(
-            screen.getByDisplayValue('https://mylink'),
-          ).toBeInTheDocument();
+          expect(screen.getByDisplayValue('https://mylink')).toBeInTheDocument();
         });
         const copyButton = screen.getByText('Copy link');
         await userEvent.click(copyButton);
@@ -179,15 +153,13 @@ describe('<AuditTrailTimeline />', () => {
 
     it('should render document workflow started event properly', () => {
       renderAuditTrailTimeline([DocumentWorkflowStarted]);
-      expect(
-        screen.getByText('Started uploading document'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Started uploading document')).toBeInTheDocument();
     });
 
     // TODO: implement this after the backend finalizes the data model for manual review fields
-    // it('should render manual review onboarding decision event correctly', () => {})
+    // it('should render manual review onboarding decision event correctly', () => undefined)
 
     // TODO: implement this tests last - after API/data model iterations are done
-    // it('should render id document collection event correctly', () => {});
+    // it('should render id document collection event correctly', () => undefined);
   });
 });

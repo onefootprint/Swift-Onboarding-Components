@@ -8,15 +8,11 @@ type ErrorProps = {
   message: string;
 };
 
-const Error = ({ message }: ErrorProps) => {
+const ErrorComponent = ({ message }: ErrorProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'notifications' });
   return (
     <ErrorContainer>
-      <EmptyState
-        description={message}
-        iconComponent={IcoForbid40}
-        title={t('error')}
-      />
+      <EmptyState description={message} iconComponent={IcoForbid40} title={t('error')} />
     </ErrorContainer>
   );
 };
@@ -28,4 +24,4 @@ const ErrorContainer = styled.div`
   justify-content: center;
 `;
 
-export default Error;
+export default ErrorComponent;

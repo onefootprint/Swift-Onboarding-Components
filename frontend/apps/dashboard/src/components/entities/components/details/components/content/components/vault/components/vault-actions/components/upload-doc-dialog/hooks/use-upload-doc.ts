@@ -17,10 +17,7 @@ type EntityDocumentUploadRequest = {
   file: File;
 };
 
-const uploadDoc = async (
-  authHeaders: AuthHeaders,
-  { entityId, identifier, file }: EntityDocumentUploadRequest,
-) => {
+const uploadDoc = async (authHeaders: AuthHeaders, { entityId, identifier, file }: EntityDocumentUploadRequest) => {
   const arrayBuffer = await file.arrayBuffer();
   const rawImage = new Uint8Array(arrayBuffer);
 
@@ -80,7 +77,7 @@ const useUploadDoc = () => {
       if (!entity.data) throw new Error('Entity must be defined');
       return uploadDoc(authHeaders, { ...data, entityId: entity.data.id });
     },
-    onSuccess: (response, payload) => {
+    onSuccess: (_response, payload) => {
       toast.show({
         title: t('feedback.success.title'),
         description: t('feedback.success.description'),

@@ -1,7 +1,4 @@
-import type {
-  PreviousWatchlistChecksEventData,
-  WatchlistCheckEventData,
-} from '@onefootprint/types';
+import type { PreviousWatchlistChecksEventData, WatchlistCheckEventData } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +11,7 @@ type WatchlistCheckEventsDrawerContentProp = {
   data: PreviousWatchlistChecksEventData;
 };
 
-const WatchlistCheckEventsDrawerContent = ({
-  data,
-}: WatchlistCheckEventsDrawerContentProp) => {
+const WatchlistCheckEventsDrawerContent = ({ data }: WatchlistCheckEventsDrawerContentProp) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
   });
@@ -47,13 +42,7 @@ const WatchlistCheckEventsDrawerContent = ({
           </Stack>
         </Stack>
       ),
-      bodyComponent: (
-        <WatchlistCheckEventBody
-          data={eventData}
-          lineHeight="default"
-          showIcons
-        />
-      ),
+      bodyComponent: <WatchlistCheckEventBody data={eventData} lineHeight="default" showIcons />,
       iconComponent: <WatchlistCheckEventIcon />,
     };
   });

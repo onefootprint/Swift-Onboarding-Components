@@ -33,20 +33,9 @@ const MobileSelfieFallbackUpload = () => {
   };
 
   return (
-    <Container
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1, transition: { duration: 0.3 } }}
-      exit={{ opacity: 0 }}
-    >
-      <NavigationHeader
-        leftButton={{ variant: 'back', onBack: handleClickBack }}
-        position="floating"
-      />
-      <HeaderTitle
-        title={t('title')}
-        subtitle={t('subtitle')}
-        icon={IcoClock40}
-      />
+    <Container initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.3 } }} exit={{ opacity: 0 }}>
+      <NavigationHeader leftButton={{ variant: 'back', onBack: handleClickBack }} position="floating" />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} icon={IcoClock40} />
       <IdDocPhotoButtons
         onComplete={onComplete}
         allowPdf={allowPdf}

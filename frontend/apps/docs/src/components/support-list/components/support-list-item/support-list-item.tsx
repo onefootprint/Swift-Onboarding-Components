@@ -9,11 +9,7 @@ type SupportListItemProps = {
   label: string;
 };
 
-const SupportListItem = ({
-  label,
-  IconComponent,
-  onClick,
-}: SupportListItemProps) => (
+const SupportListItem = ({ label, IconComponent, onClick }: SupportListItemProps) => (
   <Item onClick={onClick}>
     <IconComponent color="tertiary" />
     <Text variant="label-3" color="tertiary">

@@ -254,8 +254,7 @@ const ALL_COUNTRY_CODES = [
 type CountryCodeTuple = typeof ALL_COUNTRY_CODES;
 export type CountryCode = CountryCodeTuple[number];
 
-export const isCountryCode = (value: string): value is CountryCode =>
-  ALL_COUNTRY_CODES.includes(value as CountryCode);
+export const isCountryCode = (value: string): value is CountryCode => ALL_COUNTRY_CODES.includes(value as CountryCode);
 
 export type CountryCode3 =
   | 'USA'

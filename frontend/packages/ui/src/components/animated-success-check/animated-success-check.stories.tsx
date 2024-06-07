@@ -23,19 +23,10 @@ const Template: ComponentStory<typeof AnimatedSuccessCheck> = ({ size }) => {
     <Stack dir="column" gap={5}>
       <AnimatedSuccessCheck animationStart={animationStart} size={size} />
       <Stack gap={3}>
-        <Button
-          type="button"
-          size="compact"
-          onClick={() => setAnimationStart(true)}
-        >
+        <Button type="button" size="compact" onClick={() => setAnimationStart(true)}>
           Play Animation
         </Button>
-        <Button
-          type="button"
-          size="compact"
-          onClick={() => setAnimationStart(false)}
-          variant="secondary"
-        >
+        <Button type="button" size="compact" onClick={() => setAnimationStart(false)} variant="secondary">
           Reset Animation
         </Button>
       </Stack>

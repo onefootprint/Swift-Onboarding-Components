@@ -10,9 +10,7 @@ export type ArticlesProps = {
 
 const Articles = ({ sections }: ArticlesProps) => (
   <ArticleList id="articles-container">
-    {sections.map(s =>
-      s.articles.map(article => <Article key={article.id} article={article} />),
-    )}
+    {sections.map(s => s.articles.map(article => <Article key={article.id} article={article} />))}
   </ArticleList>
 );
 

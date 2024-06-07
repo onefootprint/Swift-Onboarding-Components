@@ -1,12 +1,7 @@
 import { EntityStatus } from '@onefootprint/types';
 import last from 'lodash/last';
 import { useMemo } from 'react';
-import useBaseFilters, {
-  getSearchParams,
-  queryToArray,
-  queryToBoolean,
-  queryToString,
-} from 'src/hooks/use-filters';
+import useBaseFilters, { getSearchParams, queryToArray, queryToBoolean, queryToString } from 'src/hooks/use-filters';
 import getDateRange from 'src/utils/get-date-range';
 
 export type EntitiesQueryParams = {
@@ -57,29 +52,19 @@ const defaultQueryParams: EntitiesQueryParams = {
 const useFilters = () => {
   const filters = useBaseFilters<EntitiesQueryParams>(defaultQueryParams);
 
-  const getStatusAndManualReviewParams = (
-    state?: string,
-    verification?: string,
-  ) => {
+  const getStatusAndManualReviewParams = (state?: string, verification?: string) => {
     if (!state && !verification) {
       return {};
     }
     if (state === EntityStatus.incomplete) {
       return {
-        statuses: queryToString([
-          EntityStatus.incomplete,
-          EntityStatus.pending,
-        ]),
+        statuses: queryToString([EntityStatus.incomplete, EntityStatus.pending]),
         requiresManualReview: false,
       };
     }
     if (!verification) {
       return {
-        statuses: queryToString([
-          EntityStatus.pass,
-          EntityStatus.failed,
-          EntityStatus.none,
-        ]),
+        statuses: queryToString([EntityStatus.pass, EntityStatus.failed, EntityStatus.none]),
         requiresManualReview: false,
       };
     }
@@ -102,18 +87,12 @@ const useFilters = () => {
       cursor: queryToArray(filters.query.cursor),
       dateRange: queryToArray(filters.query.date_range),
       labels: queryToArray(filters.query.labels),
-      pageSize: filters.query.page_size
-        ? parseInt(filters.query.page_size, 10)
-        : 15,
+      pageSize: filters.query.page_size ? parseInt(filters.query.page_size, 10) : 15,
       search: filters.query.search,
       watchlist_hit: queryToBoolean(filters.query.watchlist_hit),
-      has_outstanding_workflow_request: queryToBoolean(
-        filters.query.has_outstanding_workflow_request,
-      ),
+      has_outstanding_workflow_request: queryToBoolean(filters.query.has_outstanding_workflow_request),
       show_unverified: queryToBoolean(filters.query.show_unverified),
-      playbook_ids: filters.query.playbook_ids
-        ? queryToArray(filters.query.playbook_ids)
-        : undefined,
+      playbook_ids: filters.query.playbook_ids ? queryToArray(filters.query.playbook_ids) : undefined,
       external_id: filters.query.external_id,
     }),
     [filters.query],
@@ -146,8 +125,7 @@ const useFilters = () => {
     watchlist_hit: filters.query.watchlist_hit,
     state: filters.query.state,
     verification: filters.query.verification,
-    has_outstanding_workflow_request:
-      filters.query.has_outstanding_workflow_request,
+    has_outstanding_workflow_request: filters.query.has_outstanding_workflow_request,
     show_unverified: filters.query.show_unverified,
     playbook_ids: filters.query.playbook_ids,
     externalId: values.external_id,

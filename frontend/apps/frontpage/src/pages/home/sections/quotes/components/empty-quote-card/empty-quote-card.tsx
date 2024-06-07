@@ -9,12 +9,7 @@ const EmptyQuoteCard = () => {
   });
   return (
     <Container align="center" justify="center" direction="column" gap={5}>
-      <Text
-        variant="body-3"
-        maxWidth="320px"
-        textAlign="center"
-        color="tertiary"
-      >
+      <Text variant="body-3" maxWidth="320px" textAlign="center" color="tertiary">
         {t('title')}
         <LinkButton variant="label-3" $paddingLeft={2}>
           {t('cta')}

@@ -2,11 +2,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const LogoFpDefault = ({
-  'aria-label': ariaLabel,
-  className,
-  testID,
-}: IconProps) => (
+const LogoFpDefault = ({ 'aria-label': ariaLabel, className, testID }: IconProps) => (
   <svg
     width={116}
     height={24}

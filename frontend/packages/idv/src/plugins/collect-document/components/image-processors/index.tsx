@@ -14,18 +14,9 @@ export const ImgProcessorsContext = createContext<ImageProcessors>({
   heicLoading: true,
 });
 export const useImgProcessorsContext = () => useContext(ImgProcessorsContext);
-export const ImgProcessorsContextProvider = ({
-  children,
-}: ImgProcessorsContextProviderProps): JSX.Element => {
+export const ImgProcessorsContextProvider = ({ children }: ImgProcessorsContextProviderProps): JSX.Element => {
   const [heicLoading, heic] = useImportHeic2Any();
-  const contextValue = useMemo(
-    () => ({ heic, heicLoading }),
-    [heic, heicLoading],
-  );
+  const contextValue = useMemo(() => ({ heic, heicLoading }), [heic, heicLoading]);
 
-  return (
-    <ImgProcessorsContext.Provider value={contextValue}>
-      {children}
-    </ImgProcessorsContext.Provider>
-  );
+  return <ImgProcessorsContext.Provider value={contextValue}>{children}</ImgProcessorsContext.Provider>;
 };

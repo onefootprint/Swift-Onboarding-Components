@@ -12,13 +12,7 @@ export const FishingPenguin = () => (
       height={275}
       loading="lazy"
     />
-    <Bucket
-      src="/banners/fishing-penguin/bucket.svg"
-      alt="Fishing Bucket"
-      width={100}
-      height={100}
-      loading="lazy"
-    />
+    <Bucket src="/banners/fishing-penguin/bucket.svg" alt="Fishing Bucket" width={100} height={100} loading="lazy" />
   </IllustrationContainer>
 );
 

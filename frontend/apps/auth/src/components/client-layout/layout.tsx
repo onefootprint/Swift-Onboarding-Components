@@ -11,13 +11,7 @@ type LayoutProps = {
   config?: PublicOnboardingConfig;
 };
 
-const Layout = ({
-  children,
-  config,
-  isSandbox,
-  onClose,
-  variant,
-}: LayoutProps) => (
+const Layout = ({ children, config, isSandbox, onClose, variant }: LayoutProps) => (
   <AppLayout
     config={config}
     isSandbox={isSandbox}

@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoSelfie24 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoSelfie24 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -30,15 +25,7 @@ const IcoSelfie24 = ({
         strokeWidth={1.4}
         strokeLinecap="round"
       />
-      <rect
-        x={5.5}
-        y={4}
-        width={13}
-        height={16}
-        rx={3}
-        stroke={theme.color[color]}
-        strokeWidth={1.5}
-      />
+      <rect x={5.5} y={4} width={13} height={16} rx={3} stroke={theme.color[color]} strokeWidth={1.5} />
     </svg>
   );
 };

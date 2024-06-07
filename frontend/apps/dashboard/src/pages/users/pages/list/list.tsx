@@ -27,11 +27,7 @@ const List = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <EntitiesList
-        title={t('header.title')}
-        kind={EntityKind.person}
-        basePath="users"
-      >
+      <EntitiesList title={t('header.title')} kind={EntityKind.person} basePath="users">
         <EntitiesTable
           aria-label={t('table.aria-label')}
           searchPlaceholder={t('table.search-placeholder')}

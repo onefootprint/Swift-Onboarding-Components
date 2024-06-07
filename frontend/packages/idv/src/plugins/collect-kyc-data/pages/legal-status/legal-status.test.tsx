@@ -1,17 +1,6 @@
-import {
-  customRender,
-  screen,
-  selectEvents,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, selectEvents, userEvent, waitFor } from '@onefootprint/test-utils';
 import type { CountryCode } from '@onefootprint/types';
-import {
-  ChallengeKind,
-  IdDI,
-  UsLegalStatus,
-  VisaKind,
-} from '@onefootprint/types';
+import { ChallengeKind, IdDI, UsLegalStatus, VisaKind } from '@onefootprint/types';
 import React from 'react';
 
 import type { KycData } from '../../utils/data-types';
@@ -27,10 +16,7 @@ import {
 import LegalStatus from './legal-status';
 import getInitialContext from './utils/test/get-initial-context';
 
-const renderLegalStatus = (
-  initialContext: InitMachineArgs,
-  onComplete?: (args: KycData) => void,
-) => {
+const renderLegalStatus = (initialContext: InitMachineArgs, onComplete?: (args: KycData) => void) => {
   customRender(
     <TestWrapper initialContext={initialContext} initState="confirm">
       <LegalStatus onComplete={onComplete} />
@@ -63,9 +49,7 @@ describe('LegalStatus', () => {
       const citizenRadio = screen.getByTestId('citizen-radio');
       expect(citizenRadio).toBeInTheDocument();
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       expect(permanentResidentRadio).toBeInTheDocument();
 
       const visaRadio = screen.getByTestId('visa-radio');
@@ -79,9 +63,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
-      const citizenInput = screen
-        .getByTestId('citizen-radio')
-        .querySelector('input') as HTMLInputElement;
+      const citizenInput = screen.getByTestId('citizen-radio').querySelector('input') as HTMLInputElement;
       expect(citizenInput.checked).toBe(true);
 
       const usaText = screen.getByText('United States of America');
@@ -110,9 +92,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext({ data });
       renderLegalStatus(initialContext);
 
-      const visaInput = screen
-        .getByTestId('visa-radio')
-        .querySelector('input') as HTMLInputElement;
+      const visaInput = screen.getByTestId('visa-radio').querySelector('input') as HTMLInputElement;
       expect(visaInput.checked).toBe(true);
 
       const nationalityText = screen.getByText('Hong Kong');
@@ -121,9 +101,7 @@ describe('LegalStatus', () => {
       const visaKindText = screen.getByText('H-1B');
       expect(visaKindText).toBeInTheDocument();
 
-      const visaExpirationInput = screen.getByTestId(
-        'visa-expiration-textinput',
-      );
+      const visaExpirationInput = screen.getByTestId('visa-expiration-textinput');
       expect(visaExpirationInput).toHaveValue('01/01/2222');
     });
   });
@@ -139,9 +117,7 @@ describe('LegalStatus', () => {
       const visaKindSelect = screen.queryByTestId('visa-kind-select');
       expect(visaKindSelect).not.toBeInTheDocument();
 
-      const visaExpirationTextInput = screen.queryByTestId(
-        'visa-expiration-textinput',
-      );
+      const visaExpirationTextInput = screen.queryByTestId('visa-expiration-textinput');
       expect(visaExpirationTextInput).not.toBeInTheDocument();
     });
 
@@ -243,9 +219,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       const nationalitySelect = screen.getByTestId('nationality-select');
@@ -259,9 +233,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       await waitFor(() => {
@@ -272,16 +244,12 @@ describe('LegalStatus', () => {
       await userEvent.click(continueButton);
 
       await waitFor(() => {
-        const nationalityError = screen.getByText(
-          'Country of birth cannot be empty',
-        );
+        const nationalityError = screen.getByText('Country of birth cannot be empty');
         expect(nationalityError).toBeInTheDocument();
       });
 
       await waitFor(() => {
-        const citizenshipError = screen.getByText(
-          'Citizenship cannot be empty',
-        );
+        const citizenshipError = screen.getByText('Citizenship cannot be empty');
         expect(citizenshipError).toBeInTheDocument();
       });
     });
@@ -290,9 +258,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       const countryTriggers = screen.getAllByRole('button', {
@@ -326,9 +292,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       const countryTriggers = screen.getAllByRole('button', {
@@ -380,9 +344,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       const countryTriggers = screen.getAllByRole('button', {
@@ -394,9 +356,7 @@ describe('LegalStatus', () => {
       await selectEvents.select(citizenshipTrigger, 'Albania');
 
       await waitFor(() => {
-        const addCitizenshipButton = screen.getByTestId(
-          'add-citizenship-button',
-        );
+        const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
         expect(addCitizenshipButton).toBeInTheDocument();
       });
       const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
@@ -412,15 +372,11 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       await waitFor(() => {
-        const addCitizenshipButton = screen.queryByTestId(
-          'add-citizenship-button',
-        );
+        const addCitizenshipButton = screen.queryByTestId('add-citizenship-button');
         expect(addCitizenshipButton).toBeNull();
       });
     });
@@ -430,9 +386,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       const countryTriggers = screen.getAllByRole('button', {
@@ -446,9 +400,7 @@ describe('LegalStatus', () => {
       await selectEvents.select(citizenshipTrigger, 'Albania');
 
       await waitFor(() => {
-        const addCitizenshipButton = screen.getByTestId(
-          'add-citizenship-button',
-        );
+        const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
         expect(addCitizenshipButton).toBeInTheDocument();
       });
       const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
@@ -504,9 +456,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       const countryTriggers = screen.getAllByRole('button', {
@@ -520,9 +470,7 @@ describe('LegalStatus', () => {
       await selectEvents.select(citizenshipTrigger, 'Albania');
 
       await waitFor(() => {
-        const addCitizenshipButton = screen.getByTestId(
-          'add-citizenship-button',
-        );
+        const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
         expect(addCitizenshipButton).toBeInTheDocument();
       });
       const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
@@ -577,17 +525,13 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       const citizenshipSelects = screen.getAllByText('Citizenship');
       expect(citizenshipSelects).toHaveLength(1);
 
-      const deleteCitizenshipButtons = screen.queryAllByTestId(
-        'citizenship-delete-button',
-      );
+      const deleteCitizenshipButtons = screen.queryAllByTestId('citizenship-delete-button');
       expect(deleteCitizenshipButtons).toHaveLength(0);
     });
 
@@ -596,9 +540,7 @@ describe('LegalStatus', () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
 
-      const permanentResidentRadio = screen.getByTestId(
-        'permanent-resident-radio',
-      );
+      const permanentResidentRadio = screen.getByTestId('permanent-resident-radio');
       await userEvent.click(permanentResidentRadio);
 
       const countryTriggers = screen.getAllByRole('button', {
@@ -614,9 +556,7 @@ describe('LegalStatus', () => {
       await selectEvents.select(citizenshipTrigger, 'Albania');
 
       await waitFor(() => {
-        const addCitizenshipButton = screen.getByTestId(
-          'add-citizenship-button',
-        );
+        const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
         expect(addCitizenshipButton).toBeInTheDocument();
       });
       const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
@@ -633,14 +573,10 @@ describe('LegalStatus', () => {
       await selectEvents.select(citizenship2Trigger, 'Afghanistan');
 
       await waitFor(() => {
-        const addCitizenship2Button = screen.getByTestId(
-          'add-citizenship-button',
-        );
+        const addCitizenship2Button = screen.getByTestId('add-citizenship-button');
         expect(addCitizenship2Button).toBeInTheDocument();
       });
-      const addCitizenship2Button = screen.getByTestId(
-        'add-citizenship-button',
-      );
+      const addCitizenship2Button = screen.getByTestId('add-citizenship-button');
       await userEvent.click(addCitizenship2Button);
       await waitFor(() => {
         const citizenship3Trigger = screen.getByRole('button', {
@@ -655,14 +591,10 @@ describe('LegalStatus', () => {
 
       // Delete 3rd citizenship for a total of 2 remaining (AL, AF)
       await waitFor(() => {
-        const deleteCitizenshipButtons = screen.queryAllByTestId(
-          'citizenship-delete-button',
-        );
+        const deleteCitizenshipButtons = screen.queryAllByTestId('citizenship-delete-button');
         expect(deleteCitizenshipButtons).toHaveLength(3);
       });
-      const deleteCitizenshipButtons = screen.queryAllByTestId(
-        'citizenship-delete-button',
-      );
+      const deleteCitizenshipButtons = screen.queryAllByTestId('citizenship-delete-button');
       await userEvent.click(deleteCitizenshipButtons[2]);
 
       await waitFor(() => {
@@ -717,9 +649,7 @@ describe('LegalStatus', () => {
       const visaKindSelect = screen.getByTestId('visa-kind-select');
       expect(visaKindSelect).toBeInTheDocument();
 
-      const visaExpirationTextInput = screen.getByTestId(
-        'visa-expiration-textinput',
-      );
+      const visaExpirationTextInput = screen.getByTestId('visa-expiration-textinput');
       expect(visaExpirationTextInput).toBeInTheDocument();
     });
 
@@ -736,16 +666,12 @@ describe('LegalStatus', () => {
       await userEvent.click(continueButton);
 
       await waitFor(() => {
-        const nationalityError = screen.getByText(
-          'Country of birth cannot be empty',
-        );
+        const nationalityError = screen.getByText('Country of birth cannot be empty');
         expect(nationalityError).toBeInTheDocument();
       });
 
       await waitFor(() => {
-        const citizenshipError = screen.getByText(
-          'Citizenship cannot be empty',
-        );
+        const citizenshipError = screen.getByText('Citizenship cannot be empty');
         expect(citizenshipError).toBeInTheDocument();
       });
 
@@ -755,9 +681,7 @@ describe('LegalStatus', () => {
       });
 
       await waitFor(() => {
-        const visaExpirationError = screen.getByText(
-          'Visa expiration date cannot be empty',
-        );
+        const visaExpirationError = screen.getByText('Visa expiration date cannot be empty');
         expect(visaExpirationError).toBeInTheDocument();
       });
     });
@@ -783,9 +707,7 @@ describe('LegalStatus', () => {
       const visaTrigger = triggers[2];
       await selectEvents.select(visaTrigger, 'H-1B');
 
-      const visaExpirationTextInput = screen.getByTestId(
-        'visa-expiration-textinput',
-      );
+      const visaExpirationTextInput = screen.getByTestId('visa-expiration-textinput');
 
       const before1900 = 1899;
       await userEvent.type(visaExpirationTextInput, `01/01/${before1900}`);
@@ -796,9 +718,7 @@ describe('LegalStatus', () => {
       const continueButton = screen.getByTestId('continue-button');
       await userEvent.click(continueButton);
       await waitFor(() => {
-        const visaExpirationError = screen.getByText(
-          'Visa expiration date is invalid',
-        );
+        const visaExpirationError = screen.getByText('Visa expiration date is invalid');
         expect(visaExpirationError).toBeInTheDocument();
       });
 
@@ -806,9 +726,7 @@ describe('LegalStatus', () => {
       await userEvent.type(visaExpirationTextInput, `01/01/${after3000}`);
       await userEvent.click(continueButton);
       await waitFor(() => {
-        const visaExpirationError = screen.getByText(
-          'Visa expiration date is invalid',
-        );
+        const visaExpirationError = screen.getByText('Visa expiration date is invalid');
         expect(visaExpirationError).toBeInTheDocument();
       });
     });
@@ -833,15 +751,11 @@ describe('LegalStatus', () => {
 
       const visaTypeTrigger = triggers[2];
       await selectEvents.select(visaTypeTrigger, 'L-1');
-      const visaExpirationTextInput = screen.getByTestId(
-        'visa-expiration-textinput',
-      );
+      const visaExpirationTextInput = screen.getByTestId('visa-expiration-textinput');
       await userEvent.type(visaExpirationTextInput, '01012100');
 
       await waitFor(() => {
-        const addCitizenshipButton = screen.getByTestId(
-          'add-citizenship-button',
-        );
+        const addCitizenshipButton = screen.getByTestId('add-citizenship-button');
         expect(addCitizenshipButton).toBeInTheDocument();
       });
       const addCitizenshipButton = screen.getByTestId('add-citizenship-button');

@@ -9,9 +9,7 @@ type VaultProxyIllustrationProps = {
   isHovered?: boolean;
 };
 
-const VaultProxyIllustration = ({
-  isHovered = false,
-}: VaultProxyIllustrationProps) => {
+const VaultProxyIllustration = ({ isHovered = false }: VaultProxyIllustrationProps) => {
   const theme = useTheme();
   const isDark = theme.theme === 'dark';
   return (
@@ -48,17 +46,21 @@ const Knob = styled.div<{ isDark: boolean; isHovered: boolean }>`
     box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.1) inset;
     transition: all 0.2s ease-in-out;
 
-    ${isDark &&
-    css`
+    ${
+      isDark &&
+      css`
       box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset;
       background-color: ${theme.backgroundColor.secondary};
-    `}
+    `
+    }
 
-    ${isHovered &&
-    css`
+    ${
+      isHovered &&
+      css`
       box-shadow: ${theme.elevation[3]};
       transform: translateY(-2px) scale(1.03);
-    `}
+    `
+    }
   `}
 `;
 

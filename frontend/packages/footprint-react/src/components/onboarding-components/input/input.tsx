@@ -12,13 +12,7 @@ const Input = ({ className, id, ...props }: InputProps) => {
   const {
     form: { register },
   } = useFootprint();
-  const {
-    name,
-    className: baseClassName,
-    mask,
-    validations,
-    ...allProps
-  } = useFieldProps();
+  const { name, className: baseClassName, mask, validations, ...allProps } = useFieldProps();
 
   useEffect(() => {
     let cleaveInstance: Cleave | null = null;

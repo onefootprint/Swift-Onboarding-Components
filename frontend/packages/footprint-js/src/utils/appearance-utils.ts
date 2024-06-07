@@ -3,21 +3,11 @@ import type { Appearance } from '../types/appearance';
 
 const isObject = (obj: unknown) => typeof obj === 'object' && !!obj;
 
-export const getEncodedAppearance = ({
-  fontSrc,
-  variables = {},
-  rules = {},
-  variant,
-}: Appearance = {}) => {
+export const getEncodedAppearance = ({ fontSrc, variables = {}, rules = {}, variant }: Appearance = {}) => {
   const getVariables = () =>
-    Object.keys(variables).length
-      ? encodeURIComponent(JSON.stringify(variables))
-      : undefined;
+    Object.keys(variables).length ? encodeURIComponent(JSON.stringify(variables)) : undefined;
 
-  const getRules = () =>
-    Object.keys(rules).length
-      ? encodeURIComponent(JSON.stringify(rules))
-      : undefined;
+  const getRules = () => (Object.keys(rules).length ? encodeURIComponent(JSON.stringify(rules)) : undefined);
 
   return {
     fontSrc,

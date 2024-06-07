@@ -16,9 +16,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<TagProps> = ({ children }: TagProps) => (
-  <Tag>{children}</Tag>
-);
+const Template: Story<TagProps> = ({ children }: TagProps) => <Tag>{children}</Tag>;
 
 export const Base = Template.bind({});
 Base.args = {

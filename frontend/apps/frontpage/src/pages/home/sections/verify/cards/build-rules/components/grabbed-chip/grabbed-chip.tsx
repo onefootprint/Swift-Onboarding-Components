@@ -8,12 +8,7 @@ import RuleTag from '../rule-tag';
 const GrabbedChip = ({ className }: { className?: string }) => (
   <Container className={className}>
     <RuleTag signal="ip" op="is" list="@blocked_ips" $elevated />
-    <GrabHand
-      src="/home/verify-cards/hand.svg"
-      height={42}
-      width={42}
-      alt="grab"
-    />
+    <GrabHand src="/home/verify-cards/hand.svg" height={42} width={42} alt="grab" />
   </Container>
 );
 

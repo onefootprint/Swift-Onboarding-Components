@@ -32,9 +32,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(
-    `/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`,
-  );
+  await page.goto(`/components/verify?ob_key=${key}&app_url=${appUrl}&f=${flowId}`);
   await page.waitForLoadState();
 
   await verifyAppIframeClick(page, isMobile);
@@ -46,11 +44,9 @@ test('Verify KYC as an investor', async ({ page, browser, isMobile }) => {
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test
 
-  await expect(
-    page
-      .frameLocator('iframe[name^="footprint-iframe-"]')
-      .getByText(/Sandbox Mode/i),
-  ).toBeVisible({ timeout });
+  await expect(page.frameLocator('iframe[name^="footprint-iframe-"]').getByText(/Sandbox Mode/i)).toBeVisible({
+    timeout,
+  });
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
   await selectOutcomeOptional(frame, 'Success');
@@ -116,13 +112,8 @@ test('Verify KYC as an investor', async ({ page, browser, isMobile }) => {
   await clickOnContinue(frame);
   await page.waitForLoadState();
 
-  const noneBtn = frame
-    .getByRole('button')
-    .filter({ hasText: /none/i })
-    .first();
-  await noneBtn
-    .waitFor({ state: 'attached', timeout: 2000 })
-    .then(() => noneBtn.click());
+  const noneBtn = frame.getByRole('button').filter({ hasText: /none/i }).first();
+  await noneBtn.waitFor({ state: 'attached', timeout: 2000 }).then(() => noneBtn.click());
   await page.waitForLoadState();
 
   await doTransferFromDesktop({

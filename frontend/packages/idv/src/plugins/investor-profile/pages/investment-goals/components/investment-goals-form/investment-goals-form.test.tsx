@@ -1,33 +1,15 @@
 import '../../../../../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
-import {
-  InvestorProfileDI,
-  InvestorProfileInvestmentGoal,
-} from '@onefootprint/types';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import { InvestorProfileDI, InvestorProfileInvestmentGoal } from '@onefootprint/types';
 import React from 'react';
 
 import type { InvestmentGoalsFormProps } from './investment-goals-form';
 import InvestmentGoalsForm from './investment-goals-form';
 
 describe('<InvestmentGoalsForm />', () => {
-  const renderForm = ({
-    defaultValues,
-    isLoading,
-    onSubmit = () => {},
-  }: Partial<InvestmentGoalsFormProps>) => {
-    customRender(
-      <InvestmentGoalsForm
-        defaultValues={defaultValues}
-        isLoading={isLoading}
-        onSubmit={onSubmit}
-      />,
-    );
+  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<InvestmentGoalsFormProps>) => {
+    customRender(<InvestmentGoalsForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
   };
 
   it('should trigger onSubmit when form is submitted', async () => {
@@ -44,21 +26,15 @@ describe('<InvestmentGoalsForm />', () => {
     const income = screen.getByLabelText('Income') as HTMLInputElement;
     expect(income.checked).toBe(false);
 
-    const preserveCapital = screen.getByLabelText(
-      'Preserve capital',
-    ) as HTMLInputElement;
+    const preserveCapital = screen.getByLabelText('Preserve capital') as HTMLInputElement;
     expect(preserveCapital.checked).toBe(false);
     await userEvent.click(preserveCapital);
     expect(preserveCapital.checked).toBe(true);
 
-    const speculation = screen.getByLabelText(
-      'Speculation',
-    ) as HTMLInputElement;
+    const speculation = screen.getByLabelText('Speculation') as HTMLInputElement;
     expect(speculation.checked).toBe(false);
 
-    const diversification = screen.getByLabelText(
-      'Diversification',
-    ) as HTMLInputElement;
+    const diversification = screen.getByLabelText('Diversification') as HTMLInputElement;
     expect(diversification.checked).toBe(false);
 
     const other = screen.getByLabelText('Other') as HTMLInputElement;
@@ -94,19 +70,13 @@ describe('<InvestmentGoalsForm />', () => {
     const income = screen.getByLabelText('Income') as HTMLInputElement;
     expect(income.checked).toBe(false);
 
-    const preserveCapital = screen.getByLabelText(
-      'Preserve capital',
-    ) as HTMLInputElement;
+    const preserveCapital = screen.getByLabelText('Preserve capital') as HTMLInputElement;
     expect(preserveCapital.checked).toBe(true);
 
-    const speculation = screen.getByLabelText(
-      'Speculation',
-    ) as HTMLInputElement;
+    const speculation = screen.getByLabelText('Speculation') as HTMLInputElement;
     expect(speculation.checked).toBe(true);
 
-    const diversification = screen.getByLabelText(
-      'Diversification',
-    ) as HTMLInputElement;
+    const diversification = screen.getByLabelText('Diversification') as HTMLInputElement;
     expect(diversification.checked).toBe(false);
 
     const other = screen.getByLabelText('Other') as HTMLInputElement;
@@ -140,9 +110,7 @@ describe('<InvestmentGoalsForm />', () => {
     expect(onSubmit).not.toHaveBeenCalled();
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Please select at least one goal'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Please select at least one goal')).toBeInTheDocument();
     });
   });
 });

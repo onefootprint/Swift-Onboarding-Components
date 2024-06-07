@@ -48,29 +48,16 @@ const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   'selfie',
 ];
 
-const CdoList = ({
-  cdos,
-  optionalCdos = [],
-  disableSort,
-  singleDocument,
-}: CdoListProps) => {
+const CdoList = ({ cdos, optionalCdos = [], disableSort, singleDocument }: CdoListProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'cdo' });
   const allCdos = getCdos(cdos, !!singleDocument);
   const optionalCdosList = getCdos(optionalCdos, !!singleDocument);
   const allTagLabels = allCdos.map(cdo => t(cdo as ParseKeys<'common'>));
-  const optionalCdosLabels = optionalCdosList.map(
-    cdo => `${t(cdo as ParseKeys<'common'>)} ‧ Optional`,
-  );
+  const optionalCdosLabels = optionalCdosList.map(cdo => `${t(cdo as ParseKeys<'common'>)} ‧ Optional`);
   const tagLabels = [...allTagLabels, ...optionalCdosLabels];
 
-  const attributeLabels: string[] = tagOrder.map(
-    attr => t(attr as ParseKeys<'common'>) as string,
-  );
-  if (!disableSort)
-    tagLabels.sort(
-      (a: string, b: string) =>
-        attributeLabels.indexOf(a) - attributeLabels.indexOf(b),
-    );
+  const attributeLabels: string[] = tagOrder.map(attr => t(attr as ParseKeys<'common'>) as string);
+  if (!disableSort) tagLabels.sort((a: string, b: string) => attributeLabels.indexOf(a) - attributeLabels.indexOf(b));
 
   return <Text variant="label-3">{tagLabels.join(', ')}</Text>;
 };

@@ -3,10 +3,7 @@ import type { TransitionConfig, TransitionsConfig } from 'xstate';
 
 import type { MachineContext, MachineEvents } from './types';
 
-export const RequirementCompletedTransition: TransitionsConfig<
-  MachineContext,
-  MachineEvents
-> = {
+export const RequirementCompletedTransition: TransitionsConfig<MachineContext, MachineEvents> = {
   requirementCompleted: {
     target: 'checkRequirements',
   },
@@ -14,10 +11,7 @@ export const RequirementCompletedTransition: TransitionsConfig<
 
 // NOTE: the ordering of these targets actually dictates the order in which requirements are
 // handled by the frontend
-export const NextRequirementTargets: TransitionConfig<
-  MachineContext,
-  MachineEvents
->[] = [
+export const NextRequirementTargets: TransitionConfig<MachineContext, MachineEvents>[] = [
   {
     target: 'kybData',
     cond: context => shouldRunCollectKybData(context),
@@ -56,16 +50,13 @@ export const NextRequirementTargets: TransitionConfig<
 ];
 
 const shouldRunCollectKybData = (context: MachineContext) =>
-  context.requirements[0]?.kind === OnboardingRequirementKind.collectKybData &&
-  !context.idvContext.isTransfer;
+  context.requirements[0]?.kind === OnboardingRequirementKind.collectKybData && !context.idvContext.isTransfer;
 
 const shouldRunCollectKycData = (context: MachineContext) =>
-  context.requirements[0]?.kind === OnboardingRequirementKind.collectKycData &&
-  !context.idvContext.isTransfer;
+  context.requirements[0]?.kind === OnboardingRequirementKind.collectKycData && !context.idvContext.isTransfer;
 
 const shouldRunCollectInvestorProfile = (context: MachineContext) =>
-  context.requirements[0]?.kind === OnboardingRequirementKind.investorProfile &&
-  !context.idvContext.isTransfer;
+  context.requirements[0]?.kind === OnboardingRequirementKind.investorProfile && !context.idvContext.isTransfer;
 
 const shouldRunLiveness = (context: MachineContext) =>
   context.requirements[0]?.kind === OnboardingRequirementKind.registerPasskey;
@@ -87,25 +78,18 @@ const shouldShowAuthorize = (context: MachineContext) => {
   const {
     idvContext: { isTransfer },
   } = context;
-  return (
-    !isTransfer &&
-    context.requirements[0]?.kind === OnboardingRequirementKind.authorize
-  );
+  return !isTransfer && context.requirements[0]?.kind === OnboardingRequirementKind.authorize;
 };
 
 const shouldShowProcess = (context: MachineContext) => {
   const {
     idvContext: { isTransfer },
   } = context;
-  return (
-    !isTransfer &&
-    context.requirements[0]?.kind === OnboardingRequirementKind.process
-  );
+  return !isTransfer && context.requirements[0]?.kind === OnboardingRequirementKind.process;
 };
 
 const isDocKind = (x: unknown) => x === OnboardingRequirementKind.idDoc;
-const isLivenessKind = (x: unknown) =>
-  x === OnboardingRequirementKind.registerPasskey;
+const isLivenessKind = (x: unknown) => x === OnboardingRequirementKind.registerPasskey;
 
 const shouldRunTransfer = (context: MachineContext): boolean => {
   const {

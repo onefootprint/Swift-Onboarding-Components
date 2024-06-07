@@ -3,12 +3,7 @@ import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 
-const IcoWebhook16 = ({
-  'aria-label': ariaLabel,
-  color = 'primary',
-  className,
-  testID,
-}: IconProps) => {
+const IcoWebhook16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -23,14 +18,7 @@ const IcoWebhook16 = ({
       data-colored={false}
     >
       <g clipPath="url(#prefix__a)" fill={theme.color[color]}>
-        <mask
-          id="prefix__b"
-          maskUnits="userSpaceOnUse"
-          x={-0.42}
-          y={0.1}
-          width={17}
-          height={15}
-        >
+        <mask id="prefix__b" maskUnits="userSpaceOnUse" x={-0.42} y={0.1} width={17} height={15}>
           <path fill="#fff" d="M-.42.1h17v15h-17z" />
           <path
             fillRule="evenodd"

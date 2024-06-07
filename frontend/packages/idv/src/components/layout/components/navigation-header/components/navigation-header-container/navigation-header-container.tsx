@@ -13,10 +13,7 @@ type NavigationHeaderContainerProps = {
   containerId: string;
 };
 
-const NavigationHeaderContainer = ({
-  top,
-  containerId,
-}: NavigationHeaderContainerProps) => {
+const NavigationHeaderContainer = ({ top, containerId }: NavigationHeaderContainerProps) => {
   const hasScroll = useContainerHasScroll(containerId);
   const {
     header: { options },
@@ -35,8 +32,7 @@ const NavigationHeaderContainer = ({
       const containerWidth = layoutContainer?.clientWidth || 0;
       setLayoutContainerWidth(containerWidth);
       let newHeaderTop = top ?? 0;
-      if (headerPosition === 'floating' || headerPosition === 'button-only')
-        newHeaderTop += containerTop;
+      if (headerPosition === 'floating' || headerPosition === 'button-only') newHeaderTop += containerTop;
       setHeaderTop(newHeaderTop);
     };
 
@@ -57,8 +53,7 @@ const NavigationHeaderContainer = ({
 
   let position = 'sticky';
   if (headerPosition === 'nonSticky') position = 'relative';
-  if (headerPosition === 'floating' || headerPosition === 'button-only')
-    position = 'fixed';
+  if (headerPosition === 'floating' || headerPosition === 'button-only') position = 'fixed';
 
   const isSticky = headerPosition !== 'nonSticky';
 
@@ -102,41 +97,53 @@ const Header = styled.header<{
       height: 100%;
       z-index: 0;
 
-      ${$background === 'primary' &&
-      css`
+      ${
+        $background === 'primary' &&
+        css`
         background: ${theme.backgroundColor.primary};
-      `}
+      `
+      }
 
-      ${$background === 'transparent' &&
-      css`
+      ${
+        $background === 'transparent' &&
+        css`
         background: ${theme.backgroundColor.transparent};
-      `}
+      `
+      }
 
-      ${$background === 'dark-glass' &&
-      css`
+      ${
+        $background === 'dark-glass' &&
+        css`
         background-color: black;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         opacity: 0.2;
-      `}
+      `
+      }
       
-      ${$background === 'light-glass' &&
-      css`
+      ${
+        $background === 'light-glass' &&
+        css`
         background: ${theme.backgroundColor.primary};
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         opacity: 0.2;
-      `}
+      `
+      }
 
-      ${$buttonOnly &&
-      css`
+      ${
+        $buttonOnly &&
+        css`
         background: ${theme.backgroundColor.transparent};
-      `}
+      `
+      }
 
-      ${theme.components.bifrost.container.bg &&
-      css`
+      ${
+        theme.components.bifrost.container.bg &&
+        css`
         background: ${theme.components.bifrost.container.bg};
-      `}
+      `
+      }
     }
   `}
 
@@ -157,10 +164,12 @@ const Header = styled.header<{
         border: none;
       }
 
-      ${theme.components.bifrost.container.bg &&
-      css`
+      ${
+        theme.components.bifrost.container.bg &&
+        css`
         border-bottom: 1px solid ${theme.components.bifrost.container.border};
-      `}
+      `
+      }
     `}
 `;
 

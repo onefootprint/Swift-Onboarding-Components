@@ -1,4 +1,4 @@
-import { Box, createFontStyles, Stack, Text } from '@onefootprint/ui';
+import { Box, Stack, Text, createFontStyles } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -27,20 +27,10 @@ type ProblemSolutionCardProps = {
   icon: CustomIcons;
 };
 
-const ProblemSolutionCard = ({
-  title,
-  subtitle,
-  icon,
-  key,
-}: ProblemSolutionCardProps) => (
+const ProblemSolutionCard = ({ title, subtitle, icon, key }: ProblemSolutionCardProps) => (
   <CardContainer key={key}>
     <IconContainer>
-      <Image
-        src={`/industries/icons/${icon}.svg`}
-        alt={icon}
-        width={72}
-        height={72}
-      />
+      <Image src={`/industries/icons/${icon}.svg`} alt={icon} width={72} height={72} />
     </IconContainer>
     <TextContainer>
       <Text variant="label-1" tag="h3">

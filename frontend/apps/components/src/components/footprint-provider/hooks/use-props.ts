@@ -72,13 +72,10 @@ const useProps = <T extends Obj>(
     }
 
     // TODO: delete when all customers migrate to v3.8.0+
-    const unsubscribe = fpProvider.on(
-      FootprintPrivateEvent.propsReceived,
-      (props: unknown) => {
-        clearTimeout(timerId.current);
-        complete(props as T);
-      },
-    );
+    const unsubscribe = fpProvider.on(FootprintPrivateEvent.propsReceived, (props: unknown) => {
+      clearTimeout(timerId.current);
+      complete(props as T);
+    });
 
     timerId.current = setTimeout(() => {
       unsubscribe();
@@ -90,13 +87,7 @@ const useProps = <T extends Obj>(
       clearTimeout(timerId.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isAdapterLoaded,
-    router.isReady,
-    router.query,
-    router.asPath,
-    isSdkArgsLoading,
-  ]);
+  }, [isAdapterLoaded, router.isReady, router.query, router.asPath, isSdkArgsLoading]);
 };
 
 export default useProps;

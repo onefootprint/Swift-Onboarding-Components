@@ -1,6 +1,6 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
-import { Container, LinkButton, media, Stack, Text } from '@onefootprint/ui';
+import { Container, LinkButton, Stack, Text, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,20 +34,14 @@ const Post = ({ post }: PostProps) => {
         <Container>
           <WritingLayout>
             <BackButtonLink href="/blog" passHref>
-              <LinkButton
-                iconPosition="left"
-                iconComponent={IcoChevronLeftBig24}
-                href="/blog"
-              >
+              <LinkButton iconPosition="left" iconComponent={IcoChevronLeftBig24} href="/blog">
                 {t('go-back')}
               </LinkButton>
             </BackButtonLink>
             <header>
               <Stack justify="space-between" align="center">
                 <PostInfo
-                  publishedAt={formatDateWithLongMonth(
-                    new Date(post.published_at),
-                  )}
+                  publishedAt={formatDateWithLongMonth(new Date(post.published_at))}
                   authors={post.authors.map(author => ({
                     id: author.id,
                     profileImage: author.profile_image,
@@ -58,10 +52,7 @@ const Post = ({ post }: PostProps) => {
                     name: post.primary_tag.name,
                   }}
                 />
-                <DesktopSharePost
-                  title={post.og_title}
-                  url={`https://www.onefootprint.com/blog/${post.slug}`}
-                />
+                <DesktopSharePost title={post.og_title} url={`https://www.onefootprint.com/blog/${post.slug}`} />
               </Stack>
               <Text variant="display-2" tag="h1" marginTop={9} marginBottom={9}>
                 {post.title}

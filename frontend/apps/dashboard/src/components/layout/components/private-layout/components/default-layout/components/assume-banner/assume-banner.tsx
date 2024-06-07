@@ -10,8 +10,7 @@ const AssumeBanner = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'components.private-layout.assume-banner',
   });
-  const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } =
-    useSession();
+  const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } = useSession();
   const router = useRouter();
 
   const handleChangeEdit = () => {

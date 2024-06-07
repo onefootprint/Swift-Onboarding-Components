@@ -1,11 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { MultiSelectProps } from './multi-select';
@@ -93,14 +88,11 @@ describe('<MultiSelect />', () => {
       const firstOption = screen.getByText(options[0].label);
       await userEvent.click(firstOption);
       await waitFor(() => {
-        expect(onChange).toHaveBeenCalledWith(
-          [{ label: 'Full name', value: 'full_name' }],
-          {
-            action: 'select-option',
-            name: undefined,
-            option: { label: 'Full name', value: 'full_name' },
-          },
-        );
+        expect(onChange).toHaveBeenCalledWith([{ label: 'Full name', value: 'full_name' }], {
+          action: 'select-option',
+          name: undefined,
+          option: { label: 'Full name', value: 'full_name' },
+        });
       });
     });
   });

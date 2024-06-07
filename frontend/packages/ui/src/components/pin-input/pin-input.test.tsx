@@ -1,11 +1,6 @@
 import '../../config/initializers/i18next-test';
 
-import {
-  customRender,
-  screen,
-  userEvent,
-  waitFor,
-} from '@onefootprint/test-utils';
+import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { PinInputProps } from './pin-input';
@@ -20,13 +15,7 @@ describe('<PinInput />', () => {
     autoFocus,
   }: Partial<PinInputProps>) =>
     customRender(
-      <PinInput
-        hasError={hasError}
-        hint={hint}
-        onComplete={onComplete}
-        testID={testID}
-        autoFocus={autoFocus}
-      />,
+      <PinInput hasError={hasError} hint={hint} onComplete={onComplete} testID={testID} autoFocus={autoFocus} />,
     );
 
   it('should add a test id attribute', () => {

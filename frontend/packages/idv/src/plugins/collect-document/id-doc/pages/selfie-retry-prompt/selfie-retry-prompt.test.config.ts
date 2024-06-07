@@ -1,8 +1,4 @@
-import {
-  IdDocImageProcessingError,
-  IdDocImageTypes,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { IdDocImageProcessingError, IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 
 import type { MachineContext } from '../../utils/state-machine';
 
@@ -34,11 +30,7 @@ const contextWithSelfieErrors: MachineContext = {
       SupportedIdDocTypes.visa,
       SupportedIdDocTypes.workPermit,
     ],
-    CA: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
+    CA: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard, SupportedIdDocTypes.passport],
   },
 };
 

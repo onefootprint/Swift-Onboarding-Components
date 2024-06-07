@@ -10,12 +10,7 @@ export type PermissionGateProps = {
   tooltipPosition?: 'top' | 'bottom' | 'left' | 'right';
 };
 
-const PermissionGate = ({
-  children,
-  scopeKind,
-  fallbackText,
-  tooltipPosition = 'top',
-}: PermissionGateProps) => {
+const PermissionGate = ({ children, scopeKind, fallbackText, tooltipPosition = 'top' }: PermissionGateProps) => {
   const { hasPermission } = usePermissions();
 
   return hasPermission(scopeKind) ? (

@@ -1,5 +1,5 @@
 import { IcoChevronRight24 } from '@onefootprint/icons';
-import { Box, media, Stack } from '@onefootprint/ui';
+import { Box, Stack, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import React, { useRef } from 'react';
@@ -30,12 +30,7 @@ const chevronVariants = {
   final: { opacity: 1, x: '100%', scale: 1, transition: { duration: 0.2 } },
 };
 
-const FeaturedCard = ({
-  logo: Logo,
-  title,
-  gridArea,
-  url,
-}: FeaturedCardProps) => {
+const FeaturedCard = ({ logo: Logo, title, gridArea, url }: FeaturedCardProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isHovering = useHover(containerRef);
 
@@ -49,11 +44,7 @@ const FeaturedCard = ({
           aria-label={`${title}'s logo`}
         >
           <Logo />
-          <IconContainer
-            variants={chevronVariants}
-            initial="initial"
-            animate={isHovering ? 'final' : 'initial'}
-          >
+          <IconContainer variants={chevronVariants} initial="initial" animate={isHovering ? 'final' : 'initial'}>
             <IcoChevronRight24 />
           </IconContainer>
         </LogoContainer>

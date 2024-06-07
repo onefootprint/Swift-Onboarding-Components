@@ -6,8 +6,6 @@ type ListUpdatedEventHeaderProps = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ListUpdatedEventHeader = ({ event }: ListUpdatedEventHeaderProps) => (
-  <div>TODO</div>
-);
+const ListUpdatedEventHeader = (_props: ListUpdatedEventHeaderProps) => <div>TODO</div>;
 
 export default ListUpdatedEventHeader;

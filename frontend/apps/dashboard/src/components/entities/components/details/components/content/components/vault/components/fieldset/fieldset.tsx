@@ -20,14 +20,7 @@ export type FieldsetProps = WithEntityProps & {
   title: string;
 };
 
-const Fieldset = ({
-  children,
-  entity,
-  fields,
-  footer,
-  iconComponent: IconComponent,
-  title,
-}: FieldsetProps) => {
+const Fieldset = ({ children, entity, fields, footer, iconComponent: IconComponent, title }: FieldsetProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset',
   });
@@ -65,9 +58,7 @@ const Fieldset = ({
             <Text variant="label-3">{title}</Text>
           </Title>
           {shouldShowSelectAll && (
-            <LinkButton
-              onClick={allSelected ? handleDeselectAll : handleSelectAll}
-            >
+            <LinkButton onClick={allSelected ? handleDeselectAll : handleSelectAll}>
               {allSelected ? t('deselect-all') : t('select-all')}
             </LinkButton>
           )}

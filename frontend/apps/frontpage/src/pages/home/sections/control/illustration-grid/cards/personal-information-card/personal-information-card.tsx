@@ -85,25 +85,17 @@ const PersonalInformationCard = () => {
   const [isExtraContentVisible, setIsExtraContentVisible] = useState(false);
   return (
     <CardContainer>
-      <CardTitle onClick={() => setIsExtraContentVisible(prev => !prev)}>
-        {t('title')}
-      </CardTitle>
-      <CardAppearContent isVisible={isExtraContentVisible}>
-        {t('extra-content')}
-      </CardAppearContent>
+      <CardTitle onClick={() => setIsExtraContentVisible(prev => !prev)}>{t('title')}</CardTitle>
+      <CardAppearContent isVisible={isExtraContentVisible}>{t('extra-content')}</CardAppearContent>
       <Stack direction="column" gap={7}>
         {contentRows.map(section => (
           <Stack direction="column" gap={3} key={section.title}>
-            <Text variant="label-3">
-              {t(`${section.title}.title` as unknown as ParseKeys<'common'>)}
-            </Text>
+            <Text variant="label-3">{t(`${section.title}.title` as unknown as ParseKeys<'common'>)}</Text>
             <Stack direction="column" gap={3}>
               {section.rows.map(row => (
                 <CardRow
                   key={row.title}
-                  title={t(
-                    `${section.title}.${row.title}` as unknown as ParseKeys<'common'>,
-                  )}
+                  title={t(`${section.title}.${row.title}` as unknown as ParseKeys<'common'>)}
                   value={row.value}
                 />
               ))}

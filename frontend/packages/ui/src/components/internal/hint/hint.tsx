@@ -11,13 +11,7 @@ export type HintProps = {
   id?: string;
 };
 
-const Hint = ({
-  children,
-  className,
-  hasError = false,
-  id,
-  size = 'default',
-}: HintProps) => (
+const Hint = ({ children, className, hasError = false, id, size = 'default' }: HintProps) => (
   <HintContainer
     id={id}
     className={`${className} fp-hint fp-custom-appearance`}

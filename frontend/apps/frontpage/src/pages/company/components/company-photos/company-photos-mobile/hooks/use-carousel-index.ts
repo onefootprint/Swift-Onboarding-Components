@@ -41,12 +41,11 @@ const useCarouselIndex = (slidesCount: number) => {
     }
   };
 
-  const resetAndStartTimeout =
-    (callback: (params: number) => void) => (params: number) => {
-      resetSlideTimeout();
-      startSlideTimeout();
-      callback(params);
-    };
+  const resetAndStartTimeout = (callback: (params: number) => void) => (params: number) => {
+    resetSlideTimeout();
+    startSlideTimeout();
+    callback(params);
+  };
 
   useEffect(() => {
     startSlideTimeout();

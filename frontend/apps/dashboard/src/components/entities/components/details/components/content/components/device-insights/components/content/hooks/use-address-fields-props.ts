@@ -13,35 +13,21 @@ const attributesByType = {
     BusinessDI.zip,
     BusinessDI.country,
   ],
-  [AddressType.residential]: [
-    IdDI.addressLine1,
-    IdDI.addressLine2,
-    IdDI.city,
-    IdDI.state,
-    IdDI.zip,
-    IdDI.country,
-  ],
+  [AddressType.residential]: [IdDI.addressLine1, IdDI.addressLine2, IdDI.city, IdDI.state, IdDI.zip, IdDI.country],
 };
 
 const useAddressFieldsProps = (entity: Entity) => {
   const getProps = useField(entity);
 
   const getAddressDis = (type: AddressType) => {
-    const dis = attributesByType[type].filter(di =>
-      entity.decryptableAttributes.includes(di),
-    );
+    const dis = attributesByType[type].filter(di => entity.decryptableAttributes.includes(di));
     const disSet = new Set(dis);
     const filteredAttributes = entity.data
       .filter(attr => disSet.has(attr.identifier as IdDI | BusinessDI))
       .map(attr => attr.identifier) as (IdDI | BusinessDI)[];
-    const sortedAttributes = filteredAttributes.sort(
-      (a, b) => dis.indexOf(a) - dis.indexOf(b),
-    );
+    const sortedAttributes = filteredAttributes.sort((a, b) => dis.indexOf(a) - dis.indexOf(b));
     // If address line 1 is present, insert address line 2 right afterwards as well
-    if (
-      sortedAttributes.includes(IdDI.addressLine1) &&
-      !sortedAttributes.includes(IdDI.addressLine2)
-    ) {
+    if (sortedAttributes.includes(IdDI.addressLine1) && !sortedAttributes.includes(IdDI.addressLine2)) {
       const index = sortedAttributes.indexOf(IdDI.addressLine1);
       sortedAttributes.splice(index + 1, 0, IdDI.addressLine2);
     }

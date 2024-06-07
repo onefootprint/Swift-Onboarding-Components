@@ -8,8 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 type ExternalLinkProps = { url: string };
 
-const extractCleanDomain = (s: string): string =>
-  s.replace(/(https?:\/\/)?(www\.)?/gi, '').split('/')[0];
+const extractCleanDomain = (s: string): string => s.replace(/(https?:\/\/)?(www\.)?/gi, '').split('/')[0];
 
 const ExternalLink = ({ url }: ExternalLinkProps) => {
   const router = useRouter();
@@ -20,13 +19,7 @@ const ExternalLink = ({ url }: ExternalLinkProps) => {
   const onCloseClick = path ? () => router.push(path) : () => router.back();
 
   return (
-    <Stack
-      alignItems="center"
-      flexDirection="column"
-      justifyContent="center"
-      flexBasis="100%"
-      gap={5}
-    >
+    <Stack alignItems="center" flexDirection="column" justifyContent="center" flexBasis="100%" gap={5}>
       <IconButton aria-label="close" onClick={onCloseClick}>
         <IcoLink24 />
       </IconButton>
@@ -43,10 +36,7 @@ const ExternalLink = ({ url }: ExternalLinkProps) => {
         </Text>
       </Stack>
       <Stack alignItems="center" justifyContent="space-between" gap={3}>
-        <Button
-          variant="secondary"
-          onClick={() => (url ? window.open(url, '_blank') : undefined)}
-        >
+        <Button variant="secondary" onClick={() => (url ? window.open(url, '_blank') : undefined)}>
           {t('open-link')}
         </Button>
       </Stack>

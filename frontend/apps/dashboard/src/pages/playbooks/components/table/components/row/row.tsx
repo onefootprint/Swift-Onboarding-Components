@@ -23,9 +23,7 @@ const Row = ({ playbook }: RowProps) => {
   const { name, key, status, createdAt, kind } = playbook;
   const { sandbox } = useOrgSession();
   const canShowLink =
-    kind === OnboardingConfigKind.kyc ||
-    kind === OnboardingConfigKind.kyb ||
-    kind === OnboardingConfigKind.document;
+    kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb || kind === OnboardingConfigKind.document;
 
   return (
     <>
@@ -59,12 +57,8 @@ const Row = ({ playbook }: RowProps) => {
         <CodeInline truncate>{key}</CodeInline>
       </td>
       <td>
-        {status === 'enabled' && (
-          <Badge variant="success">{t('status.enabled')}</Badge>
-        )}
-        {status === 'disabled' && (
-          <Badge variant="error">{t('status.disabled')}</Badge>
-        )}
+        {status === 'enabled' && <Badge variant="success">{t('status.enabled')}</Badge>}
+        {status === 'disabled' && <Badge variant="error">{t('status.disabled')}</Badge>}
       </td>
       <td>{formatDateWithTime(new Date(createdAt))}</td>
       <td aria-label="actions">

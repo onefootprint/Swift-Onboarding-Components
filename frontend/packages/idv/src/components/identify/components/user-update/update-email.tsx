@@ -6,7 +6,7 @@ import type { IdentifyVariant } from '../../state/types';
 import type { HeaderProps } from '../../types';
 import { UpdateAuthMethodActionKind } from '../../types';
 import EmailPageStructure from '../email-page-structure';
-import { isCollectScreen, ScreenState } from './helpers';
+import { ScreenState, isCollectScreen } from './helpers';
 import UpdateVerifyEmail from './update-verify-email';
 
 type UpdateEmailProps = {
@@ -17,21 +17,10 @@ type UpdateEmailProps = {
   onSuccess: (newEmail: string) => void;
 };
 
-const getHeaderTitle = (
-  t: TFunction<'identify'>,
-  kind: UpdateAuthMethodActionKind,
-): string =>
-  kind === UpdateAuthMethodActionKind.replace
-    ? t('email-step.replace-title')
-    : t('email-step.add-primary-title');
+const getHeaderTitle = (t: TFunction<'identify'>, kind: UpdateAuthMethodActionKind): string =>
+  kind === UpdateAuthMethodActionKind.replace ? t('email-step.replace-title') : t('email-step.add-primary-title');
 
-const UpdateEmail = ({
-  Header,
-  actionKind,
-  authToken,
-  identifyVariant,
-  onSuccess,
-}: UpdateEmailProps) => {
+const UpdateEmail = ({ Header, actionKind, authToken, identifyVariant, onSuccess }: UpdateEmailProps) => {
   const { t } = useTranslation('identify');
   const [screen, setScreen] = useState<ScreenState>(ScreenState.collect);
   const [email, setEmail] = useState<string>('');

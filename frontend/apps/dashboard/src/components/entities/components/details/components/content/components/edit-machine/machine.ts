@@ -48,9 +48,7 @@ export const createEditStateMachine = () =>
       actions: {
         [Action.assignFields]: (context, event) => {
           if (event.type === Event.submittedFields) {
-            context.dis = Object.keys(
-              flat(event.payload.fields),
-            ) as DataIdentifier[];
+            context.dis = Object.keys(flat(event.payload.fields)) as DataIdentifier[];
           }
         },
       },

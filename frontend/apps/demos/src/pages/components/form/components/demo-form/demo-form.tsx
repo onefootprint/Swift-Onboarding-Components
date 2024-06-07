@@ -14,8 +14,7 @@ type DemoFormProps = { authToken: string };
 const getFormArgs = (o: ReturnType<typeof getQueryArgs>) => ({
   ...o,
   appUrl:
-    o.appUrl.startsWith('https://components-') ||
-    o.appUrl.startsWith('http://localhost')
+    o.appUrl.startsWith('https://components-') || o.appUrl.startsWith('http://localhost')
       ? o.appUrl
       : 'http://localhost:3010/form',
 });
@@ -94,11 +93,7 @@ const DemoForm = ({ authToken }: DemoFormProps) => {
     <>
       <SecureFormContainer id="footprint-secure-form" />
       <StyledDivider />
-      <Button
-        variant="secondary"
-        onClick={handleClick}
-        loading={isCustomSaveLoading}
-      >
+      <Button variant="secondary" onClick={handleClick} loading={isCustomSaveLoading}>
         Custom Save via Ref
       </Button>
     </>

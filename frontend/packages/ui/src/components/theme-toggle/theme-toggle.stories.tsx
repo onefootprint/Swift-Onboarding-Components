@@ -20,8 +20,7 @@ export default {
     },
     name: {
       control: 'text',
-      description:
-        'The name of the input field in a checkbox (Useful for form submission).',
+      description: 'The name of the input field in a checkbox (Useful for form submission).',
       required: false,
     },
     label: {
@@ -31,14 +30,12 @@ export default {
     },
     onBlur: {
       control: 'function',
-      description:
-        'The callback invoked when the checkbox is blurred (loses focus)',
+      description: 'The callback invoked when the checkbox is blurred (loses focus)',
       required: false,
     },
     onChange: {
       control: 'function',
-      description:
-        'The callback invoked when the checked state of the Checkbox changes.',
+      description: 'The callback invoked when the checked state of the Checkbox changes.',
       required: false,
     },
     onFocus: {
