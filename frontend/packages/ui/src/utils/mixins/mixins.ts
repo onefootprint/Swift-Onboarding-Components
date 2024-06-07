@@ -9,9 +9,9 @@ import type {
 import type * as CSS from 'csstype';
 import { css } from 'styled-components';
 
-export const createFontStyles = (variant: FontVariant, fontFamily?: FontFamily) => css`
+export const createFontStyles = (variant: FontVariant, fontFamily: FontFamily = 'default') => css`
   ${({ theme }) => css`
-    font-family: ${fontFamily ? theme.fontFamily[fontFamily] : 'inherit'};
+    font-family: ${theme.fontFamily[fontFamily]};
     font-weight: ${theme.typography[variant].fontWeight};
     font-size: ${theme.typography[variant].fontSize};
     line-height: ${theme.typography[variant].lineHeight};
@@ -34,10 +34,11 @@ const convertDeprecatedTypography = (typography: DeprecatedTypography): Typograp
 
 export const createText = (typography: Typography | DeprecatedTypography) => {
   const resolvedTypography = typeof typography === 'string' ? convertDeprecatedTypography(typography) : typography;
+
   return {
     fontFamily: 'inherit',
-    fontSize: resolvedTypography.fontSize,
     fontWeight: resolvedTypography.fontWeight,
+    fontSize: resolvedTypography.fontSize,
     lineHeight: resolvedTypography.lineHeight,
   };
 };

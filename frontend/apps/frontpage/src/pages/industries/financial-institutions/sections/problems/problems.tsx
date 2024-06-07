@@ -23,7 +23,7 @@ const keys: { key: string; icon: CustomIcons }[] = [
 
 const Problems = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.baas.problem',
+    keyPrefix: 'pages.industries.financial-institutions.problem',
   });
 
   return (

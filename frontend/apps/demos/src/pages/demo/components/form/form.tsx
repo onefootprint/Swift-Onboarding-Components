@@ -1,6 +1,5 @@
 import type { FootprintUserData } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind, identifyFootprintUser } from '@onefootprint/footprint-js';
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { Button, Container, Divider, PhoneInput, Text, TextInput, createFontStyles } from '@onefootprint/ui';
 import debounce from 'lodash/debounce';
 import Image from 'next/image';
@@ -152,7 +151,9 @@ const Form = ({ onSuccess }: FormProps) => {
             or
           </Text>
         </OrDivider>
-        <FootprintVerifyButton onClick={showFootprint} />
+        <Button onClick={showFootprint} size="large" fullWidth>
+          Verify with Footprint
+        </Button>
       </FormContainer>
     </Container>
   );

@@ -23,7 +23,7 @@ const keys: { key: string; icon: CustomIcons }[] = [
 
 const Experience = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.baas.experience',
+    keyPrefix: 'pages.industries.financial-institutions.experience',
   });
 
   return (

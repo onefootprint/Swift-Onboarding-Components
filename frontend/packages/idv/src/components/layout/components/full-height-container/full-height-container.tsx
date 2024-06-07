@@ -46,7 +46,7 @@ const Container = styled.div<{ $hasBorderRadius: boolean; height: string }>`
 
     &[data-variant='modal'] {
       height: ${height};
-      width: 100%;
+      width: 100vw;
 
       ${media.greaterThan('md')`
         height: auto;

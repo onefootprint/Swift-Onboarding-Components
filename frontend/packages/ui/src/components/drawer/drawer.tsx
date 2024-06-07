@@ -41,24 +41,22 @@ const Drawer = ({
 
   return (
     <DrawerPrimitive.Root open={open} onOpenChange={handleOpenChange}>
-      <DrawerPrimitive.Portal>
-        <DrawerContainer onEscapeKeyDown={onClose} onPointerDownOutside={onClickOutside} role="dialog">
-          <DrawerSurface>
-            <Header
-              closeAriaLabel={closeAriaLabel ?? t('components.drawer.close-aria-label-default')}
-              closeIconComponent={CloseIconComponent}
-              onClose={onClose}
-            >
-              {title}
-            </Header>
-            {headerComponent}
-            <Body>{children}</Body>
-          </DrawerSurface>
-        </DrawerContainer>
-        <DrawerPrimitive.Overlay asChild>
-          <Overlay isVisible={open} />
-        </DrawerPrimitive.Overlay>
-      </DrawerPrimitive.Portal>
+      <DrawerContainer onEscapeKeyDown={onClose} onPointerDownOutside={onClickOutside} role="dialog">
+        <DrawerSurface>
+          <Header
+            closeAriaLabel={closeAriaLabel ?? t('components.drawer.close-aria-label-default')}
+            closeIconComponent={CloseIconComponent}
+            onClose={onClose}
+          >
+            {title}
+          </Header>
+          {headerComponent}
+          <Body>{children}</Body>
+        </DrawerSurface>
+      </DrawerContainer>
+      <DrawerPrimitive.Overlay asChild>
+        <Overlay isVisible={open} />
+      </DrawerPrimitive.Overlay>
     </DrawerPrimitive.Root>
   );
 };

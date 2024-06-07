@@ -1,4 +1,4 @@
-const textVariables = new Map<string, { var: string; assignDefault?: string[] }>([
+const fonyFamilyVariables = new Map<string, { var: string; assignDefault?: string[] }>([
   [
     'fontFamily',
     {
@@ -7,4 +7,4 @@ const textVariables = new Map<string, { var: string; assignDefault?: string[] }>
   ],
 ]);
 
-export default textVariables;
+export default fonyFamilyVariables;
