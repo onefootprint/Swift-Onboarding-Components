@@ -1,10 +1,18 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "pipeline": {
+  "tasks": {
     "build": {
       "cache": false,
-      "dependsOn": ["^build", "i18n:build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
+      "dependsOn": [
+        "^build",
+        "i18n:build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        "public/dist/**"
+      ],
       "env": [
         "API_BASE_URL",
         "AUTH_URL",
@@ -79,10 +87,16 @@
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build", "i18n:copy-en"]
+      "dependsOn": [
+        "^build",
+        "i18n:copy-en"
+      ]
     },
     "test:ci": {
-      "dependsOn": ["^build", "i18n:copy-en"]
+      "dependsOn": [
+        "^build",
+        "i18n:copy-en"
+      ]
     },
     "test:ci:bun": {
       "cache": false,
@@ -90,60 +104,92 @@
     },
     "test:stress:ci": {
       "cache": false,
-      "dependsOn": ["i18n:copy-en"]
+      "dependsOn": [
+        "i18n:copy-en"
+      ]
     },
     "start": {},
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "lint:ci": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "typecheck": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "format": {},
     "dev": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["i18n:build"]
+      "dependsOn": [
+        "i18n:build"
+      ]
     },
     "clean": {
       "cache": false,
-      "dependsOn": ["i18n:clean"]
+      "dependsOn": [
+        "i18n:clean"
+      ]
     },
     "set:dot-env": {
       "cache": false
     },
     "i18n:sync": {
-      "outputs": ["src/config/locales/**"]
+      "outputs": [
+        "src/config/locales/**"
+      ]
     },
     "i18n:copy": {
-      "outputs": ["public/locales/**"]
+      "outputs": [
+        "public/locales/**"
+      ]
     },
     "i18n:copy-en": {
-      "outputs": ["public/locales/**"]
+      "outputs": [
+        "public/locales/**"
+      ]
     },
     "i18n:copy-watch": {
-      "outputs": ["public/locales/**"]
+      "outputs": [
+        "public/locales/**"
+      ]
     },
     "i18n:build": {
-      "dependsOn": ["i18n:sync", "i18n:copy"]
+      "dependsOn": [
+        "i18n:sync",
+        "i18n:copy"
+      ]
     },
     "i18n:dev": {
-      "dependsOn": ["i18n:sync", "i18n:copy-watch"]
+      "dependsOn": [
+        "i18n:sync",
+        "i18n:copy-watch"
+      ]
     },
     "i18n:clean": {
       "cache": false
     },
     "build:storybook": {
-      "dependsOn": ["^build"],
-      "outputs": ["storybook-static/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "storybook-static/**"
+      ]
     },
     "dev:storybook": {
       "cache": false,
       "persistent": true,
-      "dependsOn": ["^build:storybook"]
+      "dependsOn": [
+        "^build:storybook"
+      ]
     }
   }
 }
