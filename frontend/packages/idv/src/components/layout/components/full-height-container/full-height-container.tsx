@@ -50,7 +50,7 @@ const Container = styled.div<{ $hasBorderRadius: boolean; height: string }>`
 
       ${media.greaterThan('md')`
         height: auto;
-        max-height: min(980px, calc(100% - (2 * ${theme.spacing[9]})));
+        max-height: min(980px, calc(100vh - (2 * ${theme.spacing[9]})));
         width: ${theme.components.bifrost.container.width || '480px'};
       `}
     }
