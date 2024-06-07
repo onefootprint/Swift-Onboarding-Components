@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 import Header from './components/header';
 import Layout from './components/layout';
-import GlobalStyles from './onboarding-components.styles';
+import GlobalStyles from './kyc.styles';
 
 const steps = [
   {
