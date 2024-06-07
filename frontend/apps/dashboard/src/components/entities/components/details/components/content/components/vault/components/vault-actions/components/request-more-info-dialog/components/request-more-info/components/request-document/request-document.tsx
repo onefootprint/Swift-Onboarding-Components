@@ -38,21 +38,11 @@ const RequestDocument = ({ visible }: RequestDocumentProps) => {
               {...register('collectSelfie')}
             />
           </AnimatedContainer>
-          <Stack direction="column" gap={4}>
-            <Checkbox
-              label={t('proof-of-ssn.title')}
-              value={RequestMoreInfoKind.ProofOfSsn}
-              {...register('kinds')}
-            />
-            <AnimatedContainer
-              isExpanded={triggerKinds.includes(RequestMoreInfoKind.ProofOfSsn)}
-              marginLeft={7}
-            >
-              <Text variant="body-4" color="tertiary">
-                {t('proof-of-ssn.alert-message')}
-              </Text>
-            </AnimatedContainer>
-          </Stack>
+          <Checkbox
+            label={t('proof-of-ssn.title')}
+            value={RequestMoreInfoKind.ProofOfSsn}
+            {...register('kinds')}
+          />
           <Checkbox
             label={t('proof-of-address.title')}
             value={RequestMoreInfoKind.ProofOfAddress}

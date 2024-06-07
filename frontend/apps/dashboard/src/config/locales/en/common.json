@@ -1330,8 +1330,7 @@
                 "collect-selfie": "Request a selfie"
               },
               "proof-of-ssn": {
-                "title": "Proof of SSN",
-                "alert-message": "Note: the default behavior has changed. Previously, an ID Photo and selfie would be requested alongside Proof of SSN. If you would like this behavior, please manually select 'Upload ID Photo' above."
+                "title": "Proof of SSN"
               },
               "proof-of-address": {
                 "title": "Proof of address"
