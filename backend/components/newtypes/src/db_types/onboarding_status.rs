@@ -80,30 +80,6 @@ impl OnboardingStatus {
 
 crate::util::impl_enum_str_diesel!(OnboardingStatus);
 
-#[derive(
-    Debug, Display, Clone, Copy, PartialEq, Eq, Deserialize, EnumString, AsRefStr, Apiv2Schema, EnumIter,
-)]
-#[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-pub enum OnboardingStatusFilter {
-    Pass,
-    Fail,
-    Incomplete,
-    Pending,
-    None,
-}
-
-impl OnboardingStatus {
-    pub fn try_from(value: &OnboardingStatusFilter) -> Option<Self> {
-        match value {
-            OnboardingStatusFilter::Pass => Some(Self::Pass),
-            OnboardingStatusFilter::Fail => Some(Self::Fail),
-            OnboardingStatusFilter::Incomplete => Some(Self::Incomplete),
-            OnboardingStatusFilter::Pending => Some(Self::Pending),
-            OnboardingStatusFilter::None => Some(Self::None),
-        }
-    }
-}
 
 impl From<DecisionStatus> for OnboardingStatus {
     fn from(s: DecisionStatus) -> Self {

@@ -339,14 +339,14 @@ impl Workflow {
         };
         let wf = Self::create(conn, args)?;
 
-        // In locked transaction, update scoped vault status to Incomplete if it's null
-        let old_status = sv.status.unwrap_or(OnboardingStatus::None);
-        let new_status = (old_status == OnboardingStatus::None).then_some(OnboardingStatus::Incomplete);
-        let update = ScopedVaultUpdate {
-            status: new_status,
-            ..ScopedVaultUpdate::default()
-        };
-        ScopedVault::update(conn, &sv.id, update)?;
+        // In locked transaction, update scoped vault status to Incomplete if we don't yet have a decision
+        if OnboardingStatus::Incomplete.can_transition_from(&sv.status) {
+            let update = ScopedVaultUpdate {
+                status: Some(OnboardingStatus::Incomplete),
+                ..ScopedVaultUpdate::default()
+            };
+            ScopedVault::update(conn, &sv.id, update)?;
+        }
 
         // Create a timeline event showing the onboarding started
         let info = WorkflowStartedInfo {
@@ -672,9 +672,8 @@ impl Workflow {
                 Task::create(conn, Utc::now(), task_data)?;
             };
 
-            let old_status = sv.status.unwrap_or(OnboardingStatus::None);
-            let can_transition = new_status.can_transition_from(&old_status);
-            let new_sv_status = if sv.status != Some(new_status) && can_transition {
+            let can_transition = new_status.can_transition_from(&sv.status);
+            let new_sv_status = if sv.status != new_status && can_transition {
                 // Only set to non-decision status if the current status is a non-decision status
                 // This has the effect of never letting the scoped vault status go from a decision to a
                 // non-decision status

@@ -1063,7 +1063,7 @@ diesel::table! {
         ordering_id -> Int8,
         start_timestamp -> Timestamptz,
         is_live -> Bool,
-        status -> Nullable<Text>,
+        status -> Text,
         last_heartbeat_at -> Timestamptz,
         snapshot_seqno -> Int8,
         external_id -> Nullable<Text>,

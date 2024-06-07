@@ -122,12 +122,11 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
 
 pub fn status_from_sv(sv: &ScopedVault) -> EntityStatus {
     match sv.status {
-        None => EntityStatus::None,
-        Some(OnboardingStatus::None) => EntityStatus::None,
-        Some(OnboardingStatus::Pass) => EntityStatus::Pass,
-        Some(OnboardingStatus::Fail) => EntityStatus::Fail,
-        Some(OnboardingStatus::Pending) => EntityStatus::Pending,
-        Some(OnboardingStatus::Incomplete) => {
+        OnboardingStatus::None => EntityStatus::None,
+        OnboardingStatus::Pass => EntityStatus::Pass,
+        OnboardingStatus::Fail => EntityStatus::Fail,
+        OnboardingStatus::Pending => EntityStatus::Pending,
+        OnboardingStatus::Incomplete => {
             if Utc::now() - sv.last_heartbeat_at < Duration::minutes(5) {
                 EntityStatus::InProgress
             } else {

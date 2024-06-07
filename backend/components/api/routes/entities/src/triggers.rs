@@ -159,7 +159,7 @@ fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> ApiR
             // The frontend also disables these options.
             // TODO: theoretically we should be checking risk signals here too or that there's an FP decision,
             // but maybe not
-            if !scoped_vault.status.map(|d| d.has_decision()).unwrap_or(false) {
+            if !scoped_vault.status.has_decision() {
                 return Err(UserError::NoCompleteOnboardings.into());
             }
             DocumentRequestConfig::validate(configs)?;

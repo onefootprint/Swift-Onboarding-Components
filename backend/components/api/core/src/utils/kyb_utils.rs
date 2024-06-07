@@ -31,7 +31,6 @@ use newtypes::{
     BusinessDataKind as BDK,
     BusinessOwnerKind,
     KybState,
-    OnboardingStatus,
     PiiString,
     WorkflowState,
 };
@@ -177,15 +176,12 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Ap
 
     send_missing_secondary_bo_links(state, biz_wf, &bvw, tenant, &dbo).await?;
 
-    let has_decision = |s: Option<&OnboardingStatus>| match s {
-        None => false,
-        Some(s) => s.has_decision(),
-    };
-
-    let all_bo_kyc_complete = dbo
-        .iter()
-        .filter(|bo| bo.linked_bo.is_some())
-        .all(|bo| has_decision(bo.scoped_user.as_ref().and_then(|su| su.status.as_ref())));
+    let all_bo_kyc_complete = dbo.iter().filter(|bo| bo.linked_bo.is_some()).all(|bo| {
+        bo.scoped_user
+            .as_ref()
+            .map(|su| su.status.has_decision())
+            .unwrap_or(false)
+    });
 
     let should_run_kyb = obc.skip_kyc || all_bo_kyc_complete;
     Ok(should_run_kyb)

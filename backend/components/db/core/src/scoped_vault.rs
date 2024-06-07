@@ -23,7 +23,6 @@ use newtypes::{
     LabelKind,
     ObConfigurationId,
     OnboardingStatus,
-    OnboardingStatusFilter,
     PiiString,
     ScopedVaultCursor,
     ScopedVaultCursorKind,
@@ -38,7 +37,7 @@ use tracing::instrument;
 pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub tenant_id: TenantId,
     pub is_live: bool,
-    pub statuses: Vec<OnboardingStatusFilter>,
+    pub statuses: Vec<OnboardingStatus>,
     pub search: Option<TSearch>,
     pub fp_id: Option<FpId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
@@ -50,6 +49,7 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub only_active: bool,
     pub playbook_ids: Option<Vec<ObConfigurationId>>,
     pub has_outstanding_workflow_request: Option<bool>,
+    pub has_workflow: Option<bool>,
     pub external_id: Option<ExternalId>,
     pub labels: Vec<LabelKind>,
 }
@@ -78,6 +78,7 @@ impl ScopedVaultListQueryParams {
             only_active,
             playbook_ids,
             has_outstanding_workflow_request,
+            has_workflow,
             external_id,
             labels,
         } = self;
@@ -103,6 +104,7 @@ impl ScopedVaultListQueryParams {
             only_active,
             playbook_ids,
             has_outstanding_workflow_request,
+            has_workflow,
             external_id,
             labels,
         };
@@ -165,34 +167,7 @@ macro_rules! list_query {
 
         // Filter on onboarding status: pass/fail/incomplete/vault only
         if !$params.statuses.is_empty() {
-            // Filter on non-portable users
-            let q_none_status = if $params.statuses.contains(&OnboardingStatusFilter::None) {
-                Some(scoped_vault::status.is_null())
-            } else {
-                None
-            };
-
-            let onboarding_status: Vec<_> = $params
-                .statuses
-                .iter()
-                .flat_map(OnboardingStatus::try_from)
-                .collect();
-
-            let q_onboarding_status = if !onboarding_status.is_empty() {
-                Some(scoped_vault::status.eq_any(onboarding_status))
-            } else {
-                None
-            };
-
-            // This is tricky... If any filtering status is provided, we only want to return results
-            // that match the filters. But, the filters are determined through a handful of different
-            // queries.
-            match (q_none_status, q_onboarding_status) {
-                (Some(q1), Some(q2)) => query = query.filter(q1.or(q2)),
-                (Some(q1), None) => query = query.filter(q1),
-                (None, Some(q1)) => query = query.filter(q1),
-                (None, None) => {}
-            }
+            query = query.filter(scoped_vault::status.eq_any(&$params.statuses))
         }
 
         if let Some(fp_id) = $params.fp_id.as_ref() {
@@ -225,6 +200,15 @@ macro_rules! list_query {
                 .select(workflow_request::scoped_vault_id)
                 .distinct();
             if *has_outstanding_workflow_request {
+                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+            } else {
+                query = query.filter(not(scoped_vault::id.eq_any(matching_ids)))
+            }
+        }
+
+        if let Some(has_workflow) = $params.has_workflow.as_ref() {
+            let matching_ids = workflow::table.select(workflow::scoped_vault_id).distinct();
+            if *has_workflow {
                 query = query.filter(scoped_vault::id.eq_any(matching_ids))
             } else {
                 query = query.filter(not(scoped_vault::id.eq_any(matching_ids)))

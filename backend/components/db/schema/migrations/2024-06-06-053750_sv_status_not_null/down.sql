@@ -1,0 +1,2 @@
+ALTER TABLE scoped_vault
+    ALTER COLUMN status DROP NOT NULL;

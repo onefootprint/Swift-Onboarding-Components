@@ -63,7 +63,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
-            if sv.status.is_some_and(|s| !s.has_decision()) {
+            if !sv.status.has_decision() {
                 return Err(ValidationError(
                     "Cannot create a manual decision when the user's status is not already terminal",
                 )

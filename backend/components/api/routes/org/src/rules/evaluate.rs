@@ -46,7 +46,6 @@ use itertools::{
 use newtypes::{
     ListId,
     ObConfigurationId,
-    OnboardingStatus,
     RuleAction,
     RuleExpression,
     RuleId,
@@ -256,7 +255,7 @@ pub async fn evaluate_rule(
 
             Ok(api_wire_types::RuleEvalResult {
                 fp_id: sv.fp_id,
-                current_status: sv.status.unwrap_or(OnboardingStatus::None),
+                current_status: sv.status,
                 historical_action_triggered: rule_set_result.action_triggered,
                 backtest_action_triggered: action_triggered,
             })

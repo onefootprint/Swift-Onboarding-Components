@@ -15,7 +15,7 @@ use db::scoped_vault::{
     ScopedVaultListQueryParams,
 };
 use newtypes::{
-    OnboardingStatusFilter,
+    OnboardingStatus,
     VaultKind,
 };
 use paperclip::actix::{
@@ -43,46 +43,41 @@ async fn get(
         playbook_id,
     } = filters.into_inner();
 
-    let search_params = move |statuses: Vec<OnboardingStatusFilter>| -> ScopedVaultListQueryParams {
-        ScopedVaultListQueryParams {
-            tenant_id: tenant_id.clone(),
-            is_live,
-            kind: Some(VaultKind::Person),
-            search: None,
-            fp_id: None,
-            timestamp_lte,
-            timestamp_gte,
-            requires_manual_review: None,
-            watchlist_hit: None,
-            // TODO this could drift easily. Be careful changing this since it could affect the
-            // pass rate we display if we start also looking for vaults that aren't verified
-            only_active: true,
-            statuses,
-            playbook_ids: playbook_id.clone().map(|playbook_id| vec![playbook_id]),
-            has_outstanding_workflow_request: None,
-            external_id: None,
-            labels: vec![],
-        }
-    };
+    let search_params =
+        move |statuses: Vec<OnboardingStatus>, only_has_wf: bool| -> ScopedVaultListQueryParams {
+            ScopedVaultListQueryParams {
+                tenant_id: tenant_id.clone(),
+                is_live,
+                kind: Some(VaultKind::Person),
+                search: None,
+                fp_id: None,
+                timestamp_lte,
+                timestamp_gte,
+                requires_manual_review: None,
+                watchlist_hit: None,
+                // TODO this could drift easily. Be careful changing this since it could affect the
+                // pass rate we display if we start also looking for vaults that aren't verified
+                only_active: true,
+                statuses,
+                playbook_ids: playbook_id.clone().map(|playbook_id| vec![playbook_id]),
+                has_outstanding_workflow_request: None,
+                has_workflow: only_has_wf.then_some(true),
+                external_id: None,
+                labels: vec![],
+            }
+        };
 
     let result = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let new_user_vaults = count_for_tenant(conn, search_params(vec![]))?;
-            // All except None
-            let total_filters = search_params(vec![
-                OnboardingStatusFilter::Pass,
-                OnboardingStatusFilter::Fail,
-                OnboardingStatusFilter::Incomplete,
-                OnboardingStatusFilter::Pending,
-            ]);
-            let total_user_onboardings = count_for_tenant(conn, total_filters)?;
+            let new_user_vaults = count_for_tenant(conn, search_params(vec![], false))?;
+            let total_user_onboardings = count_for_tenant(conn, search_params(vec![], true))?;
             let failed_user_onboardings =
-                count_for_tenant(conn, search_params(vec![OnboardingStatusFilter::Fail]))?;
+                count_for_tenant(conn, search_params(vec![OnboardingStatus::Fail], true))?;
             let successful_user_onboardings =
-                count_for_tenant(conn, search_params(vec![OnboardingStatusFilter::Pass]))?;
+                count_for_tenant(conn, search_params(vec![OnboardingStatus::Pass], true))?;
             let incomplete_user_onboardings =
-                count_for_tenant(conn, search_params(vec![OnboardingStatusFilter::Incomplete]))?;
+                count_for_tenant(conn, search_params(vec![OnboardingStatus::Incomplete], true))?;
             let result = api_wire_types::OrgMetrics {
                 new_user_vaults,
                 total_user_onboardings,

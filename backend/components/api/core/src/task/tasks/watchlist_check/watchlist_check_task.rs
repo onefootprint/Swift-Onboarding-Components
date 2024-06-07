@@ -278,7 +278,7 @@ impl WatchlistCheckTask {
         uvw: &VaultWrapper<Person>,
     ) -> DbResult<WatchlistCheck> {
         let has_onboarding_in_non_pass_status =
-            !uvw.vault.is_created_via_api && sv.status != Some(OnboardingStatus::Pass);
+            !uvw.vault.is_created_via_api && sv.status != OnboardingStatus::Pass;
         let status = if !sv.is_live {
             WatchlistCheckStatus::NotNeeded(WatchlistCheckNotNeededReason::VaultNotLive)
         } else if has_onboarding_in_non_pass_status {

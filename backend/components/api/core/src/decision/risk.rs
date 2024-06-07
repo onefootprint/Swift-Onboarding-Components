@@ -124,9 +124,9 @@ pub fn save_final_decision(
 fn get_final_decision_status(
     decision: Decision,
     has_doc_mr: bool,
-    existing_status: Option<OnboardingStatus>,
+    existing_status: OnboardingStatus,
 ) -> (DecisionStatus, FailedForDocReview) {
-    let can_fail_for_doc_review = has_doc_mr && existing_status != Some(OnboardingStatus::Pass);
+    let can_fail_for_doc_review = has_doc_mr && existing_status != OnboardingStatus::Pass;
 
     match decision {
         Decision::RulesExecuted { action, .. } => match action.map(DecisionStatus::from) {
@@ -165,54 +165,54 @@ mod test {
     }
 
     // Test no existing status, no doc manual review, simple cases
-    #[test_case(Decision::RulesNotExecuted, false, None => DecisionStatus::Pass)]
-    #[test_case(rules_executed(None), false, None => DecisionStatus::Pass)]
-    #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), false, None => DecisionStatus::Pass)]
-    #[test_case(rules_executed(Some(RuleAction::Fail)), false, None => DecisionStatus::Fail)]
-    #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, None => DecisionStatus::Fail)]
-    #[test_case(rules_executed(Some(RuleAction::Fail)), false, Some(OnboardingStatus::Pass) => DecisionStatus::Fail)]
-    #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, Some(OnboardingStatus::Pass) => DecisionStatus::Fail)]
+    #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::None => DecisionStatus::Pass)]
+    #[test_case(rules_executed(None), false, OnboardingStatus::None => DecisionStatus::Pass)]
+    #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), false, OnboardingStatus::None => DecisionStatus::Pass)]
+    #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::None => DecisionStatus::Fail)]
+    #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::None => DecisionStatus::Fail)]
+    #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::Pass => DecisionStatus::Fail)]
+    #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::Pass => DecisionStatus::Fail)]
     // Fail for document MR
-    #[test_case(Decision::RulesNotExecuted, true, None => DecisionStatus::Fail)]
-    #[test_case(Decision::RulesNotExecuted, true, Some(OnboardingStatus::Pending) => DecisionStatus::Fail)]
-    #[test_case(rules_executed(None), true, None => DecisionStatus::Fail)]
-    #[test_case(rules_executed(None), true, Some(OnboardingStatus::Incomplete) => DecisionStatus::Fail)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::None => DecisionStatus::Fail)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pending => DecisionStatus::Fail)]
+    #[test_case(rules_executed(None), true, OnboardingStatus::None => DecisionStatus::Fail)]
+    #[test_case(rules_executed(None), true, OnboardingStatus::Incomplete => DecisionStatus::Fail)]
     // Don't set user to fail for doc review if they're already passed
-    #[test_case(Decision::RulesNotExecuted, true, Some(OnboardingStatus::Pass) => DecisionStatus::Pass)]
-    #[test_case(rules_executed(None), true, Some(OnboardingStatus::Pass) => DecisionStatus::Pass)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => DecisionStatus::Pass)]
+    #[test_case(rules_executed(None), true, OnboardingStatus::Pass => DecisionStatus::Pass)]
     // Doc manual review doesn't matter much when there's a rule action.
-    #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, Some(OnboardingStatus::Pass) => DecisionStatus::Fail)]
+    #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, OnboardingStatus::Pass => DecisionStatus::Fail)]
     // This one is weird behavior - we should probably fail the user if there's a doc MR +
     // PassWithManualReview. But just testing existing behavior for now
-    #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, Some(OnboardingStatus::Pass) => DecisionStatus::Pass)]
+    #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, OnboardingStatus::Pass => DecisionStatus::Pass)]
     fn test_get_final_decision_status(
         decision: Decision,
         has_doc_mr: bool,
-        existing_status: Option<OnboardingStatus>,
+        existing_status: OnboardingStatus,
     ) -> DecisionStatus {
         get_final_decision_status(decision, has_doc_mr, existing_status).0
     }
 
-    #[test_case(Decision::RulesNotExecuted, false, None => false)]
-    #[test_case(rules_executed(None), false, None => false)]
-    #[test_case(rules_executed(Some(RuleAction::Fail)), false, None => false)]
-    #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, None => false)]
+    #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::None => false)]
+    #[test_case(rules_executed(None), false, OnboardingStatus::None => false)]
+    #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::None => false)]
+    #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::None => false)]
     // Fail for document MR
-    #[test_case(Decision::RulesNotExecuted, true, None => true)]
-    #[test_case(Decision::RulesNotExecuted, true, Some(OnboardingStatus::Pending) => true)]
-    #[test_case(rules_executed(None), true, None => true)]
-    #[test_case(rules_executed(None), true, Some(OnboardingStatus::Incomplete) => true)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::None => true)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pending => true)]
+    #[test_case(rules_executed(None), true, OnboardingStatus::None => true)]
+    #[test_case(rules_executed(None), true, OnboardingStatus::Incomplete => true)]
     // Don't set user to fail for doc review if they're already passed
-    #[test_case(Decision::RulesNotExecuted, true, Some(OnboardingStatus::Pass) => false)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => false)]
     // Doc manual review doesn't matter much when there's a rule action.
-    #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, Some(OnboardingStatus::Pass) => false)]
+    #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, OnboardingStatus::Pass => false)]
     // This one is weird behavior - we should probably fail the user if there's a doc MR +
     // PassWithManualReview. But just testing existing behavior for now
-    #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, Some(OnboardingStatus::Pass) => false)]
+    #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, OnboardingStatus::Pass => false)]
     fn test_get_final_decision_status_fail_for_mr(
         decision: Decision,
         has_doc_mr: bool,
-        existing_status: Option<OnboardingStatus>,
+        existing_status: OnboardingStatus,
     ) -> bool {
         get_final_decision_status(decision, has_doc_mr, existing_status).1
     }

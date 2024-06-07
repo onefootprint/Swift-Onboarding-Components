@@ -143,7 +143,7 @@ pub async fn get(
 #[derive(Debug, Serialize)]
 struct UserSummaryObject {
     id: FpId,
-    status: Option<OnboardingStatus>,
+    status: OnboardingStatus,
     timestamp: chrono::DateTime<chrono::Utc>,
     external_id: Option<ExternalId>,
     rule_set_result: Option<api_wire_types::RuleSetResult>,

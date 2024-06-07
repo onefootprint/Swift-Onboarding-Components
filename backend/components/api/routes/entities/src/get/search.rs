@@ -120,6 +120,7 @@ pub async fn post(
         only_active: !show_all.unwrap_or_default(),
         playbook_ids,
         has_outstanding_workflow_request,
+        has_workflow: None,
         external_id,
         labels,
     };

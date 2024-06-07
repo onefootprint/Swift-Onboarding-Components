@@ -4,7 +4,7 @@ use newtypes::{
     ExternalId,
     LabelKind,
     ObConfigurationId,
-    OnboardingStatusFilter,
+    OnboardingStatus,
     PiiString,
     VaultKind,
 };
@@ -15,7 +15,7 @@ pub struct SearchEntitiesRequest {
     pub kind: Option<VaultKind>,
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
-    pub statuses: Vec<OnboardingStatusFilter>,
+    pub statuses: Vec<OnboardingStatus>,
     pub requires_manual_review: Option<bool>,
     pub watchlist_hit: Option<bool>,
     pub search: Option<PiiString>,

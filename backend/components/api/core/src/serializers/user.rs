@@ -24,8 +24,8 @@ impl DbToApi<(ScopedVault, Vec<ManualReview>, Option<WorkflowRequest>)> for api_
     fn from_db((sv, manual_reviews, wfr): (ScopedVault, Vec<ManualReview>, Option<WorkflowRequest>)) -> Self {
         // TODO serialize `null` as `"none"` once confirmed with tenants that they're not using it
         let status = match sv.status {
-            Some(OnboardingStatus::None) => None,
-            s => s,
+            OnboardingStatus::None => None,
+            s => Some(s),
         };
         Self {
             id: sv.fp_id,

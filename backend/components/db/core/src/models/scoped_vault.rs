@@ -73,8 +73,7 @@ pub struct ScopedVault {
     pub start_timestamp: DateTime<Utc>,
     /// Denormalized from the user vault just to make querying easier
     pub is_live: bool,
-    // TODO make not null
-    pub status: Option<OnboardingStatus>,
+    pub status: OnboardingStatus,
     /// Last time we logged a hosted API interacted with this scoped vault. Vaults touched recently
     /// are considered in progress if their KYC status is still incomplete
     pub last_heartbeat_at: DateTime<Utc>,
@@ -533,7 +532,7 @@ impl ScopedVault {
         }
         diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(&wf.scoped_vault_id))
-            .set(scoped_vault::status.eq(Option::<OnboardingStatus>::None))
+            .set(scoped_vault::status.eq(OnboardingStatus::None))
             .execute(conn.conn())?;
         Ok(())
     }
