@@ -1510,26 +1510,18 @@
             "end-prefill": "from user's existing data in Footprint"
           },
           "onboarding-decision-event": {
-            "verified-by": "Successfully completed",
-            "not-verified-by": "Completed",
-            "onboarded-onto": "Onboarded onto",
+            "onboarded-onto": "Onboarded onto <playbook />{{outcome}}",
+            "with-outcome": " with {{ status }} outcome",
             "decision-status": {
               "pass": "Pass",
               "fail": "Fail",
+              "none": "None",
               "step_up": "Step up required"
             },
-            "with": " with ",
-            "org-overwrite": {
+            "human-decision": {
               "title": "Manually reviewed and marked as {{decision}} by",
               "see-details": "See details",
-              "drawer": {
-                "title": "Review details",
-                "decision": "Decision",
-                "reviewer": "Reviewer",
-                "date": "Date",
-                "note": "Note",
-                "pin-note": "Pin note to the top of the page"
-              }
+              "pin-note": "Pin note to the top of the page"
             },
             "not-verified-details": {
               "drawer": {

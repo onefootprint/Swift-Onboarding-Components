@@ -139,7 +139,7 @@ export const TimelineFixture: Timeline = [
       data: {
         decision: {
           id: 'decision_kaI2ycxFAND4MpzdsYw64I',
-          status: DecisionStatus.stepUp,
+          status: DecisionStatus.fail,
           timestamp: new Date('2022-11-08T20:21:53.769699Z'),
           source: {
             kind: ActorKind.footprint,

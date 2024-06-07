@@ -55,7 +55,7 @@ const AnnotationNote = ({ annotation, hidePinToggle }: AnnotationNoteProps) => {
           checked={isNotePinned}
           onChange={handlePinNoteChange}
           size="compact"
-          label={t('org-overwrite.drawer.pin-note')}
+          label={t('human-decision.pin-note')}
         />
       )}
     </>

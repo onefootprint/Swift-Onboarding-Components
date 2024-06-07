@@ -105,18 +105,22 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
     const {
       decision: { source, status, obConfiguration },
     } = eventData;
-    const isVerified = status === DecisionStatus.pass;
-
-    const isFootprintActor = source.kind === ActorKind.firmEmployee || source.kind === ActorKind.footprint;
-    if (isFootprintActor) {
-      return `${isVerified ? 'Successfully completed' : 'Completed'} ${obConfiguration.name} playbook`;
-    }
-    const decisionText: Record<DecisionStatus, string> = {
-      [DecisionStatus.pass]: 'Verified',
-      [DecisionStatus.fail]: 'Failed',
+    const statusToText: Record<DecisionStatus, string> = {
+      [DecisionStatus.fail]: 'Fail',
+      [DecisionStatus.pass]: 'Pass',
+      [DecisionStatus.none]: 'None',
+      // We don't expect to receive an OBD with status stepUp in prod
       [DecisionStatus.stepUp]: 'Step up required',
     };
-    return `Manually reviewed and marked as ${decisionText[status]} by ${getActorText(source)}`;
+    const statusText = statusToText[status];
+
+    if (source.kind === ActorKind.footprint) {
+      if (status === DecisionStatus.pass || status === DecisionStatus.fail) {
+        return `Onboarded onto ${obConfiguration.name} with ${statusText} outcome`;
+      }
+      return `Onboarded onto ${obConfiguration.name}`;
+    }
+    return `Manually reviewed and marked as ${statusText} by ${getActorText(source)}`;
   }
 
   if (kind === TimelineEventKind.combinedWatchlistChecks) {

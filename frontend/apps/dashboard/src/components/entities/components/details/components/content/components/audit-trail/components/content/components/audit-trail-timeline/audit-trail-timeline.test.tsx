@@ -60,33 +60,26 @@ describe('<AuditTrailTimeline />', () => {
       ).toBeInTheDocument();
     });
 
-    it('should render failed onboarding decision event correctly', () => {
+    it('should render fail onboarding decision event correctly', () => {
       renderAuditTrailTimeline(TimelineFixture);
       const headers = screen.getAllByTestId('onboarding-decision-event-header');
       expect(headers.length).toEqual(2);
 
       const header = headers[1];
-      expect(within(header).getByText('Completed')).toBeInTheDocument();
+      expect(within(header).getByText('Onboarded onto', { exact: false })).toBeInTheDocument();
       expect(within(header).getByText('My Playbook')).toBeInTheDocument();
-
-      const bodies = screen.getAllByTestId('onboarding-decision-event-body');
-      expect(bodies.length).toEqual(1);
-
-      const body = bodies[0];
-      expect(within(body).getByText('Step up required')).toBeInTheDocument();
+      expect(within(header).getByText('with Fail outcome', { exact: false })).toBeInTheDocument();
     });
 
-    it('should render verified onboarding decision event correctly', () => {
+    it('should render pass onboarding decision event correctly', () => {
       renderAuditTrailTimeline(TimelineFixture);
       const headers = screen.getAllByTestId('onboarding-decision-event-header');
       expect(headers.length).toEqual(2);
 
       const header = headers[0];
-      expect(within(header).getByText('Successfully completed')).toBeInTheDocument();
+      expect(within(header).getByText('Onboarded onto', { exact: false })).toBeInTheDocument();
       expect(within(header).getByText('My Playbook')).toBeInTheDocument();
-
-      const bodies = screen.getAllByTestId('onboarding-decision-event-body');
-      expect(bodies.length).toEqual(1);
+      expect(within(header).getByText('with Pass outcome', { exact: false })).toBeInTheDocument();
     });
 
     it('should render vault created onboarding decision properly', () => {

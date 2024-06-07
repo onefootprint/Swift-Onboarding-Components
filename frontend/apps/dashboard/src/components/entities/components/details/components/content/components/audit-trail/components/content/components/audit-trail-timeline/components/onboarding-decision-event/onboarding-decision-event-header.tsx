@@ -1,9 +1,9 @@
+import type { Theme } from '@onefootprint/design-tokens';
 import type { OnboardingDecisionEventData } from '@onefootprint/types';
 import { ActorKind, DecisionStatus } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import Actor from '../actor';
 import PlaybookLink from '../playbook-link';
@@ -20,33 +20,59 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
   const {
     decision: { source, status, obConfiguration: playbook, ruleSetResultId },
   } = data;
-  const isVerified = status === DecisionStatus.pass;
-  const color = isVerified ? 'success' : 'error';
+  const statusToText: Record<DecisionStatus, string> = {
+    [DecisionStatus.fail]: t('decision-status.fail'),
+    [DecisionStatus.pass]: t('decision-status.pass'),
+    [DecisionStatus.none]: t('decision-status.none'),
+    // We don't expect to receive an OBD with status stepUp in prod
+    [DecisionStatus.stepUp]: t('decision-status.step_up'),
+  };
+  const statusToColor: Record<DecisionStatus, keyof Theme['color']> = {
+    [DecisionStatus.fail]: 'error',
+    [DecisionStatus.pass]: 'success',
+    [DecisionStatus.none]: 'neutral',
+    // We don't expect to receive an OBD with status stepUp in prod
+    [DecisionStatus.stepUp]: 'warning',
+  };
+  const color = statusToColor[status];
 
   // Text differs slightly based on whether Footprint or the tenant made the decision
-  const isFootprintActor = source.kind === ActorKind.firmEmployee || source.kind === ActorKind.footprint;
-  let text;
-  let link;
-  if (isFootprintActor) {
-    text = isVerified ? t('verified-by') : t('not-verified-by');
-    link = <PlaybookLink playbook={playbook} />;
-  } else {
-    text = t('org-overwrite.title', {
-      decision: t(`decision-status.${status}` as ParseKeys<'common'>),
-    });
-    link = <Actor actor={source} />;
+  if (source.kind === ActorKind.footprint) {
+    // User finished onboarding onto a playbook and we made an automated OBD
+    let outcome = '';
+    if (status === DecisionStatus.pass || status === DecisionStatus.fail) {
+      outcome = t('with-outcome', { status: statusToText[status] });
+    }
+    return (
+      <Stack direction="row" align="center" gap={2}>
+        <Stack align="center" testID="onboarding-decision-event-header">
+          <Text variant="label-3" color={color}>
+            <Trans
+              i18nKey="pages.entity.audit-trail.timeline.onboarding-decision-event.onboarded-onto"
+              values={{ outcome }}
+              components={{
+                playbook: <PlaybookLink playbook={playbook} />,
+              }}
+            />
+          </Text>
+        </Stack>
+        <Details ruleSetResultId={ruleSetResultId} />
+      </Stack>
+    );
   }
 
+  // Otherwise, manual review decision
   return (
     <Stack direction="row" align="center" gap={2}>
       <Stack align="center" testID="onboarding-decision-event-header">
         <Text variant="label-3" color={color}>
-          {text}
+          {t('human-decision.title', {
+            decision: statusToText[status],
+          })}
         </Text>
         &nbsp;
-        {link}
+        <Actor actor={source} />
       </Stack>
-      {isFootprintActor && <Details ruleSetResultId={ruleSetResultId} />}
     </Stack>
   );
 };

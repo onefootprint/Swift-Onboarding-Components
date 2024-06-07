@@ -47,7 +47,7 @@ describe('getEventText', () => {
   describe('when an event with kind TimelineEventKind.onboardingDecision is passed in', () => {
     it('should return the correct text', () => {
       const onboardingDecisionText = getEventText(onboardingDecisionEventFixture);
-      expect(onboardingDecisionText).toEqual('Completed My Playbook playbook');
+      expect(onboardingDecisionText).toEqual('Onboarded onto My Playbook with Pass outcome');
     });
   });
 
