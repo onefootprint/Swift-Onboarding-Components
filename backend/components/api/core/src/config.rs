@@ -205,7 +205,7 @@ pub struct IdologyConfig {
 /// Separated config for Enclave settings
 #[derive(Envconfig, Debug, Clone)]
 pub struct EnclaveConfig {
-    #[envconfig(from = "ENCLAVE_PORT", default = "5000")]
+    #[envconfig(from = "ENCLAVE_PORT", default = "5001")]
     pub enclave_port: u32,
 
     #[envconfig(from = "ENCLAVE_CID", default = "16")]

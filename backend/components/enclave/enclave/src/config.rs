@@ -2,7 +2,7 @@ use envconfig::Envconfig;
 
 #[derive(Envconfig, Clone)]
 pub struct Config {
-    #[envconfig(from = "PORT", default = "5000")]
+    #[envconfig(from = "PORT", default = "5001")]
     pub port: u16,
 }
 

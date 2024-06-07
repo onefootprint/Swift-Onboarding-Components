@@ -5,7 +5,7 @@ pub struct Config {
     #[envconfig(from = "ENCLAVE_PROXY_PORT", default = "3668")]
     pub port: u16,
 
-    #[envconfig(from = "ENCLAVE_PORT", default = "5000")]
+    #[envconfig(from = "ENCLAVE_PORT", default = "5001")]
     pub enclave_port: u16,
 
     #[envconfig(from = "ENCLAVE_CID", default = "16")]

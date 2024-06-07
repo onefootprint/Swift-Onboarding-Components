@@ -43,6 +43,6 @@ RUN apk update && apk add curl bind-tools
 
 COPY --from=builder /usr/bin/enclave /usr/bin/enclave
 
-EXPOSE 5000
+EXPOSE 5001
 
 ENTRYPOINT ["/usr/bin/enclave"]
