@@ -3921,7 +3921,7 @@
             "enum": ["pass", "fail", "incomplete", "pending", "none"]
           }
         },
-        "required": ["id", "requires_manual_review", "status"]
+        "required": ["id", "requires_manual_review"]
       },
       "ValidateRequest": {
         "type": "object",
