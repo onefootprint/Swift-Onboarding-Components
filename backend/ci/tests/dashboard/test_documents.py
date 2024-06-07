@@ -6,7 +6,8 @@ from tests.utils import (
     post,
     get_raw,
 )
-
+from tests.headers import FpAuth
+from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 from tests.utils import compare_contents, compare_b64_contents, open_multipart_file
 
@@ -281,7 +282,6 @@ def test_legacy_poa_dis(sandbox_tenant, must_collect_data):
         sandbox_tenant,
         "PoA request config",
         must_collect_data,
-        must_collect_data,
         documents_to_collect=[
             dict(kind="proof_of_ssn", data=dict()),
             dict(kind="proof_of_address", data=dict()),
@@ -301,3 +301,36 @@ def test_legacy_poa_dis(sandbox_tenant, must_collect_data):
                 f"entities/{user.fp_id}/vault/decrypt", data, sandbox_tenant.sk.key
             )
             assert body[test[0]] == body[test[1]]
+
+
+def test_review_documents(sandbox_tenant):
+    """
+    Manually reviewing a user will implicitly mark documents as reviewed by a human
+    """
+    obc = sandbox_tenant.default_ob_config
+    bifrost = BifrostClient.new_user(obc)
+    user = bifrost.run()
+
+    # Then, add a PoA in one workflow and PoSsn in another
+    document_configs = [
+        dict(kind="proof_of_address", data=dict()),
+        dict(kind="proof_of_ssn", data=dict()),
+    ]
+    for config in document_configs:
+        data = data = dict(trigger=dict(kind="document", data=dict(configs=[config])))
+        body = post(f"entities/{user.fp_id}/triggers", data, *sandbox_tenant.db_auths)
+        token = FpAuth(body["token"])
+        token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+        bifrost = BifrostClient.raw_auth(obc, token, bifrost.sandbox_id)
+        bifrost.run()
+
+    body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
+    assert len(body) == 2
+    assert all(i["review_status"] == "pending_human_review" for i in body)
+
+    # Then, make a manual review decision. This should mark all documents as reviewed by a human
+    data = dict(status="pass", annotation=dict(note="lgtm", is_pinned=False))
+    post(f"entities/{user.fp_id}/decisions", data, *sandbox_tenant.db_auths)
+
+    body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
+    assert all(i["review_status"] == "reviewed_by_human" for i in body)

@@ -62,7 +62,7 @@ pub fn save_review_decision(
     {
         // If we're clearing a ManualReview for DocumentNeedsReview, we should also implicitly
         // update the ID docs to be reviewed
-        let id_docs = Document::list_by_wf_id(conn, &wf.id)?;
+        let id_docs = Document::list(conn, &wf.scoped_vault_id)?;
         let reviewed_docs = id_docs
             .into_iter()
             .filter(|(doc, _)| doc.review_status == DocumentReviewStatus::PendingHumanReview);
