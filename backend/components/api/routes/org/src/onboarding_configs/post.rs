@@ -14,7 +14,6 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::decision::rule_engine;
 use db::models::ob_configuration::{
-    get_verification_checks_for_legacy_compat,
     NewObConfigurationArgs,
     ObConfiguration,
 };
@@ -31,6 +30,7 @@ use newtypes::{
     ObConfigurationKind,
     TenantId,
     VerificationCheck,
+    VerificationCheckKind,
 };
 use paperclip::actix::web::Json;
 use paperclip::actix::{
@@ -134,9 +134,15 @@ pub async fn post(
         .or(hardcoded_tenant_enhanced_aml_option(tenant_id))
         .unwrap_or(EnhancedAmlOption::No);
 
-    let skip_kyb = false;
+    let verification_checks = verification_checks.unwrap_or_default();
+
+    let skip_kyb = match kind {
+        ObConfigurationKind::Kyb => !verification_checks
+            .iter()
+            .any(|c| matches!(c.into(), VerificationCheckKind::Kyb)),
+        _ => false,
+    };
     let curp_validation_enabled = curp_validation_enabled.unwrap_or(false);
-    let verification_checks = get_verification_checks_for_legacy_compat(verification_checks);
 
     let args = NewObConfigurationArgs {
         name,

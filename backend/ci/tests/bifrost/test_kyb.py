@@ -1,5 +1,6 @@
 import pytest
 from tests.utils import (
+    get,
     patch,
     post,
     get_requirement_from_requirements,
@@ -222,3 +223,24 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
     assert bifrost.validate_response["business"]["status"] == expected_business_status
     # TODO: do we really want the status to be pass when skip_kyc is true? maybe we just set to none
     assert bifrost.validate_response["user"]["status"] == "pass"
+
+
+def test_skip_kyb(sandbox_tenant, must_collect_data):
+    data = must_collect_data + [
+        "business_name",
+        "business_beneficial_owners",
+        "business_address",
+    ]
+    obc = create_ob_config(
+        sandbox_tenant, "skip_kyb", data, kind="kyb", verification_checks=[]
+    )
+    bifrost = BifrostClient.new_user(obc)
+    user = bifrost.run()
+    # Business should have none status since no KYB rules ran
+    # assert bifrost.validate_response["business"]["status"] == "none"
+    assert bifrost.validate_response["user"]["status"] == "pass"
+
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "pass"
+    body = get(f"entities/{user.fp_bid}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "none"

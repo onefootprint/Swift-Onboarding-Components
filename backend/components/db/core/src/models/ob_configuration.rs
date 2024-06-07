@@ -423,22 +423,6 @@ pub struct NewObConfigurationArgs {
     pub verification_checks: Vec<VerificationCheck>,
 }
 
-#[allow(clippy::too_many_arguments)]
-pub fn get_verification_checks_for_legacy_compat(
-    verification_checks_from_api_req: Option<Vec<VerificationCheck>>,
-) -> Vec<VerificationCheck> {
-    let mut checks = vec![];
-
-    // Frontend will start sending KYB checks first, so if we receive one, take that
-    if let Some(api_checks) = verification_checks_from_api_req {
-        api_checks.into_iter().for_each(|c| {
-            checks.push(c);
-        });
-    }
-
-    checks.into_iter().collect()
-}
-
 #[derive(Debug, derive_more::From)]
 pub enum ObConfigIdentifier<'a> {
     Id(&'a ObConfigurationId),

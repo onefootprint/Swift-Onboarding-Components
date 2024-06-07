@@ -303,6 +303,10 @@ def create_ob_config(
     verification_checks=None,
 ):
     kind = kind or "kyc"
+    if kind == "kyb" and verification_checks is None:
+        # Need to populate verification_checks with the default KYB verification check, unless skip_kyb has
+        # been specifically requested by providing empty verification_checks
+        verification_checks = [dict(kind="kyb", data=dict(ein_only=False))]
     checks = get_verification_checks(verification_checks, kind)
     ob_conf_data = {
         "name": name,

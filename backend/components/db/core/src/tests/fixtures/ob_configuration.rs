@@ -1,5 +1,4 @@
 use crate::models::ob_configuration::{
-    get_verification_checks_for_legacy_compat,
     NewObConfigurationArgs,
     ObConfiguration,
 };
@@ -118,7 +117,7 @@ pub fn create_with_opts(
     let documents_to_collect = vec![];
     let skip_kyb = false;
     let curp_validation_enabled = false;
-    let verification_checks = get_verification_checks_for_legacy_compat(verification_checks);
+    let verification_checks = verification_checks.unwrap_or_default();
     let args = NewObConfigurationArgs {
         name,
         tenant_id: tenant_id.clone(),

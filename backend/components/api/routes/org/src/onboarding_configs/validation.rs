@@ -571,8 +571,7 @@ impl ObConfigurationArgsToValidate {
                 if !self.skip_kyb
                     && !self
                         .verification_checks
-                        .clone()
-                        .into_iter()
+                        .iter()
                         .any(|c| matches!(c.into(), VerificationCheckKind::Kyb))
                 {
                     Err(ApiError::from(TenantError::ValidationError(

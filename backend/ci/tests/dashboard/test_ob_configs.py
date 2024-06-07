@@ -644,8 +644,8 @@ def test_skip_kyc(
 @pytest.mark.parametrize(
     "collected_data,kind,checks,expected_error",
     [
-       (
-           [
+        (
+            [
                 "business_name",
                 "business_tin",
                 "business_address",
@@ -653,13 +653,13 @@ def test_skip_kyc(
                 "business_website",
                 "business_beneficial_owners",
                 "name",
-            ], 
-            "kyb", 
-            [{"kind": "kyb", "data": {"ein_only": False}}], 
-            None
+            ],
+            "kyb",
+            [{"kind": "kyb", "data": {"ein_only": False}}],
+            None,
         ),
         (
-           [
+            [
                 "business_name",
                 "business_tin",
                 "business_address",
@@ -667,89 +667,64 @@ def test_skip_kyc(
                 "business_website",
                 "business_beneficial_owners",
                 "name",
-            ], 
-            "kyb", 
-            [{"kind": "kyb", "data": {"ein_only": False}}, {"kind": "kyb", "data": {"ein_only": True}}], 
-            "Validation error: Duplicate verification_checks defined: kyb"
+            ],
+            "kyb",
+            [
+                {"kind": "kyb", "data": {"ein_only": False}},
+                {"kind": "kyb", "data": {"ein_only": True}},
+            ],
+            "Validation error: Duplicate verification_checks defined: kyb",
         ),
         (
-           [
+            [
                 "business_name",
                 "business_phone_number",
                 "business_website",
                 "business_beneficial_owners",
                 "name",
-            ], 
-            "kyb", 
-            [{"kind": "kyb", "data": {"ein_only": True}}], 
-            "Validation error: Playbook performing `kyb` verification_check with ein_only=true must collect: business_tin"
+            ],
+            "kyb",
+            [{"kind": "kyb", "data": {"ein_only": True}}],
+            "Validation error: Playbook performing `kyb` verification_check with ein_only=true must collect: business_tin",
         ),
         (
-           [
+            [
                 "business_name",
                 "business_tin",
                 "business_phone_number",
                 "business_website",
                 "business_beneficial_owners",
                 "name",
-            ], 
-            "kyb", 
-            [{"kind": "kyb", "data": {"ein_only": False}}], 
-            "Validation error: Playbook performing `kyb` verification_check with ein_only=false must collect: business_address"
+            ],
+            "kyb",
+            [{"kind": "kyb", "data": {"ein_only": False}}],
+            "Validation error: Playbook performing `kyb` verification_check with ein_only=false must collect: business_address",
         ),
         (
-           [
+            [
                 "name",
                 "full_address",
                 "phone_number",
                 "email",
                 "document.drivers_license.us_only.require_selfie",
             ],
-            "kyc", 
-            [{"kind": "kyb", "data": {"ein_only": False}}], 
-            "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks"
+            "kyc",
+            [{"kind": "kyb", "data": {"ein_only": False}}],
+            "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks",
         ),
         (
-           [
+            [
                 "name",
                 "full_address",
                 "phone_number",
                 "email",
                 "document.drivers_license.us_only.require_selfie",
             ],
-            "kyc", 
-            [{"kind": "kyb", "data": {"ein_only": True}}], 
-            "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks"
+            "kyc",
+            [{"kind": "kyb", "data": {"ein_only": True}}],
+            "Validation error: Cannot run KYB for non-KYB or skip_kyb Playbooks",
         ),
-        (
-          [
-                "business_name",
-                "business_tin",
-                "business_address",
-                "business_phone_number",
-                "business_website",
-                "business_beneficial_owners",
-                "name",
-            ], 
-            "kyb", 
-            None, 
-            "Validation error: Must provide a kyb verification_check if skip_kyb=false"
-        ),
-        (
-          [
-                "business_name",
-                "business_tin",
-                "business_address",
-                "business_phone_number",
-                "business_website",
-                "business_beneficial_owners",
-                "name",
-            ], 
-            "kyb", 
-            [], 
-            "Validation error: Must provide a kyb verification_check if skip_kyb=false"
-        ),
-    ], 
+    ],
 )
 def test_verification_checks(
     sandbox_tenant, collected_data, kind, checks, expected_error
@@ -772,7 +747,7 @@ def test_verification_checks(
         assert res["error"]["message"] == expected_error
     else:
         for c in checks:
-            assert c in res['verification_checks']
+            assert c in res["verification_checks"]
 
 
 @pytest.mark.parametrize(
@@ -886,7 +861,7 @@ def test_business_only_obc(sandbox_tenant):
         must_collect_data=collect_data,
         can_access_data=collect_data,
         kind="kyb",
-        verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}]
+        verification_checks=[{"kind": "kyb", "data": {"ein_only": False}}],
     )
     res = post(
         "org/onboarding_configs",
