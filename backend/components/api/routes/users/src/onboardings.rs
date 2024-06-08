@@ -69,7 +69,7 @@ pub async fn get(
             WorkflowKind::Document => false,
         })
         // Start by only showing workflows with a terminal decision
-        .filter(|(wf, _)| wf.status.has_decision())
+        .filter(|(wf, _)| wf.status.is_terminal())
         .map(api_wire_types::PublicOnboarding::from_db)
         .collect();
     let response = OffsetPaginatedResponse::ok_no_count(results, next_page);

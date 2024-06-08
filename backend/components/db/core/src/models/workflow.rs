@@ -655,7 +655,7 @@ impl Workflow {
             // currently really mean we have to fire it when we make a decision for the first time
             // or in a redo flow If the current Workflow status is not pass/fail but the new
             // status is, fire OnboardingCompleted (ie anytime a Workflow completes)
-            if !wf.status.has_decision() && new_status.has_decision() {
+            if !wf.status.is_terminal() && new_status.is_terminal() {
                 let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                     fp_id: sv.fp_id.clone(),
                     timestamp: Utc::now(),

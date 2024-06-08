@@ -53,13 +53,13 @@ pub enum OnboardingStatus {
 }
 
 impl OnboardingStatus {
-    pub fn has_decision(&self) -> bool {
+    pub fn is_terminal(&self) -> bool {
         match self {
             OnboardingStatus::Pass => true,
             OnboardingStatus::Fail => true,
+            OnboardingStatus::None => true,
             OnboardingStatus::Incomplete => false,
             OnboardingStatus::Pending => false,
-            OnboardingStatus::None => false,
         }
     }
 

@@ -1,4 +1,5 @@
 from tests.utils import get, post
+from tests.bifrost_client import BifrostClient
 
 
 def test_match_signals(sandbox_user, sandbox_tenant):
@@ -25,8 +26,10 @@ def test_risk_signals(sandbox_user, sandbox_tenant):
     assert all(i["reason_code"] for i in body)
 
 
-def test_decision(sandbox_user, sandbox_tenant):
+def test_decision(sandbox_tenant):
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
+    user = bifrost.run()
     data = dict(status="fail", annotation="Flerp")
-    post(f"/users/{sandbox_user.fp_id}/decisions", data, sandbox_tenant.sk.key)
-    body = get(f"/users/{sandbox_user.fp_id}", None, sandbox_tenant.sk.key)
+    post(f"/users/{user.fp_id}/decisions", data, sandbox_tenant.sk.key)
+    body = get(f"/users/{user.fp_id}", None, sandbox_tenant.sk.key)
     assert body["status"] == "fail"

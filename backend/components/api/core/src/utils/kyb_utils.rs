@@ -179,7 +179,7 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Ap
     let all_bo_kyc_complete = dbo.iter().filter(|bo| bo.linked_bo.is_some()).all(|bo| {
         bo.scoped_user
             .as_ref()
-            .map(|su| su.status.has_decision())
+            .map(|su| su.status.is_terminal())
             .unwrap_or(false)
     });
 

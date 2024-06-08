@@ -27,7 +27,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use newtypes::{
-    OnboardingStatus,
     PreviewApi,
     VaultKind,
 };
@@ -64,10 +63,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
-            if matches!(
-                sv.status,
-                OnboardingStatus::Incomplete | OnboardingStatus::Pending
-            ) {
+            if !sv.status.is_terminal() {
                 return Err(ValidationError(
                     "Cannot create a manual decision when the user's status is not already terminal",
                 )

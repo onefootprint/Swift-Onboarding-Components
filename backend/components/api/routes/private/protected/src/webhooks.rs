@@ -30,7 +30,6 @@ use newtypes::{
     FireWebhookArgs,
     FpId,
     OnboardingCompletedPayload,
-    OnboardingStatus,
     TaskData,
     TaskId,
     TenantId,
@@ -92,9 +91,6 @@ fn create_webhook_event(entity: SerializableEntity, kind: WebhookEventKind) -> A
     let (sv, _, _, _, mrs, _) = entity;
     let event = match kind {
         WebhookEventKind::OnboardingCompleted => {
-            if sv.status == OnboardingStatus::None {
-                return ValidationError(&format!("{} missing status", sv.fp_id)).into();
-            };
             WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                 fp_id: sv.fp_id,
                 timestamp: Utc::now(),
