@@ -27,7 +27,6 @@ use crate::decision::utils::FixtureDecision;
 use crate::decision::{
     self,
     risk,
-    RuleError,
 };
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{
@@ -197,12 +196,8 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         }
 
         if obc.skip_kyb {
-            // TODO one day we should move this into vendor calls + decisioning but have the
-            // decisioning code clear the status
-            // Handling skip_kyb flow
-            // Since we're not running KYB, let's set the sv status to None
-            ScopedVault::clear_business_status(conn, &wf.id)?;
-            Ok(KybState::from(KybComplete {}))
+            // Skip past KYB vendor calls and go straight to decisioning
+            Ok(KybState::from(KybDecisioning::new(self.wf_id, self.t_id)))
         } else {
             let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
             DbWorkflow::update(wf, conn, update)?;
@@ -435,10 +430,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
         let rsfd = decision::features::risk_signals::fetch_latest_risk_signals_map(conn, &sv.id)?;
-        let kyb_rsg = rsfd
-            .kyb
-            .ok_or(RuleError::MissingInputForKYBRules)
-            .map_err(crate::decision::Error::from)?;
+        let kyb_rsg = rsfd.kyb.unwrap_or_default();
 
         let vres_ids = kyb_rsg
             .footprint_reason_codes
@@ -447,42 +439,50 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             .unique()
             .collect();
 
-        let (decision, rsr_id) = if let Some(fixture_decision) = fixture_decision {
-            (Decision::from(fixture_decision), None)
+        let kyb_rs: Vec<RiskSignal> = rsfd.risk_signals.into_iter().flat_map(|(_, v)| v).collect();
+
+        // TODO: Consider pulling in additional insight events?
+        let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?
+            .into_iter()
+            .collect();
+
+        // TODO should we be using evaluate_workflow_decision?
+        let (decision, rsr_id) = if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
+            conn,
+            &sv.id,
+            &obc,
+            Some(&self.wf_id),
+            RuleSetResultKind::WorkflowDecision,
+            &kyb_rs,
+            &vault_data_for_rules,
+            &insight_events,
+            &lists_for_rules,
+            &RuleEvalConfig::default(),
+            self.include_rules,
+        )? {
+            let decision = Decision::RulesExecuted {
+                should_commit: false, // never commit business data for now
+                create_manual_review: rsr
+                    .action_triggered
+                    .map(|r| r.should_create_review())
+                    .unwrap_or(false),
+                action: rsr.action_triggered,
+            };
+            (decision, Some(rsr.id))
         } else {
-            let kyb_rs: Vec<RiskSignal> = rsfd.risk_signals.into_iter().flat_map(|(_, v)| v).collect();
+            (Decision::RulesNotExecuted, None)
+        };
 
-            // TODO: Consider pulling in additional insight events?
-            let insight_events: Vec<InsightEvent> = InsightEvent::get_for_workflow(conn, &self.wf_id)?
-                .into_iter()
-                .collect();
-
-            // TODO should we be using evaluate_workflow_decision?
-            if let Some((rsr, _)) = decision::rule_engine::engine::evaluate_rules(
-                conn,
-                &sv.id,
-                &obc,
-                Some(&self.wf_id),
-                RuleSetResultKind::WorkflowDecision,
-                &kyb_rs,
-                &vault_data_for_rules,
-                &insight_events,
-                &lists_for_rules,
-                &RuleEvalConfig::default(),
-                self.include_rules,
-            )? {
-                let decision = Decision::RulesExecuted {
-                    should_commit: false, // never commit business data for now
-                    create_manual_review: rsr
-                        .action_triggered
-                        .map(|r| r.should_create_review())
-                        .unwrap_or(false),
-                    action: rsr.action_triggered,
-                };
-                (decision, Some(rsr.id))
+        let decision = if let Some(fixture_decision) = fixture_decision {
+            if obc.skip_kyb {
+                // In skip KYB, we want to take the evaluated "NoRulesExecuted" rather than the fixture
+                // decision
+                decision
             } else {
-                (Decision::RulesNotExecuted, None)
+                Decision::from(fixture_decision)
             }
+        } else {
+            decision
         };
 
         // TODO should we use common::save_decision as well in order to handle step-ups in KYB?

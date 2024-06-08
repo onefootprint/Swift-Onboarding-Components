@@ -58,8 +58,6 @@ pub enum RuleError {
     MissingInputForKYCRules,
     #[error("Missing input for Doc rules")]
     MissingInputForDocRules,
-    #[error("Missing input for KYB rules")]
-    MissingInputForKYBRules,
     #[error("AssertionError {0}")]
     AssertionError(String),
     #[error("No rules found for playbook {0}")]

@@ -237,7 +237,7 @@ def test_skip_kyb(sandbox_tenant, must_collect_data):
     bifrost = BifrostClient.new_user(obc)
     user = bifrost.run()
     # Business should have none status since no KYB rules ran
-    # assert bifrost.validate_response["business"]["status"] == "none"
+    assert bifrost.validate_response["business"]["status"] == "none"
     assert bifrost.validate_response["user"]["status"] == "pass"
 
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)

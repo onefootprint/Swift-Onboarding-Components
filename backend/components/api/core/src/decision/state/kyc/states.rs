@@ -489,6 +489,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         // decision
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
+                // In skip KYC, we want to take the evaluated "NoRulesExecuted" rather than the fixture
+                // decision
                 decision
             } else {
                 let doc_collected =

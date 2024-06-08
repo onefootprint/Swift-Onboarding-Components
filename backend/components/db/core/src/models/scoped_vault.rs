@@ -511,32 +511,6 @@ impl ScopedVault {
         Ok(updated_sv)
     }
 
-    #[tracing::instrument("ScopedVault::clear_status", skip_all)]
-    /// Used to clear the status of a business vault going through a skip_kyb workflow.
-    pub fn clear_business_status(conn: &mut TxnPgConn, wf_id: &WorkflowId) -> DbResult<()> {
-        let (wf, v) = Workflow::get_with_vault(conn, wf_id)?;
-        if v.kind != VaultKind::Business {
-            return Err(DbError::ValidationError(
-                "Not allowed to clear status of non-business vault".into(),
-            ));
-        }
-        use db_schema::schema::workflow;
-        let count_wf = workflow::table
-            .filter(workflow::scoped_vault_id.eq(&wf.scoped_vault_id))
-            .count()
-            .execute(conn.conn())?;
-        if count_wf > 1 {
-            return Err(DbError::ValidationError(
-                "Not allowed to clear status of a business with multiple workflows".into(),
-            ));
-        }
-        diesel::update(scoped_vault::table)
-            .filter(scoped_vault::id.eq(&wf.scoped_vault_id))
-            .set(scoped_vault::status.eq(OnboardingStatus::None))
-            .execute(conn.conn())?;
-        Ok(())
-    }
-
     pub fn set_heartbeat(&self, conn: &mut PgConn) -> DbResult<()> {
         // To reduce frequency of writes, only set the heartbeat if it's >3 mins old
         if Utc::now() - self.last_heartbeat_at > Duration::minutes(3) {
