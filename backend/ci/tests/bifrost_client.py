@@ -373,7 +373,7 @@ class BifrostClient:
         # Check user
         assert body["user"]["fp_id"]
         assert body["user"]["requires_manual_review"] is not None
-        assert body["user"]["status"] in {"pass", "fail", "pending"}
+        assert body["user"]["status"] in {"pass", "fail", "pending", "none"}
         # Check user_auth
         assert body["user_auth"]["fp_id"] == body["user"]["fp_id"]
         assert body["user_auth"]["auth_events"]

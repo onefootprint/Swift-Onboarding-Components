@@ -221,8 +221,8 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
         "incomplete" if beneficial_owners == "collect_with_multi_kyc" else "pass"
     )
     assert bifrost.validate_response["business"]["status"] == expected_business_status
-    # TODO: do we really want the status to be pass when skip_kyc is true? maybe we just set to none
-    assert bifrost.validate_response["user"]["status"] == "pass"
+    expected_status = "pass" if not skip_kyc else "none"
+    assert bifrost.validate_response["user"]["status"] == expected_status
 
 
 def test_skip_kyb(sandbox_tenant, must_collect_data):

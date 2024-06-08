@@ -185,9 +185,17 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
         doc_playbook, bifrost.sandbox_id, fixture_result="document_decision"
     )
     user2 = bifrost.run()
-    # The initial status should remain unchanged
-    assert bifrost.validate_response["user"]["status"] == initial_fixture_result
     assert user2.fp_id == user.fp_id
+    if initial_fixture_result == "pass":
+        # The status for the document workflow should be "none"
+        assert bifrost.validate_response["user"]["status"] == "none"
+    else:
+        # TODO: this is due to some interesting rule that puts the user in fail if they are non-terminal and
+        # need review by a human
+        assert bifrost.validate_response["user"]["status"] == "fail"
+    # The status of the user should remain unchanged
+    body = get(f"users/{user.fp_id}", None, sandbox_tenant.s_sk)
+    assert body["status"] == initial_fixture_result
 
 
 def test_upload_documents_with_ob_config_restriction_legacy_version(

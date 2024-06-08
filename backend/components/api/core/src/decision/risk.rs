@@ -140,8 +140,7 @@ fn get_final_decision_status(
         // If there's a document MR and the user doesn't already have a pass status, we'll fail them.
         // This is a kind of implicit rule.
         Decision::RulesNotExecuted if can_fail_for_doc_review => (DecisionStatus::Fail, true),
-        // TODO eventually stop defaulting to pass when no rules executed
-        Decision::RulesNotExecuted => (DecisionStatus::Pass, false),
+        Decision::RulesNotExecuted => (DecisionStatus::None, false),
     }
 }
 
@@ -165,7 +164,7 @@ mod test {
     }
 
     // Test no existing status, no doc manual review, simple cases
-    #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::None => DecisionStatus::Pass)]
+    #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::None => DecisionStatus::None)]
     #[test_case(rules_executed(None), false, OnboardingStatus::None => DecisionStatus::Pass)]
     #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), false, OnboardingStatus::None => DecisionStatus::Pass)]
     #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::None => DecisionStatus::Fail)]
@@ -178,7 +177,7 @@ mod test {
     #[test_case(rules_executed(None), true, OnboardingStatus::None => DecisionStatus::Fail)]
     #[test_case(rules_executed(None), true, OnboardingStatus::Incomplete => DecisionStatus::Fail)]
     // Don't set user to fail for doc review if they're already passed
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => DecisionStatus::Pass)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => DecisionStatus::None)]
     #[test_case(rules_executed(None), true, OnboardingStatus::Pass => DecisionStatus::Pass)]
     // Doc manual review doesn't matter much when there's a rule action.
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, OnboardingStatus::Pass => DecisionStatus::Fail)]

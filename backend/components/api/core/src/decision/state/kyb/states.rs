@@ -168,7 +168,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
     ) -> ApiResult<KybState> {
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
         let bo_obds = async_res;
-        if bo_obds.iter().any(|o| o.status != DecisionStatus::Pass) {
+        if bo_obds.iter().any(|o| o.status == DecisionStatus::Fail) {
             // Add risk signal for BO failing KYC
             // TODO: one of these days we need to drop the non-null vres constraint
             if let Some(bo_risk_signal) = bo_obds
