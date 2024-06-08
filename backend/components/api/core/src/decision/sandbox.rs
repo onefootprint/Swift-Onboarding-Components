@@ -151,6 +151,7 @@ pub fn make_random_kyc_reason_codes_for_fixture_decision(
         (DecisionStatus::StepUp, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3),
         // Approved
         (DecisionStatus::Pass, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4),
+        (DecisionStatus::None, _) => vec![],
     }
 }
 
@@ -166,7 +167,7 @@ pub fn get_fixture_reason_codes_alpaca(
     let (decision_status, create_manual_review) = fixture_decision;
     let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
         // #pass | #manualreview
-        (DecisionStatus::Pass, _) | (DecisionStatus::Fail, true) => {
+        (DecisionStatus::Pass, _) | (DecisionStatus::Fail, true) | (DecisionStatus::None, _) => {
             // TODO: later could randomize some other innocuous reason codes here if we wanted
             vec![
                 FootprintReasonCode::AddressMatches,
@@ -273,6 +274,7 @@ impl From<FixtureDecision> for Decision {
             DecisionStatus::Fail => Some(RuleAction::Fail),
             DecisionStatus::StepUp => Some(RuleAction::identity_stepup()),
             DecisionStatus::Pass => None,
+            DecisionStatus::None => return Decision::RulesNotExecuted,
         };
 
         Decision::RulesExecuted {

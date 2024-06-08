@@ -48,7 +48,7 @@ pub enum OnboardingStatus {
     Incomplete,
     /// All required data has been collected. We are waiting for a decision
     Pending,
-    /// Rules have not executed for this user
+    /// No rules have executed for this user
     None,
 }
 
@@ -68,7 +68,7 @@ impl OnboardingStatus {
     /// non-decision
     pub fn can_transition_from(&self, old_status: &Self) -> bool {
         let priority = |s: &Self| match s {
-            Self::None => 0,
+            Self::None => 1,
             Self::Incomplete => 1,
             Self::Pending => 1,
             Self::Fail => 2,
@@ -87,6 +87,7 @@ impl From<DecisionStatus> for OnboardingStatus {
             DecisionStatus::Fail => OnboardingStatus::Fail,
             DecisionStatus::Pass => OnboardingStatus::Pass,
             DecisionStatus::StepUp => OnboardingStatus::Incomplete,
+            DecisionStatus::None => OnboardingStatus::None,
         }
     }
 }
@@ -105,7 +106,8 @@ mod test {
     #[test_case(Pass, Incomplete => false)]
     #[test_case(Fail, Pending => false)]
     #[test_case(Pass, None => false)]
-    #[test_case(Incomplete, None => false)]
+    #[test_case(Incomplete, None => true)]
+    #[test_case(Pending, None => true)]
     fn test_transition(from: OnboardingStatus, to: OnboardingStatus) -> bool {
         to.can_transition_from(&from)
     }

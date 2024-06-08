@@ -114,32 +114,22 @@ pub async fn post(
     };
 
     // Validate and serialize the user and optionally the business onboardings
-    let validate_and_serialize = |sv: ScopedVault,
-                                  mrs: Vec<ManualReview>,
-                                  wf: Workflow,
-                                  kind: VaultKind|
-     -> ApiResult<EntityValidateResponse> {
-        if sv.tenant_id != auth.tenant().id {
-            return Err(OnboardingError::TenantMismatch.into());
-        }
-        if sv.is_live != auth.is_live()? {
-            return Err(OnboardingError::InvalidSandboxState.into());
-        }
-        match kind {
-            VaultKind::Person => {
-                if matches!(wf.status, OnboardingStatus::Incomplete | OnboardingStatus::None) {
-                    // For now, tenants aren't expecting these enum values in the response
-                    return Err(OnboardingError::NonTerminalState.into());
-                }
+    let validate_and_serialize =
+        |sv: ScopedVault, mrs: Vec<ManualReview>, wf: Workflow| -> ApiResult<EntityValidateResponse> {
+            if sv.tenant_id != auth.tenant().id {
+                return Err(OnboardingError::TenantMismatch.into());
             }
-            // Businesses could still be in status = `incomplete` if we are still waiting for BO's to complete
-            // KYC
-            VaultKind::Business => {}
-        }
+            if sv.is_live != auth.is_live()? {
+                return Err(OnboardingError::InvalidSandboxState.into());
+            }
+            if matches!(sv.kind, VaultKind::Person) && matches!(wf.status, OnboardingStatus::Incomplete) {
+                // For now, tenants aren't expecting this enum values in the response
+                return Err(OnboardingError::NonTerminalState.into());
+            }
 
-        let response = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs));
-        Ok(response)
-    };
+            let response = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs));
+            Ok(response)
+        };
     let user_auth = UserAuthResponse {
         fp_id: sv.fp_id.clone(),
         auth_events: auth_events
@@ -152,10 +142,10 @@ pub async fn post(
     };
     let wf_id = wf.as_ref().map(|(wf, _)| wf.id.clone());
     let user = wf
-        .map(|(wf, mrs)| validate_and_serialize(sv, mrs, wf, VaultKind::Person))
+        .map(|(wf, mrs)| validate_and_serialize(sv, mrs, wf))
         .transpose()?;
     let business = biz_wf
-        .map(|(sv, wf, mrs)| validate_and_serialize(sv, mrs, wf, VaultKind::Business))
+        .map(|(sv, wf, mrs)| validate_and_serialize(sv, mrs, wf))
         .transpose()?;
 
     if let Some(wf_id) = wf_id {

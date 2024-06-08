@@ -280,8 +280,8 @@ pub(crate) async fn create_cip_request(
 
             let (mr, manual_obd, annotation) = match fp_obd.status {
                 DecisionStatus::Pass => (None, None, None),
-                DecisionStatus::Fail | DecisionStatus::StepUp => {
-                    // footprint decided as fail, see if a manual decision override exists
+                DecisionStatus::Fail | DecisionStatus::StepUp | DecisionStatus::None => {
+                    // footprint did not decide to pass, see if a manual decision override exists
                     let (obd_manual, mr) =
                         OnboardingDecision::latest_non_footprint_actor_decision(conn, &sv.id)?
                             .ok_or(CipError::EntityDecisionStatusNotPass)?;
