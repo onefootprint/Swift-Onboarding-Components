@@ -1,4 +1,4 @@
-import { Stack, Text, media } from '@onefootprint/ui';
+import { Container, Stack, Text, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -33,7 +33,7 @@ const HeroContainer = styled(Stack)`
   `}
 `;
 
-const TextContainer = styled(Stack)`
+const TextContainer = styled(Container)`
   ${({ theme }) => css`
     gap: ${theme.spacing[5]};
   `}
@@ -47,11 +47,13 @@ const IllustrationContainer = styled(Stack)`
   overflow: hidden;
 
   img {
-    transform: scale(0.8);
+    width: 100%;
+    height: auto;
+    object-fit: contain;
 
     ${media.greaterThan('md')`
-    transform: scale(1);
-  `}
+      width: 720px;
+    `}
   }
 `;
 
