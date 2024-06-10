@@ -4,6 +4,7 @@ pub mod incode;
 pub mod lexis;
 pub mod middesk;
 pub mod neuro_id;
+pub mod samba;
 pub mod socure;
 pub mod stytch;
 pub mod twilio;

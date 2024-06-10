@@ -1,6 +1,10 @@
 use self::license_validation::CreateLVOrderAddress;
 use newtypes::vendor_credentials::SambaSafetyCredentials;
-use newtypes::PiiString;
+use newtypes::{
+    PiiString,
+    SambaOrderId,
+    SambaReportId,
+};
 
 pub mod license_validation;
 
@@ -22,4 +26,16 @@ pub struct SambaCreateLVOrderRequest {
     pub weight: Option<u16>,
     pub address: Option<CreateLVOrderAddress>,
     pub middle_name: Option<PiiString>,
+}
+
+
+pub struct SambaCheckLVOrderStatusRequest {
+    pub credentials: SambaSafetyCredentials,
+    pub order_id: SambaOrderId,
+}
+
+
+pub struct SambaGetLVReportRequest {
+    pub credentials: SambaSafetyCredentials,
+    pub report_id: SambaReportId,
 }

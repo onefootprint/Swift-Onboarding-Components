@@ -291,6 +291,8 @@ pub enum Error {
     LexisError(#[from] lexis::Error),
     #[error("NeuroIdError: {0}")]
     NeuroIdError(#[from] neuro_id::error::Error),
+    #[error("SambaSafetyError: {0}")]
+    SambaSafetyError(#[from] samba::error::Error),
 }
 
 impl From<&ParsedResponse> for VendorAPI {
