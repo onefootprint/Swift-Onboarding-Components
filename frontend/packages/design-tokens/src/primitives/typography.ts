@@ -1,8 +1,8 @@
 import type { Typographies } from '../types';
 
 export const fontFamily = {
-  default: 'DM Sans',
-  code: 'Source Code Pro',
+  default: 'var(--font-family-default)',
+  code: 'var(--font-family-code)',
 };
 
 export const typography: Typographies = {

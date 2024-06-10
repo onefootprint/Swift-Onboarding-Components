@@ -34,15 +34,13 @@ const SelectNew = ({
       className={className}
     />
     {hint && <Hint text={hint} />}
-    <Select.Portal>
-      <StyledContent sideOffset={8} width={contentWidth} position="popper">
-        <Select.Viewport>
-          {options.map((option: SelectNewOption) => (
-            <Item key={option.value} option={option} size={size} />
-          ))}
-        </Select.Viewport>
-      </StyledContent>
-    </Select.Portal>
+    <StyledContent sideOffset={8} width={contentWidth} position="popper">
+      <Select.Viewport>
+        {options.map((option: SelectNewOption) => (
+          <Item key={option.value} option={option} size={size} />
+        ))}
+      </Select.Viewport>
+    </StyledContent>
   </StyledRoot>
 );
 
@@ -59,6 +57,7 @@ const StyledContent = styled(Select.Content)<{
     box-shadow: ${theme.elevation[3]};
     padding: ${theme.spacing[2]};
     width: ${width};
+    z-index: 1;
   `}
 `;
 

@@ -26,7 +26,7 @@ const keys = [
 
 const FeaturedCards = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.baas.featured',
+    keyPrefix: 'pages.industries.financial-institutions.featured',
   });
   return (
     <Background>

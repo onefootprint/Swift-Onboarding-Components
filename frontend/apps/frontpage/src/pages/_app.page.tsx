@@ -1,45 +1,14 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
-import { DM_Sans } from 'next/font/google';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 
-import CustomDesignSystemProvider from '../components/custom-design-system-provider';
 import Layout from '../components/layout';
-import MDXProvider from '../components/mdx-provider';
+import Providers from '../components/providers';
 import { FATHOM_TRACKING_CODE, UNIFY_API_KEY } from '../config/constants';
-import configureReactI18next from '../config/initializers/react-i18next';
-import queryClient from '../config/initializers/react-query';
-
-configureReactI18next();
-
-const GlobalStyle = createGlobalStyle`
- ${({ theme }) => css`
-   :root {
-     --desktop-header-height: 64px;
-     --desktop-spacing: ${theme.spacing[10]};
-     --mobile-header-height: 72px;
-     --mobile-spacing: ${theme.spacing[9]};
-     --custom-gray: #fcfcfc;
-     font-size: 16px;
-   }
-   body {
-     background-color: ${theme.backgroundColor.primary};
-   }
- `}
-`;
-
-const DMSans = DM_Sans({
-  display: 'swap',
-  preload: true,
-  subsets: ['latin'],
-  variable: '--font-dm-sans',
-  fallback: ['Inter'],
-});
 
 const App = ({ Component, pageProps }: AppProps) => (
   <>
@@ -86,19 +55,29 @@ const App = ({ Component, pageProps }: AppProps) => (
       async
       defer
     />
-    <QueryClientProvider client={queryClient}>
-      <CustomDesignSystemProvider>
-        <GlobalStyle />
-        <Layout>
-          <MDXProvider>
-            <div className={DMSans.className}>
-              <Component {...pageProps} />
-            </div>
-          </MDXProvider>
-        </Layout>
-      </CustomDesignSystemProvider>
-    </QueryClientProvider>
+    <Providers>
+      <GlobalStyle />
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </Providers>
   </>
 );
+
+const GlobalStyle = createGlobalStyle`
+ ${({ theme }) => css`
+   :root {
+     --desktop-header-height: 64px;
+     --desktop-spacing: ${theme.spacing[10]};
+     --mobile-header-height: 72px;
+     --mobile-spacing: ${theme.spacing[9]};
+     --custom-gray: #fcfcfc;
+     font-size: 16px;
+   }
+   body {
+     background-color: ${theme.backgroundColor.primary};
+   }
+ `}
+`;
 
 export default App;

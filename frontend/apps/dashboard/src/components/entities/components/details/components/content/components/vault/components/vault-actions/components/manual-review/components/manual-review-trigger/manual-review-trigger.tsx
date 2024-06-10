@@ -24,32 +24,30 @@ const ManualReviewTrigger = ({ kind, status, onSelect, disabled }: ManualReviewT
       <DropdownTrigger asChild disabled={disabled}>
         <Button>{kind === EntityKind.person ? t('button.review-person') : t('button.review-business')}</Button>
       </DropdownTrigger>
-      <Dropdown.Portal>
-        <DropdownContent align="end" sideOffset={12}>
-          <DropdownItem
-            onClick={() => {
-              onSelect(ReviewStatus.pass);
-            }}
-          >
-            <div>
-              {status === EntityStatus.pass
-                ? t('dropdown.keep-as', { status: pass })
-                : t('dropdown.mark-as', { status: pass })}
-            </div>
-          </DropdownItem>
-          <DropdownItem
-            onClick={() => {
-              onSelect(ReviewStatus.fail);
-            }}
-          >
-            <div>
-              {status === EntityStatus.failed
-                ? t('dropdown.keep-as', { status: fail })
-                : t('dropdown.mark-as', { status: fail })}
-            </div>
-          </DropdownItem>
-        </DropdownContent>
-      </Dropdown.Portal>
+      <DropdownContent align="end" sideOffset={12}>
+        <DropdownItem
+          onClick={() => {
+            onSelect(ReviewStatus.pass);
+          }}
+        >
+          <div>
+            {status === EntityStatus.pass
+              ? t('dropdown.keep-as', { status: pass })
+              : t('dropdown.mark-as', { status: pass })}
+          </div>
+        </DropdownItem>
+        <DropdownItem
+          onClick={() => {
+            onSelect(ReviewStatus.fail);
+          }}
+        >
+          <div>
+            {status === EntityStatus.failed
+              ? t('dropdown.keep-as', { status: fail })
+              : t('dropdown.mark-as', { status: fail })}
+          </div>
+        </DropdownItem>
+      </DropdownContent>
     </Dropdown.Root>
   );
 };

@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const { execSync } = require('child_process');
 
 const withPlugins = require('next-compose-plugins');
 
@@ -27,7 +28,7 @@ const ContentSecurityPolicy = `
   img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com usefathom.com *.usefathom.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net unifyintent.com *.unifyintent.com cdn.jsdelivr.net;
   media-src 'self' https footprint-blog.ghost.io;
   object-src 'self' data:;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' usefathom.com *.usefathom.com vercel.live vitals.vercel-insights.com tagmanager.google.com www.googletagmanager.com platform.twitter.com www.youtube.com static.ads-twitter.com connect.facebook.net www.facebook.com unifyintent.com *.unifyintent.com *.apollo.io;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' usefathom.com *.usefathom.com vercel.live vitals.vercel-insights.com tagmanager.google.com www.googletagmanager.com platform.twitter.com www.youtube.com static.ads-twitter.com connect.facebook.net www.facebook.com unifyintent.com *.unifyintent.com *.apollo.io *.vercel-scripts.com;
   style-src 'self' 'unsafe-inline' tagmanager.google.com fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;

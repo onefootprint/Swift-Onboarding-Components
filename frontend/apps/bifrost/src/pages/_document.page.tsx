@@ -42,7 +42,7 @@ export default class MyDocument extends Document {
           <meta name="app-commit-sha" content={COMMIT_SHA} />
           <meta name="app-deployment-url" content={DEPLOYMENT_URL} />
           <meta charSet="utf-8" />
-          <LoadFonts href={fontSrc} />
+          {fontSrc ? <LoadFonts src={fontSrc} /> : null}
         </Head>
         <body data-variant={variant}>
           <Main />

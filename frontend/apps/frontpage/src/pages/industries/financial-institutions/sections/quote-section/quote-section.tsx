@@ -7,7 +7,7 @@ import QuoteCard from '../../../components/quote-card';
 
 const QuoteSection = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.baas.quote',
+    keyPrefix: 'pages.industries.financial-institutions.quote',
   });
   return (
     <Background>
