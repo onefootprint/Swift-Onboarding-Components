@@ -1,5 +1,5 @@
 import { Fp, useFootprint } from '@onefootprint/footprint-react';
-import { Box, Button, Container, Divider, Stack, Stepper, Text } from '@onefootprint/ui';
+import { Box, Button, Container, Divider, InlineAlert, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
@@ -36,6 +36,7 @@ const Demo = () => {
 
   const isIdentify = option.value === 'identify';
   const isBusinessData = option.value === 'business-data';
+  const isBoData = option.value === 'bo-data';
   const isSuccess = option.value === 'confirmation';
 
   return (
@@ -63,6 +64,13 @@ const Demo = () => {
                 <BusinessData
                   onDone={() => {
                     setOption(steps[2]);
+                  }}
+                />
+              )}
+              {isBoData && (
+                <BoData
+                  onDone={() => {
+                    setOption(steps[3]);
                   }}
                 />
               )}
@@ -115,26 +123,22 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
 
   const handleSubmit = () => {
     fp.save({
-      onSuccess: () => {
-        fp.handoff({
-          onComplete: onDone,
-        });
-      },
+      onSuccess: onDone,
     });
   };
 
   return (
     <Layout>
       <Box marginBottom={7}>
-        <Text variant="heading-3">Basic information</Text>
+        <Text variant="heading-3">Business information</Text>
         <Text variant="body-3" color="secondary">
-          Please provide some basic personal information
+          Let's get to know your business! 😊
         </Text>
       </Box>
       <Fp.Form onSubmit={handleSubmit}>
         <Stack gap={4} direction="column">
           <Fp.Field name="business.name">
-            <Fp.Label>Business name</Fp.Label>
+            <Fp.Label>Business name1</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
@@ -176,6 +180,62 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
           </Fp.Field>
           <Fp.Field name="business.zip">
             <Fp.Label>Zip</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Divider marginBlock={3} />
+          <Button type="submit" loading={fp.busy === 'save'}>
+            Continue
+          </Button>
+        </Stack>
+      </Fp.Form>
+    </Layout>
+  );
+};
+
+const BoData = ({ onDone }: { onDone: () => void }) => {
+  const fp = useFootprint();
+
+  const handleSubmit = () => {
+    fp.save({
+      onSuccess: () => {
+        fp.handoff({
+          onComplete: onDone,
+        });
+      },
+    });
+  };
+
+  return (
+    <Layout>
+      <Box marginBottom={7}>
+        <Text variant="heading-3">Who are the beneficial owners?</Text>
+        <Text variant="body-3" color="secondary">
+          List all individuals who own at least 25% of the business or have substantial control over the business.
+        </Text>
+      </Box>
+      <Fp.Form onSubmit={handleSubmit}>
+        <InlineAlert variant="info" marginBottom={4}>
+          Spell your first, middle and last names exactly as shown on your government-issued ID
+        </InlineAlert>
+        <Stack gap={4} direction="column">
+          <Fp.Field name="business.beneficial_owners[0].first_name">
+            <Fp.Label>First name</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="business.beneficial_owners[0].middle_name">
+            <Fp.Label>Middle name (optional)</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="business.beneficial_owners[0].last_name">
+            <Fp.Label>Last name</Fp.Label>
+            <Fp.Input />
+            <Fp.FieldErrors />
+          </Fp.Field>
+          <Fp.Field name="business.beneficial_owners[0].ownership_stake">
+            <Fp.Label>Approximate ownership stake (%)</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>

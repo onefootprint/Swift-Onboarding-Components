@@ -301,6 +301,17 @@ const business: Record<string, Field> = {
   },
 };
 
+const bo: Record<string, Field> = {
+  ownershipStake: {
+    className: 'fp-bo-ownership-stake-input',
+    placeholder: '50',
+    type: 'number',
+    validations: {
+      required: 'errors.required',
+    },
+  },
+};
+
 const getProps = (name: string) => {
   if (name === 'id.phone_number') {
     return person.phoneNumber;
@@ -361,6 +372,26 @@ const getProps = (name: string) => {
   }
   if (name === 'business.phone_number') {
     return business.phoneNumber;
+  }
+  if (name.startsWith('business.beneficial_owners')) {
+    if (name.endsWith('first_name')) {
+      return person.firstName;
+    }
+    if (name.endsWith('middle_name')) {
+      return person.middleName;
+    }
+    if (name.endsWith('last_name')) {
+      return person.lastName;
+    }
+    if (name.endsWith('phone_number')) {
+      return person.phoneNumber;
+    }
+    if (name.endsWith('emai;')) {
+      return person.email;
+    }
+    if (name.endsWith('ownership_stake')) {
+      return bo.ownershipStake;
+    }
   }
   return null;
 };
