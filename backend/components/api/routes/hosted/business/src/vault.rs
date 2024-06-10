@@ -43,7 +43,7 @@ pub async fn post_validate(
     user_auth: UserWfAuthContext,
     request: Json<RawDataRequest>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
 
@@ -77,7 +77,7 @@ pub async fn patch(
     request: Json<RawDataRequest>,
     user_auth: UserWfAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+    let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
 

@@ -10,7 +10,7 @@ from tests.utils import (
     patch,
 )
 from tests.headers import FpAuth, IsComponentsSdk
-from tests.constants import ID_DATA, FIXTURE_EMAIL
+from tests.constants import BUSINESS_DATA, CDO_TO_DIS, ID_DATA, FIXTURE_EMAIL
 
 
 def create_user_with_components_token(tenant, obc=None):
@@ -112,3 +112,17 @@ def test_components_sdk_cannot_add_auth_methods(sandbox_tenant):
         body["error"]["message"]["id.email"]
         == "Not allowed to add this piece of data here"
     )
+
+
+def test_components_sdk_business(sandbox_tenant, kyb_sandbox_ob_config):
+    (components_token, _, bifrost) = create_user_with_components_token(
+        sandbox_tenant, kyb_sandbox_ob_config
+    )
+    data = {
+        di: BUSINESS_DATA.get(di)
+        for cdo in kyb_sandbox_ob_config.must_collect_data
+        for di in CDO_TO_DIS[cdo]
+        if di in BUSINESS_DATA
+    }
+    patch("hosted/business/vault", data, components_token)
+    bifrost.run()
