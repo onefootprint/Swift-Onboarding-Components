@@ -2551,7 +2551,6 @@
                         }
                     },
                     "meta": {
-                        "description": "Alternative to OffsetPaginatedResponseMeta for queries that don't return a count",
                         "type": "object",
                         "properties": {
                             "next_page": {
@@ -2704,7 +2703,6 @@
                         }
                     },
                     "meta": {
-                        "description": "Alternative to OffsetPaginatedResponseMeta for queries that don't return a count",
                         "type": "object",
                         "properties": {
                             "next_page": {

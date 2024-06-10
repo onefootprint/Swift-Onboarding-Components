@@ -169,7 +169,6 @@ pub struct OffsetPaginatedResponseMeta {
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-/// Alternative to OffsetPaginatedResponseMeta for queries that don't return a count
 pub struct OffsetPaginatedResponseMetaNoCount {
     #[openapi(example = "2")]
     /// The `page` parameter to provide in order to request the next page of results
