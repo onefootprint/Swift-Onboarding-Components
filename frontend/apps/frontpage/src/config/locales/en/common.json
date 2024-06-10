@@ -212,7 +212,7 @@
         "real-estate": "Real estate",
         "auto": "Auto",
         "fintech": "Fintech",
-        "financial-institutions": "Financial Institutions"
+        "baas": "Financial Institutions"
       },
       "company": {
         "title": "Company",
@@ -560,7 +560,7 @@
       "components": {
         "read-case-study": "Read case study"
       },
-      "financial-institutions": {
+      "baas": {
         "html-title": "Footprint - Industries: Banks & Financial Institutions",
         "hero": {
           "title": "Solve KYC, AML, and compliance with one tool",

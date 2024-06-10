@@ -1,7 +1,6 @@
-import { primitives } from '@onefootprint/design-tokens';
 import { useIntl } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
-import { Container, Stack, Text, media } from '@onefootprint/ui';
+import { Container, LinkButton, Stack, Text, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,9 +33,10 @@ const Post = ({ post }: PostProps) => {
       <article>
         <Container>
           <WritingLayout>
-            <BackButtonLink href="/blog">
-              <IcoChevronLeftBig24 />
-              {t('go-back')}
+            <BackButtonLink href="/blog" passHref>
+              <LinkButton iconPosition="left" iconComponent={IcoChevronLeftBig24} href="/blog">
+                {t('go-back')}
+              </LinkButton>
             </BackButtonLink>
             <header>
               <Stack justify="space-between" align="center">
@@ -70,31 +70,11 @@ const BackButtonLink = styled(Link)`
   ${({ theme }) => css`
     display: flex;
     text-decoration: none;
-    flex-direction: row;
-    align-items: center;
-    gap: ${theme.spacing[2]};
     margin-bottom: ${theme.spacing[6]};
-    color: ${theme.color.accent};
-
-    svg {
-      path {
-        fill: ${theme.color.accent};
-      }
-    }
 
     ${media.greaterThan('sm')`
       margin-bottom: ${theme.spacing[8]};
     `}
-
-    &:hover {
-      color: ${primitives.Purple600};
-
-      svg {
-        path {
-          fill: ${primitives.Purple600};
-        }
-      }
-    }
   `}
 `;
 

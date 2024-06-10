@@ -37,7 +37,7 @@ const PostInfo = ({ authors, publishedAt, readingTime, tag }: PostInfoProps) => 
           <Text variant="body-3" color="tertiary">
             {publishedAt}
           </Text>
-          {publishedAt && <Separator $visibleMobile />}
+          {publishedAt && <Separator visibleMobile />}
           <Text variant="body-3" color="tertiary">
             {t('post.reading-time', {
               readingTime,
@@ -59,10 +59,10 @@ const Details = styled.div`
   `}
 `;
 
-const Separator = styled.span<{ $visibleMobile?: boolean }>`
-  ${({ $visibleMobile }) => css`
+const Separator = styled.span<{ visibleMobile?: boolean }>`
+  ${({ visibleMobile }) => css`
     ${createFontStyles('label-2')};
-    display: ${$visibleMobile ? 'flex' : 'none'};
+    display: ${visibleMobile ? 'flex' : 'none'};
     height: 100%;
     align-items: center;
 

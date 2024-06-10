@@ -2465,11 +2465,17 @@
             }
           },
           "copy-link": {
-            "title": "Link generated",
-            "description": {
-              "auth": "You may now send this link to your users and they'll be able to easily authenticate.",
-              "kyc": "You may now send this link to your users, and they'll be able to easily verify their identity.",
-              "kyb": "You may now send this link to your users and they'll be able to easily verify their business and identity."
+            "auth": {
+              "title": "Link generated",
+              "description": "You may now send this link to your users and they'll be able to easily authenticate."
+            },
+            "kyc": {
+              "title": "Link generated",
+              "description": "You may now send this link to your users, and they'll be able to easily verify their identity."
+            },
+            "kyb": {
+              "title": "Link generated",
+              "description": "You may now send this link to your users and they'll be able to easily verify their business and identity."
             },
             "copy-link": "Copy link",
             "copied": "Copied!"

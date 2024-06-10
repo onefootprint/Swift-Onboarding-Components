@@ -35,15 +35,17 @@ const DropdownOptions = ({
     <Trigger variant={variant} data-loading={loading} disabled={disabled} data-flat={flat} $width={$width}>
       <IcoChevronDown16 color={variant === 'primary' ? 'quinary' : 'primary'} />
     </Trigger>
-    <DropdownContainer sideOffset={8} align="end">
-      <DropdownPrimitive.Group>
-        {options.map(option => (
-          <Item key={option.value} onSelect={() => onOptionChange(option)}>
-            {option.label}
-          </Item>
-        ))}
-      </DropdownPrimitive.Group>
-    </DropdownContainer>
+    <DropdownPrimitive.Portal>
+      <DropdownContainer sideOffset={8} align="end">
+        <DropdownPrimitive.Group>
+          {options.map(option => (
+            <Item key={option.value} onSelect={() => onOptionChange(option)}>
+              {option.label}
+            </Item>
+          ))}
+        </DropdownPrimitive.Group>
+      </DropdownContainer>
+    </DropdownPrimitive.Portal>
   </DropdownPrimitive.Root>
 );
 

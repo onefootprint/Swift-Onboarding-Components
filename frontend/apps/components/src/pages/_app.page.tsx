@@ -1,23 +1,40 @@
+import { AppearanceProvider } from '@onefootprint/appearance';
 import { Logger } from '@onefootprint/idv';
+import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Script from 'next/script';
 import React from 'react';
+import FootprintProvider from 'src/components/footprint-provider';
+import configureFootprint from 'src/components/footprint-provider/adapters';
 import { createGlobalStyle } from 'styled-components';
 
-import Providers from '../components/providers';
 import { GOOGLE_MAPS_SRC } from '../config/constants';
+import configureReactI18next from '../config/initializers/react-i18next';
+import queryClient from '../config/initializers/react-query';
 
+const footprint = configureFootprint();
+configureReactI18next();
 Logger.init('components', true);
 
-const App = ({ Component, pageProps }: AppProps) => (
-  <>
-    <Providers pageProps={pageProps}>
-      <GlobalStyle />
-      <Component {...pageProps} />
-    </Providers>
-    {GOOGLE_MAPS_SRC ? <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" /> : null}
-  </>
-);
+// TODO: add error boundary
+// https://linear.app/footprint/issue/FP-4515/add-nice-error-boundaryfallback-to-embedded-components
+const App = ({ Component, pageProps }: AppProps) => {
+  const { appearance, theme, rules } = pageProps;
+
+  return (
+    <>
+      <QueryClientProvider client={queryClient}>
+        <AppearanceProvider appearance={appearance} theme={theme} rules={rules}>
+          <GlobalStyle />
+          <FootprintProvider client={footprint}>
+            <Component {...pageProps} />
+          </FootprintProvider>
+        </AppearanceProvider>
+      </QueryClientProvider>
+      {GOOGLE_MAPS_SRC ? <Script src={GOOGLE_MAPS_SRC} async strategy="lazyOnload" /> : null}
+    </>
+  );
+};
 
 const GlobalStyle = createGlobalStyle`
   html {

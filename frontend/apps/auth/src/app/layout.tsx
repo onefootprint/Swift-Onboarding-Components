@@ -16,7 +16,7 @@ const DMSans = DM_Sans({
   display: 'swap',
   preload: true,
   subsets: ['latin'],
-  variable: '--font-family-default',
+  variable: '--font-dm-sans',
   weight: ['400', '500', '700'],
 });
 

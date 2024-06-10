@@ -64,27 +64,29 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
           <IcoDotsHorizontal16 testID="nav-dropdown-button" />
         </StyledTrigger>
         {isOpen && (
-          <NavDropdownContent forceMount sideOffset={8}>
-            <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
-            {tenants?.length > 1 && (
-              <TenantsList tenants={tenants} currTenantId={currTenantId} onSelect={handleTenantChange} />
-            )}
-            <SectionContainer>
-              {helpLinks.map(link => (
-                <StyledLink
-                  key={link.id}
-                  onSelect={event => {
-                    event.preventDefault();
-                    handleLinkSelect(link);
-                  }}
-                >
-                  {t(link.translationKey)}
-                  {link.href && <IcoArrowUpRight16 color="secondary" />}
-                </StyledLink>
-              ))}
-            </SectionContainer>
-            <Logout onSelect={handleLogout}>{t('log-out')}</Logout>
-          </NavDropdownContent>
+          <Dropdown.Portal forceMount>
+            <NavDropdownContent forceMount sideOffset={8}>
+              <UserName name={user.firstName} lastName={user.lastName} email={user.email} />
+              {tenants?.length > 1 && (
+                <TenantsList tenants={tenants} currTenantId={currTenantId} onSelect={handleTenantChange} />
+              )}
+              <SectionContainer>
+                {helpLinks.map(link => (
+                  <StyledLink
+                    key={link.id}
+                    onSelect={event => {
+                      event.preventDefault();
+                      handleLinkSelect(link);
+                    }}
+                  >
+                    {t(link.translationKey)}
+                    {link.href && <IcoArrowUpRight16 color="secondary" />}
+                  </StyledLink>
+                ))}
+              </SectionContainer>
+              <Logout onSelect={handleLogout}>{t('log-out')}</Logout>
+            </NavDropdownContent>
+          </Dropdown.Portal>
         )}
       </Dropdown.Root>
       <RiskSignalsGlossary open={isGlossaryOpen} onClose={() => setIsGlossaryOpen(false)} />
