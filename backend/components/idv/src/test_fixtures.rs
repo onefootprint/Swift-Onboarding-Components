@@ -7000,3 +7000,105 @@ pub fn incode_ine_not_found_in_db() -> serde_json::Value {
         "errorDescription": "userNotFoundInIneDb"
     })
 }
+
+pub fn samba_license_validation_pass() -> serde_json::Value {
+    serde_json::json!({
+      "Record": {
+        "DlRecord": {
+          "Criteria": {
+            "OrderDate": {
+              "Year": 2023,
+              "Month": 7,
+              "Day": 10,
+              "Full": "2023-07-10",
+              "Ticks": 1688947
+            },
+            "OrderTime": {
+              "Hour": "18",
+              "Minute": "22",
+              "Second": "0"
+            },
+            "AccountID": "K1619",
+            "UserID": "K161937",
+            "Routing": "LILO",
+            "Reference": "LICENSE VALIDATION",
+            "TrackingNumber": "000000",
+            "BillCode": "EXAMPLE",
+            "Host": "OL",
+            "ProductID": "LV",
+            "State": {
+              "Abbrev": "TX",
+              "Full": "TEXAS"
+            },
+            "Subtype": "ST",
+            "SubtypeFull": "LICENSE VALIDATION",
+            "FirstName": "ANTONINA",
+            "LastName": "STIEDEMANN",
+            "BirthDate": {
+              "Year": 1980,
+              "Month": 1,
+              "Day": 1,
+              "Full": "1980-01-01",
+              "Ticks": 315532
+            },
+            "LicenseNumber": "88894412",
+            "Gender": "M",
+            "Source": "13"
+          },
+          "Result": {
+            "Control": "07IEEF",
+            "Valid": "Y",
+            "ReturnedDate": {
+              "Year": 2023,
+              "Month": 7,
+              "Day": 10,
+              "Full": "2023-07-10",
+              "Ticks": 168894
+            },
+            "ReturnedTime": {
+              "Hour": "18",
+              "Minute": "22",
+              "Second": "0"
+            },
+            "ResultCode": "RB"
+          },
+          "LicenseValidation": {
+            "DocumentValidationResult": "PASS",
+            "DriverLicenseNumberMatch": "TRUE",
+            "BirthDateMatch": "TRUE",
+            "LastNameExactMatch": "TRUE",
+            "LastNameFuzzyPrimMatch": "FALSE",
+            "LastNameFuzzyAltMatch": "FALSE",
+            "FirstNameExactMatch": "TRUE",
+            "FirstNameFuzzyPrimMatch": "FALSE",
+            "FirstNameFuzzyAltMatch": "FALSE",
+            "MiddleNameExactMatch": "FALSE",
+            "MiddleNameFuzzyPrimMatch": "FALSE",
+            "MiddleNameFuzzyAltMatch": "FALSE",
+            "MiddleNameInitialMatch": "FALSE",
+            "NameSufixMatch": "FALSE",
+            "DocumentCategoryMatch": "FALSE",
+            "IssueDateMatch": "FALSE",
+            "ExpiryDateMatch": "FALSE",
+            "SexMatch": "FALSE",
+            "HeightMatch": "FALSE",
+            "WeightMatch": "FALSE",
+            "EyeColorMatch": "FALSE",
+            "Address1Match": "FALSE",
+            "Address2Match": "FALSE",
+            "AddressCityMatch": "FALSE",
+            "AddressStateMatch": "TRUE",
+            "AddressZip5Match": "FALSE",
+            "AddressZip4Match": "FALSE"
+          },
+          "Driver": {
+            "FirstName": "ANTONINA",
+            "LastName": "STIEDEMANN"
+          },
+          "CurrentLicense": {
+            "Number": "88894412"
+          }
+        }
+      }
+    })
+}

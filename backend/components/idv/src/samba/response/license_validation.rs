@@ -83,6 +83,10 @@ impl GetLVOrderResponse {
     pub fn valid(&self) -> bool {
         matches!(&self.record.dl_record.result.valid, &SambaValid::Yes)
     }
+
+    pub fn license_validation(&self) -> Option<LicenseValidation> {
+        self.record.dl_record.license_validation.clone()
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -128,21 +132,27 @@ pub struct Result {
     pub designation: Option<serde_json::Value>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone, Copy)]
 pub enum SambaBoolean {
     #[serde(rename = "TRUE")]
     True,
     #[serde(rename = "FALSE")]
     False,
 }
-#[derive(Serialize, Deserialize)]
+
+impl SambaBoolean {
+    pub fn as_bool(&self) -> bool {
+        matches!(self, Self::True)
+    }
+}
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "PascalCase")]
 pub struct LicenseValidation {
     // Overall composite status of the validation
     // Based on the constituent bools here + the configuration in the samba dashboard for which fields to
     // include in the calculation
     pub document_validation_result: String,
-    pub driver_license_number_match: Option<SambaBoolean>,
+    pub driver_license_number_match: SambaBoolean,
     pub birth_date_match: Option<SambaBoolean>,
     pub last_name_exact_match: Option<SambaBoolean>,
     pub last_name_fuzzy_prim_match: Option<SambaBoolean>,
@@ -168,4 +178,29 @@ pub struct LicenseValidation {
     pub address_state_match: Option<SambaBoolean>,
     pub address_zip5_match: Option<SambaBoolean>,
     pub address_zip4_match: Option<SambaBoolean>,
+}
+
+impl LicenseValidation {
+    pub fn overall_pass(&self) -> bool {
+        matches!(self.document_validation_result.as_str(), "PASS")
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::GetLVOrderResponse;
+    use crate::test_fixtures;
+
+    #[test]
+    fn test_deserializes() {
+        let parsed =
+            serde_json::from_value::<GetLVOrderResponse>(test_fixtures::samba_license_validation_pass())
+                .unwrap();
+        let lv = parsed.license_validation().clone().unwrap();
+        assert!(lv.overall_pass());
+        assert!(lv.driver_license_number_match.as_bool());
+        assert!(lv.last_name_exact_match.unwrap().as_bool());
+        assert!(!lv.name_sufix_match.unwrap().as_bool());
+    }
 }
