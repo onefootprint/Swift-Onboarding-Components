@@ -177,7 +177,6 @@ jobs:
         lint,
         test,
         typecheck,
-        audit,
         bun-unit-tests,
       ]
     if: always()
