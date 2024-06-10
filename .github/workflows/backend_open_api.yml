@@ -1,12 +1,17 @@
 name: Backend Open API
 
 on:
-  pull_request:
-    paths:
-      - 'backend/**'
-
-env:
-  CARGO_TERM_COLOR: always
+  workflow_call:
+    inputs:
+      pull_request_number:
+        type: string
+        required: true
+      pull_request_head_sha:
+        type: string
+        required: true
+      pull_request_base_sha:
+        type: string
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}-ci-open-api
@@ -18,19 +23,6 @@ jobs:
     environment: backend_ci
     outputs:
       commit: '${{ steps.commit.outputs.commit }}'
-    services:
-      postgres:
-        image: postgres:14.3
-        env:
-          POSTGRES_USER: 'runner'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     steps:
       - uses: actions/checkout@v4
         # Default behavior of actions/checkout is horribly to check out a merge commit of the PR
@@ -38,22 +30,25 @@ jobs:
         # This checks out the _actual_ commit in the PR
         # https://github.com/actions/checkout/issues/504
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ inputs.pull_request_head_sha }}
 
       - uses: ./.github/actions/backend_run_local
-        id: backend_run_local
         with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          commit_hash: ${{ inputs.pull_request_head_sha }}
+          image_tag: ${{ inputs.pull_request_head_sha }}
+          run_api_only: true
           aws_region: ${{ secrets.AWS_REGION }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          img_cache_aws_access_key_id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+          img_cache_aws_secret_access_key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
       - name: Fetch open API schema
         working-directory: ./backend
         run: |
-          set -x
+          set -euxo pipefail
           git log HEAD -n 1
-          curl http://localhost:8000/docs-spec-v3 | jq > ../head_open_api.json
-          kill ${{ steps.backend_run_local.outputs.server_pid }}
+          curl --fail http://172.17.0.1:8000/docs-spec-v3 | jq > ../head_open_api.json
 
       - uses: actions/upload-artifact@v3
         with:
@@ -64,26 +59,13 @@ jobs:
         run: |
           set -x
           echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-  
+
 
   compute_open_api_base:
     runs-on: 16core
     environment: backend_ci
     outputs:
       commit: '${{ steps.commit.outputs.commit }}'
-    services:
-      postgres:
-        image: postgres:14.3
-        env:
-          POSTGRES_USER: 'runner'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     steps:
       - uses: actions/checkout@v4
         # Default behavior of actions/checkout is horribly to check out a merge commit of the PR
@@ -91,7 +73,7 @@ jobs:
         # This checks out the _actual_ commit in the PR
         # https://github.com/actions/checkout/issues/504
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ inputs.pull_request_head_sha }}
           fetch-depth: 0
 
       # Don't compare the current open API against current master, compare it against the base of this PR.
@@ -106,7 +88,7 @@ jobs:
         run: |
           set -x
           git log HEAD -n 1
-          MERGE_BASE=$(git merge-base ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.base.sha }})
+          MERGE_BASE=$(git merge-base ${{ inputs.pull_request_head_sha }} ${{ inputs.pull_request_base_sha }})
           echo "Note: GHA is dumb - this merge base may be incorrect"
           echo "Merge base $MERGE_BASE"
           git log $MERGE_BASE -n 1
@@ -117,19 +99,22 @@ jobs:
           ref: ${{ steps.get_merge_base.outputs.merge_base }}
 
       - uses: ./.github/actions/backend_run_local
-        id: backend_run_local
         with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          commit_hash: ${{ steps.get_merge_base.outputs.merge_base }}
+          image_tag: ${{ steps.get_merge_base.outputs.merge_base }}
+          run_api_only: true
           aws_region: ${{ secrets.AWS_REGION }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          img_cache_aws_access_key_id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+          img_cache_aws_secret_access_key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
       - name: Fetch open API schema
         working-directory: ./backend
         run: |
-          set -x
+          set -euxo pipefail
           git log HEAD -n 1
-          curl http://localhost:8000/docs-spec-v3 | jq > ../base_open_api.json
-          kill ${{ steps.backend_run_local.outputs.server_pid }}
+          curl --fail http://172.17.0.1:8000/docs-spec-v3 | jq > ../base_open_api.json
 
       - uses: actions/upload-artifact@v3
         with:
@@ -187,7 +172,7 @@ jobs:
         id: fc
         if: ${{ success() || failure() }}
         with:
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ inputs.pull_request_number }}
           comment-author: 'github-actions[bot]'
           body-includes: "Open API Backcompat Report"
 
@@ -196,7 +181,7 @@ jobs:
         if: ${{ steps.compare_openapi.outcome == 'failure' && (success() || failure()) }}
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ inputs.pull_request_number }}
           body-path: incompat.txt
           edit-mode: replace
 
@@ -205,6 +190,6 @@ jobs:
         if: ${{ steps.compare_openapi.outcome == 'success' && (success() || failure()) }}
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ inputs.pull_request_number }}
           body: "### Open API Backcompat Report\nNo Open API backwards incompatibilities detected 👍"
           edit-mode: replace

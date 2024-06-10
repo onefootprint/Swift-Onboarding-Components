@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: dorny/paths-filter@affb29871ab1f927ecad0ee68c0989584101408f
         id: changes
         with:
@@ -41,27 +43,32 @@ jobs:
             dockerfile: api
             args:
               BUILD_PROFILE: release
-              GIT_HASH: ${{ github.sha }}
+              GIT_HASH: ${{ github.event.pull_request.head.sha || github.sha }}
           - name: enclave-proxy
             dockerfile: enclave-proxy
             args:
               BUILD_PROFILE: release
               CARGO_FEATURES: "vsock"
-              GIT_HASH: ${{ github.sha }}
+              GIT_HASH: ${{ github.event.pull_request.head.sha || github.sha }}
           - name: enclave-proxy-dev
             dockerfile: enclave-proxy
             args:
               BUILD_PROFILE: debug
               CARGO_FEATURES: ""
-              GIT_HASH: ${{ github.sha }}
+              GIT_HASH: ${{ github.event.pull_request.head.sha || github.sha }}
           - name: enclave
             dockerfile: enclave
             args: {}
           - name: enclave-dev
             dockerfile: enclave-dev
             args: {}
+          - name: integration-tests
+            dockerfile: integration-tests
+            args: {}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: docker/setup-buildx-action@v3
 
       - name: Configure AWS Credentials (Image Cache)
@@ -82,7 +89,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
           REPO: ${{ matrix.name }}
-          TAG: ${{ github.sha }}
+          TAG: ${{ github.event.pull_request.head.sha || github.sha }}
         working-directory: ./backend
         run: |
           set -euxo pipefail
@@ -109,7 +116,7 @@ jobs:
     environment: backend_ci
     services:
       postgres:
-        image: postgres
+        image: postgres:16.3@sha256:1bf73ccae25238fa555100080042f0b2f9be08eb757e200fe6afc1fc413a1b3c
         env:
           POSTGRES_PASSWORD: postgres
         options: >-
@@ -127,6 +134,8 @@ jobs:
           sudo apt-get install -y libssl-dev libpq-dev
 
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: rust-toolchain
         uses: dtolnay/rust-toolchain@1.77.0
@@ -176,6 +185,8 @@ jobs:
     runs-on: 16core
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: rust-toolchain
         uses: dtolnay/rust-toolchain@1.77.0
@@ -204,47 +215,32 @@ jobs:
         run: cargo clippy -p enclave_proxy -p api_core --features vsock
 
   integration_tests:
-    needs: [files-changed]
-    if: needs.files-changed.outputs.filesChanged == 'true'
+    needs: [build_images]
     runs-on: 16core
     environment: backend_ci
-    services:
-      postgres:
-        image: postgres:14.3
-        env:
-          POSTGRES_USER: 'runner'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - uses: ./.github/actions/backend_run_local
-        id: backend_run_local
         with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          commit_hash: ${{ github.event.pull_request.head.sha || github.sha }}
+          image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
           aws_region: ${{ secrets.AWS_REGION }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Setup Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.11"
+          img_cache_aws_access_key_id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+          img_cache_aws_secret_access_key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
       - name: Run local integration tests
         working-directory: ./backend/ci
         run: |
           set -euxo pipefail
-          pip install -r requirements.txt
-          pytest -n 6 tests/ 2>&1 | tee integration_test_output.txt
-          kill ${{ steps.backend_run_local.outputs.server_pid }}
+          docker compose run integration_tests \
+            pytest -n 6 ci/tests/ 2>&1 | tee integration_test_output.txt
         env:
-          EXPECTED_SERVER_VERSION: ${{ github.sha }}
+          EXPECTED_SERVER_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
           TEST_URL: 'http://localhost:8000'
           IT_SVIX_API_KEY: ${{ secrets.IT_SVIX_API_KEY }}
           ENVIRONMENT: ci
@@ -296,7 +292,18 @@ jobs:
 
       - name: Check valid db migrations
         working-directory: ./backend/ci/scripts
-        run: ./check_db_migrations.sh
+        run: |
+          docker compose run integration_tests ./ci/scripts/check_db_migrations.sh
+
+  openapi_check:
+    needs: [build_images]
+    if: ${{ github.event_name == 'pull_request' }}
+    uses: ./.github/workflows/backend_open_api.yml
+    secrets: inherit
+    with:
+      pull_request_number: ${{ github.event.pull_request.number }}
+      pull_request_head_sha: ${{ github.event.pull_request.head.sha }}
+      pull_request_base_sha: ${{ github.event.pull_request.base.sha }}
 
   rustfmt:
     needs: [files-changed]
@@ -305,6 +312,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: rust-toolchain
         uses: dtolnay/rust-toolchain@nightly

@@ -2,10 +2,7 @@
 
 set -euxo pipefail
 
-cd ../../components/db/schema
-
-DIESEL_VERSION="2.0.0"
-cargo install diesel_cli --version $DIESEL_VERSION --locked --no-default-features --features postgres
+cd components/db/schema
 
 NUM_FILES=`ls migrations | wc -l`
 NUM_TO_REVERT=$(( $NUM_FILES < 1 ? $NUM_FILES : 1 ))

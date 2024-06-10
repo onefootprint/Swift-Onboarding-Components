@@ -1,95 +1,79 @@
-name: 'Run local server'
+name: Run backend locally
+
 inputs:
-  aws_access_key_id:
+  commit_hash:
     required: true
+  image_tag:
+    required: true
+
+  run_api_only:
+    required: false
+    default: false
+
   aws_region:
+    required: true
+
+  aws_access_key_id:
     required: true
   aws_secret_access_key:
     required: true
-outputs:
-  server_pid:
-    description: 'This composite action will leave the server running under this PID. Use this PID to kill the server when you are done talking to it'
-    value: ${{ steps.run_server.outputs.server_pid }}
-runs:
-  using: 'composite'
-  steps:
-    - name: Install libpq + libssl
-      shell: bash
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libssl-dev libpq-dev
+  img_cache_aws_access_key_id:
+    required: true
+  img_cache_aws_secret_access_key:
+    required: true
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@43c891271eabca0b34d95f2453e2fe354928b16d #4.0.1
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.commit_hash }}
+
+    - name: Configure AWS Credentials (Dev)
+      uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
       with:
         aws-access-key-id: ${{ inputs.aws_access_key_id }}
         aws-region: ${{ inputs.aws_region }}
         aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
-
-    - name: Create footprint db
-      shell: bash
-      run: |
-        psql -h localhost -c 'create database footprint_db;'
 
     - name: Set dot env
       working-directory: ./backend
       shell: bash
       run: make set-dot-env
 
-    - name: Unset AWS Credentials
-      uses: aws-actions/configure-aws-credentials@43c891271eabca0b34d95f2453e2fe354928b16d #4.0.1
+    - name: Configure AWS Credentials (Image Cache)
+      uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
       with:
-        unset-current-credentials: true
-        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-access-key-id: ${{ inputs.img_cache_aws_access_key_id }}
         aws-region: ${{ inputs.aws_region }}
-        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+        aws-secret-access-key: ${{ inputs.img_cache_aws_secret_access_key }}
 
-    - name: rust-toolchain
-      uses: dtolnay/rust-toolchain@1.77.0
+    - name: Login to Amazon ECR (Image Cache)
+      id: login-ecr-image-cache
+      uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84
-      with:
-        save-if: ${{ github.ref == 'refs/heads/master' }}
-        shared-key: backend-build
-        cache-all-crates: true
-        workspaces: |
-          backend
-
-    - uses: rui314/setup-mold@7f56dbde35ee02a3fe0287e7ddd310922eb5f553
-      with:
-        mold-version: 2.0.0
-        make-default: false
-
-    - name: Run server
-      id: run_server
-      working-directory: ./backend
+    - name: Set overrides for images that may have already been built
       shell: bash
+      env:
+        REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+        TAG: ${{ inputs.image_tag }}
       run: |
-        cargo build -p enclave
-        cargo build -p enclave_proxy
-        cargo build -p api_server
+        set -euxo pipefail
 
-        # Export AWS credentials from the .env - we shouldn't use the AWS credentials available in CI to run the server
-        export $(grep ^AWS_REGION= .env)
-        export $(grep ^AWS_ACCESS_KEY_ID= .env)
-        export $(grep ^AWS_SECRET_ACCESS_KEY= .env)
+        echo "CI_IMAGE_API=${REGISTRY}/api:${TAG}" >> "$GITHUB_ENV"
+        echo "CI_IMAGE_ENCLAVE_PROXY=${REGISTRY}/enclave-proxy-dev:${TAG}" >> "$GITHUB_ENV"
+        echo "CI_IMAGE_ENCLAVE=${REGISTRY}/enclave-dev:${TAG}" >> "$GITHUB_ENV"
+        echo "CI_IMAGE_INTEGRATION_TESTS=${REGISTRY}/integration-tests:${TAG}" >> "$GITHUB_ENV"
 
-        make run-local &> server_output.txt &
-        server_pid=$!
-        echo "server_pid=$server_pid" >> "$GITHUB_OUTPUT"
+    # These will build any images that are missing.
+    - name: Run API in background
+      if: ${{ inputs.api_only }}
+      shell: bash
+      working-directory: ./backend
+      run: docker compose up -d --wait --no-deps postgres api
 
-        attempt_counter=0
-        max_attempts=6
-
-        until $(curl --output /dev/null --silent --fail http://localhost:8000); do
-            if [ ${attempt_counter} -eq ${max_attempts} ];then
-              echo "Max attempts reached"
-              cat server_output.txt
-              exit 1
-            fi
-
-            printf '.'
-            attempt_counter=$(($attempt_counter+1))
-            sleep 10
-        done
+    - name: Run backend stack in background
+      if: ${{ ! inputs.api_only }}
+      shell: bash
+      working-directory: ./backend
+      run: docker compose up -d --wait
