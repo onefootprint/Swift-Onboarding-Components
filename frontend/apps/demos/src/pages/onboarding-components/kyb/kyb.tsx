@@ -13,8 +13,12 @@ const steps = [
     value: 'identify',
   },
   {
-    label: 'Personal information',
-    value: 'basic-data',
+    label: 'Business information',
+    value: 'business-data',
+  },
+  {
+    label: "BO's information",
+    value: 'bo-data',
   },
   {
     label: 'Confirmation',
@@ -31,7 +35,7 @@ const Demo = () => {
   const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
 
   const isIdentify = option.value === 'identify';
-  const isBasicData = option.value === 'basic-data';
+  const isBusinessData = option.value === 'business-data';
   const isSuccess = option.value === 'confirmation';
 
   return (
@@ -55,8 +59,8 @@ const Demo = () => {
                   }}
                 />
               )}
-              {isBasicData && (
-                <BasicData
+              {isBusinessData && (
+                <BusinessData
                   onDone={() => {
                     setOption(steps[2]);
                   }}
@@ -106,7 +110,7 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
   );
 };
 
-const BasicData = ({ onDone }: { onDone: () => void }) => {
+const BusinessData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
   const handleSubmit = () => {
@@ -129,60 +133,49 @@ const BasicData = ({ onDone }: { onDone: () => void }) => {
       </Box>
       <Fp.Form onSubmit={handleSubmit}>
         <Stack gap={4} direction="column">
-          <Fp.Field name="id.first_name">
-            <Fp.Label>First name</Fp.Label>
+          <Fp.Field name="business.name">
+            <Fp.Label>Business name</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
-          <Fp.Field name="id.middle_name">
-            <Fp.Label>Middle name</Fp.Label>
+          <Fp.Field name="business.dba">
+            <Fp.Label>Doing Business As (optional)</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
-          <Fp.Field name="id.last_name">
-            <Fp.Label>Last name</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Fp.Field name="id.dob">
-            <Fp.Label>DOB</Fp.Label>
+          <Fp.Field name="business.tin">
+            <Fp.Label>Taxpayer Identification Number (TIN)</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
-          <Fp.Field name="id.country">
+          <Fp.Field name="business.country">
             <Fp.Label>Country</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
-          <Fp.Field name="id.address_line1">
+          <Fp.Field name="business.address_line1">
             <Fp.Label>Address line 1</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
-          <Fp.Field name="id.address_line2">
+          <Fp.Field name="business.address_line2">
             <Fp.Label>Address line 2 (optional)</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
-          <Fp.Field name="id.city">
+          <Fp.Field name="business.city">
             <Fp.Label>City</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
-          <Fp.Field name="id.state">
+          <Fp.Field name="business.state">
             <Fp.Label>State</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>
-          <Fp.Field name="id.zip">
+          <Fp.Field name="business.zip">
             <Fp.Label>Zip</Fp.Label>
-            <Fp.Input />
-            <Fp.FieldErrors />
-          </Fp.Field>
-          <Divider marginBlock={3} />
-          <Fp.Field name="id.ssn9">
-            <Fp.Label>SSN</Fp.Label>
             <Fp.Input />
             <Fp.FieldErrors />
           </Fp.Field>

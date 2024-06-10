@@ -31,6 +31,12 @@ export type Di = Partial<
     'business.state': string;
     'business.country': string;
     'business.zip': string;
+    [key: `business.beneficial_owners[${number}].first_name`]: string;
+    [key: `business.beneficial_owners[${number}].middle_name`]: string;
+    [key: `business.beneficial_owners[${number}].last_name`]: string;
+    [key: `business.beneficial_owners[${number}].email`]: string;
+    [key: `business.beneficial_owners[${number}].phone_number`]: string;
+    [key: `business.beneficial_owners[${number}].ownership_stake`]: number;
   } & {
     [key: `custom.${string}`]: string;
   }

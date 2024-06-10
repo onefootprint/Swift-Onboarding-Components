@@ -247,6 +247,7 @@ const common: Record<string, Field> = {
 const business: Record<string, Field> = {
   name: {
     placeholder: 'Acme Bank Inc.',
+    className: 'fp-business-name-input',
     validations: {
       required: 'Business name cannot be empty or is invalid',
     },
@@ -256,6 +257,7 @@ const business: Record<string, Field> = {
   },
   tin: {
     placeholder: '12-3456789',
+    className: 'fp-business-tin-input',
     mask: {
       numericOnly: true,
       delimiters: ['-'],
@@ -272,6 +274,7 @@ const business: Record<string, Field> = {
   website: {
     type: 'url',
     placeholder: 'https://www.acme.com',
+    className: 'fp-business-website-input',
     mask: {
       numericOnly: true,
       delimiters: ['-'],
@@ -283,7 +286,7 @@ const business: Record<string, Field> = {
   },
   phoneNumber: {
     autoComplete: 'tel',
-    className: 'fp-phone-input',
+    className: 'fp-business-phone-input',
     placeholder: 'Phone',
     type: 'tel',
     validations: {
