@@ -1,11 +1,14 @@
 use super::common::call_start_onboarding;
-use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::vendor::verification_result::{
     self,
     SaveVerificationResultArgs,
     ShouldSaveVerificationRequest,
+};
+use crate::decision::vendor::{
+    map_to_api_error,
+    AdditionalIdentityDocumentVerificationHelper,
 };
 use crate::decision::{
     self,
@@ -30,7 +33,6 @@ use db::models::document::{
     Document,
     DocumentUpdate,
 };
-use db::models::document_request::DocumentRequest;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::{
@@ -48,7 +50,6 @@ use idv::{
     ParsedResponse,
     VendorResponse,
 };
-use itertools::Itertools;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     BillingEventKind,
@@ -61,7 +62,6 @@ use newtypes::{
     DocumentFixtureResult,
     DocumentId,
     DocumentKind,
-    DocumentRequestKind,
     FootprintReasonCode,
     IdDocKind,
     IncodeConfigurationId,
@@ -117,7 +117,7 @@ pub async fn run_curp_validation_check(
     }
 
     // Handle both sandbox and prod
-    let id_doc_helper = DocumentForCurpHelper::new(id_documents);
+    let id_doc_helper = AdditionalIdentityDocumentVerificationHelper::new(id_documents);
     let id_doc_fixture = id_doc_helper.fixture();
     let should_sent_curp_request = id_doc_helper.get_incode_environment(state, &tenant_id, sv.is_live);
 
@@ -244,7 +244,7 @@ pub async fn run_curp_validation_check(
             }
         }
         None => {
-            let doc = id_doc_helper.identity_document_for_sandbox();
+            let doc = id_doc_helper.identity_document();
             if let Some(doc) = doc {
                 let doc_kind = doc
                     .vaulted_document_type
@@ -276,35 +276,7 @@ pub async fn run_curp_validation_check(
 }
 
 type ShouldSendCurpRequest = Option<IncodeEnvironment>;
-/// We want to be able to handle the case where documents are provided in sandbox
-pub struct DocumentForCurpHelper {
-    pub sent_to_vendor: Option<Document>,
-    pub other: Option<Document>,
-}
-impl DocumentForCurpHelper {
-    pub fn new(id_documents: Vec<(Document, DocumentRequest, Option<IncodeVerificationSession>)>) -> Self {
-        let (sent_to_vendor, other): (Vec<_>, Vec<_>) = id_documents
-            .into_iter()
-            // only take identity docs
-            .filter(|(_, dr, _)| matches!(dr.kind, DocumentRequestKind::Identity))
-            // sort desc
-            .sorted_by(|(i1, _, _), (i2, _, _)| i2.completed_seqno.cmp(&i1.completed_seqno))
-            // partition by whether we sent to a vendor or not
-            .partition(|(_, _, ivs)| ivs.is_some());
-
-        Self {
-            sent_to_vendor: sent_to_vendor.first().map(|(i, _, _)| i).cloned(),
-            other: other.first().map(|(i, _, _)| i).cloned(),
-        }
-    }
-
-    pub fn fixture(&self) -> Option<DocumentFixtureResult> {
-        self.sent_to_vendor
-            .as_ref()
-            .and_then(|i| i.fixture_result)
-            .or(self.other.as_ref().and_then(|i| i.fixture_result))
-    }
-
+impl AdditionalIdentityDocumentVerificationHelper {
     // TODO: we need to incorporate UseIncodeDemoCredentialsInLivemode
     //    -- if we flip the flag to use Incode demo creds in prod? I'm not sure validations will work
     // there...? Does this actually do anything w/ Renapo in demo?
@@ -334,10 +306,6 @@ impl DocumentForCurpHelper {
         } else {
             Some(IncodeEnvironment::Production)
         }
-    }
-
-    pub fn identity_document_for_sandbox(&self) -> Option<Document> {
-        self.sent_to_vendor.as_ref().or(self.other.as_ref()).cloned() //rm cloned
     }
 }
 

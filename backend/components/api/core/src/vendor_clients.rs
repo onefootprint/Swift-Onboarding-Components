@@ -65,6 +65,15 @@ use idv::middesk::{
 };
 use idv::neuro_id::response::NeuroApiResponse;
 use idv::neuro_id::NeuroIdAnalyticsRequest;
+use idv::samba::request::{
+    SambaCreateLVOrderRequest,
+    SambaGetLVReportRequest,
+};
+use idv::samba::response::license_validation::{
+    CreateLVOrderResponse,
+    GetLVOrderResponse,
+};
+use idv::samba::SambaAPIResponse;
 use idv::socure::client::SocureClient;
 use idv::socure::{
     SocureIDPlusAPIResponse,
@@ -250,6 +259,43 @@ impl IncodeClients {
         }
     }
 }
+
+#[derive(Clone)]
+pub struct SambaClients {
+    pub samba_create_license_validation_order: VendorClient<
+        SambaCreateLVOrderRequest,
+        SambaAPIResponse<CreateLVOrderResponse>,
+        idv::samba::error::Error,
+    >,
+    pub samba_get_license_validation_report:
+        VendorClient<SambaGetLVReportRequest, SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error>,
+}
+
+impl SambaClients {
+    #[cfg(test)]
+    pub fn new_with_mocks() -> Self {
+        use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+        Self {
+            samba_create_license_validation_order: Arc::new(MockVendorAPICall::<
+                SambaCreateLVOrderRequest,
+                SambaAPIResponse<CreateLVOrderResponse>,
+                idv::samba::error::Error,
+            >::new()),
+            samba_get_license_validation_report: Arc::new(MockVendorAPICall::<
+                SambaGetLVReportRequest,
+                SambaAPIResponse<GetLVOrderResponse>,
+                idv::samba::error::Error,
+            >::new()),
+        }
+    }
+
+    pub fn new(footprint_client: Arc<FootprintVendorHttpClient>) -> Self {
+        Self {
+            samba_create_license_validation_order: footprint_client.clone(),
+            samba_get_license_validation_report: footprint_client.clone(),
+        }
+    }
+}
 #[derive(Clone)]
 pub struct VendorClients {
     pub socure_id_plus: VendorClient<SocureIDPlusRequest, SocureIDPlusAPIResponse, idv::socure::Error>,
@@ -267,6 +313,7 @@ pub struct VendorClients {
     pub stytch_lookup: VendorClient<StytchLookupRequest, StytchLookupResponse, idv::stytch::error::Error>,
     pub neuro_id: VendorClient<NeuroIdAnalyticsRequest, NeuroApiResponse, idv::neuro_id::error::Error>,
     pub incode: IncodeClients,
+    pub samba: SambaClients,
 }
 
 impl VendorClients {
@@ -291,7 +338,8 @@ impl VendorClients {
             idology_pa: footprint_client.clone(),
             stytch_lookup: Arc::new(stytch_client),
             neuro_id: footprint_client.clone(),
-            incode: IncodeClients::new(footprint_client),
+            incode: IncodeClients::new(footprint_client.clone()),
+            samba: SambaClients::new(footprint_client),
         }
     }
 
@@ -351,6 +399,7 @@ impl VendorClients {
                 idv::neuro_id::error::Error,
             >::new()),
             incode: IncodeClients::new_with_mocks(),
+            samba: SambaClients::new_with_mocks(),
         }
     }
 }

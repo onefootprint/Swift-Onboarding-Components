@@ -4,8 +4,14 @@ use crate::errors::{
     ApiResult,
 };
 use crate::ApiError;
+use db::models::document::Document;
+use db::models::document_request::DocumentRequest;
+use db::models::incode_verification_session::IncodeVerificationSession;
+use itertools::Itertools;
 use newtypes::{
     DecisionIntentId,
+    DocumentFixtureResult,
+    DocumentRequestKind,
     IdentityDataKind,
     ScopedVaultId,
     VendorAPI,
@@ -19,6 +25,7 @@ pub mod kyc;
 pub mod make_request;
 pub mod middesk;
 pub mod neuro_id;
+pub mod samba;
 pub mod tenant_vendor_control;
 pub mod vendor_api;
 pub mod vendor_result;
@@ -58,4 +65,41 @@ impl Display for VendorAPIError {
 
 pub fn map_to_api_error<E: Into<idv::Error>>(e: E) -> ApiError {
     ApiError::from(e.into())
+}
+
+
+// Struct to help with additional verification related to Documents
+// does some common things useful for also working in sandbox where we might not have sent to a
+// vendor
+pub struct AdditionalIdentityDocumentVerificationHelper {
+    pub sent_to_vendor: Option<Document>,
+    pub other: Option<Document>,
+}
+impl AdditionalIdentityDocumentVerificationHelper {
+    pub fn new(id_documents: Vec<(Document, DocumentRequest, Option<IncodeVerificationSession>)>) -> Self {
+        let (sent_to_vendor, other): (Vec<_>, Vec<_>) = id_documents
+            .into_iter()
+            // only take identity docs
+            .filter(|(_, dr, _)| matches!(dr.kind, DocumentRequestKind::Identity))
+            // sort desc
+            .sorted_by(|(i1, _, _), (i2, _, _)| i2.completed_seqno.cmp(&i1.completed_seqno))
+            // partition by whether we sent to a vendor or not
+            .partition(|(_, _, ivs)| ivs.is_some());
+
+        Self {
+            sent_to_vendor: sent_to_vendor.first().map(|(i, _, _)| i).cloned(),
+            other: other.first().map(|(i, _, _)| i).cloned(),
+        }
+    }
+
+    pub fn fixture(&self) -> Option<DocumentFixtureResult> {
+        self.sent_to_vendor
+            .as_ref()
+            .and_then(|i| i.fixture_result)
+            .or(self.other.as_ref().and_then(|i| i.fixture_result))
+    }
+
+    pub fn identity_document(&self) -> Option<Document> {
+        self.sent_to_vendor.as_ref().or(self.other.as_ref()).cloned() //rm cloned
+    }
 }
