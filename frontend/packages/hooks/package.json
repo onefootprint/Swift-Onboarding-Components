@@ -12,7 +12,6 @@
     "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
@@ -25,8 +24,5 @@
   },
   "dependencies": {
     "next-usequerystate": "^1.7.2"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }

@@ -65,7 +65,6 @@
     "@mdx-js/react": "^3.0.1",
     "@next/bundle-analyzer": "^12.3.4",
     "@next/mdx": "^14.1.4",
-    "@onefootprint/jest-presets": "*",
     "@types/lodash": "^4.14.194",
     "@types/node": "^20",
     "@types/react-dom": "^18",
@@ -76,8 +75,5 @@
     "next-compose-plugins": "^2.2.1",
     "tsconfig": "*",
     "typescript": "^5"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }

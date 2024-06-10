@@ -12,12 +12,8 @@
     "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/types": "*",
     "tsconfig": "*",
     "typescript": "^5"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }
