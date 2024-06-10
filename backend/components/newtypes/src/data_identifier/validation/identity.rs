@@ -207,7 +207,7 @@ fn clean_and_validate_ssn4(input: PiiString) -> VResult<PiiString> {
     let old_result = old_clean_and_validate_ssn4(input);
 
     if new_result.is_ok() != old_result.is_ok() {
-        tracing::error!(
+        tracing::warn!(
             ?new_result,
             ?old_result,
             "Mismatching results for new and old SSN4 validation",
@@ -239,7 +239,7 @@ fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
     let old_result = old_clean_and_validate_ssn9(input);
 
     if new_result.is_ok() != old_result.is_ok() {
-        tracing::error!(
+        tracing::warn!(
             ?new_result,
             ?old_result,
             "Mismatching results for new and old SSN9 validation",
