@@ -433,10 +433,9 @@ async function userData(
   }
 
   // TODO: if enclave unhealthy after restart fail health check on ASG.
-  // TODO one day we should `set -e` to crash if any of these commands fails
   return `
 #!/bin/bash
-set -x
+set -euxo pipefail
 
 sudo yum update -y
 sudo amazon-linux-extras install -y aws-nitro-enclaves-cli
@@ -534,16 +533,14 @@ sudo tailscale status
 
 # setup enclave
 
-sudo usermod -aG ne $USER
-
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ecrEndpoint}
 
 mkdir -p eif
 mkdir -p proxy
 docker run --rm -v $(pwd)/eif:/shared ${enclaveImage}
 docker run --rm -v $(pwd)/proxy:/shared ${enclaveProxyImage}
-sudo chown $USER:$USER -R eif/
-sudo chown $USER:$USER -R proxy/
+sudo chown root:root -R eif/
+sudo chown root:root -R proxy/
 
 # Edit the allocator.yaml to support our desired amount of resources
 sudo cat <<'EOF' > /etc/nitro_enclaves/allocator.yaml
