@@ -17,7 +17,7 @@ const DEBOUNCE_INTERVAL = 10000; // 10 seconds
 const MAX_DEBOUNCE = 30000; // 30 seconds
 const IS_DEV = process.env.NODE_ENV === 'development';
 const IS_SERVER = typeof window === 'undefined';
-const IS_TEST = typeof jest !== 'undefined' || process.env.NODE_ENV === 'test';
+const IS_TEST = process.env.NODE_ENV === 'test';
 const IS_LOGGING_DISABLED = IS_SERVER || IS_DEV || IS_TEST;
 
 type ObserveCollectorProps = {

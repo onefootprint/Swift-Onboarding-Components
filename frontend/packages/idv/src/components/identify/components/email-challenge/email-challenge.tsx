@@ -10,7 +10,7 @@ import type { HeaderProps } from '../../types';
 import { getDisplayEmail } from '../../utils/get-display-contact-info';
 import PinVerification from '../pin-verification';
 
-const IS_TEST = typeof jest !== 'undefined';
+const IS_TEST = process.env.NODE_ENV === 'test';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
 type EmailChallengeProps = {

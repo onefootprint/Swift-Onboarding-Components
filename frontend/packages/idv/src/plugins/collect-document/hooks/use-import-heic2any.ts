@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Logger from '../../../utils/logger/logger';
 import type { Heic2AnyModule } from '../types';
 
-const IS_TEST = typeof jest !== 'undefined' || process.env.NODE_ENV === 'test';
+const IS_TEST = process.env.NODE_ENV === 'test';
 
 const loadHeic2AnyModule = async (retryCount = 0): Promise<Heic2AnyModule> => {
   try {

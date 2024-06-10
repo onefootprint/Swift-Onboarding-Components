@@ -1,6 +1,6 @@
 import { IS_BROWSER, IS_PROD } from '@onefootprint/global-constants';
 
-export const IS_TEST = typeof jest !== 'undefined' || process.env.NODE_ENV === 'test';
+export const IS_TEST = process.env.NODE_ENV === 'test';
 export const BASE_URL_DOMAIN = 'onefootprint.com';
 
 export const COMMIT_SHA = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || '';
