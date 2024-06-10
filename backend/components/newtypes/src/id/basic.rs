@@ -356,3 +356,18 @@ define_newtype_id!(
 define_newtype_id!(WaterfallStepId, String, "Identifier for a WaterfallStep");
 define_newtype_id!(SambaOrderId, String, "Identifier for a Samba Order");
 define_newtype_id!(SambaReportId, String, "Identifier for a Samba Report");
+define_newtype_id!(
+    SambaOrderTableId,
+    String,
+    "Identifier for a Samba Order table row"
+);
+define_newtype_id!(
+    SambaReportTableId,
+    String,
+    "Identifier for a Samba report table Session"
+);
+define_newtype_id!(
+    SambaDatalifetimeJunctionTableId,
+    String,
+    "Identifier for a Samba junction table row"
+);

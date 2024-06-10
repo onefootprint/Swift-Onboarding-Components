@@ -1053,6 +1053,50 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    samba_order (id) {
+        id -> Text,
+        decision_intent_id -> Text,
+        document_id -> Nullable<Text>,
+        kind -> Text,
+        created_at -> Timestamptz,
+        created_seqno -> Int8,
+        completed_at -> Nullable<Timestamptz>,
+        order_id -> Text,
+        verification_result_id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    samba_order_data_lifetime_junction (id) {
+        id -> Text,
+        lifetime_id -> Text,
+        order_id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    samba_report (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        order_id -> Text,
+        report_id -> Text,
+        verification_result_id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     scoped_vault (id) {
         id -> Text,
         fp_id -> Text,
@@ -1760,6 +1804,13 @@ diesel::joinable!(rule_set_result -> scoped_vault (scoped_vault_id));
 diesel::joinable!(rule_set_result -> workflow (workflow_id));
 diesel::joinable!(rule_set_result_risk_signal_junction -> risk_signal (risk_signal_id));
 diesel::joinable!(rule_set_result_risk_signal_junction -> rule_set_result (rule_set_result_id));
+diesel::joinable!(samba_order -> decision_intent (decision_intent_id));
+diesel::joinable!(samba_order -> identity_document (document_id));
+diesel::joinable!(samba_order -> verification_result (verification_result_id));
+diesel::joinable!(samba_order_data_lifetime_junction -> data_lifetime (lifetime_id));
+diesel::joinable!(samba_order_data_lifetime_junction -> samba_order (order_id));
+diesel::joinable!(samba_report -> samba_order (order_id));
+diesel::joinable!(samba_report -> verification_result (verification_result_id));
 diesel::joinable!(scoped_vault -> tenant (tenant_id));
 diesel::joinable!(scoped_vault -> vault (vault_id));
 diesel::joinable!(scoped_vault_label -> scoped_vault (scoped_vault_id));
@@ -1867,6 +1918,9 @@ diesel::allow_tables_to_appear_in_same_query!(
     rule_set,
     rule_set_result,
     rule_set_result_risk_signal_junction,
+    samba_order,
+    samba_order_data_lifetime_junction,
+    samba_report,
     scoped_vault,
     scoped_vault_label,
     scoped_vault_tag,
