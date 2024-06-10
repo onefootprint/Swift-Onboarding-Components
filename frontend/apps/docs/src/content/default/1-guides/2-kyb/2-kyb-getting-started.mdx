@@ -197,14 +197,19 @@ Footprint will give you some information from this onboarding session: an `fp_id
 
 ### Check the onboarding decision status
 
-Using the `status` and `requires_manual_review` fields to decide whether or not to onboard this business to your product.
+Using the `status` and `requires_manual_review` fields to decide whether or not to onboard this user and business to your product.
 
-| Status | Review | What does this mean?                                                                        |
-| ------ | ------ | ------------------------------------------------------------------------------------------- |
-| `pass` | False  | Verification checks succeeded and this user can be onboarded.                               |
-| `pass` | True   | Verification checks succeeded, but Footprint suggests manually reviewing identified risks.  |
-| `fail` | False  | Verification failed. Do not onboard this user.                                              |
-| `fail` | True   | Verification failed, but Footprint suggests manually checking possible acceptance criteria. |
+| Status    | What does this mean?                                                                                                                                                                                                                              |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pass`    | The rules defined on your playbook to verify the user evaluated to an outcome of `pass`.                                                                                                                                                                                     |
+| `fail`    | The rules defined on your playbook evaluated to an outcome of `fail`.
+| `none`    | Your playbook has no rules defined. |
+| `pending` | Verifying this user's identity is taking longer than expected. This happens in rare cases where asynchronous actions are required to make a decision. A final decision will be delivered via [webhooks](/integrate/webhooks) to your application. |
+
+| Review | What does this mean?                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------- |
+| False  | We have made a decision automatically that does not require any manual review.                    |
+| True   | Footprint suggests manually reviewing identified risks and manually checking acceptance criteria. |
 
 ### Optionally, decrypt identity fields from the user and business vaults:
 
