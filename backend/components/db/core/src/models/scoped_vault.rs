@@ -43,6 +43,7 @@ use newtypes::{
     DataLifetimeSeqno,
     DbActor,
     ExternalId,
+    FireWebhookArgs,
     FpId,
     IdempotencyId,
     Locked,
@@ -53,6 +54,7 @@ use newtypes::{
     VaultCreatedInfo,
     VaultId,
     VaultKind,
+    WebhookEvent,
     WorkflowId,
 };
 use std::collections::HashMap;
@@ -591,6 +593,15 @@ impl ScopedVault {
             .select(count_distinct(scoped_vault::id))
             .get_result(conn)?;
         Ok(count)
+    }
+
+    pub fn webhook_event(&self, webhook_event: WebhookEvent) -> FireWebhookArgs {
+        FireWebhookArgs {
+            scoped_vault_id: self.id.clone(),
+            tenant_id: self.tenant_id.clone(),
+            is_live: self.is_live,
+            webhook_event,
+        }
     }
 }
 

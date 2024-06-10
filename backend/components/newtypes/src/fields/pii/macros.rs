@@ -14,6 +14,11 @@ macro_rules! format_pii {
         };
     }
 
+pub use {
+    format_pii,
+    pii,
+};
+
 #[cfg(test)]
 mod tests {
     use super::super::PiiString;
@@ -30,8 +35,3 @@ mod tests {
         assert_eq!(hello_world.leak(), "message = hello,world");
     }
 }
-
-pub use {
-    format_pii,
-    pii,
-};

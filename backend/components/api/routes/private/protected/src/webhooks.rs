@@ -27,7 +27,6 @@ use db::models::task::{
 };
 use itertools::Itertools;
 use newtypes::{
-    FireWebhookArgs,
     FpId,
     OnboardingCompletedPayload,
     TaskData,
@@ -92,7 +91,7 @@ fn create_webhook_event(entity: SerializableEntity, kind: WebhookEventKind) -> A
     let event = match kind {
         WebhookEventKind::OnboardingCompleted => {
             WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
-                fp_id: sv.fp_id,
+                fp_id: sv.fp_id.clone(),
                 timestamp: Utc::now(),
                 status: sv.status,
                 requires_manual_review: !mrs.is_empty(),
@@ -101,11 +100,6 @@ fn create_webhook_event(entity: SerializableEntity, kind: WebhookEventKind) -> A
         }
         _ => return ValidationError("Unsupported event kind").into(),
     };
-    let task_data = TaskData::FireWebhook(FireWebhookArgs {
-        scoped_vault_id: sv.id,
-        tenant_id: sv.tenant_id,
-        is_live: sv.is_live,
-        webhook_event: event,
-    });
+    let task_data = sv.webhook_event(event).into();
     Ok(task_data)
 }

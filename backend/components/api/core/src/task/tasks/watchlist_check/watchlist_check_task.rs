@@ -40,11 +40,9 @@ use db::{
 use newtypes::{
     DecisionIntentKind,
     EnhancedAmlOption,
-    FireWebhookArgs,
     OnboardingStatus,
     RiskSignalGroupKind,
     ScopedVaultId,
-    TaskData,
     TaskId,
     VendorAPI,
     WatchlistCheckArgs,
@@ -251,12 +249,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     error,
                     is_live: sv.is_live,
                 });
-                let task_data = TaskData::FireWebhook(FireWebhookArgs {
-                    scoped_vault_id: sv.id.clone(),
-                    tenant_id: tenant.id.clone(),
-                    is_live: sv.is_live,
-                    webhook_event,
-                });
+                let task_data = sv.webhook_event(webhook_event).into();
                 Task::create(conn, Utc::now(), task_data)?;
 
                 Ok(())

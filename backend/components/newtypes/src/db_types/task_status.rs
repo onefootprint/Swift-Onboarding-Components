@@ -61,7 +61,9 @@ pub enum TaskStatus {
 }
 
 crate::util::impl_enum_str_diesel!(TaskStatus);
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants)]
+#[derive(
+    Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants, derive_more::From,
+)]
 #[strum_discriminants(
     name(TaskKind),
     vis(pub),

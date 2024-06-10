@@ -10,7 +10,6 @@ use super::scoped_vault::{
     ScopedVaultUpdate,
 };
 use super::task::Task;
-use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
 use super::workflow_event::WorkflowEvent;
 use super::workflow_request::WorkflowRequest;
@@ -43,7 +42,6 @@ use newtypes::{
     DbActor,
     DocumentConfig,
     DocumentState,
-    FireWebhookArgs,
     InsightEventId,
     KybConfig,
     KybState,
@@ -56,7 +54,6 @@ use newtypes::{
     OnboardingStatus,
     OnboardingStatusChangedPayload,
     ScopedVaultId,
-    TaskData,
     TenantId,
     TenantScope,
     VaultId,
@@ -626,7 +623,6 @@ impl Workflow {
         }
 
         let new_status = update.status;
-        // TODO short circuit if nothing changed? like status is the same?
         let result = diesel::update(workflow::table)
             .filter(workflow::id.eq(&wf.id))
             .set(update)
@@ -638,16 +634,12 @@ impl Workflow {
             let decision = OnboardingDecision::create(conn, &result, decision)?;
             // NOTE: MUST do all manual review bookkeeping before sending the webhooks below
             ManualReview::apply_actions(conn, &wf, decision, manual_reviews)?;
-            // TODO we really need to better think through how we deal with ManualReviews and
-            // multiple Workflows.
-            // Should MRs be per-SV rather than per-WF?
         }
 
         // Fire webhook
         if let Some(new_status) = new_status {
             // Must lock to make sure scoped vault status isn't stale
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?.into_inner();
-            let tenant = Tenant::get(conn, &sv.tenant_id)?;
             // !! it's important that code in the same txn that is going to write a review does it before this
             // update call
             let requires_manual_review_after_update = !ManualReview::get_active(conn, &sv.id)?.is_empty();
@@ -663,12 +655,7 @@ impl Workflow {
                     requires_manual_review: requires_manual_review_after_update,
                     is_live: sv.is_live,
                 });
-                let task_data = TaskData::FireWebhook(FireWebhookArgs {
-                    scoped_vault_id: wf.scoped_vault_id.clone(),
-                    tenant_id: tenant.id.clone(),
-                    is_live: sv.is_live,
-                    webhook_event,
-                });
+                let task_data = sv.webhook_event(webhook_event).into();
                 Task::create(conn, Utc::now(), task_data)?;
             };
 
@@ -699,12 +686,7 @@ impl Workflow {
                     requires_manual_review: requires_manual_review_after_update,
                     is_live: sv.is_live,
                 });
-                let task_data = TaskData::FireWebhook(FireWebhookArgs {
-                    scoped_vault_id: wf.scoped_vault_id.clone(),
-                    tenant_id: tenant.id,
-                    is_live: sv.is_live,
-                    webhook_event,
-                });
+                let task_data = sv.webhook_event(webhook_event).into();
                 Task::create(conn, Utc::now(), task_data)?;
             };
         }

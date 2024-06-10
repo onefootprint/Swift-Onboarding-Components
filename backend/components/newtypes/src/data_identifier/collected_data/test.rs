@@ -25,7 +25,7 @@ fn test_collected_data_options() {
         assert!(options.len() <= 2, "More than 2 options for CollectedData {}", cd);
         assert!(!options.is_empty(), "No option for CollectedData {}", cd);
         // Enforce that the .full_variant() util stays in sync with .options()
-        assert!(options.get(0).unwrap().full_variant() == options.get(1).cloned());
+        assert!(options.first().unwrap().full_variant() == options.get(1).cloned());
 
         let attrs_for_options: Vec<_> = options
             .iter()
