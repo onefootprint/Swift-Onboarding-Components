@@ -22,7 +22,7 @@ const helpLinks: HelpLink[] = [
   },
   {
     id: 'api-documentation',
-    href: `${DOCS_BASE_URL}/api`,
+    href: `${DOCS_BASE_URL}/api-reference`,
     translationKey: 'help-links.api-reference',
   },
   {
