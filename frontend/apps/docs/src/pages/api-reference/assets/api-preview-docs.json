@@ -1662,7 +1662,8 @@
                                 "middesk",
                                 "incode",
                                 "stytch",
-                                "neuro_id"
+                                "neuro_id",
+                                "samba_safety"
                             ]
                         }
                     },
@@ -1694,7 +1695,8 @@
                                 "middesk",
                                 "incode",
                                 "stytch",
-                                "neuro_id"
+                                "neuro_id",
+                                "samba_safety"
                             ]
                         }
                     },
@@ -1761,7 +1763,8 @@
                                 "middesk",
                                 "incode",
                                 "stytch",
-                                "neuro_id"
+                                "neuro_id",
+                                "samba_safety"
                             ]
                         }
                     },

@@ -4,6 +4,7 @@ mod annotation;
 mod audit_event;
 mod auth_event;
 mod authorized_org;
+mod business;
 mod business_owner;
 mod compliance;
 mod document;

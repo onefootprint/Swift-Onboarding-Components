@@ -28,11 +28,11 @@ def test_no_bos(obc, sandbox_tenant, sandbox_outcome):
         di: BUSINESS_DATA[di] for cdo in MUST_COLLECT_DATA for di in CDO_TO_DIS[cdo]
     }
     vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
-    fp_id = vault["id"]
+    fp_bid = vault["id"]
 
     # run KYB
     data = dict(key=obc.key.value, fixture_result=sandbox_outcome)
-    kyb = post(f"businesses/{fp_id}/kyb", data, sandbox_tenant.sk.key)
+    kyb = post(f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key)
 
     if sandbox_outcome == "manual_review":
         assert kyb["requires_manual_review"] == True
@@ -42,9 +42,19 @@ def test_no_bos(obc, sandbox_tenant, sandbox_outcome):
         assert kyb["status"] == sandbox_outcome
 
     # confirm OBD timeline event created
-    timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    timeline = get(f"entities/{fp_bid}/timeline", None, *sandbox_tenant.db_auths)
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
+
+    # Confirm status
+    body = get(f"businesses/{fp_bid}", None, sandbox_tenant.s_sk)
+    status = sandbox_outcome
+    requires_manual_review = False
+    if sandbox_outcome == "manual_review":
+        status = "fail"
+        requires_manual_review = True
+    assert body["status"] == status
+    assert body["requires_manual_review"] == requires_manual_review
 
 
 def test_kyb_missing_req(obc, sandbox_tenant):

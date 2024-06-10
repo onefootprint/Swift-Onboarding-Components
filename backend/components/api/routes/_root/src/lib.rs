@@ -18,11 +18,11 @@ pub fn configure(config: &mut web::ServiceConfig) {
     org::routes(config);
     partner::routes(config);
     onboarding::routes(config);
+    businesses::routes(config);
     users::routes(config);
     hosted::routes(config);
     vault_proxy::routes(config);
     entities::routes(config);
-    businesses::routes(config);
     webhooks::routes(config);
     integrations::routes(config);
     integrations::routes(config);

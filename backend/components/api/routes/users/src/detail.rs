@@ -22,7 +22,7 @@ use paperclip::actix::{
 };
 
 #[api_v2_operation(
-    description = "View details of a most recent onboarding status of user",
+    description = "View basic details for a user. See the APIs under `/users/{fp_bid}/vault` for information on reading vault data.",
     tags(Users, PublicApi)
 )]
 #[get("/users/{fp_id:fp_[_A-Za-z0-9]*}")]

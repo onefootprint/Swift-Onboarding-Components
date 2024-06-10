@@ -75,6 +75,44 @@
                 ]
             }
         },
+        "/businesses/{fp_bid:fp_[_A-Za-z0-9]*}": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "PublicApi"
+                ],
+                "description": "View basic details for a business. See the APIs under `/businesses/{fp_bid}/vault` for information on reading vault data.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_bid",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Business"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/businesses/{fp_bid}/vault": {
             "get": {
                 "tags": [
@@ -845,7 +883,7 @@
                     "Users",
                     "PublicApi"
                 ],
-                "description": "View details of a most recent onboarding status of user",
+                "description": "View basic details for a user. See the APIs under `/users/{fp_bid}/vault` for information on reading vault data.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1729,6 +1767,37 @@
             }
         },
         "schemas": {
+            "Business": {
+                "description": "Basic information about a business",
+                "type": "object",
+                "properties": {
+                    "external_id": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "example": "fp_bid_7p793EF07xKXHqAeg5VGPj",
+                        "type": "string"
+                    },
+                    "requires_manual_review": {
+                        "type": "boolean"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pass",
+                            "fail",
+                            "incomplete",
+                            "pending",
+                            "none"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "requires_manual_review",
+                    "status"
+                ]
+            },
             "ClientDecryptRequest": {
                 "type": "object",
                 "properties": {

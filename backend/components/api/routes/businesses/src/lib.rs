@@ -1,3 +1,4 @@
+mod detail;
 mod kyb;
 mod list;
 mod owners;
@@ -12,5 +13,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(post::post)
         .service(list::get)
         .service(risk_signals::get)
-        .service(kyb::post);
+        .service(kyb::post)
+        .service(detail::get);
 }
