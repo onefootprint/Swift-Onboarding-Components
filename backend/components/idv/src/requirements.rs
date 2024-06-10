@@ -120,6 +120,9 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::IncodeGovernmentValidation => false,
         VendorAPI::NeuroIdAnalytics => false,
         VendorAPI::IncodeApproveSession => false,
+        VendorAPI::SambaLicenseValidationCreate => false,
+        VendorAPI::SambaLicenseValidationGetStatus => false,
+        VendorAPI::SambaLicenseValidationGetReport => false,
     }
 }
 
@@ -164,6 +167,9 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         | VendorAPI::IncodeGovernmentValidation
         | VendorAPI::NeuroIdAnalytics
         | VendorAPI::IncodeApproveSession
+        | VendorAPI::SambaLicenseValidationCreate
+        | VendorAPI::SambaLicenseValidationGetStatus
+        | VendorAPI::SambaLicenseValidationGetReport
         | VendorAPI::IdologyPa => false,
     }
 }

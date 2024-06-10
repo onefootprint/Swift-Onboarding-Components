@@ -49,6 +49,7 @@ pub enum Vendor {
     Incode,
     Stytch,
     NeuroId,
+    SambaSafety,
 }
 
 impl_enum_str_diesel!(Vendor);
@@ -105,6 +106,9 @@ pub enum VendorAPI {
     AwsTextract,
     LexisFlexId,
     NeuroIdAnalytics,
+    SambaLicenseValidationCreate,
+    SambaLicenseValidationGetStatus,
+    SambaLicenseValidationGetReport,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -142,6 +146,9 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::AwsTextract => Self::Footprint,
             VendorAPI::LexisFlexId => Self::Lexis,
             VendorAPI::NeuroIdAnalytics => Self::NeuroId,
+            VendorAPI::SambaLicenseValidationCreate => Self::SambaSafety,
+            VendorAPI::SambaLicenseValidationGetStatus => Self::SambaSafety,
+            VendorAPI::SambaLicenseValidationGetReport => Self::SambaSafety,
         }
     }
 }
@@ -155,39 +162,19 @@ pub fn vendor_apis_from_vendor(vendor: Vendor) -> Vec<VendorAPI> {
 
 impl VendorAPI {
     pub fn is_incode_doc_flow_api(&self) -> bool {
-        match self {
+        matches!(
+            self,
             VendorAPI::IncodeAddFront
-            | VendorAPI::IncodeAddBack
-            | VendorAPI::IncodeProcessId
-            | VendorAPI::IncodeFetchScores
-            | VendorAPI::IncodeAddPrivacyConsent
-            | VendorAPI::IncodeAddMlConsent
-            | VendorAPI::IncodeFetchOcr
-            | VendorAPI::IncodeAddSelfie
-            | VendorAPI::IncodeGetOnboardingStatus
-            | VendorAPI::IncodeProcessFace => true,
-            VendorAPI::IncodeWatchlistCheck
-            | VendorAPI::IncodeUpdatedWatchlistResult
-            | VendorAPI::IncodeStartOnboarding
-            | VendorAPI::IdologyPa
-            | VendorAPI::MiddeskCreateBusiness
-            | VendorAPI::MiddeskGetBusiness
-            | VendorAPI::MiddeskBusinessUpdateWebhook
-            | VendorAPI::MiddeskTinRetriedWebhook
-            | VendorAPI::IdologyExpectId
-            | VendorAPI::TwilioLookupV2
-            | VendorAPI::SocureIdPlus
-            | VendorAPI::ExperianPreciseId
-            | VendorAPI::StytchLookup
-            | VendorAPI::FootprintDeviceAttestation
-            | VendorAPI::AwsRekognition
-            | VendorAPI::AwsTextract
-            | VendorAPI::LexisFlexId
-            | VendorAPI::IncodeCurpValidation
-            | VendorAPI::NeuroIdAnalytics
-            | VendorAPI::IncodeApproveSession
-            | VendorAPI::IncodeGovernmentValidation => false,
-        }
+                | VendorAPI::IncodeAddBack
+                | VendorAPI::IncodeProcessId
+                | VendorAPI::IncodeFetchScores
+                | VendorAPI::IncodeAddPrivacyConsent
+                | VendorAPI::IncodeAddMlConsent
+                | VendorAPI::IncodeFetchOcr
+                | VendorAPI::IncodeAddSelfie
+                | VendorAPI::IncodeGetOnboardingStatus
+                | VendorAPI::IncodeProcessFace
+        )
     }
 }
 

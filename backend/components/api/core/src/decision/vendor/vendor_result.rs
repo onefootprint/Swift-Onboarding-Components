@@ -271,6 +271,9 @@ fn deserialize_from_vendor_api(
         }
         // never used
         VendorAPI::IncodeApproveSession => ParsedResponse::IncodeRawResponse(raw_response.into()),
+        VendorAPI::SambaLicenseValidationCreate => ParsedResponse::IncodeRawResponse(raw_response.into()),
+        VendorAPI::SambaLicenseValidationGetStatus => ParsedResponse::IncodeRawResponse(raw_response.into()),
+        VendorAPI::SambaLicenseValidationGetReport => ParsedResponse::IncodeRawResponse(raw_response.into()),
     };
 
     Ok(res)

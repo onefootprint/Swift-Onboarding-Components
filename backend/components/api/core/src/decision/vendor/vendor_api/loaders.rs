@@ -377,6 +377,9 @@ mod tests {
                 .await
             }
             VendorAPI::NeuroIdAnalytics => todo!(),
+            VendorAPI::SambaLicenseValidationCreate => todo!(),
+            VendorAPI::SambaLicenseValidationGetStatus => todo!(),
+            VendorAPI::SambaLicenseValidationGetReport => todo!(),
         };
 
         assert!(test_ran)
@@ -509,6 +512,9 @@ mod tests {
             VendorAPI::AwsTextract => todo!(),
             VendorAPI::LexisFlexId => idv::test_fixtures::passing_lexis_flex_id_response(),
             VendorAPI::NeuroIdAnalytics => todo!(),
+            VendorAPI::SambaLicenseValidationCreate => todo!(),
+            VendorAPI::SambaLicenseValidationGetStatus => todo!(),
+            VendorAPI::SambaLicenseValidationGetReport => todo!(),
         }
     }
 }

@@ -44,6 +44,9 @@ pub enum WrappedVendorAPI {
     AwsTextract,
     LexisFlexId,
     NeuroIdAnalytics,
+    SambaLicenseValidationCreate,
+    SambaLicenseValidationGetStatus,
+    SambaLicenseValidationGetReport,
 }
 impl From<VendorAPI> for WrappedVendorAPI {
     fn from(value: VendorAPI) -> Self {
@@ -79,6 +82,9 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::IncodeGovernmentValidation => Self::IncodeIneData,
             VendorAPI::NeuroIdAnalytics => Self::NeuroIdAnalytics,
             VendorAPI::IncodeApproveSession => Self::IncodeApproveSession,
+            VendorAPI::SambaLicenseValidationCreate => Self::SambaLicenseValidationCreate,
+            VendorAPI::SambaLicenseValidationGetStatus => Self::SambaLicenseValidationGetStatus,
+            VendorAPI::SambaLicenseValidationGetReport => Self::SambaLicenseValidationGetReport,
         }
     }
 }
@@ -117,6 +123,9 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::IncodeIneData => VendorAPI::IncodeGovernmentValidation,
             WrappedVendorAPI::NeuroIdAnalytics => VendorAPI::NeuroIdAnalytics,
             WrappedVendorAPI::IncodeApproveSession => VendorAPI::IncodeApproveSession,
+            WrappedVendorAPI::SambaLicenseValidationCreate => VendorAPI::SambaLicenseValidationCreate,
+            WrappedVendorAPI::SambaLicenseValidationGetStatus => VendorAPI::SambaLicenseValidationGetStatus,
+            WrappedVendorAPI::SambaLicenseValidationGetReport => VendorAPI::SambaLicenseValidationGetReport,
         }
     }
 }
