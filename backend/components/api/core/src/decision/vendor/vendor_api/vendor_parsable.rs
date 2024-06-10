@@ -17,6 +17,7 @@ use idv::incode::watchlist::response::{
 use idv::lexis::response::FlexIdResponse;
 use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
+use idv::samba::response::license_validation::CreateLVOrderResponse;
 use idv::ParsedResponse;
 use newtypes::VendorAPI;
 use serde::de::DeserializeOwned;
@@ -29,7 +30,7 @@ pub trait VendorParsable
 where
     Self: Into<WrappedVendorAPI> + Clone,
 {
-    type ParsedType: DeserializeOwned + AsParsedResponse;
+    type ParsedType: DeserializeOwned;
 
     fn parse(&self, value: serde_json::Value) -> Result<Self::ParsedType, serde_json::Error> {
         let parsed: Self::ParsedType = serde_json::from_value(value)?;
@@ -144,4 +145,10 @@ impl AsParsedResponse for MiddeskBusinessUpdateWebhookResponse {
     fn into_parsed_response(self) -> ParsedResponse {
         ParsedResponse::MiddeskBusinessUpdateWebhook(self)
     }
+}
+
+// Samba
+// we don't need a vendor result for this one
+impl VendorParsable for SambaLicenseValidationCreate {
+    type ParsedType = CreateLVOrderResponse;
 }

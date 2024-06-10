@@ -22,14 +22,14 @@ use newtypes::{
 };
 
 // Represents an attempt to load and deserialize a vendor API response
-pub enum LoadVendorResponseResult<T: AsParsedResponse> {
+pub enum LoadVendorResponseResult<T> {
     NotFound,
     NoResponse,
     Success((T, VerificationRequest, VerificationResult)),
     Error(ApiError),
 }
 
-impl<T: AsParsedResponse> LoadVendorResponseResult<T> {
+impl<T> LoadVendorResponseResult<T> {
     pub fn ok(self) -> Option<(T, VerificationResultId)> {
         match self {
             LoadVendorResponseResult::NotFound => None,
@@ -38,7 +38,9 @@ impl<T: AsParsedResponse> LoadVendorResponseResult<T> {
             LoadVendorResponseResult::Error(_) => None,
         }
     }
+}
 
+impl<T: AsParsedResponse> LoadVendorResponseResult<T> {
     pub fn into_vendor_result(self) -> Option<VendorResult> {
         match self {
             LoadVendorResponseResult::NotFound
@@ -157,6 +159,7 @@ mod tests {
     #[test_state_case(VendorAPI::LexisFlexId)]
     #[test_state_case(VendorAPI::MiddeskGetBusiness)]
     #[test_state_case(VendorAPI::MiddeskBusinessUpdateWebhook)]
+    #[test_state_case(VendorAPI::SambaLicenseValidationCreate)]
     #[tokio::test(flavor = "multi_thread")]
     async fn test_load_response_for_vendor_api_for_multiple_apis(state: &mut State, vendor_api: VendorAPI) {
         let FixtureData {
@@ -377,7 +380,18 @@ mod tests {
                 .await
             }
             VendorAPI::NeuroIdAnalytics => todo!(),
-            VendorAPI::SambaLicenseValidationCreate => todo!(),
+            VendorAPI::SambaLicenseValidationCreate => {
+                assert_results(
+                    state,
+                    wf.id,
+                    di_id,
+                    sv_id2,
+                    &uv.e_private_key,
+                    vres_id_to_check,
+                    SambaLicenseValidationCreate,
+                )
+                .await
+            }
             VendorAPI::SambaLicenseValidationGetStatus => todo!(),
             VendorAPI::SambaLicenseValidationGetReport => todo!(),
         };
@@ -385,7 +399,7 @@ mod tests {
         assert!(test_ran)
     }
 
-    async fn assert_results<T: VendorParsable + std::fmt::Debug>(
+    async fn assert_results<T>(
         state: &State,
         wf_id: WorkflowId,
         di_id: DecisionIntentId,
@@ -393,7 +407,10 @@ mod tests {
         e_key: &EncryptedVaultPrivateKey,
         vres_id_to_check: Option<VerificationResultId>,
         vendor_api_struct: T,
-    ) -> bool {
+    ) -> bool
+    where
+        T: VendorParsable + std::fmt::Debug,
+    {
         let vres_to_check = vres_id_to_check.unwrap();
         let (_, vres_id) = load_response_for_vendor_api(
             state,
@@ -512,7 +529,11 @@ mod tests {
             VendorAPI::AwsTextract => todo!(),
             VendorAPI::LexisFlexId => idv::test_fixtures::passing_lexis_flex_id_response(),
             VendorAPI::NeuroIdAnalytics => todo!(),
-            VendorAPI::SambaLicenseValidationCreate => todo!(),
+            VendorAPI::SambaLicenseValidationCreate => {
+                serde_json::json!({
+                    "orderId": "f6113a2c-61e3-4ede-b8ad-aeaf67a80477"
+                })
+            }
             VendorAPI::SambaLicenseValidationGetStatus => todo!(),
             VendorAPI::SambaLicenseValidationGetReport => todo!(),
         }
