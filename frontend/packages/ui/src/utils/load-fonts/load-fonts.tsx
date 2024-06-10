@@ -1,21 +1,18 @@
 import React from 'react';
 
 type LoadFontsProps = {
-  src: string;
+  href?: string;
 };
 
-const LoadFonts = ({ src }: LoadFontsProps) => (
+const DEFAULT_FONT =
+  'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Source+Code+Pro&display=swap';
+
+const LoadFonts = ({ href }: LoadFontsProps) => (
   <>
-    {isGoogleFont(src) ? (
-      <>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-      </>
-    ) : null}
-    <link href={src} rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href={href || DEFAULT_FONT} rel="stylesheet" />
   </>
 );
-
-const isGoogleFont = (src: string) => src?.startsWith('https://fonts.googleapis');
 
 export default LoadFonts;

@@ -13,16 +13,12 @@ import Solutions from './sections/solutions';
 
 const FinancialInstitutions = () => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.industries.financial-institutions',
+    keyPrefix: 'pages.industries.baas',
   });
   return (
     <>
       <SEO title={t('html-title')} slug="/industries/baas" image="/og-img-financial-institutions.png" />
-      <Hero
-        title={t('hero.title')}
-        subtitle={t('hero.subtitle')}
-        illustration="/industries/illustrations/financial-institutions.svg"
-      />
+      <Hero title={t('hero.title')} subtitle={t('hero.subtitle')} illustration="/industries/illustrations/baas.svg" />
       <IntroCard>{t('intro.content')}</IntroCard>
       <FeaturedCards />
       <Problems />

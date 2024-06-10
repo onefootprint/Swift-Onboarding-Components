@@ -1,6 +1,6 @@
 import type { OnboardingConfig } from '@onefootprint/types';
-import { OnboardingConfigKind } from '@onefootprint/types';
 import { Box, Button, Dialog, Text, TextInput } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -16,14 +16,13 @@ export type CopyLinkProps = {
 };
 
 const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) => {
-  const { t: allT } = useTranslation('common');
+  const [open, setOpen] = useState(false);
+  const permanentLink = getPermanentLink(playbook);
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.table.actions.copy-link',
   });
-  const [open, setOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const permanentLink = getPermanentLink(playbook);
-
   useImperativeHandle(
     ref,
     () => ({
@@ -31,16 +30,6 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) 
     }),
     [],
   );
-
-  const getDescription = (kind: OnboardingConfigKind) => {
-    if (kind === OnboardingConfigKind.auth) {
-      return t('description.auth');
-    }
-    if (kind === OnboardingConfigKind.kyb) {
-      return t('description.kyb');
-    }
-    return t('description.kyc');
-  };
 
   const handleCopyToClipboard = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -59,23 +48,17 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) 
     setOpen(false);
   };
 
+  const copyButtonLabel = showSuccess ? t('copied') : t('copy-link');
+
   return (
-    <Dialog
-      onClose={handleClose}
-      open={open}
-      size="compact"
-      title={t('title')}
-      primaryButton={{
-        label: allT('close'),
-        onClick: handleClose,
-      }}
-    >
+    <Dialog size="compact" title={t(`${playbook.kind}.title` as ParseKeys<'common'>)} open={open} onClose={handleClose}>
       <Content>
-        <Text variant="body-3">{getDescription(playbook.kind)}</Text>
+        <Text variant="body-2">{t(`${playbook.kind}.description` as ParseKeys<'common'>)}</Text>
         <InputContainer>
-          <TextInput value={permanentLink} placeholder={permanentLink} size="compact" disabled />
+          <TextInput autoFocus value={permanentLink} placeholder={permanentLink} size="compact" />
+
           <Button variant="primary" onClick={handleCopyToClipboard}>
-            <Box minWidth="62px">{showSuccess ? t('copied') : t('copy-link')}</Box>
+            <Box minWidth="62px">{copyButtonLabel}</Box>
           </Button>
         </InputContainer>
       </Content>

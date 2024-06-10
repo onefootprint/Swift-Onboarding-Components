@@ -14,9 +14,13 @@ export const createTheme = (baseTheme: Theme, variables?: FootprintAppearanceVar
   );
 };
 
-const mutateTheme = (options: { theme: Theme; key: string; value: string }) => {
-  const { theme, key, value } = options;
-  set(theme, key, value);
+const mutateTheme = (options: {
+  theme: Theme;
+  cssVariable: string;
+  cssValue: string;
+}) => {
+  const { theme, cssVariable, cssValue } = options;
+  set(theme, cssVariable, cssValue);
   return theme;
 };
 
@@ -30,11 +34,11 @@ const iterateOverVariables = (options: {
   const { variables, tokenName, tokenValue } = options;
   const definitions = variablesMap.get(tokenName);
   if (definitions) {
-    const key = definitions.var;
+    const cssVariable = definitions.var;
     theme = mutateTheme({
       theme,
-      key,
-      value: tokenValue as string,
+      cssVariable,
+      cssValue: tokenValue as string,
     });
     if (definitions.assignDefault) {
       definitions.assignDefault.forEach(innerTokenName => {
