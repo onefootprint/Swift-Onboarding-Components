@@ -16,14 +16,11 @@ import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useTimeout } from 'usehooks-ts';
 
-import getSdkContext from '../../utils/sdk-context';
 import useProps from './hooks/use-props';
-
-type InitProps = { fpProvider: ProviderReturn };
 
 const STUCK_ON_SHIMMER_TIMEOUT = 5000;
 
-const { logError } = getLogger({ location: 'bifrost-init' });
+const { logError, logInfo } = getLogger({ location: 'bifrost-init' });
 
 const isPropsSaved = (context: Record<string, unknown>) => {
   const { bootstrapData, showCompletionPage, showLogo, l10n, authToken } = context;
@@ -36,14 +33,17 @@ const isPropsSaved = (context: Record<string, unknown>) => {
   );
 };
 
-const setupLogger = async (fpProvider: ProviderReturn, orgIds: Set<string>, config: PublicOnboardingConfig) => {
+const setupLogger = (orgIds: Set<string>, config: PublicOnboardingConfig) => {
   const isInIframe = checkIsInIframe();
-  const sdkContextModel = await getSdkContext(fpProvider);
+  const isRecordDisabled = orgIds.has(config.orgId);
 
-  if (config.isLive && !orgIds.has(config.orgId)) {
+  if (config.isLive && isRecordDisabled) {
+    logInfo(`Session recording disabled for org ${config.orgId}`);
+  }
+
+  if (config.isLive && !isRecordDisabled) {
     Logger.startSessionReplay();
     Logger.identify({
-      ...sdkContextModel,
       appClipExperienceId: config.appClipExperienceId,
       iframe: !!isInIframe,
       isAppClipEnabled: config.isAppClipEnabled,
@@ -59,7 +59,7 @@ const setupLogger = async (fpProvider: ProviderReturn, orgIds: Set<string>, conf
   }
 };
 
-const Init = ({ fpProvider }: InitProps) => {
+const Init = () => {
   const [state, send] = useBifrostMachine();
   const { authToken: authTokenContext, publicKey: publicKeyContext, config: configContext } = state.context;
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
@@ -81,7 +81,7 @@ const Init = ({ fpProvider }: InitProps) => {
     { obConfigAuth, authToken: authTokenContext },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
-        setupLogger(fpProvider, orgIds, config);
+        setupLogger(orgIds, config);
         send({
           type: 'initContextUpdated',
           payload: { config: { ...config } },

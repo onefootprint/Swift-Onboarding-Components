@@ -93,7 +93,7 @@ const Root = ({ variant }: RootProps) => {
   return (
     <Layout variant={variant}>
       <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
-        {state.matches('init') && <Init fpProvider={fpProvider} />}
+        {state.matches('init') && <Init />}
         {state.matches('initError') && <InitError />}
         {state.matches('idv') && (
           <Idv
