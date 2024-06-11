@@ -1,11 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Grid } from '@onefootprint/ui';
+import { media } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import CardCvc, { CvcLength } from './components/card-cvc';
 import CardExpDateInput from './components/card-exp-date-input';
@@ -52,58 +52,65 @@ const Card = () => {
   const cardCvcError = getHint('cvc');
 
   return (
-    <Grid.Container columns={['1fr 1fr']} rows={['auto']} gap={5}>
-      <InputContainer row="1" column="span 2">
-        <CardNumberInput
-          data-private
-          hasError={!!cardNumberError}
-          hint={cardNumberError}
-          {...register('number', {
-            required: true,
-            validate: {
-              empty: value => !!value,
-              invalid: value => isCardNumberValid(value),
-            },
-          })}
-        />
-      </InputContainer>
-      <InputContainer row="2">
-        <CardExpDateInput
-          data-private
-          hasError={!!cardExpiryError}
-          hint={cardExpiryError}
-          {...register('expiry', {
-            required: true,
-            validate: {
-              empty: value => !!value,
-              invalid: value => isCardExpiryValid(value),
-            },
-          })}
-        />
-      </InputContainer>
-      <InputContainer row="2">
-        <CardCvc
-          data-private
-          hasError={!!cardCvcError}
-          hint={cardCvcError}
-          numDigits={numDigits}
-          {...register('cvc', {
-            required: true,
-            validate: {
-              empty: value => !!value,
-              invalid: value => isCardCvcValid(value, numDigits),
-            },
-          })}
-        />
-      </InputContainer>
-    </Grid.Container>
+    <Row $columns={2}>
+      <CardNumberInput
+        data-private
+        hasError={!!cardNumberError}
+        hint={cardNumberError}
+        {...register('number', {
+          required: true,
+          validate: {
+            empty: value => !!value,
+            invalid: value => isCardNumberValid(value),
+          },
+        })}
+      />
+      <CardExpDateInput
+        data-private
+        hasError={!!cardExpiryError}
+        hint={cardExpiryError}
+        {...register('expiry', {
+          required: true,
+          validate: {
+            empty: value => !!value,
+            invalid: value => isCardExpiryValid(value),
+          },
+        })}
+      />
+      <CardCvc
+        data-private
+        hasError={!!cardCvcError}
+        hint={cardCvcError}
+        numDigits={numDigits}
+        {...register('cvc', {
+          required: true,
+          validate: {
+            empty: value => !!value,
+            invalid: value => isCardCvcValid(value, numDigits),
+          },
+        })}
+      />
+    </Row>
   );
 };
 
-const InputContainer = styled(Grid.Item)`
-  & > * {
-    width: 100%;
-  }
+const Row = styled.div<{ $columns: number }>`
+  ${({ $columns, theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[5]};
+    
+    ${media.greaterThan('sm')`
+      display: grid;
+      grid-template-columns: repeat(${$columns}, 1fr);
+      gap: ${theme.spacing[4]};
+    `}
+    
+    /* card number input */
+    & > :first-child {
+      min-width: 213px;
+    } 
+  `}
 `;
 
 export default Card;
