@@ -660,7 +660,7 @@ impl Workflow {
             };
 
             let can_transition = new_status.can_transition_from(&sv.status);
-            let new_sv_status = if sv.status != new_status && can_transition {
+            let new_status = if sv.status != new_status && can_transition {
                 // Only set to non-decision status if the current status is a non-decision status
                 // This has the effect of never letting the scoped vault status go from a decision to a
                 // non-decision status
@@ -675,7 +675,7 @@ impl Workflow {
             };
 
             let old_composite_status = (sv.status, requires_manual_review_before_update);
-            let new_composite_status = (new_sv_status, requires_manual_review_after_update);
+            let new_composite_status = (new_status, requires_manual_review_after_update);
             if new_composite_status != old_composite_status {
                 // Only fire a OnboardingStatusChanged webhook if the scoped vault status changes or
                 // requires_manual_review changes
