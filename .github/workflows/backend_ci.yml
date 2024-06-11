@@ -237,7 +237,7 @@ jobs:
         working-directory: ./backend/ci
         run: |
           set -euxo pipefail
-          docker compose run integration_tests \
+          docker compose run --quiet-pull integration_tests \
             pytest -n 6 ci/tests/ 2>&1 | tee integration_test_output.txt
         env:
           EXPECTED_SERVER_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -293,7 +293,7 @@ jobs:
       - name: Check valid db migrations
         working-directory: ./backend/ci/scripts
         run: |
-          docker compose run integration_tests ./ci/scripts/check_db_migrations.sh
+          docker compose run --quiet-pull integration_tests ./ci/scripts/check_db_migrations.sh
 
   openapi_check:
     needs: [build_images]
