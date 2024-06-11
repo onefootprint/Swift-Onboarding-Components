@@ -8,20 +8,16 @@ const SHOULD_SHOW_ANALYZE = IS_DEV && process.env.ANALYZE === 'true';
 const SHOULD_UPLOAD_SOURCE_MAPS = false; // process.env.VERCEL_ENV === 'production' || process.env.VERCEL_ENV === 'preview';
 
 const getNextConfig = () => {
+  const DATADOG_SRC = ['https://browser-intake-datadoghq.com'].join(' ');
   const SENTRY_CONNECT_SRC = ['*.sentry.io', '*.ingest.sentry.io'].join(' ');
-  const SENTRY_SCRIPT_SRC = [
-    'https://browser.sentry-cdn.com',
-    'https://js.sentry-cdn.com',
-  ].join(' ');
+  const SENTRY_SCRIPT_SRC = ['https://browser.sentry-cdn.com', 'https://js.sentry-cdn.com'].join(' ');
   const OBSERVE_CONNECT_SRC = ['189225732777.collect.observeinc.com'].join(' ');
 
-  const DEV_CONNECT_SRC = (
-    IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []
-  ).join(' ');
+  const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []).join(' ');
 
   const ContentSecurityPolicy = `
     child-src onefootprint.com;
-    connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.launchdarkly.com ${SENTRY_CONNECT_SRC} ${OBSERVE_CONNECT_SRC} *.mapbox.com;
+    connect-src 'self' ${DEV_CONNECT_SRC} *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.launchdarkly.com ${SENTRY_CONNECT_SRC} ${OBSERVE_CONNECT_SRC} ${DATADOG_SRC} *.mapbox.com;
     default-src 'self' vitals.vercel-insights.com data:;
     font-src 'self' fonts.googleapis.com fonts.gstatic.com;
     form-action 'self';
@@ -29,7 +25,7 @@ const getNextConfig = () => {
     frame-src 'self' vercel.live https://app.svix.com calendly.com data: blob:;
     img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com cdn.jsdelivr.net;
     media-src 'self' https data:;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com ${SENTRY_SCRIPT_SRC};
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com ${SENTRY_SCRIPT_SRC} ${DATADOG_SRC};
     style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
     worker-src 'self' blob:;
   `;
