@@ -2,7 +2,7 @@ import getCustomAppearance from '@onefootprint/appearance';
 import { FootprintPrivateEvent, type FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import type { IdvCompletePayload } from '@onefootprint/idv';
-import Idv, { AppErrorBoundary, getLogger, useFootprintProvider, useLogStateMachine } from '@onefootprint/idv';
+import Idv, { AppErrorBoundary, getLogger, Logger, useFootprintProvider, useLogStateMachine } from '@onefootprint/idv';
 import { useIdentifyValidate } from '@onefootprint/idv/src/hooks/api';
 import { checkIsAndroid } from '@onefootprint/idv/src/utils';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
@@ -52,6 +52,8 @@ const Root = ({ variant }: RootProps) => {
     deviceResponseJson,
   }: IdvCompletePayload) => {
     logInfo('IDV flow is complete, sending validation token back to the tenant');
+    Logger.stopSessionReplay();
+
     if (validationToken) {
       if (!shouldShowCompletionPage) {
         fpProvider.complete({
@@ -75,6 +77,7 @@ const Root = ({ variant }: RootProps) => {
 
   const handleClose = () => {
     logInfo('IDV flow is closed by the user');
+    Logger.stopSessionReplay();
     fpProvider.cancel();
     fpProvider.close();
   };

@@ -113,6 +113,7 @@ const initDataDogRum = (config: RumInitConfiguration): void => {
     trackLongTasks: true, // Enables collection of long task events.
     trackResources: true, // Enables collection of resource events.
     trackUserInteractions: true, // The trackUserInteractions parameter enables the automatic collection of user clicks in your application. Sensitive and private data contained in your pages may be included to identify the elements interacted with.
+    startSessionReplayRecordingManually: true, // Manually start the Session Replay
   });
 };
 

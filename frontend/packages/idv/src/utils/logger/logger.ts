@@ -1,4 +1,5 @@
 import { datadogLogs } from '@datadog/browser-logs';
+import { datadogRum } from '@datadog/browser-rum';
 import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import * as LogRocket from 'logrocket';
@@ -34,8 +35,9 @@ const filterNonEmptyTraits = (traits: PrimitiveData): ExtraProps =>
 
 const LoggerFactory = () => {
   let appName: string = '';
-  let isLogRocketEnabled: boolean = false;
   let isDataDogEnabled: boolean = false;
+  let isLogRocketEnabled: boolean = false;
+  let isSessionReplayOn: boolean = false;
 
   const init = (app: string, disableLogRocket?: boolean) => {
     if (!IS_LOGGING_ENABLED) return;
@@ -69,11 +71,27 @@ const LoggerFactory = () => {
     if (isDataDogEnabled) datadogLogs.setGlobalContext(contextProps);
   };
 
-  const enableLogRocket = () => {
-    if (isLogRocketEnabled) return;
+  const startSessionReplay = () => {
+    if (isSessionReplayOn) return;
 
-    isLogRocketEnabled = true;
-    initLogRocket(appName);
+    if (!isLogRocketEnabled) {
+      initLogRocket(appName);
+      isLogRocketEnabled = true;
+      isSessionReplayOn = true;
+    }
+
+    if (isDataDogEnabled) {
+      datadogRum.startSessionReplayRecording();
+      isSessionReplayOn = true;
+    }
+  };
+  const stopSessionReplay = () => {
+    if (!isSessionReplayOn || !isDataDogEnabled) return;
+
+    if (isDataDogEnabled) {
+      datadogRum.stopSessionReplayRecording();
+      isSessionReplayOn = false;
+    }
   };
 
   const track = (msg: string, extra: PrimitiveData) => {
@@ -117,13 +135,14 @@ const LoggerFactory = () => {
   };
 
   return {
-    enableLogRocket,
     error,
     identify,
     info,
     init,
     isDataDogEnabled,
     isLogRocketEnabled,
+    startSessionReplay,
+    stopSessionReplay,
     track,
     warn,
   };
@@ -140,11 +159,8 @@ export const getLogger = (
   logTrack: (msg: string, extra?: PrimitiveData) => void;
 } => ({
   logTrack: (msg: string, extra?: PrimitiveData) => Logger.track(msg, { ...preExtra, ...extra }),
-
   logInfo: (msg: string, extra?: PrimitiveData) => Logger.info(msg, { ...preExtra, ...extra }),
-
   logWarn: (msg: string, err?: unknown, extra?: PrimitiveData) => Logger.warn(msg, { ...preExtra, ...extra }, err),
-
   logError: (msg: string, err?: unknown, extra?: PrimitiveData) => Logger.error(err, { ...preExtra, ...extra }, msg),
 });
 

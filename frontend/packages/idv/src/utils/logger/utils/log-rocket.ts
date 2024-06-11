@@ -11,9 +11,7 @@ const initLogRocket = (_appName: string) => {
   LogRocket.init(LOG_ROCKET_ORG_ID, {
     release: COMMIT_SHA,
     rootHostname: BASE_URL_DOMAIN,
-    dom: {
-      inputSanitizer: true,
-    },
+    dom: { inputSanitizer: true },
     shouldDetectExceptions: true,
     network: {
       requestSanitizer: rawRequest => {
@@ -53,13 +51,6 @@ const initLogRocket = (_appName: string) => {
     },
   });
   setupLogRocketReact(LogRocket);
-
-  // Tie sentry issues to logrocket recordings
-  // LogRocket.getSessionURL(sessionURL => {
-  //   // const scope = Sentry.getCurrentScope();
-  //   // scope.setExtra('LogRocketSessionURL', sessionURL);
-  //   // scope.setExtra('appName', appName);
-  // });
 };
 
 export const logRocketErrorEvent = (error: Error, extra?: ExtraProps) =>

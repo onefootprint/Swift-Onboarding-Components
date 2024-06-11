@@ -41,7 +41,7 @@ const setupLogger = async (fpProvider: ProviderReturn, orgIds: Set<string>, conf
   const sdkContextModel = await getSdkContext(fpProvider);
 
   if (config.isLive && !orgIds.has(config.orgId)) {
-    Logger.enableLogRocket();
+    Logger.startSessionReplay();
     Logger.identify({
       ...sdkContextModel,
       appClipExperienceId: config.appClipExperienceId,

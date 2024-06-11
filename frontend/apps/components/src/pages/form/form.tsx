@@ -9,7 +9,7 @@ import Loading from './components/loading';
 
 const Form = () => {
   useEffectOnce(() => {
-    Logger.enableLogRocket();
+    Logger.startSessionReplay();
   });
 
   return (

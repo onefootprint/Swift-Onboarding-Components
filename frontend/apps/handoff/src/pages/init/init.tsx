@@ -25,7 +25,7 @@ const logContext = ({ meta }: GetD2PResponse) => {
 
 const setupLogger = (config: PublicOnboardingConfig, orgIds: Set<string>) => {
   if (config.isLive && !orgIds.has(config.orgId)) {
-    Logger.enableLogRocket();
+    Logger.startSessionReplay();
     Logger.identify({
       appClipExperienceId: config.appClipExperienceId,
       isAppClipEnabled: config.isAppClipEnabled,

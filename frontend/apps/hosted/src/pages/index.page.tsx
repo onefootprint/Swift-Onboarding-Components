@@ -23,8 +23,9 @@ const Root = ({ variant }: RootProps) => {
   const { email, phoneNumber } = invited || {};
 
   const handleComplete = () => {
-    Logger.info('IDV flow is completed on hosted');
     send({ type: 'idvCompleted' });
+    Logger.info('IDV flow is completed on hosted');
+    Logger.stopSessionReplay();
   };
 
   return (

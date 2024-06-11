@@ -61,7 +61,7 @@ const Init = () => {
     {
       onSuccess: onboardingConfig => {
         if (onboardingConfig.isLive && !orgIds.has(onboardingConfig.orgId)) {
-          Logger.enableLogRocket();
+          Logger.startSessionReplay();
           Logger.identify({
             appClipExperienceId: onboardingConfig.appClipExperienceId,
             isAppClipEnabled: onboardingConfig.isAppClipEnabled,

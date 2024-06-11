@@ -20,12 +20,9 @@ const Router = ({ variant }: RouterProps) => {
   const [state, send] = useHandoffMachine();
   const { authToken, onboardingConfig, idDocOutcome, l10n } = state.context;
   const tenantPk = onboardingConfig?.key;
+  const obConfigAuth = tenantPk && { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk };
 
   useLogStateMachine('handoff', state);
-
-  const obConfigAuth = tenantPk && {
-    [CLIENT_PUBLIC_KEY_HEADER]: tenantPk,
-  };
 
   useGetD2PStatus({
     enabled: !state.done,
@@ -74,6 +71,7 @@ const Router = ({ variant }: RouterProps) => {
             isTransfer
             onComplete={() => {
               send({ type: 'idvCompleted' });
+              Logger.stopSessionReplay();
             }}
             idDocOutcome={idDocOutcome}
             l10n={l10n}
