@@ -35,6 +35,7 @@ fn generate_event_type_schema() {
             WebhookEventKind::OnboardingCompleted => generate::<OnboardingCompletedPayload>(evt),
             WebhookEventKind::OnboardingStatusChanged => generate::<OnboardingStatusChangedPayload>(evt),
             WebhookEventKind::WatchlistCheckCompleted => generate::<WatchlistCheckCompletedPayload>(evt),
+            WebhookEventKind::InfoRequested => generate::<InfoRequestedPayload>(evt),
         }
     }
 }
@@ -76,6 +77,7 @@ async fn sync_webhook_event_types() {
             WebhookEventKind::WatchlistCheckCompleted => {
                 generate_json_value::<WatchlistCheckCompletedPayload>()
             }
+            WebhookEventKind::InfoRequested => generate_json_value::<InfoRequestedPayload>(),
         };
 
         let schemas = HashMap::from_iter([("1".to_string(), schema)]);

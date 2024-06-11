@@ -152,6 +152,24 @@ pub enum WebhookEvent {
     OnboardingCompleted(OnboardingCompletedPayload),
     OnboardingStatusChanged(OnboardingStatusChangedPayload),
     WatchlistCheckCompleted(WatchlistCheckCompletedPayload),
+    // We're moving towards a standard of our webhooks being thin shims that include information on the user
+    // and require you to hit our API to fetch the most up-to-date info
+    InfoRequested(UserSpecificWebhookPayload),
+    // TODO ManualDecision
+    // TODO WorkflowCompleted
+    // TODO WatchlistCheck
+}
+
+pub enum UserSpecificWebhookKind {
+    InfoRequested,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+/// A general webhook payload body that includes user info
+pub struct UserSpecificWebhookPayload {
+    pub timestamp: DateTime<Utc>,
+    pub fp_id: FpId,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]

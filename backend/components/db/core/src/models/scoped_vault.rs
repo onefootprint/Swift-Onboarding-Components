@@ -5,6 +5,7 @@ use super::ob_configuration::{
     ObConfiguration,
 };
 use super::scoped_vault_label::ScopedVaultLabel;
+use super::task::Task;
 use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
 use super::vault::{
@@ -51,6 +52,8 @@ use newtypes::{
     OnboardingStatus,
     ScopedVaultId,
     TenantId,
+    UserSpecificWebhookKind,
+    UserSpecificWebhookPayload,
     VaultCreatedInfo,
     VaultId,
     VaultKind,
@@ -602,6 +605,27 @@ impl ScopedVault {
             is_live: self.is_live,
             webhook_event,
         }
+    }
+
+    /// For the more modern webhook kinds, create a task that will send the provided webhook `kind`
+    /// for the provided `ScopedVault`.
+    pub fn create_webhook_task(&self, conn: &mut TxnPgConn, kind: UserSpecificWebhookKind) -> DbResult<()> {
+        let payload = UserSpecificWebhookPayload {
+            is_live: self.is_live,
+            fp_id: self.fp_id.clone(),
+            timestamp: Utc::now(),
+        };
+        let webhook_event = match kind {
+            UserSpecificWebhookKind::InfoRequested => WebhookEvent::InfoRequested(payload),
+        };
+        let args = FireWebhookArgs {
+            scoped_vault_id: self.id.clone(),
+            tenant_id: self.tenant_id.clone(),
+            is_live: self.is_live,
+            webhook_event,
+        };
+        Task::create(conn, Utc::now(), args.into())?;
+        Ok(())
     }
 }
 

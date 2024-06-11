@@ -19,6 +19,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
+use api_core::task::execute_webhook_tasks;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
 use api_wire_types::{
@@ -39,6 +40,7 @@ use newtypes::{
     DbActor,
     DocumentRequestConfig,
     ObConfigurationKind,
+    UserSpecificWebhookKind,
     VaultKind,
     WorkflowRequestConfig,
     WorkflowTriggeredInfo,
@@ -128,10 +130,16 @@ pub async fn post(
                 actor,
             };
             UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
+
+            sv.create_webhook_task(conn, UserSpecificWebhookKind::InfoRequested)?;
+
             // Create an auth token for this workflow that we will send to the user
             Ok((token, session))
         })
         .await?;
+
+    // Since we may have updated users onboarding status
+    execute_webhook_tasks((*state.clone().into_inner()).clone());
 
     let link = state
         .config
