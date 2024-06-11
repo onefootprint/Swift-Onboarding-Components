@@ -1,4 +1,5 @@
 import useEntityVault from '../../../hooks/use-entity-vault';
+import useBusinessOwners from './use-business-owners';
 import useEntity from './use-entity';
 import useEntityAnnotations from './use-entity-annotations';
 import useEntityLiveness from './use-entity-auth-events';
@@ -18,6 +19,7 @@ const useEntityInitialData = () => {
   const entityAnnotations = useEntityAnnotations(id);
   const entityOtherInsights = useEntityOtherInsights(id);
   const entityOwnedBusinesses = useEntityOwnedBusinesses(id);
+  const businessOwners = useBusinessOwners(id);
   const isLoadingVault = entityVaultQuery.isLoading && !entityQuery.isError;
 
   return {
@@ -30,6 +32,7 @@ const useEntityInitialData = () => {
       entityAnnotations.isLoading ||
       entityOtherInsights.isLoading ||
       entityOwnedBusinesses.isLoading ||
+      businessOwners.isLoading ||
       isLoadingVault,
   };
 };

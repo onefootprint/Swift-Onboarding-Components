@@ -2,9 +2,9 @@ import type { Entity } from '@onefootprint/types';
 import React from 'react';
 import { ErrorComponent } from 'src/components';
 
+import useBusinessOwners from '@/entity/hooks/use-business-owners';
 import Content from './components/content';
 import Loading from './components/loading';
-import useBusinessOwners from './hooks/use-business-owners.ts';
 
 export type BusinessOwnersProps = {
   entity: Entity;
