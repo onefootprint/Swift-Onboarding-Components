@@ -304,19 +304,24 @@ impl Document {
         Ok(results)
     }
 
-    #[tracing::instrument("Document::list_sent_to_incode_by_wf_id", skip_all)]
-    pub fn list_completed_sent_to_incode_by_wf_id(
+    #[tracing::instrument("Document::list_completed_sent_to_incode", skip_all)]
+    pub fn list_completed_sent_to_incode(
         conn: &mut PgConn,
-        wf_id: &WorkflowId,
+        wf_id: Option<&WorkflowId>,
     ) -> DbResult<Vec<(Self, DocumentRequest, Option<IncodeVerificationSession>)>> {
-        let results = identity_document::table
+        let mut query = identity_document::table
             .inner_join(document_request::table)
-            .filter(document_request::workflow_id.eq(wf_id))
             // only completed
             .filter(not(identity_document::completed_seqno.is_null()))
             // join in docs that went to incode
             .left_join(incode_verification_session::table.on(incode_verification_session::identity_document_id.eq(identity_document::id)))
-            // latest is first
+            .into_boxed();
+
+        if let Some(wfid) = wf_id {
+            query = query.filter(document_request::workflow_id.eq(wfid));
+        }
+        // latest is first
+        let results = query
             .order_by(identity_document::completed_seqno.desc())
             .get_results(conn)?;
 

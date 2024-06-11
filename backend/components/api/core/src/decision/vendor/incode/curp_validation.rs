@@ -100,7 +100,7 @@ pub async fn run_curp_validation_check(
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
-            let id_documents = Document::list_completed_sent_to_incode_by_wf_id(conn, &wf_id2)?;
+            let id_documents = Document::list_completed_sent_to_incode(conn, Some(&wf_id2))?;
             let latest_results =
                 VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &di_id)?;
 

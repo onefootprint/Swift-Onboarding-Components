@@ -14,6 +14,8 @@ use newtypes::{
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
+pub mod license_validation;
+
 impl SaveVerificationResultArgs {
     pub fn new_for_samba<T>(
         request_result: &Result<SambaAPIResponse<T>, idv::samba::error::Error>,
