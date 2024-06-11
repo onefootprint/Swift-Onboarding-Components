@@ -45,6 +45,7 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::PythonDetected => None, // maybe BrowserAutomation?
         Reason::UnauthorizedRequestOrigin => None,
         Reason::GolangDetected => None,
+        Reason::NodeJsDetected => None,
     }
 }
 

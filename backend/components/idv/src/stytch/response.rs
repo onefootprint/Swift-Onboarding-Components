@@ -119,6 +119,7 @@ pub enum Reason {
     PythonDetected,
     UnauthorizedRequestOrigin,
     GolangDetected,
+    NodeJsDetected,
 }
 
 #[cfg(test)]
@@ -158,7 +159,7 @@ mod tests {
     }
 
     #[test_case(example_response1() => (Action::Allow, vec![]))]
-    #[test_case(example_response2() => (Action::Challenge, vec![Reason::KnownDatacenterIp, Reason::PossibleFakeAppleChromeOrMitm, Reason::PossibleTlsMitm ]))]
+    #[test_case(example_response2() => (Action::Challenge, vec![Reason::KnownDatacenterIp, Reason::PossibleFakeAppleChromeOrMitm, Reason::PossibleTlsMitm, Reason::NodeJsDetected]))]
     fn parse_success(json: serde_json::Value) -> (Action, Vec<Reason>) {
         let parsed = parse_response(json).unwrap();
 
@@ -218,7 +219,7 @@ mod tests {
                     "action": "CHALLENGE",
                     "detected_device_type": "APPLE_CHROME",
                     "is_authentic_device": false,
-                    "reasons": ["KNOWN_DATACENTER_IP", "SOMETHING_ELSE_YO", "POSSIBLE_FAKE_APPLE_CHROME_OR_MITM", "POSSIBLE_TLS_MITM"]
+                    "reasons": ["KNOWN_DATACENTER_IP", "SOMETHING_ELSE_YO", "POSSIBLE_FAKE_APPLE_CHROME_OR_MITM", "POSSIBLE_TLS_MITM", "NODE_JS_DETECTED"]
                 }
             }
         )
