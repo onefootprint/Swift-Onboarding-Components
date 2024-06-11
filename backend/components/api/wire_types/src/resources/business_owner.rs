@@ -4,6 +4,7 @@ use crate::{
 };
 use newtypes::{
     BusinessOwnerKind,
+    BusinessOwnerSource,
     FpId,
     OnboardingStatus,
 };
@@ -17,6 +18,7 @@ pub struct PrivateBusinessOwner {
     pub status: Option<OnboardingStatus>,
     pub ownership_stake: Option<u32>,
     pub kind: BusinessOwnerKind,
+    pub source: Option<BusinessOwnerSource>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

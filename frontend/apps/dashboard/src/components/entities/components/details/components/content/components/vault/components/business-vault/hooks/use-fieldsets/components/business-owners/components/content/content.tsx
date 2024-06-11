@@ -67,13 +67,12 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
     </Stack>
   );
 
-  const boHintText = (businessOwner: BusinessOwner): string => {
-    if (businessOwner.ownershipStake) {
-      return t(`hint.${businessOwner.kind}`, {
-        stake: businessOwner.ownershipStake,
-      }) as string;
+  const boHintText = ({ ownershipStake: stake, kind, source }: BusinessOwner): string => {
+    const isPrimary = kind === 'primary' && source !== 'tenant';
+    if (isPrimary) {
+      return stake ? t('hint.primary_with_stake', { stake }) : t('hint.primary_no_stake');
     }
-    return businessOwner.kind === 'primary' ? (t(`hint.primary_no_stake` as ParseKeys<'common'>) as string) : '';
+    return stake ? t('hint.generic_stake', { stake }) : '';
   };
 
   return (

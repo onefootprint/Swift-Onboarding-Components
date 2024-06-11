@@ -15,6 +15,7 @@ use api_core::utils::vault_wrapper::{
 };
 use api_core::State;
 use db::models::scoped_vault::ScopedVault;
+use itertools::Itertools;
 use paperclip::actix::{
     api_v2_operation,
     get,
@@ -51,6 +52,14 @@ pub async fn get(
 
     let results = decrypted_bos
         .into_iter()
+        .sorted_by_key(|bo| {
+            (
+                bo.kind,
+                bo.ownership_stake,
+                bo.first_name.as_ref().map(|n| n.leak_to_string()),
+                bo.last_name.as_ref().map(|n| n.leak_to_string()),
+            )
+        })
         .map(api_wire_types::PrivateBusinessOwner::from_db)
         .collect();
     ResponseData::ok(results).json()

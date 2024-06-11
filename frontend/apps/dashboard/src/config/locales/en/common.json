@@ -2017,9 +2017,9 @@
           "title": "Beneficial owners",
           "link": "View profile",
           "hint": {
-            "primary": "Owns {{stake}}%  of the business & submitted the business information",
+            "primary_with_stake": "Owns {{stake}}%  of the business & submitted the business information",
             "primary_no_stake": "Submitted the business information",
-            "secondary": "Owns {{stake}}% of the business"
+            "generic_stake": "Owns {{stake}}% of the business"
           }
         },
         "address": {

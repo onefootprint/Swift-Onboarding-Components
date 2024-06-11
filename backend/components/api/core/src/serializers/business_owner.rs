@@ -13,6 +13,7 @@ impl DbToApi<BusinessOwnerInfo> for api_wire_types::PrivateBusinessOwner {
             id: bo.scoped_user.map(|su| su.fp_id),
             ownership_stake: bo.ownership_stake,
             kind: bo.kind,
+            source: bo.linked_bo.map(|bo| bo.source),
         }
     }
 }
