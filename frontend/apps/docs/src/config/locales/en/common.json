@@ -207,7 +207,7 @@
       "query-parameters": "Query parameters",
       "header-parameters": "Headers",
       "request-body": "Body",
-      "responses": "Responses",
+      "response": "Response",
       "examples": "Examples",
       "response-example": "Response example",
       "request-example": "Request example",

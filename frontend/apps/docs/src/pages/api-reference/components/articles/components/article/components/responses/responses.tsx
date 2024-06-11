@@ -14,29 +14,32 @@ export type ResponsesProps = {
 
 const Responses = ({ responses }: ResponsesProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
+  if (Object.keys(responses).length === 0) {
+    return null;
+  }
+  if (Object.keys(responses).length > 1) {
+    // We have an assertion in update_open_api.py that we only have one response per API
+    console.error('Multiple responses for API');
+  }
+  const [code, response] = Object.entries(responses)[0];
+  const schema = getSchemaFromComponent(response as Content);
 
-  return Object.keys(responses).length === 0 ? null : (
+  return (
     <Container>
-      <ResponsesTitle>{t('responses')}</ResponsesTitle>
-      {Object.entries(responses).map(([code, response]) => {
-        const schema = getSchemaFromComponent(response as Content);
-        return (
-          <ResponseContainer key={code}>
-            <Header>
-              <Badge variant={code === '200' ? 'success' : 'neutral'}>{code}</Badge>
-              {schema?.type && (
-                <>
-                  <Separator>·</Separator>
-                  <Text variant="snippet-3" color="quaternary">
-                    {schema?.type}
-                  </Text>
-                </>
-              )}
-            </Header>
-            {schema && <Schema schema={schema} isInBrackets />}
-          </ResponseContainer>
-        );
-      })}
+      <ResponsesTitle>{t('response')}</ResponsesTitle>
+      <ResponseContainer key={code}>
+        <Header>
+          {schema?.type && (
+            <>
+              <Separator>·</Separator>
+              <Text variant="snippet-3" color="quaternary">
+                {schema?.type}
+              </Text>
+            </>
+          )}
+        </Header>
+        {schema && <Schema schema={schema} isInBrackets />}
+      </ResponseContainer>
     </Container>
   );
 };

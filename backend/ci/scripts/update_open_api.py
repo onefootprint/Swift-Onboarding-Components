@@ -92,6 +92,9 @@ class Endpoint:
             # Make sure there's a documented response for public-facing APIs
             responses = self._path_info.get("responses", {})
             assert responses, f"{self.method} {self.url} does not have a response body"
+            assert (
+                len(responses) <= 1
+            ), f"{self.method} {self.url} has too many response bodies. Our docs site does not support APIs with multiple responses"
 
         # Update the security to filter out Firm Employee Token
         security = [
