@@ -9,10 +9,14 @@ import { createGlobalStyle, css } from 'styled-components';
 import CustomDesignSystemProvider from '../components/custom-design-system-provider';
 import ErrorBoundary from '../components/error-boundary';
 import Layout from '../components/layout';
+import initDataDogRum from '../config/initializers/datadog';
 import configureReactI18next from '../config/initializers/react-i18next';
 import ReactQueryProvider from '../config/initializers/react-query-provider';
 
 configureReactI18next();
+if (typeof window !== 'undefined') {
+  initDataDogRum();
+}
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();

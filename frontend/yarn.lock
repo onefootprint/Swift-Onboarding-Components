@@ -2295,6 +2295,11 @@
   resolved "https://registry.yarnpkg.com/@datadog/browser-core/-/browser-core-5.18.0.tgz#4f97a3f7c512210cea94285c690859b0fccc0089"
   integrity sha512-ks8XGYgprzUsEpMWZXQafMSR4d5pW3eLxOZNepJHo6CgtCFzPpiclnDoQgFleKs6zoMiVL+5iveyJP7/CFxNsw==
 
+"@datadog/browser-core@5.20.0":
+  version "5.20.0"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-core/-/browser-core-5.20.0.tgz#75274aacbd30354e4ca8de495fdec0f737248dee"
+  integrity sha512-L6GBde9ahUaELExsR9ypPlHiL67rrL+GByupOC7B/tykvu/rMr61URhvPayGODqHMLzTtmeRUYHNO1KICchdOA==
+
 "@datadog/browser-logs@^5.18.0":
   version "5.18.0"
   resolved "https://registry.yarnpkg.com/@datadog/browser-logs/-/browser-logs-5.18.0.tgz#65124c055c1af6c1c8c97a2a6425deff3b386f53"
@@ -2309,6 +2314,13 @@
   dependencies:
     "@datadog/browser-core" "5.18.0"
 
+"@datadog/browser-rum-core@5.20.0":
+  version "5.20.0"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum-core/-/browser-rum-core-5.20.0.tgz#75a4ec6e6753dbebc413dab40a5b0c5f6d527b52"
+  integrity sha512-5xiAESkSHEUodMzuRRKT7bd1OVWDmruCpxcdlk2VP9BaYeqNxIRLHSrMh83mPTHFvWbqLmAvRoUp9Gi2cpjS8A==
+  dependencies:
+    "@datadog/browser-core" "5.20.0"
+
 "@datadog/browser-rum@^5.18.0":
   version "5.18.0"
   resolved "https://registry.yarnpkg.com/@datadog/browser-rum/-/browser-rum-5.18.0.tgz#0c11649f14070e8e7f9a12a1c1cae4bd90cdddda"
@@ -2316,6 +2328,14 @@
   dependencies:
     "@datadog/browser-core" "5.18.0"
     "@datadog/browser-rum-core" "5.18.0"
+
+"@datadog/browser-rum@^5.20.0":
+  version "5.20.0"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum/-/browser-rum-5.20.0.tgz#c20e9e98e69e76ab67e86248f767e0d7950e27f0"
+  integrity sha512-UOH6l/mWPzkoYkL6n+/6/H1fCbjtgRc9HXWCAYRPiO10bn8PLeh0nLDw0AVsC287RDIz2JtqgwDjUvFDg8deLw==
+  dependencies:
+    "@datadog/browser-core" "5.20.0"
+    "@datadog/browser-rum-core" "5.20.0"
 
 "@datadog/datadog-ci@^2.36.0":
   version "2.36.0"
@@ -5184,24 +5204,12 @@
   resolved "https://registry.npmjs.org/@rive-app/canvas/-/canvas-1.1.3.tgz"
   integrity sha512-Bw8qEgtEnpvjj7g83jKyq/MqX/GiBDQKHnPk42Rw3tdfknaHH5/lIK0Oa4MWlGRtKtxO62gkprNLYyxgDq5Ajw==
 
-"@rive-app/canvas@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@rive-app/canvas/-/canvas-1.2.0.tgz#246219f3d25bc6b54416d118207a095ccd12cfcf"
-  integrity sha512-Wm6bQiE9F5+vE9R/zTnGOH3yNM8Dim+81dI2MWeuOFJ2mmdKWgsFir1tdHFjmndESNKySO7cFs8xZ4TVLERWlQ==
-
 "@rive-app/react-canvas@^3.0.35":
   version "3.0.45"
   resolved "https://registry.npmjs.org/@rive-app/react-canvas/-/react-canvas-3.0.45.tgz"
   integrity sha512-8sPu6KfjD77MQv9pK7UOUABV3YJBISrG/FFdhVu8yqxpPeobkjCePfIm9n5iMgnQgyt104U5KCoRZQUUMVYddw==
   dependencies:
     "@rive-app/canvas" "1.1.3"
-
-"@rive-app/react-canvas@^3.0.53":
-  version "3.0.53"
-  resolved "https://registry.yarnpkg.com/@rive-app/react-canvas/-/react-canvas-3.0.53.tgz#7b0d23f4d5c24c5f46364fe1edd44d75f466f47f"
-  integrity sha512-iPSvBMA3jNJLXTyCRMj9NQTpWHAupGdXbY4z0OiPR6SCB+LothdputEq43g3p3PTxVC5ujHCRLrr4P7f0drZnw==
-  dependencies:
-    "@rive-app/canvas" "1.2.0"
 
 "@rollup/plugin-commonjs@24.0.0":
   version "24.0.0"
