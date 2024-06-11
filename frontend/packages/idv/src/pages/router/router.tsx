@@ -134,7 +134,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
                 onIdentifyDone(payload);
               }
 
-              trackAction('identify:complete');
+              trackAction('done', { value: 'identify' });
             }}
           />
         </L10nContextProvider>
@@ -155,7 +155,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
           onClose={onClose}
           onDone={payload => {
             send({ type: 'onboardingCompleted', payload });
-            trackAction('onboarding:complete');
+            trackAction('done', { value: 'onboarding' });
           }}
           l10n={l10n}
         />
