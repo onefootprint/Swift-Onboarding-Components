@@ -218,6 +218,10 @@ export abstract class ServiceContainers {
         secretsStore.neuroIdApiKeyTest.arn,
         secretsStore.openaiApiKey.arn,
         secretsStore.datadogApiKey.arn,
+        secretsStore.sambaSafetyApiKey.arn,
+        secretsStore.sambaSafetyBaseUrl.arn,
+        secretsStore.sambaSafetyAuthUsername.arn,
+        secretsStore.sambaSafetyAuthPassword.arn,
       ])
       .apply(
         ([
@@ -275,6 +279,10 @@ export abstract class ServiceContainers {
           neuroIdApiKeyTest,
           openaiApiKey,
           datadogApiKeyArn,
+          sambaSafetyApiKey,
+          sambaSafetyBaseUrl,
+          sambaSafetyAuthUsername,
+          sambaSafetyAuthPassword,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -480,6 +488,22 @@ export abstract class ServiceContainers {
               {
                 name: 'OPENAI_API_KEY',
                 valueFrom: openaiApiKey,
+              },
+              {
+                name: 'SAMBA_API_KEY',
+                valueFrom: sambaSafetyApiKey,
+              },
+              {
+                name: 'SAMBA_BASE_URL',
+                valueFrom: sambaSafetyBaseUrl,
+              },
+              {
+                name: 'SAMBA_AUTH_USERNAME',
+                valueFrom: sambaSafetyAuthUsername,
+              },
+              {
+                name: 'SAMBA_AUTH_PASSWORD',
+                valueFrom: sambaSafetyAuthPassword,
               },
             ],
             environment: [

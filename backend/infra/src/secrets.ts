@@ -71,6 +71,10 @@ export interface StaticSecrets {
   neuroIdApiKeyTest: aws.ssm.Parameter;
   openaiApiKey: aws.ssm.Parameter;
   datadogApiKey: aws.secretsmanager.Secret;
+  sambaSafetyApiKey: aws.ssm.Parameter;
+  sambaSafetyBaseUrl: aws.ssm.Parameter;
+  sambaSafetyAuthUsername: aws.ssm.Parameter;
+  sambaSafetyAuthPassword: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -97,6 +101,7 @@ interface SecretConstants {
   neuro: Neuro;
   openaiApiKey: string;
   datadogApiKey: string;
+  samba: Samba;
 }
 
 interface ElasticSecrets {
@@ -200,6 +205,13 @@ interface Lexis {
 interface Neuro {
   apiKey: string;
   apiKeyTest: string;
+}
+
+interface Samba {
+  apiKey: string;
+  baseUrl: string;
+  authUsername: string;
+  authPassword: string;
 }
 
 export async function LoadSecrets(
@@ -507,6 +519,22 @@ export async function LoadSecrets(
     datadogApiKey: createSecretsManagerSecret(
       `datadog-api-key-${stack}`,
       datadogApiKey,
+    ),
+    sambaSafetyApiKey: createSecretParameter(
+      `sambaSafetyApiKey-${stack}`,
+      secretConstants.samba.apiKey,
+    ),
+    sambaSafetyBaseUrl: createSecretParameter(
+      `sambaSafetyBaseUrl-${stack}`,
+      secretConstants.samba.baseUrl,
+    ),
+    sambaSafetyAuthUsername: createSecretParameter(
+      `sambaSafetyAuthUsername-${stack}`,
+      secretConstants.samba.authUsername,
+    ),
+    sambaSafetyAuthPassword: createSecretParameter(
+      `sambaSafetyAuthPassword-${stack}`,
+      secretConstants.samba.authPassword,
     ),
   };
 }

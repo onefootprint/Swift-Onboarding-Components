@@ -20,6 +20,7 @@ use newtypes::vendor_credentials::{
     LexisCredentials,
     MiddeskCredentials,
     NeuroIdApiKeys,
+    SambaSafetyCredentials,
 };
 use newtypes::{
     IdvData,
@@ -44,6 +45,7 @@ pub struct TenantVendorControl {
     tenant_name: String,
     tbi: Option<newtypes::TenantBusinessInfo>,
     neuro_id_api_key: NeuroIdApiKeys,
+    samba_safety_credentials: SambaSafetyCredentials,
 }
 
 impl TenantVendorControl {
@@ -81,6 +83,10 @@ impl TenantVendorControl {
 
     pub fn lexis_credentials(&self) -> LexisCredentials {
         self.lexis_credentials.clone()
+    }
+
+    pub fn samba_credentials(&self) -> SambaSafetyCredentials {
+        self.samba_safety_credentials.clone()
     }
 
     pub fn incode_credentials(&self, incode_environment: IncodeEnvironment) -> IncodeCredentials {
@@ -158,6 +164,7 @@ impl TenantVendorControl {
             experian_credential_builder.build_with_subscriber_code(experian_subscriber_code);
 
         let lexis_credentials = LexisCredentials::from(config);
+        let samba_safety_credentials = SambaSafetyCredentials::from(config);
         // As of 2023-04-25, we only have a single set of incode credentials
         let incode_credentials = IncodeCredentials::from(config);
         let incode_sandbox_credentials = IncodeSandboxCredentials::from(config);
@@ -202,6 +209,7 @@ impl TenantVendorControl {
             tenant_id: tenant.id,
             tbi,
             neuro_id_api_key,
+            samba_safety_credentials,
         };
 
         Ok(control)
@@ -327,6 +335,17 @@ impl From<&Config> for NeuroIdApiKeys {
         NeuroIdApiKeys {
             key: config.neuro_id_config.api_key.clone(),
             test_key: config.neuro_id_config.api_key_test.clone(),
+        }
+    }
+}
+
+impl From<&Config> for SambaSafetyCredentials {
+    fn from(config: &Config) -> Self {
+        SambaSafetyCredentials {
+            api_key: config.samba_safety_config.api_key.clone(),
+            base_url: config.samba_safety_config.base_url.clone(),
+            auth_username: config.samba_safety_config.auth_username.clone(),
+            auth_password: config.samba_safety_config.auth_password.clone(),
         }
     }
 }

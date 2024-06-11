@@ -168,6 +168,9 @@ pub struct Config {
 
     #[envconfig(from = "OPENAI_API_KEY")]
     pub openai_api_key: String,
+
+    #[envconfig(nested = true)]
+    pub samba_safety_config: SambaSafetyConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T> {
@@ -474,4 +477,17 @@ pub struct NeuroIdConfig {
     pub api_key: PiiString,
     #[envconfig(from = "NEUROID_API_KEY_TEST")]
     pub api_key_test: PiiString,
+}
+
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct SambaSafetyConfig {
+    #[envconfig(from = "SAMBA_API_KEY")]
+    pub api_key: PiiString,
+    #[envconfig(from = "SAMBA_BASE_URL")]
+    pub base_url: PiiString,
+    #[envconfig(from = "SAMBA_AUTH_USERNAME")]
+    pub auth_username: PiiString,
+    #[envconfig(from = "SAMBA_AUTH_PASSWORD")]
+    pub auth_password: PiiString,
 }

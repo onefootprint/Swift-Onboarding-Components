@@ -2,6 +2,10 @@ secretsprovider: awskms://4e61ea01-1193-475e-82ee-e9639743efd6?region=us-east-1
 encryptedkey: AQICAHierjVilfttqs7gag2b9al8BtcDNoSoVbmhJTJW+UU0GgGJuMYg+vgtHDUvKoWRioMaAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMj/Vfw62zBk4QWSoCAgEQgDsy8VwUnEWcqNAUnFt4UwBe7p2HQDRQCLrCkNyGqXAKPv6DtxBKkM88enMkwb5vgLpEt+v7FCq91wLy9A==
 config:
   aws:region: us-east-1
+  datadog:apiKey:
+    secure: v1:qrIj6oPumKT7EcOa:bQ/WVSwrmVucwwj3cGN8SbP6MoXbOBC2bbEYb+mRpUBiY8rxmofqRFdufkyWw4sP
+  datadog:appKey:
+    secure: v1:05ky/WfsOxOVc27O:f0uOD4qJPZOITicyezH3gmm9MMsNPJ/JfyTOjph6YCpKF84n3rsWM00qwsvaSiY8mJmUZtDVJ/U=
   infra:constants:
     apple:
       deviceCheckPrivateKey:
@@ -11,13 +15,13 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     cronTasks:
-      - args:
-          - create-overdue-watchlist-check-tasks
-          - --limit=1000
-        cpuUnits: 512
-        memoryMB: 1024
-        name: overdue-watchlist
-        schedule: cron(0 17 * * ? *)
+    - args:
+      - create-overdue-watchlist-check-tasks
+      - --limit=1000
+      cpuUnits: 512
+      memoryMB: 1024
+      name: overdue-watchlist
+      schedule: cron(0 17 * * ? *)
     db:
       deletionProtection: false
       maxAcus: 16
@@ -134,6 +138,15 @@ config:
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents
+    samba:
+      apiKey:
+        secure: v1:r50Ntk71dRghYE83:0io5yUJ67Cjw5zLqixMaY3OtdAeXssQHx+rMM9mufQ2h0K7mZtuntxAt1i0denk+mPAFE/sxITY=
+      authPassword:
+        secure: v1:DELWgeDl7qRrcbsd:1ngP4uwZPufmAwN4cbBGcM2UiWQ/zZ3g59kLr90/zphMQThTgF9FlByaIPtzm7gTFjT9km1Kv8URqoC1qdMtM/8g7Vj3xdjJCIFjJz7T3Cs=
+      authUsername:
+        secure: v1:DZO6XcP3qYmtYEMv:uUFSxYiDnG7nsPYQgcDWQwHUKbL/Hr48jvApOupQoEjnz+qk
+      baseUrl:
+        secure: v1:eIAbVTzjPgptHV6K:KGbnPj7NachTFecPKPcAom5AK5n10Xb4wZ9nxs+tlQVF0G7+zCszi+GJWB6gSnk=
     sendgrid:
       apiKey:
         secure: v1:rcN9jM7uB9KA3jjQ:H49idM5tdoD3IoVXyA2T5rSIbr5xvjxqJJXHYh7jCtKefwzpE7VakZc2VzMeAC3kAX4W0uRTdvI9iSKycCMFDAXYaLH5P715BhcWm9lr739sJ849wg==
@@ -164,7 +177,7 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      phoneNumber: '+15105883668'
+      phoneNumber: "+15105883668"
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
     twilioBackup:
@@ -173,31 +186,27 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      phoneNumber: '+15105883668'
+      phoneNumber: "+15105883668"
       whatsappOtpTemplateId: HXeb04132acb5883c98bf6ff80dbeeb2b6
       whatsappSenderId: MG25d83f1f121913d74d8bc2ea96e35db6
     workerTasks:
-      - args:
-          - execute-tasks
-          - --batch-size=100
-          - --poll-period-ms=1000
-        cpuUnits: 512
-        memoryMB: 1024
-        name: execute-tasks
+    - args:
+      - execute-tasks
+      - --batch-size=100
+      - --poll-period-ms=1000
+      cpuUnits: 512
+      memoryMB: 1024
+      name: execute-tasks
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
+  infra:datadogApiKey:
+    secure: v1:qrIj6oPumKT7EcOa:bQ/WVSwrmVucwwj3cGN8SbP6MoXbOBC2bbEYb+mRpUBiY8rxmofqRFdufkyWw4sP
   infra:honeycomb:
     apiKey:
       secure: v1:OvsQ2EQpwZgDtXX2:gnCIfaNIoMI6yGAeDyc0qBFzp9f3WgptY1RBtOtR9mZBEAsf2bo=
-  infra:datadogApiKey:
-    secure: v1:qrIj6oPumKT7EcOa:bQ/WVSwrmVucwwj3cGN8SbP6MoXbOBC2bbEYb+mRpUBiY8rxmofqRFdufkyWw4sP
-  datadog:apiKey:
-    secure: v1:qrIj6oPumKT7EcOa:bQ/WVSwrmVucwwj3cGN8SbP6MoXbOBC2bbEYb+mRpUBiY8rxmofqRFdufkyWw4sP
-  datadog:appKey:
-    secure: v1:05ky/WfsOxOVc27O:f0uOD4qJPZOITicyezH3gmm9MMsNPJ/JfyTOjph6YCpKF84n3rsWM00qwsvaSiY8mJmUZtDVJ/U=
   infra:neon:
     apiKey:
       secure: v1:DTxrP6ue5m+XRElP:F0NmXy8+hG3p2oIqjwBxQReI8O5HHWNRMMYWm2gaSyacA6PMAEes/wjY6fuXfXximCNjjKsBsfw4YJr2BbSAf2/p82rljaWgCTMFHUd1z58=
