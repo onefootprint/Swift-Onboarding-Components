@@ -1455,6 +1455,7 @@ dependencies = [
  "actix-web",
  "api_core",
  "crypto",
+ "db",
  "futures",
  "futures-util",
  "hmac",

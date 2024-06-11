@@ -12,6 +12,7 @@ api_core = { path = "../../core" }
 crypto = { path = "../../../enclave/crypto" }
 idv = { path = "../../../idv" }
 newtypes = { path = "../../../newtypes" }
+db = { path = "../../../db/core" }
 
 serde = { workspace = true }
 serde_json = { workspace = true }

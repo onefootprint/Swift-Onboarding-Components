@@ -23,7 +23,7 @@ impl SaveVerificationResultArgs {
         scoped_vault_id: ScopedVaultId,
         vault_public_key: VaultPublicKey,
         vendor_api: VendorAPI,
-        document_id: DocumentId,
+        document_id: Option<DocumentId>,
     ) -> Self
     where
         T: DeserializeOwned + Serialize,
@@ -48,7 +48,7 @@ impl SaveVerificationResultArgs {
                     decision_intent_id,
                     vault_public_key,
                     scoped_vault_id,
-                    identity_document_id: Some(document_id),
+                    identity_document_id: document_id,
                 }
             }
             Err(_) => Self {
@@ -59,7 +59,7 @@ impl SaveVerificationResultArgs {
                 decision_intent_id,
                 vault_public_key,
                 scoped_vault_id,
-                identity_document_id: Some(document_id),
+                identity_document_id: document_id,
             },
         }
     }

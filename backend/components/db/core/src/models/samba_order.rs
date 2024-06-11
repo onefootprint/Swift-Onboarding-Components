@@ -2,6 +2,7 @@ use super::data_lifetime::DataLifetime;
 use super::samba_order_data_lifetime_junction::SambaOrderDataLifetimeJunction;
 use crate::{
     DbResult,
+    PgConn,
     TxnPgConn,
 };
 use chrono::{
@@ -39,6 +40,19 @@ pub struct SambaOrder {
     pub _updated_at: DateTime<Utc>,
 }
 
+
+#[derive(Debug, AsChangeset, Default)]
+#[diesel(table_name = samba_order)]
+pub struct UpdateSambaOrder {
+    completed_at: Option<DateTime<Utc>>,
+}
+impl UpdateSambaOrder {
+    pub fn set_completed_at() -> Self {
+        UpdateSambaOrder {
+            completed_at: Some(Utc::now()),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct NewSambaOrderArgs {
@@ -103,11 +117,21 @@ impl SambaOrder {
         Ok(Locked::new(result))
     }
 
-    #[tracing::instrument("SambaOrder::get", skip_all)]
-    pub fn get(conn: &mut TxnPgConn, id: &SambaOrderTableId) -> DbResult<Self> {
-        let result = samba_order::table
-            .filter(samba_order::id.eq(id))
+    #[tracing::instrument("SambaOrder::update", skip(conn, update))]
+    pub fn update(conn: &mut TxnPgConn, locked: Locked<Self>, update: UpdateSambaOrder) -> DbResult<Self> {
+        let res = diesel::update(samba_order::table)
+            .filter(samba_order::id.eq(&locked.id))
+            .set(update)
             .get_result(conn.conn())?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("SambaOrder::get", skip_all)]
+    pub fn get(conn: &mut PgConn, id: &SambaOrderId) -> DbResult<Self> {
+        let result = samba_order::table
+            .filter(samba_order::order_id.eq(id))
+            .get_result(conn)?;
         Ok(result)
     }
 }

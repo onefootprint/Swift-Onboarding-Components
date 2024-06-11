@@ -23,10 +23,17 @@ use db::models::document::Document;
 use db::models::samba_order::{
     NewSambaOrderArgs,
     SambaOrder,
+    UpdateSambaOrder,
 };
+use db::models::samba_report::SambaReport;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
-use idv::samba::request::SambaCreateLVOrderRequest;
+use idv::samba::request::{
+    SambaCreateLVOrderRequest,
+    SambaGetLVReportRequest,
+};
+use idv::samba::response::license_validation::SambaLinkType;
+use idv::samba::response::webhook::SambaWebhook;
 use newtypes::samba::SambaOrderKind;
 use newtypes::{
     DataIdentifier,
@@ -36,6 +43,7 @@ use newtypes::{
     IdDocKind,
     IdentityDataKind as IDK,
     OcrDataKind as ODK,
+    SambaReportId,
     VendorAPI,
     WorkflowId,
 };
@@ -114,7 +122,6 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
         return Ok(());
     }
 
-
     // Make the call
     let (decrypted_values, lifetime_ids) = get_decrypted_values(&vw, &state.enclave_client).await?;
     let tvc = TenantVendorControl::new(
@@ -167,7 +174,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
         di.scoped_vault_id.clone(),
         vw.vault.public_key.clone(),
         VendorAPI::SambaLicenseValidationCreate,
-        document.id.clone(),
+        Some(document.id.clone()),
     );
 
     let (vres_id, _) = args.save(&state.db_pool).await?;
@@ -190,6 +197,87 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
             };
             // create samba order
             let _ = SambaOrder::create(conn, args)?;
+
+            Ok(())
+        })
+        .await?;
+
+    Ok(())
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWebhook) -> ApiResult<()> {
+    let Some(report_id) = webhook
+        .get_link(SambaLinkType::LicenseValidation)
+        .map(|l| SambaReportId::from(l.report_id))
+    else {
+        return Err(AssertionError("missing report id").into());
+    };
+
+    let order_id = webhook.data.order_id.clone();
+    let (order, di, tenant_id, vw) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            // TODO: handle error from not finding Order?
+            let order = SambaOrder::get(conn, &order_id)?;
+            let di = DecisionIntent::get(conn, &order.decision_intent_id)?;
+            let sv = ScopedVault::get(conn, &di.scoped_vault_id)?;
+            let tenant_id = sv.tenant_id.clone();
+            let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
+
+            Ok((order, di, tenant_id, vw))
+        })
+        .await?;
+
+    if order.completed_at.is_some() {
+        tracing::info!(order_id=%order.id, "samba order already completed");
+        return Ok(());
+    }
+
+    let tvc =
+        TenantVendorControl::new(tenant_id, &state.db_pool, &state.config, &state.enclave_client).await?;
+    let request = SambaGetLVReportRequest {
+        credentials: tvc.samba_credentials(),
+        report_id: report_id.clone(),
+    };
+
+    // make request
+    let res = state
+        .vendor_clients
+        .samba
+        .samba_get_license_validation_report
+        .make_request(request)
+        .await;
+
+    // save
+    let args = SaveVerificationResultArgs::new_for_samba(
+        &res,
+        di.id.clone(),
+        di.scoped_vault_id.clone(),
+        vw.vault.public_key.clone(),
+        VendorAPI::SambaLicenseValidationGetReport,
+        order.document_id.clone(),
+    );
+
+    let (vres_id, _) = args.save(&state.db_pool).await?;
+
+    let resp = res.map_err(map_to_api_error)?;
+    // check we got a successful_response
+    // TODO: How should we handle this? i think this is right, we don't complete the order if we get
+    // some sort of error..
+    let _ = resp.result.into_success().map_err(map_to_api_error)?;
+
+
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let locked = SambaOrder::lock(conn, &order.id)?;
+            // check again we should be creating the report
+            if locked.completed_at.is_none() {
+                let _ = SambaReport::create(conn, order.id, report_id, vres_id)?;
+                let update = UpdateSambaOrder::set_completed_at();
+                let _ = SambaOrder::update(conn, locked, update)?;
+            }
 
             Ok(())
         })
