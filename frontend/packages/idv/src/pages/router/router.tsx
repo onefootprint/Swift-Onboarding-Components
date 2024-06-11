@@ -8,7 +8,7 @@ import { Identify, IdentifyVariant } from '../../components/identify';
 import { L10nContextProvider } from '../../components/l10n-provider';
 import LoadNeuroId from '../../components/load-neuro-id';
 import { useIdvMachine, useLogStateMachine, useValidateSession } from '../../hooks';
-import { FPCustomEvents, getLogger, getTracker } from '../../utils';
+import { FPCustomEvents, getLogger, trackAction } from '../../utils';
 import {
   createAuthTokenChangedPayload,
   createReceivedDeviceResponseJsonPayload,
@@ -25,7 +25,6 @@ type RouterProps = {
 
 const { receivedDeviceResponseJson, stepUpCompleted } = FPCustomEvents;
 const { logWarn } = getLogger({ location: 'idv-router' });
-const { trackAction } = getTracker();
 
 const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
   const [state, send] = useIdvMachine();

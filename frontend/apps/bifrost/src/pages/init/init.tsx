@@ -1,5 +1,4 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
-import type { ProviderReturn } from '@onefootprint/idv';
 import {
   InitShimmer,
   Logger,
@@ -45,6 +44,7 @@ const setupLogger = (orgIds: Set<string>, config: PublicOnboardingConfig) => {
     Logger.startSessionReplay();
     Logger.identify({
       appClipExperienceId: config.appClipExperienceId,
+      application_id: String(process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_BIFROST),
       iframe: !!isInIframe,
       isAppClipEnabled: config.isAppClipEnabled,
       isInstantAppEnabled: config.isInstantAppEnabled,

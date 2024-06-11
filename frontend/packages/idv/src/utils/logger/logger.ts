@@ -22,6 +22,29 @@ import initLogRocket, {
 } from './utils/log-rocket';
 import { registerErrorHandlers } from './utils/register-event-listeners';
 
+// TODO: move this function to package/core
+const getCookieValue = (name: string): string | null => {
+  if (!document || !document.cookie) return null;
+
+  const cookieValue = `; ${document.cookie}`;
+  const parts = cookieValue.split(`; ${name}=`);
+  if (parts.length < 2) return null;
+
+  const cookieValueWithoutSemicolon = parts.pop()?.split(';').shift();
+  if (!cookieValueWithoutSemicolon) {
+    return null;
+  }
+
+  return cookieValueWithoutSemicolon;
+};
+
+// TODO: move this function to package/core
+const getParameterValue = (param: string, query: string | null): string | null => {
+  if (!query || !param) return null;
+  const params = new URLSearchParams(query.replace(/&/g, '&').replace(/^\?/, ''));
+  return params.get(param);
+};
+
 /**
  * Filters out any traits that are null, undefined, or empty strings.
  *
@@ -68,7 +91,12 @@ const LoggerFactory = () => {
     };
 
     if (isLogRocketEnabled) LogRocket.identify(sessionId, contextProps);
-    if (isDataDogEnabled) datadogLogs.setGlobalContext(contextProps);
+    if (isDataDogEnabled) {
+      datadogLogs.setGlobalContext({
+        ...contextProps,
+        session_id: getParameterValue('id', getCookieValue('_dd_s')),
+      });
+    }
   };
 
   const startSessionReplay = () => {
@@ -85,6 +113,7 @@ const LoggerFactory = () => {
       isSessionReplayOn = true;
     }
   };
+
   const stopSessionReplay = () => {
     if (!isSessionReplayOn || !isDataDogEnabled) return;
 
@@ -139,8 +168,8 @@ const LoggerFactory = () => {
     identify,
     info,
     init,
-    isDataDogEnabled,
-    isLogRocketEnabled,
+    isDataDogEnabled: () => isDataDogEnabled,
+    isLogRocketEnabled: () => isLogRocketEnabled,
     startSessionReplay,
     stopSessionReplay,
     track,
@@ -164,9 +193,7 @@ export const getLogger = (
   logError: (msg: string, err?: unknown, extra?: PrimitiveData) => Logger.error(err, { ...preExtra, ...extra }, msg),
 });
 
-export const getTracker = () => ({
-  trackAction: Logger.isDataDogEnabled ? dataDogAction : () => undefined,
-});
+export const trackAction = dataDogAction;
 
 export const uniqueLogger = (logger: (_: string) => void) => {
   let prev = '';

@@ -1,7 +1,7 @@
 export {
+  default as Logger,
   default,
   getLogger,
-  getTracker,
-  default as Logger,
+  trackAction,
   uniqueLogger,
 } from './logger';
