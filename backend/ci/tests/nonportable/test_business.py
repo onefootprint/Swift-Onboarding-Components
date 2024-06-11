@@ -14,6 +14,8 @@ from tests.headers import ExternalId
         ("business.address_line1", "1 Footprint Way"),
         ("business.phone_number", "+14444444444"),
         ("business.corporation_type", "llc"),
+        ("custom.my_fun_field", "Hayes Valley"),
+        ("custom.my_fun_field2", dict(a="b")),
     ],
 )
 def test_data_vaulting(sandbox_tenant, key, value):
@@ -26,6 +28,9 @@ def test_data_vaulting(sandbox_tenant, key, value):
     fp_id = body["id"]
     patch(f"businesses/{fp_id}/vault", data, sandbox_tenant.sk.key)
     post(f"businesses/{fp_id}/vault/validate", data, sandbox_tenant.sk.key)
+    data = dict(fields=[key], reason="testing")
+    body = post(f"businesses/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
+    assert body[key] == value
 
 
 @pytest.mark.parametrize(
