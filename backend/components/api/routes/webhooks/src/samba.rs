@@ -25,7 +25,7 @@ async fn handle_webhook(
     let req = request.into_inner();
     match serde_json::from_value::<SambaWebhook>(req) {
         Ok(webhook) => {
-            log(webhook.event_type(), "samba webhook received");
+            tracing::info!(?webhook, msg = "samba webhook received", LOG_MSG);
             handle_webhook_inner(&state, webhook).await?;
         }
         Err(_) => {
