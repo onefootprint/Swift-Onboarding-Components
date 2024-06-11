@@ -18,7 +18,6 @@ export enum PostType {
 export enum SlugByPostType {
   blog = '/blog',
   investorUpdate = '/investor-updates',
-  library = '/library',
   changelog = '/changelog',
 }
 
@@ -38,9 +37,6 @@ export async function getAllPosts(type?: PostType) {
 export const getSlugPrefix = (tagName?: string) => {
   if (tagName === INVESTOR_UPDATES_TAG) {
     return SlugByPostType.investorUpdate;
-  }
-  if (tagName === LIBRARY_TAG) {
-    return SlugByPostType.library;
   }
   if (tagName === CHANGELOG_TAG) {
     return SlugByPostType.changelog;

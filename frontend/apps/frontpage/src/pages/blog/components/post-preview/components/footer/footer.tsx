@@ -9,30 +9,30 @@ type FooterProps = {
 };
 
 const Footer = ({ authors, publishedAt }: FooterProps) => {
-  const verticalStack = authors.length > 1;
+  const $verticalStack = authors.length > 1;
   return (
-    <Container verticalStack={verticalStack}>
+    <Container $verticalStack={$verticalStack}>
       <AvatarGroup count={authors.length}>
         {authors.map(author => (
           <Avatar key={author.id} alt={author.name} height={20} src={author.avatarImgUrl} width={20} />
         ))}
       </AvatarGroup>
-      <AuthorsName verticalStack={verticalStack}>{authors.map(author => author.name).join(' & ')}</AuthorsName>
-      {!verticalStack && <Separator>·</Separator>}
+      <AuthorsName $verticalStack={$verticalStack}>{authors.map(author => author.name).join(' & ')}</AuthorsName>
+      {!$verticalStack && <Separator>·</Separator>}
       <DateComponent>{publishedAt}</DateComponent>
     </Container>
   );
 };
 
-const Container = styled(Grid.Container)<{ verticalStack: boolean }>`
-  ${({ theme, verticalStack }) => css`
+const Container = styled(Grid.Container)<{ $verticalStack: boolean }>`
+  ${({ theme, $verticalStack }) => css`
     grid-template-columns: repeat(4, max-content);
     gap: ${theme.spacing[2]};
     grid-template-rows: 1fr;
     grid-template-areas: 'avatars name separator date';
 
     ${
-      verticalStack &&
+      $verticalStack &&
       css`
       grid-template-columns: max-content 1fr;
       grid-template-rows: repeat(3, max-content);
@@ -83,12 +83,12 @@ const Avatar = styled(Image)`
   `}
 `;
 
-const AuthorsName = styled.div<{ verticalStack: boolean }>`
-  ${({ theme, verticalStack }) => css`
+const AuthorsName = styled.div<{ $verticalStack: boolean }>`
+  ${({ theme, $verticalStack }) => css`
     ${createFontStyles('body-4')};
     color: ${theme.color.tertiary};
     grid-area: name;
-    margin-left: ${verticalStack ? 0 : theme.spacing[2]};
+    margin-left: ${$verticalStack ? 0 : theme.spacing[2]};
   `}
 `;
 
