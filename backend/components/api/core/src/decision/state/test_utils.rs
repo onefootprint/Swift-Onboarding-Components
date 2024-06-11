@@ -15,10 +15,16 @@ use crate::{
 };
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
+use db::models::document::{
+    Document,
+    DocumentUpdate,
+    NewDocumentArgs,
+};
 use db::models::document_request::{
     DocumentRequest,
     NewDocumentRequestArgs,
 };
+use db::models::insight_event::CreateInsightEvent;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
@@ -81,8 +87,11 @@ use newtypes::{
     DataLifetimeSeqno,
     DbUserTimelineEventKind,
     DecisionIntentKind,
+    DocumentKind,
     DocumentRequestConfig,
     DocumentRequestKind,
+    DocumentReviewStatus,
+    DocumentStatus,
     FootprintReasonCode,
     OnboardingStatus,
     PiiJsonValue,
@@ -91,6 +100,7 @@ use newtypes::{
     VendorAPI,
     WorkflowFixtureResult,
     WorkflowId,
+    WorkflowKind,
 };
 use std::sync::Arc;
 use strum_macros::EnumIter;
@@ -620,7 +630,32 @@ pub async fn mock_incode_doc_collection(
                     rule_set_result_id: None,
                     config,
                 };
-                DocumentRequest::create(conn, args).unwrap();
+                let dr = DocumentRequest::create(conn, args).unwrap();
+                let doc_args = NewDocumentArgs {
+                    request_id: dr.id,
+                    document_type: DocumentKind::DriversLicense,
+                    country_code: Some(newtypes::Iso3166TwoDigitCountryCode::US),
+                    fixture_result: None,
+                    skip_selfie: None,
+                    device_type: None,
+                    insight: CreateInsightEvent::default(),
+                };
+                let doc = Document::get_or_create(conn, doc_args);
+                let doc = doc.unwrap();
+
+                // And mock out this part of complete.rs
+                let wf = Workflow::get(conn, &wf_id)?;
+                let terminal_review_status = match wf.kind {
+                    // Documents in a document workflow must always be reviewed by a human
+                    WorkflowKind::Document => DocumentReviewStatus::PendingHumanReview,
+                    _ => DocumentReviewStatus::ReviewedByMachine,
+                };
+                let update = DocumentUpdate {
+                    status: Some(DocumentStatus::Complete),
+                    review_status: Some(terminal_review_status),
+                    ..Default::default()
+                };
+                Document::update(conn, &doc.id, update)?;
             }
 
             let vres = save_vres_for_doc_fixture_risk_signals(

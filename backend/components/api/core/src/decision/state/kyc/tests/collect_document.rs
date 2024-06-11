@@ -78,6 +78,8 @@ use newtypes::{
 #[test_state_case(UserKind::Live, PassWithManualReview)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
+    // Also tests redo_document_and_pass at the end
+
     // DATA SETUP
     let (wf, tenant, obc, _tu) = setup_data(
         state,
@@ -143,7 +145,6 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     let tenant_id = tenant.id.clone();
     mock_ff_client.mock(|c| {
         c.expect_flag()
-            .times(3)
             .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
             .return_const(matches!(user_kind, UserKind::Demo));
     });
@@ -169,7 +170,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
             mock_ff_client.mock(|c| {
                 c.expect_flag()
                     .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                    .return_once(move |_| true);
+                    .return_const(true);
             });
 
             // KYC Passes
@@ -239,7 +240,6 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
         .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
-
     let (wf, _, mrs, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
@@ -254,7 +254,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
             // redo document
-            redo_document_and_pass(state, user_kind, &wf, &obd, t_id, risk_signals_for_doc, expect_mr).await
+            collect_ad_hoc_document(state, user_kind, &wf, &obd, t_id, risk_signals_for_doc, expect_mr).await
         }
         UserKind::Live => {
             assert_have_same_elements(
@@ -287,7 +287,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
 
             // redo document
             if !doc_passed_with_review {
-                redo_document_and_pass(state, user_kind, &wf, &obd, t_id, risk_signals_for_doc, expect_mr)
+                collect_ad_hoc_document(state, user_kind, &wf, &obd, t_id, risk_signals_for_doc, expect_mr)
                     .await
             }
         }
@@ -295,14 +295,14 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
 }
 
 #[allow(clippy::too_many_arguments)]
-async fn redo_document_and_pass(
+async fn collect_ad_hoc_document(
     state: &mut State,
     user_kind: UserKind,
     prior_wf: &Workflow,
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
     previous_risk_signals: Vec<RiskSignal>,
-    expect_mr: bool,
+    old_expects_mr: bool,
 ) {
     // Trigger Redo workflow
     let sv_id = prior_wf.scoped_vault_id.clone();
@@ -343,7 +343,6 @@ async fn redo_document_and_pass(
     let tenant_id = tenant_id.clone();
     mock_ff_client.mock(|c| {
         c.expect_flag()
-            .times(1)
             .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
             .return_const(matches!(user_kind, UserKind::Demo));
     });
@@ -371,13 +370,19 @@ async fn redo_document_and_pass(
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pass),
-            ExpectedRequiresManualReview(expect_mr),
-        )],
+        // Status hasn't changed, but manual review is requested. So We'll fire status changed _if_ manual
+        // review wasn't previously requested
+        (!old_expects_mr)
+            .then_some(OnboardingStatusChanged(
+                ExpectedStatus(prior_wf.status),
+                ExpectedRequiresManualReview(true),
+            ))
+            .into_iter()
+            .collect_vec(),
+        // Ad-hoc document workflows always end with a status of None and request manual review
         vec![OnboardingCompleted(
-            ExpectedStatus(OnboardingStatus::Pass),
-            ExpectedRequiresManualReview(expect_mr),
+            ExpectedStatus(OnboardingStatus::None),
+            ExpectedRequiresManualReview(true),
         )],
     );
 
@@ -395,10 +400,10 @@ async fn redo_document_and_pass(
     // new obd was written
     let obd = obd.unwrap();
     assert!(obd.id != prior_obd.id);
-    assert!(obd.status == DecisionStatus::Pass);
+    assert_eq!(obd.status, DecisionStatus::None);
     assert_eq!(expect_committed, portablized_seqno.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
-    assert_eq!(OnboardingStatus::Pass, wf.status);
+    assert_eq!(wf.status, OnboardingStatus::None);
 
     // check RSG is different
     let rs_passing_doc = query_risk_signals(state, &svid2, RiskSignalGroupKind::Doc).await;

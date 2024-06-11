@@ -132,14 +132,11 @@ fn get_final_decision_status(
         Decision::RulesExecuted { action, .. } => match action.map(DecisionStatus::from) {
             Some(status) => (status, false),
             // If there's a document MR and the user doesn't already have a pass status, we'll fail them.
-            // This is a kind of implicit rule.
+            // This is a kind of implicit rule needed to put users in fail after a step up to provide, eg, PoA
             None if can_fail_for_doc_review => (DecisionStatus::Fail, true),
             // Default to pass if no rules were triggered
             None => (DecisionStatus::Pass, false),
         },
-        // If there's a document MR and the user doesn't already have a pass status, we'll fail them.
-        // This is a kind of implicit rule.
-        Decision::RulesNotExecuted if can_fail_for_doc_review => (DecisionStatus::Fail, true),
         Decision::RulesNotExecuted => (DecisionStatus::None, false),
     }
 }
@@ -171,13 +168,13 @@ mod test {
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::None => DecisionStatus::Fail)]
     #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::Pass => DecisionStatus::Fail)]
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::Pass => DecisionStatus::Fail)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::None => DecisionStatus::None)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pending => DecisionStatus::None)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => DecisionStatus::None)]
     // Fail for document MR
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::None => DecisionStatus::Fail)]
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pending => DecisionStatus::Fail)]
     #[test_case(rules_executed(None), true, OnboardingStatus::None => DecisionStatus::Fail)]
     #[test_case(rules_executed(None), true, OnboardingStatus::Incomplete => DecisionStatus::Fail)]
     // Don't set user to fail for doc review if they're already passed
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => DecisionStatus::None)]
     #[test_case(rules_executed(None), true, OnboardingStatus::Pass => DecisionStatus::Pass)]
     // Doc manual review doesn't matter much when there's a rule action.
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, OnboardingStatus::Pass => DecisionStatus::Fail)]
@@ -192,17 +189,19 @@ mod test {
         get_final_decision_status(decision, has_doc_mr, existing_status).0
     }
 
+
     #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::None => false)]
     #[test_case(rules_executed(None), false, OnboardingStatus::None => false)]
     #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::None => false)]
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::None => false)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::None => false)]
+    #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::Pending => false)]
+    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => false)]
     // Fail for document MR
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::None => true)]
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pending => true)]
     #[test_case(rules_executed(None), true, OnboardingStatus::None => true)]
     #[test_case(rules_executed(None), true, OnboardingStatus::Incomplete => true)]
     // Don't set user to fail for doc review if they're already passed
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => false)]
+    #[test_case(rules_executed(None), true, OnboardingStatus::Pass => false)]
     // Doc manual review doesn't matter much when there's a rule action.
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), true, OnboardingStatus::Pass => false)]
     // This one is weird behavior - we should probably fail the user if there's a doc MR +

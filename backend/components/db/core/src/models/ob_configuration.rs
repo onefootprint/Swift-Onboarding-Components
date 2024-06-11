@@ -288,6 +288,7 @@ impl ObConfiguration {
     }
 
     pub fn is_stepup_enabled(&self) -> bool {
+        // TODO this is kind of incorrect now - should check for rules with a stepup outcome
         matches!(self.cip_kind, Some(CipKind::Alpaca))
     }
 

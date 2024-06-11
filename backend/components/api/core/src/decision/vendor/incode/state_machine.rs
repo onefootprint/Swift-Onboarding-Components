@@ -86,7 +86,7 @@ impl IncodeState {
             Self::ProcessId(_) => IncodeVerificationSessionState::ProcessId,
             Self::ProcessFace(_) => IncodeVerificationSessionState::ProcessFace,
             Self::FetchScores(_) => IncodeVerificationSessionState::FetchScores,
-            IncodeState::GetOnboardingStatus(_) => IncodeVerificationSessionState::GetOnboardingStatus,
+            Self::GetOnboardingStatus(_) => IncodeVerificationSessionState::GetOnboardingStatus,
             Self::Complete(_) => IncodeVerificationSessionState::Complete,
             Self::Fail(_) => IncodeVerificationSessionState::Fail,
         }

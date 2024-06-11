@@ -46,6 +46,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
+use db::models::workflow::Workflow;
 use db::{
     DbPool,
     TxnPgConn,
@@ -81,6 +82,8 @@ use newtypes::{
     VendorAPI,
     VendorValidatedCountryCode,
     VerificationResultId,
+    WorkflowId,
+    WorkflowKind,
 };
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
@@ -357,6 +360,7 @@ fn vault_complete_images(
 pub struct CompleteArgs<'a> {
     pub vault: &'a Vault,
     pub sv_id: &'a ScopedVaultId,
+    pub wf_id: &'a WorkflowId,
     pub obc_id: &'a ObConfigurationId,
     pub id_doc_id: &'a DocumentId,
     pub dk: ValidatedIdDocKind,
@@ -373,6 +377,7 @@ impl Complete {
         let CompleteArgs {
             vault,
             sv_id,
+            wf_id,
             obc_id,
             id_doc_id,
             dk,
@@ -413,6 +418,13 @@ impl Complete {
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence();
         let selfie_score = score_response.selfie_match().0;
 
+        let wf = Workflow::get(conn, wf_id)?;
+        let terminal_review_status = match wf.kind {
+            // Documents in a document workflow must always be reviewed by a human
+            WorkflowKind::Document => DocumentReviewStatus::PendingHumanReview,
+            _ => DocumentReviewStatus::ReviewedByMachine,
+        };
+
         let update = DocumentUpdate {
             completed_seqno: Some(seqno),
             document_score,
@@ -422,7 +434,7 @@ impl Complete {
             vaulted_document_type: Some(validated_doc_kind.into()),
             curp_completed_seqno: None,
             validated_country_code: country_code.map(|c| c.0),
-            review_status: Some(DocumentReviewStatus::ReviewedByMachine),
+            review_status: Some(terminal_review_status),
         };
         Document::update(conn, id_doc_id, update)?;
 

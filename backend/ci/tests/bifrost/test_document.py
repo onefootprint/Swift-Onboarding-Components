@@ -186,13 +186,8 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
     )
     user2 = bifrost.run()
     assert user2.fp_id == user.fp_id
-    if initial_fixture_result == "pass":
-        # The status for the document workflow should be "none"
-        assert bifrost.validate_response["user"]["status"] == "none"
-    else:
-        # TODO: this is due to some interesting rule that puts the user in fail if they are non-terminal and
-        # need review by a human
-        assert bifrost.validate_response["user"]["status"] == "fail"
+    # The status for the document workflow should be "none" because it has no rules
+    assert bifrost.validate_response["user"]["status"] == "none"
     # The status of the user should remain unchanged
     body = get(f"users/{user.fp_id}", None, sandbox_tenant.s_sk)
     assert body["status"] == initial_fixture_result

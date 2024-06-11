@@ -123,7 +123,6 @@ pub async fn save_incode_fixtures(
     id_doc: Document,
     should_collect_selfie: bool,
 ) -> ApiResult<()> {
-    let wf_id = wf_id.clone();
     let suid = su_id.clone();
     let vw = state
         .db_pool
@@ -159,11 +158,12 @@ pub async fn save_incode_fixtures(
     )?;
     let suid = su_id.clone();
     let iddoc = id_doc.clone();
+    let wfid = wf_id.clone();
     let (vres, doc_uploads) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let di =
-                DecisionIntent::get_or_create_for_workflow(conn, &suid, &wf_id, DecisionIntentKind::DocScan)?;
+                DecisionIntent::get_or_create_for_workflow(conn, &suid, &wfid, DecisionIntentKind::DocScan)?;
             let apis = vec![VendorAPI::IncodeFetchOcr, VendorAPI::IncodeFetchScores];
             let requests = VerificationRequest::bulk_create(conn, suid, apis, &di.id, Some(&iddoc.id))?;
 
@@ -217,6 +217,7 @@ pub async fn save_incode_fixtures(
     let ocr_data = compute_ocr_data(state, args, &rs).await?;
 
     let suid = su_id.clone();
+    let wfid = wf_id.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -224,6 +225,7 @@ pub async fn save_incode_fixtures(
             let args = CompleteArgs {
                 vault: &vw.vault,
                 sv_id: &suid,
+                wf_id: &wfid,
                 obc_id: &obc.id,
                 id_doc_id: &id_doc.id,
                 dk: ValidatedIdDocKind::new_for_fixture(doc_type),

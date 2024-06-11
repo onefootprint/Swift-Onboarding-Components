@@ -215,28 +215,22 @@ def test_retrigger_onboard(sandbox_tenant, must_collect_data):
 
 
 @pytest.mark.parametrize(
-    "document_configs,expected_docs,expected_mr",
+    "document_configs,expected_docs",
     [
         (
             [dict(kind="identity", data=dict(collect_selfie=False))],
-            {"drivers_license": "reviewed_by_machine"},
-            False,
+            ["drivers_license"],
         ),
         (
             [
                 dict(kind="identity", data=dict(collect_selfie=False)),
                 dict(kind="proof_of_ssn", data=dict()),
             ],
-            {
-                "drivers_license": "reviewed_by_machine",
-                "ssn_card": "pending_human_review",
-            },
-            True,
+            ["drivers_license", "ssn_card"],
         ),
         (
             [dict(kind="proof_of_address", data=dict())],
-            {"proof_of_address": "pending_human_review"},
-            True,
+            ["proof_of_address"],
         ),
         (
             [
@@ -248,12 +242,11 @@ def test_retrigger_onboard(sandbox_tenant, must_collect_data):
                     ),
                 )
             ],
-            {"custom": "pending_human_review"},
-            True,
+            ["custom"],
         ),
     ],
 )
-def test_collect_document(document_configs, sandbox_tenant, expected_docs, expected_mr):
+def test_collect_document(document_configs, sandbox_tenant, expected_docs):
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
 
@@ -288,16 +281,13 @@ def test_collect_document(document_configs, sandbox_tenant, expected_docs, expec
     # And dashboard-facing API
     body = get(f"entities/{fp_id}/documents", None, *sandbox_tenant.db_auths)
     assert set(i["kind"] for i in body) == set(expected_docs)
-    for kind, review_status in expected_docs.items():
-        assert (
-            next(i for i in body if i["kind"] == kind)["review_status"] == review_status
-        )
+    assert all(i["review_status"] == "pending_human_review" for i in body)
 
     body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_tenant.db_auths)
     assert body["status"] == status, "Status shouldn't have changed from doc"
-    assert body["requires_manual_review"] == expected_mr
-    if expected_mr:
-        assert body["manual_review_kinds"] == ["document_needs_review"]
+    # All adhoc document triggers should put the user into manual review since there are no rules to execute
+    assert body["requires_manual_review"]
+    assert body["manual_review_kinds"] == ["document_needs_review"]
 
 
 @pytest.mark.parametrize(

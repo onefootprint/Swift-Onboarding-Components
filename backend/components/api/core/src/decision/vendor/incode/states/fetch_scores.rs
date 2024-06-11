@@ -278,6 +278,7 @@ impl IncodeStateTransition for FetchScores {
         let args = CompleteArgs {
             vault: &ctx.vault,
             sv_id: &ctx.sv_id,
+            wf_id: &ctx.wf_id,
             obc_id: &ctx.obc.id,
             id_doc_id: &ctx.id_doc_id,
             dk: self.document_kind,
