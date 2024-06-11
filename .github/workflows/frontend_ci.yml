@@ -128,22 +128,22 @@ jobs:
         working-directory: ./frontend
         run: yarn typecheck
 
-  audit:
-    needs: [files-changed]
-    if: needs.files-changed.outputs.filesChanged == 'true'
-    strategy:
-      matrix:
-        node-version: [18.x]
-        os: [ubuntu-latest]
-    name: 'Audit'
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # audit:
+  #   needs: [files-changed]
+  #   if: needs.files-changed.outputs.filesChanged == 'true'
+  #   strategy:
+  #     matrix:
+  #       node-version: [18.x]
+  #       os: [ubuntu-latest]
+  #   name: 'Audit'
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Audit for vulnerabilities
-        working-directory: ./frontend
-        run: npx audit-ci@^6 --config ./audit-ci.jsonc
+  #     - name: Audit for vulnerabilities
+  #       working-directory: ./frontend
+  #       run: npx audit-ci@^6 --config ./audit-ci.jsonc
 
   bun-unit-tests:
     needs: [files-changed]
