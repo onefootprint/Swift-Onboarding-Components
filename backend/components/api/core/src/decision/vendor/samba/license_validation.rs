@@ -115,13 +115,17 @@ impl CreateOrderContext {
 
     fn get_document_id(&self, conn: &mut PgConn) -> ApiResult<Option<DocumentId>> {
         // If we're running this in the context of a wf, only check documents collected in this workflow
-        let list_doc_filter = match self {
-            CreateOrderContext::Workflow { wf_id, .. } => Some(wf_id),
-            CreateOrderContext::Adhoc { .. } => None,
+        let id_documents = match self {
+            CreateOrderContext::Workflow { wf_id, .. } => {
+                Document::list_completed_sent_to_incode(conn, wf_id)?
+            }
+            CreateOrderContext::Adhoc { di, .. } => {
+                Document::list_completed_sent_to_incode(conn, &di.scoped_vault_id)?
+            }
         };
 
         // need this filter since we only support sending OCR'd DL at the moment, in future can relax this
-        let id_documents: Vec<_> = Document::list_completed_sent_to_incode(conn, list_doc_filter)?
+        let id_documents: Vec<_> = id_documents
             .into_iter()
             .filter(|(d, _, _)| d.vaulted_document_type == Some(DocumentKind::DriversLicense))
             .collect();

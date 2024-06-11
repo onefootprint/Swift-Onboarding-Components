@@ -305,9 +305,9 @@ impl Document {
     }
 
     #[tracing::instrument("Document::list_completed_sent_to_incode", skip_all)]
-    pub fn list_completed_sent_to_incode(
+    pub fn list_completed_sent_to_incode<'a, T: Into<DocumentIdentifier<'a>>>(
         conn: &mut PgConn,
-        wf_id: Option<&WorkflowId>,
+        id: T,
     ) -> DbResult<Vec<(Self, DocumentRequest, Option<IncodeVerificationSession>)>> {
         let mut query = identity_document::table
             .inner_join(document_request::table)
@@ -317,9 +317,15 @@ impl Document {
             .left_join(incode_verification_session::table.on(incode_verification_session::identity_document_id.eq(identity_document::id)))
             .into_boxed();
 
-        if let Some(wfid) = wf_id {
-            query = query.filter(document_request::workflow_id.eq(wfid));
+        match id.into() {
+            DocumentIdentifier::WorkflowId { id } => {
+                query = query.filter(document_request::workflow_id.eq(id));
+            }
+            DocumentIdentifier::SvId { id } => {
+                query = query.filter(document_request::scoped_vault_id.eq(id));
+            }
         }
+
         // latest is first
         let results = query
             .order_by(identity_document::completed_seqno.desc())
@@ -431,4 +437,11 @@ impl Document {
         let results = query.get_results(conn)?;
         Ok(results)
     }
+}
+
+
+#[derive(derive_more::From)]
+pub enum DocumentIdentifier<'a> {
+    SvId { id: &'a ScopedVaultId },
+    WorkflowId { id: &'a WorkflowId },
 }
