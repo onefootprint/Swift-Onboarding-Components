@@ -1,6 +1,6 @@
 import { FootprintComponentKind } from '@onefootprint/footprint-js';
 import footprint, { FootprintVerifyButton } from '@onefootprint/footprint-react';
-import { CodeBlock, CodeInline, Text } from '@onefootprint/ui';
+import { Box, CodeBlock, CodeInline, Text, createFontStyles } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
@@ -189,18 +189,18 @@ const Flexcar = () => (
             {`This is a step-by-step guide on how to integrate Footprint into your
             product as well as customize it to match your brand's look and feel.`}
           </Text>
-          <Text variant="body-2">
+          <Bullet>
             1. Go to the{` `}
             <Link href="https://dashboard.onefootprint.com" target="_blank">
               Footprint developer dashboard
             </Link>
             {` `}
             and create a new Playbook:
-          </Text>
+          </Bullet>
           <span>
-            <Text variant="body-2">
+            <Bullet>
               2. Grab the Onboarding Publishable Key, for example <CodeInline>{publicKey}</CodeInline>.
-            </Text>
+            </Bullet>
           </span>
           <Text variant="body-2">3. Install Footprint dependencies:</Text>
           <CodeBlock language="bash">{installation}</CodeBlock>
@@ -223,6 +223,10 @@ const Flexcar = () => (
     </Grid>
   </>
 );
+
+const Bullet = styled(Box)`
+  ${createFontStyles('body-2')}
+`;
 
 const Grid = styled.div`
   ${({ theme }) => `

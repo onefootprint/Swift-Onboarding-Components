@@ -45,7 +45,7 @@ const linkSections = [
         href: '/industries/fintech',
       },
       {
-        textKey: 'industries.baas',
+        textKey: 'industries.financial-institutions',
         href: '/industries/financial-institutions',
       },
     ],

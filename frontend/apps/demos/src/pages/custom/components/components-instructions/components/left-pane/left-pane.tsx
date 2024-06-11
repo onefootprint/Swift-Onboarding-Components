@@ -1,5 +1,5 @@
 import type { FootprintAppearance } from '@onefootprint/footprint-js';
-import { Button, CodeBlock, CodeInline, InlineAlert, Text, media } from '@onefootprint/ui';
+import { Button, CodeBlock, CodeInline, InlineAlert, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -53,10 +53,10 @@ const LeftPane = ({
           Do not post your secret keys in publicly accessible places like GitHub or client-side code like web
           front-ends.
         </InlineAlert>
-        <Text variant="body-2" display="flex" gap={3}>
+        <Bullet>
           2. Grab the Secret API Key:{` `}
           <CodeInline>{secretKey}</CodeInline>
-        </Text>
+        </Bullet>
         <Text variant="body-2">3. Install Footprint dependencies:</Text>
         {framework === 'react' ? (
           <CodeBlock language="bash">{reactInstallation}</CodeBlock>
@@ -120,6 +120,15 @@ const LeftPane = ({
     </Left>
   );
 };
+
+const Bullet = styled(Stack)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-3')}
+    flex-direction: row;
+    gap: ${theme.spacing[3]};
+    align-items: center;
+  `}
+`;
 
 const Left = styled.div`
   ${({ theme }) => css`

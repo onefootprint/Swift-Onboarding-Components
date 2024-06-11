@@ -99,11 +99,7 @@ const GlobalStyle = createGlobalStyle`
      border: 0;
      font-size: 100%;
      vertical-align: baseline;
-     font-family: ${
-       theme.fontFamily.default === 'DM Sans'
-         ? `var(--font-dm-sans, ${theme.fontFamily.default})`
-         : theme.fontFamily.default
-     };
+     font-family: ${theme.fontFamily.default};
    }
    code,
    pre {

@@ -1,30 +1,35 @@
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import type { AppProps } from 'next/app';
+import { DM_Sans, Source_Code_Pro } from 'next/font/google';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
-
-import CustomDesignSystemProvider from '../components/custom-design-system-provider';
-import ErrorBoundary from '../components/error-boundary';
 import Layout from '../components/layout';
-import initDataDogRum from '../config/initializers/datadog';
-import configureReactI18next from '../config/initializers/react-i18next';
-import ReactQueryProvider from '../config/initializers/react-query-provider';
+import Providers from '../components/providers';
 
-configureReactI18next();
-if (typeof window !== 'undefined') {
-  initDataDogRum();
-}
+const defaultFont = DM_Sans({
+  display: 'swap',
+  preload: true,
+  subsets: ['latin'],
+  variable: '--font-family-default',
+  fallback: ['Inter'],
+});
+
+const codeFont = Source_Code_Pro({
+  display: 'swap',
+  preload: true,
+  subsets: ['latin'],
+  variable: '--font-family-code',
+  fallback: ['Courier New'],
+});
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const isResponsive = router.pathname === '/onboarding' || router.pathname.startsWith('/authentication');
+
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
-
-  const isResponsive = router.pathname === '/onboarding' || router.pathname.startsWith('/authentication/');
 
   return (
     <>
@@ -35,19 +40,12 @@ const App = ({ Component, pageProps }: AppProps) => {
           <meta name="viewport" content="width=900,maximum-scale=1.0" />
         )}
       </Head>
-      <ObserveCollectorProvider appName="dashboard">
-        <CustomDesignSystemProvider>
-          <ReactQueryProvider>
-            <ReactQueryDevtools />
-            <GlobalStyle $hasMinWidth={!isResponsive} />
-            <ErrorBoundary>
-              <Layout name={pageProps.layout}>
-                <Component />
-              </Layout>
-            </ErrorBoundary>
-          </ReactQueryProvider>
-        </CustomDesignSystemProvider>
-      </ObserveCollectorProvider>
+      <Providers>
+        <GlobalStyle $hasMinWidth={!isResponsive} />
+        <Layout name={pageProps.layout}>
+          <Component />
+        </Layout>
+      </Providers>
     </>
   );
 };
@@ -57,6 +55,9 @@ const GlobalStyle = createGlobalStyle<{ $hasMinWidth: boolean }>`
     :root {
       --side-nav-width: 240px;
       --main-content-max-width: 1200px;
+      font-family: ${defaultFont.style.fontFamily};
+      --font-family-default: ${defaultFont.style.fontFamily};
+      --font-family-code: ${codeFont.style.fontFamily};
     }
 
     #__next {

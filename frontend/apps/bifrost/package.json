@@ -1,6 +1,6 @@
 {
   "name": "bifrost",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "build:analyze": "ANALYZE=true yarn build",
@@ -35,6 +35,7 @@
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
+    "@radix-ui/react-slot": "^1.0.2",
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-locales-sync": "^2.0.1",
