@@ -53,12 +53,13 @@ mod tests {
     #[test_db_pool]
     async fn test(db_pool: TestDbPool) {
         // Setup
-        let sv = db_pool
+        let (sv, obc) = db_pool
             .db_transaction(|conn| -> DbResult<_> {
                 let t = fixtures::tenant::create(conn);
                 let obc = fixtures::ob_configuration::create(conn, &t.id, true);
                 let vault = fixtures::vault::create_person(conn, true);
-                Ok(fixtures::scoped_vault::create(conn, &vault.id, &obc.id))
+                let sv = fixtures::scoped_vault::create(conn, &vault.id, &obc.id);
+                Ok((sv, obc))
             })
             .await
             .unwrap();
@@ -71,6 +72,7 @@ mod tests {
                 fp_id: sv.fp_id.clone(),
                 timestamp: chrono::Utc::now(),
                 status: OnboardingStatus::Fail,
+                playbook_key: obc.key.clone(),
                 requires_manual_review: true,
                 is_live: sv.is_live,
             }),
@@ -82,8 +84,11 @@ mod tests {
         mock_webhook_client
             .expect_send_event_to_tenant()
             .withf(move |_, w, _| match w {
-                WebhookEvent::OnboardingCompleted(obc) => {
-                    obc.fp_id == fp_id && obc.status == OnboardingStatus::Fail && obc.requires_manual_review
+                WebhookEvent::OnboardingCompleted(payload) => {
+                    payload.fp_id == fp_id
+                        && payload.status == OnboardingStatus::Fail
+                        && payload.requires_manual_review
+                        && payload.playbook_key == obc.key
                 }
                 _ => false,
             })

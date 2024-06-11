@@ -644,11 +644,14 @@ impl Workflow {
             // or in a redo flow If the current Workflow status is not pass/fail but the new
             // status is, fire OnboardingCompleted (ie anytime a Workflow completes)
             if !wf.status.is_terminal() && new_status.is_terminal() {
+                let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                     fp_id: sv.fp_id.clone(),
                     timestamp: Utc::now(),
+                    // TODO this doesn't really make sense in the context of ad-hoc document workflows
                     status: new_status,
                     requires_manual_review: requires_manual_review_after_update,
+                    playbook_key: obc.key,
                     is_live: sv.is_live,
                 });
                 let task_data = sv.webhook_event(webhook_event).into();

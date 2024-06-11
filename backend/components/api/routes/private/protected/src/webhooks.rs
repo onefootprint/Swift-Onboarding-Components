@@ -6,6 +6,7 @@ use actix_web::{
 };
 use api_core::errors::{
     ApiResult,
+    AssertionError,
     ValidationError,
 };
 use api_core::types::{
@@ -17,6 +18,7 @@ use api_core::{
     State,
 };
 use chrono::Utc;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::{
     ScopedVault,
     SerializableEntity,
@@ -25,6 +27,7 @@ use db::models::task::{
     Task,
     TaskCreateArgs,
 };
+use db::PgConn;
 use itertools::Itertools;
 use newtypes::{
     FpId,
@@ -71,7 +74,7 @@ async fn post(
             let entities = ScopedVault::bulk_get_serializable_info(conn, sv_ids)?;
             let task_data = entities
                 .into_values()
-                .map(|entity| create_webhook_event(entity, kind))
+                .map(|entity| create_webhook_event(conn, entity, kind))
                 .map_ok(|task_data| TaskCreateArgs {
                     scheduled_for: Utc::now(),
                     task_data,
@@ -86,14 +89,25 @@ async fn post(
     EmptyResponse::ok().json()
 }
 
-fn create_webhook_event(entity: SerializableEntity, kind: WebhookEventKind) -> ApiResult<TaskData> {
-    let (sv, _, _, _, mrs, _) = entity;
+fn create_webhook_event(
+    conn: &mut PgConn,
+    entity: SerializableEntity,
+    kind: WebhookEventKind,
+) -> ApiResult<TaskData> {
+    let (sv, _, _, _, mrs, wfs) = entity;
+    let (latest_wf, _) = wfs
+        .into_iter()
+        .filter(|(wf, _)| wf.completed_at.is_some())
+        .max_by_key(|(wf, _)| wf.completed_at)
+        .ok_or(AssertionError(&format!("No completed workflow for {}", sv.fp_id)))?;
+    let (obc, _) = ObConfiguration::get(conn, &latest_wf.ob_configuration_id)?;
     let event = match kind {
         WebhookEventKind::OnboardingCompleted => {
             WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                 fp_id: sv.fp_id.clone(),
                 timestamp: Utc::now(),
                 status: sv.status,
+                playbook_key: obc.key,
                 requires_manual_review: !mrs.is_empty(),
                 is_live: sv.is_live,
             })

@@ -69,6 +69,7 @@ impl schemars::JsonSchema for WebhookEventKind {
 mod payloads {
     use super::*;
     use newtypes::{
+        ObConfigurationKey,
         WatchlistCheckError,
         WatchlistCheckStatusKind,
     };
@@ -82,6 +83,8 @@ mod payloads {
         pub timestamp: DateTime<Utc>,
         #[schemars(with = "OnboardingStatusShadow")]
         pub status: OnboardingStatus,
+        #[schemars(with = "String")]
+        pub playbook_key: ObConfigurationKey,
         pub requires_manual_review: bool,
         pub is_live: bool,
     }
@@ -158,6 +161,7 @@ mod payloads {
 
 mod examples {
     use super::*;
+    use newtypes::ObConfigurationKey;
 
     impl OnboardingCompletedPayload {
         pub fn example() -> Self {
@@ -166,6 +170,7 @@ mod examples {
                 fp_id: FpId::test_data("fp_id_xyz".into()),
                 timestamp: Utc::now(),
                 status: OnboardingStatus::Pass,
+                playbook_key: ObConfigurationKey::test_data("pb_test_QoEYTOve49Q2IAmaKVYnPs".into()),
                 requires_manual_review: false,
                 is_live: false,
             }
@@ -222,6 +227,7 @@ impl From<NTOnboardingCompletedPayload> for OnboardingCompletedPayload {
             fp_id: value.fp_id,
             timestamp: value.timestamp,
             status: value.status,
+            playbook_key: value.playbook_key,
             requires_manual_review: value.requires_manual_review,
             is_live: value.is_live,
         }

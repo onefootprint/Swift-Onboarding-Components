@@ -1,5 +1,6 @@
 use crate::{
     FpId,
+    ObConfigurationKey,
     OnboardingStatus,
     ScopedVaultId,
     TenantId,
@@ -160,6 +161,7 @@ pub struct OnboardingCompletedPayload {
     pub status: OnboardingStatus,
     pub requires_manual_review: bool,
     pub is_live: bool,
+    pub playbook_key: ObConfigurationKey,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
