@@ -131,7 +131,7 @@ pub async fn post(
         .flag(BoolFlag::ApiKycSkipEmailAndPhoneRequirements(&tenant_id))
         && uvw.vault.is_created_via_api;
 
-    let wf = state
+    let (wf, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
@@ -212,7 +212,7 @@ pub async fn post(
                 );
                 return Err(err.into());
             }
-            Ok(wf)
+            Ok((wf, obc))
         })
         .await?;
 
@@ -234,7 +234,7 @@ pub async fn post(
         .await?;
 
     ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((
-        wf.status, sv, mrs,
+        wf.status, sv, mrs, obc,
     )))
     .json()
 }

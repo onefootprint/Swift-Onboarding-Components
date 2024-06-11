@@ -125,7 +125,7 @@ def test_trigger(no_phone_user):
     )
 
 
-def test_step_up(no_phone_user, sandbox_tenant):
+def test_step_up(no_phone_user, sandbox_tenant, skip_phone_obc):
     data = dict(kind="onboard", key=no_phone_user.client.ob_config.key.value)
     body = post(f"users/{no_phone_user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
@@ -135,7 +135,7 @@ def test_step_up(no_phone_user, sandbox_tenant):
 
     # And use the auth token to onboard
     bifrost2 = BifrostClient.raw_auth(
-        sandbox_tenant.default_ob_config, auth_token, no_phone_user.client.sandbox_id
+        skip_phone_obc, auth_token, no_phone_user.client.sandbox_id
     )
     user2 = bifrost2.run()
     assert user2.fp_id == no_phone_user.fp_id

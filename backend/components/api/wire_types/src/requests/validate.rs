@@ -3,6 +3,7 @@ use newtypes::{
     FpId,
     ModernAuthEventKind,
     ObConfigurationId,
+    ObConfigurationKey,
     OnboardingStatus,
     SessionAuthToken,
 };
@@ -35,6 +36,7 @@ pub struct EntityValidateResponse {
     pub fp_id: FpId,
     pub requires_manual_review: bool,
     pub status: OnboardingStatus,
+    pub playbook_key: ObConfigurationKey,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]

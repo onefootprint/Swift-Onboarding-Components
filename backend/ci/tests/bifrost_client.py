@@ -374,6 +374,7 @@ class BifrostClient:
         assert body["user"]["fp_id"]
         assert body["user"]["requires_manual_review"] is not None
         assert body["user"]["status"] in {"pass", "fail", "pending", "none"}
+        assert body["user"]["playbook_key"] == self.ob_config.key.value
         # Check user_auth
         assert body["user_auth"]["fp_id"] == body["user"]["fp_id"]
         assert body["user_auth"]["auth_events"]
@@ -382,6 +383,9 @@ class BifrostClient:
             for e in body["user_auth"]["auth_events"]
         )
         assert all(e["timestamp"] for e in body["user_auth"]["auth_events"])
+
+        if body.get("business", None):
+            assert body["business"]["playbook_key"] == self.ob_config.key.value
 
         self.validate_response = body
         return (body["user"]["fp_id"], body.get("business", {}).get("fp_id"))

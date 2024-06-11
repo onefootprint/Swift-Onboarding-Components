@@ -1981,6 +1981,9 @@
                     "fp_id": {
                         "type": "string"
                     },
+                    "playbook_key": {
+                        "type": "string"
+                    },
                     "requires_manual_review": {
                         "type": "boolean"
                     },
@@ -1997,6 +2000,7 @@
                 },
                 "required": [
                     "fp_id",
+                    "playbook_key",
                     "requires_manual_review",
                     "status"
                 ]

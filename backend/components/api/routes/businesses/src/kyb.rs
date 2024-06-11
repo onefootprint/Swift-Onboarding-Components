@@ -113,7 +113,7 @@ pub async fn post(
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &bvw).await?;
 
     let tenant_id = auth.tenant().id.clone();
-    let biz_wf = state
+    let (biz_wf, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
@@ -176,7 +176,7 @@ pub async fn post(
                 return Err(err.into());
             }
 
-            Ok(biz_wf)
+            Ok((biz_wf, obc))
         })
         .await?;
 
@@ -193,7 +193,7 @@ pub async fn post(
         .await?;
 
     ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((
-        wf.status, sv, mrs,
+        wf.status, sv, mrs, obc,
     )))
     .json()
 }

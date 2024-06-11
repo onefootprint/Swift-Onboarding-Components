@@ -76,20 +76,20 @@ pub async fn post(
                     .ob_configuration_id
                     .as_ref()
                     .ok_or(OnboardingError::NoObcForWorkflow)?;
-                let (ob_config, _) = ObConfiguration::get(conn, obc_id)?;
-                let biz_wf = if ob_config.kind == ObConfigurationKind::Kyb {
+                let (obc, _) = ObConfiguration::get(conn, obc_id)?;
+                let biz_wf = if obc.kind == ObConfigurationKind::Kyb {
                     let id = WorkflowIdentifier::BusinessOwner {
                         owner_vault_id: &sv.vault_id,
-                        ob_config_id: &ob_config.id,
+                        ob_config_id: &obc.id,
                         is_business: (),
                     };
                     let (biz_wf, biz_sv) = Workflow::get_all(conn, id)?;
                     let biz_mrs = ManualReview::get_active(conn, &biz_sv.id)?;
-                    Some((biz_sv, biz_wf, biz_mrs))
+                    Some((biz_sv, biz_wf, biz_mrs, obc.clone()))
                 } else {
                     None
                 };
-                (Some((wf, user_mrs)), biz_wf)
+                (Some((wf, user_mrs, obc)), biz_wf)
             } else {
                 (None, None)
             };
@@ -108,28 +108,31 @@ pub async fn post(
     // For now, we'll keep serializing this, but we should migrate them away as soon as we start
     // serializing the playbook key here.
     let onboarding_configuration_id = if auth.tenant().pinned_api_version.is_some_and(|v| v <= 2) {
-        wf.as_ref().and_then(|(wf, _)| wf.ob_configuration_id.clone())
+        wf.as_ref().and_then(|(wf, _, _)| wf.ob_configuration_id.clone())
     } else {
         None
     };
 
     // Validate and serialize the user and optionally the business onboardings
-    let validate_and_serialize =
-        |sv: ScopedVault, mrs: Vec<ManualReview>, wf: Workflow| -> ApiResult<EntityValidateResponse> {
-            if sv.tenant_id != auth.tenant().id {
-                return Err(OnboardingError::TenantMismatch.into());
-            }
-            if sv.is_live != auth.is_live()? {
-                return Err(OnboardingError::InvalidSandboxState.into());
-            }
-            if matches!(sv.kind, VaultKind::Person) && matches!(wf.status, OnboardingStatus::Incomplete) {
-                // For now, tenants aren't expecting this enum values in the response
-                return Err(OnboardingError::NonTerminalState.into());
-            }
+    let validate_and_serialize = |sv: ScopedVault,
+                                  mrs: Vec<ManualReview>,
+                                  wf: Workflow,
+                                  obc: ObConfiguration|
+     -> ApiResult<EntityValidateResponse> {
+        if sv.tenant_id != auth.tenant().id {
+            return Err(OnboardingError::TenantMismatch.into());
+        }
+        if sv.is_live != auth.is_live()? {
+            return Err(OnboardingError::InvalidSandboxState.into());
+        }
+        if matches!(sv.kind, VaultKind::Person) && matches!(wf.status, OnboardingStatus::Incomplete) {
+            // For now, tenants aren't expecting this enum values in the response
+            return Err(OnboardingError::NonTerminalState.into());
+        }
 
-            let response = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs));
-            Ok(response)
-        };
+        let response = api_wire_types::EntityValidateResponse::from_db((wf.status, sv, mrs, obc));
+        Ok(response)
+    };
     let user_auth = UserAuthResponse {
         fp_id: sv.fp_id.clone(),
         auth_events: auth_events
@@ -140,12 +143,12 @@ pub async fn post(
             })
             .collect(),
     };
-    let wf_id = wf.as_ref().map(|(wf, _)| wf.id.clone());
+    let wf_id = wf.as_ref().map(|(wf, _, _)| wf.id.clone());
     let user = wf
-        .map(|(wf, mrs)| validate_and_serialize(sv, mrs, wf))
+        .map(|(wf, mrs, obc)| validate_and_serialize(sv, mrs, wf, obc))
         .transpose()?;
     let business = biz_wf
-        .map(|(sv, wf, mrs)| validate_and_serialize(sv, mrs, wf))
+        .map(|(sv, wf, mrs, obc)| validate_and_serialize(sv, mrs, wf, obc))
         .transpose()?;
 
     if let Some(wf_id) = wf_id {

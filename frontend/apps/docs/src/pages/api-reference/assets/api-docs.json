@@ -3841,7 +3841,6 @@
                     "custom.ach_account_number": "1234567890",
                     "custom.cc_last_4": "4242"
                 },
-                "description": "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/apis#vault-fields).",
                 "type": "object",
                 "properties": {
                     "<key>": {
@@ -4150,31 +4149,7 @@
                             "fp_id": {
                                 "type": "string"
                             },
-                            "requires_manual_review": {
-                                "type": "boolean"
-                            },
-                            "status": {
-                                "type": "string",
-                                "enum": [
-                                    "pass",
-                                    "fail",
-                                    "incomplete",
-                                    "pending",
-                                    "none"
-                                ]
-                            }
-                        },
-                        "required": [
-                            "fp_id",
-                            "requires_manual_review",
-                            "status"
-                        ]
-                    },
-                    "user": {
-                        "description": "Information on the user and their onboarding session. Provided for KYC and KYB playbook\n sessions",
-                        "type": "object",
-                        "properties": {
-                            "fp_id": {
+                            "playbook_key": {
                                 "type": "string"
                             },
                             "requires_manual_review": {
@@ -4193,6 +4168,38 @@
                         },
                         "required": [
                             "fp_id",
+                            "playbook_key",
+                            "requires_manual_review",
+                            "status"
+                        ]
+                    },
+                    "user": {
+                        "description": "Information on the user and their onboarding session. Provided for KYC and KYB playbook\n sessions",
+                        "type": "object",
+                        "properties": {
+                            "fp_id": {
+                                "type": "string"
+                            },
+                            "playbook_key": {
+                                "type": "string"
+                            },
+                            "requires_manual_review": {
+                                "type": "boolean"
+                            },
+                            "status": {
+                                "type": "string",
+                                "enum": [
+                                    "pass",
+                                    "fail",
+                                    "incomplete",
+                                    "pending",
+                                    "none"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "fp_id",
+                            "playbook_key",
                             "requires_manual_review",
                             "status"
                         ]
