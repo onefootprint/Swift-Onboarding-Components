@@ -174,6 +174,7 @@ diesel::table! {
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
         source -> Text,
+        ownership_stake -> Nullable<Int4>,
     }
 }
 

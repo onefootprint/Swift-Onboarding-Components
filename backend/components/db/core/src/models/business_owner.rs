@@ -46,6 +46,8 @@ pub struct BusinessOwner {
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
     pub source: BusinessOwnerSource,
+    /// Only set for BOs linked via API
+    pub ownership_stake: Option<i32>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -57,6 +59,7 @@ struct NewBusinessOwnerRow {
     link_id: BoLinkId,
     created_at: DateTime<Utc>,
     source: BusinessOwnerSource,
+    ownership_stake: Option<i32>,
 }
 
 pub type UserData = (ScopedVault, Vault);
@@ -75,6 +78,7 @@ impl BusinessOwner {
             link_id: BoLinkId::generate(BusinessOwnerKind::Primary),
             created_at: Utc::now(),
             source: BusinessOwnerSource::Hosted,
+            ownership_stake: None,
         };
         let result = diesel::insert_into(business_owner::table)
             .values(new)
@@ -97,6 +101,7 @@ impl BusinessOwner {
                 link_id,
                 created_at: Utc::now(),
                 source: BusinessOwnerSource::Hosted,
+                ownership_stake: None,
             })
             .collect_vec();
         let result = diesel::insert_into(business_owner::table)
@@ -106,7 +111,12 @@ impl BusinessOwner {
     }
 
     #[tracing::instrument("BusinessOwner::create", skip_all)]
-    pub fn create(conn: &mut TxnPgConn, sb: Locked<ScopedVault>, owner_vault_id: VaultId) -> DbResult<Self> {
+    pub fn create(
+        conn: &mut TxnPgConn,
+        sb: Locked<ScopedVault>,
+        owner_vault_id: VaultId,
+        ownership_stake: i32,
+    ) -> DbResult<Self> {
         let existing = business_owner::table
             .filter(business_owner::business_vault_id.eq(&sb.vault_id))
             .get_results::<Self>(conn.conn())?;
@@ -123,6 +133,7 @@ impl BusinessOwner {
             link_id: BoLinkId::generate(kind),
             created_at: Utc::now(),
             source: BusinessOwnerSource::Tenant,
+            ownership_stake: Some(ownership_stake),
         };
         let result = diesel::insert_into(business_owner::table)
             .values(new)

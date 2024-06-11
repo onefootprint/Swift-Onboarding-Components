@@ -112,7 +112,7 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
         "id.last_name": "Businessowner",
     }
     body = post("users", data, sandbox_tenant.sk.key)
-    data = dict(fp_id=body["id"])
+    data = dict(fp_id=body["id"], ownership_stake=50)
     body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
 
     data = dict(key=obc.key.value, fixture_result="pass")
@@ -141,14 +141,22 @@ def test_link_bos(sandbox_tenant, sandbox_user):
     assert not body["data"]
 
     # Then, link a BO via API
-    data = dict(fp_id=fp_id)
+    data = dict(fp_id=fp_id, ownership_stake=50)
     post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
     body = get(f"businesses/{fp_bid}/owners", None, sandbox_tenant.sk.key)
     assert len(body["data"]) == 1
     assert body["data"][0]["fp_id"] == fp_id
 
+    # Cannot set percentage outside of [0, 100]
+    for percentage in [-1, 101]:
+        data = dict(fp_id=fp_id, ownership_stake=percentage)
+        body = post(
+            f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
+        )
+        assert body["error"]["message"] == "ownership_stake must be between 0 and 100"
+
     # Cannot add the same user as a BO twice
-    data = dict(fp_id=fp_id)
+    data = dict(fp_id=fp_id, ownership_stake=50)
     body = post(
         f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
@@ -158,7 +166,7 @@ def test_link_bos(sandbox_tenant, sandbox_user):
     )
 
     # Cannot add an owner to a user vault
-    data = dict(fp_id=fp_id)
+    data = dict(fp_id=fp_id, ownership_stake=50)
     body = post(
         f"businesses/{fp_id}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
@@ -167,7 +175,7 @@ def test_link_bos(sandbox_tenant, sandbox_user):
     )
 
     # Cannot set a business as an owner
-    data = dict(fp_id=fp_bid)
+    data = dict(fp_id=fp_bid, ownership_stake=50)
     body = post(
         f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
@@ -180,7 +188,7 @@ def test_error_linking_bo(kyb_sandbox_ob_config, sandbox_tenant, sandbox_user):
     user = bifrost.run()
     fp_bid = user.fp_bid
 
-    data = dict(fp_id=sandbox_user.fp_id)
+    data = dict(fp_id=sandbox_user.fp_id, ownership_stake=50)
     body = post(
         f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
@@ -200,7 +208,7 @@ def test_error_linking_bo_with_vaulted_bos(sandbox_tenant, sandbox_user):
     fp_bid = body["id"]
 
     # Cannot link a BO when the business has vaulted BOs
-    data = dict(fp_id=sandbox_user.fp_id)
+    data = dict(fp_id=sandbox_user.fp_id, ownership_stake=50)
     body = post(
         f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
@@ -212,8 +220,7 @@ def test_error_linking_bo_with_vaulted_bos(sandbox_tenant, sandbox_user):
     # When we clear out the vaulted BOs, we can link
     data = {bo_di: None}
     patch(f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key)
-    data = dict(fp_id=sandbox_user.fp_id)
-
+    data = dict(fp_id=sandbox_user.fp_id, ownership_stake=0)
     body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
 
 
@@ -226,7 +233,7 @@ def test_cannot_vault_bos_when_linked(sandbox_tenant):
     body = post("users", None, sandbox_tenant.sk.key)
     fp_id = body["id"]
 
-    data = dict(fp_id=fp_id)
+    data = dict(fp_id=fp_id, ownership_stake=100)
     body = post(f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key)
 
     # Cannot vault BOs because there are already linked BOs

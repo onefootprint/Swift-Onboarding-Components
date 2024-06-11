@@ -206,7 +206,7 @@ impl VaultWrapper<Business> {
                     last_name: None,
                     phone_number: None,
                     email: None,
-                    ownership_stake: None,
+                    ownership_stake: bo.ownership_stake.map(|p| p as u32),
                     kind: bo.kind,
                     linked_bo: Some(bo),
                     scoped_user: bd.map(|(su, _)| su),

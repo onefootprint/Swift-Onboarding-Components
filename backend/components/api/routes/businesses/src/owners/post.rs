@@ -49,7 +49,14 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_bid = fp_bid.into_inner();
-    let NewBusinessOwnerRequest { fp_id } = request.into_inner();
+    let NewBusinessOwnerRequest {
+        fp_id,
+        ownership_stake,
+    } = request.into_inner();
+
+    if !(0..=100).contains(&ownership_stake) {
+        return ValidationError("ownership_stake must be between 0 and 100").into();
+    }
 
     state
         .db_pool
@@ -69,7 +76,8 @@ pub async fn post(
             }
 
             let owner_su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            if owner_su.kind != VaultKind::Person { return ValidationError("Provided fp_id does not correspond to a person").into();
+            if owner_su.kind != VaultKind::Person {
+                return ValidationError("Provided fp_id does not correspond to a person").into();
             }
 
             let bvw = VaultWrapper::<Any>::build_for_tenant(conn, &sb.id)?;
@@ -80,7 +88,7 @@ pub async fn post(
                 }
             }
 
-            let result = BusinessOwner::create(conn, sb, owner_su.vault_id);
+            let result = BusinessOwner::create(conn, sb, owner_su.vault_id, ownership_stake);
             match result {
                 Ok(_) => (),
                 Err(e) if e.is_unique_constraint_violation() => {

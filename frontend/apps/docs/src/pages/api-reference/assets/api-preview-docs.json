@@ -2518,10 +2518,16 @@
                 "properties": {
                     "fp_id": {
                         "type": "string"
+                    },
+                    "ownership_stake": {
+                        "description": "The percentage of the business that this user owns, between 0 and 100 (inclusive).",
+                        "type": "integer",
+                        "format": "int32"
                     }
                 },
                 "required": [
-                    "fp_id"
+                    "fp_id",
+                    "ownership_stake"
                 ]
             },
             "ObConfigSessionToken": {

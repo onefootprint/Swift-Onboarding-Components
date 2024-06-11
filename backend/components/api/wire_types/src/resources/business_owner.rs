@@ -33,4 +33,6 @@ pub struct BusinessOwner {
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct NewBusinessOwnerRequest {
     pub fp_id: FpId,
+    /// The percentage of the business that this user owns, between 0 and 100 (inclusive).
+    pub ownership_stake: i32,
 }
