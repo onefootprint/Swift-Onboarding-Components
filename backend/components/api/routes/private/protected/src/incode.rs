@@ -384,12 +384,8 @@ pub async fn adhoc_document_process(
             }
             .insert(conn)?;
 
-            let obc_id = wf
-                .ob_configuration_id
-                .clone()
-                .ok_or(AssertionError("no obc found"))?;
-            let (obc, _) =
-                ObConfiguration::get_enabled(conn, &obc_id).map_err(|_| DbError::PlaybookNotFound)?;
+            let (obc, _) = ObConfiguration::get_enabled(conn, &wf.ob_configuration_id)
+                .map_err(|_| DbError::PlaybookNotFound)?;
 
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id))?;
 

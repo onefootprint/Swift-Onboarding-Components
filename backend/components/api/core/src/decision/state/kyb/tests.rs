@@ -112,7 +112,7 @@ async fn run_kyc_for_bo(
 ) {
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
-    let obc_id = wf.ob_configuration_id.clone().unwrap();
+    let obc_id = wf.ob_configuration_id.clone();
     let t_id = tenant.id.clone();
     let is_live = user_kind.is_live();
 

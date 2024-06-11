@@ -72,11 +72,7 @@ pub async fn post(
             let (wf, biz_wf) = if let Some(wf_id) = wf_id {
                 let (wf, sv) = Workflow::get_all(conn, &wf_id)?;
                 let user_mrs = ManualReview::get_active(conn, &sv.id)?;
-                let obc_id = wf
-                    .ob_configuration_id
-                    .as_ref()
-                    .ok_or(OnboardingError::NoObcForWorkflow)?;
-                let (obc, _) = ObConfiguration::get(conn, obc_id)?;
+                let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let biz_wf = if obc.kind == ObConfigurationKind::Kyb {
                     let id = WorkflowIdentifier::BusinessOwner {
                         owner_vault_id: &sv.vault_id,
@@ -108,7 +104,7 @@ pub async fn post(
     // For now, we'll keep serializing this, but we should migrate them away as soon as we start
     // serializing the playbook key here.
     let onboarding_configuration_id = if auth.tenant().pinned_api_version.is_some_and(|v| v <= 2) {
-        wf.as_ref().and_then(|(wf, _, _)| wf.ob_configuration_id.clone())
+        wf.as_ref().map(|(_, _, obc)| obc.id.clone())
     } else {
         None
     };

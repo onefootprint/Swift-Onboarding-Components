@@ -83,7 +83,7 @@ pub struct Workflow {
     pub config: WorkflowConfig,
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub status: OnboardingStatus,
-    pub ob_configuration_id: Option<ObConfigurationId>,
+    pub ob_configuration_id: ObConfigurationId,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
     /// The time at which the first Footprint decision was made, if any
@@ -117,7 +117,7 @@ pub struct NewWorkflow {
     pub config: WorkflowConfig,
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub status: OnboardingStatus,
-    pub ob_configuration_id: Option<ObConfigurationId>,
+    pub ob_configuration_id: ObConfigurationId,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
     pub source: WorkflowSource,
@@ -130,7 +130,7 @@ pub struct NewWorkflowArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub config: WorkflowConfig,
     pub fixture_result: Option<WorkflowFixtureResult>,
-    pub ob_configuration_id: Option<ObConfigurationId>,
+    pub ob_configuration_id: ObConfigurationId,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized: bool,
     pub source: WorkflowSource,
@@ -327,7 +327,7 @@ impl Workflow {
             scoped_vault_id,
             config,
             fixture_result,
-            ob_configuration_id: Some(ob_configuration_id.clone()),
+            ob_configuration_id: ob_configuration_id.clone(),
             authorized,
             insight_event_id,
             source,
@@ -580,16 +580,14 @@ impl Workflow {
             .get_result(conn.conn())?;
 
         if new_state.is_complete() {
-            if let Some(obc_id) = result.ob_configuration_id.as_ref() {
-                // Deactivate any outstanding WorkflowRequest for this playbook
-                // NOTE: this pretty arbitrarily decides to only deactivate a WorkflowRequest
-                // if the request was for this playbook. But you could imagine if the
-                // WorkflowRequest was only to redo KYC and the user onboards onto a KYC playbook,
-                // we might want to mark the WorkflowRequest as complete anyways.
-                // Maybe we'll revisit in the future with more descriptive requirements in the DB
-                let sv_id = &result.scoped_vault_id;
-                WorkflowRequest::deactivate(conn, sv_id, Some(obc_id))?;
-            }
+            // Deactivate any outstanding WorkflowRequest for this playbook
+            // NOTE: this pretty arbitrarily decides to only deactivate a WorkflowRequest
+            // if the request was for this playbook. But you could imagine if the
+            // WorkflowRequest was only to redo KYC and the user onboards onto a KYC playbook,
+            // we might want to mark the WorkflowRequest as complete anyways.
+            // Maybe we'll revisit in the future with more descriptive requirements in the DB
+            let sv_id = &result.scoped_vault_id;
+            WorkflowRequest::deactivate(conn, sv_id, Some(&result.ob_configuration_id))?;
             // Update the scoped vault's last_activity_at to bump them to the top of the sorted
             // list of users in the dashboard
             let update = ScopedVaultUpdate {
@@ -609,15 +607,13 @@ impl Workflow {
             !ManualReview::get_active(conn, &wf.scoped_vault_id)?.is_empty();
         if update.decision_made_at.is_some() {
             // We are making the first decision for this workflow. Create the billing event(s)
-            if let Some(obc_id) = wf.ob_configuration_id.as_ref() {
-                use newtypes::EnhancedAmlOption;
-                let (obc, _) = ObConfiguration::get(conn, obc_id)?;
-                // I want if let chains...
-                if let EnhancedAmlOption::Yes { adverse_media, .. } = obc.enhanced_aml() {
-                    if adverse_media {
-                        use newtypes::BillingEventKind::AdverseMediaPerUser;
-                        BillingEvent::create(conn, &wf.scoped_vault_id, Some(&obc.id), AdverseMediaPerUser)?;
-                    }
+            use newtypes::EnhancedAmlOption;
+            let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
+            // I want if let chains...
+            if let EnhancedAmlOption::Yes { adverse_media, .. } = obc.enhanced_aml() {
+                if adverse_media {
+                    use newtypes::BillingEventKind::AdverseMediaPerUser;
+                    BillingEvent::create(conn, &wf.scoped_vault_id, Some(&obc.id), AdverseMediaPerUser)?;
                 }
             }
         }
@@ -793,7 +789,7 @@ mod tests {
                 config,
                 fixture_result: None,
                 status: OnboardingStatus::Incomplete,
-                ob_configuration_id: None,
+                ob_configuration_id: ObConfigurationId::from_str("obc_123").unwrap(),
                 insight_event_id: None,
                 authorized_at: None,
                 source: WorkflowSource::Unknown,
@@ -821,7 +817,7 @@ mod tests {
                 config,
                 fixture_result: None,
                 status: OnboardingStatus::Incomplete,
-                ob_configuration_id: None,
+                ob_configuration_id: ObConfigurationId::from_str("obc_123").unwrap(),
                 insight_event_id: None,
                 authorized_at: None,
                 source: WorkflowSource::Unknown,

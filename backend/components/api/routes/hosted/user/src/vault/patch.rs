@@ -153,7 +153,7 @@ pub async fn patch(
     // TODO these need to be atomic with the patch
     if let Some(address) = residential_address {
         // if we allow international and haven't requested a doc, we need to create a doc req
-        let obc = user_auth.ob_config()?;
+        let obc = user_auth.ob_config();
         let wf = user_auth.workflow();
         let sv_id = &user_auth.scoped_user.id;
         if obc.allow_international_residents

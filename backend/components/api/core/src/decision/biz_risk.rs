@@ -54,10 +54,9 @@ pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> ApiResult<Vec
         .map(|sv| sv.id)
         .collect();
 
-    let obc_id = wf.ob_configuration_id.ok_or(OnboardingError::NoObcForWorkflow)?;
     let wfs = state
         .db_pool
-        .db_query(move |conn| Workflow::get_with_decisions(conn, sv_ids, &obc_id))
+        .db_query(move |conn| Workflow::get_with_decisions(conn, sv_ids, &wf.ob_configuration_id))
         .await?;
     let wfs_without_decision: Vec<_> = wfs
         .iter()

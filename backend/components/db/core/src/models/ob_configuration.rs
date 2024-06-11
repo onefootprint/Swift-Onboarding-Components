@@ -566,7 +566,7 @@ impl ObConfiguration {
                 let obc_ids = workflow::table
                     .filter(workflow::id.eq(id))
                     .select(workflow::ob_configuration_id);
-                query = query.filter(ob_configuration::id.nullable().eq_any(obc_ids))
+                query = query.filter(ob_configuration::id.eq_any(obc_ids))
             }
         }
 

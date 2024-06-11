@@ -102,7 +102,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     config: WorkflowConfig::Kyc(KycConfig { is_redo: false }),
                     fixture_result: None,
                     status: OnboardingStatus::Incomplete,
-                    ob_configuration_id: Some(obc.id),
+                    ob_configuration_id: obc.id,
                     insight_event_id: None,
                     authorized_at: None,
                     source: WorkflowSource::Hosted,

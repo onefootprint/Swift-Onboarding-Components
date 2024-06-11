@@ -601,7 +601,7 @@ impl MiddeskState<Complete> {
             .db_transaction(move |conn| -> ApiResult<_> {
                 let rsg = RiskSignalGroup::get_or_create(conn, &sv.id, RiskSignalGroupKind::Kyb)?;
                 RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)?;
-                BillingEvent::create(conn, &sv.id, obc_id.as_ref(), BillingEventKind::Kyb)?;
+                BillingEvent::create(conn, &sv.id, Some(&obc_id), BillingEventKind::Kyb)?;
 
                 derived_vault_data.write(conn)?;
 

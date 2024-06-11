@@ -62,7 +62,7 @@ pub struct GetRequirementsArgs {
 impl GetRequirementsArgs {
     pub fn from(value: &CheckUserWfAuthContext) -> ApiResult<Self> {
         Ok(Self {
-            person_obc: value.ob_config()?.clone(),
+            person_obc: value.ob_config().clone(),
             person_workflow: value.workflow().clone(),
             person_vault_id: value.user().id.clone(),
             business_sv: value.scoped_business_id(),

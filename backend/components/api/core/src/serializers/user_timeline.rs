@@ -103,11 +103,8 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     // Some legacy triggers created a Workflow inline
                     match wf.config {
                         WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) | WorkflowConfig::Kyb(_) => {
-                            if let Some(playbook_id) = wf.ob_configuration_id.clone() {
-                                WorkflowRequestConfig::Onboard { playbook_id }
-                            } else {
-                                // This probably never happens, but need the type anyways
-                                WorkflowRequestConfig::RedoKyc
+                            WorkflowRequestConfig::Onboard {
+                                playbook_id: wf.ob_configuration_id.clone(),
                             }
                         }
                         WorkflowConfig::Document(ref c) => WorkflowRequestConfig::Document {

@@ -13,7 +13,6 @@ use crate::auth::{
     IsGuardMet,
     SessionContext,
 };
-use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
 use crate::ApiError;
 use db::models::ob_configuration::ObConfiguration;
@@ -43,7 +42,7 @@ use std::sync::Arc;
 pub struct UserWfSession {
     pub user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
-    ob_config: Option<ObConfiguration>,
+    ob_config: ObConfiguration,
     tenant: Tenant,
     workflow: Workflow,
 }
@@ -85,12 +84,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         let tenant = Tenant::get(conn, &scoped_user.tenant_id)?;
 
         // Get the obc and confirm it is active
-        let scope_obc_id = user_session.ob_configuration_id();
-        let obc_id = workflow.ob_configuration_id.as_ref().or(scope_obc_id.as_ref());
-        let ob_config = obc_id
-            .map(|obc_id| ObConfiguration::get_enabled(conn, obc_id))
-            .transpose()?
-            .map(|(obc, _)| obc);
+        let (ob_config, _) = ObConfiguration::get_enabled(conn, &workflow.ob_configuration_id)?;
 
         let onboarding_session = UserWfSession {
             user_session,
@@ -156,9 +150,8 @@ impl CheckUserWfAuthContext {
 }
 
 impl UserWfSession {
-    pub fn ob_config(&self) -> ApiResult<&ObConfiguration> {
-        let obc = self.ob_config.as_ref().ok_or(OnboardingError::NoOnboarding)?;
-        Ok(obc)
+    pub fn ob_config(&self) -> &ObConfiguration {
+        &self.ob_config
     }
 
     pub fn tenant(&self) -> &Tenant {

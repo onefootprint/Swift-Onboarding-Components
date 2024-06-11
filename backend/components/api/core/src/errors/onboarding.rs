@@ -59,8 +59,6 @@ pub enum OnboardingError {
     RealDocumentFixtureNotAllowed,
     #[error("Sandbox vaults must have a fixture result")]
     NoFixtureResultForSandboxUser,
-    #[error("Workflow doesn't have an associated onboarding config")]
-    NoObcForWorkflow,
     #[error("Workflow doesn't have an associated status")]
     NoStatusForWorkflow,
     #[error("{0}")]

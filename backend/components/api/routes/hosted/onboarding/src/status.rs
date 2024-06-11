@@ -94,7 +94,7 @@ pub async fn get(
             requirement: r,
         })
         .collect_vec();
-    let ob_config = user_auth.ob_config()?.clone();
+    let ob_config = user_auth.ob_config().clone();
     let tenant = user_auth.tenant().clone();
     let ff_client = state.ff_client.clone();
     let ob_config =

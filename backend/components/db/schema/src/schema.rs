@@ -1639,7 +1639,7 @@ diesel::table! {
         config -> Jsonb,
         fixture_result -> Nullable<Text>,
         status -> Text,
-        ob_configuration_id -> Nullable<Text>,
+        ob_configuration_id -> Text,
         insight_event_id -> Nullable<Text>,
         authorized_at -> Nullable<Timestamptz>,
         decision_made_at -> Nullable<Timestamptz>,

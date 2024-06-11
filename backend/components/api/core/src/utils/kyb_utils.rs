@@ -8,7 +8,6 @@ use crate::decision::state::{
     WorkflowWrapper,
 };
 use crate::errors::business::BusinessError;
-use crate::errors::onboarding::OnboardingError;
 use crate::errors::{
     ApiResult,
     ValidationError,
@@ -57,11 +56,6 @@ pub async fn send_missing_secondary_bo_links(
 
     // If we created any BOs in the DB, create an auth session for each of the BOs - we will send
     // this token in a link to each BO
-    let obc_id = wf
-        .ob_configuration_id
-        .as_ref()
-        .ok_or(OnboardingError::NoObcForWorkflow)?;
-
     // TODO what happens when the session expires? similar to email link
     let duration = chrono::Duration::days(30);
     let sealing_key = state.session_sealing_key.clone();
@@ -71,7 +65,7 @@ pub async fn send_missing_secondary_bo_links(
         .map(|bo| {
             let session_data = BoSession {
                 bo_id: bo.id.clone(),
-                ob_config_id: obc_id.clone(),
+                ob_config_id: wf.ob_configuration_id.clone(),
             };
             (bo.link_id.clone(), session_data)
         })
@@ -158,11 +152,7 @@ pub async fn send_missing_secondary_bo_links(
 #[tracing::instrument(skip(state))]
 async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> ApiResult<bool> {
     let svid = biz_wf.scoped_vault_id.clone();
-
-    let obc_id = biz_wf
-        .ob_configuration_id
-        .clone()
-        .ok_or(OnboardingError::NoObcForWorkflow)?;
+    let obc_id = biz_wf.ob_configuration_id.clone();
     let (bvw, obc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
