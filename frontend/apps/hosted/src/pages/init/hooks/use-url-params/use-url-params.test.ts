@@ -1,20 +1,22 @@
-import { createUseRouterSpy, renderHook, waitFor } from '@onefootprint/test-utils';
+import { describe, expect, it, jest, mock } from 'bun:test';
 import { CLIENT_PUBLIC_KEY_HEADER, HostedUrlType, KYB_BO_SESSION_AUTHORIZATION_HEADER } from '@onefootprint/types';
+import { renderHook, waitFor } from '@testing-library/react';
 
 import type { UseParseUrlParamOptions } from './use-url-params';
 import useParseUrl from './use-url-params';
 
 describe('useUrlParams', () => {
-  const useRouterSpy = createUseRouterSpy();
   const token = 'tok_123456';
-
+  mock.module('next/router', () => ({
+    useRouter: () => ({
+      asPath: `#${token}`,
+      isReady: true,
+      query: { type: HostedUrlType.onboardingConfigPublicKey },
+    }),
+  }));
   const renderUseParseUrl = (options: UseParseUrlParamOptions) => renderHook(() => useParseUrl(options));
 
   it('parses ob pk token correctly', async () => {
-    useRouterSpy({
-      query: { type: HostedUrlType.onboardingConfigPublicKey },
-      asPath: `#${token}`,
-    });
     const onSuccess = jest.fn();
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
@@ -29,10 +31,13 @@ describe('useUrlParams', () => {
   });
 
   it('parses user token correctly', async () => {
-    useRouterSpy({
-      query: { type: HostedUrlType.user },
-      asPath: `#${token}`,
-    });
+    mock.module('next/router', () => ({
+      useRouter: () => ({
+        asPath: `#${token}`,
+        isReady: true,
+        query: { type: HostedUrlType.user },
+      }),
+    }));
     const onSuccess = jest.fn();
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
@@ -42,10 +47,13 @@ describe('useUrlParams', () => {
   });
 
   it('parses beneficial owner token correctly', async () => {
-    useRouterSpy({
-      query: { type: HostedUrlType.beneficialOwner },
-      asPath: `#${token}`,
-    });
+    mock.module('next/router', () => ({
+      useRouter: () => ({
+        asPath: `#${token}`,
+        isReady: true,
+        query: { type: HostedUrlType.beneficialOwner },
+      }),
+    }));
     const onSuccess = jest.fn();
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
@@ -57,10 +65,13 @@ describe('useUrlParams', () => {
   });
 
   it('handles misformatted kinds correctly', async () => {
-    useRouterSpy({
-      query: { type: [HostedUrlType.beneficialOwner, HostedUrlType.user] },
-      asPath: `#${token}`,
-    });
+    mock.module('next/router', () => ({
+      useRouter: () => ({
+        asPath: `#${token}`,
+        isReady: true,
+        query: { type: [HostedUrlType.beneficialOwner, HostedUrlType.user] },
+      }),
+    }));
     const onSuccess = jest.fn();
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
@@ -70,10 +81,9 @@ describe('useUrlParams', () => {
   });
 
   it('handles invalid kinds correctly', async () => {
-    useRouterSpy({
-      query: { type: 'hello' },
-      asPath: `#${token}`,
-    });
+    mock.module('next/router', () => ({
+      useRouter: () => ({ asPath: `#${token}`, isReady: true, query: { type: 'hello' } }),
+    }));
     const onSuccess = jest.fn();
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
@@ -83,10 +93,9 @@ describe('useUrlParams', () => {
   });
 
   it('handles missing kinds correctly', async () => {
-    useRouterSpy({
-      query: {},
-      asPath: `#${token}`,
-    });
+    mock.module('next/router', () => ({
+      useRouter: () => ({ asPath: `#${token}`, isReady: true, query: {} }),
+    }));
     const onSuccess = jest.fn();
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
@@ -96,10 +105,9 @@ describe('useUrlParams', () => {
   });
 
   it('handles missing token correctly', async () => {
-    useRouterSpy({
-      query: {},
-      asPath: '',
-    });
+    mock.module('next/router', () => ({
+      useRouter: () => ({ asPath: `#${token}`, isReady: true, query: {} }),
+    }));
     const onSuccess = jest.fn();
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
