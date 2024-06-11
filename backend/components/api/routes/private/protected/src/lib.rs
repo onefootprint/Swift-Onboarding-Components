@@ -5,6 +5,7 @@ mod default_rules;
 mod incode;
 mod org;
 mod risk;
+mod samba;
 mod sandbox_tenant;
 mod task;
 mod token_reveal;
@@ -35,6 +36,7 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(sandbox_tenant::post)
         .service(webhooks::post)
         .service(org::update_business_info)
+        .service(samba::create_samba_order)
         .service(org::get_business_info);
     backfill::configure(config);
 }

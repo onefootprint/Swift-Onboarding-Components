@@ -1,4 +1,8 @@
 use self::license_validation::CreateLVOrderAddress;
+use newtypes::samba::{
+    SambaAddress,
+    SambaLicenseValidationData,
+};
 use newtypes::vendor_credentials::SambaSafetyCredentials;
 use newtypes::{
     PiiString,
@@ -26,6 +30,64 @@ pub struct SambaCreateLVOrderRequest {
     pub weight: Option<u16>,
     pub address: Option<CreateLVOrderAddress>,
     pub middle_name: Option<PiiString>,
+}
+
+impl From<(SambaLicenseValidationData, SambaSafetyCredentials)> for SambaCreateLVOrderRequest {
+    fn from(value: (SambaLicenseValidationData, SambaSafetyCredentials)) -> Self {
+        let (data, credentials) = value;
+
+        let SambaLicenseValidationData {
+            first_name,
+            last_name,
+            license_number,
+            license_state,
+            dob,
+            license_category,
+            issue_date,
+            expiry_date,
+            gender,
+            eye_color,
+            height,
+            weight,
+            address,
+            middle_name,
+        } = data;
+
+
+        let idv_address = address.map(|a| {
+            let SambaAddress {
+                street,
+                city,
+                state,
+                zip_code,
+            } = a;
+
+            CreateLVOrderAddress {
+                street,
+                city,
+                state,
+                zip_code,
+            }
+        });
+
+        Self {
+            credentials,
+            first_name,
+            last_name,
+            license_number,
+            license_state,
+            dob,
+            license_category,
+            issue_date,
+            expiry_date,
+            gender,
+            eye_color,
+            height,
+            weight,
+            address: idv_address,
+            middle_name,
+        }
+    }
 }
 
 

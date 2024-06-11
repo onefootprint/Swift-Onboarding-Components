@@ -28,17 +28,22 @@ use db::models::samba_order::{
 use db::models::samba_report::SambaReport;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
+use db::PgConn;
 use idv::samba::request::{
     SambaCreateLVOrderRequest,
     SambaGetLVReportRequest,
 };
 use idv::samba::response::license_validation::SambaLinkType;
 use idv::samba::response::webhook::SambaWebhook;
-use newtypes::samba::SambaOrderKind;
+use newtypes::samba::{
+    SambaLicenseValidationData,
+    SambaOrderKind,
+};
 use newtypes::{
     DataIdentifier,
     DataLifetimeId,
     DocumentDiKind,
+    DocumentId,
     DocumentKind,
     IdDocKind,
     IdentityDataKind as IDK,
@@ -48,24 +53,141 @@ use newtypes::{
     WorkflowId,
 };
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum CreateOrderContext {
-    Workflow { wf_id: WorkflowId, di: DecisionIntent },
-    Adhoc { di: DecisionIntent },
+    Workflow {
+        wf_id: WorkflowId,
+        di: DecisionIntent,
+    },
+    Adhoc {
+        di: DecisionIntent,
+        // support optionally sending data as well
+        data: Option<SambaLicenseValidationData>,
+    },
 }
 
 impl CreateOrderContext {
     pub fn vreq_identifier(&self) -> VReqIdentifier {
         match self {
             CreateOrderContext::Workflow { wf_id, .. } => VReqIdentifier::WfId(wf_id.clone()),
-            CreateOrderContext::Adhoc { di } => VReqIdentifier::DiId(di.id.clone()),
+            CreateOrderContext::Adhoc { di, .. } => VReqIdentifier::DiId(di.id.clone()),
         }
     }
 
     pub fn decision_intent(&self) -> &DecisionIntent {
         match self {
             CreateOrderContext::Workflow { di, .. } => di,
-            CreateOrderContext::Adhoc { di } => di,
+            CreateOrderContext::Adhoc { di, .. } => di,
+        }
+    }
+
+    pub fn is_adhoc_with_data(&self) -> bool {
+        matches!(self, CreateOrderContext::Adhoc { data, .. } if data.is_some())
+    }
+
+    // TODO: more fields
+    async fn get_decrypted_values(
+        vw: &VaultWrapper,
+        enclave_client: &EnclaveClient,
+    ) -> ApiResult<(DecryptUncheckedResult, Vec<DataLifetimeId>)> {
+        let fields = [
+            DataIdentifier::from(IDK::FirstName),
+            DataIdentifier::from(IDK::LastName),
+            DataIdentifier::from(DocumentDiKind::OcrData(
+                IdDocKind::DriversLicense,
+                ODK::DocumentNumber,
+            )),
+            DataIdentifier::from(DocumentDiKind::OcrData(
+                IdDocKind::DriversLicense,
+                ODK::IssuingState,
+            )),
+        ];
+        let decrypted = vw.decrypt_unchecked(enclave_client, &fields).await?;
+        let lifetime_ids = fields
+            .iter()
+            .filter_map(|di| vw.get(di).map(|l| l.lifetime_id()))
+            .cloned()
+            .collect();
+
+        Ok((decrypted, lifetime_ids))
+    }
+
+    fn get_document_id(&self, conn: &mut PgConn) -> ApiResult<Option<DocumentId>> {
+        // If we're running this in the context of a wf, only check documents collected in this workflow
+        let list_doc_filter = match self {
+            CreateOrderContext::Workflow { wf_id, .. } => Some(wf_id),
+            CreateOrderContext::Adhoc { .. } => None,
+        };
+
+        // need this filter since we only support sending OCR'd DL at the moment, in future can relax this
+        let id_documents: Vec<_> = Document::list_completed_sent_to_incode(conn, list_doc_filter)?
+            .into_iter()
+            .filter(|(d, _, _)| d.vaulted_document_type == Some(DocumentKind::DriversLicense))
+            .collect();
+
+        let doc_id = AdditionalIdentityDocumentVerificationHelper::new(id_documents)
+            .identity_document()
+            .map(|d| d.id);
+
+        Ok(doc_id)
+    }
+
+    async fn create_req_from_vault(
+        vw: &VaultWrapper,
+        enclave_client: &EnclaveClient,
+        tvc: &TenantVendorControl,
+    ) -> ApiResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
+        let (decrypted_values, lifetime_ids) = Self::get_decrypted_values(vw, enclave_client).await?;
+        let request = SambaCreateLVOrderRequest {
+            credentials: tvc.samba_credentials(),
+            first_name: decrypted_values
+                .get_di(DataIdentifier::from(IDK::FirstName))
+                .ok()
+                .ok_or(AssertionError("missing first name"))?,
+            last_name: decrypted_values
+                .get_di(DataIdentifier::from(IDK::LastName))
+                .ok()
+                .ok_or(AssertionError("missing last name"))?,
+            license_number: decrypted_values
+                .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
+                    IdDocKind::DriversLicense,
+                    ODK::DocumentNumber,
+                )))
+                .ok()
+                .ok_or(AssertionError("missing license number"))?,
+            license_state: decrypted_values
+                .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
+                    IdDocKind::DriversLicense,
+                    ODK::IssuingState,
+                )))
+                .ok()
+                .ok_or(AssertionError("missing license state"))?,
+            ..Default::default()
+        };
+
+        Ok((request, lifetime_ids))
+    }
+
+    pub async fn create_request(
+        &self,
+        vw: &VaultWrapper,
+        enclave_client: &EnclaveClient,
+        tvc: &TenantVendorControl,
+    ) -> ApiResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
+        match self {
+            // we're in the context of a workflow
+            CreateOrderContext::Workflow { .. } => Self::create_req_from_vault(vw, enclave_client, tvc).await,
+            CreateOrderContext::Adhoc { data, .. } => {
+                if let Some(d) = data {
+                    Ok((
+                        SambaCreateLVOrderRequest::from((d.clone(), tvc.samba_credentials())),
+                        vec![],
+                    ))
+                } else {
+                    Self::create_req_from_vault(vw, enclave_client, tvc).await
+                }
+            }
         }
     }
 }
@@ -78,7 +200,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     let di_id = di.id.clone();
     let context2 = context.clone();
 
-    let (vw, tenant_id, id_documents) = state
+    let (vw, tenant_id, doc_id) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
@@ -86,28 +208,15 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
 
             // If we're running this in the context of a wf, only check documents collected in this workflow
-            let list_doc_filter = match context2 {
-                CreateOrderContext::Workflow { wf_id, .. } => Some(wf_id),
-                CreateOrderContext::Adhoc { .. } => None,
-            };
+            let doc_id = context2.get_document_id(conn.conn())?;
 
-            // need this filter since we only support sending OCR'd DL at the moment, in future can relax this
-            let id_documents: Vec<_> =
-                Document::list_completed_sent_to_incode(conn, list_doc_filter.as_ref())?
-                    .into_iter()
-                    .filter(|(d, _, _)| d.vaulted_document_type == Some(DocumentKind::DriversLicense))
-                    .collect();
-
-            Ok((vw, tenant_id, id_documents))
+            Ok((vw, tenant_id, doc_id))
         })
         .await?;
 
-    // check we collected a document
-    let Some(document) = AdditionalIdentityDocumentVerificationHelper::new(id_documents).identity_document()
-    else {
-        return Ok(());
-    };
-    let doc_id = document.id.clone();
+    if doc_id.is_none() && !context.is_adhoc_with_data() {
+        return Err(AssertionError("no data to call samba").into());
+    }
 
     // check if we've already created an order
     let existing_result = load_response_for_vendor_api(
@@ -123,7 +232,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     }
 
     // Make the call
-    let (decrypted_values, lifetime_ids) = get_decrypted_values(&vw, &state.enclave_client).await?;
+
     let tvc = TenantVendorControl::new(
         tenant_id.clone(),
         &state.db_pool,
@@ -131,33 +240,8 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
         &state.enclave_client,
     )
     .await?;
-
-    let request = SambaCreateLVOrderRequest {
-        credentials: tvc.samba_credentials(),
-        first_name: decrypted_values
-            .get_di(DataIdentifier::from(IDK::FirstName))
-            .ok()
-            .ok_or(AssertionError("missing first name"))?,
-        last_name: decrypted_values
-            .get_di(DataIdentifier::from(IDK::LastName))
-            .ok()
-            .ok_or(AssertionError("missing last name"))?,
-        license_number: decrypted_values
-            .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
-                IdDocKind::DriversLicense,
-                ODK::DocumentNumber,
-            )))
-            .ok()
-            .ok_or(AssertionError("missing license number"))?,
-        license_state: decrypted_values
-            .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
-                IdDocKind::DriversLicense,
-                ODK::IssuingState,
-            )))
-            .ok()
-            .ok_or(AssertionError("missing license state"))?,
-        ..Default::default()
-    };
+    // create our request based on what type of data we're handling
+    let (request, lifetime_ids) = context.create_request(&vw, &state.enclave_client, &tvc).await?;
 
     // make request
     let res = state
@@ -174,7 +258,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
         di.scoped_vault_id.clone(),
         vw.vault.public_key.clone(),
         VendorAPI::SambaLicenseValidationCreate,
-        Some(document.id.clone()),
+        doc_id.clone(),
     );
 
     let (vres_id, _) = args.save(&state.db_pool).await?;
@@ -189,7 +273,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
         .db_transaction(move |conn| -> ApiResult<_> {
             let args = NewSambaOrderArgs {
                 decision_intent_id: di_id,
-                document_id: Some(doc_id),
+                document_id: doc_id,
                 lifetime_ids,
                 kind: SambaOrderKind::LicenseValidation,
                 order_id: create_order_response.order_id.leak_to_string().into(),
@@ -284,32 +368,4 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
         .await?;
 
     Ok(())
-}
-
-
-// TODO: more fields
-async fn get_decrypted_values(
-    vw: &VaultWrapper,
-    enclave_client: &EnclaveClient,
-) -> ApiResult<(DecryptUncheckedResult, Vec<DataLifetimeId>)> {
-    let fields = [
-        DataIdentifier::from(IDK::FirstName),
-        DataIdentifier::from(IDK::LastName),
-        DataIdentifier::from(DocumentDiKind::OcrData(
-            IdDocKind::DriversLicense,
-            ODK::DocumentNumber,
-        )),
-        DataIdentifier::from(DocumentDiKind::OcrData(
-            IdDocKind::DriversLicense,
-            ODK::IssuingState,
-        )),
-    ];
-    let decrypted = vw.decrypt_unchecked(enclave_client, &fields).await?;
-    let lifetime_ids = fields
-        .iter()
-        .filter_map(|di| vw.get(di).map(|l| l.lifetime_id()))
-        .cloned()
-        .collect();
-
-    Ok((decrypted, lifetime_ids))
 }
