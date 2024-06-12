@@ -1,0 +1,30 @@
+---
+page: default
+slug: /integrate/api-errors
+category: Integrate
+subcategory: Footprint API
+title: Errors
+meta: { title: Footprint API Errors, description: . }
+---
+
+Footprint uses conventional HTTP response codes to indicate the success or failure of an API request. In general, HTTP response codes in the `2xx` range indicate that the request was successful. Codes in the `4xx` range indicate an error that failed due to the information provided (for example, a required parameter was omitted, the provided API was invalid, etc). Codes in the `5xx` range indicate an error with Footprint's servers (these are rare).
+
+| HTTP Status code       | Summary      | Description                                                                                           |
+| ---------------------- | ------------ | ----------------------------------------------------------------------------------------------------- |
+| **200**                | OK           | Everything worked as expected.                                                                        |
+| **400**                | Bad request  | The request was unacceptable, perhaps due to a missing required parameter or invalid parameter value. |
+| **401**                | Unauthorized | The API key provided is invalid or doesn't have permission to access the resource.                    |
+| **404**                | Not found    | The requested resource does not exist.                                                                |
+| **500, 502, 503, 504** | Server error | Something went wrong on Footprint's end. (These are rare)                                             |
+
+Some `4xx` errors that could be handled programatically include an error `code` and optional `context` that indicates the error reported.
+
+# Error responses
+
+Error responses from the Footprint API return a JSON object with the following fields:
+
+| Field     | Description                                                                                        |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| `message` | Human-readable description of the error.                                                           |
+| `code`    | For some errors that can be handled programatically, a short string indicating the error reported. |
+| `context` | For some errors that can be handled programatically, an optional object with relevant context.     |

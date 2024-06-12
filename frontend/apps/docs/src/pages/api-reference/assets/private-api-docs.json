@@ -7160,7 +7160,7 @@
                     "Webhooks",
                     "Private"
                 ],
-                "description": "Handles Samba Safety webhooks.",
+                "description": "Handler for Samba Safety webhooks",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -13225,6 +13225,7 @@
                             },
                             "required": [
                                 "created_at",
+                                "playbook_id",
                                 "status"
                             ]
                         }
@@ -23040,6 +23041,13 @@
                     "ownership_stake": {
                         "type": "integer",
                         "format": "int32"
+                    },
+                    "source": {
+                        "type": "string",
+                        "enum": [
+                            "Hosted",
+                            "Tenant"
+                        ]
                     },
                     "status": {
                         "type": "string",

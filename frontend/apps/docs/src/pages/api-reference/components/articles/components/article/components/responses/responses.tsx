@@ -27,30 +27,10 @@ const Responses = ({ responses }: ResponsesProps) => {
   return (
     <Container>
       <ResponsesTitle>{t('response')}</ResponsesTitle>
-      <ResponseContainer key={code}>
-        <Header>
-          {schema?.type && (
-            <>
-              <Separator>·</Separator>
-              <Text variant="snippet-3" color="quaternary">
-                {schema?.type}
-              </Text>
-            </>
-          )}
-        </Header>
-        {schema && <Schema schema={schema} isInBrackets />}
-      </ResponseContainer>
+      <ResponseContainer key={code}>{schema && <Schema schema={schema} isInBrackets />}</ResponseContainer>
     </Container>
   );
 };
-
-const Separator = styled.span`
-  ${({ theme }) => css`
-    ${createFontStyles('label-3')}
-    color: ${theme.color.secondary};
-    padding: 0 ${theme.spacing[2]};
-  `}
-`;
 
 const Container = styled.div`
   ${({ theme }) => css`
@@ -75,14 +55,6 @@ const ResponseContainer = styled.div`
     gap: ${theme.spacing[4]};
     margin: ${theme.spacing[4]} 0 0 ${theme.spacing[3]};
   `}
-`;
-
-const Header = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    gap: ${theme.spacing[2]};
-  `};
 `;
 
 export default Responses;
