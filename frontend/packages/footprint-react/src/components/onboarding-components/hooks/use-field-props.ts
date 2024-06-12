@@ -13,8 +13,8 @@ import get from 'lodash/get';
 import type React from 'react';
 import { useContext } from 'react';
 
+import { useFormContext } from 'react-hook-form';
 import fieldContext from '../field-context';
-import useFootprint from './use-footprint';
 
 type Field = React.InputHTMLAttributes<HTMLInputElement> & {
   mask?: CleaveOptions;
@@ -26,14 +26,13 @@ type Field = React.InputHTMLAttributes<HTMLInputElement> & {
     };
     validate?: (value: string) => string | boolean;
   };
+  transforms?: Record<string, boolean>;
 };
 
 const useFieldProps = () => {
   const {
-    form: {
-      formState: { errors },
-    },
-  } = useFootprint();
+    formState: { errors },
+  } = useFormContext();
   const ctx = useContext(fieldContext);
   if (!ctx.name) {
     throw new Error('Input must be used inside a Field component');
@@ -56,7 +55,6 @@ const person: Record<string, Field> = {
   phoneNumber: {
     autoComplete: 'tel',
     className: 'fp-phone-input',
-    placeholder: 'Phone',
     type: 'tel',
     validations: {
       required: 'errors.required',
@@ -71,7 +69,6 @@ const person: Record<string, Field> = {
   email: {
     autoComplete: 'email',
     className: 'fp-email-input',
-    placeholder: 'Email',
     validations: {
       required: 'errors.required',
       validate: (value: string) => {
@@ -84,7 +81,6 @@ const person: Record<string, Field> = {
   },
   dob: {
     className: 'fp-dob-input',
-    placeholder: 'Date of Birth',
     inputMode: 'numeric',
     mask: {
       date: true,
@@ -111,7 +107,6 @@ const person: Record<string, Field> = {
   ssn4: {
     autoComplete: 'ssn',
     className: 'fp-ssn-4-input',
-    placeholder: 'Last 4 of SSN',
     maxLength: 4,
     mask: {
       numericOnly: true,
@@ -131,7 +126,6 @@ const person: Record<string, Field> = {
     autoComplete: 'ssn',
     className: 'fp-ssn-9-input',
     maxLength: 11,
-    placeholder: 'SSN',
     mask: {
       numericOnly: true,
       delimiters: ['-', '-'],
@@ -150,7 +144,6 @@ const person: Record<string, Field> = {
   firstName: {
     autoComplete: 'given-name',
     className: 'fp-first-name-input',
-    placeholder: 'First Name',
     validations: {
       required: 'errors.required',
       validate: (value: string) => {
@@ -164,7 +157,6 @@ const person: Record<string, Field> = {
   middleName: {
     autoComplete: 'additional-name',
     className: 'fp-middle-name-input',
-    placeholder: 'Middle Name (optional)',
     validations: {
       validate: (value: string) => {
         if (value === '') {
@@ -180,7 +172,6 @@ const person: Record<string, Field> = {
   lastName: {
     autoComplete: 'family-name',
     className: 'fp-last-name-input',
-    placeholder: 'Last Name',
     validations: {
       required: 'errors.required',
       validate: (value: string) => {
@@ -197,7 +188,6 @@ const common: Record<string, Field> = {
   country: {
     autoComplete: 'country-name',
     className: 'fp-countrt-input',
-    placeholder: 'Country',
     validations: {
       required: 'errors.required',
     },
@@ -205,7 +195,6 @@ const common: Record<string, Field> = {
   city: {
     autoComplete: 'address-level2',
     className: 'fp-city-input',
-    placeholder: 'City',
     validations: {
       required: 'errors.required',
     },
@@ -213,7 +202,6 @@ const common: Record<string, Field> = {
   addressLine1: {
     autoComplete: 'address-line1',
     className: 'fp-address-line1-input',
-    placeholder: 'Address line 1',
     validations: {
       required: 'errors.required',
     },
@@ -221,12 +209,10 @@ const common: Record<string, Field> = {
   addressLine2: {
     autoComplete: 'address-line2',
     className: 'fp-address-line2-input',
-    placeholder: 'Address line 2 (optional)',
     validations: {},
   },
   state: {
     className: 'fp-state-input',
-    placeholder: 'State',
     validations: {
       required: 'errors.required',
     },
@@ -234,7 +220,6 @@ const common: Record<string, Field> = {
   zip: {
     autoComplete: 'postal-code',
     className: 'fp-zip-input',
-    placeholder: 'Zip',
     validations: {
       required: 'errors.required',
     },
@@ -246,17 +231,13 @@ const common: Record<string, Field> = {
 
 const business: Record<string, Field> = {
   name: {
-    placeholder: 'Acme Bank Inc.',
     className: 'fp-business-name-input',
     validations: {
       required: 'Business name cannot be empty or is invalid',
     },
   },
-  dba: {
-    placeholder: 'Acme Bank',
-  },
+  dba: {},
   tin: {
-    placeholder: '12-3456789',
     className: 'fp-business-tin-input',
     mask: {
       numericOnly: true,
@@ -273,7 +254,6 @@ const business: Record<string, Field> = {
   },
   website: {
     type: 'url',
-    placeholder: 'https://www.acme.com',
     className: 'fp-business-website-input',
     mask: {
       numericOnly: true,
@@ -287,7 +267,6 @@ const business: Record<string, Field> = {
   phoneNumber: {
     autoComplete: 'tel',
     className: 'fp-business-phone-input',
-    placeholder: 'Phone',
     type: 'tel',
     validations: {
       required: 'errors.required',
@@ -304,10 +283,12 @@ const business: Record<string, Field> = {
 const bo: Record<string, Field> = {
   ownershipStake: {
     className: 'fp-bo-ownership-stake-input',
-    placeholder: '50',
     type: 'number',
     validations: {
       required: 'errors.required',
+    },
+    transforms: {
+      valueAsNumber: true,
     },
   },
 };

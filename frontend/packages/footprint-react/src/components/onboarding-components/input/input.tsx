@@ -3,16 +3,14 @@ import cx from 'classnames';
 import Cleave from 'cleave.js';
 import React, { useEffect } from 'react';
 
+import { useFormContext } from 'react-hook-form';
 import useFieldProps from '../hooks/use-field-props';
-import { useFootprint } from '../hooks/use-footprint';
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const Input = ({ className, id, ...props }: InputProps) => {
-  const {
-    form: { register },
-  } = useFootprint();
-  const { name, className: baseClassName, mask, validations, ...allProps } = useFieldProps();
+  const { register } = useFormContext();
+  const { name, className: baseClassName, mask, validations = {}, transforms = {}, ...allProps } = useFieldProps();
 
   useEffect(() => {
     let cleaveInstance: Cleave | null = null;
@@ -21,13 +19,17 @@ const Input = ({ className, id, ...props }: InputProps) => {
       if (cleaveInstance) cleaveInstance.destroy();
     };
   });
+  const formOptions = {
+    ...validations,
+    ...transforms,
+  };
 
   return (
     <input
       {...allProps}
       {...props}
       className={cx('fp-input', baseClassName, className)}
-      {...register(name, validations)}
+      {...register(name, formOptions)}
     />
   );
 };

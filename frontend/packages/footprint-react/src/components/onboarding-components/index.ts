@@ -8,12 +8,12 @@ import Provider from './provider';
 
 const Fp = {
   Field,
+  FieldErrors,
   Form,
   Hint,
+  Input,
   Label,
   Provider,
-  Input,
-  FieldErrors,
 };
 
 export default Fp;

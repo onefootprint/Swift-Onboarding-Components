@@ -7,5 +7,6 @@ export { default as FootprintRender } from './components/footprint-render';
 export { default as Fp } from './components/onboarding-components';
 export { useFootprint } from './components/onboarding-components/hooks/use-footprint';
 export { default as FootprintVerifyButton } from './components/verify-button';
+export * from './@types';
 
 export default footprint;

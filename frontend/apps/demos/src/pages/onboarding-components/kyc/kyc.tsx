@@ -1,4 +1,4 @@
-import { Fp, useFootprint } from '@onefootprint/footprint-react';
+import { Di, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box, Button, Container, Divider, Stack, Stepper, Text } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -40,7 +40,7 @@ const Demo = () => {
       <Fp.Provider
         publicKey={publicKey}
         onComplete={() => {
-          setOption(steps[3]);
+          setOption(steps[2]);
         }}
       >
         <Header>Onboarding</Header>
@@ -55,13 +55,7 @@ const Demo = () => {
                   }}
                 />
               )}
-              {isBasicData && (
-                <BasicData
-                  onDone={() => {
-                    setOption(steps[2]);
-                  }}
-                />
-              )}
+              {isBasicData && <BasicData />}
               {isSuccess && <Success />}
             </Box>
           </Stack>
@@ -74,8 +68,14 @@ const Demo = () => {
 const Identify = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
-  const handleSubmit = () => {
-    fp.launchIdentify({ onAuthenticated: onDone });
+  const handleSubmit = (formValues: Di) => {
+    fp.launchIdentify(
+      {
+        email: formValues['id.email'],
+        phoneNumber: formValues['id.phone_number'],
+      },
+      { onAuthenticated: onDone },
+    );
   };
 
   return (
@@ -90,12 +90,12 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
         <Stack gap={4} direction="column">
           <Fp.Field name="id.email">
             <Fp.Label>Your email</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="jane@acme.com" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.phone_number">
             <Fp.Label>Phone</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="(123) 456-7890" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
@@ -106,17 +106,11 @@ const Identify = ({ onDone }: { onDone: () => void }) => {
   );
 };
 
-const BasicData = ({ onDone }: { onDone: () => void }) => {
+const BasicData = () => {
   const fp = useFootprint();
 
-  const handleSubmit = () => {
-    fp.save({
-      onSuccess: () => {
-        fp.handoff({
-          onComplete: onDone,
-        });
-      },
-    });
+  const handleSubmit = (data: Di) => {
+    fp.save(data, { onSuccess: fp.handoff });
   };
 
   return (
@@ -131,59 +125,59 @@ const BasicData = ({ onDone }: { onDone: () => void }) => {
         <Stack gap={4} direction="column">
           <Fp.Field name="id.first_name">
             <Fp.Label>First name</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="Jane" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.middle_name">
             <Fp.Label>Middle name</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="Sue" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.last_name">
             <Fp.Label>Last name</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="Joe" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.dob">
             <Fp.Label>DOB</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="MM/DD/YYYY" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
           <Fp.Field name="id.country">
             <Fp.Label>Country</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="US" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.address_line1">
             <Fp.Label>Address line 1</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="Street number" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.address_line2">
             <Fp.Label>Address line 2 (optional)</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="Apartment, suite, etc." />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.city">
             <Fp.Label>City</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="New York" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.state">
             <Fp.Label>State</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="NY" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Fp.Field name="id.zip">
             <Fp.Label>Zip</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="11206" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />
           <Fp.Field name="id.ssn9">
             <Fp.Label>SSN</Fp.Label>
-            <Fp.Input />
+            <Fp.Input placeholder="XXX-XX-XXXX" />
             <Fp.FieldErrors />
           </Fp.Field>
           <Divider marginBlock={3} />

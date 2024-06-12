@@ -5,18 +5,10 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 const IS_ANALYZE_ACTIVE = process.env.ANALYZE === 'true';
 const IS_OUTPUT_STANDALONE = process.env.NEXT_BUILD_ENV_OUTPUT === 'standalone';
 
-const DEV_CONNECT_SRC = (
-  IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []
-).join(' ');
+const DEV_CONNECT_SRC = (IS_DEV ? ['http://localhost:8000', 'http://127.0.0.1:8000'] : []).join(' ');
 
 const DEV_FRAME_SRC = (
-  IS_DEV || IS_CI
-    ? [
-        'http://localhost:3000',
-        'http://localhost:3010',
-        'http://localhost:3011',
-      ]
-    : []
+  IS_DEV || IS_CI ? ['http://localhost:3000', 'http://localhost:3010', 'http://localhost:3011'] : []
 ).join(' ');
 
 const ContentSecurityPolicy = `
@@ -49,8 +41,7 @@ const securityHeaders = [
   },
   {
     key: 'Permissions-Policy',
-    value:
-      'camera=*, otp-credentials=*, publickey-credentials-get=*, clipboard-write=*',
+    value: 'camera=*, otp-credentials=*, publickey-credentials-get=*, clipboard-write=*',
   },
   {
     key: 'X-Content-Type-Options',
@@ -127,6 +118,4 @@ if (IS_OUTPUT_STANDALONE) {
   nextConfig.output = 'standalone';
 }
 
-module.exports = IS_ANALYZE_ACTIVE
-  ? require('@next/bundle-analyzer')({ enabled: true })(nextConfig)
-  : nextConfig;
+module.exports = IS_ANALYZE_ACTIVE ? require('@next/bundle-analyzer')({ enabled: true })(nextConfig) : nextConfig;

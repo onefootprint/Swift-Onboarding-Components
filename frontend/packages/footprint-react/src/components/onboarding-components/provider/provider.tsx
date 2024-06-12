@@ -2,7 +2,6 @@ import type { Component } from '@onefootprint/footprint-js/src/types/components'
 import type { OnboardingRequirement, PublicOnboardingConfig, SignupChallengeResponse } from '@onefootprint/types';
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
 
 import type { Appearance, Di } from '../../../@types';
 import configureI18n from '../../../config/initializers/i18next';
@@ -62,9 +61,6 @@ const Provider = ({
   sandboxId,
   userData = {},
 }: ProviderProps) => {
-  const methods = useForm<Di>({
-    defaultValues: userData,
-  });
   const [context, setContext] = useState<ContextData>({
     appearance,
     authToken,
@@ -100,9 +96,7 @@ const Provider = ({
 
   return (
     <Context.Provider value={value}>
-      <FormProvider {...methods}>
-        <div>{children}</div>
-      </FormProvider>
+      <div>{children}</div>
     </Context.Provider>
   );
 };

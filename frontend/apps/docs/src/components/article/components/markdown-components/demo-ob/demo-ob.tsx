@@ -1,6 +1,6 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 
-import { Fp, useFootprint } from '@onefootprint/footprint-react';
+import { Di, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -66,12 +66,18 @@ const Step3 = () => (
 const Step4 = () => {
   const fp = useFootprint();
 
-  const handleSubmit = () => {
-    fp.launchIdentify({
-      onAuthenticated: () => {
-        console.log('done');
+  const handleSubmit = (formValues: Di) => {
+    fp.launchIdentify(
+      {
+        email: formValues['id.email'],
+        phoneNumber: formValues['id.phone_number'],
       },
-    });
+      {
+        onAuthenticated: () => {
+          console.log('done');
+        },
+      },
+    );
   };
 
   return (
@@ -100,16 +106,22 @@ const Step5 = () => {
   const fp = useFootprint();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
 
-  const identify = () => {
-    fp.launchIdentify({
-      onAuthenticated: () => {
-        setStep('collect-data');
+  const handleSubmitIdentify = (formValues: Di) => {
+    fp.launchIdentify(
+      {
+        email: formValues['id.email'],
+        phoneNumber: formValues['id.phone_number'],
       },
-    });
+      {
+        onAuthenticated: () => {
+          setStep('collect-data');
+        },
+      },
+    );
   };
 
-  const save = () => {
-    fp.save({
+  const handleSubmitData = (formValues: Di) => {
+    fp.save(formValues, {
       onSuccess: () => {
         console.log('done');
       },
@@ -120,7 +132,7 @@ const Step5 = () => {
     <>
       <Styles />
       {step === 'identify' && (
-        <Fp.Form onSubmit={identify} className="fp-c-form">
+        <Fp.Form onSubmit={handleSubmitIdentify} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
             <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
@@ -137,7 +149,7 @@ const Step5 = () => {
         </Fp.Form>
       )}
       {step === 'collect-data' && (
-        <Fp.Form onSubmit={save} className="fp-c-form">
+        <Fp.Form onSubmit={handleSubmitData} className="fp-c-form">
           <Fp.Field name="id.first_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">First name</Fp.Label>
             <Fp.Input className="fp-c-input" />
@@ -206,22 +218,23 @@ const Step6 = () => {
   const fp = useFootprint();
   const [step, setStep] = useState<'identify' | 'collect-data'>('identify');
 
-  const identify = () => {
-    fp.launchIdentify({
-      onAuthenticated: () => {
-        setStep('collect-data');
+  const handleSubmitIdentify = (formValues: Di) => {
+    fp.launchIdentify(
+      {
+        email: formValues['id.email'],
+        phoneNumber: formValues['id.phone_number'],
       },
-    });
+      {
+        onAuthenticated: () => {
+          setStep('collect-data');
+        },
+      },
+    );
   };
 
-  const save = () => {
-    fp.save({
-      onSuccess: () => {
-        console.log('success');
-        fp.handoff({
-          onComplete: (validationToken: string) => console.log(validationToken),
-        });
-      },
+  const handleSubmitData = (formValues: Di) => {
+    fp.save(formValues, {
+      onSuccess: fp.handoff,
     });
   };
 
@@ -229,7 +242,7 @@ const Step6 = () => {
     <>
       <Styles />
       {step === 'identify' && (
-        <Fp.Form onSubmit={identify} className="fp-c-form">
+        <Fp.Form onSubmit={handleSubmitIdentify} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
             <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
@@ -246,7 +259,7 @@ const Step6 = () => {
         </Fp.Form>
       )}
       {step === 'collect-data' && (
-        <Fp.Form onSubmit={save} className="fp-c-form">
+        <Fp.Form onSubmit={handleSubmitData} className="fp-c-form">
           <Fp.Field name="id.first_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">First name</Fp.Label>
             <Fp.Input className="fp-c-input" />
