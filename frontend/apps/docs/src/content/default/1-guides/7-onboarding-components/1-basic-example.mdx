@@ -267,7 +267,7 @@ Looks much better now:
 Once the user submits the data, we should identify the user. This the part where the user needs to verify their identify using OTP or Passkeys. Because this part is more complex, we delegate this part to Footprint: you just need to call `fp.launchIdentify()`:
 
 ```jsx filename="app.tsx" highlight="12,14,15,16,17,18,19,20,23"
-import { Fp, useFootprint } from '@onefootprint/footprint-react';
+import { Fp, useFootprint, Di } from '@onefootprint/footprint-react';
 
 const Demo = () => {
   return (
@@ -280,12 +280,18 @@ const Demo = () => {
 const Flow = () => {
   const fp = useFootprint();
 
-  const handleSubmit = () => {
-    fp.launchIdentify({
-      onAuthenticated: () => {
-        console.log('done');
+  const handleSubmit = (formValues: Di) => {
+    fp.launchIdentify(
+      {
+        email: formValues['id.email'],
+        phoneNumber: formValues['id.phone_number'],
       },
-    });
+      {
+        onAuthenticated: () => {
+          setStep('collect-data');
+        },
+      },
+    );
   };
 
   return (
@@ -331,16 +337,22 @@ const Flow = () => {
   const fp = useFootprint();
   const [step, setStep] = useState<string>('identify');
 
-  const identify = () => {
-    fp.launchIdentify({
-      onAuthenticated: () => {
-        setStep('collect-data');
+  const handleSubmitIdentify = (formValues: Di) => {
+    fp.launchIdentify(
+      {
+        email: formValues['id.email'],
+        phoneNumber: formValues['id.phone_number'],
       },
-    });
+      {
+        onAuthenticated: () => {
+          setStep('collect-data');
+        },
+      },
+    );
   };
 
-  const save = () => {
-    fp.save({
+  const handleSubmitData = (formValues: Di) => {
+    fp.save(formValues, {
       onSuccess: () => {
         console.log('done');
       },
@@ -351,7 +363,7 @@ const Flow = () => {
     <>
       <DemoObStyles />
       {step === 'identify' && (
-        <Fp.Form onSubmit={identify}>
+        <Fp.Form onSubmit={handleSubmitIdentify}>
           <Fp.Field name="id.email">
             <Fp.Label>Your email</Fp.Label>
             <Fp.Input placeholder="lorem@footprint.com" />
@@ -368,7 +380,7 @@ const Flow = () => {
         </Fp.Form>
       )}
       {step === 'collect-data' && (
-        <Fp.Form onSubmit={save}>
+        <Fp.Form onSubmit={handleSubmitData}>
           <Fp.Field name="id.first_name">
             <Fp.Label>First name</Fp.Label>
             <Fp.Input />
@@ -454,21 +466,23 @@ const Flow = () => {
   const fp = useFootprint();
   const [step, setStep] = useState < string > 'identify';
 
-  const identify = () => {
-    fp.launchIdentify({
-      onAuthenticated: () => {
-        setStep('collect-data');
+  const handleSubmitIdentify = (formValues: Di) => {
+    fp.launchIdentify(
+      {
+        email: formValues['id.email'],
+        phoneNumber: formValues['id.phone_number'],
       },
-    });
+      {
+        onAuthenticated: () => {
+          setStep('collect-data');
+        },
+      },
+    );
   };
 
-  const save = () => {
-    fp.save({
-      onSuccess: () => {
-        fp.handoff({
-          onComplete: validationToken => console.log(validationToken),
-        });
-      },
+  const handleSubmitData = (formValues: Di) => {
+    fp.save(formValues, {
+      onSuccess: fp.handoff,
     });
   };
 
@@ -476,7 +490,7 @@ const Flow = () => {
     <>
       <DemoObStyles />
       {step === 'identify' && (
-        <Fp.Form onSubmit={identify}>
+        <Fp.Form onSubmit={handleSubmitIdentify}>
           <Fp.Field name="id.email">
             <Fp.Label>Your email</Fp.Label>
             <Fp.Input placeholder="lorem@footprint.com" />
@@ -493,7 +507,7 @@ const Flow = () => {
         </Fp.Form>
       )}
       {step === 'collect-data' && (
-        <Fp.Form onSubmit={save}>
+        <Fp.Form onSubmit={handleSubmitData}>
           <Fp.Field name="id.first_name">
             <Fp.Label>First name</Fp.Label>
             <Fp.Input />
