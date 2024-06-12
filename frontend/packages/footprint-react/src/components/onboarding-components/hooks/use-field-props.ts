@@ -57,10 +57,10 @@ const person: Record<string, Field> = {
     className: 'fp-phone-input',
     type: 'tel',
     validations: {
-      required: 'errors.required',
+      required: 'Phone is required',
       validate: (value: string) => {
         if (!isPhoneNumber(value)) {
-          return 'errors.invalid';
+          return 'Phone is invalid';
         }
         return true;
       },
@@ -70,10 +70,10 @@ const person: Record<string, Field> = {
     autoComplete: 'email',
     className: 'fp-email-input',
     validations: {
-      required: 'errors.required',
+      required: 'Email is required',
       validate: (value: string) => {
         if (!isEmail(value)) {
-          return 'errors.invalid';
+          return 'Email is invalid';
         }
         return true;
       },
@@ -89,16 +89,16 @@ const person: Record<string, Field> = {
       numericOnly: true,
     },
     validations: {
-      required: 'errors.required',
+      required: 'Dob is required',
       validate: (value: string) => {
         if (isDobInTheFuture(value)) {
-          return 'errors.future-date';
+          return 'Cannot be in the future';
         }
         if (isDobTooYoung(value)) {
-          return 'errors.too-young';
+          return 'Must be at least 18 years old';
         }
         if (isDobTooOld(value)) {
-          return 'errors.too-old';
+          return 'Cannot be before than 1900';
         }
         return true;
       },
@@ -113,10 +113,10 @@ const person: Record<string, Field> = {
       blocks: [4],
     },
     validations: {
-      required: 'errors.required',
+      required: 'SSN is required',
       validate: (value: string) => {
         if (!isSsn4(value)) {
-          return 'errors.invalid';
+          return 'SSN is invalid';
         }
         return true;
       },
@@ -132,10 +132,10 @@ const person: Record<string, Field> = {
       blocks: [3, 2, 4],
     },
     validations: {
-      required: 'errors.required',
+      required: 'SSN is required',
       validate: (value: string) => {
         if (!isSsn9(value)) {
-          return 'errors.invalid';
+          return 'SSN is invalid';
         }
         return true;
       },
@@ -145,10 +145,10 @@ const person: Record<string, Field> = {
     autoComplete: 'given-name',
     className: 'fp-first-name-input',
     validations: {
-      required: 'errors.required',
+      required: 'First name is required',
       validate: (value: string) => {
         if (!isName(value)) {
-          return 'errors.invalid';
+          return 'First name is invalid';
         }
         return true;
       },
@@ -163,7 +163,7 @@ const person: Record<string, Field> = {
           return true;
         }
         if (!isName(value)) {
-          return 'errors.invalid';
+          return 'Middle name is invalid';
         }
         return true;
       },
@@ -173,10 +173,10 @@ const person: Record<string, Field> = {
     autoComplete: 'family-name',
     className: 'fp-last-name-input',
     validations: {
-      required: 'errors.required',
+      required: 'Last name is required',
       validate: (value: string) => {
         if (!isName(value)) {
-          return 'errors.invalid';
+          return 'Last name is invalid';
         }
         return true;
       },
@@ -189,21 +189,21 @@ const common: Record<string, Field> = {
     autoComplete: 'country-name',
     className: 'fp-countrt-input',
     validations: {
-      required: 'errors.required',
+      required: 'Country is required',
     },
   },
   city: {
     autoComplete: 'address-level2',
     className: 'fp-city-input',
     validations: {
-      required: 'errors.required',
+      required: 'City is required',
     },
   },
   addressLine1: {
     autoComplete: 'address-line1',
     className: 'fp-address-line1-input',
     validations: {
-      required: 'errors.required',
+      required: 'Address is required',
     },
   },
   addressLine2: {
@@ -214,14 +214,14 @@ const common: Record<string, Field> = {
   state: {
     className: 'fp-state-input',
     validations: {
-      required: 'errors.required',
+      required: 'State is required',
     },
   },
   zip: {
     autoComplete: 'postal-code',
     className: 'fp-zip-input',
     validations: {
-      required: 'errors.required',
+      required: 'Zip is required',
     },
   },
   custom: {
@@ -269,10 +269,10 @@ const business: Record<string, Field> = {
     className: 'fp-business-phone-input',
     type: 'tel',
     validations: {
-      required: 'errors.required',
+      required: 'Phone is required',
       validate: (value: string) => {
         if (!isPhoneNumber(value)) {
-          return 'errors.invalid';
+          return 'Phone is invalid';
         }
         return true;
       },
@@ -285,7 +285,7 @@ const bo: Record<string, Field> = {
     className: 'fp-bo-ownership-stake-input',
     type: 'number',
     validations: {
-      required: 'errors.required',
+      required: 'Stake is required',
     },
     transforms: {
       valueAsNumber: true,

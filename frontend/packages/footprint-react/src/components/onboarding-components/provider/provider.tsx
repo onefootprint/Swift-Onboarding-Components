@@ -4,10 +4,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
 import type { Appearance, Di } from '../../../@types';
-import configureI18n from '../../../config/initializers/i18next';
 import getOnboardingConfigReq from '../queries/get-onboarding-config';
-
-configureI18n();
 
 export type ContextData = {
   appearance?: Appearance;
