@@ -18,7 +18,6 @@ export type ContextData = {
   publicKey: string;
   sandboxId?: string;
   signupChallenge: SignupChallengeResponse | null;
-  userData?: Di;
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -30,7 +29,6 @@ const Context = createContext<[ContextData, UpdateContext]>([
     onboardingConfig: null,
     publicKey: '',
     signupChallenge: null,
-    userData: {},
   },
   () => undefined,
 ]);
@@ -44,7 +42,6 @@ export type ProviderProps = {
   onError?: (error: unknown) => void;
   publicKey: string;
   sandboxId?: string;
-  userData?: Di;
 };
 
 const Provider = ({
@@ -56,7 +53,6 @@ const Provider = ({
   onError,
   publicKey,
   sandboxId,
-  userData = {},
 }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
@@ -70,7 +66,6 @@ const Provider = ({
     publicKey,
     sandboxId,
     signupChallenge: null,
-    userData,
   });
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 

@@ -10,10 +10,11 @@ import type { Di } from '../../../@types';
 export type FormProps = Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit'> & {
   children: React.ReactNode;
   onSubmit: (values: Di) => void;
+  defaultValues?: Di;
 };
 
-const Form = ({ className, children, onSubmit, ...props }: FormProps) => {
-  const methods = useForm<Di>();
+const Form = ({ className, children, defaultValues, onSubmit, ...props }: FormProps) => {
+  const methods = useForm<Di>({ defaultValues });
   const { handleSubmit } = methods;
 
   const handleBeforeSubmit = (formValues: Di) => {
