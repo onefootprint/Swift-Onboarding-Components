@@ -58,7 +58,7 @@ def test_data_validation(sandbox_tenant, key, value, expected_error):
         f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
     )
     # Should have a JSON error message with the invalid field identifier as the key
-    assert body["error"]["message"][key] == expected_error
+    assert body["context"][key] == expected_error
     # Validate endpoint should also fail
     post(
         f"entities/{fp_id}/vault/validate", data, sandbox_tenant.sk.key, status_code=400

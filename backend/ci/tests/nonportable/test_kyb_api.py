@@ -242,7 +242,7 @@ def test_cannot_vault_bos_when_linked(sandbox_tenant):
         f"businesses/{fp_bid}/vault", data, sandbox_tenant.sk.key, status_code=400
     )
     assert (
-        body["error"]["message"]["business.beneficial_owners"]
+        body["context"]["business.beneficial_owners"]
         == "Cannot vault beneficial owners when they are already linked via API. Please remove the linked beneficial owners via API before vaulting"
     )
 
@@ -254,6 +254,4 @@ def test_cannot_vault_kyced_bos(sandbox_tenant):
     bo_di = "business.kyced_beneficial_owners"
     data = {bo_di: BUSINESS_DATA[bo_di]}
     body = post("businesses", data, sandbox_tenant.sk.key, status_code=400)
-    assert (
-        body["error"]["message"][bo_di] == "Not allowed to add this piece of data here"
-    )
+    assert body["context"][bo_di] == "Not allowed to add this piece of data here"

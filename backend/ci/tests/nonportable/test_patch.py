@@ -12,9 +12,9 @@ def test_ssn_vaulting(tenant):
     # Shouldn't be able to add mismatching ssn4
     data = {"id.ssn4": "1233"}
     body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
+    assert body["code"] == "T120"
     assert (
-        body["error"]["message"]["id.ssn4"]
-        == "Cannot add ssn4 when vault already has full data"
+        body["context"]["id.ssn4"] == "Cannot add ssn4 when vault already has full data"
     )
 
     # But should be able to add matching ssn4
@@ -109,7 +109,7 @@ def test_data_validation(tenant, key, value, expected_error):
 
     body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
     # Should have a JSON error message with the invalid field identifier as the key
-    assert body["error"]["message"][key] == expected_error
+    assert body["context"][key] == expected_error
     # Validate endpoint should also fail
     post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
@@ -154,7 +154,7 @@ def test_ignore_card_validation(tenant):
     data = {"card.primary.number": "4242424242424241"}
     body = patch(f"users/{fp_id}/vault", data, tenant.sk.key, status_code=400)
     assert (
-        body["error"]["message"]["card.primary.number"]
+        body["context"]["card.primary.number"]
         == "Invalid checksum. Please verify that the number is correct"
     )
 

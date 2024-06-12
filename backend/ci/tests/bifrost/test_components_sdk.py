@@ -108,10 +108,8 @@ def test_components_sdk_cannot_add_auth_methods(sandbox_tenant):
     # Add a new email using the components SDK and then verify we can't use it to log in
     data = {"id.email": FIXTURE_EMAIL}
     body = patch("hosted/user/vault", data, components_token, status_code=400)
-    assert (
-        body["error"]["message"]["id.email"]
-        == "Not allowed to add this piece of data here"
-    )
+    assert body["code"] == "T120"
+    assert body["context"]["id.email"] == "Not allowed to add this piece of data here"
 
 
 def test_components_sdk_business(sandbox_tenant, kyb_sandbox_ob_config):

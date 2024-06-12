@@ -18,16 +18,11 @@ pub enum TfError {
 
 impl CodedError for TfError {
     fn context(&self) -> Option<Value> {
-        match self {
-            Self::VaultDataValidationError(err) => {
-                // TODO cleanup
-                if let newtypes::ErrorMessage::Map(ctx) = err.json_message() {
-                    return serde_json::to_value(ctx).ok();
-                }
-                None
-            }
+        let context = match self {
+            Self::VaultDataValidationError(err) => err.context(),
             _ => return None,
-        }
+        };
+        Some(context)
     }
 
     fn code(&self) -> String {

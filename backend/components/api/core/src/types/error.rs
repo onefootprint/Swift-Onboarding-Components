@@ -1,12 +1,9 @@
-use newtypes::{
-    ErrorMessage,
-    Uuid,
-};
+use newtypes::Uuid;
 use serde_json::Value;
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct FpResponseErrorInfo {
-    pub message: ErrorMessage,
+    pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub code: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -20,7 +17,7 @@ pub struct ApiResponseError {
     // TODO deprecate
     pub error: FpResponseErrorInfo,
 
-    pub message: ErrorMessage,
+    pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub code: Option<String>,
     /// Any freeform JSON context to give more information on the error

@@ -24,7 +24,6 @@ use newtypes::output::Csv;
 use newtypes::{
     ContactInfoKind,
     DataIdentifier,
-    ErrorMessage,
     FilterFunction,
     Uuid,
 };
@@ -328,13 +327,11 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
 }
 
 impl ApiError {
-    fn message(&self) -> ErrorMessage {
+    fn message(&self) -> String {
         match self.0.as_ref() {
-            ApiErrorKind::Twilio(e) => return ErrorMessage::String(e.message()),
-            ApiErrorKind::Database(e) => return ErrorMessage::String(e.message()),
-            // TODO remove this when the client has started reading context
-            ApiErrorKind::TfError(TfError::VaultDataValidationError(err)) => err.json_message(),
-            _ => ErrorMessage::String(self.to_string()),
+            ApiErrorKind::Twilio(e) => return e.message(),
+            ApiErrorKind::Database(e) => return e.message(),
+            _ => self.to_string(),
         }
     }
 }
@@ -459,7 +456,7 @@ impl actix_web::ResponseError for ApiError {
             && crate::config::SERVICE_CONFIG.is_production()
         {
             tracing::error!(err=?self, support_id=support_id.to_string(), status_code, "returning api 500: {}", self.to_string());
-            ErrorMessage::String("something went wrong".to_string())
+            "Something went wrong".to_string()
         } else {
             tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api {}", status_code);
             message

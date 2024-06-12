@@ -77,7 +77,7 @@ def test_api_vault(sandbox_tenant, ob_config):
         f"entities/{fp_id}/vault", initial_data, sandbox_tenant.sk.key, status_code=400
     )
     assert (
-        body["error"]["message"]["id.phone_number"]
+        body["context"]["id.phone_number"]
         == "Cannot replace verified contact information via API."
     )
 

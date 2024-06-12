@@ -401,24 +401,32 @@ def test_modern_signup_flow(sandbox_tenant):
 
 
 @pytest.mark.parametrize(
-    "kba_data,expected_error",
+    "kba_data,expected_err_str,expected_err_context",
     [
-        ({"id.email": "sandbox@onefootprint.com"}, "KBA not allowed for id.email"),
-        ({"id.ssn4": "1234"}, "KBA not allowed for id.ssn4"),
+        (
+            {"id.email": "sandbox@onefootprint.com"},
+            "KBA not allowed for id.email",
+            None,
+        ),
+        ({"id.ssn4": "1234"}, "KBA not allowed for id.ssn4", None),
         (
             {"id.phone_number": "Not a phone number"},
+            "Vault data failed validation",
             {"id.phone_number": "not a number"},
         ),
         (
             {"id.phone_number": "+15555550111"},
             "Incorrect KBA response for id.phone_number",
+            None,
         ),
-        ({"id.phone_number": FIXTURE_PHONE_NUMBER}, None),
+        ({"id.phone_number": FIXTURE_PHONE_NUMBER}, None, None),
         # We should also support cleaning the user input phone number
-        ({"id.phone_number": "+1 (555) 555-0100"}, None),
+        ({"id.phone_number": "+1 (555) 555-0100"}, None, None),
     ],
 )
-def test_kba(sandbox_user, sandbox_tenant, kba_data, expected_error):
+def test_kba(
+    sandbox_user, sandbox_tenant, kba_data, expected_err_str, expected_err_context
+):
     """
     Test performing KBA on an identified token
     """
@@ -433,10 +441,11 @@ def test_kba(sandbox_user, sandbox_tenant, kba_data, expected_error):
     token = FpAuth(body["user"]["token"])
 
     # Run KBA
-    expected_status = 400 if expected_error else 200
+    expected_status = 400 if expected_err_str else 200
     body = post("hosted/identify/kba", kba_data, token, status_code=expected_status)
-    if expected_error:
-        assert body["error"]["message"] == expected_error
+    if expected_err_str:
+        assert body["error"]["message"] == expected_err_str
+        assert body["error"].get("context", None) == expected_err_context
     else:
         # Make sure the new token issued still has no scopes
         new_token = FpAuth(body["token"])

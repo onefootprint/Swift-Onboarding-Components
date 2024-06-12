@@ -41,7 +41,7 @@ def no_phone_user(skip_phone_obc):
     key = skip_phone_obc.tenant.sk.key
     body = patch(f"entities/{user.fp_id}/vault", data, key, status_code=400)
     assert (
-        body["error"]["message"]["id.email"]
+        body["context"]["id.email"]
         == "Cannot replace verified contact information via API."
     )
     return user

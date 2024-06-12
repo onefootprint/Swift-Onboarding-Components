@@ -59,10 +59,12 @@ def test_put_ip_info_invalid(incomplete_client, key, value, expected_error):
         key: value,
     }
     body = post("hosted/user/vault/validate", data, auth_token, status_code=400)
-    assert expected_error in body["error"]["message"][key]
+    assert body["code"] == "T120"
+    assert expected_error in body["context"][key]
 
     body = patch("hosted/user/vault", data, auth_token, status_code=400)
-    assert expected_error in body["error"]["message"][key]
+    assert body["code"] == "T120"
+    assert expected_error in body["context"][key]
 
 
 def test_put_ip_info_incomplete_data(incomplete_client):

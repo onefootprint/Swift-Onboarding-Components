@@ -47,7 +47,6 @@ pub use b64::{
     Base64EncodedString,
 };
 pub use serde;
-use serde::ser::SerializeMap;
 
 mod auth_token;
 pub use self::auth_token::*;
@@ -160,33 +159,9 @@ pub enum DataValidationError {
     FieldValidationError(HashMap<DataIdentifier, Error>),
 }
 
-#[derive(Debug, Clone)]
-pub enum ErrorMessage {
-    String(String),
-    Map(HashMap<String, String>),
-}
-
-impl serde::Serialize for ErrorMessage {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::String(s) => serializer.serialize_str(s),
-            Self::Map(m) => {
-                let mut ser = serializer.serialize_map(Some(m.len()))?;
-                for (k, v) in m {
-                    ser.serialize_entry(k, v)?;
-                }
-                ser.end()
-            }
-        }
-    }
-}
-
 impl DataValidationError {
-    pub fn json_message(&self) -> ErrorMessage {
-        let err = match self {
+    pub fn context(&self) -> serde_json::Value {
+        let err: HashMap<String, String> = match self {
             Self::ExtraFieldError(x) => x
                 .iter()
                 .filter_map(|di| di.parent().map(|cd| (di, cd)))
@@ -194,7 +169,9 @@ impl DataValidationError {
                 .collect(),
             Self::FieldValidationError(x) => x.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
         };
-        ErrorMessage::Map(err)
+        serde_json::to_value(err)
+            .map_err(|e| tracing::error!(?e, "Couldn't serialize DataValidationError"))
+            .unwrap_or(serde_json::json!({}))
     }
 }
 
