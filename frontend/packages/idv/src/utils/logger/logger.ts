@@ -71,10 +71,15 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
 
     const sessionId = getSessionId();
+    const ddSessionId = datadogLogs.getInternalContext()?.session_id;
     const contextProps = { ...filterNonEmptyTraits(traits), fp_session_id: sessionId };
 
     if (isLogRocketEnabled) LogRocket.identify(sessionId, contextProps);
-    if (isDDLogsEnabled || isDDRumEnabled) datadogLogs.setGlobalContext(contextProps);
+    if (isDDLogsEnabled || isDDRumEnabled) {
+      datadogLogs.setGlobalContext(
+        appName === 'bifrost' && ddSessionId ? { ...contextProps, session_id: ddSessionId } : contextProps,
+      );
+    }
   };
 
   const startSessionReplay = () => {
