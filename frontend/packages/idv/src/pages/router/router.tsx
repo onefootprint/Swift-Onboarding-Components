@@ -54,9 +54,8 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     {
       onSuccess: sessionStatus => {
         if (sessionStatus !== SessionStatus.active) {
-          send({
-            type: 'expireSession',
-          });
+          send({ type: 'expireSession' });
+          trackAction('expired:check_session');
         }
       },
       onError: error => {
@@ -133,7 +132,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
                 onIdentifyDone(payload);
               }
 
-              trackAction('done', { value: 'identify' });
+              trackAction('identify:completed');
             }}
           />
         </L10nContextProvider>
@@ -154,7 +153,7 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
           onClose={onClose}
           onDone={payload => {
             send({ type: 'onboardingCompleted', payload });
-            trackAction('done', { value: 'onboarding' });
+            trackAction('onboarding:completed');
           }}
           l10n={l10n}
         />

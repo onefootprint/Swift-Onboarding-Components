@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { trackAction } from '../../../../utils/logger';
 import { useCollectKybDataMachine } from '../../components/machine-provider';
 import BasicData from '../basic-data';
 import BeneficialOwnerKyc from '../beneficial-owner-kyc';
@@ -19,8 +20,13 @@ const Router = ({ onDone }: RouterProps) => {
   useLogStateMachine('collect-kyb-data', state);
 
   useEffect(() => {
+    trackAction('kyb:started');
+  }, []);
+
+  useEffect(() => {
     if (isDone) {
       onDone();
+      trackAction('kyb:completed');
     }
   }, [isDone, onDone]);
 

@@ -13,7 +13,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
-import { Logger } from '../../../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../../../utils/logger';
 import { isDocCdo, isInvestorProfileCdo, isKybCdo, isKycCdo } from '../../../../utils/cdo-utils';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 import useOnboardingProcess from '../../hooks/use-onboarding-process';
@@ -26,10 +26,10 @@ export type AuthorizeProps = {
   onDone: () => void;
 };
 
+const { logError } = getLogger({ location: 'onboarding-authorize' });
+
 const Authorize = ({ onDone }: AuthorizeProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'onboarding.pages.authorize',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'onboarding.pages.authorize' });
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     idvContext: { authToken },
@@ -61,6 +61,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const handleAuthorizeSuccess = () => {
     if (!processRequirement) {
       onDone();
+      trackAction('onboarding-authorize:completed');
       return;
     }
 
@@ -73,9 +74,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       {
         onSuccess: onDone,
         onError: (error: unknown) => {
-          Logger.error(`Error while processing onboarding on authorize page: ${getErrorMessage(error)}`, {
-            location: 'onboarding-authorize',
-          });
+          logError(`Error while processing onboarding on authorize page: ${getErrorMessage(error)}`, error);
           send('error');
         },
       },
@@ -92,9 +91,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       {
         onSuccess: handleAuthorizeSuccess,
         onError: (error: unknown) => {
-          Logger.error(`Error while authorizing onboarding on authorize page: ${getErrorMessage(error)}`, {
-            location: 'onboarding-authorize',
-          });
+          logError(`Error while authorizing onboarding on authorize page: ${getErrorMessage(error)}`, error);
           toast.show({
             title: t('onboarding-complete-error.title'),
             description: t('onboarding-complete-error.description'),

@@ -1,13 +1,15 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { Logger } from '../../../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../../../utils/logger';
 import { useOnboardingRequirementsMachine } from '../../components/machine-provider';
 import useOnboardingProcess from '../../hooks/use-onboarding-process';
 
 export type ProcessProps = {
   onDone: () => void;
 };
+
+const { logError } = getLogger({ location: 'onboarding-process' });
 
 const Process = ({ onDone }: ProcessProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
@@ -24,11 +26,12 @@ const Process = ({ onDone }: ProcessProps) => {
     processMutation.mutate(
       { authToken, fixtureResult: overallOutcome },
       {
-        onSuccess: onDone,
+        onSuccess: () => {
+          trackAction('onboarding-process:completed');
+          onDone();
+        },
         onError: (error: unknown) => {
-          Logger.error(`Error while processing onboarding on authorize page. ${getErrorMessage(error)}`, {
-            location: 'onboarding-process',
-          });
+          logError(`Error while processing onboarding on authorize page. ${getErrorMessage(error)}`, error);
           send('error');
         },
       },

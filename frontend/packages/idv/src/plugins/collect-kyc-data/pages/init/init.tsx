@@ -2,7 +2,7 @@ import { AnimatedLoadingSpinner } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 
-import { getLogger } from '../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../utils/logger';
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import type { KycData } from '../../utils/data-types';
 import useDecryptKycData from './hooks/use-decrypt-kyc-data/use-decrypt-kyc-data';
@@ -16,10 +16,8 @@ const Init = () => {
     requirement: { populatedAttributes: populatedCdos },
   } = state.context;
   const handleSuccess = (data: KycData) => {
-    send({
-      type: 'initialized',
-      payload: data,
-    });
+    send({ type: 'initialized', payload: data });
+    trackAction('kyc:started');
   };
 
   const handleError = (err: unknown) => {
@@ -27,10 +25,7 @@ const Init = () => {
     // forward and just have the user re-enter their info instead of taking the already portable info
     // But log anyways because this shouldn't happen :)
     logError(`Kyc init page failed to decrypt data fields (${populatedCdos.join(', ')}) requested.`, err);
-    send({
-      type: 'initialized',
-      payload: {},
-    });
+    send({ type: 'initialized', payload: {} });
   };
 
   useDecryptKycData({

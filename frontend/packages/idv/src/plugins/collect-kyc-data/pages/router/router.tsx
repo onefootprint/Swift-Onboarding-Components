@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { UpdateVerify } from '../../../../components/identify';
 import StepHeader from '../../../../components/step-header';
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
-import { getLogger } from '../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../utils/logger';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
@@ -35,6 +35,7 @@ const Router = ({ onDone }: { onDone: () => void }) => {
   useEffect(() => {
     if (isStateCompleted) {
       onDone();
+      trackAction('kyc:completed');
     }
   }, [isStateCompleted, onDone]);
 

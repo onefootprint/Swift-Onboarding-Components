@@ -1,6 +1,7 @@
 import { DocumentRequestKind } from '@onefootprint/types';
-import React from 'react';
+import React, { useEffect } from 'react';
 
+import { trackAction } from '../../utils/logger';
 import IdDoc from './id-doc';
 import NonIdDoc from './non-id-doc';
 import type { IdDocProps } from './types';
@@ -27,7 +28,12 @@ const App = ({ idvContext, context, onDone }: IdDocProps) => {
 
   const handleFlowCompletion = () => {
     onDone();
+    trackAction('id-doc:completed');
   };
+
+  useEffect(() => {
+    trackAction('id-doc:started');
+  }, []);
 
   if (config.kind === DocumentRequestKind.Identity) {
     return (

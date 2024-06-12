@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { trackAction } from '../../../../utils/logger';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import Declarations from '../declarations';
 import Employment from '../employment';
@@ -19,8 +20,13 @@ const Router = ({ onDone }: RouterProps) => {
   useLogStateMachine('investor-profile', state);
 
   useEffect(() => {
+    trackAction('investor-profile:started');
+  }, []);
+
+  useEffect(() => {
     if (isDone) {
       onDone();
+      trackAction('investor-profile:completed');
     }
   }, [isDone, onDone]);
 
