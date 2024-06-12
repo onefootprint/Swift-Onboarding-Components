@@ -6,12 +6,14 @@ import * as LogRocket from 'logrocket';
 
 import { IS_LOGGING_ENABLED } from './constants';
 import type { ExtraProps, PrimitiveData } from './types';
-import initDataDog, {
+import {
   dataDogAction,
   dataDogErrorEvent,
   dataDogInfoEvent,
   dataDogTrackEvent,
   dataDogWarnEvent,
+  initDataDogLogs,
+  initDataDogRum,
 } from './utils/datadog';
 import getEnvInfo from './utils/get-env-info';
 import initLogRocket, {
@@ -21,29 +23,6 @@ import initLogRocket, {
   logRocketWarnEvent,
 } from './utils/log-rocket';
 import { registerErrorHandlers } from './utils/register-event-listeners';
-
-// TODO: move this function to package/core
-const getCookieValue = (name: string): string | null => {
-  if (!document || !document.cookie) return null;
-
-  const cookieValue = `; ${document.cookie}`;
-  const parts = cookieValue.split(`; ${name}=`);
-  if (parts.length < 2) return null;
-
-  const cookieValueWithoutSemicolon = parts.pop()?.split(';').shift();
-  if (!cookieValueWithoutSemicolon) {
-    return null;
-  }
-
-  return cookieValueWithoutSemicolon;
-};
-
-// TODO: move this function to package/core
-const getParameterValue = (param: string, query: string | null): string | null => {
-  if (!query || !param) return null;
-  const params = new URLSearchParams(query.replace(/&/g, '&').replace(/^\?/, ''));
-  return params.get(param);
-};
 
 /**
  * Filters out any traits that are null, undefined, or empty strings.
@@ -58,24 +37,31 @@ const filterNonEmptyTraits = (traits: PrimitiveData): ExtraProps =>
 
 const LoggerFactory = () => {
   let appName: string = '';
-  let isDataDogEnabled: boolean = false;
+  let isDDLogsEnabled: boolean = false;
+  let isDDRumEnabled: boolean = false;
   let isLogRocketEnabled: boolean = false;
   let isSessionReplayOn: boolean = false;
 
-  const init = (app: string, disableLogRocket?: boolean) => {
+  const init = (app: string, deferSessionRecord?: boolean) => {
     if (!IS_LOGGING_ENABLED) return;
 
     appName = app;
-    isDataDogEnabled = initDataDog(appName);
-    isLogRocketEnabled = !disableLogRocket;
+    isDDLogsEnabled = initDataDogLogs(appName);
 
-    if (isLogRocketEnabled) initLogRocket(appName);
+    if (!deferSessionRecord) {
+      initLogRocket(appName);
+      isLogRocketEnabled = true;
+    }
+
+    if (!deferSessionRecord) {
+      isDDRumEnabled = initDataDogRum(appName);
+    }
 
     getEnvInfo().then(identify).catch(console.warn);
 
     const onError = (error: Error) => {
       if (isLogRocketEnabled) logRocketErrorEvent(error);
-      if (isDataDogEnabled) dataDogErrorEvent(error);
+      if (isDDLogsEnabled) dataDogErrorEvent(error);
     };
 
     registerErrorHandlers(onError);
@@ -85,18 +71,10 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
 
     const sessionId = getSessionId();
-    const contextProps = {
-      ...filterNonEmptyTraits(traits),
-      fp_session_id: sessionId,
-    };
+    const contextProps = { ...filterNonEmptyTraits(traits), fp_session_id: sessionId };
 
     if (isLogRocketEnabled) LogRocket.identify(sessionId, contextProps);
-    if (isDataDogEnabled) {
-      datadogLogs.setGlobalContext({
-        ...contextProps,
-        session_id: getParameterValue('id', getCookieValue('_dd_s')),
-      });
-    }
+    if (isDDLogsEnabled || isDDRumEnabled) datadogLogs.setGlobalContext(contextProps);
   };
 
   const startSessionReplay = () => {
@@ -108,16 +86,16 @@ const LoggerFactory = () => {
       isSessionReplayOn = true;
     }
 
-    if (isDataDogEnabled) {
+    if (!isDDRumEnabled && initDataDogRum(appName)) {
       datadogRum.startSessionReplayRecording();
+      isDDRumEnabled = true;
       isSessionReplayOn = true;
     }
   };
 
   const stopSessionReplay = () => {
-    if (!isSessionReplayOn || !isDataDogEnabled) return;
-
-    if (isDataDogEnabled) {
+    if (!isSessionReplayOn || !isDDRumEnabled) return;
+    if (isSessionReplayOn) {
       datadogRum.stopSessionReplayRecording();
       isSessionReplayOn = false;
     }
@@ -129,7 +107,7 @@ const LoggerFactory = () => {
     const filteredExtra = filterNonEmptyTraits(extra);
 
     if (isLogRocketEnabled) logRocketTrackEvent(msg, filteredExtra);
-    if (isDataDogEnabled) dataDogTrackEvent(msg, filteredExtra);
+    if (isDDLogsEnabled) dataDogTrackEvent(msg, filteredExtra);
   };
 
   const error = (err: unknown, extra?: PrimitiveData, msg?: string) => {
@@ -142,7 +120,7 @@ const LoggerFactory = () => {
     if (isLogRocketEnabled) {
       logRocketErrorEvent(errorObj, { ...filteredExtra, level: 'error' });
     }
-    if (isDataDogEnabled) {
+    if (isDDLogsEnabled) {
       dataDogErrorEvent(errorObj, errorMessage, filteredExtra);
     }
   };
@@ -152,7 +130,7 @@ const LoggerFactory = () => {
     const filteredExtra = filterNonEmptyTraits(extra || {});
 
     if (isLogRocketEnabled) logRocketWarnEvent(msg, filteredExtra);
-    if (isDataDogEnabled) dataDogWarnEvent(msg, filteredExtra, err);
+    if (isDDLogsEnabled) dataDogWarnEvent(msg, filteredExtra, err);
   };
 
   const info = (msg: string, extra?: PrimitiveData) => {
@@ -160,7 +138,7 @@ const LoggerFactory = () => {
     const filteredExtra = filterNonEmptyTraits(extra || {});
 
     if (isLogRocketEnabled) logRocketInfoEvent(msg, filteredExtra);
-    if (isDataDogEnabled) dataDogInfoEvent(msg, filteredExtra);
+    if (isDDLogsEnabled) dataDogInfoEvent(msg, filteredExtra);
   };
 
   return {
@@ -168,8 +146,6 @@ const LoggerFactory = () => {
     identify,
     info,
     init,
-    isDataDogEnabled: () => isDataDogEnabled,
-    isLogRocketEnabled: () => isLogRocketEnabled,
     startSessionReplay,
     stopSessionReplay,
     track,

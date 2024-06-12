@@ -8,7 +8,7 @@ import { createGlobalStyle, css } from 'styled-components';
 import Providers from '../components/providers';
 
 // Don't enable log rocket until we know we are in a live onboarding
-Logger.init('handoff', true);
+Logger.init('handoff', /* deferSessionRecord */ true);
 const defaultFont = DM_Sans({
   display: 'swap',
   preload: true,

@@ -3,6 +3,8 @@ import { datadogLogs } from '@datadog/browser-logs';
 import type { RumInitConfiguration } from '@datadog/browser-rum';
 import { datadogRum } from '@datadog/browser-rum';
 
+type BaseConfig = { applicationId: string; clientToken: string; env: string; service: string };
+
 const { NODE_ENV } = process.env;
 const VERCEL_ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
 const GIT_COMMIT_SHA = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
@@ -68,7 +70,33 @@ const hasUrlToOmit = (log?: string) =>
     'stytch.com',
   ].some(str => log?.includes(str));
 
-const initDataDogLogs = (config: LogsInitConfiguration): void => {
+const getDataDogConfig = (appName: string): void | BaseConfig => {
+  const app = appServiceMap[appName];
+  const isTest = NODE_ENV === 'test';
+  const baseError = 'Datadog not initialized';
+
+  if (isTest || !IS_DDOG_ENABLED) {
+    return console.warn(baseError);
+  }
+  if (!app || !app.service || !app.id || !app.token) {
+    return console.warn(`${baseError}: ${appName} is not configured`);
+  }
+  if (!VERCEL_ENV) {
+    return console.warn(`${baseError}: VERCEL_ENV is not defined`);
+  }
+
+  return {
+    applicationId: app.id,
+    clientToken: app.token,
+    env: VERCEL_ENV,
+    service: app.service,
+  };
+};
+
+export const initDataDogLogs = (appName: string): boolean => {
+  const config = getDataDogConfig(appName);
+  if (!config) return false;
+
   // https://docs.datadoghq.com/logs/log_collection/javascript/#configuration
   datadogLogs.init({
     clientToken: config.clientToken,
@@ -95,9 +123,14 @@ const initDataDogLogs = (config: LogsInitConfiguration): void => {
       return true;
     },
   });
+
+  return true;
 };
 
-const initDataDogRum = (config: RumInitConfiguration): void => {
+export const initDataDogRum = (appName: string): boolean => {
+  const config = getDataDogConfig(appName);
+  if (!config) return false;
+
   datadogRum.init({
     ...config,
     applicationId: config.applicationId, // The RUM application ID.
@@ -115,34 +148,7 @@ const initDataDogRum = (config: RumInitConfiguration): void => {
     trackUserInteractions: true, // The trackUserInteractions parameter enables the automatic collection of user clicks in your application. Sensitive and private data contained in your pages may be included to identify the elements interacted with.
     startSessionReplayRecordingManually: true, // Manually start the Session Replay
   });
-};
 
-const initDataDog = (appName: string): boolean => {
-  const app = appServiceMap[appName];
-  const isTest = NODE_ENV === 'test';
-  const baseError = 'Datadog not initialized';
-
-  if (isTest || !IS_DDOG_ENABLED) {
-    console.warn(baseError);
-    return false;
-  }
-  if (!app || !app.service || !app.id || !app.token) {
-    console.warn(`${baseError}: ${appName} is not configured`);
-    return false;
-  }
-  if (!VERCEL_ENV) {
-    console.warn(`${baseError}: VERCEL_ENV is not defined`);
-    return false;
-  }
-
-  const config = {
-    clientToken: app.token,
-    env: VERCEL_ENV,
-    service: app.service,
-  };
-
-  initDataDogLogs(config);
-  initDataDogRum({ ...config, applicationId: app.id });
   return true;
 };
 
@@ -166,5 +172,3 @@ export const dataDogAction = (act: string, actContext?: object) => {
     return undefined;
   }
 };
-
-export default initDataDog;

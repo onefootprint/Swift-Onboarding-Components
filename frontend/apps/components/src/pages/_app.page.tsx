@@ -7,7 +7,7 @@ import { createGlobalStyle } from 'styled-components';
 import { DM_Sans, Source_Code_Pro } from 'next/font/google';
 import Providers from '../components/providers';
 import { GOOGLE_MAPS_SRC } from '../config/constants';
-Logger.init('components', true);
+Logger.init('components', /* deferSessionRecord */ true);
 
 const defaultFont = DM_Sans({
   display: 'swap',

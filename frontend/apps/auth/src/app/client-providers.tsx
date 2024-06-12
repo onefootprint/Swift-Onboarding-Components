@@ -26,7 +26,7 @@ const fpClient = configureFootprint();
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
-Logger.init('auth', /* disableLogRocket */ true);
+Logger.init('auth', /* deferSessionRecord */ true);
 
 const overrideThemeBackground = (theme: Theme) => {
   if (theme) {

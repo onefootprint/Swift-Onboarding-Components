@@ -26,7 +26,7 @@ const codeFont = Source_Code_Pro({
 });
 
 // Don't enable log rocket until we know we are in a live onboarding
-Logger.init('bifrost', true);
+Logger.init('bifrost', /* deferSessionRecord */ true);
 
 const App = ({ Component, pageProps }: AppProps) => (
   <>
