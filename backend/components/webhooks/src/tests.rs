@@ -62,6 +62,7 @@ fn export_type_schema(schema: schemars::schema::RootSchema, name: &str) {
 }
 
 #[tokio::test]
+#[ignore]
 async fn sync_webhook_event_types() {
     let auth_token = std::env::var("SVIX_AUTH_TOKEN").expect("missing SVIX_AUTH_TOKEN env");
     let client = svix::api::Svix::new(auth_token, None);
