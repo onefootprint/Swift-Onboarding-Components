@@ -413,8 +413,8 @@ jobs:
         run: exit 1
 
   # This workflow may decide to not actually deploy the ephemeral stack.
-  ephemeral-stack:
-    name: Ephemeral Stack Deploy and Tests
+  deploy-and-test-ephemeral:
+    name: Ephemeral stack deploy and test
     needs: [build_images]
     if: ${{ github.ref != 'refs/heads/master' }}
     uses: ./.github/workflows/backend_deploy_ephemeral.yml
@@ -422,3 +422,28 @@ jobs:
     with:
       pull_request_head_sha: ${{ github.event.pull_request.head.sha || github.sha }}
       image_tag: ${{ needs.build_images.outputs.image_tag }}
+
+  deploy-and-test-dev:
+    name: Dev deploy and test
+    needs: [backend-ci]
+
+    if: ${{ github.ref == 'refs/heads/master' }}
+
+    uses: ./.github/workflows/backend_deploy_dev.yml
+    secrets: inherit
+    with:
+      commit_sha: ${{ github.sha }}
+
+  deploy-and-test-prod:
+    name: Prod deploy and test
+
+    # CRITICAL: ONLY DEPLOY TO PROD AFTER DEV TESTS SUCCEED
+    needs: [backend-ci, deploy-and-test-dev]
+
+    # CRITICAL: ONLY DEPLOY TO PROD ON MASTER
+    if: ${{ github.ref == 'refs/heads/master' }}
+
+    uses: ./.github/workflows/backend_deploy_prod.yml
+    secrets: inherit
+    with:
+      commit_sha: ${{ github.sha }}

@@ -15,8 +15,6 @@ on:
 
 concurrency:
   group: 'ephem-stack-group-${{ github.head_ref }}'
-  # We want a new push on a branch
-  cancel-in-progress: true
 
 jobs:
   detect_ephemeral_stack:
@@ -116,7 +114,7 @@ jobs:
     with:
       testUrl: '${{ needs.deploy_ephemeral_stack.outputs.url }}'
       isPR: true
-      expectedCommitHash: ${{ inputs.pull_request_head_sha || github.sha }}
+      expectedApiCommitHash: ${{ inputs.pull_request_head_sha || github.sha }}
       environment_name: ephemeral
     secrets:
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}

@@ -1,15 +1,11 @@
 name: Backend Deploy Production
 
 on:
-  #
-  # NOTE: for now we are auto-deploying to prod if tests pass!
-  #
-  workflow_run:
-    workflows: ['Backend Deploy Dev']
-    types:
-      - completed
-    branches:
-      - master
+  workflow_call:
+    inputs:
+      commit_sha:
+        type: string
+        required: true
 
   workflow_dispatch:
 
@@ -18,15 +14,14 @@ concurrency:
 
 jobs:
   extract_commit_hash:
-    # Since the prod deploy job can be triggered by either a successful prod deploy or a manual trigger,
-    # we have to extract out the commit hash that is meant to be deployed by each job run.
-    # The special case is when the prod deploy is triggered by a successful dev deploy: we look at
-    # the commit that was used to run the successful dev deploy.
+    # We check out the commit that was passed in the workflow_call event, or
+    # the HEAD of the branch for the manual workflow_dispatch. Then we
+    # backtrack to the last commits that changed each component and deploy the
+    # corresponding tags.
     runs-on: ubuntu-latest
-    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch'
     name: Compute commit hash
     outputs:
-      commitHashToDeploy: '${{ steps.constants.outputs.commitHashToDeploy }}'
+      apiCommitHash: '${{ steps.constants.outputs.apiCommitHash }}'
       apiComponentVersion: '${{ steps.components.outputs.apiComponentVersion }}'
       enclaveComponentVersion: '${{ steps.components.outputs.enclaveComponentVersion }}'
     steps:
@@ -34,16 +29,19 @@ jobs:
         shell: bash
         id: constants
         run: |
-          echo "commit hash from workflow_run ${{ github.event.workflow_run.head_commit.id }}"
+          set -euxo pipefail
+
+          echo "commit hash from workflow_call ${{ inputs.commit_sha }}"
           echo "commit hash over branch HEAD ${{ github.sha }}"
-          commit_hash="${{ github.event.workflow_run.head_commit.id || github.sha }}"
+          commit_hash="${{ inputs.commit_sha || github.sha }}"
           echo "commit hash we will deploy in this workflow: $commit_hash"
-          echo "##[set-output name=commitHashToDeploy;]$(echo ${commit_hash})"
+
+          echo "apiCommitHash=${commit_hash}" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
       - uses: ./.github/actions/backend_extract_commit_hash
         id: components
         with:
-          commitHash: ${{ steps.constants.outputs.commitHashToDeploy }}
+          commitHash: ${{ steps.constants.outputs.apiCommitHash }}
 
   deploy_stack_prod:
     name: Deploy stack
@@ -54,7 +52,7 @@ jobs:
       environment: production
       baseStackName: prod
       stackName: prod
-      commitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
+      commitHash: ${{ needs.extract_commit_hash.outputs.apiCommitHash }}
       apiComponentVersion: ${{ needs.extract_commit_hash.outputs.apiComponentVersion }}
       enclaveComponentVersion: ${{ needs.extract_commit_hash.outputs.enclaveComponentVersion }}
 
@@ -81,7 +79,7 @@ jobs:
     with:
       testUrl: '${{ needs.deploy_stack_prod.outputs.url }}'
       isPR: false
-      expectedCommitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
+      expectedApiCommitHash: ${{ needs.extract_commit_hash.outputs.apiCommitHash }}
       environment_name: production
     secrets:
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
@@ -100,7 +98,7 @@ jobs:
         with:
           payload: |
             {
-              "user": "${{ github.event.workflow_run.head_commit.author.username }}, ${{ github.triggering_actor }}, ${{ github.event.workflow_run.head_commit.author.email }}",
+              "user": "${{ github.head_commit.author.username }}, ${{ github.triggering_actor }}, ${{ github.head_commit.author.email }}",
               "environment": "[Backend PROD]",
               "url": "${{ needs.deploy_stack_prod.outputs.url }}"
             }
