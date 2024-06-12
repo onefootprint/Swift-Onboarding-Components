@@ -296,7 +296,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
 #[tracing::instrument(skip_all)]
 pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWebhook) -> ApiResult<()> {
     let Some(report_id) = webhook
-        .get_link(SambaLinkType::LicenseValidation)
+        .get_link(SambaLinkType::LicenseReports)
         .map(|l| SambaReportId::from(l.report_id))
     else {
         return Err(AssertionError("missing report id").into());

@@ -22,12 +22,10 @@ pub struct SambaWebhook {
     event_type: String,
 }
 impl SambaWebhook {
-    #[allow(unused)]
     pub fn event_type(&self) -> Option<SambaWebhookEventType> {
         SambaWebhookEventType::from_str(self.event_type.as_str()).ok()
     }
 
-    #[allow(unused)]
     pub fn get_link(&self, link_type: SambaLinkType) -> Option<OrderStatusLink> {
         self.data.links.get_link(link_type)
     }
@@ -63,6 +61,17 @@ mod tests {
         assert_eq!(ser, raw);
     }
 
+    #[test_case(SambaLinkType::LicenseReports)]
+    #[test_case(SambaLinkType::ActivityReports)]
+    fn test_get_link_type(link_type: SambaLinkType) {
+        // we wouldn't get activity history stuff in a license validation event, but that's ok for the
+        // purpose of this test
+        let webhook: SambaWebhook =
+            serde_json::from_value(fixture_webhook("licensevalidation.received").clone()).unwrap();
+
+        assert!(webhook.get_link(link_type).is_some())
+    }
+
     fn fixture_webhook(event_type: &str) -> serde_json::Value {
         serde_json::json!(
             {
@@ -73,6 +82,12 @@ mod tests {
                         {
                             "rel": "activityreports",
                             "href": "/reports/v1/activityreports/detail/c325920d-503e-4da2-891f-3b05bf20c27f",
+                            "id": "c325920d-503e-4da2-891f-3b05bf20c27f",
+                            "type": "GET"
+                        },
+                        {
+                            "rel": "licensereports",
+                            "href": "/reports/v1/licensereports/verifylicense/4008991e-08eb-43fe-9ece-75f7f5530833",
                             "id": "c325920d-503e-4da2-891f-3b05bf20c27f",
                             "type": "GET"
                         }

@@ -37,12 +37,8 @@ impl CheckLVOrderStatus {
 
 #[derive(EnumString, PartialEq, Eq)]
 pub enum SambaLinkType {
-    #[strum(serialize = "order")]
-    Order,
-    #[strum(serialize = "activityhistory")]
-    ActivityHistory,
-    #[strum(serialize = "licensevalidation")]
-    LicenseValidation,
+    #[strum(serialize = "activityreports")]
+    ActivityReports,
     #[strum(serialize = "licensereports")]
     LicenseReports,
 }
