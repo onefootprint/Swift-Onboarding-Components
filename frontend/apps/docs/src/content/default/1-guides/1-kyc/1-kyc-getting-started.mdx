@@ -190,9 +190,9 @@ Using the `status` and `requires_manual_review` fields to decide whether or not 
 
 | Status    | What does this mean?                                                                                                                                                                                                                              |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pass`    | The rules defined on your playbook to verify the user evaluated to an outcome of `pass`.                                                                                                                                                                                     |
-| `fail`    | The rules defined on your playbook evaluated to an outcome of `fail`.
-| `none`    | Your playbook has no rules defined. |
+| `pass`    | The rules defined on your playbook to verify the user evaluated to an outcome of `pass`.                                                                                                                                                          |
+| `fail`    | The rules defined on your playbook evaluated to an outcome of `fail`.                                                                                                                                                                             |
+| `none`    | Your playbook has no rules defined.                                                                                                                                                                                                               |
 | `pending` | Verifying this user's identity is taking longer than expected. This happens in rare cases where asynchronous actions are required to make a decision. A final decision will be delivered via [webhooks](/integrate/webhooks) to your application. |
 
 | Review | What does this mean?                                                                              |

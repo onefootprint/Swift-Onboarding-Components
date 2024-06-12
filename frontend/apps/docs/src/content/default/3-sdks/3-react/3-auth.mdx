@@ -34,7 +34,7 @@ import { FootprintButton } from '@onefootprint/footprint-react';
 const Page = () => {
   const handleComplete = (validationToken: string) => {
     console.log(validationToken);
-  }
+  };
 
   return (
     <FootprintButton
@@ -88,14 +88,9 @@ import { FootprintButton } from '@onefootprint/footprint-react';
 const Page = () => {
   const handleComplete = (validationToken: string) => {
     console.log(validationToken);
-  }
+  };
 
-  return (
-    <FootprintButton
-      kind="update_login_methods"
-      authToken="utok_123"
-    />
-  );
+  return <FootprintButton kind="update_login_methods" authToken="utok_123" />;
 };
 ```
 
@@ -147,7 +142,7 @@ const Page = () => {
             colorSuccess: '#10b981',
             colorError: '#F87171',
             buttonPrimaryBg: '#5550e9',
-          }
+          },
         }}
       />
     </main>

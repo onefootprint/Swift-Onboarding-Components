@@ -78,9 +78,10 @@ export default function App() {
       onCancel: () => {
         console.log('canceled');
       },
-      onError: error => { // Triggered if there are unrecoverable errors initializing the flow
-        console.error(error)
-      }
+      onError: error => {
+        // Triggered if there are unrecoverable errors initializing the flow
+        console.error(error);
+      },
     });
   };
 

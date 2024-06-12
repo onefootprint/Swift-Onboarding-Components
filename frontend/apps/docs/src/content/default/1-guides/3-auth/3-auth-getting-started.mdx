@@ -32,17 +32,13 @@ const Page = () => {
       kind: 'auth',
       publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
       onComplete: (validationToken: string) => {
-         // TODO: Post to Footprint server to fetch user ID
-      }
+        // TODO: Post to Footprint server to fetch user ID
+      },
     });
     component.render();
   };
 
-  return (
-    <button onClick={launchAuth}>
-      Launch Auth
-    </button>
-  );
+  return <button onClick={launchAuth}>Launch Auth</button>;
 };
 ```
 
@@ -123,7 +119,7 @@ const MyComponent = () => {
 
   return (
     <FootprintVerifyButton
-      authToken='tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0'
+      authToken="tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
       onComplete={handleComplete}
     />
   );
