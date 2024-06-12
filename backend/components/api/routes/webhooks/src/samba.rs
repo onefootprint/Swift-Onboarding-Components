@@ -26,7 +26,10 @@ async fn handle_webhook(
     match serde_json::from_value::<SambaWebhook>(req) {
         Ok(webhook) => {
             tracing::info!(?webhook, msg = "samba webhook received", LOG_MSG);
-            handle_webhook_inner(&state, webhook).await?;
+            match handle_webhook_inner(&state, webhook).await {
+                Ok(_) => log(None, "success"),
+                Err(e) => tracing::info!(err=?e, msg = "error handling webhook", LOG_MSG),
+            }
         }
         Err(_) => {
             log(None, "error deserializing");
