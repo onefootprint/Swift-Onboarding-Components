@@ -389,6 +389,7 @@ jobs:
   ephemeral-stack:
     name: Ephemeral Stack Deploy and Tests
     needs: [build_images]
+    if: ${{ github.ref != 'refs/heads/master' }}
     uses: ./.github/workflows/backend_deploy_ephemeral.yml
     secrets: inherit
     with:
