@@ -28,7 +28,7 @@ export const primaryBtnBackgroundColor = {
   default: `${p.Purple500}`,
   hover: `${p.Purple700}`,
   active: `${p.Purple600}`,
-  disabled: `${p.Gray0}`,
+  disabled: `${p.Purple300}`,
 };
 
 export const secondaryBtnBackgroundColor = {
@@ -303,8 +303,8 @@ const tokens: Tokens = {
           },
           disabled: {
             bg: primaryBtnBackgroundColor.disabled,
-            color: textColor.quaternary,
-            borderColor: borderColor.tertiary,
+            color: textColor.quinary,
+            borderColor: borderColor.secondary,
             boxShadow: primaryBtnBoxShadow.disabled,
           },
         },
