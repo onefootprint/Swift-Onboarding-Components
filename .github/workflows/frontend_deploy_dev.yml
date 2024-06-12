@@ -20,13 +20,13 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
       - name: Move generated files into ./public
         run: rsync -avz ./* ./tmp/
 
       - name: Deploy
-        uses: s0/git-publish-subdir-action@develop
+        uses: s0/git-publish-subdir-action@5bc6742efb946f4cba68c7a9067a31ea5631071d # ratchet:s0/git-publish-subdir-action@develop
         env:
           REPO: self
           BRANCH: development

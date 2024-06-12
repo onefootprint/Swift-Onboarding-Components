@@ -22,10 +22,10 @@ jobs:
     if: github.actor != 'dependabot[bot]' && ((github.event_name != 'pull_request') || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'FastEphemeral')) || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'FullEphemeral')))
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # ratchet:actions/checkout@v2
 
       # pulumi setup
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@7c12f8017d5436eb855f1ed4399f037a36fbd9e8 # ratchet:actions/setup-node@v2
         with:
           node-version: 14.x
       - name: Configure AWS Credentials

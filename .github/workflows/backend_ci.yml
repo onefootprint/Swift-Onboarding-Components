@@ -22,7 +22,7 @@ jobs:
     name: Determine if relevant files changed
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: dorny/paths-filter@affb29871ab1f927ecad0ee68c0989584101408f
@@ -75,10 +75,10 @@ jobs:
     outputs:
       image_tag: ${{ env.IMAGE_TAG }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # ratchet:docker/setup-buildx-action@v3
 
       - name: Configure AWS Credentials (Image Cache)
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
@@ -92,14 +92,14 @@ jobs:
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
       - name: Install Rust toolchain for usage by Swatinem/rust-cache
-        uses: dtolnay/rust-toolchain@1.77.0
+        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.77.0
 
       # Note that the cargo environment used by Swatinem/rust-cache to
       # construct a cache key is incorrect since we're actually building inside
       # Docker. This doesn't actually affect cache performance. However we
       # should keep the Rust toolchain above in sync with the one used in the
       # Dockerfiles for consistent behavior.
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # ratchet:Swatinem/rust-cache@v2
         id: rust-cache
         with:
           shared-key: image-build-${{ matrix.name }}-${{ matrix.args.BUILD_PROFILE || 'default' }}
@@ -108,7 +108,7 @@ jobs:
             backend
 
       - name: Inject Rust cache into Docker
-        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        uses: reproducible-containers/buildkit-cache-dance@5de31fc1534ed8789e63d41ea933c5df9944a261 # ratchet:reproducible-containers/buildkit-cache-dance@v3.1.0
         with:
           cache-map: |
             {
@@ -168,12 +168,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libssl-dev libpq-dev
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@1.77.0
+        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.77.0
 
       - uses: rui314/setup-mold@7f56dbde35ee02a3fe0287e7ddd310922eb5f553
         with:
@@ -219,12 +219,12 @@ jobs:
     if: needs.files-changed.outputs.filesChanged == 'true'
     runs-on: 16core
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@1.77.0
+        uses: dtolnay/rust-toolchain@b21f207ebb9b7d0b7fd7e064cabc6cde8ca12702 # ratchet:dtolnay/rust-toolchain@1.77.0
         with:
           components: clippy
 
@@ -254,7 +254,7 @@ jobs:
     runs-on: 16core
     environment: backend_ci
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -309,7 +309,7 @@ jobs:
           echo "::set-output name=body::$COMMENT"
 
       - name: Find local comment
-        uses: peter-evans/find-comment@v2.0.0
+        uses: peter-evans/find-comment@1769778a0c5bd330272d749d12c036d65e70d39d # ratchet:peter-evans/find-comment@v2.0.0
         if: ${{ github.ref != 'refs/heads/master' && (success() || failure()) }}
         id: fc
         with:
@@ -318,7 +318,7 @@ jobs:
           body-includes: 'Local integration tests'
 
       - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@v2.0.0
+        uses: peter-evans/create-or-update-comment@c9fcb64660bc90ec1cc535646af190c992007c32 # ratchet:peter-evans/create-or-update-comment@v2.0.0
         if: ${{ github.ref != 'refs/heads/master' && (success() || failure()) }}
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
@@ -348,12 +348,12 @@ jobs:
     runs-on: 16core
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # ratchet:actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@7ba5d857b13a2c335579877a00c25c134410d383 # ratchet:dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
 

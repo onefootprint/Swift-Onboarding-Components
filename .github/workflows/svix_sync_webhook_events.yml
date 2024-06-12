@@ -25,10 +25,10 @@ jobs:
     # by default deploy to production as triggered
     environment: ${{ inputs.environment || 'production' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
       - name: rust-toolchain
-        uses: actions-rs/toolchain@v1.0.6
+        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f # ratchet:actions-rs/toolchain@v1.0.6
         with:
           toolchain: stable
 

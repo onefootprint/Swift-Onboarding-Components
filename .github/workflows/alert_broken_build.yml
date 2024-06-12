@@ -25,7 +25,7 @@ jobs:
     steps:
       - name: Notify on slack
         id: slack
-        uses: slackapi/slack-github-action@v1.21.0
+        uses: slackapi/slack-github-action@936158bbe252e9a6062e793ea4609642c966e302 # ratchet:slackapi/slack-github-action@v1.21.0
         with:
           # This data can be any valid JSON from a previous step in the GitHub Action
           payload: |

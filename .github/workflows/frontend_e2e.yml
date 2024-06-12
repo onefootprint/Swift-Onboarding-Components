@@ -5,7 +5,7 @@ on:
     branches:
       - master
   pull_request:
-  
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
@@ -20,7 +20,7 @@ jobs:
     name: Determine if relevant files changed
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
       - uses: dorny/paths-filter@affb29871ab1f927ecad0ee68c0989584101408f
         id: changes
         with:
@@ -48,7 +48,7 @@ jobs:
             echo "E2E_UPDATE_UTOKEN=${E2E_UPDATE_UTOKEN}" >> $GITHUB_ENV
           fi
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
       - name: Build relevant apps and run tests
         working-directory: ./frontend
         run: |
@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload test results (for 3 days)
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # ratchet:actions/upload-artifact@v4
         with:
           name: playwright-report
           path: ./frontend/packages/e2e/test-results/
@@ -85,7 +85,7 @@ jobs:
 
       - name: Add failure comment to PR
         if: ${{ failure() }}
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # ratchet:actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

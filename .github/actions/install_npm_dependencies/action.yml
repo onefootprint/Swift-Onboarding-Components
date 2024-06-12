@@ -12,15 +12,15 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
 
     - name: Use Node.js ${{ inputs.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # ratchet:actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}
 
     - name: Cache management for "frontend/node_modules"
-      uses: actions/cache@v3
+      uses: actions/cache@e12d46a63a90f2fae62d114769bbf2a179198b5c # ratchet:actions/cache@v3
       id: cache-dependencies
       with:
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}

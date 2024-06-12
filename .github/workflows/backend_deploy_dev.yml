@@ -37,7 +37,7 @@ jobs:
           echo "commit hash we will deploy in this workflow: $commit_hash"
 
           echo "apiCommitHash=${commit_hash}" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
       - uses: ./.github/actions/backend_extract_commit_hash
         id: components
         with:

@@ -1,0 +1,31 @@
+name: Check for pinned GitHub actions
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  check_pinned_gha:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: 'actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b' # ratchet:actions/checkout@v3
+      - name: Find GitHub Action files
+        id: find_gha_files
+        run: |
+          set -euxo pipefail
+
+          FILES=$(find .github/workflows .github/actions -name '*.yml' | paste -sd " ")
+          echo "files=${FILES}" >> "$GITHUB_OUTPUT"
+
+      - uses: 'docker://ghcr.io/sethvargo/ratchet:latest@sha256:ff6206b36076dcbac39fb5c39f2ff41ba5a84c35295d8bb4348148cd463b0bfc' # ratchet:docker://ghcr.io/sethvargo/ratchet:latest
+        with:
+          args: 'check ${{ steps.find_gha_files.outputs.files }}'
+
+      - name: How to pin dependencies
+        if: failure()
+        run: |
+          echo "If this check fails:"
+          echo "  1. \`brew install ratchet\` if you don't already have the tool"
+          echo "  2. \`ratchet pin .github/workflows/*.yml .github/actions/**/*.yml\`"
+          echo "  3. Commit and push"

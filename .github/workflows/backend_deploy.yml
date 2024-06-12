@@ -240,12 +240,12 @@ jobs:
     needs: [copy_images, sign_push_enclave]
     if: success()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
         with:
           ref: ${{ inputs.commitHash }}
 
       # pulumi setup
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@7c12f8017d5436eb855f1ed4399f037a36fbd9e8 # ratchet:actions/setup-node@v2
         with:
           node-version: 18.x
       - name: Configure AWS Credentials
@@ -338,7 +338,7 @@ jobs:
 
       - name: Update deploy info on pull request
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # ratchet:actions/github-script@v6
         with:
           script: |
             // get existing comments

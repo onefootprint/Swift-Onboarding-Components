@@ -28,7 +28,7 @@ jobs:
       # The image_tag input isn't available for the pull_request trigger.
       imageTag: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # ratchet:actions/checkout@v4
         with:
           # We extract all commits here to make sure we're pulling the right commit hash
           fetch-depth: 0
