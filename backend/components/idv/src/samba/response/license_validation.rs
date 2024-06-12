@@ -1,6 +1,7 @@
 use newtypes::{
     PiiString,
     SambaReportId,
+    ScrubbedPiiJsonValue,
 };
 use serde::{
     Deserialize,
@@ -94,11 +95,11 @@ pub struct Record {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct DlRecord {
-    pub criteria: Option<serde_json::Value>,
+    pub criteria: Option<ScrubbedPiiJsonValue>,
     pub result: Result,
     pub license_validation: Option<LicenseValidation>,
-    pub driver: Option<serde_json::Value>,
-    pub current_license: Option<serde_json::Value>,
+    pub driver: Option<ScrubbedPiiJsonValue>,
+    pub current_license: Option<ScrubbedPiiJsonValue>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Eq)]
