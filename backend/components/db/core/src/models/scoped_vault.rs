@@ -616,7 +616,8 @@ impl ScopedVault {
             timestamp: Utc::now(),
         };
         let webhook_event = match kind {
-            UserSpecificWebhookKind::InfoRequested => WebhookEvent::InfoRequested(payload),
+            UserSpecificWebhookKind::InfoRequested => WebhookEvent::UserInfoRequested(payload),
+            UserSpecificWebhookKind::ManualReview => WebhookEvent::UserManualReview(payload),
         };
         let args = FireWebhookArgs {
             scoped_vault_id: self.id.clone(),

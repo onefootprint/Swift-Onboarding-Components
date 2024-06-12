@@ -1,20 +1,17 @@
-pub use self::payloads::{
-    InfoRequestedPayload,
-    OnboardingCompletedPayload,
-    OnboardingStatusChangedPayload,
-    WatchlistCheckCompletedPayload,
-};
 use chrono::{
     DateTime,
     Utc,
 };
 use newtypes::{
     FpId,
+    ObConfigurationKey,
     OnboardingCompletedPayload as NTOnboardingCompletedPayload,
     OnboardingStatus,
     OnboardingStatusChangedPayload as NTOnboardingStatusChangedPayload,
     UserSpecificWebhookPayload,
     WatchlistCheckCompletedPayload as NTWatchlistCheckCompletedPayload,
+    WatchlistCheckError,
+    WatchlistCheckStatusKind,
     WebhookEvent as NTWebhookEvent,
 };
 use schemars::JsonSchema;
@@ -40,7 +37,9 @@ pub enum WebhookEvent {
     OnboardingCompleted(OnboardingCompletedPayload),
 
     #[strum_discriminants(strum(serialize = "footprint.onboarding.status_changed"))]
-    #[strum_discriminants(strum(message = "A user's status has been changed."))]
+    #[strum_discriminants(strum(
+        message = "A user's status has been changed after finishing onboarding, manual review, or internal updates to the user's status. Generally, the pending and incomplete statuses aren't important to listen to here. This webhook is being phased out in favor of the more descriptive footprint.onboarding.completed and footprint.user.manual_review events."
+    ))]
     OnboardingStatusChanged(OnboardingStatusChangedPayload),
 
     #[strum_discriminants(strum(serialize = "footprint.watchlist_check.completed"))]
@@ -49,9 +48,15 @@ pub enum WebhookEvent {
 
     #[strum_discriminants(strum(serialize = "footprint.user.info_requested"))]
     #[strum_discriminants(strum(
-        message = "A Footprint dashboard user has requested this user to provide more information during the course of manual review."
+        message = "A Footprint dashboard user has requested this user to provide more information during the course of manual review. When responding to this webhook, you can see more context on the information requested using the GET /users/{fp_id} API."
     ))]
-    InfoRequested(InfoRequestedPayload),
+    UserInfoRequested(UserInfoRequestedPayload),
+
+    #[strum_discriminants(strum(serialize = "footprint.user.manual_review"))]
+    #[strum_discriminants(strum(
+        message = "A Footprint dashboard user has changed the user's status during manual review. When responding to this webhook, you can see more context on the user's up-to-date status using the GET /users/{fp_id} API."
+    ))]
+    UserManualReview(UserManualReviewPayload),
 }
 
 impl schemars::JsonSchema for WebhookEventKind {
@@ -75,108 +80,108 @@ impl schemars::JsonSchema for WebhookEventKind {
     }
 }
 
-/// all of the payload bodies
-mod payloads {
-    use super::*;
-    use newtypes::{
-        ObConfigurationKey,
-        WatchlistCheckError,
-        WatchlistCheckStatusKind,
-    };
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
+#[schemars(example = "OnboardingCompletedPayload::example")]
+pub struct OnboardingCompletedPayload {
+    pub event_kind: WebhookEventKind,
+    #[schemars(with = "String")]
+    pub fp_id: FpId,
+    pub timestamp: DateTime<Utc>,
+    #[schemars(with = "OnboardingStatusShadow")]
+    pub status: OnboardingStatus,
+    #[schemars(with = "String")]
+    pub playbook_key: ObConfigurationKey,
+    pub requires_manual_review: bool,
+    pub is_live: bool,
+}
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
-    #[schemars(example = "OnboardingCompletedPayload::example")]
-    pub struct OnboardingCompletedPayload {
-        pub event_kind: WebhookEventKind,
-        #[schemars(with = "String")]
-        pub fp_id: FpId,
-        pub timestamp: DateTime<Utc>,
-        #[schemars(with = "OnboardingStatusShadow")]
-        pub status: OnboardingStatus,
-        #[schemars(with = "String")]
-        pub playbook_key: ObConfigurationKey,
-        pub requires_manual_review: bool,
-        pub is_live: bool,
-    }
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
+#[schemars(example = "OnboardingStatusChangedPayload::example")]
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
-    #[schemars(example = "OnboardingStatusChangedPayload::example")]
+pub struct OnboardingStatusChangedPayload {
+    pub event_kind: WebhookEventKind,
+    #[schemars(with = "String")]
+    pub fp_id: FpId,
+    pub timestamp: DateTime<Utc>,
+    #[schemars(with = "OnboardingStatusShadow")]
+    pub new_status: OnboardingStatus,
+    pub requires_manual_review: bool,
+    pub is_live: bool,
+}
 
-    pub struct OnboardingStatusChangedPayload {
-        pub event_kind: WebhookEventKind,
-        #[schemars(with = "String")]
-        pub fp_id: FpId,
-        pub timestamp: DateTime<Utc>,
-        #[schemars(with = "OnboardingStatusShadow")]
-        pub new_status: OnboardingStatus,
-        pub requires_manual_review: bool,
-        pub is_live: bool,
-    }
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
+#[schemars(example = "WatchlistCheckCompletedPayload::example")]
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
-    #[schemars(example = "WatchlistCheckCompletedPayload::example")]
+pub struct WatchlistCheckCompletedPayload {
+    pub event_kind: WebhookEventKind,
+    #[schemars(with = "String")]
+    pub fp_id: FpId,
+    pub timestamp: DateTime<Utc>,
+    #[schemars(with = "WatchlistCheckStatusKindShadow")]
+    pub status: WatchlistCheckStatusKind,
+    #[schemars(with = "Option<WatchlistCheckErrorShadow>")]
+    pub error: Option<WatchlistCheckError>,
+    pub is_live: bool,
+}
 
-    pub struct WatchlistCheckCompletedPayload {
-        pub event_kind: WebhookEventKind,
-        #[schemars(with = "String")]
-        pub fp_id: FpId,
-        pub timestamp: DateTime<Utc>,
-        #[schemars(with = "WatchlistCheckStatusKindShadow")]
-        pub status: WatchlistCheckStatusKind,
-        #[schemars(with = "Option<WatchlistCheckErrorShadow>")]
-        pub error: Option<WatchlistCheckError>,
-        pub is_live: bool,
-    }
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
+#[schemars(example = "UserInfoRequestedPayload::example")]
+pub struct UserInfoRequestedPayload {
+    pub event_kind: WebhookEventKind,
+    #[schemars(with = "String")]
+    pub fp_id: FpId,
+    pub timestamp: DateTime<Utc>,
+    pub is_live: bool,
+}
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
-    #[schemars(example = "InfoRequestedPayload::example")]
-    pub struct InfoRequestedPayload {
-        pub event_kind: WebhookEventKind,
-        #[schemars(with = "String")]
-        pub fp_id: FpId,
-        pub timestamp: DateTime<Utc>,
-        pub is_live: bool,
-    }
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, JsonSchema)]
+#[schemars(example = "UserManualReviewPayload::example")]
+pub struct UserManualReviewPayload {
+    pub event_kind: WebhookEventKind,
+    #[schemars(with = "String")]
+    pub fp_id: FpId,
+    pub timestamp: DateTime<Utc>,
+    pub is_live: bool,
+}
 
-    // This is just a copy of the remote data structure that Schemars can use to
-    // create a suitable JsonSchema impl.
-    #[derive(JsonSchema)]
-    #[serde(remote = "OnboardingStatus")]
-    #[serde(rename_all = "snake_case")]
-    enum OnboardingStatusShadow {
-        #[allow(unused)]
-        Pass,
-        #[allow(unused)]
-        Fail,
-        #[allow(unused)]
-        Incomplete,
-        #[allow(unused)]
-        Pending,
-    }
+// This is just a copy of the remote data structure that Schemars can use to
+// create a suitable JsonSchema impl.
+#[derive(JsonSchema)]
+#[serde(remote = "OnboardingStatus")]
+#[serde(rename_all = "snake_case")]
+enum OnboardingStatusShadow {
+    #[allow(unused)]
+    Pass,
+    #[allow(unused)]
+    Fail,
+    #[allow(unused)]
+    Incomplete,
+    #[allow(unused)]
+    Pending,
+}
 
-    #[derive(JsonSchema)]
-    #[serde(remote = "WatchlistCheckStatusKind")]
-    #[serde(rename_all = "snake_case")]
-    enum WatchlistCheckStatusKindShadow {
-        #[allow(unused)]
-        Pending,
-        #[allow(unused)]
-        Pass,
-        #[allow(unused)]
-        Fail,
-        #[allow(unused)]
-        Error,
-        #[allow(unused)]
-        NotNeeded,
-    }
+#[derive(JsonSchema)]
+#[serde(remote = "WatchlistCheckStatusKind")]
+#[serde(rename_all = "snake_case")]
+enum WatchlistCheckStatusKindShadow {
+    #[allow(unused)]
+    Pending,
+    #[allow(unused)]
+    Pass,
+    #[allow(unused)]
+    Fail,
+    #[allow(unused)]
+    Error,
+    #[allow(unused)]
+    NotNeeded,
+}
 
-    #[derive(JsonSchema)]
-    #[serde(remote = "WatchlistCheckError")]
-    #[serde(rename_all = "snake_case")]
-    enum WatchlistCheckErrorShadow {
-        #[allow(unused)]
-        RequiredDataNotPresent,
-    }
+#[derive(JsonSchema)]
+#[serde(remote = "WatchlistCheckError")]
+#[serde(rename_all = "snake_case")]
+enum WatchlistCheckErrorShadow {
+    #[allow(unused)]
+    RequiredDataNotPresent,
 }
 
 mod examples {
@@ -223,10 +228,21 @@ mod examples {
         }
     }
 
-    impl InfoRequestedPayload {
+    impl UserInfoRequestedPayload {
         pub fn example() -> Self {
-            InfoRequestedPayload {
-                event_kind: WebhookEventKind::InfoRequested,
+            UserInfoRequestedPayload {
+                event_kind: WebhookEventKind::UserInfoRequested,
+                fp_id: FpId::test_data("fp_id_xyz".into()),
+                timestamp: Utc::now(),
+                is_live: false,
+            }
+        }
+    }
+
+    impl UserManualReviewPayload {
+        pub fn example() -> Self {
+            UserManualReviewPayload {
+                event_kind: WebhookEventKind::UserManualReview,
                 fp_id: FpId::test_data("fp_id_xyz".into()),
                 timestamp: Utc::now(),
                 is_live: false,
@@ -247,7 +263,8 @@ impl From<NTWebhookEvent> for WebhookEvent {
             NTWebhookEvent::OnboardingCompleted(v) => WebhookEvent::OnboardingCompleted(v.into()),
             NTWebhookEvent::OnboardingStatusChanged(v) => WebhookEvent::OnboardingStatusChanged(v.into()),
             NTWebhookEvent::WatchlistCheckCompleted(v) => WebhookEvent::WatchlistCheckCompleted(v.into()),
-            NTWebhookEvent::InfoRequested(v) => WebhookEvent::InfoRequested(v.into()),
+            NTWebhookEvent::UserInfoRequested(v) => WebhookEvent::UserInfoRequested(v.into()),
+            NTWebhookEvent::UserManualReview(v) => WebhookEvent::UserManualReview(v.into()),
         }
     }
 }
@@ -292,10 +309,22 @@ impl From<NTWatchlistCheckCompletedPayload> for WatchlistCheckCompletedPayload {
     }
 }
 
-impl From<UserSpecificWebhookPayload> for InfoRequestedPayload {
+impl From<UserSpecificWebhookPayload> for UserInfoRequestedPayload {
     fn from(value: UserSpecificWebhookPayload) -> Self {
         Self {
-            event_kind: WebhookEventKind::InfoRequested,
+            event_kind: WebhookEventKind::UserInfoRequested,
+            fp_id: value.fp_id,
+            timestamp: value.timestamp,
+            is_live: value.is_live,
+        }
+    }
+}
+
+
+impl From<UserSpecificWebhookPayload> for UserManualReviewPayload {
+    fn from(value: UserSpecificWebhookPayload) -> Self {
+        Self {
+            event_kind: WebhookEventKind::UserManualReview,
             fp_id: value.fp_id,
             timestamp: value.timestamp,
             is_live: value.is_live,

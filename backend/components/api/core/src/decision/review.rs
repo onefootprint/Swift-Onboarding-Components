@@ -27,6 +27,7 @@ use newtypes::{
     DocumentReviewStatus,
     Locked,
     ManualReviewKind,
+    UserSpecificWebhookKind,
 };
 use strum::IntoEnumIterator;
 
@@ -74,6 +75,9 @@ pub fn save_review_decision(
             Document::update(conn, &doc.id, update)?;
         }
     }
+
+    // Fire a webhook noting that manual review has occurred
+    sv.create_webhook_task(conn, UserSpecificWebhookKind::ManualReview)?;
 
     // Make the decision regardless of whether the status changed - the actor of the decision
     // may be different

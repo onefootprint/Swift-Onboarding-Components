@@ -154,14 +154,15 @@ pub enum WebhookEvent {
     WatchlistCheckCompleted(WatchlistCheckCompletedPayload),
     // We're moving towards a standard of our webhooks being thin shims that include information on the user
     // and require you to hit our API to fetch the most up-to-date info
-    InfoRequested(UserSpecificWebhookPayload),
-    // TODO ManualDecision
+    UserInfoRequested(UserSpecificWebhookPayload),
+    UserManualReview(UserSpecificWebhookPayload),
     // TODO WorkflowCompleted
     // TODO WatchlistCheck
 }
 
 pub enum UserSpecificWebhookKind {
     InfoRequested,
+    ManualReview,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
