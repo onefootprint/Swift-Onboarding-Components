@@ -152,7 +152,12 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             is_integration_test_req,
             client_version,
         } = TelemetryHeaders::parse_from_request(request.headers());
-        let session_id = session_id.map(|s| format!("{}", s));
+
+        // fp_session_id is used in telemetry to avoid conflicting with session_id, which is reserved for
+        // Datadog RUM.
+        let fp_session_id = session_id.map(|s| format!("{}", s));
+        // Continue emitting session_id to support Honeycomb workflows.
+        let session_id = fp_session_id.clone();
 
         let server_git_hash = crate::GIT_HASH.to_string();
 
@@ -165,7 +170,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             request,
             tenant_id = tracing::field::Empty,
             fp_id = tracing::field::Empty, // maybe replace with scoped_vault_id, available in more places
-            vault_id = tracing::field::Empty,
             is_live = tracing::field::Empty,
             auth_method = tracing::field::Empty,
             // Allow associating requests made with the same auth token, even if the auth extractor failed
@@ -173,6 +177,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             // Free-form data to be added by individual APIs if they choose
             meta = tracing::field::Empty,
             client_version,
+            fp_session_id,
             session_id,
             server_git_hash,
             is_integration_test_req,
@@ -343,6 +348,7 @@ where
                 | "auth_token_hash"
                 | "client_version"
                 | "session_id"
+                | "fp_session_id"
                 | "is_integration_test_req"
                 | "route"
                 | "ip_address"

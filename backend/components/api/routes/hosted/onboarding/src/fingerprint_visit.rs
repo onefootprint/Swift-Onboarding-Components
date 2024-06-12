@@ -72,7 +72,9 @@ pub async fn post(
                 // associate session_id with visitor_id and other identifiers in logs so we can see things in
                 // observe
                 tracing::info!(
-                    session_id=%format!("{:?}", telemetry_headers.session_id),
+                    // fp_session_id is used in telemetry to avoid conflicting with session_id,
+                    // which is reserved for Datadog RUM.
+                    fp_session_id=%format!("{:?}", telemetry_headers.session_id),
                     visitor_id=%visitor_id,
                     user_vault_id=%user_vault_id,
                     scoped_user_id=%format!("{:?}", scoped_user_id),

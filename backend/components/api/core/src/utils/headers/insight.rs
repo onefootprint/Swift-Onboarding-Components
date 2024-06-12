@@ -167,7 +167,8 @@ impl InsightHeaders {
             http_version,
             tls,
             origin,
-            session_id,
+            // fp_session_id is used in telemetry to avoid conflicting with session_id, which is reserved for Datadog RUM.
+            fp_session_id = session_id,
             "Extracted InsightHeaders"
         );
     }
