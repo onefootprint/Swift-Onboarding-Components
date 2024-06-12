@@ -101,16 +101,13 @@ const GlobalStyles = createGlobalStyle`
     display: block;
   }
 
-  .fp-message {
+  .fp-field-errors {
     font-family: inherit;
     font-weight: 400;
     font-size: 0.9375rem;
     line-height: 150%;
     margin-top: 4px;
-
-    &[aria-invalid='true'] {
-      color: rgb(153, 16, 8);
-    }
+    color: rgb(153, 16, 8);
   }
 
   .fp-address-container {

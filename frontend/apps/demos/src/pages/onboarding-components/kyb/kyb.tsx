@@ -148,7 +148,7 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
       <Fp.Form onSubmit={handleSubmit}>
         <Stack gap={4} direction="column">
           <Fp.Field name="business.name">
-            <Fp.Label>Business name1</Fp.Label>
+            <Fp.Label>Business name</Fp.Label>
             <Fp.Input placeholder="Acme Bank Inc." />
             <Fp.FieldErrors />
           </Fp.Field>
