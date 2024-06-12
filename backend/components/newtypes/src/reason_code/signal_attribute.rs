@@ -37,6 +37,7 @@ pub enum SignalScope {
     Country,
     Email,
     PhoneNumber,
+    DriversLicenseNumber,
 
     IpAddress,
     Device,
@@ -57,31 +58,32 @@ pub enum SignalScope {
 impl SignalScope {
     pub fn is_for_person(&self) -> bool {
         match self {
-            SignalScope::Name => true,
-            SignalScope::Dob => true,
-            SignalScope::Ssn => true,
-            SignalScope::Itin => true,
-            SignalScope::Address => true,
-            SignalScope::StreetAddress => true,
-            SignalScope::City => true,
-            SignalScope::State => true,
-            SignalScope::Zip => true,
-            SignalScope::Country => true,
-            SignalScope::Email => true,
-            SignalScope::PhoneNumber => true,
-            SignalScope::IpAddress => true,
-            SignalScope::Device => true,
-            SignalScope::NativeDevice => true,
-            SignalScope::Document => true,
-            SignalScope::Selfie => true,
-            SignalScope::BusinessAddress => false,
-            SignalScope::BusinessName => false,
-            SignalScope::BusinessPhoneNumber => false,
-            SignalScope::BusinessWebsite => false,
-            SignalScope::BusinessTin => false,
-            SignalScope::BeneficialOwners => false,
-            SignalScope::BusinessDba => false,
-            SignalScope::Behavior => true,
+            SignalScope::Name
+            | SignalScope::Dob
+            | SignalScope::Ssn
+            | SignalScope::Itin
+            | SignalScope::Address
+            | SignalScope::StreetAddress
+            | SignalScope::City
+            | SignalScope::State
+            | SignalScope::Zip
+            | SignalScope::Country
+            | SignalScope::Email
+            | SignalScope::PhoneNumber
+            | SignalScope::IpAddress
+            | SignalScope::Device
+            | SignalScope::NativeDevice
+            | SignalScope::Document
+            | SignalScope::Selfie
+            | SignalScope::DriversLicenseNumber
+            | SignalScope::Behavior => true,
+            SignalScope::BusinessAddress
+            | SignalScope::BusinessName
+            | SignalScope::BusinessPhoneNumber
+            | SignalScope::BusinessWebsite
+            | SignalScope::BusinessTin
+            | SignalScope::BeneficialOwners
+            | SignalScope::BusinessDba => false,
         }
     }
 
@@ -101,6 +103,7 @@ impl SignalScope {
             | SignalScope::PhoneNumber => true,
             SignalScope::IpAddress
             | SignalScope::Device
+            | SignalScope::DriversLicenseNumber // ?
             | SignalScope::NativeDevice
             | SignalScope::Document
             | SignalScope::Selfie
@@ -133,6 +136,7 @@ impl SignalScope {
             | SignalScope::NativeDevice
             | SignalScope::Document
             | SignalScope::Selfie
+            | SignalScope::DriversLicenseNumber
             | SignalScope::Behavior // TODO: cross this bridge when/if we use behavioral for kyb
             | SignalScope::PhoneNumber => false,
             SignalScope::BusinessAddress

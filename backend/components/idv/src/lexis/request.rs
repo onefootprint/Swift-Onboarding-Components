@@ -249,6 +249,8 @@ pub(crate) struct SearchBy {
     /// Ten-digit home phone number (for example, 925551234)
     pub home_phone: Option<PiiString>,
     pub email: Option<PiiString>,
+    #[serde(rename = "DriverLicenseNumber")]
+    pub drivers_license_number: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -282,7 +284,7 @@ pub(crate) struct Dob {
     pub day: PiiString,
 }
 
-#[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq, Eq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq, Eq, Debug, Copy)]
 #[repr(u8)]
 pub enum LBool {
     Zero = 0,
@@ -393,8 +395,7 @@ impl LexisRequest {
             email,
             phone_number,
             verification_request_id,
-            // TODO: use in request to lexis
-            drivers_license_number: _,
+            drivers_license_number,
         } = idv_data;
 
         let dob = if let Some(dob) = dob {
@@ -422,6 +423,14 @@ impl LexisRequest {
             (Some(ssn9), _) => (Some(ssn9), None),
             (None, Some(ssn4)) => (None, Some(ssn4)),
             (None, None) => (None, None),
+        };
+
+        // TODO: are there format requirements here?
+        // TODO: do we need to include DL state in SearchBy?
+        let include_dl_verification = if drivers_license_number.is_some() {
+            LBool::One
+        } else {
+            LBool::Zero
         };
 
         Ok(Self {
@@ -478,7 +487,10 @@ impl LexisRequest {
                     },
                     include_all_risk_indicators: LBool::One,
                     include_verified_element_summary: LBool::Zero, // Don't have privelages for this :(
-                    include_dl_verification: LBool::Zero,          // noops for us
+                    // TODO: what's the difference between this and `include_driver_license` in the cvi calc
+                    // options?
+                    // My guess is that it gets included in VerifiedElementSummary if this option is turned on
+                    include_dl_verification,
                     dob_match: DobMatch {
                         match_type: DobMatchType::FuzzyCCYYMMDD,
                         match_year_radius: 0, // should be noop since we arent using RadiusCCYY
@@ -497,7 +509,10 @@ impl LexisRequest {
                     include_ssn_verification: LBool::Zero, // Don't have privelages for this :(
                     cvi_calculation_options: Some(CviCalculationOptions {
                         include_dob: LBool::One,
-                        include_driver_license: LBool::Zero,
+                        // this is the option that Lexis communicated we should use
+                        // from them: "Send the DL whenever possible and if you do not send in DL and the CVI
+                        // option is turned on, it will not have a negative effect."
+                        include_driver_license: include_dl_verification,
                         disable_customer_network_option: LBool::Zero, /* TODO: might need to fiddle with this and see how it impacts scores */
                         include_itin: LBool::One,
                         include_compliance_cap: LBool::Zero,
@@ -527,6 +542,7 @@ impl LexisRequest {
                     dob,
                     ip_address: None, // maybe add this later
                     email,
+                    drivers_license_number,
                 },
             },
         })

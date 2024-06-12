@@ -46,8 +46,7 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<F
         let ValidElementSummary {
             ssn_valid,
             ssn_deceased,
-            // we dont send dl to lexis
-            dl_valid: _,
+            dl_valid,
             // we dont send passport to lexis
             passport_valid: _,
             address_po_box,
@@ -63,6 +62,25 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<F
         if ssn_deceased.unwrap_or(false) {
             codes.push(FRC::SubjectDeceased);
         }
+
+        // (maybe) we only get this if we send `include_dl_verification` in the flex options (and send DL)
+        if let Some(dlvalid) = dl_valid {
+            if dlvalid {
+                codes.push(FRC::DriversLicenseNumberIsValid)
+            } else {
+                codes.push(FRC::DriversLicenseNumberNotValid)
+            }
+        }
+
+        // i'm not sure we even get this (not sure when we get what in the VerifiedElementSummary)
+        if let Some(dl_verified) = res.dl_verified() {
+            if dl_verified {
+                codes.push(FRC::DriversLicenseNumberVerified)
+            } else {
+                codes.push(FRC::DriversLicenseNumberNotVerified)
+            }
+        }
+
         if address_po_box.unwrap_or(false) || address_cmra.unwrap_or(false) {
             // CRMA is technically different from a PO Box but I think it's fine to keep the same single risk
             // signal here?
@@ -294,7 +312,9 @@ mod tests {
             DobYobDoesNotMatch,
             SsnInputIsInvalid,
             IdFlagged,
-            PhoneNumberInputInvalid
+            PhoneNumberInputInvalid,
+            DriversLicenseNumberNotValid,
+            DriversLicenseNumberNotVerified
         ])
     ]
     #[test_case(
@@ -309,7 +329,9 @@ mod tests {
           DobPartialMatch,
           DobYobDoesNotMatch,
           IdFlagged,
-          PhoneNumberInputInvalid
+          PhoneNumberInputInvalid,
+          DriversLicenseNumberNotValid,
+          DriversLicenseNumberNotVerified
       ])
   ]
     #[test_case(
@@ -325,7 +347,9 @@ mod tests {
             DobCouldNotMatch,
             SsnInputIsInvalid,
             IdFlagged,
-            PhoneNumberInputInvalid
+            PhoneNumberInputInvalid,
+            DriversLicenseNumberIsValid,
+            DriversLicenseNumberVerified
         ])
     ]
     #[test_case(
@@ -438,12 +462,14 @@ mod tests {
                   "PassportValid": false,
                   "SSNDeceased": false,
                   "SSNFoundForLexID": true,
-                  "SSNValid": false
+                  "SSNValid": false,
+                  "DLValid": false,
                 },
                 "VerifiedElementSummary": {
                   "DOB": false,
                   "DOBMatchLevel": "4",
-                  "Email": false
+                  "Email": false,
+                  "DL": false
                 }
               }
             }
@@ -548,12 +574,14 @@ mod tests {
                   "PassportValid": false,
                   "SSNDeceased": false,
                   "SSNFoundForLexID": false,
-                  "SSNValid": false
+                  "SSNValid": false,
+                  "DLValid": true
                 },
                 "VerifiedElementSummary": {
                   "DOB": false,
                   "DOBMatchLevel": "0",
-                  "Email": false
+                  "Email": false,
+                  "DL": true
                 }
               }
             }

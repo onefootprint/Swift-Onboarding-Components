@@ -674,6 +674,33 @@ footprint_reason_code_enum! {
         #[note = "Area code doesn't match IP address state", severity = SignalSeverity::Low,  description = "IP address is not from the same state as the input phone number."]
         InputPhoneNumberDoesNotMatchIpState,
 
+        // ~~~~~~~~~~~~ Driver's License Number ~~~~~~~~~~~~
+        #[scope = SignalScope::DriversLicenseNumber, additional_scopes = vec![], match_level = None]
+        #[note = "Different license number found", severity = SignalSeverity::Medium,  description = "A different driver's license number was found for the user."]
+        DriversLicenseNumberDifferentNumberFound,
+
+        #[scope = SignalScope::DriversLicenseNumber, additional_scopes = vec![], match_level = None]
+        #[note = "License number valid but not on record", severity = SignalSeverity::Low,  description = "The driver's license number is valid, but is not on record."]
+        DriversLicenseNumberNotOnRecord,
+
+        #[scope = SignalScope::DriversLicenseNumber, additional_scopes = vec![], match_level = None]
+        #[note = "License number is not valid", severity = SignalSeverity::Medium,  description = "The driver's license number was not valid"]
+        DriversLicenseNumberNotValid,
+
+        #[scope = SignalScope::DriversLicenseNumber, additional_scopes = vec![], match_level = None]
+        #[note = "License number is valid", severity = SignalSeverity::Info,  description = "The driver's license number is valid"]
+        DriversLicenseNumberIsValid,
+
+        #[scope = SignalScope::DriversLicenseNumber, additional_scopes = vec![], match_level = None]
+        #[note = "License number was verified", severity = SignalSeverity::Info,  description = "The driver's license number was verified"]
+        DriversLicenseNumberVerified,
+
+        // I'm not sure if not verified means "we found a different DL number" or "it was not on file and therefore not verified"
+        // Hence, not using the standard `*Matches`, `*DoesNotMatch` naming here
+        #[scope = SignalScope::DriversLicenseNumber, additional_scopes = vec![], match_level = None]
+        #[note = "License number not verified", severity = SignalSeverity::Low,  description = "The driver's license number was not verified"]
+        DriversLicenseNumberNotVerified,
+
         // ~~~~~~~~~~~~ Document ~~~~~~~~~~~~
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]

@@ -538,6 +538,12 @@ impl FlexIdResponse {
                                                              // produce any FRC at all?
     }
 
+    pub fn dl_verified(&self) -> Option<bool> {
+        self.result()
+            .and_then(|r| r.verified_element_summary.as_ref())
+            .and_then(|v| v.dl)
+    }
+
     pub fn valid_element_summary(&self) -> Option<ValidElementSummary> {
         self.result().and_then(|r| r.valid_element_summary.clone())
     }

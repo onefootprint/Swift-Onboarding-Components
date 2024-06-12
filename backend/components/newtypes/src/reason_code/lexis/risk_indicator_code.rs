@@ -247,11 +247,11 @@ vendor_reason_code_enum! {
         CZ,
 
         #[ser = "DD", description = "A different driver's license number has been found for the input applicant"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(DriversLicenseNumberDifferentNumberFound)]
         DD,
 
         #[ser = "DF", description = "The input driver’s license number is valid and is not on record"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(DriversLicenseNumberNotOnRecord)]
         DF,
 
         #[ser = "DI", description = "The input identity is reported as deceased"]
