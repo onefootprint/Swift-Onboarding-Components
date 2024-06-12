@@ -132,9 +132,7 @@ export const withDeleteError = (listId: string, entryId: string) =>
     path: `/org/lists/${listId}/entries/${entryId}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -165,8 +163,6 @@ export const withListEntriesError = (listId: string) =>
     path: `/org/lists/${listId}/entries`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

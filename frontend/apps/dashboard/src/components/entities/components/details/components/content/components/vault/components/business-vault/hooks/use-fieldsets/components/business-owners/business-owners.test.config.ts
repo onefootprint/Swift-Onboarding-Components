@@ -72,8 +72,6 @@ export const withBusinessOwnersError = (entity = entityFixture) =>
     path: `/entities/${entity.id}/business_owners`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

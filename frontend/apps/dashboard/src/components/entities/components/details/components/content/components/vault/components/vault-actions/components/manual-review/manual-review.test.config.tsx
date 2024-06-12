@@ -41,8 +41,6 @@ export const withDecisionError = (entityId: string) =>
     path: `/entities/${entityId}/decisions`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

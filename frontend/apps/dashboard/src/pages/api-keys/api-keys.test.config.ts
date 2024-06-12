@@ -62,9 +62,7 @@ export const withApiKeysError = () =>
     path: '/org/api_keys',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -81,9 +79,7 @@ export const withCreateApiKeysError = () =>
     path: '/org/api_keys',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

@@ -136,9 +136,7 @@ export const withEntitiesError = () =>
     path: '/entities/search',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

@@ -33,9 +33,7 @@ export const withUserTokenError = () =>
     path: '/hosted/user/token',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -58,9 +56,7 @@ export const withIdentifyError = () =>
     path: '/hosted/identify',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -83,9 +79,7 @@ export const withLoginChallengeError = () =>
     path: '/hosted/identify/login_challenge',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

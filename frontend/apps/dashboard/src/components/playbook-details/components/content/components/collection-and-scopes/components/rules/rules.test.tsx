@@ -63,7 +63,7 @@ describe('<Rules />', () => {
         withRulesError();
         await renderRulesAndWaitFinishLoading();
 
-        const error = screen.getByText('Something went wrong');
+        const error = screen.getByText('Flerp error');
         expect(error).toBeInTheDocument();
       });
     });

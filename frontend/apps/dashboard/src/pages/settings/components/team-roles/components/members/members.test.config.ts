@@ -198,9 +198,7 @@ export const withMembersError = () =>
     path: '/org/members',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -217,9 +215,7 @@ export const withCreateMembersError = () =>
     path: '/org/members',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -240,9 +236,7 @@ export const withEditMemberError = (member: Member) =>
     path: `/org/members/${member.id}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -259,9 +253,7 @@ export const withRemoveMemberError = (id: string) =>
     path: `/org/members/${id}/deactivate`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -284,8 +276,6 @@ export const withRolesError = () =>
     path: '/org/roles',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

@@ -74,8 +74,6 @@ export const withListTimelineError = (listId: string) =>
     path: `/org/lists/${listId}/timeline`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

@@ -25,7 +25,7 @@ const useLogin = () => {
     onError(e: RequestError): void {
       let description;
       if (e.response?.status === 401) {
-        description = e.response.data.error.message;
+        description = e.response.data.message;
       } else {
         description = t('workos-error.description');
       }

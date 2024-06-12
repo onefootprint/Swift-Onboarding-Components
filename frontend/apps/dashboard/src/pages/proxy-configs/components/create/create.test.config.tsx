@@ -25,9 +25,7 @@ export const withCreateProxyConfigError = () =>
     path: '/org/proxy_configs',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

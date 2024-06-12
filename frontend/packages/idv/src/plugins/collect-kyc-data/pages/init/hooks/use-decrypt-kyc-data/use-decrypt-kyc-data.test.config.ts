@@ -14,9 +14,7 @@ export const withDecryptError = () =>
     path: '/hosted/user/vault/decrypt',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -35,8 +33,6 @@ export const withUserTokenError = () =>
     path: '/hosted/user/token',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

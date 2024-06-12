@@ -160,9 +160,7 @@ export const withPlaybookCopyError = (playbook = playbookFixture) =>
     path: `/org/onboarding_configs/${playbook.id}/copy`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

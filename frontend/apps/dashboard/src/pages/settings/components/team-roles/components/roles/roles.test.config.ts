@@ -59,9 +59,7 @@ export const withRolesError = () =>
     path: '/org/roles',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -78,9 +76,7 @@ export const withCreateRoleError = () =>
     path: '/org/roles',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -97,9 +93,7 @@ export const withUpdateRoleError = (role: Role) =>
     path: `/org/roles/${role.id}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -116,9 +110,7 @@ export const withDisableRoleError = (id: string) =>
     path: `/org/roles/${id}/deactivate`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

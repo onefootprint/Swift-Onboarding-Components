@@ -9,9 +9,7 @@ describe('@onefootprint/request', () => {
       const error = {
         response: {
           data: {
-            error: {
-              message: 'error message',
-            },
+            message: 'error message',
           },
         },
       };
@@ -22,14 +20,11 @@ describe('@onefootprint/request', () => {
     it('should return the error message 2/3', () => {
       const error = {
         code: null,
-        message: {
-          error: 'Message delivery failed. Please try resending the message or use a different phone number.',
-        },
+        message: 'Message delivery failed. Please try resending the message or use a different phone number.',
         context: null,
         status_code: 400,
         support_id: '8214a664-4fba-4f24-af69-3363886b729d',
       } as unknown as RequestError;
-
       expect(getErrorMessageStandAlone(error as RequestError)).toBe(
         'Message delivery failed. Please try resending the message or use a different phone number.',
       );
@@ -43,7 +38,7 @@ describe('@onefootprint/request', () => {
             error: {
               error: {
                 error: {
-                  error: 'Message delivery failed. Please try resending the message or use a different phone number.',
+                  error: 'Flerp',
                 },
               },
             },
@@ -54,9 +49,7 @@ describe('@onefootprint/request', () => {
         support_id: '8214a664-4fba-4f24-af69-3363886b729d',
       } as unknown as RequestError;
 
-      expect(getErrorMessageStandAlone(error as RequestError)).toBe(
-        'Message delivery failed. Please try resending the message or use a different phone number.',
-      );
+      expect(getErrorMessageStandAlone(error as RequestError)).toBe('Flerp');
     });
 
     it('should keep the original error', () => {
@@ -74,10 +67,8 @@ describe('@onefootprint/request', () => {
       const error = {
         response: {
           data: {
-            error: {
-              message: 'error message',
-              code: 'E101',
-            },
+            message: 'error message',
+            code: 'E101',
           },
         },
       };
@@ -97,10 +88,10 @@ describe('@onefootprint/request', () => {
       expect(getErrorCode({})).toEqual(undefined);
       expect(getErrorMessage({})).toEqual('Something went wrong');
 
-      expect(getErrorCode({ response: { data: { error: { code: 'A100' } } } })).toEqual('A100');
+      expect(getErrorCode({ response: { data: { code: 'A100' } } })).toEqual('A100');
       expect(
         getErrorMessage({
-          response: { data: { error: { code: 'blah' } } },
+          response: { data: { code: 'blah' } },
         }),
       ).toEqual('Something went wrong');
     });
@@ -109,11 +100,9 @@ describe('@onefootprint/request', () => {
       const error = {
         response: {
           data: {
-            error: {
-              message: 'error message',
-              code: 'E104',
-              context: { seconds: 4 },
-            },
+            message: 'error message',
+            code: 'E104',
+            context: { seconds: 4 },
           },
         },
       };

@@ -12,7 +12,7 @@ const useRequestError = () => {
     }
     const unknownError = t('unknown');
     if (isFootprintError(error)) {
-      const data = error?.response?.data?.error;
+      const data = error?.response?.data;
       const errorCode = data?.code;
       const errorContext = data?.context;
       const errorMessage = data?.message;
@@ -36,7 +36,7 @@ const useRequestError = () => {
     if (!error || !isFootprintError(error)) {
       return undefined;
     }
-    const data = error?.response?.data?.error;
+    const data = error?.response?.data;
     const errorCode = data?.code;
     return errorCode ?? undefined;
   };

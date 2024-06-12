@@ -21,9 +21,7 @@ export const withSdkArgsError = () =>
     path: '/org/sdk_args',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -44,8 +42,6 @@ export const withDecryptError = () =>
     path: '/entities/vault/decrypt',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

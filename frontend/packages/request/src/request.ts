@@ -6,10 +6,10 @@ import applyCaseMiddleware from 'axios-case-converter';
 import { useTranslation } from 'react-i18next';
 
 type Obj = Record<string, unknown>;
-export type RequestError = AxiosError<{ error: FootprintServerError }>;
+export type RequestError = AxiosError<FootprintServerError>;
 export type FootprintServerError = {
   message: string;
-  code?: string; // Translation code for resolving the erorr to the correct language
+  code?: string; // Translation code for resolving the error to the correct language
   context?: Record<string, string>; // Additional data needed to resolve the error string
   statusCode: number;
   supportId: string;
@@ -31,8 +31,6 @@ const clientVersion = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
   : 'unknown';
 
 const LOGOUT_ERROR_CODES = ['E117', 'E118', 'E119'];
-// TODO (belce): retire matching on exact error string
-const LOGOUT_ERRORS = ['Session does not exist', 'Session is expired', 'Session invalid'];
 
 const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
 const isString = (x: unknown): x is string => typeof x === 'string' && !!x;
@@ -48,20 +46,10 @@ export const isFootprintError = (err: unknown): err is RequestError =>
 export const isUnhandledError = (err: unknown): err is Error =>
   typeof err === 'object' && err != null && 'message' in err && typeof err.message === 'string';
 
-export const isFootprintServerError = (error: unknown): FootprintServerError | undefined => {
-  if (!isFootprintError(error)) return undefined;
-  const err = error?.response?.data?.error;
-  return err?.message && err?.statusCode && err?.supportId ? err : undefined;
-};
-
 export const isLogoutError = (error: unknown) => {
-  const serverError = isFootprintServerError(error);
-  if (serverError?.statusCode !== 401) {
-    return false;
-  }
-  const codeMatches = LOGOUT_ERROR_CODES.some(code => serverError?.code === code);
-  const messageMatches = LOGOUT_ERRORS.some(e => serverError?.message?.includes(e));
-  return codeMatches || messageMatches;
+  if (!isFootprintError(error)) return undefined;
+  const err = error?.response?.data as FootprintServerError;
+  return LOGOUT_ERROR_CODES.some(code => err?.code === code);
 };
 
 const extractStringProps = (x: unknown, acc: string[] = []): string[] => {
@@ -86,13 +74,8 @@ const extractStringProps = (x: unknown, acc: string[] = []): string[] => {
 
 export const getErrorMessage = (error?: unknown | Error): string => {
   if (isString(error)) return error.trim();
-  if (isFootprintError(error) && error?.response?.data?.error?.message) {
-    return isString(error?.response?.data?.error?.message)
-      ? error.response.data.error.message.trim()
-      : extractStringProps(error.response.data.error.message)
-          .filter(x => !x.match(uuidPattern))
-          .join('')
-          .trim() || '';
+  if (isFootprintError(error) && error?.response?.data?.message && isString(error?.response?.data?.message)) {
+    return error.response.data.message.trim();
   }
   if (isUnhandledError(error) && isString(error.message)) {
     return error.message.trim();
@@ -113,7 +96,7 @@ export const useRequestError = () => {
 
   const getContext = (error?: unknown | Error): Partial<Record<string, string>> => {
     if (isFootprintError(error)) {
-      const data = error?.response?.data?.error;
+      const data = error?.response?.data;
       const errorContext = data?.context;
       return errorContext || {};
     }
@@ -125,7 +108,7 @@ export const useRequestError = () => {
 
     const unknownError = t('unknown');
     if (isFootprintError(error)) {
-      const data = error?.response?.data?.error;
+      const data = error?.response?.data;
       const errorCode = data?.code;
       const errorContext = data?.context;
       const errorMessage = data?.message;
@@ -151,7 +134,7 @@ export const useRequestError = () => {
     if (!error || !isFootprintError(error)) {
       return undefined;
     }
-    const data = error?.response?.data?.error;
+    const data = error?.response?.data;
     const errorCode = data?.code;
     if (errorCode) {
       return errorCode;

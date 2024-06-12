@@ -46,8 +46,6 @@ export const withListsError = () =>
     path: '/org/lists',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

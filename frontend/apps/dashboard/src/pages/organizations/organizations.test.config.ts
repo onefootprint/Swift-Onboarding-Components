@@ -48,9 +48,7 @@ export const withOrgAuthRolesError = () =>
     path: '/org/auth/roles',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -104,8 +102,6 @@ export const withOrgAssumeRoleError = () =>
     path: '/org/auth/assume_role',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

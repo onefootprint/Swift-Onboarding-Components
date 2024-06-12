@@ -322,9 +322,7 @@ export const withRulesError = (playbookId: string = kycPlaybookFixture.id) =>
     path: `/org/onboarding_configs/${playbookId}/rules`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Flerp error',
     },
   });
 

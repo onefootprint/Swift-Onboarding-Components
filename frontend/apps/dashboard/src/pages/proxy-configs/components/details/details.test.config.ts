@@ -59,9 +59,7 @@ export const withProxyConfigDetailsError = (id: string) =>
     path: `/org/proxy_configs/${id}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -81,8 +79,6 @@ export const withEditProxyConfigError = (proxyConfig: ProxyConfigDetails) =>
     path: `/org/proxy_configs/${proxyConfig.id}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

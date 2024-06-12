@@ -88,9 +88,7 @@ export const withListError = (listId: string) =>
     path: `/org/lists/${listId}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

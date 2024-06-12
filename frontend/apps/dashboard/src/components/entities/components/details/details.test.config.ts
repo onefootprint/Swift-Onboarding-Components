@@ -155,9 +155,7 @@ export const withEntityError = (entityId = entityFixture.id) =>
     path: `/entities/${entityId}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

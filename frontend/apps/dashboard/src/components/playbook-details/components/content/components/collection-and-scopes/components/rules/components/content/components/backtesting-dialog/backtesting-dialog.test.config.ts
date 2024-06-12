@@ -237,8 +237,6 @@ export const withEvaluateRulesError = (playbookId: string = kycPlaybookFixture.i
     path: `/org/onboarding_configs/${playbookId}/rules/evaluate`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

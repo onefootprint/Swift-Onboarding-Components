@@ -9,8 +9,6 @@ export { default } from './request';
 export {
   baseRequest,
   getErrorMessage,
-  isFootprintError,
-  isFootprintServerError,
   isLogoutError,
   isUnhandledError,
   requestWithoutCaseConverter,

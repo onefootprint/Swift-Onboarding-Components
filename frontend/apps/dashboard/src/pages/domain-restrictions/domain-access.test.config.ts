@@ -34,9 +34,7 @@ export const withAllowedDomainsError = () => {
     path: '/org/client_security_config',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 };
@@ -55,9 +53,7 @@ export const withUpdateAllowedDomainError = () => {
     path: '/org/client_security_config',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 };

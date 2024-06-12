@@ -20,9 +20,7 @@ export const withSdkArgsError = () =>
     path: '/org/sdk_args',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -52,9 +50,7 @@ export const withClientTokenFieldsError = () =>
     path: '/entities/client_token',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 

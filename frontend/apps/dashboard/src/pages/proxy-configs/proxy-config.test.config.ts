@@ -72,9 +72,7 @@ export const withProxyConfigsError = () =>
     path: '/org/proxy_configs',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -91,9 +89,7 @@ export const withProxyConfigDetailsError = (id: string) =>
     path: `/org/proxy_configs/${id}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -113,9 +109,7 @@ export const withEditProxyConfigError = (proxyConfig: ProxyConfigDetails) =>
     path: `/org/proxy_configs/${proxyConfig.id}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -132,8 +126,6 @@ export const withRemoveProxyConfigError = (proxyConfig: ProxyConfigDetails) =>
     path: `/org/proxy_configs/${proxyConfig.id}/deactivate`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

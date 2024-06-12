@@ -52,8 +52,6 @@ export const withPlaybookDetailsError = (id: string) =>
     path: `/org/onboarding_configs/${id}`,
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

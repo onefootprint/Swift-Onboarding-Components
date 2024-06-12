@@ -44,9 +44,7 @@ export const withOrganizationError = () =>
     path: '/org',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -66,8 +64,6 @@ export const withUpdateOrgError = () =>
     path: '/org',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });

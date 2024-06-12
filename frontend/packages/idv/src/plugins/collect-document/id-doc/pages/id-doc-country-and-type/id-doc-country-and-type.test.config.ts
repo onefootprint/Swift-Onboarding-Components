@@ -145,9 +145,7 @@ export const withSubmitDocTypeAndCountryError = () => {
     path: '/hosted/user/documents',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 };

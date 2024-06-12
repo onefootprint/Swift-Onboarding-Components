@@ -11,11 +11,11 @@ import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 import { Passkey } from 'react-native-passkey';
 
+import { AUTH_HEADER } from '@/config/constants';
 import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 
 import hasUserCancelledPasskey from '../utils/has-user-canceled-passkey';
-import { AUTH_HEADER } from '@/config/constants';
 
 const loginChallenge = async (authToken: string) => {
   const headers = {

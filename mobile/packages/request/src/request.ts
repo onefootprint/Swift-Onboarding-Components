@@ -12,13 +12,10 @@ export type FootprintServerError = {
   message: string;
   code?: string; // Translation code for resolving the erorr to the correct language
   context?: Record<string, string>; // Additional data needed to resolve the error string
-  statusCode: number;
   supportId: string;
 };
 
-export type RequestError = AxiosError<{
-  error: FootprintServerError;
-}>;
+export type RequestError = AxiosError<FootprintServerError>;
 
 export type PaginatedRequestResponse<T> = {
   data: T;
@@ -36,20 +33,10 @@ export const isFootprintError = (error: unknown): error is RequestError =>
 export const isUnhandledError = (error: unknown): error is Error =>
   (error as Error)?.message !== undefined;
 
-export const isFootprintServerError = (
-  error: unknown,
-): FootprintServerError | undefined => {
-  const errorData = (error as RequestError).response?.data?.error;
-  if (errorData?.message && errorData?.statusCode && errorData?.supportId) {
-    return errorData;
-  }
-  return undefined;
-};
-
 export const getErrorMessage = (error?: unknown | Error): string => {
   if (isFootprintError(error)) {
-    if (error?.response?.data?.error?.message) {
-      return error.response.data.error.message;
+    if (error?.response?.data?.message) {
+      return error.response.data.message;
     }
   }
   if (isUnhandledError(error)) {

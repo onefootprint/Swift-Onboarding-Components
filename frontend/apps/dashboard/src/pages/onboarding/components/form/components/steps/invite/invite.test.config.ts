@@ -59,9 +59,7 @@ export const withRolesError = () =>
     path: '/org/roles',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -78,9 +76,7 @@ export const withOrgError = () =>
     path: '/org',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
 
@@ -97,8 +93,6 @@ export const withInviteMemberError = () =>
     path: '/org/members',
     statusCode: 400,
     response: {
-      error: {
-        message: 'Something went wrong',
-      },
+      message: 'Something went wrong',
     },
   });
