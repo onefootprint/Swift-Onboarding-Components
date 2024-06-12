@@ -62,7 +62,6 @@ fn export_type_schema(schema: schemars::schema::RootSchema, name: &str) {
 }
 
 #[tokio::test]
-#[ignore]
 async fn sync_webhook_event_types() {
     let auth_token = std::env::var("SVIX_AUTH_TOKEN").expect("missing SVIX_AUTH_TOKEN env");
     let client = svix::api::Svix::new(auth_token, None);
@@ -82,8 +81,9 @@ async fn sync_webhook_event_types() {
 
         let schemas = HashMap::from_iter([("1".to_string(), schema)]);
         let result = client.event_type().get(evt.to_string()).await;
-        match &result {
+        let result = match &result {
             Ok(_) => {
+                eprintln!("Updating schema for: {}", evt);
                 client
                     .event_type()
                     .update(
@@ -97,33 +97,29 @@ async fn sync_webhook_event_types() {
                         None,
                     )
                     .await
-                    .expect("failed to update");
-                eprintln!("Updated schema for: {}", evt);
-                continue;
             }
-            Err(svix::error::Error::Http(err)) => {
-                if err.status == 404 {
-                    client
-                        .event_type()
-                        .create(
-                            svix::api::EventTypeIn {
-                                archived: None,
-                                feature_flag: None,
-                                description,
-                                name: evt.to_string(),
-                                schemas: Some(schemas),
-                            },
-                            None,
-                        )
-                        .await
-                        .expect("failed to create");
-                    eprintln!("Created schema for: {}", evt);
-                    continue;
-                }
+            Err(svix::error::Error::Http(err)) if err.status == 404 => {
+                eprintln!("Creating schema for: {}", evt);
+                client
+                    .event_type()
+                    .create(
+                        svix::api::EventTypeIn {
+                            archived: None,
+                            feature_flag: None,
+                            description,
+                            name: evt.to_string(),
+                            schemas: Some(schemas),
+                        },
+                        None,
+                    )
+                    .await
             }
-            _ => {}
+            Err(e) => {
+                panic!("Error fetching existing {} webhook from svix: {}", evt, e);
+            }
+        };
+        if let Err(e) = result {
+            panic!("Failed to sync webhook event {}: {}", evt, e);
         }
-
-        let _ = result.unwrap_or_else(|_| panic!("Failed to sync webhook event type: {}", evt));
     }
 }

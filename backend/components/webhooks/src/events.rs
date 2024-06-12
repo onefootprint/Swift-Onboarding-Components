@@ -35,7 +35,7 @@ use strum::{
 pub enum WebhookEvent {
     #[strum_discriminants(strum(serialize = "footprint.onboarding.completed"))]
     #[strum_discriminants(strum(
-        message = "The user has completed onboarding onto a playbook and we have a terminal status. In most cases, this will fire as the user finishes the onboarding flow. In some cases (like KYB), the terminal verification status may not come until a few minutes after the user has exited the onboarding flow. You should always fetch the status synchronously after onboarding using the POST /onboarding/session/validate API."
+        message = "The user has completed onboarding onto a playbook and we have a terminal status. In most cases, this will fire as the user finishes the onboarding flow. In some cases (like KYB), the terminal verification status may not come until a few minutes after the user has exited the onboarding flow. You should always retrieve the fp_id after onboarding and attempt to fetch the status. If the status after onboarding is non-terminal, you will receive an update with the terminal status via this webhook."
     ))]
     OnboardingCompleted(OnboardingCompletedPayload),
 
@@ -49,7 +49,7 @@ pub enum WebhookEvent {
 
     #[strum_discriminants(strum(serialize = "footprint.user.info_requested"))]
     #[strum_discriminants(strum(
-        message = "An Footprint dashboard user has requested this user to provide more information during the course of manual review."
+        message = "A Footprint dashboard user has requested this user to provide more information during the course of manual review."
     ))]
     InfoRequested(InfoRequestedPayload),
 }
