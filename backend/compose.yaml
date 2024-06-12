@@ -129,8 +129,11 @@ services:
     # which seems to be necessary for WebAuthn, even with RELYING_PARTY_ID=api.
     network_mode: host
     environment:
-      EXPECTED_API_VERSION: ${EXPECTED_API_VERSION}
-      TEST_URL: http://localhost:8000
+      EXPECTED_SERVER_VERSION: ${EXPECTED_SERVER_VERSION:-dummy-version}
+      TEST_URL: ${TEST_URL:-http://localhost:8000}
+      IT_TWILIO_ACCOUNT_SID: ${IT_TWILIO_ACCOUNT_SID}
+      IT_TWILIO_SECRET_AUTH_TOKEN: ${IT_TWILIO_SECRET_AUTH_TOKEN}
+      DITTO_URL: ${DITTO_URL:-https://ditto.footprint.dev}
       IT_SVIX_API_KEY: ${IT_SVIX_API_KEY}
       ENVIRONMENT: ${ENVIRONMENT}
       # Used by diesel migration tests.

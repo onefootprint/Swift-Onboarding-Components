@@ -90,8 +90,10 @@ jobs:
       testUrl: '${{ needs.instant_deploy_stack.outputs.url }}'
       expectedCommitHash: ${{ needs.instant_deploy_stack.outputs.versionLong }}
       isPR: false
-      waitForDeploy: true
       environment_name: production
     secrets:
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}

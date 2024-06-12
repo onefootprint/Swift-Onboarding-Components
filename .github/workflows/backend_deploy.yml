@@ -128,7 +128,7 @@ jobs:
         run: |
           crane cp ${SRC_REGISTRY}/${REPO}:${TAG} ${DST_REGISTRY}/${REPO}:${TAG}
 
-      - name: Copy Enclave image to target ECR
+      - name: Copy Enclave Proxy Package to target ECR
         env:
           SRC_REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
           DST_REGISTRY: ${{ steps.login-ecr-target.outputs.registry }}
@@ -168,13 +168,21 @@ jobs:
         uses: aws-actions/amazon-ecr-login@2fc7aceee09e9e4a7105c0d060c656fad0b4f63d # v1.7.0
 
       - name: Sign EIF and package if necessary
-        working-directory: ./backend
+        # Run this in a temporary directory to convince ourselves this is hermetic.
+        # This directory is automatically cleaned up at the end of the job.
+        # On a self hosted runner, the runner.temp directory looks like this:
+        #   /home/ec2-user/actions-runner/_work/_tem
+        #
+        # Since self-hosted runners can only run one job at at time[1], there's
+        # no risk of one job run cleaning up another job's temporary directory.
+        #
+        # [1] https://github.com/orgs/community/discussions/26769#discussioncomment-3253321
+        working-directory: ${{ runner.temp }}
         env:
           REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
           REPO: enclave
           TAG: ${{ inputs.enclaveComponentVersion }}
           # We package the EIF in a Docker image, even though it's not run as a container.
-          # In the future, we can use https://github.com/oras-project/oras to package the EIF more directly.
           EIF_REGISTRY: ${{ steps.login-ecr-target.outputs.registry }}
           EIF_REPO: enclave_pkg
           EIF_TAG: ${{ inputs.enclaveComponentVersion }}
@@ -182,28 +190,44 @@ jobs:
           set -euo pipefail
           # Don't set -x to avoid leaking signing key to logs.
 
+          TMP_DIR=$(mktemp -d -p ${PWD})
+
           docker manifest inspect "${EIF_REGISTRY}/${EIF_REPO}:${EIF_TAG}" && echo "EIF package already exists in remote registry. Skipping sign & push." && exit 0 || echo "EIF package found in remote registry. Proceeding with sign & push."
 
           # Fetch the enclave image for signing
           docker pull ${REGISTRY}/${REPO}:${TAG}
 
-          echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
-          echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
+          KEYS_DIR=${TMP_DIR}/keys
+          mkdir ${KEYS_DIR}
+          echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ${KEYS_DIR}/enclavekey.pem
+          echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ${KEYS_DIR}/cert.pem
 
-          rm -f ./out/enclave.eif
+          EIF_DIR=${TMP_DIR}/eif
+          mkdir ${EIF_DIR}
 
-          # build the eif
-          nitro-cli build-enclave --docker-uri ${REGISTRY}/${REPO}:${TAG} --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
+          # Build the EIF & defensively clean up the keys.
+          nitro-cli build-enclave \
+            --docker-uri ${REGISTRY}/${REPO}:${TAG} \
+            --output-file ${EIF_DIR}/enclave.eif \
+            --private-key ${KEYS_DIR}/enclavekey.pem \
+            --signing-certificate ${KEYS_DIR}/cert.pem \
+            && rm -rf ${KEYS_DIR} || (rm -rf ${KEYS_DIR} && exit 1)
 
-          # package the eif in docker image
-          docker build -t "${EIF_REGISTRY}/${EIF_REPO}:${EIF_TAG}" -f enclave_eif_package.dockerfile .
+          # Package the eif in docker image. On startup, the enclave EC2
+          # instances will copy out the EIF from this image.
+          #
+          # Creating the package Dockerfile inline to avoid having to check out
+          # the repository. As of June 7, 2024 on the stateful nitro-devbox,
+          # it's unclear how the runner ever got access to the repository code.
+          # It seemingly has an outdated copy of the repository, since there
+          # was never a checkout action. In the future, we could add a checkout
+          # action if we find a way to make it hermetic.
+          PKG_DOCKERFILE=${TMP_DIR}/Dockerfile
+          echo "FROM alpine:latest" >> ${PKG_DOCKERFILE}
+          echo "COPY ./enclave.eif /usr/local/share/enclave.eif" >> ${PKG_DOCKERFILE}
+
+          docker build -t "${EIF_REGISTRY}/${EIF_REPO}:${EIF_TAG}" -f ${PKG_DOCKERFILE} ${EIF_DIR}
           docker push "${EIF_REGISTRY}/${EIF_REPO}:${EIF_TAG}"
-
-      # cleanup: remove keys
-      - name: cleanup
-        working-directory: ./backend
-        if: always()
-        run: rm -f ../enclavekey.pem
 
   deploy_stack:
     name: deploy stack

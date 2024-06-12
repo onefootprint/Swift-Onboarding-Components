@@ -9,6 +9,10 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+  # We prefix tags with branch hints to avoid confusion with images built on
+  # PRs. Images built on PRs may have different config (e.g. debug builds).
+  IMAGE_TAG: ${{ github.ref == 'refs/heads/master' && 'master-' || 'pr-' }}${{ github.event.pull_request.head.sha || github.sha }}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}-ci-check-test
   cancel-in-progress: true
@@ -26,8 +30,10 @@ jobs:
         with:
           filters: |
             src:
+              # Match the file patterns to .github/actions/backend_extract_commit_hash/action.yml
               - 'backend/**'
-              - '.github/**'
+              - '.github/workflows/backend*'
+              - '.github/actions/backend*'
     outputs:
       filesChanged: ${{ steps.changes.outputs.src }}
 
@@ -44,7 +50,7 @@ jobs:
             args:
               BUILD_PROFILE: release
               GIT_HASH: ${{ github.event.pull_request.head.sha || github.sha }}
-          - name: enclave-proxy
+          - name: enclave_proxy_pkg
             dockerfile: enclave-proxy
             args:
               BUILD_PROFILE: release
@@ -65,6 +71,8 @@ jobs:
           - name: integration-tests
             dockerfile: integration-tests
             args: {}
+    outputs:
+      image_tag: ${{ env.IMAGE_TAG }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -89,7 +97,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
           REPO: ${{ matrix.name }}
-          TAG: ${{ github.event.pull_request.head.sha || github.sha }}
+          TAG: ${{ env.IMAGE_TAG }}
         working-directory: ./backend
         run: |
           set -euxo pipefail
@@ -226,7 +234,7 @@ jobs:
       - uses: ./.github/actions/backend_run_local
         with:
           commit_hash: ${{ github.event.pull_request.head.sha || github.sha }}
-          image_tag: ${{ github.event.pull_request.head.sha || github.sha }}
+          image_tag: ${{ needs.build_images.outputs.image_tag }}
           aws_region: ${{ secrets.AWS_REGION }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -235,15 +243,17 @@ jobs:
 
       - name: Run local integration tests
         working-directory: ./backend/ci
-        run: |
-          set -euxo pipefail
-          docker compose run --quiet-pull integration_tests \
-            pytest -n 6 ci/tests/ 2>&1 | tee integration_test_output.txt
         env:
+          # Make sure you configure backend/compose.yaml to forward these env
+          # vars to the integration_test container or else they won't take effect.
           EXPECTED_SERVER_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
           TEST_URL: 'http://localhost:8000'
           IT_SVIX_API_KEY: ${{ secrets.IT_SVIX_API_KEY }}
           ENVIRONMENT: ci
+        run: |
+          set -euxo pipefail
+          docker compose run --quiet-pull integration_tests \
+            pytest -n 6 ci/tests/ 2>&1 | tee integration_test_output.txt
 
       - name: Create results for PR
         id: test_results
@@ -374,3 +384,13 @@ jobs:
       - name: Fail
         if: ${{ contains(needs.*.result, 'failure') }}
         run: exit 1
+
+  # This workflow may decide to not actually deploy the ephemeral stack.
+  ephemeral-stack:
+    name: Ephemeral Stack Deploy and Tests
+    needs: [build_images]
+    uses: ./.github/workflows/backend_deploy_ephemeral.yml
+    secrets: inherit
+    with:
+      pull_request_head_sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      image_tag: ${{ needs.build_images.outputs.image_tag }}

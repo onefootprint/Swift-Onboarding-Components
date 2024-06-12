@@ -14,12 +14,6 @@ on:
         default: false
         required: false
 
-      waitForDeploy:
-        description: 'whether to wait for an in-progress deploy to finish'
-        type: boolean
-        default: false
-        required: false
-
       expectedCommitHash:
         description: 'hash of commit that we expect to be deployed'
         type: string
@@ -37,6 +31,12 @@ on:
         required: true
       IT_SVIX_API_KEY:
         required: false
+      AWS_REGION:
+        required: true
+      IMG_CACHE_AWS_ACCESS_KEY_ID:
+        required: true
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY:
+        required: true
 
 jobs:
   run_tests:
@@ -55,18 +55,25 @@ jobs:
         with:
           commitHash: ${{ inputs.expectedCommitHash || github.sha }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v3
+      - name: Configure AWS Credentials (Image Cache)
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
-          python-version: "3.11"
+          aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
-      - name: Integration testing
+      - name: Login to Amazon ECR (Image Cache)
+        id: login-ecr-image-cache
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Run remote integration tests
         working-directory: ./backend/ci
-        run: |
-          set -euxo pipefail
-          pip install -r requirements.txt
-          pytest -n 6 tests/ 2>&1 | tee integration_test_output.txt
         env:
+          REGISTRY: ${{ steps.login-ecr-image-cache.outputs.registry }}
+          TAG: ${{ inputs.isPR && 'pr-' || 'master-' }}${{ steps.components.outputs.expectedServerVersion }}
+
+          # Make sure you configure backend/compose.yaml to forward these env
+          # vars to the integration_test container or else they won't take effect.
           EXPECTED_SERVER_VERSION: ${{ steps.components.outputs.expectedServerVersion }}
           TEST_URL: ${{ inputs.testUrl }}
           IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
@@ -74,6 +81,14 @@ jobs:
           DITTO_URL: 'https://ditto.footprint.dev'
           IT_SVIX_API_KEY: ${{ secrets.IT_SVIX_API_KEY }}
           ENVIRONMENT: ${{ inputs.environment_name }}
+        run: |
+          set -euxo pipefail
+
+          # Use the pre-built image for integration tests.
+          export CI_IMAGE_INTEGRATION_TESTS="${REGISTRY}/integration-tests:${TAG}"
+
+          docker compose run --quiet-pull integration_tests \
+            pytest -n 6 ci/tests/ 2>&1 | tee integration_test_output.txt
 
       - name: Create PR comment
         if: ${{ inputs.isPR && (success() || failure()) }}

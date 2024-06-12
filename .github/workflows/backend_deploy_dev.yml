@@ -2,9 +2,11 @@ name: Backend Deploy Dev
 
 on:
   workflow_run:
-    workflows: ['Backend Build Master']
+    workflows: ['Backend CI']
     types:
       - completed
+    branches:
+      - master
 
   workflow_dispatch:
 
@@ -75,9 +77,11 @@ jobs:
     with:
       testUrl: '${{ needs.deploy_stack_dev.outputs.url }}'
       isPR: false
-      waitForDeploy: true
       expectedCommitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
       environment_name: dev
     secrets:
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}

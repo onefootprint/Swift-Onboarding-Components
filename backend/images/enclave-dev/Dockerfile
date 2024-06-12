@@ -25,14 +25,14 @@ RUN cargo chef prepare --bin enclave --recipe-path recipe.json
 FROM chef AS builder
 
 COPY --from=planner /build/recipe.json recipe.json
-RUN cargo chef cook --bin enclave --target $(uname -m)-unknown-linux-musl --recipe-path recipe.json
+RUN cargo chef cook -p enclave --target $(uname -m)-unknown-linux-musl --recipe-path recipe.json
 
 #################################
 # 3b. Build the binary          #
 #################################
 COPY . .
-RUN cargo build --bin enclave && \
-    cp ./target/$(uname -m)-unknown-linux-musl/debug/enclave /usr/bin/enclave
+RUN cargo build -p enclave && \
+    cp ./target/$(uname -m)-unknown-linux-musl/debug/enclave /usr/local/bin/enclave
 
 #################################
 # 4. Build runtime image        #
@@ -41,8 +41,8 @@ FROM alpine:latest
 
 RUN apk update && apk add curl bind-tools
 
-COPY --from=builder /usr/bin/enclave /usr/bin/enclave
+COPY --from=builder /usr/local/bin/enclave /usr/local/bin/enclave
 
 EXPOSE 5001
 
-ENTRYPOINT ["/usr/bin/enclave"]
+ENTRYPOINT ["/usr/local/bin/enclave"]

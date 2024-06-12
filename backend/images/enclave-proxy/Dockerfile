@@ -28,7 +28,7 @@ ARG BUILD_PROFILE
 ARG CARGO_FEATURES
 
 COPY --from=planner /build/recipe.json recipe.json
-RUN cargo chef cook --bin enclave_proxy --target $(uname -m)-unknown-linux-musl --recipe-path recipe.json \
+RUN cargo chef cook -p enclave_proxy --target $(uname -m)-unknown-linux-musl --recipe-path recipe.json \
     --features "${CARGO_FEATURES}" \
     $(if [ "${BUILD_PROFILE}" = "release" ]; then echo "--release"; else echo ""; fi)
 
@@ -39,20 +39,26 @@ ARG GIT_HASH
 ENV GIT_HASH=${GIT_HASH}
 
 COPY . .
-RUN cargo build --bin enclave_proxy \
+RUN cargo build -p enclave_proxy \
     $(if [ "${BUILD_PROFILE}" = "release" ]; then echo "--release"; else echo ""; fi) \
     --features "${CARGO_FEATURES}" && \
-    cp ./target/$(uname -m)-unknown-linux-musl/${BUILD_PROFILE}/enclave_proxy /usr/bin/enclave_proxy
+    cp ./target/$(uname -m)-unknown-linux-musl/${BUILD_PROFILE}/enclave_proxy /usr/local/bin/enclave_proxy
 
 #################################
 # 4. Build runtime image        #
 #################################
+
+# n.b. In prod, the enclave_proxy binary is copied out of the container and run
+# without Docker. This works because the binary is statically linked against
+# musl. This image is used for testing and to provide the `cp` binary to copy
+# out the enclave_proxy binary in prod.
+
 FROM alpine:latest
 
 RUN apk update && apk add curl bind-tools
 
-COPY --from=builder /usr/bin/enclave_proxy /usr/bin/enclave_proxy
+COPY --from=builder /usr/local/bin/enclave_proxy /usr/local/bin/enclave_proxy
 
 EXPOSE 3668
 
-ENTRYPOINT ["/usr/bin/enclave_proxy"]
+ENTRYPOINT ["/usr/local/bin/enclave_proxy"]

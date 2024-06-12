@@ -2,48 +2,43 @@ account := $(shell aws sts get-caller-identity --query "Account" --output text)
 branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r 's/_/-/g')
 commit := "$(branch)-$(shell git rev-parse --short HEAD)"
 commit_full := "$(shell git rev-parse HEAD)"
+tmp_enclave_tag := "$(shell date +%s)"
 
-RUST_VERSION := "1.77.0"
 
-# Builds the actual enclave image
-build-enclave-docker:
-	rm -f ./out/enclave
+build-nitro-enclave:
+	docker buildx build -t enclave:$(tmp_enclave_tag) -f ./images/enclave/Dockerfile .
+	nitro-cli build-enclave \
+		--docker-uri enclave:$(tmp_enclave_tag) \
+		--output-file ./out/enclave.eif \
+		--private-key ../../enclavekey.pem \
+		--signing-certificate ../../cert.pem
+	docker rmi enclave:$(tmp_enclave_tag)
 
-	@echo "building enclave"
-	@docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t "ne_builder2:${RUST_VERSION}" cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
-
-	@cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
-
-	@docker build -f enclave.dockerfile -t enclave .
-
-# Packages the enclave image into an EIF
-build-signed-eif: build-enclave-docker
-	rm -f ./out/enclave.eif
-
-	@echo "building EIF"
-
-	@nitro-cli build-enclave --docker-uri enclave:latest --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
-
-run-enclave-debug: build-eif
-	@nitro-cli terminate-enclave --all
-	@echo "running enclave [debug mode]"
-	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16 --debug-mode
+run-nitro-enclave-debug:
+	nitro-cli terminate-enclave --all
+	echo "running enclave [debug mode]"
+	nitro-cli run-enclave \
+		--eif-path ./out/enclave.eif \
+		--cpu-count 2 \
+		--memory 256 \
+		--enclave-cid 16 \
+		--debug-mode
 
 run-enclave:
-	@echo "running enclave"
-	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16
+	nitro-cli run-enclave \
+		--eif-path ./out/enclave.eif \
+		--cpu-count 2 \
+		--memory 256 \
+		--enclave-cid 16
 
-# Builds our enclave_proxy_binary
-build-enclave-proxy-release:
-	@echo "[release] building enclave-proxy"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}-stable" cargo build -p enclave_proxy --features vsock --release
-	@cp ./target/x86_64-unknown-linux-musl/release/enclave_proxy ./out/enclave_proxy
 
 get-named-commit:
 	@echo "$(commit)"
 
+
 get-friendly-branch-name:
 	@echo "$(branch)"
+
 
 set-enclave-version:
 	@pulumi --cwd infra config set --path constants.containers.enclaveVersion $(commit)

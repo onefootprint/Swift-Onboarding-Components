@@ -236,12 +236,13 @@ FROM chef AS builder
 ARG CARGO_FLAGS="--no-default-features --features nitro --release"
 
 COPY --from=planner /build/recipe.json recipe.json
-RUN cargo chef cook --bin enclave --target $(uname -m)-unknown-linux-musl --recipe-path recipe.json ${CARGO_FLAGS}
+RUN cargo chef cook -p enclave --target $(uname -m)-unknown-linux-musl --recipe-path recipe.json ${CARGO_FLAGS}
 
 #################################
 # 3b. Build the binary          #
 #################################
-RUN cargo build --bin enclave ${CARGO_FLAGS} && \
+COPY . .
+RUN cargo build -p enclave ${CARGO_FLAGS} && \
     cp ./target/release/enclave /usr/bin/enclave
 
 RUN mkdir -p /rootfs

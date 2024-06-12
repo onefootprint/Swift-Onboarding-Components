@@ -107,14 +107,25 @@ make watch-local
 Note: the enclave in production is a Nitro Enclave and is only reachable via `VSOCK` -- secure linux tunnels. If testing on an EC2 machine with the enclave loaded into the Nitro Enclave, test locally by adding the `vsock` feature for `api_server` and the `nitro` feature for `enclave`:
 
 ```
-# build the enclave for use within the Nitro Enclave
-cargo build -p enclave --features nitro
+# Set up credentials:
+make set-dot-env
+# Or copy `.env` from a laptop.
 
-# build the enclave-proxy to communicate to the Nitro Enclave
-cargo run -p enclave_proxy --features vsock
+# Build the enclave for use within the Nitro Enclave:
+make build-nitro-enclave
 
-# runs the api crate in vsock mode, assuming the binary in the previous step is loaded into the Nitro Enclave
-cargo run -p api_server
+# Load the EIF into the enclave:
+make run-nitro-enclave-debug
+# Or:
+make run-nitro-enclave
+
+# Build and run the enclave-proxy to communicate to the Nitro Enclave:
+docker compose build enclave_proxy --build-arg CARGO_FEATURES=vsock
+docker run --rm --net backend_footprint --device /dev/vsock backend-enclave_proxy
+
+# Build and run the API server and DB:
+docker compose build api
+docker compose up --no-deps postgres api
 ```
 
 ## Crate and Workspace Layout

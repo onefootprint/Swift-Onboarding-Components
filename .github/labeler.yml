@@ -32,8 +32,9 @@ FastEphemeral:
   - changed-files:
     - any-glob-to-any-file:
       - 'backend/infra/**'
+      - 'backend/images/enclave/**'
+      - 'backend/images/enclave-proxy/**'
       - '.github/workflows/backend_deploy.yml'
-      - '.github/workflows/backend_release.yml'
 
 FullEphemeral:
   - changed-files:

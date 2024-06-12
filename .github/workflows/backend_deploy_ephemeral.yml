@@ -1,7 +1,17 @@
 name: Backend Ephemeral Stack
 on:
+  workflow_call:
+    inputs:
+      pull_request_head_sha:
+        type: string
+        required: true
+      image_tag:
+        type: string
+        required: true
+
+  # Re-run if the PR is manually labeled.
   pull_request:
-    types: [labeled, opened, synchronize]
+    types: [labeled]
 
 concurrency:
   group: 'ephem-stack-group-${{ github.head_ref }}'
@@ -9,19 +19,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ephemeral_stack:
+  detect_ephemeral_stack:
     name: Detect ephemeral
     runs-on: ubuntu-latest
     outputs:
       stackName: ${{ steps.constants.outputs.branch }}
       hasInfraChanges: ${{ steps.detect.outputs.ephemeral }}
       needsFullInfra: ${{ steps.detect.outputs.full_ephemeral}}
+
+      # The image_tag input isn't available for the pull_request trigger.
+      imageTag: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}
     steps:
       - uses: actions/checkout@v4
         with:
           # We extract all commits here to make sure we're pulling the right commit hash
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ inputs.pull_request_head_sha || github.sha }}
 
       - name: Extract Constants
         id: constants
@@ -36,10 +49,17 @@ jobs:
         id: detect
         shell: bash
         run: |
+          set -euxo pipefail
+
           git --version
           code_hash="$(git log -n 1 --format="%h" ./)"
-          infra_hash="$(git log -n 1 --format="%h" ./backend/infra ./backend/images/enclave ./backend/images/enclave-proxy)"
+
+          # Keep these in sync with .github/labeler.yml If they get out of
+          # sync, ephemeral stacks may not get cleaned up.
+          # TODO: find a better way to synchronize them
+          infra_hash="$(git log -n 1 --format="%h" ./backend/infra ./backend/images/enclave ./backend/images/enclave-proxy ./.github/workflows/backend_deploy.yml ./.github/workflows/backend_deploy_ephemeral.yml)"
           infra_db_hash="$(git log -n 1 --format="%h" ./backend/infra/src/db.ts)"
+
           echo "code=${code_hash} infra=${infra_hash}"
 
           if [ "$code_hash" == "$infra_hash" ]; then
@@ -53,27 +73,12 @@ jobs:
             echo "ephemeral=false" >> $GITHUB_OUTPUT
           fi
 
-  build_backend:
-    name: build backend
-    needs: [ephemeral_stack]
-    uses: ./.github/workflows/backend_build.yml
-    with:
-      commitHash: ${{ github.event.pull_request.head.sha }}
-      rustVersion: 1.77.0
-
-    # don't run for dependabot changes and only run when labeled ephemeral or infra changes detected
-    if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.ephemeral_stack.outputs.hasInfraChanges == 'true')
-    secrets:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
-      IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
-
   deploy_ephemeral_stack:
-    name: deploy ephemeral
-    needs: [build_backend, ephemeral_stack]
+    name: Deploy ephemeral
+    needs: [detect_ephemeral_stack]
     uses: ./.github/workflows/backend_deploy.yml
     # don't run for dependabot changes and only run when labeled ephemeral or infra changes detected
-    if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.ephemeral_stack.outputs.hasInfraChanges == 'true')
+    if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.detect_ephemeral_stack.outputs.hasInfraChanges == 'true')
     permissions:
       contents: write
       pull-requests: write
@@ -81,12 +86,13 @@ jobs:
       environment: dev
       baseStackName: dev
       createStack: true
-      stackName: 'dev-${{ needs.ephemeral_stack.outputs.stackName }}'
-      prefixDomain: 'api-${{ needs.ephemeral_stack.outputs.stackName }}.'
-      useNeonDB: ${{ !contains(github.event.pull_request.labels.*.name, 'FullEphemeral') && !(needs.ephemeral_stack.outputs.needsFullInfra == 'true') }}
+      stackName: 'dev-${{ needs.detect_ephemeral_stack.outputs.stackName }}'
+      prefixDomain: 'api-${{ needs.detect_ephemeral_stack.outputs.stackName }}.'
+      useNeonDB: ${{ !contains(github.event.pull_request.labels.*.name, 'FullEphemeral') && !(needs.detect_ephemeral_stack.outputs.needsFullInfra == 'true') }}
       useEphemeralHoneycombApiKey: true
-      apiComponentVersion: ${{ needs.build_backend.outputs.apiComponentVersion}}
-      enclaveComponentVersion: ${{ needs.build_backend.outputs.enclaveComponentVersion}}
+      # We deploy the images built for the PR HEAD commit to ephemeral.
+      apiComponentVersion: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}
+      enclaveComponentVersion: ${{ inputs.image_tag || format('pr-{0}', github.sha) }}
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -100,8 +106,8 @@ jobs:
       IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
   run_tests:
-    name: 'ephemeral integration tests'
-    needs: [build_backend, deploy_ephemeral_stack]
+    name: Ephemeral integration tests
+    needs: [deploy_ephemeral_stack]
     if: success()
     uses: ./.github/workflows/backend_remote_integration_tests.yml
     permissions:
@@ -109,10 +115,12 @@ jobs:
       pull-requests: write
     with:
       testUrl: '${{ needs.deploy_ephemeral_stack.outputs.url }}'
-      waitForDeploy: true
       isPR: true
-      expectedCommitHash: ${{ needs.build_backend.outputs.expectedServerVersion }}
+      expectedCommitHash: ${{ inputs.pull_request_head_sha || github.sha }}
       environment_name: ephemeral
     secrets:
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}

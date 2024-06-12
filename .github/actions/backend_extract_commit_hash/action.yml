@@ -23,10 +23,13 @@ runs:
       shell: bash
       run: |
         git --version
-        branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
-        expectedServerVersion="$(git log -n 1 --format="%H" ./backend)"
-        apiVersion="${branch}-$(git log -n 1 --format="%h" ./backend)"
-        enclaveVersion="${branch}-$(git log -n 1 --format="%h" ./backend/components/enclave)"
+
+        imageTagPrefix="${{ (github.head_ref || github.ref_name) == 'master' && 'master-' || 'pr-' }}"
+        # Match the file patterns to .github/workflows/backend_ci.yml
+        expectedServerVersion="$(git log -n 1 --format="%H" ./backend ./.github/workflows/backend* ./.github/actions/backend*)"
+
+        apiVersion="${imageTagPrefix}${expectedServerVersion}"
+        enclaveVersion="${imageTagPrefix}$(git log -n 1 --format="%H" ./backend/components/enclave ./backend/infra ./backend/images/enclave ./backend/images/enclave-proxy)"
 
         echo "api is ${apiVersion}"
         echo "enclave is ${enclaveVersion}"
