@@ -158,6 +158,8 @@ enum OnboardingStatusShadow {
     Incomplete,
     #[allow(unused)]
     Pending,
+    #[allow(unused)]
+    None,
 }
 
 #[derive(JsonSchema)]
