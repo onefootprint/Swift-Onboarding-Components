@@ -3,8 +3,8 @@ FROM ubuntu:22.04 AS rust-builder
 ARG RUST_TOOLCHAIN="1.77.0"
 ARG DIESEL_VERSION="2.0.0"
 
-RUN mkdir -p /backend
-WORKDIR /backend
+RUN mkdir -p /build
+WORKDIR /build
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -15,14 +15,17 @@ RUN apt-get update && apt-get install -y \
     mold \
     clang
 
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $RUST_TOOLCHAIN
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $RUST_TOOLCHAIN --profile minimal
 ENV PATH="${PATH}:/root/.cargo/bin"
+
+ENV CARGO_INCREMENTAL=0
 
 RUN cargo install diesel_cli --version $DIESEL_VERSION --locked --no-default-features --features postgres
 
-COPY . .
-# This builds very fast so for now there's no need to cache with cargo-chef.
-RUN cargo install --path ./external_tools/footprint-dr
+RUN --mount=type=bind,src=.,target=/build,readwrite \
+    --mount=type=cache,target=/build/target \
+    --mount=type=cache,target=/root/.cargo/registry  \
+    cargo install --path ./external_tools/footprint-dr
 
 # ----------------------------
 

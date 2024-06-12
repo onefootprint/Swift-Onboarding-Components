@@ -1,41 +1,22 @@
 ARG RUST_TOOLCHAIN="1.77.0"
 
-#############################
-# 1. Install cargo-chef     #
-#############################
-FROM clux/muslrust:${RUST_TOOLCHAIN}-stable AS chef
+FROM clux/muslrust:${RUST_TOOLCHAIN}-stable AS builder
 
 RUN apt-get update && apt-get install -y clang
 
 RUN mkdir -p /build
 WORKDIR /build
-RUN cargo install cargo-chef --version "0.1.67" --locked
 
-#################################
-# 2. Plan dependencies to build #
-#################################
-FROM chef AS planner
-
-COPY . .
-RUN cargo chef prepare --bin enclave --recipe-path recipe.json
-
-#################################
-# 3a. Pre-build dependencies    #
-#################################
-FROM chef AS builder
-
-COPY --from=planner /build/recipe.json recipe.json
-RUN cargo chef cook -p enclave --target $(uname -m)-unknown-linux-musl --recipe-path recipe.json
-
-#################################
-# 3b. Build the binary          #
-#################################
-COPY . .
-RUN cargo build -p enclave && \
+ENV CARGO_INCREMENTAL=0
+RUN --mount=type=bind,src=.,target=/build,readwrite \
+    --mount=type=cache,target=/build/target \
+    --mount=type=cache,target=/root/.cargo/registry  \
+    cargo build -p enclave && \
     cp ./target/$(uname -m)-unknown-linux-musl/debug/enclave /usr/local/bin/enclave
 
+
 #################################
-# 4. Build runtime image        #
+# Runtime Image                 #
 #################################
 FROM alpine:latest
 

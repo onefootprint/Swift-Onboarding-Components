@@ -48,7 +48,7 @@ jobs:
           - name: api
             dockerfile: api
             args:
-              BUILD_PROFILE: release
+              BUILD_PROFILE: ${{ github.ref == 'refs/heads/master' && 'release' || 'debug' }}
               GIT_HASH: ${{ github.event.pull_request.head.sha || github.sha }}
           - name: enclave_proxy_pkg
             dockerfile: enclave-proxy
@@ -64,7 +64,8 @@ jobs:
               GIT_HASH: ${{ github.event.pull_request.head.sha || github.sha }}
           - name: enclave
             dockerfile: enclave
-            args: {}
+            args:
+              BUILD_PROFILE: release
           - name: enclave-dev
             dockerfile: enclave-dev
             args: {}
@@ -90,7 +91,33 @@ jobs:
         id: login-ecr-image-cache
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-      - name: Expose GitHub env vars to Docker
+      - name: Install Rust toolchain for usage by Swatinem/rust-cache
+        uses: dtolnay/rust-toolchain@1.77.0
+
+      # Note that the cargo environment used by Swatinem/rust-cache to
+      # construct a cache key is incorrect since we're actually building inside
+      # Docker. This doesn't actually affect cache performance. However we
+      # should keep the Rust toolchain above in sync with the one used in the
+      # Dockerfiles for consistent behavior.
+      - uses: Swatinem/rust-cache@v2
+        id: rust-cache
+        with:
+          shared-key: image-build-${{ matrix.name }}-${{ matrix.args.BUILD_PROFILE || 'default' }}
+          cache-all-crates: true
+          workspaces: |
+            backend
+
+      - name: Inject Rust cache into Docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        with:
+          cache-map: |
+            {
+              "./backend/target": "/build/target",
+              "/home/runner/.cargo/registry": "/root/.cargo/registry"
+            }
+          skip-extraction: ${{ steps.rust-cache.outputs.cache-hit }}
+
+      - name: Expose env vars to Docker for layer caching to the GHA cache
         uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3
 
       - name: Build image
@@ -113,8 +140,8 @@ jobs:
               --file ./images/${{ matrix.dockerfile }}/Dockerfile \
               --tag ${IMG_REF} \
               --push \
-              ${{ github.ref == 'refs/heads/master' && '--cache-to type=gha,scope=${REPO}-master,mode=max' || '' }} \
-              --cache-from type=gha,scope=${REPO}-master \
+              --cache-to type=gha,scope=images-buildx,mode=max,compression=zstd \
+              --cache-from type=gha,scope=images-buildx \
               .
 
   test:

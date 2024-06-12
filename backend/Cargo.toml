@@ -4,6 +4,11 @@ authors = ["Footprint Engineering <eng@onefootprint.com>"]
 description = "Footprint's core APIs, verification engine, and enclave service"
 edition = "2021"
 
+[profile.dev]
+# Disabling debug info speeds up builds a bunch,
+# and we don't rely on it for debugging that much.
+debug = 0
+
 [workspace]
 resolver = "2"
 members = [
