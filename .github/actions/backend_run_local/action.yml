@@ -70,10 +70,10 @@ runs:
       if: ${{ inputs.api_only }}
       shell: bash
       working-directory: ./backend
-      run: docker compose up -d --wait --quiet-pull --no-deps postgres api
+      run: docker compose --env-file /dev/null up -d --wait --quiet-pull --no-deps postgres api
 
     - name: Run backend stack in background
       if: ${{ ! inputs.api_only }}
       shell: bash
       working-directory: ./backend
-      run: docker compose up -d --wait --quiet-pull
+      run: docker compose --env-file /dev/null up -d --wait --quiet-pull

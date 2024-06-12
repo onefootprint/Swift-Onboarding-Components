@@ -14,14 +14,19 @@
 # You may eventually need to clear your disk if the Rust build cache grows too large.
 #   docker buildx prune
 #
+# Note that we disable the Docker Compose .env file loading since that is
+# handled by the applications. Leaving off the `--env-file /dev/null` flags may
+# work, but you may see warnings if the .env file isn't compatible with
+# Docker's own .env syntax.
+#
 # Some useful commands
 # --------------------
 # Build and run all services locally:
 #   make set-dot-env
-#   docker compose build
-#   docker compose up
+#   docker compose --env-file /dev/null build
+#   docker compose --env-file /dev/null up
 # Run python integration tests:
-#   docker compose run integration_tests -- pytest ci/tests
+#   docker compose --env-file /dev/null run integration_tests -- pytest ci/tests
 
 networks:
   footprint:

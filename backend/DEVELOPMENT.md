@@ -120,12 +120,12 @@ make run-nitro-enclave-debug
 make run-nitro-enclave
 
 # Build and run the enclave-proxy to communicate to the Nitro Enclave:
-docker compose build enclave_proxy --build-arg CARGO_FEATURES=vsock
+docker compose --env-file /dev/null build enclave_proxy --build-arg CARGO_FEATURES=vsock
 docker run --rm --net backend_footprint --device /dev/vsock backend-enclave_proxy
 
 # Build and run the API server and DB:
-docker compose build api
-docker compose up --no-deps postgres api
+docker compose --env-file /dev/null build api
+docker compose --env-file /dev/null up --no-deps postgres api
 ```
 
 ## Crate and Workspace Layout

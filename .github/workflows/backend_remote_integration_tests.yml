@@ -79,7 +79,9 @@ jobs:
           # Use the pre-built image for integration tests.
           export CI_IMAGE_INTEGRATION_TESTS="${REGISTRY}/integration-tests:${TAG}"
 
-          docker compose run --quiet-pull integration_tests \
+          docker compose \
+            --env-file /dev/null \
+            run --quiet-pull integration_tests \
             pytest -n 6 ci/tests/ 2>&1 | tee integration_test_output.txt
 
       - name: Create PR comment
