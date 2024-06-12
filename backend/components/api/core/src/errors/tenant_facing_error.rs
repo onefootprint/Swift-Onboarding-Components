@@ -8,6 +8,9 @@ use serde_json::Value;
 #[strum_discriminants(name(TfErrorKind))]
 #[strum_discriminants(derive(strum_macros::Display, strum_macros::EnumIter))]
 pub enum TfError {
+    #[strum_discriminants(strum(serialize = "T120"))]
+    #[error("Vault data failed validation")]
+    VaultDataValidationError(newtypes::DataValidationError),
     #[strum_discriminants(strum(serialize = "T121"))]
     #[error("Cannot run {0} playbook due to unmet requirements. {1}")]
     PlaybookMissingRequirements(ObConfigurationKind, UnmetRequirements),
@@ -15,7 +18,16 @@ pub enum TfError {
 
 impl CodedError for TfError {
     fn context(&self) -> Option<Value> {
-        None
+        match self {
+            Self::VaultDataValidationError(err) => {
+                // TODO cleanup
+                if let newtypes::ErrorMessage::Map(ctx) = err.json_message() {
+                    return serde_json::to_value(ctx).ok();
+                }
+                None
+            }
+            _ => return None,
+        }
     }
 
     fn code(&self) -> String {
@@ -24,6 +36,7 @@ impl CodedError for TfError {
 
     fn status_code(&self) -> StatusCode {
         match self {
+            Self::VaultDataValidationError(_) => StatusCode::BAD_REQUEST,
             Self::PlaybookMissingRequirements(_, _) => StatusCode::BAD_REQUEST,
         }
     }

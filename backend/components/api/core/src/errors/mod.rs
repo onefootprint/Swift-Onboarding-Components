@@ -215,8 +215,6 @@ pub enum ApiErrorKind {
     AwsSelfieDocError(#[from] selfie_doc::AwsSelfieDocError),
     #[error("Rolling back migration as a dry run")]
     MigrationDryRun,
-    #[error("Arbitrary json error - not used")]
-    JsonError(serde_json::Value),
 
     #[error("Invalid header name: {0}")]
     InvalidHeaderName(#[from] reqwest::header::InvalidHeaderName),
@@ -254,10 +252,23 @@ macro_rules! box_from_error_impl {
 
 box_from_error_impl!(KmsError, kms::KmsSignError);
 box_from_error_impl!(Database, DbError);
-box_from_error_impl!(NewtypeError, newtypes::Error);
 box_from_error_impl!(IdvError, idv::Error);
 box_from_error_impl!(S3Error, crate::s3::S3Error);
 box_from_error_impl!(VendorRequestFailed, VendorAPIError);
+
+impl From<newtypes::Error> for ApiErrorKind {
+    #[inline]
+    fn from(value: newtypes::Error) -> Self {
+        if let newtypes::Error::DataValidationError(err) = value {
+            // We want to map this newtypes error to an error with a code.
+            // We should probably introduce this ErrorWithCode trait in newtypes so other crates can implement
+            // it.
+            ApiErrorKind::TfError(TfError::VaultDataValidationError(err))
+        } else {
+            ApiErrorKind::NewtypeError(Box::new(value))
+        }
+    }
+}
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
     match e {
@@ -318,19 +329,13 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
 
 impl ApiError {
     fn message(&self) -> ErrorMessage {
-        use ApiErrorKind::*;
         match self.0.as_ref() {
-            NewtypeError(e) => {
-                if let newtypes::Error::DataValidationError(err) = e.as_ref() {
-                    return err.json_message();
-                }
-            }
-            JsonError(e) => return ErrorMessage::Json(e.clone()),
-            Twilio(e) => return ErrorMessage::String(e.message()),
-            Database(e) => return ErrorMessage::String(e.message()),
-            _ => {}
-        };
-        ErrorMessage::String(self.to_string())
+            ApiErrorKind::Twilio(e) => return ErrorMessage::String(e.message()),
+            ApiErrorKind::Database(e) => return ErrorMessage::String(e.message()),
+            // TODO remove this when the client has started reading context
+            ApiErrorKind::TfError(TfError::VaultDataValidationError(err)) => err.json_message(),
+            _ => ErrorMessage::String(self.to_string()),
+        }
     }
 }
 
@@ -426,7 +431,6 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::AttestError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::AwsSelfieDocError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::MigrationDryRun => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::JsonError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::InvalidHeaderName(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::InvalidHeaderValue(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::HeaderToStrError(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -483,13 +487,19 @@ impl actix_web::ResponseError for ApiError {
         };
 
         resp.json(ApiResponseError {
+            // TODO no reason to have an `error` envelope around the whole body... deprecate this after
+            // updating the client and updating Grid, who has just recently started matching on error codes
             error: FpResponseErrorInfo {
+                message: message.clone(),
+                code: code.clone(),
+                context: context.clone(),
                 status_code,
-                message,
-                code,
-                context,
-                support_id,
+                support_id: support_id.clone(),
             },
+            message,
+            code,
+            context,
+            support_id,
         })
     }
 }

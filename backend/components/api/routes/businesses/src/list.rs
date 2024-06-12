@@ -24,7 +24,7 @@ use paperclip::actix::{
     web,
 };
 
-#[api_v2_operation(description = "Get the list of businesses", tags(Businesses, Preview))]
+#[api_v2_operation(description = "Get the list of businesses", tags(Businesses, PublicApi))]
 #[get("/businesses")]
 pub async fn get(
     state: web::Data<State>,

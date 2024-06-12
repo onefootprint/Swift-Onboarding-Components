@@ -29,7 +29,7 @@ use paperclip::actix::{
     web,
 };
 
-#[api_v2_operation(description = "Get the list of users", tags(Users, Preview))]
+#[api_v2_operation(description = "Get the list of users", tags(Users, PublicApi))]
 #[get("/users")]
 pub async fn get(
     state: web::Data<State>,
@@ -97,7 +97,7 @@ pub struct SearchUsersRequestBody {
     pub pagination: Option<CursorPaginationRequest<TimestampCursor>>,
 }
 
-#[api_v2_operation(description = "Search users by fingerprint", tags(Users, Preview))]
+#[api_v2_operation(description = "Search users by fingerprint", tags(Users, PublicApi))]
 #[post("/users/search")]
 pub async fn post_search(
     state: web::Data<State>,

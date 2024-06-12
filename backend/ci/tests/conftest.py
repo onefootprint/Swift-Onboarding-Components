@@ -247,8 +247,9 @@ def sandbox_user(sandbox_tenant):
     body = patch(
         f"entities/{user.fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
     )
+    assert body["code"] == "T120"
     assert (
-        body["error"]["message"]["id.phone_number"]
+        body["context"]["id.phone_number"]
         == "Cannot replace verified contact information via API."
     )
 

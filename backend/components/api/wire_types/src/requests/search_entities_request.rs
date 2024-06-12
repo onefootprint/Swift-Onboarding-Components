@@ -36,7 +36,6 @@ pub struct SearchUsersRequest {
     /// Deprecated
     #[openapi(skip)]
     pub search: Option<PiiString>,
-    /// Filter users by an external id
     pub external_id: Option<ExternalId>,
 }
 
