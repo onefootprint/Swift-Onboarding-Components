@@ -42,7 +42,9 @@ impl IsGuardMet<UserAuthScope> for CanDecrypt {
                         .or(UserAuthScope::SignUp)
                         .is_met(token_scopes)
                 }
-                IDK::Ssn4 | IDK::Ssn9 => UserAuthScope::SensitiveProfile.is_met(token_scopes),
+                IDK::DriversLicenseNumber | IDK::Ssn4 | IDK::Ssn9 => {
+                    UserAuthScope::SensitiveProfile.is_met(token_scopes)
+                }
             },
             // We don't allow decrypting business data with a user auth token right now - we
             // theoretically could, but we just don't support portable businesses yet

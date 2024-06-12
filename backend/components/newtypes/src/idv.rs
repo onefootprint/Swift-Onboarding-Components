@@ -31,6 +31,7 @@ pub struct IdvData {
     pub dob: Option<PiiString>,
     pub email: Option<PiiString>,
     pub phone_number: Option<PiiString>,
+    pub drivers_license_number: Option<PiiString>,
     // this is convenient to have
     pub verification_request_id: Option<VerificationRequestId>,
 }
@@ -68,6 +69,7 @@ impl IdvData {
             IdentityDataKind::Country => self.country.as_ref(),
             IdentityDataKind::Email => self.email.as_ref(),
             IdentityDataKind::PhoneNumber => self.phone_number.as_ref(),
+            IdentityDataKind::DriversLicenseNumber => self.drivers_license_number.as_ref(),
             IdentityDataKind::Nationality
             | IdentityDataKind::UsLegalStatus
             | IdentityDataKind::VisaKind

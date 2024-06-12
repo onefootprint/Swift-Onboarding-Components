@@ -178,6 +178,13 @@ fn doc_first_id_data(
     let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
     let zip5 = address.and_then(|a| a.normalized_zip5());
 
+    let drivers_license_number = if r.type_of_id == Some(newtypes::incode::IncodeDocumentType::DriversLicense)
+    {
+        r.document_number.as_ref()
+    } else {
+        None
+    };
+
     let all_data = vec![
         (
             IDK::FirstName,
@@ -197,6 +204,7 @@ fn doc_first_id_data(
         (IDK::Zip, zip5.as_ref()),
         (IDK::Country, r.issuing_country_two_digit().as_ref()),
         (IDK::Dob, r.dob().ok().as_ref()),
+        (IDK::DriversLicenseNumber, drivers_license_number),
     ]
     .into_iter()
     .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))

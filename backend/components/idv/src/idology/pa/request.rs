@@ -44,6 +44,7 @@ impl RequestData {
             email: _,
             phone_number: _,
             verification_request_id: _,
+            drivers_license_number: _,
         } = d;
         let first_name = first_name.ok_or(IdologyError::ConversionError::MissingFirstName)?;
         let last_name = last_name.ok_or(IdologyError::ConversionError::MissingLastName)?;

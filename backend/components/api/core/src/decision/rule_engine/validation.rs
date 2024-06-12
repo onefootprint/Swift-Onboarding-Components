@@ -47,7 +47,8 @@ fn di_supports_equality_rules(field: &DataIdentifier) -> bool {
             | IdentityDataKind::PhoneNumber
             | IdentityDataKind::VisaExpirationDate
             | IdentityDataKind::Nationality
-            | IdentityDataKind::Citizenships => false,
+            | IdentityDataKind::Citizenships
+            | IdentityDataKind::DriversLicenseNumber => false,
         },
         DataIdentifier::Card(card_info) => match card_info.kind {
             CardDataKind::BillingCountry | CardDataKind::Issuer => true,

@@ -393,6 +393,8 @@ impl LexisRequest {
             email,
             phone_number,
             verification_request_id,
+            // TODO: use in request to lexis
+            drivers_license_number: _,
         } = idv_data;
 
         let dob = if let Some(dob) = dob {

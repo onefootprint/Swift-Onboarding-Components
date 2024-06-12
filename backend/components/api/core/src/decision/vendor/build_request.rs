@@ -82,6 +82,7 @@ pub async fn build_idv_data_from_verification_request(
         ssn4: decrypted_values.remove(&IDK::Ssn4.into()),
         ssn9: decrypted_values.remove(&IDK::Ssn9.into()),
         dob: decrypted_values.remove(&IDK::Dob.into()),
+        drivers_license_number: decrypted_values.remove(&IDK::DriversLicenseNumber.into()),
         email,
         phone_number,
         verification_request_id: Some(vreq_id),
