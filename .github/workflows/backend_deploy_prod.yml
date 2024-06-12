@@ -8,6 +8,13 @@ on:
         required: true
 
   workflow_dispatch:
+    branches:
+      - master
+    inputs:
+      commit_sha:
+        type: string
+        description: "Optional commit hash to deploy from instead of the branch HEAD. Can be used for rollbacks. Images must have been built for this commit on the master branch."
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-deploy-prod
@@ -31,7 +38,7 @@ jobs:
         run: |
           set -euxo pipefail
 
-          echo "commit hash from workflow_call ${{ inputs.commit_sha }}"
+          echo "commit hash from inputs ${{ inputs.commit_sha }}"
           echo "commit hash over branch HEAD ${{ github.sha }}"
           commit_hash="${{ inputs.commit_sha || github.sha }}"
           echo "commit hash we will deploy in this workflow: $commit_hash"
