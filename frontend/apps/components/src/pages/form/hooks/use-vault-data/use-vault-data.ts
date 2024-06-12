@@ -1,17 +1,11 @@
 import { getLogger } from '@onefootprint/idv';
-import { getErrorMessage } from '@onefootprint/request';
+import { getErrorMessage, useRequestError } from '@onefootprint/request';
 import type { DataIdentifier, UsersVaultRequest } from '@onefootprint/types';
-import type { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import useUsersVault from './hooks/use-users-vault';
 
 export type UsersVaultErrorMessage = Partial<Record<DataIdentifier, string>>;
-export type UsersVaultError = {
-  error: {
-    message: string | UsersVaultErrorMessage | unknown;
-  };
-};
 
 export type UsersVaultArgs = UsersVaultRequest & {
   onSuccess: () => void;
@@ -25,6 +19,7 @@ const useVaultData = () => {
     keyPrefix: 'pages.secure-form.errors',
   });
   const usersVaultMutation = useUsersVault();
+  const { getErrorCode, getErrorContext } = useRequestError();
 
   const vaultData = ({ authToken, data, onSuccess, onError }: UsersVaultArgs) => {
     if (!authToken) {
@@ -41,9 +36,10 @@ const useVaultData = () => {
       {
         onSuccess,
         onError: (err: unknown) => {
-          const fieldErrors = (err as AxiosError<UsersVaultError>)?.response?.data?.error?.message;
-          if (fieldErrors && typeof fieldErrors === 'object') {
-            onError(fieldErrors);
+          const isVaultDataValidationError = getErrorCode(err) === 'T120';
+          const context = getErrorContext(err);
+          if (context && typeof context === 'object' && isVaultDataValidationError) {
+            onError(context);
           } else {
             const errorMessage = getErrorMessage(err);
             logError(`Form encountered error while vaulting data: ${errorMessage}`, err);

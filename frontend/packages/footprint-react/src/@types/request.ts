@@ -1,6 +1,6 @@
-export type ApiErrorDetails<E> = {
-  message: E;
-  code?: number;
+export type ApiErrorDetails<E> = E & {
+  message: string;
+  code?: string;
 };
 
 export class ApiError<E> extends Error {

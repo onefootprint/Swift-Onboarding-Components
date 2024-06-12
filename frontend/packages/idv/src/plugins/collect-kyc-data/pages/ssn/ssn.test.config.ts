@@ -60,16 +60,16 @@ export const withUserVaultError = (kind: 'ssn4' | 'ssn9') => {
     path: '/hosted/user/vault',
     statusCode: 400,
     response: {
-      error: {
-        message:
-          kind === 'ssn4'
-            ? {
-                [IdDI.ssn4]: 'Invalid SSN',
-              }
-            : {
-                [IdDI.ssn9]: 'Invalid SSN',
-              },
-      },
+      message: 'Vault data validation failed',
+      code: 'T120',
+      context:
+        kind === 'ssn4'
+          ? {
+              [IdDI.ssn4]: 'Invalid SSN',
+            }
+          : {
+              [IdDI.ssn9]: 'Invalid SSN',
+            },
     },
   });
 };

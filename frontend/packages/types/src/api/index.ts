@@ -301,7 +301,6 @@ export type {
 } from './update-proxy-config';
 export type { UploadFileRequest, UploadFileResponse } from './upload-file';
 export type {
-  UserDataError,
   UserDataRequest,
   UserDataResponse,
 } from './user-data-identity';

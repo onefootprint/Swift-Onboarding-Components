@@ -48,8 +48,8 @@ async function request<T>(options: Options): Promise<T> {
 
   if (!response.ok) {
     const errorBody = await response.json();
-    if (errorBody.error) {
-      throw new ApiError(response.statusText, errorBody.error);
+    if (errorBody.message) {
+      throw new ApiError(response.statusText, errorBody);
     }
     throw Error(response.statusText);
   }

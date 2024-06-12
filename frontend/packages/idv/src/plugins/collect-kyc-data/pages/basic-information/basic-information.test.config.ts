@@ -60,12 +60,12 @@ export const withUserVaultError = () => {
     path: '/hosted/user/vault',
     statusCode: 400,
     response: {
-      error: {
-        message: {
-          [IdDI.firstName]: 'First name error',
-          [IdDI.lastName]: 'Last name error',
-          [IdDI.dob]: 'Date of birth error',
-        },
+      message: 'Vault data validation failed',
+      code: 'T120',
+      context: {
+        [IdDI.firstName]: 'First name error',
+        [IdDI.lastName]: 'Last name error',
+        [IdDI.dob]: 'Date of birth error',
       },
     },
   });

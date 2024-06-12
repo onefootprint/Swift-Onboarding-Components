@@ -1,10 +1,11 @@
-import type { CollectKycDataRequirement, InvestorProfileDI, UserDataError, VaultValue } from '@onefootprint/types';
+import type { CollectKycDataRequirement, InvestorProfileDI, VaultValue } from '@onefootprint/types';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { AxiosError } from 'axios';
 import omit from 'lodash/omit';
 import { useTranslation } from 'react-i18next';
 
+import { useRequestError } from '@onefootprint/request';
 import { useL10nContext } from '../../../../components/l10n-provider';
 import useUserData from '../../../../hooks/api/hosted/user/vault/use-user-data';
 import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
@@ -13,7 +14,7 @@ import type { KycData } from '../../utils/data-types';
 import useCollectKycDataMachine from '../use-collect-kyc-data-machine';
 import getRequestData from './utils/get-request-data';
 
-export type SyncDataFieldErrors = UserDataError['error']['message'];
+export type SyncDataFieldErrors = Partial<Record<IdDI, string>> | string;
 type ObjWithValue = Record<string, { value?: unknown }>;
 type SyncDataArgs = {
   data: KycData;
@@ -31,6 +32,7 @@ const useSyncData = () => {
   });
   const [state] = useCollectKycDataMachine();
   const showRequestErrorToast = useIdvRequestErrorToast();
+  const { getErrorContext, getErrorCode } = useRequestError();
   const { authToken, requirement } = state.context;
   const l10n = useL10nContext();
   const locale = l10n?.locale || 'en-US';
@@ -66,14 +68,15 @@ const useSyncData = () => {
     }
 
     const handleError = (err: unknown) => {
-      const errors = (err as AxiosError<UserDataError>)?.response?.data.error.message;
-      if (typeof errors === 'string') {
+      const isVaultDataValidationError = getErrorCode(err) === 'T120';
+      if (!isVaultDataValidationError) {
         showRequestErrorToast(err);
         logError('Kyc useSyncData encountered error while syncing data', err);
         return;
       }
       const validDis = new Set(Object.values(IdDI));
-      const fieldErrors = Object.fromEntries(Object.entries(errors || {}).filter(([key]) => validDis.has(key as IdDI)));
+      const context = getErrorContext(err);
+      const fieldErrors = Object.fromEntries(Object.entries(context).filter(([key]) => validDis.has(key as IdDI)));
       if (Object.keys(fieldErrors).length > 0) {
         onError?.(fieldErrors);
       } else {

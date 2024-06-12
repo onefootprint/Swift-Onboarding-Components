@@ -204,7 +204,6 @@ export type {
   UpdateRoleResponse,
   UploadFileRequest,
   UploadFileResponse,
-  UserDataError,
   UserDataRequest,
   UserDataResponse,
   UserDecryptRequest,

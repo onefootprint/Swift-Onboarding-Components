@@ -33,14 +33,12 @@ export const withUserVaultError = (errorString?: string) => {
     path: '/hosted/user/vault',
     statusCode: 400,
     response: {
-      // TODO update
-      error: {
-        message: errorString ?? {
-          [IdDI.addressLine1]: 'Invalid addr line 1',
-          [IdDI.state]: 'Invalid state',
-        },
-      },
       message: errorString,
+      code: !errorString && 'T120',
+      context: {
+        [IdDI.addressLine1]: 'Invalid addr line 1',
+        [IdDI.state]: 'Invalid state',
+      },
     },
   });
 };

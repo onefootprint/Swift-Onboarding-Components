@@ -1,7 +1,7 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import { useContext, useState } from 'react';
 
-import { ApiError, type Di, type UserDataError } from '../../../@types';
+import { type Di } from '../../../@types';
 import { Context } from '../provider';
 import saveReq from '../queries/save';
 import { lockBody, unlockBody } from '../utils/dom-utils';

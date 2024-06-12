@@ -22,7 +22,7 @@ const steps = [
   },
 ];
 
-const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY || 'pb_test_B1Q1ubKxYEpx3uKdGaXLQ2';
+const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY || 'pb_test_kX0VyaA37SyD9LsM6u6eKs';
 
 const Demo = () => {
   const [option, setOption] = useState(steps[0]);
