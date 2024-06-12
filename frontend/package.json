@@ -2,10 +2,7 @@
   "name": "footprint",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "build:packages": "turbo run build --filter=./packages/*",
     "build:storybook": "turbo run build:storybook",
@@ -61,7 +58,7 @@
   },
   "engines": {
     "npm": ">=7.0.0",
-    "node": ">= 16.0.0"
+    "node": ">= 18.0.0"
   },
   "packageManager": "yarn@1.22.19"
 }

@@ -26,6 +26,7 @@ brew install jq
 brew install wget
 brew install watchman
 brew install node@18
+brew install biome
 
 # Add NPM to path
 echo 'export PATH="/opt/homebrew/opt/node@18/bin:$PATH"' >> ~/.zshrc
