@@ -10,21 +10,21 @@ export type ContextData = {
   appearance?: Appearance;
   authToken?: string;
   fpInstance: Component | null;
+  handoffCallbacks?: {
+    onCancel?: () => void;
+    onClose?: () => void;
+    onComplete?: (validationToken: string) => void;
+    onError?: (error: unknown) => void;
+  };
   missingRequirements: OnboardingRequirement[];
   onboardingConfig: PublicOnboardingConfig | null;
+  onCancel?: () => void;
+  onClose?: () => void;
+  onComplete?: (validationToken: string) => void;
+  onError?: (error: unknown) => void;
   publicKey: string;
   sandboxId?: string;
   signupChallenge: SignupChallengeResponse | null;
-  onComplete?: (validationToken: string) => void;
-  onError?: (error: unknown) => void;
-  onCancel?: () => void;
-  onClose?: () => void;
-  handoffCallbacks?: {
-    onComplete?: (validationToken: string) => void;
-    onError?: (error: unknown) => void;
-    onCancel?: () => void;
-    onClose?: () => void;
-  };
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -40,6 +40,7 @@ const Context = createContext<[ContextData, UpdateContext]>([
   () => undefined,
 ]);
 
+// These are the props users can set on the provider
 export type ProviderProps = {
   appearance?: Appearance;
   authToken?: string;
@@ -76,6 +77,7 @@ const Provider = ({
     publicKey,
     sandboxId,
     signupChallenge: null,
+    // when calling handoff, we can listen to fp instance events
     handoffCallbacks: {
       onCancel: undefined,
       onComplete: undefined,

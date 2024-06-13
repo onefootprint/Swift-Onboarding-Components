@@ -63,6 +63,7 @@ export const useFootprint = () => {
         onAuthenticated?.();
       },
     });
+
     fp.render();
     setContext(prev => ({ ...prev, fpInstance: fp }));
   };
@@ -81,12 +82,15 @@ export const useFootprint = () => {
     if (!authToken) {
       throw new Error('No authToken found');
     }
+
     if (!onboardingConfig) {
       throw new Error('No onboardingConfig found');
     }
+
     if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
       throw new Error('Onboarding components only support kyc and kyb kind');
     }
+
     try {
       setBusy('save');
       await saveReq({ data, bootstrapDis: [], authToken });
@@ -114,7 +118,7 @@ export const useFootprint = () => {
     }
     lockBody();
     context.fpInstance.relayFromComponents?.();
-    setContext(prev => ({ ...prev, test: '1', handoffCallbacks: { onComplete, onError, onCancel, onClose } }));
+    setContext(prev => ({ ...prev, handoffCallbacks: { onComplete, onError, onCancel, onClose } }));
   };
 
   return { context, busy, handoff, launchIdentify, save };
