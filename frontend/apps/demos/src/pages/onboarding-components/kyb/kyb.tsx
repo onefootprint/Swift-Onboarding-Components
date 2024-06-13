@@ -47,12 +47,7 @@ const Demo = () => {
   return (
     <>
       <GlobalStyles />
-      <Fp.Provider
-        publicKey={publicKey}
-        onComplete={() => {
-          setOption(steps[4]);
-        }}
-      >
+      <Fp.Provider publicKey={publicKey}>
         <Header>Onboarding</Header>
         <Container>
           <Stack marginTop={7} gap={8}>
@@ -79,7 +74,13 @@ const Demo = () => {
                   }}
                 />
               )}
-              {isPersonalData && <PersonalData />}
+              {isPersonalData && (
+                <PersonalData
+                  onDone={() => {
+                    setOption(steps[4]);
+                  }}
+                />
+              )}
               {isSuccess && <Success />}
             </Box>
           </Stack>
@@ -253,11 +254,11 @@ const BoData = ({ onDone }: { onDone: () => void }) => {
   );
 };
 
-const PersonalData = () => {
+const PersonalData = ({ onDone }: { onDone: () => void }) => {
   const fp = useFootprint();
 
   const handleSubmit = (data: Di) => {
-    fp.save(data, { onSuccess: fp.handoff });
+    fp.save(data, { onSuccess: () => fp.handoff({ onComplete: onDone }) });
   };
 
   return (

@@ -14,16 +14,10 @@ export const useFootprint = () => {
     { email, phoneNumber }: { email?: string; phoneNumber?: string },
     {
       onAuthenticated,
-      onCancel,
       onError,
-      onComplete,
-      onClose,
     }: {
       onAuthenticated?: () => void;
       onError?: (error: unknown) => void;
-      onCancel?: () => void;
-      onComplete?: (validationToken: string) => void;
-      onClose?: () => void;
     } = {},
   ) => {
     const fp = footprint.init({
@@ -34,10 +28,35 @@ export const useFootprint = () => {
         'id.email': email,
       },
       kind: FootprintComponentKind.Components,
-      onComplete,
-      onError,
-      onCancel,
-      onClose,
+      onComplete: (validationToken: string) => {
+        setContext(prev => {
+          context.onComplete?.(validationToken);
+          prev.handoffCallbacks?.onComplete?.(validationToken);
+          return prev;
+        });
+      },
+      onError: (error: unknown) => {
+        onError?.(error);
+        setContext(prev => {
+          context.onError?.(error);
+          prev.handoffCallbacks?.onError?.(error);
+          return prev;
+        });
+      },
+      onCancel: () => {
+        setContext(prev => {
+          context.onCancel?.();
+          prev.handoffCallbacks?.onCancel?.();
+          return prev;
+        });
+      },
+      onClose: () => {
+        setContext(prev => {
+          context.onClose?.();
+          prev.handoffCallbacks?.onClose?.();
+          return prev;
+        });
+      },
       onRelayToComponents: (authToken: string) => {
         unlockBody();
         setContext(prev => ({ ...prev, authToken }));
@@ -45,7 +64,7 @@ export const useFootprint = () => {
       },
     });
     fp.render();
-    setContext({ ...context, fpInstance: fp });
+    setContext(prev => ({ ...prev, fpInstance: fp }));
   };
 
   const save = async (
@@ -79,12 +98,23 @@ export const useFootprint = () => {
     }
   };
 
-  const handoff = () => {
+  const handoff = ({
+    onComplete,
+    onError,
+    onCancel,
+    onClose,
+  }: {
+    onComplete?: (validationToken: string) => void;
+    onError?: (error: unknown) => void;
+    onCancel?: () => void;
+    onClose?: () => void;
+  } = {}) => {
     if (!context.fpInstance) {
       throw new Error('No fpInstance found');
     }
     lockBody();
     context.fpInstance.relayFromComponents?.();
+    setContext(prev => ({ ...prev, test: '1', handoffCallbacks: { onComplete, onError, onCancel, onClose } }));
   };
 
   return { context, busy, handoff, launchIdentify, save };

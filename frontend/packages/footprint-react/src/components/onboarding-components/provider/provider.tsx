@@ -12,12 +12,19 @@ export type ContextData = {
   fpInstance: Component | null;
   missingRequirements: OnboardingRequirement[];
   onboardingConfig: PublicOnboardingConfig | null;
-  onCancel?: () => void;
-  onComplete?: (validationToken: string) => void;
-  onError?: (error: unknown) => void;
   publicKey: string;
   sandboxId?: string;
   signupChallenge: SignupChallengeResponse | null;
+  onComplete?: (validationToken: string) => void;
+  onError?: (error: unknown) => void;
+  onCancel?: () => void;
+  onClose?: () => void;
+  handoffCallbacks?: {
+    onComplete?: (validationToken: string) => void;
+    onError?: (error: unknown) => void;
+    onCancel?: () => void;
+    onClose?: () => void;
+  };
 };
 
 type UpdateContext = Dispatch<SetStateAction<ContextData>>;
@@ -38,6 +45,7 @@ export type ProviderProps = {
   authToken?: string;
   children: React.ReactNode;
   onCancel?: () => void;
+  onClose?: () => void;
   onComplete?: (validationToken: string) => void;
   onError?: (error: unknown) => void;
   publicKey: string;
@@ -49,6 +57,7 @@ const Provider = ({
   authToken,
   children,
   onCancel,
+  onClose,
   onComplete,
   onError,
   publicKey,
@@ -61,11 +70,22 @@ const Provider = ({
     missingRequirements: [],
     onboardingConfig: null,
     onCancel,
+    onClose,
     onComplete,
     onError,
     publicKey,
     sandboxId,
     signupChallenge: null,
+<<<<<<< HEAD
+=======
+    userData,
+    handoffCallbacks: {
+      onCancel: undefined,
+      onComplete: undefined,
+      onError: undefined,
+      onClose: undefined,
+    },
+>>>>>>> 49fed5519a (OC: Enable to overwrite callbacks using handoff)
   });
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
