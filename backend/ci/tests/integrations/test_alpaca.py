@@ -236,7 +236,7 @@ def test_alpaca_cip(
         status_code=200 if expected_error is None else 400,
     )
     if expected_error:
-        assert body["error"]["message"] == expected_error
+        assert body["message"] == expected_error
     else:
         assert body["alpaca_response"]
 

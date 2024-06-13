@@ -44,7 +44,7 @@ def create_user_with_components_token(tenant, obc=None):
     # Ensure that we cant use the components_token to create a token with more permissions
     data = dict(requested_scope="onboarding")
     body = post("hosted/user/tokens", data, components_token, status_code=400)
-    assert body["error"]["message"] == "Cannot request additional scopes"
+    assert body["message"] == "Cannot request additional scopes"
 
     return (components_token, token, bifrost)
 
@@ -67,7 +67,7 @@ def test_components_sdk(sandbox_tenant):
     data = dict(fields=["id.first_name"])
     body = post("hosted/user/vault/decrypt", data, components_token, status_code=401)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Not allowed: required permission is missing: CanDecrypt<id.first_name>"
     )
 
@@ -81,7 +81,7 @@ def test_components_sdk(sandbox_tenant):
     data = dict(kind="email", action_kind="add_primary")
     body = post("hosted/user/challenge", data, components_token, status_code=401)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Not allowed: required permission is missing: And<explicit_auth,Or<auth,sign_up>>"
     )
 

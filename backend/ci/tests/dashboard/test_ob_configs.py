@@ -547,7 +547,7 @@ def test_config_create_validation(sandbox_tenant, config_data, expected_error):
     )
 
     if expected_error:
-        assert res["error"]["message"] == expected_error
+        assert res["message"] == expected_error
 
 
 def test_no_phone_obc(sandbox_tenant):
@@ -636,7 +636,7 @@ def test_skip_kyc(
     )
 
     if expected_error:
-        assert res["error"]["message"] == expected_error
+        assert res["message"] == expected_error
     else:
         assert res["skip_kyc"] == True
 
@@ -744,7 +744,7 @@ def test_verification_checks(
     )
 
     if expected_error:
-        assert res["error"]["message"] == expected_error
+        assert res["message"] == expected_error
     else:
         for c in checks:
             assert c in res["verification_checks"]
@@ -808,7 +808,7 @@ def test_enhanced_aml(sandbox_tenant, must_collect_data, enhanced_aml, expected_
     )
 
     if expected_error:
-        assert res["error"]["message"] == expected_error
+        assert res["message"] == expected_error
     else:
         assert res["enhanced_aml"] == enhanced_aml
 
@@ -1028,7 +1028,7 @@ def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):
         status_code=401,
     )
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Not allowed: required permission is missing: OnboardingConfiguration"
     )
 
@@ -1041,6 +1041,6 @@ def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):
         status_code=401,
     )
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Not allowed: required permission is missing: OnboardingConfiguration"
     )

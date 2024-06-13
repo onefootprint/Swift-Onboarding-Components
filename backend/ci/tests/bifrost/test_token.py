@@ -192,7 +192,7 @@ def test_provide_publishable_key_on_client(sandbox_tenant, ob_config):
 
     # Should require passing obc key
     body = post("hosted/onboarding", None, auth_token, status_code=400)
-    assert body["error"]["message"] == "No playbook key provided"
+    assert body["message"] == "No playbook key provided"
 
     # Run bifrost
     bifrost = BifrostClient.raw_auth(
@@ -322,9 +322,7 @@ def test_error_with_key(sandbox_tenant, sandbox_user, operation_kind):
         sandbox_tenant.sk.key,
         status_code=400,
     )
-    assert (
-        body["error"]["message"] == f"Cannot provide playbook key for this token kind"
-    )
+    assert body["message"] == f"Cannot provide playbook key for this token kind"
 
 
 def test_inherit_error_with_no_workflow_request(sandbox_tenant, sandbox_user):
@@ -339,7 +337,7 @@ def test_inherit_error_with_no_workflow_request(sandbox_tenant, sandbox_user):
         sandbox_tenant.sk.key,
         status_code=400,
     )
-    assert body["error"]["message"] == "No outstanding info is requested from this user"
+    assert body["message"] == "No outstanding info is requested from this user"
 
 
 # TODO: test when we make a new vault via API that is already portable elsewhere...

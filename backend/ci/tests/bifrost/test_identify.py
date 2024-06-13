@@ -444,8 +444,8 @@ def test_kba(
     expected_status = 400 if expected_err_str else 200
     body = post("hosted/identify/kba", kba_data, token, status_code=expected_status)
     if expected_err_str:
-        assert body["error"]["message"] == expected_err_str
-        assert body["error"].get("context", None) == expected_err_context
+        assert body["message"] == expected_err_str
+        assert body.get("context", None) == expected_err_context
     else:
         # Make sure the new token issued still has no scopes
         new_token = FpAuth(body["token"])
@@ -470,7 +470,7 @@ def test_otp_unverified(sandbox_user, sandbox_tenant):
     # Cannot initiate a login challenge
     data = dict(preferred_challenge_kind="email", scope="onboarding")
     body = post("/hosted/identify/login_challenge", data, token, status_code=400)
-    assert body["error"]["message"] == "Cannot initiate a challenge of requested kind"
+    assert body["message"] == "Cannot initiate a challenge of requested kind"
 
     # Run KBA
     kba_data = {"id.phone_number": phone_number}
@@ -513,11 +513,11 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
         sandbox_tenant.default_ob_config.key,
         status_code=400,
     )
-    assert body["error"]["message"] == "Please log into your existing account"
-    assert body["error"]["code"] == "E120"
+    assert body["message"] == "Please log into your existing account"
+    assert body["code"] == "E120"
 
     # Perform a login challenge using the token given in the erro
-    token = FpAuth(body["error"]["context"]["token"])
+    token = FpAuth(body["context"]["token"])
     IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
 
 

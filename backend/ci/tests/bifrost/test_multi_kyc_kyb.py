@@ -123,7 +123,7 @@ def test_onboard_secondary_bo(kyb_sandbox_ob_config, twilio):
         token,
         status_code=400,
     )
-    assert body["error"]["message"] == "This business owner has already started KYC"
+    assert body["message"] == "This business owner has already started KYC"
 
 
 @pytest.fixture(scope="session")

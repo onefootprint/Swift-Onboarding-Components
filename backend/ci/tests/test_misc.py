@@ -30,7 +30,7 @@ def test_tenant_create():
     }
     body = post("private/test_tenant", org_data, CUSTODIAN_AUTH, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Cannot inherit credentials for a non-integration test tenant"
     )
 

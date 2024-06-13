@@ -10,7 +10,7 @@ def test_reonboard(sandbox_tenant, sandbox_user):
     bifrost = BifrostClient.inherit_user(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost.run()
     body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=401)
-    assert body["error"]["message"] == "Workflow state does not allow add_data"
+    assert body["message"] == "Workflow state does not allow add_data"
     assert len(bifrost.handled_requirements) == 0
 
     # no new KYC checks should be run, we should still only 1 OBD
@@ -45,9 +45,7 @@ def test_abort_then_reonboard(sandbox_tenant, must_collect_data):
 
     # Shouldn't be able to do anything with bifrost1's workflow/auth token
     body = patch("hosted/user/vault", dict(), bifrost1.auth_token, status_code=401)
-    assert (
-        body["error"]["message"] == "Workflow is deactivated. Cannot perform add_data"
-    )
+    assert body["message"] == "Workflow is deactivated. Cannot perform add_data"
 
     # But should be able to use bifrost2's auth token
     patch("hosted/user/vault", dict(), bifrost2.auth_token)

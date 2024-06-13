@@ -63,7 +63,7 @@ def test_new_user(skip_phone_obc):
         scope="onboarding",
     )
     res = post("hosted/identify/verify", data, token, status_code=400)
-    assert res["error"]["message"] == "Incorrect PIN code"
+    assert res["message"] == "Incorrect PIN code"
     # correct PIN suceeds and gives auth
     data = dict(
         challenge_response=FIXTURE_EMAIL_OTP_PIN,

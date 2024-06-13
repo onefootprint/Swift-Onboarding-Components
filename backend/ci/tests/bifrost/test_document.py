@@ -210,12 +210,12 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
         "country_code": "NO",
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
-    assert body["error"]["message"].startswith(
+    assert body["message"].startswith(
         "Unsupported document country. Supported document countries:"
     )
-    assert set(
-        body["error"]["message"].split(":")[1].replace(" ", "").split(",")
-    ) == set(["UM", "VI", "MP", "GU", "PR", "AS", "US"])
+    assert set(body["message"].split(":")[1].replace(" ", "").split(",")) == set(
+        ["UM", "VI", "MP", "GU", "PR", "AS", "US"]
+    )
 
     # Shouldn't be allowed to upload non-drivers-license
     data = {
@@ -225,7 +225,7 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Unsupported document type. Supported document types: drivers_license"
     )
 
@@ -263,7 +263,7 @@ def test_upload_documents_with_ob_config_restriction(
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Unsupported document type. Supported document types: passport"
     )
 
@@ -325,7 +325,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Unsupported document type. Supported document types: passport"
     )
 
@@ -337,7 +337,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Unsupported document type. Supported document types: drivers_license"
     )
 
@@ -349,7 +349,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
     }
     body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Unsupported document type. Supported document types: drivers_license"
     )
 
@@ -522,7 +522,7 @@ def test_user_uploading_small_image(doc_request_sandbox_ob_config):
         files=open_multipart_file("small_image.png", "image/png")(),
         status_code=400,
     )
-    assert body["error"]["message"].startswith("Image too small")
+    assert body["message"].startswith("Image too small")
 
 
 # When a user has issues with their mobile device's camera initializing, we force the user to upload images

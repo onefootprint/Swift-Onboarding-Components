@@ -118,7 +118,7 @@ def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc
         status_code=400,
     )
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Cannot use fixture email or phone number in non-sandbox mode."
     )
     body = post(
@@ -129,6 +129,6 @@ def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc
         status_code=400,
     )
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Cannot use fixture email or phone number in non-sandbox mode."
     )

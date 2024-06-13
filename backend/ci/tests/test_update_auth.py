@@ -39,7 +39,7 @@ def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
             kind="phone", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
         )
         body = post("hosted/user/challenge", data, token, status_code=status_code)
-        assert body["error"]["message"] == error_message
+        assert body["message"] == error_message
 
     # Also test that a playbook with the auth scopes can't be used
     token_for_auth = IdentifyClient.from_user(
@@ -203,7 +203,7 @@ def test_add_phone_bifrost(skip_phone_obc):
     data = dict(kind="email", email=FIXTURE_EMAIL2, action_kind="replace")
     body = post("hosted/user/challenge", data, auth_token, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Can only replace auth methods using auth issued via API"
     )
 
@@ -271,7 +271,7 @@ def test_fail_to_add_primary(user_with_token, kind, expected_error):
         challenge_response = "000000"
     data = dict(challenge_token=challenge_token, challenge_response=challenge_response)
     body = post("hosted/user/challenge/verify", data, auth_token, status_code=400)
-    assert body["error"]["message"] == expected_error
+    assert body["message"] == expected_error
 
 
 def test_replace_passkey(user_with_token):
@@ -282,7 +282,7 @@ def test_replace_passkey(user_with_token):
         kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
     )
     body = post("hosted/user/challenge", data, auth_token, status_code=400)
-    assert body["error"]["message"] == "Cannot initiate challenge of kind passkey"
+    assert body["message"] == "Cannot initiate challenge of kind passkey"
 
     # Step up the token using a passkey
     auth_token = IdentifyClient.from_token(
@@ -314,7 +314,7 @@ def test_replace_passkey(user_with_token):
     except HttpError as e:
         assert e.status_code == 400
         assert (
-            json.loads(e.content)["error"]["message"]
+            json.loads(e.content)["message"]
             == "The credential requested could not be found"
         )
 
@@ -360,7 +360,7 @@ def test_restrict_adding_email(sandbox_user, auth_playbook):
     # Make sure we can't initiate a challenge to update phone
     data = dict(kind="phone", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace")
     body = post("hosted/user/challenge", data, auth_token, status_code=400)
-    assert body["error"]["message"] == "Token cannot initiate challenge of kind phone"
+    assert body["message"] == "Token cannot initiate challenge of kind phone"
 
     # But we can initiate a challenge to replace email
     data = dict(kind="email", email=FIXTURE_EMAIL2, action_kind="replace")

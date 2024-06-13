@@ -93,7 +93,7 @@ def test_create(sandbox_tenant, data, error):
         status_code=400 if error is not None else 200,
     )
     if error is not None:
-        assert res["error"]["message"] == error
+        assert res["message"] == error
         return
 
     rule = next(r for r in res if r["rule_expression"] == data["rule_expression"])
@@ -773,6 +773,4 @@ def test_cannot_delete_all_rules(sandbox_tenant, must_collect_data):
         *sandbox_tenant.db_auths,
         status_code=400,
     )
-    assert (
-        body["error"]["message"] == "Proceeding would remove all rules on your playbook"
-    )
+    assert body["message"] == "Proceeding would remove all rules on your playbook"

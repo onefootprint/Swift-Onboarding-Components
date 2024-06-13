@@ -19,10 +19,7 @@ def authed_user(auth_playbook, sandbox_tenant):
 
     # Enforce we can't start an onboarding with this auth token
     body = post("/hosted/onboarding", None, auth_token, status_code=401)
-    assert (
-        body["error"]["message"]
-        == "Not allowed: required permission is missing: sign_up"
-    )
+    assert body["message"] == "Not allowed: required permission is missing: sign_up"
 
     # Grab a validation token
     body = post("/hosted/onboarding/validate", None, auth_token)

@@ -5,10 +5,7 @@ use crate::decision::vendor::{
     middesk,
     VendorAPIError,
 };
-use crate::types::error::{
-    ApiResponseError,
-    FpResponseErrorInfo,
-};
+use crate::types::error::ApiResponseError;
 use crate::utils::body_bytes::InvalidBodyError;
 use actix_web::error::{
     JsonPayloadError,
@@ -484,15 +481,6 @@ impl actix_web::ResponseError for ApiError {
         };
 
         resp.json(ApiResponseError {
-            // TODO no reason to have an `error` envelope around the whole body... deprecate this after
-            // updating the client and updating Grid, who has just recently started matching on error codes
-            error: FpResponseErrorInfo {
-                message: message.clone(),
-                code: code.clone(),
-                context: context.clone(),
-                status_code,
-                support_id: support_id.clone(),
-            },
             message,
             code,
             context,

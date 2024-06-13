@@ -67,9 +67,9 @@ def test_kyb_missing_req(obc, sandbox_tenant):
 
     data = dict(key=obc.key.value, fixture_result="pass")
     kyb = post(f"businesses/{fp_id}/kyb", data, sandbox_tenant.sk.key, status_code=400)
-    assert kyb["error"]["code"] == "T121"
+    assert kyb["code"] == "T121"
     assert (
-        kyb["error"]["message"]
+        kyb["message"]
         == "Cannot run kyb playbook due to unmet requirements. Missing business_name. At a minimum, the following vault data must be provided: business.name"
     )
 
@@ -102,7 +102,7 @@ def test_kyb_with_bos_linked_via_api(sandbox_tenant):
         f"businesses/{fp_bid}/kyb", data, sandbox_tenant.sk.key, status_code=400
     )
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Cannot run kyb playbook due to unmet requirements. Missing business_beneficial_owners. At a minimum, the following vault data must be provided: business.beneficial_owners"
     )
 
@@ -153,7 +153,7 @@ def test_link_bos(sandbox_tenant, sandbox_user):
         body = post(
             f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
         )
-        assert body["error"]["message"] == "ownership_stake must be between 0 and 100"
+        assert body["message"] == "ownership_stake must be between 0 and 100"
 
     # Cannot add the same user as a BO twice
     data = dict(fp_id=fp_id, ownership_stake=50)
@@ -161,7 +161,7 @@ def test_link_bos(sandbox_tenant, sandbox_user):
         f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
     assert (
-        body["error"]["message"]
+        body["message"]
         == "The provided user is already an owner of the provided business"
     )
 
@@ -170,16 +170,14 @@ def test_link_bos(sandbox_tenant, sandbox_user):
     body = post(
         f"businesses/{fp_id}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
-    assert (
-        body["error"]["message"] == "Provided fp_bid does not correspond to a business"
-    )
+    assert body["message"] == "Provided fp_bid does not correspond to a business"
 
     # Cannot set a business as an owner
     data = dict(fp_id=fp_bid, ownership_stake=50)
     body = post(
         f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
-    assert body["error"]["message"] == "Provided fp_id does not correspond to a person"
+    assert body["message"] == "Provided fp_id does not correspond to a person"
 
 
 def test_error_linking_bo(kyb_sandbox_ob_config, sandbox_tenant, sandbox_user):
@@ -193,7 +191,7 @@ def test_error_linking_bo(kyb_sandbox_ob_config, sandbox_tenant, sandbox_user):
         f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Provided business was created by onboarding onto a playbook. Business owners are managed automatically by the playbook, so they cannot be mutated."
     )
 
@@ -213,7 +211,7 @@ def test_error_linking_bo_with_vaulted_bos(sandbox_tenant, sandbox_user):
         f"businesses/{fp_bid}/owners", data, sandbox_tenant.sk.key, status_code=400
     )
     assert (
-        body["error"]["message"]
+        body["message"]
         == f"Business already has {bo_di} vaulted. If you'd like to link a user as the beneficial owner of this business, please clear out {bo_di}"
     )
 

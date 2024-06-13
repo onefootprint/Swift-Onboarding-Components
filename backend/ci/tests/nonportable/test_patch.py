@@ -169,13 +169,13 @@ def test_invalid_dis(key, tenant):
     # Can't create the user inline with invalid data
     data = {key: "123"}
     body = post("users/", data, tenant.sk.key, status_code=400)
-    assert "Json deserialize error" in body["error"]["message"]
+    assert "Json deserialize error" in body["message"]
 
     body = post("users/", None, tenant.sk.key)
     fp_id = body["id"]
 
     body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key, status_code=400)
-    assert "Json deserialize error" in body["error"]["message"]
+    assert "Json deserialize error" in body["message"]
     post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
 
 

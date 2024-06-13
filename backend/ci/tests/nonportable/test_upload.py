@@ -84,6 +84,5 @@ def test_too_large_object_upload(sandbox_tenant):
     (status, body) = asyncio.run(run())
     assert status == 400
     assert (
-        body["error"]["message"]
-        == "The request is too large, max size accepted is 10485760 KB."
+        body["message"] == "The request is too large, max size accepted is 10485760 KB."
     )

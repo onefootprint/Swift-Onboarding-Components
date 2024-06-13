@@ -54,6 +54,4 @@ def test_cannot_patch_tenant(tenant, sandbox_tenant):
         *tenant.db_auths,
         status_code=401,
     )
-    assert (
-        body["error"]["message"] == "Not allowed: user is not a risk ops firm employee"
-    )
+    assert body["message"] == "Not allowed: user is not a risk ops firm employee"

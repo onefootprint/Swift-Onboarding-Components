@@ -262,7 +262,7 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
         obc.id, 1, add=[rule], *sandbox_tenant.db_auths, status_code=400
     )
     assert (
-        resp["error"]["message"]
+        resp["message"]
         == "Vaulted field id.email can not be matched against list with kind ssn9"
     )
 
@@ -293,7 +293,7 @@ def test_list_type_di_match(sandbox_tenant, must_collect_data, can_access_data):
         obc.id, 4, add=[rule], *sandbox_tenant.db_auths, status_code=400
     )
     assert (
-        resp["error"]["message"]
+        resp["message"]
         == "Vaulted field id.email can not be matched against list with kind ssn9"
     )
 
@@ -557,7 +557,7 @@ def test_create_list_entry_format_canonicalization(sandbox_tenant):
         status_code=400,
     )
     assert (
-        resp["error"]["message"]
+        resp["message"]
         == "Invalid SSN9: Leading three digit number must not be 000, 666, or a value between 900 and 999 (inclusive)"
     )
 
@@ -843,7 +843,7 @@ def test_rule_list_id_validation(sandbox_tenant, must_collect_data, can_access_d
     resp = update_rules(
         obc.id, 2, edit=[rule_update], status_code=400, *sandbox_tenant.db_auths
     )
-    assert resp["error"]["message"] == "List with ID not_a_real_list_id not found"
+    assert resp["message"] == "List with ID not_a_real_list_id not found"
 
     # Try creating a new rule with a non-exising list ID
     new_rule = dict(
@@ -859,4 +859,4 @@ def test_rule_list_id_validation(sandbox_tenant, must_collect_data, can_access_d
     resp = update_rules(
         obc.id, 3, add=[new_rule], status_code=400, *sandbox_tenant.db_auths
     )
-    assert resp["error"]["message"] == "List with ID not_a_real_list_id not found"
+    assert resp["message"] == "List with ID not_a_real_list_id not found"

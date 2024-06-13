@@ -18,7 +18,7 @@ def send_trigger(fp_id, sandbox_tenant, trigger, expected_error=None):
     )
 
     if expected_error:
-        assert res["error"]["message"] == expected_error
+        assert res["message"] == expected_error
         return
 
     # Grab the trigger ID from the timeline

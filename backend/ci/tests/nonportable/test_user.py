@@ -180,10 +180,10 @@ def test_kyc_missing_requirement(sandbox_tenant, must_collect_data):
     data = dict(onboarding_config_key=obc.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Cannot run kyc playbook due to unmet requirements. Missing name, ssn9. At a minimum, the following vault data must be provided: id.first_name, id.last_name, id.ssn9"
     )
-    assert body["error"]["code"] == "T121"
+    assert body["code"] == "T121"
 
 
 def test_kyc_missing_derypt_perms(sandbox_tenant, must_collect_data, can_access_data):
@@ -205,6 +205,6 @@ def test_kyc_missing_derypt_perms(sandbox_tenant, must_collect_data, can_access_
     data = dict(onboarding_config_key=obc.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
-        body["error"]["message"]
+        body["message"]
         == "Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: dob"
     )

@@ -103,18 +103,12 @@ def test_d2p_biometric(sandbox_tenant):
     post("hosted/user/challenge", init_data, d2p_auth_token)
     data = dict(challenge_token=chal_token, challenge_response=json.dumps(attestation))
     body = post("hosted/user/challenge/verify", data, d2p_auth_token, status_code=400)
-    assert (
-        body["error"]["message"]
-        == "Cannot add primary passkey when one already exists."
-    )
+    assert body["message"] == "Cannot add primary passkey when one already exists."
 
     # Shouldn't be able to replace existing credential
     init_data = dict(kind="passkey", action_kind="replace")
     body = post("hosted/user/challenge", init_data, d2p_auth_token, status_code=400)
-    assert (
-        body["error"]["message"]
-        == "Can only replace auth methods using auth issued via API"
-    )
+    assert body["message"] == "Can only replace auth methods using auth issued via API"
 
     # Make sure the liveness requirement is met
     assert not any(

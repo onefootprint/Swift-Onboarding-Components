@@ -212,10 +212,7 @@ def test_delete(sandbox_tenant):
         body = delete(
             f"users/{fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
         )
-        assert (
-            body["error"]["message"]
-            == "Must provide only one of `delete_all` and `fields`"
-        )
+        assert body["message"] == "Must provide only one of `delete_all` and `fields`"
 
     # Check deleting data
     data = dict(fields=["id.phone_number"])
@@ -245,30 +242,25 @@ def test_card_expiration_transform(tenant):
         ("12/2023", "12/2023"),
         ("02/0000", "02/0000"),
         ("03/1990", "03/1990"),
-
         # MM-YYYY
         ("01-2023", "01/2023"),
         ("12-2023", "12/2023"),
         ("02-0000", "02/0000"),
         ("03-1990", "03/1990"),
-
         # MM/YY
         ("01/23", "01/2023"),
         ("12/23", "12/2023"),
         ("02/00", "02/2000"),
         ("03/90", "03/2090"),
-
         # MM-YY
         ("01-23", "01/2023"),
         ("12-23", "12/2023"),
         ("02-00", "02/2000"),
         ("03-90", "03/2090"),
-
         # M/YY
         ("1/23", "01/2023"),
         ("2/00", "02/2000"),
         ("3/90", "03/2090"),
-
         # M-YY
         ("1-23", "01/2023"),
         ("2-00", "02/2000"),
