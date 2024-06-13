@@ -166,13 +166,14 @@ curl -X POST https://api.onefootprint.com/onboarding/session/validate \
    -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
 ```
 
-Footprint will give you some information from this onboarding session. We’ll also give you a `fp_id`, which looks like `fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX`.
+Footprint will give you some information from this onboarding session. We’ll also give you a user-specific `fp_id` that can be used in our APIs to refer to this user.
 
 ```json
 {
   "user": {
     "fp_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
     "status": "pass",
+    "playbook_key": "pb_test_VMooXd04EUlnu3AvMYKjMW",
     "requires_manual_review": false
   },
   ...
@@ -184,9 +185,9 @@ Footprint will give you some information from this onboarding session. We’ll a
   identifier you will send to request any user-specific information.
 </inline-alert>
 
-### Check the onboarding decision status
+### Check the onboarding status
 
-Using the `status` and `requires_manual_review` fields to decide whether or not to onboard this user to your product.
+Your playbook will define a set of rules used to evaluate the user's status. Use the `status` and `requires_manual_review` fields to decide whether or not to onboard this user to your product.
 
 | Status    | What does this mean?                                                                                                                                                                                                                              |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -195,10 +196,10 @@ Using the `status` and `requires_manual_review` fields to decide whether or not 
 | `none`    | Your playbook has no rules defined.                                                                                                                                                                                                               |
 | `pending` | Verifying this user's identity is taking longer than expected. This happens in rare cases where asynchronous actions are required to make a decision. A final decision will be delivered via [webhooks](/integrate/webhooks) to your application. |
 
-| Review | What does this mean?                                                                              |
-| ------ | ------------------------------------------------------------------------------------------------- |
-| False  | We have made a decision automatically that does not require any manual review.                    |
-| True   | Footprint suggests manually reviewing identified risks and manually checking acceptance criteria. |
+| Review | What does this mean?                                                                        |
+| ------ | ------------------------------------------------------------------------------------------- |
+| False  | Your playbook's rules have made a decision automatically.                                   |
+| True   | Your playbook's rules have requested that this user is reviewed manually before onboarding. |
 
 ### After onboarding
 

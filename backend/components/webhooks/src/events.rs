@@ -38,7 +38,7 @@ pub enum WebhookEvent {
 
     #[strum_discriminants(strum(serialize = "footprint.onboarding.status_changed"))]
     #[strum_discriminants(strum(
-        message = "A user's status has been changed after finishing onboarding, manual review, or internal updates to the user's status. Generally, the pending and incomplete statuses aren't important to listen to here. This webhook is being phased out in favor of the more descriptive footprint.onboarding.completed and footprint.user.manual_review events."
+        message = "NOTE: This webhook is being phased out in favor of the more descriptive footprint.onboarding.completed and footprint.user.manual_review events. A user's status has been changed after finishing onboarding, manual review, or internal updates to the user's status. Generally, the pending and incomplete statuses aren't important to listen to here."
     ))]
     OnboardingStatusChanged(OnboardingStatusChangedPayload),
 
