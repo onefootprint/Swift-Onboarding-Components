@@ -13,7 +13,7 @@ const PaymentForm = () => {
 
   return (
     <FootprintForm
-      authToken="tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit" // auth token generated using the Secret API Key on step 5
+      authToken="cttok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit" // auth token generated using the Secret API Key on step 5
       variant="modal"
       appearance={appearance} // appearance object from step 6
       onSave={onSave}
@@ -33,7 +33,7 @@ export const getVueIntegration = () => `
     mounted() {
       const component = footprint.init({
         kind: 'form',
-        authToken: "tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", // auth token generated using the Secret API Key on step 5
+        authToken: "cttok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit", // auth token generated using the Secret API Key on step 5
         appearance: appearance, // appearance object from step 6
         variant: "drawer",
         onComplete: handleComplete,

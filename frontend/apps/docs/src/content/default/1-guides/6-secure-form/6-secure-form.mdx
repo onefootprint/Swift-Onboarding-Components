@@ -59,7 +59,7 @@ curl https://api.onefootprint.com/users/fp_id_ItdeKyRaEJ7Zpao4i6vTbN/client_toke
 A sample response can be found below:
 
 ```bash
-{"token":"ctok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit","expires_at":"2023-07-20T03:59:03.579654Z"}
+{"token":"cttok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit","expires_at":"2023-07-20T03:59:03.579654Z"}
 ```
 
 The token returned will need to be passed into the Footprint component on the frontend.
@@ -105,7 +105,7 @@ const renderForm = () => {
     kind: 'form',
     variant: 'inline',
     containerId: 'myContainerId', // unique ID for the div that the form should be rendered in
-    authToken: 'tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit',
+    authToken: 'cttok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit',
     onComplete: () => {
       // TODO:
     },

@@ -28,5 +28,5 @@ export const getAuthTokenRequest = ({
   `;
 
 export const getAuthTokenResponse = () => `
-    {"token":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit","expires_at":"2023-07-20T03:59:03.579654Z"}
+    {"token":"cttok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit","expires_at":"2023-07-20T03:59:03.579654Z"}
   `;

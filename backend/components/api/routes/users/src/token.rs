@@ -54,7 +54,7 @@ use paperclip::actix::{
 };
 
 #[api_v2_operation(
-    description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
+    description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
     tags(Users, Preview)
 )]
 #[post("/users/{fp_id}/token")]
@@ -127,6 +127,7 @@ pub async fn post(
                 AuthEvent::save(args, conn)?;
             }
 
+            // TODO put this behind a feature gate
             let implied_auth_events = {
                 // As customers start to use us for auth, there will be situations in which:
                 // - The user logs into/creates an account at, say, Grid using the Footprint auth component.
@@ -173,6 +174,7 @@ pub async fn post(
                     vec![]
                 }
             };
+            tracing::info!(num_events=%implied_auth_events.len(), %tenant_id, %is_live, "Creating token with implied auth events");
             let kinds = implied_auth_events.iter().map(|e| e.kind).collect();
             // All auth events associated with the token made here are implicit
             let auth_events = implied_auth_events

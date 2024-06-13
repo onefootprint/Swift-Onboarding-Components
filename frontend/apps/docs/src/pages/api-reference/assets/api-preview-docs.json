@@ -913,7 +913,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreate an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreate an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
                 "parameters": [
                     {
                         "in": "path",

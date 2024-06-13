@@ -43,7 +43,7 @@ use paperclip::actix::{
 use strum::IntoEnumIterator;
 
 #[api_v2_operation(
-    description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
+    description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user. This API is often used in combination with the [Footprint Form SDK](https://docs.onefootprint.com/embedded-components/getting-started).",
     tags(Users, Client, PublicApi)
 )]
 #[post("/users/{fp_id}/client_token")]
