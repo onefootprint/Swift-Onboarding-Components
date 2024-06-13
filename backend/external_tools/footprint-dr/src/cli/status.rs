@@ -4,6 +4,7 @@ use super::api_client::{
 };
 use anyhow::{
     anyhow,
+    bail,
     Result,
 };
 use log::debug;
@@ -21,11 +22,12 @@ pub fn status_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
 
     let status = client.get_status()?;
 
-    // If this fails, the keyring has been corrupted.
-    assert!(
-        IsLive::from(status.is_live) == is_live,
-        "Keyring has been corrupted."
-    );
+    if IsLive::from(status.is_live) != is_live {
+        bail!(
+            "Keyring has been corrupted. Run `footprint login --{}` to log in again.",
+            is_live.to_string().to_lowercase()
+        );
+    }
 
     println!(
         "Logged in to {} ({})",

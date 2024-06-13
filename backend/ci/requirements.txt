@@ -23,3 +23,4 @@ alpaca-py==0.8.2
 checkout-sdk==3.0.0
 pytest-xdist==3.3.1
 flaky==3.7.0
+pexpect==4.9
