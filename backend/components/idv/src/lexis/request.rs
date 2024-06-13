@@ -233,6 +233,14 @@ pub(crate) struct EndUser {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
+pub(crate) struct DriverInfo {
+    #[serde(rename = "DriverLicenseNumber")]
+    pub license_number: PiiString,
+    #[serde(rename = "DriverLicenseState")]
+    pub license_state: PiiString,
+}
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
 #[allow(non_snake_case)]
 pub(crate) struct SearchBy {
     pub name: Name,
@@ -249,8 +257,9 @@ pub(crate) struct SearchBy {
     /// Ten-digit home phone number (for example, 925551234)
     pub home_phone: Option<PiiString>,
     pub email: Option<PiiString>,
-    #[serde(rename = "DriverLicenseNumber")]
-    pub drivers_license_number: Option<PiiString>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub drivers_license_info: Option<DriverInfo>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -425,13 +434,21 @@ impl LexisRequest {
             (None, None) => (None, None),
         };
 
-        // TODO: are there format requirements here?
-        // TODO: do we need to include DL state in SearchBy?
-        let include_dl_verification = if drivers_license_number.is_some() {
-            LBool::One
-        } else {
-            LBool::Zero
-        };
+        // Lexis requires sending DL issuing state as well when sending DL, for now we send user's state
+        // since including DL only helps CVI
+        // TODO: update this when we collect license issuing state (or update this for doc first OBC)
+        let state2 = state_and_country.state.clone();
+        let (include_dl_in_cvi, drivers_license_info) =
+            if let Some((dl_number, state)) = drivers_license_number.and_then(|dl| state2.map(|s| (dl, s))) {
+                let info = DriverInfo {
+                    license_number: dl_number,
+                    license_state: state,
+                };
+                (LBool::One, Some(info))
+            } else {
+                (LBool::Zero, None)
+            };
+
 
         Ok(Self {
             flex_id_request: FlexIdRequest {
@@ -487,10 +504,15 @@ impl LexisRequest {
                     },
                     include_all_risk_indicators: LBool::One,
                     include_verified_element_summary: LBool::Zero, // Don't have privelages for this :(
-                    // TODO: what's the difference between this and `include_driver_license` in the cvi calc
-                    // options?
-                    // My guess is that it gets included in VerifiedElementSummary if this option is turned on
-                    include_dl_verification,
+                    // IncludeDLVerification option can be turned on if you would like LexisNExis to attempt
+                    // to verify the DL# submitted in the request Verified DL#  means that
+                    // we were actually able to verify the the DL3 and State does belong to the individuals
+                    // PII that was submitted it the FlexID transaction This is an extra
+                    // charge, which we currently (2024-06-13) do not have    -It gets
+                    // included in VerifiedElementSummary if this option is turned on
+                    //
+                    // NOTE: This will error if we try to set it to 1 and we aren't paying for it
+                    include_dl_verification: LBool::Zero,
                     dob_match: DobMatch {
                         match_type: DobMatchType::FuzzyCCYYMMDD,
                         match_year_radius: 0, // should be noop since we arent using RadiusCCYY
@@ -509,10 +531,21 @@ impl LexisRequest {
                     include_ssn_verification: LBool::Zero, // Don't have privelages for this :(
                     cvi_calculation_options: Some(CviCalculationOptions {
                         include_dob: LBool::One,
-                        // this is the option that Lexis communicated we should use
-                        // from them: "Send the DL whenever possible and if you do not send in DL and the CVI
-                        // option is turned on, it will not have a negative effect."
-                        include_driver_license: include_dl_verification,
+                        //  (this is the option that Lexis communicated we should use)
+                        // IncludeDriverLicense in CVI calculation is an option that can
+                        // be turned “on” which will take the Verified DL and add that to the CVI Calculation.
+                        // A Verified DL # can an additional 10 points to the CVI score.  It can move a 10 to
+                        // a 20, move a 20 to a 30, and move a 30 to a 40.  The Include Verified DL # will not
+                        // move a 40 to a 50.
+                        //
+                        // Note: If the IncludeDLVerification in the CVI calculation is turned “on” and
+                        // LexisNexis is “not able to verify” the DL#, it will “not” have a negative effect on
+                        // the CVI calculation.
+                        //
+                        // Unfortunate note: This helps with searching/verifying, but we can't derive whether
+                        // or not the DL was verified (since we don't know what the score would have been had
+                        // we not sent the DL)
+                        include_driver_license: include_dl_in_cvi,
                         disable_customer_network_option: LBool::Zero, /* TODO: might need to fiddle with this and see how it impacts scores */
                         include_itin: LBool::One,
                         include_compliance_cap: LBool::Zero,
@@ -542,9 +575,233 @@ impl LexisRequest {
                     dob,
                     ip_address: None, // maybe add this later
                     email,
-                    drivers_license_number,
+                    drivers_license_info,
                 },
             },
+        })
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn tbi() -> TenantBusinessInfo {
+        TenantBusinessInfo {
+            company_name: "Inc".into(),
+            address_line1: "1 main".into(),
+            city: "Philly".into(),
+            state: "NY".into(),
+            zip: "12345".into(),
+            phone: "12345".into(),
+        }
+    }
+    #[test]
+    fn test_lexis_request_new() {
+        let idv_data_with_dl_full = IdvData {
+            first_name: Some("Bob".into()),
+            last_name: Some("Flexidierto".into()),
+            drivers_license_number: Some("12345".into()),
+            state: Some("GA".into()),
+            verification_request_id: Some(VerificationRequestId::from("vres_1234".to_string())), /* need this for query id randomness */
+            ..Default::default()
+        };
+        let request = LexisRequest::new(idv_data_with_dl_full, "ti_1".into(), tbi()).unwrap();
+        assert_eq!(serde_json::to_value(request).unwrap(), example_with_dl());
+
+        // don't have state, shouldn't populate dl stuff
+        // `IncludeDriverLicense` is 0 here
+        let idv_data_with_dl_partial = IdvData {
+            first_name: Some("Bob".into()),
+            last_name: Some("Flexidierto".into()),
+            drivers_license_number: Some("12345".into()),
+            verification_request_id: Some(VerificationRequestId::from("vres_1234".to_string())), /* need this for query id randomness */
+            ..Default::default()
+        };
+        let request = LexisRequest::new(idv_data_with_dl_partial, "ti_1".into(), tbi()).unwrap();
+        assert_eq!(serde_json::to_value(request).unwrap(), example_without_dl());
+    }
+
+
+    fn example_with_dl() -> serde_json::Value {
+        serde_json::json!({
+            "FlexIDRequest": {
+                "Options": {
+                    "CVICalculationOptions": {
+                        "DisableCustomerNetworkOption": 0,
+                        "IncludeComplianceCap": 0,
+                        "IncludeDOB": 1,
+                        "IncludeDriverLicense": 1,
+                        "IncludeITIN": 1
+                    },
+                    "DisableNonGovernmentDLData": 0,
+                    "DOBMatch": {
+                        "MatchType": "FuzzyCCYYMMDD",
+                        "MatchYearRadius": 0
+                    },
+                    "DOBRadius": 2,
+                    "IncludeAllRiskIndicators": 1,
+                    "IncludeDLVerification": 0,
+                    "IncludeEmailVerification": 1,
+                    "IncludeMIOverride": 0,
+                    "IncludeModels": {
+                        "FraudPointModel": {
+                            "IncludeRiskIndices": 1,
+                            "ModelName": null
+                        },
+                        "ModelRequests": []
+                    },
+                    "IncludeMSOverride": 0,
+                    "IncludeSSNVerification": 0,
+                    "IncludeVerifiedElementSummary": 0,
+                    "InstantIDVersion": null,
+                    "LastSeenThreshold": 365,
+                    "NameInputOrder": "Unknown",
+                    "PoBoxCompliance": 0,
+                    "RequireExactMatch": {
+                        "Address": 0,
+                        "DriverLicense": 0,
+                        "FirstName": 0,
+                        "FirstNameAllowNickname": 0,
+                        "HomePhone": 0,
+                        "LastName": 0,
+                        "SSN": 0
+                    },
+                    "UseDOBFilter": 1,
+                    "Watchlists": [
+                        {
+                            "Watchlist": "ALLV4"
+                        }
+                    ]
+                },
+                "SearchBy": {
+                    "Address": {
+                        "City": null,
+                        "State": "GA",
+                        "StreetAddress1": null,
+                        "StreetAddress2": null,
+                        "Zip5": null
+                    },
+                    "DOB": null,
+                    "DriverLicenseNumber": "12345",
+                    "DriverLicenseState": "GA",
+                    "Email": null,
+                    "HomePhone": null,
+                    "IPAddress": null,
+                    "Name": {
+                        "First": "Bob",
+                        "Last": "Flexidierto",
+                        "Middle": null,
+                        "Suffix": null
+                    },
+                    "SSN": null,
+                    "SSNLast4": null
+                },
+                "User": {
+                    "DLPurpose": "3",
+                    "EndUser": {
+                        "City": "Philly",
+                        "CompanyName": "Inc",
+                        "Phone": "12345",
+                        "State": "NY",
+                        "StreetAddress1": "1 main",
+                        "Zip5": "12345"
+                    },
+                    "GLBPurpose": "1",
+                    "QueryId": "vres_1234",
+                    "ReferenceCode": "ti_1"
+                }
+            }
+        })
+    }
+    fn example_without_dl() -> serde_json::Value {
+        serde_json::json!({
+            "FlexIDRequest": {
+                "Options": {
+                    "CVICalculationOptions": {
+                        "DisableCustomerNetworkOption": 0,
+                        "IncludeComplianceCap": 0,
+                        "IncludeDOB": 1,
+                        "IncludeDriverLicense": 0,
+                        "IncludeITIN": 1
+                    },
+                    "DisableNonGovernmentDLData": 0,
+                    "DOBMatch": {
+                        "MatchType": "FuzzyCCYYMMDD",
+                        "MatchYearRadius": 0
+                    },
+                    "DOBRadius": 2,
+                    "IncludeAllRiskIndicators": 1,
+                    "IncludeDLVerification": 0,
+                    "IncludeEmailVerification": 1,
+                    "IncludeMIOverride": 0,
+                    "IncludeModels": {
+                        "FraudPointModel": {
+                            "IncludeRiskIndices": 1,
+                            "ModelName": null
+                        },
+                        "ModelRequests": []
+                    },
+                    "IncludeMSOverride": 0,
+                    "IncludeSSNVerification": 0,
+                    "IncludeVerifiedElementSummary": 0,
+                    "InstantIDVersion": null,
+                    "LastSeenThreshold": 365,
+                    "NameInputOrder": "Unknown",
+                    "PoBoxCompliance": 0,
+                    "RequireExactMatch": {
+                        "Address": 0,
+                        "DriverLicense": 0,
+                        "FirstName": 0,
+                        "FirstNameAllowNickname": 0,
+                        "HomePhone": 0,
+                        "LastName": 0,
+                        "SSN": 0
+                    },
+                    "UseDOBFilter": 1,
+                    "Watchlists": [
+                        {
+                            "Watchlist": "ALLV4"
+                        }
+                    ]
+                },
+                "SearchBy": {
+                    "Address": {
+                        "City": null,
+                        "State": null,
+                        "StreetAddress1": null,
+                        "StreetAddress2": null,
+                        "Zip5": null
+                    },
+                    "DOB": null,
+                    "Email": null,
+                    "HomePhone": null,
+                    "IPAddress": null,
+                    "Name": {
+                        "First": "Bob",
+                        "Last": "Flexidierto",
+                        "Middle": null,
+                        "Suffix": null
+                    },
+                    "SSN": null,
+                    "SSNLast4": null
+                },
+                "User": {
+                    "DLPurpose": "3",
+                    "EndUser": {
+                        "City": "Philly",
+                        "CompanyName": "Inc",
+                        "Phone": "12345",
+                        "State": "NY",
+                        "StreetAddress1": "1 main",
+                        "Zip5": "12345"
+                    },
+                    "GLBPurpose": "1",
+                    "QueryId": "vres_1234",
+                    "ReferenceCode": "ti_1"
+                }
+            }
         })
     }
 }

@@ -72,15 +72,6 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<F
             }
         }
 
-        // i'm not sure we even get this (not sure when we get what in the VerifiedElementSummary)
-        if let Some(dl_verified) = res.dl_verified() {
-            if dl_verified {
-                codes.push(FRC::DriversLicenseNumberVerified)
-            } else {
-                codes.push(FRC::DriversLicenseNumberNotVerified)
-            }
-        }
-
         if address_po_box.unwrap_or(false) || address_cmra.unwrap_or(false) {
             // CRMA is technically different from a PO Box but I think it's fine to keep the same single risk
             // signal here?
@@ -314,7 +305,6 @@ mod tests {
             IdFlagged,
             PhoneNumberInputInvalid,
             DriversLicenseNumberNotValid,
-            DriversLicenseNumberNotVerified
         ])
     ]
     #[test_case(
@@ -331,7 +321,6 @@ mod tests {
           IdFlagged,
           PhoneNumberInputInvalid,
           DriversLicenseNumberNotValid,
-          DriversLicenseNumberNotVerified
       ])
   ]
     #[test_case(
@@ -349,7 +338,6 @@ mod tests {
             IdFlagged,
             PhoneNumberInputInvalid,
             DriversLicenseNumberIsValid,
-            DriversLicenseNumberVerified
         ])
     ]
     #[test_case(
@@ -469,7 +457,6 @@ mod tests {
                   "DOB": false,
                   "DOBMatchLevel": "4",
                   "Email": false,
-                  "DL": false
                 }
               }
             }
@@ -581,7 +568,6 @@ mod tests {
                   "DOB": false,
                   "DOBMatchLevel": "0",
                   "Email": false,
-                  "DL": true
                 }
               }
             }
