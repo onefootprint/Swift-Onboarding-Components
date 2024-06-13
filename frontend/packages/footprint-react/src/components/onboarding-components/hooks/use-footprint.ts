@@ -118,7 +118,7 @@ export const useFootprint = () => {
     }
     lockBody();
     context.fpInstance.relayFromComponents?.();
-    setContext(prev => ({ ...prev, test: '1', handoffCallbacks: { onComplete, onError, onCancel, onClose } }));
+    setContext(prev => ({ ...prev, handoffCallbacks: { onComplete, onError, onCancel, onClose } }));
   };
 
   return { context, busy, handoff, launchIdentify, save };
