@@ -3,7 +3,7 @@ import type { OnboardingRequirement, PublicOnboardingConfig, SignupChallengeResp
 import type { Dispatch, SetStateAction } from 'react';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import type { Appearance, Di } from '../../../@types';
+import type { Appearance } from '../../../@types';
 import getOnboardingConfigReq from '../queries/get-onboarding-config';
 
 export type ContextData = {
