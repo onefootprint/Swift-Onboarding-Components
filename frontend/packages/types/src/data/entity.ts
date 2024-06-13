@@ -54,6 +54,7 @@ export type Entity = {
   lastActivityAt: string;
   requiresManualReview: boolean;
   sandboxId?: string;
+  externalId?: string;
   startTimestamp: string;
   status: EntityStatus;
   watchlistCheck: WatchlistCheckEventData | null;

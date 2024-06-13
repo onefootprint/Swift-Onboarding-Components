@@ -38,15 +38,17 @@ const Header = ({ entity }: HeaderProps) => {
       </Stack>
       <Stack align="center" flexWrap="wrap" justify="space-between" gap={3} width="100%" minHeight={theme.spacing[8]}>
         <Stack align="center" justify="center" gap={3}>
-          <CodeInline truncate isPrivate>
-            {entity.id}
-          </CodeInline>
+          <CodeInline truncate>{entity.id}</CodeInline>
           {user?.isFirmEmployee && entity.sandboxId && (
             <>
               <span>·</span>
-              <CodeInline truncate isPrivate>
-                {entity.sandboxId}
-              </CodeInline>
+              <CodeInline truncate>{entity.sandboxId}</CodeInline>
+            </>
+          )}
+          {user?.isFirmEmployee && entity.externalId && (
+            <>
+              <span>·</span>
+              <CodeInline truncate>{entity.externalId}</CodeInline>
             </>
           )}
         </Stack>
