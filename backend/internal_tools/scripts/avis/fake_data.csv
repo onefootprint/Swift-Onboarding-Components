@@ -1,0 +1,11 @@
+external_id,email,phone,first_name,last_name,dob,address_line1,city,state,zip,country,drivers_license_number
+550e8400-e29b-41d4-a716-446655440000,johndoe@example.com,+11234567890,John,Doe,1990-01-01,123 Elm St,Springfield,IL,62704,US,D1234567
+e29b41d4-a716-550e-8400-446655440000,janedoe@example.com,+12345678901,Jane,Doe,1985-02-02,456 Oak St,Springfield,IL,62704,US,D2345678
+a7164466-5544-550e-8400-41d4e29b0000,robertsmith@example.com,+13456789012,Robert,Smith,1978-03-03,789 Pine St,Chicago,IL,60605,US,D3456789
+44665544-0000-550e-8400-e29b41d4a716,lindajones@example.com,+14567890123,Linda,Jones,1965-04-04,101 Maple St,Chicago,IL,60605,US,D4567890
+41d4a716-550e-8400-e29b-446655440000,michaelbrown@example.com,+15678901234,Michael,Brown,1992-05-05,202 Birch St,Peoria,IL,61602,US,D5678901
+550e4466-0000-41d4-a716-e29b55448400,sarahmiller@example.com,+16789012345,Sarah,Miller,1980-06-06,303 Cedar St,Peoria,IL,61602,US,D6789012
+e29b41d4-8400-550e-5544-4466a7160000,davidwilson@example.com,+17890123456,David,Wilson,1975-07-07,404 Spruce St,Aurora,IL,60504,US,D7890123
+5544e29b-41d4-8400-a716-550044665000,emilydavis@example.com,+18901234567,Emily,Davis,1988-08-08,505 Walnut St,Aurora,IL,60504,US,D8901234
+a7165500-4466-e29b-41d4-000084004554,chrisgarcia@example.com,+19012345678,Chris,Garcia,1995-09-09,606 Chestnut St,Rockford,IL,61101,US,D9012345
+446641d4-8400-5544-550e-0000e29ba716,amandahernandez@example.com,+10123456789,Amanda,Hernandez,1983-10-10,707 Willow St,Rockford,IL,61101,US,D0123456
