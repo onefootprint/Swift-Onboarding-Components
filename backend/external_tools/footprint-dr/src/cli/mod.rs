@@ -11,6 +11,8 @@ use clap::{
 };
 use log::debug;
 use reqwest::Url;
+use std::io;
+use std::io::Write;
 use std::path::PathBuf;
 
 mod api_client;
@@ -196,6 +198,27 @@ pub fn run() -> Result<()> {
         }
         _ => {
             unimplemented!()
+        }
+    }
+}
+
+pub(crate) fn get_input(prompt: &str) -> Result<String> {
+    print!("{}", prompt);
+    io::stdout().flush()?;
+
+    let mut answer = String::new();
+    io::stdin().read_line(&mut answer)?;
+    Ok(answer.trim().to_string())
+}
+
+pub(crate) fn confirm(prompt: &str) -> Result<bool> {
+    let answer = get_input(prompt)?;
+    match answer.to_lowercase().as_str() {
+        "y" | "yes" => Ok(true),
+        "n" | "no" => Ok(false),
+        _ => {
+            println!("Please choose \"y\" (yes) or \"n\" (no).");
+            confirm(prompt)
         }
     }
 }

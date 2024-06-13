@@ -1,22 +1,12 @@
 use super::api_client::IsLive;
 use crate::cli::api_client::get_cli_client;
-use anyhow::{
-    bail,
-    Result,
-};
+use anyhow::Result;
 use reqwest::Url;
 
 pub fn status_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     let client = get_cli_client(&api_root, is_live)?;
 
     let status = client.get_status()?;
-
-    if IsLive::from(status.is_live) != is_live {
-        bail!(
-            "Keyring has been corrupted. Run `footprint login --{}` to log in again.",
-            is_live.to_string().to_lowercase()
-        );
-    }
 
     println!(
         "Logged in to {} ({})",

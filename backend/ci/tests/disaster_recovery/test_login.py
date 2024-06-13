@@ -5,7 +5,7 @@ from tests.disaster_recovery.utils import footprint_dr, login_sandbox, login_liv
 # Keep in mind that tests are run in parallel, so we must have the same login
 # configuration for all footprint-dr tests.
 def test_footprint_dr_login(sandbox_tenant, tenant):
-    # Login requires --sandbox or --live.
+    # login requires --sandbox or --live.
     with footprint_dr("login") as cmd:
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 2

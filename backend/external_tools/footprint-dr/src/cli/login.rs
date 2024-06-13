@@ -3,6 +3,7 @@ use super::api_client::{
     IsLive,
     VaultDrApiClient,
 };
+use super::confirm;
 use anyhow::{
     anyhow,
     bail,
@@ -11,7 +12,6 @@ use anyhow::{
 };
 use log::debug;
 use reqwest::Url;
-use std::io;
 use std::io::Write;
 use termcolor::{
     Color,
@@ -61,15 +61,11 @@ pub fn login_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
             )?;
             stdout.reset()?;
 
-            print!("Continue logging in to {} ({})? [y/N] ", status.org_name, is_live);
-            io::stdout().flush()?;
-
-            let mut answer = String::new();
-            io::stdin().read_line(&mut answer)?;
-
-            match answer.trim().to_lowercase().as_str() {
-                "y" | "yes" => {}
-                _ => bail!("Login aborted."),
+            if !confirm(&format!(
+                "Continue logging in to {} ({})? [y/n] ",
+                status.org_name, is_live
+            ))? {
+                bail!("Login aborted.");
             }
         }
     }

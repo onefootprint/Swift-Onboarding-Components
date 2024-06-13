@@ -4,6 +4,7 @@ use super::wire_types::{
 };
 use anyhow::{
     anyhow,
+    bail,
     Context,
     Ok,
     Result,
@@ -62,6 +63,12 @@ impl Display for IsLive {
             IsLive::Sandbox => write!(f, "Sandbox"),
             IsLive::Live => write!(f, "Live"),
         }
+    }
+}
+
+impl IsLive {
+    pub(crate) fn fmt_flag(&self) -> String {
+        format!("--{}", self.to_string().to_lowercase())
     }
 }
 
@@ -126,7 +133,18 @@ impl VaultDrApiClient {
             .get_password()
             .with_context(|| "Failed to retrieve API key from keyring")?;
 
-        Self::new(api_root.clone(), is_live, ApiKey::new(secret_key))
+        let client = Self::new(api_root.clone(), is_live, ApiKey::new(secret_key))?;
+
+        // Check that the credentials in the keyring are valid.
+        let status = client.get_status()?;
+        if IsLive::from(status.is_live) != is_live {
+            bail!(
+                "Keyring has been corrupted. Run `footprint login {}` to log in again.",
+                is_live.fmt_flag()
+            );
+        }
+
+        Ok(client)
     }
 
     pub(crate) fn save_to_keyring(&self) -> Result<()> {
@@ -141,11 +159,13 @@ impl VaultDrApiClient {
     }
 
     pub(crate) fn get_status(&self) -> Result<VaultDrStatus> {
-        Ok(self
+        let resp: VaultDrStatus = self
             .request(Method::GET, "org/vault_dr/status")?
             .send()?
             .error_for_status()?
-            .json()?)
+            .json()?;
+
+        Ok(resp)
     }
 
     pub(crate) fn aws_pre_enroll(&self) -> Result<VaultDrAwsPreEnrollResponse> {
@@ -162,8 +182,8 @@ pub(crate) fn get_cli_client(api_root: &Url, is_live: IsLive) -> Result<VaultDrA
         debug!("{:?}, ", err);
 
         anyhow!(
-            "Not logged in. Run `footprint login --{}` to log in.",
-            is_live.to_string().to_lowercase()
+            "Not logged in. Run `footprint login {}` to log in.",
+            is_live.fmt_flag()
         )
     })?;
 
