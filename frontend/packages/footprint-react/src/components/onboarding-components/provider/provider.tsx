@@ -41,17 +41,10 @@ const Context = createContext<[ContextData, UpdateContext]>([
 ]);
 
 // These are the props users can set on the provider
-export type ProviderProps = {
-  appearance?: Appearance;
-  authToken?: string;
-  children: React.ReactNode;
-  onCancel?: () => void;
-  onClose?: () => void;
-  onComplete?: (validationToken: string) => void;
-  onError?: (error: unknown) => void;
-  publicKey: string;
-  sandboxId?: string;
-};
+export type ProviderProps = Pick<
+  ContextData,
+  'appearance' | 'authToken' | 'onCancel' | 'onClose' | 'onComplete' | 'onError' | 'publicKey' | 'sandboxId'
+> & { children: React.ReactNode };
 
 const Provider = ({
   appearance,
