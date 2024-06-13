@@ -1521,6 +1521,40 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    vault_dr_aws_pre_enrollment (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_id -> Text,
+        is_live -> Bool,
+        aws_external_id -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    vault_dr_config (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        tenant_id -> Text,
+        is_live -> Bool,
+        aws_pre_enrollment_id -> Text,
+        aws_account_id -> Text,
+        aws_role_name -> Text,
+        s3_bucket_name -> Text,
+        org_public_key -> Text,
+        recovery_public_key -> Text,
+        wrapped_recovery_key -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     verification_request (id) {
         id -> Text,
         vendor -> Text,
@@ -1840,6 +1874,9 @@ diesel::joinable!(user_consent -> workflow (workflow_id));
 diesel::joinable!(user_timeline -> scoped_vault (scoped_vault_id));
 diesel::joinable!(user_timeline -> vault (vault_id));
 diesel::joinable!(vault_data -> data_lifetime (lifetime_id));
+diesel::joinable!(vault_dr_aws_pre_enrollment -> tenant (tenant_id));
+diesel::joinable!(vault_dr_config -> tenant (tenant_id));
+diesel::joinable!(vault_dr_config -> vault_dr_aws_pre_enrollment (aws_pre_enrollment_id));
 diesel::joinable!(verification_request -> decision_intent (decision_intent_id));
 diesel::joinable!(verification_request -> identity_document (identity_document_id));
 diesel::joinable!(verification_request -> scoped_vault (scoped_vault_id));
@@ -1946,6 +1983,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     user_timeline,
     vault,
     vault_data,
+    vault_dr_aws_pre_enrollment,
+    vault_dr_config,
     verification_request,
     verification_result,
     watchlist_check,
