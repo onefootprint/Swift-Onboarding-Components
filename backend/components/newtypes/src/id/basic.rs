@@ -371,3 +371,8 @@ define_newtype_id!(
     String,
     "Identifier for a Samba junction table row"
 );
+define_newtype_id!(
+    VaultDrAwsPreEnrollmentId,
+    String,
+    "Identifier for a Vault Disaster Recovery AWS Pre-Enrollment"
+);

@@ -15,3 +15,20 @@ def footprint_dr(*args):
             "FOOTPRINT_API_ROOT": os.environ["TEST_URL"],
         },
     )
+
+
+def login_sandbox(tenant):
+    with footprint_dr("login", "--sandbox") as cmd:
+        cmd.expect("Enter Footprint Sandbox API key:")
+        cmd.sendline(tenant.s_sk.value)
+        cmd.expect(pexpect.EOF)
+
+    assert cmd.exitstatus == 0
+
+
+def login_live(tenant):
+    with footprint_dr("login", "--live") as cmd:
+        cmd.expect("Enter Footprint Live API key:")
+        cmd.sendline(tenant.l_sk.value)
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0

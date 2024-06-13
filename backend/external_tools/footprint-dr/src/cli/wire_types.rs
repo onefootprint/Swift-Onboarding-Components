@@ -6,3 +6,8 @@ pub struct VaultDrStatus {
     pub org_name: String,
     pub is_live: bool,
 }
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct VaultDrAwsPreEnrollResponse {
+    pub external_id: String,
+}

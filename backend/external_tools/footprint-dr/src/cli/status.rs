@@ -1,24 +1,13 @@
-use super::api_client::{
-    IsLive,
-    VaultDrApiClient,
-};
+use super::api_client::IsLive;
+use crate::cli::api_client::get_cli_client;
 use anyhow::{
-    anyhow,
     bail,
     Result,
 };
-use log::debug;
 use reqwest::Url;
 
 pub fn status_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
-    let client = VaultDrApiClient::try_from_keyring(&api_root, is_live).map_err(|err| {
-        debug!("{:?}, ", err);
-
-        anyhow!(
-            "Not logged in. Run `footprint login --{}` to log in.",
-            is_live.to_string().to_lowercase()
-        )
-    })?;
+    let client = get_cli_client(&api_root, is_live)?;
 
     let status = client.get_status()?;
 

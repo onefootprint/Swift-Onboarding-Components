@@ -75,6 +75,7 @@ pub mod user_consent;
 pub mod user_timeline;
 pub mod vault;
 pub mod vault_data;
+pub mod vault_dr;
 pub mod verification_request;
 pub mod verification_result;
 pub mod watchlist_check;

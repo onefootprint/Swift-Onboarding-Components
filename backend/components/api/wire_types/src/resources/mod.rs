@@ -157,7 +157,7 @@ pub use user_insight::*;
 mod user_ai_summary;
 pub use user_ai_summary::*;
 
-pub mod vault_dr;
+mod vault_dr;
 pub use self::vault_dr::*;
 
 mod onboarding;

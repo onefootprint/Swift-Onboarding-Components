@@ -1,10 +1,15 @@
-use super::wire_types::VaultDrStatus;
+use super::wire_types::{
+    VaultDrAwsPreEnrollResponse,
+    VaultDrStatus,
+};
 use anyhow::{
+    anyhow,
     Context,
     Ok,
     Result,
 };
 use keyring::Entry;
+use log::debug;
 use reqwest::blocking::{
     Client,
     RequestBuilder,
@@ -142,4 +147,25 @@ impl VaultDrApiClient {
             .error_for_status()?
             .json()?)
     }
+
+    pub(crate) fn aws_pre_enroll(&self) -> Result<VaultDrAwsPreEnrollResponse> {
+        Ok(self
+            .request(Method::POST, "org/vault_dr/aws_pre_enroll")?
+            .send()?
+            .error_for_status()?
+            .json()?)
+    }
+}
+
+pub(crate) fn get_cli_client(api_root: &Url, is_live: IsLive) -> Result<VaultDrApiClient> {
+    let client = VaultDrApiClient::try_from_keyring(api_root, is_live).map_err(|err| {
+        debug!("{:?}, ", err);
+
+        anyhow!(
+            "Not logged in. Run `footprint login --{}` to log in.",
+            is_live.to_string().to_lowercase()
+        )
+    })?;
+
+    Ok(client)
 }

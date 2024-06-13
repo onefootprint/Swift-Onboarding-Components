@@ -14,10 +14,10 @@ use reqwest::Url;
 use std::path::PathBuf;
 
 mod api_client;
+mod get_external_id;
 mod login;
 mod status;
 mod wire_types;
-
 
 const SANDBOX_GROUP: &str = "sandbox or live";
 const VAULT_SELECTOR_GROUP: &str = "vault selector";
@@ -70,7 +70,10 @@ enum Subcommand {
         sandbox: SandboxFlags,
     },
     /// Fetch the external ID used for cross-account IAM setup
-    GetExternalId,
+    GetExternalId {
+        #[clap(flatten)]
+        sandbox: SandboxFlags,
+    },
     /// Enroll the authenticated Footprint organization in Vault Disaster Recovery
     Enroll {
         #[clap(flatten)]
@@ -188,6 +191,9 @@ pub fn run() -> Result<()> {
     match subcommand {
         Subcommand::Login { sandbox } => login::login_cmd(api_root, sandbox.live.into()),
         Subcommand::Status { sandbox } => status::status_cmd(api_root, sandbox.live.into()),
+        Subcommand::GetExternalId { sandbox } => {
+            get_external_id::get_external_id_cmd(api_root, sandbox.live.into())
+        }
         _ => {
             unimplemented!()
         }

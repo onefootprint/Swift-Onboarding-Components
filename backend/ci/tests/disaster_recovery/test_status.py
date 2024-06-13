@@ -7,4 +7,3 @@ def test_footprint_dr_status():
     with footprint_dr("status") as cmd:
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 2
-

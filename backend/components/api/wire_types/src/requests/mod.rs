@@ -102,3 +102,6 @@ pub use self::roles::*;
 
 pub mod seqno;
 pub use self::seqno::*;
+
+pub mod vault_dr;
+pub use self::vault_dr::*;
