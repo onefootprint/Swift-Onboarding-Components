@@ -32,13 +32,13 @@ use strum::{
 pub enum WebhookEvent {
     #[strum_discriminants(strum(serialize = "footprint.onboarding.completed"))]
     #[strum_discriminants(strum(
-        message = "The user has completed onboarding onto a playbook and we have a terminal status. In most cases, this will fire as the user finishes the onboarding flow. In some cases (like KYB), the terminal verification status may not come until a few minutes after the user has exited the onboarding flow. You should always retrieve the fp_id after onboarding and attempt to fetch the status. If the status after onboarding is non-terminal, you will receive an update with the terminal status via this webhook."
+        message = "The user has completed onboarding onto a playbook and we have a terminal status.\n\nIn most cases, this will fire as the user finishes the onboarding flow. In some cases (like KYB), the terminal verification status may not come until a few minutes after the user has exited the onboarding flow. You should always retrieve the fp_id after onboarding and attempt to fetch the status. If the status after onboarding is non-terminal, you will receive an update with the terminal status via this webhook."
     ))]
     OnboardingCompleted(OnboardingCompletedPayload),
 
     #[strum_discriminants(strum(serialize = "footprint.onboarding.status_changed"))]
     #[strum_discriminants(strum(
-        message = "NOTE: This webhook is being phased out in favor of the more descriptive footprint.onboarding.completed and footprint.user.manual_review events. A user's status has been changed after finishing onboarding, manual review, or internal updates to the user's status. Generally, the pending and incomplete statuses aren't important to listen to here."
+        message = "NOTE: This webhook is being phased out in favor of the more descriptive footprint.onboarding.completed and footprint.user.manual_review events.\n\nA user's status has been changed after finishing onboarding, manual review, or internal updates to the user's status. Generally, the pending and incomplete statuses aren't important to listen to here."
     ))]
     OnboardingStatusChanged(OnboardingStatusChangedPayload),
 
