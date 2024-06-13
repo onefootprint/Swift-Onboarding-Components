@@ -48,6 +48,7 @@ impl SocureRequest {
             phone_number,
             verification_request_id: _,
             drivers_license_number: _,
+            drivers_license_state: _,
         } = idv_data;
 
         // TODO: this zip code validation logic already existed- unsure if its entirely necessary:

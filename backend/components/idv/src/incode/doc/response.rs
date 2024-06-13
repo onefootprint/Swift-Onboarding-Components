@@ -607,6 +607,17 @@ impl FetchOCRResponse {
             .map(|is| ScrubbedPiiString::from(Self::normalize_issuing_state(is.leak_to_string())))
     }
 
+    pub fn issuing_state_us_2_char(&self) -> Option<UsState> {
+        self.issuing_state.as_ref().and_then(|raw_state| {
+            let from_2_char = UsState::from_raw_string(raw_state.leak()).ok();
+            let from_full: Option<UsState> = UsStateFull::from_raw_string(raw_state.leak())
+                .ok()
+                .map(|s| s.into());
+
+            from_2_char.or(from_full)
+        })
+    }
+
     pub fn normalized_class(&self) -> Option<PiiString> {
         self.classes
             .clone()

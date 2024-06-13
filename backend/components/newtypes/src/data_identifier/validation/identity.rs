@@ -70,6 +70,10 @@ impl CleanAndValidate for IDK {
             IDK::VisaKind => utils::parse_enum::<VisaKind>(value.as_string()?)?,
             IDK::VisaExpirationDate => clean_and_validate_date(value.as_string()?)?,
             IDK::DriversLicenseNumber => value.as_string()?,
+            // unclear if there are validations we can have here - not sure issuing state in the US will
+            // always be a 2 char state, so leave unvalidated and in code that needs a specific
+            // format we can check
+            IDK::DriversLicenseState => value.as_string()?,
             IDK::Citizenships => {
                 utils::parse_json_and_validate::<Vec<Iso3166TwoDigitCountryCode>, _>(value, |v| {
                     if v.is_empty() {

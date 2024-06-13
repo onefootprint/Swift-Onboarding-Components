@@ -388,6 +388,7 @@ impl LexisRequest {
         tbi: TenantBusinessInfo,
     ) -> Result<Self, ConversionError> {
         let state_and_country = idv_data.state_and_country_for_vendors();
+        let drivers_license_state = idv_data.normalized_2_char_drivers_license_state();
         let IdvData {
             first_name,
             middle_name,
@@ -405,6 +406,7 @@ impl LexisRequest {
             phone_number,
             verification_request_id,
             drivers_license_number,
+            drivers_license_state: _,
         } = idv_data;
 
         let dob = if let Some(dob) = dob {
@@ -437,17 +439,17 @@ impl LexisRequest {
         // Lexis requires sending DL issuing state as well when sending DL, for now we send user's state
         // since including DL only helps CVI
         // TODO: update this when we collect license issuing state (or update this for doc first OBC)
-        let state2 = state_and_country.state.clone();
-        let (include_dl_in_cvi, drivers_license_info) =
-            if let Some((dl_number, state)) = drivers_license_number.and_then(|dl| state2.map(|s| (dl, s))) {
-                let info = DriverInfo {
-                    license_number: dl_number,
-                    license_state: state,
-                };
-                (LBool::One, Some(info))
-            } else {
-                (LBool::Zero, None)
+        let (include_dl_in_cvi, drivers_license_info) = if let Some((dl_number, state)) =
+            drivers_license_number.and_then(|dl| drivers_license_state.map(|s| (dl, s.to_string().into())))
+        {
+            let info = DriverInfo {
+                license_number: dl_number,
+                license_state: state,
             };
+            (LBool::One, Some(info))
+        } else {
+            (LBool::Zero, None)
+        };
 
 
         Ok(Self {
@@ -603,7 +605,7 @@ mod tests {
             first_name: Some("Bob".into()),
             last_name: Some("Flexidierto".into()),
             drivers_license_number: Some("12345".into()),
-            state: Some("GA".into()),
+            drivers_license_state: Some("GA".into()),
             verification_request_id: Some(VerificationRequestId::from("vres_1234".to_string())), /* need this for query id randomness */
             ..Default::default()
         };
@@ -678,7 +680,7 @@ mod tests {
                 "SearchBy": {
                     "Address": {
                         "City": null,
-                        "State": "GA",
+                        "State": null,
                         "StreetAddress1": null,
                         "StreetAddress2": null,
                         "Zip5": null

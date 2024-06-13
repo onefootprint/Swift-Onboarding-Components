@@ -152,6 +152,7 @@ impl Contact {
             phone_number,
             verification_request_id: _,
             drivers_license_number: _,
+            drivers_license_state: _,
         } = d;
 
         let first_name = first_name

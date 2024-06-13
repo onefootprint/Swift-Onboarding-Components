@@ -36,6 +36,7 @@ pub enum IdentityDataKind {
     Citizenships,
 
     DriversLicenseNumber,
+    DriversLicenseState,
 }
 
 impl From<IdentityDataKind> for DataIdentifier {
@@ -78,6 +79,7 @@ impl IsDataIdentifierDiscriminant for IdentityDataKind {
             Self::VisaExpirationDate => Some(CollectedData::UsLegalStatus),
             Self::Citizenships => Some(CollectedData::UsLegalStatus),
             Self::DriversLicenseNumber => None,
+            Self::DriversLicenseState => None,
         }
     }
 }

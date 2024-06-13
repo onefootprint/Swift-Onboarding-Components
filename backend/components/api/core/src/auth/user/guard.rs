@@ -36,6 +36,7 @@ impl IsGuardMet<UserAuthScope> for CanDecrypt {
                 | IDK::Citizenships
                 | IDK::VisaKind
                 | IDK::VisaExpirationDate
+                | IDK::DriversLicenseState
                 | IDK::Nationality => {
                     // Either BasicProfile or SignUp give permissions to decrypt basic info
                     UserAuthScope::BasicProfile

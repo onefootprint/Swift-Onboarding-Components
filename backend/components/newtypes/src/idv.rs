@@ -4,6 +4,8 @@ use crate::{
     IdentityDataKind,
     Iso3166TwoDigitCountryCode,
     PiiString,
+    UsState,
+    UsStateFull,
     VerificationRequestId,
     DATE_FORMAT,
 };
@@ -32,6 +34,7 @@ pub struct IdvData {
     pub email: Option<PiiString>,
     pub phone_number: Option<PiiString>,
     pub drivers_license_number: Option<PiiString>,
+    pub drivers_license_state: Option<PiiString>,
     // this is convenient to have
     pub verification_request_id: Option<VerificationRequestId>,
 }
@@ -70,6 +73,7 @@ impl IdvData {
             IdentityDataKind::Email => self.email.as_ref(),
             IdentityDataKind::PhoneNumber => self.phone_number.as_ref(),
             IdentityDataKind::DriversLicenseNumber => self.drivers_license_number.as_ref(),
+            IdentityDataKind::DriversLicenseState => self.drivers_license_state.as_ref(),
             IdentityDataKind::Nationality
             | IdentityDataKind::UsLegalStatus
             | IdentityDataKind::VisaKind
@@ -113,6 +117,17 @@ impl IdvData {
                 country: self.country.clone(),
             }
         }
+    }
+
+    pub fn normalized_2_char_drivers_license_state(&self) -> Option<UsState> {
+        self.drivers_license_state.as_ref().and_then(|raw_state| {
+            let from_2_char = UsState::from_raw_string(raw_state.leak()).ok();
+            let from_full: Option<UsState> = UsStateFull::from_raw_string(raw_state.leak())
+                .ok()
+                .map(|s| s.into());
+
+            from_2_char.or(from_full)
+        })
     }
 }
 

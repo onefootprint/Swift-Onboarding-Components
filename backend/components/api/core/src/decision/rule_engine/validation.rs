@@ -31,7 +31,10 @@ use std::collections::HashMap;
 fn di_supports_equality_rules(field: &DataIdentifier) -> bool {
     match field {
         DataIdentifier::Id(kind) => match kind {
-            IdentityDataKind::Country | IdentityDataKind::UsLegalStatus | IdentityDataKind::VisaKind => true,
+            IdentityDataKind::Country
+            | IdentityDataKind::UsLegalStatus
+            | IdentityDataKind::VisaKind
+            | IdentityDataKind::DriversLicenseState => true,
             IdentityDataKind::FirstName
             | IdentityDataKind::MiddleName
             | IdentityDataKind::LastName

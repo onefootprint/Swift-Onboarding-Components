@@ -178,12 +178,16 @@ fn doc_first_id_data(
     let address = r.checked_address_bean.as_ref().or(r.address_fields.as_ref());
     let zip5 = address.and_then(|a| a.normalized_zip5());
 
-    let drivers_license_number = if r.type_of_id == Some(newtypes::incode::IncodeDocumentType::DriversLicense)
-    {
-        r.document_number.as_ref()
-    } else {
-        None
-    };
+    let (drivers_license_number, drivers_license_state) =
+        if r.type_of_id == Some(newtypes::incode::IncodeDocumentType::DriversLicense) {
+            let state = r
+                .issuing_state_us_2_char()
+                .map(|s| s.to_string().into())
+                .or(r.normalized_issuing_state());
+            (r.document_number.as_ref(), state)
+        } else {
+            (None, None)
+        };
 
     let all_data = vec![
         (
@@ -205,6 +209,7 @@ fn doc_first_id_data(
         (IDK::Country, r.issuing_country_two_digit().as_ref()),
         (IDK::Dob, r.dob().ok().as_ref()),
         (IDK::DriversLicenseNumber, drivers_license_number),
+        (IDK::DriversLicenseState, drivers_license_state.as_ref()),
     ]
     .into_iter()
     .flat_map(|(k, v)| v.map(|v| (DataIdentifier::from(k), PiiString::from(v.clone()))))
