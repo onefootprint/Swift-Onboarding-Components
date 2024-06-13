@@ -76,16 +76,12 @@ const Provider = ({
     publicKey,
     sandboxId,
     signupChallenge: null,
-<<<<<<< HEAD
-=======
-    userData,
     handoffCallbacks: {
       onCancel: undefined,
       onComplete: undefined,
       onError: undefined,
       onClose: undefined,
     },
->>>>>>> 49fed5519a (OC: Enable to overwrite callbacks using handoff)
   });
   const value = useMemo<[ContextData, UpdateContext]>(() => [context, setContext], [context]);
 
