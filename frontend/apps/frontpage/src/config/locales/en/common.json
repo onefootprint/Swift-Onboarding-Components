@@ -244,11 +244,11 @@
   },
   "pages": {
     "home": {
-      "html-title": "Footprint: The single onboarding tool your company needs",
-      "description": "Unify onboarding, identity verification, and data security",
+      "html-title": "Footprint: Onboard users in a unified platform",
+      "description": "Verify your customers while blocking fraud, ensuring compliance, and driving revenue.",
       "hero": {
-        "title": "The single onboarding tool your company needs",
-        "subtitle": "Drive revenue, block fraud, ensure security and compliance.",
+        "title": "Onboard users in a unified platform",
+        "subtitle": "Verify your customers while blocking fraud, ensuring compliance, and driving revenue.",
         "get-started": "Get started",
         "book-a-call": "Book a call"
       },
