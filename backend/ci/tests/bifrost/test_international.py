@@ -6,7 +6,7 @@ def test_international_address_req(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant,
         "International config",
-        must_collect_data + ["document"],
+        must_collect_data,
         must_collect_data,
         allow_international_residents=True,
     )
@@ -35,6 +35,49 @@ def test_international_address_req(sandbox_tenant, must_collect_data):
         "authorize", status["all_requirements"], is_met=True
     )["fields_to_authorize"]["collected_data"]
     assert "ssn9" not in fields_to_authorize
+
+
+def test_user_without_documents_international(
+    sandbox_tenant, must_collect_data, can_access_data
+):
+    obc = create_ob_config(
+        sandbox_tenant,
+        "International config",
+        must_collect_data,
+        can_access_data,
+        allow_international_residents=True,
+    )
+    bifrost = BifrostClient.new_user(obc)
+    status = bifrost.get_status()
+    doc_requirement_before = get_requirement_from_requirements(
+        "collect_document", status["all_requirements"]
+    )
+    assert doc_requirement_before is None
+
+    # simulate collecting international address
+    bifrost.data["id.country"] = "MX"
+    bifrost.handle_requirements(kind="collect_data")
+    bifrost.handle_requirements(kind="liveness")
+
+    status = bifrost.get_status()
+    doc_requirement_after = get_requirement_from_requirements(
+        "collect_document", status["all_requirements"]
+    )
+
+    # now we have to collect a document since they are non-US
+    country_doc_mapping = doc_requirement_after["config"][
+        "supported_country_and_doc_types"
+    ]
+    n_countries = 0
+    for country, doc_types in country_doc_mapping.items():
+        # all non-US have only passport
+        if country != "US":
+            assert doc_types == ["passport"]
+
+        n_countries += 1
+
+    # we have all iso3166 countries allowed
+    assert n_countries == 249
 
 
 def test_with_documents_handles_international_address(
@@ -164,7 +207,6 @@ def test_us_legal_status(sandbox_tenant):
             "full_address",
             "name",
             "phone_number",
-            "document",
             "email",
             "us_legal_status",
         ],
@@ -196,7 +238,6 @@ def test_us_legal_status(sandbox_tenant):
     bifrost.data.pop("id.us_legal_status")
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
-    bifrost.handle_requirements(kind="document")
 
     status = bifrost.get_status()
     collect_data_requirement_after_address = get_requirement_from_requirements(

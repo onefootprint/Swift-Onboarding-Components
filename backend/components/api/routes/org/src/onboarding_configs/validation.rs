@@ -20,7 +20,6 @@ use newtypes::{
     CollectedDataOptionKind as CDOK,
     DataIdentifierDiscriminant as DID,
     DocumentRequestConfig,
-    DocumentRequestKind,
     EnhancedAmlOption,
     ObConfigurationKind,
     TenantId,
@@ -98,10 +97,10 @@ impl ObConfigurationArgsToValidate {
             }
         }
 
-        let is_collecting_identity_doc = self.collects_document(Some(DocumentRequestKind::Identity));
+        let is_collecting_doc = self.collects_document();
 
         if self.is_doc_first {
-            if !is_collecting_identity_doc {
+            if !is_collecting_doc {
                 return Err(TenantError::ValidationError(
                     "Must collect document if is_doc_first is true".to_owned(),
                 )
@@ -119,9 +118,27 @@ impl ObConfigurationArgsToValidate {
             }
         }
 
-        self.validate_international()?;
-        self.validate_skip_kyc()?;
+        if self.curp_validation_enabled && !is_collecting_doc {
+            return Err(TenantError::ValidationError(
+                "Must collect document if `curp_validation_enabled=true".to_owned(),
+            )
+            .into());
+        }
+
+        if self.skip_kyc
+            && !self.allow_international_residents
+            && !is_collecting_doc
+            && self.kind != ObConfigurationKind::Kyb
+        {
+            return Err(TenantError::ValidationError(
+                "Can only skip_kyc if allow_international_residents or Document is collected or kind is Kyb"
+                    .to_owned(),
+            )
+            .into());
+        }
+
         self.validate_documents()?;
+
         self.validate_countries()?;
 
         // Optional ssn
@@ -129,7 +146,7 @@ impl ObConfigurationArgsToValidate {
             .iter()
             .any(|ssn_cdo| optional_data.contains(ssn_cdo))
         {
-            if is_collecting_identity_doc && self.doc_scan_for_optional_ssn.is_some() {
+            if is_collecting_doc && self.doc_scan_for_optional_ssn.is_some() {
                 return Err(TenantError::ValidationError(
                     "Cannot specify doc_scan_for_optional_ssn if already collecting a document".to_owned(),
                 )
@@ -217,29 +234,16 @@ impl ObConfigurationArgsToValidate {
         Ok(())
     }
 
-    fn collects_document(&self, doc_kind_filter: Option<DocumentRequestKind>) -> bool {
+    fn collects_document(&self) -> bool {
         // WIP while we are migrating to documents_to_collect
         let has_document_cdo = self
             .must_collect_data
             .iter()
             .any(|d| CDOK::from(d) == CDOK::Document);
-        let has_other_document = !self
-            .documents_to_collect
-            .clone()
-            .into_iter()
-            .filter(|d| {
-                if let Some(doc_kind) = doc_kind_filter {
-                    DocumentRequestKind::from(d) == doc_kind
-                } else {
-                    true
-                }
-            })
-            .collect_vec()
-            .is_empty();
+        let has_other_document = !self.documents_to_collect.is_empty();
         has_document_cdo || has_other_document
     }
 
-    // Only validates custom docs until we move identity docs to `documents_to_collect`
     fn validate_documents(&self) -> ApiResult<()> {
         if self
             .documents_to_collect
@@ -253,51 +257,6 @@ impl ObConfigurationArgsToValidate {
         }
 
         DocumentRequestConfig::validate(&self.documents_to_collect)?;
-
-        Ok(())
-    }
-
-    fn validate_skip_kyc(&self) -> ApiResult<()> {
-        // 3 case:
-        // * collecting identity document && (KYC or Doc pb)
-        // * collecting any document && doc pb
-        // * kyb
-        let id_doc_and_kyc_or_doc_pb = self.collects_document(Some(DocumentRequestKind::Identity))
-            && matches!(
-                self.kind,
-                ObConfigurationKind::Kyc | ObConfigurationKind::Document
-            );
-        let is_kyb_pb = matches!(self.kind, ObConfigurationKind::Kyb);
-        let any_doc_and_doc_pb =
-            self.collects_document(None) && matches!(self.kind, ObConfigurationKind::Document);
-        if self.skip_kyc && !(id_doc_and_kyc_or_doc_pb || is_kyb_pb || any_doc_and_doc_pb) {
-            return Err(TenantError::ValidationError(
-                "Can only skip_kyc if Document is collected or kind is Kyb".to_owned(),
-            )
-            .into());
-        };
-
-        Ok(())
-    }
-
-    fn validate_international(&self) -> ApiResult<()> {
-        let is_collecting_identity_doc = self.collects_document(Some(DocumentRequestKind::Identity));
-        if self.allow_international_residents
-            && !is_collecting_identity_doc
-            && self.kind == ObConfigurationKind::Kyc
-        {
-            return Err(TenantError::ValidationError(
-                "Can only set allow_international_residents if collecting an Identity Document".to_owned(),
-            )
-            .into());
-        }
-
-        if self.curp_validation_enabled && !is_collecting_identity_doc {
-            return Err(TenantError::ValidationError(
-                "Must collect document if `curp_validation_enabled=true".to_owned(),
-            )
-            .into());
-        }
 
         Ok(())
     }
@@ -329,7 +288,7 @@ impl ObConfigurationArgsToValidate {
             .into());
         }
 
-        if self.kind == ObConfigurationKind::Document && !self.collects_document(None) {
+        if self.kind == ObConfigurationKind::Document && !self.collects_document() {
             return ValidationError("Playbook of kind document must collect document").into();
         }
 
@@ -460,7 +419,7 @@ impl ObConfigurationArgsToValidate {
         };
 
         // Document
-        if self.collects_document(None) {
+        if self.collects_document() {
             return Err(TenantError::ValidationError(
                 "Cannot collect document for Alpaca playbook".to_owned(),
             ));

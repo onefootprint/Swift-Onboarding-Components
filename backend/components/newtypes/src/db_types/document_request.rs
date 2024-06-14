@@ -58,12 +58,6 @@ pub enum DocumentRequestConfig {
     Custom(CustomDocumentConfig),
 }
 
-impl DocumentRequestConfig {
-    pub fn is_identity(&self) -> bool {
-        matches!(self, DocumentRequestConfig::Identity { .. })
-    }
-}
-
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Apiv2Schema, macros::SerdeAttr)]
 #[serde(rename_all = "snake_case")]
 pub struct CustomDocumentConfig {
