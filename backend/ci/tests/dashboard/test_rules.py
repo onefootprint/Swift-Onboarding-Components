@@ -225,7 +225,7 @@ def test_vault_data_rules(sandbox_tenant, must_collect_data, can_access_data):
     obc = create_ob_config(
         sandbox_tenant,
         "Test Vault Data Rules",
-        must_collect_data,
+        must_collect_data + ["document"],
         can_access_data,
         # These are the necessary arguments to skip KYC so the status is only
         # dependent on rules evaluation.

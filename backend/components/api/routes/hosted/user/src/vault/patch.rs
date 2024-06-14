@@ -156,19 +156,7 @@ pub async fn patch(
         let obc = user_auth.ob_config();
         let wf = user_auth.workflow();
         let sv_id = &user_auth.scoped_user.id;
-        if obc.allow_international_residents
-            && obc.document_cdo().is_none()
-            && !address.is_us_including_territories()
-        {
-            tracing::info!(scoped_vault_id=%sv_id, wf_id=%wf.id, "creating doc request for international onboarding");
-
-            let args = default_identity_doc_args(sv_id, true, &wf.id);
-            // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
-            state
-                .db_pool
-                .db_transaction(move |conn| DocumentRequest::get_or_create(conn, args))
-                .await?;
-        } else if address.is_us_including_territories() {
+        if address.is_us_including_territories() {
             handle_ssn_skipped(&state, obc.clone(), sv_id.clone(), wf.id.clone()).await?
         }
     }

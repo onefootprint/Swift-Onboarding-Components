@@ -201,6 +201,7 @@ def test_config_create(sandbox_tenant):
                 must_collect_data=[
                     "name",
                     "full_address",
+                    "document_and_selfie",
                     "email",
                     "phone_number",
                     "dob",
@@ -217,6 +218,7 @@ def test_config_create(sandbox_tenant):
                 must_collect_data=[
                     "name",
                     "full_address",
+                    "document_and_selfie",
                     "email",
                     "phone_number",
                     "dob",
@@ -290,11 +292,13 @@ def test_config_create(sandbox_tenant):
             ),
             "Validation error: Must set one of allow_us_residents or allow_international_residents to true",
         ),
+        # TODO: fix this, shouldn't allow US and non-US in a playbook
         (
             dict(
                 must_collect_data=[
                     "name",
                     "full_address",
+                    "document_and_selfie",
                     "email",
                     "phone_number",
                     "dob",
@@ -505,6 +509,43 @@ def test_config_create(sandbox_tenant):
         ),
         (
             dict(
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                skip_kyc=True,
+                allow_us_residents=False,
+                allow_international_residents=True,
+            ),
+            "Validation error: Can only set allow_international_residents if collecting an Identity Document",
+        ),
+        (
+            dict(
+                must_collect_data=[
+                    "name",
+                    "dob",
+                    "document",
+                    "full_address",
+                    "email",
+                    "phone_number",
+                ],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                skip_kyc=True,
+                allow_us_residents=False,
+                allow_international_residents=True,
+            ),
+            None,
+        ),
+        (
+            dict(
                 must_collect_data=["name", "full_address", "email", "phone_number"],
                 optional_data=[],
                 can_access_data=[],
@@ -598,7 +639,7 @@ def test_doc_only(sandbox_tenant):
 @pytest.mark.parametrize(
     "collect_data,allow_international_residents,expected_error",
     [
-        (["name", "full_address", "phone_number", "email"], True, None),
+        (["name", "full_address", "document", "phone_number", "email"], True, None),
         (
             [
                 "name",
@@ -613,7 +654,7 @@ def test_doc_only(sandbox_tenant):
         (
             ["name", "full_address", "phone_number", "email"],
             False,
-            "Validation error: Can only skip_kyc if allow_international_residents or Document is collected or kind is Kyb",
+            "Validation error: Can only skip_kyc if Document is collected or kind is Kyb",
         ),
     ],  # don't allow skip_kyc=true if US only and doc isn't being collected
 )
@@ -943,8 +984,16 @@ def test_copy_playbook(
     obc = create_ob_config(
         sandbox_tenant,
         "Test OB Config to copy",
-        ["name", "full_address", "email", "phone_number", "nationality"],
-        ["name", "full_address", "email", "phone_number", "nationality", "ssn4"],
+        ["name", "full_address", "document", "email", "phone_number", "nationality"],
+        [
+            "name",
+            "full_address",
+            "document",
+            "email",
+            "phone_number",
+            "nationality",
+            "ssn4",
+        ],
         optional_data=["ssn9"],
         is_doc_first_flow=True,
         skip_confirm=True,

@@ -145,7 +145,7 @@ fn test_is_doc_first(
     ObConfigurationArgsToValidate(args).validate_inner().is_ok()
 }
 
-#[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], true => true)]
+#[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], true => false)]
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], false => true)]
 #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], false => false)]
 fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool {
