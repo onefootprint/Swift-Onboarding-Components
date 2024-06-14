@@ -873,6 +873,10 @@ footprint_reason_code_enum! {
         DocumentQrCodeCheck,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document classification failed", severity = SignalSeverity::High,  description = "We could not automatically classify the document, and therefore it could not be fully authenticated."]
+        DocumentCouldNotClassify,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document visible photo features are verified", severity = SignalSeverity::Info,  description = "The visible photo features of the document were verified"]
         DocumentVisiblePhotoFeaturesVerified,
 

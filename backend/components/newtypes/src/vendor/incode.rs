@@ -149,7 +149,7 @@ incode_reason_code_enum! {
         #[footprint_reason_code = None]
         SharpnessBack,
         #[ser = "documentClassification"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(IncodeRCH::new_with_optional(None, Some(FRC::DocumentCouldNotClassify)))]
         DocumentClassification,
         // Verifies visible photo features
         #[ser = "visiblePhotoFeatures"]
