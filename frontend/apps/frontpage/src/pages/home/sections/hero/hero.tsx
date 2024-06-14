@@ -32,11 +32,11 @@ const Hero = () => {
           <TextContainer>
             <Stack direction="column" gap={5} align="center">
               <Title tag="h1">{t('hero.title')}</Title>
-              <Text tag="h2" variant="display-4" maxWidth="700px" textAlign="center">
+              <Subtitle tag="h2" textAlign="center">
                 {t('hero.subtitle')}
-              </Text>
+              </Subtitle>
             </Stack>
-            <Stack direction="row" gap={5}>
+            <Stack direction="row" gap={5} marginTop={3}>
               <Button variant="primary" size="large" onClick={() => window.open(signUpUrl, '_blank')}>
                 {t('hero.get-started')}
               </Button>
@@ -69,11 +69,17 @@ const Background = styled(Image)`
 const Title = styled(Box)`
   ${createFontStyles('display-2')}
   text-align: center;
-  max-width: 800px;
+  max-width: 580px;
 
   ${media.greaterThan('md')`
     ${createFontStyles('display-1')}
   `}
+`;
+
+const Subtitle = styled(Box)`
+  ${createFontStyles('display-4')}
+  text-align: center;
+  max-width: 520px;
 `;
 
 const Overflow = styled.div`
