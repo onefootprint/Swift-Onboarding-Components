@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useTimeout } from 'usehooks-ts';
 
-import { getLogger, uniqueLogger } from '../../../../utils/logger';
+import { getLogger } from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import {
   AUTOCAPTURE_RESTART_DELAY,
@@ -86,8 +86,6 @@ const CAMERA_LOADING_FEEDBACK_DELAY = 4000;
 const { logError, logInfo, logTrack, logWarn } = getLogger({
   location: 'camera',
 });
-
-const uniqLogTrack = uniqueLogger(logTrack);
 
 const videoElementStateListener =
   (
@@ -258,7 +256,7 @@ const Camera = ({
 
   useInterval(
     () => {
-      uniqLogTrack(
+      logInfo(
         `(interval) mediaStream state: ${
           mediaStream ? 1 : 0
         }, mediaStream active: ${mediaStream?.active ? 1 : 0}, onCanPlayTriggered: ${onCanPlayTriggered ? 1 : 0}, isVideoPlaying: ${isVideoPlaying ? 1 : 0}`,
@@ -272,7 +270,7 @@ const Camera = ({
         return;
       }
       if (videoRef.current.readyState < 2) {
-        logWarn('(interval) video not ready to play');
+        logWarn(`(interval) video not ready to play. readyState: ${videoRef.current.readyState}`);
         return;
       }
       videoRef.current

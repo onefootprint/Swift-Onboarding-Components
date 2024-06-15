@@ -34,6 +34,7 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
           id: device.deviceId,
           used: device.deviceId === deviceId,
         }));
+        logInfo(`Populated device ids: ${deviceIds.current.map(device => device.id).join(', ')}`);
       } catch (e) {
         logWarn('Error while populating device ids', e);
       }
@@ -45,6 +46,7 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
         const { deviceId } = stream.getVideoTracks()[0].getSettings();
         await populateDeviceIds(deviceId);
         setMediaStream(stream);
+        logInfo(`Initialized stream with deviceId: ${deviceId}`);
       } catch (err) {
         onCameraError(err);
         onError?.();
@@ -73,8 +75,10 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
       if (isUndefined(navigator)) return;
       try {
         if (deviceIds.current.length === 0) {
+          logInfo('use-user-media: no device ids found, populating device ids and initializing stream');
           await initStreamAndPopulateDeviceIds();
         } else {
+          logInfo(`use-user-media: device ids found, switching camera, switchCameraCount: ${switchCameraCount}`);
           await switchCamera();
         }
       } catch (err) {
@@ -85,11 +89,13 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
 
     const cleanup = () => {
       if (mediaStream) {
+        logInfo('use-user-media: cleaning up media stream, stopping all tracks');
         mediaStream.getTracks().forEach(track => track.stop());
       }
     };
 
     if (!mediaStream || !mediaStream.active) {
+      logInfo('use-user-media: media stream not active, enabling video stream');
       cleanup();
       enableVideoStream();
     }
@@ -98,6 +104,7 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
   }, [cameraKind, mediaStream, switchCameraCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const switchCamera = () => {
+    logInfo('use-user-media: switch camera called from autocapture hook');
     // If all cameras have been used, don't switch anymore
     if (deviceIds.current.length - 1 > switchCameraCount) setSwitchCameraCount(prevCount => prevCount + 1);
     else logWarn('All cameras have been used, cannot switch anymore');
