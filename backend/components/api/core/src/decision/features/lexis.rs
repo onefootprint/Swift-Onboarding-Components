@@ -86,6 +86,18 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool, phone_su
         vec![]
     };
 
+    let email_codes = res
+        .verified_element_summary()
+        .and_then(|ves| ves.email)
+        .map(|email_verified| {
+            if email_verified {
+                vec![FRC::EmailFoundOnFile]
+            } else {
+                vec![FRC::EmailNotFoundOnFile]
+            }
+        })
+        .unwrap_or_default();
+
     let mut misc_codes = vec![];
     // TODO: ask lexis what address_secondary_range_mismatch is and if we should use
 
@@ -121,6 +133,7 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool, phone_su
         .chain(valid_element_summary_codes)
         .chain(misc_codes)
         .chain(risk_indicator_codes)
+        .chain(email_codes)
         .unique()
         .collect()
 }
@@ -290,6 +303,7 @@ mod tests {
             AddressMatches,
             SsnMatches,
             DobMatches,
+            EmailFoundOnFile
         ])
     ]
     #[test_case(
@@ -309,6 +323,7 @@ mod tests {
             IdFlagged,
             PhoneNumberInputInvalid,
             DriversLicenseNumberNotValid,
+            EmailNotFoundOnFile
         ])
     ]
     #[test_case(
@@ -326,6 +341,7 @@ mod tests {
           IdFlagged,
           PhoneNumberInputInvalid,
           DriversLicenseNumberNotValid,
+          EmailNotFoundOnFile
       ])
   ]
     #[test_case(
@@ -344,6 +360,7 @@ mod tests {
             IdFlagged,
             PhoneNumberInputInvalid,
             DriversLicenseNumberIsValid,
+            EmailNotFoundOnFile
         ])
     ]
     #[test_case(
@@ -357,7 +374,8 @@ mod tests {
             AddressMatches,
             DobMatches,
             SsnMatches,
-            PhoneLocatedMatches
+            PhoneLocatedMatches,
+            EmailFoundOnFile
         ])
     ]
     #[test_case(
@@ -371,6 +389,7 @@ mod tests {
           AddressMatches,
           DobMatches,
           SsnMatches,
+          EmailFoundOnFile,
       ])
   ]
     fn test_reason_codes(
@@ -667,7 +686,7 @@ mod tests {
                 "VerifiedElementSummary": {
                   "DOB": true,
                   "DOBMatchLevel": "8",
-                  "Email": false
+                  "Email": true
                 }
               }
             }

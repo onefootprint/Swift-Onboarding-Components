@@ -527,6 +527,14 @@ footprint_reason_code_enum! {
         EmailRecentlyVerified,
 
         #[scope = SignalScope::Email, additional_scopes = vec![], match_level = None]
+        #[note = "Email was found on file.", severity = SignalSeverity::Info,  description = "The email address was found on file associated with the user."]
+        EmailFoundOnFile,
+
+        #[scope = SignalScope::Email, additional_scopes = vec![], match_level = None]
+        #[note = "Email was not found on file.", severity = SignalSeverity::Low,  description = "The email address provided was not found on file associated with the user."]
+        EmailNotFoundOnFile,
+
+        #[scope = SignalScope::Email, additional_scopes = vec![], match_level = None]
         #[note = "Email from high risk country", severity = SignalSeverity::High,  description = "The email address is located to be from a country that is set as restricted."]
         EmailHighRiskCountry,
 
@@ -1229,15 +1237,15 @@ footprint_reason_code_enum! {
         #[note = "Website offline", severity = SignalSeverity::Medium,  description = "The input business website was offline"]
         BusinessWebsiteOffline,
 
-        #[scope = SignalScope::BusinessWebsite, additional_scopes = vec![], match_level = Some(MatchLevel::Verified)]
+        #[scope = SignalScope::BusinessWebsite, additional_scopes = vec![], match_level = None]
         #[note = "Website verified", severity = SignalSeverity::Info,  description = "Successfully found entity details on the input business website"]
         BusinessWebsiteVerified,
 
-        #[scope = SignalScope::BusinessWebsite, additional_scopes = vec![], match_level = Some(MatchLevel::NotVerified)]
+        #[scope = SignalScope::BusinessWebsite, additional_scopes = vec![], match_level = None]
         #[note = "Website unverified", severity = SignalSeverity::Low,  description = "Unable to find entity details on the input business website"]
         BusinessWebsiteUnverified,
 
-        #[scope = SignalScope::BusinessWebsite, additional_scopes = vec![], match_level = Some(MatchLevel::NotVerified)]
+        #[scope = SignalScope::BusinessWebsite, additional_scopes = vec![], match_level = None]
         #[note = "Website is parking page", severity = SignalSeverity::Medium,  description = "The input business website has been purchased but has no content"]
         BusinessWebsiteParkingPage,
 

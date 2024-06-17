@@ -34,7 +34,6 @@ impl NameAttribute {
                 vec![FootprintReasonCode::NameLastPartiallyMatches]
             }
             (NameAttribute::Last, MatchLevel::Exact) => vec![FootprintReasonCode::NameLastMatches],
-            _ => vec![],
         }
     }
 }
@@ -57,7 +56,7 @@ impl NameGrouping {
                         MatchLevel::NoMatch => vec![FootprintReasonCode::NameDoesNotMatch],
                         MatchLevel::Partial => vec![FootprintReasonCode::NamePartiallyMatches],
                         MatchLevel::Exact => vec![FootprintReasonCode::NameMatches],
-                        _ => vec![],
+                        MatchLevel::CouldNotMatch => vec![],
                     }
                 } else {
                     // they are both different, so no matter what it's partial
@@ -71,7 +70,7 @@ impl NameGrouping {
                 MatchLevel::NoMatch => vec![FootprintReasonCode::NameDoesNotMatch],
                 MatchLevel::Partial => vec![FootprintReasonCode::NamePartiallyMatches],
                 MatchLevel::Exact => vec![FootprintReasonCode::NameMatches],
-                _ => vec![],
+                MatchLevel::CouldNotMatch => vec![],
             },
         }
     }
@@ -392,8 +391,6 @@ mod tests {
     #[test_case(NameGrouping::FullName(MatchLevel::NoMatch) => vec![NameFirstDoesNotMatch, NameLastDoesNotMatch, NameDoesNotMatch])]
     #[test_case(NameGrouping::FullName(MatchLevel::Partial) => vec![NameFirstPartiallyMatches, NameLastPartiallyMatches, NamePartiallyMatches])]
     // don't apply to name
-    #[test_case(NameGrouping::FullName(MatchLevel::Verified) => Vec::<FootprintReasonCode>::new())]
-    #[test_case(NameGrouping::FullName(MatchLevel::NotVerified) => Vec::<FootprintReasonCode>::new())]
     #[test_case(NameGrouping::FullName(MatchLevel::CouldNotMatch) => vec![NameFirstDoesNotMatch, NameLastDoesNotMatch])]
     #[test_case(NameGrouping::FullNameSimple(MatchLevel::Exact) => vec![NameMatches])]
     #[test_case(NameGrouping::FullNameSimple(MatchLevel::NoMatch) => vec![NameDoesNotMatch])]

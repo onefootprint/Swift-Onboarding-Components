@@ -548,6 +548,10 @@ impl FlexIdResponse {
         self.result().and_then(|r| r.valid_element_summary.clone())
     }
 
+    pub fn verified_element_summary(&self) -> Option<VerifiedElementSummary> {
+        self.result().and_then(|r| r.verified_element_summary.clone())
+    }
+
     pub fn bureau_deleted(&self) -> Option<bool> {
         self.result().and_then(|r| r.bureau_deleted)
     }
