@@ -16,7 +16,6 @@ use actix_web::web::Json;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::{
     AnnotationFilters,
-    CreateAnnotationRequest,
     UpdateAnnotationRequest,
 };
 use db::models::annotation::{
@@ -28,6 +27,7 @@ use db::models::user_timeline::UserTimeline;
 use db::DbError;
 use newtypes::{
     AnnotationId,
+    CreateAnnotationRequest,
     FpId,
 };
 use paperclip::actix::{

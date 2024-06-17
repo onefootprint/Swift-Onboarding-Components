@@ -1,6 +1,4 @@
 use super::StateError;
-use crate::auth::tenant::AuthActor;
-use api_wire_types::DecisionRequest;
 use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
 use strum_macros::{
@@ -16,11 +14,6 @@ pub struct MakeVendorCalls;
 pub struct MakeDecision;
 #[derive(Debug)]
 pub struct MakeWatchlistCheckCall; // OFAC, PEP, Adverse Media
-#[derive(Debug)]
-pub struct ReviewCompleted {
-    pub decision: DecisionRequest,
-    pub actor: AuthActor,
-}
 #[derive(Debug)]
 pub struct DocCollected;
 #[derive(Debug)]
@@ -41,7 +34,6 @@ pub enum WorkflowActions {
     MakeVendorCalls(MakeVendorCalls),
     MakeDecision(MakeDecision),
     MakeWatchlistCheckCall(MakeWatchlistCheckCall),
-    ReviewCompleted(ReviewCompleted),
     DocCollected(DocCollected),
     BoKycCompleted(BoKycCompleted),
     AsyncVendorCallsCompleted(AsyncVendorCallsCompleted),
@@ -64,9 +56,6 @@ impl TryFrom<WorkflowActionsKind> for WorkflowActions {
             WorkflowActionsKind::MakeWatchlistCheckCall => {
                 Ok(Self::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}))
             }
-            WorkflowActionsKind::ReviewCompleted => Err(StateError::WorkflowActionsConversionError(
-                WorkflowActionsKind::ReviewCompleted,
-            )),
             WorkflowActionsKind::DocCollected => Ok(Self::DocCollected(DocCollected {})),
             WorkflowActionsKind::BoKycCompleted => Ok(Self::BoKycCompleted(BoKycCompleted {})),
             WorkflowActionsKind::AsyncVendorCallsCompleted => {

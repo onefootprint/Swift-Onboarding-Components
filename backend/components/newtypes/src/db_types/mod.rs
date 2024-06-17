@@ -128,5 +128,7 @@ mod workflow_source;
 pub use workflow_source::*;
 mod workos_auth_method;
 pub use workos_auth_method::*;
+mod action;
+pub use action::*;
 mod verification_check;
 pub use verification_check::*;

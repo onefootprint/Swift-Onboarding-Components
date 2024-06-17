@@ -1,6 +1,7 @@
 use api_core::*;
 use paperclip::actix::web;
 
+mod actions;
 mod ai_summarize;
 mod annotations;
 mod auth_events;
@@ -30,6 +31,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(get::detail::get)
         .service(get::search::post)
         .service(data::get)
+        .service(actions::post)
         .service(annotations::get)
         .service(annotations::patch)
         .service(annotations::post)

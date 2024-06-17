@@ -31,7 +31,6 @@ use crate::utils::vault_wrapper::{
     VwArgs,
 };
 use crate::State;
-use api_wire_types::TerminalDecisionStatus;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_instance::{
     IncludeRules,
@@ -63,6 +62,7 @@ use newtypes::{
     RuleAction,
     RuleInstanceKind,
     SignalSeverity,
+    TerminalDecisionStatus,
     VendorAPI,
     VerificationCheck,
     WorkflowFixtureResult,
@@ -481,12 +481,11 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
 
     // Simulate Middesk webhook incoming. Middesk state machine should complete and then call the KYB
     // workflow
-    let expected_rule_action = match terminal_status {
+    let (expected_rule_action, expected_status) = match terminal_status {
         // We simulate a wl hit when terminal status = Fail for these tests
-        TerminalDecisionStatus::Fail => Some(RuleAction::ManualReview),
-        TerminalDecisionStatus::Pass => None,
+        TerminalDecisionStatus::Fail => (Some(RuleAction::ManualReview), OnboardingStatus::Fail),
+        TerminalDecisionStatus::Pass => (None, OnboardingStatus::Pass),
     };
-    let expected_status = terminal_status.into();
     let expected_manual_review = matches!(terminal_status, TerminalDecisionStatus::Fail);
     mock_webhooks(
         state,

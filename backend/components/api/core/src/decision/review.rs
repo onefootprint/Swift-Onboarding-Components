@@ -1,9 +1,4 @@
-use crate::auth::tenant::AuthActor;
 use crate::errors::ApiResult;
-use api_wire_types::{
-    CreateAnnotationRequest,
-    DecisionRequest,
-};
 use db::models::annotation::Annotation;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::{
@@ -23,9 +18,11 @@ use db::models::workflow::{
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
+    CreateAnnotationRequest,
     DbActor,
     DocumentReviewStatus,
     Locked,
+    ManualDecisionRequest,
     ManualReviewKind,
     UserSpecificWebhookKind,
 };
@@ -34,10 +31,10 @@ use strum::IntoEnumIterator;
 pub fn save_review_decision(
     conn: &mut TxnPgConn,
     wf: Locked<Workflow>,
-    decision_request: DecisionRequest,
-    actor: AuthActor,
+    decision_request: ManualDecisionRequest,
+    actor: DbActor,
 ) -> ApiResult<()> {
-    let DecisionRequest {
+    let ManualDecisionRequest {
         annotation: CreateAnnotationRequest { note, is_pinned },
         status,
     } = decision_request;
@@ -88,7 +85,7 @@ pub fn save_review_decision(
         result_ids: vec![],
         status: status.into(),
         annotation_id: Some(annotation.0.id),
-        actor: DbActor::from(actor),
+        actor,
         seqno,
         manual_reviews,
         rule_set_result_id: None,

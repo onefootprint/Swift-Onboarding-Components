@@ -18,15 +18,13 @@ use api_core::{
     decision,
     task,
 };
-use api_wire_types::{
-    CreateAnnotationRequest,
-    CreateUserDecisionRequest,
-    DecisionRequest,
-};
+use api_wire_types::CreateUserDecisionRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use newtypes::{
+    CreateAnnotationRequest,
+    ManualDecisionRequest,
     PreviewApi,
     VaultKind,
 };
@@ -53,7 +51,7 @@ pub async fn post(
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let actor = auth.actor();
+    let actor = auth.actor().into();
     let fp_id = fp_id.into_inner();
     let CreateUserDecisionRequest { annotation, status } = request.into_inner();
 
@@ -76,7 +74,7 @@ pub async fn post(
             // Note we don't run the workflow like we do in the entities variant
             let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
             let wf = Workflow::lock(conn, &wf.id)?;
-            let request = DecisionRequest {
+            let request = ManualDecisionRequest {
                 annotation: CreateAnnotationRequest {
                     note: annotation,
                     is_pinned: false,

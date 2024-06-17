@@ -1,18 +1,8 @@
 use crate::*;
 use newtypes::{
     ObConfigurationKey,
-    PiiString,
     WorkflowFixtureResult,
-    WorkflowRequestConfig,
 };
-
-#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-pub struct TriggerRequest {
-    pub trigger: WorkflowRequestConfig,
-    /// Optional note with more context on what we're asking the user to do
-    pub note: Option<String>,
-}
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -27,11 +17,6 @@ pub struct TriggerKycRequest {
     pub fixture_result: Option<SimpleFixtureResult>,
 }
 
-#[derive(Debug, Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-pub struct TriggerLinkResponse {
-    pub link: PiiString,
-}
 
 #[derive(Debug, Clone, serde::Serialize, Deserialize, Apiv2Schema, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]

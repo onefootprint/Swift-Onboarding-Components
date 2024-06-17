@@ -100,6 +100,9 @@ pub use skip_passkey_register::*;
 pub mod roles;
 pub use self::roles::*;
 
+mod action;
+pub use action::*;
+
 pub mod seqno;
 pub use self::seqno::*;
 
