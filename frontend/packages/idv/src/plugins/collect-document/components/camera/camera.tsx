@@ -180,7 +180,6 @@ const Camera = ({
   const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
   const [onCanPlayTriggered, setOnCanPlayTriggered] = useState(false);
   const [showCameraLoadingFeedback, setShowCameraLoadingFeedback] = useState(false);
-  const [isInitialMediaStream, setIsInitialMediaStream] = useState(true);
 
   const videoSize = useSize(videoRef);
   const [autoCaptureTimerVal, { startCountdown, stopCountdown, resetCountdown }] = useCountdownCustom(CountDownProps);
@@ -199,27 +198,9 @@ const Camera = ({
   const positionFromTop = getPositionFromTop(deviceKind, videoSize);
   const positionFromBottom = getPositionFromBottom(deviceKind);
 
-  // When we still haven't switched to the new media stream
-  if (mediaStream && videoRef.current && !videoRef.current.srcObject && isInitialMediaStream) {
+  if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
     videoRef.current.srcObject = mediaStream;
   }
-
-  useEffect(() => {
-    // If we already had a media stream and we are switching to a new one
-    if (mediaStream && videoRef.current && !isInitialMediaStream) {
-      videoRef.current.srcObject = mediaStream;
-    }
-  }, [mediaStream]);
-
-  const updateMediaStream = () => {
-    if (!isVideoPlaying) {
-      logWarn("Video has not started playing yet, can't switch camera");
-      return;
-    }
-    switchCamera();
-    setIsVideoPlaying(false);
-    setIsInitialMediaStream(false);
-  };
 
   const handlePlayError = (err: unknown) => {
     if (err instanceof Error && isNotAllowedError(err?.name)) {
@@ -270,7 +251,9 @@ const Camera = ({
         return;
       }
       if (videoRef.current.readyState < 2) {
-        logWarn(`(interval) video not ready to play. readyState: ${videoRef.current.readyState}`);
+        logWarn(
+          `(interval) video not ready to play. readyState: ${videoRef.current.readyState}, has videoRef src: ${!!videoRef.current.src}`,
+        );
         return;
       }
       videoRef.current
@@ -455,7 +438,7 @@ const Camera = ({
                 outlineWidth,
                 videoRef,
                 videoSize,
-                switchCamera: updateMediaStream,
+                switchCamera,
               })
             : null}
           {!isImageProcessing ? (
