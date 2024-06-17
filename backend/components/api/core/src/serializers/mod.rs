@@ -15,7 +15,6 @@ mod insight_event;
 mod list;
 mod list_event;
 mod liveness_event;
-mod manual_review;
 mod onboarding;
 mod onboarding_configuration;
 mod onboarding_decision;

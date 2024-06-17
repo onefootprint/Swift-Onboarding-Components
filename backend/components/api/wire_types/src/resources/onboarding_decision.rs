@@ -2,6 +2,7 @@ use crate::*;
 use newtypes::{
     CollectedDataOption,
     DecisionStatus,
+    ManualReviewKind,
     ObConfigurationId,
     OnboardingDecisionId,
     RuleSetResultId,
@@ -15,12 +16,14 @@ pub struct OnboardingDecision {
     pub status: DecisionStatus,
     pub timestamp: DateTime<Utc>,
     pub source: Actor,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub ob_configuration: Option<TimelinePlaybook>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub manual_review: Option<ManualReview>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub rule_set_result_id: Option<RuleSetResultId>,
+    pub cleared_manual_reviews: Vec<ManualReview>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct ManualReview {
+    pub kind: ManualReviewKind,
 }
 
 /// ObConfiguration serialization used inside of an OnboardingDecision

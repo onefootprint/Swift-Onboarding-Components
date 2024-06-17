@@ -29,6 +29,7 @@ use diesel::{
     Insertable,
     Queryable,
 };
+use itertools::Itertools;
 use newtypes::{
     AnnotationId,
     DataLifetimeSeqno,
@@ -109,7 +110,7 @@ pub type SaturatedOnboardingDecisionInfo = (
     OnboardingDecision,
     ObConfiguration,
     SaturatedActor,
-    Option<ManualReview>,
+    Vec<ManualReview>,
 );
 
 impl OnboardingDecision {
@@ -180,30 +181,30 @@ impl OnboardingDecision {
             ob_configuration,
             workflow,
         };
-        let results: Vec<(Self, (Workflow, ObConfiguration), Option<ManualReview>)> =
-            onboarding_decision::table
-                .inner_join(workflow::table.inner_join(ob_configuration::table))
-                .left_join(manual_review::table)
-                .filter(onboarding_decision::id.eq_any(ids))
-                .get_results(conn)?;
+        let results: Vec<(Self, (Workflow, ObConfiguration))> = onboarding_decision::table
+            .inner_join(workflow::table.inner_join(ob_configuration::table))
+            .filter(onboarding_decision::id.eq_any(ids.clone()))
+            .get_results(conn)?;
 
         let onboarding_decisions: Vec<OnboardingDecision> =
             results.clone().into_iter().map(|r| r.0).collect();
         let onboarding_decisions_with_actors = actor::saturate_actors(conn, onboarding_decisions)?;
 
+        let manual_reviews = manual_review::table
+            .filter(manual_review::completed_by_decision_id.eq_any(ids))
+            .get_results::<ManualReview>(conn)?;
+        let manual_reviews = manual_reviews
+            .into_iter()
+            .filter_map(|mr| mr.completed_by_decision_id.clone().map(|obd_id| (obd_id, mr)))
+            .into_group_map();
+
         let result_map = results
             .into_iter()
             .zip(onboarding_decisions_with_actors.into_iter())
-            .map(
-                |((onboarding_decision, (_, onboarding_configuration), mr), (_, saturated_db_actor))| {
-                    (
-                        onboarding_decision,
-                        onboarding_configuration,
-                        saturated_db_actor,
-                        mr,
-                    )
-                },
-            )
+            .map(|((obd, (_, obc)), (_, actor))| {
+                let cleared_mrs = manual_reviews.get(&obd.id).cloned().unwrap_or_default();
+                (obd, obc, actor, cleared_mrs)
+            })
             .map(|d| (d.0.id.clone(), d))
             .collect();
 

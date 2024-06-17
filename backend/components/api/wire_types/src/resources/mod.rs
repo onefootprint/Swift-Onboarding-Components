@@ -91,9 +91,6 @@ pub use self::field_validations::*;
 mod authorized_org;
 pub use authorized_org::*;
 
-mod manual_review;
-pub use self::manual_review::*;
-
 mod vault_created;
 pub use self::vault_created::*;
 

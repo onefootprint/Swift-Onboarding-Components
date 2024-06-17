@@ -251,21 +251,19 @@ impl UserTimeline {
                         SaturatedTimelineEvent::DataCollected(event)
                     }
                     DbUserTimelineEvent::OnboardingDecision(ref e) => {
-                        let (obd, ob_config, actor, mr) = decisions
+                        let obd = decisions
                             .get(&e.id)
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone();
 
-                        let decision: SaturatedOnboardingDecisionInfo = (obd, ob_config, actor, mr);
+                        let annotation = e
+                            .annotation_id
+                            .as_ref()
+                            .map(|a_id| annotations.get(a_id).ok_or(DbError::RelatedObjectNotFound))
+                            .transpose()?
+                            .cloned();
 
-                        SaturatedTimelineEvent::OnboardingDecision(
-                            decision,
-                            e.annotation_id
-                                .as_ref()
-                                .map(|a_id| annotations.get(a_id).ok_or(DbError::RelatedObjectNotFound))
-                                .transpose()?
-                                .cloned(),
-                        )
+                        SaturatedTimelineEvent::OnboardingDecision(obd, annotation)
                     }
                     DbUserTimelineEvent::DocumentUploaded(ref e) => SaturatedTimelineEvent::DocumentUploaded(
                         document_ids_and_requests
