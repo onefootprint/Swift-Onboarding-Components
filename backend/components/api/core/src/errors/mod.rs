@@ -326,8 +326,8 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
 impl ApiError {
     fn message(&self) -> String {
         match self.0.as_ref() {
-            ApiErrorKind::Twilio(e) => return e.message(),
-            ApiErrorKind::Database(e) => return e.message(),
+            ApiErrorKind::Twilio(e) => e.message(),
+            ApiErrorKind::Database(e) => e.message(),
             _ => self.to_string(),
         }
     }
