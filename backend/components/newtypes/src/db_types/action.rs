@@ -46,5 +46,6 @@ pub struct TriggerRequest {
 #[serde(tag = "kind")]
 pub enum EntityAction {
     Trigger(TriggerRequest),
+    ClearReview,
     ManualDecision(ManualDecisionRequest),
 }

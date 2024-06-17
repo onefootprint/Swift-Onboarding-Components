@@ -44,12 +44,10 @@ pub async fn post(
     let fp_id = fp_id.into_inner();
     let request = request.into_inner();
 
-    let fpid = fp_id.clone();
-    let tid = tenant_id.clone();
     let outcome = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let outcome = apply_manual_decision(conn, request, &sv, actor)?;
             Ok(outcome)
         })
@@ -67,7 +65,7 @@ pub(super) fn apply_manual_decision(
     actor: DbActor,
 ) -> ApiResult<EntityActionPostCommit> {
     let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
-    let wf = Workflow::lock(conn, &wf.id)?;
-    save_review_decision(conn, wf, request, actor)?;
+    let ManualDecisionRequest { annotation, status } = request;
+    save_review_decision(conn, wf, status.into(), Some(annotation), actor)?;
     Ok(EntityActionPostCommit::FireWebhooks)
 }

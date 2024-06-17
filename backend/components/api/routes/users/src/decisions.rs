@@ -24,7 +24,6 @@ use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use newtypes::{
     CreateAnnotationRequest,
-    ManualDecisionRequest,
     PreviewApi,
     VaultKind,
 };
@@ -71,17 +70,12 @@ pub async fn post(
             if vault.kind != VaultKind::Person {
                 return Err(ValidationError("Can only create a manual decision for a user").into());
             }
-            // Note we don't run the workflow like we do in the entities variant
             let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
-            let wf = Workflow::lock(conn, &wf.id)?;
-            let request = ManualDecisionRequest {
-                annotation: CreateAnnotationRequest {
-                    note: annotation,
-                    is_pinned: false,
-                },
-                status,
+            let annotation = CreateAnnotationRequest {
+                note: annotation,
+                is_pinned: false,
             };
-            decision::review::save_review_decision(conn, wf, request, actor)?;
+            decision::review::save_review_decision(conn, wf, status.into(), Some(annotation), actor)?;
             Ok(())
         })
         .await?;

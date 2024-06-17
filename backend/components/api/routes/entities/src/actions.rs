@@ -11,6 +11,8 @@ use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
 };
+use api_core::decision::review::save_review_decision;
+use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::{
     ApiResult,
     ValidationError,
@@ -22,9 +24,12 @@ use api_wire_types::{
     EntityActionsRequest,
 };
 use db::models::scoped_vault::ScopedVault;
+use db::models::workflow::Workflow;
+use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
     DbActor,
+    DecisionStatus,
     EntityAction,
 };
 use paperclip::actix::{
@@ -67,6 +72,7 @@ pub async fn post(
                         EntityAction::Trigger(t) => {
                             apply_trigger_request(conn, t, &sv, actor.clone(), &session_key)?.into()
                         }
+                        EntityAction::ClearReview => clear_review(conn, &sv, actor.clone())?,
                         EntityAction::ManualDecision(d) => {
                             apply_manual_decision(conn, d, &sv, actor.clone())?
                         }
@@ -103,4 +109,11 @@ impl EntityActionPostCommit {
             }
         }
     }
+}
+
+
+fn clear_review(conn: &mut TxnPgConn, sv: &ScopedVault, actor: DbActor) -> ApiResult<EntityActionPostCommit> {
+    let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
+    save_review_decision(conn, wf, DecisionStatus::None, None, actor)?;
+    Ok(EntityActionPostCommit::FireWebhooks)
 }

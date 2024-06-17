@@ -20,9 +20,8 @@ use itertools::Itertools;
 use newtypes::{
     CreateAnnotationRequest,
     DbActor,
+    DecisionStatus,
     DocumentReviewStatus,
-    Locked,
-    ManualDecisionRequest,
     ManualReviewKind,
     UserSpecificWebhookKind,
 };
@@ -30,31 +29,30 @@ use strum::IntoEnumIterator;
 
 pub fn save_review_decision(
     conn: &mut TxnPgConn,
-    wf: Locked<Workflow>,
-    decision_request: ManualDecisionRequest,
+    wf: Workflow,
+    status: DecisionStatus,
+    annotation: Option<CreateAnnotationRequest>,
     actor: DbActor,
 ) -> ApiResult<()> {
-    let ManualDecisionRequest {
-        annotation: CreateAnnotationRequest { note, is_pinned },
-        status,
-    } = decision_request;
-
-    let sv = ScopedVault::get(conn, &wf.id)?;
+    let wf = Workflow::lock(conn, &wf.id)?;
+    let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
 
     // If a manual review will be cleared or we will create a new decision, the operation
     // is not a no-op and we should create an annotation in the DB
-    let annotation = Annotation::create(conn, note, is_pinned, sv.id.clone(), actor.clone())?;
+    let annotation = annotation
+        .map(|a| Annotation::create(conn, a.note, a.is_pinned, sv.id.clone(), actor.clone()))
+        .transpose()?;
 
-    // Clear all manual reviews. In the future, we could have the client pass in exactly which
-    // manual review kinds the user has decided to clear
-    let manual_reviews = ManualReviewKind::iter()
+    // Clear all manual reviews because a human has manually made this decision. In the future, we could
+    // have the client pass in exactly which manual review kinds the user has decided to clear
+    let mrs_to_clear = ManualReviewKind::iter()
         .map(|kind| ManualReviewArgs {
             kind,
             action: ManualReviewAction::Complete,
         })
         .collect_vec();
 
-    if manual_reviews
+    if mrs_to_clear
         .iter()
         .any(|r| r.kind == ManualReviewKind::DocumentNeedsReview)
     {
@@ -82,12 +80,13 @@ pub fn save_review_decision(
     let new_decision = NewDecisionArgs {
         vault_id: sv.vault_id,
         logic_git_hash: crate::GIT_HASH.to_string(),
-        result_ids: vec![],
-        status: status.into(),
-        annotation_id: Some(annotation.0.id),
+        status,
+        annotation_id: annotation.map(|(a, _)| a.id),
         actor,
         seqno,
-        manual_reviews,
+        manual_reviews: mrs_to_clear,
+        // Not necessary for manual decisions
+        result_ids: vec![],
         rule_set_result_id: None,
         failed_for_doc_review: false,
     };

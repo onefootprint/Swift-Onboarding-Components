@@ -23,17 +23,54 @@ def test_trigger_action(sandbox_tenant):
     bifrost.run()
 
 
-def test_mr_action(sandbox_tenant):
+def test_manual_decision_action(sandbox_tenant):
     bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
     user = bifrost.run()
     assert user.client.validate_response["user"]["status"] == "pass"
 
-    trigger_action = dict(
+    md_action = dict(
         kind="manual_decision",
         status="fail",
         annotation=dict(note="Flerp", is_pinned=False),
     )
-    data = dict(actions=[trigger_action])
+    data = dict(actions=[md_action])
     post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
     body = get(f"entities/{user.fp_id}", data, *sandbox_tenant.db_auths)
     assert body["status"] == "fail"
+
+
+def test_clear_review(sandbox_tenant):
+    bifrost = BifrostClient.new_user(
+        sandbox_tenant.default_ob_config, fixture_result="manual_review"
+    )
+    user = bifrost.run()
+    assert user.client.validate_response["user"]["status"] == "fail"
+    assert user.client.validate_response["user"]["requires_manual_review"]
+
+    clear_review_action = dict(kind="clear_review")
+    data = dict(actions=[clear_review_action])
+    post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
+    body = get(f"entities/{user.fp_id}", data, *sandbox_tenant.db_auths)
+    assert not body["requires_manual_review"]
+
+
+def test_trigger_and_clear_review(sandbox_tenant):
+    bifrost = BifrostClient.new_user(
+        sandbox_tenant.default_ob_config, fixture_result="manual_review"
+    )
+    user = bifrost.run()
+    assert user.client.validate_response["user"]["status"] == "fail"
+    assert user.client.validate_response["user"]["requires_manual_review"]
+
+    trigger_action = dict(kind="trigger", trigger=dict(kind="redo_kyc"), note="Flerp")
+    clear_review_action = dict(kind="clear_review")
+    data = dict(actions=[trigger_action, clear_review_action])
+    body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
+
+    # Make sure we got a token from the trigger
+    trigger_response = next(i for i in body if i["kind"] == "trigger")
+    assert trigger_response["token"]
+
+    # Make sure manual review is cleared
+    body = get(f"entities/{user.fp_id}", data, *sandbox_tenant.db_auths)
+    assert not body["requires_manual_review"]
