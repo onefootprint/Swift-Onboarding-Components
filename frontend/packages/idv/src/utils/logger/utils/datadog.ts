@@ -105,9 +105,14 @@ export const initDataDogLogs = (appName: string): boolean => {
     site: 'datadoghq.com', // `site` refers to the Datadog site parameter of your organization. see https://docs.datadoghq.com/getting_started/site/
     version: `${config.env}:${GIT_COMMIT_SHA}`, // Specify a version number to identify the deployed version of your application in Datadog.
 
+    allowFallbackToLocalStorage: true, // If useCrossSiteSessionCookie is true, then useLocalStorage is ignored. If usePartitionedCrossSiteSessionCookie is true, then useLocalStorage is ignored.
     forwardErrorsToLogs: true, // Set to false to stop forwarding console.error logs, uncaught exceptions and network errors to Datadog.
     sessionSampleRate: 100, // The percentage of sessions to track: 100 for all, 0 for none. Only tracked sessions send logs.
     storeContextsAcrossPages: true, // Store global context and user context in localStorage to preserve them along the user navigation.
+    trackSessionAcrossSubdomains: true, // Track sessions across subdomains.
+    useCrossSiteSessionCookie: true, // Store session cookies in cross-site cookies.
+    usePartitionedCrossSiteSessionCookie: true, // Store session cookies in partitioned cross-site cookies.
+
     beforeSend: (log: LogsEvent /* , context: LogsEventDomainContext */) => {
       // Discard 200 network logs
       if (log.http && log.http.status_code === 200) return false;
@@ -131,6 +136,7 @@ export const initDataDogRum = (appName: string): boolean => {
   const config = getDataDogConfig(appName);
   if (!config) return false;
 
+  // https://docs.datadoghq.com/real_user_monitoring/browser/setup/#initialization-parameters
   datadogRum.init({
     ...config,
     applicationId: config.applicationId, // The RUM application ID.
@@ -140,13 +146,17 @@ export const initDataDogRum = (appName: string): boolean => {
     site: 'datadoghq.com', // `site` refers to the Datadog site parameter of your organization. see https://docs.datadoghq.com/getting_started/site/
     version: `${config.env}:${GIT_COMMIT_SHA}`, // Specify a version number to identify the deployed version of your application in Datadog
 
+    allowFallbackToLocalStorage: true, // If useCrossSiteSessionCookie is true, then useLocalStorage is ignored. If usePartitionedCrossSiteSessionCookie is true, then useLocalStorage is ignored.
     defaultPrivacyLevel: 'mask-user-input', // `mask`, `mask-user-input`, or `allow`
     sessionReplaySampleRate: DDOG_RUM_PERCENTAGE, // The percentage of tracked sessions with Browser RUM & Session Replay pricing features: 100 for all, 0
     sessionSampleRate: 100, // The percentage of sessions to track: 100 for all, 0 for none.
+    startSessionReplayRecordingManually: true, // Manually start the Session Replay
+    storeContextsAcrossPages: true, // Store global context and user context in localStorage to preserve them along the user navigation.
     trackLongTasks: true, // Enables collection of long task events.
     trackResources: true, // Enables collection of resource events.
+    trackSessionAcrossSubdomains: true, // Track session across subdomains
     trackUserInteractions: true, // The trackUserInteractions parameter enables the automatic collection of user clicks in your application. Sensitive and private data contained in your pages may be included to identify the elements interacted with.
-    startSessionReplayRecordingManually: true, // Manually start the Session Replay
+    usePartitionedCrossSiteSessionCookie: true, // Use partitioned cross-site session cookies.
   });
 
   return true;
