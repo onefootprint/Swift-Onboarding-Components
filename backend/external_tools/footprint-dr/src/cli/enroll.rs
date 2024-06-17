@@ -1,0 +1,59 @@
+use super::api_client::IsLive;
+use crate::cli::api_client::get_cli_client;
+use crate::cli::get_input;
+use crate::cli::wire_types::VaultDrEnrollRequest;
+use anyhow::{
+    bail,
+    Result,
+};
+use reqwest::Url;
+
+pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
+    let client = get_cli_client(&api_root, is_live)?;
+
+    if client.get_aws_pre_enrollment()?.is_none() {
+        bail!("Your AWS external ID has not been generated. Run `footprint get-external-id {}` and create an IAM role according to the Vault Disaster Recovery documentation.", client.is_live.fmt_flag());
+    }
+
+    let status = client.get_status()?;
+    println!(
+        "Enrolling {} ({}) in Vault Disaster Recovery",
+        status.org_name,
+        IsLive::from(status.is_live)
+    );
+    println!();
+
+
+    let aws_account_id = get_input("Enter AWS Account ID: ")?;
+    let aws_role_name = get_input("Enter AWS Role Name: ")?;
+    let s3_bucket_name = get_input("Enter S3 Bucket Name: ")?;
+
+    println!();
+    print!("Verifying bucket access...");
+
+    let resp = client.enroll(VaultDrEnrollRequest {
+        aws_account_id,
+        aws_role_name,
+        s3_bucket_name,
+    });
+
+    if resp.is_ok() {
+        println!(" OK");
+    } else {
+        println!(" Failed");
+    }
+    let resp = resp?;
+
+    println!();
+
+    println!("Your Org Private Key is:");
+    println!();
+    println!("{}", resp.org_private_key.leak_ref());
+    println!();
+
+    println!("Store this securely. You will not be able to retrieve this key again without re-enrollment.");
+    println!("Enrollment complete.");
+
+
+    Ok(())
+}

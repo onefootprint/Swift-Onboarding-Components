@@ -153,7 +153,7 @@ services:
       IT_TWILIO_SECRET_AUTH_TOKEN: ${IT_TWILIO_SECRET_AUTH_TOKEN}
       DITTO_URL: ${DITTO_URL:-https://ditto.footprint.dev}
       IT_SVIX_API_KEY: ${IT_SVIX_API_KEY}
-      ENVIRONMENT: ${ENVIRONMENT}
+      ENVIRONMENT: ${ENVIRONMENT:-local-dev}
       # Used by diesel migration tests.
       DATABASE_URL: "postgresql://postgres:postgres@localhost:9432/postgres"
     volumes:

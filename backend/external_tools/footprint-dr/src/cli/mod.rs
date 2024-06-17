@@ -16,6 +16,7 @@ use std::io::Write;
 use std::path::PathBuf;
 
 mod api_client;
+mod enroll;
 mod get_external_id;
 mod login;
 mod status;
@@ -196,6 +197,7 @@ pub fn run() -> Result<()> {
         Subcommand::GetExternalId { sandbox } => {
             get_external_id::get_external_id_cmd(api_root, sandbox.live.into())
         }
+        Subcommand::Enroll { sandbox } => enroll::enroll_cmd(api_root, sandbox.live.into()),
         _ => {
             unimplemented!()
         }

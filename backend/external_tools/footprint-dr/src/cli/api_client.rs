@@ -1,5 +1,7 @@
 use super::wire_types::{
     VaultDrAwsPreEnrollResponse,
+    VaultDrEnrollRequest,
+    VaultDrEnrollResponse,
     VaultDrStatus,
 };
 use anyhow::{
@@ -170,7 +172,6 @@ impl VaultDrApiClient {
         Ok(resp.json()?)
     }
 
-    #[allow(dead_code)]
     pub(crate) fn get_aws_pre_enrollment(&self) -> Result<Option<VaultDrAwsPreEnrollResponse>> {
         let resp = self
             .request(Method::GET, "org/vault_dr/aws_pre_enrollment")?
@@ -195,6 +196,20 @@ impl VaultDrApiClient {
 
         if let Err(err) = resp.error_for_status_ref() {
             debug!(target: "VaultDrApiClient::aws_pre_enroll", "API error: {}", resp.text()?);
+            bail!(err);
+        };
+
+        Ok(resp.json()?)
+    }
+
+    pub(crate) fn enroll(&self, req: VaultDrEnrollRequest) -> Result<VaultDrEnrollResponse> {
+        let resp = self
+            .request(Method::POST, "org/vault_dr/enroll")?
+            .json(&req)
+            .send()?;
+
+        if let Err(err) = resp.error_for_status_ref() {
+            debug!(target: "VaultDrApiClient::enroll", "API error: {}", resp.text()?);
             bail!(err);
         };
 

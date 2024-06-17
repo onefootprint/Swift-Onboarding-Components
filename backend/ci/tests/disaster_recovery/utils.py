@@ -1,6 +1,8 @@
+import boto3
+import json
+import os
 import pexpect
 import sys
-import os
 
 from tests.utils import _gen_random_n_digit_number
 
@@ -46,3 +48,77 @@ def get_external_id(mode):
     assert cmd.exitstatus == 0
 
     return external_id
+
+
+def localstack_session():
+    return boto3.session.Session(profile_name="localstack")
+
+
+def create_bucket(session):
+    s3 = session.client("s3")
+
+    bucket_name = "acme-inc-footprint-vault-data-" + _gen_random_n_digit_number(16)
+    s3.create_bucket(
+        Bucket=bucket_name,
+    )
+
+    return bucket_name
+
+
+def create_iam_role(session, bucket_name, external_id):
+    iam = session.client("iam")
+
+    assume_role_policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    # FIXME
+                    "AWS": "arn:aws:iam::725896863556:root"
+                },
+                "Action": "sts:AssumeRole",
+                "Condition": {
+                    "StringEquals": {
+                        "sts:ExternalId": "your_external_id"
+                    }
+                }
+            }
+        ]
+    }
+
+    role_name = "fp-vault-data-management-" + _gen_random_n_digit_number(16)
+    role_response = iam.create_role(
+        RoleName=role_name,
+        AssumeRolePolicyDocument=json.dumps(assume_role_policy)
+    )
+
+    inline_policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "AllowFootprintWriteObjects",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:PutObject"
+                ],
+                "Resource": f"arn:aws:s3:::{bucket_name}/*"
+            },
+            {
+                "Sid": "AllowFootprintListObjects",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:ListBucket"
+                ],
+                "Resource": f"arn:aws:s3:::{bucket_name}",
+            }
+        ]
+    }
+
+    iam.put_role_policy(
+        RoleName=role_name,
+        PolicyName="fp-vault-data-management",
+        PolicyDocument=json.dumps(inline_policy)
+    )
+
+    return role_name
