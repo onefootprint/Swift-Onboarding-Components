@@ -160,13 +160,14 @@ impl VaultDrApiClient {
     }
 
     pub(crate) fn get_status(&self) -> Result<VaultDrStatus> {
-        let resp: VaultDrStatus = self
-            .request(Method::GET, "org/vault_dr/status")?
-            .send()?
-            .error_for_status()?
-            .json()?;
+        let resp = self.request(Method::GET, "org/vault_dr/status")?.send()?;
 
-        Ok(resp)
+        if let Err(err) = resp.error_for_status_ref() {
+            debug!(target: "VaultDrApiClient::get_status", "API error: {}", resp.text()?);
+            bail!(err);
+        };
+
+        Ok(resp.json()?)
     }
 
     #[allow(dead_code)]
@@ -179,15 +180,25 @@ impl VaultDrApiClient {
             return Ok(None);
         }
 
-        Ok(Some(resp.error_for_status()?.json()?))
+        if let Err(err) = resp.error_for_status_ref() {
+            debug!(target: "VaultDrApiClient::get_aws_pre_enrollment", "API error: {}", resp.text()?);
+            bail!(err);
+        };
+
+        Ok(resp.json()?)
     }
 
     pub(crate) fn aws_pre_enroll(&self) -> Result<VaultDrAwsPreEnrollResponse> {
-        Ok(self
+        let resp = self
             .request(Method::POST, "org/vault_dr/aws_pre_enrollment")?
-            .send()?
-            .error_for_status()?
-            .json()?)
+            .send()?;
+
+        if let Err(err) = resp.error_for_status_ref() {
+            debug!(target: "VaultDrApiClient::aws_pre_enroll", "API error: {}", resp.text()?);
+            bail!(err);
+        };
+
+        Ok(resp.json()?)
     }
 }
 
