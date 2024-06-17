@@ -1,6 +1,6 @@
 'use client';
 
-import { IcoCopy24 } from '@onefootprint/icons';
+import { IcoCopy16, IcoCopy24 } from '@onefootprint/icons';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +17,7 @@ export type CopyButtonProps = {
   tooltipTextConfirmation?: string;
   children?: string | React.ReactNode;
   contentToCopy: string;
+  size?: 'small' | 'default';
 };
 
 const HIDE_TIMEOUT = 600;
@@ -25,6 +26,7 @@ let confirmationTimeout: null | ReturnType<typeof setTimeout> = null;
 
 const CopyButton = ({
   ariaLabel,
+  size = 'default',
   tooltipPosition = 'right',
   tooltipText,
   tooltipTextConfirmation,
@@ -35,6 +37,7 @@ const CopyButton = ({
   const { t } = useTranslation('ui');
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
   const [isTooltipVisible, setTooltipVisible] = useState(false);
+  const CopyIcon = size === 'small' ? IcoCopy16 : IcoCopy24;
 
   useEffect(
     () => () => {
@@ -91,7 +94,7 @@ const CopyButton = ({
         disabled={disable}
         onClick={handleClick}
       >
-        {children || <IcoCopy24 color={disable ? 'tertiary' : undefined} />}
+        {children || <CopyIcon color={disable ? 'tertiary' : undefined} />}
       </Button>
     </Tooltip>
   );

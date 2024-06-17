@@ -959,6 +959,14 @@
         "watchlist": {
           "on-watchlist-person": "This user is on a watchlist",
           "on-watchlist-business": "This business is on a watchlist"
+        },
+        "id-dropdown": {
+          "footprint-id": "FP ID",
+          "sandbox-id": "Sandbox ID",
+          "external-id": "External ID",
+          "copied": "Copied!",
+          "copy-to-clipboard": "Copy to clipboard",
+          "copied-to-clipboard": "copied to clipboard"
         }
       },
       "manual-review-not-allowed": "You're not allowed to manually review users",

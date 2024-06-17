@@ -10,21 +10,20 @@ import styled, { css, useTheme } from 'styled-components';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
+import IdDropdown from './components/id-dropdown';
 
 type HeaderProps = WithEntityProps;
 
 const Header = ({ entity }: HeaderProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.header' });
   const { kind } = useEntityContext();
-  const {
-    data: { user },
-  } = useSession();
-  const theme = useTheme();
 
   return (
     <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)}>
-      <Stack align="center" gap={3}>
+      <Stack align="center" gap={3} flexGrow={1}>
         <Text variant="label-1">{t(`${kind}.title` as ParseKeys<'common'>)}</Text>
+        <IdDropdown entity={entity} />
+        <Text variant="label-1">⋅</Text>
         <Stack gap={2}>
           <StatusBadge
             status={entity.status}
@@ -36,25 +35,8 @@ const Header = ({ entity }: HeaderProps) => {
           <Tags entity={entity} />
         </Stack>
       </Stack>
-      <Stack align="center" flexWrap="wrap" justify="space-between" gap={3} width="100%" minHeight={theme.spacing[8]}>
-        <Stack align="center" justify="center" gap={3}>
-          <CodeInline truncate>{entity.id}</CodeInline>
-          {user?.isFirmEmployee && entity.sandboxId && (
-            <>
-              <span>·</span>
-              <CodeInline truncate>{entity.sandboxId}</CodeInline>
-            </>
-          )}
-          {user?.isFirmEmployee && entity.externalId && (
-            <>
-              <span>·</span>
-              <CodeInline truncate>{entity.externalId}</CodeInline>
-            </>
-          )}
-        </Stack>
-        <Stack align="center" gap={3} width="fit-content">
-          <div id={HEADER_ACTIONS_ID} />
-        </Stack>
+      <Stack align="center" gap={3} flex={0}>
+        <div id={HEADER_ACTIONS_ID} />
       </Stack>
     </HeaderContainer>
   );
@@ -63,7 +45,7 @@ const Header = ({ entity }: HeaderProps) => {
 const HeaderContainer = styled.header`
   ${({ theme }) => css`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: ${theme.spacing[2]};
   `};
 `;
