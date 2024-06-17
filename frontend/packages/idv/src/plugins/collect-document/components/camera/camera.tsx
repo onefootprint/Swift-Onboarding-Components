@@ -199,7 +199,12 @@ const Camera = ({
   const positionFromBottom = getPositionFromBottom(deviceKind);
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
+    logInfo('Setting video src object');
     videoRef.current.srcObject = mediaStream;
+  } else {
+    logWarn(
+      `Could not set video src object. MediaStream ${mediaStream}, videoRef ${videoRef.current}, has srcObject ${!!videoRef?.current?.srcObject}`,
+    );
   }
 
   const handlePlayError = (err: unknown) => {
