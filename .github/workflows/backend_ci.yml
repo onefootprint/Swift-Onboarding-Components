@@ -140,8 +140,8 @@ jobs:
               --file ./images/${{ matrix.dockerfile }}/Dockerfile \
               --tag ${IMG_REF} \
               --push \
-              --cache-to type=gha,scope=images-buildx,mode=max,compression=zstd \
-              --cache-from type=gha,scope=images-buildx \
+              --cache-to type=gha,scope=images-buildx,mode=max,compression=zstd,timeout=4m,ignore-error=true \
+              --cache-from type=gha,scope=images-buildx,timeout=2m \
               .
 
   test:
