@@ -25,10 +25,10 @@ use itertools::{
     Itertools,
 };
 use newtypes::{
-    DocumentRequestConfig,
     ListId,
     ObConfigurationId,
     ObConfigurationKind,
+    RuleInstanceKind,
     TenantId,
 };
 use paperclip::actix::web::Json;
@@ -70,18 +70,18 @@ pub async fn multi_update_rules(
             // retrieve and return full latest list of Rules for FE for convenience
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
 
-            // Make sure we're not removing all rules, unless this is a document-only playbook for
-            // a custom doc
-            let is_pb_allowed_to_have_no_rules = obc.kind == ObConfigurationKind::Document
-                && obc.must_collect_data.is_empty()
-                && obc
-                    .documents_to_collect
-                    .clone()
-                    .unwrap_or_default()
-                    .iter()
-                    .all(|d| !matches!(d, DocumentRequestConfig::Identity { .. }));
+            // Make sure we're not removing all rules, unless this is a document-only playbook
+            let is_pb_allowed_to_have_no_rules = obc.kind == ObConfigurationKind::Document;
             if rules.is_empty() && !is_pb_allowed_to_have_no_rules {
                 return Err(ValidationError("Proceeding would remove all rules on your playbook").into());
+            }
+
+            let should_pb_have_no_rules = obc.kind == ObConfigurationKind::Kyb && obc.skip_kyb;
+            if should_pb_have_no_rules && rules.iter().any(|r| matches!(r.kind, RuleInstanceKind::Business)) {
+                return Err(ValidationError(
+                    "Cannot add Business related rules to a playbook that is skipping running KYB",
+                )
+                .into());
             }
             Ok(rules)
         })
