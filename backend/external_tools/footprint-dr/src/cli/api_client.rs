@@ -21,6 +21,7 @@ use reqwest::header::{
 };
 use reqwest::{
     Method,
+    StatusCode,
     Url,
 };
 use std::fmt::{
@@ -168,9 +169,22 @@ impl VaultDrApiClient {
         Ok(resp)
     }
 
+    #[allow(dead_code)]
+    pub(crate) fn get_aws_pre_enrollment(&self) -> Result<Option<VaultDrAwsPreEnrollResponse>> {
+        let resp = self
+            .request(Method::GET, "org/vault_dr/aws_pre_enrollment")?
+            .send()?;
+
+        if resp.status() == StatusCode::NOT_FOUND {
+            return Ok(None);
+        }
+
+        Ok(Some(resp.error_for_status()?.json()?))
+    }
+
     pub(crate) fn aws_pre_enroll(&self) -> Result<VaultDrAwsPreEnrollResponse> {
         Ok(self
-            .request(Method::POST, "org/vault_dr/aws_pre_enroll")?
+            .request(Method::POST, "org/vault_dr/aws_pre_enrollment")?
             .send()?
             .error_for_status()?
             .json()?)
