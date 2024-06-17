@@ -2,7 +2,6 @@ import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
 import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
-import * as LogRocket from 'logrocket';
 
 import { IS_LOGGING_ENABLED } from './constants';
 import type { ExtraProps, PrimitiveData } from './types';
@@ -16,12 +15,6 @@ import {
   initDataDogRum,
 } from './utils/datadog';
 import getEnvInfo from './utils/get-env-info';
-import initLogRocket, {
-  logRocketErrorEvent,
-  logRocketInfoEvent,
-  logRocketTrackEvent,
-  logRocketWarnEvent,
-} from './utils/log-rocket';
 import { registerErrorHandlers } from './utils/register-event-listeners';
 
 /**
@@ -39,7 +32,6 @@ const LoggerFactory = () => {
   let appName: string = '';
   let isDDLogsEnabled: boolean = false;
   let isDDRumEnabled: boolean = false;
-  let isLogRocketEnabled: boolean = false;
   let isSessionReplayOn: boolean = false;
 
   const init = (app: string, deferSessionRecord?: boolean) => {
@@ -49,18 +41,12 @@ const LoggerFactory = () => {
     isDDLogsEnabled = initDataDogLogs(appName);
 
     if (!deferSessionRecord) {
-      initLogRocket(appName);
-      isLogRocketEnabled = true;
-    }
-
-    if (!deferSessionRecord) {
       isDDRumEnabled = initDataDogRum(appName);
     }
 
     getEnvInfo().then(identify).catch(console.warn);
 
     const onError = (error: Error) => {
-      if (isLogRocketEnabled) logRocketErrorEvent(error);
       if (isDDLogsEnabled) dataDogErrorEvent(error);
     };
 
@@ -74,7 +60,6 @@ const LoggerFactory = () => {
     const ddSessionId = datadogLogs.getInternalContext()?.session_id;
     const contextProps = { ...filterNonEmptyTraits(traits), fp_session_id: sessionId };
 
-    if (isLogRocketEnabled) LogRocket.identify(sessionId, contextProps);
     if (isDDLogsEnabled || isDDRumEnabled) {
       datadogLogs.setGlobalContext(
         appName === 'bifrost' && ddSessionId ? { ...contextProps, session_id: ddSessionId } : contextProps,
@@ -84,12 +69,6 @@ const LoggerFactory = () => {
 
   const startSessionReplay = () => {
     if (isSessionReplayOn) return;
-
-    if (!isLogRocketEnabled) {
-      initLogRocket(appName);
-      isLogRocketEnabled = true;
-      isSessionReplayOn = true;
-    }
 
     if (!isDDRumEnabled && initDataDogRum(appName)) {
       datadogRum.startSessionReplayRecording();
@@ -111,7 +90,6 @@ const LoggerFactory = () => {
 
     const filteredExtra = filterNonEmptyTraits(extra);
 
-    if (isLogRocketEnabled) logRocketTrackEvent(msg, filteredExtra);
     if (isDDLogsEnabled) dataDogTrackEvent(msg, filteredExtra);
   };
 
@@ -122,9 +100,6 @@ const LoggerFactory = () => {
     const errorMessage = msg || getErrorMessage(err);
     const errorObj: Error = err instanceof Error ? err : new Error(errorMessage);
 
-    if (isLogRocketEnabled) {
-      logRocketErrorEvent(errorObj, { ...filteredExtra, level: 'error' });
-    }
     if (isDDLogsEnabled) {
       dataDogErrorEvent(errorObj, errorMessage, filteredExtra);
     }
@@ -134,7 +109,6 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
     const filteredExtra = filterNonEmptyTraits(extra || {});
 
-    if (isLogRocketEnabled) logRocketWarnEvent(msg, filteredExtra);
     if (isDDLogsEnabled) dataDogWarnEvent(msg, filteredExtra, err);
   };
 
@@ -142,7 +116,6 @@ const LoggerFactory = () => {
     if (!IS_LOGGING_ENABLED) return;
     const filteredExtra = filterNonEmptyTraits(extra || {});
 
-    if (isLogRocketEnabled) logRocketInfoEvent(msg, filteredExtra);
     if (isDDLogsEnabled) dataDogInfoEvent(msg, filteredExtra);
   };
 

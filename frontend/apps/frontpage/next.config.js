@@ -19,7 +19,7 @@ const DEV_FRAME_SRC = (IS_DEV ? ['http://localhost:3000'] : []).join(' ');
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' *.onefootprint.com vitals.vercel-insights.com getform.io/f/pbygomeb *.pusher.com wss://*.pusher.com vercel.live aplo-evnt.com usefathom.com *.usefathom.com *.ingest.sentry.io www.youtube.com api.onefootprint.com unifyintent.com *.unifyintent.com;
+  connect-src 'self' *.onefootprint.com vitals.vercel-insights.com getform.io/f/pbygomeb *.pusher.com wss://*.pusher.com vercel.live aplo-evnt.com usefathom.com *.usefathom.com www.youtube.com api.onefootprint.com unifyintent.com *.unifyintent.com;
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';

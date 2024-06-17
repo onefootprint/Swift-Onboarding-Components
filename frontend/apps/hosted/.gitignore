@@ -1,6 +1,3 @@
 .vercel
 .env*.local
 public/locales/
-
-# Sentry Config File
-.sentryclirc

@@ -25,7 +25,6 @@
     "@onefootprint/request": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
-    "@sentry/nextjs": "^7.91.0",
     "@tanstack/react-query": "^4.35.7",
     "axios-case-converter": "^1.1.0",
     "axios": "^1.6.5",

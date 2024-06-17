@@ -60,15 +60,9 @@ const hasMessageToOmit = (log?: string) =>
 
 const hasUrlToOmit = (log?: string) =>
   Boolean(log) &&
-  [
-    'ingest-lr.com',
-    'launchdarkly.com',
-    'maps.googleapis.com',
-    'neuro-id.com',
-    'neuroid.cloud',
-    'observeinc.com',
-    'stytch.com',
-  ].some(str => log?.includes(str));
+  ['ingest-lr.com', 'launchdarkly.com', 'maps.googleapis.com', 'neuro-id.com', 'neuroid.cloud', 'stytch.com'].some(
+    str => log?.includes(str),
+  );
 
 const getDataDogConfig = (appName: string): void | BaseConfig => {
   const app = appServiceMap[appName];

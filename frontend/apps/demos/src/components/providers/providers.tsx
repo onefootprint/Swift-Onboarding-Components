@@ -6,9 +6,7 @@ import React from 'react';
 
 import configureReactI18next from '../../config/initializers/react-i18next';
 import configureReactQuery from '../../config/initializers/react-query';
-import configureSentry from '../../config/initializers/sentry';
 
-configureSentry();
 configureReactI18next();
 const queryClient = configureReactQuery();
 

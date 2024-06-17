@@ -43,9 +43,6 @@ yarn-error.log*
 # storybook
 storybook-static
 
-# Sentry
-.sentryclirc
-
 # Env
 apps/**/.env
 packages/**/.env
