@@ -73,13 +73,6 @@ const Company = () => {
       linkedin: 'https://www.linkedin.com/in/a7e/',
     },
     {
-      name: 'Belce Dogru',
-      avatarSrc: '/team/member-belce.png',
-      role: 'Engineering',
-      linkedin: 'https://www.linkedin.com/in/belce/',
-      twitter: 'https://twitter.com/belce_dogru',
-    },
-    {
       name: 'Bruno Batista',
       avatarSrc: '/team/member-bruno.png',
       role: 'Engineering',
