@@ -2,6 +2,10 @@ import pexpect
 import sys
 import os
 
+from tests.utils import _gen_random_n_digit_number
+
+
+EXTERNAL_ID_PATTERN = r"\b([a-z0-9]{32})\b"
 
 # Runs footprint-dr such that the gnome keyring is available.
 def footprint_dr(*args):
@@ -32,3 +36,13 @@ def login_live(tenant):
         cmd.sendline(tenant.l_sk.value)
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
+
+
+def get_external_id(mode):
+    with footprint_dr("get-external-id", "--" + mode) as cmd:
+        cmd.expect(EXTERNAL_ID_PATTERN)
+        external_id = cmd.match.group(1)
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+
+    return external_id
