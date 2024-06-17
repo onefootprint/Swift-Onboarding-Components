@@ -227,6 +227,9 @@ pub enum ApiErrorKind {
 
     #[error("Regex error: {0}")]
     RegexError(#[from] regex::Error),
+
+    #[error("Vault Disaster Recovery error: {0}")]
+    VaultDrError(#[from] vault_dr::Error),
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -431,6 +434,9 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::ResponseTimeout => StatusCode::GATEWAY_TIMEOUT,
             ApiErrorKind::OpenAiCompletionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::RegexError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::VaultDrError(e) => match e {
+                vault_dr::Error::MissingAwsPreEnrollment => StatusCode::BAD_REQUEST,
+            },
         }
     }
 

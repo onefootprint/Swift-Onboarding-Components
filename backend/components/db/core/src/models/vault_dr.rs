@@ -8,13 +8,17 @@ use chrono::{
     DateTime,
     Utc,
 };
-use db_schema::schema::vault_dr_aws_pre_enrollment;
+use db_schema::schema::{
+    vault_dr_aws_pre_enrollment,
+    vault_dr_config,
+};
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::{
     PiiString,
     TenantId,
     VaultDrAwsPreEnrollmentId,
+    VaultDrConfigId,
 };
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -63,5 +67,63 @@ impl VaultDrAwsPreEnrollment {
         ))?;
 
         Ok(result)
+    }
+}
+
+#[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
+#[diesel(table_name = vault_dr_config)]
+pub struct VaultDrConfig {
+    pub id: VaultDrConfigId,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
+
+    pub created_at: DateTime<Utc>,
+    pub deactivated_at: Option<DateTime<Utc>>,
+
+    pub tenant_id: TenantId,
+    pub is_live: bool,
+
+    pub aws_pre_enrollment_id: VaultDrAwsPreEnrollmentId,
+    pub aws_account_id: String,
+    pub aws_role_name: String,
+    pub s3_bucket_name: String,
+
+    pub org_public_key: String,
+    pub recovery_public_key: String,
+    pub wrapped_recovery_key: String,
+}
+
+#[derive(Debug, Clone, Insertable)]
+#[diesel(table_name = vault_dr_config)]
+pub struct NewVaultDrConfig<'a> {
+    pub created_at: DateTime<Utc>,
+
+    pub tenant_id: &'a TenantId,
+    pub is_live: bool,
+
+    pub aws_pre_enrollment_id: &'a VaultDrAwsPreEnrollmentId,
+    pub aws_account_id: String,
+    pub aws_role_name: String,
+    pub s3_bucket_name: String,
+
+    pub org_public_key: String,
+    pub recovery_public_key: String,
+    pub wrapped_recovery_key: String,
+}
+
+impl VaultDrConfig {
+    pub fn get(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Option<Self>> {
+        Ok(vault_dr_config::table
+            .filter(vault_dr_config::tenant_id.eq(tenant_id))
+            .filter(vault_dr_config::is_live.eq(is_live))
+            .filter(vault_dr_config::deactivated_at.is_null())
+            .first(conn)
+            .optional()?)
+    }
+
+    pub fn create(conn: &mut TxnPgConn, new: NewVaultDrConfig) -> DbResult<Self> {
+        Ok(diesel::insert_into(vault_dr_config::table)
+            .values(&new)
+            .get_result(conn.conn())?)
     }
 }

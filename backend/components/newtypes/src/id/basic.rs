@@ -376,3 +376,8 @@ define_newtype_id!(
     String,
     "Identifier for a Vault Disaster Recovery AWS Pre-Enrollment"
 );
+define_newtype_id!(
+    VaultDrConfigId,
+    String,
+    "Identifier for Vault Disaster Recovery config record"
+);

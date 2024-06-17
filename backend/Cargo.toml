@@ -41,6 +41,7 @@ members = [
     "components/app_attest",
     "components/twilio",
     "components/privacy_pass",
+    "components/vault_dr",
     "components/webhooks",
     "components/integrations/alpaca",
     "components/selfie_doc",
