@@ -23,7 +23,7 @@ use std::convert::Into;
 // 50 Full name, address, phone, SSN verified
 const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 20;
 
-pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<FRC> {
+pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool, phone_submitted: bool) -> Vec<FRC> {
     let risk_indicator_codes = res.risk_indicator_codes();
     let nas = res.name_address_ssn_summary().name_address_ssn_matches();
     let nap = res.name_address_phone_summary().name_address_phone_matches();
@@ -36,7 +36,9 @@ pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<F
         match_frcs.push(ssn_match_code(&nas, &risk_indicator_codes));
     }
 
-    match_frcs.push(phone_match_code(&nap, &risk_indicator_codes)); // TODO: mb need to check phone_submitted here to handle email only homies
+    if phone_submitted {
+        match_frcs.push(phone_match_code(&nap, &risk_indicator_codes));
+    }
 
     let dob_codes = Into::<Vec<FRC>>::into(&res.dob_match_level());
 
@@ -279,6 +281,7 @@ mod tests {
     #[test_case(
         idv::test_fixtures::passing_lexis_flex_id_response(),
         true,
+        true,
         vec![
             PhoneLocatedMatches,
             NameMatches,
@@ -291,6 +294,7 @@ mod tests {
     ]
     #[test_case(
         example1(),
+        true,
         true,
         vec![
             PhoneLocatedDoesNotMatch,
@@ -310,6 +314,7 @@ mod tests {
     #[test_case(
       example1(),
       false,
+      true,
       vec![
           PhoneLocatedDoesNotMatch,
           NameFirstMatches,
@@ -325,6 +330,7 @@ mod tests {
   ]
     #[test_case(
         example2(),
+        true,
         true,
         vec![
             PhoneLocatedDoesNotMatch,
@@ -343,6 +349,7 @@ mod tests {
     #[test_case(
         example3(),
         true,
+        true,
         vec![
             NameFirstMatches,
             NameLastMatches,
@@ -353,13 +360,30 @@ mod tests {
             PhoneLocatedMatches
         ])
     ]
+    #[test_case(
+      example3(),
+      true,
+      false,
+      vec![
+          NameFirstMatches,
+          NameLastMatches,
+          NameMatches,
+          AddressMatches,
+          DobMatches,
+          SsnMatches,
+      ])
+  ]
     fn test_reason_codes(
         json: serde_json::Value,
         ssn_submitted: bool,
+        phone_submitted: bool,
         expected_frc: Vec<FootprintReasonCode>,
     ) {
         let res = idv::lexis::parse_response(json).unwrap();
-        assert_have_same_elements(expected_frc, super::footprint_reason_codes(res, ssn_submitted));
+        assert_have_same_elements(
+            expected_frc,
+            super::footprint_reason_codes(res, ssn_submitted, phone_submitted),
+        );
     }
 
     fn example1() -> serde_json::Value {

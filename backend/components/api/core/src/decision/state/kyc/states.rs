@@ -17,6 +17,7 @@ use crate::decision::features::risk_signals::{
     parse_reason_codes,
     parse_reason_codes_from_vendor_result,
     RiskSignalGroupStruct,
+    UserSubmittedInfoForFRC,
 };
 use crate::decision::features::{
     self,
@@ -286,11 +287,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             neuro_result,
         ) = *async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
+        let user_submitted_info = UserSubmittedInfoForFRC::new(&vw);
 
         let curp_reason_codes = curp_result.map(|v| {
             let vendor_api: VendorAPI = (&v.response.response).into();
             let vres_id = v.verification_result_id.clone();
-            parse_reason_codes(v, false, false)
+            parse_reason_codes(v, user_submitted_info)
                 .into_iter()
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect()
@@ -312,7 +314,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         if let Some(neuro_res) = neuro_result {
             let vendor_api: VendorAPI = (&neuro_res.response.response).into();
             let vres_id = neuro_res.verification_result_id.clone();
-            let neuro_frc = parse_reason_codes(neuro_res, false, false)
+            let neuro_frc = parse_reason_codes(neuro_res, user_submitted_info)
                 .into_iter()
                 .map(|frc| (frc, vendor_api, vres_id.clone()))
                 .collect();

@@ -84,6 +84,23 @@ pub struct ParsedFootprintReasonCodes {
     pub aml: RiskSignalGroupStruct<Aml>,
 }
 
+// Helper to use in FRC construction
+#[derive(Clone, Copy)]
+pub struct UserSubmittedInfoForFRC {
+    pub dob: bool,
+    pub ssn: bool,
+    pub phone: bool,
+}
+
+impl UserSubmittedInfoForFRC {
+    pub fn new(vw: &VaultWrapper) -> Self {
+        let dob = vw.has_field(&IDK::Dob.into());
+        let ssn = vw.has_field(&IDK::Ssn4.into()) || vw.has_field(&IDK::Ssn9.into());
+        let phone = vw.has_field(&IDK::PhoneNumber.into());
+        Self { dob, ssn, phone }
+    }
+}
+
 pub fn parse_reason_codes_from_vendor_result(
     vendor_result: VendorResult, /* TODO: this could be VendorResponse later when vres_id is removed from
                                   * here */
@@ -91,13 +108,11 @@ pub fn parse_reason_codes_from_vendor_result(
 ) -> ApiResult<ParsedFootprintReasonCodes> {
     let vendor_api: VendorAPI = (&vendor_result.response.response).into();
     let vres_id = vendor_result.verification_result_id.clone();
-    let dob_submitted = vw.has_field(&IDK::Dob.into());
-    let ssn_submitted = vw.has_field(&IDK::Ssn4.into()) || vw.has_field(&IDK::Ssn9.into());
+    let submitted_info = UserSubmittedInfoForFRC::new(vw);
 
-    let (aml_frcs, kyc_frcs): (Vec<_>, Vec<_>) =
-        parse_reason_codes(vendor_result.clone(), dob_submitted, ssn_submitted)
-            .into_iter()
-            .partition(|frc| frc.is_aml());
+    let (aml_frcs, kyc_frcs): (Vec<_>, Vec<_>) = parse_reason_codes(vendor_result.clone(), submitted_info)
+        .into_iter()
+        .partition(|frc| frc.is_aml());
 
     let kyc = RiskSignalGroupStruct {
         footprint_reason_codes: kyc_frcs
@@ -121,15 +136,17 @@ pub fn parse_reason_codes_from_vendor_result(
 
 pub fn parse_reason_codes(
     vendor_result: VendorResult,
-    dob_submitted: bool,
-    ssn_submitted: bool,
+    submitted_info: UserSubmittedInfoForFRC,
 ) -> Vec<FootprintReasonCode> {
+    let dob_submitted = submitted_info.dob;
+    let ssn_submitted = submitted_info.ssn;
+    let phone_submitted = submitted_info.phone;
     match vendor_result.response.response {
         ParsedResponse::IDologyExpectID(r) => {
             idology_expectid::footprint_reason_codes(r, dob_submitted, ssn_submitted)
         }
         ParsedResponse::ExperianPreciseID(r) => experian::footprint_reason_codes(r),
-        ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, ssn_submitted)
+        ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, ssn_submitted, phone_submitted)
             .into_iter()
             .collect(),
         ParsedResponse::IncodeCurpValidation(ref r) => {
