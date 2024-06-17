@@ -33,7 +33,8 @@ FROM python:3.11-slim-bookworm
 
 RUN apt-get update && apt-get install -y \
     libpq-dev \
-    gnome-keyring
+    gnome-keyring \
+    groff # Used by AWS CLI
 
 RUN mkdir -p /backend
 WORKDIR /backend
@@ -44,3 +45,6 @@ RUN pip install -r ci/requirements.txt
 # Put the copies at the end to improve build pipelining.
 COPY --from=rust-builder /root/.cargo/bin/diesel /usr/local/bin/diesel
 COPY --from=rust-builder /root/.cargo/bin/footprint-dr /usr/local/bin/footprint-dr
+
+COPY images/integration-tests/localstack-aws-config.toml /root/.aws/config
+COPY images/integration-tests/localstack-aws-credentials.toml /root/.aws/credentials

@@ -4,9 +4,7 @@
 # To run locally, you could use Docker Desktop, but colima is often a better experience.
 #
 # Install colima:
-#   brew install colima docker docker-buildx
-#   mkdir -p ~/.docker/cli-plugins
-#   ln -sfn $HOMEBREW_PREFIX/opt/docker-buildx/bin/docker-buildx ~/.docker/cli-plugins/docker-buildx
+#   brew install colima docker
 #
 # Start colima with enough resources for Rust builds:
 #   colima start --cpu 8 --memory 16 --disk 256
@@ -122,6 +120,21 @@ services:
       timeout: 1s
       retries: 3
       start_period: 10s
+
+  # localstack approximates AWS services for integration tests.
+  # It's good enough for simple things, but don't use it for anything complicated.
+  localstack:
+    image: localstack/localstack:latest@sha256:9ca38215531f004377f5f12d9e838eed630a9ca866edb336504d91dd4973aa51
+    networks:
+      - footprint
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # External services port range
+    environment:
+      SERVICES: "s3,iam"
+      ENFORCE_IAM: "1"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
   integration_tests:
     # Optional image that may be set in CI.
