@@ -13,9 +13,10 @@ pub struct TriggerKycRequest {
     /// The publishable key of the playbook onto which you would like this user to onboard. The
     /// playbook will specify required information and the rules by which to make a KYC decision.
     pub key: Option<ObConfigurationKey>,
-    /// (only valid for sandbox users) choose the desired KYC outcome
+    /// (only valid for sandbox users) choose the desired KYC outcome.
     pub fixture_result: Option<SimpleFixtureResult>,
-    /// Force KYCing a user that has already been KYCed by this playbook. Defaults to true
+    /// Run the user through KYC on the provided playbook even if they have already onboarded onto
+    /// this playbook. Defaults to true.
     pub force_reonboard: Option<bool>,
 }
 

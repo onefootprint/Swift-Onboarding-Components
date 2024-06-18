@@ -3347,7 +3347,7 @@
                 "type": "object",
                 "properties": {
                     "fixture_result": {
-                        "description": "(only valid for sandbox users) choose the desired KYC outcome",
+                        "description": "(only valid for sandbox users) choose the desired KYC outcome.",
                         "type": "string",
                         "enum": [
                             "fail",
@@ -3356,7 +3356,7 @@
                         ]
                     },
                     "force_reonboard": {
-                        "description": "Force KYCing a user that has already been KYCed by this playbook. Defaults to true",
+                        "description": "Run the user through KYC on the provided playbook even if they have already onboarded onto\n this playbook. Defaults to true.",
                         "type": "boolean"
                     },
                     "key": {

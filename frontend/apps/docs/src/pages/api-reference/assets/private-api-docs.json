@@ -25664,6 +25664,34 @@
             "VaultDrStatus": {
                 "type": "object",
                 "properties": {
+                    "enrolled_status": {
+                        "type": "object",
+                        "properties": {
+                            "aws_account_id": {
+                                "type": "string"
+                            },
+                            "aws_role_name": {
+                                "type": "string"
+                            },
+                            "enrolled_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "org_public_key": {
+                                "type": "string"
+                            },
+                            "s3_bucket_name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "aws_account_id",
+                            "aws_role_name",
+                            "enrolled_at",
+                            "org_public_key",
+                            "s3_bucket_name"
+                        ]
+                    },
                     "is_live": {
                         "type": "boolean"
                     },
