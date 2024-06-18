@@ -255,10 +255,12 @@ const Camera = ({
         logError('(interval) video ref not initialized');
         return;
       }
-      if (videoRef.current.readyState < 2) {
-        logWarn(
-          `(interval) video not ready to play. readyState: ${videoRef.current.readyState}, has videoRef src: ${!!videoRef.current.src}`,
-        );
+      if (!videoRef.current.srcObject) {
+        logWarn('(interval) video src object not set');
+        if (mediaStream && mediaStream.active) {
+          logInfo('(interval) setting video src object');
+          videoRef.current.srcObject = mediaStream;
+        }
         return;
       }
       videoRef.current
