@@ -15,7 +15,7 @@ pub enum TfError {
     #[error("Cannot run {0} playbook due to unmet requirements. {1}")]
     PlaybookMissingRequirements(ObConfigurationKind, UnmetRequirements),
     #[strum_discriminants(strum(serialize = "T122"))]
-    #[error("User already KYCed")]
+    #[error("User has already onboarded onto this playbook")]
     UserAlreadyKyced,
 }
 

@@ -229,4 +229,4 @@ def test_force_redo_kyc(sandbox_tenant, obc):
     data = dict(key=obc.key.value, force_reonboard=False)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=409)
     assert body["code"] == "T122"
-    assert body["message"] == "User already KYCed"
+    assert body["message"] == "User has already onboarded onto this playbook"
