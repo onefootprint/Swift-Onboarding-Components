@@ -23,7 +23,6 @@ use api_core::errors::{
     TfError,
     ValidationError,
 };
-use api_core::task;
 use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -227,8 +226,6 @@ pub async fn post(
     } else {
         tracing::error!(workflow_id=?ww.workflow_id, wf_state=?ww.state, "[/kyc] Workflow has already been run");
     }
-    task::execute_webhook_tasks((*state.clone().into_inner()).clone());
-
     let (wf, sv, mrs) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {

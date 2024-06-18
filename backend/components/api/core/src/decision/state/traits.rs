@@ -21,6 +21,7 @@ use enum_dispatch::enum_dispatch;
 use newtypes::{
     Locked,
     WorkflowId,
+    WorkflowSource,
 };
 
 #[enum_dispatch]
@@ -88,7 +89,7 @@ where
     ) -> ApiResult<TWorkflow> {
         let r = self.execute_async_idempotent_actions(action, state).await?;
         let current_state = self.name();
-        let result = state
+        let (result, wf_source) = state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
                 // TODO pass the workflow into `on_commit` so we don't have to fetch + lock again
@@ -97,6 +98,7 @@ where
                     Err(StateError::ConcurrentStateChange(current_state, wf.state))?
                 }
                 let wf_id = Locked::new(wf.id.clone());
+                let wf_source = wf.source;
                 let new_state = self.on_commit(wf, r, conn)?;
                 DbWorkflow::update_state(
                     conn,
@@ -104,13 +106,15 @@ where
                     current_state,
                     newtypes::WorkflowState::from(&new_state.clone().into()),
                 )?;
-                Ok(new_state)
+                Ok((new_state, wf_source))
             })
             .await?;
-        // Various workflows can do Workflow::update which creates Task's for webhooks
-        // Until we get comfortable with a proper daemon/worker machines executing these Tasks continually,
-        // we need to manually prompt execution
-        task::execute_webhook_tasks(state.clone());
+        if wf_source != WorkflowSource::Tenant {
+            // Various workflows can do Workflow::update which creates Task's for webhooks
+            // Until we get comfortable with a proper daemon/worker machines executing these Tasks
+            // continually, we need to manually prompt execution
+            task::execute_webhook_tasks(state.clone());
+        }
         Ok(result)
     }
 }
