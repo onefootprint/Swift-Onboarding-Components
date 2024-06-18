@@ -45,6 +45,7 @@ use newtypes::{
     DbUserTimelineEvent,
     DbUserTimelineEventKind,
     ExternalIntegrationInfo,
+    OnboardingTimelineInfo,
     ScopedVaultId,
     UserTimelineId,
     VaultId,
@@ -104,6 +105,7 @@ pub enum SaturatedTimelineEvent {
     LabelAdded(ScopedVaultLabel),
     ExternalIntegrationCalled(ExternalIntegrationInfo),
     StepUp(Vec<DocumentRequest>),
+    OnboardingTimeline(OnboardingTimelineInfo),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -348,6 +350,9 @@ impl UserTimeline {
                             .cloned()
                             .collect();
                         SaturatedTimelineEvent::StepUp(drs)
+                    }
+                    DbUserTimelineEvent::OnboardingTimeline(ref e) => {
+                        SaturatedTimelineEvent::OnboardingTimeline(e.clone())
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))

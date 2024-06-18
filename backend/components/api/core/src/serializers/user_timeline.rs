@@ -175,6 +175,9 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     })
                     .collect(),
             ),
+            SaturatedTimelineEvent::OnboardingTimeline(e) => {
+                Self::OnboardingTimeline(api_wire_types::OnboardingTimelineInfo { event: e.event })
+            }
         }
     }
 }

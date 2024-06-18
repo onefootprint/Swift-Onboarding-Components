@@ -12,6 +12,7 @@ mod skip_passkey_register;
 mod socure_device;
 mod status;
 mod stytch;
+mod timeline;
 mod validate;
 
 use api_core::*;
@@ -29,6 +30,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(validate::post)
         .service(stytch::post)
         .service(neuro_id::get)
+        .service(timeline::post)
         .service(config::get);
 
     config::configure_get_aliases(config);

@@ -24,6 +24,7 @@ use newtypes::{
     LabelKind,
     WorkflowRequestConfig,
 };
+use serde::Deserialize;
 
 /// Describes a liveness event that took place
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
@@ -56,6 +57,7 @@ pub enum UserTimelineEvent {
     LabelAdded(LabelAdded),
     ExternalIntegrationCalled(ExternalIntegrationCalled),
     StepUp(Vec<DocumentRequest>),
+    OnboardingTimeline(OnboardingTimelineInfo),
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -108,4 +110,14 @@ pub struct ExternalIntegrationCalled {
     pub integration: ExternalIntegrationKind,
     pub successful: bool,
     pub external_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct OnboardingTimelineInfo {
+    pub event: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct CreateOnboardingTimelineRequest {
+    pub event: String,
 }

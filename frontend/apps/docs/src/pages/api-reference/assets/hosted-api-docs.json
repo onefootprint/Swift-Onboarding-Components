@@ -919,6 +919,42 @@
                 ]
             }
         },
+        "/hosted/onboarding/timeline": {
+            "post": {
+                "tags": [
+                    "Onboarding",
+                    "Hosted"
+                ],
+                "description": "Log a timeline event for this user using a frontend-provided page identifier",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOnboardingTimelineRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Onboarding Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/onboarding/validate": {
             "post": {
                 "tags": [
@@ -2681,6 +2717,17 @@
                 },
                 "required": [
                     "id"
+                ]
+            },
+            "CreateOnboardingTimelineRequest": {
+                "type": "object",
+                "properties": {
+                    "event": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "event"
                 ]
             },
             "CreateSdkArgsTokenResponse": {

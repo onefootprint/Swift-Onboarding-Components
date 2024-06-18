@@ -38,7 +38,9 @@ use strum::{
     EnumDiscriminants,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants)]
+#[derive(
+    Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants, derive_more::From,
+)]
 #[strum_discriminants(name(DbUserTimelineEventKind))]
 #[strum_discriminants(derive(
     Apiv2Schema,
@@ -69,87 +71,11 @@ pub enum DbUserTimelineEvent {
     LabelAdded(LabelAddedInfo),
     ExternalIntegrationCalled(ExternalIntegrationInfo),
     StepUp(StepUpInfo),
+    /// Client-provided events as the user is moving through pages
+    OnboardingTimeline(OnboardingTimelineInfo),
 }
 
 impl_enum_string_diesel!(DbUserTimelineEventKind);
-
-impl From<DataCollectedInfo> for DbUserTimelineEvent {
-    fn from(s: DataCollectedInfo) -> Self {
-        Self::DataCollected(s)
-    }
-}
-
-impl From<DocumentUploadedInfo> for DbUserTimelineEvent {
-    fn from(s: DocumentUploadedInfo) -> Self {
-        Self::DocumentUploaded(s)
-    }
-}
-
-impl From<OnboardingDecisionInfo> for DbUserTimelineEvent {
-    fn from(s: OnboardingDecisionInfo) -> Self {
-        Self::OnboardingDecision(s)
-    }
-}
-
-impl From<LivenessInfo> for DbUserTimelineEvent {
-    fn from(s: LivenessInfo) -> Self {
-        Self::Liveness(s)
-    }
-}
-
-impl From<AnnotationInfo> for DbUserTimelineEvent {
-    fn from(s: AnnotationInfo) -> Self {
-        Self::Annotation(s)
-    }
-}
-
-impl From<WatchlistCheckInfo> for DbUserTimelineEvent {
-    fn from(s: WatchlistCheckInfo) -> Self {
-        Self::WatchlistCheck(s)
-    }
-}
-
-impl From<VaultCreatedInfo> for DbUserTimelineEvent {
-    fn from(s: VaultCreatedInfo) -> Self {
-        Self::VaultCreated(s)
-    }
-}
-
-impl From<WorkflowTriggeredInfo> for DbUserTimelineEvent {
-    fn from(s: WorkflowTriggeredInfo) -> Self {
-        Self::WorkflowTriggered(s)
-    }
-}
-
-impl From<WorkflowStartedInfo> for DbUserTimelineEvent {
-    fn from(s: WorkflowStartedInfo) -> Self {
-        Self::WorkflowStarted(s)
-    }
-}
-
-impl From<AuthMethodUpdatedInfo> for DbUserTimelineEvent {
-    fn from(s: AuthMethodUpdatedInfo) -> Self {
-        Self::AuthMethodUpdated(s)
-    }
-}
-
-impl From<LabelAddedInfo> for DbUserTimelineEvent {
-    fn from(s: LabelAddedInfo) -> Self {
-        Self::LabelAdded(s)
-    }
-}
-
-impl From<ExternalIntegrationInfo> for DbUserTimelineEvent {
-    fn from(s: ExternalIntegrationInfo) -> Self {
-        Self::ExternalIntegrationCalled(s)
-    }
-}
-
-impl From<StepUpInfo> for DbUserTimelineEvent {
-    fn from(s: StepUpInfo) -> Self {
-        Self::StepUp(s)
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataCollectedInfo {
@@ -245,4 +171,9 @@ pub struct ExternalIntegrationInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StepUpInfo {
     pub document_request_ids: Vec<DocumentRequestId>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OnboardingTimelineInfo {
+    pub event: String,
 }
