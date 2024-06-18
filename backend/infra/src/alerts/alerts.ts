@@ -24,6 +24,7 @@ const LATENT_HTTP_ROUTES: string[] = [
   '/vault_proxy/reflect',
   '/hosted/user/documents/{id}/process',
   '/hosted/onboarding/tel',
+  '/users/{fp_id}/kyc',
 ];
 
 /// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25
@@ -36,12 +37,7 @@ const staticAlerts: Alert[] = [
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#f9974c9bdc4c4b62878cbdf6ef7c55dc',
     query: {
-      breakdowns: [
-        'http.method',
-        'http.route',
-        'http.status_code',
-        'tenant_id',
-      ],
+      breakdowns: ['http.method', 'http.route', 'http.status_code', 'tenant_id'],
       calculations: [
         {
           op: 'COUNT',
@@ -77,8 +73,7 @@ const staticAlerts: Alert[] = [
   },
   {
     name: 'Hosted API with invalid request',
-    description:
-      'Errors to a /hosted API (used entirely by our clients) with an invalid request.',
+    description: 'Errors to a /hosted API (used entirely by our clients) with an invalid request.',
     datasetName: 'fpc-api',
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#f078e5125efa4da187c90dfa8d2ec61a',
@@ -260,8 +255,7 @@ const staticAlerts: Alert[] = [
   },
   {
     name: 'Cloudfront 5xx Errors',
-    description:
-      'Elevated 5xx seen at cloudfront. This includes 5xxs from the application, ALB, and cloudfront.',
+    description: 'Elevated 5xx seen at cloudfront. This includes 5xxs from the application, ALB, and cloudfront.',
     datasetName: 'cloudfront',
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#b6d06909bf0e4a1689bbaaef62ebd8f0',
