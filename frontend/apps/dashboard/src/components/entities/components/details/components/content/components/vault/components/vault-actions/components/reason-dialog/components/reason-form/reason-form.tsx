@@ -1,5 +1,4 @@
-import { Box, Divider, NativeSelect, Text, TextArea } from '@onefootprint/ui';
-import Hint from '@onefootprint/ui/src/components/internal/hint';
+import { Box, Divider, Hint, NativeSelect, Text, TextArea } from '@onefootprint/ui';
 import Label from '@onefootprint/ui/src/components/label';
 import React, { useId, useState } from 'react';
 import { useForm } from 'react-hook-form';

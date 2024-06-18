@@ -1,6 +1,5 @@
 import { OrgFrequentNoteKind, WorkflowStatus } from '@onefootprint/types';
-import { Divider, Radio, Stack, Tooltip } from '@onefootprint/ui';
-import Hint from '@onefootprint/ui/src/components/internal/hint';
+import { Divider, Hint, Radio, Stack, Tooltip } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

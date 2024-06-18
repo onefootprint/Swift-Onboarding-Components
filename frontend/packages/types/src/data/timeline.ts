@@ -186,6 +186,7 @@ export type CombinedWatchlistChecksEvent = {
 export type PreviousWatchlistChecksEventData = {
   watchlistEvent: WatchlistCheckEvent;
   timestamp: string;
+  seqno: number;
 }[];
 
 export type StepUpEvent = {
@@ -223,6 +224,7 @@ export type TimelineEvent = {
     | ExternalIntegrationCalledEvent
     | StepUpEvent;
   timestamp: string;
+  seqno: number;
 };
 
 export type Timeline = TimelineEvent[];

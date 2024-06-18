@@ -10,9 +10,9 @@ import styled, { useTheme } from 'styled-components';
 
 import { useOnClickOutside } from '../../../hooks';
 import { createText } from '../../../utils/mixins';
+import Hint from '../../hint';
 import type { LabelTooltipProps } from '../../label';
 import Label from '../../label';
-import Hint from '../hint';
 import type { BaseSelectOption } from './base-select.types';
 import modifiers from './base-select.utils';
 import Control from './components/control';

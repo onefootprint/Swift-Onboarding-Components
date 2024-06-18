@@ -1,6 +1,16 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Entity } from '@onefootprint/types';
-import { ActorKind, EntityKind, EntityStatus, IdDI, ListKind } from '@onefootprint/types';
+import type { Entity, Timeline } from '@onefootprint/types';
+import {
+  ActorKind,
+  CollectedKybDataOption,
+  CollectedKycDataOption,
+  DecisionStatus,
+  EntityKind,
+  EntityStatus,
+  IdDI,
+  ListKind,
+  TimelineEventKind,
+} from '@onefootprint/types';
 
 export const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 export const entityWithPhoneFixture: Entity = {
@@ -124,4 +134,66 @@ export const withLists = () =>
     method: 'get',
     path: '/org/lists',
     response: listsFixture,
+  });
+
+export const timelineFixture: Timeline = [
+  {
+    event: {
+      kind: TimelineEventKind.dataCollected,
+      data: {
+        attributes: [
+          CollectedKybDataOption.name,
+          CollectedKybDataOption.phoneNumber,
+          CollectedKybDataOption.website,
+          CollectedKybDataOption.address,
+          CollectedKybDataOption.beneficialOwners,
+          CollectedKybDataOption.tin,
+        ],
+        isPrefill: false,
+      },
+    },
+    timestamp: '2023-04-05T11:16:13.599001Z',
+    seqno: 1,
+  },
+  {
+    event: {
+      kind: TimelineEventKind.onboardingDecision,
+      data: {
+        decision: {
+          id: 'decision_ukUpX59i8VJZiuk6boskdR',
+          status: DecisionStatus.pass,
+          timestamp: new Date('2023-04-05T11:17:06.773951Z'),
+          source: {
+            kind: ActorKind.footprint,
+          },
+          obConfiguration: {
+            id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
+            name: 'My Playbook',
+            mustCollectData: [
+              CollectedKybDataOption.name,
+              CollectedKybDataOption.address,
+              CollectedKybDataOption.tin,
+              CollectedKybDataOption.beneficialOwners,
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.address,
+              CollectedKycDataOption.phoneNumber,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.ssn4,
+            ],
+          },
+          vendors: [],
+        },
+        annotation: null,
+      },
+    },
+    timestamp: '2023-04-05T11:17:06.776409Z',
+    seqno: 2,
+  },
+];
+
+export const withTimeline = (entity = entityWithPhoneFixture, response = timelineFixture) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/timeline`,
+    response,
   });

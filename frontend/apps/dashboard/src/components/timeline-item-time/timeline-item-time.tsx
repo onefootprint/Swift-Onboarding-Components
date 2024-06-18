@@ -11,7 +11,7 @@ export type TimelineItemTimeData =
       end: string;
     };
 
-type TimelineItemTimeProps = {
+export type TimelineItemTimeProps = {
   time: TimelineItemTimeData;
 };
 

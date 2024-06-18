@@ -17,15 +17,19 @@ const processWatchlistEvent = (
   const latestWatchlistEvent = combinedWatchlistChecksEvent.latestWatchlistEvent ?? currentWatchlistEvent;
   const latestWatchlistEventTimestamp =
     combinedWatchlistChecksEvent.data.length > 0 ? combinedWatchlistChecksEvent.data[0].timestamp : event.timestamp;
+  const latestWatchlistEventSeqno =
+    combinedWatchlistChecksEvent.data.length > 0 ? combinedWatchlistChecksEvent.data[0].seqno : event.seqno;
+
   combinedWatchlistChecksEvent.data.push({
     watchlistEvent: currentWatchlistEvent,
     timestamp: event.timestamp,
+    seqno: event.seqno,
   });
   const newCombinedWatchlistCheckEvent = {
     ...combinedWatchlistChecksEvent,
     latestWatchlistEvent,
   };
-  const newBufferTimeline = [...bufferTimeline];
+
   const newTimelineWatchlishEvent: AuditTrailTimelineEvent = {
     event: {
       ...newCombinedWatchlistCheckEvent,
@@ -33,8 +37,9 @@ const processWatchlistEvent = (
     time: {
       timestamp: latestWatchlistEventTimestamp,
     },
+    seqno: latestWatchlistEventSeqno,
   };
-
+  const newBufferTimeline = [...bufferTimeline];
   if (combinedWatchlistEventIndex >= 0) {
     newBufferTimeline[combinedWatchlistEventIndex] = newTimelineWatchlishEvent;
   } else {
@@ -73,6 +78,7 @@ const mergeAuditTrailTimelineEvents = (events: TimelineEvent[]): AuditTrailTimel
       time: {
         timestamp: event.timestamp,
       },
+      seqno: event.seqno,
     });
   });
 

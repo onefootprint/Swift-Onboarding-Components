@@ -56,6 +56,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           timestamp: '2021-01-02T00:00:00.000Z',
+          seqno: 2,
         },
         {
           event: {
@@ -66,6 +67,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           timestamp: '2021-02-01T00:00:00.000Z',
+          seqno: 1,
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -79,6 +81,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           time: { timestamp: '2021-01-02T00:00:00.000Z' },
+          seqno: 2,
         },
         {
           event: {
@@ -89,6 +92,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           time: { timestamp: '2021-02-01T00:00:00.000Z' },
+          seqno: 1,
         },
       ]);
     });
@@ -110,6 +114,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           timestamp: '2021-01-02T00:00:00.000Z',
+          seqno: 3,
         },
         {
           event: {
@@ -126,6 +131,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           timestamp: '2021-02-01T00:00:00.000Z',
+          seqno: 4,
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -145,6 +151,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           time: { timestamp: '2021-01-02T00:00:00.000Z' },
+          seqno: 3,
         },
         {
           event: {
@@ -161,6 +168,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           time: { timestamp: '2021-02-01T00:00:00.000Z' },
+          seqno: 4,
         },
       ]);
     });
@@ -172,6 +180,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
         {
           event: watchlistCheckEvent1,
           timestamp: '2021-01-01T00:00:00.000Z',
+          seqno: 1,
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -183,11 +192,13 @@ describe('mergeAuditTrailTimelineEvents', () => {
               {
                 watchlistEvent: watchlistCheckEvent1,
                 timestamp: '2021-01-01T00:00:00.000Z',
+                seqno: 1,
               },
             ],
             latestWatchlistEvent: watchlistCheckEvent1,
           },
           time: { timestamp: '2021-01-01T00:00:00.000Z' },
+          seqno: 1,
         },
       ]);
     });
@@ -197,10 +208,12 @@ describe('mergeAuditTrailTimelineEvents', () => {
         {
           event: watchlistCheckEvent1,
           timestamp: '2021-01-02T00:00:00.000Z',
+          seqno: 2,
         },
         {
           event: watchlistCheckEvent2,
           timestamp: '2021-01-01T00:00:00.000Z',
+          seqno: 1,
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -212,15 +225,18 @@ describe('mergeAuditTrailTimelineEvents', () => {
               {
                 watchlistEvent: watchlistCheckEvent1,
                 timestamp: '2021-01-02T00:00:00.000Z',
+                seqno: 2,
               },
               {
                 watchlistEvent: watchlistCheckEvent2,
                 timestamp: '2021-01-01T00:00:00.000Z',
+                seqno: 1,
               },
             ],
             latestWatchlistEvent: watchlistCheckEvent1,
           },
           time: { timestamp: '2021-01-02T00:00:00.000Z' },
+          seqno: 2,
         },
       ]);
     });
@@ -230,6 +246,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
         {
           event: watchlistCheckEvent1,
           timestamp: '2021-01-06T00:00:00.000Z',
+          seqno: 6,
         },
         {
           event: {
@@ -240,6 +257,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           timestamp: '2021-01-05T00:00:00.000Z',
+          seqno: 5,
         },
         {
           event: {
@@ -250,14 +268,17 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           timestamp: '2021-01-04T00:00:00.000Z',
+          seqno: 4,
         },
         {
           event: watchlistCheckEvent2,
           timestamp: '2021-01-03T00:00:00.000Z',
+          seqno: 3,
         },
         {
           event: watchlistCheckEvent3,
           timestamp: '2021-01-02T00:00:00.000Z',
+          seqno: 2,
         },
         {
           event: {
@@ -268,6 +289,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           timestamp: '2021-01-01T00:00:00.000Z',
+          seqno: 1,
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -279,19 +301,23 @@ describe('mergeAuditTrailTimelineEvents', () => {
               {
                 watchlistEvent: watchlistCheckEvent1,
                 timestamp: '2021-01-06T00:00:00.000Z',
+                seqno: 6,
               },
               {
                 watchlistEvent: watchlistCheckEvent2,
                 timestamp: '2021-01-03T00:00:00.000Z',
+                seqno: 3,
               },
               {
                 watchlistEvent: watchlistCheckEvent3,
                 timestamp: '2021-01-02T00:00:00.000Z',
+                seqno: 2,
               },
             ],
             latestWatchlistEvent: watchlistCheckEvent1,
           },
           time: { timestamp: '2021-01-06T00:00:00.000Z' },
+          seqno: 6,
         },
         {
           event: {
@@ -302,6 +328,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           time: { timestamp: '2021-01-05T00:00:00.000Z' },
+          seqno: 5,
         },
         {
           event: {
@@ -312,8 +339,8 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           time: { timestamp: '2021-01-04T00:00:00.000Z' },
+          seqno: 4,
         },
-
         {
           event: {
             kind: TimelineEventKind.dataCollected,
@@ -323,6 +350,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           time: { timestamp: '2021-01-01T00:00:00.000Z' },
+          seqno: 1,
         },
       ]);
     });

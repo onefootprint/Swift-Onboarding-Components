@@ -4,8 +4,8 @@ import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import type { TimelineItemTimeData } from './components/timeline-item-time';
-import TimelineItemTime from './components/timeline-item-time';
+import type { TimelineItemTimeData } from '../timeline-item-time';
+import TimelineItemTime from '../timeline-item-time';
 
 export type TimelineItem = {
   time?: TimelineItemTimeData;

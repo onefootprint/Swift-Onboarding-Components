@@ -148,6 +148,7 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-03-29T23:07:44.493561Z',
+    seqno: 1,
   },
   {
     event: {
@@ -158,6 +159,7 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-03-29T23:07:44.854515Z',
+    seqno: 2,
   },
   {
     event: {
@@ -173,6 +175,7 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-03-29T23:08:13.960464Z',
+    seqno: 3,
   },
   {
     event: {
@@ -196,6 +199,7 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-03-29T23:08:36.768054Z',
+    seqno: 4,
   },
   {
     event: {
@@ -207,6 +211,7 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-03-30T00:15:27.173615Z',
+    seqno: 5,
   },
 ];
 

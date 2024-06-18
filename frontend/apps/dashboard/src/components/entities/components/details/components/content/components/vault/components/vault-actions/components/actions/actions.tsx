@@ -15,11 +15,13 @@ import RequestMoreInfoDialog from '../request-more-info-dialog';
 import SummarizeAiDialog from '../summarize-ai-dialog';
 import UpdateAuthDialog from '../update-auth-dialog';
 import UploadDocDialog from '../upload-doc-dialog';
+import ViewHistoricalDataDialog from '../view-historical-data-dialog';
 
 enum ActionDialog {
   auth,
   requestMoreInfo,
   addToList,
+  historicalData,
   summarize,
   uploadDoc,
 }
@@ -89,6 +91,7 @@ const Actions = ({ entity }: WithEntityProps) => {
       <RequestMoreInfoDialog open={openDialog === ActionDialog.requestMoreInfo} onClose={handleCloseDialog} />
       <UpdateAuthDialog open={openDialog === ActionDialog.auth} onClose={handleCloseDialog} />
       <AddToListDialog open={openDialog === ActionDialog.addToList} onClose={handleCloseDialog} />
+      <ViewHistoricalDataDialog open={openDialog === ActionDialog.historicalData} onClose={handleCloseDialog} />
       <SummarizeAiDialog open={openDialog === ActionDialog.summarize} onClose={handleCloseDialog} />
       <UploadDocDialog open={openDialog === ActionDialog.uploadDoc} onClose={handleCloseDialog} />
     </>

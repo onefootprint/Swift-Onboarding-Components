@@ -81,8 +81,10 @@ export type {
   ToastProps,
   ToggleProps,
   TooltipProps,
+  HintProps,
 } from './components';
 export {
+  Hint,
   AddressInput,
   AnimatedLoadingSpinner,
   Avatar,

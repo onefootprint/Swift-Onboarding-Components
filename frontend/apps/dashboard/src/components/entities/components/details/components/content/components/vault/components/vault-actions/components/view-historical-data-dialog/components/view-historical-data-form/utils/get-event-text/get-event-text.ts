@@ -12,6 +12,10 @@ import type {
 import {
   ActorKind,
   AuthMethodKind,
+  CollectedDocumentDataOption,
+  CollectedInvestorProfileDataOption,
+  CollectedKybDataOption,
+  CollectedKycDataOption,
   DecisionStatus,
   DocumentRequestKind,
   EntityLabel,
@@ -29,7 +33,8 @@ import {
   type WorkflowStartedEventData,
   WorkflowStartedEventKind,
 } from '@onefootprint/types/src/data/timeline';
-import type { AuditTrailTimelineEvent } from 'src/components/entities/components/details/components/content/components/audit-trail/components/content/components/audit-trail-timeline/utils/merge-audit-trail-timeline-events';
+import { startCase } from 'lodash';
+import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
 
 import getActorText from '../get-actor-text';
 
@@ -63,8 +68,50 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
       let title = eventData.isPrefill ? 'Prefilled' : 'Collected';
       const actorText = getActorText(eventData.actor);
       title = actorText ? `${actorText} edited` : title;
+
+      const cdoText: Partial<
+        Record<
+          | CollectedKybDataOption
+          | CollectedKycDataOption
+          | CollectedInvestorProfileDataOption
+          | CollectedDocumentDataOption
+          | SupportedIdDocTypes,
+          string
+        >
+      > = {
+        [CollectedKycDataOption.name]: 'Full name',
+        [CollectedKycDataOption.email]: 'Email',
+        [CollectedKycDataOption.address]: 'Address',
+        [CollectedKycDataOption.dob]: 'Date of birth',
+        [CollectedKycDataOption.phoneNumber]: 'Phone number',
+        [CollectedKycDataOption.ssn4]: 'SSN (Last 4)',
+        [CollectedKycDataOption.ssn9]: 'SSN (Full)',
+        [CollectedKycDataOption.nationality]: 'Nationality',
+        [CollectedKycDataOption.usLegalStatus]: 'Legal status in the U.S.',
+        [CollectedKybDataOption.name]: 'Business name',
+        [CollectedKybDataOption.tin]: 'Taxpayer Identification Number (TIN)',
+        [CollectedKybDataOption.address]: 'Registered business address',
+        [CollectedKybDataOption.phoneNumber]: 'Business phone number',
+        [CollectedKybDataOption.website]: 'Business website',
+        [CollectedKybDataOption.corporationType]: 'Legal entity type',
+        [CollectedKybDataOption.beneficialOwners]: 'Business beneficial owners',
+        [CollectedKybDataOption.kycedBeneficialOwners]: 'Business beneficial owners (Fully-KYCed)',
+        [CollectedInvestorProfileDataOption.investorProfile]: 'Investor profile',
+        [CollectedDocumentDataOption.document]: 'ID Document',
+        [CollectedDocumentDataOption.documentAndSelfie]: 'ID Document & Selfie',
+        [SupportedIdDocTypes.driversLicense]: "Driver's license",
+        [SupportedIdDocTypes.passport]: 'Passport',
+        [SupportedIdDocTypes.idCard]: 'ID card',
+        [SupportedIdDocTypes.visa]: 'Visa',
+        [SupportedIdDocTypes.workPermit]: 'Work permit / EAD card',
+        [SupportedIdDocTypes.residenceDocument]: 'Residence card / Green card',
+      };
+      const cdoList = eventData.attributes
+        .map(cdo => (cdo in cdoText ? cdoText[cdo] : startCase(cdo.replace('_', ' '))))
+        .join(', ');
+
       const end = eventData.isPrefill ? " from user's existing data in Footprint" : '';
-      return `${title} data fields${end}`;
+      return `${title} ${cdoList}${end}`;
     }
   }
 

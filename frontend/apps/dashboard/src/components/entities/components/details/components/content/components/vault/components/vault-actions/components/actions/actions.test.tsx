@@ -25,6 +25,7 @@ import {
   entityWithoutPhoneFixture,
   withEntity,
   withLists,
+  withTimeline,
   withTokenSendLink,
   withTrigger,
   withTriggerError,
@@ -72,6 +73,7 @@ describe('<Actions />', () => {
           withEntity(entityWithoutPhoneFixture);
           withTrigger();
           withTokenSendLink('email');
+          withTimeline(entityWithoutPhoneFixture);
         });
 
         it('should close the dialog and show a confirmation message for email sent', async () => {
@@ -140,6 +142,7 @@ describe('<Actions />', () => {
           withEntity(entityWithPhoneFixture);
           withTrigger();
           withTokenSendLink('phone');
+          withTimeline();
         });
 
         it('should close the dialog and show a confirmation message for SMS sent', async () => {
@@ -208,6 +211,7 @@ describe('<Actions />', () => {
     describe('when the request to trigger request fails', () => {
       beforeEach(() => {
         withEntity(entityWithPhoneFixture);
+        withTimeline();
         withTriggerError();
       });
 

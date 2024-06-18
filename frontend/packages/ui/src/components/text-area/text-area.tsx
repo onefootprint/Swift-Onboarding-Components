@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 import { createText } from '../../utils';
 import Box from '../box';
-import Hint from '../internal/hint';
+import Hint from '../hint';
 import Label from '../label';
 
 export type TextAreaProps = {

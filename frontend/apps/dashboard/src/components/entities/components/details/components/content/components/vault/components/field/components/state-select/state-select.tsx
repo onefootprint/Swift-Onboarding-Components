@@ -1,7 +1,6 @@
 import { STATES } from '@onefootprint/global-constants';
 import { IdDI, type VaultValue } from '@onefootprint/types';
-import { NativeSelect, TextInput } from '@onefootprint/ui';
-import Hint from '@onefootprint/ui/src/components/internal/hint';
+import { Hint, NativeSelect, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

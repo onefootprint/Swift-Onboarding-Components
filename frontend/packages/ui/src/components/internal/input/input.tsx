@@ -6,10 +6,10 @@ import styled, { css } from 'styled-components';
 
 import type { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
 import useSx from '../../../hooks/use-sx';
+import Hint from '../../hint';
 import Label from '../../label';
 import type { FieldProps } from '../field';
 import Field from '../field';
-import Hint from '../hint';
 
 export type InternalInputProps = {
   prefixComponent?: React.ReactNode;

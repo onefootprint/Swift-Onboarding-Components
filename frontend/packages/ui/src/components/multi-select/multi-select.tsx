@@ -6,7 +6,7 @@ import { useTheme } from 'styled-components';
 
 import { createText } from '../../utils';
 import Box from '../box';
-import Hint from '../internal/hint';
+import Hint from '../hint';
 import Label from '../label';
 import { ClearIndicator, DropdownIndicator, IndicatorSeparator, MultiValueRemove, Option } from './components';
 import prependAllOption from './multi-select.utils';

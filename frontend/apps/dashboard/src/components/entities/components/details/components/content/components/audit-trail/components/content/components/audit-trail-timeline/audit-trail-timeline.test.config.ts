@@ -55,6 +55,7 @@ export const TimelineFixture: Timeline = [
       },
     },
     timestamp: '2022-11-08T10:21:33.931738Z',
+    seqno: 1,
   },
   {
     event: {
@@ -72,6 +73,7 @@ export const TimelineFixture: Timeline = [
       },
     },
     timestamp: '2022-11-08T20:21:33.931738Z',
+    seqno: 2,
   },
   {
     event: {
@@ -102,6 +104,7 @@ export const TimelineFixture: Timeline = [
       },
     },
     timestamp: '2022-11-08T20:21:49.979139Z',
+    seqno: 3,
   },
   {
     event: {
@@ -132,6 +135,7 @@ export const TimelineFixture: Timeline = [
       },
     },
     timestamp: '2022-11-08T20:21:53.752388Z',
+    seqno: 4,
   },
   {
     event: {
@@ -162,6 +166,7 @@ export const TimelineFixture: Timeline = [
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',
+    seqno: 5,
   },
   {
     event: {
@@ -175,6 +180,7 @@ export const TimelineFixture: Timeline = [
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',
+    seqno: 6,
   },
   {
     event: {
@@ -202,6 +208,7 @@ export const TimelineFixture: Timeline = [
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',
+    seqno: 7,
   },
   {
     event: {
@@ -216,6 +223,7 @@ export const TimelineFixture: Timeline = [
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',
+    seqno: 8,
   },
 ];
 
@@ -237,6 +245,7 @@ export const WorkflowTriggeredWithLinkEvent: TimelineEvent = {
     },
   },
   timestamp: '2022-11-08T20:21:53.771495Z',
+  seqno: 9,
 };
 
 export const DocumentWorkflowStarted: TimelineEvent = {
@@ -252,6 +261,7 @@ export const DocumentWorkflowStarted: TimelineEvent = {
     },
   },
   timestamp: '2022-11-08T20:21:53.771495Z',
+  seqno: 10,
 };
 
 export const ruleResultsFixture: RuleResult[] = [

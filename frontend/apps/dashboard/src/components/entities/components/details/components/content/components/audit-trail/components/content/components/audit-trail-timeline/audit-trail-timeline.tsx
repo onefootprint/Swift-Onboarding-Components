@@ -27,6 +27,8 @@ import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 
+import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeline-events';
+import mergeAuditTrailTimelineEvents from 'src/utils/merge-audit-trail-timeline-events';
 import { AbandonedEventHeader } from './components/abandoned-event';
 import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
@@ -44,8 +46,6 @@ import { StepUpEventBody, StepUpEventHeader } from './components/step-up-event';
 import { WatchlistCheckEventBody, WatchlistCheckEventHeader } from './components/watchlist-check-event';
 import WorkflowStartedEventHeader from './components/workflow-started-event';
 import { WorkflowTriggeredEventBody, WorkflowTriggeredEventHeader } from './components/workflow-triggered-event';
-import type { AuditTrailTimelineEvent } from './utils/merge-audit-trail-timeline-events';
-import mergeAuditTrailTimelineEvents from './utils/merge-audit-trail-timeline-events';
 
 export type AuditTrailTimelineProps = {
   timeline: EntityTimeline;

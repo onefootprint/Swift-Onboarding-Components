@@ -94,6 +94,7 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-04-05T11:16:13.599001Z',
+    seqno: 1,
   },
   {
     event: {
@@ -127,6 +128,7 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-04-05T11:17:06.776409Z',
+    seqno: 2,
   },
 ];
 

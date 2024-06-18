@@ -33,7 +33,7 @@ describe('getEventText', () => {
   describe('when an event with kind TimelineEventKind.dataCollected is passed in', () => {
     it('should return the correct text', () => {
       const dataCollectedText = getEventText(dataCollectedEventFixture);
-      expect(dataCollectedText).toEqual('Collected data fields');
+      expect(dataCollectedText).toEqual('Collected Full name, Date of birth, SSN (Full), Address, Email, Phone number');
     });
   });
 

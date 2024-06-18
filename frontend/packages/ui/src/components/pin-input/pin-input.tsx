@@ -4,7 +4,7 @@ import identity from 'lodash/identity';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import Hint from '../internal/hint';
+import Hint from '../hint';
 import Input from '../internal/input';
 import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';

@@ -29,6 +29,8 @@ export type { CountrySelectOption, CountrySelectProps } from './country-select';
 export { default as CountrySelect } from './country-select';
 export type { DateRangeInputProps } from './date-range-input';
 export { default as DateRangeInput } from './date-range-input';
+export { default as Hint } from './hint';
+export type { HintProps } from './hint';
 export { default as DateSelectorSheet } from './date-selector-sheet';
 export { default as DateRangeSelector } from './date-selector-sheet';
 export type {

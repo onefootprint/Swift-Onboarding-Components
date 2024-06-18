@@ -1,6 +1,5 @@
 import { IdDI, type VaultValue, VisaKind } from '@onefootprint/types';
-import { NativeSelect } from '@onefootprint/ui';
-import Hint from '@onefootprint/ui/src/components/internal/hint';
+import { Hint, NativeSelect } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';

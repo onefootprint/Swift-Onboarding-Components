@@ -1422,6 +1422,22 @@
           "send-link-sms": "Send via SMS",
           "send-link-email": "Send via email"
         },
+        "view-historical-data": {
+          "label": "View historical data",
+          "title": "View historical data",
+          "no-events": "This user has no events to select from, so there is no historical data available.",
+          "form": {
+            "heading": "Select event in time",
+            "subheading": "You will see this user's details as they were at that particular moment in time.",
+            "required-error": "Please select an event",
+            "continue": "Continue",
+            "cancel": "Cancel"
+          },
+          "footer": {
+            "viewing": "Viewing user as in: ",
+            "exit": "Exit"
+          }
+        },
         "share": {
           "label": "Share"
         },
