@@ -8,7 +8,7 @@ from tests.disaster_recovery.utils import *
 # re-enrollment flows in sandbox mode. For all other tests that can enroll
 # idempotently, we'll use live mode.
 @pytest.mark.skipif(
-    ENVIRONMENT in ("ephemeral", "dev", "prod"),
+    ENVIRONMENT in ("ephemeral", "dev", "production"),
     reason="This test relies on localstack",
 )
 def test_footprint_dr_enroll(tenant):
