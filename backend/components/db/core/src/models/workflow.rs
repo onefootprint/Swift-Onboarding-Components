@@ -655,9 +655,7 @@ impl Workflow {
                     is_live: sv.is_live,
                 });
                 let task_data = sv.webhook_event(webhook_event).into();
-                if !sv.tenant_id.is_avis() {
-                    Task::create(conn, Utc::now(), task_data)?;
-                }
+                Task::create(conn, Utc::now(), task_data)?;
             };
 
             let can_transition = new_status.can_transition_from(&sv.status);
@@ -688,9 +686,7 @@ impl Workflow {
                     is_live: sv.is_live,
                 });
                 let task_data = sv.webhook_event(webhook_event).into();
-                if !sv.tenant_id.is_avis() {
-                    Task::create(conn, Utc::now(), task_data)?;
-                }
+                Task::create(conn, Utc::now(), task_data)?;
             };
         }
         Ok(result)
