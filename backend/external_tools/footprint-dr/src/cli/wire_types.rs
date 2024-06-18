@@ -43,6 +43,8 @@ pub struct VaultDrEnrollRequest {
     pub aws_account_id: String,
     pub aws_role_name: String,
     pub s3_bucket_name: String,
+
+    pub re_enroll: Option<bool>,
 }
 
 #[derive(Clone, Deserialize)]

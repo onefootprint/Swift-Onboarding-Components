@@ -32,6 +32,14 @@ def test_footprint_dr_enroll(tenant):
 
 
     with footprint_dr("enroll", "--sandbox") as cmd:
+        i = cmd.expect_exact([
+            r"Re-enrolling will deactivate the current configuration",
+            f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
+        ])
+        if i == 0:
+            cmd.expect("Type .+ to continue, or anything else to cancel: ")
+            cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
+
         cmd.expect("Enter AWS Account ID: ")
         cmd.sendline(aws_account_id)
 
@@ -41,23 +49,17 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect("Enter S3 Bucket Name: ")
         cmd.sendline(bucket_name)
 
-        # TODO:
-        # cmd.expect("Verifying bucket access... OK")
-
+        cmd.expect("Verifying bucket access... OK")
         cmd.expect(pexpect.EOF)
-    # TODO: We need to implement re-enrollment to make these assertion valid in
-    # dev/prod integration tests.
-
-    # assert cmd.exitstatus == 0
+    assert cmd.exitstatus == 0
 
     with footprint_dr("status", "--sandbox") as cmd:
         cmd.expect(f"Logged in to {tenant.name} \\(Sandbox\\)")
         cmd.expect("Enrolled in Vault Disaster Recovery since:")
 
-        # TODO: needs re-enrollment
-        # cmd.expect(f"AWS Account ID: {aws_account_id}")
-        # cmd.expect(f"AWS Role Name: {iam_role_name}")
-        # cmd.expect(f"S3 Bucket Name: {bucket_name}")
+        cmd.expect(f"AWS Account ID: {aws_account_id}")
+        cmd.expect(f"AWS Role Name:  {iam_role_name}")
+        cmd.expect(f"S3 Bucket Name: {bucket_name}")
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 

@@ -15,6 +15,7 @@ use db_schema::schema::{
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::{
+    Locked,
     PiiString,
     TenantId,
     VaultDrAwsPreEnrollmentId,
@@ -121,9 +122,33 @@ impl VaultDrConfig {
             .optional()?)
     }
 
-    pub fn create(conn: &mut TxnPgConn, new: NewVaultDrConfig) -> DbResult<Self> {
-        Ok(diesel::insert_into(vault_dr_config::table)
+    pub fn lock(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Option<Locked<Self>>> {
+        let result = vault_dr_config::table
+            .filter(vault_dr_config::tenant_id.eq(tenant_id))
+            .filter(vault_dr_config::is_live.eq(is_live))
+            .filter(vault_dr_config::deactivated_at.is_null())
+            .for_no_key_update()
+            .first(conn)
+            .optional()?;
+
+        Ok(result.map(Locked::new))
+    }
+
+    pub fn create(conn: &mut TxnPgConn, new: NewVaultDrConfig) -> DbResult<Locked<Self>> {
+        let result = diesel::insert_into(vault_dr_config::table)
             .values(&new)
-            .get_result(conn.conn())?)
+            .get_result(conn.conn())?;
+
+        Ok(Locked::new(result))
+    }
+
+    pub fn deactivate(conn: &mut TxnPgConn, config: Locked<Self>) -> DbResult<()> {
+        diesel::update(vault_dr_config::table)
+            .filter(vault_dr_config::id.eq(&config.id))
+            .filter(vault_dr_config::deactivated_at.is_null())
+            .set(vault_dr_config::deactivated_at.eq(Utc::now()))
+            .execute(conn.conn())?;
+
+        Ok(())
     }
 }

@@ -16,6 +16,34 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     }
 
     let status = client.get_status()?;
+
+    let needs_re_enroll = status.enrolled_status.is_some();
+    if needs_re_enroll {
+        println!(
+            "{} is already enrolled in Vault Disaster Recovery for {} mode.",
+            status.org_name,
+            IsLive::from(status.is_live),
+        );
+        println!();
+        println!("Re-enrolling will deactivate the current configuration, including your org private key. New backups will be written from scratch. Are you sure you want to proceed?");
+        println!();
+
+        let correct_confirmation = format!(
+            "restart {}-mode Vault Disaster Recovery from scratch",
+            IsLive::from(status.is_live).to_string().to_lowercase(),
+        );
+        let answer = get_input(&format!(
+            "Type \"{}\" to continue, or anything else to cancel: ",
+            correct_confirmation
+        ))?;
+
+        if answer != correct_confirmation {
+            println!("Cancelled");
+            std::process::exit(3);
+        }
+        println!();
+    }
+
     println!(
         "Enrolling {} ({}) in Vault Disaster Recovery",
         status.org_name,
@@ -35,6 +63,7 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
         aws_account_id,
         aws_role_name,
         s3_bucket_name,
+        re_enroll: Some(needs_re_enroll),
     });
 
     if resp.is_ok() {

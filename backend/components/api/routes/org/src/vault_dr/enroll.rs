@@ -40,6 +40,7 @@ pub async fn post(
         aws_account_id,
         aws_role_name,
         s3_bucket_name,
+        re_enroll,
     } = request.into_inner();
 
     state
@@ -48,6 +49,14 @@ pub async fn post(
             let Some(pre_enrollment) = VaultDrAwsPreEnrollment::get(conn, &tenant.id, is_live)? else {
                 return Err(vault_dr::Error::MissingAwsPreEnrollment.into());
             };
+
+            let existing_config = VaultDrConfig::lock(conn, &tenant.id, is_live)?;
+            if let Some(existing_config) = existing_config {
+                if re_enroll != Some(true) {
+                    return Err(vault_dr::Error::AlreadyEnrolled.into());
+                }
+                VaultDrConfig::deactivate(conn, existing_config)?;
+            }
 
             let new_config = NewVaultDrConfig {
                 created_at: Utc::now(),
@@ -61,8 +70,9 @@ pub async fn post(
                 recovery_public_key: "TODO".into(),
                 wrapped_recovery_key: "TODO".into(),
             };
+            VaultDrConfig::create(conn, new_config)?;
 
-            Ok(VaultDrConfig::create(conn, new_config)?)
+            Ok(())
         })
         .await?;
 

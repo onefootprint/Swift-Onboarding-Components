@@ -435,7 +435,9 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::OpenAiCompletionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::RegexError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::VaultDrError(e) => match e {
-                vault_dr::Error::MissingAwsPreEnrollment => StatusCode::BAD_REQUEST,
+                vault_dr::Error::MissingAwsPreEnrollment | vault_dr::Error::AlreadyEnrolled => {
+                    StatusCode::BAD_REQUEST
+                }
             },
         }
     }
