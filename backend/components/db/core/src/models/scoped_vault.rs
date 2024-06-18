@@ -27,8 +27,9 @@ use chrono::{
     Duration,
     Utc,
 };
-use db_schema::schema::scoped_vault::{
-    self,
+use db_schema::schema::{
+    scoped_vault,
+    vault,
 };
 use diesel::dsl::{
     count_distinct,
@@ -472,9 +473,16 @@ impl ScopedVault {
         Ok(result_map)
     }
 
-    pub fn lock(conn: &mut PgConn, id: &ScopedVaultId) -> DbResult<Locked<Self>> {
+    pub fn lock<'a, T: Into<ScopedVaultIdentifier<'a>>>(conn: &mut PgConn, id: T) -> DbResult<Locked<Self>> {
+        // First lock the vault so we have a defined ordering of locks between the vault and scoped vault
+        // tables. This will no-op if we have already locked the vault
+        let sv = Self::get(conn, id)?;
+        vault::table
+            .filter(vault::id.eq(&sv.vault_id))
+            .for_no_key_update()
+            .get_result::<Vault>(conn)?;
         let result = scoped_vault::table
-            .filter(scoped_vault::id.eq(id))
+            .filter(scoped_vault::id.eq(&sv.id))
             .for_no_key_update()
             .get_result(conn)?;
         Ok(Locked::new(result))

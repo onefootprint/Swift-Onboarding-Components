@@ -61,8 +61,7 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let sb = ScopedVault::get(conn, (&fp_bid, &tenant_id, is_live))?;
-            let sb = ScopedVault::lock(conn, &sb.id)?;
+            let sb = ScopedVault::lock(conn, (&fp_bid, &tenant_id, is_live))?;
             if sb.kind != VaultKind::Business {
                 return ValidationError("Provided fp_bid does not correspond to a business").into();
             }
