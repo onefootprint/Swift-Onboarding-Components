@@ -101,7 +101,7 @@ pub async fn create_user_and_onboarding(
                 maybe_prefill_data: None,
                 is_neuro_enabled: false,
             };
-            let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(conn, args).unwrap();
+            let (wf_id, biz_wf, _) = utils::onboarding::get_or_start_onboarding(conn, args).unwrap();
             if let Some(fixture_result) = kyc_fixture_result {
                 Workflow::update_fixture_result(conn, &wf_id, fixture_result).unwrap();
             }

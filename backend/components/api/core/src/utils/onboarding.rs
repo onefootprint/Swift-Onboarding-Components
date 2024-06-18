@@ -15,7 +15,10 @@ use db::models::document_request::{
 };
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::{
+    IsNew,
+    ScopedVault,
+};
 use db::models::vault::{
     NewVaultArgs,
     Vault,
@@ -71,7 +74,7 @@ pub struct NewOnboardingArgs<'a> {
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
     args: NewOnboardingArgs,
-) -> ApiResult<(WorkflowId, Option<Workflow>)> {
+) -> ApiResult<(WorkflowId, Option<Workflow>, IsNew)> {
     let NewOnboardingArgs {
         existing_wf_id,
         wfr_id,
@@ -95,12 +98,12 @@ pub fn get_or_start_onboarding(
         .map(|id| WorkflowRequest::get(conn, &id, &sv.id))
         .transpose()?;
 
-    let wf_id = if let Some(wf_id) = wfr.as_ref().and_then(|wfr| wfr.workflow_id.as_ref()) {
+    let (wf_id, is_new_ob) = if let Some(wf_id) = wfr.as_ref().and_then(|wfr| wfr.workflow_id.as_ref()) {
         // This request has already been used to make a Workflow. Return that workflow.
-        wf_id.clone()
+        (wf_id.clone(), false)
     } else if let Some(wf_id) = existing_wf_id {
         // The auth token already has a workflow_id in it
-        wf_id
+        (wf_id, false)
     } else {
         // Make a new workflow. The workflow is created either for the playbook specified in the
         // auth token OR for the config specified in the WorkflowRequest
@@ -136,7 +139,7 @@ pub fn get_or_start_onboarding(
                 }
             }
         }
-        wf.id
+        (wf.id, is_new_ob)
     };
 
     if let Some(wfr) = wfr {
@@ -188,7 +191,7 @@ pub fn get_or_start_onboarding(
         None
     };
 
-    Ok((wf_id, biz_wf))
+    Ok((wf_id, biz_wf, is_new_ob))
 }
 
 /// Create a DocumentRequest associated with the provided wf if the obc requires document collection

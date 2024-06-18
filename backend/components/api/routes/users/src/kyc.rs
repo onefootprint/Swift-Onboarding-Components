@@ -170,13 +170,13 @@ pub async fn post(
                 // can't run neuro if using this path
                 is_neuro_enabled: false,
             };
-            let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
+            let (wf_id, _, is_new_ob) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
+            if !is_new_ob {
+                return Err(TfError::AlreadyOnboardedToPlaybook.into());
+            }
 
             // TODO: consolidate with /authorize code
             let wf = Workflow::lock(conn, &wf_id)?;
-            if wf.status.is_terminal() {
-                return Err(TfError::UserAlreadyKyced.into());
-            }
             let wf = if wf.authorized_at.is_none() {
                 Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?
             } else {

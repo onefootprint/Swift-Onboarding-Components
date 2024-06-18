@@ -15,8 +15,8 @@ pub enum TfError {
     #[error("Cannot run {0} playbook due to unmet requirements. {1}")]
     PlaybookMissingRequirements(ObConfigurationKind, UnmetRequirements),
     #[strum_discriminants(strum(serialize = "T122"))]
-    #[error("User has already onboarded onto this playbook")]
-    UserAlreadyKyced,
+    #[error("User has already started onboarding onto this playbook")]
+    AlreadyOnboardedToPlaybook,
 }
 
 impl CodedError for TfError {
@@ -36,7 +36,7 @@ impl CodedError for TfError {
         match self {
             Self::VaultDataValidationError(_) => StatusCode::BAD_REQUEST,
             Self::PlaybookMissingRequirements(_, _) => StatusCode::BAD_REQUEST,
-            Self::UserAlreadyKyced => StatusCode::CONFLICT,
+            Self::AlreadyOnboardedToPlaybook => StatusCode::CONFLICT,
         }
     }
 }

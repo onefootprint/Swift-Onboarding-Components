@@ -120,7 +120,7 @@ pub async fn post(
                 maybe_prefill_data: Some(prefill_data),
                 is_neuro_enabled,
             };
-            let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
+            let (wf_id, biz_wf, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
 
             // Update auth token with new identifiers
             // TODO should we issue a new token here for good measure?

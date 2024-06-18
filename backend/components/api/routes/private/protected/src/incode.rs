@@ -235,7 +235,7 @@ pub async fn adhoc_create_document_and_workflow(
             };
 
 
-            let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
+            let (wf_id, _, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
             let document_request =
                 DocumentRequest::get(conn, &wf_id, DocumentRequestIdentifier::Kind(doc_kind))?
                     .ok_or(AssertionError("No document request found"))?;
