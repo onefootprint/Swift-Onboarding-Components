@@ -55,6 +55,10 @@ def test_create_tag(sandbox_tenant):
     assert body[0]["tag"] == "delinquent"
     assert body[1]["tag"] == "flerp_derp_blerp"
 
+    # Make sure the tags exist in entities API
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert set(i["tag"] for i in body["tags"]) == {"delinquent", "flerp_derp_blerp"}
+
     tag_id = tag["id"]
     delete(f"/users/{user.fp_id}/tags/{tag_id}", None, sandbox_tenant.sk.key)
     body = get(f"/users/{user.fp_id}/tags", None, sandbox_tenant.sk.key)

@@ -83,7 +83,7 @@ pub async fn get(
 
     let tags = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             Ok(ScopedVaultTag::get_active(conn, &sv.id)?)
         })

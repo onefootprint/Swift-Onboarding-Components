@@ -1,4 +1,5 @@
 use crate::{
+    EntityTag,
     InsightEvent,
     WatchlistCheck,
 };
@@ -54,6 +55,7 @@ pub struct Entity {
     pub external_id: Option<ExternalId>,
     pub last_activity_at: DateTime<Utc>,
     pub label: Option<LabelKind>,
+    pub tags: Vec<EntityTag>,
 
     /// Metadata on the data that exists in this vault.
     pub data: Vec<EntityAttribute>,

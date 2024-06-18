@@ -16,6 +16,7 @@ use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
 use super::workflow_request::WorkflowRequest;
 use crate::models::data_lifetime::DataLifetime;
+use crate::models::scoped_vault_tag::ScopedVaultTag;
 use crate::{
     DbError,
     DbResult,
@@ -180,6 +181,7 @@ pub type SerializableEntity = (
     Option<ScopedVaultLabel>,
     Vec<ManualReview>,
     Vec<SerializableWorkflow>,
+    Vec<ScopedVaultTag>,
 );
 
 pub type IsNew = bool;
@@ -412,6 +414,7 @@ impl ScopedVault {
             insight_event,
             manual_review,
             scoped_vault_label,
+            scoped_vault_tag,
             watchlist_check,
             workflow,
             workflow_request,
@@ -460,6 +463,15 @@ impl ScopedVault {
             .map(|i| (i.0.scoped_vault_id.clone(), i))
             .into_group_map();
 
+        // Fetch workflows separately since there may be multiple for one scoped vault
+        let mut tags = scoped_vault_tag::table
+            .filter(scoped_vault_tag::scoped_vault_id.eq_any(&ids))
+            .filter(scoped_vault_tag::deactivated_seqno.is_null())
+            .get_results::<ScopedVaultTag>(conn)?
+            .into_iter()
+            .map(|i| (i.scoped_vault_id.clone(), i))
+            .into_group_map();
+
         // Turn the Vec of OnboardingInfo into a hashmap of ScopedVaultId -> Vec<SerializableEntity>
         let result_map = results
             .into_iter()
@@ -467,7 +479,8 @@ impl ScopedVault {
                 let sv_id = i.0.id.clone();
                 let manual_reviews = manual_reviews.remove(&sv_id).unwrap_or_default();
                 let workflows = workflows.remove(&sv_id).unwrap_or_default();
-                let entity = (i.0, i.1, i.2, i.3, manual_reviews, workflows);
+                let tags = tags.remove(&sv_id).unwrap_or_default();
+                let entity = (i.0, i.1, i.2, i.3, manual_reviews, workflows, tags);
                 (sv_id, entity)
             })
             .collect();

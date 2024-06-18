@@ -7,3 +7,9 @@ pub struct UserTag {
     pub tag: String,
     pub created_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct EntityTag {
+    pub tag: String,
+    pub created_at: DateTime<Utc>,
+}

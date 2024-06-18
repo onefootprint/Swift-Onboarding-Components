@@ -94,7 +94,7 @@ fn create_webhook_event(
     entity: SerializableEntity,
     kind: WebhookEventKind,
 ) -> ApiResult<TaskData> {
-    let (sv, _, _, _, mrs, wfs) = entity;
+    let (sv, _, _, _, mrs, wfs, _) = entity;
     let (latest_wf, _) = wfs
         .into_iter()
         .filter(|(wf, _)| wf.completed_at.is_some())
