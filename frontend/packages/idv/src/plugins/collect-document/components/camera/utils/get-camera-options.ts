@@ -1,6 +1,6 @@
 export type CameraKind = 'front' | 'back';
 
-const getCameraOptions = (cameraKind: CameraKind, deviceId?: string) => {
+const getCameraOptions = (cameraKind: CameraKind) => {
   // We ignore the deviceId for the front camera
   if (cameraKind === 'front') {
     return {
@@ -16,7 +16,6 @@ const getCameraOptions = (cameraKind: CameraKind, deviceId?: string) => {
       zoom: 1,
       width: { ideal: 2560 },
       height: { ideal: 1920 },
-      deviceId,
     },
   };
 };

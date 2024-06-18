@@ -3,7 +3,6 @@ import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getLogger } from '../../../../../utils';
 import type { CaptureStatus, DocSrcDimensions, VideoRef, VideoSize } from '../types';
 import computeSrcDimensions, { docDrawer } from '../utils/auto-capture';
 import { CardCaptureStatus, getCardCaptureStatus } from '../utils/graphics-utils/graphics-processing-utils';
@@ -24,13 +23,11 @@ type AutoCaptureProps = {
   outlineWidth: number;
   videoRef: VideoRef;
   videoSize: VideoSize | undefined;
-  switchCamera: () => void;
 };
 
 // const SELFIE_CHECK_INTERVAL = 200; // We send a new capture from video every 200 milliseconds for selfie capture
 const REQUIRED_SUCCESSES = 2; // We will check if 2 tries were successful before considering it a complete success
 const STATUS_CHANGE_DELAY = 150; // We wait 150 ms before we change the status from ok to not-ok
-const BLUR_COUNT_THRESHOLD = 30; // We switch camera if we get 30 blurry detections in a row
 
 // We pass through the graphics params set in batches of this size.
 // This is to make sure that the autocapture algorithm doesn't block the event queue for too long while passing through all params in one go
@@ -63,10 +60,6 @@ const getNextIndexForBatch = (
   return newIndex;
 };
 
-const { logTrack } = getLogger({
-  location: 'use-auto-capture-doc.ts',
-});
-
 const useAutoCaptureDoc = ({
   canvasRef,
   isCaptured,
@@ -80,10 +73,8 @@ const useAutoCaptureDoc = ({
   outlineWidth,
   videoRef,
   videoSize,
-  switchCamera,
 }: AutoCaptureProps) => {
   const successCountRef = useRef(0);
-  const blurCountRef = useRef(0);
   const rearrangedParamsRef = useRef({ params, currentIndex: 0 });
   const pastStatusRef = useRef<FaceStatus | CardCaptureStatus | undefined>(FaceStatus.detecting);
   const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] = useState(false);
@@ -138,21 +129,10 @@ const useAutoCaptureDoc = ({
       DOC_DETECTION_PARAMS_BATCH_SIZE,
     );
 
-    if (blurCountRef.current > BLUR_COUNT_THRESHOLD) {
-      switchCamera();
-      blurCountRef.current = 0;
-      logTrack('Switching camera due to blurry detection');
-    }
-
     if (isCardOk(cardCaptureStatus)) {
       rearrangedParamsRef.current = moveParamToStart(paramIndex, rearrangedParamsRef.current.params);
-      blurCountRef.current = 0; // We reset the blur count if we get a successful detection, but not if we get a "Detecting" status
     } else {
       rearrangedParamsRef.current.currentIndex = getNextIndexForBatch(rearrangedParamsRef);
-      if (cardCaptureStatus === CardCaptureStatus.blurry) {
-        blurCountRef.current += 1;
-        logTrack(`Detected blurry image: count=${blurCountRef.current}`);
-      }
     }
 
     // if (rearrangedParams.current.currentIndex === 0) {
@@ -176,7 +156,6 @@ const useAutoCaptureDoc = ({
     resetCountdown,
     startCountdown,
     statusChangeDelayRunning,
-    switchCamera,
     videoRef,
     videoSize,
   ]);

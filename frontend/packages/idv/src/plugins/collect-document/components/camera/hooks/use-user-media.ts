@@ -44,14 +44,8 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
     return cleanup;
   }, [cameraKind, mediaStream, mediaStream?.active]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // We reverted the PR that added this function, so this function is never called temorarily while we debug
-  const switchCamera = () => {
-    logInfo('use-user-media: switch camera called from autocapture hook. Not implemented yet. noop.');
-  };
-
   return {
     mediaStream,
-    switchCamera,
   };
 };
 
