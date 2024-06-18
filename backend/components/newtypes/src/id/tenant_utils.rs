@@ -33,6 +33,10 @@ impl TenantId {
     pub fn is_flexcar(&self) -> bool {
         self.0 == *"org_pl9GdKAiT9Yo0107B6ZOGp"
     }
+
+    pub fn is_avis(&self) -> bool {
+        self.0 == *"org_4R4qnsfYT0c4gSNID3yrU6"
+    }
 }
 
 #[derive(Debug, Clone, Copy, From, PartialEq, Eq)]
