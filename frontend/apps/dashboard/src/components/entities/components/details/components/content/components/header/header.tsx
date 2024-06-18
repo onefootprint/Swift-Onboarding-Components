@@ -1,11 +1,11 @@
-import { CodeInline, Stack, Text } from '@onefootprint/ui';
+import Labels from '@/entities/components/labels';
+import { Stack, Text } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Tags from 'src/components/entities/components/tags';
 import StatusBadge from 'src/components/status-badge';
-import useSession from 'src/hooks/use-session';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
+import Tags from './components/tags';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
@@ -20,33 +20,54 @@ const Header = ({ entity }: HeaderProps) => {
 
   return (
     <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)}>
-      <Stack align="center" gap={3} flexGrow={1}>
-        <Text variant="label-1">{t(`${kind}.title` as ParseKeys<'common'>)}</Text>
-        <IdDropdown entity={entity} />
-        <Text variant="label-1">⋅</Text>
-        <Stack gap={2}>
-          <StatusBadge
-            status={entity.status}
-            requiresManualReview={entity.requiresManualReview}
-            isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
-            shouldShowWatchlistLabel
-            watchlistLabel={t(`watchlist.on-watchlist-${kind}` as ParseKeys<'common'>)}
-          />
-          <Tags entity={entity} />
-        </Stack>
-      </Stack>
-      <Stack align="center" gap={3} flex={0}>
-        <div id={HEADER_ACTIONS_ID} />
+      <Stack direction="column" flexGrow={1} gap={2} width="100%">
+        <FirstRow align="center" gap={3} flexGrow={1}>
+          <Main>
+            <Text variant="label-1">{t(`${kind}.title` as ParseKeys<'common'>)}</Text>
+            <IdDropdown entity={entity} />
+            <Text variant="label-1">⋅</Text>
+            <Stack gap={2}>
+              <StatusBadge
+                status={entity.status}
+                requiresManualReview={entity.requiresManualReview}
+                isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
+                shouldShowWatchlistLabel
+                watchlistLabel={t(`watchlist.on-watchlist-${kind}` as ParseKeys<'common'>)}
+              />
+              <Labels entity={entity} />
+            </Stack>
+          </Main>
+          <Stack align="center" gap={3} flex={0}>
+            <div id={HEADER_ACTIONS_ID} />
+          </Stack>
+        </FirstRow>
+        <Tags entity={entity} />
       </Stack>
     </HeaderContainer>
   );
 };
+
+const FirstRow = styled(Stack)`
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const Main = styled(Stack)`
+  ${({ theme }) => css`
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: ${theme.spacing[2]};
+  `};
+`;
 
 const HeaderContainer = styled.header`
   ${({ theme }) => css`
     display: flex;
     flex-direction: row;
     gap: ${theme.spacing[2]};
+    align-items: center;
+    justify-content: space-between;
   `};
 `;
 

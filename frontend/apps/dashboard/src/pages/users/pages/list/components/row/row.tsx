@@ -1,8 +1,8 @@
+import Labels from '@/entities/components/labels';
 import { type Entity } from '@onefootprint/types';
 import { CodeInline, Text } from '@onefootprint/ui';
 import React from 'react';
 import { StatusBadge } from 'src/components';
-import Tags from 'src/components/entities/components/tags';
 import getTruncatedName from 'src/utils/get-truncated-name';
 
 type RowProps = {
@@ -36,7 +36,7 @@ const Row = ({ entity }: RowProps) => (
       </Text>
     </td>
     <td aria-label="tags">
-      <Tags entity={entity} />
+      <Labels entity={entity} />
     </td>
   </>
 );

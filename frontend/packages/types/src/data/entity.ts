@@ -4,6 +4,7 @@ import type { DataIdentifier } from './di';
 import { DocumentDI, InvestorProfileDI } from './di';
 import type { EntityCard } from './entity-cards';
 import type { InsightEvent } from './insight-event';
+import type { Tag } from './tag';
 import type { WatchlistCheckEventData } from './timeline';
 import type { DataKind, VaultValue } from './vault';
 
@@ -46,6 +47,7 @@ export type Attribute = {
 
 export type Entity = {
   data: Attribute[];
+  tags?: Tag[];
   hasOutstandingWorkflowRequest: boolean;
   id: string;
   isIdentifiable: boolean;

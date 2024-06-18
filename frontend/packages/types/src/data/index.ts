@@ -21,6 +21,7 @@ export { default as AuthMethodKind } from './auth-method';
 export type { BeneficialOwner } from './beneficial-owner';
 export { BeneficialOwnerDataAttribute } from './beneficial-owner';
 export type { BiometricLoginChallengeJson } from './biometric-login-challenge-json';
+export type { Tag } from './tag';
 export type { BiometricRegisterChallengeJson } from './biometric-register-challenge-json';
 export type {
   IdvBootstrapData,

@@ -390,6 +390,7 @@ export type {
   WatchlistCheckEventData,
   WorkflowTriggeredEvent,
   WorkflowTriggeredEventData,
+  Tag,
 } from './data';
 export {
   AccessLogKind,

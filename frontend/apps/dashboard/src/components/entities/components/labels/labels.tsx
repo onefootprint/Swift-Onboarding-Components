@@ -7,7 +7,7 @@ export type TagsProps = {
   entity: Entity;
 };
 
-const Tags = ({
+const Labels = ({
   entity: { watchlistCheck, requiresManualReview, hasOutstandingWorkflowRequest, label },
 }: TagsProps) => {
   const { t } = useTranslation('users', { keyPrefix: 'table.row.status' });
@@ -35,4 +35,4 @@ const Tags = ({
   );
 };
 
-export default Tags;
+export default Labels;
