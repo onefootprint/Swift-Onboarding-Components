@@ -15,6 +15,7 @@ Footprint uses conventional HTTP response codes to indicate the success or failu
 | **400**                | Bad request  | The request was unacceptable, perhaps due to a missing required parameter or invalid parameter value. |
 | **401**                | Unauthorized | The API key provided is invalid or doesn't have permission to access the resource.                    |
 | **404**                | Not found    | The requested resource does not exist.                                                                |
+| **409**                | Conflict     | The request conflicts with another request (perhaps due to using the same idempotency key).           |
 | **500, 502, 503, 504** | Server error | Something went wrong on Footprint's end. (These are rare)                                             |
 
 Some `4xx` errors that could be handled programatically include an error `code` and optional `context` that indicates the error reported.
