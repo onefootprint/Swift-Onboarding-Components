@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import { getLogger } from '../../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../../utils/logger';
 import DesktopHeader from '../../../components/desktop-header';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
@@ -59,6 +59,10 @@ const DeskTopProcessing = () => {
   const docName = transformCase(getDocName(), 'first-letter-upper-only');
   const sideName = transformCase(getSideName(), 'first-letter-upper-only');
 
+  useEffectOnce(() => {
+    trackAction(`document-processing-${currSide}:started`);
+  });
+
   const handleProcessDocSuccess = (data: ProcessDocResponse) => {
     const { errors, nextSideToCollect, isRetryLimitExceeded } = data;
 
@@ -79,6 +83,7 @@ const DeskTopProcessing = () => {
       setMode('success');
       setNextSide(nextSideToCollect as IdDocImageTypes);
     }
+    trackAction(`document-processing-${currSide}:completed`);
   };
 
   const handleError = (err: unknown) => {

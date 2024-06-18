@@ -5,9 +5,9 @@ import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
-import { useTimeout } from 'usehooks-ts';
+import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
-import { getLogger } from '../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import {
   AUTOCAPTURE_RESTART_DELAY,
@@ -179,6 +179,16 @@ const Camera = ({
   const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
   const [onCanPlayTriggered, setOnCanPlayTriggered] = useState(false);
   const [showCameraLoadingFeedback, setShowCameraLoadingFeedback] = useState(false);
+
+  useEffectOnce(() => {
+    trackAction('camera-page:started');
+  });
+
+  useEffect(() => {
+    if (isVideoPlaying) {
+      trackAction('camera-page:video-playing');
+    }
+  }, [isVideoPlaying]);
 
   const videoSize = useSize(videoRef);
   const [autoCaptureTimerVal, { startCountdown, stopCountdown, resetCountdown }] = useCountdownCustom(CountDownProps);

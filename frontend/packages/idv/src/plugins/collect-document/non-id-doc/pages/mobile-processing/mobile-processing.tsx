@@ -6,7 +6,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { getLogger } from '../../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../../utils/logger';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';
@@ -39,6 +39,10 @@ const MobileProcessing = () => {
   const { document, authToken, id, config } = state.context;
   const { kind: documentRequestKind } = config;
 
+  useEffectOnce(() => {
+    trackAction(`document-processing-${documentRequestKind}:started`);
+  });
+
   const handleProcessDocSuccess = (data: ProcessDocResponse) => {
     const { errors, nextSideToCollect, isRetryLimitExceeded } = data;
 
@@ -62,6 +66,7 @@ const MobileProcessing = () => {
     } else {
       logError(`Unexpected next side to collect. Side: ${nextSideToCollect}`);
     }
+    trackAction(`document-processing-${documentRequestKind}:completed`);
   };
 
   const handleError = (err: unknown) => {

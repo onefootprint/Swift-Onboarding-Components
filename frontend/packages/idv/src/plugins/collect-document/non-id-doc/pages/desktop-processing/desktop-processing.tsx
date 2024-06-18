@@ -9,7 +9,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { HeaderTitle } from '../../../../../components';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
-import { getLogger } from '../../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../../utils/logger';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';
@@ -46,6 +46,10 @@ const DesktopProcessing = () => {
   const { kind: documentRequestKind } = config;
   const documentName = transformCase(useDocName(config), 'first-letter-upper-only');
 
+  useEffectOnce(() => {
+    trackAction(`document-processing-${documentRequestKind}:started`);
+  });
+
   const handleProcessDocSuccess = (data: ProcessDocResponse) => {
     const { errors, nextSideToCollect, isRetryLimitExceeded } = data;
 
@@ -69,6 +73,7 @@ const DesktopProcessing = () => {
     } else {
       logError(`Unexpected next side to collect flow. Side: ${nextSideToCollect}`);
     }
+    trackAction(`document-processing-${documentRequestKind}:completed`);
   };
 
   const handleError = (err: unknown) => {

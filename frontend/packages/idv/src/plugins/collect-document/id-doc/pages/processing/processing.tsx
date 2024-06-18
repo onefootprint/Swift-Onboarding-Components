@@ -6,7 +6,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { getLogger } from '../../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../../utils/logger';
 import IdDocAnimation from '../../../components/id-doc-animation';
 import Loading from '../../../components/loading';
 import RetryLimitExceeded from '../../../components/retry-limit-exceeded';
@@ -69,7 +69,12 @@ const Processing = () => {
       setMode('success');
       setNextSide(nextSideToCollect as IdDocImageTypes);
     }
+    trackAction(`document-processing-${currSide}:completed`);
   };
+
+  useEffectOnce(() => {
+    trackAction(`document-processing-${currSide}:started`);
+  });
 
   const handleError = (err: unknown) => {
     send({
