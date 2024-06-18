@@ -75,6 +75,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -590,6 +591,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -859,6 +861,57 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Entity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/entities/{fp_id}/actions": {
+            "post": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Atomically apply the provided list of actions.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EntityActionsRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EntityActionResponse"
+                                    }
                                 }
                             }
                         }
@@ -1258,7 +1311,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DecisionRequest"
+                                "$ref": "#/components/schemas/ManualDecisionRequest"
                             }
                         }
                     },
@@ -1911,7 +1964,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CreateTokenResponse"
+                                    "$ref": "#/components/schemas/EntityActionResponse"
                                 }
                             }
                         }
@@ -2303,6 +2356,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -2749,6 +2803,7 @@
                                     "id.nationality",
                                     "id.citizenships",
                                     "id.drivers_license_number",
+                                    "id.drivers_license_state",
                                     "custom.*",
                                     "business.name",
                                     "business.dba",
@@ -5841,6 +5896,92 @@
                 ]
             }
         },
+        "/org/vault_dr/aws_pre_enrollment": {
+            "get": {
+                "tags": [
+                    "VaultDisasterRecovery",
+                    "Private"
+                ],
+                "description": "Returns the AWS external ID for the tenant if it exists",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VaultDrAwsPreEnrollResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "VaultDisasterRecovery",
+                    "Private"
+                ],
+                "description": "Generates an AWS external ID for the tenant if necessary.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VaultDrAwsPreEnrollResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/org/vault_dr/enroll": {
+            "post": {
+                "tags": [
+                    "VaultDisasterRecovery",
+                    "Private"
+                ],
+                "description": "Enrolls the authorized tenant in Vault Disaster Recovery",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VaultDrEnrollRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VaultDrEnrollResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/org/vault_dr/status": {
             "get": {
                 "tags": [
@@ -7325,6 +7466,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -8488,6 +8630,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -9740,6 +9883,7 @@
                                                 "id.nationality",
                                                 "id.citizenships",
                                                 "id.drivers_license_number",
+                                                "id.drivers_license_state",
                                                 "custom.*",
                                                 "business.name",
                                                 "business.dba",
@@ -10172,61 +10316,6 @@
                     "role_id"
                 ]
             },
-            "CreateTokenResponse": {
-                "type": "object",
-                "properties": {
-                    "expires_at": {
-                        "description": "The time at which the token (and link) expire",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "link": {
-                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
-                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to\n complete the flow. This is useful to send in an automated message to the end user.",
-                        "type": "string"
-                    },
-                    "token": {
-                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the\n flow. This is useful when you'd like to open a native interface inside your app for the user\n to complete the flow.",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "expires_at",
-                    "link",
-                    "token"
-                ]
-            },
-            "DecisionRequest": {
-                "type": "object",
-                "properties": {
-                    "annotation": {
-                        "type": "object",
-                        "properties": {
-                            "is_pinned": {
-                                "type": "boolean"
-                            },
-                            "note": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "is_pinned",
-                            "note"
-                        ]
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "fail",
-                            "pass"
-                        ]
-                    }
-                },
-                "required": [
-                    "annotation",
-                    "status"
-                ]
-            },
             "DecryptRequest": {
                 "type": "object",
                 "properties": {
@@ -10257,6 +10346,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -10523,6 +10613,7 @@
                             "id.nationality",
                             "id.citizenships",
                             "id.drivers_license_number",
+                            "id.drivers_license_state",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -10771,6 +10862,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -11011,6 +11103,7 @@
                             "id.nationality",
                             "id.citizenships",
                             "id.drivers_license_number",
+                            "id.drivers_license_state",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -11371,6 +11464,7 @@
                                         "id.nationality",
                                         "id.citizenships",
                                         "id.drivers_license_number",
+                                        "id.drivers_license_state",
                                         "custom.*",
                                         "business.name",
                                         "business.dba",
@@ -11677,6 +11771,7 @@
                                                     "id.nationality",
                                                     "id.citizenships",
                                                     "id.drivers_license_number",
+                                                    "id.drivers_license_state",
                                                     "custom.*",
                                                     "business.name",
                                                     "business.dba",
@@ -12018,6 +12113,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -12260,6 +12356,7 @@
                                         "id.nationality",
                                         "id.citizenships",
                                         "id.drivers_license_number",
+                                        "id.drivers_license_state",
                                         "custom.*",
                                         "business.name",
                                         "business.dba",
@@ -12526,6 +12623,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -12917,6 +13015,8 @@
                                         "email_domain_private",
                                         "email_domain_corporate",
                                         "email_recently_verified",
+                                        "email_found_on_file",
+                                        "email_not_found_on_file",
                                         "email_high_risk_country",
                                         "email_high_risk_fraud",
                                         "email_high_risk_tumbled",
@@ -12957,8 +13057,6 @@
                                         "drivers_license_number_not_on_record",
                                         "drivers_license_number_not_valid",
                                         "drivers_license_number_is_valid",
-                                        "drivers_license_number_verified",
-                                        "drivers_license_number_not_verified",
                                         "document_upload_failed",
                                         "document_not_verified",
                                         "document_verified",
@@ -13003,6 +13101,7 @@
                                         "document_visible_photo_features_not_verified",
                                         "document_mrz_line_format_check",
                                         "document_qr_code_check",
+                                        "document_could_not_classify",
                                         "document_visible_photo_features_verified",
                                         "document_low_match_score_with_selfie",
                                         "document_selfie_matches",
@@ -13274,6 +13373,26 @@
                     "workflows"
                 ]
             },
+            "EntityActionResponse": {
+                "type": "string"
+            },
+            "EntityActionsRequest": {
+                "type": "object",
+                "properties": {
+                    "actions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "clear_review"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "actions"
+                ]
+            },
             "EntityAttribute": {
                 "type": "object",
                 "properties": {
@@ -13307,6 +13426,7 @@
                             "id.nationality",
                             "id.citizenships",
                             "id.drivers_license_number",
+                            "id.drivers_license_state",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -13672,6 +13792,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -13896,10 +14017,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -13915,10 +14034,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -14025,6 +14142,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -14065,8 +14184,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -14111,6 +14228,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -14298,10 +14416,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -14317,10 +14433,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -14427,6 +14541,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -14467,8 +14583,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -14513,6 +14627,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -14700,10 +14815,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -14719,10 +14832,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -14829,6 +14940,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -14869,8 +14982,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -14915,6 +15026,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -15102,10 +15214,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -15121,10 +15231,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -15231,6 +15339,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -15271,8 +15381,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -15317,6 +15425,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -15504,10 +15613,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -15523,10 +15630,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -15633,6 +15738,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -15673,8 +15780,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -15719,6 +15824,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -15906,10 +16012,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -15925,10 +16029,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -16035,6 +16137,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -16075,8 +16179,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -16121,6 +16223,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -16308,10 +16411,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -16327,10 +16428,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -16437,6 +16536,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -16477,8 +16578,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -16523,6 +16622,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -16710,10 +16810,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -16729,10 +16827,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -16839,6 +16935,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -16879,8 +16977,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -16925,6 +17021,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -17112,10 +17209,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -17131,10 +17226,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -17241,6 +17334,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -17281,8 +17376,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -17327,6 +17420,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -17514,10 +17608,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -17533,10 +17625,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -17643,6 +17733,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -17683,8 +17775,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -17729,6 +17819,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -17916,10 +18007,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -17935,10 +18024,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -18045,6 +18132,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -18085,8 +18174,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -18131,6 +18218,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -18318,10 +18406,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -18337,10 +18423,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -18447,6 +18531,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -18487,8 +18573,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -18533,6 +18617,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -18720,10 +18805,8 @@
                                 "type": "string",
                                 "enum": [
                                     "no_match",
-                                    "not_verified",
                                     "could_not_match",
                                     "partial",
-                                    "verified",
                                     "exact"
                                 ]
                             },
@@ -18739,10 +18822,8 @@
                                             "type": "string",
                                             "enum": [
                                                 "no_match",
-                                                "not_verified",
                                                 "could_not_match",
                                                 "partial",
-                                                "verified",
                                                 "exact"
                                             ]
                                         },
@@ -18849,6 +18930,8 @@
                                                 "email_domain_private",
                                                 "email_domain_corporate",
                                                 "email_recently_verified",
+                                                "email_found_on_file",
+                                                "email_not_found_on_file",
                                                 "email_high_risk_country",
                                                 "email_high_risk_fraud",
                                                 "email_high_risk_tumbled",
@@ -18889,8 +18972,6 @@
                                                 "drivers_license_number_not_on_record",
                                                 "drivers_license_number_not_valid",
                                                 "drivers_license_number_is_valid",
-                                                "drivers_license_number_verified",
-                                                "drivers_license_number_not_verified",
                                                 "document_upload_failed",
                                                 "document_not_verified",
                                                 "document_verified",
@@ -18935,6 +19016,7 @@
                                                 "document_visible_photo_features_not_verified",
                                                 "document_mrz_line_format_check",
                                                 "document_qr_code_check",
+                                                "document_could_not_classify",
                                                 "document_visible_photo_features_verified",
                                                 "document_low_match_score_with_selfie",
                                                 "document_selfie_matches",
@@ -19148,6 +19230,7 @@
                             "id.nationality",
                             "id.citizenships",
                             "id.drivers_license_number",
+                            "id.drivers_license_state",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -19392,6 +19475,7 @@
                                 "id.nationality",
                                 "id.citizenships",
                                 "id.drivers_license_number",
+                                "id.drivers_license_state",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -19639,6 +19723,7 @@
                             "id.nationality",
                             "id.citizenships",
                             "id.drivers_license_number",
+                            "id.drivers_license_state",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -20361,6 +20446,37 @@
                 },
                 "required": [
                     "source"
+                ]
+            },
+            "ManualDecisionRequest": {
+                "type": "object",
+                "properties": {
+                    "annotation": {
+                        "type": "object",
+                        "properties": {
+                            "is_pinned": {
+                                "type": "boolean"
+                            },
+                            "note": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "is_pinned",
+                            "note"
+                        ]
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass"
+                        ]
+                    }
+                },
+                "required": [
+                    "annotation",
+                    "status"
                 ]
             },
             "MultiUpdateRuleRequest": {
@@ -22885,6 +23001,7 @@
                                                 "id.nationality",
                                                 "id.citizenships",
                                                 "id.drivers_license_number",
+                                                "id.drivers_license_state",
                                                 "custom.*",
                                                 "business.name",
                                                 "business.dba",
@@ -23324,6 +23441,7 @@
                                         "id.nationality",
                                         "id.citizenships",
                                         "id.drivers_license_number",
+                                        "id.drivers_license_state",
                                         "custom.*",
                                         "business.name",
                                         "business.dba",
@@ -23632,6 +23750,7 @@
                             "id.nationality",
                             "id.citizenships",
                             "id.drivers_license_number",
+                            "id.drivers_license_state",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -23977,6 +24096,8 @@
                             "email_domain_private",
                             "email_domain_corporate",
                             "email_recently_verified",
+                            "email_found_on_file",
+                            "email_not_found_on_file",
                             "email_high_risk_country",
                             "email_high_risk_fraud",
                             "email_high_risk_tumbled",
@@ -24017,8 +24138,6 @@
                             "drivers_license_number_not_on_record",
                             "drivers_license_number_not_valid",
                             "drivers_license_number_is_valid",
-                            "drivers_license_number_verified",
-                            "drivers_license_number_not_verified",
                             "document_upload_failed",
                             "document_not_verified",
                             "document_verified",
@@ -24063,6 +24182,7 @@
                             "document_visible_photo_features_not_verified",
                             "document_mrz_line_format_check",
                             "document_qr_code_check",
+                            "document_could_not_classify",
                             "document_visible_photo_features_verified",
                             "document_low_match_score_with_selfie",
                             "document_selfie_matches",
@@ -24395,6 +24515,8 @@
                             "email_domain_private",
                             "email_domain_corporate",
                             "email_recently_verified",
+                            "email_found_on_file",
+                            "email_not_found_on_file",
                             "email_high_risk_country",
                             "email_high_risk_fraud",
                             "email_high_risk_tumbled",
@@ -24435,8 +24557,6 @@
                             "drivers_license_number_not_on_record",
                             "drivers_license_number_not_valid",
                             "drivers_license_number_is_valid",
-                            "drivers_license_number_verified",
-                            "drivers_license_number_not_verified",
                             "document_upload_failed",
                             "document_not_verified",
                             "document_verified",
@@ -24481,6 +24601,7 @@
                             "document_visible_photo_features_not_verified",
                             "document_mrz_line_format_check",
                             "document_qr_code_check",
+                            "document_could_not_classify",
                             "document_visible_photo_features_verified",
                             "document_low_match_score_with_selfie",
                             "document_selfie_matches",
@@ -25497,6 +25618,47 @@
                     "event",
                     "seqno",
                     "timestamp"
+                ]
+            },
+            "VaultDrAwsPreEnrollResponse": {
+                "type": "object",
+                "properties": {
+                    "external_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "external_id"
+                ]
+            },
+            "VaultDrEnrollRequest": {
+                "type": "object",
+                "properties": {
+                    "aws_account_id": {
+                        "type": "string"
+                    },
+                    "aws_role_name": {
+                        "type": "string"
+                    },
+                    "s3_bucket_name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "aws_account_id",
+                    "aws_role_name",
+                    "s3_bucket_name"
+                ]
+            },
+            "VaultDrEnrollResponse": {
+                "type": "object",
+                "properties": {
+                    "org_private_key": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "org_private_key"
                 ]
             },
             "VaultDrStatus": {

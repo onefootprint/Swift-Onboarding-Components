@@ -84,7 +84,9 @@ pub async fn post(
         onboarding_config_key,
         key,
         fixture_result,
+        force_reonboard,
     } = request.into_inner();
+    let force_reonboard = force_reonboard.unwrap_or(true);
     // For backwards compatibility
     match onboarding_config_key {
         Some(_) => root_span.record("meta", "with_legacy_onboarding_key"),
@@ -156,7 +158,7 @@ pub async fn post(
             let args = NewOnboardingArgs {
                 existing_wf_id: None,
                 wfr_id: None,
-                force_create: true,
+                force_create: force_reonboard,
                 sv: &sv,
                 obc: &obc,
                 insight_event: None,
@@ -172,6 +174,9 @@ pub async fn post(
 
             // TODO: consolidate with /authorize code
             let wf = Workflow::lock(conn, &wf_id)?;
+            if wf.status.is_terminal() {
+                return Err(TfError::UserAlreadyKyced.into());
+            }
             let wf = if wf.authorized_at.is_none() {
                 Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?
             } else {

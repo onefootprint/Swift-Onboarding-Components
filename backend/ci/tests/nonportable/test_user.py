@@ -11,6 +11,16 @@ from tests.utils import (
 from tests.constants import EMAIL, FIXTURE_PHONE_NUMBER, ID_DATA
 
 
+@pytest.fixture(scope="session")
+def obc(sandbox_tenant, must_collect_data):
+    return create_ob_config(
+        sandbox_tenant,
+        "Acme Bank Card",
+        must_collect_data,
+        must_collect_data,
+    )
+
+
 def test_idempotency_id(tenant, sandbox_tenant):
     idempotency_id = IdempotencyId(f"1234567890Aa._-{_gen_random_sandbox_id()}")
     body = post("users/", None, tenant.sk.key, idempotency_id)
@@ -119,16 +129,7 @@ def test_create_with_external_id_after_deactivate(tenant, sandbox_tenant):
     assert body_1["external_id"] == body_2["external_id"] == external_id
 
 
-def test_kyc(
-    sandbox_tenant,
-    must_collect_data,
-):
-    obc = create_ob_config(
-        sandbox_tenant,
-        "Acme Bank Card",
-        must_collect_data,
-        must_collect_data,
-    )
+def test_kyc(sandbox_tenant, obc):
     # create NPV
     vault_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
@@ -140,7 +141,7 @@ def test_kyc(
     fp_id = body["id"]
 
     # run KYC
-    data = dict(onboarding_config_key=obc.key.value)
+    data = dict(key=obc.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key)
 
     assert body["requires_manual_review"] == False
@@ -159,13 +160,7 @@ def test_kyc(
     post(f"entities/{fp_id}/vault/decrypt", data, sandbox_tenant.sk.key)
 
 
-def test_kyc_missing_requirement(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant,
-        "Acme Bank Card",
-        must_collect_data,
-        must_collect_data,
-    )
+def test_kyc_missing_requirement(sandbox_tenant, obc):
     vault_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
         "id.email": EMAIL,
@@ -177,7 +172,7 @@ def test_kyc_missing_requirement(sandbox_tenant, must_collect_data):
     body = post("users/", vault_data, sandbox_tenant.sk.key)
     fp_id = body["id"]
 
-    data = dict(onboarding_config_key=obc.key.value)
+    data = dict(key=obc.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
         body["message"]
@@ -186,13 +181,7 @@ def test_kyc_missing_requirement(sandbox_tenant, must_collect_data):
     assert body["code"] == "T121"
 
 
-def test_kyc_missing_derypt_perms(sandbox_tenant, must_collect_data, can_access_data):
-    obc = create_ob_config(
-        sandbox_tenant,
-        "Acme Bank Card",
-        must_collect_data,
-        can_access_data,
-    )
+def test_kyc_missing_derypt_perms(sandbox_tenant):
     vault_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
         "id.email": EMAIL,
@@ -202,9 +191,42 @@ def test_kyc_missing_derypt_perms(sandbox_tenant, must_collect_data, can_access_
     body = post("users/", vault_data, sandbox_tenant.sk.key)
     fp_id = body["id"]
 
-    data = dict(onboarding_config_key=obc.key.value)
+    # The default OBC has can access < must collect
+    data = dict(key=sandbox_tenant.default_ob_config.key.value)
     body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=400)
     assert (
         body["message"]
         == "Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: dob"
     )
+
+
+def test_force_redo_kyc(sandbox_tenant, obc):
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
+        "id.ssn9": _gen_random_ssn(),
+        **ID_DATA,
+    }
+    body = post("users", vault_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+
+    # run KYC
+    data = dict(key=obc.key.value)
+    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key)
+    assert body["requires_manual_review"] == False
+    assert body["status"] == "pass"
+
+    # Will re-run KYC by default
+    data = dict(key=obc.key.value)
+    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key)
+    assert body["status"] == "pass"
+
+    timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    assert len(obds) == 2
+
+    # Will error when trying to re-onboard to playbook if already onboarded onto
+    data = dict(key=obc.key.value, force_reonboard=False)
+    body = post(f"users/{fp_id}/kyc", data, sandbox_tenant.sk.key, status_code=409)
+    assert body["code"] == "T122"
+    assert body["message"] == "User already KYCed"

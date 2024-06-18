@@ -15,6 +15,8 @@ pub struct TriggerKycRequest {
     pub key: Option<ObConfigurationKey>,
     /// (only valid for sandbox users) choose the desired KYC outcome
     pub fixture_result: Option<SimpleFixtureResult>,
+    /// Force KYCing a user that has already been KYCed by this playbook. Defaults to true
+    pub force_reonboard: Option<bool>,
 }
 
 
