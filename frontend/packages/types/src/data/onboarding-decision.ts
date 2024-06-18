@@ -11,6 +11,8 @@ export type OnboardingDecision = {
   obConfiguration: TimelinePlaybook;
   vendors: Vendor[];
   ruleSetResultId?: string;
+  // We don't yet care about the contents of the MRs, just the count
+  clearedManualReviews?: object[];
 };
 
 export type TimelinePlaybook = {

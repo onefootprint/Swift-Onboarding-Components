@@ -1542,8 +1542,11 @@
               "none": "None",
               "step_up": "Step up required"
             },
+            "cleared-reviews": {
+              "title": "Manual review cleared by <actor/>"
+            },
             "human-decision": {
-              "title": "Manually reviewed and marked as {{decision}} by",
+              "title": "Manually reviewed and marked as {{decision}} by <actor />",
               "see-details": "See details",
               "pin-note": "Pin note to the top of the page"
             },

@@ -18,7 +18,7 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
     keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
   });
   const {
-    decision: { source, status, obConfiguration: playbook, ruleSetResultId },
+    decision: { source, status, obConfiguration: playbook, ruleSetResultId, clearedManualReviews },
   } = data;
   const statusToText: Record<DecisionStatus, string> = {
     [DecisionStatus.fail]: t('decision-status.fail'),
@@ -62,16 +62,36 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
   }
 
   // Otherwise, manual review decision
+  if (status === DecisionStatus.none && clearedManualReviews?.length) {
+    // Special copy for clearing manual review without a new status
+    return (
+      <Stack direction="row" align="center" gap={2}>
+        <Stack align="center" testID="onboarding-decision-event-header">
+          <Text variant="body-3" color="tertiary">
+            <Trans
+              i18nKey="pages.entity.audit-trail.timeline.onboarding-decision-event.cleared-reviews.title"
+              components={{
+                actor: <Actor actor={source} />,
+              }}
+            />
+          </Text>
+        </Stack>
+      </Stack>
+    );
+  }
+
   return (
     <Stack direction="row" align="center" gap={2}>
       <Stack align="center" testID="onboarding-decision-event-header">
         <Text variant="label-3" color={color}>
-          {t('human-decision.title', {
-            decision: statusToText[status],
-          })}
+          <Trans
+            i18nKey="pages.entity.audit-trail.timeline.onboarding-decision-event.human-decision.title"
+            values={{ decision: statusToText[status] }}
+            components={{
+              actor: <Actor actor={source} />,
+            }}
+          />
         </Text>
-        &nbsp;
-        <Actor actor={source} />
       </Stack>
     </Stack>
   );

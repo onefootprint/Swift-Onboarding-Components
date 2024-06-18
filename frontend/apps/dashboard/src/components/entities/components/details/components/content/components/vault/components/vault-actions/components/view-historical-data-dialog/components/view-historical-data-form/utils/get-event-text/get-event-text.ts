@@ -150,7 +150,7 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
     const eventData = data as OnboardingDecisionEventData;
 
     const {
-      decision: { source, status, obConfiguration },
+      decision: { source, status, obConfiguration, clearedManualReviews },
     } = eventData;
     const statusToText: Record<DecisionStatus, string> = {
       [DecisionStatus.fail]: 'Fail',
@@ -166,6 +166,9 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
         return `Onboarded onto ${obConfiguration.name} with ${statusText} outcome`;
       }
       return `Onboarded onto ${obConfiguration.name}`;
+    }
+    if (status === DecisionStatus.none && clearedManualReviews?.length) {
+      return `Manual review cleared by ${getActorText(source)}`;
     }
     return `Manually reviewed and marked as ${statusText} by ${getActorText(source)}`;
   }

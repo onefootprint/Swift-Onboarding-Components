@@ -1,9 +1,10 @@
+import { Theme } from '@onefootprint/design-tokens';
 import type { Actor as TActor } from '@onefootprint/types';
 import { ActorKind } from '@onefootprint/types';
 import { CodeInline, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 type ActorProps = {
   actor: TActor;
@@ -30,7 +31,9 @@ const Actor = ({ actor }: ActorProps) => {
 
 const Container = styled.span`
   ${createFontStyles('label-3')};
-  color: currentColor;
+  ${({ theme }) => css`
+    color: ${theme.color.primary};
+  `}
 `;
 
 export default Actor;
