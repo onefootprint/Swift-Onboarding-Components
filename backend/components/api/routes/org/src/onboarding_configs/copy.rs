@@ -1,18 +1,22 @@
-use crate::auth::tenant::{
+use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
+use crate::rules::validate_rules_request;
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::errors::ApiResult;
-use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
-use crate::rules::validate_rules_request;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::errors::ValidationError;
+use api_core::errors::{
+    ApiResult,
+    ValidationError,
+};
+use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
+use api_core::utils::db2api::DbToApi;
 use api_core::{
-    self,
+    State,
+    {
+        self,
+    },
 };
 use api_wire_types::{
     CopyPlaybookRequest,

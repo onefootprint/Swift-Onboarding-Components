@@ -37,7 +37,7 @@ mod tests {
         test,
         App,
     };
-    use org::OpenApiExt;
+    use api_core::OpenApiExt;
     use rand::distributions::Alphanumeric;
     use rand::Rng;
     use regex::Regex;

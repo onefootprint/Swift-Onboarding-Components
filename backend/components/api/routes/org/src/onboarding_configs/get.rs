@@ -1,17 +1,17 @@
-use crate::auth::tenant::{
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
 use api_core::errors::ApiResult;
+use api_core::types::response::ResponseData;
 use api_core::types::{
     JsonApiResponse,
     OffsetPaginatedResponse,
     OffsetPaginationRequest,
 };
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use api_wire_types::OnboardingConfigFilters;
 use db::models::ob_configuration::{
     ObConfiguration,

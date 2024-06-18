@@ -1,11 +1,13 @@
-use crate::auth::tenant::{
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::EmptyResponse;
-use crate::State;
-use api_core::types::JsonApiResponse;
+use api_core::types::{
+    EmptyResponse,
+    JsonApiResponse,
+};
+use api_core::State;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
 use db::DbResult;
 use newtypes::TenantIosAppMetaId;

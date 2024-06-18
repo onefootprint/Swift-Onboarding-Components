@@ -1,13 +1,11 @@
-use crate::errors::tenant::TenantError;
-use crate::errors::{
+use api_core::errors::tenant::TenantError;
+use api_core::errors::{
     ApiError,
     ApiResult,
-};
-use crate::State;
-use api_core::errors::{
     AssertionError,
     ValidationError,
 };
+use api_core::State;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;

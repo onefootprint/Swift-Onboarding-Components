@@ -1,13 +1,13 @@
-use crate::auth::tenant::{
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use api_core::errors::ApiError;
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
 use newtypes::TenantIosAppMetaId;
 use paperclip::actix::web::Json;

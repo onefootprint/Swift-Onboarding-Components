@@ -1,4 +1,3 @@
-use crate::State;
 use api_core::auth::tenant::{
     AnyTenantSessionAuth,
     InvalidateAuth,
@@ -7,6 +6,7 @@ use api_core::types::{
     EmptyResponse,
     JsonApiResponse,
 };
+use api_core::State;
 use paperclip::actix::{
     api_v2_operation,
     post,

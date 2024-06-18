@@ -1,13 +1,13 @@
-use crate::auth::tenant::{
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::{
+use api_core::types::{
     EmptyResponse,
     JsonApiResponse,
 };
-use crate::State;
+use api_core::State;
 use db::models::proxy_config::ProxyConfig;
 use db::DbError;
 use newtypes::ProxyConfigId;

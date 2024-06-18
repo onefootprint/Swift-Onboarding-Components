@@ -1,12 +1,14 @@
-use crate::auth::tenant::{
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::types::JsonApiResponse;
+use api_core::types::{
+    JsonApiResponse,
+    ResponseData,
+};
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use api_wire_types::UpdateTenantAndroidAppMetaRequest;
 use db::models::tenant_android_app_meta::{
     TenantAndroidAppFilters,

@@ -1,14 +1,14 @@
-use crate::auth::tenant::{
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiResult;
-use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use api_core::errors::proxy::VaultProxyError;
+use api_core::errors::ApiResult;
 use api_core::proxy::ssrf_protection::validate_safe_url;
+use api_core::types::ResponseData;
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use api_wire_types::{
     CreateProxyConfigRequest,
     GetProxyConfigRequest,
@@ -123,7 +123,7 @@ pub async fn post(
     // setup the client certificate
     let (client_identity_cert_der, e_client_identity_key_der) = if let Some(id) = client_identity {
         // validate the identity
-        let _ = crate::proxy::config::ClientCertificateKey::parse_cert_and_key(
+        let _ = api_core::proxy::config::ClientCertificateKey::parse_cert_and_key(
             id.certificate.as_bytes(),
             id.key.as_bytes(),
         )?;
@@ -236,7 +236,7 @@ pub async fn patch(
     let (client_identity_cert_der, e_client_identity_key_der) = match client_identity {
         Some(Some(id)) => {
             // validate the identity
-            let _ = crate::proxy::config::ClientCertificateKey::parse_cert_and_key(
+            let _ = api_core::proxy::config::ClientCertificateKey::parse_cert_and_key(
                 id.certificate.as_bytes(),
                 id.key.as_bytes(),
             )?;

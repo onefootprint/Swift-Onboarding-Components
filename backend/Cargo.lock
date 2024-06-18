@@ -1477,6 +1477,7 @@ version = "0.1.0"
 dependencies = [
  "actix-rt",
  "actix-web",
+ "api_core",
  "api_route_businesses",
  "api_route_entities",
  "api_route_hosted",

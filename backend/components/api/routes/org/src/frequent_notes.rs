@@ -1,16 +1,16 @@
-use crate::auth::tenant::{
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::errors::tenant::TenantError;
-use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use api_core::errors::tenant::TenantError;
 use api_core::types::{
     EmptyResponse,
     JsonApiResponse,
+    ResponseData,
 };
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use db::models::tenant_frequent_note::TenantFrequentNote;
 use db::DbResult;
 use newtypes::TenantFrequentNoteId;

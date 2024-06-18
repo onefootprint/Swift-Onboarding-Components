@@ -1,18 +1,18 @@
-use crate::auth::tenant::{
+use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::errors::tenant::TenantError;
-use crate::errors::{
+use api_core::decision::rule_engine;
+use api_core::errors::tenant::TenantError;
+use api_core::errors::{
     ApiError,
     ApiResult,
 };
-use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::decision::rule_engine;
+use api_core::types::response::ResponseData;
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use db::models::ob_configuration::{
     NewObConfigurationArgs,
     ObConfiguration,

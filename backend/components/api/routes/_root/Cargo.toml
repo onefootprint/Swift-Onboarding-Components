@@ -8,6 +8,7 @@ authors = { workspace = true }
 doctest = false
 
 [dependencies]
+api_core = { path = "../../core" }
 api_route_org = { path = "../org" }
 api_route_index = { path = "../index" }
 api_route_vault_proxy = { path = "../vault_proxy" }

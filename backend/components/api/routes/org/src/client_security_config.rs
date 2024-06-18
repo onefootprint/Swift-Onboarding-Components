@@ -1,15 +1,15 @@
-use crate::auth::tenant::{
+use api_core::auth::tenant::{
     CheckTenantGuard,
+    TenantAuth,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::{
+use api_core::errors::tenant::TenantError;
+use api_core::types::{
     JsonApiResponse,
     ResponseData,
 };
-use crate::State;
-use api_core::auth::tenant::TenantAuth;
-use api_core::errors::tenant::TenantError;
+use api_core::State;
 use api_wire_types::OrgClientSecurityConfig;
 use db::models::tenant_client_config::{
     TenantClientConfig,

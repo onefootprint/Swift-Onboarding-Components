@@ -1,5 +1,3 @@
-use crate::types::JsonApiResponse;
-use crate::State;
 use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
@@ -11,8 +9,10 @@ use api_core::errors::{
 };
 use api_core::types::{
     EmptyResponse,
+    JsonApiResponse,
     ResponseData,
 };
+use api_core::State;
 use chrono::Utc;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::ComplianceDocRequest;

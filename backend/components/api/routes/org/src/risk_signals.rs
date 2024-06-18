@@ -1,12 +1,10 @@
-use crate::auth::tenant::{
-    SecretTenantAuthContext,
-    TenantSessionAuth,
-};
-use crate::auth::Either;
 use api_core::auth::tenant::{
     CheckTenantGuard,
+    SecretTenantAuthContext,
     TenantGuard,
+    TenantSessionAuth,
 };
+use api_core::auth::Either;
 use api_core::types::{
     JsonApiResponse,
     ResponseData,

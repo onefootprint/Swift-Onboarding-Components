@@ -1,16 +1,16 @@
-use crate::auth::tenant::{
+use actix_web::web;
+use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use actix_web::web;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::serializers::IsDomainAlreadyClaimed;
+use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
+use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use api_wire_types::UpdateTenantRequest;
 use db::models::tenant::{
     Tenant,
