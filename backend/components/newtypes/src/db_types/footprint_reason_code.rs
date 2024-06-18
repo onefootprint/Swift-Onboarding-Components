@@ -692,7 +692,7 @@ footprint_reason_code_enum! {
         DriversLicenseNumberNotOnRecord,
 
         #[scope = SignalScope::DriversLicenseNumber, additional_scopes = vec![], match_level = None]
-        #[note = "License number is not valid", severity = SignalSeverity::Medium,  description = "The driver's license number was not valid"]
+        #[note = "License number is not valid", severity = SignalSeverity::Medium,  description = "The driver's license number was not valid for the state"]
         DriversLicenseNumberNotValid,
 
         #[scope = SignalScope::DriversLicenseNumber, additional_scopes = vec![], match_level = None]

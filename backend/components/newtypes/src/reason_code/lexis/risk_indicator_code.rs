@@ -114,7 +114,7 @@ vendor_reason_code_enum! {
         R39,
 
         #[ser = "41", description = "The input driver's license number is invalid for the input DL State"]
-        #[footprint_reason_code = None]
+        #[footprint_reason_code = Some(DriversLicenseNumberNotValid)]
         R41,
 
         #[ser = "44", description = "The input phone area code is changing"]
