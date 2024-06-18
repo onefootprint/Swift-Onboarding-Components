@@ -5,6 +5,7 @@ export type GetEntityRiskSignalsRequest = {
   scope?: string;
   description?: string;
   severity?: string;
+  seqno?: string | undefined;
 };
 
 export type GetEntityRiskSignalsResponse = RiskSignal[];

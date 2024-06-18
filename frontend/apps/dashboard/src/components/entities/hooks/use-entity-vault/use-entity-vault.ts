@@ -45,7 +45,7 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
     Object.keys(newData.vault).forEach((di: string) => {
       const newVal = newData.vault[di as DataIdentifier];
 
-      // BE uses null for empty data, but FE uses it for encrypted data
+      // BE uses null for empty edited data, but FE uses it for encrypted data
       // So we convert null to undefined, which FE uses to designate empty data
       newDataConverted[di as DataIdentifier] = newVal === null ? undefined : newVal;
 
@@ -65,13 +65,29 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
     });
   };
 
+  const updateToHistorical = (newData: VaultType) => {
+    const newDataConverted = {} as Partial<Record<DataIdentifier, VaultValue>>;
+    Object.keys(newData.vault).forEach((di: string) => {
+      const newVal = newData.vault[di as DataIdentifier];
+      newDataConverted[di as DataIdentifier] = newVal;
+      // BE automatically updates ssn4 if ssn9 is edited, reflect that on the FE
+      if (di === IdDI.ssn9 && newVal) {
+        newDataConverted[IdDI.ssn4] = (newVal as string).slice(-4);
+      }
+    });
+    queryClient.setQueryData(['entity', entityId, 'vault'], {
+      ...newData,
+      vault: newDataConverted,
+    });
+  };
+
   const query = useQuery<VaultType>(
     ['entity', entityId, 'vault'],
     () => getVaultOrCreate(queryClient, entity as Entity),
     { enabled: !!entityId && !!entity },
   );
 
-  return { ...query, update };
+  return { ...query, update, updateToHistorical };
 };
 
 export default useEntityVault;

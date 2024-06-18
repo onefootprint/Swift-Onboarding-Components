@@ -6,23 +6,25 @@ import useSession from 'src/hooks/use-session';
 
 type GetDocumentsRequest = {
   entityId: string;
+  seqno?: string | undefined;
 };
 
 type GetDocumentsResponse = Document[];
 
-const getDocuments = async (authHeaders: AuthHeaders, { entityId }: GetDocumentsRequest) => {
+const getDocuments = async (authHeaders: AuthHeaders, { entityId, seqno }: GetDocumentsRequest) => {
   const response = await request<GetDocumentsResponse>({
     method: 'GET',
     url: `/entities/${entityId}/documents`,
     headers: authHeaders,
+    params: { seqno },
   });
 
   return response.data;
 };
 
-const useDocuments = (id: string) => {
+const useDocuments = (id: string, seqno?: string | undefined) => {
   const { authHeaders } = useSession();
-  const requestParams = { entityId: id };
+  const requestParams = { entityId: id, seqno };
 
   return useQuery(
     ['entities', id, 'documents', requestParams, authHeaders],

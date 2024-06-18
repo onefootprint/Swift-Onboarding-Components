@@ -4,7 +4,7 @@ import React from 'react';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
-import useDocuments from '@/entity/hooks/use-documents';
+import useCurrentEntityDocuments from '@/entity/hooks/use-current-entity-documents';
 
 import Field from '../../../field';
 import DocumentField from './components/document-field';
@@ -17,7 +17,7 @@ type DocumentFieldsProps = WithEntityProps;
 const DocumentFields = ({ entity }: DocumentFieldsProps) => {
   const { data: vaultWithTransforms } = useEntityVault(entity.id, entity);
   const vault = vaultWithTransforms?.vault;
-  const { data: documents } = useDocuments(entity.id);
+  const { data: documents } = useCurrentEntityDocuments();
   const fields = useDocumentFields();
 
   return vault ? (

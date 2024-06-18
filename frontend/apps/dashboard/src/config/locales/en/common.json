@@ -1425,6 +1425,7 @@
         "view-historical-data": {
           "label": "View historical data",
           "title": "View historical data",
+          "not-allowed": "You are not allowed to view historical data",
           "no-events": "This user has no events to select from, so there is no historical data available.",
           "form": {
             "heading": "Select event in time",

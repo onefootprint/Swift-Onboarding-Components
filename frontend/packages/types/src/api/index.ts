@@ -102,6 +102,10 @@ export type {
   GetEntityRuleSetResultRequest,
   GetEntityRuleSetResultResponse,
 } from './get-entity-rule-set-result';
+export type {
+  GetHistoricalEntityDataRequest,
+  GetHistoricalEntityDataResponse,
+} from './get-historical-entity-data';
 export type { GetListDetailsRequest, GetListDetailsResponse } from './get-list';
 export type {
   GetListEntriesRequest,

@@ -197,3 +197,10 @@ export const withTimeline = (entity = entityWithPhoneFixture, response = timelin
     path: `/entities/${entity.id}/timeline`,
     response,
   });
+
+export const withData = (entity = entityWithPhoneFixture, response = {}) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/data`,
+    response,
+  });

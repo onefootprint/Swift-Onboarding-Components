@@ -15,6 +15,7 @@ import {
   entityIdFixture,
   riskSignalDetailsFixture,
   riskSignalDetailsWithAmlFixture,
+  withData,
   withDecryptRiskSignalAmlHits,
   withEntity,
   withRiskSignalDetails,
@@ -25,6 +26,7 @@ const useRouterSpy = createUseRouterSpy();
 
 describe('<Details />', () => {
   beforeEach(() => {
+    withData();
     useRouterSpy({
       pathname: `/users/detail`,
       query: {

@@ -23,6 +23,7 @@ import {
   entityId,
   entityWithPhoneFixture,
   entityWithoutPhoneFixture,
+  withData,
   withEntity,
   withLists,
   withTimeline,
@@ -45,6 +46,7 @@ describe('<Actions />', () => {
     withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
     withPlaybooks();
     withLists();
+    withData();
     useRouterSpy({
       asPath: `/entities/${entityId}&mode=sandbox`,
       pathname: '/users/[id]',

@@ -175,3 +175,10 @@ export const withEntity = (entity = entityFixture) =>
       ...entity,
     },
   });
+
+export const withData = (entity = entityFixture, response = {}) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/data`,
+    response,
+  });

@@ -87,6 +87,8 @@ export type {
   GetEntityRiskSignalsResponse,
   GetEntityRuleSetResultRequest,
   GetEntityRuleSetResultResponse,
+  GetHistoricalEntityDataRequest,
+  GetHistoricalEntityDataResponse,
   GetListDetailsRequest,
   GetListDetailsResponse,
   GetListEntriesRequest,

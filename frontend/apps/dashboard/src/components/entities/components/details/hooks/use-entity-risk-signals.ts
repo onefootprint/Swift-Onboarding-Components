@@ -14,16 +14,17 @@ const getRiskSignals = async (payload: GetEntityRiskSignalsRequest, authHeaders:
     params,
     url: `/entities/${id}/risk_signals`,
   });
+
   return response;
 };
 
-const useEntityRiskSignals = (id: string) => {
+const useEntityRiskSignals = (id: string, seqno?: string | undefined) => {
   const filters = useRiskSignalsFilters();
   const { authHeaders } = useSession();
 
   return useQuery(
-    ['entity', id, 'risk-signals', filters.requestParams, authHeaders],
-    () => getRiskSignals({ ...filters.requestParams, id }, authHeaders),
+    ['entity', id, 'risk-signals', filters.requestParams, seqno, authHeaders],
+    () => getRiskSignals({ ...filters.requestParams, seqno, id }, authHeaders),
     { enabled: !!id, keepPreviousData: true },
   );
 };

@@ -1,9 +1,37 @@
+import useEntityVault, { VaultType } from '@/entities/hooks/use-entity-vault';
+import { useRequestErrorToast } from '@onefootprint/hooks';
+import { Attribute } from '@onefootprint/types/src/data/entity';
 import useEntity from './use-entity';
 import useEntityId from './use-entity-id';
+import useEntitySeqno from './use-entity-seqno';
+import useHistoricalEntityData from './use-historical-entity-data';
 
 const useCurrentEntity = () => {
   const id = useEntityId();
-  return useEntity(id);
+  const seqno = useEntitySeqno();
+  const entityQuery = useEntity(id);
+
+  const { updateToHistorical } = useEntityVault(id, entityQuery.data);
+  const showRequestErrorToast = useRequestErrorToast();
+  useHistoricalEntityData(id, seqno, {
+    onSuccess: (historicalData: Attribute[]) => {
+      // Update cached vault to contain historical data
+      const vaultAndTransforms: VaultType = {
+        vault: {},
+        transforms: {},
+        dataKinds: {},
+      };
+      historicalData.forEach(attribute => {
+        vaultAndTransforms.vault[attribute.identifier] = attribute.value;
+        vaultAndTransforms.transforms[attribute.identifier] = attribute.transforms;
+        vaultAndTransforms.dataKinds[attribute.identifier] = attribute.dataKind;
+      });
+      updateToHistorical(vaultAndTransforms);
+    },
+    onError: (error: unknown) => showRequestErrorToast(error),
+  });
+
+  return entityQuery;
 };
 
 export default useCurrentEntity;

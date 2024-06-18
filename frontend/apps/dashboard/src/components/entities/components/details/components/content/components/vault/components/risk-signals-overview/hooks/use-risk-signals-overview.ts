@@ -9,11 +9,12 @@ import type { RiskSignalsSummary } from '../risk-signals-overview.types';
 import groupBySection from './utils/group-by-section';
 import groupBySeverity from './utils/group-by-severity';
 
-const getRiskSignals = async ({ id }: GetEntityRiskSignalsRequest, authHeaders: AuthHeaders) => {
+const getRiskSignals = async ({ id, seqno }: GetEntityRiskSignalsRequest, authHeaders: AuthHeaders) => {
   const { data: response } = await request<GetEntityRiskSignalsResponse>({
     headers: authHeaders,
     method: 'GET',
     url: `/entities/${id}/risk_signals`,
+    params: { seqno },
   });
 
   return groupBySectionAndSeverity(response);
@@ -29,10 +30,10 @@ export const groupBySectionAndSeverity = (signals: RiskSignal[]): RiskSignalsSum
   };
 };
 
-const useRiskSignalsOverview = (id: string) => {
+const useRiskSignalsOverview = (id: string, seqno?: string | undefined) => {
   const { authHeaders } = useSession();
 
-  return useQuery(['entity', id, 'risk-signals-overview'], () => getRiskSignals({ id }, authHeaders), {
+  return useQuery(['entity', id, 'risk-signals-overview'], () => getRiskSignals({ id, seqno }, authHeaders), {
     enabled: !!id,
   });
 };
