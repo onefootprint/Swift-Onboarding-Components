@@ -117,7 +117,7 @@ impl DbPool {
 const CONNECTION_RECYCLE_MAX_AGE_SECS: u64 = 600;
 
 /// Initialize our DB
-pub fn init(url: &str, statement_timeout: Duration) -> Result<DbPool, DbError> {
+pub fn init(url: &str, statement_timeout: Duration, max_conns: usize) -> Result<DbPool, DbError> {
     let manager = Manager::new(url, Runtime::Tokio1);
     let pool = Pool::builder(manager)
         .runtime(Runtime::Tokio1)
@@ -182,7 +182,7 @@ pub fn init(url: &str, statement_timeout: Duration) -> Result<DbPool, DbError> {
             );
             Ok(())
         }))
-        .max_size(50)
+        .max_size(max_conns)
         .build()?;
 
     Ok(DbPool(pool))

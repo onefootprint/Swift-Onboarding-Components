@@ -91,7 +91,7 @@ impl TestDbPool {
         let test_db_name = Self::create_test_db(&mut conn);
         let test_db_url = format!("{}/{}", Self::base_db_url(), test_db_name);
         println!("CREATED TEST DB: {}", test_db_name);
-        let pool = crate::init(test_db_url.as_str(), Duration::from_secs(30)).unwrap();
+        let pool = crate::init(test_db_url.as_str(), Duration::from_secs(30), 5).unwrap();
         Self {
             db_pool: pool,
             test_db_name,

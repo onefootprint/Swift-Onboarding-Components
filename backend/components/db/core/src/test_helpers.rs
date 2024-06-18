@@ -32,7 +32,7 @@ pub fn test_db_conn() -> PgConn {
 pub fn test_db_pool() -> DbPool {
     let db_url = db_url();
 
-    crate::init(&db_url, Duration::from_secs(30)).unwrap()
+    crate::init(&db_url, Duration::from_secs(30), 5).unwrap()
 }
 
 pub fn have_same_elements<T>(l: Vec<T>, r: Vec<T>) -> bool

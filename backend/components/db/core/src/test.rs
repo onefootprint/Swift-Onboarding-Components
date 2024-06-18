@@ -111,7 +111,7 @@ mod test {
         // Run migrations on this DB if they haven't been run yet
         test_helpers::run_migrations_once(db_url.clone());
 
-        let pool = crate::init(&db_url, Duration::from_secs(30)).expect("couldn't initiate DB pool");
+        let pool = crate::init(&db_url, Duration::from_secs(30), 5).expect("couldn't initiate DB pool");
         let tenant = crate::models::tenant::NewTenant {
             name: "test_tenant".to_owned(),
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),

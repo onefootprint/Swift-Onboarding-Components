@@ -135,7 +135,7 @@ impl State {
         use webhooks::MockWebhookClient;
         let config = Config::load_from_env().expect("failed to load config");
 
-        let mut s = Self::init_or_die(config).await;
+        let mut s = Self::init_or_die(config, false).await;
         s.enclave_client.replace_proxy_client(Arc::new(MockEnclave));
         s.enclave_client.replace_s3_client(Arc::new(MockS3Client::new()));
 
@@ -161,7 +161,7 @@ impl State {
 
     #[allow(clippy::expect_used)]
     #[tracing::instrument(skip_all)]
-    pub async fn init_or_die(mut config: Config) -> Self {
+    pub async fn init_or_die(mut config: Config, is_api_server: bool) -> Self {
         let ff_client: Arc<dyn FeatureFlagClient> = if config.disable_launch_darkly.is_none() {
             let ff_client = LaunchDarklyFeatureFlagClient::new();
             let ff_client = match ff_client.init(&config.launch_darkly_sdk_key).await {
@@ -281,13 +281,16 @@ impl State {
         }
         result.expect("failed to run migrations");
 
-        // then create the pool
-        let db_pool = db::init(
-            &config.database_url,
-            Duration::from_secs(config.database_statement_timeout_sec),
-        )
-        .map_err(ApiError::from)
-        .expect("failed to init db pool");
+        // then create the db connection pool
+        let db_max_conns = match is_api_server {
+            true => 50,
+            // Background workers need much fewer connections since they don't have much parallelism
+            false => 5,
+        };
+        let db_statement_timeout = Duration::from_secs(config.database_statement_timeout_sec);
+        let db_pool = db::init(&config.database_url, db_statement_timeout, db_max_conns)
+            .map_err(ApiError::from)
+            .expect("failed to init db pool");
 
         // our session key
         let (challenge_sealing_key, session_sealing_key) = {

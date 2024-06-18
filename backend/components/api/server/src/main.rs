@@ -78,9 +78,10 @@ async fn run(config: Config) -> Result<()> {
     // telemetry
     let _controller = telemetry::init(&config).with_context(|| "failed to init telemetry layers")?;
 
-    let state: State = State::init_or_die(config.clone()).await;
-
     let args = Args::parse();
+    let is_api_server = matches!(args.command, None | Some(Command::ApiServer));
+    let state: State = State::init_or_die(config.clone(), is_api_server).await;
+
     match args.command {
         None | Some(Command::ApiServer) => run_api_server(config, state).await?,
         Some(Command::CreateOverdueWatchlistCheckTasks(subcommand)) => subcommand.run(config, state).await?,
