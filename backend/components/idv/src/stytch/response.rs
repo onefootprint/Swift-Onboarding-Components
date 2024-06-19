@@ -71,7 +71,7 @@ impl Verdict {
             .flat_map(|s| match Reason::try_from(s.as_str()) {
                 Ok(r) => Some(r),
                 Err(err) => {
-                    tracing::error!(?err, reason_string=%s, "Error parsing Stytch Reason");
+                    tracing::warn!(?err, reason_string=%s, "Error parsing Stytch Reason");
                     None
                 }
             })
