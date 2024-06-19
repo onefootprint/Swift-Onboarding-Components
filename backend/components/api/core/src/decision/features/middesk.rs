@@ -70,6 +70,7 @@ pub enum TaskKind {
                              * reason */
     Bankruptcies(BankruptciesTask), /* premium feature we don't have turned on but still get response for
                                      * some reason */
+    AddressCMRA(AddressCMRATask),
 }
 
 task_enum! {
@@ -397,6 +398,15 @@ task_enum! {
     }
 }
 
+task_enum! {
+    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    pub enum AddressCMRATask {
+        #[footprint_reason_code = Some(FootprintReasonCode::BusinessAddressCommercialMailReceivingAgency)]
+        #[strum(serialize = "CMRA")]
+        CMRA,
+    }
+}
+
 impl TryFrom<Task> for TaskKind {
     type Error = Error;
 
@@ -463,6 +473,9 @@ impl TryFrom<Task> for TaskKind {
             TaskKindDiscriminant::Bankruptcies => {
                 TaskKind::Bankruptcies(BankruptciesTask::from_str(&sub_label).map_err(|_| e)?)
             }
+            TaskKindDiscriminant::AddressCMRA => {
+                TaskKind::AddressCMRA(AddressCMRATask::from_str(&sub_label).map_err(|_| e)?)
+            }
         };
 
         Ok(task_kind)
@@ -492,6 +505,7 @@ impl From<TaskKind> for Option<FootprintReasonCode> {
             TaskKind::SosDomesticSubStatus(v) => Into::<Option<FootprintReasonCode>>::into(&v),
             TaskKind::Industry(v) => Into::<Option<FootprintReasonCode>>::into(&v),
             TaskKind::Bankruptcies(v) => Into::<Option<FootprintReasonCode>>::into(&v),
+            TaskKind::AddressCMRA(v) => Into::<Option<FootprintReasonCode>>::into(&v),
         }
     }
 }
@@ -534,6 +548,7 @@ mod tests {
     use test_case::test_case;
 
     #[test_case(json!({"key": "address_verification", "sub_label": "Verified"}) => Ok(TaskKind::AddressVerification(AddressVerificationTask::Verified)))]
+    #[test_case(json!({"key": "address_cmra", "sub_label": "CMRA"}) => Ok(TaskKind::AddressCMRA(AddressCMRATask::CMRA)))]
     #[test_case(json!({"key": "name","sub_label": "Alternate Name",}) => Ok(TaskKind::Name(NameTask::AlternateName)))]
     #[test_case(json!({"key": "flerp","sub_label": "derp",}) => Err(Error::UnrecognizedTask("flerp".to_owned(), "derp".to_owned())))]
     fn test_from_task(v: serde_json::Value) -> Result<TaskKind, Error> {

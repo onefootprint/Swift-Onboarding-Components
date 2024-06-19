@@ -1293,6 +1293,10 @@ footprint_reason_code_enum! {
         BusinessAddressCommercial,
 
         #[scope = SignalScope::BusinessAddress, additional_scopes = vec![], match_level = None]
+        #[note = "Business address is a Commercial Mail Receiving Agency", severity = SignalSeverity::High,  description = "The input business address is zoned by the USPS as a Commercial Mail Receiving Agency"]
+        BusinessAddressCommercialMailReceivingAgency,
+
+        #[scope = SignalScope::BusinessAddress, additional_scopes = vec![], match_level = None]
         #[note = "Business address is residential", severity = SignalSeverity::Low,  description = "The input business address is residential"]
         BusinessAddressResidential,
 
