@@ -1,6 +1,5 @@
-import type { LogsEvent, LogsInitConfiguration } from '@datadog/browser-logs';
+import type { LogsEvent } from '@datadog/browser-logs';
 import { datadogLogs } from '@datadog/browser-logs';
-import type { RumInitConfiguration } from '@datadog/browser-rum';
 import { datadogRum } from '@datadog/browser-rum';
 
 type BaseConfig = { applicationId: string; clientToken: string; env: string; service: string };
@@ -171,7 +170,9 @@ export const dataDogInfoEvent = (msg: string, msgContext?: object, err?: unknown
 
 export const dataDogAction = (act: string, actContext?: object) => {
   try {
-    return datadogRum.addAction(act, actContext);
+    const rumGlobal = datadogRum.getGlobalContext();
+    const logGlobal = datadogLogs.getGlobalContext();
+    return datadogRum.addAction(act, { ...rumGlobal, ...logGlobal, ...actContext });
   } catch (_e) {
     return undefined;
   }
