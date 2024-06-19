@@ -22,7 +22,7 @@ const Init = () => {
   });
 
   useEffect(() => {
-    trackAction('idv_init_page_view');
+    trackAction('idv:started');
   }, []);
 
   useGetOnboardingConfig(
