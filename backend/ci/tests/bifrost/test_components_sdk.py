@@ -65,7 +65,7 @@ def test_components_sdk(sandbox_tenant):
 
     # Make sure we can't use components_token to decrypt or add login credentials
     data = dict(fields=["id.first_name"])
-    body = post("hosted/user/vault/decrypt", data, components_token, status_code=401)
+    body = post("hosted/user/vault/decrypt", data, components_token, status_code=403)
     assert (
         body["message"]
         == "Not allowed: required permission is missing: CanDecrypt<id.first_name>"
@@ -79,7 +79,7 @@ def test_components_sdk(sandbox_tenant):
         IdentifyClient.from_token(components_token).inherit()
 
     data = dict(kind="email", action_kind="add_primary")
-    body = post("hosted/user/challenge", data, components_token, status_code=401)
+    body = post("hosted/user/challenge", data, components_token, status_code=403)
     assert (
         body["message"]
         == "Not allowed: required permission is missing: And<explicit_auth,Or<auth,sign_up>>"

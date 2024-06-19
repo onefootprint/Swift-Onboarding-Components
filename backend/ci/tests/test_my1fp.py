@@ -55,7 +55,7 @@ def test_decrypt_basic(sandbox_user, auth_token):
 
     for f in SENSITIVE_FIELDS:
         data = dict(fields=[f])
-        post("/hosted/user/vault/decrypt", data, auth_token, status_code=401)
+        post("/hosted/user/vault/decrypt", data, auth_token, status_code=403)
 
 
 def test_decrypt_sensitive(sandbox_user, auth_token):

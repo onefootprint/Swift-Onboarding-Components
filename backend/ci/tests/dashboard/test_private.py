@@ -52,6 +52,6 @@ def test_cannot_patch_tenant(tenant, sandbox_tenant):
         f"private/tenants/{sandbox_tenant.id}",
         dict(),
         *tenant.db_auths,
-        status_code=401,
+        status_code=403,
     )
     assert body["message"] == "Not allowed: user is not a risk ops firm employee"

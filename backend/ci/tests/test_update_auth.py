@@ -13,7 +13,6 @@ from tests.utils import (
 )
 from tests.constants import (
     TEST_URL,
-    FIXTURE_PHONE_NUMBER,
     FIXTURE_PHONE_NUMBER2,
     FIXTURE_EMAIL,
     FIXTURE_EMAIL2,
@@ -61,7 +60,7 @@ def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
     # It would be nice if we could test these two separately, but there isn't a codepath to do so
     assert_cant_use_token(
         auth_token,
-        401,
+        403,
         "Not allowed: required permission is missing: And<explicit_auth,Or<auth,sign_up>>",
     )
 
@@ -202,10 +201,7 @@ def test_add_phone_bifrost(skip_phone_obc):
     # Make sure we can't _replace_ contact info using this auth token
     data = dict(kind="email", email=FIXTURE_EMAIL2, action_kind="replace")
     body = post("hosted/user/challenge", data, auth_token, status_code=400)
-    assert (
-        body["message"]
-        == "Can only replace auth methods using auth issued via API"
-    )
+    assert body["message"] == "Can only replace auth methods using auth issued via API"
 
     # But, we can add a new phone
     data = dict(

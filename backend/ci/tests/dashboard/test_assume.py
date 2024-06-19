@@ -24,7 +24,7 @@ def assumed_token(tenant, sandbox_tenant_data):
         "private/assume",
         dict(tenant_id="org_id_that_looks_real"),
         original_token,
-        status_code=401,
+        status_code=403,
     )
 
     data = dict(tenant_id=tenant.id)

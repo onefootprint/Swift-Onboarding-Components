@@ -1,6 +1,7 @@
 use self::challenge::ChallengeError;
 use self::error_with_code::ErrorWithCode;
 use self::handoff::HandoffError;
+use crate::auth::AuthError;
 use crate::decision::vendor::{
     middesk,
     VendorAPIError,
@@ -86,7 +87,7 @@ pub enum ApiErrorKind {
     #[error("{0}")]
     TfError(#[from] TfError),
     #[error("{0}")]
-    AuthError(#[from] crate::auth::AuthError),
+    AuthError(#[from] AuthError),
     #[error("{0}")]
     KmsError(Box<kms::KmsSignError>),
     #[error("{0}")]
@@ -341,7 +342,31 @@ impl actix_web::ResponseError for ApiError {
         match self.0.as_ref() {
             ApiErrorKind::ErrorWithCode(e) => e.status_code(),
             ApiErrorKind::TfError(e) => e.status_code(),
-            ApiErrorKind::AuthError(_) => StatusCode::UNAUTHORIZED,
+            ApiErrorKind::AuthError(e) => match e {
+                AuthError::ApiKeyNotFound => StatusCode::UNAUTHORIZED,
+                AuthError::ObConfigKeyUsedForApiKey => StatusCode::UNAUTHORIZED,
+                AuthError::ObConfigNotFound => StatusCode::UNAUTHORIZED,
+                AuthError::ApiKeyUsedForObConfig => StatusCode::UNAUTHORIZED,
+                AuthError::MissingHeader(_) => StatusCode::UNAUTHORIZED,
+                AuthError::InvalidHeader(_) => StatusCode::UNAUTHORIZED,
+                AuthError::ErrorLoadingSession(_, _) => StatusCode::UNAUTHORIZED,
+                AuthError::InvalidBody => StatusCode::UNAUTHORIZED,
+                AuthError::SessionTypeError => StatusCode::UNAUTHORIZED,
+                AuthError::SandboxRestricted => StatusCode::FORBIDDEN,
+                AuthError::MissingUserPermission(_) => StatusCode::FORBIDDEN,
+                AuthError::MissingBusiness => StatusCode::UNAUTHORIZED,
+                AuthError::MissingWorkflow => StatusCode::UNAUTHORIZED,
+                AuthError::MissingScopedUser => StatusCode::UNAUTHORIZED,
+                AuthError::MissingTenantPermission(_) => StatusCode::UNAUTHORIZED,
+                AuthError::NotFirmEmployee => StatusCode::FORBIDDEN,
+                AuthError::NotAllowedForIntegrationTestUser => StatusCode::FORBIDDEN,
+                AuthError::NotRiskOpsFirmEmployee => StatusCode::FORBIDDEN,
+                AuthError::BusinessNotRequired => StatusCode::UNAUTHORIZED,
+                AuthError::NonPersonVault => StatusCode::UNAUTHORIZED,
+                AuthError::MissingWorkflowGuard(_) => StatusCode::FORBIDDEN,
+                AuthError::CannotAccessPreviewApi => StatusCode::FORBIDDEN,
+                AuthError::WorkflowDeactivated(_) => StatusCode::UNAUTHORIZED,
+            },
             ApiErrorKind::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,

@@ -28,7 +28,7 @@ def biometric_sandbox_user_auth(sandbox_user):
 )
 def test_decrypt_basic(sandbox_user, fields_to_decrypt, expected_success):
     data = dict(fields=fields_to_decrypt)
-    expected_status = 200 if expected_success else 401
+    expected_status = 200 if expected_success else 403
     body = post(
         "hosted/user/vault/decrypt",
         data,
@@ -54,8 +54,7 @@ def test_decrypt_biometric(
     sandbox_user, biometric_sandbox_user_auth, fields_to_decrypt, expected_success
 ):
     data = dict(fields=fields_to_decrypt)
-    # TODO should we 403 for insufficient perms rather than 401?
-    expected_status = 200 if expected_success else 401
+    expected_status = 200 if expected_success else 403
     body = post(
         "hosted/user/vault/decrypt",
         data,

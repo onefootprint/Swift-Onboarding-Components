@@ -50,10 +50,6 @@ pub enum AuthError {
     MissingScopedUser,
     #[error("Not allowed: required permission is missing: {0}")]
     MissingTenantPermission(String),
-    #[error("Cannot modify global properties on portable user")]
-    CannotModifyPortableUser,
-    #[error("Not allowed: handoff tokens cannot create other handoff tokens")]
-    CannotCreateMultipleHandoffTokens,
     #[error("Not allowed: user is not a firm employee")]
     NotFirmEmployee,
     #[error("Not allowed: integration testing user cannot perform this action")]

@@ -5,11 +5,10 @@ from tests.utils import create_ob_config
 
 def test_reonboard(sandbox_tenant, sandbox_user):
     # User one-clicks onto same ob config
-    phone_number = sandbox_user.client.data["id.phone_number"]
     sandbox_id = sandbox_user.client.sandbox_id
     bifrost = BifrostClient.inherit_user(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost.run()
-    body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=401)
+    body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=403)
     assert body["message"] == "Workflow state does not allow add_data"
     assert len(bifrost.handled_requirements) == 0
 
