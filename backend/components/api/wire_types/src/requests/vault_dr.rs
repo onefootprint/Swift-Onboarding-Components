@@ -1,11 +1,14 @@
 use newtypes::PiiString;
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    Apiv2Response,
+    Apiv2Schema,
+};
 use serde::{
     Deserialize,
     Serialize,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct VaultDrAwsPreEnrollResponse {
     pub external_id: PiiString,
 }
@@ -19,7 +22,7 @@ pub struct VaultDrEnrollRequest {
     pub re_enroll: Option<bool>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct VaultDrEnrollResponse {
     pub org_private_key: PiiString,
 }

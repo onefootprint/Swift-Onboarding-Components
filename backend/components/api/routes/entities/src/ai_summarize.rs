@@ -3,7 +3,6 @@ use crate::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -131,13 +130,12 @@ pub async fn get(
         ApiErrorKind::OpenAiCompletionError(format!("Invalid format from AI model: {}", response))
     })?;
 
-    ResponseData::ok(UserAiSummary {
+    Ok(UserAiSummary {
         high_level_summary,
         detailed_summary,
         risk_signal_summary,
         conclusion,
     })
-    .json()
 }
 
 #[derive(Debug, Serialize)]

@@ -38,18 +38,6 @@ impl TryDbToApi<(&ComplianceDocSummary, &TenantObConfigCounts)> for api_wire_typ
     }
 }
 
-impl TryDbToApi<&ComplianceDocSummary> for api_wire_types::ListComplianceDocumentsResponse {
-    fn try_from_db(summary: &ComplianceDocSummary) -> ApiResult<Self> {
-        let documents = summary
-            .docs
-            .keys()
-            .map(|doc_id| api_wire_types::ComplianceDocSummary::try_from_db((summary, doc_id)))
-            .collect::<ApiResult<Vec<_>>>()?;
-
-        Ok(documents)
-    }
-}
-
 impl TryDbToApi<(&ComplianceDocSummary, &TenantUserId)> for api_wire_types::LiteOrgMember {
     fn try_from_db(target: (&ComplianceDocSummary, &TenantUserId)) -> ApiResult<Self> {
         let (summary, user_id) = target;

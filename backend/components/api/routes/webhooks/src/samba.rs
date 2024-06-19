@@ -1,10 +1,7 @@
 use actix_web::web;
 use api_core::decision::vendor::samba::license_validation::get_samba_license_validation_report;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::web::Json;
 use api_core::State;
 use idv::samba::response::webhook::SambaWebhook;
@@ -21,7 +18,7 @@ const LOG_MSG: &str = "samba webhook";
 async fn handle_webhook(
     state: web::Data<State>,
     request: Json<serde_json::Value>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let req = request.into_inner();
     match serde_json::from_value::<SambaWebhook>(req) {
         Ok(webhook) => {
@@ -36,7 +33,7 @@ async fn handle_webhook(
         }
     }
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 #[tracing::instrument(skip_all)]

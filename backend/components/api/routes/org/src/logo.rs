@@ -4,20 +4,14 @@ use api_core::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant::{
     Tenant,
     UpdateTenant,
 };
-use paperclip::actix::web::{
-    HttpRequest,
-    Json,
-};
+use paperclip::actix::web::HttpRequest;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -52,7 +46,5 @@ pub async fn put(
         .db_query(move |conn| Tenant::update(conn, &tenant_id, update_tenant))
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
-        updated_tenant,
-    ))))
+    Ok(api_wire_types::Organization::from_db(updated_tenant))
 }

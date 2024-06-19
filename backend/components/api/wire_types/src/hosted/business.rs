@@ -1,7 +1,7 @@
 use crate::*;
 use newtypes::PiiString;
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct HostedBusiness {
     pub name: PiiString,
     pub inviter: Inviter,

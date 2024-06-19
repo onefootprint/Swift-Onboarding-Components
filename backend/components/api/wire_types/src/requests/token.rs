@@ -102,7 +102,7 @@ pub struct CreateEntityTokenRequest {
     pub send_link: bool,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateTokenResponse {
     /// A short-lived token that can be passed into the Verify SDK to allow the user to complete the
@@ -117,7 +117,7 @@ pub struct CreateTokenResponse {
     pub expires_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateEntityTokenResponse {
     pub token: SessionAuthToken,

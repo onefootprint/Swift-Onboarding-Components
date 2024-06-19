@@ -8,7 +8,6 @@ use crate::types::JsonApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::errors::ValidationError;
-use api_core::types::ResponseData;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::{
@@ -22,6 +21,7 @@ use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
 use newtypes::{
     flat_api_object_map_type,
+    impl_response_type,
     AccessEventKind,
     AccessEventPurpose,
     AuditEventDetail,
@@ -56,6 +56,7 @@ flat_api_object_map_type!(
     description="A key-value map of identifier to whether the identifier was successfully deleted in the vault",
     example=r#"{ "id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false }"#
 );
+impl_response_type!(DeleteVaultResponse);
 
 #[route_alias(
     actix::delete(
@@ -145,5 +146,5 @@ pub async fn delete(
     );
     let out = DeleteVaultResponse { map: results };
 
-    ResponseData::ok(out).json()
+    Ok(out)
 }

@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::ResponseData;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::{
     ApiError,
@@ -17,13 +17,11 @@ use crypto::aead::{
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::tenant::Tenant;
-use itertools::Itertools;
 use newtypes::{
     ListId,
     PiiBytes,
     PiiString,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -39,7 +37,7 @@ pub async fn entries_for_list(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     list_id: web::Path<ListId>,
-) -> ApiResult<Json<ResponseData<Vec<api_wire_types::ListEntry>>>> {
+) -> JsonApiListResponse<api_wire_types::ListEntry> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -72,12 +70,9 @@ pub async fn entries_for_list(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-    ResponseData::ok(
-        entries
-            .into_iter()
-            .zip(decrypted_data.into_iter())
-            .map(api_wire_types::ListEntry::from_db)
-            .collect_vec(),
-    )
-    .json()
+    Ok(entries
+        .into_iter()
+        .zip(decrypted_data.into_iter())
+        .map(api_wire_types::ListEntry::from_db)
+        .collect())
 }

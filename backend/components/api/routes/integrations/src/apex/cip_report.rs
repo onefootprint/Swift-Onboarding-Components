@@ -3,10 +3,7 @@ use api_core::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::State;
 use api_wire_types::{
@@ -153,7 +150,7 @@ pub async fn post_inner(
         },
     };
 
-    ResponseData::ok(summary).json()
+    Ok(summary)
 }
 
 fn to_ascii(p: PiiString) -> PiiString {

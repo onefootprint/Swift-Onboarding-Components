@@ -23,11 +23,7 @@ use api_core::errors::{
     ApiResult,
     AssertionError,
 };
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::utils::onboarding::NewOnboardingArgs;
 use api_core::utils::requirements::{
@@ -173,9 +169,8 @@ pub async fn rerun_machine(
         IncodeConfigurationIdOverride(None),
     )
     .await?;
-    ResponseData::ok(response).json()
+    Ok(response)
 }
-
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AdhocCreateDocumentRequest {
@@ -234,12 +229,10 @@ pub async fn adhoc_create_document_and_workflow(
                 fixture_result: None,
             };
 
-
             let (wf_id, _, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
             let document_request =
                 DocumentRequest::get(conn, &wf_id, DocumentRequestIdentifier::Kind(doc_kind))?
                     .ok_or(AssertionError("No document request found"))?;
-
 
             Ok((uvw, document_request, wf_id))
         })
@@ -289,10 +282,8 @@ pub async fn adhoc_create_document_and_workflow(
         })
         .await?;
 
-
-    ResponseData::ok(CreateDocumentResponse { id: doc_id.id }).json()
+    Ok(CreateDocumentResponse { id: doc_id.id })
 }
-
 
 #[post("/private/incode/adhoc/{id}/upload/{side}")]
 pub async fn adhoc_upload_and_process(
@@ -302,7 +293,7 @@ pub async fn adhoc_upload_and_process(
     mut payload: Multipart,
     request: HttpRequest,
     meta: MetaHeaders,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let file = handle_file_upload(&mut payload, &request, None, 5_242_880, 100).await?;
 
     let (document_id, side) = args.into_inner();
@@ -345,22 +336,20 @@ pub async fn adhoc_upload_and_process(
     )
     .await?;
 
-
     if !response.errors.is_empty() {
         // shouldn't have any errors if we set IsRerun(true)
         return Err(AssertionError("unexpected errors received while processing side").into());
     }
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }
-
 
 #[post("/private/incode/adhoc/{id}/process")]
 pub async fn adhoc_document_process(
     state: web::Data<State>,
     _: ProtectedAuth,
     args: web::Path<DocumentId>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let document_id = args.into_inner();
 
     let (wf, uvw, obc) = state
@@ -425,5 +414,5 @@ pub async fn adhoc_document_process(
         );
     }
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }

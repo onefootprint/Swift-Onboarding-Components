@@ -3,10 +3,7 @@ use api_core::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use paperclip::actix::{
     api_v2_operation,
@@ -35,5 +32,5 @@ async fn get(
         })
         .await?;
     let result = api_wire_types::WebhookPortalResponse { app_id, url, token };
-    ResponseData::ok(result).json()
+    Ok(result)
 }

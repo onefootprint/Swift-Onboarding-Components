@@ -14,6 +14,8 @@ selfie_doc = { path = "../../../../selfie_doc" }
 db = { path = "../../../../db/core" }
 db_schema = { path = "../../../../db/schema" }
 api_wire_types = { path = "../../../wire_types" }
+macros = { path = "../../../../macros" }
+paperclip = { workspace = true }
 
 diesel = { workspace = true }
 

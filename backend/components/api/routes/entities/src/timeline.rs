@@ -3,10 +3,9 @@ use crate::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::ListTimelineRequest;
 use db::models::user_timeline::UserTimeline;
@@ -15,8 +14,6 @@ use paperclip::actix::{
     get,
     web,
 };
-
-type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 
 #[api_v2_operation(
     description = "Gets the timeline for a user.",
@@ -28,7 +25,7 @@ pub async fn get(
     fp_id: FpIdPath,
     filters: web::Query<ListTimelineRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<TimelineEventsResponse> {
+) -> JsonApiListResponse<api_wire_types::UserTimeline> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -44,5 +41,5 @@ pub async fn get(
         .into_iter()
         .map(api_wire_types::UserTimeline::from_db)
         .collect();
-    ResponseData::ok(events).json()
+    Ok(events)
 }

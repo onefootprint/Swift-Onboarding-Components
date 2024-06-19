@@ -44,7 +44,6 @@ pub enum BusinessOwnerKind {
 
 crate::util::impl_enum_str_diesel!(BusinessOwnerKind);
 
-
 #[derive(
     Debug,
     Eq,

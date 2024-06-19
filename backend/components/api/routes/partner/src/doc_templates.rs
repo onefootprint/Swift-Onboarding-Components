@@ -9,10 +9,7 @@ use api_core::errors::{
     ApiResult,
     AssertionError,
 };
-use api_core::types::{
-    EmptyResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use chrono::Utc;
 use db::models::compliance_doc_template::{
@@ -38,7 +35,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::ListComplianceDocTemplatesResponse> {
+) -> JsonApiListResponse<api_wire_types::ComplianceDocTemplate> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -76,9 +73,9 @@ pub async fn get(
 
             Ok(api_wire_types::ComplianceDocTemplate::from_db((tpl, tplv, user)))
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<ApiResult<_>>()?;
 
-    ResponseData::ok(templates).json()
+    Ok(templates)
 }
 
 #[api_v2_operation(
@@ -129,7 +126,7 @@ pub async fn post(
         .await?;
 
     let resp = api_wire_types::ComplianceDocTemplate::from_db(models);
-    ResponseData::ok(resp).json()
+    Ok(resp)
 }
 
 #[api_v2_operation(
@@ -179,7 +176,7 @@ pub async fn put(
         })
         .await?;
     let resp = api_wire_types::ComplianceDocTemplate::from_db(models);
-    ResponseData::ok(resp).json()
+    Ok(resp)
 }
 
 #[api_v2_operation(
@@ -191,7 +188,7 @@ pub async fn delete(
     state: web::Data<State>,
     template_id: web::Path<ComplianceDocTemplateId>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageTemplates)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -205,5 +202,5 @@ pub async fn delete(
         })
         .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }

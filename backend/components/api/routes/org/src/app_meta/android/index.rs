@@ -4,8 +4,8 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::types::{
+    JsonApiListResponse,
     JsonApiResponse,
-    ResponseData,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -19,7 +19,6 @@ use newtypes::{
     SealedVaultBytes,
     TenantAndroidAppMetaId,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -34,7 +33,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<Vec<api_wire_types::TenantAndroidAppMeta>> {
+) -> JsonApiListResponse<api_wire_types::TenantAndroidAppMeta> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let list = state
@@ -52,7 +51,7 @@ pub async fn get(
         .map(|partial_meta| (partial_meta, None, None))
         .map(api_wire_types::TenantAndroidAppMeta::from_db)
         .collect();
-    ResponseData::ok(list).json()
+    Ok(list)
 }
 
 #[api_v2_operation(
@@ -96,12 +95,11 @@ pub async fn post(
             )
         })
         .await?;
-    ResponseData::ok(api_wire_types::TenantAndroidAppMeta::from_db((
+    Ok(api_wire_types::TenantAndroidAppMeta::from_db((
         new_tenant_android_app_meta,
         Some(integrity_verification_key),
         Some(integrity_decryption_key),
     )))
-    .json()
 }
 
 #[api_v2_operation(
@@ -152,11 +150,9 @@ async fn patch(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::TenantAndroidAppMeta::from_db((
-            result,
-            integrity_verification_key,
-            integrity_decryption_key,
-        )),
+    Ok(api_wire_types::TenantAndroidAppMeta::from_db((
+        result,
+        integrity_verification_key,
+        integrity_decryption_key,
     )))
 }

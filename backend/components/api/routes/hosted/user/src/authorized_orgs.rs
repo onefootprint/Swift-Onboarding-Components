@@ -3,18 +3,15 @@ use crate::auth::user::{
     UserAuthContext,
     UserAuthScope,
 };
-use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::types::JsonApiResponse;
+use api_core::types::JsonApiListResponse;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::{
     self,
     api_v2_operation,
     web,
 };
-
-type AuthorizedOrgsResponse = Vec<api_wire_types::AuthorizedOrg>;
 
 #[api_v2_operation(
     tags(My1fp, Hosted),
@@ -24,7 +21,7 @@ type AuthorizedOrgsResponse = Vec<api_wire_types::AuthorizedOrg>;
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> JsonApiResponse<AuthorizedOrgsResponse> {
+) -> JsonApiListResponse<api_wire_types::AuthorizedOrg> {
     let user_auth = user_auth.check_guard(UserAuthScope::BasicProfile)?;
 
     // TODO this could return duplicate tenants if the user onboarded onto multiple OBCs
@@ -36,5 +33,5 @@ pub async fn get(
         .into_iter()
         .map(api_wire_types::AuthorizedOrg::from_db)
         .collect();
-    ResponseData::ok(results).json()
+    Ok(results)
 }

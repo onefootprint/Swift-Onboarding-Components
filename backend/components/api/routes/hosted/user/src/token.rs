@@ -1,6 +1,4 @@
 use crate::auth::user::UserAuthContext;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
 use api_core::auth::session::user::AssociatedAuthEventKind;
 use api_core::auth::user::{
     allowed_user_scopes,
@@ -11,13 +9,13 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use api_wire_types::hosted::tokens::{
     CreateUserTokenRequest,
     CreateUserTokenResponse,
     GetUserTokenResponse,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -29,15 +27,13 @@ use paperclip::actix::{
     description = "Returns information about a given auth token."
 )]
 #[actix::get("/hosted/user/token")]
-pub fn get(
-    user_auth: UserAuthContext,
-) -> actix_web::Result<Json<ResponseData<GetUserTokenResponse>>, ApiError> {
+pub fn get(user_auth: UserAuthContext) -> JsonApiResponse<GetUserTokenResponse> {
     let user_auth = user_auth.check_guard(Any)?;
 
-    Ok(Json(ResponseData::ok(GetUserTokenResponse {
+    Ok(GetUserTokenResponse {
         expires_at: user_auth.expires_at(),
         scopes: user_auth.data.session.scopes,
-    })))
+    })
 }
 
 #[api_v2_operation(
@@ -49,7 +45,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     request: web::Json<CreateUserTokenRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ResponseData<CreateUserTokenResponse>>, ApiError> {
+) -> JsonApiResponse<CreateUserTokenResponse> {
     let user_auth = user_auth.check_guard(Any)?;
     let CreateUserTokenRequest { requested_scope } = request.into_inner();
 
@@ -81,8 +77,5 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(CreateUserTokenResponse {
-        expires_at,
-        token,
-    })))
+    Ok(CreateUserTokenResponse { expires_at, token })
 }

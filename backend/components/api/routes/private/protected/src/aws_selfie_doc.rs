@@ -6,10 +6,7 @@ use actix_web::{
     web,
 };
 use api_core::errors::ApiResult;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{
     EnclaveDecryptOperation,
     Pii,
@@ -34,7 +31,7 @@ pub struct CompareAnalyzeRequest {
     selfie_id: DataIdentifier,
 }
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, macros::JsonResponder)]
 pub struct ComparisonAndDocOcrResult {
     comparison_result: selfie_doc::compare::CompareResult,
     analyzed_id_scores: HashMap<String, f32>,
@@ -92,12 +89,11 @@ pub async fn post(
         .extract_document_data(doc_pii_bytes)
         .await?;
 
-    ResponseData::ok(ComparisonAndDocOcrResult {
+    Ok(ComparisonAndDocOcrResult {
         comparison_result,
         analyzed_id_scores: match analyzed_id {
             AnalyzeIdResult::FoundDocumentMetadata(m) => m.scores(),
             _ => HashMap::new(),
         },
     })
-    .json()
 }

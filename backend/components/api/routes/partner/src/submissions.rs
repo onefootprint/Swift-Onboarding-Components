@@ -6,7 +6,6 @@ use api_core::auth::tenant::{
     PartnerTenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::ResponseData;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_submission::ComplianceDocSubmission;
 use db::models::tenant::Tenant;
@@ -83,5 +82,5 @@ pub async fn get(
     };
 
     let resp = api_wire_types::ComplianceDocSubmission { id, created_at, data };
-    ResponseData::ok(resp).json()
+    Ok(resp)
 }

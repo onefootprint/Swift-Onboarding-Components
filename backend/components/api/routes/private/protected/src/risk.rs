@@ -33,7 +33,7 @@ use api_core::errors::{
     ApiResult,
     AssertionError,
 };
-use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::{
     VaultWrapper,
@@ -83,7 +83,7 @@ pub struct MakeVendorCallsRequest {
     pub vendor_api: VendorAPI,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct MakeVendorCallsResponse {
     new_vendor_request_ids: Vec<VerificationRequestId>,
     new_vendor_result_ids: Vec<VerificationResultId>,
@@ -96,7 +96,7 @@ async fn make_vendor_calls(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<MakeVendorCallsRequest>,
-) -> actix_web::Result<Json<ResponseData<MakeVendorCallsResponse>>, ApiError> {
+) -> JsonApiResponse<MakeVendorCallsResponse> {
     let MakeVendorCallsRequest { wf_id, vendor_api } = request.into_inner();
     let (wf, sv) = state
         .db_pool
@@ -162,7 +162,7 @@ async fn make_vendor_calls(
         &RuleEvalConfig::default(),
     );
 
-    Ok(Json(ResponseData::ok(MakeVendorCallsResponse {
+    Ok(MakeVendorCallsResponse {
         new_vendor_request_ids: vec![vendor_result.verification_request_id],
         new_vendor_result_ids: vec![vendor_result.verification_result_id],
         rule_results: rule_results
@@ -170,7 +170,7 @@ async fn make_vendor_calls(
             .map(|(ri, b)| (api_wire_types::Rule::from_db(ri), b))
             .collect_vec(),
         action_triggered,
-    })))
+    })
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -179,7 +179,7 @@ pub struct MakeDecisionRequest {
     pub fp_id: FpId,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct MakeDecisionResponse {
     decision: Decision,
 }
@@ -191,7 +191,7 @@ async fn make_decision(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<MakeDecisionRequest>,
-) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
+) -> JsonApiResponse<MakeDecisionResponse> {
     let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
 
     let decision = state
@@ -234,7 +234,7 @@ async fn make_decision(
 
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    Ok(Json(ResponseData::ok(MakeDecisionResponse { decision })))
+    Ok(MakeDecisionResponse { decision })
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -243,7 +243,7 @@ pub struct ShadowRunRequest {
     pub vendor_api: VendorAPI,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct ShadowRunResult {
     action_triggered: Option<RuleAction>,
 }
@@ -253,7 +253,7 @@ async fn shadow_run(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<ShadowRunRequest>,
-) -> actix_web::Result<Json<ResponseData<ShadowRunResult>>, ApiError> {
+) -> JsonApiResponse<ShadowRunResult> {
     let ShadowRunRequest { wf_id, vendor_api } = request.into_inner();
     let vendor_apis = vec![vendor_api];
     let (wf, sv) = state
@@ -336,7 +336,7 @@ async fn shadow_run(
         &RuleEvalConfig::default(),
     );
 
-    Ok(Json(ResponseData::ok(ShadowRunResult { action_triggered })))
+    Ok(ShadowRunResult { action_triggered })
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -344,7 +344,7 @@ pub struct SaveVresRiskSignalsRequest {
     pub vres_id: VerificationResultId,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct SaveVresRiskSignalsResult {
     created_risk_signals: Vec<RiskSignalId>,
 }
@@ -356,7 +356,7 @@ async fn save_risk_signals_for_vres(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<SaveVresRiskSignalsRequest>,
-) -> actix_web::Result<Json<ResponseData<SaveVresRiskSignalsResult>>, ApiError> {
+) -> JsonApiResponse<SaveVresRiskSignalsResult> {
     let SaveVresRiskSignalsRequest { vres_id } = request.into_inner();
 
     let (vreq_vres, vw) = state
@@ -405,7 +405,7 @@ async fn save_risk_signals_for_vres(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(SaveVresRiskSignalsResult {
+    Ok(SaveVresRiskSignalsResult {
         created_risk_signals: rs.into_iter().map(|rs| rs.id).collect(),
-    })))
+    })
 }

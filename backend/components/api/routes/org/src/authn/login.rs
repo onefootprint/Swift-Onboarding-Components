@@ -1,12 +1,10 @@
-use api_core::errors::ApiError;
-use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use api_wire_types::{
     OrgLoginResponse,
     TenantLoginRequest,
 };
 use newtypes::TenantKind;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     post,
@@ -22,7 +20,7 @@ use paperclip::actix::{
 async fn handler(
     state: web::Data<State>,
     request: web::Json<TenantLoginRequest>,
-) -> actix_web::Result<Json<ResponseData<OrgLoginResponse>>, ApiError> {
+) -> JsonApiResponse<OrgLoginResponse> {
     let request = request.into_inner();
     let data = api_route_org_common::login::handle_login(
         state,
@@ -31,5 +29,5 @@ async fn handler(
         TenantKind::Tenant,
     )
     .await?;
-    ResponseData { data }.json()
+    Ok(data)
 }

@@ -5,10 +5,7 @@ use api_core::auth::tenant::{
     TenantGuard,
 };
 use api_core::errors::ApiResult;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::{
     ApiErrorKind,
     State,
@@ -18,7 +15,6 @@ use db::models::vault_dr::{
     NewVaultDrAwsPreEnrollment,
     VaultDrAwsPreEnrollment,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -46,16 +42,13 @@ pub async fn post(
                 aws_external_id: crypto::random::gen_rand_bytes(16).encode_hex::<String>().into(),
             };
 
-
             Ok(VaultDrAwsPreEnrollment::get_or_create(conn, new_pre_enrollment)?)
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::VaultDrAwsPreEnrollResponse {
-            external_id: pre_enrollment.aws_external_id,
-        },
-    )))
+    Ok(api_wire_types::VaultDrAwsPreEnrollResponse {
+        external_id: pre_enrollment.aws_external_id,
+    })
 }
 
 #[api_v2_operation(
@@ -82,9 +75,7 @@ pub async fn get(
         return Err(ApiErrorKind::ResourceNotFound.into());
     };
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::VaultDrAwsPreEnrollResponse {
-            external_id: pre_enrollment.aws_external_id,
-        },
-    )))
+    Ok(api_wire_types::VaultDrAwsPreEnrollResponse {
+        external_id: pre_enrollment.aws_external_id,
+    })
 }

@@ -5,10 +5,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::auth::Either;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiListResponse;
 use api_wire_types::PublicRiskSignalDescription;
 use newtypes::FootprintReasonCode;
 use paperclip::actix::{
@@ -19,9 +16,9 @@ use strum::IntoEnumIterator;
 
 #[api_v2_operation(description = "List all Footprint Risk Signals", tags(Org, Preview))]
 #[get("/org/risk_signals")]
-pub async fn get(
+pub fn get(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<Vec<api_wire_types::PublicRiskSignalDescription>> {
+) -> JsonApiListResponse<api_wire_types::PublicRiskSignalDescription> {
     let _auth = auth.check_guard(TenantGuard::Read)?;
 
     let response = FootprintReasonCode::iter()
@@ -36,5 +33,5 @@ pub async fn get(
         })
         .collect();
 
-    ResponseData::ok(response).json()
+    Ok(response)
 }

@@ -13,7 +13,8 @@ pub struct ValidateRequest {
     pub validation_token: SessionAuthToken,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
+
 pub struct ValidateResponse {
     /// Information on the authenticated user and the auth method they used
     pub user_auth: UserAuthResponse,
@@ -31,7 +32,7 @@ pub struct ValidateResponse {
     pub onboarding_configuration_id: Option<ObConfigurationId>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct EntityValidateResponse {
     pub fp_id: FpId,
     pub requires_manual_review: bool,
@@ -39,7 +40,7 @@ pub struct EntityValidateResponse {
     pub playbook_key: ObConfigurationKey,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct UserAuthResponse {
     pub fp_id: FpId,
     pub auth_events: Vec<ValidateAuthEvent>,

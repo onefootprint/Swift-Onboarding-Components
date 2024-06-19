@@ -1,7 +1,4 @@
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::magic_link::create_magic_link;
 use api_core::State;
 use api_wire_types::LinkAuthRequest;
@@ -11,7 +8,7 @@ use paperclip::actix::web::Json;
 pub async fn handler(
     state: web::Data<State>,
     request: Json<LinkAuthRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let LinkAuthRequest {
         email_address,
         redirect_url,
@@ -23,5 +20,5 @@ pub async fn handler(
         .send_magic_link_email(&state, email_address, link)
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

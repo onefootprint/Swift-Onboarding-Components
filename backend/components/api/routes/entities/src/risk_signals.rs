@@ -5,7 +5,6 @@ use crate::auth::tenant::{
     TenantSessionAuth,
 };
 use crate::auth::Either;
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -18,6 +17,7 @@ use api_core::errors::{
     AssertionError,
 };
 use api_core::telemetry::RootSpan;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::{
@@ -74,8 +74,6 @@ use paperclip::actix::{
 };
 use std::collections::HashMap;
 
-type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;
-
 #[api_v2_operation(
     description = "Lists the risk signals for a footprint user.",
     tags(EntityDetails, Entities, Private)
@@ -90,7 +88,7 @@ pub async fn get(
     // /users/<>/risk_signals API
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     root_span: RootSpan,
-) -> JsonApiResponse<RiskSignalsListResponse> {
+) -> JsonApiListResponse<api_wire_types::RiskSignal> {
     // Some tracing to track when tenants have stopped using this API
     if let Either::Right(_) = &auth {
         // Apiture and fractional are still using this
@@ -140,7 +138,7 @@ pub async fn get(
         .map(api_wire_types::RiskSignal::from_db)
         .collect();
 
-    ResponseData::ok(signals).json()
+    Ok(signals)
 }
 
 fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<RiskSignal> {
@@ -192,7 +190,7 @@ pub async fn get_detail(
         get_risk_signal_and_maybe_aml_detail(&state, risk_signal_id, fp_id, tenant_id, is_live).await?;
     let has_aml_hits = aml_detail.is_some();
 
-    ResponseData::ok(api_wire_types::RiskSignalDetail::from_db((rs, has_aml_hits))).json()
+    Ok(api_wire_types::RiskSignalDetail::from_db((rs, has_aml_hits)))
 }
 
 const DECRYPT_AML_HITS_ACCESS_EVENT_REASON: &str = "Reviewing AML information";
@@ -291,7 +289,7 @@ pub async fn decrypt_aml_hits(
         })
         .await?;
 
-    ResponseData::ok(aml_detail).json()
+    Ok(aml_detail)
 }
 
 async fn get_risk_signal_and_maybe_aml_detail(

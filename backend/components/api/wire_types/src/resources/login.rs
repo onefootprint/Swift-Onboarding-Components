@@ -21,7 +21,7 @@ pub struct PartnerLoginRequest {
     pub request_org_id: Option<PartnerTenantId>,
 }
 
-#[derive(serde::Serialize, Apiv2Schema)]
+#[derive(serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct OrgLoginResponse {
     /// Whether a new tenant was created for the authed user
     pub created_new_tenant: bool,

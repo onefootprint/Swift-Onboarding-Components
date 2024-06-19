@@ -8,10 +8,7 @@ use api_core::auth::tenant::{
 };
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::scoped_vault::{
@@ -39,5 +36,5 @@ async fn get(
         .await?;
     root_span.record("fp_id", sv.fp_id.to_string());
 
-    ResponseData::ok(api_wire_types::SuperAdminEntity::from_db(sv)).json()
+    Ok(api_wire_types::SuperAdminEntity::from_db(sv))
 }

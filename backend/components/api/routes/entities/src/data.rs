@@ -5,13 +5,10 @@ use crate::auth::tenant::{
 };
 use crate::errors::ApiError;
 use crate::get::search::decrypt_visible_attrs;
-use crate::types::{
-    JsonApiResponse,
-    ResponseData,
-};
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::serializers::entity_attributes;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::EntityAttribute;
 use db::models::scoped_vault::ScopedVault;
@@ -31,7 +28,7 @@ pub async fn get(
     fp_id: FpIdPath,
     auth: TenantSessionAuth,
     filters: web::Query<api_wire_types::GetHistoricalDataRequest>,
-) -> JsonApiResponse<Vec<EntityAttribute>> {
+) -> JsonApiListResponse<EntityAttribute> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let fp_id = fp_id.into_inner();
@@ -55,5 +52,5 @@ pub async fn get(
         .unwrap_or_default();
 
     let results = entity_attributes(&vw, &auth, decrypted_results);
-    ResponseData::ok(results).json()
+    Ok(results.into())
 }

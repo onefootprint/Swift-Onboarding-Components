@@ -1,4 +1,3 @@
-use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::tenant::{
     CheckTenantGuard,
@@ -6,9 +5,8 @@ use api_core::auth::tenant::{
     PartnerTenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::ResponseData;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
-use api_wire_types::ListComplianceCompaniesResponse;
 use db::helpers::ComplianceDocSummary;
 use db::models::ob_configuration::ObConfiguration;
 use paperclip::actix::{
@@ -25,7 +23,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiResponse<ListComplianceCompaniesResponse> {
+) -> JsonApiListResponse<api_wire_types::ComplianceCompanySummary> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -43,7 +41,7 @@ pub async fn get(
     let companies = summaries
         .values()
         .map(|summary| api_wire_types::ComplianceCompanySummary::try_from_db((summary, &counts)))
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<ApiResult<_>>()?;
 
-    ResponseData::ok(companies as ListComplianceCompaniesResponse).json()
+    Ok(companies)
 }

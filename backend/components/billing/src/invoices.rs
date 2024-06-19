@@ -75,7 +75,6 @@ pub async fn create_bill_for_tenant(
     Ok(())
 }
 
-
 #[tracing::instrument(skip_all)]
 async fn get_or_create_customer_id(
     client: &BillingClient,

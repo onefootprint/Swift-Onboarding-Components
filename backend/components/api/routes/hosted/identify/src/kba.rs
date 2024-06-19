@@ -9,10 +9,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{
     VaultWrapper,
     VwArgs,
@@ -94,5 +91,5 @@ pub async fn post(
         .await?;
 
     let response = KbaResponse { token };
-    ResponseData::ok(response).json()
+    Ok(response)
 }

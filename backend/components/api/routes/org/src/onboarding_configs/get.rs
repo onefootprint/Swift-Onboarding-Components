@@ -4,7 +4,6 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::response::ResponseData;
 use api_core::types::{
     JsonApiResponse,
     OffsetPaginatedResponse,
@@ -104,5 +103,5 @@ async fn get_detail(
         .await?;
 
     let result = api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()));
-    ResponseData::ok(result).json()
+    Ok(result)
 }

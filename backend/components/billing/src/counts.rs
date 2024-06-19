@@ -233,7 +233,6 @@ impl BillingCounts {
     }
 }
 
-
 impl Add for BillingCounts {
     type Output = BillingCounts;
 

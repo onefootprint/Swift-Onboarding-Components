@@ -5,7 +5,6 @@ use crate::auth::tenant::{
     TenantSessionAuth,
 };
 use crate::auth::Either;
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::{
     get,
@@ -125,5 +124,5 @@ pub async fn get_dupes(
         same_tenant,
         other_tenant,
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }

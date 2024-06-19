@@ -3,11 +3,10 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::document::Document;
 use db::models::scoped_vault::ScopedVault;
@@ -28,7 +27,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<Vec<api_wire_types::PublicDocument>> {
+) -> JsonApiListResponse<api_wire_types::PublicDocument> {
     auth.check_preview_guard(PreviewApi::DocumentsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
@@ -53,6 +52,6 @@ pub async fn get(
     let response = id_docs
         .into_iter()
         .map(api_wire_types::PublicDocument::from_db)
-        .collect::<Vec<_>>();
-    ResponseData::ok(response).json()
+        .collect();
+    Ok(response)
 }

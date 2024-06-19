@@ -2,9 +2,8 @@ use api_core::auth::tenant::{
     AnyOrgSessionAuth,
     AnyTenantSessionAuth,
 };
-use api_core::errors::ApiError;
 use api_core::serializers::IsAuthMethodSupported;
-use api_core::types::response::ResponseData;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::Organization;
@@ -13,24 +12,18 @@ use db::helpers::{
     WorkosAuthIdentity,
 };
 use db::models::tenant_rolebinding::TenantRolebinding;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     get,
     web,
 };
 
-pub type RolesResponse = Vec<Organization>;
-
 #[api_v2_operation(
     description = "Return the list of tenants that can be inherited by the authed user",
     tags(Auth, Private)
 )]
 #[get("/org/auth/roles")]
-fn get(
-    state: web::Data<State>,
-    tenant_auth: AnyTenantSessionAuth,
-) -> actix_web::Result<Json<ResponseData<RolesResponse>>, ApiError> {
+fn get(state: web::Data<State>, tenant_auth: AnyTenantSessionAuth) -> JsonApiListResponse<Organization> {
     let auth_method = tenant_auth.auth_method();
     let tu_id = tenant_auth.tenant_user_id()?;
     let tenants = state
@@ -49,5 +42,5 @@ fn get(
             Organization::from_db((t, is_auth_supported))
         })
         .collect();
-    ResponseData::ok(data).json()
+    Ok(data)
 }

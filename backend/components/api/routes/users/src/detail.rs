@@ -3,10 +3,7 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use crate::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
@@ -54,5 +51,5 @@ pub async fn detail(
         .await?;
 
     let result = api_wire_types::User::from_db((sv, mrs, wfr));
-    ResponseData::ok(result).json()
+    Ok(result)
 }

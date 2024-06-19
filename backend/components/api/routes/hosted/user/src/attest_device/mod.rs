@@ -3,16 +3,12 @@ use crate::auth::user::{
     UserAuthScope,
 };
 use crate::errors::ApiError;
-use crate::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use crate::types::JsonApiResponse;
 use crate::State;
 use actix_web::web::Json;
 use api_core::decision::vendor;
 use api_core::decision::vendor::fp_device_attestation::AttestationResult;
 use api_core::errors::ApiResult;
-use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_wire_types::hosted::device_attestation::{
@@ -89,11 +85,10 @@ pub async fn post_challenge(
     }
     .seal(&state.challenge_sealing_key)?;
 
-    ResponseData::ok(DeviceAttestationChallengeResponse {
+    Ok(DeviceAttestationChallengeResponse {
         state: sealed_state.to_string(),
         attestation_challenge,
     })
-    .json()
 }
 
 /// receive the attestation
@@ -108,7 +103,7 @@ pub async fn post_attestation(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insight: InsightHeaders,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let CreateDeviceAttestationRequest {
@@ -255,5 +250,5 @@ pub async fn post_attestation(
         }
     };
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

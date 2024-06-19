@@ -1,9 +1,6 @@
 use api_core::auth::user::UserAuthContext;
 use api_core::errors::AssertionError;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_wire_types::hosted::neuro_id::NeuroIdentityIdResponse;
 use newtypes::{
     NeuroIdentityId,
@@ -12,7 +9,6 @@ use newtypes::{
 use paperclip::actix::{
     self,
     api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(
@@ -29,5 +25,5 @@ pub async fn get(user_auth: UserAuthContext) -> JsonApiResponse<NeuroIdentityIdR
 
     let id = NeuroIdentityId::from(wf_id);
 
-    Ok(web::Json(ResponseData::ok(NeuroIdentityIdResponse { id })))
+    Ok(NeuroIdentityIdResponse { id })
 }

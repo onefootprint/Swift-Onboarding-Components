@@ -1,4 +1,5 @@
 use crate::{
+    Apiv2Response,
     Apiv2Schema,
     Serialize,
 };
@@ -10,7 +11,7 @@ use newtypes::{
 };
 use serde::Deserialize;
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PrivateBusinessOwner {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<FpId>,
@@ -21,13 +22,13 @@ pub struct PrivateBusinessOwner {
     pub source: Option<BusinessOwnerSource>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PrivateOwnedBusiness {
     pub id: FpId,
     pub status: OnboardingStatus,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct BusinessOwner {
     pub fp_id: FpId,
 }

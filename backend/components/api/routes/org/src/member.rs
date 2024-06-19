@@ -10,10 +10,7 @@ use api_core::auth::{
     Either,
 };
 use api_core::errors::tenant::TenantError;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_user::{
@@ -53,7 +50,7 @@ async fn get(
         .await?;
 
     let result = api_wire_types::AuthOrgMember::from_db((user, rb, tenant, scopes));
-    ResponseData::ok(result).json()
+    Ok(result)
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
@@ -95,5 +92,5 @@ async fn patch(
         .await?;
 
     let result = api_wire_types::AuthOrgMember::from_db((user, rb, tenant, scopes));
-    ResponseData::ok(result).json()
+    Ok(result)
 }

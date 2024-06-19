@@ -22,7 +22,10 @@ use newtypes::{
     TenantId,
     VaultKind,
 };
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    Apiv2Response,
+    Apiv2Schema,
+};
 use serde::Serialize;
 use serde_with::{
     DeserializeFromStr,
@@ -32,7 +35,7 @@ use std::collections::HashMap;
 use strum_macros::EnumString;
 
 /// Details for a specific Entity
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct Entity {
     pub id: FpId,
@@ -121,7 +124,7 @@ pub enum EntityStatus {
     None,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct SuperAdminEntity {
     pub id: FpId,

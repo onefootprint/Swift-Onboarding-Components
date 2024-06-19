@@ -1,8 +1,6 @@
 use crate::auth::user::UserAuthContext;
 use crate::errors::handoff::HandoffError;
 use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::types::EmptyResponse;
 use crate::utils::session::{
     HandoffRecord,
     JsonSession,
@@ -10,6 +8,7 @@ use crate::utils::session::{
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::error_with_code::ErrorWithCode;
+use api_core::types::JsonApiResponse;
 use api_wire_types::{
     D2pStatusResponse,
     D2pUpdateStatusRequest,
@@ -28,10 +27,7 @@ use paperclip::actix::{
     description = "Gets the status of the provided d2p session. Requires the d2p session token as the auth header."
 )]
 #[get("/hosted/onboarding/d2p/status")]
-pub async fn get(
-    state: web::Data<State>,
-    user_auth: UserAuthContext,
-) -> actix_web::Result<Json<ResponseData<D2pStatusResponse>>, ApiError> {
+pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> JsonApiResponse<D2pStatusResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let session = state
@@ -39,12 +35,10 @@ pub async fn get(
         .db_query(move |conn| JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token))
         .await?
         .ok_or(HandoffError::HandoffSessionNotFound)?;
-    Ok(Json(ResponseData {
-        data: D2pStatusResponse {
-            status: session.data.status,
-            meta: session.data.meta,
-        },
-    }))
+    Ok(D2pStatusResponse {
+        status: session.data.status,
+        meta: session.data.meta,
+    })
 }
 
 #[api_v2_operation(
@@ -57,7 +51,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     request: Json<D2pUpdateStatusRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let D2pUpdateStatusRequest { status } = request.into_inner();
@@ -84,5 +78,5 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(EmptyResponse::ok()))
+    Ok(api_wire_types::Empty)
 }

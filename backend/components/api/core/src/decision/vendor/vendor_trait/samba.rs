@@ -19,7 +19,6 @@ use idv::samba::SambaAPIResponse;
 use idv::ParsedResponse;
 use newtypes::VendorAPI;
 
-
 /// Create License Validation Samba Order
 #[async_trait]
 impl
@@ -44,7 +43,6 @@ impl
     }
 }
 
-
 impl VendorAPIResponse for SambaAPIResponse<CreateLVOrderResponse> {
     fn vendor_api(&self) -> newtypes::VendorAPI {
         VendorAPI::SambaLicenseValidationCreate
@@ -59,7 +57,6 @@ impl VendorAPIResponse for SambaAPIResponse<CreateLVOrderResponse> {
         ParsedResponse::IncodeRawResponse(self.raw_response.clone())
     }
 }
-
 
 /// Poll License Validation Samba Order
 #[async_trait]
@@ -105,7 +102,6 @@ impl VendorAPIResponse for SambaAPIResponse<CheckLVOrderStatus> {
     }
 }
 
-
 #[async_trait]
 impl VendorAPICall<SambaGetLVReportRequest, SambaAPIResponse<GetLVOrderResponse>, idv::samba::error::Error>
     for FootprintVendorHttpClient
@@ -128,7 +124,6 @@ impl VendorAPICall<SambaGetLVReportRequest, SambaAPIResponse<GetLVOrderResponse>
         Ok(res)
     }
 }
-
 
 impl VendorAPIResponse for SambaAPIResponse<GetLVOrderResponse> {
     fn vendor_api(&self) -> newtypes::VendorAPI {

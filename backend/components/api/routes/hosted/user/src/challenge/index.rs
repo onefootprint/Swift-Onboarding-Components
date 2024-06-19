@@ -15,7 +15,6 @@ use api_core::errors::{
     AssertionError,
     ValidationError,
 };
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
@@ -149,7 +148,7 @@ pub async fn post(
         challenge_token,
         time_before_retry_s,
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }
 
 /// Given the requested action_kind and the kind of the explicit AuthEvents associated with this

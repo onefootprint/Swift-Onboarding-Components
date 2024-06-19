@@ -1,12 +1,5 @@
 use crate::auth::user::UserAuthScope;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
-use crate::types::response::{
-    EmptyResponse,
-    ResponseData,
-};
+use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{
     self,
@@ -16,13 +9,13 @@ use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::types::JsonApiResponse;
 use newtypes::{
     DataIdentifier,
     DataLifetimeSource,
     DocumentDiKind,
     WorkflowGuard,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -39,7 +32,7 @@ pub async fn post(
     document_identifier: web::Path<DataIdentifier>,
     mut payload: Multipart,
     request: HttpRequest,
-) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let kind = DocumentDiKind::try_from(document_identifier.into_inner())?;
 
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
@@ -78,5 +71,5 @@ pub async fn post(
         })
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

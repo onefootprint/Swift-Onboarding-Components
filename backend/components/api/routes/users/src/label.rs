@@ -5,11 +5,7 @@ use crate::auth::tenant::{
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::CreateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
@@ -29,7 +25,7 @@ pub async fn post(
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
     request: Json<CreateLabelRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::Labels)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();
@@ -46,7 +42,7 @@ pub async fn post(
         })
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 #[api_v2_operation(description = "View a user's label", tags(Users, Preview))]
@@ -70,9 +66,8 @@ pub async fn get(
         })
         .await?;
 
-    ResponseData::ok(api_wire_types::UserLabel {
+    Ok(api_wire_types::UserLabel {
         kind: label.as_ref().map(|l| l.kind),
         created_at: label.map(|l| l.created_at),
     })
-    .json()
 }

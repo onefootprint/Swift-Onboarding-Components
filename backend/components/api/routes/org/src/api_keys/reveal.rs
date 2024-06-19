@@ -4,14 +4,12 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiError;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantApiKeyId;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     post,
@@ -54,9 +52,9 @@ async fn post(
         .decrypt_to_piistring(&key.e_secret_api_key, &tenant.e_private_key)
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
+    Ok(api_wire_types::SecretApiKey::from_db((
         key,
         role,
         Some(SecretApiKey::from(decrypted_secret_key.leak().to_string())),
-    )))))
+    )))
 }

@@ -1,5 +1,4 @@
 use crate::auth::user::UserAuthScope;
-use crate::types::response::ResponseData;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::document::route_handler::{
     IncodeConfigurationIdOverride,
@@ -48,5 +47,5 @@ pub async fn post(
     )
     .await?;
 
-    ResponseData::ok(response).json()
+    Ok(response)
 }

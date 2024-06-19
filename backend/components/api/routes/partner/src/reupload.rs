@@ -6,10 +6,6 @@ use api_core::auth::tenant::{
     PartnerTenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::{
-    EmptyResponse,
-    ResponseData,
-};
 use chrono::Utc;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::NewComplianceDocRequest;
@@ -31,7 +27,7 @@ pub async fn post(
     auth: PartnerTenantSessionAuth,
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocId)>,
     request: web::Json<api_wire_types::ReuploadComplianceDocRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageReviews)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -66,5 +62,5 @@ pub async fn post(
         })
         .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }

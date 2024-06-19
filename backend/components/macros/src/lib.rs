@@ -543,3 +543,21 @@ pub fn hidden_debug(input: TokenStream) -> TokenStream {
 pub fn serde_dummy_attr(_: TokenStream) -> TokenStream {
     TokenStream::new()
 }
+
+#[proc_macro_derive(JsonResponder)]
+pub fn json_responder(input: TokenStream) -> TokenStream {
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    let name = &ast.ident;
+
+    quote! {
+        impl actix_web::Responder for #name {
+            type Body = actix_web::body::BoxBody;
+
+            fn respond_to(self, _req: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
+                let json_resp = paperclip::actix::web::Json(self);
+                actix_web::HttpResponse::build(actix_web::http::StatusCode::OK).json(json_resp)
+            }
+        }
+    }
+    .into()
+}

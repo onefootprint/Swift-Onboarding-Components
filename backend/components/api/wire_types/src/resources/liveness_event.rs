@@ -5,7 +5,7 @@ use newtypes::{
 };
 
 /// Describes a liveness event that took place
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct LivenessEvent {
     pub source: LivenessSource,

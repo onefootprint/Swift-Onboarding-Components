@@ -4,8 +4,6 @@ use crate::triggers::{
     apply_trigger_request,
     TriggerRequestOutcome,
 };
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::tenant::{
     CheckTenantGuard,
@@ -18,6 +16,7 @@ use api_core::errors::{
     ValidationError,
 };
 use api_core::task::execute_webhook_tasks;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::{
     EntityActionResponse,
@@ -48,7 +47,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<EntityActionsRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<Vec<EntityActionResponse>> {
+) -> JsonApiListResponse<EntityActionResponse> {
     // TODO what should the auth guard be here?
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
@@ -89,9 +88,8 @@ pub async fn post(
         .map(|o| o.apply(&state))
         .flatten_ok()
         .collect::<ApiResult<_>>()?;
-    ResponseData::ok(responses).json()
+    Ok(responses)
 }
-
 
 #[derive(derive_more::From)]
 pub(super) enum EntityActionPostCommit {
@@ -110,7 +108,6 @@ impl EntityActionPostCommit {
         }
     }
 }
-
 
 fn clear_review(conn: &mut TxnPgConn, sv: &ScopedVault, actor: DbActor) -> ApiResult<EntityActionPostCommit> {
     let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;

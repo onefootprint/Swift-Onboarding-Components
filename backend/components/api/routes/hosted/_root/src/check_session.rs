@@ -1,20 +1,18 @@
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::session::check::CheckSessionContext;
-use paperclip::actix::web::Json;
+use api_core::types::JsonApiResponse;
 use paperclip::actix::{
     self,
     api_v2_operation,
     web,
-    Apiv2Schema,
+    Apiv2Response,
 };
 use serde::{
     Deserialize,
     Serialize,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub enum CheckSessionResponse {
     Active,
@@ -29,12 +27,12 @@ pub enum CheckSessionResponse {
 pub async fn get(
     _state: web::Data<State>,
     session_check: CheckSessionContext,
-) -> actix_web::Result<Json<ResponseData<CheckSessionResponse>>, ApiError> {
+) -> JsonApiResponse<CheckSessionResponse> {
     let data = match session_check {
         CheckSessionContext::Active => CheckSessionResponse::Active,
         CheckSessionContext::Expired => CheckSessionResponse::Expired,
         CheckSessionContext::InvalidOrNotFound => CheckSessionResponse::Unknown,
     };
 
-    Ok(Json(ResponseData { data }))
+    Ok(data)
 }

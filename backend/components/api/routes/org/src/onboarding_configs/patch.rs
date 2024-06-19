@@ -3,11 +3,8 @@ use api_core::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use api_core::errors::{
-    ApiError,
-    ApiResult,
-};
-use api_core::types::response::ResponseData;
+use api_core::errors::ApiResult;
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
@@ -16,7 +13,6 @@ use newtypes::{
     ApiKeyStatus,
     ObConfigurationId,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     patch,
@@ -45,7 +41,7 @@ async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
-) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
@@ -62,7 +58,10 @@ async fn patch(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone())),
+    Ok(api_wire_types::OnboardingConfiguration::from_db((
+        obc,
+        actor,
+        rs,
+        state.ff_client.clone(),
     )))
 }

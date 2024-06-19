@@ -3,7 +3,6 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::errors::onboarding::{
@@ -66,7 +65,7 @@ pub async fn post(
     request: web::Json<TriggerKybRequest>,
     auth: SecretTenantAuthContext,
     root_span: RootSpan,
-) -> JsonApiResponse<EntityValidateResponse> {
+) -> JsonApiResponse<web::Json<EntityValidateResponse>> {
     let auth = auth.check_guard(TenantGuard::TriggerKyb)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -192,8 +191,7 @@ pub async fn post(
         })
         .await?;
 
-    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((
+    Ok(web::Json(api_wire_types::EntityValidateResponse::from_db((
         wf.status, sv, mrs, obc,
-    )))
-    .json()
+    ))))
 }

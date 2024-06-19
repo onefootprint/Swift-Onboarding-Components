@@ -4,7 +4,7 @@ use newtypes::{
     PiiString,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct AmlDetail {
     pub share_url: Option<String>,
     pub hits: Vec<AmlHit>,

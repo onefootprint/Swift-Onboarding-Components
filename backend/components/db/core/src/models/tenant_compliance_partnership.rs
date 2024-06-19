@@ -15,9 +15,8 @@ use newtypes::{
     TenantCompliancePartnershipId,
     TenantId,
 };
-use serde::Serialize;
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Queryable, Selectable, Identifiable, Serialize)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = tenant_compliance_partnership)]
 #[diesel(primary_key(tenant_id, partner_tenant_id))]
 pub struct TenantCompliancePartnership {

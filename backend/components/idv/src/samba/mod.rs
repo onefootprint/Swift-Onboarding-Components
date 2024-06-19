@@ -11,7 +11,6 @@ pub mod error;
 pub mod request;
 pub mod response;
 
-
 pub enum SambaAPIResult<T>
 where
     T: Serialize,
@@ -55,7 +54,6 @@ where
     pub result: SambaAPIResult<T>,
     pub raw_response: PiiJsonValue,
 }
-
 
 impl<T> SambaAPIResponse<T>
 where

@@ -1,7 +1,4 @@
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use api_wire_types::LinkAuthRequest;
 use paperclip::actix::web::Json;
@@ -18,6 +15,9 @@ use paperclip::actix::{
     tags(Auth, Private)
 )]
 #[post("/org/auth/magic_link")]
-async fn handler(state: web::Data<State>, request: Json<LinkAuthRequest>) -> JsonApiResponse<EmptyResponse> {
+async fn handler(
+    state: web::Data<State>,
+    request: Json<LinkAuthRequest>,
+) -> JsonApiResponse<api_wire_types::Empty> {
     api_route_org_common::magic_link::handler(state, request).await
 }

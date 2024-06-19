@@ -32,7 +32,7 @@ pub struct IdentifyRequest {
     pub scope: Option<IdentifyScope>,
 }
 
-#[derive(Apiv2Schema, serde::Serialize, Default)]
+#[derive(Apiv2Response, serde::Serialize, Default, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyResponse {
     /// All of the context on the identified user, if found
@@ -69,7 +69,7 @@ pub struct LiteIdentifyRequest {
     pub phone_number: Option<PhoneNumber>,
 }
 
-#[derive(Apiv2Schema, serde::Serialize, Default)]
+#[derive(Apiv2Response, serde::Serialize, Default, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct LiteIdentifyResponse {
     pub user_found: bool,
@@ -98,7 +98,7 @@ pub struct LoginChallengeRequest {
     pub challenge_kind: ChallengeKind,
 }
 
-#[derive(Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct LoginChallengeResponse {
     pub challenge_data: UserChallengeData,
     pub error: Option<String>,
@@ -118,7 +118,7 @@ pub struct SignupChallengeRequest {
     pub scope: Option<IdentifyScope>,
 }
 
-#[derive(Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct SignupChallengeResponse {
     pub challenge_data: UserChallengeData,
     pub error: Option<String>,
@@ -134,7 +134,7 @@ pub struct IdentifyVerifyRequest {
     pub scope: IdentifyScope,
 }
 
-#[derive(Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct IdentifyVerifyResponse {
     pub auth_token: SessionAuthToken,
 }

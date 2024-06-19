@@ -28,7 +28,7 @@ impl From<DeviceType> for UploadSource {
     }
 }
 
-#[derive(Debug, Serialize, Apiv2Schema)]
+#[derive(Debug, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct Document {
     pub kind: DocumentKind,
     /// Non-null for images uploaded via the UI
@@ -58,7 +58,7 @@ pub struct DocumentUpload {
     pub identifier: DataIdentifier,
 }
 
-#[derive(Debug, Serialize, Apiv2Schema)]
+#[derive(Debug, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PublicDocument {
     /// Document type of the successfully uploaded document. Can be used to fetch from vault
     pub document_type: DocumentKind,

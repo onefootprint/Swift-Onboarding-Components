@@ -27,7 +27,6 @@ pub struct SambaReport {
     pub _updated_at: DateTime<Utc>,
 }
 
-
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = samba_report)]
 struct NewSambaReportRow {

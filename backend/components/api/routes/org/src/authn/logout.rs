@@ -2,10 +2,7 @@ use api_core::auth::tenant::{
     AnyTenantSessionAuth,
     InvalidateAuth,
 };
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use paperclip::actix::{
     api_v2_operation,
@@ -18,7 +15,10 @@ use paperclip::actix::{
     description = "Logs out the authenticated principal and invalidates the session"
 )]
 #[post("/org/auth/logout")]
-async fn handler(state: web::Data<State>, auth: AnyTenantSessionAuth) -> JsonApiResponse<EmptyResponse> {
+async fn handler(
+    state: web::Data<State>,
+    auth: AnyTenantSessionAuth,
+) -> JsonApiResponse<api_wire_types::Empty> {
     auth.invalidate(&state).await?;
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

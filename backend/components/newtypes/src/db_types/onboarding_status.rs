@@ -80,7 +80,6 @@ impl OnboardingStatus {
 
 crate::util::impl_enum_str_diesel!(OnboardingStatus);
 
-
 impl From<DecisionStatus> for OnboardingStatus {
     fn from(s: DecisionStatus) -> Self {
         match s {

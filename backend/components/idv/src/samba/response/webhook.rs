@@ -40,7 +40,6 @@ pub struct WebhookData {
     pub product_ordered: Option<serde_json::Value>,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

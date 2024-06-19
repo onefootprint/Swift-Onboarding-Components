@@ -1,7 +1,7 @@
 use crate::*;
 use newtypes::CollectedDataOption;
 
-#[derive(serde::Serialize, Apiv2Schema)]
+#[derive(serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct AuthorizedOrg {
     pub org_name: String,
     pub logo_url: Option<String>,

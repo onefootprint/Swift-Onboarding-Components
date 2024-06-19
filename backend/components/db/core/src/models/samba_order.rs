@@ -40,7 +40,6 @@ pub struct SambaOrder {
     pub _updated_at: DateTime<Utc>,
 }
 
-
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = samba_order)]
 pub struct UpdateSambaOrder {

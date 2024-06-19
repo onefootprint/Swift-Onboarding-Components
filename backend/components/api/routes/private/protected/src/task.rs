@@ -4,12 +4,7 @@ use actix_web::{
     post,
     web,
 };
-use api_core::errors::ApiError;
-use api_core::types::response::ResponseData;
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::{
     task,
     State,
@@ -32,10 +27,10 @@ async fn execute_tasks(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<ExecuteTasksRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let ExecuteTasksRequest { num_tasks } = request.into_inner();
     task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), num_tasks, None);
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -43,7 +38,7 @@ pub struct CreateTaskRequest {
     pub task_data: TaskData,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct CreateTasksResponse {
     pub task_id: TaskId,
 }
@@ -53,7 +48,7 @@ async fn create_task(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<CreateTaskRequest>,
-) -> actix_web::Result<Json<ResponseData<CreateTasksResponse>>, ApiError> {
+) -> JsonApiResponse<CreateTasksResponse> {
     let CreateTaskRequest { task_data } = request.into_inner();
 
     let task = state
@@ -61,5 +56,5 @@ async fn create_task(
         .db_query(move |conn| -> Result<Task, DbError> { Task::create(conn, Utc::now(), task_data) })
         .await?;
 
-    Ok(Json(ResponseData::ok(CreateTasksResponse { task_id: task.id })))
+    Ok(CreateTasksResponse { task_id: task.id })
 }

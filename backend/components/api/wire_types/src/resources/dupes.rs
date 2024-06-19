@@ -10,10 +10,13 @@ use newtypes::{
     DupeKind,
     FpId,
 };
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    Apiv2Response,
+    Apiv2Schema,
+};
 use serde::Serialize;
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct Dupes {
     pub same_tenant: Vec<SameTenantDupe>,
     pub other_tenant: Option<OtherTenantDupes>,

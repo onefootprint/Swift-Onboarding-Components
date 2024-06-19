@@ -4,7 +4,6 @@ use api_core::auth::user::{
 };
 use api_core::auth::IsGuardMet;
 use api_core::errors::ValidationError;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::State;
 use api_route_hosted_core::validation_token::create_validation_token;
@@ -36,5 +35,5 @@ pub async fn post(
     }
 
     let validation_token = create_validation_token(&state, user_auth.data, None).await?;
-    ResponseData::ok(HostedValidateResponse { validation_token }).json()
+    Ok(HostedValidateResponse { validation_token })
 }

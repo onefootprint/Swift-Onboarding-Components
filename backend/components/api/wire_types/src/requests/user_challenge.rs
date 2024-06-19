@@ -5,7 +5,10 @@ use newtypes::{
     ChallengeToken,
     PhoneNumber,
 };
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    Apiv2Response,
+    Apiv2Schema,
+};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct UserChallengeVerifyRequest {
@@ -28,7 +31,7 @@ pub struct UserChallengeRequest {
     pub action_kind: ActionKind,
 }
 
-#[derive(Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct UserChallengeResponse {
     /// If the challenge kind is biometric, the challenge JSON for the browser
     pub biometric_challenge_json: Option<String>,

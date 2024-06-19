@@ -10,7 +10,6 @@ use api_core::types::{
     JsonApiResponse,
     OffsetPaginatedResponse,
     OffsetPaginationRequest,
-    ResponseData,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -121,11 +120,11 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
+    Ok(api_wire_types::SecretApiKey::from_db((
         api_key,
         role,
         Some(secret_key),
-    )))))
+    )))
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -168,7 +167,5 @@ pub async fn patch(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
-        api_key, role, None,
-    )))))
+    Ok(api_wire_types::SecretApiKey::from_db((api_key, role, None)))
 }

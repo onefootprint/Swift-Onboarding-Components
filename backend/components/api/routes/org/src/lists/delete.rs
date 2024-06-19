@@ -4,14 +4,10 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::{
-    EmptyResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use db::models::list::List;
 use newtypes::ListId;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -24,7 +20,7 @@ pub async fn deactivate_list(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     list_id: web::Path<ListId>,
-) -> ApiResult<Json<ResponseData<EmptyResponse>>> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -38,5 +34,5 @@ pub async fn deactivate_list(
         })
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

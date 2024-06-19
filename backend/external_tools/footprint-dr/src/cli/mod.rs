@@ -28,7 +28,6 @@ const RECORD_SELECTOR_GROUP: &str = "record selector";
 const PAGINATION_OR_SAMPLE_GROUP: &str = "pagination or sample";
 const NUMBER_OF_VAULTS_GROUP: &str = "number of vaults";
 
-
 #[derive(Parser, Debug)]
 #[command(version, about, disable_help_subcommand = true, disable_help_flag = true)]
 struct Command {
@@ -63,7 +62,6 @@ struct SandboxFlags {
     #[arg(long, global = true, group = SANDBOX_GROUP)]
     sandbox: bool,
 }
-
 
 #[derive(clap::Subcommand, Debug)]
 enum Subcommand {

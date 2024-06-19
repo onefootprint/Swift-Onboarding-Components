@@ -8,11 +8,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::State;
 use chrono::Utc;
@@ -52,7 +48,7 @@ pub async fn post(
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocRequestId)>,
     mut payload: Multipart,
     request: HttpRequest,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManageComplianceDocSubmission)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -131,7 +127,7 @@ pub async fn post(
         })
         .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }
 
 fn doc_s3_key(partnership_id: &TenantCompliancePartnershipId, document_id: &ComplianceDocId) -> String {

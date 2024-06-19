@@ -28,10 +28,7 @@ use api_core::decision::{
 };
 use api_core::errors::cip_error::CipError;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::{
     DecryptUncheckedResult,
@@ -237,11 +234,10 @@ pub async fn post_inner(
     let status_code = response.status().as_u16();
     let alpaca_response: PiiJsonValue = response.json().await?;
 
-    ResponseData::ok(AlpacaCipResponse {
+    Ok(AlpacaCipResponse {
         status_code,
         alpaca_response,
     })
-    .json()
 }
 
 /// create a CIP request from the decision results

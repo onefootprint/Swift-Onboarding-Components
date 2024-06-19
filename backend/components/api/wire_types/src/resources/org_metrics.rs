@@ -3,13 +3,16 @@ use chrono::{
     Utc,
 };
 use newtypes::ObConfigurationId;
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    Apiv2Response,
+    Apiv2Schema,
+};
 use serde::{
     Deserialize,
     Serialize,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct OrgMetrics {
     /// All vaults created, whether or not they've been through KYC

@@ -1,9 +1,5 @@
 use crate::auth::user::UserAuthContext;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
-use crate::types::response::ResponseData;
+use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::{
     VaultWrapper,
     VwArgs,
@@ -11,6 +7,7 @@ use crate::utils::vault_wrapper::{
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::user::UserError;
+use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::Person;
 use api_core::ApiErrorKind;
 use newtypes::sms_message::SmsMessage;
@@ -24,6 +21,7 @@ use paperclip::actix::{
     api_v2_operation,
     post,
     web,
+    Apiv2Response,
     Apiv2Schema,
 };
 
@@ -32,7 +30,7 @@ pub struct D2pSmsRequest {
     url: PiiString,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct D2pSmsResponse {
     time_before_retry_s: i64,
 }
@@ -47,7 +45,7 @@ pub async fn handler(
     user_auth: UserAuthContext,
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ResponseData<D2pSmsResponse>>, ApiError> {
+) -> JsonApiResponse<D2pSmsResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let uvw = state
@@ -83,7 +81,7 @@ pub async fn handler(
         .await?;
     let time_before_retry_s = state.sms_client.duration_between_challenges;
 
-    Ok(Json(ResponseData::ok(D2pSmsResponse {
+    Ok(D2pSmsResponse {
         time_before_retry_s: time_before_retry_s.num_seconds(),
-    })))
+    })
 }

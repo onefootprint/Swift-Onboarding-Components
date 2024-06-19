@@ -7,7 +7,7 @@ use newtypes::{
 };
 
 /// Describes an audit event of a data access
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct AccessEvent {
     pub fp_id: FpId,
     pub tenant_id: TenantId,

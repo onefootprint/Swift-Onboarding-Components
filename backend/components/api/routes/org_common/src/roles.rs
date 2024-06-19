@@ -9,7 +9,6 @@ use api_core::types::{
     JsonApiResponse,
     OffsetPaginatedResponse,
     OffsetPaginationRequest,
-    ResponseData,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -95,7 +94,7 @@ pub async fn post(
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);
-    ResponseData::ok(result).json()
+    Ok(result)
 }
 
 pub async fn patch(
@@ -114,7 +113,7 @@ pub async fn patch(
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);
-    ResponseData::ok(result).json()
+    Ok(result)
 }
 
 pub async fn deactivate(
@@ -131,5 +130,5 @@ pub async fn deactivate(
         .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);
-    ResponseData::ok(result).json()
+    Ok(result)
 }

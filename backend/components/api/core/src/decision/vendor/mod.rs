@@ -67,7 +67,6 @@ pub fn map_to_api_error<E: Into<idv::Error>>(e: E) -> ApiError {
     ApiError::from(e.into())
 }
 
-
 // Struct to help with additional verification related to Documents
 // does some common things useful for also working in sandbox where we might not have sent to a
 // vendor

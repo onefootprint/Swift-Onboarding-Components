@@ -1,5 +1,5 @@
 use crate::{
-    Apiv2Schema,
+    Apiv2Response,
     Serialize,
 };
 use newtypes::{
@@ -8,7 +8,7 @@ use newtypes::{
     WatchlistCheckStatusKind,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct WatchlistCheck {
     pub id: WatchlistCheckId,
     pub status: WatchlistCheckStatusKind,

@@ -9,7 +9,6 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::{
@@ -132,7 +131,7 @@ async fn post(
         })
         .await?;
     let result = api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone()));
-    ResponseData::ok(result).json()
+    Ok(result)
 }
 
 fn copy_rule(r: RuleInstance) -> CreateRule {

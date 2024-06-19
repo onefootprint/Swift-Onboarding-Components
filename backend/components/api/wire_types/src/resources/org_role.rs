@@ -6,7 +6,7 @@ use newtypes::{
 };
 
 /// IAM Role for an Org
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct OrganizationRole {
     pub id: TenantRoleId,

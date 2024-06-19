@@ -34,7 +34,7 @@ pub struct Rule {
     pub kind: RuleInstanceKind,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct RuleSetResult {
     pub created_at: DateTime<Utc>,
     pub ob_configuration_id: ObConfigurationId,
@@ -50,7 +50,7 @@ pub struct RuleResult {
     pub result: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct RuleEvalResults {
     pub results: Vec<RuleEvalResult>,
     pub stats: RuleEvalStats,

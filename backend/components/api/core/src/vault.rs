@@ -9,10 +9,7 @@ use crate::errors::{
     ValidationError,
 };
 use crate::telemetry::RootSpan;
-use crate::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use crate::types::JsonApiResponse;
 use crate::utils::actix::OptionalJson;
 use crate::utils::db2api::DbToApi;
 use crate::utils::headers::{
@@ -171,5 +168,5 @@ pub async fn create_non_portable_vault(
     root_span.record("fp_id", scoped_user.fp_id.to_string());
 
     let response = api_wire_types::LiteUser::from_db((scoped_user, vault));
-    ResponseData::ok(response).json()
+    Ok(response)
 }

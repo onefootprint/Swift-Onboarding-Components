@@ -5,10 +5,7 @@ use crate::auth::tenant::{
 };
 use crate::get::search::decrypt_visible_attrs;
 use crate::get::EntityDetailResponse;
-use crate::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use crate::types::JsonApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::errors::ApiResult;
@@ -58,5 +55,5 @@ pub async fn get(
         .unwrap_or_default();
 
     let result = api_wire_types::Entity::from_db((entity, &vw, &auth, decrypted_results));
-    ResponseData::ok(result).json()
+    Ok(result)
 }

@@ -15,10 +15,7 @@ use api_core::auth::tenant::{
 };
 use api_core::errors::cip_error::CipError;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::{
     Person,
@@ -132,11 +129,10 @@ pub async fn post_inner(
     let status_code = response.status().as_u16();
     let alpaca_response: PiiJsonValue = response.json().await?;
 
-    ResponseData::ok(AlpacaCreateAccountResponse {
+    Ok(AlpacaCreateAccountResponse {
         status_code,
         alpaca_response,
     })
-    .json()
 }
 
 async fn create_create_account_request(

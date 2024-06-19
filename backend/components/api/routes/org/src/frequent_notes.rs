@@ -5,9 +5,8 @@ use api_core::auth::tenant::{
 };
 use api_core::errors::tenant::TenantError;
 use api_core::types::{
-    EmptyResponse,
+    JsonApiListResponse,
     JsonApiResponse,
-    ResponseData,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -29,7 +28,7 @@ pub async fn get(
     state: web::Data<State>,
     filters: web::Query<api_wire_types::GetOrgFrequentNotes>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<Vec<api_wire_types::OrgFrequentNote>> {
+) -> JsonApiListResponse<api_wire_types::OrgFrequentNote> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
 
@@ -42,7 +41,7 @@ pub async fn get(
         .into_iter()
         .map(api_wire_types::OrgFrequentNote::from_db)
         .collect();
-    ResponseData::ok(list).json()
+    Ok(list)
 }
 
 #[api_v2_operation(
@@ -71,7 +70,7 @@ pub async fn post(
             TenantFrequentNote::create(conn, tenant_id, actor, kind, content)
         })
         .await?;
-    ResponseData::ok(api_wire_types::OrgFrequentNote::from_db(new_freq_note)).json()
+    Ok(api_wire_types::OrgFrequentNote::from_db(new_freq_note))
 }
 
 #[api_v2_operation(
@@ -83,7 +82,7 @@ pub async fn delete(
     state: web::Data<State>,
     frequent_note_id: web::Path<TenantFrequentNoteId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
 
@@ -94,5 +93,5 @@ pub async fn delete(
         .db_query(move |conn| -> DbResult<_> { TenantFrequentNote::deactivate(conn, &tenant_id, &fn_id) })
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

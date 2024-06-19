@@ -1,5 +1,4 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
@@ -217,5 +216,5 @@ pub async fn post(
         link,
         expires_at,
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }

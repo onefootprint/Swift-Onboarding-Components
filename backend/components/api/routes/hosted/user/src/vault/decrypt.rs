@@ -1,8 +1,5 @@
 use crate::errors::ApiError;
-use crate::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use crate::types::JsonApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::UserAuthContext;
@@ -67,5 +64,5 @@ pub async fn post(
     );
     let out = DecryptResponse::from(results);
 
-    ResponseData::ok(out).json()
+    Ok(out)
 }

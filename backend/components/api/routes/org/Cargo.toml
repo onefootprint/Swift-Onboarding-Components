@@ -21,6 +21,7 @@ vault_dr = { path = "../../../vault_dr"}
 webhooks = { path = "../../../webhooks"}
 api_wire_types = { path = "../../wire_types" }
 api_route_org_common = { path = "../org_common" }
+macros = { path = "../../../macros" }
 
 actix-web = { workspace = true }
 paperclip = { workspace = true }

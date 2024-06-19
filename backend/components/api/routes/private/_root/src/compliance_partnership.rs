@@ -9,10 +9,12 @@ use api_core::auth::tenant::{
     FirmEmployeeGuard,
 };
 use api_core::errors::ApiResult;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_wire_types::CompliancePartnershipRequest;
-use chrono::Utc;
+use chrono::{
+    DateTime,
+    Utc,
+};
 use db::models::compliance_doc::NewComplianceDoc;
 use db::models::compliance_doc_request::NewComplianceDocRequest;
 use db::models::compliance_doc_template::ComplianceDocTemplate;
@@ -20,13 +22,32 @@ use db::models::tenant_compliance_partnership::{
     NewTenantCompliancePartnership,
     TenantCompliancePartnership,
 };
+use newtypes::{
+    PartnerTenantId,
+    TenantCompliancePartnershipId,
+    TenantId,
+};
+use paperclip::actix::Apiv2Response;
+
+#[derive(serde::Serialize, macros::JsonResponder, Apiv2Response)]
+struct TenantCompliancePartnershipResponse {
+    pub id: TenantCompliancePartnershipId,
+
+    pub tenant_id: TenantId,
+    pub partner_tenant_id: PartnerTenantId,
+
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
+
+    pub deactivated_at: Option<DateTime<Utc>>,
+}
 
 #[post("/private/compliance/partnership")]
 pub async fn post(
     state: web::Data<State>,
     request: Json<CompliancePartnershipRequest>,
     auth: FirmEmployeeAuthContext,
-) -> JsonApiResponse<TenantCompliancePartnership> {
+) -> JsonApiResponse<TenantCompliancePartnershipResponse> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
 
     let partnership = state
@@ -63,5 +84,21 @@ pub async fn post(
         })
         .await?;
 
-    ResponseData::ok(partnership).json()
+    let TenantCompliancePartnership {
+        id,
+        tenant_id,
+        partner_tenant_id,
+        _created_at,
+        _updated_at,
+        deactivated_at,
+    } = partnership;
+    let response = TenantCompliancePartnershipResponse {
+        id,
+        tenant_id,
+        partner_tenant_id,
+        _created_at,
+        _updated_at,
+        deactivated_at,
+    };
+    Ok(response)
 }

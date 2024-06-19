@@ -1,17 +1,15 @@
 use crate::auth::ob_config::ObConfigAuth;
 use crate::auth::Either;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::onboarding::OnboardingError;
+use api_core::types::JsonApiResponse;
 use db::models::appearance::Appearance;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::DbResult;
 use macros::route_alias;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     get,
@@ -31,7 +29,7 @@ use paperclip::actix::{
 pub fn get(
     state: web::Data<State>,
     auth: Either<ObConfigAuth, UserAuthContext>,
-) -> actix_web::Result<Json<ResponseData<api_wire_types::PublicOnboardingConfiguration>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::PublicOnboardingConfiguration> {
     let (tenant, ob_config) = match auth {
         Either::Left(ob_pk_auth) => {
             // Support auth that identifies an ob config
@@ -70,13 +68,11 @@ pub fn get(
 
     let ff_client = state.ff_client.clone();
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::PublicOnboardingConfiguration::from_db((
-            ob_config,
-            tenant,
-            client_config,
-            appearance,
-            ff_client,
-        )),
+    Ok(api_wire_types::PublicOnboardingConfiguration::from_db((
+        ob_config,
+        tenant,
+        client_config,
+        appearance,
+        ff_client,
     )))
 }

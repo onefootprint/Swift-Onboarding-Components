@@ -10,7 +10,6 @@ use api_core::auth::tenant::{
     FirmEmployeeGuard,
 };
 use api_core::errors::ApiResult;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::session::AuthSession;
 use chrono::Duration;
@@ -61,7 +60,7 @@ struct TenantSpec {
     user_names: Vec<(String, String)>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 struct CreatePartnerDemoResponse {
     partner_tenant_id: PartnerTenantId,
@@ -262,10 +261,9 @@ pub async fn post(
         })
         .await?;
 
-    ResponseData::ok(CreatePartnerDemoResponse {
+    Ok(CreatePartnerDemoResponse {
         partner_tenant_id: pt_id,
         partner_tenant_users,
         tenants: demo_tenants,
     })
-    .json()
 }

@@ -1,8 +1,5 @@
 use crate::errors::ApiResult;
-use crate::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use crate::types::JsonApiResponse;
 use crate::utils::email::send_email_challenge;
 use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -59,7 +56,7 @@ pub async fn post_validate(
     request: Json<RawDataRequest>,
     user_wf_auth: UserWfAuthContext,
     allow_extra_fields: AllowExtraFieldsHeaders,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
 
@@ -84,7 +81,7 @@ pub async fn post_validate(
         })
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 #[api_v2_operation(description = "Updates data in a user vault", tags(Vault, Hosted, Users))]
@@ -94,7 +91,7 @@ pub async fn patch(
     request: Json<RawDataRequest>,
     user_wf_auth: UserWfAuthContext,
     bootstrap_fields: BootstrapFieldsHeader,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let t_id = &user_auth.tenant().id;
@@ -173,7 +170,7 @@ pub async fn patch(
         }
     }
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 // Handle the case where ssn is skipped, we by default request a document if not already requested

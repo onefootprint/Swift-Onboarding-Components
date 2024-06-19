@@ -13,7 +13,7 @@ use strum_macros::Display;
 // TODO: this is basically a fork of AuditEvent but for use by the List specific /timeline endpoint
 // which does retrieval/decryption of entries that we don't want the general /audit_events endpoint
 // to do. But there's a better way to codeshare what's common here..
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct ListEvent {
     pub id: AuditEventId,
     pub timestamp: DateTime<Utc>,

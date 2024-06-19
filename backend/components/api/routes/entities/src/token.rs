@@ -1,5 +1,4 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::tenant::{
@@ -101,7 +100,7 @@ pub async fn post(
         expires_at,
         delivery_method,
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }
 
 async fn send_communication(

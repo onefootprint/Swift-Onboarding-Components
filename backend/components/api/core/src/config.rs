@@ -479,7 +479,6 @@ pub struct NeuroIdConfig {
     pub api_key_test: PiiString,
 }
 
-
 #[derive(Envconfig, Debug, Clone)]
 pub struct SambaSafetyConfig {
     #[envconfig(from = "SAMBA_API_KEY")]

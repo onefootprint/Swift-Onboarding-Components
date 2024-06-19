@@ -5,11 +5,10 @@ use api_core::auth::tenant::{
     AnyPartnerTenantSessionAuth,
 };
 use api_core::errors::{
-    ApiError,
     ApiResult,
     AssertionError,
 };
-use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::State;
@@ -41,7 +40,7 @@ fn post(
     state: web::Data<State>,
     request: Json<AssumePartnerRoleRequest>,
     pt_auth: AnyPartnerTenantSessionAuth,
-) -> actix_web::Result<Json<ResponseData<AssumePartnerRoleResponse>>, ApiError> {
+) -> JsonApiResponse<AssumePartnerRoleResponse> {
     let AssumePartnerRoleRequest { partner_tenant_id } = request.into_inner();
     let auth_method = pt_auth.auth_method();
     let tu_id = pt_auth.clone().tenant_user_id()?;
@@ -82,5 +81,5 @@ fn post(
         user: OrganizationMember::from_db((t_user, rb, role)),
         partner_tenant: PartnerOrganization::from_db(tenant),
     };
-    ResponseData::ok(data).json()
+    Ok(data)
 }

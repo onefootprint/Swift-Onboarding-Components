@@ -1,7 +1,4 @@
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use paperclip::actix::{
     api_v2_operation,
     post,
@@ -24,7 +21,7 @@ struct LogBody {
 
 #[api_v2_operation(tags(SdkArgs, Hosted), description = "Log contents of the HTTP body. ")]
 #[post("/org/sdk_telemetry")]
-async fn post(request: web::Json<LogBody>) -> JsonApiResponse<EmptyResponse> {
+async fn post(request: web::Json<LogBody>) -> JsonApiResponse<api_wire_types::Empty> {
     let fmt = |v: Option<String>| v.unwrap_or_default();
     let LogBody {
         tenant_domain,
@@ -38,5 +35,5 @@ async fn post(request: web::Json<LogBody>) -> JsonApiResponse<EmptyResponse> {
     // fp_session_id is used in telemetry to avoid conflicting with session_id, which is reserved
     // for Datadog RUM.
     tracing::info!(fp_session_id=%fmt(session_id), tenant_domain=%fmt(tenant_domain), sdk_kind=%fmt(sdk_kind), sdk_name=%fmt(sdk_name), sdk_version=%fmt(sdk_version), log_level=%fmt(log_level), log_message=%fmt(log_message), "SDK telemetry");
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

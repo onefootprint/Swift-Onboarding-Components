@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Describes a device insight event with locations and IP of the event
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct InsightEvent {
     pub timestamp: DateTime<Utc>,
@@ -19,7 +19,7 @@ pub struct InsightEvent {
 }
 
 /// Describes a device insight event with locations and IP of the event
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct PublicInsightEvent {
     pub timestamp: DateTime<Utc>,

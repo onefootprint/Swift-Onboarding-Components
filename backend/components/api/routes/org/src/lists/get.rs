@@ -4,13 +4,12 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::ResponseData;
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::list::List;
 use db::models::rule_instance::RuleInstance;
 use newtypes::ListId;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     get,
@@ -23,7 +22,7 @@ async fn get_detail(
     state: web::Data<State>,
     list_id: web::Path<ListId>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<ResponseData<api_wire_types::ListDetails>>> {
+) -> JsonApiResponse<api_wire_types::ListDetails> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -37,5 +36,5 @@ async fn get_detail(
         })
         .await?;
 
-    ResponseData::ok(api_wire_types::ListDetails::from_db((list, rules_using_list))).json()
+    Ok(api_wire_types::ListDetails::from_db((list, rules_using_list)))
 }

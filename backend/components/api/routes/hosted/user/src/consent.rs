@@ -1,13 +1,9 @@
 use crate::auth::user::UserAuthScope;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
-use crate::types::response::ResponseData;
-use crate::types::EmptyResponse;
+use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::types::JsonApiResponse;
 use api_wire_types::hosted::consent::ConsentRequest;
 use chrono::Utc;
 use db::models::insight_event::CreateInsightEvent;
@@ -29,7 +25,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     insight: InsightHeaders,
     request: Json<ConsentRequest>,
-) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let wf_id = user_auth.workflow().clone();
 
@@ -57,5 +53,5 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(EmptyResponse::ok()))
+    Ok(api_wire_types::Empty)
 }

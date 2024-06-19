@@ -51,7 +51,6 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     );
     println!();
 
-
     let aws_account_id = get_input("Enter AWS Account ID: ")?;
     let aws_role_name = get_input("Enter AWS Role Name: ")?;
     let s3_bucket_name = get_input("Enter S3 Bucket Name: ")?;
@@ -82,7 +81,6 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
 
     println!("Store this securely. You will not be able to retrieve this key again without re-enrollment.");
     println!("Enrollment complete.");
-
 
     Ok(())
 }

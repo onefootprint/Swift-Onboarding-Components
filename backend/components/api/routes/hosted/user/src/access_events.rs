@@ -1,21 +1,17 @@
 use crate::auth::user::UserAuthContext;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::{
     UserAuth,
     UserAuthScope,
 };
+use api_core::types::JsonApiListResponse;
 use db::access_event::AccessEventListItemForUser;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
     web,
 };
-
-type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 
 #[api_v2_operation(
     tags(My1fp, Hosted),
@@ -27,7 +23,7 @@ type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> actix_web::Result<Json<ResponseData<AccessEventResponse>>, ApiError> {
+) -> JsonApiListResponse<api_wire_types::AccessEvent> {
     let user_auth = user_auth.check_guard(UserAuthScope::BasicProfile)?;
 
     // TODO paginate the response when there are too many results
@@ -37,5 +33,5 @@ pub async fn get(
         .map(api_wire_types::AccessEvent::from_db)
         .collect();
 
-    Ok(Json(ResponseData { data: results }))
+    Ok(results)
 }

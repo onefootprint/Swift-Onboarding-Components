@@ -13,10 +13,7 @@ use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiError;
 use api_core::telemetry::RootSpan;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
@@ -163,7 +160,7 @@ pub async fn post(
         challenge_data,
         error: err.map(|e| e.to_string()),
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }
 
 struct BiometricChallenge {

@@ -6,12 +6,12 @@ use crate::auth::tenant::{
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::telemetry::RootSpan;
-use api_core::types::ResponseData;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
 use newtypes::{
     flat_api_object_map_type,
+    impl_response_type,
     FilterFunction,
     HmacSha256Args,
     IntegritySigningKey,
@@ -47,6 +47,7 @@ flat_api_object_map_type!(
     description="A key-value map with the corresponding hex-encoded hash values",
     example=r#"{ "id.last_name": "f7ee801830...", "id.ssn9": "1cefe40fa...", "custom.credit_card": "f7dbdc6..." }"#
 );
+impl_response_type!(IntegrityResponse);
 
 //TODO: replace handler with regular decrypt func
 #[route_alias(actix::post(
@@ -85,7 +86,7 @@ pub async fn post(
 
     let fp_id = path.into_inner();
 
-    let Json(response) = super::decrypt::post_inner(&state, fp_id, req, auth, insights, root_span).await?;
-    let response = IntegrityResponse::from(response.data.map);
-    ResponseData::ok(response).json()
+    let response = super::decrypt::post_inner(&state, fp_id, req, auth, insights, root_span).await?;
+    let response = IntegrityResponse::from(response.map);
+    Ok(response)
 }

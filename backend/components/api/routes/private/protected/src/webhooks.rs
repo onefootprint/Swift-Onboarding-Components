@@ -9,10 +9,7 @@ use api_core::errors::{
     AssertionError,
     ValidationError,
 };
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::{
     task,
     State,
@@ -47,7 +44,7 @@ pub struct PostWebhooksRequest {
     pub is_live: bool,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct CreateTasksResponse {
     pub task_id: TaskId,
 }
@@ -57,7 +54,7 @@ async fn post(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<PostWebhooksRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let PostWebhooksRequest {
         fp_ids,
         kind,
@@ -86,7 +83,7 @@ async fn post(
         .await?;
 
     task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), num_fp_ids as u32, None);
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 fn create_webhook_event(

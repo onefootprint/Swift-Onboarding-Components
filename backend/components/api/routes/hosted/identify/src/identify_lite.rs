@@ -1,10 +1,7 @@
 use crate::GetIdentifyChallengeArgs;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::telemetry::RootSpan;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use api_wire_types::{
     IdentifyId,
@@ -49,5 +46,5 @@ pub async fn post(
         .await?
         .is_some();
     let response = LiteIdentifyResponse { user_found };
-    ResponseData::ok(response).json()
+    Ok(response)
 }

@@ -6,11 +6,8 @@ use api_core::auth::tenant::{
 };
 use api_core::decision::rule_engine;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::{
-    ApiError,
-    ApiResult,
-};
-use api_core::types::response::ResponseData;
+use api_core::errors::ApiResult;
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::ob_configuration::{
@@ -84,7 +81,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     request: Json<CreateOnboardingConfigurationRequest>,
-) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let is_live = auth.is_live()?;
     let tenant = auth.tenant().clone();
@@ -186,8 +183,11 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db((obc, actor, rs, state.ff_client.clone())),
+    Ok(api_wire_types::OnboardingConfiguration::from_db((
+        obc,
+        actor,
+        rs,
+        state.ff_client.clone(),
     )))
 }
 

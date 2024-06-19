@@ -189,7 +189,6 @@ mod test {
         get_final_decision_status(decision, has_doc_mr, existing_status).0
     }
 
-
     #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::None => false)]
     #[test_case(rules_executed(None), false, OnboardingStatus::None => false)]
     #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::None => false)]

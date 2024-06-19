@@ -5,7 +5,7 @@ use newtypes::{
     ModernAuthEventKind,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct AuthEvent {
     /// Information on from where the auth occurred
@@ -17,7 +17,7 @@ pub struct AuthEvent {
     pub scope: IdentifyScope,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PublicAuthEvent {
     /// Information on from where the auth occurred
     pub insight: Option<PublicInsightEvent>,

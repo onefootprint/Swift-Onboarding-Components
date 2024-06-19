@@ -157,5 +157,8 @@ pub use user_ai_summary::*;
 mod vault_dr;
 pub use self::vault_dr::*;
 
+mod tenant_business_info;
+pub use tenant_business_info::*;
+
 mod onboarding;
 pub use self::onboarding::*;

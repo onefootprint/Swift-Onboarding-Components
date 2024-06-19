@@ -1,11 +1,7 @@
 use crate::auth::user::UserAuthScope;
-use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::web::Json;
 use api_wire_types::CreateOnboardingTimelineRequest;
 use db::models::user_timeline::UserTimeline;
@@ -25,7 +21,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     state: web::Data<State>,
     request: Json<CreateOnboardingTimelineRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let CreateOnboardingTimelineRequest { event } = request.into_inner();
 
@@ -37,5 +33,5 @@ pub async fn post(
         .db_transaction(move |conn| UserTimeline::create(conn, event, v_id, sv_id))
         .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }

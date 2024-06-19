@@ -16,7 +16,7 @@ pub enum DeviceAttestationType {
     Android,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct DeviceAttestationChallengeResponse {
     /// state token to send back along with attestation
     pub state: String,

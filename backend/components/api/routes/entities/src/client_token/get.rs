@@ -1,4 +1,3 @@
-use crate::types::response::ResponseData;
 use api_core::auth::tenant::{
     ClientTenantAuthContext,
     ClientTenantScope,
@@ -9,7 +8,6 @@ use api_wire_types::{
     GetClientTokenResponse,
     GetClientTokenResponseTenant,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -38,9 +36,9 @@ pub fn get(auth: ClientTenantAuthContext) -> JsonApiResponse<GetClientTokenRespo
         name: auth.data.tenant.name,
     };
 
-    Ok(Json(ResponseData::ok(GetClientTokenResponse {
+    Ok(GetClientTokenResponse {
         expires_at,
         vault_fields,
         tenant,
-    })))
+    })
 }

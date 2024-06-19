@@ -2,10 +2,7 @@ use crate::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
 };
-use crate::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::onboarding::OnboardingError;
@@ -43,7 +40,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<CreateUserDecisionRequest>,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::CreateUserDecision)?;
     // This is a kind of weird guard to use here. But ManualReview can't currently be added to API key
     // IAM roles
@@ -82,5 +79,5 @@ pub async fn post(
     // Since we may have updated users onboarding status
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

@@ -10,13 +10,12 @@ use api_core::errors::{
     AssertionError,
     ValidationError,
 };
-use api_core::types::ResponseData;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::{
     ApiError,
     ApiErrorKind,
 };
-use api_wire_types::ListComplianceDocumentsResponse;
 use chrono::Utc;
 use db::helpers::ComplianceDocSummary;
 use db::models::compliance_doc::NewComplianceDoc;
@@ -39,7 +38,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
     partnership_id: web::Path<TenantCompliancePartnershipId>,
-) -> JsonApiResponse<ListComplianceDocumentsResponse> {
+) -> JsonApiListResponse<api_wire_types::ComplianceDocSummary> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -57,8 +56,12 @@ pub async fn get(
         })
         .await?;
 
-    let resp = api_wire_types::ListComplianceDocumentsResponse::try_from_db(&summary)?;
-    ResponseData::ok(resp).json()
+    let documents = summary
+        .docs
+        .keys()
+        .map(|doc_id| api_wire_types::ComplianceDocSummary::try_from_db((&summary, doc_id)))
+        .collect::<ApiResult<_>>()?;
+    Ok(documents)
 }
 
 #[api_v2_operation(description = "Creates a new document.", tags(Compliance, Private))]
@@ -129,5 +132,5 @@ pub async fn post(
         .await?;
 
     let resp = api_wire_types::ComplianceDocSummary::try_from_db((&summary, &doc_id))?;
-    ResponseData::ok(resp).json()
+    Ok(resp)
 }

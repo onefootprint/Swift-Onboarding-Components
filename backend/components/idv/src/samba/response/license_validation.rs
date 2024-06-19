@@ -183,7 +183,6 @@ impl LicenseValidation {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::GetLVOrderResponse;

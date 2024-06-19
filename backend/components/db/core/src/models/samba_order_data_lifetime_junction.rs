@@ -30,7 +30,6 @@ struct NewSambaOrderDataLifetimeJunctionRow {
     order_id: SambaOrderTableId,
 }
 
-
 impl SambaOrderDataLifetimeJunction {
     #[tracing::instrument("SambaOrderDataLifetimeJunction::bulk_create", skip_all)]
     pub fn bulk_create(

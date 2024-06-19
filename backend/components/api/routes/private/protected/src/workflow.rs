@@ -13,8 +13,7 @@ use api_core::decision::state::actions::{
 };
 use api_core::decision::state::traits::Workflow as TWorkflow;
 use api_core::decision::state::WorkflowWrapper;
-use api_core::errors::ApiError;
-use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
 use api_core::ApiErrorKind;
 use db::models::workflow::Workflow;
 use newtypes::{
@@ -28,7 +27,7 @@ pub struct ProceedRequest {
     pub wf_action_kind: Option<WorkflowActionsKind>,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct ProceedResponse {
     pub new_workflow_state: WorkflowState,
 }
@@ -38,7 +37,7 @@ async fn proceed(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<ProceedRequest>,
-) -> actix_web::Result<Json<ResponseData<ProceedResponse>>, ApiError> {
+) -> JsonApiResponse<ProceedResponse> {
     let ProceedRequest {
         wf_id,
         wf_action_kind,
@@ -61,7 +60,7 @@ async fn proceed(
 
     let ww = ww.run(&state, action).await?;
 
-    Ok(Json(ResponseData::ok(ProceedResponse {
+    Ok(ProceedResponse {
         new_workflow_state: newtypes::WorkflowState::from(&ww.state),
-    })))
+    })
 }

@@ -35,8 +35,8 @@ enum_variant_type = { workspace = true }
 tracing = { workspace = true }
 macros = { path = "../macros" }
 rand = { workspace = true }
-# diesel
 diesel = { workspace = true }
+actix-web = { workspace = true }
 
 diesel_as_jsonb = { workspace = true }
 phonenumber = { workspace = true }

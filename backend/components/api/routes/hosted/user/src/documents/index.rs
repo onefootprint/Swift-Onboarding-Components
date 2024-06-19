@@ -1,5 +1,4 @@
 use crate::auth::user::UserAuthScope;
-use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision;
@@ -44,5 +43,5 @@ pub async fn post(
         insight,
     )
     .await?;
-    ResponseData::ok(CreateDocumentResponse { id: response }).json()
+    Ok(CreateDocumentResponse { id: response })
 }

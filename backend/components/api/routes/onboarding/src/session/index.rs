@@ -4,7 +4,6 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
 };
 use crate::errors::ApiResult;
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::utils::session::AuthSession;
 use crate::State;
@@ -21,6 +20,7 @@ use paperclip::actix::{
     api_v2_operation,
     post,
     web,
+    Apiv2Response,
     Apiv2Schema,
 };
 
@@ -29,7 +29,7 @@ pub struct CreateOnboardingSessionRequest {
     pub key: ObConfigurationKey,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct ObConfigSessionToken {
     /// a one-time use session token for onboarding a new user
     pub session_token: SessionAuthToken,
@@ -64,5 +64,5 @@ pub async fn post(
         is_live,
     });
     let session_token = AuthSession::create(&state, session_data, chrono::Duration::hours(1)).await?;
-    ResponseData::ok(ObConfigSessionToken { session_token }).json()
+    Ok(ObConfigSessionToken { session_token })
 }

@@ -11,7 +11,6 @@ use api_core::errors::onboarding::{
     UnmetRequirements,
 };
 use api_core::errors::AssertionError;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::identify::get_user_challenge_context;
 use api_core::utils::requirements::{
@@ -106,5 +105,5 @@ pub async fn post(
     }
 
     let validation_token = create_validation_token(&state, user_auth, wf).await?;
-    ResponseData::ok(HostedValidateResponse { validation_token }).json()
+    Ok(HostedValidateResponse { validation_token })
 }

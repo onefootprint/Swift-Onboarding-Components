@@ -7,7 +7,6 @@ use api_core::auth::tenant::{
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::serializers::IsDomainAlreadyClaimed;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -15,7 +14,6 @@ use db::models::partner_tenant::{
     PartnerTenant,
     UpdatePartnerTenant,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -39,11 +37,9 @@ pub async fn get(
         .db_query(move |conn| PartnerTenant::is_domain_already_claimed(conn, &domains))
         .await?;
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::PartnerOrganization::from_db((
-            pt,
-            Some(IsDomainAlreadyClaimed(is_domain_already_claimed)),
-        )),
+    Ok(api_wire_types::PartnerOrganization::from_db((
+        pt,
+        Some(IsDomainAlreadyClaimed(is_domain_already_claimed)),
     )))
 }
 
@@ -101,7 +97,5 @@ pub async fn patch(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::PartnerOrganization::from_db(updated_pt),
-    )))
+    Ok(api_wire_types::PartnerOrganization::from_db(updated_pt))
 }

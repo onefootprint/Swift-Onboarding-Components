@@ -9,11 +9,7 @@ use actix_web::{
     web,
 };
 use api_core::errors::ApiResult;
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::{
@@ -41,7 +37,7 @@ pub async fn update_business_info(
     _: ProtectedAuth,
     path: web::Path<TenantId>,
     request: Json<UpdateBusinessInfoRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -71,7 +67,7 @@ pub async fn update_business_info(
             Ok(())
         })
         .await?;
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 #[get("/private/protected/org/{tenant_id}/business_info")]
@@ -79,7 +75,7 @@ pub async fn get_business_info(
     state: web::Data<State>,
     _: ProtectedAuth,
     path: web::Path<TenantId>,
-) -> JsonApiResponse<Option<newtypes::TenantBusinessInfo>> {
+) -> JsonApiResponse<Option<api_wire_types::TenantBusinessInfo>> {
     let (tenant, tbi) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -90,12 +86,28 @@ pub async fn get_business_info(
         .await?;
 
     let tbi = if let Some(tbi) = tbi {
-        Some(
+        let tbi =
             utils::tenant_business_info::decrypt_tenant_business_info(&state.enclave_client, &tenant, &tbi)
-                .await?,
-        )
+                .await?;
+        let newtypes::TenantBusinessInfo {
+            company_name,
+            address_line1,
+            city,
+            state,
+            zip,
+            phone,
+        } = tbi;
+        let tbi = api_wire_types::TenantBusinessInfo {
+            company_name,
+            address_line1,
+            city,
+            state,
+            zip,
+            phone,
+        };
+        Some(tbi)
     } else {
         None
     };
-    ResponseData::ok(tbi).json()
+    Ok(tbi)
 }

@@ -3,11 +3,10 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::risk_signal::{
     AtSeqno,
@@ -27,8 +26,6 @@ use paperclip::actix::{
     web,
 };
 
-type RiskSignalsListResponse = Vec<api_wire_types::PublicRiskSignal>;
-
 #[api_v2_operation(
     description = "Lists the risk signals for a Footprint user.",
     // TODO don't take out of preview unless we paginate this API
@@ -39,7 +36,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<RiskSignalsListResponse> {
+) -> JsonApiListResponse<api_wire_types::PublicRiskSignal> {
     auth.check_preview_guard(PreviewApi::RiskSignalsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
@@ -80,5 +77,5 @@ pub async fn get(
 
     let signals = signals.map(api_wire_types::PublicRiskSignal::from_db).collect();
 
-    ResponseData::ok(signals).json()
+    Ok(signals)
 }

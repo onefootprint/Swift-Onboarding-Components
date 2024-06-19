@@ -8,7 +8,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::ResponseData;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::MultiUpdateRuleRequest;
@@ -51,7 +51,7 @@ pub async fn multi_update_rules(
     auth: TenantSessionAuth,
     path: web::Path<ObConfigurationId>,
     request: Json<MultiUpdateRuleRequest>,
-) -> ApiResult<Json<ResponseData<Vec<api_wire_types::Rule>>>> {
+) -> JsonApiListResponse<api_wire_types::Rule> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -89,7 +89,7 @@ pub async fn multi_update_rules(
         })
         .await?;
 
-    ResponseData::ok(rules.into_iter().map(api_wire_types::Rule::from_db).collect_vec()).json()
+    Ok(rules.into_iter().map(api_wire_types::Rule::from_db).collect())
 }
 
 pub(crate) fn validate_rules_request(

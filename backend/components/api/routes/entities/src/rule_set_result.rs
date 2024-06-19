@@ -3,7 +3,6 @@ use crate::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -46,7 +45,7 @@ pub async fn get_latest_workflow_decision(
         .await?
         .map(api_wire_types::RuleSetResult::from_db);
 
-    ResponseData::ok(result).json()
+    Ok(result)
 }
 
 #[api_v2_operation(
@@ -71,5 +70,5 @@ pub async fn get(
             RuleSetResult::get(conn, &rsr_id)
         })
         .await?;
-    ResponseData::ok(api_wire_types::RuleSetResult::from_db(rsr)).json()
+    Ok(api_wire_types::RuleSetResult::from_db(rsr))
 }

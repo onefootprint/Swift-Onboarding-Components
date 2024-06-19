@@ -5,7 +5,6 @@ use crate::auth::tenant::{
     TenantSessionAuth,
 };
 use crate::auth::Either;
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::decision::field_validations::create_field_validation_results;
@@ -69,5 +68,5 @@ pub async fn get(
         business_dba: field_validations_map.get(&SignalScope::BusinessDba).cloned(),
     };
 
-    ResponseData::ok(response).json()
+    Ok(response)
 }

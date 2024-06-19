@@ -271,7 +271,6 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     // check we got a successful_response
     let create_order_response = resp.result.into_success().map_err(map_to_api_error)?;
 
-
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -354,7 +353,6 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
     // TODO: How should we handle this? i think this is right, we don't complete the order if we get
     // some sort of error..
     let _ = resp.result.into_success().map_err(map_to_api_error)?;
-
 
     state
         .db_pool

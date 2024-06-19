@@ -14,10 +14,7 @@ use api_core::auth::tenant::{
 };
 use api_core::auth::AuthError;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::State;
@@ -32,7 +29,7 @@ struct AssumeRequest {
     tenant_id: TenantId,
 }
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, macros::JsonResponder)]
 struct AssumeResponse {
     tenant: api_wire_types::Organization,
     token: SessionAuthToken,
@@ -79,5 +76,5 @@ async fn post(
 
     let tenant = api_wire_types::Organization::from_db(tenant);
     let result = AssumeResponse { tenant, token };
-    ResponseData::ok(result).json()
+    Ok(result)
 }

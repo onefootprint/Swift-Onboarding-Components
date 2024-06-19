@@ -5,10 +5,7 @@ use actix_web::{
     web,
 };
 use api_core::decision::vendor;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::{
     ApiErrorKind,
     State,
@@ -26,7 +23,7 @@ pub struct DecryptVresRequest {
     vres_id: VerificationResultId,
 }
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, macros::JsonResponder)]
 pub struct DecryptVresResponse {
     vres_id: VerificationResultId,
     decrypted_e_response: PiiJsonValue,
@@ -67,5 +64,5 @@ pub async fn post(
         vres_id: vres.id,
         decrypted_e_response,
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }

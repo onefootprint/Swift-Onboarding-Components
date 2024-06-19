@@ -53,7 +53,6 @@ impl From<(SambaLicenseValidationData, SambaSafetyCredentials)> for SambaCreateL
             middle_name,
         } = data;
 
-
         let idv_address = address.map(|a| {
             let SambaAddress {
                 street,
@@ -90,12 +89,10 @@ impl From<(SambaLicenseValidationData, SambaSafetyCredentials)> for SambaCreateL
     }
 }
 
-
 pub struct SambaCheckLVOrderStatusRequest {
     pub credentials: SambaSafetyCredentials,
     pub order_id: SambaOrderId,
 }
-
 
 pub struct SambaGetLVReportRequest {
     pub credentials: SambaSafetyCredentials,

@@ -9,10 +9,6 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::{
-    EmptyResponse,
-    ResponseData,
-};
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::ComplianceDocRequest;
 use db::models::compliance_doc_submission::ComplianceDocSubmission;
@@ -33,7 +29,7 @@ pub async fn delete(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocRequestId)>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageReviews)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -67,5 +63,5 @@ pub async fn delete(
         })
         .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }

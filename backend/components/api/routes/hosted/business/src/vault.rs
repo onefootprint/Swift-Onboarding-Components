@@ -1,9 +1,6 @@
 use crate::auth::user::UserAuthScope;
 use crate::errors::ApiResult;
-use crate::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use crate::types::JsonApiResponse;
 use crate::utils::vault_wrapper::{
     Business,
     VaultWrapper,
@@ -11,7 +8,6 @@ use crate::utils::vault_wrapper::{
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::AuthError;
-use api_core::types::ResponseData;
 use api_core::utils::vault_wrapper::{
     DataLifetimeSources,
     DataRequestSource,
@@ -42,7 +38,7 @@ pub async fn post_validate(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     request: Json<RawDataRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
@@ -64,7 +60,7 @@ pub async fn post_validate(
         })
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 #[api_v2_operation(
@@ -76,7 +72,7 @@ pub async fn patch(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
     user_auth: UserWfAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
@@ -97,5 +93,5 @@ pub async fn patch(
         })
         .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }

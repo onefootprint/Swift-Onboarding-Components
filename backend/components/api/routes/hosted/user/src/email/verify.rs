@@ -1,10 +1,8 @@
 use crate::auth::session::AuthSessionData;
 use crate::errors::challenge::ChallengeError;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::types::EmptyResponse;
 use crate::utils::session::AuthSession;
 use crate::State;
+use api_core::types::JsonApiResponse;
 use db::models::contact_info::{
     ContactInfo,
     VerificationLevel,
@@ -33,7 +31,7 @@ pub struct EmailVerifyRequest {
 pub async fn post(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,
-) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let session = AuthSession::get(&state, &request.data).await?;
 
     let AuthSessionData::EmailVerify(data) = session.data else {
@@ -47,5 +45,5 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(EmptyResponse {})))
+    Ok(api_wire_types::Empty)
 }

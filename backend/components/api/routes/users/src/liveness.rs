@@ -2,15 +2,13 @@ use crate::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
 };
-use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::types::JsonApiResponse;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::liveness_event::LivenessEvent;
 use newtypes::PreviewApi;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     get,
@@ -26,7 +24,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<Vec<api_wire_types::LivenessEvent>> {
+) -> JsonApiListResponse<api_wire_types::LivenessEvent> {
     auth.check_preview_guard(PreviewApi::LivenessList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
@@ -42,5 +40,5 @@ pub async fn get(
         .into_iter()
         .map(api_wire_types::LivenessEvent::from_db)
         .collect();
-    Ok(Json(ResponseData::ok(response)))
+    Ok(response)
 }

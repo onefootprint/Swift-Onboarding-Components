@@ -1,7 +1,6 @@
 use crate::auth::custodian::CustodianAuthContext;
 use crate::types::{
     JsonApiResponse,
-    ResponseData,
     StringResponse,
 };
 use crate::State;
@@ -16,7 +15,7 @@ use paperclip::actix::{
     api_v2_operation,
     get,
     web,
-    Apiv2Schema,
+    Apiv2Response,
 };
 use serde::{
     Deserialize,
@@ -85,7 +84,7 @@ async fn status(state: web::Data<State>) -> StringResponse {
     ))
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Deserialize, Apiv2Response, macros::JsonResponder)]
 pub struct EnclaveHealthResponse {
     success: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -114,12 +113,11 @@ async fn enclave(
 
     let unseal_time = now.elapsed();
 
-    ResponseData::ok(EnclaveHealthResponse {
+    Ok(EnclaveHealthResponse {
         success: test == unsealed,
         keypair_gen_ms,
         decrypt_ms: (unseal_time - seal_time).whole_milliseconds(),
     })
-    .json()
 }
 
 #[api_v2_operation(description = "Checks health of enclave decrypt operation", tags(Private))]
@@ -145,12 +143,11 @@ async fn enclave_decrypt(
 
     let unseal_time = now.elapsed();
 
-    ResponseData::ok(EnclaveHealthResponse {
+    Ok(EnclaveHealthResponse {
         success: test == unsealed,
         keypair_gen_ms: None,
         decrypt_ms: (unseal_time - seal_time).whole_milliseconds(),
     })
-    .json()
 }
 
 #[api_v2_operation(tags(Private))]

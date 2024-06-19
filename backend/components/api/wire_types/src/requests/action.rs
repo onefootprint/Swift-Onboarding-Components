@@ -1,6 +1,9 @@
 use crate::CreateTokenResponse;
 use newtypes::EntityAction;
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    Apiv2Response,
+    Apiv2Schema,
+};
 use serde::{
     Deserialize,
     Serialize,
@@ -12,7 +15,7 @@ pub struct EntityActionsRequest {
     pub actions: Vec<EntityAction>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, derive_more::From)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, derive_more::From, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
 pub enum EntityActionResponse {

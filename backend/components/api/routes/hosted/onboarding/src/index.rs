@@ -7,7 +7,6 @@ use crate::auth::user::{
 use crate::auth::AuthError;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
@@ -143,9 +142,8 @@ pub async fn post(
     let ff_client = state.ff_client.clone();
     let onboarding_config =
         api_wire_types::PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
-    ResponseData::ok(OnboardingResponse {
+    Ok(OnboardingResponse {
         // Omit appearance serialization here
         onboarding_config,
     })
-    .json()
 }

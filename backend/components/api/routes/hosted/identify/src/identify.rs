@@ -13,10 +13,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::session::AuthSession;
 use api_core::State;
@@ -101,7 +98,7 @@ pub async fn post(
     };
     let Some(ctx) = crate::get_identify_challenge_context(&state, args).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found
-        return ResponseData::ok(IdentifyResponse::default()).json();
+        return Ok(IdentifyResponse::default());
     };
 
     let IdentifyChallengeContext {
@@ -171,7 +168,7 @@ pub async fn post(
     let response = IdentifyResponse {
         user: Some(user.clone()),
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }
 
 /// Creates an identified, unauthed token for the provided vault ID.

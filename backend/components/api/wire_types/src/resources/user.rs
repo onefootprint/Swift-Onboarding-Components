@@ -6,7 +6,7 @@ use newtypes::{
     SandboxId,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct LiteUser {
     #[openapi(example = "fp_id_7p793EF07xKXHqAeg5VGPj")]
     pub id: FpId,
@@ -16,7 +16,7 @@ pub struct LiteUser {
 }
 
 /// Basic information about a user
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct User {
     #[openapi(example = "fp_id_7p793EF07xKXHqAeg5VGPj")]
     pub id: FpId,
@@ -30,7 +30,7 @@ pub struct User {
 }
 
 /// Information on data requested from the user via the Footprint dashboard.
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PublicWorkflowRequest {
     /// The timestamp at which the additional info was requested.
     pub timestamp: DateTime<Utc>,

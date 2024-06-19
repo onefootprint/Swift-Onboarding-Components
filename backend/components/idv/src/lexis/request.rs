@@ -385,7 +385,7 @@ impl LexisRequest {
     pub fn new(
         idv_data: IdvData,
         tenant_identifier: String,
-        tbi: TenantBusinessInfo,
+        tbi: newtypes::TenantBusinessInfo,
     ) -> Result<Self, ConversionError> {
         let state_and_country = idv_data.state_and_country_for_vendors();
         let drivers_license_state = idv_data.normalized_2_char_drivers_license_state();
@@ -450,7 +450,6 @@ impl LexisRequest {
         } else {
             (LBool::Zero, None)
         };
-
 
         Ok(Self {
             flex_id_request: FlexIdRequest {
@@ -584,13 +583,12 @@ impl LexisRequest {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn tbi() -> TenantBusinessInfo {
-        TenantBusinessInfo {
+    fn tbi() -> newtypes::TenantBusinessInfo {
+        newtypes::TenantBusinessInfo {
             company_name: "Inc".into(),
             address_line1: "1 main".into(),
             city: "Philly".into(),
@@ -624,7 +622,6 @@ mod tests {
         let request = LexisRequest::new(idv_data_with_dl_partial, "ti_1".into(), tbi()).unwrap();
         assert_eq!(serde_json::to_value(request).unwrap(), example_without_dl());
     }
-
 
     fn example_with_dl() -> serde_json::Value {
         serde_json::json!({

@@ -31,7 +31,7 @@ pub struct PrivateTenant {
     pub super_tenant_id: Option<TenantId>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PrivateTenantDetail {
     pub id: TenantId,
     pub name: String,

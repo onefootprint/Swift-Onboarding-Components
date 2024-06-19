@@ -6,7 +6,7 @@ use newtypes::{
 };
 
 /// Organization
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct Organization {
     pub id: TenantId,
     pub name: String,
@@ -32,7 +32,7 @@ pub struct Organization {
 }
 
 /// Partner Organization
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PartnerOrganization {
     pub id: PartnerTenantId,
     pub name: String,

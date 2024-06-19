@@ -16,12 +16,14 @@ db = { path = "../../../../db/core" }
 api_wire_types = { path = "../../../wire_types" }
 feature_flag = { path = "../../../../feature_flag" }
 billing = { path = "../../../../billing" }
+macros = { path = "../../../../macros" }
 
 actix-web = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
 futures = { workspace = true }
+paperclip = { workspace = true }
 
 strum = { workspace = true }
 aws-config = { workspace = true }

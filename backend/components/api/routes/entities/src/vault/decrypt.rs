@@ -5,10 +5,7 @@ use crate::auth::tenant::{
 };
 use crate::auth::Either;
 use crate::errors::ApiError;
-use crate::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use crate::types::JsonApiResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -41,6 +38,7 @@ use itertools::{
 use macros::route_alias;
 use newtypes::output::Csv;
 use newtypes::{
+    impl_response_type,
     AccessEventPurpose,
     DataIdentifier,
     DataLifetimeSeqno,
@@ -123,8 +121,8 @@ pub async fn post(
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
 
     let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
-    let result = TempDecryptResponse::build(result.0.data);
-    ResponseData::ok(result).json()
+    let result = TempDecryptResponse::build(result);
+    Ok(result)
 }
 
 #[route_alias(post(
@@ -143,7 +141,7 @@ pub async fn post_client(
     auth: ClientTenantAuthContext,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> JsonApiResponse<DecryptResponse> {
+) -> JsonApiResponse<TempDecryptResponse> {
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
     let fp_id = auth.fp_id.clone();
@@ -163,10 +161,8 @@ pub async fn post_client(
         transforms,
     };
 
-    // TODO would be really cool if we could share the handler - the only difference is one gets
-    // the fp_id from the path while the other gets it from the token. could we make an extractor
-    // for this?
     let result = post_inner(&state, fp_id, request, Box::new(auth), insights, root_span).await?;
+    let result = TempDecryptResponse::build(result);
     Ok(result)
 }
 
@@ -253,7 +249,7 @@ pub(super) async fn post_inner(
     }
     let out = DecryptResponse::from(results);
 
-    ResponseData::ok(out).json()
+    Ok(out)
 }
 
 impl TempDecryptResponse {
@@ -280,7 +276,15 @@ impl TempDecryptResponse {
 }
 
 /// Temporary to support these in-progress DI migrations
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, derive_more::Deref, derive_more::DerefMut)]
+#[derive(
+    Debug,
+    Clone,
+    serde::Serialize,
+    serde::Deserialize,
+    derive_more::Deref,
+    derive_more::DerefMut,
+    macros::JsonResponder,
+)]
 pub struct TempDecryptResponse {
     #[serde(flatten)]
     pub map: std::collections::HashMap<String, Option<PiiJsonValue>>,
@@ -299,4 +303,4 @@ impl paperclip::v2::schema::Apiv2Schema for TempDecryptResponse {
         DecryptResponse::raw_schema()
     }
 }
-impl paperclip::actix::OperationModifier for TempDecryptResponse {}
+impl_response_type!(TempDecryptResponse);

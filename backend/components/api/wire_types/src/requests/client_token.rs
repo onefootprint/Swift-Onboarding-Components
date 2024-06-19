@@ -57,7 +57,7 @@ pub struct CreateClientTokenRequest {
     pub decrypt_reason: Option<String>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateClientTokenResponse {
     /// The short-lived token that gives temporary access to perform operations for this user
@@ -68,7 +68,7 @@ pub struct CreateClientTokenResponse {
     pub fields: Vec<DataIdentifier>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct GetClientTokenResponse {
     /// The list of fields that are allowed to be vaulted by this token
     pub vault_fields: Vec<DataIdentifier>,
@@ -77,7 +77,7 @@ pub struct GetClientTokenResponse {
     pub tenant: GetClientTokenResponseTenant,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct GetClientTokenResponseTenant {
     pub name: String,
 }

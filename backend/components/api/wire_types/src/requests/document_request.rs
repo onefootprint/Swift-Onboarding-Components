@@ -9,7 +9,10 @@ use newtypes::{
     IncodeFailureReason,
     Iso3166TwoDigitCountryCode,
 };
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    Apiv2Response,
+    Apiv2Schema,
+};
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct CreateDocumentRequest {
@@ -22,7 +25,7 @@ pub struct CreateDocumentRequest {
     pub request_id: Option<DocumentRequestId>,
 }
 
-#[derive(Debug, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct CreateDocumentResponse {
     pub id: DocumentId,
 }
@@ -50,7 +53,7 @@ impl From<DocumentStatus> for DocumentResponseStatus {
 
 /// Response for a identity document request. Errors are non-optional if the identity vendor.
 /// Requires additional images be collected.
-#[derive(Debug, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct DocumentResponse {
     pub next_side_to_collect: Option<DocumentSide>,
     pub errors: Vec<DocumentImageError>,

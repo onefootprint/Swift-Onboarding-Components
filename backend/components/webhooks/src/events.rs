@@ -322,7 +322,6 @@ impl From<UserSpecificWebhookPayload> for UserInfoRequestedPayload {
     }
 }
 
-
 impl From<UserSpecificWebhookPayload> for UserManualReviewPayload {
     fn from(value: UserSpecificWebhookPayload) -> Self {
         Self {

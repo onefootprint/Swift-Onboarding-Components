@@ -5,10 +5,7 @@ use api_core::auth::tenant::{
 };
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::serializers::user_insights;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::State;
 use db::models::insight_event::InsightEvent;
@@ -22,8 +19,6 @@ use paperclip::actix::{
     web,
 };
 
-type UserInsightResponse = Vec<api_wire_types::UserInsight>;
-
 #[api_v2_operation(
     description = "Lists the user insights for a Ffootprint user",
     tags(EntityDetails, Entities, Private)
@@ -33,7 +28,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<UserInsightResponse> {
+) -> JsonApiListResponse<api_wire_types::UserInsight> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -61,10 +56,10 @@ pub async fn get(
     // TODO: add unique key on wf_id
     // TODO: add aggregations
 
-    ResponseData::ok(user_insights::from_db(
+    Ok(user_insights::from_db(
         behavior_events.first().cloned(),
         latest_completed_wf,
         insight_event_for_latest_wf,
-    ))
-    .json()
+    )
+    .into())
 }

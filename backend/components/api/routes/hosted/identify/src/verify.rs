@@ -27,7 +27,6 @@ use api_core::errors::{
     ValidationError,
 };
 use api_core::telemetry::RootSpan;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
@@ -235,7 +234,7 @@ pub async fn post(
             .await?;
     }
 
-    ResponseData::ok(IdentifyVerifyResponse { auth_token }).json()
+    Ok(IdentifyVerifyResponse { auth_token })
 }
 
 /// After logging into a vault in the context of multi-KYC KYB, save the authed vault as a business

@@ -9,7 +9,6 @@ use crate::errors::{
     ApiError,
     ApiResult,
 };
-use crate::types::EmptyResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use actix_web::HttpResponseBuilder;
@@ -45,6 +44,7 @@ pub async fn get(
     // check if this is an authorization or challenge request
     let auth_headers = req.headers().get_all(AUTHORIZATION);
 
+    // TODO why is this implemented so strangely?
     if let Some(private_access_token) = auth_headers
         .filter_map(|h| h.to_str().ok())
         .filter_map(|h| h.strip_prefix("PrivateToken token="))
@@ -122,5 +122,5 @@ async fn authorize_privacy_pass(
         })
         .await?;
 
-    Ok(HttpResponse::build(StatusCode::OK).json(EmptyResponse {}))
+    Ok(HttpResponse::build(StatusCode::OK).json(api_wire_types::Empty))
 }

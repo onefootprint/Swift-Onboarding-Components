@@ -7,7 +7,7 @@ use newtypes::{
 };
 
 /// Proxy configuration
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct ProxyConfigBasic {
     pub id: ProxyConfigId,
@@ -21,7 +21,7 @@ pub struct ProxyConfigBasic {
 }
 
 /// Proxy configuration
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct ProxyConfigDetailed {
     pub id: ProxyConfigId,

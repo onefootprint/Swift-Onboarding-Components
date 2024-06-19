@@ -3,7 +3,6 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::decision::state::actions::WorkflowActions;
@@ -235,8 +234,7 @@ pub async fn post(
         })
         .await?;
 
-    ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((
+    Ok(api_wire_types::EntityValidateResponse::from_db((
         wf.status, sv, mrs, obc,
     )))
-    .json()
 }

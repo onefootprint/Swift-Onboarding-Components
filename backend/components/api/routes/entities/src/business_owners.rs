@@ -4,8 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::response::ResponseData;
-use api_core::types::JsonApiResponse;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::{
@@ -22,8 +21,6 @@ use paperclip::actix::{
     web,
 };
 
-type BusinessOwnerListResponse = Vec<api_wire_types::PrivateBusinessOwner>;
-
 #[api_v2_operation(
     description = "Gets the beneficial owners of a business entity.",
     tags(EntityDetails, Private)
@@ -33,7 +30,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<BusinessOwnerListResponse> {
+) -> JsonApiListResponse<api_wire_types::PrivateBusinessOwner> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -62,5 +59,5 @@ pub async fn get(
         })
         .map(api_wire_types::PrivateBusinessOwner::from_db)
         .collect();
-    ResponseData::ok(results).json()
+    Ok(results)
 }

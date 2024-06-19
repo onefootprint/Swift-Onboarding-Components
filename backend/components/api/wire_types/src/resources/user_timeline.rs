@@ -1,6 +1,7 @@
 use crate::{
     Actor,
     Annotation,
+    Apiv2Response,
     Apiv2Schema,
     DateTime,
     DocumentRequest,
@@ -27,7 +28,7 @@ use newtypes::{
 use serde::Deserialize;
 
 /// Describes a liveness event that took place
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct UserTimeline {
     pub event: UserTimelineEvent,

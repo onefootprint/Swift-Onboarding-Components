@@ -756,7 +756,6 @@ async fn send_middesk_call(
     }
 }
 
-
 /// Abstracts the data to be written to the vault
 /// derived from the Middesk BusinessResponse
 pub struct MiddeskResponseDerivedVaultData {

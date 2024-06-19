@@ -7,11 +7,9 @@ use api_core::auth::tenant::{
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::types::{
-    EmptyResponse,
     JsonApiResponse,
     OffsetPaginatedResponse,
     OffsetPaginationRequest,
-    ResponseData,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::magic_link::create_magic_link;
@@ -122,7 +120,7 @@ pub async fn post(
     }
 
     let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
-    ResponseData::ok(result).json()
+    Ok(result)
 }
 
 pub async fn patch(
@@ -159,14 +157,14 @@ pub async fn patch(
         .await?;
 
     let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
-    ResponseData::ok(result).json()
+    Ok(result)
 }
 
 pub async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let actor = auth.actor();
@@ -191,5 +189,5 @@ pub async fn deactivate(
         })
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

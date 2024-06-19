@@ -4,13 +4,11 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiError;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
 use newtypes::TenantIosAppMetaId;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     post,
@@ -46,10 +44,8 @@ async fn post(
         .decrypt_to_piistring(&result.e_device_check_private_key, &tenant.e_private_key)
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::TenantIosAppMeta::from_db(
-        (
-            result,
-            Some(decrypted_device_check_private_key.leak().to_string()),
-        ),
-    ))))
+    Ok(api_wire_types::TenantIosAppMeta::from_db((
+        result,
+        Some(decrypted_device_check_private_key.leak().to_string()),
+    )))
 }

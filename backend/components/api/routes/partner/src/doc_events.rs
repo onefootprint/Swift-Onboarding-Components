@@ -1,4 +1,3 @@
-use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::tenant::{
     CheckTenantGuard,
@@ -9,7 +8,7 @@ use api_core::errors::{
     ApiResult,
     AssertionError,
 };
-use api_core::types::ResponseData;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiErrorKind;
 use api_wire_types::{
@@ -38,7 +37,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocId)>,
-) -> JsonApiResponse<Vec<ComplianceDocEvent>> {
+) -> JsonApiListResponse<ComplianceDocEvent> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -169,5 +168,5 @@ pub async fn get(
     }
 
     let events = events.into_iter().sorted_by_key(|e| e.timestamp).collect();
-    ResponseData::ok(events).json()
+    Ok(events)
 }

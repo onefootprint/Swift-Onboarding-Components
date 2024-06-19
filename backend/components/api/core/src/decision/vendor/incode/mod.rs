@@ -18,7 +18,6 @@ use newtypes::{
 };
 pub use state_machine::*;
 
-
 // TEMP: will get this into State + TVC properly
 pub fn get_config_id(
     state: &State,

@@ -1,5 +1,4 @@
 use crate::auth::user::UserAuthScope;
-use crate::types::response::ResponseData;
 use crate::{
     decision,
     State,
@@ -8,10 +7,7 @@ use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::document::meta_headers::MetaHeaders;
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
 use newtypes::{
     DocumentId,
@@ -39,7 +35,7 @@ pub async fn post(
     mut payload: Multipart,
     request: HttpRequest,
     meta: MetaHeaders,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let file = handle_file_upload(
         &mut payload,
         &request,
@@ -66,5 +62,5 @@ pub async fn post(
     )
     .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }

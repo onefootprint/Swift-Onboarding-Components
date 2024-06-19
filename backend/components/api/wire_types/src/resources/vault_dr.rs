@@ -1,5 +1,5 @@
 /// Vault Disaster Recovery API resources
-use crate::Apiv2Schema;
+use crate::Apiv2Response;
 use chrono::{
     DateTime,
     Utc,
@@ -7,7 +7,7 @@ use chrono::{
 use newtypes::TenantId;
 use serde::Serialize;
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct VaultDrStatus {
     pub org_id: TenantId,
     pub org_name: String,
@@ -16,7 +16,7 @@ pub struct VaultDrStatus {
     pub enrolled_status: Option<VaultDrEnrolledStatus>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct VaultDrEnrolledStatus {
     pub enrolled_at: DateTime<Utc>,
 

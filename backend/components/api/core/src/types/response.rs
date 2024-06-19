@@ -1,82 +1,65 @@
 use crate::errors::ApiResult;
-use actix_web::Responder;
+use crate::ApiError;
 use newtypes::Base64Data;
 use paperclip::actix::web::Json;
 use paperclip::actix::Apiv2Schema;
 use paperclip::v2::models::DataType;
-use paperclip::v2::schema::TypedData;
+use paperclip::v2::schema::{
+    Apiv2Schema,
+    TypedData,
+};
 use serde::{
     Deserialize,
     Serialize,
 };
 
-/// return footprint api results
-pub type JsonApiResponse<T> = ApiResult<Json<ResponseData<T>>>;
 
-/// return string results
-pub type StringResponse = ApiResult<String>;
+pub type JsonApiResponse<T> = Result<T, ApiError>;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-#[openapi(description = "Empty response")]
-pub struct EmptyResponse {}
+/// For legacy non-paginated APIs, a wrapper around Vec that implements Responder.
+/// Should only use this for non-paginated APIs, which we shouldn't add many of.
+pub type JsonApiListResponse<T> = JsonApiResponse<ListResponse<T>>;
 
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(transparent)]
-pub struct ResponseData<T> {
-    pub data: T,
-}
+#[derive(derive_more::From, serde::Serialize)]
+pub struct ListResponse<T>(Vec<T>);
 
-impl<T> ResponseData<T> {
-    pub fn ok(data: T) -> Self {
-        Self { data }
-    }
-
-    pub fn json(self) -> JsonApiResponse<T> {
-        ApiResult::Ok(Json(self))
-    }
-}
-
-impl EmptyResponse {
-    pub fn ok() -> ResponseData<EmptyResponse> {
-        ResponseData {
-            data: EmptyResponse {},
-        }
-    }
-}
-
-impl<T> paperclip::v2::schema::Apiv2Schema for ResponseData<T>
-where
-    T: paperclip::v2::schema::Apiv2Schema,
-{
-    fn name() -> Option<String> {
-        T::name()
-    }
-
-    fn description() -> &'static str {
-        T::description()
-    }
-
-    fn required() -> bool {
-        T::required()
-    }
-
+impl<T: paperclip::v2::schema::Apiv2Schema> paperclip::v2::schema::Apiv2Schema for ListResponse<T> {
     fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        T::raw_schema()
+        <Vec<T> as paperclip::v2::schema::Apiv2Schema>::raw_schema()
     }
 }
 
-impl<T> paperclip::actix::OperationModifier for ResponseData<T> where T: paperclip::actix::OperationModifier {}
+impl<T: Apiv2Schema> paperclip::actix::OperationModifier for ListResponse<T> {
+    fn update_parameter(op: &mut paperclip::v2::models::DefaultOperationRaw) {
+        newtypes::map_container::update_body_parameter::<Vec<T>>(op);
+    }
 
-impl<T> Responder for ResponseData<T>
-where
-    T: Serialize,
-{
+    fn update_response(op: &mut paperclip::v2::models::DefaultOperationRaw) {
+        newtypes::map_container::update_200_response::<Vec<T>>(op);
+    }
+}
+
+impl<T: serde::Serialize> actix_web::Responder for ListResponse<T> {
     type Body = actix_web::body::BoxBody;
 
     fn respond_to(self, _req: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::build(actix_web::http::StatusCode::OK).json(self)
+        let json_resp = paperclip::actix::web::Json(self.0);
+        actix_web::HttpResponse::build(actix_web::http::StatusCode::OK).json(json_resp)
     }
 }
+
+impl<A> FromIterator<A> for ListResponse<A> {
+    // Required method
+    fn from_iter<T>(iter: T) -> Self
+    where
+        T: IntoIterator<Item = A>,
+    {
+        Self(Vec::from_iter(iter))
+    }
+}
+
+/// return string results
+pub type StringResponse = ApiResult<String>;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 /// Metadata required for a cursor-paginated response.
@@ -175,6 +158,7 @@ pub struct OffsetPaginatedResponseMetaNoCount {
     pub next_page: Option<usize>,
 }
 
+// TODO clean up these implementations with the newer macros::JsonResponder paradigm
 #[derive(Debug, Clone, serde::Serialize)]
 /// Wraps the response data with metadata needed for an offset-paginated result.
 /// Offset pagination requests take in a page number and page size and use postgres's OFFSET
@@ -184,6 +168,7 @@ pub struct OffsetPaginatedResponse<T, TMeta = OffsetPaginatedResponseMeta> {
     pub data: Vec<T>,
     pub meta: TMeta,
 }
+
 
 impl<T, TMeta> paperclip::v2::schema::Apiv2Schema for OffsetPaginatedResponse<T, TMeta>
 where

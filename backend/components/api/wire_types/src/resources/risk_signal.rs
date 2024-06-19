@@ -8,7 +8,7 @@ use newtypes::{
 };
 
 /// RiskSignal information, including severity, impacted scopes, and more.
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct RiskSignal {
     pub id: RiskSignalId,
     pub onboarding_decision_id: Option<OnboardingDecisionId>, // TODO: remove this ??
@@ -21,7 +21,7 @@ pub struct RiskSignal {
 }
 
 /// RiskSignal information, including severity, impacted scopes, and more.
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PublicRiskSignal {
     pub reason_code: FootprintReasonCode,
     pub note: String,
@@ -33,7 +33,7 @@ pub struct PublicRiskSignal {
 
 /// Non-public RiskSignal serialization that has additional information (at the moment just AML
 /// stuff about specific hits)
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct RiskSignalDetail {
     pub id: RiskSignalId,
     pub onboarding_decision_id: Option<OnboardingDecisionId>,
@@ -46,7 +46,7 @@ pub struct RiskSignalDetail {
     pub has_aml_hits: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct PublicRiskSignalDescription {
     pub reason_code: FootprintReasonCode,
     /// Short description of the reason code

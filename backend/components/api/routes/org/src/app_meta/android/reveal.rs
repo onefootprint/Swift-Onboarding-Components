@@ -4,13 +4,11 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiError;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
 use newtypes::TenantAndroidAppMetaId;
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     post,
@@ -50,11 +48,9 @@ async fn post(
         .decrypt_to_piistring(&result.e_integrity_decryption_key, &tenant.e_private_key)
         .await?;
 
-    Ok(Json(ResponseData::ok(
-        api_wire_types::TenantAndroidAppMeta::from_db((
-            result,
-            Some(decrypted_integrity_verification_key.leak().to_string()),
-            Some(decrypted_integrity_decryption_key.leak().to_string()),
-        )),
+    Ok(api_wire_types::TenantAndroidAppMeta::from_db((
+        result,
+        Some(decrypted_integrity_verification_key.leak().to_string()),
+        Some(decrypted_integrity_decryption_key.leak().to_string()),
     )))
 }

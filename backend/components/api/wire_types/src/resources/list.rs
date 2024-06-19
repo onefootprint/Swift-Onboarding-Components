@@ -10,7 +10,7 @@ use newtypes::{
     PiiString,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct List {
     pub id: ListId,
     pub name: String,
@@ -22,7 +22,7 @@ pub struct List {
     pub used_in_playbook: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct ListDetails {
     pub id: ListId,
     pub name: String,

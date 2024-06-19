@@ -4,8 +4,8 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::types::{
+    JsonApiListResponse,
     JsonApiResponse,
-    ResponseData,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -19,7 +19,6 @@ use newtypes::{
     SealedVaultBytes,
     TenantIosAppMetaId,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -34,7 +33,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<Vec<api_wire_types::TenantIosAppMeta>> {
+) -> JsonApiListResponse<api_wire_types::TenantIosAppMeta> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
 
@@ -53,7 +52,7 @@ pub async fn get(
         .map(|partial_meta| (partial_meta, None))
         .map(api_wire_types::TenantIosAppMeta::from_db)
         .collect();
-    ResponseData::ok(list).json()
+    Ok(list)
 }
 
 #[api_v2_operation(
@@ -94,11 +93,10 @@ pub async fn post(
             )
         })
         .await?;
-    ResponseData::ok(api_wire_types::TenantIosAppMeta::from_db((
+    Ok(api_wire_types::TenantIosAppMeta::from_db((
         new_tenant_ios_app_meta,
         Some(device_check_private_key),
     )))
-    .json()
 }
 
 #[api_v2_operation(
@@ -145,7 +143,8 @@ async fn patch(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::TenantIosAppMeta::from_db(
-        (result, device_check_private_key),
-    ))))
+    Ok(api_wire_types::TenantIosAppMeta::from_db((
+        result,
+        device_check_private_key,
+    )))
 }

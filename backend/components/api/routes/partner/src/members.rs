@@ -1,7 +1,6 @@
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::{
-    EmptyResponse,
     JsonApiResponse,
     OffsetPaginatedResponse,
     OffsetPaginationRequest,
@@ -69,6 +68,6 @@ async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     members_common::deactivate(state, tu_id, auth.into()).await
 }

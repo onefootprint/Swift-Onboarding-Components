@@ -1,6 +1,4 @@
 use crate::auth::user::UserAuthContext;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
 use crate::utils::session::{
     HandoffRecord,
     JsonSession,
@@ -11,6 +9,7 @@ use api_core::auth::session::user::{
     TokenCreationPurpose,
 };
 use api_core::errors::ApiResult;
+use api_core::types::JsonApiResponse;
 use api_wire_types::{
     D2pGenerateRequest,
     D2pGenerateResponse,
@@ -20,7 +19,6 @@ use newtypes::{
     D2pSessionStatus,
     UserAuthScope,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     api_v2_operation,
     post,
@@ -40,7 +38,7 @@ pub async fn handler(
     // Option for backwards compatibility
     request: Option<web::Json<D2pGenerateRequest>>,
     user_auth: UserAuthContext,
-) -> actix_web::Result<Json<ResponseData<D2pGenerateResponse>>, ApiError> {
+) -> JsonApiResponse<D2pGenerateResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
@@ -68,7 +66,5 @@ pub async fn handler(
         })
         .await?;
 
-    Ok(Json(ResponseData {
-        data: D2pGenerateResponse { auth_token },
-    }))
+    Ok(D2pGenerateResponse { auth_token })
 }

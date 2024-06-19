@@ -13,10 +13,7 @@ use api_core::auth::session::sdk_args::{
 };
 use api_core::auth::session::AuthSessionData;
 use api_core::errors::ValidationError;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::ApiErrorKind;
 use chrono::{
     DateTime,
@@ -42,7 +39,7 @@ pub enum UnsealedData {
     Cbor(serde_cbor::Value),
 }
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, macros::JsonResponder)]
 pub struct RevealResponse {
     data: UnsealedData,
     kind: SessionKind,
@@ -116,5 +113,5 @@ pub async fn post(
         kind,
         expires_at: session.expires_at,
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }

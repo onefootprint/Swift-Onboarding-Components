@@ -143,7 +143,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -299,7 +299,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -401,7 +401,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -714,7 +714,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -1734,7 +1734,7 @@
                     "status"
                 ]
             },
-            "EmptyResponse": {
+            "Empty": {
                 "type": "object"
             },
             "EntityValidateResponse": {
@@ -2020,6 +2020,7 @@
                     "id.ssn9": "1cefe40fa...",
                     "custom.credit_card": "f7dbdc6..."
                 },
+                "description": "A key-value map with the corresponding hex-encoded hash values",
                 "type": "object",
                 "properties": {
                     "<key>": {

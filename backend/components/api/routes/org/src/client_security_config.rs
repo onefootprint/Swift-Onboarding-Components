@@ -5,10 +5,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::tenant::TenantError;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use api_wire_types::OrgClientSecurityConfig;
 use db::models::tenant_client_config::{
@@ -53,7 +50,7 @@ async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> JsonApiRespons
             allowed_origins: vec![],
         });
 
-    ResponseData::ok(config).json()
+    Ok(config)
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
@@ -103,9 +100,8 @@ async fn patch(
         })
         .await?;
 
-    ResponseData::ok(OrgClientSecurityConfig {
+    Ok(OrgClientSecurityConfig {
         is_live,
         allowed_origins,
     })
-    .json()
 }

@@ -12,7 +12,7 @@ use newtypes::{
 use strum_macros::Display;
 
 /// Describes an event relevant to security as seen by tenants.
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct AuditEvent {
     pub id: AuditEventId,
     pub timestamp: DateTime<Utc>,

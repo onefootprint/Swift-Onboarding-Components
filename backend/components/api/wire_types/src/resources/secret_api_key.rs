@@ -5,7 +5,7 @@ use newtypes::{
 };
 
 /// Secret API key
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct SecretApiKey {
     pub id: TenantApiKeyId,

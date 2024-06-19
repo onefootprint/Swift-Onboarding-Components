@@ -17,7 +17,7 @@ use newtypes::{
 };
 
 /// OnboardingConfiguration that was created
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct OnboardingConfiguration {
     pub id: ObConfigurationId,
@@ -57,7 +57,7 @@ pub struct OnboardingConfiguration {
 }
 
 /// The public onboarding configuration
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct PublicOnboardingConfiguration {
     pub name: String,

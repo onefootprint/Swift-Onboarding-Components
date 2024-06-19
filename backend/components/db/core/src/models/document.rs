@@ -439,7 +439,6 @@ impl Document {
     }
 }
 
-
 #[derive(derive_more::From)]
 pub enum DocumentIdentifier<'a> {
     SvId { id: &'a ScopedVaultId },

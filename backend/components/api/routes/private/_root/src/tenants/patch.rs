@@ -4,10 +4,7 @@ use actix_web::{
 };
 use api_core::auth::protected_auth::ProtectedAuth;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::{
@@ -64,7 +61,7 @@ async fn patch(
         .await?;
 
     let response = api_wire_types::PrivateTenantDetail::from_db(tenant_info);
-    ResponseData::ok(response).json()
+    Ok(response)
 }
 
 fn make_tenant_update(

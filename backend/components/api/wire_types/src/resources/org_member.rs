@@ -9,7 +9,7 @@ fn is_false(b: &bool) -> bool {
 }
 
 /// Member of an organization
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct OrganizationMember {
     pub id: TenantUserId,
@@ -25,7 +25,7 @@ pub struct OrganizationMember {
 }
 
 /// Member of an organization
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 /// Info on the currently authed user
 pub struct AuthOrgMember {
@@ -52,7 +52,7 @@ pub struct LiteOrgMember {
     pub last_name: Option<String>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct LiteUserAndOrg {
     pub user: LiteOrgMember,
     pub org: String,

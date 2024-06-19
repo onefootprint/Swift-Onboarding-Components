@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::ResponseData;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
 use api_core::{
@@ -43,7 +43,7 @@ pub async fn create_list_entry(
     list_id: web::Path<ListId>,
     request: Json<CreateListEntryRequest>,
     insights: InsightHeaders,
-) -> ApiResult<Json<ResponseData<Vec<api_wire_types::ListEntry>>>> {
+) -> JsonApiListResponse<api_wire_types::ListEntry> {
     let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -129,11 +129,8 @@ pub async fn create_list_entry(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-    ResponseData::ok(
-        decrypted_list_entries
-            .into_iter()
-            .map(api_wire_types::ListEntry::from_db)
-            .collect_vec(),
-    )
-    .json()
+    Ok(decrypted_list_entries
+        .into_iter()
+        .map(api_wire_types::ListEntry::from_db)
+        .collect())
 }

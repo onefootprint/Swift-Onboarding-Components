@@ -1,25 +1,49 @@
-use crate::{
-    backfill::{BackfillRequest, BackfillResponse},
-    ProtectedAuth,
+use crate::backfill::{
+    BackfillRequest,
+    BackfillResponse,
 };
-use actix_web::{post, web, web::Json};
-use api_core::{
-    errors::{ApiResult, AssertionError, DryRunError, DryRunResult, DryRunResultTrait, ValidationError},
-    types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::{Any, TenantVw, VaultWrapper},
-    State,
+use crate::ProtectedAuth;
+use actix_web::web::Json;
+use actix_web::{
+    post,
+    web,
 };
-use db::{
-    models::fingerprint::{Fingerprint as DbFingerprint, NewFingerprintArgs},
-    DbError,
+use api_core::errors::{
+    ApiResult,
+    AssertionError,
+    DryRunError,
+    DryRunResult,
+    DryRunResultTrait,
+    ValidationError,
 };
-use db_schema::schema::{fingerprint, scoped_vault};
-use diesel::{prelude::*, QueryDsl};
+use api_core::types::JsonApiResponse;
+use api_core::utils::vault_wrapper::{
+    Any,
+    TenantVw,
+    VaultWrapper,
+};
+use api_core::State;
+use db::models::fingerprint::{
+    Fingerprint as DbFingerprint,
+    NewFingerprintArgs,
+};
+use db::DbError;
+use db_schema::schema::{
+    fingerprint,
+    scoped_vault,
+};
+use diesel::prelude::*;
+use diesel::QueryDsl;
 use futures::StreamExt;
 use itertools::Itertools;
 use newtypes::{
-    CompositeFingerprint, CompositeFingerprintKind, Fingerprint, FingerprintKind, IdentityDataKind as IDK,
-    MissingFingerprint, ScopedVaultId,
+    CompositeFingerprint,
+    CompositeFingerprintKind,
+    Fingerprint,
+    FingerprintKind,
+    IdentityDataKind as IDK,
+    MissingFingerprint,
+    ScopedVaultId,
 };
 use std::collections::HashMap;
 
@@ -93,7 +117,7 @@ pub async fn post(
 
 
     let response = BackfillResponse { data, cursor };
-    ResponseData::ok(response).json()
+    Ok(response)
 }
 
 #[tracing::instrument(skip_all)]

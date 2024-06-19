@@ -61,7 +61,7 @@ impl From<alpaca::CipResult> for ApexCipResult {
         }
     }
 }
-#[derive(Debug, Clone, Apiv2Schema, Serialize)]
+#[derive(Debug, Clone, Apiv2Response, Serialize, macros::JsonResponder)]
 pub struct ApexCipSummaryResults {
     pub user_id: FpId,
     pub checked_data: ApexCheckedKycData,

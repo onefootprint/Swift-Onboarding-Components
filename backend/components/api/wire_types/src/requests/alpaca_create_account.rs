@@ -53,7 +53,7 @@ pub struct DeprecatedAlpacaCreateAccountRequest {
     pub account_type: Option<AccountType>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, Serialize)]
+#[derive(Debug, Clone, Apiv2Response, Serialize, macros::JsonResponder)]
 pub struct AlpacaCreateAccountResponse {
     /// alpaca response HTTP status code
     pub status_code: u16,

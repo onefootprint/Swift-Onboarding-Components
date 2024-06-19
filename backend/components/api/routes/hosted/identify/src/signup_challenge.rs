@@ -16,7 +16,6 @@ use api_core::errors::{
     ValidationError,
 };
 use api_core::telemetry::RootSpan;
-use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
@@ -221,7 +220,7 @@ pub async fn post(
         challenge_data,
         error: err.map(|e| e.to_string()),
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }
 
 async fn make_vault_context(

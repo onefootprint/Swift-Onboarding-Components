@@ -1,6 +1,5 @@
 use crate::auth::user::UserAuthScope;
 use crate::errors::onboarding::OnboardingError;
-use crate::types::response::ResponseData;
 use crate::{
     decision,
     State,
@@ -21,10 +20,7 @@ use api_core::decision::state::{
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::workflow::WorkflowError;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_wire_types::ProcessRequest;
@@ -59,7 +55,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     state: web::Data<State>,
     request: OptionalJson<ProcessRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
 
@@ -128,7 +124,7 @@ pub async fn post(
 
     run_kyb_if_needed(&state, user_auth, fixture_result).await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }
 
 async fn enqueue_run_incode_stuck_workflow_task(db_pool: &DbPool, workflow_id: &WorkflowId) -> ApiResult<()> {

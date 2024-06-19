@@ -4,8 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::response::ResponseData;
-use api_core::types::JsonApiResponse;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::State;
@@ -26,7 +25,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<Vec<api_wire_types::PrivateOwnedBusiness>> {
+) -> JsonApiListResponse<api_wire_types::PrivateOwnedBusiness> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -45,5 +44,5 @@ pub async fn get(
         .into_iter()
         .map(api_wire_types::PrivateOwnedBusiness::from_db)
         .collect();
-    ResponseData::ok(results).json()
+    Ok(results)
 }

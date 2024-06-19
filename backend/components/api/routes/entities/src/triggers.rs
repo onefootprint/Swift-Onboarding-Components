@@ -3,7 +3,6 @@ use crate::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::user::{
@@ -89,7 +88,7 @@ pub async fn post(
     let response = outcome
         .post_commit(&state)?
         .ok_or(AssertionError("No response creating a token"))?;
-    ResponseData::ok(response).json()
+    Ok(response)
 }
 
 fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> ApiResult<()> {
@@ -188,7 +187,6 @@ pub(super) fn apply_trigger_request(
     let outcome = TriggerRequestOutcome { token, session };
     Ok(outcome)
 }
-
 
 impl TriggerRequestOutcome {
     pub(super) fn post_commit(self, state: &State) -> ApiResult<Option<EntityActionResponse>> {

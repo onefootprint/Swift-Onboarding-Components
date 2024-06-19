@@ -6,9 +6,8 @@ use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
 use api_core::types::{
-    EmptyResponse,
+    JsonApiListResponse,
     JsonApiResponse,
-    ResponseData,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::{
@@ -65,7 +64,7 @@ pub async fn post(
         })
         .await?;
 
-    ResponseData::ok(api_wire_types::UserTag::from_db(tag)).json()
+    Ok(api_wire_types::UserTag::from_db(tag))
 }
 
 #[api_v2_operation(description = "View a user's tags", tags(Users, Preview))]
@@ -74,7 +73,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<Vec<api_wire_types::UserTag>> {
+) -> JsonApiListResponse<api_wire_types::UserTag> {
     auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();
@@ -90,7 +89,7 @@ pub async fn get(
         .await?;
 
     let tags = tags.into_iter().map(api_wire_types::UserTag::from_db).collect();
-    ResponseData::ok(tags).json()
+    Ok(tags)
 }
 
 #[api_v2_operation(description = "Untag a user", tags(Users, Preview))]
@@ -99,7 +98,7 @@ pub async fn delete(
     state: web::Data<State>,
     path: FpIdPathPlus<TagId>,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();
@@ -114,5 +113,5 @@ pub async fn delete(
         })
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }

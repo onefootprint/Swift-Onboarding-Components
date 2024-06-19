@@ -6,10 +6,7 @@ use crate::auth::tenant::{
 };
 use crate::auth::Either;
 use crate::errors::ApiError;
-use crate::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use crate::types::JsonApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use actix_web::web::Query;
@@ -20,6 +17,7 @@ use macros::route_alias;
 use newtypes::input::Csv;
 use newtypes::{
     flat_api_object_map_type,
+    impl_response_type,
     DataIdentifier,
 };
 use paperclip::actix::{
@@ -44,6 +42,7 @@ flat_api_object_map_type!(
     description="A key-value map of identifier to whether the identifier exists in the vault",
     example=r#"{ "id.last_name": true, "id.ssn9": true, "custom.credit_card": true, "id.dob": false }"#
 );
+impl_response_type!(GetVaultResponse);
 
 #[route_alias(
     actix::get(
@@ -93,5 +92,5 @@ pub async fn get(
     let results = HashMap::from_iter(keys.into_iter().map(|di| (di.clone(), populated.contains(&di))));
     let out = GetVaultResponse { map: results };
 
-    ResponseData::ok(out).json()
+    Ok(out)
 }

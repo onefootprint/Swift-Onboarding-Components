@@ -7,10 +7,6 @@ use crate::errors::ApiResult;
 use crate::types::JsonApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::types::{
-    EmptyResponse,
-    ResponseData,
-};
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::{
@@ -44,7 +40,7 @@ pub async fn delete(
     path: FpIdPath,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let fp_id = path.into_inner();
 
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
@@ -81,5 +77,5 @@ pub async fn delete(
         })
         .await?;
 
-    ResponseData::ok(EmptyResponse {}).json()
+    Ok(api_wire_types::Empty)
 }

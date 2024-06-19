@@ -17,10 +17,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::session::AuthSession;
 use db::models::tenant::{
     NewTenant,
@@ -38,7 +35,7 @@ pub struct SandboxTenantRequest {
     super_tenant_id: Option<TenantId>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, macros::JsonResponder)]
 struct SandboxTenantResponse {
     token: SessionAuthToken,
 }
@@ -97,5 +94,5 @@ pub async fn post(
             Ok(token)
         })
         .await?;
-    ResponseData::ok(SandboxTenantResponse { token }).json()
+    Ok(SandboxTenantResponse { token })
 }

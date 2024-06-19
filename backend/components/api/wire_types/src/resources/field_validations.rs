@@ -20,7 +20,7 @@ pub struct FieldValidation {
     pub signals: Vec<FieldValidationDetail>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct GetFieldValidationResponse {
     pub email: Option<FieldValidation>,
     pub phone: Option<FieldValidation>,

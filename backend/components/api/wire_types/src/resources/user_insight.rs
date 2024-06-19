@@ -2,11 +2,11 @@ use newtypes::{
     UserInsightScope,
     UserInsightUnit,
 };
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::Apiv2Response;
 use serde::Serialize;
 
 // Represents a single insight about a user
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 
 pub struct UserInsight {
     // the display name of the metric

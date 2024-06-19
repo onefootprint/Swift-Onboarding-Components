@@ -20,7 +20,6 @@ pub struct TriggerKycRequest {
     pub force_reonboard: Option<bool>,
 }
 
-
 #[derive(Debug, Clone, serde::Serialize, Deserialize, Apiv2Schema, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SimpleFixtureResult {

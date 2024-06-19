@@ -4,9 +4,11 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::proxy::VaultProxyError;
-use api_core::errors::ApiResult;
 use api_core::proxy::ssrf_protection::validate_safe_url;
-use api_core::types::ResponseData;
+use api_core::types::{
+    JsonApiListResponse,
+    JsonApiResponse,
+};
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::{
@@ -30,8 +32,6 @@ use paperclip::actix::{
 };
 use std::str::FromStr;
 
-type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfigBasic>>>;
-
 #[api_v2_operation(
     description = "List the organization's proxy configurations",
     tags(ProxyConfigs, Organization, Private)
@@ -41,7 +41,7 @@ pub async fn get(
     state: web::Data<State>,
     filters: web::Query<GetProxyConfigRequest>,
     auth: TenantSessionAuth,
-) -> ApiResult<ProxyConfigsResponse> {
+) -> JsonApiListResponse<api_wire_types::ProxyConfigBasic> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let GetProxyConfigRequest { status } = filters.into_inner();
     let tenant_id = auth.tenant().id.clone();
@@ -65,7 +65,7 @@ pub async fn get(
         .map(api_wire_types::ProxyConfigBasic::from_db)
         .collect();
 
-    ResponseData::ok(configs).json()
+    Ok(configs)
 }
 
 #[api_v2_operation(
@@ -77,7 +77,7 @@ pub async fn get_detail(
     state: web::Data<State>,
     proxy_config_id: web::Path<ProxyConfigId>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
+) -> JsonApiResponse<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -90,7 +90,7 @@ pub async fn get_detail(
         })
         .await?;
 
-    ResponseData::ok(api_wire_types::ProxyConfigDetailed::from_db(config)).json()
+    Ok(api_wire_types::ProxyConfigDetailed::from_db(config))
 }
 
 #[api_v2_operation(
@@ -102,7 +102,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<CreateProxyConfigRequest>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
+) -> JsonApiResponse<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -198,7 +198,7 @@ pub async fn post(
 
     let config = api_wire_types::ProxyConfigDetailed::from_db(config);
 
-    ResponseData::ok(config).json()
+    Ok(config)
 }
 
 #[api_v2_operation(
@@ -211,7 +211,7 @@ pub async fn patch(
     request: Json<PatchProxyConfigRequest>,
     proxy_config_id: web::Path<ProxyConfigId>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<ResponseData<api_wire_types::ProxyConfigDetailed>>> {
+) -> JsonApiResponse<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -343,5 +343,5 @@ pub async fn patch(
 
     let config = api_wire_types::ProxyConfigDetailed::from_db(config);
 
-    ResponseData::ok(config).json()
+    Ok(config)
 }

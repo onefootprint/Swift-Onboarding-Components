@@ -4,10 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use api_wire_types::OrgMetricsRequest;
 use db::scoped_vault::{
@@ -89,5 +86,5 @@ async fn get(
         })
         .await?;
 
-    ResponseData::ok(result).json()
+    Ok(result)
 }

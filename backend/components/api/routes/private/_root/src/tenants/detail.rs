@@ -6,10 +6,7 @@ use api_core::auth::tenant::{
     FirmEmployeeAuthContext,
     FirmEmployeeGuard,
 };
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant::Tenant;
@@ -30,5 +27,5 @@ async fn get(
         .await?;
 
     let response = api_wire_types::PrivateTenantDetail::from_db(tenant);
-    ResponseData::ok(response).json()
+    Ok(response)
 }

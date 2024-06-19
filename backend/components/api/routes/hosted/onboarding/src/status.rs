@@ -1,9 +1,9 @@
 use crate::auth::user::UserAuthScope;
 use crate::errors::ApiError;
-use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::types::JsonApiResponse;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_wire_types::hosted::onboarding_status::{
@@ -22,7 +22,6 @@ use newtypes::{
     SkipLivenessClientType,
     SkipLivenessContext,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -38,7 +37,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     insights: InsightHeaders,
-) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
+) -> JsonApiResponse<OnboardingStatusResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     if user_auth.tenant().id.is_flexcar() {
@@ -100,10 +99,9 @@ pub async fn get(
     let ob_config =
         api_wire_types::PublicOnboardingConfiguration::from_db((ob_config, tenant, None, None, ff_client));
 
-    ResponseData::ok(OnboardingStatusResponse {
+    Ok(OnboardingStatusResponse {
         all_requirements,
         // This is only used by the handoff app - we might be able to rm and move elsewhere
         ob_configuration: ob_config,
     })
-    .json()
 }

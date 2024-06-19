@@ -5,14 +5,11 @@ use crate::auth::tenant::{
 };
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use actix_web::web::Json;
+use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::{
     AnnotationFilters,
@@ -39,8 +36,6 @@ use paperclip::actix::{
     Apiv2Schema,
 };
 
-type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
-
 #[api_v2_operation(
     description = "Gets the annotations for a user.",
     tags(EntityDetails, Entities, Private)
@@ -51,7 +46,7 @@ pub async fn get(
     fp_id: FpIdPath,
     query: web::Query<AnnotationFilters>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<AnnotationsListResponse> {
+) -> JsonApiListResponse<api_wire_types::Annotation> {
     // TODO paginate?
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
@@ -66,7 +61,7 @@ pub async fn get(
         .into_iter()
         .map(api_wire_types::Annotation::from_db)
         .collect();
-    ResponseData::ok(annotations).json()
+    Ok(annotations)
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -85,7 +80,7 @@ async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<UpdateAnnotationPath>,
     request: web::Json<UpdateAnnotationRequest>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant = auth.tenant();
     let is_live = auth.is_live()?;
@@ -98,7 +93,7 @@ async fn patch(
         .db_query(move |conn| Annotation::update(conn, annotation_id, tenant_id, fp_id, is_live, is_pinned))
         .await?;
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 pub trait ValidateRequest {
@@ -126,7 +121,7 @@ pub fn post(
     auth: TenantSessionAuth,
     fp_id: FpIdPath,
     request: Json<CreateAnnotationRequest>,
-) -> actix_web::Result<Json<ResponseData<api_wire_types::Annotation>>, ApiError> {
+) -> JsonApiResponse<api_wire_types::Annotation> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     request.validate()?;
     let is_live = auth.is_live()?;
@@ -158,5 +153,5 @@ pub fn post(
         .await?;
 
     let result = api_wire_types::Annotation::from_db(annotation);
-    ResponseData::ok(result).json()
+    Ok(result)
 }

@@ -4,7 +4,7 @@ use newtypes::{
     TenantIosAppMetaId,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct TenantIosAppMeta {
     pub id: TenantIosAppMetaId,

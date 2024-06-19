@@ -5,10 +5,7 @@ use api_core::auth::tenant::{
     TenantGuard,
 };
 use api_core::errors::ApiResult;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::State;
 use chrono::Utc;
 use db::models::vault_dr::{
@@ -16,7 +13,6 @@ use db::models::vault_dr::{
     VaultDrAwsPreEnrollment,
     VaultDrConfig,
 };
-use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -76,7 +72,7 @@ pub async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(api_wire_types::VaultDrEnrollResponse {
+    Ok(api_wire_types::VaultDrEnrollResponse {
         org_private_key: "todo".into(),
-    })))
+    })
 }

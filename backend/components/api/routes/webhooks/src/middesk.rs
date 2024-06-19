@@ -7,10 +7,7 @@ use api_core::decision::vendor::middesk::{
     MiddeskError,
     MiddeskStatesKind,
 };
-use api_core::types::{
-    EmptyResponse,
-    JsonApiResponse,
-};
+use api_core::types::JsonApiResponse;
 use api_core::{
     decision,
     ApiErrorKind,
@@ -30,7 +27,7 @@ use std::pin::Pin;
 async fn handle_webhook(
     webhook_signature: MiddeskWebhookSignature,
     state: web::Data<State>,
-) -> JsonApiResponse<EmptyResponse> {
+) -> JsonApiResponse<api_wire_types::Empty> {
     let res = decision::vendor::middesk::handle_middesk_webhook(&state, webhook_signature.request).await;
 
     match res {
@@ -50,7 +47,7 @@ async fn handle_webhook(
         }
     }
 
-    EmptyResponse::ok().json()
+    Ok(api_wire_types::Empty)
 }
 
 #[derive(Debug, Clone, Apiv2Header)]

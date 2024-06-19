@@ -1,7 +1,6 @@
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::errors::onboarding::OnboardingError;
-use crate::types::response::ResponseData;
 use crate::utils::session::AuthSession;
 use crate::State;
 use api_core::auth::session::user::ValidateUserToken;
@@ -161,5 +160,5 @@ pub async fn post(
         business,
         onboarding_configuration_id,
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }

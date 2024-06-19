@@ -1,5 +1,4 @@
 use crate::State;
-use actix_web::web::Json;
 use actix_web::{
     post,
     web,
@@ -7,11 +6,8 @@ use actix_web::{
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::{
-    ApiError,
-    ApiResult,
-};
-use api_core::types::response::ResponseData;
+use api_core::errors::ApiResult;
+use api_core::types::JsonApiResponse;
 use api_core::utils::session::AuthSession;
 use chrono::Duration;
 use db::models::partner_tenant::{
@@ -43,7 +39,7 @@ struct NewClientRequest {
     name: String,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 struct NewClientResponse {
     partner_tenant_id: PartnerTenantId,
     auth_token: SessionAuthToken,
@@ -61,7 +57,7 @@ async fn post(
     request: web::Json<NewClientRequest>,
     _custodian: CustodianAuthContext,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ResponseData<NewClientResponse>>, ApiError> {
+) -> JsonApiResponse<NewClientResponse> {
     let NewClientRequest { id, name } = request.into_inner();
     if !id.is_integration_test_tenant() {
         // All integration testing partner tenant primary keys have a reserved prefix that signals
@@ -166,5 +162,5 @@ async fn post(
         auth_token,
         ro_auth_token,
     };
-    ResponseData::ok(response).json()
+    Ok(response)
 }

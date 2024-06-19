@@ -1,10 +1,10 @@
 use crate::{
     Actor,
-    Apiv2Schema,
+    Apiv2Response,
     Serialize,
 };
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct VaultCreated {
     pub actor: Actor,
 }

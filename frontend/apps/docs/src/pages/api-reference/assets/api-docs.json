@@ -326,7 +326,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -428,7 +428,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -717,7 +717,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -818,7 +818,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -1099,7 +1099,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -1327,7 +1327,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -1429,7 +1429,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -1718,7 +1718,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/Empty"
                                 }
                             }
                         }
@@ -3089,6 +3089,7 @@
                     "id.ssn9": "121121212",
                     "custom.credit_card": "4242424242424242"
                 },
+                "description": "A key-value map with the corresponding decrypted values",
                 "type": "object",
                 "properties": {
                     "<key>": {
@@ -3579,6 +3580,7 @@
                     "custom.credit_card": true,
                     "id.dob": false
                 },
+                "description": "A key-value map of identifier to whether the identifier was successfully deleted in the vault",
                 "type": "object",
                 "properties": {
                     "<key>": {
@@ -3819,7 +3821,7 @@
                     "<value>"
                 ]
             },
-            "EmptyResponse": {
+            "Empty": {
                 "type": "object"
             },
             "GetVaultResponse": {
@@ -3829,6 +3831,7 @@
                     "custom.credit_card": true,
                     "id.dob": false
                 },
+                "description": "A key-value map of identifier to whether the identifier exists in the vault",
                 "type": "object",
                 "properties": {
                     "<key>": {

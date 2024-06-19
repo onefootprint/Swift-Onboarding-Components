@@ -3,7 +3,6 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
@@ -205,10 +204,9 @@ pub async fn post(
         .await?;
 
     let expires_at = session.expires_at;
-    ResponseData::ok(CreateClientTokenResponse {
+    Ok(CreateClientTokenResponse {
         token,
         expires_at,
         fields,
     })
-    .json()
 }

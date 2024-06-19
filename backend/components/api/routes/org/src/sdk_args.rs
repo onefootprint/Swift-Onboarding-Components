@@ -7,10 +7,7 @@ use api_core::auth::session::sdk_args::{
 };
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::types::{
-    JsonApiResponse,
-    ResponseData,
-};
+use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::large_json::LargeJson;
 use api_core::utils::session::AuthSession;
@@ -26,10 +23,10 @@ use paperclip::actix::{
     get,
     post,
     web,
-    Apiv2Schema,
+    Apiv2Response,
 };
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct GetSdkArgsTokenResponse {
     pub args: SdkArgs,
@@ -85,7 +82,7 @@ async fn post(
         .await?;
 
     let expires_at = session.expires_at;
-    ResponseData::ok(CreateSdkArgsTokenResponse { token, expires_at }).json()
+    Ok(CreateSdkArgsTokenResponse { token, expires_at })
 }
 
 #[api_v2_operation(
@@ -123,5 +120,5 @@ async fn get(
         PublicOnboardingConfiguration::from_db((obc, t, tcc, a, state.ff_client.clone()))
     });
     let result = GetSdkArgsTokenResponse { args, ob_config };
-    ResponseData::ok(result).json()
+    Ok(result)
 }

@@ -15,7 +15,7 @@ use newtypes::{
 use serde_with::SerializeDisplay;
 use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceCompanySummary {
     pub id: TenantCompliancePartnershipId,
@@ -25,7 +25,7 @@ pub struct ComplianceCompanySummary {
     pub num_active_playbooks: i64,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceDocSummary {
     pub id: ComplianceDocId,
@@ -43,14 +43,14 @@ pub struct ComplianceDocSummary {
     pub template_id: Option<ComplianceDocTemplateId>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceDocTemplate {
     pub id: ComplianceDocTemplateId,
     pub latest_version: ComplianceDocTemplateVersion,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceDocTemplateVersion {
     pub id: ComplianceDocTemplateVersionId,
@@ -63,7 +63,7 @@ pub struct ComplianceDocTemplateVersion {
     pub description: String,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceDocRequest {
     pub id: ComplianceDocRequestId,
@@ -74,7 +74,7 @@ pub struct ComplianceDocRequest {
     pub compliance_doc_id: ComplianceDocId,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceDocEvent {
     pub timestamp: DateTime<Utc>,
@@ -125,7 +125,7 @@ pub struct ComplianceDocEventAssigned {
     pub assigned_to: Option<LiteUserAndOrg>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]
 pub struct ComplianceDocSubmission {
     pub id: ComplianceDocSubmissionId,
@@ -133,7 +133,17 @@ pub struct ComplianceDocSubmission {
     pub data: ComplianceDocData,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Apiv2Schema, Serialize, EnumDiscriminants, macros::SerdeAttr)]
+#[derive(
+    Debug,
+    Clone,
+    Eq,
+    PartialEq,
+    Apiv2Schema,
+    macros::JsonResponder,
+    Serialize,
+    EnumDiscriminants,
+    macros::SerdeAttr,
+)]
 #[strum_discriminants(
     name(ComplianceDocDataKind),
     vis(pub),

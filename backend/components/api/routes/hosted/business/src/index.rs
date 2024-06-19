@@ -4,7 +4,6 @@ use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
 use api_core::errors::ValidationError;
-use api_core::types::ResponseData;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::hosted::business::{
     HostedBusiness,
@@ -77,5 +76,5 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> JsonApiResp
         inviter,
         invited,
     };
-    ResponseData::ok(result).json()
+    Ok(result)
 }

@@ -1,4 +1,3 @@
-use actix_web::web::Json;
 use actix_web::{
     post,
     web,
@@ -11,7 +10,7 @@ use api_core::errors::{
     ApiResult,
     AssertionError,
 };
-use api_core::types::response::ResponseData;
+use api_core::types::JsonApiResponse;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::vault_wrapper::{
     Any,
@@ -41,7 +40,7 @@ pub enum Request {
     Id(String),
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct CleanupResponse {
     num_deleted_rows: usize,
 }
@@ -54,7 +53,7 @@ async fn post(
     request: web::Json<Request>,
     // When provided, identifies only sandbox users with the suffix
     sandbox_id: SandboxId,
-) -> actix_web::Result<Json<ResponseData<CleanupResponse>>, ApiError> {
+) -> JsonApiResponse<CleanupResponse> {
     let uv_id = match request.into_inner() {
         Request::PhoneNumber(phone_number) => {
             ensure_phone_number_allowed(&state, &phone_number)?;
@@ -118,7 +117,7 @@ async fn post(
     };
 
     let Some(uv_id) = uv_id else {
-        return Ok(Json(ResponseData::ok(CleanupResponse { num_deleted_rows: 0 })));
+        return Ok(CleanupResponse { num_deleted_rows: 0 });
     };
 
     let is_production = state.config.service_config.is_production();
@@ -151,7 +150,7 @@ async fn post(
         })
         .await?;
 
-    Ok(Json(ResponseData::ok(CleanupResponse { num_deleted_rows })))
+    Ok(CleanupResponse { num_deleted_rows })
 }
 
 /// check that this phone number can be used to clean a vault
