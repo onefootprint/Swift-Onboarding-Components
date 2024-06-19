@@ -7,7 +7,7 @@ use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::document::meta_headers::MetaHeaders;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::file_upload::handle_file_upload;
 use newtypes::{
     DocumentId,
@@ -35,7 +35,7 @@ pub async fn post(
     mut payload: Multipart,
     request: HttpRequest,
     meta: MetaHeaders,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let file = handle_file_upload(
         &mut payload,
         &request,

@@ -3,7 +3,7 @@ use actix_web::post;
 use actix_web::web::{
     self,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use billing::{
     create_bill_for_tenant,
@@ -31,7 +31,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Json<CreateInvoiceRequest>,
     _: ProtectedAuth,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let CreateInvoiceRequest {
         tenant_id,
         billing_date,
@@ -60,7 +60,7 @@ async fn post_all(
     state: web::Data<State>,
     request: Option<web::Json<CreateInvoicesRequest>>,
     _: ProtectedAuth,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let tenants = state.db_pool.db_query(Tenant::list_billable).await?;
 
     // Subtract 8 hours so we always generate the invoice for last month

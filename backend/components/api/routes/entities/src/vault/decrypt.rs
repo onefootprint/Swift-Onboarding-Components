@@ -5,7 +5,7 @@ use crate::auth::tenant::{
 };
 use crate::auth::Either;
 use crate::errors::ApiError;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -115,7 +115,7 @@ pub async fn post(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> JsonApiResponse<TempDecryptResponse> {
+) -> ModernApiResult<TempDecryptResponse> {
     let request = request.into_inner();
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
@@ -141,7 +141,7 @@ pub async fn post_client(
     auth: ClientTenantAuthContext,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> JsonApiResponse<TempDecryptResponse> {
+) -> ModernApiResult<TempDecryptResponse> {
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
     let fp_id = auth.fp_id.clone();
@@ -173,7 +173,7 @@ pub(super) async fn post_inner(
     auth: Box<dyn TenantAuth>,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> JsonApiResponse<DecryptResponse> {
+) -> ModernApiResult<DecryptResponse> {
     let DecryptRequest {
         fields,
         reason,

@@ -12,6 +12,7 @@ debug = 0
 [workspace]
 resolver = "2"
 members = [
+    "components/api/errors",
     "components/api/core",
     "components/api/server",
     "components/api/wire_types",

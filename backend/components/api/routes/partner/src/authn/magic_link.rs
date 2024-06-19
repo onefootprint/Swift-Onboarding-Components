@@ -1,4 +1,4 @@
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::LinkAuthRequest;
 use paperclip::actix::web::Json;
@@ -18,6 +18,6 @@ use paperclip::actix::{
 fn handler(
     state: web::Data<State>,
     request: Json<LinkAuthRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     api_route_org_common::magic_link::handler(state, request).await
 }

@@ -8,7 +8,7 @@ use api_core::errors::{
     ApiResult,
     AssertionError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::State;
@@ -40,7 +40,7 @@ fn post(
     state: web::Data<State>,
     request: Json<AssumePartnerRoleRequest>,
     pt_auth: AnyPartnerTenantSessionAuth,
-) -> JsonApiResponse<AssumePartnerRoleResponse> {
+) -> ModernApiResult<AssumePartnerRoleResponse> {
     let AssumePartnerRoleRequest { partner_tenant_id } = request.into_inner();
     let auth_method = pt_auth.auth_method();
     let tu_id = pt_auth.clone().tenant_user_id()?;

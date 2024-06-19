@@ -5,7 +5,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::tenant::TenantError;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use chrono::Utc;
@@ -27,7 +27,7 @@ pub async fn post(
     // Don't allow updating an API key with an API key...
     auth: TenantSessionAuth,
     path: web::Path<TenantApiKeyId>,
-) -> JsonApiResponse<api_wire_types::SecretApiKey> {
+) -> ModernApiResult<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let id = path.into_inner();
     if let AuthActor::TenantApiKey(key_id) = auth.actor() {

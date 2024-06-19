@@ -1,8 +1,16 @@
 use crate::errors::ApiResult;
 use crate::ApiError;
-use newtypes::Base64Data;
+use api_errors::FpApiError;
+use http::StatusCode;
+use newtypes::{
+    Base64Data,
+    Uuid,
+};
 use paperclip::actix::web::Json;
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{
+    api_v2_errors,
+    Apiv2Schema,
+};
 use paperclip::v2::models::DataType;
 use paperclip::v2::schema::{
     Apiv2Schema,
@@ -13,12 +21,93 @@ use serde::{
     Serialize,
 };
 
+// TODO replace all ApiResult with ModernApiResult
+// TODO implement FpApiError for DbError and then remove physical enum variant on ApiError, etc
 
-pub type JsonApiResponse<T> = Result<T, ApiError>;
+/// The magical error type that can hold any type T that implements FpApiError.
+/// As crates create their own Error struct, they only need to implement FpApiError.
+#[api_v2_errors()] // We don't support error responses on our docs site yet
+#[derive(derive_more::Deref)]
+pub struct ModernApiError(Box<dyn FpApiError>);
+
+impl<T: Into<ApiError>> From<T> for ModernApiError {
+    fn from(value: T) -> Self {
+        Self(Box::new(value.into()))
+    }
+}
+
+impl std::fmt::Display for ModernApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.0, f)
+    }
+}
+
+impl std::fmt::Debug for ModernApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Debug::fmt(&self.0, f)
+    }
+}
+
+impl std::error::Error for ModernApiError {
+    fn source(&self) -> std::option::Option<&(dyn std::error::Error + 'static)> {
+        self.0.source()
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SerializedApiResponse {
+    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    /// Any freeform JSON context to give more information on the error
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub context: Option<serde_json::Value>,
+    pub support_id: Uuid,
+}
+
+
+// TODO: And then implement the error responder just once for this type! remove the macro
+impl actix_web::ResponseError for ModernApiError {
+    fn status_code(&self) -> StatusCode {
+        self.0.status_code()
+    }
+
+    fn error_response(&self) -> actix_web::HttpResponse<actix_web::body::BoxBody> {
+        let support_id = newtypes::Uuid::new_v4();
+        let status_code = self.status_code();
+
+        // Some errors have specific error codes and context
+        let code = self.code();
+        let context = self.context();
+        let message = self.message();
+
+        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR {
+            // Hide HTTP 500 error messages from client.
+            // It would be nice to be able to show the error messages in dev
+            tracing::error!(err=?self.0, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api 500: {}", &self.to_string());
+            "Something went wrong".to_string()
+        } else {
+            tracing::info!(error=?self.0, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api {}", status_code);
+            message
+        };
+
+        let mut resp = actix_web::HttpResponse::build(status_code);
+        self.mutate_response(&mut resp);
+
+        resp.json(SerializedApiResponse {
+            message,
+            code,
+            context,
+            support_id,
+        })
+    }
+}
+
+pub type ModernApiResult<T> = Result<T, ModernApiError>;
 
 /// For legacy non-paginated APIs, a wrapper around Vec that implements Responder.
 /// Should only use this for non-paginated APIs, which we shouldn't add many of.
-pub type JsonApiListResponse<T> = JsonApiResponse<ListResponse<T>>;
+pub type JsonApiListResponse<T> = ModernApiResult<ListResponse<T>>;
 
 #[derive(derive_more::From, serde::Serialize)]
 pub struct ListResponse<T>(Vec<T>);

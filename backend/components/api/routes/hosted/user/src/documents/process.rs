@@ -4,7 +4,7 @@ use api_core::decision::document::route_handler::{
     IncodeConfigurationIdOverride,
     IsRerun,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::{
     decision,
     State,
@@ -29,7 +29,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     doc_id: web::Path<DocumentId>,
-) -> JsonApiResponse<DocumentResponse> {
+) -> ModernApiResult<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let t_id = user_auth.scoped_user.tenant_id.clone();

@@ -3,7 +3,7 @@ use api_core::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use paperclip::actix::{
     api_v2_operation,
@@ -20,7 +20,7 @@ use webhooks::{
 async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::WebhookPortalResponse> {
+) -> ModernApiResult<api_wire_types::WebhookPortalResponse> {
     let auth = auth.check_guard(TenantGuard::ManageWebhooks)?;
     let is_live = auth.is_live()?;
 

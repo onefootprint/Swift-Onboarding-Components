@@ -1,4 +1,5 @@
 use super::ApiResult;
+use crate::types::ModernApiResult;
 use crate::{
     ApiError,
     ApiErrorKind,
@@ -23,6 +24,13 @@ impl<'a, T> From<AssertionError<'a>> for ApiResult<T> {
     }
 }
 
+impl<'a, T> From<AssertionError<'a>> for ModernApiResult<T> {
+    fn from(value: AssertionError<'a>) -> Self {
+        Err(ApiError::from(value).into())
+    }
+}
+
+
 #[derive(Debug)]
 /// Shorthand to make it convenient to make an HTTP 400 validation error.
 pub struct ValidationError<'a>(pub &'a str);
@@ -36,5 +44,11 @@ impl<'a> From<ValidationError<'a>> for ApiError {
 impl<'a, T> From<ValidationError<'a>> for ApiResult<T> {
     fn from(value: ValidationError<'a>) -> Self {
         Err(ApiError::from(value))
+    }
+}
+
+impl<'a, T> From<ValidationError<'a>> for ModernApiResult<T> {
+    fn from(value: ValidationError<'a>) -> Self {
+        Err(ApiError::from(value).into())
     }
 }

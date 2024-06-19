@@ -3,7 +3,7 @@ use api_core::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use db::models::proxy_config::ProxyConfig;
 use db::DbError;
@@ -23,7 +23,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     proxy_config_id: web::Path<ProxyConfigId>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

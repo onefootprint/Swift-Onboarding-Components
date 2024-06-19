@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
@@ -41,7 +41,7 @@ async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
-) -> JsonApiResponse<api_wire_types::OnboardingConfiguration> {
+) -> ModernApiResult<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;

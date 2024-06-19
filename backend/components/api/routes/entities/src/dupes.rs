@@ -5,7 +5,7 @@ use crate::auth::tenant::{
     TenantSessionAuth,
 };
 use crate::auth::Either;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::{
     get,
     State,
@@ -45,7 +45,7 @@ pub async fn get_dupes(
     state: web::Data<State>,
     request: FpIdPath,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<api_wire_types::Dupes> {
+) -> ModernApiResult<api_wire_types::Dupes> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

@@ -5,7 +5,7 @@ use crate::State;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use db::models::appearance::Appearance;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::DbResult;
@@ -29,7 +29,7 @@ use paperclip::actix::{
 pub fn get(
     state: web::Data<State>,
     auth: Either<ObConfigAuth, UserAuthContext>,
-) -> JsonApiResponse<api_wire_types::PublicOnboardingConfiguration> {
+) -> ModernApiResult<api_wire_types::PublicOnboardingConfiguration> {
     let (tenant, ob_config) = match auth {
         Either::Left(ob_pk_auth) => {
             // Support auth that identifies an ob config

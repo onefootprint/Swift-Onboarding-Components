@@ -8,7 +8,7 @@ use crate::utils::session::{
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::error_with_code::ErrorWithCode;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_wire_types::{
     D2pStatusResponse,
     D2pUpdateStatusRequest,
@@ -27,7 +27,7 @@ use paperclip::actix::{
     description = "Gets the status of the provided d2p session. Requires the d2p session token as the auth header."
 )]
 #[get("/hosted/onboarding/d2p/status")]
-pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> JsonApiResponse<D2pStatusResponse> {
+pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> ModernApiResult<D2pStatusResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let session = state
@@ -51,7 +51,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     request: Json<D2pUpdateStatusRequest>,
     state: web::Data<State>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let D2pUpdateStatusRequest { status } = request.into_inner();

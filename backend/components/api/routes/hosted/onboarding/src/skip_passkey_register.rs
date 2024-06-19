@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuthScope;
 use crate::errors::ApiError;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
@@ -25,7 +25,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     insights: InsightHeaders,
     request: OptionalJson<SkipPasskeyRegisterRequest, true>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let skip_context = request.0.and_then(|r| r.context);

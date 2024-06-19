@@ -578,6 +578,7 @@ dependencies = [
  "actix-web-prom",
  "alpaca",
  "anyhow",
+ "api_errors",
  "api_wire_types",
  "app-attest",
  "async-trait",
@@ -668,6 +669,18 @@ dependencies = [
  "webauthn-rs-proto",
  "webhooks",
  "workos",
+]
+
+[[package]]
+name = "api_errors"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "serde",
+ "serde_cbor",
+ "serde_json",
+ "thiserror",
+ "tracing",
 ]
 
 [[package]]

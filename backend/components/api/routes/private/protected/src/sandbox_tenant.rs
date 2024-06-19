@@ -17,7 +17,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::session::AuthSession;
 use db::models::tenant::{
     NewTenant,
@@ -45,7 +45,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<SandboxTenantRequest>,
     auth: FirmEmployeeAuthContext,
-) -> JsonApiResponse<SandboxTenantResponse> {
+) -> ModernApiResult<SandboxTenantResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
     let SandboxTenantRequest {
         name,

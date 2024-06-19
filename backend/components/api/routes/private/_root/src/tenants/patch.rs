@@ -4,7 +4,7 @@ use actix_web::{
 };
 use api_core::auth::protected_auth::ProtectedAuth;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::{
@@ -31,7 +31,7 @@ async fn patch(
     _: ProtectedAuth,
     id: web::Path<TenantId>,
     request: web::Json<api_wire_types::PrivatePatchTenant>,
-) -> JsonApiResponse<api_wire_types::PrivateTenantDetail> {
+) -> ModernApiResult<api_wire_types::PrivateTenantDetail> {
     let id = id.into_inner();
     let request = request.into_inner();
 

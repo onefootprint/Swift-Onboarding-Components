@@ -9,7 +9,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::hosted::tokens::{
     CreateUserTokenRequest,
@@ -27,7 +27,7 @@ use paperclip::actix::{
     description = "Returns information about a given auth token."
 )]
 #[actix::get("/hosted/user/token")]
-pub fn get(user_auth: UserAuthContext) -> JsonApiResponse<GetUserTokenResponse> {
+pub fn get(user_auth: UserAuthContext) -> ModernApiResult<GetUserTokenResponse> {
     let user_auth = user_auth.check_guard(Any)?;
 
     Ok(GetUserTokenResponse {
@@ -45,7 +45,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     request: web::Json<CreateUserTokenRequest>,
     state: web::Data<State>,
-) -> JsonApiResponse<CreateUserTokenResponse> {
+) -> ModernApiResult<CreateUserTokenResponse> {
     let user_auth = user_auth.check_guard(Any)?;
     let CreateUserTokenRequest { requested_scope } = request.into_inner();
 

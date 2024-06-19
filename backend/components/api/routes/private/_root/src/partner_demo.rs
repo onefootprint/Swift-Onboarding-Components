@@ -10,7 +10,7 @@ use api_core::auth::tenant::{
     FirmEmployeeGuard,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::session::AuthSession;
 use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
@@ -89,7 +89,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<CreatePartnerDemoRequest>,
     auth: FirmEmployeeAuthContext,
-) -> JsonApiResponse<CreatePartnerDemoResponse> {
+) -> ModernApiResult<CreatePartnerDemoResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
     let employee_user_id = auth.tenant_user.id.clone();
 

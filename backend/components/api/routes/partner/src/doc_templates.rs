@@ -1,4 +1,4 @@
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use api_core::auth::tenant::{
     CheckTenantGuard,
@@ -87,7 +87,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateComplianceDocTemplateRequest>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::ComplianceDocTemplate> {
+) -> ModernApiResult<api_wire_types::ComplianceDocTemplate> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageTemplates)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -139,7 +139,7 @@ pub async fn put(
     template_id: web::Path<ComplianceDocTemplateId>,
     request: web::Json<api_wire_types::UpdateComplianceDocTemplateRequest>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::ComplianceDocTemplate> {
+) -> ModernApiResult<api_wire_types::ComplianceDocTemplate> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageTemplates)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -188,7 +188,7 @@ pub async fn delete(
     state: web::Data<State>,
     template_id: web::Path<ComplianceDocTemplateId>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageTemplates)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();

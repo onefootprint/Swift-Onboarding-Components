@@ -4,7 +4,7 @@ use crate::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use api_core::decision::review::save_review_decision;
 use api_core::errors::onboarding::OnboardingError;
@@ -33,7 +33,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<ManualDecisionRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

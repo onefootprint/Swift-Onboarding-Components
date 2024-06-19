@@ -9,7 +9,7 @@ use api_core::auth::tenant::{
     FirmEmployeeGuard,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_wire_types::CompliancePartnershipRequest;
 use chrono::{
     DateTime,
@@ -47,7 +47,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<CompliancePartnershipRequest>,
     auth: FirmEmployeeAuthContext,
-) -> JsonApiResponse<TenantCompliancePartnershipResponse> {
+) -> ModernApiResult<TenantCompliancePartnershipResponse> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
 
     let partnership = state

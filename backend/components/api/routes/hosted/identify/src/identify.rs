@@ -13,7 +13,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::session::AuthSession;
 use api_core::State;
@@ -59,7 +59,7 @@ pub async fn post(
     // for the authed user
     user_auth: Option<UserAuthContext>,
     root_span: RootSpan,
-) -> JsonApiResponse<IdentifyResponse> {
+) -> ModernApiResult<IdentifyResponse> {
     let IdentifyRequest {
         identifier,
         email,

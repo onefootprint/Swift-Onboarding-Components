@@ -2,7 +2,7 @@ use api_core::auth::tenant::{
     AnyPartnerTenantSessionAuth,
     InvalidateAuth,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use paperclip::actix::{
     api_v2_operation,
@@ -18,7 +18,7 @@ use paperclip::actix::{
 async fn handler(
     state: web::Data<State>,
     auth: AnyPartnerTenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     auth.invalidate(&state).await?;
     Ok(api_wire_types::Empty)
 }

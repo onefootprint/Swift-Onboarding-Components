@@ -5,7 +5,7 @@ use crate::auth::tenant::{
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::CreateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
@@ -25,7 +25,7 @@ pub async fn post(
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
     request: Json<CreateLabelRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::Labels)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();
@@ -51,7 +51,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<api_wire_types::UserLabel> {
+) -> ModernApiResult<api_wire_types::UserLabel> {
     auth.check_preview_guard(PreviewApi::Labels)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();

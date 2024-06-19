@@ -17,7 +17,7 @@ use api_core::errors::{
     ApiResult,
     AssertionError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::{
     Any,
     VaultWrapper,
@@ -87,7 +87,7 @@ pub async fn evaluate_rule(
     auth: TenantSessionAuth,
     ob_config_id: web::Path<ObConfigurationId>,
     request: Json<EvaluateRuleRequest>,
-) -> JsonApiResponse<api_wire_types::RuleEvalResults> {
+) -> ModernApiResult<api_wire_types::RuleEvalResults> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?; // TODO: new guard for this ?
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

@@ -7,7 +7,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::UpdateListRequest;
 use db::models::list::List;
@@ -25,7 +25,7 @@ pub async fn patch(
     auth: TenantSessionAuth,
     list_id: web::Path<ListId>,
     request: web::Json<UpdateListRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

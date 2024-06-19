@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use db::models::vault_dr::VaultDrConfig;
 use paperclip::actix::{
@@ -20,7 +20,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<api_wire_types::VaultDrStatus> {
+) -> ModernApiResult<api_wire_types::VaultDrStatus> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

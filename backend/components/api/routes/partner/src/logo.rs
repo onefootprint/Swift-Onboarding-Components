@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     PartnerTenantGuard,
     PartnerTenantSessionAuth,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::partner_tenant::{
@@ -28,7 +28,7 @@ pub async fn put(
     auth: PartnerTenantSessionAuth,
     payload: Multipart,
     request: HttpRequest,
-) -> JsonApiResponse<api_wire_types::PartnerOrganization> {
+) -> ModernApiResult<api_wire_types::PartnerOrganization> {
     let auth = auth.check_guard(PartnerTenantGuard::Admin)?;
     let pt_id = auth.partner_tenant().id.clone();
 

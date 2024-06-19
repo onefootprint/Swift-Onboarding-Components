@@ -6,7 +6,7 @@ use actix_web::{
 };
 use api_core::decision::vendor::samba::license_validation::CreateOrderContext;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::{
     decision,
     State,
@@ -32,7 +32,7 @@ pub async fn create_samba_order(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<CreateSambaOrderRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let CreateSambaOrderRequest { fp_id, data } = request.into_inner();
 
     let di = state

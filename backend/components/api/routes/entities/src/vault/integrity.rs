@@ -3,7 +3,7 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -67,7 +67,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> JsonApiResponse<IntegrityResponse> {
+) -> ModernApiResult<IntegrityResponse> {
     auth.check_preview_guard(PreviewApi::VaultIntegrity)?;
     // TODO: should we add a separate guard for checking integrity?
     // This is incorrect - won't change though since we are deprecating this soon

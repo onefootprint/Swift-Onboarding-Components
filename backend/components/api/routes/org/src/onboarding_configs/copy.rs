@@ -9,7 +9,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::{
     State,
@@ -59,7 +59,7 @@ async fn post(
     // tenant to where we'll copy the playbook.
     // NOTE: x-is-live and x-allow-assumed-writes are shared between both auth extractors unfort
     target_auth: Option<TenantSessionAuth<true>>,
-) -> JsonApiResponse<api_wire_types::OnboardingConfiguration> {
+) -> ModernApiResult<api_wire_types::OnboardingConfiguration> {
     let (source_auth, target_actor, target_tenant) = if let Some(target_auth) = target_auth {
         // Copying into another tenant. Check read permissions at source tenant and write at destination
         let source_auth = source_auth.check_guard(TenantGuard::Read)?;

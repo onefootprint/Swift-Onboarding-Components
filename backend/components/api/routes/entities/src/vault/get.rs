@@ -6,7 +6,7 @@ use crate::auth::tenant::{
 };
 use crate::auth::Either;
 use crate::errors::ApiError;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use actix_web::web::Query;
@@ -66,7 +66,7 @@ pub async fn get(
     path: FpIdPath,
     request: Query<FieldsParams>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<GetVaultResponse> {
+) -> ModernApiResult<GetVaultResponse> {
     let fp_id = path.into_inner();
     let FieldsParams { fields } = request.into_inner();
 

@@ -8,7 +8,7 @@ use api_core::auth::tenant::{
 };
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::scoped_vault::{
@@ -22,7 +22,7 @@ async fn get(
     auth: FirmEmployeeAuthContext,
     id: web::Path<String>,
     root_span: RootSpan,
-) -> JsonApiResponse<api_wire_types::SuperAdminEntity> {
+) -> ModernApiResult<api_wire_types::SuperAdminEntity> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
     let id = id.into_inner();
 

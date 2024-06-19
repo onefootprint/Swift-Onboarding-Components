@@ -13,7 +13,7 @@ use api_core::auth::session::sdk_args::{
 };
 use api_core::auth::session::AuthSessionData;
 use api_core::errors::ValidationError;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::ApiErrorKind;
 use chrono::{
     DateTime,
@@ -59,7 +59,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<RevealRequest>,
     _: ProtectedAuth,
-) -> JsonApiResponse<RevealResponse> {
+) -> ModernApiResult<RevealResponse> {
     let RevealRequest { token, hash } = request.into_inner();
 
     let token_hash = match (token, hash) {

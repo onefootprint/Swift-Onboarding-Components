@@ -7,7 +7,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use chrono::Utc;
 use db::models::compliance_doc::ComplianceDoc;
@@ -35,7 +35,7 @@ pub async fn post(
     auth: TenantSessionAuth,
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocRequestId)>,
     request: web::Json<api_wire_types::SubmitExternalUrlRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManageComplianceDocSubmission)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

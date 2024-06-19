@@ -9,7 +9,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::{
     VaultWrapper,
     VwArgs,
@@ -38,7 +38,7 @@ pub async fn post(
     request: Json<RawDataRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> JsonApiResponse<KbaResponse> {
+) -> ModernApiResult<KbaResponse> {
     let user_auth = user_auth.check_guard(Any)?;
 
     // We reuse the same request structure that is used for adding data to the vault. This lets us

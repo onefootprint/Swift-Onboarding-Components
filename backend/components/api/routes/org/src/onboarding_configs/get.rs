@@ -5,7 +5,7 @@ use api_core::auth::tenant::{
 };
 use api_core::errors::ApiResult;
 use api_core::types::{
-    JsonApiResponse,
+    ModernApiResult,
     OffsetPaginatedResponse,
     OffsetPaginationRequest,
 };
@@ -86,7 +86,7 @@ async fn get_detail(
     state: web::Data<State>,
     ob_config_id: web::Path<ObConfigurationId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::OnboardingConfiguration> {
+) -> ModernApiResult<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

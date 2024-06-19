@@ -6,7 +6,7 @@ use crate::decision::vendor::{
     middesk,
     VendorAPIError,
 };
-use crate::types::error::ApiResponseError;
+use crate::types::SerializedApiResponse;
 use crate::utils::body_bytes::InvalidBodyError;
 use actix_web::error::{
     JsonPayloadError,
@@ -23,7 +23,6 @@ use newtypes::{
     ContactInfoKind,
     DataIdentifier,
     FilterFunction,
-    Uuid,
 };
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
@@ -116,10 +115,6 @@ pub enum ApiErrorKind {
     WorkOsError(#[from] workos::WorkOsError),
     #[error("{0}")]
     Webauthn(#[from] WebauthnError),
-    #[error("No phone number for vault")]
-    NoPhoneNumberForVault,
-    #[error("No email for vault")]
-    NoEmailForVault,
     #[error("No {0} in vault")]
     ContactInfoKindNotInVault(ContactInfoKind),
     #[error("{0}")]
@@ -327,17 +322,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
     }
 }
 
-impl ApiError {
-    fn message(&self) -> String {
-        match self.0.as_ref() {
-            ApiErrorKind::Twilio(e) => e.message(),
-            ApiErrorKind::Database(e) => e.message(),
-            _ => self.to_string(),
-        }
-    }
-}
-
-impl actix_web::ResponseError for ApiError {
+impl api_errors::FpApiError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self.0.as_ref() {
             ApiErrorKind::ErrorWithCode(e) => e.status_code(),
@@ -380,8 +365,6 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::Database(e) => status_code_for_db_error(e),
             ApiErrorKind::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
-            ApiErrorKind::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::NoEmailForVault => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::ContactInfoKindNotInVault(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -467,33 +450,33 @@ impl actix_web::ResponseError for ApiError {
         }
     }
 
-    fn error_response(&self) -> actix_web::HttpResponse<actix_web::body::BoxBody> {
-        let support_id = Uuid::new_v4();
-        let status_code = self.status_code().as_u16();
-
-        // Some errors have specific error codes and context
+    fn code(&self) -> Option<String> {
         let error_with_code = match self.kind() {
             ApiErrorKind::ErrorWithCode(e) => Some(e as &dyn CodedError),
             ApiErrorKind::TfError(e) => Some(e as &dyn CodedError),
             _ => None,
         };
-        let code = error_with_code.map(|e| e.code());
-        let context = error_with_code.and_then(|e| e.context());
-        let message = self.message();
+        error_with_code.map(|e| e.code())
+    }
 
-        // in prod, omit 500 errors from the client
-        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR
-            && crate::config::SERVICE_CONFIG.is_production()
-        {
-            tracing::error!(err=?self, support_id=support_id.to_string(), status_code, "returning api 500: {}", self.to_string());
-            "Something went wrong".to_string()
-        } else {
-            tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api {}", status_code);
-            message
+    fn context(&self) -> Option<serde_json::Value> {
+        let error_with_code = match self.kind() {
+            ApiErrorKind::ErrorWithCode(e) => Some(e as &dyn CodedError),
+            ApiErrorKind::TfError(e) => Some(e as &dyn CodedError),
+            _ => None,
         };
+        error_with_code.and_then(|e| e.context())
+    }
 
-        let mut resp = actix_web::HttpResponse::build(self.status_code());
+    fn message(&self) -> String {
+        match self.0.as_ref() {
+            ApiErrorKind::Twilio(e) => e.message(),
+            ApiErrorKind::Database(e) => e.message(),
+            _ => self.to_string(),
+        }
+    }
 
+    fn mutate_response(&self, resp: &mut actix_web::HttpResponseBuilder) {
         // Failing to close the TCP connection after sending a timeout response allows clients to
         // continue sending request data even server has sent an error response. This would create
         // unneccesary work for both the server and the client.
@@ -512,8 +495,40 @@ impl actix_web::ResponseError for ApiError {
             }
             _ => {}
         };
+    }
+}
 
-        resp.json(ApiResponseError {
+use api_errors::FpApiError;
+use newtypes::Uuid;
+
+impl actix_web::ResponseError for ApiError {
+    fn status_code(&self) -> StatusCode {
+        FpApiError::status_code(self)
+    }
+
+    fn error_response(&self) -> actix_web::HttpResponse<actix_web::body::BoxBody> {
+        let support_id = Uuid::new_v4();
+        let status_code = FpApiError::status_code(self);
+
+        // Some errors have specific error codes and context
+        let code = FpApiError::code(self);
+        let context = FpApiError::context(self);
+        let message = FpApiError::message(self);
+
+        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR {
+            // Hide HTTP 500 error messages from client.
+            // It would be nice to be able to show the error messages in dev
+            tracing::error!(err=?self, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api 500: {}", self.to_string());
+            "Something went wrong".to_string()
+        } else {
+            tracing::info!(error=?self, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api {}", status_code);
+            message
+        };
+
+        let mut resp = actix_web::HttpResponse::build(status_code);
+        FpApiError::mutate_response(self, &mut resp);
+
+        resp.json(SerializedApiResponse {
             message,
             code,
             context,

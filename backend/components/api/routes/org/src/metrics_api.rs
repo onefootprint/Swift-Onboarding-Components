@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::OrgMetricsRequest;
 use db::scoped_vault::{
@@ -30,7 +30,7 @@ async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     filters: web::Query<OrgMetricsRequest>,
-) -> JsonApiResponse<api_wire_types::OrgMetrics> {
+) -> ModernApiResult<api_wire_types::OrgMetrics> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

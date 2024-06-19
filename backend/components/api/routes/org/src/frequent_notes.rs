@@ -6,7 +6,7 @@ use api_core::auth::tenant::{
 use api_core::errors::tenant::TenantError;
 use api_core::types::{
     JsonApiListResponse,
-    JsonApiResponse,
+    ModernApiResult,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -53,7 +53,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateOrgFrequentNoteRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::OrgFrequentNote> {
+) -> ModernApiResult<api_wire_types::OrgFrequentNote> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
 
@@ -82,7 +82,7 @@ pub async fn delete(
     state: web::Data<State>,
     frequent_note_id: web::Path<TenantFrequentNoteId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
 

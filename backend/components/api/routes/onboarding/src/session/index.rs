@@ -4,7 +4,7 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
 };
 use crate::errors::ApiResult;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::session::AuthSession;
 use crate::State;
 use api_core::auth::session::ob_config::OnboardingSession;
@@ -44,7 +44,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<CreateOnboardingSessionRequest>,
-) -> JsonApiResponse<ObConfigSessionToken> {
+) -> ModernApiResult<ObConfigSessionToken> {
     auth.check_preview_guard(PreviewApi::OnboardingSessionToken)?;
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
     let tenant = auth.tenant().clone();

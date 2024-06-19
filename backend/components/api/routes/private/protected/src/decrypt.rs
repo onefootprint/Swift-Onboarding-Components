@@ -5,7 +5,7 @@ use actix_web::{
     web,
 };
 use api_core::decision::vendor;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::{
     ApiErrorKind,
     State,
@@ -34,7 +34,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<DecryptVresRequest>,
     _: ProtectedAuth,
-) -> JsonApiResponse<DecryptVresResponse> {
+) -> ModernApiResult<DecryptVresResponse> {
     let DecryptVresRequest { vres_id } = request.into_inner();
 
     let (vres, uv) = state

@@ -1,0 +1,16 @@
+[package]
+name = "api_errors"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[lib]
+doctest = false
+
+[dependencies]
+thiserror = { workspace = true }
+serde_json = { workspace = true }
+serde_cbor = { workspace = true }
+actix-web = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true }

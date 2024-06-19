@@ -7,7 +7,7 @@ use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::session::AuthSession;
 use chrono::Duration;
 use db::models::partner_tenant::{
@@ -57,7 +57,7 @@ async fn post(
     request: web::Json<NewClientRequest>,
     _custodian: CustodianAuthContext,
     state: web::Data<State>,
-) -> JsonApiResponse<NewClientResponse> {
+) -> ModernApiResult<NewClientResponse> {
     let NewClientRequest { id, name } = request.into_inner();
     if !id.is_integration_test_tenant() {
         // All integration testing partner tenant primary keys have a reserved prefix that signals

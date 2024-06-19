@@ -7,7 +7,7 @@ use api_core::auth::tenant::{
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::serializers::IsDomainAlreadyClaimed;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::UpdateTenantRequest;
@@ -29,7 +29,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::Organization> {
+) -> ModernApiResult<api_wire_types::Organization> {
     let auth = auth.check_guard(TenantGuard::Read)?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
 
@@ -59,7 +59,7 @@ async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::Organization> {
+) -> ModernApiResult<api_wire_types::Organization> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
 

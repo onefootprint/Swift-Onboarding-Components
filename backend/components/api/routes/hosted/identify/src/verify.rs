@@ -27,7 +27,7 @@ use api_core::errors::{
     ValidationError,
 };
 use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::WebauthnConfig;
@@ -87,7 +87,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     insight_headers: InsightHeaders,
     root_span: RootSpan,
-) -> JsonApiResponse<IdentifyVerifyResponse> {
+) -> ModernApiResult<IdentifyVerifyResponse> {
     // Note: Challenge::unseal checks for challenge token expiry as well
     let IdentifyVerifyRequest {
         challenge_token,

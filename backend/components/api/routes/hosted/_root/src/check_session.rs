@@ -1,6 +1,6 @@
 use crate::State;
 use api_core::auth::session::check::CheckSessionContext;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use paperclip::actix::{
     self,
     api_v2_operation,
@@ -27,7 +27,7 @@ pub enum CheckSessionResponse {
 pub async fn get(
     _state: web::Data<State>,
     session_check: CheckSessionContext,
-) -> JsonApiResponse<CheckSessionResponse> {
+) -> ModernApiResult<CheckSessionResponse> {
     let data = match session_check {
         CheckSessionContext::Active => CheckSessionResponse::Active,
         CheckSessionContext::Expired => CheckSessionResponse::Expired,

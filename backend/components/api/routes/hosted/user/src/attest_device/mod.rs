@@ -2,8 +2,7 @@ use crate::auth::user::{
     UserAuthContext,
     UserAuthScope,
 };
-use crate::errors::ApiError;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use actix_web::web::Json;
 use api_core::decision::vendor;
@@ -62,7 +61,7 @@ pub async fn post_challenge(
     request: Json<GetDeviceAttestationChallengeRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> JsonApiResponse<DeviceAttestationChallengeResponse> {
+) -> ModernApiResult<DeviceAttestationChallengeResponse> {
     let _ = user_auth.check_guard(UserAuthScope::SignUp)?;
     let GetDeviceAttestationChallengeRequest {
         device_type,
@@ -103,7 +102,7 @@ pub async fn post_attestation(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insight: InsightHeaders,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let CreateDeviceAttestationRequest {
@@ -120,7 +119,7 @@ pub async fn post_attestation(
     } = Challenge::unseal_string(&state.challenge_sealing_key, sealed_state)?.data;
 
     let Some(tenant) = auth.tenant() else {
-        return Err(ApiError::from(MissingTenant));
+        return Err(MissingTenant.into());
     };
 
     let vault_id = auth.user.id.clone();

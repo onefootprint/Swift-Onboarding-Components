@@ -16,7 +16,7 @@ use api_core::errors::{
     DryRunResultTrait,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::{
     Any,
     TenantVw,
@@ -63,7 +63,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<BackfillRequest<ScopedVaultId>>,
     _: ProtectedAuth,
-) -> JsonApiResponse<BackfillResponse<Vec<ScopedVaultId>, ScopedVaultId>> {
+) -> ModernApiResult<BackfillResponse<Vec<ScopedVaultId>, ScopedVaultId>> {
     let BackfillRequest {
         dry_run,
         limit,

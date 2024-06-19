@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiError;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
@@ -26,7 +26,7 @@ async fn post(
     state: web::Data<State>,
     meta_id: web::Path<TenantIosAppMetaId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::TenantIosAppMeta> {
+) -> ModernApiResult<api_wire_types::TenantIosAppMeta> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let meta_id = meta_id.into_inner();

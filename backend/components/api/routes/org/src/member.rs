@@ -10,7 +10,7 @@ use api_core::auth::{
     Either,
 };
 use api_core::errors::tenant::TenantError;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_user::{
@@ -33,7 +33,7 @@ use paperclip::actix::{
 async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::AuthOrgMember> {
+) -> ModernApiResult<api_wire_types::AuthOrgMember> {
     let rb = match &auth {
         Either::Left(a) => a.rolebinding().cloned(),
         Either::Right(_) => None,
@@ -66,7 +66,7 @@ async fn patch(
     request: web::Json<UpdateTenantUserRequest>,
     // Weird to take in an impersonation token here, so we only take TenantRbAuth
     auth: TenantRbAuthContext,
-) -> JsonApiResponse<api_wire_types::AuthOrgMember> {
+) -> ModernApiResult<api_wire_types::AuthOrgMember> {
     let scopes = auth.token_scopes();
     let rb = auth.rolebinding().cloned();
     let auth = auth.check_guard(Any)?;

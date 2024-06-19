@@ -5,7 +5,7 @@ use api_core::auth::tenant::{
 };
 use api_core::types::{
     JsonApiListResponse,
-    JsonApiResponse,
+    ModernApiResult,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -63,7 +63,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantAndroidAppMetaRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::TenantAndroidAppMeta> {
+) -> ModernApiResult<api_wire_types::TenantAndroidAppMeta> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -112,7 +112,7 @@ async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<TenantAndroidAppMetaId>,
     request: web::Json<UpdateTenantAndroidAppMetaRequest>,
-) -> JsonApiResponse<api_wire_types::TenantAndroidAppMeta> {
+) -> ModernApiResult<api_wire_types::TenantAndroidAppMeta> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

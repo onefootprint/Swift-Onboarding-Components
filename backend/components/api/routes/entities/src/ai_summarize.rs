@@ -3,7 +3,7 @@ use crate::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -50,7 +50,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<UserAiSummary> {
+) -> ModernApiResult<UserAiSummary> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

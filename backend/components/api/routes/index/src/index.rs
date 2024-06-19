@@ -1,5 +1,5 @@
 use crate::types::{
-    JsonApiResponse,
+    ModernApiResult,
     StringResponse,
 };
 use actix_web::HttpRequest;
@@ -11,7 +11,7 @@ use paperclip::actix::{
 #[api_v2_operation(tags(Private))]
 #[tracing::instrument(name = "index")]
 #[get("/")]
-async fn root() -> JsonApiResponse<api_wire_types::Empty> {
+async fn root() -> ModernApiResult<api_wire_types::Empty> {
     Ok(api_wire_types::Empty)
 }
 

@@ -5,7 +5,7 @@ use api_core::auth::tenant::{
     TenantGuard,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::{
     ApiErrorKind,
     State,
@@ -28,7 +28,7 @@ use paperclip::actix::{
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<api_wire_types::VaultDrAwsPreEnrollResponse> {
+) -> ModernApiResult<api_wire_types::VaultDrAwsPreEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
@@ -59,7 +59,7 @@ pub async fn post(
 pub async fn get(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<api_wire_types::VaultDrAwsPreEnrollResponse> {
+) -> ModernApiResult<api_wire_types::VaultDrAwsPreEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

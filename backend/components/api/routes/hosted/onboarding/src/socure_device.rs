@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuthScope;
 use crate::errors::ApiError;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use actix_web::web::Json;
 use api_core::auth::user::UserWfAuthContext;
@@ -22,7 +22,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     request: Json<SocureDeviceSessionIdRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let wf_id = user_auth.workflow().id.clone();
 

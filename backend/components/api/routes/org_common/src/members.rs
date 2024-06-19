@@ -7,7 +7,7 @@ use api_core::auth::tenant::{
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::types::{
-    JsonApiResponse,
+    ModernApiResult,
     OffsetPaginatedResponse,
     OffsetPaginationRequest,
 };
@@ -78,7 +78,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantUserRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::OrganizationMember> {
+) -> ModernApiResult<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let actor = auth.actor();
@@ -128,7 +128,7 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRolebindingRequest>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::OrganizationMember> {
+) -> ModernApiResult<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let actor = auth.actor();
@@ -164,7 +164,7 @@ pub async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let actor = auth.actor();

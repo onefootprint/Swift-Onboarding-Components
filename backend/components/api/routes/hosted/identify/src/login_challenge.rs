@@ -13,7 +13,7 @@ use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiError;
 use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
@@ -58,7 +58,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     root_span: RootSpan,
-) -> JsonApiResponse<LoginChallengeResponse> {
+) -> ModernApiResult<LoginChallengeResponse> {
     let LoginChallengeRequest { challenge_kind } = request.into_inner();
     let user_auth = user_auth.check_guard(Any)?;
     let token = user_auth.auth_token.clone();

@@ -8,7 +8,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::State;
 use chrono::Utc;
@@ -48,7 +48,7 @@ pub async fn post(
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocRequestId)>,
     mut payload: Multipart,
     request: HttpRequest,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManageComplianceDocSubmission)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

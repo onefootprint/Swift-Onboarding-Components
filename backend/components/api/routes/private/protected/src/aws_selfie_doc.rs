@@ -6,7 +6,7 @@ use actix_web::{
     web,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::{
     EnclaveDecryptOperation,
     Pii,
@@ -42,7 +42,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<CompareAnalyzeRequest>,
     _: ProtectedAuth,
-) -> JsonApiResponse<ComparisonAndDocOcrResult> {
+) -> ModernApiResult<ComparisonAndDocOcrResult> {
     let CompareAnalyzeRequest {
         fp_id,
         document_id,

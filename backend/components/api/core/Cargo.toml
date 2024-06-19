@@ -116,6 +116,8 @@ selfie_doc = { path = "../../selfie_doc" }
 diesel = { workspace = true }
 openai = { workspace = true }
 
+api_errors = { path = "../errors" }
+
 [dev-dependencies]
 test-case = { workspace = true }
 enclave = { path = "../../enclave/enclave" }

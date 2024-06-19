@@ -4,7 +4,7 @@ use crate::auth::tenant::{
     TenantGuard,
 };
 use crate::errors::ApiResult;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::errors::ValidationError;
@@ -81,7 +81,7 @@ pub async fn delete(
     request: Json<DeleteRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-) -> JsonApiResponse<DeleteVaultResponse> {
+) -> ModernApiResult<DeleteVaultResponse> {
     let fp_id = path.into_inner();
     let DeleteRequest { fields, delete_all } = request.into_inner();
     let delete_all = delete_all.unwrap_or_default();

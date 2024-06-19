@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiError;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
@@ -26,7 +26,7 @@ async fn post(
     state: web::Data<State>,
     meta_id: web::Path<TenantAndroidAppMetaId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::TenantAndroidAppMeta> {
+) -> ModernApiResult<api_wire_types::TenantAndroidAppMeta> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let meta_id = meta_id.into_inner();

@@ -3,7 +3,7 @@ use crate::auth::tenant::{
     SecretTenantAuthContext,
     TenantGuard,
 };
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
 use api_core::auth::tenant::{
@@ -53,7 +53,7 @@ pub async fn post(
     // For now, only accept tenant API key
     auth: SecretTenantAuthContext,
     root_span: RootSpan,
-) -> JsonApiResponse<CreateClientTokenResponse> {
+) -> ModernApiResult<CreateClientTokenResponse> {
     let CreateClientTokenRequest {
         fields,
         ttl,

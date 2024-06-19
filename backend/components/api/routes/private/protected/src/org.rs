@@ -9,7 +9,7 @@ use actix_web::{
     web,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::{
@@ -37,7 +37,7 @@ pub async fn update_business_info(
     _: ProtectedAuth,
     path: web::Path<TenantId>,
     request: Json<UpdateBusinessInfoRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -75,7 +75,7 @@ pub async fn get_business_info(
     state: web::Data<State>,
     _: ProtectedAuth,
     path: web::Path<TenantId>,
-) -> JsonApiResponse<Option<api_wire_types::TenantBusinessInfo>> {
+) -> ModernApiResult<Option<api_wire_types::TenantBusinessInfo>> {
     let (tenant, tbi) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {

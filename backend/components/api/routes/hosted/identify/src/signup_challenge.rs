@@ -11,12 +11,11 @@ use api_core::errors::challenge::ChallengeError;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
 use api_core::errors::{
-    ApiError,
     ApiResult,
     ValidationError,
 };
 use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::headers::{
@@ -72,7 +71,7 @@ pub async fn post(
     sandbox_id: SandboxId,
     is_components_sdk: IsComponentsSdk,
     root_span: RootSpan,
-) -> JsonApiResponse<SignupChallengeResponse> {
+) -> ModernApiResult<SignupChallengeResponse> {
     let SignupChallengeRequest {
         phone_number: phone,
         email,
@@ -184,9 +183,7 @@ pub async fn post(
         let tenant = ob_context.tenant();
 
         if !obc.is_no_phone_flow {
-            return Err(ApiError::from(ChallengeError::ChallengeKindNotAllowed(
-                "email".to_string(),
-            )));
+            return Err(ChallengeError::ChallengeKindNotAllowed("email".to_string()).into());
         };
 
         let challenge_data = send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;

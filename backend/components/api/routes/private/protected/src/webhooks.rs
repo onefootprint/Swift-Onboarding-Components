@@ -9,7 +9,7 @@ use api_core::errors::{
     AssertionError,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::{
     task,
     State,
@@ -54,7 +54,7 @@ async fn post(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<PostWebhooksRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let PostWebhooksRequest {
         fp_ids,
         kind,

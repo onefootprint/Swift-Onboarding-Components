@@ -7,7 +7,7 @@ use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
 use api_core::types::{
     JsonApiListResponse,
-    JsonApiResponse,
+    ModernApiResult,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::{
@@ -40,7 +40,7 @@ pub async fn post(
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
     request: Json<CreateTagRequest>,
-) -> JsonApiResponse<api_wire_types::UserTag> {
+) -> ModernApiResult<api_wire_types::UserTag> {
     auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();
@@ -98,7 +98,7 @@ pub async fn delete(
     state: web::Data<State>,
     path: FpIdPathPlus<TagId>,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();

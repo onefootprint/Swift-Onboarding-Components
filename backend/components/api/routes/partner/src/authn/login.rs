@@ -1,4 +1,4 @@
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::{
     OrgLoginResponse,
@@ -20,7 +20,7 @@ use paperclip::actix::{
 async fn handler(
     state: web::Data<State>,
     request: web::Json<PartnerLoginRequest>,
-) -> JsonApiResponse<OrgLoginResponse> {
+) -> ModernApiResult<OrgLoginResponse> {
     let request = request.into_inner();
     let data = api_route_org_common::login::handle_login(
         state,

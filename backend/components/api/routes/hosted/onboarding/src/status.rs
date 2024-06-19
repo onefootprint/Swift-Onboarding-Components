@@ -3,7 +3,7 @@ use crate::errors::ApiError;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_wire_types::hosted::onboarding_status::{
@@ -37,7 +37,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     insights: InsightHeaders,
-) -> JsonApiResponse<OnboardingStatusResponse> {
+) -> ModernApiResult<OnboardingStatusResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     if user_auth.tenant().id.is_flexcar() {

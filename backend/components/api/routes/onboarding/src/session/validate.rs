@@ -10,7 +10,7 @@ use api_core::auth::tenant::{
 };
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_wire_types::{
     EntityValidateResponse,
@@ -48,7 +48,7 @@ pub async fn post(
     request: web::Json<ValidateRequest>,
     auth: SecretTenantAuthContext,
     root_span: RootSpan,
-) -> JsonApiResponse<ValidateResponse> {
+) -> ModernApiResult<ValidateResponse> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
 
     root_span.record("auth_token_hash", request.validation_token.id().to_string());

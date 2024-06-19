@@ -3,7 +3,7 @@ use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_wire_types::hosted::consent::ConsentRequest;
 use chrono::Utc;
 use db::models::insight_event::CreateInsightEvent;
@@ -25,7 +25,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     insight: InsightHeaders,
     request: Json<ConsentRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let wf_id = user_auth.workflow().clone();
 

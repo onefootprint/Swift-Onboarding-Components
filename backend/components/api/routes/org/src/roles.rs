@@ -1,7 +1,7 @@
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::{
-    JsonApiResponse,
+    ModernApiResult,
     OffsetPaginationRequest,
 };
 use api_core::State;
@@ -39,7 +39,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantRoleRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::OrganizationRole> {
+) -> ModernApiResult<api_wire_types::OrganizationRole> {
     roles_common::post(state, request, auth.into()).await
 }
 
@@ -53,7 +53,7 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::OrganizationRole> {
+) -> ModernApiResult<api_wire_types::OrganizationRole> {
     roles_common::patch(state, request, role_id, auth.into()).await
 }
 
@@ -66,6 +66,6 @@ pub async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::OrganizationRole> {
+) -> ModernApiResult<api_wire_types::OrganizationRole> {
     roles_common::deactivate(state, role_id, auth.into()).await
 }

@@ -2,7 +2,7 @@ use crate::auth::user::UserAuthScope;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::headers::InsightHeaders;
 use api_wire_types::{
     CreateDocumentRequest,
@@ -26,7 +26,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     request: web::Json<CreateDocumentRequest>,
     insight: InsightHeaders,
-) -> JsonApiResponse<CreateDocumentResponse> {
+) -> ModernApiResult<CreateDocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let insight = CreateInsightEvent::from(insight);

@@ -28,7 +28,7 @@ use api_core::decision::{
 };
 use api_core::errors::cip_error::CipError;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::{
     DecryptUncheckedResult,
@@ -116,7 +116,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCipRequest>,
     fp_id: FpIdPath,
-) -> JsonApiResponse<AlpacaCipResponse> {
+) -> ModernApiResult<AlpacaCipResponse> {
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let AlpacaCipRequest {
         api_key,
@@ -170,7 +170,7 @@ pub async fn post_old(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<DeprecatedAlpacaCipRequest>,
-) -> JsonApiResponse<AlpacaCipResponse> {
+) -> ModernApiResult<AlpacaCipResponse> {
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
@@ -207,7 +207,7 @@ pub async fn post_inner(
     is_live: bool,
     tenant_id: TenantId,
     request: DeprecatedAlpacaCipRequest,
-) -> JsonApiResponse<AlpacaCipResponse> {
+) -> ModernApiResult<AlpacaCipResponse> {
     tracing::info!(%request.fp_user_id, %request.hostname, %request.account_id, "/integrations/alpaca/cip request");
 
     // make the client

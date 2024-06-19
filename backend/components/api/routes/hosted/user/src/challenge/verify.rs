@@ -14,7 +14,7 @@ use api_core::errors::{
     AssertionError,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::{
@@ -68,7 +68,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insights: InsightHeaders,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let user_auth = user_auth
         .check_guard(UserAuthScope::ExplicitAuth.and(UserAuthScope::Auth.or(UserAuthScope::SignUp)))?;
     let sv_id = user_auth

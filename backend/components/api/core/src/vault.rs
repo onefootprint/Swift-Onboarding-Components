@@ -9,7 +9,7 @@ use crate::errors::{
     ValidationError,
 };
 use crate::telemetry::RootSpan;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::actix::OptionalJson;
 use crate::utils::db2api::DbToApi;
 use crate::utils::headers::{
@@ -59,7 +59,7 @@ pub async fn create_non_portable_vault(
     external_id: ExternalId,
     vault_kind: VaultKind,
     root_span: RootSpan,
-) -> JsonApiResponse<api_wire_types::LiteUser> {
+) -> ModernApiResult<api_wire_types::LiteUser> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
     let insight = CreateInsightEvent::from(insight);

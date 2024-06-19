@@ -14,7 +14,7 @@ use api_core::auth::tenant::{
 };
 use api_core::auth::AuthError;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::State;
@@ -40,7 +40,7 @@ async fn post(
     state: web::Data<State>,
     auth: FirmEmployeeAuthContext,
     request: Json<AssumeRequest>,
-) -> JsonApiResponse<AssumeResponse> {
+) -> ModernApiResult<AssumeResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
     let auth_method = auth.auth_method;
     let firm_employee = auth.tenant_user.clone();

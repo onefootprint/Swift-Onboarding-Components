@@ -7,7 +7,7 @@ use api_core::errors::proxy::VaultProxyError;
 use api_core::proxy::ssrf_protection::validate_safe_url;
 use api_core::types::{
     JsonApiListResponse,
-    JsonApiResponse,
+    ModernApiResult,
 };
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
@@ -77,7 +77,7 @@ pub async fn get_detail(
     state: web::Data<State>,
     proxy_config_id: web::Path<ProxyConfigId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::ProxyConfigDetailed> {
+) -> ModernApiResult<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -102,7 +102,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<CreateProxyConfigRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::ProxyConfigDetailed> {
+) -> ModernApiResult<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -211,7 +211,7 @@ pub async fn patch(
     request: Json<PatchProxyConfigRequest>,
     proxy_config_id: web::Path<ProxyConfigId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::ProxyConfigDetailed> {
+) -> ModernApiResult<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

@@ -5,7 +5,7 @@ use crate::auth::tenant::{
     TenantSessionAuth,
 };
 use crate::auth::Either;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::CanDecrypt;
@@ -180,7 +180,7 @@ pub async fn get_detail(
     state: web::Data<State>,
     request: web::Path<(FpId, RiskSignalId)>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::RiskSignalDetail> {
+) -> ModernApiResult<api_wire_types::RiskSignalDetail> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -205,7 +205,7 @@ pub async fn decrypt_aml_hits(
     request: web::Path<(FpId, RiskSignalId)>,
     auth: TenantSessionAuth,
     insights: InsightHeaders,
-) -> JsonApiResponse<api_wire_types::AmlDetail> {
+) -> ModernApiResult<api_wire_types::AmlDetail> {
     let read_auth = auth.clone().check_guard(TenantGuard::Read)?;
     let tenant_id = read_auth.tenant().id.clone();
     let is_live = read_auth.is_live()?;

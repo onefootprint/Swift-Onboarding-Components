@@ -7,7 +7,7 @@ use api_core::auth::tenant::{
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::types::{
-    JsonApiResponse,
+    ModernApiResult,
     OffsetPaginatedResponse,
     OffsetPaginationRequest,
 };
@@ -102,7 +102,7 @@ pub async fn post(
     // Don't allow updating an API key with an API key...
     auth: TenantSessionAuth,
     request: web::Json<CreateApiKeyRequest>,
-) -> JsonApiResponse<api_wire_types::SecretApiKey> {
+) -> ModernApiResult<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
@@ -145,7 +145,7 @@ pub async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<TenantApiKeyId>,
     request: web::Json<UpdateApiKeyRequest>,
-) -> JsonApiResponse<api_wire_types::SecretApiKey> {
+) -> ModernApiResult<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let id = path.into_inner();
     if let AuthActor::TenantApiKey(key_id) = auth.actor() {

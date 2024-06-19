@@ -9,7 +9,7 @@ use api_core::auth::session::user::{
     TokenCreationPurpose,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_wire_types::{
     D2pGenerateRequest,
     D2pGenerateResponse,
@@ -38,7 +38,7 @@ pub async fn handler(
     // Option for backwards compatibility
     request: Option<web::Json<D2pGenerateRequest>>,
     user_auth: UserAuthContext,
-) -> JsonApiResponse<D2pGenerateResponse> {
+) -> ModernApiResult<D2pGenerateResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let session_key = state.session_sealing_key.clone();
     let auth_token = state

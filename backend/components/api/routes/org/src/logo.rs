@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant::{
@@ -28,7 +28,7 @@ pub async fn put(
     auth: TenantSessionAuth,
     payload: Multipart,
     request: HttpRequest,
-) -> JsonApiResponse<api_wire_types::Organization> {
+) -> ModernApiResult<api_wire_types::Organization> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
 

@@ -1,5 +1,5 @@
 use crate::errors::ApiResult;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
@@ -26,7 +26,7 @@ use paperclip::actix::{
     tags(Businesses, Hosted)
 )]
 #[actix::get("/hosted/business")]
-pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> JsonApiResponse<HostedBusiness> {
+pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ModernApiResult<HostedBusiness> {
     let bv_id = bo_auth.bo.business_vault_id.clone();
     let ob_config_id = bo_auth.ob_config.id.clone();
     let (bvw, sb) = state

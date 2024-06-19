@@ -5,7 +5,7 @@ use crate::auth::tenant::{
     TenantSessionAuth,
 };
 use crate::auth::Either;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use api_core::decision::field_validations::create_field_validation_results;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -32,7 +32,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiResponse<GetFieldValidationResponse> {
+) -> ModernApiResult<GetFieldValidationResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

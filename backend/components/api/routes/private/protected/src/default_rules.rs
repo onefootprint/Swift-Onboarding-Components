@@ -8,7 +8,7 @@ use actix_web::{
 };
 use api_core::decision::rule_engine;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
 
@@ -20,7 +20,7 @@ pub async fn add_default_rules(
     state: web::Data<State>,
     _: ProtectedAuth,
     path: web::Path<ObConfigurationId>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let ff_client = state.ff_client.clone();
     state
         .db_pool

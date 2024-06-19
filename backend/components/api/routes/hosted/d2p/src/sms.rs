@@ -7,7 +7,7 @@ use crate::utils::vault_wrapper::{
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::user::UserError;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::Person;
 use api_core::ApiErrorKind;
 use newtypes::sms_message::SmsMessage;
@@ -45,7 +45,7 @@ pub async fn handler(
     user_auth: UserAuthContext,
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
-) -> JsonApiResponse<D2pSmsResponse> {
+) -> ModernApiResult<D2pSmsResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let uvw = state

@@ -5,7 +5,7 @@ use crate::auth::tenant::{
 };
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use actix_web::web::Json;
@@ -80,7 +80,7 @@ async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<UpdateAnnotationPath>,
     request: web::Json<UpdateAnnotationRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant = auth.tenant();
     let is_live = auth.is_live()?;
@@ -121,7 +121,7 @@ pub fn post(
     auth: TenantSessionAuth,
     fp_id: FpIdPath,
     request: Json<CreateAnnotationRequest>,
-) -> JsonApiResponse<api_wire_types::Annotation> {
+) -> ModernApiResult<api_wire_types::Annotation> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     request.validate()?;
     let is_live = auth.is_live()?;

@@ -7,7 +7,7 @@ use api_core::errors::{
     ApiResult,
     ValidationError,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::{
     Any,
@@ -40,7 +40,7 @@ pub async fn post(
     fp_bid: FpIdPath,
     auth: SecretTenantAuthContext,
     request: web::Json<NewBusinessOwnerRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::CreateBusinessOwner)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

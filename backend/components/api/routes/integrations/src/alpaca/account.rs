@@ -15,7 +15,7 @@ use api_core::auth::tenant::{
 };
 use api_core::errors::cip_error::CipError;
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::{
     Person,
@@ -58,7 +58,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCreateAccountRequest>,
     fp_id: FpIdPath,
-) -> JsonApiResponse<AlpacaCreateAccountResponse> {
+) -> ModernApiResult<AlpacaCreateAccountResponse> {
     let AlpacaCreateAccountRequest {
         api_key,
         api_secret,
@@ -94,7 +94,7 @@ pub async fn post_old(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<DeprecatedAlpacaCreateAccountRequest>,
-) -> JsonApiResponse<AlpacaCreateAccountResponse> {
+) -> ModernApiResult<AlpacaCreateAccountResponse> {
     let result = post_inner(state, auth, request.into_inner()).await?;
     Ok(result)
 }
@@ -103,7 +103,7 @@ pub async fn post_inner(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: DeprecatedAlpacaCreateAccountRequest,
-) -> JsonApiResponse<AlpacaCreateAccountResponse> {
+) -> ModernApiResult<AlpacaCreateAccountResponse> {
     tracing::info!(%request.fp_user_id, %request.hostname, "/integrations/alpaca/cip request");
     // TODO: do we also want to validate here that the user is `Pass` like we do in the CIP endpoint?
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;

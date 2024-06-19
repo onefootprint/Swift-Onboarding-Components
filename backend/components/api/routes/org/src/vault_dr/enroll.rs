@@ -5,7 +5,7 @@ use api_core::auth::tenant::{
     TenantGuard,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use chrono::Utc;
 use db::models::vault_dr::{
@@ -27,7 +27,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: web::Json<api_wire_types::VaultDrEnrollRequest>,
-) -> JsonApiResponse<api_wire_types::VaultDrEnrollResponse> {
+) -> ModernApiResult<api_wire_types::VaultDrEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;

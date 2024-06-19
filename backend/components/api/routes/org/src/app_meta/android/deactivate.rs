@@ -3,7 +3,7 @@ use api_core::auth::tenant::{
     TenantGuard,
     TenantSessionAuth,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::State;
 use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
 use db::DbResult;
@@ -23,7 +23,7 @@ pub async fn deactivate(
     state: web::Data<State>,
     meta_id: web::Path<TenantAndroidAppMetaId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant_id = auth.tenant().id.clone();
     let meta_id = meta_id.into_inner();

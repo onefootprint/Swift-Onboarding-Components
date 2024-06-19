@@ -4,7 +4,7 @@ use actix_web::{
     post,
     web,
 };
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::{
     task,
     State,
@@ -27,7 +27,7 @@ async fn execute_tasks(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<ExecuteTasksRequest>,
-) -> JsonApiResponse<api_wire_types::Empty> {
+) -> ModernApiResult<api_wire_types::Empty> {
     let ExecuteTasksRequest { num_tasks } = request.into_inner();
     task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), num_tasks, None);
     Ok(api_wire_types::Empty)
@@ -48,7 +48,7 @@ async fn create_task(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<CreateTaskRequest>,
-) -> JsonApiResponse<CreateTasksResponse> {
+) -> ModernApiResult<CreateTasksResponse> {
     let CreateTaskRequest { task_data } = request.into_inner();
 
     let task = state

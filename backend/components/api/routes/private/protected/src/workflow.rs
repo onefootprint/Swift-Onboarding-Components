@@ -13,7 +13,7 @@ use api_core::decision::state::actions::{
 };
 use api_core::decision::state::traits::Workflow as TWorkflow;
 use api_core::decision::state::WorkflowWrapper;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::ApiErrorKind;
 use db::models::workflow::Workflow;
 use newtypes::{
@@ -37,7 +37,7 @@ async fn proceed(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<ProceedRequest>,
-) -> JsonApiResponse<ProceedResponse> {
+) -> ModernApiResult<ProceedResponse> {
     let ProceedRequest {
         wf_id,
         wf_action_kind,

@@ -4,7 +4,7 @@ use api_core::auth::tenant::{
     TenantSessionAuth,
 };
 use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::list::List;
@@ -22,7 +22,7 @@ async fn get_detail(
     state: web::Data<State>,
     list_id: web::Path<ListId>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<api_wire_types::ListDetails> {
+) -> ModernApiResult<api_wire_types::ListDetails> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

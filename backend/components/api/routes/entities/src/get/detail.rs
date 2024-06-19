@@ -5,7 +5,7 @@ use crate::auth::tenant::{
 };
 use crate::get::search::decrypt_visible_attrs;
 use crate::get::EntityDetailResponse;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::errors::ApiResult;
@@ -29,7 +29,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<EntityDetailResponse> {
+) -> ModernApiResult<EntityDetailResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let fp_id = fp_id.into_inner();

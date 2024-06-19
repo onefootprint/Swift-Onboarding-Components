@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::types::JsonApiResponse;
+use crate::types::ModernApiResult;
 use crate::State;
 use api_core::auth::tenant::{
     TenantGuard,
@@ -54,7 +54,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: Json<CreateEntityTokenRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<CreateEntityTokenResponse> {
+) -> ModernApiResult<CreateEntityTokenResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let CreateEntityTokenRequest { kind, key, send_link } = request.into_inner();
     let tenant_id = auth.tenant().id.clone();

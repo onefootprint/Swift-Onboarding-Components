@@ -7,7 +7,7 @@ use api_core::auth::session::sdk_args::{
 };
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::large_json::LargeJson;
 use api_core::utils::session::AuthSession;
@@ -42,7 +42,7 @@ async fn post(
     state: web::Data<State>,
     request: LargeJson<SdkArgs, 2_097_152>,
     root_span: RootSpan,
-) -> JsonApiResponse<CreateSdkArgsTokenResponse> {
+) -> ModernApiResult<CreateSdkArgsTokenResponse> {
     let session_key = state.session_sealing_key.clone();
     let data = request.0;
     let kind = SdkArgsKind::from(&data);
@@ -94,7 +94,7 @@ async fn get(
     state: web::Data<State>,
     session: SdkArgsContext,
     root_span: RootSpan,
-) -> JsonApiResponse<GetSdkArgsTokenResponse> {
+) -> ModernApiResult<GetSdkArgsTokenResponse> {
     let SdkArgsData {
         e_private_key,
         e_data,
