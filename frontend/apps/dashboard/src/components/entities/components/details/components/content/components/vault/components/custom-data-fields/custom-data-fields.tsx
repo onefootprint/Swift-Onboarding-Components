@@ -9,12 +9,12 @@ import styled, { css } from 'styled-components';
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
-import useDecryptForm from '../../../../hooks/use-decrypt-form';
-import useField from '../../../../hooks/use-field';
-import type { DiField } from '../../../../vault.types';
-import Field from '../../../field';
-import { useDecryptControls } from '../../../vault-actions';
-import CustomDocumentField from './custom-document-field';
+import useDecryptForm from '../../hooks/use-decrypt-form';
+import useField from '../../hooks/use-field';
+import type { DiField } from '../../vault.types';
+import Field from '../field';
+import { useDecryptControls } from '../vault-actions';
+import CustomDocumentField from './components/custom-document-field';
 
 type CustomDataFieldsProps = WithEntityProps & {
   iconComponent: Icon;
@@ -98,6 +98,7 @@ const Container = styled.fieldset`
     display: flex;
     flex-direction: column;
     height: 100%;
+    width: 100%;
     justify-content: space-between;
   `};
 `;

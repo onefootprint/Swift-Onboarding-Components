@@ -1,4 +1,4 @@
-import { IcoBuilding24, IcoFileText224, IcoUsers24 } from '@onefootprint/icons';
+import { IcoBuilding24, IcoFileText24, IcoFileText224, IcoUsers24 } from '@onefootprint/icons';
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
@@ -65,6 +65,11 @@ const useFieldsets = (): Fieldset => {
         { di: BusinessDI.zip },
         { di: BusinessDI.state },
       ],
+    },
+    custom: {
+      title: t('custom.title'),
+      iconComponent: IcoFileText24,
+      fields: [],
     },
   };
 };

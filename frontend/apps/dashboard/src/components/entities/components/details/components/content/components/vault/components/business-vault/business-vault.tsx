@@ -3,7 +3,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 import useBusinessOwners from '@/entity/hooks/use-business-owners';
-import { Entity } from '@onefootprint/types';
+import { Entity, hasEntityCustomData } from '@onefootprint/types';
+import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
 import useFieldsets from './hooks/use-fieldsets';
@@ -17,10 +18,11 @@ type BusinessVaultProps = {
 // https://github.com/onefootprint/monorepo/blob/f4357b95e964248abc155a6b243dec080dbf4d4b/backend/components/newtypes/src/reason_code/signal_attribute.rs
 // https://linear.app/footprint/issue/FP-3412/risk-signals-add-real-risk-signal-attributes
 const BusinessVault = ({ entity }: BusinessVaultProps) => {
-  const { basic, bos, address } = useFieldsets();
+  const { basic, bos, address, custom } = useFieldsets();
   const { data: boData } = useBusinessOwners(entity.id);
-  const shouldRenderBos = !!boData?.length;
-  const templateAreas = shouldRenderBos ? ['basic address', 'bos address'] : ['basic address'];
+  const hasBos = !!boData?.length;
+  const hasCustomData = hasEntityCustomData(entity);
+  const templateAreas = getTemplateAreas(hasBos, hasCustomData);
 
   return (
     <Grid.Container gap={5} columns={['repeat(2, 1fr)']} templateAreas={templateAreas}>
@@ -32,7 +34,7 @@ const BusinessVault = ({ entity }: BusinessVaultProps) => {
           footer={<RiskSignalsOverview type="basic" />}
         />
       </Basic>
-      {shouldRenderBos && (
+      {hasBos ? (
         <Bos>
           <Fieldset
             fields={bos.fields}
@@ -41,7 +43,7 @@ const BusinessVault = ({ entity }: BusinessVaultProps) => {
             footer={<RiskSignalsOverview type="basic" />}
           />
         </Bos>
-      )}
+      ) : null}
       <Address>
         <Fieldset
           fields={address.fields}
@@ -50,8 +52,23 @@ const BusinessVault = ({ entity }: BusinessVaultProps) => {
           footer={<RiskSignalsOverview type="basic" />}
         />
       </Address>
+      {hasCustomData ? (
+        <Custom>
+          <CustomDataFields entity={entity} title={custom.title} iconComponent={custom.iconComponent} />
+        </Custom>
+      ) : null}
     </Grid.Container>
   );
+};
+
+const getTemplateAreas = (shouldRenderBos: boolean, hasCustomData: boolean) => {
+  if (shouldRenderBos && hasCustomData) {
+    return ['basic address', 'bos address', 'custom custom'];
+  }
+  if (shouldRenderBos) {
+    return ['basic address', 'bos address'];
+  }
+  return ['basic address'];
 };
 
 const Basic = styled(Grid.Item)`
@@ -64,6 +81,10 @@ const Address = styled(Grid.Item)`
 
 const Bos = styled(Grid.Item)`
   grid-area: bos;
+`;
+
+const Custom = styled(Grid.Item)`
+  grid-area: custom;
 `;
 
 export default BusinessVault;

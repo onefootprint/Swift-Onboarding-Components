@@ -1,7 +1,6 @@
 import type { BusinessOwner, Entity } from '@onefootprint/types';
 import { BusinessDI, isVaultDataEmpty, isVaultDataEncrypted } from '@onefootprint/types';
 import { Box, Grid, Stack, Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -79,7 +78,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
     <Box testID="business-owners-content">
       <Grid.Container gap={4}>
         {businessOwners.map((businessOwner, index) => (
-          <FieldContainer key={businessOwner.id || index} hideCheckbox={index !== 0}>
+          <FieldContainer key={businessOwner.id || index} $hideCheckbox={index !== 0}>
             <Field
               entity={entity}
               di={di}
@@ -95,9 +94,9 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
   );
 };
 
-const FieldContainer = styled.div<{ hideCheckbox: boolean }>`
-  ${({ hideCheckbox }) =>
-    hideCheckbox &&
+const FieldContainer = styled.div<{ $hideCheckbox: boolean }>`
+  ${({ $hideCheckbox }) =>
+    $hideCheckbox &&
     css`
       input[type='checkbox'] {
         visibility: hidden;

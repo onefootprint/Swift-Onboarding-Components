@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import useField from '../../../../../hooks/use-field';
-import type { DiField } from '../../../../../vault.types';
+import useField from '../../../../hooks/use-field';
+import type { DiField } from '../../../../vault.types';
 
 type CustomDocumentFieldProps = {
   field: DiField;

@@ -2052,6 +2052,9 @@
         },
         "address": {
           "title": "Registered business address"
+        },
+        "custom": {
+          "title": "Custom business data"
         }
       }
     },

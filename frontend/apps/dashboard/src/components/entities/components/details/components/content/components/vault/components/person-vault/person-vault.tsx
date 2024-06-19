@@ -11,10 +11,10 @@ import styled, { css } from 'styled-components';
 
 import useEntityOwnedBusinesses from '@/entity/hooks/use-entity-owned-businesses';
 
+import CustomDataFields from '../custom-data-fields';
 import Fieldset from '../fieldset';
 import RiskSignalsOverview from '../risk-signals-overview';
 import CardFieldset from './components/card-fieldset';
-import CustomDataFields from './components/custom-data-fields';
 import DocumentsFields from './components/document-fields';
 import InvestorProfileFields from './components/investor-profile-fields';
 import OwnedBusinesses from './components/owned-businesses';

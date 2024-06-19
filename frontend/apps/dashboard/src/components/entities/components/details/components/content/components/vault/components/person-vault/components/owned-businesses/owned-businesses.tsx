@@ -90,9 +90,7 @@ const Content = styled.div`
 
 const Field = styled.div`
   display: flex;
-  flex-direction: column wrap;
   justify-content: space-between;
-  align-items: center;
 `;
 
 export default OwnedBusinesses;

@@ -10,13 +10,16 @@ const getBusinessIds = async ({ entityId }: GetEntityOwnedBusinessIdsRequest, au
     method: 'GET',
     url: `/entities/${entityId}/businesses`,
   });
+
   return response;
 };
 
 const useGetEntityOwnedBusinessIds = (id: string) => {
   const { authHeaders } = useSession();
 
-  return useQuery(['entity', id, 'owned_business_ids'], () => getBusinessIds({ entityId: id }, authHeaders));
+  return useQuery(['entity', id, 'owned_business_ids'], () => getBusinessIds({ entityId: id }, authHeaders), {
+    enabled: !!id,
+  });
 };
 
 export default useGetEntityOwnedBusinessIds;
