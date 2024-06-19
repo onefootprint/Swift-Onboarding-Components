@@ -144,13 +144,13 @@ config:
       documentImagesBucketNamePrefix: opaque-documents
     samba:
       apiKey:
-        secure: v1:3SL0o90GDsXzb/Uf:AhC5wjV5+ZJxCINtnnnLUJJgEjh/hXzysYjTkNTzjpKhzbAyJG3mC7eqXjhkhXK0zQdR5HMPw+8=
+        secure: v1:YST9BAgYkPJH0pTB:JcdAbz4kWKGSLsSmCxuv2g+UVilxaI2ei+ht/fGMp7gt+U9JTY9WpNWKdGkfLpFuDhC7S2ehFOA=
       authPassword:
-        secure: v1:gLjQhsl3ogut7dUM:p9TReXFzik/XSi9ViBEA0Y1baS04BjQjt4UDgBoCgjqYvodtvZY8HVqyae1CsXW3t+WxLu7pmvzsbiuv8c67JTx1bSVdRFGoUkJs5w3rV+s=
+        secure: v1:DcvQ25lhVkC9WoBM:Gw7y79thmPZHjqA7n9phCvzknC96TF2Zb6Mo6XXLqM0Y30HEE9B5Llin5aEychNE99zc1AAKtMIq7XiGBTgwwPz8INUXwIt4/bVUe7taBkg=
       authUsername:
-        secure: v1:WX42PQYaqKZooKgG:n24qmp9R8MsgdBlF4hMrctXrkOgSjQE02Ci1r2dJaViNMhWs
+        secure: v1:h81cyaGbrJNCO8mw:JKmnw5zXQo5Ct/epGjhmhNAuIbAu3WuN7b77UUBuGrYa/34s
       baseUrl:
-        secure: v1:fN6o2R3sCQDBuQBO:+vfvTucB3erP5y87lQ+OCJryZTbsq4iBWvY5xFnXNEc634yv/Fx9Gke4KYqds9A=
+        secure: v1:mxTrI+tZwZR42vWH:eAo7Cupkc/QkOSHrddtRfSpJ5nOe9rBFY9rH9/L3HJoMD8jEeKNyEKpS
     sendgrid:
       apiKey:
         secure: v1:bKv7D+zTxpPdjHoO:qfXikLY0jplLN/CmQ4/P0/Ts4akQLZttRFJKjW08xIEQDuFGW5DUK2VnihJq1OVtS0CgV81VJTeHdJfE5YesX4GCRVdO03bnR010AC5tJeyPnHPs/Q==
