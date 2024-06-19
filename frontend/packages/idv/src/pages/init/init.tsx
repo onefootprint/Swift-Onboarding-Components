@@ -6,7 +6,7 @@ import { InitShimmer } from '../../components';
 import type { DeviceInfo } from '../../hooks';
 import { useDeviceInfo, useGetOnboardingConfig } from '../../hooks';
 import useIdvMachine from '../../hooks/ui/use-idv-machine';
-import { Logger } from '../../utils';
+import { Logger, trackAction } from '../../utils';
 
 const Init = () => {
   const [state, send] = useIdvMachine();
@@ -25,6 +25,7 @@ const Init = () => {
     { obConfigAuth, authToken },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
+        trackAction('idv:started');
         send({
           type: 'initContextUpdated',
           payload: {
