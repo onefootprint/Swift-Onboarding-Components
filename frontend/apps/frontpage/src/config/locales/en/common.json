@@ -440,8 +440,8 @@
         "app-clip": {
           "title": "Capture ID documents with App Clip",
           "subtitle": "Leveraging the user’s mobile device, we are able to:",
-          "real-phone": "Ensure the legitatamacy of the device",
-          "device-attestation": "Leverage Apple and Google’s rectangular detection",
+          "real-phone": "Ensure the device's legitimacy",
+          "device-attestation": "Leverage Apple and Google’s document detection",
           "duplicate-fraud": "Detect and block duplicate fraud",
           "give-it-a-try": "Give it a try on your own"
         },
