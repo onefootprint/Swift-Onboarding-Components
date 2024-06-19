@@ -1,6 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { InitShimmer } from '../../components';
 import type { DeviceInfo } from '../../hooks';
@@ -21,11 +21,14 @@ const Init = () => {
     });
   });
 
+  useEffect(() => {
+    trackAction('idv_init_page_view');
+  }, []);
+
   useGetOnboardingConfig(
     { obConfigAuth, authToken },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
-        trackAction('idv:started');
         send({
           type: 'initContextUpdated',
           payload: {
