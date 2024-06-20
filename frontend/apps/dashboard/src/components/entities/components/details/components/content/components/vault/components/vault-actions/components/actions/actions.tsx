@@ -74,9 +74,6 @@ const Actions = ({ entity }: WithEntityProps) => {
           <IcoDotsHorizontal24 />
         </StyledTrigger>
         <Dropdown.Content align="end" sideOffset={8}>
-          <PermissionGate scopeKind={RoleScopeKind.manualReview} fallbackText={t('view-historical-data.not-allowed')}>
-            <Dropdown.Item onSelect={handleOpenHistoricalDataDialog}>{t('view-historical-data.label')}</Dropdown.Item>
-          </PermissionGate>
           <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-user.not-allowed')}>
             <Dropdown.Item onSelect={editControls.start}>{t('edit-user.label')}</Dropdown.Item>
           </PermissionGate>
@@ -91,6 +88,9 @@ const Actions = ({ entity }: WithEntityProps) => {
           </PermissionGate>
           <PermissionGate scopeKind={RoleScopeKind.writeLists} fallbackText={t('add-to-list.not-allowed')}>
             <Dropdown.Item onSelect={handleOpenAddToListDialog}>{t('add-to-list.label')}</Dropdown.Item>
+          </PermissionGate>
+          <PermissionGate scopeKind={RoleScopeKind.manualReview} fallbackText={t('view-historical-data.not-allowed')}>
+            <Dropdown.Item onSelect={handleOpenHistoricalDataDialog}>{t('view-historical-data.label')}</Dropdown.Item>
           </PermissionGate>
           {showAiFeatures && <Dropdown.Item onSelect={handleOpenSummarizeDialog}>{t('summarize.label')}</Dropdown.Item>}
         </Dropdown.Content>
