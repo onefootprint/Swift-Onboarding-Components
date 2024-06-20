@@ -1,7 +1,7 @@
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 
-import { Logger } from '../../../utils/logger';
+import { Logger, trackAction } from '../../../utils/logger';
 import { useMissingPermissionsSheet } from '../components/missing-permissions-sheet';
 
 const useHandleCameraError = () => {
@@ -23,24 +23,27 @@ const useHandleCameraError = () => {
     const error = err as DOMException;
     if (error instanceof TypeError) {
       showErrorToast(t('undefined-navigator'));
+      trackAction('id-doc:camera-error', { error: 'undefined-navigator' });
     } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
       // required track is missing
       showErrorToast(t('not-found'));
+      trackAction('id-doc:camera-error', { error: 'not-found' });
     } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
       // webcam or mic are already in use
       showErrorToast(t('already-in-use'));
+      trackAction('id-doc:camera-error', { error: 'already-in-use' });
     } else if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
       // constraints can not be satisfied by avb. devices
       showErrorToast(t('constraint'));
+      trackAction('id-doc:camera-error', { error: 'constraint' });
     } else if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
       // permission denied in browser
       missingPermissionsSheet.show({});
-    } else if (error.name === 'TypeError' || error.name === 'TypeError') {
-      // empty constraints object
-      showErrorToast(t('other-error'));
+      trackAction('id-doc:camera-error', { error: 'permission-denied' });
     } else {
       // other errors
       showErrorToast(t('other-error'));
+      trackAction('id-doc:camera-error', { error: 'other-error' });
     }
 
     // Do not log permission errors since they create too much noise

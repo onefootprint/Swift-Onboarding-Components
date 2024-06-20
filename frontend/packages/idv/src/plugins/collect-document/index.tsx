@@ -28,11 +28,11 @@ const App = ({ idvContext, context, onDone }: IdDocProps) => {
 
   const handleFlowCompletion = () => {
     onDone();
-    trackAction('id-doc:completed');
+    trackAction('id-doc:completed', { kind: config.kind });
   };
 
   useEffect(() => {
-    trackAction('id-doc:started');
+    trackAction('id-doc:started', { kind: config.kind });
   }, []);
 
   if (config.kind === DocumentRequestKind.Identity) {
