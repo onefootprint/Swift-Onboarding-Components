@@ -43,6 +43,10 @@ pub use crate::errors::{
     ApiError,
     ApiErrorKind,
 };
+pub use crate::types::response::{
+    ModernApiError,
+    ModernApiResult,
+};
 pub use paperclip::actix::{
     web,
     OpenApiExt,

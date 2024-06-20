@@ -1,4 +1,4 @@
-use actix_web::http::StatusCode;
+pub use actix_web::http::StatusCode;
 
 pub trait FpApiError: std::fmt::Debug + std::fmt::Display + std::error::Error {
     /// The HTTP status code representing this error

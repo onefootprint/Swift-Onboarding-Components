@@ -1,7 +1,9 @@
 use actix_web::HttpResponseBuilder;
 use api_core::errors::workos::WorkOsError;
-use api_core::errors::ApiError;
-use api_core::State;
+use api_core::{
+    ModernApiResult,
+    State,
+};
 use api_wire_types::GoogleOauthRedirectUrl;
 use paperclip::actix::web;
 use paperclip::actix::web::HttpResponse;
@@ -17,7 +19,7 @@ use workos::sso::{
 pub async fn handler(
     state: web::Data<State>,
     redirect_url: web::Query<GoogleOauthRedirectUrl>,
-) -> actix_web::Result<HttpResponse, ApiError> {
+) -> ModernApiResult<HttpResponse> {
     let redirect_url = &redirect_url.redirect_url;
 
     let authorization_url = &state

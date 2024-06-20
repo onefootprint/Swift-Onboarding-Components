@@ -20,7 +20,7 @@ use crate::utils::vault_wrapper::{
     VaultWrapper,
 };
 use crate::State;
-use actix_web::ResponseError;
+use api_errors::FpApiError;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;

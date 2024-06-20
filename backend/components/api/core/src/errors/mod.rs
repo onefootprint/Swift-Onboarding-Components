@@ -6,7 +6,6 @@ use crate::decision::vendor::{
     middesk,
     VendorAPIError,
 };
-use crate::types::SerializedApiResponse;
 use crate::utils::body_bytes::InvalidBodyError;
 use actix_web::error::{
     JsonPayloadError,
@@ -451,21 +450,23 @@ impl api_errors::FpApiError for ApiError {
     }
 
     fn code(&self) -> Option<String> {
-        let error_with_code = match self.kind() {
-            ApiErrorKind::ErrorWithCode(e) => Some(e as &dyn CodedError),
-            ApiErrorKind::TfError(e) => Some(e as &dyn CodedError),
-            _ => None,
+        let code = match self.kind() {
+            ApiErrorKind::ErrorWithCode(e) => e.code(),
+            ApiErrorKind::TfError(e) => e.code(),
+            // TODO need to make FpApiError codes an enum to prevent duplicates
+            ApiErrorKind::AuthError(AuthError::MissingHeader(_)) => "A101".into(),
+            _ => return None,
         };
-        error_with_code.map(|e| e.code())
+        Some(code)
     }
 
     fn context(&self) -> Option<serde_json::Value> {
-        let error_with_code = match self.kind() {
-            ApiErrorKind::ErrorWithCode(e) => Some(e as &dyn CodedError),
-            ApiErrorKind::TfError(e) => Some(e as &dyn CodedError),
+        match self.kind() {
+            ApiErrorKind::ErrorWithCode(e) => e.context(),
+            ApiErrorKind::TfError(e) => e.context(),
+            ApiErrorKind::AuthError(AuthError::MissingHeader(h)) => Some(serde_json::json!({"header": h})),
             _ => None,
-        };
-        error_with_code.and_then(|e| e.context())
+        }
     }
 
     fn message(&self) -> String {
@@ -495,44 +496,5 @@ impl api_errors::FpApiError for ApiError {
             }
             _ => {}
         };
-    }
-}
-
-use api_errors::FpApiError;
-use newtypes::Uuid;
-
-impl actix_web::ResponseError for ApiError {
-    fn status_code(&self) -> StatusCode {
-        FpApiError::status_code(self)
-    }
-
-    fn error_response(&self) -> actix_web::HttpResponse<actix_web::body::BoxBody> {
-        let support_id = Uuid::new_v4();
-        let status_code = FpApiError::status_code(self);
-
-        // Some errors have specific error codes and context
-        let code = FpApiError::code(self);
-        let context = FpApiError::context(self);
-        let message = FpApiError::message(self);
-
-        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR {
-            // Hide HTTP 500 error messages from client.
-            // It would be nice to be able to show the error messages in dev
-            tracing::error!(err=?self, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api 500: {}", self.to_string());
-            "Something went wrong".to_string()
-        } else {
-            tracing::info!(error=?self, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api {}", status_code);
-            message
-        };
-
-        let mut resp = actix_web::HttpResponse::build(status_code);
-        FpApiError::mutate_response(self, &mut resp);
-
-        resp.json(SerializedApiResponse {
-            message,
-            code,
-            context,
-            support_id,
-        })
     }
 }

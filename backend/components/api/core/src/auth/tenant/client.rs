@@ -86,7 +86,7 @@ impl paperclip::v2::schema::Apiv2Schema for PathClientTenantAuthContext {
 impl paperclip::actix::OperationModifier for PathClientTenantAuthContext {}
 
 impl actix_web::FromRequest for PathClientTenantAuthContext {
-    type Error = crate::ApiError;
+    type Error = crate::ModernApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {

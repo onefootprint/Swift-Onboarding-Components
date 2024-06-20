@@ -8,7 +8,7 @@ use crate::auth::{
     Either,
     SessionContext,
 };
-use crate::ApiError;
+use crate::ModernApiError;
 use actix_web::FromRequest;
 use futures_util::Future;
 use std::pin::Pin;
@@ -19,7 +19,7 @@ pub struct ProtectedAuth(
 );
 
 impl FromRequest for ProtectedAuth {
-    type Error = ApiError;
+    type Error = ModernApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {

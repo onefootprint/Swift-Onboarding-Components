@@ -122,14 +122,14 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
             // accept any content type
             .content_type(|_| true)
             // use custom error handler
-            .error_handler(|err, _req| actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidJsonBody(err))));
+            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidJsonBody(err))));
 
         let query_cfg = web::QueryConfig::default()
-            .error_handler(|err, _req| actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidQueryParam(err))));
+            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidQueryParam(err))));
 
         let form_cfg = web::FormConfig::default()
             .limit(32_768)
-            .error_handler(|err, _req| actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidFormError(err))));
+            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidFormError(err))));
 
 
         let  spec = DefaultApiRaw {
@@ -171,7 +171,7 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
                     match fut_with_timeout.await {
                         Ok(res) => res,
                         Err(_) => {
-                            Err(ApiError::from(ApiErrorKind::ResponseTimeout).into())
+                            Err(ModernApiError::from(ApiErrorKind::ResponseTimeout).into())
                         }
                     }
                 }
@@ -228,7 +228,7 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
 }
 
 async fn default_not_found() -> impl actix_web::Responder {
-    ApiError::from(ApiErrorKind::EndpointNotFound).error_response()
+    ModernApiError::from(ApiErrorKind::EndpointNotFound).error_response()
 }
 
 #[allow(unused)]

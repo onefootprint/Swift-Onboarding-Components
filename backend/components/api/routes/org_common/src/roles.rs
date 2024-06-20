@@ -33,7 +33,7 @@ pub async fn get(
     filters: web::Query<OrgRoleFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ApiResult<RolesResponse> {
+) -> ModernApiResult<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read, PartnerTenantGuard::Read)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let is_live = auth.is_live()?;

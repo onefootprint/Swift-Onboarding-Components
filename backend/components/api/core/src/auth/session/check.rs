@@ -1,6 +1,8 @@
 use crate::auth::AuthError;
-use crate::errors::ApiError;
-use crate::State;
+use crate::{
+    ModernApiError,
+    State,
+};
 use actix_web::{
     web,
     FromRequest,
@@ -36,7 +38,7 @@ impl CheckSessionContext {
 }
 
 impl FromRequest for CheckSessionContext {
-    type Error = ApiError;
+    type Error = ModernApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {

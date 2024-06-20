@@ -39,7 +39,7 @@ async fn get_list(
     filters: web::Query<OnboardingConfigFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OnboardingConfiguration>>> {
+) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::OnboardingConfiguration>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let page = pagination.page;

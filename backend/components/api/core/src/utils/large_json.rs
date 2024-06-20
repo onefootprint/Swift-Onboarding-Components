@@ -1,4 +1,4 @@
-use crate::errors::ApiError;
+use crate::ModernApiError;
 use actix_web::dev::Payload;
 use actix_web::error::{
     Error as ActixError,
@@ -49,7 +49,7 @@ mod actix_json {
     use crate::ApiErrorKind;
 
     fn err_handler(err: JsonPayloadError) -> ActixError {
-        actix_web::Error::from(ApiError::from(ApiErrorKind::InvalidJsonBody(err)))
+        actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidJsonBody(err)))
     }
 
     pub struct JsonExtractFut<T, const LIMIT: usize> {

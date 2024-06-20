@@ -2,13 +2,11 @@ use super::tenant::{
     GetFirmEmployee,
     InvalidateAuth,
 };
-use super::AuthError;
-use crate::errors::{
-    ApiError,
-    ApiErrorKind,
-    ApiResult,
+use crate::errors::ApiResult;
+use crate::{
+    ModernApiError,
+    State,
 };
-use crate::State;
 use actix_web::FromRequest;
 use async_trait::async_trait;
 use futures_util::Future;
@@ -31,10 +29,10 @@ pub enum Either<A, B> {
 
 impl<A, B> FromRequest for Either<A, B>
 where
-    A: FromRequest<Error = ApiError> + 'static,
-    B: FromRequest<Error = ApiError> + 'static,
+    A: FromRequest<Error = ModernApiError> + 'static,
+    B: FromRequest<Error = ModernApiError> + 'static,
 {
-    type Error = ApiError;
+    type Error = ModernApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
@@ -52,30 +50,28 @@ where
                 // The goal here is to produce a better error message
                 // as it's possible there's a real auth error or some headers are missing
                 (Err(e1), Err(e2)) => {
-                    match (e1.into_kind(), e2.into_kind()) {
-                        // if both headers are missing
-                        (
-                            ApiErrorKind::AuthError(AuthError::MissingHeader(h1)),
-                            ApiErrorKind::AuthError(AuthError::MissingHeader(h2)),
-                        ) => {
-                            if h1 == h2 {
+                    let e1_code = e1.code();
+                    let e1_code = e1_code.as_deref();
+                    let e2_code = e2.code();
+                    let e2_code = e2_code.as_deref();
+                    match (e1_code, e2_code) {
+                        // If both headers are missing
+                        (Some("E123"), Some("E123")) => {
+                            if e1.context() == e2.context() {
                                 // Both headers have the same name.
-                                Err(ApiError::from(AuthError::MissingHeader(h1)))
+                                Err(e1)
                             } else {
-                                Err(ApiError::from(AuthError::MissingHeader(format!(
-                                    "{} or {}",
-                                    h1, h2
-                                ))))
+                                // TODO merge them
+                                Err(e1)
                             }
                         }
 
-                        // if there's a non missing header error on one side, pick that one
-                        (ApiErrorKind::AuthError(AuthError::MissingHeader(_)), e)
-                        | (e, ApiErrorKind::AuthError(AuthError::MissingHeader(_))) => Err(ApiError::from(e)),
+                        // If only one error is from a missing header, choose the opposite error
+                        (Some("E123"), _) => Err(e2),
+                        (_, Some("E123")) => Err(e1),
 
-                        (e1, e2) => {
-                            let e1 = ApiError::from(e1);
-                            let e2 = ApiError::from(e2);
+                        // Both are non-missing header errors
+                        (_, _) => {
                             tracing::warn!(error1=?e1, error2=?e2, "Got dual error in Either FromRequest");
                             // arbitrarily choose the first one
                             Err(e1)

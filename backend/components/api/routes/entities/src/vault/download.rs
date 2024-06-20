@@ -1,7 +1,9 @@
-use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::State;
+use crate::{
+    ModernApiResult,
+    State,
+};
 use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
@@ -12,6 +14,7 @@ use api_core::auth::tenant::{
 };
 use api_core::auth::AuthError;
 use api_core::errors::tenant::TenantError;
+use api_core::errors::ApiResult;
 use api_core::utils::vault_wrapper::{
     Any,
     EnclaveDecryptOperation,
@@ -42,7 +45,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: PathClientTenantAuthContext,
     insights: InsightHeaders,
-) -> ApiResult<HttpResponse> {
+) -> ModernApiResult<HttpResponse> {
     // Any guard here since we enforce that we have the DecryptDownload permission below
     let auth = auth.0.check_guard(api_core::auth::Any)?;
     let principal = auth.actor().into();

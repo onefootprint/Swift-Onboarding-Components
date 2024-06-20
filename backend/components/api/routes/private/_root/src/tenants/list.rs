@@ -13,7 +13,10 @@ use api_core::types::{
     OffsetPaginationRequest,
 };
 use api_core::utils::db2api::DbToApi;
-use api_core::State;
+use api_core::{
+    ModernApiResult,
+    State,
+};
 use api_wire_types::PrivateTenantFilters;
 use db::models::tenant::{
     PrivateTenantFilters as DbPrivateTenantFilters,
@@ -28,7 +31,7 @@ async fn get(
     auth: FirmEmployeeAuthContext,
     pagination: web::Query<OffsetPaginationRequest>,
     filters: web::Query<PrivateTenantFilters>,
-) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::PrivateTenant>>> {
+) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::PrivateTenant>>> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
     let PrivateTenantFilters {
         search,

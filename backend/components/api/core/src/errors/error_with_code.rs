@@ -76,8 +76,12 @@ pub enum ErrorWithCode {
     #[strum_discriminants(strum(serialize = "E122"))]
     #[error("Image too small")]
     FileTooSmall(usize),
+    #[strum_discriminants(strum(serialize = "E123"))]
+    #[error("Missing header {0}")]
+    MissingAuthHeader(String),
 }
 
+// TODO can remove this in favor of new FpApiError
 pub(crate) trait CodedError: std::error::Error {
     fn context(&self) -> Option<Value>;
     fn code(&self) -> String;
@@ -92,6 +96,7 @@ impl CodedError for ErrorWithCode {
             Self::InvalidMimeType(file_type) => json!({ "file_type": file_type }),
             Self::FileTooLarge(max_size) => json!({ "max_size": max_size }),
             Self::ExistingVault(token) => json!({ "token": token }),
+            Self::MissingAuthHeader(h) => json!({"header": h}),
             _ => return None,
         };
         Some(context)
@@ -125,6 +130,7 @@ impl CodedError for ErrorWithCode {
             Self::CouldNotParseSession => StatusCode::UNAUTHORIZED,
             Self::ExistingVault(_) => StatusCode::BAD_REQUEST,
             Self::FileUploadTimeout => StatusCode::REQUEST_TIMEOUT,
+            Self::MissingAuthHeader(_) => StatusCode::UNAUTHORIZED,
         }
     }
 }

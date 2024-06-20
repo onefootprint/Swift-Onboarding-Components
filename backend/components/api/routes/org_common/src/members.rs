@@ -37,7 +37,7 @@ pub async fn get(
     filters: web::Query<OrgMemberFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
+) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
     let auth = auth.check_guard(TenantGuard::Read, PartnerTenantGuard::Read)?;
     let authed_org_ident = auth.org_identifier().clone_into();
 

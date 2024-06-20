@@ -1,5 +1,4 @@
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::{
     ModernApiResult,
     OffsetPaginatedResponse,
@@ -28,7 +27,7 @@ async fn get(
     filters: web::Query<OrgMemberFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantSessionAuth,
-) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
+) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
     members_common::get(state, filters, pagination, auth.into()).await
 }
 

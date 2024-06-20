@@ -50,7 +50,7 @@ pub async fn get(
     filters: web::Query<ApiKeyFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantSessionAuth,
-) -> ApiResult<ApiKeysResponse> {
+) -> ModernApiResult<ApiKeysResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let page = pagination.page;
     let page_size = pagination.page_size(&state);

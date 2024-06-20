@@ -1,4 +1,3 @@
-use crate::errors::ApiResult;
 use crate::ApiError;
 use api_errors::FpApiError;
 use http::StatusCode;
@@ -66,7 +65,6 @@ pub struct SerializedApiResponse {
 }
 
 
-// TODO: And then implement the error responder just once for this type! remove the macro
 impl actix_web::ResponseError for ModernApiError {
     fn status_code(&self) -> StatusCode {
         self.0.status_code()
@@ -148,7 +146,7 @@ impl<A> FromIterator<A> for ListResponse<A> {
 }
 
 /// return string results
-pub type StringResponse = ApiResult<String>;
+pub type StringResponse = ModernApiResult<String>;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 /// Metadata required for a cursor-paginated response.
@@ -163,21 +161,21 @@ pub struct CursorPaginatedResponseMeta<C> {
     pub count: Option<i64>,
 }
 
-pub type CursorPaginatedResponse<T, C> = ApiResult<Json<CursorPaginatedResponseInner<T, C>>>;
+pub type CursorPaginatedResponse<T, C> = ModernApiResult<Json<CursorPaginatedResponseInner<T, C>>>;
 
 #[derive(Debug, serde::Serialize)]
 /// Wraps the response data with metadata needed for a cursor-paginated result.
 /// Cursor pagination requests take in a cursor that identifies the start of the page (and is
 /// delivered by the last pagination request) using an ordered field.
 /// TODO need to wrap this in Json.
-/// make an alias that is ApiResult<Json<CursorPaginatedResponseInner>>
+/// make an alias that is ModernApiResult<Json<CursorPaginatedResponseInner>>
 pub struct CursorPaginatedResponseInner<T, C> {
     pub data: T,
     pub meta: CursorPaginatedResponseMeta<C>,
 }
 
 impl<T, C> CursorPaginatedResponseInner<T, C> {
-    pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> ApiResult<Json<Self>> {
+    pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> ModernApiResult<Json<Self>> {
         Ok(Json(Self {
             data,
             meta: CursorPaginatedResponseMeta { next, count },

@@ -2,7 +2,6 @@ use crate::auth::tenant::{
     CheckTenantGuard,
     SecretTenantAuthContext,
 };
-use crate::errors::ApiResult;
 use crate::proxy::config::ProxyConfig;
 use crate::proxy::pii_parser::TokenizedIngress;
 use crate::proxy::token_parser::ProxyTokenParser;
@@ -14,6 +13,7 @@ use crate::proxy::{
 use crate::utils::headers::InsightHeaders;
 use crate::{
     proxy,
+    ModernApiResult,
     State,
 };
 use api_core::auth::tenant::TenantAuth;
@@ -59,7 +59,7 @@ pub async fn just_in_time(
     insight: InsightHeaders,
     request: HttpRequest,
     root_span: RootSpan,
-) -> ApiResult<HttpResponse> {
+) -> ModernApiResult<HttpResponse> {
     auth.check_preview_guard(PreviewApi::VaultProxyJit)?;
     let proxy_config = ProxyConfig::try_from((jit_params, opt_params, request.headers()))?;
     let auth = auth.check_guard(InvokeVaultProxyPermission::JustInTime)?;
@@ -91,7 +91,7 @@ pub async fn id(
     params: ProxyHeaderParams,
     request: HttpRequest,
     root_span: RootSpan,
-) -> ApiResult<HttpResponse> {
+) -> ModernApiResult<HttpResponse> {
     auth.check_preview_guard(PreviewApi::VaultProxy)?;
     let id = proxy_config_id.into_inner();
     let auth = auth.check_guard(InvokeVaultProxyPermission::Id { id: id.clone() })?;
@@ -122,7 +122,7 @@ async fn invoke_vault_proxy(
     insight: InsightHeaders,
     request: HttpRequest,
     root_span: RootSpan,
-) -> ApiResult<HttpResponse> {
+) -> ModernApiResult<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
         return Err(ApiErrorKind::InvalidProxyBody)?;

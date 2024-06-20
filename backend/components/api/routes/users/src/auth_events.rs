@@ -11,6 +11,7 @@ use api_core::types::{
     OffsetPaginationRequest,
 };
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::ModernApiResult;
 use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::OffsetPagination;
@@ -29,7 +30,7 @@ pub async fn get(
     request: FpIdPath,
     auth: SecretTenantAuthContext,
     pagination: web::Query<OffsetPaginationRequest>,
-) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::PublicAuthEvent>>> {
+) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::PublicAuthEvent>>> {
     auth.check_preview_guard(PreviewApi::AuthEventsList)?;
     // For now, the only consumer of this is coba to get the IP address from where onboarding occurred
     // We might want to migrate them to a /cip_metadata endpoint

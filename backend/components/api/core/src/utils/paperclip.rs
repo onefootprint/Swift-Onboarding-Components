@@ -151,7 +151,7 @@ macro_rules! api_headers_schema {
             impl paperclip::actix::OperationModifier for $group {}
 
             impl actix_web::FromRequest for $group {
-                type Error = $crate::ApiError;
+                type Error = $crate::ModernApiError;
                 type Future = std::pin::Pin<Box<dyn std::future::Future<Output = Result<Self, Self::Error>>>>;
                 fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
 

@@ -1,5 +1,4 @@
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::{
     ModernApiResult,
     OffsetPaginationRequest,
@@ -26,7 +25,7 @@ async fn get(
     filters: web::Query<OrgRoleFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantSessionAuth,
-) -> ApiResult<roles_common::RolesResponse> {
+) -> ModernApiResult<roles_common::RolesResponse> {
     roles_common::get(state, filters, pagination, auth.into()).await
 }
 

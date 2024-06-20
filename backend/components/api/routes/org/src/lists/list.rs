@@ -9,7 +9,10 @@ use api_core::types::{
     OffsetPaginationRequest,
 };
 use api_core::utils::db2api::DbToApi;
-use api_core::State;
+use api_core::{
+    ModernApiResult,
+    State,
+};
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::rule_instance::RuleInstance;
@@ -30,7 +33,7 @@ pub async fn list_for_tenant(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     pagination: web::Query<OffsetPaginationRequest>,
-) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::List>>> {
+) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::List>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

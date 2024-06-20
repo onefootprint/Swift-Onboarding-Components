@@ -8,7 +8,10 @@ use crate::errors::{
     ApiError,
     AssertionError,
 };
-use crate::State;
+use crate::{
+    ModernApiError,
+    State,
+};
 use actix_web::http::header::Header;
 use actix_web::{
     web,
@@ -54,7 +57,7 @@ pub struct SecretTenantAuthContext(CheckedSecretTenantAuth);
 pub const HEADER_NAME: &str = "X-Footprint-Secret-Key";
 
 impl FromRequest for SecretTenantAuthContext {
-    type Error = crate::ApiError;
+    type Error = crate::ModernApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
@@ -78,12 +81,12 @@ impl FromRequest for SecretTenantAuthContext {
                 .db_pool
                 .db_transaction(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
                 .await
-                .map_err(|e| {
+                .map_err(|e| -> ModernApiError {
                     if e.is_not_found() {
                         if sk.is_maybe_ob_config_key() {
-                            ApiError::from(AuthError::ObConfigKeyUsedForApiKey)
+                            AuthError::ObConfigKeyUsedForApiKey.into()
                         } else {
-                            ApiError::from(AuthError::ApiKeyNotFound)
+                            AuthError::ApiKeyNotFound.into()
                         }
                     } else {
                         e.into()

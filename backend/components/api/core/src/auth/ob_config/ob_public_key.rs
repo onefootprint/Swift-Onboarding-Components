@@ -33,7 +33,7 @@ pub struct PublicOnboardingContext {
 const HEADER_NAME: &str = "X-Onboarding-Config-Key";
 
 impl FromRequest for PublicOnboardingContext {
-    type Error = crate::ApiError;
+    type Error = crate::ModernApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {

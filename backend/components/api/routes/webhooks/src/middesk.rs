@@ -59,7 +59,7 @@ pub struct MiddeskWebhookSignature {
 const MIDDESK_WEBHOOK_SIGNATURE_HEADER_NAME: &str = "X-Middesk-Signature-256";
 
 impl FromRequest for MiddeskWebhookSignature {
-    type Error = api_core::ApiError;
+    type Error = api_core::ModernApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {

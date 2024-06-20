@@ -1,6 +1,9 @@
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::errors::ApiResult;
-use crate::State;
+use crate::{
+    ModernApiResult,
+    State,
+};
 use api_core::auth::tenant::{
     CheckTenantGuard,
     TenantGuard,
@@ -39,7 +42,7 @@ pub async fn get(
     pagination: web::Query<OffsetPaginationRequest>,
     auth: SecretTenantAuthContext,
     fp_id: FpIdPath,
-) -> ApiResult<Json<OnboardingsListResponse>> {
+) -> ModernApiResult<Json<OnboardingsListResponse>> {
     auth.check_preview_guard(PreviewApi::OnboardingsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

@@ -1,5 +1,5 @@
 use super::get_header;
-use crate::errors::ApiResult;
+use crate::ModernApiResult;
 use actix_web::http::header::HeaderMap;
 use actix_web::FromRequest;
 use derive_more::Deref;
@@ -44,7 +44,7 @@ impl paperclip::actix::OperationModifier for SandboxId {}
 impl SandboxId {
     const HEADER_NAME: &'static str = "x-sandbox-id";
 
-    pub fn parse_from_request(headers: &HeaderMap) -> ApiResult<Self> {
+    pub fn parse_from_request(headers: &HeaderMap) -> ModernApiResult<Self> {
         let sandbox_id = if let Some(id) = get_header(Self::HEADER_NAME, headers) {
             let id = newtypes::SandboxId::parse(&id)?;
             Some(id)
@@ -56,7 +56,7 @@ impl SandboxId {
 }
 
 impl FromRequest for SandboxId {
-    type Error = crate::ApiError;
+    type Error = crate::ModernApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
