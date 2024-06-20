@@ -3,6 +3,8 @@ import { IdDI } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import type { QueryClient } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import isEqual from 'lodash/isEqual';
+import sortBy from 'lodash/sortBy';
 
 export type VaultType = {
   vault: EntityVault;
@@ -65,7 +67,23 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
     });
   };
 
-  const updateToHistorical = (newData: VaultType) => {
+  const updateForHistorical = (newData: VaultType) => {
+    const shouldSkipUpdate = (prevData: VaultType | undefined, newData: VaultType) => {
+      // Do nothing if this was triggered right after decryption
+      if (prevData?.vault) {
+        const isSameDIs = isEqual(sortBy(Object.keys(prevData.vault)), sortBy(Object.keys(newData.vault)));
+        const isPrevVaultDecrypted = Object.values(prevData.vault).some(value => value !== null);
+        const newVaultDecryptedVals = Object.keys(newData.vault).filter(
+          key => newData.vault[key as DataIdentifier] !== null,
+        );
+        const isNewVaultEncrypted = newVaultDecryptedVals.length === 1 && newVaultDecryptedVals[0] === IdDI.firstName; // Only first name is decrypted, which is by default
+        const isJustDecrypted = isSameDIs && isPrevVaultDecrypted && isNewVaultEncrypted;
+        return isJustDecrypted;
+      }
+    };
+    const prevData = queryClient.getQueryData<VaultType>(['entity', entityId, 'vault']);
+    if (shouldSkipUpdate(prevData, newData)) return;
+
     const newDataConverted = {} as Partial<Record<DataIdentifier, VaultValue>>;
     Object.keys(newData.vault).forEach((di: string) => {
       const newVal = newData.vault[di as DataIdentifier];
@@ -87,7 +105,7 @@ const useEntityVault = (entityId?: string, entity?: Entity) => {
     { enabled: !!entityId && !!entity },
   );
 
-  return { ...query, update, updateToHistorical };
+  return { ...query, update, updateForHistorical };
 };
 
 export default useEntityVault;

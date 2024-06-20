@@ -1861,6 +1861,10 @@
       "truncated-text": {
         "see-more": "See more",
         "see-less": "See less"
+      },
+      "historical-kyc-bar": {
+        "title": "Viewing user as in timeline event:",
+        "exit": "Exit"
       }
     },
     "home": {

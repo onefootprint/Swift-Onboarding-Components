@@ -8,8 +8,8 @@ import styled, { css } from 'styled-components';
 
 import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 
+import getTimelineEventText from '@/entities/components/details/components/content/utils/get-timeline-event-text';
 import type { HistoricalFormData } from '../../view-historical-data-dialog.types';
-import getEventText from './utils/get-event-text';
 
 export type ViewHistoricalDataFormProps = {
   events: AuditTrailTimelineEvent[];
@@ -32,7 +32,7 @@ const ViewHistoricalDataForm = ({ events, onSubmit }: ViewHistoricalDataFormProp
 
   const renderEvent = (event: AuditTrailTimelineEvent) => {
     const { time, seqno } = event;
-    const eventText = getEventText(event);
+    const eventText = getTimelineEventText(event);
     return eventText ? (
       <Stack direction="column" key={'timestamp' in time ? time.timestamp : time.end}>
         <Radio label={eventText} value={`${seqno}`} {...register('seqno', { required: t('required-error') })} />

@@ -15,6 +15,7 @@ import {
   DuplicateData,
   EditProvider,
   Header,
+  HistoricalBar,
   OtherInsights,
   PinnedNotes,
   RiskSignals,
@@ -71,6 +72,8 @@ const Content = () => {
           </>
         )}
       </Box>
+      <OtherInsights />
+      {shownSeqno && <HistoricalBar seqno={shownSeqno} />}
     </>
   );
 };

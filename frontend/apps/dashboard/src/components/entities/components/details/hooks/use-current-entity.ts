@@ -11,7 +11,7 @@ const useCurrentEntity = () => {
   const seqno = useEntitySeqno();
   const entityQuery = useEntity(id);
 
-  const { updateToHistorical } = useEntityVault(id, entityQuery.data);
+  const { updateForHistorical } = useEntityVault(id, entityQuery.data);
   const showRequestErrorToast = useRequestErrorToast();
   useHistoricalEntityData(id, seqno, {
     onSuccess: (historicalData: Attribute[]) => {
@@ -26,7 +26,7 @@ const useCurrentEntity = () => {
         vaultAndTransforms.transforms[attribute.identifier] = attribute.transforms;
         vaultAndTransforms.dataKinds[attribute.identifier] = attribute.dataKind;
       });
-      updateToHistorical(vaultAndTransforms);
+      updateForHistorical(vaultAndTransforms);
     },
     onError: (error: unknown) => showRequestErrorToast(error),
   });

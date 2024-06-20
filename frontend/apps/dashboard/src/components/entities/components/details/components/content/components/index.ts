@@ -8,6 +8,7 @@ export {
 export { default as DeviceInsights } from './device-insights';
 export { default as DuplicateData } from './duplicate-data';
 export { default as EditProvider, useEditMachine } from './edit-machine';
+export { default as HistoricalBar } from './historical-bar';
 export { default as Header } from './header';
 export { default as Notes } from './notes';
 export { default as OtherInsights } from './other-insights';

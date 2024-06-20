@@ -63,6 +63,10 @@ const Actions = ({ entity }: WithEntityProps) => {
     setOpenDialog(ActionDialog.uploadDoc);
   };
 
+  const handleOpenHistoricalDataDialog = () => {
+    setOpenDialog(ActionDialog.historicalData);
+  };
+
   return shouldShowActionsDropdown ? (
     <>
       <Dropdown.Root>
@@ -70,6 +74,9 @@ const Actions = ({ entity }: WithEntityProps) => {
           <IcoDotsHorizontal24 />
         </StyledTrigger>
         <Dropdown.Content align="end" sideOffset={8}>
+          <PermissionGate scopeKind={RoleScopeKind.manualReview} fallbackText={t('view-historical-data.not-allowed')}>
+            <Dropdown.Item onSelect={handleOpenHistoricalDataDialog}>{t('view-historical-data.label')}</Dropdown.Item>
+          </PermissionGate>
           <PermissionGate scopeKind={RoleScopeKind.writeEntities} fallbackText={t('edit-user.not-allowed')}>
             <Dropdown.Item onSelect={editControls.start}>{t('edit-user.label')}</Dropdown.Item>
           </PermissionGate>

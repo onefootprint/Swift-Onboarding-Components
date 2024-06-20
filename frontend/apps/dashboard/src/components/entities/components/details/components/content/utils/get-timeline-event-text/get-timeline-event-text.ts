@@ -39,7 +39,7 @@ import type { AuditTrailTimelineEvent } from 'src/utils/merge-audit-trail-timeli
 import getActorText from '../get-actor-text';
 
 // This is adapted from audit-trail-timeline.tsx
-const getEventText = (event: AuditTrailTimelineEvent): string => {
+const getTimelineEventText = (event: AuditTrailTimelineEvent): string => {
   // TODO: use translations
   const {
     event: { kind, data },
@@ -256,4 +256,4 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
   return '';
 };
 
-export default getEventText;
+export default getTimelineEventText;

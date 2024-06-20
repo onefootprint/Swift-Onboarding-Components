@@ -11,6 +11,7 @@ type DecryptPayload = {
   reason?: string;
   dis?: DataIdentifier[];
   vaultData?: Partial<Record<DataIdentifier, VaultValue>>;
+  seqno?: string | undefined;
 };
 
 type DecryptCallbacks = {
@@ -23,9 +24,13 @@ const useDecryptFields = () => {
   const entityId = useEntityId();
   const { data: documents } = useDocuments(entityId);
 
-  const decryptFields = ({ reason = '', dis, vaultData }: DecryptPayload, { onSuccess, onError }: DecryptCallbacks) => {
+  const decryptFields = (
+    { reason = '', dis, vaultData, seqno }: DecryptPayload,
+    { onSuccess, onError }: DecryptCallbacks,
+  ) => {
     if (dis && dis.length) {
-      const fields = getDocDis({ dis, documents, vaultData });
+      const formattedDIs = seqno ? dis.map(di => `${di}:${seqno}`) : dis;
+      const fields = getDocDis({ dis: formattedDIs, documents, vaultData });
       decryptText
         .mutateAsync({
           entityId,
