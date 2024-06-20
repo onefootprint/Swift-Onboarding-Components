@@ -1358,7 +1358,8 @@
             "note-for-user": {
               "label": "Note for user (optional)",
               "placeholder": "We need you to check if there's a typo in the address information you provided..."
-            }
+            },
+            "clear-review": "Clear manual review after request"
           },
           "link": {
             "header-generated": "Link generated!",

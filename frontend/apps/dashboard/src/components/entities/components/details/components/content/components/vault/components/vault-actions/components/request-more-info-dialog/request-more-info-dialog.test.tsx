@@ -121,6 +121,33 @@ describe('<RequestMoreInfoDialog />', () => {
     });
   });
 
+  describe('Manual review clearing option', () => {
+    beforeEach(() => {
+      withPlaybooks();
+      withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
+      useRouterSpy({
+        pathname: `/entities/${entityFixture.id}`,
+        query: {
+          id: entityFixture.id,
+        },
+      });
+    });
+
+    it('no option when user doesnt require manual review', async () => {
+      withEntity(entityFixture.id, false);
+      renderDialog({ onClose: jest.fn() });
+      expect(screen.queryByText('Clear manual review after request')).not.toBeInTheDocument();
+    });
+
+    it('has option when user requires manual review', async () => {
+      withEntity(entityFixture.id, true);
+      renderDialog({ onClose: jest.fn() });
+      await waitFor(() => {
+        expect(screen.getByText('Clear manual review after request')).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('on link page', () => {
     beforeEach(() => {
       mockRequest({
@@ -136,11 +163,14 @@ describe('<RequestMoreInfoDialog />', () => {
       });
       mockRequest({
         method: 'post',
-        path: `/entities/${entityFixture.id}/triggers`,
+        path: `/entities/${entityFixture.id}/actions`,
         statusCode: 200,
-        response: {
-          link: 'http://footprint.link/#tok_xxx',
-        },
+        response: [
+          {
+            kind: 'trigger',
+            link: 'http://footprint.link/#tok_xxx',
+          },
+        ],
       });
     });
 

@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type LinkDisplayProps = {
-  linkData?: TriggerResponse;
+  linkData?: Omit<TriggerResponse, 'kind'>;
 };
 
 const LinkDisplay = ({ linkData }: LinkDisplayProps) => {

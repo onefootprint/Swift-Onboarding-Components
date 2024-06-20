@@ -278,11 +278,10 @@ export type {
   SubmitReviewResponse,
 } from './submit-review';
 export type {
-  TriggerRequest,
   TriggerResponse,
   WorkflowRequestConfig,
-} from './trigger';
-export { TriggerKind } from './trigger';
+} from './entity-actions';
+export { TriggerKind } from './entity-actions';
 export type { TriggerLinkRequest } from './trigger-link';
 export type {
   UpdateClientSecurityConfigRequest,

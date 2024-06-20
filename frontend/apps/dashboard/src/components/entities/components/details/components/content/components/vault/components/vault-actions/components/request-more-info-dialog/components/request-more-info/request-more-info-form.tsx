@@ -1,5 +1,5 @@
 import { OrgFrequentNoteKind, WorkflowStatus } from '@onefootprint/types';
-import { Divider, Hint, Radio, Stack, Tooltip } from '@onefootprint/ui';
+import { Divider, Hint, Radio, Stack, Toggle, Tooltip } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +36,7 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
     defaultValues: {
       kinds: defaultVariant === 'onboard' ? [RequestMoreInfoKind.Onboard] : [],
       collectSelfie: false,
+      clearManualReview: true,
     },
   });
   const {
@@ -45,6 +46,7 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
     setError,
     clearErrors,
     reset,
+    register,
     formState: { errors },
   } = methods;
   const playbook = watch('playbook');
@@ -64,7 +66,11 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
       });
       return;
     }
-    onSubmit(data);
+    const formData = {
+      ...data,
+      clearManualReview: data.clearManualReview && entity.data?.requiresManualReview,
+    };
+    onSubmit(formData);
   };
 
   const resetForm = () => {
@@ -106,6 +112,10 @@ const RequestMoreInfoForm = ({ onSubmit, formId }: RequestMoreInfoFormProps) => 
           <RequestOnboard visible={requestVariant === 'onboard'} />
           {errors.kinds && <Hint hasError>{errors.kinds.message as string}</Hint>}
         </Stack>
+        {entity.data?.requiresManualReview && (
+          <Toggle label={t('clear-review')} checked={watch('clearManualReview')} {...register('clearManualReview')} />
+        )}
+
         <Divider variant="secondary" />
         <FrequentNotesTextArea
           kind={OrgFrequentNoteKind.Trigger}

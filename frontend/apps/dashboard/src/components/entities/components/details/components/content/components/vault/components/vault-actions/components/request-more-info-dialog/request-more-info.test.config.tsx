@@ -50,12 +50,15 @@ export const entityFixtureWithIncompleteOnboarding: Entity = {
   label: null,
 };
 
-export const withEntity = (entityId: string) =>
+export const withEntity = (entityId: string, requiresManualReview?: boolean) =>
   mockRequest({
     method: 'get',
     path: `/entities/${entityId}`,
     statusCode: 200,
-    response: entityFixture,
+    response: {
+      ...entityFixture,
+      requiresManualReview: requiresManualReview || false,
+    },
   });
 
 export const withEntityWithIncompleteOnboarding = (entityId: string) =>

@@ -1,11 +1,22 @@
 import type { DocumentRequestConfig } from '../data';
 
-export type TriggerRequest = {
+export type EntityActionsRequest = {
   entityId: string;
-  trigger: WorkflowRequestConfig;
-  note?: string;
-  sendLink: boolean;
+  actions: ActionRequest[];
 };
+
+export type ActionRequest =
+  | { kind: ActionRequestKind.clearReview }
+  | {
+      kind: ActionRequestKind.trigger;
+      note?: string;
+      trigger: WorkflowRequestConfig;
+    };
+
+export enum ActionRequestKind {
+  clearReview = 'clear_review',
+  trigger = 'trigger',
+}
 
 export type WorkflowRequestConfig =
   | {
@@ -31,7 +42,11 @@ export enum TriggerKind {
 }
 
 export type TriggerResponse = {
+  kind: ActionRequestKind.trigger;
   token: string;
   link: string;
   expiresAt: string;
 };
+
+// Each action can technically return a response, but only one will
+export type EntityActionsResponse = TriggerResponse[];

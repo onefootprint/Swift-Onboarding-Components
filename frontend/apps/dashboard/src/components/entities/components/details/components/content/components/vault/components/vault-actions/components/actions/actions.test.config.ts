@@ -70,11 +70,14 @@ export const withEntity = (entityFixture: Entity) =>
 export const withTrigger = () =>
   mockRequest({
     method: 'post',
-    path: `/entities/${entityId}/triggers`,
+    path: `/entities/${entityId}/actions`,
     statusCode: 200,
-    response: {
-      link: 'http://footprint.link/#tok_xxx',
-    },
+    response: [
+      {
+        kind: 'trigger',
+        link: 'http://footprint.link/#tok_xxx',
+      },
+    ],
   });
 
 export const withTokenSendLink = (deliveryMethod: string) =>
@@ -90,7 +93,7 @@ export const withTokenSendLink = (deliveryMethod: string) =>
 export const withTriggerError = () =>
   mockRequest({
     method: 'post',
-    path: `/entities/${entityId}/triggers`,
+    path: `/entities/${entityId}/actions`,
     statusCode: 400,
     response: {
       message: 'Something went wrong',

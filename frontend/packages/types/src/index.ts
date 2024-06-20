@@ -187,7 +187,6 @@ export type {
   SubmitReviewRequest,
   SubmitReviewResponse,
   TenantDetail,
-  TriggerRequest,
   TriggerResponse,
   UpdateAnnotationRequest,
   UpdateAnnotationResponse,

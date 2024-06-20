@@ -11,7 +11,7 @@ import useSendTokenLinkMutation from '../../../hooks/use-send-token-link';
 import LinkDisplay from '../components/link-display';
 
 type UseDisplayLinkDialogProps = {
-  linkData?: TriggerResponse;
+  linkData?: Omit<TriggerResponse, 'kind'>;
   onClose: () => void;
 };
 

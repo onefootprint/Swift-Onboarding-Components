@@ -1,14 +1,13 @@
+import useEntityId from '@/entity/hooks/use-entity-id';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { DocumentRequestConfig, WorkflowRequestConfig } from '@onefootprint/types';
 import { DocumentRequestKind, TriggerKind } from '@onefootprint/types';
+import { ActionRequest, ActionRequestKind } from '@onefootprint/types/src/api/entity-actions';
 import type { DialogButton } from '@onefootprint/ui';
 import { Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import useEntityId from '@/entity/hooks/use-entity-id';
-
-import useCreateTrigger from '../actions/components/hooks/use-create-trigger';
+import useSubmitActions from '../actions/components/hooks/use-submit-actions';
 import RequestMoreInfoForm from './components/request-more-info';
 import type { TriggerFormData } from './components/request-more-info/types';
 import { RequestMoreInfoKind } from './components/request-more-info/types';
@@ -28,7 +27,7 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.actions.request-more-info',
   });
-  const submitTriggerMutation = useCreateTrigger();
+  const submitActionsMutation = useSubmitActions();
   const showRequestErrorToast = useRequestErrorToast();
   const entityId = useEntityId();
   // This dialog has two states: one that collects info on what kind of link to generate,
@@ -40,7 +39,7 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
     onClose();
   };
   const displayLinkDialogProps = useDisplayLinkDialog({
-    linkData: submitTriggerMutation.data,
+    linkData: submitActionsMutation.data?.[0],
     onClose: handleClose,
   });
 
@@ -91,12 +90,14 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
       });
       trigger = { kind: TriggerKind.Document, data: { configs } };
     }
-    submitTriggerMutation.mutate(
+    const actions: ActionRequest[] = [{ trigger, note: note || undefined, kind: ActionRequestKind.trigger }];
+    if (data.clearManualReview) {
+      actions.push({ kind: ActionRequestKind.clearReview });
+    }
+    submitActionsMutation.mutate(
       {
         entityId,
-        trigger,
-        note: note || undefined,
-        sendLink: false,
+        actions,
       },
       {
         onSuccess: () => {
@@ -117,14 +118,14 @@ const RequestMoreInfoDialog = ({ open, onClose }: RequestMoreInfoDialogProps) =>
     primaryButton = {
       form: 'request-more-info-form',
       label: t('next'),
-      loading: submitTriggerMutation.isLoading,
-      disabled: submitTriggerMutation.isLoading,
+      loading: submitActionsMutation.isLoading,
+      disabled: submitActionsMutation.isLoading,
       type: 'submit',
     };
     secondaryButton = {
       label: t('cancel'),
       onClick: handleClose,
-      disabled: submitTriggerMutation.isLoading,
+      disabled: submitActionsMutation.isLoading,
     };
     component = <RequestMoreInfoForm formId="request-more-info-form" onSubmit={handleGenerateLink} />;
   } else {

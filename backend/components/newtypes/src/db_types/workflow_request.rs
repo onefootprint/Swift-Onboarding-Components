@@ -15,6 +15,7 @@ use serde::{
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
 #[serde(rename_all = "snake_case")]
+// TODO would be nice to remove the content here to reduce unnecessary nesting, but lots to migrate
 #[serde(tag = "kind", content = "data")]
 pub enum WorkflowRequestConfig {
     /// Allow editing data, re-verify data, and then re-trigger decision engine

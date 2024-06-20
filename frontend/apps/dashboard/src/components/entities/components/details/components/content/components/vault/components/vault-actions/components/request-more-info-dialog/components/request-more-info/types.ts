@@ -21,4 +21,5 @@ export type TriggerFormData = {
   customDocument?: CustomDocumentData[];
   playbook?: SelectOption;
   note?: string;
+  clearManualReview?: boolean;
 };
