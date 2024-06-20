@@ -45,6 +45,10 @@ const setupLogger = (orgIds: Set<string>, config: PublicOnboardingConfig) => {
     Logger.identify({
       appClipExperienceId: config.appClipExperienceId,
       application_id: String(process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_BIFROST),
+      // @ts-expect-error: browser support
+      deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
+      // @ts-expect-error: browser support
+      deviceConnection: typeof navigator?.connection !== 'undefined' ? navigator.connection : undefined,
       iframe: !!isInIframe,
       isAppClipEnabled: config.isAppClipEnabled,
       isInstantAppEnabled: config.isInstantAppEnabled,

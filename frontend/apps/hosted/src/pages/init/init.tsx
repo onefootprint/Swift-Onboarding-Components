@@ -64,6 +64,10 @@ const Init = () => {
           Logger.startSessionReplay();
           Logger.identify({
             appClipExperienceId: onboardingConfig.appClipExperienceId,
+            // @ts-expect-error: browser support
+            deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
+            // @ts-expect-error: browser support
+            deviceConnection: typeof navigator?.connection !== 'undefined' ? navigator.connection : undefined,
             isAppClipEnabled: onboardingConfig.isAppClipEnabled,
             isInstantAppEnabled: onboardingConfig.isInstantAppEnabled,
             isNoPhoneFlow: onboardingConfig.isNoPhoneFlow,

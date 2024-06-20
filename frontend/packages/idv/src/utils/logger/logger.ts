@@ -59,11 +59,11 @@ const LoggerFactory = () => {
     const sessionId = getSessionId();
     const ddSessionId = datadogLogs.getInternalContext()?.session_id;
     const contextProps = { ...filterNonEmptyTraits(traits), fp_session_id: sessionId };
+    const context = appName === 'bifrost' && ddSessionId ? { ...contextProps, session_id: ddSessionId } : contextProps;
 
     if (isDDLogsEnabled || isDDRumEnabled) {
-      datadogLogs.setGlobalContext(
-        appName === 'bifrost' && ddSessionId ? { ...contextProps, session_id: ddSessionId } : contextProps,
-      );
+      datadogLogs.setGlobalContext(context);
+      datadogRum.setGlobalContext(context);
     }
   };
 
