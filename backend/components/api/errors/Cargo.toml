@@ -14,3 +14,4 @@ serde_cbor = { workspace = true }
 actix-web = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }
+derive_more = { workspace = true }

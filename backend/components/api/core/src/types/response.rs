@@ -1,5 +1,5 @@
 use crate::ApiError;
-use api_errors::FpApiError;
+use api_errors::FpError;
 use http::StatusCode;
 use newtypes::{
     Base64Data,
@@ -20,20 +20,10 @@ use serde::{
     Serialize,
 };
 
-// TODO replace all ApiResult with ModernApiResult
-// TODO implement FpApiError for DbError and then remove physical enum variant on ApiError, etc
-
-/// The magical error type that can hold any type T that implements FpApiError.
-/// As crates create their own Error struct, they only need to implement FpApiError.
+/// Wrapper around FpError that implements actix_web::ResponseError
 #[api_v2_errors()] // We don't support error responses on our docs site yet
 #[derive(derive_more::Deref)]
-pub struct ModernApiError(Box<dyn FpApiError>);
-
-impl<T: Into<ApiError>> From<T> for ModernApiError {
-    fn from(value: T) -> Self {
-        Self(Box::new(value.into()))
-    }
-}
+pub struct ModernApiError(FpError);
 
 impl std::fmt::Display for ModernApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -50,6 +40,12 @@ impl std::fmt::Debug for ModernApiError {
 impl std::error::Error for ModernApiError {
     fn source(&self) -> std::option::Option<&(dyn std::error::Error + 'static)> {
         self.0.source()
+    }
+}
+
+impl<T: Into<ApiError>> From<T> for ModernApiError {
+    fn from(value: T) -> Self {
+        Self(FpError::from(value.into()))
     }
 }
 

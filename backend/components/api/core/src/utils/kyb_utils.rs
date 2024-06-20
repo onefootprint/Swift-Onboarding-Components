@@ -20,7 +20,7 @@ use crate::utils::vault_wrapper::{
     VaultWrapper,
 };
 use crate::State;
-use api_errors::FpApiError;
+use api_errors::FpErrorTrait;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;

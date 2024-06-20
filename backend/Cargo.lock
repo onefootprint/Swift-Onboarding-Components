@@ -676,6 +676,7 @@ name = "api_errors"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "derive_more",
  "serde",
  "serde_cbor",
  "serde_json",

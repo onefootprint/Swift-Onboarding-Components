@@ -321,7 +321,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
     }
 }
 
-impl api_errors::FpApiError for ApiError {
+impl api_errors::FpErrorTrait for ApiError {
     fn status_code(&self) -> StatusCode {
         match self.0.as_ref() {
             ApiErrorKind::ErrorWithCode(e) => e.status_code(),
