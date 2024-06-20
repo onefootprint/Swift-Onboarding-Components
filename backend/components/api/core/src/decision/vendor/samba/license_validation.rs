@@ -21,6 +21,7 @@ use db::models::samba_report::SambaReport;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::PgConn;
+use idv::samba::license_state_is_supported_for_license_validation;
 use idv::samba::request::SambaCreateLVOrderRequest;
 use idv::samba::request::SambaGetLVReportRequest;
 use idv::samba::response::license_validation::SambaLinkType;
@@ -237,6 +238,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     )
     .await?
     .ok();
+
     if existing_result.is_some() {
         return Ok(());
     }
@@ -252,6 +254,19 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     .await?;
     // create our request based on what type of data we're handling
     let (request, lifetime_ids) = context.create_request(&vw, &state.enclave_client, &tvc).await?;
+    let license_state = UsState::from_raw_string(request.license_state.leak()).ok();
+
+    let can_run_request_for_state = if let Some(state) = license_state {
+        license_state_is_supported_for_license_validation(state)
+    } else {
+        false
+    };
+
+    if !can_run_request_for_state {
+        return Err(map_to_api_error(idv::samba::error::Error::UnsupportedState(
+            "license_validation".to_string(),
+        )));
+    }
 
     // make request
     let res = state

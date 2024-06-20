@@ -12,4 +12,6 @@ pub enum Error {
     SendError(String),
     #[error("Samba http error {0} for service {1}")]
     HttpError(u16, String),
+    #[error("Unsupported license state for service {0}")]
+    UnsupportedState(String),
 }

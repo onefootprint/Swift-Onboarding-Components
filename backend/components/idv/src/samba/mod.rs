@@ -1,5 +1,6 @@
 use newtypes::PiiJsonValue;
 use newtypes::ScrubbedPiiJsonValue;
+use newtypes::UsState;
 use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -112,6 +113,53 @@ where
             }
         }
     }
+}
+
+// Samba only supports specific states for license_validation
+// https://dev-devportal.sambasafety.io/solutions/license-verification.html#license-validation
+pub fn license_state_is_supported_for_license_validation(state: UsState) -> bool {
+    matches!(
+        state,
+        UsState::AR
+            | UsState::AZ
+            | UsState::CA
+            | UsState::CO
+            | UsState::CT
+            | UsState::DC
+            | UsState::DE
+            | UsState::FL
+            | UsState::GA
+            | UsState::HI
+            | UsState::IA
+            | UsState::ID
+            | UsState::IL
+            | UsState::IN
+            | UsState::KS
+            | UsState::KY
+            | UsState::MA
+            | UsState::MD
+            | UsState::ME
+            | UsState::MI
+            | UsState::MO
+            | UsState::MS
+            | UsState::MT
+            | UsState::NC
+            | UsState::ND
+            | UsState::NE
+            | UsState::NJ
+            | UsState::NM
+            | UsState::OH
+            | UsState::OR
+            | UsState::RI
+            | UsState::SD
+            | UsState::TN
+            | UsState::TX
+            | UsState::VA
+            | UsState::VT
+            | UsState::WA
+            | UsState::WI
+            | UsState::WY
+    )
 }
 
 fn log_response_error(http_status: StatusCode, content_length: Option<u64>, issue: &str) {
