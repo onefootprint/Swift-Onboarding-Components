@@ -32,7 +32,11 @@ const isPropsSaved = (context: Record<string, unknown>) => {
   );
 };
 
-const setupLogger = (orgIds: Set<string>, config: PublicOnboardingConfig) => {
+const setupLogger = ({
+  orgIds,
+  config,
+  hasBootstrapData,
+}: { orgIds: Set<string>; config: PublicOnboardingConfig; hasBootstrapData: boolean }) => {
   const isInIframe = checkIsInIframe();
   const isRecordDisabled = orgIds.has(config.orgId);
 
@@ -49,6 +53,7 @@ const setupLogger = (orgIds: Set<string>, config: PublicOnboardingConfig) => {
       deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
       // @ts-expect-error: browser support
       deviceConnection: typeof navigator?.connection !== 'undefined' ? navigator.connection : undefined,
+      hasBootstrapData,
       iframe: !!isInIframe,
       isAppClipEnabled: config.isAppClipEnabled,
       isInstantAppEnabled: config.isInstantAppEnabled,
@@ -65,7 +70,12 @@ const setupLogger = (orgIds: Set<string>, config: PublicOnboardingConfig) => {
 
 const Init = () => {
   const [state, send] = useBifrostMachine();
-  const { authToken: authTokenContext, publicKey: publicKeyContext, config: configContext } = state.context;
+  const {
+    authToken: authTokenContext,
+    publicKey: publicKeyContext,
+    config: configContext,
+    bootstrapData = {},
+  } = state.context;
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const startMs = Date.now();
@@ -85,7 +95,11 @@ const Init = () => {
     { obConfigAuth, authToken: authTokenContext },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
-        setupLogger(orgIds, config);
+        setupLogger({
+          orgIds,
+          config,
+          hasBootstrapData: Object.entries(bootstrapData).some(([, value]) => value),
+        });
         send({
           type: 'initContextUpdated',
           payload: { config: { ...config } },

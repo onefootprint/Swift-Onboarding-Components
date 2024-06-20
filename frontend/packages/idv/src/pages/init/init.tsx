@@ -22,6 +22,8 @@ const Init = () => {
   });
 
   useEffect(() => {
+    trackAction('onboarding:started');
+    // TODO: Deprecate this action
     trackAction('idv:started');
   }, []);
 
