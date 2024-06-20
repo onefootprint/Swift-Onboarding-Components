@@ -1631,7 +1631,7 @@
             "uuid": "UUID: "
           },
           "workflow-triggered-event": {
-            "requested-user-to": "requested user to {{action}}",
+            "user-requested-to": "Requested to {{action}} <playbook /> by <actor />",
             "actions": {
               "onboard": "onboard onto",
               "redo_kyc": "reonboard onto playbook",

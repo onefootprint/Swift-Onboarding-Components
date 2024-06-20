@@ -90,13 +90,10 @@ describe('<AuditTrailTimeline />', () => {
 
     it('should render workflow trigger event properly', () => {
       renderAuditTrailTimeline(TimelineFixture);
+      expect(screen.getByText('Requested to upload ID photo by', { exact: false })).toBeInTheDocument();
       expect(screen.getByText('Piip Penguin (piip@onefootprint.com)')).toBeInTheDocument();
-      expect(screen.getByText('requested user to upload ID photo')).toBeInTheDocument();
 
-      const body = screen.getByTestId('workflow-triggered-event-body');
-      expect(body).toBeInTheDocument();
-      expect(within(body).getByText('Generated a link for the user to complete this task')).toBeInTheDocument();
-      expect(within(body).queryByText('Create new link')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('workflow-triggered-event-body')).not.toBeInTheDocument();
     });
 
     describe('when rendering workflow trigger event with link', () => {
@@ -114,11 +111,11 @@ describe('<AuditTrailTimeline />', () => {
         });
 
         renderAuditTrailTimeline([WorkflowTriggeredWithLinkEvent]);
-        expect(screen.getByText('Piip Penguin (piip@onefootprint.com)')).toBeInTheDocument();
-        expect(screen.getByText('requested user to onboard onto')).toBeInTheDocument();
+        expect(screen.getByText('Requested to onboard onto', { exact: false })).toBeInTheDocument();
         await waitFor(() => {
           expect(screen.getByText('My playbook')).toBeInTheDocument();
         });
+        expect(screen.getByText('Piip Penguin (piip@onefootprint.com)')).toBeInTheDocument();
 
         const body = screen.getByTestId('workflow-triggered-event-body');
         expect(body).toBeInTheDocument();

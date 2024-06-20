@@ -1,7 +1,7 @@
 import { TriggerKind, type WorkflowTriggeredEventData } from '@onefootprint/types';
 import { Shimmer, Text } from '@onefootprint/ui';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import usePlaybook from 'src/components/playbook-details/hooks/use-playbook';
 
 import Actor from '../actor/actor';
@@ -13,22 +13,21 @@ type WorkflowTriggeredEventHeaderProps = {
 };
 
 const WorkflowTriggeredEventHeader = ({ data }: WorkflowTriggeredEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
-  });
-
   const getActionName = useGetActionName();
   const action = getActionName(data.config);
 
   return (
     <>
-      <Actor actor={data.actor} />
-      <Text variant="body-3" color="tertiary" marginLeft={2}>
-        {t('requested-user-to', {
-          action,
-        })}
+      <Text variant="body-3" color="tertiary">
+        <Trans
+          i18nKey="pages.entity.audit-trail.timeline.workflow-triggered-event.user-requested-to"
+          values={{ action }}
+          components={{
+            playbook: <PlaybookContext data={data} />,
+            actor: <Actor actor={data.actor} />,
+          }}
+        />
       </Text>
-      <PlaybookContext data={data} />
     </>
   );
 };

@@ -208,7 +208,7 @@ const getEventText = (event: AuditTrailTimelineEvent): string => {
         actionText = 'upload ID photo';
       }
     }
-    return `${getActorText(eventData.actor)} requested user to ${actionText}`;
+    return `Requested to ${actionText} by ${getActorText(eventData.actor)}`;
   }
 
   if (kind === TimelineEventKind.workflowStarted) {

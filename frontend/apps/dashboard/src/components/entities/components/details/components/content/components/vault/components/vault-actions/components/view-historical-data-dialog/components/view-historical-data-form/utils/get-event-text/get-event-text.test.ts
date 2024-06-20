@@ -75,7 +75,7 @@ describe('getEventText', () => {
   describe('when an event with kind TimelineEventKind.workflowTriggered is passed in', () => {
     it('should return the correct text', () => {
       const workflowTriggeredText = getEventText(workflowTriggeredEventFixture);
-      expect(workflowTriggeredText).toEqual('Piip Penguin (piip@onefootprint.com) requested user to upload ID photo');
+      expect(workflowTriggeredText).toEqual('Requested to upload ID photo by Piip Penguin (piip@onefootprint.com)');
     });
   });
 

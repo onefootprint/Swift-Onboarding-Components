@@ -153,10 +153,11 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       });
     } else if (kind === TimelineEventKind.workflowTriggered) {
       const eventData = data as WorkflowTriggeredEventData;
+      const shouldShowBody = eventData.requestIsActive;
       items.push({
         time,
         headerComponent: <WorkflowTriggeredEventHeader data={eventData} />,
-        bodyComponent: <WorkflowTriggeredEventBody data={eventData} entityId={entity.id} />,
+        bodyComponent: shouldShowBody && <WorkflowTriggeredEventBody data={eventData} entityId={entity.id} />,
       });
     } else if (kind === TimelineEventKind.workflowStarted) {
       const eventData = data as WorkflowStartedEventData;

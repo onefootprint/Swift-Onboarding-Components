@@ -32,7 +32,9 @@ const WorkflowTriggeredEventBody = ({ data, entityId }: WorkflowTriggeredEventBo
     onClose: handleClose,
   });
 
-  const shouldShowGenerateLinkButton = data.requestIsActive;
+  if (!data.requestIsActive) {
+    return null;
+  }
 
   const openLinkDialog = () => {
     setIsDialogOpen(true);
@@ -76,22 +78,18 @@ const WorkflowTriggeredEventBody = ({ data, entityId }: WorkflowTriggeredEventBo
               <Text variant="body-3" tag="span">
                 {t('link-generated')}
               </Text>
-              {shouldShowGenerateLinkButton && (
-                <>
-                  <Stack align="center" justify="center" marginLeft={1} marginRight={1}>
-                    ·
-                  </Stack>
-                  <PermissionGate
-                    scopeKind={RoleScopeKind.manualReview}
-                    fallbackText={t('create-link.no-permission')}
-                    tooltipPosition="left"
-                  >
-                    <LinkButton onClick={openLinkDialog} disabled={generateTokenMutation.isLoading} variant="label-4">
-                      {t('create-link.label')}
-                    </LinkButton>
-                  </PermissionGate>
-                </>
-              )}
+              <Stack align="center" justify="center" marginLeft={1} marginRight={1}>
+                ·
+              </Stack>
+              <PermissionGate
+                scopeKind={RoleScopeKind.manualReview}
+                fallbackText={t('create-link.no-permission')}
+                tooltipPosition="left"
+              >
+                <LinkButton onClick={openLinkDialog} disabled={generateTokenMutation.isLoading} variant="label-4">
+                  {t('create-link.label')}
+                </LinkButton>
+              </PermissionGate>
             </Stack>
           }
         />
