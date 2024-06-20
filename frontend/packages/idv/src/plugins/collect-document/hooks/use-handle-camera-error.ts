@@ -23,27 +23,27 @@ const useHandleCameraError = () => {
     const error = err as DOMException;
     if (error instanceof TypeError) {
       showErrorToast(t('undefined-navigator'));
-      trackAction('id-doc:camera-error', { error: 'undefined-navigator' });
+      trackAction('id-doc:camera-error', { cameraError: 'undefined-navigator' });
     } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
       // required track is missing
       showErrorToast(t('not-found'));
-      trackAction('id-doc:camera-error', { error: 'not-found' });
+      trackAction('id-doc:camera-error', { cameraError: 'not-found' });
     } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
       // webcam or mic are already in use
       showErrorToast(t('already-in-use'));
-      trackAction('id-doc:camera-error', { error: 'already-in-use' });
+      trackAction('id-doc:camera-error', { cameraError: 'already-in-use' });
     } else if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
       // constraints can not be satisfied by avb. devices
       showErrorToast(t('constraint'));
-      trackAction('id-doc:camera-error', { error: 'constraint' });
+      trackAction('id-doc:camera-error', { cameraError: 'constraint' });
     } else if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
       // permission denied in browser
       missingPermissionsSheet.show({});
-      trackAction('id-doc:camera-error', { error: 'permission-denied' });
+      trackAction('id-doc:camera-error', { cameraError: 'permission-denied' });
     } else {
       // other errors
       showErrorToast(t('other-error'));
-      trackAction('id-doc:camera-error', { error: 'other-error' });
+      trackAction('id-doc:camera-error', { cameraError: 'other-error' });
     }
 
     // Do not log permission errors since they create too much noise
