@@ -61,12 +61,15 @@ const BusinessVault = ({ entity }: BusinessVaultProps) => {
   );
 };
 
-const getTemplateAreas = (shouldRenderBos: boolean, hasCustomData: boolean) => {
-  if (shouldRenderBos && hasCustomData) {
+const getTemplateAreas = (hasBos: boolean, hasCustomData: boolean) => {
+  if (hasBos && hasCustomData) {
     return ['basic address', 'bos address', 'custom custom'];
   }
-  if (shouldRenderBos) {
+  if (hasBos) {
     return ['basic address', 'bos address'];
+  }
+  if (hasCustomData) {
+    return ['basic address', 'custom custom'];
   }
   return ['basic address'];
 };
