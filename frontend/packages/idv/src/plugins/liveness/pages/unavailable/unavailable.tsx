@@ -1,13 +1,13 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { SkipLivenessClientType, SkipLivenessReason } from '@onefootprint/types/src/api/skip-liveness';
 import { AnimatedLoadingSpinner } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { useEffectOnce } from 'usehooks-ts';
 
 import { NavigationHeader } from '../../../../components';
 import { useSkipLiveness } from '../../../../hooks';
 import { checkIsSocialMediaBrowser } from '../../../../utils';
+import { trackAction } from '../../../../utils/logger';
 import { Logger } from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 
@@ -18,7 +18,7 @@ const Unavailable = () => {
   } = state.context;
   const skipLivenessMutation = useSkipLiveness();
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (!authToken) {
       return;
     }
@@ -35,6 +35,7 @@ const Unavailable = () => {
     } else {
       reason = SkipLivenessReason.unknown;
     }
+    trackAction('passkeys:unavailable', { reason });
 
     const context = {
       reason,
@@ -57,7 +58,7 @@ const Unavailable = () => {
         },
       },
     );
-  });
+  }, []);
 
   return (
     <Container>

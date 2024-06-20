@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
+import { trackAction } from '../../../../utils/logger';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import Register from '../register';
 import Unavailable from '../unavailable';
@@ -15,7 +16,12 @@ const Router = ({ onDone }: RouterProps) => {
   useLogStateMachine('liveness', state);
 
   useEffect(() => {
+    trackAction('passkeys:started');
+  }, []);
+
+  useEffect(() => {
     if (isDone) {
+      trackAction('passkeys:completed');
       onDone();
     }
   }, [isDone, onDone]);

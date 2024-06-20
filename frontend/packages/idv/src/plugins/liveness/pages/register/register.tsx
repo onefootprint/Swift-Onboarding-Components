@@ -11,7 +11,7 @@ import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useSkipLiveness } from '../../../../hooks';
 import { FPCustomEvents, sendCustomEvent } from '../../../../utils/custom-event';
-import { getLogger } from '../../../../utils/logger';
+import { getLogger, trackAction } from '../../../../utils/logger';
 import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import useBiometricInit, { isRegisterPasskeyError } from '../../hooks/use-register-biometric';
@@ -82,6 +82,7 @@ const Register = () => {
   };
 
   const handleSkip = () => {
+    trackAction('passkeys:skipped');
     if (skipLivenessMutation.isLoading) {
       return;
     }
