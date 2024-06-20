@@ -44,6 +44,7 @@ const Stepper = ({ 'aria-label': ariaLabel, onChange, options, value: selected }
           return (
             <React.Fragment key={option.value}>
               <Item
+                key={`${option.value}-${position}`}
                 data-completed={isCompleted}
                 data-next={isNext}
                 data-selected={isSelected}
@@ -70,9 +71,9 @@ const Stepper = ({ 'aria-label': ariaLabel, onChange, options, value: selected }
                     const isSubOptionCompleted = (subValueIndex ?? 0) > subIndex;
                     const isSubOptionNext = (subValueIndex ?? 0) < subIndex;
                     return (
-                      <>
+                      <React.Fragment key={suboption.value}>
                         <SubItem
-                          key={suboption.value}
+                          key={`${suboption.value}-${subIndex}`}
                           data-completed={isSubOptionCompleted}
                           data-next={isSubOptionNext}
                           data-selected={isSubOptionSelected}
@@ -87,7 +88,7 @@ const Stepper = ({ 'aria-label': ariaLabel, onChange, options, value: selected }
                         {isLast ? null : (
                           <Connector data-completed={isCompleted} data-next={isNext} data-selected={isSelected} />
                         )}
-                      </>
+                      </React.Fragment>
                     );
                   })}
                 </ul>
