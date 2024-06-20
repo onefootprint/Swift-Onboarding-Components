@@ -16,7 +16,11 @@ enum SortOrder {
   descending = 'descending',
 }
 
-const PinnedNotes = () => {
+type PinnedNotesProps = {
+  isDisabled?: boolean;
+};
+
+const PinnedNotes = ({ isDisabled }: PinnedNotesProps) => {
   const { data } = useCurrentEntityAnnotations();
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.pinned-notes',
@@ -53,7 +57,7 @@ const PinnedNotes = () => {
   }
 
   return (
-    <Container>
+    <Container data-is-disabled={isDisabled}>
       <HeaderTitle>
         <Stack direction="row" gap={2}>
           <IcoPin24 />
@@ -92,6 +96,29 @@ const PinnedNotes = () => {
   );
 };
 
+const Container = styled.div`
+  ${({ theme }) => css`
+    gap: ${theme.spacing[4]};
+    margin-bottom: ${theme.spacing[9]};
+
+    &[data-is-disabled='true'] {
+      opacity: 0.5;
+      pointer-events: none;
+      user-select: none;
+    }
+  `}
+`;
+
+const HeaderTitle = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: ${theme.spacing[2]};
+    margin-bottom: ${theme.spacing[3]};
+  `}
+`;
+
 const SortButton = styled(Stack)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')}
@@ -111,23 +138,6 @@ const StyledIconArrow = styled(IcoArrowDown16)<{ direction: SortOrder }>`
   ${({ direction }) => css`
     transform: ${direction === SortOrder.descending ? 'rotate(180deg)' : 'rotate(0deg)'};
     transition: transform 0.2s ease-in-out;
-  `}
-`;
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    gap: ${theme.spacing[4]};
-    margin-bottom: ${theme.spacing[9]};
-  `}
-`;
-
-const HeaderTitle = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: ${theme.spacing[2]};
-    margin-bottom: ${theme.spacing[3]};
   `}
 `;
 

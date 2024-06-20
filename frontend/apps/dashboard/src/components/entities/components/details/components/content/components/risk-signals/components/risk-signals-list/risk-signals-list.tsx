@@ -4,8 +4,10 @@ import type { TableRow } from '@onefootprint/ui';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
 import useCurrentEntityRiskSignals from '@/entity/hooks/use-current-entity-risk-signals';
+import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
 
 import Details from './components/details';
@@ -16,6 +18,7 @@ const RiskSignalsList = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.risk-signals.table',
   });
+  const isViewingHistorical = !!useEntitySeqno();
   const { isLoading, error, data } = useCurrentEntityRiskSignals();
   const filters = useRiskSignalsFilters();
   const columns = [
@@ -33,7 +36,7 @@ const RiskSignalsList = () => {
   };
 
   return (
-    <>
+    <Container data-primary-background={isViewingHistorical}>
       <Table<RiskSignal>
         aria-label={t('aria-label')}
         columns={columns}
@@ -48,10 +51,21 @@ const RiskSignalsList = () => {
         renderTr={renderTr}
       />
       <Details />
-    </>
+    </Container>
   );
 };
 
 const renderTr = ({ item }: TableRow<RiskSignal>) => <Row riskSignal={item} />;
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    &[data-primary-background='true'] {
+      > table,
+      > table th {
+        background-color: ${theme.backgroundColor.primary};
+      }
+    }
+  `};
+`;
 
 export default RiskSignalsList;

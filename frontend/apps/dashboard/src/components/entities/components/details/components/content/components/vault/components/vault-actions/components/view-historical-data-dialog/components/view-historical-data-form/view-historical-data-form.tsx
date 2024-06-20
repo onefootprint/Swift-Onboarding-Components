@@ -64,9 +64,15 @@ const ViewHistoricalDataForm = ({ events, onSubmit }: ViewHistoricalDataFormProp
 const TimeContainer = styled.div`
   ${({ theme }) => css`
     margin-left: calc(${theme.spacing[7]} + ${theme.spacing[2]});
-
-    > p {
-      ${createFontStyles('body-4')};
+    > div {
+      gap: ${theme.spacing[2]};
+      p {
+        ${createFontStyles('body-4')};
+        min-width: 0;
+      }
+      p:not(:last-child)::after {
+        content: ', ';
+      }
     }
   `}
 `;

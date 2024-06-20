@@ -12,14 +12,16 @@ import { HEADER_ACTIONS_ID } from '@/entity/constants';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 import IdDropdown from './components/id-dropdown';
 
-type HeaderProps = WithEntityProps;
+type HeaderProps = WithEntityProps & {
+  isDisabled?: boolean;
+};
 
-const Header = ({ entity }: HeaderProps) => {
+const Header = ({ entity, isDisabled }: HeaderProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.header' });
   const { kind } = useEntityContext();
 
   return (
-    <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)}>
+    <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)} data-is-disabled={isDisabled}>
       <Stack direction="column" flexGrow={1} gap={2} width="100%">
         <FirstRow align="center" gap={3} flexGrow={1}>
           <Main>
@@ -68,6 +70,12 @@ const HeaderContainer = styled.header`
     gap: ${theme.spacing[2]};
     align-items: center;
     justify-content: space-between;
+
+    &[data-is-disabled='true'] {
+      opacity: 0.5;
+      pointer-events: none;
+      user-select: none;
+    }
   `};
 `;
 

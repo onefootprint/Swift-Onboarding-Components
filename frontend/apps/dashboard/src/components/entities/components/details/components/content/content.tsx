@@ -1,8 +1,11 @@
 import { EntityKind } from '@onefootprint/types';
 import { Box, Divider } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { MAIN_PAGE_ID } from 'src/config/constants';
+import { createGlobalStyle, css } from 'styled-components';
 import { useEntityContext } from '../../hooks/use-entity-context';
+import useEntitySeqno from '../../hooks/use-entity-seqno';
 import {
   AuditTrail,
   Banner,
@@ -20,44 +23,67 @@ import {
 
 const Content = () => {
   const { kind } = useEntityContext();
+  const shownSeqno = useEntitySeqno();
+  const isHeadingDisabled = !!shownSeqno;
+  useHistoricalLayout(!!shownSeqno);
 
   return (
-    <Box tag="section" testID="entity-content">
-      <Box marginBottom={7}>
-        <Banner />
-      </Box>
-      <Box marginBottom={7}>
-        <Breadcrumb />
-      </Box>
-      <Box>
-        <PinnedNotes />
-      </Box>
-      <Box marginBottom={5}>
-        <Header />
-      </Box>
-      <Box marginBottom={5}>
-        <Divider />
-      </Box>
-      <Box marginBottom={9}>
-        <Vault />
-      </Box>
-      <Box marginBottom={9}>
-        <AuditTrail />
-      </Box>
-      <Box marginBottom={9}>
-        <RiskSignals />
-      </Box>
-      {kind === EntityKind.person && (
-        <Box marginBottom={9}>
-          <DuplicateData />
+    <>
+      <GlobalStyle />
+      <Box tag="section" testID="entity-content">
+        <Box marginBottom={7}>
+          <Banner isDisabled={isHeadingDisabled} />
         </Box>
-      )}
-      <Box marginBottom={9}>
-        <DeviceInsights />
+        <Box marginBottom={7}>
+          <Breadcrumb isDisabled={isHeadingDisabled} />
+        </Box>
+        <Box>
+          <PinnedNotes isDisabled={isHeadingDisabled} />
+        </Box>
+        <Box marginBottom={5}>
+          <Header isDisabled={isHeadingDisabled} />
+        </Box>
+        <Box marginBottom={5}>
+          <Divider />
+        </Box>
+        <Box marginBottom={9}>
+          <Vault />
+        </Box>
+        {!shownSeqno && (
+          <Box marginBottom={9}>
+            <AuditTrail />
+          </Box>
+        )}
+        <Box marginBottom={9}>
+          <RiskSignals />
+        </Box>
+        {!shownSeqno && kind === EntityKind.person && (
+          <Box marginBottom={9}>
+            <DuplicateData />
+          </Box>
+        )}
+        {!shownSeqno && (
+          <>
+            <Box marginBottom={9}>
+              <DeviceInsights />
+            </Box>
+            <OtherInsights />
+          </>
+        )}
       </Box>
-      <OtherInsights />
-    </Box>
+    </>
   );
+};
+
+const useHistoricalLayout = (isHeadingDisabled: boolean) => {
+  useEffect(() => {
+    const layoutElement = document.getElementById(MAIN_PAGE_ID);
+    if (isHeadingDisabled) {
+      layoutElement?.classList.add('historical');
+    } else {
+      layoutElement?.classList.remove('historical');
+    }
+  }, [isHeadingDisabled]);
 };
 
 const ContentWithProviders = () => (
@@ -67,5 +93,13 @@ const ContentWithProviders = () => (
     </DecryptMachineProvider>
   </EditProvider>
 );
+
+const GlobalStyle = createGlobalStyle`
+  ${({ theme }) => css`
+    #page-main.historical {
+      background-color: ${theme.backgroundColor.secondary};
+    }
+  `}
+`;
 
 export default ContentWithProviders;

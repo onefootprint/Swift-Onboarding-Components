@@ -3,6 +3,7 @@ import { ErrorComponent } from 'src/components';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
+import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 import Content from './components/content';
 import Loading from './components/loading';
 import useRiskSignalsOverview from './hooks/use-risk-signals-overview';
@@ -14,7 +15,8 @@ export type RiskSignalsOverviewProps = {
 
 const RiskSignalsOverview = ({ type }: RiskSignalsOverviewProps) => {
   const id = useEntityId();
-  const { data, isLoading, error } = useRiskSignalsOverview(id);
+  const seqno = useEntitySeqno();
+  const { data, isLoading, error } = useRiskSignalsOverview(id, seqno);
 
   if (isLoading) {
     return <Loading />;

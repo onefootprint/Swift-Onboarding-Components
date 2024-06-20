@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
+import useEntitySeqno from '@/entity/hooks/use-entity-seqno';
 
 import useDecryptForm from '../../hooks/use-decrypt-form';
 import useField from '../../hooks/use-field';
@@ -24,6 +25,7 @@ const Fieldset = ({ children, entity, fields, footer, iconComponent: IconCompone
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset',
   });
+  const isViewingHistorical = !!useEntitySeqno();
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
   const dis = fields.map(field => field.di);
@@ -50,9 +52,9 @@ const Fieldset = ({ children, entity, fields, footer, iconComponent: IconCompone
   };
 
   return (
-    <Container aria-label={title}>
+    <Container aria-label={title} data-primary-background={isViewingHistorical}>
       <Box>
-        <Header>
+        <Header data-primary-background={isViewingHistorical}>
           <Title>
             <IconComponent />
             <Text variant="label-3">{title}</Text>
@@ -79,6 +81,10 @@ const Container = styled.fieldset`
     width: 100%;
     height: 100%;
     justify-content: space-between;
+
+    &[data-primary-background='true'] {
+      background-color: ${theme.backgroundColor.primary};
+    }
   `};
 `;
 
@@ -90,6 +96,10 @@ const Header = styled.header`
     display: flex;
     justify-content: space-between;
     padding: ${theme.spacing[3]} ${theme.spacing[5]};
+
+    &[data-primary-background='true'] {
+      background-color: ${theme.backgroundColor.primary};
+    }
   `};
 `;
 
