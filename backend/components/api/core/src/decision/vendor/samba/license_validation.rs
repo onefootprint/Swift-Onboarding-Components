@@ -27,6 +27,7 @@ use idv::samba::response::license_validation::SambaLinkType;
 use idv::samba::response::webhook::SambaWebhook;
 use newtypes::samba::SambaLicenseValidationData;
 use newtypes::samba::SambaOrderKind;
+use newtypes::vendor_credentials::SambaSafetyCredentials;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DocumentDiKind;
@@ -36,6 +37,8 @@ use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::OcrDataKind as ODK;
 use newtypes::SambaReportId;
+use newtypes::UsState;
+use newtypes::UsStateFull;
 use newtypes::VendorAPI;
 use newtypes::WorkflowId;
 
@@ -129,33 +132,7 @@ impl CreateOrderContext {
         tvc: &TenantVendorControl,
     ) -> ApiResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
         let (decrypted_values, lifetime_ids) = Self::get_decrypted_values(vw, enclave_client).await?;
-        let request = SambaCreateLVOrderRequest {
-            credentials: tvc.samba_credentials(),
-            first_name: decrypted_values
-                .get_di(DataIdentifier::from(IDK::FirstName))
-                .ok()
-                .ok_or(AssertionError("missing first name"))?,
-            last_name: decrypted_values
-                .get_di(DataIdentifier::from(IDK::LastName))
-                .ok()
-                .ok_or(AssertionError("missing last name"))?,
-            license_number: decrypted_values
-                .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
-                    IdDocKind::DriversLicense,
-                    ODK::DocumentNumber,
-                )))
-                .ok()
-                .ok_or(AssertionError("missing license number"))?,
-            license_state: decrypted_values
-                .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
-                    IdDocKind::DriversLicense,
-                    ODK::IssuingState,
-                )))
-                .ok()
-                .ok_or(AssertionError("missing license state"))?,
-            ..Default::default()
-        };
-
+        let request = build_request(decrypted_values, tvc.samba_credentials())?;
         Ok((request, lifetime_ids))
     }
 
@@ -180,6 +157,49 @@ impl CreateOrderContext {
             }
         }
     }
+}
+
+
+fn build_request(
+    decrypted_values: DecryptUncheckedResult,
+    credentials: SambaSafetyCredentials,
+) -> ApiResult<SambaCreateLVOrderRequest> {
+    let request = SambaCreateLVOrderRequest {
+        credentials,
+        // TODO: handle for doc only where we don't ever write IDKs
+        first_name: decrypted_values
+            .get_di(DataIdentifier::from(IDK::FirstName))
+            .ok()
+            .ok_or(AssertionError("missing first name"))?,
+        last_name: decrypted_values
+            .get_di(DataIdentifier::from(IDK::LastName))
+            .ok()
+            .ok_or(AssertionError("missing last name"))?,
+        license_number: decrypted_values
+            .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
+                IdDocKind::DriversLicense,
+                ODK::DocumentNumber,
+            )))
+            .ok()
+            .ok_or(AssertionError("missing license number"))?,
+        license_state: decrypted_values
+            .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
+                IdDocKind::DriversLicense,
+                ODK::IssuingState,
+            )))
+            .ok()
+            .and_then(|s| {
+                let from_2_char = UsState::from_raw_string(s.leak()).ok();
+                let from_full: Option<UsState> =
+                    UsStateFull::from_raw_string(s.leak()).ok().map(|s| s.into());
+
+                from_2_char.or(from_full).map(|s| s.to_string().into())
+            })
+            .ok_or(AssertionError("missing license state"))?,
+        ..Default::default()
+    };
+
+    Ok(request)
 }
 
 #[tracing::instrument(skip_all)]
@@ -356,4 +376,64 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
         .await?;
 
     Ok(())
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::vault_wrapper::EnclaveDecryptOperation;
+    use newtypes::PiiString;
+    use std::collections::HashMap;
+    use test_case::test_case;
+
+    fn decrypted_values(state: &str) -> DecryptUncheckedResult {
+        let ops1 = vec![
+            DataIdentifier::from(IDK::FirstName),
+            DataIdentifier::from(IDK::LastName),
+            DataIdentifier::from(DocumentDiKind::OcrData(
+                IdDocKind::DriversLicense,
+                ODK::DocumentNumber,
+            )),
+            DataIdentifier::from(DocumentDiKind::OcrData(
+                IdDocKind::DriversLicense,
+                ODK::IssuingState,
+            )),
+        ]
+        .into_iter()
+        .zip(vec![
+            PiiString::from("bob"),
+            PiiString::from("bobierto"),
+            PiiString::from("123456"),
+            PiiString::from(state),
+        ])
+        .map(|(identifier, p)| {
+            (
+                EnclaveDecryptOperation {
+                    identifier,
+                    transforms: vec![],
+                },
+                p,
+            )
+        });
+
+        DecryptUncheckedResult {
+            results: HashMap::from_iter(ops1),
+            decrypted_dis: vec![],
+        }
+    }
+
+    #[test_case("NY" => "NY".to_string())]
+    #[test_case(" NeW yorK" => "NY".to_string())]
+    fn test_build_request(state: &str) -> String {
+        let creds = SambaSafetyCredentials {
+            api_key: "a".to_string().into(),
+            base_url: "a".to_string().into(),
+            auth_username: "a".to_string().into(),
+            auth_password: "a".to_string().into(),
+        };
+        let decrypted = decrypted_values(state);
+        let req = build_request(decrypted, creds).unwrap();
+        req.license_state.leak().to_string()
+    }
 }
