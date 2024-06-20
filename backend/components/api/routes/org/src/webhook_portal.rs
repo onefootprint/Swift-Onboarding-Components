@@ -1,19 +1,13 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::ModernApiResult;
 use api_core::State;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
-use webhooks::{
-    PortalResponse,
-    WebhookApp,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
+use webhooks::PortalResponse;
+use webhooks::WebhookApp;
 
 #[api_v2_operation(tags(OrgSettings, Private), description = "Returns the webhook portal url.")]
 #[get("/org/webhook_portal")]

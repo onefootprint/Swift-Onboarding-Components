@@ -1,25 +1,17 @@
-use crate::{
-    ProtectedAuth,
-    State,
-};
+use crate::ProtectedAuth;
+use crate::State;
+use actix_web::get;
+use actix_web::patch;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    get,
-    patch,
-    web,
-};
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils;
 use db::models::tenant::Tenant;
-use db::models::tenant_business_info::{
-    NewBusinessInfo,
-    TenantBusinessInfo,
-};
-use newtypes::{
-    PiiString,
-    TenantId,
-};
+use db::models::tenant_business_info::NewBusinessInfo;
+use db::models::tenant_business_info::TenantBusinessInfo;
+use newtypes::PiiString;
+use newtypes::TenantId;
 
 #[derive(serde::Deserialize)]
 pub struct UpdateBusinessInfoRequest {

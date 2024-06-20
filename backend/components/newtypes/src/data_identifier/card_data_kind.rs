@@ -1,20 +1,14 @@
-use crate::{
-    AliasId,
-    CollectedData,
-    DataIdentifier,
-    EnumDotNotationError,
-    IsDataIdentifierDiscriminant,
-};
+use crate::AliasId;
+use crate::CollectedData;
+use crate::DataIdentifier;
+use crate::EnumDotNotationError;
+use crate::IsDataIdentifierDiscriminant;
 use itertools::Itertools;
 use std::str::FromStr;
-use strum::{
-    EnumIter,
-    IntoEnumIterator,
-};
-use strum_macros::{
-    Display,
-    EnumString,
-};
+use strum::EnumIter;
+use strum::IntoEnumIterator;
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 #[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, EnumString, EnumIter)]
 #[strum(serialize_all = "snake_case")]

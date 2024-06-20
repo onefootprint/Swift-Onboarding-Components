@@ -1,31 +1,23 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::types::ModernApiResult;
 use crate::State;
-use api_core::auth::session::user::{
-    NewUserSessionArgs,
-    NewUserSessionContext,
-    TokenCreationPurpose,
-    UserSession,
-};
+use api_core::auth::session::user::NewUserSessionArgs;
+use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::session::user::UserSession;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
 use api_core::task::execute_webhook_tasks;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
-use api_wire_types::{
-    CreateTokenResponse,
-    EntityActionResponse,
-};
+use api_wire_types::CreateTokenResponse;
+use api_wire_types::EntityActionResponse;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
 use db::models::ob_configuration::ObConfiguration;
@@ -34,27 +26,21 @@ use db::models::session::Session;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
-use db::models::workflow_request::{
-    NewWorkflowRequestArgs,
-    WorkflowRequest,
-};
+use db::models::workflow_request::NewWorkflowRequestArgs;
+use db::models::workflow_request::WorkflowRequest;
 use db::TxnPgConn;
-use newtypes::{
-    DbActor,
-    DocumentRequestConfig,
-    ObConfigurationKind,
-    SessionAuthToken,
-    TriggerRequest,
-    UserSpecificWebhookKind,
-    VaultKind,
-    WorkflowRequestConfig,
-    WorkflowTriggeredInfo,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::DbActor;
+use newtypes::DocumentRequestConfig;
+use newtypes::ObConfigurationKind;
+use newtypes::SessionAuthToken;
+use newtypes::TriggerRequest;
+use newtypes::UserSpecificWebhookKind;
+use newtypes::VaultKind;
+use newtypes::WorkflowRequestConfig;
+use newtypes::WorkflowTriggeredInfo;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Trigger a workflow for the provided user.",

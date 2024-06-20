@@ -1,14 +1,10 @@
-use crate::{
-    Apiv2Response,
-    Apiv2Schema,
-    Serialize,
-};
-use newtypes::{
-    BusinessOwnerKind,
-    BusinessOwnerSource,
-    FpId,
-    OnboardingStatus,
-};
+use crate::Apiv2Response;
+use crate::Apiv2Schema;
+use crate::Serialize;
+use newtypes::BusinessOwnerKind;
+use newtypes::BusinessOwnerSource;
+use newtypes::FpId;
+use newtypes::OnboardingStatus;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

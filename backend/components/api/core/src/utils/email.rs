@@ -4,24 +4,20 @@ use super::sms::PhoneEmailChallengeState;
 use crate::auth::session::user::EmailVerifySession;
 use crate::auth::session::AuthSessionData;
 use crate::errors::user::UserError;
-use crate::errors::{
-    ApiError,
-    ApiErrorKind,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiErrorKind;
+use crate::errors::ApiResult;
 use crate::State;
 use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
 use newtypes::email::Email;
-use newtypes::{
-    ContactInfoId,
-    PiiString,
-    SandboxId,
-    TenantId,
-    VaultId,
-};
+use newtypes::ContactInfoId;
+use newtypes::PiiString;
+use newtypes::SandboxId;
+use newtypes::TenantId;
+use newtypes::VaultId;
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use reqwest_middleware::ClientWithMiddleware;

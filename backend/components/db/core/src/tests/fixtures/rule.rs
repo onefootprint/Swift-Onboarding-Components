@@ -1,9 +1,7 @@
-use newtypes::{
-    BooleanOperator,
-    FootprintReasonCode,
-    RuleExpression,
-    RuleExpressionCondition,
-};
+use newtypes::BooleanOperator;
+use newtypes::FootprintReasonCode;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
 
 pub fn example_rule_expression() -> RuleExpression {
     RuleExpression(vec![RuleExpressionCondition::RiskSignal {

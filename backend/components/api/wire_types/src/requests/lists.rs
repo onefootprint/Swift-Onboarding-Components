@@ -1,9 +1,7 @@
 use crate::*;
-use newtypes::{
-    ListAlias,
-    ListKind,
-    PiiString,
-};
+use newtypes::ListAlias;
+use newtypes::ListKind;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateListRequest {

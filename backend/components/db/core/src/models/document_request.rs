@@ -1,28 +1,20 @@
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::document_request::{
     self,
 };
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    DocumentRequestConfig,
-    DocumentRequestId,
-    DocumentRequestKind,
-    RuleSetResultId,
-    ScopedVaultId,
-    WorkflowId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::DocumentRequestConfig;
+use newtypes::DocumentRequestId;
+use newtypes::DocumentRequestKind;
+use newtypes::RuleSetResultId;
+use newtypes::ScopedVaultId;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable)]

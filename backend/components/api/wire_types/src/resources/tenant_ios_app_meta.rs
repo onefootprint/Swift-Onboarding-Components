@@ -1,8 +1,6 @@
 use crate::*;
-use newtypes::{
-    TenantId,
-    TenantIosAppMetaId,
-};
+use newtypes::TenantId;
+use newtypes::TenantIosAppMetaId;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]

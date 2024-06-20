@@ -1,22 +1,16 @@
 use super::portablize_data::on_otp_verified;
-use super::{
-    DataLifetimeSources,
-    DataRequestSource,
-    FingerprintedDataRequest,
-    PatchDataResult,
-    WriteableVw,
-};
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-    ValidationError,
-};
+use super::DataLifetimeSources;
+use super::DataRequestSource;
+use super::FingerprintedDataRequest;
+use super::PatchDataResult;
+use super::WriteableVw;
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::errors::ValidationError;
 use db::TxnPgConn;
-use newtypes::{
-    DataIdentifier as DI,
-    DataLifetimeSource,
-    IdentityDataKind as IDK,
-};
+use newtypes::DataIdentifier as DI;
+use newtypes::DataLifetimeSource;
+use newtypes::IdentityDataKind as IDK;
 
 impl<Type> WriteableVw<Type> {
     #[tracing::instrument("WriteableVw::replace_verified_ci", skip_all)]

@@ -1,12 +1,10 @@
 use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::LinkAuthRequest;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
 
 #[api_v2_operation(
     description = "Request to authenticate a user email. WorkOS will send the email a link to \

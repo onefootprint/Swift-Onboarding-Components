@@ -2,14 +2,10 @@ use api_wire_types::UserInsight;
 use db::models::insight_event::InsightEvent;
 use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::workflow::Workflow;
-use newtypes::{
-    UserInsightScope,
-    UserInsightUnit,
-};
-use strum_macros::{
-    Display,
-    EnumString,
-};
+use newtypes::UserInsightScope;
+use newtypes::UserInsightUnit;
+use strum_macros::Display;
+use strum_macros::EnumString;
 macro_rules! user_insight {
     (
         $(#[$macros:meta])*

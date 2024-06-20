@@ -1,10 +1,8 @@
 use newtypes::incode::IncodeDocumentType;
-use newtypes::{
-    ObConfigurationId,
-    Vendor,
-    VendorAPI,
-    VerificationResultId,
-};
+use newtypes::ObConfigurationId;
+use newtypes::Vendor;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 
 pub mod biz_risk;
 pub mod document;

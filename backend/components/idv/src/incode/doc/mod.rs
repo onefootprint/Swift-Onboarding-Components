@@ -1,9 +1,7 @@
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
-use newtypes::{
-    DocVData,
-    IncodeVerificationSessionId,
-    IncodeVerificationSessionKind,
-};
+use newtypes::DocVData;
+use newtypes::IncodeVerificationSessionId;
+use newtypes::IncodeVerificationSessionKind;
 
 pub mod request;
 pub mod response;

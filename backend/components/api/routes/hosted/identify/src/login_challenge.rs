@@ -1,12 +1,10 @@
 use super::BiometricChallengeState;
-use crate::{
-    ChallengeData,
-    ChallengeState,
-    GetIdentifyChallengeArgs,
-    IdentifyChallengeContext,
-    State,
-    UserChallengeContext,
-};
+use crate::ChallengeData;
+use crate::ChallengeState;
+use crate::GetIdentifyChallengeArgs;
+use crate::IdentifyChallengeContext;
+use crate::State;
+use crate::UserChallengeContext;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::error_with_code::ErrorWithCode;
@@ -18,33 +16,25 @@ use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
-use api_wire_types::{
-    LoginChallengeRequest,
-    LoginChallengeResponse,
-    UserChallengeData,
-};
+use api_wire_types::LoginChallengeRequest;
+use api_wire_types::LoginChallengeResponse;
+use api_wire_types::UserChallengeData;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::{
-    ChallengeKind,
-    VaultId,
-};
+use newtypes::ChallengeKind;
+use newtypes::VaultId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
-use webauthn_rs_core::proto::{
-    Base64UrlSafeData,
-    Credential,
-    ParsedAttestation,
-    ParsedAttestationData,
-};
-use webauthn_rs_proto::{
-    RegisteredExtensions,
-    UserVerificationPolicy,
-};
+use webauthn_rs_core::proto::Base64UrlSafeData;
+use webauthn_rs_core::proto::Credential;
+use webauthn_rs_core::proto::ParsedAttestation;
+use webauthn_rs_core::proto::ParsedAttestationData;
+use webauthn_rs_proto::RegisteredExtensions;
+use webauthn_rs_proto::UserVerificationPolicy;
 
 #[api_v2_operation(
     tags(Identify, Hosted),

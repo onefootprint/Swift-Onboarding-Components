@@ -1,13 +1,12 @@
+use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::features::incode_docv::{
     self,
-    IncodeOcrComparisonDataFields,
 };
 use crate::decision::features::risk_signals::risk_signal_group_struct::Aml;
-use crate::decision::features::risk_signals::{
-    RiskSignalGroupStruct,
-    RiskSignalsForDecision,
-};
+use crate::decision::features::risk_signals::RiskSignalGroupStruct;
+use crate::decision::features::risk_signals::RiskSignalsForDecision;
 use crate::decision::onboarding::Decision;
+use crate::decision::risk;
 use crate::decision::vendor::incode::curp_validation::run_curp_validation_check;
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
 use crate::decision::vendor::neuro_id::run_neuro_call;
@@ -19,31 +18,20 @@ use crate::decision::vendor::{
 };
 use crate::decision::{
     self,
-    risk,
 };
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    VaultWrapper,
-    VwArgs,
-};
-use crate::{
-    ApiError,
-    State,
-};
-use crypto::aead::{
-    AeadSealedBytes,
-    SealingKey,
-};
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
+use crate::ApiError;
+use crate::State;
+use crypto::aead::AeadSealedBytes;
+use crypto::aead::SealingKey;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document_request::{
-    DocumentRequest,
-    NewDocumentRequestArgs,
-};
-use db::models::list_entry::{
-    ListEntry,
-    ListWithDecryptedEntries,
-    ListWithEntries,
-};
+use db::models::document_request::DocumentRequest;
+use db::models::document_request::NewDocumentRequestArgs;
+use db::models::list_entry::ListEntry;
+use db::models::list_entry::ListWithDecryptedEntries;
+use db::models::list_entry::ListWithEntries;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::rule_instance::RuleInstance;
@@ -51,42 +39,36 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
-use db::{
-    DbPool,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
+use db::DbPool;
+use db::DbResult;
+use db::PgConn;
+use db::TxnPgConn;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
-use newtypes::{
-    CipKind,
-    DecisionIntentKind,
-    DeviceInsightOperation,
-    FootprintReasonCode,
-    ListId,
-    Locked,
-    OnboardingStatus,
-    PiiBytes,
-    PiiString,
-    ReviewReason,
-    RuleAction,
-    RuleExpressionCondition,
-    RuleSetResultId,
-    ScopedVaultId,
-    SealedVaultBytes,
-    StepUpInfo,
-    TenantId,
-    VaultId,
-    VaultOperation,
-    VendorAPI,
-    VerificationResultId,
-    WorkflowId,
-};
+use newtypes::CipKind;
+use newtypes::DecisionIntentKind;
+use newtypes::DeviceInsightOperation;
+use newtypes::FootprintReasonCode;
+use newtypes::ListId;
+use newtypes::Locked;
+use newtypes::OnboardingStatus;
+use newtypes::PiiBytes;
+use newtypes::PiiString;
+use newtypes::ReviewReason;
+use newtypes::RuleAction;
+use newtypes::RuleExpressionCondition;
+use newtypes::RuleSetResultId;
+use newtypes::ScopedVaultId;
+use newtypes::SealedVaultBytes;
+use newtypes::StepUpInfo;
+use newtypes::TenantId;
+use newtypes::VaultId;
+use newtypes::VaultOperation;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 #[tracing::instrument(skip(db_pool))]

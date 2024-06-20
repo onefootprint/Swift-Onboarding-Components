@@ -1,12 +1,8 @@
-use crate::{
-    Base64Data,
-    PiiString,
-};
+use crate::Base64Data;
+use crate::PiiString;
 use paperclip::v2::schema::TypedData;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt::Debug;
 
 /// Represents a Vec<u8> that hides PII

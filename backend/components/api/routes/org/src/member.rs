@@ -1,29 +1,21 @@
-use api_core::auth::tenant::{
-    AuthActor,
-    CheckTenantGuard,
-    TenantGuard,
-    TenantRbAuthContext,
-    TenantSessionAuth,
-};
-use api_core::auth::{
-    Any,
-    Either,
-};
+use api_core::auth::tenant::AuthActor;
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantRbAuthContext;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::auth::Any;
+use api_core::auth::Either;
 use api_core::errors::tenant::TenantError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
-use db::models::tenant_user::{
-    TenantUser,
-    TenantUserUpdate,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    patch,
-    web,
-    Apiv2Schema,
-};
+use db::models::tenant_user::TenantUser;
+use db::models::tenant_user::TenantUserUpdate;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::patch;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 
 #[api_v2_operation(
     tags(Members, OrgSettings, Private),

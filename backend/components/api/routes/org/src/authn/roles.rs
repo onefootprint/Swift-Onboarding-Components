@@ -1,22 +1,16 @@
-use api_core::auth::tenant::{
-    AnyOrgSessionAuth,
-    AnyTenantSessionAuth,
-};
+use api_core::auth::tenant::AnyOrgSessionAuth;
+use api_core::auth::tenant::AnyTenantSessionAuth;
 use api_core::serializers::IsAuthMethodSupported;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::Organization;
-use db::helpers::{
-    TenantOrPartnerTenant,
-    WorkosAuthIdentity,
-};
+use db::helpers::TenantOrPartnerTenant;
+use db::helpers::WorkosAuthIdentity;
 use db::models::tenant_rolebinding::TenantRolebinding;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Return the list of tenants that can be inherited by the authed user",

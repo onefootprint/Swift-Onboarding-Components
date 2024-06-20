@@ -1,22 +1,16 @@
 use crate::auth::user::UserAuthScope;
+use crate::decision;
 use crate::errors::onboarding::OnboardingError;
-use crate::{
-    decision,
-    State,
-};
-use api_core::auth::user::{
-    CheckUserWfAuthContext,
-    UserWfAuthContext,
-};
+use crate::State;
+use api_core::auth::user::CheckUserWfAuthContext;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::document::DocumentState;
 use api_core::decision::state::kyc::KycState;
-use api_core::decision::state::{
-    DocCollected,
-    RunIncodeMachineAndWorkflowResult,
-    WorkflowKind,
-    WorkflowWrapper,
-};
+use api_core::decision::state::DocCollected;
+use api_core::decision::state::RunIncodeMachineAndWorkflowResult;
+use api_core::decision::state::WorkflowKind;
+use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::workflow::WorkflowError;
 use api_core::errors::ApiResult;
@@ -24,26 +18,22 @@ use api_core::types::ModernApiResult;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_wire_types::ProcessRequest;
-use chrono::{
-    Duration,
-    Utc,
-};
+use chrono::Duration;
+use chrono::Utc;
 use db::models::task::Task;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::DbPool;
 use decision::state::Authorize;
 use itertools::Itertools;
-use newtypes::{
-    OnboardingRequirement,
-    RunIncodeStuckWorkflowArgs,
-    TaskData,
-    WorkflowFixtureResult,
-    WorkflowId,
-};
+use newtypes::OnboardingRequirement;
+use newtypes::RunIncodeStuckWorkflowArgs;
+use newtypes::TaskData;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

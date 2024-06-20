@@ -1,48 +1,32 @@
 use crate::decision::document::route_handler::IncodeConfigurationIdOverride;
 use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
-use crate::decision::vendor::incode::{
-    get_config_id,
-    IncodeContext,
-    IncodeStateMachine,
-};
-use crate::errors::{
-    ApiError,
-    ApiResult,
-    AssertionError,
-};
-use crate::utils::vault_wrapper::{
-    Person,
-    VaultWrapper,
-};
-use crate::{
-    ApiErrorKind,
-    State,
-};
-use api_wire_types::{
-    DocumentImageError,
-    DocumentResponse,
-};
-use db::models::document::{
-    Document,
-    DocumentUpdate,
-};
+use crate::decision::vendor::incode::get_config_id;
+use crate::decision::vendor::incode::IncodeContext;
+use crate::decision::vendor::incode::IncodeStateMachine;
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::ApiErrorKind;
+use crate::State;
+use api_wire_types::DocumentImageError;
+use api_wire_types::DocumentResponse;
+use db::models::document::Document;
+use db::models::document::DocumentUpdate;
 use db::models::document_request::DocumentRequest;
-use db::models::incode_verification_session::{
-    IncodeVerificationSession,
-    UpdateIncodeVerificationSession,
-};
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::incode_verification_session::UpdateIncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
 use db::DbPool;
 use feature_flag::FeatureFlagClient;
-use newtypes::{
-    DecisionIntentId,
-    DocumentId,
-    DocumentSide,
-    DocumentStatus,
-    IncodeVerificationSessionState,
-    TenantId,
-    WorkflowId,
-};
+use newtypes::DecisionIntentId;
+use newtypes::DocumentId;
+use newtypes::DocumentSide;
+use newtypes::DocumentStatus;
+use newtypes::IncodeVerificationSessionState;
+use newtypes::TenantId;
+use newtypes::WorkflowId;
 use std::sync::Arc;
 
 #[tracing::instrument(skip_all)]

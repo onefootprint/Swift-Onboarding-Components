@@ -1,7 +1,5 @@
-use super::{
-    IsAuthMethodSupported,
-    IsDomainAlreadyClaimed,
-};
+use super::IsAuthMethodSupported;
+use super::IsDomainAlreadyClaimed;
 use crate::utils::db2api::DbToApi;
 use db::models::partner_tenant::PartnerTenant;
 

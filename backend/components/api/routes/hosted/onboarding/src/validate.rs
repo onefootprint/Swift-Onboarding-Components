@@ -1,31 +1,25 @@
-use api_core::auth::user::{
-    load_auth_events,
-    UserAuthContext,
-    UserAuthScope,
-    UserIdentifier,
-    UserWfAuthContext,
-};
+use api_core::auth::user::load_auth_events;
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::user::UserAuthScope;
+use api_core::auth::user::UserIdentifier;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::IsGuardMet;
-use api_core::errors::onboarding::{
-    OnboardingError,
-    UnmetRequirements,
-};
+use api_core::errors::onboarding::OnboardingError;
+use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_core::utils::identify::get_user_challenge_context;
-use api_core::utils::requirements::{
-    get_requirements_for_person_and_maybe_business,
-    GetRequirementsArgs,
-};
+use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
+use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::State;
 use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::validate::HostedValidateResponse;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

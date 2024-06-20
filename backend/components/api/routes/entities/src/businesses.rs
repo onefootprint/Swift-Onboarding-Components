@@ -1,8 +1,6 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
@@ -10,11 +8,9 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Gets the beneficial owners of a business entity.",

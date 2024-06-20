@@ -1,13 +1,11 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::Context;
+use anyhow::Result;
+use clap::ArgGroup;
+use clap::Args;
+use clap::CommandFactory;
+use clap::Parser;
 use clap::{
     self,
-    ArgGroup,
-    Args,
-    CommandFactory,
-    Parser,
 };
 use log::debug;
 use reqwest::Url;

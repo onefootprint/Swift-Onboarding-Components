@@ -1,25 +1,19 @@
 use crate::auth::user::UserAuthContext;
 use crate::errors::handoff::HandoffError;
 use crate::errors::ApiError;
-use crate::utils::session::{
-    HandoffRecord,
-    JsonSession,
-};
+use crate::utils::session::HandoffRecord;
+use crate::utils::session::JsonSession;
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::types::ModernApiResult;
-use api_wire_types::{
-    D2pStatusResponse,
-    D2pUpdateStatusRequest,
-};
+use api_wire_types::D2pStatusResponse;
+use api_wire_types::D2pUpdateStatusRequest;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    post,
-    web,
-};
 
 #[api_v2_operation(
     operation_id = "hosted-onboarding-d2p-status",

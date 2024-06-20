@@ -1,49 +1,39 @@
 use super::ob_configuration::IsLive;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::fingerprint_junction;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::vault::BoxedQuery;
 use db_schema::schema::vault::{
     self,
-    BoxedQuery,
-};
-use db_schema::schema::{
-    fingerprint_junction,
-    scoped_vault,
 };
 use diesel::dsl::not;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::upsert::on_constraint;
-use diesel::{
-    Insertable,
-    QueryDsl,
-    Queryable,
-};
+use diesel::Insertable;
+use diesel::QueryDsl;
+use diesel::Queryable;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{
-    DataIdentifier,
-    EncryptedVaultPrivateKey,
-    Fingerprint,
-    FingerprintKind,
-    FpId,
-    IdempotencyId,
-    IdentityDataKind as IDK,
-    Locked,
-    SandboxId,
-    ScopedVaultId,
-    TenantId,
-    VaultId,
-    VaultKind,
-    VaultPublicKey,
-};
+use newtypes::DataIdentifier;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::Fingerprint;
+use newtypes::FingerprintKind;
+use newtypes::FpId;
+use newtypes::IdempotencyId;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::Locked;
+use newtypes::SandboxId;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::VaultId;
+use newtypes::VaultKind;
+use newtypes::VaultPublicKey;
 pub type IsFixture = bool;
 pub type IsNew = bool;
 
@@ -333,10 +323,8 @@ impl Vault {
         tenant_id: Option<&TenantId>,
     ) -> DbResult<Option<LocatedVault>> {
         use crate::models::scoped_vault::ScopedVault;
-        use db_schema::schema::{
-            data_lifetime,
-            fingerprint,
-        };
+        use db_schema::schema::data_lifetime;
+        use db_schema::schema::fingerprint;
 
         // Be careful changing these fingerprint queries - they're optimized to use a specific index
 

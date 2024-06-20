@@ -1,39 +1,27 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
+use crate::get;
 use crate::types::ModernApiResult;
-use crate::{
-    get,
-    State,
-};
+use crate::State;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::{
-    TenantVw,
-    VaultWrapper,
-};
+use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use db::models::fingerprint::Fingerprint;
 use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::scoped_vault::ScopedVault;
-use itertools::{
-    chain,
-    Itertools,
-};
-use newtypes::{
-    DupeKind,
-    ScopedVaultId,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use itertools::chain;
+use itertools::Itertools;
+use newtypes::DupeKind;
+use newtypes::ScopedVaultId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 use std::collections::HashMap;
 
 #[api_v2_operation(

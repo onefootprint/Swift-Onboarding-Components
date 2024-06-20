@@ -1,8 +1,6 @@
-use super::document_test_utils::{
-    mock_ff_client,
-    mock_s3_put_object,
-    UserKind,
-};
+use super::document_test_utils::mock_ff_client;
+use super::document_test_utils::mock_s3_put_object;
+use super::document_test_utils::UserKind;
 use super::test_helpers::FixtureData;
 use crate::decision::document::meta_headers::MetaHeaders;
 use crate::decision::{
@@ -10,33 +8,27 @@ use crate::decision::{
 };
 use crate::errors::onboarding::OnboardingError;
 use crate::utils::file_upload::FileUpload;
-use crate::{
-    ApiErrorKind,
-    State,
-};
+use crate::ApiErrorKind;
+use crate::State;
 use api_wire_types::CreateDocumentRequest;
 use chrono::Utc;
-use db::models::insight_event::{
-    CreateInsightEvent,
-    InsightEvent,
-};
+use db::models::insight_event::CreateInsightEvent;
+use db::models::insight_event::InsightEvent;
 use db::models::user_consent::UserConsent;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::DbResult;
 use macros::test_state_case;
-use newtypes::{
-    CollectedDataOption,
-    CountryRestriction,
-    DocTypeRestriction,
-    DocumentCdoInfo,
-    DocumentFixtureResult,
-    DocumentSide,
-    IdDocKind,
-    Iso3166TwoDigitCountryCode,
-    PiiBytes,
-    Selfie,
-    WorkflowFixtureResult,
-};
+use newtypes::CollectedDataOption;
+use newtypes::CountryRestriction;
+use newtypes::DocTypeRestriction;
+use newtypes::DocumentCdoInfo;
+use newtypes::DocumentFixtureResult;
+use newtypes::DocumentSide;
+use newtypes::IdDocKind;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::PiiBytes;
+use newtypes::Selfie;
+use newtypes::WorkflowFixtureResult;
 
 /// Test we require consent, or we'll error uploading a side
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]

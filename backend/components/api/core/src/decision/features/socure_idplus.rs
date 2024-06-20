@@ -1,14 +1,10 @@
 use idv::socure::response::SocureIDPlusResponse;
-use newtypes::{
-    DecisionStatus,
-    FootprintReasonCode,
-    SocureReasonCode,
-    VerificationResultId,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::DecisionStatus;
+use newtypes::FootprintReasonCode;
+use newtypes::SocureReasonCode;
+use newtypes::VerificationResultId;
+use serde::Deserialize;
+use serde::Serialize;
 use strum::Display;
 
 #[derive(Clone, Debug)]
@@ -248,14 +244,12 @@ impl From<&SocureIDPlusResponse> for SocureBaselineIdPlusLogicV6Result {
 #[cfg(test)]
 mod tests {
     use super::SocureBaselineIdPlusLogicV6Result;
-    use idv::socure::response::{
-        DeviceRisk,
-        FieldValidation,
-        Fraud,
-        Kyc,
-        Score,
-        SocureIDPlusResponse,
-    };
+    use idv::socure::response::DeviceRisk;
+    use idv::socure::response::FieldValidation;
+    use idv::socure::response::Fraud;
+    use idv::socure::response::Kyc;
+    use idv::socure::response::Score;
+    use idv::socure::response::SocureIDPlusResponse;
 
     #[test]
     fn empty_response() {

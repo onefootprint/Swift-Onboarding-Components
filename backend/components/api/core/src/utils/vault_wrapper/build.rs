@@ -1,29 +1,21 @@
 use super::portable_view::filter_dls_for_portable_view;
-use super::{
-    PieceOfData,
-    VaultData,
-    VaultWrapper,
-    VwArgs,
-};
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
+use super::PieceOfData;
+use super::VaultData;
+use super::VaultWrapper;
+use super::VwArgs;
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::vault::Vault;
 use db::models::vault_data::VaultData as DbVaultData;
-use db::{
-    HasLifetime,
-    PgConn,
-};
+use db::HasLifetime;
+use db::PgConn;
 use itertools::Itertools;
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeSeqno,
-    ScopedVaultId,
-    VaultId,
-};
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 

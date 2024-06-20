@@ -1,15 +1,13 @@
-use crate::{
-    AllData,
-    CleanAndValidate,
-    CollectedData,
-    DataIdentifier,
-    DataIdentifierValue,
-    IsDataIdentifierDiscriminant,
-    KvDataKey,
-    NtResult,
-    PiiJsonValue,
-    ValidateArgs,
-};
+use crate::AllData;
+use crate::CleanAndValidate;
+use crate::CollectedData;
+use crate::DataIdentifier;
+use crate::DataIdentifierValue;
+use crate::IsDataIdentifierDiscriminant;
+use crate::KvDataKey;
+use crate::NtResult;
+use crate::PiiJsonValue;
+use crate::ValidateArgs;
 
 impl CleanAndValidate for KvDataKey {
     type Parsed = ();

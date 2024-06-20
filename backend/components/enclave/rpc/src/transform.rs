@@ -1,7 +1,5 @@
-use crate::{
-    DataTransform,
-    EncryptTransformAlgorithm,
-};
+use crate::DataTransform;
+use crate::EncryptTransformAlgorithm;
 use std::str::Utf8Error;
 use thiserror::Error;
 

@@ -1,31 +1,25 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::vault_wrapper::{
-    Person,
-    WriteableVw,
-};
+use api_core::utils::vault_wrapper::Person;
+use api_core::utils::vault_wrapper::WriteableVw;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::{
-    AuditEventDetail,
-    AuditEventId,
-    DbActor,
-};
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DbActor;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[route_alias(actix::delete(

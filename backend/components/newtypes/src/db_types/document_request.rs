@@ -1,33 +1,21 @@
-use crate::{
-    DataIdentifier,
-    DocumentDiKind,
-    NtResult,
-    ValidationError,
-};
+use crate::DataIdentifier;
+use crate::DocumentDiKind;
+use crate::NtResult;
+use crate::ValidationError;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum::{
-    EnumDiscriminants,
-    EnumIter,
-};
-use strum_macros::{
-    Display,
-    EnumString,
-};
+use serde::Deserialize;
+use serde::Serialize;
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum::EnumDiscriminants;
+use strum::EnumIter;
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, AsJsonb, EnumDiscriminants, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

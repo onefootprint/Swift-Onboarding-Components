@@ -1,36 +1,28 @@
 use crate::decision::state::actions::Authorize;
+use crate::decision::state::test_utils::mock_idology_pa_hit;
+use crate::decision::state::test_utils::mock_incode;
+use crate::decision::state::test_utils::query_data;
+use crate::decision::state::test_utils::setup_data;
+use crate::decision::state::test_utils::AmlKind;
 use crate::decision::state::test_utils::UserKind::{
     self,
 };
-use crate::decision::state::test_utils::{
-    mock_idology_pa_hit,
-    mock_incode,
-    query_data,
-    setup_data,
-    AmlKind,
-    WithHit,
-};
-use crate::decision::state::{
-    WorkflowActions,
-    WorkflowWrapper,
-};
+use crate::decision::state::test_utils::WithHit;
+use crate::decision::state::WorkflowActions;
+use crate::decision::state::WorkflowWrapper;
 use crate::State;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
 use macros::test_state_case;
-use newtypes::VendorAPI::{
-    IdologyExpectId,
-    IncodeWatchlistCheck,
-};
-use newtypes::{
-    DecisionStatus,
-    EnhancedAmlOption,
-    KycState,
-    OnboardingStatus,
-    VendorAPI,
-    WorkflowState,
-};
+use newtypes::DecisionStatus;
+use newtypes::EnhancedAmlOption;
+use newtypes::KycState;
+use newtypes::OnboardingStatus;
+use newtypes::VendorAPI;
+use newtypes::VendorAPI::IdologyExpectId;
+use newtypes::VendorAPI::IncodeWatchlistCheck;
+use newtypes::WorkflowState;
 use strum::IntoEnumIterator;
 
 enum VR {

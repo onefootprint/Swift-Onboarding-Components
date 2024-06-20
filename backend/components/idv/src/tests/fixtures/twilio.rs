@@ -1,9 +1,7 @@
 use crate::twilio::TwilioLookupV2APIResponse;
-use newtypes::{
-    PiiJsonValue,
-    PiiString,
-    ScrubbedPiiString,
-};
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::ScrubbedPiiString;
 use twilio::response::lookup::LookupV2Response;
 
 pub fn create_response() -> TwilioLookupV2APIResponse {

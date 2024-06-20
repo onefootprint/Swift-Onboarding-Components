@@ -1,31 +1,23 @@
 use crate::State;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    PartnerTenantGuard,
-    PartnerTenantSessionAuth,
-};
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::PartnerTenantGuard;
+use api_core::auth::tenant::PartnerTenantSessionAuth;
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiErrorKind;
-use api_wire_types::{
-    ComplianceDocEvent,
-    ComplianceDocEventType,
-};
+use api_wire_types::ComplianceDocEvent;
+use api_wire_types::ComplianceDocEventType;
 use db::helpers::ComplianceDocSummary;
 use itertools::Itertools;
-use newtypes::{
-    ComplianceDocId,
-    TenantCompliancePartnershipId,
-    TenantKind,
-};
+use newtypes::ComplianceDocId;
+use newtypes::TenantCompliancePartnershipId;
+use newtypes::TenantKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

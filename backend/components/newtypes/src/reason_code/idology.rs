@@ -1,7 +1,5 @@
-use crate::{
-    vendor_reason_code_enum,
-    FootprintReasonCode,
-};
+use crate::vendor_reason_code_enum;
+use crate::FootprintReasonCode;
 use strum::EnumIter;
 use strum_macros::EnumString;
 

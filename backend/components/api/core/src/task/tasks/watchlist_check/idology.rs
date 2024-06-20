@@ -1,17 +1,13 @@
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_trait::VendorAPIResponse;
-use crate::decision::vendor::{
-    verification_result,
-    VendorAPIError,
-};
+use crate::decision::vendor::verification_result;
+use crate::decision::vendor::VendorAPIError;
 use crate::decision::{
     self,
 };
 use crate::errors::ApiResult;
-use crate::{
-    ApiError,
-    State,
-};
+use crate::ApiError;
+use crate::State;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
@@ -20,14 +16,12 @@ use idv::idology::expectid::response::PaWatchlistHit;
 use idv::idology::pa::response::PaResponse;
 use idv::idology::pa::IdologyPaAPIResponse;
 use idv::VendorResponse;
-use newtypes::{
-    DecisionIntentId,
-    FootprintReasonCode,
-    ScopedVaultId,
-    TenantId,
-    VendorAPI,
-    VerificationResultId,
-};
+use newtypes::DecisionIntentId;
+use newtypes::FootprintReasonCode;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 
 pub async fn complete_vendor_call(
     state: &State,

@@ -12,34 +12,26 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::models::zip_code::ZipCode;
 use db::TxnPgConn;
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
-use newtypes::{
-    DecisionStatus,
-    DocumentFixtureResult,
-    OnboardingStatus,
-    RiskSignalGroupKind,
-    TenantId,
-    VendorAPI,
-    WorkflowFixtureResult,
-    WorkflowId,
-};
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
+use newtypes::DecisionStatus;
+use newtypes::DocumentFixtureResult;
+use newtypes::OnboardingStatus;
+use newtypes::RiskSignalGroupKind;
+use newtypes::TenantId;
+use newtypes::VendorAPI;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowId;
 use std::sync::Arc;
 
 pub type CreateManualReview = bool;
 pub type FixtureDecision = (DecisionStatus, CreateManualReview);
-use geoutils::{
-    Distance,
-    Location,
-};
+use geoutils::Distance;
+use geoutils::Location;
 
 #[tracing::instrument(skip_all)]
 /// Determines whether production IDV requests should be made.

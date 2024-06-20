@@ -6,10 +6,8 @@ use api_core::web::Json;
 use api_core::State;
 use idv::samba::response::webhook::SambaWebhook;
 use newtypes::SambaWebhookEventType;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
 
 const LOG_MSG: &str = "samba webhook";
 

@@ -1,25 +1,21 @@
 use crate::ProtectedAuth;
 use actix_web::post;
+use actix_web::web::Json;
 use actix_web::web::{
     self,
-    Json,
 };
-use api_core::decision::features::risk_signals::{
-    fetch_latest_risk_signals_map,
-    parse_reason_codes_from_vendor_result,
-};
+use api_core::decision::features::risk_signals::fetch_latest_risk_signals_map;
+use api_core::decision::features::risk_signals::parse_reason_codes_from_vendor_result;
 use api_core::decision::onboarding::Decision;
-use api_core::decision::rule_engine::engine::{
-    EvaluateWorkflowDecisionArgs,
-    VaultDataForRules,
-};
+use api_core::decision::rule_engine::engine::EvaluateWorkflowDecisionArgs;
+use api_core::decision::rule_engine::engine::VaultDataForRules;
 use api_core::decision::rule_engine::eval::RuleEvalConfig;
 use api_core::decision::rule_engine::{
     self,
 };
+use api_core::decision::state::common::DecisionOutput;
 use api_core::decision::state::common::{
     self,
-    DecisionOutput,
 };
 use api_core::decision::vendor::get_vendor_apis_for_verification_requests;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
@@ -28,52 +24,42 @@ use api_core::decision::{
     self,
 };
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::{
-    ApiError,
-    ApiResult,
-    AssertionError,
-};
+use api_core::errors::ApiError;
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
+use api_core::task;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::vault_wrapper::{
-    VaultWrapper,
-    VwArgs,
-};
-use api_core::{
-    task,
-    ApiErrorKind,
-    State,
-};
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
+use api_core::ApiErrorKind;
+use api_core::State;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
-use db::models::rule_instance::{
-    IncludeRules,
-    RuleInstance,
-};
+use db::models::rule_instance::IncludeRules;
+use db::models::rule_instance::RuleInstance;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
 use itertools::Itertools;
-use newtypes::{
-    DecisionIntentId,
-    FpId,
-    RiskSignalGroupKind,
-    RiskSignalId,
-    RuleAction,
-    RuleInstanceKind,
-    RuleSetResultKind,
-    TenantId,
-    VaultKind,
-    Vendor,
-    VendorAPI,
-    VerificationRequestId,
-    VerificationResultId,
-    WorkflowId,
-};
+use newtypes::DecisionIntentId;
+use newtypes::FpId;
+use newtypes::RiskSignalGroupKind;
+use newtypes::RiskSignalId;
+use newtypes::RuleAction;
+use newtypes::RuleInstanceKind;
+use newtypes::RuleSetResultKind;
+use newtypes::TenantId;
+use newtypes::VaultKind;
+use newtypes::Vendor;
+use newtypes::VendorAPI;
+use newtypes::VerificationRequestId;
+use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 use std::str::FromStr;
 

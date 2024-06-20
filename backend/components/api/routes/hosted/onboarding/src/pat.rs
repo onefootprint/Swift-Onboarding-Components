@@ -1,33 +1,25 @@
 //! Private Access Tokens -- alternative to captcha for iOS 16 + macOS 13 devices
 //! https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-02.html
 
-use crate::auth::user::{
-    UserAuth,
-    UserAuthContext,
-};
+use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
 use crate::errors::ApiError;
 use crate::utils::headers::InsightHeaders;
-use crate::{
-    ModernApiResult,
-    State,
-};
+use crate::ModernApiResult;
+use crate::State;
 use actix_web::HttpResponseBuilder;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::AssertionError;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
-use newtypes::{
-    LivenessAttributes,
-    LivenessInfo,
-    LivenessIssuer,
-};
+use newtypes::LivenessAttributes;
+use newtypes::LivenessInfo;
+use newtypes::LivenessIssuer;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
 use paperclip::actix::web::{
     self,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
 };
 use reqwest::header::AUTHORIZATION;
 use reqwest::StatusCode;

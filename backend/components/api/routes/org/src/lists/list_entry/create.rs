@@ -1,37 +1,29 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
-use api_core::{
-    ApiError,
-    State,
-};
+use api_core::ApiError;
+use api_core::State;
 use api_wire_types::CreateListEntryRequest;
-use crypto::aead::{
-    AeadSealedBytes,
-    SealingKey,
-};
+use crypto::aead::AeadSealedBytes;
+use crypto::aead::SealingKey;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::tenant::Tenant;
 use itertools::Itertools;
-use newtypes::{
-    ListEntryValue,
-    ListId,
-    PiiBytes,
-    PiiString,
-};
+use newtypes::ListEntryValue;
+use newtypes::ListId;
+use newtypes::PiiBytes;
+use newtypes::PiiString;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 use std::collections::HashSet;
 

@@ -4,10 +4,8 @@ use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize, Deref)]

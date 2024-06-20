@@ -110,10 +110,8 @@ impl std::fmt::Debug for ErrorWithResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::{
-        json,
-        Value,
-    };
+    use serde_json::json;
+    use serde_json::Value;
 
     #[test]
     #[ignore]

@@ -1,28 +1,20 @@
 use super::data_lifetime::DataLifetime;
 use super::scoped_vault::ScopedVault;
 use super::user_timeline::UserTimeline;
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::scoped_vault_label;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    DataLifetimeSeqno,
-    LabelAddedInfo,
-    LabelId,
-    LabelKind,
-    ScopedVaultId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::DataLifetimeSeqno;
+use newtypes::LabelAddedInfo;
+use newtypes::LabelId;
+use newtypes::LabelKind;
+use newtypes::ScopedVaultId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable, Default)]

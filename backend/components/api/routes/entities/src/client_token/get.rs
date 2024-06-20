@@ -1,16 +1,12 @@
-use api_core::auth::tenant::{
-    ClientTenantAuthContext,
-    ClientTenantScope,
-};
+use api_core::auth::tenant::ClientTenantAuthContext;
+use api_core::auth::tenant::ClientTenantScope;
 use api_core::auth::Any;
 use api_core::types::ModernApiResult;
-use api_wire_types::{
-    GetClientTokenResponse,
-    GetClientTokenResponseTenant,
-};
+use api_wire_types::GetClientTokenResponse;
+use api_wire_types::GetClientTokenResponseTenant;
+use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
-    api_v2_operation,
 };
 
 #[api_v2_operation(

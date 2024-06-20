@@ -1,9 +1,7 @@
 use crate::*;
 use newtypes::input::Csv;
-use newtypes::{
-    ApiKeyStatus,
-    ObConfigurationKind,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::ObConfigurationKind;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct OnboardingConfigFilters {

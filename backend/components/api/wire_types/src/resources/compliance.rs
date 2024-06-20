@@ -1,17 +1,15 @@
 use crate::*;
-use newtypes::{
-    ComplianceDocId,
-    ComplianceDocRequestId,
-    ComplianceDocReviewDecision,
-    ComplianceDocReviewId,
-    ComplianceDocStatus,
-    ComplianceDocSubmissionId,
-    ComplianceDocTemplateId,
-    ComplianceDocTemplateVersionId,
-    PiiString,
-    TenantCompliancePartnershipId,
-    TenantKind,
-};
+use newtypes::ComplianceDocId;
+use newtypes::ComplianceDocRequestId;
+use newtypes::ComplianceDocReviewDecision;
+use newtypes::ComplianceDocReviewId;
+use newtypes::ComplianceDocStatus;
+use newtypes::ComplianceDocSubmissionId;
+use newtypes::ComplianceDocTemplateId;
+use newtypes::ComplianceDocTemplateVersionId;
+use newtypes::PiiString;
+use newtypes::TenantCompliancePartnershipId;
+use newtypes::TenantKind;
 use serde_with::SerializeDisplay;
 use strum::EnumDiscriminants;
 

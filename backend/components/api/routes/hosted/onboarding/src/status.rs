@@ -6,26 +6,20 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::types::ModernApiResult;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::requirements::GetRequirementsArgs;
-use api_wire_types::hosted::onboarding_status::{
-    ApiOnboardingRequirement,
-    OnboardingStatusResponse,
-};
+use api_wire_types::hosted::onboarding_status::ApiOnboardingRequirement;
+use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::liveness_event::{
-    LivenessEvent,
-    NewLivenessEvent,
-};
+use db::models::liveness_event::LivenessEvent;
+use db::models::liveness_event::NewLivenessEvent;
 use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
-use newtypes::{
-    LivenessSource,
-    SkipLivenessClientType,
-    SkipLivenessContext,
-};
+use newtypes::LivenessSource;
+use newtypes::SkipLivenessClientType;
+use newtypes::SkipLivenessContext;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

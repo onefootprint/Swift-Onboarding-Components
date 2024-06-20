@@ -1,11 +1,9 @@
 use crate::models::list_entry::ListEntry;
 use crate::TxnPgConn;
-use newtypes::{
-    DbActor,
-    ListId,
-    SealedVaultBytes,
-    TenantId,
-};
+use newtypes::DbActor;
+use newtypes::ListId;
+use newtypes::SealedVaultBytes;
+use newtypes::TenantId;
 
 pub fn create(conn: &mut TxnPgConn, tenant_id: &TenantId, list_id: &ListId) -> ListEntry {
     let ie = crate::tests::fixtures::insight_event::create(conn);

@@ -1,12 +1,8 @@
-use crate::{
-    Apiv2Response,
-    Serialize,
-};
-use newtypes::{
-    FootprintReasonCode,
-    WatchlistCheckId,
-    WatchlistCheckStatusKind,
-};
+use crate::Apiv2Response;
+use crate::Serialize;
+use newtypes::FootprintReasonCode;
+use newtypes::WatchlistCheckId;
+use newtypes::WatchlistCheckStatusKind;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct WatchlistCheck {

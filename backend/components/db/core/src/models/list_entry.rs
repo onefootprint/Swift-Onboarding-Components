@@ -2,40 +2,30 @@ use super::audit_event::NewAuditEvent;
 use super::data_lifetime::DataLifetime;
 use super::list::List;
 use super::list_entry_creation::ListEntryCreation;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    list,
-    list_entry,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::list;
+use db_schema::schema::list_entry;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    AuditEventDetail,
-    AuditEventId,
-    DataLifetimeSeqno,
-    DbActor,
-    InsightEventId,
-    ListEntryCreationId,
-    ListEntryId,
-    ListId,
-    Locked,
-    PiiString,
-    SealedVaultBytes,
-    TenantId,
-};
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
+use newtypes::InsightEventId;
+use newtypes::ListEntryCreationId;
+use newtypes::ListEntryId;
+use newtypes::ListId;
+use newtypes::Locked;
+use newtypes::PiiString;
+use newtypes::SealedVaultBytes;
+use newtypes::TenantId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]

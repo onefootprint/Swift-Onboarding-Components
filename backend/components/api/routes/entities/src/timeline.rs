@@ -1,19 +1,15 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::ListTimelineRequest;
 use db::models::user_timeline::UserTimeline;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Gets the timeline for a user.",

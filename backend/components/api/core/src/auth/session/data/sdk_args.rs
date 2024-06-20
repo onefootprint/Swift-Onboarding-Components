@@ -1,27 +1,21 @@
-use crate::errors::{
-    ApiResult,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::PgConn;
-use newtypes::{
-    DataIdentifier,
-    EncryptedVaultPrivateKey,
-    ObConfigurationKey,
-    PiiJsonValue,
-    PiiString,
-    SealedVaultBytes,
-    SessionAuthToken,
-};
+use newtypes::DataIdentifier;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::ObConfigurationKey;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::SealedVaultBytes;
+use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
-use strum_macros::{
-    Display,
-    EnumDiscriminants,
-};
+use strum_macros::Display;
+use strum_macros::EnumDiscriminants;
 
 pub type UserDataV1 = HashMap<DataIdentifier, PiiJsonValue>;
 

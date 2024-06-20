@@ -3,17 +3,15 @@ use crate::models::data_lifetime::DataLifetime;
 use crate::tests::prelude::*;
 use itertools::Itertools;
 use macros::db_test;
-use newtypes::{
-    DataLifetimeId,
-    DataLifetimeSeqno,
-    DocumentDiKind,
-    DocumentSide,
-    IdDocKind,
-    IdentityDataKind,
-    ScopedVaultId,
-    TenantId,
-    VaultId,
-};
+use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentSide;
+use newtypes::IdDocKind;
+use newtypes::IdentityDataKind;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::VaultId;
 use std::collections::HashSet;
 
 /// Util function to get the set of IDs from &Vec<DataLifetime> or Vec<&DataLifetime>

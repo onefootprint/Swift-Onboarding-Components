@@ -1,8 +1,6 @@
 use crate::*;
-use newtypes::{
-    TenantFrequentNoteId,
-    TenantFrequentNoteKind,
-};
+use newtypes::TenantFrequentNoteId;
+use newtypes::TenantFrequentNoteKind;
 
 /// Frequently used note for an Org
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

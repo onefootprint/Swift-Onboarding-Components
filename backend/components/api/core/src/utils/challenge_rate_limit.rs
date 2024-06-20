@@ -1,14 +1,10 @@
-use super::session::{
-    JsonSession,
-    RateLimitRecord,
-};
+use super::session::JsonSession;
+use super::session::RateLimitRecord;
 use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::ApiResult;
 use crate::State;
-use chrono::{
-    Duration,
-    Utc,
-};
+use chrono::Duration;
+use chrono::Utc;
 use newtypes::PiiString;
 
 fn compute_key(key: &PiiString, scope: &str) -> String {

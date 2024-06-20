@@ -1,29 +1,23 @@
-use super::{
-    curp_validation,
-    experian,
-    idology_expectid,
-    lexis,
-    neuro_id,
-};
+use super::curp_validation;
+use super::experian;
+use super::idology_expectid;
+use super::lexis;
+use super::neuro_id;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::ApiError;
-use db::models::risk_signal::{
-    AtSeqno,
-    RiskSignal,
-};
+use db::models::risk_signal::AtSeqno;
+use db::models::risk_signal::RiskSignal;
 use derive_more::Display;
 use enum_variant_type::EnumVariantType;
 use idv::ParsedResponse;
-use newtypes::{
-    FootprintReasonCode,
-    IdentityDataKind as IDK,
-    RiskSignalGroupKind,
-    ScopedVaultId,
-    VendorAPI,
-    VerificationResultId,
-};
+use newtypes::FootprintReasonCode;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 use std::collections::HashMap;
 
 // There are 2 main ways we interact RiskSignals:

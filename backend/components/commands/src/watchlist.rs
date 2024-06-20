@@ -1,28 +1,20 @@
-use anyhow::{
-    anyhow,
-    Result,
-};
+use anyhow::anyhow;
+use anyhow::Result;
 use api_core::config::Config;
 use api_core::State;
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
 use clap::Parser;
-use db::models::task::{
-    Task,
-    TaskCreateArgs,
-};
+use db::models::task::Task;
+use db::models::task::TaskCreateArgs;
 use db::models::watchlist_check::WatchlistCheck;
 use db::DbError;
 use newtypes::output::Csv;
-use newtypes::{
-    TaskData,
-    TaskId,
-    TenantId,
-    WatchlistCheckArgs,
-};
+use newtypes::TaskData;
+use newtypes::TaskId;
+use newtypes::TenantId;
+use newtypes::WatchlistCheckArgs;
 use std::str::FromStr;
 use tracing::info;
 
@@ -95,11 +87,9 @@ fn distribute_timestamps(
 #[cfg(test)]
 mod tests {
     use super::distribute_timestamps;
-    use chrono::{
-        DateTime,
-        Duration,
-        Utc,
-    };
+    use chrono::DateTime;
+    use chrono::Duration;
+    use chrono::Utc;
     use test_case::test_case;
 
     fn dt(s: &str) -> DateTime<Utc> {

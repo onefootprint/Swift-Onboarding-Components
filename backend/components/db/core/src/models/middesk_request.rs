@@ -1,20 +1,14 @@
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::middesk_request;
 use diesel::prelude::*;
-use newtypes::{
-    DecisionIntentId,
-    MiddeskRequestId,
-    MiddeskRequestState,
-    WorkflowId,
-};
+use newtypes::DecisionIntentId;
+use newtypes::MiddeskRequestId;
+use newtypes::MiddeskRequestState;
+use newtypes::WorkflowId;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = middesk_request)]

@@ -1,30 +1,20 @@
-use crate::auth::session::user::{
-    AssociatedAuthEvent,
-    AssociatedAuthEventKind,
-    UserSession,
-};
-use crate::auth::session::{
-    AllowSessionUpdate,
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
+use crate::auth::session::user::AssociatedAuthEvent;
+use crate::auth::session::user::AssociatedAuthEventKind;
+use crate::auth::session::user::UserSession;
+use crate::auth::session::AllowSessionUpdate;
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
 use crate::auth::user::UserAuth;
-use crate::auth::{
-    AuthError,
-    IsGuardMet,
-    SessionContext,
-};
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
+use crate::auth::AuthError;
+use crate::auth::IsGuardMet;
+use crate::auth::SessionContext;
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use crate::utils::session::AuthSession;
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
 use crypto::aead::ScopedSealingKey;
 use db::models::auth_event::AuthEvent;
 use db::models::ob_configuration::ObConfiguration;
@@ -34,16 +24,14 @@ use db::models::vault::Vault;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
-use newtypes::{
-    AuthEventKind,
-    ObConfigurationId,
-    ScopedVaultId,
-    SessionAuthToken,
-    UserAuthScope,
-    VaultId,
-    VaultKind,
-    WorkflowId,
-};
+use newtypes::AuthEventKind;
+use newtypes::ObConfigurationId;
+use newtypes::ScopedVaultId;
+use newtypes::SessionAuthToken;
+use newtypes::UserAuthScope;
+use newtypes::VaultId;
+use newtypes::VaultKind;
+use newtypes::WorkflowId;
 use paperclip::actix::Apiv2Security;
 use std::collections::HashMap;
 use std::sync::Arc;

@@ -1,17 +1,15 @@
-use crate::{
-    CardData,
-    CardDataKind,
-    CardExpiration,
-    CardInfo,
-    CardNumber,
-    DataIdentifier,
-    DataIdentifierValue,
-    IdentityData,
-    IdentityDataKind,
-    LuhnValidatedCardNumber,
-    ParsedDataIdentifier,
-    PiiString,
-};
+use crate::CardData;
+use crate::CardDataKind;
+use crate::CardExpiration;
+use crate::CardInfo;
+use crate::CardNumber;
+use crate::DataIdentifier;
+use crate::DataIdentifierValue;
+use crate::IdentityData;
+use crate::IdentityDataKind;
+use crate::LuhnValidatedCardNumber;
+use crate::ParsedDataIdentifier;
+use crate::PiiString;
 use itertools::chain;
 
 pub trait DeriveValues {

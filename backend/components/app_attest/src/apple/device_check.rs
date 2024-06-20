@@ -1,27 +1,19 @@
-use super::{
-    AppleAppAttestationVerifier,
-    Config,
-};
+use super::AppleAppAttestationVerifier;
+use super::Config;
 use crate::error::AttestationError;
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use jwt_simple::prelude::*;
 use openssl::bn::BigNumContext;
 use openssl::cms::CMSOptions;
 use openssl::ec::PointConversionForm;
 use openssl::pkey::Id;
-use openssl::x509::store::{
-    X509Store,
-    X509StoreBuilder,
-};
+use openssl::x509::store::X509Store;
+use openssl::x509::store::X509StoreBuilder;
 use openssl::x509::X509;
-use reqwest::{
-    Method,
-    RequestBuilder,
-    Response,
-};
+use reqwest::Method;
+use reqwest::RequestBuilder;
+use reqwest::Response;
 use std::collections::HashMap;
 use std::num::ParseIntError;
 use thiserror::Error;

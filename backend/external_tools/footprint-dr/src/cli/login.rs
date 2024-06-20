@@ -1,25 +1,19 @@
-use super::api_client::{
-    ApiKey,
-    IsLive,
-    VaultDrApiClient,
-};
+use super::api_client::ApiKey;
+use super::api_client::IsLive;
+use super::api_client::VaultDrApiClient;
 use super::confirm;
-use anyhow::{
-    anyhow,
-    bail,
-    Context,
-    Result,
-};
+use anyhow::anyhow;
+use anyhow::bail;
+use anyhow::Context;
+use anyhow::Result;
 use log::debug;
 use reqwest::Url;
 use std::io::Write;
-use termcolor::{
-    Color,
-    ColorChoice,
-    ColorSpec,
-    StandardStream,
-    WriteColor,
-};
+use termcolor::Color;
+use termcolor::ColorChoice;
+use termcolor::ColorSpec;
+use termcolor::StandardStream;
+use termcolor::WriteColor;
 
 pub fn login_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     let prompt = format!("Enter Footprint {} API key: ", is_live);

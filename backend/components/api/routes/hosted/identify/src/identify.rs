@@ -1,14 +1,10 @@
-use crate::{
-    GetIdentifyChallengeArgs,
-    IdentifyChallengeContext,
-    UserChallengeContext,
-};
+use crate::GetIdentifyChallengeArgs;
+use crate::IdentifyChallengeContext;
+use crate::UserChallengeContext;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::{
-    NewUserSessionArgs,
-    NewUserSessionContext,
-    UserSession,
-};
+use api_core::auth::session::user::NewUserSessionArgs;
+use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::session::user::UserSession;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::ApiResult;
@@ -17,29 +13,25 @@ use api_core::types::ModernApiResult;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::session::AuthSession;
 use api_core::State;
-use api_wire_types::{
-    IdentifiedUser,
-    IdentifyId,
-    IdentifyRequest,
-    IdentifyResponse,
-};
+use api_wire_types::IdentifiedUser;
+use api_wire_types::IdentifyId;
+use api_wire_types::IdentifyRequest;
+use api_wire_types::IdentifyResponse;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::email::Email;
-use newtypes::{
-    DataIdentifier,
-    IdentifyScope,
-    IdentityDataKind as IDK,
-    PhoneNumber,
-    SessionAuthToken,
-    UserAuthScope,
-    VaultId,
-};
+use newtypes::DataIdentifier;
+use newtypes::IdentifyScope;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::PhoneNumber;
+use newtypes::SessionAuthToken;
+use newtypes::UserAuthScope;
+use newtypes::VaultId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 use std::str::FromStr;
 

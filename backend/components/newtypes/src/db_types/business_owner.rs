@@ -1,18 +1,12 @@
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use strum::Display;
-use strum_macros::{
-    AsRefStr,
-    EnumString,
-};
+use strum_macros::AsRefStr;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

@@ -1,9 +1,7 @@
 use crate::models::tenant_vendor::TenantVendorControl;
 use chrono::Utc;
-use newtypes::{
-    TenantId,
-    TenantVendorControlId,
-};
+use newtypes::TenantId;
+use newtypes::TenantVendorControlId;
 
 pub fn create_in_memory(
     tenant_id: TenantId,

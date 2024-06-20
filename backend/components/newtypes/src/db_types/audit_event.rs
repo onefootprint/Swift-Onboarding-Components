@@ -1,38 +1,28 @@
 use crate::util::impl_enum_str_diesel;
-use crate::{
-    DataIdentifier,
-    DocumentDataId,
-    ListEntryCreationId,
-    ListEntryId,
-    ListId,
-    ObConfigurationId,
-    ScopedVaultId,
-    TenantApiKeyId,
-    TenantRoleId,
-    TenantUserId,
-};
+use crate::DataIdentifier;
+use crate::DocumentDataId;
+use crate::ListEntryCreationId;
+use crate::ListEntryId;
+use crate::ListId;
+use crate::ObConfigurationId;
+use crate::ScopedVaultId;
+use crate::TenantApiKeyId;
+use crate::TenantRoleId;
+use crate::TenantUserId;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use serde_json;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use strum::AsRefStr;
-use strum_macros::{
-    Display,
-    EnumDiscriminants,
-    EnumString,
-};
+use strum_macros::Display;
+use strum_macros::EnumDiscriminants;
+use strum_macros::EnumString;
 
 /// Represents the required detail fields used to create new audit_event rows.
 #[derive(Display, Debug, Clone)]

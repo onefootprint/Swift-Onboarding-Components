@@ -1,28 +1,20 @@
 use super::audit_event::NewAuditEvent;
-use crate::{
-    DbResult,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::list_entry_creation;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    AuditEventDetail,
-    AuditEventId,
-    DataLifetimeSeqno,
-    DbActor,
-    InsightEventId,
-    ListEntryCreationId,
-    ListId,
-    TenantId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
+use newtypes::InsightEventId;
+use newtypes::ListEntryCreationId;
+use newtypes::ListId;
+use newtypes::TenantId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = list_entry_creation)]

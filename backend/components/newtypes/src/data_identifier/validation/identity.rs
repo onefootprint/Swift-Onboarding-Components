@@ -1,36 +1,28 @@
+use super::utils::validate_state;
+use super::utils::AgeHelper;
+use super::utils::PO_BOX;
 use super::utils::{
     self,
-    validate_state,
-    AgeHelper,
-    PO_BOX,
 };
-use super::{
-    Error,
-    VResult,
-};
+use super::Error;
+use super::VResult;
 use crate::email::Email;
-use crate::ssn::{
-    Ssn4,
-    Ssn9,
-};
-use crate::{
-    AllData,
-    CleanAndValidate,
-    DataIdentifierValue,
-    IdentityDataKind as IDK,
-    Iso3166TwoDigitCountryCode,
-    NtResult,
-    PhoneNumber,
-    PiiJsonValue,
-    PiiString,
-    ValidateArgs,
-    DATE_FORMAT,
-};
-use chrono::{
-    Datelike,
-    NaiveDate,
-    Utc,
-};
+use crate::ssn::Ssn4;
+use crate::ssn::Ssn9;
+use crate::AllData;
+use crate::CleanAndValidate;
+use crate::DataIdentifierValue;
+use crate::IdentityDataKind as IDK;
+use crate::Iso3166TwoDigitCountryCode;
+use crate::NtResult;
+use crate::PhoneNumber;
+use crate::PiiJsonValue;
+use crate::PiiString;
+use crate::ValidateArgs;
+use crate::DATE_FORMAT;
+use chrono::Datelike;
+use chrono::NaiveDate;
+use chrono::Utc;
 use serde_with::DeserializeFromStr;
 use std::str::FromStr;
 use strum_macros::EnumString;
@@ -280,12 +272,10 @@ pub enum VisaKind {
 #[cfg(test)]
 mod test {
     use super::IDK::*;
-    use crate::{
-        CleanAndValidate,
-        IdentityDataKind as IDK,
-        PiiJsonValue,
-        ValidateArgs,
-    };
+    use crate::CleanAndValidate;
+    use crate::IdentityDataKind as IDK;
+    use crate::PiiJsonValue;
+    use crate::ValidateArgs;
     use std::collections::HashMap;
     use test_case::test_case;
 

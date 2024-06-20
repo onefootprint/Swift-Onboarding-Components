@@ -1,10 +1,8 @@
 pub mod business;
 pub mod webhook;
 use self::business::BusinessResponse;
-use super::{
-    Error,
-    MiddeskReqwestError,
-};
+use super::Error;
+use super::MiddeskReqwestError;
 use serde::de::DeserializeOwned;
 use std::fmt;
 
@@ -44,10 +42,8 @@ pub struct ApiErrorResponseError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::{
-        json,
-        Value,
-    };
+    use serde_json::json;
+    use serde_json::Value;
 
     #[test]
     fn test_parse_response() {

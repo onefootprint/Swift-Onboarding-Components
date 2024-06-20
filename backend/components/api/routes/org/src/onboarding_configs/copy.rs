@@ -1,49 +1,33 @@
 use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
 use crate::rules::validate_rules_request;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::State;
 use api_core::{
-    State,
-    {
-        self,
-    },
+    self,
 };
-use api_wire_types::{
-    CopyPlaybookRequest,
-    CreateRule,
-    MultiUpdateRuleRequest,
-    UnvalidatedRuleExpression,
-};
-use db::models::ob_configuration::{
-    NewObConfigurationArgs,
-    ObConfiguration,
-};
-use db::models::rule_instance::{
-    IncludeRules,
-    RuleInstance,
-};
+use api_wire_types::CopyPlaybookRequest;
+use api_wire_types::CreateRule;
+use api_wire_types::MultiUpdateRuleRequest;
+use api_wire_types::UnvalidatedRuleExpression;
+use db::models::ob_configuration::NewObConfigurationArgs;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::rule_instance::IncludeRules;
+use db::models::rule_instance::RuleInstance;
 use db::models::rule_set_version::RuleSetVersion;
 use itertools::Itertools;
-use newtypes::{
-    DbActor,
-    ObConfigurationId,
-    TenantId,
-};
+use newtypes::DbActor;
+use newtypes::ObConfigurationId;
+use newtypes::TenantId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
 
 #[api_v2_operation(
     tags(Playbooks, Organization, Private),

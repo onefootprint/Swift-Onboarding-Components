@@ -6,24 +6,18 @@ use aws_sdk_rekognition::operation::compare_faces::CompareFacesError;
 use aws_sdk_rekognition::operation::detect_faces::DetectFacesError;
 use aws_sdk_rekognition::operation::detect_text::DetectTextError;
 use aws_sdk_rekognition::primitives::Blob;
-use aws_sdk_rekognition::types::{
-    Attribute,
-    Image,
-};
+use aws_sdk_rekognition::types::Attribute;
+use aws_sdk_rekognition::types::Image;
 use aws_sdk_textract::error::SdkError as TextSdkError;
 use aws_sdk_textract::operation::analyze_id::AnalyzeIDError;
 use aws_sdk_textract::types::Document;
 use aws_sdk_textract::Client as TexClient;
 use aws_types::SdkConfig;
-use compare::{
-    CompareFacesResponse,
-    CompareResult,
-    FaceCompareDetails,
-};
-use newtypes::{
-    PiiBytes,
-    PiiString,
-};
+use compare::CompareFacesResponse;
+use compare::CompareResult;
+use compare::FaceCompareDetails;
+use newtypes::PiiBytes;
+use newtypes::PiiString;
 
 pub mod analyze_id;
 pub mod compare;

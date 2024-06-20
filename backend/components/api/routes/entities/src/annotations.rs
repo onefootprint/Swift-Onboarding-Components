@@ -1,8 +1,6 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::types::ModernApiResult;
@@ -11,30 +9,22 @@ use crate::State;
 use actix_web::web::Json;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_wire_types::{
-    AnnotationFilters,
-    UpdateAnnotationRequest,
-};
-use db::models::annotation::{
-    Annotation,
-    AnnotationInfo,
-};
+use api_wire_types::AnnotationFilters;
+use api_wire_types::UpdateAnnotationRequest;
+use db::models::annotation::Annotation;
+use db::models::annotation::AnnotationInfo;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::DbError;
-use newtypes::{
-    AnnotationId,
-    CreateAnnotationRequest,
-    FpId,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    patch,
-    post,
-    web,
-    Apiv2Schema,
-};
+use newtypes::AnnotationId;
+use newtypes::CreateAnnotationRequest;
+use newtypes::FpId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::patch;
+use paperclip::actix::post;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 
 #[api_v2_operation(
     description = "Gets the annotations for a user.",

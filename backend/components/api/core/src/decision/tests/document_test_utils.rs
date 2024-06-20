@@ -1,43 +1,35 @@
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::State;
 use crypto::aead::SealingKey;
-use db::models::document::{
-    Document,
-    DocumentImageArgs,
-};
+use db::models::document::Document;
+use db::models::document::DocumentImageArgs;
 use db::tests::MockFFClient;
 use db::DbResult;
 use feature_flag::BoolFlag;
 use idv::incode::doc::response::*;
-use idv::incode::doc::{
-    IncodeAddBackRequest,
-    IncodeAddFrontRequest,
-    IncodeAddMLConsentRequest,
-    IncodeAddPrivacyConsentRequest,
-    IncodeAddSelfieRequest,
-    IncodeFetchOCRRequest,
-    IncodeFetchScoresRequest,
-    IncodeGetOnboardingStatusRequest,
-    IncodeProcessFaceRequest,
-    IncodeProcessIdRequest,
-};
+use idv::incode::doc::IncodeAddBackRequest;
+use idv::incode::doc::IncodeAddFrontRequest;
+use idv::incode::doc::IncodeAddMLConsentRequest;
+use idv::incode::doc::IncodeAddPrivacyConsentRequest;
+use idv::incode::doc::IncodeAddSelfieRequest;
+use idv::incode::doc::IncodeFetchOCRRequest;
+use idv::incode::doc::IncodeFetchScoresRequest;
+use idv::incode::doc::IncodeGetOnboardingStatusRequest;
+use idv::incode::doc::IncodeProcessFaceRequest;
+use idv::incode::doc::IncodeProcessIdRequest;
 use idv::incode::response::OnboardingStartResponse;
-use idv::incode::{
-    IncodeResponse,
-    IncodeStartOnboardingRequest,
-};
-use newtypes::{
-    DocumentFixtureResult,
-    DocumentId,
-    DocumentKind,
-    DocumentRequestKind,
-    DocumentSide,
-    EncryptedVaultPrivateKey,
-    S3Url,
-    SealedVaultBytes,
-    Selfie,
-    TenantId,
-};
+use idv::incode::IncodeResponse;
+use idv::incode::IncodeStartOnboardingRequest;
+use newtypes::DocumentFixtureResult;
+use newtypes::DocumentId;
+use newtypes::DocumentKind;
+use newtypes::DocumentRequestKind;
+use newtypes::DocumentSide;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::S3Url;
+use newtypes::SealedVaultBytes;
+use newtypes::Selfie;
+use newtypes::TenantId;
 use std::sync::Arc;
 
 #[derive(Clone, Copy)]

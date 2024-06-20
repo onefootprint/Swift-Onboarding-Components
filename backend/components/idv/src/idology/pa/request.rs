@@ -1,13 +1,9 @@
 use crate::idology::error as IdologyError;
-use chrono::{
-    Datelike,
-    NaiveDate,
-};
-use newtypes::{
-    IdvData,
-    PiiString,
-    DATE_FORMAT,
-};
+use chrono::Datelike;
+use chrono::NaiveDate;
+use newtypes::IdvData;
+use newtypes::PiiString;
+use newtypes::DATE_FORMAT;
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

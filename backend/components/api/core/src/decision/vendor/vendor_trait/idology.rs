@@ -1,22 +1,14 @@
-use super::{
-    VendorAPICall,
-    VendorAPIResponse,
-};
+use super::VendorAPICall;
+use super::VendorAPIResponse;
 use async_trait::async_trait;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::idology::pa::{
-    IdologyPaAPIResponse,
-    IdologyPaRequest,
-};
-use idv::idology::{
-    IdologyExpectIDAPIResponse,
-    IdologyExpectIDRequest,
-};
+use idv::idology::pa::IdologyPaAPIResponse;
+use idv::idology::pa::IdologyPaRequest;
+use idv::idology::IdologyExpectIDAPIResponse;
+use idv::idology::IdologyExpectIDRequest;
 use idv::ParsedResponse;
-use newtypes::{
-    PiiJsonValue,
-    VendorAPI,
-};
+use newtypes::PiiJsonValue;
+use newtypes::VendorAPI;
 
 /////////////////////
 /// Idology Impl - ExpectID

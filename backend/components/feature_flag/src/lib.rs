@@ -1,14 +1,10 @@
-use launchdarkly_server_sdk::{
-    Client,
-    ConfigBuilder,
-    ContextBuilder,
-};
+use launchdarkly_server_sdk::Client;
+use launchdarkly_server_sdk::ConfigBuilder;
+use launchdarkly_server_sdk::ContextBuilder;
 use mockall::automock;
 use mockall::predicate::*;
-use rollout::{
-    JsonLdRollout,
-    LdRollout,
-};
+use rollout::JsonLdRollout;
+use rollout::LdRollout;
 use serde_json::json;
 use std::sync::Arc;
 use thiserror::Error;
@@ -180,10 +176,8 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
 #[cfg(test)]
 mod test {
     use super::BoolFlag as FF;
-    use newtypes::{
-        OrgMemberEmail,
-        TenantId,
-    };
+    use newtypes::OrgMemberEmail;
+    use newtypes::TenantId;
     use test_case::test_case;
 
     #[test_case(FF::IsRiskOps(&OrgMemberEmail("e@e.com".to_string())) => "IsFirmEmployeeRiskOps")]

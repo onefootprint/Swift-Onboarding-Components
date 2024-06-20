@@ -1,47 +1,33 @@
-use crate::auth::user::{
-    CheckedUserAuthContext,
-    UserAuth,
-};
+use crate::auth::user::CheckedUserAuthContext;
+use crate::auth::user::UserAuth;
 use crate::config::Config;
 use crate::errors::ApiResult;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
-use db::models::webauthn_credential::{
-    NewWebauthnCredential,
-    WebauthnCredential,
-};
+use db::models::webauthn_credential::NewWebauthnCredential;
+use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
-use newtypes::{
-    AttestationType,
-    InsightEventId,
-    LivenessAttributes,
-    LivenessInfo,
-    LivenessIssuer,
-    VaultId,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::AttestationType;
+use newtypes::InsightEventId;
+use newtypes::LivenessAttributes;
+use newtypes::LivenessInfo;
+use newtypes::LivenessIssuer;
+use newtypes::VaultId;
+use serde::Deserialize;
+use serde::Serialize;
 use webauthn_rs_core::error::WebauthnError;
-use webauthn_rs_core::proto::{
-    AttestationCaList,
-    AttestationMetadata,
-    Credential,
-    RegistrationState,
-};
-use webauthn_rs_core::{
-    AttestationFormat,
-    WebauthnCore,
-};
-use webauthn_rs_proto::{
-    AttestationConveyancePreference,
-    AuthenticatorAttachment,
-    COSEAlgorithm,
-    CreationChallengeResponse,
-    RegisterPublicKeyCredential,
-    UserVerificationPolicy,
-};
+use webauthn_rs_core::proto::AttestationCaList;
+use webauthn_rs_core::proto::AttestationMetadata;
+use webauthn_rs_core::proto::Credential;
+use webauthn_rs_core::proto::RegistrationState;
+use webauthn_rs_core::AttestationFormat;
+use webauthn_rs_core::WebauthnCore;
+use webauthn_rs_proto::AttestationConveyancePreference;
+use webauthn_rs_proto::AuthenticatorAttachment;
+use webauthn_rs_proto::COSEAlgorithm;
+use webauthn_rs_proto::CreationChallengeResponse;
+use webauthn_rs_proto::RegisterPublicKeyCredential;
+use webauthn_rs_proto::UserVerificationPolicy;
 
 pub struct WebauthnConfig {
     webauthn: WebauthnCore,
@@ -290,10 +276,8 @@ mod tests {
     use super::is_android;
     use crate::utils::passkey::WebauthnConfig;
     use webauthn_rs_core::proto::AttestationCaList;
-    use webauthn_rs_core::{
-        verify_attestation_ca_chain,
-        WebauthnCore,
-    };
+    use webauthn_rs_core::verify_attestation_ca_chain;
+    use webauthn_rs_core::WebauthnCore;
 
     #[test]
     fn test_android_origin_workaround() {

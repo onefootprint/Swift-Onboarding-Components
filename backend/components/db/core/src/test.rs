@@ -1,21 +1,17 @@
-use crate::models::annotation::{
-    Annotation,
-    AnnotationInfo,
-};
+use crate::models::annotation::Annotation;
+use crate::models::annotation::AnnotationInfo;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_user::TenantUser;
 use crate::models::user_timeline::UserTimeline;
 use crate::TxnPgConn;
-use newtypes::{
-    DbActor,
-    Fingerprint,
-    OrgMemberEmail,
-    ScopedVaultId,
-    SealedVaultBytes,
-    TenantId,
-    TenantRoleId,
-    VaultId,
-};
+use newtypes::DbActor;
+use newtypes::Fingerprint;
+use newtypes::OrgMemberEmail;
+use newtypes::ScopedVaultId;
+use newtypes::SealedVaultBytes;
+use newtypes::TenantId;
+use newtypes::TenantRoleId;
+use newtypes::VaultId;
 use std::str::FromStr;
 
 pub(crate) fn test_tenant_user(
@@ -85,21 +81,15 @@ pub(crate) fn test_tenant_api_key(
 mod test {
     use crate::models::tenant::Tenant;
     use crate::models::vault::Vault;
-    use crate::{
-        test_helpers,
-        DbResult,
-    };
+    use crate::test_helpers;
+    use crate::DbResult;
+    use diesel::sql_query;
     use diesel::sql_types::Text;
-    use diesel::{
-        sql_query,
-        RunQueryDsl,
-    };
-    use newtypes::{
-        EncryptedVaultPrivateKey,
-        SandboxId,
-        VaultKind,
-        VaultPublicKey,
-    };
+    use diesel::RunQueryDsl;
+    use newtypes::EncryptedVaultPrivateKey;
+    use newtypes::SandboxId;
+    use newtypes::VaultKind;
+    use newtypes::VaultPublicKey;
     use std::time::Duration;
 
     #[actix_rt::test]

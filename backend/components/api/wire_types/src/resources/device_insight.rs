@@ -1,9 +1,7 @@
 use crate::*;
-use newtypes::{
-    AuthEventKind,
-    IdentifyScope,
-    ModernAuthEventKind,
-};
+use newtypes::AuthEventKind;
+use newtypes::IdentifyScope;
+use newtypes::ModernAuthEventKind;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 

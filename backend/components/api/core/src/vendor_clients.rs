@@ -1,93 +1,63 @@
 use crate::decision::vendor::vendor_trait::VendorAPICall;
 use crate::utils::sms::SmsClient;
-use idv::experian::{
-    ExperianCrossCoreRequest,
-    ExperianCrossCoreResponse,
-};
+use idv::experian::ExperianCrossCoreRequest;
+use idv::experian::ExperianCrossCoreResponse;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::idology::pa::{
-    IdologyPaAPIResponse,
-    IdologyPaRequest,
-};
-use idv::idology::{
-    IdologyExpectIDAPIResponse,
-    IdologyExpectIDRequest,
-};
+use idv::idology::pa::IdologyPaAPIResponse;
+use idv::idology::pa::IdologyPaRequest;
+use idv::idology::IdologyExpectIDAPIResponse;
+use idv::idology::IdologyExpectIDRequest;
 use idv::incode::curp_validation::response::CurpValidationResponse;
 use idv::incode::curp_validation::IncodeCurpValidationRequest;
-use idv::incode::doc::response::{
-    AddConsentResponse,
-    AddSelfieResponse,
-    AddSideResponse,
-    FetchOCRResponse,
-    FetchScoresResponse,
-    GetOnboardingStatusResponse,
-    ProcessFaceResponse,
-    ProcessIdResponse,
-};
-use idv::incode::doc::{
-    IncodeAddBackRequest,
-    IncodeAddFrontRequest,
-    IncodeAddMLConsentRequest,
-    IncodeAddPrivacyConsentRequest,
-    IncodeAddSelfieRequest,
-    IncodeFetchOCRRequest,
-    IncodeFetchScoresRequest,
-    IncodeGetOnboardingStatusRequest,
-    IncodeProcessFaceRequest,
-    IncodeProcessIdRequest,
-};
+use idv::incode::doc::response::AddConsentResponse;
+use idv::incode::doc::response::AddSelfieResponse;
+use idv::incode::doc::response::AddSideResponse;
+use idv::incode::doc::response::FetchOCRResponse;
+use idv::incode::doc::response::FetchScoresResponse;
+use idv::incode::doc::response::GetOnboardingStatusResponse;
+use idv::incode::doc::response::ProcessFaceResponse;
+use idv::incode::doc::response::ProcessIdResponse;
+use idv::incode::doc::IncodeAddBackRequest;
+use idv::incode::doc::IncodeAddFrontRequest;
+use idv::incode::doc::IncodeAddMLConsentRequest;
+use idv::incode::doc::IncodeAddPrivacyConsentRequest;
+use idv::incode::doc::IncodeAddSelfieRequest;
+use idv::incode::doc::IncodeFetchOCRRequest;
+use idv::incode::doc::IncodeFetchScoresRequest;
+use idv::incode::doc::IncodeGetOnboardingStatusRequest;
+use idv::incode::doc::IncodeProcessFaceRequest;
+use idv::incode::doc::IncodeProcessIdRequest;
 use idv::incode::government_validation::request::IncodeGovernmentValidationRequest;
 use idv::incode::government_validation::response::GovernmentValidationResponse;
 use idv::incode::response::OnboardingStartResponse;
-use idv::incode::watchlist::response::{
-    UpdatedWatchlistResultResponse,
-    WatchlistResultResponse,
-};
-use idv::incode::watchlist::{
-    IncodeUpdatedWatchlistResultRequest,
-    IncodeWatchlistCheckRequest,
-};
-use idv::incode::{
-    IncodeResponse,
-    IncodeStartOnboardingRequest,
-};
-use idv::lexis::client::{
-    LexisFlexIdRequest,
-    LexisFlexIdResponse,
-};
+use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
+use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::incode::watchlist::IncodeUpdatedWatchlistResultRequest;
+use idv::incode::watchlist::IncodeWatchlistCheckRequest;
+use idv::incode::IncodeResponse;
+use idv::incode::IncodeStartOnboardingRequest;
+use idv::lexis::client::LexisFlexIdRequest;
+use idv::lexis::client::LexisFlexIdResponse;
 use idv::middesk::client::MiddeskClient;
-use idv::middesk::{
-    MiddeskCreateBusinessRequest,
-    MiddeskCreateBusinessResponse,
-    MiddeskGetBusinessRequest,
-    MiddeskGetBusinessResponse,
-};
+use idv::middesk::MiddeskCreateBusinessRequest;
+use idv::middesk::MiddeskCreateBusinessResponse;
+use idv::middesk::MiddeskGetBusinessRequest;
+use idv::middesk::MiddeskGetBusinessResponse;
 use idv::neuro_id::response::NeuroApiResponse;
 use idv::neuro_id::NeuroIdAnalyticsRequest;
-use idv::samba::request::{
-    SambaCreateLVOrderRequest,
-    SambaGetLVReportRequest,
-};
-use idv::samba::response::license_validation::{
-    CreateLVOrderResponse,
-    GetLVOrderResponse,
-};
+use idv::samba::request::SambaCreateLVOrderRequest;
+use idv::samba::request::SambaGetLVReportRequest;
+use idv::samba::response::license_validation::CreateLVOrderResponse;
+use idv::samba::response::license_validation::GetLVOrderResponse;
 use idv::samba::SambaAPIResponse;
 use idv::socure::client::SocureClient;
-use idv::socure::{
-    SocureIDPlusAPIResponse,
-    SocureIDPlusRequest,
-};
+use idv::socure::SocureIDPlusAPIResponse;
+use idv::socure::SocureIDPlusRequest;
 use idv::stytch::client::StytchClient;
-use idv::stytch::{
-    StytchLookupRequest,
-    StytchLookupResponse,
-};
-use idv::twilio::{
-    TwilioLookupV2APIResponse,
-    TwilioLookupV2Request,
-};
+use idv::stytch::StytchLookupRequest;
+use idv::stytch::StytchLookupResponse;
+use idv::twilio::TwilioLookupV2APIResponse;
+use idv::twilio::TwilioLookupV2Request;
 use std::sync::Arc;
 
 pub type VendorClient<Req, Resp, E> = Arc<dyn VendorAPICall<Req, Resp, E>>;

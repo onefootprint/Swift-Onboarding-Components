@@ -1,12 +1,10 @@
 use crate::*;
 use newtypes::email::Email;
 use newtypes::input::Csv;
-use newtypes::{
-    CompanySize,
-    TenantFrequentNoteKind,
-    TenantRoleId,
-    TenantRoleKindDiscriminant,
-};
+use newtypes::CompanySize;
+use newtypes::TenantFrequentNoteKind;
+use newtypes::TenantRoleId;
+use newtypes::TenantRoleKindDiscriminant;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct UpdateTenantRequest {

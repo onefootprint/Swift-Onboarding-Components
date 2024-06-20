@@ -1,20 +1,14 @@
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::tenant_compliance_partnership;
 use diesel::prelude::*;
-use newtypes::{
-    OrgIdentifierRef,
-    PartnerTenantId,
-    TenantCompliancePartnershipId,
-    TenantId,
-};
+use newtypes::OrgIdentifierRef;
+use newtypes::PartnerTenantId;
+use newtypes::TenantCompliancePartnershipId;
+use newtypes::TenantId;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = tenant_compliance_partnership)]

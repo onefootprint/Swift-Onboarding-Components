@@ -1,34 +1,24 @@
-use super::vendor::make_request::{
-    VerificationRequestWithVendorError,
-    VerificationRequestWithVendorResponse,
-};
+use super::vendor::make_request::VerificationRequestWithVendorError;
+use super::vendor::make_request::VerificationRequestWithVendorResponse;
 use super::vendor::tenant_vendor_control::TenantVendorControl;
 use super::vendor::vendor_result::VendorResult;
-use super::vendor::{
-    verification_result,
-    VendorAPIError,
-};
+use super::vendor::verification_result;
+use super::vendor::VendorAPIError;
 use super::*;
-use crate::errors::{
-    ApiError,
-    ApiErrorKind,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiErrorKind;
+use crate::errors::ApiResult;
 use crate::State;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
-use db::{
-    DbError,
-    DbPool,
-};
+use db::DbError;
+use db::DbPool;
 use either::Either;
 use itertools::Itertools;
-use newtypes::{
-    PiiJsonValue,
-    VerificationRequestId,
-    WorkflowId,
-};
+use newtypes::PiiJsonValue;
+use newtypes::VerificationRequestId;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 pub async fn save_vendor_responses(

@@ -1,10 +1,8 @@
-use crate::{
-    Actor,
-    Apiv2Response,
-    DateTime,
-    Serialize,
-    Utc,
-};
+use crate::Actor;
+use crate::Apiv2Response;
+use crate::DateTime;
+use crate::Serialize;
+use crate::Utc;
 use newtypes::AnnotationId;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

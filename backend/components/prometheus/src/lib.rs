@@ -1,51 +1,39 @@
 //! Adapted from https://github.com/nlopes/actix-web-prom
 
-use actix_web::body::{
-    BodySize,
-    EitherBody,
-    MessageBody,
-};
+use actix_web::body::BodySize;
+use actix_web::body::EitherBody;
+use actix_web::body::MessageBody;
+use actix_web::dev::Service;
+use actix_web::dev::ServiceRequest;
+use actix_web::dev::ServiceResponse;
+use actix_web::dev::Transform;
 use actix_web::dev::{
     self,
-    Service,
-    ServiceRequest,
-    ServiceResponse,
-    Transform,
 };
-use actix_web::http::header::{
-    HeaderValue,
-    CONTENT_TYPE,
-};
-use actix_web::http::{
-    Method,
-    StatusCode,
-};
+use actix_web::http::header::HeaderValue;
+use actix_web::http::header::CONTENT_TYPE;
+use actix_web::http::Method;
+use actix_web::http::StatusCode;
 use actix_web::web::Bytes;
 use actix_web::Error;
 use futures_core::ready;
 use pin_project_lite::pin_project;
-use prometheus::{
-    Encoder,
-    HistogramOpts,
-    HistogramVec,
-    IntCounterVec,
-    Opts,
-    Registry,
-    TextEncoder,
-};
+use prometheus::Encoder;
+use prometheus::HistogramOpts;
+use prometheus::HistogramVec;
+use prometheus::IntCounterVec;
+use prometheus::Opts;
+use prometheus::Registry;
+use prometheus::TextEncoder;
 use std::collections::HashMap;
-use std::future::{
-    ready,
-    Future,
-    Ready,
-};
+use std::future::ready;
+use std::future::Future;
+use std::future::Ready;
 use std::marker::PhantomData;
 use std::pin::Pin;
 use std::sync::Arc;
-use std::task::{
-    Context,
-    Poll,
-};
+use std::task::Context;
+use std::task::Poll;
 use std::time::Instant;
 
 #[derive(Debug)]

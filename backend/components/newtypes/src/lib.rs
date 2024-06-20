@@ -42,10 +42,8 @@ mod us_states;
 pub use us_states::*;
 
 mod b64;
-pub use b64::{
-    Base64Data,
-    Base64EncodedString,
-};
+pub use b64::Base64Data;
+pub use b64::Base64EncodedString;
 pub use serde;
 
 mod auth_token;
@@ -272,10 +270,8 @@ pub mod util {
         };
     }
 
-    pub(crate) use {
-        impl_enum_str_diesel,
-        impl_enum_string_diesel,
-    };
+    pub(crate) use impl_enum_str_diesel;
+    pub(crate) use impl_enum_string_diesel;
     #[allow(clippy::extra_unused_lifetimes)]
     #[cfg(test)]
     mod tests {
@@ -283,16 +279,12 @@ pub mod util {
         use diesel::connection::SimpleConnection;
         use diesel::prelude::*;
         use diesel::sql_types::Text;
-        use diesel::{
-            AsExpression,
-            FromSqlRow,
-            RunQueryDsl,
-        };
-        use strum_macros::{
-            AsRefStr,
-            EnumIter,
-            EnumString,
-        };
+        use diesel::AsExpression;
+        use diesel::FromSqlRow;
+        use diesel::RunQueryDsl;
+        use strum_macros::AsRefStr;
+        use strum_macros::EnumIter;
+        use strum_macros::EnumString;
 
         #[derive(Debug, Clone, PartialEq, Eq, AsExpression, FromSqlRow, EnumString, AsRefStr, EnumIter)]
         #[strum(serialize_all = "PascalCase")]

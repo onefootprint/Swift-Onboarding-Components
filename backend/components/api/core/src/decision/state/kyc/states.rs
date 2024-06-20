@@ -1,97 +1,73 @@
-use super::{
-    KycComplete,
-    KycDataCollection,
-    KycDecisioning,
-    KycDocCollection,
-    KycState,
-    KycVendorCalls,
-    MakeDecision,
-    MakeVendorCalls,
-};
-use crate::decision::features::risk_signals::risk_signal_group_struct::{
-    Aml,
-    Kyc,
-};
-use crate::decision::features::risk_signals::{
-    fetch_latest_risk_signals_map,
-    parse_reason_codes,
-    parse_reason_codes_from_vendor_result,
-    RiskSignalGroupStruct,
-    UserSubmittedInfoForFRC,
-};
+use super::KycComplete;
+use super::KycDataCollection;
+use super::KycDecisioning;
+use super::KycDocCollection;
+use super::KycState;
+use super::KycVendorCalls;
+use super::MakeDecision;
+use super::MakeVendorCalls;
+use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
+use crate::decision::features::risk_signals::parse_reason_codes;
+use crate::decision::features::risk_signals::parse_reason_codes_from_vendor_result;
+use crate::decision::features::risk_signals::risk_signal_group_struct::Aml;
+use crate::decision::features::risk_signals::risk_signal_group_struct::Kyc;
+use crate::decision::features::risk_signals::RiskSignalGroupStruct;
+use crate::decision::features::risk_signals::UserSubmittedInfoForFRC;
 use crate::decision::features::{
     self,
 };
 use crate::decision::onboarding::Decision;
-use crate::decision::rule_engine::engine::{
-    EvaluateWorkflowDecisionArgs,
-    VaultDataForRules,
-};
+use crate::decision::rule_engine::engine::EvaluateWorkflowDecisionArgs;
+use crate::decision::rule_engine::engine::VaultDataForRules;
 use crate::decision::rule_engine::{
     self,
 };
-use crate::decision::state::actions::{
-    Authorize,
-    WorkflowActions,
-};
+use crate::decision::state::actions::Authorize;
+use crate::decision::state::actions::WorkflowActions;
+use crate::decision::state::common::DecisionOutput;
 use crate::decision::state::common::{
     self,
-    DecisionOutput,
 };
-use crate::decision::state::{
-    DocCollected,
-    OnAction,
-    WorkflowState,
-};
+use crate::decision::state::DocCollected;
+use crate::decision::state::OnAction;
+use crate::decision::state::WorkflowState;
 use crate::decision::utils::should_execute_rules_for_document_only;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::{
     self,
 };
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use async_trait::async_trait;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_request::DocumentRequest;
-use db::models::list_entry::{
-    ListEntry,
-    ListWithDecryptedEntries,
-};
+use db::models::list_entry::ListEntry;
+use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::{
-    NewRiskSignalInfo,
-    RiskSignal,
-};
+use db::models::risk_signal::NewRiskSignalInfo;
+use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::rule_instance::RuleInstance;
 use db::models::vault::Vault;
-use db::models::workflow::{
-    Workflow as DbWorkflow,
-    WorkflowUpdate,
-};
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
+use db::models::workflow::Workflow as DbWorkflow;
+use db::models::workflow::WorkflowUpdate;
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
-use newtypes::{
-    DecisionStatus,
-    DocumentRequestKind,
-    EnhancedAmlOption,
-    KycConfig,
-    ListId,
-    Locked,
-    OnboardingStatus,
-    RiskSignalGroupKind,
-    RuleSetResultKind,
-    VendorAPI,
-    VerificationResultId,
-};
+use newtypes::DecisionStatus;
+use newtypes::DocumentRequestKind;
+use newtypes::EnhancedAmlOption;
+use newtypes::KycConfig;
+use newtypes::ListId;
+use newtypes::Locked;
+use newtypes::OnboardingStatus;
+use newtypes::RiskSignalGroupKind;
+use newtypes::RuleSetResultKind;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 use std::collections::HashMap;
 use std::sync::Arc;
 

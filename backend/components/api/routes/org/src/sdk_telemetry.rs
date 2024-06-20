@@ -1,10 +1,8 @@
 use api_core::types::ModernApiResult;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-    Apiv2Schema,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

@@ -1,7 +1,5 @@
-use crate::auth::user::{
-    UserAuthContext,
-    UserAuthScope,
-};
+use crate::auth::user::UserAuthContext;
+use crate::auth::user::UserAuthScope;
 use crate::types::ModernApiResult;
 use crate::State;
 use actix_web::web::Json;
@@ -10,30 +8,24 @@ use api_core::decision::vendor::fp_device_attestation::AttestationResult;
 use api_core::errors::ApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
-use api_wire_types::hosted::device_attestation::{
-    CreateDeviceAttestationRequest,
-    DeviceAttestationChallengeResponse,
-    DeviceAttestationType,
-    GetDeviceAttestationChallengeRequest,
-};
+use api_wire_types::hosted::device_attestation::CreateDeviceAttestationRequest;
+use api_wire_types::hosted::device_attestation::DeviceAttestationChallengeResponse;
+use api_wire_types::hosted::device_attestation::DeviceAttestationType;
+use api_wire_types::hosted::device_attestation::GetDeviceAttestationChallengeRequest;
 use app_attest::error::AttestationError::MissingTenant;
-use chrono::{
-    Duration,
-    Utc,
-};
+use chrono::Duration;
+use chrono::Utc;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
-use newtypes::{
-    LivenessAttributes,
-    LivenessInfo,
-    LivenessIssuer,
-};
+use newtypes::LivenessAttributes;
+use newtypes::LivenessInfo;
+use newtypes::LivenessIssuer;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
-    Apiv2Schema,
 };
 
 mod android;

@@ -5,34 +5,28 @@ use db::models::tenant::Tenant;
 use db::DbError;
 use interval::BillingInterval;
 use itertools::Itertools;
-use newtypes::{
-    PiiString,
-    StripeCustomerId,
-    TenantId,
-};
+use newtypes::PiiString;
+use newtypes::StripeCustomerId;
+use newtypes::TenantId;
 use profile::BillingProfile;
-use rust_decimal::prelude::{
-    FromPrimitive,
-    ToPrimitive,
-};
+use rust_decimal::prelude::FromPrimitive;
+use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
 use std::str::FromStr;
 pub use stripe::Client;
-use stripe::{
-    CreateCustomer,
-    CreateInvoice,
-    CreateInvoiceItem,
-    Currency,
-    Customer,
-    CustomerId,
-    Invoice,
-    InvoiceItem,
-    InvoicePendingInvoiceItemsBehavior,
-    InvoiceStatus,
-    ListCustomers,
-    ListInvoices,
-};
+use stripe::CreateCustomer;
+use stripe::CreateInvoice;
+use stripe::CreateInvoiceItem;
+use stripe::Currency;
+use stripe::Customer;
+use stripe::CustomerId;
+use stripe::Invoice;
+use stripe::InvoiceItem;
+use stripe::InvoicePendingInvoiceItemsBehavior;
+use stripe::InvoiceStatus;
+use stripe::ListCustomers;
+use stripe::ListInvoices;
 
 pub type BResult<T> = Result<T, Error>;
 

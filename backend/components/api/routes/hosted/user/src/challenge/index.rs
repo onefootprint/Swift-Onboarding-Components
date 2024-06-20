@@ -1,40 +1,30 @@
 use super::RegisterChallengeData;
 use crate::challenge::RegisterChallenge;
 use crate::State;
-use api_core::auth::session::user::{
-    AssociatedAuthEventKind,
-    TokenCreationPurpose,
-};
-use api_core::auth::user::{
-    load_auth_events,
-    UserAuthContext,
-    UserAuthScope,
-};
+use api_core::auth::session::user::AssociatedAuthEventKind;
+use api_core::auth::session::user::TokenCreationPurpose;
+use api_core::auth::user::load_auth_events;
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
-use api_core::errors::{
-    AssertionError,
-    ValidationError,
-};
+use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
-use api_wire_types::{
-    UserChallengeRequest,
-    UserChallengeResponse,
-};
+use api_wire_types::UserChallengeRequest;
+use api_wire_types::UserChallengeResponse;
 use itertools::Itertools;
-use newtypes::{
-    ActionKind,
-    AuthEventKind,
-    AuthMethodKind,
-};
+use newtypes::ActionKind;
+use newtypes::AuthEventKind;
+use newtypes::AuthMethodKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(
@@ -195,10 +185,8 @@ mod test {
     use super::allowed_challenge_kinds;
     use crate::challenge::ActionKind;
     use api_core::auth::session::user::AssociatedAuthEventKind;
-    use newtypes::{
-        AuthEventKind,
-        AuthMethodKind,
-    };
+    use newtypes::AuthEventKind;
+    use newtypes::AuthMethodKind;
     use test_case::test_case;
 
     #[test_case(ActionKind::AddPrimary, AuthEventKind::Passkey, AssociatedAuthEventKind::Implicit => Vec::<AuthMethodKind>::new(); "no-challenges-allowed-for-implicit")]

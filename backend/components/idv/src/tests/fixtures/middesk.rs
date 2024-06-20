@@ -1,13 +1,9 @@
-use crate::middesk::response::business::{
-    BusinessResponse,
-    Formation,
-    Review,
-    Task,
-};
-use crate::middesk::response::webhook::{
-    BusinessData,
-    MiddeskBusinessUpdateWebhookResponse,
-};
+use crate::middesk::response::business::BusinessResponse;
+use crate::middesk::response::business::Formation;
+use crate::middesk::response::business::Review;
+use crate::middesk::response::business::Task;
+use crate::middesk::response::webhook::BusinessData;
+use crate::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
 use crate::middesk::MiddeskCreateBusinessResponse;
 use newtypes::PiiJsonValue;
 

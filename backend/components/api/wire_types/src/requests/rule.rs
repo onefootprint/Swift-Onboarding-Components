@@ -1,8 +1,6 @@
 use crate::*;
-use newtypes::{
-    RuleAction,
-    RuleId,
-};
+use newtypes::RuleAction;
+use newtypes::RuleId;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateRuleRequest {

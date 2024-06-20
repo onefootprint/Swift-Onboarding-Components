@@ -1,60 +1,48 @@
 use super::RegisterChallengeData;
 use crate::challenge::RegisterChallenge;
 use crate::State;
-use api_core::auth::user::{
-    CheckedUserAuthContext,
-    UserAuth,
-    UserAuthContext,
-    UserAuthScope,
-};
+use api_core::auth::user::CheckedUserAuthContext;
+use api_core::auth::user::UserAuth;
+use api_core::auth::user::UserAuthContext;
+use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
 use api_core::errors::error_with_code::ErrorWithCode;
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::passkey::{
-    VerifyChallengeResult,
-    WebauthnConfig,
-};
-use api_core::utils::vault_wrapper::{
-    Any,
-    FingerprintedDataRequest,
-    VaultWrapper,
-};
+use api_core::utils::passkey::VerifyChallengeResult;
+use api_core::utils::passkey::WebauthnConfig;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::FingerprintedDataRequest;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::UserChallengeVerifyRequest;
 use chrono::Utc;
 use crypto::sha256;
-use db::models::auth_event::{
-    AuthEvent,
-    NewAuthEventArgs,
-};
+use db::models::auth_event::AuthEvent;
+use db::models::auth_event::NewAuthEventArgs;
 use db::models::contact_info::ContactInfo;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{
-    ActionKind,
-    AuthEventKind,
-    ContactInfoKind,
-    DataLifetimeSource,
-    DataRequest,
-    InsightEventId,
-    PiiString,
-    ScopedVaultId,
-    ValidateArgs,
-    WebauthnCredentialId,
-};
+use newtypes::ActionKind;
+use newtypes::AuthEventKind;
+use newtypes::ContactInfoKind;
+use newtypes::DataLifetimeSource;
+use newtypes::DataRequest;
+use newtypes::InsightEventId;
+use newtypes::PiiString;
+use newtypes::ScopedVaultId;
+use newtypes::ValidateArgs;
+use newtypes::WebauthnCredentialId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 use std::collections::HashMap;
 

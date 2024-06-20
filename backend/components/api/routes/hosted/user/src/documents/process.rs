@@ -1,23 +1,17 @@
 use crate::auth::user::UserAuthScope;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::decision::document::route_handler::{
-    IncodeConfigurationIdOverride,
-    IsRerun,
-};
+use api_core::decision;
+use api_core::decision::document::route_handler::IncodeConfigurationIdOverride;
+use api_core::decision::document::route_handler::IsRerun;
 use api_core::types::ModernApiResult;
-use api_core::{
-    decision,
-    State,
-};
+use api_core::State;
 use api_wire_types::DocumentResponse;
-use newtypes::{
-    DocumentId,
-    WorkflowGuard,
-};
+use newtypes::DocumentId;
+use newtypes::WorkflowGuard;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

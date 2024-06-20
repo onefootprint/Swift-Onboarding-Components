@@ -1,21 +1,17 @@
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::{
-    ModernApiResult,
-    OffsetPaginatedResponse,
-    OffsetPaginationRequest,
-};
+use api_core::types::ModernApiResult;
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_core::State;
 use api_route_org_common::members as members_common;
 use api_wire_types::OrgMemberFilters;
 use newtypes::TenantUserId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::patch;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    patch,
-    post,
-    web,
-};
 
 #[api_v2_operation(
     tags(Members, OrgSettings, Private),

@@ -1,10 +1,8 @@
-use crate::{
-    AuthEventKind,
-    ChallengeKind,
-    DataIdentifier,
-    Error,
-    IdentityDataKind,
-};
+use crate::AuthEventKind;
+use crate::ChallengeKind;
+use crate::DataIdentifier;
+use crate::Error;
+use crate::IdentityDataKind;
 use paperclip::actix::Apiv2Schema;
 use strum_macros::Display;
 

@@ -1,27 +1,17 @@
 use super::rule_instance::RuleInstance;
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    rule_instance,
-    rule_result,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::rule_instance;
+use db_schema::schema::rule_result;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    RuleInstanceId,
-    RuleResultId,
-    RuleSetResultId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::RuleInstanceId;
+use newtypes::RuleResultId;
+use newtypes::RuleSetResultId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_result)]

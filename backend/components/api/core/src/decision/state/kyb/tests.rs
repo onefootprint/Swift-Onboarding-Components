@@ -1,41 +1,33 @@
 use crate::decision::state::actions::WorkflowActions;
-use crate::decision::state::test_utils::{
-    mock_idology,
-    mock_middesk,
-    mock_webhooks,
-    query_data,
-    query_portablized_seqno,
-    query_risk_signals,
-    query_rule_set_result,
-    ExpectedRequiresManualReview,
-    ExpectedStatus,
-    OnboardingCompleted,
-    OnboardingStatusChanged,
-    UserKind,
-    WithQualifier,
-};
-use crate::decision::state::{
-    kyb,
-    Authorize,
-    BoKycCompleted,
-    MakeDecision,
-    MakeVendorCalls,
-    WorkflowKind,
-    WorkflowWrapper,
-};
+use crate::decision::state::kyb;
+use crate::decision::state::test_utils::mock_idology;
+use crate::decision::state::test_utils::mock_middesk;
+use crate::decision::state::test_utils::mock_webhooks;
+use crate::decision::state::test_utils::query_data;
+use crate::decision::state::test_utils::query_portablized_seqno;
+use crate::decision::state::test_utils::query_risk_signals;
+use crate::decision::state::test_utils::query_rule_set_result;
+use crate::decision::state::test_utils::ExpectedRequiresManualReview;
+use crate::decision::state::test_utils::ExpectedStatus;
+use crate::decision::state::test_utils::OnboardingCompleted;
+use crate::decision::state::test_utils::OnboardingStatusChanged;
+use crate::decision::state::test_utils::UserKind;
+use crate::decision::state::test_utils::WithQualifier;
+use crate::decision::state::Authorize;
+use crate::decision::state::BoKycCompleted;
+use crate::decision::state::MakeDecision;
+use crate::decision::state::MakeVendorCalls;
+use crate::decision::state::WorkflowKind;
+use crate::decision::state::WorkflowWrapper;
 use crate::decision::tests::test_helpers;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-    VwArgs,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_instance::{
-    IncludeRules,
-    RuleInstance,
-};
+use db::models::rule_instance::IncludeRules;
+use db::models::rule_instance::RuleInstance;
 use db::models::rule_set_result::RuleSetResult;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -45,29 +37,25 @@ use db::tests::test_db_pool::TestDbPool;
 use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use macros::{
-    test_state,
-    test_state_case,
-};
-use newtypes::{
-    BusinessDataKind,
-    CollectedDataOption as CDO,
-    DataIdentifier,
-    FootprintReasonCode,
-    KybState,
-    KycState,
-    ObConfigurationKind,
-    OnboardingStatus,
-    RiskSignalGroupKind,
-    RuleAction,
-    RuleInstanceKind,
-    SignalSeverity,
-    TerminalDecisionStatus,
-    VendorAPI,
-    VerificationCheck,
-    WorkflowFixtureResult,
-    WorkflowState,
-};
+use macros::test_state;
+use macros::test_state_case;
+use newtypes::BusinessDataKind;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DataIdentifier;
+use newtypes::FootprintReasonCode;
+use newtypes::KybState;
+use newtypes::KycState;
+use newtypes::ObConfigurationKind;
+use newtypes::OnboardingStatus;
+use newtypes::RiskSignalGroupKind;
+use newtypes::RuleAction;
+use newtypes::RuleInstanceKind;
+use newtypes::SignalSeverity;
+use newtypes::TerminalDecisionStatus;
+use newtypes::VendorAPI;
+use newtypes::VerificationCheck;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowState;
 
 async fn setup(
     state: &State,

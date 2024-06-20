@@ -3,11 +3,9 @@ use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiError;
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
-use newtypes::{
-    FilterFunction,
-    FpId,
-    ProxyToken,
-};
+use newtypes::FilterFunction;
+use newtypes::FpId;
+use newtypes::ProxyToken;
 use std::str::FromStr;
 
 /// Ingress rules define how to vault data in the response

@@ -1,19 +1,15 @@
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::{
-    ModernApiResult,
-    OffsetPaginationRequest,
-};
+use api_core::types::ModernApiResult;
+use api_core::types::OffsetPaginationRequest;
 use api_core::State;
 use api_route_org_common::roles as roles_common;
 use api_wire_types::OrgRoleFilters;
 use newtypes::TenantRoleId;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    patch,
-    post,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::patch;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     tags(Roles, OrgSettings, Private),

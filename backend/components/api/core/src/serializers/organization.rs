@@ -1,8 +1,6 @@
 use crate::utils::db2api::DbToApi;
-use db::models::tenant::{
-    Tenant,
-    TenantWithParent,
-};
+use db::models::tenant::Tenant;
+use db::models::tenant::TenantWithParent;
 
 pub struct IsAuthMethodSupported(pub bool);
 pub struct IsDomainAlreadyClaimed(pub bool);

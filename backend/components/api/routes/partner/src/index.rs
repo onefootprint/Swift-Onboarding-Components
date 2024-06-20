@@ -1,22 +1,18 @@
 use actix_web::web;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    PartnerTenantGuard,
-    PartnerTenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::PartnerTenantGuard;
+use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::serializers::IsDomainAlreadyClaimed;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
-use db::models::partner_tenant::{
-    PartnerTenant,
-    UpdatePartnerTenant,
-};
+use db::models::partner_tenant::PartnerTenant;
+use db::models::partner_tenant::UpdatePartnerTenant;
+use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
-    api_v2_operation,
 };
 
 #[api_v2_operation(

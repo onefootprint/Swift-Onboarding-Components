@@ -1,19 +1,13 @@
 use super::error;
-use newtypes::{
-    PiiJsonValue,
-    ScrubbedPiiJsonValue,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::PiiJsonValue;
+use newtypes::ScrubbedPiiJsonValue;
+use serde::Deserialize;
+use serde::Serialize;
 use serde_with::DeserializeFromStr;
-use strum::{
-    Display,
-    EnumIter,
-    EnumString,
-    IntoEnumIterator,
-};
+use strum::Display;
+use strum::EnumIter;
+use strum::EnumString;
+use strum::IntoEnumIterator;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -732,9 +726,9 @@ impl NeuroIdAttributes {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_fixtures::NeuroTestOpts;
     use crate::test_fixtures::{
         self,
-        NeuroTestOpts,
     };
 
     fn get_signal_for_model(res: &NeuroIdAnalyticsResponse, model: Model) -> Option<NeuroSignal> {

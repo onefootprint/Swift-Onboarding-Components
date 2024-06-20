@@ -1,46 +1,36 @@
 use super::ob_configuration::IsLive;
-use crate::{
-    DbError,
-    DbResult,
-    NextPage,
-    NonNullVec,
-    OffsetPagination,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::NextPage;
+use crate::NonNullVec;
+use crate::OffsetPagination;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::tenant_role::BoxedQuery;
 use db_schema::schema::tenant_role::{
     self,
-    BoxedQuery,
 };
 use diesel::dsl::count_star;
 use diesel::prelude::*;
-use diesel::sql_types::{
-    Bool,
-    Nullable,
-};
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::sql_types::Bool;
+use diesel::sql_types::Nullable;
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    ApiKeyStatus,
-    InvokeVaultProxyPermission,
-    Locked,
-    OrgIdentifierRef,
-    PartnerTenantId,
-    TenantId,
-    TenantKind,
-    TenantRoleId,
-    TenantRoleKind,
-    TenantRoleKindDiscriminant,
-    TenantScope,
-    TenantScopeDiscriminants,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::InvokeVaultProxyPermission;
+use newtypes::Locked;
+use newtypes::OrgIdentifierRef;
+use newtypes::PartnerTenantId;
+use newtypes::TenantId;
+use newtypes::TenantKind;
+use newtypes::TenantRoleId;
+use newtypes::TenantRoleKind;
+use newtypes::TenantRoleKindDiscriminant;
+use newtypes::TenantScope;
+use newtypes::TenantScopeDiscriminants;
 use std::collections::HashMap;
 
 pub type IsImmutable = bool;
@@ -287,10 +277,8 @@ impl TenantRole {
     ) -> DbResult<Self> {
         let org_id: OrgIdentifierRef<'a> = org_id.into();
 
-        use db_schema::schema::{
-            tenant_api_key,
-            tenant_rolebinding,
-        };
+        use db_schema::schema::tenant_api_key;
+        use db_schema::schema::tenant_rolebinding;
         let role = Self::lock_active(conn, id, org_id)?.into_inner();
         if role.is_immutable {
             return Err(DbError::CannotUpdateImmutableRole(role.name));
@@ -413,10 +401,8 @@ impl TenantRole {
         filters: &TenantRoleListFilters,
         pagination: OffsetPagination,
     ) -> DbResult<(Vec<TenantRoleInfo>, NextPage)> {
-        use db_schema::schema::{
-            tenant_api_key,
-            tenant_rolebinding,
-        };
+        use db_schema::schema::tenant_api_key;
+        use db_schema::schema::tenant_rolebinding;
         let mut query = Self::list_active_query(filters)
             .order_by(tenant_role::name.asc())
             .limit(pagination.limit());

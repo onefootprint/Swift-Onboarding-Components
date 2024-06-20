@@ -3,10 +3,8 @@ use crate::models::partner_tenant::PartnerTenant;
 use crate::models::tenant::Tenant;
 use crate::DbError;
 use derive_more::From;
-use newtypes::{
-    OrgIdentifierRef,
-    TenantKind,
-};
+use newtypes::OrgIdentifierRef;
+use newtypes::TenantKind;
 
 #[derive(Debug, Clone, From)]
 #[allow(clippy::large_enum_variant)]

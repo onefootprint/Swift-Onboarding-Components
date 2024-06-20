@@ -1,14 +1,10 @@
-use api_core::{
-    ModernApiResult,
-    State,
-};
+use api_core::ModernApiResult;
+use api_core::State;
 use api_wire_types::GoogleOauthRedirectUrl;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 use paperclip::actix::web::HttpResponse;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
 
 #[api_v2_operation(
     description = "Request to authenticate via Google OAuth.",

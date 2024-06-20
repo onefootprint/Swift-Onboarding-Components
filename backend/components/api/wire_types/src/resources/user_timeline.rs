@@ -1,30 +1,26 @@
-use crate::{
-    Actor,
-    Annotation,
-    Apiv2Response,
-    Apiv2Schema,
-    DateTime,
-    DocumentRequest,
-    DocumentUploadedTimelineEvent,
-    InsightEvent,
-    LivenessEvent,
-    OnboardingDecision,
-    Serialize,
-    TimelinePlaybook,
-    Utc,
-    VaultCreated,
-    WatchlistCheck,
-};
-use newtypes::{
-    ActionKind,
-    AuthMethodKind,
-    CollectedDataOption,
-    DataIdentifier,
-    DataLifetimeSeqno,
-    ExternalIntegrationKind,
-    LabelKind,
-    WorkflowRequestConfig,
-};
+use crate::Actor;
+use crate::Annotation;
+use crate::Apiv2Response;
+use crate::Apiv2Schema;
+use crate::DateTime;
+use crate::DocumentRequest;
+use crate::DocumentUploadedTimelineEvent;
+use crate::InsightEvent;
+use crate::LivenessEvent;
+use crate::OnboardingDecision;
+use crate::Serialize;
+use crate::TimelinePlaybook;
+use crate::Utc;
+use crate::VaultCreated;
+use crate::WatchlistCheck;
+use newtypes::ActionKind;
+use newtypes::AuthMethodKind;
+use newtypes::CollectedDataOption;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::ExternalIntegrationKind;
+use newtypes::LabelKind;
+use newtypes::WorkflowRequestConfig;
 use serde::Deserialize;
 
 /// Describes a liveness event that took place

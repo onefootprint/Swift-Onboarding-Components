@@ -1,8 +1,6 @@
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Deserializer,
-};
+use serde::Deserialize;
+use serde::Deserializer;
 
 #[derive(Debug, Apiv2Schema, Clone, Copy, Default)]
 /// NOTE: if you use this, the field must be annotated with `#[serde(default)]`.

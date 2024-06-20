@@ -113,12 +113,10 @@ mod tests {
     use db::test_helpers::assert_have_same_elements;
     use idv::experian::cross_core::response::CrossCoreAPIResponse;
     use idv::experian::precise_id::response::PreciseIDParsedScore;
-    use newtypes::{
-        ExperianAddressAndNameMatchReasonCodes,
-        ExperianSSNReasonCodes,
-        ExperianWatchlistReasonCodes,
-        FootprintReasonCode,
-    };
+    use newtypes::ExperianAddressAndNameMatchReasonCodes;
+    use newtypes::ExperianSSNReasonCodes;
+    use newtypes::ExperianWatchlistReasonCodes;
+    use newtypes::FootprintReasonCode;
     use test_case::test_case;
 
     #[test_case(ExperianAddressAndNameMatchReasonCodes::DefaultNoMatch, ExperianSSNReasonCodes::EA, ExperianWatchlistReasonCodes::R1, vec![

@@ -2,22 +2,20 @@ use crypto::aead::ScopedSealingKey;
 use crypto::clean_and_hash_data_for_fingerprinting;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use once_cell::sync::Lazy;
-use rpc::{
-    DataTransformer,
-    DataTransforms,
-    DecryptThenSignRequest,
-    EnvelopeDecryptThenHmacSignRequest,
-    EnvelopeHmacSignRequest,
-    GenerateDataKeypairRequest,
-    GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair,
-    GeneratedSealedDataKey,
-    HmacSignature,
-    HmacSignatureSingle,
-    SealedIkek,
-    SealedIkekId,
-    SignRequest,
-};
+use rpc::DataTransformer;
+use rpc::DataTransforms;
+use rpc::DecryptThenSignRequest;
+use rpc::EnvelopeDecryptThenHmacSignRequest;
+use rpc::EnvelopeHmacSignRequest;
+use rpc::GenerateDataKeypairRequest;
+use rpc::GenerateSymmetricDataKeyRequest;
+use rpc::GeneratedDataKeyPair;
+use rpc::GeneratedSealedDataKey;
+use rpc::HmacSignature;
+use rpc::HmacSignatureSingle;
+use rpc::SealedIkek;
+use rpc::SealedIkekId;
+use rpc::SignRequest;
 use std::collections::HashMap;
 use thiserror::Error;
 use tokio::sync::RwLock;
@@ -28,13 +26,11 @@ mod simulated;
 #[cfg(feature = "nitro")]
 mod ne;
 
-use crate::{
-    log_info_t,
-    Decryption,
-    DecryptionSingle,
-    EnvelopeDecryptRequest,
-    KmsCredentials,
-};
+use crate::log_info_t;
+use crate::Decryption;
+use crate::DecryptionSingle;
+use crate::EnvelopeDecryptRequest;
+use crate::KmsCredentials;
 
 /// init the enclave sdk if needed
 pub fn init() {

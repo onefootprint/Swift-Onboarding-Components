@@ -1,57 +1,43 @@
+use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::vendor_api::vendor_api_struct::SambaLicenseValidationCreate;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::decision::vendor::{
-    map_to_api_error,
-    AdditionalIdentityDocumentVerificationHelper,
-};
+use crate::decision::vendor::AdditionalIdentityDocumentVerificationHelper;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
-use crate::utils::vault_wrapper::{
-    Any,
-    DecryptUncheckedResult,
-    VaultWrapper,
-    VwArgs,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::DecryptUncheckedResult;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
-use db::models::samba_order::{
-    NewSambaOrderArgs,
-    SambaOrder,
-    UpdateSambaOrder,
-};
+use db::models::samba_order::NewSambaOrderArgs;
+use db::models::samba_order::SambaOrder;
+use db::models::samba_order::UpdateSambaOrder;
 use db::models::samba_report::SambaReport;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::PgConn;
-use idv::samba::request::{
-    SambaCreateLVOrderRequest,
-    SambaGetLVReportRequest,
-};
+use idv::samba::request::SambaCreateLVOrderRequest;
+use idv::samba::request::SambaGetLVReportRequest;
 use idv::samba::response::license_validation::SambaLinkType;
 use idv::samba::response::webhook::SambaWebhook;
-use newtypes::samba::{
-    SambaLicenseValidationData,
-    SambaOrderKind,
-};
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeId,
-    DocumentDiKind,
-    DocumentId,
-    DocumentKind,
-    IdDocKind,
-    IdentityDataKind as IDK,
-    OcrDataKind as ODK,
-    SambaReportId,
-    VendorAPI,
-    WorkflowId,
-};
+use newtypes::samba::SambaLicenseValidationData;
+use newtypes::samba::SambaOrderKind;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentId;
+use newtypes::DocumentKind;
+use newtypes::IdDocKind;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::OcrDataKind as ODK;
+use newtypes::SambaReportId;
+use newtypes::VendorAPI;
+use newtypes::WorkflowId;
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]

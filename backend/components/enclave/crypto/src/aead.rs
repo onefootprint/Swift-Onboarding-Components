@@ -1,22 +1,14 @@
-use aead::{
-    Aead,
-    KeyInit,
-    Payload,
-};
-use chacha20poly1305::{
-    Key,
-    XChaCha20Poly1305,
-    XNonce,
-};
-use rand_core::{
-    OsRng,
-    RngCore,
-};
+use aead::Aead;
+use aead::KeyInit;
+use aead::Payload;
+use chacha20poly1305::Key;
+use chacha20poly1305::XChaCha20Poly1305;
+use chacha20poly1305::XNonce;
+use rand_core::OsRng;
+use rand_core::RngCore;
 use serde::de::DeserializeOwned;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt::Debug;
 use std::ops::Deref;
 

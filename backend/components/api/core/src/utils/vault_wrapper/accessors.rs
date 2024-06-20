@@ -1,15 +1,11 @@
 use super::VaultWrapper;
 use db::models::data_lifetime::DataLifetime;
 use db::models::vault::Vault;
-use db::{
-    HasLifetime,
-    VaultedData,
-};
-use newtypes::{
-    DataIdentifier,
-    IsDataIdentifierDiscriminant,
-    PiiString,
-};
+use db::HasLifetime;
+use db::VaultedData;
+use newtypes::DataIdentifier;
+use newtypes::IsDataIdentifierDiscriminant;
+use newtypes::PiiString;
 
 impl<Type> VaultWrapper<Type> {
     /// helper to expose a reference/deref coercion to the underlying vault (normally from a

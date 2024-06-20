@@ -1,14 +1,10 @@
 use self::license_validation::CreateLVOrderAddress;
-use newtypes::samba::{
-    SambaAddress,
-    SambaLicenseValidationData,
-};
+use newtypes::samba::SambaAddress;
+use newtypes::samba::SambaLicenseValidationData;
 use newtypes::vendor_credentials::SambaSafetyCredentials;
-use newtypes::{
-    PiiString,
-    SambaOrderId,
-    SambaReportId,
-};
+use newtypes::PiiString;
+use newtypes::SambaOrderId;
+use newtypes::SambaReportId;
 
 pub mod license_validation;
 

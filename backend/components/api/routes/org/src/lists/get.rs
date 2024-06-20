@@ -1,8 +1,6 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
@@ -10,11 +8,9 @@ use api_core::State;
 use db::models::list::List;
 use db::models::rule_instance::RuleInstance;
 use newtypes::ListId;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(tags(Lists, Organization, Private), description = "Returns a blocklist.")]
 #[get("/org/lists/{list_id}")]

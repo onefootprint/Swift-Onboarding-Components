@@ -1,40 +1,28 @@
-use super::{
-    IncodeStateTransition,
-    VerificationSession,
-};
-use crate::decision::vendor::incode::state::{
-    IncodeState,
-    TransitionResult,
-};
+use super::IncodeStateTransition;
+use super::VerificationSession;
+use crate::decision::vendor::incode::state::IncodeState;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::errors::{
-    ApiErrorKind,
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiErrorKind;
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-use db::models::document::{
-    Document,
-    DocumentUpdate,
-};
+use db::models::document::Document;
+use db::models::document::DocumentUpdate;
 use db::models::risk_signal::RiskSignal;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
-use db::{
-    DbPool,
-    TxnPgConn,
-};
-use newtypes::{
-    DecisionIntentId,
-    DocumentId,
-    DocumentStatus,
-    FootprintReasonCode,
-    ScopedVaultId,
-    VaultId,
-    VendorAPI,
-    VerificationResultId,
-};
+use db::DbPool;
+use db::TxnPgConn;
+use newtypes::DecisionIntentId;
+use newtypes::DocumentId;
+use newtypes::DocumentStatus;
+use newtypes::FootprintReasonCode;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 
 // TODO this is more like the other workflow state transitions where it has behavior that must be
 // atomic with entering the state.

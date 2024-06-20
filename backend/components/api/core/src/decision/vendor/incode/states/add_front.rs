@@ -1,34 +1,26 @@
-use super::{
-    AddBack,
-    AddConsent,
-    AddSelfie,
-    AddSideResponseHelper,
-    IncodeStateTransition,
-    VerificationSession,
-};
-use crate::decision::vendor::incode::state::{
-    IncodeState,
-    TransitionResult,
-};
+use super::AddBack;
+use super::AddConsent;
+use super::AddSelfie;
+use super::AddSideResponseHelper;
+use super::IncodeStateTransition;
+use super::VerificationSession;
+use crate::decision::vendor::incode::state::IncodeState;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-use db::{
-    DbPool,
-    TxnPgConn,
-};
+use db::DbPool;
+use db::TxnPgConn;
 use either::Either;
 use idv::incode::doc::IncodeAddFrontRequest;
-use newtypes::{
-    DocVData,
-    DocumentKind,
-    DocumentSide,
-    IncodeFailureReason,
-    VendorAPI,
-};
+use newtypes::DocVData;
+use newtypes::DocumentKind;
+use newtypes::DocumentSide;
+use newtypes::IncodeFailureReason;
+use newtypes::VendorAPI;
 
 pub struct AddFront {
     add_side_response_helper: AddSideResponseHelper,

@@ -1,32 +1,22 @@
 use crate::decision::features::incode_utils::*;
 use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    DecryptUncheckedResult,
-    VaultWrapper,
-};
-use chrono::{
-    NaiveDateTime,
-    Utc,
-};
-use idv::incode::doc::response::{
-    FetchOCRResponse,
-    FetchScoresResponse,
-    IncodeOcrFixtureResponseFields,
-};
-use newtypes::incode::{
-    IncodeRCH,
-    IncodeStatus,
-    IncodeTest,
-};
-use newtypes::{
-    DataIdentifier,
-    FootprintReasonCode,
-    IdDocKind,
-    IdentityDataKind,
-    PiiString,
-    VerificationResultId,
-};
+use crate::utils::vault_wrapper::DecryptUncheckedResult;
+use crate::utils::vault_wrapper::VaultWrapper;
+use chrono::NaiveDateTime;
+use chrono::Utc;
+use idv::incode::doc::response::FetchOCRResponse;
+use idv::incode::doc::response::FetchScoresResponse;
+use idv::incode::doc::response::IncodeOcrFixtureResponseFields;
+use newtypes::incode::IncodeRCH;
+use newtypes::incode::IncodeStatus;
+use newtypes::incode::IncodeTest;
+use newtypes::DataIdentifier;
+use newtypes::FootprintReasonCode;
+use newtypes::IdDocKind;
+use newtypes::IdentityDataKind;
+use newtypes::PiiString;
+use newtypes::VerificationResultId;
 
 #[derive(Default, Clone, PartialEq, Eq)]
 pub struct IncodeOcrAddress {
@@ -342,26 +332,22 @@ fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintRe
 mod tests {
     use super::*;
     use db::test_helpers::assert_have_same_elements;
-    use idv::incode::doc::response::{
-        FetchScoresResponse,
-        OCRName,
-        OcrDataConfidence,
-    };
+    use idv::incode::doc::response::FetchScoresResponse;
+    use idv::incode::doc::response::OCRName;
+    use idv::incode::doc::response::OcrDataConfidence;
+    use idv::test_fixtures::DocTestOpts;
+    use idv::test_fixtures::OcrTestOpts;
     use idv::test_fixtures::{
         self,
-        DocTestOpts,
-        OcrTestOpts,
     };
     use newtypes::incode::IncodeStatus::*;
+    use newtypes::FootprintReasonCode::*;
     use newtypes::FootprintReasonCode::{
         self,
-        *,
     };
-    use newtypes::{
-        PiiLong,
-        ScrubbedPiiLong,
-        ScrubbedPiiString,
-    };
+    use newtypes::PiiLong;
+    use newtypes::ScrubbedPiiLong;
+    use newtypes::ScrubbedPiiString;
     use std::collections::HashMap;
     use test_case::test_case;
 

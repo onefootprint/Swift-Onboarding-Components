@@ -10,11 +10,9 @@ use db::models::appearance::Appearance;
 use db::models::tenant_client_config::TenantClientConfig;
 use db::DbResult;
 use macros::route_alias;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[route_alias(get(
     "/org/onboarding_config",

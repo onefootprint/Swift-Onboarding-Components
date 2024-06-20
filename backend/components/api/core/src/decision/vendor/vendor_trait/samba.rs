@@ -1,20 +1,14 @@
-use super::{
-    VendorAPICall,
-    VendorAPIResponse,
-};
+use super::VendorAPICall;
+use super::VendorAPIResponse;
 use async_trait::async_trait;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::samba::client::SambaSafetyClientAdapter;
-use idv::samba::request::{
-    SambaCheckLVOrderStatusRequest,
-    SambaCreateLVOrderRequest,
-    SambaGetLVReportRequest,
-};
-use idv::samba::response::license_validation::{
-    CheckLVOrderStatus,
-    CreateLVOrderResponse,
-    GetLVOrderResponse,
-};
+use idv::samba::request::SambaCheckLVOrderStatusRequest;
+use idv::samba::request::SambaCreateLVOrderRequest;
+use idv::samba::request::SambaGetLVReportRequest;
+use idv::samba::response::license_validation::CheckLVOrderStatus;
+use idv::samba::response::license_validation::CreateLVOrderResponse;
+use idv::samba::response::license_validation::GetLVOrderResponse;
 use idv::samba::SambaAPIResponse;
 use idv::ParsedResponse;
 use newtypes::VendorAPI;

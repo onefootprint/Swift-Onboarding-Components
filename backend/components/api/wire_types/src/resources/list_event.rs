@@ -1,13 +1,11 @@
 use crate::*;
-use newtypes::{
-    AuditEventId,
-    AuditEventName,
-    ListEntryCreationId,
-    ListEntryId,
-    ListId,
-    PiiString,
-    TenantId,
-};
+use newtypes::AuditEventId;
+use newtypes::AuditEventName;
+use newtypes::ListEntryCreationId;
+use newtypes::ListEntryId;
+use newtypes::ListId;
+use newtypes::PiiString;
+use newtypes::TenantId;
 use strum_macros::Display;
 
 // TODO: this is basically a fork of AuditEvent but for use by the List specific /timeline endpoint

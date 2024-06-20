@@ -1,10 +1,8 @@
 use super::StateError;
 use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
-use strum_macros::{
-    EnumDiscriminants,
-    EnumString,
-};
+use strum_macros::EnumDiscriminants;
+use strum_macros::EnumString;
 
 #[derive(Debug)]
 pub struct Authorize;

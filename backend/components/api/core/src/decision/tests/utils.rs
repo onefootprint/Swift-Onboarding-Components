@@ -6,10 +6,8 @@ use db::tests::test_db_pool::TestDbPool;
 use db::DbResult;
 use feature_flag::BoolFlag;
 use macros::test_state;
-use newtypes::{
-    DecisionStatus,
-    OnboardingStatus,
-};
+use newtypes::DecisionStatus;
+use newtypes::OnboardingStatus;
 
 #[test_state]
 async fn test_handle_setup(state: &mut State) {

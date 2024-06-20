@@ -1,12 +1,10 @@
-use crate::{
-    CollectedDataOption,
-    DataIdentifier,
-    DataIdentifierValue,
-    NtResult,
-    PiiJsonValue,
-    PiiValueKind,
-    ValidateArgs,
-};
+use crate::CollectedDataOption;
+use crate::DataIdentifier;
+use crate::DataIdentifierValue;
+use crate::NtResult;
+use crate::PiiJsonValue;
+use crate::PiiValueKind;
+use crate::ValidateArgs;
 use std::collections::HashMap;
 
 mod business;
@@ -16,22 +14,16 @@ mod identity;
 mod investor_profile;
 mod utils;
 
-pub use business::{
-    BusinessOwnerData,
-    KycedBusinessOwnerData,
-};
-pub use card::{
-    CardData,
-    CardExpiration,
-    CardIssuer,
-    CardNumber,
-    LuhnValidatedCardNumber,
-};
-pub use identity::{
-    IdentityData,
-    UsLegalStatus,
-    VisaKind,
-};
+pub use business::BusinessOwnerData;
+pub use business::KycedBusinessOwnerData;
+pub use card::CardData;
+pub use card::CardExpiration;
+pub use card::CardIssuer;
+pub use card::CardNumber;
+pub use card::LuhnValidatedCardNumber;
+pub use identity::IdentityData;
+pub use identity::UsLegalStatus;
+pub use identity::VisaKind;
 pub use investor_profile::Declaration;
 pub use utils::AgeHelper;
 pub type AllData = HashMap<DataIdentifier, PiiJsonValue>;

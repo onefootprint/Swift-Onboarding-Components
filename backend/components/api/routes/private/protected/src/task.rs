@@ -1,21 +1,15 @@
 use crate::ProtectedAuth;
+use actix_web::post;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    post,
-    web,
-};
+use api_core::task;
 use api_core::types::ModernApiResult;
-use api_core::{
-    task,
-    State,
-};
+use api_core::State;
 use chrono::Utc;
 use db::models::task::Task;
 use db::DbError;
-use newtypes::{
-    TaskData,
-    TaskId,
-};
+use newtypes::TaskData;
+use newtypes::TaskId;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct ExecuteTasksRequest {

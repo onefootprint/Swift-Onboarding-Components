@@ -1,15 +1,11 @@
-use super::super::{
-    Business,
-    VaultWrapper,
-};
+use super::super::Business;
+use super::super::VaultWrapper;
 use crate::errors::business::BusinessError;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
-use crate::{
-    ApiError,
-    ApiErrorKind,
-    State,
-};
+use crate::ApiError;
+use crate::ApiErrorKind;
+use crate::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
@@ -17,18 +13,16 @@ use db::models::scoped_vault::ScopedVault;
 use db::DbError;
 use itertools::Itertools;
 use newtypes::email::Email;
-use newtypes::{
-    BusinessDataKind as BDK,
-    BusinessOwnerData,
-    BusinessOwnerKind,
-    ContactInfoKind,
-    IdentityDataKind as IDK,
-    Iso3166TwoDigitCountryCode,
-    KycedBusinessOwnerData,
-    PhoneNumber,
-    PiiString,
-    TenantId,
-};
+use newtypes::BusinessDataKind as BDK;
+use newtypes::BusinessOwnerData;
+use newtypes::BusinessOwnerKind;
+use newtypes::ContactInfoKind;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::KycedBusinessOwnerData;
+use newtypes::PhoneNumber;
+use newtypes::PiiString;
+use newtypes::TenantId;
 use std::collections::HashMap;
 use std::str::FromStr;
 

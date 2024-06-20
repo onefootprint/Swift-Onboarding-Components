@@ -2,45 +2,33 @@
 // When diesel-tracing is updated to support 2.0, we can use it instead.
 
 use diesel::backend::Backend;
-use diesel::connection::{
-    AnsiTransactionManager,
-    Connection,
-    ConnectionGatWorkaround,
-    DefaultLoadingMode,
-    LoadConnection,
-    LoadRowIter,
-    SimpleConnection,
-    TransactionManager,
-};
+use diesel::connection::AnsiTransactionManager;
+use diesel::connection::Connection;
+use diesel::connection::ConnectionGatWorkaround;
+use diesel::connection::DefaultLoadingMode;
+use diesel::connection::LoadConnection;
+use diesel::connection::LoadRowIter;
+use diesel::connection::SimpleConnection;
+use diesel::connection::TransactionManager;
 use diesel::deserialize::Queryable;
 use diesel::expression::QueryMetadata;
-use diesel::pg::{
-    GetPgMetadataCache,
-    Pg,
-    PgConnection,
-    PgRowByRowLoadingMode,
-};
-use diesel::query_builder::{
-    Query,
-    QueryBuilder,
-    QueryFragment,
-    QueryId,
-};
-use diesel::result::{
-    ConnectionError,
-    ConnectionResult,
-    QueryResult,
-};
-use diesel::{
-    select,
-    RunQueryDsl,
-};
+use diesel::pg::GetPgMetadataCache;
+use diesel::pg::Pg;
+use diesel::pg::PgConnection;
+use diesel::pg::PgRowByRowLoadingMode;
+use diesel::query_builder::Query;
+use diesel::query_builder::QueryBuilder;
+use diesel::query_builder::QueryFragment;
+use diesel::query_builder::QueryId;
+use diesel::result::ConnectionError;
+use diesel::result::ConnectionResult;
+use diesel::result::QueryResult;
+use diesel::select;
+use diesel::RunQueryDsl;
 use std::marker::PhantomData;
-use tracing::{
-    debug,
-    field,
-    instrument,
-};
+use tracing::debug;
+use tracing::field;
+use tracing::instrument;
 
 // https://www.postgresql.org/docs/12/functions-info.html
 // db.name

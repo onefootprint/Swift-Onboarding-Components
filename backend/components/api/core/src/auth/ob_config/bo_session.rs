@@ -1,12 +1,8 @@
-use crate::auth::session::{
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
-use crate::auth::{
-    AuthError,
-    SessionContext,
-};
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
+use crate::auth::AuthError;
+use crate::auth::SessionContext;
 use crate::errors::ApiResult;
 use db::models::business_owner::BusinessOwner;
 use db::models::ob_configuration::ObConfiguration;

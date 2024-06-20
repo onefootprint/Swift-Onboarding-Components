@@ -7,21 +7,15 @@ use crate::errors::ApiError;
 use crate::State;
 use async_trait::async_trait;
 use db::models::task::Task;
-use db::models::task_execution::{
-    TaskExecution,
-    TaskExecutionUpdate,
-};
-use db::{
-    DbError,
-    DbPool,
-    DbResult,
-};
-use newtypes::{
-    TaskExecutionId,
-    TaskId,
-    TaskKind,
-    TaskStatus,
-};
+use db::models::task_execution::TaskExecution;
+use db::models::task_execution::TaskExecutionUpdate;
+use db::DbError;
+use db::DbPool;
+use db::DbResult;
+use newtypes::TaskExecutionId;
+use newtypes::TaskId;
+use newtypes::TaskKind;
+use newtypes::TaskStatus;
 use thiserror::Error;
 use tracing::Instrument;
 
@@ -177,10 +171,8 @@ mod task_tests {
     use db::test_helpers::have_same_elements;
     use db::tests::test_db_pool::TestDbPool;
     use macros::test_state;
-    use newtypes::{
-        LogMessageTaskArgs,
-        TaskData,
-    };
+    use newtypes::LogMessageTaskArgs;
+    use newtypes::TaskData;
 
     fn task_data(message: &str) -> TaskData {
         TaskData::LogMessage(LogMessageTaskArgs {

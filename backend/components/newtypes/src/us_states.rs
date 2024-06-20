@@ -1,13 +1,9 @@
 use paperclip::actix::Apiv2Schema;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum_macros::{
-    AsRefStr,
-    Display,
-    EnumString,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum_macros::AsRefStr;
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

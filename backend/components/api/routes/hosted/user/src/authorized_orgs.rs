@@ -1,16 +1,14 @@
-use crate::auth::user::{
-    UserAuth,
-    UserAuthContext,
-    UserAuthScope,
-};
+use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
+use crate::auth::user::UserAuthScope;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::types::JsonApiListResponse;
 use db::models::scoped_vault::ScopedVault;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

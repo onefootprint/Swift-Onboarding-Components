@@ -1,16 +1,12 @@
 use hyper::server::conn::AddrIncoming;
-use hyper::service::{
-    make_service_fn,
-    service_fn,
-};
-use hyper::{
-    Body,
-    Method,
-    Request,
-    Response,
-    Server,
-    StatusCode,
-};
+use hyper::service::make_service_fn;
+use hyper::service::service_fn;
+use hyper::Body;
+use hyper::Method;
+use hyper::Request;
+use hyper::Response;
+use hyper::Server;
+use hyper::StatusCode;
 use std::net::SocketAddr;
 use std::time::Duration;
 

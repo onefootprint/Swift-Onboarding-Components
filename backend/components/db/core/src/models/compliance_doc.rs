@@ -1,28 +1,20 @@
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    compliance_doc,
-    compliance_doc_request,
-    compliance_doc_review,
-    compliance_doc_submission,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::compliance_doc;
+use db_schema::schema::compliance_doc_request;
+use db_schema::schema::compliance_doc_review;
+use db_schema::schema::compliance_doc_submission;
 use diesel::prelude::*;
-use newtypes::{
-    ComplianceDocId,
-    ComplianceDocRequestId,
-    ComplianceDocReviewId,
-    ComplianceDocSubmissionId,
-    ComplianceDocTemplateId,
-    Locked,
-    TenantCompliancePartnershipId,
-};
+use newtypes::ComplianceDocId;
+use newtypes::ComplianceDocRequestId;
+use newtypes::ComplianceDocReviewId;
+use newtypes::ComplianceDocSubmissionId;
+use newtypes::ComplianceDocTemplateId;
+use newtypes::Locked;
+use newtypes::TenantCompliancePartnershipId;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = compliance_doc)]

@@ -1,18 +1,12 @@
-use crate::incode::doc::response::{
-    FetchOCRResponse,
-    ValueStatusKey,
-};
+use crate::incode::doc::response::FetchOCRResponse;
+use crate::incode::doc::response::ValueStatusKey;
 use crate::incode::IncodeClientErrorCustomFailureReasons;
 use newtypes::incode::IncodeStatus;
 use newtypes::IncodeFailureReason;
-use serde::{
-    Deserialize,
-    Serialize,
-};
-use strum::{
-    Display,
-    EnumString,
-};
+use serde::Deserialize;
+use serde::Serialize;
+use strum::Display;
+use strum::EnumString;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]

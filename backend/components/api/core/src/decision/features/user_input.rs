@@ -1,31 +1,25 @@
 use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    DecryptUncheckedResult,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::DecryptUncheckedResult;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::ApiErrorKind;
-use chrono::{
-    Days,
-    NaiveDate,
-    Utc,
-};
+use chrono::Days;
+use chrono::NaiveDate;
+use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
-use newtypes::{
-    AgeHelper,
-    CollectedData,
-    DataIdentifier,
-    Declaration,
-    FootprintReasonCode,
-    IdentityDataKind as IDK,
-    InvestorProfileKind,
-    PiiString,
-    VendorAPI,
-    VerificationResultId,
-    VisaKind,
-    DATE_FORMAT,
-};
+use newtypes::AgeHelper;
+use newtypes::CollectedData;
+use newtypes::DataIdentifier;
+use newtypes::Declaration;
+use newtypes::FootprintReasonCode;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::InvestorProfileKind;
+use newtypes::PiiString;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
+use newtypes::VisaKind;
+use newtypes::DATE_FORMAT;
 use std::str::FromStr;
 
 // Note: vendor_api/vres_id passed in here is a complete hack because currently RiskSignal's require

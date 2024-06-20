@@ -1,9 +1,7 @@
-use crate::{
-    run_migrations,
-    DbPool,
-    PgConn,
-    TxnPgConn,
-};
+use crate::run_migrations;
+use crate::DbPool;
+use crate::PgConn;
+use crate::TxnPgConn;
 use diesel::Connection;
 use std::sync::Once;
 use std::time::Duration;

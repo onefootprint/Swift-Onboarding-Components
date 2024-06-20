@@ -2,12 +2,10 @@ use crate::errors::workos::WorkOsError;
 use crate::errors::ApiResult;
 use crate::State;
 use newtypes::PiiString;
-use workos::passwordless::{
-    CreatePasswordlessSession,
-    CreatePasswordlessSessionParams,
-    CreatePasswordlessSessionType,
-    PasswordlessSessionType,
-};
+use workos::passwordless::CreatePasswordlessSession;
+use workos::passwordless::CreatePasswordlessSessionParams;
+use workos::passwordless::CreatePasswordlessSessionType;
+use workos::passwordless::PasswordlessSessionType;
 
 #[tracing::instrument(skip_all)]
 pub async fn create_magic_link(

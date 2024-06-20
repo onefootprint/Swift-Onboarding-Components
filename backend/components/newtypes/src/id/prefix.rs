@@ -1,23 +1,19 @@
-use crate::{
-    AccessEventId,
-    AuditEventId,
-    BoLinkId,
-    BusinessOwnerKind,
-    FingerprintId,
-    FpId,
-    NtResult,
-    ObConfigurationKey,
-    PartnerTenantId,
-    RuleId,
-    ScopedVaultId,
-    TenantId,
-    VaultId,
-    VaultKind,
-};
-use rand::distributions::{
-    Alphanumeric,
-    DistString,
-};
+use crate::AccessEventId;
+use crate::AuditEventId;
+use crate::BoLinkId;
+use crate::BusinessOwnerKind;
+use crate::FingerprintId;
+use crate::FpId;
+use crate::NtResult;
+use crate::ObConfigurationKey;
+use crate::PartnerTenantId;
+use crate::RuleId;
+use crate::ScopedVaultId;
+use crate::TenantId;
+use crate::VaultId;
+use crate::VaultKind;
+use rand::distributions::Alphanumeric;
+use rand::distributions::DistString;
 
 fn generate_random_id(prefix: &str, length: usize) -> String {
     format!(
@@ -159,10 +155,8 @@ impl FingerprintId {
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        FpId,
-        VaultKind,
-    };
+    use crate::FpId;
+    use crate::VaultKind;
     use test_case::test_case;
 
     #[test_case(VaultKind::Person, true, "fp_id")]

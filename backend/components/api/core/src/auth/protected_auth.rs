@@ -1,13 +1,9 @@
 use crate::auth::protected_custodian::ProtectedCustodianAuthContext;
-use crate::auth::tenant::{
-    FirmEmployeeAuth,
-    FirmEmployeeAuthContext,
-    FirmEmployeeGuard,
-};
-use crate::auth::{
-    Either,
-    SessionContext,
-};
+use crate::auth::tenant::FirmEmployeeAuth;
+use crate::auth::tenant::FirmEmployeeAuthContext;
+use crate::auth::tenant::FirmEmployeeGuard;
+use crate::auth::Either;
+use crate::auth::SessionContext;
 use crate::ModernApiError;
 use actix_web::FromRequest;
 use futures_util::Future;

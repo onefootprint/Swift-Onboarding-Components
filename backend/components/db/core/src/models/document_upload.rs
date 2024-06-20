@@ -1,29 +1,21 @@
-use crate::{
-    DbResult,
-    NonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::NonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::document_upload;
-use diesel::dsl::{
-    count_star,
-    not,
-};
+use diesel::dsl::count_star;
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::{
-    DataLifetimeSeqno,
-    DocumentId,
-    DocumentSide,
-    DocumentUploadId,
-    IncodeFailureReason,
-    S3Url,
-    SealedVaultDataKey,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::DocumentId;
+use newtypes::DocumentSide;
+use newtypes::DocumentUploadId;
+use newtypes::IncodeFailureReason;
+use newtypes::S3Url;
+use newtypes::SealedVaultDataKey;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = identity_document_upload)]

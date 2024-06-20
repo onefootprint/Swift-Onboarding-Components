@@ -1,24 +1,18 @@
 use super::scoped_vault::ScopedVault;
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::billing_event;
 use diesel::dsl::count_star;
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::{
-    BillingEventId,
-    BillingEventKind,
-    ObConfigurationId,
-    ScopedVaultId,
-    TenantId,
-};
+use newtypes::BillingEventId;
+use newtypes::BillingEventKind;
+use newtypes::ObConfigurationId;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]

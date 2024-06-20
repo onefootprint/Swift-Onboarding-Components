@@ -1,34 +1,24 @@
-use super::task_execution::{
-    TaskExecution,
-    TaskExecutionCreateArgs,
-    TaskExecutionUpdate,
-};
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use super::task_execution::TaskExecution;
+use super::task_execution::TaskExecutionCreateArgs;
+use super::task_execution::TaskExecutionUpdate;
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::task;
 use diesel::prelude::*;
 use diesel::sql_query;
-use diesel::sql_types::{
-    BigInt,
-    Text,
-    Timestamptz,
-};
-use newtypes::{
-    Locked,
-    TaskData,
-    TaskExecutionId,
-    TaskId,
-    TaskKind,
-    TaskStatus,
-};
+use diesel::sql_types::BigInt;
+use diesel::sql_types::Text;
+use diesel::sql_types::Timestamptz;
+use newtypes::Locked;
+use newtypes::TaskData;
+use newtypes::TaskExecutionId;
+use newtypes::TaskId;
+use newtypes::TaskKind;
+use newtypes::TaskStatus;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName)]
@@ -229,16 +219,12 @@ impl Task {
 #[allow(unused_must_use)]
 mod tests {
     use super::*;
-    use crate::test_helpers::{
-        assert_have_same_elements,
-        have_same_elements,
-    };
+    use crate::test_helpers::assert_have_same_elements;
+    use crate::test_helpers::have_same_elements;
     use crate::tests::test_db_pool::TestDbPool;
     use macros::test_db_pool;
-    use newtypes::{
-        LogMessageTaskArgs,
-        LogNumTenantApiKeysArgs,
-    };
+    use newtypes::LogMessageTaskArgs;
+    use newtypes::LogNumTenantApiKeysArgs;
     use std::str::FromStr;
 
     fn task_data() -> TaskData {

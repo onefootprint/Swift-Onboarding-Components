@@ -1,8 +1,6 @@
 use crate::State;
-use actix_web::{
-    post,
-    web,
-};
+use actix_web::post;
+use actix_web::web;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::errors::tenant::TenantError;
@@ -10,23 +8,17 @@ use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::session::AuthSession;
 use chrono::Duration;
-use db::models::partner_tenant::{
-    NewIntegrationTestPartnerTenant,
-    PartnerTenant,
-};
-use db::models::tenant_role::{
-    ImmutableRoleKind,
-    TenantRole,
-};
+use db::models::partner_tenant::NewIntegrationTestPartnerTenant;
+use db::models::partner_tenant::PartnerTenant;
+use db::models::tenant_role::ImmutableRoleKind;
+use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
-use newtypes::{
-    OrgMemberEmail,
-    PartnerTenantId,
-    SessionAuthToken,
-    TenantRoleKind,
-    WorkosAuthMethod,
-};
+use newtypes::OrgMemberEmail;
+use newtypes::PartnerTenantId;
+use newtypes::SessionAuthToken;
+use newtypes::TenantRoleKind;
+use newtypes::WorkosAuthMethod;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

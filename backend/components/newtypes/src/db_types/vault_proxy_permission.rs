@@ -1,8 +1,6 @@
 use crate::ProxyConfigId;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use strum::EnumDiscriminants;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, EnumDiscriminants)]

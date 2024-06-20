@@ -1,43 +1,29 @@
-use core::task::{
-    Context,
-    Poll,
-};
+use core::task::Context;
+use core::task::Poll;
 use futures_util::ready;
 use hyper::server::accept::Accept;
-use hyper::server::conn::{
-    AddrIncoming,
-    AddrStream,
-};
-use hyper::service::{
-    make_service_fn,
-    service_fn,
-};
-use hyper::{
-    Body,
-    Method,
-    Request,
-    Response,
-    Server,
-    StatusCode,
-};
+use hyper::server::conn::AddrIncoming;
+use hyper::server::conn::AddrStream;
+use hyper::service::make_service_fn;
+use hyper::service::service_fn;
+use hyper::Body;
+use hyper::Method;
+use hyper::Request;
+use hyper::Response;
+use hyper::Server;
+use hyper::StatusCode;
 use std::future::Future;
+use std::io;
 use std::io::Cursor;
 use std::net::SocketAddr;
 use std::pin::Pin;
-use std::sync::{
-    Arc,
-    Mutex,
-};
+use std::sync;
+use std::sync::Arc;
+use std::sync::Mutex;
 use std::vec::Vec;
-use std::{
-    io,
-    sync,
-};
-use tokio::io::{
-    AsyncRead,
-    AsyncWrite,
-    ReadBuf,
-};
+use tokio::io::AsyncRead;
+use tokio::io::AsyncWrite;
+use tokio::io::ReadBuf;
 use tokio_rustls::rustls::ServerConfig;
 use webpki::TrustAnchor;
 

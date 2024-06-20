@@ -1,14 +1,10 @@
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
-use strum_macros::{
-    AsRefStr,
-    Display,
-    EnumIter,
-    EnumString,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
+use strum_macros::AsRefStr;
+use strum_macros::Display;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

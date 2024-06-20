@@ -1,40 +1,28 @@
 use crate::ProtectedAuth;
+use actix_web::post;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    post,
-    web,
-};
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
+use api_core::task;
 use api_core::types::ModernApiResult;
-use api_core::{
-    task,
-    State,
-};
+use api_core::State;
 use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::{
-    ScopedVault,
-    SerializableEntity,
-};
-use db::models::task::{
-    Task,
-    TaskCreateArgs,
-};
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::SerializableEntity;
+use db::models::task::Task;
+use db::models::task::TaskCreateArgs;
 use db::PgConn;
 use itertools::Itertools;
-use newtypes::{
-    FpId,
-    OnboardingCompletedPayload,
-    TaskData,
-    TaskId,
-    TenantId,
-    WebhookEvent,
-    WebhookEventKind,
-};
+use newtypes::FpId;
+use newtypes::OnboardingCompletedPayload;
+use newtypes::TaskData;
+use newtypes::TaskId;
+use newtypes::TenantId;
+use newtypes::WebhookEvent;
+use newtypes::WebhookEventKind;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct PostWebhooksRequest {

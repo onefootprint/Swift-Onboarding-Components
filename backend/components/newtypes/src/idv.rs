@@ -1,19 +1,15 @@
 use super::Error::AssertionError;
-use crate::{
-    BusinessOwnerData,
-    IdentityDataKind,
-    Iso3166TwoDigitCountryCode,
-    PiiString,
-    UsState,
-    UsStateFull,
-    VerificationRequestId,
-    DATE_FORMAT,
-};
+use crate::BusinessOwnerData;
+use crate::IdentityDataKind;
+use crate::Iso3166TwoDigitCountryCode;
+use crate::PiiString;
+use crate::UsState;
+use crate::UsStateFull;
+use crate::VerificationRequestId;
+use crate::DATE_FORMAT;
 use chrono::NaiveDate;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
 

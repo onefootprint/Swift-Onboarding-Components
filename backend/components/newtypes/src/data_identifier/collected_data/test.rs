@@ -1,14 +1,12 @@
-use crate::{
-    BusinessDataKind as BDK,
-    CollectedData as CD,
-    CollectedDataOption as CDO,
-    DataIdentifier as DI,
-    DocumentDiKind as DK,
-    IdentityDataKind as IDK,
-    InvestorProfileKind as IPK,
-    IsDataIdentifierDiscriminant,
-    KvDataKey,
-};
+use crate::BusinessDataKind as BDK;
+use crate::CollectedData as CD;
+use crate::CollectedDataOption as CDO;
+use crate::DataIdentifier as DI;
+use crate::DocumentDiKind as DK;
+use crate::IdentityDataKind as IDK;
+use crate::InvestorProfileKind as IPK;
+use crate::IsDataIdentifierDiscriminant;
+use crate::KvDataKey;
 use itertools::Itertools;
 use std::collections::HashSet;
 use strum::IntoEnumIterator;

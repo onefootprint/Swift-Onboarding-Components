@@ -1,104 +1,78 @@
 #![allow(clippy::too_many_arguments)]
 
 use self::vendor_api::loaders::load_response_for_vendor_api;
-use self::vendor_api::vendor_api_struct::{
-    MiddeskBusinessUpdateWebhook,
-    MiddeskGetBusiness,
-};
+use self::vendor_api::vendor_api_struct::MiddeskBusinessUpdateWebhook;
+use self::vendor_api::vendor_api_struct::MiddeskGetBusiness;
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
 use crate::config::Config;
 use crate::decision::state::actions::WorkflowActions;
-use crate::decision::state::{
-    AsyncVendorCallsCompleted,
-    WorkflowWrapper,
-};
+use crate::decision::state::AsyncVendorCallsCompleted;
+use crate::decision::state::WorkflowWrapper;
 use crate::decision::{
     self,
 };
 use crate::enclave_client::EnclaveClient;
-use crate::errors::{
-    ApiError,
-    AssertionError,
-};
-use crate::utils::vault_wrapper::{
-    Any,
-    DataLifetimeSources,
-    FingerprintedDataRequest,
-    VaultWrapper,
-};
+use crate::errors::ApiError;
+use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::FingerprintedDataRequest;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::VendorClient;
 use crate::State;
 use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
-use db::models::middesk_request::{
-    MiddeskRequest,
-    UpdateMiddeskRequest,
-};
+use db::models::middesk_request::MiddeskRequest;
+use db::models::middesk_request::UpdateMiddeskRequest;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::{
-    NewRiskSignalInfo,
-    RiskSignal,
-};
+use db::models::risk_signal::NewRiskSignalInfo;
+use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::scoped_vault::ScopedVault;
-use db::models::verification_request::{
-    VReqIdentifier,
-    VerificationRequest,
-};
+use db::models::verification_request::VReqIdentifier;
+use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
-use db::{
-    DbError,
-    DbPool,
-    TxnPgConn,
-};
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
+use db::DbError;
+use db::DbPool;
+use db::TxnPgConn;
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
 use idv::middesk::response::business::BusinessResponse;
-use idv::middesk::response::webhook::{
-    MiddeskBusinessUpdateWebhookResponse,
-    MiddeskTinRetriedWebhookResponse,
-};
+use idv::middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
+use idv::middesk::response::webhook::MiddeskTinRetriedWebhookResponse;
+use idv::middesk::MiddeskCreateBusinessRequest;
+use idv::middesk::MiddeskCreateBusinessResponse;
+use idv::middesk::MiddeskGetBusinessRequest;
+use idv::middesk::MiddeskGetBusinessResponse;
 use idv::middesk::{
     self,
-    MiddeskCreateBusinessRequest,
-    MiddeskCreateBusinessResponse,
-    MiddeskGetBusinessRequest,
-    MiddeskGetBusinessResponse,
 };
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::{
-    BillingEventKind,
-    BusinessDataForRequest,
-    BusinessDataKind,
-    DataIdentifier,
-    DataLifetimeSource,
-    DataRequest,
-    DecisionIntentKind,
-    EinOnly,
-    MiddeskRequestState,
-    ObConfigurationKey,
-    OnboardingStatus,
-    PiiJsonValue,
-    PiiString,
-    RiskSignalGroupKind,
-    TenantId,
-    ValidateArgs,
-    VendorAPI,
-    VerificationCheck,
-    VerificationCheckKind,
-    WorkflowId,
-};
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::BillingEventKind;
+use newtypes::BusinessDataForRequest;
+use newtypes::BusinessDataKind;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::DataRequest;
+use newtypes::DecisionIntentKind;
+use newtypes::EinOnly;
+use newtypes::MiddeskRequestState;
+use newtypes::ObConfigurationKey;
+use newtypes::OnboardingStatus;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::RiskSignalGroupKind;
+use newtypes::TenantId;
+use newtypes::ValidateArgs;
+use newtypes::VendorAPI;
+use newtypes::VerificationCheck;
+use newtypes::VerificationCheckKind;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 use std::sync::Arc;
 use strum_macros::EnumDiscriminants;

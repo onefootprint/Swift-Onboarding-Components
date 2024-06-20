@@ -1,18 +1,12 @@
-use crate::{
-    ScopedVaultId,
-    TenantApiKeyId,
-    TenantUserId,
-};
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use crate::ScopedVaultId;
+use crate::TenantApiKeyId;
+use crate::TenantUserId;
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, Eq, PartialEq, Hash)]
 #[serde(rename_all = "snake_case")]

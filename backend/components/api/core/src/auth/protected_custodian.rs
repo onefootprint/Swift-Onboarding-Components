@@ -1,9 +1,7 @@
 use crate::auth::AuthError;
 use crate::State;
-use actix_web::{
-    web,
-    FromRequest,
-};
+use actix_web::web;
+use actix_web::FromRequest;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use std::marker::PhantomData;

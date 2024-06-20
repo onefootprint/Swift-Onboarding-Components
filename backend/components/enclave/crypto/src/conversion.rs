@@ -49,14 +49,12 @@ mod ec_decode_helper {
     //! <https://www.secg.org/sec1-v2.pdf>
 
     use core::fmt;
-    use sec1::der::asn1::{
-        Any,
-        OctetStringRef,
-    };
+    use sec1::der::asn1::Any;
+    use sec1::der::asn1::OctetStringRef;
+    use sec1::der::Decode;
+    use sec1::der::Reader;
     use sec1::der::{
         self,
-        Decode,
-        Reader,
     };
     use sec1::EcPrivateKey;
 

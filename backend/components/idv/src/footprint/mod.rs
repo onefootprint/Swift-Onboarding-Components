@@ -1,7 +1,5 @@
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 
 // For device attestations, we are sort of our own vendor and the there are 2 pieces of data we
 // cultivate: (1) associated_vault_count which is a count based on a PG query we make when we write

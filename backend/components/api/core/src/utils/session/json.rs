@@ -1,22 +1,16 @@
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
+use chrono::DateTime;
+use chrono::Utc;
 use crypto::sha256;
 use db::models::session::Session;
 use db::PgConn;
-use newtypes::{
-    AuthTokenHash,
-    Base64Data,
-    D2pSessionStatus,
-    HandoffMetadata,
-    HasSessionKind,
-    SessionKind,
-};
+use newtypes::AuthTokenHash;
+use newtypes::Base64Data;
+use newtypes::D2pSessionStatus;
+use newtypes::HandoffMetadata;
+use newtypes::HasSessionKind;
+use newtypes::SessionKind;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 

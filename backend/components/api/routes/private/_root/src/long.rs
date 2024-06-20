@@ -1,14 +1,10 @@
-use actix_web::{
-    get,
-    web,
-};
+use actix_web::get;
+use actix_web::web;
 use api_core::auth::protected_auth::ProtectedAuth;
 use api_core::types::ModernApiResult;
 use std::cmp;
-use tokio::time::{
-    sleep,
-    Duration,
-};
+use tokio::time::sleep;
+use tokio::time::Duration;
 
 #[derive(serde::Deserialize)]
 struct DurationQuery {

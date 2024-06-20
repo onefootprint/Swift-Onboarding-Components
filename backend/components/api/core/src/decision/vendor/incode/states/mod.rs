@@ -1,9 +1,7 @@
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document::{
-    Document,
-    DocumentImageArgs,
-};
+use db::models::document::Document;
+use db::models::document::DocumentImageArgs;
 use db::models::document_upload::DocumentUpload;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
@@ -13,20 +11,14 @@ use std::sync::Arc;
 
 mod start_onboarding;
 
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
-use idv::incode::doc::response::{
-    FetchOCRResponse,
-    FetchScoresResponse,
-    IncodeOcrFixtureResponseFields,
-};
-use newtypes::incode::{
-    IncodeDocumentRestriction,
-    IncodeDocumentSubType,
-    IncodeDocumentType,
-};
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
+use idv::incode::doc::response::FetchOCRResponse;
+use idv::incode::doc::response::FetchScoresResponse;
+use idv::incode::doc::response::IncodeOcrFixtureResponseFields;
+use newtypes::incode::IncodeDocumentRestriction;
+use newtypes::incode::IncodeDocumentSubType;
+use newtypes::incode::IncodeDocumentType;
 use newtypes::VendorValidatedCountryCode;
 pub use start_onboarding::*;
 
@@ -59,37 +51,29 @@ pub use get_onboarding_status::*;
 
 mod process_face;
 use super::state::IncodeStateTransition;
-use super::{
-    validate_doc_type_is_allowed,
-    IncodeContext,
-};
+use super::validate_doc_type_is_allowed;
+use super::IncodeContext;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use db::models::verification_result::{
-    NewVerificationResult,
-    VerificationResult,
-};
+use db::models::verification_result::NewVerificationResult;
+use db::models::verification_result::VerificationResult;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
-use newtypes::{
-    DecisionIntentKind,
-    IdDocKind,
-    IncodeFailureReason,
-    IncodeVerificationSessionId,
-    IncodeVerificationSessionKind,
-    Iso3166ThreeDigitCountryCode,
-    Iso3166TwoDigitCountryCode,
-    ScopedVaultId,
-    ScrubbedPiiString,
-    TenantId,
-    VendorAPI,
-    WorkflowId,
-};
+use newtypes::DecisionIntentKind;
+use newtypes::IdDocKind;
+use newtypes::IncodeFailureReason;
+use newtypes::IncodeVerificationSessionId;
+use newtypes::IncodeVerificationSessionKind;
+use newtypes::Iso3166ThreeDigitCountryCode;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ScopedVaultId;
+use newtypes::ScrubbedPiiString;
+use newtypes::TenantId;
+use newtypes::VendorAPI;
+use newtypes::WorkflowId;
 pub use process_face::*;
 
 #[derive(Clone)]

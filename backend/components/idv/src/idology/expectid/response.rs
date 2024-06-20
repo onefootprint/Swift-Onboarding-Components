@@ -1,15 +1,11 @@
-use crate::idology::common::response::{
-    from_string_or_int,
-    IDologyQualifiers,
-    IdologyResponseHelpers,
-    KeyResponse,
-};
+use crate::idology::common::response::from_string_or_int;
+use crate::idology::common::response::IDologyQualifiers;
+use crate::idology::common::response::IdologyResponseHelpers;
+use crate::idology::common::response::KeyResponse;
 use crate::idology::error as IdologyError;
 use crate::idology::IdologyError::RequestError;
-use newtypes::{
-    DecisionStatus,
-    FootprintReasonCode,
-};
+use newtypes::DecisionStatus;
+use newtypes::FootprintReasonCode;
 use std::collections::HashSet;
 
 // Given a raw response, deserialize

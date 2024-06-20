@@ -1,48 +1,36 @@
 use super::data_lifetime::DataLifetime;
 use super::risk_signal::RiskSignal;
 use super::rule_instance::RuleInstance;
-use super::rule_result::{
-    NewRuleResult,
-    RuleResult,
-};
+use super::rule_result::NewRuleResult;
+use super::rule_result::RuleResult;
 use super::scoped_vault::ScopedVault;
 use super::vault::Vault;
-use crate::{
-    DbResult,
-    OptionalNonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    risk_signal,
-    rule_set_result,
-    rule_set_result_risk_signal_junction,
-    scoped_vault,
-    vault,
-    workflow,
-};
+use crate::DbResult;
+use crate::OptionalNonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::risk_signal;
+use db_schema::schema::rule_set_result;
+use db_schema::schema::rule_set_result_risk_signal_junction;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::vault;
+use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    DataLifetimeSeqno,
-    ObConfigurationId,
-    RiskSignalId,
-    RuleAction,
-    RuleInstanceId,
-    RuleSetResultId,
-    RuleSetResultKind,
-    ScopedVaultId,
-    WorkflowId,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::ObConfigurationId;
+use newtypes::RiskSignalId;
+use newtypes::RuleAction;
+use newtypes::RuleInstanceId;
+use newtypes::RuleSetResultId;
+use newtypes::RuleSetResultKind;
+use newtypes::ScopedVaultId;
+use newtypes::WorkflowId;
 
 #[derive(Debug, Clone, Queryable, Eq, PartialEq)]
 #[diesel(table_name = rule_set_result)]
@@ -281,32 +269,26 @@ mod tests {
     use super::*;
     use crate::models::ob_configuration::ObConfiguration;
     use crate::models::risk_signal::RiskSignal;
-    use crate::models::rule_instance::{
-        NewRule,
-        RuleInstance,
-    };
+    use crate::models::rule_instance::NewRule;
+    use crate::models::rule_instance::RuleInstance;
     use crate::models::scoped_vault::ScopedVault;
-    use crate::models::workflow::{
-        Workflow,
-        WorkflowUpdate,
-    };
+    use crate::models::workflow::Workflow;
+    use crate::models::workflow::WorkflowUpdate;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::prelude::*;
     use chrono::Duration;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
-    use newtypes::{
-        DbActor,
-        DecisionIntentKind,
-        DecisionStatus,
-        FootprintReasonCode as FRC,
-        KycState,
-        Locked,
-        RiskSignalGroupKind,
-        RuleInstanceKind,
-        VendorAPI,
-        WorkflowState,
-    };
+    use newtypes::DbActor;
+    use newtypes::DecisionIntentKind;
+    use newtypes::DecisionStatus;
+    use newtypes::FootprintReasonCode as FRC;
+    use newtypes::KycState;
+    use newtypes::Locked;
+    use newtypes::RiskSignalGroupKind;
+    use newtypes::RuleInstanceKind;
+    use newtypes::VendorAPI;
+    use newtypes::WorkflowState;
 
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {

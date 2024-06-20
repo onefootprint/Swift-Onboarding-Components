@@ -1,8 +1,6 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::serializers::user_insights;
 use api_core::types::JsonApiListResponse;
@@ -13,11 +11,9 @@ use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::DbResult;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Lists the user insights for a Ffootprint user",

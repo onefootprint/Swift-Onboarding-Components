@@ -1,28 +1,24 @@
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::errors::ValidationError;
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
-use newtypes::{
-    AllData,
-    BusinessDataKind,
-    CardDataKind,
-    CleanAndValidate,
-    DataIdentifier,
-    DeviceInsightField,
-    DeviceInsightOperation,
-    IdentityDataKind,
-    ListId,
-    ListKind,
-    PiiJsonValue,
-    RuleExpression,
-    RuleExpressionCondition,
-    RuleInstanceKind,
-    ValidateArgs,
-    VaultOperation,
-};
+use newtypes::AllData;
+use newtypes::BusinessDataKind;
+use newtypes::CardDataKind;
+use newtypes::CleanAndValidate;
+use newtypes::DataIdentifier;
+use newtypes::DeviceInsightField;
+use newtypes::DeviceInsightOperation;
+use newtypes::IdentityDataKind;
+use newtypes::ListId;
+use newtypes::ListKind;
+use newtypes::PiiJsonValue;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
+use newtypes::RuleInstanceKind;
+use newtypes::ValidateArgs;
+use newtypes::VaultOperation;
 use std::collections::HashMap;
 
 // We only support quality rules for DIs that are not sensitive (low cardinality and un-interesting
@@ -236,23 +232,21 @@ mod tests {
     use crate::ApiError;
     use chrono::Utc;
     use newtypes::data_identifier::Error as DiValidationError;
-    use newtypes::{
-        AliasId,
-        BooleanOperator,
-        CardInfo,
-        DataIdentifier as DI,
-        DataLifetimeSeqno,
-        DbActor,
-        Equals,
-        Error as NewtypeError,
-        FootprintReasonCode as FRC,
-        IsIn,
-        ListAlias,
-        ListId,
-        ListKind,
-        SealedVaultDataKey,
-        TenantId,
-    };
+    use newtypes::AliasId;
+    use newtypes::BooleanOperator;
+    use newtypes::CardInfo;
+    use newtypes::DataIdentifier as DI;
+    use newtypes::DataLifetimeSeqno;
+    use newtypes::DbActor;
+    use newtypes::Equals;
+    use newtypes::Error as NewtypeError;
+    use newtypes::FootprintReasonCode as FRC;
+    use newtypes::IsIn;
+    use newtypes::ListAlias;
+    use newtypes::ListId;
+    use newtypes::ListKind;
+    use newtypes::SealedVaultDataKey;
+    use newtypes::TenantId;
     use std::str::FromStr;
     use test_case::test_case;
 

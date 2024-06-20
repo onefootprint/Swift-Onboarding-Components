@@ -1,16 +1,10 @@
-use crate::{
-    FootprintReasonCode as FRC,
-    IdDocKind,
-};
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use crate::FootprintReasonCode as FRC;
+use crate::IdDocKind;
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use strum::Display;
-use strum_macros::{
-    EnumIter,
-    EnumString,
-};
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(Clone)]
 pub struct IncodeRCH {
@@ -476,10 +470,8 @@ pub enum IncodeDocumentSubType {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        IncodeDocumentSubType,
-        IncodeDocumentType,
-    };
+    use super::IncodeDocumentSubType;
+    use super::IncodeDocumentType;
     use crate::IdDocKind;
     use std::str::FromStr;
     use strum::IntoEnumIterator;

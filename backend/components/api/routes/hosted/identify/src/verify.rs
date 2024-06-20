@@ -1,75 +1,57 @@
-use super::{
-    BiometricChallengeState,
-    PhoneEmailChallengeState,
-};
-use crate::{
-    ChallengeData,
-    ChallengeState,
-    State,
-};
-use api_core::auth::session::user::{
-    AssociatedAuthEvent,
-    NewUserSessionContext,
-};
-use api_core::auth::user::{
-    allowed_user_scopes,
-    CheckedUserAuthContext,
-    UserAuthContext,
-};
+use super::BiometricChallengeState;
+use super::PhoneEmailChallengeState;
+use crate::ChallengeData;
+use crate::ChallengeState;
+use crate::State;
+use api_core::auth::session::user::AssociatedAuthEvent;
+use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::user::allowed_user_scopes;
+use api_core::auth::user::CheckedUserAuthContext;
+use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::WebauthnConfig;
-use api_core::utils::vault_wrapper::{
-    Person,
-    PrefillKind,
-    VaultWrapper,
-    WriteableVw,
-};
-use api_wire_types::{
-    IdentifyVerifyRequest,
-    IdentifyVerifyResponse,
-};
+use api_core::utils::vault_wrapper::Person;
+use api_core::utils::vault_wrapper::PrefillKind;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::WriteableVw;
+use api_wire_types::IdentifyVerifyRequest;
+use api_wire_types::IdentifyVerifyResponse;
 use chrono::Utc;
 use crypto::sha256;
 use db::errors::OptionalExtension;
-use db::models::auth_event::{
-    AuthEvent,
-    NewAuthEventArgs,
-};
+use db::models::auth_event::AuthEvent;
+use db::models::auth_event::NewAuthEventArgs;
 use db::models::business_owner::BusinessOwner;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
-use newtypes::{
-    ActionKind,
-    AuthEventKind,
-    BoId,
-    DataIdentifier,
-    IdentifyScope,
-    IdentityDataKind as IDK,
-    ObConfigurationKind,
-    VaultId,
-    WebauthnCredentialId,
-};
+use newtypes::ActionKind;
+use newtypes::AuthEventKind;
+use newtypes::BoId;
+use newtypes::DataIdentifier;
+use newtypes::IdentifyScope;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::ObConfigurationKind;
+use newtypes::VaultId;
+use newtypes::WebauthnCredentialId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

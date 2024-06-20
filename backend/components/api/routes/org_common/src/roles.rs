@@ -1,28 +1,20 @@
-use api_core::auth::tenant::{
-    PartnerTenantGuard,
-    TenantGuard,
-    TenantOrPartnerTenantSessionAuth,
-};
+use api_core::auth::tenant::PartnerTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantOrPartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    ModernApiResult,
-    OffsetPaginatedResponse,
-    OffsetPaginationRequest,
-};
+use api_core::types::ModernApiResult;
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::OrgRoleFilters;
-use db::models::tenant_role::{
-    TenantRole,
-    TenantRoleListFilters,
-};
+use db::models::tenant_role::TenantRole;
+use db::models::tenant_role::TenantRoleListFilters;
 use db::OffsetPagination;
-use newtypes::{
-    TenantRoleId,
-    TenantRoleKind,
-    TenantRoleKindDiscriminant,
-};
+use newtypes::TenantRoleId;
+use newtypes::TenantRoleKind;
+use newtypes::TenantRoleKindDiscriminant;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 

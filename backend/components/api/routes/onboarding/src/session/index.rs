@@ -1,8 +1,6 @@
 use crate::auth::session::AuthSessionData;
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
 use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::session::AuthSession;
@@ -10,19 +8,15 @@ use crate::State;
 use api_core::auth::session::ob_config::OnboardingSession;
 use api_core::auth::tenant::TenantGuard;
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::{
-    ObConfigurationKey,
-    PreviewApi,
-    SessionAuthToken,
-};
+use newtypes::ObConfigurationKey;
+use newtypes::PreviewApi;
+use newtypes::SessionAuthToken;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-    Apiv2Response,
-    Apiv2Schema,
-};
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateOnboardingSessionRequest {

@@ -1,15 +1,11 @@
 use api_core::types::ModernApiResult;
 use api_core::State;
-use api_wire_types::{
-    OrgLoginResponse,
-    PartnerLoginRequest,
-};
+use api_wire_types::OrgLoginResponse;
+use api_wire_types::PartnerLoginRequest;
 use newtypes::TenantKind;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     tags(Auth, Private),

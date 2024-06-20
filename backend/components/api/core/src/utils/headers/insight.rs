@@ -1,19 +1,13 @@
-use super::{
-    get_header,
-    TelemetryHeaders,
-};
+use super::get_header;
+use super::TelemetryHeaders;
 use actix_web::FromRequest;
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use db::models::insight_event::CreateInsightEvent;
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::net::SocketAddr;
 use std::pin::Pin;
 

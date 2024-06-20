@@ -4,14 +4,10 @@ use newtypes::sms_message::SmsMessage;
 use newtypes::PiiString;
 use rand::Rng;
 use request::send_message::SendMessage;
-use reqwest::{
-    IntoUrl,
-    Method,
-};
-use reqwest_middleware::{
-    ClientWithMiddleware,
-    RequestBuilder,
-};
+use reqwest::IntoUrl;
+use reqwest::Method;
+use reqwest_middleware::ClientWithMiddleware;
+use reqwest_middleware::RequestBuilder;
 use reqwest_tracing::TracingMiddleware;
 use response::decode_response;
 use response::lookup::LookupResponse;

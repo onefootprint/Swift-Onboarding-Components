@@ -1,20 +1,18 @@
 use crate::*;
-use newtypes::{
-    ApiKeyStatus,
-    AppClipExperienceId,
-    AuthMethodKind,
-    CipKind,
-    CollectedDataOption,
-    DocumentAndCountryConfiguration,
-    DocumentRequestConfig,
-    EnhancedAml,
-    Iso3166TwoDigitCountryCode,
-    ObConfigurationId,
-    ObConfigurationKey,
-    ObConfigurationKind,
-    TenantId,
-    VerificationCheck,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::AppClipExperienceId;
+use newtypes::AuthMethodKind;
+use newtypes::CipKind;
+use newtypes::CollectedDataOption;
+use newtypes::DocumentAndCountryConfiguration;
+use newtypes::DocumentRequestConfig;
+use newtypes::EnhancedAml;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKey;
+use newtypes::ObConfigurationKind;
+use newtypes::TenantId;
+use newtypes::VerificationCheck;
 
 /// OnboardingConfiguration that was created
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

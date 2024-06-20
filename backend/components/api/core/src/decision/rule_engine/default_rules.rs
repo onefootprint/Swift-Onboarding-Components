@@ -1,32 +1,26 @@
 use crate::errors::ApiResult;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_instance::{
-    IncludeRules,
-    NewRule,
-    RuleInstance,
-};
+use db::models::rule_instance::IncludeRules;
+use db::models::rule_instance::NewRule;
+use db::models::rule_instance::RuleInstance;
 use db::TxnPgConn;
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
-use newtypes::{
-    BooleanOperator,
-    CipKind,
-    CollectedDataOption as CDO,
-    DbActor,
-    EnhancedAmlOption,
-    FootprintReasonCode as FRC,
-    Locked,
-    ObConfigurationKind,
-    RuleAction,
-    RuleAction as RA,
-    RuleExpression,
-    RuleExpressionCondition,
-    RuleInstanceKind,
-    VerificationCheck,
-    VerificationCheckKind,
-};
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
+use newtypes::BooleanOperator;
+use newtypes::CipKind;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DbActor;
+use newtypes::EnhancedAmlOption;
+use newtypes::FootprintReasonCode as FRC;
+use newtypes::Locked;
+use newtypes::ObConfigurationKind;
+use newtypes::RuleAction;
+use newtypes::RuleAction as RA;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
+use newtypes::RuleInstanceKind;
+use newtypes::VerificationCheck;
+use newtypes::VerificationCheckKind;
 use std::sync::Arc;
 
 pub fn base_kyc_rules() -> Vec<(RuleExpression, RuleAction)> {
@@ -314,12 +308,10 @@ mod tests {
     use db::tests::prelude::*;
     use db::tests::MockFFClient;
     use macros::db_test_case;
-    use newtypes::{
-        CountryRestriction,
-        DocTypeRestriction,
-        DocumentCdoInfo,
-        Selfie,
-    };
+    use newtypes::CountryRestriction;
+    use newtypes::DocTypeRestriction;
+    use newtypes::DocumentCdoInfo;
+    use newtypes::Selfie;
 
     fn kyb_vc(ein_only: bool) -> Option<Vec<VerificationCheck>> {
         Some(vec![VerificationCheck::Kyb { ein_only }])

@@ -1,12 +1,8 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
@@ -18,16 +14,14 @@ use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::tenant::Tenant;
 use itertools::Itertools;
-use newtypes::{
-    DbActor,
-    ListEntryValue,
-    SealedVaultDataKey,
-};
+use newtypes::DbActor;
+use newtypes::ListEntryValue;
+use newtypes::SealedVaultDataKey;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(description = "Creates a new List", tags(Lists, Organization, Private))]

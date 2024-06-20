@@ -1,23 +1,17 @@
-use super::{
-    GetOnboardingStatus,
-    IncodeStateTransition,
-    ProcessFace,
-    VerificationSession,
-};
-use crate::decision::vendor::incode::state::{
-    IncodeState,
-    TransitionResult,
-};
+use super::GetOnboardingStatus;
+use super::IncodeStateTransition;
+use super::ProcessFace;
+use super::VerificationSession;
+use crate::decision::vendor::incode::state::IncodeState;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-use db::{
-    DbPool,
-    TxnPgConn,
-};
+use db::DbPool;
+use db::TxnPgConn;
 use idv::incode::doc::IncodeProcessIdRequest;
 use newtypes::VendorAPI;
 

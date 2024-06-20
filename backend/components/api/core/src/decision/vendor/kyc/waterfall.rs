@@ -1,52 +1,38 @@
 use super::waterfall_vendor_api::WaterfallVendorAPI;
 use crate::decision::rule_engine::engine::VaultDataForRules;
 use crate::decision::rule_engine::eval::RuleEvalConfig;
+use crate::decision::vendor::get_vendor_apis_for_verification_requests;
 use crate::decision::vendor::kyc::waterfall_rules::WaterfallRuleAction;
+use crate::decision::vendor::make_request;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::decision::vendor::vendor_result::{
-    HydratedVerificationResult,
-    RequestAndMaybeHydratedResult,
-    VendorResult,
-};
-use crate::decision::vendor::{
-    get_vendor_apis_for_verification_requests,
-    make_request,
-};
+use crate::decision::vendor::vendor_result::HydratedVerificationResult;
+use crate::decision::vendor::vendor_result::RequestAndMaybeHydratedResult;
+use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::{
     self,
 };
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-    VwArgs,
-};
-use crate::{
-    ApiErrorKind,
-    State,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
+use crate::ApiErrorKind;
+use crate::State;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
-use db::models::waterfall_execution::{
-    UpdateWaterfallExecution,
-    WaterfallExecution,
-};
-use db::models::waterfall_step::{
-    UpdateWaterfallStep,
-    WaterfallStep,
-};
+use db::models::waterfall_execution::UpdateWaterfallExecution;
+use db::models::waterfall_execution::WaterfallExecution;
+use db::models::waterfall_step::UpdateWaterfallStep;
+use db::models::waterfall_step::WaterfallStep;
 use db::models::workflow::Workflow;
 use itertools::Itertools;
-use newtypes::{
-    BillingEventKind,
-    ObConfigurationId,
-    VerificationResultId,
-    WaterfallExecutionId,
-    WaterfallStepAction,
-};
+use newtypes::BillingEventKind;
+use newtypes::ObConfigurationId;
+use newtypes::VerificationResultId;
+use newtypes::WaterfallExecutionId;
+use newtypes::WaterfallStepAction;
 use std::collections::HashMap;
 
 #[tracing::instrument(skip(state))]

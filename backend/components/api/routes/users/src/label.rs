@@ -1,7 +1,5 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
@@ -11,11 +9,11 @@ use api_wire_types::CreateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
 use newtypes::PreviewApi;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(description = "Update a user's label", tags(Users, Preview))]

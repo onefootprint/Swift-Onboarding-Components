@@ -1,25 +1,19 @@
 use crate::auth::user::UserAuthContext;
 use api_core::auth::session::user::AssociatedAuthEventKind;
-use api_core::auth::user::{
-    allowed_user_scopes,
-    load_auth_events,
-};
+use api_core::auth::user::allowed_user_scopes;
+use api_core::auth::user::load_auth_events;
 use api_core::auth::Any;
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::State;
-use api_wire_types::hosted::tokens::{
-    CreateUserTokenRequest,
-    CreateUserTokenResponse,
-    GetUserTokenResponse,
-};
+use api_wire_types::hosted::tokens::CreateUserTokenRequest;
+use api_wire_types::hosted::tokens::CreateUserTokenResponse;
+use api_wire_types::hosted::tokens::GetUserTokenResponse;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

@@ -1,18 +1,12 @@
-use crate::{
-    Fingerprint,
-    SealedVaultBytes,
-    VaultPublicKey,
-};
+use crate::Fingerprint;
+use crate::SealedVaultBytes;
+use crate::VaultPublicKey;
 use async_trait::async_trait;
-use derive_more::{
-    From,
-    Into,
-};
+use derive_more::From;
+use derive_more::Into;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt::Debug;
 
 /// A secret api key wrapper around a string

@@ -1,16 +1,12 @@
 use crate::events::*;
 use chrono::Utc;
-use newtypes::{
-    FpId,
-    ObConfigurationKey,
-    OnboardingStatus,
-};
+use newtypes::FpId;
+use newtypes::ObConfigurationKey;
+use newtypes::OnboardingStatus;
 use schemars::gen::SchemaSettings;
 use std::collections::HashMap;
-use strum::{
-    EnumMessage,
-    IntoEnumIterator,
-};
+use strum::EnumMessage;
+use strum::IntoEnumIterator;
 
 #[test]
 fn test_raw() {

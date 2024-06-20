@@ -1,28 +1,20 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
-use api_core::types::{
-    JsonApiListResponse,
-    ModernApiResult,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::types::JsonApiListResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::UpdateTenantAndroidAppMetaRequest;
-use db::models::tenant_android_app_meta::{
-    TenantAndroidAppFilters,
-    TenantAndroidAppMeta,
-};
+use db::models::tenant_android_app_meta::TenantAndroidAppFilters;
+use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
 use db::DbResult;
-use newtypes::{
-    SealedVaultBytes,
-    TenantAndroidAppMetaId,
-};
+use newtypes::SealedVaultBytes;
+use newtypes::TenantAndroidAppMetaId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

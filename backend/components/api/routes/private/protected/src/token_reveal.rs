@@ -1,30 +1,20 @@
-use crate::{
-    ProtectedAuth,
-    State,
-};
+use crate::ProtectedAuth;
+use crate::State;
+use actix_web::post;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    post,
-    web,
-};
-use api_core::auth::session::sdk_args::{
-    SdkArgs,
-    SdkArgsData,
-};
+use api_core::auth::session::sdk_args::SdkArgs;
+use api_core::auth::session::sdk_args::SdkArgsData;
 use api_core::auth::session::AuthSessionData;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::ApiErrorKind;
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use db::models::session::Session;
-use newtypes::{
-    AuthTokenHash,
-    SealedSessionBytes,
-    SessionAuthToken,
-};
+use newtypes::AuthTokenHash;
+use newtypes::SealedSessionBytes;
+use newtypes::SessionAuthToken;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct RevealRequest {

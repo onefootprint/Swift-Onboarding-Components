@@ -1,23 +1,17 @@
-use crate::{
-    DbResult,
-    NonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::NonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::incode_verification_session_event;
 use diesel::prelude::*;
-use newtypes::{
-    DocumentId,
-    IncodeFailureReason,
-    IncodeVerificationSessionEventId,
-    IncodeVerificationSessionId,
-    IncodeVerificationSessionKind,
-    IncodeVerificationSessionState,
-};
+use newtypes::DocumentId;
+use newtypes::IncodeFailureReason;
+use newtypes::IncodeVerificationSessionEventId;
+use newtypes::IncodeVerificationSessionId;
+use newtypes::IncodeVerificationSessionKind;
+use newtypes::IncodeVerificationSessionState;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = incode_verification_session_event)]

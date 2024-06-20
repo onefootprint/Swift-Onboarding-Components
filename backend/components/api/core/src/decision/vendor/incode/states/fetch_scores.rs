@@ -1,89 +1,61 @@
-use super::{
-    compute_ocr_data,
-    compute_risk_signals,
-    Complete,
-    CompleteArgs,
-    IncodeStateTransition,
-    NewRiskSignal,
-    PreCompleteArgs,
-    ValidatedIdDocKind,
-    VerificationSession,
-};
+use super::compute_ocr_data;
+use super::compute_risk_signals;
+use super::Complete;
+use super::CompleteArgs;
+use super::IncodeStateTransition;
+use super::NewRiskSignal;
+use super::PreCompleteArgs;
+use super::ValidatedIdDocKind;
+use super::VerificationSession;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use crate::decision::vendor::incode::state::{
-    IncodeState,
-    TransitionResult,
-};
+use crate::decision::vendor::incode::state::IncodeState;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::decision::vendor::verification_result::{
-    save_vreq_and_vres,
-    SaveVerificationResultArgs,
-};
-use crate::decision::vendor::{
-    map_to_api_error,
-    VendorAPIError,
-};
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
-use crate::utils::vault_wrapper::{
-    Any,
-    EnclaveDecryptOperation,
-    FingerprintedDataRequest,
-    Pii,
-    VaultWrapper,
-};
+use crate::decision::vendor::map_to_api_error;
+use crate::decision::vendor::verification_result::save_vreq_and_vres;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::decision::vendor::VendorAPIError;
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::EnclaveDecryptOperation;
+use crate::utils::vault_wrapper::FingerprintedDataRequest;
+use crate::utils::vault_wrapper::Pii;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
 use crate::ApiErrorKind;
 use async_trait::async_trait;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document::{
-    Document,
-    DocumentImageArgs,
-};
+use db::models::document::Document;
+use db::models::document::DocumentImageArgs;
 use db::models::incode_customer_session::IncodeCustomerSession;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::verification_result::VerificationResult;
-use db::{
-    DbPool,
-    DbResult,
-    TxnPgConn,
-};
+use db::DbPool;
+use db::DbResult;
+use db::TxnPgConn;
 use feature_flag::BoolFlag;
 use http::StatusCode;
-use idv::footprint_http_client::{
-    FootprintVendorHttpClient,
-    FpVendorClientArgs,
-};
-use idv::incode::client::{
-    AuthenticatedIncodeClientAdapter,
-    IncodeClientAdapter,
-};
-use idv::incode::doc::response::{
-    AddCustomerResponse,
-    FetchScoresResponse,
-};
-use idv::incode::doc::{
-    IncodeFetchOCRRequest,
-    IncodeFetchScoresRequest,
-};
+use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::footprint_http_client::FpVendorClientArgs;
+use idv::incode::client::AuthenticatedIncodeClientAdapter;
+use idv::incode::client::IncodeClientAdapter;
+use idv::incode::doc::response::AddCustomerResponse;
+use idv::incode::doc::response::FetchScoresResponse;
+use idv::incode::doc::IncodeFetchOCRRequest;
+use idv::incode::doc::IncodeFetchScoresRequest;
 use idv::incode::IncodeResponse;
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
+use idv::ParsedResponse;
+use idv::VendorResponse;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
-use newtypes::{
-    DataIdentifier,
-    DecisionIntentKind,
-    DocumentDiKind,
-    DocumentSide,
-    IncodeVerificationSessionId,
-    PiiJsonValue,
-    VendorAPI,
-    VendorValidatedCountryCode,
-};
+use newtypes::DataIdentifier;
+use newtypes::DecisionIntentKind;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentSide;
+use newtypes::IncodeVerificationSessionId;
+use newtypes::PiiJsonValue;
+use newtypes::VendorAPI;
+use newtypes::VendorValidatedCountryCode;
 use selfie_doc::compare::CompareFacesResponse;
 use tracing::Instrument;
 

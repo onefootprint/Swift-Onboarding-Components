@@ -1,10 +1,8 @@
 pub mod client;
 mod conversion;
-use newtypes::{
-    IdvData,
-    PiiJsonValue,
-    PiiString,
-};
+use newtypes::IdvData;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
 pub mod reason_code;
 pub mod requirements;
 pub mod response;
@@ -99,16 +97,12 @@ pub enum SocureReqwestError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::socure::response::{
-        GlobalWatchlist,
-        GlobalWatchlistMatch,
-        GlobalWatchlistMatchComment,
-    };
+    use crate::socure::response::GlobalWatchlist;
+    use crate::socure::response::GlobalWatchlistMatch;
+    use crate::socure::response::GlobalWatchlistMatchComment;
     use newtypes::ScrubbedPiiString;
-    use serde_json::{
-        json,
-        Value,
-    };
+    use serde_json::json;
+    use serde_json::Value;
     use std::collections::HashMap;
 
     #[test]

@@ -1,24 +1,20 @@
 use crate::types::ModernApiResult;
 use crate::State;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    PartnerTenantGuard,
-    PartnerTenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::PartnerTenantGuard;
+use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::ApiResult;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_submission::ComplianceDocSubmission;
 use db::models::tenant::Tenant;
 use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
-use newtypes::{
-    ComplianceDocData,
-    ComplianceDocSubmissionId,
-    TenantCompliancePartnershipId,
-};
+use newtypes::ComplianceDocData;
+use newtypes::ComplianceDocSubmissionId;
+use newtypes::TenantCompliancePartnershipId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

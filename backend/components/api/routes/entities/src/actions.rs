@@ -1,41 +1,29 @@
 use crate::auth::tenant::TenantSessionAuth;
 use crate::decisions::apply_manual_decision;
-use crate::triggers::{
-    apply_trigger_request,
-    TriggerRequestOutcome,
-};
+use crate::triggers::apply_trigger_request;
+use crate::triggers::TriggerRequestOutcome;
 use crate::State;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
 use api_core::decision::review::save_review_decision;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::task::execute_webhook_tasks;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_wire_types::{
-    EntityActionResponse,
-    EntityActionsRequest,
-};
+use api_wire_types::EntityActionResponse;
+use api_wire_types::EntityActionsRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{
-    DbActor,
-    DecisionStatus,
-    EntityAction,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::DbActor;
+use newtypes::DecisionStatus;
+use newtypes::EntityAction;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Atomically apply the provided list of actions.",

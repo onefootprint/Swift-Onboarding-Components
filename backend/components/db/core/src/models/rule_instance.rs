@@ -1,49 +1,35 @@
 use super::list::List;
 use super::ob_configuration::ObConfiguration;
-use super::rule_instance_references_list::{
-    NewRuleInstanceReferencesList,
-    RuleInstanceReferencesList,
-};
+use super::rule_instance_references_list::NewRuleInstanceReferencesList;
+use super::rule_instance_references_list::RuleInstanceReferencesList;
 use super::rule_set_version::RuleSetVersion;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    ob_configuration,
-    rule_instance,
-    rule_instance_references_list,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::ob_configuration;
+use db_schema::schema::rule_instance;
+use db_schema::schema::rule_instance_references_list;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{
-    DataLifetimeSeqno,
-    DbActor,
-    ListId,
-    Locked,
-    ObConfigurationId,
-    RuleAction,
-    RuleExpression,
-    RuleId,
-    RuleInstanceId,
-    RuleInstanceKind,
-    TenantId,
-};
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
+use newtypes::ListId;
+use newtypes::Locked;
+use newtypes::ObConfigurationId;
+use newtypes::RuleAction;
+use newtypes::RuleExpression;
+use newtypes::RuleId;
+use newtypes::RuleInstanceId;
+use newtypes::RuleInstanceKind;
+use newtypes::TenantId;
+use std::collections::HashMap;
+use std::collections::HashSet;
 use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, Queryable)]
@@ -451,17 +437,15 @@ mod tests {
     use crate::tests::prelude::*;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
-    use newtypes::{
-        BooleanOperator,
-        DataIdentifier as DI,
-        FootprintReasonCode as FRC,
-        IdentityDataKind as IDK,
-        IsIn,
-        RuleExpressionCondition,
-        RuleExpressionCondition as REC,
-        StepUpKind,
-        VaultOperation,
-    };
+    use newtypes::BooleanOperator;
+    use newtypes::DataIdentifier as DI;
+    use newtypes::FootprintReasonCode as FRC;
+    use newtypes::IdentityDataKind as IDK;
+    use newtypes::IsIn;
+    use newtypes::RuleExpressionCondition;
+    use newtypes::RuleExpressionCondition as REC;
+    use newtypes::StepUpKind;
+    use newtypes::VaultOperation;
     use std::collections::HashSet;
 
     #[db_test]

@@ -1,51 +1,37 @@
-use super::vault_wrapper::{
-    Any,
-    PrefillData,
-    TenantVw,
-    VaultWrapper,
-    WriteableVw,
-};
+use super::vault_wrapper::Any;
+use super::vault_wrapper::PrefillData;
+use super::vault_wrapper::TenantVw;
+use super::vault_wrapper::VaultWrapper;
+use super::vault_wrapper::WriteableVw;
 use crate::auth::tenant::AuthActor;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
 use db::models::business_owner::BusinessOwner;
-use db::models::document_request::{
-    DocumentRequest,
-    NewDocumentRequestArgs,
-};
+use db::models::document_request::DocumentRequest;
+use db::models::document_request::NewDocumentRequestArgs;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::{
-    IsNew,
-    ScopedVault,
-};
-use db::models::vault::{
-    NewVaultArgs,
-    Vault,
-};
-use db::models::workflow::{
-    OnboardingWorkflowArgs,
-    Workflow,
-};
+use db::models::scoped_vault::IsNew;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::NewVaultArgs;
+use db::models::vault::Vault;
+use db::models::workflow::OnboardingWorkflowArgs;
+use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
-use db::{
-    OffsetPagination,
-    TxnPgConn,
-};
+use db::OffsetPagination;
+use db::TxnPgConn;
 use itertools::chain;
-use newtypes::{
-    DocumentConfig,
-    DocumentRequestConfig,
-    EncryptedVaultPrivateKey,
-    Selfie,
-    VaultKind,
-    VaultPublicKey,
-    WorkflowConfig,
-    WorkflowFixtureResult,
-    WorkflowId,
-    WorkflowRequestId,
-    WorkflowSource,
-};
+use newtypes::DocumentConfig;
+use newtypes::DocumentRequestConfig;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::Selfie;
+use newtypes::VaultKind;
+use newtypes::VaultPublicKey;
+use newtypes::WorkflowConfig;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowId;
+use newtypes::WorkflowRequestId;
+use newtypes::WorkflowSource;
 
 pub struct NewBusinessVaultArgs {
     pub public_key: VaultPublicKey,

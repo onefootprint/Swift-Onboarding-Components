@@ -1,19 +1,15 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Allows a tenant to view a customer's registered webauthn credentials.",

@@ -1,28 +1,18 @@
-use crate::experian::error::{
-    ConversionError,
-    Error,
-};
-use crate::experian::{
-    normalize_address_line_1,
-    normalize_city,
-    normalize_name,
-};
-use chrono::{
-    DateTime,
-    NaiveDate,
-    SecondsFormat,
-    Utc,
-};
-use newtypes::experian::{
-    AddressType,
-    ApplicantType,
-    DocumentType,
-    TypeOfPerson,
-};
-use newtypes::{
-    IdvData,
-    PiiString,
-};
+use crate::experian::error::ConversionError;
+use crate::experian::error::Error;
+use crate::experian::normalize_address_line_1;
+use crate::experian::normalize_city;
+use crate::experian::normalize_name;
+use chrono::DateTime;
+use chrono::NaiveDate;
+use chrono::SecondsFormat;
+use chrono::Utc;
+use newtypes::experian::AddressType;
+use newtypes::experian::ApplicantType;
+use newtypes::experian::DocumentType;
+use newtypes::experian::TypeOfPerson;
+use newtypes::IdvData;
+use newtypes::PiiString;
 
 /// This is the top level request to CrossCore
 #[derive(Debug, Clone, serde::Serialize)]

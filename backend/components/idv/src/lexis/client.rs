@@ -1,16 +1,14 @@
 use super::response::FlexIdResponse;
 use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::lexis::request::LexisRequest;
+use crate::lexis::ReqwestError;
 use crate::lexis::{
     self,
-    ReqwestError,
 };
 use newtypes::vendor_credentials::LexisCredentials;
-use newtypes::{
-    IdvData,
-    PiiJsonValue,
-    TenantBusinessInfo,
-};
+use newtypes::IdvData;
+use newtypes::PiiJsonValue;
+use newtypes::TenantBusinessInfo;
 use reqwest::header;
 use std::time::Duration;
 

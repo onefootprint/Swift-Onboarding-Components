@@ -1,26 +1,18 @@
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::tenant_vendor_control;
-use diesel::{
-    ExpressionMethods,
-    Insertable,
-    OptionalExtension,
-    QueryDsl,
-    Queryable,
-    RunQueryDsl,
-};
-use newtypes::{
-    SealedVaultBytes,
-    TenantId,
-    TenantVendorControlId,
-};
+use diesel::ExpressionMethods;
+use diesel::Insertable;
+use diesel::OptionalExtension;
+use diesel::QueryDsl;
+use diesel::Queryable;
+use diesel::RunQueryDsl;
+use newtypes::SealedVaultBytes;
+use newtypes::TenantId;
+use newtypes::TenantVendorControlId;
 
 #[derive(Debug, Clone, Queryable, PartialEq, Eq)]
 #[diesel(table_name = tenant_vendor_control)]
@@ -131,16 +123,12 @@ impl TenantVendorControl {
 
 #[cfg(test)]
 mod test {
-    use crate::models::tenant_vendor::{
-        TenantVendorControl,
-        UpdateTenantVendorControlArgs,
-    };
+    use crate::models::tenant_vendor::TenantVendorControl;
+    use crate::models::tenant_vendor::UpdateTenantVendorControlArgs;
     use crate::tests::prelude::*;
     use macros::db_test;
-    use newtypes::{
-        SealedVaultBytes,
-        TenantId,
-    };
+    use newtypes::SealedVaultBytes;
+    use newtypes::TenantId;
 
     #[db_test]
     fn test_update_tvc(conn: &mut TestPgConn) {

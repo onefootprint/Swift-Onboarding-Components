@@ -1,9 +1,7 @@
 use crate::db_types::FootprintReasonCode;
 use crate::vendor_reason_code_enum;
-use strum::{
-    Display,
-    EnumIter,
-};
+use strum::Display;
+use strum::EnumIter;
 use strum_macros::EnumString;
 
 vendor_reason_code_enum! {

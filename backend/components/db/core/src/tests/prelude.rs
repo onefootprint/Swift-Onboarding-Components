@@ -1,9 +1,7 @@
 pub use super::fixtures;
 use crate::test_helpers::test_db_conn;
-use crate::{
-    PgConn,
-    TxnPgConn,
-};
+use crate::PgConn;
+use crate::TxnPgConn;
 use diesel::Connection;
 
 /// Wrapper around TxnPgConnection that is used only in tests. Operations run on these connections

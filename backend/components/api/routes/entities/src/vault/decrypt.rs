@@ -1,65 +1,49 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::ModernApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::tenant::{
-    ClientTenantAuthContext,
-    TenantAuth,
-};
+use api_core::auth::tenant::ClientTenantAuthContext;
+use api_core::auth::tenant::TenantAuth;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::{
-    bulk_decrypt,
-    BulkDecryptReq,
-    DecryptAccessEventInfo,
-    EnclaveDecryptOperation,
-    TenantVw,
-};
+use api_core::utils::vault_wrapper::bulk_decrypt;
+use api_core::utils::vault_wrapper::BulkDecryptReq;
+use api_core::utils::vault_wrapper::DecryptAccessEventInfo;
+use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
+use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::DecryptResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
-use itertools::{
-    chain,
-    Itertools,
-};
+use itertools::chain;
+use itertools::Itertools;
 use macros::route_alias;
+use newtypes::impl_response_type;
 use newtypes::output::Csv;
-use newtypes::{
-    impl_response_type,
-    AccessEventPurpose,
-    DataIdentifier,
-    DataLifetimeSeqno,
-    DocumentDiKind,
-    FilterFunction,
-    FpId,
-    PiiJsonValue,
-    VersionedDataIdentifier,
-};
+use newtypes::AccessEventPurpose;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DocumentDiKind;
+use newtypes::FilterFunction;
+use newtypes::FpId;
+use newtypes::PiiJsonValue;
+use newtypes::VersionedDataIdentifier;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-    Apiv2Schema,
-};
+use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
 pub struct DecryptRequest {

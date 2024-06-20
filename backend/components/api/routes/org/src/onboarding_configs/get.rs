@@ -1,33 +1,23 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    ModernApiResult,
-    OffsetPaginatedResponse,
-    OffsetPaginationRequest,
-};
+use api_core::types::ModernApiResult;
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::OnboardingConfigFilters;
-use db::models::ob_configuration::{
-    ObConfiguration,
-    ObConfigurationQuery,
-};
+use db::models::ob_configuration::ObConfiguration;
+use db::models::ob_configuration::ObConfigurationQuery;
 use db::models::rule_set_version::RuleSetVersion;
-use db::{
-    DbError,
-    OffsetPagination,
-};
+use db::DbError;
+use db::OffsetPagination;
 use newtypes::ObConfigurationId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
 
 #[api_v2_operation(
     tags(Playbooks, Organization, Private),

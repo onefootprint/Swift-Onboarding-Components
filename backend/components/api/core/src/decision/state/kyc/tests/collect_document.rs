@@ -1,76 +1,64 @@
-use crate::decision::state::actions::{
-    Authorize,
-    MakeVendorCalls,
-};
+use crate::decision::state::actions::Authorize;
+use crate::decision::state::actions::MakeVendorCalls;
+use crate::decision::state::test_utils::mock_idology;
+use crate::decision::state::test_utils::mock_incode_doc_collection;
+use crate::decision::state::test_utils::mock_webhooks;
+use crate::decision::state::test_utils::query_data;
+use crate::decision::state::test_utils::query_portablized_seqno;
+use crate::decision::state::test_utils::query_risk_signals;
+use crate::decision::state::test_utils::setup_data;
+use crate::decision::state::test_utils::DocumentOutcome::*;
 use crate::decision::state::test_utils::DocumentOutcome::{
     self,
-    *,
 };
-use crate::decision::state::test_utils::{
-    mock_idology,
-    mock_incode_doc_collection,
-    mock_webhooks,
-    query_data,
-    query_portablized_seqno,
-    query_risk_signals,
-    setup_data,
-    ExpectedRequiresManualReview,
-    ExpectedStatus,
-    OnboardingCompleted,
-    OnboardingStatusChanged,
-    UserKind,
-    WithQualifier,
-};
-use crate::decision::state::{
-    DocCollected,
-    MakeDecision,
-    WorkflowActions,
-    WorkflowWrapper,
-};
+use crate::decision::state::test_utils::ExpectedRequiresManualReview;
+use crate::decision::state::test_utils::ExpectedStatus;
+use crate::decision::state::test_utils::OnboardingCompleted;
+use crate::decision::state::test_utils::OnboardingStatusChanged;
+use crate::decision::state::test_utils::UserKind;
+use crate::decision::state::test_utils::WithQualifier;
+use crate::decision::state::DocCollected;
+use crate::decision::state::MakeDecision;
+use crate::decision::state::WorkflowActions;
+use crate::decision::state::WorkflowWrapper;
 use crate::errors::ApiResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
-use db::models::rule_instance::{
-    NewRule,
-    RuleInstance,
-};
-use db::models::workflow::{
-    NewWorkflowArgs,
-    Workflow,
-};
+use db::models::rule_instance::NewRule;
+use db::models::rule_instance::RuleInstance;
+use db::models::workflow::NewWorkflowArgs;
+use db::models::workflow::Workflow;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::test_state_case;
-use newtypes::{
-    BooleanOperator,
-    CollectedDataOption as CDO,
-    CountryRestriction,
-    DbActor,
-    DecisionStatus,
-    DocTypeRestriction,
-    DocumentCdoInfo,
-    DocumentConfig,
-    DocumentRequestConfig,
-    FootprintReasonCode,
-    KycState,
-    OnboardingStatus,
-    RiskSignalGroupKind,
-    RuleAction,
-    RuleExpression,
-    RuleExpressionCondition,
-    RuleInstanceKind,
-    Selfie,
-    TenantId,
-    VendorAPI,
-    WorkflowFixtureResult,
-    WorkflowSource,
-    WorkflowState,
-};
+use newtypes::BooleanOperator;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::CountryRestriction;
+use newtypes::DbActor;
+use newtypes::DecisionStatus;
+use newtypes::DocTypeRestriction;
+use newtypes::DocumentCdoInfo;
+use newtypes::DocumentConfig;
+use newtypes::DocumentRequestConfig;
+use newtypes::FootprintReasonCode;
+use newtypes::KycState;
+use newtypes::OnboardingStatus;
+use newtypes::RiskSignalGroupKind;
+use newtypes::RuleAction;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
+use newtypes::RuleInstanceKind;
+use newtypes::Selfie;
+use newtypes::TenantId;
+use newtypes::VendorAPI;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowSource;
+use newtypes::WorkflowState;
 
 #[test_state_case(UserKind::Live, Failure)]
 #[test_state_case(UserKind::Live, DocUploadFailed)]

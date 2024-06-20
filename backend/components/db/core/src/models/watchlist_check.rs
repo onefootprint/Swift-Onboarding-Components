@@ -1,41 +1,31 @@
-use crate::{
-    DbResult,
-    OptionalNonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
-use db_schema::schema::{
-    ob_configuration,
-    scoped_vault,
-    task,
-    watchlist_check,
-    workflow,
-};
-use diesel::dsl::{
-    count,
-    count_star,
-    max,
-    not,
-};
+use crate::DbResult;
+use crate::OptionalNonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
+use db_schema::schema::ob_configuration;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::task;
+use db_schema::schema::watchlist_check;
+use db_schema::schema::workflow;
+use diesel::dsl::count;
+use diesel::dsl::count_star;
+use diesel::dsl::max;
+use diesel::dsl::not;
 use diesel::prelude::*;
-use newtypes::{
-    DecisionIntentId,
-    FootprintReasonCode,
-    Locked,
-    ScopedVaultId,
-    TaskId,
-    TenantId,
-    VaultKind,
-    WatchlistCheckId,
-    WatchlistCheckStatus,
-    WatchlistCheckStatusKind,
-    WorkflowKind,
-};
+use newtypes::DecisionIntentId;
+use newtypes::FootprintReasonCode;
+use newtypes::Locked;
+use newtypes::ScopedVaultId;
+use newtypes::TaskId;
+use newtypes::TenantId;
+use newtypes::VaultKind;
+use newtypes::WatchlistCheckId;
+use newtypes::WatchlistCheckStatus;
+use newtypes::WatchlistCheckStatusKind;
+use newtypes::WorkflowKind;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]

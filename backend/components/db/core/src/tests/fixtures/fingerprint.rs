@@ -1,16 +1,12 @@
-use crate::models::fingerprint::{
-    Fingerprint,
-    NewFingerprintArgs,
-};
+use crate::models::fingerprint::Fingerprint;
+use crate::models::fingerprint::NewFingerprintArgs;
 use crate::models::scoped_vault::ScopedVault;
 use crate::tests::prelude::TestPgConn;
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeId,
-    Fingerprint as FingerprintData,
-    FingerprintScope,
-    FingerprintVersion,
-};
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
+use newtypes::Fingerprint as FingerprintData;
+use newtypes::FingerprintScope;
+use newtypes::FingerprintVersion;
 
 pub fn create(
     conn: &mut TestPgConn,

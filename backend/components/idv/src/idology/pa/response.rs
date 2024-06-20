@@ -1,12 +1,8 @@
-use crate::idology::common::response::{
-    IDologyQualifiers,
-    IdologyResponseHelpers,
-};
+use crate::idology::common::response::IDologyQualifiers;
+use crate::idology::common::response::IdologyResponseHelpers;
 use crate::idology::error as IdologyError;
-use crate::idology::expectid::response::{
-    IdNumber,
-    Restriction,
-};
+use crate::idology::expectid::response::IdNumber;
+use crate::idology::expectid::response::Restriction;
 use crate::idology::IdologyError::RequestError;
 use crate::ParsedResponse;
 

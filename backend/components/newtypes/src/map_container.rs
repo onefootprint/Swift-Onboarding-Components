@@ -49,10 +49,8 @@ pub mod declare_map_container {
                 }
 
                 fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-                    use paperclip::v2::models::{
-                        DataType,
-                        DefaultSchemaRaw,
-                    };
+                    use paperclip::v2::models::DataType;
+                    use paperclip::v2::models::DefaultSchemaRaw;
                     let mut schema = DefaultSchemaRaw {
                         name: Self::name(),
                         example: serde_json::from_str::<serde_json::Value>($example)
@@ -104,11 +102,9 @@ pub mod declare_map_container {
         };
     }
 
-    pub use {
-        flat_api_object_map_type,
-        impl_request_type,
-        impl_response_type,
-    };
+    pub use flat_api_object_map_type;
+    pub use impl_request_type;
+    pub use impl_response_type;
 }
 
 pub fn update_body_parameter<T: paperclip::v2::schema::Apiv2Schema>(

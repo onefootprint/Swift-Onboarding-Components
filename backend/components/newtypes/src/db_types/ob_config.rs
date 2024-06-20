@@ -1,24 +1,18 @@
 use crate::util::impl_enum_str_diesel;
 use crate::CollectedDataOption as CDO;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use serde_json;
 use strum::IntoEnumIterator;
-use strum_macros::{
-    AsRefStr,
-    Display,
-    EnumIter,
-    EnumString,
-};
+use strum_macros::AsRefStr;
+use strum_macros::Display;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(
     Eq,

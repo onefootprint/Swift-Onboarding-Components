@@ -1,19 +1,13 @@
 use super::super::PatchDataResult;
-use super::{
-    Fingerprints,
-    WriteableVw,
-};
+use super::Fingerprints;
+use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
-use crate::utils::vault_wrapper::{
-    Any,
-    PieceOfData,
-    TenantVw,
-    VaultWrapper,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::PieceOfData;
+use crate::utils::vault_wrapper::TenantVw;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::ob_configuration::ObConfiguration;
@@ -23,15 +17,13 @@ use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::fingerprint_salt::FingerprintSalt;
 use newtypes::output::Csv;
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeId,
-    DataLifetimeSource,
-    Fingerprint,
-    IdentityDataKind as IDK,
-    TenantId,
-    VaultKind,
-};
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeSource;
+use newtypes::Fingerprint;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::TenantId;
+use newtypes::VaultKind;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 

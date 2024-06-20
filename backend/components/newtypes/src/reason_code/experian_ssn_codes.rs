@@ -2,15 +2,11 @@ use super::reason_code_helpers::AddressGrouping::*;
 use super::reason_code_helpers::NameGrouping::*;
 use super::reason_code_helpers::SsnTypes::*;
 use super::reason_code_helpers::*;
+use crate::vendor_reason_codes_enum;
+use crate::FootprintReasonCode;
 use crate::MatchLevel::*;
-use crate::{
-    vendor_reason_codes_enum,
-    FootprintReasonCode,
-};
-use strum_macros::{
-    EnumIter,
-    EnumString,
-};
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 // TODO: https://linear.app/footprint/issue/FP-4280/change-fulladdresspartial-to-be-its-own-reason-code
 vendor_reason_codes_enum! {
@@ -635,11 +631,9 @@ impl ExperianSSNReasonCodes {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        ExperianMatchLevel,
-        ExperianSSNReasonCodes,
-        FootprintReasonCode,
-    };
+    use crate::ExperianMatchLevel;
+    use crate::ExperianSSNReasonCodes;
+    use crate::FootprintReasonCode;
     use strum::IntoEnumIterator;
     use test_case::test_case;
     use FootprintReasonCode::*;

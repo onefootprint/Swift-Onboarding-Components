@@ -1,35 +1,25 @@
 use super::data_lifetime::DataLifetime;
 use super::risk_signal_group::RiskSignalGroup;
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    risk_signal,
-    risk_signal_group,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::risk_signal;
+use db_schema::schema::risk_signal_group;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    DataLifetimeSeqno,
-    FootprintReasonCode,
-    OnboardingDecisionId,
-    RiskSignalGroupId,
-    RiskSignalGroupKind,
-    RiskSignalId,
-    ScopedVaultId,
-    VendorAPI,
-    VerificationResultId,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::FootprintReasonCode;
+use newtypes::OnboardingDecisionId;
+use newtypes::RiskSignalGroupId;
+use newtypes::RiskSignalGroupKind;
+use newtypes::RiskSignalId;
+use newtypes::ScopedVaultId;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
 use std::collections::HashMap;
 #[cfg(test)]
 use std::str::FromStr;
@@ -336,30 +326,24 @@ enum NewRiskSignals {
 mod tests {
     use super::*;
     use crate::models::decision_intent::DecisionIntent;
-    use crate::models::onboarding_decision::{
-        NewDecisionArgs,
-        OnboardingDecision,
-    };
+    use crate::models::onboarding_decision::NewDecisionArgs;
+    use crate::models::onboarding_decision::OnboardingDecision;
     use crate::models::scoped_vault::ScopedVault;
     use crate::models::verification_request::VerificationRequest;
     use crate::models::verification_result::VerificationResult;
-    use crate::models::workflow::{
-        Workflow,
-        WorkflowUpdate,
-    };
+    use crate::models::workflow::Workflow;
+    use crate::models::workflow::WorkflowUpdate;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
     use itertools::Itertools;
     use macros::db_test_case;
-    use newtypes::{
-        DataLifetimeSeqno,
-        DbActor,
-        DecisionIntentId,
-        DecisionIntentKind,
-        DecisionStatus,
-        ScopedVaultId,
-    };
+    use newtypes::DataLifetimeSeqno;
+    use newtypes::DbActor;
+    use newtypes::DecisionIntentId;
+    use newtypes::DecisionIntentKind;
+    use newtypes::DecisionStatus;
+    use newtypes::ScopedVaultId;
     use serde_json::json;
 
     fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Workflow) {

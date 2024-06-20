@@ -1,8 +1,6 @@
 use crate::utils::db2api::DbToApi;
-use db::access_event::{
-    AccessEventListItemForTenant,
-    AccessEventListItemForUser,
-};
+use db::access_event::AccessEventListItemForTenant;
+use db::access_event::AccessEventListItemForUser;
 use db::actor::SaturatedActor;
 
 fn saturated_actor_to_principal_string(saturated_actor: &SaturatedActor) -> String {

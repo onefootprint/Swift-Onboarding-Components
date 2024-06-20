@@ -1,9 +1,7 @@
 use crate::auth::user::UserAuthContext;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    VaultWrapper,
-    VwArgs,
-};
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::user::UserError;
@@ -11,19 +9,15 @@ use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::Person;
 use api_core::ApiErrorKind;
 use newtypes::sms_message::SmsMessage;
-use newtypes::{
-    ContactInfoKind,
-    PhoneNumber,
-    PiiString,
-};
+use newtypes::ContactInfoKind;
+use newtypes::PhoneNumber;
+use newtypes::PiiString;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-    Apiv2Response,
-    Apiv2Schema,
-};
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct D2pSmsRequest {

@@ -1,10 +1,8 @@
 use crate::enclave_client::EnclaveClientProxy;
 use crate::errors::enclave::EnclaveError;
 use async_trait::async_trait;
-use enclave::{
-    EnclavePayload,
-    RpcRequest,
-};
+use enclave::EnclavePayload;
+use enclave::RpcRequest;
 
 #[derive(Debug, Clone)]
 pub struct MockEnclave;

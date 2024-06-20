@@ -1,7 +1,5 @@
-use strum_macros::{
-    Display,
-    EnumIter,
-};
+use strum_macros::Display;
+use strum_macros::EnumIter;
 
 // NOTE: the order of these products is the order in which the line items are rendered in Stripe
 // invoices

@@ -1,33 +1,23 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantGuard;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    OffsetPaginatedResponse,
-    OffsetPaginatedResponseMetaNoCount,
-    OffsetPaginationRequest,
-};
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginatedResponseMetaNoCount;
+use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::web::Json;
-use api_core::{
-    ModernApiResult,
-    State,
-};
-use db::models::business_owner::{
-    BusinessOwner,
-    BusinessOwnerQuery,
-};
+use api_core::ModernApiResult;
+use api_core::State;
+use db::models::business_owner::BusinessOwner;
+use db::models::business_owner::BusinessOwnerQuery;
 use db::models::scoped_vault::ScopedVault;
 use db::OffsetPagination;
 use newtypes::PreviewApi;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 type BusinessOwnersListResponse =
     OffsetPaginatedResponse<api_wire_types::BusinessOwner, OffsetPaginatedResponseMetaNoCount>;

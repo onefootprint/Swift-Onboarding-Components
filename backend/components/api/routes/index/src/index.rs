@@ -1,12 +1,8 @@
-use crate::types::{
-    ModernApiResult,
-    StringResponse,
-};
+use crate::types::ModernApiResult;
+use crate::types::StringResponse;
 use actix_web::HttpRequest;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
 
 #[api_v2_operation(tags(Private))]
 #[tracing::instrument(name = "index")]

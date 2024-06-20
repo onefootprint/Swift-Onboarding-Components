@@ -1,15 +1,11 @@
-use crate::models::vault::{
-    NewVaultArgs,
-    Vault,
-};
+use crate::models::vault::NewVaultArgs;
+use crate::models::vault::Vault;
 use crate::TxnPgConn;
-use newtypes::{
-    EncryptedVaultPrivateKey,
-    Locked,
-    SandboxId,
-    VaultKind,
-    VaultPublicKey,
-};
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::Locked;
+use newtypes::SandboxId;
+use newtypes::VaultKind;
+use newtypes::VaultPublicKey;
 
 pub fn create_person(conn: &mut TxnPgConn, is_live: bool) -> Locked<Vault> {
     let sandbox_id = (!is_live).then_some(crypto::random::gen_random_alphanumeric_code(10));

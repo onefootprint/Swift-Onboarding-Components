@@ -1,18 +1,14 @@
 use crate::models::data_lifetime::DataLifetime;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
 use itertools::Itertools;
-use newtypes::{
-    DataLifetimeId,
-    PiiString,
-    S3Url,
-    SealedVaultBytes,
-    VaultDataFormat,
-    VaultId,
-};
+use newtypes::DataLifetimeId;
+use newtypes::PiiString;
+use newtypes::S3Url;
+use newtypes::SealedVaultBytes;
+use newtypes::VaultDataFormat;
+use newtypes::VaultId;
 use std::collections::HashMap;
 
 const LIFETIME_ID_CHUNK_SIZE: usize = 50_000;

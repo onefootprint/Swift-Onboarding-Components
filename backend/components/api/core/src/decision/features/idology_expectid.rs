@@ -1,17 +1,11 @@
-use idv::idology::common::response::{
-    IDologyQualifiers,
-    WarmAddressType,
-};
-use idv::idology::expectid::response::{
-    ExpectIDResponse,
-    PaWatchlistHit,
-};
+use idv::idology::common::response::IDologyQualifiers;
+use idv::idology::common::response::WarmAddressType;
+use idv::idology::expectid::response::ExpectIDResponse;
+use idv::idology::expectid::response::PaWatchlistHit;
 use itertools::Itertools;
-use newtypes::{
-    idology_match_codes,
-    FootprintReasonCode,
-    IDologyReasonCode,
-};
+use newtypes::idology_match_codes;
+use newtypes::FootprintReasonCode;
+use newtypes::IDologyReasonCode;
 use std::str::FromStr;
 
 pub fn footprint_reason_codes(
@@ -164,13 +158,13 @@ fn qualifier_reason_codes(qualifiers: Option<&IDologyQualifiers>) -> Vec<Footpri
 mod test {
     use super::*;
     use idv::idology::expectid::response::ExpectIDResponse;
+    use newtypes::FootprintReasonCode::*;
     use newtypes::FootprintReasonCode::{
         self,
-        *,
     };
+    use newtypes::MatchLevel::*;
     use newtypes::MatchLevel::{
         self,
-        *,
     };
     use serde_json::json;
     use test_case::test_case;

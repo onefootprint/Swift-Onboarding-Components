@@ -1,13 +1,11 @@
 use crate::auth::tenant::ClientTenantScope;
 use db::models::tenant_rolebinding::TenantRbLoginResult;
-use newtypes::{
-    FpId,
-    TenantApiKeyId,
-    TenantId,
-    TenantRolebindingId,
-    TenantUserId,
-    WorkosAuthMethod,
-};
+use newtypes::FpId;
+use newtypes::TenantApiKeyId;
+use newtypes::TenantId;
+use newtypes::TenantRolebindingId;
+use newtypes::TenantUserId;
+use newtypes::WorkosAuthMethod;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 /// Basic auth used for dashboard sessions - this represents an authenticated TenantUser at a

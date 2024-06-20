@@ -1,8 +1,6 @@
-use newtypes::{
-    IncodeConfigurationId,
-    IncodeSessionId,
-    PiiString,
-};
+use newtypes::IncodeConfigurationId;
+use newtypes::IncodeSessionId;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

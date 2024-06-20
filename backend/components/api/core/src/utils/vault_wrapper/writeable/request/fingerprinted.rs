@@ -1,21 +1,17 @@
 use super::fingerprints::Fingerprints;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use itertools::Itertools;
 use newtypes::fingerprint_salt::FingerprintSalt;
-use newtypes::{
-    CompositeFingerprint,
-    DataIdentifier,
-    DataRequest,
-    Fingerprint,
-    PiiString,
-    ScopedVaultId,
-    TenantId,
-};
+use newtypes::CompositeFingerprint;
+use newtypes::DataIdentifier;
+use newtypes::DataRequest;
+use newtypes::Fingerprint;
+use newtypes::PiiString;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
 use std::clone::Clone;
 use std::collections::HashMap;
 

@@ -5,11 +5,9 @@
 #![allow(non_camel_case_types)]
 #![allow(dead_code)]
 
-pub use std::os::raw::{
-    c_int,
-    c_ulong,
-    c_void,
-};
+pub use std::os::raw::c_int;
+pub use std::os::raw::c_ulong;
+pub use std::os::raw::c_void;
 pub type c_size_t = usize;
 
 /// Must be kept in sync with the endpoint proxy

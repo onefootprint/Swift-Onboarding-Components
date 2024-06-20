@@ -1,11 +1,7 @@
-use crate::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::{
-    IdvData,
-    PiiJsonValue,
-};
+use crate::ParsedResponse;
+use crate::VendorResponse;
+use newtypes::IdvData;
+use newtypes::PiiJsonValue;
 use twilio::response::lookup::LookupV2Response;
 use twilio::response::parse_response;
 

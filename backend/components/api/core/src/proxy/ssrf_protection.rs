@@ -1,23 +1,17 @@
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiResult;
 use futures_util::future::FutureExt;
-use hyper::client::connect::dns::{
-    GaiResolver as HyperGaiResolver,
-    Name,
-};
+use hyper::client::connect::dns::GaiResolver as HyperGaiResolver;
+use hyper::client::connect::dns::Name;
 use hyper::service::Service;
-use reqwest::dns::{
-    Addrs,
-    Resolve,
-    Resolving,
-};
+use reqwest::dns::Addrs;
+use reqwest::dns::Resolve;
+use reqwest::dns::Resolving;
 use std::error::Error;
-use std::net::{
-    IpAddr,
-    Ipv4Addr,
-    Ipv6Addr,
-    SocketAddr,
-};
+use std::net::IpAddr;
+use std::net::Ipv4Addr;
+use std::net::Ipv6Addr;
+use std::net::SocketAddr;
 
 pub fn validate_safe_url(url: &url::Url) -> ApiResult<()> {
     if url.as_str() == "https://ditto.footprint.dev:8443/" {

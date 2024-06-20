@@ -1,9 +1,7 @@
 use super::response::StytchErrorResponse;
 use newtypes::PiiJsonValue;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use std::fmt::Debug;
 use strum::Display;
 use strum_macros::EnumString;

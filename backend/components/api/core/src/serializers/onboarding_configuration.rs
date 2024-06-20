@@ -6,10 +6,8 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_set_version::RuleSetVersion;
 use db::models::tenant::Tenant;
 use db::models::tenant_client_config::TenantClientConfig;
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
 use newtypes::DataIdentifierDiscriminant;
 use std::sync::Arc;
 

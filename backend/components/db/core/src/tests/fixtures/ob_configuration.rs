@@ -1,19 +1,15 @@
-use crate::models::ob_configuration::{
-    NewObConfigurationArgs,
-    ObConfiguration,
-};
+use crate::models::ob_configuration::NewObConfigurationArgs;
+use crate::models::ob_configuration::ObConfiguration;
 use crate::PgConn;
-use newtypes::{
-    CipKind,
-    CollectedDataOption as CDO,
-    DbActor,
-    DocumentAndCountryConfiguration,
-    EnhancedAmlOption,
-    Iso3166TwoDigitCountryCode,
-    ObConfigurationKind,
-    TenantId,
-    VerificationCheck,
-};
+use newtypes::CipKind;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DbActor;
+use newtypes::DocumentAndCountryConfiguration;
+use newtypes::EnhancedAmlOption;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ObConfigurationKind;
+use newtypes::TenantId;
+use newtypes::VerificationCheck;
 
 pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfiguration {
     let args = NewObConfigurationArgs {

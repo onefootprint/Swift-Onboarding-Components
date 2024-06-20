@@ -1,24 +1,16 @@
-use super::{
-    CanCheckTenantGuard,
-    IsGuardMet,
-};
-use crate::auth::{
-    CanDecrypt,
-    Either,
-};
-use either::Either::{
-    Left,
-    Right,
-};
+use super::CanCheckTenantGuard;
+use super::IsGuardMet;
+use crate::auth::CanDecrypt;
+use crate::auth::Either;
+use either::Either::Left;
+use either::Either::Right;
 use itertools::Itertools;
-use newtypes::{
-    CollectedDataOption as CDO,
-    DataIdentifier,
-    DocumentDiKind,
-    DocumentSide,
-    InvokeVaultProxyPermission,
-    TenantScope,
-};
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DataIdentifier;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentSide;
+use newtypes::InvokeVaultProxyPermission;
+use newtypes::TenantScope;
 use std::collections::HashSet;
 use strum::Display;
 
@@ -212,24 +204,20 @@ where
 
 #[cfg(test)]
 mod test {
-    use super::{
-        CanDecrypt,
-        PartnerTenantGuard as PTG,
-        TenantGuard as TG,
-    };
+    use super::CanDecrypt;
+    use super::PartnerTenantGuard as PTG;
+    use super::TenantGuard as TG;
     use crate::auth::tenant::IsGuardMet;
     use crate::auth::Any;
-    use newtypes::{
-        BusinessDataKind as BDK,
-        CollectedDataOption as CDO,
-        DataIdentifier as DI,
-        DocumentDiKind,
-        DocumentSide,
-        IdDocKind,
-        IdentityDataKind as IDK,
-        KvDataKey,
-        TenantScope as TS,
-    };
+    use newtypes::BusinessDataKind as BDK;
+    use newtypes::CollectedDataOption as CDO;
+    use newtypes::DataIdentifier as DI;
+    use newtypes::DocumentDiKind;
+    use newtypes::DocumentSide;
+    use newtypes::IdDocKind;
+    use newtypes::IdentityDataKind as IDK;
+    use newtypes::KvDataKey;
+    use newtypes::TenantScope as TS;
     use std::str::FromStr;
     use test_case::test_case;
 

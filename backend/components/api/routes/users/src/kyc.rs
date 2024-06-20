@@ -1,69 +1,49 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::types::ModernApiResult;
 use crate::State;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::kyc::KycState;
-use api_core::decision::state::{
-    Authorize,
-    WorkflowKind,
-    WorkflowWrapper,
-};
-use api_core::errors::onboarding::{
-    OnboardingError,
-    UnmetRequirements,
-};
+use api_core::decision::state::Authorize;
+use api_core::decision::state::WorkflowKind;
+use api_core::decision::state::WorkflowWrapper;
+use api_core::errors::onboarding::OnboardingError;
+use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::{
-    ApiResult,
-    TfError,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::TfError;
+use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::onboarding::NewOnboardingArgs;
-use api_core::utils::requirements::{
-    get_requirements_inner,
-    GetRequirementsArgs,
-    RequirementOpts,
-};
-use api_core::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-    VwArgs,
-};
-use api_wire_types::{
-    EntityValidateResponse,
-    SimpleFixtureResult,
-    TriggerKycRequest,
-};
+use api_core::utils::requirements::get_requirements_inner;
+use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::requirements::RequirementOpts;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
+use api_wire_types::EntityValidateResponse;
+use api_wire_types::SimpleFixtureResult;
+use api_wire_types::TriggerKycRequest;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::DbError;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{
-    CollectedDataOption,
-    ObConfigurationKind,
-    OnboardingRequirement,
-    VaultKind,
-    WorkflowSource,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::CollectedDataOption;
+use newtypes::ObConfigurationKind;
+use newtypes::OnboardingRequirement;
+use newtypes::VaultKind;
+use newtypes::WorkflowSource;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(description = "Trigger KYC on the provided user.", tags(Users, Preview))]
 #[post("/users/{fp_id}/kyc")]

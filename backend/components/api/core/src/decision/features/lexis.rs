@@ -1,14 +1,10 @@
-use idv::lexis::response::{
-    FlexIdResponse,
-    ValidElementSummary,
-};
+use idv::lexis::response::FlexIdResponse;
+use idv::lexis::response::ValidElementSummary;
 use itertools::Itertools;
-use newtypes::{
-    FootprintReasonCode as FRC,
-    LexisNAP,
-    LexisNAS,
-    RiskIndicatorCode,
-};
+use newtypes::FootprintReasonCode as FRC;
+use newtypes::LexisNAP;
+use newtypes::LexisNAS;
+use newtypes::RiskIndicatorCode;
 use std::convert::Into;
 
 // 0 Nothing verified
@@ -211,9 +207,9 @@ fn phone_match_code(nap: &LexisNAP, risk_indicator_codes: &[RiskIndicatorCode]) 
 mod tests {
     use super::*;
     use db::test_helpers::assert_have_same_elements;
+    use newtypes::FootprintReasonCode::*;
     use newtypes::FootprintReasonCode::{
         self,
-        *,
     };
     use newtypes::RiskIndicatorCode as RIC;
     use test_case::test_case;

@@ -2,55 +2,37 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::types::ModernApiResult;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
-use api_core::auth::tenant::{
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantGuard;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::config::LinkKind;
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::token::{
-    create_token,
-    CreateTokenArgs,
-    CreateTokenResult,
-};
-use api_core::utils::vault_wrapper::{
-    Any,
-    TenantVw,
-    VaultWrapper,
-};
-use api_wire_types::{
-    CreateTokenRequest,
-    CreateTokenResponse,
-    TokenOperationKind,
-};
-use chrono::{
-    Duration,
-    Utc,
-};
-use db::models::auth_event::{
-    AuthEvent,
-    NewAuthEventArgs,
-};
+use api_core::utils::token::create_token;
+use api_core::utils::token::CreateTokenArgs;
+use api_core::utils::token::CreateTokenResult;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_wire_types::CreateTokenRequest;
+use api_wire_types::CreateTokenResponse;
+use api_wire_types::TokenOperationKind;
+use chrono::Duration;
+use chrono::Utc;
+use db::models::auth_event::AuthEvent;
+use db::models::auth_event::NewAuthEventArgs;
 use db::models::scoped_vault::ScopedVault;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{
-    AuthEventKind,
-    IdentifyScope,
-    PreviewApi,
-    RequestedTokenScope,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::AuthEventKind;
+use newtypes::IdentifyScope;
+use newtypes::PreviewApi;
+use newtypes::RequestedTokenScope;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",

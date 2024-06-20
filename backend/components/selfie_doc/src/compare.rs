@@ -1,13 +1,9 @@
 use crate::face::BoundingBox;
 use aws_sdk_rekognition::operation::compare_faces::CompareFacesOutput;
-use aws_sdk_rekognition::types::{
-    CompareFacesMatch,
-    ComparedSourceImageFace,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use aws_sdk_rekognition::types::CompareFacesMatch;
+use aws_sdk_rekognition::types::ComparedSourceImageFace;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]

@@ -1,11 +1,7 @@
-use actix_web::{
-    get,
-    web,
-};
-use api_core::auth::tenant::{
-    FirmEmployeeAuthContext,
-    FirmEmployeeGuard,
-};
+use actix_web::get;
+use actix_web::web;
+use api_core::auth::tenant::FirmEmployeeAuthContext;
+use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;

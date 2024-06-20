@@ -62,14 +62,12 @@ mod test {
     use super::filter_dls_for_portable_view;
     use chrono::Utc;
     use db::models::data_lifetime::DataLifetime;
-    use newtypes::{
-        DataLifetimeId,
-        DataLifetimeSeqno,
-        DataLifetimeSource,
-        IdentityDataKind as IDK,
-        ScopedVaultId,
-        VaultId,
-    };
+    use newtypes::DataLifetimeId;
+    use newtypes::DataLifetimeSeqno;
+    use newtypes::DataLifetimeSource;
+    use newtypes::IdentityDataKind as IDK;
+    use newtypes::ScopedVaultId;
+    use newtypes::VaultId;
     use test_case::test_case;
 
     #[test_case(

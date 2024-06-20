@@ -1,60 +1,46 @@
 use crate::identify::create_identified_token;
-use crate::{
-    ChallengeData,
-    ChallengeState,
-    GetIdentifyChallengeArgs,
-    IdentifyChallengeContext,
-    State,
-};
+use crate::ChallengeData;
+use crate::ChallengeState;
+use crate::GetIdentifyChallengeArgs;
+use crate::IdentifyChallengeContext;
+use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
-use api_core::utils::headers::{
-    IsComponentsSdk,
-    SandboxId,
-};
+use api_core::utils::headers::IsComponentsSdk;
+use api_core::utils::headers::SandboxId;
 use api_core::utils::identify::UserChallengeContext;
 use api_core::utils::sms::rx_background_error;
-use api_core::utils::vault_wrapper::{
-    FingerprintedDataRequest,
-    VaultContext,
-    VaultWrapper,
-};
-use api_wire_types::{
-    IdentifyId,
-    SignupChallengeData,
-    SignupChallengeRequest,
-    SignupChallengeResponse,
-    UserChallengeData,
-};
-use itertools::{
-    chain,
-    Itertools,
-};
+use api_core::utils::vault_wrapper::FingerprintedDataRequest;
+use api_core::utils::vault_wrapper::VaultContext;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_wire_types::IdentifyId;
+use api_wire_types::SignupChallengeData;
+use api_wire_types::SignupChallengeRequest;
+use api_wire_types::SignupChallengeResponse;
+use api_wire_types::UserChallengeData;
+use itertools::chain;
+use itertools::Itertools;
 use newtypes::email::Email;
-use newtypes::{
-    ChallengeKind,
-    DataLifetimeSource,
-    DataRequest,
-    IdentifyScope,
-    IdentityDataKind as IDK,
-    PhoneNumber,
-    ValidateArgs,
-};
+use newtypes::ChallengeKind;
+use newtypes::DataLifetimeSource;
+use newtypes::DataRequest;
+use newtypes::IdentifyScope;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::PhoneNumber;
+use newtypes::ValidateArgs;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

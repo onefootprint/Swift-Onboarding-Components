@@ -1,26 +1,22 @@
 use super::AuthSessionData;
 use crate::errors::user::UserError;
-use crate::errors::{
-    ApiResult,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use itertools::Itertools;
-use newtypes::{
-    AuthEventId,
-    AuthMethodKind,
-    BoId,
-    ContactInfoId,
-    DataIdentifier,
-    DataLifetimeSource,
-    IdentifyScope,
-    ObConfigurationId,
-    RequestedTokenScope,
-    ScopedVaultId,
-    UserAuthScope,
-    VaultId,
-    WorkflowId,
-    WorkflowRequestId,
-};
+use newtypes::AuthEventId;
+use newtypes::AuthMethodKind;
+use newtypes::BoId;
+use newtypes::ContactInfoId;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::IdentifyScope;
+use newtypes::ObConfigurationId;
+use newtypes::RequestedTokenScope;
+use newtypes::ScopedVaultId;
+use newtypes::UserAuthScope;
+use newtypes::VaultId;
+use newtypes::WorkflowId;
+use newtypes::WorkflowRequestId;
 
 /// A user-specific auth session. Permissions for the session are defined by the set of scopes.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]

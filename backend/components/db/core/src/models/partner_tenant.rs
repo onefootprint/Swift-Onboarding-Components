@@ -1,36 +1,26 @@
-use super::tenant_role::{
-    ImmutableRoleKind,
-    TenantRole,
-};
+use super::tenant_role::ImmutableRoleKind;
+use super::tenant_role::TenantRole;
 use crate::helpers::WorkosAuthIdentity;
-use crate::{
-    DbResult,
-    NonNullVec,
-    OptionalNonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::NonNullVec;
+use crate::OptionalNonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::partner_tenant;
 use diesel::insertable::CanInsertInSingleQuery;
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::query_builder::{
-    QueryFragment,
-    QueryId,
-};
+use diesel::query_builder::QueryFragment;
+use diesel::query_builder::QueryId;
 use diesel::Insertable;
-use newtypes::{
-    EncryptedVaultPrivateKey,
-    PartnerTenantId,
-    TenantKind,
-    TenantRoleKind,
-    VaultPublicKey,
-    WorkosAuthMethod,
-};
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::PartnerTenantId;
+use newtypes::TenantKind;
+use newtypes::TenantRoleKind;
+use newtypes::VaultPublicKey;
+use newtypes::WorkosAuthMethod;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = partner_tenant)]

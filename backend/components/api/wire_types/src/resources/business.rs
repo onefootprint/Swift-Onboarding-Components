@@ -1,8 +1,6 @@
-use newtypes::{
-    ExternalId,
-    FpId,
-    OnboardingStatus,
-};
+use newtypes::ExternalId;
+use newtypes::FpId;
+use newtypes::OnboardingStatus;
 use paperclip::actix::Apiv2Response;
 use serde::Serialize;
 

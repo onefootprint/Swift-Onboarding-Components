@@ -8,22 +8,16 @@ use aws_sdk_s3::operation::list_buckets::ListBucketsError;
 use aws_sdk_s3::operation::put_object::PutObjectError;
 use aws_sdk_s3::operation::upload_part::UploadPartError;
 use aws_sdk_s3::primitives::ByteStream;
-use aws_sdk_s3::types::{
-    CompletedMultipartUpload,
-    CompletedPart,
-};
-use bytes::{
-    Bytes,
-    BytesMut,
-};
+use aws_sdk_s3::types::CompletedMultipartUpload;
+use aws_sdk_s3::types::CompletedPart;
+use bytes::Bytes;
+use bytes::BytesMut;
 use futures::StreamExt;
 #[cfg(test)]
 use mockall::automock;
 use thiserror::Error;
-use url::{
-    ParseError,
-    Url,
-};
+use url::ParseError;
+use url::Url;
 
 #[allow(unused)]
 const S3_PATH_PREFIX: &str = "s3://";

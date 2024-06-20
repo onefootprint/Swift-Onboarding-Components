@@ -2,26 +2,18 @@ use crate::config::Config;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::enclave_client::EnclaveClient;
 use crate::State;
-use db::models::tenant_vendor::{
-    TenantVendorControl as DbTenantVendorControl,
-    UpdateTenantVendorControlArgs,
-};
+use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
+use db::models::tenant_vendor::UpdateTenantVendorControlArgs;
 use db::tests::test_db_pool::TestDbPool;
-use db::{
-    DbPool,
-    DbResult,
-};
+use db::DbPool;
+use db::DbResult;
 use macros::test_state;
-use newtypes::vendor_credentials::{
-    ExperianCredentialBuilder,
-    ExperianCredentials,
-    IdologyCredentials,
-};
-use newtypes::{
-    EncryptedVaultPrivateKey,
-    TenantId,
-    VaultPublicKey,
-};
+use newtypes::vendor_credentials::ExperianCredentialBuilder;
+use newtypes::vendor_credentials::ExperianCredentials;
+use newtypes::vendor_credentials::IdologyCredentials;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::TenantId;
+use newtypes::VaultPublicKey;
 
 #[allow(clippy::too_many_arguments)]
 async fn create_db_vendor_control(

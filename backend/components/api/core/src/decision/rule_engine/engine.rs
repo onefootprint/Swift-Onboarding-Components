@@ -1,53 +1,45 @@
 use super::default_rules::base_kyc_rules;
+use super::eval::Rule;
+use super::eval::RuleEvalConfig;
 use super::eval::{
     self,
-    Rule,
-    RuleEvalConfig,
 };
 use crate::decision::onboarding::Decision;
 use crate::decision::RuleError;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    bulk_decrypt,
-    BulkDecryptReq,
-    DecryptAccessEventInfo,
-    EnclaveDecryptOperation,
-    TenantVw,
-};
+use crate::utils::vault_wrapper::bulk_decrypt;
+use crate::utils::vault_wrapper::BulkDecryptReq;
+use crate::utils::vault_wrapper::DecryptAccessEventInfo;
+use crate::utils::vault_wrapper::EnclaveDecryptOperation;
+use crate::utils::vault_wrapper::TenantVw;
 use crate::State;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
-use db::models::rule_instance::{
-    IncludeRules,
-    RuleInstance,
-};
+use db::models::rule_instance::IncludeRules;
+use db::models::rule_instance::RuleInstance;
 use db::models::rule_result::RuleResult;
-use db::models::rule_set_result::{
-    NewRuleResultArgs,
-    NewRuleSetResultArgs,
-    RuleSetResult,
-};
+use db::models::rule_set_result::NewRuleResultArgs;
+use db::models::rule_set_result::NewRuleSetResultArgs;
+use db::models::rule_set_result::RuleSetResult;
 use db::models::vault::Vault;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{
-    DataIdentifier,
-    DocumentRequestKind,
-    ListId,
-    ObConfigurationId,
-    ObConfigurationKind,
-    PiiJsonValue,
-    RiskSignalGroupKind,
-    RuleExpression,
-    RuleSetResultId,
-    RuleSetResultKind,
-    ScopedVaultId,
-    VaultKind,
-    WorkflowId,
-};
+use newtypes::DataIdentifier;
+use newtypes::DocumentRequestKind;
+use newtypes::ListId;
+use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKind;
+use newtypes::PiiJsonValue;
+use newtypes::RiskSignalGroupKind;
+use newtypes::RuleExpression;
+use newtypes::RuleSetResultId;
+use newtypes::RuleSetResultKind;
+use newtypes::ScopedVaultId;
+use newtypes::VaultKind;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 pub struct EvaluateWorkflowDecisionArgs<'a> {
@@ -307,20 +299,18 @@ mod tests {
     use diesel::prelude::*;
     use eval::tests::TRule;
     use macros::db_test_case;
-    use newtypes::{
-        BooleanOperator as BO,
-        DbActor,
-        DecisionIntentKind,
-        DocumentRequestKind,
-        FootprintReasonCode as FRC,
-        RiskSignalGroupKind,
-        RiskSignalId,
-        RuleAction as RA,
-        RuleExpression as RE,
-        RuleExpressionCondition as REC,
-        RuleInstanceKind,
-        VendorAPI,
-    };
+    use newtypes::BooleanOperator as BO;
+    use newtypes::DbActor;
+    use newtypes::DecisionIntentKind;
+    use newtypes::DocumentRequestKind;
+    use newtypes::FootprintReasonCode as FRC;
+    use newtypes::RiskSignalGroupKind;
+    use newtypes::RiskSignalId;
+    use newtypes::RuleAction as RA;
+    use newtypes::RuleExpression as RE;
+    use newtypes::RuleExpressionCondition as REC;
+    use newtypes::RuleInstanceKind;
+    use newtypes::VendorAPI;
 
     #[db_test_case(vec![TRule(
         RE(vec![REC::RiskSignal {

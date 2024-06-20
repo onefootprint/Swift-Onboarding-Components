@@ -1,12 +1,8 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
-use newtypes::{
-    AlpacaPiiString,
-    Declaration,
-    PiiJsonValue,
-};
+use chrono::DateTime;
+use chrono::Utc;
+use newtypes::AlpacaPiiString;
+use newtypes::Declaration;
+use newtypes::PiiJsonValue;
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

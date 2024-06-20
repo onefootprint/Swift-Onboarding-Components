@@ -3,23 +3,17 @@ pub mod conversion;
 pub mod random;
 pub mod seal;
 
-use hmac::{
-    Hmac,
-    Mac,
-};
-use sha2::{
-    Digest,
-    Sha256,
-};
+pub use base64;
+pub use hex;
+use hmac::Hmac;
+use hmac::Mac;
+pub use pem;
+pub use serde_cbor;
+use sha2::Digest;
+use sha2::Sha256;
 use std::str::Utf8Error;
 use thiserror::Error;
-pub use {
-    base64,
-    hex,
-    pem,
-    serde_cbor,
-    zeroize,
-};
+pub use zeroize;
 
 mod clean_data;
 pub use self::clean_data::*;

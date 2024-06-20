@@ -1,24 +1,16 @@
 use crate::util::impl_enum_string_diesel;
 use crate::EnumDotNotationError;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use std::str::FromStr;
-use strum::{
-    Display,
-    EnumDiscriminants,
-};
-use strum_macros::{
-    AsRefStr,
-    EnumString,
-};
+use strum::Display;
+use strum::EnumDiscriminants;
+use strum_macros::AsRefStr;
+use strum_macros::EnumString;
 
 // TODO: maybe move this to new `state` crate?
 #[derive(

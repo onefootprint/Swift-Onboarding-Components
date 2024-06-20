@@ -1,9 +1,7 @@
 use actix_web::web;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::serializers::IsDomainAlreadyClaimed;
@@ -11,14 +9,12 @@ use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::UpdateTenantRequest;
-use db::models::tenant::{
-    Tenant,
-    UpdateTenant,
-};
+use db::models::tenant::Tenant;
+use db::models::tenant::UpdateTenant;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::patch;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    patch,
 };
 
 #[api_v2_operation(

@@ -1,18 +1,14 @@
-use super::{
-    Error,
-    VResult,
-};
-use crate::{
-    AllData,
-    CleanAndValidate,
-    DataIdentifierValue,
-    DocumentDiKind,
-    NtResult,
-    PiiJsonValue,
-    PiiString,
-    PiiValueKind,
-    ValidateArgs,
-};
+use super::Error;
+use super::VResult;
+use crate::AllData;
+use crate::CleanAndValidate;
+use crate::DataIdentifierValue;
+use crate::DocumentDiKind;
+use crate::NtResult;
+use crate::PiiJsonValue;
+use crate::PiiString;
+use crate::PiiValueKind;
+use crate::ValidateArgs;
 
 impl CleanAndValidate for DocumentDiKind {
     type Parsed = ();

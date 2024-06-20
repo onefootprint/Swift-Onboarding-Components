@@ -1,34 +1,24 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
 use crate::types::ModernApiResult;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::decision;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
+use api_core::task;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::{
-    decision,
-    task,
-};
 use api_wire_types::CreateUserDecisionRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
-use newtypes::{
-    CreateAnnotationRequest,
-    PreviewApi,
-    VaultKind,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::CreateAnnotationRequest;
+use newtypes::PreviewApi;
+use newtypes::VaultKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Creates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.",

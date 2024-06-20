@@ -1,15 +1,11 @@
 use super::WriteableVw;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    VaultWrapper,
-    VwArgs,
-};
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use db::models::vault::Vault;
 use db::TxnPgConn;
-use newtypes::{
-    Locked,
-    ScopedVaultId,
-};
+use newtypes::Locked;
+use newtypes::ScopedVaultId;
 
 impl<Type> VaultWrapper<Type> {
     /// Builds a locked UVW that sees portable data AND speculative data for the tenant.

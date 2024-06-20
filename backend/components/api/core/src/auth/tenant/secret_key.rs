@@ -1,36 +1,24 @@
-use super::{
-    AuthActor,
-    CanCheckTenantGuard,
-};
+use super::AuthActor;
+use super::CanCheckTenantGuard;
 use crate::auth::tenant::TenantAuth;
 use crate::auth::AuthError;
-use crate::errors::{
-    ApiError,
-    AssertionError,
-};
-use crate::{
-    ModernApiError,
-    State,
-};
+use crate::errors::ApiError;
+use crate::errors::AssertionError;
+use crate::ModernApiError;
+use crate::State;
 use actix_web::http::header::Header;
-use actix_web::{
-    web,
-    FromRequest,
-};
-use actix_web_httpauth::headers::authorization::{
-    Authorization,
-    Basic,
-};
+use actix_web::web;
+use actix_web::FromRequest;
+use actix_web_httpauth::headers::authorization::Authorization;
+use actix_web_httpauth::headers::authorization::Basic;
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{
-    DataLifetimeSource,
-    PreviewApi,
-    TenantScope,
-};
+use newtypes::DataLifetimeSource;
+use newtypes::PreviewApi;
+use newtypes::TenantScope;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 use tracing_actix_web::RootSpan;

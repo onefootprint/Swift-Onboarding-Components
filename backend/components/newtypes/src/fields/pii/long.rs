@@ -1,7 +1,5 @@
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt::Debug;
 
 #[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash)]

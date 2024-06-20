@@ -1,35 +1,31 @@
 use super::engine::VaultDataForRules;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::rule_instance::RuleInstance;
 use itertools::Itertools;
 use newtypes::email::Email;
-use newtypes::{
-    BooleanOperator,
-    BusinessDataKind,
-    DataIdentifier,
-    DeviceInsightField,
-    DeviceInsightOperation,
-    DocumentRequestKind,
-    Equals,
-    FootprintReasonCode,
-    IdentityDataKind,
-    IsIn,
-    ListEntryValue,
-    ListId,
-    ListKind,
-    PhoneNumber,
-    PiiString,
-    RuleAction,
-    RuleExpression,
-    RuleExpressionCondition,
-    StepUpKind,
-    VaultOperation,
-};
+use newtypes::BooleanOperator;
+use newtypes::BusinessDataKind;
+use newtypes::DataIdentifier;
+use newtypes::DeviceInsightField;
+use newtypes::DeviceInsightOperation;
+use newtypes::DocumentRequestKind;
+use newtypes::Equals;
+use newtypes::FootprintReasonCode;
+use newtypes::IdentityDataKind;
+use newtypes::IsIn;
+use newtypes::ListEntryValue;
+use newtypes::ListId;
+use newtypes::ListKind;
+use newtypes::PhoneNumber;
+use newtypes::PiiString;
+use newtypes::RuleAction;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
+use newtypes::StepUpKind;
+use newtypes::VaultOperation;
 use std::collections::HashMap;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
@@ -376,17 +372,15 @@ fn insight_field_value_is_in_list(
 pub mod tests {
     use super::*;
     use crate::decision::rule_engine::engine::VaultDataForRules;
-    use newtypes::{
-        BooleanOperator as BO,
-        DataIdentifier as DI,
-        FootprintReasonCode as FRC,
-        IdentityDataKind,
-        InvestorProfileKind,
-        PiiJsonValue,
-        RuleAction as RA,
-        RuleExpression as RE,
-        RuleExpressionCondition as REC,
-    };
+    use newtypes::BooleanOperator as BO;
+    use newtypes::DataIdentifier as DI;
+    use newtypes::FootprintReasonCode as FRC;
+    use newtypes::IdentityDataKind;
+    use newtypes::InvestorProfileKind;
+    use newtypes::PiiJsonValue;
+    use newtypes::RuleAction as RA;
+    use newtypes::RuleExpression as RE;
+    use newtypes::RuleExpressionCondition as REC;
     use std::collections::HashMap;
     use test_case::test_case;
 

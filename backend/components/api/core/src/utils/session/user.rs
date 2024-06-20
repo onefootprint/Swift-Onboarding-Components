@@ -2,23 +2,17 @@ use crate::auth::session::AuthSessionData;
 use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::ApiResult;
 use crate::State;
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
 use crypto::aead::ScopedSealingKey;
 use db::models::session::Session;
-use db::{
-    DbResult,
-    PgConn,
-};
-use newtypes::{
-    AuthTokenHash,
-    HasSessionKind,
-    SealedSessionBytes,
-    SessionAuthToken,
-};
+use db::DbResult;
+use db::PgConn;
+use newtypes::AuthTokenHash;
+use newtypes::HasSessionKind;
+use newtypes::SealedSessionBytes;
+use newtypes::SessionAuthToken;
 
 #[derive(Debug, Clone)]
 pub struct AuthSession {

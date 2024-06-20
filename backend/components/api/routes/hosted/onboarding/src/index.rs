@@ -1,45 +1,35 @@
 use crate::auth::session::UpdateSession;
-use crate::auth::user::{
-    UserAuth,
-    UserAuthContext,
-    UserAuthScope,
-};
+use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
+use crate::auth::user::UserAuthScope;
 use crate::auth::AuthError;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::{
-    NewUserSessionContext,
-    TokenCreationPurpose,
-};
+use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::types::ModernApiResult;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::onboarding::{
-    NewBusinessVaultArgs,
-    NewOnboardingArgs,
-};
-use api_core::utils::vault_wrapper::{
-    Any,
-    PrefillKind,
-    VaultWrapper,
-};
+use api_core::utils::onboarding::NewBusinessVaultArgs;
+use api_core::utils::onboarding::NewOnboardingArgs;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::PrefillKind;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use api_wire_types::PostOnboardingRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use feature_flag::BoolFlag;
-use newtypes::{
-    ObConfigurationKind,
-    WorkflowSource,
-};
+use newtypes::ObConfigurationKind;
+use newtypes::WorkflowSource;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

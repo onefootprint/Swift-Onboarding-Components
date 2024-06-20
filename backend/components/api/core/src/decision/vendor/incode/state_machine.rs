@@ -1,29 +1,21 @@
 use super::get_config_id;
-use super::state::{
-    IncodeState,
-    IncodeStateTransition,
-    RunTransition,
-    StepResult,
-};
+use super::state::IncodeState;
+use super::state::IncodeStateTransition;
+use super::state::RunTransition;
+use super::state::StepResult;
 use super::states::*;
 use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::errors::user::UserError;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
-use crate::utils::vault_wrapper::{
-    Person,
-    VaultWrapper,
-    VwArgs,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use crate::vendor_clients::IncodeClients;
-use crate::{
-    ApiError,
-    State,
-};
+use crate::ApiError;
+use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
 use db::models::incode_verification_session::IncodeVerificationSession;
@@ -32,22 +24,20 @@ use db::models::vault::Vault;
 use db::DbPool;
 use feature_flag::FeatureFlagClient;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
-use newtypes::{
-    DecisionIntentId,
-    DecisionIntentKind,
-    DocVData,
-    DocumentId,
-    DocumentRequestId,
-    IncodeConfigurationId,
-    IncodeEnvironment,
-    IncodeFailureReason,
-    IncodeVerificationSessionKind,
-    IncodeVerificationSessionState,
-    Iso3166TwoDigitCountryCode,
-    ScopedVaultId,
-    TenantId,
-    WorkflowId,
-};
+use newtypes::DecisionIntentId;
+use newtypes::DecisionIntentKind;
+use newtypes::DocVData;
+use newtypes::DocumentId;
+use newtypes::DocumentRequestId;
+use newtypes::IncodeConfigurationId;
+use newtypes::IncodeEnvironment;
+use newtypes::IncodeFailureReason;
+use newtypes::IncodeVerificationSessionKind;
+use newtypes::IncodeVerificationSessionState;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::WorkflowId;
 use selfie_doc::AwsSelfieDocClient;
 use std::sync::Arc;
 

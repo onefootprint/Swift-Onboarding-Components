@@ -1,21 +1,17 @@
 use actix_web::web;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantGuard;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::State;
 use chrono::Utc;
-use db::models::vault_dr::{
-    NewVaultDrConfig,
-    VaultDrAwsPreEnrollment,
-    VaultDrConfig,
-};
+use db::models::vault_dr::NewVaultDrConfig;
+use db::models::vault_dr::VaultDrAwsPreEnrollment;
+use db::models::vault_dr::VaultDrConfig;
+use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
-    api_v2_operation,
 };
 
 #[api_v2_operation(

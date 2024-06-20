@@ -1,11 +1,7 @@
-use crate::enclave_client::{
-    DecryptReq,
-    EnclaveClient,
-};
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
+use crate::enclave_client::DecryptReq;
+use crate::enclave_client::EnclaveClient;
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 

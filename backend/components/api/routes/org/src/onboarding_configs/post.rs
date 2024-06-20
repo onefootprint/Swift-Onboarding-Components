@@ -1,41 +1,33 @@
 use crate::onboarding_configs::validation::ObConfigurationArgsToValidate;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
-use db::models::ob_configuration::{
-    NewObConfigurationArgs,
-    ObConfiguration,
-};
+use db::models::ob_configuration::NewObConfigurationArgs;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_set_version::RuleSetVersion;
-use newtypes::{
-    AdverseMediaListKind,
-    CipKind,
-    CollectedDataOption as CDO,
-    DocumentAndCountryConfiguration,
-    DocumentRequestConfig,
-    EnhancedAml,
-    EnhancedAmlOption,
-    Iso3166TwoDigitCountryCode,
-    ObConfigurationKind,
-    TenantId,
-    VerificationCheck,
-    VerificationCheckKind,
-};
+use newtypes::AdverseMediaListKind;
+use newtypes::CipKind;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DocumentAndCountryConfiguration;
+use newtypes::DocumentRequestConfig;
+use newtypes::EnhancedAml;
+use newtypes::EnhancedAmlOption;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ObConfigurationKind;
+use newtypes::TenantId;
+use newtypes::VerificationCheck;
+use newtypes::VerificationCheckKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-    Apiv2Schema,
-};
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

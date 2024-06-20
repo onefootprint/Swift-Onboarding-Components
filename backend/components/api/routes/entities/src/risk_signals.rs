@@ -1,9 +1,7 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::types::ModernApiResult;
 use crate::utils::db2api::DbToApi;
@@ -12,66 +10,52 @@ use api_core::auth::CanDecrypt;
 use api_core::decision;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::decision::vendor::vendor_result::VendorResult;
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-    VwArgs,
-};
-use api_wire_types::{
-    AmlHit,
-    AmlHitMedia,
-    RiskSignalFilters,
-};
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
+use api_wire_types::AmlHit;
+use api_wire_types::AmlHitMedia;
+use api_wire_types::RiskSignalFilters;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::{
-    AtSeqno,
-    RiskSignal,
-};
+use db::models::risk_signal::AtSeqno;
+use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
-use db::models::verification_request::{
-    RequestAndResult,
-    VerificationRequest,
-};
+use db::models::verification_request::RequestAndResult;
+use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::DbResult;
 use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
 use idv::ParsedResponse;
 use itertools::Itertools;
-use newtypes::{
-    AccessEventKind,
-    AccessEventPurpose,
-    AuditEventDetail,
-    AuditEventId,
-    DataIdentifier,
-    DbActor,
-    EncryptedVaultPrivateKey,
-    EnhancedAmlOption,
-    FootprintReasonCode,
-    FpId,
-    IdentityDataKind as IDK,
-    PiiJsonValue,
-    RiskSignalId,
-    TenantId,
-    VendorAPI,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    post,
-    web,
-};
+use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DataIdentifier;
+use newtypes::DbActor;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::EnhancedAmlOption;
+use newtypes::FootprintReasonCode;
+use newtypes::FpId;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::PiiJsonValue;
+use newtypes::RiskSignalId;
+use newtypes::TenantId;
+use newtypes::VendorAPI;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use std::collections::HashMap;
 
 #[api_v2_operation(

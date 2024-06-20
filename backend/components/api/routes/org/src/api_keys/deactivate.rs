@@ -1,9 +1,7 @@
-use api_core::auth::tenant::{
-    AuthActor,
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::AuthActor;
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
@@ -11,11 +9,9 @@ use api_core::State;
 use chrono::Utc;
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::TenantApiKeyId;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Permanently deactivates an existing tenant API key.",

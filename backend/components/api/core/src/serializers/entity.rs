@@ -1,28 +1,18 @@
 use crate::auth::tenant::TenantAuth;
-use crate::auth::{
-    CanDecrypt,
-    IsGuardMet,
-};
+use crate::auth::CanDecrypt;
+use crate::auth::IsGuardMet;
 use crate::utils::db2api::DbToApi;
-use crate::utils::vault_wrapper::{
-    Any,
-    DecryptedData,
-    TenantVw,
-};
-use api_wire_types::{
-    DataAttributeKind,
-    EntityAttribute,
-    EntityStatus,
-};
-use chrono::{
-    Duration,
-    Utc,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::DecryptedData;
+use crate::utils::vault_wrapper::TenantVw;
+use api_wire_types::DataAttributeKind;
+use api_wire_types::EntityAttribute;
+use api_wire_types::EntityStatus;
+use chrono::Duration;
+use chrono::Utc;
 use db::models::insight_event::InsightEvent;
-use db::models::scoped_vault::{
-    ScopedVault,
-    SerializableEntity,
-};
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::SerializableEntity;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::VaultedData;

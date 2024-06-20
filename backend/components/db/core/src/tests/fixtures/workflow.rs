@@ -1,15 +1,11 @@
 use crate::models::insight_event::CreateInsightEvent;
-use crate::models::workflow::{
-    OnboardingWorkflowArgs,
-    Workflow,
-};
+use crate::models::workflow::OnboardingWorkflowArgs;
+use crate::models::workflow::Workflow;
 use crate::TxnPgConn;
-use newtypes::{
-    ObConfigurationId,
-    ScopedVaultId,
-    WorkflowFixtureResult,
-    WorkflowSource,
-};
+use newtypes::ObConfigurationId;
+use newtypes::ScopedVaultId;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowSource;
 
 pub fn create(
     conn: &mut TxnPgConn,

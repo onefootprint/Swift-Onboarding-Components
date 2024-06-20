@@ -1,59 +1,47 @@
-use super::{
-    idology,
-    incode,
-};
+use super::idology;
+use super::incode;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
 use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyPa;
 use crate::errors::AssertionError;
+use crate::task::ExecuteTask;
+use crate::task::TaskError;
 use crate::task::{
     self,
-    ExecuteTask,
-    TaskError,
 };
-use crate::utils::vault_wrapper::{
-    Person,
-    VaultWrapper,
-    VwArgs,
-};
-use crate::{
-    ApiError,
-    State,
-};
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
+use crate::ApiError;
+use crate::State;
 use async_trait::async_trait;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::{
-    NewRiskSignalInfo,
-    RiskSignal,
-};
+use db::models::risk_signal::NewRiskSignalInfo;
+use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
 use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
 use db::models::watchlist_check::WatchlistCheck;
-use db::{
-    DbResult,
-    TxnPgConn,
-};
-use newtypes::{
-    DecisionIntentKind,
-    EnhancedAmlOption,
-    OnboardingStatus,
-    RiskSignalGroupKind,
-    ScopedVaultId,
-    TaskId,
-    VendorAPI,
-    WatchlistCheckArgs,
-    WatchlistCheckCompletedPayload,
-    WatchlistCheckError,
-    WatchlistCheckInfo,
-    WatchlistCheckNotNeededReason,
-    WatchlistCheckStatus,
-    WatchlistCheckStatusKind,
-    WebhookEvent,
-};
+use db::DbResult;
+use db::TxnPgConn;
+use newtypes::DecisionIntentKind;
+use newtypes::EnhancedAmlOption;
+use newtypes::OnboardingStatus;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
+use newtypes::TaskId;
+use newtypes::VendorAPI;
+use newtypes::WatchlistCheckArgs;
+use newtypes::WatchlistCheckCompletedPayload;
+use newtypes::WatchlistCheckError;
+use newtypes::WatchlistCheckInfo;
+use newtypes::WatchlistCheckNotNeededReason;
+use newtypes::WatchlistCheckStatus;
+use newtypes::WatchlistCheckStatusKind;
+use newtypes::WebhookEvent;
 
 pub(crate) struct WatchlistCheckTask {
     state: State,

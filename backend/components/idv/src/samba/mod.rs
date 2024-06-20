@@ -1,7 +1,5 @@
-use newtypes::{
-    PiiJsonValue,
-    ScrubbedPiiJsonValue,
-};
+use newtypes::PiiJsonValue;
+use newtypes::ScrubbedPiiJsonValue;
 use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
 use serde::Serialize;

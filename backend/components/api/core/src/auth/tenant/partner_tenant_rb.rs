@@ -1,17 +1,11 @@
-use super::{
-    AuthActor,
-    CanCheckTenantGuard,
-    PartnerTenantAuth,
-};
-use crate::auth::session::{
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
-use crate::auth::{
-    AuthError,
-    SessionContext,
-};
+use super::AuthActor;
+use super::CanCheckTenantGuard;
+use super::PartnerTenantAuth;
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
+use crate::auth::AuthError;
+use crate::auth::SessionContext;
 use crate::errors::ApiResult;
 use db::helpers::TenantOrPartnerTenant;
 use db::models::partner_tenant::PartnerTenant;
@@ -20,10 +14,8 @@ use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::{
-    TenantScope,
-    WorkosAuthMethod,
-};
+use newtypes::TenantScope;
+use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 

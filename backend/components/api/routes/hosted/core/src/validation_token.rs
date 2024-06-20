@@ -1,10 +1,8 @@
 use api_core::auth::session::user::ValidateUserToken;
 use api_core::auth::session::AuthSessionData;
 use api_core::auth::user::UserSessionContext;
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::utils::session::AuthSession;
 use api_core::State;
 use chrono::Duration;

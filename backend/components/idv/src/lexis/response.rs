@@ -1,10 +1,8 @@
 use super::ResponseError;
 use crate::lexis;
 use newtypes::*;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt::Debug;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]

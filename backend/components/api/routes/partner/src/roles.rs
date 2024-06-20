@@ -1,19 +1,15 @@
-use crate::types::{
-    ModernApiResult,
-    OffsetPaginationRequest,
-};
+use crate::types::ModernApiResult;
+use crate::types::OffsetPaginationRequest;
 use crate::State;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_route_org_common::roles as roles_common;
 use api_wire_types::OrgRoleFilters;
 use newtypes::TenantRoleId;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    patch,
-    post,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::patch;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     tags(Roles, OrgSettings, Private),

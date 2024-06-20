@@ -1,32 +1,22 @@
 use crate::State;
+use actix_web::post;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    post,
-    web,
-};
-use api_core::auth::tenant::{
-    FirmEmployeeAuthContext,
-    FirmEmployeeGuard,
-};
+use api_core::auth::tenant::FirmEmployeeAuthContext;
+use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_wire_types::CompliancePartnershipRequest;
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use db::models::compliance_doc::NewComplianceDoc;
 use db::models::compliance_doc_request::NewComplianceDocRequest;
 use db::models::compliance_doc_template::ComplianceDocTemplate;
-use db::models::tenant_compliance_partnership::{
-    NewTenantCompliancePartnership,
-    TenantCompliancePartnership,
-};
-use newtypes::{
-    PartnerTenantId,
-    TenantCompliancePartnershipId,
-    TenantId,
-};
+use db::models::tenant_compliance_partnership::NewTenantCompliancePartnership;
+use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
+use newtypes::PartnerTenantId;
+use newtypes::TenantCompliancePartnershipId;
+use newtypes::TenantId;
 use paperclip::actix::Apiv2Response;
 
 #[derive(serde::Serialize, macros::JsonResponder, Apiv2Response)]

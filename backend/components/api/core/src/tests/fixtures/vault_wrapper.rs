@@ -1,25 +1,19 @@
-use crate::utils::vault_wrapper::{
-    Person,
-    VaultWrapper,
-    VwArgs,
-};
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use db::models::vault_data::{
-    NewVaultData,
-    VaultData,
-};
+use db::models::vault_data::NewVaultData;
+use db::models::vault_data::VaultData;
 use db::tests::prelude::TestPgConn;
-use newtypes::{
-    DataLifetimeSource,
-    IdentityDataKind,
-    Locked,
-    SealedVaultBytes,
-    VaultDataFormat,
-};
+use newtypes::DataLifetimeSource;
+use newtypes::IdentityDataKind;
+use newtypes::Locked;
+use newtypes::SealedVaultBytes;
+use newtypes::VaultDataFormat;
 
 #[allow(unused)]
 pub type VwSetup = (

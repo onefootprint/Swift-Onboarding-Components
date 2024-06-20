@@ -1,36 +1,30 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::types::ModernApiResult;
 use crate::State;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
-use newtypes::{
-    flat_api_object_map_type,
-    impl_response_type,
-    FilterFunction,
-    HmacSha256Args,
-    IntegritySigningKey,
-    PiiBytes,
-    PiiJsonValue,
-    PreviewApi,
-    VersionedDataIdentifier,
-};
+use newtypes::flat_api_object_map_type;
+use newtypes::impl_response_type;
+use newtypes::FilterFunction;
+use newtypes::HmacSha256Args;
+use newtypes::IntegritySigningKey;
+use newtypes::PiiBytes;
+use newtypes::PiiJsonValue;
+use newtypes::PreviewApi;
+use newtypes::VersionedDataIdentifier;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
-    Apiv2Schema,
 };
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashSet;
 
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]

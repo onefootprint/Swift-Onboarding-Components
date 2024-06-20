@@ -1,10 +1,8 @@
 use crate::models::verification_request::VerificationRequest;
 use crate::PgConn;
-use newtypes::{
-    DecisionIntentId,
-    ScopedVaultId,
-    VendorAPI,
-};
+use newtypes::DecisionIntentId;
+use newtypes::ScopedVaultId;
+use newtypes::VendorAPI;
 
 pub fn bulk_create(
     conn: &mut PgConn,

@@ -1,8 +1,6 @@
-use crate::{
-    DataIdentifier,
-    FilterFunction,
-    FpId,
-};
+use crate::DataIdentifier;
+use crate::FilterFunction;
+use crate::FpId;
 use itertools::Itertools;
 use std::str::FromStr;
 
@@ -138,12 +136,10 @@ pub enum ProxyTokenError {
 mod tests {
     use super::FilterFunction::*;
     use super::*;
-    use crate::{
-        CountArgs,
-        DataIdentifier,
-        FpId,
-        IdentityDataKind as IDK,
-    };
+    use crate::CountArgs;
+    use crate::DataIdentifier;
+    use crate::FpId;
+    use crate::IdentityDataKind as IDK;
     use test_case::test_case;
 
     fn tok<D: Into<DataIdentifier>>(

@@ -1,44 +1,32 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::types::ModernApiResult;
 use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
-use api_core::auth::tenant::{
-    AuthActor,
-    ClientTenantScope,
-};
+use api_core::auth::tenant::AuthActor;
+use api_core::auth::tenant::ClientTenantScope;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
-use api_wire_types::{
-    CreateClientTokenRequest,
-    CreateClientTokenResponse,
-    DEPRECATEDClientTokenScopeKind,
-    ModernClientTokenScopeKind,
-};
+use api_wire_types::CreateClientTokenRequest;
+use api_wire_types::CreateClientTokenResponse;
+use api_wire_types::DEPRECATEDClientTokenScopeKind;
+use api_wire_types::ModernClientTokenScopeKind;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
-use newtypes::{
-    AliasId,
-    CardDataKind,
-    CardInfo,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::AliasId;
+use newtypes::CardDataKind;
+use newtypes::CardInfo;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use strum::IntoEnumIterator;
 
 #[api_v2_operation(

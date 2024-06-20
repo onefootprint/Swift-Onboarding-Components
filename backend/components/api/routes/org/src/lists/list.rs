@@ -1,27 +1,21 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    OffsetPaginatedResponse,
-    OffsetPaginationRequest,
-};
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
-use api_core::{
-    ModernApiResult,
-    State,
-};
+use api_core::ModernApiResult;
+use api_core::State;
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::rule_instance::RuleInstance;
 use db::OffsetPagination;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

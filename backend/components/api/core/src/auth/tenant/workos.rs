@@ -1,17 +1,13 @@
 use crate::auth::session::tenant::WorkOsSession;
-use crate::auth::session::{
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::errors::ApiResult;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::{
-    TenantUserId,
-    WorkosAuthMethod,
-};
+use newtypes::TenantUserId;
+use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 

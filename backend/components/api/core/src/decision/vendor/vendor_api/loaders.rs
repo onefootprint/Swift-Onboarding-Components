@@ -1,25 +1,17 @@
-use super::vendor_parsable::{
-    AsParsedResponse,
-    VendorParsable,
-};
+use super::vendor_parsable::AsParsedResponse;
+use super::vendor_parsable::VendorParsable;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::vendor::verification_result::decrypt_verification_result_response;
 use crate::errors::ApiResult;
-use crate::{
-    ApiError,
-    State,
-};
-use db::models::verification_request::{
-    VReqIdentifier,
-    VerificationRequest,
-};
+use crate::ApiError;
+use crate::State;
+use db::models::verification_request::VReqIdentifier;
+use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::DbResult;
 use idv::VendorResponse;
-use newtypes::{
-    EncryptedVaultPrivateKey,
-    VerificationResultId,
-};
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::VerificationResultId;
 
 // Represents an attempt to load and deserialize a vendor API response
 pub enum LoadVendorResponseResult<T> {
@@ -122,10 +114,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::decision::tests::test_helpers::{
-        create_kyc_user_and_wf,
-        FixtureData,
-    };
+    use crate::decision::tests::test_helpers::create_kyc_user_and_wf;
+    use crate::decision::tests::test_helpers::FixtureData;
     use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
     use crate::decision::vendor::vendor_api::vendor_api_struct::*;
     use crate::decision::vendor::verification_result::encrypt_verification_result_response;
@@ -133,20 +123,16 @@ mod tests {
     use chrono::Utc;
     use db::models::decision_intent::DecisionIntent;
     use db::models::verification_request::NewVerificationRequestArgs;
-    use db::models::verification_result::{
-        NewVerificationResult,
-        VerificationResult,
-    };
+    use db::models::verification_result::NewVerificationResult;
+    use db::models::verification_result::VerificationResult;
     use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use idv::test_fixtures::DocTestOpts;
     use macros::test_state_case;
-    use newtypes::{
-        DecisionIntentId,
-        DecisionIntentKind,
-        ScopedVaultId,
-        VendorAPI,
-        WorkflowId,
-    };
+    use newtypes::DecisionIntentId;
+    use newtypes::DecisionIntentKind;
+    use newtypes::ScopedVaultId;
+    use newtypes::VendorAPI;
+    use newtypes::WorkflowId;
 
     #[test_state_case(VendorAPI::ExperianPreciseId)]
     #[test_state_case(VendorAPI::IncodeApproveSession)]

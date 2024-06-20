@@ -1,30 +1,22 @@
-use crate::{
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::stytch_fingerprint_event;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    ScopedVaultId,
-    SessionId,
-    StytchBrowserFingerprint,
-    StytchBrowserId,
-    StytchFingerprintEventId,
-    StytchHardwareFingerprint,
-    StytchNetworkFingerprint,
-    StytchVisitorFingerprint,
-    StytchVisitorId,
-    VaultId,
-    VerificationResultId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::ScopedVaultId;
+use newtypes::SessionId;
+use newtypes::StytchBrowserFingerprint;
+use newtypes::StytchBrowserId;
+use newtypes::StytchFingerprintEventId;
+use newtypes::StytchHardwareFingerprint;
+use newtypes::StytchNetworkFingerprint;
+use newtypes::StytchVisitorFingerprint;
+use newtypes::StytchVisitorId;
+use newtypes::VaultId;
+use newtypes::VerificationResultId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = stytch_fingerprint_event)]

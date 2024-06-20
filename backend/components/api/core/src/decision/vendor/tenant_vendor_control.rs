@@ -5,31 +5,25 @@ use crate::utils;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
-use db::{
-    DbPool,
-    DbResult,
-};
+use db::DbPool;
+use db::DbResult;
 use idv::experian::ExperianCrossCoreRequest;
 use idv::idology::pa::IdologyPaRequest;
 use idv::idology::IdologyExpectIDRequest;
-use newtypes::vendor_credentials::{
-    ExperianCredentialBuilder,
-    ExperianCredentials,
-    IdologyCredentials,
-    IncodeCredentials,
-    LexisCredentials,
-    MiddeskCredentials,
-    NeuroIdApiKeys,
-    SambaSafetyCredentials,
-};
-use newtypes::{
-    IdvData,
-    IncodeEnvironment,
-    PiiString,
-    TenantId,
-    Vendor,
-    VendorAPI,
-};
+use newtypes::vendor_credentials::ExperianCredentialBuilder;
+use newtypes::vendor_credentials::ExperianCredentials;
+use newtypes::vendor_credentials::IdologyCredentials;
+use newtypes::vendor_credentials::IncodeCredentials;
+use newtypes::vendor_credentials::LexisCredentials;
+use newtypes::vendor_credentials::MiddeskCredentials;
+use newtypes::vendor_credentials::NeuroIdApiKeys;
+use newtypes::vendor_credentials::SambaSafetyCredentials;
+use newtypes::IdvData;
+use newtypes::IncodeEnvironment;
+use newtypes::PiiString;
+use newtypes::TenantId;
+use newtypes::Vendor;
+use newtypes::VendorAPI;
 
 #[derive(Clone, Debug, Default)]
 /// A struct for adapting db::models::TenantVendorControl for use in the api crate

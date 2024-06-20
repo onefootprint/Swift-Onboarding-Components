@@ -1,23 +1,19 @@
 use crate::auth::user::UserAuthScope;
-use crate::{
-    decision,
-    State,
-};
+use crate::decision;
+use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::document::meta_headers::MetaHeaders;
 use api_core::types::ModernApiResult;
 use api_core::utils::file_upload::handle_file_upload;
-use newtypes::{
-    DocumentId,
-    DocumentSide,
-    WorkflowGuard,
-};
+use newtypes::DocumentId;
+use newtypes::DocumentSide;
+use newtypes::WorkflowGuard;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 const MIN_DOCUMENT_SIZE_IN_BYTES: usize = 100;

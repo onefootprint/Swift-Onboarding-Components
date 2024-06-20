@@ -1,14 +1,10 @@
-use crate::decision::rule_engine::eval::{
-    HasRule,
-    IsActionAllowed,
-    RuleEvalConfig,
-};
-use newtypes::{
-    BooleanOperator,
-    FootprintReasonCode,
-    RuleExpression,
-    RuleExpressionCondition,
-};
+use crate::decision::rule_engine::eval::HasRule;
+use crate::decision::rule_engine::eval::IsActionAllowed;
+use crate::decision::rule_engine::eval::RuleEvalConfig;
+use newtypes::BooleanOperator;
+use newtypes::FootprintReasonCode;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
 use serde::Serialize;
 use serde_with::SerializeDisplay;
 use strum::Display;

@@ -1,30 +1,24 @@
-use crate::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::tests::fixtures;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{
-    DataIdentifier,
-    IdentityDataKind as IDK,
-    KycState,
-    Locked,
-    OnboardingStatus,
-    PiiString,
-    TenantId,
-    VaultKind,
-    WorkflowState,
-};
+use newtypes::DataIdentifier;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::KycState;
+use newtypes::Locked;
+use newtypes::OnboardingStatus;
+use newtypes::PiiString;
+use newtypes::TenantId;
+use newtypes::VaultKind;
+use newtypes::WorkflowState;
 use rand::Rng;
 
 // Start of fixtures utils for setting up common sets of data (eg: make a user + onboarding + fill

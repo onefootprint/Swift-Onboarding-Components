@@ -1,8 +1,6 @@
 use crate::errors::ApiResult;
-use db::models::document::{
-    Document,
-    DocumentImageArgs,
-};
+use db::models::document::Document;
+use db::models::document::DocumentImageArgs;
 use db::models::document_upload::DocumentUpload;
 use db::TxnPgConn;
 use itertools::Itertools;

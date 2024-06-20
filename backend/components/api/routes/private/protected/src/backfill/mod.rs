@@ -1,8 +1,6 @@
 use actix_web::web;
-use std::hash::{
-    DefaultHasher,
-    Hasher,
-};
+use std::hash::DefaultHasher;
+use std::hash::Hasher;
 
 #[derive(serde::Deserialize)]
 #[allow(unused)]

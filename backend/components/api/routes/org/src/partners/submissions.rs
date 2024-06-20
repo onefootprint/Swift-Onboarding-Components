@@ -1,12 +1,8 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::State;
 use chrono::Utc;
@@ -14,15 +10,13 @@ use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::ComplianceDocRequest;
 use db::models::compliance_doc_submission::NewComplianceDocSubmission;
 use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
-use newtypes::{
-    ComplianceDocData,
-    ComplianceDocRequestId,
-    TenantCompliancePartnershipId,
-};
+use newtypes::ComplianceDocData;
+use newtypes::ComplianceDocRequestId;
+use newtypes::TenantCompliancePartnershipId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

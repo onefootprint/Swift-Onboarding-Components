@@ -1,15 +1,11 @@
-use byteorder::{
-    BigEndian,
-    ByteOrder,
-    WriteBytesExt,
-};
+use byteorder::BigEndian;
+use byteorder::ByteOrder;
+use byteorder::WriteBytesExt;
 use serde::Serialize;
 use std::fmt::Debug;
 use thiserror::Error;
-use tokio::io::{
-    AsyncRead,
-    AsyncReadExt,
-};
+use tokio::io::AsyncRead;
+use tokio::io::AsyncReadExt;
 
 mod request;
 mod response;

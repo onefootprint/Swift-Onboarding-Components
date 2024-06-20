@@ -1,20 +1,14 @@
-use super::{
-    VendorAPICall,
-    VendorAPIResponse,
-};
+use super::VendorAPICall;
+use super::VendorAPIResponse;
 use async_trait::async_trait;
 use idv::middesk::client::MiddeskClient;
-use idv::middesk::{
-    MiddeskCreateBusinessRequest,
-    MiddeskCreateBusinessResponse,
-    MiddeskGetBusinessRequest,
-    MiddeskGetBusinessResponse,
-};
+use idv::middesk::MiddeskCreateBusinessRequest;
+use idv::middesk::MiddeskCreateBusinessResponse;
+use idv::middesk::MiddeskGetBusinessRequest;
+use idv::middesk::MiddeskGetBusinessResponse;
 use idv::ParsedResponse;
-use newtypes::{
-    PiiJsonValue,
-    VendorAPI,
-};
+use newtypes::PiiJsonValue;
+use newtypes::VendorAPI;
 
 //////////////////////
 /// Middesk impl

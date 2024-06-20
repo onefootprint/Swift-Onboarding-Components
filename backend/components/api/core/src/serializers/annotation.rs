@@ -1,9 +1,7 @@
 use crate::utils::db2api::DbToApi;
 use api_wire_types::Actor;
-use db::models::annotation::{
-    Annotation,
-    AnnotationInfo,
-};
+use db::models::annotation::Annotation;
+use db::models::annotation::AnnotationInfo;
 
 impl DbToApi<AnnotationInfo> for api_wire_types::Annotation {
     fn from_db((annotation, actor): AnnotationInfo) -> Self {

@@ -4,36 +4,28 @@ use crate::decision::{
     self,
 };
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Person,
-    VaultWrapper,
-    VwArgs,
-};
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
-use chrono::{
-    Duration,
-    Utc,
-};
+use chrono::Duration;
+use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
-use db::models::verification_request::{
-    RequestAndResult,
-    VerificationRequest,
-};
+use db::models::verification_request::RequestAndResult;
+use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::DbResult;
 use idv::ParsedResponse;
-use newtypes::{
-    DataIdentifier as DI,
-    DecisionIntentId,
-    EncryptedVaultPrivateKey,
-    IdentityDataKind as IDK,
-    IncodeWatchlistResultRef,
-    PiiString,
-    ScopedVaultId,
-    VendorAPI,
-};
+use newtypes::DataIdentifier as DI;
+use newtypes::DecisionIntentId;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::IncodeWatchlistResultRef;
+use newtypes::PiiString;
+use newtypes::ScopedVaultId;
+use newtypes::VendorAPI;
 
 pub async fn complete_vendor_call(
     state: &State,

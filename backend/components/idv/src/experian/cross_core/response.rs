@@ -1,17 +1,13 @@
 use super::error_code::ErrorCode;
-use crate::experian::error::{
-    CrossCoreResponseError,
-    Error,
-};
+use crate::experian::error::CrossCoreResponseError;
+use crate::experian::error::Error;
 use crate::experian::precise_id::response::PreciseIDAPIResponse;
-use newtypes::{
-    ExperianAddressAndNameMatchReasonCodes,
-    ExperianDobMatchReasonCodes,
-    ExperianFraudShieldCodes,
-    ExperianPhoneMatchReasonCodes,
-    ExperianSSNReasonCodes,
-    ExperianWatchlistReasonCodes,
-};
+use newtypes::ExperianAddressAndNameMatchReasonCodes;
+use newtypes::ExperianDobMatchReasonCodes;
+use newtypes::ExperianFraudShieldCodes;
+use newtypes::ExperianPhoneMatchReasonCodes;
+use newtypes::ExperianSSNReasonCodes;
+use newtypes::ExperianWatchlistReasonCodes;
 use std::str::FromStr;
 
 pub fn parse_response(response: serde_json::Value) -> Result<CrossCoreAPIResponse, Error> {
@@ -323,11 +319,9 @@ pub struct CCErrorResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_fixtures::{
-        cross_core_response_with_error,
-        cross_core_response_with_fraud_shield_codes,
-        experian_cross_core_response,
-    };
+    use crate::test_fixtures::cross_core_response_with_error;
+    use crate::test_fixtures::cross_core_response_with_fraud_shield_codes;
+    use crate::test_fixtures::experian_cross_core_response;
     use crate::tests::assert_have_same_elements;
     use newtypes::ExperianFraudShieldCodes;
 

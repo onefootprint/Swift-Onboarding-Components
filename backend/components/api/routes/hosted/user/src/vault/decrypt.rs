@@ -3,25 +3,21 @@ use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::UserAuthContext;
-use api_core::auth::{
-    Any,
-    CanDecrypt,
-};
+use api_core::auth::Any;
+use api_core::auth::CanDecrypt;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::DecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
-    Apiv2Schema,
 };
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct UserDecryptRequest {

@@ -1,26 +1,16 @@
 use super::super::api_schema_helper::string_api_data_type_alias;
-use crate::{
-    Base64Data,
-    PiiBytes,
-};
+use crate::Base64Data;
+use crate::PiiBytes;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
+use serde::Deserialize;
+use serde::Serialize;
 use std::convert::Infallible;
-use std::fmt::{
-    Debug,
-    Display,
-};
-use std::str::{
-    FromStr,
-    Utf8Error,
-};
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::str::FromStr;
+use std::str::Utf8Error;
 
 /// Represents a string that hides PII
 #[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, AsExpression, FromSqlRow)]

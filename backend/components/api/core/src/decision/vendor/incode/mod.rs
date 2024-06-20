@@ -10,12 +10,10 @@ use crate::errors::ApiResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::output::Csv;
-use newtypes::{
-    IdDocKind,
-    IncodeConfigurationId,
-    Iso3166TwoDigitCountryCode,
-    TenantId,
-};
+use newtypes::IdDocKind;
+use newtypes::IncodeConfigurationId;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::TenantId;
 pub use state_machine::*;
 
 // TEMP: will get this into State + TVC properly

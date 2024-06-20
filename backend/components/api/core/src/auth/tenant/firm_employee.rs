@@ -1,20 +1,14 @@
-use crate::auth::session::{
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
-use crate::auth::{
-    AuthError,
-    SessionContext,
-};
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
+use crate::auth::AuthError;
+use crate::auth::SessionContext;
 use crate::errors::ApiResult;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
 use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;

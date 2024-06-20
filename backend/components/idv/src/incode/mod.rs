@@ -1,13 +1,11 @@
 use self::request::OnboardingStartCustomNameFields;
 use itertools::Either;
 use newtypes::vendor_credentials::IncodeCredentials;
-use newtypes::{
-    IncodeConfigurationId,
-    IncodeFailureReason,
-    IncodeSessionId,
-    PiiJsonValue,
-    ScrubbedPiiJsonValue,
-};
+use newtypes::IncodeConfigurationId;
+use newtypes::IncodeFailureReason;
+use newtypes::IncodeSessionId;
+use newtypes::PiiJsonValue;
+use newtypes::ScrubbedPiiJsonValue;
 use serde::de::DeserializeOwned;
 
 pub mod client;

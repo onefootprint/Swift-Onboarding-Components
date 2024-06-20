@@ -1,26 +1,18 @@
 use crate::auth::custodian::CustodianAuthContext;
-use crate::types::{
-    ModernApiResult,
-    StringResponse,
-};
+use crate::types::ModernApiResult;
+use crate::types::StringResponse;
 use crate::State;
 use actix_web::cookie::time::Instant;
 use api_core::errors::AssertionError;
-use newtypes::{
-    EncryptedVaultPrivateKey,
-    SealedVaultBytes,
-};
-use paperclip::actix::{
-    api_v2_errors,
-    api_v2_operation,
-    get,
-    web,
-    Apiv2Response,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::SealedVaultBytes;
+use paperclip::actix::api_v2_errors;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Response;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[api_v2_operation(tags(Private), description = "Returns 200 if the API server is running")]
 #[get("/health")]

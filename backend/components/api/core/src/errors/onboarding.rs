@@ -1,13 +1,11 @@
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{
-    CollectedDataOption,
-    IdDocKind,
-    Iso3166TwoDigitCountryCode,
-    ObConfigurationKind,
-    OnboardingRequirement,
-    WorkflowId,
-};
+use newtypes::CollectedDataOption;
+use newtypes::IdDocKind;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ObConfigurationKind;
+use newtypes::OnboardingRequirement;
+use newtypes::WorkflowId;
 use std::fmt::Display;
 use thiserror::Error;
 

@@ -1,19 +1,15 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_android_app_meta::TenantAndroidAppMeta;
 use newtypes::TenantAndroidAppMetaId;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Decrypts a specific android app metadata entry",

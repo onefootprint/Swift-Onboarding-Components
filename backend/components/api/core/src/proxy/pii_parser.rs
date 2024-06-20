@@ -1,9 +1,7 @@
 //! Parses PII on the INGRESS for vaulting/tokenization
 
-use super::config::{
-    IngressConfig,
-    IngressContentType,
-};
+use super::config::IngressConfig;
+use super::config::IngressContentType;
 use super::net_client::ProxyResponse;
 use crate::errors::proxy::VaultProxyError;
 use crate::proxy::IngressRule;

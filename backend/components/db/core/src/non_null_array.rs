@@ -1,7 +1,5 @@
-use diesel::sql_types::{
-    Array,
-    Nullable,
-};
+use diesel::sql_types::Array;
+use diesel::sql_types::Nullable;
 use diesel::Queryable;
 
 /// In postgres, all Array fields can have null values.

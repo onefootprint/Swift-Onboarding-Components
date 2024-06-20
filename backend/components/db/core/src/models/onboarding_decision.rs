@@ -1,50 +1,38 @@
-use super::manual_review::{
-    ManualReview,
-    ManualReviewArgs,
-};
+use super::manual_review::ManualReview;
+use super::manual_review::ManualReviewArgs;
 use super::ob_configuration::ObConfiguration;
 use super::user_timeline::UserTimeline;
+use crate::actor;
 use crate::actor::SaturatedActor;
 use crate::models::workflow::Workflow;
-use crate::{
-    actor,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    manual_review,
-    onboarding_decision,
-    onboarding_decision_verification_result_junction,
-    scoped_vault,
-    workflow,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::manual_review;
+use db_schema::schema::onboarding_decision;
+use db_schema::schema::onboarding_decision_verification_result_junction;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::workflow;
 use diesel::dsl::not;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    AnnotationId,
-    DataLifetimeSeqno,
-    DbActor,
-    DecisionStatus,
-    FpId,
-    OnboardingDecisionId,
-    OnboardingDecisionInfo,
-    RuleSetResultId,
-    ScopedVaultId,
-    TenantId,
-    VaultId,
-    VerificationResultId,
-    WorkflowId,
-};
+use newtypes::AnnotationId;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
+use newtypes::DecisionStatus;
+use newtypes::FpId;
+use newtypes::OnboardingDecisionId;
+use newtypes::OnboardingDecisionInfo;
+use newtypes::RuleSetResultId;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::VaultId;
+use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 pub type FailedForDocReview = bool;
@@ -177,10 +165,8 @@ impl OnboardingDecision {
         conn: &mut PgConn,
         ids: Vec<&OnboardingDecisionId>,
     ) -> DbResult<HashMap<OnboardingDecisionId, SaturatedOnboardingDecisionInfo>> {
-        use db_schema::schema::{
-            ob_configuration,
-            workflow,
-        };
+        use db_schema::schema::ob_configuration;
+        use db_schema::schema::workflow;
         let results: Vec<(Self, (Workflow, ObConfiguration))> = onboarding_decision::table
             .inner_join(workflow::table.inner_join(ob_configuration::table))
             .filter(onboarding_decision::id.eq_any(ids.clone()))

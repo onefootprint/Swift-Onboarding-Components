@@ -1,37 +1,29 @@
-use super::data_lifetime::{
-    DataLifetime,
-    NewDataLifetimeArgs,
-};
+use super::data_lifetime::DataLifetime;
+use super::data_lifetime::NewDataLifetimeArgs;
 use crate::errors::AssertionError;
-use crate::{
-    DbError,
-    DbResult,
-    HasLifetime,
-    PgConn,
-    TxnPgConn,
-    VaultedData,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::HasLifetime;
+use crate::PgConn;
+use crate::TxnPgConn;
+use crate::VaultedData;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::vault_data;
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeId,
-    DataLifetimeSeqno,
-    DataLifetimeSource,
-    DbActor,
-    PiiString,
-    ScopedVaultId,
-    SealedVaultBytes,
-    StorageType,
-    VaultDataFormat,
-    VaultId,
-    VdId,
-};
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
+use newtypes::DbActor;
+use newtypes::PiiString;
+use newtypes::ScopedVaultId;
+use newtypes::SealedVaultBytes;
+use newtypes::StorageType;
+use newtypes::VaultDataFormat;
+use newtypes::VaultId;
+use newtypes::VdId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]

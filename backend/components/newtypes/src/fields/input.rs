@@ -1,17 +1,15 @@
 use crate::api_schema_helper::string_api_data_type_alias;
-use crate::{
-    AuditEventName,
-    DataIdentifier,
-    ObConfigurationKind,
-    TenantRoleId,
-    TenantScope,
-};
+use crate::AuditEventName;
+use crate::DataIdentifier;
+use crate::ObConfigurationKind;
+use crate::TenantRoleId;
+use crate::TenantScope;
 use derive_more::Deref;
 use serde::de::value::StrDeserializer;
+use serde::de::DeserializeOwned;
+use serde::de::IntoDeserializer;
 use serde::de::{
     self,
-    DeserializeOwned,
-    IntoDeserializer,
 };
 use serde::Deserialize;
 
@@ -76,10 +74,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::Csv;
-    use crate::{
-        DataIdentifier,
-        IdentityDataKind as IDK,
-    };
+    use crate::DataIdentifier;
+    use crate::IdentityDataKind as IDK;
     #[test]
     fn test_data_kinds() {
         #[derive(serde::Deserialize)]

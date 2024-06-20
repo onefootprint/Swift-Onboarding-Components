@@ -1,28 +1,22 @@
 use super::actions::WorkflowActions;
+use super::StateError;
+use super::WorkflowKind;
 // These are needed for enum_dispatch to work properly
 use super::{
     document::*,
     kyb::*,
     kyc::*,
 };
-use super::{
-    StateError,
-    WorkflowKind,
-};
 use crate::errors::ApiResult;
-use crate::{
-    task,
-    State,
-};
+use crate::task;
+use crate::State;
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::TxnPgConn;
 use enum_dispatch::enum_dispatch;
-use newtypes::{
-    Locked,
-    WorkflowId,
-    WorkflowSource,
-};
+use newtypes::Locked;
+use newtypes::WorkflowId;
+use newtypes::WorkflowSource;
 
 #[enum_dispatch]
 /// Provides basic functionality that all WorkflowStates should have

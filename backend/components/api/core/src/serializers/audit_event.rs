@@ -1,22 +1,14 @@
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
-use crate::utils::db2api::{
-    DbToApi,
-    TryDbToApi,
-};
-use api_wire_types::{
-    Actor,
-    AuditEvent,
-    AuditEventDetail,
-    InsightEvent,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::db2api::DbToApi;
+use crate::utils::db2api::TryDbToApi;
+use api_wire_types::Actor;
+use api_wire_types::AuditEvent;
+use api_wire_types::AuditEventDetail;
+use api_wire_types::InsightEvent;
 use db::models::audit_event::JoinedAuditEvent;
-use newtypes::{
-    AuditEventMetadata,
-    AuditEventName,
-};
+use newtypes::AuditEventMetadata;
+use newtypes::AuditEventName;
 
 impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
     fn try_from_db(event: JoinedAuditEvent) -> ApiResult<Self> {

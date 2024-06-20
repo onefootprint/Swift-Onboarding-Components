@@ -3,38 +3,28 @@ use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
-use db::models::manual_review::{
-    ManualReviewAction,
-    ManualReviewArgs,
-};
+use db::models::manual_review::ManualReviewAction;
+use db::models::manual_review::ManualReviewArgs;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding_decision::{
-    FailedForDocReview,
-    NewDecisionArgs,
-};
+use db::models::onboarding_decision::FailedForDocReview;
+use db::models::onboarding_decision::NewDecisionArgs;
 use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::TxnPgConn;
-use itertools::{
-    chain,
-    Itertools,
-};
-use newtypes::{
-    DbActor,
-    DecisionStatus,
-    DocumentRequestConfig,
-    DocumentReviewStatus,
-    ManualReviewKind,
-    OnboardingStatus,
-    ReviewReason,
-    RuleSetResultId,
-    VerificationResultId,
-    WorkflowId,
-    WorkflowSource,
-};
+use itertools::chain;
+use itertools::Itertools;
+use newtypes::DbActor;
+use newtypes::DecisionStatus;
+use newtypes::DocumentRequestConfig;
+use newtypes::DocumentReviewStatus;
+use newtypes::ManualReviewKind;
+use newtypes::OnboardingStatus;
+use newtypes::ReviewReason;
+use newtypes::RuleSetResultId;
+use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
+use newtypes::WorkflowSource;
 
 /// Create our final decision from the features we created, set final onboarding status, and emit
 /// risk signals assert_is_first_decision_for_onboarding determines if an error should be thrown if
@@ -145,11 +135,9 @@ fn get_final_decision_status(
 mod test {
     use super::get_final_decision_status;
     use crate::decision::onboarding::Decision;
-    use newtypes::{
-        DecisionStatus,
-        OnboardingStatus,
-        RuleAction,
-    };
+    use newtypes::DecisionStatus;
+    use newtypes::OnboardingStatus;
+    use newtypes::RuleAction;
     use test_case::test_case;
 
     fn rules_executed(action: Option<RuleAction>) -> Decision {

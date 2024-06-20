@@ -17,12 +17,10 @@ pub mod kyc;
 pub mod test_utils;
 pub mod traits;
 
-use traits::{
-    DoAction,
-    OnAction,
-    Workflow,
-    WorkflowState,
-};
+use traits::DoAction;
+use traits::OnAction;
+use traits::Workflow;
+use traits::WorkflowState;
 
 #[derive(Debug, Error)]
 pub enum StateError {

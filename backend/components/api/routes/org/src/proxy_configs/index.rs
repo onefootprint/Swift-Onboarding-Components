@@ -1,34 +1,26 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::proxy::VaultProxyError;
 use api_core::proxy::ssrf_protection::validate_safe_url;
-use api_core::types::{
-    JsonApiListResponse,
-    ModernApiResult,
-};
+use api_core::types::JsonApiListResponse;
+use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
-use api_wire_types::{
-    CreateProxyConfigRequest,
-    GetProxyConfigRequest,
-    PatchProxyConfigRequest,
-};
-use db::models::proxy_config::{
-    NewProxyConfigArgs,
-    ProxyConfig,
-    ProxyConfigFilters,
-    UpdateProxyConfigArgs,
-};
+use api_wire_types::CreateProxyConfigRequest;
+use api_wire_types::GetProxyConfigRequest;
+use api_wire_types::PatchProxyConfigRequest;
+use db::models::proxy_config::NewProxyConfigArgs;
+use db::models::proxy_config::ProxyConfig;
+use db::models::proxy_config::ProxyConfigFilters;
+use db::models::proxy_config::UpdateProxyConfigArgs;
 use db::DbError;
 use newtypes::ProxyConfigId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 use std::str::FromStr;
 

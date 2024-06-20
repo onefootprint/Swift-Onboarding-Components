@@ -1,23 +1,15 @@
-use crate::{
-    DocumentRequestKind,
-    DocumentSide,
-    OcrDataKind as ODK,
-};
+use crate::DocumentRequestKind;
+use crate::DocumentSide;
+use crate::OcrDataKind as ODK;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum_macros::{
-    Display,
-    EnumIter,
-    EnumString,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum_macros::Display;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

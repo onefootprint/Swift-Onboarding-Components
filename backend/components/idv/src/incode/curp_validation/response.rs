@@ -1,10 +1,8 @@
 use crate::incode::IncodeClientErrorCustomFailureReasons;
-use newtypes::{
-    IncodeFailureReason,
-    PiiString,
-    ScrubbedPiiJsonValue,
-    ScrubbedPiiString,
-};
+use newtypes::IncodeFailureReason;
+use newtypes::PiiString;
+use newtypes::ScrubbedPiiJsonValue;
+use newtypes::ScrubbedPiiString;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -188,10 +186,8 @@ impl IncodeClientErrorCustomFailureReasons for CurpValidationResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        CurpValidationResponse,
-        RenapoError,
-    };
+    use super::CurpValidationResponse;
+    use super::RenapoError;
     use crate::test_fixtures;
     use test_case::test_case;
 

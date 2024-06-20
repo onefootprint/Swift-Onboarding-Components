@@ -1,10 +1,8 @@
 use crate::*;
-use newtypes::{
-    ExternalId,
-    FpId,
-    OnboardingStatus,
-    SandboxId,
-};
+use newtypes::ExternalId;
+use newtypes::FpId;
+use newtypes::OnboardingStatus;
+use newtypes::SandboxId;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct LiteUser {

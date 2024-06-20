@@ -1,7 +1,5 @@
-use crate::{
-    FootprintReasonCode,
-    MatchLevel,
-};
+use crate::FootprintReasonCode;
+use crate::MatchLevel;
 use itertools::Itertools;
 use strum::IntoEnumIterator;
 

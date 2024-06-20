@@ -1,27 +1,19 @@
-use super::{
-    DocumentState,
-    MakeDecision,
-};
+use super::DocumentState;
+use super::MakeDecision;
 use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
 use crate::decision::onboarding::Decision;
 use crate::decision::risk;
-use crate::decision::state::actions::{
-    DocCollected,
-    WorkflowActions,
-};
-use crate::decision::state::{
-    OnAction,
-    WorkflowState,
-};
+use crate::decision::state::actions::DocCollected;
+use crate::decision::state::actions::WorkflowActions;
+use crate::decision::state::OnAction;
+use crate::decision::state::WorkflowState;
 use crate::errors::ApiResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
-use newtypes::{
-    DocumentConfig,
-    Locked,
-    ScopedVaultId,
-};
+use newtypes::DocumentConfig;
+use newtypes::Locked;
+use newtypes::ScopedVaultId;
 
 ///
 /// States

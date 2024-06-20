@@ -1,31 +1,23 @@
-use crate::{
-    AliasId,
-    CollectedData,
-    DataIdentifier,
-    DocumentSide,
-    IdDocKind,
-    IsDataIdentifierDiscriminant,
-    StorageType,
-};
+use crate::AliasId;
+use crate::CollectedData;
+use crate::DataIdentifier;
+use crate::DocumentSide;
+use crate::IdDocKind;
+use crate::IsDataIdentifierDiscriminant;
+use crate::StorageType;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use itertools::Itertools;
 use mime::Mime;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use strum::IntoEnumIterator;
-use strum_macros::{
-    AsRefStr,
-    Display,
-    EnumDiscriminants,
-    EnumIter,
-    EnumString,
-};
+use strum_macros::AsRefStr;
+use strum_macros::Display;
+use strum_macros::EnumDiscriminants;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 #[derive(
     Debug,
     Clone,

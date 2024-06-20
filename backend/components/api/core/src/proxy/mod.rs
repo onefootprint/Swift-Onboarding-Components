@@ -6,18 +6,14 @@ pub mod ssrf_protection;
 pub mod token_parser;
 pub mod tokenize;
 pub use self::config::ingress_rule::IngressRule;
-use enclave_proxy::{
-    DataTransform,
-    DataTransforms,
-};
-use newtypes::{
-    CountArgs,
-    DateFormatArgs,
-    EncryptArgs,
-    FilterFunction,
-    HmacSha256Args,
-    ReplaceArgs,
-};
+use enclave_proxy::DataTransform;
+use enclave_proxy::DataTransforms;
+use newtypes::CountArgs;
+use newtypes::DateFormatArgs;
+use newtypes::EncryptArgs;
+use newtypes::FilterFunction;
+use newtypes::HmacSha256Args;
+use newtypes::ReplaceArgs;
 
 pub fn to_data_transforms(transforms: &[FilterFunction]) -> Vec<DataTransform> {
     transforms.iter().map(filter_function_to_transform).collect()

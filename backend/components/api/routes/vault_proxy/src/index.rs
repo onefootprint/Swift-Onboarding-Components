@@ -1,44 +1,30 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::proxy;
 use crate::proxy::config::ProxyConfig;
+use crate::proxy::net_client;
+use crate::proxy::pii_parser;
 use crate::proxy::pii_parser::TokenizedIngress;
 use crate::proxy::token_parser::ProxyTokenParser;
-use crate::proxy::{
-    net_client,
-    pii_parser,
-    tokenize,
-};
+use crate::proxy::tokenize;
 use crate::utils::headers::InsightHeaders;
-use crate::{
-    proxy,
-    ModernApiResult,
-    State,
-};
+use crate::ModernApiResult;
+use crate::State;
 use api_core::auth::tenant::TenantAuth;
-use api_core::proxy::config::{
-    JitProxyHeaderParams,
-    ProxyHeaderParams,
-};
+use api_core::proxy::config::JitProxyHeaderParams;
+use api_core::proxy::config::ProxyHeaderParams;
 use api_core::telemetry::RootSpan;
 use api_core::utils::body_bytes::BodyBytes;
 use api_core::ApiErrorKind;
-use newtypes::{
-    AccessEventPurpose,
-    InvokeVaultProxyPermission,
-    PreviewApi,
-    ProxyConfigId,
-};
-use paperclip::actix::web::{
-    HttpRequest,
-    HttpResponse,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::AccessEventPurpose;
+use newtypes::InvokeVaultProxyPermission;
+use newtypes::PreviewApi;
+use newtypes::ProxyConfigId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
+use paperclip::actix::web::HttpRequest;
+use paperclip::actix::web::HttpResponse;
 use reqwest::StatusCode;
 
 /// Limit the body payload to 5MB

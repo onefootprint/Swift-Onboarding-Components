@@ -1,23 +1,15 @@
 use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::ApiError;
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
-use crypto::aead::{
-    AeadSealedBytes,
-    ScopedSealingKey,
-};
-use newtypes::{
-    Base64Data,
-    ChallengeToken,
-};
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
+use crypto::aead::AeadSealedBytes;
+use crypto::aead::ScopedSealingKey;
+use newtypes::Base64Data;
+use newtypes::ChallengeToken;
 use serde::de::DeserializeOwned;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

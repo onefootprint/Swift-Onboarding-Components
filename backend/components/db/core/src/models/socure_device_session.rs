@@ -1,19 +1,13 @@
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::socure_device_session;
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::{
-    SocureDeviceSessionId,
-    WorkflowId,
-};
+use newtypes::SocureDeviceSessionId;
+use newtypes::WorkflowId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = socure_device_session)]

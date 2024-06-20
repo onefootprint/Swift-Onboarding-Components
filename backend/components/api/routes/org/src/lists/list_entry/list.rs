@@ -1,31 +1,23 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
-use api_core::{
-    ApiError,
-    State,
-};
-use crypto::aead::{
-    AeadSealedBytes,
-    SealingKey,
-};
+use api_core::ApiError;
+use api_core::State;
+use crypto::aead::AeadSealedBytes;
+use crypto::aead::SealingKey;
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::tenant::Tenant;
-use newtypes::{
-    ListId,
-    PiiBytes,
-    PiiString,
-};
+use newtypes::ListId;
+use newtypes::PiiBytes;
+use newtypes::PiiString;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

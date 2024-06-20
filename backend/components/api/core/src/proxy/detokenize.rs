@@ -1,28 +1,22 @@
 use crate::auth::tenant::TenantAuth;
 use crate::errors::tenant::TenantError;
-use crate::errors::{
-    ApiResult,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use crate::utils::headers::InsightHeaders;
-use crate::utils::vault_wrapper::{
-    bulk_decrypt,
-    BulkDecryptReq,
-    DecryptAccessEventInfo,
-    EnclaveDecryptOperation,
-    TenantVw,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::bulk_decrypt;
+use crate::utils::vault_wrapper::BulkDecryptReq;
+use crate::utils::vault_wrapper::DecryptAccessEventInfo;
+use crate::utils::vault_wrapper::EnclaveDecryptOperation;
+use crate::utils::vault_wrapper::TenantVw;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
-use newtypes::{
-    AccessEventPurpose,
-    FpId,
-    PiiString,
-    ProxyToken,
-};
+use newtypes::AccessEventPurpose;
+use newtypes::FpId;
+use newtypes::PiiString;
+use newtypes::ProxyToken;
 use std::collections::HashMap;
 
 const MAX_NUM_FP_IDS_PER_BATCH: usize = 5_000;

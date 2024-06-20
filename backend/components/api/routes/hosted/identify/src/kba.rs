@@ -1,32 +1,24 @@
 use crate::State;
-use api_core::auth::session::user::{
-    NewUserSessionContext,
-    TokenCreationPurpose,
-};
+use api_core::auth::session::user::NewUserSessionContext;
+use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
-use api_core::utils::vault_wrapper::{
-    VaultWrapper,
-    VwArgs,
-};
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::KbaResponse;
 use itertools::Itertools;
 use newtypes::put_data_request::RawDataRequest;
-use newtypes::{
-    DataIdentifier,
-    IdentityDataKind as IDK,
-    ValidateArgs,
-};
+use newtypes::DataIdentifier;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::ValidateArgs;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

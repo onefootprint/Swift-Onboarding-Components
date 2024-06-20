@@ -1,12 +1,10 @@
 use crate::email::Email;
 use crate::ssn::Ssn9;
-use crate::{
-    Error,
-    ListKind,
-    NtResult,
-    PhoneNumber,
-    PiiString,
-};
+use crate::Error;
+use crate::ListKind;
+use crate::NtResult;
+use crate::PhoneNumber;
+use crate::PiiString;
 use email_address::EmailAddress;
 use phonenumber::metadata::DATABASE as PHONE_DB;
 use std::net::IpAddr;

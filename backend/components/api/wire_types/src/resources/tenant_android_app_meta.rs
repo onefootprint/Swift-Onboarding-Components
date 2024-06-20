@@ -1,8 +1,6 @@
 use crate::*;
-use newtypes::{
-    TenantAndroidAppMetaId,
-    TenantId,
-};
+use newtypes::TenantAndroidAppMetaId;
+use newtypes::TenantId;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]

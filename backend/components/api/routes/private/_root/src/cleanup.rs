@@ -1,31 +1,21 @@
-use actix_web::{
-    post,
-    web,
-};
+use actix_web::post;
+use actix_web::web;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::Either;
-use api_core::errors::{
-    ApiError,
-    ApiResult,
-    AssertionError,
-};
+use api_core::errors::ApiError;
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_core::utils::headers::SandboxId;
-use api_core::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-};
-use api_core::{
-    ApiErrorKind,
-    State,
-};
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::ApiErrorKind;
+use api_core::State;
 use api_wire_types::IdentifyId;
 use db::errors::OptionalExtension;
-use db::models::scoped_vault::{
-    ScopedVault,
-    ScopedVaultIdentifier,
-};
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;

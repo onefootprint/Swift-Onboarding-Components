@@ -1,40 +1,26 @@
-use super::{
-    IncodeStateTransition,
-    ProcessId,
-    VerificationSession,
-};
-use crate::decision::vendor::incode::state::{
-    IncodeState,
-    TransitionResult,
-};
+use super::IncodeStateTransition;
+use super::ProcessId;
+use super::VerificationSession;
+use crate::decision::vendor::incode::state::IncodeState;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
-use db::models::document::{
-    Document,
-    DocumentUpdate,
-};
+use db::models::document::Document;
+use db::models::document::DocumentUpdate;
 use db::models::user_consent::UserConsent;
-use db::{
-    DbPool,
-    TxnPgConn,
-};
-use idv::incode::doc::{
-    IncodeAddMLConsentRequest,
-    IncodeAddPrivacyConsentRequest,
-};
-use newtypes::{
-    DocumentId,
-    DocumentReviewStatus,
-    DocumentStatus,
-    VendorAPI,
-};
+use db::DbPool;
+use db::TxnPgConn;
+use idv::incode::doc::IncodeAddMLConsentRequest;
+use idv::incode::doc::IncodeAddPrivacyConsentRequest;
+use newtypes::DocumentId;
+use newtypes::DocumentReviewStatus;
+use newtypes::DocumentStatus;
+use newtypes::VendorAPI;
 
 /// Add Consent
 pub struct AddConsent {}

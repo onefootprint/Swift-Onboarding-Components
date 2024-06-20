@@ -1,11 +1,7 @@
-use crate::{
-    ProtectedAuth,
-    State,
-};
-use actix_web::{
-    patch,
-    web,
-};
+use crate::ProtectedAuth;
+use crate::State;
+use actix_web::patch;
+use actix_web::web;
 use api_core::decision::rule_engine;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;

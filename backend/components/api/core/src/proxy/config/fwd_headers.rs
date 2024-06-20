@@ -1,15 +1,11 @@
 use super::ProxyHeaderParams;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use actix_web::http::header::HeaderMap;
 use newtypes::PiiString;
-use reqwest::header::{
-    HeaderName,
-    HeaderValue,
-};
+use reqwest::header::HeaderName;
+use reqwest::header::HeaderValue;
 use std::str::FromStr;
 
 /// Parses out headers to forward along the egress

@@ -1,11 +1,9 @@
 use super::vault_wrapper::Any;
 use crate::auth::user::CheckUserWfAuthContext;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    DecryptUncheckedResult,
-    VaultWrapper,
-    VwArgs,
-};
+use crate::utils::vault_wrapper::DecryptUncheckedResult;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::document::Document;
@@ -15,40 +13,36 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
 use db::models::webauthn_credential::WebauthnCredential;
-use db::models::workflow::{
-    Workflow,
-    WorkflowIdentifier,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowIdentifier;
 use db::PgConn;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{
-    AlpacaKycState,
-    AuthorizeFields,
-    BusinessOwnerSource,
-    CollectDocumentConfig,
-    CollectedDataOption as CDO,
-    DataIdentifierDiscriminant as DID,
-    Declaration,
-    DocumentCdoInfo,
-    DocumentDiKind,
-    DocumentRequestConfig,
-    DocumentRequestKind,
-    DocumentStatus,
-    DocumentUploadMode,
-    IdentityDataKind as IDK,
-    InvestorProfileKind as IPK,
-    Iso3166TwoDigitCountryCode,
-    KycState,
-    LivenessSource,
-    OnboardingRequirement,
-    OnboardingRequirementKind,
-    ScopedVaultId,
-    Selfie,
-    UsLegalStatus,
-    VaultId,
-    WorkflowState,
-};
+use newtypes::AlpacaKycState;
+use newtypes::AuthorizeFields;
+use newtypes::BusinessOwnerSource;
+use newtypes::CollectDocumentConfig;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DataIdentifierDiscriminant as DID;
+use newtypes::Declaration;
+use newtypes::DocumentCdoInfo;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentRequestConfig;
+use newtypes::DocumentRequestKind;
+use newtypes::DocumentStatus;
+use newtypes::DocumentUploadMode;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::InvestorProfileKind as IPK;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::KycState;
+use newtypes::LivenessSource;
+use newtypes::OnboardingRequirement;
+use newtypes::OnboardingRequirementKind;
+use newtypes::ScopedVaultId;
+use newtypes::Selfie;
+use newtypes::UsLegalStatus;
+use newtypes::VaultId;
+use newtypes::WorkflowState;
 use std::str::FromStr;
 
 #[derive(Clone)]

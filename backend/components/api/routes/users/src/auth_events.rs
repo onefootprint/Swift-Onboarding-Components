@@ -1,27 +1,21 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    OffsetPaginatedResponse,
-    OffsetPaginationRequest,
-};
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::ModernApiResult;
 use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::OffsetPagination;
 use newtypes::PreviewApi;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
 
 #[api_v2_operation(description = "View a user's recent device insights", tags(Users, Preview))]
 #[get("/users/{fp_id}/auth_events")]

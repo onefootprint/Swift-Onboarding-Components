@@ -1,9 +1,7 @@
 use super::ProxyHeaderParams;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use actix_web::http::header::HeaderMap;
 use std::fmt::Debug;
 

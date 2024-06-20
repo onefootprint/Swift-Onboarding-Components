@@ -1,15 +1,11 @@
 use super::reason_code_helpers::AddressGrouping::*;
 use super::reason_code_helpers::NameGrouping::*;
 use super::reason_code_helpers::*;
+use crate::vendor_reason_codes_enum;
+use crate::FootprintReasonCode;
 use crate::MatchLevel::*;
-use crate::{
-    vendor_reason_codes_enum,
-    FootprintReasonCode,
-};
-use strum_macros::{
-    EnumIter,
-    EnumString,
-};
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 vendor_reason_codes_enum! {
     #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, EnumIter, Hash)]
@@ -287,10 +283,8 @@ vendor_reason_codes_enum! {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        ExperianPhoneMatchReasonCodes,
-        FootprintReasonCode,
-    };
+    use crate::ExperianPhoneMatchReasonCodes;
+    use crate::FootprintReasonCode;
     use test_case::test_case;
     use FootprintReasonCode::*;
 

@@ -1,23 +1,17 @@
 use crate::ModernApiError;
 use actix_web::dev::Payload;
-use actix_web::error::{
-    Error as ActixError,
-    JsonPayloadError,
-};
+use actix_web::error::Error as ActixError;
+use actix_web::error::JsonPayloadError;
 use actix_web::web::JsonBody;
-use actix_web::{
-    FromRequest,
-    HttpRequest,
-};
+use actix_web::FromRequest;
+use actix_web::HttpRequest;
 use futures::Future;
 use paperclip::v2::schema::Apiv2Schema;
 use serde::de::DeserializeOwned;
 use std::pin::Pin;
-use std::task::{
-    ready,
-    Context,
-    Poll,
-};
+use std::task::ready;
+use std::task::Context;
+use std::task::Poll;
 
 /// Just like Actix's Json, but custom size limit represented in the type
 #[derive(derive_more::Deref, derive_more::DerefMut)]

@@ -1,10 +1,8 @@
 use crate::*;
-use newtypes::{
-    FpId,
-    PiiJsonValue,
-    PiiString,
-    Vendor,
-};
+use newtypes::FpId;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::Vendor;
 
 #[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct ApexCipReportRequest {

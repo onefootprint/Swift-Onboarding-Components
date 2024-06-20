@@ -1,19 +1,13 @@
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::workflow_event;
 use diesel::prelude::*;
-use newtypes::{
-    WorkflowEventId,
-    WorkflowId,
-    WorkflowState,
-};
+use newtypes::WorkflowEventId;
+use newtypes::WorkflowId;
+use newtypes::WorkflowState;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = workflow_event)]

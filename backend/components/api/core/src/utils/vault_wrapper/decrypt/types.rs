@@ -1,21 +1,15 @@
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use crate::ApiErrorKind;
-use derive_more::{
-    Deref,
-    DerefMut,
-};
+use derive_more::Deref;
+use derive_more::DerefMut;
 use newtypes::output::Csv;
-use newtypes::{
-    DataIdentifier,
-    FilterFunction,
-    PiiBytes,
-    PiiJsonValue,
-    PiiString,
-    VaultDataFormat,
-};
+use newtypes::DataIdentifier;
+use newtypes::FilterFunction;
+use newtypes::PiiBytes;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::VaultDataFormat;
 use std::collections::HashMap;
 
 pub enum Pii {
@@ -194,12 +188,10 @@ impl DecryptUncheckedResult {
 mod test {
     use super::*;
     use crypto::hex::FromHex;
-    use newtypes::{
-        FilterFunction,
-        HmacSha256Args,
-        IdentityDataKind,
-        PiiBytes,
-    };
+    use newtypes::FilterFunction;
+    use newtypes::HmacSha256Args;
+    use newtypes::IdentityDataKind;
+    use newtypes::PiiBytes;
     use test_case::test_case;
 
     #[test_case(EnclaveDecryptOperation::new(DataIdentifier::Id(IdentityDataKind::PhoneNumber), vec![]) => "id.phone_number".to_owned())]

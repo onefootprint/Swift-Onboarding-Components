@@ -1,8 +1,6 @@
 use diesel::backend::Backend;
-use diesel::deserialize::{
-    FromSql,
-    FromSqlRow,
-};
+use diesel::deserialize::FromSql;
+use diesel::deserialize::FromSqlRow;
 use diesel::expression::AsExpression;
 use diesel::serialize::ToSql;
 use diesel::sql_types::BigInt;

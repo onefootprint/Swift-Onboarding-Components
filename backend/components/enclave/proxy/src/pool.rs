@@ -1,13 +1,11 @@
 use async_trait::async_trait;
+use bb8::ManageConnection;
+use bb8::PooledConnection;
 use bb8::{
     self,
-    ManageConnection,
-    PooledConnection,
 };
-use tokio::io::{
-    AsyncRead,
-    AsyncWrite,
-};
+use tokio::io::AsyncRead;
+use tokio::io::AsyncWrite;
 use tokio::net::TcpStream;
 
 pub trait Stream: AsyncRead + AsyncWrite + Unpin + Send {}

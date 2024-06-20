@@ -2,13 +2,11 @@ use api_core::auth::user::UserAuthContext;
 use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_wire_types::hosted::neuro_id::NeuroIdentityIdResponse;
-use newtypes::{
-    NeuroIdentityId,
-    UserAuthScope,
-};
+use newtypes::NeuroIdentityId;
+use newtypes::UserAuthScope;
+use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
-    api_v2_operation,
 };
 
 #[api_v2_operation(

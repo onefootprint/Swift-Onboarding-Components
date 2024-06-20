@@ -1,30 +1,22 @@
 use crate::errors::ApiResult;
 use db::models::annotation::Annotation;
 use db::models::data_lifetime::DataLifetime;
-use db::models::document::{
-    Document,
-    DocumentUpdate,
-};
-use db::models::manual_review::{
-    ManualReviewAction,
-    ManualReviewArgs,
-};
+use db::models::document::Document;
+use db::models::document::DocumentUpdate;
+use db::models::manual_review::ManualReviewAction;
+use db::models::manual_review::ManualReviewArgs;
 use db::models::onboarding_decision::NewDecisionArgs;
 use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{
-    CreateAnnotationRequest,
-    DbActor,
-    DecisionStatus,
-    DocumentReviewStatus,
-    ManualReviewKind,
-    UserSpecificWebhookKind,
-};
+use newtypes::CreateAnnotationRequest;
+use newtypes::DbActor;
+use newtypes::DecisionStatus;
+use newtypes::DocumentReviewStatus;
+use newtypes::ManualReviewKind;
+use newtypes::UserSpecificWebhookKind;
 use strum::IntoEnumIterator;
 
 pub fn save_review_decision(

@@ -1,20 +1,14 @@
 use crate::interval::get_billing_interval;
-use crate::{
-    BResult,
-    BillingClient,
-    BillingCounts,
-    BillingInfo,
-};
+use crate::BResult;
+use crate::BillingClient;
+use crate::BillingCounts;
+use crate::BillingInfo;
 use chrono::NaiveDate;
 use db::models::billing_profile::BillingProfile;
-use db::models::tenant::{
-    Tenant,
-    UpdateTenant,
-};
-use db::{
-    DbPool,
-    DbResult,
-};
+use db::models::tenant::Tenant;
+use db::models::tenant::UpdateTenant;
+use db::DbPool;
+use db::DbResult;
 use itertools::chain;
 use newtypes::StripeCustomerId;
 

@@ -1,34 +1,22 @@
 use super::WriteableVw;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
-use crate::utils::vault_wrapper::{
-    Person,
-    VaultWrapper,
-};
-use db::models::contact_info::{
-    ContactInfo,
-    VerificationLevel,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
+use db::models::contact_info::ContactInfo;
+use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
-use db::models::scoped_vault::{
-    ScopedVault,
-    ScopedVaultUpdate,
-};
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::vault::Vault;
 use db::TxnPgConn;
-use newtypes::{
-    CollectedDataOption,
-    DataIdentifier,
-    DataLifetimeSeqno,
-    ScopedVaultId,
-    VaultId,
-};
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use newtypes::CollectedDataOption;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 struct CurrentData {
     speculative: HashSet<CollectedDataOption>,
@@ -170,10 +158,8 @@ pub(super) fn on_otp_verified(
 
 #[cfg(test)]
 mod test {
-    use super::{
-        decide_data_to_portablize,
-        CurrentData,
-    };
+    use super::decide_data_to_portablize;
+    use super::CurrentData;
     use newtypes::CollectedDataOption;
     use std::collections::HashSet;
     use test_case::test_case;

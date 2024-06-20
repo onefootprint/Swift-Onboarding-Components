@@ -1,25 +1,17 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::OrgMetricsRequest;
-use db::scoped_vault::{
-    count_for_tenant,
-    ScopedVaultListQueryParams,
-};
-use newtypes::{
-    OnboardingStatus,
-    VaultKind,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use db::scoped_vault::count_for_tenant;
+use db::scoped_vault::ScopedVaultListQueryParams;
+use newtypes::OnboardingStatus;
+use newtypes::VaultKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     tags(OrgSettings, Private),

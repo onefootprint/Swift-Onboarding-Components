@@ -1,7 +1,5 @@
-use super::{
-    VendorAPICall,
-    VendorAPIResponse,
-};
+use super::VendorAPICall;
+use super::VendorAPIResponse;
 use async_trait::async_trait;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::neuro_id::client::NeuroIdClient;

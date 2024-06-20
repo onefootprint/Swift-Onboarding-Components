@@ -1,8 +1,6 @@
 use crate::*;
-use newtypes::{
-    DataIdentifier,
-    SessionAuthToken,
-};
+use newtypes::DataIdentifier;
+use newtypes::SessionAuthToken;
 use std::collections::HashSet;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]

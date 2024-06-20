@@ -1,29 +1,25 @@
 use api_core::errors::tenant::TenantError;
-use api_core::errors::{
-    ApiError,
-    ApiResult,
-    AssertionError,
-    ValidationError,
-};
+use api_core::errors::ApiError;
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
 use api_core::State;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{
-    CipKind,
-    CollectedData as CD,
-    CollectedDataOption as CDO,
-    CollectedDataOptionKind as CDOK,
-    DataIdentifierDiscriminant as DID,
-    DocumentRequestConfig,
-    EnhancedAmlOption,
-    ObConfigurationKind,
-    TenantId,
-    VerificationCheck,
-    VerificationCheckKind,
-};
+use newtypes::CipKind;
+use newtypes::CollectedData as CD;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::CollectedDataOptionKind as CDOK;
+use newtypes::DataIdentifierDiscriminant as DID;
+use newtypes::DocumentRequestConfig;
+use newtypes::EnhancedAmlOption;
+use newtypes::ObConfigurationKind;
+use newtypes::TenantId;
+use newtypes::VerificationCheck;
+use newtypes::VerificationCheckKind;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 

@@ -5,10 +5,8 @@ use reqwest::Method;
 use serde::Serialize;
 use std::fmt::Display;
 use std::time::Duration;
-use tokio_retry::strategy::{
-    jitter,
-    ExponentialBackoff,
-};
+use tokio_retry::strategy::jitter;
+use tokio_retry::strategy::ExponentialBackoff;
 use tokio_retry::Retry;
 use types::account::CreateAccountRequest;
 mod error;

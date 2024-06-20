@@ -2,38 +2,28 @@ use super::make_request::VerificationRequestWithVendorResponse;
 use super::VendorAPIError;
 use crate::decision::engine::VendorResults;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use chrono::Utc;
-use db::models::verification_request::{
-    NewVerificationRequestArgs,
-    VerificationRequest,
-};
-use db::models::verification_result::{
-    NewVerificationResult,
-    VerificationResult,
-};
-use db::{
-    DbError,
-    DbPool,
-    PgConn,
-};
+use db::models::verification_request::NewVerificationRequestArgs;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::NewVerificationResult;
+use db::models::verification_result::VerificationResult;
+use db::DbError;
+use db::DbPool;
+use db::PgConn;
 use idv::VendorResponse;
-use newtypes::{
-    DecisionIntentId,
-    DocumentId,
-    EncryptedVaultPrivateKey,
-    PiiJsonValue,
-    ScopedVaultId,
-    ScrubbedPiiJsonValue,
-    SealedVaultBytes,
-    VaultPublicKey,
-    VendorAPI,
-    VerificationRequestId,
-    VerificationResultId,
-};
+use newtypes::DecisionIntentId;
+use newtypes::DocumentId;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::PiiJsonValue;
+use newtypes::ScopedVaultId;
+use newtypes::ScrubbedPiiJsonValue;
+use newtypes::SealedVaultBytes;
+use newtypes::VaultPublicKey;
+use newtypes::VendorAPI;
+use newtypes::VerificationRequestId;
+use newtypes::VerificationResultId;
 use std::slice;
 
 /// Save a verification result, encrypting the response payload in the process
@@ -253,35 +243,25 @@ impl SaveVerificationResultArgs {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::decision::tests::test_helpers::{
-        create_kyc_user_and_wf,
-        FixtureData,
-    };
-    use crate::decision::vendor::vendor_trait::{
-        MockVendorAPICall,
-        VendorAPICall,
-        VendorAPIResponse,
-    };
+    use crate::decision::tests::test_helpers::create_kyc_user_and_wf;
+    use crate::decision::tests::test_helpers::FixtureData;
+    use crate::decision::vendor::vendor_trait::MockVendorAPICall;
+    use crate::decision::vendor::vendor_trait::VendorAPICall;
+    use crate::decision::vendor::vendor_trait::VendorAPIResponse;
     use crate::State;
     use db::models::decision_intent::DecisionIntent;
     use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
     use db::tests::test_db_pool::TestDbPool;
-    use idv::idology::{
-        IdologyExpectIDAPIResponse,
-        IdologyExpectIDRequest,
-    };
-    use idv::stytch::{
-        StytchLookupRequest,
-        StytchLookupResponse,
-    };
+    use idv::idology::IdologyExpectIDAPIResponse;
+    use idv::idology::IdologyExpectIDRequest;
+    use idv::stytch::StytchLookupRequest;
+    use idv::stytch::StytchLookupResponse;
     use macros::test_state;
     use newtypes::vendor_credentials::IdologyCredentials;
-    use newtypes::{
-        DecisionIntentKind,
-        IdvData,
-        Vendor,
-        VendorAPI,
-    };
+    use newtypes::DecisionIntentKind;
+    use newtypes::IdvData;
+    use newtypes::Vendor;
+    use newtypes::VendorAPI;
     use serde_json::json;
 
     async fn test_save_vreq_and_vres<T, U, E>(

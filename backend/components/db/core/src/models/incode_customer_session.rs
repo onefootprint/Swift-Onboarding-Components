@@ -1,23 +1,17 @@
 use super::scoped_vault::ScopedVault;
-use crate::{
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::incode_customer_session;
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{
-    DupeKind,
-    IncodeCustomerId,
-    IncodeCustomerSessionId,
-    IncodeVerificationSessionId,
-    ScopedVaultId,
-    TenantId,
-};
+use newtypes::DupeKind;
+use newtypes::IncodeCustomerId;
+use newtypes::IncodeCustomerSessionId;
+use newtypes::IncodeVerificationSessionId;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = incode_customer_session)]

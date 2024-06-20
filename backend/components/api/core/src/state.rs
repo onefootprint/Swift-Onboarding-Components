@@ -3,9 +3,9 @@ use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiError;
 use crate::fingerprinter::AwsHmacClient;
 use crate::metrics::Metrics;
+use crate::s3::S3Client;
 use crate::s3::{
     self,
-    S3Client,
 };
 use crate::utils::email::SendgridClient;
 use crate::utils::sms::SmsClient;
@@ -16,92 +16,100 @@ use crate::GIT_HASH;
 use crypto::aead::ScopedSealingKey;
 use db::tests::MockFFClient;
 use db::DbPool;
-use feature_flag::{
-    FeatureFlagClient,
-    LaunchDarklyFeatureFlagClient,
-};
+use feature_flag::FeatureFlagClient;
+use feature_flag::LaunchDarklyFeatureFlagClient;
+#[cfg(test)]
+use idv::experian::ExperianCrossCoreRequest;
+#[cfg(test)]
+use idv::experian::ExperianCrossCoreResponse;
 use idv::fingerprintjs::client::FingerprintJSClient;
-use idv::footprint_http_client::{
-    FootprintVendorHttpClient,
-    FpVendorClientArgs,
-};
+use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::footprint_http_client::FpVendorClientArgs;
 use idv::idology::client::IdologyClient;
+#[cfg(test)]
+use idv::idology::pa::IdologyPaAPIResponse;
+#[cfg(test)]
+use idv::idology::pa::IdologyPaRequest;
+#[cfg(test)]
+use idv::idology::IdologyExpectIDAPIResponse;
+#[cfg(test)]
+use idv::idology::IdologyExpectIDRequest;
+#[cfg(test)]
+use idv::incode::doc::response::AddConsentResponse;
+#[cfg(test)]
+use idv::incode::doc::response::AddSelfieResponse;
+#[cfg(test)]
+use idv::incode::doc::response::AddSideResponse;
+#[cfg(test)]
+use idv::incode::doc::response::FetchOCRResponse;
+#[cfg(test)]
+use idv::incode::doc::response::FetchScoresResponse;
+#[cfg(test)]
+use idv::incode::doc::response::GetOnboardingStatusResponse;
+#[cfg(test)]
+use idv::incode::doc::response::ProcessFaceResponse;
+#[cfg(test)]
+use idv::incode::doc::response::ProcessIdResponse;
+#[cfg(test)]
+use idv::incode::doc::IncodeAddBackRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeAddFrontRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeAddMLConsentRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeAddPrivacyConsentRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeAddSelfieRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeFetchOCRRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeFetchScoresRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeGetOnboardingStatusRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeProcessFaceRequest;
+#[cfg(test)]
+use idv::incode::doc::IncodeProcessIdRequest;
+#[cfg(test)]
+use idv::incode::response::OnboardingStartResponse;
+#[cfg(test)]
+use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
+#[cfg(test)]
+use idv::incode::watchlist::response::WatchlistResultResponse;
+#[cfg(test)]
+use idv::incode::watchlist::IncodeUpdatedWatchlistResultRequest;
+#[cfg(test)]
+use idv::incode::watchlist::IncodeWatchlistCheckRequest;
+#[cfg(test)]
+use idv::incode::IncodeResponse;
+#[cfg(test)]
+use idv::incode::IncodeStartOnboardingRequest;
 use idv::middesk::client::MiddeskClient;
+#[cfg(test)]
+use idv::middesk::MiddeskCreateBusinessRequest;
+#[cfg(test)]
+use idv::middesk::MiddeskCreateBusinessResponse;
+#[cfg(test)]
+use idv::middesk::MiddeskGetBusinessRequest;
+#[cfg(test)]
+use idv::middesk::MiddeskGetBusinessResponse;
 use idv::socure::client::SocureClient;
+#[cfg(test)]
+use idv::socure::SocureIDPlusAPIResponse;
+#[cfg(test)]
+use idv::socure::SocureIDPlusRequest;
 use idv::stytch::client::StytchClient;
 #[cfg(test)]
-use idv::{
-    experian::{
-        ExperianCrossCoreRequest,
-        ExperianCrossCoreResponse,
-    },
-    idology::pa::{
-        IdologyPaAPIResponse,
-        IdologyPaRequest,
-    },
-    idology::{
-        IdologyExpectIDAPIResponse,
-        IdologyExpectIDRequest,
-    },
-    incode::watchlist::{
-        response::UpdatedWatchlistResultResponse,
-        IncodeUpdatedWatchlistResultRequest,
-    },
-    incode::{
-        doc::{
-            response::{
-                AddConsentResponse,
-                AddSelfieResponse,
-                AddSideResponse,
-                FetchOCRResponse,
-                FetchScoresResponse,
-                GetOnboardingStatusResponse,
-                ProcessFaceResponse,
-                ProcessIdResponse,
-            },
-            IncodeAddBackRequest,
-            IncodeAddFrontRequest,
-            IncodeAddMLConsentRequest,
-            IncodeAddPrivacyConsentRequest,
-            IncodeAddSelfieRequest,
-            IncodeFetchOCRRequest,
-            IncodeFetchScoresRequest,
-            IncodeGetOnboardingStatusRequest,
-            IncodeProcessFaceRequest,
-            IncodeProcessIdRequest,
-        },
-        response::OnboardingStartResponse,
-        watchlist::{
-            response::WatchlistResultResponse,
-            IncodeWatchlistCheckRequest,
-        },
-        IncodeResponse,
-        IncodeStartOnboardingRequest,
-    },
-    middesk::{
-        MiddeskCreateBusinessRequest,
-        MiddeskCreateBusinessResponse,
-        MiddeskGetBusinessRequest,
-        MiddeskGetBusinessResponse,
-    },
-    socure::{
-        SocureIDPlusAPIResponse,
-        SocureIDPlusRequest,
-    },
-    twilio::{
-        TwilioLookupV2APIResponse,
-        TwilioLookupV2Request,
-    },
-};
+use idv::twilio::TwilioLookupV2APIResponse;
+#[cfg(test)]
+use idv::twilio::TwilioLookupV2Request;
 use selfie_doc::AwsSelfieDocClient;
 use std::sync::Arc;
 use std::time::Duration;
 use twilio::TwilioConfig;
 use webhooks::WebhookClient;
-use workos::{
-    ApiKey,
-    WorkOs,
-};
+use workos::ApiKey;
+use workos::WorkOs;
 
 #[derive(Clone)]
 pub struct State {
@@ -612,15 +620,11 @@ mod test {
     use crate::decision::vendor::vendor_trait::MockVendorAPICall;
     use db::models::tenant::Tenant;
     use db::tests::test_db_pool::TestDbPool;
-    use feature_flag::{
-        BoolFlag,
-        MockFeatureFlagClient,
-    };
+    use feature_flag::BoolFlag;
+    use feature_flag::MockFeatureFlagClient;
     use idv::socure::SocureIDPlusRequest;
-    use macros::{
-        test_state,
-        test_state_case,
-    };
+    use macros::test_state;
+    use macros::test_state_case;
     use newtypes::IdvData;
 
     #[test_state]

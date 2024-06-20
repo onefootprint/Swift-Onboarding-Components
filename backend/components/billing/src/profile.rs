@@ -1,24 +1,20 @@
+use crate::is_managed;
+use crate::managed_metadata;
 use crate::product::Product;
-use crate::{
-    is_managed,
-    managed_metadata,
-    BResult,
-    BillingInfo,
-};
+use crate::BResult;
+use crate::BillingInfo;
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use newtypes::TenantId;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
 use std::str::FromStr;
-use stripe::{
-    CreatePrice,
-    Currency,
-    IdOrCreate,
-    ListPrices,
-    Price,
-    PriceBillingScheme,
-    PriceId,
-};
+use stripe::CreatePrice;
+use stripe::Currency;
+use stripe::IdOrCreate;
+use stripe::ListPrices;
+use stripe::Price;
+use stripe::PriceBillingScheme;
+use stripe::PriceId;
 use strum::IntoEnumIterator;
 
 /// Stores all the price IDs for products we offer. This may differ per environment and occasionally

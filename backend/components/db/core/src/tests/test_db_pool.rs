@@ -1,12 +1,8 @@
-use crate::diesel::{
-    Connection,
-    RunQueryDsl,
-};
+use crate::diesel::Connection;
+use crate::diesel::RunQueryDsl;
 use crate::test_helpers::db_url;
-use crate::{
-    DbPool,
-    DbResult,
-};
+use crate::DbPool;
+use crate::DbResult;
 use diesel::PgConnection;
 use macros::test_db_pool;
 use std::ops::Deref;

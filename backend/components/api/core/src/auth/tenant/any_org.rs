@@ -1,17 +1,13 @@
-use super::{
-    Any,
-    CheckTenantGuard,
-    Either,
-    PartnerTenantSessionAuth,
-    SessionContext,
-    TenantSessionAuth,
-    WorkOsSessionData,
-};
+use super::Any;
+use super::CheckTenantGuard;
+use super::Either;
+use super::PartnerTenantSessionAuth;
+use super::SessionContext;
+use super::TenantSessionAuth;
+use super::WorkOsSessionData;
 use crate::errors::ApiResult;
-use newtypes::{
-    TenantUserId,
-    WorkosAuthMethod,
-};
+use newtypes::TenantUserId;
+use newtypes::WorkosAuthMethod;
 
 pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, TenantSessionAuth>;
 pub type AnyPartnerTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, PartnerTenantSessionAuth>;

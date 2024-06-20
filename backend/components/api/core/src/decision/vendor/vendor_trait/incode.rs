@@ -1,60 +1,44 @@
-use super::{
-    VendorAPICall,
-    VendorAPIResponse,
-};
+use super::VendorAPICall;
+use super::VendorAPIResponse;
 use async_trait::async_trait;
 use chrono::Datelike;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::incode::client::{
-    AuthenticatedIncodeClientAdapter,
-    IncodeClientAdapter,
-};
+use idv::incode::client::AuthenticatedIncodeClientAdapter;
+use idv::incode::client::IncodeClientAdapter;
 use idv::incode::curp_validation::response::CurpValidationResponse;
 use idv::incode::curp_validation::IncodeCurpValidationRequest;
 use idv::incode::doc::request::DocumentSide;
-use idv::incode::doc::response::{
-    AddConsentResponse,
-    AddSelfieResponse,
-    AddSideResponse,
-    FetchOCRResponse,
-    FetchScoresResponse,
-    GetOnboardingStatusResponse,
-    ProcessFaceResponse,
-    ProcessIdResponse,
-};
-use idv::incode::doc::{
-    IncodeAddBackRequest,
-    IncodeAddFrontRequest,
-    IncodeAddMLConsentRequest,
-    IncodeAddPrivacyConsentRequest,
-    IncodeAddSelfieRequest,
-    IncodeFetchOCRRequest,
-    IncodeFetchScoresRequest,
-    IncodeGetOnboardingStatusRequest,
-    IncodeProcessFaceRequest,
-    IncodeProcessIdRequest,
-};
+use idv::incode::doc::response::AddConsentResponse;
+use idv::incode::doc::response::AddSelfieResponse;
+use idv::incode::doc::response::AddSideResponse;
+use idv::incode::doc::response::FetchOCRResponse;
+use idv::incode::doc::response::FetchScoresResponse;
+use idv::incode::doc::response::GetOnboardingStatusResponse;
+use idv::incode::doc::response::ProcessFaceResponse;
+use idv::incode::doc::response::ProcessIdResponse;
+use idv::incode::doc::IncodeAddBackRequest;
+use idv::incode::doc::IncodeAddFrontRequest;
+use idv::incode::doc::IncodeAddMLConsentRequest;
+use idv::incode::doc::IncodeAddPrivacyConsentRequest;
+use idv::incode::doc::IncodeAddSelfieRequest;
+use idv::incode::doc::IncodeFetchOCRRequest;
+use idv::incode::doc::IncodeFetchScoresRequest;
+use idv::incode::doc::IncodeGetOnboardingStatusRequest;
+use idv::incode::doc::IncodeProcessFaceRequest;
+use idv::incode::doc::IncodeProcessIdRequest;
 use idv::incode::error::Error as IncodeError;
 use idv::incode::government_validation::request::IncodeGovernmentValidationRequest;
 use idv::incode::government_validation::response::GovernmentValidationResponse;
 use idv::incode::response::OnboardingStartResponse;
-use idv::incode::watchlist::response::{
-    UpdatedWatchlistResultResponse,
-    WatchlistResultResponse,
-};
-use idv::incode::watchlist::{
-    IncodeUpdatedWatchlistResultRequest,
-    IncodeWatchlistCheckRequest,
-};
-use idv::incode::{
-    IncodeResponse,
-    IncodeStartOnboardingRequest,
-};
+use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
+use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::incode::watchlist::IncodeUpdatedWatchlistResultRequest;
+use idv::incode::watchlist::IncodeWatchlistCheckRequest;
+use idv::incode::IncodeResponse;
+use idv::incode::IncodeStartOnboardingRequest;
 use idv::ParsedResponse;
-use newtypes::{
-    PiiString,
-    VendorAPI,
-};
+use newtypes::PiiString;
+use newtypes::VendorAPI;
 
 //////////////////////
 /// Incode impl

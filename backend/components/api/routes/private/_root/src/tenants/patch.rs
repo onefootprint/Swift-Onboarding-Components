@@ -1,28 +1,18 @@
-use actix_web::{
-    patch,
-    web,
-};
+use actix_web::patch;
+use actix_web::web;
 use api_core::auth::protected_auth::ProtectedAuth;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
-use api_wire_types::{
-    PrivateUpdateBillingProfile,
-    PrivateUpdateTvc,
-};
-use db::models::billing_profile::{
-    BillingProfile,
-    UpdateBillingProfile,
-};
-use db::models::tenant::{
-    PrivateUpdateTenant,
-    Tenant,
-};
-use db::models::tenant_vendor::{
-    TenantVendorControl,
-    UpdateTenantVendorControlArgs,
-};
+use api_wire_types::PrivateUpdateBillingProfile;
+use api_wire_types::PrivateUpdateTvc;
+use db::models::billing_profile::BillingProfile;
+use db::models::billing_profile::UpdateBillingProfile;
+use db::models::tenant::PrivateUpdateTenant;
+use db::models::tenant::Tenant;
+use db::models::tenant_vendor::TenantVendorControl;
+use db::models::tenant_vendor::UpdateTenantVendorControlArgs;
 use newtypes::TenantId;
 
 #[patch("/private/tenants/{id}")]

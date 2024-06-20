@@ -1,36 +1,26 @@
-use crate::{
-    EntityTag,
-    InsightEvent,
-    WatchlistCheck,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeSource,
-    ExternalId,
-    FilterFunction,
-    FpId,
-    LabelKind,
-    ManualReviewKind,
-    ObConfigurationId,
-    OnboardingStatus,
-    PiiString,
-    SandboxId,
-    TenantId,
-    VaultKind,
-};
-use paperclip::actix::{
-    Apiv2Response,
-    Apiv2Schema,
-};
+use crate::EntityTag;
+use crate::InsightEvent;
+use crate::WatchlistCheck;
+use chrono::DateTime;
+use chrono::Utc;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::ExternalId;
+use newtypes::FilterFunction;
+use newtypes::FpId;
+use newtypes::LabelKind;
+use newtypes::ManualReviewKind;
+use newtypes::ObConfigurationId;
+use newtypes::OnboardingStatus;
+use newtypes::PiiString;
+use newtypes::SandboxId;
+use newtypes::TenantId;
+use newtypes::VaultKind;
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
 use serde::Serialize;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use std::collections::HashMap;
 use strum_macros::EnumString;
 

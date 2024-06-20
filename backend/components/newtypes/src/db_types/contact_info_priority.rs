@@ -1,13 +1,9 @@
 use derive_more::Display;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
-use strum_macros::{
-    AsRefStr,
-    EnumString,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
+use strum_macros::AsRefStr;
+use strum_macros::EnumString;
 
 /// The type of data attribute
 #[derive(

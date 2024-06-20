@@ -1,55 +1,37 @@
 use crate::audit_events::AuditEventCursor;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
-use api_core::types::{
-    Base64Cursor,
-    CursorPaginatedResponse,
-    CursorPaginatedResponseInner,
-    CursorPaginationRequest,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
+use api_core::types::Base64Cursor;
+use api_core::types::CursorPaginatedResponse;
+use api_core::types::CursorPaginatedResponseInner;
+use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
-use api_core::{
-    ApiError,
-    State,
-};
-use api_wire_types::{
-    ListEvent,
-    ListEventDetail,
-};
-use crypto::aead::{
-    AeadSealedBytes,
-    SealingKey,
-};
-use db::models::audit_event::{
-    AuditEvent,
-    FilterQueryParams,
-    JoinedAuditEvent,
-};
+use api_core::ApiError;
+use api_core::State;
+use api_wire_types::ListEvent;
+use api_wire_types::ListEventDetail;
+use crypto::aead::AeadSealedBytes;
+use crypto::aead::SealingKey;
+use db::models::audit_event::AuditEvent;
+use db::models::audit_event::FilterQueryParams;
+use db::models::audit_event::JoinedAuditEvent;
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::tenant::Tenant;
 use itertools::Itertools;
-use newtypes::{
-    AuditEventMetadata,
-    AuditEventName,
-    ListEntryCreationId,
-    ListEntryId,
-    ListId,
-    PiiBytes,
-    PiiString,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use newtypes::AuditEventMetadata;
+use newtypes::AuditEventName;
+use newtypes::ListEntryCreationId;
+use newtypes::ListEntryId;
+use newtypes::ListId;
+use newtypes::PiiBytes;
+use newtypes::PiiString;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 use std::collections::HashMap;
 
 pub const LIST_AUDIT_EVENT_NAMES: [AuditEventName; 2] =

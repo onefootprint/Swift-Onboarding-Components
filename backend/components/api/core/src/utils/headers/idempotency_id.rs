@@ -1,26 +1,18 @@
 use super::get_header;
-use crate::{
-    ApiErrorKind,
-    ModernApiResult,
-};
+use crate::ApiErrorKind;
+use crate::ModernApiResult;
 use actix_web::http::header::HeaderMap;
 use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
 use lazy_static::lazy_static;
-use paperclip::v2::models::{
-    DefaultSchemaRaw,
-    Parameter,
-};
-use paperclip::v2::schema::{
-    Apiv2Schema,
-    TypedData,
-};
+use paperclip::v2::models::DefaultSchemaRaw;
+use paperclip::v2::models::Parameter;
+use paperclip::v2::schema::Apiv2Schema;
+use paperclip::v2::schema::TypedData;
 use regex::Regex;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::pin::Pin;
 
 fn idempotency_id_regex() -> Regex {

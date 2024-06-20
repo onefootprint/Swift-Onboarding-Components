@@ -1,17 +1,11 @@
+use actix_web::post;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    post,
-    web,
-};
 use api_core::auth::session::tenant::FirmEmployeeSession;
-use api_core::auth::session::{
-    AuthSessionData,
-    GetSessionForUpdate,
-};
-use api_core::auth::tenant::{
-    FirmEmployeeAuthContext,
-    FirmEmployeeGuard,
-};
+use api_core::auth::session::AuthSessionData;
+use api_core::auth::session::GetSessionForUpdate;
+use api_core::auth::tenant::FirmEmployeeAuthContext;
+use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::auth::AuthError;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
@@ -19,10 +13,8 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::State;
 use db::models::tenant::Tenant;
-use newtypes::{
-    SessionAuthToken,
-    TenantId,
-};
+use newtypes::SessionAuthToken;
+use newtypes::TenantId;
 
 #[derive(Debug, serde::Deserialize)]
 struct AssumeRequest {

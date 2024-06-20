@@ -2,10 +2,8 @@ use super::api_client::IsLive;
 use crate::cli::api_client::get_cli_client;
 use crate::cli::get_input;
 use crate::cli::wire_types::VaultDrEnrollRequest;
-use anyhow::{
-    bail,
-    Result,
-};
+use anyhow::bail;
+use anyhow::Result;
 use reqwest::Url;
 
 pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {

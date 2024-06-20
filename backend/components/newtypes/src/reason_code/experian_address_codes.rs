@@ -2,15 +2,11 @@ use super::reason_code_helpers::AddressAttribute::*;
 use super::reason_code_helpers::AddressGrouping::*;
 use super::reason_code_helpers::NameGrouping::*;
 use super::reason_code_helpers::*;
+use crate::vendor_reason_codes_enum;
+use crate::FootprintReasonCode;
 use crate::MatchLevel::*;
-use crate::{
-    vendor_reason_codes_enum,
-    FootprintReasonCode,
-};
-use strum_macros::{
-    EnumIter,
-    EnumString,
-};
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 // As of 2023-05-18 we consider Experian's "Level 5 and Level 4" matching.
 // If we receive a code that isn't covered here, we consider both the name and address to be not
@@ -883,10 +879,8 @@ vendor_reason_codes_enum! {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        ExperianAddressAndNameMatchReasonCodes,
-        FootprintReasonCode,
-    };
+    use crate::ExperianAddressAndNameMatchReasonCodes;
+    use crate::FootprintReasonCode;
     use test_case::test_case;
     use FootprintReasonCode::*;
 

@@ -2,27 +2,21 @@ use self::challenge::ChallengeError;
 use self::error_with_code::ErrorWithCode;
 use self::handoff::HandoffError;
 use crate::auth::AuthError;
-use crate::decision::vendor::{
-    middesk,
-    VendorAPIError,
-};
+use crate::decision::vendor::middesk;
+use crate::decision::vendor::VendorAPIError;
 use crate::utils::body_bytes::InvalidBodyError;
-use actix_web::error::{
-    JsonPayloadError,
-    QueryPayloadError,
-    UrlencodedError,
-};
+use actix_web::error::JsonPayloadError;
+use actix_web::error::QueryPayloadError;
+use actix_web::error::UrlencodedError;
 use actix_web::http::StatusCode;
 use aws_sdk_pinpointsmsvoicev2::error::SdkError as SmsSdkError;
 use aws_sdk_pinpointsmsvoicev2::operation::send_text_message::SendTextMessageError;
 use db::errors::DbError;
 use error_with_code::CodedError;
 use newtypes::output::Csv;
-use newtypes::{
-    ContactInfoKind,
-    DataIdentifier,
-    FilterFunction,
-};
+use newtypes::ContactInfoKind;
+use newtypes::DataIdentifier;
+use newtypes::FilterFunction;
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use twilio::error::Error as TwilioError;

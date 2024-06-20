@@ -1,27 +1,21 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::types::ModernApiResult;
 use crate::State;
 use api_core::decision::field_validations::create_field_validation_results;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::GetFieldValidationResponse;
-use db::models::risk_signal::{
-    AtSeqno,
-    RiskSignal,
-};
+use db::models::risk_signal::AtSeqno;
+use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::DbResult;
 use newtypes::SignalScope;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Lists the match signals for a footprint user.",

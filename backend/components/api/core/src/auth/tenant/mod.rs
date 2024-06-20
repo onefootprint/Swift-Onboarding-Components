@@ -19,30 +19,24 @@ mod tenant_rb;
 pub use self::tenant_rb::*;
 mod workos;
 pub use self::workos::*;
-use super::{
-    Any,
-    AuthError,
-    Either,
-    IsGuardMet,
-    SessionContext,
-};
-use crate::errors::{
-    ApiError,
-    ApiResult,
-    ValidationError,
-};
+use super::Any;
+use super::AuthError;
+use super::Either;
+use super::IsGuardMet;
+use super::SessionContext;
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use crate::State;
 use async_trait::async_trait;
 use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
-use newtypes::{
-    DataLifetimeSource,
-    DbActor,
-    TenantApiKeyId,
-    TenantScope,
-    TenantUserId,
-    WorkosAuthMethod,
-};
+use newtypes::DataLifetimeSource;
+use newtypes::DbActor;
+use newtypes::TenantApiKeyId;
+use newtypes::TenantScope;
+use newtypes::TenantUserId;
+use newtypes::WorkosAuthMethod;
 
 pub type TenantSessionAuth<const IS_SECONDARY: bool = false> =
     Either<TenantRbAuthContext<IS_SECONDARY>, FirmEmployeeAssumeAuthContext<IS_SECONDARY>>;

@@ -1,19 +1,11 @@
-use crate::{
-    EntityAttribute,
-    EntityStatus,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use newtypes::{
-    DupeKind,
-    FpId,
-};
-use paperclip::actix::{
-    Apiv2Response,
-    Apiv2Schema,
-};
+use crate::EntityAttribute;
+use crate::EntityStatus;
+use chrono::DateTime;
+use chrono::Utc;
+use newtypes::DupeKind;
+use newtypes::FpId;
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
 use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

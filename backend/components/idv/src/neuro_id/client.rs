@@ -2,10 +2,8 @@ use super::error::Error as NeuroError;
 use super::NeuroApiResult;
 use crate::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::vendor_credentials::NeuroIdCredentials;
-use newtypes::{
-    NeuroIdentityId,
-    PiiString,
-};
+use newtypes::NeuroIdentityId;
+use newtypes::PiiString;
 use reqwest::header;
 
 pub struct NeuroIdClient {
@@ -54,14 +52,10 @@ impl NeuroIdClient {
 mod tests {
     use super::*;
     use crate::footprint_http_client::FpVendorClientArgs;
-    use crate::neuro_id::response::{
-        NeuroApiResponse,
-        Status,
-    };
-    use newtypes::vendor_credentials::{
-        NeuroIdApiKeys,
-        NeuroIdSiteId,
-    };
+    use crate::neuro_id::response::NeuroApiResponse;
+    use crate::neuro_id::response::Status;
+    use newtypes::vendor_credentials::NeuroIdApiKeys;
+    use newtypes::vendor_credentials::NeuroIdSiteId;
 
     fn example_neuro_creds() -> (NeuroIdCredentials, NeuroIdentityId) {
         // https://neuro-id.readme.io/reference/api-test-cases

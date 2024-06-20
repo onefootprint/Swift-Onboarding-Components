@@ -1,23 +1,17 @@
-use crate::{
-    CollectedDataOption,
-    CustomDocumentConfig,
-    DocumentKind,
-    DocumentRequestId,
-    DocumentRequestKind,
-    DocumentUploadMode,
-    IdDocKind,
-    Iso3166TwoDigitCountryCode,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::CollectedDataOption;
+use crate::CustomDocumentConfig;
+use crate::DocumentKind;
+use crate::DocumentRequestId;
+use crate::DocumentRequestKind;
+use crate::DocumentUploadMode;
+use crate::IdDocKind;
+use crate::Iso3166TwoDigitCountryCode;
+use chrono::DateTime;
+use chrono::Utc;
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use std::collections::HashMap;
+use std::collections::HashSet;
 use strum::EnumDiscriminants;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants)]
@@ -244,17 +238,15 @@ pub struct AuthorizeFields {
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        AuthorizeFields,
-        CollectDocumentConfig,
-        CustomDocumentConfig,
-        DataIdentifier,
-        DocumentRequestId,
-        DocumentRequestKind,
-        DocumentUploadMode,
-        OnboardingRequirement,
-        OnboardingRequirementKind,
-    };
+    use crate::AuthorizeFields;
+    use crate::CollectDocumentConfig;
+    use crate::CustomDocumentConfig;
+    use crate::DataIdentifier;
+    use crate::DocumentRequestId;
+    use crate::DocumentRequestKind;
+    use crate::DocumentUploadMode;
+    use crate::OnboardingRequirement;
+    use crate::OnboardingRequirementKind;
     use itertools::Itertools;
     use std::collections::HashMap;
     use std::str::FromStr;

@@ -1,10 +1,8 @@
 use anyhow::Result;
 use api_wire_types::TokenOperationKind;
 use envconfig::Envconfig;
-use newtypes::{
-    PiiString,
-    SessionAuthToken,
-};
+use newtypes::PiiString;
+use newtypes::SessionAuthToken;
 use rand::Rng;
 
 #[derive(Envconfig, Clone)]

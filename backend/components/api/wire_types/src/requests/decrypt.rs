@@ -1,10 +1,8 @@
-use newtypes::{
-    flat_api_object_map_type,
-    impl_response_type,
-    DataIdentifier,
-    PiiJsonValue,
-    VersionedDataIdentifier,
-};
+use newtypes::flat_api_object_map_type;
+use newtypes::impl_response_type;
+use newtypes::DataIdentifier;
+use newtypes::PiiJsonValue;
+use newtypes::VersionedDataIdentifier;
 use std::collections::HashMap;
 
 flat_api_object_map_type!(

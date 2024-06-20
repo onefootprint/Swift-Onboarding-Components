@@ -1,41 +1,27 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::request::CursorPaginationRequest;
 use api_core::types::response::CursorPaginatedResponse;
-use api_core::types::{
-    Base64Cursor,
-    CursorPaginatedResponseInner,
-};
+use api_core::types::Base64Cursor;
+use api_core::types::CursorPaginatedResponseInner;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::State;
-use api_wire_types::{
-    AuditEvent,
-    AuditEventRequest,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use api_wire_types::AuditEvent;
+use api_wire_types::AuditEventRequest;
+use chrono::DateTime;
+use chrono::Utc;
 use db::models::audit_event::FilterQueryParams;
 use db::DbResult;
-use newtypes::{
-    AuditEventId,
-    AuditEventName,
-    DataIdentifier,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::AuditEventId;
+use newtypes::AuditEventName;
+use newtypes::DataIdentifier;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[api_v2_operation(
     description = "Query audit events, in descending order of timestamp.",

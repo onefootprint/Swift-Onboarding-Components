@@ -3,11 +3,9 @@ use crate::errors::ApiResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::vault::Vault;
 use db::PgConn;
-use newtypes::{
-    DataLifetimeSeqno,
-    ScopedVaultId,
-    VaultId,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
 
 /// There are a lot of places we build VWs, under varying circumstances. Things to consider:
 ///   - Portable and Speculative data: Does the flow need access to both portable AND speculative

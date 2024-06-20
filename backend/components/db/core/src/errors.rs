@@ -1,9 +1,7 @@
 use diesel::result::DatabaseErrorKind;
 use diesel::result::Error::DatabaseError as DieselDbError;
-use newtypes::{
-    TenantRoleKindDiscriminant,
-    TenantScopeDiscriminants,
-};
+use newtypes::TenantRoleKindDiscriminant;
+use newtypes::TenantScopeDiscriminants;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

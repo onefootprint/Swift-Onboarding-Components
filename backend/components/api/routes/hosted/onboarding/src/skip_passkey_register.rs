@@ -9,11 +9,9 @@ use api_wire_types::SkipPasskeyRegisterRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use newtypes::WorkflowGuard;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     tags(Onboarding, Hosted),

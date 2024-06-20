@@ -1,20 +1,16 @@
 use actix_web::HttpResponseBuilder;
 use api_core::errors::workos::WorkOsError;
-use api_core::{
-    ModernApiResult,
-    State,
-};
+use api_core::ModernApiResult;
+use api_core::State;
 use api_wire_types::GoogleOauthRedirectUrl;
 use paperclip::actix::web;
 use paperclip::actix::web::HttpResponse;
 use reqwest::redirect;
-use workos::sso::{
-    ClientId,
-    ConnectionSelector,
-    GetAuthorizationUrl,
-    GetAuthorizationUrlParams,
-    Provider,
-};
+use workos::sso::ClientId;
+use workos::sso::ConnectionSelector;
+use workos::sso::GetAuthorizationUrl;
+use workos::sso::GetAuthorizationUrlParams;
+use workos::sso::Provider;
 
 pub async fn handler(
     state: web::Data<State>,

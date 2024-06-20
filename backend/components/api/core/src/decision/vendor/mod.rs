@@ -1,21 +1,17 @@
 use self::tenant_vendor_control::TenantVendorControl;
-use crate::errors::{
-    ApiErrorKind,
-    ApiResult,
-};
+use crate::errors::ApiErrorKind;
+use crate::errors::ApiResult;
 use crate::ApiError;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use itertools::Itertools;
-use newtypes::{
-    DecisionIntentId,
-    DocumentFixtureResult,
-    DocumentRequestKind,
-    IdentityDataKind,
-    ScopedVaultId,
-    VendorAPI,
-};
+use newtypes::DecisionIntentId;
+use newtypes::DocumentFixtureResult;
+use newtypes::DocumentRequestKind;
+use newtypes::IdentityDataKind;
+use newtypes::ScopedVaultId;
+use newtypes::VendorAPI;
 use std::fmt::Display;
 
 pub mod build_request;

@@ -1,10 +1,8 @@
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Any,
-    DataLifetimeSources,
-    FingerprintedDataRequest,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::FingerprintedDataRequest;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::fingerprint::Fingerprint;
 use db::models::ob_configuration::ObConfiguration;
@@ -13,19 +11,15 @@ use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures;
 use itertools::Itertools;
 use macros::test_state_case;
-use newtypes::put_data_request::{
-    PatchDataRequest,
-    RawDataRequest,
-};
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeSource,
-    DupeKind as DK,
-    IdentityDataKind as IDK,
-    PiiJsonValue,
-    ValidateArgs,
-    VaultId,
-};
+use newtypes::put_data_request::PatchDataRequest;
+use newtypes::put_data_request::RawDataRequest;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::DupeKind as DK;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::PiiJsonValue;
+use newtypes::ValidateArgs;
+use newtypes::VaultId;
 use serde_json::json;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;

@@ -1,36 +1,28 @@
 use super::scoped_vault::ScopedVault;
 use super::vault::Vault;
 use super::workflow::Workflow;
-use crate::{
-    DbError,
-    DbResult,
-    OffsetPaginatedResult,
-    OffsetPagination,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    business_owner,
-    scoped_vault,
-    vault,
-    workflow,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::OffsetPaginatedResult;
+use crate::OffsetPagination;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::business_owner;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::vault;
+use db_schema::schema::workflow;
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{
-    BoId,
-    BoLinkId,
-    BusinessOwnerKind,
-    BusinessOwnerSource,
-    Locked,
-    ObConfigurationId,
-    TenantId,
-    VaultId,
-};
+use newtypes::BoId;
+use newtypes::BoLinkId;
+use newtypes::BusinessOwnerKind;
+use newtypes::BusinessOwnerSource;
+use newtypes::Locked;
+use newtypes::ObConfigurationId;
+use newtypes::TenantId;
+use newtypes::VaultId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = business_owner)]

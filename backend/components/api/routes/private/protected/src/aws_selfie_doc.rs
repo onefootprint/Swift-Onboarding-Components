@@ -1,26 +1,18 @@
 //! Temporary tool to analyze selfie + doc comparison and over
 
 use crate::ProtectedAuth;
-use actix_web::{
-    post,
-    web,
-};
+use actix_web::post;
+use actix_web::web;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
-use api_core::utils::vault_wrapper::{
-    EnclaveDecryptOperation,
-    Pii,
-    VaultWrapper,
-};
-use api_core::{
-    ApiErrorKind,
-    State,
-};
+use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
+use api_core::utils::vault_wrapper::Pii;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::ApiErrorKind;
+use api_core::State;
 use db::models::scoped_vault::ScopedVault;
-use newtypes::{
-    DataIdentifier,
-    FpId,
-};
+use newtypes::DataIdentifier;
+use newtypes::FpId;
 use selfie_doc::analyze_id::AnalyzeIdResult;
 use std::collections::HashMap;
 

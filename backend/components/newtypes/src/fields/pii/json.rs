@@ -1,13 +1,9 @@
-use crate::{
-    PiiBytes,
-    PiiString,
-    VResult,
-    VaultDataFormat,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use crate::PiiBytes;
+use crate::PiiString;
+use crate::VResult;
+use crate::VaultDataFormat;
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt::Debug;
 use std::str::FromStr;
 

@@ -1,21 +1,15 @@
 use crate::errors::ApiResult;
-use crate::utils::db2api::{
-    DbToApi,
-    TryDbToApi,
-};
-use api_wire_types::{
-    DocumentImageError,
-    UploadSource,
-};
+use crate::utils::db2api::DbToApi;
+use crate::utils::db2api::TryDbToApi;
+use api_wire_types::DocumentImageError;
+use api_wire_types::UploadSource;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
-use newtypes::{
-    DeviceType,
-    DocumentKind,
-    DocumentSide,
-};
+use newtypes::DeviceType;
+use newtypes::DocumentKind;
+use newtypes::DocumentSide;
 
 /// Document info from Documents, created via hosted bifrost
 pub type DocumentInfo = (Document, DocumentRequest, Vec<DocumentUpload>);

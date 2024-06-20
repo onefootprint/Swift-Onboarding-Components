@@ -5,51 +5,39 @@ use super::document::Document;
 use super::document_request::DocumentRequest;
 use super::insight_event::InsightEvent;
 use super::ob_configuration::ObConfiguration;
-use super::onboarding_decision::{
-    OnboardingDecision,
-    SaturatedOnboardingDecisionInfo,
-};
+use super::onboarding_decision::OnboardingDecision;
+use super::onboarding_decision::SaturatedOnboardingDecisionInfo;
 use super::scoped_vault::ScopedVaultIdentifier;
 use super::scoped_vault_label::ScopedVaultLabel;
 use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
 use super::workflow_request::WorkflowRequest;
-use crate::actor::{
-    saturate_actors,
-    SaturatedActor,
-};
+use crate::actor::saturate_actors;
+use crate::actor::SaturatedActor;
 use crate::models::annotation::Annotation;
 use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_vault::ScopedVault;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::user_timeline;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    AuthMethodUpdatedInfo,
-    CollectedDataOption,
-    DataIdentifier,
-    DataLifetimeSeqno,
-    DbUserTimelineEvent,
-    DbUserTimelineEventKind,
-    ExternalIntegrationInfo,
-    OnboardingTimelineInfo,
-    ScopedVaultId,
-    UserTimelineId,
-    VaultId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::AuthMethodUpdatedInfo;
+use newtypes::CollectedDataOption;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbUserTimelineEvent;
+use newtypes::DbUserTimelineEventKind;
+use newtypes::ExternalIntegrationInfo;
+use newtypes::OnboardingTimelineInfo;
+use newtypes::ScopedVaultId;
+use newtypes::UserTimelineId;
+use newtypes::VaultId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
@@ -404,10 +392,8 @@ mod tests {
         },
     };
     use macros::db_test;
-    use newtypes::{
-        DbActor,
-        TenantRoleKind,
-    };
+    use newtypes::DbActor;
+    use newtypes::TenantRoleKind;
 
     #[db_test]
     fn test_list(conn: &mut TestPgConn) {

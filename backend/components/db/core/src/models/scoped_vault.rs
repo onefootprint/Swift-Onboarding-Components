@@ -1,67 +1,51 @@
 use super::insight_event::InsightEvent;
 use super::manual_review::ManualReview;
-use super::ob_configuration::{
-    IsLive,
-    ObConfiguration,
-};
+use super::ob_configuration::IsLive;
+use super::ob_configuration::ObConfiguration;
 use super::scoped_vault_label::ScopedVaultLabel;
 use super::task::Task;
 use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
-use super::vault::{
-    NewVaultArgs,
-    Vault,
-};
+use super::vault::NewVaultArgs;
+use super::vault::Vault;
 use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
 use super::workflow_request::WorkflowRequest;
 use crate::models::data_lifetime::DataLifetime;
 use crate::models::scoped_vault_tag::ScopedVaultTag;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
-use db_schema::schema::{
-    scoped_vault,
-    vault,
-};
-use diesel::dsl::{
-    count_distinct,
-    not,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::vault;
+use diesel::dsl::count_distinct;
+use diesel::dsl::not;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    DataLifetimeSeqno,
-    DbActor,
-    ExternalId,
-    FireWebhookArgs,
-    FpId,
-    IdempotencyId,
-    Locked,
-    ObConfigurationId,
-    OnboardingStatus,
-    ScopedVaultId,
-    TenantId,
-    UserSpecificWebhookKind,
-    UserSpecificWebhookPayload,
-    VaultCreatedInfo,
-    VaultId,
-    VaultKind,
-    WebhookEvent,
-    WorkflowId,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
+use newtypes::ExternalId;
+use newtypes::FireWebhookArgs;
+use newtypes::FpId;
+use newtypes::IdempotencyId;
+use newtypes::Locked;
+use newtypes::ObConfigurationId;
+use newtypes::OnboardingStatus;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::UserSpecificWebhookKind;
+use newtypes::UserSpecificWebhookPayload;
+use newtypes::VaultCreatedInfo;
+use newtypes::VaultId;
+use newtypes::VaultKind;
+use newtypes::WebhookEvent;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 /// Creates a unique identifier specific to each onboarding configuration.
@@ -410,15 +394,13 @@ impl ScopedVault {
         conn: &mut PgConn,
         ids: Vec<ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
-        use db_schema::schema::{
-            insight_event,
-            manual_review,
-            scoped_vault_label,
-            scoped_vault_tag,
-            watchlist_check,
-            workflow,
-            workflow_request,
-        };
+        use db_schema::schema::insight_event;
+        use db_schema::schema::manual_review;
+        use db_schema::schema::scoped_vault_label;
+        use db_schema::schema::scoped_vault_tag;
+        use db_schema::schema::watchlist_check;
+        use db_schema::schema::workflow;
+        use db_schema::schema::workflow_request;
         type ScopedVaultInfo = (
             ScopedVault,
             Option<WatchlistCheck>,
@@ -556,11 +538,9 @@ impl ScopedVault {
     /// List all authorized onboardings for a given vault
     #[tracing::instrument("ScopedVault::list_authorized", skip_all)]
     pub fn list_authorized(conn: &mut PgConn, v_id: &VaultId) -> DbResult<Vec<AuthorizedTenant>> {
-        use db_schema::schema::{
-            ob_configuration,
-            tenant,
-            workflow,
-        };
+        use db_schema::schema::ob_configuration;
+        use db_schema::schema::tenant;
+        use db_schema::schema::workflow;
         let results = workflow::table
             .inner_join(scoped_vault::table)
             .inner_join(ob_configuration::table)

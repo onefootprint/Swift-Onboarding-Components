@@ -1,19 +1,13 @@
 use super::timeouts::ResponseDeadline;
 use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::ApiResult;
-use crate::{
-    ApiError,
-    ApiErrorKind,
-};
+use crate::ApiError;
+use crate::ApiErrorKind;
 use actix_multipart::Multipart;
-use actix_web::{
-    HttpMessage,
-    HttpRequest,
-};
-use bytes::{
-    BufMut,
-    BytesMut,
-};
+use actix_web::HttpMessage;
+use actix_web::HttpRequest;
+use bytes::BufMut;
+use bytes::BytesMut;
 use futures_util::StreamExt as _;
 use mime::Mime;
 use newtypes::PiiBytes;

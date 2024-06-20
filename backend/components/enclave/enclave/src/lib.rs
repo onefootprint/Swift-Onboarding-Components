@@ -5,21 +5,17 @@ mod util;
 pub use self::util::*;
 mod config;
 pub use self::config::Config;
-use crate::enclave::{
-    handle_decrypt,
-    handle_decrypt_then_hmac_sign,
-    handle_generate_data_keypair,
-    handle_generate_symmetric_data_key,
-    handle_hmac_sign,
-    init as init_enclave_sdk,
-};
+use crate::enclave::handle_decrypt;
+use crate::enclave::handle_decrypt_then_hmac_sign;
+use crate::enclave::handle_generate_data_keypair;
+use crate::enclave::handle_generate_symmetric_data_key;
+use crate::enclave::handle_hmac_sign;
+use crate::enclave::init as init_enclave_sdk;
 #[allow(unused_imports)]
 use futures::StreamExt as _;
-use tokio::io::{
-    AsyncRead,
-    AsyncWrite,
-    AsyncWriteExt,
-};
+use tokio::io::AsyncRead;
+use tokio::io::AsyncWrite;
+use tokio::io::AsyncWriteExt;
 use tokio::net::TcpListener;
 #[cfg(feature = "nitro")]
 use tokio_vsock::VsockListener;

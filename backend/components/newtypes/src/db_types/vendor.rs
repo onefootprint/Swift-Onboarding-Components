@@ -1,21 +1,15 @@
 use crate::util::impl_enum_str_diesel;
 use derive_more::Display;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use strum::IntoEnumIterator;
-use strum_macros::{
-    AsRefStr,
-    EnumIter,
-    EnumString,
-};
+use strum_macros::AsRefStr;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

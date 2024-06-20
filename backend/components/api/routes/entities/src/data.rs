@@ -1,8 +1,6 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::ApiError;
 use crate::get::search::decrypt_visible_attrs;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -12,11 +10,9 @@ use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::EntityAttribute;
 use db::models::scoped_vault::ScopedVault;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "View the vault data for a specific entity (business or user)",

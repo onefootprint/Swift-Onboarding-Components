@@ -5,37 +5,27 @@ use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::expectid::response::ExpectIDResponse;
 use idology::pa::response::PaResponse;
 use incode::curp_validation::response::CurpValidationResponse;
-use incode::doc::response::{
-    AddConsentResponse,
-    AddCustomerResponse,
-    AddSelfieResponse,
-    AddSideResponse,
-    FetchOCRResponse,
-    FetchScoresResponse,
-    GetOnboardingStatusResponse,
-    ProcessFaceResponse,
-    ProcessIdResponse,
-};
+use incode::doc::response::AddConsentResponse;
+use incode::doc::response::AddCustomerResponse;
+use incode::doc::response::AddSelfieResponse;
+use incode::doc::response::AddSideResponse;
+use incode::doc::response::FetchOCRResponse;
+use incode::doc::response::FetchScoresResponse;
+use incode::doc::response::GetOnboardingStatusResponse;
+use incode::doc::response::ProcessFaceResponse;
+use incode::doc::response::ProcessIdResponse;
 use incode::response::OnboardingStartResponse;
-use incode::watchlist::response::{
-    UpdatedWatchlistResultResponse,
-    WatchlistResultResponse,
-};
-use incode::{
-    IncodeAPIResult,
-    IncodeClientErrorCustomFailureReasons,
-};
+use incode::watchlist::response::UpdatedWatchlistResultResponse;
+use incode::watchlist::response::WatchlistResultResponse;
+use incode::IncodeAPIResult;
+use incode::IncodeClientErrorCustomFailureReasons;
 use lexis::response::FlexIdResponse;
 use middesk::response::business::BusinessResponse;
-use middesk::response::webhook::{
-    MiddeskBusinessUpdateWebhookResponse,
-    MiddeskTinRetriedWebhookResponse,
-};
+use middesk::response::webhook::MiddeskBusinessUpdateWebhookResponse;
+use middesk::response::webhook::MiddeskTinRetriedWebhookResponse;
 use neuro_id::response::NeuroIdAnalyticsResponse;
-use newtypes::{
-    PiiJsonValue,
-    VendorAPI,
-};
+use newtypes::PiiJsonValue;
+use newtypes::VendorAPI;
 use socure::response::SocureIDPlusResponse;
 use std::fmt::Debug;
 

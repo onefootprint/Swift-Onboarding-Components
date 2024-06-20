@@ -5,20 +5,16 @@ use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
 use api_core::errors::ValidationError;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_wire_types::hosted::business::{
-    HostedBusiness,
-    Invited,
-    Inviter,
-};
+use api_wire_types::hosted::business::HostedBusiness;
+use api_wire_types::hosted::business::Invited;
+use api_wire_types::hosted::business::Inviter;
 use db::models::workflow::Workflow;
-use newtypes::{
-    BusinessDataKind as BDK,
-    BusinessOwnerKind,
-};
+use newtypes::BusinessDataKind as BDK;
+use newtypes::BusinessOwnerKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

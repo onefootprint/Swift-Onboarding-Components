@@ -4,19 +4,15 @@ use crate::State;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::utils::actix::OptionalJson;
-use api_core::utils::headers::{
-    ExternalId,
-    IdempotencyId,
-    SandboxId,
-};
+use api_core::utils::headers::ExternalId;
+use api_core::utils::headers::IdempotencyId;
+use api_core::utils::headers::SandboxId;
 use api_core::vault::create_non_portable_vault;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::VaultKind;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[allow(clippy::too_many_arguments)]
 #[api_v2_operation(

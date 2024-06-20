@@ -1,8 +1,6 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::errors::ApiResult;
@@ -12,11 +10,9 @@ use db::models::document::Document;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use newtypes::PreviewApi;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "View the successfully uploaded documents uploaded for this user.",

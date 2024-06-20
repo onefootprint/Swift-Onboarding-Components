@@ -14,22 +14,18 @@ use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
 use db::DbPool;
 use idv::incode::watchlist::response::WatchlistResultResponse;
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::{
-    CipKind,
-    DecisionIntentId,
-    DecisionStatus,
-    FootprintReasonCode,
-    RuleAction,
-    ScopedVaultId,
-    SignalSeverity,
-    VaultKind,
-    VaultPublicKey,
-    VendorAPI,
-};
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::CipKind;
+use newtypes::DecisionIntentId;
+use newtypes::DecisionStatus;
+use newtypes::FootprintReasonCode;
+use newtypes::RuleAction;
+use newtypes::ScopedVaultId;
+use newtypes::SignalSeverity;
+use newtypes::VaultKind;
+use newtypes::VaultPublicKey;
+use newtypes::VendorAPI;
 use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
@@ -326,15 +322,11 @@ pub async fn save_fixture_incode_watchlist_result(
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        build_reason_code_map,
-        choose_random_reason_codes,
-    };
-    use newtypes::{
-        SignalScope,
-        SignalSeverity,
-        VaultKind,
-    };
+    use super::build_reason_code_map;
+    use super::choose_random_reason_codes;
+    use newtypes::SignalScope;
+    use newtypes::SignalSeverity;
+    use newtypes::VaultKind;
     use test_case::test_case;
 
     #[test_case(3, SignalSeverity::High => 3)]

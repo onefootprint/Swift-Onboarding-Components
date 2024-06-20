@@ -1,14 +1,10 @@
 use crate::idology::IdologyError::RequestError;
-use newtypes::{
-    FootprintReasonCode,
-    IDologyReasonCode,
-    PiiString,
-    ScrubbedPiiString,
-};
-use serde::{
-    Deserialize,
-    Deserializer,
-};
+use newtypes::FootprintReasonCode;
+use newtypes::IDologyReasonCode;
+use newtypes::PiiString;
+use newtypes::ScrubbedPiiString;
+use serde::Deserialize;
+use serde::Deserializer;
 use std::convert::Infallible;
 use std::str::FromStr;
 use strum::EnumString;

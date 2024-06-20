@@ -1,8 +1,6 @@
 use actix_web::web;
-use api_core::auth::session::tenant::{
-    TenantRbSession,
-    WorkOsSession,
-};
+use api_core::auth::session::tenant::TenantRbSession;
+use api_core::auth::session::tenant::WorkOsSession;
 use api_core::auth::session::AuthSessionData;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::workos::WorkOsError;
@@ -11,44 +9,32 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::email_domain;
 use api_core::utils::session::AuthSession;
 use api_core::State;
-use api_wire_types::{
-    OrgLoginResponse,
-    Organization,
-    OrganizationMember,
-    PartnerOrganization,
-};
+use api_wire_types::OrgLoginResponse;
+use api_wire_types::Organization;
+use api_wire_types::OrganizationMember;
+use api_wire_types::PartnerOrganization;
 use chrono::Duration;
 use db::helpers::TenantOrPartnerTenant;
-use db::models::partner_tenant::{
-    NewPartnerTenant,
-    PartnerTenant,
-};
-use db::models::tenant::{
-    NewTenant,
-    Tenant,
-};
-use db::models::tenant_rolebinding::{
-    TenantRbLoginResult,
-    TenantRolebinding,
-};
+use db::models::partner_tenant::NewPartnerTenant;
+use db::models::partner_tenant::PartnerTenant;
+use db::models::tenant::NewTenant;
+use db::models::tenant::Tenant;
+use db::models::tenant_rolebinding::TenantRbLoginResult;
+use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
-use newtypes::{
-    OrgIdentifier,
-    OrgMemberEmail,
-    TenantKind,
-    TenantScope,
-    WorkosAuthMethod,
-};
+use newtypes::OrgIdentifier;
+use newtypes::OrgMemberEmail;
+use newtypes::TenantKind;
+use newtypes::TenantScope;
+use newtypes::WorkosAuthMethod;
 use std::str::FromStr;
-use workos::sso::{
-    AuthorizationCode,
-    ClientId,
-    ConnectionType,
-    GetProfileAndToken,
-    GetProfileAndTokenParams,
-    GetProfileAndTokenResponse,
-    Profile,
-};
+use workos::sso::AuthorizationCode;
+use workos::sso::ClientId;
+use workos::sso::ConnectionType;
+use workos::sso::GetProfileAndToken;
+use workos::sso::GetProfileAndTokenParams;
+use workos::sso::GetProfileAndTokenResponse;
+use workos::sso::Profile;
 use workos::KnownOrUnknown;
 
 fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> ApiResult<WorkosAuthMethod> {

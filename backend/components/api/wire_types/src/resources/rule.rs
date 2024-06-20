@@ -1,15 +1,13 @@
 use crate::*;
-use newtypes::{
-    FpId,
-    ListId,
-    ObConfigurationId,
-    OnboardingStatus,
-    RuleAction,
-    RuleExpression,
-    RuleExpressionCondition,
-    RuleId,
-    RuleInstanceKind,
-};
+use newtypes::FpId;
+use newtypes::ListId;
+use newtypes::ObConfigurationId;
+use newtypes::OnboardingStatus;
+use newtypes::RuleAction;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
+use newtypes::RuleId;
+use newtypes::RuleInstanceKind;
 use serde_with::SerializeDisplay;
 use std::collections::HashMap;
 

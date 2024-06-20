@@ -1,14 +1,12 @@
 use crate::experian::error::Error as ExperianError;
-use newtypes::{
-    scrub_pii_value,
-    scrub_value,
-    ExperianDobMatchReasonCodes,
-    ExperianFraudShieldCodes,
-    ExperianPhoneMatchReasonCodes,
-    ExperianSSNReasonCodes,
-    PiiJsonValue,
-    ScrubbedPiiString,
-};
+use newtypes::scrub_pii_value;
+use newtypes::scrub_value;
+use newtypes::ExperianDobMatchReasonCodes;
+use newtypes::ExperianFraudShieldCodes;
+use newtypes::ExperianPhoneMatchReasonCodes;
+use newtypes::ExperianSSNReasonCodes;
+use newtypes::PiiJsonValue;
+use newtypes::ScrubbedPiiString;
 use std::str::FromStr;
 
 /// This is the top level response from PreciseID (which we receive embedded in the CrossCore API

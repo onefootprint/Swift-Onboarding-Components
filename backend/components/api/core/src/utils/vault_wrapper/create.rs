@@ -1,43 +1,33 @@
-use super::{
-    Any,
-    DataLifetimeSources,
-    DataRequestSource,
-    FingerprintedDataRequest,
-    PatchDataResult,
-    Person,
-    VaultWrapper,
-    WriteableVw,
-};
+use super::Any;
+use super::DataLifetimeSources;
+use super::DataRequestSource;
+use super::FingerprintedDataRequest;
+use super::PatchDataResult;
+use super::Person;
+use super::VaultWrapper;
+use super::WriteableVw;
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::user::UserError;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::telemetry::RootSpan;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::{
-    NewScopedVaultArgs,
-    ScopedVault,
-};
-use db::models::vault::{
-    NewVaultArgs,
-    Vault,
-};
+use db::models::scoped_vault::NewScopedVaultArgs;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::NewVaultArgs;
+use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::email::Email;
-use newtypes::{
-    DataIdentifier as DI,
-    DataLifetimeSource,
-    IdentityDataKind as IDK,
-    Locked,
-    ObConfigurationKind,
-    OnboardingStatus,
-    PhoneNumber,
-    SandboxId,
-    VaultId,
-    VaultKind,
-};
+use newtypes::DataIdentifier as DI;
+use newtypes::DataLifetimeSource;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::Locked;
+use newtypes::ObConfigurationKind;
+use newtypes::OnboardingStatus;
+use newtypes::PhoneNumber;
+use newtypes::SandboxId;
+use newtypes::VaultId;
+use newtypes::VaultKind;
 use std::collections::HashMap;
 use std::str::FromStr;
 

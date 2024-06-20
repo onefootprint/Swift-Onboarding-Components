@@ -1,21 +1,15 @@
 use crate::models::data_lifetime::DataLifetime;
-use crate::models::document::{
-    Document,
-    NewDocumentArgs,
-};
-use crate::models::document_upload::{
-    DocumentUpload,
-    NewDocumentUploadArgs,
-};
+use crate::models::document::Document;
+use crate::models::document::NewDocumentArgs;
+use crate::models::document_upload::DocumentUpload;
+use crate::models::document_upload::NewDocumentUploadArgs;
 use crate::models::insight_event::CreateInsightEvent;
 use crate::TxnPgConn;
-use newtypes::{
-    DocumentKind,
-    DocumentRequestId,
-    DocumentSide,
-    S3Url,
-    SealedVaultDataKey,
-};
+use newtypes::DocumentKind;
+use newtypes::DocumentRequestId;
+use newtypes::DocumentSide;
+use newtypes::S3Url;
+use newtypes::SealedVaultDataKey;
 use std::str::FromStr;
 
 pub fn create(conn: &mut TxnPgConn, request_id: Option<DocumentRequestId>) -> Document {

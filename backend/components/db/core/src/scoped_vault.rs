@@ -1,36 +1,30 @@
 use crate::models::scoped_vault::ScopedVault;
 use crate::models::vault::Vault;
-use crate::{
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::vault;
 use db_schema::schema::{
     self,
-    vault,
 };
 use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{
-    ExternalId,
-    Fingerprint,
-    FpId,
-    LabelKind,
-    ObConfigurationId,
-    OnboardingStatus,
-    PiiString,
-    ScopedVaultCursor,
-    ScopedVaultCursorKind,
-    ScopedVaultId,
-    TenantId,
-    VaultKind,
-    WatchlistCheckStatusKind,
-};
+use newtypes::ExternalId;
+use newtypes::Fingerprint;
+use newtypes::FpId;
+use newtypes::LabelKind;
+use newtypes::ObConfigurationId;
+use newtypes::OnboardingStatus;
+use newtypes::PiiString;
+use newtypes::ScopedVaultCursor;
+use newtypes::ScopedVaultCursorKind;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::VaultKind;
+use newtypes::WatchlistCheckStatusKind;
 use tracing::instrument;
 
 #[derive(Debug, Clone, Default)]
@@ -120,14 +114,12 @@ macro_rules! list_query {
         // Filter out onboardings that haven't been explicitly authorized by the user - these should
         // not be visible in the dashboard since the tenant doesn't have permissions to view anything
         // about the user
-        use db_schema::schema::{
-            manual_review,
-            scoped_vault,
-            scoped_vault_label,
-            watchlist_check,
-            workflow,
-            workflow_request,
-        };
+        use db_schema::schema::manual_review;
+        use db_schema::schema::scoped_vault;
+        use db_schema::schema::scoped_vault_label;
+        use db_schema::schema::watchlist_check;
+        use db_schema::schema::workflow;
+        use db_schema::schema::workflow_request;
         let mut query = scoped_vault::table
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
             .filter(scoped_vault::is_live.eq($params.is_live))

@@ -1,12 +1,10 @@
 use super::actions::MakeDecision;
-use super::{
-    DoAction,
-    StateError,
-    Workflow,
-    WorkflowActions,
-    WorkflowKind,
-    WorkflowState,
-};
+use super::DoAction;
+use super::StateError;
+use super::Workflow;
+use super::WorkflowActions;
+use super::WorkflowKind;
+use super::WorkflowState;
 use crate::errors::ApiResult;
 use crate::State;
 use async_trait::async_trait;

@@ -1,19 +1,13 @@
 use crate::*;
-use newtypes::{
-    AuthMethodKind,
-    ContactInfoKind,
-    ObConfigurationKey,
-    PiiString,
-    SessionAuthToken,
-};
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum_macros::{
-    Display,
-    EnumString,
-};
+use newtypes::AuthMethodKind;
+use newtypes::ContactInfoKind;
+use newtypes::ObConfigurationKey;
+use newtypes::PiiString;
+use newtypes::SessionAuthToken;
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 #[derive(Default, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

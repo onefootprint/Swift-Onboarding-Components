@@ -1,18 +1,14 @@
 use proc_macro::TokenStream;
-use quote::{
-    format_ident,
-    quote,
-    ToTokens,
-};
+use quote::format_ident;
+use quote::quote;
+use quote::ToTokens;
+use syn::parse_macro_input;
+use syn::parse_quote;
 use syn::spanned::Spanned;
-use syn::{
-    parse_macro_input,
-    parse_quote,
-    AttributeArgs,
-    ItemFn,
-    Meta,
-    NestedMeta,
-};
+use syn::AttributeArgs;
+use syn::ItemFn;
+use syn::Meta;
+use syn::NestedMeta;
 use test_case_core::TestCase;
 
 extern crate proc_macro;

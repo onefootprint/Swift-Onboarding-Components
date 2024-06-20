@@ -1,37 +1,29 @@
 use super::data_lifetime::DataLifetime;
 use super::ob_configuration::IsLive;
-use crate::{
-    DbError,
-    DbResult,
-    NextPage,
-    OffsetPagination,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::NextPage;
+use crate::OffsetPagination;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::list::BoxedQuery;
 use db_schema::schema::list::{
     self,
-    BoxedQuery,
 };
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    DataLifetimeSeqno,
-    DbActor,
-    ListAlias,
-    ListId,
-    ListKind,
-    Locked,
-    SealedVaultDataKey,
-    TenantId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
+use newtypes::ListAlias;
+use newtypes::ListId;
+use newtypes::ListKind;
+use newtypes::Locked;
+use newtypes::SealedVaultDataKey;
+use newtypes::TenantId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]

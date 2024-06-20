@@ -1,9 +1,7 @@
 use crate::utils::db2api::DbToApi;
 use db::models::billing_profile::BillingProfile;
-use db::models::tenant::{
-    Tenant,
-    UserCounts,
-};
+use db::models::tenant::Tenant;
+use db::models::tenant::UserCounts;
 use db::models::tenant_vendor::TenantVendorControl;
 
 impl DbToApi<(Option<UserCounts>, Tenant)> for api_wire_types::PrivateTenant {

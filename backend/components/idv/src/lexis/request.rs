@@ -1,13 +1,9 @@
 use super::ConversionError;
-use chrono::{
-    Datelike,
-    NaiveDate,
-};
+use chrono::Datelike;
+use chrono::NaiveDate;
 use newtypes::*;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use serde_repr::*;
 use std::fmt::Debug;
 

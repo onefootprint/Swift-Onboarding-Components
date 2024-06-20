@@ -1,60 +1,46 @@
 use crate::config::Config;
-use crate::utils::headers::{
-    InsightHeaders,
-    TelemetryHeaders,
-};
+use crate::utils::headers::InsightHeaders;
+use crate::utils::headers::TelemetryHeaders;
 use actix_web::FromRequest;
 use anyhow::Result;
-use chrono::{
-    SecondsFormat,
-    Utc,
-};
+use chrono::SecondsFormat;
+use chrono::Utc;
 use futures_util::Future;
 use itertools::Itertools;
 use opentelemetry::global;
 use opentelemetry::sdk::metrics::controllers::BasicController;
 use opentelemetry::sdk::metrics::selectors;
 use opentelemetry::sdk::propagation::TraceContextPropagator;
-use opentelemetry::trace::{
-    SpanId,
-    TraceContextExt,
-    TraceId,
-};
+use opentelemetry::trace::SpanId;
+use opentelemetry::trace::TraceContextExt;
+use opentelemetry::trace::TraceId;
 use opentelemetry_otlp::WithExportConfig;
 use serde::ser::SerializeMap;
 use serde::Serializer;
 use std::io;
 use std::pin::Pin;
-use tracing::{
-    Span,
-    Subscriber,
-};
-use tracing_actix_web::{
-    root_span,
-    DefaultRootSpanBuilder,
-    RootSpanBuilder,
-};
+use tracing::Span;
+use tracing::Subscriber;
+use tracing_actix_web::root_span;
+use tracing_actix_web::DefaultRootSpanBuilder;
+use tracing_actix_web::RootSpanBuilder;
 use tracing_core::Event;
 use tracing_opentelemetry::OtelData;
 use tracing_serde::fields::AsMap;
 use tracing_serde::AsSerde;
 use tracing_subscriber::fmt::format::Writer;
+use tracing_subscriber::fmt::FmtContext;
+use tracing_subscriber::fmt::FormatEvent;
+use tracing_subscriber::fmt::FormatFields;
 use tracing_subscriber::fmt::{
     self,
-    FmtContext,
-    FormatEvent,
-    FormatFields,
 };
 use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::registry::{
-    LookupSpan,
-    SpanRef,
-};
-use tracing_subscriber::{
-    EnvFilter,
-    Layer,
-    Registry,
-};
+use tracing_subscriber::registry::LookupSpan;
+use tracing_subscriber::registry::SpanRef;
+use tracing_subscriber::EnvFilter;
+use tracing_subscriber::Layer;
+use tracing_subscriber::Registry;
 
 // Initialize `tracing` using `opentelemetry-tracing` and configure logging
 pub fn init(config: &Config) -> Result<Option<BasicController>> {

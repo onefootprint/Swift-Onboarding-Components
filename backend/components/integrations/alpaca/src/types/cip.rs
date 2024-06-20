@@ -1,13 +1,11 @@
 use chrono::Utc;
 use newtypes::macros::pii;
-use newtypes::{
-    AlpacaDocumentType,
-    AlpacaPiiString,
-    FpId,
-    PiiJsonValue,
-    PiiString,
-    Vendor,
-};
+use newtypes::AlpacaDocumentType;
+use newtypes::AlpacaPiiString;
+use newtypes::FpId;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::Vendor;
 /// Represents a request to upload CIP information for an alpaca Account
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CipRequest {

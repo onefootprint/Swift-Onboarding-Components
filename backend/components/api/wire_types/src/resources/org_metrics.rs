@@ -1,16 +1,10 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use newtypes::ObConfigurationId;
-use paperclip::actix::{
-    Apiv2Response,
-    Apiv2Schema,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 

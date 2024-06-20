@@ -1,9 +1,7 @@
+use newtypes::AuthEventKind;
+use newtypes::RequestedTokenScope;
 pub use newtypes::UserAuthScope;
-use newtypes::{
-    AuthEventKind,
-    RequestedTokenScope,
-    VaultId,
-};
+use newtypes::VaultId;
 use std::collections::HashSet;
 
 mod session;
@@ -77,10 +75,8 @@ fn auth_event_to_scopes(k: &AuthEventKind) -> Vec<UserAuthScope> {
 
 #[cfg(test)]
 mod test {
-    use super::{
-        RequestedTokenScope,
-        UserAuthScope,
-    };
+    use super::RequestedTokenScope;
+    use super::UserAuthScope;
     use newtypes::AuthEventKind;
     use test_case::test_case;
 

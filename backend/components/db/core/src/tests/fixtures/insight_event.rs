@@ -1,7 +1,5 @@
-use crate::models::insight_event::{
-    CreateInsightEvent,
-    InsightEvent,
-};
+use crate::models::insight_event::CreateInsightEvent;
+use crate::models::insight_event::InsightEvent;
 use crate::TxnPgConn;
 use chrono::Utc;
 

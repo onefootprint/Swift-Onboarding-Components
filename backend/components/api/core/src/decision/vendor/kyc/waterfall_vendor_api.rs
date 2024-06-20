@@ -1,21 +1,15 @@
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use crate::decision::vendor::vendor_api::vendor_api_struct::{
-    ExperianPreciseID,
-    IdologyExpectID,
-    LexisFlexId,
-};
+use crate::decision::vendor::vendor_api::vendor_api_struct::ExperianPreciseID;
+use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyExpectID;
+use crate::decision::vendor::vendor_api::vendor_api_struct::LexisFlexId;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::ApiResult;
 use crate::State;
 use db::models::verification_request::VReqIdentifier;
-use newtypes::{
-    EncryptedVaultPrivateKey,
-    VendorAPI,
-};
-use strum::{
-    EnumIter,
-    IntoEnumIterator,
-};
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::VendorAPI;
+use strum::EnumIter;
+use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, EnumIter)]
 // For now, we just have 1 singular KYC waterfall ordering for all vendors. We start with Experian

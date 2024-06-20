@@ -1,8 +1,6 @@
 use newtypes::PiiJsonValue;
-use std::fmt::{
-    Debug,
-    Display,
-};
+use std::fmt::Debug;
+use std::fmt::Display;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

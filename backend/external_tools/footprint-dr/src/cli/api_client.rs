@@ -1,35 +1,25 @@
-use super::wire_types::{
-    VaultDrAwsPreEnrollResponse,
-    VaultDrEnrollRequest,
-    VaultDrEnrollResponse,
-    VaultDrStatus,
-};
-use anyhow::{
-    anyhow,
-    bail,
-    Context,
-    Ok,
-    Result,
-};
+use super::wire_types::VaultDrAwsPreEnrollResponse;
+use super::wire_types::VaultDrEnrollRequest;
+use super::wire_types::VaultDrEnrollResponse;
+use super::wire_types::VaultDrStatus;
+use anyhow::anyhow;
+use anyhow::bail;
+use anyhow::Context;
+use anyhow::Ok;
+use anyhow::Result;
 use keyring::Entry;
 use log::debug;
-use reqwest::blocking::{
-    Client,
-    RequestBuilder,
-};
-use reqwest::header::{
-    HeaderMap,
-    HeaderValue,
-};
-use reqwest::{
-    Method,
-    StatusCode,
-    Url,
-};
+use reqwest::blocking::Client;
+use reqwest::blocking::RequestBuilder;
+use reqwest::header::HeaderMap;
+use reqwest::header::HeaderValue;
+use reqwest::Method;
+use reqwest::StatusCode;
+use reqwest::Url;
+use std::fmt::Display;
+use std::fmt::Formatter;
 use std::fmt::{
     self,
-    Display,
-    Formatter,
 };
 use std::ops::Not;
 

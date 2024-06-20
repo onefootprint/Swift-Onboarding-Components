@@ -1,8 +1,6 @@
 use crate::*;
-use newtypes::{
-    ObConfigurationKey,
-    WorkflowFixtureResult,
-};
+use newtypes::ObConfigurationKey;
+use newtypes::WorkflowFixtureResult;
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

@@ -1,9 +1,7 @@
 use crate::*;
-use newtypes::{
-    PartnerTenantId,
-    SessionAuthToken,
-    TenantId,
-};
+use newtypes::PartnerTenantId;
+use newtypes::SessionAuthToken;
+use newtypes::TenantId;
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct TenantLoginRequest {

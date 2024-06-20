@@ -6,23 +6,17 @@ use crate::models::onboarding_decision::OnboardingDecision;
 use crate::models::scoped_vault::ScopedVault;
 use crate::models::tenant_api_key::TenantApiKey;
 use crate::models::tenant_user::TenantUser;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-};
-use db_schema::schema::{
-    scoped_vault,
-    tenant_api_key,
-    tenant_user,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::tenant_api_key;
+use db_schema::schema::tenant_user;
 use diesel::prelude::*;
-use newtypes::{
-    DbActor,
-    ScopedVaultId,
-    TenantApiKeyId,
-    TenantUserId,
-};
+use newtypes::DbActor;
+use newtypes::ScopedVaultId;
+use newtypes::TenantApiKeyId;
+use newtypes::TenantUserId;
 use std::collections::HashMap;
 use tracing::instrument;
 

@@ -4,15 +4,11 @@ use actix_web::http::header::HeaderMap;
 use actix_web::FromRequest;
 use derive_more::Deref;
 use futures_util::Future;
-use paperclip::v2::models::{
-    DefaultSchemaRaw,
-    Parameter,
-};
+use paperclip::v2::models::DefaultSchemaRaw;
+use paperclip::v2::models::Parameter;
 use paperclip::v2::schema::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Deref)]

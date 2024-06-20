@@ -1,9 +1,7 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::ModernApiResult;
@@ -14,17 +12,15 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
+use newtypes::flat_api_object_map_type;
+use newtypes::impl_response_type;
 use newtypes::input::Csv;
-use newtypes::{
-    flat_api_object_map_type,
-    impl_response_type,
-    DataIdentifier,
-};
+use newtypes::DataIdentifier;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
-    Apiv2Schema,
 };
 use serde::Deserialize;
 use std::collections::HashMap;

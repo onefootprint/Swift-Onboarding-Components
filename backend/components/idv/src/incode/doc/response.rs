@@ -1,37 +1,31 @@
 use crate::incode::error::Error as IncodeError;
 use crate::incode::IncodeClientErrorCustomFailureReasons;
+use crate::test_fixtures::DocTestOpts;
 use crate::test_fixtures::{
     self,
-    DocTestOpts,
 };
-use chrono::{
-    NaiveDate,
-    NaiveDateTime,
-    Utc,
-};
+use chrono::NaiveDate;
+use chrono::NaiveDateTime;
+use chrono::Utc;
 use itertools::Itertools;
-use newtypes::incode::{
-    IncodeDocumentRestriction,
-    IncodeDocumentSubType,
-    IncodeDocumentType,
-    IncodeStatus,
-    IncodeTest,
-};
-use newtypes::{
-    DocumentFixtureResult,
-    IdDocKind,
-    IncodeFailureReason,
-    IncodeVerificationSessionKind,
-    Iso3166ThreeDigitCountryCode,
-    Iso3166TwoDigitCountryCode,
-    PiiString,
-    ScrubbedPiiInt,
-    ScrubbedPiiLong,
-    ScrubbedPiiString,
-    UsState,
-    UsStateFull,
-    DATE_FORMAT,
-};
+use newtypes::incode::IncodeDocumentRestriction;
+use newtypes::incode::IncodeDocumentSubType;
+use newtypes::incode::IncodeDocumentType;
+use newtypes::incode::IncodeStatus;
+use newtypes::incode::IncodeTest;
+use newtypes::DocumentFixtureResult;
+use newtypes::IdDocKind;
+use newtypes::IncodeFailureReason;
+use newtypes::IncodeVerificationSessionKind;
+use newtypes::Iso3166ThreeDigitCountryCode;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::PiiString;
+use newtypes::ScrubbedPiiInt;
+use newtypes::ScrubbedPiiLong;
+use newtypes::ScrubbedPiiString;
+use newtypes::UsState;
+use newtypes::UsStateFull;
+use newtypes::DATE_FORMAT;
 use std::collections::HashMap;
 use std::str::FromStr;
 
@@ -969,27 +963,21 @@ pub struct OcrDataConfidence {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::incode::doc::response::{
-        AddSelfieResponse,
-        ProcessFaceResponse,
-    };
+    use crate::incode::doc::response::AddSelfieResponse;
+    use crate::incode::doc::response::ProcessFaceResponse;
     use crate::incode::IncodeAPIResult;
+    use crate::test_fixtures::DocTestOpts;
     use crate::test_fixtures::{
         self,
-        DocTestOpts,
     };
-    use newtypes::incode::{
-        IncodeDocumentRestriction,
-        IncodeDocumentType,
-        IncodeStatus,
-        IncodeTest,
-    };
-    use newtypes::{
-        IdDocKind,
-        IncodeFailureReason,
-        PiiLong,
-        ScrubbedPiiLong,
-    };
+    use newtypes::incode::IncodeDocumentRestriction;
+    use newtypes::incode::IncodeDocumentType;
+    use newtypes::incode::IncodeStatus;
+    use newtypes::incode::IncodeTest;
+    use newtypes::IdDocKind;
+    use newtypes::IncodeFailureReason;
+    use newtypes::PiiLong;
+    use newtypes::ScrubbedPiiLong;
 
     #[test]
     pub fn test_parse_fetch_scores() {

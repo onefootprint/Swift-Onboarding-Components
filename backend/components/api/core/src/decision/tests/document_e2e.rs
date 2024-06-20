@@ -1,39 +1,29 @@
-use super::document_test_utils::{
-    mock_enclave_s3_client,
-    mock_ff_client,
-    mock_incode_request,
-    mock_s3_put_object,
-    DocumentUploadTestCase,
-    UserKind,
-};
+use super::document_test_utils::mock_enclave_s3_client;
+use super::document_test_utils::mock_ff_client;
+use super::document_test_utils::mock_incode_request;
+use super::document_test_utils::mock_s3_put_object;
+use super::document_test_utils::DocumentUploadTestCase;
+use super::document_test_utils::UserKind;
 use super::test_helpers::FixtureData;
 use crate::decision::document::meta_headers::MetaHeaders;
-use crate::decision::document::route_handler::{
-    IncodeConfigurationIdOverride,
-    IsRerun,
-};
+use crate::decision::document::route_handler::IncodeConfigurationIdOverride;
+use crate::decision::document::route_handler::IsRerun;
 use crate::decision::state::test_utils::query_risk_signals;
 use crate::decision::{
     self,
 };
 use crate::utils::file_upload::FileUpload;
 use crate::State;
-use api_wire_types::{
-    CreateDocumentRequest,
-    DocumentResponse,
-};
+use api_wire_types::CreateDocumentRequest;
+use api_wire_types::DocumentResponse;
 use chrono::Utc;
 use db::models::document::Document;
-use db::models::document_request::{
-    DocumentRequest,
-    NewDocumentRequestArgs,
-};
+use db::models::document_request::DocumentRequest;
+use db::models::document_request::NewDocumentRequestArgs;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::incode_verification_session_event::IncodeVerificationSessionEvent;
-use db::models::insight_event::{
-    CreateInsightEvent,
-    InsightEvent,
-};
+use db::models::insight_event::CreateInsightEvent;
+use db::models::insight_event::InsightEvent;
 use db::models::user_consent::UserConsent;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
@@ -41,28 +31,26 @@ use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::DbResult;
 use macros::test_state_case;
-use newtypes::{
-    CollectedDataOption,
-    CountryRestriction,
-    DocTypeRestriction,
-    DocumentCdoInfo,
-    DocumentFixtureResult,
-    DocumentId,
-    DocumentKind,
-    DocumentRequestConfig,
-    DocumentRequestKind,
-    DocumentSide,
-    DocumentStatus,
-    IdDocKind,
-    IncodeVerificationSessionState,
-    Iso3166TwoDigitCountryCode,
-    PiiBytes,
-    RiskSignalGroupKind,
-    ScopedVaultId,
-    Selfie,
-    TenantId,
-    WorkflowFixtureResult,
-};
+use newtypes::CollectedDataOption;
+use newtypes::CountryRestriction;
+use newtypes::DocTypeRestriction;
+use newtypes::DocumentCdoInfo;
+use newtypes::DocumentFixtureResult;
+use newtypes::DocumentId;
+use newtypes::DocumentKind;
+use newtypes::DocumentRequestConfig;
+use newtypes::DocumentRequestKind;
+use newtypes::DocumentSide;
+use newtypes::DocumentStatus;
+use newtypes::IdDocKind;
+use newtypes::IncodeVerificationSessionState;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::PiiBytes;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
+use newtypes::Selfie;
+use newtypes::TenantId;
+use newtypes::WorkflowFixtureResult;
 use strum::IntoEnumIterator;
 
 #[test_state_case(UserKind::Live, Selfie::RequireSelfie)]

@@ -1,11 +1,7 @@
-use super::error::{
-    Error,
-    StytchError,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use super::error::Error;
+use super::error::StytchError;
+use chrono::DateTime;
+use chrono::Utc;
 use newtypes::PiiString;
 use serde::*;
 use serde_with::DeserializeFromStr;

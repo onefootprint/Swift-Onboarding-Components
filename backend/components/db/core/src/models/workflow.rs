@@ -1,14 +1,10 @@
 use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
-use super::onboarding_decision::{
-    NewDecisionArgs,
-    OnboardingDecision,
-};
-use super::scoped_vault::{
-    ScopedVault,
-    ScopedVaultUpdate,
-};
+use super::onboarding_decision::NewDecisionArgs;
+use super::onboarding_decision::OnboardingDecision;
+use super::scoped_vault::ScopedVault;
+use super::scoped_vault::ScopedVaultUpdate;
 use super::task::Task;
 use super::user_timeline::UserTimeline;
 use super::workflow_event::WorkflowEvent;
@@ -16,58 +12,48 @@ use super::workflow_request::WorkflowRequest;
 use crate::errors::ValidationError;
 use crate::models::billing_event::BillingEvent;
 use crate::models::vault::Vault;
-use crate::{
-    DbResult,
-    OffsetPaginatedResult,
-    OffsetPagination,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    ob_configuration,
-    workflow,
-};
-use diesel::dsl::{
-    count_star,
-    not,
-};
+use crate::DbResult;
+use crate::OffsetPaginatedResult;
+use crate::OffsetPagination;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::ob_configuration;
+use db_schema::schema::workflow;
+use diesel::dsl::count_star;
+use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
-use newtypes::{
-    AlpacaKycState,
-    DbActor,
-    DocumentConfig,
-    DocumentState,
-    InsightEventId,
-    KybConfig,
-    KybState,
-    KycConfig,
-    KycState,
-    Locked,
-    ObConfigurationId,
-    ObConfigurationKind,
-    OnboardingCompletedPayload,
-    OnboardingStatus,
-    OnboardingStatusChangedPayload,
-    ScopedVaultId,
-    TenantId,
-    TenantScope,
-    VaultId,
-    VaultKind,
-    WebhookEvent,
-    WorkflowConfig,
-    WorkflowFixtureResult,
-    WorkflowId,
-    WorkflowKind,
-    WorkflowRequestConfig,
-    WorkflowSource,
-    WorkflowStartedInfo,
-    WorkflowState,
-};
+use newtypes::AlpacaKycState;
+use newtypes::DbActor;
+use newtypes::DocumentConfig;
+use newtypes::DocumentState;
+use newtypes::InsightEventId;
+use newtypes::KybConfig;
+use newtypes::KybState;
+use newtypes::KycConfig;
+use newtypes::KycState;
+use newtypes::Locked;
+use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKind;
+use newtypes::OnboardingCompletedPayload;
+use newtypes::OnboardingStatus;
+use newtypes::OnboardingStatusChangedPayload;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::TenantScope;
+use newtypes::VaultId;
+use newtypes::VaultKind;
+use newtypes::WebhookEvent;
+use newtypes::WorkflowConfig;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowId;
+use newtypes::WorkflowKind;
+use newtypes::WorkflowRequestConfig;
+use newtypes::WorkflowSource;
+use newtypes::WorkflowStartedInfo;
+use newtypes::WorkflowState;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
@@ -453,10 +439,8 @@ impl Workflow {
         conn: &mut PgConn,
         id: T,
     ) -> DbResult<(Self, ScopedVault)> {
-        use db_schema::schema::{
-            business_owner,
-            scoped_vault,
-        };
+        use db_schema::schema::business_owner;
+        use db_schema::schema::scoped_vault;
         let mut query = workflow::table.inner_join(scoped_vault::table).into_boxed();
         match id.into() {
             WorkflowIdentifier::Id { id } => query = query.filter(workflow::id.eq(id)),
@@ -500,10 +484,8 @@ impl Workflow {
 
     #[tracing::instrument("Workflow::get_with_vault", skip_all)]
     pub fn get_with_vault(conn: &mut PgConn, id: &WorkflowId) -> DbResult<(Self, Vault)> {
-        use db_schema::schema::{
-            scoped_vault,
-            vault,
-        };
+        use db_schema::schema::scoped_vault;
+        use db_schema::schema::vault;
         let res = workflow::table
             .filter(workflow::id.eq(id))
             .inner_join(scoped_vault::table.inner_join(vault::table))
@@ -735,10 +717,8 @@ impl Workflow {
         end_date: DateTime<Utc>,
         kind: VaultKind,
     ) -> DbResult<i64> {
-        use db_schema::schema::{
-            ob_configuration,
-            scoped_vault,
-        };
+        use db_schema::schema::ob_configuration;
+        use db_schema::schema::scoped_vault;
         let mut query = workflow::table
             .inner_join(scoped_vault::table)
             .inner_join(ob_configuration::table)
@@ -770,11 +750,9 @@ mod tests {
     use crate::models::workflow_event::WorkflowEvent;
     use crate::tests::prelude::*;
     use macros::db_test;
-    use newtypes::{
-        KycConfig,
-        KycState,
-        WorkflowSource,
-    };
+    use newtypes::KycConfig;
+    use newtypes::KycState;
+    use newtypes::WorkflowSource;
     use std::str::FromStr;
 
     #[db_test]

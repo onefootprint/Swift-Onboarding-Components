@@ -1,41 +1,31 @@
 use super::scoped_vault::ScopedVault;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    fingerprint,
-    fingerprint_junction,
-    scoped_vault,
-};
-use diesel::dsl::{
-    count_distinct,
-    not,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::fingerprint;
+use db_schema::schema::fingerprint_junction;
+use db_schema::schema::scoped_vault;
+use diesel::dsl::count_distinct;
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    CompositeFingerprintKind,
-    DataIdentifier as DI,
-    DataLifetimeId,
-    Fingerprint as FingerprintData,
-    FingerprintId,
-    FingerprintKind,
-    FingerprintScope,
-    FingerprintVersion,
-    IdentityDataKind as IDK,
-    PiiString,
-    ScopedVaultId,
-    TenantId,
-    VaultId,
-};
+use newtypes::CompositeFingerprintKind;
+use newtypes::DataIdentifier as DI;
+use newtypes::DataLifetimeId;
+use newtypes::Fingerprint as FingerprintData;
+use newtypes::FingerprintId;
+use newtypes::FingerprintKind;
+use newtypes::FingerprintScope;
+use newtypes::FingerprintVersion;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::PiiString;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::VaultId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = fingerprint)]

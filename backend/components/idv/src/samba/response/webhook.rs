@@ -1,16 +1,10 @@
-use super::license_validation::{
-    OrderStatusLink,
-    OrderStatusLinks,
-    SambaLinkType,
-};
-use newtypes::{
-    SambaOrderId,
-    SambaWebhookEventType,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use super::license_validation::OrderStatusLink;
+use super::license_validation::OrderStatusLinks;
+use super::license_validation::SambaLinkType;
+use newtypes::SambaOrderId;
+use newtypes::SambaWebhookEventType;
+use serde::Deserialize;
+use serde::Serialize;
 use std::str::FromStr;
 
 #[derive(Deserialize, Serialize, Clone, Debug)]

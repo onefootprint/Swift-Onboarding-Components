@@ -1,19 +1,15 @@
-use super::{
-    VendorAPICall,
-    VendorAPIResponse,
-};
+use super::VendorAPICall;
+use super::VendorAPIResponse;
 use async_trait::async_trait;
+use idv::experian::ExperianCrossCoreRequest;
+use idv::experian::ExperianCrossCoreResponse;
 use idv::experian::{
     self,
-    ExperianCrossCoreRequest,
-    ExperianCrossCoreResponse,
 };
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::ParsedResponse;
-use newtypes::{
-    PiiJsonValue,
-    VendorAPI,
-};
+use newtypes::PiiJsonValue;
+use newtypes::VendorAPI;
 ////////////////////
 /// Experian Impl
 /// /// ////////////////

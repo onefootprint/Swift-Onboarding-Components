@@ -2,10 +2,8 @@ use crate::auth::AuthError;
 use crate::errors::AssertionError;
 use crate::telemetry::RootSpan;
 use crate::State;
-use actix_web::{
-    web,
-    FromRequest,
-};
+use actix_web::web;
+use actix_web::FromRequest;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::DbResult;

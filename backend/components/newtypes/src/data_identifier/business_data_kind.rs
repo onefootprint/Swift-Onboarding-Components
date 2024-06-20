@@ -1,13 +1,9 @@
-use crate::{
-    CollectedData,
-    DataIdentifier,
-    IsDataIdentifierDiscriminant,
-};
-use strum_macros::{
-    Display,
-    EnumIter,
-    EnumString,
-};
+use crate::CollectedData;
+use crate::DataIdentifier;
+use crate::IsDataIdentifierDiscriminant;
+use strum_macros::Display;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, EnumString, EnumIter)]
 #[strum(serialize_all = "snake_case")]

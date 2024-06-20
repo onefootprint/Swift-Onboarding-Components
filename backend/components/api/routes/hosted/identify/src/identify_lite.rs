@@ -3,17 +3,15 @@ use api_core::auth::ob_config::ObConfigAuth;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::State;
-use api_wire_types::{
-    IdentifyId,
-    LiteIdentifyRequest,
-    LiteIdentifyResponse,
-};
+use api_wire_types::IdentifyId;
+use api_wire_types::LiteIdentifyRequest;
+use api_wire_types::LiteIdentifyResponse;
 use itertools::Itertools;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

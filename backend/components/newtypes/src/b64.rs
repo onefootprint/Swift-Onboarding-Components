@@ -1,10 +1,8 @@
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    de,
-    Deserialize,
-    Deserializer,
-    Serialize,
-};
+use serde::de;
+use serde::Deserialize;
+use serde::Deserializer;
+use serde::Serialize;
 use std::fmt::Display;
 use std::str::FromStr;
 

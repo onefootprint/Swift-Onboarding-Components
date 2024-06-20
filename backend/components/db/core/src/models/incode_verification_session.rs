@@ -1,40 +1,32 @@
 use super::incode_verification_session_event::IncodeVerificationSessionEvent;
-use crate::{
-    DbResult,
-    NonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
+use crate::DbResult;
+use crate::NonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
+use db_schema::schema::document_request;
+use db_schema::schema::identity_document;
+use db_schema::schema::incode_verification_session::BoxedQuery;
 use db_schema::schema::incode_verification_session::{
     self,
-    BoxedQuery,
-};
-use db_schema::schema::{
-    document_request,
-    identity_document,
 };
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use newtypes::{
-    DocumentId,
-    DocumentSide,
-    IncodeAuthorizationToken,
-    IncodeConfigurationId,
-    IncodeEnvironment,
-    IncodeFailureReason,
-    IncodeSessionId,
-    IncodeVerificationSessionId,
-    IncodeVerificationSessionKind,
-    IncodeVerificationSessionPurpose,
-    IncodeVerificationSessionState,
-    Locked,
-    WorkflowId,
-};
+use newtypes::DocumentId;
+use newtypes::DocumentSide;
+use newtypes::IncodeAuthorizationToken;
+use newtypes::IncodeConfigurationId;
+use newtypes::IncodeEnvironment;
+use newtypes::IncodeFailureReason;
+use newtypes::IncodeSessionId;
+use newtypes::IncodeVerificationSessionId;
+use newtypes::IncodeVerificationSessionKind;
+use newtypes::IncodeVerificationSessionPurpose;
+use newtypes::IncodeVerificationSessionState;
+use newtypes::Locked;
+use newtypes::WorkflowId;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = incode_verification_session)]

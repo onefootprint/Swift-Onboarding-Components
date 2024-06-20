@@ -25,10 +25,8 @@ mod is_components_sdk;
 pub use is_components_sdk::*;
 
 mod bootstrap_fields;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use crate::ApiErrorKind;
 pub use bootstrap_fields::*;
 

@@ -1,9 +1,7 @@
 use crate::lexis_name_address_ssn_enum;
 use crate::reason_code::reason_code_helpers::*;
-use strum_macros::{
-    EnumIter,
-    EnumString,
-};
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(derive_more::Deref)]
 struct Ssn(bool);

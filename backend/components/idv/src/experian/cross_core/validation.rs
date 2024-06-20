@@ -1,8 +1,6 @@
-use newtypes::{
-    IdentityDataKind,
-    IdvData,
-    PiiString,
-};
+use newtypes::IdentityDataKind;
+use newtypes::IdvData;
+use newtypes::PiiString;
 
 pub enum TestCaseOutcome {
     Pass,

@@ -1,17 +1,15 @@
+use api_route_businesses as businesses;
+use api_route_entities as entities;
+use api_route_hosted as hosted;
+use api_route_index as index;
+use api_route_integrations as integrations;
+use api_route_onboarding as onboarding;
+use api_route_org as org;
+use api_route_partner as partner;
+use api_route_users as users;
+use api_route_vault_proxy as vault_proxy;
+use api_route_webhooks as webhooks;
 use paperclip::actix::web;
-use {
-    api_route_businesses as businesses,
-    api_route_entities as entities,
-    api_route_hosted as hosted,
-    api_route_index as index,
-    api_route_integrations as integrations,
-    api_route_onboarding as onboarding,
-    api_route_org as org,
-    api_route_partner as partner,
-    api_route_users as users,
-    api_route_vault_proxy as vault_proxy,
-    api_route_webhooks as webhooks,
-};
 
 pub fn configure(config: &mut web::ServiceConfig) {
     index::routes(config);
@@ -31,20 +29,16 @@ pub fn configure(config: &mut web::ServiceConfig) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use actix_web::body;
     use actix_web::dev::Service;
-    use actix_web::{
-        body,
-        test,
-        App,
-    };
+    use actix_web::test;
+    use actix_web::App;
     use api_core::OpenApiExt;
     use rand::distributions::Alphanumeric;
     use rand::Rng;
     use regex::Regex;
-    use std::sync::{
-        Arc,
-        Mutex,
-    };
+    use std::sync::Arc;
+    use std::sync::Mutex;
 
     /// Actix route ordering is important because it's possible to shadow specific route patterns
     /// with more general ones. For example, /widgets/{id} would shadow /widgets/action.

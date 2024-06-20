@@ -1,28 +1,22 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
-use newtypes::{
-    FpId,
-    ObConfigurationKey,
-    OnboardingCompletedPayload as NTOnboardingCompletedPayload,
-    OnboardingStatus,
-    OnboardingStatusChangedPayload as NTOnboardingStatusChangedPayload,
-    UserSpecificWebhookPayload,
-    WatchlistCheckCompletedPayload as NTWatchlistCheckCompletedPayload,
-    WatchlistCheckError,
-    WatchlistCheckStatusKind,
-    WebhookEvent as NTWebhookEvent,
-};
+use chrono::DateTime;
+use chrono::Utc;
+use newtypes::FpId;
+use newtypes::ObConfigurationKey;
+use newtypes::OnboardingCompletedPayload as NTOnboardingCompletedPayload;
+use newtypes::OnboardingStatus;
+use newtypes::OnboardingStatusChangedPayload as NTOnboardingStatusChangedPayload;
+use newtypes::UserSpecificWebhookPayload;
+use newtypes::WatchlistCheckCompletedPayload as NTWatchlistCheckCompletedPayload;
+use newtypes::WatchlistCheckError;
+use newtypes::WatchlistCheckStatusKind;
+use newtypes::WebhookEvent as NTWebhookEvent;
 use schemars::JsonSchema;
 use serde::Serialize;
 use serde_with::SerializeDisplay;
-use strum::{
-    EnumDiscriminants,
-    EnumIter,
-    EnumMessage,
-    IntoEnumIterator,
-};
+use strum::EnumDiscriminants;
+use strum::EnumIter;
+use strum::EnumMessage;
+use strum::IntoEnumIterator;
 
 /// Defines supported webhook event types and payloads
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, EnumDiscriminants)]

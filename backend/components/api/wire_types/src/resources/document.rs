@@ -1,13 +1,11 @@
 use crate::*;
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeSeqno,
-    DeviceType,
-    DocumentKind,
-    DocumentReviewStatus,
-    DocumentSide,
-    DocumentStatus,
-};
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DeviceType;
+use newtypes::DocumentKind;
+use newtypes::DocumentReviewStatus;
+use newtypes::DocumentSide;
+use newtypes::DocumentStatus;
 use serde_with::SerializeDisplay;
 pub use strum_macros::Display;
 

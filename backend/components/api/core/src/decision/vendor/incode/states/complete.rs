@@ -1,45 +1,33 @@
-use super::{
-    IncodeStateTransition,
-    ValidatedIdDocKind,
-    VerificationSession,
-};
+use super::IncodeStateTransition;
+use super::ValidatedIdDocKind;
+use super::VerificationSession;
+use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::features::incode_docv::{
     self,
-    IncodeOcrComparisonDataFields,
 };
-use crate::decision::features::incode_utils::{
-    ParsedIncodeFields,
-    ParsedIncodeNames,
-};
-use crate::decision::vendor::incode::state::{
-    IncodeState,
-    TransitionResult,
-};
+use crate::decision::features::incode_utils::ParsedIncodeFields;
+use crate::decision::features::incode_utils::ParsedIncodeNames;
+use crate::decision::vendor::incode::state::IncodeState;
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
-use crate::errors::{
-    ApiErrorKind,
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiErrorKind;
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::utils::file_upload::mime_type_to_extension;
-use crate::utils::vault_wrapper::{
-    DataLifetimeSources,
-    FingerprintedDataRequest,
-    NewDocument,
-    Person,
-    VaultWrapper,
-    WriteableVw,
-};
+use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::FingerprintedDataRequest;
+use crate::utils::vault_wrapper::NewDocument;
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::WriteableVw;
 use crate::vendor_clients::IncodeClients;
 use crate::State;
 use async_trait::async_trait;
 use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
-use db::models::document::{
-    Document,
-    DocumentImageArgs,
-    DocumentUpdate,
-};
+use db::models::document::Document;
+use db::models::document::DocumentImageArgs;
+use db::models::document::DocumentUpdate;
 use db::models::document_data::DocumentData;
 use db::models::document_upload::DocumentUpload;
 use db::models::ob_configuration::ObConfiguration;
@@ -47,44 +35,38 @@ use db::models::risk_signal::RiskSignal;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
-use db::{
-    DbPool,
-    TxnPgConn,
-};
-use idv::incode::doc::response::{
-    FetchOCRResponse,
-    FetchScoresResponse,
-};
+use db::DbPool;
+use db::TxnPgConn;
+use idv::incode::doc::response::FetchOCRResponse;
+use idv::incode::doc::response::FetchScoresResponse;
 use itertools::Itertools;
-use newtypes::{
-    BillingEventKind,
-    CleanAndValidate,
-    DataIdentifier,
-    DataLifetimeSeqno,
-    DataLifetimeSource,
-    DataRequest,
-    DocumentDiKind,
-    DocumentId,
-    DocumentReviewStatus,
-    DocumentStatus,
-    FootprintReasonCode,
-    IdDocKind,
-    IdentityDataKind as IDK,
-    IncodeFailureReason,
-    ObConfigurationId,
-    ObConfigurationKind,
-    OcrDataKind as ODK,
-    PiiJsonValue,
-    PiiString,
-    ScopedVaultId,
-    ScrubbedPiiString,
-    ValidateArgs,
-    VendorAPI,
-    VendorValidatedCountryCode,
-    VerificationResultId,
-    WorkflowId,
-    WorkflowKind,
-};
+use newtypes::BillingEventKind;
+use newtypes::CleanAndValidate;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
+use newtypes::DataRequest;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentId;
+use newtypes::DocumentReviewStatus;
+use newtypes::DocumentStatus;
+use newtypes::FootprintReasonCode;
+use newtypes::IdDocKind;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::IncodeFailureReason;
+use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKind;
+use newtypes::OcrDataKind as ODK;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::ScopedVaultId;
+use newtypes::ScrubbedPiiString;
+use newtypes::ValidateArgs;
+use newtypes::VendorAPI;
+use newtypes::VendorValidatedCountryCode;
+use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
+use newtypes::WorkflowKind;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 

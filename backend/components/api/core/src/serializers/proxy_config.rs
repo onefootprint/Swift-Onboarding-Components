@@ -1,13 +1,9 @@
 use crate::utils::db2api::DbToApi;
-use api_wire_types::{
-    OmittedSecretCustomHeader,
-    PlainCustomHeader,
-    ProxyIngressRule,
-};
-use db::models::proxy_config::{
-    DbProxyConfigAll,
-    ProxyConfig,
-};
+use api_wire_types::OmittedSecretCustomHeader;
+use api_wire_types::PlainCustomHeader;
+use api_wire_types::ProxyIngressRule;
+use db::models::proxy_config::DbProxyConfigAll;
+use db::models::proxy_config::ProxyConfig;
 use newtypes::DataIdentifier;
 use std::str::FromStr;
 

@@ -41,29 +41,21 @@ pub use self::doc_kind::*;
 pub use self::document_di_kind::*;
 pub use self::identity_data_kind::*;
 pub use self::investor_profile_kind::*;
-pub use self::validation::{
-    Error as DiValidationError,
-    *,
-};
+pub use self::validation::Error as DiValidationError;
+pub use self::validation::*;
 use crate::util::impl_enum_string_diesel;
-use crate::{
-    KvDataKey,
-    NtResult,
-    PiiJsonValue,
-    PiiString,
-    ValidateArgs,
-};
+use crate::KvDataKey;
+use crate::NtResult;
+use crate::PiiJsonValue;
+use crate::PiiString;
+use crate::ValidateArgs;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use itertools::Itertools;
 use paperclip::v2::models::DataType;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use std::hash::Hash;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
@@ -389,11 +381,9 @@ impl_enum_string_diesel!(DataIdentifier);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        AliasId,
-        DocumentSide,
-        IdDocKind,
-    };
+    use crate::AliasId;
+    use crate::DocumentSide;
+    use crate::IdDocKind;
     use itertools::Itertools;
     use test_case::test_case;
 

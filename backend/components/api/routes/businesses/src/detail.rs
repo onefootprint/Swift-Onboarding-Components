@@ -1,8 +1,6 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::State;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
@@ -10,11 +8,9 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "View basic details for a business. See the APIs under `/businesses/{fp_bid}/vault` for information on reading vault data.",

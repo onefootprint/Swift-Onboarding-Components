@@ -1,88 +1,64 @@
 use crate::ProtectedAuth;
 use actix_multipart::Multipart;
+use actix_web::post;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    post,
-    web,
-    HttpRequest,
-};
+use actix_web::HttpRequest;
+use api_core::decision;
 use api_core::decision::document::meta_headers::MetaHeaders;
-use api_core::decision::document::route_handler::{
-    IncodeConfigurationIdOverride,
-    IsRerun,
-};
+use api_core::decision::document::route_handler::IncodeConfigurationIdOverride;
+use api_core::decision::document::route_handler::IsRerun;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::state::kyc::KycState;
-use api_core::decision::state::{
-    Authorize,
-    WorkflowActions,
-    WorkflowKind,
-    WorkflowWrapper,
-};
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
+use api_core::decision::state::Authorize;
+use api_core::decision::state::WorkflowActions;
+use api_core::decision::state::WorkflowKind;
+use api_core::decision::state::WorkflowWrapper;
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::utils::onboarding::NewOnboardingArgs;
-use api_core::utils::requirements::{
-    get_requirements_inner,
-    GetRequirementsArgs,
-    RequirementOpts,
-};
-use api_core::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-    VwArgs,
-};
-use api_core::{
-    decision,
-    State,
-};
-use api_wire_types::{
-    CreateDocumentResponse,
-    DocumentResponse,
-};
+use api_core::utils::requirements::get_requirements_inner;
+use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::requirements::RequirementOpts;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
+use api_core::State;
+use api_wire_types::CreateDocumentResponse;
+use api_wire_types::DocumentResponse;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document::{
-    Document,
-    NewDocumentArgs,
-};
-use db::models::document_request::{
-    DocumentRequest,
-    DocumentRequestIdentifier,
-};
+use db::models::document::Document;
+use db::models::document::NewDocumentArgs;
+use db::models::document_request::DocumentRequest;
+use db::models::document_request::DocumentRequestIdentifier;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::DbError;
-use newtypes::{
-    DecisionIntentKind,
-    DocumentId,
-    DocumentKind,
-    DocumentRequestKind,
-    DocumentSide,
-    FpId,
-    IncodeConfigurationId,
-    IncodeEnvironment,
-    IncodeVerificationSessionId,
-    IncodeVerificationSessionKind,
-    Iso3166TwoDigitCountryCode,
-    ObConfigurationKey,
-    ObConfigurationKind,
-    OnboardingRequirement,
-    TenantId,
-    WorkflowSource,
-};
+use newtypes::DecisionIntentKind;
+use newtypes::DocumentId;
+use newtypes::DocumentKind;
+use newtypes::DocumentRequestKind;
+use newtypes::DocumentSide;
+use newtypes::FpId;
+use newtypes::IncodeConfigurationId;
+use newtypes::IncodeEnvironment;
+use newtypes::IncodeVerificationSessionId;
+use newtypes::IncodeVerificationSessionKind;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ObConfigurationKey;
+use newtypes::ObConfigurationKind;
+use newtypes::OnboardingRequirement;
+use newtypes::TenantId;
+use newtypes::WorkflowSource;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct Request {

@@ -1,28 +1,20 @@
 use super::data_lifetime::DataLifetime;
 use super::ob_configuration::ObConfiguration;
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::rule_set;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    DataLifetimeSeqno,
-    DbActor,
-    Locked,
-    ObConfigurationId,
-    RuleSetVersionId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
+use newtypes::Locked;
+use newtypes::ObConfigurationId;
+use newtypes::RuleSetVersionId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]

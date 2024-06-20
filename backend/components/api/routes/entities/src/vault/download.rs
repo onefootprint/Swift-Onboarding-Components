@@ -1,35 +1,27 @@
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::{
-    ModernApiResult,
-    State,
-};
+use crate::ModernApiResult;
+use crate::State;
 use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
-use api_core::auth::tenant::{
-    ClientTenantScope,
-    PathClientTenantAuthContext,
-    TenantAuth,
-};
+use api_core::auth::tenant::ClientTenantScope;
+use api_core::auth::tenant::PathClientTenantAuthContext;
+use api_core::auth::tenant::TenantAuth;
 use api_core::auth::AuthError;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
-use api_core::utils::vault_wrapper::{
-    Any,
-    EnclaveDecryptOperation,
-    Pii,
-    TenantVw,
-};
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
+use api_core::utils::vault_wrapper::Pii;
+use api_core::utils::vault_wrapper::TenantVw;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
 use newtypes::AccessEventPurpose;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[route_alias(get(
     "/users/vault/decrypt/{token}",

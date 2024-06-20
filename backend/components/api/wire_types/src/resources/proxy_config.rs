@@ -1,10 +1,8 @@
 use crate::*;
-use newtypes::{
-    ApiKeyStatus,
-    ProxyConfigId,
-    ProxyConfigSecretHeaderId,
-    ProxyIngressContentType,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::ProxyConfigId;
+use newtypes::ProxyConfigSecretHeaderId;
+use newtypes::ProxyIngressContentType;
 
 /// Proxy configuration
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

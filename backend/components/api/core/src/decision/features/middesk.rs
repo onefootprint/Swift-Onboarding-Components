@@ -1,15 +1,11 @@
 #![allow(clippy::enum_variant_names)]
-use idv::middesk::response::business::{
-    BusinessResponse,
-    Task,
-};
+use idv::middesk::response::business::BusinessResponse;
+use idv::middesk::response::business::Task;
 use newtypes::FootprintReasonCode;
 use std::str::FromStr;
 use strum::Display;
-use strum_macros::{
-    EnumDiscriminants,
-    EnumString,
-};
+use strum_macros::EnumDiscriminants;
+use strum_macros::EnumString;
 
 macro_rules! task_enum {
     (

@@ -5,15 +5,11 @@ use actix_web::web::{
 };
 use api_core::types::ModernApiResult;
 use api_core::State;
-use billing::{
-    create_bill_for_tenant,
-    BResult,
-};
-use chrono::{
-    Duration,
-    NaiveDate,
-    Utc,
-};
+use billing::create_bill_for_tenant;
+use billing::BResult;
+use chrono::Duration;
+use chrono::NaiveDate;
+use chrono::Utc;
 use db::models::tenant::Tenant;
 use futures::StreamExt;
 use newtypes::TenantId;

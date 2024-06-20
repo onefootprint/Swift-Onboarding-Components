@@ -1,54 +1,40 @@
-use crate::auth::user::{
-    UserAuthContext,
-    UserAuthScope,
-};
+use crate::auth::user::UserAuthContext;
+use crate::auth::user::UserAuthScope;
 use crate::types::ModernApiResult;
 use crate::State;
 use actix_web::web::Json;
 use api_core::auth::user::UserAuth;
+use api_core::decision;
 use api_core::decision::vendor;
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::utils::headers::TelemetryHeaders;
-use api_core::{
-    decision,
-    ApiError,
-};
+use api_core::ApiError;
 use api_wire_types::hosted::stytch::StytchTelemetryRequest;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::risk_signal::RiskSignal;
-use db::models::stytch_fingerprint_event::{
-    NewStytchFingerprintEvent,
-    StytchFingerprintEvent,
-};
+use db::models::stytch_fingerprint_event::NewStytchFingerprintEvent;
+use db::models::stytch_fingerprint_event::StytchFingerprintEvent;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::TxnPgConn;
 use either::Either;
 use feature_flag::BoolFlag;
-use idv::stytch::{
-    StytchLookupRequest,
-    StytchLookupResponse,
-};
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::{
-    DecisionIntentKind,
-    RiskSignalGroupKind,
-    ScopedVaultId,
-    VaultId,
-    VaultPublicKey,
-    VendorAPI,
-};
+use idv::stytch::StytchLookupRequest;
+use idv::stytch::StytchLookupResponse;
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::DecisionIntentKind;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
+use newtypes::VaultPublicKey;
+use newtypes::VendorAPI;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

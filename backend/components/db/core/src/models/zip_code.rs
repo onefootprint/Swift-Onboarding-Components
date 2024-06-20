@@ -1,7 +1,5 @@
-use crate::{
-    DbResult,
-    PgConn,
-};
+use crate::DbResult;
+use crate::PgConn;
 use db_schema::schema::zip_code;
 use diesel::prelude::*;
 use newtypes::ZipCode as NTZipCode;

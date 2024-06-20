@@ -1,10 +1,8 @@
 use db::models::apple_device_attest::AppleDeviceAttestation;
 use db::models::google_device_attest::GoogleDeviceAttestation;
-use newtypes::{
-    AndroidAppLicense,
-    AndroidDeviceIntegrityLevel,
-    FootprintReasonCode,
-};
+use newtypes::AndroidAppLicense;
+use newtypes::AndroidDeviceIntegrityLevel;
+use newtypes::FootprintReasonCode;
 
 /// generates our risk signals for apple device attestation by footprint
 /// receipt metric value defined here: https://developer.apple.com/documentation/devicecheck/assessing_fraud_risk#3578868

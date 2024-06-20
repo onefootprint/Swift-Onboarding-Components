@@ -1,16 +1,14 @@
 use crate::State;
 use api_core::auth::session::check::CheckSessionContext;
 use api_core::types::ModernApiResult;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Response;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
-    Apiv2Response,
 };
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Response, macros::JsonResponder)]
 #[serde(rename_all = "snake_case")]

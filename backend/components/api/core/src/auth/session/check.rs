@@ -1,19 +1,13 @@
 use crate::auth::AuthError;
-use crate::{
-    ModernApiError,
-    State,
-};
-use actix_web::{
-    web,
-    FromRequest,
-};
+use crate::ModernApiError;
+use crate::State;
+use actix_web::web;
+use actix_web::FromRequest;
 use chrono::Utc;
 use db::models::session::Session;
 use futures_util::Future;
-use newtypes::{
-    PiiString,
-    SessionAuthToken,
-};
+use newtypes::PiiString;
+use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 

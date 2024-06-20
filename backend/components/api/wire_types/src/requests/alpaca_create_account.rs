@@ -1,16 +1,12 @@
 use crate::*;
-use alpaca::types::account::{
-    AccountType,
-    Agreement,
-    AssetClass,
-    Disclosures,
-    TrustedContact,
-};
-use newtypes::{
-    FpId,
-    PiiJsonValue,
-    PiiString,
-};
+use alpaca::types::account::AccountType;
+use alpaca::types::account::Agreement;
+use alpaca::types::account::AssetClass;
+use alpaca::types::account::Disclosures;
+use alpaca::types::account::TrustedContact;
+use newtypes::FpId;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct AlpacaCreateAccountRequest {

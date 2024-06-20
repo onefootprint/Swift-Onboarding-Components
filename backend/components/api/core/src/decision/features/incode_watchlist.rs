@@ -1,15 +1,11 @@
 use super::incode_utils::pii_strings_match_name_normalized;
-use idv::incode::watchlist::response::{
-    Hit,
-    WatchlistResultResponse,
-};
+use idv::incode::watchlist::response::Hit;
+use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
-use newtypes::{
-    vendor_reason_code_enum,
-    AdverseMediaListKind,
-    EnhancedAmlOption,
-    FootprintReasonCode,
-};
+use newtypes::vendor_reason_code_enum;
+use newtypes::AdverseMediaListKind;
+use newtypes::EnhancedAmlOption;
+use newtypes::FootprintReasonCode;
 use strum_macros::EnumString;
 
 vendor_reason_code_enum! {
@@ -298,12 +294,10 @@ pub fn reason_codes_from_watchlist_result(
 #[cfg(test)]
 mod test {
     use super::*;
-    use idv::incode::watchlist::response::{
-        Content,
-        Data,
-        Doc,
-        Hit,
-    };
+    use idv::incode::watchlist::response::Content;
+    use idv::incode::watchlist::response::Data;
+    use idv::incode::watchlist::response::Doc;
+    use idv::incode::watchlist::response::Hit;
     use std::str::FromStr;
     use test_case::test_case;
 

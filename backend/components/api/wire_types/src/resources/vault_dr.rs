@@ -1,9 +1,7 @@
 /// Vault Disaster Recovery API resources
 use crate::Apiv2Response;
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use newtypes::TenantId;
 use serde::Serialize;
 

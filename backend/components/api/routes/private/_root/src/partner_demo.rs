@@ -1,49 +1,35 @@
 use crate::State;
+use actix_web::post;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    post,
-    web,
-};
 use api_core::auth::session::tenant::TenantRbSession;
-use api_core::auth::tenant::{
-    FirmEmployeeAuthContext,
-    FirmEmployeeGuard,
-};
+use api_core::auth::tenant::FirmEmployeeAuthContext;
+use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::session::AuthSession;
 use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
-use db::models::partner_tenant::{
-    NewPartnerTenant,
-    PartnerTenant,
-};
-use db::models::tenant::{
-    NewTenant,
-    Tenant,
-};
+use db::models::partner_tenant::NewPartnerTenant;
+use db::models::partner_tenant::PartnerTenant;
+use db::models::tenant::NewTenant;
+use db::models::tenant::Tenant;
 use db::models::tenant_compliance_partnership::NewTenantCompliancePartnership;
-use db::models::tenant_role::{
-    ImmutableRoleKind,
-    IsImmutable,
-    TenantRole,
-};
+use db::models::tenant_role::ImmutableRoleKind;
+use db::models::tenant_role::IsImmutable;
+use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
-use newtypes::{
-    PartnerTenantId,
-    SessionAuthToken,
-    TenantCompliancePartnershipId,
-    TenantId,
-    TenantRoleKind,
-    TenantScope,
-    TenantUserId,
-    WorkosAuthMethod,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::PartnerTenantId;
+use newtypes::SessionAuthToken;
+use newtypes::TenantCompliancePartnershipId;
+use newtypes::TenantId;
+use newtypes::TenantRoleKind;
+use newtypes::TenantScope;
+use newtypes::TenantUserId;
+use newtypes::WorkosAuthMethod;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "snake_case")]

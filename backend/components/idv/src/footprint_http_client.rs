@@ -1,15 +1,11 @@
 use chrono::Utc;
-use reqwest_middleware::{
-    ClientBuilder,
-    ClientWithMiddleware,
-    Middleware,
-};
+use reqwest_middleware::ClientBuilder;
+use reqwest_middleware::ClientWithMiddleware;
+use reqwest_middleware::Middleware;
 use reqwest_retry::policies::ExponentialBackoff;
 use reqwest_retry::RetryTransientMiddleware;
-use reqwest_tracing::{
-    ReqwestOtelSpanBackend,
-    TracingMiddleware,
-};
+use reqwest_tracing::ReqwestOtelSpanBackend;
+use reqwest_tracing::TracingMiddleware;
 use std::time::Duration;
 
 #[derive(Clone)]

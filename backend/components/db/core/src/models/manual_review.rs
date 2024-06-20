@@ -1,28 +1,22 @@
 use super::onboarding_decision::OnboardingDecision;
 use super::workflow::Workflow;
-use crate::{
-    DbError,
-    DbResult,
-    NonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::NonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::manual_review;
 use diesel::prelude::*;
 use newtypes::output::Csv;
-use newtypes::{
-    DbActor,
-    ManualReviewId,
-    ManualReviewKind,
-    OnboardingDecisionId,
-    ReviewReason,
-    ScopedVaultId,
-    WorkflowId,
-};
+use newtypes::DbActor;
+use newtypes::ManualReviewId;
+use newtypes::ManualReviewKind;
+use newtypes::OnboardingDecisionId;
+use newtypes::ReviewReason;
+use newtypes::ScopedVaultId;
+use newtypes::WorkflowId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = manual_review)]

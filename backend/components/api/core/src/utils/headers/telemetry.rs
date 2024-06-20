@@ -1,19 +1,13 @@
-use super::{
-    get_bool_header,
-    get_header,
-};
+use super::get_bool_header;
+use super::get_header;
 use actix_web::http::header::HeaderMap;
 use actix_web::FromRequest;
 use futures_util::Future;
-use newtypes::{
-    SessionId,
-    Uuid,
-};
+use newtypes::SessionId;
+use newtypes::Uuid;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize)]

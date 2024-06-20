@@ -1,32 +1,22 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::request::CursorPaginationRequest;
 use api_core::types::response::CursorPaginatedResponse;
 use api_core::types::CursorPaginatedResponseInner;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db::access_event::{
-    AccessEventListItemForTenant,
-    AccessEventListQueryParams,
-};
+use chrono::DateTime;
+use chrono::Utc;
+use db::access_event::AccessEventListItemForTenant;
+use db::access_event::AccessEventListQueryParams;
 use newtypes::input::deserialize_stringified_list;
-use newtypes::{
-    AccessEventKind,
-    DataIdentifier,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-    Apiv2Schema,
-};
+use newtypes::AccessEventKind;
+use newtypes::DataIdentifier;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

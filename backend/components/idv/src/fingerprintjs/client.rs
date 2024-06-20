@@ -1,8 +1,6 @@
 use super::error;
-use newtypes::{
-    FingerprintRequestId,
-    PiiString,
-};
+use newtypes::FingerprintRequestId;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone)]
 pub struct FingerprintJSClient {

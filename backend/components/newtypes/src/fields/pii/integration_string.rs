@@ -1,11 +1,9 @@
 use crate::api_schema_helper::string_api_data_type_alias;
 use crate::PiiString;
 use serde::ser::Error;
-use serde::{
-    Deserialize,
-    Serialize,
-    Serializer,
-};
+use serde::Deserialize;
+use serde::Serialize;
+use serde::Serializer;
 use std::fmt::Display;
 use std::str::Utf8Error;
 

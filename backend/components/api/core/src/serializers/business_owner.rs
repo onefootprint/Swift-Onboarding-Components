@@ -1,9 +1,7 @@
 use crate::utils::db2api::DbToApi;
 use crate::utils::vault_wrapper::BusinessOwnerInfo;
-use db::models::business_owner::{
-    BusinessOwner,
-    UserData,
-};
+use db::models::business_owner::BusinessOwner;
+use db::models::business_owner::UserData;
 use db::models::scoped_vault::ScopedVault;
 
 impl DbToApi<BusinessOwnerInfo> for api_wire_types::PrivateBusinessOwner {

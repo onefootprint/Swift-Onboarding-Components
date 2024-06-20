@@ -4,11 +4,9 @@ use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiResult;
 use crate::telemetry::RootSpan;
 use itertools::Itertools;
-use newtypes::{
-    FpId,
-    PiiString,
-    ProxyToken,
-};
+use newtypes::FpId;
+use newtypes::PiiString;
+use newtypes::ProxyToken;
 use std::collections::HashMap;
 
 /// The Proxy Token Parser finds proxy tokens in a body
@@ -176,15 +174,13 @@ mod tests {
     //!     - multiple fp_ids
     //!     - multiple matches
     use super::*;
-    use newtypes::{
-        pii,
-        CountArgs,
-        DataIdentifier,
-        FilterFunction,
-        FpId,
-        IdentityDataKind as IDK,
-        KvDataKey,
-    };
+    use newtypes::pii;
+    use newtypes::CountArgs;
+    use newtypes::DataIdentifier;
+    use newtypes::FilterFunction;
+    use newtypes::FpId;
+    use newtypes::IdentityDataKind as IDK;
+    use newtypes::KvDataKey;
     use std::str::FromStr;
     use test_case::test_case;
     use DataIdentifier as DI;

@@ -2,15 +2,11 @@ use crate::State;
 use api_core::errors::ApiResult;
 use app_attest::apple::AppleAppAttestationVerifier;
 use crypto::base64;
-use db::models::apple_device_attest::{
-    AppleDeviceMetadata,
-    NewAppleDeviceAttestation,
-};
+use db::models::apple_device_attest::AppleDeviceMetadata;
+use db::models::apple_device_attest::NewAppleDeviceAttestation;
 use db::models::tenant::Tenant;
-use db::models::tenant_ios_app_meta::{
-    TenantIosAppFilters,
-    TenantIosAppMeta,
-};
+use db::models::tenant_ios_app_meta::TenantIosAppFilters;
+use db::models::tenant_ios_app_meta::TenantIosAppMeta;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::DbResult;
 use newtypes::VaultId;

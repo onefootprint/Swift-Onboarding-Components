@@ -1,12 +1,8 @@
-use crate::{
-    DataIdentifier,
-    DataLifetimeSeqno,
-};
+use crate::DataIdentifier;
+use crate::DataLifetimeSeqno;
 use itertools::Itertools;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use std::fmt::Display;
 use std::str::FromStr;
 
@@ -98,10 +94,8 @@ impl Display for VersionedDataIdentifier {
 #[cfg(test)]
 mod test {
     use super::VersionedDataIdentifier;
-    use crate::{
-        DataLifetimeSeqno,
-        IdentityDataKind as IDK,
-    };
+    use crate::DataLifetimeSeqno;
+    use crate::IdentityDataKind as IDK;
     use std::str::FromStr;
     use test_case::test_case;
 

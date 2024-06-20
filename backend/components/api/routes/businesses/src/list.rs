@@ -1,28 +1,20 @@
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::errors::ApiResult;
 use crate::State;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-};
-use api_core::types::{
-    CursorPaginatedResponse,
-    CursorPaginatedResponseInner,
-    CursorPaginationRequest,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::types::CursorPaginatedResponse;
+use api_core::types::CursorPaginatedResponseInner;
+use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_wire_types::ModernSearchRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
-use newtypes::{
-    ScopedVaultCursor,
-    ScopedVaultCursorKind,
-    VaultKind,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use newtypes::ScopedVaultCursor;
+use newtypes::ScopedVaultCursorKind;
+use newtypes::VaultKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(description = "Get the list of businesses", tags(Businesses, PublicApi))]
 #[get("/businesses")]

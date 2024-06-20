@@ -1,37 +1,29 @@
 use super::curp_validation::request::CurpValidationRequest;
-use super::doc::request::{
-    AddDocumentSideRequest,
-    AddMLConsent,
-    AddPrivacyConsent,
-    AddSelfieRequest,
-    DocumentSide,
-};
+use super::doc::request::AddDocumentSideRequest;
+use super::doc::request::AddMLConsent;
+use super::doc::request::AddPrivacyConsent;
+use super::doc::request::AddSelfieRequest;
+use super::doc::request::DocumentSide;
 use super::doc::response::GetOnboardingStatusResponse;
 use super::government_validation::request::GovernmentValidationRequestQueryParams;
-use super::request::{
-    OnboardingStartCustomNameFields,
-    OnboardingStartRequest,
-};
+use super::request::OnboardingStartCustomNameFields;
+use super::request::OnboardingStartRequest;
 use super::response::OnboardingStartResponse;
 use super::watchlist::request::WatchlistResultRequest;
 use super::IncodeAPIResult;
-use crate::footprint_http_client::{
-    FootprintVendorHttpClient,
-    FpVendorClientArgs,
-};
+use crate::footprint_http_client::FootprintVendorHttpClient;
+use crate::footprint_http_client::FpVendorClientArgs;
 use crate::incode::error::Error as IncodeError;
 use newtypes::vendor_credentials::IncodeCredentials;
-use newtypes::{
-    DocVData,
-    DocumentKind,
-    IdDocKind,
-    IncodeConfigurationId,
-    IncodeSessionId,
-    IncodeVerificationSessionId,
-    IncodeVerificationSessionKind,
-    IncodeWatchlistResultRef,
-    PiiString,
-};
+use newtypes::DocVData;
+use newtypes::DocumentKind;
+use newtypes::IdDocKind;
+use newtypes::IncodeConfigurationId;
+use newtypes::IncodeSessionId;
+use newtypes::IncodeVerificationSessionId;
+use newtypes::IncodeVerificationSessionKind;
+use newtypes::IncodeWatchlistResultRef;
+use newtypes::PiiString;
 use reqwest::header;
 use tokio_retry::strategy::FixedInterval;
 use tokio_retry::RetryIf;
@@ -557,53 +549,37 @@ fn image_from_side(docv_data: DocVData, side: DocumentSide) -> Result<PiiString,
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        AuthenticatedIncodeClientAdapter,
-        IncodeClientAdapter,
-    };
-    use crate::footprint_http_client::{
-        FootprintVendorHttpClient,
-        FpVendorClientArgs,
-    };
+    use super::AuthenticatedIncodeClientAdapter;
+    use super::IncodeClientAdapter;
+    use crate::footprint_http_client::FootprintVendorHttpClient;
+    use crate::footprint_http_client::FpVendorClientArgs;
     use crate::incode::curp_validation::response::CurpValidationResponse;
     use crate::incode::doc::request::DocumentSide;
-    use crate::incode::doc::response::{
-        AddCustomerResponse,
-        AddSideResponse,
-        FetchOCRResponse,
-        FetchScoresResponse,
-        ProcessFaceResponse,
-        ProcessIdResponse,
-    };
-    use crate::incode::government_validation::request::{
-        GovernmentValidationConfigByCountry,
-        MXRequestConfig,
-    };
-    use crate::incode::government_validation::response::{
-        GovernmentValidationResponse,
-        MXStatusCode,
-    };
+    use crate::incode::doc::response::AddCustomerResponse;
+    use crate::incode::doc::response::AddSideResponse;
+    use crate::incode::doc::response::FetchOCRResponse;
+    use crate::incode::doc::response::FetchScoresResponse;
+    use crate::incode::doc::response::ProcessFaceResponse;
+    use crate::incode::doc::response::ProcessIdResponse;
+    use crate::incode::government_validation::request::GovernmentValidationConfigByCountry;
+    use crate::incode::government_validation::request::MXRequestConfig;
+    use crate::incode::government_validation::response::GovernmentValidationResponse;
+    use crate::incode::government_validation::response::MXStatusCode;
     use crate::incode::response::OnboardingStartResponse;
-    use crate::incode::watchlist::response::{
-        UpdatedWatchlistResultResponse,
-        WatchlistResultResponse,
-    };
-    use crate::incode::{
-        IncodeAPIResult,
-        IncodeResponse,
-    };
+    use crate::incode::watchlist::response::UpdatedWatchlistResultResponse;
+    use crate::incode::watchlist::response::WatchlistResultResponse;
+    use crate::incode::IncodeAPIResult;
+    use crate::incode::IncodeResponse;
     use crate::tests::fixtures::images::load_image_and_encode_as_b64;
     use newtypes::incode::IncodeStatus;
     use newtypes::vendor_credentials::IncodeCredentials;
-    use newtypes::{
-        DocVData,
-        IdDocKind,
-        IncodeConfigurationId,
-        IncodeSessionId,
-        IncodeVerificationSessionId,
-        IncodeVerificationSessionKind,
-        PiiString,
-    };
+    use newtypes::DocVData;
+    use newtypes::IdDocKind;
+    use newtypes::IncodeConfigurationId;
+    use newtypes::IncodeSessionId;
+    use newtypes::IncodeVerificationSessionId;
+    use newtypes::IncodeVerificationSessionKind;
+    use newtypes::PiiString;
     const INCODE_SANDBOX_SELFIE_FLOW_ID: &str = "643d8b43313fd2f4aa6b3b9f";
 
     pub fn load_client() -> IncodeClientAdapter {

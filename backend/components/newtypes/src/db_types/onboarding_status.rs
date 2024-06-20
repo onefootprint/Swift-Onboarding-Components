@@ -1,22 +1,14 @@
 use crate::DecisionStatus;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
-use strum::{
-    Display,
-    EnumIter,
-};
-use strum_macros::{
-    AsRefStr,
-    EnumString,
-};
+use serde::Deserialize;
+use serde::Serialize;
+use strum::Display;
+use strum::EnumIter;
+use strum_macros::AsRefStr;
+use strum_macros::EnumString;
 
 /// The status of the onboarding
 #[derive(

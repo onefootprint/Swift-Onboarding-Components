@@ -1,14 +1,12 @@
 use crate::*;
-use newtypes::{
-    DbActor,
-    ListAlias,
-    ListEntryId,
-    ListId,
-    ListKind,
-    ObConfigurationId,
-    ObConfigurationKey,
-    PiiString,
-};
+use newtypes::DbActor;
+use newtypes::ListAlias;
+use newtypes::ListEntryId;
+use newtypes::ListId;
+use newtypes::ListKind;
+use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKey;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct List {

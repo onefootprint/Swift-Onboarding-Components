@@ -10,43 +10,27 @@ use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::DbError;
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
 use idv::experian::error::Error as ExperianError;
-use idv::experian::{
-    ExperianCrossCoreRequest,
-    ExperianCrossCoreResponse,
-};
+use idv::experian::ExperianCrossCoreRequest;
+use idv::experian::ExperianCrossCoreResponse;
 use idv::idology::expectid::response::ExpectIDResponse;
-use idv::idology::{
-    IdologyExpectIDAPIResponse,
-    IdologyExpectIDRequest,
-};
-use idv::lexis::client::{
-    LexisFlexIdRequest,
-    LexisFlexIdResponse,
-};
-use idv::socure::{
-    SocureIDPlusAPIResponse,
-    SocureIDPlusRequest,
-};
-use idv::twilio::{
-    TwilioLookupV2APIResponse,
-    TwilioLookupV2Request,
-};
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::{
-    IdvData,
-    ObConfigurationKey,
-    PiiString,
-    VendorAPI,
-    WorkflowId,
-};
+use idv::idology::IdologyExpectIDAPIResponse;
+use idv::idology::IdologyExpectIDRequest;
+use idv::lexis::client::LexisFlexIdRequest;
+use idv::lexis::client::LexisFlexIdResponse;
+use idv::socure::SocureIDPlusAPIResponse;
+use idv::socure::SocureIDPlusRequest;
+use idv::twilio::TwilioLookupV2APIResponse;
+use idv::twilio::TwilioLookupV2Request;
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::IdvData;
+use newtypes::ObConfigurationKey;
+use newtypes::PiiString;
+use newtypes::VendorAPI;
+use newtypes::WorkflowId;
 use std::sync::Arc;
 
 // For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call,
@@ -477,10 +461,8 @@ mod tests {
     use super::*;
     use crate::decision::vendor::vendor_trait::MockVendorAPICall;
     use db::tests::MockFFClient;
-    use idv::idology::expectid::response::{
-        ExpectIDResponse,
-        Response,
-    };
+    use idv::idology::expectid::response::ExpectIDResponse;
+    use idv::idology::expectid::response::Response;
     use idv::idology::IdologyExpectIDAPIResponse;
     use newtypes::PiiJsonValue;
     use serde_json::json;

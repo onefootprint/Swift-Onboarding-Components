@@ -8,10 +8,8 @@ use futures_util::Future;
 use newtypes::input::parse_csv;
 use newtypes::DataIdentifier;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize, Deref)]

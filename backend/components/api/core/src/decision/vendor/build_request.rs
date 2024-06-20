@@ -1,41 +1,33 @@
 use crate::enclave_client::EnclaveClient;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-    ValidationError,
-};
-use crate::utils::vault_wrapper::{
-    Business,
-    Person,
-    TenantVw,
-    VaultWrapper,
-    VwArgs,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
+use crate::utils::vault_wrapper::Business;
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::TenantVw;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
 use crate::State;
-use db::models::document::{
-    Document,
-    DocumentImageArgs,
-};
+use db::models::document::Document;
+use db::models::document::DocumentImageArgs;
 use db::models::document_upload::DocumentUpload;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use db::DbPool;
 use newtypes::email::Email;
-use newtypes::{
-    BoData,
-    BusinessDataFromVault,
-    BusinessDataKind as BDK,
-    DataIdentifier,
-    DocVData,
-    DocumentId,
-    DocumentSide,
-    EncryptedVaultPrivateKey,
-    IdentityDataKind as IDK,
-    IdvData,
-    PhoneNumber,
-    PiiBytes,
-    PiiString,
-};
+use newtypes::BoData;
+use newtypes::BusinessDataFromVault;
+use newtypes::BusinessDataKind as BDK;
+use newtypes::DataIdentifier;
+use newtypes::DocVData;
+use newtypes::DocumentId;
+use newtypes::DocumentSide;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::IdvData;
+use newtypes::PhoneNumber;
+use newtypes::PiiBytes;
+use newtypes::PiiString;
 use std::collections::HashMap;
 use std::str::FromStr;
 use strum::IntoEnumIterator;

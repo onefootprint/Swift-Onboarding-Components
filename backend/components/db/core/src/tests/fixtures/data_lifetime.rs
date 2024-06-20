@@ -1,15 +1,11 @@
-use crate::models::data_lifetime::{
-    DataLifetime,
-    NewDataLifetimeArgs,
-};
+use crate::models::data_lifetime::DataLifetime;
+use crate::models::data_lifetime::NewDataLifetimeArgs;
 use crate::tests::prelude::TestPgConn;
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeSeqno,
-    DataLifetimeSource,
-    ScopedVaultId,
-    VaultId,
-};
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
 
 /// Util function to create multiple DataLifetimes with the provided info
 pub fn build<T: Into<DataIdentifier>>(

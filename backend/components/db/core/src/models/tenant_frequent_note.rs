@@ -1,24 +1,16 @@
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::tenant_frequent_note;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    DbActor,
-    TenantFrequentNoteId,
-    TenantFrequentNoteKind,
-    TenantId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::DbActor;
+use newtypes::TenantFrequentNoteId;
+use newtypes::TenantFrequentNoteKind;
+use newtypes::TenantId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_frequent_note)]

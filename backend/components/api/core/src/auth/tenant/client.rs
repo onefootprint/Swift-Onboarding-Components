@@ -1,20 +1,14 @@
-use super::{
-    AuthActor,
-    TenantAuth,
-};
+use super::AuthActor;
+use super::TenantAuth;
 use crate::auth::session::tenant::ClientTenantAuth;
-use crate::auth::session::{
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
-use crate::auth::{
-    AuthError,
-    CanDecrypt,
-    CanVault,
-    IsGuardMet,
-    SessionContext,
-};
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
+use crate::auth::AuthError;
+use crate::auth::CanDecrypt;
+use crate::auth::CanVault;
+use crate::auth::IsGuardMet;
+use crate::auth::SessionContext;
 use crate::errors::ApiResult;
 use crate::State;
 use actix_web::web;
@@ -22,20 +16,16 @@ use db::models::tenant::Tenant;
 use db::PgConn;
 use futures_util::Future;
 use itertools::Itertools;
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeSource,
-    FpId,
-    PiiString,
-    TenantApiKeyId,
-};
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::FpId;
+use newtypes::PiiString;
+use newtypes::TenantApiKeyId;
 use paperclip::actix::Apiv2Security;
-use paperclip::v2::models::{
-    DataType,
-    DefaultSchemaRaw,
-    Parameter,
-    ParameterIn,
-};
+use paperclip::v2::models::DataType;
+use paperclip::v2::models::DefaultSchemaRaw;
+use paperclip::v2::models::Parameter;
+use paperclip::v2::models::ParameterIn;
 use std::pin::Pin;
 use std::sync::Arc;
 use tracing_actix_web::RootSpan;

@@ -1,23 +1,17 @@
-use crate::auth::tenant::{
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::api_headers_schema;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    ClientTenantAuthContext,
-    TenantAuth,
-    TenantSessionAuth,
-};
-use api_core::auth::{
-    CanVault,
-    Either,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::ClientTenantAuthContext;
+use api_core::auth::tenant::TenantAuth;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::auth::CanVault;
+use api_core::auth::Either;
 use api_core::utils::body_bytes::BodyBytes;
 use api_core::utils::file_upload::FileUpload;
 use api_core::utils::vault_wrapper::NewDocument;
@@ -30,22 +24,20 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use macros::route_alias;
-use newtypes::{
-    AccessEventKind,
-    AccessEventPurpose,
-    AuditEventDetail,
-    AuditEventId,
-    DataIdentifier,
-    DbActor,
-    DocumentDiKind,
-    FpId,
-    PiiBytes,
-};
+use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DataIdentifier;
+use newtypes::DbActor;
+use newtypes::DocumentDiKind;
+use newtypes::FpId;
+use newtypes::PiiBytes;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Path;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 api_headers_schema! {

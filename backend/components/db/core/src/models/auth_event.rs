@@ -3,38 +3,30 @@ use super::google_device_attest::GoogleDeviceAttestation;
 use super::insight_event::InsightEvent;
 use super::user_timeline::UserTimeline;
 use crate::errors::ValidationError;
-use crate::{
-    DbError,
-    DbResult,
-    NextPage,
-    OffsetPagination,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::NextPage;
+use crate::OffsetPagination;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
 use db_schema::schema;
 use db_schema::schema::auth_event;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    ActionKind,
-    AuthEventId,
-    AuthEventKind,
-    AuthMethodKind,
-    AuthMethodUpdatedInfo,
-    IdentifyScope,
-    InsightEventId,
-    ScopedVaultId,
-    VaultId,
-    WebauthnCredentialId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::ActionKind;
+use newtypes::AuthEventId;
+use newtypes::AuthEventKind;
+use newtypes::AuthMethodKind;
+use newtypes::AuthMethodUpdatedInfo;
+use newtypes::IdentifyScope;
+use newtypes::InsightEventId;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
+use newtypes::WebauthnCredentialId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable)]

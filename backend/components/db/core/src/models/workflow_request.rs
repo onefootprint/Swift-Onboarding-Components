@@ -1,23 +1,17 @@
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::workflow_request;
 use diesel::prelude::*;
-use newtypes::{
-    DbActor,
-    ObConfigurationId,
-    ScopedVaultId,
-    WorkflowId,
-    WorkflowRequestConfig,
-    WorkflowRequestId,
-};
+use newtypes::DbActor;
+use newtypes::ObConfigurationId;
+use newtypes::ScopedVaultId;
+use newtypes::WorkflowId;
+use newtypes::WorkflowRequestConfig;
+use newtypes::WorkflowRequestId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]

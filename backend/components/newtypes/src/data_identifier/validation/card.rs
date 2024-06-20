@@ -1,32 +1,24 @@
-use super::{
-    utils,
-    Error,
-    VResult,
-};
-use crate::{
-    AliasId,
-    AllData,
-    CardDataKind as CDK,
-    CardInfo as CI,
-    CleanAndValidate,
-    DataIdentifierValue,
-    NtResult,
-    PiiJsonValue,
-    PiiString,
-    ValidateArgs,
-};
+use super::utils;
+use super::Error;
+use super::VResult;
+use crate::AliasId;
+use crate::AllData;
+use crate::CardDataKind as CDK;
+use crate::CardInfo as CI;
+use crate::CleanAndValidate;
+use crate::DataIdentifierValue;
+use crate::NtResult;
+use crate::PiiJsonValue;
+use crate::PiiString;
+use crate::ValidateArgs;
 use card_validate::Validate as CardValidate;
 use itertools::Itertools;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use std::str::FromStr;
-use strum::{
-    Display,
-    EnumIter,
-    EnumString,
-};
+use strum::Display;
+use strum::EnumIter;
+use strum::EnumString;
 
 pub enum CardData {
     CardNumber(CardNumber),
@@ -330,23 +322,19 @@ fn validate_cc_cvc(value: PiiString, alias: &AliasId, all_data: &AllData) -> VRe
 
 #[cfg(test)]
 mod test {
+    use super::parse_expiration;
+    use super::CDK::*;
     use super::CDK::{
         self,
-        *,
     };
-    use super::{
-        parse_expiration,
-        CI,
-    };
-    use crate::{
-        AliasId,
-        CardData,
-        CleanAndValidate,
-        DataIdentifier,
-        PiiJsonValue,
-        PiiString,
-        ValidateArgs,
-    };
+    use super::CI;
+    use crate::AliasId;
+    use crate::CardData;
+    use crate::CleanAndValidate;
+    use crate::DataIdentifier;
+    use crate::PiiJsonValue;
+    use crate::PiiString;
+    use crate::ValidateArgs;
     use std::collections::HashMap;
     use test_case::test_case;
 

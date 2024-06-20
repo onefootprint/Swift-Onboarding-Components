@@ -1,9 +1,7 @@
 use crate::actions::EntityActionPostCommit;
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::types::ModernApiResult;
 use crate::State;
 use api_core::decision::review::save_review_decision;
@@ -13,15 +11,11 @@ use api_core::utils::fp_id_path::FpIdPath;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
-use newtypes::{
-    DbActor,
-    ManualDecisionRequest,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::DbActor;
+use newtypes::ManualDecisionRequest;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",

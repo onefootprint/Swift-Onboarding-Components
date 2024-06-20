@@ -4,45 +4,35 @@ use crate::utils::email::send_email_challenge;
 use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::user::{
-    UserAuthScope,
-    UserWfAuthContext,
-};
+use api_core::auth::user::UserAuthScope;
+use api_core::auth::user::UserWfAuthContext;
 use api_core::utils::headers::BootstrapFieldsHeader;
-use api_core::utils::vault_wrapper::{
-    Any,
-    DataLifetimeSources,
-    DataRequestSource,
-    FingerprintedDataRequest,
-    Person,
-    VwArgs,
-};
-use db::models::document_request::{
-    DocumentRequest,
-    NewDocumentRequestArgs,
-};
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::DataLifetimeSources;
+use api_core::utils::vault_wrapper::DataRequestSource;
+use api_core::utils::vault_wrapper::FingerprintedDataRequest;
+use api_core::utils::vault_wrapper::Person;
+use api_core::utils::vault_wrapper::VwArgs;
+use db::models::document_request::DocumentRequest;
+use db::models::document_request::NewDocumentRequestArgs;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::email::Email;
-use newtypes::put_data_request::{
-    PatchDataRequest,
-    RawDataRequest,
-};
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeSource,
-    DocumentRequestConfig,
-    IdentityDataKind as IDK,
-    Iso3166TwoDigitCountryCode,
-    ScopedVaultId,
-    ValidateArgs,
-    WorkflowGuard,
-    WorkflowId,
-};
+use newtypes::put_data_request::PatchDataRequest;
+use newtypes::put_data_request::RawDataRequest;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::DocumentRequestConfig;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ScopedVaultId;
+use newtypes::ValidateArgs;
+use newtypes::WorkflowGuard;
+use newtypes::WorkflowId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 use std::str::FromStr;
 

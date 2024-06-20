@@ -1,21 +1,15 @@
-use super::tenant::{
-    GetFirmEmployee,
-    InvalidateAuth,
-};
+use super::tenant::GetFirmEmployee;
+use super::tenant::InvalidateAuth;
 use crate::errors::ApiResult;
-use crate::{
-    ModernApiError,
-    State,
-};
+use crate::ModernApiError;
+use crate::State;
 use actix_web::FromRequest;
 use async_trait::async_trait;
 use futures_util::Future;
 use paperclip::actix::OperationModifier;
-use paperclip::v2::models::{
-    DefaultOperationRaw,
-    DefaultSchemaRaw,
-    SecurityScheme,
-};
+use paperclip::v2::models::DefaultOperationRaw;
+use paperclip::v2::models::DefaultSchemaRaw;
+use paperclip::v2::models::SecurityScheme;
 use paperclip::v2::schema::Apiv2Schema;
 use std::collections::BTreeMap;
 use std::pin::Pin;

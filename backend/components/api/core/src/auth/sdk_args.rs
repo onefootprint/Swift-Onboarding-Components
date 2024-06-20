@@ -1,13 +1,9 @@
 use super::session::sdk_args::SdkArgsData;
-use crate::auth::session::{
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
-use crate::auth::{
-    AuthError,
-    SessionContext,
-};
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
+use crate::auth::AuthError;
+use crate::auth::SessionContext;
 use crate::errors::ApiError;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;

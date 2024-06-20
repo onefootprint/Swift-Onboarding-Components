@@ -1,10 +1,8 @@
 use crate::*;
-use newtypes::{
-    AccessEventKind,
-    DataIdentifier,
-    FpId,
-    TenantId,
-};
+use newtypes::AccessEventKind;
+use newtypes::DataIdentifier;
+use newtypes::FpId;
+use newtypes::TenantId;
 
 /// Describes an audit event of a data access
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

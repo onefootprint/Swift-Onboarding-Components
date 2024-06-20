@@ -1,8 +1,6 @@
 use paperclip::actix::Apiv2Schema;
-use strum_macros::{
-    Display,
-    EnumString,
-};
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

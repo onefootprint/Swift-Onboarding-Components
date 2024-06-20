@@ -1,42 +1,32 @@
 use crate::util::impl_enum_string_diesel;
-use crate::{
-    ActionKind,
-    AnnotationId,
-    AuthEventId,
-    AuthMethodKind,
-    CollectedDataOption,
-    DataIdentifier,
-    DbActor,
-    DocumentId,
-    DocumentRequestId,
-    LabelId,
-    LivenessEventId,
-    ObConfigurationId,
-    OnboardingDecisionId,
-    WatchlistCheckId,
-    WebauthnCredentialId,
-    WorkflowId,
-    WorkflowRequestId,
-};
+use crate::ActionKind;
+use crate::AnnotationId;
+use crate::AuthEventId;
+use crate::AuthMethodKind;
+use crate::CollectedDataOption;
+use crate::DataIdentifier;
+use crate::DbActor;
+use crate::DocumentId;
+use crate::DocumentRequestId;
+use crate::LabelId;
+use crate::LivenessEventId;
+use crate::ObConfigurationId;
+use crate::OnboardingDecisionId;
+use crate::WatchlistCheckId;
+use crate::WebauthnCredentialId;
+use crate::WorkflowId;
+use crate::WorkflowRequestId;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum::{
-    Display,
-    EnumDiscriminants,
-};
+use serde::Deserialize;
+use serde::Serialize;
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum::Display;
+use strum::EnumDiscriminants;
 
 #[derive(
     Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants, derive_more::From,

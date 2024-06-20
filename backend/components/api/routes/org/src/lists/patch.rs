@@ -1,22 +1,16 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::UpdateListRequest;
 use db::models::list::List;
 use newtypes::ListId;
-use paperclip::actix::{
-    api_v2_operation,
-    patch,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::patch;
+use paperclip::actix::web;
 
 #[api_v2_operation(description = "Updates an existing list", tags(Lists, Organization, Private))]
 #[patch("/org/lists/{list_id}")]

@@ -4,24 +4,16 @@
 //! They usually will involve a combination of DB operations and other async
 //! operations (such as enclave, etc).
 use api_core::errors::ApiResult;
-use api_core::{
-    ApiErrorKind,
-    State,
-};
-use byteorder::{
-    BigEndian,
-    ReadBytesExt,
-};
-use db::{
-    DbError,
-    DbResult,
-    TxnPgConn,
-};
+use api_core::ApiErrorKind;
+use api_core::State;
+use byteorder::BigEndian;
+use byteorder::ReadBytesExt;
+use db::DbError;
+use db::DbResult;
+use db::TxnPgConn;
+use diesel::sql_query;
 use diesel::sql_types::BigInt;
-use diesel::{
-    sql_query,
-    RunQueryDsl,
-};
+use diesel::RunQueryDsl;
 
 trait CustomMigration {
     type MigrationState;

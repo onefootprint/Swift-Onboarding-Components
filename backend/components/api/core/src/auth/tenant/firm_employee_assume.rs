@@ -1,38 +1,26 @@
-use super::{
-    AuthActor,
-    CanCheckTenantGuard,
-    GetFirmEmployee,
-    TenantAuth,
-};
-use crate::auth::session::{
-    get_is_live,
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
-use crate::auth::{
-    AuthError,
-    SessionContext,
-};
+use super::AuthActor;
+use super::CanCheckTenantGuard;
+use super::GetFirmEmployee;
+use super::TenantAuth;
+use crate::auth::session::get_is_live;
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
+use crate::auth::AuthError;
+use crate::auth::SessionContext;
 use crate::errors::ApiResult;
 use crate::utils::headers::get_bool_header;
 use db::models::tenant::Tenant;
-use db::models::tenant_role::{
-    ImmutableRoleKind,
-    TenantRole,
-};
+use db::models::tenant_role::ImmutableRoleKind;
+use db::models::tenant_role::TenantRole;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-};
-use newtypes::{
-    DataLifetimeSource,
-    TenantRoleKind,
-    TenantScope,
-    WorkosAuthMethod,
-};
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
+use newtypes::DataLifetimeSource;
+use newtypes::TenantRoleKind;
+use newtypes::TenantScope;
+use newtypes::WorkosAuthMethod;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 
@@ -218,24 +206,18 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
 #[cfg(test)]
 mod test {
     use super::super::CanCheckTenantGuard;
-    use super::{
-        FirmEmployeeAssumeAuth,
-        ParsedFirmEmployeeAssumeAuth,
-    };
+    use super::FirmEmployeeAssumeAuth;
+    use super::ParsedFirmEmployeeAssumeAuth;
     use crate::auth::session::tenant::FirmEmployeeSession;
     use crate::auth::session::AuthSessionData;
     use crate::auth::SessionContext;
-    use db::models::tenant_role::{
-        ImmutableRoleKind,
-        TenantRole,
-    };
+    use db::models::tenant_role::ImmutableRoleKind;
+    use db::models::tenant_role::TenantRole;
     use db::tests::prelude::*;
     use macros::db_test_case;
-    use newtypes::{
-        TenantRoleKind,
-        TenantScope,
-        WorkosAuthMethod,
-    };
+    use newtypes::TenantRoleKind;
+    use newtypes::TenantScope;
+    use newtypes::WorkosAuthMethod;
 
     #[db_test_case(false, false, false => vec![TenantScope::Read])]
     #[db_test_case(false, true, false => vec![TenantScope::Read])]

@@ -1,43 +1,29 @@
-use super::{
-    ExtractableAuthSession,
-    GetSessionForUpdate,
-};
+use super::ExtractableAuthSession;
+use super::GetSessionForUpdate;
 use crate::auth::tenant::InvalidateAuth;
 use crate::auth::AuthError;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::utils::session::AuthSession;
-use crate::{
-    ModernApiError,
-    ModernApiResult,
-    State,
-};
+use crate::ModernApiError;
+use crate::ModernApiResult;
+use crate::State;
 use actix_web::http::header::HeaderMap;
-use actix_web::{
-    web,
-    FromRequest,
-};
+use actix_web::web;
+use actix_web::FromRequest;
 use async_trait::async_trait;
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use db::models::session::Session;
 use derive_more::Deref;
 use futures_util::Future;
 use http::Method;
-use newtypes::{
-    PiiString,
-    SessionAuthToken,
-};
+use newtypes::PiiString;
+use newtypes::SessionAuthToken;
 use paperclip::actix::OperationModifier;
-use paperclip::v2::models::{
-    DefaultSchemaRaw,
-    Parameter,
-    SecurityScheme,
-};
+use paperclip::v2::models::DefaultSchemaRaw;
+use paperclip::v2::models::Parameter;
+use paperclip::v2::models::SecurityScheme;
 use paperclip::v2::schema::Apiv2Schema;
 use std::marker::PhantomData;
 use std::pin::Pin;
@@ -229,10 +215,8 @@ mod test {
     use crate::auth::session::AuthSessionData;
     use crate::utils::session::AuthSession;
     use chrono::Utc;
-    use newtypes::{
-        SessionAuthToken,
-        SessionAuthTokenKind,
-    };
+    use newtypes::SessionAuthToken;
+    use newtypes::SessionAuthTokenKind;
     use std::marker::PhantomData;
 
     impl<T> SessionContext<T> {

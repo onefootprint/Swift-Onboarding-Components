@@ -1,17 +1,13 @@
-use super::incode_docv::{
-    IncodeOcrAddress,
-    IncodeOcrComparisonDataFields,
-};
+use super::incode_docv::IncodeOcrAddress;
+use super::incode_docv::IncodeOcrComparisonDataFields;
 use idv::incode::doc::response::FetchOCRResponse;
 use itertools::Itertools;
 use levenshtein::levenshtein;
-use newtypes::{
-    FootprintReasonCode,
-    IdentityDataKind,
-    OcrDataKind as ODK,
-    PiiString,
-    ScrubbedPiiString,
-};
+use newtypes::FootprintReasonCode;
+use newtypes::IdentityDataKind;
+use newtypes::OcrDataKind as ODK;
+use newtypes::PiiString;
+use newtypes::ScrubbedPiiString;
 use regex::Regex;
 
 #[derive(Debug, Clone)]
@@ -680,10 +676,8 @@ pub fn reason_codes_from_match_field(
 mod tests {
     use super::*;
     use crate::decision::features::incode_docv::IncodeOcrAddress;
-    use idv::incode::doc::response::{
-        OCRAddress,
-        OCRName,
-    };
+    use idv::incode::doc::response::OCRAddress;
+    use idv::incode::doc::response::OCRName;
     use newtypes::IdentityDataKind as IDK;
     use test_case::test_case;
 

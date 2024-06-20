@@ -1,14 +1,10 @@
 use newtypes::email::Email;
-use newtypes::{
-    ActionKind,
-    AuthMethodKind,
-    ChallengeToken,
-    PhoneNumber,
-};
-use paperclip::actix::{
-    Apiv2Response,
-    Apiv2Schema,
-};
+use newtypes::ActionKind;
+use newtypes::AuthMethodKind;
+use newtypes::ChallengeToken;
+use newtypes::PhoneNumber;
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct UserChallengeVerifyRequest {

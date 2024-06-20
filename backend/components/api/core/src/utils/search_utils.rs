@@ -3,18 +3,16 @@ use crate::State;
 use db::scoped_vault::SearchQuery;
 use itertools::Itertools;
 use newtypes::fingerprint_salt::FingerprintSalt;
-use newtypes::{
-    BusinessDataKind as BDK,
-    CompositeFingerprint,
-    CompositeFingerprintKind,
-    DataIdentifier,
-    FingerprintKind,
-    FpId,
-    IdentityDataKind as IDK,
-    PhoneNumber,
-    PiiString,
-    TenantId,
-};
+use newtypes::BusinessDataKind as BDK;
+use newtypes::CompositeFingerprint;
+use newtypes::CompositeFingerprintKind;
+use newtypes::DataIdentifier;
+use newtypes::FingerprintKind;
+use newtypes::FpId;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::PhoneNumber;
+use newtypes::PiiString;
+use newtypes::TenantId;
 
 /// Given a search string and fp_id, parse into the list of FingerprintQueries and fp_id by which to
 /// query for ScopedVaults
@@ -23,10 +21,8 @@ pub async fn parse_search(
     search: Option<PiiString>,
     tenant_id: &TenantId,
 ) -> ApiResult<(Option<SearchQuery>, Option<FpId>)> {
-    use DataIdentifier::{
-        Business,
-        Id,
-    };
+    use DataIdentifier::Business;
+    use DataIdentifier::Id;
     let Some(search) = search else {
         return Ok((None, None));
     };

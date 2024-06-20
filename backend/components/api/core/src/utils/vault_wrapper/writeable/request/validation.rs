@@ -1,39 +1,31 @@
-use super::{
-    FingerprintedDataRequest,
-    ValidatedDataRequest,
-};
+use super::FingerprintedDataRequest;
+use super::ValidatedDataRequest;
 use crate::auth::tenant::AuthActor;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    PrefillData,
-    VaultWrapper,
-    WriteableVw,
-};
+use crate::utils::vault_wrapper::PrefillData;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::WriteableVw;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault_data::NewVaultData;
 use db::PgConn;
 use itertools::Itertools;
-use newtypes::{
-    BusinessDataKind as BDK,
-    BusinessOwnerSource,
-    CollectedDataOption,
-    DataIdentifier,
-    DataLifetimeSource,
-    DataValidationError,
-    DiValidationError,
-    Error as NtError,
-    IdentityDataKind as IDK,
-    NtResult,
-    ScopedVaultId,
-    VaultDataFormat,
-    VaultKind,
-};
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use newtypes::BusinessDataKind as BDK;
+use newtypes::BusinessOwnerSource;
+use newtypes::CollectedDataOption;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::DataValidationError;
+use newtypes::DiValidationError;
+use newtypes::Error as NtError;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::NtResult;
+use newtypes::ScopedVaultId;
+use newtypes::VaultDataFormat;
+use newtypes::VaultKind;
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Clone, Copy)]
 pub enum DataRequestSource {

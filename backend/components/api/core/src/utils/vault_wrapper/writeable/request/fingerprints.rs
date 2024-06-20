@@ -1,31 +1,23 @@
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::errors::ValidationError;
 use crate::utils::vault_wrapper::WriteableVw;
-use db::models::fingerprint::{
-    Fingerprint as DbFingerprint,
-    FingerprintDataValue,
-    NewFingerprintArgs,
-};
+use db::models::fingerprint::Fingerprint as DbFingerprint;
+use db::models::fingerprint::FingerprintDataValue;
+use db::models::fingerprint::NewFingerprintArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault_data::VaultData;
 use db::TxnPgConn;
-use itertools::{
-    chain,
-    Itertools,
-};
+use itertools::chain;
+use itertools::Itertools;
 use newtypes::fingerprint_salt::FingerprintSalt;
-use newtypes::{
-    CompositeFingerprint,
-    CompositeFingerprintKind,
-    DataLifetimeId,
-    Fingerprint,
-    FingerprintKind,
-    FingerprintScope,
-    MissingFingerprint,
-};
+use newtypes::CompositeFingerprint;
+use newtypes::CompositeFingerprintKind;
+use newtypes::DataLifetimeId;
+use newtypes::Fingerprint;
+use newtypes::FingerprintKind;
+use newtypes::FingerprintScope;
+use newtypes::MissingFingerprint;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, derive_more::Deref)]

@@ -1,24 +1,16 @@
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
-use crate::utils::db2api::{
-    DbToApi,
-    TryDbToApi,
-};
-use db::helpers::{
-    ActiveDocResources,
-    ComplianceDocSummary,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
+use crate::utils::db2api::DbToApi;
+use crate::utils::db2api::TryDbToApi;
+use db::helpers::ActiveDocResources;
+use db::helpers::ComplianceDocSummary;
 use db::models::compliance_doc_template::ComplianceDocTemplate;
 use db::models::compliance_doc_template_version::ComplianceDocTemplateVersion;
 use db::models::ob_configuration::TenantObConfigCounts;
 use db::models::tenant_user::TenantUser;
-use newtypes::{
-    ComplianceDocId,
-    ComplianceDocStatus,
-    TenantUserId,
-};
+use newtypes::ComplianceDocId;
+use newtypes::ComplianceDocStatus;
+use newtypes::TenantUserId;
 
 impl TryDbToApi<(&ComplianceDocSummary, &TenantObConfigCounts)> for api_wire_types::ComplianceCompanySummary {
     fn try_from_db(target: (&ComplianceDocSummary, &TenantObConfigCounts)) -> ApiResult<Self> {

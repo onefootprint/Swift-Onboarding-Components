@@ -1,18 +1,14 @@
 use crate::incode::response::Error;
 use crate::incode::IncodeClientErrorCustomFailureReasons;
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use derive_more::Deref;
-use newtypes::{
-    scrub_pii_value,
-    IncodeFailureReason,
-    IncodeWatchlistResultRef,
-    PiiJsonValue,
-    PiiString,
-    ScrubbedPiiString,
-};
+use newtypes::scrub_pii_value;
+use newtypes::IncodeFailureReason;
+use newtypes::IncodeWatchlistResultRef;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::ScrubbedPiiString;
 
 impl IncodeClientErrorCustomFailureReasons for WatchlistResultResponse {
     fn custom_failure_reasons(_error: Error) -> Option<Vec<IncodeFailureReason>> {

@@ -1,9 +1,7 @@
 use crate::data_identifier::DiValidationError;
 use diesel::backend::Backend;
-use diesel::deserialize::{
-    FromSql,
-    FromSqlRow,
-};
+use diesel::deserialize::FromSql;
+use diesel::deserialize::FromSqlRow;
 use diesel::expression::AsExpression;
 use diesel::serialize::ToSql;
 use diesel::sql_types::Text;
@@ -175,10 +173,8 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        AliasId,
-        KvDataKey,
-    };
+    use crate::AliasId;
+    use crate::KvDataKey;
     use std::str::FromStr;
     use test_case::test_case;
 

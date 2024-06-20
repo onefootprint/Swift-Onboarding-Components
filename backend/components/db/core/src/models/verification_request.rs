@@ -1,33 +1,25 @@
 use super::data_lifetime::DataLifetime;
 use super::vault::Vault;
 use super::verification_result::VerificationResult;
-use crate::{
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    decision_intent,
-    scoped_vault,
-    vault,
-    verification_request,
-    verification_result,
-};
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::decision_intent;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::vault;
+use db_schema::schema::verification_request;
+use db_schema::schema::verification_result;
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::{
-    DataLifetimeSeqno,
-    DecisionIntentId,
-    DocumentId,
-    ScopedVaultId,
-    Vendor,
-    VendorAPI,
-    VerificationRequestId,
-    WorkflowId,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::DecisionIntentId;
+use newtypes::DocumentId;
+use newtypes::ScopedVaultId;
+use newtypes::Vendor;
+use newtypes::VendorAPI;
+use newtypes::VerificationRequestId;
+use newtypes::WorkflowId;
 
 #[derive(Debug, Clone, Queryable, Identifiable)]
 #[diesel(table_name = verification_request)]
@@ -366,10 +358,8 @@ mod tests {
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::prelude::*;
     use macros::db_test_case;
-    use newtypes::{
-        DecisionIntentKind,
-        VerificationResultId,
-    };
+    use newtypes::DecisionIntentKind;
+    use newtypes::VerificationResultId;
     use std::str::FromStr;
 
     enum VresType {

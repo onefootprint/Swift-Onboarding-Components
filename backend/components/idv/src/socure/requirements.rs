@@ -1,13 +1,11 @@
 use crate::requirements::SocureRequirements;
+use newtypes::IdentityDataKind::*;
 use newtypes::IdentityDataKind::{
     self,
-    *,
 };
 use strum::IntoEnumIterator;
-use strum_macros::{
-    Display,
-    EnumIter,
-};
+use strum_macros::Display;
+use strum_macros::EnumIter;
 
 #[derive(Debug, Clone, EnumIter, PartialEq, Eq, Display)]
 #[strum(serialize_all = "lowercase")]
@@ -142,10 +140,8 @@ pub fn meets_requirements_for_idplus_request(present_data_kinds: &[IdentityDataK
 mod tests {
 
     use super::*;
-    use newtypes::{
-        IdvData,
-        PiiString,
-    };
+    use newtypes::IdvData;
+    use newtypes::PiiString;
     use SocureModule::*;
 
     #[test]

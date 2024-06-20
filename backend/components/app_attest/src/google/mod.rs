@@ -1,12 +1,10 @@
 use crate::error::Result;
-use crate::google::integrity_verdict::{
-    AppRecognitionVerdict,
-    IntegrityVerdict,
-};
+use crate::google::integrity_verdict::AppRecognitionVerdict;
+use crate::google::integrity_verdict::IntegrityVerdict;
 use chrono::Utc;
+use josekit::jwe::A256KW;
 use josekit::jwe::{
     self,
-    A256KW,
 };
 use josekit::jws::ES256;
 use josekit::jwt;

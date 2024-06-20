@@ -1,27 +1,21 @@
 use super::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::decision::vendor::verification_result::{
-    SaveVerificationResultArgs,
-    ShouldSaveVerificationRequest,
-};
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::errors::ApiResult;
 use crate::State;
 use idv::incode::response::OnboardingStartResponse;
-use idv::incode::{
-    IncodeClientErrorCustomFailureReasons,
-    IncodeResponse,
-    IncodeStartOnboardingRequest,
-};
-use newtypes::{
-    DecisionIntentId,
-    DocumentId,
-    IncodeConfigurationId,
-    IncodeEnvironment,
-    ScopedVaultId,
-    VaultPublicKey,
-    VendorAPI,
-};
+use idv::incode::IncodeClientErrorCustomFailureReasons;
+use idv::incode::IncodeResponse;
+use idv::incode::IncodeStartOnboardingRequest;
+use newtypes::DecisionIntentId;
+use newtypes::DocumentId;
+use newtypes::IncodeConfigurationId;
+use newtypes::IncodeEnvironment;
+use newtypes::ScopedVaultId;
+use newtypes::VaultPublicKey;
+use newtypes::VendorAPI;
 
 impl SaveVerificationResultArgs {
     pub fn new<T>(

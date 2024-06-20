@@ -6,10 +6,10 @@ use actix_web::web::Json;
 use api_core::auth::user::UserWfAuthContext;
 use api_wire_types::hosted::socure_device::SocureDeviceSessionIdRequest;
 use db::models::socure_device_session::SocureDeviceSession;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

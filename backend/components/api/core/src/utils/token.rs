@@ -1,16 +1,12 @@
 use super::session::AuthSession;
-use crate::auth::session::user::{
-    AssociatedAuthEvent,
-    NewUserSessionArgs,
-    NewUserSessionContext,
-    TokenCreationPurpose,
-    UserSession,
-};
+use crate::auth::session::user::AssociatedAuthEvent;
+use crate::auth::session::user::NewUserSessionArgs;
+use crate::auth::session::user::NewUserSessionContext;
+use crate::auth::session::user::TokenCreationPurpose;
+use crate::auth::session::user::UserSession;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::{
-    ApiResult,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
@@ -21,13 +17,11 @@ use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
 use db::TxnPgConn;
-use newtypes::{
-    AuthMethodKind,
-    ObConfigurationKey,
-    SessionAuthToken,
-    UserAuthScope,
-    VaultKind,
-};
+use newtypes::AuthMethodKind;
+use newtypes::ObConfigurationKey;
+use newtypes::SessionAuthToken;
+use newtypes::UserAuthScope;
+use newtypes::VaultKind;
 
 pub struct CreateTokenArgs {
     pub sv: ScopedVault,

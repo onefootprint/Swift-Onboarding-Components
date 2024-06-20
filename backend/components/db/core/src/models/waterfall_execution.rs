@@ -1,29 +1,19 @@
-use super::waterfall_step::{
-    NewWaterfallStepArgs,
-    WaterfallStep,
-};
-use crate::{
-    DbResult,
-    NonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use super::waterfall_step::NewWaterfallStepArgs;
+use super::waterfall_step::WaterfallStep;
+use crate::DbResult;
+use crate::NonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::waterfall_execution;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    DecisionIntentId,
-    Locked,
-    VendorAPI,
-    WaterfallExecutionId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::DecisionIntentId;
+use newtypes::Locked;
+use newtypes::VendorAPI;
+use newtypes::WaterfallExecutionId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = waterfall_execution)]

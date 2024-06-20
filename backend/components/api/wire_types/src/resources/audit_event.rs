@@ -1,14 +1,12 @@
 use crate::*;
-use newtypes::{
-    AuditEventId,
-    AuditEventName,
-    DataIdentifier,
-    FpId,
-    ListEntryCreationId,
-    ListEntryId,
-    ListId,
-    TenantId,
-};
+use newtypes::AuditEventId;
+use newtypes::AuditEventName;
+use newtypes::DataIdentifier;
+use newtypes::FpId;
+use newtypes::ListEntryCreationId;
+use newtypes::ListEntryId;
+use newtypes::ListId;
+use newtypes::TenantId;
 use strum_macros::Display;
 
 /// Describes an event relevant to security as seen by tenants.

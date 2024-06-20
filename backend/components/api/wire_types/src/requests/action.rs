@@ -1,13 +1,9 @@
 use crate::CreateTokenResponse;
 use newtypes::EntityAction;
-use paperclip::actix::{
-    Apiv2Response,
-    Apiv2Schema,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

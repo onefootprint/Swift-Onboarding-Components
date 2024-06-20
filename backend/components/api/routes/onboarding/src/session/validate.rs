@@ -4,39 +4,29 @@ use crate::errors::onboarding::OnboardingError;
 use crate::utils::session::AuthSession;
 use crate::State;
 use api_core::auth::session::user::ValidateUserToken;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
-use api_wire_types::{
-    EntityValidateResponse,
-    UserAuthResponse,
-    ValidateAuthEvent,
-    ValidateRequest,
-    ValidateResponse,
-};
+use api_wire_types::EntityValidateResponse;
+use api_wire_types::UserAuthResponse;
+use api_wire_types::ValidateAuthEvent;
+use api_wire_types::ValidateRequest;
+use api_wire_types::ValidateResponse;
 use db::models::auth_event::AuthEvent;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::{
-    Workflow,
-    WorkflowIdentifier,
-};
-use newtypes::{
-    ObConfigurationKind,
-    OnboardingStatus,
-    VaultKind,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowIdentifier;
+use newtypes::ObConfigurationKind;
+use newtypes::OnboardingStatus;
+use newtypes::VaultKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Validate a short-lived onboarding session token and exchange it for a long-lived fp_id",

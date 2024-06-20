@@ -1,10 +1,8 @@
 use chrono::NaiveDate;
 use newtypes::incode::IncodeStatus;
-use newtypes::{
-    ExperianAddressAndNameMatchReasonCodes,
-    ExperianSSNReasonCodes,
-    ExperianWatchlistReasonCodes,
-};
+use newtypes::ExperianAddressAndNameMatchReasonCodes;
+use newtypes::ExperianSSNReasonCodes;
+use newtypes::ExperianWatchlistReasonCodes;
 // From: https://learn.sayari.com/mexico-national-id-number-curp/
 //
 // Name: Juan Carlos Hernandez Garcia

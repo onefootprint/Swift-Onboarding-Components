@@ -1,34 +1,24 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantGuard;
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-};
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::State;
 use api_wire_types::NewBusinessOwnerRequest;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
-use newtypes::{
-    BusinessDataKind as BDK,
-    DataIdentifier as DI,
-    PreviewApi,
-    VaultKind,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::BusinessDataKind as BDK;
+use newtypes::DataIdentifier as DI;
+use newtypes::PreviewApi;
+use newtypes::VaultKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Link an existing fp_id to the provided business as a beneficial owner.",

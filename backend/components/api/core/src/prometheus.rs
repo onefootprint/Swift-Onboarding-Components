@@ -1,8 +1,6 @@
 use crate::config::Config;
-use actix_web_prom::{
-    PrometheusMetrics,
-    PrometheusMetricsBuilder,
-};
+use actix_web_prom::PrometheusMetrics;
+use actix_web_prom::PrometheusMetricsBuilder;
 use gethostname::gethostname;
 use std::collections::HashMap;
 

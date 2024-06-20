@@ -5,19 +5,15 @@ pub mod expectid;
 pub(crate) mod fixtures;
 pub mod pa;
 
-use self::common::request::{
-    IdologyRequestData,
-    Request,
-};
+use self::common::request::IdologyRequestData;
+use self::common::request::Request;
 use self::pa::IdologyPaRequest;
 use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::idology::error as IdologyError;
 use expectid::response::ExpectIDResponse;
 use newtypes::vendor_credentials::IdologyCredentials;
-use newtypes::{
-    IdvData,
-    PiiJsonValue,
-};
+use newtypes::IdvData;
+use newtypes::PiiJsonValue;
 
 pub struct IdologyExpectIDRequest {
     pub idv_data: IdvData,

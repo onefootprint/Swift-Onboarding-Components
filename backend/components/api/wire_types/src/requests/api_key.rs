@@ -1,9 +1,7 @@
 use crate::*;
 use newtypes::input::Csv;
-use newtypes::{
-    ApiKeyStatus,
-    TenantRoleId,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::TenantRoleId;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct ApiKeyFilters {

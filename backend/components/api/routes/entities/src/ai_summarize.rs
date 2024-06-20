@@ -1,45 +1,31 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
 use crate::types::ModernApiResult;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::{
-    ApiError,
-    ApiErrorKind,
-};
+use api_core::ApiError;
+use api_core::ApiErrorKind;
 use api_wire_types::UserAiSummary;
 use db::models::annotation::Annotation;
 use db::models::auth_event::AuthEvent;
-use db::models::risk_signal::{
-    AtSeqno,
-    RiskSignal,
-};
+use db::models::risk_signal::AtSeqno;
+use db::models::risk_signal::RiskSignal;
 use db::models::rule_set_result::RuleSetResult;
 use db::models::scoped_vault::ScopedVault;
-use newtypes::{
-    ExternalId,
-    FpId,
-    OnboardingStatus,
-};
-use openai::chat::{
-    ChatCompletion,
-    ChatCompletionMessage,
-    ChatCompletionMessageRole,
-    ChatCompletionResponseFormat,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::ExternalId;
+use newtypes::FpId;
+use newtypes::OnboardingStatus;
+use openai::chat::ChatCompletion;
+use openai::chat::ChatCompletionMessage;
+use openai::chat::ChatCompletionMessageRole;
+use openai::chat::ChatCompletionResponseFormat;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[api_v2_operation(
     description = "Computes a human-readable summary of the user's detail page.",

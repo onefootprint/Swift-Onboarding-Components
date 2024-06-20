@@ -1,53 +1,43 @@
-use alpaca::types::account::{
-    Contact,
-    CreateAccountRequest,
-    Disclosures,
-    Document as AlpacaDocument,
-    DocumentType,
-    Identity,
-    TaxIdType,
-};
+use alpaca::types::account::Contact;
+use alpaca::types::account::CreateAccountRequest;
+use alpaca::types::account::Disclosures;
+use alpaca::types::account::Document as AlpacaDocument;
+use alpaca::types::account::DocumentType;
+use alpaca::types::account::Identity;
+use alpaca::types::account::TaxIdType;
 use alpaca::AlpacaCip;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantGuard;
 use api_core::errors::cip_error::CipError;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::{
-    Person,
-    TenantVw,
-    VaultWrapper,
-};
+use api_core::utils::vault_wrapper::Person;
+use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::State;
-use api_wire_types::{
-    AlpacaCreateAccountRequest,
-    AlpacaCreateAccountResponse,
-    DeprecatedAlpacaCreateAccountRequest,
-};
+use api_wire_types::AlpacaCreateAccountRequest;
+use api_wire_types::AlpacaCreateAccountResponse;
+use api_wire_types::DeprecatedAlpacaCreateAccountRequest;
 use db::models::document::Document;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::email::Email;
-use newtypes::{
-    DataIdentifier as DI,
-    Declaration,
-    DocumentDiKind as DK,
-    IdDocKind,
-    IdentityDataKind as IDK,
-    InvestorProfileKind as IPK,
-    PhoneNumber,
-    PiiJsonValue,
-    PiiString,
-    TenantId,
-};
+use newtypes::DataIdentifier as DI;
+use newtypes::Declaration;
+use newtypes::DocumentDiKind as DK;
+use newtypes::IdDocKind;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::InvestorProfileKind as IPK;
+use newtypes::PhoneNumber;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::TenantId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 use std::str::FromStr;
 

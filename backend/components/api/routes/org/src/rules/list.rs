@@ -1,21 +1,17 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
-use db::models::rule_instance::{
-    IncludeRules,
-    RuleInstance,
-};
+use db::models::rule_instance::IncludeRules;
+use db::models::rule_instance::RuleInstance;
 use db::DbError;
 use newtypes::ObConfigurationId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

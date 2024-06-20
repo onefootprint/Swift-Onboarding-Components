@@ -1,63 +1,45 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine::engine::VaultDataForRules;
-use api_core::decision::rule_engine::eval::{
-    Rule,
-    RuleEvalConfig,
-};
+use api_core::decision::rule_engine::eval::Rule;
+use api_core::decision::rule_engine::eval::RuleEvalConfig;
 use api_core::decision::rule_engine::validation::validate_rule_expression;
 use api_core::decision::state::common::saturate_list_entries;
 use api_core::decision::{
     self,
 };
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
-use api_core::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-};
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::State;
-use api_wire_types::{
-    EvaluateRuleRequest,
-    RuleEvalResult,
-    RuleEvalStats,
-    RuleResultRuleAction,
-};
+use api_wire_types::EvaluateRuleRequest;
+use api_wire_types::RuleEvalResult;
+use api_wire_types::RuleEvalStats;
+use api_wire_types::RuleResultRuleAction;
 use db::models::insight_event::InsightEvent;
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_instance::{
-    IncludeRules,
-    RuleInstance,
-};
-use db::models::rule_set_result::{
-    RuleSetResult,
-    RuleSetResultSample,
-};
-use itertools::{
-    chain,
-    Itertools,
-};
-use newtypes::{
-    ListId,
-    ObConfigurationId,
-    RuleAction,
-    RuleExpression,
-    RuleId,
-    RuleInstanceKind,
-};
+use db::models::rule_instance::IncludeRules;
+use db::models::rule_instance::RuleInstance;
+use db::models::rule_set_result::RuleSetResult;
+use db::models::rule_set_result::RuleSetResultSample;
+use itertools::chain;
+use itertools::Itertools;
+use newtypes::ListId;
+use newtypes::ObConfigurationId;
+use newtypes::RuleAction;
+use newtypes::RuleExpression;
+use newtypes::RuleId;
+use newtypes::RuleInstanceKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 use std::collections::HashMap;
 
@@ -305,11 +287,9 @@ fn get_stats(results: &[RuleEvalResult]) -> RuleEvalStats {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use newtypes::{
-        FpId,
-        OnboardingStatus,
-        RuleAction,
-    };
+    use newtypes::FpId;
+    use newtypes::OnboardingStatus;
+    use newtypes::RuleAction;
 
     #[test]
     fn test_get_stats() {

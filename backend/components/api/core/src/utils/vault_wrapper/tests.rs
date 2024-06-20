@@ -1,38 +1,30 @@
-use super::{
-    Any,
-    Business,
-    VaultWrapper,
-    WriteableVw,
-};
-use crate::utils::vault_wrapper::{
-    Person,
-    VwArgs,
-};
+use super::Any;
+use super::Business;
+use super::VaultWrapper;
+use super::WriteableVw;
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
 use db::models::user_timeline::UserTimeline;
-use db::models::vault_data::{
-    NewVaultData,
-    VaultData,
-};
+use db::models::vault_data::NewVaultData;
+use db::models::vault_data::VaultData;
 use db::tests::fixtures;
 use db::tests::prelude::*;
 use itertools::Itertools;
 use macros::db_test;
-use newtypes::{
-    BusinessDataKind as BDK,
-    DataIdentifier,
-    DataLifetimeSource,
-    DocumentDiKind,
-    DocumentSide,
-    IdDocKind,
-    IdentityDataKind as IDK,
-    InvestorProfileKind as IPK,
-    KvDataKey,
-    PiiString,
-    S3Url,
-    SealedVaultBytes,
-    VaultDataFormat,
-};
+use newtypes::BusinessDataKind as BDK;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentSide;
+use newtypes::IdDocKind;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::InvestorProfileKind as IPK;
+use newtypes::KvDataKey;
+use newtypes::PiiString;
+use newtypes::S3Url;
+use newtypes::SealedVaultBytes;
+use newtypes::VaultDataFormat;
 use std::collections::HashSet;
 use std::str::FromStr;
 

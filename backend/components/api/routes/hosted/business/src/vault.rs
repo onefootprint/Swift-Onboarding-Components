@@ -1,32 +1,24 @@
 use crate::auth::user::UserAuthScope;
 use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
-use crate::utils::vault_wrapper::{
-    Business,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::Business;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::AuthError;
-use api_core::utils::vault_wrapper::{
-    DataLifetimeSources,
-    DataRequestSource,
-    FingerprintedDataRequest,
-    TenantVw,
-};
-use newtypes::put_data_request::{
-    PatchDataRequest,
-    RawDataRequest,
-};
-use newtypes::{
-    ValidateArgs,
-    WorkflowGuard,
-};
+use api_core::utils::vault_wrapper::DataLifetimeSources;
+use api_core::utils::vault_wrapper::DataRequestSource;
+use api_core::utils::vault_wrapper::FingerprintedDataRequest;
+use api_core::utils::vault_wrapper::TenantVw;
+use newtypes::put_data_request::PatchDataRequest;
+use newtypes::put_data_request::RawDataRequest;
+use newtypes::ValidateArgs;
+use newtypes::WorkflowGuard;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

@@ -1,8 +1,6 @@
-use super::{
-    AuthActor,
-    PartnerTenantAuth,
-    TenantAuth,
-};
+use super::AuthActor;
+use super::PartnerTenantAuth;
+use super::TenantAuth;
 use crate::auth::Either;
 use crate::errors::ApiResult;
 use db::helpers::TenantOrPartnerTenantRef;

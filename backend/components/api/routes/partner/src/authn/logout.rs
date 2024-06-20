@@ -1,14 +1,10 @@
-use api_core::auth::tenant::{
-    AnyPartnerTenantSessionAuth,
-    InvalidateAuth,
-};
+use api_core::auth::tenant::AnyPartnerTenantSessionAuth;
+use api_core::auth::tenant::InvalidateAuth;
 use api_core::types::ModernApiResult;
 use api_core::State;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     tags(Auth, Private),

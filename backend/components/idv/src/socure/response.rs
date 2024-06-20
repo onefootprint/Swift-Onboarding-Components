@@ -1,8 +1,6 @@
 use itertools::Itertools;
-use newtypes::{
-    ScrubbedPiiString,
-    SocureReasonCode,
-};
+use newtypes::ScrubbedPiiString;
+use newtypes::SocureReasonCode;
 use std::collections::HashMap;
 
 // https://developer.socure.com/reference#tag/ID+

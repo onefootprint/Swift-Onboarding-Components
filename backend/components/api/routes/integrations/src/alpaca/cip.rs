@@ -1,28 +1,22 @@
-use alpaca::{
-    AlpacaCip,
-    CipRequest,
-    CipResult,
-    DataComparsionBreakDown,
-    ImageIntegrityBreakdown,
-    VisualAuthenticity,
-};
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use alpaca::AlpacaCip;
+use alpaca::CipRequest;
+use alpaca::CipResult;
+use alpaca::DataComparsionBreakDown;
+use alpaca::ImageIntegrityBreakdown;
+use alpaca::VisualAuthenticity;
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::SecretTenantAuthContext;
+use api_core::auth::tenant::TenantGuard;
 use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use api_core::decision::features::{
     self,
 };
 use api_core::decision::field_validations::create_field_validation_results;
 use api_core::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
-use api_core::decision::vendor::vendor_api::vendor_api_struct::{
-    vendor_api_enum_from_struct,
-    IncodeFetchOCR,
-    IncodeFetchScores,
-    IncodeWatchlistCheck,
-};
+use api_core::decision::vendor::vendor_api::vendor_api_struct::vendor_api_enum_from_struct;
+use api_core::decision::vendor::vendor_api::vendor_api_struct::IncodeFetchOCR;
+use api_core::decision::vendor::vendor_api::vendor_api_struct::IncodeFetchScores;
+use api_core::decision::vendor::vendor_api::vendor_api_struct::IncodeWatchlistCheck;
 use api_core::decision::{
     self,
 };
@@ -30,28 +24,18 @@ use api_core::errors::cip_error::CipError;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::{
-    DecryptUncheckedResult,
-    TenantVw,
-    VaultWrapper,
-};
-use api_core::{
-    ApiErrorKind,
-    State,
-};
-use api_wire_types::{
-    AlpacaCipRequest,
-    AlpacaCipResponse,
-    DeprecatedAlpacaCipRequest,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db::actor::{
-    saturate_actors,
-    SaturatedActor,
-};
+use api_core::utils::vault_wrapper::DecryptUncheckedResult;
+use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::ApiErrorKind;
+use api_core::State;
+use api_wire_types::AlpacaCipRequest;
+use api_wire_types::AlpacaCipResponse;
+use api_wire_types::DeprecatedAlpacaCipRequest;
+use chrono::DateTime;
+use chrono::Utc;
+use db::actor::saturate_actors;
+use db::actor::SaturatedActor;
 use db::models::annotation::Annotation;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
@@ -59,47 +43,41 @@ use db::models::insight_event::InsightEvent;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
-use db::models::risk_signal::{
-    AtSeqno,
-    RiskSignal,
-};
+use db::models::risk_signal::AtSeqno;
+use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
 use db::models::workflow::Workflow;
-use idv::incode::doc::response::{
-    FetchOCRResponse,
-    FetchScoresResponse,
-};
+use idv::incode::doc::response::FetchOCRResponse;
+use idv::incode::doc::response::FetchScoresResponse;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
-use newtypes::{
-    format_pii,
-    pii,
-    AlpacaPiiString,
-    DataIdentifier,
-    DecisionStatus,
-    DocumentDiKind,
-    ExternalIntegrationInfo,
-    ExternalIntegrationKind,
-    FootprintReasonCode,
-    FpId,
-    IdDocKind,
-    IdentityDataKind,
-    MatchLevel,
-    OcrDataKind,
-    PiiJsonValue,
-    PiiString,
-    ReviewReason,
-    SignalScope,
-    TenantId,
-    Vendor,
-};
+use newtypes::format_pii;
+use newtypes::pii;
+use newtypes::AlpacaPiiString;
+use newtypes::DataIdentifier;
+use newtypes::DecisionStatus;
+use newtypes::DocumentDiKind;
+use newtypes::ExternalIntegrationInfo;
+use newtypes::ExternalIntegrationKind;
+use newtypes::FootprintReasonCode;
+use newtypes::FpId;
+use newtypes::IdDocKind;
+use newtypes::IdentityDataKind;
+use newtypes::MatchLevel;
+use newtypes::OcrDataKind;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::ReviewReason;
+use newtypes::SignalScope;
+use newtypes::TenantId;
+use newtypes::Vendor;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 use std::collections::HashSet;
 use DataIdentifier::*;

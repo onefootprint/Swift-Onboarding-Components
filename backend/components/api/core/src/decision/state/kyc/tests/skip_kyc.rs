@@ -1,41 +1,35 @@
 use crate::decision::state::actions::Authorize;
+use crate::decision::state::test_utils::mock_incode_doc_collection;
+use crate::decision::state::test_utils::mock_webhooks;
+use crate::decision::state::test_utils::query_data;
+use crate::decision::state::test_utils::setup_data;
+use crate::decision::state::test_utils::DocumentOutcome as Doc;
+use crate::decision::state::test_utils::ExpectedRequiresManualReview;
+use crate::decision::state::test_utils::ExpectedStatus;
+use crate::decision::state::test_utils::OnboardingCompleted;
+use crate::decision::state::test_utils::OnboardingStatusChanged;
+use crate::decision::state::test_utils::UserKind::*;
 use crate::decision::state::test_utils::UserKind::{
     self,
-    *,
 };
-use crate::decision::state::test_utils::{
-    mock_incode_doc_collection,
-    mock_webhooks,
-    query_data,
-    setup_data,
-    DocumentOutcome as Doc,
-    ExpectedRequiresManualReview,
-    ExpectedStatus,
-    OnboardingCompleted,
-    OnboardingStatusChanged,
-};
-use crate::decision::state::{
-    WorkflowActions,
-    WorkflowWrapper,
-};
+use crate::decision::state::WorkflowActions;
+use crate::decision::state::WorkflowWrapper;
 use crate::State;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use macros::test_state_case;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::CountryRestriction;
+use newtypes::DocTypeRestriction;
+use newtypes::DocumentCdoInfo;
+use newtypes::KycState;
+use newtypes::OnboardingStatus::*;
 use newtypes::OnboardingStatus::{
     self,
-    *,
 };
-use newtypes::{
-    CollectedDataOption as CDO,
-    CountryRestriction,
-    DocTypeRestriction,
-    DocumentCdoInfo,
-    KycState,
-    Selfie,
-    SignalScope,
-    WorkflowFixtureResult as Fixture,
-    WorkflowState,
-};
+use newtypes::Selfie;
+use newtypes::SignalScope;
+use newtypes::WorkflowFixtureResult as Fixture;
+use newtypes::WorkflowState;
 
 struct Review(bool);
 

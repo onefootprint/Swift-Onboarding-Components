@@ -1,15 +1,11 @@
-use crate::models::tenant::{
-    NewTenant,
-    Tenant,
-};
+use crate::models::tenant::NewTenant;
+use crate::models::tenant::Tenant;
 use crate::TxnPgConn;
 use chrono::Utc;
-use newtypes::{
-    AppClipExperienceId,
-    EncryptedVaultPrivateKey,
-    TenantId,
-    VaultPublicKey,
-};
+use newtypes::AppClipExperienceId;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::TenantId;
+use newtypes::VaultPublicKey;
 
 pub fn create(conn: &mut TxnPgConn) -> Tenant {
     let new_tenant = NewTenant {

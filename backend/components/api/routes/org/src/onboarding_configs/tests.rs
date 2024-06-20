@@ -1,20 +1,18 @@
 use super::validation::ObConfigurationArgsToValidate;
 use db::models::ob_configuration::NewObConfigurationArgs;
-use newtypes::{
-    CipKind,
-    CollectedDataOption as CDO,
-    CountryRestriction,
-    CustomDocumentConfig,
-    DataIdentifier,
-    DbActor,
-    DocTypeRestriction,
-    DocumentCdoInfo,
-    DocumentRequestConfig,
-    EnhancedAmlOption,
-    ObConfigurationKind,
-    Selfie,
-    TenantId,
-};
+use newtypes::CipKind;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::CountryRestriction;
+use newtypes::CustomDocumentConfig;
+use newtypes::DataIdentifier;
+use newtypes::DbActor;
+use newtypes::DocTypeRestriction;
+use newtypes::DocumentCdoInfo;
+use newtypes::DocumentRequestConfig;
+use newtypes::EnhancedAmlOption;
+use newtypes::ObConfigurationKind;
+use newtypes::Selfie;
+use newtypes::TenantId;
 use std::str::FromStr;
 use test_case::test_case;
 

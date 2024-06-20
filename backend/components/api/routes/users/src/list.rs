@@ -1,33 +1,25 @@
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::errors::ApiResult;
 use crate::State;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
 use api_core::telemetry::RootSpan;
-use api_core::types::{
-    CursorPaginatedResponse,
-    CursorPaginatedResponseInner,
-    CursorPaginationRequest,
-};
+use api_core::types::CursorPaginatedResponse;
+use api_core::types::CursorPaginatedResponseInner;
+use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::search_utils::parse_search;
 use api_wire_types::SearchUsersRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
-use newtypes::{
-    PiiString,
-    ScopedVaultCursor,
-    ScopedVaultCursorKind,
-    TimestampCursor,
-    VaultKind,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    post,
-    web,
-};
+use newtypes::PiiString;
+use newtypes::ScopedVaultCursor;
+use newtypes::ScopedVaultCursorKind;
+use newtypes::TimestampCursor;
+use newtypes::VaultKind;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(description = "Get the list of users", tags(Users, PublicApi))]
 #[get("/users")]

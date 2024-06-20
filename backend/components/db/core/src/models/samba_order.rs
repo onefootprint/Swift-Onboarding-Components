@@ -1,27 +1,21 @@
 use super::data_lifetime::DataLifetime;
 use super::samba_order_data_lifetime_junction::SambaOrderDataLifetimeJunction;
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::samba_order;
 use diesel::prelude::*;
 use newtypes::samba::SambaOrderKind;
-use newtypes::{
-    DataLifetimeId,
-    DataLifetimeSeqno,
-    DecisionIntentId,
-    DocumentId,
-    Locked,
-    SambaOrderId,
-    SambaOrderTableId,
-    VerificationResultId,
-};
+use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DecisionIntentId;
+use newtypes::DocumentId;
+use newtypes::Locked;
+use newtypes::SambaOrderId;
+use newtypes::SambaOrderTableId;
+use newtypes::VerificationResultId;
 
 /// Represents a single order placed with Samba
 #[derive(Debug, Clone, Queryable)]

@@ -1,7 +1,5 @@
-use newtypes::{
-    UserInsightScope,
-    UserInsightUnit,
-};
+use newtypes::UserInsightScope;
+use newtypes::UserInsightUnit;
 use paperclip::actix::Apiv2Response;
 use serde::Serialize;
 

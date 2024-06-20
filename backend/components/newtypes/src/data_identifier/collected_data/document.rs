@@ -2,10 +2,8 @@ use crate::IdDocKind;
 use itertools::Itertools;
 use std::str::FromStr;
 use strum::ParseError;
-use strum_macros::{
-    Display,
-    EnumString,
-};
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub enum DocTypeRestriction {
@@ -134,12 +132,10 @@ impl FromStr for DocumentCdoInfo {
 
 #[cfg(test)]
 mod test {
-    use super::{
-        CountryRestriction,
-        DocTypeRestriction,
-        DocumentCdoInfo,
-        Selfie,
-    };
+    use super::CountryRestriction;
+    use super::DocTypeRestriction;
+    use super::DocumentCdoInfo;
+    use super::Selfie;
     use crate::IdDocKind;
     use std::str::FromStr;
     use test_case::test_case;

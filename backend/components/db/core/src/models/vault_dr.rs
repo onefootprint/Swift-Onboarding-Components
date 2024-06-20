@@ -1,26 +1,18 @@
 use crate::errors::AssertionError;
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    vault_dr_aws_pre_enrollment,
-    vault_dr_config,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::vault_dr_aws_pre_enrollment;
+use db_schema::schema::vault_dr_config;
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::{
-    Locked,
-    PiiString,
-    TenantId,
-    VaultDrAwsPreEnrollmentId,
-    VaultDrConfigId,
-};
+use newtypes::Locked;
+use newtypes::PiiString;
+use newtypes::TenantId;
+use newtypes::VaultDrAwsPreEnrollmentId;
+use newtypes::VaultDrConfigId;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
 #[diesel(table_name = vault_dr_aws_pre_enrollment)]

@@ -1,28 +1,20 @@
 use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
 use crate::errors::ApiResult;
-use db::models::contact_info::{
-    ContactInfo,
-    NewContactInfoArgs,
-};
+use db::models::contact_info::ContactInfo;
+use db::models::contact_info::NewContactInfoArgs;
 use db::models::data_lifetime::DataLifetime;
-use db::models::vault_data::{
-    NewVaultData,
-    VaultData,
-};
+use db::models::vault_data::NewVaultData;
+use db::models::vault_data::VaultData;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::{
-    CollectedDataOption,
-    ContactInfoPriority,
-    DataIdentifier,
-    DataLifetimeSeqno,
-};
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use newtypes::CollectedDataOption;
+use newtypes::ContactInfoPriority;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 mod fingerprinted;
 mod fingerprints;
@@ -31,14 +23,10 @@ mod validation;
 
 use self::fingerprints::Fingerprints;
 pub use fingerprinted::FingerprintedDataRequest;
-pub use prefill::{
-    PrefillData,
-    PrefillKind,
-};
-pub use validation::{
-    DataLifetimeSources,
-    DataRequestSource,
-};
+pub use prefill::PrefillData;
+pub use prefill::PrefillKind;
+pub use validation::DataLifetimeSources;
+pub use validation::DataRequestSource;
 
 /// DataRequest that has been validated through a UserVaultWrapper
 pub struct ValidatedDataRequest {

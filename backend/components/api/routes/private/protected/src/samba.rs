@@ -1,26 +1,18 @@
 use crate::ProtectedAuth;
+use actix_web::post;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    post,
-    web,
-};
+use api_core::decision;
 use api_core::decision::vendor::samba::license_validation::CreateOrderContext;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
-use api_core::{
-    decision,
-    State,
-};
+use api_core::State;
 use db::models::decision_intent::DecisionIntent;
-use db::models::scoped_vault::{
-    ScopedVault,
-    ScopedVaultIdentifier,
-};
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultIdentifier;
 use newtypes::samba::SambaLicenseValidationData;
-use newtypes::{
-    DecisionIntentKind,
-    FpId,
-};
+use newtypes::DecisionIntentKind;
+use newtypes::FpId;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct CreateSambaOrderRequest {

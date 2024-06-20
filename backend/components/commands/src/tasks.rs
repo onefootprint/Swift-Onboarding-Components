@@ -1,25 +1,17 @@
-use anyhow::{
-    anyhow,
-    Result,
-};
+use anyhow::anyhow;
+use anyhow::Result;
 use api_core::config::Config;
-use api_core::{
-    task,
-    State,
-};
+use api_core::task;
+use api_core::State;
 use clap::Parser;
+use tokio::select;
+use tokio::signal;
+use tokio::time::Duration;
 use tokio::time::{
     self,
-    Duration,
 };
-use tokio::{
-    select,
-    signal,
-};
-use tracing::{
-    error,
-    info,
-};
+use tracing::error;
+use tracing::info;
 
 // Test by running:
 //   cargo run -p api_server -- execute-tasks --batch-size 100 --poll-period-ms 1000

@@ -3,30 +3,24 @@ use crate::models::compliance_doc_assignment::NewComplianceDocAssignment;
 use crate::models::compliance_doc_request::NewComplianceDocRequest;
 use crate::models::compliance_doc_review::NewComplianceDocReview;
 use crate::models::compliance_doc_submission::NewComplianceDocSubmission;
-use crate::models::compliance_doc_template::{
-    ComplianceDocTemplate,
-    NewComplianceDocTemplate,
-};
+use crate::models::compliance_doc_template::ComplianceDocTemplate;
+use crate::models::compliance_doc_template::NewComplianceDocTemplate;
 use crate::models::compliance_doc_template_version::NewComplianceDocTemplateVersion;
 use crate::models::partner_tenant::PartnerTenant;
 use crate::models::tenant::Tenant;
-use crate::models::tenant_compliance_partnership::{
-    NewTenantCompliancePartnership,
-    TenantCompliancePartnership,
-};
+use crate::models::tenant_compliance_partnership::NewTenantCompliancePartnership;
+use crate::models::tenant_compliance_partnership::TenantCompliancePartnership;
 use crate::models::tenant_user::TenantUser;
 use crate::TxnPgConn;
 use chrono::Utc;
-use newtypes::{
-    ComplianceDocData,
-    ComplianceDocReviewDecision,
-    OrgMemberEmail,
-    PartnerTenantId,
-    S3Url,
-    SealedVaultDataKey,
-    TenantId,
-    TenantKind,
-};
+use newtypes::ComplianceDocData;
+use newtypes::ComplianceDocReviewDecision;
+use newtypes::OrgMemberEmail;
+use newtypes::PartnerTenantId;
+use newtypes::S3Url;
+use newtypes::SealedVaultDataKey;
+use newtypes::TenantId;
+use newtypes::TenantKind;
 use std::collections::HashMap;
 use std::iter::zip;
 

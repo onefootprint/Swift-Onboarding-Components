@@ -1,16 +1,14 @@
 use crate::*;
 use newtypes::email::Email;
-use newtypes::{
-    AuthMethodKind,
-    ChallengeKind,
-    ChallengeToken,
-    DataIdentifier,
-    IdentifyScope,
-    PhoneNumber,
-    PiiString,
-    SessionAuthToken,
-    UserAuthScope,
-};
+use newtypes::AuthMethodKind;
+use newtypes::ChallengeKind;
+use newtypes::ChallengeToken;
+use newtypes::DataIdentifier;
+use newtypes::IdentifyScope;
+use newtypes::PhoneNumber;
+use newtypes::PiiString;
+use newtypes::SessionAuthToken;
+use newtypes::UserAuthScope;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]

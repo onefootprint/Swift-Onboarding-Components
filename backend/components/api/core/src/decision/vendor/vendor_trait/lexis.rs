@@ -1,18 +1,12 @@
-use super::{
-    VendorAPICall,
-    VendorAPIResponse,
-};
+use super::VendorAPICall;
+use super::VendorAPIResponse;
 use async_trait::async_trait;
 use idv::footprint_http_client::FootprintVendorHttpClient;
-use idv::lexis::client::{
-    LexisFlexIdRequest,
-    LexisFlexIdResponse,
-};
+use idv::lexis::client::LexisFlexIdRequest;
+use idv::lexis::client::LexisFlexIdResponse;
 use idv::ParsedResponse;
-use newtypes::{
-    PiiJsonValue,
-    VendorAPI,
-};
+use newtypes::PiiJsonValue;
+use newtypes::VendorAPI;
 
 #[async_trait]
 impl VendorAPICall<LexisFlexIdRequest, LexisFlexIdResponse, idv::lexis::Error> for FootprintVendorHttpClient {

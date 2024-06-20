@@ -1,15 +1,9 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
-use paperclip::actix::{
-    Apiv2Response,
-    Apiv2Schema,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use chrono::DateTime;
+use chrono::Utc;
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
+use serde::Deserialize;
+use serde::Serialize;
 
 mod resources;
 pub use resources::*;

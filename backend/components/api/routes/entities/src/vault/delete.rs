@@ -1,8 +1,6 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -10,37 +8,31 @@ use crate::State;
 use api_core::errors::ValidationError;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::vault_wrapper::{
-    Any,
-    WriteableVw,
-};
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::WriteableVw;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::{
-    flat_api_object_map_type,
-    impl_response_type,
-    AccessEventKind,
-    AccessEventPurpose,
-    AuditEventDetail,
-    AuditEventId,
-    DataIdentifier,
-    DbActor,
-};
+use newtypes::flat_api_object_map_type;
+use newtypes::impl_response_type;
+use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DataIdentifier;
+use newtypes::DbActor;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
-    Apiv2Schema,
 };
 use serde::Deserialize;
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct DeleteRequest {

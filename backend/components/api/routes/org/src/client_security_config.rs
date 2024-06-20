@@ -1,24 +1,18 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantAuth,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantAuth;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
 use api_core::types::ModernApiResult;
 use api_core::State;
 use api_wire_types::OrgClientSecurityConfig;
-use db::models::tenant_client_config::{
-    TenantClientConfig,
-    UpdateTenantClientConfig,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    patch,
-    web,
-    Apiv2Schema,
-};
+use db::models::tenant_client_config::TenantClientConfig;
+use db::models::tenant_client_config::UpdateTenantClientConfig;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::patch;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 
 #[api_v2_operation(
     tags(SecurityConfig, Organization, Private),

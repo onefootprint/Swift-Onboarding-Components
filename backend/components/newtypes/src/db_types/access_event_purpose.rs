@@ -1,17 +1,11 @@
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum_macros::{
-    Display,
-    EnumIter,
-    EnumString,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum_macros::Display;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

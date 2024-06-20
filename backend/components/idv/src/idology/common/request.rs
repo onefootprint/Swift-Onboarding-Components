@@ -1,7 +1,5 @@
-use crate::idology::{
-    expectid,
-    pa,
-};
+use crate::idology::expectid;
+use crate::idology::pa;
 use newtypes::PiiString;
 
 /// Request to Idology ExpectID

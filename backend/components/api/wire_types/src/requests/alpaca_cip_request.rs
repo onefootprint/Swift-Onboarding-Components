@@ -1,9 +1,7 @@
 use crate::*;
-use newtypes::{
-    FpId,
-    PiiJsonValue,
-    PiiString,
-};
+use newtypes::FpId;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct AlpacaCipRequest {

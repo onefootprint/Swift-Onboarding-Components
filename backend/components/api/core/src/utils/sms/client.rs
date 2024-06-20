@@ -1,40 +1,32 @@
 use super::super::challenge_rate_limit::RateLimit;
 use super::vendors::SmsVendorKind;
 use crate::errors::user::UserError;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::utils::sms::vendors::SmsSendStatus;
 use crate::State;
 use aws_credential_types::provider::SharedCredentialsProvider;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::tenant::Tenant;
-use feature_flag::{
-    BoolFlag,
-    FeatureFlagClient,
-    JsonFlag,
-};
+use feature_flag::BoolFlag;
+use feature_flag::FeatureFlagClient;
+use feature_flag::JsonFlag;
 use itertools::Itertools;
 use newtypes::output::Csv;
-use newtypes::sms_message::{
-    SmsMessage,
-    SmsMessageKind,
-};
-use newtypes::{
-    PhoneNumber,
-    PiiString,
-    SandboxId,
-    VaultId,
-};
+use newtypes::sms_message::SmsMessage;
+use newtypes::sms_message::SmsMessageKind;
+use newtypes::PhoneNumber;
+use newtypes::PiiString;
+use newtypes::SandboxId;
+use newtypes::VaultId;
 use std::fmt::Debug;
 use std::sync::Arc;
+use tokio::sync::oneshot::Receiver;
+use tokio::sync::oneshot::Sender;
 use tokio::sync::oneshot::{
     self,
-    Receiver,
-    Sender,
 };
 use tracing::Instrument;
 use twilio::TwilioConfig;

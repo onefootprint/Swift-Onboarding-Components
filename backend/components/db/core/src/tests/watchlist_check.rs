@@ -1,40 +1,30 @@
 use super::fixtures::ob_configuration::ObConfigurationOpts;
 use crate::models::onboarding_decision::NewDecisionArgs;
-use crate::models::task::{
-    NewTask,
-    Task,
-};
-use crate::models::watchlist_check::{
-    NewWatchlistCheck,
-    WatchlistCheck,
-};
-use crate::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
+use crate::models::task::NewTask;
+use crate::models::task::Task;
+use crate::models::watchlist_check::NewWatchlistCheck;
+use crate::models::watchlist_check::WatchlistCheck;
+use crate::models::workflow::Workflow;
+use crate::models::workflow::WorkflowUpdate;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::prelude::*;
-use chrono::{
-    DateTime,
-    Duration,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Duration;
+use chrono::Utc;
 use macros::db_test;
-use newtypes::{
-    DataLifetimeSeqno,
-    DbActor,
-    DecisionStatus,
-    EnhancedAmlOption,
-    ScopedVaultId,
-    TaskData,
-    TaskStatus,
-    TenantId,
-    VaultKind,
-    WatchlistCheckArgs,
-    WatchlistCheckStatus,
-    WatchlistCheckStatusKind,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbActor;
+use newtypes::DecisionStatus;
+use newtypes::EnhancedAmlOption;
+use newtypes::ScopedVaultId;
+use newtypes::TaskData;
+use newtypes::TaskStatus;
+use newtypes::TenantId;
+use newtypes::VaultKind;
+use newtypes::WatchlistCheckArgs;
+use newtypes::WatchlistCheckStatus;
+use newtypes::WatchlistCheckStatusKind;
 
 #[db_test]
 fn test_watchlist_check(conn: &mut TestPgConn) {

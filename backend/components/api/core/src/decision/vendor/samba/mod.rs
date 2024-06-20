@@ -1,16 +1,12 @@
-use super::verification_result::{
-    SaveVerificationResultArgs,
-    ShouldSaveVerificationRequest,
-};
+use super::verification_result::SaveVerificationResultArgs;
+use super::verification_result::ShouldSaveVerificationRequest;
 use crate::ApiError;
 use idv::samba::SambaAPIResponse;
-use newtypes::{
-    DecisionIntentId,
-    DocumentId,
-    ScopedVaultId,
-    VaultPublicKey,
-    VendorAPI,
-};
+use newtypes::DecisionIntentId;
+use newtypes::DocumentId;
+use newtypes::ScopedVaultId;
+use newtypes::VaultPublicKey;
+use newtypes::VendorAPI;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 

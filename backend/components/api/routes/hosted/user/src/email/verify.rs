@@ -3,17 +3,15 @@ use crate::errors::challenge::ChallengeError;
 use crate::utils::session::AuthSession;
 use crate::State;
 use api_core::types::ModernApiResult;
-use db::models::contact_info::{
-    ContactInfo,
-    VerificationLevel,
-};
+use db::models::contact_info::ContactInfo;
+use db::models::contact_info::VerificationLevel;
 use newtypes::SessionAuthToken;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
-    Apiv2Schema,
 };
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

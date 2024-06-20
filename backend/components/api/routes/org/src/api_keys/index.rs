@@ -1,41 +1,31 @@
-use api_core::auth::tenant::{
-    AuthActor,
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::AuthActor;
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    ModernApiResult,
-    OffsetPaginatedResponse,
-    OffsetPaginationRequest,
-};
+use api_core::types::ModernApiResult;
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::ApiKeyFilters;
-use db::models::tenant_api_key::{
-    ApiKeyListFilters,
-    TenantApiKey,
-};
+use db::models::tenant_api_key::ApiKeyListFilters;
+use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
-use db::{
-    DbError,
-    OffsetPagination,
-};
+use db::DbError;
+use db::OffsetPagination;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{
-    ApiKeyStatus,
-    TenantApiKeyId,
-    TenantRoleId,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::TenantApiKeyId;
+use newtypes::TenantRoleId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::patch;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    patch,
-    web,
-    Apiv2Schema,
 };
 
 type ApiKeysResponse = Json<OffsetPaginatedResponse<api_wire_types::SecretApiKey>>;

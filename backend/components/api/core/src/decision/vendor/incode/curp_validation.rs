@@ -1,44 +1,34 @@
 use super::common::call_start_onboarding;
+use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_result::VendorResult;
+use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
+use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::decision::vendor::verification_result::{
     self,
-    SaveVerificationResultArgs,
-    ShouldSaveVerificationRequest,
 };
-use crate::decision::vendor::{
-    map_to_api_error,
-    AdditionalIdentityDocumentVerificationHelper,
-};
+use crate::decision::vendor::AdditionalIdentityDocumentVerificationHelper;
 use crate::decision::{
     self,
 };
 use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Any,
-    DataLifetimeSources,
-    FingerprintedDataRequest,
-    VaultWrapper,
-    VwArgs,
-    WriteableVw,
-};
-use crate::{
-    ApiError,
-    State,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::FingerprintedDataRequest;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
+use crate::utils::vault_wrapper::WriteableVw;
+use crate::ApiError;
+use crate::State;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document::{
-    Document,
-    DocumentUpdate,
-};
+use db::models::document::Document;
+use db::models::document::DocumentUpdate;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::{
-    NewRiskSignalInfo,
-    RiskSignal,
-};
+use db::models::risk_signal::NewRiskSignalInfo;
+use db::models::risk_signal::RiskSignal;
 use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
@@ -46,42 +36,38 @@ use db::TxnPgConn;
 use feature_flag::BoolFlag;
 use idv::incode::curp_validation::response::CurpValidationResponse;
 use idv::incode::curp_validation::IncodeCurpValidationRequest;
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
+use idv::ParsedResponse;
+use idv::VendorResponse;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
-use newtypes::{
-    BillingEventKind,
-    DataIdentifier,
-    DataLifetimeSeqno,
-    DataLifetimeSource,
-    DataRequest,
-    DecisionIntentId,
-    DocumentDiKind,
-    DocumentFixtureResult,
-    DocumentId,
-    DocumentKind,
-    FootprintReasonCode,
-    IdDocKind,
-    IncodeConfigurationId,
-    IncodeEnvironment,
-    IncodeFailureReason,
-    IncodeSessionId,
-    IncodeVerificationSessionKind,
-    Iso3166TwoDigitCountryCode,
-    OcrDataKind as ODK,
-    PiiJsonValue,
-    PiiString,
-    RiskSignalGroupKind,
-    ScopedVaultId,
-    TenantId,
-    ValidateArgs,
-    VaultPublicKey,
-    VendorAPI,
-    VerificationResultId,
-    WorkflowId,
-};
+use newtypes::BillingEventKind;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
+use newtypes::DataRequest;
+use newtypes::DecisionIntentId;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentFixtureResult;
+use newtypes::DocumentId;
+use newtypes::DocumentKind;
+use newtypes::FootprintReasonCode;
+use newtypes::IdDocKind;
+use newtypes::IncodeConfigurationId;
+use newtypes::IncodeEnvironment;
+use newtypes::IncodeFailureReason;
+use newtypes::IncodeSessionId;
+use newtypes::IncodeVerificationSessionKind;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::OcrDataKind as ODK;
+use newtypes::PiiJsonValue;
+use newtypes::PiiString;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::ValidateArgs;
+use newtypes::VaultPublicKey;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 #[tracing::instrument(skip(state, di))]

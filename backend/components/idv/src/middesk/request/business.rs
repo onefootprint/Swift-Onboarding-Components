@@ -133,10 +133,8 @@ mod tests {
 
     use super::*;
     use crate::middesk::request;
-    use newtypes::{
-        BoData,
-        BusinessDataFromVault,
-    };
+    use newtypes::BoData;
+    use newtypes::BusinessDataFromVault;
 
     #[test]
     fn test_from_business_data() {

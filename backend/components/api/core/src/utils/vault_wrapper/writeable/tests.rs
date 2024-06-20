@@ -1,15 +1,11 @@
-use super::{
-    DataLifetimeSources,
-    FingerprintedDataRequest,
-    PrefillKind,
-    WriteableVw,
-};
+use super::DataLifetimeSources;
+use super::FingerprintedDataRequest;
+use super::PrefillKind;
+use super::WriteableVw;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Person,
-    TenantVw,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::TenantVw;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::ob_configuration::ObConfiguration;
@@ -20,22 +16,18 @@ use db::tests::test_db_pool::TestDbPool;
 use db::TxnPgConn;
 use itertools::Itertools;
 use macros::test_state;
-use newtypes::fingerprint_salt::{
-    FingerprintSalt,
-    GlobalFingerprintKind,
-};
-use newtypes::{
-    CollectedDataOption as CDO,
-    DataIdentifier,
-    DataLifetimeSource,
-    DataRequest,
-    Fingerprint,
-    FingerprintScope,
-    IdentityDataKind,
-    IdentityDataKind as IDK,
-    PiiString,
-    ValidateArgs,
-};
+use newtypes::fingerprint_salt::FingerprintSalt;
+use newtypes::fingerprint_salt::GlobalFingerprintKind;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSource;
+use newtypes::DataRequest;
+use newtypes::Fingerprint;
+use newtypes::FingerprintScope;
+use newtypes::IdentityDataKind;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::PiiString;
+use newtypes::ValidateArgs;
 use std::collections::HashMap;
 
 struct TestData {

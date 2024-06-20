@@ -1,24 +1,16 @@
 use crate::ApiError;
 use api_errors::FpError;
 use http::StatusCode;
-use newtypes::{
-    Base64Data,
-    Uuid,
-};
+use newtypes::Base64Data;
+use newtypes::Uuid;
+use paperclip::actix::api_v2_errors;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_errors,
-    Apiv2Schema,
-};
+use paperclip::actix::Apiv2Schema;
 use paperclip::v2::models::DataType;
-use paperclip::v2::schema::{
-    Apiv2Schema,
-    TypedData,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use paperclip::v2::schema::Apiv2Schema;
+use paperclip::v2::schema::TypedData;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Wrapper around FpError that implements actix_web::ResponseError
 #[api_v2_errors()] // We don't support error responses on our docs site yet

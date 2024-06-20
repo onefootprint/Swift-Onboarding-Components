@@ -1,11 +1,9 @@
 use super::entity;
 use crate::auth::tenant::TenantAuth;
 use crate::utils::db2api::DbToApi;
-use crate::utils::vault_wrapper::{
-    Any,
-    DecryptedData,
-    TenantVw,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::DecryptedData;
+use crate::utils::vault_wrapper::TenantVw;
 use newtypes::DupeKind;
 
 pub type SameTenantDupeDetail<'a> = (

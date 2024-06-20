@@ -7,22 +7,16 @@ use actix_web::HttpMessage;
 use api_core::config::Config;
 use api_core::utils::timeouts::ResponseDeadline;
 use api_core::*;
-use clap::{
-    Parser,
-    Subcommand,
-};
+use clap::Parser;
+use clap::Subcommand;
 use std::time::Duration;
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
-use anyhow::{
-    Context,
-    Result,
-};
-use paperclip::v2::models::{
-    DefaultApiRaw,
-    Info,
-    Tag,
-};
+use anyhow::Context;
+use anyhow::Result;
+use paperclip::v2::models::DefaultApiRaw;
+use paperclip::v2::models::Info;
+use paperclip::v2::models::Tag;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

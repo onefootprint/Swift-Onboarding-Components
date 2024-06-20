@@ -1,7 +1,5 @@
-use newtypes::{
-    IdentifyScope,
-    ObConfigurationKind,
-};
+use newtypes::IdentifyScope;
+use newtypes::ObConfigurationKind;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

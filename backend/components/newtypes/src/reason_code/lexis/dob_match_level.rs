@@ -1,12 +1,8 @@
+use crate::vendor_reason_codes_enum;
+use crate::FootprintReasonCode;
 use crate::FootprintReasonCode::*;
-use crate::{
-    vendor_reason_codes_enum,
-    FootprintReasonCode,
-};
-use strum_macros::{
-    EnumIter,
-    EnumString,
-};
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 vendor_reason_codes_enum! {
     #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, EnumIter, Hash)]

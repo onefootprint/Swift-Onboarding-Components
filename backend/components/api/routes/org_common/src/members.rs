@@ -1,34 +1,26 @@
-use api_core::auth::tenant::{
-    AuthActor,
-    PartnerTenantGuard,
-    TenantGuard,
-    TenantOrPartnerTenantSessionAuth,
-};
+use api_core::auth::tenant::AuthActor;
+use api_core::auth::tenant::PartnerTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantOrPartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    ModernApiResult,
-    OffsetPaginatedResponse,
-    OffsetPaginationRequest,
-};
+use api_core::types::ModernApiResult;
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::magic_link::create_magic_link;
 use api_core::State;
 use api_wire_types::OrgMemberFilters;
 use chrono::Utc;
 use db::helpers::TenantOrPartnerTenantRef;
-use db::models::tenant_rolebinding::{
-    TenantRolebinding,
-    TenantRolebindingFilters,
-    TenantRolebindingUpdate,
-};
+use db::models::tenant_rolebinding::TenantRolebinding;
+use db::models::tenant_rolebinding::TenantRolebindingFilters;
+use db::models::tenant_rolebinding::TenantRolebindingUpdate;
 use db::models::tenant_user::TenantUser;
 use db::OffsetPagination;
-use newtypes::{
-    OrgIdentifierRef,
-    OrgMemberEmail,
-    TenantUserId,
-};
+use newtypes::OrgIdentifierRef;
+use newtypes::OrgMemberEmail;
+use newtypes::TenantUserId;
 use paperclip::actix::web;
 use paperclip::actix::web::Json;
 

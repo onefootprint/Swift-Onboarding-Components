@@ -1,33 +1,21 @@
-use crate::util::{
-    impl_enum_str_diesel,
-    impl_enum_string_diesel,
-};
-use crate::{
-    DecisionStatus,
-    DocumentRequestConfig,
-    DocumentRequestKind,
-};
+use crate::util::impl_enum_str_diesel;
+use crate::util::impl_enum_string_diesel;
+use crate::DecisionStatus;
+use crate::DocumentRequestConfig;
+use crate::DocumentRequestKind;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
 use paperclip::v2::models::DataType;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum::{
-    AsRefStr,
-    IntoEnumIterator,
-    ParseError,
-};
-use strum_macros::{
-    Display,
-    EnumIter,
-    EnumString,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum::AsRefStr;
+use strum::IntoEnumIterator;
+use strum::ParseError;
+use strum_macros::Display;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(
     SerializeDisplay,

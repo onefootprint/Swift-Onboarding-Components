@@ -1,9 +1,7 @@
 use super::ApiResult;
 use crate::types::ModernApiResult;
-use crate::{
-    ApiError,
-    ApiErrorKind,
-};
+use crate::ApiError;
+use crate::ApiErrorKind;
 
 #[derive(Debug)]
 /// Shorthand to make it convenient to make an HTTP 500 assertion error.

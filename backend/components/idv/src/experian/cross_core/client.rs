@@ -1,35 +1,27 @@
-use super::request::{
-    ControlOption,
-    CrossCoreAPIRequest,
-    PreciseIDRequestConfig,
-};
-use super::response::{
-    CCErrorResponse,
-    CrossCoreAPIResponse,
-};
+use super::request::ControlOption;
+use super::request::CrossCoreAPIRequest;
+use super::request::PreciseIDRequestConfig;
+use super::response::CCErrorResponse;
+use super::response::CrossCoreAPIResponse;
 use super::validation;
 use crate::experian::auth::response::JwtTokenResponse;
 use crate::experian::auth::{
     self,
 };
 use crate::experian::cross_core::error_code::ErrorCode;
-use crate::experian::error::{
-    EnvironmentMismatchError,
-    Error,
-    ValidationError,
-};
+use crate::experian::error::EnvironmentMismatchError;
+use crate::experian::error::Error;
+use crate::experian::error::ValidationError;
 use crate::footprint_http_client::FootprintVendorHttpClient;
 use chrono::Utc;
 use newtypes::experian::ProductOptions;
 use newtypes::vendor_credentials::ExperianCredentials;
-use newtypes::{
-    Base64Data,
-    Base64EncodedString,
-    IdvData,
-    PiiString,
-    Uuid,
-    VerificationRequestId,
-};
+use newtypes::Base64Data;
+use newtypes::Base64EncodedString;
+use newtypes::IdvData;
+use newtypes::PiiString;
+use newtypes::Uuid;
+use newtypes::VerificationRequestId;
 use tokio_retry::strategy::FixedInterval;
 
 const REQUIRED_X_USER_DOMAIN_HEADER_VAL: &str = "onefootprint.com";
@@ -381,31 +373,23 @@ impl CrossCoreRequestCredentials {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        ClientEnvironment,
-        ExperianClientAdapter,
-    };
+    use super::ClientEnvironment;
+    use super::ExperianClientAdapter;
     use crate::experian::cross_core::request::CrossCoreAPIRequest;
     use crate::experian::cross_core::response::CrossCoreAPIResponse;
     use crate::experian::cross_core::send_precise_id_request;
+    use crate::experian::cross_core::validation::load_sandbox_data;
     use crate::experian::cross_core::validation::{
         self,
-        load_sandbox_data,
     };
-    use crate::experian::error::{
-        Error,
-        ValidationError,
-    };
+    use crate::experian::error::Error;
+    use crate::experian::error::ValidationError;
     use crate::experian::ExperianCrossCoreRequest;
-    use crate::footprint_http_client::{
-        FootprintVendorHttpClient,
-        FpVendorClientArgs,
-    };
+    use crate::footprint_http_client::FootprintVendorHttpClient;
+    use crate::footprint_http_client::FpVendorClientArgs;
     use newtypes::vendor_credentials::ExperianCredentials;
-    use newtypes::{
-        IdvData,
-        PiiString,
-    };
+    use newtypes::IdvData;
+    use newtypes::PiiString;
     use test_case::test_case;
 
     fn load_sandbox_credentials() -> ExperianCredentials {

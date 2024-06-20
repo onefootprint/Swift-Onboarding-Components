@@ -1,17 +1,11 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use core::fmt;
-use serde::{
-    Deserialize,
-    Serialize,
-};
-use std::fmt::{
-    Debug,
-    Display,
-    Formatter,
-};
+use serde::Deserialize;
+use serde::Serialize;
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::fmt::Formatter;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct VaultDrStatus {

@@ -1,24 +1,18 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_set_version::RuleSetVersion;
-use newtypes::{
-    ApiKeyStatus,
-    ObConfigurationId,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    patch,
-    web,
-    Apiv2Schema,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::ObConfigurationId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::patch;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct UpdateObConfigPath {

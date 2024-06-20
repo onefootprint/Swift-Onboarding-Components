@@ -1,16 +1,10 @@
-use super::business::{
-    BusinessResponse,
-    Tin,
-};
+use super::business::BusinessResponse;
+use super::business::Tin;
 use crate::middesk::Error;
-use chrono::{
-    DateTime,
-    Utc,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use chrono::DateTime;
+use chrono::Utc;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(Debug)]
 #[allow(clippy::large_enum_variant)]

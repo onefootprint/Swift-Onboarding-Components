@@ -1,57 +1,43 @@
 use super::billing_profile::BillingProfile;
-use super::tenant_role::{
-    ImmutableRoleKind,
-    TenantRole,
-};
+use super::tenant_role::ImmutableRoleKind;
+use super::tenant_role::TenantRole;
 use super::tenant_vendor::TenantVendorControl;
 use crate::helpers::WorkosAuthIdentity;
-use crate::{
-    DbResult,
-    NonNullVec,
-    OptionalNonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::NonNullVec;
+use crate::OptionalNonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::billing_profile;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::tenant::BoxedQuery;
 use db_schema::schema::tenant::{
     self,
-    BoxedQuery,
 };
-use db_schema::schema::{
-    billing_profile,
-    scoped_vault,
-    tenant_vendor_control,
-};
+use db_schema::schema::tenant_vendor_control;
 use diesel::dsl::count_star;
 use diesel::insertable::CanInsertInSingleQuery;
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::query_builder::{
-    QueryFragment,
-    QueryId,
-};
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::query_builder::QueryFragment;
+use diesel::query_builder::QueryId;
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    AppClipExperienceId,
-    CompanySize,
-    EncryptedVaultPrivateKey,
-    PreviewApi,
-    ScopedVaultId,
-    StripeCustomerId,
-    TenantId,
-    TenantKind,
-    TenantRoleKind,
-    VaultId,
-    VaultPublicKey,
-    WorkosAuthMethod,
-};
+use newtypes::AppClipExperienceId;
+use newtypes::CompanySize;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::PreviewApi;
+use newtypes::ScopedVaultId;
+use newtypes::StripeCustomerId;
+use newtypes::TenantId;
+use newtypes::TenantKind;
+use newtypes::TenantRoleKind;
+use newtypes::VaultId;
+use newtypes::VaultPublicKey;
+use newtypes::WorkosAuthMethod;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Insertable, Selectable)]

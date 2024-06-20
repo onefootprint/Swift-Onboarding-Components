@@ -63,10 +63,8 @@ mod tests {
 
     use super::compare_enum_vs_latest_api_response;
     use crate::socure::client::SocureClient;
-    use crate::socure::reason_code::check_reason_code_api::{
-        DifferingDescriptionReasonCode,
-        MissingReasonCode,
-    };
+    use crate::socure::reason_code::check_reason_code_api::DifferingDescriptionReasonCode;
+    use crate::socure::reason_code::check_reason_code_api::MissingReasonCode;
     use newtypes::SocureReasonCode;
     use serde_json::json;
     use tracing_test::traced_test;

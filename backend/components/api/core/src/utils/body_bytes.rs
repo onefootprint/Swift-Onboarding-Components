@@ -1,23 +1,17 @@
 use crate::ModernApiError;
 use actix_web::dev::Payload;
-use actix_web::{
-    FromRequest,
-    HttpRequest,
-};
+use actix_web::FromRequest;
+use actix_web::HttpRequest;
 use futures::Future;
 use paperclip::actix::web;
 use paperclip::v2::models::DataTypeFormat;
 use paperclip::v2::schema::Apiv2Schema;
 use std::pin::Pin;
-use std::task::{
-    ready,
-    Context,
-    Poll,
-};
-pub use web::{
-    Bytes,
-    BytesMut,
-};
+use std::task::ready;
+use std::task::Context;
+use std::task::Poll;
+pub use web::Bytes;
+pub use web::BytesMut;
 
 /// Just like Actix's bytes, but custom size limit represented in the type
 #[derive(derive_more::Deref, derive_more::DerefMut)]

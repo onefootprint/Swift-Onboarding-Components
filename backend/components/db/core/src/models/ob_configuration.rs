@@ -1,59 +1,49 @@
 use super::rule_set_version::RuleSetVersion;
 use super::tenant::Tenant;
 use super::workflow::Workflow;
+use crate::actor;
 use crate::actor::SaturatedActor;
-use crate::{
-    actor,
-    DbError,
-    DbResult,
-    NextPage,
-    NonNullVec,
-    OffsetPagination,
-    OptionalNonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::NextPage;
+use crate::NonNullVec;
+use crate::OffsetPagination;
+use crate::OptionalNonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::ob_configuration;
 use db_schema::schema::ob_configuration::BoxedQuery;
-use db_schema::schema::{
-    ob_configuration,
-    tenant,
-};
+use db_schema::schema::tenant;
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
+use diesel::Insertable;
+use diesel::Queryable;
 use itertools::Itertools;
-use newtypes::{
-    ApiKeyStatus,
-    AppearanceId,
-    AuthMethodKind,
-    CipKind,
-    CollectedDataOption as CDO,
-    DataIdentifierDiscriminant,
-    DbActor,
-    DocumentAndCountryConfiguration,
-    DocumentCdoInfo,
-    DocumentRequestConfig,
-    EnhancedAmlOption,
-    IdDocKind,
-    Iso3166TwoDigitCountryCode,
-    Locked,
-    ObConfigurationId,
-    ObConfigurationKey,
-    ObConfigurationKind,
-    ScopedVaultId,
-    SupportedDocumentAndCountryMappingForBifrost,
-    TenantId,
-    VerificationCheck,
-    VerificationCheckKind,
-    WorkflowId,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::AppearanceId;
+use newtypes::AuthMethodKind;
+use newtypes::CipKind;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DataIdentifierDiscriminant;
+use newtypes::DbActor;
+use newtypes::DocumentAndCountryConfiguration;
+use newtypes::DocumentCdoInfo;
+use newtypes::DocumentRequestConfig;
+use newtypes::EnhancedAmlOption;
+use newtypes::IdDocKind;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::Locked;
+use newtypes::ObConfigurationId;
+use newtypes::ObConfigurationKey;
+use newtypes::ObConfigurationKind;
+use newtypes::ScopedVaultId;
+use newtypes::SupportedDocumentAndCountryMappingForBifrost;
+use newtypes::TenantId;
+use newtypes::VerificationCheck;
+use newtypes::VerificationCheckKind;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 

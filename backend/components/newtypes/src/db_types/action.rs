@@ -1,7 +1,5 @@
-use crate::{
-    DecisionStatus,
-    WorkflowRequestConfig,
-};
+use crate::DecisionStatus;
+use crate::WorkflowRequestConfig;
 use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 

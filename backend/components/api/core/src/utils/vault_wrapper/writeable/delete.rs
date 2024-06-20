@@ -49,22 +49,16 @@ impl<Type> WriteableVw<Type> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::vault_wrapper::{
-        Person,
-        VaultWrapper,
-    };
-    use db::models::vault_data::{
-        NewVaultData,
-        VaultData,
-    };
+    use crate::utils::vault_wrapper::Person;
+    use crate::utils::vault_wrapper::VaultWrapper;
+    use db::models::vault_data::NewVaultData;
+    use db::models::vault_data::VaultData;
     use db::tests::prelude::*;
     use macros::db_test;
-    use newtypes::{
-        DataLifetimeSource,
-        IdentityDataKind as IDK,
-        SealedVaultBytes,
-        VaultDataFormat,
-    };
+    use newtypes::DataLifetimeSource;
+    use newtypes::IdentityDataKind as IDK;
+    use newtypes::SealedVaultBytes;
+    use newtypes::VaultDataFormat;
 
     #[db_test]
     fn test_soft_deletion(conn: &mut TestPgConn) {

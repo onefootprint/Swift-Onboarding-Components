@@ -1,9 +1,7 @@
 use crate::*;
 use newtypes::decision::MatchLevel;
-use newtypes::{
-    FootprintReasonCode,
-    SignalSeverity,
-};
+use newtypes::FootprintReasonCode;
+use newtypes::SignalSeverity;
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct FieldValidationDetail {

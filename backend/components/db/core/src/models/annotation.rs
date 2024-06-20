@@ -1,36 +1,26 @@
 use super::user_timeline::UserTimeline;
+use crate::actor;
 use crate::actor::SaturatedActor;
 use crate::models::scoped_vault::ScopedVault;
-use crate::{
-    actor,
-    DbError,
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    annotation,
-    scoped_vault,
-    user_timeline,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::annotation;
+use db_schema::schema::scoped_vault;
+use db_schema::schema::user_timeline;
 use diesel::dsl::not;
 use diesel::prelude::*;
-use newtypes::{
-    AnnotationId,
-    DbActor,
-    DbUserTimelineEvent,
-    FpId,
-    OnboardingDecisionId,
-    ScopedVaultId,
-    TenantId,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::AnnotationId;
+use newtypes::DbActor;
+use newtypes::DbUserTimelineEvent;
+use newtypes::FpId;
+use newtypes::OnboardingDecisionId;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Serialize, Deserialize)]

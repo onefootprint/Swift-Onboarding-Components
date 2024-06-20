@@ -1,41 +1,27 @@
 use super::meta_headers::MetaHeaders;
+use crate::decision;
 use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::{
-    ApiResult,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use crate::utils::file_upload::FileUpload;
-use crate::utils::vault_wrapper::{
-    seal_file_and_upload_to_s3,
-    Any,
-    Person,
-    VaultWrapper,
-    VwArgs,
-};
-use crate::{
-    decision,
-    State,
-};
-use api_wire_types::{
-    CreateDocumentRequest,
-    DocumentResponse,
-};
+use crate::utils::vault_wrapper::seal_file_and_upload_to_s3;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
+use crate::State;
+use api_wire_types::CreateDocumentRequest;
+use api_wire_types::DocumentResponse;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document::{
-    Document,
-    DocumentUpdate,
-    NewDocumentArgs,
-};
-use db::models::document_request::{
-    DocumentRequest as DbDocumentRequest,
-    DocumentRequestIdentifier,
-};
-use db::models::document_upload::{
-    DocumentUpload,
-    NewDocumentUploadArgs,
-};
+use db::models::document::Document;
+use db::models::document::DocumentUpdate;
+use db::models::document::NewDocumentArgs;
+use db::models::document_request::DocumentRequest as DbDocumentRequest;
+use db::models::document_request::DocumentRequestIdentifier;
+use db::models::document_upload::DocumentUpload;
+use db::models::document_upload::NewDocumentUploadArgs;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
@@ -44,21 +30,19 @@ use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use feature_flag::BoolFlag;
-use newtypes::{
-    DataLifetimeSource,
-    DecisionIntentKind,
-    DocumentFixtureResult,
-    DocumentId,
-    DocumentRequestKind,
-    DocumentReviewStatus,
-    DocumentSide,
-    DocumentStatus,
-    IdDocKind,
-    IncodeConfigurationId,
-    ScopedVaultId,
-    TenantId,
-    WorkflowId,
-};
+use newtypes::DataLifetimeSource;
+use newtypes::DecisionIntentKind;
+use newtypes::DocumentFixtureResult;
+use newtypes::DocumentId;
+use newtypes::DocumentRequestKind;
+use newtypes::DocumentReviewStatus;
+use newtypes::DocumentSide;
+use newtypes::DocumentStatus;
+use newtypes::IdDocKind;
+use newtypes::IncodeConfigurationId;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::WorkflowId;
 
 /// Route handler for "/hosted/user/documents"
 pub async fn handle_document_create(

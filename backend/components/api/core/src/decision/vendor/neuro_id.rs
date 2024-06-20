@@ -1,52 +1,36 @@
 use super::map_to_api_error;
 use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_result::VendorResult;
-use super::verification_result::{
-    SaveVerificationResultArgs,
-    ShouldSaveVerificationRequest,
-};
+use super::verification_result::SaveVerificationResultArgs;
+use super::verification_result::ShouldSaveVerificationRequest;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-    VwArgs,
-};
-use crate::{
-    ApiError,
-    State,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
+use crate::utils::vault_wrapper::VwArgs;
+use crate::ApiError;
+use crate::State;
 use db::models::decision_intent::DecisionIntent;
-use db::models::neuro_id_analytics_event::{
-    NeuroIdAnalyticsEvent,
-    NewNeuroIdAnalyticsEvent,
-};
+use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
+use db::models::neuro_id_analytics_event::NewNeuroIdAnalyticsEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use feature_flag::BoolFlag;
-use idv::neuro_id::response::{
-    NeuroApiResponse,
-    NeuroIdAnalyticsResponse,
-    NeuroIdAttributes,
-};
+use idv::neuro_id::response::NeuroApiResponse;
+use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+use idv::neuro_id::response::NeuroIdAttributes;
 use idv::neuro_id::NeuroIdAnalyticsRequest;
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::vendor_credentials::{
-    NeuroIdCredentials,
-    NeuroIdSiteId,
-};
-use newtypes::{
-    DecisionIntentId,
-    NeuroIdentityId,
-    ScopedVaultId,
-    TenantId,
-    VaultPublicKey,
-    VendorAPI,
-    VerificationResultId,
-    WorkflowId,
-};
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::vendor_credentials::NeuroIdCredentials;
+use newtypes::vendor_credentials::NeuroIdSiteId;
+use newtypes::DecisionIntentId;
+use newtypes::NeuroIdentityId;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::VaultPublicKey;
+use newtypes::VendorAPI;
+use newtypes::VerificationResultId;
+use newtypes::WorkflowId;
 
 impl SaveVerificationResultArgs {
     pub fn new_for_neuro(
@@ -225,10 +209,8 @@ pub fn tenant_can_view_neuro(state: &State, tenant_id: &TenantId) -> bool {
 
 mod tests {
     use super::save_neuro_event;
-    use crate::decision::tests::test_helpers::{
-        create_kyc_user_and_wf,
-        FixtureData,
-    };
+    use crate::decision::tests::test_helpers::create_kyc_user_and_wf;
+    use crate::decision::tests::test_helpers::FixtureData;
     use crate::decision::vendor::verification_result::save_vreq_and_vres;
     use crate::errors::ApiResult;
     use crate::State;
@@ -243,20 +225,16 @@ mod tests {
     };
     use db::tests::test_db_pool::TestDbPool;
     use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+    use idv::test_fixtures::NeuroTestOpts;
     use idv::test_fixtures::{
         self,
-        NeuroTestOpts,
     };
-    use idv::{
-        ParsedResponse,
-        VendorResponse,
-    };
+    use idv::ParsedResponse;
+    use idv::VendorResponse;
     use macros::test_state;
-    use newtypes::{
-        DecisionIntentKind,
-        DupeKind,
-        NeuroIdentityId,
-    };
+    use newtypes::DecisionIntentKind;
+    use newtypes::DupeKind;
+    use newtypes::NeuroIdentityId;
 
     async fn create_neuro_event(
         state: &mut State,

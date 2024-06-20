@@ -1,34 +1,24 @@
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::auth::session::GetSessionForUpdate;
-use api_core::auth::tenant::{
-    AnyOrgSessionAuth,
-    AnyPartnerTenantSessionAuth,
-};
-use api_core::errors::{
-    ApiResult,
-    AssertionError,
-};
+use api_core::auth::tenant::AnyOrgSessionAuth;
+use api_core::auth::tenant::AnyPartnerTenantSessionAuth;
+use api_core::errors::ApiResult;
+use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::State;
-use api_wire_types::{
-    AssumePartnerRoleRequest,
-    AssumePartnerRoleResponse,
-    OrganizationMember,
-    PartnerOrganization,
-};
+use api_wire_types::AssumePartnerRoleRequest;
+use api_wire_types::AssumePartnerRoleResponse;
+use api_wire_types::OrganizationMember;
+use api_wire_types::PartnerOrganization;
 use db::helpers::TenantOrPartnerTenant;
-use db::models::tenant_rolebinding::{
-    TenantRbLoginResult,
-    TenantRolebinding,
-};
+use db::models::tenant_rolebinding::TenantRbLoginResult;
+use db::models::tenant_rolebinding::TenantRolebinding;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
 
 #[api_v2_operation(
     description = "After the user has proven they own an email address, allow them to assume an

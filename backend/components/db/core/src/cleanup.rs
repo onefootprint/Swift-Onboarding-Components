@@ -1,14 +1,10 @@
-use crate::{
-    DbResult,
-    TxnPgConn,
-};
-use db_schema::schema::{
-    apple_device_attestation,
-    auth_event,
-    rule_result,
-    rule_set_result,
-    rule_set_result_risk_signal_junction,
-};
+use crate::DbResult;
+use crate::TxnPgConn;
+use db_schema::schema::apple_device_attestation;
+use db_schema::schema::auth_event;
+use db_schema::schema::rule_result;
+use db_schema::schema::rule_set_result;
+use db_schema::schema::rule_set_result_risk_signal_junction;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::VaultId;
@@ -18,48 +14,46 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     // we register users within our integration tests. to avoid filling up our database with fake
     // information, we clean up afterwards.
 
-    use db_schema::schema::{
-        access_event,
-        annotation,
-        audit_event,
-        billing_event,
-        business_owner,
-        contact_info,
-        data_lifetime,
-        decision_intent,
-        document_data,
-        document_request,
-        document_upload,
-        fingerprint,
-        fingerprint_junction,
-        fingerprint_visit_event,
-        identity_document,
-        incode_verification_session,
-        incode_verification_session_event,
-        liveness_event,
-        manual_review,
-        middesk_request,
-        onboarding_decision,
-        onboarding_decision_verification_result_junction,
-        risk_signal,
-        risk_signal_group,
-        scoped_vault,
-        socure_device_session,
-        stytch_fingerprint_event,
-        user_consent,
-        user_timeline,
-        vault,
-        vault_data,
-        verification_request,
-        verification_result,
-        watchlist_check,
-        waterfall_execution,
-        waterfall_step,
-        webauthn_credential,
-        workflow,
-        workflow_event,
-        workflow_request,
-    };
+    use db_schema::schema::access_event;
+    use db_schema::schema::annotation;
+    use db_schema::schema::audit_event;
+    use db_schema::schema::billing_event;
+    use db_schema::schema::business_owner;
+    use db_schema::schema::contact_info;
+    use db_schema::schema::data_lifetime;
+    use db_schema::schema::decision_intent;
+    use db_schema::schema::document_data;
+    use db_schema::schema::document_request;
+    use db_schema::schema::document_upload;
+    use db_schema::schema::fingerprint;
+    use db_schema::schema::fingerprint_junction;
+    use db_schema::schema::fingerprint_visit_event;
+    use db_schema::schema::identity_document;
+    use db_schema::schema::incode_verification_session;
+    use db_schema::schema::incode_verification_session_event;
+    use db_schema::schema::liveness_event;
+    use db_schema::schema::manual_review;
+    use db_schema::schema::middesk_request;
+    use db_schema::schema::onboarding_decision;
+    use db_schema::schema::onboarding_decision_verification_result_junction;
+    use db_schema::schema::risk_signal;
+    use db_schema::schema::risk_signal_group;
+    use db_schema::schema::scoped_vault;
+    use db_schema::schema::socure_device_session;
+    use db_schema::schema::stytch_fingerprint_event;
+    use db_schema::schema::user_consent;
+    use db_schema::schema::user_timeline;
+    use db_schema::schema::vault;
+    use db_schema::schema::vault_data;
+    use db_schema::schema::verification_request;
+    use db_schema::schema::verification_result;
+    use db_schema::schema::watchlist_check;
+    use db_schema::schema::waterfall_execution;
+    use db_schema::schema::waterfall_step;
+    use db_schema::schema::webauthn_credential;
+    use db_schema::schema::workflow;
+    use db_schema::schema::workflow_event;
+    use db_schema::schema::workflow_request;
     let mut deleted_rows = 0;
 
     // First, get any business vaults related to this user and delete them.

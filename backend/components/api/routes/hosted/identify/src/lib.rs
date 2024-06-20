@@ -1,17 +1,13 @@
 #![recursion_limit = "256"]
 
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::user::{
-    CheckedUserAuthContext,
-    UserIdentifier,
-};
+use api_core::auth::user::CheckedUserAuthContext;
+use api_core::auth::user::UserIdentifier;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::utils::identify::{
-    get_user_challenge_context,
-    UserChallengeContext,
-};
+use api_core::utils::identify::get_user_challenge_context;
+use api_core::utils::identify::UserChallengeContext;
 use api_core::utils::sms::PhoneEmailChallengeState;
 use api_core::State;
 use api_wire_types::IdentifyId;
@@ -19,20 +15,14 @@ use db::errors::OptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;
-use newtypes::{
-    DataIdentifier,
-    SandboxId,
-    VaultId,
-};
-use paperclip::actix::{
-    web,
-    Apiv2Schema,
-};
+use newtypes::DataIdentifier;
+use newtypes::SandboxId;
+use newtypes::VaultId;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 use strum::EnumDiscriminants;
-use webauthn_rs_core::proto::{
-    AuthenticationState,
-    Base64UrlSafeData,
-};
+use webauthn_rs_core::proto::AuthenticationState;
+use webauthn_rs_core::proto::Base64UrlSafeData;
 
 #[allow(clippy::module_inception)]
 pub mod identify;

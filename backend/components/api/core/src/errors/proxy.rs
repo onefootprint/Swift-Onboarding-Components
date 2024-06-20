@@ -1,8 +1,6 @@
 use http::StatusCode;
-use newtypes::{
-    ProxyConfigIngressRuleId,
-    ProxyTokenError,
-};
+use newtypes::ProxyConfigIngressRuleId;
+use newtypes::ProxyTokenError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

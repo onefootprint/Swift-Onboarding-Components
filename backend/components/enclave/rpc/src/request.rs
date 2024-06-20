@@ -3,10 +3,8 @@ use crate::DataTransform;
 use crypto::hex::ToHex;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use crypto::sha256;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use uuid::Uuid;

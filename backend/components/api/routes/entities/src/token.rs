@@ -1,47 +1,35 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::types::ModernApiResult;
 use crate::State;
-use api_core::auth::tenant::{
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::config::LinkKind;
 use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
 use api_core::utils::email::SendgridClient;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::token::{
-    create_token,
-    CreateTokenArgs,
-    CreateTokenResult,
-};
-use api_core::utils::vault_wrapper::{
-    Any,
-    TenantVw,
-    VaultWrapper,
-};
-use api_wire_types::{
-    CreateEntityTokenRequest,
-    CreateEntityTokenResponse,
-};
+use api_core::utils::token::create_token;
+use api_core::utils::token::CreateTokenArgs;
+use api_core::utils::token::CreateTokenResult;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_wire_types::CreateEntityTokenRequest;
+use api_wire_types::CreateEntityTokenResponse;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow_request::WorkflowRequest;
 use itertools::Itertools;
 use newtypes::sms_message::SmsMessage;
-use newtypes::{
-    ContactInfoKind,
-    DocumentRequestConfig,
-    PhoneNumber,
-    PiiString,
-    WorkflowRequestConfig,
-};
+use newtypes::ContactInfoKind;
+use newtypes::DocumentRequestConfig;
+use newtypes::PhoneNumber;
+use newtypes::PiiString;
+use newtypes::WorkflowRequestConfig;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
 use std::collections::HashMap;
 
 #[api_v2_operation(

@@ -1,24 +1,16 @@
-use crate::{
-    MatchLevel,
-    SignalScope,
-};
+use crate::MatchLevel;
+use crate::SignalScope;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use strum::IntoEnumIterator;
-use strum_macros::{
-    AsRefStr,
-    Display,
-    EnumIter,
-    EnumString,
-};
+use strum_macros::AsRefStr;
+use strum_macros::Display;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 // yes one day we'll consolidate this and vendor_reason_code_enum into beautiful proc macros
 macro_rules! footprint_reason_code_enum {
@@ -1616,11 +1608,9 @@ pub fn export_reason_codes() {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        FootprintReasonCode,
-        SignalScope,
-        SignalSeverity,
-    };
+    use super::FootprintReasonCode;
+    use super::SignalScope;
+    use super::SignalSeverity;
     use std::cmp::Ordering;
     use strum::IntoEnumIterator;
     use test_case::test_case;

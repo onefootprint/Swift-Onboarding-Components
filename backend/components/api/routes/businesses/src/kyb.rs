@@ -1,58 +1,40 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::types::ModernApiResult;
 use crate::State;
-use api_core::errors::onboarding::{
-    OnboardingError,
-    UnmetRequirements,
-};
+use api_core::errors::onboarding::OnboardingError;
+use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::{
-    ApiResult,
-    TfError,
-    ValidationError,
-};
+use api_core::errors::ApiResult;
+use api_core::errors::TfError;
+use api_core::errors::ValidationError;
 use api_core::task;
 use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::requirements::{
-    GetRequirementsArgs,
-    RequirementOpts,
-};
-use api_core::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-    VwArgs,
-};
-use api_wire_types::{
-    EntityValidateResponse,
-    TriggerKybRequest,
-};
+use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::requirements::RequirementOpts;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
+use api_wire_types::EntityValidateResponse;
+use api_wire_types::TriggerKybRequest;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::{
-    OnboardingWorkflowArgs,
-    Workflow,
-};
+use db::models::workflow::OnboardingWorkflowArgs;
+use db::models::workflow::Workflow;
 use db::DbError;
 use itertools::Itertools;
-use newtypes::{
-    ObConfigurationKind,
-    OnboardingRequirement,
-    VaultKind,
-    WorkflowFixtureResult,
-    WorkflowSource,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-};
+use newtypes::ObConfigurationKind;
+use newtypes::OnboardingRequirement;
+use newtypes::VaultKind;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowSource;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Triggers KYB on the provided business.",

@@ -1,17 +1,11 @@
-use super::{
-    Error,
-    VResult,
-};
-use crate::{
-    Iso3166TwoDigitCountryCode,
-    PiiJsonValue,
-    PiiString,
-    UsState,
-};
-use chrono::{
-    Datelike,
-    NaiveDate,
-};
+use super::Error;
+use super::VResult;
+use crate::Iso3166TwoDigitCountryCode;
+use crate::PiiJsonValue;
+use crate::PiiString;
+use crate::UsState;
+use chrono::Datelike;
+use chrono::NaiveDate;
 use regex::Regex;
 use serde::de::DeserializeOwned;
 use std::str::FromStr;

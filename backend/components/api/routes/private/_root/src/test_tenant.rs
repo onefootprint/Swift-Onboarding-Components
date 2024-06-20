@@ -1,8 +1,6 @@
 use crate::State;
-use actix_web::{
-    post,
-    web,
-};
+use actix_web::post;
+use actix_web::web;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::errors::tenant::TenantError;
@@ -11,25 +9,19 @@ use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use chrono::Duration;
-use db::models::tenant::{
-    NewIntegrationTestTenant,
-    Tenant,
-};
+use db::models::tenant::NewIntegrationTestTenant;
+use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
-use db::models::tenant_role::{
-    ImmutableRoleKind,
-    TenantRole,
-};
+use db::models::tenant_role::ImmutableRoleKind;
+use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{
-    OrgMemberEmail,
-    SessionAuthToken,
-    TenantId,
-    TenantRoleKind,
-    WorkosAuthMethod,
-};
+use newtypes::OrgMemberEmail;
+use newtypes::SessionAuthToken;
+use newtypes::TenantId;
+use newtypes::TenantRoleKind;
+use newtypes::WorkosAuthMethod;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

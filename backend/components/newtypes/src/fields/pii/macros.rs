@@ -14,10 +14,8 @@ macro_rules! format_pii {
         };
     }
 
-pub use {
-    format_pii,
-    pii,
-};
+pub use format_pii;
+pub use pii;
 
 #[cfg(test)]
 mod tests {

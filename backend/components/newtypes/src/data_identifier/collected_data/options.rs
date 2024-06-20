@@ -1,34 +1,24 @@
-use crate::{
-    BusinessDataKind as BDK,
-    CollectedData,
-    DataIdentifier,
-    DocumentCdoInfo,
-    DocumentDiKind as DK,
-    IdentityDataKind as IDK,
-    InvestorProfileKind as IPK,
-    Selfie,
-    TenantScope,
-};
+use crate::BusinessDataKind as BDK;
+use crate::CollectedData;
+use crate::DataIdentifier;
+use crate::DocumentCdoInfo;
+use crate::DocumentDiKind as DK;
+use crate::IdentityDataKind as IDK;
+use crate::InvestorProfileKind as IPK;
+use crate::Selfie;
+use crate::TenantScope;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
 use std::collections::HashSet;
-use strum::{
-    EnumDiscriminants,
-    IntoEnumIterator,
-};
-use strum_macros::{
-    Display,
-    EnumString,
-};
+use strum::EnumDiscriminants;
+use strum::IntoEnumIterator;
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

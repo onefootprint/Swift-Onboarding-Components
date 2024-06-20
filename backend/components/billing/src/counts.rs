@@ -1,33 +1,23 @@
 use crate::interval::BillingInterval;
 use crate::product::Product;
-use crate::profile::{
-    BillingProfile,
-    PriceInfo,
-};
-use crate::{
-    BResult,
-    Error,
-};
+use crate::profile::BillingProfile;
+use crate::profile::PriceInfo;
+use crate::BResult;
+use crate::Error;
 use db::models::access_event::AccessEvent;
 use db::models::billing_event::BillingEvent;
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use db::models::document::Document;
-use db::models::scoped_vault::{
-    ScopedVault,
-    ScopedVaultPiiFilters,
-};
+use db::models::scoped_vault::ScopedVault;
+use db::models::scoped_vault::ScopedVaultPiiFilters;
 use db::models::watchlist_check::WatchlistCheck;
 use db::models::workflow::Workflow;
-use db::{
-    DbResult,
-    PgConn,
-};
-use newtypes::{
-    AccessEventPurpose,
-    BillingEventKind,
-    TenantId,
-    VaultKind,
-};
+use db::DbResult;
+use db::PgConn;
+use newtypes::AccessEventPurpose;
+use newtypes::BillingEventKind;
+use newtypes::TenantId;
+use newtypes::VaultKind;
 use rust_decimal_macros::dec;
 use std::ops::Add;
 use strum::IntoEnumIterator;

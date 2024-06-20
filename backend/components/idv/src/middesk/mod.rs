@@ -1,9 +1,7 @@
 use newtypes::vendor_credentials::MiddeskCredentials;
-use newtypes::{
-    BusinessDataForRequest,
-    PiiJsonValue,
-    TenantId,
-};
+use newtypes::BusinessDataForRequest;
+use newtypes::PiiJsonValue;
+use newtypes::TenantId;
 use reqwest::StatusCode;
 use thiserror::Error;
 

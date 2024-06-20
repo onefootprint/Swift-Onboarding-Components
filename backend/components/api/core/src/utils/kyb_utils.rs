@@ -1,24 +1,18 @@
 use super::vault_wrapper::BusinessOwnerInfo;
 use crate::auth::session::ob_config::BoSession;
 use crate::config::LinkKind;
-use crate::decision::state::{
-    Authorize,
-    BoKycCompleted,
-    WorkflowActions,
-    WorkflowWrapper,
-};
+use crate::decision::state::Authorize;
+use crate::decision::state::BoKycCompleted;
+use crate::decision::state::WorkflowActions;
+use crate::decision::state::WorkflowWrapper;
 use crate::errors::business::BusinessError;
-use crate::errors::{
-    ApiResult,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use crate::utils::email::BoInviteEmailInfo;
 use crate::utils::session::AuthSession;
-use crate::utils::vault_wrapper::{
-    Business,
-    TenantVw,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::Business;
+use crate::utils::vault_wrapper::TenantVw;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_errors::FpErrorTrait;
 use db::models::ob_configuration::ObConfiguration;
@@ -26,13 +20,11 @@ use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
 use itertools::Itertools;
 use newtypes::sms_message::SmsMessage;
-use newtypes::{
-    BusinessDataKind as BDK,
-    BusinessOwnerKind,
-    KybState,
-    PiiString,
-    WorkflowState,
-};
+use newtypes::BusinessDataKind as BDK;
+use newtypes::BusinessOwnerKind;
+use newtypes::KybState;
+use newtypes::PiiString;
+use newtypes::WorkflowState;
 use std::pin::Pin;
 
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form

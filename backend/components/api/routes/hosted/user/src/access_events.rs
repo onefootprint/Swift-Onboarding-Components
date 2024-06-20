@@ -1,16 +1,14 @@
 use crate::auth::user::UserAuthContext;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::auth::user::{
-    UserAuth,
-    UserAuthScope,
-};
+use api_core::auth::user::UserAuth;
+use api_core::auth::user::UserAuthScope;
 use api_core::types::JsonApiListResponse;
 use db::access_event::AccessEventListItemForUser;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

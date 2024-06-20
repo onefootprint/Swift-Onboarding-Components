@@ -1,13 +1,9 @@
 use actix_multipart::Multipart;
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
-use api_core::errors::{
-    ApiResult,
-    ValidationError,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::State;
@@ -17,21 +13,19 @@ use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::ComplianceDocRequest;
 use db::models::compliance_doc_submission::NewComplianceDocSubmission;
 use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
-use newtypes::{
-    ComplianceDocData,
-    ComplianceDocId,
-    ComplianceDocRequestId,
-    S3Url,
-    SealedVaultDataKey,
-    TenantCompliancePartnershipId,
-};
+use newtypes::ComplianceDocData;
+use newtypes::ComplianceDocId;
+use newtypes::ComplianceDocRequestId;
+use newtypes::S3Url;
+use newtypes::SealedVaultDataKey;
+use newtypes::TenantCompliancePartnershipId;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web::HttpRequest;
 use paperclip::actix::web::{
     self,
-    HttpRequest,
 };
 use paperclip::actix::{
     self,
-    api_v2_operation,
 };
 
 const MIN_DOCUMENT_SIZE_IN_BYTES: usize = 1;

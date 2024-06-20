@@ -1,25 +1,17 @@
-use crate::{
-    DbError,
-    DbResult,
-    NonNullVec,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbError;
+use crate::DbResult;
+use crate::NonNullVec;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::tenant_android_app_meta;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    SealedVaultBytes,
-    TenantAndroidAppMetaId,
-    TenantId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::SealedVaultBytes;
+use newtypes::TenantAndroidAppMetaId;
+use newtypes::TenantId;
 
 #[derive(Debug, Clone, Insertable, Queryable)]
 #[diesel(table_name = tenant_android_app_meta)]

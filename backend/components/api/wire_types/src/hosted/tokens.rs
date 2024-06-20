@@ -1,16 +1,10 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
-use newtypes::{
-    RequestedTokenScope,
-    SessionAuthToken,
-    UserAuthScope,
-};
-use paperclip::actix::{
-    Apiv2Response,
-    Apiv2Schema,
-};
+use chrono::DateTime;
+use chrono::Utc;
+use newtypes::RequestedTokenScope;
+use newtypes::SessionAuthToken;
+use newtypes::UserAuthScope;
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Response, serde::Serialize, macros::JsonResponder)]
 pub struct GetUserTokenResponse {

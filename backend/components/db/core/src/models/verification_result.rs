@@ -1,33 +1,23 @@
 use super::decision_intent::DecisionIntent;
-use super::verification_request::{
-    RequestAndResult,
-    VerificationRequest,
-};
-use crate::{
-    DbError,
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    decision_intent,
-    verification_request,
-    verification_result,
-};
+use super::verification_request::RequestAndResult;
+use super::verification_request::VerificationRequest;
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::decision_intent;
+use db_schema::schema::verification_request;
+use db_schema::schema::verification_result;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::{
-    ScopedVaultId,
-    ScrubbedPiiJsonValue,
-    SealedVaultBytes,
-    VendorAPI,
-    VerificationRequestId,
-    VerificationResultId,
-};
+use newtypes::ScopedVaultId;
+use newtypes::ScrubbedPiiJsonValue;
+use newtypes::SealedVaultBytes;
+use newtypes::VendorAPI;
+use newtypes::VerificationRequestId;
+use newtypes::VerificationResultId;
 
 #[derive(Debug, Clone, Queryable, Identifiable)]
 #[diesel(table_name = verification_result)]

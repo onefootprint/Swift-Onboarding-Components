@@ -1,27 +1,17 @@
+use actix_web::get;
+use actix_web::web;
 use actix_web::web::Json;
-use actix_web::{
-    get,
-    web,
-};
-use api_core::auth::tenant::{
-    FirmEmployeeAuthContext,
-    FirmEmployeeGuard,
-};
+use api_core::auth::tenant::FirmEmployeeAuthContext;
+use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::errors::ApiResult;
-use api_core::types::{
-    OffsetPaginatedResponse,
-    OffsetPaginationRequest,
-};
+use api_core::types::OffsetPaginatedResponse;
+use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
-use api_core::{
-    ModernApiResult,
-    State,
-};
+use api_core::ModernApiResult;
+use api_core::State;
 use api_wire_types::PrivateTenantFilters;
-use db::models::tenant::{
-    PrivateTenantFilters as DbPrivateTenantFilters,
-    Tenant,
-};
+use db::models::tenant::PrivateTenantFilters as DbPrivateTenantFilters;
+use db::models::tenant::Tenant;
 use db::OffsetPagination;
 use itertools::Itertools;
 

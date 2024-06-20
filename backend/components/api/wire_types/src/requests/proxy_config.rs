@@ -1,11 +1,9 @@
 use crate::*;
-use newtypes::{
-    ApiKeyStatus,
-    DataIdentifier,
-    PiiString,
-    ProxyConfigSecretHeaderId,
-    ProxyIngressContentType,
-};
+use newtypes::ApiKeyStatus;
+use newtypes::DataIdentifier;
+use newtypes::PiiString;
+use newtypes::ProxyConfigSecretHeaderId;
+use newtypes::ProxyIngressContentType;
 
 /// Create a new proxy configuration
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

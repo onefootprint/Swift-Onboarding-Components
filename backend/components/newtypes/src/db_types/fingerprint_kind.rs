@@ -1,31 +1,23 @@
-use crate::fingerprint_salt::{
-    FingerprintSalt,
-    GlobalFingerprintKind,
-    PartialFingerprintKind,
-};
+use crate::fingerprint_salt::FingerprintSalt;
+use crate::fingerprint_salt::GlobalFingerprintKind;
+use crate::fingerprint_salt::PartialFingerprintKind;
 use crate::util::impl_enum_string_diesel;
-use crate::{
-    DataIdentifier,
-    Fingerprint,
-    FingerprintScope,
-    IdentityDataKind as IDK,
-    TenantId,
-    ValidationError,
-};
+use crate::DataIdentifier;
+use crate::Fingerprint;
+use crate::FingerprintScope;
+use crate::IdentityDataKind as IDK;
+use crate::TenantId;
+use crate::ValidationError;
 use diesel::deserialize::FromSqlRow;
 use diesel::expression::AsExpression;
 use diesel::sql_types::Text;
-use itertools::{
-    chain,
-    Itertools,
-};
+use itertools::chain;
+use itertools::Itertools;
 use std::collections::HashMap;
 use std::str::FromStr;
-use strum::{
-    EnumIter,
-    EnumString,
-    IntoEnumIterator,
-};
+use strum::EnumIter;
+use strum::EnumString;
+use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, derive_more::From, AsExpression, FromSqlRow, Eq, PartialEq, Hash)]
 #[diesel(sql_type = Text)]
@@ -187,18 +179,14 @@ pub struct MissingFingerprint(pub FingerprintSalt);
 
 #[cfg(test)]
 mod test {
-    use crate::fingerprint_salt::{
-        FingerprintSalt,
-        PartialFingerprintKind,
-    };
-    use crate::{
-        CompositeFingerprint,
-        DataIdentifier,
-        Fingerprint,
-        IdentityDataKind as IDK,
-        MissingFingerprint,
-        TenantId,
-    };
+    use crate::fingerprint_salt::FingerprintSalt;
+    use crate::fingerprint_salt::PartialFingerprintKind;
+    use crate::CompositeFingerprint;
+    use crate::DataIdentifier;
+    use crate::Fingerprint;
+    use crate::IdentityDataKind as IDK;
+    use crate::MissingFingerprint;
+    use crate::TenantId;
     use itertools::Itertools;
     use std::collections::HashMap;
     use test_case::test_case;

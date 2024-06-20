@@ -1,10 +1,8 @@
 use crate::utils::db2api::DbToApi;
-use api_wire_types::{
-    Actor,
-    InsightEvent,
-    ListEvent,
-    ListEventDetail,
-};
+use api_wire_types::Actor;
+use api_wire_types::InsightEvent;
+use api_wire_types::ListEvent;
+use api_wire_types::ListEventDetail;
 use db::models::audit_event::JoinedAuditEvent;
 
 impl DbToApi<(JoinedAuditEvent, ListEventDetail)> for ListEvent {

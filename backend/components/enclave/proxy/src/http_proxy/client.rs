@@ -1,9 +1,7 @@
 use reqwest_middleware::ClientWithMiddleware;
 use reqwest_tracing::TracingMiddleware;
-use rpc::{
-    EnclavePayload,
-    RpcRequest,
-};
+use rpc::EnclavePayload;
+use rpc::RpcRequest;
 use std::error::Error;
 use std::time::Duration;
 

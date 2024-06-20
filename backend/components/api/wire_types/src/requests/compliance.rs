@@ -1,13 +1,11 @@
 use crate::*;
-use newtypes::{
-    ComplianceDocReviewDecision,
-    ComplianceDocSubmissionId,
-    ComplianceDocTemplateVersionId,
-    PartnerTenantId,
-    PiiString,
-    TenantId,
-    TenantUserId,
-};
+use newtypes::ComplianceDocReviewDecision;
+use newtypes::ComplianceDocSubmissionId;
+use newtypes::ComplianceDocTemplateVersionId;
+use newtypes::PartnerTenantId;
+use newtypes::PiiString;
+use newtypes::TenantId;
+use newtypes::TenantUserId;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

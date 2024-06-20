@@ -1,23 +1,15 @@
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use macros::SerdeAttr;
 use paperclip::actix::Apiv2Schema;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum::{
-    Display,
-    IntoEnumIterator,
-};
-use strum_macros::{
-    AsRefStr,
-    EnumIter,
-    EnumString,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum::Display;
+use strum::IntoEnumIterator;
+use strum_macros::AsRefStr;
+use strum_macros::EnumIter;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,
@@ -870,10 +862,8 @@ pub struct VendorValidatedCountryCode(pub Iso3166TwoDigitCountryCode);
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        Iso3166ThreeDigitCountryCode,
-        Iso3166TwoDigitCountryCode,
-    };
+    use crate::Iso3166ThreeDigitCountryCode;
+    use crate::Iso3166TwoDigitCountryCode;
     use strum::IntoEnumIterator;
 
     #[test]

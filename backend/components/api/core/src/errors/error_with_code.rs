@@ -1,9 +1,7 @@
 use http::StatusCode;
 use newtypes::SessionAuthToken;
-use serde_json::{
-    json,
-    Value,
-};
+use serde_json::json;
+use serde_json::Value;
 use strum_macros;
 
 #[derive(Debug, strum_macros::EnumDiscriminants, thiserror::Error)]

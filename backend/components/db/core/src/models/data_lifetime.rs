@@ -1,34 +1,28 @@
 use super::fingerprint::Fingerprint;
-use crate::{
-    nextval,
-    DbError,
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::nextval;
+use crate::DbError;
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::data_lifetime::{
     self,
 };
 use diesel::pg::Pg;
 use diesel::prelude::*;
+use diesel::sql_types::Int8;
 use diesel::sql_types::{
     self,
-    Int8,
 };
 use itertools::Itertools;
-use newtypes::{
-    DataIdentifier,
-    DataLifetimeId,
-    DataLifetimeSeqno,
-    DataLifetimeSource,
-    DbActor,
-    ScopedVaultId,
-    VaultId,
-};
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
+use newtypes::DbActor;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = data_lifetime)]

@@ -19,10 +19,8 @@ pub use pagination::*;
 mod instrumented_connection;
 
 pub use crate::errors::DbError;
-use deadpool::managed::{
-    Hook,
-    HookError,
-};
+use deadpool::managed::Hook;
+use deadpool::managed::HookError;
 use deadpool_diesel::postgres::Runtime;
 use diesel::connection::SimpleConnection;
 use diesel::pg::PgConnection as DieselPgConnection;

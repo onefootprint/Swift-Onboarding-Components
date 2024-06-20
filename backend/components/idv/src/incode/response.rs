@@ -1,8 +1,6 @@
 use super::IncodeClientErrorCustomFailureReasons;
-use newtypes::{
-    IncodeFailureReason,
-    PiiString,
-};
+use newtypes::IncodeFailureReason;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

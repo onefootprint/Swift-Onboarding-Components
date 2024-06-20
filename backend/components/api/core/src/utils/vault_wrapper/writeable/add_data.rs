@@ -1,16 +1,12 @@
-use super::{
-    DataLifetimeSources,
-    DataRequestSource,
-    FingerprintedDataRequest,
-    SavedData,
-    ValidatedDataRequest,
-    WriteableVw,
-};
+use super::DataLifetimeSources;
+use super::DataRequestSource;
+use super::FingerprintedDataRequest;
+use super::SavedData;
+use super::ValidatedDataRequest;
+use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
-use crate::errors::{
-    ApiResult,
-    AssertionError,
-};
+use crate::errors::ApiResult;
+use crate::errors::AssertionError;
 use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::Person;
 use crate::State;
@@ -23,20 +19,18 @@ use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{
-    BusinessDataKind as BDK,
-    CollectedDataOption,
-    DataCollectedInfo,
-    DataIdentifier,
-    DataLifetimeSeqno,
-    DataLifetimeSource,
-    KycedBusinessOwnerData,
-    PiiString,
-    S3Url,
-    ScopedVaultId,
-    SealedVaultDataKey,
-    VaultId,
-};
+use newtypes::BusinessDataKind as BDK;
+use newtypes::CollectedDataOption;
+use newtypes::DataCollectedInfo;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DataLifetimeSource;
+use newtypes::KycedBusinessOwnerData;
+use newtypes::PiiString;
+use newtypes::S3Url;
+use newtypes::ScopedVaultId;
+use newtypes::SealedVaultDataKey;
+use newtypes::VaultId;
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
 

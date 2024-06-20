@@ -1,22 +1,14 @@
-use crate::{
-    DbResult,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::rule_instance_references_list;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    ListId,
-    RuleInstanceId,
-    RuleInstanceReferencesListId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::ListId;
+use newtypes::RuleInstanceId;
+use newtypes::RuleInstanceReferencesListId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_instance_references_list)]

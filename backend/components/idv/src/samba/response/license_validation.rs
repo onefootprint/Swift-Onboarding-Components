@@ -1,12 +1,8 @@
-use newtypes::{
-    PiiString,
-    SambaReportId,
-    ScrubbedPiiJsonValue,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use newtypes::PiiString;
+use newtypes::SambaReportId;
+use newtypes::ScrubbedPiiJsonValue;
+use serde::Deserialize;
+use serde::Serialize;
 use std::str::FromStr;
 use strum_macros::EnumString;
 

@@ -3,53 +3,41 @@ use super::document_upload::DocumentUpload;
 use super::incode_verification_session::IncodeVerificationSession;
 use super::insight_event::CreateInsightEvent;
 use crate::errors::ValidationError;
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    document_request,
-    document_upload,
-    identity_document,
-    incode_verification_session,
-};
-use diesel::dsl::{
-    count_star,
-    not,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::document_request;
+use db_schema::schema::document_upload;
+use db_schema::schema::identity_document;
+use db_schema::schema::incode_verification_session;
+use diesel::dsl::count_star;
+use diesel::dsl::not;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    CustomDocumentConfig,
-    DataIdentifier,
-    DataLifetimeSeqno,
-    DeviceType,
-    DocumentDiKind,
-    DocumentFixtureResult,
-    DocumentId,
-    DocumentKind,
-    DocumentRequestConfig,
-    DocumentRequestId,
-    DocumentReviewStatus,
-    DocumentSide,
-    DocumentStatus,
-    IdDocKind,
-    IncodeVerificationSessionState,
-    InsightEventId,
-    Iso3166TwoDigitCountryCode,
-    ScopedVaultId,
-    TenantId,
-    VendorValidatedCountryCode,
-    WorkflowId,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::CustomDocumentConfig;
+use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
+use newtypes::DeviceType;
+use newtypes::DocumentDiKind;
+use newtypes::DocumentFixtureResult;
+use newtypes::DocumentId;
+use newtypes::DocumentKind;
+use newtypes::DocumentRequestConfig;
+use newtypes::DocumentRequestId;
+use newtypes::DocumentReviewStatus;
+use newtypes::DocumentSide;
+use newtypes::DocumentStatus;
+use newtypes::IdDocKind;
+use newtypes::IncodeVerificationSessionState;
+use newtypes::InsightEventId;
+use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::VendorValidatedCountryCode;
+use newtypes::WorkflowId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
@@ -357,10 +345,8 @@ impl Document {
         start_date: DateTime<Utc>,
         end_date: DateTime<Utc>,
     ) -> DbResult<i64> {
-        use db_schema::schema::{
-            incode_verification_session,
-            scoped_vault,
-        };
+        use db_schema::schema::incode_verification_session;
+        use db_schema::schema::scoped_vault;
         let count = identity_document::table
             .inner_join(document_request::table.inner_join(scoped_vault::table))
             // This will have the effect of not charging for SSN cards since we don't verify them

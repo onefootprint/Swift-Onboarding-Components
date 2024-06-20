@@ -1,18 +1,12 @@
-use crate::{
-    CollectedDataOption,
-    InvokeVaultProxyPermission,
-    TenantRoleKindDiscriminant,
-};
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use crate::CollectedDataOption;
+use crate::InvokeVaultProxyPermission;
+use crate::TenantRoleKindDiscriminant;
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use strum::{
-    AsRefStr,
-    EnumDiscriminants,
-};
+use strum::AsRefStr;
+use strum::EnumDiscriminants;
 
 #[derive(
     Debug,

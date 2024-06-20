@@ -4,10 +4,8 @@
 mod client;
 mod ffi;
 
-pub use self::client::{
-    decrypt as kms_decrypt,
-    Client,
-};
+pub use self::client::decrypt as kms_decrypt;
+pub use self::client::Client;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

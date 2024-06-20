@@ -1,20 +1,16 @@
 use super::waterfall;
+use crate::decision::state::test_utils::WithScore;
+use crate::decision::state::test_utils::WithSsnResultCode;
 use crate::decision::state::test_utils::{
     self,
-    WithScore,
-    WithSsnResultCode,
 };
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::ApiResult;
-use crate::{
-    ApiErrorKind,
-    State,
-};
+use crate::ApiErrorKind;
+use crate::State;
 use db::models::decision_intent::DecisionIntent;
-use db::models::tenant_vendor::{
-    TenantVendorControl as DbTenantVendorControl,
-    UpdateTenantVendorControlArgs,
-};
+use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
+use db::models::tenant_vendor::UpdateTenantVendorControlArgs;
 use db::models::verification_result::VerificationResult;
 use db::models::waterfall_execution::WaterfallExecution;
 use db::models::waterfall_step::WaterfallStep;
@@ -22,14 +18,12 @@ use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::MockFFClient;
 use idv::ParsedResponse;
 use macros::test_state_case;
-use newtypes::{
-    DecisionIntentId,
-    DecisionIntentKind,
-    Vendor,
-    VendorAPI,
-    WaterfallExecutionId,
-    WaterfallStepAction,
-};
+use newtypes::DecisionIntentId;
+use newtypes::DecisionIntentKind;
+use newtypes::Vendor;
+use newtypes::VendorAPI;
+use newtypes::WaterfallExecutionId;
+use newtypes::WaterfallStepAction;
 
 struct ExperianEnabled(bool);
 struct IdologyEnabled(bool);

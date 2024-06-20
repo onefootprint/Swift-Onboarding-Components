@@ -1,29 +1,21 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::errors::tenant::TenantError;
-use crate::errors::{
-    ApiResult,
-    ValidationError,
-};
+use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use crate::telemetry::RootSpan;
 use crate::types::ModernApiResult;
 use crate::utils::actix::OptionalJson;
 use crate::utils::db2api::DbToApi;
-use crate::utils::headers::{
-    ExternalId,
-    IdempotencyId,
-    InsightHeaders,
-    SandboxId as SandboxIdHeader,
-};
-use crate::utils::vault_wrapper::{
-    Any,
-    DataLifetimeSources,
-    FingerprintedDataRequest,
-    VaultWrapper,
-};
+use crate::utils::headers::ExternalId;
+use crate::utils::headers::IdempotencyId;
+use crate::utils::headers::InsightHeaders;
+use crate::utils::headers::SandboxId as SandboxIdHeader;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::DataLifetimeSources;
+use crate::utils::vault_wrapper::FingerprintedDataRequest;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::NewAuditEvent;
@@ -31,20 +23,16 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use itertools::Itertools;
-use newtypes::put_data_request::{
-    PatchDataRequest,
-    RawDataRequest,
-};
-use newtypes::{
-    AccessEventKind,
-    AccessEventPurpose,
-    AuditEventDetail,
-    AuditEventId,
-    DbActor,
-    SandboxId,
-    ValidateArgs,
-    VaultKind,
-};
+use newtypes::put_data_request::PatchDataRequest;
+use newtypes::put_data_request::RawDataRequest;
+use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DbActor;
+use newtypes::SandboxId;
+use newtypes::ValidateArgs;
+use newtypes::VaultKind;
 use paperclip::actix::web;
 
 #[allow(clippy::unwrap_or_default)]

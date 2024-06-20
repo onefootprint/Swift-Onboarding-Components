@@ -4,16 +4,14 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::decision;
 use api_core::types::ModernApiResult;
 use api_core::utils::headers::InsightHeaders;
-use api_wire_types::{
-    CreateDocumentRequest,
-    CreateDocumentResponse,
-};
+use api_wire_types::CreateDocumentRequest;
+use api_wire_types::CreateDocumentResponse;
 use db::models::insight_event::CreateInsightEvent;
 use newtypes::WorkflowGuard;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

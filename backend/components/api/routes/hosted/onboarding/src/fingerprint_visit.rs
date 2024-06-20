@@ -1,8 +1,6 @@
-use crate::auth::user::{
-    UserAuth,
-    UserAuthContext,
-    UserAuthScope,
-};
+use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
+use crate::auth::user::UserAuthScope;
 use crate::errors::ApiError;
 use crate::types::ModernApiResult;
 use crate::utils::headers::TelemetryHeaders;
@@ -10,10 +8,10 @@ use crate::State;
 use actix_web::web::Json;
 use api_wire_types::hosted::fingerprint_visit::FingerprintVisitRequest;
 use db::models::fingerprint_visit_event::FingerprintVisitEvent;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

@@ -1,46 +1,38 @@
-use crate::decision::state::actions::{
-    Authorize,
-    MakeVendorCalls,
-};
+use crate::decision::state::actions::Authorize;
+use crate::decision::state::actions::MakeVendorCalls;
+use crate::decision::state::kyc;
+use crate::decision::state::test_utils::mock_idology;
+use crate::decision::state::test_utils::mock_incode_doc_collection;
+use crate::decision::state::test_utils::mock_webhooks;
+use crate::decision::state::test_utils::query_data;
+use crate::decision::state::test_utils::query_portablized_seqno;
+use crate::decision::state::test_utils::query_risk_signals;
+use crate::decision::state::test_utils::setup_data;
+use crate::decision::state::test_utils::DocumentCollectionKind;
 use crate::decision::state::test_utils::DocumentOutcome::*;
-use crate::decision::state::test_utils::{
-    mock_idology,
-    mock_incode_doc_collection,
-    mock_webhooks,
-    query_data,
-    query_portablized_seqno,
-    query_risk_signals,
-    setup_data,
-    DocumentCollectionKind,
-    ExpectedRequiresManualReview,
-    ExpectedStatus,
-    OnboardingCompleted,
-    OnboardingStatusChanged,
-    UserKind,
-    WithQualifier,
-};
-use crate::decision::state::{
-    kyc,
-    MakeDecision,
-    WorkflowActions,
-    WorkflowKind,
-    WorkflowWrapper,
-};
+use crate::decision::state::test_utils::ExpectedRequiresManualReview;
+use crate::decision::state::test_utils::ExpectedStatus;
+use crate::decision::state::test_utils::OnboardingCompleted;
+use crate::decision::state::test_utils::OnboardingStatusChanged;
+use crate::decision::state::test_utils::UserKind;
+use crate::decision::state::test_utils::WithQualifier;
+use crate::decision::state::MakeDecision;
+use crate::decision::state::WorkflowActions;
+use crate::decision::state::WorkflowKind;
+use crate::decision::state::WorkflowWrapper;
+use crate::decision::tests::test_helpers::FixtureData;
 use crate::decision::tests::test_helpers::{
     self,
-    FixtureData,
 };
 use crate::State;
 use chrono::Utc;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
 use db::models::rule_set_result::RuleSetResult;
-use db::models::workflow::{
-    NewWorkflow,
-    NewWorkflowArgs,
-    Workflow,
-    Workflow as DbWorkflow,
-};
+use db::models::workflow::NewWorkflow;
+use db::models::workflow::NewWorkflowArgs;
+use db::models::workflow::Workflow;
+use db::models::workflow::Workflow as DbWorkflow;
 use db::models::workflow_event::WorkflowEvent;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
@@ -49,33 +41,29 @@ use db::tests::MockFFClient;
 use db::DbResult;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use macros::{
-    test_state,
-    test_state_case,
-};
-use newtypes::{
-    CollectedDataOption as CDO,
-    CountryRestriction,
-    DbActor,
-    DecisionStatus,
-    DocTypeRestriction,
-    DocumentCdoInfo,
-    FootprintReasonCode,
-    KycConfig,
-    KycState,
-    ObConfigurationKey,
-    OnboardingStatus,
-    RiskSignalGroupKind,
-    Selfie,
-    SignalSeverity,
-    TenantId,
-    VendorAPI,
-    WorkflowConfig,
-    WorkflowFixtureResult,
-    WorkflowId,
-    WorkflowSource,
-    WorkflowState,
-};
+use macros::test_state;
+use macros::test_state_case;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::CountryRestriction;
+use newtypes::DbActor;
+use newtypes::DecisionStatus;
+use newtypes::DocTypeRestriction;
+use newtypes::DocumentCdoInfo;
+use newtypes::FootprintReasonCode;
+use newtypes::KycConfig;
+use newtypes::KycState;
+use newtypes::ObConfigurationKey;
+use newtypes::OnboardingStatus;
+use newtypes::RiskSignalGroupKind;
+use newtypes::Selfie;
+use newtypes::SignalSeverity;
+use newtypes::TenantId;
+use newtypes::VendorAPI;
+use newtypes::WorkflowConfig;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowId;
+use newtypes::WorkflowSource;
+use newtypes::WorkflowState;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
     let FixtureData { sv, obc, .. } = test_helpers::create_kyc_user_and_wf(

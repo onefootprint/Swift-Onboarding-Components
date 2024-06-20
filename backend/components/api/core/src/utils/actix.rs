@@ -1,21 +1,15 @@
 use actix_web::dev::Payload;
 use actix_web::web::Json;
-use actix_web::{
-    FromRequest,
-    HttpRequest,
-};
-use derive_more::{
-    Deref,
-    DerefMut,
-};
+use actix_web::FromRequest;
+use actix_web::HttpRequest;
+use derive_more::Deref;
+use derive_more::DerefMut;
 use futures_util::Future;
 use paperclip::actix::OperationModifier;
-use paperclip::v2::models::{
-    DefaultOperationRaw,
-    Either,
-    Parameter,
-    ParameterIn,
-};
+use paperclip::v2::models::DefaultOperationRaw;
+use paperclip::v2::models::Either;
+use paperclip::v2::models::Parameter;
+use paperclip::v2::models::ParameterIn;
 use paperclip::v2::schema::Apiv2Schema;
 use serde::de::DeserializeOwned;
 use std::pin::Pin;

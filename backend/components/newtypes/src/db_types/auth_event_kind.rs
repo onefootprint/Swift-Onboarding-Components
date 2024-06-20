@@ -2,20 +2,14 @@ use crate::util::impl_enum_str_diesel;
 use crate::ContactInfoKind;
 use derive_more::Display;
 use diesel::sql_types::Text;
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use paperclip::actix::Apiv2Schema;
 use serde_json;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum_macros::{
-    AsRefStr,
-    EnumString,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum_macros::AsRefStr;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

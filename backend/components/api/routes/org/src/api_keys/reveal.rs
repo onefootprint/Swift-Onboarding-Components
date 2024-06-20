@@ -1,8 +1,6 @@
-use api_core::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-    TenantSessionAuth,
-};
+use api_core::auth::tenant::CheckTenantGuard;
+use api_core::auth::tenant::TenantGuard;
+use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
@@ -10,12 +8,10 @@ use api_core::State;
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantApiKeyId;
-use paperclip::actix::{
-    api_v2_operation,
-    post,
-    web,
-    Apiv2Schema,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::post;
+use paperclip::actix::web;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 struct RevealRequest {

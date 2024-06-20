@@ -3,34 +3,24 @@ use futures::StreamExt;
 use hyper::body::Sender as BodySender;
 use hyper::http::Method;
 use hyper::server::conn::AddrIncoming;
-use hyper::service::{
-    make_service_fn,
-    service_fn,
-};
-use hyper::{
-    Body,
-    HeaderMap,
-    Request,
-    Response,
-    Server,
-};
-use log::{
-    error,
-    info,
-};
-use sha2::{
-    Digest,
-    Sha256,
-};
+use hyper::service::make_service_fn;
+use hyper::service::service_fn;
+use hyper::Body;
+use hyper::HeaderMap;
+use hyper::Request;
+use hyper::Response;
+use hyper::Server;
+use log::error;
+use log::info;
+use sha2::Digest;
+use sha2::Sha256;
 use std::sync::Arc;
 use std::time::Duration;
 use thiserror::Error;
+use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::error::SendError;
-use tokio::sync::mpsc::{
-    channel,
-    Receiver,
-    Sender,
-};
+use tokio::sync::mpsc::Receiver;
+use tokio::sync::mpsc::Sender;
 
 #[derive(Error, Debug)]
 pub enum Error {

@@ -5,39 +5,35 @@ pub mod pool;
 use async_trait::async_trait;
 pub use bb8;
 pub use config::Config;
-use pool::{
-    Stream,
-    StreamConnection,
-};
+use pool::Stream;
+use pool::StreamConnection;
+pub use rpc::DataTransform;
+pub use rpc::DataTransformer;
+pub use rpc::DataTransforms;
+pub use rpc::DecryptRequest;
+pub use rpc::DecryptThenSignRequest;
+pub use rpc::Decryption;
+pub use rpc::EnclavePayload;
+pub use rpc::EnclaveResponse;
+pub use rpc::EncryptTransformAlgorithm;
+pub use rpc::EnvelopeDecryptRequest;
+pub use rpc::EnvelopeDecryptThenHmacSignRequest;
+pub use rpc::EnvelopeHmacSignRequest;
+pub use rpc::Error as EnclaveError;
+pub use rpc::GenerateDataKeypairRequest;
+pub use rpc::GenerateSymmetricDataKeyRequest;
+pub use rpc::GeneratedDataKeyPair;
+pub use rpc::GeneratedSealedDataKey;
+pub use rpc::HmacSignature;
+pub use rpc::KmsCredentials;
+pub use rpc::RpcPayload;
+pub use rpc::RpcRequest;
+pub use rpc::SealedIkek;
+pub use rpc::Sealing;
+pub use rpc::SignRequest;
+pub use rpc::Signing;
+pub use rpc::TransformError;
 use rpc::WireMessage;
-pub use rpc::{
-    DataTransform,
-    DataTransformer,
-    DataTransforms,
-    DecryptRequest,
-    DecryptThenSignRequest,
-    Decryption,
-    EnclavePayload,
-    EnclaveResponse,
-    EncryptTransformAlgorithm,
-    EnvelopeDecryptRequest,
-    EnvelopeDecryptThenHmacSignRequest,
-    EnvelopeHmacSignRequest,
-    Error as EnclaveError,
-    GenerateDataKeypairRequest,
-    GenerateSymmetricDataKeyRequest,
-    GeneratedDataKeyPair,
-    GeneratedSealedDataKey,
-    HmacSignature,
-    KmsCredentials,
-    RpcPayload,
-    RpcRequest,
-    SealedIkek,
-    Sealing,
-    SignRequest,
-    Signing,
-    TransformError,
-};
 use thiserror::Error;
 use tokio::io::AsyncWriteExt;
 

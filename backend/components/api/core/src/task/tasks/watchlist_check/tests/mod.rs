@@ -1,10 +1,8 @@
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::errors::ApiResult;
 use crate::task::tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask;
-use crate::task::{
-    ExecuteTask,
-    TaskError,
-};
+use crate::task::ExecuteTask;
+use crate::task::TaskError;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::risk_signal::RiskSignal;
@@ -12,45 +10,33 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
-use db::models::verification_request::{
-    RequestAndMaybeResult,
-    VerificationRequest,
-};
+use db::models::verification_request::RequestAndMaybeResult;
+use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::watchlist_check::WatchlistCheck;
 use db::tests::fixtures;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-use db::{
-    DbPool,
-    DbResult,
-};
-use idv::idology::pa::{
-    IdologyPaAPIResponse,
-    IdologyPaRequest,
-};
+use db::DbPool;
+use db::DbResult;
+use idv::idology::pa::IdologyPaAPIResponse;
+use idv::idology::pa::IdologyPaRequest;
 use idv::incode::response::OnboardingStartResponse;
 use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
-use idv::incode::{
-    IncodeAPIResult,
-    IncodeResponse,
-    IncodeStartOnboardingRequest,
-};
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::{
-    DecisionIntentKind,
-    EnhancedAmlOption,
-    IdentityDataKind as IDK,
-    OnboardingStatus,
-    RiskSignalGroupKind,
-    ScopedVaultId,
-    TaskId,
-    WatchlistCheckArgs,
-    WatchlistCheckError,
-    WatchlistCheckStatusKind,
-};
+use idv::incode::IncodeAPIResult;
+use idv::incode::IncodeResponse;
+use idv::incode::IncodeStartOnboardingRequest;
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::DecisionIntentKind;
+use newtypes::EnhancedAmlOption;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::OnboardingStatus;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
+use newtypes::TaskId;
+use newtypes::WatchlistCheckArgs;
+use newtypes::WatchlistCheckError;
+use newtypes::WatchlistCheckStatusKind;
 use std::sync::Arc;
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;

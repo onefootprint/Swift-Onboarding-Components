@@ -1,11 +1,9 @@
 use crate::*;
-use newtypes::{
-    FootprintReasonCode,
-    OnboardingDecisionId,
-    RiskSignalId,
-    SignalScope,
-    SignalSeverity,
-};
+use newtypes::FootprintReasonCode;
+use newtypes::OnboardingDecisionId;
+use newtypes::RiskSignalId;
+use newtypes::SignalScope;
+use newtypes::SignalSeverity;
 
 /// RiskSignal information, including severity, impacted scopes, and more.
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]

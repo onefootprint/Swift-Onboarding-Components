@@ -1,36 +1,28 @@
-use super::states::{
-    AddBack,
-    AddConsent,
-    AddFront,
-    AddSelfie,
-    Complete,
-    Fail,
-    FetchScores,
-    GetOnboardingStatus,
-    ProcessFace,
-    ProcessId,
-    VerificationSession,
-};
+use super::states::AddBack;
+use super::states::AddConsent;
+use super::states::AddFront;
+use super::states::AddSelfie;
+use super::states::Complete;
+use super::states::Fail;
+use super::states::FetchScores;
+use super::states::GetOnboardingStatus;
+use super::states::ProcessFace;
+use super::states::ProcessId;
+use super::states::VerificationSession;
 use super::IncodeContext;
 use crate::decision::state::StateError;
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::models::document_upload::DocumentUpload;
-use db::models::incode_verification_session::{
-    IncodeVerificationSession,
-    UpdateIncodeVerificationSession,
-};
-use db::{
-    DbPool,
-    TxnPgConn,
-};
+use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::incode_verification_session::UpdateIncodeVerificationSession;
+use db::DbPool;
+use db::TxnPgConn;
 use enum_dispatch::enum_dispatch;
 use itertools::Itertools;
-use newtypes::{
-    DocumentSide,
-    IncodeFailureReason,
-};
+use newtypes::DocumentSide;
+use newtypes::IncodeFailureReason;
 use std::marker::PhantomData;
 
 pub struct Uninitialized<T>(PhantomData<T>);

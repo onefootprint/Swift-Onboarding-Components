@@ -1,13 +1,9 @@
-use byteorder::{
-    BigEndian,
-    ReadBytesExt,
-    WriteBytesExt,
-};
+use byteorder::BigEndian;
+use byteorder::ReadBytesExt;
+use byteorder::WriteBytesExt;
 use crypto::base64;
-use std::io::{
-    Read,
-    Write,
-};
+use std::io::Read;
+use std::io::Write;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -182,10 +178,8 @@ impl Token {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        Token,
-        TokenChallenge,
-    };
+    use crate::Token;
+    use crate::TokenChallenge;
 
     #[test]
     fn test_verify() {

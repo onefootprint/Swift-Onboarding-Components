@@ -1,7 +1,5 @@
-use crate::task::{
-    ExecuteTask,
-    TaskError,
-};
+use crate::task::ExecuteTask;
+use crate::task::TaskError;
 use async_trait::async_trait;
 use newtypes::LogMessageTaskArgs;
 

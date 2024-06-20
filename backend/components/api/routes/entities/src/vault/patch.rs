@@ -1,54 +1,42 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::tenant::{
-    ClientTenantAuthContext,
-    TenantAuth,
-    TenantSessionAuth,
-};
-use api_core::auth::{
-    CanVault,
-    Either,
-};
+use api_core::auth::tenant::ClientTenantAuthContext;
+use api_core::auth::tenant::TenantAuth;
+use api_core::auth::tenant::TenantSessionAuth;
+use api_core::auth::CanVault;
+use api_core::auth::Either;
 use api_core::errors::AssertionError;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::IgnoreLuhnValidation;
-use api_core::utils::vault_wrapper::{
-    Any,
-    DataLifetimeSources,
-    FingerprintedDataRequest,
-};
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::DataLifetimeSources;
+use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::put_data_request::{
-    PatchDataRequest,
-    RawDataRequest,
-};
-use newtypes::{
-    AccessEventKind,
-    AccessEventPurpose,
-    AuditEventDetail,
-    AuditEventId,
-    DbActor,
-    FpId,
-    ValidateArgs,
-};
+use newtypes::put_data_request::PatchDataRequest;
+use newtypes::put_data_request::RawDataRequest;
+use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DbActor;
+use newtypes::FpId;
+use newtypes::ValidateArgs;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::web::Json;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[route_alias(

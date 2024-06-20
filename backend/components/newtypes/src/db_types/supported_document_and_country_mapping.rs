@@ -1,17 +1,11 @@
-use crate::{
-    IdDocKind,
-    Iso3166TwoDigitCountryCode,
-};
-use diesel::{
-    AsExpression,
-    FromSqlRow,
-};
+use crate::IdDocKind;
+use crate::Iso3166TwoDigitCountryCode;
+use diesel::AsExpression;
+use diesel::FromSqlRow;
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 

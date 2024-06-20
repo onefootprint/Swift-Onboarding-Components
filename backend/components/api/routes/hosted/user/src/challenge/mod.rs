@@ -1,8 +1,6 @@
-use newtypes::{
-    ActionKind,
-    AuthMethodKind,
-    PiiString,
-};
+use newtypes::ActionKind;
+use newtypes::AuthMethodKind;
+use newtypes::PiiString;
 use webauthn_rs_core::proto::RegistrationState;
 
 pub mod index;

@@ -1,27 +1,19 @@
 use super::config::EgressConfig;
-use super::ssrf_protection::{
-    validate_safe_url,
-    PublicIpDNSResolver,
-};
+use super::ssrf_protection::validate_safe_url;
+use super::ssrf_protection::PublicIpDNSResolver;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use crate::State;
 use bytes::Bytes;
 use chrono::Utc;
-use db::models::proxy_request_log::{
-    FinishedRequestLog,
-    NewProxyRequestLog,
-    ProxyRequestLog,
-};
+use db::models::proxy_request_log::FinishedRequestLog;
+use db::models::proxy_request_log::NewProxyRequestLog;
+use db::models::proxy_request_log::ProxyRequestLog;
 use db::models::tenant::Tenant;
 use http::HeaderName;
-use newtypes::{
-    PiiString,
-    ProxyConfigId,
-};
+use newtypes::PiiString;
+use newtypes::ProxyConfigId;
 use reqwest::header::HeaderMap;
 use reqwest::StatusCode;
 use std::sync::Arc;

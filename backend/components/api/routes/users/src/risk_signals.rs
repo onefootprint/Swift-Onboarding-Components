@@ -1,30 +1,22 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    SecretTenantAuthContext,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
-use db::models::risk_signal::{
-    AtSeqno,
-    RiskSignal,
-};
+use db::models::risk_signal::AtSeqno;
+use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::DbResult;
 use itertools::Itertools;
-use newtypes::{
-    FootprintReasonCode,
-    PreviewApi,
-    VendorAPI,
-};
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use newtypes::FootprintReasonCode;
+use newtypes::PreviewApi;
+use newtypes::VendorAPI;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Lists the risk signals for a Footprint user.",

@@ -1,16 +1,10 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
-use newtypes::{
-    scrub_pii_value,
-    PiiJsonValue,
-    ScrubbedPiiString,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use chrono::DateTime;
+use chrono::Utc;
+use newtypes::scrub_pii_value;
+use newtypes::PiiJsonValue;
+use newtypes::ScrubbedPiiString;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BusinessResponse {

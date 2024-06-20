@@ -1,21 +1,17 @@
 use crate::models::data_lifetime::DataLifetime;
-use crate::models::verification_request::{
-    RequestAndMaybeResult,
-    VerificationRequest,
-};
+use crate::models::verification_request::RequestAndMaybeResult;
+use crate::models::verification_request::VerificationRequest;
 use crate::models::verification_result::VerificationResult;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::prelude::*;
 use macros::db_test_case;
-use newtypes::{
-    DecisionIntentId,
-    PiiJsonValue,
-    ScopedVaultId,
-    SealedVaultBytes,
-    VendorAPI,
-    VerificationRequestId,
-    VerificationResultId,
-};
+use newtypes::DecisionIntentId;
+use newtypes::PiiJsonValue;
+use newtypes::ScopedVaultId;
+use newtypes::SealedVaultBytes;
+use newtypes::VendorAPI;
+use newtypes::VerificationRequestId;
+use newtypes::VerificationResultId;
 use serde_json::json;
 use std::str::FromStr;
 

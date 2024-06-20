@@ -1,18 +1,14 @@
-use newtypes::{
-    DeviceType,
-    DocumentFixtureResult,
-    DocumentId,
-    DocumentKind,
-    DocumentRequestId,
-    DocumentSide,
-    DocumentStatus,
-    IncodeFailureReason,
-    Iso3166TwoDigitCountryCode,
-};
-use paperclip::actix::{
-    Apiv2Response,
-    Apiv2Schema,
-};
+use newtypes::DeviceType;
+use newtypes::DocumentFixtureResult;
+use newtypes::DocumentId;
+use newtypes::DocumentKind;
+use newtypes::DocumentRequestId;
+use newtypes::DocumentSide;
+use newtypes::DocumentStatus;
+use newtypes::IncodeFailureReason;
+use newtypes::Iso3166TwoDigitCountryCode;
+use paperclip::actix::Apiv2Response;
+use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Apiv2Schema, serde::Deserialize)]
 pub struct CreateDocumentRequest {

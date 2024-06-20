@@ -1,32 +1,22 @@
 pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
 pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
-use crate::aead::{
-    generate_chacha20_poly1305_key_bytes,
-    AeadSealedBytes,
-    ScopedSealingKey,
-    SealingKey,
-};
+use crate::aead::generate_chacha20_poly1305_key_bytes;
+use crate::aead::AeadSealedBytes;
+use crate::aead::ScopedSealingKey;
+use crate::aead::SealingKey;
 use aes_gcm::aead::Payload;
-use aes_gcm::{
-    Aes256Gcm,
-    Key,
-    Nonce,
-};
+use aes_gcm::Aes256Gcm;
+use aes_gcm::Key;
+use aes_gcm::Nonce;
 use p256::ecdh::EphemeralSecret;
 use p256::elliptic_curve::sec1::ToEncodedPoint;
 use p256::EncodedPoint;
-use rand_core::{
-    OsRng,
-    RngCore,
-};
-use serde::{
-    Deserialize,
-    Serialize,
-};
-use sha2::{
-    Digest,
-    Sha256,
-};
+use rand_core::OsRng;
+use rand_core::RngCore;
+use serde::Deserialize;
+use serde::Serialize;
+use sha2::Digest;
+use sha2::Sha256;
 use std::fmt::Debug;
 use std::str::FromStr;
 

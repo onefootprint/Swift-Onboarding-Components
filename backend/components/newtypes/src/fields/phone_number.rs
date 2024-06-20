@@ -1,8 +1,6 @@
 use crate::api_schema_helper::string_api_data_type_alias;
-use crate::{
-    NtResult,
-    PiiString,
-};
+use crate::NtResult;
+use crate::PiiString;
 use phonenumber::country::Id as CountryId;
 use serde_with::DeserializeFromStr;
 use std::fmt::Debug;

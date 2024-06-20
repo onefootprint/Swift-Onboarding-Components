@@ -1,22 +1,16 @@
 use super::fixtures;
 use crate::models::data_lifetime::DataLifetime;
 use crate::models::fingerprint::Fingerprint as DbFingerprint;
-use crate::models::vault::{
-    Priority,
-    Vault,
-};
+use crate::models::vault::Priority;
+use crate::models::vault::Vault;
 use crate::tests::prelude::*;
-use chrono::{
-    DateTime,
-    Utc,
-};
+use chrono::DateTime;
+use chrono::Utc;
 use macros::db_test_case;
-use newtypes::{
-    Fingerprint,
-    FingerprintScope,
-    IdentityDataKind as IDK,
-    SandboxId,
-};
+use newtypes::Fingerprint;
+use newtypes::FingerprintScope;
+use newtypes::IdentityDataKind as IDK;
+use newtypes::SandboxId;
 use std::time::Duration;
 
 #[db_test_case(false, false => false; "cant-find-speculative")]

@@ -1,21 +1,13 @@
-use crate::{
-    DbResult,
-    PgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::PgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::session;
 use diesel::prelude::*;
-use diesel::{
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    AuthTokenHash,
-    SessionKind,
-};
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::AuthTokenHash;
+use newtypes::SessionKind;
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = session)]

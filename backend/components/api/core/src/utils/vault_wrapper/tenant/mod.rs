@@ -3,10 +3,8 @@ mod build;
 mod bulk_decrypt;
 mod decrypt;
 
-use super::{
-    Any,
-    VaultWrapper,
-};
+use super::Any;
+use super::VaultWrapper;
 pub use bulk_decrypt::*;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::WorkflowAndConfig;

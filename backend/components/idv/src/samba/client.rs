@@ -4,11 +4,9 @@ use super::request::SambaCreateLVOrderRequest;
 use super::response::auth::AuthenticationResponse;
 use crate::footprint_http_client::FootprintVendorHttpClient;
 use newtypes::vendor_credentials::SambaSafetyCredentials;
-use newtypes::{
-    PiiString,
-    SambaOrderId,
-    SambaReportId,
-};
+use newtypes::PiiString;
+use newtypes::SambaOrderId;
+use newtypes::SambaReportId;
 use reqwest::header;
 
 type SambaResult<T> = Result<T, SambaSafetyError>;
@@ -197,15 +195,11 @@ mod tests {
     use super::*;
     use crate::footprint_http_client::FpVendorClientArgs;
     use crate::samba::request::license_validation::CreateLVOrderAddress;
-    use crate::samba::response::license_validation::{
-        CheckLVOrderStatus,
-        CreateLVOrderResponse,
-        GetLVOrderResponse,
-    };
-    use std::{
-        thread,
-        time,
-    };
+    use crate::samba::response::license_validation::CheckLVOrderStatus;
+    use crate::samba::response::license_validation::CreateLVOrderResponse;
+    use crate::samba::response::license_validation::GetLVOrderResponse;
+    use std::thread;
+    use std::time;
 
     async fn get_authed_client(creds: SambaSafetyCredentials) -> AuthenticatedSambaSafetyClientAdapter {
         let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();

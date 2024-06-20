@@ -1,36 +1,26 @@
-use super::{
-    ParsedUserSessionContext,
-    UserAuth,
-    UserSessionContext,
-};
-use crate::auth::session::{
-    AuthSessionData,
-    ExtractableAuthSession,
-    RequestInfo,
-};
-use crate::auth::{
-    AuthError,
-    IsGuardMet,
-    SessionContext,
-};
+use super::ParsedUserSessionContext;
+use super::UserAuth;
+use super::UserSessionContext;
+use crate::auth::session::AuthSessionData;
+use crate::auth::session::ExtractableAuthSession;
+use crate::auth::session::RequestInfo;
+use crate::auth::AuthError;
+use crate::auth::IsGuardMet;
+use crate::auth::SessionContext;
 use crate::errors::ApiResult;
 use crate::ApiError;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use db::models::workflow::{
-    Workflow,
-    WorkflowIdentifier,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowIdentifier;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
-use newtypes::{
-    ScopedVaultId,
-    UserAuthScope,
-    VaultId,
-    WorkflowGuard,
-};
+use newtypes::ScopedVaultId;
+use newtypes::UserAuthScope;
+use newtypes::VaultId;
+use newtypes::WorkflowGuard;
 use paperclip::actix::Apiv2Security;
 use std::sync::Arc;
 

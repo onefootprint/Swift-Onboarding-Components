@@ -1,17 +1,11 @@
-use crate::{
-    CompositeFingerprintKind,
-    DataIdentifier,
-    FingerprintKind,
-};
+use crate::CompositeFingerprintKind;
+use crate::DataIdentifier;
+use crate::FingerprintKind;
 use paperclip::actix::Apiv2Schema;
-use serde_with::{
-    DeserializeFromStr,
-    SerializeDisplay,
-};
-use strum_macros::{
-    Display,
-    EnumString,
-};
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use strum_macros::Display;
+use strum_macros::EnumString;
 
 #[derive(
     Debug,

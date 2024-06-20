@@ -1,18 +1,14 @@
-use super::{
-    response,
-    Error,
-    MiddeskCreateBusinessRequest,
-    MiddeskGetBusinessRequest,
-    MiddeskReqwestError,
-};
+use super::response;
+use super::Error;
+use super::MiddeskCreateBusinessRequest;
+use super::MiddeskGetBusinessRequest;
+use super::MiddeskReqwestError;
 use crate::middesk::request::business::BusinessRequest;
 use newtypes::vendor_credentials::MiddeskCredentials;
-use reqwest::{
-    header,
-    Method,
-    RequestBuilder,
-    Url,
-};
+use reqwest::header;
+use reqwest::Method;
+use reqwest::RequestBuilder;
+use reqwest::Url;
 use std::time::Duration;
 
 #[derive(Clone)]
@@ -108,14 +104,12 @@ mod tests {
 
     use super::*;
     use dotenv;
-    use newtypes::{
-        BoData,
-        BusinessDataForRequest,
-        BusinessDataFromVault,
-        EinOnly,
-        PiiString,
-        TenantId,
-    };
+    use newtypes::BoData;
+    use newtypes::BusinessDataForRequest;
+    use newtypes::BusinessDataFromVault;
+    use newtypes::EinOnly;
+    use newtypes::PiiString;
+    use newtypes::TenantId;
     use std::str::FromStr;
 
     #[ignore]

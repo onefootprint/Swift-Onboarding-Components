@@ -1,18 +1,12 @@
-use crate::{
-    DbResult,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::samba_order_data_lifetime_junction;
 use diesel::prelude::*;
-use newtypes::{
-    DataLifetimeId,
-    SambaDatalifetimeJunctionTableId,
-    SambaOrderTableId,
-};
+use newtypes::DataLifetimeId;
+use newtypes::SambaDatalifetimeJunctionTableId;
+use newtypes::SambaOrderTableId;
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = samba_order_data_lifetime_junction)]
 pub struct SambaOrderDataLifetimeJunction {

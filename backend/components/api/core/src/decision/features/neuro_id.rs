@@ -1,11 +1,7 @@
-use idv::neuro_id::response::{
-    Model,
-    NeuroIdAnalyticsResponse,
-};
-use newtypes::{
-    DecisionStatus,
-    FootprintReasonCode as FRC,
-};
+use idv::neuro_id::response::Model;
+use idv::neuro_id::response::NeuroIdAnalyticsResponse;
+use newtypes::DecisionStatus;
+use newtypes::FootprintReasonCode as FRC;
 pub fn footprint_reason_codes(res: &NeuroIdAnalyticsResponse) -> Vec<FRC> {
     let mut frcs = vec![];
 
@@ -165,9 +161,9 @@ fn model_to_frc(model: &Model) -> Vec<FRC> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use idv::test_fixtures::NeuroTestOpts;
     use idv::test_fixtures::{
         self,
-        NeuroTestOpts,
     };
     use idv::tests::assert_have_same_elements;
     use test_case::test_case;

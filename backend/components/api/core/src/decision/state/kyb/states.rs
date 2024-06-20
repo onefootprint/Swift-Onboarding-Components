@@ -1,46 +1,36 @@
-use super::{
-    KybAwaitingAsyncVendors,
-    KybAwaitingBoKyc,
-    KybComplete,
-    KybDataCollection,
-    KybDecisioning,
-    KybState,
-    KybVendorCalls,
-};
+use super::KybAwaitingAsyncVendors;
+use super::KybAwaitingBoKyc;
+use super::KybComplete;
+use super::KybDataCollection;
+use super::KybDecisioning;
+use super::KybState;
+use super::KybVendorCalls;
 use crate::decision::onboarding::Decision;
+use crate::decision::risk;
 use crate::decision::rule_engine::engine::VaultDataForRules;
 use crate::decision::rule_engine::eval::RuleEvalConfig;
-use crate::decision::state::actions::{
-    Authorize,
-    WorkflowActions,
-};
-use crate::decision::state::{
-    common,
-    AsyncVendorCallsCompleted,
-    BoKycCompleted,
-    MakeDecision,
-    MakeVendorCalls,
-    OnAction,
-    WorkflowState,
-};
+use crate::decision::state::actions::Authorize;
+use crate::decision::state::actions::WorkflowActions;
+use crate::decision::state::common;
+use crate::decision::state::AsyncVendorCallsCompleted;
+use crate::decision::state::BoKycCompleted;
+use crate::decision::state::MakeDecision;
+use crate::decision::state::MakeVendorCalls;
+use crate::decision::state::OnAction;
+use crate::decision::state::WorkflowState;
 use crate::decision::utils::FixtureDecision;
 use crate::decision::{
     self,
-    risk,
 };
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-};
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use async_trait::async_trait;
 use db::models::data_lifetime::DataLifetime;
 use db::models::insight_event::InsightEvent;
-use db::models::list_entry::{
-    ListEntry,
-    ListWithDecryptedEntries,
-};
+use db::models::list_entry::ListEntry;
+use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
@@ -48,22 +38,18 @@ use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::rule_instance::RuleInstance;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
-use db::models::workflow::{
-    Workflow as DbWorkflow,
-    WorkflowUpdate,
-};
+use db::models::workflow::Workflow as DbWorkflow;
+use db::models::workflow::WorkflowUpdate;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
-use newtypes::{
-    DecisionStatus,
-    FootprintReasonCode,
-    KybConfig,
-    ListId,
-    Locked,
-    OnboardingStatus,
-    RiskSignalGroupKind,
-    RuleSetResultKind,
-};
+use newtypes::DecisionStatus;
+use newtypes::FootprintReasonCode;
+use newtypes::KybConfig;
+use newtypes::ListId;
+use newtypes::Locked;
+use newtypes::OnboardingStatus;
+use newtypes::RiskSignalGroupKind;
+use newtypes::RuleSetResultKind;
 use std::collections::HashMap;
 use std::sync::Arc;
 

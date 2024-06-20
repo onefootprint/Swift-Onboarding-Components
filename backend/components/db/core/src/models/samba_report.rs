@@ -1,19 +1,13 @@
-use crate::{
-    DbResult,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbResult;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema::samba_report;
 use diesel::prelude::*;
-use newtypes::{
-    SambaOrderTableId,
-    SambaReportId,
-    SambaReportTableId,
-    VerificationResultId,
-};
+use newtypes::SambaOrderTableId;
+use newtypes::SambaReportId;
+use newtypes::SambaReportTableId;
+use newtypes::VerificationResultId;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = samba_report)]

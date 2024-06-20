@@ -1,12 +1,8 @@
 use crate::idology::error as IdologyError;
-use chrono::{
-    Datelike,
-    NaiveDate,
-};
-use newtypes::{
-    IdvData,
-    PiiString,
-};
+use chrono::Datelike;
+use chrono::NaiveDate;
+use newtypes::IdvData;
+use newtypes::PiiString;
 
 /// Idology request, we'll only use this for U.S. citizens for now
 /// as KYC requests differ for UK + other countries
@@ -101,10 +97,8 @@ impl RequestData {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::idology::common::request::{
-        IdologyRequestData,
-        Request,
-    };
+    use crate::idology::common::request::IdologyRequestData;
+    use crate::idology::common::request::Request;
     use serde_json::json;
 
     #[test]

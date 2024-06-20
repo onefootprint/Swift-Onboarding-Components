@@ -1,61 +1,49 @@
-use crate::decision::state::actions::{
-    Authorize,
-    MakeVendorCalls,
-};
-use crate::decision::state::test_utils::{
-    mock_idology,
-    mock_incode_doc_collection,
-    mock_webhooks,
-    query_data,
-    query_doc_requests,
-    query_rule_set_result,
-    query_timeline_events,
-    setup_data,
-    ExpectedRequiresManualReview,
-    ExpectedStatus,
-    OnboardingCompleted,
-    OnboardingStatusChanged,
-    WithQualifier,
-};
-use crate::decision::state::{
-    MakeDecision,
-    WorkflowActions,
-    WorkflowWrapper,
-};
+use crate::decision::state::actions::Authorize;
+use crate::decision::state::actions::MakeVendorCalls;
+use crate::decision::state::test_utils::mock_idology;
+use crate::decision::state::test_utils::mock_incode_doc_collection;
+use crate::decision::state::test_utils::mock_webhooks;
+use crate::decision::state::test_utils::query_data;
+use crate::decision::state::test_utils::query_doc_requests;
+use crate::decision::state::test_utils::query_rule_set_result;
+use crate::decision::state::test_utils::query_timeline_events;
+use crate::decision::state::test_utils::setup_data;
+use crate::decision::state::test_utils::ExpectedRequiresManualReview;
+use crate::decision::state::test_utils::ExpectedStatus;
+use crate::decision::state::test_utils::OnboardingCompleted;
+use crate::decision::state::test_utils::OnboardingStatusChanged;
+use crate::decision::state::test_utils::WithQualifier;
+use crate::decision::state::MakeDecision;
+use crate::decision::state::WorkflowActions;
+use crate::decision::state::WorkflowWrapper;
 use crate::errors::ApiResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_instance::{
-    NewRule,
-    RuleInstance,
-};
+use db::models::rule_instance::NewRule;
+use db::models::rule_instance::RuleInstance;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::test_db_pool::TestDbPool;
 use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
-use macros::{
-    test_state,
-    test_state_case,
-};
-use newtypes::{
-    BooleanOperator,
-    CollectedDataOption as CDO,
-    DbActor,
-    DbUserTimelineEvent,
-    DbUserTimelineEventKind,
-    DecisionStatus,
-    DocumentRequestKind,
-    FootprintReasonCode as FRC,
-    KycState,
-    OnboardingStatus,
-    RuleAction,
-    RuleExpression,
-    RuleExpressionCondition,
-    RuleInstanceKind,
-    StepUpKind,
-    WorkflowState,
-};
+use macros::test_state;
+use macros::test_state_case;
+use newtypes::BooleanOperator;
+use newtypes::CollectedDataOption as CDO;
+use newtypes::DbActor;
+use newtypes::DbUserTimelineEvent;
+use newtypes::DbUserTimelineEventKind;
+use newtypes::DecisionStatus;
+use newtypes::DocumentRequestKind;
+use newtypes::FootprintReasonCode as FRC;
+use newtypes::KycState;
+use newtypes::OnboardingStatus;
+use newtypes::RuleAction;
+use newtypes::RuleExpression;
+use newtypes::RuleExpressionCondition;
+use newtypes::RuleInstanceKind;
+use newtypes::StepUpKind;
+use newtypes::WorkflowState;
 
 #[test_state_case(StepUpKind::Identity)]
 #[test_state_case(StepUpKind::IdentityProofOfSsn)]

@@ -1,50 +1,40 @@
 use crate::decision::rule_engine;
 use crate::errors::ApiResult;
 use crate::tests::fixtures::lib::random_phone_number;
-use crate::utils::onboarding::{
-    NewBusinessVaultArgs,
-    NewOnboardingArgs,
-};
-use crate::utils::vault_wrapper::{
-    Any,
-    VaultWrapper,
-};
+use crate::utils::onboarding::NewBusinessVaultArgs;
+use crate::utils::onboarding::NewOnboardingArgs;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{
     self,
 };
 use crate::State;
-use db::models::contact_info::{
-    ContactInfo,
-    VerificationLevel,
-};
+use db::models::contact_info::ContactInfo;
+use db::models::contact_info::VerificationLevel;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
-use db::models::workflow::{
-    Workflow,
-    WorkflowUpdate,
-};
+use db::models::workflow::Workflow;
+use db::models::workflow::WorkflowUpdate;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::fixtures::{
     self,
 };
 use db::TxnPgConn;
-use newtypes::{
-    BusinessDataKind,
-    DataIdentifier,
-    DocumentRequestKind,
-    IdentityDataKind,
-    PiiString,
-    ScopedVaultId,
-    VaultKind,
-    VerificationCheck,
-    VerificationCheckKind,
-    WorkflowFixtureResult,
-    WorkflowSource,
-};
+use newtypes::BusinessDataKind;
+use newtypes::DataIdentifier;
+use newtypes::DocumentRequestKind;
+use newtypes::IdentityDataKind;
+use newtypes::PiiString;
+use newtypes::ScopedVaultId;
+use newtypes::VaultKind;
+use newtypes::VerificationCheck;
+use newtypes::VerificationCheckKind;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowSource;
 
 pub async fn create_user_and_onboarding(
     state: &State,

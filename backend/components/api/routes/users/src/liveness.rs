@@ -1,7 +1,5 @@
-use crate::auth::tenant::{
-    CheckTenantGuard,
-    TenantGuard,
-};
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
@@ -9,11 +7,9 @@ use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::liveness_event::LivenessEvent;
 use newtypes::PreviewApi;
-use paperclip::actix::{
-    api_v2_operation,
-    get,
-    web,
-};
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::get;
+use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Lists the liveness signals for the provided user. This API is deprecated in favor of the `auth_events` API.",

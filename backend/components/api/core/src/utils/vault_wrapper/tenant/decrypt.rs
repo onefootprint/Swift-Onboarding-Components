@@ -1,22 +1,18 @@
 use super::TenantVw;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::decrypt::{
-    EnclaveDecryptOperation,
-    Pii,
-};
+use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
+use crate::utils::vault_wrapper::decrypt::Pii;
 use crate::State;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
 use itertools::Itertools;
-use newtypes::{
-    AccessEventKind,
-    AccessEventPurpose,
-    AuditEventDetail,
-    AuditEventId,
-    DataIdentifier,
-    DbActor,
-};
+use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
+use newtypes::AuditEventDetail;
+use newtypes::AuditEventId;
+use newtypes::DataIdentifier;
+use newtypes::DbActor;
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {

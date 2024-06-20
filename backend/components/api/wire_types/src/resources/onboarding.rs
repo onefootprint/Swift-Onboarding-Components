@@ -1,11 +1,7 @@
-use chrono::{
-    DateTime,
-    Utc,
-};
-use newtypes::{
-    ObConfigurationKey,
-    OnboardingStatus,
-};
+use chrono::DateTime;
+use chrono::Utc;
+use newtypes::ObConfigurationKey;
+use newtypes::OnboardingStatus;
 use paperclip::actix::Apiv2Response;
 use serde::Serialize;
 

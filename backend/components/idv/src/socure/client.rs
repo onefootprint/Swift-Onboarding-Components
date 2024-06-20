@@ -1,19 +1,13 @@
-use super::{
-    decode_response,
-    requirements,
-};
+use super::decode_response;
+use super::requirements;
 use crate::socure::conversion::SocureRequest;
 use crate::socure::SocureReqwestError;
-use newtypes::{
-    IdvData,
-    PiiString,
-};
+use newtypes::IdvData;
+use newtypes::PiiString;
 use reqwest::header;
 use std::time::Duration;
-use tokio_retry::strategy::{
-    jitter,
-    ExponentialBackoff,
-};
+use tokio_retry::strategy::jitter;
+use tokio_retry::strategy::ExponentialBackoff;
 use tokio_retry::Retry;
 
 #[derive(Clone)]

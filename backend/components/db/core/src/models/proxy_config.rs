@@ -1,35 +1,25 @@
-use crate::{
-    DbResult,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    proxy_config,
-    proxy_config_header,
-    proxy_config_ingress_rule,
-    proxy_config_secret_header,
-    proxy_config_server_cert,
-};
+use crate::DbResult;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::proxy_config;
+use db_schema::schema::proxy_config_header;
+use db_schema::schema::proxy_config_ingress_rule;
+use db_schema::schema::proxy_config_secret_header;
+use db_schema::schema::proxy_config_server_cert;
 use diesel::prelude::*;
-use diesel::{
-    Identifiable,
-    Insertable,
-    Queryable,
-};
-use newtypes::{
-    ApiKeyStatus,
-    ProxyConfigId,
-    ProxyConfigIngressRuleId,
-    ProxyConfigItemId,
-    ProxyConfigSecretHeaderId,
-    ProxyIngressContentType,
-    SealedVaultBytes,
-    TenantId,
-};
+use diesel::Identifiable;
+use diesel::Insertable;
+use diesel::Queryable;
+use newtypes::ApiKeyStatus;
+use newtypes::ProxyConfigId;
+use newtypes::ProxyConfigIngressRuleId;
+use newtypes::ProxyConfigItemId;
+use newtypes::ProxyConfigSecretHeaderId;
+use newtypes::ProxyIngressContentType;
+use newtypes::SealedVaultBytes;
+use newtypes::TenantId;
 
 #[derive(Debug, Queryable, Identifiable)]
 #[diesel(table_name = proxy_config)]

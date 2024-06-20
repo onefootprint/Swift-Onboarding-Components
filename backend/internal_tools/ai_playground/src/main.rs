@@ -1,9 +1,7 @@
 use dotenv::dotenv;
-use openai::chat::{
-    ChatCompletion,
-    ChatCompletionMessage,
-    ChatCompletionMessageRole,
-};
+use openai::chat::ChatCompletion;
+use openai::chat::ChatCompletionMessage;
+use openai::chat::ChatCompletionMessageRole;
 use openai::set_key;
 use std::env;
 

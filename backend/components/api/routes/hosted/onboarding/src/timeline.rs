@@ -6,10 +6,10 @@ use api_core::web::Json;
 use api_wire_types::CreateOnboardingTimelineRequest;
 use db::models::user_timeline::UserTimeline;
 use newtypes::OnboardingTimelineInfo;
+use paperclip::actix::api_v2_operation;
+use paperclip::actix::web;
 use paperclip::actix::{
     self,
-    api_v2_operation,
-    web,
 };
 
 #[api_v2_operation(

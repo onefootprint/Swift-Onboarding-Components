@@ -1,46 +1,34 @@
 use super::partner_tenant::PartnerTenant;
 use super::tenant::Tenant;
-use super::tenant_role::{
-    ImmutableRoleKind,
-    TenantRole,
-};
+use super::tenant_role::ImmutableRoleKind;
+use super::tenant_role::TenantRole;
 use super::tenant_user::TenantUser;
-use crate::helpers::{
-    TenantOrPartnerTenant,
-    WorkosAuthIdentity,
-};
-use crate::{
-    DbError,
-    DbResult,
-    NextPage,
-    OffsetPagination,
-    PgConn,
-    TxnPgConn,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
-use db_schema::schema::{
-    tenant_role,
-    tenant_rolebinding,
-    tenant_user,
-};
+use crate::helpers::TenantOrPartnerTenant;
+use crate::helpers::WorkosAuthIdentity;
+use crate::DbError;
+use crate::DbResult;
+use crate::NextPage;
+use crate::OffsetPagination;
+use crate::PgConn;
+use crate::TxnPgConn;
+use chrono::DateTime;
+use chrono::Utc;
+use db_schema::schema::tenant_role;
+use db_schema::schema::tenant_rolebinding;
+use db_schema::schema::tenant_user;
 use derive_more::From;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::{
-    OrgIdentifierRef,
-    PartnerTenantId,
-    TenantId,
-    TenantRoleId,
-    TenantRoleKind,
-    TenantRoleKindDiscriminant,
-    TenantRolebindingId,
-    TenantUserId,
-    WorkosAuthMethod,
-};
+use newtypes::OrgIdentifierRef;
+use newtypes::PartnerTenantId;
+use newtypes::TenantId;
+use newtypes::TenantRoleId;
+use newtypes::TenantRoleKind;
+use newtypes::TenantRoleKindDiscriminant;
+use newtypes::TenantRolebindingId;
+use newtypes::TenantUserId;
+use newtypes::WorkosAuthMethod;
 
 #[derive(Debug, Clone, Queryable, Selectable)]
 #[diesel(table_name = tenant_rolebinding)]
@@ -216,10 +204,8 @@ impl TenantRolebinding {
         conn: &mut TxnPgConn,
         user_id: &TenantUserId,
     ) -> DbResult<Vec<(Self, TenantOrPartnerTenant)>> {
-        use db_schema::schema::{
-            partner_tenant,
-            tenant,
-        };
+        use db_schema::schema::partner_tenant;
+        use db_schema::schema::tenant;
         #[allow(clippy::type_complexity)]
         let results: Vec<(
             TenantRolebinding,
@@ -247,10 +233,8 @@ impl TenantRolebinding {
     where
         T: Into<TenantRolebindingIdentifier<'a>>,
     {
-        use db_schema::schema::{
-            partner_tenant,
-            tenant,
-        };
+        use db_schema::schema::partner_tenant;
+        use db_schema::schema::tenant;
         let mut query = tenant_user::table
             .inner_join(
                 tenant_rolebinding::table.inner_join(

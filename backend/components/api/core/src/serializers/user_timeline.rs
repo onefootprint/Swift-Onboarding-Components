@@ -1,22 +1,16 @@
 use crate::utils::db2api::DbToApi;
-use api_wire_types::{
-    DocumentRequest,
-    WorkflowStartedEventKind,
-};
+use api_wire_types::DocumentRequest;
+use api_wire_types::WorkflowStartedEventKind;
 use db::models::scoped_vault_label::ScopedVaultLabel;
-use db::models::user_timeline::{
-    SaturatedDataCollectedEvent,
-    SaturatedTimelineEvent,
-    UserTimeline,
-    UserTimelineInfo,
-};
+use db::models::user_timeline::SaturatedDataCollectedEvent;
+use db::models::user_timeline::SaturatedTimelineEvent;
+use db::models::user_timeline::UserTimeline;
+use db::models::user_timeline::UserTimelineInfo;
 use itertools::Itertools;
-use newtypes::{
-    AuthMethodUpdatedInfo,
-    ExternalIntegrationInfo,
-    WorkflowConfig,
-    WorkflowRequestConfig,
-};
+use newtypes::AuthMethodUpdatedInfo;
+use newtypes::ExternalIntegrationInfo;
+use newtypes::WorkflowConfig;
+use newtypes::WorkflowRequestConfig;
 
 impl DbToApi<UserTimelineInfo> for api_wire_types::UserTimeline {
     fn from_db(target: UserTimelineInfo) -> Self {

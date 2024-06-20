@@ -1,50 +1,38 @@
 use crate::decision::features::risk_signals::risk_signal_group_struct::Doc;
 use crate::decision::features::risk_signals::RiskSignalGroupStruct;
+use crate::decision::tests::test_helpers::FixtureData;
 use crate::decision::tests::test_helpers::{
     self,
-    FixtureData,
 };
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::decision::vendor::{
     self,
 };
 use crate::errors::ApiResult;
-use crate::{
-    ApiError,
-    State,
-};
+use crate::ApiError;
+use crate::State;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document::{
-    Document,
-    DocumentUpdate,
-    NewDocumentArgs,
-};
-use db::models::document_request::{
-    DocumentRequest,
-    NewDocumentRequestArgs,
-};
+use db::models::document::Document;
+use db::models::document::DocumentUpdate;
+use db::models::document::NewDocumentArgs;
+use db::models::document_request::DocumentRequest;
+use db::models::document_request::NewDocumentRequestArgs;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
-use db::models::risk_signal::{
-    AtSeqno,
-    RiskSignal,
-};
+use db::models::risk_signal::AtSeqno;
+use db::models::risk_signal::RiskSignal;
 use db::models::rule_instance::RuleInstance;
 use db::models::rule_result::RuleResult;
 use db::models::rule_set_result::RuleSetResult;
 use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
-use db::models::tenant_vendor::{
-    TenantVendorControl,
-    UpdateTenantVendorControlArgs,
-};
-use db::models::user_timeline::{
-    UserTimeline,
-    UserTimelineInfo,
-};
+use db::models::tenant_vendor::TenantVendorControl;
+use db::models::tenant_vendor::UpdateTenantVendorControlArgs;
+use db::models::user_timeline::UserTimeline;
+use db::models::user_timeline::UserTimelineInfo;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
@@ -54,54 +42,40 @@ use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::fixtures::{
     self,
 };
-use db::{
-    DbError,
-    DbResult,
-    TxnPgConn,
-};
+use db::DbError;
+use db::DbResult;
+use db::TxnPgConn;
 use db_schema::schema::document_request;
 use diesel::prelude::*;
-use idv::experian::{
-    ExperianCrossCoreRequest,
-    ExperianCrossCoreResponse,
-};
-use idv::idology::{
-    IdologyExpectIDAPIResponse,
-    IdologyExpectIDRequest,
-};
+use idv::experian::ExperianCrossCoreRequest;
+use idv::experian::ExperianCrossCoreResponse;
+use idv::idology::IdologyExpectIDAPIResponse;
+use idv::idology::IdologyExpectIDRequest;
 use idv::incode::response::OnboardingStartResponse;
-use idv::incode::{
-    IncodeResponse,
-    IncodeStartOnboardingRequest,
-};
-use idv::middesk::{
-    MiddeskCreateBusinessRequest,
-    MiddeskCreateBusinessResponse,
-};
-use idv::twilio::{
-    TwilioLookupV2APIResponse,
-    TwilioLookupV2Request,
-};
+use idv::incode::IncodeResponse;
+use idv::incode::IncodeStartOnboardingRequest;
+use idv::middesk::MiddeskCreateBusinessRequest;
+use idv::middesk::MiddeskCreateBusinessResponse;
+use idv::twilio::TwilioLookupV2APIResponse;
+use idv::twilio::TwilioLookupV2Request;
 use itertools::Itertools;
-use newtypes::{
-    DataLifetimeSeqno,
-    DbUserTimelineEventKind,
-    DecisionIntentKind,
-    DocumentKind,
-    DocumentRequestConfig,
-    DocumentRequestKind,
-    DocumentReviewStatus,
-    DocumentStatus,
-    FootprintReasonCode,
-    OnboardingStatus,
-    PiiJsonValue,
-    RiskSignalGroupKind,
-    ScopedVaultId,
-    VendorAPI,
-    WorkflowFixtureResult,
-    WorkflowId,
-    WorkflowKind,
-};
+use newtypes::DataLifetimeSeqno;
+use newtypes::DbUserTimelineEventKind;
+use newtypes::DecisionIntentKind;
+use newtypes::DocumentKind;
+use newtypes::DocumentRequestConfig;
+use newtypes::DocumentRequestKind;
+use newtypes::DocumentReviewStatus;
+use newtypes::DocumentStatus;
+use newtypes::FootprintReasonCode;
+use newtypes::OnboardingStatus;
+use newtypes::PiiJsonValue;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
+use newtypes::VendorAPI;
+use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowId;
+use newtypes::WorkflowKind;
 use std::sync::Arc;
 use strum_macros::EnumIter;
 use webhooks::events::WebhookEvent;

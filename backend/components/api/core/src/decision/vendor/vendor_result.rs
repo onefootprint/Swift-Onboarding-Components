@@ -1,29 +1,21 @@
 use super::verification_result::decrypt_verification_result_response;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::{
-    ApiError,
-    ApiResult,
-};
+use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use db::models::verification_request::{
-    RequestAndMaybeResult,
-    RequestAndResult,
-    VerificationRequest,
-};
+use db::models::verification_request::RequestAndMaybeResult;
+use db::models::verification_request::RequestAndResult;
+use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::DbError;
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::{
-    EncryptedVaultPrivateKey,
-    SealedVaultBytes,
-    VendorAPI,
-    VerificationRequestId,
-    VerificationResultId,
-};
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::EncryptedVaultPrivateKey;
+use newtypes::SealedVaultBytes;
+use newtypes::VendorAPI;
+use newtypes::VerificationRequestId;
+use newtypes::VerificationResultId;
 use std::collections::HashMap;
 
 #[derive(Clone)]

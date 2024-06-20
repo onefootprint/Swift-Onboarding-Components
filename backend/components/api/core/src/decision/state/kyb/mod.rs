@@ -3,26 +3,22 @@ pub mod states;
 #[cfg(test)]
 mod tests;
 
-use super::{
-    DoAction,
-    StateError,
-    Workflow,
-    WorkflowActions,
-    WorkflowKind,
-    WorkflowState,
-};
+use super::DoAction;
+use super::StateError;
+use super::Workflow;
+use super::WorkflowActions;
+use super::WorkflowKind;
+use super::WorkflowState;
 use crate::errors::ApiResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::rule_instance::IncludeRules;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
-use newtypes::{
-    RuleInstanceKind,
-    ScopedVaultId,
-    TenantId,
-    WorkflowId,
-};
+use newtypes::RuleInstanceKind;
+use newtypes::ScopedVaultId;
+use newtypes::TenantId;
+use newtypes::WorkflowId;
 
 ///
 /// States

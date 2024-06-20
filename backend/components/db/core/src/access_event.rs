@@ -1,26 +1,20 @@
+use crate::actor;
 use crate::actor::SaturatedActor;
 use crate::errors::DbError;
 use crate::models::access_event::AccessEvent;
 use crate::models::insight_event::InsightEvent;
 use crate::models::scoped_vault::*;
 use crate::models::tenant::Tenant;
-use crate::{
-    actor,
-    DbPool,
-    DbResult,
-};
-use chrono::{
-    DateTime,
-    Utc,
-};
+use crate::DbPool;
+use crate::DbResult;
+use chrono::DateTime;
+use chrono::Utc;
 use db_schema::schema;
 use diesel::prelude::*;
-use newtypes::{
-    AccessEventKind,
-    DataIdentifier,
-    TenantId,
-    VaultId,
-};
+use newtypes::AccessEventKind;
+use newtypes::DataIdentifier;
+use newtypes::TenantId;
+use newtypes::VaultId;
 use tracing::instrument;
 
 #[derive(Debug)]

@@ -10,19 +10,15 @@ use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::TxnPgConn;
 use idv::footprint::FootprintDeviceAttestationData;
-use idv::{
-    ParsedResponse,
-    VendorResponse,
-};
-use newtypes::{
-    DecisionIntentKind,
-    PiiJsonValue,
-    RiskSignalGroupKind,
-    ScopedVaultId,
-    VaultPublicKey,
-    VendorAPI,
-    WorkflowId,
-};
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::DecisionIntentKind;
+use newtypes::PiiJsonValue;
+use newtypes::RiskSignalGroupKind;
+use newtypes::ScopedVaultId;
+use newtypes::VaultPublicKey;
+use newtypes::VendorAPI;
+use newtypes::WorkflowId;
 
 pub enum AttestationResult<'a> {
     Apple(&'a AppleDeviceAttestation),
