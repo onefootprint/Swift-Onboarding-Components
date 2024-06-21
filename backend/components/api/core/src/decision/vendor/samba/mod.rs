@@ -1,6 +1,6 @@
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
-use crate::ApiError;
+use api_errors::FpError;
 use idv::samba::SambaAPIResponse;
 use newtypes::DecisionIntentId;
 use newtypes::DocumentId;
@@ -33,7 +33,7 @@ impl SaveVerificationResultArgs {
                 let scrubbed_response = response
                     .result
                     .scrub()
-                    .map_err(|e| ApiError::from(idv::Error::from(e)))
+                    .map_err(|e| FpError::from(idv::Error::from(e)))
                     .unwrap_or(serde_json::json!("").into());
 
                 Self {

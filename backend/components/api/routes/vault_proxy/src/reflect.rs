@@ -49,7 +49,7 @@ pub async fn post(
 ) -> ModernApiResult<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
-        Err(ApiErrorKind::InvalidProxyBody)?
+        return Err(ApiErrorKind::InvalidProxyBody.into());
     };
 
     // 0. pull out a global fp_id if exists

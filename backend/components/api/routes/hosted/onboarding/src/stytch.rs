@@ -9,7 +9,7 @@ use api_core::decision::vendor;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::utils::headers::TelemetryHeaders;
-use api_core::ApiError;
+use api_core::FpError;
 use api_wire_types::hosted::stytch::StytchTelemetryRequest;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
@@ -60,7 +60,7 @@ pub async fn post(
                 tracing::error!(?err, "Stytch error response");
                 Either::Right(err.response.clone())
             }
-            _ => Err(ApiError::from(idv::Error::from(err)))?,
+            _ => Err(FpError::from(idv::Error::from(err)))?,
         },
     };
 

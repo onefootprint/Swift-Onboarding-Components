@@ -1,4 +1,3 @@
-use crate::ApiError;
 use api_errors::FpError;
 use http::StatusCode;
 use newtypes::Base64Data;
@@ -35,9 +34,9 @@ impl std::error::Error for ModernApiError {
     }
 }
 
-impl<T: Into<ApiError>> From<T> for ModernApiError {
+impl<T: Into<FpError>> From<T> for ModernApiError {
     fn from(value: T) -> Self {
-        Self(FpError::from(value.into()))
+        Self(value.into())
     }
 }
 
@@ -50,6 +49,9 @@ pub struct SerializedApiResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<serde_json::Value>,
     pub support_id: Uuid,
+    // In non-prod, debug representation of the error message
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub debug: Option<String>,
 }
 
 
@@ -67,15 +69,17 @@ impl actix_web::ResponseError for ModernApiError {
         let context = self.context();
         let message = self.message();
 
-        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR {
-            // Hide HTTP 500 error messages from client.
-            // It would be nice to be able to show the error messages in dev
+        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR
+            && crate::config::SERVICE_CONFIG.is_production()
+        {
+            // Hide HTTP 500 error messages from client in prod.
             tracing::error!(err=?self.0, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api 500: {}", &self.to_string());
             "Something went wrong".to_string()
         } else {
             tracing::info!(error=?self.0, support_id=support_id.to_string(), status_code=status_code.as_u16(), "returning api {}", status_code);
             message
         };
+        let debug = (!crate::config::SERVICE_CONFIG.is_production()).then_some(format!("{:?}", self));
 
         let mut resp = actix_web::HttpResponse::build(status_code);
         self.mutate_response(&mut resp);
@@ -85,6 +89,7 @@ impl actix_web::ResponseError for ModernApiError {
             code,
             context,
             support_id,
+            debug,
         })
     }
 }

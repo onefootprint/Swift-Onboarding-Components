@@ -15,6 +15,18 @@ pub enum TransformError {
     DateFormat(#[from] chrono::ParseError),
 }
 
+
+impl api_errors::FpErrorTrait for TransformError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+
 pub trait DataTransformer {
     fn apply(&self, data: Vec<u8>) -> Result<Vec<u8>, TransformError>;
     fn apply_str<T: From<String>>(&self, data: &str) -> Result<T, TransformError>;

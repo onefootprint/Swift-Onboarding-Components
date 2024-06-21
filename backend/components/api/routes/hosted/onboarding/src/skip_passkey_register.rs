@@ -1,9 +1,9 @@
 use crate::auth::user::UserAuthScope;
-use crate::errors::ApiError;
 use crate::types::ModernApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::errors::ApiResult;
 use api_core::utils::actix::OptionalJson;
 use api_wire_types::SkipPasskeyRegisterRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -32,7 +32,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, ApiError> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
 
             let _ = NewLivenessEvent {

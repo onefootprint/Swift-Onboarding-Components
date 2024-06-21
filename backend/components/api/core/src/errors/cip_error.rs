@@ -26,8 +26,8 @@ pub enum CipError {
     VerificationResultNotFound(VendorAPI),
 }
 
-impl CipError {
-    pub fn status_code(&self) -> StatusCode {
+impl api_errors::FpErrorTrait for CipError {
+    fn status_code(&self) -> StatusCode {
         match self {
             CipError::EntityDecisionManualReviewStatusNotPass
             | CipError::EntityDecisionDoesNotExist
@@ -38,5 +38,9 @@ impl CipError {
             | CipError::ExpectedReviewReasonNotFound(_)
             | CipError::VerificationResultNotFound(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
     }
 }

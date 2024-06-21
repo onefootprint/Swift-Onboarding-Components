@@ -1,7 +1,7 @@
 use crate::errors::kms::KmsSignError;
 use crate::errors::ApiResult;
-use crate::ApiError;
 use crate::State;
+use api_errors::FpError;
 use api_wire_types::IdentifyId;
 use async_trait::async_trait;
 use aws_sdk_kms::primitives::Blob;
@@ -70,7 +70,7 @@ impl AwsHmacClient {
 
 #[async_trait]
 impl ApiKeyFingerprinter for State {
-    type Error = ApiError;
+    type Error = FpError;
 
     async fn sign_raw_data(&self, data: &[u8]) -> Result<Fingerprint, Self::Error> {
         Ok(Fingerprint(self.aws_hmac_client.signed_hash(data).await?))

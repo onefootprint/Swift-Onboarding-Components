@@ -71,8 +71,8 @@ pub enum VaultProxyError {
     InvalidUpstreamContentType(String),
 }
 
-impl VaultProxyError {
-    pub fn status_code(&self) -> StatusCode {
+impl api_errors::FpErrorTrait for VaultProxyError {
+    fn status_code(&self) -> StatusCode {
         match self {
             VaultProxyError::InvalidTokenStart
             | VaultProxyError::InvalidTokenComponents
@@ -108,5 +108,9 @@ impl VaultProxyError {
                 StatusCode::BAD_GATEWAY
             }
         }
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
     }
 }

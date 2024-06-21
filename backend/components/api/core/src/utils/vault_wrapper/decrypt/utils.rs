@@ -6,6 +6,7 @@ use crate::utils::vault_wrapper::Any;
 use crate::ApiError;
 use crate::ApiErrorKind;
 use crate::State;
+use api_errors::FpError;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
@@ -42,7 +43,7 @@ impl<Type> VaultWrapper<Type> {
             let data = self
                 .decrypt_unchecked_single(&state.enclave_client, kind.into())
                 .await?
-                .ok_or(ApiError::from(DbError::ObjectNotFound))?;
+                .ok_or(FpError::from(DbError::ObjectNotFound))?;
             Ok(Some((data, ci, dl.clone())))
         } else {
             Ok(None)
@@ -54,7 +55,7 @@ impl<Type> VaultWrapper<Type> {
             .decrypt_contact_info(state, ContactInfoKind::Phone)
             .await?
             .ok_or(ApiErrorKind::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
-        PhoneNumber::parse(data).map_err(ApiError::from)
+        PhoneNumber::parse(data).map_err(FpError::from)
     }
 
     pub async fn get_decrypted_email(&self, state: &State) -> ApiResult<Email> {
@@ -62,7 +63,7 @@ impl<Type> VaultWrapper<Type> {
             .decrypt_contact_info(state, ContactInfoKind::Email)
             .await?
             .ok_or(ApiErrorKind::ContactInfoKindNotInVault(ContactInfoKind::Email))?;
-        Email::from_str(data.leak()).map_err(ApiError::from)
+        Email::from_str(data.leak()).map_err(FpError::from)
     }
 
     pub async fn get_decrypted_country(

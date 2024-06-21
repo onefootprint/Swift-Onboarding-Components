@@ -3,6 +3,7 @@ use api_core::errors::ApiError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
+use api_core::FpError;
 use api_core::State;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::tenant::Tenant;
@@ -568,7 +569,7 @@ impl ObConfigurationArgsToValidate {
                         .iter()
                         .any(|c| matches!(c.into(), VerificationCheckKind::Kyb))
                 {
-                    Err(ApiError::from(TenantError::ValidationError(
+                    Err(FpError::from(TenantError::ValidationError(
                         "Must provide a kyb verification_check if skip_kyb=false".to_owned(),
                     )))
                 } else {

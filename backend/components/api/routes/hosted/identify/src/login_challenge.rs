@@ -9,7 +9,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiError;
+use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::utils::challenge::Challenge;
@@ -162,7 +162,7 @@ async fn initiate_passkey_login_challenge(
     state: &web::Data<State>,
     user_id: &VaultId,
     creds: Vec<WebauthnCredential>,
-) -> Result<BiometricChallenge, ApiError> {
+) -> ApiResult<BiometricChallenge> {
     if creds.is_empty() {
         return Err(OnboardingError::WebauthnCredentialsNotSet)?;
     }

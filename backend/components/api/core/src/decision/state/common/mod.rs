@@ -22,8 +22,8 @@ use crate::decision::{
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
-use crate::ApiError;
 use crate::State;
+use api_errors::FpError;
 use crypto::aead::AeadSealedBytes;
 use crypto::aead::SealingKey;
 use db::models::decision_intent::DecisionIntent;
@@ -446,9 +446,9 @@ pub async fn saturate_list_entries(
 
 fn decrypt_list_entry(key: &SealingKey, le: &ListEntry) -> ApiResult<PiiString> {
     key.unseal_bytes(AeadSealedBytes(le.e_data.clone().0))
-        .map_err(ApiError::from)
+        .map_err(FpError::from)
         .map(PiiBytes::new)
-        .and_then(|b| PiiString::try_from(b).map_err(ApiError::from))
+        .and_then(|b| PiiString::try_from(b).map_err(FpError::from))
 }
 
 #[cfg(test)]

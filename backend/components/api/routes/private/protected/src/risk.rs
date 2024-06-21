@@ -24,7 +24,6 @@ use api_core::decision::{
     self,
 };
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::task;
@@ -34,6 +33,7 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::ApiErrorKind;
 use api_core::State;
+use api_errors::FpError;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -130,7 +130,7 @@ async fn make_vendor_calls(
     )
     .await?
     .pop()
-    .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
+    .ok_or(FpError::from(ApiErrorKind::VendorRequestsFailed))?;
 
     let reason_codes =
         decision::features::risk_signals::parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw)?
@@ -282,7 +282,7 @@ async fn shadow_run(
 
     let vendor_results = decision::engine::make_vendor_requests(&state, tvc, requests, &wf.id).await?;
 
-    let all_vendor_errors: Vec<&ApiError> = vendor_results.all_errors();
+    let all_vendor_errors = vendor_results.all_errors();
     if !all_vendor_errors.is_empty() {
         return Err(ApiErrorKind::AssertionError(format!(
             "Vendor call(s) failed: {:?}",
@@ -304,7 +304,7 @@ async fn shadow_run(
             verification_request_id: req.id,
         })
         .last()
-        .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
+        .ok_or(FpError::from(ApiErrorKind::VendorRequestsFailed))?;
 
     let reason_codes =
         decision::features::risk_signals::parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw)?

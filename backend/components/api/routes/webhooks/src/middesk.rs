@@ -2,10 +2,7 @@ use actix_web::web;
 use actix_web::FromRequest;
 use api_core::auth::AuthError;
 use api_core::decision;
-use api_core::decision::vendor::middesk::MiddeskError;
-use api_core::decision::vendor::middesk::MiddeskStatesKind;
 use api_core::types::ModernApiResult;
-use api_core::ApiErrorKind;
 use api_core::State;
 use crypto::hex;
 use futures_util::Future;
@@ -28,10 +25,7 @@ async fn handle_webhook(
             // We are sometimes getting extraneous webhooks for businesses we've already completed
             // verification for. For these cases we still want to log the error, but we want to
             // return a 200 response to middesk doesn't keep retrying the webhook
-            if matches!(
-                err.kind(),
-                ApiErrorKind::MiddeskError(MiddeskError::UnexpectedState(MiddeskStatesKind::Complete, _, _))
-            ) {
+            if err.code() == Some(api_errors::MIDDESK_ALREADY_COMPLETED.to_string()) {
                 tracing::error!(?err, "Received webhook for completed middesk_request");
             } else {
                 Err(err)?;

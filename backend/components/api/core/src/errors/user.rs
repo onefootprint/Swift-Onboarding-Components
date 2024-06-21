@@ -21,3 +21,13 @@ pub enum UserError {
     #[error("Cannot reonboard user - user has no complete onboardings.")]
     NoCompleteOnboardings,
 }
+
+impl api_errors::FpErrorTrait for UserError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}

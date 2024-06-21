@@ -25,3 +25,4 @@ tracing = { workspace = true }
 uuid = { workspace = true }
 serde_json = { workspace = true }
 josekit = { workspace = true }
+api_errors = { path = "../api/errors" }

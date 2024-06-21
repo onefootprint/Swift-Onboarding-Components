@@ -3,12 +3,12 @@
 
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
-use crate::errors::ApiError;
 use crate::utils::headers::InsightHeaders;
 use crate::ModernApiResult;
 use crate::State;
 use actix_web::HttpResponseBuilder;
 use api_core::auth::user::UserAuthScope;
+use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
@@ -90,7 +90,7 @@ async fn authorize_privacy_pass(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, ApiError> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
             let liveness_event = NewLivenessEvent {

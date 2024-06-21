@@ -9,7 +9,6 @@ use crate::auth::user::UserAuth;
 use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::utils::session::AuthSession;
 use chrono::DateTime;
@@ -147,7 +146,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
         req: RequestInfo,
-    ) -> Result<Self, ApiError> {
+    ) -> ApiResult<Self> {
         match value {
             AuthSessionData::User(data) => {
                 let vault = Vault::get(conn, &data.user_vault_id)?;

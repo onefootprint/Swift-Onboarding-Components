@@ -8,3 +8,13 @@ pub enum Error {
     #[error("Already enrolled in Vault Disaster Recovery")]
     AlreadyEnrolled,
 }
+
+impl api_errors::FpErrorTrait for Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}

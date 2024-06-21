@@ -285,6 +285,17 @@ pub enum Error {
     SambaSafetyError(#[from] samba::error::Error),
 }
 
+impl api_errors::FpErrorTrait for Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+
 impl From<&ParsedResponse> for VendorAPI {
     fn from(value: &ParsedResponse) -> Self {
         match value {

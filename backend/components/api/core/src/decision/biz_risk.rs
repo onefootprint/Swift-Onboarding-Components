@@ -2,8 +2,8 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Business;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::ApiError;
 use crate::State;
+use api_errors::FpError;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::workflow::Workflow;
@@ -58,7 +58,7 @@ pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> ApiResult<Vec
         .map(|(wf, _)| wf.id.clone())
         .collect();
     if !wfs_without_decision.is_empty() {
-        return Err(ApiError::from(OnboardingError::MissingBoOnboardingDecision(
+        return Err(FpError::from(OnboardingError::MissingBoOnboardingDecision(
             wfs_without_decision.into(),
         )));
     }

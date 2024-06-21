@@ -41,6 +41,16 @@ pub enum AwsSelfieDocError {
     TextractData(#[from] TextSdkError<AnalyzeIDError>),
 }
 
+impl api_errors::FpErrorTrait for AwsSelfieDocError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
 pub type SResult<T> = Result<T, AwsSelfieDocError>;
 
 impl AwsSelfieDocClient {

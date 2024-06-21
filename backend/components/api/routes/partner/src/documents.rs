@@ -10,6 +10,7 @@ use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiError;
 use api_core::ApiErrorKind;
+use api_core::FpError;
 use chrono::Utc;
 use db::helpers::ComplianceDocSummary;
 use db::models::compliance_doc::NewComplianceDoc;
@@ -46,7 +47,7 @@ pub async fn get(
             let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), None)?
                 .into_values()
                 .next()
-                .ok_or(ApiError::from(ApiErrorKind::ResourceNotFound))?;
+                .ok_or(FpError::from(ApiErrorKind::ResourceNotFound))?;
             Ok(summary)
         })
         .await?;

@@ -2,7 +2,6 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
-use crate::errors::ApiError;
 use crate::types::ModernApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -185,7 +184,7 @@ pub(super) async fn post_inner(
 
     let vws: HashMap<Option<DataLifetimeSeqno>, TenantVw> = state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
+        .db_query(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             // Build a VW for every version requested
             let vws = versions

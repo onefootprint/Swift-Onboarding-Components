@@ -60,9 +60,21 @@ pub enum Error {
     FeatureFlagError(#[from] feature_flag::Error),
     #[error("{0}")]
     DecimalError(#[from] rust_decimal::Error),
+    // TODO remove this and use FpResult everywhere in this crate
     #[error("{0}")]
     Database(Box<DbError>),
 }
+
+impl api_errors::FpErrorTrait for Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
 
 macro_rules! box_from_error_impl {
     ($var:ident, $typ:ty) => {

@@ -19,8 +19,8 @@ use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::utils::vault_wrapper::WriteableVw;
-use crate::ApiError;
 use crate::State;
+use api_errors::FpError;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
@@ -354,7 +354,7 @@ async fn get_curp_for_check(
 
         Ok((decrypted_curp, doc.clone()))
     } else {
-        Err(ApiError::from(decision::Error::from(
+        Err(FpError::from(decision::Error::from(
             decision::CurpValidationError::NoDocumentFoundForWorkflow,
         )))
     }

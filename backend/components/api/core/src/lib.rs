@@ -41,6 +41,7 @@ pub use crate::errors::ApiError;
 pub use crate::errors::ApiErrorKind;
 pub use crate::types::response::ModernApiError;
 pub use crate::types::response::ModernApiResult;
+pub use api_errors::FpError;
 pub use paperclip::actix::web;
 pub use paperclip::actix::OpenApiExt;
 

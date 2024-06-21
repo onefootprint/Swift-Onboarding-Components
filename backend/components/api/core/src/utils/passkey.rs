@@ -15,7 +15,6 @@ use newtypes::LivenessIssuer;
 use newtypes::VaultId;
 use serde::Deserialize;
 use serde::Serialize;
-use webauthn_rs_core::error::WebauthnError;
 use webauthn_rs_core::proto::AttestationCaList;
 use webauthn_rs_core::proto::AttestationMetadata;
 use webauthn_rs_core::proto::Credential;
@@ -124,9 +123,9 @@ impl WebauthnConfig {
         // Validate the challenge response
         let cred = match self.register_credential(&reg, &reg_state, None) {
             Ok(cred) => cred,
-            Err(err) => match err.kind() {
+            Err(err) => match err.code() {
                 // temporary addition to detect some webauthn issues on windows devices
-                crate::ApiErrorKind::Webauthn(WebauthnError::ParseNOMFailure) => {
+                Some(code) if code == *"parse_nom_failure" => {
                     tracing::info!(challenge_response=%challenge_response, "webauthn parse NOM failure");
                     return Err(err);
                 }

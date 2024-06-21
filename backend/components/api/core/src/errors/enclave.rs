@@ -21,3 +21,21 @@ pub enum EnclaveError {
     #[error("error in test: {0}")]
     TestError(String),
 }
+
+
+impl api_errors::FpErrorTrait for EnclaveError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        match self {
+            Self::Enclave(enclave_proxy::EnclaveError::EnclaveError(err))
+                if err.starts_with("TransformError") =>
+            {
+                api_errors::StatusCode::BAD_REQUEST
+            } /* a little hacky, but for */
+            _ => api_errors::StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}

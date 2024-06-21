@@ -18,6 +18,40 @@ pub enum Error {
     SerdeJson(#[from] serde_json::Error),
 }
 
+impl api_errors::FpErrorTrait for Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        match self {
+            Error::Request(_) | Error::ReqwestMiddleware(_) | Error::SerdeJson(_) => {
+                api_errors::StatusCode::INTERNAL_SERVER_ERROR
+            }
+            Error::DeliveryFailed(_, _) | Error::NotDeliveredAfterTimeout(_, _) => {
+                api_errors::StatusCode::BAD_REQUEST
+            }
+            Error::Api(e) => match e.status {
+                400 => api_errors::StatusCode::BAD_REQUEST,
+                _ => api_errors::StatusCode::INTERNAL_SERVER_ERROR,
+            },
+        }
+    }
+
+    fn message(&self) -> String {
+        match self {
+            Self::DeliveryFailed(_, error_code) | Self::NotDeliveredAfterTimeout(_, error_code) => {
+                // Try attaching specific context from the error code received by twilio, if any
+                let generic_err = self.to_string();
+                let specific_err = error_code.and_then(error_description);
+                if let Some(specific_err) = specific_err {
+                    format!("{} {}", generic_err, specific_err)
+                } else {
+                    generic_err
+                }
+            }
+            _ => self.to_string(),
+        }
+    }
+}
+
+
 impl Error {
     /// Returns true if the error is from failed delivery due to the recipient being invalid
     pub fn is_invalid_recipient_error(&self) -> bool {
@@ -40,24 +74,6 @@ pub struct ApiErrorResponse {
 impl Display for ApiErrorResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&self.message)
-    }
-}
-
-impl Error {
-    pub fn message(&self) -> String {
-        match self {
-            Self::DeliveryFailed(_, error_code) | Self::NotDeliveredAfterTimeout(_, error_code) => {
-                // Try attaching specific context from the error code received by twilio, if any
-                let generic_err = self.to_string();
-                let specific_err = error_code.and_then(error_description);
-                if let Some(specific_err) = specific_err {
-                    format!("{} {}", generic_err, specific_err)
-                } else {
-                    generic_err
-                }
-            }
-            _ => self.to_string(),
-        }
     }
 }
 

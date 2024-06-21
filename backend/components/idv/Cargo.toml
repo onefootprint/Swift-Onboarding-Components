@@ -36,6 +36,7 @@ reqwest-middleware = { workspace = true }
 reqwest-retry = "0.3.0"
 reqwest-tracing = { workspace = true }
 task-local-extensions = { workspace = true }
+api_errors = { path = "../api/errors" }
 
 
 [dev-dependencies]

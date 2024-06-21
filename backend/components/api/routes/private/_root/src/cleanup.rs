@@ -3,7 +3,6 @@ use actix_web::web;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::Either;
-use api_core::errors::ApiError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
@@ -115,7 +114,7 @@ async fn post(
     let ff_client = state.ff_client.clone();
     let num_deleted_rows = state
         .db_pool
-        .db_transaction(move |conn| -> Result<usize, ApiError> {
+        .db_transaction(move |conn| -> ApiResult<usize> {
             Vault::lock(conn, &uv_id)?;
 
             if is_production {

@@ -3,11 +3,11 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
-use crate::errors::ApiError;
 use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use actix_web::web::Query;
+use api_core::errors::ApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
@@ -72,7 +72,7 @@ pub async fn get(
 
     let uvw = state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
+        .db_query(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)

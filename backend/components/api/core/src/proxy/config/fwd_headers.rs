@@ -38,7 +38,7 @@ impl TryFrom<&HeaderMap> for ForwardProxyHeaders {
                 };
                 Ok(parse().ok_or(VaultProxyError::InvalidProxyForwardHeader(name_string))?)
             })
-            .collect::<Result<Vec<_>, ApiError>>();
+            .collect::<ApiResult<Vec<_>>>();
 
         Ok(Self(result?))
     }

@@ -42,6 +42,16 @@ pub enum Error {
     CurpError(#[from] CurpValidationError),
 }
 
+impl api_errors::FpErrorTrait for Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum TenantVendorControlError {
     #[error("No tenant specific credentials for vendor {0}")]

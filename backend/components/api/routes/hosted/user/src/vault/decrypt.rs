@@ -1,10 +1,10 @@
-use crate::errors::ApiError;
 use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::auth::CanDecrypt;
+use api_core::errors::ApiResult;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::DecryptResponse;
 use itertools::Itertools;
@@ -41,7 +41,7 @@ pub async fn post(
 
     let uvw = state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
+        .db_query(move |conn| -> ApiResult<_> {
             let id = user_auth.user_identifier();
             let args = VwArgs::from(&id);
             let uvw = VaultWrapper::<Any>::build(conn, args)?;

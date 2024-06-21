@@ -6,6 +6,7 @@ authors = { workspace = true }
 
 [dependencies]
 api_core = { path = "../core" }
+api_errors = { path = "../errors" }
 db = { path = "../../db/core" }
 commands = { path = "../../commands" }
 db_schema = { path = "../../db/schema" }

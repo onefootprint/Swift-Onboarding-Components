@@ -13,7 +13,6 @@ use crate::decision::{
     self,
 };
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiError;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DataLifetimeSources;
@@ -21,6 +20,7 @@ use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::VendorClient;
 use crate::State;
+use api_errors::FpError;
 use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -139,6 +139,25 @@ pub enum MiddeskError {
     AssertionError(String),
 }
 
+impl api_errors::FpErrorTrait for MiddeskError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+
+    fn code(&self) -> Option<String> {
+        match self {
+            Self::UnexpectedState(MiddeskStatesKind::Complete, _, _) => {
+                Some(api_errors::MIDDESK_ALREADY_COMPLETED.to_string())
+            }
+            _ => None,
+        }
+    }
+}
+
 impl TryFrom<VendorAPI> for MiddeskVendorApi {
     type Error = MiddeskError;
 
@@ -241,7 +260,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         self,
         state: &State,
         tenant_id: &TenantId,
-    ) -> Result<MiddeskState<AwaitingBusinessUpdateWebhook>, ApiError> {
+    ) -> ApiResult<MiddeskState<AwaitingBusinessUpdateWebhook>> {
         let vreq_id = self.state.create_business_vreq.id.clone();
         let wf_id = self.middesk_request.workflow_id;
 
@@ -479,7 +498,7 @@ impl MiddeskState<PendingGetBusinessCall> {
                 credentials: tvc.middesk_credentials(),
             })
             .await
-            .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+            .map_err(|e| FpError::from(idv::Error::from(e)))?;
 
         let vendor_response = VendorResponse {
             response: get_business_res.clone().parsed_response(),
@@ -638,7 +657,7 @@ pub async fn init_middesk_request(
 
 // Insertion point 2: We are receiving either a `business.updated` or `tin.retried` webhook from
 // Middesk
-pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Result<(), ApiError> {
+pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> ApiResult<()> {
     let webhook_res = middesk::response::webhook::parse_webhook(res.clone()).map_err(idv::Error::from)?;
     let business_id = webhook_res
         .business_id()
@@ -706,7 +725,7 @@ async fn send_middesk_call(
                 tenant_id: tenant_id.clone(),
             })
             .await
-            .map_err(|e| ApiError::from(idv::Error::from(e)))
+            .map_err(|e| FpError::from(idv::Error::from(e)))
     } else {
         // TODO: the faked vendor response thing doesn't really work well for stuff like Middesk flow. Would
         // need to rethink how to support this if its really needed.
@@ -721,7 +740,7 @@ async fn send_middesk_call(
           }
         );
         let parsed: BusinessResponse = idv::middesk::response::parse_response(raw.clone())
-            .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+            .map_err(|e| FpError::from(idv::Error::from(e)))?;
 
         Ok(MiddeskCreateBusinessResponse {
             raw_response: raw.into(),

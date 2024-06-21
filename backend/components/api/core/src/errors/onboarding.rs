@@ -69,6 +69,17 @@ pub enum OnboardingError {
     UnmetRequirements(#[from] UnmetRequirements),
 }
 
+impl api_errors::FpErrorTrait for OnboardingError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+
 #[derive(Debug, Error)]
 pub struct UnmetRequirements(pub Vec<OnboardingRequirement>);
 

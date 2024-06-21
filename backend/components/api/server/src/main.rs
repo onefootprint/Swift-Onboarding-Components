@@ -116,7 +116,7 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
             // accept any content type
             .content_type(|_| true)
             // use custom error handler
-            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidJsonBody(err))));
+            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(FpError::from(err))));
 
         let query_cfg = web::QueryConfig::default()
             .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidQueryParam(err))));

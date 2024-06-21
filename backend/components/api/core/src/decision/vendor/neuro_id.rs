@@ -7,8 +7,8 @@ use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
-use crate::ApiError;
 use crate::State;
+use api_errors::FpError;
 use db::models::decision_intent::DecisionIntent;
 use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::neuro_id_analytics_event::NewNeuroIdAnalyticsEvent;
@@ -49,7 +49,7 @@ impl SaveVerificationResultArgs {
                 let scrubbed_response = response
                     .result
                     .scrub()
-                    .map_err(|e| ApiError::from(idv::Error::from(e)))
+                    .map_err(|e| FpError::from(idv::Error::from(e)))
                     .unwrap_or(serde_json::json!("").into());
 
                 Self {

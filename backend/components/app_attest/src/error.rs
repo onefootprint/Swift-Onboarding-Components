@@ -91,3 +91,14 @@ pub enum AttestationError {
     #[error("Play integrity token error")]
     PlayIntegrityToken(#[from] crate::google::PlayIntegrityTokenError),
 }
+
+
+impl api_errors::FpErrorTrait for AttestationError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}

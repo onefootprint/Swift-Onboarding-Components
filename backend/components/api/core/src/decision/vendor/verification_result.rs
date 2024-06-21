@@ -2,8 +2,8 @@ use super::make_request::VerificationRequestWithVendorResponse;
 use super::VendorAPIError;
 use crate::decision::engine::VendorResults;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
+use api_errors::FpError;
 use chrono::Utc;
 use db::models::verification_request::NewVerificationRequestArgs;
 use db::models::verification_request::VerificationRequest;
@@ -31,7 +31,7 @@ pub fn save_verification_results(
     conn: &mut PgConn,
     vendor_responses: &[VerificationRequestWithVendorResponse],
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> Result<Vec<VerificationResult>, ApiError> {
+) -> ApiResult<Vec<VerificationResult>> {
     let now = Utc::now();
     let new_verification_results: Vec<NewVerificationResult> = vendor_responses
         .iter()
@@ -49,7 +49,7 @@ pub fn save_verification_results(
                 is_error: false,
             })
         })
-        .collect::<Result<Vec<NewVerificationResult>, ApiError>>()?;
+        .collect::<ApiResult<Vec<NewVerificationResult>>>()?;
 
     Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
 }
@@ -61,7 +61,7 @@ pub fn save_error_verification_results(
     conn: &mut PgConn,
     vendor_responses_with_errors: &[(VerificationRequest, Option<PiiJsonValue>)],
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> Result<Vec<VerificationResult>, ApiError> {
+) -> ApiResult<Vec<VerificationResult>> {
     let now = Utc::now();
     let new_verification_results: Vec<NewVerificationResult> = vendor_responses_with_errors
         .iter()
@@ -88,7 +88,7 @@ pub fn save_error_verification_results(
                 is_error: true,
             })
         })
-        .collect::<Result<Vec<NewVerificationResult>, ApiError>>()?;
+        .collect::<ApiResult<Vec<NewVerificationResult>>>()?;
 
     Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
 }
@@ -97,30 +97,30 @@ pub fn save_verification_result(
     conn: &mut PgConn,
     vendor_response: &VerificationRequestWithVendorResponse,
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> Result<VerificationResult, ApiError> {
+) -> ApiResult<VerificationResult> {
     save_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
         .pop()
-        .ok_or(ApiError::from(DbError::IncorrectNumberOfRowsUpdated))
+        .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))
 }
 
 pub fn save_error_verification_result(
     conn: &mut PgConn,
     vendor_response: &(VerificationRequest, Option<PiiJsonValue>),
     user_vault_public_key: &VaultPublicKey,
-) -> Result<VerificationResult, ApiError> {
+) -> ApiResult<VerificationResult> {
     save_error_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
         .pop()
-        .ok_or(ApiError::from(DbError::IncorrectNumberOfRowsUpdated))
+        .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))
 }
 
 // Encrypt payload using UV
 pub fn encrypt_verification_result_response(
     response: &PiiJsonValue,
     user_vault_public_key: &VaultPublicKey,
-) -> Result<SealedVaultBytes, ApiError> {
+) -> ApiResult<SealedVaultBytes> {
     user_vault_public_key
         .seal_bytes(response.leak_to_vec()?.as_slice())
-        .map_err(ApiError::from)
+        .map_err(FpError::from)
 }
 
 // Bulk decrypt a Vec of encrypted responses
@@ -129,7 +129,7 @@ pub async fn decrypt_verification_result_response(
     enclave_client: &EnclaveClient,
     sealed_data: Vec<SealedVaultBytes>, // sealed vault bytes
     sealed_key: &EncryptedVaultPrivateKey,
-) -> Result<Vec<PiiJsonValue>, ApiError> {
+) -> ApiResult<Vec<PiiJsonValue>> {
     let sealed_data = sealed_data
         .iter()
         .map(|sealed| (sealed_key, sealed, vec![]))
@@ -139,7 +139,7 @@ pub async fn decrypt_verification_result_response(
         .batch_decrypt_to_piibytes(sealed_data)
         .await?
         .into_iter()
-        .map(|b| PiiJsonValue::try_from(b).map_err(ApiError::from))
+        .map(|b| PiiJsonValue::try_from(b).map_err(FpError::from))
         .collect()
 }
 

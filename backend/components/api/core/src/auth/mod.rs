@@ -1,3 +1,4 @@
+use api_errors::StatusCode;
 use thiserror::Error;
 
 pub mod custodian;
@@ -66,4 +67,53 @@ pub enum AuthError {
     CannotAccessPreviewApi,
     #[error("Workflow is deactivated. Cannot perform {0}")]
     WorkflowDeactivated(newtypes::WorkflowGuard),
+}
+
+impl api_errors::FpErrorTrait for AuthError {
+    fn status_code(&self) -> StatusCode {
+        match self {
+            AuthError::ApiKeyNotFound => StatusCode::UNAUTHORIZED,
+            AuthError::ObConfigKeyUsedForApiKey => StatusCode::UNAUTHORIZED,
+            AuthError::ObConfigNotFound => StatusCode::UNAUTHORIZED,
+            AuthError::ApiKeyUsedForObConfig => StatusCode::UNAUTHORIZED,
+            AuthError::MissingHeader(_) => StatusCode::UNAUTHORIZED,
+            AuthError::InvalidHeader(_) => StatusCode::UNAUTHORIZED,
+            AuthError::ErrorLoadingSession(_, _) => StatusCode::UNAUTHORIZED,
+            AuthError::InvalidBody => StatusCode::UNAUTHORIZED,
+            AuthError::SessionTypeError => StatusCode::UNAUTHORIZED,
+            AuthError::SandboxRestricted => StatusCode::FORBIDDEN,
+            AuthError::MissingUserPermission(_) => StatusCode::FORBIDDEN,
+            AuthError::MissingBusiness => StatusCode::UNAUTHORIZED,
+            AuthError::MissingWorkflow => StatusCode::UNAUTHORIZED,
+            AuthError::MissingScopedUser => StatusCode::UNAUTHORIZED,
+            AuthError::MissingTenantPermission(_) => StatusCode::UNAUTHORIZED,
+            AuthError::NotFirmEmployee => StatusCode::FORBIDDEN,
+            AuthError::NotAllowedForIntegrationTestUser => StatusCode::FORBIDDEN,
+            AuthError::NotRiskOpsFirmEmployee => StatusCode::FORBIDDEN,
+            AuthError::BusinessNotRequired => StatusCode::UNAUTHORIZED,
+            AuthError::NonPersonVault => StatusCode::UNAUTHORIZED,
+            AuthError::MissingWorkflowGuard(_) => StatusCode::FORBIDDEN,
+            AuthError::CannotAccessPreviewApi => StatusCode::FORBIDDEN,
+            AuthError::WorkflowDeactivated(_) => StatusCode::UNAUTHORIZED,
+        }
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+
+    fn code(&self) -> Option<String> {
+        match self {
+            // TODO need to make FpErrorTrait codes an enum to prevent duplicates
+            AuthError::MissingHeader(_) => Some("A101".into()),
+            _ => None,
+        }
+    }
+
+    fn context(&self) -> Option<serde_json::Value> {
+        match self {
+            AuthError::MissingHeader(h) => Some(serde_json::json!({"header": h})),
+            _ => None,
+        }
+    }
 }

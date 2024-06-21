@@ -8,7 +8,6 @@ use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
 use crate::errors::ApiResult;
-use crate::ApiError;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
@@ -57,7 +56,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
         req: RequestInfo,
-    ) -> Result<Self, ApiError> {
+    ) -> ApiResult<Self> {
         // Since this is derived from a user session, we just grab all the user info
         let user_session = <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(
             value, conn, ff_client, req,

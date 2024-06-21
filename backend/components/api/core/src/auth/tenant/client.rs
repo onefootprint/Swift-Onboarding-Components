@@ -146,7 +146,7 @@ impl TenantAuth for SessionContext<ClientTenantData> {
         &self.tenant
     }
 
-    fn is_live(&self) -> Result<bool, crate::ApiError> {
+    fn is_live(&self) -> ApiResult<bool> {
         Ok(self.is_live)
     }
 

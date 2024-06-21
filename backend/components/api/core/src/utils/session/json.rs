@@ -1,4 +1,3 @@
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use chrono::DateTime;
 use chrono::Utc;
@@ -90,7 +89,7 @@ where
         key: S,
         data: &C,
         expires_at: DateTime<Utc>,
-    ) -> Result<(), ApiError> {
+    ) -> ApiResult<()> {
         let kind = data.session_kind();
         let data = serde_json::to_vec(data)?;
         Session::update_or_create(conn, key.into().0.into(), data, kind, expires_at)?;

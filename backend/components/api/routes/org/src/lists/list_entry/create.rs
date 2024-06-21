@@ -5,7 +5,7 @@ use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
-use api_core::ApiError;
+use api_core::FpError;
 use api_core::State;
 use api_wire_types::CreateListEntryRequest;
 use crypto::aead::AeadSealedBytes;
@@ -65,9 +65,9 @@ pub async fn create_list_entry(
         .map(|e| {
             decrypted_list_key
                 .unseal_bytes(AeadSealedBytes(e.e_data.clone().0))
-                .map_err(ApiError::from)
+                .map_err(FpError::from)
                 .map(PiiBytes::new)
-                .and_then(|b| PiiString::try_from(b).map_err(ApiError::from))
+                .and_then(|b| PiiString::try_from(b).map_err(FpError::from))
         })
         .collect::<Result<HashSet<_>, _>>()?;
 
@@ -115,8 +115,8 @@ pub async fn create_list_entry(
         .map(|le| {
             decrypted_list_key
                 .unseal_bytes(AeadSealedBytes(le.e_data.clone().0))
-                .map_err(ApiError::from)
-                .and_then(|b| PiiBytes::new(b).try_into().map_err(ApiError::from))
+                .map_err(FpError::from)
+                .and_then(|b| PiiBytes::new(b).try_into().map_err(FpError::from))
                 .map(|p| (le, p))
         })
         .collect::<Result<Vec<_>, _>>()?;

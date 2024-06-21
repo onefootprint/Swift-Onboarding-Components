@@ -1,4 +1,3 @@
-use super::error_with_code::CodedError;
 use super::onboarding::UnmetRequirements;
 use http::StatusCode;
 use newtypes::ObConfigurationKind;
@@ -19,7 +18,7 @@ pub enum TfError {
     AlreadyOnboardedToPlaybook,
 }
 
-impl CodedError for TfError {
+impl api_errors::FpErrorTrait for TfError {
     fn context(&self) -> Option<Value> {
         let context = match self {
             Self::VaultDataValidationError(err) => err.context(),
@@ -28,8 +27,8 @@ impl CodedError for TfError {
         Some(context)
     }
 
-    fn code(&self) -> String {
-        TfErrorKind::from(self).to_string()
+    fn code(&self) -> Option<String> {
+        Some(TfErrorKind::from(self).to_string())
     }
 
     fn status_code(&self) -> StatusCode {
@@ -38,6 +37,10 @@ impl CodedError for TfError {
             Self::PlaybookMissingRequirements(_, _) => StatusCode::BAD_REQUEST,
             Self::AlreadyOnboardedToPlaybook => StatusCode::CONFLICT,
         }
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
     }
 }
 

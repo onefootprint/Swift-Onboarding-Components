@@ -6,8 +6,8 @@ use crate::decision::{
     self,
 };
 use crate::errors::ApiResult;
-use crate::ApiError;
 use crate::State;
+use api_errors::FpError;
 use db::models::risk_signal::NewRiskSignalInfo;
 use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
@@ -114,7 +114,7 @@ fn parse_reason_codes(res: PaResponse) -> ApiResult<Vec<FootprintReasonCode>> {
     } else {
         // TODO: we really should have .validate() on the raw response validate stuff like this and
         // transform it into a struct without Option's
-        Err(ApiError::from(idv::Error::from(
+        Err(FpError::from(idv::Error::from(
             idv::idology::error::Error::MissingRestrictionField,
         )))
     }

@@ -2,11 +2,12 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
-use crate::errors::ApiError;
 use crate::types::ModernApiResult;
 use crate::utils::db2api::DbToApi;
+use crate::FpError;
 use crate::State;
 use actix_web::web::Json;
+use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::AnnotationFilters;
@@ -87,13 +88,13 @@ async fn patch(
 }
 
 pub trait ValidateRequest {
-    fn validate(&self) -> Result<(), ApiError>;
+    fn validate(&self) -> ApiResult<()>;
 }
 
 impl ValidateRequest for CreateAnnotationRequest {
-    fn validate(&self) -> Result<(), ApiError> {
+    fn validate(&self) -> ApiResult<()> {
         if self.note.is_empty() {
-            return Err(ApiError::from(TenantError::ValidationError(
+            return Err(FpError::from(TenantError::ValidationError(
                 "note cannot be empty".to_owned(),
             )));
         }

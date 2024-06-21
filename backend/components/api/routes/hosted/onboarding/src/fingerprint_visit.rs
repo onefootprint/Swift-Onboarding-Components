@@ -1,11 +1,11 @@
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
-use crate::errors::ApiError;
 use crate::types::ModernApiResult;
 use crate::utils::headers::TelemetryHeaders;
 use crate::State;
 use actix_web::web::Json;
+use api_core::errors::ApiResult;
 use api_wire_types::hosted::fingerprint_visit::FingerprintVisitRequest;
 use db::models::fingerprint_visit_event::FingerprintVisitEvent;
 use paperclip::actix::api_v2_operation;
@@ -49,7 +49,7 @@ pub async fn post(
 
         let db_res = state
             .db_pool
-            .db_transaction(move |conn| -> Result<_, ApiError> {
+            .db_transaction(move |conn| -> ApiResult<_> {
                 let user_vault_id = user_auth.user_vault_id().clone();
                 let scoped_user_id = user_auth.scoped_user_id();
 

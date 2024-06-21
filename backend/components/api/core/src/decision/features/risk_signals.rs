@@ -6,7 +6,6 @@ use super::neuro_id;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::ApiError;
 use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
 use derive_more::Display;
@@ -164,7 +163,7 @@ pub fn parse_reason_codes(
 pub fn fetch_latest_kyc_risk_signals(
     conn: &mut db::PgConn,
     scoped_vault_id: &ScopedVaultId,
-) -> Result<RiskSignalsForDecision, ApiError> {
+) -> ApiResult<RiskSignalsForDecision> {
     let rsfd = fetch_latest_risk_signals_map(conn, scoped_vault_id)?;
     Ok(RiskSignalsForDecision {
         kyc: rsfd.kyc.clone(),
@@ -178,7 +177,7 @@ pub fn fetch_latest_kyc_risk_signals(
 pub fn fetch_latest_risk_signals_map(
     conn: &mut db::PgConn,
     scoped_vault_id: &ScopedVaultId,
-) -> Result<RiskSignalsForDecision, ApiError> {
+) -> ApiResult<RiskSignalsForDecision> {
     let mut db_risk_signals_map: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
         // We don't make decisions on hidden risk signals
         RiskSignal::latest_by_risk_signal_group_kinds(conn, scoped_vault_id, AtSeqno(None))?

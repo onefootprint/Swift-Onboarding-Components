@@ -67,3 +67,16 @@ pub enum TenantError {
     #[error("Login target incompatible with other login request fields")]
     IncompatibleLoginTarget,
 }
+
+impl api_errors::FpErrorTrait for TenantError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        match self {
+            Self::DataDoesntExist(_) => api_errors::StatusCode::NOT_FOUND,
+            _ => api_errors::StatusCode::BAD_REQUEST,
+        }
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}

@@ -4,7 +4,7 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
-use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use paperclip::actix::Apiv2Security;
@@ -35,7 +35,7 @@ impl ExtractableAuthSession for ParsedSdkArgsSession {
         _: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
         _: RequestInfo,
-    ) -> Result<Self, ApiError> {
+    ) -> ApiResult<Self> {
         let data = match auth_session {
             AuthSessionData::SdkArgs(data) => data,
             _ => {

@@ -1,6 +1,7 @@
 use super::ProxyHeaderParams;
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiError;
+use crate::errors::ApiResult;
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
 use newtypes::FilterFunction;
@@ -28,19 +29,19 @@ impl IngressRule {
     pub fn parse_from_db_rules(
         rules: Vec<ProxyConfigIngressRule>,
         fp_id: Option<FpId>,
-    ) -> Result<Vec<Self>, ApiError> {
+    ) -> ApiResult<Vec<Self>> {
         if rules.is_empty() {
             return Ok(vec![]);
         }
 
         let rules = rules
             .into_iter()
-            .map(|rule| -> Result<_, ApiError> { Self::parse(fp_id.clone(), &rule.token_path, &rule.target) })
+            .map(|rule| -> ApiResult<_> { Self::parse(fp_id.clone(), &rule.token_path, &rule.target) })
             .collect::<Result<Vec<_>, _>>()?;
         Ok(rules)
     }
 
-    fn parse(fp_id: Option<FpId>, token_path: &str, target: &str) -> Result<Self, ApiError> {
+    fn parse(fp_id: Option<FpId>, token_path: &str, target: &str) -> ApiResult<Self> {
         let mut proxy_token = ProxyToken::parse_global(token_path, fp_id.as_ref())?;
 
         if !proxy_token.filter_functions.is_empty() {
@@ -122,7 +123,7 @@ impl TryFrom<&HeaderMap> for ParsedIngressRules {
 
                 Ok(rules)
             })
-            .collect::<Result<Vec<_>, ApiError>>()?
+            .collect::<ApiResult<Vec<_>>>()?
             .into_iter()
             .flatten()
             .collect();

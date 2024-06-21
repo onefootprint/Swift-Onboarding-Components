@@ -4,7 +4,6 @@ use super::sms::PhoneEmailChallengeState;
 use crate::auth::session::user::EmailVerifySession;
 use crate::auth::session::AuthSessionData;
 use crate::errors::user::UserError;
-use crate::errors::ApiError;
 use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
 use crate::State;
@@ -129,7 +128,7 @@ impl SendgridClient {
         inviter: String,
         org_name: String,
         accept_url: PiiString,
-    ) -> Result<(), ApiError> {
+    ) -> ApiResult<()> {
         let to_email = PiiString::from(to_email);
         let template_data = HashMap::from([
             ("recipient_email".to_string(), to_email.clone()),
@@ -272,7 +271,7 @@ pub async fn send_email_challenge(
     tenant_id: &TenantId,
     email_id: ContactInfoId,
     email_address: &PiiString,
-) -> Result<(), ApiError> {
+) -> ApiResult<()> {
     // Some tenants don't ever want to verify email
     // TODO we'll want to ignore this on no-phone OBCs
     let omit_email_verification = state.ff_client.flag(BoolFlag::OmitEmailVerification(tenant_id));

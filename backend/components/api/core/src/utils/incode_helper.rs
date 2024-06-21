@@ -8,7 +8,6 @@ use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::ApiErrorKind;
 use crate::State;
 use api_wire_types::DocumentImageError;
 use api_wire_types::DocumentResponse;
@@ -47,7 +46,7 @@ pub async fn handle_incode_request(
     is_re_run: bool,
     missing_sides: Vec<DocumentSide>, //kinda dumb
     configuration_id_override: IncodeConfigurationIdOverride,
-) -> Result<DocumentResponse, ApiError> {
+) -> ApiResult<DocumentResponse> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let vault_country = uvw.get_decrypted_country(state).await?;
     let sv_id: newtypes::ScopedVaultId = doc_request.scoped_vault_id.clone();
@@ -169,12 +168,7 @@ pub async fn handle_incode_request(
 async fn on_incode_hard_error(db_pool: &DbPool, err: ApiError, id_doc_id: &DocumentId) -> ApiResult<()> {
     tracing::error!(?err, "IncodeMachineError");
     let id_doc_id = id_doc_id.clone();
-    if matches!(
-        err.kind(),
-        ApiErrorKind::StateError(
-            crate::decision::state::StateError::IncodeMachineConcurrentStateChange(_, _)
-        )
-    ) {
+    if err.code() == Some(api_errors::INCODE_MACHINE_CONCURRENT_CHANGE.to_string()) {
         tracing::error!(?err, "Not setting hard error");
         return Ok(());
     }

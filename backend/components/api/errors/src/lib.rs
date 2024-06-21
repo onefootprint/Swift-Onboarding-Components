@@ -5,9 +5,13 @@ pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error 
     fn status_code(&self) -> StatusCode;
     // TODO maybe one day we'll make this return an enum to help guarantee that errors have unique codes
     /// For errors that clients can programatically respond to, a representative string
-    fn code(&self) -> Option<String>;
+    fn code(&self) -> Option<String> {
+        None
+    }
     /// For errors that clients can programatically respond to, any machine-readable context
-    fn context(&self) -> Option<serde_json::Value>;
+    fn context(&self) -> Option<serde_json::Value> {
+        None
+    }
     /// A brief human-readable description of the error. This is visible to tenants and clients, so
     /// please choose language accordingly.
     fn message(&self) -> String;
@@ -17,10 +21,6 @@ pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error 
 
 // FpError needs to be separate from ModernApiError - FpError is the common type that all crates can
 // return, ModernApiError wraps it and implements actix responder
-
-
-// TODO replace all ApiResult with ModernApiResult
-// TODO implement FpErrorTrait for DbError and then remove physical enum variant on ApiError, etc
 
 /// The magical error type that can hold any type T that implements FpErrorTrait.
 /// As crates create their own Error struct, they only need to implement FpErrorTrait.
@@ -50,3 +50,17 @@ impl std::error::Error for FpError {
         self.0.source()
     }
 }
+
+mod base;
+pub use base::AssertionError;
+pub use base::ValidationError;
+
+impl From<std::convert::Infallible> for FpError {
+    fn from(_: std::convert::Infallible) -> Self {
+        panic!("impossible condition convert Infallible to ApiError")
+    }
+}
+
+pub const INCODE_MACHINE_CONCURRENT_CHANGE: &str = "incode_machine_concurrent_change";
+pub const MIDDESK_ALREADY_COMPLETED: &str = "middesk_already_completed";
+pub const MIGRATION_DRY_RUN: &str = "migration_dry_run";

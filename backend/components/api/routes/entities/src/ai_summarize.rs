@@ -4,8 +4,8 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::types::ModernApiResult;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::errors::ApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::ApiError;
 use api_core::ApiErrorKind;
 use api_wire_types::UserAiSummary;
 use db::models::annotation::Annotation;
@@ -45,7 +45,7 @@ pub async fn get(
     // gather relevant user data
     let (scoped_vault, rule_set_result, risk_signals, auth_events, annotations) = state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
+        .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (auth_events, _) = AuthEvent::list(conn, &sv.id, None)?;
             let annotations = Annotation::list(conn, fp_id.clone(), tenant_id.clone(), is_live, None)?;

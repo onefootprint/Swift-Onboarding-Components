@@ -17,6 +17,7 @@ serde_json = { workspace = true }
 tracing = { workspace = true }
 mockall = { workspace = true }
 itertools = { workspace = true }
+api_errors = { path = "../api/errors" }
 
 [dev-dependencies]
 test-case = { workspace = true }

@@ -20,3 +20,13 @@ pub enum KmsSignError {
     #[error("data not available")]
     MacDataNotReturned,
 }
+
+impl api_errors::FpErrorTrait for KmsSignError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}

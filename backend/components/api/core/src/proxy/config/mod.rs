@@ -7,10 +7,10 @@ use crate::api_headers_schema;
 use crate::auth::tenant::TenantAuth;
 use crate::enclave_client::DecryptReq;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::State;
 use actix_web::http::header::HeaderMap;
+use api_errors::FpError;
 use newtypes::ApiKeyStatus;
 use newtypes::FpId;
 use newtypes::PiiString;
@@ -140,7 +140,7 @@ impl From<ProxyIngressContentType> for IngressContentType {
 }
 
 impl TryFrom<(JitProxyHeaderParams, ProxyHeaderParams, &HeaderMap)> for ProxyConfig {
-    type Error = ApiError;
+    type Error = FpError;
 
     /// Parses the intended Proxy configuration from the request
     fn try_from(
@@ -190,7 +190,7 @@ impl ProxyConfig {
         proxy_id: ProxyConfigId,
         params: ProxyHeaderParams,
         header_map: &HeaderMap,
-    ) -> Result<Self, crate::ApiError> {
+    ) -> ApiResult<Self> {
         let tenant_id = auth.tenant().id.clone();
         let is_live = auth.is_live()?;
 

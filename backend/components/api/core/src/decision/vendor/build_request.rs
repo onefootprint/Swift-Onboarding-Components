@@ -1,5 +1,4 @@
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::errors::ValidationError;
 use crate::utils::vault_wrapper::Business;
@@ -37,7 +36,7 @@ pub async fn build_idv_data_from_verification_request(
     db_pool: &DbPool, // TODO: migrate to PgConn
     enclave_client: &EnclaveClient,
     request: VerificationRequest,
-) -> Result<IdvData, ApiError> {
+) -> ApiResult<IdvData> {
     let vreq_id = request.id.clone();
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
@@ -88,7 +87,7 @@ pub async fn bulk_build_data_from_requests(
     db_pool: &DbPool, // TODO: migrate to PgConn
     enclave_client: &EnclaveClient,
     requests: Vec<VerificationRequest>,
-) -> Result<Vec<(VerificationRequest, IdvData)>, ApiError> {
+) -> ApiResult<Vec<(VerificationRequest, IdvData)>> {
     let data_futs = requests
         .iter()
         .map(|r| build_idv_data_from_verification_request(db_pool, enclave_client, r.clone()));
@@ -163,7 +162,7 @@ pub async fn build_docv_data_from_identity_doc(
 pub async fn build_business_data_from_verification_request(
     state: &State,
     request: VerificationRequest,
-) -> Result<BusinessDataFromVault, ApiError> {
+) -> ApiResult<BusinessDataFromVault> {
     let (sv, bvw) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<(ScopedVault, VaultWrapper<_>)> {

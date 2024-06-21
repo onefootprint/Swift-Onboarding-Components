@@ -16,6 +16,7 @@ newtypes = { path = "../newtypes" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 tracing = { workspace = true }
+api_errors = { path = "../api/errors" }
 
 [dev-dependencies]
 dotenv = { workspace = true }

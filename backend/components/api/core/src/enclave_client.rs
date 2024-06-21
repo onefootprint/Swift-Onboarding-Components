@@ -4,7 +4,7 @@ use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::proxy::to_data_transforms;
 use crate::s3::S3Client;
-use crate::ApiError;
+use api_errors::FpError;
 use async_trait::async_trait;
 use crypto::aead::AeadSealedBytes;
 use crypto::aead::SealingKey;
@@ -401,7 +401,7 @@ impl EnclaveClient {
     pub async fn batch_decrypt_documents<T: Eq + Hash>(
         &self,
         documents: HashMap<T, (&EncryptedVaultPrivateKey, &SealedVaultDataKey, &S3Url)>,
-    ) -> Result<HashMap<T, PiiBytes>, ApiError> {
+    ) -> ApiResult<HashMap<T, PiiBytes>> {
         if documents.is_empty() {
             return Ok(HashMap::new());
         }
@@ -414,7 +414,7 @@ impl EnclaveClient {
         let get_futures = s3_urls.into_iter().map(|s3_url| {
             self.s3_client
                 .get_object_from_s3_url(s3_url)
-                .map_err(ApiError::from)
+                .map_err(FpError::from)
         });
         let document_bytes = futures::future::try_join_all(get_futures).await?;
 

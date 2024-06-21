@@ -27,6 +27,17 @@ pub enum Error {
     #[error("io error: {0}")]
     IO(#[from] std::io::Error),
 }
+
+impl api_errors::FpErrorTrait for Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct TokenChallenge {
     pub issuer_name: String,

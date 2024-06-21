@@ -230,6 +230,7 @@ pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) ->
 mod tests {
     use super::*;
     use crate::ApiError;
+    use api_errors::FpError;
     use chrono::Utc;
     use newtypes::data_identifier::Error as DiValidationError;
     use newtypes::AliasId;
@@ -387,7 +388,7 @@ mod tests {
                 value: "not-a-country".into(),
             }
         ),
-    ], Err(ApiError::from(NewtypeError::ParsingError(DiValidationError::InvalidCountry))))]
+    ], Err(FpError::from(NewtypeError::ParsingError(DiValidationError::InvalidCountry))))]
     #[test_case(vec![
         RuleExpressionCondition::VaultData(
             VaultOperation::Equals {
@@ -396,7 +397,7 @@ mod tests {
                 value: "not-a-visa-kind".into(),
             }
         ),
-    ], Err(ApiError::from(NewtypeError::ParsingError(DiValidationError::CannotParseEnum(strum::ParseError::VariantNotFound)))))]
+    ], Err(FpError::from(NewtypeError::ParsingError(DiValidationError::CannotParseEnum(strum::ParseError::VariantNotFound)))))]
     fn test_validate_rule_expression_for_rule_instance_kind(
         recs: Vec<RuleExpressionCondition>,
         expected_kind: ApiResult<RuleInstanceKind>,

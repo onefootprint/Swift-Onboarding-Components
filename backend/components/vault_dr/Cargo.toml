@@ -11,3 +11,4 @@ doctest = false
 
 [dependencies]
 thiserror = { workspace = true }
+api_errors = { path = "../api/errors" }

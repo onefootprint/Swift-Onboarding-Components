@@ -1,11 +1,10 @@
 use super::timeouts::ResponseDeadline;
 use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::ApiResult;
-use crate::ApiError;
-use crate::ApiErrorKind;
 use actix_multipart::Multipart;
 use actix_web::HttpMessage;
 use actix_web::HttpRequest;
+use api_errors::FpError;
 use bytes::BufMut;
 use bytes::BytesMut;
 use futures_util::StreamExt as _;
@@ -81,9 +80,7 @@ pub async fn handle_file_upload(
     let fut_with_timeout = tokio::time::timeout_at(upload_deadline, fut);
     match fut_with_timeout.await {
         Ok(res) => res,
-        Err(_) => Err(ApiError::from(ApiErrorKind::ErrorWithCode(
-            ErrorWithCode::FileUploadTimeout,
-        ))),
+        Err(_) => Err(FpError::from(ErrorWithCode::FileUploadTimeout)),
     }
 }
 

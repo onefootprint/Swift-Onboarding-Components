@@ -103,7 +103,7 @@ where
     if let Err(e) = result {
         // Swallow errors of kind MigrationDryRun. This allows the server to start up successfully
         // after a dry run
-        if !matches!(e.kind(), ApiErrorKind::MigrationDryRun) {
+        if e.code() == Some(api_errors::MIGRATION_DRY_RUN.to_string()) {
             return Err(e);
         }
     }

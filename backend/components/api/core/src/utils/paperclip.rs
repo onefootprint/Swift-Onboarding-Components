@@ -89,8 +89,8 @@ macro_rules! api_headers_schema {
                     }
 
                     #[allow(unused)]
-                    pub fn [<get_ $o_name>](&self) -> Result<$o_typ, $crate::ApiError> {
-                        self.$o_name.clone().ok_or($crate::ApiError::from($crate::ApiErrorKind::MissingRequiredHeader($o_header)))
+                    pub fn [<get_ $o_name>](&self) -> Result<$o_typ, $crate::FpError> {
+                        self.$o_name.clone().ok_or($crate::FpError::from($crate::ApiErrorKind::MissingRequiredHeader($o_header)))
                     }
                 )*
 
@@ -165,14 +165,14 @@ macro_rules! api_headers_schema {
                         $(
                             .or(get_header($r_alias, req.headers()))
                         )*
-                        .map($r_typ::from_str).transpose().map_err($crate::ApiError::from);
+                        .map($r_typ::from_str).transpose().map_err($crate::FpError::from);
                     )*
                     $(
                         let [<$o_name _res>] = get_header($o_header, req.headers())
                         $(
                             .or(get_header($o_alias, req.headers()))
                         )*
-                        .map($o_typ::from_str).transpose().map_err($crate::ApiError::from);
+                        .map($o_typ::from_str).transpose().map_err($crate::FpError::from);
                     )*
                     Box::pin(async move {
                         Ok(Self {

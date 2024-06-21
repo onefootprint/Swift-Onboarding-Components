@@ -13,3 +13,4 @@ thiserror = { workspace = true }
 byteorder = { workspace = true }
 blind-rsa-signatures = { workspace = true }
 crypto = { path = "../enclave/crypto"}
+api_errors = { path = "../api/errors" }

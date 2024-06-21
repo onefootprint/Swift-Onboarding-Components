@@ -4,7 +4,7 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
-use api_core::ApiError;
+use api_core::FpError;
 use api_core::State;
 use crypto::aead::AeadSealedBytes;
 use crypto::aead::SealingKey;
@@ -56,9 +56,9 @@ pub async fn entries_for_list(
         .map(|e| {
             decrypted_list_key
                 .unseal_bytes(AeadSealedBytes(e.e_data.clone().0))
-                .map_err(ApiError::from)
+                .map_err(FpError::from)
                 .map(PiiBytes::new)
-                .and_then(|b| PiiString::try_from(b).map_err(ApiError::from))
+                .and_then(|b| PiiString::try_from(b).map_err(FpError::from))
         })
         .collect::<Result<Vec<_>, _>>()?;
 

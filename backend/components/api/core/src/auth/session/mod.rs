@@ -4,7 +4,8 @@ use std::sync::Arc;
 mod data;
 pub use data::*;
 mod update;
-use crate::errors::ApiError;
+
+use crate::errors::ApiResult;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use paperclip::v2::schema::Apiv2Schema;
@@ -23,7 +24,7 @@ pub trait ExtractableAuthSession: Apiv2Schema + Sized + Send + Sync + 'static {
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
         req: RequestInfo,
-    ) -> Result<Self, ApiError>;
+    ) -> ApiResult<Self>;
 
     fn log_authed_principal(&self, root_span: RootSpan);
 }

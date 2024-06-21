@@ -9,7 +9,6 @@ use crate::decision::vendor::{
     self,
 };
 use crate::errors::ApiResult;
-use crate::ApiError;
 use crate::State;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -562,7 +561,7 @@ pub fn save_vres_for_doc_fixture_risk_signals(
     response: serde_json::Value,
     vendor_api: VendorAPI,
     wf_id: &WorkflowId,
-) -> Result<VerificationResult, ApiError> {
+) -> ApiResult<VerificationResult> {
     let di = DecisionIntent::get_or_create_for_workflow(conn, sv_id, wf_id, DecisionIntentKind::DocScan)?;
     let vreq = VerificationRequest::create(conn, (sv_id, &di.id, vendor_api).into())?;
     let e_response = vendor::verification_result::encrypt_verification_result_response(

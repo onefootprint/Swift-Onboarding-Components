@@ -1,11 +1,11 @@
 use super::super::challenge_rate_limit::RateLimit;
 use super::vendors::SmsVendorKind;
 use crate::errors::user::UserError;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::sms::vendors::SmsSendStatus;
 use crate::State;
+use api_errors::FpError;
 use aws_credential_types::provider::SharedCredentialsProvider;
 use chrono::Duration;
 use crypto::sha256;
@@ -133,7 +133,7 @@ impl SmsClient {
         state: &State,
         message: SmsMessage,
         destination: PhoneNumber,
-        tx: Sender<ApiError>,
+        tx: Sender<FpError>,
     ) -> ApiResult<()> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
@@ -163,7 +163,7 @@ impl SmsClient {
         &self,
         message: SmsMessage,
         destination: PhoneNumber,
-        mut tx: Option<Sender<ApiError>>,
+        mut tx: Option<Sender<FpError>>,
     ) -> ApiResult<()> {
         let e164 = destination.e164();
         // Assemble the list of vendors we will use to attempt to send the message.
@@ -273,7 +273,7 @@ impl SmsClient {
         destination: PhoneNumber,
         vault_id: VaultId,
         sandbox_id: Option<SandboxId>,
-    ) -> ApiResult<(Receiver<ApiError>, PhoneEmailChallengeState, SecondsBeforeRetry)> {
+    ) -> ApiResult<(Receiver<FpError>, PhoneEmailChallengeState, SecondsBeforeRetry)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
         // we wait for twilio latency
         if destination.is_fixture_phone_number() && sandbox_id.is_none() {
@@ -316,7 +316,7 @@ pub struct BoSessionSmsInfo<'a> {
 #[tracing::instrument(skip_all)]
 /// Wait for the provided timeout_s to see if the background task asynchronously either
 /// (1) completes or (2) sends us an error.
-pub async fn rx_background_error(rx: Receiver<ApiError>, timeout_s: u64) -> ApiResult<()> {
+pub async fn rx_background_error(rx: Receiver<FpError>, timeout_s: u64) -> ApiResult<()> {
     match tokio::time::timeout(std::time::Duration::from_secs(timeout_s), rx).await {
         Ok(Ok(err)) => {
             tracing::warn!(err=%err, "Error received");

@@ -6,9 +6,7 @@ use crate::decision::document::meta_headers::MetaHeaders;
 use crate::decision::{
     self,
 };
-use crate::errors::onboarding::OnboardingError;
 use crate::utils::file_upload::FileUpload;
-use crate::ApiErrorKind;
 use crate::State;
 use api_wire_types::CreateDocumentRequest;
 use chrono::Utc;
@@ -96,11 +94,8 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
     .await;
 
     // we are expecting a no consent error
-    let err = upload_res_no_consent.err().unwrap().into_kind();
-    match err {
-        ApiErrorKind::OnboardingError(OnboardingError::UserConsentNotFound) => {}
-        _ => panic!("wrong error found when uploading a side without consent"),
-    }
+    let err = upload_res_no_consent.err().unwrap().message();
+    assert_eq!(err, "User consent not found for onboarding");
     // Now add consent
     let wf_id = wf.id.clone();
     state
@@ -177,11 +172,8 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     )
     .await;
 
-    let err = identity_doc_res.err().unwrap().into_kind();
-    match err {
-        ApiErrorKind::OnboardingError(OnboardingError::UnsupportedDocumentType(_)) => {}
-        _ => panic!("wrong error found when trying to uploading a doc with wrong type"),
-    }
+    let err = identity_doc_res.err().unwrap().message();
+    assert!(err.contains("Unsupported document type. Supported document types:"));
     //
     // Add DL, but wrong country
     //
@@ -205,9 +197,6 @@ async fn test_add_unsupported_doc_type(state: &mut State, user_kind: UserKind) {
     )
     .await;
 
-    let err = identity_doc_res.err().unwrap().into_kind();
-    match err {
-        ApiErrorKind::OnboardingError(OnboardingError::UnsupportedDocumentCountryForDocumentType(_)) => {}
-        _ => panic!("wrong error found when trying to uploading a doc with wrong country"),
-    }
+    let err = identity_doc_res.err().unwrap().message();
+    assert!(err.contains("Unsupported document country. Supported document countries"));
 }

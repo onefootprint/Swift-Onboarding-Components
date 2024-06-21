@@ -143,10 +143,11 @@ async fn vendor_error(state: &mut State, vault_kind: VaultKind) {
     let TaskError::ApiError(e) = res.err().unwrap() else {
         panic!();
     };
-    assert!(matches!(
-        e.kind(),
-        crate::ApiErrorKind::VendorRequestFailed(_) | crate::ApiErrorKind::IdvError(_)
-    ));
+    assert!(
+        e.message()
+            == "Incode error: Incode API Error: IncodeAPIResponseError Something bad happened yo:  in >"
+            || e.message() == "IDology error: Could not parse error code: uhoh"
+    );
 
     assert_eq!(WatchlistCheckStatusKind::Pending, wc.status);
     assert!(ut.is_none());

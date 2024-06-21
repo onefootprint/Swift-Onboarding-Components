@@ -2,7 +2,6 @@ use super::config::EgressConfig;
 use super::ssrf_protection::validate_safe_url;
 use super::ssrf_protection::PublicIpDNSResolver;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::State;
 use bytes::Bytes;
@@ -31,7 +30,7 @@ pub async fn proxy_request(
     config_id: Option<ProxyConfigId>,
     body: PiiString,
     config: EgressConfig,
-) -> Result<ProxyResponse, ApiError> {
+) -> ApiResult<ProxyResponse> {
     // Prevent SSRF as much as possible before DNS resolution.
     validate_safe_url(&config.url)?;
 

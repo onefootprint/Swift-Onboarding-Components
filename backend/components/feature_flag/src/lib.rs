@@ -27,6 +27,16 @@ pub enum Error {
     SerdeJson(#[from] serde_json::Error),
 }
 
+impl api_errors::FpErrorTrait for Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
 struct ManagedClient {
     inner: launchdarkly_server_sdk::Client,
 }

@@ -1,7 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::get::EntityListResponse;
 use crate::types::response::CursorPaginatedResponse;
@@ -114,7 +113,7 @@ pub async fn post(
     };
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
+        .db_query(move |conn| -> ApiResult<_> {
             let page_size = (page_size + 1) as i64;
             let order_by = ScopedVaultCursorKind::LastActivityAt;
             let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(

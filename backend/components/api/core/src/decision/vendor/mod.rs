@@ -1,7 +1,7 @@
 use self::tenant_vendor_control::TenantVendorControl;
-use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
-use crate::ApiError;
+use crate::errors::AssertionError;
+use api_errors::FpError;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::incode_verification_session::IncodeVerificationSession;
@@ -39,9 +39,7 @@ pub fn get_vendor_apis_for_verification_requests(
         .filter(|v| tenant_vendor_control.enabled_vendor_apis().contains(v))
         .collect::<Vec<_>>();
     if vendor_apis.is_empty() {
-        Err(ApiErrorKind::AssertionError(
-            "Not enough information to send to any vendors".into(),
-        ))?;
+        Err(AssertionError("Not enough information to send to any vendors"))?;
     } // probably should add some more validations in the future, like make sure we are _at least_ sending
       // to a KYC vendor
     Ok(vendor_apis)
@@ -53,14 +51,38 @@ pub struct VendorAPIError {
     pub error: idv::Error,
 }
 
+impl api_errors::FpErrorTrait for VendorAPIError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        self.error.status_code()
+    }
+
+    fn code(&self) -> Option<String> {
+        self.error.code()
+    }
+
+    fn context(&self) -> Option<serde_json::Value> {
+        self.error.context()
+    }
+
+    fn message(&self) -> String {
+        self.error.message()
+    }
+}
+
 impl Display for VendorAPIError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.error)
     }
 }
 
-pub fn map_to_api_error<E: Into<idv::Error>>(e: E) -> ApiError {
-    ApiError::from(e.into())
+impl std::error::Error for VendorAPIError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.error.source()
+    }
+}
+
+pub fn map_to_api_error<E: Into<idv::Error>>(e: E) -> FpError {
+    FpError::from(e.into())
 }
 
 // Struct to help with additional verification related to Documents

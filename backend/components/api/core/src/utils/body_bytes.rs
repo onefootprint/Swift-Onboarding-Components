@@ -51,6 +51,19 @@ pub enum InvalidBodyError {
     #[error("The request body could not be decoded.")]
     FailedToDecode,
 }
+
+
+impl api_errors::FpErrorTrait for InvalidBodyError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+
 /// adapted from actix_web payload.rs to control limits per request
 mod actix_bytes {
     pub use super::*;

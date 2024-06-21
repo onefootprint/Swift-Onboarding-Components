@@ -1,6 +1,5 @@
 use super::verification_result::decrypt_verification_result_response;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
@@ -123,7 +122,7 @@ impl VendorResult {
         requests_and_results: Vec<RequestAndMaybeResult>,
         enclave_client: &EnclaveClient,
         user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> Result<Vec<Self>, ApiError> {
+    ) -> ApiResult<Vec<Self>> {
         let requests_with_responses: Vec<(VerificationRequest, VerificationResult, SealedVaultBytes)> =
             requests_and_results
                 .into_iter()
@@ -211,7 +210,7 @@ impl VendorResult {
 fn deserialize_from_vendor_api(
     raw_response: serde_json::Value,
     vendor_api: VendorAPI,
-) -> Result<ParsedResponse, ApiError> {
+) -> ApiResult<ParsedResponse> {
     let res: ParsedResponse = match vendor_api {
         VendorAPI::IdologyExpectId => ParsedResponse::from_idology_expectid_response(raw_response)?,
         VendorAPI::TwilioLookupV2 => ParsedResponse::from_twilio_lookupv2_response(raw_response)?,

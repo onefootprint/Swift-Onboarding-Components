@@ -11,8 +11,8 @@ use crate::task::{
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
-use crate::ApiError;
 use crate::State;
+use api_errors::FpError;
 use async_trait::async_trait;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
@@ -126,7 +126,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
         if !matches!(wc.status, WatchlistCheckStatusKind::Pending) {
             return Ok(());
         }
-        let di_id = wc.decision_intent_id.ok_or(ApiError::from(AssertionError(
+        let di_id = wc.decision_intent_id.ok_or(FpError::from(AssertionError(
             "Expected watchlist_check.decision_intent_id to be non-null",
         )))?;
 
@@ -177,7 +177,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
             ) => {
                 // logic that enqeues this Task should prevent this, but extra precaution
                 if !continuous_monitoring {
-                    return Err(ApiError::from(AssertionError(format!("WatchlistCheckTask run with an obc enhanced_aml.continuous_monitoring = false: {}, {}",tenant.id, obc.id).as_str())).into());
+                    return Err(FpError::from(AssertionError(format!("WatchlistCheckTask run with an obc enhanced_aml.continuous_monitoring = false: {}, {}",tenant.id, obc.id).as_str())).into());
                 }
                 if idv::requirements::vendor_api_requirements_are_satisfied(
                     &VendorAPI::IncodeWatchlistCheck,

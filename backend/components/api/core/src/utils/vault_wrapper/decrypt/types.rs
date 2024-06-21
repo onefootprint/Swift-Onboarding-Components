@@ -1,6 +1,6 @@
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::ApiErrorKind;
+use api_errors::FpError;
 use derive_more::Deref;
 use derive_more::DerefMut;
 use newtypes::output::Csv;
@@ -167,7 +167,7 @@ impl DecryptUncheckedResult {
         self.results
             .remove(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
             .ok_or(ApiErrorKind::MissingRequiredEntityData(di, Csv(transforms)))
-            .map_err(ApiError::from)
+            .map_err(FpError::from)
     }
 
     pub fn get_di<D: Into<DataIdentifier>>(&self, di: D) -> ApiResult<PiiString> {
@@ -180,7 +180,7 @@ impl DecryptUncheckedResult {
             .get(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
             .cloned()
             .ok_or(ApiErrorKind::MissingRequiredEntityData(di, Csv(transforms)))
-            .map_err(ApiError::from)
+            .map_err(FpError::from)
     }
 }
 

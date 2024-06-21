@@ -11,8 +11,8 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{
     self,
 };
-use crate::ApiError;
 use crate::State;
+use api_errors::FpError;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::NewAuditEvent;
 use db::models::insight_event::CreateInsightEvent;
@@ -79,7 +79,7 @@ pub async fn vault_pii(
                     filters
                         .apply_str::<String>(pii.leak())
                         .map(|mt| Some((DocumentDiKind::from_id_doc_kind(*doc_kind, *side), mt)))
-                        .map_err(ApiError::from)
+                        .map_err(FpError::from)
                         .transpose()
                 } else {
                     None
@@ -113,7 +113,7 @@ pub async fn vault_pii(
         let data = data
             .into_iter()
             .map(|(di, filters, value)| Ok((di, filters.apply_str::<PiiString>(value.leak())?)))
-            .collect::<Result<Vec<_>, ApiError>>()?;
+            .collect::<ApiResult<Vec<_>>>()?;
 
         let data: HashMap<_, _> = data.into_iter().collect();
         let documents: HashMap<_, _> = documents.into_iter().collect();

@@ -79,31 +79,7 @@ pub enum ErrorWithCode {
     MissingAuthHeader(String),
 }
 
-// TODO can remove this in favor of new FpErrorTrait
-pub(crate) trait CodedError: std::error::Error {
-    fn context(&self) -> Option<Value>;
-    fn code(&self) -> String;
-    fn status_code(&self) -> StatusCode;
-}
-
-impl CodedError for ErrorWithCode {
-    fn context(&self) -> Option<Value> {
-        let context = match self {
-            Self::RateLimited(seconds) => json!({ "seconds": seconds }),
-            Self::UnsupportedChallengeKind(challenge_kind) => json!({ "challenge_kind": challenge_kind }),
-            Self::InvalidMimeType(file_type) => json!({ "file_type": file_type }),
-            Self::FileTooLarge(max_size) => json!({ "max_size": max_size }),
-            Self::ExistingVault(token) => json!({ "token": token }),
-            Self::MissingAuthHeader(h) => json!({"header": h}),
-            _ => return None,
-        };
-        Some(context)
-    }
-
-    fn code(&self) -> String {
-        ErrorWithCodeKind::from(self).to_string()
-    }
-
+impl api_errors::FpErrorTrait for ErrorWithCode {
     fn status_code(&self) -> StatusCode {
         match self {
             Self::InvalidStatusTransition => StatusCode::BAD_REQUEST,
@@ -130,6 +106,46 @@ impl CodedError for ErrorWithCode {
             Self::FileUploadTimeout => StatusCode::REQUEST_TIMEOUT,
             Self::MissingAuthHeader(_) => StatusCode::UNAUTHORIZED,
         }
+    }
+
+    fn code(&self) -> Option<String> {
+        Some(ErrorWithCodeKind::from(self).to_string())
+    }
+
+    fn context(&self) -> Option<Value> {
+        let context = match self {
+            Self::RateLimited(seconds) => json!({ "seconds": seconds }),
+            Self::UnsupportedChallengeKind(challenge_kind) => json!({ "challenge_kind": challenge_kind }),
+            Self::InvalidMimeType(file_type) => json!({ "file_type": file_type }),
+            Self::FileTooLarge(max_size) => json!({ "max_size": max_size }),
+            Self::ExistingVault(token) => json!({ "token": token }),
+            Self::MissingAuthHeader(h) => json!({"header": h}),
+            _ => return None,
+        };
+        Some(context)
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+
+    fn mutate_response(&self, resp: &mut actix_web::HttpResponseBuilder) {
+        // Failing to close the TCP connection after sending a timeout response allows clients to
+        // continue sending request data even server has sent an error response. This would create
+        // unneccesary work for both the server and the client.
+        //
+        // Closing the connection on FileTooLarge errors works around a long-standing actix-web
+        // bug:
+        // https://github.com/actix/actix-web/issues/2357
+        // https://github.com/actix/actix-web/issues/3152
+        // May not be necessary in all environments (e.g. load balancers mask the issue), but it's
+        // necessary in local dev to prevent the client from hanging.
+        match self {
+            ErrorWithCode::FileUploadTimeout | ErrorWithCode::FileTooLarge(_) => {
+                resp.force_close();
+            }
+            _ => {}
+        };
     }
 }
 

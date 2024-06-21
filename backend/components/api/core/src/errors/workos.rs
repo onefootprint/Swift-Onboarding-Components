@@ -24,3 +24,23 @@ pub enum WorkOsError {
     #[error("{0}")]
     Generic(#[from] LibWorkOsError<()>),
 }
+
+impl api_errors::FpErrorTrait for WorkOsError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        match self {
+            WorkOsError::GetProfileAndToken(::workos::WorkOsError::Operation(e)) => {
+                if e.error == *"invalid_grant" {
+                    // Should not 500 when the token is invalid
+                    api_errors::StatusCode::BAD_REQUEST
+                } else {
+                    api_errors::StatusCode::INTERNAL_SERVER_ERROR
+                }
+            }
+            _ => api_errors::StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}

@@ -40,10 +40,10 @@ impl<T: DeserializeOwned, const LIMIT: usize> FromRequest for LargeJson<T, LIMIT
 /// to poll the json parsing future
 mod actix_json {
     use super::*;
-    use crate::ApiErrorKind;
+    use api_errors::FpError;
 
     fn err_handler(err: JsonPayloadError) -> ActixError {
-        actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidJsonBody(err)))
+        actix_web::Error::from(ModernApiError::from(FpError::from(err)))
     }
 
     pub struct JsonExtractFut<T, const LIMIT: usize> {

@@ -6,7 +6,6 @@ use crate::decision::state::test_utils::{
 };
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::errors::ApiResult;
-use crate::ApiErrorKind;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
@@ -324,21 +323,12 @@ async fn assert_expected_result(
         }
         ExpectedResult::ErrVendorRequestsFailed => {
             let err = res.err().unwrap();
-            if !matches!(err.kind(), ApiErrorKind::VendorRequestsFailed) {
-                panic!("{:#?}", err);
-            }
+            assert_eq!(err.message(), "One or more vendor requests failed");
             // TODO: could also assert that vreq/vres with is_error = true was written
         }
         ExpectedResult::ErrNotEnoughInformation => {
-            let err = res.err().unwrap();
-            if let ApiErrorKind::AssertionError(s) = err.kind() {
-                assert_eq!(
-                    "Not enough information to send to any vendors".to_owned(),
-                    s.to_owned()
-                );
-            } else {
-                panic!("{:#?}", err);
-            }
+            let err = res.err().unwrap().message();
+            assert_eq!(err, "Not enough information to send to any vendors",);
         }
     };
 }

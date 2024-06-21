@@ -2,6 +2,7 @@ use crate::auth::AuthError;
 use crate::State;
 use actix_web::web;
 use actix_web::FromRequest;
+use api_errors::FpError;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use std::marker::PhantomData;
@@ -42,11 +43,11 @@ impl FromRequest for CustodianAuthContext {
             .clone();
 
         Box::pin(async move {
-            let custodian_key = custodian_key?;
+            let custodian_key = custodian_key.map_err(FpError::from)?;
             if crypto::safe_compare(custodian_key.as_bytes(), expected_custodian_key.as_bytes()) {
                 Ok(Self { phantom: PhantomData })
             } else {
-                Err(AuthError::InvalidHeader(HEADER_NAME.to_owned()).into())
+                Err(FpError::from(AuthError::InvalidHeader(HEADER_NAME.to_owned())).into())
             }
         })
     }

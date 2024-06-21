@@ -2,7 +2,6 @@
 use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
-use crate::errors::ApiError;
 use crate::vendor_clients::VendorClient;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
@@ -393,7 +392,7 @@ pub async fn make_idv_request(
 }
 
 pub type VerificationRequestWithVendorResponse = (VerificationRequest, VendorResponse);
-pub type VerificationRequestWithVendorError = (VerificationRequest, ApiError);
+pub type VerificationRequestWithVendorError = (VerificationRequest, VendorAPIError);
 
 #[tracing::instrument(skip_all,
     fields(vreqs = ?requests.iter().map(|r| r.id.clone()).collect::<Vec<_>>(),
@@ -404,8 +403,7 @@ pub async fn make_vendor_requests(
     tvc: TenantVendorControl,
     requests: Vec<VerificationRequest>,
     wf_id: &WorkflowId, // TODO: remove?
-) -> Result<Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>, ApiError>
-{
+) -> ApiResult<Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>> {
     let requests_with_data =
         build_request::bulk_build_data_from_requests(&state.db_pool, &state.enclave_client, requests).await?;
 
@@ -444,8 +442,7 @@ pub async fn make_vendor_requests(
                         log_msg
                     );
 
-                    Err((reqs[idx].clone(), ApiError::from(err))) // TODO: no need to wrap in
-                                                                  // ApiError
+                    Err((reqs[idx].clone(), err))
                 }
             }
         })

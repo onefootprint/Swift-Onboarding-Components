@@ -676,12 +676,21 @@ name = "api_errors"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "aws-sdk-pinpointsmsvoicev2",
+ "base64 0.13.0",
  "derive_more",
+ "http 0.2.9",
+ "regex",
+ "reqwest 0.11.27",
+ "reqwest-middleware",
  "serde",
  "serde_cbor",
  "serde_json",
+ "strum",
  "thiserror",
  "tracing",
+ "url",
+ "webauthn-rs-core",
 ]
 
 [[package]]
@@ -1299,6 +1308,7 @@ dependencies = [
  "actix-multipart",
  "actix-web",
  "api_core",
+ "api_errors",
  "api_wire_types",
  "aws-config",
  "aws-sdk-kms",
@@ -1328,6 +1338,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "api_core",
+ "api_errors",
  "api_wire_types",
  "aws-config",
  "aws-sdk-kms",
@@ -1477,6 +1488,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "api_core",
+ "api_errors",
  "api_wire_types",
  "crypto",
  "db",
@@ -1529,6 +1541,7 @@ dependencies = [
  "actix-web-opentelemetry",
  "anyhow",
  "api_core",
+ "api_errors",
  "api_route_private_protected",
  "api_route_private_root",
  "api_routes_root",
@@ -1579,6 +1592,7 @@ dependencies = [
 name = "app-attest"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "base64 0.13.0",
  "byteorder",
  "chrono",
@@ -2509,6 +2523,7 @@ dependencies = [
 name = "billing"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "async-stripe",
  "chrono",
  "db",
@@ -3209,6 +3224,7 @@ version = "0.1.0"
 dependencies = [
  "aead 0.5.1",
  "aes-gcm 0.10.3",
+ "api_errors",
  "base64 0.13.0",
  "chacha20poly1305",
  "elliptic-curve 0.12.3",
@@ -4110,6 +4126,7 @@ dependencies = [
 name = "feature_flag"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "itertools",
  "launchdarkly-server-sdk",
  "mockall",
@@ -4965,6 +4982,7 @@ name = "idv"
 version = "0.1.0"
 dependencies = [
  "actix-rt",
+ "api_errors",
  "async-trait",
  "base64 0.13.0",
  "chrono",
@@ -6727,6 +6745,7 @@ dependencies = [
 name = "privacy_pass"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "blind-rsa-signatures",
  "byteorder",
  "crypto",
@@ -7434,6 +7453,7 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "byteorder",
  "chrono",
  "crypto",
@@ -7850,6 +7870,7 @@ dependencies = [
 name = "selfie_doc"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "async-trait",
  "aws-config",
  "aws-sdk-rekognition",
@@ -9098,6 +9119,7 @@ checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
 name = "twilio"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "newtypes",
  "rand 0.8.5",
  "reqwest 0.11.27",
@@ -9327,6 +9349,7 @@ checksum = "830b7e5d4d90034032940e4ace0d9a9a057e7a45cd94e6c007832e39edb82f6d"
 name = "vault_dr"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "thiserror",
 ]
 
@@ -9547,6 +9570,7 @@ dependencies = [
 name = "webhooks"
 version = "0.1.0"
 dependencies = [
+ "api_errors",
  "async-trait",
  "chrono",
  "derive_more",

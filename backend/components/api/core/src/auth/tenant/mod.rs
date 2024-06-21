@@ -24,7 +24,6 @@ use super::AuthError;
 use super::Either;
 use super::IsGuardMet;
 use super::SessionContext;
-use crate::errors::ApiError;
 use crate::errors::ApiResult;
 use crate::errors::ValidationError;
 use crate::State;
@@ -94,7 +93,7 @@ impl From<PartnerTenantSessionAuth> for TenantOrPartnerTenantSessionAuth {
 
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
-    fn is_live(&self) -> Result<bool, ApiError>;
+    fn is_live(&self) -> ApiResult<bool>;
     fn actor(&self) -> AuthActor;
     fn scopes(&self) -> Vec<TenantScope>;
     fn dl_source(&self) -> DataLifetimeSource;

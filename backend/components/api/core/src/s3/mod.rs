@@ -297,6 +297,17 @@ pub enum S3Error {
     BuildError(#[from] aws_sdk_s3::error::BuildError),
 }
 
+impl api_errors::FpErrorTrait for S3Error {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+
 impl From<actix_multipart::MultipartError> for S3Error {
     fn from(value: actix_multipart::MultipartError) -> Self {
         Self::MultipartUpload(format!("{:?}", &value))

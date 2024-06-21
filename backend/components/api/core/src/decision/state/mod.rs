@@ -43,6 +43,25 @@ pub enum StateError {
     WorkflowActionsConversionError(WorkflowActionsKind),
 }
 
+impl api_errors::FpErrorTrait for StateError {
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+
+    fn code(&self) -> Option<String> {
+        match self {
+            StateError::IncodeMachineConcurrentStateChange(_, _) => {
+                Some(api_errors::INCODE_MACHINE_CONCURRENT_CHANGE.to_owned())
+            }
+            _ => None,
+        }
+    }
+}
+
 use super::vendor::incode::IncodeStateMachine;
 use document::DocumentState;
 use kyc::KycState;

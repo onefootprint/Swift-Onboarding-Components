@@ -1,6 +1,5 @@
 use crate::config::Config;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiError;
 use crate::fingerprinter::AwsHmacClient;
 use crate::metrics::Metrics;
 use crate::s3::S3Client;
@@ -13,6 +12,7 @@ use crate::utils::sms::SmsClient;
 use crate::vendor_clients::VendorClient;
 use crate::vendor_clients::VendorClients;
 use crate::GIT_HASH;
+use api_errors::FpError;
 use crypto::aead::ScopedSealingKey;
 use db::tests::MockFFClient;
 use db::DbPool;
@@ -297,7 +297,7 @@ impl State {
         };
         let db_statement_timeout = Duration::from_secs(config.database_statement_timeout_sec);
         let db_pool = db::init(&config.database_url, db_statement_timeout, db_max_conns)
-            .map_err(ApiError::from)
+            .map_err(FpError::from)
             .expect("failed to init db pool");
 
         // our session key

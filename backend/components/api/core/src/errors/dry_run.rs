@@ -1,5 +1,6 @@
 use super::ApiResult;
 use crate::ApiError;
+use api_errors::FpError;
 use db::DbError;
 
 /// Drop-in replacement for ApiError when we also want to be able to roll back a transaction
@@ -12,7 +13,7 @@ pub enum DryRunError<T> {
 // Any error type from conn.transaction() needs to implement From<DbError>
 impl<T> From<DbError> for DryRunError<T> {
     fn from(value: DbError) -> Self {
-        Self::Err(ApiError::from(value))
+        Self::Err(FpError::from(value))
     }
 }
 
