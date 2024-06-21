@@ -2,3 +2,4 @@
 *.out
 *.txt
 !fake_data.csv
+*.log

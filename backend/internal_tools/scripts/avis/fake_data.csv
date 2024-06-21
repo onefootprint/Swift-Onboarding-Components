@@ -1,11 +1,11 @@
-external_id,email,phone,first_name,last_name,dob,address_line1,city,state,zip,country,drivers_license_number
-550e8400-e29b-41d4-a716-446655440000,johndoe@example.com,+11234567890,John,Doe,1990-01-01,123 Elm St,Springfield,IL,62704,US,D1234567
-e29b41d4-a716-550e-8400-446655440000,janedoe@example.com,+12345678901,Jane,Doe,1985-02-02,456 Oak St,Springfield,IL,62704,US,D2345678
-a7164466-5544-550e-8400-41d4e29b0000,robertsmith@example.com,+13456789012,Robert,Smith,1978-03-03,789 Pine St,Chicago,IL,60605,US,D3456789
-44665544-0000-550e-8400-e29b41d4a716,lindajones@example.com,+14567890123,Linda,Jones,1965-04-04,101 Maple St,Chicago,IL,60605,US,D4567890
-41d4a716-550e-8400-e29b-446655440000,michaelbrown@example.com,+15678901234,Michael,Brown,1992-05-05,202 Birch St,Peoria,IL,61602,US,D5678901
-550e4466-0000-41d4-a716-e29b55448400,sarahmiller@example.com,+16789012345,Sarah,Miller,1980-06-06,303 Cedar St,Peoria,IL,61602,US,D6789012
-e29b41d4-8400-550e-5544-4466a7160000,davidwilson@example.com,+17890123456,David,Wilson,1975-07-07,404 Spruce St,Aurora,IL,60504,US,D7890123
-5544e29b-41d4-8400-a716-550044665000,emilydavis@example.com,+18901234567,Emily,Davis,1988-08-08,505 Walnut St,Aurora,IL,60504,US,D8901234
-a7165500-4466-e29b-41d4-000084004554,chrisgarcia@example.com,+19012345678,Chris,Garcia,1995-09-09,606 Chestnut St,Rockford,IL,61101,US,D9012345
-446641d4-8400-5544-550e-0000e29ba716,amandahernandez@example.com,+10123456789,Amanda,Hernandez,1983-10-10,707 Willow St,Rockford,IL,61101,US,D0123456
+RA_NO,RENTAL_EMAIL_ADDRESS,FIRST_NAME,LAST_NAME,DOB_TRIMMED,STREET_ADDRESS,CITY,STATE,ZIP_CODE,COUNTRY,DRIVER_LICENSE_STATE_CODE,DRIVER_LICENSE_NO
+U891708546,dawnbridges@gmail.com,Carla,Rogers,1972-11-14,3874 Hudson Row,North Johnville,AK,19330,US,FL,R89728863
+U420314669,ojohnson@yahoo.com,Caleb,Briggs,1970-10-03,69561 Ingram Groves Suite 633,Patrickbury,MS,48059,US,MS,B53317834
+U121120437,ryan00@yahoo.com,Danny,Perez,2006-05-22,840 Sean Manor,Schneiderbury,NH,48297,US,ID,S98201644
+U496520257,tcoleman@gmail.com,Joshua,Adams,1942-01-04,3162 Matthew Row Suite 715,East Meganfurt,NJ,05796,US,OK,L47264447
+U588336001,walshronnie@burnett.com,Breanna,Murray,1987-08-16,75556 Jennifer Stravenue Suite 647,Williamsbury,OR,30948,US,NY,H50885434
+U907349279,longjohn@martinez.com,Colleen,Moore,1994-09-20,7766 Maynard Harbor Apt. 310,Virginiatown,NH,08107,US,NH,M29220187
+U700150758,shawnduarte@burns.biz,Richard,Reid,1977-06-24,428 Calvin Passage Apt. 732,Kennethton,IA,97252,US,SD,R97119415
+U919740648,barbara13@lee-mcgee.net,Harold,Arellano,1997-04-10,62933 Flores Overpass,Brownview,ND,40201,US,WY,Y30604223
+U373655157,jpeterson@yahoo.com,Jessica,Barajas,2002-02-21,46024 Watson Plains,Port Kellyborough,SC,56179,US,MN,F89538361
+U666385916,pbaker@hotmail.com,Duane,Savage,1994-04-17,312 Wayne Ports,New Drew,NH,01367,US,MA,K26140060
