@@ -403,6 +403,7 @@ impl LexisRequest {
             verification_request_id,
             drivers_license_number,
             drivers_license_state: _,
+            itin: _,
         } = idv_data;
 
         let dob = if let Some(dob) = dob {

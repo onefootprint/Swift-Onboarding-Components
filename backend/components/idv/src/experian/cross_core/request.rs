@@ -143,6 +143,7 @@ impl Contact {
             verification_request_id: _,
             drivers_license_number: _,
             drivers_license_state: _,
+            itin: _,
         } = d;
 
         let first_name = first_name

@@ -39,7 +39,7 @@ impl IsGuardMet<UserAuthScope> for CanDecrypt {
                         .or(UserAuthScope::SignUp)
                         .is_met(token_scopes)
                 }
-                IDK::DriversLicenseNumber | IDK::Ssn4 | IDK::Ssn9 => {
+                IDK::UsTaxId | IDK::Itin | IDK::DriversLicenseNumber | IDK::Ssn4 | IDK::Ssn9 => {
                     UserAuthScope::SensitiveProfile.is_met(token_scopes)
                 }
             },

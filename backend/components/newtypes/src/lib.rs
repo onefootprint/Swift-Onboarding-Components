@@ -101,6 +101,8 @@ pub enum Error {
     InvalidSsn9(String),
     #[error("Invalid SSN4: {0}")]
     InvalidSsn4(String),
+    #[error("Invalid ITIN: {0}")]
+    InvalidItin(String),
     #[error("{0}")]
     PhoneNumber(#[from] fields::phone_number::Error),
     #[error("Invalid phone number country code: {0}")]

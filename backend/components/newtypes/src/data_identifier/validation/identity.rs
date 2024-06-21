@@ -7,8 +7,10 @@ use super::utils::{
 use super::Error;
 use super::VResult;
 use crate::email::Email;
+use crate::ssn::Itin;
 use crate::ssn::Ssn4;
 use crate::ssn::Ssn9;
+use crate::ssn::SsnOrItin;
 use crate::AllData;
 use crate::CleanAndValidate;
 use crate::DataIdentifierValue;
@@ -31,6 +33,7 @@ pub enum IdentityData {
     // TODO: Make this Ssn9(Ssn9) once we decide on one of old_clean_and_validate_ssn9 or
     // new_clean_and_validate_ssn9.
     Sss9(PiiString),
+    UsTaxId(SsnOrItin),
 }
 
 impl CleanAndValidate for IDK {
@@ -80,6 +83,16 @@ impl CleanAndValidate for IDK {
                     di: self.into(),
                     value: ssn9.clone(),
                     parsed: Some(IdentityData::Sss9(ssn9)),
+                });
+            }
+            IDK::Itin => clean_and_validate_itin(value.as_string()?)?,
+            IDK::UsTaxId => {
+                let parsed = SsnOrItin::parse(value.as_string()?)?;
+
+                return Ok(DataIdentifierValue {
+                    di: self.into(),
+                    value: parsed.clone().value(),
+                    parsed: Some(IdentityData::UsTaxId(parsed)),
                 });
             }
         };
@@ -245,6 +258,12 @@ fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
 
     old_result
 }
+
+fn clean_and_validate_itin(input: PiiString) -> NtResult<PiiString> {
+    let itin = Itin::parse(input)?;
+    Ok(itin.format_no_dashes())
+}
+
 
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq)]
 #[strum(serialize_all = "snake_case")]

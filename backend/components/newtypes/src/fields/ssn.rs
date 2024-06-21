@@ -11,6 +11,7 @@ lazy_static! {
     static ref SSN9_BAD_GROUP_3: Regex = Regex::new(r"^\d{3}-?\d{2}-?0000$").unwrap();
 }
 
+#[derive(Clone)]
 pub struct Ssn9(PiiString);
 
 impl Ssn9 {
@@ -44,6 +45,72 @@ impl Ssn9 {
     }
 }
 
+#[derive(Clone)]
+pub struct Itin(PiiString);
+
+impl Itin {
+    /// All valid ITINs are a nine-digit number in the same
+    /// format as the SSN (9XX-8X-XXXX), begins with a “9”
+    /// and the 4th and 5th digits range from 50 to 65, 70 to 88,
+    /// 90 to 92, and 94 to 99
+    pub fn parse(val: PiiString) -> Result<Self, Error> {
+        let value = val.leak();
+        if !SSN9_FORMAT.is_match(value) {
+            return Err(Error::InvalidItin(
+                "Must have format ###-##-####, with optional dashes".into(),
+            ));
+        }
+
+        if !value.starts_with('9') {
+            return Err(Error::InvalidItin("Must start with 9".into()));
+        }
+
+        let digits: String = value.chars().filter(|c| c.is_ascii_digit()).collect();
+        if digits.len() != 9 {
+            return Err(Error::InvalidItin("Must contain exactly 9 digits".into()));
+        }
+        let d45 = digits[3..5].parse::<u32>().unwrap();
+
+        if (50..=65).contains(&d45)
+            || (70..=88).contains(&d45)
+            || (90..=92).contains(&d45)
+            || (94..=99).contains(&d45)
+        {
+            Ok(Itin(digits.into()))
+        } else {
+            Err(Error::InvalidItin(
+                "4th and 5th digits range from 50 to 65, 70 to 88, 90 to 92, and 94 to 99".into(),
+            ))
+        }
+    }
+
+    pub fn format_no_dashes(&self) -> PiiString {
+        self.0.clone()
+    }
+}
+
+#[derive(Clone)]
+pub enum SsnOrItin {
+    Ssn(PiiString),
+    Itin(PiiString),
+}
+
+impl SsnOrItin {
+    pub fn parse(val: PiiString) -> Result<Self, Error> {
+        if val.leak().starts_with('9') {
+            Ok(SsnOrItin::Itin(Itin::parse(val)?.0))
+        } else {
+            Ok(SsnOrItin::Ssn(Ssn9::parse(val)?.0))
+        }
+    }
+
+    pub fn value(self) -> PiiString {
+        match self {
+            SsnOrItin::Ssn(ssn) => ssn,
+            SsnOrItin::Itin(itin) => itin,
+        }
+    }
+}
 pub struct Ssn4(PiiString);
 
 impl Ssn4 {

@@ -72,6 +72,7 @@ pub async fn build_idv_data_from_verification_request(
         country: decrypted_values.remove(&IDK::Country.into()),
         ssn4: decrypted_values.remove(&IDK::Ssn4.into()),
         ssn9: decrypted_values.remove(&IDK::Ssn9.into()),
+        itin: decrypted_values.remove(&IDK::Itin.into()),
         dob: decrypted_values.remove(&IDK::Dob.into()),
         drivers_license_number: decrypted_values.remove(&IDK::DriversLicenseNumber.into()),
         drivers_license_state: decrypted_values.remove(&IDK::DriversLicenseState.into()),

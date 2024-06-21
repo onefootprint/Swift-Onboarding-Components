@@ -209,6 +209,7 @@ impl<Type> VaultWrapper<Type> {
                 }
             }
         }
+
         if !validation_errors.is_empty() {
             let validation_error = DataValidationError::FieldValidationError(validation_errors);
             return Err(newtypes::Error::from(validation_error).into());

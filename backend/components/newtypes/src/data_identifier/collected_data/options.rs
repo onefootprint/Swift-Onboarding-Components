@@ -69,6 +69,8 @@ pub enum CollectedDataOption {
     InvestorProfile,
 
     Card,
+
+    UsTaxId,
 }
 
 crate::util::impl_enum_string_diesel!(CollectedDataOption);
@@ -120,6 +122,7 @@ impl TryFrom<CollectedDataOptionKind> for CollectedDataOption {
             CollectedDataOptionKind::Card => Self::Card,
             CollectedDataOptionKind::Nationality => Self::Nationality,
             CollectedDataOptionKind::UsLegalStatus => Self::UsLegalStatus,
+            CollectedDataOptionKind::UsTaxId => Self::UsTaxId,
             CollectedDataOptionKind::Document => {
                 return Err(crate::Error::Custom("Cannot convert".to_owned()))
             }
@@ -150,6 +153,7 @@ impl CollectedDataOption {
             Self::Card => CollectedData::Card,
             Self::Nationality => CollectedData::Nationality,
             Self::UsLegalStatus => CollectedData::UsLegalStatus,
+            Self::UsTaxId => CollectedData::UsTaxId,
         }
     }
 
@@ -211,6 +215,7 @@ impl CollectedDataOption {
                 IDK::VisaExpirationDate.into(),
                 IDK::Citizenships.into(),
             ]),
+            Self::UsTaxId => Some(vec![IDK::UsTaxId.into()]),
         }
     }
 
@@ -252,6 +257,7 @@ impl CollectedDataOption {
 
             Self::Nationality => vec![IDK::Nationality.into()],
             Self::UsLegalStatus => vec![IDK::UsLegalStatus.into()],
+            Self::UsTaxId => vec![IDK::UsTaxId.into()],
         }
     }
 

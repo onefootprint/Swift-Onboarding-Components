@@ -31,6 +31,8 @@ pub enum CollectedData {
     UsLegalStatus,
     /// Deprecated for new playbooks, but we have a few legacy playbooks using this in prod
     Nationality,
+
+    UsTaxId,
 }
 
 impl CollectedData {
@@ -60,6 +62,7 @@ impl CollectedData {
             Self::Document => vec![],
             Self::UsLegalStatus => vec![UsLegalStatus],
             Self::Nationality => vec![Nationality],
+            Self::UsTaxId => vec![UsTaxId],
         }
     }
 
@@ -79,7 +82,8 @@ impl CollectedData {
             | Self::Email
             | Self::PhoneNumber
             | Self::Nationality
-            | Self::UsLegalStatus => DataIdentifierDiscriminant::Id,
+            | Self::UsLegalStatus
+            | Self::UsTaxId => DataIdentifierDiscriminant::Id,
             Self::Document => DataIdentifierDiscriminant::Document,
             Self::InvestorProfile => DataIdentifierDiscriminant::InvestorProfile,
             Self::Card => DataIdentifierDiscriminant::Card,

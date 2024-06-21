@@ -1,3 +1,4 @@
+use crate::ssn::SsnOrItin;
 use crate::CardData;
 use crate::CardDataKind;
 use crate::CardExpiration;
@@ -11,6 +12,7 @@ use crate::LuhnValidatedCardNumber;
 use crate::ParsedDataIdentifier;
 use crate::PiiString;
 use itertools::chain;
+
 
 pub trait DeriveValues {
     fn derive_values(&self) -> Vec<DataIdentifierValue>;
@@ -122,19 +124,39 @@ impl DeriveValues for IdentityData {
     fn derive_values(&self) -> Vec<DataIdentifierValue> {
         match self {
             IdentityData::Sss9(ssn9) => {
-                let ssn4 = PiiString::new(
-                    ssn9.leak()
-                        .chars()
-                        .skip(ssn9.leak().len().saturating_sub(4))
-                        .collect(),
-                );
-
-                vec![DataIdentifierValue {
-                    di: DataIdentifier::Id(IdentityDataKind::Ssn4),
-                    value: ssn4,
-                    parsed: (),
-                }]
+                vec![get_ssn4_from_ssn9(ssn9)]
             }
+            IdentityData::UsTaxId(ssn_or_itin) => match ssn_or_itin {
+                SsnOrItin::Ssn(ssn9) => {
+                    let ssn4 = get_ssn4_from_ssn9(ssn9);
+                    let ssn9 = DataIdentifierValue {
+                        di: DataIdentifier::Id(IdentityDataKind::Ssn9),
+                        value: ssn9.clone(),
+                        parsed: (),
+                    };
+                    vec![ssn9, ssn4]
+                }
+                SsnOrItin::Itin(itin) => vec![DataIdentifierValue {
+                    di: DataIdentifier::Id(IdentityDataKind::Itin),
+                    value: itin.clone(),
+                    parsed: (),
+                }],
+            },
         }
+    }
+}
+
+fn get_ssn4_from_ssn9(ssn9: &PiiString) -> DataIdentifierValue {
+    let ssn4 = PiiString::new(
+        ssn9.leak()
+            .chars()
+            .skip(ssn9.leak().len().saturating_sub(4))
+            .collect(),
+    );
+
+    DataIdentifierValue {
+        di: DataIdentifier::Id(IdentityDataKind::Ssn4),
+        value: ssn4,
+        parsed: (),
     }
 }

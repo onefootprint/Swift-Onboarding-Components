@@ -419,6 +419,10 @@ footprint_reason_code_enum! {
         #[note = "SSN not provided", severity = SignalSeverity::High,  description = "The user indicated they do not have an SSN."]
         SsnNotProvided,
 
+        #[scope = SignalScope::Itin, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+        #[note = "US Tax ID is ITIN", severity = SignalSeverity::Low,  description = "The user provided an ITIN as their US Tax ID."]
+        UsTaxIdIsItin,
+
         // ~~~~~~~~~~~~ ITIN ~~~~~~~~~~~~
         #[scope = SignalScope::Itin, additional_scopes = vec![], match_level = None]
         #[note = "ITIN expired", severity = SignalSeverity::Medium,  description = "The input ITIN is potentially expired."]

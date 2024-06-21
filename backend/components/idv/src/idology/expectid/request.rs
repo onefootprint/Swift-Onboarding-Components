@@ -52,6 +52,7 @@ impl RequestData {
             verification_request_id: _,
             drivers_license_number: _,
             drivers_license_state: _,
+            itin: _,
         } = d;
         // these are minimum required fields for idology, so we error.
         let first_name = first_name.ok_or(IdologyError::ConversionError::MissingFirstName)?;

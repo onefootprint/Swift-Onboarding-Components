@@ -246,4 +246,5 @@ CDO_TO_DIS = {
         "investor_profile.family_member_names",
         "investor_profile.political_organization",
     ],
+    "us_tax_id": ["id.us_tax_id"],
 }

@@ -10,6 +10,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
 use newtypes::AgeHelper;
 use newtypes::CollectedData;
+use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::Declaration;
 use newtypes::FootprintReasonCode;
@@ -131,6 +132,15 @@ pub fn user_input_based_risk_signals(
 
     if !vw.has_field(&IDK::PhoneNumber.into()) {
         frcs.push(FootprintReasonCode::PhoneNotProvided);
+    }
+
+    // indicates that the user submitted an itin for their us tax id
+    if vw.has_field(&IDK::UsTaxId.into())
+        && vw.has_field(&IDK::Itin.into())
+        && !vw.has_field(&IDK::Ssn9.into())
+        && obc.must_collect_data.contains(&CollectedDataOption::UsTaxId)
+    {
+        frcs.push(FootprintReasonCode::UsTaxIdIsItin);
     }
 
     if let Ok(dob) = decrypted.get_di(IDK::Dob) {
