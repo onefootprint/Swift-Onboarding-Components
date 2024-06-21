@@ -13,7 +13,7 @@ use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::vendor_clients::IncodeClients;
-use crate::ApiError;
+use crate::FpError;
 use crate::FpResult;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
@@ -86,7 +86,7 @@ impl IncodeState {
 /// Special error struct that shows in which state a given error occured while we are running
 /// through multiple states
 pub struct IncodeMachineError {
-    pub error: ApiError,
+    pub error: FpError,
     pub state_name: IncodeVerificationSessionState,
 }
 

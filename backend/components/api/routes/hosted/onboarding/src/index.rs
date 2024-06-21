@@ -4,8 +4,8 @@ use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::auth::AuthError;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiError;
 use crate::utils::headers::InsightHeaders;
+use crate::FpError;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionContext;
@@ -92,7 +92,7 @@ pub async fn post(
     let is_neuro_enabled = state.ff_client.flag(BoolFlag::IsNeuroEnabledForObc(&obc.key));
     state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, ApiError> {
+        .db_transaction(move |conn| -> Result<_, FpError> {
             // If this auth token was created via API or via the dashboard, the tenant is
             // specifically requesting that a new Workflow is created, even if one already exists
             let force_create = user_auth.data.is_from_api();

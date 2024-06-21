@@ -2,7 +2,7 @@ use super::vendor_parsable::AsParsedResponse;
 use super::vendor_parsable::VendorParsable;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::vendor::verification_result::decrypt_verification_result_response;
-use crate::ApiError;
+use crate::FpError;
 use crate::FpResult;
 use crate::State;
 use db::models::verification_request::VReqIdentifier;
@@ -18,7 +18,7 @@ pub enum LoadVendorResponseResult<T> {
     NotFound,
     NoResponse,
     Success((T, VerificationRequest, VerificationResult)),
-    Error(ApiError),
+    Error(FpError),
 }
 
 impl<T> LoadVendorResponseResult<T> {

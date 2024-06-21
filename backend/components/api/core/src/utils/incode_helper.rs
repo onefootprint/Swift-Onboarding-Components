@@ -3,10 +3,10 @@ use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use crate::decision::vendor::incode::get_config_id;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::incode::IncodeStateMachine;
-use crate::errors::ApiError;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpError;
 use crate::FpResult;
 use crate::State;
 use api_wire_types::DocumentImageError;
@@ -165,7 +165,7 @@ pub async fn handle_incode_request(
 }
 
 #[tracing::instrument(skip(db_pool))]
-async fn on_incode_hard_error(db_pool: &DbPool, err: ApiError, id_doc_id: &DocumentId) -> FpResult<()> {
+async fn on_incode_hard_error(db_pool: &DbPool, err: FpError, id_doc_id: &DocumentId) -> FpResult<()> {
     tracing::error!(?err, "IncodeMachineError");
     let id_doc_id = id_doc_id.clone();
     if err.code() == Some(api_errors::INCODE_MACHINE_CONCURRENT_CHANGE.to_string()) {

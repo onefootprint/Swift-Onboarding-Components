@@ -7,7 +7,6 @@ use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
-use api_core::ApiError;
 use api_core::ApiErrorKind;
 use api_core::FpError;
 use api_core::FpResult;
@@ -99,7 +98,7 @@ pub async fn post(
                 template_id: template_id.as_ref(),
             }
             .create(conn)
-            .map_err(|e| -> ApiError {
+            .map_err(|e| -> FpError {
                 match e {
                     DbError::UniqueConstraintViolation => {
                         ValidationError("A compliance document request already exists for this template")

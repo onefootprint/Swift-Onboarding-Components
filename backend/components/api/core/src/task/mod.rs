@@ -3,7 +3,7 @@ use self::tasks::log_message_task::LogMessageTask;
 use self::tasks::log_num_tenant_api_keys_task::LogNumTenantApiKeysTask;
 use self::tasks::run_incode_stuck_workflow_task::RunIncodeStuckWorkflowTask;
 use self::tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask;
-use crate::errors::ApiError;
+use crate::FpError;
 use crate::State;
 use async_trait::async_trait;
 use db::models::task::Task;
@@ -26,7 +26,7 @@ pub enum TaskError {
     #[error("{0}")]
     Database(#[from] DbError),
     #[error("{0}")]
-    ApiError(#[from] ApiError),
+    ApiError(#[from] FpError),
     #[error("{0}")]
     IdologyError(#[from] idv::idology::error::Error),
     #[error("{0}")]

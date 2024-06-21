@@ -8,7 +8,7 @@ use api_core::types::CursorPaginatedResponse;
 use api_core::types::CursorPaginatedResponseInner;
 use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
-use api_core::ApiError;
+use api_core::FpError;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::ListEvent;
@@ -202,7 +202,7 @@ async fn saturate_events(
 
 fn decrypt_list_entry(key: &SealingKey, le: &ListEntry) -> FpResult<PiiString> {
     key.unseal_bytes(AeadSealedBytes(le.e_data.clone().0))
-        .map_err(ApiError::from)
+        .map_err(FpError::from)
         .map(PiiBytes::new)
-        .and_then(|b| PiiString::try_from(b).map_err(ApiError::from))
+        .and_then(|b| PiiString::try_from(b).map_err(FpError::from))
 }

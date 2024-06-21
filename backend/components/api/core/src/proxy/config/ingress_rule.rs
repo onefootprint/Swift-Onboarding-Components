@@ -1,6 +1,6 @@
 use super::ProxyHeaderParams;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiError;
+use crate::FpError;
 use crate::FpResult;
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
@@ -76,7 +76,7 @@ impl IngressRule {
 }
 
 impl TryFrom<(&str, Option<FpId>)> for IngressRule {
-    type Error = ApiError;
+    type Error = FpError;
 
     /// <proxy_token> + '=' + <target>
     ///
@@ -102,7 +102,7 @@ impl TryFrom<(&str, Option<FpId>)> for IngressRule {
 pub struct ParsedIngressRules(pub Vec<IngressRule>);
 
 impl TryFrom<&HeaderMap> for ParsedIngressRules {
-    type Error = ApiError;
+    type Error = FpError;
 
     fn try_from(headers: &HeaderMap) -> Result<Self, Self::Error> {
         let global_fp_id = ProxyHeaderParams::raw_get_user_token_assignment(headers)

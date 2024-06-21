@@ -1,6 +1,6 @@
 use super::ProxyHeaderParams;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiError;
+use crate::FpError;
 use crate::FpResult;
 use actix_web::http::header::HeaderMap;
 use newtypes::PiiString;
@@ -19,7 +19,7 @@ impl ForwardProxyHeaders {
 }
 
 impl TryFrom<&HeaderMap> for ForwardProxyHeaders {
-    type Error = ApiError;
+    type Error = FpError;
 
     fn try_from(map: &HeaderMap) -> FpResult<Self> {
         let result = map

@@ -37,7 +37,6 @@ pub mod vault;
 pub mod vendor_clients;
 
 pub use self::state::State;
-pub use crate::errors::ApiError;
 pub use crate::errors::ApiErrorKind;
 pub use crate::types::response::ModernApiError;
 pub use crate::types::response::ModernApiResult;

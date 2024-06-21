@@ -1,8 +1,8 @@
 use super::ProxyHeaderParams;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiError;
 use crate::FpResult;
 use actix_web::http::header::HeaderMap;
+use api_errors::FpError;
 use std::fmt::Debug;
 
 /// Client certificate authentication to use for the upstream proxy
@@ -41,7 +41,7 @@ pub struct ParsedClientCertificate {
 }
 
 impl TryFrom<&ProxyHeaderParams> for ParsedClientCertificate {
-    type Error = ApiError;
+    type Error = FpError;
 
     fn try_from(params: &ProxyHeaderParams) -> FpResult<Self> {
         let cert = params.client_cert.clone();

@@ -229,8 +229,7 @@ pub fn rule_instance_kind_from_condition(condition: &RuleExpressionCondition) ->
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ApiError;
-    use api_errors::FpError;
+    use crate::FpError;
     use chrono::Utc;
     use newtypes::data_identifier::Error as DiValidationError;
     use newtypes::AliasId;
@@ -273,7 +272,7 @@ mod tests {
         }
     }
 
-    fn validation_error(s: &str) -> ApiError {
+    fn validation_error(s: &str) -> FpError {
         ValidationError(s).into()
     }
 

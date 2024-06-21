@@ -1,5 +1,4 @@
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiError;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::FpError;
@@ -180,7 +179,7 @@ impl ObConfigurationArgsToValidate {
                 let can_access_cdo = can_access.get(&cd);
 
                 let collectable_cdo = match (must_collect_cdo, optional_cdo) {
-                    (None, None) => Ok::<_, ApiError>(None),
+                    (None, None) => Ok::<_, FpError>(None),
                     (None, Some(c)) => Ok(Some(c)),
                     (Some(c), None) => Ok(Some(c)),
                     (Some(_), Some(_)) => Err(TenantError::ValidationError(format!(

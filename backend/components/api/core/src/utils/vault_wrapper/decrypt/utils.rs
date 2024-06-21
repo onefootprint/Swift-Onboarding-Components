@@ -2,11 +2,10 @@ use super::super::Business;
 use super::super::VaultWrapper;
 use crate::errors::business::BusinessError;
 use crate::utils::vault_wrapper::Any;
-use crate::ApiError;
 use crate::ApiErrorKind;
+use crate::FpError;
 use crate::FpResult;
 use crate::State;
-use api_errors::FpError;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::data_lifetime::DataLifetime;
@@ -214,7 +213,7 @@ impl VaultWrapper<Business> {
             let mut res = vw.decrypt_unchecked(&state.enclave_client, dis).await?;
             let first_name = res.remove(&IDK::FirstName.into());
             let last_name = res.remove(&IDK::LastName.into());
-            Ok::<_, ApiError>((vw.scoped_vault.id, (first_name, last_name)))
+            Ok::<_, FpError>((vw.scoped_vault.id, (first_name, last_name)))
         });
         // Future optimization would be to bulk decrypt multiple vaults data in one enclave call
         let bo_names = futures::future::join_all(decrypt_futs)

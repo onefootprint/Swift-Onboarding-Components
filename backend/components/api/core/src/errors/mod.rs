@@ -1,7 +1,6 @@
 use actix_web::error::QueryPayloadError;
 use actix_web::error::UrlencodedError;
 use actix_web::http::StatusCode;
-use api_errors::FpError;
 use api_errors::FpErrorTrait;
 use newtypes::output::Csv;
 use newtypes::ContactInfoKind;
@@ -28,9 +27,6 @@ mod dry_run;
 pub use dry_run::*;
 mod tenant_facing_error;
 pub use tenant_facing_error::*;
-
-// TODO rm
-pub type ApiError = FpError;
 
 #[derive(Debug, Error)]
 pub enum ApiErrorKind {
