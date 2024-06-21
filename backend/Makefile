@@ -60,16 +60,19 @@ configure-aws:
 	@aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
 	@aws configure set default.region ${AWS_REGION}
 
+
+
+.PHONY: rage
+rage:
+	command -v rage || ./util/scripts/install_rage.sh
+
 .PHONY: update-dot-env
-update-dot-env:
-	@command -v rage || (echo "missing rage: installing" && cargo install rage)
+update-dot-env: rage
 	@cat .env | rage -e -r age1u4858547zdlc7ncghc3wypqxamt7v5xh0kasysqjfk0dt6ahcdnqtprun4 -a -o .env.age
 	@echo "updated .env.age"
 
 .PHONY: set-dot-env
-set-dot-env:
-	@command -v rage || (echo "missing rage: installing" && cargo install rage)
-
+set-dot-env: rage
 	@cat encrypted_env_key.base64 | base64 --decode > /tmp/e_key.age
 	@AWS_REGION=us-east-1 aws kms decrypt --key-id 4e61ea01-1193-475e-82ee-e9639743efd6 \
 		--ciphertext-blob fileb:///tmp/e_key.age \
