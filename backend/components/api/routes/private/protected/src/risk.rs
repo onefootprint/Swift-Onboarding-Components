@@ -24,7 +24,6 @@ use api_core::decision::{
     self,
 };
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::task;
 use api_core::types::ModernApiResult;
@@ -32,6 +31,7 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::ApiErrorKind;
+use api_core::FpResult;
 use api_core::State;
 use api_errors::FpError;
 use chrono::Utc;
@@ -95,7 +95,7 @@ async fn make_vendor_calls(
     let wf_id = wf.id.clone();
     let (requests, vw, rules) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
             let decision_intent =
                 DecisionIntent::create(conn, newtypes::DecisionIntentKind::ManualRunKyc, &sv.id, None)?;
@@ -182,7 +182,7 @@ async fn make_decision(
 
     let decision = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let res = ScopedVault::bulk_get(conn, vec![fp_id.clone()], &tenant_id, true)?;
             let (sv, vault) = res.first().ok_or(OnboardingError::NoWorkflow)?;
             let vault_id = sv.vault_id.clone();
@@ -251,7 +251,7 @@ async fn shadow_run(
     let wfid = wf.id.clone();
     let (requests, vw, rules) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
@@ -347,7 +347,7 @@ async fn save_risk_signals_for_vres(
 
     let (vreq_vres, vw) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let vreq_vres = VerificationResult::get(conn, &vres_id)?;
             let existing_rs = RiskSignal::list_by_verification_result_id(conn, &vres_id)?;
             if !existing_rs.is_empty() {
@@ -372,7 +372,7 @@ async fn save_risk_signals_for_vres(
 
     let rs: Vec<_> = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let kyc_rs = RiskSignal::bulk_create(
                 conn,
                 &svid,

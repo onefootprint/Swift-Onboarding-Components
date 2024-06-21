@@ -1,6 +1,5 @@
 use crate::auth::tenant::TenantAuth;
 use crate::errors::tenant::TenantError;
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::bulk_decrypt;
@@ -9,6 +8,7 @@ use crate::utils::vault_wrapper::DecryptAccessEventInfo;
 use crate::utils::vault_wrapper::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -34,7 +34,7 @@ pub async fn detokenize(
     reason: Option<String>,
     insight: InsightHeaders,
     purpose: AccessEventPurpose,
-) -> ApiResult<HashMap<ProxyToken, PiiString>> {
+) -> FpResult<HashMap<ProxyToken, PiiString>> {
     // split tokens by fp_id
     let tokens = tokens
         .into_iter()
@@ -59,7 +59,7 @@ pub async fn detokenize(
     let is_live = auth.is_live()?;
     let vws: HashMap<FpId, TenantVw> = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let svs = ScopedVault::bulk_get(conn, fp_ids, &tenant_id, is_live)?;
             let vws = VaultWrapper::multi_get_for_tenant(conn, svs, None)?;
             Ok(vws)
@@ -71,7 +71,7 @@ pub async fn detokenize(
 
     let decrypt_reqs = tokens
         .into_iter()
-        .map(|(fp_id, targets)| -> ApiResult<_> {
+        .map(|(fp_id, targets)| -> FpResult<_> {
             let vw = vws
                 .get(&fp_id)
                 .ok_or(TenantError::VaultDoesntExist(fp_id.clone()))?;
@@ -82,7 +82,7 @@ pub async fn detokenize(
             let key = vw.scoped_vault.fp_id.clone();
             Ok((key, BulkDecryptReq { vw, targets }))
         })
-        .collect::<ApiResult<_>>()?;
+        .collect::<FpResult<_>>()?;
     let reason = reason.unwrap_or_else(|| "Vault Proxy Default Reason".to_string());
     let insight = CreateInsightEvent::from(insight);
     let actor = auth.actor().into();
@@ -96,10 +96,10 @@ pub async fn detokenize(
 
     let out = decrypted_results
         .into_iter()
-        .map(|(fp_id, results)| -> ApiResult<_> {
+        .map(|(fp_id, results)| -> FpResult<_> {
             let results = results
                 .into_iter()
-                .map(|(op, pii)| -> ApiResult<_> {
+                .map(|(op, pii)| -> FpResult<_> {
                     let token = ProxyToken {
                         fp_id: fp_id.clone(),
                         identifier: op.identifier,
@@ -108,10 +108,10 @@ pub async fn detokenize(
                     let pii = pii.to_piistring()?;
                     Ok((token, pii))
                 })
-                .collect::<ApiResult<Vec<_>>>()?;
+                .collect::<FpResult<Vec<_>>>()?;
             Ok(results)
         })
-        .collect::<ApiResult<Vec<_>>>()?
+        .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         .flatten()
         .collect();

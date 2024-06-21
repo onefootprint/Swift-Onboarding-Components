@@ -1,8 +1,8 @@
-use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::email::send_email_challenge;
 use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::user::UserWfAuthContext;
@@ -63,7 +63,7 @@ pub async fn post_validate(
     let source = user_auth.user_session.dl_source();
     state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Person>::build_for_tenant(conn, &su_id)?;
             let sources = DataLifetimeSources::single(source);
             vw.validate_request(conn, updates, sources, None, DataRequestSource::PatchVault)?;
@@ -106,7 +106,7 @@ pub async fn patch(
     let source = user_auth.user_session.dl_source();
     let new_ci = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su_id)?;
 
             let overrides = bootstrap_fields
@@ -169,7 +169,7 @@ async fn handle_ssn_skipped(
     obc: ObConfiguration,
     sv_id: ScopedVaultId,
     workflow_id: WorkflowId,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     // bail early if not needed
     let Some(doc_info) = obc.document_cdo_for_optional_ssn() else {
         return Ok(());
@@ -177,7 +177,7 @@ async fn handle_ssn_skipped(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
             let ssn_optional_and_missing = api_core::decision::features::user_input::ssn_optional_and_missing(&vw, &obc);
 

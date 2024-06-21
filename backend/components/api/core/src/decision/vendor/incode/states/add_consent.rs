@@ -6,9 +6,9 @@ use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::models::document::Document;
 use db::models::document::DocumentUpdate;
@@ -26,7 +26,7 @@ use newtypes::VendorAPI;
 pub struct AddConsent {}
 
 impl AddConsent {
-    pub fn enter(conn: &mut TxnPgConn, id_doc_id: &DocumentId) -> ApiResult<()> {
+    pub fn enter(conn: &mut TxnPgConn, id_doc_id: &DocumentId) -> FpResult<()> {
         // Update Document to status = complete so we clear the Bifrost req
         // TODO: we are setting status to complete here but set completed_seqno later- is that gunna cause
         // any problems?? It would actually be nice to write the timeline event, vault the docs, etc
@@ -49,7 +49,7 @@ impl IncodeStateTransition for AddConsent {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         let wf_id = ctx.wf_id.clone();
         let consent = db_pool
             .db_query(move |conn| UserConsent::get_for_workflow(conn, &wf_id))
@@ -101,7 +101,7 @@ impl IncodeStateTransition for AddConsent {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         let next = Self::next_state(session);
         Ok(next.into())
     }

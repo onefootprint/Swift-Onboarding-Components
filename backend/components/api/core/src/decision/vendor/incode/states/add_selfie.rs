@@ -6,8 +6,8 @@ use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::DbPool;
 use db::TxnPgConn;
@@ -30,7 +30,7 @@ impl IncodeStateTransition for AddSelfie {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         let Some(selfie_image) = ctx.docv_data.selfie_image.clone() else {
             // Not ready to run
             return Ok(None);
@@ -57,7 +57,7 @@ impl IncodeStateTransition for AddSelfie {
         _: &mut TxnPgConn,
         _ctx: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         let result = TransitionResult {
             failure_reasons: self.failure_reasons,
             side: Some(DocumentSide::Selfie),
@@ -76,7 +76,7 @@ async fn add_selfie_inner(
     ctx: &IncodeContext,
     session: &VerificationSession,
     selfie_image: PiiString,
-) -> ApiResult<Vec<IncodeFailureReason>> {
+) -> FpResult<Vec<IncodeFailureReason>> {
     // make the request to incode
     let docv_data = DocVData {
         selfie_image: Some(selfie_image),

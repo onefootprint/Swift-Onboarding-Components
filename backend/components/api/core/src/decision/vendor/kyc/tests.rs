@@ -5,7 +5,7 @@ use crate::decision::state::test_utils::{
     self,
 };
 use crate::decision::vendor::vendor_result::VendorResult;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
@@ -211,7 +211,7 @@ async fn test_run_kyc_waterfall(
     let sv_id = wf.scoped_vault_id.clone();
     let di = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let args = UpdateTenantVendorControlArgs {
                 idology_enabled: Some(idology_enabled.0),
                 experian_enabled: Some(experian_enabled.0),
@@ -315,7 +315,7 @@ fn mock_calls(state: &mut State, experian_response: ExperianResponse, idology_re
 async fn assert_expected_result(
     state: &mut State,
     expected_result: ExpectedResult,
-    res: ApiResult<VendorResult>,
+    res: FpResult<VendorResult>,
 ) {
     match expected_result {
         ExpectedResult::SingularSuccessVendorResult(vendor) => {
@@ -340,7 +340,7 @@ async fn assert_expected_result_with_wfe(
     idology_response: IdologyResponse,
     di_id: &DecisionIntentId,
     run_number: usize,
-    res: ApiResult<VendorResult>,
+    res: FpResult<VendorResult>,
 ) {
     assert_waterfall_execution(
         state,

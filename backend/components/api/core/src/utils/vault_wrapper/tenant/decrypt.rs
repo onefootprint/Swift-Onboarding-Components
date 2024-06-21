@@ -1,7 +1,7 @@
 use super::TenantVw;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::decrypt::Pii;
+use crate::FpResult;
 use crate::State;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::NewAuditEvent;
@@ -20,7 +20,7 @@ impl<Type> TenantVw<Type> {
     pub(super) fn check_ob_config_access(
         &self,
         targets: Vec<EnclaveDecryptOperation>,
-    ) -> ApiResult<Vec<EnclaveDecryptOperation>> {
+    ) -> FpResult<Vec<EnclaveDecryptOperation>> {
         let can_access = targets
             .into_iter()
             .filter(|x| !self.has_field(&x.identifier) || self.tenant_can_decrypt(x.identifier.clone()))
@@ -38,7 +38,7 @@ impl<Type> TenantVw<Type> {
         insight: CreateInsightEvent,
         targets: Vec<EnclaveDecryptOperation>,
         purpose: AccessEventPurpose,
-    ) -> ApiResult<HashMap<EnclaveDecryptOperation, Pii>> {
+    ) -> FpResult<HashMap<EnclaveDecryptOperation, Pii>> {
         let targets = self.check_ob_config_access(targets)?;
         let results = self
             .fn_decrypt_unchecked_raw(&state.enclave_client, targets)
@@ -50,7 +50,7 @@ impl<Type> TenantVw<Type> {
 
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
 
                 let targets: Vec<DataIdentifier> =

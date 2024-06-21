@@ -7,8 +7,8 @@ use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::DbPool;
 use db::TxnPgConn;
@@ -24,7 +24,7 @@ impl IncodeStateTransition for ProcessId {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         process_id_inner(db_pool, clients, ctx, session).await?;
 
         Ok(Some(Self {}))
@@ -35,7 +35,7 @@ impl IncodeStateTransition for ProcessId {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         let next = Self::next_state(session);
         Ok(next.into())
     }
@@ -55,7 +55,7 @@ async fn process_id_inner(
     clients: &IncodeClients,
     ctx: &IncodeContext,
     session: &VerificationSession,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     // make the request to incode
     let request = IncodeProcessIdRequest {
         credentials: session.credentials.clone(),

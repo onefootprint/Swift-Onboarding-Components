@@ -1,9 +1,9 @@
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiError;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::FpError;
+use api_core::FpResult;
 use api_core::State;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::tenant::Tenant;
@@ -35,7 +35,7 @@ impl ObConfigurationArgsToValidate {
         state: &State,
         args: NewObConfigurationArgs,
         tenant: &Tenant,
-    ) -> ApiResult<NewObConfigurationArgs> {
+    ) -> FpResult<NewObConfigurationArgs> {
         let args = Self(args);
         args.validate_inner()?;
         args.validate_kind()?;
@@ -46,14 +46,14 @@ impl ObConfigurationArgsToValidate {
     }
 
     /// Core validation business logic, separated from checking simple required fields
-    pub(super) fn validate_inner(&self) -> ApiResult<()> {
+    pub(super) fn validate_inner(&self) -> FpResult<()> {
         let group_by_parent = |cdos: Vec<CDO>| {
             cdos
             .into_iter()
             .map(|cdo| (cdo.parent(), cdo))
             .into_group_map()
             .into_iter()
-            .map(|(cd, cdos)| -> ApiResult<(CD, CDO)>  {
+            .map(|(cd, cdos)| -> FpResult<(CD, CDO)>  {
             if cdos.len() > 1 {
                 Err(TenantError::ValidationError(format!(
                     "Cannot provide both {} and {}",
@@ -65,7 +65,7 @@ impl ObConfigurationArgsToValidate {
                  Ok((cd, cdo))
             }})
             // Find the CDO parents that have more than one option specified
-            .collect::<ApiResult<HashMap<_, _>>>()
+            .collect::<FpResult<HashMap<_, _>>>()
         };
 
         let optional_data = self.optional_data.clone();
@@ -225,7 +225,7 @@ impl ObConfigurationArgsToValidate {
                     Ok(())
                 }
             })
-            .collect::<ApiResult<Vec<_>>>()?;
+            .collect::<FpResult<Vec<_>>>()?;
         Ok(())
     }
 
@@ -239,7 +239,7 @@ impl ObConfigurationArgsToValidate {
         has_document_cdo || has_other_document
     }
 
-    fn validate_documents(&self) -> ApiResult<()> {
+    fn validate_documents(&self) -> FpResult<()> {
         if self
             .documents_to_collect
             .iter()
@@ -256,7 +256,7 @@ impl ObConfigurationArgsToValidate {
         Ok(())
     }
 
-    fn validate_kind(&self) -> ApiResult<()> {
+    fn validate_kind(&self) -> FpResult<()> {
         // Check for required fields based on playbook kind
         let required_fields = match self.kind {
             ObConfigurationKind::Auth => vec![CDOK::Email, CDOK::PhoneNumber],
@@ -343,7 +343,7 @@ impl ObConfigurationArgsToValidate {
         Ok(())
     }
 
-    fn validate_countries(&self) -> ApiResult<()> {
+    fn validate_countries(&self) -> FpResult<()> {
         if !self.allow_us_residents && !self.allow_international_residents {
             return Err(TenantError::ValidationError(
                 "Must set one of allow_us_residents or allow_international_residents to true".to_owned(),
@@ -442,7 +442,7 @@ impl ObConfigurationArgsToValidate {
         }
     }
 
-    pub(super) fn validate_flags(&self, state: &State, tenant_id: &TenantId) -> ApiResult<()> {
+    pub(super) fn validate_flags(&self, state: &State, tenant_id: &TenantId) -> FpResult<()> {
         if matches!(self.kind, ObConfigurationKind::Auth) {
             // Not strictly necessary, but just a warm-up for better per-config-kind validation
             let unallowed_flags = vec![
@@ -502,7 +502,7 @@ impl ObConfigurationArgsToValidate {
         Ok(())
     }
 
-    pub(super) fn validate_tenant_restrictions(&self, tenant: &Tenant) -> ApiResult<()> {
+    pub(super) fn validate_tenant_restrictions(&self, tenant: &Tenant) -> FpResult<()> {
         let restrictions = vec![
             (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Kyc),
             (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Document), // Separate flag?
@@ -517,7 +517,7 @@ impl ObConfigurationArgsToValidate {
         Ok(())
     }
 
-    pub(super) fn validate_checks(&self) -> ApiResult<()> {
+    pub(super) fn validate_checks(&self) -> FpResult<()> {
         let duplicates: Vec<VerificationCheckKind> = self
             .verification_checks
             .clone()
@@ -544,7 +544,7 @@ impl ObConfigurationArgsToValidate {
         // validate against kind
         self.verification_checks
             .iter()
-            .try_for_each(|c| -> ApiResult<()> {
+            .try_for_each(|c| -> FpResult<()> {
                 match c {
                     newtypes::VerificationCheck::Kyb { .. } => {
                         if !matches!(&self.kind, &ObConfigurationKind::Kyb) || self.skip_kyb {
@@ -585,7 +585,7 @@ impl ObConfigurationArgsToValidate {
         // validate against collected data
         self.verification_checks
             .iter()
-            .try_for_each(|c| -> ApiResult<()> {
+            .try_for_each(|c| -> FpResult<()> {
                 self.validate_verification_check_collected_data(c.clone())?;
 
                 Ok(())
@@ -597,7 +597,7 @@ impl ObConfigurationArgsToValidate {
     fn validate_verification_check_collected_data(
         &self,
         verification_check: VerificationCheck,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         match verification_check {
             VerificationCheck::Kyb { ein_only } => {
                 let required_fields = if ein_only {

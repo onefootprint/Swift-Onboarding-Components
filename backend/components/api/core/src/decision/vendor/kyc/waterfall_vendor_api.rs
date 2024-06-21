@@ -3,7 +3,7 @@ use crate::decision::vendor::vendor_api::vendor_api_struct::ExperianPreciseID;
 use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyExpectID;
 use crate::decision::vendor::vendor_api::vendor_api_struct::LexisFlexId;
 use crate::decision::vendor::vendor_result::VendorResult;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::verification_request::VReqIdentifier;
 use newtypes::EncryptedVaultPrivateKey;
@@ -27,7 +27,7 @@ impl WaterfallVendorAPI {
         state: &State,
         id: VReqIdentifier,
         user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> ApiResult<Option<VendorResult>> {
+    ) -> FpResult<Option<VendorResult>> {
         let res = match order {
             WaterfallVendorAPI::Experian => {
                 load_response_for_vendor_api(state, id, user_vault_private_key, ExperianPreciseID)
@@ -53,14 +53,14 @@ impl WaterfallVendorAPI {
         state: &State,
         id: VReqIdentifier,
         user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> ApiResult<Vec<VendorResult>> {
+    ) -> FpResult<Vec<VendorResult>> {
         let futs = Self::iter()
             .map(|v| Self::get_vendor_result(v.clone(), state, id.clone(), user_vault_private_key));
 
         let res = futures::future::join_all(futs)
             .await
             .into_iter()
-            .collect::<ApiResult<Vec<Option<VendorResult>>>>()?
+            .collect::<FpResult<Vec<Option<VendorResult>>>>()?
             .into_iter()
             .flatten()
             .collect();

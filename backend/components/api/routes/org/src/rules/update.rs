@@ -2,10 +2,10 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine::validation::validate_rule_expression;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::MultiUpdateRuleRequest;
 use db::models::list::List;
@@ -52,7 +52,7 @@ pub async fn multi_update_rules(
 
     let rules = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let update = validate_rules_request(conn, &tenant_id, is_live, req)?;
 
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
@@ -87,7 +87,7 @@ pub(crate) fn validate_rules_request(
     tenant_id: &TenantId,
     is_live: bool,
     req: MultiUpdateRuleRequest,
-) -> ApiResult<MultiRuleUpdate> {
+) -> FpResult<MultiRuleUpdate> {
     let MultiUpdateRuleRequest {
         expected_rule_set_version,
         add,
@@ -109,7 +109,7 @@ pub(crate) fn validate_rules_request(
     let new_rules = add
         .unwrap_or_default()
         .into_iter()
-        .map(|r| -> ApiResult<_> {
+        .map(|r| -> FpResult<_> {
             let (rule_expression, rule_instance_kind) =
                 validate_rule_expression(r.rule_expression, &lists, is_live)?;
             Ok(NewRule {
@@ -120,7 +120,7 @@ pub(crate) fn validate_rules_request(
                 is_shadow: r.is_shadow,
             })
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<FpResult<Vec<_>>>()?;
 
     // check that the same rule isn't being edited and deleted
     let edit_rule_ids: HashSet<_> = edit
@@ -152,7 +152,7 @@ pub(crate) fn validate_rules_request(
                 Some(kind),
             ))
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<FpResult<Vec<_>>>()?;
 
     let delete_updates = delete
         .unwrap_or_default()

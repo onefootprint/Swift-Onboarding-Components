@@ -1,8 +1,8 @@
 use actix_web::web;
 use api_core::decision::vendor::samba::license_validation::get_samba_license_validation_report;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::web::Json;
+use api_core::FpResult;
 use api_core::State;
 use idv::samba::response::webhook::SambaWebhook;
 use newtypes::SambaWebhookEventType;
@@ -35,7 +35,7 @@ async fn handle_webhook(
 }
 
 #[tracing::instrument(skip_all)]
-async fn handle_webhook_inner(state: &State, webhook: SambaWebhook) -> ApiResult<()> {
+async fn handle_webhook_inner(state: &State, webhook: SambaWebhook) -> FpResult<()> {
     match webhook.event_type() {
         Some(k) => match k {
             SambaWebhookEventType::LicenseValidationReceived => {

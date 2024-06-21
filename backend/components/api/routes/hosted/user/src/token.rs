@@ -3,9 +3,9 @@ use api_core::auth::session::user::AssociatedAuthEventKind;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::load_auth_events;
 use api_core::auth::Any;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::hosted::tokens::CreateUserTokenRequest;
 use api_wire_types::hosted::tokens::CreateUserTokenResponse;
@@ -46,7 +46,7 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let (token, expires_at) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let aes = load_auth_events(conn, &user_auth.auth_events)?
                 .iter()
                 .map(|(ae, _)| ae.kind)

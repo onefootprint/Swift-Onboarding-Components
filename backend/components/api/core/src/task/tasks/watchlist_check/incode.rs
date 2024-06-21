@@ -3,10 +3,10 @@ use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::{
     self,
 };
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use chrono::Duration;
 use chrono::Utc;
@@ -33,7 +33,7 @@ pub async fn complete_vendor_call(
     di_id: &DecisionIntentId,
     obc: &ObConfiguration,
     current_uvw: &VaultWrapper<Person>,
-) -> ApiResult<Vec<NewRiskSignalInfo>> {
+) -> FpResult<Vec<NewRiskSignalInfo>> {
     let sv_id = sv_id.clone();
     let di_id = di_id.clone();
     let (di, latest_watchlist_check_vres) = state
@@ -90,7 +90,7 @@ async fn watchlist_check_ref_from_latest_vres(
     state: &State,
     user_vault_private_key: &EncryptedVaultPrivateKey,
     latest_watchlist_check_vres: Option<RequestAndResult>,
-) -> ApiResult<Option<(VerificationRequest, VerificationResult, IncodeWatchlistResultRef)>> {
+) -> FpResult<Option<(VerificationRequest, VerificationResult, IncodeWatchlistResultRef)>> {
     let watchlist_ref = if let Some(latest_watchlist_check_vres) = latest_watchlist_check_vres {
         let vreq_vres = VendorResult::hydrate_vendor_result(
             latest_watchlist_check_vres,
@@ -127,7 +127,7 @@ async fn has_data_changed_since_vres(
     state: &State,
     current_uvw: &VaultWrapper<Person>,
     vreq: &VerificationRequest,
-) -> ApiResult<bool> {
+) -> FpResult<bool> {
     let svid = vreq.scoped_vault_id.clone();
     let seqno = vreq.uvw_snapshot_seqno;
     let uvw_for_vres = state

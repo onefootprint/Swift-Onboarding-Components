@@ -1,9 +1,9 @@
 use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::session::AuthSession;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::session::ob_config::OnboardingSession;
 use api_core::auth::tenant::TenantGuard;
@@ -46,7 +46,7 @@ pub async fn post(
 
     let (ob_config, tenant) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let result = ObConfiguration::get_enabled(conn, (&request.key, &tenant.id, is_live))?;
             Ok(result)
         })

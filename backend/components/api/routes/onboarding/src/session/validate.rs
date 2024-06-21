@@ -6,10 +6,10 @@ use crate::State;
 use api_core::auth::session::user::ValidateUserToken;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::UserAuthResponse;
 use api_wire_types::ValidateAuthEvent;
@@ -55,7 +55,7 @@ pub async fn post(
 
     let (sv, auth_events, wf, biz_wf) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &sv_id)?;
             let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
             let (wf, biz_wf) = if let Some(wf_id) = wf_id {
@@ -103,7 +103,7 @@ pub async fn post(
                                   mrs: Vec<ManualReview>,
                                   wf: Workflow,
                                   obc: ObConfiguration|
-     -> ApiResult<EntityValidateResponse> {
+     -> FpResult<EntityValidateResponse> {
         if sv.tenant_id != auth.tenant().id {
             return Err(OnboardingError::TenantMismatch.into());
         }

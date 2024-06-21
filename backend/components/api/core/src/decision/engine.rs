@@ -5,7 +5,7 @@ use super::vendor::vendor_result::VendorResult;
 use super::vendor::verification_result;
 use super::vendor::VendorAPIError;
 use super::*;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
@@ -24,12 +24,12 @@ pub async fn save_vendor_responses(
     vendor_responses: &[VerificationRequestWithVendorResponse],
     vendor_error_responses: Vec<(VerificationRequest, Option<PiiJsonValue>)>,
     wf_id: &WorkflowId,
-) -> ApiResult<Vec<VendorResult>> {
+) -> FpResult<Vec<VendorResult>> {
     let wf_id = wf_id.clone();
 
     let responses = vendor_responses.to_owned();
     let results = db_pool
-        .db_transaction(move |conn| -> ApiResult<Vec<VendorResult>> {
+        .db_transaction(move |conn| -> FpResult<Vec<VendorResult>> {
             let (_, uv) = Workflow::get_with_vault(conn, &wf_id)?;
             let vres = verification_result::save_verification_results(conn, &responses, &uv.public_key)?;
             verification_result::save_error_verification_results(
@@ -43,7 +43,7 @@ pub async fn save_vendor_responses(
 
             let results: Vec<VendorResult> = responses
                 .iter()
-                .map(|(req, res)| -> ApiResult<VendorResult> {
+                .map(|(req, res)| -> FpResult<VendorResult> {
                     let verification_result = verification_results
                         .remove(&req.id)
                         .ok_or(DbError::RelatedObjectNotFound)?;
@@ -153,7 +153,7 @@ pub async fn make_vendor_requests(
     tvc: TenantVendorControl,
     requests: Vec<VerificationRequest>,
     wf_id: &WorkflowId,
-) -> ApiResult<VendorResults> {
+) -> FpResult<VendorResults> {
     // Make requests
     let results = vendor::make_request::make_vendor_requests(state, tvc, requests, wf_id).await?;
 

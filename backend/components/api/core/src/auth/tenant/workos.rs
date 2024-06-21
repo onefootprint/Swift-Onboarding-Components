@@ -3,7 +3,7 @@ use crate::auth::session::AuthSessionData;
 use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::TenantUserId;
@@ -36,7 +36,7 @@ impl ExtractableAuthSession for WorkOsSessionData {
         _: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
         _: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::WorkOs(data) => data,
             _ => {

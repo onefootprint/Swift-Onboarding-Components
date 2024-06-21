@@ -5,7 +5,7 @@ use super::PartnerTenantSessionAuth;
 use super::SessionContext;
 use super::TenantSessionAuth;
 use super::WorkOsSessionData;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use newtypes::TenantUserId;
 use newtypes::WorkosAuthMethod;
 
@@ -13,14 +13,14 @@ pub type AnyTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, Tenant
 pub type AnyPartnerTenantSessionAuth = Either<SessionContext<WorkOsSessionData>, PartnerTenantSessionAuth>;
 
 pub trait AnyOrgSessionAuth {
-    fn tenant_user_id(self) -> ApiResult<TenantUserId>;
+    fn tenant_user_id(self) -> FpResult<TenantUserId>;
     fn auth_method(&self) -> WorkosAuthMethod;
 }
 
 impl AnyOrgSessionAuth for AnyTenantSessionAuth {
     /// The different types of session auths have very different purposes, so we have to do some
     /// branching to extract the tenant_user_id
-    fn tenant_user_id(self) -> ApiResult<TenantUserId> {
+    fn tenant_user_id(self) -> FpResult<TenantUserId> {
         let tu_id = match self {
             // WorkOsSessions are only used for selecting an org, just pull out the tenant_user_id
             Either::Left(l) => l.data.tenant_user_id,
@@ -42,7 +42,7 @@ impl AnyOrgSessionAuth for AnyTenantSessionAuth {
 }
 
 impl AnyOrgSessionAuth for AnyPartnerTenantSessionAuth {
-    fn tenant_user_id(self) -> ApiResult<TenantUserId> {
+    fn tenant_user_id(self) -> FpResult<TenantUserId> {
         let tu_id = match self {
             // WorkOsSessions are only used for selecting an org, just pull out the tenant_user_id
             Either::Left(l) => l.data.tenant_user_id,

@@ -1,13 +1,13 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ApiResult;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginatedResponseMetaNoCount;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::web::Json;
+use api_core::FpResult;
 use api_core::ModernApiResult;
 use api_core::State;
 use db::models::business_owner::BusinessOwner;
@@ -45,7 +45,7 @@ pub async fn get(
     let pagination = OffsetPagination::new(page, page_size);
     let (bos, next_page) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sb = ScopedVault::get(conn, (&fp_bid, &tenant_id, is_live))?;
             let query = BusinessOwnerQuery {
                 bv_id: &sb.vault_id,

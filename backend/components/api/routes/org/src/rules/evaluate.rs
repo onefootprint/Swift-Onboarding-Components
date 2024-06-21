@@ -9,11 +9,11 @@ use api_core::decision::state::common::saturate_list_entries;
 use api_core::decision::{
     self,
 };
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::EvaluateRuleRequest;
 use api_wire_types::RuleEvalResult;
@@ -85,7 +85,7 @@ pub async fn evaluate_rule(
     } = request.into_inner();
     let (current_rules, historical_results, adds, edits, lists_with_entries, vws, insight_events) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&obc_id, &tenant_id, is_live))?;
 
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc_id, IncludeRules::All)?;
@@ -106,24 +106,24 @@ pub async fn evaluate_rule(
             let adds: Vec<((RuleExpression, RuleInstanceKind), RuleAction)> = add
                 .into_iter()
                 .flatten()
-                .map(|rule| -> ApiResult<_> {
+                .map(|rule| -> FpResult<_> {
                     Ok((
                         validate_rule_expression(rule.rule_expression, &lists, is_live)?,
                         rule.rule_action,
                     ))
                 })
-                .collect::<ApiResult<_>>()?;
+                .collect::<FpResult<_>>()?;
 
             let edits: Vec<(RuleId, (RuleExpression, RuleInstanceKind))> = edit
                 .into_iter()
                 .flatten()
-                .map(|rule| -> ApiResult<_> {
+                .map(|rule| -> FpResult<_> {
                     Ok((
                         rule.rule_id,
                         validate_rule_expression(rule.rule_expression, &lists, is_live)?,
                     ))
                 })
-                .collect::<ApiResult<_>>()?;
+                .collect::<FpResult<_>>()?;
 
             let lists_with_entries = ListEntry::list_bulk(conn, &list_ids)?;
 
@@ -244,7 +244,7 @@ pub async fn evaluate_rule(
                 backtest_action_triggered: action_triggered,
             })
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<FpResult<Vec<_>>>()?;
 
     let stats = get_stats(&results);
     Ok(api_wire_types::RuleEvalResults { results, stats })

@@ -27,6 +27,8 @@ pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error 
 #[derive(derive_more::Deref)]
 pub struct FpError(pub Box<dyn FpErrorTrait>);
 
+pub type FpResult<T> = Result<T, FpError>;
+
 impl<T: FpErrorTrait + 'static> From<T> for FpError {
     fn from(value: T) -> Self {
         FpError(Box::new(value))

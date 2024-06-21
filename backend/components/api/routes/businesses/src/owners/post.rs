@@ -1,12 +1,12 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::NewBusinessOwnerRequest;
 use db::models::business_owner::BusinessOwner;
@@ -48,7 +48,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sb = ScopedVault::lock(conn, (&fp_bid, &tenant_id, is_live))?;
             if sb.kind != VaultKind::Business {
                 return ValidationError("Provided fp_bid does not correspond to a business").into();

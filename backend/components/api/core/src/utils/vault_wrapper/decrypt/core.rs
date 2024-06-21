@@ -5,8 +5,8 @@ use super::Pii;
 use crate::enclave_client::DecryptReq;
 use crate::enclave_client::EnclaveClient;
 use crate::errors::enclave::EnclaveError;
-use crate::errors::ApiResult;
 use crate::proxy::get_transformer;
+use crate::FpResult;
 use db::VaultedData;
 use either::Either;
 use enclave_proxy::DataTransformer;
@@ -33,7 +33,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         enclave_client: &EnclaveClient,
         ops: &[DataIdentifier],
-    ) -> ApiResult<DecryptUncheckedResult> {
+    ) -> FpResult<DecryptUncheckedResult> {
         let results = self
             ._decrypt_unchecked_raw(enclave_client, ops)
             .await?
@@ -47,7 +47,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         enclave_client: &EnclaveClient,
         ops: &[DataIdentifier],
-    ) -> ApiResult<DecryptUncheckedResult<PiiJsonValue>> {
+    ) -> FpResult<DecryptUncheckedResult<PiiJsonValue>> {
         let results = self
             ._decrypt_unchecked_raw(enclave_client, ops)
             .await?
@@ -59,7 +59,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         enclave_client: &EnclaveClient,
         ops: &[DataIdentifier],
-    ) -> ApiResult<DecryptUncheckedResult<Pii>> {
+    ) -> FpResult<DecryptUncheckedResult<Pii>> {
         let ops: Vec<_> = ops.iter().map(|di| di.clone().into()).collect();
         let results = self.fn_decrypt_unchecked_raw(enclave_client, ops).await?;
         Ok(results)
@@ -88,7 +88,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         enclave_client: &EnclaveClient,
         ops: Vec<EnclaveDecryptOperation>,
-    ) -> ApiResult<DecryptUncheckedResult<Pii>> {
+    ) -> FpResult<DecryptUncheckedResult<Pii>> {
         tracing::info!(dis=?Csv::from(ops.clone()), "Decrypting DIs");
 
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
@@ -111,7 +111,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         enclave_client: &EnclaveClient,
         id: DataIdentifier,
-    ) -> ApiResult<Option<PiiString>> {
+    ) -> FpResult<Option<PiiString>> {
         let result = self
             .decrypt_unchecked(enclave_client, &[id])
             .await?
@@ -150,7 +150,7 @@ const BATCH_DECRYPT_CHUNK_SIZE: usize = 500;
 pub(in crate::utils::vault_wrapper) async fn batch_execute_decrypt_requests<'a, T>(
     enclave_client: &EnclaveClient,
     data: Vec<(T, VwDecryptRequest<'a>)>,
-) -> ApiResult<HashMap<T, DecryptUncheckedResult<Pii>>>
+) -> FpResult<HashMap<T, DecryptUncheckedResult<Pii>>>
 where
     T: std::hash::Hash + Eq + Clone,
 {
@@ -173,13 +173,13 @@ where
     let p_data = {
         p_data
             .into_iter()
-            .map(|((id, op, format), p_data)| -> ApiResult<_> {
+            .map(|((id, op, format), p_data)| -> FpResult<_> {
                 // We apply the data transforms for p_data outside of the enclave here.
                 let p_data = p_data.leak();
                 let transformed = get_transformer(&op.transforms).apply_str::<PiiString>(p_data)?;
                 Ok((id, (op, Pii::format(transformed, format))))
             })
-            .collect::<ApiResult<Vec<_>>>()?
+            .collect::<FpResult<Vec<_>>>()?
     };
 
     // Handle e_data
@@ -219,17 +219,17 @@ where
             .collect::<Vec<_>>()
             .await
             .into_iter()
-            .collect::<ApiResult<Vec<_>>>()?
+            .collect::<FpResult<Vec<_>>>()?
             .into_iter()
             .flatten()
-            .map(|((id, op), pii_bytes)| -> ApiResult<_> {
+            .map(|((id, op), pii_bytes)| -> FpResult<_> {
                 // Apply the document transforms inline since we decrypt the document outside of
                 // the enclave
                 let transformed = get_transformer(&op.transforms).apply(pii_bytes.into_leak())?;
                 let pii = Pii::Bytes(PiiBytes::new(transformed));
                 Ok((id, (op, pii)))
             })
-            .collect::<ApiResult<Vec<_>>>()?
+            .collect::<FpResult<Vec<_>>>()?
     };
 
     // We don't want to make access events for the DIs that are already in plaintext - track which

@@ -7,11 +7,11 @@ use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
-use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifiedUser;
 use api_wire_types::IdentifyId;
@@ -173,11 +173,11 @@ pub(super) async fn create_identified_token(
     scope: IdentifyScope,
     sv: Option<ScopedVault>,
     ob_context: Option<ObConfigAuth>,
-) -> ApiResult<(SessionAuthToken, Vec<UserAuthScope>)> {
+) -> FpResult<(SessionAuthToken, Vec<UserAuthScope>)> {
     let session_key = state.session_sealing_key.clone();
     let token = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let scopes = vec![];
             // TODO we should migrate the BO tokens to use these new un-authed, identified tokens
             let bo = ob_context.as_ref().and_then(|obc| obc.business_owner()).cloned();

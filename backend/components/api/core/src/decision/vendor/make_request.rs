@@ -42,7 +42,7 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
     di_id: &DecisionIntentId,
     ob_configuration_key: ObConfigurationKey,
     vendor_api: VendorAPI,
-) -> ApiResult<(
+) -> FpResult<(
     VerificationRequest,
     VerificationResult,
     Result<VendorResponse, VendorAPIError>,
@@ -70,7 +70,7 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
     let v_req: VerificationRequest = vreq.clone();
     let (vres, vendor_result) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let uv = Vault::get(conn, &sv_id)?;
             let vres = verification_result::save_vres(conn, &uv.public_key, &vendor_result, &v_req)?;
             Ok((vres, vendor_result))
@@ -90,7 +90,7 @@ pub async fn make_idv_vendor_call_save_vreq(
     di_id: &DecisionIntentId,
     ob_configuration_key: ObConfigurationKey,
     vendor_api: VendorAPI,
-) -> ApiResult<(VerificationRequest, Result<VendorResponse, VendorAPIError>)> {
+) -> FpResult<(VerificationRequest, Result<VendorResponse, VendorAPIError>)> {
     let sv_id = sv_id.clone();
     let di_id = di_id.clone();
     let vreq = state
@@ -403,7 +403,7 @@ pub async fn make_vendor_requests(
     tvc: TenantVendorControl,
     requests: Vec<VerificationRequest>,
     wf_id: &WorkflowId, // TODO: remove?
-) -> ApiResult<Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>> {
+) -> FpResult<Vec<Result<VerificationRequestWithVendorResponse, VerificationRequestWithVendorError>>> {
     let requests_with_data =
         build_request::bulk_build_data_from_requests(&state.db_pool, &state.enclave_client, requests).await?;
 

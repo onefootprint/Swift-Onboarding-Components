@@ -1,7 +1,7 @@
 use super::session::JsonSession;
 use super::session::RateLimitRecord;
 use crate::errors::error_with_code::ErrorWithCode;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use chrono::Duration;
 use chrono::Utc;
@@ -20,7 +20,7 @@ pub struct RateLimit<'a> {
 
 impl<'a> RateLimit<'a> {
     #[tracing::instrument(skip_all)]
-    pub(super) async fn enforce_and_update(&self, state: &State) -> ApiResult<()> {
+    pub(super) async fn enforce_and_update(&self, state: &State) -> FpResult<()> {
         let RateLimit { period, key, scope } = *self;
 
         let rate_limit_key = compute_key(key, scope);
@@ -28,7 +28,7 @@ impl<'a> RateLimit<'a> {
 
         state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 if let Some(session) = JsonSession::<RateLimitRecord>::get(conn, &rate_limit_key)? {
                     let time_since_last_sent = now - session.data.sent_at;
                     if time_since_last_sent < period {

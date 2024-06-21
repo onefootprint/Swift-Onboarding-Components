@@ -3,7 +3,6 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::types::JsonApiListResponse;
@@ -11,6 +10,7 @@ use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiError;
 use api_core::ApiErrorKind;
 use api_core::FpError;
+use api_core::FpResult;
 use chrono::Utc;
 use db::helpers::ComplianceDocSummary;
 use db::models::compliance_doc::NewComplianceDoc;
@@ -43,7 +43,7 @@ pub async fn get(
 
     let summary = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), None)?
                 .into_values()
                 .next()
@@ -56,7 +56,7 @@ pub async fn get(
         .docs
         .keys()
         .map(|doc_id| api_wire_types::ComplianceDocSummary::try_from_db((&summary, doc_id)))
-        .collect::<ApiResult<_>>()?;
+        .collect::<FpResult<_>>()?;
     Ok(documents)
 }
 
@@ -81,7 +81,7 @@ pub async fn post(
 
     let (summary, doc_id) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             // Check that the authorized partner tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;
 

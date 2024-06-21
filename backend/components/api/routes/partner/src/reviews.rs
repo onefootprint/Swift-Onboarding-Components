@@ -3,9 +3,9 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
+use api_core::FpResult;
 use chrono::Utc;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_request::ComplianceDocRequest;
@@ -46,7 +46,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             // Check that the authorized tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;
 

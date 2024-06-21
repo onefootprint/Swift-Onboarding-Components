@@ -3,8 +3,8 @@ use super::PieceOfData;
 use super::VaultData;
 use super::VaultWrapper;
 use super::VwArgs;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
+use crate::FpResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::vault::Vault;
@@ -23,7 +23,7 @@ use std::marker::PhantomData;
 /// - created_seqno if added by this tenant
 /// - portablized_seqno if added by another tenant
 /// And for now, give preference to data added by other tenants over data added by this tenants.
-fn sort_key(l: &DataLifetime, sv_id: Option<&ScopedVaultId>) -> ApiResult<(DataLifetimeSeqno, bool)> {
+fn sort_key(l: &DataLifetime, sv_id: Option<&ScopedVaultId>) -> FpResult<(DataLifetimeSeqno, bool)> {
     if let Some(sv_id) = sv_id {
         // Building VW for tenant view
         if &l.scoped_vault_id == sv_id {
@@ -54,7 +54,7 @@ impl<Type> VaultWrapper<Type> {
         documents: Vec<DocumentData>,
         lifetimes: Vec<DataLifetime>,
         sv_id: Option<&ScopedVaultId>,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let mut documents: HashMap<_, _> = documents
             .into_iter()
             .map(|d| (d.lifetime_id.clone(), d))
@@ -64,7 +64,7 @@ impl<Type> VaultWrapper<Type> {
         // Join lifetimes with their underlying piece of data
         let data = lifetimes
             .into_iter()
-            .map(|l| -> ApiResult<_> {
+            .map(|l| -> FpResult<_> {
                 let data = if let Some(d) = documents.remove(&l.id) {
                     PieceOfData::Document(d)
                 } else if let Some(vd) = vd.remove(&l.id) {
@@ -75,7 +75,7 @@ impl<Type> VaultWrapper<Type> {
                 let data = VaultData { lifetime: l, data };
                 Ok(data)
             })
-            .collect::<ApiResult<Vec<_>>>()?;
+            .collect::<FpResult<Vec<_>>>()?;
 
         // TODO some runtime checks that business vaults don't have id data and vice versa
         if data
@@ -92,13 +92,13 @@ impl<Type> VaultWrapper<Type> {
             .into_iter()
             .into_group_map_by(|d| d.lifetime.kind.clone())
             .into_iter()
-            .map(|(k, v)| -> ApiResult<_> {
+            .map(|(k, v)| -> FpResult<_> {
                 // Sort the data in the chronological order in which they became visible to the
                 // vault with most up-to-date data first
                 let v = v
                     .into_iter()
                     .map(|d| Ok((sort_key(&d.lifetime, sv_id)?, d)))
-                    .collect::<ApiResult<Vec<_>>>()?
+                    .collect::<FpResult<Vec<_>>>()?
                     .into_iter()
                     .sorted_by_key(|(key, _)| *key)
                     .rev()
@@ -106,7 +106,7 @@ impl<Type> VaultWrapper<Type> {
                     .collect_vec();
                 Ok((k, v))
             })
-            .collect::<ApiResult<_>>()?;
+            .collect::<FpResult<_>>()?;
 
         let result = Self {
             vault: user_vault,
@@ -118,13 +118,13 @@ impl<Type> VaultWrapper<Type> {
         Ok(result)
     }
 
-    pub fn build_portable(conn: &mut PgConn, v_id: &VaultId) -> ApiResult<Self> {
+    pub fn build_portable(conn: &mut PgConn, v_id: &VaultId) -> FpResult<Self> {
         let args = VwArgs::Vault(v_id);
         Self::build(conn, args)
     }
 
     #[tracing::instrument("VaultWrapper:build", skip_all)]
-    pub fn build(conn: &mut PgConn, args: VwArgs) -> ApiResult<Self> {
+    pub fn build(conn: &mut PgConn, args: VwArgs) -> FpResult<Self> {
         let (uv, sv_id, seqno) = args.build(conn)?;
         let active_lifetimes = if let Some(sv_id) = sv_id.as_ref() {
             // Get all DLs that belong to this tenant

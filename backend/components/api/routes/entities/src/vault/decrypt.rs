@@ -10,7 +10,6 @@ use api_core::auth::tenant::ClientTenantAuthContext;
 use api_core::auth::tenant::TenantAuth;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -19,6 +18,7 @@ use api_core::utils::vault_wrapper::BulkDecryptReq;
 use api_core::utils::vault_wrapper::DecryptAccessEventInfo;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::TenantVw;
+use api_core::FpResult;
 use api_wire_types::DecryptResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -184,13 +184,13 @@ pub(super) async fn post_inner(
 
     let vws: HashMap<Option<DataLifetimeSeqno>, TenantVw> = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             // Build a VW for every version requested
             let vws = versions
                 .into_iter()
                 .map(|v| VaultWrapper::build_for_tenant_version(conn, &scoped_user.id, v).map(|vw| (v, vw)))
-                .collect::<ApiResult<_>>()?;
+                .collect::<FpResult<_>>()?;
             Ok(vws)
         })
         .await?;
@@ -198,11 +198,11 @@ pub(super) async fn post_inner(
     let reqs = version_to_targets
         .clone()
         .into_iter()
-        .map(|(v, targets)| -> ApiResult<_> {
+        .map(|(v, targets)| -> FpResult<_> {
             let vw = vws.get(&v).ok_or(AssertionError("No VW found for version"))?;
             Ok((v, BulkDecryptReq { vw, targets }))
         })
-        .collect::<ApiResult<_>>()?;
+        .collect::<FpResult<_>>()?;
     let insight = CreateInsightEvent::from(insights);
     let actor = auth.actor().into();
     let purpose = AccessEventPurpose::Api;

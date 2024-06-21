@@ -1,7 +1,7 @@
 use super::ProxyHeaderParams;
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use actix_web::http::header::HeaderMap;
 use newtypes::PiiString;
 use reqwest::header::HeaderName;
@@ -21,7 +21,7 @@ impl ForwardProxyHeaders {
 impl TryFrom<&HeaderMap> for ForwardProxyHeaders {
     type Error = ApiError;
 
-    fn try_from(map: &HeaderMap) -> ApiResult<Self> {
+    fn try_from(map: &HeaderMap) -> FpResult<Self> {
         let result = map
             .iter()
             .filter(|(n, _v)| {
@@ -38,7 +38,7 @@ impl TryFrom<&HeaderMap> for ForwardProxyHeaders {
                 };
                 Ok(parse().ok_or(VaultProxyError::InvalidProxyForwardHeader(name_string))?)
             })
-            .collect::<ApiResult<Vec<_>>>();
+            .collect::<FpResult<Vec<_>>>();
 
         Ok(Self(result?))
     }

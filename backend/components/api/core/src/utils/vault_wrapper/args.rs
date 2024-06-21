@@ -1,5 +1,5 @@
 use crate::auth::user::UserIdentifier;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::vault::Vault;
 use db::PgConn;
@@ -42,7 +42,7 @@ impl<'a> From<&'a UserIdentifier> for VwArgs<'a> {
 type Args = (Vault, Option<ScopedVaultId>, DataLifetimeSeqno);
 
 impl<'a> VwArgs<'a> {
-    pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
+    pub(super) fn build(self, conn: &mut PgConn) -> FpResult<Args> {
         let (vault, sv_id, seqno) = match self {
             Self::Vault(uv_id) => {
                 let user_vault = Vault::get(conn, uv_id)?;

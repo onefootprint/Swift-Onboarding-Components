@@ -3,8 +3,8 @@
 //!
 //! They usually will involve a combination of DB operations and other async
 //! operations (such as enclave, etc).
-use api_core::errors::ApiResult;
 use api_core::ApiErrorKind;
+use api_core::FpResult;
 use api_core::State;
 use byteorder::BigEndian;
 use byteorder::ReadBytesExt;
@@ -24,23 +24,23 @@ trait CustomMigration {
         true
     }
 
-    fn run(self, state: Self::MigrationState, conn: &mut TxnPgConn) -> ApiResult<()>;
+    fn run(self, state: Self::MigrationState, conn: &mut TxnPgConn) -> FpResult<()>;
 
-    fn adivsory_xact_lock_value() -> ApiResult<i64> {
+    fn adivsory_xact_lock_value() -> FpResult<i64> {
         let hash = crypto::sha256(Self::version().as_bytes());
         Ok((&hash[0..8]).read_i64::<BigEndian>()?)
     }
 }
 
 /// runs any active migrations that need to be run
-pub async fn run(_state: &State) -> ApiResult<()> {
+pub async fn run(_state: &State) -> FpResult<()> {
     // TODO Add any custom migrations here
     // run_migration(state, m112223_backfill_portable_data::Migration).await?;
     Ok(())
 }
 
 #[tracing::instrument(skip(state))]
-async fn run_migration<M>(state: &State, migration: M) -> ApiResult<()>
+async fn run_migration<M>(state: &State, migration: M) -> FpResult<()>
 where
     M: CustomMigration + Send + Sync + std::fmt::Debug + 'static,
     M::MigrationState: From<State> + Send + 'static,
@@ -70,7 +70,7 @@ where
     // Run the migration inside a DB TXN
     let result = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<()> {
+        .db_transaction(move |conn| -> FpResult<()> {
             // 1. take out the lock so no other servers can continue along the txn (we don't need to unlock it
             //    as it will be dropped after the txn)
             let _ = sql_query("SELECT pg_advisory_xact_lock($1);")

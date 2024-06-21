@@ -8,7 +8,6 @@ use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
@@ -21,6 +20,7 @@ use api_core::utils::sms::rx_background_error;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultContext;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_wire_types::IdentifyId;
 use api_wire_types::SignupChallengeData;
 use api_wire_types::SignupChallengeRequest;
@@ -126,7 +126,7 @@ pub async fn post(
     .await?;
     let (uv, sv, root_span) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (uv, sv, _) = VaultWrapper::create_unverified(conn, ctx, &root_span, duplicate_of_id)?;
             Ok((uv.into_inner(), sv, root_span))
         })
@@ -213,7 +213,7 @@ async fn make_vault_context(
     phone: Option<SignupChallengeData<PhoneNumber>>,
     sandbox_id: Option<newtypes::SandboxId>,
     is_components_sdk: bool,
-) -> ApiResult<VaultContext> {
+) -> FpResult<VaultContext> {
     let sources = chain(
         email.as_ref().map(|e| (IDK::Email.into(), e.is_bootstrap)),
         phone.as_ref().map(|p| (IDK::PhoneNumber.into(), p.is_bootstrap)),

@@ -8,8 +8,8 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
 use crate::utils::headers::get_bool_header;
+use crate::FpResult;
 use db::models::tenant::Tenant;
 use db::models::tenant_role::ImmutableRoleKind;
 use db::models::tenant_role::TenantRole;
@@ -74,7 +74,7 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
         req: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::FirmEmployee(data) => data,
             _ => {
@@ -120,7 +120,7 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedFirmEmployeeAssu
 }
 
 impl<const IS_SECONDARY: bool> GetFirmEmployee for FirmEmployeeAssumeAuthContext<IS_SECONDARY> {
-    fn firm_employee_user(&self) -> ApiResult<TenantUser> {
+    fn firm_employee_user(&self) -> FpResult<TenantUser> {
         let tu = &self.0.tenant_user;
         if !tu.is_firm_employee {
             // TODO should we hide these errors with 404s?
@@ -178,7 +178,7 @@ impl<const IS_SECONDARY: bool> CanCheckTenantGuard for FirmEmployeeAssumeAuthCon
 }
 
 impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
-    fn is_live(&self) -> ApiResult<bool> {
+    fn is_live(&self) -> FpResult<bool> {
         if self.tenant.sandbox_restricted && self.is_live {
             // error if the tenant is sandbox-restricted but is requesting live data
             return Err(AuthError::SandboxRestricted.into());

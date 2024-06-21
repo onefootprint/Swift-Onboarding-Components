@@ -10,12 +10,12 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
 use api_core::errors::cip_error::CipError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::AlpacaCreateAccountRequest;
 use api_wire_types::AlpacaCreateAccountResponse;
@@ -130,10 +130,10 @@ async fn create_create_account_request(
     tenant_id: TenantId,
     is_live: bool,
     req: DeprecatedAlpacaCreateAccountRequest,
-) -> ApiResult<CreateAccountRequest> {
+) -> FpResult<CreateAccountRequest> {
     let (uvw, doc) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<(TenantVw<Person>, _)> {
+        .db_query(move |conn| -> FpResult<(TenantVw<Person>, _)> {
             let sv = ScopedVault::get(conn, (&req.fp_user_id, &tenant_id, is_live))?;
             let doc = Document::get_latest_complete(conn, sv.id.clone())?;
             let uvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
@@ -144,7 +144,7 @@ async fn create_create_account_request(
     tracing::info!(?doc, "create_create_account_request");
 
     let doc_info = doc
-        .map(|(id, _)| -> ApiResult<_> {
+        .map(|(id, _)| -> FpResult<_> {
             // Get the document type that we used to vault the verified images. This is how incode
             // classified the document, which in rare cases may be different from how the user
             // classified the document
@@ -203,7 +203,7 @@ async fn create_create_account_request(
         let documents = doc_info
             .di_pairs
             .into_iter()
-            .map(|(latest_doc_di, mime_di)| -> ApiResult<AlpacaDocument> {
+            .map(|(latest_doc_di, mime_di)| -> FpResult<AlpacaDocument> {
                 let content = decrypted.rm_di(latest_doc_di)?.into();
                 let mime_type = decrypted.rm_di(mime_di)?;
                 Ok(AlpacaDocument {

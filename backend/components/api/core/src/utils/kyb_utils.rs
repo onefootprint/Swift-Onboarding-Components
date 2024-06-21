@@ -6,13 +6,13 @@ use crate::decision::state::BoKycCompleted;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
 use crate::errors::business::BusinessError;
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
 use crate::utils::email::BoInviteEmailInfo;
 use crate::utils::session::AuthSession;
 use crate::utils::vault_wrapper::Business;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
@@ -34,7 +34,7 @@ pub async fn send_missing_secondary_bo_links(
     bvw: &TenantVw<Business>,
     tenant: &Tenant,
     dbos: &[BusinessOwnerInfo],
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let missing_kyc_secondary_bos = dbos
         .iter()
         .filter(|bo| bo.kind == BusinessOwnerKind::Secondary)
@@ -63,10 +63,10 @@ pub async fn send_missing_secondary_bo_links(
         .collect_vec();
     let tokens = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<Vec<_>> {
+        .db_query(move |conn| -> FpResult<Vec<_>> {
             sessions_to_make
                 .into_iter()
-                .map(|(l_id, d)| -> ApiResult<_> {
+                .map(|(l_id, d)| -> FpResult<_> {
                     let (token, _) = AuthSession::create_sync(conn, &sealing_key, d.into(), duration)?;
                     Ok((l_id, token))
                 })
@@ -89,7 +89,7 @@ pub async fn send_missing_secondary_bo_links(
         .clone();
     let bo_sms_info = tokens
         .into_iter()
-        .map(|(l_id, token)| -> ApiResult<_> {
+        .map(|(l_id, token)| -> FpResult<_> {
             let bo_data = missing_kyc_secondary_bos
                 .iter()
                 .find(|bo| bo.linked_bo.as_ref().is_some_and(|bo| bo.link_id == l_id))
@@ -121,32 +121,32 @@ pub async fn send_missing_secondary_bo_links(
             };
             Ok((sms, email))
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<FpResult<Vec<_>>>()?;
 
     let futs = bo_sms_info
         .into_iter()
         .flat_map(|((sms_message, sms_destination), email)| {
             let sms = state.sms_client.send_message(state, sms_message, sms_destination);
             let email = state.sendgrid_client.send_business_owner_invite(state, email);
-            let v: Vec<Pin<Box<dyn futures::Future<Output = ApiResult<()>>>>> =
+            let v: Vec<Pin<Box<dyn futures::Future<Output = FpResult<()>>>>> =
                 vec![Box::pin(sms), Box::pin(email)];
             v
         });
     futures::future::join_all(futs)
         .await
         .into_iter()
-        .collect::<ApiResult<_>>()?;
+        .collect::<FpResult<_>>()?;
 
     Ok(())
 }
 
 #[tracing::instrument(skip(state))]
-async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> ApiResult<bool> {
+async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> FpResult<bool> {
     let svid = biz_wf.scoped_vault_id.clone();
     let obc_id = biz_wf.ob_configuration_id.clone();
     let (bvw, obc) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &svid)?;
             let (obc, _) = ObConfiguration::get(conn, &obc_id)?;
             Ok((bvw, obc))
@@ -169,7 +169,7 @@ async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -> Ap
 }
 
 #[tracing::instrument(skip(state))]
-pub async fn run_kyb(state: &State, tenant: &Tenant, biz_wf: Workflow) -> ApiResult<()> {
+pub async fn run_kyb(state: &State, tenant: &Tenant, biz_wf: Workflow) -> FpResult<()> {
     let wf_id = biz_wf.id.clone();
 
     // First see if we have to run authorize

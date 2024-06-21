@@ -1,5 +1,5 @@
 use self::kyb::KybState;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -100,7 +100,7 @@ pub struct WorkflowWrapper {
 
 impl WorkflowWrapper {
     #[tracing::instrument("WorkflowWrapper::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> FpResult<Self> {
         let workflow_id = workflow.id.clone();
         let s = match workflow.state {
             newtypes::WorkflowState::Kyc(_) => KycState::init(state, workflow).await?.into(),
@@ -119,7 +119,7 @@ impl WorkflowWrapper {
         self,
         state: &State,
         action: WorkflowActions,
-    ) -> ApiResult<(Self, Option<WorkflowActions>)> {
+    ) -> FpResult<(Self, Option<WorkflowActions>)> {
         let Self {
             state: wf_state,
             workflow_id,
@@ -136,7 +136,7 @@ impl WorkflowWrapper {
     }
 
     #[tracing::instrument("WorkflowWrapper::run", skip(state))]
-    pub async fn run(self, state: &State, action: WorkflowActions) -> ApiResult<Self> {
+    pub async fn run(self, state: &State, action: WorkflowActions) -> FpResult<Self> {
         let mut next_action = Some(action);
         let mut ww = self;
         while let Some(action) = next_action {
@@ -155,7 +155,7 @@ pub enum RunIncodeMachineAndWorkflowResult {
 pub async fn run_incode_machine_and_workflow(
     state: &State,
     ww: WorkflowWrapper,
-) -> ApiResult<RunIncodeMachineAndWorkflowResult> {
+) -> FpResult<RunIncodeMachineAndWorkflowResult> {
     let wfid = ww.workflow_id.clone();
     let ivs = state
         .db_pool

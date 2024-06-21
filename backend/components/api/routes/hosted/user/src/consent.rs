@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuthScope;
-use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::types::ModernApiResult;
@@ -36,7 +36,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
             let ml_consent = ml_consent.unwrap_or(false);

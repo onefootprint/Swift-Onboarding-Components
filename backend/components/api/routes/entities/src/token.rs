@@ -5,7 +5,6 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::config::LinkKind;
 use api_core::errors::user::UserError;
-use api_core::errors::ApiResult;
 use api_core::utils::email::SendgridClient;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::token::create_token;
@@ -14,6 +13,7 @@ use api_core::utils::token::CreateTokenResult;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_wire_types::CreateEntityTokenRequest;
 use api_wire_types::CreateEntityTokenResponse;
 use chrono::Duration;
@@ -52,7 +52,7 @@ pub async fn post(
 
     let (res, vw) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
 
@@ -97,7 +97,7 @@ async fn send_communication(
     wfr: Option<WorkflowRequest>,
     org_name: String,
     link: PiiString,
-) -> ApiResult<Option<ContactInfoKind>> {
+) -> FpResult<Option<ContactInfoKind>> {
     let (kind, note) = if let Some(wfr) = wfr {
         let WorkflowRequest { note, config, .. } = wfr;
         let kind = match config {

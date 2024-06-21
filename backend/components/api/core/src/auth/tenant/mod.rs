@@ -24,8 +24,8 @@ use super::AuthError;
 use super::Either;
 use super::IsGuardMet;
 use super::SessionContext;
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
+use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::tenant::Tenant;
@@ -64,7 +64,7 @@ impl TenantOrPartnerTenantSessionAuth {
         self,
         t_guard: TenantGuard,
         pt_guard: PartnerTenantGuard,
-    ) -> ApiResult<TenantOrPartnerTenantAuth> {
+    ) -> FpResult<TenantOrPartnerTenantAuth> {
         Ok(match self {
             Either::Left(t_auth) => Either::Left(t_auth.check_guard(t_guard)?),
             Either::Right(pt_auth) => Either::Right(pt_auth.check_guard(pt_guard)?),
@@ -93,7 +93,7 @@ impl From<PartnerTenantSessionAuth> for TenantOrPartnerTenantSessionAuth {
 
 pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
-    fn is_live(&self) -> ApiResult<bool>;
+    fn is_live(&self) -> FpResult<bool>;
     fn actor(&self) -> AuthActor;
     fn scopes(&self) -> Vec<TenantScope>;
     fn dl_source(&self) -> DataLifetimeSource;
@@ -108,12 +108,12 @@ pub trait PartnerTenantAuth {
 pub trait GetFirmEmployee {
     /// Escape hatch to get the `TenantUser` for an auth session, if and only if the authed user
     /// is a firm employee.
-    fn firm_employee_user(&self) -> ApiResult<TenantUser>;
+    fn firm_employee_user(&self) -> FpResult<TenantUser>;
 }
 
 #[async_trait]
 pub trait InvalidateAuth {
-    async fn invalidate(self, state: &State) -> ApiResult<()>;
+    async fn invalidate(self, state: &State) -> FpResult<()>;
 }
 
 #[derive(Clone, Debug)]
@@ -124,7 +124,7 @@ pub enum AuthActor {
 }
 
 impl AuthActor {
-    pub fn tenant_user_id(&self) -> ApiResult<&TenantUserId> {
+    pub fn tenant_user_id(&self) -> FpResult<&TenantUserId> {
         match self {
             AuthActor::TenantUser(tu_id) | AuthActor::FirmEmployee(tu_id) => Ok(tu_id),
             _ => ValidationError("Non-user principal").into(),

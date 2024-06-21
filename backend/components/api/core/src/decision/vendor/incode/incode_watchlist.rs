@@ -10,10 +10,10 @@ use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
 use crate::decision::vendor::verification_result::{
     self,
 };
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
@@ -60,7 +60,7 @@ async fn save_verification_result_for_watchlist_check<
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
     vreq_id: VerificationRequestId,
-) -> ApiResult<VerificationResultId> {
+) -> FpResult<VerificationResultId> {
     let args = SaveVerificationResultArgs::new(
         res,
         di_id.clone(),
@@ -83,7 +83,7 @@ async fn call_watchlist_result(
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
     kind: WatchlistCheckKind,
-) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
+) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     let svid = sv_id.clone();
     let diid = di_id.clone();
     let vendor_api: VendorAPI = kind.clone().into();
@@ -168,7 +168,7 @@ pub async fn make_watchlist_result_call(
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
     kind: WatchlistCheckKind,
-) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
+) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     // TODO: upstream this somewhere based on OBC, maybe not even necessary for watchlist
     let config_id = IncodeConfigurationId::from("65023dbdc221a0aba52791be".to_string());
     let res = call_start_onboarding(
@@ -222,12 +222,12 @@ pub async fn run_watchlist_check(
     di: &DecisionIntent,
     obc_key: &ObConfigurationKey,
     kind: WatchlistCheckKind,
-) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
+) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     let svid = di.scoped_vault_id.clone();
     let obc_key = obc_key.clone();
     let (tenant_id, vw, obc) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             let (obc, _) = ObConfiguration::get(conn, &obc_key)?;
@@ -281,7 +281,7 @@ async fn existing_watchlist_check_response(
     vault_private_key: &EncryptedVaultPrivateKey,
     di_id: &DecisionIntentId,
     kind: WatchlistCheckKind,
-) -> ApiResult<Option<(VerificationResultId, WatchlistResultResponse)>> {
+) -> FpResult<Option<(VerificationResultId, WatchlistResultResponse)>> {
     let response = match kind {
         WatchlistCheckKind::MakeNewSearch => load_response_for_vendor_api(
             state,
@@ -314,10 +314,10 @@ async fn save_canned_response(
     sv_id: ScopedVaultId,
     di_id: DecisionIntentId,
     public_key: VaultPublicKey,
-) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
+) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let canned_res = idv::test_fixtures::incode_watchlist_result_response_no_hits();
             let parsed = serde_json::from_value::<WatchlistResultResponse>(canned_res.clone())?;
 

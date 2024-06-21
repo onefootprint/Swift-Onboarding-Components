@@ -2,8 +2,8 @@ use super::vendor_parsable::AsParsedResponse;
 use super::vendor_parsable::VendorParsable;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::vendor::verification_result::decrypt_verification_result_response;
-use crate::errors::ApiResult;
 use crate::ApiError;
+use crate::FpResult;
 use crate::State;
 use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
@@ -66,7 +66,7 @@ pub async fn load_response_for_vendor_api<T>(
     id: VReqIdentifier,
     user_vault_private_key: &EncryptedVaultPrivateKey,
     vendor_api_struct: T,
-) -> ApiResult<LoadVendorResponseResult<T::ParsedType>>
+) -> FpResult<LoadVendorResponseResult<T::ParsedType>>
 where
     T: VendorParsable + std::fmt::Debug,
 {
@@ -166,7 +166,7 @@ mod tests {
 
         let (vres_id_to_check, di_id) = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let di = DecisionIntent::get_or_create_for_workflow(
                     conn,
                     &sv_id,
@@ -441,7 +441,7 @@ mod tests {
 
         state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let res = VerificationRequest::list(conn, &di_id).unwrap();
                 let res_responses: Vec<_> = res
                     .clone()

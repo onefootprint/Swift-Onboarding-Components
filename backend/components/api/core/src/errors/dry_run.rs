@@ -1,5 +1,5 @@
-use super::ApiResult;
 use crate::ApiError;
+use crate::FpResult;
 use api_errors::FpError;
 use db::DbError;
 
@@ -36,7 +36,7 @@ pub type DryRunResult<T> = Result<T, DryRunError<T>>;
 
 pub trait DryRunResultTrait<T> {
     fn ok_or_rollback(value: T, dry_run: bool) -> Self;
-    fn value(self) -> ApiResult<T>;
+    fn value(self) -> FpResult<T>;
 }
 
 impl<T> DryRunResultTrait<T> for DryRunResult<T> {
@@ -52,7 +52,7 @@ impl<T> DryRunResultTrait<T> for DryRunResult<T> {
     }
 
     /// Unpack the result `T` from either the Ok result or dry run rollback result
-    fn value(self) -> ApiResult<T> {
+    fn value(self) -> FpResult<T> {
         match self {
             Ok(v) => Ok(v),
             // If the result is an error, but the error is DryRunRollback, return the wrapped value

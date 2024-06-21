@@ -1,7 +1,7 @@
 use super::fingerprints::Fingerprints;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use itertools::Itertools;
 use newtypes::fingerprint_salt::FingerprintSalt;
@@ -31,7 +31,7 @@ impl FingerprintedDataRequest {
     /// This gives us type safety that fingerprints are provided to the VW utils that add data to a
     /// vault
     #[tracing::instrument("FingerprintedDataRequest::build", skip_all)]
-    pub async fn build(state: &State, data: DataRequest, sv_id: &ScopedVaultId) -> ApiResult<Self> {
+    pub async fn build(state: &State, data: DataRequest, sv_id: &ScopedVaultId) -> FpResult<Self> {
         let sv_id = sv_id.clone();
         let vw = state
             .db_pool
@@ -66,7 +66,7 @@ impl FingerprintedDataRequest {
         state: &State,
         data: DataRequest,
         tenant_id: &TenantId,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let DataRequest { data, json_fields } = data;
 
         let data_to_fingerprint: Vec<_> = data

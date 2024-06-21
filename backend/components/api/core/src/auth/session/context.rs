@@ -2,9 +2,9 @@ use super::ExtractableAuthSession;
 use super::GetSessionForUpdate;
 use crate::auth::tenant::InvalidateAuth;
 use crate::auth::AuthError;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::session::AuthSession;
+use crate::FpResult;
 use crate::ModernApiError;
 use crate::ModernApiResult;
 use crate::State;
@@ -200,7 +200,7 @@ where
     T: Send,
 {
     /// invalidate the session token for logout purposes
-    async fn invalidate(self, state: &State) -> ApiResult<()> {
+    async fn invalidate(self, state: &State) -> FpResult<()> {
         let key = self.session.key;
         Ok(state
             .db_pool

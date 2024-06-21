@@ -11,7 +11,6 @@ use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::errors::TfError;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
@@ -24,6 +23,7 @@ use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
+use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::SimpleFixtureResult;
 use api_wire_types::TriggerKycRequest;
@@ -86,7 +86,7 @@ pub async fn post(
 
     let (uvw, sv) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             Ok((uvw, sv))
@@ -113,7 +113,7 @@ pub async fn post(
 
     let (wf, obc) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
             tracing::info!(playbook_key=%obc.key, "Post /kyc with playbook");
@@ -207,7 +207,7 @@ pub async fn post(
     }
     let (wf, sv, mrs) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (wf, sv) = Workflow::get_all(conn, &wf.id)?;
             let mrs = ManualReview::get_active(conn, &sv.id)?;
             Ok((wf, sv, mrs))

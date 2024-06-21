@@ -1,7 +1,7 @@
 use super::AuthSessionData;
 use crate::auth::Either;
-use crate::errors::ApiResult;
 use crate::utils::session::AuthSession;
+use crate::FpResult;
 use crypto::aead::ScopedSealingKey;
 use db::PgConn;
 
@@ -35,7 +35,7 @@ pub trait UpdateSession {
         conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
-    ) -> ApiResult<()>;
+    ) -> FpResult<()>;
 }
 
 impl<T> UpdateSession for T
@@ -47,7 +47,7 @@ where
         conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
         data: AuthSessionData,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         self.session().update(conn, session_sealing_key, data)?;
         Ok(())
     }

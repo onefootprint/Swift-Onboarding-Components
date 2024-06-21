@@ -11,7 +11,6 @@ use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
 use crate::errors::ApiErrorKind;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::file_upload::mime_type_to_extension;
 use crate::utils::vault_wrapper::DataLifetimeSources;
@@ -21,6 +20,7 @@ use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::WriteableVw;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::billing_event::BillingEvent;
@@ -93,7 +93,7 @@ pub(super) async fn compute_ocr_data<'a>(
     state: &State,
     args: PreCompleteArgs<'a>,
     rs: &'a [NewRiskSignal],
-) -> ApiResult<FingerprintedDataRequest> {
+) -> FpResult<FingerprintedDataRequest> {
     let PreCompleteArgs {
         obc,
         vw,
@@ -219,7 +219,7 @@ pub(super) fn compute_risk_signals<'a>(
     ocr_vres_id: VerificationResultId,
     score_vres_id: VerificationResultId,
     ignored_failure_reasons: &'a [IncodeFailureReason],
-) -> ApiResult<Vec<NewRiskSignal>> {
+) -> FpResult<Vec<NewRiskSignal>> {
     let PreCompleteArgs {
         obc,
         id_doc,
@@ -327,7 +327,7 @@ fn vault_complete_images(
     vw: &WriteableVw<Person>,
     dk: IdDocKind,
     id_doc: &Document,
-) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
+) -> FpResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
     // When we vault .latest_upload, we use the document_type that is provided by the user, not the
     // eventual doc_type from incode which is the one we vault the complete images for
     let doc_type = IdDocKind::try_from(id_doc.document_type)?;
@@ -368,7 +368,7 @@ pub struct CompleteArgs<'a> {
 impl Complete {
     /// Must call this before instantiating Complete
     #[tracing::instrument("Complete::enter", skip_all)]
-    pub fn enter(conn: &mut TxnPgConn, args: CompleteArgs) -> ApiResult<()> {
+    pub fn enter(conn: &mut TxnPgConn, args: CompleteArgs) -> FpResult<()> {
         let CompleteArgs {
             vault,
             sv_id,
@@ -448,7 +448,7 @@ impl IncodeStateTransition for Complete {
         _: &IncodeClients,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         Ok(None)
     }
 
@@ -457,7 +457,7 @@ impl IncodeStateTransition for Complete {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         Err(ApiErrorKind::AssertionError(
             "Incode machine already complete".into(),
         ))?

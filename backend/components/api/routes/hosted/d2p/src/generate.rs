@@ -4,8 +4,8 @@ use crate::utils::session::JsonSession;
 use crate::State;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
+use api_core::FpResult;
 use api_wire_types::D2pGenerateRequest;
 use api_wire_types::D2pGenerateResponse;
 use chrono::Duration;
@@ -33,7 +33,7 @@ pub async fn handler(
     let session_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let limit_ttl = Duration::minutes(30);
             let args = NewUserSessionContext::default();
             let session = user_auth.update(

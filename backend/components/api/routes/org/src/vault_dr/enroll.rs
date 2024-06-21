@@ -2,8 +2,8 @@ use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
+use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
 use db::models::vault_dr::NewVaultDrConfig;
@@ -37,7 +37,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let Some(pre_enrollment) = VaultDrAwsPreEnrollment::get(conn, &tenant.id, is_live)? else {
                 return Err(vault_dr::Error::MissingAwsPreEnrollment.into());
             };

@@ -1,9 +1,9 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
@@ -36,7 +36,7 @@ async fn post(
     let tenant_id = auth.tenant().id.clone();
     let (key, role) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (key, role) = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
             Ok((key, role))
         })

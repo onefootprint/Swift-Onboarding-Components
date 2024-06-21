@@ -1,9 +1,9 @@
 use crate::config::Config;
 use crate::errors::enclave::EnclaveError;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::proxy::to_data_transforms;
 use crate::s3::S3Client;
+use crate::FpResult;
 use api_errors::FpError;
 use async_trait::async_trait;
 use crypto::aead::AeadSealedBytes;
@@ -277,7 +277,7 @@ impl EnclaveClient {
     pub async fn compute_fingerprints_keys<T>(
         &self,
         data: Vec<(T, (FingerprintSalt, &PiiString))>,
-    ) -> ApiResult<Vec<(T, Fingerprint)>> {
+    ) -> FpResult<Vec<(T, Fingerprint)>> {
         // Zip the keys of type T back together with the fingerprinted results, since we know
         // that the order of the results from the enclave will match the order of the input data
         let (keys, values_to_fp): (Vec<_>, Vec<_>) = data.into_iter().unzip();
@@ -380,7 +380,7 @@ impl EnclaveClient {
         e_private_key: &EncryptedVaultPrivateKey,
         e_data_key: &SealedVaultDataKey,
         s3_url: &S3Url,
-    ) -> ApiResult<PiiBytes> {
+    ) -> FpResult<PiiBytes> {
         #[allow(clippy::let_unit_value)]
         let key = ();
         let documents = vec![(key, (e_private_key, e_data_key, s3_url))]
@@ -401,7 +401,7 @@ impl EnclaveClient {
     pub async fn batch_decrypt_documents<T: Eq + Hash>(
         &self,
         documents: HashMap<T, (&EncryptedVaultPrivateKey, &SealedVaultDataKey, &S3Url)>,
-    ) -> ApiResult<HashMap<T, PiiBytes>> {
+    ) -> FpResult<HashMap<T, PiiBytes>> {
         if documents.is_empty() {
             return Ok(HashMap::new());
         }

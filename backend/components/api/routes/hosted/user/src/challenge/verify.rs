@@ -7,7 +7,6 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
 use api_core::errors::error_with_code::ErrorWithCode;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
@@ -18,6 +17,7 @@ use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::FingerprintedDataRequest;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_wire_types::UserChallengeVerifyRequest;
 use chrono::Utc;
 use crypto::sha256;
@@ -105,7 +105,7 @@ pub async fn post(
     // Perform the action - register the email/phone/passkey
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let ie = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             let (event_kind, passkey_cred_id) =
                 action.register(conn, &sv_id, action_kind, &user_auth, ie.id.clone())?;
@@ -152,7 +152,7 @@ impl Action {
         ci_kind: ContactInfoKind,
         value: PiiString,
         sv_id: &ScopedVaultId,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let args = ValidateArgs::for_bifrost(user_auth.user.is_live);
         let data = HashMap::from_iter([(ci_kind.into(), value)]);
         let data = DataRequest::clean_and_validate_str(data, args)?;
@@ -170,7 +170,7 @@ impl Action {
         action_kind: ActionKind,
         user_auth: &CheckedUserAuthContext,
         ie_id: InsightEventId,
-    ) -> ApiResult<(AuthEventKind, Option<WebauthnCredentialId>)> {
+    ) -> FpResult<(AuthEventKind, Option<WebauthnCredentialId>)> {
         // TODO: eventually, let's make this a Vw util that is used to add login methods and use
         // this in identify/verify.
         // Then, send an email to the user's last verified CI any time their login methods change

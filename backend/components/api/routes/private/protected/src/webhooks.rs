@@ -2,11 +2,11 @@ use crate::ProtectedAuth;
 use actix_web::post;
 use actix_web::web;
 use actix_web::web::Json;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::task;
 use api_core::types::ModernApiResult;
+use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
@@ -53,7 +53,7 @@ async fn post(
 
     state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let svs = ScopedVault::bulk_get(conn, fp_ids, &tenant_id, is_live)?;
             let sv_ids = svs.into_iter().map(|(sv, _)| sv.id).collect_vec();
             let entities = ScopedVault::bulk_get_serializable_info(conn, sv_ids)?;
@@ -64,7 +64,7 @@ async fn post(
                     scheduled_for: Utc::now(),
                     task_data,
                 })
-                .collect::<ApiResult<Vec<_>>>()?;
+                .collect::<FpResult<Vec<_>>>()?;
             Task::bulk_create(conn, task_data)?;
             Ok(())
         })
@@ -78,7 +78,7 @@ fn create_webhook_event(
     conn: &mut PgConn,
     entity: SerializableEntity,
     kind: WebhookEventKind,
-) -> ApiResult<TaskData> {
+) -> FpResult<TaskData> {
     let (sv, _, _, _, mrs, wfs, _) = entity;
     let (latest_wf, _) = wfs
         .into_iter()

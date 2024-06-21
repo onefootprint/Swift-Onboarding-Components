@@ -1,7 +1,7 @@
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Business;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use db::models::ob_configuration::ObConfiguration;
@@ -11,11 +11,11 @@ use itertools::Itertools;
 use newtypes::BusinessOwnerKind;
 use newtypes::WorkflowId;
 
-pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> ApiResult<Vec<OnboardingDecision>> {
+pub async fn get_bo_obds(state: &State, biz_wf_id: &WorkflowId) -> FpResult<Vec<OnboardingDecision>> {
     let wfid = biz_wf_id.clone();
     let (wf, sv, bvw, obc) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (wf, sv) = Workflow::get_all(conn, &wfid)?;
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sv.id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;

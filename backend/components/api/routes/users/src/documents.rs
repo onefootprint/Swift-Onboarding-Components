@@ -3,9 +3,9 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use db::models::document::Document;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
@@ -33,7 +33,7 @@ pub async fn get(
     // get all completed id docs, sort by created_at asc
     let id_docs = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let id_docs: Vec<Document> = Document::list(conn, &sv.id)?
                 .into_iter()

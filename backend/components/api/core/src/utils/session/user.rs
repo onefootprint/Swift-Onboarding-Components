@@ -1,6 +1,6 @@
 use crate::auth::session::AuthSessionData;
 use crate::errors::error_with_code::ErrorWithCode;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use chrono::DateTime;
 use chrono::Duration;
@@ -28,7 +28,7 @@ pub enum Expiry {
 }
 
 impl AuthSession {
-    pub async fn get(state: &State, auth_token: &SessionAuthToken) -> ApiResult<Self> {
+    pub async fn get(state: &State, auth_token: &SessionAuthToken) -> FpResult<Self> {
         let key = auth_token.id();
         let session: Option<Session> = state
             .db_pool

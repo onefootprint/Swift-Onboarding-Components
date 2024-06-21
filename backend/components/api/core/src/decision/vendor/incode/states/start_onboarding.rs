@@ -3,7 +3,7 @@ use super::IncodeStateTransition;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::incode_verification_session::UpdateIncodeVerificationSession;
@@ -26,7 +26,7 @@ impl StartOnboarding {
         incode_session: IncodeVerificationSession,
         incode_credentials: IncodeCredentials,
         configuration_id: IncodeConfigurationId,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         //
         // make the request to incode
         //
@@ -65,7 +65,7 @@ impl StartOnboarding {
 
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let ivs = IncodeVerificationSession::lock(conn, &incode_session.id)?;
                 let next_state = AddFront::new();
 

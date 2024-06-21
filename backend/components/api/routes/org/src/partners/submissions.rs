@@ -1,9 +1,9 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
+use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
 use db::models::compliance_doc::ComplianceDoc;
@@ -41,7 +41,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             // Check that the authorized tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &tenant_id)?;
 

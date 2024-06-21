@@ -1,4 +1,4 @@
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::scoped_vault::SearchQuery;
 use itertools::Itertools;
@@ -20,7 +20,7 @@ pub async fn parse_search(
     state: &State,
     search: Option<PiiString>,
     tenant_id: &TenantId,
-) -> ApiResult<(Option<SearchQuery>, Option<FpId>)> {
+) -> FpResult<(Option<SearchQuery>, Option<FpId>)> {
     use DataIdentifier::Business;
     use DataIdentifier::Id;
     let Some(search) = search else {

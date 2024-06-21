@@ -1,9 +1,9 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
@@ -44,7 +44,7 @@ pub async fn delete(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<()> {
+        .db_transaction(move |conn| -> FpResult<()> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;
 

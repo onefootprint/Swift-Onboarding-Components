@@ -3,10 +3,10 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use chrono::Utc;
 use db::models::compliance_doc_template::ComplianceDocTemplate;
 use db::models::compliance_doc_template::NewComplianceDocTemplate;
@@ -36,7 +36,7 @@ pub async fn get(
 
     let (templates_with_latest_version, users) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let templates_with_latest_version =
                 ComplianceDocTemplate::list_active_with_latest_version(conn, &pt_id)?;
 
@@ -57,7 +57,7 @@ pub async fn get(
             let user = tplv
                 .created_by_partner_tenant_user_id
                 .as_ref()
-                .map(|u| -> ApiResult<_> {
+                .map(|u| -> FpResult<_> {
                     Ok(users
                         .get(u)
                         .ok_or(AssertionError("missing tenant user ID after get_bulk"))?
@@ -67,7 +67,7 @@ pub async fn get(
 
             Ok(api_wire_types::ComplianceDocTemplate::from_db((tpl, tplv, user)))
         })
-        .collect::<ApiResult<_>>()?;
+        .collect::<FpResult<_>>()?;
 
     Ok(templates)
 }

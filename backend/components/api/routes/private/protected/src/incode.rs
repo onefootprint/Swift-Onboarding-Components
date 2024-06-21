@@ -14,7 +14,6 @@ use api_core::decision::state::Authorize;
 use api_core::decision::state::WorkflowActions;
 use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_core::utils::file_upload::handle_file_upload;
@@ -25,6 +24,7 @@ use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::CreateDocumentResponse;
 use api_wire_types::DocumentResponse;
@@ -95,7 +95,7 @@ pub async fn rerun_machine(
 
     let (id_doc, dr, su, di, uvw, obc) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let old_session =
                 IncodeVerificationSession::get(conn, &id)?.ok_or(AssertionError("No session found"))?;
             let (id_doc, dr) = Document::get(conn, &old_session.identity_document_id)?;
@@ -179,7 +179,7 @@ pub async fn adhoc_create_document_and_workflow(
 
     let (vw, document_request, wf_id) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
 
@@ -231,7 +231,7 @@ pub async fn adhoc_create_document_and_workflow(
     // Create our identity document now
     let doc_id = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let args = NewDocumentArgs {
                 request_id: document_request.id,
                 document_type,
@@ -275,7 +275,7 @@ pub async fn adhoc_upload_and_process(
     let (document_id, side) = args.into_inner();
     let (iddoc, wf, tenant_id) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (iddoc, doc_req) = Document::get(conn, &document_id)?;
             let wf = Workflow::get(conn, &doc_req.workflow_id)?;
             let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
@@ -330,7 +330,7 @@ pub async fn adhoc_document_process(
 
     let (wf, uvw, obc) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (_, doc_req) = Document::get(conn, &document_id)?;
             // authorize since this is a non-customer facing route
             let wf = Workflow::lock(conn, &doc_req.workflow_id)?;
@@ -373,7 +373,7 @@ pub async fn adhoc_document_process(
 
     let unmet_requirements: Vec<_> = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let reqs =
                 get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values, RequirementOpts::default())?;
             Ok(reqs)

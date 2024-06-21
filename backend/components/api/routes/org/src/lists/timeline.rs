@@ -2,7 +2,6 @@ use crate::audit_events::AuditEventCursor;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::types::Base64Cursor;
 use api_core::types::CursorPaginatedResponse;
@@ -10,6 +9,7 @@ use api_core::types::CursorPaginatedResponseInner;
 use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::ApiError;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::ListEvent;
 use api_wire_types::ListEventDetail;
@@ -66,7 +66,7 @@ async fn timeline(
 
     let (events, list, list_entry_creations, list_entries) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
             let events = AuditEvent::filter(conn, params, (page_size + 1) as i64)?;
             let events = events.into_iter().take(page_size).collect_vec(); // TODO: why is this needed?
@@ -121,7 +121,7 @@ async fn saturate_events(
     list: &List,
     list_entry_creations: HashMap<ListEntryCreationId, Vec<ListEntry>>,
     list_entries: HashMap<ListEntryId, ListEntry>,
-) -> ApiResult<Vec<(JoinedAuditEvent, ListEventDetail)>> {
+) -> FpResult<Vec<(JoinedAuditEvent, ListEventDetail)>> {
     let decrypted_list_key = SealingKey::new(
         state
             .enclave_client
@@ -197,10 +197,10 @@ async fn saturate_events(
             };
             detail.map(|d| (le, d))
         })
-        .collect::<ApiResult<Vec<_>>>()
+        .collect::<FpResult<Vec<_>>>()
 }
 
-fn decrypt_list_entry(key: &SealingKey, le: &ListEntry) -> ApiResult<PiiString> {
+fn decrypt_list_entry(key: &SealingKey, le: &ListEntry) -> FpResult<PiiString> {
     key.unseal_bytes(AeadSealedBytes(le.e_data.clone().0))
         .map_err(ApiError::from)
         .map(PiiBytes::new)

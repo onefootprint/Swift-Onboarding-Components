@@ -55,9 +55,9 @@ use super::validate_doc_type_is_allowed;
 use super::IncodeContext;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::verification_result::NewVerificationResult;
 use db::models::verification_result::VerificationResult;
@@ -106,7 +106,7 @@ pub async fn save_incode_fixtures(
     obc: ObConfiguration,
     id_doc: Document,
     should_collect_selfie: bool,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let suid = su_id.clone();
     let vw = state
         .db_pool
@@ -145,7 +145,7 @@ pub async fn save_incode_fixtures(
     let wfid = wf_id.clone();
     let (vres, doc_uploads) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let di =
                 DecisionIntent::get_or_create_for_workflow(conn, &suid, &wfid, DecisionIntentKind::DocScan)?;
             let apis = vec![VendorAPI::IncodeFetchOcr, VendorAPI::IncodeFetchScores];
@@ -204,7 +204,7 @@ pub async fn save_incode_fixtures(
     let wfid = wf_id.clone();
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             // Enter the complete state to save risk signals
             let args = CompleteArgs {
                 vault: &vw.vault,
@@ -252,7 +252,7 @@ fn parse_type_of_id(
     type_of_id: Option<&IncodeDocumentType>,
     document_sub_type: Option<&IncodeDocumentSubType>,
     country_code: Option<&ScrubbedPiiString>,
-) -> ApiResult<Result<ValidatedIdDocKind, IncodeFailureReason>> {
+) -> FpResult<Result<ValidatedIdDocKind, IncodeFailureReason>> {
     // Validate the doc type matches what the client told us (and what we validated against the
     // doc request)
     let expected_doc_type = ctx

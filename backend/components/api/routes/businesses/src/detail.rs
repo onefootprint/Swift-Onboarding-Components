@@ -2,10 +2,10 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::api_v2_operation;
@@ -29,7 +29,7 @@ pub async fn get(
 
     let (sv, mrs) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_bid, &tenant_id, is_live))?;
             let mrs = ManualReview::get_active(conn, &sv.id)?;
             Ok((sv, mrs))

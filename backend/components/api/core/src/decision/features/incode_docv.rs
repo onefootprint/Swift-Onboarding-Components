@@ -1,8 +1,8 @@
 use crate::decision::features::incode_utils::*;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use chrono::NaiveDateTime;
 use chrono::Utc;
 use idv::incode::doc::response::FetchOCRResponse;
@@ -55,7 +55,7 @@ impl From<IncodeOcrComparisonDataFields> for IncodeOcrFixtureResponseFields {
 }
 
 impl IncodeOcrComparisonDataFields {
-    pub async fn compose(enclave_client: &EnclaveClient, vw: &VaultWrapper) -> ApiResult<Self> {
+    pub async fn compose(enclave_client: &EnclaveClient, vw: &VaultWrapper) -> FpResult<Self> {
         let fields = &[
             DataIdentifier::Id(IdentityDataKind::FirstName),
             DataIdentifier::Id(IdentityDataKind::LastName),

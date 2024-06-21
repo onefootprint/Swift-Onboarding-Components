@@ -1,9 +1,9 @@
 use super::super::challenge_rate_limit::RateLimit;
 use super::vendors::SmsVendorKind;
 use crate::errors::user::UserError;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::sms::vendors::SmsSendStatus;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use aws_credential_types::provider::SharedCredentialsProvider;
@@ -58,7 +58,7 @@ impl SmsClient {
         twilio_backup: TwilioConfig,
         time_s_between_challenges: i64,
         ff_client: Arc<dyn FeatureFlagClient>,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let twilio_client = twilio
             .make_client()
             .ok_or(AssertionError("Unable to make twilio client"))?;
@@ -110,7 +110,7 @@ impl SmsClient {
         state: &State,
         message: SmsMessage,
         destination: PhoneNumber,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
             tracing::info!("Fixture phone number. Not sending SMS");
@@ -134,7 +134,7 @@ impl SmsClient {
         message: SmsMessage,
         destination: PhoneNumber,
         tx: Sender<FpError>,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         if destination.is_fixture_phone_number() {
             // Don't rate limit or send SMS messages to the fixture phone number
             return Ok(());
@@ -164,7 +164,7 @@ impl SmsClient {
         message: SmsMessage,
         destination: PhoneNumber,
         mut tx: Option<Sender<FpError>>,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         let e164 = destination.e164();
         // Assemble the list of vendors we will use to attempt to send the message.
         // This launchdarkly flag controls both (1) which vendors are available and
@@ -273,7 +273,7 @@ impl SmsClient {
         destination: PhoneNumber,
         vault_id: VaultId,
         sandbox_id: Option<SandboxId>,
-    ) -> ApiResult<(Receiver<FpError>, PhoneEmailChallengeState, SecondsBeforeRetry)> {
+    ) -> FpResult<(Receiver<FpError>, PhoneEmailChallengeState, SecondsBeforeRetry)> {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
         // we wait for twilio latency
         if destination.is_fixture_phone_number() && sandbox_id.is_none() {
@@ -316,7 +316,7 @@ pub struct BoSessionSmsInfo<'a> {
 #[tracing::instrument(skip_all)]
 /// Wait for the provided timeout_s to see if the background task asynchronously either
 /// (1) completes or (2) sends us an error.
-pub async fn rx_background_error(rx: Receiver<FpError>, timeout_s: u64) -> ApiResult<()> {
+pub async fn rx_background_error(rx: Receiver<FpError>, timeout_s: u64) -> FpResult<()> {
     match tokio::time::timeout(std::time::Duration::from_secs(timeout_s), rx).await {
         Ok(Ok(err)) => {
             tracing::warn!(err=%err, "Error received");

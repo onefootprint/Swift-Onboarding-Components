@@ -2,12 +2,12 @@ use super::super::PatchDataResult;
 use super::Fingerprints;
 use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::PieceOfData;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::ob_configuration::ObConfiguration;
@@ -76,7 +76,7 @@ impl<Type> VaultWrapper<Type> {
         destination_sv: &'a ScopedVault,
         pb: &'a ObConfiguration,
         kind: PrefillKind,
-    ) -> ApiResult<PrefillData> {
+    ) -> FpResult<PrefillData> {
         if self.vault.id != destination_sv.vault_id {
             return Err(AssertionError("Cannot prefill data into a separate vault").into());
         }
@@ -137,10 +137,10 @@ impl<Type> VaultWrapper<Type> {
             .collect_vec();
         let old_ci = state
             .db_pool
-            .db_query(|conn| -> ApiResult<_> {
+            .db_query(|conn| -> FpResult<_> {
                 old_ci_dls
                     .into_iter()
-                    .map(|(di, dl_id)| -> ApiResult<_> {
+                    .map(|(di, dl_id)| -> FpResult<_> {
                         let ci = ContactInfo::get(conn, &dl_id)?;
                         Ok((di, ci))
                     })
@@ -180,7 +180,7 @@ impl<Type> VaultWrapper<Type> {
         state: &State,
         dis: Vec<&DataIdentifier>,
         tenant_id: &TenantId,
-    ) -> ApiResult<(
+    ) -> FpResult<(
         Vec<(FingerprintSalt, Fingerprint)>,
         HashMap<FingerprintSalt, DataLifetimeId>,
     )> {
@@ -221,7 +221,7 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         prefill_data: PrefillData,
         actor: Option<AuthActor>,
-    ) -> ApiResult<PatchDataResult> {
+    ) -> FpResult<PatchDataResult> {
         let request = self.validate_prefill_data_request(conn, prefill_data)?;
         let result = self.internal_save_data(conn, request, actor)?;
         Ok(result)

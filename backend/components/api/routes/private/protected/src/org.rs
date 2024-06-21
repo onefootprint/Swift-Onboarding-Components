@@ -4,9 +4,9 @@ use actix_web::get;
 use actix_web::patch;
 use actix_web::web;
 use actix_web::web::Json;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils;
+use api_core::FpResult;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::NewBusinessInfo;
 use db::models::tenant_business_info::TenantBusinessInfo;
@@ -32,7 +32,7 @@ pub async fn update_business_info(
 ) -> ModernApiResult<api_wire_types::Empty> {
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &path.into_inner())?;
             // TODO: could apply validations we use for bifrost address/phone here
             let UpdateBusinessInfoRequest {
@@ -70,7 +70,7 @@ pub async fn get_business_info(
 ) -> ModernApiResult<Option<api_wire_types::TenantBusinessInfo>> {
     let (tenant, tbi) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &path.into_inner())?;
             let tbi = TenantBusinessInfo::get(conn, &tenant.id)?;
             Ok((tenant, tbi))

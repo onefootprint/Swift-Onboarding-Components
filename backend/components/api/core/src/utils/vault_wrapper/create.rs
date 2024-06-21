@@ -8,9 +8,9 @@ use super::VaultWrapper;
 use super::WriteableVw;
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::user::UserError;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::telemetry::RootSpan;
+use crate::FpResult;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::NewScopedVaultArgs;
 use db::models::scoped_vault::ScopedVault;
@@ -48,7 +48,7 @@ impl VaultWrapper<Person> {
         ctx: VaultContext,
         root_span: &RootSpan,
         duplicate_of_id: Option<VaultId>,
-    ) -> ApiResult<(Locked<Vault>, ScopedVault, PatchDataResult)> {
+    ) -> FpResult<(Locked<Vault>, ScopedVault, PatchDataResult)> {
         let VaultContext {
             data,
             sources,
@@ -62,7 +62,7 @@ impl VaultWrapper<Person> {
         }
         let is_fixture_data = data
             .iter()
-            .map(|(di, pii)| -> ApiResult<_> {
+            .map(|(di, pii)| -> FpResult<_> {
                 let is_fixture = match di {
                     DI::Id(IDK::PhoneNumber) => PhoneNumber::parse(pii.clone())?.is_fixture_phone_number(),
                     DI::Id(IDK::Email) => Email::from_str(pii.leak())?.is_fixture(),
@@ -70,7 +70,7 @@ impl VaultWrapper<Person> {
                 };
                 Ok(is_fixture)
             })
-            .collect::<ApiResult<Vec<_>>>()?
+            .collect::<FpResult<Vec<_>>>()?
             .into_iter()
             .any(|x| x);
         if obc.is_live && is_fixture_data {

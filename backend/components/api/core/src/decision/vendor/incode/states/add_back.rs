@@ -8,8 +8,8 @@ use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::DbPool;
 use db::TxnPgConn;
@@ -31,7 +31,7 @@ impl IncodeStateTransition for AddBack {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         let Some(back_image) = ctx.docv_data.back_image.clone() else {
             // Not ready to run
             return Ok(None);
@@ -100,7 +100,7 @@ impl IncodeStateTransition for AddBack {
         _: &mut TxnPgConn,
         ctx: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         // Ensure we've gotten a doc type we can support
         //
         // Theoretically if we progressed to back fine, and are _now_ getting this error, it

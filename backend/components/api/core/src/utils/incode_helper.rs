@@ -4,10 +4,10 @@ use crate::decision::vendor::incode::get_config_id;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::incode::IncodeStateMachine;
 use crate::errors::ApiError;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_wire_types::DocumentImageError;
 use api_wire_types::DocumentResponse;
@@ -46,7 +46,7 @@ pub async fn handle_incode_request(
     is_re_run: bool,
     missing_sides: Vec<DocumentSide>, //kinda dumb
     configuration_id_override: IncodeConfigurationIdOverride,
-) -> ApiResult<DocumentResponse> {
+) -> FpResult<DocumentResponse> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let vault_country = uvw.get_decrypted_country(state).await?;
     let sv_id: newtypes::ScopedVaultId = doc_request.scoped_vault_id.clone();
@@ -139,7 +139,7 @@ pub async fn handle_incode_request(
             let id_doc_id = identity_document_id.clone();
             state
                 .db_pool
-                .db_transaction(move |conn| -> ApiResult<_> {
+                .db_transaction(move |conn| -> FpResult<_> {
                     // mb lock??
                     let (iddoc, _) = Document::get(conn, &id_doc_id)?;
                     if iddoc.status == DocumentStatus::Pending {
@@ -165,7 +165,7 @@ pub async fn handle_incode_request(
 }
 
 #[tracing::instrument(skip(db_pool))]
-async fn on_incode_hard_error(db_pool: &DbPool, err: ApiError, id_doc_id: &DocumentId) -> ApiResult<()> {
+async fn on_incode_hard_error(db_pool: &DbPool, err: ApiError, id_doc_id: &DocumentId) -> FpResult<()> {
     tracing::error!(?err, "IncodeMachineError");
     let id_doc_id = id_doc_id.clone();
     if err.code() == Some(api_errors::INCODE_MACHINE_CONCURRENT_CHANGE.to_string()) {
@@ -174,7 +174,7 @@ async fn on_incode_hard_error(db_pool: &DbPool, err: ApiError, id_doc_id: &Docum
     }
 
     db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let ivs = IncodeVerificationSession::get(conn, &id_doc_id)?;
 
             if let Some(ivs) = ivs {

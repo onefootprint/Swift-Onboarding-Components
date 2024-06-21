@@ -5,10 +5,10 @@ use super::SavedData;
 use super::ValidatedDataRequest;
 use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::Person;
+use crate::FpResult;
 use crate::State;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::business_owner::BusinessOwner;
@@ -61,7 +61,7 @@ impl<Type> WriteableVw<Type> {
         request: FingerprintedDataRequest,
         sources: DataLifetimeSources,
         actor: Option<AuthActor>,
-    ) -> ApiResult<PatchDataResult> {
+    ) -> FpResult<PatchDataResult> {
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         let r_source = DataRequestSource::PatchVault;
         let request = self.validate_request(conn, request, sources, actor.clone(), r_source)?;
@@ -75,7 +75,7 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         request: ValidatedDataRequest,
         actor: Option<AuthActor>,
-    ) -> ApiResult<PatchDataResult> {
+    ) -> FpResult<PatchDataResult> {
         let is_prefill = request.is_prefill;
         let keys = request.data.iter().map(|d| d.kind.clone()).collect_vec();
         let SavedData { vd, ci, seqno } = request.save(conn, self, actor.clone())?;
@@ -98,7 +98,7 @@ impl<Type> WriteableVw<Type> {
     /// We have book-keeping for business owners that are KYCed outside of the vault. When BOs are
     /// added to the vault, also create those secondary records in the DB.
     #[tracing::instrument("WriteableVw::create_bos_if_needed", skip_all)]
-    fn create_bos_if_needed(&self, conn: &mut TxnPgConn, kyced_bos: Option<PiiString>) -> ApiResult<()> {
+    fn create_bos_if_needed(&self, conn: &mut TxnPgConn, kyced_bos: Option<PiiString>) -> FpResult<()> {
         let Some(kyced_bos) = kyced_bos else {
             return Ok(());
         };
@@ -119,7 +119,7 @@ impl<Type> WriteableVw<Type> {
         keys: Vec<DataIdentifier>,
         actor: Option<AuthActor>,
         is_prefill: bool,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         // Add UserTimeline for all the newly added data
         if !keys.is_empty() {
             // Create a timeline event that shows all the new data that was added
@@ -154,7 +154,7 @@ impl WriteableVw<Person> {
         source: DataLifetimeSource,
         actor: Option<AuthActor>,
         make_timeline_event: bool,
-    ) -> ApiResult<(DocumentData, DataLifetimeSeqno)> {
+    ) -> FpResult<(DocumentData, DataLifetimeSeqno)> {
         let new_doc = NewDocument {
             kind,
             mime_type,
@@ -180,7 +180,7 @@ impl WriteableVw<Person> {
         docs: Vec<NewDocument>,
         actor: Option<AuthActor>,
         make_timeline_event: bool,
-    ) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
+    ) -> FpResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
         let su_id = self.scoped_vault_id.clone();
 
@@ -229,7 +229,7 @@ pub async fn seal_file_and_upload_to_s3(
     kind: &DataIdentifier,
     vault: &Vault,
     scoped_vault_id: &ScopedVaultId,
-) -> ApiResult<(SealedVaultDataKey, S3Url)> {
+) -> FpResult<(SealedVaultDataKey, S3Url)> {
     let (e_data_key, data_key) =
         SealedChaCha20Poly1305DataKey::generate_sealed_random_chacha20_poly1305_key_with_plaintext(
             vault.public_key.as_ref(),

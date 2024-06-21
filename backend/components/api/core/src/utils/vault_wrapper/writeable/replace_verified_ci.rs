@@ -4,9 +4,9 @@ use super::DataRequestSource;
 use super::FingerprintedDataRequest;
 use super::PatchDataResult;
 use super::WriteableVw;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::errors::ValidationError;
+use crate::FpResult;
 use db::TxnPgConn;
 use newtypes::DataIdentifier as DI;
 use newtypes::DataLifetimeSource;
@@ -20,7 +20,7 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         request: FingerprintedDataRequest,
         source: DataLifetimeSource,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         // Validate only phone/email
         if request
             .data

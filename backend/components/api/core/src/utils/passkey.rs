@@ -1,7 +1,7 @@
 use crate::auth::user::CheckedUserAuthContext;
 use crate::auth::user::UserAuth;
 use crate::config::Config;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
 use db::models::webauthn_credential::NewWebauthnCredential;
@@ -82,7 +82,7 @@ impl WebauthnConfig {
         reg: &RegisterPublicKeyCredential,
         reg_state: &RegistrationState,
         cas: Option<&AttestationCaList>,
-    ) -> ApiResult<Credential> {
+    ) -> FpResult<Credential> {
         let cred = if is_android(&reg.response.client_data_json.0)? {
             self.android_webauthn.register_credential(reg, reg_state, cas)?
         } else {
@@ -96,7 +96,7 @@ impl WebauthnConfig {
     pub fn initiate_challenge(
         self,
         vault_id: VaultId,
-    ) -> ApiResult<(CreationChallengeResponse, RegistrationState)> {
+    ) -> FpResult<(CreationChallengeResponse, RegistrationState)> {
         let (challenge, reg_state) = self.webauthn().generate_challenge_register_options(
             vault_id.to_string().as_bytes(),
             "Footprint",
@@ -117,7 +117,7 @@ impl WebauthnConfig {
         self,
         reg_state: RegistrationState,
         challenge_response: String,
-    ) -> ApiResult<VerifyChallengeResult> {
+    ) -> FpResult<VerifyChallengeResult> {
         let reg: RegisterPublicKeyCredential = serde_json::from_str(&challenge_response)?;
 
         // Validate the challenge response
@@ -207,7 +207,7 @@ impl VerifyChallengeResult {
         conn: &mut TxnPgConn,
         user_auth: &CheckedUserAuthContext,
         ie_id: InsightEventId,
-    ) -> ApiResult<WebauthnCredential> {
+    ) -> FpResult<WebauthnCredential> {
         let vault_id = user_auth.user_vault_id();
         let Self {
             liveness_event_attributes,
@@ -263,7 +263,7 @@ pub struct SavedAttestationData {
 
 /// currently android likely has a bug with the wrong origin
 /// so we have a heuristic to check that here
-fn is_android(client_data_json: &[u8]) -> ApiResult<bool> {
+fn is_android(client_data_json: &[u8]) -> FpResult<bool> {
     Ok(serde_json::from_slice::<serde_json::Value>(client_data_json)?
         .as_object()
         .map(|map| matches!(map.get("androidPackageName"), Some(serde_json::Value::String(val)) if val.as_str() == "com.onefootprint.my"))

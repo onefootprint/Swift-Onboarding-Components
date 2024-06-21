@@ -1,5 +1,5 @@
 use crate::errors::kms::KmsSignError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use api_wire_types::IdentifyId;
@@ -86,7 +86,7 @@ impl State {
         ids: Vec<IdentifyId>,
         sandbox_id: Option<SandboxId>,
         t_id: Option<&TenantId>,
-    ) -> ApiResult<Option<(LocatedVault, Option<ScopedVaultId>)>> {
+    ) -> FpResult<Option<(LocatedVault, Option<ScopedVaultId>)>> {
         // Search via fingerprint
         let fps: Vec<(DataIdentifier, PiiString)> = ids
             .into_iter()
@@ -109,7 +109,7 @@ impl State {
         let t_id = t_id.cloned();
         let result = self
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let existing = Vault::find_portable(conn, &sh_datas, sandbox_id, t_id.as_ref())?;
                 let Some(existing) = existing else {
                     return Ok(None);

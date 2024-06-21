@@ -3,11 +3,11 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::ApiKeyFilters;
 use db::models::tenant_api_key::ApiKeyListFilters;
@@ -103,7 +103,7 @@ pub async fn post(
     let CreateApiKeyRequest { name, role_id } = request.into_inner();
     let (api_key, role) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let api_key = TenantApiKey::create(conn, name, sh_key, e_key, tenant_id, is_live, role_id)?;
             let role = TenantRole::get(conn, &api_key.role_id)?;
             Ok((api_key, role))

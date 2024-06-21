@@ -1,7 +1,7 @@
 use super::WriteableVw;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use db::models::vault::Vault;
 use db::TxnPgConn;
 use newtypes::Locked;
@@ -14,7 +14,7 @@ impl<Type> VaultWrapper<Type> {
     pub fn lock_for_onboarding(
         conn: &mut TxnPgConn,
         scoped_user_id: &ScopedVaultId,
-    ) -> ApiResult<WriteableVw<Type>> {
+    ) -> FpResult<WriteableVw<Type>> {
         // Lock the UserVault in this transaction, then build the UVW
         Vault::lock_by_scoped_user(conn, scoped_user_id)?;
         let uvw = Self::build(conn, VwArgs::Tenant(scoped_user_id))?;

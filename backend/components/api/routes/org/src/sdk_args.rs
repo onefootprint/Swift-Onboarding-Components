@@ -3,12 +3,12 @@ use api_core::auth::session::sdk_args::SdkArgs;
 use api_core::auth::session::sdk_args::SdkArgsData;
 use api_core::auth::session::sdk_args::SdkArgsKind;
 use api_core::auth::session::sdk_args::ValidateSdkArgs;
-use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::large_json::LargeJson;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::CreateSdkArgsTokenResponse;
 use api_wire_types::PublicOnboardingConfiguration;
@@ -48,7 +48,7 @@ async fn post(
         .db_pool
         // Don't make this a transaction since we return errors from here but still want to save
         // the session in the database
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let duration = Duration::minutes(15);
             let err = data.validate();
             let obc = data.ob_config(conn);
@@ -100,7 +100,7 @@ async fn get(
     let args: SdkArgs = serde_json::de::from_str(sdk_args_str.leak())?;
     let (obc, args) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let obc = args.ob_config(conn)?;
             Ok((obc, args))
         })

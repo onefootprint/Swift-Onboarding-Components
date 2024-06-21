@@ -6,12 +6,12 @@ use super::eval::{
 };
 use crate::decision::onboarding::Decision;
 use crate::decision::RuleError;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::bulk_decrypt;
 use crate::utils::vault_wrapper::BulkDecryptReq;
 use crate::utils::vault_wrapper::DecryptAccessEventInfo;
 use crate::utils::vault_wrapper::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::TenantVw;
+use crate::FpResult;
 use crate::State;
 use db::models::document_request::DocumentRequest;
 use db::models::insight_event::InsightEvent;
@@ -58,7 +58,7 @@ pub struct EvaluateWorkflowDecisionArgs<'a> {
 pub fn evaluate_workflow_decision<'a>(
     conn: &mut TxnPgConn,
     args: EvaluateWorkflowDecisionArgs<'a>,
-) -> ApiResult<(Decision, Option<RuleSetResultId>)> {
+) -> FpResult<(Decision, Option<RuleSetResultId>)> {
     let EvaluateWorkflowDecisionArgs {
         sv_id,
         obc_id,
@@ -149,7 +149,7 @@ impl VaultDataForRules {
         state: &State,
         vw: TenantVw<T>,
         rule_expressions: &[&RuleExpression],
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let key = ();
         let result =
             Self::bulk_decrypt_for_rules(state, HashMap::from([(key, vw)]), rule_expressions).await?;
@@ -163,7 +163,7 @@ impl VaultDataForRules {
         state: &State,
         vws: HashMap<K, TenantVw<T>>,
         rule_expressions: &[&RuleExpression],
-    ) -> ApiResult<HashMap<K, Self>>
+    ) -> FpResult<HashMap<K, Self>>
     where
         K: Eq + std::hash::Hash + 'static + Clone,
     {
@@ -232,7 +232,7 @@ pub fn evaluate_rules(
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
     rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
     rule_kinds: IncludeRules,
-) -> ApiResult<Option<(RuleSetResult, Vec<RuleResult>)>> {
+) -> FpResult<Option<(RuleSetResult, Vec<RuleResult>)>> {
     let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kinds)?;
     if rules.is_empty() {
         let v = Vault::get(conn, sv_id)?;

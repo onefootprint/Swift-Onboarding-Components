@@ -6,7 +6,6 @@ use crate::State;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::errors::TfError;
 use api_core::errors::ValidationError;
 use api_core::task;
@@ -18,6 +17,7 @@ use api_core::utils::requirements::RequirementOpts;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
+use api_core::FpResult;
 use api_wire_types::EntityValidateResponse;
 use api_wire_types::TriggerKybRequest;
 use db::models::manual_review::ManualReview;
@@ -76,7 +76,7 @@ pub async fn post(
 
     let (bvw, sb) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sb = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sb.id))?;
             Ok((bvw, sb))
@@ -96,7 +96,7 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let (biz_wf, obc) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
                 .map_err(|_| DbError::PlaybookNotFound)?;
             tracing::info!(playbook_key=%obc.key, "Post /kyb with playbook");
@@ -166,7 +166,7 @@ pub async fn post(
 
     let (wf, sv, mrs) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (biz_wf, biz_sv) = Workflow::get_all(conn, &biz_wf.id)?;
             let mrs = ManualReview::get_active(conn, &biz_sv.id)?;
             Ok((biz_wf, biz_sv, mrs))

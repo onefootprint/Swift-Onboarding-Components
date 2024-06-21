@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuthScope;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::errors::onboarding::UnmetRequirements;
@@ -52,7 +52,7 @@ pub async fn post(
     let wf_id = user_auth.workflow().id.clone();
     state
         .db_pool
-        .db_transaction(move |c| -> ApiResult<_> {
+        .db_transaction(move |c| -> FpResult<_> {
             let wf = Workflow::lock(c, &wf_id)?;
             if wf.authorized_at.is_none() {
                 Workflow::update(wf, c, WorkflowUpdate::is_authorized())?;

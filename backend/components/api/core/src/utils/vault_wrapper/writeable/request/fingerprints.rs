@@ -1,7 +1,7 @@
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::errors::ValidationError;
 use crate::utils::vault_wrapper::WriteableVw;
+use crate::FpResult;
 use db::models::fingerprint::Fingerprint as DbFingerprint;
 use db::models::fingerprint::FingerprintDataValue;
 use db::models::fingerprint::NewFingerprintArgs;
@@ -47,7 +47,7 @@ impl Fingerprints {
         conn: &mut TxnPgConn,
         vw: &WriteableVw<Type>,
         new_vd: &[VaultData],
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         let Self { fps, salt_to_dl_id } = self;
         let sv = ScopedVault::get(conn, &vw.scoped_vault_id)?;
 
@@ -107,7 +107,7 @@ impl Fingerprints {
         let composite_fingerprints = CompositeFingerprint::list(&sv.tenant_id)
             .into_iter()
             .filter(|cfp| cfp.should_generate(&vw.populated_dis(), &vd_kinds))
-            .map(|cfp| -> ApiResult<_> {
+            .map(|cfp| -> FpResult<_> {
                 // For each Composite FPK that has any DI represented in this data update, generate
                 // the new composite fingerprint out of the pre-computed partial fingerprints
                 let sh_data = match cfp.compute(&fps) {
@@ -145,7 +145,7 @@ impl Fingerprints {
                 };
                 Ok(Some(d))
             })
-            .collect::<ApiResult<Vec<_>>>()?
+            .collect::<FpResult<Vec<_>>>()?
             .into_iter()
             .flatten();
         // We are susceptible to a race condition... Our partial fingerprints may be stale if the

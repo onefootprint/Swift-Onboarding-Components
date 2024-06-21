@@ -8,13 +8,13 @@ use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use crate::decision::vendor::incode::states::VerificationSession;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::errors::user::UserError;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::vendor_clients::IncodeClients;
 use crate::ApiError;
+use crate::FpResult;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
@@ -114,7 +114,7 @@ impl IncodeStateMachine {
         configuration_id: IncodeConfigurationId,
         ctx: IncodeContext,
         is_sandbox: bool,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let use_demo_creds_in_livemode =
             state
                 .ff_client
@@ -136,7 +136,7 @@ impl IncodeStateMachine {
         let id_doc_id = ctx.id_doc_id.clone();
         let session = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 // TODO: we need to handle auth tokens expiring on stale IVS sessions
                 // (e.g. someone starts and then comes back > 90d we will error here.)
                 let session = IncodeVerificationSession::get(conn, &id_doc_id)?;
@@ -250,11 +250,11 @@ impl IncodeStateMachine {
 
     // TODO:: use this from /upload as well? be careful on is_re_run param below if so
     #[tracing::instrument(skip_all)]
-    pub async fn init_from_existing(state: &State, ivs: IncodeVerificationSession) -> ApiResult<Self> {
+    pub async fn init_from_existing(state: &State, ivs: IncodeVerificationSession) -> FpResult<Self> {
         let idi = ivs.identity_document_id.clone();
         let (di, id_doc, doc_req, obc, uvw) = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let (id_doc, doc_req) = Document::get(conn, &idi)?;
 
                 let di = DecisionIntent::get_or_create_for_workflow(

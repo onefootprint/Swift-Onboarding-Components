@@ -1,6 +1,6 @@
 use super::timeouts::ResponseDeadline;
 use crate::errors::error_with_code::ErrorWithCode;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use actix_multipart::Multipart;
 use actix_web::HttpMessage;
 use actix_web::HttpRequest;
@@ -59,7 +59,7 @@ pub async fn handle_file_upload(
     restrict_to_mime_types: Option<Vec<Mime>>,
     max_allowed_file_size_in_bytes: usize,
     must_be_gt_file_size_in_bytes: usize,
-) -> ApiResult<FileUpload> {
+) -> FpResult<FileUpload> {
     let fut = handle_file_upload_inner(
         payload,
         request,
@@ -91,7 +91,7 @@ async fn handle_file_upload_inner(
     restrict_to_mime_types: Option<Vec<Mime>>,
     max_allowed_file_size_in_bytes: usize,
     must_be_gt_file_size_in_bytes: usize,
-) -> ApiResult<FileUpload> {
+) -> FpResult<FileUpload> {
     let request_content_length: usize =
         crate::utils::headers::get_required_header(CONTENT_LENGTH.as_str(), request.headers())?
             .parse()

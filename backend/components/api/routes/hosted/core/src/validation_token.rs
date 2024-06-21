@@ -1,9 +1,9 @@
 use api_core::auth::session::user::ValidateUserToken;
 use api_core::auth::session::AuthSessionData;
 use api_core::auth::user::UserSessionContext;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use api_core::State;
 use chrono::Duration;
 use db::models::auth_event::AuthEvent;
@@ -15,14 +15,14 @@ pub async fn create_validation_token(
     state: &State,
     user_auth: UserSessionContext,
     wf: Option<Workflow>,
-) -> ApiResult<SessionAuthToken> {
+) -> FpResult<SessionAuthToken> {
     let session_key = state.session_sealing_key.clone();
     let sv_id = user_auth
         .scoped_user_id()
         .ok_or(AssertionError("No scoped user associated with auth session"))?;
     let validation_token = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             if user_auth.auth_events.is_empty() {
                 return Err(AssertionError("No auth events found for user").into());
             }

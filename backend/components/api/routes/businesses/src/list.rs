@@ -1,5 +1,5 @@
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
@@ -43,7 +43,7 @@ pub async fn get(
 
     let (svs, count) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let page_size = (page_size + 1) as i64;
             let cursor = cursor.map(ScopedVaultCursor::OrderingId);
             let order_by = ScopedVaultCursorKind::OrderingId;

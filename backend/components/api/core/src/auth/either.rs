@@ -1,6 +1,6 @@
 use super::tenant::GetFirmEmployee;
 use super::tenant::InvalidateAuth;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::ModernApiError;
 use crate::State;
 use actix_web::FromRequest;
@@ -121,7 +121,7 @@ where
     A: GetFirmEmployee,
     B: GetFirmEmployee,
 {
-    fn firm_employee_user(&self) -> crate::errors::ApiResult<db::models::tenant_user::TenantUser> {
+    fn firm_employee_user(&self) -> crate::FpResult<db::models::tenant_user::TenantUser> {
         match self {
             Either::Left(l) => l.firm_employee_user(),
             Either::Right(r) => r.firm_employee_user(),
@@ -136,7 +136,7 @@ where
     B: InvalidateAuth + Send,
 {
     /// invalidate the session token for logout purposes
-    async fn invalidate(self, state: &State) -> ApiResult<()> {
+    async fn invalidate(self, state: &State) -> FpResult<()> {
         match self {
             Either::Left(l) => l.invalidate(state).await,
             Either::Right(r) => r.invalidate(state).await,

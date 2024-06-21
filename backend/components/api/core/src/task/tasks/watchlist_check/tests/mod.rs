@@ -1,8 +1,8 @@
 use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-use crate::errors::ApiResult;
 use crate::task::tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask;
 use crate::task::ExecuteTask;
 use crate::task::TaskError;
+use crate::FpResult;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::risk_signal::RiskSignal;
@@ -120,7 +120,7 @@ async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVau
     });
     state
         .db_pool
-        .db_query(move |conn| -> ApiResult<VerificationResult> {
+        .db_query(move |conn| -> FpResult<VerificationResult> {
             let v = Vault::get(conn, &sv_id).unwrap();
             let di = DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &sv_id, None).unwrap();
             let (_vreq, vres) = crate::decision::vendor::verification_result::save_vreq_and_vres(

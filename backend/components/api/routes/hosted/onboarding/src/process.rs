@@ -13,10 +13,10 @@ use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::workflow::WorkflowError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::FpResult;
 use api_wire_types::ProcessRequest;
 use chrono::Duration;
 use chrono::Utc;
@@ -117,7 +117,7 @@ pub async fn post(
     Ok(api_wire_types::Empty)
 }
 
-async fn enqueue_run_incode_stuck_workflow_task(db_pool: &DbPool, workflow_id: &WorkflowId) -> ApiResult<()> {
+async fn enqueue_run_incode_stuck_workflow_task(db_pool: &DbPool, workflow_id: &WorkflowId) -> FpResult<()> {
     let workflow_id = workflow_id.clone();
 
     db_pool
@@ -135,7 +135,7 @@ async fn run_kyb_if_needed(
     state: &State,
     user_auth: CheckUserWfAuthContext,
     fixture_result: Option<WorkflowFixtureResult>,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     // Run KYB
     let tenant = user_auth.tenant().clone();
     let biz_wf = state

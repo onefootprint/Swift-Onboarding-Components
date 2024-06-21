@@ -1,10 +1,10 @@
 use super::FingerprintedDataRequest;
 use super::ValidatedDataRequest;
 use crate::auth::tenant::AuthActor;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::PrefillData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::WriteableVw;
+use crate::FpResult;
 use db::models::business_owner::BusinessOwner;
 use db::models::contact_info::ContactInfo;
 use db::models::scoped_vault::ScopedVault;
@@ -44,7 +44,7 @@ impl<Type> VaultWrapper<Type> {
         sources: DataLifetimeSources,
         actor: Option<AuthActor>,
         request_source: DataRequestSource,
-    ) -> ApiResult<ValidatedDataRequest> {
+    ) -> FpResult<ValidatedDataRequest> {
         self.assert_update_allowed(conn, &request, &sources, request_source)?;
         // Transform the request into a Vec<NewVaultData>
         let FingerprintedDataRequest {
@@ -72,7 +72,7 @@ impl<Type> VaultWrapper<Type> {
                 };
                 Ok(vd)
             })
-            .collect::<ApiResult<Vec<_>>>()?;
+            .collect::<FpResult<Vec<_>>>()?;
 
         let for_replacing_ci = matches!(request_source, DataRequestSource::UpdateContactInfo);
         let new_cdos = self.validate_adding_dis(conn, &data, None, actor, for_replacing_ci)?;
@@ -95,7 +95,7 @@ impl<Type> WriteableVw<Type> {
         &self,
         conn: &mut PgConn,
         prefill_data: PrefillData,
-    ) -> ApiResult<ValidatedDataRequest> {
+    ) -> FpResult<ValidatedDataRequest> {
         let PrefillData {
             data,
             fingerprints,
@@ -123,7 +123,7 @@ impl<Type> VaultWrapper<Type> {
         prefill_sv_id: Option<&ScopedVaultId>,
         actor: Option<AuthActor>,
         for_replacing_ci: bool,
-    ) -> ApiResult<HashSet<CollectedDataOption>> {
+    ) -> FpResult<HashSet<CollectedDataOption>> {
         // Don't allow replacing some pieces of info
         let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
@@ -224,7 +224,7 @@ impl<Type> VaultWrapper<Type> {
         request: &FingerprintedDataRequest,
         sources: &DataLifetimeSources,
         request_source: DataRequestSource,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         assert_allowed_for_vault(request, self.vault.kind)?;
         assert_allowed_for_sources(request, sources, request_source)?;
 

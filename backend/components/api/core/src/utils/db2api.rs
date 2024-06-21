@@ -1,6 +1,6 @@
 //! Helper trait to convert DB types to API types
 
-use crate::errors::ApiResult;
+use crate::FpResult;
 
 /// Convert DB type to an API type
 pub trait DbToApi<T>: Sized {
@@ -11,5 +11,5 @@ pub trait DbToApi<T>: Sized {
 /// Convert DB type to an API type
 pub trait TryDbToApi<T>: Sized {
     ///  convert from the target type
-    fn try_from_db(target: T) -> ApiResult<Self>;
+    fn try_from_db(target: T) -> FpResult<Self>;
 }

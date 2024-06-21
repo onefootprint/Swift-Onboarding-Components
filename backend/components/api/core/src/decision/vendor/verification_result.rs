@@ -2,7 +2,7 @@ use super::make_request::VerificationRequestWithVendorResponse;
 use super::VendorAPIError;
 use crate::decision::engine::VendorResults;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use api_errors::FpError;
 use chrono::Utc;
 use db::models::verification_request::NewVerificationRequestArgs;
@@ -31,7 +31,7 @@ pub fn save_verification_results(
     conn: &mut PgConn,
     vendor_responses: &[VerificationRequestWithVendorResponse],
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> ApiResult<Vec<VerificationResult>> {
+) -> FpResult<Vec<VerificationResult>> {
     let now = Utc::now();
     let new_verification_results: Vec<NewVerificationResult> = vendor_responses
         .iter()
@@ -49,7 +49,7 @@ pub fn save_verification_results(
                 is_error: false,
             })
         })
-        .collect::<ApiResult<Vec<NewVerificationResult>>>()?;
+        .collect::<FpResult<Vec<NewVerificationResult>>>()?;
 
     Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
 }
@@ -61,7 +61,7 @@ pub fn save_error_verification_results(
     conn: &mut PgConn,
     vendor_responses_with_errors: &[(VerificationRequest, Option<PiiJsonValue>)],
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> ApiResult<Vec<VerificationResult>> {
+) -> FpResult<Vec<VerificationResult>> {
     let now = Utc::now();
     let new_verification_results: Vec<NewVerificationResult> = vendor_responses_with_errors
         .iter()
@@ -88,7 +88,7 @@ pub fn save_error_verification_results(
                 is_error: true,
             })
         })
-        .collect::<ApiResult<Vec<NewVerificationResult>>>()?;
+        .collect::<FpResult<Vec<NewVerificationResult>>>()?;
 
     Ok(VerificationResult::bulk_create(conn, new_verification_results)?)
 }
@@ -97,7 +97,7 @@ pub fn save_verification_result(
     conn: &mut PgConn,
     vendor_response: &VerificationRequestWithVendorResponse,
     user_vault_public_key: &VaultPublicKey, // passed in so unit testing is easier
-) -> ApiResult<VerificationResult> {
+) -> FpResult<VerificationResult> {
     save_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
         .pop()
         .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))
@@ -107,7 +107,7 @@ pub fn save_error_verification_result(
     conn: &mut PgConn,
     vendor_response: &(VerificationRequest, Option<PiiJsonValue>),
     user_vault_public_key: &VaultPublicKey,
-) -> ApiResult<VerificationResult> {
+) -> FpResult<VerificationResult> {
     save_error_verification_results(conn, slice::from_ref(vendor_response), user_vault_public_key)?
         .pop()
         .ok_or(FpError::from(DbError::IncorrectNumberOfRowsUpdated))
@@ -117,7 +117,7 @@ pub fn save_error_verification_result(
 pub fn encrypt_verification_result_response(
     response: &PiiJsonValue,
     user_vault_public_key: &VaultPublicKey,
-) -> ApiResult<SealedVaultBytes> {
+) -> FpResult<SealedVaultBytes> {
     user_vault_public_key
         .seal_bytes(response.leak_to_vec()?.as_slice())
         .map_err(FpError::from)
@@ -129,7 +129,7 @@ pub async fn decrypt_verification_result_response(
     enclave_client: &EnclaveClient,
     sealed_data: Vec<SealedVaultBytes>, // sealed vault bytes
     sealed_key: &EncryptedVaultPrivateKey,
-) -> ApiResult<Vec<PiiJsonValue>> {
+) -> FpResult<Vec<PiiJsonValue>> {
     let sealed_data = sealed_data
         .iter()
         .map(|sealed| (sealed_key, sealed, vec![]))
@@ -149,7 +149,7 @@ pub fn save_vreq_and_vres(
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     vendor_result: Result<VendorResponse, VendorAPIError>,
-) -> ApiResult<(VerificationRequest, VerificationResult)> {
+) -> FpResult<(VerificationRequest, VerificationResult)> {
     let vendor_api = match &vendor_result {
         Ok(vr) => (&vr.response).into(),
         Err(e) => e.vendor_api,
@@ -167,7 +167,7 @@ pub fn save_vres(
     public_key: &VaultPublicKey,
     vendor_result: &Result<VendorResponse, VendorAPIError>,
     vreq: &VerificationRequest,
-) -> ApiResult<VerificationResult> {
+) -> FpResult<VerificationResult> {
     match vendor_result {
         Ok(vr) => save_verification_result(conn, &(vreq.clone(), vr.clone()), public_key),
         Err(e) => {
@@ -194,7 +194,7 @@ pub struct SaveVerificationResultArgs {
     pub identity_document_id: Option<DocumentId>,
 }
 impl SaveVerificationResultArgs {
-    pub async fn save(self, db_pool: &DbPool) -> ApiResult<(VerificationResultId, VerificationRequestId)> {
+    pub async fn save(self, db_pool: &DbPool) -> FpResult<(VerificationResultId, VerificationRequestId)> {
         let SaveVerificationResultArgs {
             scrubbed_response,
             raw_response,
@@ -207,7 +207,7 @@ impl SaveVerificationResultArgs {
         } = self;
         let e_response = encrypt_verification_result_response(&raw_response, &vault_public_key)?;
         let result = db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 // This is interesting - we make the VReq and VRes at the same time.
                 // In other vendor APIs, the only bookkeeping we have for an outstanding vendor request
                 // is a VReq without a VRes - for the document workflow, we have the incode state

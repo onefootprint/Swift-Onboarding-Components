@@ -1,10 +1,10 @@
 use super::super::Business;
 use super::super::VaultWrapper;
 use crate::errors::business::BusinessError;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::ApiError;
 use crate::ApiErrorKind;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use db::models::business_owner::BusinessOwner;
@@ -32,7 +32,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         state: &State,
         kind: ContactInfoKind,
-    ) -> ApiResult<Option<(PiiString, ContactInfo, DataLifetime)>> {
+    ) -> FpResult<Option<(PiiString, ContactInfo, DataLifetime)>> {
         if let Some(dl) = self.get_lifetime(&kind.into()) {
             let dl_id = dl.id.clone();
             let ci = state
@@ -50,7 +50,7 @@ impl<Type> VaultWrapper<Type> {
         }
     }
 
-    pub async fn get_decrypted_phone(&self, state: &State) -> ApiResult<PhoneNumber> {
+    pub async fn get_decrypted_phone(&self, state: &State) -> FpResult<PhoneNumber> {
         let (data, _, _) = self
             .decrypt_contact_info(state, ContactInfoKind::Phone)
             .await?
@@ -58,7 +58,7 @@ impl<Type> VaultWrapper<Type> {
         PhoneNumber::parse(data).map_err(FpError::from)
     }
 
-    pub async fn get_decrypted_email(&self, state: &State) -> ApiResult<Email> {
+    pub async fn get_decrypted_email(&self, state: &State) -> FpResult<Email> {
         let (data, _, _) = self
             .decrypt_contact_info(state, ContactInfoKind::Email)
             .await?
@@ -66,10 +66,7 @@ impl<Type> VaultWrapper<Type> {
         Email::from_str(data.leak()).map_err(FpError::from)
     }
 
-    pub async fn get_decrypted_country(
-        &self,
-        state: &State,
-    ) -> ApiResult<Option<Iso3166TwoDigitCountryCode>> {
+    pub async fn get_decrypted_country(&self, state: &State) -> FpResult<Option<Iso3166TwoDigitCountryCode>> {
         let decrypted_values = self
             .decrypt_unchecked(&state.enclave_client, &[IDK::Country.into()])
             .await?;
@@ -111,13 +108,13 @@ impl VaultWrapper<Business> {
         &self,
         state: &State,
         tenant_id: &TenantId,
-    ) -> ApiResult<Vec<BusinessOwnerInfo>> {
+    ) -> FpResult<Vec<BusinessOwnerInfo>> {
         let vid = self.vault().id.clone();
         let tid = tenant_id.clone();
         let seqno = self.seqno;
         let (linked_bos, vws) = state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let linked_bos = BusinessOwner::list_all(conn, &vid, &tid)?;
                 let vaults = linked_bos.iter().flat_map(|(_, x)| x.clone()).collect_vec();
                 // Build VWs for each linked BO (at the same seqno that this VW was built at)
@@ -169,7 +166,7 @@ impl VaultWrapper<Business> {
             let kyced_bos: Vec<KycedBusinessOwnerData> = kyced_bos.deserialize()?;
             kyced_bos
                 .into_iter()
-                .map(|vault_bo| -> ApiResult<_> {
+                .map(|vault_bo| -> FpResult<_> {
                     let linked_bo = linked_bos
                         .iter()
                         .find(|bo| bo.0.link_id == vault_bo.link_id)
@@ -190,7 +187,7 @@ impl VaultWrapper<Business> {
                     scoped_user: linked_bo_data.map(|(su, _)| su),
                     from_kyced_beneficial_owners: true,
                 })
-                .collect::<ApiResult<Vec<_>>>()?
+                .collect::<FpResult<Vec<_>>>()?
         } else {
             // API-initiated flow with BOs linked via API, or bifrost-initiated flow with only primary BO
             // before the full list of BOs has been collected
@@ -223,7 +220,7 @@ impl VaultWrapper<Business> {
         let bo_names = futures::future::join_all(decrypt_futs)
             .await
             .into_iter()
-            .collect::<ApiResult<HashMap<_, _>>>()?;
+            .collect::<FpResult<HashMap<_, _>>>()?;
         let results = results
             .into_iter()
             .map(|mut bo| {

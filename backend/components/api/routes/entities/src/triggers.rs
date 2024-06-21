@@ -10,12 +10,12 @@ use api_core::auth::session::user::UserSession;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::task::execute_webhook_tasks;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use api_wire_types::CreateTokenResponse;
 use api_wire_types::EntityActionResponse;
 use chrono::Duration;
@@ -64,7 +64,7 @@ pub async fn post(
     // Generate an auth token for the user and send to their phone number on file
     let outcome = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let outcome = apply_trigger_request(conn, request, &sv, actor, &session_key)?;
             Ok(outcome)
@@ -77,7 +77,7 @@ pub async fn post(
     Ok(response)
 }
 
-fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> ApiResult<()> {
+fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> FpResult<()> {
     match trigger {
         WorkflowRequestConfig::RedoKyc { .. } | WorkflowRequestConfig::Onboard { .. } => Ok(()),
         WorkflowRequestConfig::Document { configs } => {
@@ -109,7 +109,7 @@ pub(super) fn apply_trigger_request(
     sv: &ScopedVault,
     actor: DbActor,
     session_key: &ScopedSealingKey,
-) -> ApiResult<TriggerRequestOutcome> {
+) -> FpResult<TriggerRequestOutcome> {
     let TriggerRequest { trigger, note } = request;
     let vault = Vault::get(conn, &sv.id)?;
     validate(&trigger, sv)?;
@@ -175,7 +175,7 @@ pub(super) fn apply_trigger_request(
 }
 
 impl TriggerRequestOutcome {
-    pub(super) fn post_commit(self, state: &State) -> ApiResult<Option<EntityActionResponse>> {
+    pub(super) fn post_commit(self, state: &State) -> FpResult<Option<EntityActionResponse>> {
         let TriggerRequestOutcome { token, session } = self;
         // Since we may have updated users onboarding status
         execute_webhook_tasks(state.clone());

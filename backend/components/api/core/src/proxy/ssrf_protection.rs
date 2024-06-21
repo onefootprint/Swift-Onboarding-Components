@@ -1,5 +1,5 @@
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use futures_util::future::FutureExt;
 use hyper::client::connect::dns::GaiResolver as HyperGaiResolver;
 use hyper::client::connect::dns::Name;
@@ -13,7 +13,7 @@ use std::net::Ipv4Addr;
 use std::net::Ipv6Addr;
 use std::net::SocketAddr;
 
-pub fn validate_safe_url(url: &url::Url) -> ApiResult<()> {
+pub fn validate_safe_url(url: &url::Url) -> FpResult<()> {
     if url.as_str() == "https://ditto.footprint.dev:8443/" {
         // Non-standard port used in integration tests.
         return Ok(());

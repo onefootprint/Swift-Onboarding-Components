@@ -2,7 +2,7 @@ use super::AuthActor;
 use super::PartnerTenantAuth;
 use super::TenantAuth;
 use crate::auth::Either;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::helpers::TenantOrPartnerTenantRef;
 use newtypes::OrgIdentifierRef;
 
@@ -16,7 +16,7 @@ impl TenantOrPartnerTenantAuth {
         }
     }
 
-    pub fn is_live(&self) -> ApiResult<bool> {
+    pub fn is_live(&self) -> FpResult<bool> {
         Ok(match &self {
             Either::Left(t) => t.is_live()?,
             Either::Right(_) => true,

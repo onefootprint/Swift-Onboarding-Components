@@ -6,8 +6,8 @@ use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::DbPool;
 use db::TxnPgConn;
@@ -23,7 +23,7 @@ impl IncodeStateTransition for ProcessFace {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         process_face_inner(db_pool, clients, ctx, session).await?;
 
         Ok(Some(Self {}))
@@ -34,7 +34,7 @@ impl IncodeStateTransition for ProcessFace {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         Ok(Self::next_state(session).into())
     }
 
@@ -48,7 +48,7 @@ pub async fn process_face_inner(
     clients: &IncodeClients,
     ctx: &IncodeContext,
     session: &VerificationSession,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     // make the request to incode
     let request = IncodeProcessFaceRequest {
         credentials: session.credentials.clone(),

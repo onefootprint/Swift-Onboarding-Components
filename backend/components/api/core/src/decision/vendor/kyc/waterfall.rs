@@ -11,11 +11,11 @@ use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::{
     self,
 };
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::ApiErrorKind;
+use crate::FpResult;
 use crate::State;
 use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
@@ -36,12 +36,12 @@ use newtypes::WaterfallStepAction;
 use std::collections::HashMap;
 
 #[tracing::instrument(skip(state))]
-pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow) -> ApiResult<VendorResult> {
+pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow) -> FpResult<VendorResult> {
     let svid = di.scoped_vault_id.clone();
     let wf_id = wf.id.clone();
     let (tenant_id, vw, obc) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             let obc = ObConfiguration::get(conn, &wf_id)?.0;
@@ -65,7 +65,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
     let diid2 = di.id.clone();
     let waterfall_execution = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let wfe = WaterfallExecution::get_or_create(
                 conn,
                 ordered_apis2.into_iter().map(|v| v.into()).collect(),
@@ -103,7 +103,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         let v_api = waterfall_vendor_api.clone().into();
         let step = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let locked = WaterfallExecution::lock(conn, &eid)?;
                 let step = WaterfallExecution::create_step(locked, conn, v_api)?;
                 Ok(step)
@@ -153,7 +153,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
         let sr2 = step_result.clone();
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let locked = WaterfallExecution::lock(conn, &eid2)?;
                 let update = UpdateWaterfallStep::save_step_result(
                     sr2.verification_result_id,
@@ -211,7 +211,7 @@ async fn complete_waterfall_execution(
     wf: &Workflow,
     obc_id: &ObConfigurationId,
     execution_id: &WaterfallExecutionId,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let eid = execution_id.clone();
     let sv_id = wf.scoped_vault_id.clone();
     // TODO: eventually, we'll want to distinguish between how much data is actually used to one
@@ -220,7 +220,7 @@ async fn complete_waterfall_execution(
     let obc_id = obc_id.clone();
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let locked = WaterfallExecution::lock(conn, &eid)?;
             if locked.completed_at.is_some() {
                 return Ok(());
@@ -294,7 +294,7 @@ pub(super) fn eval_waterfall_rules(
     res: VendorResult,
     vw: &VaultWrapper,
     obc: &ObConfiguration,
-) -> ApiResult<WaterfallStepResult> {
+) -> FpResult<WaterfallStepResult> {
     let vendor_api = res.vendor_api();
     let vault_id = vw.vault.id.clone();
     let reason_codes =

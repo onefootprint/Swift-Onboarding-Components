@@ -7,11 +7,11 @@ use crate::get;
 use crate::types::ModernApiResult;
 use crate::State;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
-use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use db::models::fingerprint::Fingerprint;
 use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -42,7 +42,7 @@ pub async fn get_dupes(
 
     let (dupes, vws, neuro_dupes) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             // Load the dupes
             let dupes = Fingerprint::get_dupes(conn, &sv)?;
@@ -97,7 +97,7 @@ pub async fn get_dupes(
             .collect_vec();
             Ok((duplicate_kinds, vw, decrypted_data))
         })
-        .collect::<ApiResult<Vec<_>>>()?
+        .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         // don't return dupes if there are no dupe kinds
         .filter(|(d, _, _)| !d.is_empty())

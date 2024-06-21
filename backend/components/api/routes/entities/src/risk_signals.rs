@@ -10,7 +10,6 @@ use api_core::auth::CanDecrypt;
 use api_core::decision;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::decision::vendor::vendor_result::VendorResult;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiListResponse;
@@ -19,6 +18,7 @@ use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
+use api_core::FpResult;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
@@ -236,7 +236,7 @@ pub async fn decrypt_aml_hits(
     let insight = CreateInsightEvent::from(insights);
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let reason = DECRYPT_AML_HITS_ACCESS_EVENT_REASON.to_owned();
 
@@ -282,13 +282,13 @@ async fn get_risk_signal_and_maybe_aml_detail(
     fp_id: FpId,
     tenant_id: TenantId,
     is_live: bool,
-) -> ApiResult<(
+) -> FpResult<(
     RiskSignal,
     Option<(api_wire_types::AmlDetail, VerificationRequest)>,
 )> {
     let (rs, vreq_vres_key_obc) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let rs = RiskSignal::get(conn, &risk_signal_id, &sv.id)?;
             let vreq_vres_key = if rs.reason_code.is_aml() {
@@ -326,7 +326,7 @@ async fn get_aml_hits(
     enhanced_aml: &EnhancedAmlOption,
     vreq_vres: RequestAndResult,
     private_key: EncryptedVaultPrivateKey,
-) -> ApiResult<Option<api_wire_types::AmlDetail>> {
+) -> FpResult<Option<api_wire_types::AmlDetail>> {
     let vreq_vres =
         VendorResult::hydrate_vendor_result(vreq_vres, &state.enclave_client, &private_key).await?;
 

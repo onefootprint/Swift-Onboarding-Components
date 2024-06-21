@@ -8,12 +8,12 @@ use api_core::auth::tenant::AuthActor;
 use api_core::auth::tenant::ClientTenantScope;
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use api_wire_types::CreateClientTokenRequest;
 use api_wire_types::CreateClientTokenResponse;
 use api_wire_types::DEPRECATEDClientTokenScopeKind;
@@ -126,7 +126,7 @@ pub async fn post(
 
     let scopes: Vec<_> = scopes
         .into_iter()
-        .map(|s| -> ApiResult<_> {
+        .map(|s| -> FpResult<_> {
             let result = match s {
                 DEPRECATEDClientTokenScopeKind::Decrypt => ClientTenantScope::Decrypt(fields.clone()),
                 DEPRECATEDClientTokenScopeKind::Vault => ClientTenantScope::Vault(fields.clone()),
@@ -150,7 +150,7 @@ pub async fn post(
             };
             Ok(result)
         })
-        .collect::<ApiResult<_>>()?;
+        .collect::<FpResult<_>>()?;
 
     let has_decrypt_download_scope = scopes
         .iter()
@@ -173,7 +173,7 @@ pub async fn post(
 
     let (token, session) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             // We'll check this later too, but worth at least doing a sanity check that the user
             // in question exists
             ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;

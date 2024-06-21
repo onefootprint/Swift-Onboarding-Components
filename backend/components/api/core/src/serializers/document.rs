@@ -1,6 +1,6 @@
-use crate::errors::ApiResult;
 use crate::utils::db2api::DbToApi;
 use crate::utils::db2api::TryDbToApi;
+use crate::FpResult;
 use api_wire_types::DocumentImageError;
 use api_wire_types::UploadSource;
 use db::models::data_lifetime::DataLifetime;
@@ -17,12 +17,12 @@ pub type DocumentInfo = (Document, DocumentRequest, Vec<DocumentUpload>);
 pub type DocumentVaultInfo = (DocumentKind, Vec<(DocumentSide, DataLifetime)>);
 
 impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
-    fn try_from_db((doc, dr, uploads): DocumentInfo) -> ApiResult<Self> {
+    fn try_from_db((doc, dr, uploads): DocumentInfo) -> FpResult<Self> {
         let uploads = uploads
             .into_iter()
             .map(|u| (&doc, &dr, u))
             .map(api_wire_types::DocumentUpload::try_from_db)
-            .collect::<ApiResult<_>>()?;
+            .collect::<FpResult<_>>()?;
 
         let Document {
             created_at,
@@ -57,9 +57,7 @@ impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
 }
 
 impl<'a> TryDbToApi<(&'a Document, &'a DocumentRequest, DocumentUpload)> for api_wire_types::DocumentUpload {
-    fn try_from_db(
-        (doc, dr, upload): (&'a Document, &'a DocumentRequest, DocumentUpload),
-    ) -> ApiResult<Self> {
+    fn try_from_db((doc, dr, upload): (&'a Document, &'a DocumentRequest, DocumentUpload)) -> FpResult<Self> {
         let DocumentUpload {
             created_at,
             side,

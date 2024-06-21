@@ -7,10 +7,10 @@ use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::auth::AuthError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use api_core::State;
 use db::models::tenant::Tenant;
 use newtypes::SessionAuthToken;
@@ -49,7 +49,7 @@ async fn post(
     let expires_at = auth.session().expires_at;
     let (tenant, token) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             // Verify the tenant_id is real
             let tenant = Tenant::get(conn, &tenant_id)?;
 

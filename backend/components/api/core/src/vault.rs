@@ -2,7 +2,6 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::errors::tenant::TenantError;
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
 use crate::telemetry::RootSpan;
 use crate::types::ModernApiResult;
@@ -16,6 +15,7 @@ use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DataLifetimeSources;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::NewAuditEvent;
@@ -99,7 +99,7 @@ pub async fn create_non_portable_vault(
     let source = auth.dl_source();
     let (scoped_user, vault) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let idempotency_id = idempotency_id.0;
             let external_id = external_id.0;
             let db_actor: DbActor = actor.clone().into();

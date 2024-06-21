@@ -1,4 +1,4 @@
-use crate::errors::ApiResult;
+use crate::FpResult;
 use chrono::DateTime;
 use chrono::Utc;
 use crypto::sha256;
@@ -66,7 +66,7 @@ impl<C> JsonSession<C>
 where
     C: Serialize + DeserializeOwned + HasSessionKind,
 {
-    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConn, key: S) -> ApiResult<Option<Self>> {
+    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConn, key: S) -> FpResult<Option<Self>> {
         let session = Session::get(conn, key.into().0.into())?;
         let session = if let Some(session) = session {
             if session.expires_at < Utc::now() {
@@ -89,7 +89,7 @@ where
         key: S,
         data: &C,
         expires_at: DateTime<Utc>,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         let kind = data.session_kind();
         let data = serde_json::to_vec(data)?;
         Session::update_or_create(conn, key.into().0.into(), data, kind, expires_at)?;

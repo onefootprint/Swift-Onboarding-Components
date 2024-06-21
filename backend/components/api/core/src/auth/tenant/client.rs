@@ -9,7 +9,7 @@ use crate::auth::CanDecrypt;
 use crate::auth::CanVault;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use actix_web::web;
 use db::models::tenant::Tenant;
@@ -103,7 +103,7 @@ impl ExtractableAuthSession for ParsedClientTenantData {
         conn: &mut PgConn,
         _: Arc<dyn feature_flag::FeatureFlagClient>,
         _: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::ClientTenant(data) => {
                 let ClientTenantAuth {
@@ -146,7 +146,7 @@ impl TenantAuth for SessionContext<ClientTenantData> {
         &self.tenant
     }
 
-    fn is_live(&self) -> ApiResult<bool> {
+    fn is_live(&self) -> FpResult<bool> {
         Ok(self.is_live)
     }
 

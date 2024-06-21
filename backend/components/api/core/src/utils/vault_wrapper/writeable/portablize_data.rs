@@ -1,8 +1,8 @@
 use super::WriteableVw;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
@@ -71,7 +71,7 @@ impl WriteableVw<Person> {
     /// NOTE: this DOES NOT portablize custom data or identity documents since we haven't figured
     /// out the portability story for those types of data.
     #[tracing::instrument("WriteableVw::portablize_identity_data", skip_all)]
-    pub fn portablize_identity_data(self, conn: &mut TxnPgConn) -> ApiResult<DataLifetimeSeqno> {
+    pub fn portablize_identity_data(self, conn: &mut TxnPgConn) -> FpResult<DataLifetimeSeqno> {
         // TODO only portablize data collected by the ob config rather than all data
         // TODO also only portablize the _exact_ data that was sent off to be verified. It's possible
         // the data has been changed via API in between sending VReqs and now.
@@ -123,7 +123,7 @@ impl WriteableVw<Person> {
         &self,
         conn: &mut TxnPgConn,
         di: DataIdentifier,
-    ) -> ApiResult<IsFirstTimeVerifying> {
+    ) -> FpResult<IsFirstTimeVerifying> {
         let lifetime = self
             .get_lifetime(&di)
             .ok_or(AssertionError("No lifetime for CI"))?;
@@ -140,7 +140,7 @@ pub(super) fn on_otp_verified(
     ci: ContactInfo,
     sv_id: &ScopedVaultId,
     v_id: &VaultId,
-) -> ApiResult<IsFirstTimeVerifying> {
+) -> FpResult<IsFirstTimeVerifying> {
     let is_first_time_verifying_ci = !ci.is_otp_verified;
     if is_first_time_verifying_ci {
         ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;

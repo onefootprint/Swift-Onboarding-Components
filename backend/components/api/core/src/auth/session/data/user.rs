@@ -1,7 +1,7 @@
 use super::AuthSessionData;
 use crate::errors::user::UserError;
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
+use crate::FpResult;
 use itertools::Itertools;
 use newtypes::AuthEventId;
 use newtypes::AuthMethodKind;
@@ -167,7 +167,7 @@ pub struct NewUserSessionArgs {
 }
 
 impl UserSession {
-    pub fn make(args: NewUserSessionArgs) -> ApiResult<AuthSessionData> {
+    pub fn make(args: NewUserSessionArgs) -> FpResult<AuthSessionData> {
         let NewUserSessionArgs {
             user_vault_id,
             context,
@@ -212,7 +212,7 @@ impl UserSession {
         new_scopes: Vec<UserAuthScope>,
         new_purpose: TokenCreationPurpose,
         new_auth_event: Option<AssociatedAuthEvent>,
-    ) -> ApiResult<AuthSessionData> {
+    ) -> FpResult<AuthSessionData> {
         self.validate_not_derived_from_components()?;
         let old = self.clone();
         // Merge context, scopes, and auth factors and create a new session with these merged fields
@@ -241,7 +241,7 @@ impl UserSession {
         &self,
         new_scopes: Vec<UserAuthScope>,
         new_purpose: TokenCreationPurpose,
-    ) -> ApiResult<AuthSessionData> {
+    ) -> FpResult<AuthSessionData> {
         self.validate_not_derived_from_components()?;
         let old = self.clone();
         let context = NewUserSessionContext {
@@ -273,7 +273,7 @@ impl UserSession {
 
     /// We don't want to allow any token given to the components SDK to ever be used to derive
     /// a new auth token.
-    fn validate_not_derived_from_components(&self) -> ApiResult<()> {
+    fn validate_not_derived_from_components(&self) -> FpResult<()> {
         if self.is_derived_from_components() {
             return ValidationError("Cannot create a new token from one issued for the components SDK")
                 .into();

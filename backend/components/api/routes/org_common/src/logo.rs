@@ -1,8 +1,8 @@
 use actix_multipart::Multipart;
 use api_core::errors::error_with_code::ErrorWithCode;
-use api_core::errors::ApiResult;
 use api_core::utils::file_upload;
 use api_core::utils::file_upload::mime_type_to_extension;
+use api_core::FpResult;
 use api_core::State;
 use newtypes::OrgIdentifierRef;
 use paperclip::actix::web;
@@ -15,7 +15,7 @@ pub async fn upload_org_logo(
     org_ident: OrgIdentifierRef<'_>,
     mut payload: Multipart,
     request: HttpRequest,
-) -> ApiResult<String> {
+) -> FpResult<String> {
     let file = file_upload::handle_file_upload(
         &mut payload,
         &request,

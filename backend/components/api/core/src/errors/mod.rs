@@ -29,7 +29,6 @@ pub use dry_run::*;
 mod tenant_facing_error;
 pub use tenant_facing_error::*;
 
-pub type ApiResult<T> = Result<T, FpError>;
 // TODO rm
 pub type ApiError = FpError;
 

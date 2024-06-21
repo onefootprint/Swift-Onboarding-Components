@@ -6,7 +6,7 @@ mod state_machine;
 pub mod states;
 
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::output::Csv;
@@ -51,7 +51,7 @@ pub fn validate_doc_type_is_allowed(
     document_type: IdDocKind,
     residential_country: Option<Iso3166TwoDigitCountryCode>,
     country_code: Iso3166TwoDigitCountryCode,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let document_to_country_mapping = obc.supported_country_mapping_for_document(residential_country);
     let Some(allowed_doc_types) = document_to_country_mapping.get(&country_code) else {
         // this country is not in our available countries

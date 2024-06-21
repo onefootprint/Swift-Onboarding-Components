@@ -3,12 +3,12 @@ use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantOrPartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::magic_link::create_magic_link;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OrgMemberFilters;
 use chrono::Utc;
@@ -44,7 +44,7 @@ pub async fn get(
 
     let (results, next_page, count) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let filters = TenantRolebindingFilters {
                 org_id: (&authed_org_ident).into(),
                 only_active: true,
@@ -94,7 +94,7 @@ pub async fn post(
     let email2 = email.clone();
     let (inviter, user, rb, role) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let inviter = TenantUser::get(conn, &user_id)?;
             let user = TenantUser::get_and_update_or_create(conn, email2, first_name, last_name)?;
             let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, &authed_org_ident)?;
@@ -140,7 +140,7 @@ pub async fn patch(
     };
     let (user, rb, role) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let org_ref: OrgIdentifierRef<'_> = (&authed_org_ident).into();
             let (user, _, role, _) = TenantRolebinding::get(conn, (&tu_id, org_ref))?;
             let rb = TenantRolebinding::update(conn, (&tu_id, org_ref), rolebinding_update)?;
@@ -174,7 +174,7 @@ pub async fn deactivate(
     };
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let org_ref: OrgIdentifierRef<'_> = (&authed_org_ident).into();
             TenantRolebinding::update(conn, (&tu_id, org_ref), update)?;
             Ok(())

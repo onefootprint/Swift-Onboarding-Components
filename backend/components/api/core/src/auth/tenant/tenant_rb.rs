@@ -8,7 +8,7 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::helpers::TenantOrPartnerTenant;
 use db::models::tenant::Tenant;
 use db::models::tenant_role::TenantRole;
@@ -63,7 +63,7 @@ impl<const IS_SECONDARY: bool> ExtractableAuthSession for ParsedTenantRbAuth<IS_
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
         req: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,
             _ => {
@@ -128,7 +128,7 @@ impl<const IS_SECONDARY: bool> CanCheckTenantGuard for TenantRbAuthContext<IS_SE
 }
 
 impl TenantAuth for SessionContext<TenantRbAuth> {
-    fn is_live(&self) -> ApiResult<bool> {
+    fn is_live(&self) -> FpResult<bool> {
         if self.tenant().sandbox_restricted && self.is_live {
             // error if the tenant is sandbox-restricted but is requesting live data
             return Err(AuthError::SandboxRestricted.into());
@@ -154,7 +154,7 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
 }
 
 impl<const IS_SECONDARY: bool> GetFirmEmployee for TenantRbAuthContext<IS_SECONDARY> {
-    fn firm_employee_user(&self) -> ApiResult<TenantUser> {
+    fn firm_employee_user(&self) -> FpResult<TenantUser> {
         let tu = &self.0.tenant_user;
         if !tu.is_firm_employee {
             return Err(AuthError::NotFirmEmployee.into());

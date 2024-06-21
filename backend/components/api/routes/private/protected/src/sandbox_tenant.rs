@@ -7,10 +7,10 @@ use api_core::auth::session::AuthSessionData;
 use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use db::models::tenant::NewTenant;
 use db::models::tenant::Tenant;
 use newtypes::SessionAuthToken;
@@ -48,7 +48,7 @@ pub async fn post(
     let expires_at = auth.clone().session().expires_at;
     let token = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             if Tenant::is_domain_already_claimed(conn, &domains)? {
                 return ValidationError("Tenant for this domain already exists").into();
             }

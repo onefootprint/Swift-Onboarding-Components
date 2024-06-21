@@ -4,8 +4,8 @@ use super::idology_expectid;
 use super::lexis;
 use super::neuro_id;
 use crate::decision::vendor::vendor_result::VendorResult;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
 use derive_more::Display;
@@ -98,7 +98,7 @@ pub fn parse_reason_codes_from_vendor_result(
     vendor_result: VendorResult, /* TODO: this could be VendorResponse later when vres_id is removed from
                                   * here */
     vw: &VaultWrapper,
-) -> ApiResult<ParsedFootprintReasonCodes> {
+) -> FpResult<ParsedFootprintReasonCodes> {
     let vendor_api: VendorAPI = (&vendor_result.response.response).into();
     let vres_id = vendor_result.verification_result_id.clone();
     let submitted_info = UserSubmittedInfoForFRC::new(vw);
@@ -163,7 +163,7 @@ pub fn parse_reason_codes(
 pub fn fetch_latest_kyc_risk_signals(
     conn: &mut db::PgConn,
     scoped_vault_id: &ScopedVaultId,
-) -> ApiResult<RiskSignalsForDecision> {
+) -> FpResult<RiskSignalsForDecision> {
     let rsfd = fetch_latest_risk_signals_map(conn, scoped_vault_id)?;
     Ok(RiskSignalsForDecision {
         kyc: rsfd.kyc.clone(),
@@ -177,7 +177,7 @@ pub fn fetch_latest_kyc_risk_signals(
 pub fn fetch_latest_risk_signals_map(
     conn: &mut db::PgConn,
     scoped_vault_id: &ScopedVaultId,
-) -> ApiResult<RiskSignalsForDecision> {
+) -> FpResult<RiskSignalsForDecision> {
     let mut db_risk_signals_map: HashMap<RiskSignalGroupKind, Vec<RiskSignal>> =
         // We don't make decisions on hidden risk signals
         RiskSignal::latest_by_risk_signal_group_kinds(conn, scoped_vault_id, AtSeqno(None))?

@@ -20,10 +20,10 @@ use crate::decision::state::MakeVendorCalls;
 use crate::decision::state::WorkflowKind;
 use crate::decision::state::WorkflowWrapper;
 use crate::decision::tests::test_helpers;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_instance::IncludeRules;
@@ -106,7 +106,7 @@ async fn run_kyc_for_bo(
 
     state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let rule_instance_kinds = RuleInstance::list(conn, &t_id, is_live, &obc_id, IncludeRules::All)
                 .unwrap()
                 .into_iter()

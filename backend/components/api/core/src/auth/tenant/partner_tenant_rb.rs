@@ -6,7 +6,7 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::helpers::TenantOrPartnerTenant;
 use db::models::partner_tenant::PartnerTenant;
 use db::models::tenant_role::TenantRole;
@@ -58,7 +58,7 @@ impl ExtractableAuthSession for ParsedPartnerTenantRbAuth {
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
         _: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::TenantRb(data) => data,
             _ => {

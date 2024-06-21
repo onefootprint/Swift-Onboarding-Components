@@ -21,13 +21,13 @@ use api_core::decision::{
     self,
 };
 use api_core::errors::cip_error::CipError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::DecryptUncheckedResult;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::ApiErrorKind;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::AlpacaCipRequest;
 use api_wire_types::AlpacaCipResponse;
@@ -128,7 +128,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id2, &tenant_id2, is_live))?;
             UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
 
@@ -168,7 +168,7 @@ pub async fn post_old(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id2, is_live))?;
             UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
 
@@ -225,7 +225,7 @@ pub(crate) async fn create_cip_request(
     fp_id: FpId,
     tenant_id: TenantId,
     is_live: bool,
-) -> ApiResult<(CipRequest, TenantVw)> {
+) -> FpResult<(CipRequest, TenantVw)> {
     let (
         uvw,
         wf,
@@ -240,7 +240,7 @@ pub(crate) async fn create_cip_request(
         latest_identity_document_and_request,
     ) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let fp_obd =
                 OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
                     .ok_or(CipError::EntityDecisionDoesNotExist)?;
@@ -432,7 +432,7 @@ fn kyc(
     mr: Option<&ManualReview>,
     annotation: Option<&Annotation>,
     decrypted_data: &DecryptUncheckedResult,
-) -> ApiResult<alpaca::Kyc> {
+) -> FpResult<alpaca::Kyc> {
     // find the right approver
     let approved_by = actor
         .and_then(|a| match a {
@@ -591,7 +591,7 @@ fn watchlist(
     risk_signals: &[RiskSignal],
     mr: Option<&ManualReview>,
     watchlist_result_response: WatchlistResultResponse,
-) -> ApiResult<alpaca::Watchlist> {
+) -> FpResult<alpaca::Watchlist> {
     let pep: bool = risk_signals
         .iter()
         .any(|rs| rs.reason_code == FootprintReasonCode::WatchlistHitPep);
@@ -676,7 +676,7 @@ fn document_and_photo(
     document_request: DocumentRequest,
     ocr_response: FetchOCRResponse,
     scores_response: FetchScoresResponse,
-) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
+) -> FpResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
     let expect_selfie = document_request.should_collect_selfie();
 
     let ocr_name = ok_or(ocr_response.name.as_ref(), "missing ocr name".into())?;
@@ -751,7 +751,7 @@ fn document_and_photo(
     Ok((Some(document_photo_id), Some(photo_selfie)))
 }
 
-fn ok_or<T>(o: Option<T>, assert_msg: String) -> ApiResult<T> {
+fn ok_or<T>(o: Option<T>, assert_msg: String) -> FpResult<T> {
     let unwrapped = o.ok_or(ApiErrorKind::AssertionError(assert_msg))?;
 
     Ok(unwrapped)

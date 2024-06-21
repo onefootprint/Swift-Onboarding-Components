@@ -6,11 +6,11 @@ use crate::get::EntityDetailResponse;
 use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::ApiErrorKind;
+use api_core::FpResult;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -33,7 +33,7 @@ pub async fn get(
 
     let (entity, vw) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let entity = ScopedVault::bulk_get_serializable_info(conn, vec![sv.id.clone()])?

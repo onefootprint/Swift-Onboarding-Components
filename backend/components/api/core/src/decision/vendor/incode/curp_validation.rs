@@ -12,13 +12,13 @@ use crate::decision::{
     self,
 };
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DataLifetimeSources;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::utils::vault_wrapper::WriteableVw;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use db::models::billing_event::BillingEvent;
@@ -75,14 +75,14 @@ pub async fn run_curp_validation_check(
     state: &State,
     di: &DecisionIntent,
     wf_id: &WorkflowId,
-) -> ApiResult<Option<VendorResult>> {
+) -> FpResult<Option<VendorResult>> {
     let svid = di.scoped_vault_id.clone();
     let wf_id2 = wf_id.clone();
     let wf_id3 = wf_id.clone();
     let di_id = di.id.clone();
     let (vw, tenant_id, id_documents, latest_results, sv) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -176,7 +176,7 @@ pub async fn run_curp_validation_check(
 
                     state
                         .db_pool
-                        .db_transaction(move |conn| -> ApiResult<_> {
+                        .db_transaction(move |conn| -> FpResult<_> {
                             // Vault the curp response
                             let seqno = vault_curp_response(conn, &sv_id, vault_data)?;
 
@@ -327,7 +327,7 @@ async fn get_curp_for_check(
     enclave_client: &EnclaveClient,
     vw: &VaultWrapper,
     id_document: Option<&Document>,
-) -> ApiResult<(Option<PiiString>, Document)> {
+) -> FpResult<(Option<PiiString>, Document)> {
     if let Some(doc) = id_document {
         // We only expect a CURP for voter ID now
         if !doc_expects_curp(doc) {
@@ -370,7 +370,7 @@ async fn save_canned_response(
     identity_document_fixture: Option<DocumentFixtureResult>,
     id_doc_kind: IdDocKind,
     id_doc_id: DocumentId,
-) -> ApiResult<VendorResult> {
+) -> FpResult<VendorResult> {
     let canned_res = match identity_document_fixture {
         Some(decision) => match decision {
             DocumentFixtureResult::Pass => idv::test_fixtures::incode_curp_validation_good_curp(),
@@ -386,7 +386,7 @@ async fn save_canned_response(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let parsed = serde_json::from_value::<CurpValidationResponse>(canned_res.clone())?;
             let raw_response = PiiJsonValue::new(serde_json::to_value(&canned_res.clone())?);
 
@@ -426,7 +426,7 @@ pub async fn pre_vault(
     response: PiiJsonValue,
     is_live: bool,
     sv_id: &ScopedVaultId,
-) -> ApiResult<FingerprintedDataRequest> {
+) -> FpResult<FingerprintedDataRequest> {
     let data = vec![(
         DocumentDiKind::OcrData(id_doc_kind, ODK::CurpValidationResponse).into(),
         response,
@@ -444,7 +444,7 @@ pub fn vault_curp_response(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
     data: FingerprintedDataRequest,
-) -> ApiResult<DataLifetimeSeqno> {
+) -> FpResult<DataLifetimeSeqno> {
     let vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
     let sources = DataLifetimeSources::single(DataLifetimeSource::Ocr);
     let result = vw.patch_data(conn, data, sources, None)?;
@@ -468,7 +468,7 @@ async fn handle_curp_error(
     sv_id: &ScopedVaultId,
     vres_id: &VerificationResultId,
     errors: Option<Vec<IncodeFailureReason>>,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let svid = sv_id.clone();
     // We save under the same RSG created during the incode state machine if it ran so we
     // don't invalidate the old RSG
@@ -484,7 +484,7 @@ async fn handle_curp_error(
         )];
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let rsg = RiskSignalGroup::get_or_create(conn, &svid, RiskSignalGroupKind::Doc)?;
                 RiskSignal::bulk_add(conn, new_reason_codes, false, rsg.id)?;
 

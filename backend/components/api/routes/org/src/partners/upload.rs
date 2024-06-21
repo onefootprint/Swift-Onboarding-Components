@@ -2,10 +2,10 @@ use actix_multipart::Multipart;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::file_upload::handle_file_upload;
+use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
@@ -54,7 +54,7 @@ pub async fn post(
     let params = (tenant_id.clone(), partnership_id.clone(), request_id.clone());
     let document_id = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (tenant_id, partnership_id, request_id) = params;
             // Check that the authorized tenant owns the partnership.
             TenantCompliancePartnership::get(conn, &partnership_id, &tenant_id)?;
@@ -93,7 +93,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             // We've already validated that the authorized user matches the partnership.
 
             let doc = ComplianceDoc::lock(conn, &request_id, &partnership_id)?;

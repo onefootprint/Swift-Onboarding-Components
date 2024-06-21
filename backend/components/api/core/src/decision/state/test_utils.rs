@@ -8,7 +8,7 @@ use crate::decision::vendor::vendor_trait::MockVendorAPICall;
 use crate::decision::vendor::{
     self,
 };
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -183,7 +183,7 @@ pub async fn setup_data(
     let tid = tenant.id.clone();
     let tu = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             // only enable Idology for this dummy test merchant
             let args = UpdateTenantVendorControlArgs {
                 idology_enabled: Some(true),
@@ -215,7 +215,7 @@ pub async fn query_data(
     let wfid = wf_id.clone();
     state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, AtSeqno(None))
                 .unwrap()
                 .into_iter()
@@ -259,7 +259,7 @@ pub async fn query_risk_signals(
     let s = sv_id.clone();
     state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             Ok(RiskSignal::latest_by_risk_signal_group_kind(conn, &s, kind)?)
         })
         .await
@@ -561,7 +561,7 @@ pub fn save_vres_for_doc_fixture_risk_signals(
     response: serde_json::Value,
     vendor_api: VendorAPI,
     wf_id: &WorkflowId,
-) -> ApiResult<VerificationResult> {
+) -> FpResult<VerificationResult> {
     let di = DecisionIntent::get_or_create_for_workflow(conn, sv_id, wf_id, DecisionIntentKind::DocScan)?;
     let vreq = VerificationRequest::create(conn, (sv_id, &di.id, vendor_api).into())?;
     let e_response = vendor::verification_result::encrypt_verification_result_response(
@@ -584,7 +584,7 @@ pub async fn mock_incode_doc_collection(
 ) {
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let vault = Vault::get(conn.conn(), &scoped_vault_id).unwrap();
 
             if create_doc_request

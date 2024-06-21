@@ -4,10 +4,10 @@ use api_core::auth::session::tenant::WorkOsSession;
 use api_core::auth::session::AuthSessionData;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::workos::WorkOsError;
-use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::email_domain;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OrgLoginResponse;
 use api_wire_types::Organization;
@@ -37,7 +37,7 @@ use workos::sso::GetProfileAndTokenResponse;
 use workos::sso::Profile;
 use workos::KnownOrUnknown;
 
-fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> ApiResult<WorkosAuthMethod> {
+fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> FpResult<WorkosAuthMethod> {
     // To protect against MagcicLink becoming a known type, check based on the string representation
     // of the connection type. Sadly, Display isn't implemented so have to check the serialization
     let connection_type = serde_json::ser::to_string(&connection_type)?;
@@ -54,7 +54,7 @@ pub async fn handle_login<T>(
     code: String,
     request_org_id: Option<T>,
     tenant_kind: TenantKind,
-) -> ApiResult<OrgLoginResponse>
+) -> FpResult<OrgLoginResponse>
 where
     T: Into<OrgIdentifier>,
 {
@@ -86,7 +86,7 @@ where
 
     let (user, matching_rolebindings) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let email = OrgMemberEmail::from_str(&profile2.email)?;
             // Get or create tenant user
             let user =
@@ -225,7 +225,7 @@ where
 }
 
 type IsNewTenant = bool;
-async fn find_or_create_tenant(state: &State, profile: &Profile) -> ApiResult<(Tenant, IsNewTenant)> {
+async fn find_or_create_tenant(state: &State, profile: &Profile) -> FpResult<(Tenant, IsNewTenant)> {
     // process domain
     let domain = email_domain::parse_private_email_domain(profile.email.as_str());
 
@@ -272,7 +272,7 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> ApiResult<(T
 async fn find_or_create_partner_tenant(
     state: &State,
     profile: &Profile,
-) -> ApiResult<(PartnerTenant, IsNewTenant)> {
+) -> FpResult<(PartnerTenant, IsNewTenant)> {
     let domain = email_domain::parse_private_email_domain(profile.email.as_str());
 
     if let Some(domain) = domain.as_ref() {

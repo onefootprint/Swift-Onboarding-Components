@@ -3,7 +3,7 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::business_owner::BusinessOwner;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
@@ -40,7 +40,7 @@ impl ExtractableAuthSession for ParsedBoSession {
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
         _: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::BusinessOwner(data) => data,
             _ => {

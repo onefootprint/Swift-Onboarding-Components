@@ -7,11 +7,11 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::decision::review::save_review_decision;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::task::execute_webhook_tasks;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use api_wire_types::EntityActionResponse;
 use api_wire_types::EntityActionsRequest;
 use db::models::scoped_vault::ScopedVault;
@@ -50,11 +50,11 @@ pub async fn post(
 
     let outcomes = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let outcomes = actions
                 .into_iter()
-                .map(|a| -> ApiResult<EntityActionPostCommit> {
+                .map(|a| -> FpResult<EntityActionPostCommit> {
                     let action = match a {
                         EntityAction::Trigger(t) => {
                             apply_trigger_request(conn, t, &sv, actor.clone(), &session_key)?.into()
@@ -66,7 +66,7 @@ pub async fn post(
                     };
                     Ok(action)
                 })
-                .collect::<ApiResult<Vec<_>>>()?;
+                .collect::<FpResult<Vec<_>>>()?;
             Ok(outcomes)
         })
         .await?;
@@ -75,7 +75,7 @@ pub async fn post(
         .into_iter()
         .map(|o| o.apply(&state))
         .flatten_ok()
-        .collect::<ApiResult<_>>()?;
+        .collect::<FpResult<_>>()?;
     Ok(responses)
 }
 
@@ -86,7 +86,7 @@ pub(super) enum EntityActionPostCommit {
 }
 
 impl EntityActionPostCommit {
-    pub(super) fn apply(self, state: &State) -> ApiResult<Option<EntityActionResponse>> {
+    pub(super) fn apply(self, state: &State) -> FpResult<Option<EntityActionResponse>> {
         match self {
             EntityActionPostCommit::Trigger(t) => t.post_commit(state),
             EntityActionPostCommit::FireWebhooks => {
@@ -97,7 +97,7 @@ impl EntityActionPostCommit {
     }
 }
 
-fn clear_review(conn: &mut TxnPgConn, sv: &ScopedVault, actor: DbActor) -> ApiResult<EntityActionPostCommit> {
+fn clear_review(conn: &mut TxnPgConn, sv: &ScopedVault, actor: DbActor) -> FpResult<EntityActionPostCommit> {
     let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
     save_review_decision(conn, wf, DecisionStatus::None, None, actor)?;
     Ok(EntityActionPostCommit::FireWebhooks)

@@ -5,12 +5,12 @@ use crate::decision::vendor::vendor_api::vendor_api_struct::SambaLicenseValidati
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::AdditionalIdentityDocumentVerificationHelper;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
@@ -80,7 +80,7 @@ impl CreateOrderContext {
     async fn get_decrypted_values(
         vw: &VaultWrapper,
         enclave_client: &EnclaveClient,
-    ) -> ApiResult<(DecryptUncheckedResult, Vec<DataLifetimeId>)> {
+    ) -> FpResult<(DecryptUncheckedResult, Vec<DataLifetimeId>)> {
         let fields = [
             DataIdentifier::from(IDK::FirstName),
             DataIdentifier::from(IDK::LastName),
@@ -103,7 +103,7 @@ impl CreateOrderContext {
         Ok((decrypted, lifetime_ids))
     }
 
-    fn get_document_id(&self, conn: &mut PgConn) -> ApiResult<Option<DocumentId>> {
+    fn get_document_id(&self, conn: &mut PgConn) -> FpResult<Option<DocumentId>> {
         // If we're running this in the context of a wf, only check documents collected in this workflow
         let id_documents = match self {
             CreateOrderContext::Workflow { wf_id, .. } => {
@@ -131,7 +131,7 @@ impl CreateOrderContext {
         vw: &VaultWrapper,
         enclave_client: &EnclaveClient,
         tvc: &TenantVendorControl,
-    ) -> ApiResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
+    ) -> FpResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
         let (decrypted_values, lifetime_ids) = Self::get_decrypted_values(vw, enclave_client).await?;
         let request = build_request(decrypted_values, tvc.samba_credentials())?;
         Ok((request, lifetime_ids))
@@ -142,7 +142,7 @@ impl CreateOrderContext {
         vw: &VaultWrapper,
         enclave_client: &EnclaveClient,
         tvc: &TenantVendorControl,
-    ) -> ApiResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
+    ) -> FpResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
         match self {
             // we're in the context of a workflow
             CreateOrderContext::Workflow { .. } => Self::create_req_from_vault(vw, enclave_client, tvc).await,
@@ -164,7 +164,7 @@ impl CreateOrderContext {
 fn build_request(
     decrypted_values: DecryptUncheckedResult,
     credentials: SambaSafetyCredentials,
-) -> ApiResult<SambaCreateLVOrderRequest> {
+) -> FpResult<SambaCreateLVOrderRequest> {
     let request = SambaCreateLVOrderRequest {
         credentials,
         // TODO: handle for doc only where we don't ever write IDKs
@@ -204,7 +204,7 @@ fn build_request(
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) -> ApiResult<()> {
+pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) -> FpResult<()> {
     let di = context.decision_intent();
     let vreq_identifier = context.vreq_identifier();
     let svid = di.scoped_vault_id.clone();
@@ -213,7 +213,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
 
     let (vw, tenant_id, doc_id) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
             let tenant_id = sv.tenant_id.clone();
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -294,7 +294,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let args = NewSambaOrderArgs {
                 decision_intent_id: di_id,
                 document_id: doc_id,
@@ -314,7 +314,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWebhook) -> ApiResult<()> {
+pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWebhook) -> FpResult<()> {
     let Some(report_id) = webhook
         .get_link(SambaLinkType::LicenseReports)
         .map(|l| SambaReportId::from(l.report_id))
@@ -325,7 +325,7 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
     let order_id = webhook.data.order_id.clone();
     let (order, di, tenant_id, vw) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             // TODO: handle error from not finding Order?
             let order = SambaOrder::get(conn, &order_id)?;
             let di = DecisionIntent::get(conn, &order.decision_intent_id)?;
@@ -377,7 +377,7 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let locked = SambaOrder::lock(conn, &order.id)?;
             // check again we should be creating the report
             if locked.completed_at.is_none() {

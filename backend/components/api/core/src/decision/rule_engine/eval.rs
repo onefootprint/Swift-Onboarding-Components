@@ -1,6 +1,6 @@
 use super::engine::VaultDataForRules;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
+use crate::FpResult;
 use db::models::insight_event::InsightEvent;
 use db::models::list_entry::ListWithDecryptedEntries;
 use db::models::rule_instance::RuleInstance;
@@ -197,7 +197,7 @@ pub fn evaluate_rule_expression(
     vault_data: &VaultDataForRules,
     insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
-) -> ApiResult<bool> {
+) -> FpResult<bool> {
     // Conditions in a Rule are all AND'd together
     // Empty rule_expression's with no conditions shouldn't be possible (should fail validation), but
     // should one of these sneak into existence (ie a bad manual PG fiddle) then we'd want to default to
@@ -217,7 +217,7 @@ fn evaluate_condition(
     vault_data: &VaultDataForRules,
     insight_events: &[InsightEvent],
     lists: &HashMap<ListId, ListWithDecryptedEntries>,
-) -> ApiResult<bool> {
+) -> FpResult<bool> {
     let res = match cond {
         RuleExpressionCondition::RiskSignal { field, op, value } => {
             let field_value = reason_codes.contains(field);
@@ -287,7 +287,7 @@ fn vault_data_is_in_list(
     field: &DataIdentifier,
     value: PiiString,
     list: &ListWithDecryptedEntries,
-) -> ApiResult<bool> {
+) -> FpResult<bool> {
     let (list, entries) = list;
 
     match (field, list.kind) {
@@ -336,7 +336,7 @@ fn insight_field_value_is_in_list(
     field: &DeviceInsightField,
     insight_events: &[InsightEvent],
     list: &ListWithDecryptedEntries,
-) -> ApiResult<bool> {
+) -> FpResult<bool> {
     let (list, entries) = list;
 
     if list.kind != ListKind::IpAddress {

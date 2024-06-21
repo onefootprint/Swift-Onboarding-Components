@@ -1,10 +1,10 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use api_core::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
@@ -29,7 +29,7 @@ pub async fn get(
 
     let businesses = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let businesses = BusinessOwner::list_businesses(conn, &su.vault_id, &tenant_id)?;
             Ok(businesses)

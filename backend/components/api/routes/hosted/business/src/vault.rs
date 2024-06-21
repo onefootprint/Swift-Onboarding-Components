@@ -1,8 +1,8 @@
 use crate::auth::user::UserAuthScope;
-use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::Business;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::auth::AuthError;
@@ -44,7 +44,7 @@ pub async fn post_validate(
     let source = user_auth.user_session.dl_source();
     state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
             let sources = DataLifetimeSources::single(source);
             bvw.validate_request(conn, updates, sources, None, DataRequestSource::PatchVault)?;
@@ -77,7 +77,7 @@ pub async fn patch(
     let source = user_auth.user_session.dl_source();
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
             let sources = DataLifetimeSources::single(source);
             bvw.patch_data(conn, updates, sources, None)?;

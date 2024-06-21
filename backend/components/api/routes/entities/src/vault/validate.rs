@@ -1,9 +1,9 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::ClientTenantAuthContext;
 use api_core::auth::tenant::TenantAuth;
@@ -97,7 +97,7 @@ async fn post_inner(
     let source = auth.dl_source();
     state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             let sources = DataLifetimeSources::single(source);

@@ -3,12 +3,12 @@
 use crate::ProtectedAuth;
 use actix_web::post;
 use actix_web::web;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::Pii;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::ApiErrorKind;
+use api_core::FpResult;
 use api_core::State;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::DataIdentifier;
@@ -43,7 +43,7 @@ pub async fn post(
 
     let uvw = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(
                 conn,
                 db::models::scoped_vault::ScopedVaultIdentifier::SuperAdminView { identifier: &fp_id },

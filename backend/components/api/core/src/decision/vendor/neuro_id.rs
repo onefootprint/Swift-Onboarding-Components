@@ -3,10 +3,10 @@ use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_result::VendorResult;
 use super::verification_result::SaveVerificationResultArgs;
 use super::verification_result::ShouldSaveVerificationRequest;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use db::models::decision_intent::DecisionIntent;
@@ -83,12 +83,12 @@ pub async fn run_neuro_call(
     di: &DecisionIntent,
     wf_id: &WorkflowId,
     t_id: &TenantId,
-) -> ApiResult<Option<VendorResult>> {
+) -> FpResult<Option<VendorResult>> {
     let di_id = di.id.clone();
     let svid = di.scoped_vault_id.clone();
     let (vw, latest_results, scoped_vault) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&svid))?;
             let latest_results =
                 VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, &di_id)?;
@@ -161,7 +161,7 @@ pub async fn save_neuro_event(
     scoped_vault_id: &ScopedVaultId,
     workflow_id: &WorkflowId,
     vres_id: &VerificationResultId,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let attributes = NeuroIdAttributes::new(response);
 
     let event = NewNeuroIdAnalyticsEvent {
@@ -212,7 +212,7 @@ mod tests {
     use crate::decision::tests::test_helpers::create_kyc_user_and_wf;
     use crate::decision::tests::test_helpers::FixtureData;
     use crate::decision::vendor::verification_result::save_vreq_and_vres;
-    use crate::errors::ApiResult;
+    use crate::FpResult;
     use crate::State;
     use db::models::decision_intent::DecisionIntent;
     use db::models::neuro_id_analytics_event::NeuroIdAnalyticsEvent;
@@ -299,7 +299,7 @@ mod tests {
         let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
         let tenant = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 Ok(fixtures::tenant::create_with_keys(conn, pk, tenant_e_key))
             })
             .await
@@ -350,7 +350,7 @@ mod tests {
         //
         let (dupes1, dupes2, dupes3, dupes4) = state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let d1 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv1)?;
                 let d2 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv2)?;
                 let d3 = NeuroIdAnalyticsEvent::get_dupes_for_tenant(conn, &sv3)?;

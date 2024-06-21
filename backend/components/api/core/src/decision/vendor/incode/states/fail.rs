@@ -4,9 +4,9 @@ use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiErrorKind;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::models::document::Document;
 use db::models::document::DocumentUpdate;
@@ -37,7 +37,7 @@ impl Fail {
         sv_id: &ScopedVaultId,
         vault_id: &VaultId,
         id_doc_id: &DocumentId,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         // Mark the id doc as failed
         let update = DocumentUpdate {
             completed_seqno: None,
@@ -89,7 +89,7 @@ impl IncodeStateTransition for Fail {
         _: &IncodeClients,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         Ok(None)
     }
 
@@ -98,7 +98,7 @@ impl IncodeStateTransition for Fail {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         Err(ApiErrorKind::AssertionError(
             "Incode machine already failed".into(),
         ))?

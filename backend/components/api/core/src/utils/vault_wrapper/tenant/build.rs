@@ -1,7 +1,7 @@
 use super::TenantVw;
 use super::VaultWrapper;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::scoped_vault::ScopedVault;
@@ -17,7 +17,7 @@ use std::collections::HashMap;
 
 impl<Type> VaultWrapper<Type> {
     // TODO support building with any ScopedVaultIdentifier, like fp_id, is_live, and tenant_id
-    pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
+    pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> FpResult<TenantVw<Type>> {
         Self::build_for_tenant_version(conn, sv_id, None)
     }
 
@@ -25,7 +25,7 @@ impl<Type> VaultWrapper<Type> {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         version: Option<DataLifetimeSeqno>,
-    ) -> ApiResult<TenantVw<Type>> {
+    ) -> FpResult<TenantVw<Type>> {
         Self::build_inner(conn, sv_id, version)
     }
 
@@ -33,7 +33,7 @@ impl<Type> VaultWrapper<Type> {
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         version: Option<DataLifetimeSeqno>,
-    ) -> ApiResult<TenantVw<Type>> {
+    ) -> FpResult<TenantVw<Type>> {
         let args = match version {
             Some(version) => VwArgs::Historical(sv_id, version),
             None => VwArgs::Tenant(sv_id),
@@ -58,7 +58,7 @@ impl<Type> VaultWrapper<Type> {
         conn: &mut PgConn,
         users: Vec<(ScopedVault, Vault)>,
         seqno: Option<DataLifetimeSeqno>,
-    ) -> ApiResult<HashMap<ScopedVaultId, TenantVw<Type>>> {
+    ) -> FpResult<HashMap<ScopedVaultId, TenantVw<Type>>> {
         if users.is_empty() {
             return Ok(HashMap::new());
         }
@@ -101,7 +101,7 @@ impl<Type> VaultWrapper<Type> {
                 };
                 Ok((sv_id, uvw))
             })
-            .collect::<ApiResult<_>>()?;
+            .collect::<FpResult<_>>()?;
         Ok(results)
     }
 }

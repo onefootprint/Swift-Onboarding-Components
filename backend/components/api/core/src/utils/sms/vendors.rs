@@ -1,5 +1,5 @@
 use super::client::SmsClient;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use async_trait::async_trait;
 use newtypes::sms_message::SmsMessage;
 use newtypes::PiiString;
@@ -60,7 +60,7 @@ pub trait SmsVendor: Send + Sync {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
-    ) -> ApiResult<SmsSendStatus>;
+    ) -> FpResult<SmsSendStatus>;
 }
 
 #[async_trait]
@@ -71,7 +71,7 @@ impl SmsVendor for TwilioSms {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
-    ) -> ApiResult<SmsSendStatus> {
+    ) -> FpResult<SmsSendStatus> {
         let twilio_client = client.twilio_client(destination);
         let message = twilio_client.compose_sms_message(message, destination);
         twilio_client.send(message).await?;
@@ -87,7 +87,7 @@ impl SmsVendor for TwilioWhatsapp {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
-    ) -> ApiResult<SmsSendStatus> {
+    ) -> FpResult<SmsSendStatus> {
         let twilio_client = client.twilio_client(destination);
         let message = twilio_client.compose_whatsapp_message(message, destination)?;
         let result = twilio_client.send(message).await;
@@ -118,7 +118,7 @@ impl SmsVendor for Pinpoint {
         client: &SmsClient,
         message: &SmsMessage,
         destination: &PiiString,
-    ) -> ApiResult<SmsSendStatus> {
+    ) -> FpResult<SmsSendStatus> {
         client
             .pinpoint_client
             .send_text_message()

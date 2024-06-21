@@ -1,10 +1,10 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpError;
+use api_core::FpResult;
 use api_core::State;
 use crypto::aead::AeadSealedBytes;
 use crypto::aead::SealingKey;
@@ -36,7 +36,7 @@ pub async fn entries_for_list(
 
     let (tenant, list, entries) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &tenant_id)?;
             let list = List::get(conn, &tenant_id, is_live, &list_id)?;
             let entries = ListEntry::list(conn, &list_id)?;

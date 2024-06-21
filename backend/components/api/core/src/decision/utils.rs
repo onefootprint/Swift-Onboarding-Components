@@ -4,7 +4,7 @@ use super::vendor::{
     self,
 };
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::decision_intent::DecisionIntent;
 use db::models::insight_event::InsightEvent;
 use db::models::risk_signal::RiskSignal;
@@ -42,7 +42,7 @@ pub fn get_fixture_data_decision(
     vault: &Vault,
     workflow: &Workflow,
     tenant_id: &TenantId,
-) -> ApiResult<Option<FixtureDecision>> {
+) -> FpResult<Option<FixtureDecision>> {
     let is_demo_tenant = ff_client.flag(BoolFlag::IsDemoTenant(tenant_id));
     if !vault.is_live {
         // Ensure that each sandbox vault has a fixture result - we don't want to make real
@@ -71,7 +71,7 @@ pub fn get_fixture_data_decision(
     }
 }
 
-pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> ApiResult<bool> {
+pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> FpResult<bool> {
     if !vault.is_live {
         // Ensure that each sandbox vault has a fixture result - we don't want to make real
         // requests for sandbox vaults
@@ -97,7 +97,7 @@ type ShouldInitiateRealDocumentRequests = bool;
 pub async fn should_initiate_requests_for_document(
     vault: &Vault,
     document_decision: Option<DocumentFixtureResult>,
-) -> ApiResult<ShouldInitiateRealDocumentRequests> {
+) -> FpResult<ShouldInitiateRealDocumentRequests> {
     // We allow identity documents to be tested in sandbox against incode demo environment, if a tenant
     // is flagged in We use a flag since not all tenants should have this enabled by default (they
     // might need to sign incode terms and be advised that they can only do this for testing purposes)
@@ -140,7 +140,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     conn: &mut TxnPgConn,
     biz_wf_id: &WorkflowId,
     fixture_decision: FixtureDecision,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let biz_wf = Workflow::lock(conn, biz_wf_id)?;
     let sb = ScopedVault::get(conn, biz_wf_id)?;
     // TODO should these state transitions be handled by the ww machines?

@@ -5,9 +5,9 @@ use crate::State;
 use actix_web::web::Json;
 use api_core::decision::vendor;
 use api_core::decision::vendor::fp_device_attestation::AttestationResult;
-use api_core::errors::ApiResult;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
+use api_core::FpResult;
 use api_wire_types::hosted::device_attestation::CreateDeviceAttestationRequest;
 use api_wire_types::hosted::device_attestation::DeviceAttestationChallengeResponse;
 use api_wire_types::hosted::device_attestation::DeviceAttestationType;
@@ -134,7 +134,7 @@ pub async fn post_attestation(
 
             state
                 .db_pool
-                .db_transaction(move |conn| -> ApiResult<()> {
+                .db_transaction(move |conn| -> FpResult<()> {
                     let attestation = new_attestation.create(conn.conn())?;
 
                     // if we have a scoped vault (which we should always have in an onboarding)
@@ -193,7 +193,7 @@ pub async fn post_attestation(
 
             state
                 .db_pool
-                .db_transaction(move |conn| -> ApiResult<()> {
+                .db_transaction(move |conn| -> FpResult<()> {
                     let attestation = new_attestation.create(conn.conn())?;
 
                     // if we have a scoped vault (which we should always have in an onboarding)

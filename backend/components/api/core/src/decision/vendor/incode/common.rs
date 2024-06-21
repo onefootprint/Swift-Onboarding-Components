@@ -3,7 +3,7 @@ use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::verification_result::ShouldSaveVerificationRequest;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use idv::incode::response::OnboardingStartResponse;
 use idv::incode::IncodeClientErrorCustomFailureReasons;
@@ -99,7 +99,7 @@ pub async fn call_start_onboarding(
     user_vault_public_key: &VaultPublicKey,
     configuration_id: IncodeConfigurationId,
     environment: IncodeEnvironment,
-) -> ApiResult<OnboardingStartResponse> {
+) -> FpResult<OnboardingStartResponse> {
     let request = IncodeStartOnboardingRequest {
         credentials: tvc.incode_credentials(environment),
         configuration_id,

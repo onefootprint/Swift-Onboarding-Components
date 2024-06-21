@@ -5,7 +5,7 @@ mod data;
 pub use data::*;
 mod update;
 
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::PgConn;
 use feature_flag::FeatureFlagClient;
 use paperclip::v2::schema::Apiv2Schema;
@@ -24,7 +24,7 @@ pub trait ExtractableAuthSession: Apiv2Schema + Sized + Send + Sync + 'static {
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
         req: RequestInfo,
-    ) -> ApiResult<Self>;
+    ) -> FpResult<Self>;
 
     fn log_authed_principal(&self, root_span: RootSpan);
 }

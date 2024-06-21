@@ -1,4 +1,4 @@
-use api_core::errors::ApiResult;
+use api_core::FpResult;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
 use db::models::document_upload::DocumentUpload;
@@ -21,7 +21,7 @@ pub fn get_side_info(
     id_doc: &Document,
     should_collect_selfie: bool,
     side: Option<DocumentSide>,
-) -> ApiResult<(MissingSides, Option<i64>)> {
+) -> FpResult<(MissingSides, Option<i64>)> {
     let existing_sides = id_doc
         .images(conn, DocumentImageArgs::default())?
         .into_iter()

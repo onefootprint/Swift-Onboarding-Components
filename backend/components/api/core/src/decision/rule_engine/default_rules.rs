@@ -1,4 +1,4 @@
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_instance::IncludeRules;
 use db::models::rule_instance::NewRule;
@@ -255,7 +255,7 @@ pub fn save_default_rules_for_obc(
     conn: &mut TxnPgConn,
     obc: &Locked<ObConfiguration>,
     ff_client: Option<Arc<dyn FeatureFlagClient>>,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let existing_rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, IncludeRules::All)?;
     if !existing_rules.is_empty() {
         tracing::warn!(

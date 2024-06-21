@@ -1,7 +1,7 @@
 //! logic for integrating into risk signal/decision engine
 use crate::decision;
 use crate::decision::vendor;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::apple_device_attest::AppleDeviceAttestation;
 use db::models::decision_intent::DecisionIntent;
 use db::models::google_device_attest::GoogleDeviceAttestation;
@@ -32,7 +32,7 @@ pub fn save_vendor_result_and_risk_signals(
     sv_id: &ScopedVaultId,
     wf_id: Option<&WorkflowId>,
     is_live: bool,
-) -> ApiResult<(VerificationRequest, VerificationResult, Vec<RiskSignal>)> {
+) -> FpResult<(VerificationRequest, VerificationResult, Vec<RiskSignal>)> {
     // count the associated vaults derived by this attestation
     let associated_vault_count = match res {
         AttestationResult::Apple(res) => res.count_associated_vaults(conn, is_live)?,
@@ -99,7 +99,7 @@ pub fn save_vendor_result_and_risk_signals(
 mod tests {
     use super::*;
     use crate::decision::vendor::vendor_result::VendorResult;
-    use crate::errors::ApiResult;
+    use crate::FpResult;
     use crate::State;
     use db::tests::fixtures;
     use db::tests::test_db_pool::TestDbPool;
@@ -109,7 +109,7 @@ mod tests {
     async fn test_deser(state: &mut State) {
         let (vreq, vres, private_key) = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let uv = fixtures::vault::create_person(conn, true);
                 let t = fixtures::tenant::create(conn);
                 let obc = fixtures::ob_configuration::create(conn, &t.id, true);

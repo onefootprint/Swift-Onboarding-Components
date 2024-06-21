@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
 use crate::utils;
+use crate::FpResult;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
@@ -48,7 +48,7 @@ impl TenantVendorControl {
         db_pool: &DbPool,
         config: &Config,
         enclave_client: &EnclaveClient,
-    ) -> ApiResult<TenantVendorControl> {
+    ) -> FpResult<TenantVendorControl> {
         let (tenant, vendor_control, tbi) = db_pool
             .db_query(move |conn| -> DbResult<_> {
                 let t = Tenant::get(conn, &tenant_id)?;
@@ -138,7 +138,7 @@ impl TenantVendorControl {
         enclave_client: &EnclaveClient,
         tenant: Tenant,
         tbi: Option<TenantBusinessInfo>,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         // As of 2023-06-28 we just use our default idology credentials for all tenants
         let idology_credentials = IdologyCredentials::from(config);
         // TODO: we'll likely need to have diff site_ids in the future that we store on playbooks so we will
@@ -269,7 +269,7 @@ impl TenantVendorControl {
         enclave_client: &EnclaveClient,
         vendor_control: Option<DbTenantVendorControl>,
         tenant: Tenant,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         Self::new_internal(vendor_control, config, enclave_client, tenant, None).await
     }
 }

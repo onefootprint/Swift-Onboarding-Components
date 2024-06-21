@@ -5,10 +5,10 @@ use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::decision;
 use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::task;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use api_wire_types::CreateUserDecisionRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -45,7 +45,7 @@ pub async fn post(
     let tid = tenant_id.clone();
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fpid, &tid, is_live))?;
             if !sv.status.is_terminal() {
                 return Err(ValidationError(

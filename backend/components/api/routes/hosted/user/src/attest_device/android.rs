@@ -1,4 +1,4 @@
-use api_core::errors::ApiResult;
+use api_core::FpResult;
 use api_core::State;
 use app_attest::error::AttestationError;
 use app_attest::google::integrity_verdict::AppLicensingVerdict;
@@ -56,7 +56,7 @@ pub(super) async fn attest(
     challenge: String,
     attestation: String,
     package_name: Option<String>,
-) -> ApiResult<NewGoogleDeviceAttestation> {
+) -> FpResult<NewGoogleDeviceAttestation> {
     // If package name is provided, fetch the tenant android app metadata
     // Otherwise assume we are running against footprint verifier
     let meta: Option<TenantAndroidAppMeta> = if package_name.is_some() {
@@ -123,7 +123,7 @@ pub(super) async fn attest_inner(
     challenge: String,
     attestation: String,
     webauthn_creds: Vec<WebauthnCredential>,
-) -> ApiResult<NewGoogleDeviceAttestation> {
+) -> FpResult<NewGoogleDeviceAttestation> {
     let payload: AndroidAttestationPayload = serde_json::from_slice(&base64::decode(attestation)?)?;
 
     let client_data = base64::decode(payload.metadata_json_data)?;

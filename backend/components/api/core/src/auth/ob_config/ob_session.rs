@@ -3,7 +3,7 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::PgConn;
@@ -37,7 +37,7 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
         _: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let data = match auth_session {
             AuthSessionData::OnboardingSession(data) => data,
             _ => {

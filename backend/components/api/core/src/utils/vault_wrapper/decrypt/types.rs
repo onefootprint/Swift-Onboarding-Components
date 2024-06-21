@@ -1,5 +1,5 @@
-use crate::errors::ApiResult;
 use crate::ApiErrorKind;
+use crate::FpResult;
 use api_errors::FpError;
 use derive_more::Deref;
 use derive_more::DerefMut;
@@ -77,7 +77,7 @@ impl<T> Default for DecryptUncheckedResult<T> {
 impl DecryptUncheckedResult<Pii> {
     pub(in crate::utils::vault_wrapper) fn map_to_piistrings(
         self,
-    ) -> ApiResult<DecryptUncheckedResult<PiiString>> {
+    ) -> FpResult<DecryptUncheckedResult<PiiString>> {
         let DecryptUncheckedResult {
             results,
             decrypted_dis,
@@ -85,7 +85,7 @@ impl DecryptUncheckedResult<Pii> {
         // Map the PiiBytes to PiiStrings
         let results = results
             .into_iter()
-            .map(|(k, v)| -> ApiResult<_> {
+            .map(|(k, v)| -> FpResult<_> {
                 let pii = match v {
                     // Since the value may be either JSON or a string, we map it into a string representation
                     // here One day, the callers of this may actually want the full
@@ -101,7 +101,7 @@ impl DecryptUncheckedResult<Pii> {
                 };
                 Ok((k, pii))
             })
-            .collect::<ApiResult<_>>()?;
+            .collect::<FpResult<_>>()?;
 
         let result = DecryptUncheckedResult {
             results,
@@ -112,7 +112,7 @@ impl DecryptUncheckedResult<Pii> {
 
     pub(in crate::utils::vault_wrapper) fn map_to_piijsonvalues(
         self,
-    ) -> ApiResult<DecryptUncheckedResult<PiiJsonValue>> {
+    ) -> FpResult<DecryptUncheckedResult<PiiJsonValue>> {
         let DecryptUncheckedResult {
             results,
             decrypted_dis,
@@ -120,7 +120,7 @@ impl DecryptUncheckedResult<Pii> {
         // Map the PiiBytes to PiiJsonValues
         let results = results
             .into_iter()
-            .map(|(k, v)| -> ApiResult<_> {
+            .map(|(k, v)| -> FpResult<_> {
                 let pii = match v {
                     Pii::Value(s) => s,
                     Pii::Bytes(b) => {
@@ -134,7 +134,7 @@ impl DecryptUncheckedResult<Pii> {
                 };
                 Ok((k, pii))
             })
-            .collect::<ApiResult<_>>()?;
+            .collect::<FpResult<_>>()?;
 
         let result = DecryptUncheckedResult {
             results,
@@ -154,15 +154,11 @@ impl<D: Into<DataIdentifier>> From<D> for EnclaveDecryptOperation {
 }
 
 impl DecryptUncheckedResult {
-    pub fn rm_di<D: Into<DataIdentifier>>(&mut self, di: D) -> ApiResult<PiiString> {
+    pub fn rm_di<D: Into<DataIdentifier>>(&mut self, di: D) -> FpResult<PiiString> {
         self.rm(di, vec![])
     }
 
-    fn rm<D: Into<DataIdentifier>>(
-        &mut self,
-        di: D,
-        transforms: Vec<FilterFunction>,
-    ) -> ApiResult<PiiString> {
+    fn rm<D: Into<DataIdentifier>>(&mut self, di: D, transforms: Vec<FilterFunction>) -> FpResult<PiiString> {
         let di = di.into();
         self.results
             .remove(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
@@ -170,11 +166,11 @@ impl DecryptUncheckedResult {
             .map_err(FpError::from)
     }
 
-    pub fn get_di<D: Into<DataIdentifier>>(&self, di: D) -> ApiResult<PiiString> {
+    pub fn get_di<D: Into<DataIdentifier>>(&self, di: D) -> FpResult<PiiString> {
         self.get(di, vec![])
     }
 
-    fn get<D: Into<DataIdentifier>>(&self, di: D, transforms: Vec<FilterFunction>) -> ApiResult<PiiString> {
+    fn get<D: Into<DataIdentifier>>(&self, di: D, transforms: Vec<FilterFunction>) -> FpResult<PiiString> {
         let di = di.into();
         self.results
             .get(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))

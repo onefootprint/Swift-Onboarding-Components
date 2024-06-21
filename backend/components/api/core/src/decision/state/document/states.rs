@@ -7,7 +7,7 @@ use crate::decision::state::actions::DocCollected;
 use crate::decision::state::actions::WorkflowActions;
 use crate::decision::state::OnAction;
 use crate::decision::state::WorkflowState;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -36,7 +36,7 @@ pub struct DocumentComplete;
 /// ////////////////
 impl DocumentDataCollection {
     #[tracing::instrument("DocumentDataCollection::init", skip_all)]
-    pub async fn init(_: &State, workflow: DbWorkflow, _config: DocumentConfig) -> ApiResult<Self> {
+    pub async fn init(_: &State, workflow: DbWorkflow, _config: DocumentConfig) -> FpResult<Self> {
         Ok(DocumentDataCollection {
             sv_id: workflow.scoped_vault_id.clone(),
         })
@@ -55,7 +55,7 @@ impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
         &self,
         _action: DocCollected,
         _: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         Ok(())
     }
 
@@ -65,7 +65,7 @@ impl OnAction<DocCollected, DocumentState> for DocumentDataCollection {
         _wf: Locked<DbWorkflow>,
         _: Self::AsyncRes,
         _conn: &mut db::TxnPgConn,
-    ) -> ApiResult<DocumentState> {
+    ) -> FpResult<DocumentState> {
         Ok(DocumentState::from(DocumentDecisioning { sv_id: self.sv_id }))
     }
 }
@@ -85,7 +85,7 @@ impl WorkflowState for DocumentDataCollection {
 /// ////////////////
 impl DocumentDecisioning {
     #[tracing::instrument("DocumentDecisioning::init", skip_all)]
-    pub async fn init(_: &State, workflow: DbWorkflow, _config: DocumentConfig) -> ApiResult<Self> {
+    pub async fn init(_: &State, workflow: DbWorkflow, _config: DocumentConfig) -> FpResult<Self> {
         Ok(DocumentDecisioning {
             sv_id: workflow.scoped_vault_id.clone(),
         })
@@ -100,11 +100,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         "OnAction<MakeDecision, DocumentState>::execute_async_idempotent_actions",
         skip_all
     )]
-    async fn execute_async_idempotent_actions(
-        &self,
-        _: MakeDecision,
-        _: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    async fn execute_async_idempotent_actions(&self, _: MakeDecision, _: &State) -> FpResult<Self::AsyncRes> {
         Ok(())
     }
 
@@ -114,7 +110,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         wf: Locked<DbWorkflow>,
         _: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
-    ) -> ApiResult<DocumentState> {
+    ) -> FpResult<DocumentState> {
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
         let vres_ids = risk_signals.verification_result_ids();
 
@@ -138,7 +134,7 @@ impl WorkflowState for DocumentDecisioning {
 /// ////////////////
 impl DocumentComplete {
     #[tracing::instrument("DocumentComplete::init", skip_all)]
-    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: DocumentConfig) -> ApiResult<Self> {
+    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: DocumentConfig) -> FpResult<Self> {
         Ok(DocumentComplete)
     }
 }

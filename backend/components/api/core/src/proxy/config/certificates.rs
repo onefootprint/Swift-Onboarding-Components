@@ -1,7 +1,7 @@
 use super::ProxyHeaderParams;
 use crate::errors::proxy::VaultProxyError;
 use crate::errors::ApiError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use actix_web::http::header::HeaderMap;
 use std::fmt::Debug;
 
@@ -43,7 +43,7 @@ pub struct ParsedClientCertificate {
 impl TryFrom<&ProxyHeaderParams> for ParsedClientCertificate {
     type Error = ApiError;
 
-    fn try_from(params: &ProxyHeaderParams) -> ApiResult<Self> {
+    fn try_from(params: &ProxyHeaderParams) -> FpResult<Self> {
         let cert = params.client_cert.clone();
         let key = params.client_key.clone();
 

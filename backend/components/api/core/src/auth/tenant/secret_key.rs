@@ -2,8 +2,8 @@ use super::AuthActor;
 use super::CanCheckTenantGuard;
 use crate::auth::tenant::TenantAuth;
 use crate::auth::AuthError;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
+use crate::FpResult;
 use crate::State;
 use actix_web::http::header::Header;
 use actix_web::web;
@@ -98,7 +98,7 @@ impl FromRequest for SecretTenantAuthContext {
 }
 
 /// Supports either HTTP basic auth (key as the user id) or our auth header
-fn parse_auth_key(req: &actix_web::HttpRequest) -> ApiResult<SecretApiKey> {
+fn parse_auth_key(req: &actix_web::HttpRequest) -> FpResult<SecretApiKey> {
     if let Ok(auth) = Authorization::<Basic>::parse(req) {
         let auth = auth.into_scheme();
         return Ok(SecretApiKey::from(auth.user_id().to_string()));
@@ -120,7 +120,7 @@ impl SecretTenantAuthContext {
         tenant.is_demo_tenant || tenant.allowed_preview_apis.contains(api)
     }
 
-    pub fn check_preview_guard(&self, api: PreviewApi) -> ApiResult<()> {
+    pub fn check_preview_guard(&self, api: PreviewApi) -> FpResult<()> {
         if !self.can_access_preview(&api) {
             tracing::error!(tenant_id=%self.0.tenant.id, tenant_name=%self.0.tenant.name, api=%api, "Tenant attempting to use unallowed preview API");
             return Err(AuthError::CannotAccessPreviewApi.into());
@@ -134,7 +134,7 @@ impl TenantAuth for CheckedSecretTenantAuth {
         &self.tenant
     }
 
-    fn is_live(&self) -> ApiResult<bool> {
+    fn is_live(&self) -> FpResult<bool> {
         if self.tenant.sandbox_restricted && self.api_key.is_live {
             return Err(AuthError::SandboxRestricted.into());
         }

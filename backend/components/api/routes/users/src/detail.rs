@@ -3,9 +3,9 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::types::ModernApiResult;
 use crate::State;
-use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow_request::WorkflowRequest;
@@ -34,7 +34,7 @@ pub async fn detail(
 
     let (sv, mrs, wfr) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let mrs = ManualReview::get_active(conn, &sv.id)?;
             let wfr = if show_requires_additional_info {

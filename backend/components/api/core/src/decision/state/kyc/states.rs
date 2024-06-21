@@ -36,9 +36,9 @@ use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::{
     self,
 };
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::data_lifetime::DataLifetime;
@@ -76,7 +76,7 @@ use std::sync::Arc;
 /// ////////////////
 impl KycDataCollection {
     #[tracing::instrument("KycDataCollection::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDataCollection {
@@ -96,12 +96,12 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
         &self,
         _action: Authorize,
         _state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         Ok(())
     }
 
     #[tracing::instrument("OnAction<Authorize, KycState>::on_commit", skip_all)]
-    fn on_commit(self, wf: Locked<DbWorkflow>, _: (), conn: &mut db::TxnPgConn) -> ApiResult<KycState> {
+    fn on_commit(self, wf: Locked<DbWorkflow>, _: (), conn: &mut db::TxnPgConn) -> FpResult<KycState> {
         DbWorkflow::update(wf, conn, WorkflowUpdate::set_status(OnboardingStatus::Pending))?;
 
         Ok(KycState::from(KycVendorCalls {
@@ -127,7 +127,7 @@ impl WorkflowState for KycDataCollection {
 /// ////////////////
 impl KycVendorCalls {
     #[tracing::instrument("KycVendorCalls::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycVendorCalls {
@@ -158,12 +158,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         &self,
         _action: MakeVendorCalls,
         state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         let wfid = self.wf_id.clone();
         let svid = self.sv_id.clone();
         let (vw, obc, wf) = state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let (vw, obc) = common::get_vw_and_obc(conn, &svid, &wfid)?;
                 let wf = DbWorkflow::get(conn, &wfid)?;
 
@@ -252,7 +252,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         wf: Locked<DbWorkflow>,
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KycState> {
+    ) -> FpResult<KycState> {
         let (
             ocr_reason_codes,
             user_input_risk_signals,
@@ -375,7 +375,7 @@ impl WorkflowState for KycVendorCalls {
 /// ////////////////
 impl KycDecisioning {
     #[tracing::instrument("KycDecisioning::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDecisioning::new(
@@ -402,13 +402,13 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         &self,
         _action: MakeDecision,
         state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         let svid = self.sv_id.clone();
         let wfid = self.wf_id.clone();
         let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
 
@@ -435,7 +435,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         wf: Locked<DbWorkflow>,
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KycState> {
+    ) -> FpResult<KycState> {
         let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
@@ -514,7 +514,7 @@ impl WorkflowState for KycDecisioning {
 /// ////////////////
 impl KycComplete {
     #[tracing::instrument("KycComplete::init", skip_all)]
-    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: KycConfig) -> ApiResult<Self> {
+    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: KycConfig) -> FpResult<Self> {
         Ok(KycComplete)
     }
 }
@@ -534,7 +534,7 @@ impl WorkflowState for KycComplete {
 /// ////////////////
 impl KycDocCollection {
     #[tracing::instrument("AlpacaKycDocCollection::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDocCollection {
@@ -557,7 +557,7 @@ impl OnAction<DocCollected, KycState> for KycDocCollection {
         &self,
         _action: DocCollected,
         _state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         Ok(())
     }
 
@@ -567,7 +567,7 @@ impl OnAction<DocCollected, KycState> for KycDocCollection {
         _wf: Locked<DbWorkflow>,
         _async_res: Self::AsyncRes,
         _conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KycState> {
+    ) -> FpResult<KycState> {
         Ok(KycState::from(KycDecisioning::new(
             self.wf_id, self.sv_id, self.t_id,
         )))

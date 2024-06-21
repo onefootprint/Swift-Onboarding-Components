@@ -1,5 +1,5 @@
 use super::WriteableVw;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
 use db::TxnPgConn;
@@ -9,7 +9,7 @@ use newtypes::DataIdentifier;
 impl<Type> WriteableVw<Type> {
     /// soft "delete" an entire scoped vault, but not the corresponding data lifetimes.
     #[tracing::instrument("WriteableVw::soft_delete_vault", skip_all)]
-    pub fn soft_delete_vault(self, conn: &mut TxnPgConn) -> ApiResult<()> {
+    pub fn soft_delete_vault(self, conn: &mut TxnPgConn) -> FpResult<()> {
         tracing::info!(
             scoped_vault_id = ?self.scoped_vault_id,
             "Deactivating entire scoped vault"
@@ -26,7 +26,7 @@ impl<Type> WriteableVw<Type> {
         &self,
         conn: &mut TxnPgConn,
         dis: Vec<DataIdentifier>,
-    ) -> ApiResult<Vec<DataIdentifier>> {
+    ) -> FpResult<Vec<DataIdentifier>> {
         if dis.is_empty() {
             return Ok(dis);
         }

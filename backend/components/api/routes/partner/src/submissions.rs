@@ -3,7 +3,7 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::ApiResult;
+use api_core::FpResult;
 use db::models::compliance_doc::ComplianceDoc;
 use db::models::compliance_doc_submission::ComplianceDocSubmission;
 use db::models::tenant::Tenant;
@@ -35,7 +35,7 @@ pub async fn get(
 
     let (sub, tenant_e_private_key) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             // Check that the authorized partner tenant owns the partnership.
             let partnership = TenantCompliancePartnership::get(conn, &partnership_id, &pt_id)?;
 

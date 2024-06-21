@@ -4,10 +4,10 @@ use actix_web::web;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use chrono::Duration;
 use db::models::tenant::NewIntegrationTestTenant;
 use db::models::tenant::Tenant;
@@ -84,7 +84,7 @@ async fn post(
         ro_auth_token,
     } = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             //
             // Get or create the tenant
             //
@@ -114,9 +114,7 @@ async fn post(
             //
             // Get or create the TenantUser
             //
-            let mut create_auth_token = |email: &str,
-                                         irk: ImmutableRoleKind|
-             -> ApiResult<SessionAuthToken> {
+            let mut create_auth_token = |email: &str, irk: ImmutableRoleKind| -> FpResult<SessionAuthToken> {
                 let email = OrgMemberEmail::from_str(email)?;
                 let first_name = Some("Footprint".to_owned());
                 let last_name = Some("Integration Testing".to_owned());
@@ -158,7 +156,7 @@ async fn post(
             //
             let api_keys = api_keys
                 .into_iter()
-                .map(|(is_live, p_api_key, sh_api_key)| -> ApiResult<_> {
+                .map(|(is_live, p_api_key, sh_api_key)| -> FpResult<_> {
                     let rk = ImmutableRoleKind::Admin;
                     let admin_role =
                         TenantRole::get_immutable(conn, &tenant.id, rk, TenantRoleKind::ApiKey { is_live })?;
@@ -182,7 +180,7 @@ async fn post(
                     };
                     Ok(r)
                 })
-                .collect::<ApiResult<_>>()?;
+                .collect::<FpResult<_>>()?;
             let result = Result {
                 tenant,
                 api_keys,

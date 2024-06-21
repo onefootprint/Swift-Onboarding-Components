@@ -6,8 +6,8 @@ use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::DbPool;
 use db::TxnPgConn;
@@ -23,7 +23,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         // make the request to incode
         let request = IncodeGetOnboardingStatusRequest {
             credentials: session.credentials.clone(),
@@ -66,7 +66,7 @@ impl IncodeStateTransition for GetOnboardingStatus {
         _: &mut TxnPgConn,
         _: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         Ok(FetchScores::new().into())
     }
 

@@ -1,9 +1,9 @@
 use super::vault_wrapper::Person;
 use crate::auth::user::CheckedUserAuthContext;
 use crate::auth::user::UserIdentifier;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::webauthn_credential::WebauthnCredential;
@@ -35,10 +35,10 @@ pub async fn get_user_challenge_context(
     state: &State,
     identifier: UserIdentifier,
     user_auth: Option<CheckedUserAuthContext>,
-) -> ApiResult<UserChallengeContext> {
+) -> FpResult<UserChallengeContext> {
     let (uvw, passkeys, cis) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let args = VwArgs::from(&identifier);
             let uvw = VaultWrapper::build(conn, args)?;
 
@@ -51,8 +51,8 @@ pub async fn get_user_challenge_context(
 
             let cis = ci
                 .into_iter()
-                .map(|(ci, dl)| -> ApiResult<_> { Ok((ci, ContactInfo::get(conn, &dl.id)?, dl)) })
-                .collect::<ApiResult<Vec<_>>>()?;
+                .map(|(ci, dl)| -> FpResult<_> { Ok((ci, ContactInfo::get(conn, &dl.id)?, dl)) })
+                .collect::<FpResult<Vec<_>>>()?;
 
             Ok((uvw, passkeys, cis))
         })

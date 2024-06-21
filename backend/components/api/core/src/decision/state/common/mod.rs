@@ -19,9 +19,9 @@ use crate::decision::vendor::{
 use crate::decision::{
     self,
 };
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use crypto::aead::AeadSealedBytes;
@@ -82,7 +82,7 @@ pub fn get_vw_and_obc(
     conn: &mut PgConn,
     sv_id: &ScopedVaultId,
     wf_id: &WorkflowId,
-) -> ApiResult<(VaultWrapper, ObConfiguration)> {
+) -> FpResult<(VaultWrapper, ObConfiguration)> {
     let (obc, _) = ObConfiguration::get(conn, wf_id)?;
 
     let vw = VaultWrapper::<_>::build(conn, VwArgs::Tenant(sv_id))?;
@@ -95,11 +95,11 @@ pub async fn run_kyc_vendor_calls(
     state: &State,
     wf_id: &WorkflowId,
     t_id: &TenantId,
-) -> ApiResult<VendorResult> {
+) -> FpResult<VendorResult> {
     let wfid = wf_id.clone();
     let (wf, v, di) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -121,11 +121,11 @@ pub async fn run_kyc_vendor_calls(
 }
 
 #[tracing::instrument(skip(state))]
-pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> ApiResult<Option<VendorResult>> {
+pub async fn run_curp_check(state: &State, wf_id: &WorkflowId) -> FpResult<Option<VendorResult>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -144,11 +144,11 @@ pub async fn run_neuro_check(
     state: &State,
     wf_id: &WorkflowId,
     t_id: &TenantId,
-) -> ApiResult<Option<VendorResult>> {
+) -> FpResult<Option<VendorResult>> {
     let wfid = wf_id.clone();
     let (wf, di) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (wf, _) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -168,11 +168,11 @@ pub async fn run_aml_call(
     state: &State,
     wf_id: &WorkflowId,
     t_id: &TenantId,
-) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
+) -> FpResult<(VerificationResultId, WatchlistResultResponse)> {
     let wfid = wf_id.clone();
     let (wf, obc, v, di) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
@@ -225,7 +225,7 @@ pub fn handle_rules_output(
     rules_output: Decision,
     rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
-) -> ApiResult<DecisionOutput> {
+) -> FpResult<DecisionOutput> {
     if let Decision::RulesExecuted {
         action: Some(RuleAction::StepUp(suk)),
         ..
@@ -262,7 +262,7 @@ pub async fn maybe_generate_ocr_reason_codes(
     state: &State,
     wf_id: &WorkflowId,
     vw: &VaultWrapper,
-) -> ApiResult<Option<Vec<NewRiskSignalInfo>>> {
+) -> FpResult<Option<Vec<NewRiskSignalInfo>>> {
     let wfid = wf_id.clone();
     let (obc, _) = state
         .db_pool
@@ -323,7 +323,7 @@ pub fn get_aml_risk_signals_from_aml_call(
 pub fn get_aml_risk_signals_from_kyc_call(
     vw: &VaultWrapper,
     kyc_vendor_result: VendorResult,
-) -> ApiResult<RiskSignalGroupStruct<Aml>> {
+) -> FpResult<RiskSignalGroupStruct<Aml>> {
     decision::features::risk_signals::parse_reason_codes_from_vendor_result(kyc_vendor_result, vw)
         .map(|r| r.aml)
 }
@@ -411,7 +411,7 @@ pub async fn saturate_list_entries(
     state: &State,
     tenant: &Tenant,
     lists: HashMap<ListId, ListWithEntries>,
-) -> ApiResult<HashMap<ListId, ListWithDecryptedEntries>> {
+) -> FpResult<HashMap<ListId, ListWithDecryptedEntries>> {
     let lists = lists.values().collect_vec();
 
     let list_keys = lists
@@ -444,7 +444,7 @@ pub async fn saturate_list_entries(
         .collect::<Result<HashMap<ListId, ListWithDecryptedEntries>, _>>()
 }
 
-fn decrypt_list_entry(key: &SealingKey, le: &ListEntry) -> ApiResult<PiiString> {
+fn decrypt_list_entry(key: &SealingKey, le: &ListEntry) -> FpResult<PiiString> {
     key.unseal_bytes(AeadSealedBytes(le.e_data.clone().0))
         .map_err(FpError::from)
         .map(PiiBytes::new)

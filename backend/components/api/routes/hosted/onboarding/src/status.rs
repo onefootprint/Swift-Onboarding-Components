@@ -2,10 +2,10 @@ use crate::auth::user::UserAuthScope;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::FpResult;
 use api_wire_types::hosted::onboarding_status::ApiOnboardingRequirement;
 use api_wire_types::hosted::onboarding_status::OnboardingStatusResponse;
 use db::models::insight_event::CreateInsightEvent;
@@ -39,7 +39,7 @@ pub async fn get(
         let sv_id = user_auth.scoped_user.id.clone();
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let credentials = WebauthnCredential::list(conn, &vault_id)?;
 
                 let liveness_skip_events = LivenessEvent::get_by_scoped_vault_id(conn, &sv_id)?

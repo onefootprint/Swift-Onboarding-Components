@@ -1,11 +1,11 @@
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
 use crate::utils::vault_wrapper::Business;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
@@ -36,7 +36,7 @@ pub async fn build_idv_data_from_verification_request(
     db_pool: &DbPool, // TODO: migrate to PgConn
     enclave_client: &EnclaveClient,
     request: VerificationRequest,
-) -> ApiResult<IdvData> {
+) -> FpResult<IdvData> {
     let vreq_id = request.id.clone();
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
@@ -87,14 +87,14 @@ pub async fn bulk_build_data_from_requests(
     db_pool: &DbPool, // TODO: migrate to PgConn
     enclave_client: &EnclaveClient,
     requests: Vec<VerificationRequest>,
-) -> ApiResult<Vec<(VerificationRequest, IdvData)>> {
+) -> FpResult<Vec<(VerificationRequest, IdvData)>> {
     let data_futs = requests
         .iter()
         .map(|r| build_idv_data_from_verification_request(db_pool, enclave_client, r.clone()));
     let res: Vec<IdvData> = futures::future::join_all(data_futs)
         .await
         .into_iter()
-        .collect::<ApiResult<Vec<IdvData>>>()?;
+        .collect::<FpResult<Vec<IdvData>>>()?;
 
     let zipped = requests.into_iter().zip(res.into_iter()).collect();
 
@@ -105,7 +105,7 @@ async fn decrypt_documents(
     e_private_key: &EncryptedVaultPrivateKey,
     enclave_client: &EnclaveClient,
     images: Vec<DocumentUpload>,
-) -> ApiResult<HashMap<DocumentSide, PiiBytes>> {
+) -> FpResult<HashMap<DocumentSide, PiiBytes>> {
     let docs = images
         .iter()
         .map(|u| (u.side, (e_private_key, &u.e_data_key, &u.s3_url)))
@@ -120,10 +120,10 @@ async fn decrypt_documents(
 pub async fn build_docv_data_from_identity_doc(
     state: &State,
     identity_document_id: DocumentId,
-) -> ApiResult<DocVData> {
+) -> FpResult<DocVData> {
     let (doc, images, uvw) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (doc, dr) = Document::get(conn, &identity_document_id)?;
             let images = doc.images(conn, DocumentImageArgs::default())?;
             // TODO: if IDV args provided, only fetch the document with the ID on the VerificationRequest
@@ -162,10 +162,10 @@ pub async fn build_docv_data_from_identity_doc(
 pub async fn build_business_data_from_verification_request(
     state: &State,
     request: VerificationRequest,
-) -> ApiResult<BusinessDataFromVault> {
+) -> FpResult<BusinessDataFromVault> {
     let (sv, bvw) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<(ScopedVault, VaultWrapper<_>)> {
+        .db_query(move |conn| -> FpResult<(ScopedVault, VaultWrapper<_>)> {
             let sv = ScopedVault::get(conn, &request.scoped_vault_id)?;
             let args = VwArgs::Historical(&request.scoped_vault_id, request.uvw_snapshot_seqno);
             let bvw = VaultWrapper::<Business>::build(conn, args)?;
@@ -178,7 +178,7 @@ pub async fn build_business_data_from_verification_request(
     let dbos = bvw.decrypt_business_owners(state, &sv.tenant_id).await?;
     let business_owners = dbos
         .into_iter()
-        .map(|bo| -> ApiResult<_> {
+        .map(|bo| -> FpResult<_> {
             let Some((first_name, last_name)) = bo.first_name.zip(bo.last_name) else {
                 // The BO exists, but it doesn't have a name - means we haven't yet collected the BO's info
                 return ValidationError("BO is missing name").into();
@@ -188,7 +188,7 @@ pub async fn build_business_data_from_verification_request(
                 last_name,
             })
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<FpResult<Vec<_>>>()?;
 
     // Get remaining Business vault data
     let all_bdks: Vec<_> = BDK::iter()

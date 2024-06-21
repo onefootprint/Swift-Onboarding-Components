@@ -1,9 +1,9 @@
 use super::vault_wrapper::Any;
 use crate::auth::user::CheckUserWfAuthContext;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::document::Document;
@@ -54,7 +54,7 @@ pub struct GetRequirementsArgs {
 }
 
 impl GetRequirementsArgs {
-    pub fn from(value: &CheckUserWfAuthContext) -> ApiResult<Self> {
+    pub fn from(value: &CheckUserWfAuthContext) -> FpResult<Self> {
         Ok(Self {
             person_obc: value.ob_config().clone(),
             person_workflow: value.workflow().clone(),
@@ -74,7 +74,7 @@ impl GetRequirementsArgs {
     pub async fn get_decrypted_values(
         state: &State,
         vw: &VaultWrapper<Any>,
-    ) -> ApiResult<DecryptUncheckedResultForReqs> {
+    ) -> FpResult<DecryptUncheckedResultForReqs> {
         let values = vec![
             IPK::Declarations.into(),
             IDK::UsLegalStatus.into(),
@@ -106,7 +106,7 @@ pub struct RequirementOpts {
 pub async fn get_requirements_for_person_and_maybe_business(
     state: &State,
     args: GetRequirementsArgs,
-) -> ApiResult<Vec<OnboardingRequirement>> {
+) -> FpResult<Vec<OnboardingRequirement>> {
     // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
     let GetRequirementsArgs {
         person_obc,
@@ -119,7 +119,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
     let sb_id = business_sv.clone();
     let (uvw, bvw_wf) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&su_id))?;
             let bvw = if let Some(sb_id) = sb_id {
                 let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sb_id))?;
@@ -157,7 +157,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
 
     let requirements = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<Vec<_>> {
+        .db_query(move |conn| -> FpResult<Vec<_>> {
             let person_requirements = get_requirements_inner(
                 conn,
                 uvw,
@@ -315,7 +315,7 @@ pub fn get_requirements_inner(
     wf: &Workflow,
     decrypted_values: DecryptUncheckedResultForReqs,
     opts: RequirementOpts,
-) -> ApiResult<Vec<OnboardingRequirement>> {
+) -> FpResult<Vec<OnboardingRequirement>> {
     // Depending on the workflow that we are running, we only want to show a subset of requirements
     let relevant_requirement_kinds = wf.state.relevant_requirements();
 
@@ -324,7 +324,7 @@ pub fn get_requirements_inner(
     let requirements = relevant_requirement_kinds
         .into_iter()
         .map(|k| get_requirement_inner(k, conn, &vw, obc, wf, &decrypted_values, &opts))
-        .collect::<ApiResult<Vec<_>>>()?
+        .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         .flatten()
         .filter(|r| {
@@ -374,7 +374,7 @@ fn get_requirement_inner(
     wf: &Workflow,
     decrypted_values: &DecryptUncheckedResultForReqs,
     opts: &RequirementOpts,
-) -> ApiResult<Vec<OnboardingRequirement>> {
+) -> FpResult<Vec<OnboardingRequirement>> {
     let req = match k {
         OnboardingRequirementKind::CollectData => {
             obc.must_collect(DID::Id)
@@ -396,7 +396,7 @@ fn get_requirement_inner(
         }
         OnboardingRequirementKind::CollectInvestorProfile => {
             obc.must_collect(DID::InvestorProfile)
-                .then(|| -> ApiResult<_> {
+                .then(|| -> FpResult<_> {
                     let RequirementProgress {
                         populated_attributes,
                         optional_attributes: _,
@@ -424,7 +424,7 @@ fn get_requirement_inner(
         }
         OnboardingRequirementKind::CollectBusinessData => obc
             .must_collect(DID::Business)
-            .then(|| -> ApiResult<_> {
+            .then(|| -> FpResult<_> {
                 let RequirementProgress {
                     mut populated_attributes,
                     optional_attributes: _,
@@ -473,7 +473,7 @@ fn get_requirement_inner(
             let document_requests = DocumentRequest::get_all(conn, &wf.id)?;
             document_requests
                 .into_iter()
-                .map(|dr| -> ApiResult<_> {
+                .map(|dr| -> FpResult<_> {
                     let id_doc = Document::list_by_request_id(conn, &dr.id)?;
                     let should_render =
                         id_doc.is_empty() || id_doc.into_iter().any(|d| d.status == DocumentStatus::Pending);
@@ -523,7 +523,7 @@ fn get_requirement_inner(
 
                     Ok(Some(req))
                 })
-                .collect::<ApiResult<Vec<Option<_>>>>()?
+                .collect::<FpResult<Vec<Option<_>>>>()?
                 .into_iter()
                 .flatten()
                 .collect()

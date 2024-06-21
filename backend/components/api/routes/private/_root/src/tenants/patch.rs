@@ -1,9 +1,9 @@
 use actix_web::patch;
 use actix_web::web;
 use api_core::auth::protected_auth::ProtectedAuth;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::PrivateUpdateBillingProfile;
 use api_wire_types::PrivateUpdateTvc;
@@ -27,7 +27,7 @@ async fn patch(
 
     let tenant_info = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (tenant, bp, tvc) = Tenant::private_get(conn, &id)?;
             // In absence of a real update log, will just add a log line
             tracing::info!(?request, ?tenant, ?bp, ?tvc, "Updating tenant info");
@@ -57,7 +57,7 @@ async fn patch(
 fn make_tenant_update(
     tenant: &Tenant,
     req: api_wire_types::PrivatePatchTenant,
-) -> ApiResult<(
+) -> FpResult<(
     PrivateUpdateTenant,
     Option<UpdateBillingProfile>,
     Option<UpdateTenantVendorControlArgs>,
@@ -140,7 +140,7 @@ fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBi
     }
 }
 
-fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> ApiResult<UpdateTenantVendorControlArgs> {
+fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> FpResult<UpdateTenantVendorControlArgs> {
     let PrivateUpdateTvc {
         idology_enabled,
         lexis_enabled,

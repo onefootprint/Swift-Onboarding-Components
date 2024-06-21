@@ -1,13 +1,13 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_core::State;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
@@ -32,7 +32,7 @@ pub async fn get(
 
     let (vw, sv) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             Ok((vw, sv))

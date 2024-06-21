@@ -9,8 +9,8 @@ use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
-use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::DbPool;
 use db::TxnPgConn;
@@ -36,7 +36,7 @@ impl IncodeStateTransition for AddFront {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         let Some(front_image) = ctx.docv_data.front_image.clone() else {
             // Not ready to run
             return Ok(None);
@@ -110,7 +110,7 @@ impl IncodeStateTransition for AddFront {
         _: &mut TxnPgConn,
         ctx: &IncodeContext,
         _: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         // Ensure we've gotten a doc we can support
         let type_of_id = self.add_side_response_helper.type_of_id.as_ref();
         let document_subtype = self.add_side_response_helper.document_subtype.as_ref();

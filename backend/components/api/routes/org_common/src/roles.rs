@@ -2,11 +2,11 @@ use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantOrPartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OrgRoleFilters;
 use db::models::tenant_role::TenantRole;
@@ -36,7 +36,7 @@ pub async fn get(
 
     let (results, next_page, count) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let filters = TenantRoleListFilters {
                 org_ident: (&authed_org_ident).into(),
                 scopes: None,

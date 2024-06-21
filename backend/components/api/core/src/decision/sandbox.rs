@@ -5,7 +5,7 @@ use super::vendor::{
     self,
 };
 use super::Error;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
@@ -34,7 +34,7 @@ use strum::IntoEnumIterator;
 // In future, this could take in FixtureDecision and determine the fixture vendor response to use.
 // But its a little tricky because if the sandbox selection is "Review" or "Stepup" thats a function
 // of rules not just the individual vendor responses
-fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> ApiResult<VendorResponse> {
+fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> FpResult<VendorResponse> {
     match vendor_api {
         VendorAPI::IdologyExpectId => {
             let v = idv::test_fixtures::test_idology_expectid_response();
@@ -72,7 +72,7 @@ pub async fn save_fixture_vendor_result(
     db_pool: &DbPool,
     di: &DecisionIntent,
     wf: &Workflow,
-) -> ApiResult<VendorResult> {
+) -> FpResult<VendorResult> {
     let di_id = di.id.clone();
     let sv_id = wf.scoped_vault_id.clone();
     db_pool
@@ -297,7 +297,7 @@ pub async fn save_fixture_incode_watchlist_result(
     di_id: &DecisionIntentId,
     sv_id: &ScopedVaultId,
     vault_public_key: &VaultPublicKey,
-) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
+) -> FpResult<(VerificationResult, WatchlistResultResponse)> {
     let raw = incode_watchlist_result_response_for_fixture(fixture_decision);
     let parsed = serde_json::from_value::<WatchlistResultResponse>(raw.clone())?;
 
@@ -305,7 +305,7 @@ pub async fn save_fixture_incode_watchlist_result(
     let sv_id = sv_id.clone();
     let vault_public_key = vault_public_key.clone();
     let vres = db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let vreq =
                 VerificationRequest::create(conn, (&sv_id, &di_id, VendorAPI::IncodeWatchlistCheck).into())?;
             let e_response = vendor::verification_result::encrypt_verification_result_response(

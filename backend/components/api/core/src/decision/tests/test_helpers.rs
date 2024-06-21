@@ -1,5 +1,4 @@
 use crate::decision::rule_engine;
-use crate::errors::ApiResult;
 use crate::tests::fixtures::lib::random_phone_number;
 use crate::utils::onboarding::NewBusinessVaultArgs;
 use crate::utils::onboarding::NewOnboardingArgs;
@@ -8,6 +7,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{
     self,
 };
+use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::VerificationLevel;
@@ -63,7 +63,7 @@ pub async fn create_user_and_onboarding(
     };
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let tenant = if let Some(t) = reuse_tenant {
                 t
             } else {
@@ -102,7 +102,7 @@ pub async fn create_user_and_onboarding(
             let wf = Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?;
 
             let biz_wf = biz_wf
-                .map(|biz_wf| -> ApiResult<_> {
+                .map(|biz_wf| -> FpResult<_> {
                     let biz_wf = Workflow::lock(conn, &biz_wf.id)?;
                     let biz_wf = Workflow::update(biz_wf, conn, WorkflowUpdate::is_authorized())?;
                     Ok(biz_wf)

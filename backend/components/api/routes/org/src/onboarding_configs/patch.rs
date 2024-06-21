@@ -1,9 +1,9 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_set_version::RuleSetVersion;
@@ -44,7 +44,7 @@ async fn patch(
     let tenant_id = tenant.id.clone();
     let (obc, actor, rs) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let obc = ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status)?;
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             let rs = RuleSetVersion::get_active(conn, &obc.id)?;

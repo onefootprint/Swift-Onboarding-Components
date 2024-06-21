@@ -14,7 +14,6 @@ use api_core::errors::business::BusinessError;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
 use api_core::types::ModernApiResult;
@@ -25,6 +24,7 @@ use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::PrefillKind;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::WriteableVw;
+use api_core::FpResult;
 use api_wire_types::IdentifyVerifyRequest;
 use api_wire_types::IdentifyVerifyResponse;
 use chrono::Utc;
@@ -85,7 +85,7 @@ pub async fn post(
     let session_key = state.session_sealing_key.clone();
     let (auth_token, portable_vw, su, obc) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let (uv_id, event_kind, passkey_cred_id, added_auth_method) = match challenge_state.data {
                 ChallengeData::Sms(s) => {
                     let (vault_id, added_auth_method) =
@@ -208,7 +208,7 @@ pub async fn post(
             .await?;
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
                 tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
                 Ok(())
@@ -221,7 +221,7 @@ pub async fn post(
 
 /// After logging into a vault in the context of multi-KYC KYB, save the authed vault as a business
 /// owner of the provided business.
-fn register_business_owner(conn: &mut TxnPgConn, sv: &ScopedVault, bo_id: &BoId) -> ApiResult<()> {
+fn register_business_owner(conn: &mut TxnPgConn, sv: &ScopedVault, bo_id: &BoId) -> FpResult<()> {
     // If we verified with a BoSessionAuth, update the corresponding BO
     let bo = BusinessOwner::lock(conn, bo_id)?.into_inner();
     if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
@@ -241,7 +241,7 @@ fn validate_biometric_challenge(
     config: &Config,
     challenge_state: BiometricChallengeState,
     challenge_response: &str,
-) -> ApiResult<(VaultId, WebauthnCredentialId)> {
+) -> FpResult<(VaultId, WebauthnCredentialId)> {
     // Decode and validate the response to the biometric challenge
     let webauthn = WebauthnConfig::new(config);
     let auth_resp = serde_json::from_str(challenge_response)?;
@@ -271,7 +271,7 @@ fn validate(
     user_auth: &CheckedUserAuthContext,
     challenge_response: &str,
     di: DataIdentifier,
-) -> ApiResult<(VaultId, AddedAuthMethod)> {
+) -> FpResult<(VaultId, AddedAuthMethod)> {
     let PhoneEmailChallengeState { h_code, vault_id } = challenge_state;
     if h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ErrorWithCode::IncorrectPin.into());

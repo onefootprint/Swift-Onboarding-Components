@@ -2,11 +2,11 @@ use api_core::auth::session::tenant::TenantRbSession;
 use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::AnyOrgSessionAuth;
 use api_core::auth::tenant::AnyPartnerTenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::AssumePartnerRoleRequest;
 use api_wire_types::AssumePartnerRoleResponse;
@@ -58,7 +58,7 @@ fn post(
     let expires_at = pt_auth.session().expires_at;
     let token = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             // The new token will expire at the same time as the existing token to prevent allowing
             // perpetually re-creating a new token for yourself
             let (token, _) = AuthSession::create_sync(conn, &session_sealing_key, session_data, expires_at)?;

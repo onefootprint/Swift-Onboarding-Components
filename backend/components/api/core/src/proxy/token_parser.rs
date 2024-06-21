@@ -1,8 +1,8 @@
 //! Parses tokens on the EGRESS and detokenizes
 
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiResult;
 use crate::telemetry::RootSpan;
+use crate::FpResult;
 use itertools::Itertools;
 use newtypes::FpId;
 use newtypes::PiiString;
@@ -23,10 +23,10 @@ const DELIMITER_END: [char; 2] = ['}', '}'];
 impl<'a> ProxyTokenParser<'a> {
     /// parses a string into a map of Proxy Tokens
     #[tracing::instrument("ProxyTokenParser::parse", skip_all)]
-    fn parse(body: &'a str, global_fp_id: Option<FpId>) -> ApiResult<(ProxyTokenParser, Vec<ProxyToken>)> {
+    fn parse(body: &'a str, global_fp_id: Option<FpId>) -> FpResult<(ProxyTokenParser, Vec<ProxyToken>)> {
         let mut tokens = vec![];
 
-        process_tokens(body, |token| -> ApiResult<Option<&PiiString>> {
+        process_tokens(body, |token| -> FpResult<Option<&PiiString>> {
             let token = ProxyToken::parse_global(token, global_fp_id.as_ref())?;
             tokens.push(token);
             Ok(None)
@@ -42,7 +42,7 @@ impl<'a> ProxyTokenParser<'a> {
         body: &'a str,
         global_fp_id: Option<FpId>,
         root_span: RootSpan,
-    ) -> ApiResult<(ProxyTokenParser, Vec<ProxyToken>)> {
+    ) -> FpResult<(ProxyTokenParser, Vec<ProxyToken>)> {
         let (parser, tokens) = Self::parse(body, global_fp_id)?;
         let fp_ids = tokens.iter().map(|pt| &pt.fp_id).unique().collect_vec();
         if fp_ids.len() == 1 {
@@ -54,10 +54,10 @@ impl<'a> ProxyTokenParser<'a> {
     }
 
     #[tracing::instrument("ProxyTokenParser::detokenize_body", skip_all)]
-    pub fn detokenize_body(&self, detokens: &HashMap<ProxyToken, PiiString>) -> ApiResult<PiiString> {
+    pub fn detokenize_body(&self, detokens: &HashMap<ProxyToken, PiiString>) -> FpResult<PiiString> {
         let mut not_found = vec![];
 
-        let detokenized_body = process_tokens(self.body, |token_str| -> ApiResult<Option<&PiiString>> {
+        let detokenized_body = process_tokens(self.body, |token_str| -> FpResult<Option<&PiiString>> {
             // Every time a token is encountered, parse it and add it
             let token = ProxyToken::parse_global(token_str, self.global_fp_id.as_ref())?;
             let Some(detoken) = detokens.get(&token) else {
@@ -84,9 +84,9 @@ impl<'a> ProxyTokenParser<'a> {
 /// This returns the raw body with tokens replaced with the return value of the callback.
 /// - `detokenize` is called for each complete token in the body that is extracted. Its return value
 ///   is used to replace the token in the return value.
-fn process_tokens<'a, F>(raw: &str, mut detokenize: F) -> ApiResult<PiiString>
+fn process_tokens<'a, F>(raw: &str, mut detokenize: F) -> FpResult<PiiString>
 where
-    F: FnMut(&str) -> ApiResult<Option<&'a PiiString>>,
+    F: FnMut(&str) -> FpResult<Option<&'a PiiString>>,
 {
     // Approximate the capacity of the new string we're going to build
     let mut detokenized_body = String::with_capacity(raw.len());
@@ -222,7 +222,7 @@ mod tests {
         let expected_non_token_str =
             "*** This is a nice string. }} It has *** some tokens inside of it. And {*** another token. And also ***} some {{ text-before-an-extra-opening-brace {*** more tokens.{{ ***";
         let token_replacement = PiiString::new("***".into());
-        let non_token_str = process_tokens(raw, |token| -> ApiResult<Option<&PiiString>> {
+        let non_token_str = process_tokens(raw, |token| -> FpResult<Option<&PiiString>> {
             tokens.push(token.to_string());
             Ok(Some(&token_replacement))
         })

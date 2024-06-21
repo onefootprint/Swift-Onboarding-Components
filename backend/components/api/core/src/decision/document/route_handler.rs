@@ -2,7 +2,6 @@ use super::meta_headers::MetaHeaders;
 use crate::decision;
 use crate::errors::error_with_code::ErrorWithCode;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
 use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::seal_file_and_upload_to_s3;
@@ -10,6 +9,7 @@ use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
+use crate::FpResult;
 use crate::State;
 use api_wire_types::CreateDocumentRequest;
 use api_wire_types::DocumentResponse;
@@ -52,7 +52,7 @@ pub async fn handle_document_create(
     sv_id: ScopedVaultId,
     wf_id: WorkflowId,
     insight: CreateInsightEvent,
-) -> ApiResult<DocumentId> {
+) -> FpResult<DocumentId> {
     let CreateDocumentRequest {
         document_type,
         country_code,
@@ -71,7 +71,7 @@ pub async fn handle_document_create(
     let workflow_id = wf_id.clone();
     let dr = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let id = if let Some(request_id) = request_id.as_ref() {
                 DocumentRequestIdentifier::Id(request_id)
             } else {
@@ -91,7 +91,7 @@ pub async fn handle_document_create(
         // Non-identity documents don't require many checks, we can just create the doc
         let id = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let args = NewDocumentArgs {
                     request_id: dr.id,
                     document_type,
@@ -110,7 +110,7 @@ pub async fn handle_document_create(
 
     let uvw = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let uvw: VaultWrapper<_> = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su_id2))?;
             Ok(uvw)
         })
@@ -121,7 +121,7 @@ pub async fn handle_document_create(
 
     let id_doc = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let country_code =
                 country_code.ok_or(ValidationError("Identity document requires country code"))?;
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
@@ -190,13 +190,13 @@ pub async fn handle_document_upload(
     file: FileUpload,
     document_id: DocumentId,
     side: DocumentSide,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let wf_id = workflow.id.clone();
     let wf_id2 = wf_id.clone();
     let su_id = sv_id.clone();
     let (doc, doc_request, uvw, user_consent) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (doc, doc_request) = Document::get(conn, &document_id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
             let user_consent = UserConsent::get_for_workflow(conn, &wf_id)?;
@@ -228,7 +228,7 @@ pub async fn handle_document_upload(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
             // Vault the images under latest uploads
             let source = DataLifetimeSource::LikelyHosted;
@@ -289,13 +289,13 @@ pub async fn handle_document_process(
     doc_id: DocumentId,
     is_re_run: IsRerun,
     configuration_id_override: IncodeConfigurationIdOverride,
-) -> ApiResult<DocumentResponse> {
+) -> FpResult<DocumentResponse> {
     let su_id = sv_id.clone();
     let wf_id2 = wf_id.clone();
     let wf_id3 = wf_id.clone();
     let (di, id_doc, dr, failed_attempts, uvw, missing_sides, should_collect_selfie, obc) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let di = DecisionIntent::get_or_create_for_workflow(
                 conn,
                 &su_id,
@@ -387,10 +387,10 @@ pub async fn complete_non_identity_document(
     state: &State,
     id_doc: Document,
     sv_id: ScopedVaultId,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<()> {
+        .db_transaction(move |conn| -> FpResult<()> {
             let id_doc_id = id_doc.id.clone();
             let dk = id_doc.document_type;
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id)?;

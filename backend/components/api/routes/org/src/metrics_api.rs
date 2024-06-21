@@ -1,8 +1,8 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OrgMetricsRequest;
 use db::scoped_vault::count_for_tenant;
@@ -58,7 +58,7 @@ async fn get(
 
     let result = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let new_user_vaults = count_for_tenant(conn, search_params(vec![], false))?;
             let total_user_onboardings = count_for_tenant(conn, search_params(vec![], true))?;
             let failed_user_onboardings =

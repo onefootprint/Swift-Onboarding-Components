@@ -2,12 +2,12 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::fp_id_path::FpIdPathPlus;
+use api_core::FpResult;
 use api_wire_types::CreateTagRequest;
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
@@ -40,7 +40,7 @@ pub async fn post(
 
     let tag = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
@@ -72,7 +72,7 @@ pub async fn get(
 
     let tags = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             Ok(ScopedVaultTag::get_active(conn, &sv.id)?)
         })
@@ -97,7 +97,7 @@ pub async fn delete(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             Ok(ScopedVaultTag::deactivate(conn, &sv.id, &tag_id)?)
         })

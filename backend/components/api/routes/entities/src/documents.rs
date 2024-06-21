@@ -3,13 +3,13 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use db::models::document::Document;
 use db::models::document::DocumentImageArgs;
 use db::models::scoped_vault::ScopedVault;
@@ -45,12 +45,12 @@ pub async fn get(
 
     let (id_docs, api_docs) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let documents = Document::list(conn, &sv.id)?;
             let id_docs = documents
                 .into_iter()
-                .map(|(doc, dr)| -> ApiResult<_> {
+                .map(|(doc, dr)| -> FpResult<_> {
                     let args = DocumentImageArgs {
                         only_active: false,
                         at_seqno: seqno,
@@ -59,7 +59,7 @@ pub async fn get(
                     Ok((doc, dr, images))
                 })
                 .filter_ok(|(_, _, images)| !images.is_empty())
-                .collect::<ApiResult<Vec<_>>>()?;
+                .collect::<FpResult<Vec<_>>>()?;
 
             let custom_dis = id_docs
                 .iter()
@@ -107,7 +107,7 @@ pub async fn get(
         id_docs
             .into_iter()
             .map(api_wire_types::Document::try_from_db)
-            .collect::<ApiResult<Vec<_>>>()?,
+            .collect::<FpResult<Vec<_>>>()?,
         api_docs.into_iter().map(api_wire_types::Document::from_db),
     )
     .collect();

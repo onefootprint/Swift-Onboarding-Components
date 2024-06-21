@@ -25,8 +25,8 @@ mod is_components_sdk;
 pub use is_components_sdk::*;
 
 mod bootstrap_fields;
-use crate::errors::ApiResult;
 use crate::ApiErrorKind;
+use crate::FpResult;
 use api_errors::FpError;
 pub use bootstrap_fields::*;
 
@@ -41,7 +41,7 @@ pub fn get_bool_header(name: &str, req: &HeaderMap) -> Option<bool> {
         .map(|h| h == "true")
 }
 
-pub fn get_required_header(name: &'static str, req: &HeaderMap) -> ApiResult<String> {
+pub fn get_required_header(name: &'static str, req: &HeaderMap) -> FpResult<String> {
     let h = req
         .get(name)
         .and_then(|h| h.to_str().ok())

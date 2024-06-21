@@ -21,7 +21,7 @@ use crate::decision::state::DocCollected;
 use crate::decision::state::MakeDecision;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
@@ -99,7 +99,7 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
         // This is not a default rule, but we're testing it here
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let obc = ObConfiguration::lock(conn, &obc_id2).unwrap();
                 let rule = NewRule {
                     rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {

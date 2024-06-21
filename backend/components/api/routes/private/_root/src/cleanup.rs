@@ -3,13 +3,13 @@ use actix_web::web;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::Either;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::types::ModernApiResult;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::ApiErrorKind;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifyId;
 use db::errors::OptionalExtension;
@@ -96,7 +96,7 @@ async fn post(
         Request::Id(id) => {
             state
                 .db_pool
-                .db_query(move |conn| -> ApiResult<_> {
+                .db_query(move |conn| -> FpResult<_> {
                     let id = ScopedVaultIdentifier::SuperAdminView { identifier: &id };
                     let sv = ScopedVault::get(conn, id).optional()?;
                     Ok(sv.map(|sv| sv.vault_id))
@@ -114,7 +114,7 @@ async fn post(
     let ff_client = state.ff_client.clone();
     let num_deleted_rows = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<usize> {
+        .db_transaction(move |conn| -> FpResult<usize> {
             Vault::lock(conn, &uv_id)?;
 
             if is_production {
@@ -143,7 +143,7 @@ async fn post(
 }
 
 /// check that this phone number can be used to clean a vault
-fn ensure_phone_number_allowed(state: &State, phone_number: &PhoneNumber) -> ApiResult<bool> {
+fn ensure_phone_number_allowed(state: &State, phone_number: &PhoneNumber) -> FpResult<bool> {
     // Use e164 to see if cleanup is allowed for this phone number
     let can_clean_up_number = state
         .ff_client

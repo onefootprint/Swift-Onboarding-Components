@@ -5,7 +5,7 @@ use crate::auth::session::user::EmailVerifySession;
 use crate::auth::session::AuthSessionData;
 use crate::errors::user::UserError;
 use crate::errors::ApiErrorKind;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
@@ -110,7 +110,7 @@ impl SendgridClient {
         state: &State,
         to_email: String,
         url: PiiString,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         let template_data = HashMap::from([("curl_request".to_string(), url)]);
         self.send_template(
             state,
@@ -128,7 +128,7 @@ impl SendgridClient {
         inviter: String,
         org_name: String,
         accept_url: PiiString,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         let to_email = PiiString::from(to_email);
         let template_data = HashMap::from([
             ("recipient_email".to_string(), to_email.clone()),
@@ -145,7 +145,7 @@ impl SendgridClient {
         state: &State,
         to_email: PiiString,
         curl_url: PiiString,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
         self.send_template(state, to_email, Self::EMAIL_VERIFY_TEMPLATE_ID, template_data)
             .await
@@ -155,7 +155,7 @@ impl SendgridClient {
         &self,
         state: &State,
         info: BoInviteEmailInfo<'a>,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         let BoInviteEmailInfo {
             to_email,
             inviter,
@@ -199,7 +199,7 @@ impl SendgridClient {
         to_email: PiiString,
         code: String,
         tenant_url: String,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         let template_data = HashMap::from([
             ("code".to_string(), code.into()),
             ("tenant_url".to_string(), tenant_url.into()),
@@ -215,7 +215,7 @@ impl SendgridClient {
         to_email: PiiString,
         template_id: &str,
         template_data: HashMap<String, PiiString>,
-    ) -> ApiResult<()> {
+    ) -> FpResult<()> {
         if Email::from_str(to_email.leak())
             .ok()
             .is_some_and(|e| e.is_fixture())
@@ -271,7 +271,7 @@ pub async fn send_email_challenge(
     tenant_id: &TenantId,
     email_id: ContactInfoId,
     email_address: &PiiString,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     // Some tenants don't ever want to verify email
     // TODO we'll want to ignore this on no-phone OBCs
     let omit_email_verification = state.ff_client.flag(BoolFlag::OmitEmailVerification(tenant_id));
@@ -306,7 +306,7 @@ pub fn send_email_challenge_non_blocking(
     vault_id: VaultId,
     tenant: &Tenant,
     sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
-) -> ApiResult<PhoneEmailChallengeState> {
+) -> FpResult<PhoneEmailChallengeState> {
     // Send non-blocking to prevent us from returning the challenge data to the frontend while
     // we wait for sendrid latency
     if email.is_fixture() && sandbox_id.is_none() {

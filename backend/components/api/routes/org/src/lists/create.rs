@@ -1,11 +1,11 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::CreateListRequest;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
@@ -48,7 +48,7 @@ pub async fn create_list(
     let insight = CreateInsightEvent::from(insights);
     let (list, entries_count) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let tenant = Tenant::get(conn, &tenant_id)?;
             if List::find(conn, &tenant_id, is_live, &name, &alias)?.is_some() {
                 return Err(ValidationError("List with that name already exists").into());
@@ -67,7 +67,7 @@ pub async fn create_list(
                 Some(entries) => {
                     let canonicalized = entries
                         .into_iter()
-                        .map(|d| -> ApiResult<_> {
+                        .map(|d| -> FpResult<_> {
                             let parsed = ListEntryValue::parse(list.kind, d)?;
                             Ok(parsed.canonicalize())
                         })
@@ -77,7 +77,7 @@ pub async fn create_list(
                     let e_data = canonicalized
                         .into_iter()
                         .unique()
-                        .map(|canon| -> ApiResult<_> {
+                        .map(|canon| -> FpResult<_> {
                             let enc = sealing_key
                                 .seal_bytes(canon.leak().as_bytes())
                                 .map(|b| b.into())?;

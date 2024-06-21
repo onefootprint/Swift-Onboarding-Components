@@ -22,9 +22,9 @@ use crate::decision::utils::FixtureDecision;
 use crate::decision::{
     self,
 };
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::data_lifetime::DataLifetime;
@@ -60,7 +60,7 @@ use std::sync::Arc;
 /// authorized
 impl KybDataCollection {
     #[tracing::instrument("KybDataCollection::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybDataCollection {
@@ -83,7 +83,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
         &self,
         _action: Authorize,
         _state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         Ok(())
     }
 
@@ -93,7 +93,7 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
         _wf: Locked<DbWorkflow>,
         _async_res: (),
         _conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KybState> {
+    ) -> FpResult<KybState> {
         Ok(KybState::from(KybAwaitingBoKyc {
             wf_id: self.wf_id,
             t_id: self.t_id,
@@ -117,7 +117,7 @@ impl WorkflowState for KybDataCollection {
 /// After all business information is collected, we wait in this state for all BO's to complete KYC
 impl KybAwaitingBoKyc {
     #[tracing::instrument("KybAwaitingBoKyc::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybAwaitingBoKyc {
@@ -139,7 +139,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         &self,
         _action: BoKycCompleted,
         state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         let bo_obds = decision::biz_risk::get_bo_obds(state, &self.wf_id).await?;
         Ok(bo_obds)
     }
@@ -150,7 +150,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         wf: Locked<DbWorkflow>,
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KybState> {
+    ) -> FpResult<KybState> {
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
         let bo_obds = async_res;
         if bo_obds.iter().any(|o| o.status == DecisionStatus::Fail) {
@@ -212,7 +212,7 @@ impl WorkflowState for KybAwaitingBoKyc {
 /// syncronous KYB vendors here (eg: Lexis + Experian)
 impl KybVendorCalls {
     #[tracing::instrument("KybVendorCalls::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybVendorCalls {
@@ -234,7 +234,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
         &self,
         _action: MakeVendorCalls,
         state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         let wf_id = self.wf_id.clone();
         let (wf, v) = state
             .db_pool
@@ -264,7 +264,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
         _wf: Locked<DbWorkflow>,
         fixture_decision: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KybState> {
+    ) -> FpResult<KybState> {
         if let Some(fixture_decision) = fixture_decision {
             decision::utils::write_kyb_fixture_vendor_result_and_risk_signals(
                 conn,
@@ -297,7 +297,7 @@ impl WorkflowState for KybVendorCalls {
 /// We remain in this state until the Middesk asyncronous flow completes.
 impl KybAwaitingAsyncVendors {
     #[tracing::instrument("KybAwaitingAsyncVendors::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybAwaitingAsyncVendors {
@@ -319,7 +319,7 @@ impl OnAction<AsyncVendorCallsCompleted, KybState> for KybAwaitingAsyncVendors {
         &self,
         _action: AsyncVendorCallsCompleted,
         _state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         Ok(())
     }
 
@@ -332,7 +332,7 @@ impl OnAction<AsyncVendorCallsCompleted, KybState> for KybAwaitingAsyncVendors {
         _wf: Locked<DbWorkflow>,
         _async_res: (),
         _conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KybState> {
+    ) -> FpResult<KybState> {
         Ok(KybState::from(KybDecisioning::new(self.wf_id, self.t_id)))
     }
 }
@@ -352,7 +352,7 @@ impl WorkflowState for KybAwaitingAsyncVendors {
 /// ////////////////
 impl KybDecisioning {
     #[tracing::instrument("KybDecisioning::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KybDecisioning::new(workflow.id, sv.tenant_id))
@@ -375,12 +375,12 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         &self,
         _action: MakeDecision,
         state: &State,
-    ) -> ApiResult<Self::AsyncRes> {
+    ) -> FpResult<Self::AsyncRes> {
         let wfid = self.wf_id.clone();
         let rule_kind = self.include_rules;
         let (tenant, rules, vw, lists) = state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let wf = DbWorkflow::get(conn, &wfid)?;
                 let (obc, tenant) = ObConfiguration::get(conn, &wfid)?;
                 let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id, rule_kind)?;
@@ -408,7 +408,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         wf: Locked<DbWorkflow>,
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
-    ) -> ApiResult<KybState> {
+    ) -> FpResult<KybState> {
         let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
@@ -496,7 +496,7 @@ impl WorkflowState for KybDecisioning {
 /// ////////////////
 impl KybComplete {
     #[tracing::instrument("KybComplete::init", skip_all)]
-    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: KybConfig) -> ApiResult<Self> {
+    pub async fn init(_state: &State, _workflow: DbWorkflow, _config: KybConfig) -> FpResult<Self> {
         Ok(KybComplete {})
     }
 }

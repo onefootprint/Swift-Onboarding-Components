@@ -1,5 +1,5 @@
-use api_core::errors::ApiResult;
 use api_core::utils::passkey::SavedAttestationData;
+use api_core::FpResult;
 use newtypes::WebauthnCredentialId;
 
 /// helper function to link a webauthn cred to an attestation
@@ -9,7 +9,7 @@ use newtypes::WebauthnCredentialId;
 pub(super) fn link_webauthn_credential(
     creds: Vec<db::models::webauthn_credential::WebauthnCredential>,
     webauthn_device_response_json: Option<String>,
-) -> ApiResult<Option<WebauthnCredentialId>> {
+) -> FpResult<Option<WebauthnCredentialId>> {
     let Some(webauthn_device_response_json) = webauthn_device_response_json else {
         return Ok(None);
     };

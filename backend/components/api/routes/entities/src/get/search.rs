@@ -1,11 +1,11 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::ApiResult;
 use crate::get::EntityListResponse;
 use crate::types::response::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::tenant::TenantAuth;
 use api_core::auth::CanDecrypt;
@@ -113,7 +113,7 @@ pub async fn post(
     };
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let page_size = (page_size + 1) as i64;
             let order_by = ScopedVaultCursorKind::LastActivityAt;
             let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(
@@ -148,7 +148,7 @@ pub async fn post(
             let decrypted_data = decrypted_results.remove(&sv.id).unwrap_or_default();
             Ok((vw, entity, decrypted_data))
         })
-        .collect::<ApiResult<Vec<_>>>()?
+        .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         .map(|(vw, entity, d)| api_wire_types::Entity::from_db((entity, vw, &auth, d)))
         .collect();
@@ -162,7 +162,7 @@ pub async fn decrypt_visible_attrs(
     state: &State,
     auth: &Box<dyn TenantAuth>,
     vws: Vec<&TenantVw<Any>>,
-) -> ApiResult<HashMap<ScopedVaultId, DecryptedData>> {
+) -> FpResult<HashMap<ScopedVaultId, DecryptedData>> {
     let reqs = vws
         .into_iter()
         .map(|vw| {

@@ -4,9 +4,9 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use db::models::ob_configuration::NewObConfigurationArgs;
 use db::models::ob_configuration::ObConfiguration;
@@ -165,7 +165,7 @@ pub async fn post(
     let ff_client = state.ff_client.clone();
     let (obc, actor, rs) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let obc: ObConfiguration = ObConfiguration::create(conn, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;
             rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))?;

@@ -1,7 +1,7 @@
 use crate::enclave_client::DecryptReq;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
+use crate::FpResult;
 use db::models::tenant::Tenant;
 use db::models::tenant_business_info::TenantBusinessInfo;
 
@@ -19,7 +19,7 @@ pub async fn decrypt_tenant_business_info(
     enclave_client: &EnclaveClient,
     tenant: &Tenant,
     tbi: &TenantBusinessInfo,
-) -> ApiResult<newtypes::TenantBusinessInfo> {
+) -> FpResult<newtypes::TenantBusinessInfo> {
     let private_key = tenant.e_private_key.clone();
     let encryped_fields = [
         (BusinessInfoField::CompanyName, tbi.company_name.clone()),

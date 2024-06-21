@@ -15,7 +15,6 @@ use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::verification_result::save_vreq_and_vres;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::VendorAPIError;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::EnclaveDecryptOperation;
@@ -24,6 +23,7 @@ use crate::utils::vault_wrapper::Pii;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
 use crate::ApiErrorKind;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document::Document;
@@ -75,7 +75,7 @@ impl IncodeStateTransition for FetchScores {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>> {
+    ) -> FpResult<Option<Self>> {
         // make the request to incode
         let request = IncodeFetchScoresRequest {
             credentials: session.credentials.clone(),
@@ -119,7 +119,7 @@ impl IncodeStateTransition for FetchScores {
         let sv_id = ctx.sv_id.clone();
         let id_doc_id = ctx.id_doc_id.clone();
         let (obc, vw, id_doc, doc_uploads) = db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
                 let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
                 let (id_doc, _) = Document::get(conn, &id_doc_id)?;
@@ -245,7 +245,7 @@ impl IncodeStateTransition for FetchScores {
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
         _session: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
+    ) -> FpResult<TransitionResult> {
         // TODO could represent enter inside the state transition
         let args = CompleteArgs {
             vault: &ctx.vault,
@@ -272,7 +272,7 @@ impl IncodeStateTransition for FetchScores {
 async fn run_aws_rekognition(
     db_pool: &DbPool,
     ctx: &IncodeContext,
-) -> ApiResult<Option<(CompareFacesResponse, VerificationResult)>> {
+) -> FpResult<Option<(CompareFacesResponse, VerificationResult)>> {
     let enclave_client = &ctx.state.enclave_client;
     let id_doc_id = ctx.id_doc_id.clone();
     let sv_id = ctx.sv_id.clone();
@@ -281,7 +281,7 @@ async fn run_aws_rekognition(
 
     let sv_id2 = ctx.sv_id.clone();
     let (id_doc, vw) = db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (id_doc, _) = Document::get(conn, &id_doc_id)?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id2)?;
             Ok((id_doc, vw))
@@ -337,7 +337,7 @@ async fn run_aws_rekognition(
     };
 
     let vres = db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let di = DecisionIntent::create(conn, DecisionIntentKind::DocScan, &sv_id, Some(&wf_id))?;
             let (_, vres) =
                 save_vreq_and_vres(conn, &vw.vault.public_key.clone(), &sv_id, &di.id, res_to_save)?;
@@ -349,7 +349,7 @@ async fn run_aws_rekognition(
     Ok(result.map(|r| (r, vres)))
 }
 
-async fn mark_status_as_complete(credentials: IncodeCredentialsWithToken) -> ApiResult<reqwest::Response> {
+async fn mark_status_as_complete(credentials: IncodeCredentialsWithToken) -> FpResult<reqwest::Response> {
     let http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())?;
     let client = IncodeClientAdapter::new(credentials.credentials).map_err(map_to_api_error)?;
     let authenticated_client =
@@ -370,7 +370,7 @@ async fn add_customer_and_save_session(
     credentials: IncodeCredentialsWithToken,
     ctx: IncodeContext,
     ivs_id: IncodeVerificationSessionId,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let sv_id2 = ctx.sv_id.clone();
     let ivs_id2 = ivs_id.clone();
 

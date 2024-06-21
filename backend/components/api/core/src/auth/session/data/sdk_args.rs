@@ -1,5 +1,5 @@
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
+use crate::FpResult;
 use db::models::appearance::Appearance;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
@@ -130,16 +130,16 @@ pub type ObConfigInfo = (
 
 pub trait ValidateSdkArgs {
     /// Validate the contents of the SdkArgs
-    fn validate(&self) -> ApiResult<()>;
+    fn validate(&self) -> FpResult<()>;
 
     /// If pertinent, the ob config identified by these SDK args
-    fn ob_config(&self, _conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+    fn ob_config(&self, _conn: &mut PgConn) -> FpResult<Option<ObConfigInfo>> {
         Ok(None)
     }
 }
 
 impl ValidateSdkArgs for VerifyV1SdkArgs {
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self) -> FpResult<()> {
         let auth_token_hash = self
             .auth_token
             .as_ref()
@@ -164,7 +164,7 @@ impl ValidateSdkArgs for VerifyV1SdkArgs {
         Ok(())
     }
 
-    fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+    fn ob_config(&self, conn: &mut PgConn) -> FpResult<Option<ObConfigInfo>> {
         let obc = if let Some(key) = self.public_key.as_ref() {
             let (obc, tenant) = ObConfiguration::get_enabled(conn, key)?;
             let appearance = if let Some(appearance_id) = obc.appearance_id.as_ref() {
@@ -182,7 +182,7 @@ impl ValidateSdkArgs for VerifyV1SdkArgs {
 }
 
 impl ValidateSdkArgs for AuthV1SdkArgs {
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self) -> FpResult<()> {
         let public_key = self
             .public_key
             .as_ref()
@@ -195,7 +195,7 @@ impl ValidateSdkArgs for AuthV1SdkArgs {
         Ok(())
     }
 
-    fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+    fn ob_config(&self, conn: &mut PgConn) -> FpResult<Option<ObConfigInfo>> {
         let obc = if let Some(key) = self.public_key.as_ref() {
             let (obc, tenant) = ObConfiguration::get_enabled(conn, key)?;
             let appearance = if let Some(appearance_id) = obc.appearance_id.as_ref() {
@@ -213,13 +213,13 @@ impl ValidateSdkArgs for AuthV1SdkArgs {
 }
 
 impl ValidateSdkArgs for UpdateAuthMethodsV1SdkArgs {
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self) -> FpResult<()> {
         Ok(())
     }
 }
 
 impl ValidateSdkArgs for FormV1SdkArgs {
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self) -> FpResult<()> {
         let auth_token_hash = self
             .auth_token
             .as_ref()
@@ -234,13 +234,13 @@ impl ValidateSdkArgs for FormV1SdkArgs {
 }
 
 impl ValidateSdkArgs for RenderV1SdkArgs {
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self) -> FpResult<()> {
         Ok(())
     }
 }
 
 impl ValidateSdkArgs for VerifyResultV1SdkArgs {
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self) -> FpResult<()> {
         Ok(())
     }
 }
@@ -281,7 +281,7 @@ impl std::fmt::Debug for SdkArgsData {
 }
 
 impl ValidateSdkArgs for SdkArgs {
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self) -> FpResult<()> {
         match self {
             Self::VerifyV1(args) => args.validate()?,
             Self::VerifyResultV1(args) => args.validate()?,
@@ -293,7 +293,7 @@ impl ValidateSdkArgs for SdkArgs {
         Ok(())
     }
 
-    fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+    fn ob_config(&self, conn: &mut PgConn) -> FpResult<Option<ObConfigInfo>> {
         match self {
             Self::VerifyV1(args) => args.ob_config(conn),
             Self::VerifyResultV1(args) => args.ob_config(conn),

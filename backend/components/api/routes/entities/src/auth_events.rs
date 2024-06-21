@@ -5,9 +5,9 @@ use crate::auth::Either;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::api_v2_operation;
@@ -31,7 +31,7 @@ pub async fn get(
 
     let events = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (events, _) = AuthEvent::list(conn, &sv.id, None)?;
             Ok(events)

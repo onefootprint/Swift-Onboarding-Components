@@ -2,11 +2,11 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiErrorKind;
+use api_core::FpResult;
 use api_wire_types::ComplianceDocEvent;
 use api_wire_types::ComplianceDocEventType;
 use db::helpers::ComplianceDocSummary;
@@ -38,7 +38,7 @@ pub async fn get(
 
     let summary = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), Some(&doc_id))?
                 .into_values()
                 .next()
@@ -71,7 +71,7 @@ pub async fn get(
                 assigned_to: assignment
                     .assigned_to_tenant_user_id
                     .as_ref()
-                    .map(|user_id| -> ApiResult<_> {
+                    .map(|user_id| -> FpResult<_> {
                         Ok(api_wire_types::LiteUserAndOrg {
                             user: api_wire_types::LiteOrgMember::try_from_db((&summary, user_id))?,
                             org,
@@ -94,7 +94,7 @@ pub async fn get(
             actor: req
                 .requested_by_partner_tenant_user_id
                 .as_ref()
-                .map(|user_id| -> ApiResult<_> {
+                .map(|user_id| -> FpResult<_> {
                     Ok(api_wire_types::LiteUserAndOrg {
                         user: api_wire_types::LiteOrgMember::try_from_db((&summary, user_id))?,
                         org: summary.partner_tenant.name.clone(),

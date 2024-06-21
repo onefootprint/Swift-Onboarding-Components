@@ -1,6 +1,6 @@
 use super::onboarding::Decision;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::manual_review::ManualReviewAction;
@@ -40,7 +40,7 @@ pub fn save_final_decision(
     decision: Decision,
     rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let wf = Workflow::lock(conn, wf_id)?;
     let scoped_user = ScopedVault::get(conn, &wf.scoped_vault_id)?;
     let (obc, _) = ObConfiguration::get(conn, wf_id)?;

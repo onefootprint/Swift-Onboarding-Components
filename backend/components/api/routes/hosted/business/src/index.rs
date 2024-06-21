@@ -1,5 +1,5 @@
-use crate::errors::ApiResult;
 use crate::types::ModernApiResult;
+use crate::FpResult;
 use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
@@ -27,7 +27,7 @@ pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ModernApiRe
     let ob_config_id = bo_auth.ob_config.id.clone();
     let (bvw, sb) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (_, sb) = Workflow::get_all(conn, (&bv_id, &ob_config_id))?;
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
             Ok((bvw, sb))

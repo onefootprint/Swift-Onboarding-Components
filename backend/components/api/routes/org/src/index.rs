@@ -3,10 +3,10 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::serializers::IsDomainAlreadyClaimed;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::UpdateTenantRequest;
 use db::models::tenant::Tenant;
@@ -32,7 +32,7 @@ pub async fn get(
     let domains = tenant.domains.clone();
     let (is_domain_already_claimed, tenant_with_parent) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             Ok((
                 Tenant::is_domain_already_claimed(conn, &domains)?,
                 tenant.with_parent(conn)?,
@@ -101,7 +101,7 @@ async fn patch(
     };
     let updated_tenant = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let tenant = Tenant::lock(conn, &tenant_id)?;
 
             // If we're enabling domain access, ensure the tenant's domains aren't already claimed.

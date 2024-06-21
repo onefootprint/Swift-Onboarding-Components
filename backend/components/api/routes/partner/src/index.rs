@@ -3,10 +3,10 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
 use api_core::serializers::IsDomainAlreadyClaimed;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use db::models::partner_tenant::PartnerTenant;
 use db::models::partner_tenant::UpdatePartnerTenant;
@@ -74,7 +74,7 @@ pub async fn patch(
 
     let updated_pt = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let pt = PartnerTenant::lock(conn, &pt_id)?;
 
             // If we're enabling domain access, ensure the partner tenant's domains aren't already claimed.

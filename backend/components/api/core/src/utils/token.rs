@@ -5,8 +5,8 @@ use crate::auth::session::user::NewUserSessionContext;
 use crate::auth::session::user::TokenCreationPurpose;
 use crate::auth::session::user::UserSession;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
 use crate::errors::ValidationError;
+use crate::FpResult;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
@@ -44,7 +44,7 @@ pub fn create_token(
     session_key: &ScopedSealingKey,
     args: CreateTokenArgs,
     duration: Duration,
-) -> ApiResult<CreateTokenResult> {
+) -> FpResult<CreateTokenResult> {
     let CreateTokenArgs {
         sv,
         kind,

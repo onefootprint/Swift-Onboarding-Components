@@ -11,8 +11,8 @@ use super::states::ProcessId;
 use super::states::VerificationSession;
 use super::IncodeContext;
 use crate::decision::state::StateError;
-use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
+use crate::FpResult;
 use async_trait::async_trait;
 use db::models::document_upload::DocumentUpload;
 use db::models::incode_verification_session::IncodeVerificationSession;
@@ -62,7 +62,7 @@ pub trait IncodeStateTransition: Sized {
         clients: &IncodeClients,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<Option<Self>>;
+    ) -> FpResult<Option<Self>>;
 
     /// Perform any bookkeeping that must be atomic with the state transition upon exiting a state.
     /// Can access any context created in `run`.
@@ -73,7 +73,7 @@ pub trait IncodeStateTransition: Sized {
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
         session: &VerificationSession,
-    ) -> ApiResult<TransitionResult>;
+    ) -> FpResult<TransitionResult>;
 
     #[allow(clippy::new_ret_no_self)]
     fn new() -> IncodeState
@@ -95,7 +95,7 @@ pub trait RunTransition {
         clients: &IncodeClients,
         ctx: IncodeContext,
         session: VerificationSession,
-    ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)>;
+    ) -> FpResult<(IncodeState, StepResult, IncodeContext, VerificationSession)>;
 }
 
 pub enum StepResult {
@@ -122,7 +122,7 @@ where
         clients: &IncodeClients,
         ctx: IncodeContext,
         session: VerificationSession,
-    ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)> {
+    ) -> FpResult<(IncodeState, StepResult, IncodeContext, VerificationSession)> {
         let starting_state = self.into();
         // we know what we'll transition to, based properties of the session
         let default_next_state = T::next_state(&session);
@@ -134,7 +134,7 @@ where
         };
 
         let result = db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let ivs = IncodeVerificationSession::lock(conn, &session.id)?;
                 if ivs.state != starting_state.name() {
                     Err(StateError::IncodeMachineConcurrentStateChange(

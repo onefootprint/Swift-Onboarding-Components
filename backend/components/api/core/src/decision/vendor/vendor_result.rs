@@ -1,7 +1,7 @@
 use super::verification_result::decrypt_verification_result_response;
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::verification_request::RequestAndMaybeResult;
 use db::models::verification_request::RequestAndResult;
@@ -63,7 +63,7 @@ impl VendorResult {
         requests_and_results: Vec<RequestAndMaybeResult>,
         enclave_client: &EnclaveClient,
         user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> ApiResult<Vec<RequestAndMaybeHydratedResult>> {
+    ) -> FpResult<Vec<RequestAndMaybeHydratedResult>> {
         // TODO: our saving/derser of vendor "Errors" is pretty sketch and
         // from_verification_results_for_onboarding decrypting and deser'ing Vres's that are
         // is_error = true seems a bit scary to me. Need to overhaul our approach to vendor errors
@@ -106,7 +106,7 @@ impl VendorResult {
         request_and_result: RequestAndResult,
         enclave_client: &EnclaveClient,
         user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> ApiResult<RequestAndMaybeHydratedResult> {
+    ) -> FpResult<RequestAndMaybeHydratedResult> {
         Self::hydrate_vendor_results(
             vec![(request_and_result.0, Some(request_and_result.1))],
             enclave_client,
@@ -122,7 +122,7 @@ impl VendorResult {
         requests_and_results: Vec<RequestAndMaybeResult>,
         enclave_client: &EnclaveClient,
         user_vault_private_key: &EncryptedVaultPrivateKey,
-    ) -> ApiResult<Vec<Self>> {
+    ) -> FpResult<Vec<Self>> {
         let requests_with_responses: Vec<(VerificationRequest, VerificationResult, SealedVaultBytes)> =
             requests_and_results
                 .into_iter()
@@ -188,7 +188,7 @@ impl VendorResult {
         latest_results: Vec<RequestAndMaybeResult>,
         vw: &VaultWrapper,
         vendor_api_to_check: VendorAPI,
-    ) -> ApiResult<Option<VendorResult>> {
+    ) -> FpResult<Option<VendorResult>> {
         let vendor_api_to_latest_result: HashMap<VendorAPI, RequestAndMaybeHydratedResult> =
             VendorResult::hydrate_vendor_results(
                 latest_results,
@@ -210,7 +210,7 @@ impl VendorResult {
 fn deserialize_from_vendor_api(
     raw_response: serde_json::Value,
     vendor_api: VendorAPI,
-) -> ApiResult<ParsedResponse> {
+) -> FpResult<ParsedResponse> {
     let res: ParsedResponse = match vendor_api {
         VendorAPI::IdologyExpectId => ParsedResponse::from_idology_expectid_response(raw_response)?,
         VendorAPI::TwilioLookupV2 => ParsedResponse::from_twilio_lookupv2_response(raw_response)?,

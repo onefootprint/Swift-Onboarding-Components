@@ -1,5 +1,5 @@
 use crate::errors::workos::WorkOsError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use newtypes::PiiString;
 use workos::passwordless::CreatePasswordlessSession;
@@ -13,7 +13,7 @@ pub async fn create_magic_link(
     email: &str,
     redirect_url: &str,
     is_invite: bool,
-) -> ApiResult<PiiString> {
+) -> FpResult<PiiString> {
     let session = state
         .workos_client
         .passwordless()

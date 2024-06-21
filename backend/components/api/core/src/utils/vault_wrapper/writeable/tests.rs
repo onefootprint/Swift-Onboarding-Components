@@ -2,10 +2,10 @@ use super::DataLifetimeSources;
 use super::FingerprintedDataRequest;
 use super::PrefillKind;
 use super::WriteableVw;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::ob_configuration::ObConfiguration;
@@ -46,7 +46,7 @@ async fn test_prefill_data(state: &mut State) {
     //
     let (data, vw) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let test_data = create_test_data(conn);
             let vw = VaultWrapper::<Person>::build_portable(conn, &test_data.su1.vault_id)?;
             Ok((test_data, vw))
@@ -96,7 +96,7 @@ async fn test_prefill_data(state: &mut State) {
     let su1 = data.su1.clone();
     let vw = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
             let data = vec![
                 (IDK::Dob.into(), PiiString::new("1990-01-01".into())),
@@ -164,7 +164,7 @@ async fn test_prefill_data(state: &mut State) {
     let su2_id = data.su2.id.clone();
     let (vw1, vw2) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
             vw2.prefill_portable_data(conn, prefill_data, None).unwrap();
 
@@ -218,7 +218,7 @@ async fn test_prefill_data(state: &mut State) {
     let su2_id = data.su2.id.clone();
     let vw2 = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             // Should be able to update tenant2's view of ssn4, even thought tenant1 has the full ssn9
             // TODO uncomment this after we switch the source of truth for reading
             // let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
@@ -254,7 +254,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
     //
     let (data, vw) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let test_data = create_test_data(conn);
             let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &test_data.su1.id).unwrap();
             let data = vec![
@@ -287,7 +287,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
     let su2 = data.su2.clone();
     let vw = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
             vw2.prefill_portable_data(conn, prefill_data, None).unwrap();
 
@@ -311,7 +311,7 @@ async fn test_prefill_data_auth_then_kyc(state: &mut State) {
     let su2 = data.su2.clone();
     let vw2 = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
             vw2.prefill_portable_data(conn, prefill_data, None).unwrap();
             let vw2: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &su2.id).unwrap();
@@ -382,7 +382,7 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         data: Vec<(DataIdentifier, PiiString)>,
         create_fingerprints: bool,
-    ) -> ApiResult<Vec<(DataIdentifier, ContactInfo)>> {
+    ) -> FpResult<Vec<(DataIdentifier, ContactInfo)>> {
         let sv = ScopedVault::get(conn, &self.scoped_vault_id)?;
         let data = HashMap::from_iter(data);
         let request =

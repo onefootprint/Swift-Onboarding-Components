@@ -1,6 +1,6 @@
 use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::NewContactInfoArgs;
 use db::models::data_lifetime::DataLifetime;
@@ -55,7 +55,7 @@ impl ValidatedDataRequest {
         conn: &mut TxnPgConn,
         vw: &WriteableVw<Type>,
         actor: Option<AuthActor>,
-    ) -> ApiResult<SavedData> {
+    ) -> FpResult<SavedData> {
         let Self {
             data,
             fingerprints,

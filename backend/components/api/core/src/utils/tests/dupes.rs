@@ -1,8 +1,8 @@
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DataLifetimeSources;
 use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
+use crate::FpResult;
 use crate::State;
 use db::models::fingerprint::Fingerprint;
 use db::models::ob_configuration::ObConfiguration;
@@ -163,7 +163,7 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
     // create an obc for every tenant and create a T->OBC mapping
     let obc_map = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let obc_map: HashMap<T, ObConfiguration> = T::iter()
                 .map(|t| {
                     let tenant = fixtures::tenant::create(conn);
@@ -181,7 +181,7 @@ async fn test_get_dupes(state: &mut State, data: Vec<InputData>, expected: Expec
     let data2 = data.clone();
     let sv_map = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let mut vault_id_map: HashMap<V, VaultId> = HashMap::new();
             let sv_map: HashMap<(V, T), ScopedVault> = data2
                 .iter()
@@ -251,7 +251,7 @@ async fn vault_data(state: &mut State, sv: &ScopedVault, data: Vec<(IDK, &str)>)
     let sv_id = sv.id.clone();
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id).unwrap();
             let sources = DataLifetimeSources::single(DataLifetimeSource::Tenant);
             uvw.patch_data(conn, data_req, sources, None).unwrap();

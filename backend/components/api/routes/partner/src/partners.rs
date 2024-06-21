@@ -2,9 +2,9 @@ use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
+use api_core::FpResult;
 use db::helpers::ComplianceDocSummary;
 use db::models::ob_configuration::ObConfiguration;
 use paperclip::actix::api_v2_operation;
@@ -28,7 +28,7 @@ pub async fn get(
 
     let (summaries, counts) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let summaries = ComplianceDocSummary::filter(conn, &pt_id, None, None)?;
             let tenant_ids: Vec<_> = summaries.values().map(|s| &s.tenant.id).collect();
             let counts = ObConfiguration::count_bulk(conn, tenant_ids, true)?;
@@ -39,7 +39,7 @@ pub async fn get(
     let companies = summaries
         .values()
         .map(|summary| api_wire_types::ComplianceCompanySummary::try_from_db((summary, &counts)))
-        .collect::<ApiResult<_>>()?;
+        .collect::<FpResult<_>>()?;
 
     Ok(companies)
 }

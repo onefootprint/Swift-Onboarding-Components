@@ -4,11 +4,11 @@ use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserIdentifier;
 use api_core::errors::error_with_code::ErrorWithCode;
-use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::utils::identify::get_user_challenge_context;
 use api_core::utils::identify::UserChallengeContext;
 use api_core::utils::sms::PhoneEmailChallengeState;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifyId;
 use db::errors::OptionalExtension;
@@ -98,7 +98,7 @@ pub struct IdentifyChallengeContext {
 async fn get_identify_challenge_context(
     state: &State,
     args: GetIdentifyChallengeArgs,
-) -> ApiResult<Option<IdentifyChallengeContext>> {
+) -> FpResult<Option<IdentifyChallengeContext>> {
     let GetIdentifyChallengeArgs {
         user_auth,
         identifiers,
@@ -135,7 +135,7 @@ async fn get_identify_challenge_context(
     let v_id = existing_user_id.clone();
     let (tenant, sv) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             // Add some log fields to the root span. Prefer info from the sv_id, otherwise look
             // through the obc
             let (tenant, sv) = if let Some(sv_id) = sv_id.as_ref() {

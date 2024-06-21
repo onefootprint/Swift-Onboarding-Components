@@ -1,9 +1,9 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use db::models::tenant_ios_app_meta::TenantIosAppMeta;
 use newtypes::TenantIosAppMetaId;
@@ -28,7 +28,7 @@ async fn post(
     let meta_id = meta_id.into_inner();
     let result = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let result = TenantIosAppMeta::get(conn, meta_id, &tenant_id)?;
             Ok(result)
         })

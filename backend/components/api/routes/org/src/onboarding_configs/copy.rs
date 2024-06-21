@@ -3,10 +3,10 @@ use crate::rules::validate_rules_request;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_core::{
     self,
@@ -74,7 +74,7 @@ async fn post(
     let target_tenant_id = target_tenant.id.clone();
     let (obc, rules) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
             let rules = RuleInstance::list(conn, &tenant_id, is_live, &obc.id, IncludeRules::All)?;
             Ok((obc, rules))
@@ -89,7 +89,7 @@ async fn post(
 
     let (obc, actor, rs) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             // Create the copied playbook
             let obc: ObConfiguration = ObConfiguration::create(conn, args)?;
             let obc = ObConfiguration::lock(conn, &obc.id)?;

@@ -1,6 +1,6 @@
 use self::tenant_vendor_control::TenantVendorControl;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
+use crate::FpResult;
 use api_errors::FpError;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
@@ -31,7 +31,7 @@ pub mod verification_result;
 pub fn get_vendor_apis_for_verification_requests(
     present_data_lifetime_kinds: &[IdentityDataKind],
     tenant_vendor_control: &TenantVendorControl,
-) -> ApiResult<Vec<VendorAPI>> {
+) -> FpResult<Vec<VendorAPI>> {
     // From the data in the vault, figure out which vendors we _can_ send to
     let vendor_apis = idv::requirements::available_vendor_apis(present_data_lifetime_kinds)
         .into_iter()

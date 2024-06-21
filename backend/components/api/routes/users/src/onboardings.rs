@@ -1,5 +1,5 @@
 use crate::auth::tenant::SecretTenantAuthContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::ModernApiResult;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
@@ -45,7 +45,7 @@ pub async fn get(
     let pagination = OffsetPagination::new(page, page_size);
     let (wfs, next_page) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (wfs, next_page) = Workflow::list(conn, &sv.id, pagination)?;
             Ok((wfs, next_page))

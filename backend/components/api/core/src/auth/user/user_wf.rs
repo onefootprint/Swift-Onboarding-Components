@@ -7,7 +7,7 @@ use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
@@ -56,7 +56,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
         req: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         // Since this is derived from a user session, we just grab all the user info
         let user_session = <ParsedUserSessionContext as ExtractableAuthSession>::try_load_session(
             value, conn, ff_client, req,
@@ -124,7 +124,7 @@ impl CheckUserWfAuthContext {
     }
 
     /// Get the business workflow associated with this auth token, if any
-    pub fn business_workflow(&self, conn: &mut PgConn) -> ApiResult<Option<Workflow>> {
+    pub fn business_workflow(&self, conn: &mut PgConn) -> FpResult<Option<Workflow>> {
         let Some(sb_id) = self.scoped_business_id() else {
             return Ok(None);
         };
@@ -153,7 +153,7 @@ impl UserWfSession {
         &self.workflow
     }
 
-    pub fn check_workflow_guard(&self, guard: WorkflowGuard) -> ApiResult<()> {
+    pub fn check_workflow_guard(&self, guard: WorkflowGuard) -> FpResult<()> {
         // TODO we ideally want this to happen inside a locked transaction with the refreshed
         // workflow state, otherwise this could be stale
         // TODO to solve ^, maybe we add this check to the write path on the VW. I believe

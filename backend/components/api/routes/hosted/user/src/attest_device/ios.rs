@@ -1,5 +1,5 @@
 use crate::State;
-use api_core::errors::ApiResult;
+use api_core::FpResult;
 use app_attest::apple::AppleAppAttestationVerifier;
 use crypto::base64;
 use db::models::apple_device_attest::AppleDeviceMetadata;
@@ -42,7 +42,7 @@ pub(super) async fn attest(
     challenge: String,
     attestation: String,
     app_bundle_id: Option<String>,
-) -> ApiResult<NewAppleDeviceAttestation> {
+) -> FpResult<NewAppleDeviceAttestation> {
     // If app bundle id is provided, fetch the tenant ios app metadata
     // Otherwise assume we are running inside app clip and use footprint verifier info
     let meta: Option<TenantIosAppMeta> = if app_bundle_id.is_some() {
@@ -101,7 +101,7 @@ pub(super) async fn attest_inner(
     challenge: String,
     attestation: String,
     webauthn_creds: Vec<WebauthnCredential>,
-) -> ApiResult<NewAppleDeviceAttestation> {
+) -> FpResult<NewAppleDeviceAttestation> {
     let payload: IosAttestationPayload = serde_json::from_slice(&base64::decode(attestation)?)?;
     let attestation_data = base64::decode(payload.attestation_data)?;
 

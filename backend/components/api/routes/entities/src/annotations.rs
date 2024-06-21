@@ -7,9 +7,9 @@ use crate::utils::db2api::DbToApi;
 use crate::FpError;
 use crate::State;
 use actix_web::web::Json;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use api_wire_types::AnnotationFilters;
 use api_wire_types::UpdateAnnotationRequest;
 use db::models::annotation::Annotation;
@@ -88,11 +88,11 @@ async fn patch(
 }
 
 pub trait ValidateRequest {
-    fn validate(&self) -> ApiResult<()>;
+    fn validate(&self) -> FpResult<()>;
 }
 
 impl ValidateRequest for CreateAnnotationRequest {
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self) -> FpResult<()> {
         if self.note.is_empty() {
             return Err(FpError::from(TenantError::ValidationError(
                 "note cannot be empty".to_owned(),

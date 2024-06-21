@@ -2,9 +2,9 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::FpResult;
 use api_wire_types::CreateLabelRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault_label::ScopedVaultLabel;
@@ -33,7 +33,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             ScopedVaultLabel::create(conn, sv, label_kind)?;
             Ok(())
@@ -58,7 +58,7 @@ pub async fn get(
 
     let label = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             Ok(ScopedVaultLabel::get_active(conn, &sv.id)?)
         })

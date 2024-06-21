@@ -1,10 +1,10 @@
 use super::TenantVw;
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::batch_execute_decrypt_requests;
 use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
+use crate::FpResult;
 use crate::State;
 use db::models::access_event::AccessEvent;
 use db::models::access_event::NewAccessEventRow;
@@ -53,19 +53,19 @@ pub async fn bulk_decrypt<'a, TKey, T>(
     // maybe unchecked too so it doesn't error if the user can't decrypt???
     // integration test for user with role that can't decrypt
     access_event: DecryptAccessEventInfo,
-) -> ApiResult<Vec<(TKey, DecryptedData)>>
+) -> FpResult<Vec<(TKey, DecryptedData)>>
 where
     TKey: Eq + std::hash::Hash + 'static + Clone,
 {
     let requests = requests
         .into_iter()
-        .map(|(k, r)| -> ApiResult<_> {
+        .map(|(k, r)| -> FpResult<_> {
             let BulkDecryptReq { vw, targets } = r;
             let targets = r.vw.check_ob_config_access(targets)?;
             let req = BulkDecryptReq { vw, targets };
             Ok((k, req))
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<FpResult<Vec<_>>>()?;
 
     let decrypt_requests = requests
         .iter()
@@ -87,7 +87,7 @@ where
     // Separate the results into access events and decrypted results
     let (access_events, decrypted_results): (Vec<_>, Vec<_>) = results
         .into_iter()
-        .map(|(key, res)| -> ApiResult<_> {
+        .map(|(key, res)| -> FpResult<_> {
             let DecryptUncheckedResult::<PiiJsonValue> {
                 decrypted_dis,
                 results,
@@ -100,7 +100,7 @@ where
             let decrypted_result = (key, results);
             Ok((access_event, decrypted_result))
         })
-        .collect::<ApiResult<Vec<_>>>()?
+        .collect::<FpResult<Vec<_>>>()?
         .into_iter()
         .unzip();
 
@@ -118,12 +118,12 @@ where
     {
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let insight = insight.insert_with_conn(conn)?;
 
                 let access_and_audit_events = access_events
                     .into_iter()
-                    .map(|(fp_id, targets)| -> ApiResult<_> {
+                    .map(|(fp_id, targets)| -> FpResult<_> {
                         let sv = fp_id_to_sv
                             .remove(&fp_id)
                             .ok_or(AssertionError("No ScopedVault for key"))?;
@@ -161,7 +161,7 @@ where
 
                         Ok((access_event, audit_event))
                     })
-                    .collect::<ApiResult<Vec<_>>>()?;
+                    .collect::<FpResult<Vec<_>>>()?;
 
                 for chunk in access_and_audit_events
                     .into_iter()

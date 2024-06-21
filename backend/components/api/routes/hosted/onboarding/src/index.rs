@@ -10,7 +10,6 @@ use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
@@ -19,6 +18,7 @@ use api_core::utils::onboarding::NewOnboardingArgs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::PrefillKind;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::FpResult;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use api_wire_types::PostOnboardingRequest;
 use db::models::insight_event::CreateInsightEvent;
@@ -57,7 +57,7 @@ pub async fn post(
         .ok_or(OnboardingError::NoObConfig)?;
     let (scoped_user, ob_config, tenant, vw) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
             let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &obc_id)?;

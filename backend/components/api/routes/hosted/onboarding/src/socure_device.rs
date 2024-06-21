@@ -3,7 +3,7 @@ use crate::types::ModernApiResult;
 use crate::State;
 use actix_web::web::Json;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::errors::ApiResult;
+use api_core::FpResult;
 use api_wire_types::hosted::socure_device::SocureDeviceSessionIdRequest;
 use db::models::socure_device_session::SocureDeviceSession;
 use paperclip::actix::api_v2_operation;
@@ -30,7 +30,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             SocureDeviceSession::create(conn, device_session_id, wf_id)?;
 
             Ok(())

@@ -1,7 +1,7 @@
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::db2api::DbToApi;
 use crate::utils::db2api::TryDbToApi;
+use crate::FpResult;
 use api_wire_types::Actor;
 use api_wire_types::AuditEvent;
 use api_wire_types::AuditEventDetail;
@@ -11,7 +11,7 @@ use newtypes::AuditEventMetadata;
 use newtypes::AuditEventName;
 
 impl TryDbToApi<JoinedAuditEvent> for AuditEvent {
-    fn try_from_db(event: JoinedAuditEvent) -> ApiResult<Self> {
+    fn try_from_db(event: JoinedAuditEvent) -> FpResult<Self> {
         let JoinedAuditEvent {
             audit_event,
             tenant: _,

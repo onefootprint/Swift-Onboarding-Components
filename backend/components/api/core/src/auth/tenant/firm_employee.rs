@@ -3,7 +3,7 @@ use crate::auth::session::ExtractableAuthSession;
 use crate::auth::session::RequestInfo;
 use crate::auth::AuthError;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use db::PgConn;
@@ -48,7 +48,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
         conn: &mut PgConn,
         ff_client: Arc<dyn FeatureFlagClient>,
         _: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         // Uniquely, this kind of auth allows extracting the user from two different types of tokens
         let (tenant_user, auth_method) = match auth_session {
             AuthSessionData::TenantRb(data) => {
@@ -92,7 +92,7 @@ pub enum FirmEmployeeGuard {
 }
 
 impl FirmEmployeeAuthContext {
-    pub fn check_guard(self, guard: FirmEmployeeGuard) -> ApiResult<SessionContext<FirmEmployeeAuth>> {
+    pub fn check_guard(self, guard: FirmEmployeeGuard) -> FpResult<SessionContext<FirmEmployeeAuth>> {
         match guard {
             FirmEmployeeGuard::Any => (),
             FirmEmployeeGuard::RiskOps => {

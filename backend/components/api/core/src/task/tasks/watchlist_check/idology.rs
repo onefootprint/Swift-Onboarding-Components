@@ -5,7 +5,7 @@ use crate::decision::vendor::VendorAPIError;
 use crate::decision::{
     self,
 };
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use db::models::risk_signal::NewRiskSignalInfo;
@@ -29,7 +29,7 @@ pub async fn complete_vendor_call(
     di_id: &DecisionIntentId,
     tenant_id: &TenantId,
     existing_response: Option<(PaResponse, VerificationResultId)>,
-) -> ApiResult<Vec<NewRiskSignalInfo>> {
+) -> FpResult<Vec<NewRiskSignalInfo>> {
     let (reason_codes, vres_id) = if let Some((res, vres_id)) = existing_response {
         // we already successfully completed a IdologyPa call for this watchlist task, so just return reason
         // codes from it
@@ -51,7 +51,7 @@ async fn make_vendor_call(
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     tenant_id: &TenantId,
-) -> ApiResult<(VendorResponse, VerificationResult)> {
+) -> FpResult<(VendorResponse, VerificationResult)> {
     // TODO: consolidate this with make_idv_vendor_call_save_vreq_vres
     let vendor_api = VendorAPI::IdologyPa;
     let svid = sv_id.clone();
@@ -96,7 +96,7 @@ async fn make_vendor_call(
     let svid = sv_id.clone();
     let (res, vres) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let uv = Vault::get(conn, &svid)?;
             let vres = verification_result::save_vres(conn, &uv.public_key, &res, &vreq)?;
             Ok((res, vres))
@@ -106,7 +106,7 @@ async fn make_vendor_call(
     Ok((res?, vres))
 }
 
-fn parse_reason_codes(res: PaResponse) -> ApiResult<Vec<FootprintReasonCode>> {
+fn parse_reason_codes(res: PaResponse) -> FpResult<Vec<FootprintReasonCode>> {
     if let Some(restriction) = res.response.restriction {
         Ok(PaWatchlistHit::to_footprint_reason_codes(
             restriction.watchlists(),

@@ -1,11 +1,11 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
 use api_core::FpError;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::CreateListEntryRequest;
 use crypto::aead::AeadSealedBytes;
@@ -45,7 +45,7 @@ pub async fn create_list_entry(
     let tid = tenant_id.clone();
     let (tenant, list, existing_entries) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let t = Tenant::get(conn, &tid)?;
             let list = List::get(conn, &tid, is_live, &list_id)?;
             let entries = ListEntry::list(conn, &list_id)?;
@@ -76,10 +76,10 @@ pub async fn create_list_entry(
     let insight = CreateInsightEvent::from(insights);
     let list_entries = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let canonicalized = entries
                 .into_iter()
-                .map(|d| -> ApiResult<_> {
+                .map(|d| -> FpResult<_> {
                     let parsed = ListEntryValue::parse(list.kind, d)?;
                     Ok(parsed.canonicalize())
                 })
@@ -90,7 +90,7 @@ pub async fn create_list_entry(
                 .into_iter()
                 .unique()
                 .filter(|canon| !decrypted_existing_entries.contains(canon))
-                .map(|canon| -> ApiResult<_> {
+                .map(|canon| -> FpResult<_> {
                     let enc = key.seal_bytes(canon.leak().as_bytes()).map(|b| b.into())?;
                     Ok(enc)
                 })

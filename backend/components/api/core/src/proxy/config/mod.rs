@@ -7,7 +7,7 @@ use crate::api_headers_schema;
 use crate::auth::tenant::TenantAuth;
 use crate::enclave_client::DecryptReq;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use actix_web::http::header::HeaderMap;
 use api_errors::FpError;
@@ -145,7 +145,7 @@ impl TryFrom<(JitProxyHeaderParams, ProxyHeaderParams, &HeaderMap)> for ProxyCon
     /// Parses the intended Proxy configuration from the request
     fn try_from(
         (jit_params, params, headers): (JitProxyHeaderParams, ProxyHeaderParams, &HeaderMap),
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let egress_headers = ForwardProxyHeaders::try_from(headers)?;
         let pinned_certs = PinnedServerCertificates::try_from(headers)?;
         let client_certs = ParsedClientCertificate::try_from(&params)?;
@@ -190,7 +190,7 @@ impl ProxyConfig {
         proxy_id: ProxyConfigId,
         params: ProxyHeaderParams,
         header_map: &HeaderMap,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let tenant_id = auth.tenant().id.clone();
         let is_live = auth.is_live()?;
 

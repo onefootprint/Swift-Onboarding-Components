@@ -1,8 +1,8 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
+use api_core::FpResult;
 use api_core::State;
 use db::models::list::List;
 use newtypes::ListId;
@@ -25,7 +25,7 @@ pub async fn deactivate_list(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let list = List::lock(conn, &tenant_id, is_live, &list_id)?;
             List::deactivate(conn, list)?;
             Ok(())

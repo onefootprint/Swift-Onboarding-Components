@@ -1,8 +1,8 @@
 use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::ApiErrorKind;
+use crate::FpResult;
 use chrono::Days;
 use chrono::NaiveDate;
 use chrono::Utc;
@@ -32,7 +32,7 @@ pub async fn generate_user_input_risk_signals(
     obc: &ObConfiguration,
     vendor_api: VendorAPI,
     vres_id: &VerificationResultId,
-) -> ApiResult<Vec<NewRiskSignalInfo>> {
+) -> FpResult<Vec<NewRiskSignalInfo>> {
     let fields = &[
         DataIdentifier::Id(IDK::VisaKind),
         DataIdentifier::Id(IDK::VisaExpirationDate),
@@ -85,7 +85,7 @@ async fn visa_features(
     kind: Option<PiiString>,
     expiration: Option<PiiString>,
     now: NaiveDate,
-) -> ApiResult<Vec<FootprintReasonCode>> {
+) -> FpResult<Vec<FootprintReasonCode>> {
     let mut frc = vec![];
 
     let visa = VisaForFeatures::from_values(kind, expiration);
@@ -144,7 +144,7 @@ pub fn user_input_based_risk_signals(
     frcs
 }
 
-fn age_gte(dob: PiiString, age_to_check: i32) -> ApiResult<bool> {
+fn age_gte(dob: PiiString, age_to_check: i32) -> FpResult<bool> {
     // from the vault so should be valid age
     let dob = NaiveDate::parse_from_str(dob.leak(), DATE_FORMAT)
         .map_err(|_| ApiErrorKind::AssertionError("not a valid date".to_string()))?;

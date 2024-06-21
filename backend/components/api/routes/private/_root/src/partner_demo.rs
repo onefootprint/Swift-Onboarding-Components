@@ -5,9 +5,9 @@ use actix_web::web::Json;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::utils::session::AuthSession;
+use api_core::FpResult;
 use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::partner_tenant::NewPartnerTenant;
@@ -96,7 +96,7 @@ pub async fn post(
 
     let (pt_id, partner_tenant_users, demo_tenants) = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let pt = PartnerTenant::create(
                 conn,
                 NewPartnerTenant {
@@ -135,7 +135,7 @@ pub async fn post(
             // Create partner users and mint short-lived sessions.
             let partner_tenant_users = partner_tenant_user_names
                 .into_iter()
-                .map(|(first, last)| -> ApiResult<_> {
+                .map(|(first, last)| -> FpResult<_> {
                     let email = format!(
                         "{}.{}@compliance-automation-demo-email-{}.onefootprint.com",
                         &first,
@@ -158,7 +158,7 @@ pub async fn post(
                         token: auth_token,
                     })
                 })
-                .collect::<ApiResult<Vec<_>>>()?;
+                .collect::<FpResult<Vec<_>>>()?;
 
             let mut demo_tenants = vec![];
             for (tenant_spec, (public_key, e_private_key)) in tenant_specs.into_iter().zip(tenant_keys) {
@@ -198,7 +198,7 @@ pub async fn post(
                 let users = tenant_spec
                     .user_names
                     .into_iter()
-                    .map(|(first, last)| -> ApiResult<_> {
+                    .map(|(first, last)| -> FpResult<_> {
                         let email = format!(
                             "{}.{}@compliance-automation-demo-email-{}.onefootprint.com",
                             &first,
@@ -233,7 +233,7 @@ pub async fn post(
                             token: auth_token,
                         })
                     })
-                    .collect::<ApiResult<Vec<_>>>()?;
+                    .collect::<FpResult<Vec<_>>>()?;
 
                 demo_tenants.push(DemoTenant {
                     id: tenant.id,

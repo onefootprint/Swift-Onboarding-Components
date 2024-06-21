@@ -1,7 +1,6 @@
 use super::get_transformer;
 use super::IngressRule;
 use crate::auth::tenant::TenantAuth;
-use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DataLifetimeSources;
@@ -11,6 +10,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{
     self,
 };
+use crate::FpResult;
 use crate::State;
 use api_errors::FpError;
 use db::models::access_event::NewAccessEventRow;
@@ -48,7 +48,7 @@ pub async fn vault_pii(
     auth: &dyn TenantAuth,
     values: HashMap<IngressRule, PiiString>,
     insights: InsightHeaders,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     // no need to DB ops if no ingress to vault
     if values.is_empty() {
         return Ok(());
@@ -85,7 +85,7 @@ pub async fn vault_pii(
                     None
                 }
             })
-            .collect::<ApiResult<Vec<_>>>()?
+            .collect::<FpResult<Vec<_>>>()?
             .into_iter()
             .collect::<HashMap<_, _>>();
 
@@ -113,7 +113,7 @@ pub async fn vault_pii(
         let data = data
             .into_iter()
             .map(|(di, filters, value)| Ok((di, filters.apply_str::<PiiString>(value.leak())?)))
-            .collect::<ApiResult<Vec<_>>>()?;
+            .collect::<FpResult<Vec<_>>>()?;
 
         let data: HashMap<_, _> = data.into_iter().collect();
         let documents: HashMap<_, _> = documents.into_iter().collect();
@@ -155,7 +155,7 @@ pub async fn vault_pii(
         let actor = auth.actor();
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let vault = Vault::get(conn, &sv.id)?;
 
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
@@ -266,10 +266,10 @@ async fn encrypt_document(
     fp_id: FpId,
     tenant_id: TenantId,
     is_live: bool,
-) -> ApiResult<EncryptedDocumentToStore> {
+) -> FpResult<EncryptedDocumentToStore> {
     let (vault, scoped_vault) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vault = Vault::get(conn, &scoped_vault.id)?;
             Ok((vault, scoped_vault))

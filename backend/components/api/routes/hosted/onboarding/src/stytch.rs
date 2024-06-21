@@ -6,10 +6,10 @@ use actix_web::web::Json;
 use api_core::auth::user::UserAuth;
 use api_core::decision;
 use api_core::decision::vendor;
-use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::utils::headers::TelemetryHeaders;
 use api_core::FpError;
+use api_core::FpResult;
 use api_wire_types::hosted::stytch::StytchTelemetryRequest;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
@@ -79,7 +79,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn: &mut db::TxnPgConn<'_>| -> ApiResult<_> {
+        .db_transaction(move |conn: &mut db::TxnPgConn<'_>| -> FpResult<_> {
             let di = DecisionIntent::create(
                 conn,
                 DecisionIntentKind::DeviceFingerprint,
@@ -130,7 +130,7 @@ fn save_successful_response(
     sv_id: &ScopedVaultId,
     telemetry_headers: TelemetryHeaders,
     hide_risk_signals: bool,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let vendor_response = VendorResponse {
         response: ParsedResponse::StytchLookup(res.parsed_response.clone()),
         raw_response: res.raw_response,

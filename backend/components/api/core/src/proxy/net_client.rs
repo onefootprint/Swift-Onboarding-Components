@@ -2,7 +2,7 @@ use super::config::EgressConfig;
 use super::ssrf_protection::validate_safe_url;
 use super::ssrf_protection::PublicIpDNSResolver;
 use crate::errors::proxy::VaultProxyError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use bytes::Bytes;
 use chrono::Utc;
@@ -30,7 +30,7 @@ pub async fn proxy_request(
     config_id: Option<ProxyConfigId>,
     body: PiiString,
     config: EgressConfig,
-) -> ApiResult<ProxyResponse> {
+) -> FpResult<ProxyResponse> {
     // Prevent SSRF as much as possible before DNS resolution.
     validate_safe_url(&config.url)?;
 
@@ -123,7 +123,7 @@ pub async fn proxy_request(
     })
 }
 
-async fn record_reqwest_error(log: ProxyRequestLog, state: &State, error: &reqwest::Error) -> ApiResult<()> {
+async fn record_reqwest_error(log: ProxyRequestLog, state: &State, error: &reqwest::Error) -> FpResult<()> {
     let update = FinishedRequestLog {
         status_code: None,
         e_response_data: None,
@@ -146,7 +146,7 @@ async fn record_reqwest_error(log: ProxyRequestLog, state: &State, error: &reqwe
 // headers and filtering out a few we know are dangerous. For example, Set-Cookie may be dangerous
 // in some contexts, but not others. For example, Fetch APIs ignore Set-Cookie in the response, but
 // XMLHttpRequest may set cookies received in the response if withCredentials is true.
-fn sanitize_headers(original_headers: HeaderMap) -> ApiResult<HeaderMap> {
+fn sanitize_headers(original_headers: HeaderMap) -> FpResult<HeaderMap> {
     let mut ret = HeaderMap::new();
 
     // Make sure the browser doesn't try to guess the content type if it does manage to render the

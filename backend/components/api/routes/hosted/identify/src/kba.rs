@@ -3,11 +3,11 @@ use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
-use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
+use api_core::FpResult;
 use api_wire_types::KbaResponse;
 use itertools::Itertools;
 use newtypes::put_data_request::RawDataRequest;
@@ -47,7 +47,7 @@ pub async fn post(
     let id = user_auth.user_identifier();
     let vw = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_query(move |conn| -> FpResult<_> {
             let args = VwArgs::from(&id);
             let vw = VaultWrapper::<Any>::build(conn, args)?;
             Ok(vw)
@@ -59,19 +59,19 @@ pub async fn post(
     let successful_kba = data
         .data
         .into_iter()
-        .map(|(di, kba_response)| -> ApiResult<_> {
+        .map(|(di, kba_response)| -> FpResult<_> {
             let actual = decrypted.get_di(di.clone())?;
             if !crypto::safe_compare(actual.leak().as_bytes(), kba_response.leak().as_bytes()) {
                 return ValidationError(&format!("Incorrect KBA response for {}", di)).into();
             }
             Ok(di)
         })
-        .collect::<ApiResult<Vec<_>>>()?;
+        .collect::<FpResult<Vec<_>>>()?;
 
     let session_key = state.session_sealing_key.clone();
     let token = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let context = NewUserSessionContext {
                 kba: successful_kba,
                 ..Default::default()

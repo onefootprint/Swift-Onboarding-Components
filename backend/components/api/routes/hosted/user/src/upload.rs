@@ -1,10 +1,10 @@
 use crate::auth::user::UserAuthScope;
-use crate::errors::ApiResult;
 use crate::utils::file_upload;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::{
     self,
 };
+use crate::FpResult;
 use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
@@ -52,7 +52,7 @@ pub async fn post(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &user_auth.scoped_user.id)?;
             let doc = uvw.put_document_unsafe(
                 conn,

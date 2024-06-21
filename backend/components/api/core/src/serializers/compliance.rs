@@ -1,7 +1,7 @@
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::db2api::DbToApi;
 use crate::utils::db2api::TryDbToApi;
+use crate::FpResult;
 use db::helpers::ActiveDocResources;
 use db::helpers::ComplianceDocSummary;
 use db::models::compliance_doc_template::ComplianceDocTemplate;
@@ -13,7 +13,7 @@ use newtypes::ComplianceDocStatus;
 use newtypes::TenantUserId;
 
 impl TryDbToApi<(&ComplianceDocSummary, &TenantObConfigCounts)> for api_wire_types::ComplianceCompanySummary {
-    fn try_from_db(target: (&ComplianceDocSummary, &TenantObConfigCounts)) -> ApiResult<Self> {
+    fn try_from_db(target: (&ComplianceDocSummary, &TenantObConfigCounts)) -> FpResult<Self> {
         let (summary, counts) = target;
 
         let num_controls_complete = summary.num_controls_complete()?;
@@ -31,7 +31,7 @@ impl TryDbToApi<(&ComplianceDocSummary, &TenantObConfigCounts)> for api_wire_typ
 }
 
 impl TryDbToApi<(&ComplianceDocSummary, &TenantUserId)> for api_wire_types::LiteOrgMember {
-    fn try_from_db(target: (&ComplianceDocSummary, &TenantUserId)) -> ApiResult<Self> {
+    fn try_from_db(target: (&ComplianceDocSummary, &TenantUserId)) -> FpResult<Self> {
         let (summary, user_id) = target;
         let user = summary
             .users
@@ -42,7 +42,7 @@ impl TryDbToApi<(&ComplianceDocSummary, &TenantUserId)> for api_wire_types::Lite
 }
 
 impl TryDbToApi<(&ComplianceDocSummary, &ComplianceDocId)> for api_wire_types::ComplianceDocSummary {
-    fn try_from_db(target: (&ComplianceDocSummary, &ComplianceDocId)) -> ApiResult<Self> {
+    fn try_from_db(target: (&ComplianceDocSummary, &ComplianceDocId)) -> FpResult<Self> {
         let (summary, doc_id) = target;
         let doc = summary
             .docs

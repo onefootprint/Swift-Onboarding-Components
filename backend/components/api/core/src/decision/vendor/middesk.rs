@@ -173,7 +173,7 @@ impl TryFrom<VendorAPI> for MiddeskVendorApi {
 }
 
 impl MiddeskStates {
-    async fn init(db_pool: &DbPool, middesk_request: MiddeskRequest) -> ApiResult<MiddeskStates> {
+    async fn init(db_pool: &DbPool, middesk_request: MiddeskRequest) -> FpResult<MiddeskStates> {
         let di_id = middesk_request.decision_intent_id.clone();
         let all_vreq_vres = db_pool
             .db_query(move |conn| VerificationRequest::list(conn, &di_id))
@@ -260,7 +260,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         self,
         state: &State,
         tenant_id: &TenantId,
-    ) -> ApiResult<MiddeskState<AwaitingBusinessUpdateWebhook>> {
+    ) -> FpResult<MiddeskState<AwaitingBusinessUpdateWebhook>> {
         let vreq_id = self.state.create_business_vreq.id.clone();
         let wf_id = self.middesk_request.workflow_id;
 
@@ -319,7 +319,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
         let middesk_request_id = self.middesk_request.id.clone();
         let (udpated_middesk_request, business_update_webhook_vreq) = state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let uv = VerificationRequest::get_user_vault(conn, vreq_id)?;
                 let _vres = verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
 
@@ -356,7 +356,7 @@ impl MiddeskState<AwaitingBusinessUpdateWebhook> {
         db_pool: &DbPool,
         middesk_response: MiddeskBusinessUpdateWebhookResponse,
         raw_res: serde_json::Value,
-    ) -> ApiResult<MiddeskStates> {
+    ) -> FpResult<MiddeskStates> {
         let webhook_vreq: VerificationRequest = self.state.business_update_webhook_vreq.clone();
         let mr = middesk_response.clone();
         let has_tin_error = mr.has_tin_error();
@@ -365,7 +365,7 @@ impl MiddeskState<AwaitingBusinessUpdateWebhook> {
 
         let middesk_request_id = self.middesk_request.id.clone();
         let (updated_middesk_request, vres, tin_retry_vreq) = db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let uv = VerificationRequest::get_user_vault(conn, webhook_vreq.id.clone())?;
 
                 let vendor_response = VendorResponse {
@@ -423,7 +423,7 @@ impl MiddeskState<AwaitingTinRetry> {
         db_pool: &DbPool,
         middesk_response: MiddeskTinRetriedWebhookResponse,
         raw_res: serde_json::Value,
-    ) -> ApiResult<MiddeskState<PendingGetBusinessCall>> {
+    ) -> FpResult<MiddeskState<PendingGetBusinessCall>> {
         let mr = middesk_response.clone();
         let webhook_vreq = self.state.tin_retry_vreq;
         let sv_id = webhook_vreq.scoped_vault_id.clone();
@@ -431,7 +431,7 @@ impl MiddeskState<AwaitingTinRetry> {
         let middesk_request_id = self.middesk_request.id.clone();
 
         let (updated_middesk_request, get_business_vreq) = db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let uv = VerificationRequest::get_user_vault(conn, webhook_vreq.id.clone())?;
 
                 let vendor_response = VendorResponse {
@@ -479,7 +479,7 @@ impl MiddeskState<PendingGetBusinessCall> {
         >,
         config: &Config,
         enclave_client: &EnclaveClient,
-    ) -> ApiResult<MiddeskStates> {
+    ) -> FpResult<MiddeskStates> {
         let business_id = self
             .middesk_request
             .business_id
@@ -508,7 +508,7 @@ impl MiddeskState<PendingGetBusinessCall> {
         // TODO: refactor code sites where we save a single vres to share a common func
         let vr = (self.state.get_business_vreq.clone(), vendor_response.clone());
         let (updated_middesk_request, business_response_vres) = db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let (_, uv) = Workflow::get_with_vault(conn, &wf.id)?;
                 let vres = verification_result::save_verification_result(conn, &vr, &uv.public_key)?;
 
@@ -533,11 +533,11 @@ impl MiddeskState<PendingGetBusinessCall> {
 }
 
 impl MiddeskState<Complete> {
-    pub async fn run_kyb_decisioning(self, state: &State) -> ApiResult<()> {
+    pub async fn run_kyb_decisioning(self, state: &State) -> FpResult<()> {
         let wfid = self.middesk_request.workflow_id.clone();
         let (v, sv, wf) = state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_query(move |conn| -> FpResult<_> {
                 let (_, v) = Workflow::get_with_vault(conn, &wfid)?;
                 let (wf, sv) = Workflow::get_all(conn, &wfid)?;
                 Ok((v, sv, wf))
@@ -591,7 +591,7 @@ impl MiddeskState<Complete> {
         let obc_id = wf.ob_configuration_id.clone();
         state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 let rsg = RiskSignalGroup::get_or_create(conn, &sv.id, RiskSignalGroupKind::Kyb)?;
                 RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)?;
                 BillingEvent::create(conn, &sv.id, Some(&obc_id), BillingEventKind::Kyb)?;
@@ -617,9 +617,9 @@ impl MiddeskState<Complete> {
 pub async fn init_middesk_request(
     db_pool: &DbPool,
     wf_id: WorkflowId,
-) -> ApiResult<MiddeskState<PendingCreateBusinessCall>> {
+) -> FpResult<MiddeskState<PendingCreateBusinessCall>> {
     let (middesk_request, create_business_vreq) = db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let wf = Workflow::lock(conn, &wf_id)?;
             // TODO should these state transitions be handled by the ww machines?
             let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
@@ -657,7 +657,7 @@ pub async fn init_middesk_request(
 
 // Insertion point 2: We are receiving either a `business.updated` or `tin.retried` webhook from
 // Middesk
-pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> ApiResult<()> {
+pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> FpResult<()> {
     let webhook_res = middesk::response::webhook::parse_webhook(res.clone()).map_err(idv::Error::from)?;
     let business_id = webhook_res
         .business_id()
@@ -713,7 +713,7 @@ async fn send_middesk_call(
     business_data: BusinessDataForRequest,
     ob_configuration_key: ObConfigurationKey,
     tenant_id: &TenantId,
-) -> ApiResult<MiddeskCreateBusinessResponse> {
+) -> FpResult<MiddeskCreateBusinessResponse> {
     if config.service_config.is_production()
         || ff_client.flag(BoolFlag::EnableMiddeskInNonProd(&ob_configuration_key))
     {
@@ -763,7 +763,7 @@ impl MiddeskResponseDerivedVaultData {
         state: &State,
         business_response: &BusinessResponse,
         sv: &ScopedVault,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         let formation = business_response.formation.as_ref();
         let data = vec![
             formation
@@ -809,7 +809,7 @@ impl MiddeskResponseDerivedVaultData {
         }
     }
 
-    pub fn write(self, conn: &mut TxnPgConn) -> ApiResult<()> {
+    pub fn write(self, conn: &mut TxnPgConn) -> FpResult<()> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
         let dis = Self::DATA_KINDS
             .iter()

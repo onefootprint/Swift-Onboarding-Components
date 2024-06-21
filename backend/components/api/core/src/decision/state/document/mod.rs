@@ -5,7 +5,7 @@ use super::Workflow;
 use super::WorkflowActions;
 use super::WorkflowKind;
 use super::WorkflowState;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -24,7 +24,7 @@ pub enum DocumentState {
 }
 
 impl DocumentState {
-    pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow) -> FpResult<Self> {
         let newtypes::WorkflowState::Document(s) = workflow.state else {
             return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into());
         };
@@ -57,7 +57,7 @@ impl Workflow for DocumentState {
         state: &State,
         action: WorkflowActions,
         workflow_id: WorkflowId,
-    ) -> ApiResult<WorkflowKind> {
+    ) -> FpResult<WorkflowKind> {
         let new_state = match (self, action) {
             (Self::DataCollection(s), WorkflowActions::DocCollected(a)) => {
                 s.do_action(state, a, workflow_id).await?

@@ -1,9 +1,9 @@
-use api_core::errors::ApiResult;
+use api_core::FpResult;
 use criterion::criterion_group;
 use criterion::criterion_main;
 use criterion::Criterion;
 
-fn api_error() -> ApiResult<()> {
+fn api_error() -> FpResult<()> {
     Ok(())
 }
 

@@ -16,7 +16,7 @@ use crate::decision::state::test_utils::WithQualifier;
 use crate::decision::state::MakeDecision;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_instance::NewRule;
@@ -72,7 +72,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     //
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let expr = RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                 field: FRC::DobCouldNotMatch,
                 op: BooleanOperator::Equals,
@@ -251,7 +251,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
     //
     state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let kyc_stepup_rule = NewRule {
                 rule_expression: RuleExpression(vec![RuleExpressionCondition::RiskSignal {
                     field: FRC::DobCouldNotMatch,

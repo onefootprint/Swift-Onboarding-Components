@@ -1,6 +1,6 @@
-use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::errors::ValidationError;
+use crate::FpResult;
 use api_wire_types::UnvalidatedRuleExpression;
 use db::models::list::List;
 use newtypes::AllData;
@@ -71,7 +71,7 @@ pub fn validate_rule_expression(
     rule_expression: UnvalidatedRuleExpression,
     lists: &HashMap<ListId, List>,
     is_live: bool,
-) -> ApiResult<(RuleExpression, RuleInstanceKind)> {
+) -> FpResult<(RuleExpression, RuleInstanceKind)> {
     for condition in rule_expression.0.iter() {
         match condition {
             RuleExpressionCondition::RiskSignal { .. } => {}
@@ -400,7 +400,7 @@ mod tests {
     ], Err(FpError::from(NewtypeError::ParsingError(DiValidationError::CannotParseEnum(strum::ParseError::VariantNotFound)))))]
     fn test_validate_rule_expression_for_rule_instance_kind(
         recs: Vec<RuleExpressionCondition>,
-        expected_kind: ApiResult<RuleInstanceKind>,
+        expected_kind: FpResult<RuleInstanceKind>,
     ) {
         let unvalidated = UnvalidatedRuleExpression(recs);
         let lists = HashMap::from_iter([(test_list_id(), test_list(ListKind::IpAddress))]);

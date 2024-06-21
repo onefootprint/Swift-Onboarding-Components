@@ -7,8 +7,8 @@ use super::{
     kyb::*,
     kyc::*,
 };
-use crate::errors::ApiResult;
 use crate::task;
+use crate::FpResult;
 use crate::State;
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
@@ -44,7 +44,7 @@ pub(super) trait OnAction<TAction, TWorkflow>: WorkflowState + Clone {
         &self,
         action: TAction,
         state: &State,
-    ) -> ApiResult<Self::AsyncRes>;
+    ) -> FpResult<Self::AsyncRes>;
     // TODO: maybe in future this could be modeled as Actions vs Transitions. So OnAction, you perform
     // the action and then return a Transition which actually encapsulates the new state and
     // whatever other writes need to occur for that state
@@ -53,15 +53,14 @@ pub(super) trait OnAction<TAction, TWorkflow>: WorkflowState + Clone {
         wf: Locked<DbWorkflow>,
         async_res: Self::AsyncRes,
         conn: &mut TxnPgConn,
-    ) -> ApiResult<TWorkflow>;
+    ) -> FpResult<TWorkflow>;
 }
 
 #[async_trait]
 /// Provides an automatic implementation to handle a given TAction for types that implement
 /// OnAction<TAction>
 pub(super) trait DoAction<TAction, TWorkflow> {
-    async fn do_action(self, state: &State, action: TAction, workflow_id: WorkflowId)
-        -> ApiResult<TWorkflow>;
+    async fn do_action(self, state: &State, action: TAction, workflow_id: WorkflowId) -> FpResult<TWorkflow>;
 }
 
 #[async_trait]
@@ -75,17 +74,12 @@ where
         "<T, TAction, TWorkflow> DoAction<TAction, TWorkflow>::do_action",
         skip(self, state)
     )]
-    async fn do_action(
-        self,
-        state: &State,
-        action: TAction,
-        workflow_id: WorkflowId,
-    ) -> ApiResult<TWorkflow> {
+    async fn do_action(self, state: &State, action: TAction, workflow_id: WorkflowId) -> FpResult<TWorkflow> {
         let r = self.execute_async_idempotent_actions(action, state).await?;
         let current_state = self.name();
         let (result, wf_source) = state
             .db_pool
-            .db_transaction(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> FpResult<_> {
                 // TODO pass the workflow into `on_commit` so we don't have to fetch + lock again
                 let wf = DbWorkflow::lock(conn, &workflow_id)?;
                 if wf.state != current_state {
@@ -125,5 +119,5 @@ pub trait Workflow: Clone + Into<WorkflowKind> + std::marker::Send + std::marker
         state: &State,
         action: WorkflowActions,
         workflow_id: WorkflowId,
-    ) -> ApiResult<WorkflowKind>;
+    ) -> FpResult<WorkflowKind>;
 }

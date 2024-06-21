@@ -1,4 +1,4 @@
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::annotation::Annotation;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
@@ -25,7 +25,7 @@ pub fn save_review_decision(
     status: DecisionStatus,
     annotation: Option<CreateAnnotationRequest>,
     actor: DbActor,
-) -> ApiResult<()> {
+) -> FpResult<()> {
     let wf = Workflow::lock(conn, &wf.id)?;
     let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
 

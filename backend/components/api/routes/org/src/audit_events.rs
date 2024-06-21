@@ -1,12 +1,12 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::errors::ApiResult;
 use api_core::types::request::CursorPaginationRequest;
 use api_core::types::response::CursorPaginatedResponse;
 use api_core::types::Base64Cursor;
 use api_core::types::CursorPaginatedResponseInner;
 use api_core::utils::db2api::TryDbToApi;
+use api_core::FpResult;
 use api_core::State;
 use api_wire_types::AuditEvent;
 use api_wire_types::AuditEventRequest;
@@ -80,7 +80,7 @@ async fn get(
         .into_iter()
         .take(page_size)
         .map(api_wire_types::AuditEvent::try_from_db)
-        .collect::<ApiResult<Vec<api_wire_types::AuditEvent>>>()?;
+        .collect::<FpResult<Vec<api_wire_types::AuditEvent>>>()?;
     CursorPaginatedResponseInner::ok(response, next_cursor, None)
 }
 

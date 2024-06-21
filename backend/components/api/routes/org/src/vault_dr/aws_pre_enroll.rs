@@ -2,9 +2,9 @@ use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
-use api_core::errors::ApiResult;
 use api_core::types::ModernApiResult;
 use api_core::ApiErrorKind;
+use api_core::FpResult;
 use api_core::State;
 use crypto::hex::ToHex;
 use db::models::vault_dr::NewVaultDrAwsPreEnrollment;
@@ -29,7 +29,7 @@ pub async fn post(
 
     let pre_enrollment = state
         .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> FpResult<_> {
             let new_pre_enrollment = NewVaultDrAwsPreEnrollment {
                 tenant_id: &tenant.id,
                 is_live,
@@ -60,9 +60,7 @@ pub async fn get(
 
     let pre_enrollment = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            Ok(VaultDrAwsPreEnrollment::get(conn, &tenant_id, is_live)?)
-        })
+        .db_query(move |conn| -> FpResult<_> { Ok(VaultDrAwsPreEnrollment::get(conn, &tenant_id, is_live)?) })
         .await?;
 
     let Some(pre_enrollment) = pre_enrollment else {

@@ -9,8 +9,8 @@ use crate::auth::user::UserAuth;
 use crate::auth::AuthError;
 use crate::auth::IsGuardMet;
 use crate::auth::SessionContext;
-use crate::errors::ApiResult;
 use crate::utils::session::AuthSession;
+use crate::FpResult;
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
@@ -47,7 +47,7 @@ pub struct UserSessionContext {
 }
 
 impl UserSessionContext {
-    pub fn did_use_passkey(&self, conn: &mut PgConn) -> ApiResult<bool> {
+    pub fn did_use_passkey(&self, conn: &mut PgConn) -> FpResult<bool> {
         let aes = load_auth_events(conn, &self.auth_events)?;
         Ok(aes.iter().any(|(ae, _)| ae.kind == AuthEventKind::Passkey))
     }
@@ -56,7 +56,7 @@ impl UserSessionContext {
 pub fn load_auth_events(
     conn: &mut PgConn,
     auth_events: &[AssociatedAuthEvent],
-) -> ApiResult<Vec<(AuthEvent, AssociatedAuthEventKind)>> {
+) -> FpResult<Vec<(AuthEvent, AssociatedAuthEventKind)>> {
     let id_to_kind: HashMap<_, _> = auth_events.iter().map(|e| (e.id.clone(), e.kind)).collect();
     let ids = id_to_kind.keys().cloned().collect_vec();
     let aes = AuthEvent::get_bulk(conn, &ids)?;
@@ -146,7 +146,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
         conn: &mut PgConn,
         _: Arc<dyn FeatureFlagClient>,
         req: RequestInfo,
-    ) -> ApiResult<Self> {
+    ) -> FpResult<Self> {
         match value {
             AuthSessionData::User(data) => {
                 let vault = Vault::get(conn, &data.user_vault_id)?;
@@ -237,7 +237,7 @@ impl CheckedUserAuthContext {
         session_key: &ScopedSealingKey,
         session: AuthSessionData,
         max_duration: Option<Duration>,
-    ) -> ApiResult<(SessionAuthToken, DateTime<Utc>)> {
+    ) -> FpResult<(SessionAuthToken, DateTime<Utc>)> {
         let current_expires_at = self.expires_at();
         let expires_at = if let Some(duration) = max_duration {
             current_expires_at.min(Utc::now() + duration)

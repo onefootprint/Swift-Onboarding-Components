@@ -5,7 +5,7 @@ use super::vault_wrapper::VaultWrapper;
 use super::vault_wrapper::WriteableVw;
 use crate::auth::tenant::AuthActor;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
+use crate::FpResult;
 use db::models::business_owner::BusinessOwner;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
@@ -60,7 +60,7 @@ pub struct NewOnboardingArgs<'a> {
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
     args: NewOnboardingArgs,
-) -> ApiResult<(WorkflowId, Option<Workflow>, IsNew)> {
+) -> FpResult<(WorkflowId, Option<Workflow>, IsNew)> {
     let NewOnboardingArgs {
         existing_wf_id,
         wfr_id,
@@ -181,7 +181,7 @@ pub fn get_or_start_onboarding(
 }
 
 /// Create a DocumentRequest associated with the provided wf if the obc requires document collection
-fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObConfiguration) -> ApiResult<()> {
+fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObConfiguration) -> FpResult<()> {
     let doc_requests_to_create = match wf.config {
         WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => chain(
             // Identity documents are generally still represented in CDOs. We could migrate them
