@@ -1,10 +1,7 @@
-account := $(shell aws sts get-caller-identity --query "Account" --output text)
-branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r 's/_/-/g')
-commit := "$(branch)-$(shell git rev-parse --short HEAD)"
-commit_full := "$(shell git rev-parse HEAD)"
 tmp_enclave_tag := "$(shell date +%s)"
 
 
+.PHONY: build-nitro-enclave
 build-nitro-enclave:
 	docker buildx build -t enclave:$(tmp_enclave_tag) -f ./images/enclave/Dockerfile .
 	nitro-cli build-enclave \
@@ -14,6 +11,7 @@ build-nitro-enclave:
 		--signing-certificate ../../cert.pem
 	docker rmi enclave:$(tmp_enclave_tag)
 
+.PHONY: run-nitro-enclave-debug
 run-nitro-enclave-debug:
 	nitro-cli terminate-enclave --all
 	echo "running enclave [debug mode]"
@@ -24,6 +22,7 @@ run-nitro-enclave-debug:
 		--enclave-cid 16 \
 		--debug-mode
 
+.PHONY: run-enclave
 run-enclave:
 	nitro-cli run-enclave \
 		--eif-path ./out/enclave.eif \
@@ -31,53 +30,43 @@ run-enclave:
 		--memory 256 \
 		--enclave-cid 16
 
-
-get-named-commit:
-	@echo "$(commit)"
-
-
-get-friendly-branch-name:
-	@echo "$(branch)"
-
-
-set-enclave-version:
-	@pulumi --cwd infra config set --path constants.containers.enclaveVersion $(commit)
-
-
-set-api-version:
-	@pulumi --cwd infra config set --path constants.containers.apiVersion $(commit)
-
-
+.PHONY: run-enclave-local
 run-enclave-local:
 	(trap 'kill 0' SIGINT EXIT; \
 		echo "starting enclave..." && cargo run -p enclave --features simulate & \
 		echo "starting enclave proxy..." && cargo run -p enclave_proxy \
 	)
 
+.PHONY: run-local
 run-local:
 	(trap 'kill 0' SIGINT EXIT; \
 		make run-enclave-local & \
 		echo "starting api server..." && cargo run -p api_server \
 	)
 
+.PHONY: watch-local
 watch-local:
 	(trap 'kill 0' SIGINT EXIT; \
 		make run-enclave-local & \
 		echo "starting api server and watching for changes..." && cargo watch -x 'run -p api_server' -i ci -i vscode-target -i target \
 	)
 
+.PHONY: watch
 watch: watch-local
 
+.PHONY: configure-aws
 configure-aws:
 	@aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
 	@aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
 	@aws configure set default.region ${AWS_REGION}
 
+.PHONY: update-dot-env
 update-dot-env:
 	@command -v rage || (echo "missing rage: installing" && cargo install rage)
 	@cat .env | rage -e -r age1u4858547zdlc7ncghc3wypqxamt7v5xh0kasysqjfk0dt6ahcdnqtprun4 -a -o .env.age
 	@echo "updated .env.age"
 
+.PHONY: set-dot-env
 set-dot-env:
 	@command -v rage || (echo "missing rage: installing" && cargo install rage)
 
@@ -93,24 +82,30 @@ set-dot-env:
 
 	@echo "created .env"
 
+.PHONY: open-api
 open-api:
 	@MONOREPO_DIR=../ python3 ci/scripts/update_open_api.py
 
+.PHONY: setup-integration-tests
 setup-integration-tests:
 	@python3 -m venv ~/.virtualenvs/fpc
 	@source ~/.virtualenvs/fpc/bin/activate
 	@pip3 install -r ci/requirements.txt
 
+.PHONY: run-integration-tests
 run-integration-tests:
 	TEST_URL="http://localhost:8000" pytest ci/tests
 
+.PHONY: generate-api-types
 generate-api-types:
 	@cd components/api/wire_types && cargo test
 	@cd components/api/wire_types/ts-gen && yarn && yarn build
 
+.PHONY: run-jaeger
 run-jaeger:
 	docker run -d --rm --name jaeger -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 4317:4317 -p 4318:4318 jaegertracing/all-in-one
 
+.PHONY: stop-jaeger
 stop-jaeger:
 	docker stop jaeger
 
