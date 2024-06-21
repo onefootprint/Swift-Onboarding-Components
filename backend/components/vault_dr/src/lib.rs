@@ -1,2 +1,5 @@
 mod error;
-pub use error::Error;
+pub use error::*;
+
+mod writer;
+pub use writer::*;

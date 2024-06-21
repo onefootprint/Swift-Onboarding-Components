@@ -49,6 +49,12 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres/postgres
       ENCLAVE_PROXY_ENDPOINT: http://enclave_proxy:3668
+      # Use localstack for Dockerized Vault DR integration tests.
+      VAULT_DR_USE_LOCALSTACK: "1"
+      VAULT_DR_AWS_REGION: "us-east-1"
+      VAULT_DR_AWS_ENDPOINT: "http://localstack:4566"
+      VAULT_DR_AWS_ACCESS_KEY_ID: "111111111111"
+      VAULT_DR_AWS_SECRET_ACCESS_KEY: "test"
     healthcheck:
       test: curl --fail http://127.0.0.1:8000/health
       interval: 5s
@@ -123,6 +129,7 @@ services:
 
   # localstack approximates AWS services for integration tests.
   # It's good enough for simple things, but don't use it for anything complicated.
+  # For instance, IAM enforcement does not work well.
   localstack:
     image: localstack/localstack:latest@sha256:9ca38215531f004377f5f12d9e838eed630a9ca866edb336504d91dd4973aa51
     networks:
@@ -131,8 +138,7 @@ services:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
       - "127.0.0.1:4510-4559:4510-4559"  # External services port range
     environment:
-      SERVICES: "s3,iam"
-      ENFORCE_IAM: "1"
+      SERVICES: "s3,iam,sts"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
 
@@ -153,7 +159,7 @@ services:
       IT_TWILIO_SECRET_AUTH_TOKEN: ${IT_TWILIO_SECRET_AUTH_TOKEN}
       DITTO_URL: ${DITTO_URL:-https://ditto.footprint.dev}
       IT_SVIX_API_KEY: ${IT_SVIX_API_KEY}
-      ENVIRONMENT: ${ENVIRONMENT:-local-dev}
+      ENVIRONMENT: ${ENVIRONMENT:-local}
       # Used by diesel migration tests.
       DATABASE_URL: "postgresql://postgres:postgres@localhost:9432/postgres"
     volumes:

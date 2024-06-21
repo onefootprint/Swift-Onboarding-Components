@@ -664,7 +664,6 @@ dependencies = [
  "typedmap",
  "url",
  "urlencoding",
- "vault_dr",
  "webauthn-rs-core",
  "webauthn-rs-proto",
  "webhooks",
@@ -9412,7 +9411,15 @@ checksum = "830b7e5d4d90034032940e4ace0d9a9a057e7a45cd94e6c007832e39edb82f6d"
 name = "vault_dr"
 version = "0.1.0"
 dependencies = [
+ "actix-web",
+ "api_core",
  "api_errors",
+ "aws-config",
+ "aws-credential-types",
+ "aws-sdk-sts",
+ "aws-types",
+ "db",
+ "newtypes",
  "thiserror",
 ]
 

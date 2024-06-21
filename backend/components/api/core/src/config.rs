@@ -169,6 +169,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub samba_safety_config: SambaSafetyConfig,
+
+    #[envconfig(nested = true)]
+    pub vault_dr_config: VaultDrConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T> {
@@ -487,4 +490,19 @@ pub struct SambaSafetyConfig {
     pub auth_username: PiiString,
     #[envconfig(from = "SAMBA_AUTH_PASSWORD")]
     pub auth_password: PiiString,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct VaultDrConfig {
+    // These AWS overrides are used to point the server at localstack for testing purposes.
+    #[envconfig(from = "VAULT_DR_USE_LOCALSTACK")]
+    pub use_localstack: Option<String>,
+    #[envconfig(from = "VAULT_DR_AWS_REGION")]
+    pub aws_region: Option<String>,
+    #[envconfig(from = "VAULT_DR_AWS_ENDPOINT")]
+    pub aws_endpoint: Option<String>,
+    #[envconfig(from = "VAULT_DR_AWS_ACCESS_KEY_ID")]
+    pub aws_access_key_id: Option<PiiString>,
+    #[envconfig(from = "VAULT_DR_AWS_SECRET_ACCESS_KEY")]
+    pub aws_secret_access_key: Option<PiiString>,
 }

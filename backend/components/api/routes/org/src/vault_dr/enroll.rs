@@ -13,6 +13,7 @@ use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
 };
+use vault_dr::VaultDrWriter;
 
 #[api_v2_operation(
     tags(VaultDisasterRecovery, Private),
@@ -25,7 +26,7 @@ pub async fn post(
     request: web::Json<api_wire_types::VaultDrEnrollRequest>,
 ) -> ApiResponse<api_wire_types::VaultDrEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
-    let tenant = auth.tenant().clone();
+    let tenant = auth.tenant();
     let is_live = auth.is_live()?;
 
     let api_wire_types::VaultDrEnrollRequest {
@@ -35,14 +36,35 @@ pub async fn post(
         re_enroll,
     } = request.into_inner();
 
+
+    let tenant_id = tenant.id.clone();
+    let pre_enrollment = state
+        .db_pool
+        .db_query(move |conn| -> FpResult<_> {
+            Ok(VaultDrAwsPreEnrollment::get(conn, &tenant_id, is_live)?
+                .ok_or(vault_dr::Error::MissingAwsPreEnrollment)?)
+        })
+        .await?;
+    let pre_enrollment_id = pre_enrollment.id.clone();
+
+    let writer = VaultDrWriter {
+        config: state.config.vault_dr_config.clone(),
+
+        tenant_id: tenant.id.clone(),
+        is_live,
+        aws_account_id,
+        aws_external_id: pre_enrollment.aws_external_id.clone(),
+        aws_role_name,
+        s3_bucket_name,
+    };
+
+    writer.validate_aws_config().await?;
+
+    let tenant_id = tenant.id.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let Some(pre_enrollment) = VaultDrAwsPreEnrollment::get(conn, &tenant.id, is_live)? else {
-                return Err(vault_dr::Error::MissingAwsPreEnrollment.into());
-            };
-
-            let existing_config = VaultDrConfig::lock(conn, &tenant.id, is_live)?;
+            let existing_config = VaultDrConfig::lock(conn, &tenant_id, is_live)?;
             if let Some(existing_config) = existing_config {
                 if re_enroll != Some(true) {
                     return Err(vault_dr::Error::AlreadyEnrolled.into());
@@ -52,16 +74,17 @@ pub async fn post(
 
             let new_config = NewVaultDrConfig {
                 created_at: Utc::now(),
-                tenant_id: &tenant.id,
+                tenant_id: &tenant_id,
                 is_live,
-                aws_pre_enrollment_id: &pre_enrollment.id,
-                aws_account_id,
-                aws_role_name,
-                s3_bucket_name,
+                aws_pre_enrollment_id: &pre_enrollment_id,
+                aws_account_id: writer.aws_account_id,
+                aws_role_name: writer.aws_role_name,
+                s3_bucket_name: writer.s3_bucket_name,
                 org_public_key: "TODO".into(),
                 recovery_public_key: "TODO".into(),
                 wrapped_recovery_key: "TODO".into(),
             };
+
             VaultDrConfig::create(conn, new_config)?;
 
             Ok(())

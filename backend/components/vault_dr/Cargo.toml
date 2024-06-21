@@ -10,5 +10,14 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = { workspace = true }
+api_core= { path = "../api/core" }
 api_errors = { path = "../api/errors" }
+db = { path = "../db/core" }
+newtypes = { path = "../newtypes" }
+
+actix-web = { workspace = true }
+aws-types = { workspace = true }
+aws-config = { workspace = true }
+aws-credential-types = { workspace = true }
+aws-sdk-sts = { workspace = true }
+thiserror = { workspace = true }

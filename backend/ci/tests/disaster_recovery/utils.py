@@ -47,7 +47,7 @@ def get_external_id(mode):
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 
-    return external_id
+    return external_id.decode("utf-8")
 
 
 def localstack_session():
@@ -65,6 +65,7 @@ def create_bucket(session):
     return bucket_name
 
 
+# Note that Localstack doesn't really enforce IAM.
 def create_iam_role(session, bucket_name, external_id):
     iam = session.client("iam")
 
@@ -74,13 +75,12 @@ def create_iam_role(session, bucket_name, external_id):
             {
                 "Effect": "Allow",
                 "Principal": {
-                    # FIXME
                     "AWS": "arn:aws:iam::725896863556:root"
                 },
                 "Action": "sts:AssumeRole",
                 "Condition": {
                     "StringEquals": {
-                        "sts:ExternalId": "your_external_id"
+                        "sts:ExternalId": external_id
                     }
                 }
             }
@@ -109,6 +109,14 @@ def create_iam_role(session, bucket_name, external_id):
                 "Effect": "Allow",
                 "Action": [
                     "s3:ListBucket"
+                ],
+                "Resource": f"arn:aws:s3:::{bucket_name}",
+            },
+            {
+                "Sid": "AllowFootprintGetBucketLocation",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetBucketLocation"
                 ],
                 "Resource": f"arn:aws:s3:::{bucket_name}",
             }
