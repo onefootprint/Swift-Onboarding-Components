@@ -124,7 +124,7 @@ pub struct NewWorkflowArgs {
     pub is_neuro_enabled: bool,
 }
 
-#[derive(Debug, Default, AsChangeset)]
+#[derive(Debug, Default, AsChangeset, Eq, PartialEq)]
 #[diesel(table_name = workflow)]
 struct WorkflowUpdateRow {
     status: Option<OnboardingStatus>,
@@ -600,16 +600,36 @@ impl Workflow {
             }
         }
 
-        let new_status = update.status;
-        let result = diesel::update(workflow::table)
-            .filter(workflow::id.eq(&wf.id))
-            .set(update)
-            .get_result(conn.conn())?;
+        // Don't want manual review decision None to unset the workflow status.
+        // TODO: get rid of this when manual review stops affecting WF status at all
+        let old_status = wf.status;
+        let WorkflowUpdateRow {
+            status: new_status,
+            authorized_at,
+            decision_made_at,
+        } = update;
+        let new_wf_status = new_status
+            .is_some_and(|s| s.can_transition_from(&old_status))
+            .then_some(new_status)
+            .flatten();
+        let update = WorkflowUpdateRow {
+            status: new_wf_status,
+            authorized_at,
+            decision_made_at,
+        };
+        let wf = if update != Default::default() {
+            diesel::update(workflow::table)
+                .filter(workflow::id.eq(&wf.id))
+                .set(update)
+                .get_result(conn.conn())?
+        } else {
+            wf.into_inner()
+        };
 
         // Make the new OnboardingDecision if any
         if let Some(decision) = new_decision {
             let manual_reviews = decision.manual_reviews.clone();
-            let decision = OnboardingDecision::create(conn, &result, decision)?;
+            let decision = OnboardingDecision::create(conn, &wf, decision)?;
             // NOTE: MUST do all manual review bookkeeping before sending the webhooks below
             ManualReview::apply_actions(conn, &wf, decision, manual_reviews)?;
         }
@@ -625,7 +645,7 @@ impl Workflow {
             // currently really mean we have to fire it when we make a decision for the first time
             // or in a redo flow If the current Workflow status is not pass/fail but the new
             // status is, fire OnboardingCompleted (ie anytime a Workflow completes)
-            if !wf.status.is_terminal() && new_status.is_terminal() {
+            if !old_status.is_terminal() && new_status.is_terminal() {
                 let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                     fp_id: sv.fp_id.clone(),
@@ -671,7 +691,7 @@ impl Workflow {
                 Task::create(conn, Utc::now(), task_data)?;
             };
         }
-        Ok(result)
+        Ok(wf)
     }
 
     #[tracing::instrument("Workflow::update_fixture_result", skip_all)]

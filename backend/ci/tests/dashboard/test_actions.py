@@ -47,11 +47,18 @@ def test_clear_review(sandbox_tenant):
     assert user.client.validate_response["user"]["status"] == "fail"
     assert user.client.validate_response["user"]["requires_manual_review"]
 
+    body = get(f"users/{user.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert body["data"][0]["status"] == "fail"
+
     clear_review_action = dict(kind="clear_review")
     data = dict(actions=[clear_review_action])
     post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
     body = get(f"entities/{user.fp_id}", data, *sandbox_tenant.db_auths)
     assert not body["requires_manual_review"]
+
+    # Make sure the onboarding status hasn't changed
+    body = get(f"users/{user.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert body["data"][0]["status"] == "fail"
 
 
 def test_trigger_and_clear_review(sandbox_tenant):
