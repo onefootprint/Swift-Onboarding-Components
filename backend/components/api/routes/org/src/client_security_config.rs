@@ -3,7 +3,7 @@ use api_core::auth::tenant::TenantAuth;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use api_wire_types::OrgClientSecurityConfig;
 use db::models::tenant_client_config::TenantClientConfig;
@@ -19,7 +19,7 @@ use paperclip::actix::Apiv2Schema;
     description = "Get the client security configuration."
 )]
 #[get("/org/client_security_config")]
-async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ModernApiResult<OrgClientSecurityConfig> {
+async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiResponse<OrgClientSecurityConfig> {
     let auth: Box<dyn TenantAuth> = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let is_live = auth.is_live()?;
@@ -61,7 +61,7 @@ async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateClientSecurityConfig>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<OrgClientSecurityConfig> {
+) -> ApiResponse<OrgClientSecurityConfig> {
     let auth: Box<dyn TenantAuth> = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let tenant = auth.tenant();
     let is_live = auth.is_live()?;

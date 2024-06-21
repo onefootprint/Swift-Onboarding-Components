@@ -4,7 +4,7 @@ use crate::auth::tenant::FirmEmployeeAuthContext;
 use crate::auth::tenant::FirmEmployeeGuard;
 use crate::auth::Either;
 use crate::auth::SessionContext;
-use crate::ModernApiError;
+use crate::ApiError;
 use actix_web::FromRequest;
 use futures_util::Future;
 use std::pin::Pin;
@@ -15,7 +15,7 @@ pub struct ProtectedAuth(
 );
 
 impl FromRequest for ProtectedAuth {
-    type Error = ModernApiError;
+    type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {

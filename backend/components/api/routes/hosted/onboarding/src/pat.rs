@@ -4,7 +4,7 @@
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::utils::headers::InsightHeaders;
-use crate::ModernApiResult;
+use crate::ApiResponse;
 use crate::State;
 use actix_web::HttpResponseBuilder;
 use api_core::auth::user::UserAuthScope;
@@ -32,7 +32,7 @@ pub async fn get(
     req: web::HttpRequest,
     user_auth: UserAuthContext,
     insight: InsightHeaders,
-) -> ModernApiResult<HttpResponse> {
+) -> ApiResponse<HttpResponse> {
     // check if this is an authorization or challenge request
     let auth_headers = req.headers().get_all(AUTHORIZATION);
 
@@ -51,7 +51,7 @@ pub async fn get(
 async fn challenge_privacy_pass(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> ModernApiResult<HttpResponse> {
+) -> ApiResponse<HttpResponse> {
     let nonce = user_auth.auth_token.hash_bytes();
 
     let challenge = privacy_pass::TokenChallenge::new(state.config.rp_id.clone(), nonce).marshal()?;
@@ -73,7 +73,7 @@ async fn authorize_privacy_pass(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insight: InsightHeaders,
-) -> ModernApiResult<HttpResponse> {
+) -> ApiResponse<HttpResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let scoped_user_id = user_auth
         .scoped_user_id()

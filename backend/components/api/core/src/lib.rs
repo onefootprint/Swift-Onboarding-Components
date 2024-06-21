@@ -38,8 +38,8 @@ pub mod vendor_clients;
 
 pub use self::state::State;
 pub use crate::errors::ApiCoreError;
-pub use crate::types::response::ModernApiError;
-pub use crate::types::response::ModernApiResult;
+pub use crate::types::response::ApiError;
+pub use crate::types::response::ApiResponse;
 pub use api_errors::FpError;
 pub use api_errors::FpResult;
 pub use paperclip::actix::web;

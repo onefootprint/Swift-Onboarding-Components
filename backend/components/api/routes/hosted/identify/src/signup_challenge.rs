@@ -10,7 +10,7 @@ use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::user::UserError;
 use api_core::errors::ValidationError;
 use api_core::telemetry::RootSpan;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::headers::IsComponentsSdk;
@@ -57,7 +57,7 @@ pub async fn post(
     sandbox_id: SandboxId,
     is_components_sdk: IsComponentsSdk,
     root_span: RootSpan,
-) -> ModernApiResult<SignupChallengeResponse> {
+) -> ApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest {
         phone_number: phone,
         email,

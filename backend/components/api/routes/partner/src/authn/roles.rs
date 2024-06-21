@@ -1,7 +1,7 @@
 use api_core::auth::tenant::AnyOrgSessionAuth;
 use api_core::auth::tenant::AnyPartnerTenantSessionAuth;
 use api_core::serializers::IsAuthMethodSupported;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::helpers::TenantOrPartnerTenant;
@@ -19,7 +19,7 @@ use paperclip::actix::web;
 fn get(
     state: web::Data<State>,
     auth: AnyPartnerTenantSessionAuth,
-) -> JsonApiListResponse<api_wire_types::PartnerOrganization> {
+) -> ApiListResponse<api_wire_types::PartnerOrganization> {
     let auth_method = auth.auth_method();
     let tu_id = auth.tenant_user_id()?;
     let tenants = state

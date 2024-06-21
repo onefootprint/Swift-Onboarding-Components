@@ -3,8 +3,8 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::proxy::VaultProxyError;
 use api_core::proxy::ssrf_protection::validate_safe_url;
-use api_core::types::JsonApiListResponse;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiListResponse;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::CreateProxyConfigRequest;
@@ -33,7 +33,7 @@ pub async fn get(
     state: web::Data<State>,
     filters: web::Query<GetProxyConfigRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiListResponse<api_wire_types::ProxyConfigBasic> {
+) -> ApiListResponse<api_wire_types::ProxyConfigBasic> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let GetProxyConfigRequest { status } = filters.into_inner();
     let tenant_id = auth.tenant().id.clone();
@@ -69,7 +69,7 @@ pub async fn get_detail(
     state: web::Data<State>,
     proxy_config_id: web::Path<ProxyConfigId>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::ProxyConfigDetailed> {
+) -> ApiResponse<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -94,7 +94,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<CreateProxyConfigRequest>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::ProxyConfigDetailed> {
+) -> ApiResponse<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -203,7 +203,7 @@ pub async fn patch(
     request: Json<PatchProxyConfigRequest>,
     proxy_config_id: web::Path<ProxyConfigId>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::ProxyConfigDetailed> {
+) -> ApiResponse<api_wire_types::ProxyConfigDetailed> {
     let auth = auth.check_guard(TenantGuard::ManageVaultProxy)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

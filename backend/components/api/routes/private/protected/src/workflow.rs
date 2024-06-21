@@ -7,7 +7,7 @@ use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::actions::WorkflowActionsKind;
 use api_core::decision::state::traits::Workflow as TWorkflow;
 use api_core::decision::state::WorkflowWrapper;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::ApiCoreError;
 use db::models::workflow::Workflow;
 use newtypes::WorkflowId;
@@ -29,7 +29,7 @@ async fn proceed(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<ProceedRequest>,
-) -> ModernApiResult<ProceedResponse> {
+) -> ApiResponse<ProceedResponse> {
     let ProceedRequest {
         wf_id,
         wf_action_kind,

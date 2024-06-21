@@ -2,7 +2,7 @@ use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
 use api_core::errors::ValidationError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use api_route_hosted_core::validation_token::create_validation_token;
 use api_wire_types::hosted::validate::HostedValidateResponse;
@@ -21,7 +21,7 @@ use paperclip::actix::{
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> ModernApiResult<HostedValidateResponse> {
+) -> ApiResponse<HostedValidateResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
 
     if let Some(obc) = user_auth.ob_config() {

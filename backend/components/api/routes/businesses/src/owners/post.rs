@@ -2,7 +2,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
 use api_core::errors::ValidationError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -31,7 +31,7 @@ pub async fn post(
     fp_bid: FpIdPath,
     auth: SecretTenantAuthContext,
     request: web::Json<NewBusinessOwnerRequest>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::CreateBusinessOwner)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

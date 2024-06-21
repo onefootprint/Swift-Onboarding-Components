@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::OrgMetricsRequest;
@@ -22,7 +22,7 @@ async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     filters: web::Query<OrgMetricsRequest>,
-) -> ModernApiResult<api_wire_types::OrgMetrics> {
+) -> ApiResponse<api_wire_types::OrgMetrics> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

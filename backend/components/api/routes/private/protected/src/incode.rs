@@ -15,7 +15,7 @@ use api_core::decision::state::WorkflowActions;
 use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::AssertionError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
 use api_core::utils::onboarding::NewOnboardingArgs;
 use api_core::utils::requirements::get_requirements_inner;
@@ -78,7 +78,7 @@ pub async fn rerun_machine(
     state: web::Data<State>,
     request: Json<Request>,
     _: ProtectedAuth,
-) -> ModernApiResult<DocumentResponse> {
+) -> ApiResponse<DocumentResponse> {
     let Request {
         id,
         i_acknowledge_that_i_re_enabled_my_upload,
@@ -163,7 +163,7 @@ pub async fn adhoc_create_document_and_workflow(
     state: web::Data<State>,
     request: Json<AdhocCreateDocumentRequest>,
     _: ProtectedAuth,
-) -> ModernApiResult<CreateDocumentResponse> {
+) -> ApiResponse<CreateDocumentResponse> {
     // check NPV, can always relax this
     let AdhocCreateDocumentRequest {
         document_type,
@@ -269,7 +269,7 @@ pub async fn adhoc_upload_and_process(
     mut payload: Multipart,
     request: HttpRequest,
     meta: MetaHeaders,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let file = handle_file_upload(&mut payload, &request, None, 5_242_880, 100).await?;
 
     let (document_id, side) = args.into_inner();
@@ -325,7 +325,7 @@ pub async fn adhoc_document_process(
     state: web::Data<State>,
     _: ProtectedAuth,
     args: web::Path<DocumentId>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let document_id = args.into_inner();
 
     let (wf, uvw, obc) = state

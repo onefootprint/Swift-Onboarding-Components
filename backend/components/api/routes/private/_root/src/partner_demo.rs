@@ -5,7 +5,7 @@ use actix_web::web::Json;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use chrono::Duration;
@@ -75,7 +75,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<CreatePartnerDemoRequest>,
     auth: FirmEmployeeAuthContext,
-) -> ModernApiResult<CreatePartnerDemoResponse> {
+) -> ApiResponse<CreatePartnerDemoResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
     let employee_user_id = auth.tenant_user.id.clone();
 

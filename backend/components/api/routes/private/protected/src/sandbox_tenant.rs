@@ -8,7 +8,7 @@ use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::errors::ValidationError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use db::models::tenant::NewTenant;
@@ -33,7 +33,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<SandboxTenantRequest>,
     auth: FirmEmployeeAuthContext,
-) -> ModernApiResult<SandboxTenantResponse> {
+) -> ApiResponse<SandboxTenantResponse> {
     let auth = auth.check_guard(FirmEmployeeGuard::Any)?;
     let SandboxTenantRequest {
         name,

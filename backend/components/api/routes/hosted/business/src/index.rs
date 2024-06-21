@@ -1,4 +1,4 @@
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::FpResult;
 use crate::State;
 use api_core::auth::ob_config::BoSessionAuth;
@@ -22,7 +22,7 @@ use paperclip::actix::{
     tags(Businesses, Hosted)
 )]
 #[actix::get("/hosted/business")]
-pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ModernApiResult<HostedBusiness> {
+pub async fn get(state: web::Data<State>, bo_auth: BoSessionAuth) -> ApiResponse<HostedBusiness> {
     let bv_id = bo_auth.bo.business_vault_id.clone();
     let ob_config_id = bo_auth.ob_config.id.clone();
     let (bvw, sb) = state

@@ -1,4 +1,4 @@
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use api_wire_types::OrgLoginResponse;
 use api_wire_types::TenantLoginRequest;
@@ -16,7 +16,7 @@ use paperclip::actix::web;
 async fn handler(
     state: web::Data<State>,
     request: web::Json<TenantLoginRequest>,
-) -> ModernApiResult<OrgLoginResponse> {
+) -> ApiResponse<OrgLoginResponse> {
     let request = request.into_inner();
     let data = api_route_org_common::login::handle_login(
         state,

@@ -3,7 +3,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::liveness_event::LivenessEvent;
 use newtypes::PreviewApi;
@@ -20,7 +20,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiListResponse<api_wire_types::LivenessEvent> {
+) -> ApiListResponse<api_wire_types::LivenessEvent> {
     auth.check_preview_guard(PreviewApi::LivenessList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

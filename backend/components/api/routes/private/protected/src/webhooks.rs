@@ -5,7 +5,7 @@ use actix_web::web::Json;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::task;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
@@ -42,7 +42,7 @@ async fn post(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<PostWebhooksRequest>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let PostWebhooksRequest {
         fp_ids,
         kind,

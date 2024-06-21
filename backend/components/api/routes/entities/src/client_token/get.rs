@@ -1,7 +1,7 @@
 use api_core::auth::tenant::ClientTenantAuthContext;
 use api_core::auth::tenant::ClientTenantScope;
 use api_core::auth::Any;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_wire_types::GetClientTokenResponse;
 use api_wire_types::GetClientTokenResponseTenant;
 use paperclip::actix::api_v2_operation;
@@ -14,7 +14,7 @@ use paperclip::actix::{
     description = "Returns information about the provided client auth token."
 )]
 #[actix::get("/entities/client_token")]
-pub fn get(auth: ClientTenantAuthContext) -> ModernApiResult<GetClientTokenResponse> {
+pub fn get(auth: ClientTenantAuthContext) -> ApiResponse<GetClientTokenResponse> {
     let auth = auth.check_guard(Any)?;
 
     let expires_at = auth.expires_at();

@@ -3,7 +3,7 @@ use crate::State;
 use actix_web::patch;
 use actix_web::web;
 use api_core::decision::rule_engine;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::FpResult;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
@@ -16,7 +16,7 @@ pub async fn add_default_rules(
     state: web::Data<State>,
     _: ProtectedAuth,
     path: web::Path<ObConfigurationId>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let ff_client = state.ff_client.clone();
     state
         .db_pool

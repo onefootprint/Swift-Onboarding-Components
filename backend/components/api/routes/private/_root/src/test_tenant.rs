@@ -4,7 +4,7 @@ use actix_web::web;
 use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::session::tenant::TenantRbSession;
 use api_core::errors::tenant::TenantError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
@@ -54,7 +54,7 @@ async fn post(
     request: web::Json<NewClientRequest>,
     _custodian: CustodianAuthContext,
     state: web::Data<State>,
-) -> ModernApiResult<NewClientResponse> {
+) -> ApiResponse<NewClientResponse> {
     let NewClientRequest { id, name } = request.into_inner();
     if !id.is_integration_test_tenant() {
         // All integration testing tenant primary keys have a reserved prefix that signals that the

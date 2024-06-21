@@ -3,7 +3,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use actix_web::web::Query;
@@ -62,7 +62,7 @@ pub async fn get(
     path: FpIdPath,
     request: Query<FieldsParams>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> ModernApiResult<GetVaultResponse> {
+) -> ApiResponse<GetVaultResponse> {
     let fp_id = path.into_inner();
     let FieldsParams { fields } = request.into_inner();
 

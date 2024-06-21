@@ -1,4 +1,4 @@
-use api_core::ModernApiResult;
+use api_core::ApiResponse;
 use api_core::State;
 use api_wire_types::GoogleOauthRedirectUrl;
 use paperclip::actix::api_v2_operation;
@@ -14,6 +14,6 @@ use paperclip::actix::web::HttpResponse;
 async fn handler(
     state: web::Data<State>,
     redirect_url: web::Query<GoogleOauthRedirectUrl>,
-) -> ModernApiResult<HttpResponse> {
+) -> ApiResponse<HttpResponse> {
     api_route_org_common::google_oauth::handler(state, redirect_url).await
 }

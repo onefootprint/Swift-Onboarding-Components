@@ -1,4 +1,4 @@
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
@@ -26,7 +26,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocSubmissionId)>,
-) -> ModernApiResult<api_wire_types::ComplianceDocSubmission> {
+) -> ApiResponse<api_wire_types::ComplianceDocSubmission> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();

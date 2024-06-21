@@ -1,11 +1,11 @@
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiCoreError;
 use api_core::FpError;
@@ -33,7 +33,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
     partnership_id: web::Path<TenantCompliancePartnershipId>,
-) -> JsonApiListResponse<api_wire_types::ComplianceDocSummary> {
+) -> ApiListResponse<api_wire_types::ComplianceDocSummary> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -66,7 +66,7 @@ pub async fn post(
     auth: PartnerTenantSessionAuth,
     partnership_id: web::Path<TenantCompliancePartnershipId>,
     request: web::Json<api_wire_types::CreateComplianceDocRequest>,
-) -> ModernApiResult<api_wire_types::ComplianceDocSummary> {
+) -> ApiResponse<api_wire_types::ComplianceDocSummary> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageReviews)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();

@@ -3,7 +3,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use db::models::document::Document;
@@ -23,7 +23,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiListResponse<api_wire_types::PublicDocument> {
+) -> ApiListResponse<api_wire_types::PublicDocument> {
     auth.check_preview_guard(PreviewApi::DocumentsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

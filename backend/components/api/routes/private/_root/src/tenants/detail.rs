@@ -2,7 +2,7 @@ use actix_web::get;
 use actix_web::web;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant::Tenant;
@@ -13,7 +13,7 @@ async fn get(
     state: web::Data<State>,
     auth: FirmEmployeeAuthContext,
     id: web::Path<TenantId>,
-) -> ModernApiResult<api_wire_types::PrivateTenantDetail> {
+) -> ApiResponse<api_wire_types::PrivateTenantDetail> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
     let id = id.into_inner();
 

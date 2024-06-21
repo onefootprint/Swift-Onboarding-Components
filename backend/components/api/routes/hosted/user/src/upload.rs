@@ -9,7 +9,7 @@ use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::DocumentDiKind;
@@ -30,7 +30,7 @@ pub async fn post(
     document_identifier: web::Path<DataIdentifier>,
     mut payload: Multipart,
     request: HttpRequest,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let kind = DocumentDiKind::try_from(document_identifier.into_inner())?;
 
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;

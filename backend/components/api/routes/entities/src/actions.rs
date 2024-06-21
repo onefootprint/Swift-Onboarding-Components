@@ -9,7 +9,7 @@ use api_core::decision::review::save_review_decision;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ValidationError;
 use api_core::task::execute_webhook_tasks;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use api_wire_types::EntityActionResponse;
@@ -35,7 +35,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<EntityActionsRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiListResponse<EntityActionResponse> {
+) -> ApiListResponse<EntityActionResponse> {
     // TODO what should the auth guard be here?
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();

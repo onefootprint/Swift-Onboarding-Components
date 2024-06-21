@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
@@ -34,7 +34,7 @@ pub async fn delete(
     path: FpIdPath,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let fp_id = path.into_inner();
 
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;

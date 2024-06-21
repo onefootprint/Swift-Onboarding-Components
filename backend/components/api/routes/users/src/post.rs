@@ -2,7 +2,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::telemetry::RootSpan;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::headers::ExternalId;
 use api_core::utils::headers::IdempotencyId;
@@ -29,7 +29,7 @@ pub async fn post(
     sandbox_id: SandboxId,
     external_id: ExternalId,
     root_span: RootSpan,
-) -> ModernApiResult<api_wire_types::LiteUser> {
+) -> ApiResponse<api_wire_types::LiteUser> {
     let result = create_non_portable_vault(
         state,
         request,

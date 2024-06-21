@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpError;
 use api_core::FpResult;
@@ -29,7 +29,7 @@ pub async fn entries_for_list(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     list_id: web::Path<ListId>,
-) -> JsonApiListResponse<api_wire_types::ListEntry> {
+) -> ApiListResponse<api_wire_types::ListEntry> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

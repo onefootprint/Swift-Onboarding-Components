@@ -2,7 +2,7 @@ use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::IsGuardMet;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::identify::get_user_challenge_context;
 use api_core::State;
 use itertools::Itertools;
@@ -20,7 +20,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> JsonApiListResponse<api_wire_types::AuthMethod> {
+) -> ApiListResponse<api_wire_types::AuthMethod> {
     let user_auth = user_auth.check_guard(UserAuthScope::Auth.or(UserAuthScope::SignUp))?;
     let limit_auth_methods = user_auth
         .data

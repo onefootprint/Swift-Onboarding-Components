@@ -2,12 +2,12 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::FpError;
 use crate::State;
 use actix_web::web::Json;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use api_wire_types::AnnotationFilters;
@@ -37,7 +37,7 @@ pub async fn get(
     fp_id: FpIdPath,
     query: web::Query<AnnotationFilters>,
     auth: TenantSessionAuth,
-) -> JsonApiListResponse<api_wire_types::Annotation> {
+) -> ApiListResponse<api_wire_types::Annotation> {
     // TODO paginate?
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
@@ -71,7 +71,7 @@ async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<UpdateAnnotationPath>,
     request: web::Json<UpdateAnnotationRequest>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant = auth.tenant();
     let is_live = auth.is_live()?;
@@ -112,7 +112,7 @@ pub fn post(
     auth: TenantSessionAuth,
     fp_id: FpIdPath,
     request: Json<CreateAnnotationRequest>,
-) -> ModernApiResult<api_wire_types::Annotation> {
+) -> ApiResponse<api_wire_types::Annotation> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     request.validate()?;
     let is_live = auth.is_live()?;

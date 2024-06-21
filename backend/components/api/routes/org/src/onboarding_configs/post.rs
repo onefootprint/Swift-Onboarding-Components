@@ -4,7 +4,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine;
 use api_core::errors::tenant::TenantError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
@@ -73,7 +73,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     request: Json<CreateOnboardingConfigurationRequest>,
-) -> ModernApiResult<api_wire_types::OnboardingConfiguration> {
+) -> ApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let is_live = auth.is_live()?;
     let tenant = auth.tenant().clone();

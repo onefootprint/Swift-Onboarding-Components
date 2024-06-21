@@ -1,4 +1,4 @@
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::UserAuthContext;
@@ -35,7 +35,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<UserDecryptRequest>,
     user_auth: UserAuthContext,
-) -> ModernApiResult<DecryptResponse> {
+) -> ApiResponse<DecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
     let user_auth = user_auth.check_guard(CanDecrypt::new(fields.clone()))?;
 

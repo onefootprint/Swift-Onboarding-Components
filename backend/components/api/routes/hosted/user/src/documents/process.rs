@@ -3,7 +3,7 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::decision;
 use api_core::decision::document::route_handler::IncodeConfigurationIdOverride;
 use api_core::decision::document::route_handler::IsRerun;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use api_wire_types::DocumentResponse;
 use newtypes::DocumentId;
@@ -23,7 +23,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     doc_id: web::Path<DocumentId>,
-) -> ModernApiResult<DocumentResponse> {
+) -> ApiResponse<DocumentResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let t_id = user_auth.scoped_user.tenant_id.clone();

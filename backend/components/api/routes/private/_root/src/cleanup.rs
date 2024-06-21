@@ -4,7 +4,7 @@ use api_core::auth::custodian::CustodianAuthContext;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::Either;
 use api_core::errors::AssertionError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -42,7 +42,7 @@ async fn post(
     request: web::Json<Request>,
     // When provided, identifies only sandbox users with the suffix
     sandbox_id: SandboxId,
-) -> ModernApiResult<CleanupResponse> {
+) -> ApiResponse<CleanupResponse> {
     let uv_id = match request.into_inner() {
         Request::PhoneNumber(phone_number) => {
             ensure_phone_number_allowed(&state, &phone_number)?;

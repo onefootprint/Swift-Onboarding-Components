@@ -14,27 +14,27 @@ use serde::Serialize;
 /// Wrapper around FpError that implements actix_web::ResponseError
 #[api_v2_errors()] // We don't support error responses on our docs site yet
 #[derive(derive_more::Deref)]
-pub struct ModernApiError(FpError);
+pub struct ApiError(FpError);
 
-impl std::fmt::Display for ModernApiError {
+impl std::fmt::Display for ApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(&self.0, f)
     }
 }
 
-impl std::fmt::Debug for ModernApiError {
+impl std::fmt::Debug for ApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Debug::fmt(&self.0, f)
     }
 }
 
-impl std::error::Error for ModernApiError {
+impl std::error::Error for ApiError {
     fn source(&self) -> std::option::Option<&(dyn std::error::Error + 'static)> {
         self.0.source()
     }
 }
 
-impl<T: Into<FpError>> From<T> for ModernApiError {
+impl<T: Into<FpError>> From<T> for ApiError {
     fn from(value: T) -> Self {
         Self(value.into())
     }
@@ -55,7 +55,7 @@ pub struct SerializedApiResponse {
 }
 
 
-impl actix_web::ResponseError for ModernApiError {
+impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         self.0.status_code()
     }
@@ -94,11 +94,11 @@ impl actix_web::ResponseError for ModernApiError {
     }
 }
 
-pub type ModernApiResult<T> = Result<T, ModernApiError>;
+pub type ApiResponse<T> = Result<T, ApiError>;
 
 /// For legacy non-paginated APIs, a wrapper around Vec that implements Responder.
 /// Should only use this for non-paginated APIs, which we shouldn't add many of.
-pub type JsonApiListResponse<T> = ModernApiResult<ListResponse<T>>;
+pub type ApiListResponse<T> = ApiResponse<ListResponse<T>>;
 
 #[derive(derive_more::From, serde::Serialize)]
 pub struct ListResponse<T>(Vec<T>);
@@ -139,7 +139,7 @@ impl<A> FromIterator<A> for ListResponse<A> {
 }
 
 /// return string results
-pub type StringResponse = ModernApiResult<String>;
+pub type StringResponse = ApiResponse<String>;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 /// Metadata required for a cursor-paginated response.
@@ -154,7 +154,7 @@ pub struct CursorPaginatedResponseMeta<C> {
     pub count: Option<i64>,
 }
 
-pub type CursorPaginatedResponse<T, C> = ModernApiResult<Json<CursorPaginatedResponseInner<T, C>>>;
+pub type CursorPaginatedResponse<T, C> = ApiResponse<Json<CursorPaginatedResponseInner<T, C>>>;
 
 #[derive(Debug, serde::Serialize)]
 /// Wraps the response data with metadata needed for a cursor-paginated result.
@@ -168,7 +168,7 @@ pub struct CursorPaginatedResponseInner<T, C> {
 }
 
 impl<T, C> CursorPaginatedResponseInner<T, C> {
-    pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> ModernApiResult<Json<Self>> {
+    pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> ApiResponse<Json<Self>> {
         Ok(Json(Self {
             data,
             meta: CursorPaginatedResponseMeta { next, count },

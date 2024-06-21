@@ -4,7 +4,7 @@ use crate::utils::session::JsonSession;
 use crate::State;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_wire_types::D2pGenerateRequest;
 use api_wire_types::D2pGenerateResponse;
@@ -28,7 +28,7 @@ pub async fn handler(
     // Option for backwards compatibility
     request: Option<web::Json<D2pGenerateRequest>>,
     user_auth: UserAuthContext,
-) -> ModernApiResult<D2pGenerateResponse> {
+) -> ApiResponse<D2pGenerateResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let session_key = state.session_sealing_key.clone();
     let auth_token = state

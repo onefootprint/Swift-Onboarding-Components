@@ -1,7 +1,7 @@
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::headers::TelemetryHeaders;
 use crate::State;
 use actix_web::web::Json;
@@ -24,7 +24,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     telemetry_headers: TelemetryHeaders,
     request: Json<FingerprintVisitRequest>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let FingerprintVisitRequest {

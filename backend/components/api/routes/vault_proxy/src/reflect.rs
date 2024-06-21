@@ -3,7 +3,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::proxy;
 use crate::proxy::token_parser::ProxyTokenParser;
 use crate::utils::headers::InsightHeaders;
-use crate::ModernApiResult;
+use crate::ApiResponse;
 use crate::State;
 use api_core::api_headers_schema;
 use api_core::auth::CanDecrypt;
@@ -46,7 +46,7 @@ pub async fn post(
     insight: InsightHeaders,
     params: ReflectHeaderParams,
     root_span: RootSpan,
-) -> ModernApiResult<HttpResponse> {
+) -> ApiResponse<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
         return Err(ApiCoreError::InvalidProxyBody.into());
@@ -79,7 +79,7 @@ pub async fn post(
 }
 
 #[tracing::instrument(skip_all)]
-fn build_response(detokenized_body: PiiString) -> ModernApiResult<HttpResponse> {
+fn build_response(detokenized_body: PiiString) -> ApiResponse<HttpResponse> {
     let mut builder = HttpResponse::build(StatusCode::OK);
     let response = builder.body(detokenized_body.leak().as_bytes().to_vec());
     Ok(response)

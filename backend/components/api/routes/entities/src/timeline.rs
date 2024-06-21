@@ -3,7 +3,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::ListTimelineRequest;
 use db::models::user_timeline::UserTimeline;
@@ -21,7 +21,7 @@ pub async fn get(
     fp_id: FpIdPath,
     filters: web::Query<ListTimelineRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiListResponse<api_wire_types::UserTimeline> {
+) -> ApiListResponse<api_wire_types::UserTimeline> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

@@ -1,6 +1,6 @@
 use super::get_header;
 use crate::ApiCoreError;
-use crate::ModernApiResult;
+use crate::ApiResponse;
 use actix_web::http::header::HeaderMap;
 use actix_web::FromRequest;
 use derive_more::Deref;
@@ -53,7 +53,7 @@ impl paperclip::actix::OperationModifier for ExternalId {}
 impl ExternalId {
     const HEADER_NAME: &'static str = "x-external-id";
 
-    pub fn parse_from_request(headers: &HeaderMap) -> ModernApiResult<Self> {
+    pub fn parse_from_request(headers: &HeaderMap) -> ApiResponse<Self> {
         let external_id = if let Some(id) = get_header(Self::HEADER_NAME, headers) {
             if id.len() < 10 || id.len() > 256 {
                 return Err(ApiCoreError::ValidationError(
@@ -74,7 +74,7 @@ impl ExternalId {
 }
 
 impl FromRequest for ExternalId {
-    type Error = crate::ModernApiError;
+    type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {

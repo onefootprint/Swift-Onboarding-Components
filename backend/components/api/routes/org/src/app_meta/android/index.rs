@@ -1,8 +1,8 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::JsonApiListResponse;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiListResponse;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::UpdateTenantAndroidAppMetaRequest;
@@ -25,7 +25,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> JsonApiListResponse<api_wire_types::TenantAndroidAppMeta> {
+) -> ApiListResponse<api_wire_types::TenantAndroidAppMeta> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let list = state
@@ -55,7 +55,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantAndroidAppMetaRequest>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::TenantAndroidAppMeta> {
+) -> ApiResponse<api_wire_types::TenantAndroidAppMeta> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -104,7 +104,7 @@ async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<TenantAndroidAppMetaId>,
     request: web::Json<UpdateTenantAndroidAppMetaRequest>,
-) -> ModernApiResult<api_wire_types::TenantAndroidAppMeta> {
+) -> ApiResponse<api_wire_types::TenantAndroidAppMeta> {
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();

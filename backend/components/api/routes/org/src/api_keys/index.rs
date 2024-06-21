@@ -3,7 +3,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
@@ -40,7 +40,7 @@ pub async fn get(
     filters: web::Query<ApiKeyFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<ApiKeysResponse> {
+) -> ApiResponse<ApiKeysResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let page = pagination.page;
     let page_size = pagination.page_size(&state);
@@ -92,7 +92,7 @@ pub async fn post(
     // Don't allow updating an API key with an API key...
     auth: TenantSessionAuth,
     request: web::Json<CreateApiKeyRequest>,
-) -> ModernApiResult<api_wire_types::SecretApiKey> {
+) -> ApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
@@ -135,7 +135,7 @@ pub async fn patch(
     auth: TenantSessionAuth,
     path: web::Path<TenantApiKeyId>,
     request: web::Json<UpdateApiKeyRequest>,
-) -> ModernApiResult<api_wire_types::SecretApiKey> {
+) -> ApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let id = path.into_inner();
     if let AuthActor::TenantApiKey(key_id) = auth.actor() {

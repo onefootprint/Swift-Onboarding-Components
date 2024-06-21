@@ -3,7 +3,7 @@ use actix_web::post;
 use actix_web::web;
 use actix_web::web::Json;
 use api_core::task;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use chrono::Utc;
 use db::models::task::Task;
@@ -21,7 +21,7 @@ async fn execute_tasks(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<ExecuteTasksRequest>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let ExecuteTasksRequest { num_tasks } = request.into_inner();
     task::poll_and_execute_tasks_non_blocking((*state.into_inner()).clone(), num_tasks, None);
     Ok(api_wire_types::Empty)
@@ -42,7 +42,7 @@ async fn create_task(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<CreateTaskRequest>,
-) -> ModernApiResult<CreateTasksResponse> {
+) -> ApiResponse<CreateTasksResponse> {
     let CreateTaskRequest { task_data } = request.into_inner();
 
     let task = state

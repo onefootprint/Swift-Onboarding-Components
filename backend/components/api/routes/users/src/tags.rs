@@ -2,8 +2,8 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::types::JsonApiListResponse;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiListResponse;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::fp_id_path::FpIdPathPlus;
@@ -30,7 +30,7 @@ pub async fn post(
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
     request: Json<CreateTagRequest>,
-) -> ModernApiResult<api_wire_types::UserTag> {
+) -> ApiResponse<api_wire_types::UserTag> {
     auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();
@@ -63,7 +63,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiListResponse<api_wire_types::UserTag> {
+) -> ApiListResponse<api_wire_types::UserTag> {
     auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();
@@ -88,7 +88,7 @@ pub async fn delete(
     state: web::Data<State>,
     path: FpIdPathPlus<TagId>,
     auth: SecretTenantAuthContext,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::Tags)?;
     let auth = auth.check_guard(TenantGuard::LabelAndTag)?;
     let tenant_id = auth.tenant().id.clone();

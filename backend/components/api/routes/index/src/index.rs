@@ -1,4 +1,4 @@
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::types::StringResponse;
 use actix_web::HttpRequest;
 use paperclip::actix::api_v2_operation;
@@ -7,7 +7,7 @@ use paperclip::actix::get;
 #[api_v2_operation(tags(Private))]
 #[tracing::instrument(name = "index")]
 #[get("/")]
-async fn root() -> ModernApiResult<api_wire_types::Empty> {
+async fn root() -> ApiResponse<api_wire_types::Empty> {
     Ok(api_wire_types::Empty)
 }
 

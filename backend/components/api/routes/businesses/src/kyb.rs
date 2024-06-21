@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
@@ -47,7 +47,7 @@ pub async fn post(
     request: web::Json<TriggerKybRequest>,
     auth: SecretTenantAuthContext,
     root_span: RootSpan,
-) -> ModernApiResult<web::Json<EntityValidateResponse>> {
+) -> ApiResponse<web::Json<EntityValidateResponse>> {
     let auth = auth.check_guard(TenantGuard::TriggerKyb)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

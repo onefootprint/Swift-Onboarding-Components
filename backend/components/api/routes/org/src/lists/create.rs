@@ -2,7 +2,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ValidationError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::headers::InsightHeaders;
 use api_core::FpResult;
@@ -31,7 +31,7 @@ pub async fn create_list(
     auth: TenantSessionAuth,
     request: Json<CreateListRequest>,
     insights: InsightHeaders,
-) -> ModernApiResult<api_wire_types::List> {
+) -> ApiResponse<api_wire_types::List> {
     let auth = auth.check_guard(TenantGuard::WriteLists)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

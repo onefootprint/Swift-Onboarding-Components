@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
@@ -63,7 +63,7 @@ pub async fn patch(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insight: InsightHeaders,
     ignore_luhn_validation: IgnoreLuhnValidation,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let path = path.into_inner();
@@ -87,7 +87,7 @@ pub async fn patch_client(
     request: Json<RawDataRequest>,
     auth: ClientTenantAuthContext,
     insight: InsightHeaders,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     // This is a little different - we actually require a permission to update the data in the
     // vault since the ClientTenantAuth tokens are scoped to specific fields
     let request = request.into_inner();
@@ -105,7 +105,7 @@ async fn patch_inner(
     auth: Box<dyn TenantAuth>,
     insight: InsightHeaders,
     ignore_luhn_validation: bool,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let insight = CreateInsightEvent::from(insight);
 
     let tenant_id: newtypes::TenantId = auth.tenant().id.clone();

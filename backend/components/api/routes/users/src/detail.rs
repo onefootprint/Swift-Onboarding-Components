@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -23,7 +23,7 @@ pub async fn detail(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> ModernApiResult<api_wire_types::User> {
+) -> ApiResponse<api_wire_types::User> {
     // Low confidence in this being the right future-proof API, so let's gate it
     let show_requires_additional_info = auth.can_access_preview(&PreviewApi::CreateUserToken);
 

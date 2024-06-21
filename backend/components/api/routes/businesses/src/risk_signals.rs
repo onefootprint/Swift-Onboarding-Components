@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::JsonApiListResponse;
+use crate::types::ApiListResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -26,7 +26,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiListResponse<api_wire_types::PublicRiskSignal> {
+) -> ApiListResponse<api_wire_types::PublicRiskSignal> {
     auth.check_preview_guard(PreviewApi::RiskSignalsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

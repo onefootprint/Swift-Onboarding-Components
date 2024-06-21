@@ -3,7 +3,7 @@ use api_core::auth::session::GetSessionForUpdate;
 use api_core::auth::tenant::AnyOrgSessionAuth;
 use api_core::auth::tenant::AnyPartnerTenantSessionAuth;
 use api_core::errors::AssertionError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
@@ -30,7 +30,7 @@ fn post(
     state: web::Data<State>,
     request: Json<AssumePartnerRoleRequest>,
     pt_auth: AnyPartnerTenantSessionAuth,
-) -> ModernApiResult<AssumePartnerRoleResponse> {
+) -> ApiResponse<AssumePartnerRoleResponse> {
     let AssumePartnerRoleRequest { partner_tenant_id } = request.into_inner();
     let auth_method = pt_auth.auth_method();
     let tu_id = pt_auth.clone().tenant_user_id()?;

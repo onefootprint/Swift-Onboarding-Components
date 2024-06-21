@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
@@ -52,7 +52,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<TriggerRequest>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<EntityActionResponse> {
+) -> ApiResponse<EntityActionResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let request = request.into_inner();
     let tenant_id = auth.tenant().id.clone();

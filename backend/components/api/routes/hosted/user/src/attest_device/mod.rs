@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use actix_web::web::Json;
 use api_core::decision::vendor;
@@ -53,7 +53,7 @@ pub async fn post_challenge(
     request: Json<GetDeviceAttestationChallengeRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> ModernApiResult<DeviceAttestationChallengeResponse> {
+) -> ApiResponse<DeviceAttestationChallengeResponse> {
     let _ = user_auth.check_guard(UserAuthScope::SignUp)?;
     let GetDeviceAttestationChallengeRequest {
         device_type,
@@ -94,7 +94,7 @@ pub async fn post_attestation(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insight: InsightHeaders,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let CreateDeviceAttestationRequest {

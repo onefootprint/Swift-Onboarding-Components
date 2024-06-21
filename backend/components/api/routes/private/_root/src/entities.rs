@@ -3,7 +3,7 @@ use actix_web::web;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
 use api_core::telemetry::RootSpan;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
@@ -16,7 +16,7 @@ async fn get(
     auth: FirmEmployeeAuthContext,
     id: web::Path<String>,
     root_span: RootSpan,
-) -> ModernApiResult<api_wire_types::SuperAdminEntity> {
+) -> ApiResponse<api_wire_types::SuperAdminEntity> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
     let id = id.into_inner();
 

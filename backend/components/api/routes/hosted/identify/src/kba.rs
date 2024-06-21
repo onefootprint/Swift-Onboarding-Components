@@ -4,7 +4,7 @@ use api_core::auth::session::user::TokenCreationPurpose;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::ValidationError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_core::FpResult;
@@ -30,7 +30,7 @@ pub async fn post(
     request: Json<RawDataRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> ModernApiResult<KbaResponse> {
+) -> ApiResponse<KbaResponse> {
     let user_auth = user_auth.check_guard(Any)?;
 
     // We reuse the same request structure that is used for adding data to the vault. This lets us

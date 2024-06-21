@@ -3,7 +3,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthScope;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use db::access_event::AccessEventListItemForUser;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -21,7 +21,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> JsonApiListResponse<api_wire_types::AccessEvent> {
+) -> ApiListResponse<api_wire_types::AccessEvent> {
     let user_auth = user_auth.check_guard(UserAuthScope::BasicProfile)?;
 
     // TODO paginate the response when there are too many results

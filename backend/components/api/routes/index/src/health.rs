@@ -1,5 +1,5 @@
 use crate::auth::custodian::CustodianAuthContext;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::types::StringResponse;
 use crate::State;
 use actix_web::cookie::time::Instant;
@@ -90,7 +90,7 @@ pub struct EnclaveHealthResponse {
 async fn enclave(
     state: web::Data<State>,
     _custodian: CustodianAuthContext,
-) -> ModernApiResult<EnclaveHealthResponse> {
+) -> ApiResponse<EnclaveHealthResponse> {
     let now = Instant::now();
 
     let (pk, sk) = state.enclave_client.generate_sealed_keypair().await?;
@@ -118,7 +118,7 @@ async fn enclave(
 async fn enclave_decrypt(
     state: web::Data<State>,
     _custodian: CustodianAuthContext,
-) -> ModernApiResult<EnclaveHealthResponse> {
+) -> ApiResponse<EnclaveHealthResponse> {
     let now = Instant::now();
 
     let test = newtypes::PiiString::from("test data");

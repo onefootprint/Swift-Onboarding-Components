@@ -2,7 +2,7 @@ use actix_multipart::Multipart;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::partner_tenant::PartnerTenant;
@@ -24,7 +24,7 @@ pub async fn put(
     auth: PartnerTenantSessionAuth,
     payload: Multipart,
     request: HttpRequest,
-) -> ModernApiResult<api_wire_types::PartnerOrganization> {
+) -> ApiResponse<api_wire_types::PartnerOrganization> {
     let auth = auth.check_guard(PartnerTenantGuard::Admin)?;
     let pt_id = auth.partner_tenant().id.clone();
 

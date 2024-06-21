@@ -1,6 +1,6 @@
 use actix_web::web;
 use api_core::decision::vendor::samba::license_validation::get_samba_license_validation_report;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::web::Json;
 use api_core::FpResult;
 use api_core::State;
@@ -16,7 +16,7 @@ const LOG_MSG: &str = "samba webhook";
 async fn handle_webhook(
     state: web::Data<State>,
     request: Json<serde_json::Value>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let req = request.into_inner();
     match serde_json::from_value::<SambaWebhook>(req) {
         Ok(webhook) => {

@@ -2,7 +2,7 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::State;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
@@ -21,7 +21,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_bid: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> ModernApiResult<api_wire_types::Business> {
+) -> ApiResponse<api_wire_types::Business> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

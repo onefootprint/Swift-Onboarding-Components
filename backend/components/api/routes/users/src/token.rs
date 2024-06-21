@@ -1,5 +1,5 @@
 use crate::auth::tenant::CheckTenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::tenant::SecretTenantAuthContext;
@@ -44,7 +44,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: OptionalJson<CreateTokenRequest, true>,
     auth: SecretTenantAuthContext,
-) -> ModernApiResult<CreateTokenResponse> {
+) -> ApiResponse<CreateTokenResponse> {
     auth.check_preview_guard(PreviewApi::CreateUserToken)?;
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
     let CreateTokenRequest {

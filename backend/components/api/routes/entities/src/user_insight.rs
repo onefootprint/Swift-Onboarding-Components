@@ -3,7 +3,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::serializers::user_insights;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::State;
 use db::models::insight_event::InsightEvent;
@@ -24,7 +24,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: TenantSessionAuth,
-) -> JsonApiListResponse<api_wire_types::UserInsight> {
+) -> ApiListResponse<api_wire_types::UserInsight> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

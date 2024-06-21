@@ -3,7 +3,7 @@
 use crate::ProtectedAuth;
 use actix_web::post;
 use actix_web::web;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::Pii;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -34,7 +34,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<CompareAnalyzeRequest>,
     _: ProtectedAuth,
-) -> ModernApiResult<ComparisonAndDocOcrResult> {
+) -> ApiResponse<ComparisonAndDocOcrResult> {
     let CompareAnalyzeRequest {
         fp_id,
         document_id,

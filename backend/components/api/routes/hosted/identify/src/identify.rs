@@ -8,7 +8,7 @@ use api_core::auth::session::user::UserSession;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::telemetry::RootSpan;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
@@ -51,7 +51,7 @@ pub async fn post(
     // for the authed user
     user_auth: Option<UserAuthContext>,
     root_span: RootSpan,
-) -> ModernApiResult<IdentifyResponse> {
+) -> ApiResponse<IdentifyResponse> {
     let IdentifyRequest {
         identifier,
         email,

@@ -3,7 +3,7 @@ use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::Either;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_wire_types::PublicRiskSignalDescription;
 use newtypes::FootprintReasonCode;
 use paperclip::actix::api_v2_operation;
@@ -14,7 +14,7 @@ use strum::IntoEnumIterator;
 #[get("/org/risk_signals")]
 pub fn get(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiListResponse<api_wire_types::PublicRiskSignalDescription> {
+) -> ApiListResponse<api_wire_types::PublicRiskSignalDescription> {
     let _auth = auth.check_guard(TenantGuard::Read)?;
 
     let response = FootprintReasonCode::iter()

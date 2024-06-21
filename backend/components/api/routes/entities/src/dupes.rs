@@ -4,7 +4,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
 use crate::get;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::utils::db2api::DbToApi;
@@ -33,7 +33,7 @@ pub async fn get_dupes(
     state: web::Data<State>,
     request: FpIdPath,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> ModernApiResult<api_wire_types::Dupes> {
+) -> ApiResponse<api_wire_types::Dupes> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
@@ -30,7 +30,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::SecretApiKey> {
+) -> ApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_guard(TenantGuard::ApiKeys)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();

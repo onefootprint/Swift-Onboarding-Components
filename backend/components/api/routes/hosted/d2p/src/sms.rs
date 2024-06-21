@@ -5,7 +5,7 @@ use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::user::UserError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::vault_wrapper::Person;
 use api_core::ApiCoreError;
 use newtypes::sms_message::SmsMessage;
@@ -39,7 +39,7 @@ pub async fn handler(
     user_auth: UserAuthContext,
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
-) -> ModernApiResult<D2pSmsResponse> {
+) -> ApiResponse<D2pSmsResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::Handoff)?;
 
     let uvw = state

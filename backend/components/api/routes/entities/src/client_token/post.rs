@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::session::tenant::ClientTenantAuth;
 use api_core::auth::tenant::AuthActor;
@@ -41,7 +41,7 @@ pub async fn post(
     // For now, only accept tenant API key
     auth: SecretTenantAuthContext,
     root_span: RootSpan,
-) -> ModernApiResult<CreateClientTokenResponse> {
+) -> ApiResponse<CreateClientTokenResponse> {
     let CreateClientTokenRequest {
         fields,
         ttl,

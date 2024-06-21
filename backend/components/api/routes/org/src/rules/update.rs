@@ -3,7 +3,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
 use api_core::decision::rule_engine::validation::validate_rule_expression;
 use api_core::errors::ValidationError;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
@@ -41,7 +41,7 @@ pub async fn multi_update_rules(
     auth: TenantSessionAuth,
     path: web::Path<ObConfigurationId>,
     request: Json<MultiUpdateRuleRequest>,
-) -> JsonApiListResponse<api_wire_types::Rule> {
+) -> ApiListResponse<api_wire_types::Rule> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

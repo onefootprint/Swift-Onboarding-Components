@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
@@ -18,7 +18,7 @@ async fn get_detail(
     state: web::Data<State>,
     list_id: web::Path<ListId>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::ListDetails> {
+) -> ApiResponse<api_wire_types::ListDetails> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

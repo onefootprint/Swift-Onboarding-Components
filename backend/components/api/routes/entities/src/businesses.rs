@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
@@ -21,7 +21,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: TenantSessionAuth,
-) -> JsonApiListResponse<api_wire_types::PrivateOwnedBusiness> {
+) -> ApiListResponse<api_wire_types::PrivateOwnedBusiness> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

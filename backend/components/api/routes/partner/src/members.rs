@@ -1,5 +1,5 @@
 use api_core::auth::tenant::PartnerTenantSessionAuth;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::State;
@@ -23,7 +23,7 @@ async fn get(
     filters: web::Query<OrgMemberFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
+) -> ApiResponse<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
     members_common::get(state, filters, pagination, auth.into()).await
 }
 
@@ -36,7 +36,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantUserRequest>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationMember> {
+) -> ApiResponse<api_wire_types::OrganizationMember> {
     members_common::post(state, request, auth.into()).await
 }
 
@@ -50,7 +50,7 @@ async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRolebindingRequest>,
     tu_id: web::Path<TenantUserId>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationMember> {
+) -> ApiResponse<api_wire_types::OrganizationMember> {
     members_common::patch(state, request, tu_id, auth.into()).await
 }
 
@@ -63,6 +63,6 @@ async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     members_common::deactivate(state, tu_id, auth.into()).await
 }

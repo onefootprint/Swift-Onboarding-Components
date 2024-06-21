@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::rule_instance::IncludeRules;
@@ -23,7 +23,7 @@ pub async fn list_rules_for_playbook(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     ob_config_id: web::Path<ObConfigurationId>,
-) -> JsonApiListResponse<api_wire_types::Rule> {
+) -> ApiListResponse<api_wire_types::Rule> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

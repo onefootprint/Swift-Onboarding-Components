@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::State;
 use api_wire_types::ApexCheckedKycData;
@@ -30,7 +30,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<ApexCipReportRequest>,
     fp_id: FpIdPath,
-) -> ModernApiResult<ApexCipSummaryResults> {
+) -> ApiResponse<ApexCipSummaryResults> {
     let ApexCipReportRequest { default_approver } = request.into_inner();
     let fp_id = fp_id.into_inner();
     let request = OldApexCipReportRequest {
@@ -51,7 +51,7 @@ pub async fn post_old(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<OldApexCipReportRequest>,
-) -> ModernApiResult<ApexCipSummaryResults> {
+) -> ApiResponse<ApexCipSummaryResults> {
     let result = post_inner(state, auth, request.into_inner()).await?;
     Ok(result)
 }
@@ -60,7 +60,7 @@ pub async fn post_inner(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: OldApexCipReportRequest,
-) -> ModernApiResult<ApexCipSummaryResults> {
+) -> ApiResponse<ApexCipSummaryResults> {
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();

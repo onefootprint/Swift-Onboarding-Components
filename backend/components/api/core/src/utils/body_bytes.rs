@@ -1,4 +1,4 @@
-use crate::ModernApiError;
+use crate::ApiError;
 use actix_web::dev::Payload;
 use actix_web::FromRequest;
 use actix_web::HttpRequest;
@@ -24,7 +24,7 @@ impl<const L: usize> BodyBytes<L> {
 }
 // This is our actual deserialzier (where the limit is used)
 impl<const LIMIT: usize> FromRequest for BodyBytes<LIMIT> {
-    type Error = ModernApiError;
+    type Error = ApiError;
     type Future = actix_bytes::BytesExtractFut<LIMIT>;
 
     fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
@@ -77,7 +77,7 @@ mod actix_bytes {
     }
 
     impl<const LIMIT: usize> Future for BytesExtractFut<LIMIT> {
-        type Output = Result<BodyBytes<LIMIT>, ModernApiError>;
+        type Output = Result<BodyBytes<LIMIT>, ApiError>;
 
         fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             Pin::new(&mut self.body_fut).poll(cx).map_err(Into::into)
@@ -90,7 +90,7 @@ mod actix_bytes {
         length: Option<usize>,
         stream: dev::Decompress<dev::Payload>,
         buf: BytesMut,
-        err: Option<ModernApiError>,
+        err: Option<ApiError>,
     }
 
     impl<const LIMIT: usize> HttpMessageBody<LIMIT> {
@@ -105,15 +105,13 @@ mod actix_bytes {
                     Ok(s) => match s.parse::<usize>() {
                         Ok(l) => {
                             if l > LIMIT {
-                                err = Some(ModernApiError::from(InvalidBodyError::RequestTooLarge {
-                                    max: LIMIT,
-                                }));
+                                err = Some(ApiError::from(InvalidBodyError::RequestTooLarge { max: LIMIT }));
                             }
                             length = Some(l)
                         }
-                        Err(_) => err = Some(ModernApiError::from(InvalidBodyError::UnknownLength)),
+                        Err(_) => err = Some(ApiError::from(InvalidBodyError::UnknownLength)),
                     },
-                    Err(_) => err = Some(ModernApiError::from(InvalidBodyError::UnknownLength)),
+                    Err(_) => err = Some(ApiError::from(InvalidBodyError::UnknownLength)),
                 }
             }
 
@@ -129,7 +127,7 @@ mod actix_bytes {
     }
 
     impl<const LIMIT: usize> Future for HttpMessageBody<LIMIT> {
-        type Output = Result<BodyBytes<LIMIT>, ModernApiError>;
+        type Output = Result<BodyBytes<LIMIT>, ApiError>;
 
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             let this = self.get_mut();
@@ -156,12 +154,12 @@ mod actix_bytes {
                                     InvalidBodyError::FailedToDecode
                                 }
                             })
-                            .map_err(ModernApiError::from)?;
+                            .map_err(ApiError::from)?;
 
                         if this.buf.len() + chunk.len() > LIMIT {
-                            return Poll::Ready(Err(ModernApiError::from(
-                                InvalidBodyError::RequestTooLarge { max: LIMIT },
-                            )));
+                            return Poll::Ready(Err(ApiError::from(InvalidBodyError::RequestTooLarge {
+                                max: LIMIT,
+                            })));
                         } else {
                             this.buf.extend_from_slice(&chunk);
                         }

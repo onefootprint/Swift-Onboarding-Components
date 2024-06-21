@@ -1,6 +1,6 @@
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::ModernApiResult;
+use crate::ApiResponse;
 use crate::State;
 use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
@@ -37,7 +37,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: PathClientTenantAuthContext,
     insights: InsightHeaders,
-) -> ModernApiResult<HttpResponse> {
+) -> ApiResponse<HttpResponse> {
     // Any guard here since we enforce that we have the DecryptDownload permission below
     let auth = auth.0.check_guard(api_core::auth::Any)?;
     let principal = auth.actor().into();

@@ -13,7 +13,7 @@ use api_core::decision::state::WorkflowKind;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::workflow::WorkflowError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::FpResult;
@@ -45,7 +45,7 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     state: web::Data<State>,
     request: OptionalJson<ProcessRequest>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
 

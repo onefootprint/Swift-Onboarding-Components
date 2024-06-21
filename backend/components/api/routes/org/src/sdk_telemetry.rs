@@ -1,4 +1,4 @@
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
 use paperclip::actix::web;
@@ -19,7 +19,7 @@ struct LogBody {
 
 #[api_v2_operation(tags(SdkArgs, Hosted), description = "Log contents of the HTTP body. ")]
 #[post("/org/sdk_telemetry")]
-async fn post(request: web::Json<LogBody>) -> ModernApiResult<api_wire_types::Empty> {
+async fn post(request: web::Json<LogBody>) -> ApiResponse<api_wire_types::Empty> {
     let fmt = |v: Option<String>| v.unwrap_or_default();
     let LogBody {
         tenant_domain,

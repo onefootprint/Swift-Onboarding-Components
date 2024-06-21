@@ -5,7 +5,7 @@ use crate::auth::Either;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::FpResult;
 use db::models::auth_event::AuthEvent;
@@ -23,7 +23,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
-) -> JsonApiListResponse<api_wire_types::AuthEvent> {
+) -> ApiListResponse<api_wire_types::AuthEvent> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

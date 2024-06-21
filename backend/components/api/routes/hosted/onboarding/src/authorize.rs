@@ -4,7 +4,7 @@ use crate::FpResult;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::errors::onboarding::UnmetRequirements;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::requirements::GetRequirementsArgs;
 use db::models::workflow::Workflow;
@@ -25,7 +25,7 @@ use paperclip::actix::{
 pub async fn post(
     user_auth: UserWfAuthContext,
     state: web::Data<State>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
 
     let span = tracing::Span::current();

@@ -1,4 +1,4 @@
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::types::OffsetPaginationRequest;
 use crate::State;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
@@ -21,7 +21,7 @@ async fn get(
     filters: web::Query<OrgRoleFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<roles_common::RolesResponse> {
+) -> ApiResponse<roles_common::RolesResponse> {
     roles_common::get(state, filters, pagination, auth.into()).await
 }
 
@@ -34,7 +34,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantRoleRequest>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationRole> {
+) -> ApiResponse<api_wire_types::OrganizationRole> {
     roles_common::post(state, request, auth.into()).await
 }
 
@@ -48,7 +48,7 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationRole> {
+) -> ApiResponse<api_wire_types::OrganizationRole> {
     roles_common::patch(state, request, role_id, auth.into()).await
 }
 
@@ -61,6 +61,6 @@ pub async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationRole> {
+) -> ApiResponse<api_wire_types::OrganizationRole> {
     roles_common::deactivate(state, role_id, auth.into()).await
 }

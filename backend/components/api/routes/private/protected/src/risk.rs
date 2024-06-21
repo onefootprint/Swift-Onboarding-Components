@@ -26,7 +26,7 @@ use api_core::decision::{
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::AssertionError;
 use api_core::task;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
@@ -82,7 +82,7 @@ async fn make_vendor_calls(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<MakeVendorCallsRequest>,
-) -> ModernApiResult<MakeVendorCallsResponse> {
+) -> ApiResponse<MakeVendorCallsResponse> {
     let MakeVendorCallsRequest { wf_id, vendor_api } = request.into_inner();
     let (wf, sv) = state
         .db_pool
@@ -177,7 +177,7 @@ async fn make_decision(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<MakeDecisionRequest>,
-) -> ModernApiResult<MakeDecisionResponse> {
+) -> ApiResponse<MakeDecisionResponse> {
     let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
 
     let decision = state
@@ -239,7 +239,7 @@ async fn shadow_run(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<ShadowRunRequest>,
-) -> ModernApiResult<ShadowRunResult> {
+) -> ApiResponse<ShadowRunResult> {
     let ShadowRunRequest { wf_id, vendor_api } = request.into_inner();
     let vendor_apis = vec![vendor_api];
     let (wf, sv) = state
@@ -342,7 +342,7 @@ async fn save_risk_signals_for_vres(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<SaveVresRiskSignalsRequest>,
-) -> ModernApiResult<SaveVresRiskSignalsResult> {
+) -> ApiResponse<SaveVresRiskSignalsResult> {
     let SaveVresRiskSignalsRequest { vres_id } = request.into_inner();
 
     let (vreq_vres, vw) = state

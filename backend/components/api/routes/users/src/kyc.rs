@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::kyc::KycState;
@@ -53,7 +53,7 @@ pub async fn post(
     request: web::Json<TriggerKycRequest>,
     auth: SecretTenantAuthContext,
     root_span: RootSpan,
-) -> ModernApiResult<EntityValidateResponse> {
+) -> ApiResponse<EntityValidateResponse> {
     let auth = auth.check_guard(TenantGuard::TriggerKyc)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

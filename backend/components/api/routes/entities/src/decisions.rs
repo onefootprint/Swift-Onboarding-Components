@@ -2,7 +2,7 @@ use crate::actions::EntityActionPostCommit;
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::decision::review::save_review_decision;
 use api_core::errors::onboarding::OnboardingError;
@@ -27,7 +27,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<ManualDecisionRequest>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

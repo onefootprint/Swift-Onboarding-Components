@@ -2,7 +2,7 @@ use actix_web::web;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
@@ -23,7 +23,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: web::Json<api_wire_types::VaultDrEnrollRequest>,
-) -> ModernApiResult<api_wire_types::VaultDrEnrollResponse> {
+) -> ApiResponse<api_wire_types::VaultDrEnrollResponse> {
     let auth = auth.check_guard(TenantGuard::Admin)?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;

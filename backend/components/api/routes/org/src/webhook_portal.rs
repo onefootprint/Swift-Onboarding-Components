@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
@@ -14,7 +14,7 @@ use webhooks::WebhookApp;
 async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::WebhookPortalResponse> {
+) -> ApiResponse<api_wire_types::WebhookPortalResponse> {
     let auth = auth.check_guard(TenantGuard::ManageWebhooks)?;
     let is_live = auth.is_live()?;
 

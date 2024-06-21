@@ -3,7 +3,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::CanDecrypt;
@@ -12,7 +12,7 @@ use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
 use api_core::decision::vendor::vendor_result::VendorResult;
 use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::Any;
@@ -72,7 +72,7 @@ pub async fn get(
     // /users/<>/risk_signals API
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     root_span: RootSpan,
-) -> JsonApiListResponse<api_wire_types::RiskSignal> {
+) -> ApiListResponse<api_wire_types::RiskSignal> {
     // Some tracing to track when tenants have stopped using this API
     if let Either::Right(_) = &auth {
         // Apiture and fractional are still using this
@@ -164,7 +164,7 @@ pub async fn get_detail(
     state: web::Data<State>,
     request: web::Path<(FpId, RiskSignalId)>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::RiskSignalDetail> {
+) -> ApiResponse<api_wire_types::RiskSignalDetail> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -189,7 +189,7 @@ pub async fn decrypt_aml_hits(
     request: web::Path<(FpId, RiskSignalId)>,
     auth: TenantSessionAuth,
     insights: InsightHeaders,
-) -> ModernApiResult<api_wire_types::AmlDetail> {
+) -> ApiResponse<api_wire_types::AmlDetail> {
     let read_auth = auth.clone().check_guard(TenantGuard::Read)?;
     let tenant_id = read_auth.tenant().id.clone();
     let is_live = read_auth.is_live()?;

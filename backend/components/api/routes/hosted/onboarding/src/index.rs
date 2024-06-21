@@ -10,7 +10,7 @@ use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::TokenCreationPurpose;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::onboarding::NewBusinessVaultArgs;
@@ -44,7 +44,7 @@ pub async fn post(
     ob_pk_auth: Option<ObConfigAuth>,
     insights: InsightHeaders,
     request: OptionalJson<PostOnboardingRequest>,
-) -> ModernApiResult<OnboardingResponse> {
+) -> ApiResponse<OnboardingResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
 

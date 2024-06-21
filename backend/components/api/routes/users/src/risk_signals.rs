@@ -4,7 +4,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::decision::vendor::neuro_id::tenant_can_view_neuro;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::risk_signal::AtSeqno;
 use db::models::risk_signal::RiskSignal;
@@ -28,7 +28,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> JsonApiListResponse<api_wire_types::PublicRiskSignal> {
+) -> ApiListResponse<api_wire_types::PublicRiskSignal> {
     auth.check_preview_guard(PreviewApi::RiskSignalsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

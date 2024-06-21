@@ -3,7 +3,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::AssertionError;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::ApiCoreError;
 use api_core::FpResult;
@@ -29,7 +29,7 @@ pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
     args: web::Path<(TenantCompliancePartnershipId, ComplianceDocId)>,
-) -> JsonApiListResponse<ComplianceDocEvent> {
+) -> ApiListResponse<ComplianceDocEvent> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();

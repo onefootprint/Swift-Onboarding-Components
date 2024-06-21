@@ -7,7 +7,7 @@ use api_core::auth::IsGuardMet;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::onboarding::UnmetRequirements;
 use api_core::errors::AssertionError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::identify::get_user_challenge_context;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::requirements::GetRequirementsArgs;
@@ -32,7 +32,7 @@ pub async fn post(
     // We should build some better consolidation for accepting these two auths
     user_auth: UserAuthContext,
     user_wf_auth: Option<UserWfAuthContext>,
-) -> ModernApiResult<HostedValidateResponse> {
+) -> ApiResponse<HostedValidateResponse> {
     let (wf, sv_id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
         // We're generating a token after onboarding has finished
         let user_wf_auth = user_wf_auth.check_guard(UserAuthScope::SignUp)?;

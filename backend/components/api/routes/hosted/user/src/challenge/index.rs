@@ -9,7 +9,7 @@ use api_core::auth::user::UserAuthScope;
 use api_core::auth::IsGuardMet;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
@@ -36,7 +36,7 @@ pub async fn post(
     request: Json<UserChallengeRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> ModernApiResult<UserChallengeResponse> {
+) -> ApiResponse<UserChallengeResponse> {
     let user_auth = user_auth
         .check_guard(UserAuthScope::ExplicitAuth.and(UserAuthScope::Auth.or(UserAuthScope::SignUp)))?;
     let UserChallengeRequest {

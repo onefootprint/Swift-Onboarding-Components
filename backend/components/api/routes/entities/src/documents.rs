@@ -3,7 +3,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Any;
@@ -35,7 +35,7 @@ pub async fn get(
     request: FpIdPath,
     auth: TenantSessionAuth,
     filters: web::Query<api_wire_types::GetHistoricalDataRequest>,
-) -> JsonApiListResponse<api_wire_types::Document> {
+) -> ApiListResponse<api_wire_types::Document> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

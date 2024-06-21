@@ -1,7 +1,7 @@
 use crate::GetIdentifyChallengeArgs;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::telemetry::RootSpan;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use api_wire_types::IdentifyId;
 use api_wire_types::LiteIdentifyRequest;
@@ -24,7 +24,7 @@ pub async fn post(
     state: web::Data<State>,
     ob_context: Option<ObConfigAuth>,
     root_span: RootSpan,
-) -> ModernApiResult<LiteIdentifyResponse> {
+) -> ApiResponse<LiteIdentifyResponse> {
     let LiteIdentifyRequest { email, phone_number } = request.into_inner();
     let identifiers = vec![
         email.as_ref().map(|e| IdentifyId::Email(e.clone())),

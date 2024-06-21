@@ -9,7 +9,7 @@ use api_core::auth::IsGuardMet;
 use api_core::errors::error_with_code::ErrorWithCode;
 use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::VerifyChallengeResult;
@@ -56,7 +56,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insights: InsightHeaders,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth
         .check_guard(UserAuthScope::ExplicitAuth.and(UserAuthScope::Auth.or(UserAuthScope::SignUp)))?;
     let sv_id = user_auth

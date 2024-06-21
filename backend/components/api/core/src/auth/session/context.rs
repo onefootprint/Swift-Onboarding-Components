@@ -4,9 +4,9 @@ use crate::auth::tenant::InvalidateAuth;
 use crate::auth::AuthError;
 use crate::errors::AssertionError;
 use crate::utils::session::AuthSession;
+use crate::ApiError;
+use crate::ApiResponse;
 use crate::FpResult;
-use crate::ModernApiError;
-use crate::ModernApiResult;
 use crate::State;
 use actix_web::http::header::HeaderMap;
 use actix_web::web;
@@ -114,7 +114,7 @@ where
         root_span: <RootSpan as FromRequest>::Future,
         auth_token: Option<PiiString>,
         req: RequestInfo,
-    ) -> Pin<Box<dyn Future<Output = ModernApiResult<Self>>>> {
+    ) -> Pin<Box<dyn Future<Output = ApiResponse<Self>>>> {
         Box::pin(async move {
             let root_span = root_span
                 .await
@@ -156,7 +156,7 @@ impl<T> FromRequest for SessionContext<T>
 where
     T: ExtractableAuthSession,
 {
-    type Error = ModernApiError;
+    type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {

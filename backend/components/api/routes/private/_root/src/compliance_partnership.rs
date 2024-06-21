@@ -4,7 +4,7 @@ use actix_web::web;
 use actix_web::web::Json;
 use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::tenant::FirmEmployeeGuard;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_wire_types::CompliancePartnershipRequest;
 use chrono::DateTime;
@@ -37,7 +37,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<CompliancePartnershipRequest>,
     auth: FirmEmployeeAuthContext,
-) -> ModernApiResult<TenantCompliancePartnershipResponse> {
+) -> ApiResponse<TenantCompliancePartnershipResponse> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
 
     let partnership = state

@@ -4,8 +4,8 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
+use api_core::ApiResponse;
 use api_core::FpResult;
-use api_core::ModernApiResult;
 use api_core::State;
 use db::models::list::List;
 use db::models::list_entry::ListEntry;
@@ -27,7 +27,7 @@ pub async fn list_for_tenant(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     pagination: web::Query<OffsetPaginationRequest>,
-) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::List>>> {
+) -> ApiResponse<Json<OffsetPaginatedResponse<api_wire_types::List>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

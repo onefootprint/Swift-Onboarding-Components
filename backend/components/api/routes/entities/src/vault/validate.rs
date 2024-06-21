@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use crate::State;
@@ -48,7 +48,7 @@ pub async fn post(
     path: FpIdPath,
     request: Json<RawDataRequest>,
     auth: SecretTenantAuthContext,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
 
     let result = post_inner(&state, path.into_inner(), request.into_inner(), auth).await?;
@@ -69,7 +69,7 @@ pub async fn post_client(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
     auth: ClientTenantAuthContext,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     // This is a little different - we actually require a permission to update the data in the
     // vault since the ClientTenantAuth tokens are scoped to specific fields
     let request = request.into_inner();
@@ -85,7 +85,7 @@ async fn post_inner(
     fp_id: FpId,
     request: RawDataRequest,
     auth: Box<dyn TenantAuth>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let actor = auth.actor();

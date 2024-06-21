@@ -7,8 +7,8 @@ use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::web::Json;
+use api_core::ApiResponse;
 use api_core::FpResult;
-use api_core::ModernApiResult;
 use api_core::State;
 use db::models::business_owner::BusinessOwner;
 use db::models::business_owner::BusinessOwnerQuery;
@@ -32,7 +32,7 @@ pub async fn get(
     fp_bid: FpIdPath,
     auth: SecretTenantAuthContext,
     pagination: web::Query<OffsetPaginationRequest>,
-) -> ModernApiResult<Json<BusinessOwnersListResponse>> {
+) -> ApiResponse<Json<BusinessOwnersListResponse>> {
     auth.check_preview_guard(PreviewApi::ListBusinessOwners)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

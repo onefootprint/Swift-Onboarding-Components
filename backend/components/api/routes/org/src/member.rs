@@ -6,7 +6,7 @@ use api_core::auth::tenant::TenantSessionAuth;
 use api_core::auth::Any;
 use api_core::auth::Either;
 use api_core::errors::tenant::TenantError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant_user::TenantUser;
@@ -22,10 +22,7 @@ use paperclip::actix::Apiv2Schema;
     description = "Returns info on the authed user."
 )]
 #[get("/org/member")]
-async fn get(
-    state: web::Data<State>,
-    auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::AuthOrgMember> {
+async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> ApiResponse<api_wire_types::AuthOrgMember> {
     let rb = match &auth {
         Either::Left(a) => a.rolebinding().cloned(),
         Either::Right(_) => None,
@@ -58,7 +55,7 @@ async fn patch(
     request: web::Json<UpdateTenantUserRequest>,
     // Weird to take in an impersonation token here, so we only take TenantRbAuth
     auth: TenantRbAuthContext,
-) -> ModernApiResult<api_wire_types::AuthOrgMember> {
+) -> ApiResponse<api_wire_types::AuthOrgMember> {
     let scopes = auth.token_scopes();
     let rb = auth.rolebinding().cloned();
     let auth = auth.check_guard(Any)?;

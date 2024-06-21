@@ -3,7 +3,7 @@ use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantOrPartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
@@ -29,7 +29,7 @@ pub async fn get(
     filters: web::Query<OrgMemberFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
+) -> ApiResponse<Json<OffsetPaginatedResponse<api_wire_types::OrganizationMember>>> {
     let auth = auth.check_guard(TenantGuard::Read, PartnerTenantGuard::Read)?;
     let authed_org_ident = auth.org_identifier().clone_into();
 
@@ -70,7 +70,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantUserRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationMember> {
+) -> ApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let actor = auth.actor();
@@ -120,7 +120,7 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRolebindingRequest>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationMember> {
+) -> ApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let actor = auth.actor();
@@ -156,7 +156,7 @@ pub async fn deactivate(
     state: web::Data<State>,
     tu_id: web::Path<TenantUserId>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let actor = auth.actor();

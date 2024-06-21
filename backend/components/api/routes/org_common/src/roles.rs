@@ -2,7 +2,7 @@ use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantOrPartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
@@ -25,7 +25,7 @@ pub async fn get(
     filters: web::Query<OrgRoleFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ModernApiResult<RolesResponse> {
+) -> ApiResponse<RolesResponse> {
     let auth = auth.check_guard(TenantGuard::Read, PartnerTenantGuard::Read)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let is_live = auth.is_live()?;
@@ -62,7 +62,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateTenantRoleRequest>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationRole> {
+) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
     let is_live = auth.is_live()?;
@@ -94,7 +94,7 @@ pub async fn patch(
     request: web::Json<api_wire_types::UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationRole> {
+) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
 
@@ -112,7 +112,7 @@ pub async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
     auth: TenantOrPartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OrganizationRole> {
+) -> ApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_guard(TenantGuard::OrgSettings, PartnerTenantGuard::Admin)?;
     let authed_org_ident = auth.org_identifier().clone_into();
 

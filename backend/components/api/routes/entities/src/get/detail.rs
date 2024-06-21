@@ -3,7 +3,7 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::get::search::decrypt_visible_attrs;
 use crate::get::EntityDetailResponse;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::utils::db2api::DbToApi;
@@ -25,7 +25,7 @@ pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,
     auth: TenantSessionAuth,
-) -> ModernApiResult<EntityDetailResponse> {
+) -> ApiResponse<EntityDetailResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let fp_id = fp_id.into_inner();

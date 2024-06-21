@@ -1,6 +1,6 @@
 use api_core::auth::tenant::AnyPartnerTenantSessionAuth;
 use api_core::auth::tenant::InvalidateAuth;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -14,7 +14,7 @@ use paperclip::actix::web;
 async fn handler(
     state: web::Data<State>,
     auth: AnyPartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     auth.invalidate(&state).await?;
     Ok(api_wire_types::Empty)
 }

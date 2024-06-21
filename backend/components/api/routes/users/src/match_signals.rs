@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::decision::field_validations::create_field_validation_results;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -25,7 +25,7 @@ pub async fn get(
     state: web::Data<State>,
     request: FpIdPath,
     auth: SecretTenantAuthContext,
-) -> ModernApiResult<GetFieldValidationResponse> {
+) -> ApiResponse<GetFieldValidationResponse> {
     auth.check_preview_guard(PreviewApi::MatchSignalsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

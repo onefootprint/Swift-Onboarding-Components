@@ -2,7 +2,7 @@ use crate::auth::session::AuthSessionData;
 use crate::errors::challenge::ChallengeError;
 use crate::utils::session::AuthSession;
 use crate::State;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::VerificationLevel;
 use newtypes::SessionAuthToken;
@@ -29,7 +29,7 @@ pub struct EmailVerifyRequest {
 pub async fn post(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let session = AuthSession::get(&state, &request.data).await?;
 
     let AuthSessionData::EmailVerify(data) = session.data else {

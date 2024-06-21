@@ -2,7 +2,7 @@ use actix_web::web;
 use actix_web::FromRequest;
 use api_core::auth::AuthError;
 use api_core::decision;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::State;
 use crypto::hex;
 use futures_util::Future;
@@ -16,7 +16,7 @@ use std::pin::Pin;
 async fn handle_webhook(
     webhook_signature: MiddeskWebhookSignature,
     state: web::Data<State>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let res = decision::vendor::middesk::handle_middesk_webhook(&state, webhook_signature.request).await;
 
     match res {
@@ -45,7 +45,7 @@ pub struct MiddeskWebhookSignature {
 const MIDDESK_WEBHOOK_SIGNATURE_HEADER_NAME: &str = "X-Middesk-Signature-256";
 
 impl FromRequest for MiddeskWebhookSignature {
-    type Error = api_core::ModernApiError;
+    type Error = api_core::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {

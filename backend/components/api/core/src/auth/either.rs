@@ -1,7 +1,7 @@
 use super::tenant::GetFirmEmployee;
 use super::tenant::InvalidateAuth;
+use crate::ApiError;
 use crate::FpResult;
-use crate::ModernApiError;
 use crate::State;
 use actix_web::FromRequest;
 use async_trait::async_trait;
@@ -23,10 +23,10 @@ pub enum Either<A, B> {
 
 impl<A, B> FromRequest for Either<A, B>
 where
-    A: FromRequest<Error = ModernApiError> + 'static,
-    B: FromRequest<Error = ModernApiError> + 'static,
+    A: FromRequest<Error = ApiError> + 'static,
+    B: FromRequest<Error = ApiError> + 'static,
 {
-    type Error = ModernApiError;
+    type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {

@@ -1,7 +1,7 @@
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
 use api_core::utils::db2api::DbToApi;
@@ -29,7 +29,7 @@ async fn get_list(
     filters: web::Query<OnboardingConfigFilters>,
     pagination: web::Query<OffsetPaginationRequest>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<Json<OffsetPaginatedResponse<api_wire_types::OnboardingConfiguration>>> {
+) -> ApiResponse<Json<OffsetPaginatedResponse<api_wire_types::OnboardingConfiguration>>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let page = pagination.page;
@@ -76,7 +76,7 @@ async fn get_detail(
     state: web::Data<State>,
     ob_config_id: web::Path<ObConfigurationId>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::OnboardingConfiguration> {
+) -> ApiResponse<api_wire_types::OnboardingConfiguration> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

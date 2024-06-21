@@ -1,6 +1,6 @@
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
@@ -80,7 +80,7 @@ pub async fn post(
     insight: InsightHeaders,
     headers: UploadHeaderParams,
     body: BodyBytes<TEN_MB>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (fp_id, identifier) = path.into_inner();
     post_upload_inner(&state, body, headers, auth, fp_id, identifier, insight).await
@@ -104,7 +104,7 @@ pub async fn post_client(
     insight: InsightHeaders,
     body: BodyBytes<TEN_MB>,
     headers: UploadHeaderParams,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let identifier = path.into_inner();
     let auth = auth.check_guard(CanVault::new(vec![identifier.clone()]))?;
     let fp_id = auth.fp_id.clone();
@@ -119,7 +119,7 @@ async fn post_upload_inner(
     fp_id: FpId,
     di: DataIdentifier,
     insight: InsightHeaders,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let insight = CreateInsightEvent::from(insight);
     let tenant_id: newtypes::TenantId = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

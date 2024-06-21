@@ -1,6 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::decision;
@@ -30,7 +30,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<CreateUserDecisionRequest>,
     auth: SecretTenantAuthContext,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     auth.check_preview_guard(PreviewApi::CreateUserDecision)?;
     // This is a kind of weird guard to use here. But ManualReview can't currently be added to API key
     // IAM roles

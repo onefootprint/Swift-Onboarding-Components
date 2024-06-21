@@ -3,7 +3,7 @@ use actix_web::post;
 use actix_web::web;
 use actix_web::web::Json;
 use api_core::decision::vendor;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::ApiCoreError;
 use api_core::State;
 use db::models::vault::Vault;
@@ -28,7 +28,7 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<DecryptVresRequest>,
     _: ProtectedAuth,
-) -> ModernApiResult<DecryptVresResponse> {
+) -> ApiResponse<DecryptVresResponse> {
     let DecryptVresRequest { vres_id } = request.into_inner();
 
     let (vres, uv) = state

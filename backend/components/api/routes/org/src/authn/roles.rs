@@ -1,7 +1,7 @@
 use api_core::auth::tenant::AnyOrgSessionAuth;
 use api_core::auth::tenant::AnyTenantSessionAuth;
 use api_core::serializers::IsAuthMethodSupported;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use api_wire_types::Organization;
@@ -17,7 +17,7 @@ use paperclip::actix::web;
     tags(Auth, Private)
 )]
 #[get("/org/auth/roles")]
-fn get(state: web::Data<State>, tenant_auth: AnyTenantSessionAuth) -> JsonApiListResponse<Organization> {
+fn get(state: web::Data<State>, tenant_auth: AnyTenantSessionAuth) -> ApiListResponse<Organization> {
     let auth_method = tenant_auth.auth_method();
     let tu_id = tenant_auth.tenant_user_id()?;
     let tenants = state

@@ -1,10 +1,10 @@
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::AssertionError;
-use api_core::types::JsonApiListResponse;
+use api_core::types::ApiListResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use chrono::Utc;
@@ -29,7 +29,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
-) -> JsonApiListResponse<api_wire_types::ComplianceDocTemplate> {
+) -> ApiListResponse<api_wire_types::ComplianceDocTemplate> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -81,7 +81,7 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<api_wire_types::CreateComplianceDocTemplateRequest>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::ComplianceDocTemplate> {
+) -> ApiResponse<api_wire_types::ComplianceDocTemplate> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageTemplates)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -133,7 +133,7 @@ pub async fn put(
     template_id: web::Path<ComplianceDocTemplateId>,
     request: web::Json<api_wire_types::UpdateComplianceDocTemplateRequest>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::ComplianceDocTemplate> {
+) -> ApiResponse<api_wire_types::ComplianceDocTemplate> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageTemplates)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();
@@ -182,7 +182,7 @@ pub async fn delete(
     state: web::Data<State>,
     template_id: web::Path<ComplianceDocTemplateId>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let auth = auth.check_guard(PartnerTenantGuard::ManageTemplates)?;
     let pt = auth.partner_tenant();
     let pt_id = pt.id.clone();

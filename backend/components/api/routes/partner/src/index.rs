@@ -4,7 +4,7 @@ use api_core::auth::tenant::PartnerTenantGuard;
 use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::tenant::TenantError;
 use api_core::serializers::IsDomainAlreadyClaimed;
-use api_core::types::ModernApiResult;
+use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
@@ -23,7 +23,7 @@ use paperclip::actix::{
 pub async fn get(
     state: web::Data<State>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::PartnerOrganization> {
+) -> ApiResponse<api_wire_types::PartnerOrganization> {
     let auth = auth.check_guard(PartnerTenantGuard::Read)?;
     let pt = auth.partner_tenant().clone();
 
@@ -48,7 +48,7 @@ pub async fn patch(
     state: web::Data<State>,
     request: web::Json<api_wire_types::UpdatePartnerTenantRequest>,
     auth: PartnerTenantSessionAuth,
-) -> ModernApiResult<api_wire_types::PartnerOrganization> {
+) -> ApiResponse<api_wire_types::PartnerOrganization> {
     let auth = auth.check_guard(PartnerTenantGuard::Admin)?;
     let pt = auth.partner_tenant().clone();
     let pt_id = pt.id.clone();

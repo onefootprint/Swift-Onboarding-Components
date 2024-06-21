@@ -1,7 +1,7 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
@@ -24,7 +24,7 @@ pub async fn get_latest_workflow_decision(
     state: web::Data<State>,
     request: FpIdPath,
     auth: TenantSessionAuth,
-) -> ModernApiResult<Option<api_wire_types::RuleSetResult>> {
+) -> ApiResponse<Option<api_wire_types::RuleSetResult>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -51,7 +51,7 @@ pub async fn get(
     state: web::Data<State>,
     request: web::Path<(FpId, RuleSetResultId)>,
     auth: TenantSessionAuth,
-) -> ModernApiResult<api_wire_types::RuleSetResult> {
+) -> ApiResponse<api_wire_types::RuleSetResult> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

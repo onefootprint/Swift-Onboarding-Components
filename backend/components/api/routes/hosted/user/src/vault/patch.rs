@@ -1,4 +1,4 @@
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::email::send_email_challenge;
 use crate::utils::headers::AllowExtraFieldsHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -46,7 +46,7 @@ pub async fn post_validate(
     request: Json<RawDataRequest>,
     user_wf_auth: UserWfAuthContext,
     allow_extra_fields: AllowExtraFieldsHeaders,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
 
@@ -81,7 +81,7 @@ pub async fn patch(
     request: Json<RawDataRequest>,
     user_wf_auth: UserWfAuthContext,
     bootstrap_fields: BootstrapFieldsHeader,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_wf_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let t_id = &user_auth.tenant().id;

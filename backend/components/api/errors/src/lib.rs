@@ -19,14 +19,13 @@ pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error 
     fn mutate_response(&self, _resp: &mut actix_web::HttpResponseBuilder) {}
 }
 
-// FpError needs to be separate from ModernApiError - FpError is the common type that all crates can
-// return, ModernApiError wraps it and implements actix responder
-
 /// The magical error type that can hold any type T that implements FpErrorTrait.
 /// As crates create their own Error struct, they only need to implement FpErrorTrait.
 #[derive(derive_more::Deref)]
 pub struct FpError(pub Box<dyn FpErrorTrait>);
 
+/// Most functions should return an FpResult<T> in order to properly handle all errors from around
+/// the Footprint ecosystem
 pub type FpResult<T> = Result<T, FpError>;
 
 impl<T: FpErrorTrait + 'static> From<T> for FpError {

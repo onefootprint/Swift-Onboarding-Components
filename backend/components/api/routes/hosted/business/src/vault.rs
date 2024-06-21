@@ -1,5 +1,5 @@
 use crate::auth::user::UserAuthScope;
-use crate::types::ModernApiResult;
+use crate::types::ApiResponse;
 use crate::utils::vault_wrapper::Business;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
@@ -30,7 +30,7 @@ pub async fn post_validate(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,
     request: Json<RawDataRequest>,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
@@ -64,7 +64,7 @@ pub async fn patch(
     state: web::Data<State>,
     request: Json<RawDataRequest>,
     user_auth: UserWfAuthContext,
-) -> ModernApiResult<api_wire_types::Empty> {
+) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::VaultData)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddData)?;
     let sb_id = user_auth.scoped_business_id().ok_or(AuthError::MissingBusiness)?;
