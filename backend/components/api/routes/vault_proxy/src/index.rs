@@ -15,7 +15,7 @@ use api_core::proxy::config::JitProxyHeaderParams;
 use api_core::proxy::config::ProxyHeaderParams;
 use api_core::telemetry::RootSpan;
 use api_core::utils::body_bytes::BodyBytes;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpError;
 use newtypes::AccessEventPurpose;
 use newtypes::InvokeVaultProxyPermission;
@@ -112,7 +112,7 @@ async fn invoke_vault_proxy(
 ) -> ModernApiResult<HttpResponse> {
     let body_bytes = body_bytes.to_vec();
     let Some(body) = std::str::from_utf8(&body_bytes).ok() else {
-        return Err(FpError::from(ApiErrorKind::InvalidProxyBody))?;
+        return Err(FpError::from(ApiCoreError::InvalidProxyBody))?;
     };
 
     let config = match source {

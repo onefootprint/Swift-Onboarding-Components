@@ -10,7 +10,7 @@ use crate::decision::features::incode_utils::ParsedIncodeNames;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
-use crate::errors::ApiErrorKind;
+use crate::errors::ApiCoreError;
 use crate::errors::AssertionError;
 use crate::utils::file_upload::mime_type_to_extension;
 use crate::utils::vault_wrapper::DataLifetimeSources;
@@ -458,7 +458,7 @@ impl IncodeStateTransition for Complete {
         _: &IncodeContext,
         _: &VerificationSession,
     ) -> FpResult<TransitionResult> {
-        Err(ApiErrorKind::AssertionError(
+        Err(ApiCoreError::AssertionError(
             "Incode machine already complete".into(),
         ))?
     }

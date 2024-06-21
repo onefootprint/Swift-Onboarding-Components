@@ -26,7 +26,7 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::DecryptUncheckedResult;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::AlpacaCipRequest;
@@ -752,7 +752,7 @@ fn document_and_photo(
 }
 
 fn ok_or<T>(o: Option<T>, assert_msg: String) -> FpResult<T> {
-    let unwrapped = o.ok_or(ApiErrorKind::AssertionError(assert_msg))?;
+    let unwrapped = o.ok_or(ApiCoreError::AssertionError(assert_msg))?;
 
     Ok(unwrapped)
 }

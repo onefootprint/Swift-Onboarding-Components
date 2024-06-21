@@ -119,11 +119,11 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
             .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(FpError::from(err))));
 
         let query_cfg = web::QueryConfig::default()
-            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidQueryParam(err))));
+            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiCoreError::InvalidQueryParam(err))));
 
         let form_cfg = web::FormConfig::default()
             .limit(32_768)
-            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiErrorKind::InvalidFormError(err))));
+            .error_handler(|err, _req| actix_web::Error::from(ModernApiError::from(ApiCoreError::InvalidFormError(err))));
 
 
         let  spec = DefaultApiRaw {
@@ -165,7 +165,7 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
                     match fut_with_timeout.await {
                         Ok(res) => res,
                         Err(_) => {
-                            Err(ModernApiError::from(ApiErrorKind::ResponseTimeout).into())
+                            Err(ModernApiError::from(ApiCoreError::ResponseTimeout).into())
                         }
                     }
                 }
@@ -222,7 +222,7 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
 }
 
 async fn default_not_found() -> impl actix_web::Responder {
-    ModernApiError::from(ApiErrorKind::EndpointNotFound).error_response()
+    ModernApiError::from(ApiCoreError::EndpointNotFound).error_response()
 }
 
 #[allow(unused)]

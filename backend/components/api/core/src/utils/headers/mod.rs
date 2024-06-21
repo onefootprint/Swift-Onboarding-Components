@@ -25,7 +25,7 @@ mod is_components_sdk;
 pub use is_components_sdk::*;
 
 mod bootstrap_fields;
-use crate::ApiErrorKind;
+use crate::ApiCoreError;
 use crate::FpResult;
 use api_errors::FpError;
 pub use bootstrap_fields::*;
@@ -46,7 +46,7 @@ pub fn get_required_header(name: &'static str, req: &HeaderMap) -> FpResult<Stri
         .get(name)
         .and_then(|h| h.to_str().ok())
         .map(|s| s.to_string())
-        .ok_or(ApiErrorKind::MissingRequiredHeader(name))
+        .ok_or(ApiCoreError::MissingRequiredHeader(name))
         .map_err(FpError::from)?;
     Ok(h)
 }

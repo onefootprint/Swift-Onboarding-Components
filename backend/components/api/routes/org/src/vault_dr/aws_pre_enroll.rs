@@ -3,7 +3,7 @@ use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
 use api_core::types::ModernApiResult;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use crypto::hex::ToHex;
@@ -64,7 +64,7 @@ pub async fn get(
         .await?;
 
     let Some(pre_enrollment) = pre_enrollment else {
-        return Err(ApiErrorKind::ResourceNotFound.into());
+        return Err(ApiCoreError::ResourceNotFound.into());
     };
 
     Ok(api_wire_types::VaultDrAwsPreEnrollResponse {

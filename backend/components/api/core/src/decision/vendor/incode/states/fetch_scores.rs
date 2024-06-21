@@ -22,7 +22,7 @@ use crate::utils::vault_wrapper::FingerprintedDataRequest;
 use crate::utils::vault_wrapper::Pii;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::IncodeClients;
-use crate::ApiErrorKind;
+use crate::ApiCoreError;
 use crate::FpResult;
 use async_trait::async_trait;
 use db::models::decision_intent::DecisionIntent;
@@ -301,13 +301,13 @@ async fn run_aws_rekognition(
         .fn_decrypt_unchecked_raw(enclave_client, vec![doc_id_op.clone(), selfie_id_op.clone()])
         .await?;
 
-    let doc_pii_bytes = match results.get(&doc_id_op).ok_or(ApiErrorKind::ResourceNotFound)? {
+    let doc_pii_bytes = match results.get(&doc_id_op).ok_or(ApiCoreError::ResourceNotFound)? {
         Pii::Bytes(bytes) => bytes,
-        _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
+        _ => return Err(ApiCoreError::AssertionError("unexpected pii type".into()))?,
     };
-    let selfie_pii_bytes = match results.get(&selfie_id_op).ok_or(ApiErrorKind::ResourceNotFound)? {
+    let selfie_pii_bytes = match results.get(&selfie_id_op).ok_or(ApiCoreError::ResourceNotFound)? {
         Pii::Bytes(bytes) => bytes,
-        _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
+        _ => return Err(ApiCoreError::AssertionError("unexpected pii type".into()))?,
     };
 
     let comparison_result = client.doc_to_selfie(doc_pii_bytes, selfie_pii_bytes, None).await;

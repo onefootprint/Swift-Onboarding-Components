@@ -1,4 +1,4 @@
-use crate::ApiErrorKind;
+use crate::ApiCoreError;
 use crate::FpResult;
 use api_errors::FpError;
 use derive_more::Deref;
@@ -162,7 +162,7 @@ impl DecryptUncheckedResult {
         let di = di.into();
         self.results
             .remove(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
-            .ok_or(ApiErrorKind::MissingRequiredEntityData(di, Csv(transforms)))
+            .ok_or(ApiCoreError::MissingRequiredEntityData(di, Csv(transforms)))
             .map_err(FpError::from)
     }
 
@@ -175,7 +175,7 @@ impl DecryptUncheckedResult {
         self.results
             .get(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
             .cloned()
-            .ok_or(ApiErrorKind::MissingRequiredEntityData(di, Csv(transforms)))
+            .ok_or(ApiCoreError::MissingRequiredEntityData(di, Csv(transforms)))
             .map_err(FpError::from)
     }
 }

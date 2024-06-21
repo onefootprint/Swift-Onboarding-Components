@@ -8,7 +8,7 @@ use api_core::decision::state::actions::WorkflowActionsKind;
 use api_core::decision::state::traits::Workflow as TWorkflow;
 use api_core::decision::state::WorkflowWrapper;
 use api_core::types::ModernApiResult;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use db::models::workflow::Workflow;
 use newtypes::WorkflowId;
 use newtypes::WorkflowState;
@@ -45,7 +45,7 @@ async fn proceed(
     let action = if let Some(wf_action_kind) = wf_action_kind {
         WorkflowActions::try_from(wf_action_kind)?
     } else {
-        ww.state.default_action().ok_or(ApiErrorKind::AssertionError(
+        ww.state.default_action().ok_or(ApiCoreError::AssertionError(
             "Current state has no default action".to_string(),
         ))?
     };

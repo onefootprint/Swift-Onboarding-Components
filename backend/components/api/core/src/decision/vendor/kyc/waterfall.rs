@@ -14,7 +14,7 @@ use crate::decision::{
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
-use crate::ApiErrorKind;
+use crate::ApiCoreError;
 use crate::FpResult;
 use crate::State;
 use db::models::billing_event::BillingEvent;
@@ -180,7 +180,7 @@ pub async fn run_kyc_waterfall(state: &State, di: &DecisionIntent, wf: &Workflow
     if let Some(vr) = final_result {
         Ok(vr)
     } else {
-        Err(ApiErrorKind::VendorRequestsFailed.into())
+        Err(ApiCoreError::VendorRequestsFailed.into())
     }
 }
 

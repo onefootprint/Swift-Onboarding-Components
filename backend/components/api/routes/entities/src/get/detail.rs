@@ -9,7 +9,7 @@ use crate::State;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::api_v2_operation;
@@ -38,7 +38,7 @@ pub async fn get(
             let vw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let entity = ScopedVault::bulk_get_serializable_info(conn, vec![sv.id.clone()])?
                 .remove(&sv.id)
-                .ok_or(ApiErrorKind::ResourceNotFound)?;
+                .ok_or(ApiCoreError::ResourceNotFound)?;
 
             Ok((entity, vw))
         })

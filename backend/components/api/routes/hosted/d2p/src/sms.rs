@@ -7,7 +7,7 @@ use api_core::auth::user::UserAuthScope;
 use api_core::errors::user::UserError;
 use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::Person;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use newtypes::sms_message::SmsMessage;
 use newtypes::ContactInfoKind;
 use newtypes::PhoneNumber;
@@ -55,7 +55,7 @@ pub async fn handler(
     let (phone_number, ci, _) = uvw
         .decrypt_contact_info(&state, ContactInfoKind::Phone)
         .await?
-        .ok_or(ApiErrorKind::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
+        .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
 
     if !ci.is_otp_verified {
         // The d2p link we send out is authenticated as the user.

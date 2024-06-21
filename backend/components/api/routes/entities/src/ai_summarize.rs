@@ -5,7 +5,7 @@ use crate::types::ModernApiResult;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_wire_types::UserAiSummary;
 use db::models::annotation::Annotation;
@@ -101,11 +101,11 @@ pub async fn get(
         .response_format(ChatCompletionResponseFormat::json_object())
         .create()
         .await
-        .map_err(|e| ApiErrorKind::OpenAiCompletionError(e.to_string()))?;
+        .map_err(|e| ApiCoreError::OpenAiCompletionError(e.to_string()))?;
 
     let response = completion.choices.first().and_then(|c| c.message.content.clone());
     let response = response
-        .ok_or_else(|| ApiErrorKind::OpenAiCompletionError("No response from AI model".to_string()))?;
+        .ok_or_else(|| ApiCoreError::OpenAiCompletionError("No response from AI model".to_string()))?;
 
     let AiSummaryObject {
         high_level_summary,
@@ -113,7 +113,7 @@ pub async fn get(
         risk_signal_summary,
         conclusion,
     } = serde_json::from_str(&response).map_err(|_| {
-        ApiErrorKind::OpenAiCompletionError(format!("Invalid format from AI model: {}", response))
+        ApiCoreError::OpenAiCompletionError(format!("Invalid format from AI model: {}", response))
     })?;
 
     Ok(UserAiSummary {

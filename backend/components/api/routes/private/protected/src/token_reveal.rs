@@ -8,7 +8,7 @@ use api_core::auth::session::sdk_args::SdkArgsData;
 use api_core::auth::session::AuthSessionData;
 use api_core::errors::ValidationError;
 use api_core::types::ModernApiResult;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use chrono::DateTime;
 use chrono::Utc;
 use db::models::session::Session;
@@ -63,7 +63,7 @@ pub async fn post(
         .await?;
 
     let Some(session) = session else {
-        return Err(ApiErrorKind::ResourceNotFound)?;
+        return Err(ApiCoreError::ResourceNotFound)?;
     };
 
     // First try just decrypting the session, as some sessions aren't stored encrypted

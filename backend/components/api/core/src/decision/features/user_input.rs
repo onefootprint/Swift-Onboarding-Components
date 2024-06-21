@@ -1,7 +1,7 @@
 use crate::enclave_client::EnclaveClient;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
-use crate::ApiErrorKind;
+use crate::ApiCoreError;
 use crate::FpResult;
 use chrono::Days;
 use chrono::NaiveDate;
@@ -147,7 +147,7 @@ pub fn user_input_based_risk_signals(
 fn age_gte(dob: PiiString, age_to_check: i32) -> FpResult<bool> {
     // from the vault so should be valid age
     let dob = NaiveDate::parse_from_str(dob.leak(), DATE_FORMAT)
-        .map_err(|_| ApiErrorKind::AssertionError("not a valid date".to_string()))?;
+        .map_err(|_| ApiCoreError::AssertionError("not a valid date".to_string()))?;
     let age_helper = AgeHelper { dob };
     let today = Utc::now().naive_utc().into();
 

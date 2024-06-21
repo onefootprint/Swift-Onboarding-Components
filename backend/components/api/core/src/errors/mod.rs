@@ -29,7 +29,7 @@ mod tenant_facing_error;
 pub use tenant_facing_error::*;
 
 #[derive(Debug, Error)]
-pub enum ApiErrorKind {
+pub enum ApiCoreError {
     #[error("No {0} in vault")]
     ContactInfoKindNotInVault(ContactInfoKind),
     #[error("Sendgrid error: {0}")]
@@ -62,30 +62,30 @@ pub enum ApiErrorKind {
     OpenAiCompletionError(String),
 }
 
-impl From<std::convert::Infallible> for ApiErrorKind {
+impl From<std::convert::Infallible> for ApiCoreError {
     fn from(_: std::convert::Infallible) -> Self {
         panic!("impossible condition convert Infallible to ApiError")
     }
 }
 
-impl FpErrorTrait for ApiErrorKind {
+impl FpErrorTrait for ApiCoreError {
     fn status_code(&self) -> StatusCode {
         match self {
             // This invariant should never be broken
-            ApiErrorKind::ContactInfoKindNotInVault(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::VendorRequestsFailed => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::InvalidFormError(_) | ApiErrorKind::InvalidQueryParam(_) => StatusCode::BAD_REQUEST,
-            ApiErrorKind::EndpointNotFound => StatusCode::NOT_FOUND,
-            ApiErrorKind::ResourceNotFound => StatusCode::NOT_FOUND,
-            ApiErrorKind::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::ValidationError(_) => StatusCode::BAD_REQUEST,
-            ApiErrorKind::InvalidProxyBody => StatusCode::BAD_REQUEST,
-            ApiErrorKind::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
-            ApiErrorKind::MissingRequiredEntityData(_, _) => StatusCode::BAD_REQUEST,
-            ApiErrorKind::MigrationDryRun => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::ResponseTimeout => StatusCode::GATEWAY_TIMEOUT,
-            ApiErrorKind::OpenAiCompletionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiCoreError::ContactInfoKindNotInVault(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiCoreError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiCoreError::VendorRequestsFailed => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiCoreError::InvalidFormError(_) | ApiCoreError::InvalidQueryParam(_) => StatusCode::BAD_REQUEST,
+            ApiCoreError::EndpointNotFound => StatusCode::NOT_FOUND,
+            ApiCoreError::ResourceNotFound => StatusCode::NOT_FOUND,
+            ApiCoreError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiCoreError::ValidationError(_) => StatusCode::BAD_REQUEST,
+            ApiCoreError::InvalidProxyBody => StatusCode::BAD_REQUEST,
+            ApiCoreError::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
+            ApiCoreError::MissingRequiredEntityData(_, _) => StatusCode::BAD_REQUEST,
+            ApiCoreError::MigrationDryRun => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiCoreError::ResponseTimeout => StatusCode::GATEWAY_TIMEOUT,
+            ApiCoreError::OpenAiCompletionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -111,7 +111,7 @@ impl FpErrorTrait for ApiErrorKind {
         // https://github.com/actix/actix-web/issues/3152
         // May not be necessary in all environments (e.g. load balancers mask the issue), but it's
         // necessary in local dev to prevent the client from hanging.
-        if matches!(self, ApiErrorKind::ResponseTimeout) {
+        if matches!(self, ApiCoreError::ResponseTimeout) {
             resp.force_close();
         }
     }

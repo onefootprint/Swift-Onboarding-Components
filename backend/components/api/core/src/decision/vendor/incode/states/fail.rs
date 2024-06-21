@@ -3,7 +3,7 @@ use super::VerificationSession;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
-use crate::errors::ApiErrorKind;
+use crate::errors::ApiCoreError;
 use crate::errors::AssertionError;
 use crate::vendor_clients::IncodeClients;
 use crate::FpResult;
@@ -99,7 +99,7 @@ impl IncodeStateTransition for Fail {
         _: &IncodeContext,
         _: &VerificationSession,
     ) -> FpResult<TransitionResult> {
-        Err(ApiErrorKind::AssertionError(
+        Err(ApiCoreError::AssertionError(
             "Incode machine already failed".into(),
         ))?
     }

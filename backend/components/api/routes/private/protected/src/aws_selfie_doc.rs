@@ -7,7 +7,7 @@ use api_core::types::ModernApiResult;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::Pii;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use db::models::scoped_vault::ScopedVault;
@@ -62,13 +62,13 @@ pub async fn post(
         )
         .await?;
 
-    let doc_pii_bytes = match results.get(&doc_id_op).ok_or(ApiErrorKind::ResourceNotFound)? {
+    let doc_pii_bytes = match results.get(&doc_id_op).ok_or(ApiCoreError::ResourceNotFound)? {
         Pii::Bytes(bytes) => bytes,
-        _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
+        _ => return Err(ApiCoreError::AssertionError("unexpected pii type".into()))?,
     };
-    let selfie_pii_bytes = match results.get(&selfie_id_op).ok_or(ApiErrorKind::ResourceNotFound)? {
+    let selfie_pii_bytes = match results.get(&selfie_id_op).ok_or(ApiCoreError::ResourceNotFound)? {
         Pii::Bytes(bytes) => bytes,
-        _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
+        _ => return Err(ApiCoreError::AssertionError("unexpected pii type".into()))?,
     };
 
     let comparison_result = state

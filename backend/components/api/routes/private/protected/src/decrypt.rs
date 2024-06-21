@@ -4,7 +4,7 @@ use actix_web::web;
 use actix_web::web::Json;
 use api_core::decision::vendor;
 use api_core::types::ModernApiResult;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::State;
 use db::models::vault::Vault;
 use db::models::verification_result::VerificationResult;
@@ -45,12 +45,12 @@ pub async fn post(
         &state.enclave_client,
         vec![vres
             .e_response
-            .ok_or(ApiErrorKind::AssertionError("e_response is None".to_owned()))?],
+            .ok_or(ApiCoreError::AssertionError("e_response is None".to_owned()))?],
         &uv.e_private_key,
     )
     .await?
     .pop()
-    .ok_or(ApiErrorKind::AssertionError(
+    .ok_or(ApiCoreError::AssertionError(
         "decrypt_verification_result_response returned empty list".to_owned(),
     ))?;
 

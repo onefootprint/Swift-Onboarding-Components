@@ -2,7 +2,7 @@ use super::super::Business;
 use super::super::VaultWrapper;
 use crate::errors::business::BusinessError;
 use crate::utils::vault_wrapper::Any;
-use crate::ApiErrorKind;
+use crate::ApiCoreError;
 use crate::FpError;
 use crate::FpResult;
 use crate::State;
@@ -53,7 +53,7 @@ impl<Type> VaultWrapper<Type> {
         let (data, _, _) = self
             .decrypt_contact_info(state, ContactInfoKind::Phone)
             .await?
-            .ok_or(ApiErrorKind::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
+            .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
         PhoneNumber::parse(data).map_err(FpError::from)
     }
 
@@ -61,7 +61,7 @@ impl<Type> VaultWrapper<Type> {
         let (data, _, _) = self
             .decrypt_contact_info(state, ContactInfoKind::Email)
             .await?
-            .ok_or(ApiErrorKind::ContactInfoKindNotInVault(ContactInfoKind::Email))?;
+            .ok_or(ApiCoreError::ContactInfoKindNotInVault(ContactInfoKind::Email))?;
         Email::from_str(data.leak()).map_err(FpError::from)
     }
 

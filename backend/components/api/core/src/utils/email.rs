@@ -4,7 +4,7 @@ use super::sms::PhoneEmailChallengeState;
 use crate::auth::session::user::EmailVerifySession;
 use crate::auth::session::AuthSessionData;
 use crate::errors::user::UserError;
-use crate::errors::ApiErrorKind;
+use crate::errors::ApiCoreError;
 use crate::FpResult;
 use crate::State;
 use chrono::Duration;
@@ -262,7 +262,7 @@ impl SendgridClient {
         }
 
         let err = &res.text().await?;
-        Err(ApiErrorKind::SendgridError(err.to_owned()))?
+        Err(ApiCoreError::SendgridError(err.to_owned()))?
     }
 }
 

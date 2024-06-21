@@ -30,7 +30,7 @@ use api_core::types::ModernApiResult;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::FpError;
@@ -103,7 +103,7 @@ async fn make_vendor_calls(
             let available_vendor_apis =
                 get_vendor_apis_for_verification_requests(uvw.populated().as_slice(), &tvc2)?;
             if !available_vendor_apis.contains(&vendor_api) {
-                Err(ApiErrorKind::AssertionError(format!(
+                Err(ApiCoreError::AssertionError(format!(
                     "{vendor_api} not enabled for tenant!"
                 )))?;
             }
@@ -119,7 +119,7 @@ async fn make_vendor_calls(
     let vendor_results = decision::engine::make_vendor_requests(&state, tvc, requests, &wf.id).await?;
 
     if !vendor_results.critical_errors.is_empty() {
-        return Err(ApiErrorKind::VendorRequestsFailed)?;
+        return Err(ApiCoreError::VendorRequestsFailed)?;
     }
 
     let vendor_result = decision::engine::save_vendor_responses(
@@ -130,7 +130,7 @@ async fn make_vendor_calls(
     )
     .await?
     .pop()
-    .ok_or(FpError::from(ApiErrorKind::VendorRequestsFailed))?;
+    .ok_or(FpError::from(ApiCoreError::VendorRequestsFailed))?;
 
     let reason_codes =
         decision::features::risk_signals::parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw)?
@@ -284,7 +284,7 @@ async fn shadow_run(
 
     let all_vendor_errors = vendor_results.all_errors();
     if !all_vendor_errors.is_empty() {
-        return Err(ApiErrorKind::AssertionError(format!(
+        return Err(ApiCoreError::AssertionError(format!(
             "Vendor call(s) failed: {:?}",
             &all_vendor_errors
         )))?;
@@ -304,7 +304,7 @@ async fn shadow_run(
             verification_request_id: req.id,
         })
         .last()
-        .ok_or(FpError::from(ApiErrorKind::VendorRequestsFailed))?;
+        .ok_or(FpError::from(ApiCoreError::VendorRequestsFailed))?;
 
     let reason_codes =
         decision::features::risk_signals::parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw)?

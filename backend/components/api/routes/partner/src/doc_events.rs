@@ -5,7 +5,7 @@ use api_core::auth::tenant::PartnerTenantSessionAuth;
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiListResponse;
 use api_core::utils::db2api::TryDbToApi;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_wire_types::ComplianceDocEvent;
 use api_wire_types::ComplianceDocEventType;
@@ -42,7 +42,7 @@ pub async fn get(
             let summary = ComplianceDocSummary::filter(conn, &pt_id, Some(&partnership_id), Some(&doc_id))?
                 .into_values()
                 .next()
-                .ok_or(ApiErrorKind::ResourceNotFound)?;
+                .ok_or(ApiCoreError::ResourceNotFound)?;
 
             Ok(summary)
         })

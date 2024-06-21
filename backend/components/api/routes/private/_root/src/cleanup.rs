@@ -8,7 +8,7 @@ use api_core::types::ModernApiResult;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifyId;
@@ -127,7 +127,7 @@ async fn post(
                     .collect();
 
                 if !unallowed_affected_tenants.is_empty() {
-                    return Err(ApiErrorKind::AssertionError(format!(
+                    return Err(ApiCoreError::AssertionError(format!(
                         "Clearing vault would have impacted tenants: {}",
                         unallowed_affected_tenants.join(",")
                     )))?;

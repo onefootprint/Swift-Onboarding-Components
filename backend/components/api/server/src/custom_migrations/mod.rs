@@ -3,7 +3,7 @@
 //!
 //! They usually will involve a combination of DB operations and other async
 //! operations (such as enclave, etc).
-use api_core::ApiErrorKind;
+use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use byteorder::BigEndian;
@@ -91,7 +91,7 @@ where
             migration.run(mig_state, conn)?;
             if M::is_dry_run() {
                 // Some migrations run as a dry run and should never have their changes committed.
-                return Err(ApiErrorKind::MigrationDryRun.into());
+                return Err(ApiCoreError::MigrationDryRun.into());
             }
 
             // 3. record the migration
