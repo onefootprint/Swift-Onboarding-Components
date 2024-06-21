@@ -34,6 +34,7 @@ card-validate = { workspace = true }
 enum_variant_type = { workspace = true }
 tracing = { workspace = true }
 macros = { path = "../macros" }
+api_errors = { path = "../api/errors" }
 rand = { workspace = true }
 diesel = { workspace = true }
 actix-web = { workspace = true }

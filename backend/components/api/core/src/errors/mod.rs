@@ -392,6 +392,7 @@ impl api_errors::FpErrorTrait for ApiError {
             ApiErrorKind::TfError(e) => e.code(),
             // TODO remove DbError from hard enum type so we don't have to pass through impl here
             ApiErrorKind::Database(e) => return e.code(),
+            ApiErrorKind::NewtypeError(e) => return e.code(),
             // TODO need to make FpErrorTrait codes an enum to prevent duplicates
             ApiErrorKind::AuthError(AuthError::MissingHeader(_)) => "A101".into(),
             _ => return None,
@@ -404,6 +405,7 @@ impl api_errors::FpErrorTrait for ApiError {
             ApiErrorKind::ErrorWithCode(e) => e.context(),
             ApiErrorKind::TfError(e) => e.context(),
             ApiErrorKind::Database(e) => e.context(),
+            ApiErrorKind::NewtypeError(e) => e.context(),
             ApiErrorKind::AuthError(AuthError::MissingHeader(h)) => Some(serde_json::json!({"header": h})),
             _ => None,
         }
@@ -413,6 +415,7 @@ impl api_errors::FpErrorTrait for ApiError {
         match self.0.as_ref() {
             ApiErrorKind::Twilio(e) => e.message(),
             ApiErrorKind::Database(e) => e.message(),
+            ApiErrorKind::NewtypeError(e) => e.message(),
             _ => self.to_string(),
         }
     }

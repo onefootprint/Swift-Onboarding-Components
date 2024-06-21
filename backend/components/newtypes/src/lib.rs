@@ -6,6 +6,7 @@ pub use self::id::*;
 pub use self::phone_number::*;
 
 pub mod idv;
+use api_errors::FpErrorTrait;
 pub use idv::*;
 
 pub mod docv;
@@ -118,8 +119,8 @@ pub enum Error {
     InvalidFpIdPrefix,
     #[error("{0}")]
     ParsingError(#[from] data_identifier::DiValidationError),
-    #[error("{0}")]
-    DataValidationError(#[from] DataValidationError),
+    #[error("Vault data failed validation")]
+    DataValidationError(DataValidationError),
     #[error("{0}")]
     Custom(String),
     #[error("Cannot add to this type of vault")]
@@ -146,10 +147,41 @@ pub enum Error {
     AssertionError(String),
 }
 
-use std::collections::HashMap;
-use strum::Display;
+impl From<DataValidationError> for Error {
+    fn from(value: DataValidationError) -> Self {
+        Self::DataValidationError(value)
+    }
+}
 
-#[derive(Debug, Display)]
+impl FpErrorTrait for Error {
+    fn code(&self) -> Option<String> {
+        match self {
+            // TODO Use hardcoded error code enum so we can guarantee no duplicates
+            Self::DataValidationError(_) => Some("T120".into()),
+            _ => None,
+        }
+    }
+
+    fn context(&self) -> Option<serde_json::Value> {
+        let context = match self {
+            Self::DataValidationError(err) => err.context(),
+            _ => return None,
+        };
+        Some(context)
+    }
+
+    fn status_code(&self) -> api_errors::StatusCode {
+        api_errors::StatusCode::BAD_REQUEST
+    }
+
+    fn message(&self) -> String {
+        self.to_string()
+    }
+}
+
+use std::collections::HashMap;
+
+#[derive(Debug)]
 pub enum DataValidationError {
     /// There are additional data identifiers provided that aren't part of any CDO
     ExtraFieldError(Vec<DataIdentifier>),
@@ -170,12 +202,6 @@ impl DataValidationError {
         serde_json::to_value(err)
             .map_err(|e| tracing::error!(?e, "Couldn't serialize DataValidationError"))
             .unwrap_or(serde_json::json!({}))
-    }
-}
-
-impl std::error::Error for DataValidationError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        None
     }
 }
 

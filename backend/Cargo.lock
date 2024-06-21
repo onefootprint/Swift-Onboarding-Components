@@ -5695,6 +5695,7 @@ name = "newtypes"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "api_errors",
  "async-trait",
  "base64 0.13.0",
  "card-validate",
