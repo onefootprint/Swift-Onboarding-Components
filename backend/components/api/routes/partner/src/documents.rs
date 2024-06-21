@@ -16,6 +16,7 @@ use db::models::compliance_doc::NewComplianceDoc;
 use db::models::compliance_doc_request::NewComplianceDocRequest;
 use db::models::compliance_doc_template_version::ComplianceDocTemplateVersion;
 use db::models::tenant_compliance_partnership::TenantCompliancePartnership;
+use db::DbError;
 use newtypes::TenantCompliancePartnershipId;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -98,10 +99,12 @@ pub async fn post(
             }
             .create(conn)
             .map_err(|e| -> ApiError {
-                if e.is_unique_constraint_violation() {
-                    ValidationError("A compliance document request already exists for this template").into()
-                } else {
-                    e.into()
+                match e {
+                    DbError::UniqueConstraintViolation => {
+                        ValidationError("A compliance document request already exists for this template")
+                            .into()
+                    }
+                    _ => e.into(),
                 }
             })?;
 

@@ -16,6 +16,7 @@ use db::models::tenant_role::ImmutableRoleKind;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
+use db::DbError;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::OrgMemberEmail;
 use newtypes::SessionAuthToken;
@@ -89,10 +90,7 @@ async fn post(
             //
             let tenant = match Tenant::lock(conn, &id) {
                 Ok(t) => t,
-                Err(e) => {
-                    if !e.is_not_found() {
-                        return Err(e.into()); // Real error, return
-                    }
+                Err(DbError::DataNotFound) => {
                     let new_tenant = NewIntegrationTestTenant {
                         // Notably, we create the tenant with the ID as passed in. Next time the
                         // tenant is requested, it will already exist
@@ -110,6 +108,7 @@ async fn post(
                     };
                     Tenant::create(conn, new_tenant)?
                 }
+                Err(e) => return Err(e.into()),
             };
 
             //
@@ -131,14 +130,12 @@ async fn post(
                 let role = TenantRole::get_immutable(conn, &tenant.id, irk, TenantRoleKind::DashboardUser)?;
                 let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {
                     Ok((_, rb, _, _)) => rb,
-                    Err(e) => {
-                        if !e.is_not_found() {
-                            return Err(e.into()); // Real error, return
-                        }
+                    Err(DbError::DataNotFound) => {
                         let role_id = role.id.clone();
                         let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, &tenant.id)?;
                         rb
                     }
+                    Err(e) => return Err(e.into()),
                 };
                 // Create a new tenant RB session for the integration test tenant user
                 let login_result = TenantRolebinding::login(conn, &rb.id, WorkosAuthMethod::GoogleOauth)?;
@@ -168,10 +165,7 @@ async fn post(
                     let tenant_api_key_name = "Integration test API key";
                     let r = match TenantApiKey::get(conn, (tenant_api_key_name, &tenant.id, is_live)) {
                         Ok(r) => r,
-                        Err(e) => {
-                            if !e.is_not_found() {
-                                return Err(e.into()); // Real error, return
-                            }
+                        Err(DbError::DataNotFound) => {
                             let api_key = TenantApiKey::create(
                                 conn,
                                 // Always create it with the same name so we find it next time
@@ -184,6 +178,7 @@ async fn post(
                             )?;
                             (api_key, admin_role)
                         }
+                        Err(e) => return Err(e.into()),
                     };
                     Ok(r)
                 })

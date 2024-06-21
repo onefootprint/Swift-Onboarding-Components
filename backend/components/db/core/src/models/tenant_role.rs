@@ -238,13 +238,9 @@ impl TenantRole {
             .values(new)
             .get_result(conn)
             .map_err(DbError::from)
-            .map_err(|e| {
-                if e.is_unique_constraint_violation() {
-                    // There's already a role with this name at this tenant
-                    DbError::TenantRoleAlreadyExists
-                } else {
-                    e
-                }
+            .map_err(|e| match e {
+                DbError::UniqueConstraintViolation => DbError::TenantRoleAlreadyExists,
+                _ => e,
             })?;
         Ok(result)
     }
@@ -349,13 +345,9 @@ impl TenantRole {
             .set(update)
             .load(conn.conn())
             .map_err(DbError::from)
-            .map_err(|e| {
-                if e.is_unique_constraint_violation() {
-                    // There's already a role with this name at this tenant
-                    DbError::TenantRoleAlreadyExists
-                } else {
-                    e
-                }
+            .map_err(|e| match e {
+                DbError::UniqueConstraintViolation => DbError::TenantRoleAlreadyExists,
+                _ => e,
             })?;
 
         if results.len() > 1 {

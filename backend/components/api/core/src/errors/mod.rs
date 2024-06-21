@@ -11,7 +11,7 @@ use actix_web::error::UrlencodedError;
 use actix_web::http::StatusCode;
 use aws_sdk_pinpointsmsvoicev2::error::SdkError as SmsSdkError;
 use aws_sdk_pinpointsmsvoicev2::operation::send_text_message::SendTextMessageError;
-use db::errors::DbError;
+use db::DbError;
 use error_with_code::CodedError;
 use newtypes::output::Csv;
 use newtypes::ContactInfoKind;
@@ -258,63 +258,6 @@ impl From<newtypes::Error> for ApiErrorKind {
     }
 }
 
-fn status_code_for_db_error(e: &DbError) -> StatusCode {
-    match e {
-        DbError::MigrationFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::DbInteract(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::DbError(_) => {
-            if e.is_not_found() {
-                return StatusCode::NOT_FOUND;
-            }
-            if e.is_fk_constraint_violation()
-                || e.is_check_constraint_violation()
-                || e.is_unique_constraint_violation()
-            {
-                return StatusCode::BAD_REQUEST;
-            }
-            StatusCode::INTERNAL_SERVER_ERROR
-        }
-        DbError::PoolGet(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::PoolInit(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::ConnectionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::MigrationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::IncorrectNumberOfRowsUpdated => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::ObjectNotFound => StatusCode::NOT_FOUND,
-        DbError::UpdateTargetNotFound => StatusCode::NOT_FOUND,
-        DbError::RelatedObjectNotFound => StatusCode::NOT_FOUND,
-        DbError::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::ApiKeyDisabled => StatusCode::UNAUTHORIZED,
-        DbError::PlaybookNotFound => StatusCode::BAD_REQUEST,
-        DbError::TenantUserDeactivated => StatusCode::UNAUTHORIZED,
-        DbError::TenantRoleMismatch => StatusCode::UNAUTHORIZED,
-        DbError::TenantRoleAlreadyExists => StatusCode::BAD_REQUEST,
-        DbError::TenantRoleDeactivated => StatusCode::UNAUTHORIZED,
-        DbError::TargetTenantRoleDeactivated => StatusCode::BAD_REQUEST,
-        DbError::TenantRoleHasUsers(_) => StatusCode::BAD_REQUEST,
-        DbError::InvalidTenantScope(_, _) => StatusCode::BAD_REQUEST,
-        DbError::TenantRoleAlreadyDeactivated => StatusCode::BAD_REQUEST,
-        DbError::InvalidRoleIsLive => StatusCode::BAD_REQUEST,
-        DbError::TenantRoleHasActiveApiKeys(_) => StatusCode::BAD_REQUEST,
-        DbError::IncorrectTenantRoleKind => StatusCode::BAD_REQUEST,
-        DbError::IncorrectTenantKind => StatusCode::BAD_REQUEST,
-        DbError::SandboxMismatch => StatusCode::BAD_REQUEST,
-        DbError::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
-        DbError::NewtypesError(newtypes::Error::AssertionError(_)) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::NewtypesError(_) => StatusCode::BAD_REQUEST,
-        DbError::InsufficientTenantScopes(_) => StatusCode::BAD_REQUEST,
-        DbError::NonUniqueTenantScopes => StatusCode::BAD_REQUEST,
-        DbError::InvalidProxyConfigId => StatusCode::BAD_REQUEST,
-        DbError::ListAlreadyDeactivated => StatusCode::BAD_REQUEST,
-        DbError::ListEntryAlreadyDeactivated => StatusCode::BAD_REQUEST,
-        DbError::TenantRolebindingAlreadyExists => StatusCode::BAD_REQUEST,
-        DbError::UnexpectedRuleSetVersion(_, _) => StatusCode::BAD_REQUEST,
-        DbError::ValidationError(_) => StatusCode::BAD_REQUEST,
-        DbError::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::UnsupportedAuthMethod => StatusCode::UNAUTHORIZED,
-    }
-}
-
 impl api_errors::FpErrorTrait for ApiError {
     fn status_code(&self) -> StatusCode {
         match self.0.as_ref() {
@@ -355,7 +298,7 @@ impl api_errors::FpErrorTrait for ApiError {
             // future need structured
             // errors from enclave!
             ApiErrorKind::EnclaveError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiErrorKind::Database(e) => status_code_for_db_error(e),
+            ApiErrorKind::Database(e) => e.status_code(),
             ApiErrorKind::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
             ApiErrorKind::ContactInfoKindNotInVault(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -447,7 +390,9 @@ impl api_errors::FpErrorTrait for ApiError {
         let code = match self.kind() {
             ApiErrorKind::ErrorWithCode(e) => e.code(),
             ApiErrorKind::TfError(e) => e.code(),
-            // TODO need to make FpApiError codes an enum to prevent duplicates
+            // TODO remove DbError from hard enum type so we don't have to pass through impl here
+            ApiErrorKind::Database(e) => return e.code(),
+            // TODO need to make FpErrorTrait codes an enum to prevent duplicates
             ApiErrorKind::AuthError(AuthError::MissingHeader(_)) => "A101".into(),
             _ => return None,
         };
@@ -458,6 +403,7 @@ impl api_errors::FpErrorTrait for ApiError {
         match self.kind() {
             ApiErrorKind::ErrorWithCode(e) => e.context(),
             ApiErrorKind::TfError(e) => e.context(),
+            ApiErrorKind::Database(e) => e.context(),
             ApiErrorKind::AuthError(AuthError::MissingHeader(h)) => Some(serde_json::json!({"header": h})),
             _ => None,
         }

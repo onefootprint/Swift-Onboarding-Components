@@ -12,6 +12,7 @@ use api_wire_types::NewBusinessOwnerRequest;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
+use db::DbError;
 use newtypes::BusinessDataKind as BDK;
 use newtypes::DataIdentifier as DI;
 use newtypes::PreviewApi;
@@ -77,7 +78,7 @@ pub async fn post(
             let result = BusinessOwner::create(conn, sb, owner_su.vault_id, ownership_stake);
             match result {
                 Ok(_) => (),
-                Err(e) if e.is_unique_constraint_violation() => {
+                Err(DbError::UniqueConstraintViolation) => {
                     return ValidationError("The provided user is already an owner of the provided business")
                         .into()
                 }

@@ -4,7 +4,6 @@ use crate::auth::tenant::TenantAuth;
 use crate::auth::AuthError;
 use crate::errors::ApiError;
 use crate::errors::AssertionError;
-use crate::ModernApiError;
 use crate::State;
 use actix_web::http::header::Header;
 use actix_web::web;
@@ -14,6 +13,7 @@ use actix_web_httpauth::headers::authorization::Basic;
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
+use db::DbError;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::DataLifetimeSource;
@@ -69,15 +69,16 @@ impl FromRequest for SecretTenantAuthContext {
                 .db_pool
                 .db_transaction(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
                 .await
-                .map_err(|e| -> ModernApiError {
-                    if e.is_not_found() {
-                        if sk.is_maybe_ob_config_key() {
-                            AuthError::ObConfigKeyUsedForApiKey.into()
-                        } else {
-                            AuthError::ApiKeyNotFound.into()
+                .map_err(|e| -> Self::Error {
+                    match e {
+                        DbError::DataNotFound => {
+                            if sk.is_maybe_ob_config_key() {
+                                AuthError::ObConfigKeyUsedForApiKey.into()
+                            } else {
+                                AuthError::ApiKeyNotFound.into()
+                            }
                         }
-                    } else {
-                        e.into()
+                        _ => e.into(),
                     }
                 })?;
 

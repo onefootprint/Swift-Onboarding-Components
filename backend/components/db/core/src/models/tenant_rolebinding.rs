@@ -144,13 +144,9 @@ impl TenantRolebinding {
             .values(new)
             .get_result(conn.conn())
             .map_err(DbError::from)
-            .map_err(|e| {
-                if e.is_unique_constraint_violation() {
-                    // There's already a rolebinding for this tenant user at this tenant
-                    DbError::TenantRolebindingAlreadyExists
-                } else {
-                    e
-                }
+            .map_err(|e| match e {
+                DbError::UniqueConstraintViolation => DbError::TenantRolebindingAlreadyExists,
+                _ => e,
             })?;
         Ok((rb, tenant_role.into_inner()))
     }

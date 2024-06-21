@@ -6,6 +6,7 @@ use actix_web::web;
 use actix_web::FromRequest;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
+use db::DbError;
 use db::DbResult;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
@@ -59,16 +60,17 @@ impl FromRequest for PublicOnboardingContext {
                 .db_query(move |conn| -> DbResult<_> { ObConfiguration::get_enabled(conn, &key) })
                 .await
                 .map_err(|e| -> Self::Error {
-                    if e.is_not_found() {
-                        // Slightly more informative error message when we can't find an ObConfig with this
-                        // key
-                        if key2.starts_with("sk_") {
-                            AuthError::ApiKeyUsedForObConfig.into()
-                        } else {
-                            AuthError::ObConfigNotFound.into()
+                    match e {
+                        DbError::DataNotFound => {
+                            // Slightly more informative error message when we can't find an ObConfig with
+                            // this key
+                            if key2.starts_with("sk_") {
+                                AuthError::ApiKeyUsedForObConfig.into()
+                            } else {
+                                AuthError::ObConfigNotFound.into()
+                            }
                         }
-                    } else {
-                        e.into()
+                        _ => e.into(),
                     }
                 })?;
 

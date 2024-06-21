@@ -3400,6 +3400,7 @@ name = "db"
 version = "0.1.0"
 dependencies = [
  "actix-rt",
+ "api_errors",
  "chrono",
  "crypto",
  "db_schema",

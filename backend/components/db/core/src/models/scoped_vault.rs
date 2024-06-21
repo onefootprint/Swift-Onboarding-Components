@@ -267,7 +267,7 @@ impl ScopedVault {
                 // TODO instead of silently inheriting, we might want to actualy HTTP 409
                 match svr {
                     Ok(sv) => Ok((Vault::lock(conn, &sv.vault_id)?, false)),
-                    Err(err) if err.is_not_found() => Ok(Vault::insert(conn, new_user, idempotency_id)?),
+                    Err(DbError::DataNotFound) => Ok(Vault::insert(conn, new_user, idempotency_id)?),
                     Err(err) => Err(err),
                 }?
             }

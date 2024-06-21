@@ -79,7 +79,7 @@ pub enum ErrorWithCode {
     MissingAuthHeader(String),
 }
 
-// TODO can remove this in favor of new FpApiError
+// TODO can remove this in favor of new FpErrorTrait
 pub(crate) trait CodedError: std::error::Error {
     fn context(&self) -> Option<Value>;
     fn code(&self) -> String;

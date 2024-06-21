@@ -14,6 +14,7 @@ use db::models::tenant_role::ImmutableRoleKind;
 use db::models::tenant_role::TenantRole;
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
+use db::DbError;
 use newtypes::OrgMemberEmail;
 use newtypes::PartnerTenantId;
 use newtypes::SessionAuthToken;
@@ -76,10 +77,7 @@ async fn post(
             //
             let partner_tenant = match PartnerTenant::lock(conn, &id) {
                 Ok(t) => t,
-                Err(e) => {
-                    if !e.is_not_found() {
-                        return Err(e.into()); // Real error, return
-                    }
+                Err(DbError::DataNotFound) => {
                     let new_partner_tenant = NewIntegrationTestPartnerTenant {
                         // Notably, we create the partner tenant with the ID as passed in. Next
                         // time the partner tenant is requested, it will already exist
@@ -95,6 +93,7 @@ async fn post(
                     };
                     PartnerTenant::create(conn, new_partner_tenant)?
                 }
+                Err(e) => return Err(e.into()),
             };
 
             //
@@ -115,14 +114,12 @@ async fn post(
                 )?;
                 let rb = match TenantRolebinding::get(conn, (&user.id, &partner_tenant.id)) {
                     Ok((_, rb, _, _)) => rb,
-                    Err(e) => {
-                        if !e.is_not_found() {
-                            return Err(e.into()); // Real error, return
-                        }
+                    Err(DbError::DataNotFound) => {
                         let role_id = role.id.clone();
                         let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, &partner_tenant.id)?;
                         rb
                     }
+                    Err(e) => return Err(e.into()),
                 };
                 // Create a new partner tenant RB session for the integration test tenant user
                 let login_result = TenantRolebinding::login(conn, &rb.id, WorkosAuthMethod::GoogleOauth)?;

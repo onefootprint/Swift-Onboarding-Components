@@ -1,3 +1,5 @@
+use api_errors::FpErrorTrait;
+use api_errors::StatusCode;
 use diesel::result::DatabaseErrorKind;
 use diesel::result::Error::DatabaseError as DieselDbError;
 use newtypes::TenantRoleKindDiscriminant;
@@ -26,10 +28,18 @@ where
 /// Note: the error messages here are publicly visible to the API
 pub enum DbError {
     // Wrapped errors
-    #[error("Db interact error: {0}")]
+    #[error("Database interact error: {0}")]
     DbInteract(#[from] deadpool_diesel::InteractError),
     #[error("Database error: {0}")]
-    DbError(#[from] diesel::result::Error),
+    DbError(diesel::result::Error),
+    #[error("Data not found")]
+    DataNotFound,
+    #[error("Operation not allowed: foreign key constraint violation")]
+    ForeignKeyViolation,
+    #[error("Operation not allowed: unique constraint violation")]
+    UniqueConstraintViolation,
+    #[error("Operation not allowed: check constraint violation")]
+    CheckConstraintViolation,
     #[error("Pool error: {0}")]
     PoolGet(#[from] deadpool_diesel::PoolError),
     #[error("Pool init error: {0}")]
@@ -114,46 +124,79 @@ pub enum DbError {
     CryptoError(#[from] crypto::Error),
 }
 
-impl DbError {
-    pub fn is_not_found(&self) -> bool {
-        matches!(self, Self::DbError(diesel::result::Error::NotFound))
+impl From<diesel::result::Error> for DbError {
+    fn from(value: diesel::result::Error) -> Self {
+        match value {
+            diesel::result::Error::NotFound => Self::DataNotFound,
+            DieselDbError(DatabaseErrorKind::ForeignKeyViolation, _) => Self::ForeignKeyViolation,
+            DieselDbError(DatabaseErrorKind::CheckViolation, _) => Self::CheckConstraintViolation,
+            DieselDbError(DatabaseErrorKind::UniqueViolation, _) => Self::UniqueConstraintViolation,
+            _ => Self::DbError(value),
+        }
+    }
+}
+
+impl FpErrorTrait for DbError {
+    fn code(&self) -> Option<String> {
+        None
     }
 
-    pub fn is_fk_constraint_violation(&self) -> bool {
-        matches!(
-            self,
-            Self::DbError(DieselDbError(DatabaseErrorKind::ForeignKeyViolation, _))
-        )
+    fn context(&self) -> Option<serde_json::Value> {
+        None
     }
 
-    pub fn is_check_constraint_violation(&self) -> bool {
-        matches!(
-            self,
-            Self::DbError(DieselDbError(DatabaseErrorKind::CheckViolation, _))
-        )
-    }
-
-    pub fn is_unique_constraint_violation(&self) -> bool {
-        matches!(
-            self,
-            Self::DbError(DieselDbError(DatabaseErrorKind::UniqueViolation, _))
-        )
-    }
-
-    pub fn message(&self) -> String {
-        if self.is_not_found() {
-            return "Data not found".to_owned();
-        }
-        if self.is_fk_constraint_violation() {
-            return "Operation not allowed: foreign key constraint violation".to_owned();
-        }
-        if self.is_check_constraint_violation() {
-            return "Operation not allowed: check constraint violation".to_owned();
-        }
-        if self.is_unique_constraint_violation() {
-            return "Operation not allowed: unique constraint violation".to_owned();
-        }
+    fn message(&self) -> String {
         self.to_string()
+    }
+
+    fn status_code(&self) -> StatusCode {
+        match self {
+            Self::MigrationFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::DbInteract(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::DbError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::DataNotFound => StatusCode::NOT_FOUND,
+            Self::ForeignKeyViolation => StatusCode::BAD_REQUEST,
+            Self::CheckConstraintViolation => StatusCode::BAD_REQUEST,
+            Self::UniqueConstraintViolation => StatusCode::BAD_REQUEST,
+            Self::PoolGet(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::PoolInit(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::ConnectionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::MigrationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::IncorrectNumberOfRowsUpdated => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::ObjectNotFound => StatusCode::NOT_FOUND,
+            Self::UpdateTargetNotFound => StatusCode::NOT_FOUND,
+            Self::RelatedObjectNotFound => StatusCode::NOT_FOUND,
+            Self::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::ApiKeyDisabled => StatusCode::UNAUTHORIZED,
+            Self::PlaybookNotFound => StatusCode::BAD_REQUEST,
+            Self::TenantUserDeactivated => StatusCode::UNAUTHORIZED,
+            Self::TenantRoleMismatch => StatusCode::UNAUTHORIZED,
+            Self::TenantRoleAlreadyExists => StatusCode::BAD_REQUEST,
+            Self::TenantRoleDeactivated => StatusCode::UNAUTHORIZED,
+            Self::TargetTenantRoleDeactivated => StatusCode::BAD_REQUEST,
+            Self::TenantRoleHasUsers(_) => StatusCode::BAD_REQUEST,
+            Self::InvalidTenantScope(_, _) => StatusCode::BAD_REQUEST,
+            Self::TenantRoleAlreadyDeactivated => StatusCode::BAD_REQUEST,
+            Self::InvalidRoleIsLive => StatusCode::BAD_REQUEST,
+            Self::TenantRoleHasActiveApiKeys(_) => StatusCode::BAD_REQUEST,
+            Self::IncorrectTenantRoleKind => StatusCode::BAD_REQUEST,
+            Self::IncorrectTenantKind => StatusCode::BAD_REQUEST,
+            Self::SandboxMismatch => StatusCode::BAD_REQUEST,
+            Self::CannotCreatedScopedUser => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::CannotUpdateImmutableRole(_) => StatusCode::BAD_REQUEST,
+            Self::NewtypesError(newtypes::Error::AssertionError(_)) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::NewtypesError(_) => StatusCode::BAD_REQUEST,
+            Self::InsufficientTenantScopes(_) => StatusCode::BAD_REQUEST,
+            Self::NonUniqueTenantScopes => StatusCode::BAD_REQUEST,
+            Self::InvalidProxyConfigId => StatusCode::BAD_REQUEST,
+            Self::ListAlreadyDeactivated => StatusCode::BAD_REQUEST,
+            Self::ListEntryAlreadyDeactivated => StatusCode::BAD_REQUEST,
+            Self::TenantRolebindingAlreadyExists => StatusCode::BAD_REQUEST,
+            Self::UnexpectedRuleSetVersion(_, _) => StatusCode::BAD_REQUEST,
+            Self::ValidationError(_) => StatusCode::BAD_REQUEST,
+            Self::AssertionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::UnsupportedAuthMethod => StatusCode::UNAUTHORIZED,
+        }
     }
 }
 
@@ -165,13 +208,8 @@ impl<T> OptionalExtension<T, DbError> for Result<T, DbError> {
     fn optional(self) -> Result<Option<T>, DbError> {
         match self {
             Ok(v) => Ok(Some(v)),
-            Err(e) => {
-                if e.is_not_found() {
-                    Ok(None)
-                } else {
-                    Err(e)
-                }
-            }
+            Err(DbError::DataNotFound) => Ok(None),
+            Err(e) => Err(e),
         }
     }
 }

@@ -1,6 +1,6 @@
 pub use actix_web::http::StatusCode;
 
-pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error {
+pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error + Send {
     /// The HTTP status code representing this error
     fn status_code(&self) -> StatusCode;
     // TODO maybe one day we'll make this return an enum to help guarantee that errors have unique codes
