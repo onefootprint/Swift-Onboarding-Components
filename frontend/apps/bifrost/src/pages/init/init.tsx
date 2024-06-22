@@ -65,12 +65,7 @@ const setupLogger = ({ orgIds, config }: { orgIds: Set<string>; config: PublicOn
 
 const Init = () => {
   const [state, send] = useBifrostMachine();
-  const {
-    authToken: authTokenContext,
-    publicKey: publicKeyContext,
-    config: configContext,
-    bootstrapData = {},
-  } = state.context;
+  const { authToken: authTokenContext, publicKey: publicKeyContext, config: configContext } = state.context;
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const startMs = Date.now();
