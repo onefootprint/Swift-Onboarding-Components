@@ -32,11 +32,7 @@ const isPropsSaved = (context: Record<string, unknown>) => {
   );
 };
 
-const setupLogger = ({
-  orgIds,
-  config,
-  hasBootstrapData,
-}: { orgIds: Set<string>; config: PublicOnboardingConfig; hasBootstrapData: boolean }) => {
+const setupLogger = ({ orgIds, config }: { orgIds: Set<string>; config: PublicOnboardingConfig }) => {
   const isInIframe = checkIsInIframe();
   const isRecordDisabled = orgIds.has(config.orgId);
 
@@ -53,7 +49,6 @@ const setupLogger = ({
       deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
       // @ts-expect-error: browser support
       deviceConnection: typeof navigator?.connection !== 'undefined' ? navigator.connection : undefined,
-      hasBootstrapData,
       iframe: !!isInIframe,
       isAppClipEnabled: config.isAppClipEnabled,
       isInstantAppEnabled: config.isInstantAppEnabled,
@@ -98,7 +93,6 @@ const Init = () => {
         setupLogger({
           orgIds,
           config,
-          hasBootstrapData: Object.entries(bootstrapData).some(([, value]) => value),
         });
         send({
           type: 'initContextUpdated',
