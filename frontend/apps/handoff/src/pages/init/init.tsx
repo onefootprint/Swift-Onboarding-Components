@@ -31,19 +31,16 @@ const setupLogger = (config: PublicOnboardingConfig, orgIds: Set<string>) => {
   if (config.isLive && !orgIds.has(config.orgId)) {
     Logger.startSessionReplay();
     Logger.identify({
-      appClipExperienceId: config.appClipExperienceId,
       // @ts-expect-error: browser support
       deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
       // @ts-expect-error: browser support
       deviceConnection: typeof navigator?.connection !== 'undefined' ? navigator.connection : undefined,
       isAppClipEnabled: config.isAppClipEnabled,
       isInstantAppEnabled: config.isInstantAppEnabled,
-      isNoPhoneFlow: config.isNoPhoneFlow,
       kind: String(config.kind),
       orgId: config.orgId,
       orgName: config.orgName,
       publicKey: config.key,
-      requiresIdDoc: config.requiresIdDoc,
     });
   }
 };

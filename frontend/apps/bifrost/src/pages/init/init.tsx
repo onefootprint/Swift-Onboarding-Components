@@ -43,7 +43,6 @@ const setupLogger = ({ orgIds, config }: { orgIds: Set<string>; config: PublicOn
   if (config.isLive && !isRecordDisabled) {
     Logger.startSessionReplay();
     Logger.identify({
-      appClipExperienceId: config.appClipExperienceId,
       application_id: String(process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_BIFROST),
       // @ts-expect-error: browser support
       deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
@@ -52,12 +51,10 @@ const setupLogger = ({ orgIds, config }: { orgIds: Set<string>; config: PublicOn
       iframe: !!isInIframe,
       isAppClipEnabled: config.isAppClipEnabled,
       isInstantAppEnabled: config.isInstantAppEnabled,
-      isNoPhoneFlow: config.isNoPhoneFlow,
       kind: String(config.kind),
       orgId: config.orgId,
       orgName: config.orgName,
       publicKey: config.key,
-      requiresIdDoc: config.requiresIdDoc,
       socialMedia: checkIsSocialMediaBrowser(),
     });
   }
