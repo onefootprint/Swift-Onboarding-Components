@@ -50,7 +50,7 @@ const Content = () => {
         <Box marginBottom={9}>
           <Vault />
         </Box>
-        {!shownSeqno && (
+        {shownSeqno ? null : (
           <Box marginBottom={9}>
             <AuditTrail />
           </Box>
@@ -63,7 +63,7 @@ const Content = () => {
             <DuplicateData />
           </Box>
         )}
-        {!shownSeqno && (
+        {shownSeqno ? null : (
           <>
             <Box marginBottom={9}>
               <DeviceInsights />
@@ -72,8 +72,7 @@ const Content = () => {
           </>
         )}
       </Box>
-      <OtherInsights />
-      {shownSeqno && <HistoricalBar seqno={shownSeqno} />}
+      {shownSeqno ? <HistoricalBar seqno={shownSeqno} /> : null}
     </>
   );
 };
@@ -89,14 +88,6 @@ const useHistoricalLayout = (isHeadingDisabled: boolean) => {
   }, [isHeadingDisabled]);
 };
 
-const ContentWithProviders = () => (
-  <EditProvider>
-    <DecryptMachineProvider>
-      <Content />
-    </DecryptMachineProvider>
-  </EditProvider>
-);
-
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
     #page-main.historical {
@@ -104,5 +95,13 @@ const GlobalStyle = createGlobalStyle`
     }
   `}
 `;
+
+const ContentWithProviders = () => (
+  <EditProvider>
+    <DecryptMachineProvider>
+      <Content />
+    </DecryptMachineProvider>
+  </EditProvider>
+);
 
 export default ContentWithProviders;
