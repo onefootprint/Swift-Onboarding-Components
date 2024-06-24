@@ -534,6 +534,7 @@ pub struct IncodeOcrFixtureResponseFields {
     // just used for MX now, but in future will extend and de-private
     pub curp: Option<PiiString>,
     pub type_of_id: Option<IncodeDocumentType>,
+    pub issuing_state: Option<PiiString>,
 }
 
 impl IncodeOcrFixtureResponseFields {
@@ -718,6 +719,10 @@ impl FetchOCRResponse {
             .and_then(|d| d.type_of_id.clone())
             .unwrap_or(IncodeDocumentType::DriversLicense)
             .to_string();
+        let issuing_state = data
+            .as_ref()
+            .and_then(|d| d.issuing_state.clone())
+            .unwrap_or(PiiString::from("CALIFORNIA"));
 
         serde_json::json!(
             {"additionalTimestamps":null,
@@ -752,7 +757,7 @@ impl FetchOCRResponse {
             "issueDate":2022,
             "issuingAuthority":null,
             "issuingCountry":"USA",
-            "issuingState":"CALIFORNIA",
+            "issuingState": issuing_state,
             "name":{
                 "firstName":first_name,
                 "fullName":full_name,
@@ -1208,6 +1213,7 @@ mod tests {
             dob: None,
             curp: None,
             type_of_id,
+            issuing_state: None,
         };
         let raw_response = FetchOCRResponse::fixture_response(Some(opts.clone()));
         let parsed: FetchOCRResponse = serde_json::from_value(raw_response).unwrap();

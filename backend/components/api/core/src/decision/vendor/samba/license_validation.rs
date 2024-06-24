@@ -1,13 +1,14 @@
+use crate::decision::features::incode_utils::ParsedIncodeAddress;
+use crate::decision::features::incode_utils::ParsedIncodeNames;
 use crate::decision::vendor::map_to_api_error;
 use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use crate::decision::vendor::vendor_api::loaders::load_response_for_vendor_api;
+use crate::decision::vendor::vendor_api::vendor_api_struct::IncodeFetchOCR;
 use crate::decision::vendor::vendor_api::vendor_api_struct::SambaLicenseValidationCreate;
 use crate::decision::vendor::verification_result::SaveVerificationResultArgs;
 use crate::decision::vendor::AdditionalIdentityDocumentVerificationHelper;
-use crate::enclave_client::EnclaveClient;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::DecryptUncheckedResult;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::VwArgs;
 use crate::FpResult;
@@ -21,7 +22,9 @@ use db::models::samba_report::SambaReport;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VReqIdentifier;
 use db::PgConn;
+use idv::incode::doc::response::FetchOCRResponse;
 use idv::samba::license_state_is_supported_for_license_validation;
+use idv::samba::request::license_validation::CreateLVOrderAddress;
 use idv::samba::request::SambaCreateLVOrderRequest;
 use idv::samba::request::SambaGetLVReportRequest;
 use idv::samba::response::license_validation::SambaLinkType;
@@ -29,14 +32,10 @@ use idv::samba::response::webhook::SambaWebhook;
 use newtypes::samba::SambaLicenseValidationData;
 use newtypes::samba::SambaOrderKind;
 use newtypes::vendor_credentials::SambaSafetyCredentials;
-use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
-use newtypes::DocumentDiKind;
 use newtypes::DocumentId;
 use newtypes::DocumentKind;
-use newtypes::IdDocKind;
-use newtypes::IdentityDataKind as IDK;
-use newtypes::OcrDataKind as ODK;
+use newtypes::PiiString;
 use newtypes::SambaReportId;
 use newtypes::UsState;
 use newtypes::UsStateFull;
@@ -46,10 +45,12 @@ use newtypes::WorkflowId;
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum CreateOrderContext {
+    // TODO: support IDK version of this. For now we pull from the iddoc
     Workflow {
         wf_id: WorkflowId,
         di: DecisionIntent,
     },
+    // TODO: support IDK version of this. For now we pull from the latest DL iddoc
     Adhoc {
         di: DecisionIntent,
         // support optionally sending data as well
@@ -76,33 +77,7 @@ impl CreateOrderContext {
         matches!(self, CreateOrderContext::Adhoc { data, .. } if data.is_some())
     }
 
-    // TODO: more fields
-    async fn get_decrypted_values(
-        vw: &VaultWrapper,
-        enclave_client: &EnclaveClient,
-    ) -> FpResult<(DecryptUncheckedResult, Vec<DataLifetimeId>)> {
-        let fields = [
-            DataIdentifier::from(IDK::FirstName),
-            DataIdentifier::from(IDK::LastName),
-            DataIdentifier::from(DocumentDiKind::OcrData(
-                IdDocKind::DriversLicense,
-                ODK::DocumentNumber,
-            )),
-            DataIdentifier::from(DocumentDiKind::OcrData(
-                IdDocKind::DriversLicense,
-                ODK::IssuingState,
-            )),
-        ];
-        let decrypted = vw.decrypt_unchecked(enclave_client, &fields).await?;
-        let lifetime_ids = fields
-            .iter()
-            .filter_map(|di| vw.get(di).map(|l| l.lifetime_id()))
-            .cloned()
-            .collect();
-
-        Ok((decrypted, lifetime_ids))
-    }
-
+    #[tracing::instrument(skip_all)]
     fn get_document_id(&self, conn: &mut PgConn) -> FpResult<Option<DocumentId>> {
         // If we're running this in the context of a wf, only check documents collected in this workflow
         let id_documents = match self {
@@ -127,25 +102,19 @@ impl CreateOrderContext {
         Ok(doc_id)
     }
 
-    async fn create_req_from_vault(
-        vw: &VaultWrapper,
-        enclave_client: &EnclaveClient,
-        tvc: &TenantVendorControl,
-    ) -> FpResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
-        let (decrypted_values, lifetime_ids) = Self::get_decrypted_values(vw, enclave_client).await?;
-        let request = build_request(decrypted_values, tvc.samba_credentials())?;
-        Ok((request, lifetime_ids))
-    }
-
+    #[tracing::instrument(skip_all)]
     pub async fn create_request(
         &self,
+        state: &State,
         vw: &VaultWrapper,
-        enclave_client: &EnclaveClient,
+        doc_id: Option<DocumentId>,
         tvc: &TenantVendorControl,
     ) -> FpResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
         match self {
             // we're in the context of a workflow
-            CreateOrderContext::Workflow { .. } => Self::create_req_from_vault(vw, enclave_client, tvc).await,
+            CreateOrderContext::Workflow { .. } => {
+                build_request_from_ocr_response(state, vw, doc_id, tvc).await
+            }
             CreateOrderContext::Adhoc { data, .. } => {
                 if let Some(d) = data {
                     Ok((
@@ -153,42 +122,68 @@ impl CreateOrderContext {
                         vec![],
                     ))
                 } else {
-                    Self::create_req_from_vault(vw, enclave_client, tvc).await
+                    // otherwise take the latest DL and run it through
+                    build_request_from_ocr_response(state, vw, doc_id, tvc).await
                 }
             }
         }
     }
 }
 
+#[tracing::instrument(skip_all)]
+async fn build_request_from_ocr_response(
+    state: &State,
+    vw: &VaultWrapper,
+    doc_id: Option<DocumentId>,
+    tvc: &TenantVendorControl,
+) -> FpResult<(SambaCreateLVOrderRequest, Vec<DataLifetimeId>)> {
+    let Some(did) = doc_id else {
+        return Err(AssertionError("missing document id").into());
+    };
+
+    let Some((ocr_res, _)) = load_response_for_vendor_api(
+        state,
+        VReqIdentifier::DocumentId(did),
+        &vw.vault.e_private_key,
+        IncodeFetchOCR,
+    )
+    .await?
+    .ok() else {
+        return Err(AssertionError("missing fetch ocr res").into());
+    };
+
+    let request = build_request(&ocr_res, tvc.samba_credentials())?;
+    Ok((request, vec![]))
+}
 
 fn build_request(
-    decrypted_values: DecryptUncheckedResult,
+    ocr_res: &FetchOCRResponse,
     credentials: SambaSafetyCredentials,
 ) -> FpResult<SambaCreateLVOrderRequest> {
+    let names = ParsedIncodeNames::from_fetch_ocr_res(ocr_res);
+    let address: ParsedIncodeAddress = ParsedIncodeAddress::from_fetch_ocr_res(ocr_res);
+    let samba_address = match (address.street, address.zip, address.city, address.state) {
+        (Some(street), Some(zip_code), Some(city), Some(state)) => Some(CreateLVOrderAddress {
+            street,
+            zip_code,
+            city,
+            state,
+        }),
+        _ => None,
+    };
+    let dob: Option<PiiString> = ocr_res.dob().ok().map(|s| s.into());
+
     let request = SambaCreateLVOrderRequest {
         credentials,
-        // TODO: handle for doc only where we don't ever write IDKs
-        first_name: decrypted_values
-            .get_di(DataIdentifier::from(IDK::FirstName))
-            .ok()
-            .ok_or(AssertionError("missing first name"))?,
-        last_name: decrypted_values
-            .get_di(DataIdentifier::from(IDK::LastName))
-            .ok()
-            .ok_or(AssertionError("missing last name"))?,
-        license_number: decrypted_values
-            .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
-                IdDocKind::DriversLicense,
-                ODK::DocumentNumber,
-            )))
-            .ok()
+        first_name: names.first_name.ok_or(AssertionError("missing first name"))?,
+        last_name: names.last_name.ok_or(AssertionError("missing last name"))?,
+        license_number: ocr_res
+            .document_number
+            .clone()
+            .map(|s| s.into())
             .ok_or(AssertionError("missing license number"))?,
-        license_state: decrypted_values
-            .get_di(DataIdentifier::from(DocumentDiKind::OcrData(
-                IdDocKind::DriversLicense,
-                ODK::IssuingState,
-            )))
-            .ok()
+        license_state: ocr_res
+            .normalized_issuing_state()
             .and_then(|s| {
                 let from_2_char = UsState::from_raw_string(s.leak()).ok();
                 let from_full: Option<UsState> =
@@ -197,6 +192,8 @@ fn build_request(
                 from_2_char.or(from_full).map(|s| s.to_string().into())
             })
             .ok_or(AssertionError("missing license state"))?,
+        dob,
+        address: samba_address,
         ..Default::default()
     };
 
@@ -253,7 +250,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     )
     .await?;
     // create our request based on what type of data we're handling
-    let (request, lifetime_ids) = context.create_request(&vw, &state.enclave_client, &tvc).await?;
+    let (request, lifetime_ids) = context.create_request(state, &vw, doc_id.clone(), &tvc).await?;
     let license_state = UsState::from_raw_string(request.license_state.leak()).ok();
 
     let can_run_request_for_state = if let Some(state) = license_state {
@@ -397,46 +394,9 @@ pub async fn get_samba_license_validation_report(state: &State, webhook: SambaWe
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::vault_wrapper::EnclaveDecryptOperation;
-    use newtypes::PiiString;
-    use std::collections::HashMap;
+    use idv::incode::doc::response::IncodeOcrFixtureResponseFields;
     use test_case::test_case;
 
-    fn decrypted_values(state: &str) -> DecryptUncheckedResult {
-        let ops1 = vec![
-            DataIdentifier::from(IDK::FirstName),
-            DataIdentifier::from(IDK::LastName),
-            DataIdentifier::from(DocumentDiKind::OcrData(
-                IdDocKind::DriversLicense,
-                ODK::DocumentNumber,
-            )),
-            DataIdentifier::from(DocumentDiKind::OcrData(
-                IdDocKind::DriversLicense,
-                ODK::IssuingState,
-            )),
-        ]
-        .into_iter()
-        .zip(vec![
-            PiiString::from("bob"),
-            PiiString::from("bobierto"),
-            PiiString::from("123456"),
-            PiiString::from(state),
-        ])
-        .map(|(identifier, p)| {
-            (
-                EnclaveDecryptOperation {
-                    identifier,
-                    transforms: vec![],
-                },
-                p,
-            )
-        });
-
-        DecryptUncheckedResult {
-            results: HashMap::from_iter(ops1),
-            decrypted_dis: vec![],
-        }
-    }
 
     #[test_case("NY" => "NY".to_string())]
     #[test_case(" NeW yorK" => "NY".to_string())]
@@ -447,8 +407,14 @@ mod tests {
             auth_username: "a".to_string().into(),
             auth_password: "a".to_string().into(),
         };
-        let decrypted = decrypted_values(state);
-        let req = build_request(decrypted, creds).unwrap();
+        let fixture = IncodeOcrFixtureResponseFields {
+            issuing_state: Some(PiiString::from(state)),
+            ..Default::default()
+        };
+
+        let ocr_res: FetchOCRResponse =
+            serde_json::from_value(FetchOCRResponse::fixture_response(Some(fixture))).unwrap();
+        let req = build_request(&ocr_res, creds).unwrap();
         req.license_state.leak().to_string()
     }
 }
