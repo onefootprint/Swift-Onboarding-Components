@@ -48,3 +48,7 @@ COPY --from=rust-builder /root/.cargo/bin/footprint-dr /usr/local/bin/footprint-
 
 COPY images/integration-tests/localstack-aws-config.toml /root/.aws/config
 COPY images/integration-tests/localstack-aws-credentials.toml /root/.aws/credentials
+
+COPY images/integration-tests/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

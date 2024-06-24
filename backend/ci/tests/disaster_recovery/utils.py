@@ -9,11 +9,10 @@ from tests.utils import _gen_random_n_digit_number
 
 EXTERNAL_ID_PATTERN = r"\b([a-z0-9]{32})\b"
 
-# Runs footprint-dr such that the gnome keyring is available.
 def footprint_dr(*args):
     return pexpect.spawn(
-        "dbus-run-session",
-        ["--", "bash", "-c", "echo -n test | gnome-keyring-daemon --unlock && footprint-dr $@", "--"] + list(args),
+        "footprint-dr",
+        list(args),
         timeout=5,
         logfile=sys.stdout.buffer,
         env=os.environ | {
