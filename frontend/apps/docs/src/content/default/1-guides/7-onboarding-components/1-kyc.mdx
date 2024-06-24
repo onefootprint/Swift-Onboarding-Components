@@ -95,7 +95,7 @@ As you can see, our components are really raw: they don't have any styling. This
 
 Our Onboarding Components are totally customizable. If you want to change the default placeholder, you can just pass the attribute as you would normally do. The same goes for all the other input attributes:
 
-```jsx filename="app.tsx" highlight="15,16"
+```jsx filename="app.tsx" highlight="15,16,21"
 import { Fp } from '@onefootprint/footprint-react';
 
 const Demo = () => {
@@ -116,7 +116,7 @@ const Flow = () => {
       </Fp.Field>
       <Fp.Field name="id.phone_number">
         <Fp.Label>Phone</Fp.Label>
-        <Fp.Input />
+        <Fp.Input placeholder="(123) 456-7890" />
         <Fp.FieldErrors />
       </Fp.Field>
       <button type="submit">Continue</button>
@@ -266,7 +266,7 @@ Looks much better now:
 
 Once the user submits the data, we should identify the user. This the part where the user needs to verify their identify using OTP or Passkeys. Because this part is more complex, we delegate this part to Footprint: you just need to call `fp.launchIdentify()`:
 
-```jsx filename="app.tsx" highlight="12,14,15,16,17,18,19,20,23"
+```jsx filename="app.tsx" highlight="12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,29"
 import { Fp, useFootprint, Di } from '@onefootprint/footprint-react';
 
 const Demo = () => {
@@ -322,7 +322,7 @@ Demo:
 
 Now that we identified the user, it's time to collect data. This evolves declaring the components that you want to collect, and later, saving the data.
 
-```jsx filename="app.tsx" highlight="18,23,24,25,26,27,28,29,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111"
+```jsx filename="app.tsx" highlight="29,30,31,32,33,34,35,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117"
 import { Fp, useFootprint } from '@onefootprint/footprint-react';
 
 const Demo = () => {
@@ -451,7 +451,7 @@ const Flow = () => {
 
 With all the data collected, we need to now init Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token.
 
-```jsx filename="app.tsx" highlight="26,27,28"
+```jsx filename="app.tsx" highlight="31"
 import { Fp, useFootprint } from '@onefootprint/footprint-react';
 
 const Demo = () => {

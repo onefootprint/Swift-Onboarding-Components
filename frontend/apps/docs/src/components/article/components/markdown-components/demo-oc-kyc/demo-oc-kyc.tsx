@@ -157,52 +157,50 @@ const Step5 = () => {
           </Fp.Field>
           <Fp.Field name="id.middle_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">Middle name</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Sue" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.last_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">Last name</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Doe" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.dob" className="fp-c-field">
             <Fp.Label className="fp-c-label">DOB</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="MM/DD/YYYY" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
-          <Fp.Field name="id.country" className="fp-c-field">
-            <Fp.Label className="fp-c-label">Country</Fp.Label>
-            <Fp.Input className="fp-c-input" />
-            <Fp.FieldErrors className="fp-c-field-errors" />
+          <Fp.Field name="business.country">
+            <Fp.Input placeholder="US" defaultValue="US" type="hidden" />
           </Fp.Field>
           <Fp.Field name="id.address_line1" className="fp-c-field">
             <Fp.Label className="fp-c-label">Address line 1</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Street number" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.address_line2" className="fp-c-field">
             <Fp.Label className="fp-c-label">Address line 2 (optional)</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Apartment, suite, etc." />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.city" className="fp-c-field">
             <Fp.Label className="fp-c-label">City</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="New York" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.zip" className="fp-c-field">
             <Fp.Label className="fp-c-label">Zip code</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="11206" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.state" className="fp-c-field">
             <Fp.Label className="fp-c-label">State</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="NY" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.ssn9" className="fp-c-field">
             <Fp.Label className="fp-c-label">SSN9</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="XXX-XX-XXXX" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
@@ -267,17 +265,17 @@ const Step6 = () => {
           </Fp.Field>
           <Fp.Field name="id.middle_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">Middle name</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Sue" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.last_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">Last name</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Doe" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.dob" className="fp-c-field">
             <Fp.Label className="fp-c-label">DOB</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="MM/DD/YYYY" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.country" className="fp-c-field">
@@ -287,32 +285,32 @@ const Step6 = () => {
           </Fp.Field>
           <Fp.Field name="id.address_line1" className="fp-c-field">
             <Fp.Label className="fp-c-label">Address line 1</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Street number" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.address_line2" className="fp-c-field">
             <Fp.Label className="fp-c-label">Address line 2 (optional)</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Apartment, suite, etc." />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.city" className="fp-c-field">
             <Fp.Label className="fp-c-label">City</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="New York" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.zip" className="fp-c-field">
             <Fp.Label className="fp-c-label">Zip code</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="11206" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.state" className="fp-c-field">
             <Fp.Label className="fp-c-label">State</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="NY" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.ssn9" className="fp-c-field">
             <Fp.Label className="fp-c-label">SSN9</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="XXX-XX-XXXX" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
