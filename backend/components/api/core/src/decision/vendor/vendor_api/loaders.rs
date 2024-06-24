@@ -122,6 +122,11 @@ mod tests {
     use crate::State;
     use chrono::Utc;
     use db::models::decision_intent::DecisionIntent;
+    use db::models::document::Document;
+    use db::models::document::NewDocumentArgs;
+    use db::models::document_request::DocumentRequest;
+    use db::models::document_request::NewDocumentRequestArgs;
+    use db::models::insight_event::CreateInsightEvent;
     use db::models::verification_request::NewVerificationRequestArgs;
     use db::models::verification_result::NewVerificationResult;
     use db::models::verification_result::VerificationResult;
@@ -130,6 +135,9 @@ mod tests {
     use macros::test_state_case;
     use newtypes::DecisionIntentId;
     use newtypes::DecisionIntentKind;
+    use newtypes::DocumentId;
+    use newtypes::DocumentKind;
+    use newtypes::DocumentRequestConfig;
     use newtypes::ScopedVaultId;
     use newtypes::VendorAPI;
     use newtypes::WorkflowId;
@@ -164,7 +172,7 @@ mod tests {
         let wf_id = wf.id.clone();
         let v_pub_key = uv.public_key.clone();
 
-        let (vres_id_to_check, di_id) = state
+        let (vres_id_to_check, di_id, doc_id) = state
             .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
                 let di = DecisionIntent::get_or_create_for_workflow(
@@ -175,14 +183,44 @@ mod tests {
                 )
                 .unwrap();
 
+                // test retrieving by document_id as well
+                let id_doc_id = if vendor_api.is_incode_doc_flow_api() {
+                    let dr_args = NewDocumentRequestArgs {
+                        scoped_vault_id: sv_id.clone(),
+                        workflow_id: wf_id.clone(),
+                        rule_set_result_id: None,
+                        config: DocumentRequestConfig::Identity {
+                            collect_selfie: false,
+                        },
+                    };
+
+                    let dr = DocumentRequest::get_or_create(conn, dr_args).unwrap();
+                    let doc_args = NewDocumentArgs {
+                        request_id: dr.id,
+                        document_type: DocumentKind::DriversLicense,
+                        country_code: Some(newtypes::Iso3166TwoDigitCountryCode::US),
+                        fixture_result: None,
+                        skip_selfie: None,
+                        device_type: None,
+                        insight: CreateInsightEvent::default(),
+                    };
+                    let doc_id = Document::get_or_create(conn, doc_args).unwrap();
+
+                    Some(doc_id.id)
+                } else {
+                    None
+                };
+
                 // Save a requests and stash the vres_id of the one we should find via the query
                 let mut vres_id_to_check = None;
                 for val in [(true, true), (false, false), (false, true)] {
                     let (is_error, should_save_vres) = val;
+
+
                     let args = NewVerificationRequestArgs {
                         scoped_vault_id: &sv_id,
                         decision_intent_id: &di.id,
-                        identity_document_id: None,
+                        identity_document_id: id_doc_id.as_ref(),
                         vendor_api,
                     };
                     let vreq = VerificationRequest::create(conn, args).unwrap();
@@ -207,7 +245,7 @@ mod tests {
                     }
                 }
 
-                Ok((vres_id_to_check, di.id))
+                Ok((vres_id_to_check, di.id, id_doc_id))
             })
             .await
             .unwrap();
@@ -220,6 +258,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IdologyExpectID,
@@ -232,6 +271,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IdologyPa,
@@ -246,6 +286,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     ExperianPreciseID,
@@ -259,6 +300,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     MiddeskGetBusiness,
@@ -271,6 +313,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     MiddeskBusinessUpdateWebhook,
@@ -288,6 +331,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeFetchScores,
@@ -302,6 +346,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeFetchOCR,
@@ -315,6 +360,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeWatchlistCheck,
@@ -327,6 +373,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeUpdatedWatchlistResult,
@@ -343,6 +390,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     IncodeApproveSession,
@@ -359,6 +407,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     LexisFlexId,
@@ -372,6 +421,7 @@ mod tests {
                     wf.id,
                     di_id,
                     sv_id2,
+                    doc_id,
                     &uv.e_private_key,
                     vres_id_to_check,
                     SambaLicenseValidationCreate,
@@ -385,11 +435,13 @@ mod tests {
         assert!(test_ran)
     }
 
+    #[allow(clippy::too_many_arguments)]
     async fn assert_results<T>(
         state: &State,
         wf_id: WorkflowId,
         di_id: DecisionIntentId,
         sv_id: ScopedVaultId,
+        doc_id: Option<DocumentId>,
         e_key: &EncryptedVaultPrivateKey,
         vres_id_to_check: Option<VerificationResultId>,
         vendor_api_struct: T,
@@ -430,7 +482,7 @@ mod tests {
             state,
             VReqIdentifier::LatestForSv(sv_id),
             e_key,
-            vendor_api_struct,
+            vendor_api_struct.clone(),
         )
         .await
         .unwrap()
@@ -438,6 +490,18 @@ mod tests {
         .unwrap();
 
         assert_eq!(vres_id_sv, vres_to_check);
+
+        // try fetching via doc_id too
+        if let Some(id) = doc_id {
+            let (_, vres_id_doc) =
+                load_response_for_vendor_api(state, VReqIdentifier::DocumentId(id), e_key, vendor_api_struct)
+                    .await
+                    .unwrap()
+                    .ok()
+                    .unwrap();
+
+            assert_eq!(vres_id_doc, vres_to_check);
+        }
 
         state
             .db_pool

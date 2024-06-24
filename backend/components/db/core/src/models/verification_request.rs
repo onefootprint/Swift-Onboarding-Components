@@ -258,6 +258,9 @@ impl VerificationRequest {
             VReqIdentifier::Id(vreq_id) => {
                 query = query.filter(verification_request::id.eq(vreq_id));
             }
+            VReqIdentifier::DocumentId(doc_id) => {
+                query = query.filter(verification_request::identity_document_id.eq(doc_id));
+            }
         };
 
         let req_and_res = query
@@ -350,6 +353,7 @@ pub enum VReqIdentifier {
     WfId(WorkflowId),
     LatestForSv(ScopedVaultId),
     Id(VerificationRequestId),
+    DocumentId(DocumentId),
 }
 #[cfg(test)]
 mod tests {
