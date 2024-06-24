@@ -1,10 +1,7 @@
 import React from 'react';
+import { Logo } from '../logo.type';
 
-type FindigsLogoProps = {
-  color?: string;
-};
-
-const FindigsLogo = ({ color }: FindigsLogoProps) => (
+const Fractional = ({ color }: Logo) => (
   <svg width="126" height="24" viewBox="0 0 126 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3665_67262)">
       <path
@@ -111,4 +108,4 @@ const FindigsLogo = ({ color }: FindigsLogoProps) => (
   </svg>
 );
 
-export default FindigsLogo;
+export default Fractional;

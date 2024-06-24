@@ -1,7 +1,7 @@
 import { Container, Text, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ApitureLogo, ComposerLogo, FindigsLogo, GridLogo, YieldStreetLogo } from 'src/components/company-logos/themed';
+import { ApitureLogo, ComposerLogo, FindigsLogo, GridLogo, YieldStreet } from 'src/components/company-logos/themed';
 import TreasuryPrimeLogo from 'src/components/company-logos/themed/treasury-prime';
 import styled, { css, useTheme } from 'styled-components';
 
@@ -27,7 +27,7 @@ const OtherCustomers = () => {
         <FindigsLogo color={theme.color.secondary} />
         <TreasuryPrimeLogo color={theme.color.secondary} />
         <GridLogo color={theme.color.secondary} />
-        <YieldStreetLogo color={theme.color.secondary} />
+        <YieldStreet color={theme.color.secondary} />
         <ComposerLogo color={theme.color.secondary} />
         <ApitureLogo color={theme.color.secondary} />
         <Line variant="vertical" position={{ left: '0%' }} />

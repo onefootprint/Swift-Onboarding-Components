@@ -1,11 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-type ApitureLogoProps = {
-  color?: string;
-};
+import { Logo } from '../logo.type';
 
-const ApitureLogo = ({ color }: ApitureLogoProps) => (
+const ApitureLogo = ({ color }: Logo) => (
   <StyledSvg width="568.99" height="241.86" viewBox="0 0 568.99 241.86" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g fill={color}>
       <path d="m288.55 14.54h-25.1l30.49 66.08h-43.42l-9.92 20.16h63.34l11.09 22.37h28.04l-54.52-108.62zm-35.34 0-55.68 108.62h7.41l55.68-108.62z" />

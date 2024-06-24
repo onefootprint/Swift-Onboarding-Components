@@ -1,10 +1,7 @@
 import React from 'react';
+import { Logo } from 'src/components/company-logos/themed';
 
-type GridProps = {
-  color: string;
-};
-
-const ComposerLogo = ({ color }: GridProps) => (
+const ComposerLogo = ({ color }: Logo) => (
   <svg width="117" height="20" viewBox="0 0 117 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3.44088 14.6236H0V18.2795H3.44088V14.6236Z" fill={color} />
     <path d="M8.38713 9.89258H4.94629V18.2797H8.38713V9.89258Z" fill={color} />

@@ -1,10 +1,7 @@
 import React from 'react';
+import { Logo } from '../logo.type';
 
-type GridProps = {
-  color: string;
-};
-
-const GridLogo = ({ color }: GridProps) => (
+const Grid = ({ color }: Logo) => (
   <svg width="79" height="20" viewBox="0 0 79 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_3665_67237)">
       <path
@@ -40,4 +37,4 @@ const GridLogo = ({ color }: GridProps) => (
   </svg>
 );
 
-export default GridLogo;
+export default Grid;

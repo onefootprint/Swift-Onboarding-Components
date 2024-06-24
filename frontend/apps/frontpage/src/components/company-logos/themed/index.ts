@@ -1,12 +1,16 @@
 import ApitureLogo from './apiture';
+import Aryeo from './aryeo';
 import BloomLogo from './bloom';
 import CobaLogo from './coba';
 import ComposerLogo from './composer';
 import FindigsLogo from './findigs';
 import FlexcarLogo from './flexcar';
-import FractionalLogo from './fractional';
+import Fractional from './fractional';
+import Goodfin from './goodfin';
 import GridLogo from './grid';
-import YieldStreetLogo from './yieldstreet';
+import type { Logo } from './logo.type';
+import WingSpan from './wingspan';
+import YieldStreet from './yieldstreet';
 
 export {
   ApitureLogo,
@@ -15,7 +19,12 @@ export {
   ComposerLogo,
   FindigsLogo,
   FlexcarLogo,
-  FractionalLogo,
+  Fractional,
   GridLogo,
-  YieldStreetLogo,
+  YieldStreet,
+  WingSpan,
+  Goodfin,
+  Aryeo,
 };
+
+export type { Logo };

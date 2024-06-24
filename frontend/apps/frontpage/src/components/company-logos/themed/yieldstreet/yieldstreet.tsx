@@ -1,11 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Logo } from '../logo.type';
 
-type ApitureLogoProps = {
-  color?: string;
-};
-
-const ApitureLogo = ({ color }: ApitureLogoProps) => (
+const YieldStreet = ({ color }: Logo) => (
   <StyledSvg enableBackground="new 0 0 500.9 75" viewBox="0 0 500.9 75" xmlns="http://www.w3.org/2000/svg">
     <g fill={color}>
       <path d="m211.8 65.5 1.2 8.5h-9.5l-1.2-7.6h-.2c-3.4 5.3-10.3 8.7-18.1 8.7-15.3 0-25.8-12.2-25.8-27.5s10.5-27.5 25.8-27.5c8 0 14.8 3.6 18.1 8.7h.2v-28.8h9.5zm-9-17.9c0-10.6-6.8-18.7-17.3-18.7-10.6 0-17.4 8-17.4 18.7s6.9 18.7 17.4 18.7c10.6-.1 17.3-8.2 17.3-18.7z" />
@@ -28,4 +25,4 @@ const StyledSvg = styled.svg`
   width: 110px;
 `;
 
-export default ApitureLogo;
+export default YieldStreet;

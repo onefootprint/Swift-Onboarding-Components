@@ -1,11 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-type TreasuryPrimeLogoProps = {
-  color: string;
-};
+import { Logo } from '../logo.type';
 
-const TreasuryPrimeLogo = ({ color = '#000' }: TreasuryPrimeLogoProps) => (
+const TreasuryPrime = ({ color = '#000' }: Logo) => (
   <StyledSvg viewBox="0 0 522.58 139.25" xmlns="http://www.w3.org/2000/svg">
     <path fill={color} d="m328.93 81.46h24.69v3h-21.34v14.43h20.24v3.11h-20.24v15.62h22.93l-1.41 3.08h-24.87z" />
     <path
@@ -54,4 +52,4 @@ const StyledSvg = styled.svg`
   width: 160px;
 `;
 
-export default TreasuryPrimeLogo;
+export default TreasuryPrime;
