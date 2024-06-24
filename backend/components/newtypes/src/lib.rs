@@ -131,7 +131,7 @@ pub enum Error {
     CannotAddDiWithSource,
     #[error("{0}")]
     EnumDotNotationError(#[from] EnumDotNotationError),
-    #[error("Cannont parse data identifier: {0}")]
+    #[error("Cannot parse data identifier: {0}")]
     CannotParseDi(String),
     #[error("{0}")]
     VersionedDiError(#[from] VersionedDataIdentifierError),

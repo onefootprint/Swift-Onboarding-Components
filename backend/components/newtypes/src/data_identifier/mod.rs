@@ -54,12 +54,19 @@ use diesel::AsExpression;
 use diesel::FromSqlRow;
 use itertools::Itertools;
 use paperclip::v2::models::DataType;
+use regex::Regex;
 use serde_with::DeserializeFromStr;
 use serde_with::SerializeDisplay;
 use std::hash::Hash;
 use std::str::FromStr;
 use strum::IntoEnumIterator;
 use strum_macros::EnumDiscriminants;
+
+lazy_static! {
+    // The charset of a DI must not include a '/' to be compatible with Vault Disaster Recovery,
+    // which places DIs in S3 paths.
+    pub static ref DATA_IDENTIFIER_CHARS: Regex = Regex::new(r"^([A-Za-z0-9\-_\.]+)$").unwrap();
+}
 
 #[derive(
     Debug,
@@ -279,6 +286,9 @@ impl FromStr for DataIdentifier {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !DATA_IDENTIFIER_CHARS.is_match(s) {
+            return Err(crate::Error::CannotParseDi(s.to_owned()));
+        }
         let period_idx = s
             .find('.')
             .ok_or_else(|| crate::Error::CannotParseDi(s.to_owned()))?;
@@ -426,6 +436,16 @@ mod tests {
     #[test_case("document.proof_of_address.front.latest_upload" => DataIdentifier::Document(DocumentDiKind::ProofOfAddress))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
+    }
+
+    #[test_case("custom.a+b")]
+    #[test_case("custom.c/d")]
+    #[test_case("a/b.c")]
+    #[test_case("d+e.f")]
+    #[test_case("document+.proof_of_address.front.image")]
+    #[test_case("document.proof_of_address.front.latest_upload/")]
+    fn test_invalid(input: &str) {
+        assert!(DataIdentifier::from_str(input).is_err());
     }
 
     #[test]
