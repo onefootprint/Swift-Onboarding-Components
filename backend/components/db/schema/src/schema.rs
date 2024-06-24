@@ -1534,6 +1534,24 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
+    vault_dr_blob (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+        config_id -> Text,
+        data_lifetime_id -> Text,
+        dl_created_at_seqno -> Int8,
+        bucket_path -> Text,
+        content_etag -> Text,
+        content_md5 -> Text,
+        wrapped_record_key -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+
     vault_dr_config (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -1875,6 +1893,8 @@ diesel::joinable!(user_timeline -> scoped_vault (scoped_vault_id));
 diesel::joinable!(user_timeline -> vault (vault_id));
 diesel::joinable!(vault_data -> data_lifetime (lifetime_id));
 diesel::joinable!(vault_dr_aws_pre_enrollment -> tenant (tenant_id));
+diesel::joinable!(vault_dr_blob -> data_lifetime (data_lifetime_id));
+diesel::joinable!(vault_dr_blob -> vault_dr_config (config_id));
 diesel::joinable!(vault_dr_config -> tenant (tenant_id));
 diesel::joinable!(vault_dr_config -> vault_dr_aws_pre_enrollment (aws_pre_enrollment_id));
 diesel::joinable!(verification_request -> decision_intent (decision_intent_id));
@@ -1984,6 +2004,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     vault,
     vault_data,
     vault_dr_aws_pre_enrollment,
+    vault_dr_blob,
     vault_dr_config,
     verification_request,
     verification_result,
