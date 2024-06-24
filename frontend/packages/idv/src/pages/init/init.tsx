@@ -41,6 +41,7 @@ const Init = () => {
         });
       },
       onError: error => {
+        trackAction('onboarding:started-failed', { error: getErrorMessage(error) });
         Logger.error(`Fetching onboarding config in IDV init page failed: ${getErrorMessage(error)}`, {
           location: 'idv-init',
         });
