@@ -4069,19 +4069,6 @@
   dependencies:
     "@octokit/openapi-types" "^17.1.0"
 
-"@onefootprint/footprint-react@7.0.0-beta.1":
-  version "7.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@onefootprint/footprint-react/-/footprint-react-7.0.0-beta.1.tgz#3b31dac10ae361e32361109d3617450157ca17d5"
-  integrity sha512-90+dkUkd4BVOkUmVee9zVC2Yov5Hl69XFLfbBxHmBZt9tiok/YwiemXos+mcVJZ7eaJvaYYglgGQDKr/0NpnFg==
-  dependencies:
-    classnames "^2.5.1"
-    cleave.js "https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9"
-    csstype "^3.1.2"
-    i18next "^23.10.1"
-    lodash "^4.17.21"
-    react-hook-form "^7.47.0"
-    react-i18next "^14.1.0"
-
 "@onefootprint/postmate@2.1.0":
   version "2.1.0"
   resolved "https://registry.npmjs.org/@onefootprint/postmate/-/postmate-2.1.0.tgz"
@@ -9692,11 +9679,6 @@ clean-stack@^2.0.0:
   version "2.2.0"
   resolved "https://registry.npmjs.org/clean-stack/-/clean-stack-2.2.0.tgz"
   integrity sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==
-
-"cleave.js@git+https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9":
-  version "1.6.0"
-  uid "8b5392cd87f19d200da68143f0ce81676b1733f9"
-  resolved "git+https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9"
 
 "cleave.js@https://github.com/3runo/cleave.js.git#8b5392cd87f19d200da68143f0ce81676b1733f9":
   version "1.6.0"
