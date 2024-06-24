@@ -12,13 +12,13 @@ import { useEntityContext } from '@/entity/hooks/use-entity-context';
 import useDecryptControls from '../../hooks/use-decrypt-controls';
 import useEditControls from '../../hooks/use-edit-controls';
 import type { VaultActionsControlsProps } from '../../vault-actions';
+import ManualReviewDialog from '../manual-review/components/manual-review-dialog';
 import RequestMoreInfoDialog from '../request-more-info-dialog';
 import { ActionType } from './cmdk.types';
 import DiscoverFeatureChip from './components/discover-feature-chip';
 import ActionList from './components/main-dialog/action-list/action-list';
 import Footer from './components/main-dialog/footer/footer';
 import SearchInput from './components/main-dialog/search-input';
-import ManualReviewDialog from './components/manual-review-dialog';
 
 const SHOW_TIMES_LIMIT = 5;
 
