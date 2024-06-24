@@ -219,15 +219,6 @@ impl std::str::FromStr for DocumentDiKind {
             tracing::info!(legacy_repr=%false, "Parsed PoA DI");
             return Ok(Self::ProofOfAddress);
         }
-        // TODO remove these legacy-parsed DIs after all clients are updated and values are backfilled
-        if s == "ssn_card.front.image" || s == "ssn_card.front.latest_upload" {
-            tracing::info!(legacy_repr=%true, "Parsed SSN card DI");
-            return Ok(Self::SsnCard);
-        }
-        if s == "proof_of_address.front.image" || s == "proof_of_address.front.latest_upload" {
-            tracing::info!(legacy_repr=%true, "Parsed PoA DI");
-            return Ok(Self::ProofOfAddress);
-        }
 
         // First try parsing govt-isued ID types based on the suffix, like mime_type or latest_upload
         let variant: Option<DocumentDiKind> = match variant {

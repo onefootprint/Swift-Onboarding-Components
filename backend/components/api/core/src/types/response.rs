@@ -94,6 +94,8 @@ impl actix_web::ResponseError for ApiError {
     }
 }
 
+/// The return type for any HTTP handler function. `FpError`s are coerced into `ApiError`s and are
+/// serialized in the HTTP response JSON body.
 pub type ApiResponse<T> = Result<T, ApiError>;
 
 /// For legacy non-paginated APIs, a wrapper around Vec that implements Responder.

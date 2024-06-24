@@ -277,32 +277,6 @@ def test_decrypt_historical(user_with_documents):
     )
 
 
-def test_legacy_poa_dis(sandbox_tenant, must_collect_data):
-    obc = create_ob_config(
-        sandbox_tenant,
-        "PoA request config",
-        must_collect_data,
-        documents_to_collect=[
-            dict(kind="proof_of_ssn", data=dict()),
-            dict(kind="proof_of_address", data=dict()),
-        ],
-    )
-    bifrost = BifrostClient.new_user(obc)
-    user = bifrost.run()
-
-    TESTS = [
-        ["document.proof_of_address.image", "document.proof_of_address.front.image"],
-        ["document.ssn_card.image", "document.ssn_card.front.image"],
-    ]
-    for test in TESTS:
-        for di in test:
-            data = dict(fields=[di], reason="Testing legacy decrypt")
-            body = post(
-                f"entities/{user.fp_id}/vault/decrypt", data, sandbox_tenant.sk.key
-            )
-            assert body[test[0]] == body[test[1]]
-
-
 def test_review_documents(sandbox_tenant):
     """
     Manually reviewing a user will implicitly mark documents as reviewed by a human

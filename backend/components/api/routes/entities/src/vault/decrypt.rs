@@ -22,18 +22,13 @@ use api_core::FpResult;
 use api_wire_types::DecryptResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
-use itertools::chain;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::impl_response_type;
 use newtypes::output::Csv;
 use newtypes::AccessEventPurpose;
-use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
-use newtypes::DocumentDiKind;
 use newtypes::FilterFunction;
 use newtypes::FpId;
-use newtypes::PiiJsonValue;
 use newtypes::VersionedDataIdentifier;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -98,13 +93,12 @@ pub async fn post(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> ApiResponse<TempDecryptResponse> {
+) -> ApiResponse<DecryptResponse> {
     let request = request.into_inner();
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
 
     let result = post_inner(&state, path.into_inner(), request, auth, insights, root_span).await?;
-    let result = TempDecryptResponse::build(result);
     Ok(result)
 }
 
@@ -124,7 +118,7 @@ pub async fn post_client(
     auth: ClientTenantAuthContext,
     insights: InsightHeaders,
     root_span: RootSpan,
-) -> ApiResponse<TempDecryptResponse> {
+) -> ApiResponse<DecryptResponse> {
     let dis = request.fields.iter().map(|id| id.di.clone()).collect();
     let auth = auth.check_guard(CanDecrypt::new(dis))?;
     let fp_id = auth.fp_id.clone();
@@ -145,7 +139,6 @@ pub async fn post_client(
     };
 
     let result = post_inner(&state, fp_id, request, Box::new(auth), insights, root_span).await?;
-    let result = TempDecryptResponse::build(result);
     Ok(result)
 }
 
@@ -234,56 +227,3 @@ pub(super) async fn post_inner(
 
     Ok(out)
 }
-
-impl TempDecryptResponse {
-    fn build(resp: DecryptResponse) -> Self {
-        // Temporarily, while we're migrating away from old ProofOfAddress DIs, manually include
-        // the old DI in the response.
-        // This assumes we're not decrypting with versions
-        let map = resp
-            .into_iter()
-            .flat_map(|(vdi, val)| {
-                let extra_entry =
-                    if matches!(vdi.di, DataIdentifier::Document(DocumentDiKind::ProofOfAddress)) {
-                        Some(("document.proof_of_address.front.image".to_string(), val.clone()))
-                    } else if matches!(vdi.di, DataIdentifier::Document(DocumentDiKind::SsnCard)) {
-                        Some(("document.ssn_card.front.image".to_string(), val.clone()))
-                    } else {
-                        None
-                    };
-                chain(extra_entry, Some((vdi.to_string(), val)))
-            })
-            .collect();
-        Self { map }
-    }
-}
-
-/// Temporary to support these in-progress DI migrations
-#[derive(
-    Debug,
-    Clone,
-    serde::Serialize,
-    serde::Deserialize,
-    derive_more::Deref,
-    derive_more::DerefMut,
-    macros::JsonResponder,
-)]
-pub struct TempDecryptResponse {
-    #[serde(flatten)]
-    pub map: std::collections::HashMap<String, Option<PiiJsonValue>>,
-}
-
-impl paperclip::v2::schema::Apiv2Schema for TempDecryptResponse {
-    fn name() -> Option<String> {
-        DecryptResponse::name()
-    }
-
-    fn description() -> &'static str {
-        DecryptResponse::description()
-    }
-
-    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        DecryptResponse::raw_schema()
-    }
-}
-impl_response_type!(TempDecryptResponse);
