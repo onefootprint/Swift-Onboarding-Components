@@ -4,7 +4,7 @@ import { Di, Fp, useFootprint } from '@onefootprint/footprint-react';
 import { Box } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import Styles from './demo-ob-styles';
+import Styles from './demo-oc-kyc-styles';
 
 type DemoOnboardingComponentsProps = {
   step: string;
@@ -30,12 +30,12 @@ const Step2 = () => (
   <Fp.Form onSubmit={() => undefined}>
     <Fp.Field name="id.email">
       <Fp.Label>Your email</Fp.Label>
-      <Fp.Input placeholder="lorem@footprint.com" />
+      <Fp.Input placeholder="jane@acme.com" />
       <Fp.FieldErrors />
     </Fp.Field>
     <Fp.Field name="id.phone_number">
       <Fp.Label>Phone</Fp.Label>
-      <Fp.Input />
+      <Fp.Input placeholder="(123) 456-7890" />
       <Fp.FieldErrors />
     </Fp.Field>
     <button type="submit">Continue</button>
@@ -48,12 +48,12 @@ const Step3 = () => (
     <Fp.Form onSubmit={() => undefined} className="fp-c-form">
       <Fp.Field name="id.email" className="fp-c-field">
         <Fp.Label className="fp-c-label">Your email</Fp.Label>
-        <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
+        <Fp.Input className="fp-c-input" placeholder="jane@acme.com" />
         <Fp.FieldErrors className="fp-c-field-errors" />
       </Fp.Field>
       <Fp.Field name="id.phone_number" className="fp-c-field">
         <Fp.Label className="fp-c-label">Phone</Fp.Label>
-        <Fp.Input className="fp-c-input" />
+        <Fp.Input className="fp-c-input" placeholder="(123) 456-7890" />
         <Fp.FieldErrors className="fp-c-field-errors" />
       </Fp.Field>
       <button type="submit" className="fp-button">
@@ -86,12 +86,12 @@ const Step4 = () => {
       <Fp.Form onSubmit={handleSubmit} className="fp-c-form">
         <Fp.Field name="id.email" className="fp-c-field">
           <Fp.Label className="fp-c-label">Your email</Fp.Label>
-          <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
+          <Fp.Input className="fp-c-input" placeholder="jane@acme.com" />
           <Fp.FieldErrors className="fp-c-field-errors" />
         </Fp.Field>
         <Fp.Field name="id.phone_number" className="fp-c-field">
           <Fp.Label className="fp-c-label">Phone</Fp.Label>
-          <Fp.Input className="fp-c-input" />
+          <Fp.Input className="fp-c-input" placeholder="(123) 456-7890" />
           <Fp.FieldErrors className="fp-c-field-errors" />
         </Fp.Field>
         <button type="submit" className="fp-button">
@@ -135,12 +135,12 @@ const Step5 = () => {
         <Fp.Form onSubmit={handleSubmitIdentify} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
-            <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
+            <Fp.Input className="fp-c-input" placeholder="jane@acme.com" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.phone_number" className="fp-c-field">
             <Fp.Label className="fp-c-label">Phone</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="(123) 456-7890" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
@@ -152,7 +152,7 @@ const Step5 = () => {
         <Fp.Form onSubmit={handleSubmitData} className="fp-c-form">
           <Fp.Field name="id.first_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">First name</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Jane" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.middle_name" className="fp-c-field">
@@ -245,12 +245,12 @@ const Step6 = () => {
         <Fp.Form onSubmit={handleSubmitIdentify} className="fp-c-form">
           <Fp.Field name="id.email" className="fp-c-field">
             <Fp.Label className="fp-c-label">Your email</Fp.Label>
-            <Fp.Input className="fp-c-input" placeholder="lorem@footprint.com" />
+            <Fp.Input className="fp-c-input" placeholder="jane@acme.com" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.phone_number" className="fp-c-field">
             <Fp.Label className="fp-c-label">Phone</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="(123) 456-7890" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <button type="submit" className="fp-button">
@@ -262,7 +262,7 @@ const Step6 = () => {
         <Fp.Form onSubmit={handleSubmitData} className="fp-c-form">
           <Fp.Field name="id.first_name" className="fp-c-field">
             <Fp.Label className="fp-c-label">First name</Fp.Label>
-            <Fp.Input className="fp-c-input" />
+            <Fp.Input className="fp-c-input" placeholder="Jane" />
             <Fp.FieldErrors className="fp-c-field-errors" />
           </Fp.Field>
           <Fp.Field name="id.middle_name" className="fp-c-field">
@@ -347,7 +347,7 @@ const DemoOnboardingComponents = ({ step }: DemoOnboardingComponentsProps) => {
   return null;
 };
 
-const publicKey = 'pb_test_hLKePSu5AH5wAYuZH2ehR7';
+const publicKey = process.env.NEXT_PUBLIC_KYC_KEY || '';
 
 const DemoObWithProvider = ({ step }: DemoOnboardingComponentsProps) => (
   <Fp.Provider publicKey={publicKey}>

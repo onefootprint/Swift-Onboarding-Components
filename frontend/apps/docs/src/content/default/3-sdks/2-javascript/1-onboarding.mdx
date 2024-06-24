@@ -19,7 +19,7 @@ This guide explains how to integrate the Footprint onboarding flow for KYC (Know
 
    - Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
    - Use an existing playbook or create a new one.
-   - Obtain the Publishable Key, e.g., `pb_test_hLKePSu5AH5wAYuZH2ehR7`.
+   - Obtain the Publishable Key, e.g., `pb_test_LRfe5D3dZnWSf5vOGSeCFk`.
 
 2. **Initialize the Footprint Flow**:
    - Trigger Footprint, for example, when a button is clicked. Them, pass the `publicKey` and `onComplete` callback to the `init` method.
@@ -31,7 +31,7 @@ import footprint from '@onefootprint/footprint-js';
 const handleButtonClick = () => {
   const component = footprint.init({
     kind: 'verify',
-    publicKey: 'pb_test_hLKePSu5AH5wAYuZH2ehR7',
+    publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
     onComplete: validationToken => {
       console.log(validationToken);
     },
@@ -53,7 +53,7 @@ Footprint provides some events based on some actions performed by the user. To l
 ```typescript
 const component = footprint.init({
   kind: 'verify',
-  publicKey: 'pb_test_hLKePSu5AH5wAYuZH2ehR7',
+  publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
   onComplete: validationToken => {
     console.log(validationToken);
   },
@@ -80,7 +80,7 @@ You can customize the appearance of the onboarding flow by passing an `appearanc
 ```typescript
 const component = footprint.init({
   kind: 'verify',
-  publicKey: 'pb_test_hLKePSu5AH5wAYuZH2ehR7',
+  publicKey: 'pb_test_LRfe5D3dZnWSf5vOGSeCFk',
   onComplete: validationToken => {
     console.log(validationToken);
   },
@@ -104,7 +104,7 @@ For more information, including a list of available variables, check out the [cu
 import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
-const publicKey = 'pb_test_hLKePSu5AH5wAYuZH2ehR7';
+const publicKey = 'pb_test_LRfe5D3dZnWSf5vOGSeCFk';
 const l10n = {
   language: 'es',
 };

@@ -67,6 +67,7 @@ module.exports = {
     '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
+    '@onefootprint/footprint-react',
     '@radix-ui',
   ],
   async headers() {

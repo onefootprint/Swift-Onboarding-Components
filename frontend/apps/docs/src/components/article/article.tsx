@@ -12,7 +12,7 @@ import ArticleHeader from './components/article-header';
 import A from './components/markdown-components/a';
 import Code from './components/markdown-components/code';
 import CustomizationPreview from './components/markdown-components/customization-preview';
-import DemoOb from './components/markdown-components/demo-ob';
+import DemoOcKyc from './components/markdown-components/demo-oc-kyc';
 import DemoReact from './components/markdown-components/demo-react';
 import DocsInlineAlert from './components/markdown-components/docs-inline-alert';
 import Examples from './components/markdown-components/examples';
@@ -82,8 +82,8 @@ const overrides: MarkdownToJSX.Overrides = {
   'demo-react': {
     component: DemoReact,
   },
-  'demo-ob': {
-    component: DemoOb,
+  'demo-oc-kyc': {
+    component: DemoOcKyc,
   },
 };
 

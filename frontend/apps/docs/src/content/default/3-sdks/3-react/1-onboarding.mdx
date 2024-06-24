@@ -20,7 +20,7 @@ This component will render a button that will launch the onboarding flow when cl
 
    - Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
    - Use an existing playbook or create a new one.
-   - Obtain the Publishable Key, e.g., `pb_test_hLKePSu5AH5wAYuZH2ehR7`.
+   - Obtain the Publishable Key, e.g., `pb_test_LRfe5D3dZnWSf5vOGSeCFk`.
 
 2. **Initialize the Footprint Flow**:
 
@@ -42,7 +42,7 @@ const Page = () => {
     <main>
       <FootprintButton
         kind="verify"
-        publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7"
+        publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         onComplete={handleComplete}
         onCancel={handleCancel}
       />
@@ -80,7 +80,7 @@ const Page = () => {
     <main>
       <FootprintButton
         kind="verify"
-        publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7"
+        publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         userData={{
           'id.email': 'jane.doe@acme.com',
           'id.phone_number': '+12025550179',
@@ -122,7 +122,7 @@ const Page = () => {
     <main>
       <FootprintButton
         kind="verify"
-        publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7"
+        publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         onComplete={handleComplete}
         onError={handleError}
         onCancel={handleCancel}
@@ -148,7 +148,7 @@ const Page = () => {
     <main>
       <FootprintButton
         kind="verify"
-        publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7"
+        publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         appearance={{
           variables: {
             borderRadius: '8px',
@@ -180,7 +180,7 @@ const Page = () => {
     <main>
       <FootprintButton
         kind="verify"
-        publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7"
+        publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         onComplete={handleComplete}
         l10n={{
           language: 'es',

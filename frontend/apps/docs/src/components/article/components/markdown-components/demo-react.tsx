@@ -22,7 +22,7 @@ const DemoReact = ({ kind }: DemoReactProps) => {
     return (
       <FootprintButton
         kind={FootprintComponentKind.Verify}
-        publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7"
+        publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk"
         onComplete={console.log}
       />
     );

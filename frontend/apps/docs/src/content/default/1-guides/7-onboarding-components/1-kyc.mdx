@@ -1,35 +1,35 @@
 ---
 page: default
-slug: /guides/onboarding-components-basic-example
+slug: /guides/onboarding-components-kyc
 category: Guides
 subcategory: Onboarding Components
-title: Basic Example
+title: Basic Example (KYC)
 meta:
   {
-    title: Footprint | React Integration - Onboarding Components,
+    title: Footprint | React Integration - Onboarding Components - KYC,
     description: Discover how to integrate Footprint's Onboarding Components flow into your React application,
   }
 ---
 
 ## 1. Getting started
 
-### 1.1 Install dependencies:
+In this guide, we'll show you how to integrate Footprint's Onboarding Components into your React application to collect user data.
 
-```terminal
-# With NPM
-npm install @onefootprint/footprint-js
-npm install @onefootprint/footprint-react@beta
+These are the steps you'll need to follow:
 
-# With yarn
-yarn add @onefootprint/footprint-js
-yarn add @onefootprint/footprint-react@beta
-```
+- Identify the user: for this part, we'll collect the user's email and phone number and use our OTP components to validate the user;
+- Collect user basic information, such as name, address and etc;
+- Finalize the onboarding: this is the last step, where we'll collect any missing data, register passkeys (if needed) and finalize the onboarding sending you a validation token.
 
-### 1.2. Get a public key
+<br />
+
+[Here](https://demo.onefootprint.com/onboarding-components/kyc) you can find a live demo.
+
+### 1.1. Get a public key
 
 - Go to the [playbooks page](https://dashboard.onefootprint.com/playbooks) on your dashboard.
 - Use an existing playbook or create a new one.
-- Obtain the Publishable Key, e.g., `pb_test_hLKePSu5AH5wAYuZH2ehR7`.
+- Obtain the Publishable Key, e.g., `pb_test_LRfe5D3dZnWSf5vOGSeCFk`.
 
 ## 2. Add Footprint Provider
 
@@ -40,7 +40,7 @@ import { Fp } from '@onefootprint/footprint-react';
 
 const Demo = () => {
   return (
-    <Fp.Provider publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7">
+    <Fp.Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
       <h2>Hello World</h2>
     </Fp.Provider>
   );
@@ -58,7 +58,7 @@ import { Fp } from '@onefootprint/footprint-react';
 
 const Demo = () => {
   return (
-    <Provider publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7">
+    <Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
       <Flow />
     </Provider>
   );
@@ -86,7 +86,7 @@ const Flow = () => {
 And this is how it looks like:
 
 <div style="margin-bottom: 24px;">
-  <demo-ob step={1}></demo-ob>
+  <demo-oc-kyc step={1}></demo-oc-kyc>
 </div>
 
 As you can see, our components are really raw: they don't have any styling. This is intentional so you can style them as you wish. However, we provide a set of pre-defined behaviors / values, such as placeholders, validations, masks and other attributes to make your form accessible: for example, once you click on the Label, it will focus the input as you would expect.
@@ -100,7 +100,7 @@ import { Fp } from '@onefootprint/footprint-react';
 
 const Demo = () => {
   return (
-    <Provider publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7">
+    <Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
       <Flow />
     </Provider>
   );
@@ -126,7 +126,7 @@ const Flow = () => {
 ```
 
 <div style="margin-bottom: 24px;">
-  <demo-ob step={2}></demo-ob>
+  <demo-oc-kyc step={2}></demo-oc-kyc>
 </div>
 
 ### 3.2 Adding styles
@@ -259,7 +259,7 @@ You can customize the style of Onboarding Components with your preferred approac
 Looks much better now:
 
 <div style="margin-bottom: 24px;">
-  <demo-ob step={3}></demo-ob>
+  <demo-oc-kyc step={3}></demo-oc-kyc>
 </div>
 
 ### 3.3 Identifying the user
@@ -271,7 +271,7 @@ import { Fp, useFootprint, Di } from '@onefootprint/footprint-react';
 
 const Demo = () => {
   return (
-    <Provider publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7">
+    <Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
       <Flow />
     </Provider>
   );
@@ -315,7 +315,7 @@ const Flow = () => {
 Demo:
 
 <div style="margin-bottom: 24px;">
-  <demo-ob step={4}></demo-ob>
+  <demo-oc-kyc step={4}></demo-oc-kyc>
 </div>
 
 ## 4. Collecting user's data
@@ -327,7 +327,7 @@ import { Fp, useFootprint } from '@onefootprint/footprint-react';
 
 const Demo = () => {
   return (
-    <Provider publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7">
+    <Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
       <Flow />
     </Provider>
   );
@@ -445,7 +445,7 @@ const Flow = () => {
   );
 ```
 
-<demo-ob step={5}></demo-ob>
+<demo-oc-kyc step={5}></demo-oc-kyc>
 
 ## 5. Finalizing the onboarding
 
@@ -456,7 +456,7 @@ import { Fp, useFootprint } from '@onefootprint/footprint-react';
 
 const Demo = () => {
   return (
-    <Provider publicKey="pb_test_hLKePSu5AH5wAYuZH2ehR7">
+    <Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
       <Flow />
     </Provider>
   );
@@ -575,4 +575,9 @@ const Flow = () => {
 
 Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` callback. Post this token to your backend for further processing.
 
-<demo-ob step={6}></demo-ob>
+<demo-oc-kyc step={6}></demo-oc-kyc>
+
+## 6. What's next
+
+- [KYB example](/guides/onboarding-components-kyb)
+- [Styling](/guides/onboarding-components-styling)
