@@ -9,6 +9,7 @@ use db::models::user_timeline::UserTimelineInfo;
 use itertools::Itertools;
 use newtypes::AuthMethodUpdatedInfo;
 use newtypes::ExternalIntegrationInfo;
+use newtypes::OnboardingTimelineInfo;
 use newtypes::WorkflowConfig;
 use newtypes::WorkflowRequestConfig;
 
@@ -170,7 +171,8 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     .collect(),
             ),
             SaturatedTimelineEvent::OnboardingTimeline(e) => {
-                Self::OnboardingTimeline(api_wire_types::OnboardingTimelineInfo { event: e.event })
+                let OnboardingTimelineInfo { event, session_id } = e;
+                Self::OnboardingTimeline(api_wire_types::OnboardingTimelineInfo { event, session_id })
             }
         }
     }

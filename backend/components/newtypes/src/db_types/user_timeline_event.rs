@@ -166,4 +166,5 @@ pub struct StepUpInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OnboardingTimelineInfo {
     pub event: String,
+    pub session_id: Option<String>,
 }

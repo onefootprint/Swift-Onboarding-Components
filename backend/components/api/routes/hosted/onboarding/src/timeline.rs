@@ -2,6 +2,7 @@ use crate::auth::user::UserAuthScope;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::types::ApiResponse;
+use api_core::utils::headers::InsightHeaders;
 use api_core::web::Json;
 use api_wire_types::CreateOnboardingTimelineRequest;
 use db::models::user_timeline::UserTimeline;
@@ -21,11 +22,13 @@ pub async fn post(
     user_auth: UserWfAuthContext,
     state: web::Data<State>,
     request: Json<CreateOnboardingTimelineRequest>,
+    insights: InsightHeaders,
 ) -> ApiResponse<api_wire_types::Empty> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     let CreateOnboardingTimelineRequest { event } = request.into_inner();
 
-    let event = OnboardingTimelineInfo { event };
+    let session_id = insights.session_id;
+    let event = OnboardingTimelineInfo { event, session_id };
     let v_id = user_auth.user().id.clone();
     let sv_id = user_auth.scoped_user.id.clone();
     state

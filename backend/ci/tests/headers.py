@@ -82,3 +82,7 @@ class IsComponentsSdk(BaseAuth):
 
 class BootstrappedFields(BaseAuth):
     HEADER_NAME = "x-fp-bootstrapped-fields"
+
+
+class SessionId(BaseAuth):
+    HEADER_NAME = "x-fp-session-id"

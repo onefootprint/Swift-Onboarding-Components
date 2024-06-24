@@ -112,6 +112,7 @@ pub struct ExternalIntegrationCalled {
 #[derive(Debug, Clone, Serialize)]
 pub struct OnboardingTimelineInfo {
     pub event: String,
+    pub session_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
