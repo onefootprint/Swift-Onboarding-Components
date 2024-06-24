@@ -16,11 +16,9 @@ use reqwest::header::HeaderValue;
 use reqwest::Method;
 use reqwest::StatusCode;
 use reqwest::Url;
+use std::fmt;
 use std::fmt::Display;
 use std::fmt::Formatter;
-use std::fmt::{
-    self,
-};
 use std::ops::Not;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

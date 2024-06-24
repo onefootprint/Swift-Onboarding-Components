@@ -45,6 +45,21 @@ pub enum Error {
 
     #[error("S3 GetBucketLocation error: {0}")]
     S3GetBucketLocation(#[from] Box<GetBucketLocationError>),
+
+    #[error("Invalid org age identity: {0}")]
+    InvalidAgeIdentity(String),
+
+    #[error("Age error: {0}")]
+    Age(String),
+
+    #[error("Age encrypt error: {0}")]
+    AgeEncrypt(#[from] age::EncryptError),
+
+    #[error("IO error: {0}")]
+    IoError(#[from] std::io::Error),
+
+    #[error("Utf8 decode failed: {0}")]
+    Utf8Decode(#[from] std::string::FromUtf8Error),
 }
 
 impl api_errors::FpErrorTrait for Error {
@@ -54,14 +69,19 @@ impl api_errors::FpErrorTrait for Error {
             | Self::NotEnrolled
             | Self::AlreadyEnrolled
             | Self::RoleValidationFailed(_)
-            | Self::BucketValidationFailed(_) => StatusCode::BAD_REQUEST,
+            | Self::BucketValidationFailed(_)
+            | Self::InvalidAgeIdentity(_) => StatusCode::BAD_REQUEST,
             Self::IamAssertionFailed(_)
             | Self::AwsClientMissingRegion
             | Self::StsGetCallerIdentity(_)
             | Self::S3GetObject(_)
             | Self::S3PutObject(_)
             | Self::S3ListObjectsV2(_)
-            | Self::S3GetBucketLocation(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            | Self::S3GetBucketLocation(_)
+            | Self::Age(_)
+            | Self::AgeEncrypt(_)
+            | Self::IoError(_)
+            | Self::Utf8Decode(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

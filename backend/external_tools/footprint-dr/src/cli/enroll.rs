@@ -2,6 +2,7 @@ use super::api_client::IsLive;
 use crate::cli::api_client::get_cli_client;
 use crate::cli::get_input;
 use crate::cli::wire_types::VaultDrEnrollRequest;
+use age::secrecy::ExposeSecret;
 use anyhow::bail;
 use anyhow::Result;
 use reqwest::Url;
@@ -53,28 +54,31 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     let aws_role_name = get_input("Enter AWS Role Name: ")?;
     let s3_bucket_name = get_input("Enter S3 Bucket Name: ")?;
 
-    println!();
-    print!("Verifying bucket access...");
+    let org_identity = vault_dr_client::OrgIdentity::generate();
 
+    println!();
+    print!("Verifying configuration...");
     let resp = client.enroll(VaultDrEnrollRequest {
         aws_account_id,
         aws_role_name,
         s3_bucket_name,
+        org_public_key: org_identity.public_key_string(),
         re_enroll: Some(needs_re_enroll),
     });
 
-    if resp.is_ok() {
-        println!(" OK");
-    } else {
-        println!(" Failed");
+    match resp {
+        Ok(_) => println!(" OK"),
+        Err(e) => {
+            println!(" Failed");
+            return Err(e);
+        }
     }
-    let resp = resp?;
 
     println!();
 
     println!("Your Org Private Key is:");
     println!();
-    println!("{}", resp.org_private_key.leak_ref());
+    println!("{}", org_identity.private_key_string().expose_secret());
     println!();
 
     println!("Store this securely. You will not be able to retrieve this key again without re-enrollment.");

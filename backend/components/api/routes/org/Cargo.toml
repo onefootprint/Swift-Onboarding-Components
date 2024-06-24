@@ -72,6 +72,7 @@ jsonpath_lib = { workspace = true }
 urlencoding = { workspace = true }
 actix-multipart = { workspace = true }
 
+age = { workspace = true }
 
 [dev-dependencies]
 test-case = { workspace = true }

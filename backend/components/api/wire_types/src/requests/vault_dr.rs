@@ -15,10 +15,12 @@ pub struct VaultDrEnrollRequest {
     pub aws_role_name: String,
     pub s3_bucket_name: String,
 
+    pub org_public_key: String,
+
     pub re_enroll: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Response, macros::JsonResponder)]
 pub struct VaultDrEnrollResponse {
-    pub org_private_key: PiiString,
+    // Using a dedicated struct instead of Empty so types align directly with the Rust client.
 }

@@ -50,7 +50,7 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect("Enter S3 Bucket Name: ")
         cmd.sendline(bucket_name + "bad")
 
-        cmd.expect("Verifying bucket access... Failed")
+        cmd.expect("Verifying configuration... Failed")
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 1
 
@@ -75,7 +75,7 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect("Enter S3 Bucket Name: ")
         cmd.sendline(bucket_name)
 
-        cmd.expect("Verifying bucket access... Failed")
+        cmd.expect("Verifying configuration... Failed")
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 1
 
@@ -99,7 +99,10 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect("Enter S3 Bucket Name: ")
         cmd.sendline(bucket_name)
 
-        cmd.expect("Verifying bucket access... OK")
+        cmd.expect("Verifying configuration... OK")
+
+        cmd.expect("AGE-SECRET-KEY-")
+
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 
@@ -132,7 +135,7 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect("Enter S3 Bucket Name: ")
         cmd.sendline(bucket_name + "bad")
 
-        cmd.expect("Verifying bucket access... Failed")
+        cmd.expect("Verifying configuration... Failed")
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 1
 

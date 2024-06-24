@@ -1,4 +1,5 @@
 use actix_web::web;
+use age::secrecy::ExposeSecret;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
@@ -13,6 +14,8 @@ use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
 };
+use vault_dr::EnrollmentKeys;
+use vault_dr::PublicKey;
 use vault_dr::VaultDrWriter;
 
 #[api_v2_operation(
@@ -33,9 +36,11 @@ pub async fn post(
         aws_account_id,
         aws_role_name,
         s3_bucket_name,
+        org_public_key,
         re_enroll,
     } = request.into_inner();
 
+    let org_public_key: PublicKey = org_public_key.parse()?;
 
     let tenant_id = tenant.id.clone();
     let pre_enrollment = state
@@ -60,6 +65,11 @@ pub async fn post(
 
     writer.validate_aws_config().await?;
 
+    let EnrollmentKeys {
+        recovery_public_key,
+        wrapped_recovery_key,
+    } = EnrollmentKeys::generate(&org_public_key)?;
+
     let tenant_id = tenant.id.clone();
     state
         .db_pool
@@ -72,17 +82,24 @@ pub async fn post(
                 VaultDrConfig::deactivate(conn, existing_config)?;
             }
 
+            let VaultDrWriter {
+                aws_account_id,
+                aws_role_name,
+                s3_bucket_name,
+                ..
+            } = writer;
+
             let new_config = NewVaultDrConfig {
                 created_at: Utc::now(),
                 tenant_id: &tenant_id,
                 is_live,
                 aws_pre_enrollment_id: &pre_enrollment_id,
-                aws_account_id: writer.aws_account_id,
-                aws_role_name: writer.aws_role_name,
-                s3_bucket_name: writer.s3_bucket_name,
-                org_public_key: "TODO".into(),
-                recovery_public_key: "TODO".into(),
-                wrapped_recovery_key: "TODO".into(),
+                aws_account_id,
+                aws_role_name,
+                s3_bucket_name,
+                org_public_key: org_public_key.to_string(),
+                recovery_public_key,
+                wrapped_recovery_key: wrapped_recovery_key.expose_secret().clone(),
             };
 
             VaultDrConfig::create(conn, new_config)?;
@@ -91,7 +108,5 @@ pub async fn post(
         })
         .await?;
 
-    Ok(api_wire_types::VaultDrEnrollResponse {
-        org_private_key: "todo".into(),
-    })
+    Ok(api_wire_types::VaultDrEnrollResponse {})
 }
