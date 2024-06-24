@@ -31,6 +31,56 @@ def test_footprint_dr_enroll(tenant):
     iam_role_name = create_iam_role(session, bucket_name, external_id)
 
 
+    # Enrollment fails with bad bucket name.
+    with footprint_dr("enroll", "--sandbox") as cmd:
+        i = cmd.expect_exact([
+            r"Re-enrolling will deactivate the current configuration",
+            f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
+        ])
+        if i == 0:
+            cmd.expect("Type .+ to continue, or anything else to cancel: ")
+            cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
+
+        cmd.expect("Enter AWS Account ID: ")
+        cmd.sendline(aws_account_id)
+
+        cmd.expect("Enter AWS Role Name: ")
+        cmd.sendline(iam_role_name)
+
+        cmd.expect("Enter S3 Bucket Name: ")
+        cmd.sendline(bucket_name + "bad")
+
+        cmd.expect("Verifying bucket access... Failed")
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 1
+
+    # localstack's lack of IAM enforcement prevents us from testing an invalid role name.
+
+    # Enrollment fails with bad account ID.
+    with footprint_dr("enroll", "--sandbox") as cmd:
+        i = cmd.expect_exact([
+            r"Re-enrolling will deactivate the current configuration",
+            f"Enrolling {tenant.name} (Sandbox) in Vault Disaster Recovery",
+        ])
+        if i == 0:
+            cmd.expect("Type .+ to continue, or anything else to cancel: ")
+            cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
+
+        cmd.expect("Enter AWS Account ID: ")
+        cmd.sendline(aws_account_id + "bad")
+
+        cmd.expect("Enter AWS Role Name: ")
+        cmd.sendline(iam_role_name)
+
+        cmd.expect("Enter S3 Bucket Name: ")
+        cmd.sendline(bucket_name)
+
+        cmd.expect("Verifying bucket access... Failed")
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 1
+
+
+    # Enrollment works with valid data.
     with footprint_dr("enroll", "--sandbox") as cmd:
         i = cmd.expect_exact([
             r"Re-enrolling will deactivate the current configuration",
@@ -53,9 +103,12 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
 
+
+    # Status now reflects enrollment.
     with footprint_dr("status", "--sandbox") as cmd:
         cmd.expect(f"Logged in to {tenant.name} \\(Sandbox\\)")
-        cmd.expect("Enrolled in Vault Disaster Recovery since:")
+        cmd.expect(r"Enrolled in Vault Disaster Recovery since: ([0-9:\.\- ]+ UTC)")
+        enrolled_at = cmd.match.group(1)
 
         cmd.expect(f"AWS Account ID: {aws_account_id}")
         cmd.expect(f"AWS Role Name:  {iam_role_name}")
@@ -64,3 +117,34 @@ def test_footprint_dr_enroll(tenant):
     assert cmd.exitstatus == 0
 
 
+    # Re-rollment fails with bogus data.
+    with footprint_dr("enroll", "--sandbox") as cmd:
+        cmd.expect(r"Re-enrolling will deactivate the current configuration")
+        cmd.expect("Type .+ to continue, or anything else to cancel: ")
+        cmd.sendline("restart sandbox-mode Vault Disaster Recovery from scratch")
+
+        cmd.expect("Enter AWS Account ID: ")
+        cmd.sendline(aws_account_id)
+
+        cmd.expect("Enter AWS Role Name: ")
+        cmd.sendline(iam_role_name + "bad")
+
+        cmd.expect("Enter S3 Bucket Name: ")
+        cmd.sendline(bucket_name + "bad")
+
+        cmd.expect("Verifying bucket access... Failed")
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 1
+
+
+    # Status still reflects the previous successful enrollment.
+    with footprint_dr("status", "--sandbox") as cmd:
+        cmd.expect(f"Logged in to {tenant.name} \\(Sandbox\\)")
+        cmd.expect(r"Enrolled in Vault Disaster Recovery since: ([0-9:\.\- ]+ UTC)")
+        assert enrolled_at == cmd.match.group(1), "Enrollment time should not have changed"
+
+        cmd.expect(f"AWS Account ID: {aws_account_id}")
+        cmd.expect(f"AWS Role Name:  {iam_role_name}")
+        cmd.expect(f"S3 Bucket Name: {bucket_name}")
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0

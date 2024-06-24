@@ -1,4 +1,9 @@
 use actix_web::http::StatusCode;
+use aws_sdk_s3::operation::get_bucket_location::GetBucketLocationError;
+use aws_sdk_s3::operation::get_object::GetObjectError;
+use aws_sdk_s3::operation::list_objects_v2::ListObjectsV2Error;
+use aws_sdk_s3::operation::put_object::PutObjectError;
+use aws_sdk_sts::operation::get_caller_identity::GetCallerIdentityError;
 use thiserror::Error;
 
 // Keeping this in its own crate to make it easier to break circular dependencies in api_core
@@ -25,6 +30,21 @@ pub enum Error {
 
     #[error("AWS client has no region defined")]
     AwsClientMissingRegion,
+
+    #[error("STS GetCallerIdentity error: {0}")]
+    StsGetCallerIdentity(#[from] Box<GetCallerIdentityError>),
+
+    #[error("S3 GetObject error: {0}")]
+    S3GetObject(#[from] Box<GetObjectError>),
+
+    #[error("S3 PutObject error: {0}")]
+    S3PutObject(#[from] Box<PutObjectError>),
+
+    #[error("S3 ListObjectsV2 error: {0}")]
+    S3ListObjectsV2(#[from] Box<ListObjectsV2Error>),
+
+    #[error("S3 GetBucketLocation error: {0}")]
+    S3GetBucketLocation(#[from] Box<GetBucketLocationError>),
 }
 
 impl api_errors::FpErrorTrait for Error {
@@ -35,7 +55,13 @@ impl api_errors::FpErrorTrait for Error {
             | Self::AlreadyEnrolled
             | Self::RoleValidationFailed(_)
             | Self::BucketValidationFailed(_) => StatusCode::BAD_REQUEST,
-            Self::IamAssertionFailed(_) | Self::AwsClientMissingRegion => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::IamAssertionFailed(_)
+            | Self::AwsClientMissingRegion
+            | Self::StsGetCallerIdentity(_)
+            | Self::S3GetObject(_)
+            | Self::S3PutObject(_)
+            | Self::S3ListObjectsV2(_)
+            | Self::S3GetBucketLocation(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

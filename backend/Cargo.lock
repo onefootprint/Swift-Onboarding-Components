@@ -9416,11 +9416,13 @@ dependencies = [
  "api_errors",
  "aws-config",
  "aws-credential-types",
+ "aws-sdk-s3",
  "aws-sdk-sts",
  "aws-types",
  "db",
  "newtypes",
  "thiserror",
+ "tracing",
 ]
 
 [[package]]
