@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { DECRYPT_VAULT_FORM_ID } from '@/entity/constants';
 
 import type { DecryptFormData } from '../../vault.types';
+import { useDecryptControls } from '../vault-actions';
 
 export type DecryptFormProps = {
   children: React.ReactNode;
@@ -12,7 +13,14 @@ export type DecryptFormProps = {
 
 const DecryptForm = ({ children, onSubmit }: DecryptFormProps) => {
   const formMethods = useForm<DecryptFormData>();
-  const { handleSubmit } = formMethods;
+  const { handleSubmit, reset } = formMethods;
+  const decryptControls = useDecryptControls();
+
+  useEffect(() => {
+    if (decryptControls.isIdle) {
+      reset();
+    }
+  }, [decryptControls.isIdle]);
 
   return (
     <form id={DECRYPT_VAULT_FORM_ID} onSubmit={handleSubmit(onSubmit)}>
