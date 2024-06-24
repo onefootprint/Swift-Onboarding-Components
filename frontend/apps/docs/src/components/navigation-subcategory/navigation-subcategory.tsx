@@ -12,9 +12,10 @@ import NavigationLink from '../navigation-link';
 export type NavigationSubcategoryProps = {
   title: string;
   items: PageNavigationItem[];
+  onItemClick?: () => void;
 };
 
-const NavigationSubcategory = ({ title, items }: NavigationSubcategoryProps) => {
+const NavigationSubcategory = ({ title, items, onItemClick }: NavigationSubcategoryProps) => {
   const router = useRouter();
   const [isSelected, setSelected] = useState(() => items.some(item => router.asPath.startsWith(item.slug)));
   const [animatedList] = useAutoAnimate<HTMLElement>();
@@ -38,6 +39,7 @@ const NavigationSubcategory = ({ title, items }: NavigationSubcategoryProps) => 
                 as={Link}
                 href={item.slug}
                 key={`nav-item-${item.title}-${item.slug}`}
+                onClick={onItemClick}
               >
                 {item.title}
               </NavigationLink>
