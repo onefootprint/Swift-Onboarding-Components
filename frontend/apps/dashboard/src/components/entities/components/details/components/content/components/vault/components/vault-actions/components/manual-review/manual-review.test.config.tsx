@@ -31,14 +31,14 @@ export const withEntity = (entityId: string) =>
 export const withDecision = (entityId: string) =>
   mockRequest({
     method: 'post',
-    path: `/entities/${entityId}/decisions`,
+    path: `/entities/${entityId}/actions`,
     response: {},
   });
 
 export const withDecisionError = (entityId: string) =>
   mockRequest({
     method: 'post',
-    path: `/entities/${entityId}/decisions`,
+    path: `/entities/${entityId}/actions`,
     statusCode: 400,
     response: {
       message: 'Something went wrong',

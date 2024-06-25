@@ -1,4 +1,5 @@
 export type {
+  ActionRequest,
   AddListEntriesRequest,
   AddListEntriesResponse,
   AddRuleRequest,
@@ -184,8 +185,6 @@ export type {
   SubmitDocTypeResponse,
   SubmitFreeFormNoteRequest,
   SubmitFreeFormNoteResponse,
-  SubmitReviewRequest,
-  SubmitReviewResponse,
   TenantDetail,
   TriggerResponse,
   UpdateAnnotationRequest,
@@ -229,6 +228,7 @@ export {
   ALLOW_EXTRA_FIELDS_HEADER,
   AUTH_HEADER,
   ContactInfoKind,
+  ActionRequestKind,
   getRequirement,
   IdentifyTokenScope,
   OnboardingRequirementKind,

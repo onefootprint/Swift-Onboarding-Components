@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { OrgFrequentNoteKind, type ReviewStatus } from '@onefootprint/types';
+import { ActionRequest, ActionRequestKind, OrgFrequentNoteKind, type ReviewStatus } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import type { ManualNoteFormData } from '@/entities/components/details/component
 import ManualNoteEntryForm from '@/entities/components/details/components/content/components/manual-note-entry-form';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import useSubmitReview from './hooks/use-submit-review';
+import useSubmitActions from '../../../../hooks/use-submit-actions';
 
 export type ManualReviewDialogProps = {
   open: boolean;
@@ -22,19 +22,23 @@ const ManualReviewDialog = ({ open, onClose, status }: ManualReviewDialogProps) 
   });
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
-  const submitReviewMutation = useSubmitReview();
+  const submitActionsMutation = useSubmitActions();
   const entityId = useEntityId();
 
   const handleSubmit = (data: ManualNoteFormData) => {
     const { isPinned, note } = data;
-    submitReviewMutation.mutate(
+    const action: ActionRequest = {
+      kind: ActionRequestKind.manualDecision,
+      status,
+      annotation: {
+        isPinned,
+        note,
+      },
+    };
+    submitActionsMutation.mutate(
       {
         entityId,
-        status,
-        annotation: {
-          isPinned,
-          note,
-        },
+        actions: [action],
       },
       {
         onSuccess: () => {
@@ -56,13 +60,13 @@ const ManualReviewDialog = ({ open, onClose, status }: ManualReviewDialogProps) 
       primaryButton={{
         form: 'manual-review-form',
         label: t('dialog.complete'),
-        loading: submitReviewMutation.isLoading,
+        loading: submitActionsMutation.isLoading,
         type: 'submit',
       }}
       secondaryButton={{
         label: t('dialog.cancel'),
         onClick: onClose,
-        disabled: submitReviewMutation.isLoading,
+        disabled: submitActionsMutation.isLoading,
       }}
       onClose={onClose}
       open={open}

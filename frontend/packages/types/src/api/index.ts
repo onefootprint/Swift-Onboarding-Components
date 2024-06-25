@@ -273,11 +273,9 @@ export type {
   SubmitFreeFormNoteRequest,
   SubmitFreeFormNoteResponse,
 } from './submit-free-form-note';
+export { ActionRequestKind } from './entity-actions';
 export type {
-  SubmitReviewRequest,
-  SubmitReviewResponse,
-} from './submit-review';
-export type {
+  ActionRequest,
   TriggerResponse,
   WorkflowRequestConfig,
 } from './entity-actions';

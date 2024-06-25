@@ -1,4 +1,4 @@
-import type { DocumentRequestConfig } from '../data';
+import type { DocumentRequestConfig, ReviewStatus } from '../data';
 
 export type EntityActionsRequest = {
   entityId: string;
@@ -8,6 +8,14 @@ export type EntityActionsRequest = {
 export type ActionRequest =
   | { kind: ActionRequestKind.clearReview }
   | {
+      kind: ActionRequestKind.manualDecision;
+      annotation: {
+        isPinned: boolean;
+        note: string;
+      };
+      status: ReviewStatus;
+    }
+  | {
       kind: ActionRequestKind.trigger;
       note?: string;
       trigger: WorkflowRequestConfig;
@@ -16,6 +24,7 @@ export type ActionRequest =
 export enum ActionRequestKind {
   clearReview = 'clear_review',
   trigger = 'trigger',
+  manualDecision = 'manual_decision',
 }
 
 export type WorkflowRequestConfig =
