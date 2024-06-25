@@ -282,18 +282,18 @@ fn expect_webhook(state: &mut State, status: WatchlistCheckStatusKind, error: Op
 
     mock_webhook_client
         .expect_send_event_to_tenant()
-        .withf(move |_, _, w, _| match w {
+        .withf(move |_, _, _, w, _| match w {
             WebhookEvent::WatchlistCheckCompleted(p) => p.status == status && p.error == error,
             _ => false,
         })
         .times(1)
-        .return_once(|_, _, _, _| Ok(()));
+        .return_once(|_, _, _, _, _| Ok(()));
     // allow another other kind of webhooks (ie incidental
     // OnboardingStatusChanged/OnboardingStatusCompleted that our fixturing might cause)
     mock_webhook_client
         .expect_send_event_to_tenant()
-        .withf(move |_, _, w, _| !matches!(w, WebhookEvent::WatchlistCheckCompleted(_p)))
-        .returning(move |_, _, _, _| Ok(()));
+        .withf(move |_, _, _, w, _| !matches!(w, WebhookEvent::WatchlistCheckCompleted(_p)))
+        .returning(move |_, _, _, _, _| Ok(()));
     state.set_webhook_client(Arc::new(mock_webhook_client));
 }
 

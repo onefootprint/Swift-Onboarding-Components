@@ -157,7 +157,7 @@ impl State {
         let mut mock_webhook_client = MockWebhookClient::new();
         mock_webhook_client
             .expect_send_event_to_tenant()
-            .returning(move |_, _, _, _| Ok(()));
+            .returning(move |_, _, _, _, _| Ok(()));
         s.set_webhook_client(Arc::new(mock_webhook_client));
 
         s.set_vendor_clients(VendorClients::new_with_mocks());

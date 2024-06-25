@@ -19,7 +19,7 @@ async fn get(
 
     let PortalResponse { app_id, url, token } = state
         .webhook_client
-        .portal_url_for_tenant(&auth.tenant().id.clone(), is_live)
+        .portal_url_for_tenant(&state.db_pool, &auth.tenant().id.clone(), is_live)
         .await?;
     let result = api_wire_types::WebhookPortalResponse { app_id, url, token };
     Ok(result)

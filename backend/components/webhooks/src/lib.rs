@@ -1,9 +1,11 @@
 use api_errors::FpResult;
 use async_trait::async_trait;
+use db::models::tenant::Tenant;
+use db::DbPool;
 use events::WebhookEvent;
 use mockall::automock;
+use newtypes::SvixAppId;
 use newtypes::TenantId;
-use newtypes::WebhookServiceId;
 use std::fmt::Debug;
 use svix::api::AppPortalAccessIn;
 use svix::api::ApplicationIn;
@@ -57,35 +59,48 @@ impl WebhookServiceClient {
     }
 
     /// Create a new webhook service for a tenant
-    #[tracing::instrument(skip(self))]
-    async fn get_app_id_for_tenant(&self, tenant_id: &TenantId, is_live: bool) -> FpResult<WebhookServiceId> {
+    #[tracing::instrument(skip(self, db_pool))]
+    async fn get_app_id_for_tenant(
+        &self,
+        db_pool: &DbPool,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> FpResult<SvixAppId> {
+        // First, see if the app_id is already saved to the tenant and return it if so.
+        let t_id = tenant_id.clone();
+        let tenant = db_pool.db_query(move |conn| Tenant::get(conn, &t_id)).await?;
+        match (is_live, tenant.svix_app_id_live, tenant.svix_app_id_sandbox) {
+            (true, Some(app_id), _) | (false, _, Some(app_id)) => return Ok(app_id),
+            _ => {}
+        };
+
+        // Otherwise, create the svix app via svix's API. We'll make a separate app in live / sandbox
         let client = self.client();
-
         let name = format!("{} ({})", tenant_id, if is_live { "Live" } else { "Sandbox" });
-
-        // create separate apps for prod and live per tenant!
         let uid = if is_live {
             tenant_id.to_string()
         } else {
             format!("{}_sandbox", tenant_id)
         };
-
-        // TODO we should save these app URLs in the tenant table - this can take 300ms
-        // https://ui.honeycomb.io/footprint-2e/environments/prod/datasets/fpc-api/result/2vcWaR8FYLY/trace/HHAjiu2kirp?fields[]=s_name&fields[]=s_serviceName&span=8af9744106e2f8a2
+        let svix_app = ApplicationIn {
+            name,
+            uid: Some(uid),
+            ..ApplicationIn::default()
+        };
         let app = client
             .application()
-            .get_or_create(
-                ApplicationIn {
-                    name,
-                    uid: Some(uid),
-                    ..ApplicationIn::default()
-                },
-                None,
-            )
+            .get_or_create(svix_app, None)
             .await
             .map_err(Error::from)?;
 
-        let id = WebhookServiceId::from(app.id);
+        let id = SvixAppId::from(app.id);
+        let id2 = id.clone();
+
+        // Save the new app ID to the tenant table
+        let t_id = tenant_id.clone();
+        db_pool
+            .db_query(move |conn| Tenant::set_svix_app_id(conn, &t_id, is_live, &id2))
+            .await?;
         Ok(id)
     }
 }
@@ -96,12 +111,13 @@ impl WebhookClient for WebhookServiceClient {
     #[tracing::instrument(skip_all)]
     async fn send_event_to_tenant(
         &self,
+        db_pool: &DbPool,
         tenant_id: &TenantId,
         is_live: bool,
         event: WebhookEvent,
         idempotency_key: Option<String>,
     ) -> FpResult<()> {
-        let app_id = self.get_app_id_for_tenant(tenant_id, is_live).await?;
+        let app_id = self.get_app_id_for_tenant(db_pool, tenant_id, is_live).await?;
 
         let client = self.client();
         client
@@ -124,9 +140,14 @@ impl WebhookClient for WebhookServiceClient {
     }
 
     /// Get the portal URL to edit webhooks
-    #[tracing::instrument(skip(self))]
-    async fn portal_url_for_tenant(&self, tenant_id: &TenantId, is_live: bool) -> FpResult<PortalResponse> {
-        let app_id = self.get_app_id_for_tenant(tenant_id, is_live).await?;
+    #[tracing::instrument(skip(self, db_pool))]
+    async fn portal_url_for_tenant(
+        &self,
+        db_pool: &DbPool,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> FpResult<PortalResponse> {
+        let app_id = self.get_app_id_for_tenant(db_pool, tenant_id, is_live).await?;
         let client = self.client();
         let out = client
             .authentication()
@@ -148,7 +169,7 @@ impl WebhookClient for WebhookServiceClient {
 
 #[derive(Debug, Clone)]
 pub struct PortalResponse {
-    pub app_id: WebhookServiceId,
+    pub app_id: SvixAppId,
     pub url: String,
     pub token: String,
 }
@@ -158,11 +179,17 @@ pub struct PortalResponse {
 pub trait WebhookClient: Send + Sync {
     async fn send_event_to_tenant(
         &self,
+        db_pool: &DbPool,
         tenant_id: &TenantId,
         is_live: bool,
         event: WebhookEvent,
         idempotency_key: Option<String>,
     ) -> FpResult<()>;
 
-    async fn portal_url_for_tenant(&self, tenant_id: &TenantId, is_live: bool) -> FpResult<PortalResponse>;
+    async fn portal_url_for_tenant(
+        &self,
+        db_pool: &DbPool,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> FpResult<PortalResponse>;
 }
