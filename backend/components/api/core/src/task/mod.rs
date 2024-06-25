@@ -115,11 +115,7 @@ async fn execute_task(task: &Task, state: &State) -> Result<(), TaskError> {
                 .execute(args)
                 .await
         }
-        newtypes::TaskData::FireWebhook(args) => {
-            FireWebhookTask::new(state.webhook_client.clone())
-                .execute(args)
-                .await
-        }
+        newtypes::TaskData::FireWebhook(args) => FireWebhookTask::new(state.clone()).execute(args).await,
         newtypes::TaskData::RunIncodeStuckWorkflow(args) => {
             RunIncodeStuckWorkflowTask::new(state.clone()).execute(args).await
         }

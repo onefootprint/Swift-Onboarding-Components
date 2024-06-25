@@ -156,11 +156,8 @@ impl State {
         // by default, the webhook_client on a test state will expect anything
         let mut mock_webhook_client = MockWebhookClient::new();
         mock_webhook_client
-            .expect_send_event_to_tenant_non_blocking()
-            .return_const(());
-        mock_webhook_client
             .expect_send_event_to_tenant()
-            .returning(move |_, _, _| Ok(()));
+            .returning(move |_, _, _, _| Ok(()));
         s.set_webhook_client(Arc::new(mock_webhook_client));
 
         s.set_vendor_clients(VendorClients::new_with_mocks());

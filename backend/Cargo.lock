@@ -3590,7 +3590,6 @@ dependencies = [
  "tokio",
  "tracing",
  "uuid 1.4.1",
- "webhooks",
 ]
 
 [[package]]
@@ -10071,6 +10070,7 @@ dependencies = [
  "api_errors",
  "async-trait",
  "chrono",
+ "db",
  "derive_more",
  "mockall",
  "newtypes",

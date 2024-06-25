@@ -14,7 +14,6 @@ testing = []
 crypto = { path = "../../enclave/crypto" }
 newtypes = { path = "../../newtypes" }
 macros = { path = "../../macros" }
-webhooks = { path = "../../webhooks" }
 api_errors = { path = "../../api/errors" }
 serde = { workspace = true }
 serde_json = { workspace = true }

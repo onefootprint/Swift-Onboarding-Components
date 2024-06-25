@@ -24,7 +24,6 @@ pub mod tenant_business_info;
 pub mod timeouts;
 pub mod token;
 pub mod vault_wrapper;
-pub mod webhook_app;
 
 #[allow(clippy::expect_used)]
 #[allow(clippy::unwrap_used)]

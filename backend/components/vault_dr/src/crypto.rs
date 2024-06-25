@@ -3,7 +3,6 @@ use age::secrecy::ExposeSecret;
 use age::secrecy::SecretString;
 use age::secrecy::Zeroize;
 use std::io::Write;
-use std::ops::Deref;
 use std::str::FromStr;
 
 

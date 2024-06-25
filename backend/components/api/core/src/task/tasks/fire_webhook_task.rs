@@ -1,20 +1,18 @@
 use crate::task::ExecuteTask;
 use crate::task::TaskError;
+use crate::State;
 use async_trait::async_trait;
 use newtypes::FireWebhookArgs;
-use std::sync::Arc;
 use webhooks::events::WebhookEvent;
-use webhooks::WebhookApp;
-use webhooks::WebhookClient;
 
 pub(crate) struct FireWebhookTask {
-    webhook_client: Arc<dyn WebhookClient>,
+    state: State,
 }
 
 impl FireWebhookTask {
     #[allow(unused)]
-    pub fn new(webhook_client: Arc<dyn WebhookClient>) -> Self {
-        Self { webhook_client }
+    pub fn new(state: State) -> Self {
+        Self { state }
     }
 }
 
@@ -25,8 +23,9 @@ impl ExecuteTask<FireWebhookArgs> for FireWebhookTask {
         let is_live = args.is_live;
         let event = WebhookEvent::from(args.webhook_event.clone());
         let _ = self
+            .state
             .webhook_client
-            .send_event_to_tenant(WebhookApp { id: t_id, is_live }, event, None)
+            .send_event_to_tenant(&t_id, is_live, event, None)
             .await?;
         Ok(())
     }
@@ -42,6 +41,7 @@ mod tests {
     use newtypes::OnboardingCompletedPayload as NTOnboardingCompletedPayload;
     use newtypes::OnboardingStatus;
     use newtypes::WebhookEvent as NTWebhookEvent;
+    use std::sync::Arc;
     use webhooks::MockWebhookClient;
 
     #[test_db_pool]
@@ -77,7 +77,7 @@ mod tests {
         let mut mock_webhook_client = MockWebhookClient::new();
         mock_webhook_client
             .expect_send_event_to_tenant()
-            .withf(move |_, w, _| match w {
+            .withf(move |_, _, w, _| match w {
                 WebhookEvent::OnboardingCompleted(payload) => {
                     payload.fp_id == fp_id
                         && payload.status == OnboardingStatus::Fail
@@ -87,10 +87,12 @@ mod tests {
                 _ => false,
             })
             .times(1)
-            .return_once(|_, _, _| Ok(()));
+            .return_once(|_, _, _, _| Ok(()));
 
         // Run task
-        let task = FireWebhookTask::new(Arc::new(mock_webhook_client));
+        let mut state = State::test_state().await;
+        state.set_webhook_client(Arc::new(mock_webhook_client));
+        let task = FireWebhookTask::new(state);
         task.execute(&args).await.unwrap();
     }
 }

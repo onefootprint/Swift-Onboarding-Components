@@ -524,7 +524,7 @@ pub fn mock_webhooks(
 
         mock_webhook_client
             .expect_send_event_to_tenant()
-            .withf(move |_, w, _| match w {
+            .withf(move |_, _, w, _| match w {
                 WebhookEvent::OnboardingStatusChanged(osc) => {
                     osc.new_status == expected_status.0
                         && osc.requires_manual_review == expected_requires_manual_review.0
@@ -532,7 +532,7 @@ pub fn mock_webhooks(
                 _ => false,
             })
             .times(1)
-            .return_once(|_, _, _| Ok(()));
+            .return_once(|_, _, _, _| Ok(()));
     }
 
     for e in expected_ob_completed.iter() {
@@ -540,7 +540,7 @@ pub fn mock_webhooks(
         let expected_requires_manual_review = e.1.clone();
         mock_webhook_client
             .expect_send_event_to_tenant()
-            .withf(move |_, w, _| match w {
+            .withf(move |_, _, w, _| match w {
                 WebhookEvent::OnboardingCompleted(obc) => {
                     obc.status == expected_status.0
                         && obc.requires_manual_review == expected_requires_manual_review.0
@@ -548,7 +548,7 @@ pub fn mock_webhooks(
                 _ => false,
             })
             .times(1)
-            .return_once(|_, _, _| Ok(()));
+            .return_once(|_, _, _, _| Ok(()));
     }
 
     state.set_webhook_client(Arc::new(mock_webhook_client));
