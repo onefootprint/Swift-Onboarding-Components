@@ -6,12 +6,17 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { defaultOption, options } from './examples.constants';
+import optionsByProduct from './examples.constants';
+import type { Item } from './examples.types';
 
-const Examples = () => {
+type ExamplesProps = {
+  product: 'onboarding-components';
+};
+
+const Examples = ({ product }: ExamplesProps) => {
+  const { options, defaultOption } = optionsByProduct[product];
   const [tab, setTab] = useState(defaultOption);
   const { theme } = useTheme();
-
   const tabOptions = options.map(option => ({
     label: option.name,
     value: option.name,
