@@ -28,16 +28,16 @@ pub struct BillingCounts {
     /// API
     pub pii: i64,
     /// Number of KYC verifications ran this month, not including one-click onboardings
-    pub kyc: i64,
+    pub kyc: Option<i64>,
     /// Number of KYC verifications ran from one-click onboardings
     pub one_click_kyc: Option<i64>,
     pub kyc_waterfall_second_vendor: Option<i64>,
     pub kyc_waterfall_third_vendor: Option<i64>,
     /// Number of KYB verifications ran this month
-    pub kyb: i64,
+    pub kyb: Option<i64>,
     /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't
     /// finish onboarding
-    pub id_docs: i64,
+    pub id_docs: Option<i64>,
     /// Number of watchlist checks ran this month
     pub curp_verifications: Option<i64>,
     /// Number of watchlist checks ran this month
@@ -56,6 +56,10 @@ pub struct BillingCounts {
     /// Instead of watchlist_checks, billing for incode continuos monitoring. We bill on a per year
     /// basis, but run the checks monthly
     pub continuous_monitoring_per_year: Option<i64>,
+
+    pub legacy_kyc: i64,
+    pub legacy_kyb: i64,
+    pub legacy_id_docs: i64,
 }
 
 #[derive(Debug)]
@@ -82,12 +86,12 @@ impl BillingCounts {
         let count = match product {
             Product::MonthlyPlatformFee => Some(1), // Always quantity one
             Product::Pii => Some(self.pii),
-            Product::Kyc => Some(self.kyc),
+            Product::Kyc => self.kyc,
             Product::OneClickKyc => self.one_click_kyc,
             Product::KycWaterfallSecondVendor => self.kyc_waterfall_second_vendor,
             Product::KycWaterfallThirdVendor => self.kyc_waterfall_third_vendor,
-            Product::Kyb => Some(self.kyb),
-            Product::IdDocs => Some(self.id_docs),
+            Product::Kyb => self.kyb,
+            Product::IdDocs => self.id_docs,
             Product::CurpVerification => self.curp_verifications,
             Product::WatchlistChecks => Some(self.watchlist_checks),
             Product::HotVaults => self.hot_vaults,
@@ -156,9 +160,6 @@ impl BillingCounts {
         // billing for them. We will error if any of these products have use when they haven't
         // been contracted
         let pii = ScopedVault::count_billable(conn, t_id, i.end, ScopedVaultPiiFilters::None)?;
-        let kyc = Workflow::get_kyc_kyb_billable_count(conn, t_id, i.start, i.end, VaultKind::Person)?;
-        let kyb = Workflow::get_kyc_kyb_billable_count(conn, t_id, i.start, i.end, VaultKind::Business)?;
-        let id_docs = Document::get_billable_count(conn, t_id, i.start, i.end)?;
         let watchlist_checks = WatchlistCheck::get_billable_count(conn, t_id, i.start, i.end)?;
 
         // These billing schemes are only used by some tenants, so only count them conditionally
@@ -191,9 +192,15 @@ impl BillingCounts {
         // the BillingEvent model so it becomes easier to count at read time
         let billing_event_counts = BillingEvent::get_counts(conn, t_id, i.start, i.end)?;
 
+        // TODO rm
+        let legacy_kyc = Workflow::get_kyc_kyb_billable_count(conn, t_id, i.start, i.end, VaultKind::Person)?;
+        let legacy_kyb =
+            Workflow::get_kyc_kyb_billable_count(conn, t_id, i.start, i.end, VaultKind::Business)?;
+        let legacy_id_docs = Document::get_billable_count(conn, t_id, i.start, i.end)?;
+
         let counts = BillingCounts {
             pii,
-            kyc,
+            kyc: billing_event_counts.get(&BillingEventKind::Kyc).cloned(),
             one_click_kyc: billing_event_counts.get(&BillingEventKind::OneClickKyc).cloned(),
             kyc_waterfall_second_vendor: billing_event_counts
                 .get(&BillingEventKind::KycWaterfallSecondVendor)
@@ -201,8 +208,10 @@ impl BillingCounts {
             kyc_waterfall_third_vendor: billing_event_counts
                 .get(&BillingEventKind::KycWaterfallThirdVendor)
                 .cloned(),
-            kyb,
-            id_docs,
+            kyb: billing_event_counts.get(&BillingEventKind::Kyb).cloned(),
+            id_docs: billing_event_counts
+                .get(&BillingEventKind::IdentityDocument)
+                .cloned(),
             curp_verifications: billing_event_counts
                 .get(&BillingEventKind::CurpValidation)
                 .cloned(),
@@ -218,6 +227,10 @@ impl BillingCounts {
             continuous_monitoring_per_year: billing_event_counts
                 .get(&BillingEventKind::ContinuousMonitoringPerYear)
                 .cloned(),
+            // TODO rm
+            legacy_kyc,
+            legacy_kyb,
+            legacy_id_docs,
         };
         Ok(counts)
     }
@@ -235,15 +248,15 @@ impl Add for BillingCounts {
         let a = self;
         BillingCounts {
             pii: a.pii + b.pii,
-            kyc: a.kyc + b.kyc,
+            kyc: add_opt(a.kyc, b.kyc),
             one_click_kyc: add_opt(a.one_click_kyc, b.one_click_kyc),
             kyc_waterfall_second_vendor: add_opt(
                 a.kyc_waterfall_second_vendor,
                 b.kyc_waterfall_second_vendor,
             ),
             kyc_waterfall_third_vendor: add_opt(a.kyc_waterfall_third_vendor, b.kyc_waterfall_third_vendor),
-            kyb: a.kyb + b.kyb,
-            id_docs: a.id_docs + b.id_docs,
+            kyb: add_opt(a.kyb, b.kyb),
+            id_docs: add_opt(a.id_docs, b.id_docs),
             curp_verifications: add_opt(a.curp_verifications, b.curp_verifications),
             watchlist_checks: a.watchlist_checks + b.watchlist_checks,
             hot_vaults: add_opt(a.hot_vaults, b.hot_vaults),
@@ -255,6 +268,9 @@ impl Add for BillingCounts {
                 a.continuous_monitoring_per_year,
                 b.continuous_monitoring_per_year,
             ),
+            legacy_kyc: a.legacy_kyc + b.legacy_kyc,
+            legacy_kyb: a.legacy_kyb + b.legacy_kyb,
+            legacy_id_docs: a.legacy_id_docs + b.legacy_id_docs,
         }
     }
 }

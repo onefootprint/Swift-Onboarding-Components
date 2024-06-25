@@ -195,6 +195,11 @@ impl BillingClient {
         // Calculate each of the line items
         let profile = BillingProfile::get_for(&self.client, &info).await?;
         let mut items = HashMap::new();
+        let legacy_line_items = vec![
+            (info.counts.legacy_kyc, "Legacy KYC"),
+            (info.counts.legacy_kyb, "Legacy KYB"),
+            (info.counts.legacy_id_docs, "Legacy ID docs"),
+        ];
         let line_items = info.counts.line_items(&profile)?;
         let monthly_spend_cents: Decimal = line_items
             .iter()
@@ -230,6 +235,17 @@ impl BillingClient {
                 let i = InvoiceItem::create(&self.client, new_invoice_item).await?;
                 items.insert(i.id.clone(), i);
             }
+        }
+
+        // TODO rm
+        for (count, name) in legacy_line_items {
+            let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
+            new_invoice_item.description = Some(name);
+            new_invoice_item.amount = Some(count);
+            new_invoice_item.metadata = Some(managed_metadata());
+            new_invoice_item.currency = Some(Currency::USD);
+            let i = InvoiceItem::create(&self.client, new_invoice_item).await?;
+            items.insert(i.id.clone(), i);
         }
 
         // Create the invoice, which will automatically include these billing items
