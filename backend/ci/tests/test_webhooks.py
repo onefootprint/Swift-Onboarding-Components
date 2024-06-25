@@ -35,7 +35,6 @@ def test_webhook_e2e(sandbox_tenant, run_id):
         assert body["app_id"]
         app_id = body["app_id"]
 
-        print(IT_SVIX_API_KEY)
         svix = Svix(IT_SVIX_API_KEY)
         app = svix.application.get_or_create(
             ApplicationIn(
