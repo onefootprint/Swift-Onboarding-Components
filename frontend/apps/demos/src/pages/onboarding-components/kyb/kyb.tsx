@@ -192,10 +192,6 @@ const BusinessData = ({ onDone }: { onDone: () => void }) => {
             <Fp.Input placeholder="11206" />
             <Fp.FieldErrors />
           </Fp.Field>
-          <Fp.Field name="custom.lorem">
-            <Fp.Label>Lorem</Fp.Label>
-            <Fp.Input />
-          </Fp.Field>
           <Divider marginBlock={3} />
           <Button type="submit" loading={fp.busy === 'save'}>
             Continue

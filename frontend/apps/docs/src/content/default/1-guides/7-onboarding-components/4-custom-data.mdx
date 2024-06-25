@@ -1,0 +1,113 @@
+---
+page: default
+slug: /guides/onboarding-components-custom
+category: Guides
+subcategory: Onboarding Components
+title: Custom data collection
+meta:
+  {
+    title: Footprint | Onboarding Components - Custom data collectin,
+    description: Discover how to collect custom data,
+  }
+---
+
+Footprint’s onboarding components are expertly designed to capture essential user information such as names, emails, and addresses. Recognizing that businesses often have unique data requirements that go beyond these basics, we also provide a specialized component for custom data collection. This feature allows for the integration of tailored data fields, ensuring your onboarding process meets all your specific needs.
+
+## Custom fields
+
+To implement a custom field in your application, simply use the `Field` component with a `custom.*` prefix in the name attribute. This setup allows you to gather any specific data that your application requires. Below is an example demonstrating how to create a custom field:
+
+```jsx filename="app.tsx" highlight="14,15,16,17,18"
+import { Fp } from '@onefootprint/footprint-react';
+
+const Demo = () => {
+  return (
+    <Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
+      <Flow />
+    </Provider>
+  );
+};
+
+const Flow = () => {
+  return (
+    <Fp.Form>
+      <Fp.Field name="custom.lorem">
+        <Fp.Label>Lorem</Fp.Label>
+        <Fp.Input />
+        <Fp.FieldErrors />
+      </Fp.Field>
+    </Fp.Form>
+  );
+};
+```
+
+## Validation
+
+Custom fields can be validated using the same methods as standard fields. You can use the `validate` prop to define custom validation rules for your custom fields. Below is an example demonstrating how to validate a custom field:
+
+```jsx filename="app.tsx"  highlight="17,18,19,20,21,22,23,24"
+import { Fp } from '@onefootprint/footprint-react';
+
+const Demo = () => {
+  return (
+    <Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
+      <Flow />
+    </Provider>
+  );
+};
+
+const Flow = () => {
+  return (
+    <Fp.Form>
+      <Fp.Field name="custom.lorem">
+        <Fp.Label>Lorem</Fp.Label>
+        <Fp.Input 
+          validations={{
+            required: 'Lorem is required',
+            validate: (value: string) => {
+              if (value.length < 5) {
+                return 'Lorem must be at least 5 characters long';
+              }
+              return true;
+            }
+          }} />
+        <Fp.FieldErrors />
+      </Fp.Field>
+    </Fp.Form>
+  );
+};
+```
+
+### Saving
+
+Once the data is collected, just use `fp.save` as usual:
+
+```jsx filename="app.tsx" highlight="12,14,15,16,19"
+import { Fp, useFootprint, Di } from '@onefootprint/footprint-react';
+
+const Demo = () => {
+  return (
+    <Provider publicKey="pb_test_LRfe5D3dZnWSf5vOGSeCFk">
+      <Flow />
+    </Provider>
+  );
+};
+
+const Flow = () => {
+  const { fp } = useFootprint();
+
+  const handleSubmit = (data: Di) => {
+    fp.save(data, { onSuccess: () => console.log('Saved!') });
+  };
+
+  return (
+    <Fp.Form onSubmit={handleSubmit}>
+      <Fp.Field name="custom.lorem">
+        <Fp.Label>Lorem</Fp.Label>
+        <Fp.Input />
+        <Fp.FieldErrors />
+      </Fp.Field>
+    </Fp.Form>
+  );
+};
+```
