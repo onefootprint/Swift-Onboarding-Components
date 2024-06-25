@@ -1,9 +1,7 @@
 import { ApiError } from '../../../../@types';
 import { keysToCamelCase, keysToSnakeCase } from './utils/transform-data';
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  (process.env.NODE_ENV === 'development' ? 'https://api.dev.onefootprint.com' : 'https://api.onefootprint.com');
+const API_BASE_URL = process.env.API_BASE_URL;
 
 type Options = Omit<RequestInit, 'headers'> & {
   baseURL?: string;
