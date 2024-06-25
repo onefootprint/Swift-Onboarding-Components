@@ -11,7 +11,8 @@ export type HelpLink = {
 export type TranslationKeys =
   | 'help-links.documentation'
   | 'help-links.api-reference'
-  | 'help-links.risk-signals-glossary';
+  | 'help-links.risk-signals-glossary'
+  | 'help-links.pgp-helper-tool';
 
 export type NavDropdownProps = {
   tenants: GetAuthRolesOrg[];

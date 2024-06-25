@@ -1,12 +1,13 @@
 import { DOCS_BASE_URL } from '@onefootprint/global-constants';
 import { IcoArrowUpRight16, IcoDotsHorizontal16 } from '@onefootprint/icons';
-import { Dropdown, createFontStyles } from '@onefootprint/ui';
+import { Button, Dropdown, createFontStyles } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import RiskSignalsGlossary from 'src/components/risk-signals-glossary';
 import styled, { css } from 'styled-components';
 
+import PgpUploadTool from 'src/components/pgp-upload-tool';
 import Logout from './components/log-out';
 import SectionContainer from './components/section-container';
 import TenantsList from './components/tenants-list';
@@ -29,11 +30,16 @@ const helpLinks: HelpLink[] = [
     id: 'risk-signals-glossary',
     translationKey: 'help-links.risk-signals-glossary',
   },
+  {
+    id: 'pgp-upload-helper',
+    translationKey: 'help-links.pgp-helper-tool',
+  },
 ];
 
 const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
+  const [isPgpHelperOpen, setIsPgpHelperOpen] = useState(false);
   const { t } = useTranslation('common', {
     keyPrefix: 'components.private-layout.nav',
   });
@@ -53,6 +59,8 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
       window.open(link.href, '_blank');
     } else if (link.id === 'risk-signals-glossary') {
       setIsGlossaryOpen(true);
+    } else if (link.id === 'pgp-upload-helper') {
+      setIsPgpHelperOpen(true);
     }
     setIsOpen(false);
   };
@@ -88,6 +96,7 @@ const NavDropdown = ({ tenants, currTenantId, onAssumeTenant, user }: NavDropdow
         )}
       </Dropdown.Root>
       <RiskSignalsGlossary open={isGlossaryOpen} onClose={() => setIsGlossaryOpen(false)} />
+      <PgpUploadTool open={isPgpHelperOpen} onClose={() => setIsPgpHelperOpen(false)} />
     </>
   );
 };

@@ -468,6 +468,14 @@
       "search": "Search risk signals",
       "no-results": "No results found"
     },
+    "pgp-helper-tool": {
+      "title": "PGP Upload Tool",
+      "select-file-button-title": "Select data file",
+      "description": "When sending sensitive data to Footprint for support cases or migration requests, please use PGP to secure data in transit. If you need help migrating data please reach out to us at support@onefootprint.com with the details of your request.",
+      "manual-pgp-instructions-link-title": "Manual PGP instructions",
+      "public-key-link-title": "Footprint's PGP public key"
+    },
+
     "frequent-notes": {
       "title": "Frequent Notes",
       "edit": "Edit",
@@ -555,7 +563,8 @@
           "documentation": "Documentation",
           "support": "Support",
           "api-reference": "API reference",
-          "risk-signals-glossary": "Risk signals glossary"
+          "risk-signals-glossary": "Risk signals glossary",
+          "pgp-helper-tool": "PGP Upload Tool"
         },
         "tenants-list": {
           "title": "Tenants",
