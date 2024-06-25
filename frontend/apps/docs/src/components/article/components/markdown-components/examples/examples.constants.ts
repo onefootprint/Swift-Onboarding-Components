@@ -28,6 +28,15 @@ const onboardingComponents = createOptions({
           width: 32,
         },
       },
+      {
+        name: 'KYB + Next.js',
+        href: 'https://github.com/onefootprint/examples/tree/master/onboarding-components/kyb/web-next-js',
+        img: {
+          src: '/examples/next.png',
+          height: 32,
+          width: 32,
+        },
+      },
     ],
   },
 });
