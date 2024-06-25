@@ -44,7 +44,7 @@ const getRequestData = (
   Object.keys(CollectedKycDataOptionToRequiredAttributes).forEach((cdoKey: string) => {
     // Detect whether any part of the cdo is in request data
     const cdo = cdoKey as CollectedKycDataOption;
-    const allDisForCdo = CdoToAllDisMap[cdo] as IdDI[];
+    const allDisForCdo = (CdoToAllDisMap[cdo] || []) as IdDI[];
     // "" is a valid value to save to the backend, so only check for undefined
     if (cdos.indexOf(cdo) === -1 || !allDisForCdo.some(di => typeof filteredData[di]?.value !== 'undefined')) {
       return;
