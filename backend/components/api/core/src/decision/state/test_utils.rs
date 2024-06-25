@@ -58,6 +58,7 @@ use idv::middesk::MiddeskCreateBusinessResponse;
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
 use itertools::Itertools;
+use mockall::predicate::always;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::DecisionIntentKind;
@@ -500,12 +501,55 @@ pub fn mock_middesk(state: &mut State, business_id: &str) {
     state.set_middesk_create_business(Arc::new(mock_middesk_create_business));
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, derive_more::Display)]
 pub struct ExpectedStatus(pub OnboardingStatus);
-#[derive(Clone)]
+
+#[derive(Clone, Debug, derive_more::Display)]
 pub struct ExpectedRequiresManualReview(pub bool);
+
+#[derive(Debug)]
 pub struct OnboardingCompleted(pub ExpectedStatus, pub ExpectedRequiresManualReview);
+
+impl std::fmt::Display for OnboardingCompleted {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        <Self as std::fmt::Debug>::fmt(self, f)
+    }
+}
+
+impl predicates::reflection::PredicateReflection for OnboardingCompleted {}
+
+impl mockall::Predicate<WebhookEvent> for OnboardingCompleted {
+    fn eval(&self, w: &WebhookEvent) -> bool {
+        match w {
+            WebhookEvent::OnboardingCompleted(osc) => {
+                osc.status == self.0 .0 && osc.requires_manual_review == self.1 .0
+            }
+            _ => false,
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct OnboardingStatusChanged(pub ExpectedStatus, pub ExpectedRequiresManualReview);
+
+impl std::fmt::Display for OnboardingStatusChanged {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        <Self as std::fmt::Debug>::fmt(self, f)
+    }
+}
+
+impl predicates::reflection::PredicateReflection for OnboardingStatusChanged {}
+
+impl mockall::Predicate<WebhookEvent> for OnboardingStatusChanged {
+    fn eval(&self, w: &WebhookEvent) -> bool {
+        match w {
+            WebhookEvent::OnboardingStatusChanged(osc) => {
+                osc.new_status == self.0 .0 && osc.requires_manual_review == self.1 .0
+            }
+            _ => false,
+        }
+    }
+}
 
 // TODO: I think since we are executing the webhook Task's spawned threads, it could be possible
 // these expectations panic but don't necessarily fail the test need to check what CI would do that
@@ -518,35 +562,18 @@ pub fn mock_webhooks(
 ) {
     let mut mock_webhook_client = MockWebhookClient::new();
 
-    for e in expected_ob_status_changed.iter() {
-        let expected_status = e.0.clone();
-        let expected_requires_manual_review = e.1.clone();
-
+    for e in expected_ob_status_changed {
         mock_webhook_client
             .expect_send_event_to_tenant()
-            .withf(move |_, _, _, w, _| match w {
-                WebhookEvent::OnboardingStatusChanged(osc) => {
-                    osc.new_status == expected_status.0
-                        && osc.requires_manual_review == expected_requires_manual_review.0
-                }
-                _ => false,
-            })
+            .with(always(), always(), always(), e, always())
             .times(1)
             .return_once(|_, _, _, _, _| Ok(()));
     }
 
-    for e in expected_ob_completed.iter() {
-        let expected_status = e.0.clone();
-        let expected_requires_manual_review = e.1.clone();
+    for e in expected_ob_completed {
         mock_webhook_client
             .expect_send_event_to_tenant()
-            .withf(move |_, _, _, w, _| match w {
-                WebhookEvent::OnboardingCompleted(obc) => {
-                    obc.status == expected_status.0
-                        && obc.requires_manual_review == expected_requires_manual_review.0
-                }
-                _ => false,
-            })
+            .with(always(), always(), always(), e, always())
             .times(1)
             .return_once(|_, _, _, _, _| Ok(()));
     }

@@ -125,6 +125,7 @@ portpicker = { workspace = true }
 
 tokio-test = { workspace = true }
 mockall = { workspace = true }
+predicates = { workspace = true }
 
 opentelemetry_api = { workspace = true }
 

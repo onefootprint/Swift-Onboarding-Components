@@ -172,7 +172,8 @@ aws-credential-types = { version = "1.0.0", features = ["hardcoded-credentials"]
 
 x509-parser = "0.14"
 test-case = "3.0.0"
-mockall = "0.11.4"
+mockall = "0.12.1"
+predicates = "3.1.0"
 url = "2.3.1"
 
 sentry = "0.31.5"
