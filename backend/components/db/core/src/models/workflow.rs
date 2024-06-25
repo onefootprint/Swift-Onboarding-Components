@@ -129,7 +129,6 @@ pub struct NewWorkflowArgs {
 #[diesel(table_name = workflow)]
 struct WorkflowUpdateRow {
     status: Option<OnboardingStatus>,
-    authorized_at: Option<Option<DateTime<Utc>>>,
     decision_made_at: Option<Option<DateTime<Utc>>>,
 }
 
@@ -156,18 +155,8 @@ impl WorkflowUpdate {
         let update = WorkflowUpdateRow {
             status: Some(new_decision.status.into()),
             decision_made_at: is_first_fp_decision.then_some(Some(Utc::now())),
-            ..Default::default()
         };
         let new_decision = Some(new_decision);
-        Self { update, new_decision }
-    }
-
-    pub fn is_authorized() -> Self {
-        let update = WorkflowUpdateRow {
-            authorized_at: Some(Some(Utc::now())),
-            ..Default::default()
-        };
-        let new_decision = None;
         Self { update, new_decision }
     }
 }
@@ -598,7 +587,6 @@ impl Workflow {
         let old_status = wf.status;
         let WorkflowUpdateRow {
             status: new_status,
-            authorized_at,
             decision_made_at,
         } = update;
         let new_wf_status = new_status
@@ -607,7 +595,6 @@ impl Workflow {
             .flatten();
         let update = WorkflowUpdateRow {
             status: new_wf_status,
-            authorized_at,
             decision_made_at,
         };
         let wf = if update != Default::default() {
@@ -679,6 +666,14 @@ impl Workflow {
             };
         }
         Ok(wf)
+    }
+
+    pub fn set_is_authorized(wf: Locked<Self>, conn: &mut TxnPgConn) -> DbResult<Self> {
+        let result = diesel::update(workflow::table)
+            .filter(workflow::id.eq(&wf.id))
+            .set(workflow::authorized_at.eq(Utc::now()))
+            .get_result(conn.conn())?;
+        Ok(result)
     }
 
     #[tracing::instrument("Workflow::update_fixture_result", skip_all)]

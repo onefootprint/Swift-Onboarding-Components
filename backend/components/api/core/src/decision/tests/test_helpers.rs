@@ -19,7 +19,6 @@ use db::models::tenant::PrivateUpdateTenant;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::fixtures::{
     self,
@@ -106,12 +105,12 @@ pub async fn create_user_and_onboarding(
             // Mark the onboardings as authorized since they would be authorized in prod by the
             // time they're used here
             let wf = Workflow::lock(conn, &wf_id)?;
-            let wf = Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?;
+            let wf = Workflow::set_is_authorized(wf, conn)?;
 
             let biz_wf = biz_wf
                 .map(|biz_wf| -> FpResult<_> {
                     let biz_wf = Workflow::lock(conn, &biz_wf.id)?;
-                    let biz_wf = Workflow::update(biz_wf, conn, WorkflowUpdate::is_authorized())?;
+                    let biz_wf = Workflow::set_is_authorized(biz_wf, conn)?;
                     Ok(biz_wf)
                 })
                 .transpose()?;

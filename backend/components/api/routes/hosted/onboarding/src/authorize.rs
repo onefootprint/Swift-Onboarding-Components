@@ -8,7 +8,6 @@ use api_core::types::ApiResponse;
 use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::requirements::GetRequirementsArgs;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use itertools::Itertools;
 use newtypes::OnboardingRequirement;
 use paperclip::actix::api_v2_operation;
@@ -52,19 +51,19 @@ pub async fn post(
     let wf_id = user_auth.workflow().id.clone();
     state
         .db_pool
-        .db_transaction(move |c| -> FpResult<_> {
-            let wf = Workflow::lock(c, &wf_id)?;
+        .db_transaction(move |conn| -> FpResult<_> {
+            let wf = Workflow::lock(conn, &wf_id)?;
             if wf.authorized_at.is_none() {
-                Workflow::update(wf, c, WorkflowUpdate::is_authorized())?;
+                Workflow::set_is_authorized(wf, conn)?;
             }
 
             // TODO we eventually won't hit this anymore because business workflows are now
             // automatically authorized
-            let biz_wf = user_auth.business_workflow(c)?;
+            let biz_wf = user_auth.business_workflow(conn)?;
             if let Some(biz_wf) = biz_wf {
-                let biz_wf = Workflow::lock(c, &biz_wf.id)?;
+                let biz_wf = Workflow::lock(conn, &biz_wf.id)?;
                 if biz_wf.authorized_at.is_none() {
-                    Workflow::update(biz_wf, c, WorkflowUpdate::is_authorized())?;
+                    Workflow::set_is_authorized(biz_wf, conn)?;
                 }
             }
             Ok(())

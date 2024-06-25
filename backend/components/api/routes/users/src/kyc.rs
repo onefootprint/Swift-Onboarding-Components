@@ -32,7 +32,6 @@ use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::DbError;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
@@ -156,7 +155,7 @@ pub async fn post(
             // TODO: consolidate with /authorize code
             let wf = Workflow::lock(conn, &wf_id)?;
             let wf = if wf.authorized_at.is_none() {
-                Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?
+                Workflow::set_is_authorized(wf, conn)?
             } else {
                 wf.into_inner()
             };

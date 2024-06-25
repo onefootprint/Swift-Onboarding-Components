@@ -41,7 +41,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_consent::UserConsent;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::DbError;
 use newtypes::DecisionIntentKind;
 use newtypes::DocumentId;
@@ -335,7 +334,7 @@ pub async fn adhoc_document_process(
             // authorize since this is a non-customer facing route
             let wf = Workflow::lock(conn, &doc_req.workflow_id)?;
             let wf = if wf.authorized_at.is_none() {
-                Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?
+                Workflow::set_is_authorized(wf, conn)?
             } else {
                 wf.into_inner()
             };
