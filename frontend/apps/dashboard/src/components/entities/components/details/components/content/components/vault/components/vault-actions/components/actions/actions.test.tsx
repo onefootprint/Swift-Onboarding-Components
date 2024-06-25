@@ -65,6 +65,12 @@ describe('<Actions />', () => {
         ],
       },
     });
+    mockRequest({
+      method: 'get',
+      path: `/entities/${entityId}/auth_events`,
+      statusCode: 200,
+      response: [],
+    });
     asAdminUser();
   });
 

@@ -16,6 +16,7 @@ pub struct InsightEvent {
     pub postal_code: Option<String>,
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
+    pub session_id: Option<String>,
 }
 
 /// Describes a device insight event with locations and IP of the event

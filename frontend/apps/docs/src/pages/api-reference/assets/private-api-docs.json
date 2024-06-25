@@ -76,6 +76,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -592,6 +594,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -2358,6 +2362,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -2805,6 +2811,8 @@
                                     "id.citizenships",
                                     "id.drivers_license_number",
                                     "id.drivers_license_state",
+                                    "id.itin",
+                                    "id.us_tax_id",
                                     "custom.*",
                                     "business.name",
                                     "business.dba",
@@ -7408,6 +7416,9 @@
                             "region_name": {
                                 "type": "string"
                             },
+                            "session_id": {
+                                "type": "string"
+                            },
                             "time_zone": {
                                 "type": "string"
                             },
@@ -7468,6 +7479,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -8259,6 +8272,9 @@
                             "region_name": {
                                 "type": "string"
                             },
+                            "session_id": {
+                                "type": "string"
+                            },
                             "time_zone": {
                                 "type": "string"
                             },
@@ -8366,6 +8382,9 @@
                                 "type": "string"
                             },
                             "region_name": {
+                                "type": "string"
+                            },
+                            "session_id": {
                                 "type": "string"
                             },
                             "time_zone": {
@@ -8632,6 +8651,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -9318,7 +9339,8 @@
                                 "BusinessKycedBeneficialOwners",
                                 "BusinessCorporationType",
                                 "InvestorProfile",
-                                "Card"
+                                "Card",
+                                "UsTaxId"
                             ]
                         }
                     },
@@ -9353,7 +9375,8 @@
                             "BusinessKycedBeneficialOwners",
                             "BusinessCorporationType",
                             "InvestorProfile",
-                            "Card"
+                            "Card",
+                            "UsTaxId"
                         ]
                     },
                     "document_types_and_countries": {
@@ -9711,7 +9734,8 @@
                                 "BusinessKycedBeneficialOwners",
                                 "BusinessCorporationType",
                                 "InvestorProfile",
-                                "Card"
+                                "Card",
+                                "UsTaxId"
                             ]
                         }
                     },
@@ -9742,7 +9766,8 @@
                                 "BusinessKycedBeneficialOwners",
                                 "BusinessCorporationType",
                                 "InvestorProfile",
-                                "Card"
+                                "Card",
+                                "UsTaxId"
                             ]
                         }
                     },
@@ -9885,6 +9910,8 @@
                                                 "id.citizenships",
                                                 "id.drivers_license_number",
                                                 "id.drivers_license_state",
+                                                "id.itin",
+                                                "id.us_tax_id",
                                                 "custom.*",
                                                 "business.name",
                                                 "business.dba",
@@ -10348,6 +10375,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -10616,6 +10645,8 @@
                             "id.citizenships",
                             "id.drivers_license_number",
                             "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -10865,6 +10896,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -11107,6 +11140,8 @@
                             "id.citizenships",
                             "id.drivers_license_number",
                             "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -11468,6 +11503,8 @@
                                         "id.citizenships",
                                         "id.drivers_license_number",
                                         "id.drivers_license_state",
+                                        "id.itin",
+                                        "id.us_tax_id",
                                         "custom.*",
                                         "business.name",
                                         "business.dba",
@@ -11775,6 +11812,8 @@
                                                     "id.citizenships",
                                                     "id.drivers_license_number",
                                                     "id.drivers_license_state",
+                                                    "id.itin",
+                                                    "id.us_tax_id",
                                                     "custom.*",
                                                     "business.name",
                                                     "business.dba",
@@ -12117,6 +12156,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -12360,6 +12401,8 @@
                                         "id.citizenships",
                                         "id.drivers_license_number",
                                         "id.drivers_license_state",
+                                        "id.itin",
+                                        "id.us_tax_id",
                                         "custom.*",
                                         "business.name",
                                         "business.dba",
@@ -12627,6 +12670,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -13014,6 +13059,7 @@
                                         "ssn_input_is_invalid",
                                         "ssn_located_is_invalid",
                                         "ssn_not_provided",
+                                        "us_tax_id_is_itin",
                                         "itin_is_expired",
                                         "name_last_does_not_match",
                                         "name_last_partially_matches",
@@ -13221,6 +13267,7 @@
                                         "business_address_incomplete_match",
                                         "business_address_does_not_match",
                                         "business_address_commercial",
+                                        "business_address_commercial_mail_receiving_agency",
                                         "business_address_residential",
                                         "business_address_deliverable",
                                         "business_address_not_deliverable",
@@ -13338,6 +13385,9 @@
                                         "region_name": {
                                             "type": "string"
                                         },
+                                        "session_id": {
+                                            "type": "string"
+                                        },
                                         "time_zone": {
                                             "type": "string"
                                         },
@@ -13450,6 +13500,8 @@
                             "id.citizenships",
                             "id.drivers_license_number",
                             "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -13816,6 +13868,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -14142,6 +14196,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -14349,6 +14404,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -14541,6 +14597,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -14748,6 +14805,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -14940,6 +14998,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -15147,6 +15206,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -15339,6 +15399,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -15546,6 +15607,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -15738,6 +15800,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -15945,6 +16008,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -16137,6 +16201,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -16344,6 +16409,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -16536,6 +16602,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -16743,6 +16810,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -16935,6 +17003,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -17142,6 +17211,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -17334,6 +17404,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -17541,6 +17612,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -17733,6 +17805,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -17940,6 +18013,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -18132,6 +18206,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -18339,6 +18414,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -18531,6 +18607,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -18738,6 +18815,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -18930,6 +19008,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "us_tax_id_is_itin",
                                                 "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
@@ -19137,6 +19216,7 @@
                                                 "business_address_incomplete_match",
                                                 "business_address_does_not_match",
                                                 "business_address_commercial",
+                                                "business_address_commercial_mail_receiving_agency",
                                                 "business_address_residential",
                                                 "business_address_deliverable",
                                                 "business_address_not_deliverable",
@@ -19255,6 +19335,8 @@
                             "id.citizenships",
                             "id.drivers_license_number",
                             "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -19500,6 +19582,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -19749,6 +19833,8 @@
                             "id.citizenships",
                             "id.drivers_license_number",
                             "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -20308,6 +20394,9 @@
                             "region_name": {
                                 "type": "string"
                             },
+                            "session_id": {
+                                "type": "string"
+                            },
                             "time_zone": {
                                 "type": "string"
                             },
@@ -20441,6 +20530,9 @@
                                 "type": "string"
                             },
                             "region_name": {
+                                "type": "string"
+                            },
+                            "session_id": {
                                 "type": "string"
                             },
                             "time_zone": {
@@ -20715,7 +20807,8 @@
                                             "BusinessKycedBeneficialOwners",
                                             "BusinessCorporationType",
                                             "InvestorProfile",
-                                            "Card"
+                                            "Card",
+                                            "UsTaxId"
                                         ]
                                     }
                                 },
@@ -20754,7 +20847,8 @@
                                         "BusinessKycedBeneficialOwners",
                                         "BusinessCorporationType",
                                         "InvestorProfile",
-                                        "Card"
+                                        "Card",
+                                        "UsTaxId"
                                     ]
                                 },
                                 "document_types_and_countries": {
@@ -21124,7 +21218,8 @@
                                             "BusinessKycedBeneficialOwners",
                                             "BusinessCorporationType",
                                             "InvestorProfile",
-                                            "Card"
+                                            "Card",
+                                            "UsTaxId"
                                         ]
                                     }
                                 },
@@ -21155,7 +21250,8 @@
                                             "BusinessKycedBeneficialOwners",
                                             "BusinessCorporationType",
                                             "InvestorProfile",
-                                            "Card"
+                                            "Card",
+                                            "UsTaxId"
                                         ]
                                     }
                                 },
@@ -21705,7 +21801,8 @@
                                 "BusinessKycedBeneficialOwners",
                                 "BusinessCorporationType",
                                 "InvestorProfile",
-                                "Card"
+                                "Card",
+                                "UsTaxId"
                             ]
                         }
                     },
@@ -21744,7 +21841,8 @@
                             "BusinessKycedBeneficialOwners",
                             "BusinessCorporationType",
                             "InvestorProfile",
-                            "Card"
+                            "Card",
+                            "UsTaxId"
                         ]
                     },
                     "document_types_and_countries": {
@@ -22114,7 +22212,8 @@
                                 "BusinessKycedBeneficialOwners",
                                 "BusinessCorporationType",
                                 "InvestorProfile",
-                                "Card"
+                                "Card",
+                                "UsTaxId"
                             ]
                         }
                     },
@@ -22145,7 +22244,8 @@
                                 "BusinessKycedBeneficialOwners",
                                 "BusinessCorporationType",
                                 "InvestorProfile",
-                                "Card"
+                                "Card",
+                                "UsTaxId"
                             ]
                         }
                     },
@@ -23027,6 +23127,8 @@
                                                 "id.citizenships",
                                                 "id.drivers_license_number",
                                                 "id.drivers_license_state",
+                                                "id.itin",
+                                                "id.us_tax_id",
                                                 "custom.*",
                                                 "business.name",
                                                 "business.dba",
@@ -23467,6 +23569,8 @@
                                         "id.citizenships",
                                         "id.drivers_license_number",
                                         "id.drivers_license_state",
+                                        "id.itin",
+                                        "id.us_tax_id",
                                         "custom.*",
                                         "business.name",
                                         "business.dba",
@@ -23776,6 +23880,8 @@
                             "id.citizenships",
                             "id.drivers_license_number",
                             "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -24098,6 +24204,7 @@
                             "ssn_input_is_invalid",
                             "ssn_located_is_invalid",
                             "ssn_not_provided",
+                            "us_tax_id_is_itin",
                             "itin_is_expired",
                             "name_last_does_not_match",
                             "name_last_partially_matches",
@@ -24305,6 +24412,7 @@
                             "business_address_incomplete_match",
                             "business_address_does_not_match",
                             "business_address_commercial",
+                            "business_address_commercial_mail_receiving_agency",
                             "business_address_residential",
                             "business_address_deliverable",
                             "business_address_not_deliverable",
@@ -24517,6 +24625,7 @@
                             "ssn_input_is_invalid",
                             "ssn_located_is_invalid",
                             "ssn_not_provided",
+                            "us_tax_id_is_itin",
                             "itin_is_expired",
                             "name_last_does_not_match",
                             "name_last_partially_matches",
@@ -24724,6 +24833,7 @@
                             "business_address_incomplete_match",
                             "business_address_does_not_match",
                             "business_address_commercial",
+                            "business_address_commercial_mail_receiving_agency",
                             "business_address_residential",
                             "business_address_deliverable",
                             "business_address_not_deliverable",
@@ -25665,6 +25775,9 @@
                     "aws_role_name": {
                         "type": "string"
                     },
+                    "org_public_key": {
+                        "type": "string"
+                    },
                     "re_enroll": {
                         "type": "boolean"
                     },
@@ -25675,19 +25788,12 @@
                 "required": [
                     "aws_account_id",
                     "aws_role_name",
+                    "org_public_key",
                     "s3_bucket_name"
                 ]
             },
             "VaultDrEnrollResponse": {
-                "type": "object",
-                "properties": {
-                    "org_private_key": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "org_private_key"
-                ]
+                "type": "object"
             },
             "VaultDrStatus": {
                 "type": "object",

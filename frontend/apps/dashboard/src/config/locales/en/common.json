@@ -1300,6 +1300,7 @@
           "label": "Edit user information",
           "not-allowed": "You're not allowed to edit user information"
         },
+        "open-datadog": "Open in Datadog",
         "summarize": {
           "label": "Summarize with AI",
           "title": "Summarize user identity results",

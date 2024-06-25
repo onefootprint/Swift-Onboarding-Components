@@ -8,8 +8,10 @@ import PermissionGate from 'src/components/permission-gate';
 import useOrgSession from 'src/hooks/use-org-session';
 import styled, { css } from 'styled-components';
 
+import useSession from 'src/hooks/use-session';
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
+import { useOpenDatadog } from '../../hooks/use-open-datadog';
 import AddToListDialog from '../add-to-list-dialog';
 import RequestMoreInfoDialog from '../request-more-info-dialog';
 import SummarizeAiDialog from '../summarize-ai-dialog';
@@ -36,6 +38,10 @@ const Actions = ({ entity }: WithEntityProps) => {
   const shouldShowActionsDropdown = entity.kind === EntityKind.person;
   const { AiPreviewFeaturesEnabledOrgIds } = useFlags();
   const orgIds = new Set<string>(AiPreviewFeaturesEnabledOrgIds);
+  const {
+    data: { user },
+  } = useSession();
+  const { openDatadog, isEnabled: isOpenDatadogEnabled } = useOpenDatadog();
   const { data } = useOrgSession();
   const showAiFeatures = data && orgIds.has(data.id);
 
@@ -93,6 +99,11 @@ const Actions = ({ entity }: WithEntityProps) => {
             <Dropdown.Item onSelect={handleOpenHistoricalDataDialog}>{t('view-historical-data.label')}</Dropdown.Item>
           </PermissionGate>
           {showAiFeatures && <Dropdown.Item onSelect={handleOpenSummarizeDialog}>{t('summarize.label')}</Dropdown.Item>}
+          {user?.isFirmEmployee && (
+            <Dropdown.Item disabled={!isOpenDatadogEnabled} onSelect={openDatadog}>
+              {t('open-datadog')}
+            </Dropdown.Item>
+          )}
         </Dropdown.Content>
       </Dropdown.Root>
       <RequestMoreInfoDialog open={openDialog === ActionDialog.requestMoreInfo} onClose={handleCloseDialog} />

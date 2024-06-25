@@ -16,6 +16,7 @@ impl DbToApi<InsightEvent> for api_wire_types::InsightEvent {
             postal_code,
             time_zone,
             user_agent,
+            session_id,
             ..
         } = e;
 
@@ -32,6 +33,7 @@ impl DbToApi<InsightEvent> for api_wire_types::InsightEvent {
             postal_code,
             time_zone,
             user_agent,
+            session_id,
         }
     }
 }

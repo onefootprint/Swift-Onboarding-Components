@@ -1505,6 +1505,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -2018,6 +2020,9 @@
                             "region_name": {
                                 "type": "string"
                             },
+                            "session_id": {
+                                "type": "string"
+                            },
                             "time_zone": {
                                 "type": "string"
                             },
@@ -2078,6 +2083,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",
@@ -2354,7 +2361,8 @@
                                 "BusinessKycedBeneficialOwners",
                                 "BusinessCorporationType",
                                 "InvestorProfile",
-                                "Card"
+                                "Card",
+                                "UsTaxId"
                             ]
                         }
                     },
@@ -2955,6 +2963,8 @@
                             "id.citizenships",
                             "id.drivers_license_number",
                             "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -3892,6 +3902,8 @@
                                         "id.citizenships",
                                         "id.drivers_license_number",
                                         "id.drivers_license_state",
+                                        "id.itin",
+                                        "id.us_tax_id",
                                         "custom.*",
                                         "business.name",
                                         "business.dba",
@@ -5555,6 +5567,8 @@
                             "id.citizenships",
                             "id.drivers_license_number",
                             "id.drivers_license_state",
+                            "id.itin",
+                            "id.us_tax_id",
                             "custom.*",
                             "business.name",
                             "business.dba",
@@ -6034,6 +6048,8 @@
                                 "id.citizenships",
                                 "id.drivers_license_number",
                                 "id.drivers_license_state",
+                                "id.itin",
+                                "id.us_tax_id",
                                 "custom.*",
                                 "business.name",
                                 "business.dba",

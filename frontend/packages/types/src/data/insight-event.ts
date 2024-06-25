@@ -11,4 +11,5 @@ export type InsightEvent = {
   timeZone: string | null;
   userAgent: string | null;
   timestamp: string;
+  sessionId?: string;
 };
