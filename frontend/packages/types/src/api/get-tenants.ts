@@ -30,6 +30,7 @@ export enum TenantPreviewApi {
   VaultProxy = 'vault_proxy',
   VaultProxyJit = 'vault_proxy_jit',
   OnboardingsList = 'onboardings_list',
+  LegacyOnboardingStatusWebhook = 'legacy_onboarding_status_webhook',
 }
 
 export const TENANT_BILLING_PROFILE_PRODUCTS = [

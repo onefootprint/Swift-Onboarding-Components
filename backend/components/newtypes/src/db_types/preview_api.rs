@@ -44,6 +44,7 @@ pub enum PreviewApi {
     VaultProxy,
     VaultProxyJit,
     OnboardingsList,
+    LegacyOnboardingStatusWebhook,
     /// A catch-all variant here since we'll be scarily manually writing these values in a DB shell
     Other(String),
 }
