@@ -22,9 +22,7 @@ const DataCollection = ({
     optionalData = [],
   },
 }: DataCollectionProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.details.data-collection',
-  });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.details.data-collection' });
   const requiresSSN = mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
   const documentsAsString = docScanForOptionalSsn || mustCollectData.filter(scopes => scopes.includes('document'))?.[0];
@@ -93,6 +91,7 @@ const DataCollection = ({
                   kind: mustCollectData.includes('ssn9') || optionalData.includes('ssn9') ? 'ssn9' : 'ssn4',
                   optional: optionalSSN,
                 },
+                usTaxIdAcceptable: mustCollectData.includes('us_tax_id'),
                 usLegalStatus: mustCollectData.includes('us_legal_status'),
                 ssnDocScanStepUp: !!docScanForOptionalSsn,
               }}

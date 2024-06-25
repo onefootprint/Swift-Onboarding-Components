@@ -92,6 +92,7 @@ const processPlaybook = ({
   }
   const omitBeneficialOwnersKycForKybPlaybook =
     isKyb(kind) && !businessInformation?.[CollectedKybDataOption.beneficialOwners];
+
   if (omitBeneficialOwnersKycForKybPlaybook) {
     return {
       ...getNoBoKycOptions({
@@ -122,6 +123,11 @@ const processPlaybook = ({
     mustCollectData.push(personal.ssnKind);
   } else if (personal.ssnOptional && personal.ssnKind) {
     optionalData.push(personal.ssnKind);
+  }
+
+  // Accept ITIN / US Tax ID
+  if (personal.ssn && personal.ssnKind === CollectedKycDataOption.ssn9 && personal.usTaxIdAcceptable) {
+    mustCollectData.push(CollectedKycDataOption.usTaxId);
   }
 
   // no phone flows handling

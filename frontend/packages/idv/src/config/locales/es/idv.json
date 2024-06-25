@@ -207,6 +207,7 @@
           "address-full": "Dirección",
           "nationality": "Nacionalidad",
           "us-legal-status": "Situación legal en EE.UU.",
+          "us_tax_id": "ITIN",
           "id-card": "Documento de identificación",
           "passport": "Pasaporte",
           "driversLicense": "Licencia de conducir",

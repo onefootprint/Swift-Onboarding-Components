@@ -41,6 +41,7 @@ const IconByCollectedKycDataOption: Record<CollectedKycDataOption, Icon> = {
   [CollectedKycDataOption.phoneNumber]: IcoPhone24,
   [CollectedKycDataOption.ssn4]: IcoFileText24,
   [CollectedKycDataOption.ssn9]: IcoFileText24,
+  [CollectedKycDataOption.usTaxId]: IcoFileText24,
   [CollectedKycDataOption.dob]: IcoCake24,
   [CollectedKycDataOption.address]: IcoBuilding24,
   [CollectedKycDataOption.nationality]: IcoFlag24,
@@ -71,9 +72,7 @@ type KycFieldsProps = {
 };
 
 const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'onboarding.pages.authorize',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'onboarding.pages.authorize' });
 
   const collectedKycDataOptionLabels: Record<CollectedKycDataOption, string> = {
     [CollectedKycDataOption.name]: t('data-labels.name'),
@@ -85,6 +84,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [CollectedKycDataOption.address]: t('data-labels.address-full'),
     [CollectedKycDataOption.nationality]: t('data-labels.nationality'),
     [CollectedKycDataOption.usLegalStatus]: t('data-labels.us-legal-status'),
+    [CollectedKycDataOption.usTaxId]: t('data-labels.us_tax_id'),
   };
   const docTypeLabels: Record<SupportedIdDocTypes, string> = {
     [SupportedIdDocTypes.idCard]: t('data-labels.id-card'),

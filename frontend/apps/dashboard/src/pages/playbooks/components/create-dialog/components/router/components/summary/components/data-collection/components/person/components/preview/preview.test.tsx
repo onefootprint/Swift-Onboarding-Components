@@ -13,6 +13,18 @@ const renderForm = ({ startingValues, kind }: PreviewWithContextProps) => {
 };
 
 describe('<Preview />', () => {
+  it('should show Accept ITIN when it is enabled', () => {
+    renderForm({ startingValues: { personal: { ssn: true, usTaxIdAcceptable: true } } });
+    expect(screen.queryAllByText('SSN')).toBeDefined();
+    expect(screen.queryAllByText('Accept ITIN')).toBeDefined();
+  });
+
+  it('should show Accept ITIN when it is disabled', () => {
+    renderForm({ startingValues: { personal: { ssn: true, usTaxIdAcceptable: false } } });
+    expect(screen.queryAllByText('SSN')).toBeDefined();
+    expect(screen.queryAllByText('Accept ITIN')).toBeDefined();
+  });
+
   it("should show SSN only once when we aren't showing", () => {
     renderForm({ startingValues: { personal: { ssn: false } } });
     expect(screen.getAllByText('SSN').length).toBe(1);
