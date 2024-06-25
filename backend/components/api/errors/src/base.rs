@@ -1,4 +1,5 @@
 use crate::FpError;
+use crate::FpErrorCode;
 use crate::FpErrorTrait;
 use actix_web::http::StatusCode;
 
@@ -135,10 +136,9 @@ impl FpErrorTrait for webauthn_rs_core::error::WebauthnError {
         self.to_string()
     }
 
-    fn code(&self) -> Option<String> {
+    fn code(&self) -> Option<FpErrorCode> {
         match self {
-            // TODO error code enum
-            Self::ParseNOMFailure => Some("parse_nom_failure".into()),
+            Self::ParseNOMFailure => Some(FpErrorCode::ParseNomFailure),
             _ => None,
         }
     }

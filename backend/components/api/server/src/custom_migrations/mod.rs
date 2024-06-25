@@ -6,6 +6,7 @@
 use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
+use api_errors::FpErrorCode;
 use byteorder::BigEndian;
 use byteorder::ReadBytesExt;
 use db::DbError;
@@ -103,7 +104,7 @@ where
     if let Err(e) = result {
         // Swallow errors of kind MigrationDryRun. This allows the server to start up successfully
         // after a dry run
-        if e.code() == Some(api_errors::MIGRATION_DRY_RUN.to_string()) {
+        if e.code() == Some(FpErrorCode::MigrationDryRun) {
             return Err(e);
         }
     }

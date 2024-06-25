@@ -9,6 +9,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpError;
 use crate::FpResult;
 use crate::State;
+use api_errors::FpErrorCode;
 use api_wire_types::DocumentImageError;
 use api_wire_types::DocumentResponse;
 use db::models::document::Document;
@@ -168,7 +169,7 @@ pub async fn handle_incode_request(
 async fn on_incode_hard_error(db_pool: &DbPool, err: FpError, id_doc_id: &DocumentId) -> FpResult<()> {
     tracing::error!(?err, "IncodeMachineError");
     let id_doc_id = id_doc_id.clone();
-    if err.code() == Some(api_errors::INCODE_MACHINE_CONCURRENT_CHANGE.to_string()) {
+    if err.code() == Some(FpErrorCode::IncodeMachineConcurrentChange) {
         tracing::error!(?err, "Not setting hard error");
         return Ok(());
     }

@@ -14,8 +14,9 @@ serde_cbor = { workspace = true }
 actix-web = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }
+serde_with = { workspace = true }
 derive_more = { workspace = true }
-
+itertools = { workspace = true }
 regex = { workspace = true }
 reqwest = { workspace = true }
 reqwest-middleware = { workspace = true }

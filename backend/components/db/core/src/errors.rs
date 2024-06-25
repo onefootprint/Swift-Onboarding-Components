@@ -137,14 +137,6 @@ impl From<diesel::result::Error> for DbError {
 }
 
 impl FpErrorTrait for DbError {
-    fn code(&self) -> Option<String> {
-        None
-    }
-
-    fn context(&self) -> Option<serde_json::Value> {
-        None
-    }
-
     fn message(&self) -> String {
         self.to_string()
     }

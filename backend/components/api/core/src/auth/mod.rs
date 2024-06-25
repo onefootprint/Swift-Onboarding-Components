@@ -1,3 +1,4 @@
+use api_errors::FpErrorCode;
 use api_errors::StatusCode;
 use thiserror::Error;
 
@@ -29,7 +30,7 @@ pub enum AuthError {
         "It looks like you may have provide a secret API key. Please use an onboarding publishable key instead, and keep your secret API keys safe on your backend!"
     )]
     ApiKeyUsedForObConfig,
-    #[error("Missing {0}")]
+    #[error("Missing header: {0}")]
     MissingHeader(String),
     #[error("Invalid {0}")]
     InvalidHeader(String),
@@ -102,10 +103,9 @@ impl api_errors::FpErrorTrait for AuthError {
         self.to_string()
     }
 
-    fn code(&self) -> Option<String> {
+    fn code(&self) -> Option<FpErrorCode> {
         match self {
-            // TODO need to make FpErrorTrait codes an enum to prevent duplicates
-            AuthError::MissingHeader(_) => Some("A101".into()),
+            AuthError::MissingHeader(_) => Some(FpErrorCode::MissingAuthHeader),
             _ => None,
         }
     }

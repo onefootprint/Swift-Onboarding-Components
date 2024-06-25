@@ -21,6 +21,7 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::vendor_clients::VendorClient;
 use crate::State;
 use api_errors::FpError;
+use api_errors::FpErrorCode;
 use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
@@ -148,10 +149,10 @@ impl api_errors::FpErrorTrait for MiddeskError {
         self.to_string()
     }
 
-    fn code(&self) -> Option<String> {
+    fn code(&self) -> Option<FpErrorCode> {
         match self {
             Self::UnexpectedState(MiddeskStatesKind::Complete, _, _) => {
-                Some(api_errors::MIDDESK_ALREADY_COMPLETED.to_string())
+                Some(FpErrorCode::MiddeskAlreadyCompleted)
             }
             _ => None,
         }

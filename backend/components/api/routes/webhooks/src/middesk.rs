@@ -4,6 +4,7 @@ use api_core::auth::AuthError;
 use api_core::decision;
 use api_core::types::ApiResponse;
 use api_core::State;
+use api_errors::FpErrorCode;
 use crypto::hex;
 use futures_util::Future;
 use paperclip::actix::api_v2_operation;
@@ -21,16 +22,13 @@ async fn handle_webhook(
 
     match res {
         Ok(_) => {}
-        Err(err) => {
-            // We are sometimes getting extraneous webhooks for businesses we've already completed
-            // verification for. For these cases we still want to log the error, but we want to
-            // return a 200 response to middesk doesn't keep retrying the webhook
-            if err.code() == Some(api_errors::MIDDESK_ALREADY_COMPLETED.to_string()) {
-                tracing::error!(?err, "Received webhook for completed middesk_request");
-            } else {
-                Err(err)?;
-            }
+        // We are sometimes getting extraneous webhooks for businesses we've already completed
+        // verification for. For these cases we still want to log the error, but we want to
+        // return a 200 response to middesk doesn't keep retrying the webhook
+        Err(err) if err.code() == Some(FpErrorCode::MiddeskAlreadyCompleted) => {
+            tracing::error!(?err, "Received webhook for completed middesk_request")
         }
+        Err(err) => Err(err)?,
     }
 
     Ok(api_wire_types::Empty)

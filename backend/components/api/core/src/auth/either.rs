@@ -1,17 +1,22 @@
 use super::tenant::GetFirmEmployee;
 use super::tenant::InvalidateAuth;
+use super::AuthError;
 use crate::ApiError;
 use crate::FpResult;
 use crate::State;
 use actix_web::FromRequest;
+use api_errors::FpErrorCode;
 use async_trait::async_trait;
 use futures_util::Future;
+use itertools::chain;
+use itertools::Itertools;
 use paperclip::actix::OperationModifier;
 use paperclip::v2::models::DefaultOperationRaw;
 use paperclip::v2::models::DefaultSchemaRaw;
 use paperclip::v2::models::SecurityScheme;
 use paperclip::v2::schema::Apiv2Schema;
 use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::pin::Pin;
 
 #[derive(Debug, Clone)]
@@ -43,35 +48,38 @@ where
 
                 // The goal here is to produce a better error message
                 // as it's possible there's a real auth error or some headers are missing
-                (Err(e1), Err(e2)) => {
-                    let e1_code = e1.code();
-                    let e1_code = e1_code.as_deref();
-                    let e2_code = e2.code();
-                    let e2_code = e2_code.as_deref();
-                    match (e1_code, e2_code) {
-                        // If both headers are missing
-                        (Some("E123"), Some("E123")) => {
-                            if e1.context() == e2.context() {
-                                // Both headers have the same name.
-                                Err(e1)
-                            } else {
-                                // TODO merge them
-                                Err(e1)
-                            }
-                        }
-
-                        // If only one error is from a missing header, choose the opposite error
-                        (Some("E123"), _) => Err(e2),
-                        (_, Some("E123")) => Err(e1),
-
-                        // Both are non-missing header errors
-                        (_, _) => {
-                            tracing::warn!(error1=?e1, error2=?e2, "Got dual error in Either FromRequest");
-                            // arbitrarily choose the first one
+                (Err(e1), Err(e2)) => match (e1.code(), e2.code()) {
+                    // If both headers are missing
+                    (Some(FpErrorCode::MissingAuthHeader), Some(FpErrorCode::MissingAuthHeader)) => {
+                        if e1.context() == e2.context() {
+                            // Both headers have the same name.
                             Err(e1)
+                        } else {
+                            // Headers have different names, merge them
+                            let get_header_value = |e: ApiError| {
+                                e.context()
+                                    .and_then(|c| serde_json::from_value::<HashMap<String, String>>(c).ok())
+                                    .map(|m| m.into_values().collect_vec())
+                                    .unwrap_or_default()
+                            };
+                            let missing_headers = chain!(get_header_value(e1), get_header_value(e2))
+                                .unique()
+                                .join(" or ");
+                            Err(AuthError::MissingHeader(missing_headers).into())
                         }
                     }
-                }
+
+                    // If only one error is from a missing header, choose the opposite error
+                    (Some(FpErrorCode::MissingAuthHeader), _) => Err(e2),
+                    (_, Some(FpErrorCode::MissingAuthHeader)) => Err(e1),
+
+                    // Both are non-missing header errors
+                    (_, _) => {
+                        tracing::warn!(error1=?e1, error2=?e2, "Got dual error in Either FromRequest");
+                        // arbitrarily choose the first one
+                        Err(e1)
+                    }
+                },
             }
         })
     }

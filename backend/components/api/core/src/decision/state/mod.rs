@@ -1,6 +1,7 @@
 use self::kyb::KybState;
 use crate::FpResult;
 use crate::State;
+use api_errors::FpErrorCode;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
@@ -52,10 +53,10 @@ impl api_errors::FpErrorTrait for StateError {
         self.to_string()
     }
 
-    fn code(&self) -> Option<String> {
+    fn code(&self) -> Option<FpErrorCode> {
         match self {
             StateError::IncodeMachineConcurrentStateChange(_, _) => {
-                Some(api_errors::INCODE_MACHINE_CONCURRENT_CHANGE.to_owned())
+                Some(FpErrorCode::IncodeMachineConcurrentChange)
             }
             _ => None,
         }

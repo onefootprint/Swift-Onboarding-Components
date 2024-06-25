@@ -120,7 +120,7 @@ where
                 .await
                 .map_err(|_| AssertionError("Cannot extract root span"))?;
 
-            let allowed_headers = T::header_names().join(", "); // Temporary
+            let allowed_headers = T::header_names().join(" or "); // Temporary
             let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()))?;
             let auth_token = SessionAuthToken::from(auth_token);
 

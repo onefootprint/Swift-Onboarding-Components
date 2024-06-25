@@ -1,4 +1,5 @@
 use api_errors::FpError;
+use api_errors::FpErrorCode;
 use http::StatusCode;
 use newtypes::Base64Data;
 use newtypes::Uuid;
@@ -40,11 +41,11 @@ impl<T: Into<FpError>> From<T> for ApiError {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Clone, serde::Serialize)]
 pub struct SerializedApiResponse {
     pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub code: Option<String>,
+    pub code: Option<FpErrorCode>,
     /// Any freeform JSON context to give more information on the error
     #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<serde_json::Value>,

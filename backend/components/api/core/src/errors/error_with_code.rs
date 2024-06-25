@@ -1,82 +1,55 @@
+use api_errors::FpErrorCode;
 use http::StatusCode;
 use newtypes::SessionAuthToken;
 use serde_json::json;
 use serde_json::Value;
-use strum_macros;
 
-#[derive(Debug, strum_macros::EnumDiscriminants, thiserror::Error)]
-#[strum_discriminants(name(ErrorWithCodeKind))]
-#[strum_discriminants(derive(strum_macros::Display, strum_macros::EnumIter))]
+#[derive(Debug, thiserror::Error)]
 pub enum ErrorWithCode {
-    #[strum_discriminants(strum(serialize = "E101"))]
     #[error("Cannot transition status backwards")]
     InvalidStatusTransition,
-    #[strum_discriminants(strum(serialize = "E102"))]
     #[error("Incorrect PIN code")]
     IncorrectPin,
-    #[strum_discriminants(strum(serialize = "E103"))]
     #[error("Challenge has timed out. Please try again")]
     ChallengeExpired,
-    #[strum_discriminants(strum(serialize = "E104"))]
     #[error("Please wait a few more seconds")]
     RateLimited(i64),
-    #[strum_discriminants(strum(serialize = "E105"))]
     #[error("Cannot initiate a challenge of requested kind")]
     UnsupportedChallengeKind(String),
-    #[strum_discriminants(strum(serialize = "E106"))]
     #[error("Cannot register passkey")]
     CannotRegisterPasskey,
-    #[strum_discriminants(strum(serialize = "E107"))]
     #[error("Login challenge initiated for non-existent user vault")]
     LoginChallengeUserNotFound,
-    #[strum_discriminants(strum(serialize = "E108"))]
     #[error("Provide one user identifier to initiate a challenge")]
     OnlyOneIdentifier,
-    #[strum_discriminants(strum(serialize = "E109"))]
     #[error("Identity document is not pending upload")]
     DocumentNotPending,
-    #[strum_discriminants(strum(serialize = "E110"))]
     #[error("Invalid file upload: body missing")]
     InvalidFileUploadMissing,
-    #[strum_discriminants(strum(serialize = "E111"))]
     #[error("Missing content type (mime)")]
     MissingMimeType,
-    #[strum_discriminants(strum(serialize = "E112"))]
     #[error("Invalid file type")]
     InvalidMimeType(String),
-    #[strum_discriminants(strum(serialize = "E113"))]
     #[error("Invalid file upload, try another file")]
     MultipartError,
-    #[strum_discriminants(strum(serialize = "E114"))]
     #[error("Image too large")]
     FileTooLarge(usize),
-    #[strum_discriminants(strum(serialize = "E115"))]
     #[error("Invalid content length")]
     InvalidContentLength,
-    #[strum_discriminants(strum(serialize = "E116"))]
     #[error("Missing filename")]
     MissingFilename,
-    #[strum_discriminants(strum(serialize = "E117"))]
     #[error("Session does not exist")]
     NoSessionFound,
-    #[strum_discriminants(strum(serialize = "E118"))]
     #[error("Session is expired")]
     SessionExpired,
-    #[strum_discriminants(strum(serialize = "E119"))]
     #[error("Session invalid")]
     CouldNotParseSession,
-    #[strum_discriminants(strum(serialize = "E120"))]
     #[error("Please log into your existing account")]
     ExistingVault(SessionAuthToken),
-    #[strum_discriminants(strum(serialize = "E121"))]
     #[error("File upload exceeded time limit")]
     FileUploadTimeout,
-    #[strum_discriminants(strum(serialize = "E122"))]
     #[error("Image too small")]
     FileTooSmall(usize),
-    #[strum_discriminants(strum(serialize = "E123"))]
-    #[error("Missing header {0}")]
-    MissingAuthHeader(String),
 }
 
 impl api_errors::FpErrorTrait for ErrorWithCode {
@@ -104,12 +77,35 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
             Self::CouldNotParseSession => StatusCode::UNAUTHORIZED,
             Self::ExistingVault(_) => StatusCode::BAD_REQUEST,
             Self::FileUploadTimeout => StatusCode::REQUEST_TIMEOUT,
-            Self::MissingAuthHeader(_) => StatusCode::UNAUTHORIZED,
         }
     }
 
-    fn code(&self) -> Option<String> {
-        Some(ErrorWithCodeKind::from(self).to_string())
+    fn code(&self) -> Option<FpErrorCode> {
+        let code = match self {
+            Self::InvalidStatusTransition => FpErrorCode::InvalidStatusTransition,
+            Self::IncorrectPin => FpErrorCode::IncorrectPin,
+            Self::ChallengeExpired => FpErrorCode::ChallengeExpired,
+            Self::RateLimited(_) => FpErrorCode::RateLimited,
+            Self::UnsupportedChallengeKind(_) => FpErrorCode::UnsupportedChallengeKind,
+            Self::CannotRegisterPasskey => FpErrorCode::CannotRegisterPasskey,
+            Self::LoginChallengeUserNotFound => FpErrorCode::LoginChallengeUserNotFound,
+            Self::OnlyOneIdentifier => FpErrorCode::OnlyOneIdentifier,
+            Self::DocumentNotPending => FpErrorCode::DocumentNotPending,
+            Self::InvalidFileUploadMissing => FpErrorCode::InvalidFileUploadMissing,
+            Self::MissingMimeType => FpErrorCode::MissingMimeType,
+            Self::InvalidMimeType(_) => FpErrorCode::InvalidMimeType,
+            Self::MultipartError => FpErrorCode::MultipartError,
+            Self::FileTooLarge(_) => FpErrorCode::FileTooLarge,
+            Self::InvalidContentLength => FpErrorCode::InvalidContentLength,
+            Self::MissingFilename => FpErrorCode::MissingFilename,
+            Self::NoSessionFound => FpErrorCode::NoSessionFound,
+            Self::SessionExpired => FpErrorCode::SessionExpired,
+            Self::CouldNotParseSession => FpErrorCode::CouldNotParseSession,
+            Self::ExistingVault(_) => FpErrorCode::ExistingVault,
+            Self::FileUploadTimeout => FpErrorCode::FileUploadTimeout,
+            Self::FileTooSmall(_) => FpErrorCode::FileTooSmall,
+        };
+        Some(code)
     }
 
     fn context(&self) -> Option<Value> {
@@ -119,7 +115,6 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
             Self::InvalidMimeType(file_type) => json!({ "file_type": file_type }),
             Self::FileTooLarge(max_size) => json!({ "max_size": max_size }),
             Self::ExistingVault(token) => json!({ "token": token }),
-            Self::MissingAuthHeader(h) => json!({"header": h}),
             _ => return None,
         };
         Some(context)
@@ -146,20 +141,5 @@ impl api_errors::FpErrorTrait for ErrorWithCode {
             }
             _ => {}
         };
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::errors::error_with_code::ErrorWithCodeKind;
-    use itertools::Itertools;
-    use strum::IntoEnumIterator;
-
-    #[test]
-    fn test_unique_error_codes() {
-        assert!(ErrorWithCodeKind::iter().all(|e| !e.to_string().is_empty()));
-        let codes = ErrorWithCodeKind::iter().map(|e| e.to_string()).unique().count();
-        let total = ErrorWithCodeKind::iter().count();
-        assert_eq!(codes, total, "Duplicate or missing error codes");
     }
 }

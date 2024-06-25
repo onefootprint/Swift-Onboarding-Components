@@ -2,6 +2,7 @@ use crate::auth::user::CheckedUserAuthContext;
 use crate::auth::user::UserAuth;
 use crate::config::Config;
 use crate::FpResult;
+use api_errors::FpErrorCode;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::user_timeline::UserTimeline;
 use db::models::webauthn_credential::NewWebauthnCredential;
@@ -123,14 +124,12 @@ impl WebauthnConfig {
         // Validate the challenge response
         let cred = match self.register_credential(&reg, &reg_state, None) {
             Ok(cred) => cred,
-            Err(err) => match err.code() {
-                // temporary addition to detect some webauthn issues on windows devices
-                Some(code) if code == *"parse_nom_failure" => {
-                    tracing::info!(challenge_response=%challenge_response, "webauthn parse NOM failure");
-                    return Err(err);
-                }
-                _ => return Err(err),
-            },
+            // temporary addition to detect some webauthn issues on windows devices
+            Err(err) if err.code() == Some(FpErrorCode::ParseNomFailure) => {
+                tracing::info!(challenge_response=%challenge_response, "webauthn parse NOM failure");
+                return Err(err);
+            }
+            Err(err) => return Err(err),
         };
 
         // if the attestation format is android or apple, verify the attestation chain

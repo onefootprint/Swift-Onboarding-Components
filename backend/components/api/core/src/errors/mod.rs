@@ -1,6 +1,7 @@
 use actix_web::error::QueryPayloadError;
 use actix_web::error::UrlencodedError;
 use actix_web::http::StatusCode;
+use api_errors::FpErrorCode;
 use api_errors::FpErrorTrait;
 use newtypes::output::Csv;
 use newtypes::ContactInfoKind;
@@ -93,9 +94,9 @@ impl FpErrorTrait for ApiCoreError {
         self.to_string()
     }
 
-    fn code(&self) -> Option<String> {
+    fn code(&self) -> Option<FpErrorCode> {
         match self {
-            Self::MigrationDryRun => Some(api_errors::MIGRATION_DRY_RUN.to_string()),
+            Self::MigrationDryRun => Some(FpErrorCode::MigrationDryRun),
             _ => None,
         }
     }

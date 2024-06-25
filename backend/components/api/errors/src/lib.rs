@@ -3,9 +3,9 @@ pub use actix_web::http::StatusCode;
 pub trait FpErrorTrait: std::fmt::Debug + std::fmt::Display + std::error::Error + Send {
     /// The HTTP status code representing this error
     fn status_code(&self) -> StatusCode;
-    // TODO maybe one day we'll make this return an enum to help guarantee that errors have unique codes
-    /// For errors that clients can programatically respond to, a representative string
-    fn code(&self) -> Option<String> {
+    /// For errors that clients can programatically respond to, a unique string to identify the
+    /// error
+    fn code(&self) -> Option<FpErrorCode> {
         None
     }
     /// For errors that clients can programatically respond to, any machine-readable context
@@ -53,15 +53,14 @@ impl std::error::Error for FpError {
 }
 
 mod base;
+mod code;
+
 pub use base::AssertionError;
 pub use base::ValidationError;
+pub use code::FpErrorCode;
 
 impl From<std::convert::Infallible> for FpError {
     fn from(_: std::convert::Infallible) -> Self {
         panic!("impossible condition convert Infallible to ApiError")
     }
 }
-
-pub const INCODE_MACHINE_CONCURRENT_CHANGE: &str = "incode_machine_concurrent_change";
-pub const MIDDESK_ALREADY_COMPLETED: &str = "middesk_already_completed";
-pub const MIGRATION_DRY_RUN: &str = "migration_dry_run";

@@ -2,6 +2,7 @@ use self::tenant_vendor_control::TenantVendorControl;
 use crate::errors::AssertionError;
 use crate::FpResult;
 use api_errors::FpError;
+use api_errors::FpErrorCode;
 use db::models::document::Document;
 use db::models::document_request::DocumentRequest;
 use db::models::incode_verification_session::IncodeVerificationSession;
@@ -56,7 +57,7 @@ impl api_errors::FpErrorTrait for VendorAPIError {
         self.error.status_code()
     }
 
-    fn code(&self) -> Option<String> {
+    fn code(&self) -> Option<FpErrorCode> {
         self.error.code()
     }
 

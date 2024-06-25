@@ -6,6 +6,7 @@ pub use self::id::*;
 pub use self::phone_number::*;
 
 pub mod idv;
+use api_errors::FpErrorCode;
 use api_errors::FpErrorTrait;
 pub use idv::*;
 
@@ -156,10 +157,9 @@ impl From<DataValidationError> for Error {
 }
 
 impl FpErrorTrait for Error {
-    fn code(&self) -> Option<String> {
+    fn code(&self) -> Option<FpErrorCode> {
         match self {
-            // TODO Use hardcoded error code enum so we can guarantee no duplicates
-            Self::DataValidationError(_) => Some("T120".into()),
+            Self::DataValidationError(_) => Some(FpErrorCode::VaultDataValidationError),
             _ => None,
         }
     }
