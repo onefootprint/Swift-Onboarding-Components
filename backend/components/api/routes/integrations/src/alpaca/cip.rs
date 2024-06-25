@@ -219,6 +219,7 @@ pub async fn post_inner(
 }
 
 /// create a CIP request from the decision results
+#[tracing::instrument(skip(state, default_approver))]
 pub(crate) async fn create_cip_request(
     state: &State,
     default_approver: PiiString,
