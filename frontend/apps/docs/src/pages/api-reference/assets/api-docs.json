@@ -61,7 +61,6 @@
                                             }
                                         },
                                         "meta": {
-                                            "description": "Metadata required for a cursor-paginated response.",
                                             "type": "object",
                                             "properties": {
                                                 "count": {
@@ -528,7 +527,6 @@
                                             }
                                         },
                                         "meta": {
-                                            "description": "Metadata required for a cursor-paginated response.",
                                             "type": "object",
                                             "properties": {
                                                 "count": {
@@ -659,7 +657,6 @@
                                             }
                                         },
                                         "meta": {
-                                            "description": "Metadata required for a cursor-paginated response.",
                                             "type": "object",
                                             "properties": {
                                                 "count": {

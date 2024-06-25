@@ -141,11 +141,9 @@ impl<A> FromIterator<A> for ListResponse<A> {
     }
 }
 
-/// return string results
 pub type StringResponse = ApiResponse<String>;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-/// Metadata required for a cursor-paginated response.
 pub struct CursorPaginatedResponseMeta<C> {
     // TODO need a reasonable openapi example. This doesn't work for every C
     #[openapi(example = "1234")]
