@@ -109,10 +109,9 @@ struct NewScopedVault {
     status: OnboardingStatus,
 }
 
-#[derive(Debug, Clone, Default, AsChangeset)]
+#[derive(Debug, Clone, Default, AsChangeset, Eq, PartialEq)]
 #[diesel(table_name = scoped_vault)]
 pub struct ScopedVaultUpdate {
-    pub status: Option<OnboardingStatus>,
     pub is_active: Option<bool>,
     pub last_activity_at: Option<DateTime<Utc>>,
 }
@@ -173,6 +172,12 @@ pub type IsNew = bool;
 pub struct NewScopedVaultArgs {
     pub is_active: bool,
     pub status: OnboardingStatus,
+}
+
+#[derive(Debug)]
+pub struct SvStatusDelta {
+    pub old_status: OnboardingStatus,
+    pub new_status: OnboardingStatus,
 }
 
 impl ScopedVault {
@@ -486,12 +491,7 @@ impl ScopedVault {
 
     #[tracing::instrument("ScopedVault::update", skip_all)]
     pub fn update(conn: &mut TxnPgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<Self> {
-        let ScopedVaultUpdate {
-            status,
-            is_active,
-            last_activity_at,
-        } = &update;
-        if status.is_none() && is_active.is_none() && last_activity_at.is_none() {
+        if update == Default::default() {
             // No-op if the update is empty
             let existing_sv = scoped_vault::table
                 .filter(scoped_vault::id.eq(id))
@@ -504,6 +504,38 @@ impl ScopedVault {
             .set(update)
             .get_result(conn.conn())?;
         Ok(updated_sv)
+    }
+
+    #[tracing::instrument("ScopedVault::update_status_if_valid", skip_all)]
+    pub fn update_status_if_valid(
+        conn: &mut TxnPgConn,
+        id: &ScopedVaultId,
+        new_status: OnboardingStatus,
+    ) -> DbResult<SvStatusDelta> {
+        // Must lock to make sure scoped vault status isn't stale
+        let sv = ScopedVault::lock(conn, id)?.into_inner();
+        let can_transition = new_status.can_transition_from(&sv.status);
+        if !can_transition {
+            let result = SvStatusDelta {
+                old_status: sv.status,
+                new_status: sv.status,
+            };
+            return Ok(result);
+        }
+
+        // Only set to non-decision status if the current status is a non-decision status.
+        // This has the effect of never letting the scoped vault status go from a decision to a
+        // non-decision status
+        diesel::update(scoped_vault::table)
+            .filter(scoped_vault::id.eq(id))
+            .set(scoped_vault::status.eq(new_status))
+            .execute(conn.conn())?;
+
+        let result = SvStatusDelta {
+            old_status: sv.status,
+            new_status,
+        };
+        Ok(result)
     }
 
     #[tracing::instrument("ScopedVault::deactivate", skip_all)]

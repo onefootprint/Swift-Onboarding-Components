@@ -324,13 +324,7 @@ impl Workflow {
         let wf = Self::create(conn, args)?;
 
         // In locked transaction, update scoped vault status to Incomplete if we don't yet have a decision
-        if OnboardingStatus::Incomplete.can_transition_from(&sv.status) {
-            let update = ScopedVaultUpdate {
-                status: Some(OnboardingStatus::Incomplete),
-                ..ScopedVaultUpdate::default()
-            };
-            ScopedVault::update(conn, &sv.id, update)?;
-        }
+        ScopedVault::update_status_if_valid(conn, &sv.id, OnboardingStatus::Incomplete)?;
 
         // Create a timeline event showing the onboarding started
         let info = WorkflowStartedInfo {
@@ -586,8 +580,6 @@ impl Workflow {
     #[tracing::instrument("Workflow::update", skip_all)]
     pub fn update(wf: Locked<Self>, conn: &mut TxnPgConn, update: WorkflowUpdate) -> DbResult<Self> {
         let WorkflowUpdate { update, new_decision } = update;
-        let requires_manual_review_before_update =
-            !ManualReview::get_active(conn, &wf.scoped_vault_id)?.is_empty();
         if update.decision_made_at.is_some() {
             // We are making the first decision for this workflow. Create the billing event(s)
             use newtypes::EnhancedAmlOption;
@@ -627,6 +619,9 @@ impl Workflow {
             wf.into_inner()
         };
 
+        // Snapshot manual review status BEFORE updating MR
+        let requires_manual_review_before_update =
+            !ManualReview::get_active(conn, &wf.scoped_vault_id)?.is_empty();
         // Make the new OnboardingDecision if any
         if let Some(decision) = new_decision {
             let manual_reviews = decision.manual_reviews.clone();
@@ -640,12 +635,11 @@ impl Workflow {
             let (obc, tenant) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
             // Must lock to make sure scoped vault status isn't stale
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?.into_inner();
-            // !! it's important that code in the same txn that is going to write a review does it before this
-            // update call
             let requires_manual_review_after_update = !ManualReview::get_active(conn, &sv.id)?.is_empty();
             // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics
             // currently really mean we have to fire it when we make a decision for the first time
-            // or in a redo flow If the current Workflow status is not pass/fail but the new
+            // or in a redo flow.
+            // If the current Workflow status is not pass/fail but the new
             // status is, fire OnboardingCompleted (ie anytime a Workflow completes)
             if !old_status.is_terminal() && new_status.is_terminal() {
                 let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
@@ -661,25 +655,12 @@ impl Workflow {
                 Task::create(conn, Utc::now(), task_data)?;
             };
 
-            let can_transition = new_status.can_transition_from(&sv.status);
-            let new_status = if sv.status != new_status && can_transition {
-                // Only set to non-decision status if the current status is a non-decision status
-                // This has the effect of never letting the scoped vault status go from a decision to a
-                // non-decision status
-                let update = ScopedVaultUpdate {
-                    status: Some(new_status),
-                    ..Default::default()
-                };
-                let updated_sv = ScopedVault::update(conn, &sv.id, update)?;
-                updated_sv.status
-            } else {
-                sv.status
-            };
+            let sv_delta = ScopedVault::update_status_if_valid(conn, &sv.id, new_status)?;
 
             // If this is a legacy tenant that can still see the old onboarding status webhooks, send out the
             // legacy webhook event
-            let old_composite_status = (sv.status, requires_manual_review_before_update);
-            let new_composite_status = (new_status, requires_manual_review_after_update);
+            let old_composite_status = (sv_delta.old_status, requires_manual_review_before_update);
+            let new_composite_status = (sv_delta.new_status, requires_manual_review_after_update);
             let tenant_has_legacy_webhook = tenant
                 .allowed_preview_apis
                 .contains(&PreviewApi::LegacyOnboardingStatusWebhook);
@@ -689,7 +670,7 @@ impl Workflow {
                 let webhook_event = WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {
                     fp_id: sv.fp_id.clone(),
                     timestamp: Utc::now(),
-                    new_status,
+                    new_status: sv_delta.new_status,
                     requires_manual_review: requires_manual_review_after_update,
                     is_live: sv.is_live,
                 });

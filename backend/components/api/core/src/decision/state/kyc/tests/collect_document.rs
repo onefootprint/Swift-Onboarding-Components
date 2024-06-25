@@ -33,6 +33,7 @@ use db::models::workflow::Workflow;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::MockFFClient;
+use db::DbResult;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::test_state_case;
@@ -298,7 +299,7 @@ async fn collect_ad_hoc_document(
     let obc_id = prior_wf.ob_configuration_id.clone();
     let wf = state
         .db_pool
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> DbResult<_> {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id.clone(),
                 config: DocumentConfig {
