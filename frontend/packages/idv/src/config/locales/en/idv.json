@@ -207,7 +207,6 @@
           "address-full": "Address",
           "nationality": "Nationality",
           "us-legal-status": "U.S. Legal Status",
-          "us_tax_id": "ITIN",
           "id-card": "ID card",
           "passport": "Passport",
           "driversLicense": "Driver's license",

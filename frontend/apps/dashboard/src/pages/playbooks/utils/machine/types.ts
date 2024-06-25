@@ -175,7 +175,6 @@ export type Personal = {
   idDocFirst?: boolean;
   selfie?: boolean;
   ssnOptional?: boolean;
-  usTaxIdAcceptable?: boolean;
   ssnDocScanStepUp?: boolean;
 };
 

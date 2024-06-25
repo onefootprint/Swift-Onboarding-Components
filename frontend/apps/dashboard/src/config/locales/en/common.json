@@ -2923,8 +2923,6 @@
             "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
           },
           "person": {
-            "accept-itin-label": "Accept ITIN",
-            "accept-itin-hint": "Users may use either their SSN or ITIN as part of the verification process.",
             "title": {
               "kyb": {
                 "main": "Beneficial owners",
@@ -3187,8 +3185,7 @@
         "business-type": "Legal entity type",
         "business-website": "Business website",
         "business-phone-number": "Business phone",
-        "country-specific-docs": "Country-specific documents",
-        "us-tax-id-acceptable": "Accept ITIN"
+        "country-specific-docs": "Country-specific documents"
       }
     },
     "api-keys": {

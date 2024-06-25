@@ -17,22 +17,12 @@ describe('<Editing />', () => {
     renderEditing({});
     expect(screen.getByRole('radio', { name: 'Full' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Last 4' })).toBeInTheDocument();
-    expect(screen.getByRole('checkbox', { name: 'Accept ITIN' })).toBeInTheDocument();
     expect(
-      screen.getByRole('checkbox', { name: 'Allow users without an SSN to proceed with the verification' }),
+      screen.getByRole('checkbox', {
+        name: 'Allow users without an SSN to proceed with the verification',
+      }),
     ).toBeInTheDocument();
     expect(screen.getByText('They will need to be manually reviewed by you.')).toBeInTheDocument();
-  });
-
-  it('should remove "Allow users without an SSN to proceed with the verification"', async () => {
-    renderEditing({});
-
-    expect(screen.queryByLabelText('Allow users without an SSN to proceed with the verification')).not.toBeNull();
-
-    const acceptITIN = screen.getByLabelText('Accept ITIN');
-    await userEvent.click(acceptITIN);
-
-    expect(screen.queryByLabelText('Allow users without an SSN to proceed with the verification')).toBeNull();
   });
 
   it('should disable save button if ID doc not selected', async () => {

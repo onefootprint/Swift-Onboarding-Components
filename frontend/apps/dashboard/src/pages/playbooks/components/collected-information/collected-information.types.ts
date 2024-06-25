@@ -16,7 +16,6 @@ export type Option = Partial<{
     kind?: string;
     optional?: boolean;
   };
-  usTaxIdAcceptable?: boolean;
   usLegalStatus: boolean;
   countriesRestrictions: CountryRecord[];
   internationalCountryRestrictions: CountryCode[] | null;

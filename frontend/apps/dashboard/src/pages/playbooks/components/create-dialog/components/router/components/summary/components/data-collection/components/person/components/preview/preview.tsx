@@ -9,7 +9,6 @@ import CollectedInformation from '@/playbooks/components/collected-information';
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
 import { OnboardingTemplate, PlaybookKind } from '@/playbooks/utils/machine/types';
 
-import { isKyb } from 'src/pages/playbooks/utils/kind';
 import DocEditor from './components/doc-editor';
 import PreviewHeader from './components/doc-editor/preview-header';
 import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
@@ -20,10 +19,13 @@ type PreviewProps = {
 };
 
 const Preview = ({ onStartEditing, meta }: PreviewProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.dialog.summary.person' });
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary.person',
+  });
   const { getValues, register } = useFormContext();
   const values: Personal = getValues('personal');
   const collectBO = getValues(`businessInformation.${CollectedKybDataOption.beneficialOwners}`);
+  const isKyb = meta.kind === PlaybookKind.Kyb;
   const isIdDocFirstFlowEnabled = useIdDocFirstFlowEnabled(meta.kind === PlaybookKind.Kyc);
   const showNonUsResidentsEmptyState =
     meta.residency?.allowInternationalResidents === false || meta.kind === PlaybookKind.Kyb;
@@ -36,11 +38,15 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   const canEdit = !internationalOnly && !isFixedPlaybook;
   const allowUsTerritoryResidents = meta.residency?.allowUsTerritories;
 
-  if (isKyb(meta.kind) && !collectBO) {
+  if (isKyb && !collectBO) {
     return (
       <Container>
         <PreviewHeader meta={meta} canEdit={canEdit} onStartEditing={onStartEditing} />
-        <CollectedInformation options={{ businessBeneficialOwners: !!collectBO }} />
+        <CollectedInformation
+          options={{
+            businessBeneficialOwners: !!collectBO,
+          }}
+        />
       </Container>
     );
   }
@@ -49,7 +55,13 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     <Container>
       <PreviewHeader meta={meta} canEdit={canEdit} onStartEditing={onStartEditing} />
       <FormElementsContainer>
-        {isKyb(meta.kind) && <CollectedInformation options={{ businessBeneficialOwners: !!collectBO }} />}
+        {isKyb && (
+          <CollectedInformation
+            options={{
+              businessBeneficialOwners: !!collectBO,
+            }}
+          />
+        )}
         <CollectedInformation
           title={t('basic-information.title')}
           options={{
@@ -71,7 +83,6 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
                 kind: values.ssnKind,
                 optional: values.ssnOptional,
               },
-              usTaxIdAcceptable: values.usTaxIdAcceptable,
               usLegalStatus: values.us_legal_status,
               ...(values.ssnDocScanStepUp ? { ssnDocScanStepUp: values.ssnDocScanStepUp } : {}),
             }}

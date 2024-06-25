@@ -139,7 +139,6 @@ const validateUserData = (
     [IdDI.lastName]: (value: string) => isNameValid(value),
     [IdDI.dob]: isDobValid,
     [IdDI.ssn9]: isSsn9Valid,
-    [IdDI.usTaxId]: () => true, // TODO: The validation will be added in another PR, a bifrost PR is in progress
     [IdDI.ssn4]: isSsn4Valid,
     [IdDI.addressLine1]: isAddressLine1Valid,
     [IdDI.addressLine2]: isStringValid,
