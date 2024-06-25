@@ -89,7 +89,6 @@ async fn patch(
 
     let update_tenant = UpdateTenant {
         name,
-        logo_url: None,
         website_url,
         company_size,
         privacy_policy_url,
@@ -97,7 +96,7 @@ async fn patch(
         support_email,
         support_phone,
         support_website,
-        stripe_customer_id: None,
+        ..Default::default()
     };
     let updated_tenant = state
         .db_pool

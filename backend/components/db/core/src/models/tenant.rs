@@ -32,6 +32,7 @@ use newtypes::EncryptedVaultPrivateKey;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
 use newtypes::StripeCustomerId;
+use newtypes::SvixAppId;
 use newtypes::TenantId;
 use newtypes::TenantKind;
 use newtypes::TenantRoleKind;
@@ -90,6 +91,8 @@ pub struct Tenant {
     pub support_website: Option<String>,
     /// The tenant that this tenant belongs to
     pub super_tenant_id: Option<TenantId>,
+    pub svix_app_id_sandbox: Option<SvixAppId>,
+    pub svix_app_id_live: Option<SvixAppId>,
 }
 
 pub struct PrivateTenantFilters {
@@ -314,7 +317,7 @@ impl Tenant {
     }
 
     #[tracing::instrument("Tenant::update", skip_all)]
-    pub fn update(conn: &mut PgConn, id: &TenantId, update_tenant: UpdateTenant) -> DbResult<Self> {
+    pub fn update<'a>(conn: &mut PgConn, id: &TenantId, update_tenant: UpdateTenant<'a>) -> DbResult<Self> {
         let result = diesel::update(tenant::table)
             .filter(tenant::id.eq(id))
             .set(update_tenant)
@@ -387,6 +390,20 @@ impl Tenant {
             .get_results::<Self>(conn)?;
         Ok(results)
     }
+
+    pub fn set_svix_app_id(
+        conn: &mut PgConn,
+        id: &TenantId,
+        is_live: bool,
+        app_id: &SvixAppId,
+    ) -> DbResult<Self> {
+        let update = UpdateTenant {
+            svix_app_id_sandbox: (!is_live).then_some(app_id),
+            svix_app_id_live: (is_live).then_some(app_id),
+            ..Default::default()
+        };
+        Self::update(conn, id, update)
+    }
 }
 
 impl WorkosAuthIdentity for Tenant {
@@ -408,7 +425,7 @@ impl From<&Tenant> for TenantKind {
 
 #[derive(Debug, Clone, AsChangeset, Default, PartialEq)]
 #[diesel(table_name = tenant)]
-pub struct UpdateTenant {
+pub struct UpdateTenant<'a> {
     pub name: Option<String>,
     pub logo_url: Option<String>,
     pub website_url: Option<String>,
@@ -419,6 +436,8 @@ pub struct UpdateTenant {
     pub support_email: Option<Option<String>>,
     pub support_phone: Option<Option<String>>,
     pub support_website: Option<Option<String>>,
+    pub svix_app_id_sandbox: Option<&'a SvixAppId>,
+    pub svix_app_id_live: Option<&'a SvixAppId>,
 }
 
 #[derive(Debug, Clone, AsChangeset, Default, PartialEq)]

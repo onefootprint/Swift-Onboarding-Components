@@ -1262,6 +1262,8 @@ diesel::table! {
         support_phone -> Nullable<Text>,
         support_website -> Nullable<Text>,
         super_tenant_id -> Nullable<Text>,
+        svix_app_id_sandbox -> Nullable<Text>,
+        svix_app_id_live -> Nullable<Text>,
     }
 }
 

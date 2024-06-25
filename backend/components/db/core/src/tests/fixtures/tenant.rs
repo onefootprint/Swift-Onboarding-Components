@@ -79,5 +79,7 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         support_phone: Default::default(),
         support_website: Default::default(),
         super_tenant_id: None,
+        svix_app_id_live: None,
+        svix_app_id_sandbox: None,
     }
 }
