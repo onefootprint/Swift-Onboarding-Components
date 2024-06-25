@@ -44,10 +44,6 @@ const setupLogger = ({ orgIds, config }: { orgIds: Set<string>; config: PublicOn
     Logger.startSessionReplay();
     Logger.identify({
       application_id: String(process.env.NEXT_PUBLIC_DDOG_RUM_APPLICATION_BIFROST),
-      // @ts-expect-error: browser support
-      deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
-      // @ts-expect-error: browser support
-      deviceConnection: typeof navigator?.connection !== 'undefined' ? navigator.connection : undefined,
       iframe: !!isInIframe,
       isAppClipEnabled: config.isAppClipEnabled,
       isInstantAppEnabled: config.isInstantAppEnabled,

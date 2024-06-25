@@ -14,6 +14,7 @@ import {
   initDataDogLogs,
   initDataDogRum,
 } from './utils/datadog';
+import { getDeviceMemory, getDeviceNetwork } from './utils/get-device-info';
 import getEnvInfo from './utils/get-env-info';
 import { registerErrorHandlers } from './utils/register-event-listeners';
 
@@ -58,7 +59,12 @@ const LoggerFactory = () => {
 
     const sessionId = getSessionId();
     const ddSessionId = datadogLogs.getInternalContext()?.session_id;
-    const contextProps = { ...filterNonEmptyTraits(traits), fp_session_id: sessionId };
+    const contextProps = {
+      ...filterNonEmptyTraits(traits),
+      ...getDeviceNetwork(),
+      ...getDeviceMemory(),
+      fp_session_id: sessionId,
+    };
     const context = appName === 'bifrost' && ddSessionId ? { ...contextProps, session_id: ddSessionId } : contextProps;
 
     if (isDDLogsEnabled || isDDRumEnabled) {

@@ -63,10 +63,7 @@ const Init = () => {
         if (onboardingConfig.isLive && !orgIds.has(onboardingConfig.orgId)) {
           Logger.startSessionReplay();
           Logger.identify({
-            // @ts-expect-error: browser support
-            deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
-            // @ts-expect-error: browser support
-            deviceConnection: typeof navigator?.connection !== 'undefined' ? navigator.connection : undefined,
+            appClipExperienceId: onboardingConfig.appClipExperienceId,
             isAppClipEnabled: onboardingConfig.isAppClipEnabled,
             isInstantAppEnabled: onboardingConfig.isInstantAppEnabled,
             kind: String(onboardingConfig.kind),

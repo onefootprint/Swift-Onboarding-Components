@@ -16,10 +16,6 @@ import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
 const logContext = ({ meta }: GetD2PResponse) => {
   Logger.identify({
-    // @ts-expect-error: browser support
-    deviceMemory: typeof navigator?.deviceMemory === 'number' ? navigator.deviceMemory : undefined,
-    // @ts-expect-error: browser support
-    deviceConnection: typeof navigator?.connection !== 'undefined' ? navigator.connection : undefined,
     fp_session_id: String(meta?.sessionId),
     l10n: JSON.stringify(meta?.l10n),
     opener: String(meta?.opener),
