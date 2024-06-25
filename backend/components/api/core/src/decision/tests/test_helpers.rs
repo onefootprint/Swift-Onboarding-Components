@@ -15,6 +15,7 @@ use db::models::document_request::DocumentRequest;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::PrivateUpdateTenant;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
@@ -29,6 +30,7 @@ use newtypes::DataIdentifier;
 use newtypes::DocumentRequestKind;
 use newtypes::IdentityDataKind;
 use newtypes::PiiString;
+use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
 use newtypes::VaultKind;
 use newtypes::VerificationCheck;
@@ -69,6 +71,11 @@ pub async fn create_user_and_onboarding(
             } else {
                 fixtures::tenant::create_with_keys(conn, pk, tenant_e_key)
             };
+            let update = PrivateUpdateTenant {
+                allowed_preview_apis: Some(vec![PreviewApi::LegacyOnboardingStatusWebhook]),
+                ..Default::default()
+            };
+            let tenant = Tenant::private_update(conn, &tenant.id, update)?;
             let obc = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
             let obc = ObConfiguration::lock(conn, &obc.id).unwrap();
             // TODO: need to rework our test utils so they use the same codepaths as our application logic to

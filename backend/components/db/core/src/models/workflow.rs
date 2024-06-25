@@ -40,6 +40,7 @@ use newtypes::ObConfigurationKind;
 use newtypes::OnboardingCompletedPayload;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusChangedPayload;
+use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::TenantScope;
@@ -636,6 +637,7 @@ impl Workflow {
 
         // Fire webhook
         if let Some(new_status) = new_status {
+            let (obc, tenant) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
             // Must lock to make sure scoped vault status isn't stale
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?.into_inner();
             // !! it's important that code in the same txn that is going to write a review does it before this
@@ -646,7 +648,6 @@ impl Workflow {
             // or in a redo flow If the current Workflow status is not pass/fail but the new
             // status is, fire OnboardingCompleted (ie anytime a Workflow completes)
             if !old_status.is_terminal() && new_status.is_terminal() {
-                let (obc, _) = ObConfiguration::get(conn, &wf.ob_configuration_id)?;
                 let webhook_event = WebhookEvent::OnboardingCompleted(OnboardingCompletedPayload {
                     fp_id: sv.fp_id.clone(),
                     timestamp: Utc::now(),
@@ -675,9 +676,14 @@ impl Workflow {
                 sv.status
             };
 
+            // If this is a legacy tenant that can still see the old onboarding status webhooks, send out the
+            // legacy webhook event
             let old_composite_status = (sv.status, requires_manual_review_before_update);
             let new_composite_status = (new_status, requires_manual_review_after_update);
-            if new_composite_status != old_composite_status {
+            let tenant_has_legacy_webhook = tenant
+                .allowed_preview_apis
+                .contains(&PreviewApi::LegacyOnboardingStatusWebhook);
+            if tenant_has_legacy_webhook && (new_composite_status != old_composite_status) {
                 // Only fire a OnboardingStatusChanged webhook if the scoped vault status changes or
                 // requires_manual_review changes
                 let webhook_event = WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {
