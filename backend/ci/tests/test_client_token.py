@@ -213,7 +213,8 @@ def test_large_objects(sandbox_user, di):
 
     obj = {"some_key": "hello world!" * 100_000}
 
-    post(f"entities/vault/{di}/upload", obj, auth_token)
+    body = post(f"entities/vault/{di}/upload", obj, auth_token)
+    assert body == {}
 
     resp = post(
         f"entities/vault/decrypt",

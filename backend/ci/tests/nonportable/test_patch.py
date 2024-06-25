@@ -33,6 +33,18 @@ def test_nationality_vaulting(tenant):
     patch(f"entities/{fp_id}/vault", data, tenant.sk.key)
 
 
+def test_empty_response(tenant):
+    """
+    Make sure the empty response is an empty JSON object and not null
+    """
+    body = post("users/", None, tenant.sk.key)
+    fp_id = body["id"]
+
+    data = {"id.first_name": "Flerp"}
+    body = patch(f"entities/{fp_id}/vault", data, tenant.sk.key)
+    assert body == {}
+
+
 @pytest.mark.parametrize(
     "key, value",
     [
