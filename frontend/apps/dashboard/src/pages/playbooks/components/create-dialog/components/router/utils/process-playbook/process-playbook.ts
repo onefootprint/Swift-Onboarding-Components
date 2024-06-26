@@ -131,15 +131,10 @@ const processPlaybook = ({
   const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber] && !isIdDocOnly(kind);
 
   // id doc handling
-  const { idDoc, idDocKind, selfie, idDocFirst, ssnDocScanStepUp, countrySpecificIdDocKind } = personal;
+  const { idDoc, idDocKind, selfie, idDocFirst, countrySpecificIdDocKind } = personal;
   const docString = selfie ? 'document_and_selfie' : 'document';
   if (idDoc && (idDocKind?.length > 0 || Object.keys(countrySpecificIdDocKind).length > 0)) {
     mustCollectData.push(docString);
-  }
-
-  let docScanForOptionalSsn;
-  if (ssnDocScanStepUp && idDocKind?.length > 0) {
-    docScanForOptionalSsn = docString;
   }
 
   const isDocFirstFlow = (idDocFirst && idDoc && idDocKind?.length > 0) ?? false;
@@ -169,7 +164,6 @@ const processPlaybook = ({
     optionalData,
     skipConfirm,
     skipKyc: shouldSkipKyc,
-    docScanForOptionalSsn,
     documentTypesAndCountries,
     verificationChecks: getVerificationChecks({ kind, verificationChecks }),
     ...getResidency(residencyForm),
@@ -263,7 +257,6 @@ const getNoBoKycOptions = ({
     documentTypesAndCountries,
     ...getResidency(residencyForm),
     cipKind: undefined,
-    docScanForOptionalSsn: undefined,
   };
 };
 

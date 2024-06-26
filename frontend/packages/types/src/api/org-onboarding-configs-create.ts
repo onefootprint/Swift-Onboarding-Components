@@ -20,7 +20,6 @@ export type OrgOnboardingConfigCreateRequest = {
   allowUsResidents?: boolean;
   allowUsTerritories?: boolean;
   internationalCountryRestrictions?: string[] | null;
-  docScanForOptionalSsn?: string;
   enhancedAml?: {
     enhancedAml: boolean;
     ofac: boolean;

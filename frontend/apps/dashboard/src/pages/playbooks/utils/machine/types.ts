@@ -175,7 +175,6 @@ export type Personal = {
   idDocFirst?: boolean;
   selfie?: boolean;
   ssnOptional?: boolean;
-  ssnDocScanStepUp?: boolean;
 };
 
 export type BusinessInformation = {
@@ -237,7 +236,6 @@ export const defaultPlaybookValuesKYC: DataToCollectFormData = {
     countrySpecificIdDocKind: {},
     selfie: true,
     ssn: true,
-    ssnDocScanStepUp: false,
     ssnKind: CollectedKycDataOption.ssn9,
   },
   [CollectedInvestorProfileDataOption.investorProfile]: false,
@@ -256,7 +254,6 @@ export const defaultPlaybookValuesAlpaca: DataToCollectFormData = {
     countrySpecificIdDocKind: {},
     selfie: false,
     ssn: true,
-    ssnDocScanStepUp: false,
     ssnKind: CollectedKycDataOption.ssn9,
   },
   [CollectedInvestorProfileDataOption.investorProfile]: false,
@@ -275,7 +272,6 @@ export const defaultPlaybookValuesApex: DataToCollectFormData = {
     countrySpecificIdDocKind: {},
     selfie: false,
     ssn: true,
-    ssnDocScanStepUp: false,
     ssnKind: CollectedKycDataOption.ssn9,
   },
   [CollectedInvestorProfileDataOption.investorProfile]: false,
@@ -346,7 +342,6 @@ export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
     countrySpecificIdDocKind: {},
     selfie: true,
     ssn: true,
-    ssnDocScanStepUp: true,
     ssnKind: CollectedKycDataOption.ssn9,
     ssnOptional: true,
   },

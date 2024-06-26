@@ -11,7 +11,7 @@ export type AuthorizedScopesProps = {
 };
 
 const AuthorizedScopes = ({
-  playbook: { allowUsResidents, allowInternationalResidents, canAccessData, docScanForOptionalSsn },
+  playbook: { allowUsResidents, allowInternationalResidents, canAccessData },
 }: AuthorizedScopesProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.details.authorized-scopes',
@@ -19,7 +19,7 @@ const AuthorizedScopes = ({
   const ssn =
     canAccessData.includes(CollectedKycDataOption.ssn9) || canAccessData.includes(CollectedKycDataOption.ssn4);
   const usLegalStatus = canAccessData.includes(CollectedKycDataOption.usLegalStatus);
-  const idDoc = !!docScanForOptionalSsn || canAccessData.filter(scope => scope.includes('document'))?.length > 0;
+  const idDoc = canAccessData.filter(scope => scope.includes('document'))?.length > 0;
 
   return (
     <Container>
@@ -28,7 +28,6 @@ const AuthorizedScopes = ({
         <Section
           canAccessData={canAccessData}
           displayScopes={usResidentDisplayScopes}
-          docScanForOptionalSsn={docScanForOptionalSsn}
           title={t('us-residents.title')}
         />
       )}

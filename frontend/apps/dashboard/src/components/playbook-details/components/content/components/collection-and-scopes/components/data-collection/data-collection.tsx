@@ -14,7 +14,6 @@ const DataCollection = ({
     allowInternationalResidents,
     allowUsResidents,
     allowUsTerritoryResidents,
-    docScanForOptionalSsn,
     internationalCountryRestrictions,
     isDocFirstFlow,
     mustCollectData,
@@ -27,7 +26,7 @@ const DataCollection = ({
   });
   const requiresSSN = mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
-  const documentsAsString = docScanForOptionalSsn || mustCollectData.filter(scopes => scopes.includes('document'))?.[0];
+  const documentsAsString = mustCollectData.filter(scopes => scopes.includes('document'))?.[0];
   const selfie = !!documentsAsString?.includes('selfie');
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
   const isKYB = mustCollectData.includes(
@@ -94,7 +93,6 @@ const DataCollection = ({
                   optional: optionalSSN,
                 },
                 usLegalStatus: mustCollectData.includes('us_legal_status'),
-                ssnDocScanStepUp: !!docScanForOptionalSsn,
               }}
             />
           ) : (

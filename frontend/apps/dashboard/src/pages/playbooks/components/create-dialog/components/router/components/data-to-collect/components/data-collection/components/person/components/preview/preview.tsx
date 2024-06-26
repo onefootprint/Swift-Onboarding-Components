@@ -84,7 +84,6 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
                 optional: values.ssnOptional,
               },
               usLegalStatus: values.us_legal_status,
-              ...(values.ssnDocScanStepUp ? { ssnDocScanStepUp: values.ssnDocScanStepUp } : {}),
             }}
           />
         )}

@@ -112,10 +112,6 @@
           "label": "Allow users without an SSN to proceed with the verification",
           "hint": "They will need to be manually reviewed by you."
         },
-        "ssn-doc-scan-step-up": {
-          "label": "Do document scan step-up",
-          "hint": "If for any reason we can't verify your users’ identities with the collected data, we'll require them to scan an U.S.-issued document, except for passports"
-        },
         "selfie": {
           "label": "Request a selfie",
           "hint": "You can optionally request users to take a selfie to validate the ID document requested."

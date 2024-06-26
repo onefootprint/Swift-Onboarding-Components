@@ -31,14 +31,11 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const shouldCollectIdDoc = watch('personal.idDoc');
   const selectedGlobalDocs = watch('personal.idDocKind');
   const selectedCountrySpecificDocs = watch('personal.countrySpecificIdDocKind');
-  const isSsnOptional = !!watch('personal.ssnOptional');
-  const shouldStepUpIdDoc = !!watch('personal.ssnDocScanStepUp');
   const collectBO = !!watch(`businessInformation.${CollectedKybDataOption.beneficialOwners}`);
   const isKyb = kind === PlaybookKind.Kyb;
 
   const showNoPhoneFlow =
     (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) && kind === PlaybookKind.Kyc;
-  const showSsnDocStepUp = isSsnOptional;
 
   // need to store this so we don't re-fetch on add'l renders
   const [initialValues] = useState<Personal>({
@@ -47,11 +44,11 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
 
   const handleSave = () => {
     if (
-      (shouldCollectIdDoc || shouldStepUpIdDoc) &&
+      shouldCollectIdDoc &&
       (selectedGlobalDocs?.length >= 1 || Object.keys(selectedCountrySpecificDocs).length >= 1)
     ) {
       onStopEditing();
-    } else if (!shouldCollectIdDoc && !shouldStepUpIdDoc) {
+    } else if (!shouldCollectIdDoc) {
       onStopEditing();
     }
   };
@@ -59,10 +56,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const handleCancel = () => {
     setValue('personal', initialValues);
     onStopEditing();
-  };
-
-  const resetSsnDocStepUp = () => {
-    setValue('personal.ssnDocScanStepUp', false);
   };
 
   const setSsnType = (nextValue: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +77,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
 
   const isSaveDisabled = () => {
     if (
-      (shouldCollectIdDoc || shouldStepUpIdDoc) &&
+      shouldCollectIdDoc &&
       selectedGlobalDocs.length === 0 &&
       Object.keys(selectedCountrySpecificDocs).length === 0
     ) {
@@ -190,7 +183,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                 onBlur={field.onBlur}
                 onChange={nextValue => {
                   field.onChange(nextValue);
-                  resetSsnDocStepUp();
                   setSsnType(nextValue);
                 }}
                 checked={field.value}
@@ -211,37 +203,8 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
               <Checkbox
                 hint={t('ssn-optional.hint')}
                 label={t('ssn-optional.label')}
-                {...register('personal.ssnOptional', {
-                  onChange: () => {
-                    resetSsnDocStepUp();
-                  },
-                })}
+                {...register('personal.ssnOptional')}
               />
-              {showSsnDocStepUp && (
-                <LeftSpacing>
-                  <Box marginTop={5} marginBottom={5}>
-                    <Divider variant="secondary" />
-                  </Box>
-                  <Checkbox
-                    hint={t('ssn-doc-scan-step-up.hint')}
-                    label={t('ssn-doc-scan-step-up.label')}
-                    disabled={shouldCollectIdDoc}
-                    {...register('personal.ssnDocScanStepUp', {
-                      onChange: () => {
-                        resetDocs();
-                      },
-                    })}
-                  />
-                  {shouldStepUpIdDoc && (
-                    <Box>
-                      <Box marginTop={5} marginBottom={5}>
-                        <Divider variant="secondary" />
-                      </Box>
-                      <Document />
-                    </Box>
-                  )}
-                </LeftSpacing>
-              )}
             </Subsection>
           </>
         )}
@@ -262,7 +225,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
             <ToggleContainer>
               <Toggle
                 checked={field.value}
-                disabled={shouldStepUpIdDoc}
                 label={t('id-doc.toggle')}
                 onBlur={field.onBlur}
                 onChange={nextValue => {
@@ -298,12 +260,6 @@ const Subsection = styled.div`
   ${({ theme }) => css`
     border-top: ${theme.borderWidth[1]} ${theme.borderColor.tertiary} dashed;
     padding-top: ${theme.spacing[5]};
-  `}
-`;
-
-const LeftSpacing = styled.div`
-  ${({ theme }) => css`
-    margin-left: calc(${theme.spacing[7]} + ${theme.spacing[2]});
   `}
 `;
 
