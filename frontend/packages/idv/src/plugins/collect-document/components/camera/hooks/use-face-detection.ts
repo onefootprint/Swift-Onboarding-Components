@@ -32,59 +32,64 @@ const useFaceDetection = () => {
       return FaceStatus.detecting;
     }
 
-    matchDimensions(videoElement, { width, height });
-    const result = await detectSingleFace(videoElement, options).withFaceLandmarks();
+    try {
+      matchDimensions(videoElement, { width, height });
+      const result = await detectSingleFace(videoElement, options).withFaceLandmarks();
 
-    if (!result) return FaceStatus.detecting;
+      if (!result) return FaceStatus.detecting;
 
-    const { detection } = result;
-    if (!detection || !detection.box) return FaceStatus.detecting;
+      const { detection } = result;
+      if (!detection || !detection.box) return FaceStatus.detecting;
 
-    const {
-      box: { width: detectionBoxWidth, height: detectionBoxHeight },
-    } = detection;
-    if (!detectionBoxWidth || !detectionBoxHeight) {
-      Logger.warn('FaceApi detection box has null or zero dimensions', {
-        location: 'use-face-detection',
-      });
+      const {
+        box: { width: detectionBoxWidth, height: detectionBoxHeight },
+      } = detection;
+      if (!detectionBoxWidth || !detectionBoxHeight) {
+        Logger.warn('FaceApi detection box has null or zero dimensions', {
+          location: 'use-face-detection',
+        });
+        return FaceStatus.detecting;
+      }
+
+      const { width: frameWidth, height: frameHeight, frameOffsetX, frameOffsetY } = frameDimensions;
+
+      const resizedDetections = resizeResults(detection, { width, height });
+      const face = resizedDetections.box;
+      const faceX = Math.floor(face.x);
+      const faceY = Math.floor(face.y);
+      const faceWidth = Math.floor(face.width);
+      const faceHeight = Math.floor(face.height);
+
+      // Order matters
+      // First priority: face should be close enough
+      if (!isFaceCloseEnough({ frameWidth, frameHeight, faceWidth, faceHeight })) return FaceStatus.faceTooFar;
+
+      // Second priority: face should be inside the frame
+      if (
+        !isFaceInTheFrame({
+          videoWidth: width,
+          videoHeight: height,
+          frameWidth,
+          frameHeight,
+          faceWidth,
+          faceHeight,
+          faceX,
+          faceY,
+          frameOffsetX,
+          frameOffsetY,
+        })
+      )
+        return FaceStatus.faceOutsideTheFrame;
+
+      // // Third priority: head should be straight pointing to the camera
+      const angle = calculateFaceAngle(result.landmarks);
+      if (!isHeadStraight(angle)) return FaceStatus.headNotStraight;
+
+      return FaceStatus.OK;
+    } catch (error) {
+      Logger.warn(`Face detection failed with error: ${error}`, { location: 'use-face-detection' });
       return FaceStatus.detecting;
     }
-
-    const { width: frameWidth, height: frameHeight, frameOffsetX, frameOffsetY } = frameDimensions;
-
-    const resizedDetections = resizeResults(detection, { width, height });
-    const face = resizedDetections.box;
-    const faceX = Math.floor(face.x);
-    const faceY = Math.floor(face.y);
-    const faceWidth = Math.floor(face.width);
-    const faceHeight = Math.floor(face.height);
-
-    // Order matters
-    // First priority: face should be close enough
-    if (!isFaceCloseEnough({ frameWidth, frameHeight, faceWidth, faceHeight })) return FaceStatus.faceTooFar;
-
-    // Second priority: face should be inside the frame
-    if (
-      !isFaceInTheFrame({
-        videoWidth: width,
-        videoHeight: height,
-        frameWidth,
-        frameHeight,
-        faceWidth,
-        faceHeight,
-        faceX,
-        faceY,
-        frameOffsetX,
-        frameOffsetY,
-      })
-    )
-      return FaceStatus.faceOutsideTheFrame;
-
-    // // Third priority: head should be straight pointing to the camera
-    const angle = calculateFaceAngle(result.landmarks);
-    if (!isHeadStraight(angle)) return FaceStatus.headNotStraight;
-
-    return FaceStatus.OK;
   };
 
   return { getFaceStatus };
