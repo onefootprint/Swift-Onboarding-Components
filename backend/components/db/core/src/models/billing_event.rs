@@ -10,6 +10,7 @@ use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::BillingEventId;
 use newtypes::BillingEventKind;
+use newtypes::BillingStrategy;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
@@ -81,14 +82,20 @@ impl BillingEvent {
         kind: BillingEventKind,
     ) -> DbResult<Self> {
         ScopedVault::lock(conn, sv_id)?;
-        let mut query = billing_event::table
+        let existing_query = billing_event::table
             .filter(billing_event::scoped_vault_id.eq(&sv_id))
             .filter(billing_event::kind.eq(kind))
             .into_boxed();
-        if let Some(interval) = kind.billing_interval() {
-            query = query.filter(billing_event::timestamp.gt(Utc::now() - interval));
-        }
-        let existing = query.get_result::<Self>(conn.conn()).optional()?;
+        let existing = match kind.billing_strategy() {
+            BillingStrategy::Each => None,
+            // Some billing events are only to be created once per user or once per user per interval
+            BillingStrategy::PerUser => existing_query.get_result::<Self>(conn.conn()).optional()?,
+            BillingStrategy::PerInterval(i) => existing_query
+                .filter(billing_event::timestamp.gt(Utc::now() - i))
+                .get_result::<Self>(conn.conn())
+                .optional()?,
+        };
+
         let event = NewBillingEventRow {
             timestamp: Utc::now(),
             scoped_vault_id: sv_id,

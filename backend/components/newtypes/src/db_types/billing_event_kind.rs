@@ -23,22 +23,28 @@ pub enum BillingEventKind {
 }
 
 impl BillingEventKind {
-    /// Returns the Duration representing the billing frequency of this event.
-    /// We will only create a BillingEvent once per interval for the product.
-    /// None if the event is billed once per user.
-    pub fn billing_interval(&self) -> Option<Duration> {
+    pub fn billing_strategy(&self) -> BillingStrategy {
         match self {
-            Self::ContinuousMonitoringPerYear => Some(Duration::days(365)),
-            Self::AdverseMediaPerUser => None,
-            Self::CurpValidation => None,
-            Self::Kyc => None,
-            Self::OneClickKyc => None,
-            Self::KycWaterfallSecondVendor => None,
-            Self::KycWaterfallThirdVendor => None,
-            Self::IdentityDocument => None,
-            Self::Kyb => None,
+            Self::ContinuousMonitoringPerYear => BillingStrategy::PerInterval(Duration::days(365)),
+            Self::AdverseMediaPerUser => BillingStrategy::PerUser,
+            Self::CurpValidation => BillingStrategy::Each,
+            Self::Kyc => BillingStrategy::Each,
+            Self::OneClickKyc => BillingStrategy::Each,
+            Self::KycWaterfallSecondVendor => BillingStrategy::Each,
+            Self::KycWaterfallThirdVendor => BillingStrategy::Each,
+            Self::IdentityDocument => BillingStrategy::Each,
+            Self::Kyb => BillingStrategy::Each,
         }
     }
+}
+
+pub enum BillingStrategy {
+    /// Bill every time an event is created
+    Each,
+    /// Bill for this product once per user
+    PerUser,
+    /// Bill for this product once per user in the defined interval
+    PerInterval(Duration),
 }
 
 impl_enum_string_diesel!(BillingEventKind);
