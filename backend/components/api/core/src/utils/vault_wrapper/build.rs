@@ -137,7 +137,6 @@ impl<Type> VaultWrapper<Type> {
         let active_lifetime_ids: Vec<_> = active_lifetimes.iter().map(|l| l.id.clone()).collect();
 
         // Fetch all the data related to the active lifetimes
-        // Split into portable + speculative data
         let data = DbVaultData::get_for(conn, &active_lifetime_ids)?;
         let documents = DocumentData::get_for(conn, &active_lifetime_ids)?;
 
