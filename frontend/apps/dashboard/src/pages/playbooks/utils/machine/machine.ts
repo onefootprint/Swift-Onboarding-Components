@@ -95,12 +95,12 @@ export const createPlaybookMachine = () =>
               },
             ],
             nameYourPlaybookSubmitted: {
-              target: 'summary',
+              target: 'dataToCollect',
               actions: ['assignNameYourPlaybook'],
             },
           },
         },
-        summary: {
+        dataToCollect: {
           on: {
             whoToOnboardSelected: {
               target: 'whoToOnboard',
@@ -127,11 +127,11 @@ export const createPlaybookMachine = () =>
             nameYourPlaybookSelected: {
               target: 'nameYourPlaybook',
             },
-            summarySelected: {
-              target: 'summary',
+            dataToCollectSelected: {
+              target: 'dataToCollect',
             },
             navigationBackward: {
-              target: 'summary',
+              target: 'dataToCollect',
             },
             verificationChecksSubmitted: {
               actions: 'assignVerificationChecks',

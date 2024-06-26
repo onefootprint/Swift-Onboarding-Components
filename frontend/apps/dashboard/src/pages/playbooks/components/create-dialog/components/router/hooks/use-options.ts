@@ -13,7 +13,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
   const defaultOptions = [
     { value: 'whoToOnboard', label: t('dialog.who-to-onboard.nav') },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
-    { value: 'summary', label: t('dialog.summary.nav') },
+    { value: 'dataToCollect', label: t('dialog.data-to-collect.nav') },
     { value: 'verificationChecks', label: t('dialog.verification-checks.nav') },
   ];
   const kycOptions = [
@@ -28,7 +28,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
       ],
     },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
-    { value: 'summary', label: t('dialog.summary.nav') },
+    { value: 'dataToCollect', label: t('dialog.data-to-collect.nav') },
   ];
   if (isEditableKycTemplate) {
     kycOptions[0].options?.push({
@@ -47,7 +47,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
       options: [{ value: 'residency', label: t('dialog.residency.nav') }],
     },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
-    { value: 'summary', label: t('details.title') },
+    { value: 'dataToCollect', label: t('details.title') },
   ];
   const docOptions = [
     {
@@ -55,7 +55,7 @@ const useOptions = ({ template }: UseOptionsProps) => {
       label: t('dialog.who-to-onboard.nav'),
     },
     { value: 'nameYourPlaybook', label: t('dialog.name-your-playbook.nav') },
-    { value: 'summary', label: t('dialog.summary.nav') },
+    { value: 'dataToCollect', label: t('dialog.data-to-collect.nav') },
   ];
   const kybOptions = defaultOptions;
 

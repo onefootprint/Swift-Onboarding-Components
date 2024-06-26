@@ -5,13 +5,13 @@ import {
   CollectedKycDataOption,
 } from '@onefootprint/types';
 
-import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
+import { isAuth, isIdDocOnly, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
   BusinessInformation,
+  DataToCollectFormData,
   KybChecksKind,
   NameFormData,
   ResidencyFormData,
-  SummaryFormData,
 } from '@/playbooks/utils/machine/types';
 import {
   CountryRestriction,
@@ -21,7 +21,7 @@ import {
 } from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
-  playbook: SummaryFormData;
+  playbook: DataToCollectFormData;
   kind: PlaybookKind;
   residencyForm?: ResidencyFormData;
   nameForm: NameFormData;
@@ -108,7 +108,7 @@ const processPlaybook = ({
   const requiredKycFields = getRequiredKycCollectFields();
   if (isAuth(kind)) {
     mustCollectData.push(CollectedKycDataOption.email);
-  } else if (!isIdDoc(kind)) {
+  } else if (!isIdDocOnly(kind)) {
     mustCollectData.push(...requiredKycFields);
   }
 
@@ -128,7 +128,7 @@ const processPlaybook = ({
   if (personal[CollectedKycDataOption.phoneNumber]) {
     mustCollectData.push(CollectedKycDataOption.phoneNumber);
   }
-  const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber] && !isIdDoc(kind);
+  const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber] && !isIdDocOnly(kind);
 
   // id doc handling
   const { idDoc, idDocKind, selfie, idDocFirst, ssnDocScanStepUp, countrySpecificIdDocKind } = personal;
@@ -158,7 +158,7 @@ const processPlaybook = ({
     countrySpecific: countrySpecificIdDocKind,
     global: idDocKind,
   };
-  const skipConfirm = isIdDoc(kind);
+  const skipConfirm = isIdDocOnly(kind);
 
   return {
     canAccessData,

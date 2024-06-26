@@ -1,1 +1,1 @@
-export { isAuth, isIdDoc, isKyb, isKyc } from './is';
+export { isAuth, isIdDocOnly, isKyb, isKyc } from './is';

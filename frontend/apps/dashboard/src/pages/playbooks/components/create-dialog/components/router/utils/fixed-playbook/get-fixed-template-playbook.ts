@@ -1,13 +1,13 @@
 import type {
+  DataToCollectFormData,
   DefaultValues,
   MachineContext,
-  SummaryFormData,
   VerificationChecksFormData,
 } from '@/playbooks/utils/machine/types';
 
 const getFixedTemplatePlaybook = (
   context: MachineContext,
-  playbook: SummaryFormData,
+  playbook: DataToCollectFormData,
   verificationChecksForm: VerificationChecksFormData,
   defaultValues: DefaultValues,
 ) => {

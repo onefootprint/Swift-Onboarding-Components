@@ -1,4 +1,4 @@
-import { isAuth, isIdDoc, isKyb, isKyc } from '@/playbooks/utils/kind';
+import { isAuth, isIdDocOnly, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type { DefaultValues, MachineContext } from '@/playbooks/utils/machine/types';
 import {
   OnboardingTemplate,
@@ -67,7 +67,7 @@ const getDefaultValues = (context: MachineContext): DefaultValues => {
   if (isKyb(context.kind)) {
     defaultValues = defaultPlaybookValuesKYB;
   }
-  if (isIdDoc(context.kind)) {
+  if (isIdDocOnly(context.kind)) {
     defaultValues = defaultPlaybookValuesIdDoc;
   }
 

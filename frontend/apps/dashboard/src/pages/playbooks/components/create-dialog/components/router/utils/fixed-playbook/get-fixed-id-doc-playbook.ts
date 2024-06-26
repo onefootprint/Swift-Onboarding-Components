@@ -1,8 +1,12 @@
-import type { MachineContext, SummaryFormData, VerificationChecksFormData } from '@/playbooks/utils/machine/types';
+import type {
+  DataToCollectFormData,
+  MachineContext,
+  VerificationChecksFormData,
+} from '@/playbooks/utils/machine/types';
 
 export const getFixedIdDocPlaybook = (
   context: MachineContext,
-  playbook: SummaryFormData,
+  playbook: DataToCollectFormData,
   verificationChecksForm: VerificationChecksFormData,
 ) => {
   const { kind, nameForm, residencyForm } = context;

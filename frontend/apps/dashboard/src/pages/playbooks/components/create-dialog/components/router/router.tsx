@@ -6,20 +6,20 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-import { isAuth, isIdDoc } from '@/playbooks/utils/kind';
+import { isAuth, isIdDocOnly } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
 import type {
+  DataToCollectFormData,
   MachineContext,
   Personal,
-  SummaryFormData,
   VerificationChecksFormData,
 } from '@/playbooks/utils/machine/types';
 import { OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
+import DataToCollect from './components/data-to-collect';
 import Name from './components/name-your-playbook';
 import OnboardingTemplates from './components/onboarding-templates';
 import Residency from './components/residency';
-import Summary from './components/summary';
 import VerificationChecks from './components/verification-checks';
 import WhoToOnboard from './components/who-to-onboard';
 import useCreatePlaybook from './hooks/use-create-playbook';
@@ -36,9 +36,7 @@ export type RouterProps = {
 const Router = ({ onCreate }: RouterProps) => {
   const [state, send] = useMachine(playbookMachine);
   const { kind, onboardingTemplate } = state.context;
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.dialog',
-  });
+  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.dialog' });
   const toast = useToast();
   const showRequestError = useRequestErrorToast();
   const mutation = useCreatePlaybook();
@@ -141,15 +139,15 @@ const Router = ({ onCreate }: RouterProps) => {
 
   const createFixedTemplatePlaybook = (
     verificationChecksForm: VerificationChecksFormData,
-    formData: SummaryFormData,
+    formData: DataToCollectFormData,
   ) => {
     const context = getFixedTemplatePlaybook(state.context, formData, verificationChecksForm, defaultValues);
     createPlaybook(context, verificationChecksForm);
   };
 
-  const handleSubmitSummary = (formData: SummaryFormData) => {
+  const handleSubmitDataToCollect = (formData: DataToCollectFormData) => {
     const { nameForm } = state.context;
-    if (isIdDoc(state.context.kind) && nameForm) {
+    if (isIdDocOnly(state.context.kind) && nameForm) {
       const verificationChecksForm = {
         skipKyc: true,
         amlFormData: defaultValues.aml,
@@ -197,8 +195,8 @@ const Router = ({ onCreate }: RouterProps) => {
               send('nameYourPlaybookSelected');
             } else if (option.value === 'whoToOnboard') {
               send('whoToOnboardSelected');
-            } else if (option.value === 'summary') {
-              send('summarySelected');
+            } else if (option.value === 'dataToCollect') {
+              send('dataToCollectSelected');
             } else if (option.value === 'onboardingTemplates') {
               send('templateSelected');
             }
@@ -263,8 +261,8 @@ const Router = ({ onCreate }: RouterProps) => {
             }}
           />
         )}
-        {state.matches('summary') && (
-          <Summary
+        {state.matches('dataToCollect') && (
+          <DataToCollect
             defaultValues={defaultValues.playbook}
             meta={{
               kind: state.context.kind || defaultValues.playbook.kind,
@@ -274,7 +272,7 @@ const Router = ({ onCreate }: RouterProps) => {
             onBack={() => {
               send('navigationBackward');
             }}
-            onSubmit={handleSubmitSummary}
+            onSubmit={handleSubmitDataToCollect}
             isLastStep={isLastStep}
             isLoading={mutation.isLoading}
           />

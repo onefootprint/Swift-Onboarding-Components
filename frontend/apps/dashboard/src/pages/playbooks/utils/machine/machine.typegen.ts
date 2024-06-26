@@ -26,10 +26,10 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
+    | 'dataToCollect'
     | 'nameYourPlaybook'
     | 'onboardingTemplates'
     | 'residency'
-    | 'summary'
     | 'verificationChecks'
     | 'whoToOnboard';
   tags: never;

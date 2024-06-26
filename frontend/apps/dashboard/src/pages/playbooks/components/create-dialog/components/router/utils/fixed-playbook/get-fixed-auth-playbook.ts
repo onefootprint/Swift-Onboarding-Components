@@ -1,6 +1,6 @@
-import type { MachineContext, SummaryFormData } from '@/playbooks/utils/machine/types';
+import type { DataToCollectFormData, MachineContext } from '@/playbooks/utils/machine/types';
 
-export const getFixedAuthPlaybook = (obj: SummaryFormData & Pick<MachineContext, 'nameForm'>) => ({
+export const getFixedAuthPlaybook = (obj: DataToCollectFormData & Pick<MachineContext, 'nameForm'>) => ({
   kind: obj.kind,
   nameForm: obj.nameForm,
   playbook: obj,

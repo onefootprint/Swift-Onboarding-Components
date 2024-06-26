@@ -16,14 +16,14 @@ export enum PlaybookKind {
   Unknown = 'unknown',
 }
 
-export type SummaryFormData = {
+export type DataToCollectFormData = {
   kind: PlaybookKind;
   personal: Personal;
   businessInformation?: BusinessInformation;
   [CollectedInvestorProfileDataOption.investorProfile]?: boolean;
 };
 
-export type SummaryMeta = {
+export type DataToCollectMeta = {
   kind: PlaybookKind;
   residency?: ResidencyFormData;
   onboardingTemplate?: OnboardingTemplate;
@@ -157,7 +157,7 @@ export const defaultAmlFormDataCreditCard: AMLFormData = {
 export type DefaultValues = {
   aml: AMLFormData;
   name: NameFormData;
-  playbook: SummaryFormData;
+  playbook: DataToCollectFormData;
   residency: ResidencyFormData;
 };
 
@@ -224,7 +224,7 @@ export const defaultPlaybookValuesAuth = {
   },
 };
 
-export const defaultPlaybookValuesKYC: SummaryFormData = {
+export const defaultPlaybookValuesKYC: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
   personal: {
     [CollectedKycDataOption.address]: true,
@@ -243,7 +243,7 @@ export const defaultPlaybookValuesKYC: SummaryFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
-export const defaultPlaybookValuesAlpaca: SummaryFormData = {
+export const defaultPlaybookValuesAlpaca: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
   personal: {
     [CollectedKycDataOption.address]: true,
@@ -262,7 +262,7 @@ export const defaultPlaybookValuesAlpaca: SummaryFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
-export const defaultPlaybookValuesApex: SummaryFormData = {
+export const defaultPlaybookValuesApex: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
   personal: {
     [CollectedKycDataOption.address]: true,
@@ -281,7 +281,7 @@ export const defaultPlaybookValuesApex: SummaryFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
-export const defaultPlaybookValuesTenantScreening: SummaryFormData = {
+export const defaultPlaybookValuesTenantScreening: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
   personal: {
     [CollectedKycDataOption.address]: true,
@@ -307,7 +307,7 @@ export const defaultPlaybookValuesTenantScreening: SummaryFormData = {
   },
 };
 
-export const defaultPlaybookValuesCarRental: SummaryFormData = {
+export const defaultPlaybookValuesCarRental: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
   personal: {
     [CollectedKycDataOption.address]: true,
@@ -324,7 +324,7 @@ export const defaultPlaybookValuesCarRental: SummaryFormData = {
   },
 };
 
-export const defaultPlaybookValuesCreditCard: SummaryFormData = {
+export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
   kind: PlaybookKind.Kyc,
   personal: {
     [CollectedKycDataOption.address]: true,
@@ -352,7 +352,7 @@ export const defaultPlaybookValuesCreditCard: SummaryFormData = {
   },
 };
 
-export const defaultPlaybookValuesIdDoc: SummaryFormData = {
+export const defaultPlaybookValuesIdDoc: DataToCollectFormData = {
   kind: PlaybookKind.IdDoc,
   personal: {
     email: false,
@@ -369,7 +369,7 @@ export const defaultPlaybookValuesIdDoc: SummaryFormData = {
   [CollectedInvestorProfileDataOption.investorProfile]: false,
 };
 
-export const defaultPlaybookValuesKYB: SummaryFormData = {
+export const defaultPlaybookValuesKYB: DataToCollectFormData = {
   ...defaultPlaybookValuesKYC,
   kind: PlaybookKind.Kyb,
   businessInformation: defaultBusinessInformation,
@@ -387,7 +387,7 @@ export enum OnboardingTemplate {
 export type MachineContext = {
   kind: PlaybookKind;
   nameForm?: NameFormData;
-  playbook?: SummaryFormData;
+  playbook?: DataToCollectFormData;
   residencyForm?: ResidencyFormData;
   onboardingTemplate?: OnboardingTemplate;
   verificationChecksForm?: VerificationChecksFormData;
@@ -397,12 +397,12 @@ export type MachineEvents =
   | { type: 'navigationBackward' }
   | { type: 'nameYourPlaybookSelected' }
   | { type: 'whoToOnboardSelected' }
-  | { type: 'summarySelected' }
+  | { type: 'dataToCollectSelected' }
   | { type: 'templateSelected' }
   | { type: 'whoToOnboardSubmitted'; payload: { kind: PlaybookKind } }
   | { type: 'nameYourPlaybookSubmitted'; payload: { formData: NameFormData } }
   | { type: 'residencySubmitted'; payload: { formData: ResidencyFormData } }
-  | { type: 'playbookSubmitted'; payload: { formData: SummaryFormData } }
+  | { type: 'playbookSubmitted'; payload: { formData: DataToCollectFormData } }
   | {
       type: 'onboardingTemplatesSelected';
       payload: {
