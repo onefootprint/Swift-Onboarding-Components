@@ -85,13 +85,17 @@ pub fn save_final_decision(
     };
 
     let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
-    let (status, failed_for_doc_review) =
-        get_final_decision_status(decision, doc_manual_review.is_some(), sv.status);
+    let has_doc_mr = doc_manual_review.is_some();
+    let (status, failed_for_doc_review) = get_final_decision_status(decision.clone(), has_doc_mr, sv.status);
 
     let manual_reviews = chain(rules_manual_review, doc_manual_review).collect();
     if status == DecisionStatus::StepUp {
         tracing::error!(%wf_id, "Saving final decision with non-terminal status");
     }
+
+
+    log_canonical_line(&obc, decision, has_doc_mr, sv.status);
+
     let decision = NewDecisionArgs {
         vault_id: scoped_user.vault_id,
         logic_git_hash: crate::GIT_HASH.to_string(),
@@ -129,6 +133,35 @@ fn get_final_decision_status(
         },
         Decision::RulesNotExecuted => (DecisionStatus::None, false),
     }
+}
+
+fn log_canonical_line(
+    obc: &ObConfiguration,
+    decision: Decision,
+    has_doc_mr: bool,
+    existing_status: OnboardingStatus,
+) {
+    let (should_commit, create_manual_review, action) = match decision.clone() {
+        Decision::RulesExecuted {
+            should_commit,
+            create_manual_review,
+            action,
+        } => (Some(should_commit), Some(create_manual_review), action),
+        Decision::RulesNotExecuted => (None, None, None),
+    };
+    let decision_status = get_final_decision_status(decision, has_doc_mr, existing_status);
+
+    tracing::info!(
+        obc_key=?obc.key,
+        ?should_commit,
+        ?create_manual_review,
+        ?decision_status,
+        ?action,
+        is_live=?obc.is_live,
+        tenant_id=?obc.tenant_id,
+        kind=?obc.kind,
+        name = "CANONICAL-WORKFLOW-COMPLETE"
+    );
 }
 
 #[cfg(test)]
