@@ -1,5 +1,6 @@
 use super::manual_review::ManualReview;
 use super::manual_review::ManualReviewArgs;
+use super::manual_review::ManualReviewDeltas;
 use super::ob_configuration::ObConfiguration;
 use super::user_timeline::UserTimeline;
 use crate::actor;
@@ -107,7 +108,7 @@ impl OnboardingDecision {
         conn: &mut TxnPgConn,
         wf: &Workflow,
         args: NewDecisionArgs,
-    ) -> DbResult<Self> {
+    ) -> DbResult<(Self, ManualReviewDeltas)> {
         let NewDecisionArgs {
             vault_id,
             logic_git_hash,
@@ -161,9 +162,9 @@ impl OnboardingDecision {
         };
         UserTimeline::create(conn, decision_info, vault_id, wf.scoped_vault_id.clone())?;
 
-        ManualReview::apply_actions(conn, wf, &result, manual_reviews)?;
+        let mr_deltas = ManualReview::apply_actions(conn, wf, &result, manual_reviews)?;
 
-        Ok(result)
+        Ok((result, mr_deltas))
     }
 
     #[tracing::instrument("OnboardingDecision::get_bulk", skip_all)]

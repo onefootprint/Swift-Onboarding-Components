@@ -1,5 +1,4 @@
 use super::insight_event::CreateInsightEvent;
-use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
 use super::onboarding_decision::NewDecisionArgs;
 use super::onboarding_decision::OnboardingDecision;
@@ -587,15 +586,8 @@ impl Workflow {
                 .execute(conn.conn())?;
         }
 
-        // Snapshot manual review status BEFORE updating MR
-        let requires_manual_review_before_update =
-            !ManualReview::get_active(conn, &wf.scoped_vault_id)?.is_empty();
-
         // Save the new OBD and related manual reviews
-        OnboardingDecision::create_decision_and_mrs(conn, &wf, new_decision)?;
-
-        let requires_manual_review_after_update =
-            !ManualReview::get_active(conn, &wf.scoped_vault_id)?.is_empty();
+        let (_, mr_deltas) = OnboardingDecision::create_decision_and_mrs(conn, &wf, new_decision)?;
 
         // Update the workflow's status to match the new decision's status
         let (wf, sv_delta) = Workflow::update_status(wf, conn, new_status)?;
@@ -611,7 +603,7 @@ impl Workflow {
                 timestamp: Utc::now(),
                 // TODO this doesn't really make sense in the context of ad-hoc document workflows
                 status: new_status,
-                requires_manual_review: requires_manual_review_after_update,
+                requires_manual_review: mr_deltas.new_has_mrs,
                 playbook_key: obc.key,
                 is_live: sv.is_live,
             });
@@ -621,8 +613,8 @@ impl Workflow {
 
         // If this is a legacy tenant that can still see the old onboarding status webhooks, send out the
         // legacy webhook event
-        let old_composite_status = (sv_delta.old_status, requires_manual_review_before_update);
-        let new_composite_status = (sv_delta.new_status, requires_manual_review_after_update);
+        let old_composite_status = (sv_delta.old_status, mr_deltas.old_has_mrs);
+        let new_composite_status = (sv_delta.new_status, mr_deltas.new_has_mrs);
         let tenant_has_legacy_webhook = tenant
             .allowed_preview_apis
             .contains(&PreviewApi::LegacyOnboardingStatusWebhook);
@@ -633,7 +625,7 @@ impl Workflow {
                 fp_id: sv.fp_id.clone(),
                 timestamp: Utc::now(),
                 new_status: sv_delta.new_status,
-                requires_manual_review: requires_manual_review_after_update,
+                requires_manual_review: mr_deltas.new_has_mrs,
                 is_live: sv.is_live,
             });
             let task_data = sv.webhook_event(webhook_event).into();

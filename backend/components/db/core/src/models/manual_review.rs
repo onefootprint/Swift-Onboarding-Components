@@ -71,6 +71,13 @@ struct ManualReviewUpdate {
     completed_by_actor: Option<Option<DbActor>>,
 }
 
+pub struct ManualReviewDeltas {
+    /// True if there existed an incomplete ManualReview _before_ applying ManualReview actions
+    pub old_has_mrs: bool,
+    /// True if there exists an incomplete ManualReview _after_ applying ManualReview actions
+    pub new_has_mrs: bool,
+}
+
 impl ManualReview {
     #[tracing::instrument("ManualReview::apply_actions", skip_all)]
     pub fn apply_actions(
@@ -78,8 +85,9 @@ impl ManualReview {
         workflow: &Workflow,
         decision: &OnboardingDecision,
         mrs: Vec<ManualReviewArgs>,
-    ) -> DbResult<()> {
+    ) -> DbResult<ManualReviewDeltas> {
         let existing_mrs = Self::get_active(conn, &workflow.scoped_vault_id)?;
+        let old_has_mrs = !existing_mrs.is_empty();
         for ManualReviewArgs { kind, action } in mrs {
             let existing = existing_mrs.iter().find(|mr| mr.kind == kind);
             match (existing, action) {
@@ -120,7 +128,12 @@ impl ManualReview {
                 }
             }
         }
-        Ok(())
+        let new_has_mrs = !Self::get_active(conn, &workflow.scoped_vault_id)?.is_empty();
+        let result = ManualReviewDeltas {
+            old_has_mrs,
+            new_has_mrs,
+        };
+        Ok(result)
     }
 
     #[tracing::instrument("ManualReview::get_active", skip_all)]
