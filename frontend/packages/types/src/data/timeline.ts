@@ -11,7 +11,6 @@ import type { DocumentRequestConfig } from './document-request-config';
 import type { EntityLabel } from './entity';
 import type { IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
 import type { InsightEvent } from './insight-event';
-import type { LivenessAttribute, LivenessSource } from './liveness';
 import type { OnboardingDecision, TimelinePlaybook } from './onboarding-decision';
 
 export enum TimelineEventKind {
@@ -59,6 +58,38 @@ export type FreeFormNoteEvent = {
 export type LivenessEvent = {
   kind: TimelineEventKind.liveness;
   data: LivenessEventData;
+};
+
+export enum LivenessSource {
+  skipped = 'skipped',
+  webauthnAttestation = 'webauthn_attestation',
+  privacyPass = 'privacyPass',
+  appleDeviceAttestation = 'apple_device_attestation',
+}
+
+export enum LivenessIssuer {
+  apple = 'apple',
+  google = 'google',
+  cloudflare = 'cloudflare',
+  footprint = 'footprint',
+}
+
+export type LivenessAttribute = {
+  issuers: LivenessIssuer[];
+  device: string | null;
+  os: string | null;
+  metadata: LivenessMetadata;
+};
+export type LivenessMetadata = InstantAppMetadata | null;
+
+export type InstantAppMetadata = {
+  androidSafetyNet: {
+    basicIntegrity: boolean;
+    evaluationType: string;
+    apkPackageName: string;
+    ctsProfileMatch: boolean;
+    apkCertificateDigestSha256: string[];
+  };
 };
 
 export type LivenessEventData = {

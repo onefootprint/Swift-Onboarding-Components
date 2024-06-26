@@ -139,19 +139,11 @@ export type {
 export { ListTimelineEventKind } from './list';
 export { ListKind } from './list';
 export type {
-  InstantAppMetadata,
-  Liveness,
-  LivenessAttestation,
-  LivenessAttestationDeviceType,
-  LivenessAttribute,
-  LivenessMetadata,
-} from './liveness';
-export {
-  IdentifyScope,
-  LivenessIssuer,
-  LivenessKind,
-  LivenessSource,
-} from './liveness';
+  AuthEvent,
+  AuthEventAttestation,
+  AuthEventAttestationDeviceType,
+} from './auth-event';
+export { IdentifyScope, AuthEventKind } from './auth-event';
 export type { LivenessCheckInfo } from './liveness-check-info';
 export type { MatchSignal } from './match-signal';
 export { MatchLevel } from './match-signal';
@@ -252,6 +244,8 @@ export type {
 export {
   StepUpDocumentKind,
   TimelineEventKind,
+  LivenessSource,
+  LivenessIssuer,
   WatchlistCheckReasonCode,
   WatchlistCheckStatus,
 } from './timeline';

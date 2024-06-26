@@ -1,6 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Entity, InsightEvent, Liveness } from '@onefootprint/types';
-import { BusinessDI, EntityKind, EntityStatus, IdentifyScope, LivenessKind, LivenessSource } from '@onefootprint/types';
+import type { AuthEvent, Entity, InsightEvent } from '@onefootprint/types';
+import { AuthEventKind, BusinessDI, EntityKind, EntityStatus, IdentifyScope } from '@onefootprint/types';
 
 export const insight: InsightEvent = {
   city: 'San Francisco',
@@ -18,12 +18,10 @@ export const insight: InsightEvent = {
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
 };
 
-export const biometricCred: Liveness = {
-  attributes: null,
+export const biometricCred: AuthEvent = {
   insight,
-  source: LivenessSource.webauthnAttestation,
   linkedAttestations: [],
-  kind: LivenessKind.passkey,
+  kind: AuthEventKind.passkey,
   scope: IdentifyScope.onboarding,
 };
 

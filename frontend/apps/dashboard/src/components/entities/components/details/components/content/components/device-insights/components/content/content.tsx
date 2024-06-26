@@ -1,5 +1,5 @@
 import { IcoForbid40 } from '@onefootprint/icons';
-import type { Entity, Liveness } from '@onefootprint/types';
+import type { AuthEvent, Entity } from '@onefootprint/types';
 import { Divider, MultiSelect, Stack, Text } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +16,7 @@ import useMultiSelectOptions, { MultiSelectOptionValue } from './hooks/use-multi
 
 export type ContentProps = {
   entity: Entity;
-  livenessData: Liveness[];
+  livenessData: AuthEvent[];
 };
 
 const Content = ({ entity, livenessData }: ContentProps) => {

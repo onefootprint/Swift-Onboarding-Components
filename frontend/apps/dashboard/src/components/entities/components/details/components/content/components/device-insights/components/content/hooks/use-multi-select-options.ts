@@ -1,4 +1,4 @@
-import { BusinessDI, type Entity, IdDI, IdentifyScope, type Liveness } from '@onefootprint/types';
+import { type AuthEvent, BusinessDI, type Entity, IdDI, IdentifyScope } from '@onefootprint/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,7 @@ export type MultiSelectOption = {
   value: MultiSelectOptionValue;
 };
 
-const useMultiSelectOptions = (entity: Entity, livenessData: Liveness[]) => {
+const useMultiSelectOptions = (entity: Entity, livenessData: AuthEvent[]) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.device-insights',
   });

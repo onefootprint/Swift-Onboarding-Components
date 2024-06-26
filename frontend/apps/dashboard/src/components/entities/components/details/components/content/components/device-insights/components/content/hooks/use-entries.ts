@@ -1,5 +1,5 @@
 import type { Color } from '@onefootprint/design-tokens';
-import type { Entity, Liveness } from '@onefootprint/types';
+import type { AuthEvent, Entity } from '@onefootprint/types';
 import { IdentifyScope } from '@onefootprint/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -16,13 +16,13 @@ type Entry = {
   id: string; // unique id
   type: MultiSelectOptionValue;
   coordinates?: { lat: number; lng: number };
-  data?: Liveness;
+  data?: AuthEvent;
   cardIsLoading?: boolean;
   marker?: MapMarkerProps;
-  liveness?: Liveness;
+  liveness?: AuthEvent;
 };
 
-const useEntries = (entity: Entity, livenessData: Liveness[], options: MultiSelectOption[]) => {
+const useEntries = (entity: Entity, livenessData: AuthEvent[], options: MultiSelectOption[]) => {
   const {
     data: businessData,
     isLoading: businessCoordLoading,

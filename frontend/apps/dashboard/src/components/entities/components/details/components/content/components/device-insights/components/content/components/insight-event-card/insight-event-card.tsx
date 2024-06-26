@@ -1,7 +1,7 @@
 import { useIntl } from '@onefootprint/hooks';
 import { IcoAppclip16, IcoBolt16, IcoCheckCircle16, IcoClose16 } from '@onefootprint/icons';
-import type { Liveness } from '@onefootprint/types';
-import { EntityKind, LivenessKind } from '@onefootprint/types';
+import type { AuthEvent } from '@onefootprint/types';
+import { AuthEventKind, EntityKind } from '@onefootprint/types';
 import { Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ type InsightEventCardProps = {
   id: string;
   isSelected?: boolean;
   onSelect?: (id: string) => void;
-  liveness: Liveness;
+  liveness: AuthEvent;
 };
 
 const InsightEventCard = ({ id, liveness, isSelected, onSelect }: InsightEventCardProps) => {
@@ -93,7 +93,7 @@ const InsightEventCard = ({ id, liveness, isSelected, onSelect }: InsightEventCa
         label={t('biometrics')}
         value={
           <Stack align="center" gap={3}>
-            {kind === LivenessKind.passkey ? (
+            {kind === AuthEventKind.passkey ? (
               <>
                 <IcoCheckCircle16 color="success" />
                 <Text variant="body-3" color="success">

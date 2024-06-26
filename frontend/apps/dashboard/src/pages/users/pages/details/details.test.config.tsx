@@ -1,7 +1,8 @@
 import { mockRequest, screen, userEvent, waitFor, within } from '@onefootprint/test-utils';
-import type { DataIdentifier, Entity, Liveness, Timeline, VaultValue } from '@onefootprint/types';
+import type { AuthEvent, DataIdentifier, Entity, Timeline, VaultValue } from '@onefootprint/types';
 import {
   ActorKind,
+  AuthEventKind,
   CollectedKycDataOption,
   DataKind,
   DecisionStatus,
@@ -11,8 +12,6 @@ import {
   IdDI,
   IdentifyScope,
   InvestorProfileDI,
-  LivenessKind,
-  LivenessSource,
   TimelineEventKind,
   Vendor,
   WatchlistCheckStatus,
@@ -113,12 +112,10 @@ export const entityFixture: Entity = {
   label: null,
 };
 
-export const livenessFixture: Liveness[] = [
+export const livenessFixture: AuthEvent[] = [
   {
-    kind: LivenessKind.sms,
+    kind: AuthEventKind.sms,
     linkedAttestations: [],
-    source: LivenessSource.skipped,
-    attributes: null,
     scope: IdentifyScope.onboarding,
     insight: {
       timestamp: '2023-03-29T23:08:33.147280Z',
