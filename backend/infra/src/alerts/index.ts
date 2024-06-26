@@ -15,15 +15,15 @@ type HoneycombSecrets = {
 };
 
 export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
-  let config = new pulumi.Config();
-  let honeycombSecrets = config.getSecretObject<HoneycombSecrets>('honeycomb');
+  const config = new pulumi.Config();
+  const honeycombSecrets = config.getSecretObject<HoneycombSecrets>('honeycomb');
   if (!honeycombSecrets) {
     throw 'Missing Honeycomb API key from secrets config';
   }
   const apiKey = honeycombSecrets.apiKey;
 
   const alerts = generateAlerts(g);
-  if (new Set(alerts.map(a => a.name)).size != alerts.length) {
+  if (new Set(alerts.map(a => a.name)).size !== alerts.length) {
     throw 'Alerts must have unique `name`s';
   }
 
@@ -34,14 +34,6 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
         target: slackRecipientChannel,
       }
     : undefined;
-
-  const pagerRecipientOld: Recipient | undefined =
-    stackMeta.environment === StackEnvironment.Prod
-      ? {
-          type: 'webhook',
-          target: 'BetterStack',
-        }
-      : undefined;
 
   const pagerRecipient: Recipient | undefined =
     stackMeta.environment === StackEnvironment.Prod
@@ -95,8 +87,8 @@ export function ConfigureAlerts(g: GlobalState, stackMeta: StackMetadata) {
       });
     }
     // Create a pager trigger
-    if (pageThreshold && pagerRecipient && pagerRecipientOld) {
-      const recipients = [pagerRecipientOld, pagerRecipient];
+    if (pageThreshold && pagerRecipient) {
+      const recipients = [pagerRecipient];
       if (slackRecipient) {
         recipients.push(slackRecipient);
       }
