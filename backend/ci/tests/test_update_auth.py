@@ -80,7 +80,7 @@ def test_scrubbed_phone_email(sandbox_user, sandbox_tenant):
     data = dict(scope="onboarding")
     body = post("hosted/identify", data, auth_token)
     assert body["user"]["scrubbed_phone"] == "+1 (***) ***-**00"
-    assert body["user"]["scrubbed_email"] == "s******@o***********.com"
+    assert body["user"]["scrubbed_email"] == "f*@e******.com"
 
 
 def test_auth_methods(user_with_token):

@@ -11,8 +11,14 @@ fn findigs_fixture_email_re() -> Regex {
     Regex::new(r"^qauserfootprint\+[A-Za-z0-9]+@findigs\.com$").unwrap()
 }
 
+fn example_com_regex() -> Regex {
+    #[allow(clippy::unwrap_used)]
+    Regex::new(r"^[A-Za-z0-9._%+-]+@example\.com$").unwrap()
+}
+
 lazy_static! {
     pub static ref FINDIGS_FIXTURE_EMAIL_RE: Regex = findigs_fixture_email_re();
+    pub static ref EXAMPLE_COM_REGEX: Regex = example_com_regex();
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, DeserializeFromStr, Default)]
@@ -47,6 +53,7 @@ impl Email {
         self.email.leak() == Self::FIXTURE_EMAIL
             || self.email.leak() == Self::FIXTURE_EMAIL2
             || FINDIGS_FIXTURE_EMAIL_RE.is_match(self.email.leak())
+            || EXAMPLE_COM_REGEX.is_match(self.email.leak())
     }
 
     /// Formats the Email with most scrubbed - just first letter of email and first letter of domain

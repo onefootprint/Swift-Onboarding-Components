@@ -80,8 +80,8 @@ FIXTURE_PHONE_NUMBER = "+15555550100"
 FIXTURE_PHONE_NUMBER2 = "+15555550111"
 # This email can only be used in sandbox. It will always yield a PIN code of 000000 in the identify flow and we never send emails to it.
 # However, users created with this email can never be identified at another tenant.
-FIXTURE_EMAIL = f"sandbox@onefootprint.com"
-FIXTURE_EMAIL2 = f"sandbox2@onefootprint.com"
+FIXTURE_EMAIL = f"fp@example.com"
+FIXTURE_EMAIL2 = f"sandbox@onefootprint.com"
 
 live_phone_number_hash = hash(LIVE_PHONE_NUMBER)
 EMAIL = f"footprint.user.dev+{live_phone_number_hash}@gmail.com"
