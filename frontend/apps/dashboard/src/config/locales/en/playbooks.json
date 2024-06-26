@@ -65,24 +65,11 @@
         "credit-card": "Here's your playbook configuration based on your selected template"
       },
       "data-collection": {
-        "investor-profile": {
-          "title": "Investor profile questions",
-          "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
-          "done": "Done",
-          "toggle": {
-            "add": "Add",
-            "remove": "Remove"
-          },
-          "questions": {
-            "employment-status": "What's your employment status and occupation?",
-            "annual-income": "What's your annual income?",
-            "net-worth": "What's your net worth?",
-            "investment-goals": "What are your investment goals?",
-            "risk-tolerance": "How would you describe your risk tolerance?",
-            "immediate-family": "Do any of the following apply to you or your immediate family?"
-          }
-        },
         "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
+      },
+      "toggle-panel": {
+        "add": "Add",
+        "remove": "Remove"
       },
       "person": {
         "title": {
@@ -220,6 +207,19 @@
           "business_beneficial_owners": "Beneficial owners",
           "business_address": "Registered business address",
           "business_tin": "TIN (EIN)"
+        }
+      },
+      "investor-profile": {
+        "title": "Investor profile questions",
+        "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
+        "done": "Done",
+        "questions": {
+          "employment-status": "What's your employment status and occupation?",
+          "annual-income": "What's your annual income?",
+          "net-worth": "What's your net worth?",
+          "investment-goals": "What are your investment goals?",
+          "risk-tolerance": "How would you describe your risk tolerance?",
+          "immediate-family": "Do any of the following apply to you or your immediate family?"
         }
       },
       "auth": {
