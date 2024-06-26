@@ -112,14 +112,6 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
 
     // TESTS
     //
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -130,16 +122,6 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
-
-    // Expect Webhook from moving to stepup
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Incomplete),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
 
     // MakeDecision
     let (ww, _) = ww
@@ -158,6 +140,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
 
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
+    assert_eq!(OnboardingStatus::Incomplete, wf.status);
     // We have the correct pending doc requests
     assert_have_same_elements(
         doc_requests.iter().map(|d| d.config.clone()).collect(),
@@ -323,14 +306,6 @@ async fn test_multi_stage_step_up(state: &mut State) {
 
     // TESTS
     //
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -341,16 +316,6 @@ async fn test_multi_stage_step_up(state: &mut State) {
         .action(state, WorkflowActions::MakeVendorCalls(MakeVendorCalls {}))
         .await
         .unwrap();
-
-    // Expect Webhook from moving to stepup
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Incomplete),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
 
     // MakeDecision
     let (ww, _) = ww
@@ -372,6 +337,7 @@ async fn test_multi_stage_step_up(state: &mut State) {
 
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
+    assert_eq!(OnboardingStatus::Incomplete, wf.status);
     // assert correct action was applied
     assert_eq!(
         rule_set_result.action_triggered.unwrap(),

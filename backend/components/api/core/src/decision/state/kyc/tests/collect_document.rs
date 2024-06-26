@@ -180,15 +180,6 @@ async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome
     // TESTS
     //
     // Authorize
-    // Expect Webhooks
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await

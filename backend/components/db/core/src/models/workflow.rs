@@ -651,7 +651,10 @@ impl Workflow {
             let tenant_has_legacy_webhook = tenant
                 .allowed_preview_apis
                 .contains(&PreviewApi::LegacyOnboardingStatusWebhook);
-            if tenant_has_legacy_webhook && (new_composite_status != old_composite_status) {
+            if tenant_has_legacy_webhook
+                && (new_composite_status != old_composite_status)
+                && sv_delta.new_status.is_terminal()
+            {
                 // Only fire a OnboardingStatusChanged webhook if the scoped vault status changes or
                 // requires_manual_review changes
                 let webhook_event = WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {

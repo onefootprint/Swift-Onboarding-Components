@@ -126,15 +126,6 @@ async fn valid_action(state: &mut State) {
         WorkflowKind::Kyc(kyc::KycState::DataCollection(_))
     ));
 
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
-
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -255,15 +246,6 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     //
     // Authorize
     // Expect Webhook
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
-
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -477,15 +459,6 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     // TESTS
     //
     // Authorize
-    // Expect Webhooks
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await

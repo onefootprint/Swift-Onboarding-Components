@@ -164,15 +164,6 @@ async fn run_kyc_for_bo(
     };
     state.set_ff_client(mock_ff_client.into_mock());
 
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
-
     let (ww, _) = ww
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
@@ -273,15 +264,6 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
 
     // BoKycCompleted
     run_kyc_for_bo(state, &person_wf, tenant, obc, UserKind::Sandbox(fixture_result)).await;
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
-
     let (ww, _) = ww
         .action(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
         .await
@@ -425,15 +407,6 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus, ein_on
     state.set_ff_client(mock_ff_client.into_mock());
 
     // BoKycCompleted
-
-    mock_webhooks(
-        state,
-        vec![OnboardingStatusChanged(
-            ExpectedStatus(OnboardingStatus::Pending),
-            ExpectedRequiresManualReview(false),
-        )],
-        vec![],
-    );
 
     let (ww, _) = ww
         .action(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))

@@ -97,16 +97,10 @@ async fn collect_doc_skip_kyc(
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![
-            OnboardingStatusChanged(
-                ExpectedStatus(OnboardingStatus::Pending),
-                ExpectedRequiresManualReview(false),
-            ),
-            OnboardingStatusChanged(
-                ExpectedStatus(expected_status),
-                ExpectedRequiresManualReview(expected_review.0),
-            ),
-        ],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(expected_status),
+            ExpectedRequiresManualReview(expected_review.0),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(expected_status),
             ExpectedRequiresManualReview(expected_review.0),
