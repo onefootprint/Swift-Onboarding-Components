@@ -16,24 +16,23 @@ const SandboxBanner = () => {
     <SandboxBannerContainer>
       <StyledBanner variant="warning">
         <Stack direction="row" align="center" justify="center">
-          {t('title')}
+          <span>{t('title')}</span>
           {sandbox.canToggle ? (
             <button type="button" onClick={sandbox.toggle} disabled={!sandbox.canToggle}>
               {t('toggle')}
             </button>
           ) : (
-            <Stack direction="row" gap={2}>
-              <Link href="mailto:eli@onefootprint.com">
-                <button type="button">{t('contact-us')}</button>
-              </Link>
-              <Text variant="body-2" color="warning" marginLeft={2}>
-                {t('or')}
-              </Text>
-              <ContactForm>{t('form')}</ContactForm>
-              <Text variant="body-2" color="warning">
-                .
-              </Text>
-            </Stack>
+            <>
+              <Stack direction="row" gap={2} marginLeft={2}>
+                <span>{t('to-activate')}</span>
+                <Link href="mailto:eli@onefootprint.com">
+                  <button type="button">{t('contact-us')}</button>
+                </Link>
+                <span color="warning">{t('or')}</span>
+                <ContactForm>{t('form')}</ContactForm>
+              </Stack>
+              <span color="warning">.</span>
+            </>
           )}
         </Stack>
       </StyledBanner>

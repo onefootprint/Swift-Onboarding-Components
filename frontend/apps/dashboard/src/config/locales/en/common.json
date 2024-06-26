@@ -660,11 +660,12 @@
           }
         }
       },
+      "to-activate": "To activate your account,",
       "contact-us": "contact us",
       "form": "schedule a call",
       "or": "or",
-      "title": "You're in sandbox mode. To activate your account,",
-      "toggle": "turn sandbox mode off."
+      "title": "You're in sandbox mode.",
+      "toggle": "Turn sandbox mode off."
     },
     "custom-doc-request-form": {
       "document-name": {

@@ -19,7 +19,7 @@ const renderDefaultLayout = () =>
     </DefaultLayout>,
   );
 
-const SANDBOX_MODE_TEXT = "You're in sandbox mode. To activate your account,";
+const SANDBOX_MODE_TEXT = "You're in sandbox mode.";
 const useRouterSpy = createUseRouterSpy();
 
 describe('<DefaultLayout />', () => {
