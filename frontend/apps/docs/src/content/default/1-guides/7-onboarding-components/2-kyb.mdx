@@ -292,7 +292,6 @@ const BoData = ({ onDone }: { onDone: () => void }) => {
 
 Once you collect the BO's information, it's time to collect the personal information of the people filling out the form. With all the data collected, we need to now init Footprint's flow to finalize the onboarding: we'll collect any missing data, as well as register passkeys (if needed) and finalize the onboarding sending you a validation token.
 
-
 ```jsx filename="app.tsx"
 import { Fp, useFootprint, Di } from '@onefootprint/footprint-react';
 

@@ -1,0 +1,40 @@
+---
+page: default
+slug: /guides/sandbox-mode
+category: Guides
+title: Sandbox mode
+meta:
+  { title: Sandbox mode, description: Sandbox mode for testing integrations }
+---
+
+Footprint's sandbox mode allows you to test your integration without contacting live identity verification vendors and incurring cost. Sandbox mode is a testing environment that simulates creating real records without consulting live vendors.
+
+You can toggle between live mode and sandbox mode on the dashboard. Sandbox and live mode each have their own API keys, playbooks, and users. To start performing real KYC and KYB verifications, you must activate your account by contacting us.
+
+## Sandbox IDs
+
+In live mode, users are generally unique by phone number. In sandbox mode, two users can share a phone number as long as they have different sandbox IDs. This allows you to create multiple test users with the same login credentials. And, by providing the login credentials and sandbox ID of an existing user, you can test flows where an existing user logs back into your app.
+
+You can see an existing user's sandbox ID on the user detail page of the dashboard.
+
+## Mock outcome results
+
+When testing KYC and KYB in sandbox mode, you will be given the option to select the mock outcome after onboarding onto the playbook. Since your playbook's rules don't execute in sandbox mode, this allows you to choose which rule outcome you'd like to emulate. For example, you may select that you'd like the user to be put into manual review or to fail onboarding.
+
+<img
+  alt="Footprint sandbox outcome selector"
+  height={250}
+  src="/sandbox-mode/outcome-selector.png"
+  width={750}
+/>
+
+## Fixture contact info
+
+When testing onboarding flows in sandbox mode, it may be tedious to receive one-time passcodes (OTPs) to your phone / email. So, we have provided a set of phone numbers and emails that may be used to log into sandbox user accounts.
+
+| Type  | Fixture contact info                                                               | Fixture OTP |
+| ----- | ---------------------------------------------------------------------------------- | ----------- |
+| Phone | `+1 (555) 555-0100` or `+1 (555) 555-0111`                                         | `000000`    |
+| Email | `sandbox@onefootprint.com` or any `@example.com` address, like `piip@example.com`. | `000000`    |
+
+Sandbox contact info is only valid in sandbox mode. Don't use them in live mode.
