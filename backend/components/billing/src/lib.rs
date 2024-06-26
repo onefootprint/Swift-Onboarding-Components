@@ -241,7 +241,8 @@ impl BillingClient {
         for (count, name) in legacy_line_items {
             let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
             new_invoice_item.description = Some(name);
-            new_invoice_item.amount = Some(count);
+            new_invoice_item.quantity = Some(count as u64);
+            new_invoice_item.unit_amount = Some(0);
             new_invoice_item.metadata = Some(managed_metadata());
             new_invoice_item.currency = Some(Currency::USD);
             let i = InvoiceItem::create(&self.client, new_invoice_item).await?;
