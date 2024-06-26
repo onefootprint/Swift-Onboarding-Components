@@ -118,10 +118,10 @@ def test_phone_user_cannot_inherit_from_email(sandbox_user):
 def test_trigger(no_phone_user):
     # Should not error because the user is missing phone (we should email them instead)
     # TODO: later could use something like mailtrap/mailslurp to strongly assert the email was sent
+    action = dict(trigger=dict(kind="redo_kyc"), note="yo", kind="trigger")
+    data = dict(actions=[action])
     post(
-        f"entities/{no_phone_user.fp_id}/triggers",
-        dict(trigger=dict(kind="redo_kyc"), note="yo"),
-        *no_phone_user.tenant.db_auths,
+        f"entities/{no_phone_user.fp_id}/actions", data, *no_phone_user.tenant.db_auths
     )
 
 

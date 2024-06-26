@@ -1885,54 +1885,6 @@
                 ]
             }
         },
-        "/entities/{fp_id}/triggers": {
-            "post": {
-                "tags": [
-                    "EntityDetails",
-                    "Entities",
-                    "Private"
-                ],
-                "description": "Trigger a workflow for the provided user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TriggerRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EntityActionResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
         "/entities/{fp_id}/user_insights": {
             "get": {
                 "tags": [
@@ -25309,24 +25261,6 @@
                 },
                 "required": [
                     "code"
-                ]
-            },
-            "TriggerRequest": {
-                "type": "object",
-                "properties": {
-                    "note": {
-                        "description": "Optional note with more context on what we're asking the user to do",
-                        "type": "string"
-                    },
-                    "trigger": {
-                        "type": "string",
-                        "enum": [
-                            "redo_kyc"
-                        ]
-                    }
-                },
-                "required": [
-                    "trigger"
                 ]
             },
             "UpdateAnnotationRequest": {

@@ -1,7 +1,3 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::types::ApiResponse;
 use crate::State;
 use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
@@ -10,10 +6,8 @@ use api_core::auth::session::user::UserSession;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
-use api_core::errors::AssertionError;
 use api_core::errors::ValidationError;
 use api_core::task::execute_webhook_tasks;
-use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
 use api_core::FpResult;
 use api_wire_types::CreateTokenResponse;
@@ -38,44 +32,6 @@ use newtypes::UserSpecificWebhookKind;
 use newtypes::VaultKind;
 use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowTriggeredInfo;
-use paperclip::actix::api_v2_operation;
-use paperclip::actix::post;
-use paperclip::actix::web;
-
-#[api_v2_operation(
-    description = "Trigger a workflow for the provided user.",
-    tags(EntityDetails, Entities, Private)
-)]
-#[post("/entities/{fp_id}/triggers")]
-pub async fn post(
-    state: web::Data<State>,
-    fp_id: FpIdPath,
-    request: web::Json<TriggerRequest>,
-    auth: TenantSessionAuth,
-) -> ApiResponse<EntityActionResponse> {
-    let auth = auth.check_guard(TenantGuard::ManualReview)?;
-    let request = request.into_inner();
-    let tenant_id = auth.tenant().id.clone();
-    let is_live = auth.is_live()?;
-    let fp_id = fp_id.into_inner();
-    let session_key = state.session_sealing_key.clone();
-    let actor = DbActor::from(auth.actor());
-
-    // Generate an auth token for the user and send to their phone number on file
-    let outcome = state
-        .db_pool
-        .db_transaction(move |conn| -> FpResult<_> {
-            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let outcome = apply_trigger_request(conn, request, &sv, actor, &session_key)?;
-            Ok(outcome)
-        })
-        .await?;
-
-    let response = outcome
-        .post_commit(&state)?
-        .ok_or(AssertionError("No response creating a token"))?;
-    Ok(response)
-}
 
 fn validate(trigger: &WorkflowRequestConfig, scoped_vault: &ScopedVault) -> FpResult<()> {
     match trigger {

@@ -108,8 +108,9 @@ def test_get_users_filter_workflow_request(sandbox_user2):
     body = post("entities/search", filters, *tenant.db_auths)
     assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
-    data = dict(trigger=dict(kind="redo_kyc"), note="Flerp")
-    body = post(f"entities/{sandbox_user2.fp_id}/triggers", data, *tenant.db_auths)
+    action = dict(trigger=dict(kind="redo_kyc"), note="Flerp", kind="trigger")
+    data = dict(actions=[action])
+    body = post(f"entities/{sandbox_user2.fp_id}/actions", data, *tenant.db_auths)
 
     filters = dict(
         pagination=dict(page_size=100), has_outstanding_workflow_request=True

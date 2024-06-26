@@ -9,9 +9,10 @@ from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL, ID_DATA
 
 def send_trigger(fp_id, sandbox_tenant, trigger, expected_error=None):
     status_code = 200 if expected_error is None else 400
-    data = dict(trigger=trigger)
+    action = dict(trigger=trigger, kind="trigger")
+    data = dict(actions=[action])
     res = post(
-        f"entities/{fp_id}/triggers",
+        f"entities/{fp_id}/actions",
         data,
         *sandbox_tenant.db_auths,
         status_code=status_code,

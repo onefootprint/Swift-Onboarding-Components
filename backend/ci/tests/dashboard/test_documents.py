@@ -291,9 +291,12 @@ def test_review_documents(sandbox_tenant):
         dict(kind="proof_of_ssn", data=dict()),
     ]
     for config in document_configs:
-        data = data = dict(trigger=dict(kind="document", data=dict(configs=[config])))
-        body = post(f"entities/{user.fp_id}/triggers", data, *sandbox_tenant.db_auths)
-        token = FpAuth(body["token"])
+        action = data = dict(
+            trigger=dict(kind="document", data=dict(configs=[config])), kind="trigger"
+        )
+        data = dict(actions=[action])
+        body = post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
+        token = FpAuth(body[0]["token"])
         token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
         bifrost = BifrostClient.raw_auth(obc, token, bifrost.sandbox_id)
         bifrost.run()

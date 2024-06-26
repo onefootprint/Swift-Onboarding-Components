@@ -1,11 +1,12 @@
-use crate::triggers::TriggerRequestOutcome;
 use crate::State;
 use api_core::task::execute_webhook_tasks;
 use api_core::FpResult;
 use api_wire_types::EntityActionResponse;
+use triggers::TriggerRequestOutcome;
 
 mod decision;
 pub mod post;
+mod triggers;
 
 
 #[derive(derive_more::From)]

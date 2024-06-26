@@ -1,8 +1,8 @@
 use crate::actions::decision::apply_manual_decision;
 use crate::actions::decision::clear_review;
+use crate::actions::triggers::apply_trigger_request;
 use crate::actions::EntityActionPostCommit;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::triggers::apply_trigger_request;
 use crate::State;
 use api_core::auth::tenant::CheckTenantGuard;
 use api_core::auth::tenant::TenantGuard;
