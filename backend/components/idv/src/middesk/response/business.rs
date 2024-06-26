@@ -361,7 +361,7 @@ pub struct FmcsaRegistration {
     pub dot_number: Option<String>,
     pub legal_name: Option<String>,
     pub dba_name: Option<String>,
-    pub source: Option<Source>,
+    pub source: Option<serde_json::Value>,
     pub addresses: Option<Vec<String>>,
 }
 
