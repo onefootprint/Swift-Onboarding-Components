@@ -135,14 +135,13 @@ def test_alpaca_cip(
 
     if review_annotation:
         # Complete review
-        post(
-            f"entities/{user.fp_id}/decisions",
-            dict(
-                annotation=dict(note=review_annotation, is_pinned=False),
-                status="pass",
-            ),
-            *sandbox_tenant.db_auths,
+        action = dict(
+            annotation=dict(note=review_annotation, is_pinned=False),
+            status="pass",
+            kind="manual_decision",
         )
+        data = dict(actions=[action])
+        post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
         # Check that the timeline event for the completed review has correct review_reasons as well
         timeline = get(
             f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths

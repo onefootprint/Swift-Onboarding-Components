@@ -135,10 +135,13 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
     assert body[0]["uploads"][0]["identifier"] == "document.custom.utility_bill"
 
     # Manually review the user
-    data = dict(
-        annotation=dict(note="Looks good to me", is_pinned=False), status="pass"
+    action = dict(
+        annotation=dict(note="Looks good to me", is_pinned=False),
+        status="pass",
+        kind="manual_decision",
     )
-    post(f"entities/{user.fp_id}/decisions", data, *sandbox_tenant.db_auths)
+    data = dict(actions=[action])
+    post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
 
     # Now, the user shouldn't require manual review
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)

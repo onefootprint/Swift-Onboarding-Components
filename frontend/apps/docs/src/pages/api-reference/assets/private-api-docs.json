@@ -1291,54 +1291,6 @@
                 ]
             }
         },
-        "/entities/{fp_id}/decisions": {
-            "post": {
-                "tags": [
-                    "EntityDetails",
-                    "Entities",
-                    "Private"
-                ],
-                "description": "Creates a new override decision for an onboarding, overriding any previous decision and clearing any outstanding manual review.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ManualDecisionRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Empty"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
         "/entities/{fp_id}/decrypt_aml_hits/{signal_id}": {
             "post": {
                 "tags": [
@@ -20559,37 +20511,6 @@
                 },
                 "required": [
                     "source"
-                ]
-            },
-            "ManualDecisionRequest": {
-                "type": "object",
-                "properties": {
-                    "annotation": {
-                        "type": "object",
-                        "properties": {
-                            "is_pinned": {
-                                "type": "boolean"
-                            },
-                            "note": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "is_pinned",
-                            "note"
-                        ]
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "fail",
-                            "pass"
-                        ]
-                    }
-                },
-                "required": [
-                    "annotation",
-                    "status"
                 ]
             },
             "MultiUpdateRuleRequest": {

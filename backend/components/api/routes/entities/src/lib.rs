@@ -9,7 +9,6 @@ mod business_owners;
 mod businesses;
 mod client_token;
 mod data;
-mod decisions;
 mod documents;
 mod dupes;
 mod get;
@@ -31,11 +30,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(get::detail::get)
         .service(get::search::post)
         .service(data::get)
-        .service(actions::post)
+        .service(actions::post::post)
         .service(annotations::get)
         .service(annotations::patch)
         .service(annotations::post)
-        .service(decisions::post)
         .service(documents::get)
         .service(liveness::get)
         .service(token::post)

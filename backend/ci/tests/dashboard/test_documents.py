@@ -303,8 +303,13 @@ def test_review_documents(sandbox_tenant):
     assert all(i["review_status"] == "pending_human_review" for i in body)
 
     # Then, make a manual review decision. This should mark all documents as reviewed by a human
-    data = dict(status="pass", annotation=dict(note="lgtm", is_pinned=False))
-    post(f"entities/{user.fp_id}/decisions", data, *sandbox_tenant.db_auths)
+    action = dict(
+        status="pass",
+        annotation=dict(note="lgtm", is_pinned=False),
+        kind="manual_decision",
+    )
+    data = dict(actions=[action])
+    post(f"entities/{user.fp_id}/actions", data, *sandbox_tenant.db_auths)
 
     body = get(f"entities/{user.fp_id}/documents", None, *sandbox_tenant.db_auths)
     assert all(i["review_status"] == "reviewed_by_human" for i in body)

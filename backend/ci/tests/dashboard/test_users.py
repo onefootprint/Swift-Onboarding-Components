@@ -272,11 +272,13 @@ def test_override_onboarding_decision(sandbox_user):
     assert event["data"]["decision"]["source"]["kind"] == "footprint"
 
     test_note = "This is a test note. Flerp derp"
-    decision_data = dict(
+    action = dict(
         annotation=dict(note=test_note, is_pinned=True),
         status="fail",
+        kind="manual_decision",
     )
-    post(f"entities/{sandbox_user.fp_id}/decisions", decision_data, *tenant.db_auths)
+    decision_data = dict(actions=[action])
+    post(f"entities/{sandbox_user.fp_id}/actions", decision_data, *tenant.db_auths)
 
     scoped_user = get(f"entities/{sandbox_user.fp_id}", None, *tenant.db_auths)
     assert scoped_user["status"] == "fail"
