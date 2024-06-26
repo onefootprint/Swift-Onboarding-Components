@@ -8,6 +8,7 @@ use api_wire_types::Organization;
 use db::helpers::TenantOrPartnerTenant;
 use db::helpers::WorkosAuthIdentity;
 use db::models::tenant_rolebinding::TenantRolebinding;
+use itertools::Itertools;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -31,6 +32,7 @@ fn get(state: web::Data<State>, tenant_auth: AnyTenantSessionAuth) -> ApiListRes
         });
 
     let data = tenants
+        .sorted_by_key(|t| t.name.to_lowercase().clone())
         .map(move |t| {
             let is_auth_supported = IsAuthMethodSupported(t.supports_auth_method(auth_method));
             Organization::from_db((t, is_auth_supported))
