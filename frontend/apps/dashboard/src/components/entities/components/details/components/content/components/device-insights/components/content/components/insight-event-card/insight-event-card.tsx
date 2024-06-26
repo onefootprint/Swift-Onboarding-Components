@@ -35,6 +35,14 @@ const InsightEventCard = ({ id, liveness, isSelected, onSelect }: InsightEventCa
     scope,
   } = liveness;
 
+  const AuthEventKindToText: Record<AuthEventKind, string> = {
+    [AuthEventKind.email]: t('auth-event-kind.email'),
+    [AuthEventKind.passkey]: t('auth-event-kind.passkey'),
+    [AuthEventKind.sms]: t('auth-event-kind.sms'),
+    // Not used in production yet
+    [AuthEventKind.thirdParty]: t('auth-event-kind.third-party'),
+  };
+
   const attestation = linkedAttestations.at(0);
   const deviceInfo = {
     appClip: attestation?.deviceType === 'ios',
@@ -87,31 +95,7 @@ const InsightEventCard = ({ id, liveness, isSelected, onSelect }: InsightEventCa
     );
   }
   if (context.kind === EntityKind.person) {
-    rows.push(
-      <CardRow
-        key="biometrics"
-        label={t('biometrics')}
-        value={
-          <Stack align="center" gap={3}>
-            {kind === AuthEventKind.passkey ? (
-              <>
-                <IcoCheckCircle16 color="success" />
-                <Text variant="body-3" color="success">
-                  {t('verified')}
-                </Text>
-              </>
-            ) : (
-              <>
-                <IcoClose16 color="error" />
-                <Text variant="body-3" color="error">
-                  {t('not_verified')}
-                </Text>
-              </>
-            )}
-          </Stack>
-        }
-      />,
-    );
+    rows.push(<CardRow key="auth-method" label={t('auth-method')} value={AuthEventKindToText[kind]} />);
     if (fullRegion) {
       rows.push(<CardRow key="region" label={t('region')} value={fullRegion} />);
     }

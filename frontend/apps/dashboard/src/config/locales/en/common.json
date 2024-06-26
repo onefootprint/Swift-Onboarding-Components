@@ -1809,11 +1809,15 @@
         "title": "Device insights",
         "date-and-time": "Date & time",
         "ip-address": "IP address",
-        "biometrics": "Biometrics",
         "region": "Region",
+        "auth-method": "Method",
+        "auth-event-kind": {
+          "sms": "Phone OTP",
+          "email": "Email OTP",
+          "passkey": "Passkey",
+          "third-party": "Third party"
+        },
         "country": "Country",
-        "verified": "Verified",
-        "not_verified": "Not verified",
         "scope": {
           "onboarding": "Onboarding",
           "auth": "Auth",
