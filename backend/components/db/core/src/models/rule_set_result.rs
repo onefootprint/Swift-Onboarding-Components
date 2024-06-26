@@ -273,7 +273,6 @@ mod tests {
     use crate::models::rule_instance::RuleInstance;
     use crate::models::scoped_vault::ScopedVault;
     use crate::models::workflow::Workflow;
-    use crate::models::workflow::WorkflowUpdate;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::prelude::*;
     use chrono::Duration;
@@ -445,8 +444,7 @@ mod tests {
                 failed_for_doc_review: false,
             };
             let wf = Workflow::lock(conn, &wf.id).unwrap();
-            let update = WorkflowUpdate::set_decision(&wf, decision);
-            let wf = Workflow::update(wf, conn, update).unwrap();
+            let wf = Workflow::update_decision(wf, conn, decision).unwrap();
             Workflow::update_state(
                 conn,
                 Locked::new(wf.id.clone()),

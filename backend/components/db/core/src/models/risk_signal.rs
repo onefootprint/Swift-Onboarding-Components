@@ -332,7 +332,6 @@ mod tests {
     use crate::models::verification_request::VerificationRequest;
     use crate::models::verification_result::VerificationResult;
     use crate::models::workflow::Workflow;
-    use crate::models::workflow::WorkflowUpdate;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
@@ -466,8 +465,7 @@ mod tests {
                 };
 
                 let wf = Workflow::lock(conn, &wf.id).unwrap();
-                let update = WorkflowUpdate::set_decision(&wf, new_decision);
-                let wf = Workflow::update(wf, conn, update).unwrap();
+                let wf = Workflow::update_decision(wf, conn, new_decision).unwrap();
                 let obd = OnboardingDecision::get_active(conn, &wf.id).unwrap().unwrap();
 
                 for (vres, vendor_api, reason_codes, key_type) in vres_with_rs {

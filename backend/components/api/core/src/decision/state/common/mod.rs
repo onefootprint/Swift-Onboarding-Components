@@ -40,7 +40,6 @@ use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VReqIdentifier;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::DbPool;
 use db::DbResult;
 use db::PgConn;
@@ -249,8 +248,7 @@ pub fn handle_rules_output(
         UserTimeline::create(conn, stepup_info, v_id, wf.scoped_vault_id.clone())?;
 
         // Move the workflow back into an Incomplete state to show we are waiting for data from user
-        let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
-        Workflow::update(wf, conn, update)?;
+        Workflow::update_status(wf, conn, OnboardingStatus::Incomplete)?;
         Ok(DecisionOutput::NonTerminal)
     } else {
         risk::save_final_decision(conn, &wf.id, vres_ids, rules_output, rsr_id, review_reasons)?;

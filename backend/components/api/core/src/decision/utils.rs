@@ -13,7 +13,6 @@ use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::models::zip_code::ZipCode;
 use db::TxnPgConn;
 use feature_flag::BoolFlag;
@@ -144,8 +143,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     let biz_wf = Workflow::lock(conn, biz_wf_id)?;
     let sb = ScopedVault::get(conn, biz_wf_id)?;
     // TODO should these state transitions be handled by the ww machines?
-    let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
-    let biz_wf = Workflow::update(biz_wf, conn, update)?;
+    let (biz_wf, _) = Workflow::update_status(biz_wf, conn, OnboardingStatus::Pending)?;
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;

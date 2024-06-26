@@ -10,7 +10,6 @@ use db::models::onboarding_decision::FailedForDocReview;
 use db::models::onboarding_decision::NewDecisionArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::TxnPgConn;
 use itertools::chain;
 use itertools::Itertools;
@@ -109,8 +108,7 @@ pub fn save_final_decision(
         rule_set_result_id: rsr_id,
     };
 
-    let update = WorkflowUpdate::set_decision(&wf, decision);
-    Workflow::update(wf, conn, update)?;
+    Workflow::update_decision(wf, conn, decision)?;
 
     Ok(())
 }

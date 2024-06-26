@@ -5,7 +5,6 @@ use crate::models::task::Task;
 use crate::models::watchlist_check::NewWatchlistCheck;
 use crate::models::watchlist_check::WatchlistCheck;
 use crate::models::workflow::Workflow;
-use crate::models::workflow::WorkflowUpdate;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::prelude::*;
@@ -262,8 +261,7 @@ fn make_vault(
                 failed_for_doc_review: false,
             };
             let wf = Workflow::lock(conn, &wf.id).unwrap();
-            let update = WorkflowUpdate::set_decision(&wf, decision);
-            let wf = Workflow::update(wf, conn, update).unwrap();
+            let wf = Workflow::update_decision(wf, conn, decision).unwrap();
             // Patch the decision_made_at to make it look like it was made earlier
             use db_schema::schema::workflow;
             use diesel::prelude::*;

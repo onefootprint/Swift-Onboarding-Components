@@ -102,8 +102,12 @@ pub type SaturatedOnboardingDecisionInfo = (
 );
 
 impl OnboardingDecision {
-    #[tracing::instrument("OnboardingDecision::create", skip_all)]
-    pub(super) fn create(conn: &mut TxnPgConn, wf: &Workflow, args: NewDecisionArgs) -> DbResult<Self> {
+    #[tracing::instrument("OnboardingDecision::create_decision_and_mrs", skip_all)]
+    pub(super) fn create_decision_and_mrs(
+        conn: &mut TxnPgConn,
+        wf: &Workflow,
+        args: NewDecisionArgs,
+    ) -> DbResult<Self> {
         let NewDecisionArgs {
             vault_id,
             logic_git_hash,
@@ -114,8 +118,7 @@ impl OnboardingDecision {
             seqno,
             rule_set_result_id,
             failed_for_doc_review,
-            // Used by caller
-            manual_reviews: _,
+            manual_reviews,
         } = args;
         // Deactivate the last decision
         diesel::update(onboarding_decision::table)
@@ -157,6 +160,9 @@ impl OnboardingDecision {
             annotation_id,
         };
         UserTimeline::create(conn, decision_info, vault_id, wf.scoped_vault_id.clone())?;
+
+        ManualReview::apply_actions(conn, wf, &result, manual_reviews)?;
+
         Ok(result)
     }
 

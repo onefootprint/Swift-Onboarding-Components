@@ -76,7 +76,7 @@ impl ManualReview {
     pub fn apply_actions(
         conn: &mut TxnPgConn,
         workflow: &Workflow,
-        decision: OnboardingDecision,
+        decision: &OnboardingDecision,
         mrs: Vec<ManualReviewArgs>,
     ) -> DbResult<()> {
         let existing_mrs = Self::get_active(conn, &workflow.scoped_vault_id)?;

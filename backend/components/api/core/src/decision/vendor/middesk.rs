@@ -36,7 +36,6 @@ use db::models::verification_request::VReqIdentifier;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::DbError;
 use db::DbPool;
 use db::TxnPgConn;
@@ -623,8 +622,7 @@ pub async fn init_middesk_request(
         .db_transaction(move |conn| -> FpResult<_> {
             let wf = Workflow::lock(conn, &wf_id)?;
             // TODO should these state transitions be handled by the ww machines?
-            let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
-            let wf = Workflow::update(wf, conn, update)?;
+            let (wf, _) = Workflow::update_status(wf, conn, OnboardingStatus::Pending)?;
             let sv_id = &wf.scoped_vault_id;
 
             let decision_intent = DecisionIntent::get_or_create_for_workflow(

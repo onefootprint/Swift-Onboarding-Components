@@ -8,7 +8,6 @@ use db::models::manual_review::ManualReviewArgs;
 use db::models::onboarding_decision::NewDecisionArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::CreateAnnotationRequest;
@@ -83,8 +82,7 @@ pub fn save_review_decision(
         failed_for_doc_review: false,
     };
 
-    let update = WorkflowUpdate::set_decision(&wf, new_decision);
-    Workflow::update(wf, conn, update)?;
+    Workflow::update_decision(wf, conn, new_decision)?;
 
     Ok(())
 }

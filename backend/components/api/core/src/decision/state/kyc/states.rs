@@ -52,7 +52,6 @@ use db::models::risk_signal_group::RiskSignalGroup;
 use db::models::rule_instance::RuleInstance;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
-use db::models::workflow::WorkflowUpdate;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
@@ -102,7 +101,7 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
 
     #[tracing::instrument("OnAction<Authorize, KycState>::on_commit", skip_all)]
     fn on_commit(self, wf: Locked<DbWorkflow>, _: (), conn: &mut db::TxnPgConn) -> FpResult<KycState> {
-        DbWorkflow::update(wf, conn, WorkflowUpdate::set_status(OnboardingStatus::Pending))?;
+        DbWorkflow::update_status(wf, conn, OnboardingStatus::Pending)?;
 
         Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,

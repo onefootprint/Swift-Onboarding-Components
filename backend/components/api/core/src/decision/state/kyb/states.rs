@@ -39,7 +39,6 @@ use db::models::rule_instance::RuleInstance;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
-use db::models::workflow::WorkflowUpdate;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::DecisionStatus;
@@ -185,8 +184,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             // Skip past KYB vendor calls and go straight to decisioning
             Ok(KybState::from(KybDecisioning::new(self.wf_id, self.t_id)))
         } else {
-            let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
-            DbWorkflow::update(wf, conn, update)?;
+            DbWorkflow::update_status(wf, conn, OnboardingStatus::Pending)?;
             Ok(KybState::from(KybVendorCalls {
                 wf_id: self.wf_id,
                 t_id: self.t_id,

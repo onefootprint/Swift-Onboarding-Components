@@ -5,7 +5,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
 use db::tests::fixtures;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::TxnPgConn;
@@ -92,8 +91,7 @@ pub fn create_user_and_onboarding(
 
     let wf = fixtures::workflow::create(conn, &su.id, &obc_id, None);
     let wf = Workflow::lock(conn, &wf.id).unwrap();
-    let update = WorkflowUpdate::set_status(onboarding_status);
-    let wf = Workflow::update(wf, conn, update).unwrap();
+    let (wf, _) = Workflow::update_status(wf, conn, onboarding_status).unwrap();
     let wf_id = Locked::new(wf.id);
     let wf = Workflow::update_state(
         conn,
