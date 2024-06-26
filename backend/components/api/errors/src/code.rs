@@ -69,6 +69,49 @@ pub enum FpErrorCode {
     AlreadyOnboardedToPlaybook,
 }
 
+impl FpErrorCode {
+    pub fn should_serialize(&self) -> bool {
+        match self {
+            // Internal errors whose serialization generally don't matter
+            Self::IncodeMachineConcurrentChange => false,
+            Self::MiddeskAlreadyCompleted => false,
+            Self::MigrationDryRun => false,
+            Self::ParseNomFailure => false,
+            Self::MissingHeader => false,
+
+            // Errors used by our client
+            Self::InvalidStatusTransition => true,
+            Self::IncorrectPin => true,
+            Self::ChallengeExpired => true,
+            Self::RateLimited => true,
+            Self::UnsupportedChallengeKind => true,
+            Self::CannotRegisterPasskey => true,
+            Self::LoginChallengeUserNotFound => true,
+            Self::OnlyOneIdentifier => true,
+            Self::DocumentNotPending => true,
+            Self::InvalidFileUploadMissing => true,
+            Self::MissingMimeType => true,
+            Self::InvalidMimeType => true,
+            Self::MultipartError => true,
+            Self::FileTooLarge => true,
+            Self::InvalidContentLength => true,
+            Self::MissingFilename => true,
+            Self::NoSessionFound => true,
+            Self::SessionExpired => true,
+            Self::CouldNotParseSession => true,
+            Self::ExistingVault => true,
+            Self::FileUploadTimeout => true,
+            Self::FileTooSmall => true,
+            Self::MissingAuthHeader => true,
+
+            // Tenant-facing errors
+            Self::VaultDataValidationError => true,
+            Self::PlaybookMissingRequirements => true,
+            Self::AlreadyOnboardedToPlaybook => true,
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

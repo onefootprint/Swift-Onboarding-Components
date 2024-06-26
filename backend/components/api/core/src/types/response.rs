@@ -44,7 +44,6 @@ impl<T: Into<FpError>> From<T> for ApiError {
 #[derive(Clone, serde::Serialize)]
 pub struct SerializedApiResponse {
     pub message: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub code: Option<FpErrorCode>,
     /// Any freeform JSON context to give more information on the error
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,7 +86,7 @@ impl actix_web::ResponseError for ApiError {
 
         resp.json(SerializedApiResponse {
             message,
-            code,
+            code: code.filter(|c| c.should_serialize()),
             context,
             support_id,
             debug,
