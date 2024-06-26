@@ -17,7 +17,9 @@ pub enum CipError {
     #[error("Alpaca error: {0}")]
     AlpacaError(#[from] alpaca::Error),
 
-    #[error("Watchlist results not found")]
+    #[error(
+        "Watchlist results not found. The entity must have gone through a playbook that includes AML checks."
+    )]
     WatchlistResultsNotFoundError,
 
     #[error("Expected ReviewReason but not found: {0}")]
@@ -32,9 +34,9 @@ impl api_errors::FpErrorTrait for CipError {
             CipError::EntityDecisionManualReviewStatusNotPass
             | CipError::EntityDecisionDoesNotExist
             | CipError::EntityDecisionStatusNotPass
+            | CipError::WatchlistResultsNotFoundError
             | CipError::AlpacaError(Error::ConnectionError(_)) => StatusCode::BAD_REQUEST,
             CipError::AlpacaError(_)
-            | CipError::WatchlistResultsNotFoundError
             | CipError::ExpectedReviewReasonNotFound(_)
             | CipError::VerificationResultNotFound(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
