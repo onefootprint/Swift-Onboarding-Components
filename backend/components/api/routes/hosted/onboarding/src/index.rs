@@ -46,7 +46,7 @@ pub async fn post(
     request: OptionalJson<PostOnboardingRequest>,
 ) -> ApiResponse<OnboardingResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
-    let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
+    let request = request.into_inner().unwrap_or_default();
 
     let scoped_user_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
     let uv_id = user_auth.user_vault_id().clone();
@@ -105,7 +105,8 @@ pub async fn post(
                 insight_event: Some(insight_event.clone()),
                 new_biz_args: maybe_new_biz_args,
                 source: WorkflowSource::Hosted,
-                fixture_result,
+                fixture_result: request.fixture_result,
+                kyb_fixture_result: request.kyb_fixture_result,
                 actor: None,
                 maybe_prefill_data: Some(prefill_data),
                 is_neuro_enabled,

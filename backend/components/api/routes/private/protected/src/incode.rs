@@ -202,6 +202,7 @@ pub async fn adhoc_create_document_and_workflow(
                 maybe_prefill_data: None,
                 is_neuro_enabled: false,
                 fixture_result: None,
+                kyb_fixture_result: None,
             };
 
             let (wf_id, _, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;

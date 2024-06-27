@@ -1320,7 +1320,7 @@ footprint_reason_code_enum! {
 
         #[scope = SignalScope::BeneficialOwners, additional_scopes = vec![], match_level = None]
         #[note = "Beneficial owner failed KYC", severity = SignalSeverity::Info,  description = "One or more Benificial Owners failed KYC"]
-        BeneficialOwnerFailedKyc, // TODO: Generate this in KYB workflow
+        BeneficialOwnerFailedKyc,
 
         // ~~~~~~~~~ Secretary of State Filings ~~~~~~~~~~~
         // TODO match since I didn't understand these checks

@@ -67,6 +67,7 @@ class BifrostClient:
         override_email=None,
         provide_playbook_auth=False,
         fixture_result=None,
+        kyb_fixture_result=None,
     ):
         self.ob_config = ob_config
         self.auth_token = auth_token
@@ -74,8 +75,10 @@ class BifrostClient:
 
         if sandbox_id is None:
             self.fixture_result = None
+            self.kyb_fixture_result = None
         else:
             self.fixture_result = fixture_result or "pass"
+            self.kyb_fixture_result = kyb_fixture_result or fixture_result
 
         phone_number = override_phone or FIXTURE_PHONE_NUMBER
         email = override_email or FIXTURE_EMAIL
@@ -158,7 +161,13 @@ class BifrostClient:
         auths = [self.auth_token]
         if provide_playbook_auth:
             auths.append(self.ob_config.key)
-        body = dict(fixture_result=self.fixture_result) if self.fixture_result else None
+        body = dict(
+            fixture_result=self.fixture_result,
+            kyb_fixture_result=self.kyb_fixture_result,
+        )
+        if not self.fixture_result:
+            # For backwards compatibility
+            body = None
         return post("hosted/onboarding", body, *auths)
 
     def get_status(self):

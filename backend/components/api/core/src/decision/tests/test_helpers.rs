@@ -93,6 +93,7 @@ pub async fn create_user_and_onboarding(
                 new_biz_args: biz_args,
                 source: WorkflowSource::Hosted,
                 fixture_result: None,
+                kyb_fixture_result: None,
                 actor: None,
                 maybe_prefill_data: None,
                 is_neuro_enabled: false,

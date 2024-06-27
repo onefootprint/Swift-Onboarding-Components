@@ -50,6 +50,7 @@ pub struct NewOnboardingArgs<'a> {
     // one day
     pub new_biz_args: Option<NewBusinessVaultArgs>,
     pub fixture_result: Option<WorkflowFixtureResult>,
+    pub kyb_fixture_result: Option<WorkflowFixtureResult>,
     pub source: WorkflowSource,
     pub actor: Option<AuthActor>,
     pub maybe_prefill_data: Option<PrefillData>,
@@ -71,6 +72,7 @@ pub fn get_or_start_onboarding(
         new_biz_args,
         source,
         fixture_result,
+        kyb_fixture_result,
         actor,
         maybe_prefill_data,
         is_neuro_enabled,
@@ -164,7 +166,8 @@ pub fn get_or_start_onboarding(
                 authorized: true,
                 insight_event,
                 source,
-                fixture_result,
+                // Default to the same fixture result for KYB as KYC if none provided
+                fixture_result: kyb_fixture_result.or(fixture_result),
                 is_one_click: false,
                 wfr: None,
                 is_neuro_enabled: false, // not now

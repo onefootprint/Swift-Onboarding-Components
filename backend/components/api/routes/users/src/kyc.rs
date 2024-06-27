@@ -142,6 +142,7 @@ pub async fn post(
                 new_biz_args: None, // currently dont support KYB for NPV
                 source: WorkflowSource::Tenant,
                 fixture_result: fixture_result.map(|fr| fr.into()),
+                kyb_fixture_result: None,
                 actor: Some(actor),
                 maybe_prefill_data: None,
                 // can't run neuro if using this path

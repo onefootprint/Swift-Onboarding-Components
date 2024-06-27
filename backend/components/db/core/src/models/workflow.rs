@@ -206,6 +206,10 @@ impl Workflow {
         let sv = ScopedVault::lock(conn, &scoped_vault_id)?.into_inner();
         let v = Vault::get(conn.conn(), &scoped_vault_id)?;
 
+        if sv.is_live && fixture_result.is_some() {
+            return ValidationError("Cannot add a fixture_result for live vault").into();
+        }
+
         if !force_create {
             // Check if an active or completed workflow exists for this ob config.
             // An existing workflow (that we'd inherit) has to be _either_ active OR already
