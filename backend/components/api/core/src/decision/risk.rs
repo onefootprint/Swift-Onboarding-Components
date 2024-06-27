@@ -1,6 +1,7 @@
 use super::onboarding::Decision;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
+use api_wire_types::RuleResultRuleAction;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::manual_review::ManualReviewAction;
@@ -147,17 +148,17 @@ fn log_canonical_line(
         } => (Some(should_commit), Some(create_manual_review), action),
         Decision::RulesNotExecuted => (None, None, None),
     };
-    let decision_status = get_final_decision_status(decision, has_doc_mr, existing_status);
+    let (decision_status, _) = get_final_decision_status(decision, has_doc_mr, existing_status);
 
     tracing::info!(
-        obc_key=?obc.key,
-        ?should_commit,
-        ?create_manual_review,
-        ?decision_status,
-        ?action,
-        is_live=?obc.is_live,
-        tenant_id=?obc.tenant_id,
-        kind=?obc.kind,
+        obc_key=%obc.key,
+        should_commit=%should_commit.unwrap_or(false),
+        create_manual_review=%create_manual_review.unwrap_or(false),
+        %decision_status,
+        action=%RuleResultRuleAction::from(action),
+        is_live=%obc.is_live,
+        tenant_id=%obc.tenant_id,
+        kind=%obc.kind,
         name = "CANONICAL-WORKFLOW-COMPLETE"
     );
 }
