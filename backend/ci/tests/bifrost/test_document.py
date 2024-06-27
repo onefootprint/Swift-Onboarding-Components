@@ -104,7 +104,7 @@ def test_upload_custom_document(sandbox_tenant, must_collect_data):
         ],
     )
 
-    bifrost = BifrostClient.new_user(obc, fixture_result="document_decision")
+    bifrost = BifrostClient.new_user(obc, fixture_result="use_rules_outcome")
     user = bifrost.run()
     assert any(
         r["kind"] == "collect_document" and r["config"]["kind"] == "custom"
@@ -185,7 +185,7 @@ def test_document_playbook_no_rules(sandbox_tenant, initial_fixture_result):
 
     # Onboard the user to the doc-only playbook
     bifrost = BifrostClient.inherit_user(
-        doc_playbook, bifrost.sandbox_id, fixture_result="document_decision"
+        doc_playbook, bifrost.sandbox_id, fixture_result="use_rules_outcome"
     )
     user2 = bifrost.run()
     assert user2.fp_id == user.fp_id

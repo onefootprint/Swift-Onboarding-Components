@@ -36,15 +36,16 @@ struct Review(bool);
 #[test_state_case(Live, Doc::Success, (Pass, Review(false)))]
 #[test_state_case(Live, Doc::Failure, (Fail, Review(false)))]
 #[test_state_case(Live, Doc::DocUploadFailed, (Fail, Review(true)))]
-#[test_state_case(Sandbox(Fixture::DocumentDecision), Doc::Success, (Pass, Review(false)))]
-#[test_state_case(Sandbox(Fixture::DocumentDecision), Doc::Failure, (Fail, Review(false)))]
-#[test_state_case(Sandbox(Fixture::DocumentDecision), Doc::DocUploadFailed, (Fail, Review(true)))]
+#[test_state_case(Sandbox(Fixture::UseRulesOutcome), Doc::Success, (Pass, Review(false)))]
+#[test_state_case(Sandbox(Fixture::UseRulesOutcome), Doc::Failure, (Fail, Review(false)))]
+#[test_state_case(Sandbox(Fixture::UseRulesOutcome), Doc::DocUploadFailed, (Fail, Review(true)))]
+// We'll always respect the sandbox fixture result
 #[test_state_case(Sandbox(Fixture::Pass), Doc::Success, (Pass, Review(false)))]
-#[test_state_case(Sandbox(Fixture::Pass), Doc::Failure, (Fail, Review(false)))]
-#[test_state_case(Sandbox(Fixture::Pass), Doc::DocUploadFailed, (Fail, Review(true)))]
-#[test_state_case(Sandbox(Fixture::Fail), Doc::Success, (Pass, Review(false)))]
+#[test_state_case(Sandbox(Fixture::Pass), Doc::Failure, (Pass, Review(false)))]
+#[test_state_case(Sandbox(Fixture::Pass), Doc::DocUploadFailed, (Pass, Review(false)))]
+#[test_state_case(Sandbox(Fixture::Fail), Doc::Success, (Fail, Review(false)))]
 #[test_state_case(Sandbox(Fixture::Fail), Doc::Failure, (Fail, Review(false)))]
-#[test_state_case(Sandbox(Fixture::Fail), Doc::DocUploadFailed, (Fail, Review(true)))]
+#[test_state_case(Sandbox(Fixture::Fail), Doc::DocUploadFailed, (Fail, Review(false)))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn collect_doc_skip_kyc(
     state: &mut State,

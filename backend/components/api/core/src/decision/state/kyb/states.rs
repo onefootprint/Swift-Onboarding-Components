@@ -18,6 +18,7 @@ use crate::decision::state::MakeDecision;
 use crate::decision::state::MakeVendorCalls;
 use crate::decision::state::OnAction;
 use crate::decision::state::WorkflowState;
+use crate::decision::utils::get_final_rules_outcome;
 use crate::decision::{
     self,
 };
@@ -457,17 +458,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             (Decision::RulesNotExecuted, None)
         };
 
-        let decision = if let Some(fixture_result) = fixture_result {
-            if obc.skip_kyb {
-                // In skip KYB, we want to take the evaluated "NoRulesExecuted" rather than the fixture
-                // decision
-                decision
-            } else {
-                Decision::from(fixture_result)
-            }
-        } else {
-            decision
-        };
+        let decision = get_final_rules_outcome(fixture_result, decision);
 
         // TODO should we use common::save_decision as well in order to handle step-ups in KYB?
         // or no, because this only applies to business entities? then where are we saving the

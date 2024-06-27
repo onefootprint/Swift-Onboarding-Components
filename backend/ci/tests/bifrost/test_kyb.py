@@ -204,7 +204,10 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
         skip_kyc=skip_kyc,
         kind="kyb",
     )
-    bifrost = BifrostClient.new_user(obc)
+    fixture_result = "use_rules_outcome" if skip_kyc else "pass"
+    bifrost = BifrostClient.new_user(
+        obc, fixture_result=fixture_result, kyb_fixture_result="pass"
+    )
     # Make sure we don't send an sms to the secondary BO
 
     bifrost.data["business.kyced_beneficial_owners"] = [
@@ -217,12 +220,12 @@ def test_business_owners(sandbox_tenant, beneficial_owners):
     bifrost.run()
 
     # Just because we're not running it in this test
+    expected_status = "none" if skip_kyc else "pass"
+    assert bifrost.validate_response["user"]["status"] == expected_status
     expected_business_status = (
         "incomplete" if beneficial_owners == "collect_with_multi_kyc" else "pass"
     )
     assert bifrost.validate_response["business"]["status"] == expected_business_status
-    expected_status = "pass" if not skip_kyc else "none"
-    assert bifrost.validate_response["user"]["status"] == expected_status
 
 
 def test_skip_kyb(sandbox_tenant, must_collect_data):
@@ -234,7 +237,7 @@ def test_skip_kyb(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant, "skip_kyb", data, kind="kyb", verification_checks=[]
     )
-    bifrost = BifrostClient.new_user(obc)
+    bifrost = BifrostClient.new_user(obc, fixture_result="use_rules_outcome")
     user = bifrost.run()
     # Business should have none status since no KYB rules ran
     assert bifrost.validate_response["business"]["status"] == "none"

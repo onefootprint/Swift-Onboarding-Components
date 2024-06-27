@@ -31,7 +31,9 @@ pub enum WorkflowFixtureResult {
     Pass,
     ManualReview,
     StepUp,
+    // TODO combine these two - they are identical, with the latter being better named
     DocumentDecision,
+    UseRulesOutcome,
 }
 
 impl WorkflowFixtureResult {
@@ -46,7 +48,9 @@ impl WorkflowFixtureResult {
             // This isn't quite right, and will be ignored. We are running real rules on a real sandbox
             // document vendor call but this fn is used in a lot of places and we should have it
             // return something
-            WorkflowFixtureResult::DocumentDecision => (DecisionStatus::Pass, false),
+            WorkflowFixtureResult::DocumentDecision | WorkflowFixtureResult::UseRulesOutcome => {
+                (DecisionStatus::Pass, false)
+            }
         }
     }
 }

@@ -22,7 +22,9 @@ def test_skip_kyc(sandbox_tenant, skip_kyc_playbook):
     """
     Since a skip_kyc playbook has no rules, we expect that it doesn't set a user's status
     """
-    bifrost = BifrostClient.new_user(skip_kyc_playbook)
+    bifrost = BifrostClient.new_user(
+        skip_kyc_playbook, fixture_result="use_rules_outcome"
+    )
     user = bifrost.run()
     assert user.client.validate_response["user"]["status"] == "none"
 
@@ -37,7 +39,9 @@ def test_skip_kyc_status_unchanged(sandbox_tenant, skip_kyc_playbook):
     assert user.client.validate_response["user"]["status"] == "pass"
 
     # Then, onboard them onto a playbook with no rules.
-    bifrost = BifrostClient.inherit_user(skip_kyc_playbook, bifrost.sandbox_id)
+    bifrost = BifrostClient.inherit_user(
+        skip_kyc_playbook, bifrost.sandbox_id, fixture_result="use_rules_outcome"
+    )
     user = bifrost.run()
     # Status of the workflow should be none
     assert user.client.validate_response["user"]["status"] == "none"

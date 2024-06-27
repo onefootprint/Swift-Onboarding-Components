@@ -1,4 +1,3 @@
-use super::onboarding::Decision;
 use super::vendor::vendor_result::VendorResult;
 use super::vendor::{
     self,
@@ -19,7 +18,6 @@ use newtypes::CipKind;
 use newtypes::DecisionIntentId;
 use newtypes::DecisionStatus;
 use newtypes::FootprintReasonCode;
-use newtypes::RuleAction;
 use newtypes::ScopedVaultId;
 use newtypes::SignalSeverity;
 use newtypes::VaultKind;
@@ -253,25 +251,6 @@ pub fn get_fixture_aml_reason_codes(
         // particular
         _ => {
             vec![]
-        }
-    }
-}
-
-// TODO rm
-impl From<WorkflowFixtureResult> for Decision {
-    fn from(value: WorkflowFixtureResult) -> Self {
-        let (decision_status, create_manual_review) = value.decision_status();
-        let action = match decision_status {
-            DecisionStatus::Fail => Some(RuleAction::Fail),
-            DecisionStatus::StepUp => Some(RuleAction::identity_stepup()),
-            DecisionStatus::Pass => None,
-            DecisionStatus::None => return Decision::RulesNotExecuted,
-        };
-
-        Decision::RulesExecuted {
-            should_commit: decision_status == DecisionStatus::Pass,
-            create_manual_review,
-            action,
         }
     }
 }

@@ -16,7 +16,6 @@ use crate::decision::features::risk_signals::UserSubmittedInfoForFRC;
 use crate::decision::features::{
     self,
 };
-use crate::decision::onboarding::Decision;
 use crate::decision::rule_engine::engine::EvaluateWorkflowDecisionArgs;
 use crate::decision::rule_engine::engine::VaultDataForRules;
 use crate::decision::rule_engine::{
@@ -31,7 +30,7 @@ use crate::decision::state::common::{
 use crate::decision::state::DocCollected;
 use crate::decision::state::OnAction;
 use crate::decision::state::WorkflowState;
-use crate::decision::utils::should_execute_rules_for_document_only;
+use crate::decision::utils::get_final_rules_outcome;
 use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::{
     self,
@@ -439,7 +438,6 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
         let fixture_result = decision::utils::get_fixture_result(ff_client.clone(), &v, &wf, &self.t_id)?;
-        let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         let doc_collected = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
@@ -460,28 +458,18 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             include_rules: self.include_rules,
         };
         let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
-        // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture
-        // decision
-        let decision = if let Some(fixture_result) = fixture_result {
-            if execute_rules_for_real_document_decision_only || obc.skip_kyc {
-                // In skip KYC, we want to take the evaluated "NoRulesExecuted" rather than the fixture
-                // decision
-                decision
-            } else {
-                let doc_collected =
-                    DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
-                // we'll hopefully support fixturing the post-stepup decision but for now we just always fail
-                // with review if we stepped up
-                let fixture_result = if fixture_result == WorkflowFixtureResult::StepUp && doc_collected {
-                    WorkflowFixtureResult::ManualReview
-                } else {
-                    fixture_result
-                };
-                Decision::from(fixture_result)
-            }
+
+        let fixture_result = if fixture_result == Some(WorkflowFixtureResult::StepUp)
+            && DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some()
+        {
+            // we'll hopefully support fixturing the post-stepup decision but for now we just always
+            // fail with review if we already stepped up and provided the document
+            Some(WorkflowFixtureResult::ManualReview)
         } else {
-            decision
+            fixture_result
         };
+
+        let decision = get_final_rules_outcome(fixture_result, decision);
 
         let output = common::handle_rules_output(conn, wf, v.id, vres_ids, decision, rsr_id, review_reasons)?;
         match output {

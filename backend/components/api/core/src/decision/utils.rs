@@ -1,3 +1,4 @@
+use super::onboarding::Decision;
 use super::sandbox;
 use super::vendor::middesk::MiddeskResponseDerivedVaultData;
 use super::vendor::{
@@ -19,9 +20,11 @@ use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use geoutils::Distance;
 use geoutils::Location;
+use newtypes::DecisionStatus;
 use newtypes::DocumentFixtureResult;
 use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
+use newtypes::RuleAction;
 use newtypes::TenantId;
 use newtypes::VendorAPI;
 use newtypes::WorkflowFixtureResult;
@@ -62,22 +65,39 @@ pub fn get_fixture_result(
     }
 }
 
-pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> FpResult<bool> {
-    if !vault.is_live {
-        // Ensure that each sandbox vault has a fixture result - we don't want to make real
-        // requests for sandbox vaults
-        let fixture_result = workflow.fixture_result.unwrap_or_else(|| {
-            // TODO error here with OnboardingError::NoFixtureResultForSandboxUser.
-            // Temporarily setting this to Pass until the frontend allows choosing result on auth flows
-            tracing::warn!("No fixture result provided in document only");
-            WorkflowFixtureResult::Pass
-        });
-        Ok(matches!(fixture_result, WorkflowFixtureResult::DocumentDecision))
-    } else {
-        // TODO based on OBC
-        Ok(false)
+/// Determines whether to use the output of the rules engine or a fixture output.
+/// Creates a fixture RulesOutcome for the provided fixture_result if any, otherwise returns the
+/// actual outcome of running rules.
+pub(super) fn get_final_rules_outcome(
+    fixture_result: Option<WorkflowFixtureResult>,
+    rules_outcome: Decision,
+) -> Decision {
+    let fixture_result = match fixture_result {
+        None
+        | Some(WorkflowFixtureResult::DocumentDecision)
+        | Some(WorkflowFixtureResult::UseRulesOutcome) => {
+            // Use the real outcome of running the rules engine
+            return rules_outcome;
+        }
+        Some(fr) => fr,
+    };
+
+    // Otherwise, parse the desired outcome from the fixture_result and assemble a fixture RulesOutcome
+    let (decision_status, create_manual_review) = fixture_result.decision_status();
+    let action = match decision_status {
+        DecisionStatus::Fail => Some(RuleAction::Fail),
+        DecisionStatus::StepUp => Some(RuleAction::identity_stepup()),
+        DecisionStatus::Pass => None,
+        DecisionStatus::None => return Decision::RulesNotExecuted,
+    };
+
+    Decision::RulesExecuted {
+        should_commit: decision_status == DecisionStatus::Pass,
+        create_manual_review,
+        action,
     }
 }
+
 
 type ShouldInitiateRealDocumentRequests = bool;
 

@@ -5131,7 +5131,17 @@
                             "pass",
                             "manual_review",
                             "step_up",
-                            "document_decision"
+                            "use_rules_outcome"
+                        ]
+                    },
+                    "kyb_fixture_result": {
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass",
+                            "manual_review",
+                            "step_up",
+                            "use_rules_outcome"
                         ]
                     }
                 }
@@ -5146,7 +5156,7 @@
                             "pass",
                             "manual_review",
                             "step_up",
-                            "document_decision"
+                            "use_rules_outcome"
                         ]
                     }
                 }
