@@ -1,6 +1,6 @@
 use newtypes::PiiJsonValue;
 use newtypes::ScrubbedPiiJsonValue;
-use newtypes::UsState;
+use newtypes::UsStateAndTerritories;
 use reqwest::StatusCode;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -117,48 +117,48 @@ where
 
 // Samba only supports specific states for license_validation
 // https://dev-devportal.sambasafety.io/solutions/license-verification.html#license-validation
-pub fn license_state_is_supported_for_license_validation(state: UsState) -> bool {
+pub fn license_state_is_supported_for_license_validation(state: UsStateAndTerritories) -> bool {
     matches!(
         state,
-        UsState::AR
-            | UsState::AZ
-            | UsState::CA
-            | UsState::CO
-            | UsState::CT
-            | UsState::DC
-            | UsState::DE
-            | UsState::FL
-            | UsState::GA
-            | UsState::HI
-            | UsState::IA
-            | UsState::ID
-            | UsState::IL
-            | UsState::IN
-            | UsState::KS
-            | UsState::KY
-            | UsState::MA
-            | UsState::MD
-            | UsState::ME
-            | UsState::MI
-            | UsState::MO
-            | UsState::MS
-            | UsState::MT
-            | UsState::NC
-            | UsState::ND
-            | UsState::NE
-            | UsState::NJ
-            | UsState::NM
-            | UsState::OH
-            | UsState::OR
-            | UsState::RI
-            | UsState::SD
-            | UsState::TN
-            | UsState::TX
-            | UsState::VA
-            | UsState::VT
-            | UsState::WA
-            | UsState::WI
-            | UsState::WY
+        UsStateAndTerritories::AR
+            | UsStateAndTerritories::AZ
+            | UsStateAndTerritories::CA
+            | UsStateAndTerritories::CO
+            | UsStateAndTerritories::CT
+            | UsStateAndTerritories::DC
+            | UsStateAndTerritories::DE
+            | UsStateAndTerritories::FL
+            | UsStateAndTerritories::GA
+            | UsStateAndTerritories::HI
+            | UsStateAndTerritories::IA
+            | UsStateAndTerritories::ID
+            | UsStateAndTerritories::IL
+            | UsStateAndTerritories::IN
+            | UsStateAndTerritories::KS
+            | UsStateAndTerritories::KY
+            | UsStateAndTerritories::MA
+            | UsStateAndTerritories::MD
+            | UsStateAndTerritories::ME
+            | UsStateAndTerritories::MI
+            | UsStateAndTerritories::MO
+            | UsStateAndTerritories::MS
+            | UsStateAndTerritories::MT
+            | UsStateAndTerritories::NC
+            | UsStateAndTerritories::ND
+            | UsStateAndTerritories::NE
+            | UsStateAndTerritories::NJ
+            | UsStateAndTerritories::NM
+            | UsStateAndTerritories::OH
+            | UsStateAndTerritories::OR
+            | UsStateAndTerritories::RI
+            | UsStateAndTerritories::SD
+            | UsStateAndTerritories::TN
+            | UsStateAndTerritories::TX
+            | UsStateAndTerritories::VA
+            | UsStateAndTerritories::VT
+            | UsStateAndTerritories::WA
+            | UsStateAndTerritories::WI
+            | UsStateAndTerritories::WY
     )
 }
 

@@ -3,7 +3,7 @@ use super::VResult;
 use crate::Iso3166TwoDigitCountryCode;
 use crate::PiiJsonValue;
 use crate::PiiString;
-use crate::UsState;
+use crate::UsStateAndTerritories;
 use chrono::Datelike;
 use chrono::NaiveDate;
 use regex::Regex;
@@ -80,9 +80,11 @@ pub(super) fn validate_state(
     provided_country: Option<&PiiJsonValue>,
 ) -> VResult<PiiString> {
     let us = PiiJsonValue::from_piistring(PiiString::new(Iso3166TwoDigitCountryCode::US.to_string()));
+
+    // if country is US we require state to be 50 states + US territories
     if provided_country == Some(&us) {
         // Validate state is a US state if the country is US
-        parse_enum::<UsState>(value)
+        parse_enum::<UsStateAndTerritories>(value)
     } else {
         Ok(value)
     }

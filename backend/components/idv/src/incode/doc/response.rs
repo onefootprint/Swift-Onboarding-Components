@@ -23,7 +23,7 @@ use newtypes::PiiString;
 use newtypes::ScrubbedPiiInt;
 use newtypes::ScrubbedPiiLong;
 use newtypes::ScrubbedPiiString;
-use newtypes::UsState;
+use newtypes::UsStateAndTerritories;
 use newtypes::UsStateFull;
 use newtypes::DATE_FORMAT;
 use std::collections::HashMap;
@@ -602,10 +602,10 @@ impl FetchOCRResponse {
             .map(|is| ScrubbedPiiString::from(Self::normalize_issuing_state(is.leak_to_string())))
     }
 
-    pub fn issuing_state_us_2_char(&self) -> Option<UsState> {
+    pub fn issuing_state_us_2_char(&self) -> Option<UsStateAndTerritories> {
         self.issuing_state.as_ref().and_then(|raw_state| {
-            let from_2_char = UsState::from_raw_string(raw_state.leak()).ok();
-            let from_full: Option<UsState> = UsStateFull::from_raw_string(raw_state.leak())
+            let from_2_char = UsStateAndTerritories::from_raw_string(raw_state.leak()).ok();
+            let from_full: Option<UsStateAndTerritories> = UsStateFull::from_raw_string(raw_state.leak())
                 .ok()
                 .map(|s| s.into());
 
@@ -879,8 +879,9 @@ impl OCRAddress {
     // returns None if no state, returns Result if there's a state inside that we tried to parse
     pub fn normalized_state(&self) -> Option<Result<ScrubbedPiiString, strum::ParseError>> {
         self.state.as_ref().map(|s| {
-            let from_2_char = UsState::from_raw_string(s.leak()).ok();
-            let from_full: Option<UsState> = UsStateFull::from_raw_string(s.leak()).ok().map(|s| s.into());
+            let from_2_char = UsStateAndTerritories::from_raw_string(s.leak()).ok();
+            let from_full: Option<UsStateAndTerritories> =
+                UsStateFull::from_raw_string(s.leak()).ok().map(|s| s.into());
             // try to parse our state, otherwise error
             let parsed: Option<ScrubbedPiiString> = from_2_char.or(from_full).map(|s| s.to_string().into());
             if let Some(p) = parsed {

@@ -5,6 +5,8 @@ use strum_macros::AsRefStr;
 use strum_macros::Display;
 use strum_macros::EnumString;
 
+
+/// List of USPS-accepted US States: https://pe.usps.com/text/pub28/28apb.htm
 #[derive(
     Debug,
     Clone,
@@ -22,7 +24,7 @@ use strum_macros::EnumString;
 )]
 #[serde(rename_all = "UPPERCASE")]
 #[strum(serialize_all = "UPPERCASE")]
-pub enum UsState {
+pub enum UsStateAndTerritories {
     AL,
     AK,
     AZ,
@@ -74,13 +76,22 @@ pub enum UsState {
     WV,
     WI,
     WY,
+    // Territories
+    PR,
+    AS,
+    GU,
+    MP,
+    MH,
+    VI,
+    PW,
+    FM,
 }
 
-impl UsState {
+impl UsStateAndTerritories {
     pub fn from_raw_string(s: &str) -> Result<Self, strum::ParseError> {
         let sanitized = s.trim().to_uppercase();
 
-        UsState::try_from(sanitized.as_str())
+        UsStateAndTerritories::try_from(sanitized.as_str())
     }
 }
 
@@ -137,7 +148,21 @@ pub enum UsStateFull {
     WestVirginia,
     Wisconsin,
     Wyoming,
-    WashingtonDC, // it's in the UsState list already, but not a state /shrug
+    WashingtonDC,
+    // Territories
+    PuertoRico,
+    AmericanSamoa,
+    MarshallIslands,
+    Palau,
+    FederatedStatesofMicronesia,
+    NorthernMarianaIslands,
+    #[strum(
+        serialize = "VIRGIN_ISLANDS",
+        serialize = "US_VIRGIN_ISLANDS",
+        serialize = "UNITED_STATES_VIRGIN_ISLANDS"
+    )]
+    VirginIslands,
+    Guam,
 }
 
 impl UsStateFull {
@@ -148,60 +173,68 @@ impl UsStateFull {
     }
 }
 
-impl From<UsStateFull> for UsState {
-    fn from(value: UsStateFull) -> UsState {
+impl From<UsStateFull> for UsStateAndTerritories {
+    fn from(value: UsStateFull) -> UsStateAndTerritories {
         match value {
-            UsStateFull::Alabama => UsState::AL,
-            UsStateFull::Alaska => UsState::AK,
-            UsStateFull::Arizona => UsState::AZ,
-            UsStateFull::Arkansas => UsState::AR,
-            UsStateFull::California => UsState::CA,
-            UsStateFull::Colorado => UsState::CO,
-            UsStateFull::Connecticut => UsState::CT,
-            UsStateFull::Delaware => UsState::DE,
-            UsStateFull::Florida => UsState::FL,
-            UsStateFull::Georgia => UsState::GA,
-            UsStateFull::Hawaii => UsState::HI,
-            UsStateFull::Idaho => UsState::ID,
-            UsStateFull::Illinois => UsState::IL,
-            UsStateFull::Indiana => UsState::IN,
-            UsStateFull::Iowa => UsState::IA,
-            UsStateFull::Kansas => UsState::KS,
-            UsStateFull::Kentucky => UsState::KY,
-            UsStateFull::Louisiana => UsState::LA,
-            UsStateFull::Maine => UsState::ME,
-            UsStateFull::Maryland => UsState::MD,
-            UsStateFull::Massachusetts => UsState::MA,
-            UsStateFull::Michigan => UsState::MI,
-            UsStateFull::Minnesota => UsState::MN,
-            UsStateFull::Mississippi => UsState::MS,
-            UsStateFull::Missouri => UsState::MO,
-            UsStateFull::Montana => UsState::MT,
-            UsStateFull::Nebraska => UsState::NE,
-            UsStateFull::Nevada => UsState::NV,
-            UsStateFull::NewHampshire => UsState::NH,
-            UsStateFull::NewJersey => UsState::NJ,
-            UsStateFull::NewMexico => UsState::NM,
-            UsStateFull::NewYork => UsState::NY,
-            UsStateFull::NorthCarolina => UsState::NC,
-            UsStateFull::NorthDakota => UsState::ND,
-            UsStateFull::Ohio => UsState::OH,
-            UsStateFull::Oklahoma => UsState::OK,
-            UsStateFull::Oregon => UsState::OR,
-            UsStateFull::Pennsylvania => UsState::PA,
-            UsStateFull::RhodeIsland => UsState::RI,
-            UsStateFull::SouthCarolina => UsState::SC,
-            UsStateFull::SouthDakota => UsState::SD,
-            UsStateFull::Tennessee => UsState::TN,
-            UsStateFull::Texas => UsState::TX,
-            UsStateFull::Utah => UsState::UT,
-            UsStateFull::Vermont => UsState::VT,
-            UsStateFull::Virginia => UsState::VA,
-            UsStateFull::Washington => UsState::WA,
-            UsStateFull::WestVirginia => UsState::WV,
-            UsStateFull::Wisconsin => UsState::WI,
-            UsStateFull::Wyoming => UsState::WY,
-            UsStateFull::WashingtonDC => UsState::DC,
+            UsStateFull::Alabama => UsStateAndTerritories::AL,
+            UsStateFull::Alaska => UsStateAndTerritories::AK,
+            UsStateFull::Arizona => UsStateAndTerritories::AZ,
+            UsStateFull::Arkansas => UsStateAndTerritories::AR,
+            UsStateFull::California => UsStateAndTerritories::CA,
+            UsStateFull::Colorado => UsStateAndTerritories::CO,
+            UsStateFull::Connecticut => UsStateAndTerritories::CT,
+            UsStateFull::Delaware => UsStateAndTerritories::DE,
+            UsStateFull::Florida => UsStateAndTerritories::FL,
+            UsStateFull::Georgia => UsStateAndTerritories::GA,
+            UsStateFull::Hawaii => UsStateAndTerritories::HI,
+            UsStateFull::Idaho => UsStateAndTerritories::ID,
+            UsStateFull::Illinois => UsStateAndTerritories::IL,
+            UsStateFull::Indiana => UsStateAndTerritories::IN,
+            UsStateFull::Iowa => UsStateAndTerritories::IA,
+            UsStateFull::Kansas => UsStateAndTerritories::KS,
+            UsStateFull::Kentucky => UsStateAndTerritories::KY,
+            UsStateFull::Louisiana => UsStateAndTerritories::LA,
+            UsStateFull::Maine => UsStateAndTerritories::ME,
+            UsStateFull::Maryland => UsStateAndTerritories::MD,
+            UsStateFull::Massachusetts => UsStateAndTerritories::MA,
+            UsStateFull::Michigan => UsStateAndTerritories::MI,
+            UsStateFull::Minnesota => UsStateAndTerritories::MN,
+            UsStateFull::Mississippi => UsStateAndTerritories::MS,
+            UsStateFull::Missouri => UsStateAndTerritories::MO,
+            UsStateFull::Montana => UsStateAndTerritories::MT,
+            UsStateFull::Nebraska => UsStateAndTerritories::NE,
+            UsStateFull::Nevada => UsStateAndTerritories::NV,
+            UsStateFull::NewHampshire => UsStateAndTerritories::NH,
+            UsStateFull::NewJersey => UsStateAndTerritories::NJ,
+            UsStateFull::NewMexico => UsStateAndTerritories::NM,
+            UsStateFull::NewYork => UsStateAndTerritories::NY,
+            UsStateFull::NorthCarolina => UsStateAndTerritories::NC,
+            UsStateFull::NorthDakota => UsStateAndTerritories::ND,
+            UsStateFull::Ohio => UsStateAndTerritories::OH,
+            UsStateFull::Oklahoma => UsStateAndTerritories::OK,
+            UsStateFull::Oregon => UsStateAndTerritories::OR,
+            UsStateFull::Pennsylvania => UsStateAndTerritories::PA,
+            UsStateFull::RhodeIsland => UsStateAndTerritories::RI,
+            UsStateFull::SouthCarolina => UsStateAndTerritories::SC,
+            UsStateFull::SouthDakota => UsStateAndTerritories::SD,
+            UsStateFull::Tennessee => UsStateAndTerritories::TN,
+            UsStateFull::Texas => UsStateAndTerritories::TX,
+            UsStateFull::Utah => UsStateAndTerritories::UT,
+            UsStateFull::Vermont => UsStateAndTerritories::VT,
+            UsStateFull::Virginia => UsStateAndTerritories::VA,
+            UsStateFull::Washington => UsStateAndTerritories::WA,
+            UsStateFull::WestVirginia => UsStateAndTerritories::WV,
+            UsStateFull::Wisconsin => UsStateAndTerritories::WI,
+            UsStateFull::Wyoming => UsStateAndTerritories::WY,
+            UsStateFull::WashingtonDC => UsStateAndTerritories::DC,
+            UsStateFull::PuertoRico => UsStateAndTerritories::PR,
+            UsStateFull::AmericanSamoa => UsStateAndTerritories::AS,
+            UsStateFull::NorthernMarianaIslands => UsStateAndTerritories::MP,
+            UsStateFull::VirginIslands => UsStateAndTerritories::VI,
+            UsStateFull::Guam => UsStateAndTerritories::GU,
+            UsStateFull::MarshallIslands => UsStateAndTerritories::MH,
+            UsStateFull::Palau => UsStateAndTerritories::PW,
+            UsStateFull::FederatedStatesofMicronesia => UsStateAndTerritories::FM,
         }
     }
 }
@@ -215,6 +248,13 @@ mod tests {
     #[test_case("  North DaKotA     " => UsStateFull::NorthDakota)]
     #[test_case("new york" => UsStateFull::NewYork)]
     #[test_case("Washington D.C." => UsStateFull::WashingtonDC)]
+    #[test_case("Puerto Rico" => UsStateFull::PuertoRico)]
+    #[test_case("Virgin Islands" => UsStateFull::VirginIslands)]
+    #[test_case("U.S. Virgin Islands" => UsStateFull::VirginIslands)]
+    #[test_case("United States Virgin Islands" => UsStateFull::VirginIslands)]
+    #[test_case("American Samoa" => UsStateFull::AmericanSamoa)]
+    #[test_case("Northern Mariana Islands" => UsStateFull::NorthernMarianaIslands)]
+    #[test_case("Guam" => UsStateFull::Guam)]
     fn test_us_state_full_from_raw_string(raw: &str) -> UsStateFull {
         UsStateFull::from_raw_string(raw).unwrap()
     }

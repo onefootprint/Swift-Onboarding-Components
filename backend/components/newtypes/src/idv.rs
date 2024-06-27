@@ -3,7 +3,7 @@ use crate::BusinessOwnerData;
 use crate::IdentityDataKind;
 use crate::Iso3166TwoDigitCountryCode;
 use crate::PiiString;
-use crate::UsState;
+use crate::UsStateAndTerritories;
 use crate::UsStateFull;
 use crate::VerificationRequestId;
 use crate::DATE_FORMAT;
@@ -95,7 +95,7 @@ impl IdvData {
 
     pub fn state_and_country_for_vendors(&self) -> IdvDataStateAndCountry {
         // For some vendors, they expect US territory country codes to be sent in the "state" field but US
-        // territory code is vaulted in `id.country`
+        // territory code is vaulted in `id.country` (historically)
         if self
             .country
             .as_ref()
@@ -118,10 +118,10 @@ impl IdvData {
         }
     }
 
-    pub fn normalized_2_char_drivers_license_state(&self) -> Option<UsState> {
+    pub fn normalized_2_char_drivers_license_state(&self) -> Option<UsStateAndTerritories> {
         self.drivers_license_state.as_ref().and_then(|raw_state| {
-            let from_2_char = UsState::from_raw_string(raw_state.leak()).ok();
-            let from_full: Option<UsState> = UsStateFull::from_raw_string(raw_state.leak())
+            let from_2_char = UsStateAndTerritories::from_raw_string(raw_state.leak()).ok();
+            let from_full: Option<UsStateAndTerritories> = UsStateFull::from_raw_string(raw_state.leak())
                 .ok()
                 .map(|s| s.into());
 
@@ -240,12 +240,13 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case("US" => IdvDataStateAndCountry {state: Some("NY".into()), country: Some("US".into())})]
-    #[test_case("PR" => IdvDataStateAndCountry {state: Some("PR".into()), country: Some("US".into())}; "sending PR country puts PR into state instead of country")]
-    fn test_state_and_country_for_vendors(country: &str) -> IdvDataStateAndCountry {
+    #[test_case(Some("NY"), "US" => IdvDataStateAndCountry {state: Some("NY".into()), country: Some("US".into())})]
+    #[test_case(None, "PR" => IdvDataStateAndCountry {state: Some("PR".into()), country: Some("US".into())}; "sending PR country puts PR into state instead of country")]
+    #[test_case(Some("PR"), "US" => IdvDataStateAndCountry {state: Some("PR".into()), country: Some("US".into())}; "sending PR in state works")]
+    fn test_state_and_country_for_vendors(state: Option<&str>, country: &str) -> IdvDataStateAndCountry {
         let idv_data = IdvData {
             country: Some(country.into()),
-            state: Some("NY".into()),
+            state: state.map(|s| s.into()),
             ..Default::default()
         };
 

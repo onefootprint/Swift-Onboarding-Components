@@ -37,8 +37,7 @@ use newtypes::DocumentId;
 use newtypes::DocumentKind;
 use newtypes::PiiString;
 use newtypes::SambaReportId;
-use newtypes::UsState;
-use newtypes::UsStateFull;
+use newtypes::UsStateAndTerritories;
 use newtypes::VendorAPI;
 use newtypes::WorkflowId;
 
@@ -183,15 +182,10 @@ fn build_request(
             .map(|s| s.into())
             .ok_or(AssertionError("missing license number"))?,
         license_state: ocr_res
-            .normalized_issuing_state()
-            .and_then(|s| {
-                let from_2_char = UsState::from_raw_string(s.leak()).ok();
-                let from_full: Option<UsState> =
-                    UsStateFull::from_raw_string(s.leak()).ok().map(|s| s.into());
-
-                from_2_char.or(from_full).map(|s| s.to_string().into())
-            })
+            .issuing_state_us_2_char()
+            .map(|s| s.to_string().into())
             .ok_or(AssertionError("missing license state"))?,
+
         dob,
         address: samba_address,
         ..Default::default()
@@ -251,7 +245,7 @@ pub async fn run_samba_create_order(state: &State, context: CreateOrderContext) 
     .await?;
     // create our request based on what type of data we're handling
     let (request, lifetime_ids) = context.create_request(state, &vw, doc_id.clone(), &tvc).await?;
-    let license_state = UsState::from_raw_string(request.license_state.leak()).ok();
+    let license_state = UsStateAndTerritories::from_raw_string(request.license_state.leak()).ok();
 
     let can_run_request_for_state = if let Some(state) = license_state {
         license_state_is_supported_for_license_validation(state)
