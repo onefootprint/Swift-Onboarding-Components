@@ -4,7 +4,6 @@ use crate::IdentityDataKind;
 use crate::Iso3166TwoDigitCountryCode;
 use crate::PiiString;
 use crate::UsStateAndTerritories;
-use crate::UsStateFull;
 use crate::VerificationRequestId;
 use crate::DATE_FORMAT;
 use chrono::NaiveDate;
@@ -119,14 +118,9 @@ impl IdvData {
     }
 
     pub fn normalized_2_char_drivers_license_state(&self) -> Option<UsStateAndTerritories> {
-        self.drivers_license_state.as_ref().and_then(|raw_state| {
-            let from_2_char = UsStateAndTerritories::from_raw_string(raw_state.leak()).ok();
-            let from_full: Option<UsStateAndTerritories> = UsStateFull::from_raw_string(raw_state.leak())
-                .ok()
-                .map(|s| s.into());
-
-            from_2_char.or(from_full)
-        })
+        self.drivers_license_state
+            .as_ref()
+            .and_then(|raw_state| UsStateAndTerritories::from_raw_string(raw_state.leak()).ok())
     }
 }
 

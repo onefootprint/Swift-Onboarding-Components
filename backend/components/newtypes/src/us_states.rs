@@ -89,6 +89,14 @@ pub enum UsStateAndTerritories {
 
 impl UsStateAndTerritories {
     pub fn from_raw_string(s: &str) -> Result<Self, strum::ParseError> {
+        let from_2_char = Self::from_raw_string_inner(s);
+        let from_full: Result<UsStateAndTerritories, strum::ParseError> =
+            UsStateFull::from_raw_string_inner(s).map(|full| full.into());
+
+        from_2_char.or(from_full)
+    }
+
+    fn from_raw_string_inner(s: &str) -> Result<Self, strum::ParseError> {
         let sanitized = s.trim().to_uppercase();
 
         UsStateAndTerritories::try_from(sanitized.as_str())
@@ -166,8 +174,10 @@ pub enum UsStateFull {
 }
 
 impl UsStateFull {
-    pub fn from_raw_string(s: &str) -> Result<Self, strum::ParseError> {
-        let sanitized = s.trim().to_uppercase().replace(' ', "_").replace('.', "");
+    fn from_raw_string_inner(s: &str) -> Result<Self, strum::ParseError> {
+        let trimmed = s.trim();
+        let chars: Vec<_> = trimmed.split_whitespace().collect();
+        let sanitized = chars.join(" ").to_uppercase().replace(' ', "_").replace('.', "");
 
         UsStateFull::try_from(sanitized.as_str())
     }
@@ -245,17 +255,19 @@ mod tests {
     use super::*;
     use test_case::test_case;
 
-    #[test_case("  North DaKotA     " => UsStateFull::NorthDakota)]
-    #[test_case("new york" => UsStateFull::NewYork)]
-    #[test_case("Washington D.C." => UsStateFull::WashingtonDC)]
-    #[test_case("Puerto Rico" => UsStateFull::PuertoRico)]
-    #[test_case("Virgin Islands" => UsStateFull::VirginIslands)]
-    #[test_case("U.S. Virgin Islands" => UsStateFull::VirginIslands)]
-    #[test_case("United States Virgin Islands" => UsStateFull::VirginIslands)]
-    #[test_case("American Samoa" => UsStateFull::AmericanSamoa)]
-    #[test_case("Northern Mariana Islands" => UsStateFull::NorthernMarianaIslands)]
-    #[test_case("Guam" => UsStateFull::Guam)]
-    fn test_us_state_full_from_raw_string(raw: &str) -> UsStateFull {
-        UsStateFull::from_raw_string(raw).unwrap()
+    #[test_case("  North    DaKotA     " => UsStateAndTerritories::ND)]
+    #[test_case(" WY " => UsStateAndTerritories::WY)]
+    #[test_case("new              york" => UsStateAndTerritories::NY)]
+    #[test_case("Washington D.C." => UsStateAndTerritories::DC)]
+    #[test_case("DC" => UsStateAndTerritories::DC)]
+    #[test_case("Puerto Rico" => UsStateAndTerritories::PR)]
+    #[test_case("Virgin Islands" => UsStateAndTerritories::VI)]
+    #[test_case("U.S. Virgin Islands" => UsStateAndTerritories::VI)]
+    #[test_case("United States Virgin Islands" => UsStateAndTerritories::VI)]
+    #[test_case("American Samoa" => UsStateAndTerritories::AS)]
+    #[test_case("Northern Mariana Islands" => UsStateAndTerritories::MP)]
+    #[test_case("Guam" => UsStateAndTerritories::GU)]
+    fn test_us_state_from_raw_string(raw: &str) -> UsStateAndTerritories {
+        UsStateAndTerritories::from_raw_string(raw).unwrap()
     }
 }
