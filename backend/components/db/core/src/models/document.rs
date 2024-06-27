@@ -12,7 +12,6 @@ use db_schema::schema::document_request;
 use db_schema::schema::document_upload;
 use db_schema::schema::identity_document;
 use db_schema::schema::incode_verification_session;
-use diesel::dsl::count_star;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Insertable;
@@ -31,11 +30,9 @@ use newtypes::DocumentReviewStatus;
 use newtypes::DocumentSide;
 use newtypes::DocumentStatus;
 use newtypes::IdDocKind;
-use newtypes::IncodeVerificationSessionState;
 use newtypes::InsightEventId;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ScopedVaultId;
-use newtypes::TenantId;
 use newtypes::VendorValidatedCountryCode;
 use newtypes::WorkflowId;
 use std::collections::HashMap;
@@ -336,34 +333,6 @@ impl Document {
             .optional()?;
 
         Ok(res)
-    }
-
-    #[tracing::instrument("Document::get_billable_count", skip_all)]
-    pub fn get_billable_count(
-        conn: &mut PgConn,
-        t_id: &TenantId,
-        start_date: DateTime<Utc>,
-        end_date: DateTime<Utc>,
-    ) -> DbResult<i64> {
-        use db_schema::schema::incode_verification_session;
-        use db_schema::schema::scoped_vault;
-        let count = identity_document::table
-            .inner_join(document_request::table.inner_join(scoped_vault::table))
-            // This will have the effect of not charging for SSN cards since we don't verify them
-            // with incode
-            .inner_join(incode_verification_session::table)
-            // Basic filters
-            .filter(scoped_vault::is_live.eq(true))
-            .filter(scoped_vault::tenant_id.eq(t_id))
-            // Include deactivated scoped vaults.
-            // Only completed docs
-            .filter(incode_verification_session::state.eq(IncodeVerificationSessionState::Complete))
-            // Filter for id docs that happened during this time
-            .filter(incode_verification_session::completed_at.ge(start_date))
-            .filter(incode_verification_session::completed_at.lt(end_date))
-            .select(count_star())
-            .get_result(conn)?;
-        Ok(count)
     }
 
     /// Logic to extract the DI for a given Document row. It can be derived from GovtIssuedDocKinds,

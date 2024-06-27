@@ -21,7 +21,6 @@ use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::ob_configuration;
 use db_schema::schema::workflow;
-use diesel::dsl::count_star;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
@@ -42,7 +41,6 @@ use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusChangedPayload;
 use newtypes::PreviewApi;
 use newtypes::ScopedVaultId;
-use newtypes::TenantId;
 use newtypes::TenantScope;
 use newtypes::VaultId;
 use newtypes::VaultKind;
@@ -673,42 +671,6 @@ impl Workflow {
             .first(conn)
             .optional()?;
         Ok(res)
-    }
-
-    #[tracing::instrument("Workflow::get_billable_count", skip_all)]
-    /// Get the number of billable KYC/KYB vaults. Cannot be used to determine billing for auth or
-    /// documents
-    pub fn get_kyc_kyb_billable_count(
-        conn: &mut PgConn,
-        tenant_id: &TenantId,
-        start_date: DateTime<Utc>,
-        end_date: DateTime<Utc>,
-        kind: VaultKind,
-    ) -> DbResult<i64> {
-        use db_schema::schema::ob_configuration;
-        use db_schema::schema::scoped_vault;
-        let mut query = workflow::table
-            .inner_join(scoped_vault::table)
-            .inner_join(ob_configuration::table)
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::is_live.eq(true))
-            // Include deactivated scoped vaults.
-            .filter(scoped_vault::kind.eq(kind))
-            // We won't charge tenants for workflows that didn't finish authorizing, even if we
-            // already ran KYC checks
-            .filter(not(workflow::authorized_at.is_null()))
-            // Don't bill document workflows as KYC
-            .filter(not(workflow::kind.eq(WorkflowKind::Document)))
-            // Filter for workflows that had their final decision made during this billing period
-            .filter(workflow::decision_made_at.ge(start_date))
-            .filter(workflow::decision_made_at.lt(end_date))
-            .into_boxed();
-        query = match kind {
-            VaultKind::Person => query.filter(ob_configuration::skip_kyc.eq(false)),
-            VaultKind::Business => query.filter(ob_configuration::skip_kyb.eq(false)),
-        };
-        let count = query.select(count_star()).get_result(conn)?;
-        Ok(count)
     }
 }
 

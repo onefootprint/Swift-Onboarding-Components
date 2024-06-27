@@ -7,17 +7,14 @@ use crate::Error;
 use db::models::access_event::AccessEvent;
 use db::models::billing_event::BillingEvent;
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
-use db::models::document::Document;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultPiiFilters;
 use db::models::watchlist_check::WatchlistCheck;
-use db::models::workflow::Workflow;
 use db::DbResult;
 use db::PgConn;
 use newtypes::AccessEventPurpose;
 use newtypes::BillingEventKind;
 use newtypes::TenantId;
-use newtypes::VaultKind;
 use rust_decimal_macros::dec;
 use std::ops::Add;
 use strum::IntoEnumIterator;
@@ -56,10 +53,6 @@ pub struct BillingCounts {
     /// Instead of watchlist_checks, billing for incode continuos monitoring. We bill on a per year
     /// basis, but run the checks monthly
     pub continuous_monitoring_per_year: Option<i64>,
-
-    pub legacy_kyc: i64,
-    pub legacy_kyb: i64,
-    pub legacy_id_docs: i64,
 }
 
 #[derive(Debug)]
@@ -192,12 +185,6 @@ impl BillingCounts {
         // the BillingEvent model so it becomes easier to count at read time
         let billing_event_counts = BillingEvent::get_counts(conn, t_id, i.start, i.end)?;
 
-        // TODO rm
-        let legacy_kyc = Workflow::get_kyc_kyb_billable_count(conn, t_id, i.start, i.end, VaultKind::Person)?;
-        let legacy_kyb =
-            Workflow::get_kyc_kyb_billable_count(conn, t_id, i.start, i.end, VaultKind::Business)?;
-        let legacy_id_docs = Document::get_billable_count(conn, t_id, i.start, i.end)?;
-
         let counts = BillingCounts {
             pii,
             kyc: billing_event_counts.get(&BillingEventKind::Kyc).cloned(),
@@ -227,10 +214,6 @@ impl BillingCounts {
             continuous_monitoring_per_year: billing_event_counts
                 .get(&BillingEventKind::ContinuousMonitoringPerYear)
                 .cloned(),
-            // TODO rm
-            legacy_kyc,
-            legacy_kyb,
-            legacy_id_docs,
         };
         Ok(counts)
     }
@@ -268,9 +251,6 @@ impl Add for BillingCounts {
                 a.continuous_monitoring_per_year,
                 b.continuous_monitoring_per_year,
             ),
-            legacy_kyc: a.legacy_kyc + b.legacy_kyc,
-            legacy_kyb: a.legacy_kyb + b.legacy_kyb,
-            legacy_id_docs: a.legacy_id_docs + b.legacy_id_docs,
         }
     }
 }
