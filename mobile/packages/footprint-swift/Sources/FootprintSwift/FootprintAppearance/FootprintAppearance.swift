@@ -25,7 +25,11 @@ public struct FootprintAppearance {
         case variables
     }
     
-    private func valueToString<T>(value: T) throws -> String where T: Encodable {
+    private func valueToString<T>(value: T?) throws -> String where T: Encodable {
+        if value == nil {
+            return ""
+        }
+
         let encoder = JSONEncoder()
         let encoded = try encoder.encode(value)
         let json = try JSONSerialization.jsonObject(with: encoded, options: [])
