@@ -56,7 +56,6 @@ use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use itertools::Itertools;
-use newtypes::DecisionStatus;
 use newtypes::DocumentRequestKind;
 use newtypes::EnhancedAmlOption;
 use newtypes::KycConfig;
@@ -67,6 +66,7 @@ use newtypes::RiskSignalGroupKind;
 use newtypes::RuleSetResultKind;
 use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
+use newtypes::WorkflowFixtureResult;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -298,11 +298,10 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             RiskSignal::bulk_add(conn, neuro_frc, false, rsg.id)?;
         }
 
-        let fixture_decision =
-            decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
+        let fixture_result = decision::utils::get_fixture_result(ff_client, &vw.vault, &wf, &self.t_id)?;
         // Save KYC risk signals, if we made KYC calls
         if let Some(kyc_vendor_result) = &kyc_vendor_result {
-            let kyc_risk_signals = if let Some(fd) = fixture_decision {
+            let kyc_risk_signals = if let Some(fd) = fixture_result {
                 let reason_codes = decision::sandbox::get_fixture_kyc_reason_codes(fd, &obc);
                 let vres_id = kyc_vendor_result.verification_result_id.clone();
 
@@ -328,8 +327,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
         // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
         if let Some((watchlist_vres_id, watchlist_result_response)) = aml_vendor_result {
-            let aml_risk_signals = if let Some(fixture_decision) = fixture_decision {
-                let reason_codes = decision::sandbox::get_fixture_aml_reason_codes(&fixture_decision, &obc);
+            let aml_risk_signals = if let Some(fixture_result) = fixture_result {
+                let reason_codes = decision::sandbox::get_fixture_aml_reason_codes(&fixture_result, &obc);
 
                 RiskSignalGroupStruct {
                     footprint_reason_codes: reason_codes
@@ -439,8 +438,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
-        let fixture_decision =
-            decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
+        let fixture_result = decision::utils::get_fixture_result(ff_client.clone(), &v, &wf, &self.t_id)?;
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
@@ -458,13 +456,13 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             risk_signals: risk_signals.risk_signals,
             vault_data: &vault_data_for_rules,
             lists: &lists_for_rules,
-            is_fixture: fixture_decision.is_some(),
+            is_fixture: fixture_result.is_some(),
             include_rules: self.include_rules,
         };
         let (decision, rsr_id) = rule_engine::engine::evaluate_workflow_decision(conn, args)?;
         // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture
         // decision
-        let decision = if let Some(fixture_decision) = fixture_decision {
+        let decision = if let Some(fixture_result) = fixture_result {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
                 // In skip KYC, we want to take the evaluated "NoRulesExecuted" rather than the fixture
                 // decision
@@ -474,13 +472,12 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                     DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
                 // we'll hopefully support fixturing the post-stepup decision but for now we just always fail
                 // with review if we stepped up
-                let fixture_decision =
-                    if matches!(fixture_decision.0, DecisionStatus::StepUp) && doc_collected {
-                        (DecisionStatus::Fail, true)
-                    } else {
-                        fixture_decision
-                    };
-                Decision::from(fixture_decision)
+                let fixture_result = if fixture_result == WorkflowFixtureResult::StepUp && doc_collected {
+                    WorkflowFixtureResult::ManualReview
+                } else {
+                    fixture_result
+                };
+                Decision::from(fixture_result)
             }
         } else {
             decision

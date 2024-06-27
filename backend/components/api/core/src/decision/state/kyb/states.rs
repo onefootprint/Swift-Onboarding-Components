@@ -18,7 +18,6 @@ use crate::decision::state::MakeDecision;
 use crate::decision::state::MakeVendorCalls;
 use crate::decision::state::OnAction;
 use crate::decision::state::WorkflowState;
-use crate::decision::utils::FixtureDecision;
 use crate::decision::{
     self,
 };
@@ -49,6 +48,7 @@ use newtypes::Locked;
 use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
 use newtypes::RuleSetResultKind;
+use newtypes::WorkflowFixtureResult;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -222,7 +222,7 @@ impl KybVendorCalls {
 
 #[async_trait]
 impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
-    type AsyncRes = Option<FixtureDecision>;
+    type AsyncRes = Option<WorkflowFixtureResult>;
 
     #[tracing::instrument(
         "KybVendorCalls#OnAction<MakeVendorCalls, KybState>::execute_async_idempotent_actions",
@@ -238,9 +238,9 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
             .db_pool
             .db_query(move |conn| DbWorkflow::get_with_vault(conn, &wf_id))
             .await?;
-        let fixture_decision =
-            decision::utils::get_fixture_data_decision(state.ff_client.clone(), &v, &wf, &self.t_id)?;
-        if fixture_decision.is_none() {
+        let fixture_result =
+            decision::utils::get_fixture_result(state.ff_client.clone(), &v, &wf, &self.t_id)?;
+        if fixture_result.is_none() {
             // TODO: later will refactor so we instead construct the BusinessData from the vault here, then
             // make the CreateBusiness request to middesk and then in the on_commit txn save the
             // vreq + vres + MiddeskRequest with the business_id from the response all at once.
@@ -253,21 +253,21 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
             let _middesk_state = middesk_state.make_create_business_call(state, &self.t_id).await?;
         }
 
-        Ok(fixture_decision)
+        Ok(fixture_result)
     }
 
     #[tracing::instrument("KybVendorCalls#OnAction<MakeVendorCalls, KybState>::on_commit", skip_all)]
     fn on_commit(
         self,
         _wf: Locked<DbWorkflow>,
-        fixture_decision: Self::AsyncRes,
+        fixture_result: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> FpResult<KybState> {
-        if let Some(fixture_decision) = fixture_decision {
+        if let Some(fixture_result) = fixture_result {
             decision::utils::write_kyb_fixture_vendor_result_and_risk_signals(
                 conn,
                 &self.wf_id,
-                fixture_decision,
+                fixture_result,
             )?;
             Ok(KybState::from(KybDecisioning::new(self.wf_id, self.t_id)))
         } else {
@@ -409,7 +409,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
     ) -> FpResult<KybState> {
         let (ff_client, vault_data_for_rules, lists_for_rules) = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+        let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, &self.t_id)?;
         let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
@@ -457,13 +457,13 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             (Decision::RulesNotExecuted, None)
         };
 
-        let decision = if let Some(fixture_decision) = fixture_decision {
+        let decision = if let Some(fixture_result) = fixture_result {
             if obc.skip_kyb {
                 // In skip KYB, we want to take the evaluated "NoRulesExecuted" rather than the fixture
                 // decision
                 decision
             } else {
-                Decision::from(fixture_decision)
+                Decision::from(fixture_result)
             }
         } else {
             decision

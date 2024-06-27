@@ -17,7 +17,8 @@ use db::models::zip_code::ZipCode;
 use db::TxnPgConn;
 use feature_flag::BoolFlag;
 use feature_flag::FeatureFlagClient;
-use newtypes::DecisionStatus;
+use geoutils::Distance;
+use geoutils::Location;
 use newtypes::DocumentFixtureResult;
 use newtypes::OnboardingStatus;
 use newtypes::RiskSignalGroupKind;
@@ -27,41 +28,32 @@ use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowId;
 use std::sync::Arc;
 
-pub type CreateManualReview = bool;
-pub type FixtureDecision = (DecisionStatus, CreateManualReview);
-use geoutils::Distance;
-use geoutils::Location;
-
 #[tracing::instrument(skip_all)]
 /// Determines whether production IDV requests should be made.
 /// Returns None if we should make production IDV reqs, otherwise returns Some with the desired
-/// fixture status
-pub fn get_fixture_data_decision(
+/// fixture result
+pub fn get_fixture_result(
     ff_client: Arc<dyn FeatureFlagClient>, // Pass in ff_client directly to make it easier to test
     vault: &Vault,
     workflow: &Workflow,
     tenant_id: &TenantId,
-) -> FpResult<Option<FixtureDecision>> {
+) -> FpResult<Option<WorkflowFixtureResult>> {
     let is_demo_tenant = ff_client.flag(BoolFlag::IsDemoTenant(tenant_id));
     if !vault.is_live {
         // Ensure that each sandbox vault has a fixture result - we don't want to make real
         // requests for sandbox vaults
-        let fixture_result = if let Some(r) = workflow.fixture_result {
-            r
-        } else {
+        let fixture_result = workflow.fixture_result.unwrap_or_else(|| {
             // TODO error here with OnboardingError::NoFixtureResultForSandboxUser.
             // Temporarily setting this to Pass until the frontend allows choosing result on auth flows
             tracing::warn!("No fixture result provided");
             WorkflowFixtureResult::Pass
-        };
-        let fixture_decision = decision_status(fixture_result);
-        return Ok(Some(fixture_decision));
+        });
+        return Ok(Some(fixture_result));
     }
 
     if is_demo_tenant {
         // For our tenant we use for demos, always make a fixture pass
-        let fixture_decision = (DecisionStatus::Pass, false);
-        Ok(Some(fixture_decision))
+        Ok(Some(WorkflowFixtureResult::Pass))
     } else {
         // If this is a prod user vault, we always send prod requests
         // In order to create production UVs, customers need us to flip a bit for them in PG on `tenant`
@@ -74,14 +66,12 @@ pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow
     if !vault.is_live {
         // Ensure that each sandbox vault has a fixture result - we don't want to make real
         // requests for sandbox vaults
-        let fixture_result = if let Some(r) = workflow.fixture_result {
-            r
-        } else {
+        let fixture_result = workflow.fixture_result.unwrap_or_else(|| {
             // TODO error here with OnboardingError::NoFixtureResultForSandboxUser.
             // Temporarily setting this to Pass until the frontend allows choosing result on auth flows
             tracing::warn!("No fixture result provided in document only");
             WorkflowFixtureResult::Pass
-        };
+        });
         Ok(matches!(fixture_result, WorkflowFixtureResult::DocumentDecision))
     } else {
         // TODO based on OBC
@@ -122,23 +112,11 @@ pub fn should_throw_error_in_decision_engine_if_error_in_request(vendor_api: &Ve
     !matches!(vendor_api, VendorAPI::SocureIdPlus | VendorAPI::TwilioLookupV2)
 }
 
-pub fn decision_status(fixture_result: WorkflowFixtureResult) -> FixtureDecision {
-    match fixture_result {
-        WorkflowFixtureResult::Pass => (DecisionStatus::Pass, false),
-        WorkflowFixtureResult::Fail => (DecisionStatus::Fail, false),
-        WorkflowFixtureResult::ManualReview => (DecisionStatus::Fail, true),
-        WorkflowFixtureResult::StepUp => (DecisionStatus::StepUp, false),
-        // This isn't quite right, and will be ignored. We are running real rules on a real sandbox document
-        // vendor call but this fn is used in a lot of places and we should have it return something
-        WorkflowFixtureResult::DocumentDecision => (DecisionStatus::Pass, false),
-    }
-}
-
 #[tracing::instrument(skip_all)]
 pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     conn: &mut TxnPgConn,
     biz_wf_id: &WorkflowId,
-    fixture_decision: FixtureDecision,
+    fixture_result: WorkflowFixtureResult,
 ) -> FpResult<()> {
     let biz_wf = Workflow::lock(conn, biz_wf_id)?;
     let sb = ScopedVault::get(conn, biz_wf_id)?;
@@ -158,7 +136,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     )?;
     let vres = VerificationResult::create(conn, vreq.id, raw.into(), e_response, false)?;
 
-    let signals = sandbox::get_fixture_kyb_reason_codes(fixture_decision);
+    let signals = sandbox::get_fixture_kyb_reason_codes(fixture_result);
     RiskSignal::bulk_create(
         conn,
         &sb.id,
@@ -172,7 +150,10 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
 
     // write fixture derived vault data
     // if the decision likely would result in real derived data
-    if fixture_decision.0 == DecisionStatus::Pass || fixture_decision.1 {
+    if matches!(
+        fixture_result,
+        WorkflowFixtureResult::Pass | WorkflowFixtureResult::ManualReview
+    ) {
         let derived_vault_data = MiddeskResponseDerivedVaultData::fixture(&biz_wf.scoped_vault_id);
         derived_vault_data.write(conn)?;
     }

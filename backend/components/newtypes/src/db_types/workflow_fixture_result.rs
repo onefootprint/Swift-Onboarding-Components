@@ -1,3 +1,4 @@
+use crate::DecisionStatus;
 use diesel::sql_types::Text;
 use diesel::AsExpression;
 use diesel::FromSqlRow;
@@ -31,6 +32,23 @@ pub enum WorkflowFixtureResult {
     ManualReview,
     StepUp,
     DocumentDecision,
+}
+
+impl WorkflowFixtureResult {
+    /// For a given WorkflowFixtureResult, returns the desired DecisionStatus and whether we should
+    /// raise a manual review
+    pub fn decision_status(&self) -> (DecisionStatus, bool) {
+        match self {
+            WorkflowFixtureResult::Pass => (DecisionStatus::Pass, false),
+            WorkflowFixtureResult::Fail => (DecisionStatus::Fail, false),
+            WorkflowFixtureResult::ManualReview => (DecisionStatus::Fail, true),
+            WorkflowFixtureResult::StepUp => (DecisionStatus::StepUp, false),
+            // This isn't quite right, and will be ignored. We are running real rules on a real sandbox
+            // document vendor call but this fn is used in a lot of places and we should have it
+            // return something
+            WorkflowFixtureResult::DocumentDecision => (DecisionStatus::Pass, false),
+        }
+    }
 }
 
 crate::util::impl_enum_str_diesel!(WorkflowFixtureResult);

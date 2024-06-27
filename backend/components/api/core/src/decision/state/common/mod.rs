@@ -110,7 +110,7 @@ pub async fn run_kyc_vendor_calls(
         })
         .await?;
     let ff_client = state.ff_client.clone();
-    let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
+    let fixture_decision = decision::utils::get_fixture_result(ff_client, &v, &wf, t_id)?;
 
     if fixture_decision.is_some() {
         Ok(decision::sandbox::save_fixture_vendor_result(&state.db_pool, &di, &wf).await?)
@@ -184,12 +184,12 @@ pub async fn run_aml_call(
         })
         .await?;
     let ff_client = state.ff_client.clone();
-    let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
+    let fixture_result = decision::utils::get_fixture_result(ff_client, &v, &wf, t_id)?;
 
-    if let Some(fixture_decision) = fixture_decision {
+    if let Some(fixture_result) = fixture_result {
         decision::sandbox::save_fixture_incode_watchlist_result(
             &state.db_pool,
-            fixture_decision,
+            fixture_result,
             &di.id,
             &wf.scoped_vault_id,
             &v.public_key,

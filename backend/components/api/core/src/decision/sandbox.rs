@@ -1,5 +1,4 @@
 use super::onboarding::Decision;
-use super::utils::FixtureDecision;
 use super::vendor::vendor_result::VendorResult;
 use super::vendor::{
     self,
@@ -26,14 +25,15 @@ use newtypes::SignalSeverity;
 use newtypes::VaultKind;
 use newtypes::VaultPublicKey;
 use newtypes::VendorAPI;
+use newtypes::WorkflowFixtureResult;
 use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
-// In future, this could take in FixtureDecision and determine the fixture vendor response to use.
-// But its a little tricky because if the sandbox selection is "Review" or "Stepup" thats a function
-// of rules not just the individual vendor responses
+// In future, this could take in WorkflowFixtureResult and determine the fixture vendor response to
+// use. But its a little tricky because if the sandbox selection is "Review" or "Stepup" thats a
+// function of rules not just the individual vendor responses
 fn fixture_response_for_vendor_api(vendor_api: VendorAPI) -> FpResult<VendorResponse> {
     match vendor_api {
         VendorAPI::IdologyExpectId => {
@@ -98,26 +98,26 @@ pub async fn save_fixture_vendor_result(
 
 // TODO: get_fixture_kyb_reason_codes
 pub fn get_fixture_kyb_reason_codes(
-    fixture_decision: FixtureDecision,
+    fixture_result: WorkflowFixtureResult,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
-    make_random_kyc_reason_codes_for_fixture_decision(fixture_decision, VaultKind::Business)
+    make_random_kyc_reason_codes_for_fixture_decision(fixture_result, VaultKind::Business)
         .into_iter()
         .map(|r| (r, VendorAPI::MiddeskBusinessUpdateWebhook))
         .collect()
 }
 
 pub fn get_fixture_kyc_reason_codes(
-    fixture_decision: FixtureDecision,
+    fixture_result: WorkflowFixtureResult,
     obc: &ObConfiguration,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
     match obc.cip_kind {
         // We produce specific fixtures for Alpaca to better simulate the 3 canonical use cases that Alpaca
         // always asks for
-        Some(CipKind::Alpaca) => get_fixture_reason_codes_alpaca(fixture_decision),
+        Some(CipKind::Alpaca) => get_fixture_reason_codes_alpaca(fixture_result),
         // For non-alpaca cases, we just produce an assortment of reasonable random risk signals
         Some(CipKind::Apex) | None => {
             let reason_codes =
-                make_random_kyc_reason_codes_for_fixture_decision(fixture_decision, VaultKind::Person);
+                make_random_kyc_reason_codes_for_fixture_decision(fixture_result, VaultKind::Person);
 
             reason_codes
                 .into_iter()
@@ -128,14 +128,13 @@ pub fn get_fixture_kyc_reason_codes(
 }
 
 pub fn make_random_kyc_reason_codes_for_fixture_decision(
-    fixture_decision: FixtureDecision,
+    fixture_result: WorkflowFixtureResult,
     vault_kind: VaultKind,
 ) -> Vec<FootprintReasonCode> {
     let reason_code_map = build_reason_code_map(vault_kind);
-    let (decision_status, create_manual_review) = fixture_decision;
 
     // Create some mock risk signals that are somewhat consistent with the mock decision
-    match (decision_status, create_manual_review) {
+    match fixture_result.decision_status() {
         // Straight out rejection
         (DecisionStatus::Fail, false) => choose_random_reason_codes(reason_code_map, SignalSeverity::High, 3),
         // Manual review
@@ -158,10 +157,9 @@ pub fn make_random_kyc_reason_codes_for_fixture_decision(
 // name/dob/address mismatch) #fail => KYC hard fails (KYC reason_code should be SSN does not match
 // or something else catastrophic)
 pub fn get_fixture_reason_codes_alpaca(
-    fixture_decision: FixtureDecision,
+    fixture_result: WorkflowFixtureResult,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
-    let (decision_status, create_manual_review) = fixture_decision;
-    let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
+    let reason_codes = match fixture_result.decision_status() {
         // #pass | #manualreview
         (DecisionStatus::Pass, _) | (DecisionStatus::Fail, true) | (DecisionStatus::None, _) => {
             // TODO: later could randomize some other innocuous reason codes here if we wanted
@@ -233,28 +231,24 @@ fn build_reason_code_map(vault_kind: VaultKind) -> HashMap<SignalSeverity, Vec<F
 }
 
 pub fn get_fixture_aml_reason_codes(
-    fixture_decision: &FixtureDecision,
+    fixture_result: &WorkflowFixtureResult,
     obc: &ObConfiguration,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
     match obc.cip_kind {
         // For Alpaca, for the manual_review fixture, we want to simulate a watchlist hit
-        Some(CipKind::Alpaca) => {
-            let (decision_status, create_manual_review) = fixture_decision;
-
-            match (decision_status, create_manual_review) {
-                (DecisionStatus::Fail, true) => vec![
-                    (
-                        FootprintReasonCode::WatchlistHitOfac,
-                        VendorAPI::IncodeWatchlistCheck,
-                    ),
-                    (
-                        FootprintReasonCode::AdverseMediaHit,
-                        VendorAPI::IncodeWatchlistCheck,
-                    ),
-                ],
-                _ => vec![],
-            }
-        }
+        Some(CipKind::Alpaca) => match fixture_result.decision_status() {
+            (DecisionStatus::Fail, true) => vec![
+                (
+                    FootprintReasonCode::WatchlistHitOfac,
+                    VendorAPI::IncodeWatchlistCheck,
+                ),
+                (
+                    FootprintReasonCode::AdverseMediaHit,
+                    VendorAPI::IncodeWatchlistCheck,
+                ),
+            ],
+            _ => vec![],
+        },
         // For non-alpaca cases, we don't really currently provide a way to fixture watchlist hits in
         // particular
         _ => {
@@ -263,9 +257,10 @@ pub fn get_fixture_aml_reason_codes(
     }
 }
 
-impl From<FixtureDecision> for Decision {
-    fn from(value: FixtureDecision) -> Self {
-        let (decision_status, create_manual_review) = value;
+// TODO rm
+impl From<WorkflowFixtureResult> for Decision {
+    fn from(value: WorkflowFixtureResult) -> Self {
+        let (decision_status, create_manual_review) = value.decision_status();
         let action = match decision_status {
             DecisionStatus::Fail => Some(RuleAction::Fail),
             DecisionStatus::StepUp => Some(RuleAction::identity_stepup()),
@@ -281,8 +276,8 @@ impl From<FixtureDecision> for Decision {
     }
 }
 
-fn incode_watchlist_result_response_for_fixture(fixture_decision: FixtureDecision) -> serde_json::Value {
-    match fixture_decision {
+fn incode_watchlist_result_response_for_fixture(fixture_result: WorkflowFixtureResult) -> serde_json::Value {
+    match fixture_result.decision_status() {
         // #manualreview
         (newtypes::DecisionStatus::Fail, true) => {
             idv::test_fixtures::incode_watchlist_result_response_yes_hits()
@@ -293,12 +288,12 @@ fn incode_watchlist_result_response_for_fixture(fixture_decision: FixtureDecisio
 
 pub async fn save_fixture_incode_watchlist_result(
     db_pool: &DbPool,
-    fixture_decision: FixtureDecision,
+    fixture_result: WorkflowFixtureResult,
     di_id: &DecisionIntentId,
     sv_id: &ScopedVaultId,
     vault_public_key: &VaultPublicKey,
 ) -> FpResult<(VerificationResult, WatchlistResultResponse)> {
-    let raw = incode_watchlist_result_response_for_fixture(fixture_decision);
+    let raw = incode_watchlist_result_response_for_fixture(fixture_result);
     let parsed = serde_json::from_value::<WatchlistResultResponse>(raw.clone())?;
 
     let di_id = di_id.clone();
