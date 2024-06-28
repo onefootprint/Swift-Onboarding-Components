@@ -5,13 +5,17 @@ use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
 use db_schema::schema::vault_dr_aws_pre_enrollment;
+use db_schema::schema::vault_dr_blob;
 use db_schema::schema::vault_dr_config;
 use diesel::prelude::*;
 use diesel::Insertable;
+use newtypes::DataLifetimeId;
+use newtypes::DataLifetimeSeqno;
 use newtypes::Locked;
 use newtypes::PiiString;
 use newtypes::TenantId;
 use newtypes::VaultDrAwsPreEnrollmentId;
+use newtypes::VaultDrBlobId;
 use newtypes::VaultDrConfigId;
 
 #[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
@@ -142,5 +146,48 @@ impl VaultDrConfig {
             .execute(conn.conn())?;
 
         Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Queryable, Selectable, Identifiable)]
+#[diesel(table_name = vault_dr_blob)]
+pub struct VaultDrBlob {
+    pub id: VaultDrBlobId,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
+
+    pub config_id: VaultDrConfigId,
+    pub data_lifetime_id: DataLifetimeId,
+    pub dl_created_seqno: DataLifetimeSeqno,
+
+    pub bucket_path: String,
+    pub content_etag: String,
+    pub wrapped_record_key: PiiString,
+    pub content_length_bytes: i64,
+}
+
+#[derive(Debug, Clone, Insertable)]
+#[diesel(table_name = vault_dr_blob)]
+pub struct NewVaultDrBlob<'a> {
+    pub created_at: DateTime<Utc>,
+
+    pub config_id: &'a VaultDrConfigId,
+    pub data_lifetime_id: &'a DataLifetimeId,
+    pub dl_created_seqno: DataLifetimeSeqno,
+
+    pub bucket_path: String,
+    pub content_etag: String,
+    pub wrapped_record_key: PiiString,
+    pub content_length_bytes: i64,
+}
+
+impl VaultDrBlob {
+    pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewVaultDrBlob>) -> DbResult<Vec<Self>> {
+        let results = diesel::insert_into(vault_dr_blob::table)
+            .values(new)
+            .get_results(conn.conn())?;
+
+        Ok(results)
     }
 }

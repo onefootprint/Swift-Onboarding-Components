@@ -381,3 +381,8 @@ define_newtype_id!(
     String,
     "Identifier for Vault Disaster Recovery config record"
 );
+define_newtype_id!(
+    VaultDrBlobId,
+    String,
+    "Identifier for Vault Disaster Recovery blob row"
+);

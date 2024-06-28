@@ -1544,11 +1544,11 @@ diesel::table! {
         created_at -> Timestamptz,
         config_id -> Text,
         data_lifetime_id -> Text,
-        dl_created_at_seqno -> Int8,
+        dl_created_seqno -> Int8,
         bucket_path -> Text,
         content_etag -> Text,
-        content_md5 -> Text,
         wrapped_record_key -> Text,
+        content_length_bytes -> Int8,
     }
 }
 

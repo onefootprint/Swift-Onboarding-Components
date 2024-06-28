@@ -1,0 +1,3 @@
+ALTER TABLE vault_dr_blob DROP COLUMN content_length_bytes;
+ALTER TABLE vault_dr_blob RENAME COLUMN dl_created_seqno TO dl_created_at_seqno;
+ALTER INDEX vault_dr_blob_dl_created_seqno RENAME TO vault_dr_blob_dl_created_at_seqno;
