@@ -115,6 +115,8 @@ pub enum Error {
     BoMissingEmail,
     #[error("Business owner is missing phone number.")]
     BoMissingPhoneNumber,
+    #[error("Conflicts with {0}.")]
+    ConflictingDataNotAllowed(DataIdentifier),
 }
 
 pub type VResult<T> = Result<T, Error>;

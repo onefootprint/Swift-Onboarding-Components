@@ -176,6 +176,30 @@ impl DataIdentifier {
             Self::Id(IdentityDataKind::PhoneNumber) | Self::Id(IdentityDataKind::Email)
         )
     }
+
+    /// does this data identifier conflict with the existence of another data identifer already
+    /// present, return conflicting DIs
+    pub fn conflicting_data_identifiers(&self) -> Vec<DataIdentifier> {
+        match self {
+            DataIdentifier::Id(id) => match *id {
+                // don't allow SSN when ITIN is present
+                IdentityDataKind::Itin => vec![
+                    DataIdentifier::Id(IdentityDataKind::Ssn9),
+                    DataIdentifier::Id(IdentityDataKind::Ssn4),
+                ],
+                // don't allow ITIN when SSN is present
+                IdentityDataKind::Ssn4 | IdentityDataKind::Ssn9 => {
+                    vec![DataIdentifier::Id(IdentityDataKind::Itin)]
+                }
+                _ => vec![],
+            },
+            DataIdentifier::Custom(_)
+            | DataIdentifier::Business(_)
+            | DataIdentifier::InvestorProfile(_)
+            | DataIdentifier::Document(_)
+            | DataIdentifier::Card(_) => vec![],
+        }
+    }
 }
 
 #[derive(derive_more::From)]

@@ -124,7 +124,20 @@ impl DeriveValues for IdentityData {
     fn derive_values(&self) -> Vec<DataIdentifierValue> {
         match self {
             IdentityData::Sss9(ssn9) => {
-                vec![get_ssn4_from_ssn9(ssn9)]
+                let us_tax_id = DataIdentifierValue {
+                    di: DataIdentifier::Id(IdentityDataKind::UsTaxId),
+                    value: ssn9.clone(),
+                    parsed: (),
+                };
+                vec![get_ssn4_from_ssn9(ssn9), us_tax_id]
+            }
+            IdentityData::Itin(itin) => {
+                let us_tax_id = DataIdentifierValue {
+                    di: DataIdentifier::Id(IdentityDataKind::UsTaxId),
+                    value: itin.clone(),
+                    parsed: (),
+                };
+                vec![us_tax_id]
             }
             IdentityData::UsTaxId(ssn_or_itin) => match ssn_or_itin {
                 SsnOrItin::Ssn(ssn9) => {

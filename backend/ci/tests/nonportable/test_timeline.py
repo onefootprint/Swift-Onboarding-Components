@@ -22,7 +22,9 @@ def test_timeline_data_added(sandbox_tenant):
     ]
     assert len(data_collected_events) == 2
     # Include name CDO in edited attributes even though we only changed first name
-    assert set(data_collected_events[1]["data"]["attributes"]) == set(["ssn9", "name"])
+    assert set(data_collected_events[1]["data"]["attributes"]) == set(
+        ["ssn9", "name", "us_tax_id"]
+    )
     assert data_collected_events[0]["data"]["attributes"] == ["email"]
     assert all(
         e["data"]["actor"]["id"] == sandbox_tenant.sk.id for e in data_collected_events

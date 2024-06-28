@@ -189,6 +189,7 @@ async fn test_prefill_data(state: &mut State) {
             IDK::Dob.into(),
             IDK::Ssn4.into(),
             IDK::Ssn9.into(),
+            IDK::UsTaxId.into(),
         ],
     );
     let expected_vw2_data = vec![

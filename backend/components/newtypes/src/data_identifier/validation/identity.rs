@@ -33,6 +33,7 @@ pub enum IdentityData {
     // TODO: Make this Ssn9(Ssn9) once we decide on one of old_clean_and_validate_ssn9 or
     // new_clean_and_validate_ssn9.
     Sss9(PiiString),
+    Itin(PiiString),
     UsTaxId(SsnOrItin),
 }
 
@@ -85,7 +86,15 @@ impl CleanAndValidate for IDK {
                     parsed: Some(IdentityData::Sss9(ssn9)),
                 });
             }
-            IDK::Itin => clean_and_validate_itin(value.as_string()?)?,
+            IDK::Itin => {
+                let parsed = clean_and_validate_itin(value.as_string()?)?;
+
+                return Ok(DataIdentifierValue {
+                    di: self.into(),
+                    value: parsed.clone(),
+                    parsed: Some(IdentityData::Itin(parsed)),
+                });
+            }
             IDK::UsTaxId => {
                 let parsed = SsnOrItin::parse(value.as_string()?)?;
 

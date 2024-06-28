@@ -204,11 +204,25 @@ impl<Type> VaultWrapper<Type> {
                     .flatten()
                     .filter(|di| dis.contains(&di))
                 {
-                    let err = DiValidationError::PartialUpdateNotAllowed(speculative_cdo.clone()).into();
+                    let err: NtError =
+                        DiValidationError::PartialUpdateNotAllowed(speculative_cdo.clone()).into();
                     validation_errors.insert(di, err);
                 }
             }
         }
+
+        // ensure that we aren't adding a conflicting DI (i.e. itin when ssn9 exists)
+        for di in &dis {
+            let di_clone = (*di).clone();
+            di.conflicting_data_identifiers()
+                .iter()
+                .filter(|conflict| self.data(conflict).is_some() || dis.contains(conflict))
+                .for_each(|conflict| {
+                    let err: NtError = DiValidationError::ConflictingDataNotAllowed(conflict.clone()).into();
+                    validation_errors.insert(di_clone.clone(), err);
+                });
+        }
+
 
         if !validation_errors.is_empty() {
             let validation_error = DataValidationError::FieldValidationError(validation_errors);
