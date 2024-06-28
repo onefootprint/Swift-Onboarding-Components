@@ -30,7 +30,9 @@ enum Command {
     // Cron jobs
     CreateOverdueWatchlistCheckTasks(commands::CreateOverdueWatchlistCheckTasks),
     GenerateInvoices(commands::GenerateInvoices),
+    // Workers
     ExecuteTasks(commands::ExecuteTasks),
+    VaultDrWorker(commands::VaultDrWorker),
 }
 
 #[allow(clippy::expect_used)]
@@ -81,6 +83,7 @@ async fn run(config: Config) -> Result<()> {
         Some(Command::CreateOverdueWatchlistCheckTasks(subcommand)) => subcommand.run(config, state).await?,
         Some(Command::GenerateInvoices(subcommand)) => subcommand.run(config, state).await?,
         Some(Command::ExecuteTasks(subcommand)) => subcommand.run(config, state).await?,
+        Some(Command::VaultDrWorker(subcommand)) => subcommand.run(config, state).await?,
     };
 
     telemetry::shutdown();

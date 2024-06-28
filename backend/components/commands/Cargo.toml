@@ -13,6 +13,7 @@ billing = { path = "../billing" }
 db = { path = "../db/core" }
 db_schema = { path = "../db/schema" }
 newtypes = { path = "../newtypes" }
+vault_dr = { path = "../vault_dr" }
 
 anyhow = { workspace = true }
 chrono = { workspace = true }

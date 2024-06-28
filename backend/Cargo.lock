@@ -3106,6 +3106,7 @@ dependencies = [
  "test-case",
  "tokio",
  "tracing",
+ "vault_dr",
 ]
 
 [[package]]
