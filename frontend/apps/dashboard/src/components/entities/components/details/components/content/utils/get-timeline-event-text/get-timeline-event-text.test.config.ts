@@ -136,6 +136,7 @@ export const onboardingDecisionEventFixture = {
           mustCollectData: [CollectedKycDataOption.name, CollectedKycDataOption.dob, CollectedKycDataOption.ssn9],
         },
         vendors: [Vendor.idology],
+        ranRulesInSandbox: false,
       },
       annotation: null,
     },

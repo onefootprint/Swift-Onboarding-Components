@@ -56,7 +56,7 @@ const OnboardingDecisionEventHeader = ({ data }: OnboardingDecisionEventHeaderPr
             />
           </Text>
         </Stack>
-        <Details ruleSetResultId={ruleSetResultId} />
+        <Details onboardingDecision={data} ruleSetResultId={ruleSetResultId} />
       </Stack>
     );
   }

@@ -191,6 +191,7 @@ export const timelineFixture: Timeline = [
             mustCollectData: [],
           },
           vendors: [Vendor.idology, Vendor.twilio],
+          ranRulesInSandbox: false,
         },
         annotation: null,
       },

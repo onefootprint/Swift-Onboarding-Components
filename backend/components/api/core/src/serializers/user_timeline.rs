@@ -67,16 +67,8 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::DocumentUploaded((id_doc, doc_req)) => Self::DocumentUploaded(
                 api_wire_types::DocumentUploadedTimelineEvent::from_db((id_doc, doc_req)),
             ), // TODO
-            SaturatedTimelineEvent::OnboardingDecision(
-                (decision, ob_config, tenant_user, cleared_mrs),
-                annotation,
-            ) => Self::OnboardingDecision {
-                decision: api_wire_types::OnboardingDecision::from_db((
-                    decision,
-                    Some(ob_config),
-                    tenant_user,
-                    cleared_mrs,
-                )),
+            SaturatedTimelineEvent::OnboardingDecision(obd_info, annotation) => Self::OnboardingDecision {
+                decision: api_wire_types::OnboardingDecision::from_db(obd_info),
                 annotation: annotation.map(api_wire_types::Annotation::from_db),
             },
             SaturatedTimelineEvent::Annotation(annotation_info) => {

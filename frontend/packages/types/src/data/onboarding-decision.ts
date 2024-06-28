@@ -13,6 +13,8 @@ export type OnboardingDecision = {
   ruleSetResultId?: string;
   // We don't yet care about the contents of the MRs, just the count
   clearedManualReviews?: object[];
+  /** When true, the rules were ran for this decision despite being in sandbox mode - we should show the rules outcome drawer */
+  ranRulesInSandbox: boolean;
 };
 
 export type TimelinePlaybook = {

@@ -97,6 +97,7 @@ pub struct NewDecisionArgs {
 
 pub type SaturatedOnboardingDecisionInfo = (
     OnboardingDecision,
+    Workflow,
     ObConfiguration,
     SaturatedActor,
     Vec<ManualReview>,
@@ -194,9 +195,9 @@ impl OnboardingDecision {
         let result_map = results
             .into_iter()
             .zip(onboarding_decisions_with_actors.into_iter())
-            .map(|((obd, (_, obc)), (_, actor))| {
+            .map(|((obd, (wf, obc)), (_, actor))| {
                 let cleared_mrs = manual_reviews.get(&obd.id).cloned().unwrap_or_default();
-                (obd, obc, actor, cleared_mrs)
+                (obd, wf, obc, actor, cleared_mrs)
             })
             .map(|d| (d.0.id.clone(), d))
             .collect();

@@ -123,6 +123,7 @@ export const timelineFixture: Timeline = [
             ],
           },
           vendors: [],
+          ranRulesInSandbox: false,
         },
         annotation: null,
       },

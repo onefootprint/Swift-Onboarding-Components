@@ -14,9 +14,12 @@ pub struct OnboardingDecision {
     pub status: DecisionStatus,
     pub timestamp: DateTime<Utc>,
     pub source: Actor,
-    pub ob_configuration: Option<TimelinePlaybook>,
+    pub ob_configuration: TimelinePlaybook,
     pub rule_set_result_id: Option<RuleSetResultId>,
     pub cleared_manual_reviews: Vec<ManualReview>,
+    /// When true, the rules were ran for this decision despite being in sandbox mode - we should
+    /// show the rules outcome drawer
+    pub ran_rules_in_sandbox: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

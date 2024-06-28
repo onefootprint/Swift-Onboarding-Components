@@ -5,15 +5,17 @@ import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
+import { OnboardingDecisionEventData } from '@onefootprint/types';
 import RuleSetResults from '../../../rule-set-results';
 import useEntityRuleSetResult from '../../../rule-set-results/hooks/use-entity-rule-set-result';
 import FieldValidations from './components/field-validations';
 
 type DetailsProps = {
+  onboardingDecision: OnboardingDecisionEventData;
   ruleSetResultId?: string;
 };
 
-const Details = ({ ruleSetResultId }: DetailsProps) => {
+const Details = ({ onboardingDecision, ruleSetResultId }: DetailsProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details',
   });
@@ -29,7 +31,7 @@ const Details = ({ ruleSetResultId }: DetailsProps) => {
     entityId,
     ruleSetResultId,
   });
-  const showRulesTab = isLive && data && data.actionTriggered;
+  const showRulesTab = (isLive || onboardingDecision.decision.ranRulesInSandbox) && data && data.actionTriggered;
 
   const handleChange = (value: string) => {
     setTab(value);
