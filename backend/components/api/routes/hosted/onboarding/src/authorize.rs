@@ -52,19 +52,13 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> FpResult<_> {
-            let wf = Workflow::lock(conn, &wf_id)?;
-            if wf.authorized_at.is_none() {
-                Workflow::set_is_authorized(wf, conn)?;
-            }
+            Workflow::set_is_authorized(conn, &wf_id)?;
 
             // TODO we eventually won't hit this anymore because business workflows are now
             // automatically authorized
             let biz_wf = user_auth.business_workflow(conn)?;
             if let Some(biz_wf) = biz_wf {
-                let biz_wf = Workflow::lock(conn, &biz_wf.id)?;
-                if biz_wf.authorized_at.is_none() {
-                    Workflow::set_is_authorized(biz_wf, conn)?;
-                }
+                Workflow::set_is_authorized(conn, &biz_wf.id)?;
             }
             Ok(())
         })

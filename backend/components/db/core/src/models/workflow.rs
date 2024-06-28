@@ -617,12 +617,13 @@ impl Workflow {
         Ok(())
     }
 
-    pub fn set_is_authorized(wf: Locked<Self>, conn: &mut TxnPgConn) -> DbResult<Self> {
-        let result = diesel::update(workflow::table)
-            .filter(workflow::id.eq(&wf.id))
+    pub fn set_is_authorized(conn: &mut TxnPgConn, id: &WorkflowId) -> DbResult<()> {
+        diesel::update(workflow::table)
+            .filter(workflow::id.eq(id))
+            .filter(workflow::authorized_at.is_null())
             .set(workflow::authorized_at.eq(Utc::now()))
-            .get_result(conn.conn())?;
-        Ok(result)
+            .execute(conn.conn())?;
+        Ok(())
     }
 
     pub fn set_decision_made_at(conn: &mut TxnPgConn, id: &WorkflowId) -> DbResult<Self> {

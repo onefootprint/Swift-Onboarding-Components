@@ -333,12 +333,8 @@ pub async fn adhoc_document_process(
         .db_transaction(move |conn| -> FpResult<_> {
             let (_, doc_req) = Document::get(conn, &document_id)?;
             // authorize since this is a non-customer facing route
-            let wf = Workflow::lock(conn, &doc_req.workflow_id)?;
-            let wf = if wf.authorized_at.is_none() {
-                Workflow::set_is_authorized(wf, conn)?
-            } else {
-                wf.into_inner()
-            };
+            Workflow::set_is_authorized(conn, &doc_req.workflow_id)?;
+            let wf = Workflow::get(conn, &doc_req.workflow_id)?;
 
             let _ = NewLivenessEvent {
                 scoped_vault_id: wf.scoped_vault_id.clone(),

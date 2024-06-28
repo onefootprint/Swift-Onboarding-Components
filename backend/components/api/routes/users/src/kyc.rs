@@ -154,12 +154,8 @@ pub async fn post(
             }
 
             // TODO: consolidate with /authorize code
-            let wf = Workflow::lock(conn, &wf_id)?;
-            let wf = if wf.authorized_at.is_none() {
-                Workflow::set_is_authorized(wf, conn)?
-            } else {
-                wf.into_inner()
-            };
+            Workflow::set_is_authorized(conn, &wf_id)?;
+            let wf = Workflow::get(conn, &wf_id)?;
 
             let _ = NewLivenessEvent {
                 scoped_vault_id: sv.id,
