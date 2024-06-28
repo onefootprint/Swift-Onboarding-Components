@@ -1,6 +1,6 @@
 import { IcoCheck24, IcoChevronDown24 } from '@onefootprint/icons';
 import type { EntityCard } from '@onefootprint/types';
-import { Dropdown, Text, media } from '@onefootprint/ui';
+import { Dropdown, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -24,6 +24,10 @@ export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =
     setShowDropdown(false);
   };
 
+  const sortedCards = cards
+    .slice()
+    .sort(({ alias = '' }, { alias: otherAlias = '' }) => (alias || '').localeCompare(otherAlias || ''));
+
   return (
     <CardHeaderContainer>
       <Dropdown.Root open={showDropdown} onOpenChange={toggleDropdown}>
@@ -33,36 +37,39 @@ export const CardHeader = ({ cards, selectedCard, onChange }: CardHeaderProps) =
             <Text variant="body-4">{selectedCard?.number_last4 ? `••••${selectedCard.number_last4}` : `••••`}</Text>
             <Text variant="body-4">({selectedCard.alias})</Text>
           </CardLine>
-          <IcoChevronDown24 />
+          <IcoChevronDown24 className="dropdown-trigger-icon" />
         </CustomDropdownTrigger>
-        <Dropdown.Content
-          align="end"
-          sideOffset={4}
-          style={{
-            padding: '0',
-          }}
-        >
-          <DropdownInner>
-            {cards.map(card => (
+        <Dropdown.Content align="end" sideOffset={4} asChild>
+          <Content>
+            {sortedCards.map(card => (
               <CardDropdownElement key={`${card?.number_last4}-${card.alias}`} onClick={() => changeCard(card)}>
                 <CardAndNumber>
                   <CardIcon key={card.issuer || ''} issuer={card.issuer || ''} />
                   <Text variant="body-4">{card?.number_last4 ? `••••${card.number_last4}` : `••••`}</Text>
                 </CardAndNumber>
                 <AliasAndCheckmark>
-                  <Text variant="body-4" color="tertiary">
-                    {card.alias}
-                  </Text>
+                  {card.alias}
                   {card.alias === selectedCard.alias ? <IcoCheck24 /> : <BlankIcon />}
                 </AliasAndCheckmark>
               </CardDropdownElement>
             ))}
-          </DropdownInner>
+          </Content>
         </Dropdown.Content>
       </Dropdown.Root>
     </CardHeaderContainer>
   );
 };
+
+const Content = styled(Stack)`
+  ${({ theme }) => css`
+    max-height: 30vh;
+    overflow-y: auto;
+    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[2]};
+    display: flex;
+    flex-direction: column;
+  `};
+`;
 
 const CardHeaderContainer = styled.div`
   ${media.lessThan('md')`
@@ -72,11 +79,20 @@ const CardHeaderContainer = styled.div`
 
 const CustomDropdownTrigger = styled(Dropdown.Trigger)`
   ${({ theme }) => css`
-    padding-left: ${theme.spacing[3]};
+    padding: ${theme.spacing[3]} 0 ${theme.spacing[3]} ${theme.spacing[3]};
     width: unset;
+    border-radius: ${theme.borderRadius.default};
+
+    .dropdown-trigger-icon {
+      transition: transform 0.2s ease-in-out;
+    }
 
     &[data-state='open'] {
       background: unset;
+
+      .dropdown-trigger-icon {
+        transform: rotate(180deg);
+      }
     }
   `};
 `;
@@ -88,29 +104,20 @@ const BlankIcon = styled.div`
   `};
 `;
 
-const DropdownInner = styled.div`
-  ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.primary};
-    display: flex;
-    flex-direction: column;
-    padding: ${theme.spacing[3]} 0px;
-    user-select: none;
-    width: 280px;
-    border-radius: ${theme.borderRadius.default};
-  `};
-`;
-
-const CardDropdownElement = styled.div`
+const CardDropdownElement = styled(Dropdown.Item)`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: ${theme.spacing[2]} ${theme.spacing[5]};
+    padding: ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[5]};
     cursor: pointer;
     flex-wrap: nowrap;
     overflow: hidden;
-    :hover {
+    border-radius: ${theme.borderRadius.default};
+    min-height: 40px;
+
+    &:hover {
       background-color: ${theme.backgroundColor.secondary};
     }
   `};
@@ -134,15 +141,16 @@ const CardAndNumber = styled.div`
     gap: ${theme.spacing[3]};
     flex-wrap: nowrap;
     overflow: hidden;
+    width: 100%;
   `};
 `;
 
-const AliasAndCheckmark = styled.div`
+const AliasAndCheckmark = styled(Stack)`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
+    ${createFontStyles('body-3')}
+    color: ${theme.color.tertiary};
     align-items: center;
-    gap: ${theme.spacing[3]};
+    gap: ${theme.spacing[2]};
   `};
 `;
 
