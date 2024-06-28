@@ -589,12 +589,26 @@ impl MiddeskState<Complete> {
             MiddeskResponseDerivedVaultData::create(state, &business_response, &sv).await?;
 
         let obc_id = wf.ob_configuration_id.clone();
+        let wf_id = wf.id.clone();
         state
             .db_pool
             .db_transaction(move |conn| -> FpResult<_> {
+                let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
+                let billing_event_kind = if let Some(VerificationCheck::Kyb { ein_only }) =
+                    obc.get_verification_check(VerificationCheckKind::Kyb)
+                {
+                    if ein_only {
+                        Ok(BillingEventKind::KybEinOnly)
+                    } else {
+                        Ok(BillingEventKind::Kyb)
+                    }
+                } else {
+                    Err(AssertionError("no kyb check configured"))
+                }?;
+
                 let rsg = RiskSignalGroup::get_or_create(conn, &sv.id, RiskSignalGroupKind::Kyb)?;
                 RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)?;
-                BillingEvent::create(conn, &sv.id, Some(&obc_id), BillingEventKind::Kyb)?;
+                BillingEvent::create(conn, &sv.id, Some(&obc_id), billing_event_kind)?;
 
                 derived_vault_data.write(conn)?;
 
