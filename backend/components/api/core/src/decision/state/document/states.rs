@@ -1,7 +1,7 @@
 use super::DocumentState;
 use super::MakeDecision;
 use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
-use crate::decision::onboarding::Decision;
+use crate::decision::onboarding::RulesOutcome;
 use crate::decision::risk;
 use crate::decision::state::actions::DocCollected;
 use crate::decision::state::actions::WorkflowActions;
@@ -114,7 +114,14 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
         let vres_ids = risk_signals.verification_result_ids();
 
-        risk::save_final_decision(conn, &wf.id, vres_ids, Decision::RulesNotExecuted, None, vec![])?;
+        risk::save_final_decision(
+            conn,
+            &wf.id,
+            vres_ids,
+            RulesOutcome::RulesNotExecuted,
+            None,
+            vec![],
+        )?;
         Ok(DocumentState::from(DocumentComplete))
     }
 }

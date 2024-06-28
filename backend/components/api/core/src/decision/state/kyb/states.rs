@@ -5,7 +5,7 @@ use super::KybDataCollection;
 use super::KybDecisioning;
 use super::KybState;
 use super::KybVendorCalls;
-use crate::decision::onboarding::Decision;
+use crate::decision::onboarding::RulesOutcome;
 use crate::decision::risk;
 use crate::decision::rule_engine::engine::VaultDataForRules;
 use crate::decision::rule_engine::eval::RuleEvalConfig;
@@ -445,7 +445,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             &RuleEvalConfig::default(),
             self.include_rules,
         )? {
-            let decision = Decision::RulesExecuted {
+            let decision = RulesOutcome::RulesExecuted {
                 should_commit: false, // never commit business data for now
                 create_manual_review: rsr
                     .action_triggered
@@ -455,7 +455,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             };
             (decision, Some(rsr.id))
         } else {
-            (Decision::RulesNotExecuted, None)
+            (RulesOutcome::RulesNotExecuted, None)
         };
 
         let decision = get_final_rules_outcome(fixture_result, decision);

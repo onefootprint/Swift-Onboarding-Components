@@ -4,7 +4,7 @@ use super::eval::RuleEvalConfig;
 use super::eval::{
     self,
 };
-use crate::decision::onboarding::Decision;
+use crate::decision::onboarding::RulesOutcome;
 use crate::decision::RuleError;
 use crate::utils::vault_wrapper::bulk_decrypt;
 use crate::utils::vault_wrapper::BulkDecryptReq;
@@ -58,7 +58,7 @@ pub struct EvaluateWorkflowDecisionArgs<'a> {
 pub fn evaluate_workflow_decision<'a>(
     conn: &mut TxnPgConn,
     args: EvaluateWorkflowDecisionArgs<'a>,
-) -> FpResult<(Decision, Option<RuleSetResultId>)> {
+) -> FpResult<(RulesOutcome, Option<RuleSetResultId>)> {
     let EvaluateWorkflowDecisionArgs {
         sv_id,
         obc_id,
@@ -111,7 +111,7 @@ pub fn evaluate_workflow_decision<'a>(
     )?;
 
     let Some((rule_set_result, _)) = rules_output else {
-        return Ok((Decision::RulesNotExecuted, None));
+        return Ok((RulesOutcome::RulesNotExecuted, None));
     };
     let should_commit_rules: Vec<_> = [base_kyc_rules(), super::default_rules::ssn_rules()]
         .concat()
@@ -130,7 +130,7 @@ pub fn evaluate_workflow_decision<'a>(
         &rule_eval_config,
     );
     let is_kyc_playbook = obc.kind == ObConfigurationKind::Kyc || obc.kind == ObConfigurationKind::Kyb;
-    let decision = Decision::RulesExecuted {
+    let decision = RulesOutcome::RulesExecuted {
         should_commit: !is_fixture && is_kyc_playbook && should_commit_action.is_none(),
         create_manual_review: rule_set_result
             .action_triggered

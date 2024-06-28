@@ -1,4 +1,4 @@
-use super::onboarding::Decision;
+use super::onboarding::RulesOutcome;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use api_wire_types::RuleResultRuleAction;
@@ -37,7 +37,7 @@ pub fn save_final_decision(
     conn: &mut TxnPgConn,
     wf_id: &WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
-    decision: Decision,
+    decision: RulesOutcome,
     rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
 ) -> FpResult<()> {
@@ -115,14 +115,14 @@ pub fn save_final_decision(
 }
 
 fn get_final_decision_status(
-    decision: Decision,
+    decision: RulesOutcome,
     has_doc_mr: bool,
     existing_status: OnboardingStatus,
 ) -> (DecisionStatus, FailedForDocReview) {
     let can_fail_for_doc_review = has_doc_mr && existing_status != OnboardingStatus::Pass;
 
     match decision {
-        Decision::RulesExecuted { action, .. } => match action.map(DecisionStatus::from) {
+        RulesOutcome::RulesExecuted { action, .. } => match action.map(DecisionStatus::from) {
             Some(status) => (status, false),
             // If there's a document MR and the user doesn't already have a pass status, we'll fail them.
             // This is a kind of implicit rule needed to put users in fail after a step up to provide, eg, PoA
@@ -130,23 +130,23 @@ fn get_final_decision_status(
             // Default to pass if no rules were triggered
             None => (DecisionStatus::Pass, false),
         },
-        Decision::RulesNotExecuted => (DecisionStatus::None, false),
+        RulesOutcome::RulesNotExecuted => (DecisionStatus::None, false),
     }
 }
 
 fn log_canonical_line(
     obc: &ObConfiguration,
-    decision: Decision,
+    decision: RulesOutcome,
     has_doc_mr: bool,
     existing_status: OnboardingStatus,
 ) {
     let (should_commit, create_manual_review, action) = match decision.clone() {
-        Decision::RulesExecuted {
+        RulesOutcome::RulesExecuted {
             should_commit,
             create_manual_review,
             action,
         } => (Some(should_commit), Some(create_manual_review), action),
-        Decision::RulesNotExecuted => (None, None, None),
+        RulesOutcome::RulesNotExecuted => (None, None, None),
     };
     let (decision_status, _) = get_final_decision_status(decision, has_doc_mr, existing_status);
 
@@ -166,14 +166,14 @@ fn log_canonical_line(
 #[cfg(test)]
 mod test {
     use super::get_final_decision_status;
-    use crate::decision::onboarding::Decision;
+    use crate::decision::onboarding::RulesOutcome;
     use newtypes::DecisionStatus;
     use newtypes::OnboardingStatus;
     use newtypes::RuleAction;
     use test_case::test_case;
 
-    fn rules_executed(action: Option<RuleAction>) -> Decision {
-        Decision::RulesExecuted {
+    fn rules_executed(action: Option<RuleAction>) -> RulesOutcome {
+        RulesOutcome::RulesExecuted {
             should_commit: true,
             create_manual_review: false,
             action,
@@ -181,16 +181,16 @@ mod test {
     }
 
     // Test no existing status, no doc manual review, simple cases
-    #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::None => DecisionStatus::None)]
+    #[test_case(RulesOutcome::RulesNotExecuted, false, OnboardingStatus::None => DecisionStatus::None)]
     #[test_case(rules_executed(None), false, OnboardingStatus::None => DecisionStatus::Pass)]
     #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), false, OnboardingStatus::None => DecisionStatus::Pass)]
     #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::None => DecisionStatus::Fail)]
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::None => DecisionStatus::Fail)]
     #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::Pass => DecisionStatus::Fail)]
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::Pass => DecisionStatus::Fail)]
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::None => DecisionStatus::None)]
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pending => DecisionStatus::None)]
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => DecisionStatus::None)]
+    #[test_case(RulesOutcome::RulesNotExecuted, true, OnboardingStatus::None => DecisionStatus::None)]
+    #[test_case(RulesOutcome::RulesNotExecuted, true, OnboardingStatus::Pending => DecisionStatus::None)]
+    #[test_case(RulesOutcome::RulesNotExecuted, true, OnboardingStatus::Pass => DecisionStatus::None)]
     // Fail for document MR
     #[test_case(rules_executed(None), true, OnboardingStatus::None => DecisionStatus::Fail)]
     #[test_case(rules_executed(None), true, OnboardingStatus::Incomplete => DecisionStatus::Fail)]
@@ -202,20 +202,20 @@ mod test {
     // PassWithManualReview. But just testing existing behavior for now
     #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, OnboardingStatus::Pass => DecisionStatus::Pass)]
     fn test_get_final_decision_status(
-        decision: Decision,
+        decision: RulesOutcome,
         has_doc_mr: bool,
         existing_status: OnboardingStatus,
     ) -> DecisionStatus {
         get_final_decision_status(decision, has_doc_mr, existing_status).0
     }
 
-    #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::None => false)]
+    #[test_case(RulesOutcome::RulesNotExecuted, false, OnboardingStatus::None => false)]
     #[test_case(rules_executed(None), false, OnboardingStatus::None => false)]
     #[test_case(rules_executed(Some(RuleAction::Fail)), false, OnboardingStatus::None => false)]
     #[test_case(rules_executed(Some(RuleAction::ManualReview)), false, OnboardingStatus::None => false)]
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::None => false)]
-    #[test_case(Decision::RulesNotExecuted, false, OnboardingStatus::Pending => false)]
-    #[test_case(Decision::RulesNotExecuted, true, OnboardingStatus::Pass => false)]
+    #[test_case(RulesOutcome::RulesNotExecuted, true, OnboardingStatus::None => false)]
+    #[test_case(RulesOutcome::RulesNotExecuted, false, OnboardingStatus::Pending => false)]
+    #[test_case(RulesOutcome::RulesNotExecuted, true, OnboardingStatus::Pass => false)]
     // Fail for document MR
     #[test_case(rules_executed(None), true, OnboardingStatus::None => true)]
     #[test_case(rules_executed(None), true, OnboardingStatus::Incomplete => true)]
@@ -227,7 +227,7 @@ mod test {
     // PassWithManualReview. But just testing existing behavior for now
     #[test_case(rules_executed(Some(RuleAction::PassWithManualReview)), true, OnboardingStatus::Pass => false)]
     fn test_get_final_decision_status_fail_for_mr(
-        decision: Decision,
+        decision: RulesOutcome,
         has_doc_mr: bool,
         existing_status: OnboardingStatus,
     ) -> bool {

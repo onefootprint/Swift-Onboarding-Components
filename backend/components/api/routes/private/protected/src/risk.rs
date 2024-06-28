@@ -6,7 +6,7 @@ use actix_web::web::{
 };
 use api_core::decision::features::risk_signals::fetch_latest_risk_signals_map;
 use api_core::decision::features::risk_signals::parse_reason_codes_from_vendor_result;
-use api_core::decision::onboarding::Decision;
+use api_core::decision::onboarding::RulesOutcome;
 use api_core::decision::rule_engine::engine::EvaluateWorkflowDecisionArgs;
 use api_core::decision::rule_engine::engine::VaultDataForRules;
 use api_core::decision::rule_engine::eval::RuleEvalConfig;
@@ -167,7 +167,7 @@ pub struct MakeDecisionRequest {
 
 #[derive(Debug, Clone, serde::Serialize, macros::JsonResponder)]
 pub struct MakeDecisionResponse {
-    decision: Decision,
+    decision: RulesOutcome,
 }
 
 /// Fetches latest risk signals, executes rules against those, and writes a new onboarding decision

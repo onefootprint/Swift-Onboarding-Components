@@ -1,4 +1,4 @@
-use super::onboarding::Decision;
+use super::onboarding::RulesOutcome;
 use super::sandbox;
 use super::vendor::middesk::MiddeskResponseDerivedVaultData;
 use super::vendor::{
@@ -70,8 +70,8 @@ pub fn get_fixture_result(
 /// actual outcome of running rules.
 pub(super) fn get_final_rules_outcome(
     fixture_result: Option<WorkflowFixtureResult>,
-    rules_outcome: Decision,
-) -> Decision {
+    rules_outcome: RulesOutcome,
+) -> RulesOutcome {
     let fixture_result = match fixture_result {
         None
         | Some(WorkflowFixtureResult::DocumentDecision)
@@ -88,10 +88,10 @@ pub(super) fn get_final_rules_outcome(
         DecisionStatus::Fail => Some(RuleAction::Fail),
         DecisionStatus::StepUp => Some(RuleAction::identity_stepup()),
         DecisionStatus::Pass => None,
-        DecisionStatus::None => return Decision::RulesNotExecuted,
+        DecisionStatus::None => return RulesOutcome::RulesNotExecuted,
     };
 
-    Decision::RulesExecuted {
+    RulesOutcome::RulesExecuted {
         should_commit: decision_status == DecisionStatus::Pass,
         create_manual_review,
         action,

@@ -4,7 +4,8 @@ use serde::Serialize;
 #[derive(PartialEq, Eq, Debug, Clone, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
-pub enum Decision {
+/// The outcome of running the rules engine
+pub enum RulesOutcome {
     RulesExecuted {
         should_commit: bool,
         create_manual_review: bool,
@@ -12,7 +13,7 @@ pub enum Decision {
     },
     RulesNotExecuted,
 }
-impl Decision {
+impl RulesOutcome {
     pub fn should_commit(&self) -> bool {
         match self {
             Self::RulesExecuted { should_commit, .. } => *should_commit,

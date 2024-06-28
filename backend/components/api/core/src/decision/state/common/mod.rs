@@ -5,7 +5,7 @@ use crate::decision::features::incode_docv::{
 use crate::decision::features::risk_signals::risk_signal_group_struct::Aml;
 use crate::decision::features::risk_signals::RiskSignalGroupStruct;
 use crate::decision::features::risk_signals::RiskSignalsForDecision;
-use crate::decision::onboarding::Decision;
+use crate::decision::onboarding::RulesOutcome;
 use crate::decision::risk;
 use crate::decision::vendor::incode::curp_validation::run_curp_validation_check;
 use crate::decision::vendor::incode::incode_watchlist::WatchlistCheckKind;
@@ -221,11 +221,11 @@ pub fn handle_rules_output(
     wf: Locked<Workflow>,
     v_id: VaultId,
     vres_ids: Vec<VerificationResultId>,
-    rules_output: Decision,
+    rules_output: RulesOutcome,
     rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
 ) -> FpResult<DecisionOutput> {
-    if let Decision::RulesExecuted {
+    if let RulesOutcome::RulesExecuted {
         action: Some(RuleAction::StepUp(suk)),
         ..
     } = rules_output
