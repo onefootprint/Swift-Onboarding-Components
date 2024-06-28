@@ -1,3 +1,4 @@
+use newtypes::BillingEventKind;
 use strum_macros::Display;
 use strum_macros::EnumIter;
 
@@ -114,6 +115,31 @@ impl Product {
             | Self::Pii
             | Self::VaultsWithNonPci
             | Self::VaultsWithPci => false,
+        }
+    }
+}
+
+impl From<BillingEventKind> for Product {
+    fn from(value: BillingEventKind) -> Self {
+        // If you've come here after adding a new BillingEventKind, you'll need to:
+        // - Add a variant to the Product enum
+        // - Create a new product in the stripe dashboard
+        // - Add a new column to the BillingProfile table to support per-tenant pricing of this product
+        // - Expose the new price for the new product in the private APIs for getting / updating billing
+        //   profile
+        // - Add the new price for the new product to billing-profile.tsx on the dashboard
+        // The rust compiler will guide you through all but the dashboard changes
+        match value {
+            BillingEventKind::ContinuousMonitoringPerYear => Product::ContinuousMonitoringPerYear,
+            BillingEventKind::AdverseMediaPerUser => Product::AdverseMediaPerOnboarding,
+            BillingEventKind::CurpValidation => Product::CurpVerification,
+            BillingEventKind::Kyc => Product::Kyc,
+            BillingEventKind::OneClickKyc => Product::OneClickKyc,
+            BillingEventKind::KycWaterfallSecondVendor => Product::KycWaterfallSecondVendor,
+            BillingEventKind::KycWaterfallThirdVendor => Product::KycWaterfallThirdVendor,
+            BillingEventKind::IdentityDocument => Product::IdDocs,
+            BillingEventKind::Kyb => Product::Kyb,
+            BillingEventKind::KybEinOnly => Product::KybEinOnly,
         }
     }
 }

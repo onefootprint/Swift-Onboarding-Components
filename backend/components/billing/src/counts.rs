@@ -12,50 +12,16 @@ use db::models::scoped_vault::ScopedVaultPiiFilters;
 use db::models::watchlist_check::WatchlistCheck;
 use db::DbResult;
 use db::PgConn;
+use itertools::chain;
 use newtypes::AccessEventPurpose;
-use newtypes::BillingEventKind;
 use newtypes::TenantId;
 use rust_decimal_macros::dec;
+use std::collections::HashMap;
 use std::ops::Add;
 use strum::IntoEnumIterator;
 
 #[derive(Debug, Default)]
-pub struct BillingCounts {
-    /// Total number user vaults with billable PII - either an authorized workflow OR created via
-    /// API
-    pub pii: i64,
-    /// Number of KYC verifications ran this month, not including one-click onboardings
-    pub kyc: Option<i64>,
-    /// Number of KYC verifications ran from one-click onboardings
-    pub one_click_kyc: Option<i64>,
-    pub kyc_waterfall_second_vendor: Option<i64>,
-    pub kyc_waterfall_third_vendor: Option<i64>,
-    /// Number of KYB verifications ran this month
-    pub kyb: Option<i64>,
-    /// Number of KYB verifications ran this month on EIN only
-    pub kyb_ein_only: Option<i64>,
-    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't
-    /// finish onboarding
-    pub id_docs: Option<i64>,
-    /// Number of watchlist checks ran this month
-    pub curp_verifications: Option<i64>,
-    /// Number of watchlist checks ran this month
-    pub watchlist_checks: i64,
-    /// Number of vaults with decrypts this month
-    pub hot_vaults: Option<i64>,
-    /// Number of vaults with proxy decrypts this month
-    pub hot_proxy_vaults: Option<i64>,
-    /// Number of vaults with non-card and non-custom data
-    pub vaults_with_non_pci: Option<i64>,
-    /// Number of vaults with card or custom data
-    pub vaults_with_pci: Option<i64>,
-    /// Number of completed workflows onto playbooks that include adverse media checks.
-    /// Adverse media checks are billing per onboarding even though we run them monthly???
-    pub adverse_media_per_user: Option<i64>,
-    /// Instead of watchlist_checks, billing for incode continuos monitoring. We bill on a per year
-    /// basis, but run the checks monthly
-    pub continuous_monitoring_per_year: Option<i64>,
-}
+pub struct BillingCounts(HashMap<Product, i64>);
 
 #[derive(Debug)]
 pub(crate) struct LineItem {
@@ -78,26 +44,7 @@ impl BillingCounts {
     }
 
     fn get_count(&self, product: Product) -> i64 {
-        let count = match product {
-            Product::MonthlyPlatformFee => Some(1), // Always quantity one
-            Product::Pii => Some(self.pii),
-            Product::Kyc => self.kyc,
-            Product::OneClickKyc => self.one_click_kyc,
-            Product::KycWaterfallSecondVendor => self.kyc_waterfall_second_vendor,
-            Product::KycWaterfallThirdVendor => self.kyc_waterfall_third_vendor,
-            Product::Kyb => self.kyb,
-            Product::KybEinOnly => self.kyb_ein_only,
-            Product::IdDocs => self.id_docs,
-            Product::CurpVerification => self.curp_verifications,
-            Product::WatchlistChecks => Some(self.watchlist_checks),
-            Product::HotVaults => self.hot_vaults,
-            Product::HotProxyVaults => self.hot_proxy_vaults,
-            Product::VaultsWithNonPci => self.vaults_with_non_pci,
-            Product::VaultsWithPci => self.vaults_with_pci,
-            Product::AdverseMediaPerOnboarding => self.adverse_media_per_user,
-            Product::ContinuousMonitoringPerYear => self.continuous_monitoring_per_year,
-        };
-        count.unwrap_or_default()
+        self.0.get(&product).cloned().unwrap_or_default()
     }
 
     fn raw_line_items(&self) -> Vec<(Product, i64)> {
@@ -188,38 +135,19 @@ impl BillingCounts {
         // the BillingEvent model so it becomes easier to count at read time
         let billing_event_counts = BillingEvent::get_counts(conn, t_id, i.start, i.end)?;
 
-        let counts = BillingCounts {
-            pii,
-            kyc: billing_event_counts.get(&BillingEventKind::Kyc).cloned(),
-            one_click_kyc: billing_event_counts.get(&BillingEventKind::OneClickKyc).cloned(),
-            kyc_waterfall_second_vendor: billing_event_counts
-                .get(&BillingEventKind::KycWaterfallSecondVendor)
-                .cloned(),
-            kyc_waterfall_third_vendor: billing_event_counts
-                .get(&BillingEventKind::KycWaterfallThirdVendor)
-                .cloned(),
-            kyb: billing_event_counts.get(&BillingEventKind::Kyb).cloned(),
-            kyb_ein_only: billing_event_counts.get(&BillingEventKind::KybEinOnly).cloned(),
-            id_docs: billing_event_counts
-                .get(&BillingEventKind::IdentityDocument)
-                .cloned(),
-            curp_verifications: billing_event_counts
-                .get(&BillingEventKind::CurpValidation)
-                .cloned(),
-            watchlist_checks,
-            hot_vaults,
-            hot_proxy_vaults,
-            vaults_with_non_pci,
-            vaults_with_pci,
-            // Could clean this up once all billing stuff is on BillingEvent
-            adverse_media_per_user: billing_event_counts
-                .get(&BillingEventKind::AdverseMediaPerUser)
-                .cloned(),
-            continuous_monitoring_per_year: billing_event_counts
-                .get(&BillingEventKind::ContinuousMonitoringPerYear)
-                .cloned(),
-        };
-        Ok(counts)
+        let counts = chain!(
+            vec![
+                (Product::Pii, pii),
+                (Product::WatchlistChecks, watchlist_checks),
+                (Product::HotVaults, hot_vaults.unwrap_or_default()),
+                (Product::HotProxyVaults, hot_proxy_vaults.unwrap_or_default()),
+                (Product::VaultsWithNonPci, vaults_with_non_pci.unwrap_or_default()),
+                (Product::VaultsWithPci, vaults_with_pci.unwrap_or_default()),
+            ],
+            billing_event_counts.into_iter().map(|(k, c)| (k.into(), c)),
+        )
+        .collect();
+        Ok(Self(counts))
     }
 }
 
@@ -227,35 +155,10 @@ impl Add for BillingCounts {
     type Output = BillingCounts;
 
     fn add(self, b: BillingCounts) -> BillingCounts {
-        let add_opt = |a, b| match (a, b) {
-            (Some(a), Some(b)) => Some(a + b),
-            (Some(i), None) | (None, Some(i)) => Some(i),
-            (None, None) => None,
-        };
         let a = self;
-        BillingCounts {
-            pii: a.pii + b.pii,
-            kyc: add_opt(a.kyc, b.kyc),
-            one_click_kyc: add_opt(a.one_click_kyc, b.one_click_kyc),
-            kyc_waterfall_second_vendor: add_opt(
-                a.kyc_waterfall_second_vendor,
-                b.kyc_waterfall_second_vendor,
-            ),
-            kyc_waterfall_third_vendor: add_opt(a.kyc_waterfall_third_vendor, b.kyc_waterfall_third_vendor),
-            kyb: add_opt(a.kyb, b.kyb),
-            kyb_ein_only: add_opt(a.kyb_ein_only, b.kyb_ein_only),
-            id_docs: add_opt(a.id_docs, b.id_docs),
-            curp_verifications: add_opt(a.curp_verifications, b.curp_verifications),
-            watchlist_checks: a.watchlist_checks + b.watchlist_checks,
-            hot_vaults: add_opt(a.hot_vaults, b.hot_vaults),
-            hot_proxy_vaults: add_opt(a.hot_proxy_vaults, b.hot_proxy_vaults),
-            vaults_with_non_pci: add_opt(a.vaults_with_non_pci, b.vaults_with_non_pci),
-            vaults_with_pci: add_opt(a.vaults_with_pci, b.vaults_with_pci),
-            adverse_media_per_user: add_opt(a.adverse_media_per_user, b.adverse_media_per_user),
-            continuous_monitoring_per_year: add_opt(
-                a.continuous_monitoring_per_year,
-                b.continuous_monitoring_per_year,
-            ),
-        }
+        let counts = Product::iter()
+            .map(|p| (p, a.get_count(p) + b.get_count(p)))
+            .collect();
+        BillingCounts(counts)
     }
 }
