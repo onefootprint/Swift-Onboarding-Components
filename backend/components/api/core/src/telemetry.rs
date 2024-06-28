@@ -183,7 +183,26 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         span: Span,
         outcome: &Result<actix_web::dev::ServiceResponse<B>, actix_web::Error>,
     ) {
-        DefaultRootSpanBuilder::on_request_end(span, outcome)
+        DefaultRootSpanBuilder::on_request_end(span, outcome);
+
+        // Emit a log line after every HTTP request.
+        // This log line is very precariously placed to happen after the response attributes are added to
+        // the root span in DefaultRootSpanBuilder::on_request_end(span, outcome);
+        // It largely makes use of DatadogJsonEventFormatter to automatically add useful attributes from the
+        // root span to the log line.
+        let name = match outcome {
+            Ok(r) => {
+                let req = r.request();
+                format!(
+                    "{} {}",
+                    req.method().as_str(),
+                    req.uri().path_and_query().map(|p| p.as_str()).unwrap_or("")
+                )
+            }
+            // API errors don't end up in this branch. I'm not sure in what situations we have an Err here.
+            Err(_) => "Canonical log line".to_string(),
+        };
+        tracing::info!(is_root = true, "{}", name);
     }
 }
 
@@ -340,6 +359,9 @@ where
                 | "ip_address"
                 | "country"
                 | "user_agent"
+                | "exception.message"
+                | "exception.details"
+                | "http.status_code"
                 | "http.route"
                 | "http.target" => match v {
                     opentelemetry::Value::Bool(v) => serializer.serialize_entry(k, v)?,
