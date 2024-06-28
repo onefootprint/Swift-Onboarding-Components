@@ -29,7 +29,7 @@ use api_wire_types::IdentifyVerifyRequest;
 use api_wire_types::IdentifyVerifyResponse;
 use chrono::Utc;
 use crypto::sha256;
-use db::errors::OptionalExtension;
+use db::errors::FpOptionalExtension;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEventArgs;
 use db::models::business_owner::BusinessOwner;

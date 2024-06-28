@@ -6,7 +6,7 @@ use api_wire_types::IdentifyId;
 use async_trait::async_trait;
 use aws_sdk_kms::primitives::Blob;
 use crypto::sha256;
-use db::errors::OptionalExtension;
+use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::LocatedVault;
 use db::models::vault::Vault;

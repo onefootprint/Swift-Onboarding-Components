@@ -1,4 +1,5 @@
-use crate::errors::AssertionError;
+use super::ob_configuration::IsLive;
+use crate::errors::FpOptionalExtension;
 use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
@@ -38,19 +39,40 @@ pub struct NewVaultDrAwsPreEnrollment<'a> {
     pub aws_external_id: PiiString,
 }
 
+#[derive(Debug, Clone, derive_more::From)]
+enum VaultDrAwsPreEnrollmentIdentifier<'a> {
+    Id(&'a VaultDrAwsPreEnrollmentId),
+    TenantIdIsLive(&'a TenantId, IsLive),
+}
+
 impl VaultDrAwsPreEnrollment {
-    pub fn get(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Option<Self>> {
-        Ok(vault_dr_aws_pre_enrollment::table
-            .filter(vault_dr_aws_pre_enrollment::tenant_id.eq(tenant_id))
-            .filter(vault_dr_aws_pre_enrollment::is_live.eq(is_live))
-            .first(conn)
-            .optional()?)
+    #[tracing::instrument("VaultDrAwsPreEnrollment::get", skip_all)]
+    pub fn get<'a>(
+        conn: &mut PgConn,
+        id_ref: impl Into<VaultDrAwsPreEnrollmentIdentifier<'a>>,
+    ) -> DbResult<Self> {
+        let id_ref: VaultDrAwsPreEnrollmentIdentifier = id_ref.into();
+
+        let row = match id_ref {
+            VaultDrAwsPreEnrollmentIdentifier::Id(id) => vault_dr_aws_pre_enrollment::table
+                .filter(vault_dr_aws_pre_enrollment::id.eq(id))
+                .first(conn)?,
+            VaultDrAwsPreEnrollmentIdentifier::TenantIdIsLive(tenant_id, is_live) => {
+                vault_dr_aws_pre_enrollment::table
+                    .filter(vault_dr_aws_pre_enrollment::tenant_id.eq(tenant_id))
+                    .filter(vault_dr_aws_pre_enrollment::is_live.eq(is_live))
+                    .first(conn)?
+            }
+        };
+
+        Ok(row)
     }
 
+    #[tracing::instrument("VaultDrAwsPreEnrollment::get_or_create", skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, new: NewVaultDrAwsPreEnrollment) -> DbResult<Self> {
-        if let Some(existing) = Self::get(conn.conn(), new.tenant_id, new.is_live)? {
+        if let Some(existing) = Self::get(conn.conn(), (new.tenant_id, new.is_live)).optional()? {
             return Ok(existing);
-        }
+        };
 
         // Try to insert the new record.
         diesel::insert_into(vault_dr_aws_pre_enrollment::table)
@@ -59,9 +81,7 @@ impl VaultDrAwsPreEnrollment {
             .execute(conn.conn())?;
 
         // Re-fetch the record. May be a record inserted by a different transaction.
-        let result = Self::get(conn.conn(), new.tenant_id, new.is_live)?.ok_or(AssertionError(
-            "upsert of Vault DR AWS pre-enrollment yielded no records",
-        ))?;
+        let result = Self::get(conn.conn(), (new.tenant_id, new.is_live))?;
 
         Ok(result)
     }
@@ -108,21 +128,36 @@ pub struct NewVaultDrConfig<'a> {
     pub wrapped_recovery_key: String,
 }
 
+#[derive(Debug, Clone, derive_more::From)]
+enum VaultDrConfigIdentifier<'a> {
+    Id(&'a VaultDrConfigId),
+    TenantIdIsLive(&'a TenantId, IsLive),
+}
+
 impl VaultDrConfig {
-    pub fn get(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Option<Self>> {
-        Ok(vault_dr_config::table
-            .filter(vault_dr_config::tenant_id.eq(tenant_id))
-            .filter(vault_dr_config::is_live.eq(is_live))
-            .filter(vault_dr_config::deactivated_at.is_null())
-            .first(conn)
-            .optional()?)
+    #[tracing::instrument("VaultDrConfig::get", skip_all)]
+    pub fn get<'a>(conn: &mut PgConn, id_ref: impl Into<VaultDrConfigIdentifier<'a>>) -> DbResult<Self> {
+        let id_ref: VaultDrConfigIdentifier = id_ref.into();
+
+        let row = match id_ref {
+            VaultDrConfigIdentifier::Id(id) => vault_dr_config::table.find(id).first(conn)?,
+            VaultDrConfigIdentifier::TenantIdIsLive(tenant_id, is_live) => vault_dr_config::table
+                .filter(vault_dr_config::tenant_id.eq(tenant_id))
+                .filter(vault_dr_config::is_live.eq(is_live))
+                .filter(vault_dr_config::deactivated_at.is_null())
+                .select(Self::as_select())
+                .first(conn)?,
+        };
+        Ok(row)
     }
 
+    #[tracing::instrument("VaultDrConfig::lock", skip_all)]
     pub fn lock(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> DbResult<Option<Locked<Self>>> {
         let result = vault_dr_config::table
             .filter(vault_dr_config::tenant_id.eq(tenant_id))
             .filter(vault_dr_config::is_live.eq(is_live))
             .filter(vault_dr_config::deactivated_at.is_null())
+            .select(Self::as_select())
             .for_no_key_update()
             .first(conn)
             .optional()?;
@@ -130,6 +165,7 @@ impl VaultDrConfig {
         Ok(result.map(Locked::new))
     }
 
+    #[tracing::instrument("VaultDrConfig::create", skip_all)]
     pub fn create(conn: &mut TxnPgConn, new: NewVaultDrConfig) -> DbResult<Locked<Self>> {
         let result = diesel::insert_into(vault_dr_config::table)
             .values(&new)
@@ -138,6 +174,7 @@ impl VaultDrConfig {
         Ok(Locked::new(result))
     }
 
+    #[tracing::instrument("VaultDrConfig::deactivate", skip_all)]
     pub fn deactivate(conn: &mut TxnPgConn, config: Locked<Self>) -> DbResult<()> {
         diesel::update(vault_dr_config::table)
             .filter(vault_dr_config::id.eq(&config.id))
@@ -146,6 +183,14 @@ impl VaultDrConfig {
             .execute(conn.conn())?;
 
         Ok(())
+    }
+
+    #[tracing::instrument("VaultDrConfig::list", skip_all)]
+    pub fn list(conn: &mut PgConn) -> DbResult<Vec<Self>> {
+        Ok(vault_dr_config::table
+            .filter(vault_dr_config::deactivated_at.is_null())
+            .select(Self::as_select())
+            .load(conn)?)
     }
 }
 
@@ -183,6 +228,7 @@ pub struct NewVaultDrBlob<'a> {
 }
 
 impl VaultDrBlob {
+    #[tracing::instrument("VaultDrBlob::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut TxnPgConn, new: Vec<NewVaultDrBlob>) -> DbResult<Vec<Self>> {
         let results = diesel::insert_into(vault_dr_blob::table)
             .values(new)

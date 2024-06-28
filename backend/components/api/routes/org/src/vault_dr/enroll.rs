@@ -7,6 +7,7 @@ use api_core::types::ApiResponse;
 use api_core::FpResult;
 use api_core::State;
 use chrono::Utc;
+use db::errors::FpOptionalExtension;
 use db::models::vault_dr::NewVaultDrConfig;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrConfig;
@@ -46,7 +47,8 @@ pub async fn post(
     let pre_enrollment = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
-            Ok(VaultDrAwsPreEnrollment::get(conn, &tenant_id, is_live)?
+            Ok(VaultDrAwsPreEnrollment::get(conn, (&tenant_id, is_live))
+                .optional()?
                 .ok_or(vault_dr::Error::MissingAwsPreEnrollment)?)
         })
         .await?;

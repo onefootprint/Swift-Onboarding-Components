@@ -11,7 +11,7 @@ use api_core::utils::sms::PhoneEmailChallengeState;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifyId;
-use db::errors::OptionalExtension;
+use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::vault::LocatedVault;

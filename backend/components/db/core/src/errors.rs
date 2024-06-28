@@ -192,11 +192,11 @@ impl FpErrorTrait for DbError {
     }
 }
 
-pub trait OptionalExtension<T, E> {
-    fn optional(self) -> Result<Option<T>, E>;
+pub trait FpOptionalExtension<T, DbError> {
+    fn optional(self) -> Result<Option<T>, DbError>;
 }
 
-impl<T> OptionalExtension<T, DbError> for Result<T, DbError> {
+impl<T> FpOptionalExtension<T, DbError> for Result<T, DbError> {
     fn optional(self) -> Result<Option<T>, DbError> {
         match self {
             Ok(v) => Ok(Some(v)),

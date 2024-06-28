@@ -8,10 +8,12 @@ use aws_config::retry::ProvideErrorKind;
 use aws_config::Region;
 use aws_sdk_s3::config::SharedCredentialsProvider;
 use aws_types::SdkConfig;
+use db::errors::FpOptionalExtension;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrConfig;
 use newtypes::PiiString;
 use newtypes::TenantId;
+use newtypes::VaultDrConfigId;
 use std::fmt::Debug;
 use tracing::info;
 use tracing::warn;
@@ -32,18 +34,19 @@ pub struct VaultDrWriter {
 }
 
 impl VaultDrWriter {
-    pub async fn new(state: &State, tenant_id: &TenantId, is_live: bool) -> FpResult<Self> {
-        let tenant_id = tenant_id.clone();
-
+    pub async fn new(state: &State, config_id: &VaultDrConfigId) -> FpResult<Self> {
         let state_config = state.config.vault_dr_config.clone();
 
+        let config_id = config_id.clone();
         let writer = state
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
-                let aws_pre_enrollment = VaultDrAwsPreEnrollment::get(conn, &tenant_id, is_live)?
-                    .ok_or(Error::MissingAwsPreEnrollment)?;
+                let config = VaultDrConfig::get(conn, &config_id)
+                    .optional()?
+                    .ok_or(Error::NotEnrolled)?;
 
-                let config = VaultDrConfig::get(conn, &tenant_id, is_live)?.ok_or(Error::AlreadyEnrolled)?;
+                let aws_pre_enrollment = VaultDrAwsPreEnrollment::get(conn, &config.aws_pre_enrollment_id)?;
+
 
                 let VaultDrConfig {
                     tenant_id,
@@ -71,14 +74,14 @@ impl VaultDrWriter {
         Ok(writer)
     }
 
-    pub fn tenant_role_arn(&self) -> String {
+    fn tenant_role_arn(&self) -> String {
         format!(
             "arn:aws:iam::{}:role/{}",
             &self.aws_account_id, &self.aws_role_name
         )
     }
 
-    pub async fn default_aws_config(&self) -> Result<SdkConfig, Error> {
+    async fn default_aws_config(&self) -> Result<SdkConfig, Error> {
         self.aws_config(None).await
     }
 

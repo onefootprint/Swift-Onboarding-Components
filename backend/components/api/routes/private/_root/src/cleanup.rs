@@ -12,7 +12,7 @@ use api_core::ApiCoreError;
 use api_core::FpResult;
 use api_core::State;
 use api_wire_types::IdentifyId;
-use db::errors::OptionalExtension;
+use db::errors::FpOptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultIdentifier;
 use db::models::tenant::Tenant;
