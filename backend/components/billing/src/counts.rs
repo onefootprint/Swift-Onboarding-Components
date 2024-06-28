@@ -32,6 +32,8 @@ pub struct BillingCounts {
     pub kyc_waterfall_third_vendor: Option<i64>,
     /// Number of KYB verifications ran this month
     pub kyb: Option<i64>,
+    /// Number of KYB verifications ran this month on EIN only
+    pub kyb_ein_only: Option<i64>,
     /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't
     /// finish onboarding
     pub id_docs: Option<i64>,
@@ -84,6 +86,7 @@ impl BillingCounts {
             Product::KycWaterfallSecondVendor => self.kyc_waterfall_second_vendor,
             Product::KycWaterfallThirdVendor => self.kyc_waterfall_third_vendor,
             Product::Kyb => self.kyb,
+            Product::KybEinOnly => self.kyb_ein_only,
             Product::IdDocs => self.id_docs,
             Product::CurpVerification => self.curp_verifications,
             Product::WatchlistChecks => Some(self.watchlist_checks),
@@ -196,6 +199,7 @@ impl BillingCounts {
                 .get(&BillingEventKind::KycWaterfallThirdVendor)
                 .cloned(),
             kyb: billing_event_counts.get(&BillingEventKind::Kyb).cloned(),
+            kyb_ein_only: billing_event_counts.get(&BillingEventKind::KybEinOnly).cloned(),
             id_docs: billing_event_counts
                 .get(&BillingEventKind::IdentityDocument)
                 .cloned(),
@@ -239,6 +243,7 @@ impl Add for BillingCounts {
             ),
             kyc_waterfall_third_vendor: add_opt(a.kyc_waterfall_third_vendor, b.kyc_waterfall_third_vendor),
             kyb: add_opt(a.kyb, b.kyb),
+            kyb_ein_only: add_opt(a.kyb_ein_only, b.kyb_ein_only),
             id_docs: add_opt(a.id_docs, b.id_docs),
             curp_verifications: add_opt(a.curp_verifications, b.curp_verifications),
             watchlist_checks: a.watchlist_checks + b.watchlist_checks,

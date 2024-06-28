@@ -36,6 +36,7 @@ pub struct BillingProfile {
     pub one_click_kyc: Option<String>,
     pub monthly_platform_fee: Option<String>,
     pub curp_verification: Option<String>,
+    pub kyb_ein_only: Option<String>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -64,6 +65,7 @@ pub struct UpdateBillingProfile {
     pub one_click_kyc: Option<Option<String>>,
     pub monthly_platform_fee: Option<Option<String>>,
     pub curp_verification: Option<Option<String>>,
+    pub kyb_ein_only: Option<Option<String>>,
 }
 
 impl BillingProfile {

@@ -41,6 +41,7 @@ export const TENANT_BILLING_PROFILE_PRODUCTS = [
   'kycWaterfallThirdVendor',
   'idDocs',
   'kyb',
+  'kybEinOnly',
   'curpVerification',
   'pii',
   'hotVaults',

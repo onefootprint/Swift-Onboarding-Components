@@ -66,6 +66,7 @@ pub struct PrivateBillingProfile {
 
     pub id_docs: Option<String>,
     pub kyb: Option<String>,
+    pub kyb_ein_only: Option<String>,
     pub curp_verification: Option<String>,
 
     pub pii: Option<String>,
@@ -106,6 +107,8 @@ pub struct PrivateUpdateBillingProfile {
     pub id_docs: Patch<String>,
     #[serde(default)]
     pub kyb: Patch<String>,
+    #[serde(default)]
+    pub kyb_ein_only: Patch<String>,
     #[serde(default)]
     pub curp_verification: Patch<String>,
 

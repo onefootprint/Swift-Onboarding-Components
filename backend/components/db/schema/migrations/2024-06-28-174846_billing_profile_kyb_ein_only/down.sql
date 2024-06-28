@@ -1,0 +1,1 @@
+ALTER TABLE billing_profile DROP COLUMN kyb_ein_only;

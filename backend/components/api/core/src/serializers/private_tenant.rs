@@ -98,6 +98,7 @@ impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
         let BillingProfile {
             kyc,
             kyb,
+            kyb_ein_only,
             pii,
             id_docs,
             watchlist,
@@ -123,6 +124,7 @@ impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
         Self {
             kyc,
             kyb,
+            kyb_ein_only,
             pii,
             id_docs,
             watchlist,

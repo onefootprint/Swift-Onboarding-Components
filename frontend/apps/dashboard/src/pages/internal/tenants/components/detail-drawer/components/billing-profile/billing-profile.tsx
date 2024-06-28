@@ -51,6 +51,10 @@ const OTHER_VERIFICATIONS: BillingProfileField[] = [
     field: 'kyb',
   },
   {
+    title: 'KYB (EIN only)',
+    field: 'kybEinOnly',
+  },
+  {
     title: 'CURP verification',
     field: 'curpVerification',
   },

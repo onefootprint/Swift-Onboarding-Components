@@ -24,6 +24,8 @@ pub enum Product {
     ContinuousMonitoringPerYear,
     /// Number of KYB verifications ran this month
     Kyb,
+    /// KYB run only on EIN
+    KybEinOnly,
     /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't
     /// finish onboarding
     IdDocs,
@@ -54,6 +56,7 @@ impl Product {
             Self::HotVaults => "prod_OVSbMYqHKSm9VT",
             Self::IdDocs => "prod_ON7rDKhCD3yVsw",
             Self::Kyb => "prod_NbtsYZ8CIBKWo2",
+            Self::KybEinOnly => "prod_QNTiOIxS3o60RG",
             Self::WatchlistChecks => "prod_NbtH04u60RlSWg",
             Self::Kyc => "prod_NPMdLP5c6udoVi",
             Self::OneClickKyc => "prod_QC1i3DEeWac4Xy",
@@ -75,6 +78,7 @@ impl Product {
             Self::HotVaults => "Uncontracted HotVaults",
             Self::IdDocs => "Uncontracted IdDocs",
             Self::Kyb => "Uncontracted Kyb",
+            Self::KybEinOnly => "Uncontracted Kyb EIN only",
             Self::WatchlistChecks => "Uncontracted WatchlistChecks",
             Self::Kyc => "Uncontracted Kyc",
             Self::OneClickKyc => "Uncontracted OneClickKyc",
@@ -95,6 +99,7 @@ impl Product {
         match self {
             Self::IdDocs
             | Self::Kyb
+            | Self::KybEinOnly
             | Self::WatchlistChecks
             | Self::Kyc
             | Self::OneClickKyc

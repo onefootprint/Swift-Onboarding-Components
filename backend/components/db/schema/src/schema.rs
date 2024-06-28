@@ -158,6 +158,7 @@ diesel::table! {
         one_click_kyc -> Nullable<Text>,
         monthly_platform_fee -> Nullable<Text>,
         curp_verification -> Nullable<Text>,
+        kyb_ein_only -> Nullable<Text>,
     }
 }
 
