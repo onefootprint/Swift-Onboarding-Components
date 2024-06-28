@@ -2,6 +2,7 @@ use super::onboarding::RulesOutcome;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use api_wire_types::RuleResultRuleAction;
+use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::manual_review::ManualReviewAction;
@@ -9,11 +10,13 @@ use db::models::manual_review::ManualReviewArgs;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::FailedForDocReview;
 use db::models::onboarding_decision::NewDecisionArgs;
+use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
 use itertools::chain;
 use itertools::Itertools;
+use newtypes::BillingEventKind::AdverseMediaPerUser;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
 use newtypes::DocumentRequestConfig;
@@ -37,7 +40,7 @@ pub fn save_final_decision(
     conn: &mut TxnPgConn,
     wf_id: &WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
-    decision: RulesOutcome,
+    rules_outcome: RulesOutcome,
     rsr_id: Option<RuleSetResultId>,
     review_reasons: Vec<ReviewReason>,
 ) -> FpResult<()> {
@@ -48,18 +51,19 @@ pub fn save_final_decision(
     // If we should commit, portablize all data for the onboarding
     // But, don't portabalize vaults from no-phone onboardings,
     // and don't portablize vaults from tenant-initiated flows via POST /kyc
-    let seqno = if decision.should_commit() && !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
-        // We may decide to start portablizing data from tenant-initiated workflows, but leave
-        // the vaults un-identifiable.
-        // Make sure our product stats reflect this if we do so
-        let vw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
-        // Explicitly use the seqno from portablizing data on the decision
-        vw.portablize_identity_data(conn)?
-    } else {
-        DataLifetime::get_current_seqno(conn)?
-    };
+    let seqno =
+        if rules_outcome.should_commit() && !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
+            // We may decide to start portablizing data from tenant-initiated workflows, but leave
+            // the vaults un-identifiable.
+            // Make sure our product stats reflect this if we do so
+            let vw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
+            // Explicitly use the seqno from portablizing data on the decision
+            vw.portablize_identity_data(conn)?
+        } else {
+            DataLifetime::get_current_seqno(conn)?
+        };
 
-    let rules_manual_review = decision.create_manual_review().then_some(ManualReviewArgs {
+    let rules_manual_review = rules_outcome.create_manual_review().then_some(ManualReviewArgs {
         kind: ManualReviewKind::RuleTriggered,
         action: ManualReviewAction::GetOrCreate { review_reasons },
     });
@@ -86,17 +90,30 @@ pub fn save_final_decision(
 
     let sv = ScopedVault::get(conn, &wf.scoped_vault_id)?;
     let has_doc_mr = doc_manual_review.is_some();
-    let (status, failed_for_doc_review) = get_final_decision_status(decision.clone(), has_doc_mr, sv.status);
+    let (status, failed_for_doc_review) =
+        get_final_decision_status(rules_outcome.clone(), has_doc_mr, sv.status);
 
     let manual_reviews = chain(rules_manual_review, doc_manual_review).collect();
     if status == DecisionStatus::StepUp {
         tracing::error!(%wf_id, "Saving final decision with non-terminal status");
     }
 
+    // Bookkeeping if this is the first Footprint decision
+    if wf.decision_made_at.is_none() {
+        Workflow::set_decision_made_at(conn, &wf.id)?;
 
-    log_canonical_line(&obc, decision, has_doc_mr, sv.status);
+        // Create the billing event(s)
+        use newtypes::EnhancedAmlOption;
+        match obc.enhanced_aml() {
+            EnhancedAmlOption::Yes { adverse_media, .. } if adverse_media => {
+                BillingEvent::create(conn, &wf.scoped_vault_id, Some(&obc.id), AdverseMediaPerUser)?;
+            }
+            _ => (),
+        }
+    }
 
-    let decision = NewDecisionArgs {
+    // Create an OBD, update ManualReviews, and update Workflow state
+    let new_decision = NewDecisionArgs {
         vault_id: scoped_user.vault_id,
         logic_git_hash: crate::GIT_HASH.to_string(),
         status,
@@ -108,8 +125,12 @@ pub fn save_final_decision(
         manual_reviews,
         rule_set_result_id: rsr_id,
     };
+    let (obd, mr_deltas) = OnboardingDecision::create_decision_and_mrs(conn, &wf, new_decision)?;
+    let (wf, wf_delta, sv_delta) = Workflow::update_status_if_valid(wf, conn, obd.status.into())?;
+    wf.maybe_fire_completed_webhook(conn, wf_delta, mr_deltas)?;
+    wf.maybe_fire_status_changed_webhook(conn, sv_delta, mr_deltas)?;
 
-    Workflow::update_decision(wf, conn, decision)?;
+    log_canonical_line(&obc, rules_outcome, &obd);
 
     Ok(())
 }
@@ -134,28 +155,19 @@ fn get_final_decision_status(
     }
 }
 
-fn log_canonical_line(
-    obc: &ObConfiguration,
-    decision: RulesOutcome,
-    has_doc_mr: bool,
-    existing_status: OnboardingStatus,
-) {
-    let (should_commit, create_manual_review, action) = match decision.clone() {
-        RulesOutcome::RulesExecuted {
-            should_commit,
-            create_manual_review,
-            action,
-        } => (Some(should_commit), Some(create_manual_review), action),
-        RulesOutcome::RulesNotExecuted => (None, None, None),
+fn log_canonical_line(obc: &ObConfiguration, rules_outcome: RulesOutcome, obd: &OnboardingDecision) {
+    let action = match rules_outcome {
+        RulesOutcome::RulesExecuted { action, .. } => action,
+        RulesOutcome::RulesNotExecuted => None,
     };
-    let (decision_status, _) = get_final_decision_status(decision, has_doc_mr, existing_status);
 
     tracing::info!(
         obc_key=%obc.key,
-        should_commit=%should_commit.unwrap_or(false),
-        create_manual_review=%create_manual_review.unwrap_or(false),
-        %decision_status,
+        should_commit=%rules_outcome.should_commit(),
+        create_manual_review=rules_outcome.create_manual_review(),
         action=%RuleResultRuleAction::from(action),
+        decision_status=%obd.status,
+        failed_for_doc_review=%obd.failed_for_doc_review,
         is_live=%obc.is_live,
         tenant_id=%obc.tenant_id,
         kind=%obc.kind,

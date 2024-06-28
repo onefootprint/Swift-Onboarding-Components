@@ -185,7 +185,7 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
             // Skip past KYB vendor calls and go straight to decisioning
             Ok(KybState::from(KybDecisioning::new(self.wf_id, self.t_id)))
         } else {
-            DbWorkflow::update_status(wf, conn, OnboardingStatus::Pending)?;
+            DbWorkflow::update_status_if_valid(wf, conn, OnboardingStatus::Pending)?;
             Ok(KybState::from(KybVendorCalls {
                 wf_id: self.wf_id,
                 t_id: self.t_id,

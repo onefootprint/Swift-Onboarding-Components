@@ -100,7 +100,7 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
 
     #[tracing::instrument("OnAction<Authorize, KycState>::on_commit", skip_all)]
     fn on_commit(self, wf: Locked<DbWorkflow>, _: (), conn: &mut db::TxnPgConn) -> FpResult<KycState> {
-        DbWorkflow::update_status(wf, conn, OnboardingStatus::Pending)?;
+        DbWorkflow::update_status_if_valid(wf, conn, OnboardingStatus::Pending)?;
 
         Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,

@@ -1,5 +1,6 @@
 use super::fixtures::ob_configuration::ObConfigurationOpts;
 use crate::models::onboarding_decision::NewDecisionArgs;
+use crate::models::onboarding_decision::OnboardingDecision;
 use crate::models::task::NewTask;
 use crate::models::task::Task;
 use crate::models::watchlist_check::NewWatchlistCheck;
@@ -261,7 +262,8 @@ fn make_vault(
                 failed_for_doc_review: false,
             };
             let wf = Workflow::lock(conn, &wf.id).unwrap();
-            let wf = Workflow::update_decision(wf, conn, decision).unwrap();
+            let (obd, _) = OnboardingDecision::create_decision_and_mrs(conn, &wf, decision).unwrap();
+            let (wf, _, _) = Workflow::update_status_if_valid(wf, conn, obd.status.into()).unwrap();
             // Patch the decision_made_at to make it look like it was made earlier
             use db_schema::schema::workflow;
             use diesel::prelude::*;

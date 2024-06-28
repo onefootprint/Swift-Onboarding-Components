@@ -6,6 +6,7 @@ use db::models::document::DocumentUpdate;
 use db::models::manual_review::ManualReviewAction;
 use db::models::manual_review::ManualReviewArgs;
 use db::models::onboarding_decision::NewDecisionArgs;
+use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
@@ -68,7 +69,7 @@ pub fn save_review_decision(
     // Make the decision regardless of whether the status changed - the actor of the decision
     // may be different
     let seqno = DataLifetime::get_current_seqno(conn)?;
-    let new_decision = NewDecisionArgs {
+    let decision = NewDecisionArgs {
         vault_id: sv.vault_id,
         logic_git_hash: crate::GIT_HASH.to_string(),
         status,
@@ -82,7 +83,13 @@ pub fn save_review_decision(
         failed_for_doc_review: false,
     };
 
-    Workflow::update_decision(wf, conn, new_decision)?;
+    let (obd, mr_deltas) = OnboardingDecision::create_decision_and_mrs(conn, &wf, decision)?;
+
+    // Notably, we skip updating the Workflow's status here. ManualReview makes an OBD (associated with
+    // the workflow, strangely) and update's the ScopedVault's status, but we want to keep the
+    // Workflow's status equal to the output of running rules.
+    let sv_delta = ScopedVault::update_status_if_valid(conn, &sv.id, obd.status.into())?;
+    wf.maybe_fire_status_changed_webhook(conn, sv_delta, mr_deltas)?;
 
     Ok(())
 }

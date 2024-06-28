@@ -141,7 +141,7 @@ pub fn write_kyb_fixture_vendor_result_and_risk_signals(
     let biz_wf = Workflow::lock(conn, biz_wf_id)?;
     let sb = ScopedVault::get(conn, biz_wf_id)?;
     // TODO should these state transitions be handled by the ww machines?
-    let (biz_wf, _) = Workflow::update_status(biz_wf, conn, OnboardingStatus::Pending)?;
+    let (biz_wf, _, _) = Workflow::update_status_if_valid(biz_wf, conn, OnboardingStatus::Pending)?;
 
     let di = DecisionIntent::get_or_create_onboarding_kyb(conn, &sb.id)?;
     let uv = Vault::get(conn, &sb.id)?;

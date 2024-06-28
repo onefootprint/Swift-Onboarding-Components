@@ -91,7 +91,7 @@ pub fn create_user_and_onboarding(
 
     let wf = fixtures::workflow::create(conn, &su.id, &obc_id, None);
     let wf = Workflow::lock(conn, &wf.id).unwrap();
-    let (wf, _) = Workflow::update_status(wf, conn, onboarding_status).unwrap();
+    let (wf, _, _) = Workflow::update_status_if_valid(wf, conn, onboarding_status).unwrap();
     let wf_id = Locked::new(wf.id);
     let wf = Workflow::update_state(
         conn,

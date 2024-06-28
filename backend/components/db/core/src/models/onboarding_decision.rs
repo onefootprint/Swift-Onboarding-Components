@@ -1,6 +1,6 @@
 use super::manual_review::ManualReview;
 use super::manual_review::ManualReviewArgs;
-use super::manual_review::ManualReviewDeltas;
+use super::manual_review::ManualReviewDelta;
 use super::ob_configuration::ObConfiguration;
 use super::user_timeline::UserTimeline;
 use crate::actor;
@@ -105,11 +105,11 @@ pub type SaturatedOnboardingDecisionInfo = (
 
 impl OnboardingDecision {
     #[tracing::instrument("OnboardingDecision::create_decision_and_mrs", skip_all)]
-    pub(super) fn create_decision_and_mrs(
+    pub fn create_decision_and_mrs(
         conn: &mut TxnPgConn,
         wf: &Workflow,
         args: NewDecisionArgs,
-    ) -> DbResult<(Self, ManualReviewDeltas)> {
+    ) -> DbResult<(Self, ManualReviewDelta)> {
         let NewDecisionArgs {
             vault_id,
             logic_git_hash,

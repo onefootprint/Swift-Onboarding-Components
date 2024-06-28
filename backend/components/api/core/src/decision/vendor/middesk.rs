@@ -636,7 +636,7 @@ pub async fn init_middesk_request(
         .db_transaction(move |conn| -> FpResult<_> {
             let wf = Workflow::lock(conn, &wf_id)?;
             // TODO should these state transitions be handled by the ww machines?
-            let (wf, _) = Workflow::update_status(wf, conn, OnboardingStatus::Pending)?;
+            let (wf, _, _) = Workflow::update_status_if_valid(wf, conn, OnboardingStatus::Pending)?;
             let sv_id = &wf.scoped_vault_id;
 
             let decision_intent = DecisionIntent::get_or_create_for_workflow(

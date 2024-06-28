@@ -268,6 +268,7 @@ pub struct RuleSetResultSample {
 mod tests {
     use super::*;
     use crate::models::ob_configuration::ObConfiguration;
+    use crate::models::onboarding_decision::OnboardingDecision;
     use crate::models::risk_signal::RiskSignal;
     use crate::models::rule_instance::NewRule;
     use crate::models::rule_instance::RuleInstance;
@@ -444,7 +445,8 @@ mod tests {
                 failed_for_doc_review: false,
             };
             let wf = Workflow::lock(conn, &wf.id).unwrap();
-            let wf = Workflow::update_decision(wf, conn, decision).unwrap();
+            let (obd, _) = OnboardingDecision::create_decision_and_mrs(conn, &wf, decision).unwrap();
+            let (wf, _, _) = Workflow::update_status_if_valid(wf, conn, obd.status.into()).unwrap();
             Workflow::update_state(
                 conn,
                 Locked::new(wf.id.clone()),

@@ -248,7 +248,7 @@ pub fn handle_rules_output(
         UserTimeline::create(conn, stepup_info, v_id, wf.scoped_vault_id.clone())?;
 
         // Move the workflow back into an Incomplete state to show we are waiting for data from user
-        Workflow::update_status(wf, conn, OnboardingStatus::Incomplete)?;
+        Workflow::update_status_if_valid(wf, conn, OnboardingStatus::Incomplete)?;
         Ok(DecisionOutput::NonTerminal)
     } else {
         risk::save_final_decision(conn, &wf.id, vres_ids, rules_output, rsr_id, review_reasons)?;

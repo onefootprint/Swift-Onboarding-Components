@@ -71,7 +71,8 @@ struct ManualReviewUpdate {
     completed_by_actor: Option<Option<DbActor>>,
 }
 
-pub struct ManualReviewDeltas {
+#[derive(Clone, Copy)]
+pub struct ManualReviewDelta {
     /// True if there existed an incomplete ManualReview _before_ applying ManualReview actions
     pub old_has_mrs: bool,
     /// True if there exists an incomplete ManualReview _after_ applying ManualReview actions
@@ -85,7 +86,7 @@ impl ManualReview {
         workflow: &Workflow,
         decision: &OnboardingDecision,
         mrs: Vec<ManualReviewArgs>,
-    ) -> DbResult<ManualReviewDeltas> {
+    ) -> DbResult<ManualReviewDelta> {
         let existing_mrs = Self::get_active(conn, &workflow.scoped_vault_id)?;
         let old_has_mrs = !existing_mrs.is_empty();
         for ManualReviewArgs { kind, action } in mrs {
@@ -129,7 +130,7 @@ impl ManualReview {
             }
         }
         let new_has_mrs = !Self::get_active(conn, &workflow.scoped_vault_id)?.is_empty();
-        let result = ManualReviewDeltas {
+        let result = ManualReviewDelta {
             old_has_mrs,
             new_has_mrs,
         };

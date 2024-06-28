@@ -465,8 +465,8 @@ mod tests {
                 };
 
                 let wf = Workflow::lock(conn, &wf.id).unwrap();
-                let wf = Workflow::update_decision(wf, conn, new_decision).unwrap();
-                let obd = OnboardingDecision::get_active(conn, &wf.id).unwrap().unwrap();
+                let (obd, _) = OnboardingDecision::create_decision_and_mrs(conn, &wf, new_decision).unwrap();
+                Workflow::update_status_if_valid(wf, conn, obd.status.into()).unwrap();
 
                 for (vres, vendor_api, reason_codes, key_type) in vres_with_rs {
                     let new_risk_signals = match key_type {
