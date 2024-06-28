@@ -18,7 +18,7 @@ const Content = ({ label, sandboxId, overallOutcome }: ContentProps) => {
     [OverallOutcome.success]: t('options.success'),
     [OverallOutcome.manualReview]: t('options.manual-review'),
     [OverallOutcome.fail]: t('options.fail'),
-    [OverallOutcome.documentDecision]: t('options.document-decision'),
+    [OverallOutcome.useRulesOutcome]: t('options.document-decision'),
     [OverallOutcome.stepUp]: t('options.step-up'),
   };
   return sandboxId ? (

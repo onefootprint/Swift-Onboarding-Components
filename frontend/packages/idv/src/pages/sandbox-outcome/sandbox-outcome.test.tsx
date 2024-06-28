@@ -343,7 +343,7 @@ describe('<SandboxOutcome/>', () => {
       expect(submittedFormData.overallOutcome).toEqual('fail');
     });
 
-    it('Overall outcome is disabled and set to document_decisions when sandbox outcome is selected to be real', async () => {
+    it('Overall outcome is disabled and set to use_rules_outcome when sandbox outcome is selected to be real', async () => {
       renderSandbox({ requiresIdDoc: true });
       const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
       const continueButton = screen.getByText('Continue');
@@ -357,7 +357,7 @@ describe('<SandboxOutcome/>', () => {
         ).disabled,
       ).toBeTruthy();
       await userEvent.click(continueButton);
-      expect(submittedFormData.overallOutcome).toEqual('document_decision');
+      expect(submittedFormData.overallOutcome).toEqual('use_rules_outcome');
     });
   });
 

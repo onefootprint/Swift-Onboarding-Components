@@ -25,7 +25,7 @@ const useSandboxOutcomeOptions = () => {
   };
   const overallOutcomeDocumentDecision = {
     label: t('overall-outcome.outcome.options.document-decision.title'),
-    value: OverallOutcome.documentDecision,
+    value: OverallOutcome.useRulesOutcome,
   };
 
   const idDocOutcomeSuccess = {

@@ -2,7 +2,7 @@ export enum OverallOutcome {
   success = 'pass',
   manualReview = 'manual_review',
   fail = 'fail',
-  documentDecision = 'document_decision',
+  useRulesOutcome = 'use_rules_outcome',
   stepUp = 'step_up',
 }
 
