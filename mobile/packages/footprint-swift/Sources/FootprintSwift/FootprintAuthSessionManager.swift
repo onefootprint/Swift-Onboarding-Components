@@ -22,7 +22,7 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
         
         if let appearance = try self.configuration.appearance?.toJSON() {
             if let fontSrc = appearance["fontSrc"] {
-                queryItems.append(URLQueryItem(name: "fontSrc", value: fontSrc))
+                queryItems.append(URLQueryItem(name: "font_src", value: fontSrc))
             }
             if let variant = appearance["variant"] {
                 queryItems.append(URLQueryItem(name: "variant", value: variant))
