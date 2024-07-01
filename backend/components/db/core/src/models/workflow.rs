@@ -24,6 +24,7 @@ use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::AlpacaKycState;
+use newtypes::ApiKeyStatus;
 use newtypes::DocumentConfig;
 use newtypes::DocumentState;
 use newtypes::InsightEventId;
@@ -367,6 +368,7 @@ impl Workflow {
             .inner_join(ob_configuration::table)
             .filter(workflow::scoped_vault_id.eq(sv_id))
             .filter(ob_configuration::kind.eq_any(ObConfigurationKind::reonboardable()))
+            .filter(ob_configuration::status.eq(ApiKeyStatus::Enabled))
             .into_boxed();
 
         if only_completed {

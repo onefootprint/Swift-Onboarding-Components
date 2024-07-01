@@ -18,7 +18,7 @@ pub enum UserError {
     InvalidAuthSession(String),
     #[error("Must provide an auth playbook public key to create an auth token")]
     PlaybookMissingForAuth,
-    #[error("Cannot reonboard user - user has no complete onboardings.")]
+    #[error("Cannot reonboard user - user has no complete onboardings. Please request additional information by onboarding a user onto a specific Playbook.")]
     NoCompleteOnboardings,
 }
 
