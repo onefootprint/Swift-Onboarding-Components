@@ -63,7 +63,7 @@
     "constate": "^3.3.2",
     "copy-and-watch": "^0.1.6",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",

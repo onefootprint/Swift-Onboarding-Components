@@ -17,6 +17,6 @@
     "@onefootprint/types": "*",
     "eslint-config-footprint": "*",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   }
 }

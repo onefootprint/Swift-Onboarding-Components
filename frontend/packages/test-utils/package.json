@@ -27,7 +27,7 @@
     "react-dom": "^18",
     "resize-observer-polyfill": "^1.5.1",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

@@ -21,7 +21,7 @@
     "@types/uuid": "^9.0.0",
     "bun-types": "^1.0.25",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "constate": "^3.3.2",

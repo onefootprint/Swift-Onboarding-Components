@@ -18,7 +18,7 @@
     "msw": "^1.1.0",
     "react": "18.2.0",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "@types/react": "^18.2.8"

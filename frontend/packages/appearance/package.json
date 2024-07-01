@@ -27,7 +27,7 @@
     "react": "^18",
     "react-dom": "^18",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "peerDependencies": {
     "react": "18.x",

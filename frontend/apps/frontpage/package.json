@@ -76,6 +76,6 @@
     "csstype": "^3.1.2",
     "next-compose-plugins": "^2.2.1",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   }
 }

@@ -19,7 +19,7 @@
     "react-native-device-info": "^10.11.0",
     "react-native": "^0.71.15",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "@onefootprint/types": "*",

@@ -91,7 +91,7 @@
     "@types/validator": "^13.11.9",
     "copy-and-watch": "^0.1.6",
     "tsconfig": "*",
-    "typescript": "^5",
+    "typescript": "^5.5.2",
     "@types/openpgp": "4.4.22"
   },
   "jest": {

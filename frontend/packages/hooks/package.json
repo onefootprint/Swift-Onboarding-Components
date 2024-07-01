@@ -20,7 +20,7 @@
     "react-dom": "^18",
     "react-i18next": "^14.0.0",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "next-usequerystate": "^1.7.2"

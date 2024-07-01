@@ -33,7 +33,7 @@
     "msw": "^2.1.2",
     "tsconfig": "*",
     "tsup": "^6.5.0",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "publishConfig": {
     "access": "public"

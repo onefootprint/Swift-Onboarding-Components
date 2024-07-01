@@ -35,7 +35,7 @@
     "lodash": "^4.17.21",
     "react-native-svg-transformer": "^1.0.0",
     "tsconfig": "*",
-    "typescript": "^5"
+    "typescript": "^5.5.2"
   },
   "jest": {
     "preset": "jest-expo",
