@@ -11,7 +11,7 @@ import {
   Liveness,
   Transfer,
 } from '../../../../../../plugins';
-import { Logger } from '../../../../../../utils/logger';
+import { getLogger } from '../../../../../../utils/logger';
 import ErrorComponent from '../../../../components/error';
 import WaitForComponentsSdk from '../../components/wait-for-components-sdk';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
@@ -21,9 +21,9 @@ import Process from '../process';
 import StartOnboarding from '../start-onboarding';
 import getKycBootstrapData from './utils/get-kyc-user-data';
 
-type RouterProps = {
-  onDone: () => void;
-};
+type RouterProps = { onDone: () => void };
+
+const { logInfo } = getLogger({ location: 'onboarding-requirements-router' });
 
 const Router = ({ onDone }: RouterProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
@@ -34,25 +34,23 @@ const Router = ({ onDone }: RouterProps) => {
     requirements,
   } = state.context;
   const { orgId } = config;
+  const isDone = state.matches('success');
   const kyb = getRequirement(requirements, OnboardingRequirementKind.collectKybData);
   const kyc = getRequirement(requirements, OnboardingRequirementKind.collectKycData);
   const liveness = getRequirement(requirements, OnboardingRequirementKind.registerPasskey);
   const idDocReqs = getRequirements(requirements, OnboardingRequirementKind.idDoc);
-  const isDone = state.matches('success');
-  useLogStateMachine('onboarding-requirements', state);
   const kycUserData = getKycBootstrapData(userData);
+  useLogStateMachine('onboarding-requirements', state);
 
   useEffect(() => {
     if (isDone) {
-      Logger.info('Onboarding requirements flow is complete');
+      logInfo('Onboarding requirements flow is complete');
       onDone();
     }
   }, [isDone, onDone]);
 
   const handleRequirementCompleted = () => {
-    send({
-      type: 'requirementCompleted',
-    });
+    send({ type: 'requirementCompleted' });
   };
 
   if (state.matches('startOnboarding')) {
@@ -95,9 +93,7 @@ const Router = ({ onDone }: RouterProps) => {
     return (
       <InvestorProfile
         idvContext={idvContext}
-        context={{
-          showTransition: !!collectedKycData,
-        }}
+        context={{ showTransition: !!collectedKycData }}
         onDone={handleRequirementCompleted}
       />
     );

@@ -34,41 +34,16 @@ export type MachineContext = {
   // In the future, we can generalize to use different icons to indicate prev plugin type
   showTransition?: boolean;
   data: InvestorProfileData;
+  declarationFiles?: File[];
 };
 
 export type MachineEvents =
-  | {
-      type: 'receivedContext';
-      payload: {
-        authToken: string;
-        device: DeviceInfo;
-        showTransition?: boolean;
-      };
-    }
-  | {
-      type: 'employmentSubmitted';
-      payload: EmploymentData;
-    }
-  | {
-      type: 'incomeSubmitted';
-      payload: IncomeData;
-    }
-  | {
-      type: 'netWorthSubmitted';
-      payload: NetWorthData;
-    }
-  | {
-      type: 'investmentGoalsSubmitted';
-      payload: InvestmentGoalsData;
-    }
-  | {
-      type: 'riskToleranceSubmitted';
-      payload: RiskToleranceData;
-    }
-  | {
-      type: 'declarationsSubmitted';
-      payload: DeclarationData;
-    }
-  | {
-      type: 'navigatedToPrevPage';
-    };
+  | { type: 'confirmed' }
+  | { type: 'declarationsSubmitted'; payload: { data: DeclarationData; files?: File[] } }
+  | { type: 'employmentSubmitted'; payload: EmploymentData }
+  | { type: 'incomeSubmitted'; payload: IncomeData }
+  | { type: 'investmentGoalsSubmitted'; payload: InvestmentGoalsData }
+  | { type: 'navigatedToPrevPage' }
+  | { type: 'netWorthSubmitted'; payload: NetWorthData }
+  | { type: 'receivedContext'; payload: { authToken: string; device: DeviceInfo; showTransition?: boolean } }
+  | { type: 'riskToleranceSubmitted'; payload: RiskToleranceData };

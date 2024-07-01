@@ -5,7 +5,8 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import CustomForm from '../../../../components/custom-form';
+import FormWithErrorAndFooter from '../../../../components/form-with-error-footer';
+import ContinueButton from '../../../../components/form-with-error-footer/components/continue-button';
 import type { EmploymentData } from '../../../../utils/state-machine/types';
 
 export type EmploymentFormProps = {
@@ -21,9 +22,7 @@ type FormData = {
 };
 
 const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.pages.employment',
-  });
+  const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages.employment' });
   const options: SelectOption[] = [
     {
       label: t('employment-status.employed'),
@@ -73,13 +72,9 @@ const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormPr
   };
 
   return (
-    <CustomForm
-      title={t('title')}
-      subtitle={t('subtitle')}
-      isLoading={isLoading}
-      formAttributes={{
-        onSubmit: handleSubmit(handleBeforeSubmit),
-      }}
+    <FormWithErrorAndFooter
+      footer={<ContinueButton isLoading={isLoading} />}
+      formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }}
     >
       <Controller
         control={control}
@@ -125,7 +120,7 @@ const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormPr
           />
         </>
       )}
-    </CustomForm>
+    </FormWithErrorAndFooter>
   );
 };
 

@@ -4,12 +4,23 @@ import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-uti
 import { InvestorProfileAnnualIncome, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
+import ContinueButton from 'src/plugins/investor-profile/components/form-with-error-footer/components/continue-button';
 import type { IncomeFormProps } from './income-form';
 import IncomeForm from './income-form';
 
 describe('<IncomeForm />', () => {
-  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<IncomeFormProps>) => {
-    customRender(<IncomeForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
+  const renderForm = ({
+    defaultValues,
+    isLoading,
+    onSubmit = () => undefined,
+  }: Partial<IncomeFormProps> & { isLoading?: boolean }) => {
+    customRender(
+      <IncomeForm
+        defaultValues={defaultValues}
+        footer={<ContinueButton isLoading={isLoading} />}
+        onSubmit={onSubmit}
+      />,
+    );
   };
 
   it('onSubmit is called when form is submitted', async () => {

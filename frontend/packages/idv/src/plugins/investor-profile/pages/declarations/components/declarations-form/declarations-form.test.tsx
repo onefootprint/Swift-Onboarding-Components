@@ -4,12 +4,23 @@ import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-uti
 import { InvestorProfileDI, InvestorProfileDeclaration } from '@onefootprint/types';
 import React from 'react';
 
+import ContinueButton from 'src/plugins/investor-profile/components/form-with-error-footer/components/continue-button';
 import type { DeclarationsFormProps } from './declarations-form';
 import DeclarationsForm from './declarations-form';
 
 describe('<DeclarationsForm />', () => {
-  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<DeclarationsFormProps>) => {
-    customRender(<DeclarationsForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
+  const renderForm = ({
+    defaultValues,
+    isLoading,
+    onSubmit = () => undefined,
+  }: Partial<DeclarationsFormProps> & { isLoading?: boolean }) => {
+    customRender(
+      <DeclarationsForm
+        onSubmit={onSubmit}
+        defaultValues={defaultValues}
+        footer={<ContinueButton isLoading={isLoading} />}
+      />,
+    );
   };
 
   describe('when the user is affiliated or work with a broke dealer', () => {

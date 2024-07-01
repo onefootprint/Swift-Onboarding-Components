@@ -1,14 +1,22 @@
 import { InvestorProfileAnnualIncome, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
-import { Logger } from '../../../../utils/logger';
-import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
+import { getLogger } from '../../../../utils/logger';
+import ContinueButton from '../../components/form-with-error-footer/components/continue-button';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import type { IncomeData } from '../../utils/state-machine/types';
 import IncomeForm from './components/income-form';
 
-const Income = () => {
+type IncomeProps = {
+  onSuccess?: () => void;
+  renderFooter?: (isLoading: boolean) => React.ReactNode;
+};
+
+const annualIncome = InvestorProfileDI.annualIncome;
+const { logError } = getLogger({ location: 'investor-profile-income' });
+
+const Income = ({ onSuccess, renderFooter }: IncomeProps) => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -19,32 +27,21 @@ const Income = () => {
       data: incomeData,
       speculative: true,
       onSuccess: () => {
-        send({
-          type: 'incomeSubmitted',
-          payload: {
-            ...incomeData,
-          },
-        });
+        send({ type: 'incomeSubmitted', payload: { ...incomeData } });
+        onSuccess?.();
       },
-      onError: (error: string) => {
-        Logger.error(`Encountered error while speculatively syncing data on investor profile income page: ${error}`, {
-          location: 'investor-profile-income',
-        });
+      onError: error => {
+        logError(`Encountered error while speculatively syncing data on investor profile income page: ${error}`, error);
       },
     });
   };
 
   return (
-    <>
-      <InvestorProfileNavigationHeader />
-      <IncomeForm
-        isLoading={mutation.isLoading}
-        onSubmit={handleSubmit}
-        defaultValues={{
-          [InvestorProfileDI.annualIncome]: data?.[InvestorProfileDI.annualIncome] || InvestorProfileAnnualIncome.le25k,
-        }}
-      />
-    </>
+    <IncomeForm
+      defaultValues={{ [annualIncome]: data?.[annualIncome] || InvestorProfileAnnualIncome.le25k }}
+      footer={renderFooter ? renderFooter(mutation.isLoading) : <ContinueButton isLoading={mutation.isLoading} />}
+      onSubmit={handleSubmit}
+    />
   );
 };
 

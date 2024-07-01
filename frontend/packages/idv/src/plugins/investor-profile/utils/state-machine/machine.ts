@@ -35,84 +35,70 @@ const createCollectInvestorProfileDataMachine = ({ device, authToken, showTransi
               {
                 target: 'income',
                 actions: 'assignData',
-                cond: (_context, event) => !!event.payload[InvestorProfileDI.occupation],
+                cond: (_, event) => !!event.payload[InvestorProfileDI.occupation],
               },
-              {
-                target: 'income',
-                actions: 'assignData',
-              },
+              { target: 'income', actions: 'assignData' },
             ],
           },
         },
         income: {
           on: {
-            incomeSubmitted: {
-              target: 'netWorth',
-              actions: 'assignData',
-            },
-            navigatedToPrevPage: {
-              target: 'employment',
-            },
+            incomeSubmitted: { target: 'netWorth', actions: 'assignData' },
+            navigatedToPrevPage: { target: 'employment' },
           },
         },
         netWorth: {
           on: {
-            netWorthSubmitted: {
-              target: 'investmentGoals',
-              actions: 'assignData',
-            },
-            navigatedToPrevPage: {
-              target: 'income',
-            },
+            netWorthSubmitted: { target: 'investmentGoals', actions: 'assignData' },
+            navigatedToPrevPage: { target: 'income' },
           },
         },
         investmentGoals: {
           on: {
-            investmentGoalsSubmitted: {
-              target: 'riskTolerance',
-              actions: 'assignData',
-            },
-            navigatedToPrevPage: {
-              target: 'netWorth',
-            },
+            investmentGoalsSubmitted: { target: 'riskTolerance', actions: 'assignData' },
+            navigatedToPrevPage: { target: 'netWorth' },
           },
         },
         riskTolerance: {
           on: {
-            riskToleranceSubmitted: {
-              target: 'declarations',
-              actions: 'assignData',
-            },
-            navigatedToPrevPage: {
-              target: 'investmentGoals',
-            },
+            riskToleranceSubmitted: { target: 'declarations', actions: 'assignData' },
+            navigatedToPrevPage: { target: 'investmentGoals' },
           },
         },
         declarations: {
           on: {
-            declarationsSubmitted: {
-              target: 'completed',
-              actions: 'assignData',
-            },
-            navigatedToPrevPage: {
-              target: 'riskTolerance',
-            },
+            declarationsSubmitted: { target: 'confirm', actions: 'assignData' },
+            navigatedToPrevPage: { target: 'riskTolerance' },
           },
         },
-        completed: {
-          type: 'final',
+        confirm: {
+          on: {
+            navigatedToPrevPage: { target: 'declarations' },
+            incomeSubmitted: { actions: 'assignData' },
+            netWorthSubmitted: { actions: 'assignData' },
+            investmentGoalsSubmitted: { actions: 'assignData' },
+            riskToleranceSubmitted: { actions: 'assignData' },
+            declarationsSubmitted: { actions: 'assignData' },
+            confirmed: { target: 'completed' },
+          },
         },
+        completed: { type: 'final' },
       },
     },
     {
       actions: {
-        assignData: assign((context, event) => ({
-          ...context,
-          data: {
-            ...context.data,
-            ...event.payload,
-          },
-        })),
+        assignData: assign((context, event) => {
+          return event.type === 'declarationsSubmitted'
+            ? {
+                ...context,
+                declarationFiles: event.payload.files,
+                data: { ...context.data, ...event.payload.data },
+              }
+            : {
+                ...context,
+                data: { ...context.data, ...event.payload },
+              };
+        }),
       },
     },
   );

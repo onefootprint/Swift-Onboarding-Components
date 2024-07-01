@@ -26,6 +26,7 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'completed'
+    | 'confirm'
     | 'declarations'
     | 'employment'
     | 'income'

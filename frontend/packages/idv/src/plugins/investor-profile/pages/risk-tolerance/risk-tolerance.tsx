@@ -1,14 +1,22 @@
 import { InvestorProfileDI, InvestorProfileRiskTolerance } from '@onefootprint/types';
 import React from 'react';
 
-import { Logger } from '../../../../utils/logger';
-import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
+import { getLogger } from '../../../../utils/logger';
+import ContinueButton from '../../components/form-with-error-footer/components/continue-button';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import type { RiskToleranceData } from '../../utils/state-machine/types';
 import RiskToleranceForm from './components/risk-tolerance-form';
 
-const RiskTolerance = () => {
+type RiskToleranceProps = {
+  onSuccess?: () => void;
+  renderFooter?: (isLoading: boolean) => React.ReactNode;
+};
+
+const DiRiskTolerance = InvestorProfileDI.riskTolerance;
+const { logError } = getLogger({ location: 'investor-profile-risk-tolerance' });
+
+const RiskTolerance = ({ onSuccess, renderFooter }: RiskToleranceProps) => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -19,34 +27,24 @@ const RiskTolerance = () => {
       data: riskToleranceData,
       speculative: true,
       onSuccess: () => {
-        send({
-          type: 'riskToleranceSubmitted',
-          payload: {
-            ...riskToleranceData,
-          },
-        });
+        send({ type: 'riskToleranceSubmitted', payload: { ...riskToleranceData } });
+        onSuccess?.();
       },
       onError: (error: unknown) => {
-        Logger.error(
+        logError(
           `Encountered error while speculatively syncing data on investor profile risk tolerance page: ${error}`,
-          { location: 'investor-profile-risk-tolerance' },
+          error,
         );
       },
     });
   };
 
   return (
-    <>
-      <InvestorProfileNavigationHeader />
-      <RiskToleranceForm
-        isLoading={mutation.isLoading}
-        onSubmit={handleSubmit}
-        defaultValues={{
-          [InvestorProfileDI.riskTolerance]:
-            data?.[InvestorProfileDI.riskTolerance] || InvestorProfileRiskTolerance.conservative,
-        }}
-      />
-    </>
+    <RiskToleranceForm
+      defaultValues={{ [DiRiskTolerance]: data?.[DiRiskTolerance] || InvestorProfileRiskTolerance.conservative }}
+      footer={renderFooter ? renderFooter(mutation.isLoading) : <ContinueButton isLoading={mutation.isLoading} />}
+      onSubmit={handleSubmit}
+    />
   );
 };
 

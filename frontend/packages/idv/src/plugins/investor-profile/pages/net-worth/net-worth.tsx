@@ -1,14 +1,22 @@
 import { InvestorProfileDI, InvestorProfileNetWorth } from '@onefootprint/types';
 import React from 'react';
 
-import { Logger } from '../../../../utils/logger';
-import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
+import { getLogger } from '../../../../utils/logger';
+import ContinueButton from '../../components/form-with-error-footer/components/continue-button';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import type { NetWorthData } from '../../utils/state-machine/types';
 import NetWorthForm from './components/net-worth-form';
 
-const NetWorth = () => {
+type NetWorthProps = {
+  onSuccess?: () => void;
+  renderFooter?: (isLoading: boolean) => React.ReactNode;
+};
+
+const netWorth = InvestorProfileDI.netWorth;
+const { logError } = getLogger({ location: 'investor-profile-net-worth' });
+
+const NetWorth = ({ onSuccess, renderFooter }: NetWorthProps) => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -19,33 +27,24 @@ const NetWorth = () => {
       data: networthData,
       speculative: true,
       onSuccess: () => {
-        send({
-          type: 'netWorthSubmitted',
-          payload: {
-            ...networthData,
-          },
-        });
+        send({ type: 'netWorthSubmitted', payload: { ...networthData } });
+        onSuccess?.();
       },
       onError: (error: unknown) => {
-        Logger.error(
+        logError(
           `Encountered error while speculatively syncing data on investor profile net worth page: ${error}`,
-          { location: 'investor-profile-net-worth' },
+          error,
         );
       },
     });
   };
 
   return (
-    <>
-      <InvestorProfileNavigationHeader />
-      <NetWorthForm
-        isLoading={mutation.isLoading}
-        onSubmit={handleSubmit}
-        defaultValues={{
-          [InvestorProfileDI.netWorth]: data?.[InvestorProfileDI.netWorth] || InvestorProfileNetWorth.le50k,
-        }}
-      />
-    </>
+    <NetWorthForm
+      defaultValues={{ [netWorth]: data?.[netWorth] || InvestorProfileNetWorth.le50k }}
+      footer={renderFooter ? renderFooter(mutation.isLoading) : <ContinueButton isLoading={mutation.isLoading} />}
+      onSubmit={handleSubmit}
+    />
   );
 };
 

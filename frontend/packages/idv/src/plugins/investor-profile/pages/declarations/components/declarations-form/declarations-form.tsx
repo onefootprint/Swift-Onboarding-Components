@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import CustomForm from '../../../../components/custom-form';
+import FormWithErrorAndFooter from '../../../../components/form-with-error-footer';
 import type { DeclarationData } from '../../../../utils/state-machine/types';
 import UploadComplianceLetter from '../upload-compliance-letter';
 import filterNonTruthy from './utils/filter-non-truthy';
@@ -14,8 +14,9 @@ import validateFamilyMemberNames from './utils/validate-family-member-names';
 
 export type DeclarationsFormProps = {
   defaultValues?: Partial<DeclarationData>;
-  isLoading?: boolean;
+  footer: React.ReactNode;
   onSubmit: (data: DeclarationData, files?: File[]) => void;
+  selectedFiles?: File[];
 };
 
 type FormData = Record<InvestorProfileDeclaration, boolean> & {
@@ -31,10 +32,8 @@ const declarationKeys = [
   InvestorProfileDeclaration.seniorPoliticalFigure,
 ];
 
-const DeclarationsForm = ({ defaultValues, isLoading, onSubmit }: DeclarationsFormProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.pages.declarations',
-  });
+const DeclarationsForm = ({ defaultValues, footer, onSubmit, selectedFiles }: DeclarationsFormProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages.declarations' });
   const defaultEntries = (defaultValues?.[InvestorProfileDI.declarations] ?? []).map(goal => [goal, true]);
   const {
     handleSubmit,
@@ -52,7 +51,6 @@ const DeclarationsForm = ({ defaultValues, isLoading, onSubmit }: DeclarationsFo
     },
   });
 
-  const checkboxes = watch(declarationKeys);
   const seniorExecutive = watch(InvestorProfileDeclaration.seniorExecutive);
   const politicalFigure = watch(InvestorProfileDeclaration.seniorPoliticalFigure);
   const affiliatedWithUsBroker = watch(InvestorProfileDeclaration.affiliatedWithUsBroker);
@@ -63,12 +61,11 @@ const DeclarationsForm = ({ defaultValues, isLoading, onSubmit }: DeclarationsFo
   const showPoliticalOrganization = politicalFigure;
   const [shouldShowUploadError, setShouldShowUploadError] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
-  const hasSelectedAnyOption = Object.values(checkboxes).some(value => value);
-  const handleUploadChange = (newFiles: File[]) => {
-    if (newFiles.length > 0) {
+  const handleUploadChange = (fileList: File[]) => {
+    if (fileList.length > 0) {
       setShouldShowUploadError(false);
     }
-    setFiles(newFiles);
+    setFiles(fileList);
   };
 
   const handleBeforeSubmit = (data: FormData) => {
@@ -93,15 +90,9 @@ const DeclarationsForm = ({ defaultValues, isLoading, onSubmit }: DeclarationsFo
   };
 
   return (
-    <CustomForm
-      title={t('title')}
-      subtitle={t('subtitle')}
-      isLoading={isLoading}
-      ctaLabel={hasSelectedAnyOption ? undefined : t('cta-none')}
-      formAttributes={{
-        encType: 'multipart/form-data',
-        onSubmit: handleSubmit(handleBeforeSubmit),
-      }}
+    <FormWithErrorAndFooter
+      footer={footer}
+      formAttributes={{ encType: 'multipart/form-data', onSubmit: handleSubmit(handleBeforeSubmit) }}
     >
       <Checkbox
         label={t(`options.${InvestorProfileDeclaration.affiliatedWithUsBroker}`)}
@@ -183,8 +174,14 @@ const DeclarationsForm = ({ defaultValues, isLoading, onSubmit }: DeclarationsFo
           })}
         />
       )}
-      {shouldRequireUpload && <UploadComplianceLetter hasError={shouldShowUploadError} onChange={handleUploadChange} />}
-    </CustomForm>
+      {shouldRequireUpload && (
+        <UploadComplianceLetter
+          hasError={shouldShowUploadError}
+          selectedFiles={selectedFiles}
+          onChange={handleUploadChange}
+        />
+      )}
+    </FormWithErrorAndFooter>
   );
 };
 

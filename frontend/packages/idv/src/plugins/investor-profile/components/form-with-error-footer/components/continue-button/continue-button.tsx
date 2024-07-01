@@ -7,10 +7,8 @@ type ContinueButtonProps = {
   label?: string;
 };
 
-const ContinueButton = ({ label, isLoading }: ContinueButtonProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.components.continue-button',
-  });
+const ContinueButton = ({ isLoading, label }: ContinueButtonProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.components.continue-button' });
 
   return (
     <Button type="submit" fullWidth loading={isLoading} loadingAriaLabel={t('loading-aria-label')} size="large">

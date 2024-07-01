@@ -793,6 +793,12 @@
       }
     },
     "pages": {
+      "cancel": "Cancel",
+      "confirm-continue": "Confirm & Continue",
+      "edit": "Edit",
+      "loading": "Loading...",
+      "none": "None",
+      "save": "Save",
       "employment": {
         "title": "What's your employment status and occupation?",
         "subtitle": "We're legally required to collect this information.",
@@ -908,6 +914,10 @@
           "hint": "Max size: 5 MB",
           "size-limit-error": "File size exceeds 5 MB"
         }
+      },
+      "confirm": {
+        "title": "Confirm your profile",
+        "subtitle": "Please make sure that your answers are accurate before continuing."
       }
     }
   },

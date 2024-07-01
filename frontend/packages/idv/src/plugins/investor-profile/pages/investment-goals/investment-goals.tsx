@@ -1,14 +1,22 @@
 import { InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
-import { Logger } from '../../../../utils/logger';
-import InvestorProfileNavigationHeader from '../../components/investor-profile-navigation-header';
+import { getLogger } from '../../../../utils/logger';
+import ContinueButton from '../../components/form-with-error-footer/components/continue-button';
 import useInvestorProfileMachine from '../../hooks/use-investor-profile-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import type { InvestmentGoalsData } from '../../utils/state-machine/types';
 import InvestmentGoalsForm from './components/investment-goals-form';
 
-const InvestmentGoals = () => {
+type InvestmentGoalsProps = {
+  onSuccess?: () => void;
+  renderFooter?: (isLoading: boolean) => React.ReactNode;
+};
+
+const investmentGoals = InvestorProfileDI.investmentGoals;
+const { logError } = getLogger({ location: 'investor-profile-investment-goals' });
+
+const InvestmentGoals = ({ onSuccess, renderFooter }: InvestmentGoalsProps) => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -19,33 +27,24 @@ const InvestmentGoals = () => {
       data: investmentGoalsData,
       speculative: true,
       onSuccess: () => {
-        send({
-          type: 'investmentGoalsSubmitted',
-          payload: {
-            ...investmentGoalsData,
-          },
-        });
+        send({ type: 'investmentGoalsSubmitted', payload: { ...investmentGoalsData } });
+        onSuccess?.();
       },
       onError: (error: unknown) => {
-        Logger.error(
+        logError(
           `Encountered error while speculatively syncing data on investor profile investment goals page: ${error}`,
-          { location: 'investor-profile-investment-goals' },
+          error,
         );
       },
     });
   };
 
   return (
-    <>
-      <InvestorProfileNavigationHeader />
-      <InvestmentGoalsForm
-        isLoading={mutation.isLoading}
-        onSubmit={handleSubmit}
-        defaultValues={{
-          [InvestorProfileDI.investmentGoals]: data?.[InvestorProfileDI.investmentGoals],
-        }}
-      />
-    </>
+    <InvestmentGoalsForm
+      defaultValues={{ [investmentGoals]: data?.[investmentGoals] }}
+      footer={renderFooter ? renderFooter(mutation.isLoading) : <ContinueButton isLoading={mutation.isLoading} />}
+      onSubmit={handleSubmit}
+    />
   );
 };
 

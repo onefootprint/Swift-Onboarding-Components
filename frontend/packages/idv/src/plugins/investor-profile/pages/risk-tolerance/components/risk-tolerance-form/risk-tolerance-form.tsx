@@ -5,70 +5,57 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import CustomForm from '../../../../components/custom-form';
+import FormWithErrorAndFooter from '../../../../components/form-with-error-footer';
 import type { RiskToleranceData } from '../../../../utils/state-machine/types';
 
 export type RiskToleranceFormProps = {
   defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.riskTolerance>;
-  isLoading?: boolean;
+  footer: React.ReactNode;
   onSubmit: (data: RiskToleranceData) => void;
 };
 
-type FormData = {
-  riskTolerance: InvestorProfileRiskTolerance;
-};
+type FormData = { riskTolerance: InvestorProfileRiskTolerance };
 
-const RiskToleranceForm = ({ isLoading, defaultValues, onSubmit }: RiskToleranceFormProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.pages.risk-tolerance',
-  });
+const DiRiskTolerance = InvestorProfileDI.riskTolerance;
+const { aggressive, conservative, moderate } = InvestorProfileRiskTolerance;
+
+const RiskToleranceForm = ({ defaultValues, footer, onSubmit }: RiskToleranceFormProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages.risk-tolerance' });
   const { handleSubmit, register } = useForm<FormData>({
-    defaultValues: {
-      riskTolerance: defaultValues?.[InvestorProfileDI.riskTolerance] ?? InvestorProfileRiskTolerance.conservative,
-    },
+    defaultValues: { riskTolerance: defaultValues?.[DiRiskTolerance] ?? conservative },
   });
 
   const handleBeforeSubmit = (data: FormData) => {
-    const { riskTolerance } = data;
-    onSubmit({
-      [InvestorProfileDI.riskTolerance]: riskTolerance,
-    });
+    onSubmit({ [DiRiskTolerance]: data.riskTolerance });
   };
 
   return (
-    <CustomForm
-      title={t('title')}
-      subtitle={t('subtitle')}
-      formAttributes={{
-        onSubmit: handleSubmit(handleBeforeSubmit),
-      }}
-      isLoading={isLoading}
-    >
+    <FormWithErrorAndFooter formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }} footer={footer}>
       <Grid.Container gap={2}>
         <Radio
-          value={InvestorProfileRiskTolerance.conservative}
-          label={t(`${InvestorProfileRiskTolerance.conservative}.label`)}
-          hint={t(`${InvestorProfileRiskTolerance.conservative}.description`)}
+          value={conservative}
+          label={t(`${conservative}.label`)}
+          hint={t(`${conservative}.description`)}
           {...register('riskTolerance')}
         />
       </Grid.Container>
       <Grid.Container gap={2}>
         <Radio
-          value={InvestorProfileRiskTolerance.moderate}
-          label={t(`${InvestorProfileRiskTolerance.moderate}.label`)}
-          hint={t(`${InvestorProfileRiskTolerance.moderate}.description`)}
+          value={moderate}
+          label={t(`${moderate}.label`)}
+          hint={t(`${moderate}.description`)}
           {...register('riskTolerance')}
         />
       </Grid.Container>
       <Grid.Container gap={2}>
         <Radio
-          value={InvestorProfileRiskTolerance.aggressive}
-          label={t(`${InvestorProfileRiskTolerance.aggressive}.label`)}
-          hint={t(`${InvestorProfileRiskTolerance.aggressive}.description`)}
+          value={aggressive}
+          label={t(`${aggressive}.label`)}
+          hint={t(`${aggressive}.description`)}
           {...register('riskTolerance')}
         />
       </Grid.Container>
-    </CustomForm>
+    </FormWithErrorAndFooter>
   );
 };
 

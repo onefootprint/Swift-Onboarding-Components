@@ -793,6 +793,12 @@
       }
     },
     "pages": {
+      "cancel": "Cancelar",
+      "confirm-continue": "Confirmar y continuar",
+      "edit": "Editar",
+      "loading": "Cargando...",
+      "none": "Ninguno",
+      "save": "Guardar",
       "employment": {
         "title": "¿Cuál es tu estado de empleo y ocupación?",
         "subtitle": "Estamos legalmente obligados a requerir esta información.",
@@ -908,6 +914,10 @@
           "hint": "Max size: 5 MB",
           "size-limit-error": "File size exceeds 5 MB"
         }
+      },
+      "confirm": {
+        "title": "Confirma tu perfil",
+        "subtitle": "Por favor, asegúrate de que tus respuestas sean precisas antes de continuar"
       }
     }
   },

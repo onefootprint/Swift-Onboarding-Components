@@ -4,12 +4,23 @@ import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-uti
 import { InvestorProfileDI, InvestorProfileRiskTolerance } from '@onefootprint/types';
 import React from 'react';
 
+import ContinueButton from 'src/plugins/investor-profile/components/form-with-error-footer/components/continue-button';
 import type { RiskToleranceFormProps } from './risk-tolerance-form';
 import RiskToleranceForm from './risk-tolerance-form';
 
 describe('<RiskToleranceForm />', () => {
-  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<RiskToleranceFormProps>) => {
-    customRender(<RiskToleranceForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
+  const renderForm = ({
+    defaultValues,
+    isLoading,
+    onSubmit = () => undefined,
+  }: Partial<RiskToleranceFormProps> & { isLoading?: boolean }) => {
+    customRender(
+      <RiskToleranceForm
+        defaultValues={defaultValues}
+        footer={<ContinueButton isLoading={isLoading} />}
+        onSubmit={onSubmit}
+      />,
+    );
   };
 
   it('should trigger onSubmit when form is submitted', async () => {

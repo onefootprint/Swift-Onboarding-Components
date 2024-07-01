@@ -19,21 +19,12 @@ describe('<InvestorProfile />', () => {
       warn: () => undefined,
       error: () => undefined,
     },
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
+    defaultOptions: { queries: { retry: false } },
   });
 
   beforeEach(() => {
     queryCache.clear();
-    useRouterSpy({
-      pathname: '/',
-      query: {
-        public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY',
-      },
-    });
+    useRouterSpy({ pathname: '/', query: { public_key: 'ob_test_yK7Wn5qL7xUSlvhG6AZQuY' } });
     withOnboardingConfig();
     withUserVaultValidate();
     withUserVault();
@@ -67,9 +58,7 @@ describe('<InvestorProfile />', () => {
   it('takes user through all of the pages', async () => {
     const onDone = jest.fn();
 
-    renderPlugin({
-      onDone,
-    });
+    renderPlugin({ onDone });
 
     await waitFor(() => {
       expect(screen.getByText("What's your employment status and occupation?")).toBeInTheDocument();
@@ -82,22 +71,22 @@ describe('<InvestorProfile />', () => {
     const employer = screen.getByLabelText('Employer');
     await userEvent.type(employer, 'Hospital');
 
-    let submitButton = screen.getByText('Continue');
-    await userEvent.click(submitButton);
+    let ctaButton = screen.getByText('Continue');
+    await userEvent.click(ctaButton);
 
     await waitFor(() => {
       expect(screen.getByText("What's your annual income?")).toBeInTheDocument();
     });
 
-    submitButton = screen.getByText('Continue');
-    await userEvent.click(submitButton);
+    ctaButton = screen.getByText('Continue');
+    await userEvent.click(ctaButton);
 
     await waitFor(() => {
       expect(screen.getByText("What's your net worth?")).toBeInTheDocument();
     });
 
-    submitButton = screen.getByText('Continue');
-    await userEvent.click(submitButton);
+    ctaButton = screen.getByText('Continue');
+    await userEvent.click(ctaButton);
 
     await waitFor(() => {
       expect(screen.getByText('What are your investment goals?')).toBeInTheDocument();
@@ -108,15 +97,15 @@ describe('<InvestorProfile />', () => {
     await userEvent.click(longTerm);
     expect(longTerm.checked).toBe(true);
 
-    submitButton = screen.getByText('Continue');
-    await userEvent.click(submitButton);
+    ctaButton = screen.getByText('Continue');
+    await userEvent.click(ctaButton);
 
     await waitFor(() => {
       expect(screen.getByText('How would you describe your risk tolerance?')).toBeInTheDocument();
     });
 
-    submitButton = screen.getByText('Continue');
-    await userEvent.click(submitButton);
+    ctaButton = screen.getByText('Continue');
+    await userEvent.click(ctaButton);
 
     await waitFor(() => {
       expect(
@@ -124,8 +113,15 @@ describe('<InvestorProfile />', () => {
       ).toBeInTheDocument();
     });
 
-    submitButton = screen.getByText('None of these apply to me');
-    await userEvent.click(submitButton);
+    ctaButton = screen.getByText('Continue');
+    await userEvent.click(ctaButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('Confirm your profile')).toBeInTheDocument();
+    });
+
+    ctaButton = screen.getByText('Confirm & Continue');
+    await userEvent.click(ctaButton);
 
     await waitFor(() => {
       expect(onDone).toHaveBeenCalled();

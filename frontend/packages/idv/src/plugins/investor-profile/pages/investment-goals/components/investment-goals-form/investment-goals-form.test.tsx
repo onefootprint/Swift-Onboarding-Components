@@ -4,12 +4,23 @@ import { customRender, screen, userEvent, waitFor } from '@onefootprint/test-uti
 import { InvestorProfileDI, InvestorProfileInvestmentGoal } from '@onefootprint/types';
 import React from 'react';
 
+import ContinueButton from 'src/plugins/investor-profile/components/form-with-error-footer/components/continue-button';
 import type { InvestmentGoalsFormProps } from './investment-goals-form';
 import InvestmentGoalsForm from './investment-goals-form';
 
 describe('<InvestmentGoalsForm />', () => {
-  const renderForm = ({ defaultValues, isLoading, onSubmit = () => undefined }: Partial<InvestmentGoalsFormProps>) => {
-    customRender(<InvestmentGoalsForm defaultValues={defaultValues} isLoading={isLoading} onSubmit={onSubmit} />);
+  const renderForm = ({
+    defaultValues,
+    isLoading,
+    onSubmit = () => undefined,
+  }: Partial<InvestmentGoalsFormProps> & { isLoading?: boolean }) => {
+    customRender(
+      <InvestmentGoalsForm
+        defaultValues={defaultValues}
+        footer={<ContinueButton isLoading={isLoading} />}
+        onSubmit={onSubmit}
+      />,
+    );
   };
 
   it('should trigger onSubmit when form is submitted', async () => {

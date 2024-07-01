@@ -5,34 +5,32 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import CustomForm from '../../../../components/custom-form';
+import FormWithErrorAndFooter from '../../../../components/form-with-error-footer';
 import type { InvestmentGoalsData } from '../../../../utils/state-machine/types';
 
 export type InvestmentGoalsFormProps = {
   defaultValues?: Pick<InvestorProfileData, InvestorProfileDI.investmentGoals>;
-  isLoading?: boolean;
+  footer: React.ReactNode;
   onSubmit: (data: InvestmentGoalsData) => void;
 };
 
 type FormData = Record<InvestorProfileInvestmentGoal, boolean>;
 
-const InvestmentGoalsForm = ({ defaultValues, isLoading, onSubmit }: InvestmentGoalsFormProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.pages.investment-goals',
-  });
+const { growth, income, preserveCapital, speculation, diversification, other } = InvestorProfileInvestmentGoal;
+
+const InvestmentGoalsForm = ({ defaultValues, footer, onSubmit }: InvestmentGoalsFormProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages.investment-goals' });
   const defaultEntries = (defaultValues?.[InvestorProfileDI.investmentGoals] ?? []).map(goal => [goal, true]);
 
-  const { handleSubmit, register, watch } = useForm<FormData>({
-    defaultValues: Object.fromEntries(defaultEntries),
-  });
+  const { handleSubmit, register, watch } = useForm<FormData>({ defaultValues: Object.fromEntries(defaultEntries) });
   const [showError, setShowError] = useState(false);
-  const growth = watch(InvestorProfileInvestmentGoal.growth);
-  const income = watch(InvestorProfileInvestmentGoal.income);
-  const preserve = watch(InvestorProfileInvestmentGoal.preserveCapital);
-  const speculation = watch(InvestorProfileInvestmentGoal.speculation);
-  const diversification = watch(InvestorProfileInvestmentGoal.diversification);
-  const other = watch(InvestorProfileInvestmentGoal.other);
-  const hasEmptySelection = !growth && !income && !diversification && !preserve && !speculation && !other;
+  const hasEmptySelection =
+    !watch(growth) &&
+    !watch(income) &&
+    !watch(diversification) &&
+    !watch(preserveCapital) &&
+    !watch(speculation) &&
+    !watch(other);
 
   const handleBeforeSubmit = (data: FormData) => {
     if (hasEmptySelection) {
@@ -44,35 +42,22 @@ const InvestmentGoalsForm = ({ defaultValues, isLoading, onSubmit }: InvestmentG
       .filter(([, value]) => !!value)
       .map(([key]) => key as InvestorProfileInvestmentGoal);
 
-    onSubmit({
-      [InvestorProfileDI.investmentGoals]: goals,
-    });
+    onSubmit({ [InvestorProfileDI.investmentGoals]: goals });
   };
 
   return (
-    <CustomForm
-      title={t('title')}
-      subtitle={t('subtitle')}
-      isLoading={isLoading}
-      formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }}
+    <FormWithErrorAndFooter
       error={hasEmptySelection && showError ? t('empty-selection') : undefined}
+      footer={footer}
+      formAttributes={{ onSubmit: handleSubmit(handleBeforeSubmit) }}
     >
-      <Checkbox label={t(InvestorProfileInvestmentGoal.growth)} {...register(InvestorProfileInvestmentGoal.growth)} />
-      <Checkbox label={t(InvestorProfileInvestmentGoal.income)} {...register(InvestorProfileInvestmentGoal.income)} />
-      <Checkbox
-        label={t(InvestorProfileInvestmentGoal.preserveCapital)}
-        {...register(InvestorProfileInvestmentGoal.preserveCapital)}
-      />
-      <Checkbox
-        label={t(InvestorProfileInvestmentGoal.speculation)}
-        {...register(InvestorProfileInvestmentGoal.speculation)}
-      />
-      <Checkbox
-        label={t(InvestorProfileInvestmentGoal.diversification)}
-        {...register(InvestorProfileInvestmentGoal.diversification)}
-      />
-      <Checkbox label={t(InvestorProfileInvestmentGoal.other)} {...register(InvestorProfileInvestmentGoal.other)} />
-    </CustomForm>
+      <Checkbox label={t(growth)} {...register(growth)} />
+      <Checkbox label={t(income)} {...register(income)} />
+      <Checkbox label={t(preserveCapital)} {...register(preserveCapital)} />
+      <Checkbox label={t(speculation)} {...register(speculation)} />
+      <Checkbox label={t(diversification)} {...register(diversification)} />
+      <Checkbox label={t(other)} {...register(other)} />
+    </FormWithErrorAndFooter>
   );
 };
 

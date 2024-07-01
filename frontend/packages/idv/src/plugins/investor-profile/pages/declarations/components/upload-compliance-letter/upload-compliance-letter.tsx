@@ -9,12 +9,11 @@ import UploadFiles from './components/upload-files';
 type UploadComplianceLetterProps = {
   hasError?: boolean;
   onChange: (files: File[]) => void;
+  selectedFiles?: File[];
 };
 
-const UploadComplianceLetter = ({ hasError, onChange }: UploadComplianceLetterProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.pages.declarations.doc-upload',
-  });
+const UploadComplianceLetter = ({ hasError, onChange, selectedFiles }: UploadComplianceLetterProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages.declarations.doc-upload' });
 
   return (
     <>
@@ -26,7 +25,7 @@ const UploadComplianceLetter = ({ hasError, onChange }: UploadComplianceLetterPr
             {t('label')}
           </Text>
         </UploadFilesLabel>
-        <UploadFiles onChange={onChange} />
+        <UploadFiles selectedFiles={selectedFiles} onChange={onChange} />
         {hasError && (
           <ErrorContainer>
             <IcoWarning16 color="error" />

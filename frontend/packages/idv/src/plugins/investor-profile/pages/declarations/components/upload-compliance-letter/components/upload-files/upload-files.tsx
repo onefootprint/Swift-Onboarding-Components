@@ -7,17 +7,16 @@ import styled from 'styled-components';
 import FileEntry from '../file-entry';
 
 type UploadFilesProps = {
+  selectedFiles?: File[];
   onChange: (files: File[]) => void;
 };
 
 // TODO: For now, we are restricted by API to upload only one file even though
 // this component supports multiple files
-const UploadFiles = ({ onChange }: UploadFilesProps) => {
-  const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.pages.declarations.doc-upload',
-  });
+const UploadFiles = ({ onChange, selectedFiles }: UploadFilesProps) => {
+  const { t } = useTranslation('idv', { keyPrefix: 'investor-profile.pages.declarations.doc-upload' });
   const inputRef = useRef<HTMLInputElement>(null);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<File[]>(selectedFiles || []);
   const [showFileSizeError, setShowFileSizeError] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
