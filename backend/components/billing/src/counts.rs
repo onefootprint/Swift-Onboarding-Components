@@ -37,12 +37,6 @@ pub enum LineItemPrice {
 }
 
 impl BillingCounts {
-    /// Returns true if this tenant has used zero products in the provided BillingCounts
-    pub(crate) fn is_zero(&self) -> bool {
-        let total_count: i64 = self.raw_line_items().into_iter().map(|(_, c)| c).sum();
-        total_count == 0
-    }
-
     fn get_count(&self, product: Product) -> i64 {
         self.0.get(&product).cloned().unwrap_or_default()
     }

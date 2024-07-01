@@ -169,10 +169,6 @@ impl BillingClient {
 
     #[tracing::instrument(skip(self))]
     pub async fn generate_draft_invoice(&self, info: BillingInfo) -> BResult<()> {
-        if info.counts.is_zero() {
-            return Ok(());
-        }
-
         let customer_id = stripe::CustomerId::from_str(&info.customer_id)?;
         // See if there's an existing draft invoice for the tenant and cancel
         // TODO use search API rather than filtering in RAM
@@ -230,6 +226,11 @@ impl BillingClient {
                 let i = InvoiceItem::create(&self.client, new_invoice_item).await?;
                 items.insert(i.id.clone(), i);
             }
+        }
+
+        // If there are no line items, no-op
+        if items.is_empty() {
+            return Ok(());
         }
 
         // Create the invoice, which will automatically include these billing items
