@@ -18,6 +18,7 @@ feature_flag = { path = "../../../../feature_flag" }
 billing = { path = "../../../../billing" }
 macros = { path = "../../../../macros" }
 api_errors = { path = "../../../errors" }
+vault_dr = { path = "../../../../vault_dr" }
 
 actix-web = { workspace = true }
 tracing = { workspace = true }

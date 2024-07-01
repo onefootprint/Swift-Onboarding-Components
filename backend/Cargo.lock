@@ -1405,6 +1405,7 @@ dependencies = [
  "strum",
  "tokio",
  "tracing",
+ "vault_dr",
 ]
 
 [[package]]

@@ -1,5 +1,5 @@
 import pexpect
-from tests.disaster_recovery.utils import footprint_dr, login_sandbox, login_live, get_external_id
+from tests.vault_dr.utils import footprint_dr, login_sandbox, login_live, get_external_id
 
 
 def test_footprint_dr_get_external_id(tenant):

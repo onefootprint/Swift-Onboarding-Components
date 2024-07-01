@@ -1,5 +1,5 @@
 import pexpect
-from tests.disaster_recovery.utils import footprint_dr, login_sandbox, login_live
+from tests.vault_dr.utils import footprint_dr, login_sandbox, login_live
 
 
 # Keep in mind that tests are run in parallel, so we must have the same login

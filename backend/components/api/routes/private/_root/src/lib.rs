@@ -9,6 +9,7 @@ mod partner_demo;
 mod tenants;
 mod test_partner_tenant;
 mod test_tenant;
+mod vault_dr_run_batch;
 
 pub use api_core::auth::protected_auth::ProtectedAuth;
 pub use api_core::State;
@@ -25,7 +26,8 @@ pub fn configure(config: &mut actix_web::web::ServiceConfig) {
         .service(invoice::post)
         .service(invoice::post_all)
         .service(compliance_partnership::post)
-        .service(partner_demo::post);
+        .service(partner_demo::post)
+        .service(vault_dr_run_batch::post);
 
     tenants::configure(config);
 }

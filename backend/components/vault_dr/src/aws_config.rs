@@ -121,7 +121,7 @@ impl VaultDrAwsConfig {
         ))?;
         if assumed_role_account != self.aws_account_id {
             if use_localstack {
-                tracing::error!("STS GetCallerIdentity returned an incorrect account ID because Localstack doesn't persist data across restarts and silently lets the STS AssumeRole succeed even though the destination role no longer exists. Re-enroll from scratch to re-create cloud resources, e.g. by by running integration tests.");
+                tracing::error!("STS GetCallerIdentity returned an incorrect account ID because Localstack doesn't persist data across restarts and silently lets the STS AssumeRole succeed even though the destination role no longer exists. Re-enroll from scratch to re-create cloud resources, e.g. by running integration tests.");
             }
 
             return Err(Error::IamAssertionFailed(

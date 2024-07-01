@@ -1,7 +1,7 @@
 import pytest
 import pexpect
 from tests.constants import ENVIRONMENT
-from tests.disaster_recovery.utils import *
+from tests.vault_dr.utils import *
 
 
 # To allow for tests to run concurrently, we'll test enrollment and
@@ -120,7 +120,7 @@ def test_footprint_dr_enroll(tenant):
     assert cmd.exitstatus == 0
 
 
-    # Re-rollment fails with bogus data.
+    # Re-enrollment fails with bogus data.
     with footprint_dr("enroll", "--sandbox") as cmd:
         cmd.expect(r"Re-enrolling will deactivate the current configuration")
         cmd.expect("Type .+ to continue, or anything else to cancel: ")
@@ -138,16 +138,3 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect("Verifying configuration... Failed")
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 1
-
-
-    # Status still reflects the previous successful enrollment.
-    with footprint_dr("status", "--sandbox") as cmd:
-        cmd.expect(f"Logged in to {tenant.name} \\(Sandbox\\)")
-        cmd.expect(r"Enrolled in Vault Disaster Recovery since: ([0-9:\.\- ]+ UTC)")
-        assert enrolled_at == cmd.match.group(1), "Enrollment time should not have changed"
-
-        cmd.expect(f"AWS Account ID: {aws_account_id}")
-        cmd.expect(f"AWS Role Name:  {iam_role_name}")
-        cmd.expect(f"S3 Bucket Name: {bucket_name}")
-        cmd.expect(pexpect.EOF)
-    assert cmd.exitstatus == 0

@@ -1,5 +1,5 @@
 import pexpect
-from tests.disaster_recovery.utils import footprint_dr
+from tests.vault_dr.utils import footprint_dr
 
 
 def test_footprint_dr_status():
