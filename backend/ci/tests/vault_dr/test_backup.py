@@ -1,9 +1,13 @@
 import pytest
-from tests.constants import CUSTODIAN_AUTH
+from tests.constants import CUSTODIAN_AUTH, ENVIRONMENT
 from tests.vault_dr.utils import *
 from tests.utils import patch, post
 
 
+@pytest.mark.skipif(
+    ENVIRONMENT in ("ephemeral", "dev", "production"),
+    reason="This test relies on localstack",
+)
 def test_footprint_dr_backup(tenant):
     enroll_tenant_in_live_vdr(tenant)
 
