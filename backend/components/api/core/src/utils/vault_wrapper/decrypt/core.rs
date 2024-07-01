@@ -137,9 +137,9 @@ impl<Type> VaultWrapper<Type> {
 }
 
 pub(in crate::utils::vault_wrapper) struct VwDecryptRequest<'a>(
-    &'a EncryptedVaultPrivateKey,
-    EnclaveDecryptOperation,
-    VaultedData<'a>,
+    pub &'a EncryptedVaultPrivateKey,
+    pub EnclaveDecryptOperation,
+    pub VaultedData<'a>,
 );
 
 const BATCH_DECRYPT_CHUNK_SIZE: usize = 500;

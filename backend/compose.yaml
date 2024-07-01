@@ -130,6 +130,8 @@ services:
   # localstack approximates AWS services for integration tests.
   # It's good enough for simple things, but don't use it for anything complicated.
   # For instance, IAM enforcement does not work well.
+  #
+  # Note that localstack does not persist data between restarts.
   localstack:
     image: localstack/localstack:latest@sha256:9ca38215531f004377f5f12d9e838eed630a9ca866edb336504d91dd4973aa51
     networks:

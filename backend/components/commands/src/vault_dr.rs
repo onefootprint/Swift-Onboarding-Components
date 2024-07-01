@@ -73,7 +73,7 @@ impl VaultDrWorker {
     async fn run_batch(&self, state: &State) -> Result<()> {
         vault_dr::run_batch(state, self.batch_size)
             .await
-            .map_err(|e| anyhow!(e).context("VaultDrWorker::run_batch"))?;
+            .map_err(|err| anyhow!("{}", err).context("VaultDrWorker::run_batch"))?;
 
         Ok(())
     }

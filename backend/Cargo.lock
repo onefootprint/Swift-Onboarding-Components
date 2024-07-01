@@ -9840,6 +9840,7 @@ dependencies = [
  "base64 0.13.0",
  "db",
  "derive_more",
+ "itertools",
  "newtypes",
  "thiserror",
  "tracing",

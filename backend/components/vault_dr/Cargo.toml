@@ -23,6 +23,7 @@ aws-sdk-s3 = { workspace = true }
 aws-sdk-sts = { workspace = true }
 aws-types = { workspace = true }
 derive_more = { workspace = true }
+itertools = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 

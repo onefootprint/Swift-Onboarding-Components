@@ -4,13 +4,21 @@ use crate::utils::vault_wrapper::batch_execute_decrypt_requests;
 use crate::utils::vault_wrapper::decrypt::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::DecryptUncheckedResult;
+use crate::utils::vault_wrapper::Pii;
+use crate::utils::vault_wrapper::VwDecryptRequest;
 use crate::FpResult;
 use crate::State;
 use db::models::access_event::AccessEvent;
 use db::models::access_event::NewAccessEventRow;
 use db::models::audit_event::AuditEvent;
 use db::models::audit_event::NewAuditEvent;
+use db::models::data_lifetime::DataLifetime;
+use db::models::document_data::DocumentData;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::ob_configuration::IsLive;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault_data::VaultData;
+use db::HasLifetime;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::AccessEventKind;
@@ -18,8 +26,10 @@ use newtypes::AccessEventPurpose;
 use newtypes::AuditEventDetail;
 use newtypes::AuditEventId;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeId;
 use newtypes::DbActor;
 use newtypes::PiiJsonValue;
+use newtypes::TenantId;
 use std::collections::HashMap;
 
 /// Represents a request to decrypt targets for a specific VaultWrapper instance. Use the key to
@@ -178,4 +188,94 @@ where
     }
 
     Ok(decrypted_results)
+}
+
+/// Decrypt DLs for a tenant without checking permissions or creating audit logs.
+#[tracing::instrument(skip_all)]
+pub async fn bulk_decrypt_dls_unchecked(
+    state: &State,
+    tenant_id: &TenantId,
+    is_live: IsLive,
+    dls: &HashMap<DataLifetimeId, DataLifetime>,
+) -> FpResult<HashMap<DataLifetimeId, Pii>> {
+    let tenant_id = tenant_id.clone();
+
+    let dl_ids = dls.iter().map(|(_, dl)| dl.id.clone()).collect_vec();
+    let sv_ids = dls.iter().map(|(_, dl)| dl.scoped_vault_id.clone()).collect_vec();
+
+    let (sv_vaults, vault_data_by_dl, document_data_by_dl) = state
+        .db_pool
+        .db_query(move |conn| -> FpResult<_> {
+            // Fetch Vaults and group by Scoped Vault ID.
+            let sv_vaults = ScopedVault::bulk_get(conn, sv_ids.iter().collect_vec(), &tenant_id, is_live)?;
+
+            // Fetch the vaulted data related to the data lifetimes.
+            let vault_data_by_dl = VaultData::get_for(conn, &dl_ids)?
+                .into_iter()
+                .into_group_map_by(|d| d.lifetime_id.clone());
+            let document_data_by_dl = DocumentData::get_for(conn, &dl_ids)?
+                .into_iter()
+                .into_group_map_by(|d| d.lifetime_id.clone());
+
+            Ok((sv_vaults, vault_data_by_dl, document_data_by_dl))
+        })
+        .await?;
+
+    let sv_vault_by_sv_id: HashMap<_, _> = sv_vaults
+        .into_iter()
+        .map(|(sv, vault)| (sv.id.clone(), (sv, vault)))
+        .collect();
+
+
+    let mut requests = vec![];
+    for (dl_id, dl) in dls.iter() {
+        let (_, vault) = sv_vault_by_sv_id
+            .get(&dl.scoped_vault_id)
+            .ok_or(AssertionError("No vault fetched for DL"))?;
+
+        let vault_data = vault_data_by_dl.get(&dl.id).into_iter().flatten();
+        for vd in vault_data {
+            let req = VwDecryptRequest(
+                &vault.e_private_key,
+                EnclaveDecryptOperation {
+                    identifier: dl.kind.clone(),
+                    transforms: vec![],
+                },
+                vd.data(),
+            );
+            requests.push((dl_id.clone(), req));
+        }
+
+        let document_data = document_data_by_dl.get(&dl.id).into_iter().flatten();
+        for dd in document_data {
+            let req = VwDecryptRequest(
+                &vault.e_private_key,
+                EnclaveDecryptOperation {
+                    identifier: dl.kind.clone(),
+                    transforms: vec![],
+                },
+                dd.data(),
+            );
+            requests.push((dl_id.clone(), req));
+        }
+    }
+
+    let decrypted_batch = batch_execute_decrypt_requests(&state.enclave_client, requests).await?;
+
+    let mut pii_by_dl = HashMap::new();
+    for (dl_id, decrypt_result) in decrypted_batch {
+        let mut decrypt_ops = decrypt_result.results.into_iter();
+
+        if let Some((_, pii)) = decrypt_ops.next() {
+            pii_by_dl.insert(dl_id, pii);
+        } else {
+            return AssertionError("Expected at least one decryption result per DL").into();
+        }
+
+        if decrypt_ops.next().is_some() {
+            return AssertionError("Expected only one decryption result per DL").into();
+        }
+    }
+
+    Ok(pii_by_dl)
 }
