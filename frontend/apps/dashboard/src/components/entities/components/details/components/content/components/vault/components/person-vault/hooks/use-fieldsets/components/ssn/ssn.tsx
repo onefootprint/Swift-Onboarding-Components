@@ -13,7 +13,7 @@ export type SSNType = {
 };
 
 const SSN = ({ di, entity }: SSNType) =>
-  entity.attributes.includes(IdDI.ssn9) ? (
+  entity.attributes.includes(di) ? (
     <Field
       di={di}
       entity={entity}
@@ -21,7 +21,7 @@ const SSN = ({ di, entity }: SSNType) =>
         if (isVaultDataDecrypted(value) && isVaultDataText(value)) {
           return (
             <Text variant="body-3" color="primary">
-              {ssnFormatter(value)}
+              {di === IdDI.ssn4 ? value : ssnFormatter(value)}
             </Text>
           );
         }

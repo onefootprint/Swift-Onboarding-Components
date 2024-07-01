@@ -11,6 +11,7 @@ import type {
   DataToCollectFormData,
   KybChecksKind,
   NameFormData,
+  Personal,
   ResidencyFormData,
 } from '@/playbooks/utils/machine/types';
 import {
@@ -20,6 +21,8 @@ import {
   PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
+type OptionalSSN = CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9 | undefined;
+type MandatorySSN = OptionalSSN | CollectedKycDataOption.usTaxId;
 type ProcessPlaybookProps = {
   playbook: DataToCollectFormData;
   kind: PlaybookKind;
@@ -36,6 +39,15 @@ type ProcessPlaybookProps = {
   };
 };
 
+// KYB field handling;
+const optionalKYBFields = [
+  CollectedKybDataOption.address,
+  CollectedKybDataOption.corporationType,
+  CollectedKybDataOption.website,
+  CollectedKybDataOption.phoneNumber,
+];
+
+const isSsn9 = (x: unknown): x is CollectedKycDataOption.ssn9 => x === CollectedKycDataOption.ssn9;
 const getRequiredKybCollectFields = () => [CollectedKybDataOption.name, CollectedKybDataOption.tin];
 
 const getRequiredKycCollectFields = () => [
@@ -44,6 +56,16 @@ const getRequiredKycCollectFields = () => [
   CollectedKycDataOption.dob,
   CollectedKycDataOption.address,
 ];
+
+export const getMandatoryAndOptionalTaxIdFields = (x: Personal): [MandatorySSN, OptionalSSN] => {
+  const mandatory = !!x.ssn && !!x.ssnKind && !x.ssnOptional ? x.ssnKind : undefined;
+  const optional = !!x.ssnKind && !!x.ssnOptional ? x.ssnKind : undefined;
+
+  return [
+    isSsn9(mandatory) && x.usTaxIdAcceptable ? CollectedKycDataOption.usTaxId : mandatory,
+    isSsn9(mandatory) && x.usTaxIdAcceptable ? undefined : optional,
+  ];
+};
 
 const processPlaybook = ({
   kind,
@@ -59,14 +81,6 @@ const processPlaybook = ({
   const optionalData: CollectedDataOption[] = [];
   const { personal, businessInformation } = playbook;
   let shouldSkipKyc = skipKyc;
-
-  // KYB field handling;
-  const optionalKYBFields = [
-    CollectedKybDataOption.address,
-    CollectedKybDataOption.corporationType,
-    CollectedKybDataOption.website,
-    CollectedKybDataOption.phoneNumber,
-  ];
 
   if (isKyb(kind) && businessInformation) {
     const requiredKybFields = getRequiredKybCollectFields();
@@ -92,6 +106,7 @@ const processPlaybook = ({
   }
   const omitBeneficialOwnersKycForKybPlaybook =
     isKyb(kind) && !businessInformation?.[CollectedKybDataOption.beneficialOwners];
+
   if (omitBeneficialOwnersKycForKybPlaybook) {
     return {
       ...getNoBoKycOptions({
@@ -118,11 +133,9 @@ const processPlaybook = ({
   }
 
   // SSN handling
-  if (personal.ssn && !personal.ssnOptional && personal.ssnKind) {
-    mustCollectData.push(personal.ssnKind);
-  } else if (personal.ssnOptional && personal.ssnKind) {
-    optionalData.push(personal.ssnKind);
-  }
+  const [mandatorySSN, optionalSSN] = getMandatoryAndOptionalTaxIdFields(personal);
+  if (mandatorySSN) mustCollectData.push(mandatorySSN);
+  if (optionalSSN) optionalData.push(optionalSSN);
 
   // no phone flows handling
   if (personal[CollectedKycDataOption.phoneNumber]) {

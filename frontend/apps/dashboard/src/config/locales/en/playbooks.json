@@ -133,7 +133,9 @@
         "us-territories": {
           "label": "Note:",
           "content": "Residents from U.S. territories are allowed to be onboarded."
-        }
+        },
+        "accept-itin-hint": "Users may use either their SSN or ITIN as part of the verification process.",
+        "accept-itin-label": "Accept ITIN"
       },
       "id-doc": {
         "title": "ID document scan",

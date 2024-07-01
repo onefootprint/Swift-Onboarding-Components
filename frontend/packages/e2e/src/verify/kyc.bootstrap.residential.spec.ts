@@ -38,7 +38,7 @@ test.beforeEach(async ({ browserName, isMobile, page }) => {
   await page.waitForLoadState();
 });
 
-test('KYC bootstrap:residential page #ci #debug', async ({ page, isMobile }) => {
+test('KYC bootstrap:residential page #ci', async ({ page, isMobile }) => {
   test.slow();
   test.skip(isMobile, 'skip test for mobile'); // eslint-disable-line playwright/no-skipped-test
   const timeout = isMobile ? 40000 : 20000; // eslint-disable-line playwright/no-conditional-in-test

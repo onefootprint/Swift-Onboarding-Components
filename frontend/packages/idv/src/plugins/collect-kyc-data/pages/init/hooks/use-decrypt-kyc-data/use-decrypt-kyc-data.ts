@@ -1,5 +1,6 @@
 import { getErrorMessage } from '@onefootprint/request';
-import type { CollectedKycDataOption, UserTokenResponse } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
+import type { UserTokenResponse } from '@onefootprint/types';
 import { CdoToAllDisMap, IdDI, UserTokenScope } from '@onefootprint/types';
 
 import useUserToken from '../../../../../../hooks/api/hosted/user/use-user-token';
@@ -9,7 +10,7 @@ import type { KycData } from '../../../../utils/data-types';
 
 // These fields are decryptable with any auth token. Other fields are only decryptable if authed
 // with biometric
-const SENSITIVE_DIS: IdDI[] = [IdDI.ssn4, IdDI.ssn9, IdDI.email, IdDI.phoneNumber];
+const SENSITIVE_DIS: IdDI[] = [IdDI.email, IdDI.phoneNumber, IdDI.ssn4, IdDI.ssn9, IdDI.itin, IdDI.usTaxId];
 const BASIC_PROFILE_DIS: IdDI[] = [...Object.values(IdDI)].filter(di => !SENSITIVE_DIS.includes(di));
 
 type UseDecryptKycDataArgs = {

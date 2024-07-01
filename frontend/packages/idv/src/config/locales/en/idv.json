@@ -207,6 +207,7 @@
           "address-full": "Address",
           "nationality": "Nationality",
           "us-legal-status": "U.S. Legal Status",
+          "us-tax-id": "ITIN",
           "id-card": "ID card",
           "passport": "Passport",
           "driversLicense": "Driver's license",
@@ -410,32 +411,24 @@
         }
       },
       "ssn": {
-        "full": {
-          "title": "What's your Social Security Number?",
-          "subtitle": "We need to collect this information to verify your identity.",
-          "disclaimer": {
-            "security": {
-              "title": "Your data is safe",
-              "description": "Your SSN is encrypted and protected by a state-of-the-art secure environment."
-            }
-          },
-          "form": {
-            "label": "SSN",
-            "placeholder": "XXX-XX-XXXX",
-            "error": "SSN cannot be empty or is invalid"
-          },
-          "skip-label": "I don't have a Social Security Number"
-        },
-        "last-four": {
-          "title": "What are the last 4 digits of your Social Security Number?",
-          "subtitle": "We need to collect this information to verify your identity.",
-          "form": {
-            "label": "SSN (last 4)",
-            "placeholder": "XXXX",
-            "error": "SSN cannot be empty or is invalid"
-          },
-          "skip-label": "I don't have a Social Security Number"
-        },
+        "itin-disclaimer": "Your SSN or ITIN are encrypted and protected by a state-of-the-art secure environment",
+        "itin-label": "ITIN",
+        "skip-label": "I don't have a Social Security Number",
+        "ssn-invalid": "SSN cannot be empty or is invalid",
+        "ssn-us-tax-id-invalid": "SSN or ITIN cannot be empty or is invalid",
+        "ssn4-label": "SSN (last 4)",
+        "ssn4-placeholder": "XXXX",
+        "ssn4-subtitle": "We need to collect this information to verify your identity.",
+        "ssn4-title": "What are the last 4 digits of your Social Security Number?",
+        "ssn9-disclaimer": "Your SSN is encrypted and protected by a state-of-the-art secure environment.",
+        "ssn9-label": "SSN",
+        "ssn9-placeholder": "XXX-XX-XXXX",
+        "ssn9-subtitle": "We need to collect this information to verify your identity.",
+        "ssn9-title": "What's your Social Security Number?",
+        "us-tax-id-disclaimer": "Your SSN or ITIN are encrypted and protected by a state-of-the-art secure environment",
+        "us-tax-id-label": "Tax ID",
+        "us-tax-id-title": "What's your Tax ID?",
+        "your-data-is-safe": "Your data is safe",
         "skip": {
           "cta": "I don't have a Social Security Number",
           "confirmation": {
@@ -491,10 +484,12 @@
           "title": "Address"
         },
         "identity": {
-          "title": "Identity",
-          "ssn9": "SSN",
+          "ssn-skipped-subtext": "You don't have a Social Security Number",
           "ssn4": "SSN (last 4)",
-          "ssn-skipped-subtext": "You don't have a Social Security Number"
+          "ssn9": "SSN",
+          "title": "Identity",
+          "itin": "ITIN",
+          "us-tax-id": "Tax ID"
         },
         "di": {
           "id": {

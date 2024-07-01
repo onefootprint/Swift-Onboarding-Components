@@ -4,7 +4,7 @@ import type { TFunction } from 'i18next';
 
 import type { SectionItemProps as SectionItem } from '../../../../../../components/confirm-collected-data';
 import type { ReturnOfCollectKycDataMachine } from '../../../../hooks/use-collect-kyc-data-machine';
-import allAttributes from '../../../../utils/all-attributes/all-attributes';
+import getAllKycAttributes from '../../../../utils/all-attributes/all-attributes';
 import getInitialCountry from '../../../../utils/get-initial-country';
 
 type T = TFunction<'idv', 'kyc.pages'>;
@@ -19,7 +19,7 @@ type AuthMethodRes = WithIsVerified & { kind: `${AuthMethodKind}` };
 type AuthMethodMap = Record<VerifiableKind, boolean>;
 
 export const isUsLegalStatusRequired = (req: CollectKycDataRequirement): boolean =>
-  allAttributes(req).includes(CollectedKycDataOption.usLegalStatus);
+  getAllKycAttributes(req).includes(CollectedKycDataOption.usLegalStatus);
 
 /**
  * Retrieves basic information items from the provided context data and returns them as an array of SectionItems.

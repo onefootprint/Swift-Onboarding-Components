@@ -59,6 +59,8 @@
       "email": "Email",
       "first_name": "First name",
       "middle_name": "Middle name",
+      "us_tax_id": "US Tax ID",
+      "itin": "ITIN",
       "last_name": "Last name",
       "ssn9": "SSN (Full)",
       "ssn4": "SSN (Last 4)",
@@ -424,7 +426,8 @@
     "business_beneficial_owners": "Business beneficial owners",
     "business_kyced_beneficial_owners": "Business beneficial owners (Fully-KYCed)",
     "investor_profile": "Investor profile",
-    "us_legal_status": "Legal status in the U.S."
+    "us_legal_status": "Legal status in the U.S.",
+    "us_tax_id": "ITIN"
   },
   "vendor": {
     "idology": "Idology",
@@ -3004,7 +3007,8 @@
         "business-type": "Legal entity type",
         "business-website": "Business website",
         "business-phone-number": "Business phone",
-        "country-specific-docs": "Country-specific documents"
+        "country-specific-docs": "Country-specific documents",
+        "us-tax-id-acceptable": "Accept ITIN"
       }
     },
     "api-keys": {

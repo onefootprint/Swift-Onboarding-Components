@@ -1,36 +1,37 @@
 import { useInputMask } from '@onefootprint/hooks';
 import { TextInput, Toggle } from '@onefootprint/ui';
+import { TFunction } from 'i18next';
 import React, { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { FieldErrors, FieldValues, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 type SSN4Props = {
   disabled?: boolean;
   isOptional?: boolean;
-  onSkipChange: () => void;
   isSkipped: boolean;
+  onSkipChange: () => void;
+};
+
+const getErrorHint = (errors: FieldErrors<FieldValues>, t: TFunction<'idv', 'kyc.pages.ssn'>) => {
+  if (!errors.ssn4) {
+    return undefined;
+  }
+  const { message } = errors.ssn4;
+  if (message && typeof message === 'string') {
+    return message;
+  }
+  return t('ssn-invalid');
 };
 
 const SSN4 = ({ disabled, isOptional, isSkipped, onSkipChange }: SSN4Props) => {
   const inputMasks = useInputMask('en-US');
-  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.ssn.last-four' });
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.ssn' });
   const {
     register,
     getValues,
     formState: { errors },
     setValue,
   } = useFormContext();
-
-  const getHint = () => {
-    if (!errors.ssn4) {
-      return undefined;
-    }
-    const { message } = errors.ssn4;
-    if (message && typeof message === 'string') {
-      return message;
-    }
-    return t('form.error');
-  };
 
   useEffect(() => {
     if (isSkipped) {
@@ -47,10 +48,10 @@ const SSN4 = ({ disabled, isOptional, isSkipped, onSkipChange }: SSN4Props) => {
         data-dd-privacy="mask"
         disabled={disabled}
         hasError={!!errors.ssn4}
-        hint={getHint()}
-        label={t('form.label')}
+        hint={getErrorHint(errors, t)}
+        label={t('ssn4-label')}
         mask={inputMasks.lastFourSsn}
-        placeholder={t('form.placeholder')}
+        placeholder={t('ssn4-placeholder')}
         type="tel"
         value={getValues('ssn4')}
         {...register('ssn4', {

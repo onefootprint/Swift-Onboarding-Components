@@ -9,6 +9,7 @@ import {
 } from '@onefootprint/types';
 import {
   CountryRestriction,
+  Personal,
   PlaybookKind,
   defaultBusinessInformation,
   defaultNameFormData,
@@ -16,7 +17,7 @@ import {
   defaultPlaybookValuesKYC,
 } from 'src/pages/playbooks/utils/machine/types';
 
-import processPlaybook from './process-playbook';
+import processPlaybook, { getMandatoryAndOptionalTaxIdFields } from './process-playbook';
 
 const setsEqual = (a: CollectedDataOption[], b: CollectedDataOption[]): boolean =>
   a.length === b.length && a.every(i => b.includes(i));
@@ -789,5 +790,24 @@ describe('processPlaybook', () => {
         });
       });
     });
+  });
+});
+
+describe('getMandatoryAndOptionalTaxIdFields', () => {
+  it.each([
+    { i: { ssn: false, ssnKind: 'ssn9', ssnOptional: false, usTaxIdAcceptable: false }, o: [undefined, undefined] },
+    { i: { ssn: false, ssnKind: 'ssn9', ssnOptional: true, usTaxIdAcceptable: false }, o: [undefined, 'ssn9'] },
+    { i: { ssn: false, ssnKind: undefined, ssnOptional: false, usTaxIdAcceptable: false }, o: [undefined, undefined] },
+    { i: { ssn: true, ssnKind: 'ssn4', ssnOptional: false, usTaxIdAcceptable: false }, o: ['ssn4', undefined] },
+    { i: { ssn: true, ssnKind: 'ssn4', ssnOptional: false, usTaxIdAcceptable: true }, o: ['ssn4', undefined] },
+    { i: { ssn: true, ssnKind: 'ssn4', ssnOptional: true, usTaxIdAcceptable: false }, o: [undefined, 'ssn4'] },
+    { i: { ssn: true, ssnKind: 'ssn4', ssnOptional: true, usTaxIdAcceptable: true }, o: [undefined, 'ssn4'] },
+    { i: { ssn: true, ssnKind: 'ssn9', ssnOptional: false, usTaxIdAcceptable: false }, o: ['ssn9', undefined] },
+    { i: { ssn: true, ssnKind: 'ssn9', ssnOptional: false, usTaxIdAcceptable: false }, o: ['ssn9', undefined] },
+    { i: { ssn: true, ssnKind: 'ssn9', ssnOptional: false, usTaxIdAcceptable: true }, o: ['us_tax_id', undefined] },
+    { i: { ssn: true, ssnKind: 'ssn9', ssnOptional: true, usTaxIdAcceptable: false }, o: [undefined, 'ssn9'] },
+    { i: { ssn: true, ssnKind: undefined, ssnOptional: true, usTaxIdAcceptable: false }, o: [undefined, undefined] },
+  ])('case %#', ({ i, o }) => {
+    expect(getMandatoryAndOptionalTaxIdFields(i as Personal)).toEqual(o);
   });
 });

@@ -17,30 +17,32 @@ export type ValueTypeForIdDI<K> = K extends IdDI.email
           ? string
           : K extends IdDI.dob
             ? string
-            : K extends IdDI.ssn9
+            : K extends IdDI.usTaxId
               ? string
-              : K extends IdDI.ssn4
+              : K extends IdDI.ssn9
                 ? string
-                : K extends IdDI.addressLine1
+                : K extends IdDI.ssn4
                   ? string
-                  : K extends IdDI.addressLine2
+                  : K extends IdDI.addressLine1
                     ? string
-                    : K extends IdDI.city
+                    : K extends IdDI.addressLine2
                       ? string
-                      : K extends IdDI.state
+                      : K extends IdDI.city
                         ? string
-                        : K extends IdDI.country
-                          ? CountryCode
-                          : K extends IdDI.zip
-                            ? string
-                            : K extends IdDI.nationality
-                              ? CountryCode
-                              : K extends IdDI.usLegalStatus
-                                ? UsLegalStatus
-                                : K extends IdDI.visaExpirationDate
-                                  ? string
-                                  : K extends IdDI.visaKind
-                                    ? VisaKind
-                                    : K extends IdDI.citizenships
-                                      ? CountryCode[]
-                                      : never;
+                        : K extends IdDI.state
+                          ? string
+                          : K extends IdDI.country
+                            ? CountryCode
+                            : K extends IdDI.zip
+                              ? string
+                              : K extends IdDI.nationality
+                                ? CountryCode
+                                : K extends IdDI.usLegalStatus
+                                  ? UsLegalStatus
+                                  : K extends IdDI.visaExpirationDate
+                                    ? string
+                                    : K extends IdDI.visaKind
+                                      ? VisaKind
+                                      : K extends IdDI.citizenships
+                                        ? CountryCode[]
+                                        : never;

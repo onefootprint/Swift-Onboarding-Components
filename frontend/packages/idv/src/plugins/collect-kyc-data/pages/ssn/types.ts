@@ -1,4 +1,5 @@
 export type FormData = {
-  ssn9: string;
   ssn4: string;
+  ssn9: string;
+  usTaxId: string;
 };

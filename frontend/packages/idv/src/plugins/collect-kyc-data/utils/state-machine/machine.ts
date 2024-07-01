@@ -38,7 +38,7 @@ const ORDERED_SCREENS: Screen[] = [
   },
   {
     screen: 'ssn',
-    cdos: [CollectedKycDataOption.ssn9, CollectedKycDataOption.ssn4],
+    cdos: [CollectedKycDataOption.usTaxId, CollectedKycDataOption.ssn9, CollectedKycDataOption.ssn4],
     addlCond: (allData: KycData) => isCountryUsOrTerritories(allData),
   },
   {

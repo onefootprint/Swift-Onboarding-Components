@@ -178,6 +178,11 @@ export const fillSSN = async (frame: FrameLocator, payload: { ssn: string }) => 
   await field.waitFor(attachedState).then(() => field.fill(payload.ssn));
 };
 
+export const fillTaxId = async (frame: FrameLocator, payload: { id: string }) => {
+  const field = frame.getByLabel('Tax ID').first();
+  await field.waitFor(attachedState).then(() => field.fill(payload.id));
+};
+
 export const fillVisa = async ({ frame, page }: PageNFrame) => {
   await frame.getByRole('radio', { name: 'I have a Visa', disabled: false }).first().click();
 

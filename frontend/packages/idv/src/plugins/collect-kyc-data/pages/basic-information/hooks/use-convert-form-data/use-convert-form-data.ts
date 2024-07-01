@@ -1,7 +1,7 @@
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import allAttributes from '../../../../utils/all-attributes/all-attributes';
+import getAllKycAttributes from '../../../../utils/all-attributes/all-attributes';
 import type { KycData } from '../../../../utils/data-types';
 import updateDataValue from '../../../../utils/update-data-value';
 import type { FormData } from '../../types';
@@ -11,7 +11,7 @@ const isTest = process.env.NODE_ENV === 'test';
 const useConvertFormData = () => {
   const [state] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
-  const attributes = allAttributes(requirement);
+  const attributes = getAllKycAttributes(requirement);
   const requiresName = attributes.includes(CollectedKycDataOption.name);
   const requiresDob = attributes.includes(CollectedKycDataOption.dob);
   const requiresNationality = attributes.includes(CollectedKycDataOption.nationality);

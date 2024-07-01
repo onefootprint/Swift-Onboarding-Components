@@ -21,6 +21,8 @@ import State from './components/state';
 import UsLegalStatus from './components/us-legal-status';
 import VisaKind from './components/visa-kind';
 
+type CustomFieldProp = { di: DataIdentifier; entity: Entity };
+
 const useFieldsets = (excludeNationality?: boolean): Fieldset => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.user.vault' });
 
@@ -41,16 +43,17 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
       iconComponent: IcoUsers24,
       fields: [
         {
-          di: IdDI.ssn9,
-          renderCustomField: ({
-            di,
-            entity,
-          }: {
-            di: DataIdentifier;
-            entity: Entity;
-          }) => <SSN di={di} entity={entity} />,
+          di: IdDI.itin,
+          renderCustomField: ({ di, entity }: CustomFieldProp) => <SSN di={di} entity={entity} />,
         },
-        { di: IdDI.ssn4 },
+        {
+          di: IdDI.ssn9,
+          renderCustomField: ({ di, entity }: CustomFieldProp) => <SSN di={di} entity={entity} />,
+        },
+        {
+          di: IdDI.ssn4,
+          renderCustomField: ({ di, entity }: CustomFieldProp) => <SSN di={di} entity={entity} />,
+        },
         { di: IdDI.dob },
       ],
     },
@@ -65,13 +68,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
         { di: IdDI.zip },
         {
           di: IdDI.state,
-          renderCustomField: ({
-            di,
-            entity,
-          }: {
-            di: DataIdentifier;
-            entity: Entity;
-          }) => <State di={di} entity={entity} />,
+          renderCustomField: ({ di, entity }: CustomFieldProp) => <State di={di} entity={entity} />,
         },
       ],
     },
@@ -81,43 +78,19 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
       fields: [
         {
           di: IdDI.usLegalStatus,
-          renderCustomField: ({
-            di,
-            entity,
-          }: {
-            di: DataIdentifier;
-            entity: Entity;
-          }) => <UsLegalStatus di={di} entity={entity} />,
+          renderCustomField: ({ di, entity }: CustomFieldProp) => <UsLegalStatus di={di} entity={entity} />,
         },
         {
           di: IdDI.nationality,
-          renderCustomField: ({
-            di,
-            entity,
-          }: {
-            di: DataIdentifier;
-            entity: Entity;
-          }) => <CountryOfBirth di={di} entity={entity} />,
+          renderCustomField: ({ di, entity }: CustomFieldProp) => <CountryOfBirth di={di} entity={entity} />,
         },
         {
           di: IdDI.citizenships,
-          renderCustomField: ({
-            di,
-            entity,
-          }: {
-            di: DataIdentifier;
-            entity: Entity;
-          }) => <Citizenships di={di} entity={entity} />,
+          renderCustomField: ({ di, entity }: CustomFieldProp) => <Citizenships di={di} entity={entity} />,
         },
         {
           di: IdDI.visaKind,
-          renderCustomField: ({
-            di,
-            entity,
-          }: {
-            di: DataIdentifier;
-            entity: Entity;
-          }) => <VisaKind di={di} entity={entity} />,
+          renderCustomField: ({ di, entity }: CustomFieldProp) => <VisaKind di={di} entity={entity} />,
         },
         {
           di: IdDI.visaExpirationDate,
@@ -178,13 +151,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
   if (!excludeNationality) {
     fieldsets.identity.fields.push({
       di: IdDI.nationality,
-      renderCustomField: ({
-        di,
-        entity,
-      }: {
-        di: DataIdentifier;
-        entity: Entity;
-      }) => <Nationality di={di} entity={entity} />,
+      renderCustomField: ({ di, entity }: CustomFieldProp) => <Nationality di={di} entity={entity} />,
     });
   }
 

@@ -5,7 +5,7 @@ export type CollectedDataOption =
   | CollectedKycDataOption
   | CollectedInvestorProfileDataOption
   | CollectedDocumentDataOption
-  | string;
+  | string; // Fixme: This "string" type makes the whole "CollectedDataOption" fallback to "string"
 
 export enum CollectedInvestorProfileDataOption {
   investorProfile = 'investor_profile',
@@ -32,6 +32,7 @@ export enum CollectedKycDataOption {
   phoneNumber = 'phone_number',
   nationality = 'nationality',
   usLegalStatus = 'us_legal_status',
+  usTaxId = 'us_tax_id',
 }
 
 // TODO: update this
@@ -75,6 +76,7 @@ export const CollectedKycDataOptionToRequiredAttributes: Record<CollectedKycData
   [CollectedKycDataOption.dob]: [IdDI.dob],
   [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
   [CollectedKycDataOption.ssn9]: [IdDI.ssn9],
+  [CollectedKycDataOption.usTaxId]: [IdDI.usTaxId],
   [CollectedKycDataOption.address]: [IdDI.addressLine1, IdDI.city, IdDI.state, IdDI.zip, IdDI.country],
   [CollectedKycDataOption.email]: [IdDI.email],
   [CollectedKycDataOption.phoneNumber]: [IdDI.phoneNumber],

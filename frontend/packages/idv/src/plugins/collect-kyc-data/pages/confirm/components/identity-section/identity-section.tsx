@@ -6,171 +6,155 @@ import { useToast } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { TFunction } from 'i18next';
 import type { SectionAction, SectionItemProps } from '../../../../../../components/confirm-collected-data';
 import { Section, SectionItem } from '../../../../../../components/confirm-collected-data';
 import { FPCustomEvents, sendCustomEvent } from '../../../../../../utils';
-import { Logger } from '../../../../../../utils/logger';
+import { getLogger } from '../../../../../../utils/logger';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
 import type { KycData } from '../../../../utils/data-types';
-import { getSsnKind, getSsnValue, ssnFormatter } from '../../../../utils/ssn-utils';
+import {
+  TaxIdDisplay,
+  getTaxIdDataValue,
+  getTaxIdFields,
+  getTaxIdKind,
+  getTypeOfTaxId,
+  taxIdFormatter,
+} from '../../../../utils/ssn-utils';
+import type { TaxIdKind } from '../../../../utils/ssn-utils';
 import isCountryUsOrTerritories from '../../../../utils/state-machine/utils/is-country-us-or-territories';
 import Ssn from '../../../ssn';
 import useStepUp from './hooks/use-step-up';
 
-export enum SsnValue {
-  skipped,
-  hidden,
-  revealed,
-}
+type T = TFunction<'idv', 'kyc.pages'>;
+type TaxIdData = ReturnType<typeof getTaxIdDataValue>;
 
-type SSN = ReturnType<typeof getSsnValue>;
+const getTaxIdVisualState = (data: TaxIdData) =>
+  data?.value || data?.scrubbed ? TaxIdDisplay.hidden : TaxIdDisplay.skipped;
 
-const getSsnValueType = (ssn: SSN) => {
-  if (ssn?.value) {
-    return SsnValue.hidden;
-  }
-  return ssn?.scrubbed ? SsnValue.hidden : SsnValue.skipped;
+const getIdentitiesSections = (
+  t: T,
+  kind: TaxIdKind | undefined,
+  value: string | undefined,
+  display: TaxIdDisplay,
+): SectionItemProps[] => {
+  if (!kind) return [];
+  const isHidden = display === TaxIdDisplay.hidden;
+  const isSkipped = display === TaxIdDisplay.skipped;
+  const subText = isSkipped ? t('confirm.identity.ssn-skipped-subtext') : taxIdFormatter(kind, value, isHidden);
+
+  return [
+    {
+      subtext: subText,
+      text:
+        kind === 'ssn9'
+          ? t('confirm.identity.ssn9')
+          : kind === 'ssn4'
+            ? t('confirm.identity.ssn4')
+            : kind === 'itin'
+              ? t('confirm.identity.itin')
+              : t('confirm.identity.us-tax-id'),
+    },
+  ];
 };
+
+const showErrorToast = (t: T, toast: ReturnType<typeof useToast>) => {
+  toast.show({
+    title: t('confirm.summary.reveal-error.title'),
+    description: t('confirm.summary.reveal-error.description'),
+    variant: 'error',
+  });
+};
+
+const { logError, logWarn } = getLogger({ location: 'kyc-confirm' });
 
 const IdentitySection = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages' });
-  const [editing, setEditing] = useState(false);
   const [state, send] = useCollectKycDataMachine();
   const { authToken, device, data, requirement } = state.context;
-  const toast = useToast();
-  const decryptUserMutation = useDecryptUser();
-  const ssnKind = getSsnKind(requirement);
-  const ssn = getSsnValue(data, ssnKind);
-  const [ssnValueType, setSsnValueType] = useState(() => getSsnValueType(ssn));
   const isUsOrTerritories = isCountryUsOrTerritories(data);
-
-  const getIdentitiesSections = (): SectionItemProps[] => {
-    if (!ssnKind) {
-      return [];
-    }
-
-    const ssnDisplayVal =
-      ssnValueType === SsnValue.skipped
-        ? t('confirm.identity.ssn-skipped-subtext')
-        : ssnFormatter(ssnKind, ssn?.value, ssnValueType === SsnValue.hidden);
-
-    const text = ssnKind === 'ssn9' ? t('confirm.identity.ssn9') : t('confirm.identity.ssn4');
-
-    return [{ text, subtext: ssnDisplayVal }];
-  };
-
-  const identity = getIdentitiesSections();
+  const taxIdKind = getTaxIdKind(requirement);
+  const taxIdObj = getTaxIdDataValue(data, taxIdKind);
+  const [taxIdVisual, setTaxIdVisual] = useState(() => getTaxIdVisualState(taxIdObj));
+  const [editing, setEditing] = useState(false);
+  const toast = useToast();
+  const mutDecryptUser = useDecryptUser();
+  const identity = getIdentitiesSections(t, getTypeOfTaxId(taxIdKind, taxIdObj?.value), taxIdObj?.value, taxIdVisual);
 
   useEffect(() => {
-    if (ssn?.decrypted) {
+    if (taxIdObj?.decrypted) {
       // If newly decrypted, want to reveal immediately
-      setSsnValueType(SsnValue.revealed);
+      setTaxIdVisual(TaxIdDisplay.revealed);
     } else {
-      setSsnValueType(getSsnValueType(ssn));
+      setTaxIdVisual(getTaxIdVisualState(taxIdObj));
     }
-  }, [ssn]);
+  }, [taxIdObj]);
 
-  const stopEditing = () => {
-    setEditing(false);
-  };
+  const stopEditing = () => setEditing(false);
 
-  const getSectionContent = () => {
-    if (!editing) {
-      const identityItems = identity.map(({ text, subtext, textColor }: SectionItemProps) => (
+  const getSectionContent = () =>
+    !editing ? (
+      identity.map(({ text, subtext, textColor }: SectionItemProps) => (
         <SectionItem key={text} text={text} subtext={subtext} textColor={textColor} />
-      ));
-      return identityItems;
-    }
-    return <Ssn onCancel={stopEditing} onComplete={stopEditing} hideHeader hideDisclaimer />;
-  };
+      ))
+    ) : (
+      <Ssn onCancel={stopEditing} onComplete={stopEditing} hideHeader hideDisclaimer />
+    );
 
   const handleDecryptSuccess = (payload: DecryptUserResponse) => {
     const decryptedData: KycData = {};
     Object.entries(payload).forEach(([key, value]) => {
-      decryptedData[key as IdDI] = {
-        // @ts-expect-error: fix-me Type 'string | string[]' is not assignable to type 'undefined'.
-        value: value ?? '',
-        decrypted: true,
-      };
+      // @ts-expect-error: fix-me Type 'string | string[]' is not assignable to type 'undefined'.
+      decryptedData[key as IdDI] = { value: value ?? '', decrypted: true };
     });
 
-    send({
-      type: 'decryptedData',
-      payload: decryptedData,
-    });
-  };
-
-  const showErrorToast = () => {
-    toast.show({
-      title: t('confirm.summary.reveal-error.title'),
-      description: t('confirm.summary.reveal-error.description'),
-      variant: 'error',
-    });
+    send({ type: 'decryptedData', payload: decryptedData });
   };
 
   const handleStepUpSuccess = (stepUpAuthToken: string) => {
-    send({
-      type: 'stepUpCompleted',
-      payload: {
-        authToken: stepUpAuthToken,
-      },
-    });
-    sendCustomEvent(FPCustomEvents.stepUpCompleted, {
-      authToken: stepUpAuthToken,
-    });
+    send({ type: 'stepUpCompleted', payload: { authToken: stepUpAuthToken } });
+    sendCustomEvent(FPCustomEvents.stepUpCompleted, { authToken: stepUpAuthToken });
 
     // If the user has already decrypted their SSN, we don't need to do it again
-    if (!ssn?.scrubbed) {
-      return;
-    }
+    if (!taxIdObj?.scrubbed) return;
+    if (mutDecryptUser.isLoading) return;
 
-    if (decryptUserMutation.isLoading) {
-      return;
-    }
-
-    decryptUserMutation.mutate(
-      {
-        authToken: stepUpAuthToken,
-        fields: ssnKind === 'ssn9' ? [IdDI.ssn9] : [IdDI.ssn4],
-      },
+    mutDecryptUser.mutate(
+      { authToken: stepUpAuthToken, fields: getTaxIdFields(taxIdKind) },
       {
         onSuccess: handleDecryptSuccess,
         onError: (error: unknown) => {
-          Logger.error(`Decrypting SSN after step up failed in kyc confirm page. ${getErrorMessage(error)}`, {
-            location: 'kyc-confirm',
-          });
-          showErrorToast();
+          logError(`Decrypting ${taxIdKind} after step up failed. ${getErrorMessage(error)}`, error);
+          showErrorToast(t, toast);
         },
       },
     );
   };
 
   const {
-    needsStepUp,
     canStepUp,
-    stepUp,
     isLoading: isStepUpLoading,
+    needsStepUp,
+    stepUp,
   } = useStepUp({
     authToken,
     device,
     onSuccess: handleStepUpSuccess,
     onError: (error: unknown) => {
-      Logger.warn(`useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`, { location: 'kyc-confirm' });
-      showErrorToast();
+      logWarn(`useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`);
+      showErrorToast(t, toast);
     },
   });
 
-  const shouldTriggerStepUp = ssn?.scrubbed && needsStepUp && canStepUp;
+  const shouldTriggerStepUp = taxIdObj?.scrubbed && needsStepUp && canStepUp;
   const handleReveal = () => {
-    if (ssn?.value) {
-      setSsnValueType(SsnValue.revealed);
+    if (taxIdObj?.value) {
+      setTaxIdVisual(TaxIdDisplay.revealed);
     } else if (shouldTriggerStepUp) {
       stepUp();
     } else {
-      Logger.error('Attempted to reveal SSN on confirm page when step up is not available', {
-        location: 'kyc-confirm',
-      });
+      logError(`Attempted to reveal ${taxIdKind} on confirm page when step up is not available`);
     }
   };
 
@@ -182,12 +166,12 @@ const IdentitySection = () => {
       actionTestID: 'identity-edit-button',
     });
 
-    const canReveal = ssn?.value || isStepUpLoading || shouldTriggerStepUp;
+    const canReveal = taxIdObj?.value || isStepUpLoading || shouldTriggerStepUp;
     if (canReveal) {
-      if (ssnValueType === SsnValue.revealed) {
+      if (taxIdVisual === TaxIdDisplay.revealed) {
         actions.unshift({
           label: t('confirm.summary.hide'),
-          onClick: () => setSsnValueType(SsnValue.hidden),
+          onClick: () => setTaxIdVisual(TaxIdDisplay.hidden),
           actionTestID: 'identity-hide-button',
         });
       } else {

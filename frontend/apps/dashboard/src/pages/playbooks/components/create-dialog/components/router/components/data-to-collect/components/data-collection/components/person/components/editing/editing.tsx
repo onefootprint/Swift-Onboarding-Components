@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
+import { isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
 import styled, { css } from 'styled-components';
 
 import type { DataToCollectMeta, Personal } from '@/playbooks/utils/machine/types';
-import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import Document from '../../../document';
 
@@ -19,9 +19,7 @@ type EditingProps = {
 const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const { control, register, watch, setValue, getValues } = useFormContext();
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.person',
-  });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.person' });
   const { kind } = meta;
   const {
     data: { user, org },
@@ -31,16 +29,13 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const shouldCollectIdDoc = watch('personal.idDoc');
   const selectedGlobalDocs = watch('personal.idDocKind');
   const selectedCountrySpecificDocs = watch('personal.countrySpecificIdDocKind');
+  const isUsTaxIdAcceptable = !!watch('personal.usTaxIdAcceptable');
+  const isSsnOptional = !!watch('personal.ssnOptional');
   const collectBO = !!watch(`businessInformation.${CollectedKybDataOption.beneficialOwners}`);
-  const isKyb = kind === PlaybookKind.Kyb;
-
-  const showNoPhoneFlow =
-    (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) && kind === PlaybookKind.Kyc;
+  const showNoPhoneFlow = (user?.isFirmEmployee || org?.name.toLowerCase().includes('findigs')) && isKyc(kind);
 
   // need to store this so we don't re-fetch on add'l renders
-  const [initialValues] = useState<Personal>({
-    ...getValues('personal'),
-  });
+  const [initialValues] = useState<Personal>({ ...getValues('personal') });
 
   const handleSave = () => {
     if (
@@ -58,6 +53,20 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     onStopEditing();
   };
 
+  const resetSsnDocStepUp = () => setValue('personal.ssnDocScanStepUp', false);
+
+  const handleSsnKindChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value === CollectedKycDataOption.ssn4) {
+      setValue('personal.usTaxIdAcceptable', false);
+    }
+  };
+
+  const handleUsTaxIdAcceptableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isSsnOptional && e.target.checked) {
+      setValue('personal.ssnOptional', false);
+    }
+  };
+
   const setSsnType = (nextValue: React.ChangeEvent<HTMLInputElement>) => {
     if (nextValue.target.checked && !ssnKind) {
       setValue('personal.ssnKind', CollectedKycDataOption.ssn9);
@@ -69,24 +78,16 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     setValue('personal.countrySpecificIdDocKind', {});
   };
 
-  const title = isKyb ? (
+  const title = isKyb(kind) ? (
     <Text variant="label-3">{t('editing.kyb')}</Text>
   ) : (
     <Text variant="label-3">{t('editing.kyc')}</Text>
   );
 
-  const isSaveDisabled = () => {
-    if (
-      shouldCollectIdDoc &&
-      selectedGlobalDocs.length === 0 &&
-      Object.keys(selectedCountrySpecificDocs).length === 0
-    ) {
-      return true;
-    }
-    return false;
-  };
+  const isSaveDisabled = (): boolean =>
+    shouldCollectIdDoc && selectedGlobalDocs.length === 0 && Object.keys(selectedCountrySpecificDocs).length === 0;
 
-  if (isKyb && !collectBO) {
+  if (isKyb(kind) && !collectBO) {
     return (
       <EditingContainer>
         <Section>
@@ -122,7 +123,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
 
   return (
     <EditingContainer>
-      {isKyb && (
+      {isKyb(kind) && (
         <Section>
           {title}
           <Controller
@@ -145,7 +146,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
       )}
       {showNoPhoneFlow && (
         <Section>
-          {!isKyb && title}
+          {!isKyb(kind) && title}
           <Text paddingBottom={2} variant="label-1">
             {t('basic-information.title')}
           </Text>
@@ -169,7 +170,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
         </Section>
       )}
       <Section>
-        {!isKyb && !showNoPhoneFlow && title}
+        {!isKyb(kind) && !showNoPhoneFlow && title}
         <Text paddingBottom={3} variant="label-1">
           {t('us-residents.title')}
         </Text>
@@ -195,17 +196,36 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
           <>
             <Subsection>
               <OptionsContainer>
-                <Radio label={t('ssn.full')} value={CollectedKycDataOption.ssn9} {...register('personal.ssnKind')} />
-                <Radio label={t('ssn.last4')} value={CollectedKycDataOption.ssn4} {...register('personal.ssnKind')} />
+                <Radio
+                  label={t('ssn.full')}
+                  value={CollectedKycDataOption.ssn9}
+                  {...register('personal.ssnKind', { onChange: handleSsnKindChange })}
+                />
+                <Radio
+                  label={t('ssn.last4')}
+                  value={CollectedKycDataOption.ssn4}
+                  {...register('personal.ssnKind', { onChange: handleSsnKindChange })}
+                />
               </OptionsContainer>
             </Subsection>
-            <Subsection>
-              <Checkbox
-                hint={t('ssn-optional.hint')}
-                label={t('ssn-optional.label')}
-                {...register('personal.ssnOptional')}
-              />
-            </Subsection>
+            {ssnKind === CollectedKycDataOption.ssn9 ? (
+              <Subsection>
+                <Checkbox
+                  hint={t('accept-itin-hint')}
+                  label={t('accept-itin-label')}
+                  {...register('personal.usTaxIdAcceptable', { onChange: handleUsTaxIdAcceptableChange })}
+                />
+              </Subsection>
+            ) : null}
+            {!isUsTaxIdAcceptable ? (
+              <Subsection>
+                <Checkbox
+                  hint={t('ssn-optional.hint')}
+                  label={t('ssn-optional.label')}
+                  {...register('personal.ssnOptional', { onChange: resetSsnDocStepUp })}
+                />
+              </Subsection>
+            ) : null}
           </>
         )}
       </Section>

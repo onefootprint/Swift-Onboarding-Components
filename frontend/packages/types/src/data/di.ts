@@ -52,6 +52,8 @@ export enum IdDI {
   visaKind = 'id.visa_kind',
   visaExpirationDate = 'id.visa_expiration_date',
   citizenships = 'id.citizenships',
+  usTaxId = 'id.us_tax_id',
+  itin = 'id.itin',
 }
 
 export enum DocumentDI {

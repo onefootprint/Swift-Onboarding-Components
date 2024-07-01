@@ -1,1 +1,10 @@
-export { getSsnKind, getSsnValue, ssnFormatter } from './ssn-utils';
+export {
+  getTaxIdDataValue,
+  getTaxIdFields,
+  getTaxIdKind,
+  getTypeOfTaxId,
+  isSsnOptional,
+  TaxIdDisplay,
+  taxIdFormatter,
+} from './ssn-utils';
+export type { TaxIdKind } from './ssn-utils';

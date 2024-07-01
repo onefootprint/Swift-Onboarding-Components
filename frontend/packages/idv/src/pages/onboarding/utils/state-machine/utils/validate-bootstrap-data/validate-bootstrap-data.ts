@@ -140,6 +140,8 @@ const validateUserData = (
     [IdDI.dob]: isDobValid,
     [IdDI.ssn9]: isSsn9Valid,
     [IdDI.ssn4]: isSsn4Valid,
+    [IdDI.usTaxId]: () => true,
+    [IdDI.itin]: () => true,
     [IdDI.addressLine1]: isAddressLine1Valid,
     [IdDI.addressLine2]: isStringValid,
     [IdDI.city]: isStringValid,

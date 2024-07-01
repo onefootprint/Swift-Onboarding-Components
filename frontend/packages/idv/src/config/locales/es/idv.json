@@ -207,6 +207,7 @@
           "address-full": "Dirección",
           "nationality": "Nacionalidad",
           "us-legal-status": "Situación legal en EE.UU.",
+          "us-tax-id": "ITIN",
           "id-card": "Documento de identificación",
           "passport": "Pasaporte",
           "driversLicense": "Licencia de conducir",
@@ -410,32 +411,24 @@
         }
       },
       "ssn": {
-        "full": {
-          "title": "¿Cuál es tu Número de Seguridad Social (SSN)?",
-          "subtitle": "Necesitamos recopilar esta información para verificar tu identidad.",
-          "disclaimer": {
-            "security": {
-              "title": "Tus datos están seguros",
-              "description": "Tu SSN está encriptado y protegido por un sistema informático seguro de última generación."
-            }
-          },
-          "form": {
-            "label": "SSN",
-            "placeholder": "XXX-XX-XXXX",
-            "error": "El campo 'SSN' no puede quedar vacío o ser inválido"
-          },
-          "skip-label": "No tengo un Número de Seguridad Social (SSN)"
-        },
-        "last-four": {
-          "title": "¿Cuáles son los últimos 4 dígitos de tu Número de Seguridad Social (SSN)?",
-          "subtitle": "Necesitamos recopilar esta información para verificar tu identidad.",
-          "form": {
-            "label": "SSN (últimos 4)",
-            "placeholder": "XXXX",
-            "error": "El SSN no puede estar vacío o es inválido"
-          },
-          "skip-label": "No tengo un Número de Seguridad Social (SSN)"
-        },
+        "itin-disclaimer": "Tu SSN o ITIN están encriptados y protegidos por un sistema informático seguro de última generación.",
+        "itin-label": "Tax ID",
+        "skip-label": "No tengo un Número de Seguridad Social (SSN)",
+        "ssn-invalid": "El campo 'SSN' no puede quedar vacío o ser inválido",
+        "ssn-us-tax-id-invalid": "El campo 'SSN o ITIN' no puede quedar vacío o ser inválido",
+        "ssn4-label": "SSN (últimos 4)",
+        "ssn4-placeholder": "XXXX",
+        "ssn4-subtitle": "Necesitamos recopilar esta información para verificar tu identidad.",
+        "ssn4-title": "¿Cuáles son los últimos 4 dígitos de tu Número de Seguridad Social (SSN)?",
+        "ssn9-disclaimer": "Tu SSN está encriptado y protegido por un sistema informático seguro de última generación.",
+        "ssn9-label": "SSN",
+        "ssn9-placeholder": "XXX-XX-XXXX",
+        "ssn9-subtitle": "Necesitamos recopilar esta información para verificar tu identidad.",
+        "ssn9-title": "¿Cuál es tu Número de Seguridad Social (SSN)?",
+        "us-tax-id-disclaimer": "Tu SSN o ITIN están encriptados y protegidos por un sistema informático seguro de última generación.",
+        "us-tax-id-label": "Tax ID",
+        "us-tax-id-title": "¿Cuál es tu Tax ID?",
+        "your-data-is-safe": "Tus datos están seguros",
         "skip": {
           "cta": "No tengo un Número de Seguridad Social (SSN)",
           "confirmation": {
@@ -491,10 +484,12 @@
           "title": "Dirección"
         },
         "identity": {
-          "title": "Identidad",
-          "ssn9": "SSN",
+          "ssn-skipped-subtext": "No tengo un Número de Seguridad Social (SSN)",
           "ssn4": "SSN (últimos 4)",
-          "ssn-skipped-subtext": "No tengo un Número de Seguridad Social (SSN)"
+          "ssn9": "SSN",
+          "title": "Identidad",
+          "itin": "Identidad",
+          "us-tax-id": "Tax Id"
         },
         "di": {
           "id": {

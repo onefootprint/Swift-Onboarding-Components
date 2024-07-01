@@ -326,6 +326,31 @@ describe('Collect KYC Data Machine Tests', () => {
       ]);
       expect(state.value).toEqual('usLegalStatus');
     });
+
+    it('Should go to ssn screen if user is missing ssn', () => {
+      const machine = createMachine(
+        [
+          CollectedKycDataOption.email,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.address,
+          CollectedKycDataOption.usLegalStatus,
+          CollectedKycDataOption.ssn4,
+        ],
+        {
+          [IdDI.email]: { value: 'piip@onefootprint.com', bootstrap: true },
+          [IdDI.firstName]: { value: 'Bob', bootstrap: true },
+          [IdDI.lastName]: { value: 'Lee', bootstrap: true },
+          [IdDI.addressLine1]: { value: '123 Main St', bootstrap: true },
+          [IdDI.city]: { value: 'San Francisco', bootstrap: true },
+          [IdDI.state]: { value: 'CA', disabled: true },
+          [IdDI.zip]: { value: '94105', disabled: true },
+          [IdDI.country]: { value: 'US', disabled: true },
+          [IdDI.usLegalStatus]: { value: UsLegalStatus.citizen },
+        },
+      );
+
+      expect(machine.state.context.dataCollectionScreensToShow).toEqual(['ssn', 'confirm']);
+    });
   });
 
   describe('When user is missing an email', () => {

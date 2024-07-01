@@ -15,6 +15,7 @@ const CdoToAllDisMap: Record<CollectedDataOption, DataIdentifier[]> = {
   [CollectedKycDataOption.dob]: [IdDI.dob],
   [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
   [CollectedKycDataOption.ssn9]: [IdDI.ssn9],
+  [CollectedKycDataOption.usTaxId]: [IdDI.usTaxId],
   [CollectedKycDataOption.address]: [
     IdDI.addressLine1,
     IdDI.addressLine2,
