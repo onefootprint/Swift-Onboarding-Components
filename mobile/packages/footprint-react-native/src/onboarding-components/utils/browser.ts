@@ -15,8 +15,13 @@ const getDeepLink = () => {
   return Platform.OS === 'android' ? `${scheme}://callback/` : `${scheme}://`;
 };
 
+export enum OnboardingStep {
+  Auth = 'auth',
+  Onboard = 'onboard',
+}
+
 type OnboardingProps = FootprintVerifyProps & {
-  step: 'auth' | 'onboard';
+  step: OnboardingStep;
   onAuthComplete?: (tokens: {
     authToken: string;
     vaultingToken: string;
@@ -131,7 +136,7 @@ const footprint = () => {
       return;
     }
 
-    if (step === 'auth') {
+    if (step === OnboardingStep.Auth) {
       const authToken = urlParams.auth_token;
       const vaultingToken = urlParams.components_vault_token;
       if (!authToken || typeof authToken !== 'string') {
