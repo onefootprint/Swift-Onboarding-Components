@@ -36,7 +36,7 @@ const WaitForComponentsSdk = ({ onDone }: WaitForComponentsProps) => {
         onSuccess: ({ token }) => {
           // TODO e2e test that this token doesn't have advanced scopes
           // Pass the scoped auth token back to the components SDK to handle any requirements it pleases
-          componentsSdkContext.relayToComponents(token);
+          componentsSdkContext.relayToComponents(token, authToken);
         },
         onError: () => {
           send('error');

@@ -6,6 +6,7 @@ import Idv, { AppErrorBoundary, getLogger, Logger, useFootprintProvider, useLogS
 import { useIdentifyValidate } from '@onefootprint/idv/src/hooks/api';
 import { checkIsAndroid } from '@onefootprint/idv/src/utils';
 import checkIsIframe from '@onefootprint/idv/src/utils/check-is-in-iframe';
+import { type ComponentsSdkContext, ComponentsSdkTypes } from '@onefootprint/idv/src/utils/state-machine/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import type { GetServerSideProps } from 'next';
@@ -27,6 +28,7 @@ const Root = ({ variant }: RootProps) => {
   const { bootstrapData, l10n, showCompletionPage, showLogo, authToken, publicKey, isComponentsSdk } = state.context;
   const obConfigAuth = publicKey ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey } : undefined;
 
+  const isWebview = !checkIsIframe();
   const isAndroidWebview = !checkIsIframe() && checkIsAndroid();
   const shouldShowCompletionPage = showCompletionPage || isAndroidWebview;
   const mutIdentifyValidate = useIdentifyValidate();
@@ -82,11 +84,13 @@ const Root = ({ variant }: RootProps) => {
     fpProvider.close();
   };
 
-  let componentsSdkContext;
+  let componentsSdkContext: ComponentsSdkContext | undefined;
   if (isComponentsSdk) {
     componentsSdkContext = {
       onRelayFromComponents: (cb: () => void) => fpProvider.on(FootprintPrivateEvent.relayFromComponents, cb),
       relayToComponents: fpProvider.relayToComponents,
+      componentsSdkType: isWebview ? ComponentsSdkTypes.MOBILE : ComponentsSdkTypes.WEB,
+      skipRelayToComponents: isWebview && !!authToken,
     };
   }
 

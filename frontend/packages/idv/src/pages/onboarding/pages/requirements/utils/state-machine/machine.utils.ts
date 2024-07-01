@@ -1,6 +1,7 @@
 import { OnboardingRequirementKind } from '@onefootprint/types';
 import type { TransitionConfig, TransitionsConfig } from 'xstate';
 
+import { ComponentsSdkTypes } from '@onefootprint/idv/src/utils/state-machine/types';
 import type { MachineContext, MachineEvents } from './types';
 
 const getFirstKind = (c: MachineContext): OnboardingRequirementKind | undefined => c.requirements[0]?.kind;
@@ -71,3 +72,15 @@ export const NextRequirementTargets: TransitionConfig<MachineContext, MachineEve
   { target: 'process', cond: context => shouldShowProcess(context) },
   { target: 'success' },
 ];
+
+export const shouldWaitForComponentsSdk = (context: MachineContext) => {
+  const componentSdkContext = context.idvContext.componentsSdkContext;
+  if (!componentSdkContext) return false;
+
+  const { componentsSdkType, skipRelayToComponents } = componentSdkContext;
+  if (skipRelayToComponents) return false;
+  if (componentsSdkType === ComponentsSdkTypes.WEB) {
+    return !!context.idvContext.isInIframe;
+  }
+  return componentsSdkType === ComponentsSdkTypes.MOBILE;
+};

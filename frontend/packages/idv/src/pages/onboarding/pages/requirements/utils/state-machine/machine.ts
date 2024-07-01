@@ -5,7 +5,7 @@ import type { UserData } from '../../../../../../types';
 import { Logger } from '../../../../../../utils/logger';
 import type { CommonIdvContext } from '../../../../../../utils/state-machine';
 import isRepeatRequirement from '../is-repeat-requirement';
-import { NextRequirementTargets, RequirementCompletedTransition } from './machine.utils';
+import { NextRequirementTargets, RequirementCompletedTransition, shouldWaitForComponentsSdk } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
@@ -68,7 +68,7 @@ const createOnboardingRequirementsMachine = ({
             initialized: [
               {
                 target: 'waitForComponentsSdk',
-                cond: ctx => !!ctx.idvContext.isInIframe && !!ctx.idvContext.componentsSdkContext,
+                cond: shouldWaitForComponentsSdk,
                 description:
                   'If we are running bifrost for the components SDK, wait for the components SDK to finish handling its requirements',
               },

@@ -133,7 +133,7 @@ const footprint = () => {
 
     if (step === 'auth') {
       const authToken = urlParams.auth_token;
-      const vaultingToken = urlParams.downscoped_auth_token;
+      const vaultingToken = urlParams.components_vault_token;
       if (!authToken || typeof authToken !== 'string') {
         logError(`${LOGGER_PREFIX}: Missing auth token after auth step.`);
         handleBrowserSessionEnd(props, {

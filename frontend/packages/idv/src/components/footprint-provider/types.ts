@@ -20,7 +20,7 @@ export type CustomChildAPI = Postmate.ChildAPI & {
 
 export type IframeAdapterReturn = {
   auth: (token: string) => void;
-  relayToComponents: (authToken: string) => void;
+  relayToComponents: (componentsVaultToken: string) => void;
   cancel: () => void;
   close: () => void;
   complete: (completePayload: CompletePayload) => void;
@@ -44,7 +44,7 @@ export type SendResultCallback = (authToken: string, deviceResponse: string) => 
 
 export type WebViewAdapterReturn = {
   auth: (token: string) => void;
-  relayToComponents: () => void;
+  relayToComponents: (componentsVaultToken: string, authToken: string) => void;
   cancel: () => void;
   close: () => void;
   complete: (completePayload: CompletePayload) => void;

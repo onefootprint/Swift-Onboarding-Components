@@ -5,9 +5,16 @@ import type { DeviceInfo } from '../../hooks';
 import type { UserData } from '../../types';
 import type { AuthTokenPayload, DeviceResponseJsonPayload } from './utils/custom-listener';
 
+export enum ComponentsSdkTypes {
+  WEB = 'web',
+  MOBILE = 'mobile',
+}
+
 export type ComponentsSdkContext = {
   onRelayFromComponents: (cb: () => void) => () => void;
-  relayToComponents: (authToken: string) => void;
+  relayToComponents: (componentsVaultToken: string, authToken: string) => void;
+  componentsSdkType: ComponentsSdkTypes;
+  skipRelayToComponents?: boolean;
 };
 
 /** These constant properties are often passed around to other idv machines */
