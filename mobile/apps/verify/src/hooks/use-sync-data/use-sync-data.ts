@@ -58,6 +58,7 @@ const useSyncData = () => {
           data,
           authToken,
           speculative,
+          bootstrapDis: [],
         },
         {
           onSuccess,

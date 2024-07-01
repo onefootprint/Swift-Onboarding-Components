@@ -10,6 +10,7 @@ export type UserDataError = {
 
 export type UserDataRequest = {
   data: Partial<Record<IdDI | InvestorProfileDI, VaultValue>>;
+  bootstrapDis: (IdDI | InvestorProfileDI)[];
   authToken: string;
   allowExtraFields?: boolean;
   speculative?: boolean;

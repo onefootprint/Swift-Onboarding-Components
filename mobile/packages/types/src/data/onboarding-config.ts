@@ -1,3 +1,4 @@
+import { AuthMethodKind } from '../api';
 import type { FootprintAppearance } from './appearance';
 import type { CollectedDataOption } from './collected-data-option';
 import type { CountryCode } from './countries';
@@ -32,9 +33,14 @@ export type PublicOnboardingConfig = {
   isKyb: boolean;
   allowInternationalResidents: boolean;
   supportedCountries?: CountryCode[];
+  allowedOrigins?: string[];
   canMakeRealDocScanCallsInSandbox?: boolean;
   isStepupEnabled?: boolean;
   kind?: 'auth' | 'kyb' | 'kyc';
+  supportEmail?: string;
+  supportPhone?: string;
+  supportWebsite?: string;
+  requiredAuthMethods?: AuthMethodKind[];
   nidEnabled?: boolean;
 };
 
