@@ -1,3 +1,9 @@
+type SessionAuthCompleteResult = {
+  kind: 'auth_complete';
+  authToken: string;
+  vaultingToken: string;
+};
+
 type SessionCompleteResult = {
   kind: 'complete';
   validationToken: string;
@@ -13,6 +19,7 @@ type SessionErroredResult = {
 };
 
 export type SessionResult =
+  | SessionAuthCompleteResult // <-- This type is only used in the onboarding components
   | SessionCompleteResult
   | SessionCanceledResult
   | SessionErroredResult;

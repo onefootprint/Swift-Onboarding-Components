@@ -10,6 +10,7 @@ type SendSdkArgsRequest = {
     FootprintVerifyProps,
     'publicKey' | 'authToken' | 'userData' | 'options' | 'l10n'
   >;
+  is_components_sdk?: boolean;
 };
 
 type SendSdkArgsResponse = {
@@ -38,11 +39,17 @@ const sendSdkArgsRecursive = async (
     return undefined;
   });
 
-const sendSdkArgs = async (data: SendSdkArgsRequest['data']) => {
+const sendSdkArgs = async (
+  data: SendSdkArgsRequest['data'],
+  options?: { isComponentSdk?: boolean },
+) => {
   const result = await sendSdkArgsRecursive(
     {
       kind: SDK_KIND,
-      data: transformKeys(data),
+      data: {
+        ...transformKeys(data),
+        is_components_sdk: options?.isComponentSdk,
+      },
     },
     NUM_RETRIES,
   );
