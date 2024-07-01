@@ -66,7 +66,7 @@ const SectionCards = () => {
         <SectionCard
           title={t('vaulting.title')}
           subtitle={t('vaulting.description')}
-          href="/vault/apis"
+          href="https://docs.onefootprint.com/vault/fields"
           icon={IcoDatabase24}
           gridArea="vaulting"
         >

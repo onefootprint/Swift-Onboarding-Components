@@ -130,7 +130,7 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/apis#vault-fields).",
+                    "description": "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -596,7 +596,7 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/apis#vault-fields).",
+                    "description": "Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
                     "content": {
                         "application/json": {
                             "schema": {
@@ -4392,7 +4392,7 @@
                         "type": "string"
                     },
                     "requires_additional_info": {
-                        "description": "When non-null, there is additional info pending collection from this user. In this case, you\n may create a token for this user with the `inherited` operation. This token can be used to\n collect any outstanding information.",
+                        "description": "When non-null, there is additional info pending collection from this user. In this case, you\n may create a token for this user with the `inherit` operation. This token can be used to\n collect any outstanding information.",
                         "type": "object",
                         "properties": {
                             "note": {

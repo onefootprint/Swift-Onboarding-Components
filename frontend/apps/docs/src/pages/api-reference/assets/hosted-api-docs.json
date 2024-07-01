@@ -5131,6 +5131,7 @@
                             "pass",
                             "manual_review",
                             "step_up",
+                            "document_decision",
                             "use_rules_outcome"
                         ]
                     },
@@ -5141,6 +5142,7 @@
                             "pass",
                             "manual_review",
                             "step_up",
+                            "document_decision",
                             "use_rules_outcome"
                         ]
                     }
@@ -5156,6 +5158,7 @@
                             "pass",
                             "manual_review",
                             "step_up",
+                            "document_decision",
                             "use_rules_outcome"
                         ]
                     }

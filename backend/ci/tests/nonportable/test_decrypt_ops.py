@@ -235,7 +235,7 @@ def test_delete(sandbox_tenant):
 
 
 def test_card_expiration_transform(tenant):
-    # https://docs.onefootprint.com/vault/apis#vault-fields-card-fields
+    # https://docs.onefootprint.com/vault/fields
     expiration_transforms = [
         # MM/YYYY (not transformed)
         ("01/2023", "01/2023"),

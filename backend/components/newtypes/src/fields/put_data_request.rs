@@ -16,7 +16,7 @@ use std::collections::HashMap;
 
 flat_api_object_map_type!(
     RawDataRequest<DataIdentifier, PiiJsonValue>,
-    description="Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/apis#vault-fields).",
+    description="Key-value map of data to add to the vault. For more documentation on available keys, see [here](https://docs.onefootprint.com/vault/fields).",
     example=r#"{ "id.first_name": "Jane", "custom.ach_account_number": "1234567890", "custom.cc_last_4": "4242" }"#
 );
 impl_request_type!(RawDataRequest);
