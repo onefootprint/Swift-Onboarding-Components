@@ -17,7 +17,7 @@ use paperclip::actix::{
 };
 use vault_dr::EnrollmentKeys;
 use vault_dr::PublicKey;
-use vault_dr::VaultDrWriter;
+use vault_dr::VaultDrAwsConfig;
 
 #[api_v2_operation(
     tags(VaultDisasterRecovery, Private),
@@ -54,18 +54,15 @@ pub async fn post(
         .await?;
     let pre_enrollment_id = pre_enrollment.id.clone();
 
-    let writer = VaultDrWriter {
-        config: state.config.vault_dr_config.clone(),
-
-        tenant_id: tenant.id.clone(),
-        is_live,
+    let aws_config = VaultDrAwsConfig {
+        state_config: state.config.vault_dr_config.clone(),
         aws_account_id,
         aws_external_id: pre_enrollment.aws_external_id.clone(),
         aws_role_name,
         s3_bucket_name,
     };
 
-    writer.validate_aws_config().await?;
+    aws_config.validate().await?;
 
     let EnrollmentKeys {
         recovery_public_key,
@@ -84,12 +81,12 @@ pub async fn post(
                 VaultDrConfig::deactivate(conn, existing_config)?;
             }
 
-            let VaultDrWriter {
+            let VaultDrAwsConfig {
                 aws_account_id,
                 aws_role_name,
                 s3_bucket_name,
                 ..
-            } = writer;
+            } = aws_config;
 
             let new_config = NewVaultDrConfig {
                 created_at: Utc::now(),
