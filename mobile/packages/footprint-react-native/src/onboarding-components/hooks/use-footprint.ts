@@ -1,8 +1,8 @@
-import type { IdDI, InvestorProfileDI, VaultValue } from '@onefootprint/types';
 import { useContext } from 'react';
 
 import { Context } from '../provider';
 import save from '../queries/save';
+import type { Di } from '../types/dis';
 import browser, { OnboardingStep } from '../utils/browser';
 
 const useFootprint = () => {
@@ -47,7 +47,7 @@ const useFootprint = () => {
   };
 
   const vaultData = async (
-    data: Partial<Record<IdDI | InvestorProfileDI, VaultValue>>,
+    data: Di,
     {
       onSuccess,
       onError,

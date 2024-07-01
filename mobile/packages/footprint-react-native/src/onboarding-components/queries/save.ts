@@ -1,6 +1,10 @@
-import type { UserDataRequest, UserDataResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { API_BASE_URL } from 'src/utils/constants';
+
+import type {
+  SaveDataRequest,
+  SaveDataResponse,
+} from '../types/save-request-data';
 
 const getDataKind = (data: Record<string, unknown>) => {
   const hasId = Object.entries(data).some(([key]) => key.startsWith('id.'));
@@ -10,7 +14,7 @@ const getDataKind = (data: Record<string, unknown>) => {
   return { hasId, hasBusiness };
 };
 
-const save = async (payload: UserDataRequest) => {
+const save = async (payload: SaveDataRequest) => {
   const data = Object.fromEntries(
     Object.entries(payload.data).filter(
       // Don't send null values
@@ -20,7 +24,7 @@ const save = async (payload: UserDataRequest) => {
 
   if (!Object.entries(data).length) {
     // If there's no data to send to the backend, short circuit
-    return {} as UserDataResponse;
+    return {} as SaveDataResponse;
   }
 
   const { hasId, hasBusiness } = getDataKind(data);
@@ -40,7 +44,7 @@ const save = async (payload: UserDataRequest) => {
 
   if (!response.ok) throw new Error('Failed to save data');
 
-  return response.json() as Promise<UserDataResponse>;
+  return response.json() as Promise<SaveDataRequest>;
 };
 
 export default save;
