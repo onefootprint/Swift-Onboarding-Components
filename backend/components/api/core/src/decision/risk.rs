@@ -12,6 +12,7 @@ use db::models::onboarding_decision::FailedForDocReview;
 use db::models::onboarding_decision::NewDecisionArgs;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_vault::ScopedVault;
+use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
 use db::TxnPgConn;
 use itertools::chain;
@@ -46,7 +47,7 @@ pub fn save_final_decision(
 ) -> FpResult<()> {
     let wf = Workflow::lock(conn, wf_id)?;
     let scoped_user = ScopedVault::get(conn, &wf.scoped_vault_id)?;
-    let (obc, _) = ObConfiguration::get(conn, wf_id)?;
+    let (obc, tenant) = ObConfiguration::get(conn, wf_id)?;
 
     // If we should commit, portablize all data for the onboarding
     // But, don't portabalize vaults from no-phone onboardings,
@@ -130,7 +131,7 @@ pub fn save_final_decision(
     wf.maybe_fire_completed_webhook(conn, wf_delta, mr_deltas)?;
     wf.maybe_fire_status_changed_webhook(conn, sv_delta, mr_deltas)?;
 
-    log_canonical_line(&obc, rules_outcome, &obd);
+    log_canonical_line(&obc, rules_outcome, &obd, &tenant);
 
     Ok(())
 }
@@ -155,7 +156,12 @@ fn get_final_decision_status(
     }
 }
 
-fn log_canonical_line(obc: &ObConfiguration, rules_outcome: RulesOutcome, obd: &OnboardingDecision) {
+fn log_canonical_line(
+    obc: &ObConfiguration,
+    rules_outcome: RulesOutcome,
+    obd: &OnboardingDecision,
+    tenant: &Tenant,
+) {
     let action = match rules_outcome {
         RulesOutcome::RulesExecuted { action, .. } => action,
         RulesOutcome::RulesNotExecuted => None,
@@ -170,6 +176,7 @@ fn log_canonical_line(obc: &ObConfiguration, rules_outcome: RulesOutcome, obd: &
         failed_for_doc_review=%obd.failed_for_doc_review,
         is_live=%obc.is_live,
         tenant_id=%obc.tenant_id,
+        tenant_name=%tenant.name,
         kind=%obc.kind,
         name = "CANONICAL-WORKFLOW-COMPLETE"
     );
