@@ -1,0 +1,88 @@
+---
+page: default
+category: Guides
+subcategory: Vaulting APIs
+title: Creating new vaults
+slug: /vault/creating-new-vaults
+meta: { title: 'Creating new vaults' }
+---
+
+If you're backfilling your existing users into Footprint, you may need to vault PII data directly via API. In this case, Footprint supports "Standalone" user vaults that did not onboard through a KYC/IDV flow using our Frontend SDK.
+
+The first step is to create a new vault for your user:
+
+```bash
+curl https://api.onefootprint.com/users \
+	-X POST \
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+```json
+{
+  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
+}
+```
+
+Save this `id` and associate it with the user in your database.
+
+### Initial data
+
+If you have initial data to seed in the vault, you may provide it in the HTTP body:
+
+```bash
+curl https://api.onefootprint.com/users \
+	-X POST \
+	-d '{
+		    "id.first_name": "Jane",
+		    "id.last_name": "Joe",
+		    "id.dob": "1988-12-30",
+			"id.ssn9": "12-121-1212",
+			"custom.ach_account": "111122224444"
+		}' \
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+```json
+{
+  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
+}
+```
+
+### Idempotency ID
+
+To safely support retrying this `POST /user` request without creating a second user, we support an `x-idempotency-id` header. Requests made with the same `x-idempotency-id` value will no-op and return the same `fp_id`.
+
+If you are creating a user vault in Footprint for an existing user record in your database, we recommend using your user record's unique ID as the `x-idempotency-id` to guarantee that only one Footprint user vault is ever created per user.
+
+Note, when using `x-idempotency-id`, you are not able to provide initial data in the HTTP body.
+
+```bash
+curl https://api.onefootprint.com/users \
+	-X POST \
+	-H 'x-idempotency-id: my_user_id_1234'
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+```json
+{
+  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
+}
+```
+
+<inline-alert variant='info'>This value is safe to store in plaintext!</inline-alert>
+
+### Update a standalone user vault
+
+With the `id` given from creating a user, you may always update and add new data to your standalone vaults:
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
+	-X PATCH \
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+	-d '{
+		    "id.email": "jane@acmebank.com",
+			"custom.ach_account": "111122224444"
+		}'
+```
+
+For listing, decrypting, and updating -- all the APIs above are identical for standalone user vaults.

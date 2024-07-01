@@ -1,0 +1,124 @@
+---
+page: default
+category: Guides
+subcategory: Vaulting APIs
+title: Introduction
+slug: /vault/apis
+meta: { title: 'Vault identity, payment cards, and anything sensitive' }
+---
+
+Footprint vaults are structured as a key-value store. We define a fixed set of predefined keys that you can use for structured data: like SSN (`id.ssn9`), address (`id.address_line1`, `id.address_line2`, etc), and card number (`card.*.number`). These fields have validation specific to the type of data that they're storing, allowing you to read and write data to these fields with confidence that the data is in the correct format.
+
+For any other kinds of unstructred data, you may always use `custom.*` attributes.
+
+You'll find the list of supported structured data keys and their validators [here](/vault/fields).
+
+### Identity
+
+Identity data that originates from user and business embedded onboarding flows (KYC and KYB) is verified with our decisioning platform and then vaulted. Identity data is comprised of specific attributes that are validated, vaulted, tokenized, and in some attribute types fingerprinted to become matchable. Identity vaults can also be standalone and provisioned via API or vault-proxy, which can be useful when migrating sensitive user data. Regardless of origination, the APIs are identical to provide unified secure PII vaulting. PII reserves the namespace of vault data identifiers prefixed with `id.`.
+
+### Payment Cards
+
+In many financial applications, it's required to collect or store payment card data associated with users that your onboard (KYC or not). Footprint provides a PCI-compliant vaulting solution for payment card holder data like: card number, expiration authorization/security code (CVV), and more. The payment card vaulting APIs are consistent with all Footprint vaulting APIs and reserve a specific namespace of vault data identifiers: `card.*`. Unlike identity data, users may have multiple cards, so you can give each card type an alias namespace such as `card.primary.*`. Like identity data, card data is validated prior to vaulting.
+
+### Custom Key-Value
+
+Footprint also supports custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests. You can use custom data to **securely vault** any associated sensitive user or businesses in the vault using a unified vaulting API.
+
+## Update a user vault
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
+	-X PATCH \
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+	-d '{
+			"custom.ach_account": "111122224444",
+			"card.primary.expiration": "10/2025",
+			"card.primary.cvc": "424"
+		}'
+```
+
+<inline-alert variant="info">
+  This endpoint has a JSON body limit of 32KB.
+</inline-alert>
+
+## Store large objects in a user vault
+
+For custom objects that are larger (up to 10MB), use the `POST /users/<fp_id>/vault/<data_identifier>/upload` API.
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/custom.card_transaction_history/upload \
+	-X POST \
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+	--data-binary @transactions.csv
+```
+
+The raw contents of body will be encrypted and stored in the user vault. Use the same decrypt method as defined below to retrieve the contents.
+
+<inline-alert variant="info">
+  Note that upon decryption, the raw contents of the large object are `base64`
+  encoded.
+</inline-alert>
+
+## List available data in a user's vault
+
+Check what fields exist on a user's vault.
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault?fields=id.ssn9,custom.ach_account,card.primary.number \
+  	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
+```
+
+```json
+{
+  "id.ssn9": true,
+  "custom.ach_account": true,
+  "card.primary.number": true
+}
+```
+
+## Decrypt data from a user's vault
+
+Footprint’s API provides attribute-level decryption. API keys are configurable to have certain attribute-level scopes.
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/decrypt \
+	-X POST \
+	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+	-d '{
+			"fields": ["id.last_name", "id.dob", "id.ssn9", "custom.ach_account"],
+			"reason": "direct deposit verification"
+		}'
+```
+
+```json
+{
+  "id.last_name": "Doe",
+  "id.dob": "1988-12-25",
+  "id.ssn9": "121211212",
+  "custom.ach_account": "111122224444"
+}
+```
+
+## Search across users' vaults
+
+Footprint lets you search across all of your users' vaults by specific fields that are fingerprinted. This lets you easily search across all of your users vaults privately without building complicated decryption procedures.
+
+```bash
+curl https://api.onefootprint.com/users/search -X POST -d '{"search": "Doe"}' \
+  	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
+```
+
+```json
+{
+  "data": [
+    {
+      "id": "fp_id_XyEJ6CF7UNl6K2ymIq8YQS"
+    }
+  ],
+  "meta": {
+    "next": null,
+    "count": 1
+  }
+}
+```

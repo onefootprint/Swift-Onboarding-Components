@@ -1,218 +1,11 @@
 ---
 page: default
 category: Guides
-title: Vault PII, PCI, and more
-slug: /vault/apis
-meta: { title: 'Vault identity,
-      payment cards,
-      and anything sensitive', description: Footprint's vaulting APIs work seamlessly with and without our onboarding components }
+subcategory: Vaulting APIs
+title: Vault fields
+slug: /vault/fields
+meta: { title: 'Vaulting API fields' }
 ---
-
-Footprint vaults store three types of data: identity data, payment card data, and custom key-value data.
-
-### Identity
-
-Identity data that originates from user and business embedded onboarding flows (KYC and KYB) is verified with our decisioning platform and then vaulted. Identity data is comprised of specific attributes that are validated, vaulted, tokenized, and in some attribute types fingerprinted to become matchable. Identity vaults can also be standalone and provisioned via API or vault-proxy, which can be useful when migrating sensitive user data. Regardless of origination, the APIs are identical to provide unified secure PII vaulting. PII reserves the namespace of vault data identifiers prefixed with `id.`
-
-### Payment Cards
-
-In many financial applications, it's required to collect or store payment card data associated with users that your onboard (KYC or not). Footprint provides a PCI-compliant vaulting solution for payment card holder data like: card number, expiration authorization/security code (CVV), and more. The payment card vaulting APIs are consistent with all Footprint vaulting APIs and reserve a specific namespace of vault data identifiers: `card.`. Unlike identity data, users may have multiple cards, so you can give each card type an alias namespace such as `card.primary.`. Like identity data, card data is validated prior to vaulting.
-
-### Custom Key-Value
-
-Footprint also supports custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests. You can use custom data to **securely vault** any associated sensitive user or businesses in the vault using a unified vaulting API.
-
-### Setup and authentication
-
-Please ensure you are familiar with our [server-side API authentication guide](/integrate/api-authentication) to securely connect to the Footprint API from your backend.
-
-### Update a user vault
-
-```bash
-curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
-	-X PATCH \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-	-d '{
-			"custom.ach_account": "111122224444",
-			"card.primary.expiration": "10/2025",
-			"card.primary.cvc": "424"
-		}'
-```
-
-<inline-alert variant="info">
-  This endpoint has a JSON body limit of 32KB.
-</inline-alert>
-
-### Store large objects in a user vault
-
-For custom objects that are larger (up to 10MB), use the `POST /users/<fp_id>/vault/<data_identifier>/upload` API.
-
-```bash
-curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/custom.card_transaction_history/upload \
-	-X POST \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-	--data-binary @transactions.csv
-```
-
-The raw contents of body will be encrypted and stored in the user vault. Use the same decrypt method as defined below to retrieve the contents.
-
-<inline-alert variant="info">
-  Note that upon decryption, the raw contents of the large object are `base64`
-  encoded.
-</inline-alert>
-
-<inline-alert variant="info">
-  Note, multipart uploads for even larger objects are coming soon!
-</inline-alert>
-
-## List available data in a user's vault
-
-Check what fields exist on a user's vault.
-
-```bash
-curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault?fields=id.ssn9,custom.ach_account,card.primary.number \
-  	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
-```
-
-```json
-{
-  "id.ssn9": true,
-  "custom.ach_account": true,
-  "card.primary.number": true
-}
-```
-
-## Decrypt data from a user's vault
-
-Footprint’s API provides attribute-level decryption. API keys are configurable to have certain attribute-level scopes.
-
-```bash
-curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/decrypt \
-	-X POST \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-	-d '{
-			"fields": ["id.last_name", "id.dob", "id.ssn9", "custom.ach_account"],
-			"reason": "direct deposit verification"
-		}'
-```
-
-```json
-{
-  "id.last_name": "Doe",
-  "id.dob": "1988-12-25",
-  "id.ssn9": "121211212",
-  "custom.ach_account": "111122224444"
-}
-```
-
-## Search across users' vaults
-
-Footprint lets you search across all of your users' vaults by specific fields that are fingerprinted. This lets you easily search across all of your users vaults privately without building complicated decryption procedures.
-
-```bash
-curl https://api.onefootprint.com/users/search -X POST -d '{"search": "Doe"}' \
-  	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
-```
-
-```json
-{
-  "data": [
-    {
-      "id": "fp_id_XyEJ6CF7UNl6K2ymIq8YQS"
-    }
-  ],
-  "meta": {
-    "next": null,
-    "count": 1
-  }
-}
-```
-
-## Create "Standalone" user vaults
-
-In some circumstances, you may need to vault PII user data for users that did not onboard through Footprint's KYC/IDV flow. In this case, Footprint supports the concept of "Standalone" user vaults.
-
-Standalone Footprint user vaults can store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make searchable. Unstructured data are custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
-
-The first step is to create a new vault for one of your users.
-
-```bash
-curl https://api.onefootprint.com/users \
-	-X POST \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
-```
-
-```json
-{
-  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
-}
-```
-
-Save this `id` and associate it with the corresponding user in your database.
-
-### Initial data
-
-If you have initial data to seed in the vault, you may provide it in the HTTP body:
-
-```bash
-curl https://api.onefootprint.com/users \
-	-X POST \
-	-d '{
-		    "id.first_name": "Jane",
-		    "id.last_name": "Joe",
-		    "id.dob": "1988-12-30",
-			"id.ssn9": "12-121-1212",
-			"custom.ach_account": "111122224444"
-		}' \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
-```
-
-```json
-{
-  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
-}
-```
-
-### Idempotency ID
-
-To safely support retrying this `POST /user` request without creating a second user, we support an `x-idempotency-id` header. Requests made with the same `x-idempotency-id` value will no-op and return the same `fp_id`.
-
-If you are creating a user vault in Footprint for an existing user record in your database, we recommend using your user record's unique ID as the `x-idempotency-id` to guarantee that only one Footprint user vault is ever created per user.
-
-Note, when using `x-idempotency-id`, you are not able to provide initial data in the HTTP body.
-
-```bash
-curl https://api.onefootprint.com/users \
-	-X POST \
-	-H 'x-idempotency-id: my_user_id_1234'
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
-```
-
-```json
-{
-  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr"
-}
-```
-
-<inline-alert variant='info'>This value is safe to store in plaintext!</inline-alert>
-
-### Update a standalone user vault
-
-With the `id` given from creating a user, you may always update and add new data to your standalone vaults:
-
-```bash
-curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault \
-	-X PATCH \
-	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-	-d '{
-		    "id.email": "jane@acmebank.com",
-			"custom.ach_account": "111122224444"
-		}'
-```
-
-For listing, decrypting, and updating -- all the APIs above are identical for standalone user vaults.
-
-## Vault fields
 
 Footprint's vaulting aims to be flexible while providing base-level validation logic for structured vault data such as Identity or PCI data. Below we outline the allowed data identifiers and any validation rules enforced.
 
@@ -229,6 +22,7 @@ Note that not all fields may be populated in the vault.
 | `id.last_name`            | Last name                                                | Any valid UTF-8 string <1KB                                                            |
 | `id.ssn9`                 | Full SSN                                                 | 9-digit string (hyphens will be ignored and stripped out)                              |
 | `id.ssn4`                 | Last four of the SSN                                     | 4-digit string                                                                         |
+| `id.itin`                 | Individual taxpayer identification number                | 9-digit string beginning with a `9` (hyphens will be ignored and stripped out)         |
 | `id.dob`                  | Date of birth                                            | Formatted as `%Y-%m-%d`                                                                |
 | `id.address_line1`        | First line of the user's street address                  | Any valid UTF-8 string <1KB                                                            |
 | `id.address_line2`        | Second line of the user's street address                 | Any valid UTF-8 string <1KB                                                            |
@@ -311,15 +105,16 @@ If a document is uploaded during onboarding or vaulted via the API, the document
 
 Each individual card is assigned an alias by your application. Each card alias must match `^([A-Za-z0-9\-_]+)$`.
 
-| Data Identifier              | Description                                                      | Format                                                                                                                                                                                      |
-| ---------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `card.*.name`                | The name of the cardholder                                       | Any UTF-8 string <200B                                                                                                                                                                      |
-| `card.*.number`              | The full card number                                             | Valid credit or debit card number (length and Luhn check). Supports Visa, Mastercard, Amex, MIR, Diners Club, Discover, UnionPay, JCB, Visa Electron, Maestro, Forbrugsforeningen, Dankort. |
-| `card.*.cvc`                 | The verification code for the credit card                        | Valid 3- or 4-digit numeric code                                                                                                                                                            |
-| `card.*.expiration`          | The date at which the card expires                               | `MM/YYYY`. Accepts as input any of `MM/YYYY`, `MM-YYYY`, `MM/YY`, `MM-YY`, `M/YY`, or `M-YY`, and canonicalized as `MM/YYYY` before vaulting, with `MM/YY` interpreted as `MM/20YY`.        |
-| `card.*.billing_address.zip` | The billing ZIP code for the card                                | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                                                           |
-| `card.*.number_last4`        | The last four digits of the card number. Automatically populated | 4-digit string. Cannot be specified, can only be read.                                                                                                                                      |
-| `card.*.issuer`              | The issuer of the card. Automatically populated                  | One of `visa`, `master_card`, `amex`, `discover`, `mir`, `diners_club`, `union_pay`, `jcb`, `visa_electron`, `maestro`, `forbrugsforeningen`, `dankort`, or `unknown`                       |
+| Data Identifier                  | Description                                                      | Format                                                                                                                                                                                      |
+| -------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `card.*.name`                    | The name of the cardholder                                       | Any UTF-8 string <200B                                                                                                                                                                      |
+| `card.*.number`                  | The full card number                                             | Valid credit or debit card number (length and Luhn check). Supports Visa, Mastercard, Amex, MIR, Diners Club, Discover, UnionPay, JCB, Visa Electron, Maestro, Forbrugsforeningen, Dankort. |
+| `card.*.cvc`                     | The verification code for the credit card                        | Valid 3- or 4-digit numeric code                                                                                                                                                            |
+| `card.*.expiration`              | The date at which the card expires                               | `MM/YYYY`. Accepts as input any of `MM/YYYY`, `MM-YYYY`, `MM/YY`, `MM-YY`, `M/YY`, or `M-YY`, and canonicalized as `MM/YYYY` before vaulting, with `MM/YY` interpreted as `MM/20YY`.        |
+| `card.*.billing_address.zip`     | The billing ZIP code for the card                                | Postal code `^([A-Za-z0-9\- ]*)$`                                                                                                                                                           |
+| `card.*.billing_address.country` | The billing country for the card                                 | Any valid [ISO3166-alpha-2 Country Code](https://datahub.io/core/country-codes)                                                                                                             |
+| `card.*.number_last4`            | The last four digits of the card number. Automatically populated | 4-digit string. Cannot be specified, can only be read.                                                                                                                                      |
+| `card.*.issuer`                  | The issuer of the card. Automatically populated                  | One of `visa`, `master_card`, `amex`, `discover`, `mir`, `diners_club`, `union_pay`, `jcb`, `visa_electron`, `maestro`, `forbrugsforeningen`, `dankort`, or `unknown`                       |
 
 ### Custom fields
 
