@@ -196,7 +196,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
                 format!(
                     "{} {}",
                     req.method().as_str(),
-                    req.uri().path_and_query().map(|p| p.as_str()).unwrap_or("")
+                    req.match_pattern().unwrap_or("default".into())
                 )
             }
             // API errors don't end up in this branch. I'm not sure in what situations we have an Err here.
