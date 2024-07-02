@@ -15,6 +15,8 @@ use db::PgConn;
 use itertools::chain;
 use newtypes::AccessEventPurpose;
 use newtypes::TenantId;
+use rust_decimal::prelude::FromPrimitive;
+use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 use std::collections::HashMap;
 use std::ops::Add;
@@ -28,6 +30,17 @@ pub(crate) struct LineItem {
     pub product: Product,
     pub price: LineItemPrice,
     pub count: i64,
+}
+
+impl LineItem {
+    pub fn notional(&self) -> Option<Decimal> {
+        let LineItemPrice::Price(price) = &self.price else {
+            return None;
+        };
+        let count = Decimal::from_i64(self.count)?;
+        let notional = price.price_cents * count;
+        Some(notional)
+    }
 }
 
 #[derive(Debug, derive_more::From)]
@@ -87,6 +100,9 @@ impl BillingCounts {
                 Ok(LineItem { product, price, count })
             })
             .collect::<BResult<Vec<_>>>()?;
+
+        // For some legacy tenants, apply "minimum of" clauses. We'll be phasing these out in the future.
+        let results = apply_minimum_of(&profile.tenant_id, results);
 
         Ok(results)
     }
@@ -158,5 +174,118 @@ impl Add for BillingCounts {
             .map(|p| (p, a.get_count(p) + b.get_count(p)))
             .collect();
         BillingCounts(counts)
+    }
+}
+
+/// For a few legacy tenants, applies the "minimum of(x, y)" clauses.
+fn apply_minimum_of(tenant_id: &TenantId, line_items: Vec<LineItem>) -> Vec<LineItem> {
+    let minimums_product_bundles = match tenant_id.as_str() {
+        TenantId::GRID => vec![vec![Product::HotVaults], vec![Product::VaultsWithNonPci]],
+        TenantId::ARYEO => vec![
+            vec![
+                Product::VaultsWithNonPci,
+                Product::VaultsWithPci,
+                Product::HotProxyVaults,
+            ],
+            vec![Product::HotVaults],
+        ],
+        TenantId::BLOOM => vec![vec![Product::HotVaults], vec![Product::VaultsWithNonPci]],
+        _ => return line_items,
+    };
+    // Sum up the notionals of each line item for the bundles of products in the minimum clause
+    let products_with_notionals = minimums_product_bundles.into_iter().map(|products| {
+        let sum_for_products: Decimal = products
+            .iter()
+            .flat_map(|p| line_items.iter().find(|li| &li.product == p))
+            .flat_map(|li| li.notional())
+            .sum();
+        (products, sum_for_products)
+    });
+    // Then, remove the products from the bundle whose sum is the greatest
+    let products_to_remove = products_with_notionals
+        .max_by_key(|(_, notional)| *notional)
+        .map(|(p, _)| p)
+        .unwrap_or_default();
+    line_items
+        .into_iter()
+        .filter(|li| {
+            let should_keep = !products_to_remove.contains(&li.product);
+            if !should_keep {
+                tracing::info!(product=%li.product, notional=?li.notional(), "Removing line item from invoice for minimum of clause");
+            }
+            should_keep
+        })
+        .collect()
+}
+
+#[cfg(test)]
+mod test {
+    use super::apply_minimum_of;
+    use super::LineItem;
+    use super::LineItemPrice;
+    use crate::product::Product;
+    use crate::profile::PriceInfo;
+    use db::test_helpers::assert_have_same_elements;
+    use newtypes::TenantId;
+    use rust_decimal_macros::dec;
+    use std::str::FromStr;
+
+    #[test]
+    fn test_minimum_of() {
+        let li = |product, price, count| LineItem {
+            product,
+            price: LineItemPrice::Price(PriceInfo {
+                price_id: stripe::PriceId::from_str("price_xyz").unwrap(),
+                price_cents: price,
+            }),
+            count,
+        };
+
+        // Should filter out HotVaults
+        let line_items = vec![
+            li(Product::Kyc, dec!(3), 10), // Unrelated line item, should always be preserved
+            li(Product::HotVaults, dec!(15), 10), // 150c
+            li(Product::VaultsWithNonPci, dec!(3), 20), // 60c
+            li(Product::VaultsWithPci, dec!(3), 20), // 60c
+        ];
+        let tenant_id = TenantId::from_str(TenantId::ARYEO).unwrap();
+        let line_items = apply_minimum_of(&tenant_id, line_items);
+        assert_have_same_elements(
+            line_items.iter().map(|li| li.product).collect(),
+            vec![Product::Kyc, Product::VaultsWithNonPci, Product::VaultsWithPci],
+        );
+
+        // Should filter out NonPci + Pci
+        let line_items = vec![
+            li(Product::Kyc, dec!(3), 10), // Unrelated line item, should always be preserved
+            li(Product::HotVaults, dec!(10), 10), // 100c
+            li(Product::VaultsWithNonPci, dec!(3), 20), // 60c
+            li(Product::VaultsWithPci, dec!(3), 20), // 60c
+        ];
+        let tenant_id = TenantId::from_str(TenantId::ARYEO).unwrap();
+        let line_items = apply_minimum_of(&tenant_id, line_items);
+        assert_have_same_elements(
+            line_items.iter().map(|li| li.product).collect(),
+            vec![Product::Kyc, Product::HotVaults],
+        );
+
+        // No minimum of for other tenants
+        let line_items = vec![
+            li(Product::Kyc, dec!(3), 10), // Unrelated line item, should always be preserved
+            li(Product::HotVaults, dec!(10), 10), // 100c
+            li(Product::VaultsWithNonPci, dec!(3), 20), // 60c
+            li(Product::VaultsWithPci, dec!(3), 20), // 60c
+        ];
+        let tenant_id = TenantId::from_str("flerp").unwrap();
+        let line_items = apply_minimum_of(&tenant_id, line_items);
+        assert_have_same_elements(
+            line_items.iter().map(|li| li.product).collect(),
+            vec![
+                Product::Kyc,
+                Product::HotVaults,
+                Product::VaultsWithNonPci,
+                Product::VaultsWithPci,
+            ],
+        );
     }
 }

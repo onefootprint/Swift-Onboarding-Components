@@ -11,7 +11,6 @@ use newtypes::StripeCustomerId;
 use newtypes::TenantId;
 use product::RevenueCategory;
 use profile::BillingProfile;
-use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
@@ -197,15 +196,8 @@ impl BillingClient {
         let line_items = info.counts.line_items(&profile)?;
         let monthly_spend_cents: Decimal = line_items
             .iter()
-            .filter(|r| r.product.applies_to_monthly_minimum())
-            .flat_map(|r| {
-                let LineItemPrice::Price(price) = &r.price else {
-                    return None;
-                };
-                let count = Decimal::from_i64(r.count)?;
-                let notional = price.price_cents * count;
-                Some(notional)
-            })
+            .filter(|li| li.product.applies_to_monthly_minimum())
+            .flat_map(|li| li.notional())
             .sum();
 
         // Create the invoice items in stripe, including monthly minimum
