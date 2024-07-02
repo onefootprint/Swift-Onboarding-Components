@@ -49,11 +49,6 @@ describe('<Preview />', () => {
     expect(screen.getAllByText('SSN').length).toBe(1);
   });
 
-  it('should not show ID doc when not id doc is not selected', () => {
-    renderForm({ startingValues: { personal: { idDoc: false } } });
-    expect(screen.queryAllByText('ID document scan').length).toBe(0);
-  });
-
   it('should show correct title for KYC flow', () => {
     renderForm({ kind: PlaybookKind.Kyc });
     expect(screen.getByText('Personal information')).toBeInTheDocument();
@@ -108,109 +103,5 @@ describe('<Preview />', () => {
     });
     const basicInfo = screen.getByText('Basic information');
     expect(basicInfo).toBeInTheDocument();
-  });
-
-  it('should show doc first flow option if firm employee and ID doc kind exists and kind is KYC', async () => {
-    asAdminUserFirmEmployee();
-    renderForm({
-      kind: PlaybookKind.Kyc,
-      startingValues: {
-        personal: {
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.driversLicense],
-        },
-      },
-    });
-
-    const checkbox = screen.getByRole('checkbox', {
-      name: 'Use document scan to autofill basic identity data',
-    });
-    expect(checkbox).toBeInTheDocument();
-  });
-  it('should show doc first flow option if flexcar employee', async () => {
-    asAdminUserInOrg('flexcar');
-    renderForm({
-      kind: PlaybookKind.Kyc,
-      startingValues: {
-        personal: {
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.driversLicense],
-        },
-      },
-    });
-
-    const checkbox = screen.getByRole('checkbox', {
-      name: 'Use document scan to autofill basic identity data',
-    });
-    expect(checkbox).toBeInTheDocument();
-  });
-
-  it('should NOT doc first flow option if firm employee and ID doc kind exists BUT kind is KYB', async () => {
-    asAdminUserFirmEmployee();
-    renderForm({
-      kind: PlaybookKind.Kyb,
-      startingValues: {
-        personal: {
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.driversLicense],
-        },
-      },
-    });
-    expect(
-      screen.queryByRole('checkbox', {
-        name: 'Use document scan to autofill basic identity data',
-      }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole(
-        'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
-      ),
-    ).not.toBeInTheDocument();
-  });
-
-  it('should not show doc first flow option if firm employee but no ID doc kind shown', async () => {
-    asAdminUserFirmEmployee();
-    renderForm({
-      kind: PlaybookKind.Kyc,
-      startingValues: {
-        personal: {
-          idDoc: true,
-          idDocKind: [],
-        },
-      },
-    });
-    expect(
-      screen.queryByRole('checkbox', {
-        name: 'Use document scan to autofill basic identity data',
-      }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole(
-        'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
-      ),
-    ).not.toBeInTheDocument();
-  });
-
-  it('should not show doc first flow option if non-firm employee', async () => {
-    asAdminUser();
-    renderForm({
-      kind: PlaybookKind.Kyc,
-      startingValues: {
-        personal: {
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.driversLicense, SupportedIdDocTypes.idCard],
-        },
-      },
-    });
-    expect(
-      screen.queryByRole('checkbox', {
-        name: 'Use document scan to autofill basic identity data',
-      }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole(
-        'Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan.',
-      ),
-    ).not.toBeInTheDocument();
   });
 });

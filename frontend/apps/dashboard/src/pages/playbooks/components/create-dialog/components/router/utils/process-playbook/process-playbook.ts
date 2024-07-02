@@ -144,13 +144,11 @@ const processPlaybook = ({
   const isNoPhoneFlow = !personal[CollectedKycDataOption.phoneNumber] && !isIdDocOnly(kind);
 
   // id doc handling
-  const { idDoc, idDocKind, selfie, idDocFirst, countrySpecificIdDocKind } = personal;
-  const docString = selfie ? 'document_and_selfie' : 'document';
-  if (idDoc && (idDocKind?.length > 0 || Object.keys(countrySpecificIdDocKind).length > 0)) {
-    mustCollectData.push(docString);
+  const { global = [], country, selfie, idDocFirst } = personal.docs;
+  const hasIdDocuments = global.length > 0 || Object.keys(country).length > 0;
+  if (hasIdDocuments) {
+    mustCollectData.push(selfie ? 'document_and_selfie' : 'document');
   }
-
-  const isDocFirstFlow = (idDocFirst && idDoc && idDocKind?.length > 0) ?? false;
 
   // investor profile handling
   if (playbook?.[CollectedInvestorProfileDataOption.investorProfile] && isKyc(kind)) {
@@ -163,14 +161,14 @@ const processPlaybook = ({
   // assuming canAccess = mustCollect + optional
   const canAccessData = mustCollectData.concat(optionalData);
   const documentTypesAndCountries = {
-    countrySpecific: countrySpecificIdDocKind,
-    global: idDocKind,
+    countrySpecific: country,
+    global: global,
   };
   const skipConfirm = isIdDocOnly(kind);
 
   return {
     canAccessData,
-    isDocFirstFlow,
+    isDocFirstFlow: idDocFirst,
     isNoPhoneFlow,
     mustCollectData,
     name,

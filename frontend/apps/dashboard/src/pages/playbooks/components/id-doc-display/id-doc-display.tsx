@@ -1,5 +1,6 @@
 // TODO: Deprecate this file
 
+import { Color } from '@onefootprint/design-tokens';
 import { IcoCloseSmall24 } from '@onefootprint/icons';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
 import { Text, Tooltip } from '@onefootprint/ui';
@@ -10,14 +11,13 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 export type IdDocDisplayProps = {
+  textColor?: Color;
   idDocKind: SupportedIdDocTypes[];
   threshold?: number;
 };
 
-const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.playbooks.collected-data',
-  });
+const IdDocDisplay = ({ idDocKind, threshold = 3, textColor = 'primary' }: IdDocDisplayProps) => {
+  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks.collected-data' });
 
   if (idDocKind.length === 0) {
     return <IcoCloseSmall24 />;
@@ -44,19 +44,24 @@ const IdDocDisplay = ({ idDocKind, threshold = 3 }: IdDocDisplayProps) => {
 
     return (
       <DocPreviewContainer>
-        <Text variant="body-3" whiteSpace="nowrap">
+        <Text variant="body-3" whiteSpace="nowrap" color={textColor}>
           {threshold === 3 ? displayStringFirstTwo : displayStringFirst}
         </Text>
         <Tooltip text={remainingDocString} alignment="center" position="bottom">
-          <Text variant="body-3" textDecoration="underline" whiteSpace="nowrap">
+          <Text variant="body-3" textDecoration="underline" whiteSpace="nowrap" color={textColor}>
             {`${remainingIdDocTypes.length} ${t('more')}`}
           </Text>
         </Tooltip>
       </DocPreviewContainer>
     );
   }
+
   const possibleIdDocs = idDocKind.map(k => t(`${kebabCase(k as string)}` as ParseKeys<'common'>)).join(', ');
-  return <Text variant="body-3">{possibleIdDocs}</Text>;
+  return (
+    <Text variant="body-3" color={textColor}>
+      {possibleIdDocs}
+    </Text>
+  );
 };
 
 const DocPreviewContainer = styled.div`

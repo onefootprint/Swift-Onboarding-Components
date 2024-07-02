@@ -1,5 +1,5 @@
 import { CollectedKybDataOption } from '@onefootprint/types';
-import { Box, Checkbox, Divider, Text } from '@onefootprint/ui';
+import { Box, Divider, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,6 @@ import { OnboardingTemplate, PlaybookKind } from '@/playbooks/utils/machine/type
 
 import { isKyb } from 'src/pages/playbooks/utils/kind';
 import PreviewHeader from './components/preview-header';
-import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
 
 type PreviewProps = {
   onStartEditing: () => void;
@@ -20,10 +19,9 @@ type PreviewProps = {
 
 const Preview = ({ onStartEditing, meta }: PreviewProps) => {
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.person' });
-  const { getValues, register } = useFormContext();
+  const { getValues } = useFormContext();
   const values: Personal = getValues('personal');
   const collectBO = getValues(`businessInformation.${CollectedKybDataOption.beneficialOwners}`);
-  const isIdDocOnlyFirstFlowEnabled = useIdDocFirstFlowEnabled(meta.kind === PlaybookKind.Kyc);
   const showNonUsResidentsEmptyState =
     meta.residency?.allowInternationalResidents === false || meta.kind === PlaybookKind.Kyb;
   const showUsResidentsEmptyState = meta.residency?.allowUsResidents === false;
@@ -84,15 +82,6 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
           />
         )}
       </FormElementsContainer>
-      {isIdDocOnlyFirstFlowEnabled && !isFixedPlaybook && (
-        <Subsection>
-          <Checkbox
-            label={t('id-doc-first.label')}
-            hint={t('id-doc-first.hint')}
-            {...register('personal.idDocFirst')}
-          />
-        </Subsection>
-      )}
       {allowUsTerritoryResidents && (
         <footer>
           <Box marginTop={5} marginBottom={5}>
@@ -123,14 +112,6 @@ const FormElementsContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[8]};
-  `}
-`;
-
-const Subsection = styled.div`
-  ${({ theme }) => css`
-    border-top: ${theme.borderWidth[1]} ${theme.borderColor.tertiary} dashed;
-    padding-top: ${theme.spacing[5]};
-    gap: ${theme.spacing[2]};
   `}
 `;
 

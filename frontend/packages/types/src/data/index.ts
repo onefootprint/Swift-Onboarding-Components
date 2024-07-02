@@ -17,7 +17,6 @@ export { ActorKind } from './actor';
 export type { AmlDetail, AmlHit, AmlHitMedia } from './aml-detail';
 export type { Annotation, AnnotationSource } from './annotation';
 export type { ApiKey } from './api-key';
-export { default as AuthMethodKind } from './auth-method';
 export type { BeneficialOwner } from './beneficial-owner';
 export { BeneficialOwnerDataAttribute } from './beneficial-owner';
 export type { BiometricLoginChallengeJson } from './biometric-login-challenge-json';
@@ -144,6 +143,7 @@ export type {
   AuthEventAttestationDeviceType,
 } from './auth-event';
 export { IdentifyScope, AuthEventKind } from './auth-event';
+export { AuthMethodKind } from './auth-method';
 export type { LivenessCheckInfo } from './liveness-check-info';
 export type { MatchSignal } from './match-signal';
 export { MatchLevel } from './match-signal';
@@ -248,6 +248,7 @@ export {
   LivenessIssuer,
   WatchlistCheckReasonCode,
   WatchlistCheckStatus,
+  AuthMethodAction,
 } from './timeline';
 export { default as UsLegalStatus } from './us-legal-status';
 export type { UserInsights } from './user-insights';

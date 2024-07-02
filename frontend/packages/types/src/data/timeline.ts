@@ -1,7 +1,7 @@
 import type { WorkflowRequestConfig } from '../api/entity-actions';
 import type { Actor } from './actor';
 import type { Annotation } from './annotation';
-import type AuthMethodKind from './auth-method';
+import type { AuthMethodKind } from './auth-method';
 import type {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,

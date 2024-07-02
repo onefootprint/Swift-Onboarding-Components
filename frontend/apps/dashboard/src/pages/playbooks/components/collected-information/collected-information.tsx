@@ -8,15 +8,16 @@ import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { Option } from './collected-information.types';
-import CountrySpecificDocDisplay from './components/country-specific-doc-display';
 import DisplayValue from './components/display-value';
 
 type DisplayValueProps = ComponentProps<typeof DisplayValue>;
+
 type CollectedInformationProps = {
   title?: string;
   subtitle?: string;
   options?: Option;
 };
+
 const CollectedInformation = ({ title, subtitle, options }: CollectedInformationProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.collected-data',
@@ -33,16 +34,6 @@ const CollectedInformation = ({ title, subtitle, options }: CollectedInformation
         <OptionsContainer>
           {Object.entries(options).map(([name, value]) => {
             if (value == null || value === undefined) return null;
-            if (name === 'countrySpecificIdDocKind') {
-              const hasCountrySpecificIdDocKind = Object.keys(value).length > 0;
-              if (!hasCountrySpecificIdDocKind) return null;
-              return (
-                <CountrySpecificDocDisplay
-                  key={name}
-                  countryDocMappings={value as Partial<Record<CountryCode, SupportedIdDocTypes[]>>}
-                />
-              );
-            }
             return (
               <OptionItem key={name} role="row" aria-label={t(kebabCase(name) as ParseKeys<'common'>)}>
                 <Label variant="body-3" color="tertiary">

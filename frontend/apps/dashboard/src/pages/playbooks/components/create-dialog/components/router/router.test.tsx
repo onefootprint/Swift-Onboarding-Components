@@ -17,25 +17,42 @@ describe('<Router />', () => {
       it('should create an onboarding config and show a confirmation', async () => {
         const onCreate = jest.fn();
         withCreateOnboardingConfigs();
+
         renderRouter({ onCreate });
 
         // Who to onboard
+        const step1Title = screen.getByText('What type of playbook would you like to create?');
+        expect(step1Title).toBeInTheDocument();
         await moveForward();
 
         // Templates
+        const step2Title = screen.getByText('Configure your own KYC settings or select a pre-defined template.');
+        expect(step2Title).toBeInTheDocument();
         await moveForward();
 
         // Residency
+        const step3Title = screen.getByText('Select the countries from which your users may onboard.');
+        expect(step3Title).toBeInTheDocument();
         await moveForward();
 
         // Name
+        const step4Title = screen.getByText('Name your playbook');
+        expect(step4Title).toBeInTheDocument();
         await enterName('KYC');
         await moveForward();
 
-        // Summary
+        // Settings
+        const step5Title = screen.getByText(
+          "Here's our recommended Playbook configuration. Feel free to edit it to better suit your needs.",
+        );
+        expect(step5Title).toBeInTheDocument();
         await moveForward();
 
         // AML
+        const step6Title = screen.getByText(
+          'Configure which verification checks will be performed with the collected identity data.',
+        );
+        expect(step6Title).toBeInTheDocument;
         await createPlaybook();
 
         await waitFor(() => {

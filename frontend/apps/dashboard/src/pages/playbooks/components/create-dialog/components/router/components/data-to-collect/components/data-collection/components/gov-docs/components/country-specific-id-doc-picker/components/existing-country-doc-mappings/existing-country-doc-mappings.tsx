@@ -1,11 +1,9 @@
-// @ts-nocheck
-
 import { getCountryNameFromCode } from '@onefootprint/global-constants';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import { Flag, Grid, LinkButton, Stack, Text } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import useIdDocText from 'src/hooks/use-id-doc-text';
 
 type ExistingCountryDocMappingsProps = {
   countryDocMappings: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
@@ -13,43 +11,41 @@ type ExistingCountryDocMappingsProps = {
 };
 
 const ExistingCountryDocMappings = ({ onEdit, countryDocMappings }: ExistingCountryDocMappingsProps) => {
+  const { t } = useTranslation('common');
+  const getText = useIdDocText();
   const existingCountries = Object.keys(countryDocMappings);
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.id-doc',
-  });
 
-  const getDocNames = (docTypes: SupportedIdDocTypes[]) =>
-    docTypes.map(docType => t(docType as unknown as ParseKeys<`common`>)).join(', ');
+  const getDocNames = (docs: SupportedIdDocTypes[]) => {
+    return docs.map(getText).join(', ');
+  };
 
   return (
     <Stack direction="column" gap={1}>
       {existingCountries.map(country => (
         <Grid.Container
           columns={['24px', 'auto', '2fr', '32px']}
-          templateAreas={['flag, country, docs, link']}
+          templateAreas={['flag country docs link']}
           alignItems="center"
           key={country}
           paddingTop={3}
           paddingBottom={3}
           gap={3}
         >
-          <Grid.Item area="flag">
+          <Grid.Item gridArea="flag">
             <Flag code={country as CountryCode} />
           </Grid.Item>
-          <Grid.Item area="country" overflow="hidden">
+          <Grid.Item gridArea="country" overflow="hidden">
             <Text variant="label-3" truncate>
               {getCountryNameFromCode(country as CountryCode)}:
             </Text>
           </Grid.Item>
-          <Grid.Item area="docs" overflow="hidden">
+          <Grid.Item gridArea="docs" overflow="hidden">
             <Text variant="body-3" truncate>
               {getDocNames(countryDocMappings[country as CountryCode] ?? [])}
             </Text>
           </Grid.Item>
-          <Grid.Item area="link">
-            <LinkButton onClick={() => onEdit(country as CountryCode)}>
-              {t('sections.country-specific.edit')}
-            </LinkButton>
+          <Grid.Item>
+            <LinkButton onClick={() => onEdit(country as CountryCode)}>{t('edit')}</LinkButton>
           </Grid.Item>
         </Grid.Container>
       ))}

@@ -5,9 +5,7 @@ import { SupportedIdDocTypes } from '@onefootprint/types';
 import { useTranslation } from 'react-i18next';
 
 const useIdDocOptions = (country: CountryRecord) => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.id-doc',
-  });
+  const { t } = useTranslation('common', { keyPrefix: 'id_document' });
   const options = [];
   if (country.driversLicense) {
     options.push({

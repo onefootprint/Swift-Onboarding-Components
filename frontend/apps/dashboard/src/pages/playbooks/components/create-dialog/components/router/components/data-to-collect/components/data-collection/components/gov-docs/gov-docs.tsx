@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -7,7 +5,7 @@ import CountrySpecificIdDocPicker from './components/country-specific-id-doc-pic
 import ExtraRequirements from './components/extra-requirements';
 import GlobalIdDocPicker from './components/global-id-doc-picker';
 
-const Document = () => (
+const GovDocs = () => (
   <Container>
     <Section>
       <GlobalIdDocPicker />
@@ -37,4 +35,4 @@ const Section = styled.div`
   `};
 `;
 
-export default Document;
+export default GovDocs;

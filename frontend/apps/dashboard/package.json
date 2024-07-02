@@ -102,6 +102,7 @@
       "@/entities/(.*)": "<rootDir>/src/components/entities/$1",
       "@/entity/(.*)": "<rootDir>/src/components/entities/components/details/$1",
       "@/playbooks/(.*)": "<rootDir>/src/pages/playbooks/$1",
+      "@/create-playbook/*": "<rootDir>/src/pages/playbooks/components/create-dialog/$1",
       "@/lists/(.*)": "<rootDir>/src/pages/lists/$1",
       "\\.css$": "<rootDir>/emptyModule.js"
     },

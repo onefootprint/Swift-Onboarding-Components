@@ -67,10 +67,6 @@
       "data-collection": {
         "alert": "Only a beneficial owner can verify a business. A beneficial owner is anyone who owns at least 25% of the business."
       },
-      "toggle-panel": {
-        "add": "Add",
-        "remove": "Remove"
-      },
       "person": {
         "title": {
           "kyb": {
@@ -116,10 +112,6 @@
           "label": "Request a selfie",
           "hint": "You can optionally request users to take a selfie to validate the ID document requested."
         },
-        "id-doc-first": {
-          "label": "Use document scan to autofill basic identity data",
-          "hint": "Normally, users scan their documents after typing in their personal data. This configuration allows us to pre-fill the personal data based on OCRed information after they do the scan."
-        },
         "us-legal-status": {
           "title": "Legal status",
           "label": "Request users to provide their legal status in the U.S."
@@ -134,36 +126,8 @@
       "id-doc": {
         "title": "ID document scan",
         "toggle": "Request users to scan an ID document",
-        "drivers_license": "Driver's license",
-        "id_card": "Identity card",
-        "passport": "Passport (photo page)",
-        "visa": "Visa",
-        "residence_document": "Residence card",
-        "permit": "Work permit",
-        "voter_identification": "Voter identification",
-        "proof_of_address": "Proof of address",
-        "passport_card": "Passport card",
         "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
-        "no-id-doc-selected": "You must select at least one ID document type.",
-        "sections": {
-          "global": {
-            "title": "Globally accepted documents"
-          },
-          "country-specific": {
-            "title": "Country-specific requirements",
-            "subtitle": "You can select documents for specific countries, overriding global settings.",
-            "add": "Add",
-            "add-more": "Add more",
-            "edit": "Edit",
-            "save": "Save",
-            "cancel": "Cancel",
-            "delete": "Delete"
-          },
-          "extra-requirements": {
-            "title": "Extra requirements",
-            "request-selfie": "Request a selfie after ID upload"
-          }
-        }
+        "no-id-doc-selected": "You must select at least one ID document type."
       },
       "business-information": {
         "editing": {
@@ -204,6 +168,8 @@
       "investor-profile": {
         "title": "Investor profile questions",
         "subtitle": "If you're a brokerage company, for instance, you're required to ask investor profile questions.",
+        "add": "Add",
+        "remove": "Remove",
         "done": "Done",
         "questions": {
           "employment-status": "What's your employment status and occupation?",
@@ -233,6 +199,33 @@
         "passkeys-more": {
           "title": "More about passkeys",
           "content": "Passkey authentication simplifies the login process on iOS and Android devices, eliminating the need for traditional passwords. \nWhen we detect an already onboarded user wants to log-in, we will prompt them with a passkey challenge to sign-in to your platform. \nThis means fewer password-related headaches and enhanced security for all your customers’ online accounts. \nThis service has a cost based on the number of auth'd users."
+        }
+      },
+      "docs": {
+        "title": "Collect government-issued ID",
+        "description": "Request that users submit scanned IDs",
+        "global": {
+          "title": "Globally accepted documents"
+        },
+        "country-specific": {
+          "title": "Country-specific requirements",
+          "subtitle": "You can select documents for specific countries, overriding global settings.",
+          "add": "Add",
+          "add-more": "Add more",
+          "edit": "Edit",
+          "save": "Save",
+          "cancel": "Cancel",
+          "delete": "Delete"
+        },
+        "list": {
+          "add": "and",
+          "more": "{{count}} more"
+        },
+        "extra-requirements": {
+          "title": "Extra requirements",
+          "selfie": {
+            "title": "Request a selfie after ID upload"
+          }
         }
       }
     },

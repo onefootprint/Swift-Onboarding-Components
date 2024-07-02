@@ -8,7 +8,8 @@ import { type DataToCollectMeta, OnboardingTemplate } from '@/playbooks/utils/ma
 
 import Auth from './components/auth';
 import Business from './components/business';
-import Document from './components/document';
+import GovDocs from './components/gov-docs';
+import GovDocsWithPanel from './components/gov-docs-with-panel';
 import Investor from './components/investor';
 import Person from './components/person';
 
@@ -33,7 +34,7 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
   if (isIdDocOnly(meta.kind)) {
     return (
       <Container>
-        <Document />
+        <GovDocs />
       </Container>
     );
   }
@@ -42,6 +43,7 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
     <Container>
       {isKyb(meta.kind) && <Business />}
       <Person meta={meta} />
+      <GovDocsWithPanel />
       {isKyc(meta.kind) && isCustom && <Investor />}
       {isKyb(meta.kind) && <InlineAlert variant="info">{t('alert')}</InlineAlert>}
     </Container>

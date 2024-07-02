@@ -169,11 +169,12 @@ export type Personal = {
   [CollectedKycDataOption.address]: boolean;
   ssn: boolean;
   ssnKind?: CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9;
-  idDoc: boolean;
-  idDocKind: SupportedIdDocTypes[];
-  countrySpecificIdDocKind: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
-  idDocFirst?: boolean;
-  selfie?: boolean;
+  docs: {
+    global: SupportedIdDocTypes[];
+    country: Partial<Record<CountryCode, SupportedIdDocTypes[]>>;
+    selfie?: boolean;
+    idDocFirst?: boolean;
+  };
   ssnOptional?: boolean;
   usTaxIdAcceptable?: boolean;
 };
@@ -209,9 +210,11 @@ export const defaultPlaybookValuesAuth = {
       phone_number: true,
       dob: false,
       full_address: false,
-      idDoc: false,
-      idDocKind: [],
-      countrySpecificIdDocKind: {},
+      docs: {
+        global: [],
+        country: {},
+        selfie: true,
+      },
       name: false,
       ssn: false,
       us_legal_status: false,
@@ -232,10 +235,11 @@ export const defaultPlaybookValuesKYC: DataToCollectFormData = {
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.usLegalStatus]: false,
     email: true,
-    idDoc: false,
-    idDocKind: [],
-    countrySpecificIdDocKind: {},
-    selfie: true,
+    docs: {
+      global: [],
+      country: {},
+      selfie: true,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
   },
@@ -250,10 +254,11 @@ export const defaultPlaybookValuesAlpaca: DataToCollectFormData = {
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.usLegalStatus]: true,
     email: true,
-    idDoc: false,
-    idDocKind: [],
-    countrySpecificIdDocKind: {},
-    selfie: false,
+    docs: {
+      global: [],
+      country: {},
+      selfie: true,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
   },
@@ -268,10 +273,11 @@ export const defaultPlaybookValuesApex: DataToCollectFormData = {
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.usLegalStatus]: true,
     email: true,
-    idDoc: false,
-    idDocKind: [],
-    countrySpecificIdDocKind: {},
-    selfie: false,
+    docs: {
+      global: [],
+      country: {},
+      selfie: true,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
   },
@@ -286,18 +292,19 @@ export const defaultPlaybookValuesTenantScreening: DataToCollectFormData = {
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.usLegalStatus]: false,
     email: true,
-    idDoc: true,
-    idDocKind: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.passportCard,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-    ],
-    countrySpecificIdDocKind: {},
-    selfie: true,
+    docs: {
+      global: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.passport,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.residenceDocument,
+        SupportedIdDocTypes.passportCard,
+        SupportedIdDocTypes.visa,
+        SupportedIdDocTypes.workPermit,
+      ],
+      country: {},
+      selfie: false,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
     ssnOptional: true,
@@ -312,12 +319,13 @@ export const defaultPlaybookValuesCarRental: DataToCollectFormData = {
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.usLegalStatus]: false,
     email: true,
-    idDoc: true,
-    idDocKind: [SupportedIdDocTypes.driversLicense],
-    countrySpecificIdDocKind: {},
-    selfie: true,
+    docs: {
+      global: [SupportedIdDocTypes.driversLicense],
+      country: {},
+      selfie: false,
+      idDocFirst: true,
+    },
     ssn: false,
-    idDocFirst: true,
   },
 };
 
@@ -329,19 +337,20 @@ export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
     [CollectedKycDataOption.phoneNumber]: true,
     [CollectedKycDataOption.usLegalStatus]: false,
     email: true,
-    idDoc: false,
-    idDocKind: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passportCard,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.workPermit,
-      SupportedIdDocTypes.voterIdentification,
-    ],
-    countrySpecificIdDocKind: {},
-    selfie: true,
+    docs: {
+      global: [
+        SupportedIdDocTypes.driversLicense,
+        SupportedIdDocTypes.passport,
+        SupportedIdDocTypes.idCard,
+        SupportedIdDocTypes.passportCard,
+        SupportedIdDocTypes.visa,
+        SupportedIdDocTypes.residenceDocument,
+        SupportedIdDocTypes.workPermit,
+        SupportedIdDocTypes.voterIdentification,
+      ],
+      country: {},
+      selfie: false,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
     ssnOptional: true,
@@ -352,10 +361,11 @@ export const defaultPlaybookValuesIdDoc: DataToCollectFormData = {
   kind: PlaybookKind.IdDoc,
   personal: {
     email: false,
-    idDoc: true,
-    idDocKind: [],
-    countrySpecificIdDocKind: {},
-    selfie: false,
+    docs: {
+      global: [],
+      country: {},
+      selfie: true,
+    },
     ssn: false,
     [CollectedKycDataOption.phoneNumber]: false,
     [CollectedKycDataOption.dob]: false,

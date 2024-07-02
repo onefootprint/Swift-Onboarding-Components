@@ -14,6 +14,7 @@
       "@/entities/*": ["./src/components/entities/*"],
       "@/entity/*": ["./src/components/entities/components/details/*"],
       "@/playbooks/*": ["./src/pages/playbooks/*"],
+      "@/create-playbook/*": ["./src/pages/playbooks/components/create-dialog/*"],
       "@/lists/*": ["./src/pages/lists/*"]
     }
   }

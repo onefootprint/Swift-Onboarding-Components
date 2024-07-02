@@ -18,6 +18,9 @@
   "close": "Close",
   "back": "Back",
   "next": "Next",
+  "add": "Add",
+  "remove": "Remove",
+  "add-more": "Add more",
   "complete": "Complete",
   "create": "Create",
   "cancel": "Cancel",
@@ -38,7 +41,6 @@
   },
   "id_document": {
     "id_card": "ID card",
-    "driver_license": "Driver's license",
     "drivers_license": "Driver's license",
     "passport": "Passport",
     "visa": "Visa",
@@ -50,7 +52,8 @@
     "utility_bill": "Utility Bill",
     "bank_statement": "Bank Statement",
     "proof_of_address": "Proof of Address",
-    "passport_card": "Passport card"
+    "passport_card": "Passport card",
+    "custom": "Custom"
   },
   "di": {
     "id": {
@@ -1631,9 +1634,11 @@
           },
           "auth-method-updated": {
             "user": "User",
-            "replace": "updated the <b>{{kind}}</b> used as a Footprint login method",
-            "add_primary": "registered <b>{{kind}}</b> as a Footprint login method",
-            "method": {
+            "action": {
+              "replace": "updated the <b>{{kind}}</b> used as a Footprint login method",
+              "add_primary": "registered <b>{{kind}}</b> as a Footprint login method"
+            },
+            "kind": {
               "phone": "Phone number",
               "email": "Email",
               "passkey": "Passkey"

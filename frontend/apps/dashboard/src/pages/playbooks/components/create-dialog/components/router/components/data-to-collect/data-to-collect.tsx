@@ -28,8 +28,8 @@ const DataToCollect = ({ meta, onSubmit, onBack, defaultValues, isLastStep, isLo
   const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect' });
   const formMethods = useForm<DataToCollectFormData>({ defaultValues });
   const { handleSubmit, watch } = formMethods;
-  const selectedGlobalDocs = watch('personal.idDocKind');
-  const selectedCountrySpecificDocs = watch('personal.countrySpecificIdDocKind');
+  const selectedGlobalDocs = watch('personal.docs.global');
+  const selectedCountrySpecificDocs = watch('personal.docs.country');
 
   const onboardingTemplateToSubtitleMap = {
     [OnboardingTemplate.Custom]: t('subtitle.default'),

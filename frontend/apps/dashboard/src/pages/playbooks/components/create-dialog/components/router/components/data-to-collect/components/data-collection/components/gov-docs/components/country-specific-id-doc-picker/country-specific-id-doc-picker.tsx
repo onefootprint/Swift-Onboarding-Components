@@ -12,10 +12,11 @@ import Picker from './components/picker';
 
 const CountrySpecificIdDocPicker = () => {
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.id-doc.sections.country-specific',
+    keyPrefix: 'create.data-to-collect.docs.country-specific',
   });
+  const { t: allT } = useTranslation('common');
   const { watch, setValue } = useFormContext();
-  const countryDocMap = watch('personal.countrySpecificIdDocKind');
+  const countryDocMap = watch('personal.docs.country');
   const existingCountries = Object.keys(countryDocMap);
   const isEmptyMap = existingCountries.length === 0;
   const [showPicker, setShowPicker] = useState(false);
@@ -28,7 +29,7 @@ const CountrySpecificIdDocPicker = () => {
     setEditingCountryDocMap({ [country]: selectedDocs });
     const newMap = { ...countryDocMap };
     delete newMap[country];
-    setValue('personal.countrySpecificIdDocKind', newMap);
+    setValue('personal.docs.country', newMap);
     setShowPicker(true);
   };
 
@@ -41,14 +42,14 @@ const CountrySpecificIdDocPicker = () => {
     setShowPicker(false);
     const newMap = { ...countryDocMap, [newCountry]: newDocs };
     setEditingCountryDocMap(undefined);
-    setValue('personal.countrySpecificIdDocKind', newMap);
+    setValue('personal.docs.country', newMap);
   };
 
   const handleCancel = () => {
     setShowPicker(false);
     const newMap = { ...countryDocMap, ...editingCountryDocMap };
     setEditingCountryDocMap(undefined);
-    setValue('personal.countrySpecificIdDocKind', newMap);
+    setValue('personal.docs.country', newMap);
   };
 
   const handleRemove = (country: CountryCode) => {
@@ -56,7 +57,7 @@ const CountrySpecificIdDocPicker = () => {
     const newMap = { ...countryDocMap };
     delete newMap[country];
     setEditingCountryDocMap(undefined);
-    setValue('personal.countrySpecificIdDocKind', newMap);
+    setValue('personal.docs.country', newMap);
   };
 
   return (
@@ -76,7 +77,7 @@ const CountrySpecificIdDocPicker = () => {
           />
         ) : (
           <LinkButton onClick={handleAdd} iconComponent={IcoPlusSmall16} iconPosition="left">
-            {isEmptyMap ? t('add') : t('add-more')}
+            {isEmptyMap ? allT('add') : allT('add-more')}
           </LinkButton>
         )}
       </Stack>

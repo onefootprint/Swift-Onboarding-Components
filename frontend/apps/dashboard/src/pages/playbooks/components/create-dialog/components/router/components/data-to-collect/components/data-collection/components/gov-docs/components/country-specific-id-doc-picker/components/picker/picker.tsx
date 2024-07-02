@@ -22,12 +22,10 @@ type PickerProps = {
 };
 
 const Picker = ({ editingCountryDocMap, onSave, onRemove, onCancel }: PickerProps) => {
-  const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.id-doc.sections.country-specific',
-  });
+  const { t } = useTranslation('common');
   const { watch } = useFormContext();
-  const countryDocMap = watch('personal.countrySpecificIdDocKind');
-  const globalDocs = watch('personal.idDocKind');
+  const countryDocMap = watch('personal.docs.country');
+  const globalDocs = watch('personal.docs.global');
   const editingCountry = editingCountryDocMap ? Object.keys(editingCountryDocMap)[0] : null;
   const editingCountryRecord = COUNTRIES.find(country => country.value === editingCountry);
   const editingDocs = editingCountryDocMap ? editingCountryDocMap[editingCountry as CountryCode] : null;
@@ -117,7 +115,7 @@ const Picker = ({ editingCountryDocMap, onSave, onRemove, onCancel }: PickerProp
           onClick={() => onRemove(selectedCountry.value)}
           destructive
         >
-          {t('delete')}
+          {t('remove')}
         </LinkButton>
       </Stack>
     </Container>

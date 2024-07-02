@@ -45,8 +45,9 @@ export type LinkButtonProps = {
   $paddingBlock?: keyof Theme['spacing'];
 };
 
-type StyledProps = Omit<LinkButtonProps, 'variant'> & {
+type StyledProps = Omit<LinkButtonProps, 'variant' | 'destructive'> & {
   $variant?: LinkButtonVariant;
+  $destructive?: boolean;
 };
 
 const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
@@ -106,7 +107,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         type={href ? undefined : type}
         $variant={variant}
         form={href ? undefined : form}
-        destructive={destructive}
+        $destructive={destructive}
         $margin={$margin}
         $marginInline={$marginInline}
         $marginBlock={$marginBlock}
@@ -133,7 +134,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
 export const LinkButtonStyled = styled.button<StyledProps>`
   ${({
     theme,
-    destructive,
+    $destructive,
     $variant = 'label-3',
     disabled,
     $margin,
@@ -155,7 +156,7 @@ export const LinkButtonStyled = styled.button<StyledProps>`
       components: { linkButton },
     } = theme;
 
-    const styleVariant = destructive ? 'destructive' : 'default';
+    const styleVariant = $destructive ? 'destructive' : 'default';
     const smallSizes = ['snippet-2', 'snippet-3'];
 
     return css`

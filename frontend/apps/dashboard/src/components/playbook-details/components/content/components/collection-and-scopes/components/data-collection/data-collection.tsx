@@ -1,5 +1,5 @@
 import { type OnboardingConfig } from '@onefootprint/types';
-import { Box, Divider, InlineAlert, Stack, Text } from '@onefootprint/ui';
+import { Box, Divider, Stack, Text } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +15,6 @@ const DataCollection = ({
     allowUsResidents,
     allowUsTerritoryResidents,
     internationalCountryRestrictions,
-    isDocFirstFlow,
     mustCollectData,
     documentTypesAndCountries,
     optionalData = [],
@@ -25,7 +24,6 @@ const DataCollection = ({
   const requiresSSN = mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN = optionalData.includes('ssn9') || optionalData.includes('ssn4');
   const documentsAsString = mustCollectData.filter(scopes => scopes.includes('document'))?.[0];
-  const selfie = !!documentsAsString?.includes('selfie');
   const hasInvestorProfile = mustCollectData.includes('investor_profile');
   const isKYB = mustCollectData.includes(
     'business_name' || 'business_address' || 'business_tin' || 'business_kyced_beneficial_owners' || 'business_tin',
@@ -33,8 +31,6 @@ const DataCollection = ({
   const showIdDocScan = mustCollectData.some(
     scope => scope.includes('document'), // to make it backwards compatible; new playbooks will have 'document' or "document_and_selfie"
   );
-  const idDocKind = documentTypesAndCountries?.global;
-  const countrySpecificIdDocKind = documentTypesAndCountries?.countrySpecific;
 
   return (
     <Stack direction="column">
@@ -113,19 +109,16 @@ const DataCollection = ({
             <CollectedInformation
               title={t('id-doc.title')}
               options={{
-                idDocKind,
-                selfie,
-                countrySpecificIdDocKind,
+                idDocKind: documentTypesAndCountries?.global,
+                selfie: !!documentsAsString?.includes('selfie'),
               }}
             />
           )}
-
           {hasInvestorProfile && (
             <CollectedInformation title={t('investor_profile.title')} subtitle={t('investor_profile.subtitle')} />
           )}
         </Stack>
       </Stack>
-      {isDocFirstFlow && <InlineAlert variant="info">{t('id-doc-first')}</InlineAlert>}
       {allowUsTerritoryResidents && (
         <footer>
           <Box marginTop={5} marginBottom={5}>

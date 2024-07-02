@@ -387,12 +387,12 @@ export type {
   Tag,
 } from './data';
 export {
+  AuthMethodKind,
   AccessLogKind,
   LivenessSource,
   LivenessIssuer,
   AuthEventKind,
   ActorKind,
-  AuthMethodKind,
   BacktestingRuleAction,
   BeneficialOwnerDataAttribute,
   BusinessDI,
@@ -485,4 +485,5 @@ export {
   WatchlistCheckReasonCode,
   WatchlistCheckStatus,
   WorkflowStatus,
+  AuthMethodAction,
 } from './data';

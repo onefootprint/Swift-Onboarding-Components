@@ -49,8 +49,8 @@ const Router = ({ onCreate }: RouterProps) => {
     options,
   });
   const defaultValues = getDefaultValues(state.context);
-  const idDocKinds = state.context.playbook?.personal.idDocKind;
-  const countrySpecificIdDocKinds = state.context.playbook?.personal.countrySpecificIdDocKind;
+  const idDocKinds = state.context.playbook?.personal.docs.global;
+  const countrySpecificIdDocKinds = state.context.playbook?.personal.docs.country;
   const requiresIdDoc = (idDocKinds ?? []).length > 0 || Object.keys(countrySpecificIdDocKinds ?? {}).length > 0;
 
   const createPlaybook = (
