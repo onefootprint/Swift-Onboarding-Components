@@ -12,6 +12,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
 use db::models::vault_dr::VaultDrConfig;
 use itertools::Itertools;
+use newtypes::FpId;
 use newtypes::TenantId;
 use newtypes::VaultDrConfigId;
 use std::collections::HashMap;
@@ -72,7 +73,12 @@ impl VaultDrWriter {
         Ok(writer)
     }
 
-    pub async fn write_blobs_batch(&self, state: &State, batch_size: u32) -> FpResult<u32> {
+    pub async fn write_blobs_batch(
+        &self,
+        state: &State,
+        batch_size: u32,
+        fp_id_filter: Option<Vec<FpId>>,
+    ) -> FpResult<u32> {
         let tenant_id = self.tenant_id.clone();
         let config_id = self.config_id.clone();
         let is_live = self.is_live;
@@ -80,8 +86,14 @@ impl VaultDrWriter {
         let (dls, sv_id_to_fp_id) = state
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
-                let dls =
-                    load_vault_dr_data_lifetime_batch(conn, &tenant_id, is_live, &config_id, batch_size)?;
+                let dls = load_vault_dr_data_lifetime_batch(
+                    conn,
+                    &tenant_id,
+                    is_live,
+                    &config_id,
+                    batch_size,
+                    fp_id_filter,
+                )?;
 
                 let sv_ids = dls.iter().map(|dl| &dl.scoped_vault_id).collect_vec();
                 let sv_id_to_fp_id: HashMap<_, _> = ScopedVault::bulk_get(conn, sv_ids, &tenant_id, is_live)?

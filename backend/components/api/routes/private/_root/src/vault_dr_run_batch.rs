@@ -8,6 +8,7 @@ use api_core::FpResult;
 use api_errors::ValidationError;
 use db::models::ob_configuration::IsLive;
 use db::models::vault_dr::VaultDrConfig;
+use newtypes::FpId;
 use newtypes::TenantId;
 use paperclip::actix::Apiv2Response;
 use paperclip::actix::Apiv2Schema;
@@ -17,6 +18,8 @@ use vault_dr::VaultDrWriter;
 struct VaultDrRunBatchRequest {
     pub tenant_id: TenantId,
     pub is_live: IsLive,
+
+    pub fp_ids: Option<Vec<FpId>>,
 
     pub batch_size: u32,
 }
@@ -37,6 +40,7 @@ pub async fn post(
         tenant_id,
         is_live,
         batch_size,
+        fp_ids,
     } = request.into_inner();
 
     if !tenant_id.is_integration_test_tenant() {
@@ -53,7 +57,7 @@ pub async fn post(
 
     let writer = VaultDrWriter::new(&state, &config.id).await?;
 
-    let num_blobs = writer.write_blobs_batch(&state, batch_size).await?;
+    let num_blobs = writer.write_blobs_batch(&state, batch_size, fp_ids).await?;
 
     Ok(VaultDrRunBatchResponse { num_blobs })
 }

@@ -37,6 +37,7 @@ def test_footprint_dr_backup(tenant):
         "tenant_id": tenant.id,
         "is_live": True,
         "batch_size": 100,
+        "fp_ids": [fp_id_1, fp_id_2],
     }, CUSTODIAN_AUTH)
 
     # TODO: check that the backup worked using the footprint-dr client.
