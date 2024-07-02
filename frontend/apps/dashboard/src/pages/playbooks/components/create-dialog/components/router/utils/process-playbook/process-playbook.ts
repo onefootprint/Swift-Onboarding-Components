@@ -3,6 +3,8 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
+  DocumentRequestConfig,
+  DocumentRequestKind,
 } from '@onefootprint/types';
 
 import { isAuth, isIdDocOnly, isKyb, isKyc } from '@/playbooks/utils/kind';
@@ -22,15 +24,17 @@ import {
 } from '@/playbooks/utils/machine/types';
 
 type OptionalSSN = CollectedKycDataOption.ssn4 | CollectedKycDataOption.ssn9 | undefined;
+
 type MandatorySSN = OptionalSSN | CollectedKycDataOption.usTaxId;
+
 type ProcessPlaybookProps = {
-  playbook: DataToCollectFormData;
   kind: PlaybookKind;
-  residencyForm?: ResidencyFormData;
-  nameForm: NameFormData;
-  template?: OnboardingTemplate;
-  skipKyc?: boolean;
   kycOptionForBeneficialOwners?: KycOptionsForBeneficialOwners;
+  nameForm: NameFormData;
+  playbook: DataToCollectFormData;
+  residencyForm?: ResidencyFormData;
+  skipKyc?: boolean;
+  template?: OnboardingTemplate;
   verificationChecks: {
     kyb?: {
       skip: boolean;
@@ -48,6 +52,7 @@ const optionalKYBFields = [
 ];
 
 const isSsn9 = (x: unknown): x is CollectedKycDataOption.ssn9 => x === CollectedKycDataOption.ssn9;
+
 const getRequiredKybCollectFields = () => [CollectedKybDataOption.name, CollectedKybDataOption.tin];
 
 const getRequiredKycCollectFields = () => [
@@ -65,6 +70,121 @@ export const getMandatoryAndOptionalTaxIdFields = (x: Personal): [MandatorySSN, 
     isSsn9(mandatory) && x.usTaxIdAcceptable ? CollectedKycDataOption.usTaxId : mandatory,
     isSsn9(mandatory) && x.usTaxIdAcceptable ? undefined : optional,
   ];
+};
+
+const getVerificationChecks = ({
+  verificationChecks,
+  kind,
+}: {
+  kind: PlaybookKind;
+  verificationChecks: {
+    kyb?: {
+      skip: boolean;
+      kind?: KybChecksKind;
+    };
+  };
+}) => {
+  if (kind === PlaybookKind.Kyb) {
+    if (!verificationChecks.kyb || verificationChecks.kyb.skip) {
+      return [];
+    }
+    return [
+      {
+        kind: 'kyb',
+        data: {
+          einOnly: verificationChecks.kyb?.kind === 'ein',
+        },
+      },
+    ];
+  }
+  return null;
+};
+
+const getResidency = (residencyForm?: ResidencyFormData) => {
+  if (!residencyForm) {
+    return {};
+  }
+  const { allowUsResidents, allowUsTerritories, allowInternationalResidents, restrictCountries, countryList } =
+    residencyForm;
+
+  if (restrictCountries === CountryRestriction.restrict && countryList) {
+    const internationalCountryRestrictions: string[] = [];
+    const countryListCode = countryList.map(country => country.value);
+    internationalCountryRestrictions.push(...countryListCode);
+    return {
+      allowUsResidents,
+      allowUsTerritories,
+      allowInternationalResidents,
+      internationalCountryRestrictions,
+    };
+  }
+  return {
+    allowUsResidents,
+    allowUsTerritories: allowInternationalResidents ? false : allowUsTerritories,
+    allowInternationalResidents,
+    internationalCountryRestrictions: null,
+  };
+};
+
+const getNoBoKycOptions = ({
+  mustCollectData,
+  optionalData,
+  nameForm,
+  shouldSkipKyc,
+  residencyForm,
+}: {
+  mustCollectData: CollectedDataOption[];
+  optionalData: CollectedDataOption[];
+  nameForm: NameFormData;
+  shouldSkipKyc?: boolean;
+  residencyForm?: ResidencyFormData;
+}) => {
+  const { name } = nameForm;
+  const canAccessData = mustCollectData.concat(optionalData);
+  const skipConfirm = false;
+  return {
+    canAccessData,
+    isDocFirstFlow: false,
+    isNoPhoneFlow: false,
+    mustCollectData,
+    name,
+    optionalData,
+    skipConfirm,
+    skipKyc: shouldSkipKyc,
+    documentTypesAndCountries: {
+      countrySpecific: {},
+      global: [],
+    },
+    documentsToCollect: [],
+    ...getResidency(residencyForm),
+    cipKind: undefined,
+  };
+};
+
+const createGovDocsPayload = (formData: DataToCollectFormData) => {
+  const { global = [], country = {} } = formData.personal.docs;
+  return {
+    countrySpecific: country,
+    global: global,
+  };
+};
+
+const createAdditionalDocsPayload = (formData: DataToCollectFormData) => {
+  const documentsToCollect: DocumentRequestConfig[] = [];
+  const { poa, possn } = formData.personal.additionalDocs;
+  if (poa) {
+    documentsToCollect.push({
+      kind: DocumentRequestKind.ProofOfAddress,
+      data: {},
+    });
+  }
+  if (possn) {
+    documentsToCollect.push({
+      kind: DocumentRequestKind.ProofOfSsn,
+      data: {},
+    });
+  }
+  return documentsToCollect;
 };
 
 const processPlaybook = ({
@@ -160,10 +280,7 @@ const processPlaybook = ({
   // No tenants are currently using this, so we simplify the playbook creation flow by always
   // assuming canAccess = mustCollect + optional
   const canAccessData = mustCollectData.concat(optionalData);
-  const documentTypesAndCountries = {
-    countrySpecific: country,
-    global: global,
-  };
+
   const skipConfirm = isIdDocOnly(kind);
 
   return {
@@ -175,99 +292,11 @@ const processPlaybook = ({
     optionalData,
     skipConfirm,
     skipKyc: shouldSkipKyc,
-    documentTypesAndCountries,
+    documentTypesAndCountries: createGovDocsPayload(playbook),
+    documentsToCollect: createAdditionalDocsPayload(playbook),
     verificationChecks: getVerificationChecks({ kind, verificationChecks }),
     ...getResidency(residencyForm),
     cipKind: template === OnboardingTemplate.Alpaca ? 'alpaca' : undefined,
-  };
-};
-
-const getVerificationChecks = ({
-  verificationChecks,
-  kind,
-}: {
-  kind: PlaybookKind;
-  verificationChecks: {
-    kyb?: {
-      skip: boolean;
-      kind?: KybChecksKind;
-    };
-  };
-}) => {
-  if (kind === PlaybookKind.Kyb) {
-    if (!verificationChecks.kyb || verificationChecks.kyb.skip) {
-      return [];
-    }
-    return [
-      {
-        kind: 'kyb',
-        data: {
-          einOnly: verificationChecks.kyb?.kind === 'ein',
-        },
-      },
-    ];
-  }
-  return null;
-};
-
-const getResidency = (residencyForm?: ResidencyFormData) => {
-  if (!residencyForm) {
-    return {};
-  }
-  const { allowUsResidents, allowUsTerritories, allowInternationalResidents, restrictCountries, countryList } =
-    residencyForm;
-
-  if (restrictCountries === CountryRestriction.restrict && countryList) {
-    const internationalCountryRestrictions: string[] = [];
-    const countryListCode = countryList.map(country => country.value);
-    internationalCountryRestrictions.push(...countryListCode);
-    return {
-      allowUsResidents,
-      allowUsTerritories,
-      allowInternationalResidents,
-      internationalCountryRestrictions,
-    };
-  }
-  return {
-    allowUsResidents,
-    allowUsTerritories: allowInternationalResidents ? false : allowUsTerritories,
-    allowInternationalResidents,
-    internationalCountryRestrictions: null,
-  };
-};
-
-const getNoBoKycOptions = ({
-  mustCollectData,
-  optionalData,
-  nameForm,
-  shouldSkipKyc,
-  residencyForm,
-}: {
-  mustCollectData: CollectedDataOption[];
-  optionalData: CollectedDataOption[];
-  nameForm: NameFormData;
-  shouldSkipKyc?: boolean;
-  residencyForm?: ResidencyFormData;
-}) => {
-  const { name } = nameForm;
-  const canAccessData = mustCollectData.concat(optionalData);
-  const documentTypesAndCountries = {
-    countrySpecific: {},
-    global: [],
-  };
-  const skipConfirm = false;
-  return {
-    canAccessData,
-    isDocFirstFlow: false,
-    isNoPhoneFlow: false,
-    mustCollectData,
-    name,
-    optionalData,
-    skipConfirm,
-    skipKyc: shouldSkipKyc,
-    documentTypesAndCountries,
-    ...getResidency(residencyForm),
-    cipKind: undefined,
   };
 };
 

@@ -11,6 +11,7 @@ const createPlaybook = async (authHeaders: AuthHeaders, data: OrgOnboardingConfi
     method: 'POST',
     url: '/org/onboarding_configs',
   });
+
   return response.data;
 };
 

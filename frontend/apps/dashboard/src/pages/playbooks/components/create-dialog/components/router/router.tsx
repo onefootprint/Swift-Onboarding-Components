@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { type OnboardingConfigKind } from '@onefootprint/types';
+import { DocumentRequestKind, type OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
@@ -73,6 +73,9 @@ const Router = ({ onCreate }: RouterProps) => {
       allowUsResidents,
       allowUsTerritories,
       canAccessData,
+      cipKind,
+      documentsToCollect,
+      documentTypesAndCountries,
       internationalCountryRestrictions,
       isDocFirstFlow,
       isNoPhoneFlow,
@@ -80,8 +83,6 @@ const Router = ({ onCreate }: RouterProps) => {
       name,
       optionalData,
       skipConfirm,
-      documentTypesAndCountries,
-      cipKind,
       skipKyc,
       verificationChecks,
     } = processPlaybook({
@@ -107,6 +108,7 @@ const Router = ({ onCreate }: RouterProps) => {
         allowUsTerritories,
         canAccessData,
         cipKind,
+        documentsToCollect,
         documentTypesAndCountries,
         enhancedAml,
         internationalCountryRestrictions,

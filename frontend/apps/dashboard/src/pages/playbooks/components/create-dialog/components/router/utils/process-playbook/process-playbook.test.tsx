@@ -563,6 +563,52 @@ describe('processPlaybook', () => {
         });
       });
     });
+
+    describe('additional docs', () => {
+      describe('when "Proof of Address" is selected', () => {
+        it('should generate the payload correctly', () => {
+          const { documentsToCollect } = processPlaybook({
+            playbook: {
+              ...defaultPlaybookValuesKYC,
+              personal: {
+                ...defaultPlaybookValuesKYC.personal,
+                additionalDocs: {
+                  poa: true,
+                  possn: false,
+                },
+              },
+            },
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            verificationChecks: {},
+          });
+
+          expect(documentsToCollect).toEqual([{ data: {}, kind: 'proof_of_address' }]);
+        });
+      });
+
+      describe('when "Proof of SSN" is selected', () => {
+        it('should generate the payload correctly', () => {
+          const { documentsToCollect } = processPlaybook({
+            playbook: {
+              ...defaultPlaybookValuesKYC,
+              personal: {
+                ...defaultPlaybookValuesKYC.personal,
+                additionalDocs: {
+                  poa: false,
+                  possn: true,
+                },
+              },
+            },
+            kind: PlaybookKind.Kyc,
+            nameForm: { kind: PlaybookKind.Kyc, name: 'test name' },
+            verificationChecks: {},
+          });
+
+          expect(documentsToCollect).toEqual([{ data: {}, kind: 'proof_of_ssn' }]);
+        });
+      });
+    });
   });
 
   describe('KYB', () => {

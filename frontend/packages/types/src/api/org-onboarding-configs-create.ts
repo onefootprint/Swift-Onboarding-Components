@@ -1,4 +1,5 @@
 import type { CollectedDataOption } from '../data/collected-data-option';
+import type { DocumentRequestConfig } from '../data/document-request-config';
 import type { DocumentTypesAndCountries, OnboardingConfigKind } from '../data/onboarding-config';
 
 type VerificationCheck = {
@@ -26,11 +27,12 @@ export type OrgOnboardingConfigCreateRequest = {
     pep: boolean;
     adverseMedia: boolean;
   };
-  kind: OnboardingConfigKind;
-  skipKyc?: boolean;
-  skipConfirm?: boolean;
-  documentTypesAndCountries: DocumentTypesAndCountries;
   cipKind?: string;
+  documentsToCollect?: DocumentRequestConfig[];
+  documentTypesAndCountries: DocumentTypesAndCountries;
+  kind: OnboardingConfigKind;
+  skipConfirm?: boolean;
+  skipKyc?: boolean;
   verificationChecks: VerificationCheck[] | null;
 };
 
