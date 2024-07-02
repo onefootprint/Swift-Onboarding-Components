@@ -2600,7 +2600,6 @@
         },
         "tabs": {
           "data-collection": "Data collection",
-          "authorized-scopes": "Authorized scopes",
           "aml-monitoring": "AML monitoring",
           "rules": "Rules"
         },
@@ -2638,16 +2637,6 @@
           },
           "id-doc": {
             "title": "ID document scan"
-          }
-        },
-        "authorized-scopes": {
-          "title": "Authorized scopes",
-          "basic-information": "Basic information",
-          "us-residents": {
-            "title": "U.S. residents"
-          },
-          "non-us-residents": {
-            "title": "Non U.S. residents"
           }
         },
         "aml-monitoring": {
