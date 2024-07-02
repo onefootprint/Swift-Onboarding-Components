@@ -16,10 +16,11 @@ const AuthMethodUpdatedEventHeader = ({ data }: AuthMethodUpdatedEventHeaderProp
   });
 
   const getActionLabel = (action: AuthMethodAction) => {
+    const prefix = 'pages.entity.audit-trail.timeline.auth-method-updated';
     if (action === AuthMethodAction.add_primary) {
-      return t('pages.entity.audit-trail.timeline.auth-method-updated.action.add_primary');
+      return `${prefix}.action.add_primary`;
     }
-    return t('pages.entity.audit-trail.timeline.auth-method-updated.action.replace');
+    return `${prefix}.action.replace`;
   };
 
   const getKindLabel = (kind: AuthMethodKind) => {
