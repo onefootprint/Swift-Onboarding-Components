@@ -9,7 +9,7 @@ import DocForm from './components/doc-form';
 import DocPreview from './components/doc-preview';
 
 const GovDocsWithPanel = () => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.docs' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.gov-docs' });
   const [showContent, setShowContent] = useState(false);
   const {
     meta: { hasDoc },

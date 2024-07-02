@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 const GlobalIdDocPicker = () => {
   const { register } = useFormContext();
   const { t } = useTranslation('playbooks', {
-    keyPrefix: 'create.data-to-collect.docs.global',
+    keyPrefix: 'create.data-to-collect.gov-docs.global',
   });
   const { t: tDocs } = useTranslation('common', { keyPrefix: 'id_document' });
 

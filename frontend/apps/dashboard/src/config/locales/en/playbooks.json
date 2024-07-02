@@ -201,7 +201,7 @@
           "content": "Passkey authentication simplifies the login process on iOS and Android devices, eliminating the need for traditional passwords. \nWhen we detect an already onboarded user wants to log-in, we will prompt them with a passkey challenge to sign-in to your platform. \nThis means fewer password-related headaches and enhanced security for all your customers’ online accounts. \nThis service has a cost based on the number of auth'd users."
         }
       },
-      "docs": {
+      "gov-docs": {
         "title": "Collect government-issued ID",
         "description": "Request that users submit scanned IDs",
         "global": {

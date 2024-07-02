@@ -10,7 +10,7 @@ export type IdDocListProps = {
 };
 
 const IdDocList = ({ docs, limit = 10 }: IdDocListProps) => {
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.docs' });
+  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.gov-docs' });
   const list = useIdDocList(docs);
   const firstPart = list.slice(0, limit);
   const lastPart = list.slice(limit);
