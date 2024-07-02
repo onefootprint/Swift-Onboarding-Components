@@ -38,6 +38,10 @@ pub enum LineItemPrice {
 
 impl BillingCounts {
     fn get_count(&self, product: Product) -> i64 {
+        if matches!(product, Product::MonthlyPlatformFee) {
+            // Platform fee always has quantity 1
+            return 1;
+        }
         self.0.get(&product).cloned().unwrap_or_default()
     }
 
