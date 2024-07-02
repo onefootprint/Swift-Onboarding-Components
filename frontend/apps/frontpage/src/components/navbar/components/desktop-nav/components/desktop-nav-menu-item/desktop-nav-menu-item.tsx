@@ -1,4 +1,4 @@
-import { createFontStyles } from '@onefootprint/ui';
+import { Stack, createFontStyles } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
 import React from 'react';
@@ -17,7 +17,9 @@ const DesktopNavMenuItem = ({ item }: DesktopNavMenuItemProps) => {
   return (
     <StyledLink asChild>
       <Link href={item.href}>
-        <Icon />
+        <Stack flex={0} align="center" justify="center" height="fit-content">
+          <Icon />
+        </Stack>
         <ItemText>
           <Title>{item.text}</Title>
           <Subtitle>{item.subtext}</Subtitle>
@@ -58,7 +60,7 @@ const StyledLink = styled(NavigationMenuLink)`
   ${({ theme }) => css`
     text-decoration: none;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     flex-direction: row;
     padding: ${theme.spacing[4]};
     border-radius: ${theme.borderRadius.default};

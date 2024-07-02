@@ -28,9 +28,11 @@ const SuportLinks = () => {
 
   return (
     <Container>
-      <Link href="/" aria-label="Go to homepage">
-        <ThemedLogoFpCompact color="secondary" />
-      </Link>
+      <Box minHeight="40px">
+        <Link href="/" aria-label="Go to homepage">
+          <ThemedLogoFpCompact color="secondary" />
+        </Link>
+      </Box>
       <Text variant="body-3" color="tertiary">
         © {currentYear} {t('copyright')}
       </Text>

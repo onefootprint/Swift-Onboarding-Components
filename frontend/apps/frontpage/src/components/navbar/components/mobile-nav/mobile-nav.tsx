@@ -1,6 +1,6 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { IcoClose24, IcoMenu24, ThemedLogoFpDefault } from '@onefootprint/icons';
-import { createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
+import { Box, createFontStyles, media, useMediaQuery } from '@onefootprint/ui';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';

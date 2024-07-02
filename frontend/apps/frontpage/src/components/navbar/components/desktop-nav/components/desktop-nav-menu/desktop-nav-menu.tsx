@@ -67,6 +67,7 @@ const IconContainer = styled.div`
   ${({ theme }) => css`
     min-width: 16px;
     height: 20px;
+    flex: 0;
     display: flex;
     align-items: center;
 

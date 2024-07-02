@@ -13,19 +13,19 @@ const linkSections = [
     links: [
       {
         textKey: 'product.kyc',
-        href: '/kyc',
+        href: '/platform/kyc',
       },
       {
         textKey: 'product.kyb',
-        href: '/kyb',
+        href: '/platform/kyb',
       },
       {
         textKey: 'product.vaulting',
-        href: '/vaulting',
+        href: '/platform/vaulting',
       },
       {
         textKey: 'product.auth',
-        href: '/auth',
+        href: '/platform/auth',
       },
     ],
   },
