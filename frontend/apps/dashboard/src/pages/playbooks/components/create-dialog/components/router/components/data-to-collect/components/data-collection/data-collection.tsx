@@ -1,4 +1,4 @@
-import { InlineAlert } from '@onefootprint/ui';
+import { Divider, InlineAlert } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { isAuth, isIdDocOnly, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components';
 
 import { type DataToCollectMeta, OnboardingTemplate } from '@/playbooks/utils/machine/types';
 
+import AdditionalDocsPanel from './components/aditional-docs-panel';
 import Auth from './components/auth';
 import Business from './components/business';
 import GovDocs from './components/gov-docs';
@@ -44,6 +45,7 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
       {isKyb(meta.kind) && <Business />}
       <Person meta={meta} />
       <GovDocsWithPanel />
+      <AdditionalDocsPanel />
       {isKyc(meta.kind) && isCustom && <Investor />}
       {isKyb(meta.kind) && <InlineAlert variant="info">{t('alert')}</InlineAlert>}
     </Container>

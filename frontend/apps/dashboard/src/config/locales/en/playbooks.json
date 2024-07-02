@@ -227,6 +227,20 @@
             "title": "Request a selfie after ID upload"
           }
         }
+      },
+      "additional-docs": {
+        "title": "Additional documents",
+        "description": "Additional proofs that may help you analyze the user",
+        "form": {
+          "poa": {
+            "label": "Proof of address",
+            "hint": "Official documents displaying the user's name and address."
+          },
+          "possn": {
+            "label": "Proof of SSN",
+            "hint": "Scan of Social Security card or official document displaying your name and Social Security Number."
+          }
+        }
       }
     },
     "kyb-checks": {

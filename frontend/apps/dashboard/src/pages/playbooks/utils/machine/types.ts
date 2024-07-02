@@ -175,6 +175,10 @@ export type Personal = {
     selfie?: boolean;
     idDocFirst?: boolean;
   };
+  additionalDocs: {
+    poa?: boolean;
+    possn?: boolean;
+  };
   ssnOptional?: boolean;
   usTaxIdAcceptable?: boolean;
 };
@@ -215,6 +219,10 @@ export const defaultPlaybookValuesAuth = {
         country: {},
         selfie: true,
       },
+      additionalDocs: {
+        poa: false,
+        possn: false,
+      },
       name: false,
       ssn: false,
       us_legal_status: false,
@@ -240,6 +248,10 @@ export const defaultPlaybookValuesKYC: DataToCollectFormData = {
       country: {},
       selfie: true,
     },
+    additionalDocs: {
+      poa: false,
+      possn: false,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
   },
@@ -259,6 +271,10 @@ export const defaultPlaybookValuesAlpaca: DataToCollectFormData = {
       country: {},
       selfie: true,
     },
+    additionalDocs: {
+      poa: false,
+      possn: false,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
   },
@@ -277,6 +293,10 @@ export const defaultPlaybookValuesApex: DataToCollectFormData = {
       global: [],
       country: {},
       selfie: true,
+    },
+    additionalDocs: {
+      poa: false,
+      possn: false,
     },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
@@ -305,6 +325,10 @@ export const defaultPlaybookValuesTenantScreening: DataToCollectFormData = {
       country: {},
       selfie: false,
     },
+    additionalDocs: {
+      poa: false,
+      possn: false,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
     ssnOptional: true,
@@ -324,6 +348,10 @@ export const defaultPlaybookValuesCarRental: DataToCollectFormData = {
       country: {},
       selfie: false,
       idDocFirst: true,
+    },
+    additionalDocs: {
+      poa: false,
+      possn: false,
     },
     ssn: false,
   },
@@ -351,6 +379,10 @@ export const defaultPlaybookValuesCreditCard: DataToCollectFormData = {
       country: {},
       selfie: false,
     },
+    additionalDocs: {
+      poa: false,
+      possn: false,
+    },
     ssn: true,
     ssnKind: CollectedKycDataOption.ssn9,
     ssnOptional: true,
@@ -365,6 +397,10 @@ export const defaultPlaybookValuesIdDoc: DataToCollectFormData = {
       global: [],
       country: {},
       selfie: true,
+    },
+    additionalDocs: {
+      poa: false,
+      possn: false,
     },
     ssn: false,
     [CollectedKycDataOption.phoneNumber]: false,
