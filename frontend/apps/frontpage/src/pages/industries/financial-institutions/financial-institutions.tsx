@@ -17,7 +17,12 @@ const FinancialInstitutions = () => {
   });
   return (
     <>
-      <SEO title={t('html-title')} slug="/industries/baas" image="/og-img-financial-institutions.png" />
+      <SEO
+        title={t('html-title')}
+        slug="/industries/financial-institutions"
+        image="/og-img-financial-institutions.png"
+        description={t('meta-description')}
+      />
       <Hero
         title={t('hero.title')}
         subtitle={t('hero.subtitle')}

@@ -16,7 +16,12 @@ const RealEstate = () => {
   });
   return (
     <>
-      <SEO title={t('html-title')} slug="/industries/real-estate" image="/og-img-real-estate.png" />
+      <SEO
+        title={t('html-title')}
+        slug="/industries/real-estate"
+        image="/og-img-real-estate.png"
+        description={t('meta-description')}
+      />
       <Hero
         title={t('hero.title')}
         subtitle={t('hero.subtitle')}

@@ -14,7 +14,7 @@ const DocScan = () => {
 
   return (
     <>
-      <SEO title={t('html-title')} description={t('html-description')} />
+      <SEO title={t('html-title')} description={t('html-description')} slug="/platform/doc-scan" />
       <Hero />
       <GridCards />
       <Leverage />

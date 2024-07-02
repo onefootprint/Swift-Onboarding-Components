@@ -567,6 +567,7 @@
       },
       "financial-institutions": {
         "html-title": "Footprint - Industries: Banks & Financial Institutions",
+        "meta-description": "Enhance compliance, reduce fraud, and streamline customer onboarding for banks and financial institutions with our comprehensive identity verification solution",
         "hero": {
           "title": "Solve KYC, AML, and compliance with one tool",
           "subtitle": "Footprint is built to help Banks, BaaS, and Financial Institutions holistically solve challenges facing the identity lifecycle of their customers",
@@ -658,6 +659,7 @@
       },
       "fintech": {
         "html-title": "Footprint - Industries: Fintech",
+        "meta-description": "Reduce fraud and build trust with seamless identity verification and compliance solutions",
         "hero": {
           "title": "KYC designed to boost conversion and simplify your work with partner banks and broker-dealers",
           "subtitle": "Fintechs like Bloom, Composer and Coba use Footprint to seamlessly comply with their partner’s CIP requirements, even when navigating evolving landscapes.",
@@ -745,6 +747,7 @@
       },
       "auto": {
         "html-title": "Footprint - Industries: Auto",
+        "meta-description": "Enhance compliance, reduce fraud, and streamline drivers onboarding with our comprehensive identity verification solution",
         "hero": {
           "title": "Streamline onboarding, verify licenses, and assess driving history in real-time",
           "subtitle": "Footprint is built to help auto companies conduct robust yet seamless identity verification to reduce fraud and simplify the rental or purchase process",
@@ -825,6 +828,7 @@
       },
       "real-estate": {
         "html-title": "Footprint - Industries: Real Estate",
+        "meta-description": "Reduce fraud, increase trust in rental applicants by verifying identity + credit in one place",
         "hero": {
           "title": "Reduce Fraud, Increase Trust in Rental Applicants by verifying identity + credit in one place",
           "subtitle": "Footprint is built to help tenant screening companies conduct robust yet seamless identity verification to assist PMs",
