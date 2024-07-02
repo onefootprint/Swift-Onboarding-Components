@@ -27,6 +27,12 @@ pub fn status_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     );
     println!();
 
+    println!("Organization Public Keys:");
+    for key in status.org_public_keys {
+        println!("  {}", key);
+    }
+    println!();
+
     println!("Storage Configuration:");
     println!("  AWS Account ID: {}", status.aws_account_id);
     println!("  AWS Role Name:  {}", status.aws_role_name);

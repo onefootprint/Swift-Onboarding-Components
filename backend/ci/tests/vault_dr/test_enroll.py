@@ -113,6 +113,9 @@ def test_footprint_dr_enroll(tenant):
         cmd.expect(r"Enrolled in Vault Disaster Recovery since: ([0-9:\.\- ]+ UTC)")
         enrolled_at = cmd.match.group(1)
 
+        cmd.expect("Organization Public Keys:")
+        cmd.expect("age1")
+
         cmd.expect(f"AWS Account ID: {aws_account_id}")
         cmd.expect(f"AWS Role Name:  {iam_role_name}")
         cmd.expect(f"S3 Bucket Name: {bucket_name}")
