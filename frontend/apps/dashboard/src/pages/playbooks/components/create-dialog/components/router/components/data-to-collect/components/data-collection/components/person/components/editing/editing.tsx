@@ -1,5 +1,5 @@
 import { CollectedKybDataOption, CollectedKycDataOption } from '@onefootprint/types';
-import { Box, Button, Checkbox, Divider, Radio, Text, Toggle } from '@onefootprint/ui';
+import { Button, Checkbox, Divider, Radio, Text, Toggle } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -9,26 +9,23 @@ import styled, { css } from 'styled-components';
 
 import type { DataToCollectMeta, Personal } from '@/playbooks/utils/machine/types';
 
-import Document from '../../../document';
-
 type EditingProps = {
   onStopEditing: () => void;
   meta: DataToCollectMeta;
 };
 
 const Editing = ({ onStopEditing, meta }: EditingProps) => {
-  const { control, register, watch, setValue, getValues } = useFormContext();
   const { t: allT } = useTranslation('common');
-  const { t } = useTranslation('playbooks', { keyPrefix: 'create.data-to-collect.person' });
+  const { t } = useTranslation('playbooks', {
+    keyPrefix: 'create.data-to-collect.person',
+  });
+  const { control, register, watch, setValue, getValues } = useFormContext();
   const { kind } = meta;
   const {
     data: { user, org },
   } = useSession();
   const ssnOpen = watch('personal.ssn');
   const ssnKind = watch('personal.ssnKind');
-  const shouldCollectIdDoc = watch('personal.idDoc');
-  const selectedGlobalDocs = watch('personal.idDocKind');
-  const selectedCountrySpecificDocs = watch('personal.countrySpecificIdDocKind');
   const isUsTaxIdAcceptable = !!watch('personal.usTaxIdAcceptable');
   const isSsnOptional = !!watch('personal.ssnOptional');
   const collectBO = !!watch(`businessInformation.${CollectedKybDataOption.beneficialOwners}`);
@@ -38,14 +35,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const [initialValues] = useState<Personal>({ ...getValues('personal') });
 
   const handleSave = () => {
-    if (
-      shouldCollectIdDoc &&
-      (selectedGlobalDocs?.length >= 1 || Object.keys(selectedCountrySpecificDocs).length >= 1)
-    ) {
-      onStopEditing();
-    } else if (!shouldCollectIdDoc) {
-      onStopEditing();
-    }
+    onStopEditing();
   };
 
   const handleCancel = () => {
@@ -73,19 +63,11 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
     }
   };
 
-  const resetDocs = () => {
-    setValue('personal.idDocKind', []);
-    setValue('personal.countrySpecificIdDocKind', {});
-  };
-
   const title = isKyb(kind) ? (
     <Text variant="label-3">{t('editing.kyb')}</Text>
   ) : (
     <Text variant="label-3">{t('editing.kyc')}</Text>
   );
-
-  const isSaveDisabled = (): boolean =>
-    shouldCollectIdDoc && selectedGlobalDocs.length === 0 && Object.keys(selectedCountrySpecificDocs).length === 0;
 
   if (isKyb(kind) && !collectBO) {
     return (
@@ -110,7 +92,7 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
           />
         </Section>
         <ButtonContainer>
-          <Button fullWidth variant="primary" onClick={handleSave} disabled={isSaveDisabled()}>
+          <Button fullWidth variant="primary" onClick={handleSave}>
             {allT('save')}
           </Button>
           <Button variant="secondary" fullWidth onClick={handleCancel}>
@@ -236,36 +218,8 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
           {...register(`personal.${CollectedKycDataOption.usLegalStatus}`)}
         />
       </Section>
-      <Section>
-        <Text variant="label-3">{t('id-doc.title')}</Text>
-        <Controller
-          control={control}
-          name="personal.idDoc"
-          render={({ field }) => (
-            <ToggleContainer>
-              <Toggle
-                checked={field.value}
-                label={t('id-doc.toggle')}
-                onBlur={field.onBlur}
-                onChange={nextValue => {
-                  field.onChange(nextValue);
-                  resetDocs();
-                }}
-              />
-            </ToggleContainer>
-          )}
-        />
-        {shouldCollectIdDoc && (
-          <Box>
-            <Box marginBottom={5}>
-              <Divider variant="secondary" />
-            </Box>
-            <Document />
-          </Box>
-        )}
-      </Section>
       <ButtonContainer>
-        <Button fullWidth variant="primary" onClick={handleSave} disabled={isSaveDisabled()}>
+        <Button fullWidth variant="primary" onClick={handleSave}>
           {allT('save')}
         </Button>
         <Button variant="secondary" fullWidth onClick={handleCancel}>

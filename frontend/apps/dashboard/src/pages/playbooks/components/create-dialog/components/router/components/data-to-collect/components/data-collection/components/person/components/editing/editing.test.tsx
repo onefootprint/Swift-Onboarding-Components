@@ -35,45 +35,9 @@ describe('<Editing />', () => {
     expect(screen.queryByLabelText('Allow users without an SSN to proceed with the verification')).toBeNull();
   });
 
-  it('should disable save button if ID doc not selected', async () => {
-    renderEditing({
-      startingValues: { personal: { idDoc: true, idDocKind: [] } },
-    });
-    const saveButton = screen.getByRole('button', { name: 'Save' });
-    expect(saveButton).toBeDisabled();
-  });
-
-  it('should not show warning if ID doc selected', async () => {
-    renderEditing({
-      startingValues: {
-        personal: {
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.driversLicense],
-        },
-      },
-    });
-    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-    expect(screen.queryByText('You must select at least one ID document type.')).not.toBeInTheDocument();
-  });
-
-  it('save button should be disabled if ID doc not selected', async () => {
-    renderEditing({
-      startingValues: { personal: { idDoc: true, idDocKind: [] } },
-    });
-    const saveButton = screen.getByRole('button', { name: 'Save' });
-    expect(saveButton).toBeDisabled();
-  });
-
-  it('should show selfie option when just ID doc is selected', async () => {
-    renderEditing({
-      startingValues: { personal: { idDoc: true, idDocKind: [] } },
-    });
-    expect(screen.getByText('Request a selfie after ID upload')).toBeInTheDocument();
-  });
-
   it('should show correct title for KYC', async () => {
     renderEditing({ kind: PlaybookKind.Kyc });
-    expect(screen.getByText('Edit personal information & docs')).toBeInTheDocument();
+    expect(screen.getByText('Edit Personal information')).toBeInTheDocument();
   });
 
   it('should show correct title for KYB', async () => {
@@ -110,16 +74,8 @@ describe('<Editing />', () => {
       name: "Collect beneficial owners' information",
     });
     expect(collectBoToogle).toBeChecked();
-    const idScanOption = screen.getByRole('switch', {
-      name: 'Request users to scan an ID document',
-    });
-    expect(idScanOption).toBeInTheDocument();
     await userEvent.click(collectBoToogle);
     expect(collectBoToogle).not.toBeChecked();
-    const idDocOptionRemoved = screen.queryByRole('switch', {
-      name: 'Request users to scan an ID document',
-    });
-    expect(idDocOptionRemoved).not.toBeInTheDocument();
   });
 
   it('should show no phone flow option if firm employee', async () => {
@@ -152,68 +108,6 @@ describe('<Editing />', () => {
         name: 'Request users to provide their phone number',
       }),
     ).not.toBeInTheDocument();
-  });
-
-  describe('when selecting the option to collect id doc', () => {
-    it('should show the list of id docs', async () => {
-      renderEditing({});
-
-      const requestIdDoc = screen.getByRole('switch', {
-        name: 'Request users to scan an ID document',
-      });
-      await userEvent.click(requestIdDoc);
-
-      const dl = screen.getByRole('checkbox', {
-        name: "Driver's license",
-      });
-      expect(dl).toBeInTheDocument();
-
-      const idCard = screen.getByRole('checkbox', { name: 'Identity card' });
-      expect(idCard).toBeInTheDocument();
-
-      const passport = screen.getByRole('checkbox', {
-        name: 'Passport (photo page)',
-      });
-      expect(passport).toBeInTheDocument();
-
-      const visa = screen.getByRole('checkbox', { name: 'Visa' });
-      expect(visa).toBeInTheDocument();
-
-      const residenceCard = screen.getByRole('checkbox', {
-        name: 'Residence card',
-      });
-      expect(residenceCard).toBeInTheDocument();
-
-      const workPermit = screen.getByRole('checkbox', {
-        name: 'Work permit',
-      });
-      expect(workPermit).toBeInTheDocument();
-    });
-
-    describe('when selecting DL, then un-selecting the option to collect id doc and selecting it again', () => {
-      it('should unselect any id doc that was previously selected', async () => {
-        renderEditing({});
-
-        const requestIdDoc = screen.getByRole('switch', {
-          name: 'Request users to scan an ID document',
-        });
-        await userEvent.click(requestIdDoc);
-
-        const dl = screen.getByRole('checkbox', {
-          name: "Driver's license",
-        });
-        await userEvent.click(dl);
-        expect(dl).toBeChecked();
-
-        // un-select
-        await userEvent.click(requestIdDoc);
-
-        // select again
-        await userEvent.click(requestIdDoc);
-
-        expect(dl).not.toBeChecked();
-      });
-    });
   });
 
   describe('when it is non-firm employee', () => {

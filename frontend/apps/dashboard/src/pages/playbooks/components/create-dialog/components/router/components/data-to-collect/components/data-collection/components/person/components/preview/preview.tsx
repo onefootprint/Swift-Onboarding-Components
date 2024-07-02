@@ -1,6 +1,6 @@
 import { CollectedKybDataOption } from '@onefootprint/types';
-import { Box, Checkbox, Divider, LinkButton, Text } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { Box, Checkbox, Divider, Text } from '@onefootprint/ui';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -10,8 +10,7 @@ import type { DataToCollectMeta, Personal } from '@/playbooks/utils/machine/type
 import { OnboardingTemplate, PlaybookKind } from '@/playbooks/utils/machine/types';
 
 import { isKyb } from 'src/pages/playbooks/utils/kind';
-import DocEditor from './components/doc-editor';
-import PreviewHeader from './components/doc-editor/preview-header';
+import PreviewHeader from './components/preview-header';
 import useIdDocFirstFlowEnabled from './hooks/use-id-doc-first-flow-enabled';
 
 type PreviewProps = {
@@ -29,8 +28,6 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
     meta.residency?.allowInternationalResidents === false || meta.kind === PlaybookKind.Kyb;
   const showUsResidentsEmptyState = meta.residency?.allowUsResidents === false;
   const internationalOnly = meta.residency?.allowInternationalResidents && !meta.residency.allowUsResidents;
-  const showIdDocScan = values.idDocKind.length > 0 || Object.keys(values.countrySpecificIdDocKind).length > 0;
-  const [showIdDocEditor, setShowIdDocEditor] = useState(false);
   const isFixedPlaybook =
     meta.onboardingTemplate === OnboardingTemplate.Alpaca || meta.onboardingTemplate === OnboardingTemplate.Apex;
   const canEdit = !internationalOnly && !isFixedPlaybook;
@@ -86,24 +83,6 @@ const Preview = ({ onStartEditing, meta }: PreviewProps) => {
             }}
           />
         )}
-        {showIdDocScan && (
-          <CollectedInformation
-            title={t('id-doc.title')}
-            options={{
-              idDocKind: values.idDocKind,
-              selfie: values.selfie,
-              countrySpecificIdDocKind: values.countrySpecificIdDocKind,
-            }}
-          />
-        )}
-        {internationalOnly &&
-          (showIdDocEditor ? (
-            <DocEditor onDone={() => setShowIdDocEditor(false)} />
-          ) : (
-            <LinkButton onClick={() => setShowIdDocEditor(true)}>
-              {showIdDocScan ? t('id-doc.edit') : t('id-doc.add')}
-            </LinkButton>
-          ))}
       </FormElementsContainer>
       {isIdDocOnlyFirstFlowEnabled && !isFixedPlaybook && (
         <Subsection>

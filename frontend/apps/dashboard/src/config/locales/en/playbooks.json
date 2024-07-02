@@ -77,11 +77,11 @@
             "main": "Beneficial owners",
             "tooltip": "For a stronger verification of the business, you may also verify its beneficial owners' identities."
           },
-          "kyc": "Personal information & docs"
+          "kyc": "Personal information"
         },
         "edit": "Edit",
         "editing": {
-          "kyc": "Edit personal information & docs",
+          "kyc": "Edit Personal information",
           "kyb": "Edit beneficial owners"
         },
         "basic-information": {
@@ -123,12 +123,6 @@
         "us-legal-status": {
           "title": "Legal status",
           "label": "Request users to provide their legal status in the U.S."
-        },
-        "id-doc": {
-          "title": "ID document scan",
-          "toggle": "Request users to scan an ID document",
-          "add": "Add collected documents",
-          "edit": "Edit collected documents"
         },
         "us-territories": {
           "label": "Note:",

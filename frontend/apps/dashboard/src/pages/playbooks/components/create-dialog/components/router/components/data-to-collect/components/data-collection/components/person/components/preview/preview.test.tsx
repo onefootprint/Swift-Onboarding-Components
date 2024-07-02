@@ -54,21 +54,9 @@ describe('<Preview />', () => {
     expect(screen.queryAllByText('ID document scan').length).toBe(0);
   });
 
-  it('should show ID doc only once when we are showing', () => {
-    renderForm({
-      startingValues: {
-        personal: {
-          idDoc: true,
-          idDocKind: [SupportedIdDocTypes.idCard, SupportedIdDocTypes.driversLicense],
-        },
-      },
-    });
-    expect(screen.getAllByText('ID document scan').length).toBe(1);
-  });
-
   it('should show correct title for KYC flow', () => {
     renderForm({ kind: PlaybookKind.Kyc });
-    expect(screen.getByText('Personal information & docs')).toBeInTheDocument();
+    expect(screen.getByText('Personal information')).toBeInTheDocument();
   });
 
   it('should show correct title for KYB flow', async () => {
