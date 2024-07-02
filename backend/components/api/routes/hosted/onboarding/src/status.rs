@@ -33,8 +33,9 @@ pub async fn get(
     insights: InsightHeaders,
 ) -> ApiResponse<OnboardingStatusResponse> {
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
+    let tenant_id = user_auth.tenant().id.clone();
 
-    if user_auth.tenant().id.is_flexcar() {
+    if tenant_id.is_flexcar() || tenant_id.is_basic_capital() {
         let vault_id = user_auth.user().id.clone();
         let sv_id = user_auth.scoped_user.id.clone();
         state
@@ -49,13 +50,13 @@ pub async fn get(
 
                 let has_registered_passkey = !liveness_skip_events.is_empty() || !credentials.is_empty();
                 let is_desktop = insights.is_desktop_viewer.as_ref().is_some_and(|d| !d.is_empty());
-                if has_registered_passkey || is_desktop {
+                if has_registered_passkey || (is_desktop && !tenant_id.is_basic_capital()) {
                     return Ok(());
                 }
 
                 let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
                 let skip_context = SkipLivenessContext {
-                    reason: "skip_for_flexcar".to_string(),
+                    reason: format!("skip_for_{}", tenant_id),
                     client_type: SkipLivenessClientType::Mobile,
                     num_attempts: 0,
                     attempts: vec![],

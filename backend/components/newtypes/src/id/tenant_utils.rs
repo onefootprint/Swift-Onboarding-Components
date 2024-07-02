@@ -31,6 +31,10 @@ impl TenantId {
     pub fn is_flexcar(&self) -> bool {
         self.0 == *"org_pl9GdKAiT9Yo0107B6ZOGp"
     }
+
+    pub fn is_basic_capital(&self) -> bool {
+        self.0 == *"org_hfT6m85IKbPHDFVOcybEmF"
+    }
 }
 
 #[derive(Debug, Clone, Copy, From, PartialEq, Eq)]
