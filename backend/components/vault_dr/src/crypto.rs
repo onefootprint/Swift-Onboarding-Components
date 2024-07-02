@@ -2,10 +2,12 @@ use super::error::Error;
 use age::secrecy::ExposeSecret;
 use age::secrecy::SecretString;
 use age::secrecy::Zeroize;
+use itertools::Itertools;
 use std::io::Write;
 use std::str::FromStr;
 
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PublicKey {
     recipient: age::x25519::Recipient,
 }
@@ -16,7 +18,7 @@ impl FromStr for PublicKey {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self {
             recipient: age::x25519::Recipient::from_str(s)
-                .map_err(|err| Error::InvalidAgeIdentity(err.to_owned()))?,
+                .map_err(|err| Error::InvalidAgeRecipient(err.to_owned()))?,
         })
     }
 }
@@ -27,10 +29,34 @@ impl ToString for PublicKey {
     }
 }
 
-impl PublicKey {
+pub struct PublicKeySet(Vec<PublicKey>);
+
+impl PublicKeySet {
+    pub fn new(public_keys: Vec<PublicKey>) -> Result<Self, Error> {
+        if public_keys.is_empty() {
+            return Err(Error::ValidationError("public key set is empty".to_owned()));
+        }
+
+        let set = Self(public_keys);
+        if set.0.iter().unique().count() != set.0.len() {
+            return Err(Error::ValidationError(
+                "public key set contains duplicates".to_owned(),
+            ));
+        }
+
+        Ok(set)
+    }
+
+    fn recipients(&self) -> Vec<Box<dyn age::Recipient + Send>> {
+        self.0
+            .iter()
+            .map(|pubkey| -> Box<dyn age::Recipient + Send> { Box::new(pubkey.recipient.clone()) })
+            .collect()
+    }
+
     fn encrypt_armored(&self, plaintext: &[u8]) -> Result<String, Error> {
-        let encryptor = age::Encryptor::with_recipients(vec![Box::new(self.recipient.clone())])
-            .ok_or(Error::Age("given recipient vec is not empty".to_owned()))?;
+        let encryptor = age::Encryptor::with_recipients(self.recipients())
+            .ok_or(Error::Age("given recipient vec is empty".to_owned()))?;
 
         let mut encrypted = vec![];
         let mut writer = encryptor.wrap_output(age::armor::ArmoredWriter::wrap_output(
@@ -57,6 +83,18 @@ impl PublicKey {
     }
 }
 
+impl From<PublicKey> for PublicKeySet {
+    fn from(pubkey: PublicKey) -> Self {
+        Self(vec![pubkey])
+    }
+}
+
+impl From<PublicKeySet> for Vec<String> {
+    fn from(pubkeys: PublicKeySet) -> Self {
+        pubkeys.0.iter().map(|pubkey| pubkey.to_string()).collect()
+    }
+}
+
 #[derive(derive_more::Deref)]
 pub struct WrappedKey(SecretString);
 
@@ -66,11 +104,11 @@ pub struct EnrollmentKeys {
 }
 
 impl EnrollmentKeys {
-    pub fn generate(org_public_key: &PublicKey) -> Result<Self, Error> {
+    pub fn generate(org_public_keys: &PublicKeySet) -> Result<Self, Error> {
         let recovery_identity = age::x25519::Identity::generate();
         let recovery_public_key = recovery_identity.to_public();
 
-        let wrapped_recovery_key = org_public_key.wrap_key(&recovery_identity)?;
+        let wrapped_recovery_key = org_public_keys.wrap_key(&recovery_identity)?;
 
         // We immediately discard the recovery private key.
         //
@@ -87,16 +125,23 @@ impl EnrollmentKeys {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Read;
+    use std::iter;
 
     #[test]
     fn test_enrollment_keys() {
-        let org_pubkey_str = "age12w83tzg054rhcrx32ludwxxkk0jj4d9mtmvufmmjv3utm97xdu7szgg538";
-        let org_pubkey = PublicKey::from_str(org_pubkey_str).unwrap();
+        let org_privkey_1 = age::x25519::Identity::generate();
+        let org_pubkey_1 = PublicKey::from_str(&org_privkey_1.to_public().to_string()).unwrap();
+
+        let org_privkey_2 = age::x25519::Identity::generate();
+        let org_pubkey_2 = PublicKey::from_str(&org_privkey_2.to_public().to_string()).unwrap();
+
+        let org_pubkeys = PublicKeySet::new(vec![org_pubkey_1, org_pubkey_2]).unwrap();
 
         let EnrollmentKeys {
             recovery_public_key,
             wrapped_recovery_key,
-        } = EnrollmentKeys::generate(&org_pubkey).unwrap();
+        } = EnrollmentKeys::generate(&org_pubkeys).unwrap();
 
         let wrapped_recovery_key = wrapped_recovery_key.expose_secret();
 
@@ -104,5 +149,23 @@ mod tests {
 
         assert!(wrapped_recovery_key.starts_with("-----BEGIN AGE ENCRYPTED FILE-----\n"));
         assert!(wrapped_recovery_key.ends_with("\n-----END AGE ENCRYPTED FILE-----\n"));
+
+        // Check that both keys can independently decrypt and we get back a private key that
+        // matches the recovery_public_key.
+        for key in &[org_privkey_1, org_privkey_2] {
+            let armored_reader = age::armor::ArmoredReader::new(wrapped_recovery_key.as_bytes());
+            let decryptor = match age::Decryptor::new(armored_reader).unwrap() {
+                age::Decryptor::Recipients(d) => d,
+                age::Decryptor::Passphrase(_) => panic!("expected decryptor type"),
+            };
+
+            let mut decrypted = vec![];
+            let mut reader = decryptor.decrypt(iter::once(key as &dyn age::Identity)).unwrap();
+            reader.read_to_end(&mut decrypted).unwrap();
+
+            let recovery_private_key =
+                age::x25519::Identity::from_str(&String::from_utf8(decrypted).unwrap()).unwrap();
+            assert_eq!(recovery_private_key.to_public().to_string(), recovery_public_key);
+        }
     }
 }

@@ -62,7 +62,7 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
         aws_account_id,
         aws_role_name,
         s3_bucket_name,
-        org_public_key: org_identity.public_key_string(),
+        org_public_keys: vec![org_identity.public_key_string()],
         re_enroll: Some(needs_re_enroll),
     });
 

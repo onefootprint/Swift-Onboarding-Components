@@ -1567,9 +1567,9 @@ diesel::table! {
         aws_account_id -> Text,
         aws_role_name -> Text,
         s3_bucket_name -> Text,
-        org_public_key -> Text,
         recovery_public_key -> Text,
         wrapped_recovery_key -> Text,
+        org_public_keys -> Array<Nullable<Text>>,
     }
 }
 

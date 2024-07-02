@@ -35,7 +35,7 @@ pub async fn get(
         aws_account_id: c.aws_account_id,
         aws_role_name: c.aws_role_name,
         s3_bucket_name: c.s3_bucket_name,
-        org_public_key: c.org_public_key,
+        org_public_keys: c.org_public_keys,
     });
 
     Ok(api_wire_types::VaultDrStatus {

@@ -15,7 +15,7 @@ pub struct VaultDrEnrollRequest {
     pub aws_role_name: String,
     pub s3_bucket_name: String,
 
-    pub org_public_key: String,
+    pub org_public_keys: Vec<String>,
 
     pub re_enroll: Option<bool>,
 }

@@ -17,6 +17,7 @@ use paperclip::actix::{
 };
 use vault_dr::EnrollmentKeys;
 use vault_dr::PublicKey;
+use vault_dr::PublicKeySet;
 use vault_dr::VaultDrAwsConfig;
 
 #[api_v2_operation(
@@ -37,11 +38,16 @@ pub async fn post(
         aws_account_id,
         aws_role_name,
         s3_bucket_name,
-        org_public_key,
+        org_public_keys,
         re_enroll,
     } = request.into_inner();
 
-    let org_public_key: PublicKey = org_public_key.parse()?;
+    let org_public_keys = org_public_keys
+        .into_iter()
+        .map(|pubkey| pubkey.parse::<PublicKey>())
+        .collect::<Result<Vec<_>, _>>()?;
+
+    let org_public_key_set = PublicKeySet::new(org_public_keys)?;
 
     let tenant_id = tenant.id.clone();
     let pre_enrollment = state
@@ -67,7 +73,8 @@ pub async fn post(
     let EnrollmentKeys {
         recovery_public_key,
         wrapped_recovery_key,
-    } = EnrollmentKeys::generate(&org_public_key)?;
+    } = EnrollmentKeys::generate(&org_public_key_set)?;
+
 
     let tenant_id = tenant.id.clone();
     state
@@ -96,9 +103,9 @@ pub async fn post(
                 aws_account_id,
                 aws_role_name,
                 s3_bucket_name,
-                org_public_key: org_public_key.to_string(),
                 recovery_public_key,
                 wrapped_recovery_key: wrapped_recovery_key.expose_secret().clone(),
+                org_public_keys: org_public_key_set.into(),
             };
 
             VaultDrConfig::create(conn, new_config)?;

@@ -1,6 +1,7 @@
 use super::ob_configuration::IsLive;
 use crate::errors::FpOptionalExtension;
 use crate::DbResult;
+use crate::NonNullVec;
 use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
@@ -105,9 +106,10 @@ pub struct VaultDrConfig {
     pub aws_role_name: String,
     pub s3_bucket_name: String,
 
-    pub org_public_key: String,
     pub recovery_public_key: String,
     pub wrapped_recovery_key: String,
+    #[diesel(deserialize_as = NonNullVec<String>)]
+    pub org_public_keys: Vec<String>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -123,9 +125,9 @@ pub struct NewVaultDrConfig<'a> {
     pub aws_role_name: String,
     pub s3_bucket_name: String,
 
-    pub org_public_key: String,
     pub recovery_public_key: String,
     pub wrapped_recovery_key: String,
+    pub org_public_keys: Vec<String>,
 }
 
 #[derive(Debug, Clone, derive_more::From)]

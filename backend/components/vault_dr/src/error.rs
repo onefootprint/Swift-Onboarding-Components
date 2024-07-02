@@ -46,14 +46,17 @@ pub enum Error {
     #[error("S3 GetBucketLocation error: {0}")]
     S3GetBucketLocation(#[from] Box<GetBucketLocationError>),
 
-    #[error("Invalid org age identity: {0}")]
-    InvalidAgeIdentity(String),
+    #[error("Invalid age recipient: {0}")]
+    InvalidAgeRecipient(String),
 
     #[error("Age error: {0}")]
     Age(String),
 
     #[error("Age encrypt error: {0}")]
     AgeEncrypt(#[from] age::EncryptError),
+
+    #[error("Validation error: {0}")]
+    ValidationError(String),
 
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
@@ -70,7 +73,8 @@ impl api_errors::FpErrorTrait for Error {
             | Self::AlreadyEnrolled
             | Self::RoleValidationFailed(_)
             | Self::BucketValidationFailed(_)
-            | Self::InvalidAgeIdentity(_) => StatusCode::BAD_REQUEST,
+            | Self::InvalidAgeRecipient(_)
+            | Self::ValidationError(_) => StatusCode::BAD_REQUEST,
             Self::IamAssertionFailed(_)
             | Self::AwsClientMissingRegion
             | Self::StsGetCallerIdentity(_)

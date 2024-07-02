@@ -27,8 +27,6 @@ pub struct VaultDrWriter {
     aws_config: VaultDrAwsConfig,
 }
 
-pub struct VaultDrCloudConfig {}
-
 impl VaultDrWriter {
     pub async fn new(state: &State, config_id: &VaultDrConfigId) -> FpResult<Self> {
         let state_config = state.config.vault_dr_config.clone();

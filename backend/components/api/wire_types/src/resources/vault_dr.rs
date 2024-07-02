@@ -22,8 +22,8 @@ pub struct VaultDrEnrolledStatus {
     pub aws_role_name: String,
     pub s3_bucket_name: String,
 
-    // We expose the org public key so clients can verify their own private key.
-    pub org_public_key: String,
+    // We expose the org public keys so clients can verify their own private key.
+    pub org_public_keys: Vec<String>,
     // TODO:
     // - Latest backup record timestamp
     // - Latest online record timestamp
