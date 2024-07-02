@@ -1,3 +1,4 @@
+import useDocs from '@/create-playbook/hooks/use-docs';
 import { type DataToCollectFormData } from '@/playbooks/utils/machine/types';
 import { IcoTrash24 } from '@onefootprint/icons';
 import { Button, LinkButton, Stack } from '@onefootprint/ui';
@@ -21,6 +22,9 @@ const DocForm = ({ onClose }: DocFormProps) => {
       selfie: watch('personal.docs.selfie'),
     };
   });
+  const {
+    meta: { hasDoc },
+  } = useDocs();
 
   useEffect(() => {
     if (containerRef.current) {
@@ -57,8 +61,9 @@ const DocForm = ({ onClose }: DocFormProps) => {
             iconPosition="left"
             onClick={handleRemoveAll}
             variant="label-4"
+            disabled={!hasDoc}
           >
-            Remove all
+            {t('remove-all')}
           </LinkButton>
         </Stack>
       </Stack>
