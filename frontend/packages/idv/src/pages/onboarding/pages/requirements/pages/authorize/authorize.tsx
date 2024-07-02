@@ -33,7 +33,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     idvContext: { authToken },
-    onboardingContext: { config, overallOutcome },
+    onboardingContext: { config },
     requirements,
   } = state.context;
   const authorizeRequirement = getRequirement(requirements, OnboardingRequirementKind.authorize);
@@ -70,7 +70,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     }
 
     processMutation.mutate(
-      { authToken, fixtureResult: overallOutcome },
+      { authToken },
       {
         onSuccess: onDone,
         onError: (error: unknown) => {

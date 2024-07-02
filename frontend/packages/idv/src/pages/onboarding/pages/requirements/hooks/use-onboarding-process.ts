@@ -4,15 +4,12 @@ import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const onboardingProcess = async (payload: OnboardingProcessRequest) => {
-  const { authToken, fixtureResult } = payload;
+  const { authToken } = payload;
   const response = await request<{}>({
     method: 'POST',
     url: '/hosted/onboarding/process',
     headers: {
       [AUTH_HEADER]: authToken,
-    },
-    data: {
-      fixtureResult,
     },
   });
   return response.data;

@@ -10,12 +10,13 @@ const StartOnboarding = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     idvContext: { authToken },
+    onboardingContext: { overallOutcome },
   } = state.context;
   const onboardingMutation = useOnboarding();
 
   useEffectOnce(() => {
     onboardingMutation.mutate(
-      { authToken },
+      { authToken, fixtureResult: overallOutcome },
       {
         onSuccess: () => {
           nid.identify(authToken);

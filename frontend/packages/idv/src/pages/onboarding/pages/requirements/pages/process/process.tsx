@@ -15,7 +15,6 @@ const Process = ({ onDone }: ProcessProps) => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     idvContext: { authToken },
-    onboardingContext: { overallOutcome },
   } = state.context;
   const processMutation = useOnboardingProcess();
 
@@ -24,7 +23,7 @@ const Process = ({ onDone }: ProcessProps) => {
       return;
     }
     processMutation.mutate(
-      { authToken, fixtureResult: overallOutcome },
+      { authToken },
       {
         onSuccess: () => {
           trackAction('onboarding-process:completed');

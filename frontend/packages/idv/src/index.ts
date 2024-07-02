@@ -37,7 +37,6 @@ export {
   useGetOnboardingConfig,
   useGetOnboardingStatus,
   useLogStateMachine,
-  useOnboarding,
   useOnboardingValidate,
   useParseHandoffUrl,
   useUpdateD2PStatus,
