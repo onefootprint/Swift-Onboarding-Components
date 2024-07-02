@@ -244,5 +244,8 @@
         "description": "We'll only verify TIN (EIN) and business name."
       }
     }
+  },
+  "details": {
+    "html-title": "Footprint | Playbook details"
   }
 }
