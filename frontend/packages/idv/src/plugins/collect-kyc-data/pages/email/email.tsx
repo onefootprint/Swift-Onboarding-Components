@@ -85,7 +85,6 @@ const Email = ({ onComplete, onCancel, ctaLabel, hideHeader }: EmailProps) => {
         <Stack direction="column" gap={5}>
           <TextInput
             data-nid-target="email"
-            data-private
             data-dd-privacy="mask"
             defaultValue={getValues('email')}
             hasError={!!errors.email}

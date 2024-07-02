@@ -21,7 +21,7 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
   const { issuers, device, os } = attributes ?? {};
 
   return (
-    <div data-test-id="liveness-event-body" data-private>
+    <div data-test-id="liveness-event-body" data-dd-privacy="mask">
       {issuers && (
         <EventBodyEntry
           content={

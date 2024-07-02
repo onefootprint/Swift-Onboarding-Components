@@ -59,7 +59,6 @@ const PhoneForm = ({ defaultPhone, isLoading, l10n, onSubmit, options, texts, va
           <PhoneInput
             autoFocus
             data-nid-target="phone-number"
-            data-private
             data-dd-privacy="mask"
             hasError={!!error}
             hint={hint}

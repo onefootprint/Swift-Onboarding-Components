@@ -26,7 +26,6 @@ const CountryOfBirthField = () => {
 
   return (
     <Controller
-      data-private
       data-dd-privacy="mask"
       name="nationality"
       control={control}

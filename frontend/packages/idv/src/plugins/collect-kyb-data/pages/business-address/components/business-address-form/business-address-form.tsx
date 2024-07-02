@@ -134,10 +134,9 @@ const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onC
     <FormProvider {...methods}>
       <Grid.Container tag="form" gap={7} width="100%" onSubmit={handleSubmit(onSubmitFormData)}>
         <Stack gap={5} direction="column">
-          <CountryField onChange={handleCountryChange} data-private data-dd-privacy="mask" />
+          <CountryField onChange={handleCountryChange} data-dd-privacy="mask" />
           <AddressInput
             autoFocus
-            data-private
             data-dd-privacy="mask"
             country={country.value}
             hasError={!!errors.addressLine1}
@@ -148,7 +147,6 @@ const BusinessAddressForm = ({ defaultValues, isLoading, ctaLabel, onSubmit, onC
             {...register('addressLine1', { required: true })}
           />
           <TextInput
-            data-private
             data-dd-privacy="mask"
             autoComplete="address-line2"
             label={t('address-line-2.label')}

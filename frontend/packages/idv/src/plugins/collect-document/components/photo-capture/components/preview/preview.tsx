@@ -25,7 +25,6 @@ const Preview = ({ imageSrc, onRetake, onConfirm, isLoading, cameraKind, deviceK
     <Container>
       <PreviewContainer data-device-kind={deviceKind}>
         <ImagePreview
-          data-private
           data-dd-privacy="mask"
           src={imageSrc}
           data-camera-kind={cameraKind}

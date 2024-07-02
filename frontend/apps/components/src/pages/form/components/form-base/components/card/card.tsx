@@ -54,7 +54,7 @@ const Card = () => {
   return (
     <Row $columns={2}>
       <CardNumberInput
-        data-private
+        data-dd-privacy="mask"
         hasError={!!cardNumberError}
         hint={cardNumberError}
         {...register('number', {
@@ -66,7 +66,7 @@ const Card = () => {
         })}
       />
       <CardExpDateInput
-        data-private
+        data-dd-privacy="mask"
         hasError={!!cardExpiryError}
         hint={cardExpiryError}
         {...register('expiry', {
@@ -78,7 +78,7 @@ const Card = () => {
         })}
       />
       <CardCvc
-        data-private
+        data-dd-privacy="mask"
         hasError={!!cardCvcError}
         hint={cardCvcError}
         numDigits={numDigits}

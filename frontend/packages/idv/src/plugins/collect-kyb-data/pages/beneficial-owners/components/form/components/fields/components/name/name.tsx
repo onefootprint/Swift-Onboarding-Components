@@ -31,7 +31,6 @@ const Name = ({ index }: NameProps) => {
       <Row columns={2}>
         <TextInput
           autoFocus
-          data-private
           data-dd-privacy="mask"
           hasError={hasFirstNameError}
           hint={hasFirstNameError ? t('first-name.error') : undefined}
@@ -41,7 +40,6 @@ const Name = ({ index }: NameProps) => {
         />
 
         <TextInput
-          data-private
           data-dd-privacy="mask"
           label={t('middle-name.label')}
           placeholder={t('middle-name.placeholder')}
@@ -50,7 +48,6 @@ const Name = ({ index }: NameProps) => {
       </Row>
       <Row columns={1}>
         <TextInput
-          data-private
           data-dd-privacy="mask"
           hasError={hasLastNameError}
           hint={hasLastNameError ? t('last-name.error') : undefined}

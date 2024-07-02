@@ -52,7 +52,7 @@ const DobInput = ({ value }: DobInputProps) => {
   return (
     <ValueContainer>
       <TextInput
-        data-private
+        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder="YYYY-MM-DD"

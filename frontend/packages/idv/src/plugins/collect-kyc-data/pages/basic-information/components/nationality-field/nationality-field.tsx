@@ -18,7 +18,6 @@ const NationalityField = ({ disabled }: NationalityFieldProps) => {
 
   return (
     <Controller
-      data-private
       data-dd-privacy="mask"
       control={control}
       name="nationality"

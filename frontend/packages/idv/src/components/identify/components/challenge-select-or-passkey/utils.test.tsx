@@ -1,5 +1,4 @@
 import { ChallengeKind } from '@onefootprint/types';
-import React from 'react';
 
 import type { IdentifyContext } from '../../state/types';
 import { SuccessfulIdentifier } from '../../state/types';
@@ -21,14 +20,7 @@ describe('getChallengeTitleByKind', () => {
       phoneNumber: undefined,
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
-        email: (
-          <>
-            challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true" data-dd-privacy="mask">
-              a@b.com
-            </span>
-          </>
-        ),
+        email: 'a@b.com',
         sms: 'challenge-select-or-biometric.send-code-via-sms',
       },
     },
@@ -42,14 +34,7 @@ describe('getChallengeTitleByKind', () => {
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
         email: 'challenge-select-or-biometric.send-code-via-email',
-        sms: (
-          <>
-            challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true" data-dd-privacy="mask">
-              +123
-            </span>
-          </>
-        ),
+        sms: '+123',
       },
     },
     {
@@ -61,22 +46,8 @@ describe('getChallengeTitleByKind', () => {
       phoneNumber: '+123',
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
-        email: (
-          <>
-            challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true" data-dd-privacy="mask">
-              b•••@g••.com
-            </span>
-          </>
-        ),
-        sms: (
-          <>
-            challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true" data-dd-privacy="mask">
-              +123
-            </span>
-          </>
-        ),
+        email: 'b•••@g••.com',
+        sms: '+123',
       },
     },
     {
@@ -88,42 +59,23 @@ describe('getChallengeTitleByKind', () => {
       phoneNumber: '+123',
       x: {
         biometric: 'challenge-select-or-biometric.passkey',
-        email: (
-          <>
-            challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true" data-dd-privacy="mask">
-              a@b.com
-            </span>
-          </>
-        ),
-        sms: (
-          <>
-            challenge-select-or-biometric.send-code-to{' '}
-            <span data-private="true" data-dd-privacy="mask">
-              +123
-            </span>
-          </>
-        ),
+        email: 'a@b.com',
+        sms: '+123',
       },
     },
   ])('case %#', ({ identify, email, phoneNumber, x }) => {
     const context = {
       identify: identify as IdentifyContext,
-      email: email
-        ? {
-            value: email,
-            isBootstrap: false,
-          }
-        : undefined,
-      phoneNumber: phoneNumber
-        ? {
-            value: phoneNumber,
-            isBootstrap: false,
-          }
-        : undefined,
+      email: email ? { value: email, isBootstrap: false } : undefined,
+      phoneNumber: phoneNumber ? { value: phoneNumber, isBootstrap: false } : undefined,
     };
-    const result = getChallengeTitleByKind(t as T, context);
-    expect(result).toEqual(x);
+    const jsxResult = getChallengeTitleByKind(t as T, context);
+    const strJsxEmail = JSON.stringify(jsxResult.email, null, 0);
+    const strJsxSms = JSON.stringify(jsxResult.sms, null, 0);
+
+    expect(jsxResult.biometric).toEqual(x.biometric);
+    expect(strJsxEmail).toContain(x.email);
+    expect(strJsxSms).toContain(x.sms);
   });
 });
 

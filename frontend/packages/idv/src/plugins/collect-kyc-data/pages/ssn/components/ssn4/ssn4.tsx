@@ -44,7 +44,6 @@ const SSN4 = ({ disabled, isOptional, isSkipped, onSkipChange }: SSN4Props) => {
       <TextInput
         autoFocus
         data-nid-target="ssn4"
-        data-private
         data-dd-privacy="mask"
         disabled={disabled}
         hasError={!!errors.ssn4}

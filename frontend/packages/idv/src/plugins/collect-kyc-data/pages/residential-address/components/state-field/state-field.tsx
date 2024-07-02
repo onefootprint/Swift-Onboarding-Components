@@ -54,7 +54,6 @@ const StateField = () => {
     <TextInput
       autoComplete="address-level1"
       data-nid-target="state"
-      data-private
       data-dd-privacy="mask"
       hasError={!!errors.state}
       hint={errors.state && t('error')}

@@ -28,7 +28,6 @@ const Email = ({ index, requireMultiKyc }: EmailProps) => {
   return shouldHide ? null : (
     <TextInput
       type="email"
-      data-private
       data-dd-privacy="mask"
       label={t('label')}
       placeholder={t('placeholder')}

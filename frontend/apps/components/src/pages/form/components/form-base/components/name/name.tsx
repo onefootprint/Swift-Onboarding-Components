@@ -22,7 +22,7 @@ const Name = ({ label }: NameProps) => {
 
   return (
     <TextInput
-      data-private
+      data-dd-privacy="mask"
       hasError={!!errors.name}
       hint={errors.name?.message}
       label={label ?? t('label')}

@@ -61,7 +61,6 @@ const TaxId = ({
       <TextInput
         autoFocus
         data-nid-target={vaultTaxId}
-        data-private
         data-dd-privacy="mask"
         disabled={disabled}
         hasError={Boolean(errors[vaultTaxId])}

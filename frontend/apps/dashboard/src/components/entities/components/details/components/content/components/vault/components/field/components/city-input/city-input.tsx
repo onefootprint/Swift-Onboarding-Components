@@ -36,7 +36,7 @@ const CityInput = ({ value }: CityInputProps) => {
   return (
     <ValueContainer>
       <TextInput
-        data-private
+        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder=""

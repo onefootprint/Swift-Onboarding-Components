@@ -25,8 +25,7 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
     <BaseSelectTriggerContainer
       data-has-error={hasError}
       data-has-focus={hasFocus}
-      data-private={isPrivate}
-      data-dd-privacy={isPrivate ? 'mask' : 'allow'}
+      {...(isPrivate && { 'data-dd-privacy': 'mask' })}
       data-testid={testID}
       data-size={size}
       disabled={disabled}
@@ -36,7 +35,7 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       /** Do not change/remove these classes */
       className="fp-input fp-custom-appearance"
     >
-      <Content data-private={isPrivate} data-dd-privacy={isPrivate ? 'mask' : 'allow'} data-testid={testID}>
+      <Content data-testid={testID} {...(isPrivate && { 'data-dd-privacy': 'mask' })}>
         {hasIcon ? children : <Text>{children}</Text>}
       </Content>
       <Stack align="center" justify="center" marginLeft={4}>

@@ -30,7 +30,6 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
 
   return (
     <Controller
-      data-private
       data-dd-privacy="mask"
       control={control}
       name="country"

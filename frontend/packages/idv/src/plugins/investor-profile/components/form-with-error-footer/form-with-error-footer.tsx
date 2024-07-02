@@ -15,9 +15,7 @@ type FormWithErrorAndFooterProps = {
 const FormWithErrorAndFooter = ({ children, error, footer, formAttributes }: FormWithErrorAndFooterProps) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
   <Form {...formAttributes}>
-    <Container data-private data-dd-privacy="mask">
-      {children}
-    </Container>
+    <Container data-dd-privacy="mask">{children}</Container>
     {error && <ErrorComponent label={error} />}
     {footer}
   </Form>

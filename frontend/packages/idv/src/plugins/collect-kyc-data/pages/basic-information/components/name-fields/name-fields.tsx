@@ -82,7 +82,6 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
         <TextInput
           data-nid-target="first-name"
           autoFocus
-          data-private
           data-dd-privacy="mask"
           disabled={disabled}
           hasError={!!errors.firstName}
@@ -96,7 +95,6 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
         />
         <TextInput
           data-nid-target="middle-name"
-          data-private
           data-dd-privacy="mask"
           disabled={disabled}
           hasError={!!errors.middleName}
@@ -111,7 +109,6 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
       <Row columns={1}>
         <TextInput
           data-nid-target="last-name"
-          data-private
           data-dd-privacy="mask"
           disabled={disabled}
           hasError={!!errors.lastName}

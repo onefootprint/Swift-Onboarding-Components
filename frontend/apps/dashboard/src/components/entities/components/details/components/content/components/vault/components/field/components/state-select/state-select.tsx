@@ -39,7 +39,7 @@ const StateSelect = ({ value }: StateSelectProps) => {
   return isDomestic ? (
     <ValueContainer>
       <NativeSelect
-        data-private
+        data-dd-privacy="mask"
         aria-label="state"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField)}
@@ -56,7 +56,7 @@ const StateSelect = ({ value }: StateSelectProps) => {
   ) : (
     <ValueContainer>
       <TextInput
-        data-private
+        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder=""

@@ -30,12 +30,7 @@ const CodeInline = ({
 
   if (disabled) {
     return (
-      <CodeContent
-        data-truncate={truncate}
-        data-private={isPrivate}
-        data-dd-privacy={isPrivate ? 'mask' : 'allow'}
-        size={size}
-      >
+      <CodeContent data-truncate={truncate} size={size} {...(isPrivate && { 'data-dd-privacy': 'mask' })}>
         {children}
       </CodeContent>
     );
@@ -48,12 +43,7 @@ const CodeInline = ({
       tooltipText={tooltipText ?? t('components.code-inline.tooltip-text-default')}
       tooltipTextConfirmation={tooltipTextConfirmation ?? t('components.code-inline.tooltip-text-confirmation-default')}
     >
-      <CodeContent
-        data-truncate={truncate}
-        data-private={isPrivate}
-        data-dd-privacy={isPrivate ? 'mask' : 'allow'}
-        size={size}
-      >
+      <CodeContent data-truncate={truncate} size={size} {...(isPrivate && { 'data-dd-privacy': 'mask' })}>
         {children}
       </CodeContent>
     </CopyButton>

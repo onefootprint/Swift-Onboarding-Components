@@ -26,7 +26,6 @@ const OwnershipStake = ({ index }: OwnershipStakeProps) => {
   return (
     <TextInput
       type="number"
-      data-private
       data-dd-privacy="mask"
       hasError={hasError}
       hint={hint}

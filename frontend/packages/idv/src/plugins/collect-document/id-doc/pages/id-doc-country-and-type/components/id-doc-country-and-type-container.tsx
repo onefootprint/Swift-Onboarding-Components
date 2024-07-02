@@ -146,7 +146,6 @@ const IdDocCountryAndTypeContainer = ({
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <InputsContainer>
         <CountrySelect
-          data-private
           data-dd-privacy="mask"
           disabled={supportedCountryRecords.length <= 1}
           label={t('form.country')}

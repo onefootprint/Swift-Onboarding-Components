@@ -26,9 +26,7 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
   const headerTitle = useGetHeaderText();
   const displayEmail = getDisplayEmail({ identify, email });
   const headerSubtitle = displayEmail ? (
-    <span data-private="true" data-dd-privacy="mask">
-      {t('email-challenge.prompt-with-email', { email: displayEmail })}
-    </span>
+    <span data-dd-privacy="mask">{t('email-challenge.prompt-with-email', { email: displayEmail })}</span>
   ) : (
     t('email-challenge.prompt-without-email')
   );
@@ -51,7 +49,7 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
 
   return (
     <Container>
-      <Header data-private data-dd-privacy="mask" title={headerTitle} subtitle={headerSubtitle} />
+      <Header data-dd-privacy="mask" title={headerTitle} subtitle={headerSubtitle} />
       <PinVerification
         onChallengeSucceed={handleChallengeSucceed}
         onNewChallengeRequested={handleNewChallengeRequested}

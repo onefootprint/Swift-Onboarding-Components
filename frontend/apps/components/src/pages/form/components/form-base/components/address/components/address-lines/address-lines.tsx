@@ -62,7 +62,7 @@ const AddressLines = ({ countryCode }: AddressLinesProps) => {
   return (
     <>
       <AddressInput
-        data-private
+        data-dd-privacy="mask"
         country={countryCode}
         hasError={!!errors.addressLine1}
         hint={errors.addressLine1 && t('address-line-1.error')}
@@ -75,7 +75,7 @@ const AddressLines = ({ countryCode }: AddressLinesProps) => {
         })}
       />
       <TextInput
-        data-private
+        data-dd-privacy="mask"
         autoComplete="address-line2"
         label={t('address-line-2.label')}
         placeholder={t('address-line-2.placeholder')}

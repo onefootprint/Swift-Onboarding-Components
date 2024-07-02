@@ -108,7 +108,7 @@ const Confirm = () => {
                 )}
               />
             ) : (
-              <Text tag="span" variant="body-3" color="primary">
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
                 {t(`income.${valueAnnualIncome}`)}
               </Text>
             )}
@@ -144,7 +144,7 @@ const Confirm = () => {
                 )}
               />
             ) : (
-              <Text tag="span" variant="body-3" color="primary">
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
                 {t(`net-worth.${valueNetWorth}`)}
               </Text>
             )}
@@ -185,16 +185,16 @@ const Confirm = () => {
               />
             ) : listInvestmentGoals.length > 1 ? (
               listInvestmentGoals.map(goal => (
-                <Text key={goal} tag="div" variant="body-3" color="primary">
+                <Text key={goal} tag="div" variant="body-3" color="primary" data-dd-privacy="mask">
                   &#8226; {t(`investment-goals.${goal}`)}
                 </Text>
               ))
             ) : listInvestmentGoals.length === 1 ? (
-              <Text tag="span" variant="body-3" color="primary">
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
                 {t(`investment-goals.${listInvestmentGoals[0]}`)}
               </Text>
             ) : (
-              <Text tag="span" variant="body-3" color="primary">
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
                 {t('none')}
               </Text>
             )}
@@ -234,7 +234,7 @@ const Confirm = () => {
                 )}
               />
             ) : (
-              <Text tag="span" variant="body-3" color="primary">
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
                 {t(`risk-tolerance.${valueRiskTolerance}.label`)}
               </Text>
             )}
@@ -275,16 +275,16 @@ const Confirm = () => {
               />
             ) : listDeclarations.length > 1 ? (
               listDeclarations.map(opt => (
-                <Text key={opt} tag="div" variant="body-3" color="primary">
+                <Text key={opt} tag="div" variant="body-3" color="primary" data-dd-privacy="mask">
                   &#8226; {t(`declarations.options.${opt}`)}
                 </Text>
               ))
             ) : listDeclarations.length === 1 ? (
-              <Text tag="span" variant="body-3" color="primary">
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
                 {t(`declarations.options.${listDeclarations[0]}`)}
               </Text>
             ) : (
-              <Text tag="span" variant="body-3" color="primary">
+              <Text tag="span" variant="body-3" color="primary" data-dd-privacy="mask">
                 {t('none')}
               </Text>
             )}

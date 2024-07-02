@@ -27,11 +27,10 @@ const Box = forwardRef<HTMLDivElement, BoxProps>(({ center, typography, tag, tes
       $styleProps={styleProps}
       $typography={typography}
       as={tag}
-      data-private={isPrivate ? 'true' : undefined}
-      data-dd-privacy={isPrivate ? 'mask' : 'allow'}
       data-testid={testID}
       ref={ref}
       className={props.className}
+      {...(isPrivate && { 'data-dd-privacy': 'mask' })}
       {...allProps}
     />
   );

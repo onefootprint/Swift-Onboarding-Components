@@ -17,7 +17,7 @@ const AddressCountrySelect = ({ value }: AddressCountrySelectProps) => {
   return (
     <ValueContainer>
       <NativeSelect
-        data-private
+        data-dd-privacy="mask"
         aria-label="address country"
         defaultValue={value as string}
         {...register(formField, {

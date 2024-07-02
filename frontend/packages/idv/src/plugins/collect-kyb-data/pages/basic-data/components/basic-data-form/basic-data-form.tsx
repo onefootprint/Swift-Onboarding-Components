@@ -109,7 +109,6 @@ const BasicDataForm = ({
       <Stack gap={5} direction="column">
         <TextInput
           autoFocus
-          data-private
           data-dd-privacy="mask"
           hasError={!!errors.name}
           hint={errors.name ? t('business-name.error') : undefined}
@@ -118,14 +117,12 @@ const BasicDataForm = ({
           {...register('name', { required: true })}
         />
         <TextInput
-          data-private
           data-dd-privacy="mask"
           label={t('doing-business-as.label')}
           placeholder={t('doing-business-as.placeholder')}
           {...register('doingBusinessAs')}
         />
         <TextInput
-          data-private
           data-dd-privacy="mask"
           hasError={!!tinHint}
           hint={tinHint}
@@ -147,7 +144,6 @@ const BasicDataForm = ({
 
         {optionalFields?.includes(BusinessDI.corporationType) && (
           <Controller
-            data-private
             data-dd-privacy="mask"
             control={control}
             name="corporationType"
@@ -159,7 +155,6 @@ const BasicDataForm = ({
             }}
             render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
               <Select<{ label: string; value: string }>
-                data-private
                 data-dd-privacy="mask"
                 hasError={!!error}
                 label={t('corporation-type.label')}
@@ -175,7 +170,6 @@ const BasicDataForm = ({
 
         {optionalFields?.includes(BusinessDI.website) && (
           <TextInput
-            data-private
             data-dd-privacy="mask"
             hasError={!!websiteHint}
             hint={websiteHint}
@@ -203,7 +197,6 @@ const BasicDataForm = ({
             }}
             render={({ field: { onChange, onBlur, value, name }, fieldState: { error } }) => (
               <PhoneInput
-                data-private
                 data-dd-privacy="mask"
                 hasError={!!error && !!phoneNumberHint}
                 hint={phoneNumberHint}

@@ -69,7 +69,6 @@ const AddressLines = () => {
       <AddressInput
         data-attribute="address-line-1"
         autoFocus
-        data-private
         data-dd-privacy="mask"
         country={country.value}
         hasError={!!errors.addressLine1}
@@ -83,7 +82,6 @@ const AddressLines = () => {
         })}
       />
       <TextInput
-        data-private
         data-dd-privacy="mask"
         data-attribute="address-line-2"
         autoComplete="address-line2"

@@ -172,7 +172,6 @@ const BaseSelect = <Option extends BaseSelectOption>({
       </div>
       {isOpen && !isMobile && (
         <div
-          data-private
           data-dd-privacy="mask"
           data-testid={`select-${internalId}`}
           ref={setPopperElement}

@@ -50,14 +50,12 @@ const VisaFields = () => {
   return (
     <>
       <Controller
-        data-private
         data-dd-privacy="mask"
         control={control}
         name="visa.kind"
         rules={{ required: true }}
         render={({ field }) => (
           <Select
-            data-private
             data-dd-privacy="mask"
             label={t('visa-kind.label')}
             onBlur={field.onBlur}
@@ -72,7 +70,6 @@ const VisaFields = () => {
         )}
       />
       <TextInput
-        data-private
         data-dd-privacy="mask"
         hasError={!!expirationErrorMessage}
         hint={expirationErrorMessage}

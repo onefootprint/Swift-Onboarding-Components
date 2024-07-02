@@ -31,7 +31,6 @@ const EmailForm = ({ defaultEmail, isLoading, onSubmit, texts }: EmailFormProps)
         <TextInput
           autoFocus
           data-nid-target="email"
-          data-private
           data-dd-privacy="mask"
           defaultValue={getValues('email')}
           hasError={hasError}

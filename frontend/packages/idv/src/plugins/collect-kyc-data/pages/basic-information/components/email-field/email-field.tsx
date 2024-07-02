@@ -24,7 +24,6 @@ const EmailField = ({ disabled }: EmailFieldProps) => {
   return (
     <TextInput
       data-nid-target="email"
-      data-private
       data-dd-privacy="mask"
       defaultValue={getValues('email')}
       disabled={disabled}

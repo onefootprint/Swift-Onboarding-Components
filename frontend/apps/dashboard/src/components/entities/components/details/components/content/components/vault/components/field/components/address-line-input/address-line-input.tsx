@@ -49,7 +49,7 @@ const AddressLineInput = ({ fieldName, fieldValue }: AddressLineInputProps) => {
   return (
     <ValueContainer>
       <TextInput
-        data-private
+        data-dd-privacy="mask"
         size="compact"
         width="fit-content"
         placeholder=""

@@ -18,7 +18,7 @@ const StepUpEventBody = ({ data }: StepUpEventBodyProps) => {
   const documents = data.map(document => t(`${kebabCase(document.kind)}` as ParseKeys<'common'>)).join(', ');
 
   return (
-    <div data-private>
+    <div data-dd-privacy="mask">
       <EventBodyEntry
         iconColor="primary"
         content={

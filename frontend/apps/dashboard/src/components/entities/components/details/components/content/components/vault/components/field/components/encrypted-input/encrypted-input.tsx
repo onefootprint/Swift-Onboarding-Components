@@ -6,7 +6,7 @@ const EncryptedInput = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
   return (
     <Tooltip text={t('decrypt-first')} position="bottom">
-      <TextInput data-private size="compact" placeholder="" disabled defaultValue="•••••••••" />
+      <TextInput data-dd-privacy="mask" size="compact" placeholder="" disabled defaultValue="•••••••••" />
     </Tooltip>
   );
 };

@@ -97,7 +97,6 @@ const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormPr
       {employmentStatus.value === 'employed' && (
         <>
           <TextInput
-            data-private
             data-dd-privacy="mask"
             hasError={!!errors.occupation}
             hint={errors.occupation ? t('occupation.error') : undefined}
@@ -108,7 +107,6 @@ const EmploymentForm = ({ defaultValues, isLoading, onSubmit }: EmploymentFormPr
             })}
           />
           <TextInput
-            data-private
             data-dd-privacy="mask"
             hasError={!!errors.employer}
             hint={errors.employer ? t('employer.error') : undefined}

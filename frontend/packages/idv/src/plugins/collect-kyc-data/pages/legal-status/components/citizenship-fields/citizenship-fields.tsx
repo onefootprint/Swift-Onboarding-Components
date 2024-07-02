@@ -81,7 +81,6 @@ const CitizenshipFields = () => {
       {fields.map((citizenshipField, index) => (
         <Controller
           key={citizenshipField.id}
-          data-private
           data-dd-privacy="mask"
           name={`citizenships.${index}`}
           control={control}

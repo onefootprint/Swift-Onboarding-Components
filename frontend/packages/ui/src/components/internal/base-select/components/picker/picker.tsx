@@ -126,7 +126,6 @@ const Picker = ({
                 onReset={resetSearch}
                 tabIndex={0}
                 value={search}
-                data-private
                 data-dd-privacy="mask"
               />
             </SearchContainer>
