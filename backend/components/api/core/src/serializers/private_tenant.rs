@@ -114,6 +114,8 @@ impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
             one_click_kyc,
             monthly_platform_fee,
             curp_verification,
+            // TODO deal with this
+            prices: _,
 
             id: _,
             _created_at: _,

@@ -159,6 +159,7 @@ diesel::table! {
         monthly_platform_fee -> Nullable<Text>,
         curp_verification -> Nullable<Text>,
         kyb_ein_only -> Nullable<Text>,
+        prices -> Jsonb,
     }
 }
 

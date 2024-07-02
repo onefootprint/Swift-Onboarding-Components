@@ -7,6 +7,7 @@ use db_schema::schema::billing_profile;
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::BillingProfileId;
+use newtypes::PriceMap;
 use newtypes::TenantId;
 
 #[derive(Debug, Clone, Queryable)]
@@ -37,7 +38,9 @@ pub struct BillingProfile {
     pub monthly_platform_fee: Option<String>,
     pub curp_verification: Option<String>,
     pub kyb_ein_only: Option<String>,
+    pub prices: PriceMap,
 }
+
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = billing_profile)]

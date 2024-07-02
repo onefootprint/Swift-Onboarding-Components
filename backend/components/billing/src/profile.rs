@@ -1,9 +1,9 @@
 use crate::is_managed;
 use crate::managed_metadata;
-use crate::product::Product;
 use crate::BResult;
 use crate::BillingInfo;
 use db::models::billing_profile::BillingProfile as DbBillingProfile;
+use newtypes::Product;
 use newtypes::TenantId;
 use rust_decimal::Decimal;
 use std::collections::HashMap;
@@ -74,6 +74,10 @@ impl BillingProfile {
 /// Returns the price of the specified product, in cents
 fn get_price_from(profile: Option<&DbBillingProfile>, product: Product) -> Option<&str> {
     let profile = profile?;
+    if let Some(price) = profile.prices.get(&product) {
+        return Some(price);
+    }
+    // TODO remove this in favor of price map
     match product {
         Product::MonthlyPlatformFee => profile.monthly_platform_fee.as_deref(),
         Product::Pii => profile.pii.as_deref(),

@@ -1,10 +1,79 @@
-use newtypes::BillingEventKind;
+use crate::util::impl_enum_string_diesel;
+use chrono::Duration;
+use diesel::sql_types::Text;
+use diesel::AsExpression;
+use diesel::FromSqlRow;
+use diesel_as_jsonb::AsJsonb;
+use serde_with::DeserializeFromStr;
+use serde_with::SerializeDisplay;
+use std::collections::HashMap;
 use strum_macros::Display;
 use strum_macros::EnumIter;
+use strum_macros::EnumString;
+
+#[derive(Debug, Display, Eq, PartialEq, Hash, Clone, Copy, EnumString, AsExpression, FromSqlRow)]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum BillingEventKind {
+    /// TODO: charge again for events 1y after
+    ContinuousMonitoringPerYear,
+    AdverseMediaPerUser,
+    CurpValidation,
+    Kyc,
+    OneClickKyc,
+    KycWaterfallSecondVendor,
+    KycWaterfallThirdVendor,
+    IdentityDocument,
+    Kyb,
+    KybEinOnly,
+}
+
+impl BillingEventKind {
+    pub fn billing_strategy(&self) -> BillingStrategy {
+        match self {
+            Self::ContinuousMonitoringPerYear => BillingStrategy::PerInterval(Duration::days(365)),
+            Self::AdverseMediaPerUser => BillingStrategy::PerUser,
+            Self::CurpValidation => BillingStrategy::Each,
+            Self::Kyc => BillingStrategy::Each,
+            Self::OneClickKyc => BillingStrategy::Each,
+            Self::KycWaterfallSecondVendor => BillingStrategy::Each,
+            Self::KycWaterfallThirdVendor => BillingStrategy::Each,
+            Self::IdentityDocument => BillingStrategy::Each,
+            Self::Kyb => BillingStrategy::Each,
+            Self::KybEinOnly => BillingStrategy::Each,
+        }
+    }
+}
+
+pub enum BillingStrategy {
+    /// Bill every time an event is created
+    Each,
+    /// Bill for this product once per user
+    PerUser,
+    /// Bill for this product once per user in the defined interval
+    PerInterval(Duration),
+}
+
+impl_enum_string_diesel!(BillingEventKind);
 
 // NOTE: the order of these products is the order in which the line items are rendered in Stripe
 // invoices
-#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter, Display, Ord, PartialOrd)]
+#[derive(
+    Debug,
+    Hash,
+    PartialEq,
+    Eq,
+    Clone,
+    Copy,
+    EnumIter,
+    Display,
+    EnumString,
+    Ord,
+    PartialOrd,
+    DeserializeFromStr,
+    SerializeDisplay,
+)]
+#[strum(serialize_all = "snake_case")]
 pub enum Product {
     /// A fixed amount charged monthly
     MonthlyPlatformFee,
@@ -120,7 +189,7 @@ impl Product {
 
     /// Groups the product into one of the predefined revenue categories. These catgegories are used
     /// to generate monthly revenue reports in stripe sigms
-    pub(crate) fn revenue_category(&self) -> RevenueCategory {
+    pub fn revenue_category(&self) -> RevenueCategory {
         match self {
             Self::IdDocs
             | Self::Kyb
@@ -175,3 +244,7 @@ impl From<BillingEventKind> for Product {
         }
     }
 }
+
+#[derive(Debug, Clone, AsJsonb, serde::Serialize, serde::Deserialize, derive_more::Deref)]
+#[serde(transparent)]
+pub struct PriceMap(HashMap<Product, String>);

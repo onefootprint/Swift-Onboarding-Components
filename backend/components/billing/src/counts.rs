@@ -1,5 +1,4 @@
 use crate::interval::BillingInterval;
-use crate::product::Product;
 use crate::profile::BillingProfile;
 use crate::profile::PriceInfo;
 use crate::BResult;
@@ -14,6 +13,7 @@ use db::DbResult;
 use db::PgConn;
 use itertools::chain;
 use newtypes::AccessEventPurpose;
+use newtypes::Product;
 use newtypes::TenantId;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
@@ -223,9 +223,9 @@ mod test {
     use super::apply_minimum_of;
     use super::LineItem;
     use super::LineItemPrice;
-    use crate::product::Product;
     use crate::profile::PriceInfo;
     use db::test_helpers::assert_have_same_elements;
+    use newtypes::Product;
     use newtypes::TenantId;
     use rust_decimal_macros::dec;
     use std::str::FromStr;

@@ -7,9 +7,9 @@ use interval::BillingInterval;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::PiiString;
+use newtypes::RevenueCategory;
 use newtypes::StripeCustomerId;
 use newtypes::TenantId;
-use product::RevenueCategory;
 use profile::BillingProfile;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
@@ -36,7 +36,6 @@ pub use counts::BillingCounts;
 pub mod interval;
 mod invoices;
 pub use invoices::*;
-mod product;
 mod profile;
 
 #[derive(Debug, thiserror::Error)]
