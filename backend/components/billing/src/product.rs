@@ -117,6 +117,38 @@ impl Product {
             | Self::VaultsWithPci => false,
         }
     }
+
+    /// Groups the product into one of the predefined revenue categories. These catgegories are used
+    /// to generate monthly revenue reports in stripe sigms
+    pub(crate) fn revenue_category(&self) -> RevenueCategory {
+        match self {
+            Self::IdDocs
+            | Self::Kyb
+            | Self::KybEinOnly
+            | Self::WatchlistChecks
+            | Self::Kyc
+            | Self::OneClickKyc
+            | Self::KycWaterfallSecondVendor
+            | Self::KycWaterfallThirdVendor
+            | Self::AdverseMediaPerOnboarding
+            | Self::ContinuousMonitoringPerYear
+            | Self::CurpVerification => RevenueCategory::Identity,
+            Self::HotProxyVaults
+            | Self::HotVaults
+            | Self::Pii
+            | Self::VaultsWithNonPci
+            | Self::VaultsWithPci => RevenueCategory::Security,
+            Self::MonthlyPlatformFee => RevenueCategory::PlatformFee,
+        }
+    }
+}
+
+#[derive(Display)]
+#[strum(serialize_all = "snake_case")]
+pub enum RevenueCategory {
+    Identity,
+    Security,
+    PlatformFee,
 }
 
 impl From<BillingEventKind> for Product {

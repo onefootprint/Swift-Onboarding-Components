@@ -4,10 +4,12 @@ use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use db::models::tenant::Tenant;
 use db::DbError;
 use interval::BillingInterval;
+use itertools::chain;
 use itertools::Itertools;
 use newtypes::PiiString;
 use newtypes::StripeCustomerId;
 use newtypes::TenantId;
+use product::RevenueCategory;
 use profile::BillingProfile;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::prelude::ToPrimitive;
@@ -162,7 +164,8 @@ impl BillingClient {
             }
         }
         new_invoice_item.quantity = Some(count as u64);
-        new_invoice_item.metadata = Some(managed_metadata());
+        let extra_metadata = [("revenue-category".into(), product.revenue_category().to_string())];
+        new_invoice_item.metadata = Some(chain!(extra_metadata, managed_metadata()).collect());
         let item = InvoiceItem::create(&self.client, new_invoice_item).await?;
         Ok(Some(item))
     }
@@ -219,9 +222,11 @@ impl BillingClient {
             if monthly_spend_cents < *monthly_minimum_cents {
                 let remaining_cents = monthly_minimum_cents - monthly_spend_cents;
                 let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
+                let extra_metadata = [("revenue-category".into(), RevenueCategory::Identity.to_string())];
+
                 new_invoice_item.description = Some("Monthly minimum spend on identity");
                 new_invoice_item.amount = remaining_cents.to_i64();
-                new_invoice_item.metadata = Some(managed_metadata());
+                new_invoice_item.metadata = Some(chain!(extra_metadata, managed_metadata()).collect());
                 new_invoice_item.currency = Some(Currency::USD);
                 let i = InvoiceItem::create(&self.client, new_invoice_item).await?;
                 items.insert(i.id.clone(), i);
@@ -235,7 +240,7 @@ impl BillingClient {
 
         // Create the invoice, which will automatically include these billing items
         let extra_metadata = [("billing-interval".to_owned(), info.interval.label())];
-        let metadata = extra_metadata.into_iter().chain(managed_metadata()).collect();
+        let metadata = chain!(extra_metadata, managed_metadata()).collect();
         let new_invoice = CreateInvoice {
             customer: Some(customer_id.clone()),
             metadata: Some(metadata),
