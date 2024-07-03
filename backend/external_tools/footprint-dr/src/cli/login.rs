@@ -56,7 +56,7 @@ pub fn login_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
             stdout.reset()?;
 
             if !confirm(&format!(
-                "Continue logging in to {} ({})? [y/n] ",
+                "Continue logging in to {} ({})?",
                 status.org_name, is_live
             ))? {
                 bail!("Login aborted.");

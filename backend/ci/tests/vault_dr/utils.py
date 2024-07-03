@@ -3,9 +3,12 @@ import boto3
 import json
 import os
 import pexpect
+import re
 import sys
+from dataclasses import dataclass
 
 from tests.utils import _gen_random_n_digit_number
+from tests.constants import VDR_AGE_KEYS
 
 
 EXTERNAL_ID_PATTERN = r"\b([a-z0-9]{32})\b"
@@ -14,7 +17,7 @@ def footprint_dr(*args):
     return pexpect.spawn(
         "footprint-dr",
         list(args),
-        timeout=20,
+        timeout=5,
         logfile=sys.stdout.buffer,
         env=os.environ | {
             "LOG_LEVEL": "debug",
@@ -144,6 +147,33 @@ def create_iam_role(session, bucket_name, external_id, randomize=True):
     return role_name
 
 
+@dataclass
+class EnrollmentConfig:
+    org_public_keys: list[str]
+    aws_account_id: str
+    aws_role_name: str
+    s3_bucket_name: str
+
+    # Extracts the config from the output of `footprint-dr status`.
+    def parse_from_footprint_dr_status(output):
+        match = re.search(r"Organization Public Keys:((?:\s*age1\S+\s*)+)", output)
+        if match is None:
+            # Not enrolled
+            return None
+
+        pubkeys = match.groups(1)[0].split()
+        for key in pubkeys:
+            assert key.startswith("age1")
+
+        return EnrollmentConfig(
+            org_public_keys=pubkeys,
+            aws_account_id=re.search(r"AWS Account ID:\s*(\d+)", output).group(1),
+            aws_role_name=re.search(r"AWS Role Name:\s*(\S+)", output).group(1),
+            s3_bucket_name=re.search(r"S3 Bucket Name:\s*(\S+)", output).group(1),
+        )
+
+
+
 # Idempotently enroll a tenant Vault Disaster Recovery (live mode)
 def enroll_tenant_in_live_vdr(tenant):
     login_live(tenant)
@@ -161,29 +191,84 @@ def enroll_tenant_in_live_vdr(tenant):
 
     iam_role_name = create_iam_role(session, bucket_name, external_id, randomize=False)
 
+    cfg = EnrollmentConfig(
+        org_public_keys=[
+            VDR_AGE_KEYS["1"]["public"],
+            VDR_AGE_KEYS["2"]["public"],
+            # Include a Yubikey public key to test server-side encryption to
+            # YubiKeys. We won't be able to actually decrypt using this
+            # identity though since we don't have YubiKeys in CI. We'll use
+            # the X25519 keys above for that.
+            "age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p",
+        ],
+        aws_account_id=aws_account_id,
+        aws_role_name=iam_role_name,
+        s3_bucket_name=bucket_name,
+    )
 
+    # Compare the current configuration with the desired configuration.
+    with footprint_dr("status", "--live") as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+    output = cmd.before.decode()
+    got_cfg = EnrollmentConfig.parse_from_footprint_dr_status(output)
+
+    # If the configuration is already correct, leave it as is.
+    if got_cfg == cfg:
+        return
+
+    # Otherwise, re-enroll the tenant in Vault Disaster Recovery.
     with footprint_dr("enroll", "--live") as cmd:
         i = cmd.expect_exact([
             r"Re-enrolling will deactivate the current configuration",
             f"Enrolling {tenant.name} (Live) in Vault Disaster Recovery",
         ])
         if i == 0:
-            # Already enrolled. Don't re-enroll to keep this function idempotent.
             cmd.expect("Type .+ to continue, or anything else to cancel: ")
-            return
+            cmd.sendline("restart live-mode Vault Disaster Recovery from scratch")
 
-        cmd.expect("Enter AWS Account ID: ")
+        cmd.expect_exact("Enter org public key (age recipient): ")
+        cmd.sendline(cfg.org_public_keys[0])
+
+        cmd.expect_exact("Are you sure you don't want the benefits of a hardware security token?")
+        cmd.sendline("y")
+
+        cmd.expect_exact("Add another org public key? [y/n] ")
+        cmd.sendline("y")
+
+        cmd.expect_exact("Enter org public key (age recipient): ")
+        cmd.sendline(cfg.org_public_keys[1])
+
+        cmd.expect_exact("Are you sure you don't want the benefits of a hardware security token?")
+        cmd.sendline("y")
+
+        cmd.expect_exact("Add another org public key? [y/n] ")
+        cmd.sendline("y")
+
+        cmd.expect_exact("Enter org public key (age recipient): ")
+        cmd.sendline(cfg.org_public_keys[2])
+
+        cmd.expect_exact("Add another org public key? [y/n] ")
+        cmd.sendline("n")
+
+        cmd.expect("Enter AWS account ID: ")
         cmd.sendline(aws_account_id)
 
-        cmd.expect("Enter AWS Role Name: ")
+        cmd.expect("Enter AWS role name: ")
         cmd.sendline(iam_role_name)
 
-        cmd.expect("Enter S3 Bucket Name: ")
+        cmd.expect("Enter S3 bucket name: ")
         cmd.sendline(bucket_name)
 
         cmd.expect("Verifying configuration... OK")
 
-        cmd.expect("AGE-SECRET-KEY-")
-
         cmd.expect(pexpect.EOF)
     assert cmd.exitstatus == 0
+
+    # Check that the configuration is now correct.
+    with footprint_dr("status", "--live") as cmd:
+        cmd.expect(pexpect.EOF)
+    assert cmd.exitstatus == 0
+    output = cmd.before.decode()
+    got_cfg = EnrollmentConfig.parse_from_footprint_dr_status(output)
+    assert got_cfg == cfg

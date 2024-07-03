@@ -210,7 +210,7 @@ pub(crate) fn get_input(prompt: &str) -> Result<String> {
 }
 
 pub(crate) fn confirm(prompt: &str) -> Result<bool> {
-    let answer = get_input(prompt)?;
+    let answer = get_input(&format!("{} [y/n] ", prompt))?;
     match answer.to_lowercase().as_str() {
         "y" | "yes" => Ok(true),
         "n" | "no" => Ok(false),

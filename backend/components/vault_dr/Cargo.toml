@@ -10,13 +10,12 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-api_core= { path = "../api/core" }
+api_core = { path = "../api/core" }
 api_errors = { path = "../api/errors" }
 db = { path = "../db/core" }
 newtypes = { path = "../newtypes" }
 
 actix-web = { workspace = true }
-age = { workspace = true }
 aws-config = { workspace = true }
 aws-credential-types = { workspace = true }
 aws-sdk-s3 = { workspace = true }
@@ -27,5 +26,12 @@ itertools = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 
-[dev-dependencies]
+age = { workspace = true }
+age-plugin = { workspace = true }
+age-core = { workspace = true }
+sha2 = { workspace = true }
+rand = { workspace = true }
+bech32 = { workspace = true }
+p256 = { workspace = true, features = ["ecdh"] }
 base64 = { workspace = true }
+tempfile = { workspace = true }

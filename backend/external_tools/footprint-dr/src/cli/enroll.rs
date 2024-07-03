@@ -1,8 +1,8 @@
 use super::api_client::IsLive;
 use crate::cli::api_client::get_cli_client;
+use crate::cli::confirm;
 use crate::cli::get_input;
 use crate::cli::wire_types::VaultDrEnrollRequest;
-use age::secrecy::ExposeSecret;
 use anyhow::bail;
 use anyhow::Result;
 use reqwest::Url;
@@ -19,7 +19,7 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     let needs_re_enroll = status.enrolled_status.is_some();
     if needs_re_enroll {
         println!(
-            "{} is already enrolled in Vault Disaster Recovery for {} mode.",
+            "⚠️  {} is already enrolled in Vault Disaster Recovery for {} mode.",
             status.org_name,
             IsLive::from(status.is_live),
         );
@@ -50,11 +50,20 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     );
     println!();
 
-    let aws_account_id = get_input("Enter AWS Account ID: ")?;
-    let aws_role_name = get_input("Enter AWS Role Name: ")?;
-    let s3_bucket_name = get_input("Enter S3 Bucket Name: ")?;
+    let mut org_public_keys = vec![];
+    loop {
+        let pubkey = get_org_pubkey()?;
+        org_public_keys.push(pubkey);
 
-    let org_identity = vault_dr_client::OrgIdentity::generate();
+        if !confirm("Add another org public key?")? {
+            break;
+        }
+    }
+
+    println!();
+    let aws_account_id = get_input("Enter AWS account ID: ")?;
+    let aws_role_name = get_input("Enter AWS role name: ")?;
+    let s3_bucket_name = get_input("Enter S3 bucket name: ")?;
 
     println!();
     print!("Verifying configuration...");
@@ -62,7 +71,7 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
         aws_account_id,
         aws_role_name,
         s3_bucket_name,
-        org_public_keys: vec![org_identity.public_key_string()],
+        org_public_keys,
         re_enroll: Some(needs_re_enroll),
     });
 
@@ -75,14 +84,40 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
     }
 
     println!();
-
-    println!("Your Org Private Key is:");
-    println!();
-    println!("{}", org_identity.private_key_string().expose_secret());
-    println!();
-
-    println!("Store this securely. You will not be able to retrieve this key again without re-enrollment.");
     println!("Enrollment complete.");
 
     Ok(())
+}
+
+pub fn get_org_pubkey() -> Result<String> {
+    let org_pubkey = get_input("Enter org public key (age recipient): ")?;
+
+    // Try parsing as either a plugin or X25519 recipient.
+    let plugin_recipient: Result<age::plugin::Recipient> = org_pubkey
+        .parse()
+        .map_err(|e| anyhow::anyhow!("Invalid YubiKey age recipient: {}", e));
+
+    let x25519_recipient: Result<age::x25519::Recipient> = org_pubkey
+        .parse()
+        .map_err(|e| anyhow::anyhow!("Invalid X25519 age recipient: {}", e));
+
+    match (plugin_recipient, x25519_recipient) {
+        (Ok(plugin_recipient), Err(_)) => {
+            if plugin_recipient.plugin() != "yubikey" {
+                bail!("Invalid age plugin recipient: only age-plugin-yubikey is supported");
+            }
+            Ok(plugin_recipient.to_string())
+        }
+        (Err(_), Ok(x25519_recipient)) => {
+            println!();
+            println!("⚠️  We recommend that you store your org public key on a YubiKey instead of using an X25519 identity.");
+            if confirm("Are you sure you don't want the benefits of a hardware security token?")? {
+                Ok(x25519_recipient.to_string())
+            } else {
+                bail!("Enrollment aborted.");
+            }
+        }
+        (Ok(_), Ok(_)) => bail!("Unreachable: ambiguous age recipient type"),
+        (Err(_), Err(_)) => bail!("Invalid age recipient: only YubiKey and X25519 recipients are supported"),
+    }
 }

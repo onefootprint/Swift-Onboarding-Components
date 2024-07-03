@@ -248,3 +248,15 @@ CDO_TO_DIS = {
     ],
     "us_tax_id": ["id.us_tax_id"],
 }
+
+# Vault Disaster Recovery
+VDR_AGE_KEYS = {
+    "1": {
+        "public": get_secret("VDR_AGE_PUBLIC_KEY_1"),
+        "private": get_secret("VDR_AGE_PUBLIC_KEY_1"),
+    },
+    "2": {
+        "public": get_secret("VDR_AGE_PUBLIC_KEY_2"),
+        "private": get_secret("VDR_AGE_PUBLIC_KEY_2"),
+    },
+}

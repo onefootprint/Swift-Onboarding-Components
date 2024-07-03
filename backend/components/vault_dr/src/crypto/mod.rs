@@ -2,30 +2,68 @@ use super::error::Error;
 use age::secrecy::ExposeSecret;
 use age::secrecy::SecretString;
 use age::secrecy::Zeroize;
+use age::Callbacks;
+use bech32::FromBase32;
 use itertools::Itertools;
 use std::io::Write;
 use std::str::FromStr;
 
+mod integration_tests;
+mod p256;
+mod piv_format;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PublicKey {
-    recipient: age::x25519::Recipient,
+
+#[derive(Clone)]
+pub enum PublicKey {
+    X15519Recipient(age::x25519::Recipient),
+    YubiKeyRecipient {
+        recipient: p256::Recipient,
+        recipient_string: String,
+    },
 }
 
 impl FromStr for PublicKey {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self {
-            recipient: age::x25519::Recipient::from_str(s)
-                .map_err(|err| Error::InvalidAgeRecipient(err.to_owned()))?,
-        })
+        let (hrp, bytes, _) = bech32::decode(s)
+            .map_err(|_| Error::InvalidAgeRecipient("invalid bech32 encoding".to_owned()))?;
+
+        if hrp == "age1yubikey" {
+            let bytes: Vec<_> = Vec::from_base32(&bytes)
+                .map_err(|_| Error::InvalidAgeRecipient("invalid bech32 byte encoding".to_owned()))?;
+            let recipient = p256::Recipient::from_bytes(bytes.as_slice())
+                .ok_or_else(|| Error::InvalidAgeRecipient("parsing failed".to_owned()))?;
+
+            Ok(Self::YubiKeyRecipient {
+                recipient,
+                recipient_string: s.to_owned(),
+            })
+        } else {
+            let x25519_recipient: Result<age::x25519::Recipient, Error> = s
+                .parse()
+                .map_err(|err: &str| Error::InvalidAgeRecipient(err.to_owned()));
+
+            Ok(Self::X15519Recipient(x25519_recipient?))
+        }
     }
 }
 
 impl ToString for PublicKey {
     fn to_string(&self) -> String {
-        self.recipient.to_string()
+        match self {
+            PublicKey::X15519Recipient(r) => r.to_string(),
+            PublicKey::YubiKeyRecipient { recipient_string, .. } => recipient_string.clone(),
+        }
+    }
+}
+
+impl PublicKey {
+    pub fn recipient(self) -> Box<dyn age::Recipient + Send> {
+        match self {
+            PublicKey::X15519Recipient(recipient) => Box::new(recipient),
+            PublicKey::YubiKeyRecipient { recipient, .. } => Box::new(recipient),
+        }
     }
 }
 
@@ -38,7 +76,7 @@ impl PublicKeySet {
         }
 
         let set = Self(public_keys);
-        if set.0.iter().unique().count() != set.0.len() {
+        if set.0.iter().map(|r| r.to_string()).unique().count() != set.0.len() {
             return Err(Error::ValidationError(
                 "public key set contains duplicates".to_owned(),
             ));
@@ -48,10 +86,7 @@ impl PublicKeySet {
     }
 
     fn recipients(&self) -> Vec<Box<dyn age::Recipient + Send>> {
-        self.0
-            .iter()
-            .map(|pubkey| -> Box<dyn age::Recipient + Send> { Box::new(pubkey.recipient.clone()) })
-            .collect()
+        self.0.iter().map(|pubkey| pubkey.clone().recipient()).collect()
     }
 
     fn encrypt_armored(&self, plaintext: &[u8]) -> Result<String, Error> {
@@ -122,6 +157,38 @@ impl EnrollmentKeys {
     }
 }
 
+/// A dummy implementation of Callbacks to fulfill the age plugin API.
+/// Our server-side usage of age-plugin-yubikey should not generate any callbacks.
+#[derive(Clone)]
+struct CallbacksNotSupported;
+
+impl Callbacks for CallbacksNotSupported {
+    fn display_message(&self, message: &str) {
+        tracing::info!(message, "Message from age plugin");
+    }
+
+    fn confirm(&self, message: &str, _yes_string: &str, _no_string: Option<&str>) -> Option<bool> {
+        tracing::error!(message, "Unexpected call to confirm callback from age plugin");
+        None
+    }
+
+    fn request_public_string(&self, description: &str) -> Option<String> {
+        tracing::error!(
+            description,
+            "Unexpected call to request_public_string callback from age plugin"
+        );
+        None
+    }
+
+    fn request_passphrase(&self, description: &str) -> Option<SecretString> {
+        tracing::error!(
+            description,
+            "Unexpected call to request_passphrase callback from age plugin"
+        );
+        None
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -136,7 +203,11 @@ mod tests {
         let org_privkey_2 = age::x25519::Identity::generate();
         let org_pubkey_2 = PublicKey::from_str(&org_privkey_2.to_public().to_string()).unwrap();
 
-        let org_pubkeys = PublicKeySet::new(vec![org_pubkey_1, org_pubkey_2]).unwrap();
+        let org_pubkey_3 =
+            PublicKey::from_str("age1yubikey1q23xqm9y4ym90e90jqzdtejvpm3k65460aqxca5nm2p3vxhtr9dky648v2p")
+                .unwrap();
+
+        let org_pubkeys = PublicKeySet::new(vec![org_pubkey_1, org_pubkey_2, org_pubkey_3]).unwrap();
 
         let EnrollmentKeys {
             recovery_public_key,
@@ -150,7 +221,7 @@ mod tests {
         assert!(wrapped_recovery_key.starts_with("-----BEGIN AGE ENCRYPTED FILE-----\n"));
         assert!(wrapped_recovery_key.ends_with("\n-----END AGE ENCRYPTED FILE-----\n"));
 
-        // Check that both keys can independently decrypt and we get back a private key that
+        // Check that both X25519 keys can independently decrypt and we get back a private key that
         // matches the recovery_public_key.
         for key in &[org_privkey_1, org_privkey_2] {
             let armored_reader = age::armor::ArmoredReader::new(wrapped_recovery_key.as_bytes());
