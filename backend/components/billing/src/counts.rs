@@ -120,25 +120,28 @@ impl BillingCounts {
         let watchlist_checks = WatchlistCheck::get_billable_count(conn, t_id, i.start, i.end)?;
 
         // These billing schemes are only used by some tenants, so only count them conditionally
-        let hot_vaults = if bp.is_some_and(|p| p.hot_vaults.is_some()) {
+        let hot_vaults = if bp.and_then(|p| p.prices.get(&Product::HotVaults)).is_some() {
             let p = AccessEventPurpose::iter().collect(); // Any access is billable
             Some(AccessEvent::count_hot_vaults(conn, t_id, i.start, i.end, p)?)
         } else {
             None
         };
-        let hot_proxy_vaults = if bp.is_some_and(|p| p.hot_proxy_vaults.is_some()) {
+        let hot_proxy_vaults = if bp.and_then(|p| p.prices.get(&Product::HotProxyVaults)).is_some() {
             let p = vec![AccessEventPurpose::VaultProxy];
             Some(AccessEvent::count_hot_vaults(conn, t_id, i.start, i.end, p)?)
         } else {
             None
         };
-        let vaults_with_non_pci = if bp.is_some_and(|p| p.vaults_with_non_pci.is_some()) {
+        let vaults_with_non_pci = if bp
+            .and_then(|p| p.prices.get(&Product::VaultsWithNonPci))
+            .is_some()
+        {
             let filter = ScopedVaultPiiFilters::NonPci;
             Some(ScopedVault::count_billable(conn, t_id, i.end, filter)?)
         } else {
             None
         };
-        let vaults_with_pci = if bp.is_some_and(|p| p.vaults_with_non_pci.is_some()) {
+        let vaults_with_pci = if bp.and_then(|p| p.prices.get(&Product::VaultsWithPci)).is_some() {
             let filter = ScopedVaultPiiFilters::PciOrCustom;
             Some(ScopedVault::count_billable(conn, t_id, i.end, filter)?)
         } else {
