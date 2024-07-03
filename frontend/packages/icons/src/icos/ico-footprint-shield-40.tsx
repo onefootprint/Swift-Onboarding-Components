@@ -1,8 +1,6 @@
 import React from 'react';
 import { useTheme } from 'styled-components';
-
 import type { IconProps } from '../types';
-
 const IcoFootprintShield40 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
@@ -20,7 +18,7 @@ const IcoFootprintShield40 = ({ 'aria-label': ariaLabel, color = 'primary', clas
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M3 10.62 20 3l17 7.62S35.565 37 20 37 3 10.62 3 10.62Zm22.51 11.446h-2.755a3.444 3.444 0 0 0-3.444 3.444v2.754h-4.82V11.736h11.018v3.126a2.737 2.737 0 0 0-1.377-.371 2.755 2.755 0 1 0 1.377 5.137v2.438Z"
+        d="M19.511 3.08a1.13 1.13 0 0 1 .977 0L36.37 10.7c.427.205.681.642.62 1.112C36.44 16.114 33.093 36.97 20 36.97c-13.092 0-16.44-20.856-16.991-25.158-.06-.47.194-.907.621-1.112l15.881-7.62Zm6.518 19.093h-2.753a3.44 3.44 0 0 0-3.442 3.438v2.75h-4.817v-16.5h11.012v3.12a2.752 2.752 0 0 0-4.13 2.38 2.751 2.751 0 0 0 4.13 2.379v2.433Z"
         fill={theme.color[color]}
       />
     </svg>

@@ -1,8 +1,6 @@
 import React from 'react';
 import { useTheme } from 'styled-components';
-
 import type { IconProps } from '../types';
-
 const IcoFootprintShield16 = ({ 'aria-label': ariaLabel, color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
@@ -17,19 +15,12 @@ const IcoFootprintShield16 = ({ 'aria-label': ariaLabel, color = 'primary', clas
       role="img"
       data-colored={false}
     >
-      <g clipPath="url(#prefix__a)">
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M.5 3.862 8 .5l7.5 3.362S14.867 15.5 8 15.5.5 3.862.5 3.862Zm9.833 5.013H9.167c-.806 0-1.459.653-1.459 1.459V11.5H5.667v-7h4.666v1.324a1.167 1.167 0 1 0 0 2.019v1.032Z"
-          fill={theme.color[color]}
-        />
-      </g>
-      <defs>
-        <clipPath id="prefix__a">
-          <path fill="#fff" d="M0 0h16v16H0z" />
-        </clipPath>
-      </defs>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.799 1.046a.464.464 0 0 1 .402 0l6.528 3.137c.175.084.28.264.255.457C14.758 6.41 13.382 15 8 15S1.243 6.41 1.016 4.64a.443.443 0 0 1 .255-.457L7.8 1.046Zm2.68 7.861H9.346c-.782 0-1.415.634-1.415 1.416v1.132h-1.98V4.661h4.526v1.285a1.132 1.132 0 1 0 0 1.96v1.001Z"
+        fill={theme.color[color]}
+      />
     </svg>
   );
 };
