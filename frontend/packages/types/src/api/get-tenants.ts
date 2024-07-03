@@ -33,33 +33,31 @@ export enum TenantPreviewApi {
   LegacyOnboardingStatusWebhook = 'legacy_onboarding_status_webhook',
 }
 
-export const TENANT_BILLING_PROFILE_PRODUCTS = [
-  'monthlyPlatformFee',
-  'kyc',
-  'oneClickKyc',
-  'kycWaterfallSecondVendor',
-  'kycWaterfallThirdVendor',
-  'idDocs',
-  'kyb',
-  'kybEinOnly',
-  'curpVerification',
-  'pii',
-  'hotVaults',
-  'hotProxyVaults',
-  'vaultsWithNonPci',
-  'vaultsWithPci',
-  'watchlist',
-  'adverseMediaPerUser',
-  'continuousMonitoringPerYear',
-  'monthlyMinimum',
-];
-
-export type TenantBillingProfileProduct = (typeof TENANT_BILLING_PROFILE_PRODUCTS)[number];
+export enum TenantBillingProfileProduct {
+  monthlyPlatformFee = 'monthlyPlatformFee',
+  kyc = 'kyc',
+  oneClickKyc = 'oneClickKyc',
+  kycWaterfallSecondVendor = 'kycWaterfallSecondVendor',
+  kycWaterfallThirdVendor = 'kycWaterfallThirdVendor',
+  idDocs = 'idDocs',
+  kyb = 'kyb',
+  kybEinOnly = 'kybEinOnly',
+  curpVerification = 'curpVerification',
+  pii = 'pii',
+  hotVaults = 'hotVaults',
+  hotProxyVaults = 'hotProxyVaults',
+  vaultsWithNonPci = 'vaultsWithNonPci',
+  vaultsWithPci = 'vaultsWithPci',
+  watchlistChecks = 'watchlistChecks',
+  adverseMediaPerOnboarding = 'adverseMediaPerOnboarding',
+  continuousMonitoringPerYear = 'continuousMonitoringPerYear',
+  monthlyMinimum = 'monthlyMinimum',
+}
 
 /**
  * The price of each product for this tenant, set in cents.
  */
-export type TenantBillingProfile = Record<TenantBillingProfileProduct, string | undefined | null>;
+export type TenantBillingProfile = Partial<Record<TenantBillingProfileProduct, string | null>>;
 
 export type TenantVendorControl = {
   idologyEnabled: boolean;

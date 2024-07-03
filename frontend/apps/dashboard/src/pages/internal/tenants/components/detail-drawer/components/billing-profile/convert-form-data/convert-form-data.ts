@@ -1,5 +1,5 @@
 import type { TenantBillingProfile } from '@onefootprint/types/src/api/get-tenants';
-import { TENANT_BILLING_PROFILE_PRODUCTS } from '@onefootprint/types/src/api/get-tenants';
+import { TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
 
 import { ifChanged, strOrNull } from '../../../utils/form-data-utils';
 
@@ -10,7 +10,7 @@ export const convertFormData = (
   formData: BillingProfileFormData,
 ): TenantBillingProfile =>
   Object.fromEntries(
-    TENANT_BILLING_PROFILE_PRODUCTS.map(k => {
+    Object.values(TenantBillingProfileProduct).map(k => {
       // Serialize the empty string as null
       const value = ifChanged(strOrNull(formData?.[k]), bp?.[k]);
       return [k, value];

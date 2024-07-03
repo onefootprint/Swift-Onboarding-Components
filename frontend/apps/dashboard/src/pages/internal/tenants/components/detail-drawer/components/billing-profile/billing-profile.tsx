@@ -1,6 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import type { TenantDetail } from '@onefootprint/types';
-import type { TenantBillingProfile, TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
+import type { TenantBillingProfile } from '@onefootprint/types/src/api/get-tenants';
+import { TenantBillingProfileProduct } from '@onefootprint/types/src/api/get-tenants';
 import { Stack, Text, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -15,99 +16,58 @@ type BillingProfileProps = {
   tenant: TenantDetail;
 };
 
-type BillingProfileField = {
-  title: string;
-  field: TenantBillingProfileProduct;
-};
-
 const UPDATE_BP_FORM_ID = 'update-bp-form';
 
-const KYC: BillingProfileField[] = [
-  {
-    title: 'KYC',
-    field: 'kyc',
-  },
-  {
-    title: 'One-click KYC',
-    field: 'oneClickKyc',
-  },
-  {
-    title: 'KYC Waterfall (second vendor)',
-    field: 'kycWaterfallSecondVendor',
-  },
-  {
-    title: 'KYC Waterfall (third vendor)',
-    field: 'kycWaterfallThirdVendor',
-  },
+const KYC = [
+  TenantBillingProfileProduct.kyc,
+  TenantBillingProfileProduct.oneClickKyc,
+  TenantBillingProfileProduct.kycWaterfallSecondVendor,
+  TenantBillingProfileProduct.kycWaterfallThirdVendor,
 ];
 
-const OTHER_VERIFICATIONS: BillingProfileField[] = [
-  {
-    title: 'ID documents',
-    field: 'idDocs',
-  },
-  {
-    title: 'KYB',
-    field: 'kyb',
-  },
-  {
-    title: 'KYB (EIN only)',
-    field: 'kybEinOnly',
-  },
-  {
-    title: 'CURP verification',
-    field: 'curpVerification',
-  },
+const OTHER_VERIFICATIONS = [
+  TenantBillingProfileProduct.idDocs,
+  TenantBillingProfileProduct.kyb,
+  TenantBillingProfileProduct.kybEinOnly,
+  TenantBillingProfileProduct.curpVerification,
 ];
 
-const VAULTING: BillingProfileField[] = [
-  {
-    title: 'Monthly PII',
-    field: 'pii',
-  },
-  {
-    title: 'Hot vaults',
-    field: 'hotVaults',
-  },
-  {
-    title: 'Hot proxy vaults',
-    field: 'hotProxyVaults',
-  },
-  {
-    title: 'Monthly vaults with PCI',
-    field: 'vaultsWithPci',
-  },
-  {
-    title: 'Monthly vaults with Non-PCI',
-    field: 'vaultsWithNonPci',
-  },
+const VAULTING = [
+  TenantBillingProfileProduct.pii,
+  TenantBillingProfileProduct.hotVaults,
+  TenantBillingProfileProduct.hotProxyVaults,
+  TenantBillingProfileProduct.vaultsWithPci,
+  TenantBillingProfileProduct.vaultsWithNonPci,
 ];
 
-const WATCHLIST: BillingProfileField[] = [
-  {
-    title: 'Monthly Watchlist',
-    field: 'watchlist',
-  },
-  {
-    title: 'Adverse media (per user)',
-    field: 'adverseMediaPerUser',
-  },
-  {
-    title: 'Continuous monitoring (per year)',
-    field: 'continuousMonitoringPerYear',
-  },
+const WATCHLIST = [
+  TenantBillingProfileProduct.watchlistChecks,
+  TenantBillingProfileProduct.adverseMediaPerOnboarding,
+  TenantBillingProfileProduct.continuousMonitoringPerYear,
 ];
 
-const OTHER: BillingProfileField[] = [
-  {
-    title: 'Monthly minimum on identity products',
-    field: 'monthlyMinimum',
-  },
-  {
-    title: 'Monthly platform fee',
-    field: 'monthlyPlatformFee',
-  },
-];
+const OTHER = [TenantBillingProfileProduct.monthlyMinimum, TenantBillingProfileProduct.monthlyPlatformFee];
+
+const ProductToTitle: Record<TenantBillingProfileProduct, string> = {
+  [TenantBillingProfileProduct.kyc]: 'KYC',
+  [TenantBillingProfileProduct.oneClickKyc]: 'One-click KYC',
+  [TenantBillingProfileProduct.kycWaterfallSecondVendor]: 'KYC waterfall (second vendor)',
+  [TenantBillingProfileProduct.kycWaterfallThirdVendor]: 'KYC waterfall (third vendor)',
+  [TenantBillingProfileProduct.idDocs]: 'ID documents',
+  [TenantBillingProfileProduct.kyb]: 'KYB',
+  [TenantBillingProfileProduct.kybEinOnly]: 'KYB (EIN-only)',
+  [TenantBillingProfileProduct.curpVerification]: 'CURP verification',
+  [TenantBillingProfileProduct.pii]: 'Per vault (monthly)',
+  [TenantBillingProfileProduct.hotVaults]: 'Hot vaults',
+  [TenantBillingProfileProduct.hotProxyVaults]: 'Hot proxy vaults',
+  [TenantBillingProfileProduct.vaultsWithPci]: 'Per vault with card/custom data (monthly)',
+  [TenantBillingProfileProduct.vaultsWithNonPci]: 'Per vault with id data (monthly) ',
+  [TenantBillingProfileProduct.watchlistChecks]: 'Monthly watchlist',
+  [TenantBillingProfileProduct.adverseMediaPerOnboarding]: 'Adverse media (per user)',
+  [TenantBillingProfileProduct.continuousMonitoringPerYear]: 'Continuous monitoring (per year)',
+  [TenantBillingProfileProduct.monthlyMinimum]: 'Monthly minimum',
+  [TenantBillingProfileProduct.monthlyPlatformFee]: 'Monthly platform fee',
+};
 
 const SECTIONS = [
   {
@@ -201,10 +161,10 @@ const BillingProfile = ({ tenant }: BillingProfileProps) => {
           {SECTIONS.map((section, i) => (
             <Fieldset title={section.title} key={section.title} cta={i === 0 ? headerCta : undefined}>
               <Stack direction="column" gap={5}>
-                {section.fields.map(f => (
-                  <Field label={f.title} key={f.title}>
-                    {!isEditing && priceDisplay(bp?.[f.field])}
-                    {isEditing && <TextInput placeholder="0" {...register(f.field)} />}
+                {section.fields.map(p => (
+                  <Field label={ProductToTitle[p]} key={p}>
+                    {!isEditing && priceDisplay(bp?.[p])}
+                    {isEditing && <TextInput placeholder="0" {...register(p)} />}
                   </Field>
                 ))}
               </Stack>

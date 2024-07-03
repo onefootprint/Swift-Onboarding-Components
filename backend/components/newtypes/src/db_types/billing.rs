@@ -225,10 +225,7 @@ impl From<BillingEventKind> for Product {
         // If you've come here after adding a new BillingEventKind, you'll need to:
         // - Add a variant to the Product enum
         // - Create a new product in the stripe dashboard
-        // - Add a new column to the BillingProfile table to support per-tenant pricing of this product
-        // - Expose the new price for the new product in the private APIs for getting / updating billing
-        //   profile
-        // - Add the new price for the new product to billing-profile.tsx on the dashboard
+        // - Add the product to billing-profile.tsx on the dashboard
         // The rust compiler will guide you through all but the dashboard changes
         match value {
             BillingEventKind::ContinuousMonitoringPerYear => Product::ContinuousMonitoringPerYear,
@@ -245,6 +242,15 @@ impl From<BillingEventKind> for Product {
     }
 }
 
-#[derive(Debug, Clone, AsJsonb, serde::Serialize, serde::Deserialize, derive_more::Deref)]
+#[derive(
+    Debug, Clone, AsJsonb, serde::Serialize, serde::Deserialize, derive_more::Deref, derive_more::DerefMut,
+)]
 #[serde(transparent)]
+/// Mapping of Product -> price in cents
 pub struct PriceMap(HashMap<Product, String>);
+
+impl From<PriceMap> for HashMap<Product, String> {
+    fn from(value: PriceMap) -> Self {
+        value.0
+    }
+}

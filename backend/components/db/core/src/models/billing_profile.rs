@@ -8,7 +8,9 @@ use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::BillingProfileId;
 use newtypes::PriceMap;
+use newtypes::Product;
 use newtypes::TenantId;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = billing_profile)]
@@ -20,6 +22,7 @@ pub struct BillingProfile {
 
     // WARNING: do NOT re-order these columns
     // All in cents
+    // TODO remove all of these in favor of the prices hashmap
     pub kyc: Option<String>,
     pub kyb: Option<String>,
     pub pii: Option<String>,
@@ -48,29 +51,6 @@ pub struct NewBillingProfile<'a> {
     pub tenant_id: &'a TenantId,
 }
 
-#[derive(Debug, Clone, AsChangeset, Default)]
-#[diesel(table_name = billing_profile)]
-pub struct UpdateBillingProfile {
-    pub kyc: Option<Option<String>>,
-    pub kyb: Option<Option<String>>,
-    pub pii: Option<Option<String>>,
-    pub id_docs: Option<Option<String>>,
-    pub watchlist: Option<Option<String>>,
-    pub hot_vaults: Option<Option<String>>,
-    pub hot_proxy_vaults: Option<Option<String>>,
-    pub vaults_with_non_pci: Option<Option<String>>,
-    pub vaults_with_pci: Option<Option<String>>,
-    pub adverse_media_per_user: Option<Option<String>>,
-    pub continuous_monitoring_per_year: Option<Option<String>>,
-    pub monthly_minimum: Option<Option<String>>,
-    pub kyc_waterfall_second_vendor: Option<Option<String>>,
-    pub kyc_waterfall_third_vendor: Option<Option<String>>,
-    pub one_click_kyc: Option<Option<String>>,
-    pub monthly_platform_fee: Option<Option<String>>,
-    pub curp_verification: Option<Option<String>>,
-    pub kyb_ein_only: Option<Option<String>>,
-}
-
 impl BillingProfile {
     pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> DbResult<Option<Self>> {
         let result = billing_profile::table
@@ -90,51 +70,67 @@ impl BillingProfile {
             .for_no_key_update()
             .get_result::<Self>(conn.conn())
             .optional()?;
-        if existing.is_none() {
+        let existing = if let Some(existing) = existing {
+            existing
+        } else {
             let new = NewBillingProfile { tenant_id };
             diesel::insert_into(billing_profile::table)
                 .values(new)
-                .execute(conn.conn())?;
-        }
+                .get_result::<Self>(conn.conn())?
+        };
+        let mut new_prices = existing.prices;
+        update.into_iter().for_each(|(product, value)| match value {
+            Some(Some(v)) => {
+                new_prices.insert(product, v);
+            }
+            Some(None) => {
+                new_prices.remove(&product);
+            }
+            None => (),
+        });
+        // Apply onto existing prices
         let result = diesel::update(billing_profile::table)
             .filter(billing_profile::tenant_id.eq(tenant_id))
-            .set(update)
+            .set(billing_profile::prices.eq(new_prices))
             .get_result::<Self>(conn.conn())?;
         Ok(result)
     }
 }
 
+pub type UpdateBillingProfile = HashMap<Product, Option<Option<String>>>;
+
 #[cfg(test)]
 mod test {
     use crate::models::billing_profile::BillingProfile;
-    use crate::models::billing_profile::UpdateBillingProfile;
     use crate::tests::prelude::TestPgConn;
     use crate::tests::prelude::*;
     use macros::db_test;
+    use newtypes::Product;
     use newtypes::TenantId;
+    use std::collections::HashMap;
 
     #[db_test]
     fn test_billing_profile(conn: &mut TestPgConn) {
         let tenant_id = TenantId::test_data("org_flerp".into());
-        let update = UpdateBillingProfile {
-            kyc: Some(Some("50".into())),
-            kyb: Some(Some("700".into())),
-            pii: Some(Some("3".into())),
-            ..Default::default()
-        };
+        let update = HashMap::from_iter([
+            (Product::Kyc, Some(Some("50".into()))),
+            (Product::Kyb, Some(Some("700".into()))),
+            (Product::KybEinOnly, Some(Some("100".into()))),
+            (Product::Pii, Some(Some("3".into()))),
+        ]);
         BillingProfile::update_or_create(conn, &tenant_id, update).unwrap();
-        let update = UpdateBillingProfile {
+        let update = HashMap::from_iter([
             // Should clear kyc
-            kyc: Some(None),
-            // Should leave kyb untouched
-            kyb: None,
+            (Product::Kyc, Some(None)),
+            // Should leave kyb untouched, and KybEinOnly because omitted
+            (Product::Kyb, None),
             // And should update pii
-            pii: Some(Some("5".into())),
-            ..Default::default()
-        };
+            (Product::Pii, Some(Some("5".into()))),
+        ]);
         let bp = BillingProfile::update_or_create(conn, &tenant_id, update).unwrap();
-        assert!(bp.kyc.is_none());
-        assert_eq!(bp.kyb, Some("700".into()));
-        assert_eq!(bp.pii, Some("5".into()));
+        assert!(bp.prices.get(&Product::Kyc).is_none());
+        assert_eq!(bp.prices.get(&Product::Kyb).unwrap(), "700");
+        assert_eq!(bp.prices.get(&Product::KybEinOnly).unwrap(), "100");
+        assert_eq!(bp.prices.get(&Product::Pii).unwrap(), "5");
     }
 }

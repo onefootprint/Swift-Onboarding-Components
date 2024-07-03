@@ -2,9 +2,11 @@ use crate::*;
 use newtypes::AppClipExperienceId;
 use newtypes::PiiString;
 use newtypes::PreviewApi;
+use newtypes::Product;
 use newtypes::StripeCustomerId;
 use newtypes::TenantId;
 use newtypes::WorkosAuthMethod;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivateTenantFilters {
@@ -53,34 +55,8 @@ pub struct PrivateTenantDetail {
     pub stripe_customer_id: Option<StripeCustomerId>,
     pub app_clip_experience_id: AppClipExperienceId,
 
-    pub billing_profile: Option<PrivateBillingProfile>,
+    pub billing_profile: Option<HashMap<Product, String>>,
     pub vendor_control: Option<PrivateTenantVendorControl>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-pub struct PrivateBillingProfile {
-    pub kyc: Option<String>,
-    pub one_click_kyc: Option<String>,
-    pub kyc_waterfall_second_vendor: Option<String>,
-    pub kyc_waterfall_third_vendor: Option<String>,
-
-    pub id_docs: Option<String>,
-    pub kyb: Option<String>,
-    pub kyb_ein_only: Option<String>,
-    pub curp_verification: Option<String>,
-
-    pub pii: Option<String>,
-    pub hot_vaults: Option<String>,
-    pub hot_proxy_vaults: Option<String>,
-    pub vaults_with_non_pci: Option<String>,
-    pub vaults_with_pci: Option<String>,
-
-    pub watchlist: Option<String>,
-    pub adverse_media_per_user: Option<String>,
-    pub continuous_monitoring_per_year: Option<String>,
-
-    pub monthly_minimum: Option<String>,
-    pub monthly_platform_fee: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -92,49 +68,9 @@ pub struct PrivateTenantVendorControl {
     pub middesk_api_key_exists: bool,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
-pub struct PrivateUpdateBillingProfile {
-    #[serde(default)]
-    pub kyc: Patch<String>,
-    #[serde(default)]
-    pub one_click_kyc: Patch<String>,
-    #[serde(default)]
-    pub kyc_waterfall_second_vendor: Patch<String>,
-    #[serde(default)]
-    pub kyc_waterfall_third_vendor: Patch<String>,
-
-    #[serde(default)]
-    pub id_docs: Patch<String>,
-    #[serde(default)]
-    pub kyb: Patch<String>,
-    #[serde(default)]
-    pub kyb_ein_only: Patch<String>,
-    #[serde(default)]
-    pub curp_verification: Patch<String>,
-
-    #[serde(default)]
-    pub pii: Patch<String>,
-    #[serde(default)]
-    pub hot_vaults: Patch<String>,
-    #[serde(default)]
-    pub hot_proxy_vaults: Patch<String>,
-    #[serde(default)]
-    pub vaults_with_non_pci: Patch<String>,
-    #[serde(default)]
-    pub vaults_with_pci: Patch<String>,
-
-    #[serde(default)]
-    pub watchlist: Patch<String>,
-    #[serde(default)]
-    pub adverse_media_per_user: Patch<String>,
-    #[serde(default)]
-    pub continuous_monitoring_per_year: Patch<String>,
-
-    #[serde(default)]
-    pub monthly_minimum: Patch<String>,
-    #[serde(default)]
-    pub monthly_platform_fee: Patch<String>,
-}
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema, derive_more::Deref)]
+#[serde(transparent)]
+pub struct PrivateUpdateBillingProfile(pub HashMap<Product, Patch<String>>);
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivateUpdateTvc {

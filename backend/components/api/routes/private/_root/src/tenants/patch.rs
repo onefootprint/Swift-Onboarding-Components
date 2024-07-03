@@ -5,7 +5,6 @@ use api_core::types::ApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::FpResult;
 use api_core::State;
-use api_wire_types::PrivateUpdateBillingProfile;
 use api_wire_types::PrivateUpdateTvc;
 use db::models::billing_profile::BillingProfile;
 use db::models::billing_profile::UpdateBillingProfile;
@@ -92,54 +91,12 @@ fn make_tenant_update(
         is_demo_tenant,
         super_tenant_id: super_tenant_id.to_changeset(),
     };
-    let billing_profile = billing_profile.map(make_billing_profile_update);
+    let billing_profile =
+        billing_profile.map(|bp| bp.0.into_iter().map(|(k, v)| (k, v.to_changeset())).collect());
     let vendor_control = vendor_control
         .map(|tvc| make_tvc_update(tenant, tvc))
         .transpose()?;
     Ok((update, billing_profile, vendor_control))
-}
-
-fn make_billing_profile_update(request: PrivateUpdateBillingProfile) -> UpdateBillingProfile {
-    let PrivateUpdateBillingProfile {
-        kyc,
-        one_click_kyc,
-        kyc_waterfall_second_vendor,
-        kyc_waterfall_third_vendor,
-        id_docs,
-        kyb,
-        kyb_ein_only,
-        curp_verification,
-        pii,
-        hot_vaults,
-        hot_proxy_vaults,
-        vaults_with_non_pci,
-        vaults_with_pci,
-        watchlist,
-        adverse_media_per_user,
-        continuous_monitoring_per_year,
-        monthly_minimum,
-        monthly_platform_fee,
-    } = request;
-    UpdateBillingProfile {
-        kyc: kyc.to_changeset(),
-        one_click_kyc: one_click_kyc.to_changeset(),
-        kyc_waterfall_second_vendor: kyc_waterfall_second_vendor.to_changeset(),
-        kyc_waterfall_third_vendor: kyc_waterfall_third_vendor.to_changeset(),
-        id_docs: id_docs.to_changeset(),
-        kyb: kyb.to_changeset(),
-        kyb_ein_only: kyb_ein_only.to_changeset(),
-        pii: pii.to_changeset(),
-        curp_verification: curp_verification.to_changeset(),
-        hot_vaults: hot_vaults.to_changeset(),
-        hot_proxy_vaults: hot_proxy_vaults.to_changeset(),
-        vaults_with_non_pci: vaults_with_non_pci.to_changeset(),
-        vaults_with_pci: vaults_with_pci.to_changeset(),
-        watchlist: watchlist.to_changeset(),
-        adverse_media_per_user: adverse_media_per_user.to_changeset(),
-        continuous_monitoring_per_year: continuous_monitoring_per_year.to_changeset(),
-        monthly_minimum: monthly_minimum.to_changeset(),
-        monthly_platform_fee: monthly_platform_fee.to_changeset(),
-    }
 }
 
 fn make_tvc_update(tenant: &Tenant, request: PrivateUpdateTvc) -> FpResult<UpdateTenantVendorControlArgs> {

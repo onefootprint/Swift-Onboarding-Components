@@ -87,61 +87,8 @@ impl DbToApi<(Tenant, Option<BillingProfile>, Option<TenantVendorControl>)>
             stripe_customer_id,
             app_clip_experience_id,
 
-            billing_profile: bp.map(api_wire_types::PrivateBillingProfile::from_db),
+            billing_profile: bp.map(|bp| bp.prices.into()),
             vendor_control: tvc.map(api_wire_types::PrivateTenantVendorControl::from_db),
-        }
-    }
-}
-
-impl DbToApi<BillingProfile> for api_wire_types::PrivateBillingProfile {
-    fn from_db(bp: BillingProfile) -> Self {
-        let BillingProfile {
-            kyc,
-            kyb,
-            kyb_ein_only,
-            pii,
-            id_docs,
-            watchlist,
-            hot_vaults,
-            hot_proxy_vaults,
-            vaults_with_non_pci,
-            vaults_with_pci,
-            adverse_media_per_user,
-            continuous_monitoring_per_year,
-            monthly_minimum,
-            kyc_waterfall_second_vendor,
-            kyc_waterfall_third_vendor,
-            one_click_kyc,
-            monthly_platform_fee,
-            curp_verification,
-            // TODO deal with this
-            prices: _,
-
-            id: _,
-            _created_at: _,
-            _updated_at: _,
-            tenant_id: _,
-        } = bp;
-
-        Self {
-            kyc,
-            kyb,
-            kyb_ein_only,
-            pii,
-            id_docs,
-            watchlist,
-            hot_vaults,
-            hot_proxy_vaults,
-            vaults_with_non_pci,
-            vaults_with_pci,
-            adverse_media_per_user,
-            continuous_monitoring_per_year,
-            monthly_minimum,
-            kyc_waterfall_second_vendor,
-            kyc_waterfall_third_vendor,
-            one_click_kyc,
-            monthly_platform_fee,
-            curp_verification,
         }
     }
 }
