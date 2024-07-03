@@ -1,3 +1,4 @@
+use super::data_lifetime::DataLifetime;
 use super::ob_configuration::IsLive;
 use crate::errors::FpOptionalExtension;
 use crate::DbResult;
@@ -6,11 +7,13 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::DateTime;
 use chrono::Utc;
+use db_schema::schema::data_lifetime;
 use db_schema::schema::vault_dr_aws_pre_enrollment;
 use db_schema::schema::vault_dr_blob;
 use db_schema::schema::vault_dr_config;
 use diesel::prelude::*;
 use diesel::Insertable;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::Locked;
@@ -237,6 +240,22 @@ impl VaultDrBlob {
         let results = diesel::insert_into(vault_dr_blob::table)
             .values(new)
             .get_results(conn.conn())?;
+
+        Ok(results)
+    }
+
+    #[tracing::instrument("VaultDrBlob::bulk_get", skip_all)]
+    pub fn bulk_get(
+        conn: &mut PgConn,
+        config_id: &VaultDrConfigId,
+        bucket_paths: Vec<String>,
+    ) -> DbResult<Vec<(Self, DataLifetime)>> {
+        let results = vault_dr_blob::table
+            .inner_join(data_lifetime::table)
+            .filter(vault_dr_blob::config_id.eq(config_id))
+            .filter(vault_dr_blob::bucket_path.eq_any(bucket_paths))
+            .select((VaultDrBlob::as_select(), DataLifetime::as_select()))
+            .load(conn)?;
 
         Ok(results)
     }

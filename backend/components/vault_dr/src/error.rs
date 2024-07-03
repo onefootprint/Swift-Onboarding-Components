@@ -72,6 +72,12 @@ pub enum Error {
 
     #[error("S3 PutObject checksum mismatch: got {got}, expected {expected}")]
     S3PutObjectChecksumMismatch { got: String, expected: String },
+
+    #[error("Encrypted record does not exist for the current Vault Disaster Recovery configuration")]
+    BlobDoesNotExist,
+
+    #[error("Can not test decryption for more than {0} records at once")]
+    TooManyWrappedRecordKeyRequests(usize),
 }
 
 impl api_errors::FpErrorTrait for Error {
@@ -83,7 +89,9 @@ impl api_errors::FpErrorTrait for Error {
             | Self::RoleValidationFailed(_)
             | Self::BucketValidationFailed(_)
             | Self::InvalidAgeRecipient(_)
-            | Self::ValidationError(_) => StatusCode::BAD_REQUEST,
+            | Self::ValidationError(_)
+            | Self::BlobDoesNotExist
+            | Self::TooManyWrappedRecordKeyRequests(_) => StatusCode::BAD_REQUEST,
             Self::IamAssertionFailed(_)
             | Self::AwsClientMissingRegion
             | Self::StsGetCallerIdentity(_)
