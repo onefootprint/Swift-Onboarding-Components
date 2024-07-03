@@ -110,6 +110,7 @@ pub struct VaultDrConfig {
     pub wrapped_recovery_key: String,
     #[diesel(deserialize_as = NonNullVec<String>)]
     pub org_public_keys: Vec<String>,
+    pub bucket_path_namespace: String,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -128,6 +129,7 @@ pub struct NewVaultDrConfig<'a> {
     pub recovery_public_key: String,
     pub wrapped_recovery_key: String,
     pub org_public_keys: Vec<String>,
+    pub bucket_path_namespace: String,
 }
 
 #[derive(Debug, Clone, derive_more::From)]

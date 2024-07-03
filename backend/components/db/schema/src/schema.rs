@@ -1571,6 +1571,7 @@ diesel::table! {
         recovery_public_key -> Text,
         wrapped_recovery_key -> Text,
         org_public_keys -> Array<Nullable<Text>>,
+        bucket_path_namespace -> Text,
     }
 }
 

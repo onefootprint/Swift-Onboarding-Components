@@ -73,11 +73,11 @@ urlencoding = { workspace = true }
 actix-multipart = { workspace = true }
 
 age = { workspace = true }
+rand = { workspace = true }
 
 [dev-dependencies]
 test-case = { workspace = true }
 enclave = { path = "../../../enclave/enclave"}
 portpicker = { workspace = true }
-rand = { workspace = true }
 tokio-test = { workspace = true }
 mockall = { workspace = true }

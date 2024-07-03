@@ -15,6 +15,9 @@ use paperclip::actix::api_v2_operation;
 use paperclip::actix::{
     self,
 };
+use rand::distributions::Alphanumeric;
+use rand::thread_rng;
+use rand::Rng;
 use vault_dr::EnrollmentKeys;
 use vault_dr::PublicKey;
 use vault_dr::PublicKeySet;
@@ -95,6 +98,13 @@ pub async fn post(
                 ..
             } = aws_config;
 
+            let bucket_path_namespace = thread_rng()
+                .sample_iter(&Alphanumeric)
+                .map(char::from)
+                .filter(|c| !c.is_uppercase())
+                .take(32)
+                .collect();
+
             let new_config = NewVaultDrConfig {
                 created_at: Utc::now(),
                 tenant_id: &tenant_id,
@@ -106,6 +116,7 @@ pub async fn post(
                 recovery_public_key,
                 wrapped_recovery_key: wrapped_recovery_key.expose_secret().clone(),
                 org_public_keys: org_public_key_set.into(),
+                bucket_path_namespace,
             };
 
             VaultDrConfig::create(conn, new_config)?;
