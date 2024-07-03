@@ -10,12 +10,17 @@ use api_core::utils::vault_wrapper::Pii;
 use api_core::FpResult;
 use api_core::State;
 use api_errors::AssertionError;
+use aws_sdk_s3::primitives::ByteStream;
+use aws_sdk_s3::primitives::SdkBody;
+use chrono::Utc;
 use db::errors::FpOptionalExtension;
 use db::helpers::load_vault_dr_data_lifetime_batch;
 use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::IsLive;
 use db::models::scoped_vault::ScopedVault;
+use db::models::vault_dr::NewVaultDrBlob;
 use db::models::vault_dr::VaultDrAwsPreEnrollment;
+use db::models::vault_dr::VaultDrBlob;
 use db::models::vault_dr::VaultDrConfig;
 use itertools::Itertools;
 use newtypes::FpId;
@@ -31,6 +36,8 @@ pub struct VaultDrWriter {
     is_live: IsLive,
 
     aws_config: VaultDrAwsConfig,
+    bucket_path_namespace: String,
+    s3_client: aws_sdk_s3::Client,
 
     org_public_keys: PublicKeySet,
     recovery_public_key: PublicKey,
@@ -45,52 +52,60 @@ impl VaultDrWriter {
     pub async fn new(state: &State, config_id: &VaultDrConfigId) -> FpResult<Self> {
         let state_config = state.config.vault_dr_config.clone();
 
-        let config_id = config_id.clone();
-        let writer = state
+        let config_id_0 = config_id.clone();
+        let (config, aws_pre_enrollment) = state
             .db_pool
             .db_query(move |conn| -> FpResult<_> {
-                let config = VaultDrConfig::get(conn, &config_id)
+                let config = VaultDrConfig::get(conn, &config_id_0)
                     .optional()?
                     .ok_or(Error::NotEnrolled)?;
 
                 let aws_pre_enrollment = VaultDrAwsPreEnrollment::get(conn, &config.aws_pre_enrollment_id)?;
 
-
-                let VaultDrConfig {
-                    tenant_id,
-                    is_live,
-                    aws_account_id,
-                    aws_role_name,
-                    s3_bucket_name,
-                    org_public_keys,
-                    recovery_public_key,
-                    ..
-                } = config;
-
-                let org_public_keys = PublicKeySet::new(
-                    org_public_keys
-                        .into_iter()
-                        .map(|k| k.parse::<PublicKey>())
-                        .collect::<Result<_, _>>()?,
-                )?;
-                let recovery_public_key: PublicKey = recovery_public_key.parse()?;
-
-                Ok(VaultDrWriter {
-                    config_id,
-                    tenant_id,
-                    is_live,
-                    aws_config: VaultDrAwsConfig {
-                        state_config,
-                        aws_account_id,
-                        aws_external_id: aws_pre_enrollment.aws_external_id,
-                        aws_role_name,
-                        s3_bucket_name,
-                    },
-                    org_public_keys,
-                    recovery_public_key,
-                })
+                Ok((config, aws_pre_enrollment))
             })
             .await?;
+
+        let VaultDrConfig {
+            tenant_id,
+            is_live,
+            aws_account_id,
+            aws_role_name,
+            s3_bucket_name,
+            bucket_path_namespace,
+            org_public_keys,
+            recovery_public_key,
+            ..
+        } = config;
+
+        let org_public_keys = PublicKeySet::new(
+            org_public_keys
+                .into_iter()
+                .map(|k| k.parse::<PublicKey>())
+                .collect::<Result<_, _>>()?,
+        )?;
+        let recovery_public_key: PublicKey = recovery_public_key.parse()?;
+
+        let aws_config = VaultDrAwsConfig {
+            state_config,
+            aws_account_id,
+            aws_external_id: aws_pre_enrollment.aws_external_id,
+            aws_role_name,
+            s3_bucket_name,
+        };
+
+        let s3_client = aws_config.s3_client().await?;
+
+        let writer = VaultDrWriter {
+            config_id: config_id.clone(),
+            tenant_id,
+            is_live,
+            aws_config,
+            s3_client,
+            bucket_path_namespace,
+            org_public_keys,
+            recovery_public_key,
+        };
 
         writer.aws_config.validate().await?;
 
@@ -132,7 +147,7 @@ impl VaultDrWriter {
         let mut dls_by_id = dls.into_iter().map(|dl| (dl.id.clone(), dl)).collect();
         let pii_by_dl = bulk_decrypt_dls_unchecked(state, &self.tenant_id, self.is_live, &dls_by_id).await?;
 
-        let mut blob_count = 0;
+        let mut new_blobs = vec![];
         for (dl_id, pii) in pii_by_dl {
             let dl = dls_by_id.remove(&dl_id).ok_or(AssertionError(
                 "Got DL ID in bulk_decrypt_dls_unchecked that was not present in dls_by_id",
@@ -142,13 +157,17 @@ impl VaultDrWriter {
                 .get(&dl.scoped_vault_id)
                 .ok_or(AssertionError("Got DL with SV ID not in sv_id_to_fp_id"))?;
 
-            self.encrypt_and_write_record(fp_id, &dl, pii).await?;
-
-            blob_count += 1;
+            let new_blob = self.encrypt_and_write_record_to_s3(fp_id, &dl, pii).await?;
+            new_blobs.push(new_blob);
         }
 
+        let blob_count = new_blobs.len();
+        state
+            .db_pool
+            .db_transaction(move |conn| VaultDrBlob::bulk_create(conn, new_blobs))
+            .await?;
 
-        Ok(blob_count)
+        Ok(blob_count as u32)
     }
 
     #[tracing::instrument("VaultDrWriter::encrypt_and_write_record", skip_all, fields(
@@ -160,7 +179,12 @@ impl VaultDrWriter {
             dl.kind=%dl.kind,
             dl.scoped_vault_id=%dl.scoped_vault_id,
     ))]
-    async fn encrypt_and_write_record(&self, fp_id: &FpId, dl: &DataLifetime, pii: Pii) -> FpResult<()> {
+    async fn encrypt_and_write_record_to_s3(
+        &self,
+        fp_id: &FpId,
+        dl: &DataLifetime,
+        pii: Pii,
+    ) -> FpResult<NewVaultDrBlob> {
         tracing::info!(
             sv_id=?dl.scoped_vault_id,
             ?fp_id,
@@ -170,8 +194,9 @@ impl VaultDrWriter {
         );
 
         let e_record = self.encrypt_record(pii)?;
-        self.write_blob(fp_id, dl, e_record).await?;
-        Ok(())
+        let new_blob = self.write_blob_to_s3(fp_id, dl, e_record).await?;
+
+        Ok(new_blob)
     }
 
     #[tracing::instrument("VaultDrWriter::encrypt_record", skip_all)]
@@ -183,7 +208,6 @@ impl VaultDrWriter {
 
         let record_public_key_set =
             PublicKeySet::new(vec![record_public_key, self.recovery_public_key.clone()])?;
-
 
         let mut plaintext_record = match pii {
             Pii::Value(v) => v.to_piistring()?.leak_to_string().into_bytes(),
@@ -199,14 +223,172 @@ impl VaultDrWriter {
         })
     }
 
-    #[tracing::instrument("VaultDrWriter::write_blob", skip_all)]
-    async fn write_blob(
+    #[tracing::instrument("VaultDrWriter::write_blob_to_s3", skip_all)]
+    async fn write_blob_to_s3(
         &self,
-        _fp_id: &FpId,
-        _dl: &DataLifetime,
-        _e_record: EncryptedRecord,
-    ) -> FpResult<()> {
-        // TODO
-        Ok(())
+        fp_id: &FpId,
+        dl: &DataLifetime,
+        e_record: EncryptedRecord,
+    ) -> FpResult<NewVaultDrBlob> {
+        let EncryptedRecord {
+            e_record,
+            wrapped_record_key,
+        } = e_record;
+
+
+        let digest_bytes = crypto::sha256(&e_record);
+        let checksum_b64_sha256 = base64::encode(digest_bytes);
+        let content_length = e_record.len();
+
+        let key = blob_key(&self.bucket_path_namespace, fp_id, dl, &digest_bytes)?;
+
+        let body = ByteStream::new(SdkBody::from(e_record));
+        let req = self
+            .s3_client
+            .put_object()
+            .bucket(&self.aws_config.s3_bucket_name)
+            .checksum_sha256(&checksum_b64_sha256)
+            .key(&key)
+            .body(body);
+
+        let result = req.send().await.map_err(|e| -> Error {
+            let svc_error = e.into_service_error();
+            tracing::error!(error = ?svc_error, "S3 PutObject failed");
+            Box::new(svc_error).into()
+        })?;
+
+        tracing::info!(
+            key=?key,
+            blob.checksum=?checksum_b64_sha256,
+            blob.response_checksum=?result.checksum_sha256,
+            blob.content_length=?content_length,
+            blob.etag=?result.e_tag.as_deref().unwrap_or(""),
+            "Wrote blob to S3",
+        );
+
+        let content_etag = result.e_tag.ok_or_else(|| Error::S3ETagNotAvailable)?;
+
+        let got_checksum_sha256 = result
+            .checksum_sha256
+            .ok_or_else(|| Error::S3Sha256ChecksumNotAvailable)?;
+
+        if got_checksum_sha256 != checksum_b64_sha256 {
+            return Err(Error::S3PutObjectChecksumMismatch {
+                got: got_checksum_sha256,
+                expected: checksum_b64_sha256,
+            }
+            .into());
+        }
+
+
+        let new_blob = NewVaultDrBlob {
+            created_at: Utc::now(),
+            config_id: self.config_id.clone(),
+            data_lifetime_id: dl.id.clone(),
+            dl_created_seqno: dl.created_seqno,
+            bucket_path: key,
+            content_etag,
+            wrapped_record_key: wrapped_record_key.into(),
+            content_length_bytes: content_length as i64,
+        };
+        Ok(new_blob)
+    }
+}
+
+fn blob_key(
+    bucket_path_namespace: &str,
+    fp_id: &FpId,
+    dl: &DataLifetime,
+    blob_sha256_digest: &[u8],
+) -> FpResult<String> {
+    // Partition by last two characters of the fp_id.
+    //
+    // Often when reading large amounts of data from an S3 bucket, it's handy to split up the
+    // work over multiple machines/workers. This is facilitated with partition keys.
+    // An fp_id may be too fine-grained for a partition key for large customers, so we provide
+    // a coarser partition key. Using the last two characters of the fp_id gives us ~4k
+    // partitions max, which can be quickly paginated over for scheduling purposes
+    let fp_id_partition = fp_id
+        .to_string()
+        .split('_')
+        .last()
+        .ok_or(AssertionError("fp_id is not split by '_'"))?
+        .chars()
+        .rev()
+        .take(2)
+        .collect::<String>()
+        .chars()
+        .rev()
+        .collect::<String>();
+
+    if fp_id_partition.len() != 2 {
+        // This shouldn't happen if fp_ids are generated with proper length.
+        return AssertionError("fp_id_partition is not 2 characters long").into();
+    }
+
+    let created_ts = dl.created_at.timestamp().to_string();
+    if created_ts.len() != 10 {
+        // By year 2286, this code will surely be dead :)
+        return AssertionError(
+            "Timestamp is not 10 characters long. Timestamps between 2001 and 2286 should all be 10 characters.",
+        )
+        .into();
+    }
+
+    let digest_str = base64::encode_config(blob_sha256_digest, base64::URL_SAFE_NO_PAD);
+
+    let key = format!(
+        "footprint/vdr/{}/{}/{}/data/{}/{}-{}",
+        bucket_path_namespace, fp_id_partition, &fp_id, dl.kind, created_ts, digest_str,
+    );
+    Ok(key)
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::DateTime;
+    use newtypes::DataLifetimeId;
+    use newtypes::DataLifetimeSource;
+    use newtypes::KvDataKey;
+    use newtypes::ScopedVaultId;
+    use newtypes::VaultId;
+    use newtypes::VaultKind;
+    use std::str::FromStr;
+
+    #[test]
+    fn test_blob_key() {
+        let created_at = DateTime::<Utc>::from_str("2023-01-01T00:00:00Z").unwrap();
+
+        let key = blob_key(
+            "a1b6cf025aaa4e5f926c2fa182755392",
+            &FpId::from_str("fp_id_Vu5lEC3KeaAfVeedqtBjQ9").unwrap(),
+            &DataLifetime {
+                id: DataLifetimeId::test_data("dl_id_1".to_owned()),
+                _created_at: Utc::now(),
+                _updated_at: Utc::now(),
+                vault_id: VaultId::generate(VaultKind::Person),
+                scoped_vault_id: ScopedVaultId::generate(VaultKind::Person),
+                created_at,
+                portablized_at: None,
+                deactivated_at: None,
+                created_seqno: 111.into(),
+                portablized_seqno: Some(222.into()),
+                deactivated_seqno: Some(333.into()),
+                kind: newtypes::DataIdentifier::Custom(KvDataKey::from_str("my_custom_field").unwrap()),
+                source: DataLifetimeSource::Tenant,
+                actor: None,
+                origin_id: None,
+            },
+            &[
+                0xd8, 0xfb, 0xfe, 0x2e, 0x41, 0xb1, 0xe5, 0x76, 0xbb, 0xf3, 0xf3, 0x56, 0xbc, 0x98, 0xdd,
+                0x41, 0x68, 0x56, 0xe0, 0x6a, 0x38, 0xd9, 0xb5, 0xf1, 0x70, 0x3a, 0xac, 0xc4, 0xca, 0x53,
+                0x9e, 0x6b,
+            ],
+        )
+        .unwrap();
+
+        assert_eq!(&key, "footprint/vdr/a1b6cf025aaa4e5f926c2fa182755392/Q9/fp_id_Vu5lEC3KeaAfVeedqtBjQ9/data/custom.my_custom_field/1672531200-2Pv-LkGx5Xa78_NWvJjdQWhW4Go42bXxcDqsxMpTnms");
     }
 }

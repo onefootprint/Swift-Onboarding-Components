@@ -88,9 +88,21 @@ impl VaultDrAwsConfig {
         Ok(assume_role_config)
     }
 
-    pub async fn validate(&self) -> Result<(), Error> {
-        let use_localstack = self.state_config.use_localstack.is_some();
+    pub async fn s3_client(&self) -> Result<aws_sdk_s3::Client, Error> {
+        let aws_config = self.default_sdk_config().await?;
+        let s3_config = aws_sdk_s3::Config::from(&aws_config)
+            .to_builder()
+            .force_path_style(self.use_localstack())
+            .build();
+        let s3_client = aws_sdk_s3::Client::from_conf(s3_config);
+        Ok(s3_client)
+    }
 
+    fn use_localstack(&self) -> bool {
+        self.state_config.use_localstack.is_some()
+    }
+
+    pub async fn validate(&self) -> Result<(), Error> {
         let aws_config = self.default_sdk_config().await?;
 
         // Test that the assumed role works.
@@ -120,7 +132,7 @@ impl VaultDrAwsConfig {
             "Missing account ID in STS GetCallerIdentity response".to_string(),
         ))?;
         if assumed_role_account != self.aws_account_id {
-            if use_localstack {
+            if self.use_localstack() {
                 tracing::error!("STS GetCallerIdentity returned an incorrect account ID because Localstack doesn't persist data across restarts and silently lets the STS AssumeRole succeed even though the destination role no longer exists. Re-enroll from scratch to re-create cloud resources, e.g. by running integration tests.");
             }
 
@@ -145,7 +157,7 @@ impl VaultDrAwsConfig {
                 );
 
                 // Localstack doesn't support IAM enforcement.
-                if !use_localstack {
+                if !self.use_localstack() {
                     return Err(Error::RoleValidationFailed(
                         "Able to assume role with an incorrect external ID. The assume role policy must restrict access based on the sts:ExternalId.".to_string(),
                     ));
@@ -165,11 +177,7 @@ impl VaultDrAwsConfig {
         }
 
         // Test for access to the S3 bucket.
-        let s3_config = aws_sdk_s3::Config::from(&aws_config)
-            .to_builder()
-            .force_path_style(use_localstack)
-            .build();
-        let s3_client = aws_sdk_s3::Client::from_conf(s3_config);
+        let s3_client = self.s3_client().await?;
 
         // Test for s3:PutObject.
         let req = s3_client
@@ -219,8 +227,6 @@ impl VaultDrAwsConfig {
         })?;
         info!(?resp, "S3 GetBucketLocation response");
 
-        let client_region = aws_config.region().ok_or(Error::AwsClientMissingRegion)?;
-
         // For some reason, the null location constraint is deserialized as an empty
         // string UnknownVariantValue.
         let location_constraint = resp
@@ -232,6 +238,7 @@ impl VaultDrAwsConfig {
             "" => {
                 // Implicitly us-east-1.
                 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateBucketConfiguration.html
+                let client_region = aws_config.region().ok_or(Error::AwsClientMissingRegion)?;
                 if client_region != &Region::new("us-east-1") {
                     return Err(Error::BucketValidationFailed(
                         "Bucket must be created in the us-east-1 region".to_string(),
@@ -255,7 +262,7 @@ impl VaultDrAwsConfig {
         match result {
             Ok(resp) => {
                 warn!(?resp, "S3 GetObject should have failed");
-                if !use_localstack {
+                if !self.use_localstack() {
                     return Err(Error::RoleValidationFailed(
                         "S3 GetObject should have failed. Ensure the role is granted only permissions listed in the documentation.".to_string(),
                     ));

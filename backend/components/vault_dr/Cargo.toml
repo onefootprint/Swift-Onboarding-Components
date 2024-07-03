@@ -13,6 +13,7 @@ doctest = false
 api_core = { path = "../api/core" }
 api_errors = { path = "../api/errors" }
 db = { path = "../db/core" }
+crypto = { path = "../enclave/crypto" }
 newtypes = { path = "../newtypes" }
 
 actix-web = { workspace = true }
@@ -29,6 +30,7 @@ tracing = { workspace = true }
 age = { workspace = true }
 age-plugin = { workspace = true }
 age-core = { workspace = true }
+chrono = { workspace = true }
 sha2 = { workspace = true }
 rand = { workspace = true }
 bech32 = { workspace = true }

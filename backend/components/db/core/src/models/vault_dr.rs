@@ -218,11 +218,11 @@ pub struct VaultDrBlob {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = vault_dr_blob)]
-pub struct NewVaultDrBlob<'a> {
+pub struct NewVaultDrBlob {
     pub created_at: DateTime<Utc>,
 
-    pub config_id: &'a VaultDrConfigId,
-    pub data_lifetime_id: &'a DataLifetimeId,
+    pub config_id: VaultDrConfigId,
+    pub data_lifetime_id: DataLifetimeId,
     pub dl_created_seqno: DataLifetimeSeqno,
 
     pub bucket_path: String,

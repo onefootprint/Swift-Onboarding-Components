@@ -63,6 +63,15 @@ pub enum Error {
 
     #[error("Utf8 decode failed: {0}")]
     Utf8Decode(#[from] std::string::FromUtf8Error),
+
+    #[error("S3 ETag not available")]
+    S3ETagNotAvailable,
+
+    #[error("S3 SHA256 checksum not available")]
+    S3Sha256ChecksumNotAvailable,
+
+    #[error("S3 PutObject checksum mismatch: got {got}, expected {expected}")]
+    S3PutObjectChecksumMismatch { got: String, expected: String },
 }
 
 impl api_errors::FpErrorTrait for Error {
@@ -85,7 +94,10 @@ impl api_errors::FpErrorTrait for Error {
             | Self::Age(_)
             | Self::AgeEncrypt(_)
             | Self::IoError(_)
-            | Self::Utf8Decode(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            | Self::Utf8Decode(_)
+            | Self::S3ETagNotAvailable
+            | Self::S3Sha256ChecksumNotAvailable
+            | Self::S3PutObjectChecksumMismatch { .. } => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

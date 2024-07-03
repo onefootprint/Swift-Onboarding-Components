@@ -4,6 +4,7 @@ use age::secrecy::SecretString;
 use age::secrecy::Zeroize;
 use bech32::FromBase32;
 use itertools::Itertools;
+use newtypes::PiiString;
 use std::io::Write;
 use std::str::FromStr;
 
@@ -161,6 +162,12 @@ impl From<PublicKeySet> for Vec<String> {
 
 #[derive(derive_more::Deref)]
 pub struct WrappedKey(SecretString);
+
+impl From<WrappedKey> for PiiString {
+    fn from(value: WrappedKey) -> Self {
+        PiiString::new(value.0.expose_secret().to_owned())
+    }
+}
 
 pub struct EnrollmentKeys {
     pub recovery_public_key: String,

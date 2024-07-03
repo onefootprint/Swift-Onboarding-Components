@@ -19,7 +19,7 @@ def test_footprint_dr_backup(tenant):
     fp_id_1 = body["id"]
 
     body = patch(f"users/{fp_id_1}/vault", {
-        "id.ssn9": "222222222",
+        "id.phone_number": "+123121234",
     }, tenant.sk.key)
 
     body = post("users", {
@@ -29,15 +29,15 @@ def test_footprint_dr_backup(tenant):
     fp_id_2 = body["id"]
 
     body = patch(f"users/{fp_id_2}/vault", {
-        "id.ssn9": "333333333",
+        "id.phone_number": "+1234232345",
     }, tenant.sk.key)
 
     # Run the VDR batch.
-    post("private/vault_dr/run_batch", {
+    resp = post("private/vault_dr/run_batch", {
         "tenant_id": tenant.id,
         "is_live": True,
         "batch_size": 100,
         "fp_ids": [fp_id_1, fp_id_2],
     }, CUSTODIAN_AUTH)
 
-    # TODO: check that the backup worked using the footprint-dr client.
+    assert resp["num_blobs"] == 6
