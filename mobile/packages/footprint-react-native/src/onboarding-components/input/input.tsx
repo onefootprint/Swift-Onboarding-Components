@@ -2,7 +2,7 @@
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import type { TextInputProps } from 'react-native';
-import { TextInput } from 'react-native';
+import MaskInput from 'react-native-mask-input';
 
 import useFieldProps from '../hooks/use-field-props';
 
@@ -18,7 +18,7 @@ const Input = ({ ...props }: InputProps) => {
       rules={validations}
       render={({ field: { onChange, onBlur, value } }) => {
         return (
-          <TextInput
+          <MaskInput
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}

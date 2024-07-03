@@ -2,9 +2,12 @@ import get from 'lodash/get';
 import { useContext } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { TextInputProps } from 'react-native';
+import type { MaskInputProps } from 'react-native-mask-input';
+import { createNumberMask, Masks } from 'react-native-mask-input';
 import { isEmail, isMobilePhone } from 'validator';
 
 import fieldContext from '../field-context';
+import { fromUSDateToISO8601Format } from '../utils/date-formatter';
 import {
   isDobInTheFuture,
   isDobTooOld,
@@ -23,7 +26,7 @@ type Field = TextInputProps & {
     };
     validate?: (value: string) => string | boolean;
   };
-};
+} & MaskInputProps;
 
 const useFieldProps = () => {
   const {
@@ -51,6 +54,13 @@ const person: Record<string, Field> = {
   phoneNumber: {
     autoComplete: 'tel',
     keyboardType: 'phone-pad',
+    mask: createNumberMask({
+      prefix: ['+'],
+      delimiter: '',
+      separator: '',
+      precision: 0,
+    }),
+    returnKeyType: 'done',
     validations: {
       required: 'Phone is required',
       validate: (value: string) => {
@@ -77,19 +87,23 @@ const person: Record<string, Field> = {
   },
   dob: {
     autoComplete: 'birthdate-full',
+    keyboardType: 'number-pad',
+    returnKeyType: 'done',
+    mask: Masks.DATE_MMDDYYYY,
     validations: {
       required: 'Dob is required',
       validate: (value: string) => {
-        if (!isValidDate(value)) {
+        const formattedDate = fromUSDateToISO8601Format(value);
+        if (!formattedDate || !isValidDate(formattedDate)) {
           return 'Invalid date';
         }
-        if (isDobInTheFuture(value)) {
+        if (isDobInTheFuture(formattedDate)) {
           return 'Cannot be in the future';
         }
-        if (isDobTooYoung(value)) {
+        if (isDobTooYoung(formattedDate)) {
           return 'Must be at least 18 years old';
         }
-        if (isDobTooOld(value)) {
+        if (isDobTooOld(formattedDate)) {
           return 'Cannot be before than 1900';
         }
         return true;
@@ -98,6 +112,8 @@ const person: Record<string, Field> = {
   },
   ssn4: {
     autoComplete: 'off',
+    keyboardType: 'number-pad',
+    returnKeyType: 'done',
     maxLength: 4,
     validations: {
       required: 'SSN is required',
@@ -111,6 +127,9 @@ const person: Record<string, Field> = {
   },
   ssn9: {
     autoComplete: 'off',
+    keyboardType: 'number-pad',
+    returnKeyType: 'done',
+    mask: [/\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
     maxLength: 11,
     validations: {
       required: 'SSN is required',
@@ -208,6 +227,10 @@ const business: Record<string, Field> = {
   },
   dba: {},
   tin: {
+    keyboardType: 'number-pad',
+    returnKeyType: 'done',
+    maxLength: 10,
+    mask: [/\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/],
     validations: {
       required: 'TIN cannot be empty or is invalid',
       pattern: {
@@ -228,6 +251,13 @@ const business: Record<string, Field> = {
   phoneNumber: {
     autoComplete: 'tel',
     keyboardType: 'phone-pad',
+    returnKeyType: 'done',
+    mask: createNumberMask({
+      prefix: ['+'],
+      delimiter: '',
+      separator: '',
+      precision: 0,
+    }),
     validations: {
       required: 'Phone is required',
       validate: (value: string) => {
@@ -243,6 +273,7 @@ const business: Record<string, Field> = {
 const bo: Record<string, Field> = {
   ownershipStake: {
     keyboardType: 'number-pad',
+    returnKeyType: 'done',
     inputMode: 'numeric',
     validations: {
       required: 'Stake is required',
