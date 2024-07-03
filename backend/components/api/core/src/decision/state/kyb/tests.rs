@@ -132,7 +132,6 @@ async fn run_kyc_for_bo(
             WorkflowFixtureResult::Pass => Some(OnboardingStatus::Pass),
             WorkflowFixtureResult::ManualReview => unimplemented!(),
             WorkflowFixtureResult::StepUp => unimplemented!(),
-            WorkflowFixtureResult::DocumentDecision => unimplemented!(),
             WorkflowFixtureResult::UseRulesOutcome => unimplemented!(),
         },
         // assuming BO passes in live
@@ -299,7 +298,6 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
         WorkflowFixtureResult::Pass => SignalSeverity::Info,
         WorkflowFixtureResult::ManualReview => todo!(),
         WorkflowFixtureResult::StepUp => todo!(),
-        WorkflowFixtureResult::DocumentDecision => panic!("unsupported fixture passed for kyb"),
         WorkflowFixtureResult::UseRulesOutcome => panic!("unsupported fixture passed for kyb"),
     };
     assert!(rs.iter().all(|rs| rs.reason_code.severity() == expected_severity
@@ -313,7 +311,6 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult, ein_o
         WorkflowFixtureResult::Pass => OnboardingStatus::Pass,
         WorkflowFixtureResult::ManualReview => todo!(),
         WorkflowFixtureResult::StepUp => todo!(),
-        WorkflowFixtureResult::DocumentDecision => panic!("unsupported fixture passed for kyb"),
         WorkflowFixtureResult::UseRulesOutcome => panic!("unsupported fixture passed for kyb"),
     };
     mock_webhooks(

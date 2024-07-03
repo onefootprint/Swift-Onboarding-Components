@@ -73,9 +73,7 @@ pub(super) fn get_final_rules_outcome(
     rules_outcome: RulesOutcome,
 ) -> RulesOutcome {
     let fixture_result = match fixture_result {
-        None
-        | Some(WorkflowFixtureResult::DocumentDecision)
-        | Some(WorkflowFixtureResult::UseRulesOutcome) => {
+        None | Some(WorkflowFixtureResult::UseRulesOutcome) => {
             // Use the real outcome of running the rules engine
             return rules_outcome;
         }

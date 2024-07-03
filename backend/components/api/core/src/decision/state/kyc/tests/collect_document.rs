@@ -63,7 +63,7 @@ use newtypes::WorkflowState;
 
 #[test_state_case(UserKind::Live, Failure)]
 #[test_state_case(UserKind::Live, DocUploadFailed)]
-#[test_state_case(UserKind::Sandbox(newtypes::WorkflowFixtureResult::DocumentDecision), Failure)]
+#[test_state_case(UserKind::Sandbox(newtypes::WorkflowFixtureResult::UseRulesOutcome), Failure)]
 #[test_state_case(UserKind::Live, PassWithManualReview)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_document_fails(state: &mut State, user_kind: UserKind, doc_outcome: DocumentOutcome) {
@@ -395,7 +395,7 @@ async fn collect_ad_hoc_document(
         .into_iter()
         .for_each(|r| assert!(!previous_rs_ids.contains(&r.id) && !r.hidden));
     match user_kind {
-        UserKind::Sandbox(WorkflowFixtureResult::DocumentDecision) => {
+        UserKind::Sandbox(WorkflowFixtureResult::UseRulesOutcome) => {
             // In this case, we run real rules to get a decision. In this case, we do not generate synthetic
             // KYC signals. I think this is fine since the purpose of doing sandbox real document
             // is just to see the doc outcome, not to get synthetic KYC risk signals
