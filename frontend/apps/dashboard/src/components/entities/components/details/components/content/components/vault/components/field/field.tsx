@@ -15,11 +15,10 @@ export type FieldProps = {
   hint?: string;
   renderLabel?: () => React.ReactNode;
   renderValue?: (value: VaultValue, isValueDecrypted: boolean) => React.ReactNode;
-  status?: React.ReactNode;
   skipRegisterFieldToDecryptForm?: boolean;
 };
 
-const Field = ({ di, entity, hint, renderValue, renderLabel, status, skipRegisterFieldToDecryptForm }: FieldProps) => {
+const Field = ({ di, entity, hint, renderValue, renderLabel, skipRegisterFieldToDecryptForm }: FieldProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.entity.decrypt' });
   const { register } = useFormContext();
   const field = useField(entity)(di);
@@ -49,12 +48,9 @@ const Field = ({ di, entity, hint, renderValue, renderLabel, status, skipRegiste
           {customLabel && React.isValidElement(customLabel) ? (
             customLabel
           ) : (
-            <LabelAndStatusContainer>
-              <Text variant="body-3" color="tertiary" tag="label">
-                {label}
-              </Text>
-              {status}
-            </LabelAndStatusContainer>
+            <Text variant="body-3" color="tertiary" tag="label">
+              {label}
+            </Text>
           )}
           {hint && (
             <Text variant="caption-2" color="secondary">
@@ -79,16 +75,6 @@ const LabelContainer = styled.div`
     display: flex;
     gap: ${theme.spacing[2]};
     flex-direction: column;
-  `};
-`;
-
-const LabelAndStatusContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacing[3]};
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
   `};
 `;
 

@@ -120,21 +120,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
     documents: {
       title: t('documents.title'),
       iconComponent: IcoFileText24,
-      fields: [
-        { di: DocumentDI.latestDriversLicenseFront },
-        { di: DocumentDI.latestIdCardFront },
-        { di: DocumentDI.latestPassport },
-        { di: DocumentDI.latestVisa },
-        { di: DocumentDI.latestResidenceDocumentFront },
-        { di: DocumentDI.latestWorkPermitFront },
-        { di: DocumentDI.latestVoterIdentificationFront },
-        { di: DocumentDI.latestPassportCardFront },
-        { di: DocumentDI.ssnCard },
-        { di: DocumentDI.latestLeaseFront },
-        { di: DocumentDI.latestUtilityBillFront },
-        { di: DocumentDI.latestBankStatementFront },
-        { di: DocumentDI.proofOfAddress },
-      ],
+      fields: [],
     },
     cards: {
       title: t('cards.title'),

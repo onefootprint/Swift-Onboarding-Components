@@ -1,7 +1,27 @@
 import type { Icon } from '@onefootprint/icons';
-import type { DataIdentifier, Entity, VaultEmptyData, VaultEncryptedData, VaultValue } from '@onefootprint/types';
+import type {
+  DataIdentifier,
+  Entity,
+  SupportedIdDocTypes,
+  VaultEmptyData,
+  VaultEncryptedData,
+  VaultValue,
+} from '@onefootprint/types';
 
-export type DecryptFormData = Partial<Record<DataIdentifier, boolean | VaultEncryptedData | VaultEmptyData>>;
+/**
+ * For legacy reasons, decryption controls expect fields to be registered as just the DI.
+ * We should put these in a wrapper
+ */
+type DecryptDiFormData = Partial<Record<DataIdentifier, boolean>>;
+
+/**
+ * Document fields are identified by the doc type
+ */
+type DecryptDocumentFormData = {
+  documents?: Partial<Record<SupportedIdDocTypes, boolean>>;
+};
+
+export type DecryptFormData = DecryptDiFormData & DecryptDocumentFormData;
 
 export type EditFormData = Record<string, VaultValue>;
 

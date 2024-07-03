@@ -9,10 +9,10 @@ import driversLicensePartialDIs, { entityId } from './document-field.test.config
 
 const useRouterSpy = createUseRouterSpy();
 
-const renderDocumentField = ({ vault, label, documentType, documents }: DocumentFieldProps) =>
+const renderDocumentField = ({ vault, documentType, documents }: DocumentFieldProps) =>
   customRender(
     <TestWrapper>
-      <DocumentField vault={vault} label={label} documentType={documentType} documents={documents} />,
+      <DocumentField vault={vault} documentType={documentType} documents={documents} />,
     </TestWrapper>,
   );
 
@@ -29,7 +29,6 @@ describe('<DocumentField />', () => {
   it('should properly open drawer', async () => {
     renderDocumentField({
       vault: driversLicensePartialDIs,
-      label: `Driver's license and selfie`,
       documentType: SupportedIdDocTypes.driversLicense,
       documents: [],
     });

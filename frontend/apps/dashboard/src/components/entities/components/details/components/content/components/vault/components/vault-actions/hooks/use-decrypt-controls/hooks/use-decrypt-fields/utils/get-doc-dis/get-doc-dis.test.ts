@@ -1,4 +1,4 @@
-import { DocumentDI } from '@onefootprint/types';
+import { DocumentDI, SupportedIdDocTypes } from '@onefootprint/types';
 
 import getDocDis from './get-doc-dis';
 import {
@@ -15,12 +15,11 @@ describe('getDocDis', () => {
   it('should return correct DIs when there are multiple documents of same type', () => {
     expect(
       getDocDis({
-        dis: [DocumentDI.latestIdCardFront],
+        documentKinds: [SupportedIdDocTypes.idCard],
         documents: [idCardDocument1, idCardDocument2],
         vaultData: entityVaultWithJustIDCardDIs,
       }),
     ).toEqual([
-      DocumentDI.latestIdCardFront,
       `${DocumentDI.idCardFullName}:3`,
       `${DocumentDI.idCardDOB}:3`,
       `${DocumentDI.idCardGender}:3`,
@@ -53,12 +52,11 @@ describe('getDocDis', () => {
   it('should return correct DIs for when there are multiple documents of different types, but only one of the type requested', () => {
     expect(
       getDocDis({
-        dis: [DocumentDI.latestDriversLicenseFront],
+        documentKinds: [SupportedIdDocTypes.driversLicense],
         documents: [driversLicenseDocument1, idCardDocument1, idCardDocument2],
         vaultData: entityVaultWithIDCardAndDriversLicenseDIs,
       }),
     ).toEqual([
-      DocumentDI.latestDriversLicenseFront,
       `${DocumentDI.driversLicenseFullName}:787`,
       `${DocumentDI.driversLicenseDOB}:787`,
       `${DocumentDI.driversLicenseGender}:787`,
@@ -78,12 +76,11 @@ describe('getDocDis', () => {
   it('should return correct DIs for when there are multiple documents of different types, and multiple of the type requested', () => {
     expect(
       getDocDis({
-        dis: [DocumentDI.latestDriversLicenseFront],
+        documentKinds: [SupportedIdDocTypes.driversLicense],
         documents: [driversLicenseDocument1, driversLicenseDocument2, idCardDocument1, idCardDocument2],
         vaultData: entityVaultWithIDCardAndDriversLicenseDIs,
       }),
     ).toEqual([
-      DocumentDI.latestDriversLicenseFront,
       `${DocumentDI.driversLicenseFullName}:787`,
       `${DocumentDI.driversLicenseDOB}:787`,
       `${DocumentDI.driversLicenseGender}:787`,
@@ -116,14 +113,10 @@ describe('getDocDis', () => {
   it('should return only partial list of uploads for incomplete document and no extracted data', () => {
     expect(
       getDocDis({
-        dis: [DocumentDI.latestDriversLicenseFront],
+        documentKinds: [SupportedIdDocTypes.driversLicense],
         documents: [incompleteDriversLicense],
         vaultData: entityVaultWithIDCardAndDriversLicenseDIs,
       }),
-    ).toEqual([
-      DocumentDI.latestDriversLicenseFront,
-      `${DocumentDI.latestDriversLicenseFront}:789`,
-      `${DocumentDI.latestDriversLicenseBack}:790`,
-    ]);
+    ).toEqual([`${DocumentDI.latestDriversLicenseFront}:789`, `${DocumentDI.latestDriversLicenseBack}:790`]);
   });
 });

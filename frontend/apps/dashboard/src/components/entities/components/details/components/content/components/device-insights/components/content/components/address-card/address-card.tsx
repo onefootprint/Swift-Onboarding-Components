@@ -39,7 +39,7 @@ const AddressCard = ({ id, type, entity, isSelected, onSelect, isLoading }: Addr
 
   const handleClick = () => {
     const dis = getAddressDis(type);
-    decryptControls.submitAllFields(dis);
+    decryptControls.submitFields(dis, []);
   };
 
   const decryptableSet = new Set(entity.decryptableAttributes);

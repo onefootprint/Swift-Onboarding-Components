@@ -3,22 +3,6 @@ import { DocumentDI, RawJsonKinds, SupportedIdDocTypes, isVaultDataEmpty } from 
 
 import { filterDocumentsByKind } from '../../../../../../../person-vault/components/document-fields/utils';
 
-const mainDIs: Partial<Record<DocumentDI, SupportedIdDocTypes>> = {
-  [DocumentDI.latestIdCardFront]: SupportedIdDocTypes.idCard,
-  [DocumentDI.latestDriversLicenseFront]: SupportedIdDocTypes.driversLicense,
-  [DocumentDI.latestPassport]: SupportedIdDocTypes.passport,
-  [DocumentDI.latestVisa]: SupportedIdDocTypes.visa,
-  [DocumentDI.latestWorkPermitFront]: SupportedIdDocTypes.workPermit,
-  [DocumentDI.latestResidenceDocumentFront]: SupportedIdDocTypes.residenceDocument,
-  [DocumentDI.latestVoterIdentificationFront]: SupportedIdDocTypes.voterIdentification,
-  [DocumentDI.ssnCard]: SupportedIdDocTypes.ssnCard,
-  [DocumentDI.latestLeaseFront]: SupportedIdDocTypes.lease,
-  [DocumentDI.latestBankStatementFront]: SupportedIdDocTypes.bankStatement,
-  [DocumentDI.latestUtilityBillFront]: SupportedIdDocTypes.utilityBill,
-  [DocumentDI.proofOfAddress]: SupportedIdDocTypes.proofOfAddress,
-  [DocumentDI.latestPassportCardFront]: SupportedIdDocTypes.passportCard,
-};
-
 const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
   [SupportedIdDocTypes.idCard]: [
     DocumentDI.idCardFullName,
@@ -151,38 +135,36 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
 };
 
 type GetDocDIsProps = {
-  dis: string[]; // | DataIdentifier[], although we ruin typesafety by adding to the dis array
+  documentKinds?: SupportedIdDocTypes[];
   documents?: Document[];
   vaultData?: Partial<Record<DataIdentifier, VaultValue>>;
 };
 
-const getDocDis = ({ dis, documents, vaultData }: GetDocDIsProps) => {
-  Object.entries(mainDIs).forEach(([mainDi, idDocType]) => {
-    // main DI is something like id_card.front.latest_upload or passport.latest_upload
-    if (dis.includes(mainDi as DataIdentifier)) {
-      const associatedDocuments = filterDocumentsByKind(documents, idDocType);
-      associatedDocuments.forEach(document => {
-        const { completedVersion, uploads } = document;
-        const extractedDIs = extractedDIsBase[idDocType];
-        // get the extracted DIs for each document
-        extractedDIs?.forEach(di => {
-          if (vaultData && !isVaultDataEmpty(vaultData[di]) && completedVersion) {
-            if (di.includes(RawJsonKinds.CurpValidationResponse)) {
-              const curpVersion = document.curpCompletedVersion ?? '';
-              const versionedCurpDI = curpVersion ? `${di}:${curpVersion}` : di;
-              dis.push(versionedCurpDI);
-            }
-            dis.push(`${di}:${completedVersion}`);
+const getDocDis = ({ documentKinds, documents, vaultData }: GetDocDIsProps) => {
+  const dis: DataIdentifier[] = [];
+  (documentKinds || []).forEach(idDocType => {
+    const associatedDocuments = filterDocumentsByKind(documents, idDocType);
+    associatedDocuments.forEach(document => {
+      const { completedVersion, uploads } = document;
+      const extractedDIs = extractedDIsBase[idDocType];
+      // get the extracted DIs for each document
+      extractedDIs?.forEach(di => {
+        if (vaultData && !isVaultDataEmpty(vaultData[di]) && completedVersion) {
+          if (di.includes(RawJsonKinds.CurpValidationResponse)) {
+            const curpVersion = document.curpCompletedVersion ?? '';
+            const versionedCurpDI = curpVersion ? `${di}:${curpVersion}` : di;
+            dis.push(versionedCurpDI as DataIdentifier);
           }
-        });
-        // get the specific upload images for each document
-        uploads.forEach(upload => {
-          const { version, identifier } = upload;
-          const di = `${identifier}:${version}`;
-          dis.push(di);
-        });
+          dis.push(`${di}:${completedVersion}` as DataIdentifier);
+        }
       });
-    }
+      // get the specific upload images for each document
+      uploads.forEach(upload => {
+        const { version, identifier } = upload;
+        const di = `${identifier}:${version}`;
+        dis.push(di as DataIdentifier);
+      });
+    });
   });
 
   return dis as DataIdentifier[];

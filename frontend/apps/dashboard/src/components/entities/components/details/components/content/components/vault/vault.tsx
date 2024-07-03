@@ -1,10 +1,12 @@
-import type { DataIdentifier, EntityVault, VaultValue } from '@onefootprint/types';
+import type { DataIdentifier, EntityVault, SupportedIdDocTypes, VaultValue } from '@onefootprint/types';
 import { EntityKind, IdDI } from '@onefootprint/types';
 import React from 'react';
 
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
+import flat from 'flat';
+import get from 'lodash/get';
 import type { WithEntityProps } from '../../../with-entity';
 import BusinessVault from './components/business-vault';
 import DecryptForm from './components/decrypt-form';
@@ -12,7 +14,7 @@ import EditForm from './components/edit-form';
 import PersonVault from './components/person-vault';
 import VaultActionControls, { useDecryptControls, useEditControls } from './components/vault-actions';
 import EMPTY_SELECT_VALUE from './constants';
-import type { EditFormData, EditSubmitData } from './vault.types';
+import type { DecryptFormData, EditFormData, EditSubmitData } from './vault.types';
 
 type VaultProps = WithEntityProps;
 
@@ -83,6 +85,18 @@ const Vault = ({ entity }: VaultProps) => {
     });
   };
 
+  const handleBeforeDecryptSubmit = (formData: DecryptFormData) => {
+    const { documents: documentsMap, ...dis } = formData;
+    // Convert the form data
+    const fields = Object.keys(flat(dis))
+      .filter(di => get(dis, di))
+      .map(di => di as DataIdentifier);
+    const documents = Object.entries(documentsMap || {})
+      .filter(([, value]) => value)
+      .map(([kind]) => kind as SupportedIdDocTypes);
+    decrypt.submitFields(fields, documents);
+  };
+
   return (
     <>
       <VaultActionControls entity={entity} />
@@ -91,7 +105,7 @@ const Vault = ({ entity }: VaultProps) => {
           <PersonVault />
         </EditForm>
       ) : (
-        <DecryptForm onSubmit={decrypt.submitFields}>
+        <DecryptForm onSubmit={handleBeforeDecryptSubmit}>
           {context.kind === EntityKind.business ? <BusinessVault /> : <PersonVault />}
         </DecryptForm>
       )}

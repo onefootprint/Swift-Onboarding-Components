@@ -44,7 +44,7 @@ const DecryptHistoricalButton = ({ entity }: DecryptHistoricalProps) => {
                   value: 'start-all',
                   onSelect: () => {
                     if (entityVault) {
-                      decryptControls.submitAllFields(Object.keys(entityVault).map(str => str as DataIdentifier));
+                      decryptControls.submitAllFields();
                     }
                   },
                 },

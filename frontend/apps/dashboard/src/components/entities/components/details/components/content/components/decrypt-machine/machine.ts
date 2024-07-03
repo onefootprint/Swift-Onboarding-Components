@@ -2,7 +2,6 @@ import { createMachine } from 'xstate';
 
 import type { Context, MachineEvents, MachineStates } from './types';
 import { Action, Event, Guard, State } from './types';
-import getDiFields from './utils/get-di-fields';
 
 export const createDecryptStateMachine = () =>
   createMachine<Context, MachineEvents, MachineStates>(
@@ -16,7 +15,7 @@ export const createDecryptStateMachine = () =>
             [Event.started]: {
               target: State.selectingFields,
             },
-            [Event.submittedAllFields]: [
+            [Event.submittedFields]: [
               {
                 target: State.confirmingDecryptAllReason,
                 actions: [Action.assignFields],
@@ -86,8 +85,7 @@ export const createDecryptStateMachine = () =>
       guards: {
         [Guard.hasAtLeastOneFieldSelected]: (_context, event) => {
           if (event.type === Event.submittedFields) {
-            const dis = getDiFields(event.payload.fields);
-            return dis.length > 0;
+            return event.payload.fields.length > 0 || event.payload.documents.length > 0;
           }
           return false;
         },
@@ -95,10 +93,8 @@ export const createDecryptStateMachine = () =>
       actions: {
         [Action.assignFields]: (context, event) => {
           if (event.type === Event.submittedFields) {
-            context.dis = getDiFields(event.payload.fields);
-          }
-          if (event.type === Event.submittedAllFields) {
             context.dis = event.payload.fields;
+            context.documents = event.payload.documents;
           }
         },
         [Action.assignReason]: (context, event) => {

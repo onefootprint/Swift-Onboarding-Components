@@ -8,7 +8,6 @@ import styled, { css } from 'styled-components';
 
 import { useEditControls } from '../../../../../vault-actions';
 import { getDocumentVersion } from '../../utils';
-import DocumentStatusBadge from '../document-status-badge';
 import ConfidenceScores from './components/confidence-scores';
 import ExtractedDocumentData from './components/extracted-document-data';
 import RawJsonData from './components/raw-json-data';
@@ -16,13 +15,12 @@ import SessionSelect from './components/session-select';
 import Uploads from './components/uploads';
 
 export type DocumentFieldProps = {
-  label: string;
   vault: EntityVault;
   documentType?: SupportedIdDocTypes;
   documents: Document[];
 };
 
-const DocumentField = ({ label, documentType, vault, documents }: DocumentFieldProps) => {
+const DocumentField = ({ documentType, vault, documents }: DocumentFieldProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document',
   });
@@ -44,12 +42,6 @@ const DocumentField = ({ label, documentType, vault, documents }: DocumentFieldP
   return documentType ? (
     <Container>
       <Inner>
-        <LabelContainer>
-          <Text variant="body-3" color="tertiary" tag="label">
-            {label}
-          </Text>
-          <DocumentStatusBadge documents={documents} documentType={documentType} />
-        </LabelContainer>
         {showEditView ? (
           <Text variant="body-3" color="tertiary">
             {t('cannot-edit')}
@@ -102,16 +94,6 @@ const DrawerItems = styled.div`
     gap: ${theme.spacing[9]};
     padding-bottom: ${theme.spacing[8]};
   `}
-`;
-
-const LabelContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacing[3]};
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  `};
 `;
 
 export default DocumentField;

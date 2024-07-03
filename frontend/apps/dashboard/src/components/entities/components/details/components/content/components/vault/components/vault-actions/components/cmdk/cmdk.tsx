@@ -162,7 +162,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         {
           label: t('components.cmdk.decrypt.decrypt-all'),
           value: 'decrypt-all',
-          onSelect: () => decryptControls.submitAllFields(entity.decryptableAttributes),
+          onSelect: () => decryptControls.submitAllFields(),
           closeAfterSelect: true,
           disabled: !canDecrypt,
         },

@@ -67,7 +67,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
                 {
                   label: t('pages.entity.decrypt.start-all'),
                   value: 'start-all',
-                  onSelect: () => decryptControls.submitAllFields(entity.decryptableAttributes),
+                  onSelect: () => decryptControls.submitAllFields(),
                 },
               ]}
             />

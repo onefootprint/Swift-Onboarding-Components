@@ -1,4 +1,4 @@
-import type { DataIdentifier } from '@onefootprint/types';
+import type { DataIdentifier, SupportedIdDocTypes } from '@onefootprint/types';
 
 import type { DecryptFormData } from '../vault/vault.types';
 
@@ -16,7 +16,6 @@ export enum Event {
   started = 'started',
   canceled = 'canceled',
   submittedFields = 'submittedFields',
-  submittedAllFields = 'submittedAllFields',
   submittedReason = 'submittedReason',
   decryptSucceeded = 'decryptSucceeded',
   decryptFailed = 'decryptFailed',
@@ -35,6 +34,7 @@ export type Context = {
   reason?: string;
   fields?: DecryptFormData;
   dis?: DataIdentifier[];
+  documents?: SupportedIdDocTypes[];
 };
 
 export type MachineEvents =
@@ -42,11 +42,7 @@ export type MachineEvents =
   | { type: Event.canceled }
   | {
       type: Event.submittedFields;
-      payload: { fields: DecryptFormData };
-    }
-  | {
-      type: Event.submittedAllFields;
-      payload: { fields: DataIdentifier[] };
+      payload: { fields: DataIdentifier[]; documents: SupportedIdDocTypes[] };
     }
   | {
       type: Event.submittedReason;
