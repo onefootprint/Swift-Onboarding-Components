@@ -301,30 +301,25 @@ fn blob_key(
     dl: &DataLifetime,
     blob_sha256_digest: &[u8],
 ) -> FpResult<String> {
-    // Partition by last two characters of the fp_id.
+    // Partition by fp_id_(test_) prefix plus the first two characters of the ID.
+    //
+    // For example:
+    //   fp_id_ab
+    //   fp_bid_test_cd
     //
     // Often when reading large amounts of data from an S3 bucket, it's handy to split up the
     // work over multiple machines/workers. This is facilitated with partition keys.
     // An fp_id may be too fine-grained for a partition key for large customers, so we provide
     // a coarser partition key. Using the last two characters of the fp_id gives us ~4k
     // partitions max, which can be quickly paginated over for scheduling purposes
-    let fp_id_partition = fp_id
-        .to_string()
-        .split('_')
-        .last()
-        .ok_or(AssertionError("fp_id is not split by '_'"))?
-        .chars()
-        .rev()
-        .take(2)
-        .collect::<String>()
-        .chars()
-        .rev()
-        .collect::<String>();
+    let fp_id = fp_id.to_string();
+    let parts: Vec<&str> = fp_id.split('_').collect();
 
-    if fp_id_partition.len() != 2 {
-        // This shouldn't happen if fp_ids are generated with proper length.
-        return AssertionError("fp_id_partition is not 2 characters long").into();
-    }
+    let id = parts.last().ok_or(AssertionError("fp_id is empty"))?;
+    let id_first_two = id.chars().take(2).collect::<String>();
+
+    let prefix = parts.into_iter().rev().skip(1).rev().join("_");
+    let fp_id_partition = format!("{}_{}", prefix, id_first_two);
 
     let created_ts = dl.created_at.timestamp().to_string();
     if created_ts.len() != 10 {
@@ -389,6 +384,6 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(&key, "footprint/vdr/a1b6cf025aaa4e5f926c2fa182755392/Q9/fp_id_Vu5lEC3KeaAfVeedqtBjQ9/data/custom.my_custom_field/1672531200-2Pv-LkGx5Xa78_NWvJjdQWhW4Go42bXxcDqsxMpTnms");
+        assert_eq!(&key, "footprint/vdr/a1b6cf025aaa4e5f926c2fa182755392/fp_id_Vu/fp_id_Vu5lEC3KeaAfVeedqtBjQ9/data/custom.my_custom_field/1672531200-2Pv-LkGx5Xa78_NWvJjdQWhW4Go42bXxcDqsxMpTnms");
     }
 }
