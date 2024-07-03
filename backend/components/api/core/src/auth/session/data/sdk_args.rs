@@ -17,7 +17,7 @@ use std::collections::HashMap;
 use strum_macros::Display;
 use strum_macros::EnumDiscriminants;
 
-pub type BootstrapDataV1 = HashMap<DataIdentifier, PiiJsonValue>;
+pub type UserDataV1 = HashMap<DataIdentifier, PiiJsonValue>;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct L10nV1 {
@@ -42,8 +42,7 @@ pub struct VerifyV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key: Option<ObConfigurationKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(alias = "user_data")]
-    pub bootstrap_data: Option<BootstrapDataV1>,
+    pub user_data: Option<UserDataV1>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<VerifyV1Options>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -70,7 +69,7 @@ pub struct AuthV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key: Option<ObConfigurationKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_data: Option<BootstrapDataV1>,
+    pub user_data: Option<UserDataV1>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<AuthV1Options>,
     #[serde(skip_serializing_if = "Option::is_none")]
