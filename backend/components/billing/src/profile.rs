@@ -96,6 +96,7 @@ fn get_price_from(profile: Option<&DbBillingProfile>, product: Product) -> Optio
         Product::VaultsWithPci => profile.vaults_with_pci.as_deref(),
         Product::AdverseMediaPerOnboarding => profile.adverse_media_per_user.as_deref(),
         Product::ContinuousMonitoringPerYear => profile.continuous_monitoring_per_year.as_deref(),
+        Product::AdverseMediaPerYear => profile.continuous_monitoring_per_year.as_deref(),
     }
 }
 

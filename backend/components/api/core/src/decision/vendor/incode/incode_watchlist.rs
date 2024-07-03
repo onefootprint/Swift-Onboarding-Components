@@ -31,9 +31,10 @@ use idv::incode::IncodeResponse;
 use idv::ParsedResponse;
 use idv::VendorResponse;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
-use newtypes::BillingEventKind::ContinuousMonitoringPerYear;
+use newtypes::BillingEventKind as BEK;
 use newtypes::DecisionIntentId;
 use newtypes::EncryptedVaultPrivateKey;
+use newtypes::EnhancedAmlOption;
 use newtypes::IdvData;
 use newtypes::IncodeConfigurationId;
 use newtypes::IncodeEnvironment;
@@ -233,7 +234,14 @@ pub async fn run_watchlist_check(
             let (obc, _) = ObConfiguration::get(conn, &obc_key)?;
 
             // Create a BillingEvent once per year for this user
-            BillingEvent::create(conn, &sv.id, Some(&obc.id), ContinuousMonitoringPerYear)?;
+            let adverse_media = match obc.enhanced_aml() {
+                EnhancedAmlOption::Yes { adverse_media, .. } => adverse_media,
+                EnhancedAmlOption::No => false,
+            };
+            if adverse_media {
+                BillingEvent::create(conn, &sv.id, Some(&obc.id), BEK::AdverseMediaPerYear)?;
+            }
+            BillingEvent::create(conn, &sv.id, Some(&obc.id), BEK::ContinuousMonitoringPerYear)?;
 
             Ok((sv.tenant_id, vw, obc))
         })

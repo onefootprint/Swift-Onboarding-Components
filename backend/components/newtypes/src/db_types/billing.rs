@@ -17,6 +17,7 @@ use strum_macros::EnumString;
 pub enum BillingEventKind {
     /// TODO: charge again for events 1y after
     ContinuousMonitoringPerYear,
+    AdverseMediaPerYear,
     AdverseMediaPerUser,
     CurpValidation,
     Kyc,
@@ -32,6 +33,7 @@ impl BillingEventKind {
     pub fn billing_strategy(&self) -> BillingStrategy {
         match self {
             Self::ContinuousMonitoringPerYear => BillingStrategy::PerInterval(Duration::days(365)),
+            Self::AdverseMediaPerYear => BillingStrategy::PerInterval(Duration::days(365)),
             Self::AdverseMediaPerUser => BillingStrategy::PerUser,
             Self::CurpValidation => BillingStrategy::Each,
             Self::Kyc => BillingStrategy::Each,
@@ -86,12 +88,16 @@ pub enum Product {
     KycWaterfallSecondVendor,
     /// Number of KYC verifications that contacted a third vendor in waterfall
     KycWaterfallThirdVendor,
-    /// Number of completed workflows onto playbooks that include adverse media checks.
-    /// Adverse media checks are billing per onboarding even though we run them monthly???
-    AdverseMediaPerOnboarding,
     /// Instead of watchlist_checks, billing for incode continuos monitoring. We bill on a per year
     /// basis, but run the checks monthly
     ContinuousMonitoringPerYear,
+    /// Instead of watchlist_checks, billing for incode continuos monitoring with adverse media. We
+    /// bill on a per year basis, but run the checks monthly.
+    AdverseMediaPerYear,
+    /// Number of completed workflows onto playbooks that include adverse media checks.
+    /// This is only for customers on a legacy billing plan that billed one-time for adverse media
+    /// checks even though we're continuously running adverse media checks.
+    AdverseMediaPerOnboarding,
     /// Number of KYB verifications ran this month
     Kyb,
     /// KYB run only on EIN
@@ -137,6 +143,7 @@ impl Product {
             Self::VaultsWithPci => "prod_OXKHHjVIuWL7OV",
             Self::AdverseMediaPerOnboarding => "prod_P6nOzVVredzvo1",
             Self::ContinuousMonitoringPerYear => "prod_P6nPpoj4yjL3tj",
+            Self::AdverseMediaPerYear => "prod_P6nPpoj4yjL3tj",
             Self::CurpVerification => "prod_QE6roGU9hUeA6m",
         }
     }
@@ -159,6 +166,7 @@ impl Product {
             Self::VaultsWithPci => "Uncontracted VaultsWithPci",
             Self::AdverseMediaPerOnboarding => "Uncontracted AdverseMediaPerOnboarding",
             Self::ContinuousMonitoringPerYear => "Uncontracted ContinuousMonitoringPerYear",
+            Self::AdverseMediaPerYear => "Uncontracted ContinuousMonitoringWithAdverseMediaPerYear",
             Self::CurpVerification => "Uncontracted CurpVerification",
         }
     }
@@ -177,6 +185,7 @@ impl Product {
             | Self::KycWaterfallThirdVendor
             | Self::AdverseMediaPerOnboarding
             | Self::ContinuousMonitoringPerYear
+            | Self::AdverseMediaPerYear
             | Self::CurpVerification => true,
             Self::MonthlyPlatformFee
             | Self::HotProxyVaults
@@ -201,6 +210,7 @@ impl Product {
             | Self::KycWaterfallThirdVendor
             | Self::AdverseMediaPerOnboarding
             | Self::ContinuousMonitoringPerYear
+            | Self::AdverseMediaPerYear
             | Self::CurpVerification => RevenueCategory::Identity,
             Self::HotProxyVaults
             | Self::HotVaults
@@ -229,6 +239,7 @@ impl From<BillingEventKind> for Product {
         // The rust compiler will guide you through all but the dashboard changes
         match value {
             BillingEventKind::ContinuousMonitoringPerYear => Product::ContinuousMonitoringPerYear,
+            BillingEventKind::AdverseMediaPerYear => Product::AdverseMediaPerYear,
             BillingEventKind::AdverseMediaPerUser => Product::AdverseMediaPerOnboarding,
             BillingEventKind::CurpValidation => Product::CurpVerification,
             BillingEventKind::Kyc => Product::Kyc,

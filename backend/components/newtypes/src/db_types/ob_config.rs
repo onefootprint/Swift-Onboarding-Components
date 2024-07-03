@@ -131,6 +131,11 @@ impl CipKind {
 #[serde(tag = "kind", content = "data")]
 pub enum EnhancedAmlOption {
     No,
+    /// This contains various options of which watchlist are selected. Generally, we get all results
+    /// from incode and just filter which results we pay attention to in RiskSignal generation
+    /// based on what the tenant wants to see.
+    /// Interestingly, we charge more for adverse media even though we're getting the results all
+    /// the time
     Yes {
         ofac: bool,
         pep: bool,
