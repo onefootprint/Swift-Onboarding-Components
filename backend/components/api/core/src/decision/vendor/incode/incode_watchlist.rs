@@ -240,6 +240,7 @@ pub async fn run_watchlist_check(
             };
             if adverse_media {
                 BillingEvent::create(conn, &sv.id, Some(&obc.id), BEK::AdverseMediaPerYear)?;
+                BillingEvent::create(conn, &sv.id, Some(&obc.id), BEK::AdverseMediaPerUser)?;
             }
             BillingEvent::create(conn, &sv.id, Some(&obc.id), BEK::ContinuousMonitoringPerYear)?;
 

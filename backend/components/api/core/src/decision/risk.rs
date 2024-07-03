@@ -2,7 +2,6 @@ use super::onboarding::RulesOutcome;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::FpResult;
 use api_wire_types::RuleResultRuleAction;
-use db::models::billing_event::BillingEvent;
 use db::models::data_lifetime::DataLifetime;
 use db::models::document::Document;
 use db::models::manual_review::ManualReviewAction;
@@ -17,7 +16,6 @@ use db::models::workflow::Workflow;
 use db::TxnPgConn;
 use itertools::chain;
 use itertools::Itertools;
-use newtypes::BillingEventKind::AdverseMediaPerUser;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
 use newtypes::DocumentRequestConfig;
@@ -102,15 +100,6 @@ pub fn save_final_decision(
     // Bookkeeping if this is the first Footprint decision
     if wf.decision_made_at.is_none() {
         Workflow::set_decision_made_at(conn, &wf.id)?;
-
-        // Create the billing event(s)
-        use newtypes::EnhancedAmlOption;
-        match obc.enhanced_aml() {
-            EnhancedAmlOption::Yes { adverse_media, .. } if adverse_media => {
-                BillingEvent::create(conn, &wf.scoped_vault_id, Some(&obc.id), AdverseMediaPerUser)?;
-            }
-            _ => (),
-        }
     }
 
     // Create an OBD, update ManualReviews, and update Workflow state
