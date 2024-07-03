@@ -23,7 +23,6 @@ use newtypes::DataLifetimeSource;
 use newtypes::DbActor;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Selectable)]
 #[diesel(table_name = data_lifetime)]

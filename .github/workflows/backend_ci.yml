@@ -243,7 +243,7 @@ jobs:
 
       - name: Clippy
         working-directory: ./backend
-        run: cargo clippy --all --no-default-features --features simulate
+        run: cargo clippy --all --no-default-features --features simulate -- -D warnings
 
       - name: Clippy (vsock enabled)
         working-directory: ./backend

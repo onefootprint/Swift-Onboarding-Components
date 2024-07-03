@@ -13,7 +13,6 @@ use db_schema::schema::vault_dr_blob;
 use db_schema::schema::vault_dr_config;
 use diesel::prelude::*;
 use diesel::Insertable;
-use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::Locked;
