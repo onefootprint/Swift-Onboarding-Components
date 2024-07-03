@@ -1,5 +1,5 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
+import { Box, Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -46,8 +46,9 @@ const Banner = ({ title }: BannerProps) => {
   );
 };
 
-const BannerContainer = styled(Container)`
+const BannerContainer = styled(Box)`
   ${({ theme }) => css`
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;

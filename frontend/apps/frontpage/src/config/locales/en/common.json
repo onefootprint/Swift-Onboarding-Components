@@ -965,6 +965,57 @@
         "email-address": "join@onefootprint.com"
       }
     },
+    "compare": {
+      "html-title": "Footprint | Compare",
+      "html-description": "See how Footprint compares to its competition",
+      "title": {
+        "first": "We're built",
+        "differently": "different",
+        "fromTheStart": "from the start"
+      },
+      "subtitle": "Footprint integrates identity verification and fraud detection, dynamically adjusting friction with the strongest possible security infrastructure.",
+      "table": {
+        "database-kyc": "Database KYC",
+        "tokenization": "Tokenization",
+        "document-kyc": "Document KYC",
+        "customizable-ui": "Customizable UI",
+        "fraud-detection": "Fraud Detection",
+        "step-ups": "Step-ups",
+        "device-insights": "Device Insights",
+        "custom-documents-uploads": "Custom Doc. Uploads",
+        "data-vault": "Data Vault",
+        "data-proxy": "Data Proxy",
+        "seamless-integration": "Seamless Integration"
+      },
+      "switching": {
+        "title": "Thinking about switching?",
+        "alloy": {
+          "company": "Alloy",
+          "title": "Customizable rules and document requests",
+          "subtitle": "Footprint empowers you to set up custom rules and document requests with our no-code rule builder, keeping users out of manual review and boosting your conversion."
+        },
+        "plaid": {
+          "company": "Plaid",
+          "title": "Advanced identity and fraud detection",
+          "subtitle": "With a seamless integration, Footprint handles KYC, fraud prevention and security. Stay ahead of bad actors and seamlessly onboard users faster."
+        },
+        "onfido": {
+          "company": "Onfido",
+          "title": "Smoother document scanning, enhanced conversion",
+          "subtitle": "Upgrade to our streamlined document scanning for improved user conversions. Experience fast, accurate, and hassle-free identity verification with our advanced app clip technology."
+        },
+        "persona": {
+          "company": "Persona",
+          "title": "Flexible, customizable styles to meet your needs",
+          "subtitle": "Whether you need custom embedded components or fully customizable flows, we offer seamless and consistent onboarding experiences tailored to your users' needs."
+        }
+      },
+      "logos-section": {
+        "title": "Join the leading brands and institutions that use Footprint to power their onboarding experience",
+        "get-started": "Get started",
+        "book-a-demo": "Book a demo"
+      }
+    },
     "kyc": {
       "html-title": "Footprint - KYC",
       "html-description": "Verify the people behind the device",
