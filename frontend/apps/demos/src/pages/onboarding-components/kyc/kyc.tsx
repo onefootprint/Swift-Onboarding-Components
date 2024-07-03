@@ -150,9 +150,7 @@ const BasicData = ({ onDone }: { onDone: () => void }) => {
           </Fp.Field>
           <Divider marginBlock={3} />
           <Fp.Field name="id.country">
-            <Fp.Label>Country</Fp.Label>
-            <Fp.Input placeholder="US" />
-            <Fp.FieldErrors />
+            <Fp.Input placeholder="US" defaultValue="US" type="hidden" />
           </Fp.Field>
           <Fp.Field name="id.address_line1">
             <Fp.Label>Address line 1</Fp.Label>
