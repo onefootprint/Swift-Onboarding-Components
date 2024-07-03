@@ -6,12 +6,14 @@ import { useFormContext } from 'react-hook-form';
 import FieldContext from '../field-context';
 import type { Di } from '../types/dis';
 
+type FieldOptions = {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  error: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined;
+};
+
 export type FieldProps = {
   name: keyof Di;
-  children?: (
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    error: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined,
-  ) => React.ReactNode;
+  children?: (options: FieldOptions) => React.ReactNode;
 };
 
 const Field = ({ name, children }: FieldProps) => {
@@ -24,7 +26,7 @@ const Field = ({ name, children }: FieldProps) => {
 
   return (
     <FieldContext.Provider value={contextValues}>
-      {children?.(error)}
+      {children?.({ error })}
     </FieldContext.Provider>
   );
 };

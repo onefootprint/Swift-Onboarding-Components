@@ -1,19 +1,32 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import isPlainObject from 'lodash/isPlainObject';
 import React from 'react';
+import type { FieldErrors } from 'react-hook-form';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { Di } from '../types/dis';
 
+type DiKey = keyof Di;
+
+type FormOptions = {
+  handleSubmit: () => void;
+  setValue: (name: DiKey, value: Di[DiKey]) => void;
+  errors: FieldErrors<Di>;
+};
+
 export type FormProps = {
-  children: (onSubmit: () => void) => React.ReactNode;
+  children: (options: FormOptions) => React.ReactNode;
   onSubmit: (values: Di) => void;
   defaultValues?: Di;
 };
 
 const Form = ({ children, defaultValues, onSubmit }: FormProps) => {
   const methods = useForm<Di>({ defaultValues });
-  const { handleSubmit } = methods;
+  const {
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = methods;
 
   const handleBeforeSubmit = (formValues: Di) => {
     onSubmit(flattenObject(formValues) as Di);
@@ -21,7 +34,11 @@ const Form = ({ children, defaultValues, onSubmit }: FormProps) => {
 
   return (
     <FormProvider {...methods}>
-      {children(handleSubmit(handleBeforeSubmit))}
+      {children({
+        handleSubmit: handleSubmit(handleBeforeSubmit),
+        setValue: (name, value) => setValue(name, value as never), // TODO: Fix this type casting - issue with react-form-hook
+        errors,
+      })}
     </FormProvider>
   );
 };
