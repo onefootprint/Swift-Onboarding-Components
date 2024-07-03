@@ -27,7 +27,7 @@ const NavigationSubcategory = ({ title, items, onItemClick }: NavigationSubcateg
   return (
     <NavigationSubcategoryContainer>
       <TitleContainer aria-selected={isSelected} type="button" onClick={handleTitleClick}>
-        <Text variant="label-4">{title}</Text>
+        <Text variant="body-4">{title}</Text>
         <StyledChevron color={isSelected ? 'primary' : 'tertiary'} $isSelected={isSelected} />
       </TitleContainer>
       <div ref={animatedList}>
