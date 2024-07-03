@@ -137,22 +137,44 @@ const Content = styled.div`
     }
 
     ol {
-      margin-bottom: ${theme.spacing[9]};
+      margin-bottom: ${theme.spacing[8]};
 
       li {
         list-style-type: decimal;
-        list-style-position: inside;
         ${createFontStyles('body-1')};
+        padding-left: ${theme.spacing[2]}; 
+
+        ol {
+          padding-bottom: ${theme.spacing[2]};
+          padding-left: ${theme.spacing[6]};
+
+          li {
+            padding-top: ${theme.spacing[3]};
+            list-style-type: lower-alpha;
+            ${createFontStyles('body-1')};
+            padding-left: ${theme.spacing[2]};           }
+        }
       }
     }
 
     ul {
-      margin-bottom: ${theme.spacing[9]};
+      margin-bottom: ${theme.spacing[8]};
 
       li {
         list-style-type: disc;
-        list-style-position: inside;
         ${createFontStyles('body-1')};
+        padding-left: ${theme.spacing[2]}; 
+
+        ul {
+          padding-bottom: ${theme.spacing[2]};
+          padding-left: ${theme.spacing[6]};
+
+          li {
+            list-style-type: circle;
+            padding-top: ${theme.spacing[3]};
+            ${createFontStyles('body-1')};
+            padding-left: ${theme.spacing[2]};           }
+        }
       }
     }
 
