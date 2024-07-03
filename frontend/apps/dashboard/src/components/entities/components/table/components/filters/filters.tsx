@@ -2,6 +2,7 @@ import { Stack } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useRouter } from 'next/router';
 import useFilters, { EntityStatusFilter } from '../../../../hooks/use-filters';
 import DrawerFilter from './components/drawer-filter';
 import Info from './components/info';
@@ -35,20 +36,22 @@ const Filters = () => {
   const filters = useFilters();
   const manualReviewQuery = useManualReview();
   const isAll = !filters.values.state && !filters.values.verification;
+  const router = useRouter();
+  const isBusinesses = router.pathname.includes('/businesses');
 
   return (
     <>
       <Stack gap={3} flexWrap="wrap">
         <ToggleGroup
           options={[{ value: 'all', label: 'All' }]}
-          groupId="all"
+          groupId={isBusinesses ? 'all-businesses' : 'all-individuals'}
           value={isAll ? 'all' : undefined}
           onChange={() => {
             filters.push({ state: undefined, verification: undefined });
           }}
         />
         <ToggleGroup
-          groupId="state"
+          groupId={isBusinesses ? 'state-businesses' : 'state-individuals'}
           value={filters.values.state}
           options={[
             { value: EntityStatusFilter.complete, label: t('status.complete') },
@@ -68,7 +71,7 @@ const Filters = () => {
           }}
         />
         <ToggleGroup
-          groupId="verification"
+          groupId={isBusinesses ? 'verification-businesses' : 'verification-individuals'}
           value={filters.values.verification}
           disabled={filters.values.state === EntityStatusFilter.incomplete}
           options={[

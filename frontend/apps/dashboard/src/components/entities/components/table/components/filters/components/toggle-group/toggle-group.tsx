@@ -45,7 +45,7 @@ const ToggleGroup = ({ 'aria-label': ariaLabel, options, value, onChange, disabl
   };
 
   return (
-    <ToggleGroupContainer aria-label={ariaLabel} data-disabled={disabled} role="radiogroup">
+    <ToggleGroupContainer aria-label={ariaLabel} data-disabled={disabled} role="radiogroup" layout layoutRoot>
       {options.map(option => (
         <Stack position="relative" key={option.value} height="100%" align="center" justify="center">
           <Option
@@ -93,7 +93,7 @@ const SelectedIndicator = styled(motion.div)`
   `}
 `;
 
-const ToggleGroupContainer = styled.div`
+const ToggleGroupContainer = styled(motion.div)`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
