@@ -6,6 +6,7 @@ const BASIC_DATA_ATTRIBUTES = [
   CollectedKybDataOption.tin,
   CollectedKybDataOption.phoneNumber,
   CollectedKybDataOption.website,
+  CollectedKybDataOption.corporationType,
 ];
 
 const BUSINESS_ADDRESS_ATTRIBUTES = [CollectedKybDataOption.address];
