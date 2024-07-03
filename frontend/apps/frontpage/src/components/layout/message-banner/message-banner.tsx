@@ -1,5 +1,5 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { Stack, Text, media } from '@onefootprint/ui';
+import { Stack, createFontStyles, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import React from 'react';
@@ -48,12 +48,10 @@ const MessageBanner = ({ onClose, articleUrl, text, showBanner }: MessageBannerP
     <AnimatePresence>
       {showBanner && (
         <Container variants={containerVariants} initial="initial" animate="animate" exit="exit">
-          <motion.div variants={textVariants} initial="initial" animate="animate">
-            <Text variant="label-3">
-              {text}
-              <StyledLink href={articleUrl}>{t('cta')}</StyledLink>
-            </Text>
-          </motion.div>
+          <motion.p variants={textVariants} initial="initial" animate="animate">
+            {text}
+            <StyledLink href={articleUrl}>{t('cta')}</StyledLink>
+          </motion.p>
           <CloseButtonContainer onClick={onClose}>
             <IcoCloseSmall16 />
           </CloseButtonContainer>
@@ -65,6 +63,8 @@ const MessageBanner = ({ onClose, articleUrl, text, showBanner }: MessageBannerP
 
 const Container = styled(motion(Stack))`
   ${({ theme }) => css`
+    ${createFontStyles('label-3')}
+    color: ${theme.color.primary};
     align-items: center;
     justify-content: center;
     display: flex;
@@ -98,7 +98,10 @@ const CloseButtonContainer = styled.button`
 
 const StyledLink = styled(Link)`
   ${({ theme }) => css`
+    ${createFontStyles('label-3')}
+    color: ${theme.color.accent};
     margin-left: ${theme.spacing[3]};
+    text-decoration: none;
   `}
 `;
 
