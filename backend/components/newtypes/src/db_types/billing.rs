@@ -79,6 +79,8 @@ impl_enum_string_diesel!(BillingEventKind);
 pub enum Product {
     /// A fixed amount charged monthly
     MonthlyPlatformFee,
+    /// Monthly minimum spend on identity products
+    MonthlyMinimumOnIdentity,
 
     /// Number of KYC verifications ran this month, not including one-click onboardings
     Kyc,
@@ -145,12 +147,16 @@ impl Product {
             Self::ContinuousMonitoringPerYear => "prod_P6nPpoj4yjL3tj",
             Self::AdverseMediaPerYear => "prod_P6nPpoj4yjL3tj",
             Self::CurpVerification => "prod_QE6roGU9hUeA6m",
+
+            // TODO this isn't actually used
+            Self::MonthlyMinimumOnIdentity => "prod_QPQlh7JsolnihQ",
         }
     }
 
     pub fn uncontracted_description(&self) -> &'static str {
         match self {
             Self::MonthlyPlatformFee => "Uncontracted MonthlyPlatformFee",
+            Self::MonthlyMinimumOnIdentity => "Uncontracted MonthlyMinimumOnIdentity",
             Self::HotProxyVaults => "Uncontracted HotProxyVaults",
             Self::HotVaults => "Uncontracted HotVaults",
             Self::IdDocs => "Uncontracted IdDocs",
@@ -188,6 +194,7 @@ impl Product {
             | Self::AdverseMediaPerYear
             | Self::CurpVerification => true,
             Self::MonthlyPlatformFee
+            | Self::MonthlyMinimumOnIdentity
             | Self::HotProxyVaults
             | Self::HotVaults
             | Self::Pii
@@ -211,7 +218,8 @@ impl Product {
             | Self::AdverseMediaPerOnboarding
             | Self::ContinuousMonitoringPerYear
             | Self::AdverseMediaPerYear
-            | Self::CurpVerification => RevenueCategory::Identity,
+            | Self::CurpVerification
+            | Self::MonthlyMinimumOnIdentity => RevenueCategory::Identity,
             Self::HotProxyVaults
             | Self::HotVaults
             | Self::Pii

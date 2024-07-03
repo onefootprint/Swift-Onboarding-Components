@@ -47,7 +47,7 @@ const WATCHLIST = [
   TenantBillingProfileProduct.watchlistChecks,
 ];
 
-const OTHER = [TenantBillingProfileProduct.monthlyMinimum, TenantBillingProfileProduct.monthlyPlatformFee];
+const OTHER = [TenantBillingProfileProduct.monthlyMinimumOnIdentity, TenantBillingProfileProduct.monthlyPlatformFee];
 
 const ProductToTitle: Record<TenantBillingProfileProduct, string> = {
   [TenantBillingProfileProduct.kyc]: 'KYC',
@@ -67,7 +67,7 @@ const ProductToTitle: Record<TenantBillingProfileProduct, string> = {
   [TenantBillingProfileProduct.continuousMonitoringPerYear]: 'Continuous monitoring (per year)',
   [TenantBillingProfileProduct.adverseMediaPerYear]: 'Adverse media (per year)',
   [TenantBillingProfileProduct.adverseMediaPerOnboarding]: 'Adverse media (per user, legacy)',
-  [TenantBillingProfileProduct.monthlyMinimum]: 'Monthly minimum',
+  [TenantBillingProfileProduct.monthlyMinimumOnIdentity]: 'Monthly minimum',
   [TenantBillingProfileProduct.monthlyPlatformFee]: 'Monthly platform fee',
 };
 

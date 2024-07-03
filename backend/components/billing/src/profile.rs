@@ -22,7 +22,6 @@ use strum::IntoEnumIterator;
 pub struct BillingProfile {
     pub(crate) tenant_id: TenantId,
     prices: HashMap<Product, PriceInfo>,
-    pub(crate) monthly_minimum: Option<Decimal>,
 }
 
 #[derive(Debug, Clone)]
@@ -56,17 +55,7 @@ impl BillingProfile {
             }
         }
         let tenant_id = info.tenant_id.clone();
-        let monthly_minimum = info
-            .billing_profile
-            .as_ref()
-            .and_then(|p| p.monthly_minimum.as_ref())
-            .map(|p| Decimal::from_str(p))
-            .transpose()?;
-        let profile = BillingProfile {
-            tenant_id,
-            prices,
-            monthly_minimum,
-        };
+        let profile = BillingProfile { tenant_id, prices };
         Ok(profile)
     }
 }

@@ -7,6 +7,7 @@ use interval::BillingInterval;
 use itertools::chain;
 use itertools::Itertools;
 use newtypes::PiiString;
+use newtypes::Product;
 use newtypes::RevenueCategory;
 use newtypes::StripeCustomerId;
 use newtypes::TenantId;
@@ -209,9 +210,9 @@ impl BillingClient {
 
         // If the tenant didn't hit their monthly minimum, add another line item for the remaining
         // amount
-        if let Some(monthly_minimum_cents) = profile.monthly_minimum.as_ref() {
-            if monthly_spend_cents < *monthly_minimum_cents {
-                let remaining_cents = monthly_minimum_cents - monthly_spend_cents;
+        if let Some(monthly_minimum) = profile.get(Product::MonthlyMinimumOnIdentity) {
+            if monthly_spend_cents < monthly_minimum.price_cents {
+                let remaining_cents = monthly_minimum.price_cents - monthly_spend_cents;
                 let mut new_invoice_item = CreateInvoiceItem::new(customer_id.clone());
                 let extra_metadata = [("revenue-category".into(), RevenueCategory::Identity.to_string())];
 
