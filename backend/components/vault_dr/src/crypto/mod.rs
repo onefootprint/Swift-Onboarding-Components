@@ -2,7 +2,6 @@ use super::error::Error;
 use age::secrecy::ExposeSecret;
 use age::secrecy::SecretString;
 use age::secrecy::Zeroize;
-use age::Callbacks;
 use bech32::FromBase32;
 use itertools::Itertools;
 use std::io::Write;
@@ -12,6 +11,49 @@ mod integration_tests;
 mod p256;
 mod piv_format;
 
+pub trait AgeEncryptor {
+    fn recipients(&self) -> Vec<Box<dyn age::Recipient + Send>>;
+
+    fn encrypt(&self, plaintext: &[u8]) -> Result<Vec<u8>, Error> {
+        let encryptor = age::Encryptor::with_recipients(self.recipients())
+            .ok_or(Error::Age("given recipient vec is empty".to_owned()))?;
+
+        let mut encrypted = vec![];
+        let mut writer = encryptor.wrap_output(&mut encrypted)?;
+        writer.write_all(plaintext)?;
+        writer.finish()?;
+
+        Ok(encrypted)
+    }
+
+    fn encrypt_armored(&self, plaintext: &[u8]) -> Result<String, Error> {
+        let encryptor = age::Encryptor::with_recipients(self.recipients())
+            .ok_or(Error::Age("given recipient vec is empty".to_owned()))?;
+
+        let mut encrypted = vec![];
+        let mut writer = encryptor.wrap_output(age::armor::ArmoredWriter::wrap_output(
+            &mut encrypted,
+            age::armor::Format::AsciiArmor,
+        )?)?;
+
+        writer.write_all(plaintext)?;
+
+        let armored_writer = writer.finish()?;
+        armored_writer.finish()?;
+
+        Ok(String::from_utf8(encrypted)?)
+    }
+
+    // We ASCII armor wrapped keys so they are easy to transfer to the tenant.
+    fn wrap_key(&self, inner_key: age::x25519::Identity) -> Result<WrappedKey, Error> {
+        let mut payload = inner_key.to_string().expose_secret().clone().into_bytes();
+
+        let wrapped = self.encrypt_armored(&payload)?;
+        payload.zeroize();
+
+        Ok(WrappedKey(SecretString::new(wrapped)))
+    }
+}
 
 #[derive(Clone)]
 pub enum PublicKey {
@@ -58,6 +100,12 @@ impl ToString for PublicKey {
     }
 }
 
+impl std::fmt::Debug for PublicKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("PublicKey").field(&self.to_string()).finish()
+    }
+}
+
 impl PublicKey {
     pub fn recipient(self) -> Box<dyn age::Recipient + Send> {
         match self {
@@ -67,6 +115,13 @@ impl PublicKey {
     }
 }
 
+impl AgeEncryptor for PublicKey {
+    fn recipients(&self) -> Vec<Box<dyn age::Recipient + Send>> {
+        vec![self.clone().recipient()]
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct PublicKeySet(Vec<PublicKey>);
 
 impl PublicKeySet {
@@ -84,37 +139,11 @@ impl PublicKeySet {
 
         Ok(set)
     }
+}
 
+impl AgeEncryptor for PublicKeySet {
     fn recipients(&self) -> Vec<Box<dyn age::Recipient + Send>> {
         self.0.iter().map(|pubkey| pubkey.clone().recipient()).collect()
-    }
-
-    fn encrypt_armored(&self, plaintext: &[u8]) -> Result<String, Error> {
-        let encryptor = age::Encryptor::with_recipients(self.recipients())
-            .ok_or(Error::Age("given recipient vec is empty".to_owned()))?;
-
-        let mut encrypted = vec![];
-        let mut writer = encryptor.wrap_output(age::armor::ArmoredWriter::wrap_output(
-            &mut encrypted,
-            age::armor::Format::AsciiArmor,
-        )?)?;
-
-        writer.write_all(plaintext)?;
-
-        let armored_writer = writer.finish()?;
-        armored_writer.finish()?;
-
-        Ok(String::from_utf8(encrypted)?)
-    }
-
-    // We ASCII armor wrapped keys so they are easy to transfer to the tenant.
-    fn wrap_key(&self, inner_key: &age::x25519::Identity) -> Result<WrappedKey, Error> {
-        let mut payload = inner_key.to_string().expose_secret().clone().into_bytes();
-
-        let wrapped = self.encrypt_armored(&payload)?;
-        payload.zeroize();
-
-        Ok(WrappedKey(SecretString::new(wrapped)))
     }
 }
 
@@ -143,7 +172,7 @@ impl EnrollmentKeys {
         let recovery_identity = age::x25519::Identity::generate();
         let recovery_public_key = recovery_identity.to_public();
 
-        let wrapped_recovery_key = org_public_keys.wrap_key(&recovery_identity)?;
+        let wrapped_recovery_key = org_public_keys.wrap_key(recovery_identity)?;
 
         // We immediately discard the recovery private key.
         //
@@ -154,38 +183,6 @@ impl EnrollmentKeys {
             recovery_public_key: recovery_public_key.to_string(),
             wrapped_recovery_key,
         })
-    }
-}
-
-/// A dummy implementation of Callbacks to fulfill the age plugin API.
-/// Our server-side usage of age-plugin-yubikey should not generate any callbacks.
-#[derive(Clone)]
-struct CallbacksNotSupported;
-
-impl Callbacks for CallbacksNotSupported {
-    fn display_message(&self, message: &str) {
-        tracing::info!(message, "Message from age plugin");
-    }
-
-    fn confirm(&self, message: &str, _yes_string: &str, _no_string: Option<&str>) -> Option<bool> {
-        tracing::error!(message, "Unexpected call to confirm callback from age plugin");
-        None
-    }
-
-    fn request_public_string(&self, description: &str) -> Option<String> {
-        tracing::error!(
-            description,
-            "Unexpected call to request_public_string callback from age plugin"
-        );
-        None
-    }
-
-    fn request_passphrase(&self, description: &str) -> Option<SecretString> {
-        tracing::error!(
-            description,
-            "Unexpected call to request_passphrase callback from age plugin"
-        );
-        None
     }
 }
 
