@@ -16,7 +16,6 @@ export type CopyLinkProps = {
 };
 
 const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) => {
-  const { t: allT } = useTranslation('common');
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.playbooks.table.actions.copy-link',
   });
@@ -60,16 +59,7 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(({ playbook }, ref) 
   };
 
   return (
-    <Dialog
-      onClose={handleClose}
-      open={open}
-      size="compact"
-      title={t('title')}
-      primaryButton={{
-        label: allT('close'),
-        onClick: handleClose,
-      }}
-    >
+    <Dialog onClose={handleClose} open={open} size="compact" title={t('title')}>
       <Content>
         <Text variant="body-3">{getDescription(playbook.kind)}</Text>
         <InputContainer>
