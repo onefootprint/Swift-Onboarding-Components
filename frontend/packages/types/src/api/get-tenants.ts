@@ -50,6 +50,7 @@ export enum TenantBillingProfileProduct {
   vaultsWithPci = 'vaultsWithPci',
   watchlistChecks = 'watchlistChecks',
   adverseMediaPerOnboarding = 'adverseMediaPerOnboarding',
+  adverseMediaPerYear = 'adverseMediaPerYear',
   continuousMonitoringPerYear = 'continuousMonitoringPerYear',
   monthlyMinimum = 'monthlyMinimum',
 }

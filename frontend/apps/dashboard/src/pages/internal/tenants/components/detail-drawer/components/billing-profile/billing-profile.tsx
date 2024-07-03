@@ -41,9 +41,10 @@ const VAULTING = [
 ];
 
 const WATCHLIST = [
-  TenantBillingProfileProduct.watchlistChecks,
-  TenantBillingProfileProduct.adverseMediaPerOnboarding,
   TenantBillingProfileProduct.continuousMonitoringPerYear,
+  TenantBillingProfileProduct.adverseMediaPerYear,
+  TenantBillingProfileProduct.adverseMediaPerOnboarding,
+  TenantBillingProfileProduct.watchlistChecks,
 ];
 
 const OTHER = [TenantBillingProfileProduct.monthlyMinimum, TenantBillingProfileProduct.monthlyPlatformFee];
@@ -62,9 +63,10 @@ const ProductToTitle: Record<TenantBillingProfileProduct, string> = {
   [TenantBillingProfileProduct.hotProxyVaults]: 'Hot proxy vaults',
   [TenantBillingProfileProduct.vaultsWithPci]: 'Per vault with card/custom data (monthly)',
   [TenantBillingProfileProduct.vaultsWithNonPci]: 'Per vault with id data (monthly) ',
-  [TenantBillingProfileProduct.watchlistChecks]: 'Monthly watchlist',
-  [TenantBillingProfileProduct.adverseMediaPerOnboarding]: 'Adverse media (per user)',
+  [TenantBillingProfileProduct.watchlistChecks]: 'Monthly watchlist (legacy)',
   [TenantBillingProfileProduct.continuousMonitoringPerYear]: 'Continuous monitoring (per year)',
+  [TenantBillingProfileProduct.adverseMediaPerYear]: 'Adverse media (per year)',
+  [TenantBillingProfileProduct.adverseMediaPerOnboarding]: 'Adverse media (per user, legacy)',
   [TenantBillingProfileProduct.monthlyMinimum]: 'Monthly minimum',
   [TenantBillingProfileProduct.monthlyPlatformFee]: 'Monthly platform fee',
 };
