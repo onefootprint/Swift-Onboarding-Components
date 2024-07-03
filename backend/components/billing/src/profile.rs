@@ -2,7 +2,6 @@ use crate::is_managed;
 use crate::managed_metadata;
 use crate::BResult;
 use crate::BillingInfo;
-use db::models::billing_profile::BillingProfile as DbBillingProfile;
 use newtypes::Product;
 use newtypes::TenantId;
 use rust_decimal::Decimal;
@@ -43,7 +42,8 @@ impl BillingProfile {
         // Get prices for each product
         let mut prices = HashMap::new();
         for product in Product::iter() {
-            let price_cents = get_price_from(info.billing_profile.as_ref(), product);
+            let bp = info.billing_profile.as_ref();
+            let price_cents = bp.and_then(|bp| bp.prices.get(&product));
             if let Some(price_cents) = price_cents {
                 let product_id = product.product_id();
                 let price_id = get_or_create_price(client, product_id, price_cents).await?;
@@ -71,34 +71,6 @@ impl BillingProfile {
     }
 }
 
-/// Returns the price of the specified product, in cents
-fn get_price_from(profile: Option<&DbBillingProfile>, product: Product) -> Option<&str> {
-    let profile = profile?;
-    if let Some(price) = profile.prices.get(&product) {
-        return Some(price);
-    }
-    // TODO remove this in favor of price map
-    match product {
-        Product::MonthlyPlatformFee => profile.monthly_platform_fee.as_deref(),
-        Product::Pii => profile.pii.as_deref(),
-        Product::Kyc => profile.kyc.as_deref(),
-        Product::OneClickKyc => profile.one_click_kyc.as_deref(),
-        Product::KycWaterfallSecondVendor => profile.kyc_waterfall_second_vendor.as_deref(),
-        Product::KycWaterfallThirdVendor => profile.kyc_waterfall_third_vendor.as_deref(),
-        Product::Kyb => profile.kyb.as_deref(),
-        Product::KybEinOnly => profile.kyb.as_deref(),
-        Product::IdDocs => profile.id_docs.as_deref(),
-        Product::CurpVerification => profile.curp_verification.as_deref(),
-        Product::WatchlistChecks => profile.watchlist.as_deref(),
-        Product::HotVaults => profile.hot_vaults.as_deref(),
-        Product::HotProxyVaults => profile.hot_proxy_vaults.as_deref(),
-        Product::VaultsWithNonPci => profile.vaults_with_non_pci.as_deref(),
-        Product::VaultsWithPci => profile.vaults_with_pci.as_deref(),
-        Product::AdverseMediaPerOnboarding => profile.adverse_media_per_user.as_deref(),
-        Product::ContinuousMonitoringPerYear => profile.continuous_monitoring_per_year.as_deref(),
-        Product::AdverseMediaPerYear => profile.continuous_monitoring_per_year.as_deref(),
-    }
-}
 
 /// Lookup existing prices for the specified product. If one exists with the same numeric price,
 /// return it. Otherwise, make a new price
