@@ -53,7 +53,9 @@ pub async fn get(
             _ => None,
         })
         .next()
-        .ok_or(AuthError::MissingTenantPermission("decrypt_download".to_owned()))?;
+        .ok_or(AuthError::MissingClientTokenPermission(
+            "decrypt_download".to_owned(),
+        ))?;
     let reason = auth
         .data
         .decrypt_reason

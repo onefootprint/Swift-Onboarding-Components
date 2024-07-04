@@ -1029,7 +1029,7 @@ def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):
     )
     assert (
         body["message"]
-        == "Not allowed: required permission is missing: OnboardingConfiguration"
+        == "Not allowed: required permission is missing: OnboardingConfiguration. Please review the permissions configured for your role in the Footprint dashboard."
     )
 
     # Try copying to another tenant with insufficient write permissions at that tenant
@@ -1042,5 +1042,5 @@ def test_cannot_copy_with_read_perms(sandbox_tenant, foo_sandbox_tenant):
     )
     assert (
         body["message"]
-        == "Not allowed: required permission is missing: OnboardingConfiguration"
+        == "Not allowed: required permission is missing: OnboardingConfiguration. Please review the permissions configured for your role in the Footprint dashboard."
     )

@@ -50,8 +50,10 @@ pub enum AuthError {
     MissingWorkflow,
     #[error("Not allowed without scoped user")]
     MissingScopedUser,
-    #[error("Not allowed: required permission is missing: {0}")]
+    #[error("Not allowed: required permission is missing: {0}. Please review the permissions configured for your role in the Footprint dashboard.")]
     MissingTenantPermission(String),
+    #[error("Not allowed: required permission is missing: {0}. Please review the permissions requested when creating your client token.")]
+    MissingClientTokenPermission(String),
     #[error("Not allowed: user is not a firm employee")]
     NotFirmEmployee,
     #[error("Not allowed: integration testing user cannot perform this action")]
@@ -88,6 +90,7 @@ impl api_errors::FpErrorTrait for AuthError {
             AuthError::MissingWorkflow => StatusCode::UNAUTHORIZED,
             AuthError::MissingScopedUser => StatusCode::UNAUTHORIZED,
             AuthError::MissingTenantPermission(_) => StatusCode::UNAUTHORIZED,
+            AuthError::MissingClientTokenPermission(_) => StatusCode::UNAUTHORIZED,
             AuthError::NotFirmEmployee => StatusCode::FORBIDDEN,
             AuthError::NotAllowedForIntegrationTestUser => StatusCode::FORBIDDEN,
             AuthError::NotRiskOpsFirmEmployee => StatusCode::FORBIDDEN,
