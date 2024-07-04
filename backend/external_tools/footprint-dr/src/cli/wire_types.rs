@@ -3,6 +3,7 @@ use chrono::Utc;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
+use std::fmt::Display;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct VaultDrStatus {
@@ -42,3 +43,17 @@ pub struct VaultDrEnrollRequest {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct VaultDrEnrollResponse {}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ApiError {
+    pub message: String,
+    pub code: Option<String>,
+    pub support_id: String,
+}
+
+impl Display for ApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let ser = serde_json::to_string(&self).unwrap();
+        write!(f, "{}", ser)
+    }
+}

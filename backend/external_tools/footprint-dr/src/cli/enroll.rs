@@ -58,6 +58,7 @@ pub fn enroll_cmd(api_root: Url, is_live: IsLive) -> Result<()> {
         if !confirm("Add another org public key?")? {
             break;
         }
+        println!();
     }
 
     println!();
@@ -112,6 +113,7 @@ pub fn get_org_pubkey() -> Result<String> {
             println!();
             println!("⚠️  We recommend that you store your org public key on a YubiKey instead of using an X25519 identity.");
             if confirm("Are you sure you don't want the benefits of a hardware security token?")? {
+                println!();
                 Ok(x25519_recipient.to_string())
             } else {
                 bail!("Enrollment aborted.");

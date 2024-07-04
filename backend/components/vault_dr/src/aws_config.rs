@@ -1,10 +1,9 @@
 use crate::Error;
 use api_core::config::VaultDrConfig as VaultDrStateConfig;
 use aws_config::default_provider::credentials::DefaultCredentialsChain;
-use aws_config::retry::ErrorKind;
-use aws_config::retry::ProvideErrorKind;
 use aws_config::Region;
 use aws_sdk_s3::config::SharedCredentialsProvider;
+use aws_sdk_s3::error::ProvideErrorMetadata;
 use aws_types::SdkConfig;
 use newtypes::PiiString;
 use std::fmt::Debug;
@@ -110,20 +109,16 @@ impl VaultDrAwsConfig {
         let client = aws_sdk_sts::Client::from_conf(sts_config);
         let req = client.get_caller_identity();
 
-        let resp = req.send().await.map_err(|e| {
-            let svc_error = e.into_service_error();
-            let error_kind = svc_error.meta().retryable_error_kind();
-            if error_kind == Some(ErrorKind::ClientError) {
-                warn!(error = ?svc_error, "STS GetCallerIdentity failed");
-                Error::RoleValidationFailed(format!("STS GetCallerIdentity failed: {}", svc_error))
-            } else {
-                warn!(
-                    error = ?svc_error,
-                    "STS GetCallerIdentity failed with unexpected error kind"
-                );
-                Box::new(svc_error).into()
-            }
-        })?;
+        // n.b. We currently can't check error codes on STS errors.
+        // This means transient errors or implementation errors may be marked with 4xx status codes.
+        // Look at the warning logs emitted by the library to see the actual error code.
+        //
+        // https://github.com/awslabs/aws-sdk-rust/discussions/1076#discussioncomment-8609035
+
+        let resp = req
+            .send()
+            .await
+            .map_err(|_| Error::RoleValidationFailed("Unable to assume role".to_owned()))?;
         info!(?resp, "STS GetCallerIdentity succeeded");
 
 
@@ -165,14 +160,7 @@ impl VaultDrAwsConfig {
             }
             Err(e) => {
                 let svc_error = e.into_service_error();
-                let error_kind = svc_error.meta().retryable_error_kind();
-                if error_kind != Some(ErrorKind::ClientError) {
-                    warn!(
-                        error = ?svc_error,
-                        "STS GetCallerIdentity failed with unexpected error kind"
-                    );
-                    return Err(Box::new(svc_error).into());
-                }
+                info!(error = ?svc_error, "STS GetCallerIdentity failed as expected");
             }
         }
 
@@ -186,10 +174,11 @@ impl VaultDrAwsConfig {
             .key(S3_ACCESS_PROBE_KEY);
         req.send().await.map_err(|e| {
             let svc_error = e.into_service_error();
-            warn!(error = ?svc_error, "S3 PutObject failed");
-            let error_kind = svc_error.meta().retryable_error_kind();
-            if error_kind == Some(ErrorKind::ClientError) {
-                Error::RoleValidationFailed(format!("S3 PutObject failed: {}", svc_error))
+
+            warn!(error=?svc_error, "S3 PutObject failed");
+
+            if matches!(svc_error.code(), Some("AccessDenied") | Some("NoSuchBucket")) {
+                Error::RoleValidationFailed(format!("S3 PutObject failed: {}", svc_error.meta()))
             } else {
                 Box::new(svc_error).into()
             }
@@ -203,10 +192,11 @@ impl VaultDrAwsConfig {
             .max_keys(1);
         req.send().await.map_err(|e| {
             let svc_error = e.into_service_error();
+
             warn!(error = ?svc_error, "S3 ListObjectsV2 failed");
-            let error_kind = svc_error.meta().retryable_error_kind();
-            if error_kind == Some(ErrorKind::ClientError) {
-                Error::RoleValidationFailed(format!("S3 ListObjectsV2 failed: {}", svc_error))
+
+            if matches!(svc_error.code(), Some("AccessDenied") | Some("NoSuchBucket")) {
+                Error::RoleValidationFailed(format!("S3 ListObjectsV2 failed: {}", svc_error.meta()))
             } else {
                 Box::new(svc_error).into()
             }
@@ -217,10 +207,11 @@ impl VaultDrAwsConfig {
         let req = s3_client.get_bucket_location().bucket(&self.s3_bucket_name);
         let resp = req.send().await.map_err(|e| {
             let svc_error = e.into_service_error();
+
             warn!(error = ?svc_error, "S3 GetBucketLocation failed");
-            let error_kind = svc_error.meta().retryable_error_kind();
-            if error_kind == Some(ErrorKind::ClientError) {
-                Error::RoleValidationFailed(format!("S3 GetBucketLocation failed: {}", svc_error))
+
+            if matches!(svc_error.code(), Some("AccessDenied") | Some("NoSuchBucket")) {
+                Error::RoleValidationFailed(format!("S3 GetBucketLocation failed: {}", svc_error.meta()))
             } else {
                 Box::new(svc_error).into()
             }
@@ -270,12 +261,9 @@ impl VaultDrAwsConfig {
             }
             Err(e) => {
                 let svc_error = e.into_service_error();
-                let error_kind = svc_error.meta().retryable_error_kind();
-                if error_kind != Some(ErrorKind::ClientError) {
-                    warn!(
-                        error = ?svc_error,
-                        "S3 GetObject failed with unexpected error kind"
-                    );
+
+                info!(error = ?svc_error, "S3 GetObject failed as expected. Expected code is AccessDenied");
+                if svc_error.code() != Some("AccessDenied") {
                     return Err(Box::new(svc_error).into());
                 }
             }

@@ -211,6 +211,24 @@ function createTaskContainerRole(
               ],
             }),
           },
+          {
+            name: 'vault_disaster_recovery_customer_account_access',
+            policy: JSON.stringify({
+              Version: '2012-10-17',
+              Statement: [
+                {
+                  Action: ['sts:AssumeRole'],
+                  Effect: 'Allow',
+                  Resource: '*',
+                  Condition: {
+                    StringEquals: {
+                      'sts:RoleSessionName': 'FootprintVaultDisasterRecovery',
+                    },
+                  },
+                },
+              ],
+            }),
+          },
           // Add in our s3 Policies to inlinePolicies
         ].concat(s3Policies),
       });

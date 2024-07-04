@@ -2,6 +2,7 @@ use super::wire_types::VaultDrAwsPreEnrollResponse;
 use super::wire_types::VaultDrEnrollRequest;
 use super::wire_types::VaultDrEnrollResponse;
 use super::wire_types::VaultDrStatus;
+use crate::cli::wire_types::ApiError;
 use anyhow::anyhow;
 use anyhow::bail;
 use anyhow::Context;
@@ -11,11 +12,13 @@ use keyring::Entry;
 use log::debug;
 use reqwest::blocking::Client;
 use reqwest::blocking::RequestBuilder;
+use reqwest::blocking::Response;
 use reqwest::header::HeaderMap;
 use reqwest::header::HeaderValue;
 use reqwest::Method;
 use reqwest::StatusCode;
 use reqwest::Url;
+use serde::de::DeserializeOwned;
 use std::fmt;
 use std::fmt::Display;
 use std::fmt::Formatter;
@@ -149,15 +152,26 @@ impl VaultDrApiClient {
         Ok(self.client.request(method, self.api_root.join(path)?))
     }
 
-    pub(crate) fn get_status(&self) -> Result<VaultDrStatus> {
-        let resp = self.request(Method::GET, "org/vault_dr/status")?.send()?;
-
+    fn handle_response<T>(resp: Response) -> Result<T>
+    where
+        T: DeserializeOwned,
+    {
         if let Err(err) = resp.error_for_status_ref() {
-            debug!(target: "VaultDrApiClient::get_status", "API error: {}", resp.text()?);
-            bail!(err);
+            let body = resp.text()?;
+            let message: String = serde_json::from_str(&body)
+                .map(|e: ApiError| e.message)
+                .unwrap_or(body.clone());
+            debug!("{}: {}", err, body);
+            bail!(message);
         };
 
         Ok(resp.json()?)
+    }
+
+    pub(crate) fn get_status(&self) -> Result<VaultDrStatus> {
+        let resp = self.request(Method::GET, "org/vault_dr/status")?.send()?;
+
+        Self::handle_response(resp)
     }
 
     pub(crate) fn get_aws_pre_enrollment(&self) -> Result<Option<VaultDrAwsPreEnrollResponse>> {
@@ -169,12 +183,7 @@ impl VaultDrApiClient {
             return Ok(None);
         }
 
-        if let Err(err) = resp.error_for_status_ref() {
-            debug!(target: "VaultDrApiClient::get_aws_pre_enrollment", "API error: {}", resp.text()?);
-            bail!(err);
-        };
-
-        Ok(resp.json()?)
+        Ok(Some(Self::handle_response(resp)?))
     }
 
     pub(crate) fn aws_pre_enroll(&self) -> Result<VaultDrAwsPreEnrollResponse> {
@@ -182,12 +191,7 @@ impl VaultDrApiClient {
             .request(Method::POST, "org/vault_dr/aws_pre_enrollment")?
             .send()?;
 
-        if let Err(err) = resp.error_for_status_ref() {
-            debug!(target: "VaultDrApiClient::aws_pre_enroll", "API error: {}", resp.text()?);
-            bail!(err);
-        };
-
-        Ok(resp.json()?)
+        Self::handle_response(resp)
     }
 
     pub(crate) fn enroll(&self, req: VaultDrEnrollRequest) -> Result<VaultDrEnrollResponse> {
@@ -196,12 +200,7 @@ impl VaultDrApiClient {
             .json(&req)
             .send()?;
 
-        if let Err(err) = resp.error_for_status_ref() {
-            debug!(target: "VaultDrApiClient::enroll", "API error: {}", resp.text()?);
-            bail!(err);
-        };
-
-        Ok(resp.json()?)
+        Self::handle_response(resp)
     }
 }
 

@@ -4449,6 +4449,7 @@ dependencies = [
  "reqwest 0.11.27",
  "rpassword",
  "serde",
+ "serde_json",
  "termcolor",
  "vault_dr_client",
 ]
