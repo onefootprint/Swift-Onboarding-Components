@@ -270,6 +270,12 @@ const business: Record<string, Field> = {
       },
     },
   },
+  corporationType: {
+    autoCapitalize: 'none',
+    validations: {
+      required: 'Corporation type is required',
+    },
+  },
 };
 
 const bo: Record<string, Field> = {
@@ -344,6 +350,9 @@ const getProps = (name: string) => {
   }
   if (name === 'business.phone_number') {
     return business.phoneNumber;
+  }
+  if (name === 'business.corporation_type') {
+    return business.corporationType;
   }
   if (name.startsWith('business.beneficial_owners')) {
     if (name.endsWith('first_name')) {
