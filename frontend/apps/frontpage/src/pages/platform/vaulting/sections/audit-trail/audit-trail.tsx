@@ -1,4 +1,5 @@
 import { Container, media } from '@onefootprint/ui';
+import _ from 'lodash';
 import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,21 +14,28 @@ const AuditTrail = () => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.vaulting.audit-trail',
   });
+
+  const rectangles = [
+    { top: 32, left: 32, width: 80, height: 12 },
+    { top: 26, left: 124, width: 24, height: 24 },
+    { top: 32, left: 164, width: 160, height: 12 },
+    { top: 56, left: 134, width: 4, height: 24 },
+    { top: 92, left: 32, width: 80, height: 12 },
+    { top: 86, left: 124, width: 24, height: 24 },
+    { top: 92, left: 164, width: 160, height: 12 },
+  ];
+
   return (
     <StyledContainer>
       <Title>
         <IllustrationContainer>
-          <Rectangle top={32} left={32} width={80} height={12} />
-          <Rectangle top={26} left={124} width={24} height={24} />
-          <Rectangle top={32} left={164} width={160} height={12} />
-          <Rectangle top={56} left={134} width={4} height={24} />
-          <Rectangle top={92} left={32} width={80} height={12} />
-          <Rectangle top={86} left={124} width={24} height={24} />
-          <Rectangle top={92} left={164} width={160} height={12} />
+          {rectangles.map(rect => (
+            <Rectangle key={_.uniqueId()} top={rect.top} left={rect.left} width={rect.width} height={rect.height} />
+          ))}
         </IllustrationContainer>
         <TitleContainer>
           <SectionTitle variant="display-2">{t('title')}</SectionTitle>
-          <SectionSubtitle maxWidth="500px">{t('subtitle')}</SectionSubtitle>
+          <SectionSubtitle $maxWidth="500px">{t('subtitle')}</SectionSubtitle>
         </TitleContainer>
       </Title>
       <DesktopTimeline src="/vaulting/audit-trail/audit-trail-timeline.png" width={874} height={320} alt="" />

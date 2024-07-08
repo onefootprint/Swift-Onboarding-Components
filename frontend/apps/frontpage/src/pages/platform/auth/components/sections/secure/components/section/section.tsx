@@ -6,15 +6,15 @@ type SectionProps = {
   title: string;
   subtitle: string;
   image: React.ReactNode;
-  inverted?: boolean;
+  $inverted?: boolean;
 };
-const Section = ({ title, subtitle, image, inverted }: SectionProps) => (
+const Section = ({ title, subtitle, image, $inverted }: SectionProps) => (
   <ResponsiveGridContainer justifyContent="center" alignItems="center">
-    <StyledGridItem direction="column" gap={2} inverted={inverted}>
+    <StyledGridItem direction="column" gap={2} $inverted={$inverted}>
       <Text variant="heading-2">{title}</Text>
       <Text variant="body-1">{subtitle}</Text>
     </StyledGridItem>
-    <Image inverted={inverted}>{image}</Image>
+    <Image $inverted={$inverted}>{image}</Image>
   </ResponsiveGridContainer>
 );
 
@@ -35,26 +35,25 @@ const ResponsiveGridContainer = styled(Grid.Container)`
   `}
 `;
 
-const StyledGridItem = styled(Grid.Item)<{ inverted?: boolean }>`
-  ${({ theme, inverted }) => css`
+const StyledGridItem = styled(Grid.Item)<{ $inverted?: boolean }>`
+  ${({ theme, $inverted }) => css`
     grid-area: text;
     white-space: pre-line;
 
     ${media.greaterThan('md')`
       padding: 0 ${theme.spacing[9]};
-      grid-area: ${inverted ? 'image' : 'text'};
+      grid-area: ${$inverted ? 'image' : 'text'};
     `}
   `}
 `;
 
-const Image = styled(Grid.Item)<{ inverted?: boolean }>`
-  ${({ theme, inverted }) => css`
+const Image = styled(Grid.Item)<{ $inverted?: boolean }>`
+  ${({ theme, $inverted }) => css`
     grid-area: image;
 
     ${media.greaterThan('md')`
       padding: 0 ${theme.spacing[9]};
-      grid-area: ${inverted ? 'text' : 'image'};
-      
+      grid-area: ${$inverted ? 'text' : 'image'};
     `}
   `}
 `;

@@ -23,83 +23,33 @@ const imageVariants = {
   },
 };
 
+const images = [
+  { gridArea: 'basic-data', width: 632, height: 211, name: 'basic-data' },
+  { gridArea: 'id-data', width: 632, height: 211, name: 'id-data' },
+  { gridArea: 'address', width: 632, height: 306, name: 'address' },
+  { gridArea: 'payment-data', width: 632, height: 306, name: 'payment-data' },
+  { gridArea: 'custom-data', width: 1280, height: 170, name: 'custom-data' },
+];
+
 const DesktopImageGrid = ({ isDecrypted }: DesktopImageGridProps) => (
   <Grid>
-    <ImageContainer
-      gridArea="basic-data"
-      key={isDecrypted ? 'decrypted' : 'encrypted'}
-      variants={imageVariants}
-      initial="initial"
-      animate="animate"
-    >
-      <Image
-        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/basic-data.png`}
-        width={632}
-        height={211}
-        alt=""
-        priority
-      />
-    </ImageContainer>
-    <ImageContainer
-      gridArea="id-data"
-      key={isDecrypted ? 'decrypted' : 'encrypted'}
-      variants={imageVariants}
-      initial="initial"
-      animate="animate"
-    >
-      <Image
-        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/id-data.png`}
-        width={632}
-        height={211}
-        alt=""
-        priority
-      />
-    </ImageContainer>
-    <ImageContainer
-      gridArea="address"
-      key={isDecrypted ? 'decrypted' : 'encrypted'}
-      variants={imageVariants}
-      initial="initial"
-      animate="animate"
-    >
-      <Image
-        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/address.png`}
-        width={632}
-        height={306}
-        alt=""
-        priority
-      />
-    </ImageContainer>
-    <ImageContainer
-      gridArea="payment-data"
-      key={isDecrypted ? 'decrypted' : 'encrypted'}
-      variants={imageVariants}
-      initial="initial"
-      animate="animate"
-    >
-      <Image
-        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/payment-data.png`}
-        width={632}
-        height={306}
-        alt=""
-        priority
-      />
-    </ImageContainer>
-    <ImageContainer
-      gridArea="custom-data"
-      key={isDecrypted ? 'decrypted' : 'encrypted'}
-      variants={imageVariants}
-      initial="initial"
-      animate="animate"
-    >
-      <Image
-        src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/custom-data.png`}
-        width={1280}
-        height={170}
-        alt=""
-        priority
-      />
-    </ImageContainer>
+    {images.map(image => (
+      <ImageContainer
+        key={image.name}
+        $gridArea={image.gridArea}
+        variants={imageVariants}
+        initial="initial"
+        animate="animate"
+      >
+        <Image
+          src={`/vaulting/all-data/${isDecrypted ? 'decrypted' : 'encrypted'}/${image.name}.png`}
+          width={image.width}
+          height={image.height}
+          alt=""
+          priority
+        />
+      </ImageContainer>
+    ))}
   </Grid>
 );
 
@@ -120,15 +70,9 @@ const Grid = styled(Container)`
   `}
 `;
 
-const ImageContainer = styled(motion.div)<{ gridArea: string }>`
-  ${({ gridArea }) => css`
-    grid-area: ${gridArea};
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+const ImageContainer = styled(motion.div)<{ $gridArea: string }>`
+  ${({ $gridArea }) => css`
+    grid-area: ${$gridArea};
   `}
 `;
 

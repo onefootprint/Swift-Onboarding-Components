@@ -48,7 +48,7 @@ const IllustrationOnboard = ({ scroll }: IllustrationOnboardProps) => {
           },
         }}
       >
-        <Circle diameter={600} style={{ scale: scaleOutCircle }}>
+        <Circle $diameter={600} style={{ scale: scaleOutCircle }}>
           <IconContainer
             data-type="bolt"
             animate={{
@@ -76,7 +76,7 @@ const IllustrationOnboard = ({ scroll }: IllustrationOnboardProps) => {
           },
         }}
       >
-        <Circle diameter={480} style={{ scale: scaleCenterCircle }}>
+        <Circle $diameter={480} style={{ scale: scaleCenterCircle }}>
           <IconContainer
             data-type="user"
             animate={{
@@ -93,7 +93,7 @@ const IllustrationOnboard = ({ scroll }: IllustrationOnboardProps) => {
           </IconContainer>
         </Circle>
       </motion.span>
-      <Circle diameter={350} style={{ scale: scaleInnerCircle }} />
+      <Circle $diameter={350} style={{ scale: scaleInnerCircle }} />
     </Container>
   ) : null;
 };
@@ -108,15 +108,15 @@ const Container = styled(motion.div)`
   align-items: center;
 `;
 
-const Circle = styled(motion.div)<{ diameter: number }>`
-  ${({ diameter, theme }) => css`
-    width: ${diameter}px;
-    height: ${diameter}px;
+const Circle = styled(motion.div)<{ $diameter: number }>`
+  ${({ $diameter, theme }) => css`
+    width: ${$diameter}px;
+    height: ${$diameter}px;
     border-radius: 50%;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     position: absolute;
-    top: calc(50% - ${diameter}px / 2);
-    left: calc(50% - ${diameter}px / 2);
+    top: calc(50% - ${$diameter}px / 2);
+    left: calc(50% - ${$diameter}px / 2);
     z-index: 0;
   `}
 `;

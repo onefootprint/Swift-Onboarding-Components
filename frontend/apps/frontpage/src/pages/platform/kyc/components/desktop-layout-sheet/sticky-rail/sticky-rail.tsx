@@ -15,7 +15,7 @@ const StickyRail = () => {
 
   return (
     <Container ref={ref}>
-      <StickyFrame containerHeight={800}>
+      <StickyFrame $containerHeight={800}>
         <IllustrationOnboard scroll={scrollYProgress} />
         <IllustrationConfidence scroll={scrollYProgress} />
         <IllustrationOnboardingExperience scroll={scrollYProgress} />
@@ -32,11 +32,11 @@ const Container = styled.div`
   position: relative;
 `;
 
-const StickyFrame = styled.div<{ containerHeight: number }>`
-  ${({ containerHeight }) => css`
-    top: calc(50% - ${containerHeight / 2}px);
+const StickyFrame = styled.div<{ $containerHeight: number }>`
+  ${({ $containerHeight }) => css`
+    top: calc(50% - ${$containerHeight / 2}px);
     width: 100%;
-    height: ${containerHeight}px;
+    height: ${$containerHeight}px;
     position: sticky;
     isolation: isolate;
   `};

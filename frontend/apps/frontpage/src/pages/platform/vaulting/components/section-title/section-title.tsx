@@ -4,24 +4,18 @@ import styled, { css } from 'styled-components';
 
 type SectionTitleProps = {
   variant: 'display-1' | 'display-2' | 'display-3';
-  maxWidth?: number;
+  $maxWidth?: string;
   multiline?: boolean;
   children: React.ReactNode;
 };
 
-const SectionTitle = ({ variant, maxWidth, children, multiline }: SectionTitleProps) => (
-  <Container maxWidth={maxWidth}>
+const SectionTitle = ({ variant, $maxWidth, children, multiline }: SectionTitleProps) => (
+  <Box maxWidth={$maxWidth}>
     <Title variant={variant} multiline={multiline} tag={variant === 'display-1' ? 'h1' : 'h2'}>
       {children}
     </Title>
-  </Container>
+  </Box>
 );
-
-const Container = styled.div<{ maxWidth?: number }>`
-  ${({ maxWidth }) => css`
-    max-width: ${maxWidth}px;
-  `}
-`;
 
 const Title = styled(Box)<{
   variant: 'display-1' | 'display-2' | 'display-3';

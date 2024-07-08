@@ -8,10 +8,10 @@ type FeatureCardProps = {
   subtitle: string;
   cta?: string;
   children: React.ReactNode;
-  gridArea?: string;
+  $gridArea?: string;
   size?: 'compact' | 'default';
   href?: string;
-  invertedGradient?: boolean;
+  $invertedGradient?: boolean;
 };
 
 const FeatureCard = ({
@@ -20,11 +20,11 @@ const FeatureCard = ({
   cta,
   href,
   children,
-  gridArea,
+  $gridArea,
   size = 'default',
-  invertedGradient,
+  $invertedGradient,
 }: FeatureCardProps) => (
-  <Container gridArea={gridArea} invertedGradient={invertedGradient}>
+  <Container $gridArea={$gridArea} $invertedGradient={$invertedGradient}>
     {children}
     <TextContainer>
       <Title size={size}>{title}</Title>
@@ -41,16 +41,16 @@ const FeatureCard = ({
 );
 
 const Container = styled.div<{
-  gridArea?: string;
-  invertedGradient?: boolean;
+  $gridArea?: string;
+  $invertedGradient?: boolean;
 }>`
-  ${({ gridArea, theme, invertedGradient }) => css`
+  ${({ $gridArea, theme, $invertedGradient }) => css`
     display: flex;
     flex-direction: column;
-    grid-area: ${gridArea};
+    grid-area: ${$gridArea};
     position: relative;
     background: ${
-      invertedGradient
+      $invertedGradient
         ? `linear-gradient(0deg, ${theme.backgroundColor.secondary} 0%, transparent 100%)`
         : `linear-gradient(180deg, ${theme.backgroundColor.secondary} 0%, transparent 100%)`
     };

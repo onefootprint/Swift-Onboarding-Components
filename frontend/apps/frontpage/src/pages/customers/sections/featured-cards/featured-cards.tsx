@@ -40,7 +40,7 @@ const FeaturedCards = () => (
           <FeaturedCard
             logo={featuredCase.logo}
             title={featuredCase.title}
-            gridArea={featuredCase.gridArea}
+            $gridArea={featuredCase.gridArea}
             url={featuredCase.url}
           />
           <Line variant="vertical" position={{ left: '0%' }} />

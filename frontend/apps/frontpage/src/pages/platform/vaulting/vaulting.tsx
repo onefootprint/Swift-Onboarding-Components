@@ -19,11 +19,11 @@ const Vaulting = () => {
       <SEO title={t('html-title')} description={t('html-description')} slug="/platform/vaulting" />
       <Hero />
       <AllData />
-      <AuditTrail />
+      {/* <AuditTrail />
       <VaultProxy />
       <DeviceInsights />
       <AllFeatures />
-      <PenguinBanner section="vaulting" imgSrc="/vaulting/penguin-banner/vaulting.svg" />
+      <PenguinBanner section="vaulting" imgSrc="/vaulting/penguin-banner/vaulting.svg" /> */}
     </Container>
   );
 };

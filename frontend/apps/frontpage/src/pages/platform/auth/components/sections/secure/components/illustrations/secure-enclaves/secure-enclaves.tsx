@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 import IllustrationContainer from '../../illustration-container';
 
 const SecureEnclaves = () => (
-  <IllustrationContainer isDark>
+  <IllustrationContainer $isDark>
     <Spider src="/auth/sections/spider-01.svg" height={300} width={400} alt="decorative" position="right" />
     <Spider src="/auth/sections/spider-02.svg" height={300} width={400} alt="decorative" position="left" />
     <Icons justify="center" position="absolute" gap={8}>

@@ -8,7 +8,7 @@ import { useHover } from 'usehooks-ts';
 
 type FeaturedCardProps = {
   title: string;
-  gridArea: string;
+  $gridArea: string;
   logo: React.ElementType;
   url: string;
 };
@@ -30,13 +30,13 @@ const chevronVariants = {
   final: { opacity: 1, x: '100%', scale: 1, transition: { duration: 0.2 } },
 };
 
-const FeaturedCard = ({ logo: Logo, title, gridArea, url }: FeaturedCardProps) => {
+const FeaturedCard = ({ logo: Logo, title, $gridArea, url }: FeaturedCardProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isHovering = useHover(containerRef);
 
   return (
     <StyledLink href={url}>
-      <CardContainer aria-label={title} gridArea={gridArea} ref={containerRef}>
+      <CardContainer aria-label={title} $gridArea={$gridArea} ref={containerRef}>
         <LogoContainer
           variants={logoVariants}
           initial="hidden"
@@ -89,7 +89,7 @@ const LogoContainer = styled(motion.div)`
   justify-content: center;
 `;
 
-const CardContainer = styled(Stack)`
+const CardContainer = styled(Stack)<{ $gridArea?: string }>`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

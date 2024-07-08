@@ -9,10 +9,10 @@ type BifrostImageProps = {
   height: number;
   width: number;
   variants?: Variants;
-  zIndex?: number;
+  $zIndex?: number;
 };
 
-const BifrostImage = ({ src, height, width, zIndex = 1, variants }: BifrostImageProps) => {
+const BifrostImage = ({ src, height, width, $zIndex = 1, variants }: BifrostImageProps) => {
   const ref = useRef(null);
   const isInView = useInView(ref, {
     once: true,
@@ -33,7 +33,7 @@ const BifrostImage = ({ src, height, width, zIndex = 1, variants }: BifrostImage
       animate={controls}
       height={height}
       width={width}
-      zIndex={zIndex}
+      $zIndex={$zIndex}
       ref={ref}
     >
       <Image src={src} height={height} width={width} alt="decorative" />
@@ -44,10 +44,10 @@ const BifrostImage = ({ src, height, width, zIndex = 1, variants }: BifrostImage
 const Container = styled(motion.div)<{
   height: number;
   width: number;
-  zIndex: number;
+  $zIndex: number;
 }>`
-  ${({ height, width, zIndex, theme }) => css`
-    z-index: ${zIndex};
+  ${({ height, width, $zIndex, theme }) => css`
+    z-index: ${$zIndex};
     height: ${height}px;
     width: ${width}px;
     position: absolute;

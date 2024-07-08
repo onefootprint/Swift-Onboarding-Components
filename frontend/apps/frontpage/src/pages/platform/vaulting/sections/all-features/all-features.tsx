@@ -63,10 +63,10 @@ const AllFeatures = () => {
       <Title>
         <TitleIllustration />
         <TitleContainer direction="column" gap={3} align="center">
-          <SectionTitle variant="display-2" maxWidth={460} multiline>
+          <SectionTitle variant="display-2" $maxWidth="460px" multiline>
             {t('title')}
           </SectionTitle>
-          <SectionSubtitle maxWidth="500px">{t('subtitle')}</SectionSubtitle>
+          <SectionSubtitle $maxWidth="500px">{t('subtitle')}</SectionSubtitle>
         </TitleContainer>
       </Title>
       <FeatureCardGrid
@@ -89,7 +89,7 @@ const AllFeatures = () => {
             title={t(`bullets.${card.id}.title` as ParseKeys<'common'>)}
             subtitle={t(`bullets.${card.id}.subtitle` as ParseKeys<'common'>)}
             icon={card.icon}
-            gridArea={card.id}
+            $gridArea={card.id}
           />
         ))}
       </FeatureCardGrid>

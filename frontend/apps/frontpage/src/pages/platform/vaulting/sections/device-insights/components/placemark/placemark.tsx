@@ -2,15 +2,15 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 type PlacemarkProps = {
-  zIndex?: number;
+  $zIndex?: number;
 };
 
-const Placemark = ({ zIndex }: PlacemarkProps) => <PlacemarkItem zIndex={zIndex} />;
+const Placemark = ({ $zIndex }: PlacemarkProps) => <PlacemarkItem $zIndex={$zIndex} />;
 
-const PlacemarkItem = styled.div<{ zIndex?: number }>`
-  ${({ theme, zIndex }) => css`
+const PlacemarkItem = styled.div<{ $zIndex?: number }>`
+  ${({ theme, $zIndex }) => css`
     position: absolute;
-    z-index: ${zIndex};
+    z-index: ${$zIndex};
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

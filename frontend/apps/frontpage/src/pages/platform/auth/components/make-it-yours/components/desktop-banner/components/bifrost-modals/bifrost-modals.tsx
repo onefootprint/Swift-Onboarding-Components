@@ -31,7 +31,7 @@ const screens = [
 const BifrostModals = ({ className }: { className?: string }) => (
   <Box className={className} width="100%" height="100%">
     {screens.map(({ url, variants, height, width, zIndex }) => (
-      <BifrostImage key={url} src={url} variants={variants} height={height} width={width} zIndex={zIndex} />
+      <BifrostImage key={url} src={url} variants={variants} height={height} width={width} $zIndex={zIndex} />
     ))}
   </Box>
 );

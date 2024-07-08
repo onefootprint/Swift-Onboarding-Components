@@ -63,9 +63,9 @@ const CardGrid = () => {
           size="compact"
           title={t(`${translations}.title` as ParseKeys<'common'>)}
           subtitle={t(`${translations}.subtitle` as ParseKeys<'common'>)}
-          gridArea={translations}
+          $gridArea={translations}
           key={id}
-          invertedGradient={!isMobile ? invertedGradient : id % 2 === 0}
+          $invertedGradient={!isMobile ? invertedGradient : id % 2 === 0}
         >
           {illustration}
         </FeatureCard>

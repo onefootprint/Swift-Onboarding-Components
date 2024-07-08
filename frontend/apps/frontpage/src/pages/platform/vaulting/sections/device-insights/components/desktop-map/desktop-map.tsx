@@ -12,8 +12,8 @@ const DesktopMap = () => (
       <Image src="/vaulting/device-insights/card-data.png" width={420} height={381} alt="" />
     </Metrics>
     <PlacemarkContainer>
-      <Placemark zIndex={2} />
-      <Wave initialDiameter={80} finalDiameter={240} duration={6} delay={0} zIndex={0} />
+      <Placemark $zIndex={2} />
+      <Wave initialDiameter={80} finalDiameter={240} duration={6} delay={0} $zIndex={0} />
     </PlacemarkContainer>
   </MapBackground>
 );

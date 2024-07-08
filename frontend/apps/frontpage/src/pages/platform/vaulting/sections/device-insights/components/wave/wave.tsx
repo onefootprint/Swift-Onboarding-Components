@@ -7,22 +7,22 @@ type WaveProps = {
   finalDiameter: number;
   duration: number;
   delay: number;
-  zIndex?: number;
+  $zIndex?: number;
 };
 
-const Wave = ({ initialDiameter, finalDiameter, duration, delay, zIndex }: WaveProps) => (
+const Wave = ({ initialDiameter, finalDiameter, duration, delay, $zIndex }: WaveProps) => (
   <WaveContainer
     initial={{
       width: initialDiameter,
       height: initialDiameter,
       opacity: 0,
-      zIndex,
+      zIndex: $zIndex,
     }}
     animate={{
       width: finalDiameter,
       height: finalDiameter,
       opacity: [0, 1, 0],
-      zIndex,
+      zIndex: $zIndex,
     }}
     transition={{
       duration,

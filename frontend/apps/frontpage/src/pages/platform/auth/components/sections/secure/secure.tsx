@@ -29,7 +29,7 @@ const Secure = () => {
             title={t(`${translations}.title` as ParseKeys<'common'>)}
             subtitle={t(`${translations}.subtitle` as ParseKeys<'common'>)}
             image={illustration}
-            inverted={!isMobile ? index % 2 !== 0 : false}
+            $inverted={!isMobile ? index % 2 !== 0 : false}
             key={translations}
           />
         ))}

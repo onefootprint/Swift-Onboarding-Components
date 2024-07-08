@@ -6,20 +6,21 @@ import styled, { css } from 'styled-components';
 const DesktopIllustration = () => (
   <Grid>
     <ImageContainer data-grid-area="hey-there">
-      <Image src="/kyb/verify-businesses/hey-there.png" alt="Basic Data" width={336.8} height={265} />
-      <Image src="/kyb/verify-businesses/basic-data.png" alt="Basic Data" width={336.8} height={358.75} />
+      <StyledImage src="/kyb/verify-businesses/hey-there.png" alt="Basic Data" width={800} height={800} priority />
+      <StyledImage src="/kyb/verify-businesses/basic-data.png" alt="Basic Data" width={800} height={800} priority />
     </ImageContainer>
     <ImageContainer data-grid-area="business-address">
-      <Image
+      <StyledImage
         src="/kyb/verify-businesses/business-address.png"
         alt="App Clip"
-        width={336.8}
-        height={497.7}
+        width={800}
+        height={800}
         data-grid-area="business-address"
+        priority
       />
     </ImageContainer>
     <ImageContainer data-grid-area="bos">
-      <Image src="/kyb/verify-businesses/bos.png" alt="Residential Address" width={336.8} height={391} />
+      <StyledImage src="/kyb/verify-businesses/bos.png" alt="Residential Address" width={800} height={800} />
     </ImageContainer>
   </Grid>
 );
@@ -46,16 +47,18 @@ const Grid = styled.div`
 
 const ImageContainer = styled.div`
   ${({ theme }) => css`
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
-
-    img {
-      object-fit: contain;
-      width: 100%;
-      height: 100%;
-    }
   `}
+`;
+
+const StyledImage = styled(Image)`
+  width: 100%;
+  height: auto;
 `;
 
 export default DesktopIllustration;

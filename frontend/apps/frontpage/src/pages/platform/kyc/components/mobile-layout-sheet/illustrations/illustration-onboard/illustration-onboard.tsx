@@ -14,12 +14,12 @@ const IllustrationOnboard = () => {
         <Screen src="/kyc/sticky-rail/welcome-back.png" width={222} height={490} alt="" />
       </PhoneContainer>
       <CirclesContainer>
-        <Circle diameter={340}>
+        <Circle $diameter={340}>
           <IconContainer data-type="bolt">
             <IcoBolt24 />
           </IconContainer>
         </Circle>
-        <Circle diameter={280}>
+        <Circle $diameter={280}>
           <IconContainer data-type="user">
             <IcoUser24 />
           </IconContainer>
@@ -81,15 +81,15 @@ const PhoneFrameImage = styled(Image)`
   z-index: 2;
 `;
 
-const Circle = styled.div<{ diameter: number }>`
-  ${({ diameter, theme }) => css`
-    width: ${diameter}px;
-    height: ${diameter}px;
+const Circle = styled.div<{ $diameter: number }>`
+  ${({ $diameter, theme }) => css`
+    width: ${$diameter}px;
+    height: ${$diameter}px;
     border-radius: 50%;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     position: absolute;
-    top: calc(50% - ${diameter}px / 2);
-    left: calc(50% - ${diameter}px / 2);
+    top: calc(50% - ${$diameter}px / 2);
+    left: calc(50% - ${$diameter}px / 2);
     z-index: 0;
   `}
 `;

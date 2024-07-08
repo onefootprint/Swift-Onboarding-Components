@@ -21,7 +21,7 @@ const DeviceInsights = () => {
         </DeviceInsightsImage>
         <TitleContainer>
           <SectionTitle variant="display-2">{t('title')}</SectionTitle>
-          <SectionSubtitle maxWidth="500px">{t('subtitle')}</SectionSubtitle>
+          <SectionSubtitle $maxWidth="500px">{t('subtitle')}</SectionSubtitle>
         </TitleContainer>
       </Title>
       <DesktopMap />

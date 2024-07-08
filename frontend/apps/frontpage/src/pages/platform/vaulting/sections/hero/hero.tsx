@@ -39,7 +39,7 @@ const Hero = () => {
       <MobileHeroImage />
       <Title>
         <SectionTitle variant="display-1">{t('title')}</SectionTitle>
-        <SectionSubtitle maxWidth="640px">{t('subtitle')}</SectionSubtitle>
+        <SectionSubtitle $maxWidth="640px">{t('subtitle')}</SectionSubtitle>
       </Title>
       <FeatureCardsGrid width="100%" columns={['1fr']} rows={['repeat(4, 1fr)']} marginTop={11}>
         {featureCards.map(card => (

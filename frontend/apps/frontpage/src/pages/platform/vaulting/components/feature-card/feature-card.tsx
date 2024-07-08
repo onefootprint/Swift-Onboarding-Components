@@ -7,14 +7,14 @@ type FeatureCardProps = {
   icon: Icon;
   title: string;
   subtitle: string;
-  gridArea?: string;
+  $gridArea?: string;
 };
 
-const FeatureCard = ({ icon: Icon, title, subtitle, gridArea }: FeatureCardProps) => {
+const FeatureCard = ({ icon: Icon, title, subtitle, $gridArea }: FeatureCardProps) => {
   const renderedIcon = Icon && <Icon />;
 
   return (
-    <Container gridArea={gridArea}>
+    <Container $gridArea={$gridArea}>
       <IconContainer>{renderedIcon}</IconContainer>
       <Text variant="label-2" color="primary" tag="h3">
         {title}
@@ -26,11 +26,11 @@ const FeatureCard = ({ icon: Icon, title, subtitle, gridArea }: FeatureCardProps
   );
 };
 
-const Container = styled.div<{ gridArea?: string }>`
-  ${({ theme, gridArea }) => css`
+const Container = styled.div<{ $gridArea?: string }>`
+  ${({ theme, $gridArea }) => css`
     position: relative;
     display: flex;
-    grid-area: ${gridArea};
+    grid-area: ${$gridArea};
     flex-direction: column;
     align-items: flex-start;
     padding: ${theme.spacing[8]};

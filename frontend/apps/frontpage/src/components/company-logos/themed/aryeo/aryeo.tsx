@@ -13,8 +13,8 @@ const Aryeo = ({ color }: Logo) => {
       xmlnsXlink="http://www.w3.org/1999/xlink"
     >
       <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="66.25" x2="66.25" y1="0" y2="132.5">
-        <stop offset="0" stop-color={color} />
-        <stop offset="1" stop-color={color} />
+        <stop offset="0" stopColor={color} />
+        <stop offset="1" stopColor={color} />
       </linearGradient>
       <mask id="b" height="126" maskUnits="userSpaceOnUse" width="383" x="169" y="18">
         <path
@@ -50,8 +50,8 @@ const Aryeo = ({ color }: Logo) => {
         <path
           d="m7.5 0h117.5c4.142 0 7.5 3.35786 7.5 7.5v117.5c0 4.142-3.358 7.5-7.5 7.5h-117.5c-4.14214 0-7.5-3.358-7.5-7.5v-117.5c0-4.14214 3.35786-7.5 7.5-7.5z"
           stroke="#392fd0"
-          stroke-miterlimit="5"
-          stroke-width=".4"
+          strokeMiterlimit="5"
+          strokeWidth=".4"
         />
       </g>
       <g mask="url(#e)">

@@ -1,5 +1,6 @@
 import { Box } from '@onefootprint/ui';
 import { AnimatePresence } from 'framer-motion';
+import _ from 'lodash';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
@@ -12,6 +13,14 @@ import DesktopImageGrid from './components/desktop-image-grid';
 import MobileImageGrid from './components/mobile-image-grid/mobile-image-grid';
 import ToggleButton from './components/toggle-button';
 
+const rectangles = [
+  { top: 24, left: 24, width: 117, height: 24 },
+  { top: 80, left: 24, width: 90, height: 24 },
+  { top: 125, left: 24, width: 90, height: 24 },
+  { top: 80, left: 280, width: 50, height: 24 },
+  { top: 125, left: 280, width: 50, height: 24 },
+];
+
 const AllData = () => {
   const [isDecrypted, setIsDecrypted] = useState(false);
   const { t } = useTranslation('common', {
@@ -22,11 +31,15 @@ const AllData = () => {
     <Container>
       <TitleContainer>
         <IllustrationContainer>
-          <Rectangle top={24} left={24} width={117} height={24} />
-          <Rectangle top={80} left={24} width={90} height={24} />
-          <Rectangle top={125} left={24} width={90} height={24} />
-          <Rectangle top={80} left={280} width={50} height={24} />
-          <Rectangle top={125} left={280} width={50} height={24} />
+          {rectangles.map(rect => (
+            <Rectangle
+              key={_.uniqueId('rectangle_')}
+              top={rect.top}
+              left={rect.left}
+              width={rect.width}
+              height={rect.height}
+            />
+          ))}
         </IllustrationContainer>
         <Title>
           <SectionTitle variant="display-2">{t('title')}</SectionTitle>
@@ -43,7 +56,7 @@ const AllData = () => {
           </AnimatePresence>
         </Title>
       </TitleContainer>
-      <SectionSubtitle maxWidth="500px">{t('subtitle')}</SectionSubtitle>
+      <SectionSubtitle $maxWidth="500px">{t('subtitle')}</SectionSubtitle>
       <Box marginBottom={8} />
       <DesktopImageGrid isDecrypted={isDecrypted} />
       <MobileImageGrid isDecrypted={isDecrypted} />
