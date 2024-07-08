@@ -153,9 +153,8 @@ pub trait FeatureFlagClient: Sync + Send + 'static {
 }
 
 impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
-    #[tracing::instrument(skip(self))]
     /// Fetches the value for the provided BoolFlag
-    fn flag<'a>(&self, flag: BoolFlag<'a>) -> bool {
+    fn flag(&self, flag: BoolFlag) -> bool {
         let result = self.get_bool_flag(&flag);
         Self::log_flag(&result, flag.flag_name());
         // Catch errors reading the value from LD by returning the default value - we will
@@ -164,8 +163,7 @@ impl FeatureFlagClient for LaunchDarklyFeatureFlagClient {
     }
 
     /// Fetches the value for the provided JsonFlag and deserializes into T
-    #[tracing::instrument(skip(self))]
-    fn json_flag<'a>(&self, flag: JsonFlag<'a>) -> Result<serde_json::Value, serde_json::Error> {
+    fn json_flag(&self, flag: JsonFlag) -> Result<serde_json::Value, serde_json::Error> {
         let evaluate_flag = || -> Result<serde_json::Value, Error> {
             let client = &self.unwrap_client()?.inner;
             let rollout = get_rollout_flag_value::<JsonLdRollout>(client, &flag.flag_name())?;
