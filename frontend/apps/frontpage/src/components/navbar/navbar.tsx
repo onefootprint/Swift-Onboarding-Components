@@ -14,7 +14,7 @@ import {
 } from '@onefootprint/icons';
 import { Container, media } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
@@ -33,6 +33,16 @@ const Navbar = () => {
   const isArticlePage = router.pathname.includes(ARTICLE_URL);
 
   const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!isArticlePage);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (isBannerVisible) {
+      url.searchParams.set('banner', 'true');
+    } else {
+      url.searchParams.delete('banner');
+    }
+    router.push(url.toString(), undefined, { shallow: true });
+  }, [isBannerVisible]);
 
   const handleCloseBanner = () => setIsBannerVisible(false);
   const entries: NavEntry[] = [

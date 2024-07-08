@@ -21,7 +21,7 @@ const MessageBanner = ({ onClose, articleUrl, text, showBanner }: MessageBannerP
   });
 
   const containerVariants = {
-    initial: { opacity: 1, height: 'auto' },
+    initial: { opacity: 1, height: 0 },
     animate: {
       opacity: 1,
       height: 'auto',
@@ -49,8 +49,7 @@ const MessageBanner = ({ onClose, articleUrl, text, showBanner }: MessageBannerP
       {showBanner && (
         <Container variants={containerVariants} initial="initial" animate="animate" exit="exit">
           <motion.p variants={textVariants} initial="initial" animate="animate">
-            {text}
-            <StyledLink href={articleUrl}>{t('cta')}</StyledLink>
+            {text}. <StyledLink href={articleUrl}>{t('cta')}</StyledLink>
           </motion.p>
           <CloseButtonContainer onClick={onClose}>
             <IcoCloseSmall16 />
@@ -68,15 +67,18 @@ const Container = styled(motion(Stack))`
     align-items: center;
     justify-content: center;
     display: flex;
+    min-height: 72px;
     position: relative;
-    padding: ${theme.spacing[3]} ${theme.spacing[9]};
     background-color: ${theme.backgroundColor.primary};
     border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     text-align: center;
     width: 100%;
+    padding: 0 ${theme.spacing[6]};
 
     ${media.greaterThan('md')`
+      padding: 0;
       flex-direction: row;
+      min-height: 40px;
     `}
   `}
 `;
@@ -100,7 +102,7 @@ const StyledLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')}
     color: ${theme.color.accent};
-    margin-left: ${theme.spacing[3]};
+    margin-left: ${theme.spacing[1]};
     text-decoration: none;
   `}
 `;

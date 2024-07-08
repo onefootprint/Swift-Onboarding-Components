@@ -1,13 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import Banner from 'src/components/banner';
 import SEO from '../../components/seo';
-import BannerSection from './sections/banner-section';
 import Control from './sections/control';
 import Customize from './sections/customize';
 import Hero from './sections/hero';
 import Leverage from './sections/leverage';
-// import Leverage from './sections/leverage';
 import Quotes from './sections/quotes';
 import Verify from './sections/verify';
 
@@ -23,7 +22,7 @@ const NewHome = () => {
       <Verify />
       <Leverage />
       <Quotes />
-      <BannerSection />
+      <Banner title={t('banner.title')} />
     </>
   );
 };

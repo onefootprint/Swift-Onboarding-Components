@@ -46,7 +46,7 @@ const Banner = ({ title }: BannerProps) => {
   );
 };
 
-const BannerContainer = styled(Box)`
+const BannerContainer = styled(Container)`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
@@ -54,6 +54,7 @@ const BannerContainer = styled(Box)`
     justify-content: center;
     gap: ${theme.spacing[10]};
     max-width: 100%;
+    padding: ${theme.spacing[11]} 0 ${theme.spacing[12]} 0;
   `}
 `;
 
