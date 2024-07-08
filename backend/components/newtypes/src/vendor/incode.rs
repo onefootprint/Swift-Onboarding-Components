@@ -112,6 +112,9 @@ incode_reason_code_enum! {
         #[ser = "fakeCheck"]
         #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentPdf417DataIsValid, FRC::DocumentPdf417DataIsNotValid))]
         FakeCheck,
+        #[ser = "fakeIdCheck"]
+        #[footprint_reason_code = Some(IncodeRCH::new_with_optional(None, Some(FRC::DocumentPossibleDigitalFraud)))]
+        FakeIdCheck,
         #[ser = "ocrIdentityCheck"]
         #[footprint_reason_code = None]
         OcrIdentityCheck,
@@ -298,6 +301,7 @@ impl IncodeTest {
             | IncodeTest::TwoDBarcodeContent
             | IncodeTest::Barcode2DDetected
             | IncodeTest::MrzLineFormatCheck
+            | IncodeTest::FakeIdCheck
             | IncodeTest::IdAlterationCheck
             | IncodeTest::LastNameMatch => false,
 

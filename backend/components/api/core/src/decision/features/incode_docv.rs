@@ -318,14 +318,19 @@ fn doc_expired_reason_code(res: &FetchOCRResponse) -> Option<FootprintReasonCode
 
 fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintReasonCode, (bool, bool))> {
     let (t, s) = value;
+    let test = t.clone();
     let frc_helper: Option<IncodeRCH> = t.into();
-    frc_helper.and_then(|f| {
+
+    if let Some(helper) = frc_helper {
         if s == &IncodeStatus::Fail {
-            f.fail_code.map(|c| (c, (t.is_crosscheck(), false)))
+            helper.fail_code.map(|c| (c, (t.is_crosscheck(), false)))
         } else {
-            f.ok_code.map(|c| (c, (false, t.is_crosscheck())))
+            helper.ok_code.map(|c| (c, (false, t.is_crosscheck())))
         }
-    })
+    } else {
+        tracing::info!(?test, "incode test not producing FRC");
+        None
+    }
 }
 
 #[cfg(test)]

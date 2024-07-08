@@ -710,7 +710,7 @@ footprint_reason_code_enum! {
         DocumentVerified,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document OCR not successful", severity = SignalSeverity::High,  description = "The OCR for the document failed."]
+        #[note = "Document OCR not successful", severity = SignalSeverity::Low,  description = "The OCR for the document failed."]
         DocumentOcrNotSuccessful,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
@@ -804,9 +804,15 @@ footprint_reason_code_enum! {
         #[note = "Back of document has signs of digital alteration", severity = SignalSeverity::Medium,  description = "The back of the document has signs of being digitally manipulated or altered."]
         DocumentPossibleImageAlterationBack,
 
+        // TODO: 2024-07-08 getting more clarity from incode on this one, but changing severity since it comes up a bit
+        // https://onefootprint.slack.com/archives/C0514LEFUCS/p1720456393010729
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document has signs of digital alteration", severity = SignalSeverity::High,  description = "Document has signs of being digitally manipulated or altered."]
+        #[note = "Document has signs of alteration", severity = SignalSeverity::Medium,  description = "Document potentially has foreign objects obscuring parts of the document, or has been manipulated."]
         DocumentPossibleImageAlteration,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
+        #[note = "Document has signs of digital manipulation", severity = SignalSeverity::Medium,  description = "Document potentially has discrepancies in the layout, fonts, or other signs of fraud."]
+        DocumentPossibleDigitalFraud,
 
         #[scope = SignalScope::Selfie, additional_scopes = vec![SignalScope::Document], match_level = None]
         #[note = "Selfie used with different information", severity = SignalSeverity::Medium,  description = "The face from the selfie image has been used with different information across Footprint's network."]
@@ -829,7 +835,7 @@ footprint_reason_code_enum! {
         DocumentSelfieNotLiveImage,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document image possible fake", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being a fake document. For example: slight difference in layout of the ID, different font or font size."]
+        #[note = "Document image possible fake", severity = SignalSeverity::Medium,  description = "The image of the document has evidence or appearances of being a fake document. For example: slight difference in layout of the ID, different font or font size."]
         DocumentPossibleFakeImage,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
@@ -841,7 +847,7 @@ footprint_reason_code_enum! {
         DocumentPdf417DataIsValid,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document PDF417 data validation failed", severity = SignalSeverity::High,  description = "Information decoded from the barcode was not valid, did not match information from OCR, or was incorrect for the version or state"]
+        #[note = "Document PDF417 data validation failed", severity = SignalSeverity::Medium,  description = "Information decoded from the barcode was not valid, did not match information from OCR, or was incorrect for the version or state"]
         DocumentPdf417DataIsNotValid,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
@@ -913,11 +919,11 @@ footprint_reason_code_enum! {
         DocumentCountryCodeMismatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document is a learner's permit or provisional driver's license", severity = SignalSeverity::High,  description = "The document provided was a provisional license or learner's permit"]
+        #[note = "Document is a learner's permit or provisional driver's license", severity = SignalSeverity::Medium,  description = "The document provided was a provisional license or learner's permit"]
         DocumentIsPermitOrProvisionalLicense,
 
         #[scope = SignalScope::Selfie, additional_scopes = vec![], match_level = None]
-        #[note = "Selfie was skipped", severity = SignalSeverity::High,  description = "Although requested, selfie image was not captured because the user completed the onboarding on a device that did not have a camera available"]
+        #[note = "Selfie was skipped", severity = SignalSeverity::Medium,  description = "Although requested, selfie image was not captured because the user completed the onboarding on a device that did not have a camera available"]
         DocumentSelfieWasSkipped,
 
         #[scope = SignalScope::Selfie, additional_scopes = vec![], match_level = None]
