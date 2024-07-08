@@ -1,6 +1,6 @@
 {
   "name": "frontpage",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "build:analyze": "ANALYZE=true yarn build",
