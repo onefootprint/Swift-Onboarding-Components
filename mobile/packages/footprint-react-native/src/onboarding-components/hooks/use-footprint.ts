@@ -58,13 +58,20 @@ const useFootprint = () => {
   ) => {
     const { vaultingToken, onboardingConfig } = context;
     if (!vaultingToken) {
-      throw new Error('No authToken found');
+      onError?.(new Error('No authToken found. Please authenticate first'));
+      return;
     }
     if (!onboardingConfig) {
-      throw new Error('No onboardingConfig found');
+      onError?.(
+        new Error(
+          'No onboardingConfig found. Please make sure that the publicKey is correct',
+        ),
+      );
+      return;
     }
     if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
-      throw new Error('Onboarding components only support kyc and kyb kind');
+      onError?.(new Error('Unsupported onboardingConfig kind'));
+      return;
     }
     try {
       await save({ data, bootstrapDis: [], authToken: vaultingToken });
@@ -85,7 +92,8 @@ const useFootprint = () => {
   } = {}) => {
     const { authToken, appearance } = context;
     if (!authToken) {
-      throw new Error('No authToken found');
+      onError?.(new Error('No authToken found. Please authenticate first'));
+      return;
     }
     browser.open({
       appearance,

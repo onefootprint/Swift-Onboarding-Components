@@ -76,15 +76,18 @@ export const useFootprint = () => {
   ) => {
     const { authToken, onboardingConfig } = context;
     if (!authToken) {
-      throw new Error('No authToken found');
+      onError?.(new Error('No authToken found. Please authenticate first'));
+      return;
     }
 
     if (!onboardingConfig) {
-      throw new Error('No onboardingConfig found');
+      onError?.(new Error('No onboardingConfig found. Make sure that the publicKey is correct'));
+      return;
     }
 
     if (onboardingConfig.kind !== 'kyc' && onboardingConfig.kind !== 'kyb') {
-      throw new Error('Onboarding components only support kyc and kyb kind');
+      onError?.(new Error('Onboarding components only support kyc and kyb kind'));
+      return;
     }
 
     try {
@@ -110,7 +113,8 @@ export const useFootprint = () => {
     onClose?: () => void;
   } = {}) => {
     if (!context.fpInstance) {
-      throw new Error('No fpInstance found');
+      onError?.(new Error('No fpInstance found'));
+      return;
     }
     lockBody();
     context.fpInstance.relayFromComponents?.();
