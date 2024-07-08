@@ -1,4 +1,4 @@
-import { Box, Stack, Text, createFontStyles } from '@onefootprint/ui';
+import { Box, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -35,7 +35,10 @@ const TextContainer = styled(Stack)`
     justify-content: flex-start;
     margin-top: ${theme.spacing[2]};
     width: 100%;
-    flex: 1;
+
+    ${media.greaterThan('md')`
+      flex: 1;
+    `}
   `}
 `;
 
@@ -49,6 +52,7 @@ const CardContainer = styled(Box)<{ area: string }>`
     grid-area: ${area};
     width: 100%;
     margin: 0 auto;
+    height: fit-content;
   `}
 `;
 

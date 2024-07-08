@@ -211,7 +211,8 @@
         "kyc": "KYC",
         "kyb": "KYB",
         "vaulting": "Vaulting",
-        "auth": "Auth"
+        "auth": "Auth",
+        "compare": "Compare"
       },
       "industries": {
         "title": "Industries",
@@ -976,29 +977,31 @@
       },
       "subtitle": "Footprint integrates identity verification and fraud detection, dynamically adjusting friction with the strongest possible security infrastructure.",
       "table": {
-        "database-kyc": "Database KYC",
-        "tokenization": "Tokenization",
-        "document-kyc": "Document KYC",
-        "customizable-ui": "Customizable UI",
-        "fraud-detection": "Fraud Detection",
-        "step-ups": "Step-ups",
-        "device-insights": "Device Insights",
-        "custom-documents-uploads": "Custom Doc. Uploads",
-        "data-vault": "Data Vault",
-        "data-proxy": "Data Proxy",
-        "seamless-integration": "Seamless Integration"
+        "kyc": "KYC",
+        "kyb": "KYB",
+        "dynamic-doc-scan": "Dynamic Doc Scan",
+        "frontend-flow": "Frontend Flow",
+        "behavioral-location-fraud": "Behavioral & Location Fraud",
+        "customizable-elements": "+100 Customizable Elements",
+        "synthetic-fraud": "Synthetic Fraud",
+        "bank-compliance-dashboard": "Bank Compliance Dashboard",
+        "custom-doc-upload": "Custom Doc Upload",
+        "app-clip-doc-scan": "App Clip Doc Scan",
+        "passkey-auth": "Passkey Auth",
+        "secure-data-vaulting": "Secure Data Vaulting",
+        "secure-data-proxying": "Secure Data Proxying"
       },
       "switching": {
         "title": "Thinking about switching?",
         "alloy": {
           "company": "Alloy",
-          "title": "Customizable rules and document requests",
-          "subtitle": "Footprint empowers you to set up custom rules and document requests with our no-code rule builder, keeping users out of manual review and boosting your conversion."
+          "title": "Single SDK for more intuitive rules",
+          "subtitle": "No code backtests. A holistic rules engine to power KYC + Fraud. All under a single SDK that is built to work together."
         },
         "plaid": {
-          "company": "Plaid",
+          "company": "KYB + Fraud Detection",
           "title": "Advanced identity and fraud detection",
-          "subtitle": "With a seamless integration, Footprint handles KYC, fraud prevention and security. Stay ahead of bad actors and seamlessly onboard users faster."
+          "subtitle": "Footprint verifies both consumers and businesses with one SDK. We also use tools to catch synthetic and behavioral fraud to be more than a database check."
         },
         "onfido": {
           "company": "Onfido",
@@ -1008,7 +1011,7 @@
         "persona": {
           "company": "Persona",
           "title": "Flexible, customizable styles to meet your needs",
-          "subtitle": "Whether you need custom embedded components or fully customizable flows, we offer seamless and consistent onboarding experiences tailored to your users' needs."
+          "subtitle": "Whether you need custom embedded components or fully customizable flows, we offer near-unlimited customization so you do not need to make design trade-offs to catch fraud."
         }
       },
       "logos-section": {

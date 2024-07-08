@@ -1,7 +1,7 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
 import { Container, createFontStyles } from '@onefootprint/ui';
 import { ParseKeys } from 'i18next';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import compareTableContent from './compare-table-content';
@@ -14,36 +14,75 @@ const Table = () => {
   const getIcon = (isChecked: boolean) => {
     return isChecked ? <IcoCheckSmall16 /> : '';
   };
+
+  const tableWrapperRef = useRef<HTMLDivElement>(null);
+  const [isOverflowingLeft, setIsOverflowingLeft] = useState(false);
+  const [isOverflowingRight, setIsOverflowingRight] = useState(false);
+
+  const handleScroll = () => {
+    if (tableWrapperRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tableWrapperRef.current;
+      setIsOverflowingLeft(scrollLeft > 0);
+      setIsOverflowingRight(scrollLeft + clientWidth < scrollWidth);
+    }
+  };
+
+  useEffect(() => {
+    handleScroll();
+    window.addEventListener('resize', handleScroll);
+    return () => window.removeEventListener('resize', handleScroll);
+  }, []);
+
   return (
     <Container>
-      <TableContent>
-        <thead>
-          <Header>
-            <HeaderItem></HeaderItem>
-            <HeaderItem>Footprint</HeaderItem>
-            <HeaderItem>Alloy</HeaderItem>
-            <HeaderItem>Plaid</HeaderItem>
-            <HeaderItem>Onfido</HeaderItem>
-          </Header>
-        </thead>
-        <tbody>
-          {compareTableContent.map((row, index) => (
-            <Row key={row.featureId} $isLast={index === compareTableContent.length - 1}>
-              <RowItem $isFirst>{t(`table.${row.featureId}` as ParseKeys<'common'>)}</RowItem>
-              <RowItem>{getIcon(row.footprint)}</RowItem>
-              <RowItem>{getIcon(row.alloy)}</RowItem>
-              <RowItem>{getIcon(row.plaid)}</RowItem>
-              <RowItem>{getIcon(row.onfido)}</RowItem>
-            </Row>
-          ))}
-        </tbody>
-      </TableContent>
+      <TableWrapper
+        ref={tableWrapperRef}
+        onScroll={handleScroll}
+        $isOverflowingLeft={isOverflowingLeft}
+        $isOverflowingRight={isOverflowingRight}
+      >
+        <TableContent>
+          <thead>
+            <Header>
+              <HeaderItem></HeaderItem>
+              <HeaderItem>Footprint</HeaderItem>
+              <HeaderItem>Alloy</HeaderItem>
+              <HeaderItem>Persona</HeaderItem>
+              <HeaderItem>Plaid</HeaderItem>
+              <HeaderItem>Onfido</HeaderItem>
+            </Header>
+          </thead>
+          <tbody>
+            {compareTableContent.map((row, index) => (
+              <Row key={row.featureId} $isLast={index === compareTableContent.length - 1}>
+                <RowItem>{t(`table.${row.featureId}` as ParseKeys<'common'>)}</RowItem>
+                <RowItem>{getIcon(row.footprint)}</RowItem>
+                <RowItem>{row.alloy && getIcon(row.alloy)}</RowItem>
+                <RowItem>{row.persona && getIcon(row.persona)}</RowItem>
+                <RowItem>{row.plaid && getIcon(row.plaid)}</RowItem>
+                <RowItem>{row.onfido && getIcon(row.onfido)}</RowItem>
+              </Row>
+            ))}
+          </tbody>
+        </TableContent>
+      </TableWrapper>
     </Container>
   );
 };
 
+const TableWrapper = styled.div<{ $isOverflowingLeft: boolean; $isOverflowingRight: boolean }>`
+  ${({ theme, $isOverflowingLeft, $isOverflowingRight }) => css`
+    overflow-x: auto;
+    white-space: nowrap;
+    position: relative;
+    border-right: ${$isOverflowingRight ? theme.borderWidth[1] : 0} solid ${theme.borderColor.tertiary};
+    border-left: ${$isOverflowingLeft ? theme.borderWidth[1] : 0} solid ${theme.borderColor.tertiary};
+    transition: border-right 0.1s ease-in-out, border-left 0.1s ease-in-out;
+  `}
+`;
+
 const TableContent = styled.table`
-${({ theme }) => css`
+  ${({ theme }) => css`
     max-width: 1100px;
     width: 100%;
     margin: 0 auto;
@@ -64,11 +103,14 @@ const Header = styled.tr`
 `;
 
 const HeaderItem = styled.th`
-  ${createFontStyles('label-4')}
+  ${({ theme }) => css`
+    ${createFontStyles('label-4')}
     height: ${HEADER_HEIGHT}px;
     line-height: ${HEADER_HEIGHT}px;
     width: 80px;
     white-space: nowrap;
+    padding: 0 ${theme.spacing[5]};
+  `}
 `;
 
 const Row = styled.tr<{ $isLast?: boolean }>`
@@ -77,12 +119,13 @@ const Row = styled.tr<{ $isLast?: boolean }>`
     ${!$isLast && `border-bottom: ${theme.borderWidth[1]} dashed ${theme.borderColor.tertiary};`}
   `}
 `;
-const RowItem = styled.td<{ $isFirst?: boolean }>`
-  ${({ theme, $isFirst }) => css`
+
+const RowItem = styled.td`
+  ${({ theme }) => css`
     ${createFontStyles('body-4')}
     line-height: ${ROW_HEIGHT}px;
     position: relative;
-    text-align: ${$isFirst ? 'left' : 'center'};
+    text-align: left;
     vertical-align: middle;
     padding: 0 ${theme.spacing[5]};
     white-space: nowrap;

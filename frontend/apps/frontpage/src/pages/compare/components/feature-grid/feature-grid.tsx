@@ -42,7 +42,9 @@ const FeatureGrid = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.compare.switching' });
   return (
     <Section direction="column" align="center" justify="center">
-      <Text variant="display-2">{t('title')}</Text>
+      <Text variant="display-2" textAlign="center">
+        {t('title')}
+      </Text>
       <StyledContainer>
         {featureCards.map(featureCard => (
           <FeatureCard
@@ -61,22 +63,25 @@ const FeatureGrid = () => {
 
 const Section = styled(Container)`
   ${({ theme }) => css`
-    gap: ${theme.spacing[7]};
     padding-top: ${theme.spacing[12]};
     padding-bottom: ${theme.spacing[9]};
+    gap: ${theme.spacing[5]};
+
+    ${media.greaterThan('md')`
+      gap: ${theme.spacing[9]};
+    `}
   `}
 `;
 
 const StyledContainer = styled(Box)`
   ${({ theme }) => css`
     width: 100%;
-    grid-column-gap: ${theme.spacing[9]};
-    grid-row-gap: ${theme.spacing[10]};
+    grid-column-gap: ${theme.spacing[10]};
+    grid-row-gap: ${theme.spacing[11]};
     padding-top: ${theme.spacing[9]};
     padding-bottom: ${theme.spacing[10]};
     display: grid;
     grid-template-columns: repeat(1, 1fr);
-    grid-template-rows: repeat(4, 1fr);
     max-width: 1100px;
     grid-template-areas:
       'feature1'

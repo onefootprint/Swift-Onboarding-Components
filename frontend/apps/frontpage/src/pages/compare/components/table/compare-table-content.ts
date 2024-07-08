@@ -1,88 +1,80 @@
 type CompareTableContent = {
   featureId: string;
   footprint: boolean;
-  alloy: boolean;
-  plaid: boolean;
-  onfido: boolean;
+  alloy?: boolean;
+  plaid?: boolean;
+  onfido?: boolean;
+  persona?: boolean;
 };
 
 const compareTableContent: CompareTableContent[] = [
   {
-    featureId: 'database-kyc',
+    featureId: 'kyc',
     footprint: true,
     alloy: true,
     plaid: true,
     onfido: true,
+    persona: true,
   },
   {
-    featureId: 'tokenization',
+    featureId: 'kyb',
     footprint: true,
-    alloy: false,
+    alloy: true,
+    persona: true,
+  },
+  {
+    featureId: 'dynamic-doc-scan',
+    footprint: true,
+    persona: true,
     plaid: true,
     onfido: true,
   },
   {
-    featureId: 'document-kyc',
+    featureId: 'frontend-flow',
     footprint: true,
-    alloy: false,
+    persona: true,
     plaid: true,
-    onfido: false,
-  },
-  {
-    featureId: 'customizable-ui',
-    footprint: true,
-    alloy: true,
-    plaid: false,
-    onfido: false,
-  },
-  {
-    featureId: 'fraud-detection',
-    footprint: true,
-    alloy: false,
-    plaid: false,
-    onfido: false,
-  },
-  {
-    featureId: 'step-ups',
-    footprint: true,
-    alloy: false,
-    plaid: false,
-    onfido: false,
-  },
-  {
-    featureId: 'device-insights',
-    footprint: true,
-    alloy: false,
-    plaid: false,
-    onfido: false,
-  },
-  {
-    featureId: 'custom-documents-uploads',
-    footprint: true,
-    alloy: false,
-    plaid: false,
-    onfido: false,
-  },
-  {
-    featureId: 'data-vault',
-    footprint: true,
-    alloy: false,
-    plaid: false,
-    onfido: false,
-  },
-  {
-    featureId: 'data-proxy',
-    footprint: true,
-    alloy: false,
-    plaid: false,
-    onfido: false,
-  },
-  {
-    featureId: 'seamless-integration',
-    footprint: true,
-    alloy: true,
-    plaid: false,
     onfido: true,
+  },
+  {
+    featureId: 'behavioral-location-fraud',
+    footprint: true,
+    persona: true,
+    plaid: true,
+  },
+  {
+    featureId: 'customizable-elements',
+    footprint: true,
+  },
+  {
+    featureId: 'synthetic-fraud',
+    footprint: true,
+    alloy: true,
+  },
+  {
+    featureId: 'bank-compliance-dashboard',
+    footprint: true,
+    alloy: true,
+  },
+  {
+    featureId: 'custom-doc-upload',
+    footprint: true,
+  },
+  {
+    featureId: 'app-clip-doc-scan',
+    footprint: true,
+  },
+  {
+    featureId: 'passkey-auth',
+    footprint: true,
+  },
+  {
+    featureId: 'secure-data-vaulting',
+    footprint: true,
+  },
+  {
+    featureId: 'secure-data-proxying',
+    footprint: true,
   },
 ];
 
