@@ -17,10 +17,6 @@ export type ContextData = {
     onError?: (error: unknown) => void;
   };
   onboardingConfig: PublicOnboardingConfig | null;
-  onCancel?: () => void;
-  onClose?: () => void;
-  onComplete?: (validationToken: string) => void;
-  onError?: (error: unknown) => void;
   publicKey: string;
 };
 
@@ -36,30 +32,14 @@ const Context = createContext<[ContextData, UpdateContext]>([
 ]);
 
 // These are the props users can set on the provider
-export type ProviderProps = Pick<
-  ContextData,
-  'appearance' | 'authToken' | 'onCancel' | 'onClose' | 'onComplete' | 'onError' | 'publicKey'
-> & { children: React.ReactNode };
+export type ProviderProps = Pick<ContextData, 'appearance' | 'authToken' | 'publicKey'> & { children: React.ReactNode };
 
-const Provider = ({
-  appearance,
-  authToken,
-  children,
-  onCancel,
-  onClose,
-  onComplete,
-  onError,
-  publicKey,
-}: ProviderProps) => {
+const Provider = ({ appearance, authToken, children, publicKey }: ProviderProps) => {
   const [context, setContext] = useState<ContextData>({
     appearance,
     authToken,
     fpInstance: null,
     onboardingConfig: null,
-    onCancel,
-    onClose,
-    onComplete,
-    onError,
     publicKey,
     // when calling handoff, we can listen to fp instance events
     handoffCallbacks: {

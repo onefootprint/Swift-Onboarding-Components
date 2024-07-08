@@ -30,7 +30,6 @@ export const useFootprint = () => {
       kind: FootprintComponentKind.Components,
       onComplete: (validationToken: string) => {
         setContext(prev => {
-          context.onComplete?.(validationToken);
           prev.handoffCallbacks?.onComplete?.(validationToken);
           return prev;
         });
@@ -38,21 +37,18 @@ export const useFootprint = () => {
       onError: (error: unknown) => {
         onError?.(error);
         setContext(prev => {
-          context.onError?.(error);
           prev.handoffCallbacks?.onError?.(error);
           return prev;
         });
       },
       onCancel: () => {
         setContext(prev => {
-          context.onCancel?.();
           prev.handoffCallbacks?.onCancel?.();
           return prev;
         });
       },
       onClose: () => {
         setContext(prev => {
-          context.onClose?.();
           prev.handoffCallbacks?.onClose?.();
           return prev;
         });
