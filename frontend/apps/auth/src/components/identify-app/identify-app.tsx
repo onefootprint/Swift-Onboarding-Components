@@ -12,7 +12,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useOnboardingValidate } from '@/src/queries';
-import { isSdkUrlAllowed } from '@/src/utils';
+import { getAuthBootstrapData, isSdkUrlAllowed } from '@/src/utils';
 
 import { useFootprintProvider } from '../../provider-footprint';
 import useProps from '../../provider-footprint/hooks/use-props';
@@ -115,7 +115,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
     [], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  const { authToken, options = voidObj, publicKey, userData } = props || voidObj;
+  const { authToken, options = voidObj, publicKey } = props || voidObj;
   const isSandbox = !config?.isLive;
 
   const fpProvider = useFootprintProvider();
@@ -143,10 +143,7 @@ const IdentifyApp = ({ variant: paramVariant, fallback }: IdentifyAppProps) => {
         initialAuthToken={authToken}
         config={config}
         isLive={config.isLive}
-        bootstrapData={{
-          email: userData?.['id.email'],
-          phoneNumber: userData?.['id.phone_number'],
-        }}
+        bootstrapData={getAuthBootstrapData(props || voidObj)}
         logoConfig={
           options.showLogo
             ? {
