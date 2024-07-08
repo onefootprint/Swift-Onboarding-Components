@@ -52,3 +52,21 @@ def test_onboardings(sandbox_tenant, must_collect_data):
     assert body["data"][1]["playbook_key"] == sandbox_tenant.default_ob_config.key.value
     assert body["data"][2]["status"] == "fail"
     assert body["data"][2]["playbook_key"] == sandbox_tenant.default_ob_config.key.value
+
+
+def test_business_onboardings(sandbox_tenant, kyb_sandbox_ob_config):
+    # First onboard the user onto a KYC playbook
+    bifrost = BifrostClient.new_user(sandbox_tenant.default_ob_config)
+    bifrost.run()
+
+    # And then onboard the user and make a business while onboarding onto KYB playbook
+    bifrost = BifrostClient.inherit_user(kyb_sandbox_ob_config, bifrost.sandbox_id)
+    user = bifrost.run()
+
+    body = get(f"users/{user.fp_id}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 2
+    assert body["data"][0]["playbook_key"] == kyb_sandbox_ob_config.key.value
+    assert body["data"][1]["playbook_key"] == sandbox_tenant.default_ob_config.key.value
+    body = get(f"businesses/{user.fp_bid}/onboardings", None, sandbox_tenant.s_sk)
+    assert len(body["data"]) == 1
+    assert body["data"][0]["playbook_key"] == kyb_sandbox_ob_config.key.value

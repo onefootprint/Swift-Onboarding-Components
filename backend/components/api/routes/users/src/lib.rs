@@ -18,6 +18,7 @@ mod tags;
 mod token;
 
 pub fn routes(config: &mut web::ServiceConfig) {
+    onboardings::configure_get_aliases(config);
     config
         .service(post::post)
         .service(list::get)

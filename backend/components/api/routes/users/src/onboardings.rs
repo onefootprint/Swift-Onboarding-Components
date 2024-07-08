@@ -13,6 +13,7 @@ use api_core::web::Json;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::OffsetPagination;
+use macros::route_alias;
 use newtypes::PreviewApi;
 use newtypes::WorkflowKind;
 use paperclip::actix::api_v2_operation;
@@ -22,6 +23,12 @@ use paperclip::actix::web;
 type OnboardingsListResponse =
     OffsetPaginatedResponse<api_wire_types::PublicOnboarding, OffsetPaginatedResponseMetaNoCount>;
 
+
+#[route_alias(get(
+    "/businesses/{fp_id}/onboardings",
+    description = "Get the list of playbooks a business has onboarded onto, ordered by timestamp descending. If a business has onboarded onto one playbook multiple times, there will be two separate onboardings.",
+    tags(Businesses, Preview)
+))]
 #[api_v2_operation(
     description = "Get the list of playbooks a user has onboarded onto, ordered by timestamp descending. If a user has onboarded onto one playbook multiple times, there will be two separate onboardings.",
     tags(Users, Preview)
