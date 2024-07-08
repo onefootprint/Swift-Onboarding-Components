@@ -25,7 +25,9 @@ describe('useUrlParams', () => {
     });
     await waitFor(() => {
       expect(onSuccess).toHaveBeenCalledWith({
-        [CLIENT_PUBLIC_KEY_HEADER]: token,
+        obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: token },
+        authToken: undefined,
+        urlType: HostedUrlType.onboardingConfigPublicKey,
       });
     });
   });
@@ -42,7 +44,11 @@ describe('useUrlParams', () => {
     const onError = jest.fn();
     renderUseParseUrl({ onSuccess, onError });
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledWith(undefined, token);
+      expect(onSuccess).toHaveBeenCalledWith({
+        obConfigAuth: undefined,
+        authToken: token,
+        urlType: HostedUrlType.user,
+      });
     });
   });
 
@@ -59,7 +65,9 @@ describe('useUrlParams', () => {
     renderUseParseUrl({ onSuccess, onError });
     await waitFor(() => {
       expect(onSuccess).toHaveBeenCalledWith({
-        [KYB_BO_SESSION_AUTHORIZATION_HEADER]: token,
+        obConfigAuth: { [KYB_BO_SESSION_AUTHORIZATION_HEADER]: token },
+        authToken: undefined,
+        urlType: HostedUrlType.beneficialOwner,
       });
     });
   });

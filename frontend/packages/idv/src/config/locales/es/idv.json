@@ -83,10 +83,15 @@
         "description": "Tu sesión ha expirado. Por favor, indentifícate nuevamente.",
         "cta": "Reiniciar sesión"
       },
+      "generic-error": {
+        "title": "Ocurrió un error",
+        "description": "Desafortunadamente, no pudimos completar su solicitud.",
+        "cta": "Intentar de nuevo"
+      },
       "confirmation-dialog": {
-        "title": "Are you sure?",
-        "description": "Closing this will not save your data.",
-        "confirm": "Yes",
+        "title": "¿Estás seguro?",
+        "description": "Cerrar esto no guardará tus datos.",
+        "confirm": "Sí",
         "cancel": "No"
       }
     },

@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next';
 
 import { NavigationHeader } from '../layout';
 
-type SessionExpiredProps = {
-  onRestart: () => void;
+type GenericErrorPageProps = {
+  onRetry: () => void;
   retryLimitExceeded?: boolean;
 };
 
-const SessionExpired = ({ onRestart, retryLimitExceeded }: SessionExpiredProps) => {
+const GenericErrorPage = ({ onRetry, retryLimitExceeded }: GenericErrorPageProps) => {
   const { t } = useTranslation('idv', {
-    keyPrefix: 'global.components.session-expired',
+    keyPrefix: 'global.components.generic-error',
   });
 
   return (
@@ -25,13 +25,12 @@ const SessionExpired = ({ onRestart, retryLimitExceeded }: SessionExpiredProps) 
             ? undefined
             : {
                 label: t('cta'),
-                onClick: onRestart,
+                onClick: onRetry,
               }
         }
-        testID="restart-button"
       />
     </>
   );
 };
 
-export default SessionExpired;
+export default GenericErrorPage;

@@ -1,10 +1,11 @@
-import type { BusinessBoKycData, ObConfigAuth, PublicOnboardingConfig } from '@onefootprint/types';
+import type { BusinessBoKycData, HostedUrlType, ObConfigAuth, PublicOnboardingConfig } from '@onefootprint/types';
 
 export type MachineContext = {
   obConfigAuth?: ObConfigAuth;
   authToken?: string;
   businessBoKycData?: BusinessBoKycData;
   onboardingConfig?: PublicOnboardingConfig;
+  urlType?: HostedUrlType;
 };
 
 export type MachineEvents =
@@ -18,6 +19,7 @@ export type MachineEvents =
         authToken?: string;
         businessBoKycData?: BusinessBoKycData;
         onboardingConfig?: PublicOnboardingConfig;
+        urlType?: HostedUrlType;
       };
     }
   | { type: 'introductionCompleted' }

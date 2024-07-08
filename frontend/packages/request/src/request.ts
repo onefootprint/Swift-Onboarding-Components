@@ -142,10 +142,23 @@ export const useRequestError = () => {
     return undefined;
   };
 
+  const getStatusCode = (error?: unknown | Error): number | undefined => {
+    if (!error || !isFootprintError(error)) {
+      return undefined;
+    }
+    const data = error?.response?.data;
+    const statusCode = data?.statusCode;
+    if (statusCode) {
+      return statusCode;
+    }
+    return undefined;
+  };
+
   return {
     getErrorMessage: getMessage,
     getErrorCode: getCode,
     getErrorContext: getContext,
+    getErrorStatusCode: getStatusCode,
   };
 };
 

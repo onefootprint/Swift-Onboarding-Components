@@ -83,6 +83,11 @@
         "description": "Your session has expired. Please restart it.",
         "cta": "Restart"
       },
+      "generic-error": {
+        "title": "An error occurred",
+        "description": "Unfortunately, we couldn't complete your request.",
+        "cta": "Try again"
+      },
       "confirmation-dialog": {
         "title": "Are you sure?",
         "description": "Closing this will not save your data.",

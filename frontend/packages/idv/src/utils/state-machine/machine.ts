@@ -4,7 +4,13 @@ import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../hooks/ui/use-device-info';
 import type { UserData } from '../../types';
-import type { CompletePayload, ComponentsSdkContext, MachineContext, MachineEvents } from './types';
+import {
+  type CompletePayload,
+  type ComponentsSdkContext,
+  ConfigRequestFailureReason,
+  type MachineContext,
+  type MachineEvents,
+} from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldShowIdentify from './utils/should-show-identify';
 import shouldShowSandbox from './utils/should-show-sandbox';
@@ -35,6 +41,7 @@ const getIdvMachineContext = (args: IdvMachineArgs): MachineContext => {
   return {
     userData,
     ...restOfArgs,
+    retries: 0,
   };
 };
 
@@ -69,9 +76,19 @@ const createIdvMachine = (args: IdvMachineArgs) =>
       states: {
         init: {
           on: {
-            configRequestFailed: {
-              target: 'configInvalid',
-            },
+            configRequestFailed: [
+              {
+                target: 'configInvalid',
+                cond: (_, event) => event.payload.reason === ConfigRequestFailureReason.invalidConfig,
+              },
+              {
+                target: 'sessionExpired',
+                cond: (_, event) => event.payload.reason === ConfigRequestFailureReason.sessionExpired,
+              },
+              {
+                target: 'initConfigFailed',
+              },
+            ],
             initContextUpdated: [
               {
                 target: 'sandboxOutcome',
@@ -127,7 +144,17 @@ const createIdvMachine = (args: IdvMachineArgs) =>
             reset: [
               {
                 target: 'init',
-                actions: ['eraseAuthToken', 'resetContext'],
+                actions: ['eraseAuthToken', 'resetContext', 'incrementRetries'],
+              },
+            ],
+          },
+        },
+        initConfigFailed: {
+          on: {
+            reset: [
+              {
+                target: 'init',
+                actions: ['eraseAuthToken', 'resetContext', 'incrementRetries'],
               },
             ],
           },
@@ -192,6 +219,10 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         assignDeviceResponseJson: assign((context, event) => ({
           ...context,
           deviceResponseJson: event.payload.deviceResponseJson,
+        })),
+        incrementRetries: assign(context => ({
+          ...context,
+          retries: context.retries + 1,
         })),
       },
     },

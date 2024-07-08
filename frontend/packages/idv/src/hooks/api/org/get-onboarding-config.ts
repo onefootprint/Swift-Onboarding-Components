@@ -30,6 +30,7 @@ const useGetOnboardingConfig = (
     enabled: !!obConfigAuth || !!authToken,
     onSuccess: options.onSuccess,
     onError: options.onError,
+    retry: 2,
   });
 };
 

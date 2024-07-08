@@ -17,6 +17,12 @@ export type ComponentsSdkContext = {
   skipRelayToComponents?: boolean;
 };
 
+export enum ConfigRequestFailureReason {
+  invalidConfig = 'invalidConfig',
+  sessionExpired = 'sessionExpired',
+  other = 'other',
+}
+
 /** These constant properties are often passed around to other idv machines */
 export type CommonIdvContext = {
   device: DeviceInfo;
@@ -50,6 +56,7 @@ export type MachineContext = {
   deviceResponseJson?: string;
   onClose?: () => void;
   onComplete?: (payload: CompletePayload) => void; // Generated
+  retries: number;
 };
 
 export type MachineEvents =
@@ -62,6 +69,9 @@ export type MachineEvents =
     }
   | {
       type: 'configRequestFailed';
+      payload: {
+        reason: ConfigRequestFailureReason;
+      };
     }
   | {
       type: 'sandboxOutcomeSubmitted';

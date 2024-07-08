@@ -20,6 +20,7 @@ export interface Typegen0 {
     assignSandboxOutcome: 'sandboxOutcomeSubmitted';
     assignValidationToken: 'onboardingCompleted';
     eraseAuthToken: 'reset';
+    incrementRetries: 'reset';
     resetContext: 'reset';
   };
   eventsCausingDelays: {};
@@ -31,6 +32,7 @@ export interface Typegen0 {
     | 'expired'
     | 'identify'
     | 'init'
+    | 'initConfigFailed'
     | 'onboarding'
     | 'sandboxOutcome'
     | 'sessionExpired';

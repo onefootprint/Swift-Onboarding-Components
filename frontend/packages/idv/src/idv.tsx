@@ -9,13 +9,14 @@ import { GOOGLE_MAPS_SRC } from './config/constants';
 import Router from './pages/router';
 import type { IdvProps } from './types';
 import { checkIsInIframe } from './utils';
+import type { IdvMachineArgs } from './utils/state-machine';
 
 type RouterProps = ComponentProps<typeof Router>;
 type AppProps = IdvProps & RouterProps;
 
 const App = ({ l10n, onIdentifyDone, isInIframe, ...props }: AppProps) => {
   const newIsInIframe = isInIframe === undefined ? checkIsInIframe() : isInIframe;
-  const args = { ...props, isInIframe: newIsInIframe };
+  const args: IdvMachineArgs = { ...props, isInIframe: newIsInIframe };
   return (
     <>
       <L10nContextProvider l10n={l10n}>

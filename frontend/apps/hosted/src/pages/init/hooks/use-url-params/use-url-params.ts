@@ -9,7 +9,7 @@ const ObConfigAuthHeaderByTokenKind = {
 };
 
 export type UseParseUrlParamOptions = {
-  onSuccess?: (obConfigAuth?: ObConfigAuth, authToken?: string) => void;
+  onSuccess?: (args: { obConfigAuth?: ObConfigAuth; authToken?: string; urlType?: HostedUrlType }) => void;
   onError?: (error: string) => void; // If URL is invalid or malformed
 };
 
@@ -42,11 +42,11 @@ const useParseUrl = (options: UseParseUrlParamOptions = {}) => {
 
     const tokenKind = type as HostedUrlType;
     if (tokenKind === HostedUrlType.user) {
-      onSuccess?.(undefined, token);
+      onSuccess?.({ obConfigAuth: undefined, authToken: token, urlType: tokenKind });
     } else {
       const authHeader = ObConfigAuthHeaderByTokenKind[tokenKind];
       const obConfigAuth = { [authHeader]: token } as ObConfigAuth;
-      onSuccess?.(obConfigAuth);
+      onSuccess?.({ obConfigAuth, authToken: undefined, urlType: tokenKind });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady]);

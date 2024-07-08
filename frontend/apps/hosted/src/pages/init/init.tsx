@@ -1,7 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { Logger, getLogger, useGetOnboardingConfig } from '@onefootprint/idv';
-import { getErrorMessage } from '@onefootprint/request';
-import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
+import { getErrorMessage, useRequestError } from '@onefootprint/request';
+import type { BusinessResponse } from '@onefootprint/types';
 import { Shimmer, media } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
@@ -19,14 +19,16 @@ const Init = () => {
   const showRequestError = useRequestErrorToast();
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
+  const { getErrorCode } = useRequestError();
 
   useParseUrl({
-    onSuccess: (parsedObConfigAuth?: ObConfigAuth, parsedAuthToken?: string) => {
+    onSuccess: ({ obConfigAuth: parsedObConfigAuth, authToken: parsedAuthToken, urlType }) => {
       send({
         type: 'initContextUpdated',
         payload: {
           authToken: parsedAuthToken,
           obConfigAuth: parsedObConfigAuth,
+          urlType,
         },
       });
     },
@@ -51,7 +53,12 @@ const Init = () => {
       onError: err => {
         logError(`Fetching business details: ${getErrorMessage(err)}`, err);
         showRequestError(err);
-        send({ type: 'invalidUrlReceived' });
+        const errorCode = getErrorCode(err);
+        if (errorCode === 'E118') {
+          send({ type: 'expired' });
+        } else {
+          send({ type: 'invalidUrlReceived' });
+        }
       },
     },
   );
@@ -81,7 +88,12 @@ const Init = () => {
       onError: err => {
         logError(`Fetching onboarding config: ${getErrorMessage(err)}`, err);
         showRequestError(err);
-        send({ type: 'invalidUrlReceived' });
+        const errorCode = getErrorCode(err);
+        if (errorCode === 'E118') {
+          send({ type: 'expired' });
+        } else {
+          send({ type: 'invalidUrlReceived' });
+        }
       },
     },
   );

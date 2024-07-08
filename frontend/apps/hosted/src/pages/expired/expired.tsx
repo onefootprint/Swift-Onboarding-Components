@@ -1,4 +1,5 @@
 import { HeaderTitle } from '@onefootprint/idv';
+import { HostedUrlType } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +8,8 @@ import styled, { css } from 'styled-components';
 
 const Expired = () => {
   const { t } = useTranslation('common', { keyPrefix: 'pages.expired' });
-  const [, send] = useHostedMachine();
+  const [state, send] = useHostedMachine();
+  const { urlType } = state.context;
 
   const handleClick = () => {
     send({ type: 'reset' });
@@ -16,9 +18,11 @@ const Expired = () => {
   return (
     <Container>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Button fullWidth onClick={handleClick}>
-        {t('cta')}
-      </Button>
+      {urlType === HostedUrlType.onboardingConfigPublicKey && (
+        <Button fullWidth onClick={handleClick}>
+          {t('cta')}
+        </Button>
+      )}
     </Container>
   );
 };

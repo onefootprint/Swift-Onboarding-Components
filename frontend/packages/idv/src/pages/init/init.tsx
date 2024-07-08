@@ -1,7 +1,8 @@
-import { getErrorMessage } from '@onefootprint/request';
+import { getErrorMessage, useRequestError } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
+import { ConfigRequestFailureReason } from '../../../src/utils/state-machine/types';
 import { InitShimmer } from '../../components';
 import type { DeviceInfo } from '../../hooks';
 import { useDeviceInfo, useGetOnboardingConfig } from '../../hooks';
@@ -10,6 +11,7 @@ import { Logger, trackAction } from '../../utils';
 
 const Init = () => {
   const [state, send] = useIdvMachine();
+  const { getErrorCode, getErrorStatusCode } = useRequestError();
   const { obConfigAuth, authToken, device, userData = {} } = state.context;
 
   useDeviceInfo((newDevice: DeviceInfo) => {
@@ -45,8 +47,19 @@ const Init = () => {
         Logger.error(`Fetching onboarding config in IDV init page failed: ${getErrorMessage(error)}`, {
           location: 'idv-init',
         });
+        const errorCode = getErrorCode(error);
+        const errorStatusCode = getErrorStatusCode(error);
+        let reason: ConfigRequestFailureReason = ConfigRequestFailureReason.other;
+        if (errorCode === 'E118') {
+          reason = ConfigRequestFailureReason.sessionExpired;
+        } else if (errorStatusCode === 401 || errorStatusCode === 404) {
+          reason = ConfigRequestFailureReason.invalidConfig;
+        }
         send({
           type: 'configRequestFailed',
+          payload: {
+            reason,
+          },
         });
       },
     },

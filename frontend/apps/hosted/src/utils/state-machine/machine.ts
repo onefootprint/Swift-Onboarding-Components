@@ -31,6 +31,9 @@ export const createHostedMachine = () =>
             invalidUrlReceived: {
               target: 'invalidUrl',
             },
+            expired: {
+              target: 'expired',
+            },
             initContextUpdated: [
               {
                 target: 'intro',
@@ -65,11 +68,12 @@ export const createHostedMachine = () =>
       actions: {
         resetContext: assign(() => ({})),
         assignInitContext: assign((context, event) => {
-          const { obConfigAuth, businessBoKycData, onboardingConfig, authToken } = event.payload;
+          const { obConfigAuth, businessBoKycData, onboardingConfig, authToken, urlType } = event.payload;
           context.obConfigAuth = obConfigAuth !== undefined ? obConfigAuth : context.obConfigAuth;
           context.authToken = authToken !== undefined ? authToken : context.authToken;
           context.businessBoKycData = businessBoKycData !== undefined ? businessBoKycData : context.businessBoKycData;
           context.onboardingConfig = onboardingConfig !== undefined ? onboardingConfig : context.onboardingConfig;
+          context.urlType = urlType !== undefined ? urlType : context.urlType;
 
           return context;
         }),

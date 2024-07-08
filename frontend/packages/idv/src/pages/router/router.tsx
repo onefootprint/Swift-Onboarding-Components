@@ -3,6 +3,8 @@ import { IdDI, SessionStatus } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
+import GenericErrorPage from '../../../src/components/gerenic-error-page/generic-error-page';
+import { IDV_SESSION_RETRY_LIMIT } from '../../../src/config/constants';
 import { AppErrorBoundary, SessionExpired } from '../../components';
 import { Identify, IdentifyVariant } from '../../components/identify';
 import { L10nContextProvider } from '../../components/l10n-provider';
@@ -46,8 +48,10 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
     onClose,
     onComplete,
     deviceResponseJson,
+    retries,
   } = state.context;
   const isDone = state.matches('complete');
+  const retryLimitExceeded = retries > IDV_SESSION_RETRY_LIMIT;
 
   useValidateSession(
     { authToken },
@@ -158,7 +162,12 @@ const Router = ({ l10n, onIdentifyDone }: RouterProps) => {
           l10n={l10n}
         />
       ) : null}
-      {state.matches('sessionExpired') ? <SessionExpired onRestart={() => send({ type: 'reset' })} /> : null}
+      {state.matches('sessionExpired') ? (
+        <SessionExpired onRestart={() => send({ type: 'reset' })} retryLimitExceeded={retryLimitExceeded} />
+      ) : null}
+      {state.matches('initConfigFailed') ? (
+        <GenericErrorPage onRetry={() => send({ type: 'reset' })} retryLimitExceeded={retryLimitExceeded} />
+      ) : null}
       {state.matches('configInvalid') ? <ConfigInvalid /> : null}
     </AppErrorBoundary>
   );
