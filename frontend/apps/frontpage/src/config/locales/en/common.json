@@ -211,8 +211,7 @@
         "kyc": "KYC",
         "kyb": "KYB",
         "vaulting": "Vaulting",
-        "auth": "Auth",
-        "compare": "Compare"
+        "auth": "Auth"
       },
       "industries": {
         "title": "Industries",

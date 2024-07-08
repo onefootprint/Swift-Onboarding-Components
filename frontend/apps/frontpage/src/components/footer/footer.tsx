@@ -27,10 +27,6 @@ const linkSections = [
         textKey: 'product.auth',
         href: '/platform/auth',
       },
-      {
-        textKey: 'product.compare',
-        href: '/compare',
-      },
     ],
   },
   {
