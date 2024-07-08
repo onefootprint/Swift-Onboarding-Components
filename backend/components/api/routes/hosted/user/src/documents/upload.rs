@@ -1,10 +1,11 @@
 use crate::auth::user::UserAuthScope;
-use crate::decision;
+use crate::documents::get_user_or_business_for_dr;
 use crate::State;
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::document::meta_headers::MetaHeaders;
+use api_core::decision::document::route_handler::handle_document_upload;
 use api_core::types::ApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
 use newtypes::DocumentId;
@@ -44,19 +45,10 @@ pub async fn post(
     let (document_id, side) = args.into_inner();
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
-    let wf = user_auth.workflow().clone();
-    let su_id = user_auth.scoped_user.id.clone();
 
-    decision::document::route_handler::handle_document_upload(
-        &state,
-        wf,
-        su_id.clone(),
-        meta,
-        file,
-        document_id.clone(),
-        side,
-    )
-    .await?;
+    let (sv_id, wf_id) = get_user_or_business_for_dr(&state, user_auth, Some(document_id.clone())).await?;
+
+    handle_document_upload(&state, wf_id, sv_id, meta, file, document_id, side).await?;
 
     Ok(api_wire_types::Empty)
 }

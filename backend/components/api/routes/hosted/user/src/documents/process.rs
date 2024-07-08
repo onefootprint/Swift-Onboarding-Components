@@ -1,6 +1,7 @@
 use crate::auth::user::UserAuthScope;
+use crate::documents::get_user_or_business_for_dr;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::decision;
+use api_core::decision::document::route_handler::handle_document_process;
 use api_core::decision::document::route_handler::IncodeConfigurationIdOverride;
 use api_core::decision::document::route_handler::IsRerun;
 use api_core::types::ApiResponse;
@@ -27,15 +28,16 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let t_id = user_auth.scoped_user.tenant_id.clone();
-    let wf = user_auth.workflow();
-    let su_id = user_auth.scoped_user.id.clone();
-    let wf_id = wf.id.clone();
-    let response = decision::document::route_handler::handle_document_process(
+    let doc_id = doc_id.into_inner();
+
+    let (sv_id, wf_id) = get_user_or_business_for_dr(&state, user_auth, Some(doc_id.clone())).await?;
+
+    let response = handle_document_process(
         &state,
-        su_id,
+        sv_id,
         wf_id,
         t_id,
-        doc_id.into_inner(),
+        doc_id,
         IsRerun(false),
         IncodeConfigurationIdOverride(None),
     )

@@ -21,6 +21,7 @@ use db::models::workflow_request::WorkflowRequest;
 use db::OffsetPagination;
 use db::TxnPgConn;
 use itertools::chain;
+use itertools::Itertools;
 use newtypes::DocumentConfig;
 use newtypes::DocumentRequestConfig;
 use newtypes::EncryptedVaultPrivateKey;
@@ -115,16 +116,13 @@ pub fn get_or_start_onboarding(
         };
         let (wf, is_new_ob) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
 
-        if is_new_ob {
-            create_doc_request_if_needed(conn, &wf, obc)?;
-            if is_first_wf {
-                // For the first WF created at this tenant, prefill portable data into this tenant.
-                // TODO: the goal is to do this for all WFs in the future. But it's simpler to
-                // start with only prefilling data once
-                if let Some(prefill_data) = maybe_prefill_data {
-                    let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &sv.id)?;
-                    tenant_vw.prefill_portable_data(conn, prefill_data, actor)?;
-                }
+        if is_new_ob && is_first_wf {
+            // For the first WF created at this tenant, prefill portable data into this tenant.
+            // TODO: the goal is to do this for all WFs in the future. But it's simpler to
+            // start with only prefilling data once
+            if let Some(prefill_data) = maybe_prefill_data {
+                let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &sv.id)?;
+                tenant_vw.prefill_portable_data(conn, prefill_data, actor)?;
             }
         }
         (wf.id, is_new_ob)
@@ -180,12 +178,22 @@ pub fn get_or_start_onboarding(
         None
     };
 
+    if is_new_ob {
+        create_doc_request_if_needed(conn, &wf_id, biz_wf.as_ref(), obc)?;
+    }
+
     Ok((wf_id, biz_wf, is_new_ob))
 }
 
 /// Create a DocumentRequest associated with the provided wf if the obc requires document collection
-fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObConfiguration) -> FpResult<()> {
-    let doc_requests_to_create = match wf.config {
+fn create_doc_request_if_needed(
+    conn: &mut TxnPgConn,
+    wf_id: &WorkflowId,
+    biz_wf: Option<&Workflow>,
+    obc: &ObConfiguration,
+) -> FpResult<()> {
+    let wf = Workflow::get(conn, wf_id)?;
+    let user_doc_requests = match wf.config {
         WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => chain(
             // Identity documents are generally still represented in CDOs. We could migrate them
             // to `obc.documents_to_collect` one day
@@ -200,20 +208,26 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
             vec![]
         }
     };
-    if doc_requests_to_create.is_empty() {
-        return Ok(());
-    }
-
-    let doc_requests_to_create = doc_requests_to_create
+    let user_doc_requests = user_doc_requests.into_iter().map(|r| (r, &wf));
+    let biz_doc_requests = obc
+        .business_documents_to_collect
+        .clone()
         .into_iter()
-        .map(|config| NewDocumentRequestArgs {
+        .flat_map(|r| biz_wf.map(|biz_wf| (r, biz_wf)));
+
+
+    let doc_requests_to_create = chain!(user_doc_requests, biz_doc_requests)
+        .map(|(config, wf)| NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
             workflow_id: wf.id.clone(),
             rule_set_result_id: None,
             config,
         })
-        .collect();
+        .collect_vec();
 
+    if doc_requests_to_create.is_empty() {
+        return Ok(());
+    }
     DocumentRequest::bulk_create(conn, doc_requests_to_create)?;
 
     Ok(())

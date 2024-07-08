@@ -298,6 +298,7 @@ def create_ob_config(
     enhanced_aml=None,
     document_types_and_countries=None,  # TODO: argoff fix this, not what the FE uses as the default
     documents_to_collect=None,
+    business_documents_to_collect=None,
     curp_validation_enabled=False,
     skip_kyc=False,
     verification_checks=None,
@@ -325,6 +326,7 @@ def create_ob_config(
         "enhanced_aml": enhanced_aml,
         "document_types_and_countries": document_types_and_countries,
         "documents_to_collect": documents_to_collect or [],
+        "business_documents_to_collect": business_documents_to_collect or [],
         "curp_validation_enabled": curp_validation_enabled,
         "skip_kyc": skip_kyc,
         "verification_checks": checks,

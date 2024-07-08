@@ -1,7 +1,8 @@
 use crate::auth::user::UserAuthScope;
+use crate::documents::get_user_or_business_for_dr;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
-use api_core::decision;
+use api_core::decision::document::route_handler::handle_document_create;
 use api_core::types::ApiResponse;
 use api_core::utils::headers::InsightHeaders;
 use api_wire_types::CreateDocumentRequest;
@@ -18,6 +19,7 @@ use paperclip::actix::{
     description = "Create a new identity document for this user's outstanding document request",
     tags(Document, Hosted)
 )]
+// TODO maybe we should alias to `/hosted/documents` since this will also work for businesses
 #[actix::post("/hosted/user/documents")]
 pub async fn post(
     state: web::Data<State>,
@@ -28,18 +30,12 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthScope::SignUp)?;
     user_auth.check_workflow_guard(WorkflowGuard::AddDocument)?;
     let insight = CreateInsightEvent::from(insight);
+    let request = request.into_inner();
 
-    let su_id = user_auth.scoped_user.id.clone();
     let tenant_id = user_auth.tenant().id.clone();
-    let wf_id = user_auth.workflow().id.clone();
-    let response = decision::document::route_handler::handle_document_create(
-        &state,
-        request.into_inner(),
-        tenant_id,
-        su_id,
-        wf_id,
-        insight,
-    )
-    .await?;
+
+    let (sv_id, wf_id) = get_user_or_business_for_dr(&state, user_auth, request.request_id.clone()).await?;
+
+    let response = handle_document_create(&state, request, tenant_id, sv_id, wf_id, insight).await?;
     Ok(CreateDocumentResponse { id: response })
 }

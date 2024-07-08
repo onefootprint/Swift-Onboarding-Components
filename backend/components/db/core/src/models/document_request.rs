@@ -6,14 +6,18 @@ use chrono::Utc;
 use db_schema::schema::document_request::{
     self,
 };
+use db_schema::schema::identity_document;
+use db_schema::schema::scoped_vault;
 use diesel::prelude::*;
 use diesel::Insertable;
 use diesel::Queryable;
+use newtypes::DocumentId;
 use newtypes::DocumentRequestConfig;
 use newtypes::DocumentRequestId;
 use newtypes::DocumentRequestKind;
 use newtypes::RuleSetResultId;
 use newtypes::ScopedVaultId;
+use newtypes::VaultKind;
 use newtypes::WorkflowId;
 use std::collections::HashMap;
 
@@ -146,6 +150,36 @@ impl DocumentRequest {
             .collect();
         Ok(results)
     }
+
+    #[tracing::instrument("DocumentRequest::get_owner_kind", skip_all)]
+    /// Very targeted method to just return the kind of the vault that owns this document request.
+    /// Since we haven't checked ownership of the document request at this point, we don't want to
+    /// return any info from the document request itself.
+    pub fn get_owner_kind(conn: &mut PgConn, id: UncheckedDrIdentifier) -> DbResult<VaultKind> {
+        let mut sv_query = document_request::table
+            .select(document_request::scoped_vault_id)
+            .into_boxed();
+        match id {
+            UncheckedDrIdentifier::Id(dr_id) => sv_query = sv_query.filter(document_request::id.eq(dr_id)),
+            UncheckedDrIdentifier::DocumentId(d_id) => {
+                let dr_id = identity_document::table
+                    .filter(identity_document::id.eq(d_id))
+                    .select(identity_document::request_id);
+                sv_query = sv_query.filter(document_request::id.eq_any(dr_id))
+            }
+        };
+        let result = scoped_vault::table
+            .filter(scoped_vault::id.eq_any(sv_query))
+            .select(scoped_vault::kind)
+            .get_result::<VaultKind>(conn)?;
+        Ok(result)
+    }
+}
+
+#[derive(derive_more::From)]
+pub enum UncheckedDrIdentifier {
+    Id(DocumentRequestId),
+    DocumentId(DocumentId),
 }
 
 impl DocumentRequest {

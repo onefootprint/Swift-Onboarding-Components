@@ -532,6 +532,35 @@ def test_config_create(sandbox_tenant):
             ),
             "Must use identifier starting with document.custom. for custom documents",
         ),
+        (
+            dict(
+                must_collect_data=["name", "full_address", "email", "phone_number"],
+                optional_data=[],
+                can_access_data=[],
+                kind="kyc",
+                cip_kind=None,
+                skip_kyc=False,
+                skip_confirm=False,
+                enhanced_aml=dict(
+                    enhanced_aml=False,
+                    ofac=False,
+                    pep=False,
+                    adverse_media=False,
+                ),
+                allow_us_residents=True,
+                allow_us_territories=False,
+                business_documents_to_collect=[
+                    dict(
+                        kind="custom",
+                        data=dict(
+                            identifier="id.first_name",
+                            name="Custom document",
+                        ),
+                    )
+                ],
+            ),
+            "Cannot collect business documents in non-KYB playbook",
+        ),
     ],
 )
 def test_config_create_validation(sandbox_tenant, config_data, expected_error):

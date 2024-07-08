@@ -184,23 +184,22 @@ pub async fn handle_document_create(
 #[allow(clippy::too_many_arguments)]
 pub async fn handle_document_upload(
     state: &State,
-    workflow: Workflow,
+    wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     meta: MetaHeaders,
     file: FileUpload,
     document_id: DocumentId,
     side: DocumentSide,
 ) -> FpResult<()> {
-    let wf_id = workflow.id.clone();
-    let wf_id2 = wf_id.clone();
     let su_id = sv_id.clone();
-    let (doc, doc_request, uvw, user_consent) = state
+    let (wf, doc, doc_request, uvw, user_consent) = state
         .db_pool
         .db_query(move |conn| -> FpResult<_> {
+            let wf = Workflow::get(conn, &wf_id)?;
             let (doc, doc_request) = Document::get(conn, &document_id)?;
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
             let user_consent = UserConsent::get_for_workflow(conn, &wf_id)?;
-            Ok((doc, doc_request, uvw, user_consent))
+            Ok((wf, doc, doc_request, uvw, user_consent))
         })
         .await?;
 
@@ -264,7 +263,7 @@ pub async fn handle_document_upload(
                 DecisionIntent::get_or_create_for_workflow(
                     conn,
                     &su_id,
-                    &wf_id2,
+                    &wf.id,
                     DecisionIntentKind::DocScan,
                 )?;
             };

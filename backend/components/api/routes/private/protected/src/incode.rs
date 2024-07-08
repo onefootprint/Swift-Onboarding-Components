@@ -288,7 +288,7 @@ pub async fn adhoc_upload_and_process(
 
     decision::document::route_handler::handle_document_upload(
         &state,
-        wf,
+        wf.id,
         sv_id.clone(),
         meta,
         file,

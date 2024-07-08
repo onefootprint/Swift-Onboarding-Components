@@ -247,3 +247,35 @@ def test_skip_kyb(sandbox_tenant, must_collect_data):
     assert body["status"] == "pass"
     body = get(f"entities/{user.fp_bid}", None, *sandbox_tenant.db_auths)
     assert body["status"] == "none"
+
+
+def test_business_docs(sandbox_tenant, must_collect_data):
+    data = must_collect_data + [
+        "business_name",
+        "business_beneficial_owners",
+        "business_address",
+    ]
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Biz documents",
+        data,
+        kind="kyb",
+        business_documents_to_collect=[
+            dict(
+                kind="custom",
+                data=dict(
+                    name="Trust document",
+                    identifier="document.custom.trust_document",
+                    description="Please upload your trust document.",
+                ),
+            ),
+        ],
+    )
+    bifrost = BifrostClient.new_user(obc, fixture_result="use_rules_outcome")
+    user = bifrost.run()
+
+    body = get(f"entities/{user.fp_bid}/documents", None, *sandbox_tenant.db_auths)
+    assert body[0]["kind"] == "custom"
+    assert body[0]["status"] == "complete"
+    assert body[0]["review_status"] == "pending_human_review"
+    assert body[0]["uploads"][0]["identifier"] == "document.custom.trust_document"

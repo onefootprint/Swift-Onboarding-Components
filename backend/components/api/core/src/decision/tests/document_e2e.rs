@@ -268,7 +268,7 @@ async fn upload_and_process_inner(
     // Upload the document
     decision::document::route_handler::handle_document_upload(
         state,
-        workflow.clone(),
+        workflow.id.clone(),
         sv_id.clone(),
         MetaHeaders::default(),
         file_upload,

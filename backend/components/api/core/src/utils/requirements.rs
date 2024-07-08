@@ -17,6 +17,7 @@ use db::models::workflow::Workflow;
 use db::models::workflow::WorkflowIdentifier;
 use db::PgConn;
 use feature_flag::BoolFlag;
+use itertools::chain;
 use itertools::Itertools;
 use newtypes::AlpacaKycState;
 use newtypes::AuthorizeFields;
@@ -184,10 +185,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
                     vec![]
                 };
 
-            Ok(business_requirements
-                .into_iter()
-                .chain(person_requirements.into_iter())
-                .collect())
+            Ok(chain!(business_requirements, person_requirements).collect())
         })
         .await?;
     Ok(requirements)

@@ -10,7 +10,10 @@ impl WorkflowState {
             Self::AlpacaKyc(_) | Self::Kyc(_) => OnboardingRequirementKind::iter()
                 .filter(|o| !matches!(o, OnboardingRequirementKind::CollectBusinessData))
                 .collect(),
-            Self::Kyb(_) => vec![OnboardingRequirementKind::CollectBusinessData],
+            Self::Kyb(_) => vec![
+                OnboardingRequirementKind::CollectBusinessData,
+                OnboardingRequirementKind::CollectDocument,
+            ],
             // Don't want to display any other requirements in a collect doc workflow
             Self::Document(_) => vec![
                 OnboardingRequirementKind::CollectDocument,

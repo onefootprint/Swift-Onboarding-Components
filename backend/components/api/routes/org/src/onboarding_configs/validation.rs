@@ -339,6 +339,10 @@ impl ObConfigurationArgsToValidate {
             }
         }
 
+        if !self.business_documents_to_collect.is_empty() && self.kind != ObConfigurationKind::Kyb {
+            return ValidationError("Cannot collect business documents in non-KYB playbook").into();
+        }
+
         Ok(())
     }
 

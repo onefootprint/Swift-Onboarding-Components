@@ -84,7 +84,7 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
     // First try without consent
     let upload_res_no_consent = decision::document::route_handler::handle_document_upload(
         state,
-        wf.clone(),
+        wf.id.clone(),
         sv.id.clone(),
         MetaHeaders::default(),
         file_upload.clone(),
@@ -113,7 +113,7 @@ async fn test_require_consent(state: &mut State, user_kind: UserKind, require_se
     // try uploading again, and we're successful
     decision::document::route_handler::handle_document_upload(
         state,
-        wf.clone(),
+        wf.id.clone(),
         sv.id.clone(),
         MetaHeaders::default(),
         file_upload,
