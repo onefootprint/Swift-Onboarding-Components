@@ -27,6 +27,7 @@ impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
         let Document {
             created_at,
             document_type,
+            vaulted_document_type,
             completed_seqno,
             document_score,
             selfie_score,
@@ -39,7 +40,7 @@ impl TryDbToApi<DocumentInfo> for api_wire_types::Document {
         } = doc;
 
         let result = Self {
-            kind: document_type,
+            kind: vaulted_document_type.unwrap_or(document_type),
             started_at: Some(created_at),
             status: Some(status),
             review_status: Some(review_status),
