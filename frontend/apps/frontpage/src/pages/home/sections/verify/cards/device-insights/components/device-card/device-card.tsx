@@ -26,7 +26,7 @@ const cardAnimation = {
   },
   animate: {
     opacity: 1,
-    y: -20,
+    y: 0,
     filter: 'blur(0px)',
   },
   exit: {
@@ -117,7 +117,7 @@ const DeviceCard = ({ icon, deviceName, date, ip, biometric, appClip, id, onWhat
 const CardContainer = styled(motion(Stack))`
   ${({ theme }) => css`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.lg};
+    border-radius: ${theme.borderRadius.xl};
     overflow: hidden;
     padding: ${theme.spacing[7]};
     background-color: rgba(255, 255, 255, 0.1);
@@ -130,6 +130,7 @@ const CardContainer = styled(motion(Stack))`
     gap: ${theme.spacing[6]};
 
     ${media.greaterThan('md')`
+      border-radius: ${theme.borderRadius.lg};
       width: 400px;
     `}
   `}
