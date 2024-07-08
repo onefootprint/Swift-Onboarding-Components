@@ -1,6 +1,7 @@
 use api_core::auth::user::UserWfSession;
 use api_core::auth::SessionContext;
 use api_core::errors::ValidationError;
+use api_core::web;
 use api_core::FpResult;
 use api_core::State;
 use db::models::document_request::DocumentRequest;
@@ -50,4 +51,14 @@ async fn get_user_or_business_for_dr<T: Into<UncheckedDrIdentifier>>(
         }
     };
     Ok(result)
+}
+
+pub fn routes(config: &mut web::ServiceConfig) {
+    index::configure_post_aliases(config);
+    upload::configure_post_aliases(config);
+    process::configure_post_aliases(config);
+    config
+        .service(index::post)
+        .service(upload::post)
+        .service(process::post);
 }

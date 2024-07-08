@@ -8,6 +8,7 @@ use api_core::utils::headers::InsightHeaders;
 use api_wire_types::CreateDocumentRequest;
 use api_wire_types::CreateDocumentResponse;
 use db::models::insight_event::CreateInsightEvent;
+use macros::route_alias;
 use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::web;
@@ -15,12 +16,16 @@ use paperclip::actix::{
     self,
 };
 
+#[route_alias(actix::post(
+    "/hosted/user/documents",
+    description = "Create a new document for the outstanding document request",
+    tags(Document, Hosted)
+))]
 #[api_v2_operation(
-    description = "Create a new identity document for this user's outstanding document request",
+    description = "Create a new document for the outstanding document request",
     tags(Document, Hosted)
 )]
-// TODO maybe we should alias to `/hosted/documents` since this will also work for businesses
-#[actix::post("/hosted/user/documents")]
+#[actix::post("/hosted/documents")]
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,

@@ -134,6 +134,130 @@
                 ]
             }
         },
+        "/hosted/documents": {
+            "post": {
+                "tags": [
+                    "Document",
+                    "Hosted"
+                ],
+                "description": "Create a new document for the outstanding document request",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDocumentRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateDocumentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Onboarding Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/documents/{id}/process": {
+            "post": {
+                "tags": [
+                    "Document",
+                    "Hosted"
+                ],
+                "description": "Process the document and run any vendor verifications.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Onboarding Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/documents/{id}/upload/{side}": {
+            "post": {
+                "tags": [
+                    "Document",
+                    "Hosted"
+                ],
+                "description": "Upload an image for the given side to the provided document.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "side",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "front",
+                                "back",
+                                "selfie"
+                            ]
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Onboarding Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/identify": {
             "post": {
                 "tags": [
@@ -1257,7 +1381,7 @@
                     "Document",
                     "Hosted"
                 ],
-                "description": "Create a new identity document for this user's outstanding document request",
+                "description": "Create a new document for the outstanding document request",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -1293,7 +1417,7 @@
                     "Document",
                     "Hosted"
                 ],
-                "description": "Continue processing the ID doc, if any remaining",
+                "description": "Process the document and run any vendor verifications.",
                 "parameters": [
                     {
                         "in": "path",
@@ -1330,7 +1454,7 @@
                     "Document",
                     "Hosted"
                 ],
-                "description": "Upload an image for the given side to the provided ID doc.",
+                "description": "Upload an image for the given side to the provided document.",
                 "parameters": [
                     {
                         "in": "path",
@@ -5131,7 +5255,6 @@
                             "pass",
                             "manual_review",
                             "step_up",
-                            "document_decision",
                             "use_rules_outcome"
                         ]
                     },
@@ -5142,7 +5265,6 @@
                             "pass",
                             "manual_review",
                             "step_up",
-                            "document_decision",
                             "use_rules_outcome"
                         ]
                     }
@@ -5158,7 +5280,6 @@
                             "pass",
                             "manual_review",
                             "step_up",
-                            "document_decision",
                             "use_rules_outcome"
                         ]
                     }

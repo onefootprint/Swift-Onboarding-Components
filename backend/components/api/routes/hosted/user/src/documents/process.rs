@@ -7,6 +7,7 @@ use api_core::decision::document::route_handler::IsRerun;
 use api_core::types::ApiResponse;
 use api_core::State;
 use api_wire_types::DocumentResponse;
+use macros::route_alias;
 use newtypes::DocumentId;
 use newtypes::WorkflowGuard;
 use paperclip::actix::api_v2_operation;
@@ -15,11 +16,16 @@ use paperclip::actix::{
     self,
 };
 
+#[route_alias(actix::post(
+    "/hosted/user/documents/{id}/process",
+    description = "Process the document and run any vendor verifications.",
+    tags(Document, Hosted)
+))]
 #[api_v2_operation(
-    description = "Continue processing the ID doc, if any remaining",
+    description = "Process the document and run any vendor verifications.",
     tags(Document, Hosted)
 )]
-#[actix::post("/hosted/user/documents/{id}/process")]
+#[actix::post("/hosted/documents/{id}/process")]
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,

@@ -8,6 +8,7 @@ use api_core::decision::document::meta_headers::MetaHeaders;
 use api_core::decision::document::route_handler::handle_document_upload;
 use api_core::types::ApiResponse;
 use api_core::utils::file_upload::handle_file_upload;
+use macros::route_alias;
 use newtypes::DocumentId;
 use newtypes::DocumentSide;
 use newtypes::WorkflowGuard;
@@ -20,11 +21,16 @@ use paperclip::actix::{
 const MIN_DOCUMENT_SIZE_IN_BYTES: usize = 100;
 const MAX_DOCUMENT_SIZE_IN_BYTES: usize = 5_242_880;
 
+#[route_alias(actix::post(
+    "/hosted/user/documents/{id}/upload/{side}",
+    description = "Upload an image for the given side to the provided document.",
+    tags(Document, Hosted)
+))]
 #[api_v2_operation(
-    description = "Upload an image for the given side to the provided ID doc.",
+    description = "Upload an image for the given side to the provided document.",
     tags(Document, Hosted)
 )]
-#[actix::post("/hosted/user/documents/{id}/upload/{side}")]
+#[actix::post("/hosted/documents/{id}/upload/{side}")]
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserWfAuthContext,

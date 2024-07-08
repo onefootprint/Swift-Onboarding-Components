@@ -5891,6 +5891,42 @@
                 ]
             }
         },
+        "/org/vault_dr/reveal_wrapped_record_keys": {
+            "post": {
+                "tags": [
+                    "VaultDisasterRecovery",
+                    "Private"
+                ],
+                "description": "Reveals the wrapped record keys necessary to decrypt the Vault Disaster Recovery backups for the given fp_id fields",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VaultDrRevealWrappedRecordKeysRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VaultDrRevealWrappedRecordKeysResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/org/vault_dr/status": {
             "get": {
                 "tags": [
@@ -9215,6 +9251,12 @@
                     "allow_us_territories": {
                         "type": "boolean"
                     },
+                    "business_documents_to_collect": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
                     "can_access_data": {
                         "type": "array",
                         "items": {
@@ -9686,6 +9728,7 @@
                 },
                 "required": [
                     "allow_international_residents",
+                    "business_documents_to_collect",
                     "can_access_data",
                     "documents_to_collect",
                     "is_doc_first_flow",
@@ -20652,6 +20695,12 @@
                                         "firm_employee"
                                     ]
                                 },
+                                "business_documents_to_collect": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
                                 "can_access_data": {
                                     "type": "array",
                                     "items": {
@@ -21163,6 +21212,7 @@
                                 "allow_international_residents",
                                 "allow_us_residents",
                                 "allow_us_territory_residents",
+                                "business_documents_to_collect",
                                 "can_access_data",
                                 "created_at",
                                 "curp_validation_enabled",
@@ -21645,6 +21695,12 @@
                             "footprint",
                             "firm_employee"
                         ]
+                    },
+                    "business_documents_to_collect": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "can_access_data": {
                         "type": "array",
@@ -22157,6 +22213,7 @@
                     "allow_international_residents",
                     "allow_us_residents",
                     "allow_us_territory_residents",
+                    "business_documents_to_collect",
                     "can_access_data",
                     "created_at",
                     "curp_validation_enabled",
@@ -25626,8 +25683,11 @@
                     "aws_role_name": {
                         "type": "string"
                     },
-                    "org_public_key": {
-                        "type": "string"
+                    "org_public_keys": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "re_enroll": {
                         "type": "boolean"
@@ -25639,12 +25699,38 @@
                 "required": [
                     "aws_account_id",
                     "aws_role_name",
-                    "org_public_key",
+                    "org_public_keys",
                     "s3_bucket_name"
                 ]
             },
             "VaultDrEnrollResponse": {
                 "type": "object"
+            },
+            "VaultDrRevealWrappedRecordKeysRequest": {
+                "type": "object",
+                "properties": {
+                    "record_paths": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "record_paths"
+                ]
+            },
+            "VaultDrRevealWrappedRecordKeysResponse": {
+                "type": "object",
+                "properties": {
+                    "wrapped_record_keys": {
+                        "description": "Maps record paths to their wrapped record keys.",
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "wrapped_record_keys"
+                ]
             },
             "VaultDrStatus": {
                 "type": "object",
@@ -25662,8 +25748,11 @@
                                 "type": "string",
                                 "format": "date-time"
                             },
-                            "org_public_key": {
-                                "type": "string"
+                            "org_public_keys": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
                             },
                             "s3_bucket_name": {
                                 "type": "string"
@@ -25673,7 +25762,7 @@
                             "aws_account_id",
                             "aws_role_name",
                             "enrolled_at",
-                            "org_public_key",
+                            "org_public_keys",
                             "s3_bucket_name"
                         ]
                     },
