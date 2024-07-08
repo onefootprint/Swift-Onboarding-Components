@@ -56,6 +56,10 @@ const person: Record<string, Field> = {
     autoComplete: 'tel',
     className: 'fp-phone-input',
     type: 'tel',
+    mask: {
+      prefix: '+',
+      noImmediatePrefix: true,
+    },
     validations: {
       required: 'Phone is required',
       validate: (value: string) => {
@@ -268,6 +272,10 @@ const business: Record<string, Field> = {
     autoComplete: 'tel',
     className: 'fp-business-phone-input',
     type: 'tel',
+    mask: {
+      prefix: '+',
+      noImmediatePrefix: true,
+    },
     validations: {
       required: 'Phone is required',
       validate: (value: string) => {
