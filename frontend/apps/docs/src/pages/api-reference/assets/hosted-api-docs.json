@@ -1375,7 +1375,7 @@
                 ]
             }
         },
-        "/hosted/user/documents": {
+        "/hosted/documents": {
             "post": {
                 "tags": [
                     "Document",
@@ -1411,7 +1411,7 @@
                 ]
             }
         },
-        "/hosted/user/documents/{id}/process": {
+        "/hosted/documents/{id}/process": {
             "post": {
                 "tags": [
                     "Document",
@@ -1448,7 +1448,7 @@
                 ]
             }
         },
-        "/hosted/user/documents/{id}/upload/{side}": {
+        "/hosted/documents/{id}/upload/{side}": {
             "post": {
                 "tags": [
                     "Document",

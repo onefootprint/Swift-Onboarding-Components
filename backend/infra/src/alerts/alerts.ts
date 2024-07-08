@@ -16,13 +16,13 @@ export interface Alert {
 
 /// Endpoints whose latency we never want to alert on
 const IGNORE_LATENT_HTTP_ROUTES: string[] = [
-  '/hosted/user/documents/{id}/upload/{side}', // Latency can be a function of user network connection :/
+  '/hosted/documents/{id}/upload/{side}', // Latency can be a function of user network connection :/
   '/entities/{fp_id}/ai_summarize', // This is a long-running operation because of the OpenAI api
 ];
 /// Generally higher-latency HTTP requests that we want to have a higher alert threshold
 const LATENT_HTTP_ROUTES: string[] = [
   '/vault_proxy/reflect',
-  '/hosted/user/documents/{id}/process',
+  '/hosted/documents/{id}/process',
   '/hosted/onboarding/tel',
   '/users/{fp_id}/kyc',
 ];

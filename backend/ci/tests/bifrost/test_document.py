@@ -45,24 +45,24 @@ def test_upload_documents(doc_request_sandbox_ob_config):
         "document_type": "id_card",
         "country_code": "US",
     }
-    id = post("hosted/user/documents", data, bifrost.auth_token)["id"]
+    id = post("hosted/documents", data, bifrost.auth_token)["id"]
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
 
     post(
-        f"hosted/user/documents/{id}/upload/front",
+        f"hosted/documents/{id}/upload/front",
         None,
         bifrost.auth_token,
         files=bifrost.data["document.drivers_license.front.image"](),
     )
-    post(f"hosted/user/documents/{id}/process", None, bifrost.auth_token)
+    post(f"hosted/documents/{id}/process", None, bifrost.auth_token)
 
     data = {
         "request_id": doc_requirement["document_request_id"],
         "document_type": "drivers_license",
         "country_code": "US",
     }
-    post("hosted/user/documents", data, bifrost.auth_token)
+    post("hosted/documents", data, bifrost.auth_token)
 
     # Running bifrost should inherit the already-created DL session
     user = bifrost.run()
@@ -212,7 +212,7 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
         "document_type": "drivers_license",
         "country_code": "NO",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    body = post("hosted/documents", data, bifrost.auth_token, status_code=400)
     assert body["message"].startswith(
         "Unsupported document country. Supported document countries:"
     )
@@ -226,7 +226,7 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
         "document_type": "id_card",
         "country_code": "US",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    body = post("hosted/documents", data, bifrost.auth_token, status_code=400)
     assert (
         body["message"]
         == "Unsupported document type. Supported document types: drivers_license"
@@ -264,7 +264,7 @@ def test_upload_documents_with_ob_config_restriction(
         "document_type": "drivers_license",
         "country_code": "MX",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    body = post("hosted/documents", data, bifrost.auth_token, status_code=400)
     assert (
         body["message"]
         == "Unsupported document type. Supported document types: passport"
@@ -276,7 +276,7 @@ def test_upload_documents_with_ob_config_restriction(
         "document_type": "passport",
         "country_code": "NO",
     }
-    post("hosted/user/documents", data, bifrost.auth_token)
+    post("hosted/documents", data, bifrost.auth_token)
 
     # Can upload a US DL
     data = {
@@ -284,7 +284,7 @@ def test_upload_documents_with_ob_config_restriction(
         "document_type": "drivers_license",
         "country_code": "US",
     }
-    post("hosted/user/documents", data, bifrost.auth_token)
+    post("hosted/documents", data, bifrost.auth_token)
 
     bifrost.handle_requirements(kind="collect_document")
     status = bifrost.get_status()
@@ -326,7 +326,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
         "document_type": "drivers_license",
         "country_code": "MX",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    body = post("hosted/documents", data, bifrost.auth_token, status_code=400)
     assert (
         body["message"]
         == "Unsupported document type. Supported document types: passport"
@@ -338,7 +338,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
         "document_type": "passport",
         "country_code": "US",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    body = post("hosted/documents", data, bifrost.auth_token, status_code=400)
     assert (
         body["message"]
         == "Unsupported document type. Supported document types: drivers_license"
@@ -350,7 +350,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
         "document_type": "voter_identification",
         "country_code": "US",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token, status_code=400)
+    body = post("hosted/documents", data, bifrost.auth_token, status_code=400)
     assert (
         body["message"]
         == "Unsupported document type. Supported document types: drivers_license"
@@ -362,7 +362,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
         "document_type": "passport",
         "country_code": "NO",
     }
-    post("hosted/user/documents", data, bifrost.auth_token)
+    post("hosted/documents", data, bifrost.auth_token)
 
     # Can upload a US DL
     data = {
@@ -370,7 +370,7 @@ def test_upload_documents_with_new_ob_config_document_and_countries_field(
         "document_type": "drivers_license",
         "country_code": "US",
     }
-    post("hosted/user/documents", data, bifrost.auth_token)
+    post("hosted/documents", data, bifrost.auth_token)
 
     bifrost.handle_requirements(kind="collect_document")
     status = bifrost.get_status()
@@ -403,7 +403,7 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config):
         "skip_selfie": True,
         "device_type": "desktop",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token)
+    body = post("hosted/documents", data, bifrost.auth_token)
     doc_id = body["id"]
 
     # Upload the documents consecutively in separate requests
@@ -413,13 +413,13 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config):
             "x-fp-process-separately": "true",
         }
         post(
-            f"hosted/user/documents/{doc_id}/upload/{side}",
+            f"hosted/documents/{doc_id}/upload/{side}",
             None,
             bifrost.auth_token,
             files=bifrost.data[f"document.drivers_license.{side}.image"](),
             addl_headers=headers,
         )
-        post(f"hosted/user/documents/{doc_id}/process", None, bifrost.auth_token)
+        post(f"hosted/documents/{doc_id}/process", None, bifrost.auth_token)
     # now check what fields we have to authorize
     status = bifrost.get_status()
     fields_to_authorize = get_requirement_from_requirements(
@@ -449,9 +449,9 @@ def test_upload_apis(doc_request_sandbox_ob_config):
         "country_code": "US",
         "device_type": "desktop",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token)
+    body = post("hosted/documents", data, bifrost.auth_token)
     doc_id = body["id"]
-    body = post("hosted/user/documents", data, bifrost.auth_token)
+    body = post("hosted/documents", data, bifrost.auth_token)
     assert body["id"] == doc_id
 
     # Now, make a drivers_license session. Should have a different ID
@@ -461,7 +461,7 @@ def test_upload_apis(doc_request_sandbox_ob_config):
         "country_code": "US",
         "device_type": "desktop",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token)
+    body = post("hosted/documents", data, bifrost.auth_token)
     assert body["id"] != doc_id
     doc_id = body["id"]
 
@@ -473,13 +473,13 @@ def test_upload_apis(doc_request_sandbox_ob_config):
             "x-fp-is-extra-compressed": "true" if side == "front" else "false",
         }
         post(
-            f"hosted/user/documents/{doc_id}/upload/{side}",
+            f"hosted/documents/{doc_id}/upload/{side}",
             None,
             bifrost.auth_token,
             files=bifrost.data[f"document.drivers_license.{side}.image"](),
             addl_headers=headers,
         )
-        body = post(f"hosted/user/documents/{doc_id}/process", None, bifrost.auth_token)
+        body = post(f"hosted/documents/{doc_id}/process", None, bifrost.auth_token)
         next_side = sides[i + 1] if i + 1 < len(sides) else None
         assert body["next_side_to_collect"] == next_side
         assert not body["errors"]
@@ -515,11 +515,11 @@ def test_user_uploading_small_image(doc_request_sandbox_ob_config):
         "skip_selfie": True,
         "device_type": "desktop",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token)
+    body = post("hosted/documents", data, bifrost.auth_token)
     doc_id = body["id"]
 
     body = post(
-        f"hosted/user/documents/{doc_id}/upload/front",
+        f"hosted/documents/{doc_id}/upload/front",
         None,
         bifrost.auth_token,
         files=open_multipart_file("small_image.png", "image/png")(),
@@ -548,7 +548,7 @@ def test_user_having_trouble_with_their_mobile_camera(
         "country_code": "US",
         "device_type": "desktop",
     }
-    body = post("hosted/user/documents", data, bifrost.auth_token)
+    body = post("hosted/documents", data, bifrost.auth_token)
     doc_id = body["id"]
 
     # Upload the documents consecutively in separate requests
@@ -559,13 +559,13 @@ def test_user_having_trouble_with_their_mobile_camera(
             "x-fp-is-forced-upload": "true",
         }
         post(
-            f"hosted/user/documents/{doc_id}/upload/{side}",
+            f"hosted/documents/{doc_id}/upload/{side}",
             None,
             bifrost.auth_token,
             files=bifrost.data[f"document.drivers_license.{side}.image"](),
             addl_headers=headers,
         )
-        post(f"hosted/user/documents/{doc_id}/process", None, bifrost.auth_token)
+        post(f"hosted/documents/{doc_id}/process", None, bifrost.auth_token)
 
     # Finish bifrost
     user = bifrost.run()

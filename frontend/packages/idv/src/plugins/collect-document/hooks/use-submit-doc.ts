@@ -10,7 +10,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
   formData.set('upload', image);
   const response = await request<SubmitDocResponse>({
     method: 'POST',
-    url: `/hosted/user/documents/${id}/upload/${side}`,
+    url: `/hosted/documents/${id}/upload/${side}`,
     data: formData,
     headers: {
       [AUTH_HEADER]: authToken,

@@ -44,7 +44,7 @@ use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::WorkflowId;
 
-/// Route handler for "/hosted/user/documents"
+/// Route handler for "/hosted/documents"
 pub async fn handle_document_create(
     state: &State,
     create_identity_document_request: CreateDocumentRequest,
@@ -180,7 +180,7 @@ pub async fn handle_document_create(
     Ok(id_doc.id)
 }
 
-/// Route handler for "/hosted/user/documents/{id}/upload/{side}"
+/// Route handler for "/hosted/documents/{id}/upload/{side}"
 #[allow(clippy::too_many_arguments)]
 pub async fn handle_document_upload(
     state: &State,
@@ -278,7 +278,7 @@ pub async fn handle_document_upload(
 pub struct IsRerun(pub bool);
 pub struct IncodeConfigurationIdOverride(pub Option<IncodeConfigurationId>);
 
-/// Route handler for /hosted/user/documents/{id}/process
+/// Route handler for /hosted/documents/{id}/process
 /// TODO: appclip special logic
 pub async fn handle_document_process(
     state: &State,

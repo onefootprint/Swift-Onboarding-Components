@@ -7,7 +7,7 @@ const processDoc = async (payload: ProcessDocRequest) => {
   const { authToken, id } = payload;
   const response = await request<ProcessDocResponse>({
     method: 'POST',
-    url: `/hosted/user/documents/${id}/process`,
+    url: `/hosted/documents/${id}/process`,
     headers: {
       [AUTH_HEADER]: authToken,
     },

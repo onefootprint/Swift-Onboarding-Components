@@ -311,7 +311,7 @@ class BifrostClient:
             "document_type": doc_kind,
             "country_code": country_code,
         }
-        body = post("hosted/user/documents", data, self.auth_token)
+        body = post("hosted/documents", data, self.auth_token)
         doc_id = body["id"]
 
         # Upload the documents consecutively in separate requests
@@ -323,15 +323,13 @@ class BifrostClient:
                 "x-fp-is-mobile": "true",
             }
             post(
-                f"hosted/user/documents/{doc_id}/upload/{side}",
+                f"hosted/documents/{doc_id}/upload/{side}",
                 None,
                 self.auth_token,
                 files=file,
                 addl_headers=headers,
             )
-            body = post(
-                f"hosted/user/documents/{doc_id}/process", None, self.auth_token
-            )
+            body = post(f"hosted/documents/{doc_id}/process", None, self.auth_token)
             next_side = sides[i + 1] if i + 1 < len(sides) else None
             assert body["next_side_to_collect"] == next_side
             assert not body["errors"]

@@ -14,7 +14,7 @@ const uploadDoc = async ({
 }: UploadDocRequest) => {
   const response = await request<UploadDocResponse>({
     method: 'POST',
-    url: `/hosted/user/documents/${docId}/upload/${side}`,
+    url: `/hosted/documents/${docId}/upload/${side}`,
     data,
     headers: {
       [AUTH_HEADER]: authToken,

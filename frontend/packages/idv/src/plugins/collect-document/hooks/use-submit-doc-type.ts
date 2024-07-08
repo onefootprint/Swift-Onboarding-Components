@@ -7,7 +7,7 @@ const submitDocType = async (payload: SubmitDocTypeRequest) => {
   const { authToken, documentType, requestId, countryCode, fixtureResult, skipSelfie, deviceType } = payload;
   const response = await request<SubmitDocTypeResponse>({
     method: 'POST',
-    url: '/hosted/user/documents',
+    url: '/hosted/documents',
     data: {
       documentType,
       countryCode,

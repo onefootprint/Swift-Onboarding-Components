@@ -131,7 +131,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
 export const withSubmitDocTypeAndCountry = () => {
   mockRequest({
     method: 'post',
-    path: '/hosted/user/documents',
+    path: '/hosted/documents',
     statusCode: 200,
     response: {
       id: 'testID',
@@ -142,7 +142,7 @@ export const withSubmitDocTypeAndCountry = () => {
 export const withSubmitDocTypeAndCountryError = () => {
   mockRequest({
     method: 'post',
-    path: '/hosted/user/documents',
+    path: '/hosted/documents',
     statusCode: 400,
     response: {
       message: 'Something went wrong',

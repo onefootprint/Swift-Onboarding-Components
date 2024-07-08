@@ -102,7 +102,7 @@ export const initialContextDLSelfie: MachineContext = {
 export const withSubmitDocFront = () => {
   mockRequest({
     method: 'post',
-    path: '/hosted/user/documents/testID/upload/front',
+    path: '/hosted/documents/testID/upload/front',
     statusCode: 200,
     response: {
       errors: [],
@@ -115,7 +115,7 @@ export const withSubmitDocFront = () => {
 export const withSubmitDocBack = () => {
   mockRequest({
     method: 'post',
-    path: '/hosted/user/documents/testID/upload/back',
+    path: '/hosted/documents/testID/upload/back',
     statusCode: 200,
     response: {
       errors: [],
@@ -128,7 +128,7 @@ export const withSubmitDocBack = () => {
 export const withSubmitDocSelfie = () => {
   mockRequest({
     method: 'post',
-    path: '/hosted/user/documents/testID/upload/selfie',
+    path: '/hosted/documents/testID/upload/selfie',
     statusCode: 200,
     response: {
       errors: [],

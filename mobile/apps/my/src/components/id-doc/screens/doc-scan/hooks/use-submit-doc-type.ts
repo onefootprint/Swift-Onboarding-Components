@@ -15,7 +15,7 @@ const submitDocType = async ({
 }: SubmitDocTypeRequest) => {
   const response = await request<SubmitDocTypeResponse>({
     method: 'POST',
-    url: '/hosted/user/documents',
+    url: '/hosted/documents',
     data: {
       documentType,
       countryCode,
