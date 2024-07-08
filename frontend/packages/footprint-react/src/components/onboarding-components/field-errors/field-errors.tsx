@@ -9,7 +9,7 @@ import fieldContext from '../field-context';
 
 export type FieldErrorsProps = HTMLAttributes<HTMLDivElement>;
 
-const FieldErrors = ({ className, children, ...props }: FieldErrorsProps) => {
+const FieldErrors = ({ className, ...props }: FieldErrorsProps) => {
   const { name } = useContext(fieldContext);
   const {
     formState: { errors },
