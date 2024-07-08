@@ -3,9 +3,6 @@
     "errors": {}
   },
   "components": {
-    "message-banner": {
-      "cta": "Read more"
-    },
     "developer-experience": {
       "title": "Developer experience like no other",
       "subtitle": "Just five lines of code, Footprint is quick and easy to integrate into your product",
@@ -186,6 +183,10 @@
           "text": "Changelog",
           "href": "/changelog"
         }
+      },
+      "message-banner": {
+        "text": "Footprint raises $13M Series A led by QED Investors",
+        "cta": "Read more"
       }
     },
     "subscribe-to-newsletter": {

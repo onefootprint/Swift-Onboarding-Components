@@ -1,9 +1,7 @@
 import { IcoCloseSmall16 } from '@onefootprint/icons';
-import { Stack, createFontStyles, media } from '@onefootprint/ui';
+import { LinkButton, Stack, createFontStyles, media } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import Link from 'next/link';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 type MessageBannerProps = {
@@ -11,15 +9,12 @@ type MessageBannerProps = {
   showBanner: boolean;
   articleUrl: string;
   text: string;
+  cta: string;
 };
 
 export const CASE_STUDY_BANNER_PORTAL_ID = 'banner-portal';
 
-const MessageBanner = ({ onClose, articleUrl, text, showBanner }: MessageBannerProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'components.message-banner',
-  });
-
+const MessageBanner = ({ onClose, articleUrl, text, cta, showBanner }: MessageBannerProps) => {
   const containerVariants = {
     initial: { opacity: 1, height: 0 },
     animate: {
@@ -49,7 +44,10 @@ const MessageBanner = ({ onClose, articleUrl, text, showBanner }: MessageBannerP
       {showBanner && (
         <Container variants={containerVariants} initial="initial" animate="animate" exit="exit">
           <motion.p variants={textVariants} initial="initial" animate="animate">
-            {text}. <StyledLink href={articleUrl}>{t('cta')}</StyledLink>
+            {text}.{' '}
+            <LinkButton href={articleUrl} target="_blank" variant="label-3">
+              {cta}
+            </LinkButton>
           </motion.p>
           <CloseButtonContainer onClick={onClose}>
             <IcoCloseSmall16 />
@@ -95,15 +93,6 @@ const CloseButtonContainer = styled.button`
     right: ${theme.spacing[5]};
     top: 50%;
     transform: translateY(-50%);
-  `}
-`;
-
-const StyledLink = styled(Link)`
-  ${({ theme }) => css`
-    ${createFontStyles('label-3')}
-    color: ${theme.color.accent};
-    margin-left: ${theme.spacing[1]};
-    text-decoration: none;
   `}
 `;
 

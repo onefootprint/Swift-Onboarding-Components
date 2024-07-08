@@ -142,7 +142,8 @@ const Navbar = () => {
         showBanner={isBannerVisible}
         onClose={handleCloseBanner}
         articleUrl={ARTICLE_URL}
-        text="Footprint raised $13M Series A led by QED Investors"
+        text={t('message-banner.text')}
+        cta={t('message-banner.cta')}
       />
       <Container>
         <Inner id="navbar">
