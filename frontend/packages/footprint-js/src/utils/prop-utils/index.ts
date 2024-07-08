@@ -1,8 +1,10 @@
 export {
+  getBootstrapData,
   getCallbackFunction,
   getCallbackProps,
   getDefaultVariantForKind,
   getRefProps,
+  isObject,
   sanitizeAndValidateProps,
   transformVerifyButtonProps,
   validateComponentKind,

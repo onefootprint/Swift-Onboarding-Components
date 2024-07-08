@@ -3,6 +3,7 @@ import { describe, expect, mock, test } from 'bun:test';
 import type { Variant, VerifyButtonProps } from '../../types/components';
 import { ComponentKind } from '../../types/components';
 import {
+  getBootstrapData,
   getCallbackProps,
   getDefaultVariantForKind,
   transformVerifyButtonProps,
@@ -151,7 +152,7 @@ describe('validateComponentKind', () => {
 
     const fn2 = () => validateComponentKind('banana' as unknown as ComponentKind);
     expect(fn2).toThrow(
-      'Invalid kind: banana. Valid kinds are: auth, form, render, update_login_methods, verify, components, verify-button',
+      'Invalid kind: banana. Valid kinds are: auth, components, form, render, update_login_methods, verify, verify-button',
     );
   });
 });
@@ -192,5 +193,39 @@ describe('transformVerifyButtonProps', () => {
       publicKey: 'publicKey',
       variant: 'drawer',
     });
+  });
+});
+
+describe('getBootstrapData', () => {
+  test('should return userData when props has bootstrapData with keys', () => {
+    const result = getBootstrapData({ bootstrapData: { key: 'value' } });
+    expect(result).toEqual({ userData: { key: 'value' } });
+  });
+
+  test('should return userData when props has userData with keys', () => {
+    const result = getBootstrapData({ userData: { key: 'value' } });
+    expect(result).toEqual({ userData: { key: 'value' } });
+  });
+
+  test('should return undefined when props has neither bootstrapData nor userData', () => {
+    const result = getBootstrapData({});
+    expect(result).toBeUndefined();
+  });
+
+  test('should return undefined when both bootstrapData and userData are empty.', () => {
+    // @ts-expect-error: banana is should not be in props
+    const result = getBootstrapData({ bootstrapData: {}, userData: {}, banana: { a: 1 } });
+    expect(result).toBeUndefined();
+  });
+
+  test('should prioritize bootstrapData', () => {
+    const result = getBootstrapData({ bootstrapData: { key: 'value' }, userData: { key: 'value' } });
+    expect(result).toEqual({ userData: { key: 'value' } });
+  });
+
+  test('should fallback to userData', () => {
+    // @ts-expect-error: otherData is should not be in props
+    const result = getBootstrapData({ bootstrapData: {}, otherData: { key: 'value' }, userData: { key: 'value' } });
+    expect(result).toEqual({ userData: { key: 'value' } });
   });
 });

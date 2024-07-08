@@ -1,7 +1,6 @@
 import type { Window } from '../@types/global';
 import type { Appearance } from '../types/appearance';
-
-const isObject = (obj: unknown) => typeof obj === 'object' && !!obj;
+import { isObject } from './prop-utils';
 
 export const getEncodedAppearance = ({ fontSrc, variables = {}, rules = {}, variant }: Appearance = {}) => {
   const getVariables = () =>

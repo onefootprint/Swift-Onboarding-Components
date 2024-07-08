@@ -1,13 +1,13 @@
 import type { Appearance } from './appearance';
-import type { FootprintUserData as UserData } from './user-data';
+import type { BootstrapData, FootprintUserData } from './bootstrap-data';
 
 export enum ComponentKind {
   Auth = 'auth',
+  Components = 'components',
   Form = 'form',
   Render = 'render',
   UpdateLoginMethods = 'update_login_methods',
   Verify = 'verify',
-  Components = 'components',
   VerifyButton = 'verify-button',
 }
 
@@ -50,13 +50,17 @@ export type PropsBase = {
 export type VerifyAuthToken = { authToken: string; publicKey?: never };
 export type VerifyPublicKey = { publicKey: string; authToken?: never };
 type VerifyVariant = 'modal' | 'drawer';
+type BootstrapKeys = 'userData' | 'bootstrapData';
+type VerifyDataKeys = BootstrapKeys | 'publicKey' | 'options' | 'authToken' | 'l10n';
 type VerifyPropsBase<TAuth> = PropsBase & {
+  readonly bootstrapData?: BootstrapData;
   readonly onAuth?: (validationToken: string) => void;
   readonly onCancel?: () => void;
   readonly onClose?: () => void;
   readonly onComplete?: (validationToken: string) => void;
   readonly options?: Options;
-  readonly userData?: UserData;
+  /** @deprecated use bootstrapData instead */
+  readonly userData?: FootprintUserData;
 } & TAuth;
 
 export type VerifyProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
@@ -64,7 +68,6 @@ export type VerifyProps = VerifyPropsBase<VerifyAuthToken | VerifyPublicKey> & {
   readonly variant?: VerifyVariant;
 };
 
-type VerifyDataKeys = 'publicKey' | 'userData' | 'options' | 'authToken' | 'l10n';
 // The subset of VerifyProps that are sent to the iframe via sdk_args
 export type VerifyDataProps = Pick<VerifyProps, VerifyDataKeys> & {
   isComponentsSdk?: boolean;
@@ -129,12 +132,14 @@ export type FormDataProps = Pick<FormProps, 'authToken' | 'options' | 'title' | 
 
 /** auth */
 type AuthPropsBase = PropsBase & {
+  readonly bootstrapData?: Pick<BootstrapData, 'id.email' | 'id.phone_number'>;
   readonly kind: ComponentKind.Auth;
   readonly onCancel?: () => void;
   readonly onClose?: () => void;
   readonly onComplete?: (validationToken: string) => void;
   readonly options?: Pick<Options, 'showLogo'>;
-  readonly userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
+  /** @deprecated: use bootstrapData instead */
+  readonly userData?: Pick<FootprintUserData, 'id.email' | 'id.phone_number'>;
   readonly variant?: 'modal' | 'drawer';
 };
 
@@ -146,18 +151,23 @@ export type AuthProps = AuthPropsBase & {
 };
 export type AuthDataProps = Pick<
   AuthProps,
-  'authToken' | 'updateLoginMethods' | 'publicKey' | 'userData' | 'l10n' | 'options'
+  BootstrapKeys | 'authToken' | 'updateLoginMethods' | 'publicKey' | 'l10n' | 'options'
 >;
 
 /** update_login_methods */
 export type UpdateLoginMethodsProps = PropsBase & {
+  readonly authToken?: string;
+  readonly bootstrapData?: Pick<BootstrapData, 'id.email' | 'id.phone_number'>;
   readonly kind: ComponentKind.UpdateLoginMethods;
   readonly onCancel?: () => void;
   readonly onClose?: () => void;
   readonly onComplete?: (validationToken: string) => void;
   readonly options?: Pick<Options, 'showLogo'>;
-  readonly userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
+  /** @deprecated use bootstrapData instead */
+  readonly userData?: Pick<FootprintUserData, 'id.email' | 'id.phone_number'>;
   readonly variant?: 'modal' | 'drawer';
-  readonly authToken?: string;
 };
-export type UpdateLoginMethodsDataProps = Pick<UpdateLoginMethodsProps, 'authToken' | 'userData' | 'l10n' | 'options'>;
+export type UpdateLoginMethodsDataProps = Pick<
+  UpdateLoginMethodsProps,
+  BootstrapKeys | 'authToken' | 'l10n' | 'options'
+>;

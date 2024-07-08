@@ -42,5 +42,5 @@ export {
   PublicEvent as FootprintPublicEvent,
 } from './types/events';
 export type { IdentifyRequest as FootprintIdentifyRequest } from './types/identify';
-export type { FootprintUserData } from './types/user-data';
+export type { FootprintUserData, BootstrapData as FootprintBootstrapData } from './types/bootstrap-data';
 export { default as identifyFootprintUser } from './utils/identify-user';

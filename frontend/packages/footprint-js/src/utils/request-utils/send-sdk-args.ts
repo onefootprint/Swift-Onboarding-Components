@@ -8,11 +8,13 @@ import type {
   VerifyDataProps,
 } from '../../types/components';
 import { ComponentKind } from '../../types/components';
+import { getBootstrapData } from '../prop-utils';
 import { isAuthUpdateLoginMethods, isUpdateLoginMethods } from '../type-guards';
 import { API_BASE_URL, SDK_NAME, SDK_VERSION, SdkKind, SdkKindByComponentKind } from './constants';
 import transformKeys from './transform-keys';
 
 const NUM_RETRIES = 3;
+const IS_BACKEND_ACCEPTING_AUTH_TOKEN = false;
 
 type SendSdkArgsResponse = { token: string; expires_at: string };
 type SendSdkArgsRequest =
@@ -40,18 +42,18 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
 
   if (kind === ComponentKind.Verify || kind === ComponentKind.Components) {
     return {
+      ...getBootstrapData(props),
       publicKey: props.publicKey,
       authToken: props.authToken,
-      userData: props.userData,
       options: props.options,
       l10n: props.l10n,
       isComponentsSdk: kind === ComponentKind.Components,
-    } as VerifyDataProps;
+    };
   }
   if (kind === ComponentKind.UpdateLoginMethods) {
     return {
+      ...getBootstrapData(props),
       authToken: props.authToken,
-      userData: props.userData,
       options: props.options,
       l10n: props.l10n,
     };
@@ -59,18 +61,25 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
   if (kind === ComponentKind.Auth) {
     return isAuthUpdateLoginMethods(props)
       ? {
+          ...getBootstrapData(props),
           authToken: props.authToken,
           updateLoginMethods: props.updateLoginMethods,
-          userData: props.userData,
           options: props.options,
           l10n: props.l10n,
         }
-      : {
-          publicKey: props.publicKey,
-          userData: props.userData,
-          options: props.options,
-          l10n: props.l10n,
-        };
+      : props.authToken && IS_BACKEND_ACCEPTING_AUTH_TOKEN // Delete "IS_BACKEND_ACCEPTING_AUTH_TOKEN" variable when backend accepts auth token
+        ? {
+            ...getBootstrapData(props),
+            authToken: props.authToken,
+            options: props.options,
+            l10n: props.l10n,
+          }
+        : {
+            ...getBootstrapData(props),
+            publicKey: props.publicKey,
+            options: props.options,
+            l10n: props.l10n,
+          };
   }
   if (kind === ComponentKind.Form) {
     return {
@@ -93,8 +102,8 @@ export const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
   }
   if (kind === ComponentKind.VerifyButton) {
     return {
+      ...getBootstrapData(props),
       publicKey: props.publicKey,
-      userData: props.userData,
       options: props.options,
       authToken: props.authToken,
       label: props.label,

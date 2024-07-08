@@ -1,5 +1,6 @@
+import type { BootstrapData, FootprintUserData } from '../../types/bootstrap-data';
 import type { IdentifyRequest } from '../../types/identify';
-import type { FootprintUserData } from '../../types/user-data';
+import { isObject } from '../prop-utils';
 
 const isTest = process.env.NODE_ENV === 'test';
 const baseUrl = process.env.API_BASE_URL ?? isTest ? 'http://test' : '';
@@ -17,12 +18,11 @@ const identifyUserRequest = async (payload: IdentifyRequest) => {
   return data.user_found;
 };
 
-const identifyUser = async (userData?: FootprintUserData) => {
-  if (!userData) {
-    throw new Error('User data must be passed in order to identify an user');
-  }
-  const email = userData['id.email'];
-  const phoneNumber = userData['id.phone_number'];
+const identifyUser = async (obj?: BootstrapData | FootprintUserData) => {
+  if (!isObject(obj)) throw new Error('User data must be passed in order to identify an user');
+
+  const email = obj['id.email'];
+  const phoneNumber = obj['id.phone_number'];
   if (email) {
     const result = await identifyUserRequest({ email });
     if (result) return true;

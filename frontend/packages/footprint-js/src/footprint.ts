@@ -1,16 +1,10 @@
 import './styles.css';
 
-import type {
-  AdditionalComponentsSdkFunctionality,
-  Component,
-  ComponentsSdkProps,
-  Footprint,
-  Props,
-} from './types/components';
-import { ComponentKind } from './types/components';
+import type { AdditionalComponentsSdkFunctionality, Component, Footprint, Props } from './types/components';
 import initIframe from './utils/iframe-utils/iframe';
 import initIframeManager from './utils/iframe-utils/iframe-manager';
 import type { Iframe } from './utils/iframe-utils/types';
+import { isComponentsSdkProps } from './utils/type-guards';
 
 const getFootprint = (): Footprint => {
   const manager = initIframeManager();
@@ -66,8 +60,6 @@ const getFootprint = (): Footprint => {
     init,
   };
 };
-
-const isComponentsSdkProps = (p: Props): p is ComponentsSdkProps => p.kind === ComponentKind.Components;
 
 const footprint = getFootprint();
 export default footprint;

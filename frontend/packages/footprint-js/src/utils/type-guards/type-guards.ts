@@ -1,5 +1,5 @@
 import type { Props } from '../../types/components';
-import { ComponentKind } from '../../types/components';
+import { ComponentKind, ComponentsSdkProps } from '../../types/components';
 
 const isAuth = (x: unknown): x is ComponentKind.Auth => x === ComponentKind.Auth;
 
@@ -7,10 +7,12 @@ const isVerify = (x: unknown): x is ComponentKind.Verify => x === ComponentKind.
 
 const isUpdateLogin = (x: unknown): x is ComponentKind.UpdateLoginMethods => x === ComponentKind.UpdateLoginMethods;
 
-const isComoponentsSdk = (x: unknown): x is ComponentKind.Components => x === ComponentKind.Components;
+const isComponentsSdk = (x: unknown): x is ComponentKind.Components => x === ComponentKind.Components;
+
+export const isComponentsSdkProps = (p: Props): p is ComponentsSdkProps => p.kind === ComponentKind.Components;
 
 export const isAuthOrVerifyOrUpdateLogin = (x: unknown) =>
-  [isAuth, isVerify, isComoponentsSdk, isUpdateLogin].some(fn => fn(x));
+  [isAuth, isVerify, isComponentsSdk, isUpdateLogin].some(fn => fn(x));
 
 export const isValidString = (x: unknown) => typeof x === 'string' && x.length > 0;
 

@@ -14,6 +14,7 @@ import { ComponentKind } from '../../types/components';
 import type { CallbackKeys, ExtractOnProps } from '../../types/events';
 import { PublicEvent } from '../../types/events';
 
+type Obj = Record<string, unknown>;
 type PossibleCallbacks = ExtractOnProps<AuthProps> &
   ExtractOnProps<FormProps> &
   ExtractOnProps<RenderProps> &
@@ -23,16 +24,20 @@ type PossibleCallbacks = ExtractOnProps<AuthProps> &
 
 const VariantsByKind: Record<ComponentKind, Variant[]> = {
   [ComponentKind.Auth]: ['modal', 'drawer'],
+  [ComponentKind.Components]: ['modal'],
   [ComponentKind.Form]: ['inline', 'modal', 'drawer'],
   [ComponentKind.Render]: ['inline'],
   [ComponentKind.UpdateLoginMethods]: ['modal', 'drawer'],
   [ComponentKind.Verify]: ['modal', 'drawer'],
-  [ComponentKind.Components]: ['modal'],
   [ComponentKind.VerifyButton]: ['inline'],
 };
 
 const publicEventList: PublicEvent[] = Object.values(PublicEvent);
 const noop = (..._args: unknown[]) => undefined;
+
+export const isObject = (o: unknown): o is Obj => o != null && typeof o === 'object' && !Array.isArray(o);
+
+const hasObjKeys = (o: unknown): o is Obj => isObject(o) && Object.keys(o).length > 0;
 
 const validateContainerIdForVariant = (variant: Variant, containerId?: string): void | never => {
   if (variant === 'inline' && !containerId) {
@@ -144,8 +149,23 @@ export const sanitizeAndValidateProps = (props: Props): Props => {
   validateComponentVariant(kind, rawVariant);
   validateContainerIdForVariant(variant, containerId);
 
+  // @ts-expect-error: userData is deprecated, cleanup ticket FP-7845
+  if (hasObjKeys(props?.userData)) {
+    console.warn(
+      'userData is deprecated and will be removed in the next major version. Please use bootstrapData instead.',
+    );
+  }
+
   return {
     ...props,
     variant,
   } as Props;
+};
+
+export const getBootstrapData = (obj: { bootstrapData?: Obj; userData?: Obj }): { userData: Obj } | undefined => {
+  return hasObjKeys(obj?.bootstrapData) /** First check for bootstrapData */
+    ? { userData: obj.bootstrapData }
+    : hasObjKeys(obj?.userData) /** Then check for userData */
+      ? { userData: obj.userData }
+      : undefined;
 };

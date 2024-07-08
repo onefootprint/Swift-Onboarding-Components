@@ -4,12 +4,11 @@ import type { ComponentKind, Footprint, Props, Variant } from './types/component
 import { getAppearanceForVanilla } from './utils/appearance-utils';
 import getUniqueId from './utils/get-unique-id';
 import { getDefaultVariantForKind, validateComponentKind, validateComponentVariant } from './utils/prop-utils';
+import { isObject } from './utils/prop-utils';
 
 const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
 };
-
-const isObject = (obj: unknown) => typeof obj === 'object' && !!obj;
 
 const vanillaIntegration = (footprint: Footprint) => {
   if (typeof window === 'undefined') return; // Don't do anything for SSR
