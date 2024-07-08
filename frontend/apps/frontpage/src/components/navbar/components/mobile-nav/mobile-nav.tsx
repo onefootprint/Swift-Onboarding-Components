@@ -10,6 +10,7 @@ import LinkButton from 'src/components/linking-button';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
+import { sendGTMEvent } from '@next/third-parties/google';
 import type { NavEntry } from '../../types';
 import { isNavLink, isNavMenu } from '../../types';
 import MobileNavLink from './components/mobile-nav-link';
@@ -21,6 +22,8 @@ type MobileNavProps = {
   entries: NavEntry[];
   $isOnDarkSection?: boolean;
 };
+
+type TrackingEventType = 'mobile-login' | 'mobile-sign-up';
 
 const { Root: NavigationMenuRoot, List: NavigationMenuList } = NavigationMenu;
 
@@ -53,8 +56,12 @@ const MobileNav = ({ onOpen, onClose, entries, $isOnDarkSection }: MobileNavProp
     });
   };
 
-  const handleLinkClick = () => {
+  const handleLogoClick = () => {
     close();
+  };
+
+  const sendTrackingEvent = (type: TrackingEventType) => {
+    sendGTMEvent({ event: 'buttonClicked', value: type });
   };
 
   return (
@@ -62,7 +69,7 @@ const MobileNav = ({ onOpen, onClose, entries, $isOnDarkSection }: MobileNavProp
       {isOpen ? (
         <Menu>
           <Header>
-            <Logo href="/" onClick={handleLinkClick}>
+            <Logo href="/" onClick={handleLogoClick}>
               <ThemedLogoFpDefault color="primary" />
             </Logo>
             <NavTriggerButton aria-label={t('nav-toggle.open')} onClick={handleToggle} type="button">
@@ -89,14 +96,24 @@ const MobileNav = ({ onOpen, onClose, entries, $isOnDarkSection }: MobileNavProp
               </LinkList>
             </NavigationMenuRoot>
             <CtaContainer>
-              <LoginLink href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}>{t('login')}</LoginLink>
-              <LinkButton href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}>{t('sign-up')}</LinkButton>
+              <LoginLink
+                href={`${DASHBOARD_BASE_URL}/authentication/sign-in`}
+                onClick={() => sendTrackingEvent('mobile-login')}
+              >
+                {t('login')}
+              </LoginLink>
+              <LinkButton
+                href={`${DASHBOARD_BASE_URL}/authentication/sign-up`}
+                onClick={() => sendTrackingEvent('mobile-sign-up')}
+              >
+                {t('sign-up')}
+              </LinkButton>
             </CtaContainer>
           </Content>
         </Menu>
       ) : (
         <Container>
-          <Logo href="/" onClick={handleLinkClick}>
+          <Logo href="/" onClick={handleLogoClick}>
             <ThemedLogoFpDefault color={$isOnDarkSection ? 'quinary' : 'primary'} />
           </Logo>
           <NavTriggerButton aria-label={t('nav-toggle.close')} onClick={handleToggle} type="button">

@@ -1,4 +1,5 @@
 import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { GoogleTagManager } from '@next/third-parties/google';
 
 import type { AppProps } from 'next/app';
 import { DM_Sans, Source_Code_Pro } from 'next/font/google';
@@ -72,6 +73,7 @@ const App = ({ Component, pageProps }: AppProps) => (
       async
       defer
     />
+    <GoogleTagManager gtmId="GTM-PKWK59QW" />
     <Providers>
       <GlobalStyle />
       <Layout>
