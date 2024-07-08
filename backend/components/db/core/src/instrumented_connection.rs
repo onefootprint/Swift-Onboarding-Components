@@ -116,7 +116,7 @@ impl Connection for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=field::Empty,
             net.peer.port=field::Empty,
-            sql=field::Empty,
+            db.statement=field::Empty,
         ),
         skip(database_url),
         err,
@@ -145,7 +145,7 @@ impl Connection for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
-            sql=field::Empty,
+            db.statement=field::Empty,
         ),
         skip(self, f),
     )]
@@ -165,8 +165,8 @@ impl Connection for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
-            sql=%DebugQuery::new(source),
-            num_rows=field::Empty,
+            db.statement=%DebugQuery::new(source),
+            db.row_count=field::Empty,
         ),
         skip(self, source),
         err,
@@ -179,7 +179,7 @@ impl Connection for InstrumentedPgConnection {
         if let Ok(r) = &result {
             // Instrument the number of rows returned on a successful result
             let span = tracing::Span::current();
-            span.record("num_rows", r);
+            span.record("db.row_count", r);
         }
         result
     }
@@ -198,8 +198,8 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
-            sql=%DebugQuery::new(&source),
-            num_rows=field::Empty,
+            db.statement=%DebugQuery::new(&source),
+            db.row_count=field::Empty,
         ),
         skip(self, source),
         err,
@@ -216,7 +216,7 @@ impl LoadConnection<DefaultLoadingMode> for InstrumentedPgConnection {
         if let Ok(r) = &result {
             // Instrument the number of rows returned on a successful result
             let span = tracing::Span::current();
-            span.record("num_rows", r.len());
+            span.record("db.row_count", r.len());
         }
         result
     }
@@ -232,7 +232,7 @@ impl LoadConnection<PgRowByRowLoadingMode> for InstrumentedPgConnection {
             otel.kind="client",
             net.peer.ip=%self.info.inet_server_addr,
             net.peer.port=%self.info.inet_server_port,
-            sql=%DebugQuery::new(&source),
+            db.statement=%DebugQuery::new(&source),
         ),
         skip(self, source),
         err,
