@@ -50,6 +50,7 @@ pub struct OnboardingConfiguration {
                                     * radius for just this rule set version stuff here) */
     pub cip_kind: Option<CipKind>,
     pub documents_to_collect: Vec<DocumentRequestConfig>,
+    pub business_documents_to_collect: Vec<DocumentRequestConfig>,
     pub curp_validation_enabled: bool,
     pub verification_checks: Vec<VerificationCheck>,
 }

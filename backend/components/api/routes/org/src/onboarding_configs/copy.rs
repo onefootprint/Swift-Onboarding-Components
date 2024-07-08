@@ -174,6 +174,7 @@ fn copy_playbook(
         document_types_and_countries,
         curp_validation_enabled,
         documents_to_collect,
+        business_documents_to_collect,
 
         // Don't copy these fields. Explicitly enumerate them so the compiler complains when a new
         // field is added
@@ -218,6 +219,7 @@ fn copy_playbook(
         document_types_and_countries,
         curp_validation_enabled,
         documents_to_collect: documents_to_collect.unwrap_or_default(),
+        business_documents_to_collect,
         verification_checks: verification_checks.unwrap_or_default(),
     }
 }

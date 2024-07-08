@@ -1,0 +1,1 @@
+ALTER TABLE ob_configuration ADD COLUMN business_documents_to_collect JSONB[] NOT NULL DEFAULT ARRAY[]::JSONB[];

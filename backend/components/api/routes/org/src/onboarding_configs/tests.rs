@@ -59,6 +59,7 @@ fn test(must_collect_data: Vec<CDO>, optional_data: Vec<CDO>, can_access_data: V
         skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
+        business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
         verification_checks: vec![],
@@ -98,6 +99,7 @@ fn test_is_no_phone_flow(
         skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
+        business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
         verification_checks: vec![],
@@ -136,6 +138,7 @@ fn test_is_doc_first(
         skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
+        business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
         verification_checks: vec![],
@@ -170,6 +173,7 @@ fn test_skip_kyc(must_collect_data: Vec<CDO>, allow_international: bool) -> bool
         skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
+        business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test once migrated over to checks
         verification_checks: vec![],
@@ -209,6 +213,7 @@ fn test_documents(documents_to_collect: Vec<DocumentRequestConfig>) -> bool {
         skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect,
+        business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
         verification_checks: vec![],
@@ -251,6 +256,7 @@ fn test_validate_for_cip(kind: CipKind, must_collect_data: Vec<CDO>) -> bool {
         skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
+        business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
         verification_checks: vec![],

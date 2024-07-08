@@ -93,9 +93,12 @@ pub struct ObConfiguration {
     /// Identity documents are still unfortunately specified in CDOs. We could migrate them
     /// to this field in the future.
     #[diesel(deserialize_as = OptionalNonNullVec<DocumentRequestConfig>)]
+    // TODO make these non null?
     pub documents_to_collect: Option<Vec<DocumentRequestConfig>>,
     #[diesel(deserialize_as = OptionalNonNullVec<VerificationCheck>)]
     pub verification_checks: Option<Vec<VerificationCheck>>,
+    #[diesel(deserialize_as = NonNullVec<DocumentRequestConfig>)]
+    pub business_documents_to_collect: Vec<DocumentRequestConfig>,
 }
 
 impl ObConfiguration {
@@ -383,6 +386,7 @@ struct NewObConfiguration {
     document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     curp_validation_enabled: bool,
     documents_to_collect: Vec<DocumentRequestConfig>,
+    business_documents_to_collect: Vec<DocumentRequestConfig>,
     verification_checks: Vec<VerificationCheck>,
 }
 
@@ -411,6 +415,7 @@ pub struct NewObConfigurationArgs {
     pub document_types_and_countries: Option<DocumentAndCountryConfiguration>,
     pub curp_validation_enabled: bool,
     pub documents_to_collect: Vec<DocumentRequestConfig>,
+    pub business_documents_to_collect: Vec<DocumentRequestConfig>,
     pub verification_checks: Vec<VerificationCheck>,
 }
 
@@ -626,6 +631,7 @@ impl ObConfiguration {
             skip_confirm,
             document_types_and_countries,
             documents_to_collect,
+            business_documents_to_collect,
             curp_validation_enabled,
             verification_checks,
         } = args;
@@ -656,6 +662,7 @@ impl ObConfiguration {
             document_types_and_countries,
             curp_validation_enabled,
             documents_to_collect,
+            business_documents_to_collect,
             verification_checks,
         };
         let obc = diesel::insert_into(ob_configuration::table)

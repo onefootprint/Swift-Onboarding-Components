@@ -59,6 +59,8 @@ pub struct CreateOnboardingConfigurationRequest {
     #[serde(default)]
     pub documents_to_collect: Vec<DocumentRequestConfig>,
     #[serde(default)]
+    pub business_documents_to_collect: Vec<DocumentRequestConfig>,
+    #[serde(default)]
     pub curp_validation_enabled: Option<bool>,
     #[serde(default)]
     pub verification_checks: Option<Vec<VerificationCheck>>,
@@ -97,6 +99,7 @@ pub async fn post(
         skip_confirm,
         document_types_and_countries,
         documents_to_collect,
+        business_documents_to_collect,
         curp_validation_enabled,
         enhanced_aml,
         kind,
@@ -157,6 +160,7 @@ pub async fn post(
         skip_confirm: skip_confirm.unwrap_or(false),
         document_types_and_countries,
         documents_to_collect,
+        business_documents_to_collect,
         curp_validation_enabled,
         verification_checks,
     };

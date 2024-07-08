@@ -35,6 +35,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         skip_confirm: false,
         document_types_and_countries: None,
         documents_to_collect: vec![],
+        business_documents_to_collect: vec![],
         curp_validation_enabled: false,
         // TODO: fix this test when migrated over
         verification_checks: vec![],
@@ -137,6 +138,7 @@ pub fn create_with_opts(
         skip_confirm: false,
         document_types_and_countries,
         documents_to_collect,
+        business_documents_to_collect: vec![],
         curp_validation_enabled,
         verification_checks,
     };

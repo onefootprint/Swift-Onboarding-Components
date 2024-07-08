@@ -95,6 +95,7 @@ fn test_ob_config_international_countries(
         document_types_and_countries: None,
         curp_validation_enabled: false,
         documents_to_collect: None,
+        business_documents_to_collect: vec![],
         verification_checks: None,
     };
 
@@ -143,6 +144,7 @@ fn obc_with_doc_cdo(
         document_types_and_countries: None,
         curp_validation_enabled: false,
         documents_to_collect: None,
+        business_documents_to_collect: vec![],
         verification_checks: None,
     }
 }
@@ -396,6 +398,7 @@ fn test_doc_scan_for_optional_ssn(cdo: Option<&str>) -> Option<Vec<IdDocKind>> {
         document_types_and_countries: None,
         curp_validation_enabled: false,
         documents_to_collect: None,
+        business_documents_to_collect: vec![],
         verification_checks: None,
     };
 
@@ -441,6 +444,7 @@ fn test_cip_kind_documents(cip: Option<CipKind>, residential_country: Option<Iso
         document_types_and_countries: None,
         curp_validation_enabled: false,
         documents_to_collect: None,
+        business_documents_to_collect: vec![],
         verification_checks: None,
     };
 
@@ -523,6 +527,7 @@ fn test_document_types_and_countries() {
         document_types_and_countries: Some(doc_config),
         curp_validation_enabled: false,
         documents_to_collect: None,
+        business_documents_to_collect: vec![],
         verification_checks: None,
     };
 
@@ -579,6 +584,7 @@ fn test_document_and_countries_field_with_cip_kind() {
         document_types_and_countries: Some(doc_config),
         curp_validation_enabled: false,
         documents_to_collect: None,
+        business_documents_to_collect: vec![],
         verification_checks: None,
     };
 

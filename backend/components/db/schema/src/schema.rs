@@ -773,6 +773,7 @@ diesel::table! {
         curp_validation_enabled -> Bool,
         documents_to_collect -> Nullable<Array<Nullable<Jsonb>>>,
         verification_checks -> Nullable<Array<Nullable<Jsonb>>>,
+        business_documents_to_collect -> Array<Nullable<Jsonb>>,
     }
 }
 

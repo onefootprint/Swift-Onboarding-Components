@@ -139,6 +139,7 @@ impl
             kind,
             document_types_and_countries,
             documents_to_collect,
+            business_documents_to_collect,
             cip_kind,
             curp_validation_enabled,
             verification_checks,
@@ -179,6 +180,7 @@ impl
             rule_set: rule_set.map(|rs| api_wire_types::RuleSet { version: rs.version }),
             cip_kind,
             documents_to_collect: documents_to_collect.unwrap_or_default(),
+            business_documents_to_collect,
             curp_validation_enabled,
             verification_checks: verification_checks.unwrap_or_default(),
         }
