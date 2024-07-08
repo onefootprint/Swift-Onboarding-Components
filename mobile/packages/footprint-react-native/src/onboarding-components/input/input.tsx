@@ -10,7 +10,12 @@ export type InputProps = TextInputProps;
 
 const Input = ({ ...props }: InputProps) => {
   const { control } = useFormContext();
-  const { name, validations = {}, ...allProps } = useFieldProps();
+  const {
+    name,
+    validations = {},
+    transformValue,
+    ...allProps
+  } = useFieldProps();
 
   return (
     <Controller
@@ -20,7 +25,13 @@ const Input = ({ ...props }: InputProps) => {
         return (
           <MaskInput
             onBlur={onBlur}
-            onChangeText={onChange}
+            onChangeText={val => {
+              if (transformValue) {
+                onChange(transformValue(val));
+                return;
+              }
+              onChange(val);
+            }}
             value={value}
             {...allProps}
             {...props}

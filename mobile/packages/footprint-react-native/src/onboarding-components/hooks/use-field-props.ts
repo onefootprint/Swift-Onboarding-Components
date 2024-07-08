@@ -7,6 +7,7 @@ import { createNumberMask, Masks } from 'react-native-mask-input';
 import { isEmail, isMobilePhone } from 'validator';
 
 import fieldContext from '../field-context';
+import type { Di } from '../types/dis';
 import { fromUSDateToISO8601Format } from '../utils/date-formatter';
 import {
   isDobInTheFuture,
@@ -26,6 +27,7 @@ type Field = TextInputProps & {
     };
     validate?: (value: string) => string | boolean;
   };
+  transformValue?: (value: string) => Di[keyof Di];
 } & MaskInputProps;
 
 const useFieldProps = () => {
@@ -278,6 +280,7 @@ const bo: Record<string, Field> = {
     validations: {
       required: 'Stake is required',
     },
+    transformValue: (value: string) => parseInt(value, 10),
   },
 };
 
