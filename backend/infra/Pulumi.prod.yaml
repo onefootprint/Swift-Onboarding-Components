@@ -21,7 +21,7 @@ config:
       cpuUnits: 1024
       memoryMB: 2048
       name: overdue-watchlist
-      schedule: cron(0 17 * * ? *)
+      schedule: cron(0 0/4 * * ? *)
     - args:
       - generate-invoices
       cpuUnits: 1024
