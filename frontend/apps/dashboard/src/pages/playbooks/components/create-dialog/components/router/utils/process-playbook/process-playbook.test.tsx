@@ -854,20 +854,124 @@ describe('processPlaybook', () => {
 });
 
 describe('getMandatoryAndOptionalTaxIdFields', () => {
-  it.each([
-    { i: { ssn: false, ssnKind: 'ssn9', ssnOptional: false, usTaxIdAcceptable: false }, o: [undefined, undefined] },
-    { i: { ssn: false, ssnKind: 'ssn9', ssnOptional: true, usTaxIdAcceptable: false }, o: [undefined, 'ssn9'] },
-    { i: { ssn: false, ssnKind: undefined, ssnOptional: false, usTaxIdAcceptable: false }, o: [undefined, undefined] },
-    { i: { ssn: true, ssnKind: 'ssn4', ssnOptional: false, usTaxIdAcceptable: false }, o: ['ssn4', undefined] },
-    { i: { ssn: true, ssnKind: 'ssn4', ssnOptional: false, usTaxIdAcceptable: true }, o: ['ssn4', undefined] },
-    { i: { ssn: true, ssnKind: 'ssn4', ssnOptional: true, usTaxIdAcceptable: false }, o: [undefined, 'ssn4'] },
-    { i: { ssn: true, ssnKind: 'ssn4', ssnOptional: true, usTaxIdAcceptable: true }, o: [undefined, 'ssn4'] },
-    { i: { ssn: true, ssnKind: 'ssn9', ssnOptional: false, usTaxIdAcceptable: false }, o: ['ssn9', undefined] },
-    { i: { ssn: true, ssnKind: 'ssn9', ssnOptional: false, usTaxIdAcceptable: false }, o: ['ssn9', undefined] },
-    { i: { ssn: true, ssnKind: 'ssn9', ssnOptional: false, usTaxIdAcceptable: true }, o: ['us_tax_id', undefined] },
-    { i: { ssn: true, ssnKind: 'ssn9', ssnOptional: true, usTaxIdAcceptable: false }, o: [undefined, 'ssn9'] },
-    { i: { ssn: true, ssnKind: undefined, ssnOptional: true, usTaxIdAcceptable: false }, o: [undefined, undefined] },
-  ])('case %#', ({ i, o }) => {
-    expect(getMandatoryAndOptionalTaxIdFields(i as Personal)).toEqual(o);
+  it('should return [undefined, undefined] when ssn is false', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: false,
+        ssnKind: 'ssn9',
+        ssnOptional: false,
+        usTaxIdAcceptable: false,
+      } as Personal),
+    ).toEqual([undefined, undefined]);
+  });
+
+  it('should return [undefined, ssn9] when ssn9 is optional', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: false,
+        ssnKind: 'ssn9',
+        ssnOptional: true,
+        usTaxIdAcceptable: false,
+      } as Personal),
+    ).toEqual([undefined, 'ssn9']);
+  });
+
+  it('should return [undefined, undefined] when all is falsy', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: false,
+        ssnKind: undefined,
+        ssnOptional: false,
+        usTaxIdAcceptable: false,
+      } as Personal),
+    ).toEqual([undefined, undefined]);
+  });
+
+  it('should return [ssn4, undefined] when ssn4 is mandatory', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: true,
+        ssnKind: 'ssn4',
+        ssnOptional: false,
+        usTaxIdAcceptable: false,
+      } as Personal),
+    ).toEqual(['ssn4', undefined]);
+  });
+
+  it('should return [ssn4, undefined] when ssn4 is mandatory and itin is checked', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: true,
+        ssnKind: 'ssn4',
+        ssnOptional: false,
+        usTaxIdAcceptable: true,
+      } as Personal),
+    ).toEqual(['ssn4', undefined]);
+  });
+
+  it('should return [undefined, ssn4] when ssn4 is optional', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: true,
+        ssnKind: 'ssn4',
+        ssnOptional: true,
+        usTaxIdAcceptable: false,
+      } as Personal),
+    ).toEqual([undefined, 'ssn4']);
+  });
+
+  it('should return [undefined, ssn4] when ssn4 is optional and itin is checked', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: true,
+        ssnKind: 'ssn4',
+        ssnOptional: true,
+        usTaxIdAcceptable: true,
+      } as Personal),
+    ).toEqual([undefined, 'ssn4']);
+  });
+
+  it('should return [ssn9, undefined] when ssn9 is mandatory', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: true,
+        ssnKind: 'ssn9',
+        ssnOptional: false,
+        usTaxIdAcceptable: false,
+      } as Personal),
+    ).toEqual(['ssn9', undefined]);
+  });
+
+  it('should return [us_tax_id, undefined] when ssn9 is mandatory and itin is checked ', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: true,
+        ssnKind: 'ssn9',
+        ssnOptional: false,
+        usTaxIdAcceptable: true,
+      } as Personal),
+    ).toEqual(['us_tax_id', undefined]);
+  });
+
+  it('should return [undefined, ssn9] when ssn9 is optional and itin is not checked', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: true,
+        ssnKind: 'ssn9',
+        ssnOptional: true,
+        usTaxIdAcceptable: false,
+      } as Personal),
+    ).toEqual([undefined, 'ssn9']);
+  });
+
+  it('should return [undefined, undefined] when ssn is true and the values are falsy', () => {
+    expect(
+      getMandatoryAndOptionalTaxIdFields({
+        ssn: true,
+        ssnKind: undefined,
+        ssnOptional: true,
+        usTaxIdAcceptable: false,
+      } as Personal),
+    ).toEqual([undefined, undefined]);
   });
 });
