@@ -90,9 +90,7 @@ const GlobalStyle = createGlobalStyle`
     --font-family-default: ${defaultFont.style.fontFamily};
     --font-family-code: ${codeFont.style.fontFamily};
      --desktop-header-height: 64px;
-     --desktop-spacing: ${theme.spacing[10]};
      --mobile-header-height: 72px;
-     --mobile-spacing: ${theme.spacing[9]};
      --custom-gray: #fcfcfc;
      font-size: 16px;
    }

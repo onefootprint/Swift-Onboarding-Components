@@ -159,16 +159,17 @@ const Header = styled.header<{
   $isFloating: boolean;
 }>`
   ${({ theme, $isFloating }) => css`
+    position: sticky;
     left: 0;
-    position: fixed;
     right: 0;
     top: 0;
-    transition: background 200ms ease 0s;
+    transition: background 200ms ease 0s, position 200ms ease 0s;
     z-index: ${theme.zIndex.overlay};
 
     ${
       $isFloating &&
       css`
+      position: fixed;
       -webkit-backdrop-filter: blur(15px) saturate(125%);
       backdrop-filter: blur(15px) saturate(125%);
       background-color: rgba(${theme.backgroundColor.primary}, 0.75);
