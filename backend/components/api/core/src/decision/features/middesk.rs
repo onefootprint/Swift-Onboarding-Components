@@ -1,6 +1,7 @@
 #![allow(clippy::enum_variant_names)]
 use idv::middesk::response::business::BusinessResponse;
 use idv::middesk::response::business::Task;
+use itertools::Itertools;
 use newtypes::FootprintReasonCode;
 use std::str::FromStr;
 use strum::Display;
@@ -35,7 +36,7 @@ macro_rules! task_enum {
     }
 }
 
-#[derive(EnumDiscriminants, Display, Debug, Eq, PartialEq)]
+#[derive(EnumDiscriminants, Display, Debug, Eq, PartialEq, Clone)]
 #[strum_discriminants(
     name(TaskKindDiscriminant),
     vis(pub),
@@ -70,7 +71,7 @@ pub enum TaskKind {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum NameTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessNameMatch)]
         #[strum(serialize = "Verified")]
@@ -91,7 +92,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum DbaNameTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessDbaMatch)]
         #[strum(serialize = "Verified")]
@@ -112,7 +113,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum PhoneTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessPhoneNumberMatch)]
         #[strum(serialize = "Verified")]
@@ -125,7 +126,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum WebsiteStatusTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessWebsiteOnline)]
         #[strum(serialize = "Online")]
@@ -138,7 +139,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum WebsiteVerificationTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessWebsiteVerified)]
         #[strum(serialize = "Verified")]
@@ -155,7 +156,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum AddressVerificationTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessAddressMatch)]
         #[strum(serialize = "Verified")]
@@ -180,7 +181,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum AddressPropertyTypeTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessAddressCommercial)]
         #[strum(serialize = "Commercial")]
@@ -193,7 +194,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum AddressDeliverabilityTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessAddressDeliverable)]
         #[strum(serialize = "Deliverable")]
@@ -206,7 +207,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum TinTask {
         #[footprint_reason_code = Some(FootprintReasonCode::TinMatch)]
         #[strum(serialize = "Found")]
@@ -227,7 +228,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum PersonVerificationTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BeneficialOwnersMatch)]
         #[strum(serialize = "Verified")]
@@ -244,7 +245,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum WatchlistTask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessNameNoWatchlistHits)]
         #[strum(serialize = "No Hits")]
@@ -257,7 +258,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum SosActiveTask {
         #[footprint_reason_code = Some(FootprintReasonCode::SosActiveFilingFound)]
         #[strum(serialize = "Active")]
@@ -266,7 +267,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum SosUnknownTask {
         #[footprint_reason_code = Some(FootprintReasonCode::SosFilingNoStatus)]
         #[strum(serialize = "Partially Unknown")]
@@ -275,7 +276,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum SosInactiveTask {
         #[footprint_reason_code = Some(FootprintReasonCode::SosFilingPartiallyActive)]
         #[strum(serialize = "Partially Active")]
@@ -292,7 +293,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum SosNotFoundTask {
         #[footprint_reason_code = Some(FootprintReasonCode::SosFilingNotFound)]
         #[strum(serialize = "Not Registered	")]
@@ -301,7 +302,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum SosDomesticTask {
         #[footprint_reason_code = Some(FootprintReasonCode::SosDomesticActiveFilingFound)]
         #[strum(serialize = "Domestic Active")]
@@ -322,7 +323,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum SosMatchTask {
         #[footprint_reason_code = Some(FootprintReasonCode::SosBusinessAddressActiveFilingFound)]
         #[strum(serialize = "Submitted Active")]
@@ -343,7 +344,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum SosDomesticSubStatusTask {
         #[footprint_reason_code = Some(FootprintReasonCode::SosDomesticFilingStatusGoodStanding)]
         #[strum(serialize = "Good Standing")]
@@ -372,7 +373,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum IndustryTask {
         #[footprint_reason_code = None]
         #[strum(serialize = "No Hits")]
@@ -385,7 +386,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum BankruptciesTask {
         //Cant find this in docs and "None Found" is the only response i've seen
         #[footprint_reason_code = None]
@@ -395,7 +396,7 @@ task_enum! {
 }
 
 task_enum! {
-    #[derive(Display, Debug, EnumString, Eq, PartialEq)]
+    #[derive(Display, Debug, EnumString, Eq, PartialEq, Clone)]
     pub enum AddressCMRATask {
         #[footprint_reason_code = Some(FootprintReasonCode::BusinessAddressCommercialMailReceivingAgency)]
         #[strum(serialize = "CMRA")]
@@ -534,6 +535,29 @@ pub fn reason_codes(business_response: &BusinessResponse) -> Vec<FootprintReason
                 .collect::<Vec<FootprintReasonCode>>()
         })
         .unwrap_or_default()
+}
+
+// TODO: test
+pub fn get_task(
+    business_response: &BusinessResponse,
+    kind: TaskKindDiscriminant,
+) -> Option<(Task, TaskKind)> {
+    business_response
+        .review
+        .as_ref()
+        .and_then(|r| r.tasks.as_ref())
+        .and_then(|ts| {
+            ts.iter()
+                .filter_map(|t| {
+                    let task_kind = TaskKind::try_from(t.clone()).ok();
+                    let discr: Option<TaskKindDiscriminant> = task_kind.clone().map(|t| t.into());
+                    let (d, tk) = discr.zip(task_kind)?;
+                    (kind == d).then_some((t.clone(), tk))
+                })
+                .collect_vec()
+                .first()
+                .cloned()
+        })
 }
 
 #[cfg(test)]

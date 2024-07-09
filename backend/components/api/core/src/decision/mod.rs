@@ -5,6 +5,7 @@ use newtypes::VendorAPI;
 use newtypes::VerificationResultId;
 
 pub mod biz_risk;
+pub mod business_insights;
 pub mod document;
 pub mod engine;
 pub mod features;
@@ -40,6 +41,8 @@ pub enum Error {
     DecisionNotFound,
     #[error("CURP validation error")]
     CurpError(#[from] CurpValidationError),
+    #[error("Vendor result not found {0}")]
+    VendorResultNotFound(VendorAPI),
 }
 
 impl api_errors::FpErrorTrait for Error {

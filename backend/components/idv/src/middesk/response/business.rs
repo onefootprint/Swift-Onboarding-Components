@@ -1,10 +1,14 @@
 use chrono::DateTime;
 use chrono::Utc;
+use itertools::Itertools;
 use newtypes::scrub_pii_value;
 use newtypes::PiiJsonValue;
 use newtypes::ScrubbedPiiString;
 use serde::Deserialize;
 use serde::Serialize;
+use std::collections::HashMap;
+use strum::Display;
+use strum::EnumString;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BusinessResponse {
@@ -37,6 +41,99 @@ pub struct BusinessResponse {
     pub liens: Option<PiiJsonValue>, // premium feature we aren't using
     pub tags: Option<Vec<String>>,
     pub fmcsa_registrations: Option<Vec<FmcsaRegistration>>,
+}
+
+#[derive(Debug, Hash, PartialEq, Eq)]
+pub enum MiddeskSourceIdKey {
+    SourceId(String),
+    NoSources,
+}
+
+impl From<Option<String>> for MiddeskSourceIdKey {
+    fn from(value: Option<String>) -> Self {
+        match value {
+            Some(s) => Self::SourceId(s),
+            None => Self::NoSources,
+        }
+    }
+}
+
+impl BusinessResponse {
+    // TODO: test
+    pub fn people_by_source_id(
+        &self,
+        source_type: Option<SourceType>,
+    ) -> HashMap<MiddeskSourceIdKey, Vec<Person>> {
+        self.people
+            .clone()
+            .unwrap_or_default()
+            .into_iter()
+            .flat_map(|person| {
+                let mut source_ids_for_person: Vec<(MiddeskSourceIdKey, Person)> = person
+                    .sources
+                    .as_ref()
+                    .into_iter()
+                    .flatten()
+                    .filter(|src| {
+                        let src_filter_string = source_type.clone().map(|s| s.to_string());
+                        if src_filter_string.is_some() {
+                            src.type_ == src_filter_string
+                        } else {
+                            true
+                        }
+                    })
+                    .map(|src| (src.id.clone().into(), person.clone()))
+                    .collect_vec();
+
+                // still include the person if there are no sources found
+                if source_ids_for_person.is_empty() {
+                    source_ids_for_person.push((MiddeskSourceIdKey::NoSources, person));
+                }
+
+                source_ids_for_person
+            })
+            .collect_vec()
+            .into_iter()
+            .into_group_map()
+    }
+
+    // TODO: test
+    pub fn names_by_source_id(
+        &self,
+        source_type: Option<SourceType>,
+    ) -> HashMap<MiddeskSourceIdKey, Vec<Name>> {
+        self.names
+            .clone()
+            .unwrap_or_default()
+            .into_iter()
+            .flat_map(|name| {
+                let mut source_ids_for_name: Vec<(MiddeskSourceIdKey, Name)> = name
+                    .sources
+                    .as_ref()
+                    .into_iter()
+                    .flatten()
+                    .filter(|src| {
+                        let src_filter_string = source_type.clone().map(|s| s.to_string());
+                        if src_filter_string.is_some() {
+                            src.type_ == src_filter_string
+                        } else {
+                            true
+                        }
+                    })
+                    .map(|src| (src.id.clone().into(), name.clone()))
+                    .collect_vec();
+
+                // still include the name if there are no sources found
+                if source_ids_for_name.is_empty() {
+                    source_ids_for_name.push((MiddeskSourceIdKey::NoSources, name));
+                }
+
+                source_ids_for_name
+            })
+            .collect_vec()
+            .into_iter()
+            .into_group_map()
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
@@ -72,7 +169,7 @@ pub struct Registration {
     pub status_details: Option<String>,
     pub entity_type: Option<String>,
     pub file_number: Option<String>,
-    pub addresses: Option<Vec<String>>,
+    pub addresses: Option<Vec<ScrubbedPiiString>>,
     pub jurisdiction: Option<String>,
     pub officers: Option<Vec<Officer>>,
     pub registration_date: Option<String>,
@@ -88,6 +185,12 @@ pub struct Officer {
     pub roles: Option<Vec<String>>,
 }
 
+impl Officer {
+    pub fn roles_for_display(&self) -> Option<String> {
+        self.roles.clone().map(|r| r.join(", "))
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct Name {
     pub object: Option<String>,
@@ -100,12 +203,76 @@ pub struct Name {
     pub sources: Option<Vec<Source>>,
 }
 
+impl Name {
+    pub fn sources_for_display(&self, include_watchlist: bool) -> Option<String> {
+        let sources = self.sources.as_ref()?;
+        let res = sources
+            .iter()
+            .filter_map(|source| {
+                let source_type = source
+                    .type_
+                    .as_ref()
+                    .and_then(|s| SourceType::try_from(s.as_str()).ok());
+
+                if !include_watchlist && source_type == Some(SourceType::WatchlistResult) {
+                    None
+                } else {
+                    source.source_for_display()
+                }
+            })
+            .collect_vec()
+            .join(", ");
+
+        Some(res)
+    }
+}
+
+#[derive(EnumString, Debug, Clone, PartialEq, Eq, Display)]
+#[strum(serialize_all = "snake_case")]
+pub enum SourceType {
+    Registration,
+    FmcsaRegistration,
+    WatchlistResult,
+}
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct Source {
     pub id: Option<String>,
     #[serde(rename = "type")]
     pub type_: Option<String>,
     pub metadata: Option<SourceMetadata>,
+}
+
+impl Source {
+    pub fn source_for_display(&self) -> Option<String> {
+        let source_type = self
+            .type_
+            .clone()
+            .and_then(|s| SourceType::try_from(s.as_str()).ok());
+
+
+        if let Some(st) = source_type {
+            match st {
+                SourceType::Registration => self
+                    .metadata
+                    .as_ref()
+                    .and_then(|m| m.state.clone())
+                    .map(|s| format!("{} - SOS", s)),
+                SourceType::FmcsaRegistration => {
+                    let dot_number = self.metadata.as_ref().and_then(|m| m.dot_number.clone());
+
+                    Some(format!("FMCSA - dot number: {:?}", dot_number))
+                }
+                SourceType::WatchlistResult => {
+                    let agency = self.metadata.as_ref().and_then(|m| m.agency.clone());
+
+                    Some(format!("Watchlist - agency: {:?}", agency))
+                }
+            }
+        } else {
+            // TODO: make this more interesting perhaps?
+            self.type_.clone()
+        }
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
@@ -117,27 +284,34 @@ pub struct SourceMetadata {
     pub status: Option<String>,
     pub submitted: Option<bool>,
     pub name: Option<String>,
-    pub city: Option<String>,
-    pub postal_code: Option<String>,
-    pub full_address: Option<String>,
-    pub address_line1: Option<String>,
-    pub address_line2: Option<String>,
+    pub city: Option<ScrubbedPiiString>,
+    pub postal_code: Option<ScrubbedPiiString>,
+    pub full_address: Option<ScrubbedPiiString>,
+    pub address_line1: Option<ScrubbedPiiString>,
+    pub address_line2: Option<ScrubbedPiiString>,
+    pub dot_number: Option<String>,
+    // watchlist
+    pub abbr: Option<String>,
+    pub agency: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Address {
-    pub address_line1: Option<String>,
-    pub address_line2: Option<String>,
-    pub city: Option<String>,
-    pub state: Option<String>,
-    pub postal_code: Option<String>,
-    pub full_address: Option<String>,
+    pub address_line1: Option<ScrubbedPiiString>,
+    pub address_line2: Option<ScrubbedPiiString>,
+    pub city: Option<ScrubbedPiiString>,
+    pub state: Option<ScrubbedPiiString>,
+    pub postal_code: Option<ScrubbedPiiString>,
+    pub full_address: Option<ScrubbedPiiString>,
     pub latitude: Option<f64>,
     pub longitude: Option<f64>,
     pub property_type: Option<String>,
     pub sources: Option<Vec<Source>>,
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
+    pub submitted: Option<bool>,
+    pub deliverable: Option<bool>,
+    pub cmra: Option<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
@@ -224,8 +398,20 @@ pub struct Watchlist {
     pub lists: Option<Vec<List>>,
     pub hit_count: Option<i32>,
     pub agencies: Option<Vec<Agency>>,
+    pub people: Option<Vec<PeopleWatchlist>>,
 }
 
+// hits are only found in the "$.lists.results" field
+#[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
+pub struct PeopleWatchlist {
+    pub object: Option<String>,
+    pub name: Option<ScrubbedPiiString>,
+    pub submitted: Option<bool>,
+    pub sources: Option<Vec<Source>>,
+    pub titles: Option<Vec<Title>>,
+    #[serde(serialize_with = "scrub_pii_value")]
+    pub people_bankrupcies: Option<PiiJsonValue>,
+}
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct List {
     pub abbr: Option<String>,
@@ -235,6 +421,7 @@ pub struct List {
     pub organization: Option<String>,
     pub results: Option<Vec<Result>>,
 }
+
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct Result {
@@ -261,7 +448,7 @@ pub struct Agency {
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct Person {
-    pub name: Option<String>,
+    pub name: Option<ScrubbedPiiString>,
     pub titles: Option<Vec<Title>>,
     pub submitted: Option<bool>,
     pub sources: Option<Vec<Source>>,
@@ -269,11 +456,43 @@ pub struct Person {
     pub kyc: Option<PiiJsonValue>, // We are not using Middesk for KYC so this should never be set
 }
 
+impl Person {
+    pub fn titles_for_display(&self) -> Option<String> {
+        self.titles.as_ref().map(|t| {
+            t.iter()
+                .filter_map(|title| title.title.clone())
+                .collect_vec()
+                .join(", ")
+        })
+    }
+
+    pub fn sources_for_display(&self, include_watchlist: bool) -> Option<String> {
+        self.sources.as_ref().map(|s| {
+            s.iter()
+                .filter_map(|source| {
+                    let source_type = source
+                        .type_
+                        .as_ref()
+                        .and_then(|s| SourceType::try_from(s.as_str()).ok());
+
+                    if !include_watchlist && source_type == Some(SourceType::WatchlistResult) {
+                        None
+                    } else {
+                        source.source_for_display()
+                    }
+                })
+                .collect_vec()
+                .join(", ")
+        })
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct Title {
     pub object: Option<String>,
     pub title: Option<String>,
 }
+
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq, Serialize)]
 pub struct Profile {

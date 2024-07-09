@@ -2074,6 +2074,16 @@ pub fn middesk_business_response() -> serde_json::Value {
                     []
                 },
                 {
+                    "category": "tin",
+                    "key": "tin",
+                    "label": "TIN Match",
+                    "message": "The IRS does not have a record for the submitted TIN and Business Name combination",
+                    "name": "tin",
+                    "status": "failure",
+                    "sub_label": "Not Found",
+                    "sources": []
+                },
+                {
                     "category": "phone",
                     "key": "phone",
                     "label": "Phone Number",
