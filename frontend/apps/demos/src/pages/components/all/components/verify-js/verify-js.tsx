@@ -11,7 +11,7 @@ const VerifyJsIntegration = () => {
       kind: FootprintComponentKind.Verify,
       variant: 'drawer',
       publicKey,
-      userData: {
+      bootstrapData: {
         [IdDI.email]: 'jappleseed@onefootprint.com',
         [IdDI.phoneNumber]: '+15555550100',
         [IdDI.firstName]: 'Johnny',

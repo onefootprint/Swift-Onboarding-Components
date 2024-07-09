@@ -6,24 +6,29 @@ import styled, { css } from 'styled-components';
 
 type RouterReturn = ReturnType<typeof useRouter>;
 
+const isString = (x: unknown): x is string => typeof x === 'string' && !!x;
 const AcmeDevAuthKey = 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
 const envPublicKey = process.env.NEXT_PUBLIC_TENANT_KEY || AcmeDevAuthKey;
 
 const getQueryArgs = (query: RouterReturn['query']) => {
-  const { ob_key: obKey, user_data: rawUserData } = query;
+  const { bootstrap_data: rawBootstrapData, ob_key: obKey, user_data: rawUserData } = query;
   const publicKey = typeof obKey === 'string' ? obKey : envPublicKey;
-  let userData = {};
+  let bootstrapData = {};
   try {
-    userData = typeof rawUserData === 'string' ? JSON.parse(decodeURIComponent(rawUserData)) : {};
+    bootstrapData = isString(rawBootstrapData)
+      ? JSON.parse(decodeURIComponent(rawBootstrapData))
+      : isString(rawUserData)
+        ? JSON.parse(decodeURIComponent(rawUserData))
+        : {};
   } catch (_) {
     // do nothing
   }
-  return { userData, publicKey };
+  return { bootstrapData, publicKey };
 };
 
 const AuthButtonReact = () => {
   const router = useRouter();
-  const { userData, publicKey } = getQueryArgs(router.query);
+  const { bootstrapData, publicKey } = getQueryArgs(router.query);
 
   return (
     <Container>
@@ -31,13 +36,13 @@ const AuthButtonReact = () => {
         <title>Auth Button React</title>
       </Head>
       <FootprintAuthButton
-        publicKey={publicKey}
-        bootstrapData={userData}
+        bootstrapData={bootstrapData}
         dialogVariant="modal"
         label="Auth with Footprint (modal)"
         onCancel={() => console.log('cancel')}
         onClose={() => console.log('close')}
         onComplete={(validationToken: string) => console.log('complete ', validationToken)}
+        publicKey={publicKey}
       />
     </Container>
   );

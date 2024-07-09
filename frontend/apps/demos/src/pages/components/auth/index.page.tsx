@@ -20,19 +20,37 @@ const getAuthArgs = (o: ReturnType<typeof getQueryArgs>) => ({
 
 const AuthDemo = () => {
   const router = useRouter();
-  const { appUrl, authToken, publicKey, userData } = getAuthArgs(getQueryArgs(router));
+  const { appUrl, authToken, bootstrapData, publicKey } = getAuthArgs(getQueryArgs(router));
+  if (!authToken && !publicKey) {
+    console.error('No authToken or publicKey provided');
+    return null;
+  }
+
+  const authProps = {
+    ...(isString(authToken) ? { authToken } : { publicKey }),
+    bootstrapData,
+    kind: FootprintComponentKind.Auth,
+    onCancel: () => console.log('demo onCancel'),
+    onClose: () => console.log('demo onClose'),
+    onComplete: (s: string) => console.log('demo onComplete', s),
+    options: { showLogo: false },
+    variant: 'modal',
+  };
 
   const handleAuthenticateClick = () => {
-    const component = fakeSdk.init({
-      kind: FootprintComponentKind.Auth,
-      onCancel: () => console.log('demo onCancel'),
-      onClose: () => console.log('demo onClose'),
-      onComplete: (s: string) => console.log('demo onComplete', s),
-      options: { showLogo: false },
-      publicKey,
-      userData,
-      variant: 'modal',
-    });
+    // @ts-expect-error: enum vs string match
+    const component = fakeSdk.init(authProps);
+    component.render(appUrl);
+
+    return () => {
+      component.destroy();
+    };
+  };
+
+  const handleAuthenticateOldClick = () => {
+    const { bootstrapData, ...rest } = authProps;
+    // @ts-expect-error: enum vs string match
+    const component = fakeSdk.init({ ...rest, userData: bootstrapData }); /** userData deprecated after 3.11.0 */
     component.render(appUrl);
 
     return () => {
@@ -42,15 +60,15 @@ const AuthDemo = () => {
 
   const handleUpdateFlowClick = () => {
     const component = fakeSdk.init({
-      kind: FootprintComponentKind.Auth,
-      variant: 'modal',
       authToken,
-      updateLoginMethods: true,
-      options: { showLogo: false },
-      userData,
+      bootstrapData,
+      kind: FootprintComponentKind.Auth,
       onCancel: () => console.log('demo onCancel'),
       onClose: () => console.log('demo onClose'),
       onComplete: (s: string) => console.log('demo onComplete', s),
+      options: { showLogo: false },
+      updateLoginMethods: true,
+      variant: 'modal',
     });
     component.render(appUrl);
 
@@ -67,6 +85,10 @@ const AuthDemo = () => {
       <Container>
         <Button onClick={handleAuthenticateClick} variant="secondary">
           Authenticate with Footprint
+        </Button>
+        <br />
+        <Button onClick={handleAuthenticateOldClick} variant="secondary">
+          Authenticate with Footprint (via userData)
         </Button>
         <br />
         <Button onClick={handleUpdateFlowClick} variant="secondary">

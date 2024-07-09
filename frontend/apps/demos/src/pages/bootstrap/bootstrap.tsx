@@ -10,7 +10,7 @@ const handleOpen = () => {
   const component = footprint.init({
     kind: FootprintComponentKind.Verify,
     publicKey,
-    userData: {
+    bootstrapData: {
       'id.email': 'jane@acme.com',
       'id.first_name': 'Jane',
       'id.last_name': 'Doe',

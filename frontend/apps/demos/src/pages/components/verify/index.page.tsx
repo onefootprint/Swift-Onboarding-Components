@@ -29,20 +29,20 @@ const onComplete = (token: string) => {
 
 const VerifyDemo = () => {
   const router = useRouter();
-  const { appUrl, locale, publicKey, userData } = getVerifyArgs(getQueryArgs(router));
+  const { appUrl, bootstrapData, locale, publicKey } = getVerifyArgs(getQueryArgs(router));
 
   const handleVerifyClick = () => {
     const component = fakeSdk.init({
+      bootstrapData,
       kind: FootprintComponentKind.Verify,
-      variant: 'modal',
-      onAuth: (s: string) => console.log('demo onAuth', s),
-      onCancel: () => console.log('demo onCancel'),
-      onClose: () => console.log('demo onClose'),
-      onComplete,
       l10n: { locale: locale as SupportedLocale },
+      onAuth: (s: string) => console.log(`${FootprintComponentKind.Verify} onAuth`, s),
+      onCancel: () => console.log(`${FootprintComponentKind.Verify} onCancel`),
+      onClose: () => console.log(`${FootprintComponentKind.Verify} onClose`),
+      onComplete,
       options: { showLogo: false },
       publicKey,
-      userData,
+      variant: 'modal',
     });
     component.render(appUrl);
 

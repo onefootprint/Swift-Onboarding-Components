@@ -7,31 +7,41 @@ import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 const publicKeyEnv = process.env.NEXT_PUBLIC_E2E_TENANT_PK as string;
+const isString = (x: unknown): x is string => typeof x === 'string' && !!x;
 
 // Do not change this page. It is used for E2E testing.
 const Demo = () => {
   const router = useRouter();
   const { query, isReady } = router;
 
-  const { userData, publicKey, locale } = useMemo(() => {
+  const { bootstrapData, publicKey, locale } = useMemo(() => {
     if (!isReady) {
       return {
-        userData: undefined,
+        bootstrapData: undefined,
         publicKey: undefined,
         locale: undefined,
       };
     }
 
-    const { locale: localeString = 'en-US', ob_key: obKey, user_data: rawUserData = {} } = query;
+    const {
+      bootstrap_data: rawBootstrapData,
+      locale: localeString = 'en-US',
+      ob_key: obKey,
+      user_data: rawUserData = {},
+    } = query;
     const key = typeof obKey === 'string' ? obKey : publicKeyEnv;
-    let data = {};
+    let bootstrapData = {};
     try {
-      data = typeof rawUserData === 'string' ? JSON.parse(decodeURIComponent(rawUserData)) : {};
+      bootstrapData = isString(rawBootstrapData)
+        ? JSON.parse(decodeURIComponent(rawBootstrapData))
+        : isString(rawUserData)
+          ? JSON.parse(decodeURIComponent(rawUserData))
+          : {};
     } catch (_) {
       // do nothing
     }
     return {
-      userData: data,
+      bootstrapData,
       publicKey: key,
       locale: localeString,
     };
@@ -50,9 +60,9 @@ const Demo = () => {
         <title>Footprint E2E</title>
       </Head>
       <Container>
-        {publicKey && locale && userData ? (
+        {publicKey && locale && bootstrapData ? (
           <FootprintVerifyButton
-            userData={userData}
+            bootstrapData={bootstrapData}
             publicKey={publicKey}
             l10n={{ locale: locale as SupportedLocale }}
             onComplete={onComplete}

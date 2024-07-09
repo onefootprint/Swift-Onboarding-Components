@@ -1,4 +1,4 @@
-import type { FootprintUserData } from '@onefootprint/footprint-js';
+import type { FootprintBootstrapData } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind, identifyFootprintUser } from '@onefootprint/footprint-js';
 import { Button, Container, Divider, PhoneInput, Text, TextInput, createFontStyles } from '@onefootprint/ui';
 import debounce from 'lodash/debounce';
@@ -41,8 +41,8 @@ const Form = ({ onSuccess }: FormProps) => {
     console.log('canceled');
   };
 
-  const getUserData = (): FootprintUserData => {
-    const userData: FootprintUserData = {
+  const getUserData = (): FootprintBootstrapData => {
+    const bootstrapData: FootprintBootstrapData = {
       'id.email': getValues('email'),
       'id.phone_number': getValues('phoneNumber'),
     };
@@ -52,18 +52,18 @@ const Form = ({ onSuccess }: FormProps) => {
       const firstName = names.splice(0, 1)[0];
       const lastName = names.pop();
       const middleName = names.join(' ');
-      userData['id.first_name'] = firstName;
-      userData['id.middle_name'] = middleName;
-      userData['id.last_name'] = lastName;
+      bootstrapData['id.first_name'] = firstName;
+      bootstrapData['id.middle_name'] = middleName;
+      bootstrapData['id.last_name'] = lastName;
     }
 
-    return userData;
+    return bootstrapData;
   };
 
   const showFootprint = () => {
     const component = footprint.init({
       kind: FootprintComponentKind.Verify,
-      userData: getUserData(),
+      bootstrapData: getUserData(),
       publicKey,
       onCancel: handleFootprintCanceled,
       onClose: handleFootprintClosed,
@@ -78,9 +78,9 @@ const Form = ({ onSuccess }: FormProps) => {
   };
 
   const handleChange = async () => {
-    const userData = getUserData();
-    const email = userData['id.email'];
-    const phoneNumber = userData['id.phone_number'];
+    const bootstrapData = getUserData();
+    const email = bootstrapData['id.email'];
+    const phoneNumber = bootstrapData['id.phone_number'];
     const isValidUserData = validateUserData(email, phoneNumber);
     if (!isValidUserData) {
       return;

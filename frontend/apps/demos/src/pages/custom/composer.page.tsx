@@ -97,7 +97,7 @@ const handleOpen = () => {
     options: {
       showCompletionPage: true,
     },
-    userData: {
+    bootstrapData: {
       'id.email': 'rafael@onefootprint.com',
     },
     appearance: {
