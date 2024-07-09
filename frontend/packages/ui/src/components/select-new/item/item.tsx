@@ -7,8 +7,8 @@ import { createFontStyles } from '../../../utils';
 import Tooltip from '../../tooltip';
 import type { ItemProps } from '../select-new.types';
 
-const Item = ({ option, size }: ItemProps) => (
-  <StyledItem value={option.value} disabled={option.disabled} size={size}>
+const Item = ({ option, size, isLast, isFirst }: ItemProps) => (
+  <StyledItem value={option.value} disabled={option.disabled} size={size} $isLast={isLast} $isFirst={isFirst}>
     <TextContainer>
       <Select.ItemText>{option.label}</Select.ItemText>
     </TextContainer>
@@ -23,8 +23,8 @@ const Item = ({ option, size }: ItemProps) => (
   </StyledItem>
 );
 
-const StyledItem = styled(Select.Item)<{ size?: string; disabled?: boolean }>`
-  ${({ theme, size, disabled }) => css`
+const StyledItem = styled(Select.Item)<{ size?: string; disabled?: boolean; $isLast?: boolean; $isFirst?: boolean }>`
+  ${({ theme, size, disabled, $isLast, $isFirst }) => css`  
     ${createFontStyles(size === 'compact' ? 'body-4' : 'body-3')};
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     border-radius: calc(${theme.borderRadius.default} - 2px);
@@ -39,6 +39,8 @@ const StyledItem = styled(Select.Item)<{ size?: string; disabled?: boolean }>`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: ${$isLast ? theme.spacing[2] : 0};
+    margin-top: ${$isFirst ? theme.spacing[2] : 0};
 
     &:hover {
       &:not([data-disabled]) {

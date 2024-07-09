@@ -38,4 +38,6 @@ export type ContentProps = {
 export type ItemProps = {
   option: SelectNewOption;
   size?: SelectNewProps['size'];
+  isLast?: boolean;
+  isFirst?: boolean;
 };
