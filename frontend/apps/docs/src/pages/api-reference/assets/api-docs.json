@@ -1197,6 +1197,54 @@
                 ]
             }
         },
+        "/users/{fp_id}/token": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "PublicApi"
+                ],
+                "description": "Create an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTokenRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateTokenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/vault": {
             "get": {
                 "tags": [
@@ -2821,6 +2869,75 @@
                 "required": [
                     "expires_at",
                     "fields",
+                    "token"
+                ]
+            },
+            "CreateTokenRequest": {
+                "type": "object",
+                "properties": {
+                    "fp_bid": {
+                        "description": "The existing business to be linked to this user's onboarding session. Only takes effect when\n onboarding onto a KYB playbook.\n If no `fp_bid` is provided here when onboarding onto a KYB playbook, the user will be asked\n to enter their business information and create a new business.",
+                        "type": "string"
+                    },
+                    "key": {
+                        "description": "Can only be provided when the kind is `onboard`.\n Optionally, the publishable key of the playbook onto which you would like this user to\n onboard. The user will be asked to provide any missing information required by playbook. If\n you provide the key here, you can omit providing it in the frontend Footprint.js SDK\n integration.",
+                        "type": "string"
+                    },
+                    "kind": {
+                        "description": "The kind of token to create.\n - `onboard` creates a token that onboards the user onto a specific playbook, specified by\n   the `key`.\n - `reonboard` creates a token that reonboards the user onto the last playbook that they\n   onboarded onto.\n - `inherit` creates a token that inherits any operation previously requested via the\n   dashboard.\n - `user` simply create a token for the user. A playbook key may be provided directly to the\n   Footprint Verify SDK to trigger onboarding.\n - `update_auth_methods` creates a token that allows the user to update their contact info\n   using the Footprint Auth SDK.\n You can find more information on the options [here](https://docs.onefootprint.com/integrate/user-specific-sessions#step-2-generate-an-auth-token-for-the-user-on-your-backend-token-kinds).",
+                        "type": "string",
+                        "enum": [
+                            "onboard",
+                            "reonboard",
+                            "inherit",
+                            "user",
+                            "update_auth_methods"
+                        ]
+                    },
+                    "limit_auth_methods": {
+                        "description": "Can only be provided when the kind is `update_auth_methods`. The set of auth methods that\n you would like to be allowed to be updated. When not provided, the token allows updating any\n auth method.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "phone",
+                                "passkey",
+                                "email"
+                            ]
+                        }
+                    },
+                    "ttl_min": {
+                        "example": 60,
+                        "description": "Time to live until this token expires, provided in minutes. Defaults to 60 minutes. Must be\n at least 1 minute, at most 1 day",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "required": [
+                    "kind"
+                ]
+            },
+            "CreateTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "description": "The time at which the token (and link) expire",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "link": {
+                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
+                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to\n complete the flow. This is useful to send in an automated message to the end user.",
+                        "type": "string"
+                    },
+                    "token": {
+                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the\n flow. This is useful when you'd like to open a native interface inside your app for the user\n to complete the flow.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "link",
                     "token"
                 ]
             },

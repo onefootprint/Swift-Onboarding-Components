@@ -9,7 +9,6 @@ use api_core::FpResult;
 use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow_request::WorkflowRequest;
-use newtypes::PreviewApi;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::get;
 use paperclip::actix::web;
@@ -24,9 +23,6 @@ pub async fn detail(
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> ApiResponse<api_wire_types::User> {
-    // Low confidence in this being the right future-proof API, so let's gate it
-    let show_requires_additional_info = auth.can_access_preview(&PreviewApi::CreateUserToken);
-
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -37,11 +33,7 @@ pub async fn detail(
         .db_query(move |conn| -> FpResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let mrs = ManualReview::get_active(conn, &sv.id)?;
-            let wfr = if show_requires_additional_info {
-                WorkflowRequest::get_active(conn, &sv.id)?
-            } else {
-                None
-            };
+            let wfr = WorkflowRequest::get_active(conn, &sv.id)?;
             Ok((sv, mrs, wfr))
         })
         .await?;

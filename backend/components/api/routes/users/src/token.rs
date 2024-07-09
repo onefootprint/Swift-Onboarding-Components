@@ -28,7 +28,6 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
-use newtypes::PreviewApi;
 use newtypes::RequestedTokenScope;
 use paperclip::actix::api_v2_operation;
 use paperclip::actix::post;
@@ -36,7 +35,7 @@ use paperclip::actix::web;
 
 #[api_v2_operation(
     description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js's KYC and KYB SDKs to bootstrap a user's onboarding with known information. Re-auth will be required with Footprint. More detailed documentation can be found [here](https://docs.onefootprint.com/integrate/user-specific-sessions).",
-    tags(Users, Preview)
+    tags(Users, PublicApi)
 )]
 #[post("/users/{fp_id}/token")]
 pub async fn post(
@@ -45,7 +44,6 @@ pub async fn post(
     request: OptionalJson<CreateTokenRequest, true>,
     auth: SecretTenantAuthContext,
 ) -> ApiResponse<CreateTokenResponse> {
-    auth.check_preview_guard(PreviewApi::CreateUserToken)?;
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
     let CreateTokenRequest {
         kind,
