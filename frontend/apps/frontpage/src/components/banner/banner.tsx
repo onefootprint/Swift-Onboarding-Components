@@ -1,5 +1,4 @@
 import { sendGTMEvent } from '@next/third-parties/google';
-import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
@@ -7,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { TrackingEventType } from 'src/@types/tracking';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';
+import { GET_FORM_URL, SIGN_UP_URL } from 'src/config/constants';
 import styled, { css } from 'styled-components';
 import FishingPenguin from './components/fishing-penguin';
 
@@ -14,9 +14,6 @@ type BannerProps = {
   title: string;
   imgSrc?: string;
 };
-
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
-const SIGN_UP_URL = `${DASHBOARD_BASE_URL}/authentication/sign-up`;
 
 const sendTrackingEvent = (type: TrackingEventType) => {
   sendGTMEvent({ event: 'buttonClicked', value: type });

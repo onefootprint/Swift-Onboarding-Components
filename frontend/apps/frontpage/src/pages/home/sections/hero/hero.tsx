@@ -1,8 +1,10 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { Box, Button, Container, Stack, Text, createFontStyles, media } from '@onefootprint/ui';
+import { Box, Button, Container, Stack, createFontStyles, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React, { useCallback, useState } from 'react';
+import { GET_FORM_URL, SIGN_UP_URL } from 'src/config/constants';
+
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ContactDialog from 'src/components/contact-dialog';
@@ -14,9 +16,6 @@ import { TrackingEventType } from 'src/@types/tracking';
 import CustomersLogos from './components/customers-logos';
 
 const Screen = dynamic(() => import('./components/screen'));
-
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
-const SIGN_UP_URL = `${DASHBOARD_BASE_URL}/authentication/sign-up`;
 
 const sendTrackingEvent = (type: TrackingEventType) => {
   sendGTMEvent({ event: 'buttonClicked', value: type });

@@ -3,9 +3,9 @@ import React, { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { sendGTMEvent } from '@next/third-parties/google';
-import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { TrackingEventType } from 'src/@types/tracking';
 import ContactDialog from 'src/components/contact-dialog';
+import { GET_FORM_URL, SIGN_UP_URL } from 'src/config/constants';
 import Illustration from './components/illustration';
 
 type CustomBannerProps = {
@@ -16,9 +16,6 @@ type CustomBannerProps = {
   onClickPrimaryButton?: () => void;
   onClickSecondaryButton?: () => void;
 };
-
-const GET_FORM_URL = 'https://getform.io/f/pbygomeb';
-const SIGN_UP_URL = `${DASHBOARD_BASE_URL}/authentication/sign-up`;
 
 const sendTrackingEvent = (type: TrackingEventType) => {
   sendGTMEvent({ event: 'buttonClicked', value: type });
