@@ -1,3 +1,4 @@
+import { CORPORATION_TYPES, COUNTRY_CODES } from './constants';
 import Field from './field';
 import FieldErrors from './field-errors';
 import Form from './form';
@@ -14,6 +15,8 @@ const Fp = {
   Select,
   Label,
   Provider,
+  COUNTRY_CODES,
+  CORPORATION_TYPES,
 };
 
 export default Fp;
